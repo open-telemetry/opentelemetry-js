@@ -24,7 +24,6 @@ import {
   AggregationTemporality,
   AggregationType,
   DataPointType,
-  InstrumentType,
   ScopeMetrics,
 } from '../../src';
 import {
@@ -59,7 +58,6 @@ const testScopeMetrics: ScopeMetrics[] = [
         descriptor: {
           name: 'additionalCounter',
           unit: '',
-          type: InstrumentType.COUNTER,
           description: '',
           valueType: ValueType.INT,
         },
@@ -132,7 +130,7 @@ describe('MetricReader', () => {
       const collectSpy = sinon.spy(producer, 'collect');
 
       await reader.collect({ timeoutMillis: 20 });
-      assert(collectSpy.calledOnce);
+      assert.ok(collectSpy.calledOnce);
       const args = collectSpy.args[0];
       assert.deepStrictEqual(args, [{ timeoutMillis: 20 }]);
 

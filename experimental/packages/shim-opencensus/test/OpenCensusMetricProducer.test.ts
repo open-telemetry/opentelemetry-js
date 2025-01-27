@@ -100,7 +100,6 @@ describe('OpenCensusMetricProducer', () => {
     assert.deepStrictEqual(ocMetric.descriptor, {
       description: 'Test OC description',
       name: 'measure',
-      type: 'COUNTER',
       unit: 'ms',
       valueType: ValueType.DOUBLE,
     });

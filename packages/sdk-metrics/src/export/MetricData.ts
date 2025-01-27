@@ -37,11 +37,6 @@ export interface MetricDescriptor {
   readonly name: string;
   readonly description: string;
   readonly unit: string;
-  /**
-   * @deprecated exporter should avoid depending on the type of the instrument
-   * as their resulting aggregator can be re-mapped with views.
-   */
-  readonly type: InstrumentType;
   readonly valueType: ValueType;
 }
 

@@ -256,7 +256,7 @@ describe('Trace', () => {
           },
         },
       ],
-      instrumentationLibrary: {
+      instrumentationScope: {
         name: 'myLib',
         version: '0.1.0',
         schemaUrl: 'http://url.to.schema',

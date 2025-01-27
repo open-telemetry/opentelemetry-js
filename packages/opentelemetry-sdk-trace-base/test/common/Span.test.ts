@@ -78,7 +78,7 @@ describe('Span', () => {
 
   it('should create a Span instance', () => {
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -93,7 +93,7 @@ describe('Span', () => {
 
   it('should have valid startTime', () => {
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -110,7 +110,7 @@ describe('Span', () => {
 
   it('should have valid endTime', () => {
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -134,7 +134,7 @@ describe('Span', () => {
 
   it('should have a duration', () => {
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -149,7 +149,7 @@ describe('Span', () => {
 
   it('should ensure duration is never negative even if provided with inconsistent times', () => {
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -166,7 +166,7 @@ describe('Span', () => {
 
   it('should have valid event.time', () => {
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -185,7 +185,7 @@ describe('Span', () => {
   it('should have an entered time for event', () => {
     const startTime = Date.now();
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -209,7 +209,7 @@ describe('Span', () => {
     it('should have an entered time for event - ', () => {
       const startTime = Date.now();
       const span = new SpanImpl({
-        scope: tracer.instrumentationLibrary,
+        scope: tracer.instrumentationScope,
         resource: tracer['_resource'],
         context: ROOT_CONTEXT,
         spanContext,
@@ -232,7 +232,7 @@ describe('Span', () => {
 
   it('should get the span context of span', () => {
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -253,7 +253,7 @@ describe('Span', () => {
   describe('isRecording', () => {
     it('should return true when span is not ended', () => {
       const span = new SpanImpl({
-        scope: tracer.instrumentationLibrary,
+        scope: tracer.instrumentationScope,
         resource: tracer['_resource'],
         context: ROOT_CONTEXT,
         spanContext,
@@ -267,7 +267,7 @@ describe('Span', () => {
     });
     it('should return false when span is ended', () => {
       const span = new SpanImpl({
-        scope: tracer.instrumentationLibrary,
+        scope: tracer.instrumentationScope,
         resource: tracer['_resource'],
         context: ROOT_CONTEXT,
         spanContext,
@@ -281,11 +281,36 @@ describe('Span', () => {
     });
   });
 
+  it('should log a warning attempting to add event to ended span', () => {
+    const span = new SpanImpl({
+      scope: tracer.instrumentationScope,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
+      spanContext,
+      name,
+      kind: SpanKind.CLIENT,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
+    span.end();
+
+    const warnStub = sinon.spy(diag, 'warn');
+
+    span.addEvent('oops, too late');
+
+    sinon.assert.calledOnce(warnStub);
+    sinon.assert.calledWith(
+      warnStub,
+      sinon.match(/Cannot execute the operation on ended Span/),
+      sinon.match.instanceOf(Error)
+    );
+  });
+
   describe('setAttribute', () => {
     describe('when default options set', () => {
       it('should set an attribute', () => {
         const span = new SpanImpl({
-          scope: tracer.instrumentationLibrary,
+          scope: tracer.instrumentationScope,
           resource: tracer['_resource'],
           context: ROOT_CONTEXT,
           spanContext,
@@ -307,7 +332,7 @@ describe('Span', () => {
 
       it('should be able to overwrite attributes', () => {
         const span = new SpanImpl({
-          scope: tracer.instrumentationLibrary,
+          scope: tracer.instrumentationScope,
           resource: tracer['_resource'],
           context: ROOT_CONTEXT,
           spanContext,
@@ -336,7 +361,7 @@ describe('Span', () => {
         }).getTracer('default');
 
         const span = new SpanImpl({
-          scope: tracer.instrumentationLibrary,
+          scope: tracer.instrumentationScope,
           resource: tracer['_resource'],
           context: ROOT_CONTEXT,
           spanContext,
@@ -371,7 +396,7 @@ describe('Span', () => {
         }).getTracer('default');
 
         const span = new SpanImpl({
-          scope: tracer.instrumentationLibrary,
+          scope: tracer.instrumentationScope,
           resource: tracer['_resource'],
           context: ROOT_CONTEXT,
           spanContext,
@@ -418,7 +443,7 @@ describe('Span', () => {
 
         it('should truncate value when attributes are passed to the constructor', () => {
           const span = new SpanImpl({
-            scope: tracer.instrumentationLibrary,
+            scope: tracer.instrumentationScope,
             resource: tracer['_resource'],
             context: ROOT_CONTEXT,
             spanContext,
@@ -441,7 +466,7 @@ describe('Span', () => {
         }).getTracer('default');
 
         const span = new SpanImpl({
-          scope: tracer.instrumentationLibrary,
+          scope: tracer.instrumentationScope,
           resource: tracer['_resource'],
           context: ROOT_CONTEXT,
           spanContext,
@@ -481,7 +506,7 @@ describe('Span', () => {
         }).getTracer('default');
 
         const span = new SpanImpl({
-          scope: tracer.instrumentationLibrary,
+          scope: tracer.instrumentationScope,
           resource: tracer['_resource'],
           context: ROOT_CONTEXT,
           spanContext,
@@ -512,7 +537,7 @@ describe('Span', () => {
         }).getTracer('default');
 
         const span = new SpanImpl({
-          scope: tracer.instrumentationLibrary,
+          scope: tracer.instrumentationScope,
           resource: tracer['_resource'],
           context: ROOT_CONTEXT,
           spanContext,
@@ -567,7 +592,7 @@ describe('Span', () => {
         }).getTracer('default');
 
         const span = new SpanImpl({
-          scope: tracer.instrumentationLibrary,
+          scope: tracer.instrumentationScope,
           resource: tracer['_resource'],
           context: ROOT_CONTEXT,
           spanContext,
@@ -610,7 +635,7 @@ describe('Span', () => {
         }).getTracer('default');
 
         const span = new SpanImpl({
-          scope: tracer.instrumentationLibrary,
+          scope: tracer.instrumentationScope,
           resource: tracer['_resource'],
           context: ROOT_CONTEXT,
           spanContext,
@@ -645,7 +670,7 @@ describe('Span', () => {
         }).getTracer('default');
 
         const span = new SpanImpl({
-          scope: tracer.instrumentationLibrary,
+          scope: tracer.instrumentationScope,
           resource: tracer['_resource'],
           context: ROOT_CONTEXT,
           spanContext,
@@ -684,7 +709,7 @@ describe('Span', () => {
         }).getTracer('default');
 
         const span = new SpanImpl({
-          scope: tracer.instrumentationLibrary,
+          scope: tracer.instrumentationScope,
           resource: tracer['_resource'],
           context: ROOT_CONTEXT,
           spanContext,
@@ -743,7 +768,7 @@ describe('Span', () => {
         }).getTracer('default');
 
         const span = new SpanImpl({
-          scope: tracer.instrumentationLibrary,
+          scope: tracer.instrumentationScope,
           resource: tracer['_resource'],
           context: ROOT_CONTEXT,
           spanContext,
@@ -792,7 +817,7 @@ describe('Span', () => {
   describe('setAttributes', () => {
     it('should be able to set multiple attributes', () => {
       const span = new SpanImpl({
-        scope: tracer.instrumentationLibrary,
+        scope: tracer.instrumentationScope,
         resource: tracer['_resource'],
         context: ROOT_CONTEXT,
         spanContext,
@@ -812,7 +837,7 @@ describe('Span', () => {
   describe('addEvent', () => {
     it('should add an event', () => {
       const span = new SpanImpl({
-        scope: tracer.instrumentationLibrary,
+        scope: tracer.instrumentationScope,
         resource: tracer['_resource'],
         context: ROOT_CONTEXT,
         spanContext,
@@ -828,7 +853,7 @@ describe('Span', () => {
 
     it('should sanitize attribute values', () => {
       const span = new SpanImpl({
-        scope: tracer.instrumentationLibrary,
+        scope: tracer.instrumentationScope,
         resource: tracer['_resource'],
         context: ROOT_CONTEXT,
         spanContext,
@@ -851,7 +876,7 @@ describe('Span', () => {
 
   it('should drop extra events', () => {
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -881,7 +906,7 @@ describe('Span', () => {
 
   it('should store the count of dropped events in droppedEventsCount', () => {
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -906,7 +931,7 @@ describe('Span', () => {
     }).getTracer('default');
 
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -925,7 +950,7 @@ describe('Span', () => {
 
   it('should set an error status', () => {
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -947,7 +972,7 @@ describe('Span', () => {
   it('should drop non-string status message', function () {
     const warnStub = sinon.spy(diag, 'warn');
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -973,7 +998,7 @@ describe('Span', () => {
   it('should return ReadableSpan', () => {
     const parentId = '5c1c63257de34c67';
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -995,15 +1020,15 @@ describe('Span', () => {
     assert.deepStrictEqual(span.links, []);
     assert.deepStrictEqual(span.events, []);
 
-    assert.ok(span.instrumentationLibrary);
-    const { name, version } = span.instrumentationLibrary;
+    assert.ok(span.instrumentationScope);
+    const { name, version } = span.instrumentationScope;
     assert.strictEqual(name, 'default');
     assert.strictEqual(version, undefined);
   });
 
   it('should return ReadableSpan with attributes', () => {
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -1032,7 +1057,7 @@ describe('Span', () => {
 
   it('should return ReadableSpan with links', () => {
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -1064,7 +1089,7 @@ describe('Span', () => {
 
   it('should be possible to add a link after span creation', () => {
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -1088,7 +1113,7 @@ describe('Span', () => {
 
   it('should be possible to add multiple links after span creation', () => {
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -1122,7 +1147,7 @@ describe('Span', () => {
 
   it('should return ReadableSpan with events', () => {
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -1160,7 +1185,7 @@ describe('Span', () => {
 
   it('should return ReadableSpan with new status', () => {
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -1187,7 +1212,7 @@ describe('Span', () => {
 
   it('should only end a span once', () => {
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -1204,7 +1229,7 @@ describe('Span', () => {
 
   it('should update name', () => {
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -1223,7 +1248,7 @@ describe('Span', () => {
 
   it('should have ended', () => {
     const span = new SpanImpl({
-      scope: tracer.instrumentationLibrary,
+      scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
       context: ROOT_CONTEXT,
       spanContext,
@@ -1330,7 +1355,7 @@ describe('Span', () => {
       describe(`when exception is (${JSON.stringify(key)})`, () => {
         it('should NOT record an exception', () => {
           const span = new SpanImpl({
-            scope: tracer.instrumentationLibrary,
+            scope: tracer.instrumentationScope,
             resource: tracer['_resource'],
             context: ROOT_CONTEXT,
             spanContext,
@@ -1353,7 +1378,7 @@ describe('Span', () => {
       });
       it('should record an exception', () => {
         const span = new SpanImpl({
-          scope: tracer.instrumentationLibrary,
+          scope: tracer.instrumentationScope,
           resource: tracer['_resource'],
           context: ROOT_CONTEXT,
           spanContext,
@@ -1389,7 +1414,7 @@ describe('Span', () => {
         const error: Exception = errorObj.obj;
         it('should record an exception', () => {
           const span = new SpanImpl({
-            scope: tracer.instrumentationLibrary,
+            scope: tracer.instrumentationScope,
             resource: tracer['_resource'],
             context: ROOT_CONTEXT,
             spanContext,
@@ -1422,7 +1447,7 @@ describe('Span', () => {
     describe('when time is provided', () => {
       it('should record an exception with provided time', () => {
         const span = new SpanImpl({
-          scope: tracer.instrumentationLibrary,
+          scope: tracer.instrumentationScope,
           resource: tracer['_resource'],
           context: ROOT_CONTEXT,
           spanContext,
@@ -1443,7 +1468,7 @@ describe('Span', () => {
     describe('when exception code is numeric', () => {
       it('should record an exception with string value', () => {
         const span = new SpanImpl({
-          scope: tracer.instrumentationLibrary,
+          scope: tracer.instrumentationScope,
           resource: tracer['_resource'],
           context: ROOT_CONTEXT,
           spanContext,
@@ -1464,7 +1489,7 @@ describe('Span', () => {
     describe('when attributes are specified', () => {
       it('should store specified attributes', () => {
         const span = new SpanImpl({
-          scope: tracer.instrumentationLibrary,
+          scope: tracer.instrumentationScope,
           resource: tracer['_resource'],
           context: ROOT_CONTEXT,
           spanContext,

@@ -29,7 +29,7 @@ import {
   TraceState,
 } from '@opentelemetry/api';
 import {
-  InstrumentationLibrary,
+  InstrumentationScope,
   sanitizeAttributes,
   suppressTracing,
 } from '@opentelemetry/core';
@@ -181,7 +181,7 @@ describe('Tracer', () => {
     assert.strictEqual(span.spanContext().traceState, traceState);
   });
 
-  it('should have an instrumentationLibrary', () => {
+  it('should have an instrumentationScope', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       {},
@@ -189,7 +189,7 @@ describe('Tracer', () => {
       tracerProvider['_activeSpanProcessor']
     );
 
-    const lib: InstrumentationLibrary = tracer.instrumentationLibrary;
+    const lib: InstrumentationScope = tracer.instrumentationScope;
 
     assert.strictEqual(lib.name, 'default');
     assert.strictEqual(lib.version, '0.0.1');
@@ -385,7 +385,7 @@ describe('Tracer', () => {
     assert.strictEqual(
       tracer.startActiveSpan('my-span', span => {
         try {
-          assert(spy.calledWith('my-span'));
+          assert.ok(spy.calledWith('my-span'));
           assert.strictEqual(trace.getSpan(context.active()), span);
           return 1;
         } finally {
@@ -412,7 +412,9 @@ describe('Tracer', () => {
         { attributes: { foo: 'bar' } },
         span => {
           try {
-            assert(spy.calledWith('my-span', { attributes: { foo: 'bar' } }));
+            assert.ok(
+              spy.calledWith('my-span', { attributes: { foo: 'bar' } })
+            );
             assert.strictEqual(trace.getSpan(context.active()), span);
             return 1;
           } finally {
@@ -445,7 +447,7 @@ describe('Tracer', () => {
         ctx,
         span => {
           try {
-            assert(
+            assert.ok(
               spy.calledWith('my-span', { attributes: { foo: 'bar' } }, ctx)
             );
             assert.strictEqual(trace.getSpan(context.active()), span);

@@ -78,10 +78,10 @@
     "karma-webpack": "5.0.1",
     "lerna": "6.6.2",
     "mocha": "10.8.2",
-    "nyc": "15.1.0",
+    "nyc": "17.1.0",
     "sinon": "15.1.2",
-    "ts-loader": "9.5.1",
-    "typescript": "4.4.4",
+    "ts-loader": "9.5.2",
+    "typescript": "5.0.4",
     "webpack": "5.96.1"
   },
   "peerDependencies": {

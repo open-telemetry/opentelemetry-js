@@ -74,7 +74,7 @@ describe('PrometheusSerializer', () => {
   describe('constructor', () => {
     it('should construct a serializer', () => {
       const serializer = new PrometheusSerializer();
-      assert(serializer instanceof PrometheusSerializer);
+      assert.ok(serializer instanceof PrometheusSerializer);
     });
   });
 
@@ -107,7 +107,7 @@ describe('PrometheusSerializer', () => {
 
         const result = serializer['_serializeSingularDataPoint'](
           metric.descriptor.name,
-          metric.descriptor.type,
+          metric,
           pointData[0]
         );
         return result;
@@ -162,7 +162,7 @@ describe('PrometheusSerializer', () => {
 
         const result = serializer['_serializeHistogramDataPoint'](
           metric.descriptor.name,
-          metric.descriptor.type,
+          metric,
           pointData[0]
         );
         return result;
@@ -511,7 +511,7 @@ describe('PrometheusSerializer', () => {
       } else {
         const result = serializer['_serializeSingularDataPoint'](
           metric.descriptor.name,
-          metric.descriptor.type,
+          metric,
           pointData[0]
         );
         return result;
@@ -598,7 +598,7 @@ describe('PrometheusSerializer', () => {
 
       const result = serializer['_serializeSingularDataPoint'](
         metric.descriptor.name,
-        metric.descriptor.type,
+        metric,
         pointData[0]
       );
       return result;

@@ -35,7 +35,7 @@ import {
   getTimeOrigin,
   hrTime,
   hrTimeDuration,
-  InstrumentationLibrary,
+  InstrumentationScope,
   isAttributeValue,
   isTimeInput,
   isTimeInputHrTime,
@@ -62,7 +62,7 @@ export type Span = APISpan & ReadableSpan;
 
 interface SpanOptions {
   resource: IResource;
-  scope: InstrumentationLibrary;
+  scope: InstrumentationScope;
   context: Context;
   spanContext: SpanContext;
   name: string;
@@ -89,7 +89,7 @@ export class SpanImpl implements Span {
   readonly events: TimedEvent[] = [];
   readonly startTime: HrTime;
   readonly resource: IResource;
-  readonly instrumentationLibrary: InstrumentationLibrary;
+  readonly instrumentationScope: InstrumentationScope;
 
   private _droppedAttributesCount = 0;
   private _droppedEventsCount: number = 0;
@@ -132,7 +132,7 @@ export class SpanImpl implements Span {
     this.links = opts.links || [];
     this.startTime = this._getTime(opts.startTime ?? now);
     this.resource = opts.resource;
-    this.instrumentationLibrary = opts.scope;
+    this.instrumentationScope = opts.scope;
 
     if (opts.attributes != null) {
       this.setAttributes(opts.attributes);
@@ -369,8 +369,13 @@ export class SpanImpl implements Span {
 
   private _isSpanEnded(): boolean {
     if (this._ended) {
+      const error = new Error(
+        `Operation attempted on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`
+      );
+
       diag.warn(
-        `Can not execute the operation on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`
+        `Cannot execute the operation on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`,
+        error
       );
     }
     return this._ended;
