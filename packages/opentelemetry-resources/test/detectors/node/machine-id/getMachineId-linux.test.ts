@@ -60,7 +60,7 @@ describe('getMachineId on linux', () => {
 
     const machineId = await getMachineId();
 
-    assert.equal(machineId, undefined);
+    assert.strictEqual(machineId, undefined);
     assert.equal(stub.callCount, 2);
   });
 });
