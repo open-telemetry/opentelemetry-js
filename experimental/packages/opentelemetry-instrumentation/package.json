@@ -74,7 +74,6 @@
     "@types/shimmer": "^1.2.0",
     "import-in-the-middle": "^1.8.1",
     "require-in-the-middle": "^7.1.1",
-    "semver": "^7.5.2",
     "shimmer": "^1.2.1"
   },
   "peerDependencies": {
