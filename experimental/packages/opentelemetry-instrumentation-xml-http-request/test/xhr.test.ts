@@ -134,28 +134,37 @@ const postData = (
 
 function createResource(resource = {}): PerformanceResourceTiming {
   const defaultResource = {
-    connectEnd: 15,
-    connectStart: 13,
-    decodedBodySize: 0,
-    domainLookupEnd: 12,
-    domainLookupStart: 11,
-    encodedBodySize: 0,
-    fetchStart: 10.1,
-    initiatorType: 'xmlhttprequest',
-    nextHopProtocol: '',
-    redirectEnd: 0,
-    redirectStart: 0,
-    requestStart: 16,
-    responseEnd: 20.5,
-    responseStart: 17,
-    secureConnectionStart: 14,
-    transferSize: 0,
-    workerStart: 0,
-    duration: 0,
-    entryType: '',
+    entryType: 'resource',
     name: '',
-    startTime: 0,
+    initiatorType: 'xmlhttprequest',
+    startTime: 10.1,
+    redirectStart: 0,
+    redirectEnd: 0,
+    workerStart: 0,
+    fetchStart: 10.1,
+    domainLookupStart: 11,
+    domainLookupEnd: 12,
+    connectStart: 13,
+    secureConnectionStart: 0,
+    connectEnd: 15,
+    requestStart: 16,
+    responseStart: 17,
+    responseEnd: 20.5,
+    duration: 10.4,
+    decodedBodySize: 30,
+    encodedBodySize: 30,
+    transferSize: 0,
+    nextHopProtocol: '',
   };
+
+  if (
+    'name' in resource &&
+    typeof resource.name === 'string' &&
+    resource.name.startsWith('https:')
+  ) {
+    defaultResource.secureConnectionStart = 14;
+  }
+
   return Object.assign(
     {},
     defaultResource,
@@ -166,7 +175,7 @@ function createResource(resource = {}): PerformanceResourceTiming {
 function createMainResource(resource = {}): PerformanceResourceTiming {
   const mainResource: any = createResource(resource);
   Object.keys(mainResource).forEach((key: string) => {
-    if (typeof mainResource[key] === 'number') {
+    if (typeof mainResource[key] === 'number' && mainResource[key] !== 0) {
       mainResource[key] = mainResource[key] + 30;
     }
   });
@@ -424,7 +433,7 @@ describe('xhr', () => {
           ] as number;
           assert.strictEqual(
             responseContentLength,
-            30,
+            60,
             `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
           );
           assert.strictEqual(
@@ -868,7 +877,7 @@ describe('xhr', () => {
             ] as number;
             assert.strictEqual(
               responseContentLength,
-              30,
+              60,
               `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
             );
           });
@@ -1052,7 +1061,7 @@ describe('xhr', () => {
             ] as number;
             assert.strictEqual(
               responseContentLength,
-              0,
+              30,
               `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
             );
             assert.strictEqual(
@@ -1622,7 +1631,7 @@ describe('xhr', () => {
           ] as number;
           assert.strictEqual(
             responseContentLength,
-            30,
+            60,
             `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
           );
           assert.strictEqual(
@@ -2236,7 +2245,7 @@ describe('xhr', () => {
             ] as number;
             assert.strictEqual(
               responseContentLength,
-              0,
+              30,
               `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
             );
             assert.strictEqual(
