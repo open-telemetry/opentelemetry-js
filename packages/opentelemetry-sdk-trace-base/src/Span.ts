@@ -179,13 +179,18 @@ export class SpanImpl implements Span {
   /**
    *
    * @param name Span Name
-   * @param [attributesOrStartTime] Span attributes or start time
-   *     if type is {@type TimeInput} and 3rd param is undefined
+   * @param [attributes] Span attributes for the event
    * @param [timeStamp] Specified time stamp for the event
    */
+  addEvent(name: string, timeStamp?: TimeInput): this;
   addEvent(
     name: string,
-    attributesOrStartTime?: Attributes | TimeInput,
+    attributes: Attributes | undefined,
+    timeStamp?: TimeInput
+  ): this;
+  addEvent(
+    name: string,
+    attributesOrTimestamp?: Attributes | TimeInput,
     timeStamp?: TimeInput
   ): this {
     if (this._isSpanEnded()) return this;
@@ -202,14 +207,13 @@ export class SpanImpl implements Span {
       this._droppedEventsCount++;
     }
 
-    if (isTimeInput(attributesOrStartTime)) {
-      if (!isTimeInput(timeStamp)) {
-        timeStamp = attributesOrStartTime;
-      }
-      attributesOrStartTime = undefined;
-    }
+    let attributes: Attributes | undefined = undefined;
 
-    const attributes = sanitizeAttributes(attributesOrStartTime);
+    if (isTimeInput(attributesOrTimestamp)) {
+      timeStamp = attributesOrTimestamp;
+    } else {
+      attributes = sanitizeAttributes(attributesOrTimestamp);
+    }
 
     this.events.push({
       name,
