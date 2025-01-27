@@ -19,127 +19,6 @@
 //----------------------------------------------------------------------------------------------------------
 
 /**
- * Rate-limiting result, shows whether the lease was acquired or contains a rejection reason
- * 
- * @example acquired
- * @example request_canceled
- */
-export const ATTR_ASPNETCORE_RATE_LIMITING_RESULT = 'aspnetcore.rate_limiting.result' as const;
-
-/**
-  * Enum value "acquired" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
-  */
-export const ASPNETCORE_RATE_LIMITING_RESULT_VALUE_ACQUIRED = "acquired" as const;
-
-/**
-  * Enum value "endpoint_limiter" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
-  */
-export const ASPNETCORE_RATE_LIMITING_RESULT_VALUE_ENDPOINT_LIMITER = "endpoint_limiter" as const;
-
-/**
-  * Enum value "global_limiter" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
-  */
-export const ASPNETCORE_RATE_LIMITING_RESULT_VALUE_GLOBAL_LIMITER = "global_limiter" as const;
-
-/**
-  * Enum value "request_canceled" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
-  */
-export const ASPNETCORE_RATE_LIMITING_RESULT_VALUE_REQUEST_CANCELED = "request_canceled" as const;
-
-/**
- * The language of the telemetry SDK.
- */
-export const ATTR_TELEMETRY_SDK_LANGUAGE = 'telemetry.sdk.language' as const;
-
-/**
-  * Enum value "cpp" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
-export const TELEMETRY_SDK_LANGUAGE_VALUE_CPP = "cpp" as const;
-
-/**
-  * Enum value "dotnet" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
-export const TELEMETRY_SDK_LANGUAGE_VALUE_DOTNET = "dotnet" as const;
-
-/**
-  * Enum value "erlang" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
-export const TELEMETRY_SDK_LANGUAGE_VALUE_ERLANG = "erlang" as const;
-
-/**
-  * Enum value "go" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
-export const TELEMETRY_SDK_LANGUAGE_VALUE_GO = "go" as const;
-
-/**
-  * Enum value "java" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
-export const TELEMETRY_SDK_LANGUAGE_VALUE_JAVA = "java" as const;
-
-/**
-  * Enum value "nodejs" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
-export const TELEMETRY_SDK_LANGUAGE_VALUE_NODEJS = "nodejs" as const;
-
-/**
-  * Enum value "php" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
-export const TELEMETRY_SDK_LANGUAGE_VALUE_PHP = "php" as const;
-
-/**
-  * Enum value "python" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
-export const TELEMETRY_SDK_LANGUAGE_VALUE_PYTHON = "python" as const;
-
-/**
-  * Enum value "ruby" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
-export const TELEMETRY_SDK_LANGUAGE_VALUE_RUBY = "ruby" as const;
-
-/**
-  * Enum value "rust" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
-export const TELEMETRY_SDK_LANGUAGE_VALUE_RUST = "rust" as const;
-
-/**
-  * Enum value "swift" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
-export const TELEMETRY_SDK_LANGUAGE_VALUE_SWIFT = "swift" as const;
-
-/**
-  * Enum value "webjs" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
-export const TELEMETRY_SDK_LANGUAGE_VALUE_WEBJS = "webjs" as const;
-
-/**
- * The name of the telemetry SDK as defined above.
- * 
- * @example opentelemetry
- * 
- * @note The OpenTelemetry SDK **MUST** set the `telemetry.sdk.name` attribute to `opentelemetry`.
- * If another SDK, like a fork or a vendor-provided implementation, is used, this SDK **MUST** set the
- * `telemetry.sdk.name` attribute to the fully-qualified class or module name of this SDK's main entry point
- * or another suitable identifier depending on the language.
- * The identifier `opentelemetry` is reserved and **MUST NOT** be used in this case.
- * All custom identifiers **SHOULD** be stable across different versions of an implementation.
- */
-export const ATTR_TELEMETRY_SDK_NAME = 'telemetry.sdk.name' as const;
-
-/**
- * The version string of the telemetry SDK.
- * 
- * @example 1.2.3
- */
-export const ATTR_TELEMETRY_SDK_VERSION = 'telemetry.sdk.version' as const;
-
-/**
- * Full type name of the [`IExceptionHandler`](https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.diagnostics.iexceptionhandler) implementation that handled the exception.
- * 
- * @example Contoso.MyHandler
- */
-export const ATTR_ASPNETCORE_DIAGNOSTICS_HANDLER_TYPE = 'aspnetcore.diagnostics.handler.type' as const;
-
-/**
  * ASP.NET Core exception middleware handling result
  * 
  * @example handled
@@ -168,6 +47,13 @@ export const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_SKIPPED = "skipped" a
 export const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_UNHANDLED = "unhandled" as const;
 
 /**
+ * Full type name of the [`IExceptionHandler`](https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.diagnostics.iexceptionhandler) implementation that handled the exception.
+ * 
+ * @example Contoso.MyHandler
+ */
+export const ATTR_ASPNETCORE_DIAGNOSTICS_HANDLER_TYPE = 'aspnetcore.diagnostics.handler.type' as const;
+
+/**
  * Rate limiting policy name.
  * 
  * @example fixed
@@ -175,6 +61,34 @@ export const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_UNHANDLED = "unhandle
  * @example token
  */
 export const ATTR_ASPNETCORE_RATE_LIMITING_POLICY = 'aspnetcore.rate_limiting.policy' as const;
+
+/**
+ * Rate-limiting result, shows whether the lease was acquired or contains a rejection reason
+ * 
+ * @example acquired
+ * @example request_canceled
+ */
+export const ATTR_ASPNETCORE_RATE_LIMITING_RESULT = 'aspnetcore.rate_limiting.result' as const;
+
+/**
+  * Enum value "acquired" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
+  */
+export const ASPNETCORE_RATE_LIMITING_RESULT_VALUE_ACQUIRED = "acquired" as const;
+
+/**
+  * Enum value "endpoint_limiter" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
+  */
+export const ASPNETCORE_RATE_LIMITING_RESULT_VALUE_ENDPOINT_LIMITER = "endpoint_limiter" as const;
+
+/**
+  * Enum value "global_limiter" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
+  */
+export const ASPNETCORE_RATE_LIMITING_RESULT_VALUE_GLOBAL_LIMITER = "global_limiter" as const;
+
+/**
+  * Enum value "request_canceled" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
+  */
+export const ASPNETCORE_RATE_LIMITING_RESULT_VALUE_REQUEST_CANCELED = "request_canceled" as const;
 
 /**
  * Flag indicating if request was handled by the application pipeline.
@@ -565,7 +479,7 @@ export const ATTR_NETWORK_PEER_ADDRESS = 'network.peer.address' as const;
 export const ATTR_NETWORK_PEER_PORT = 'network.peer.port' as const;
 
 /**
- * [OSI application layer](https://osi-model.com/application-layer/) or non-OSI equivalent.
+ * [OSI application layer](https://wikipedia.org/wiki/Application_layer) or non-OSI equivalent.
  * 
  * @example amqp
  * @example http
@@ -586,7 +500,7 @@ export const ATTR_NETWORK_PROTOCOL_NAME = 'network.protocol.name' as const;
 export const ATTR_NETWORK_PROTOCOL_VERSION = 'network.protocol.version' as const;
 
 /**
- * [OSI transport layer](https://osi-model.com/transport-layer/) or [inter-process communication method](https://wikipedia.org/wiki/Inter-process_communication).
+ * [OSI transport layer](https://wikipedia.org/wiki/Transport_layer) or [inter-process communication method](https://wikipedia.org/wiki/Inter-process_communication).
  * 
  * @example tcp
  * @example udp
@@ -625,7 +539,7 @@ export const NETWORK_TRANSPORT_VALUE_UDP = "udp" as const;
 export const NETWORK_TRANSPORT_VALUE_UNIX = "unix" as const;
 
 /**
- * [OSI network layer](https://osi-model.com/network-layer/) or non-OSI equivalent.
+ * [OSI network layer](https://wikipedia.org/wiki/Network_layer) or non-OSI equivalent.
  * 
  * @example ipv4
  * @example ipv6
@@ -766,6 +680,92 @@ export const SIGNALR_TRANSPORT_VALUE_SERVER_SENT_EVENTS = "server_sent_events" a
 export const SIGNALR_TRANSPORT_VALUE_WEB_SOCKETS = "web_sockets" as const;
 
 /**
+ * The language of the telemetry SDK.
+ */
+export const ATTR_TELEMETRY_SDK_LANGUAGE = 'telemetry.sdk.language' as const;
+
+/**
+  * Enum value "cpp" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const TELEMETRY_SDK_LANGUAGE_VALUE_CPP = "cpp" as const;
+
+/**
+  * Enum value "dotnet" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const TELEMETRY_SDK_LANGUAGE_VALUE_DOTNET = "dotnet" as const;
+
+/**
+  * Enum value "erlang" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const TELEMETRY_SDK_LANGUAGE_VALUE_ERLANG = "erlang" as const;
+
+/**
+  * Enum value "go" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const TELEMETRY_SDK_LANGUAGE_VALUE_GO = "go" as const;
+
+/**
+  * Enum value "java" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const TELEMETRY_SDK_LANGUAGE_VALUE_JAVA = "java" as const;
+
+/**
+  * Enum value "nodejs" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const TELEMETRY_SDK_LANGUAGE_VALUE_NODEJS = "nodejs" as const;
+
+/**
+  * Enum value "php" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const TELEMETRY_SDK_LANGUAGE_VALUE_PHP = "php" as const;
+
+/**
+  * Enum value "python" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const TELEMETRY_SDK_LANGUAGE_VALUE_PYTHON = "python" as const;
+
+/**
+  * Enum value "ruby" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const TELEMETRY_SDK_LANGUAGE_VALUE_RUBY = "ruby" as const;
+
+/**
+  * Enum value "rust" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const TELEMETRY_SDK_LANGUAGE_VALUE_RUST = "rust" as const;
+
+/**
+  * Enum value "swift" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const TELEMETRY_SDK_LANGUAGE_VALUE_SWIFT = "swift" as const;
+
+/**
+  * Enum value "webjs" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const TELEMETRY_SDK_LANGUAGE_VALUE_WEBJS = "webjs" as const;
+
+/**
+ * The name of the telemetry SDK as defined above.
+ * 
+ * @example opentelemetry
+ * 
+ * @note The OpenTelemetry SDK **MUST** set the `telemetry.sdk.name` attribute to `opentelemetry`.
+ * If another SDK, like a fork or a vendor-provided implementation, is used, this SDK **MUST** set the
+ * `telemetry.sdk.name` attribute to the fully-qualified class or module name of this SDK's main entry point
+ * or another suitable identifier depending on the language.
+ * The identifier `opentelemetry` is reserved and **MUST NOT** be used in this case.
+ * All custom identifiers **SHOULD** be stable across different versions of an implementation.
+ */
+export const ATTR_TELEMETRY_SDK_NAME = 'telemetry.sdk.name' as const;
+
+/**
+ * The version string of the telemetry SDK.
+ * 
+ * @example 1.2.3
+ */
+export const ATTR_TELEMETRY_SDK_VERSION = 'telemetry.sdk.version' as const;
+
+/**
  * The [URI fragment](https://www.rfc-editor.org/rfc/rfc3986#section-3.5) component
  * 
  * @example SemConv
@@ -778,9 +778,29 @@ export const ATTR_URL_FRAGMENT = 'url.fragment' as const;
  * @example https://www.foo.bar/search?q=OpenTelemetry#SemConv
  * @example //localhost
  * 
- * @note For network calls, URL usually has `scheme://host[:port][path][?query][#fragment]` format, where the fragment is not transmitted over HTTP, but if it is known, it **SHOULD** be included nevertheless.
- * `url.full` **MUST NOT** contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case username and password **SHOULD** be redacted and attribute's value **SHOULD** be `https://REDACTED:REDACTED@www.example.com/`.
- * `url.full` **SHOULD** capture the absolute URL when it is available (or can be reconstructed). Sensitive content provided in `url.full` **SHOULD** be scrubbed when instrumentations can identify it.
+ * @note For network calls, URL usually has `scheme://host[:port][path][?query][#fragment]` format, where the fragment
+ * is not transmitted over HTTP, but if it is known, it **SHOULD** be included nevertheless.
+ * 
+ * `url.full` **MUST NOT** contain credentials passed via URL in form of `https://username:password@www.example.com/`.
+ * In such case username and password **SHOULD** be redacted and attribute's value **SHOULD** be `https://REDACTED:REDACTED@www.example.com/`.
+ * 
+ * `url.full` **SHOULD** capture the absolute URL when it is available (or can be reconstructed).
+ * 
+ * Sensitive content provided in `url.full` **SHOULD** be scrubbed when instrumentations can identify it.
+ * 
+ * 
+ * Query string values for the following keys **SHOULD** be redacted by default and replaced by the
+ * value `REDACTED`:
+ * 
+ *   - [`AWSAccessKeyId`](https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html#RESTAuthenticationQueryStringAuth)
+ *   - [`Signature`](https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html#RESTAuthenticationQueryStringAuth)
+ *   - [`sig`](https://learn.microsoft.com/azure/storage/common/storage-sas-overview#sas-token)
+ *   - [`X-Goog-Signature`](https://cloud.google.com/storage/docs/access-control/signed-urls)
+ * 
+ * This list is subject to change over time.
+ * 
+ * When a query string value is redacted, the query string key **SHOULD** still be preserved, e.g.
+ * `https://www.example.com/path?color=blue&sig=REDACTED`.
  */
 export const ATTR_URL_FULL = 'url.full' as const;
 
@@ -799,6 +819,19 @@ export const ATTR_URL_PATH = 'url.path' as const;
  * @example q=OpenTelemetry
  * 
  * @note Sensitive content provided in `url.query` **SHOULD** be scrubbed when instrumentations can identify it.
+ * 
+ * 
+ * Query string values for the following keys **SHOULD** be redacted by default and replaced by the value `REDACTED`:
+ * 
+ *   - [`AWSAccessKeyId`](https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html#RESTAuthenticationQueryStringAuth)
+ *   - [`Signature`](https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html#RESTAuthenticationQueryStringAuth)
+ *   - [`sig`](https://learn.microsoft.com/azure/storage/common/storage-sas-overview#sas-token)
+ *   - [`X-Goog-Signature`](https://cloud.google.com/storage/docs/access-control/signed-urls)
+ * 
+ * This list is subject to change over time.
+ * 
+ * When a query string value is redacted, the query string key **SHOULD** still be preserved, e.g.
+ * `q=OpenTelemetry&sig=REDACTED`.
  */
 export const ATTR_URL_QUERY = 'url.query' as const;
 
