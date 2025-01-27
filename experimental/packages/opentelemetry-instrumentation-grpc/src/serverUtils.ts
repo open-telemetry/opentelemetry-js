@@ -20,6 +20,8 @@
  * error event should be processed.
  */
 
+import { errorMonitor } from 'node:events';
+
 import type {
   ClientReadableStream,
   handleBidiStreamingCall,
@@ -86,7 +88,7 @@ function serverStreamAndBidiHandler<RequestType, ResponseType>(
     endSpan();
   });
 
-  call.on('error', (err: ServiceError) => {
+  call.on(errorMonitor, (err: ServiceError) => {
     if (call[CALL_SPAN_ENDED]) {
       return;
     }

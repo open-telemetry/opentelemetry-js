@@ -29,8 +29,9 @@ const options = {port: 9464};
 const exporter = new PrometheusExporter(options);
 
 // Creates MeterProvider and installs the exporter as a MetricReader
-const meterProvider = new MeterProvider();
-meterProvider.addMetricReader(exporter);
+const meterProvider = new MeterProvider({
+  readers: [exporter],
+});
 const meter = meterProvider.getMeter('example-prometheus');
 
 // Now, start recording data

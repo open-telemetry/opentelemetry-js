@@ -46,12 +46,13 @@ interface OpenCensusMetricProducerOptions {
  *
  * @example
  * ```
- * const meterProvider = new MeterProvider();
  * const reader = new PeriodicExportingMetricReader({
  *   metricProducers: [new OpenCensusMetricProducer()],
  *   exporter: exporter,
  * });
- * meterProvider.addMetricReader(reader);
+ * const meterProvider = new MeterProvider({
+ *   readers: [reader],
+ * });
  * ```
  */
 export class OpenCensusMetricProducer implements MetricProducer {

@@ -395,6 +395,7 @@ export const runTests = (
           bidiStream.write(element);
         });
 
+        assert.strictEqual(bidiStream.listenerCount('error'), 0);
         bidiStream.on('error', (err: ServiceError) => {
           reject(err);
         });
