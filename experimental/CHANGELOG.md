@@ -32,6 +32,7 @@ All notable changes to experimental packages in this project will be documented 
 
 * chore(instrumentation-grpc): remove unused findIndex() function [#5372](https://github.com/open-telemetry/opentelemetry-js/pull/5372) @cjihrig
 * refactor(otlp-exporter-base): remove unnecessary isNaN() checks [#5374](https://github.com/open-telemetry/opentelemetry-js/pull/5374) @cjihrig
+* refactor(exporter-prometheus): remove unnecessary isNaN() check [#5377](https://github.com/open-telemetry/opentelemetry-js/pull/5377) @cjihrig
 
 ## 0.57.0
 
