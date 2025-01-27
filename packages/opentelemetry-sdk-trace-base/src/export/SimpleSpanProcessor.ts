@@ -37,7 +37,7 @@ import { Resource } from '@opentelemetry/resources';
  */
 export class SimpleSpanProcessor implements SpanProcessor {
   private _shutdownOnce: BindOnceFuture<void>;
-  private _pendingExports: Set<Promise<any>>;
+  private _pendingExports: Set<Promise<unknown>>;
 
   constructor(private readonly _exporter: SpanExporter) {
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
@@ -63,7 +63,12 @@ export class SimpleSpanProcessor implements SpanProcessor {
       return;
     }
 
-    this.doExport(span).catch(err => globalErrorHandler(err));
+    const pendingExport = this.doExport(span).catch(err =>
+      globalErrorHandler(err)
+    );
+    // Enqueue this export to the pending list so it can be flushed by the user.
+    this._pendingExports.add(pendingExport);
+    pendingExport.finally(() => this._pendingExports.delete(pendingExport));
   }
 
   private async doExport(span: ReadableSpan): Promise<void> {
@@ -72,17 +77,14 @@ export class SimpleSpanProcessor implements SpanProcessor {
       await (span.resource as Resource).waitForAsyncAttributes?.();
     }
 
-    let exportPromise = internal._export(this._exporter, [span]);
-    // Enqueue this export to the pending list so it can be flushed by the user.
-    this._pendingExports.add(exportPromise);
+    const exportPromise = internal._export(this._exporter, [span]);
 
-    try {
-      const result = await exportPromise;
-      if (result.code !== ExportResultCode.SUCCESS) {
-        throw result.error ?? new Error(`SimpleSpanProcessor: span export failed (status ${result})`);
-      }
-    } finally {
-      this._pendingExports.delete(exportPromise);
+    const result = await exportPromise;
+    if (result.code !== ExportResultCode.SUCCESS) {
+      throw (
+        result.error ??
+        new Error(`SimpleSpanProcessor: span export failed (status ${result})`)
+      );
     }
   }
 

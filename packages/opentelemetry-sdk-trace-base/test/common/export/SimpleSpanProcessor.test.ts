@@ -226,7 +226,7 @@ describe('SimpleSpanProcessor', () => {
       };
       const tracer = provider.getTracer('default');
       const span = new SpanImpl({
-        scope: tracer.instrumentationLibrary,
+        scope: tracer.instrumentationScope,
         resource: tracer['_resource'],
         context: ROOT_CONTEXT,
         spanContext,
