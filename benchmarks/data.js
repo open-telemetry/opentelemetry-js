@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1737997732056,
+  "lastUpdate": 1737997801349,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -24288,6 +24288,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.21%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "199fd8ddd3c1024725bd3d9ffb898a7dffa57bcf",
+          "message": "feat(sdk-trace-web): do not throw when passing extra options (#5357)",
+          "timestamp": "2025-01-27T16:38:27Z",
+          "tree_id": "3cc354807468c5dff50bfcbe050e4eebf3a23a9c",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/199fd8ddd3c1024725bd3d9ffb898a7dffa57bcf"
+        },
+        "date": 1737997800461,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1477193,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 16583,
+            "range": "±0.31%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 846368,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 780110,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
           }
         ]
       }
