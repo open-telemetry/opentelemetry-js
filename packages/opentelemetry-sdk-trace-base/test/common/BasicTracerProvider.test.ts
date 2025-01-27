@@ -21,9 +21,7 @@ import {
   TraceFlags,
   ROOT_CONTEXT,
   TextMapPropagator,
-  TextMapSetter,
   Context,
-  TextMapGetter,
   propagation,
   diag,
 } from '@opentelemetry/api';
@@ -44,11 +42,11 @@ import {
 import { SpanImpl } from '../../src/Span';
 import { MultiSpanProcessor } from '../../src/MultiSpanProcessor';
 
-class DummyPropagator implements TextMapPropagator {
-  inject(context: Context, carrier: any, setter: TextMapSetter<any>): void {
+class DummyPropagator implements TextMapPropagator<unknown> {
+  inject(): void {
     throw new Error('Method not implemented.');
   }
-  extract(context: Context, carrier: any, getter: TextMapGetter<any>): Context {
+  extract(): Context {
     throw new Error('Method not implemented.');
   }
   fields(): string[] {

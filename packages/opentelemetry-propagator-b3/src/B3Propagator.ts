@@ -33,7 +33,7 @@ import { B3InjectEncoding, B3PropagatorConfig } from './types';
  * be implemented as a composite propagator.
  * Based on: https://github.com/openzipkin/b3-propagation
  */
-export class B3Propagator implements TextMapPropagator {
+export class B3Propagator implements TextMapPropagator<unknown> {
   private readonly _b3MultiPropagator: B3MultiPropagator =
     new B3MultiPropagator();
   private readonly _b3SinglePropagator: B3SinglePropagator =
@@ -41,7 +41,7 @@ export class B3Propagator implements TextMapPropagator {
   private readonly _inject: (
     context: Context,
     carrier: unknown,
-    setter: TextMapSetter
+    setter: TextMapSetter<unknown>
   ) => void;
   public readonly _fields: string[];
 
@@ -55,14 +55,22 @@ export class B3Propagator implements TextMapPropagator {
     }
   }
 
-  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
+  inject(
+    context: Context,
+    carrier: unknown,
+    setter: TextMapSetter<unknown>
+  ): void {
     if (isTracingSuppressed(context)) {
       return;
     }
     this._inject(context, carrier, setter);
   }
 
-  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
+  extract(
+    context: Context,
+    carrier: unknown,
+    getter: TextMapGetter<unknown>
+  ): Context {
     const header = getter.get(carrier, B3_CONTEXT_HEADER);
     const b3Context = Array.isArray(header) ? header[0] : header;
 

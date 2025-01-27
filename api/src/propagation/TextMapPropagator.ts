@@ -22,13 +22,36 @@ import { Context } from '../context/types';
  * HTTP Header Field semantics. Values are often encoded as RPC/HTTP request
  * headers.
  *
- * The carrier of propagated data on both the client (injector) and server
- * (extractor) side is usually an object such as http headers. Propagation is
- * usually implemented via library-specific request interceptors, where the
- * client-side injects values and the server-side extracts them.
+ * Propagation is usually implemented via library-specific request
+ * interceptors, where the client-side injects values and the server-side
+ * extracts them.
+ *
+ * @template Carrier **It is strongly recommended to set the `Carrier` type
+ * parameter to `unknown`, as it is the only correct type here.**
+ *
+ * The carrier is the medium for communicating propagated data between the
+ * client (injector) and server (extractor) side, such as HTTP headers. To
+ * work with `TextMapPropagator`, the carrier type must semantically function
+ * as an abstract map data structure, supporting string keys and values.
+ *
+ * This type parameter exists on the interface for historical reasons. While
+ * it may be suggest that implementors have a choice over what type of carrier
+ * medium it accepts, this is not true in practice.
+ *
+ * The propagator API is designed to be called by participating code around the
+ * various transport layers (such as the `fetch` instrumentation on the browser
+ * client, or integration with the HTTP server library on the backend), and it
+ * is these callers that ultimately controls what carrier type your propagator
+ * is called with.
+ *
+ * Therefore, a correct implementation of this interface must treat the carrier
+ * as an opaque value, and only work with it using the provided getter/setter.
  *
  * @since 1.0.0
  */
+// TODO: move this generic parameter into the methods in API 2.0 and remove
+// the default to `any`
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface TextMapPropagator<Carrier = any> {
   /**
    * Injects values from a given `Context` into a carrier.
@@ -38,10 +61,10 @@ export interface TextMapPropagator<Carrier = any> {
    *
    * @param context the Context from which to extract values to transmit over
    *     the wire.
-   * @param carrier the carrier of propagation fields, such as http request
+   * @param carrier the carrier of propagation fields, such as HTTP request
    *     headers.
-   * @param setter an optional {@link TextMapSetter}. If undefined, values will be
-   *     set by direct object assignment.
+   * @param setter a {@link TextMapSetter} guaranteed to work with the given
+   *     carrier, implementors must use this to set values on the carrier.
    */
   inject(
     context: Context,
@@ -56,10 +79,10 @@ export interface TextMapPropagator<Carrier = any> {
    *
    * @param context the Context from which to extract values to transmit over
    *     the wire.
-   * @param carrier the carrier of propagation fields, such as http request
+   * @param carrier the carrier of propagation fields, such as HTTP request
    *     headers.
-   * @param getter an optional {@link TextMapGetter}. If undefined, keys will be all
-   *     own properties, and keys will be accessed by direct object access.
+   * @param getter a {@link TextMapGetter} guaranteed to work with the given
+   *     carrier, implementors must use this to read values from the carrier.
    */
   extract(
     context: Context,
@@ -79,6 +102,8 @@ export interface TextMapPropagator<Carrier = any> {
  *
  * @since 1.0.0
  */
+// TODO: remove the default to `any` in API 2.0
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface TextMapSetter<Carrier = any> {
   /**
    * Callback used to set a key/value pair on an object.
@@ -99,6 +124,8 @@ export interface TextMapSetter<Carrier = any> {
  *
  * @since 1.0.0
  */
+// TODO: remove the default to `any` in API 2.0
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface TextMapGetter<Carrier = any> {
   /**
    * Get a list of all keys available on the carrier.

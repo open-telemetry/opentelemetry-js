@@ -46,12 +46,19 @@ function parseHeader(header: unknown) {
   return Array.isArray(header) ? header[0] : header;
 }
 
-function getHeaderValue(carrier: unknown, getter: TextMapGetter, key: string) {
+function getHeaderValue<Carrier>(
+  carrier: Carrier,
+  getter: TextMapGetter<Carrier>,
+  key: string
+) {
   const header = getter.get(carrier, key);
   return parseHeader(header);
 }
 
-function getTraceId(carrier: unknown, getter: TextMapGetter): string {
+function getTraceId<Carrier>(
+  carrier: Carrier,
+  getter: TextMapGetter<Carrier>
+): string {
   const traceId = getHeaderValue(carrier, getter, X_B3_TRACE_ID);
   if (typeof traceId === 'string') {
     return traceId.padStart(32, '0');
@@ -59,7 +66,10 @@ function getTraceId(carrier: unknown, getter: TextMapGetter): string {
   return '';
 }
 
-function getSpanId(carrier: unknown, getter: TextMapGetter): string {
+function getSpanId<Carrier>(
+  carrier: Carrier,
+  getter: TextMapGetter<Carrier>
+): string {
   const spanId = getHeaderValue(carrier, getter, X_B3_SPAN_ID);
   if (typeof spanId === 'string') {
     return spanId;
@@ -67,14 +77,17 @@ function getSpanId(carrier: unknown, getter: TextMapGetter): string {
   return '';
 }
 
-function getDebug(carrier: unknown, getter: TextMapGetter): string | undefined {
+function getDebug<Carrier>(
+  carrier: Carrier,
+  getter: TextMapGetter<Carrier>
+): string | undefined {
   const debug = getHeaderValue(carrier, getter, X_B3_FLAGS);
   return debug === '1' ? '1' : undefined;
 }
 
-function getTraceFlags(
+function getTraceFlags<Carrier>(
   carrier: unknown,
-  getter: TextMapGetter
+  getter: TextMapGetter<Carrier>
 ): TraceFlags | undefined {
   const traceFlags = getHeaderValue(carrier, getter, X_B3_SAMPLED);
   const debug = getDebug(carrier, getter);
@@ -92,8 +105,12 @@ function getTraceFlags(
  * Propagator for the B3 multiple-header HTTP format.
  * Based on: https://github.com/openzipkin/b3-propagation
  */
-export class B3MultiPropagator implements TextMapPropagator {
-  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
+export class B3MultiPropagator implements TextMapPropagator<unknown> {
+  inject(
+    context: Context,
+    carrier: unknown,
+    setter: TextMapSetter<unknown>
+  ): void {
     const spanContext = trace.getSpanContext(context);
     if (
       !spanContext ||
@@ -122,7 +139,11 @@ export class B3MultiPropagator implements TextMapPropagator {
     }
   }
 
-  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
+  extract(
+    context: Context,
+    carrier: unknown,
+    getter: TextMapGetter<unknown>
+  ): Context {
     const traceId = getTraceId(carrier, getter);
     const spanId = getSpanId(carrier, getter);
     const traceFlags = getTraceFlags(carrier, getter) as TraceFlags;
