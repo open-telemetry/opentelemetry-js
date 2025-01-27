@@ -22,7 +22,7 @@ npm install --save @opentelemetry/instrumentation-http
 
 ## Usage
 
-OpenTelemetry HTTP Instrumentation allows the user to automatically collect trace data and export them to their backend of choice, to give observability to distributed systems.
+OpenTelemetry HTTP Instrumentation allows the user to automatically collect telemetry and export it to their backend of choice, to give observability to distributed systems.
 
 To load a specific instrumentation (HTTP in this case), specify it in the Node Tracer's configuration.
 
