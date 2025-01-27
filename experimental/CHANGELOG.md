@@ -29,6 +29,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
+* refactor(otlp-exporter-base): remove unnecessary isNaN() checks [#5374](https://github.com/open-telemetry/opentelemetry-js/pull/5374) @cjihrig
+
 ## 0.57.0
 
 ### :rocket: (Enhancement)
