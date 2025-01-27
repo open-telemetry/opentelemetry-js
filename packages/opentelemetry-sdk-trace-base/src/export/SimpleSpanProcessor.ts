@@ -77,9 +77,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
       await (span.resource as Resource).waitForAsyncAttributes?.();
     }
 
-    const exportPromise = internal._export(this._exporter, [span]);
-
-    const result = await exportPromise;
+    const result = await internal._export(this._exporter, [span]);
     if (result.code !== ExportResultCode.SUCCESS) {
       throw (
         result.error ??
