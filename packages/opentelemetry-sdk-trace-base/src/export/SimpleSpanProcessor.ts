@@ -20,7 +20,6 @@ import {
   ExportResultCode,
   globalErrorHandler,
   BindOnceFuture,
-  ExportResult,
 } from '@opentelemetry/core';
 import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
@@ -38,7 +37,7 @@ import { Resource } from '@opentelemetry/resources';
  */
 export class SimpleSpanProcessor implements SpanProcessor {
   private _shutdownOnce: BindOnceFuture<void>;
-  private _pendingExports: Set<Promise<void>>;
+  private _pendingExports: Set<Promise<any>>;
 
   constructor(private readonly _exporter: SpanExporter) {
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
@@ -64,39 +63,26 @@ export class SimpleSpanProcessor implements SpanProcessor {
       return;
     }
 
-    let exportPromise: Promise<void> | undefined = undefined;
+    this.doExport(span).catch(err => globalErrorHandler(err));
+  }
 
-    const doExport = () =>
-      internal
-        ._export(this._exporter, [span])
-        .then((result: ExportResult) => {
-          if (exportPromise) {
-            this._pendingExports.delete(exportPromise);
-          }
-          if (result.code !== ExportResultCode.SUCCESS) {
-            globalErrorHandler(
-              result.error ??
-                new Error(
-                  `SimpleSpanProcessor: span export failed (status ${result})`
-                )
-            );
-          }
-        })
-        .catch(error => {
-          globalErrorHandler(error);
-        });
-
+  private async doExport(span: ReadableSpan): Promise<void> {
     if (span.resource.asyncAttributesPending) {
-      exportPromise = (span.resource as Resource)
-        .waitForAsyncAttributes?.()
-        .then(doExport, err => globalErrorHandler(err));
-    } else {
-      exportPromise = doExport();
+      // Ensure resource is fully resolved before exporting.
+      await (span.resource as Resource).waitForAsyncAttributes?.();
     }
 
-    // store the unresolved exports
-    if (exportPromise) {
-      this._pendingExports.add(exportPromise);
+    let exportPromise = internal._export(this._exporter, [span]);
+    // Enqueue this export to the pending list so it can be flushed by the user.
+    this._pendingExports.add(exportPromise);
+
+    try {
+      const result = await exportPromise;
+      if (result.code !== ExportResultCode.SUCCESS) {
+        throw result.error ?? new Error(`SimpleSpanProcessor: span export failed (status ${result})`);
+      }
+    } finally {
+      this._pendingExports.delete(exportPromise);
     }
   }
 
