@@ -22,7 +22,7 @@ import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
 describe('NoopLogger', () => {
   it('constructor should not crash', () => {
     const logger = new NoopLoggerProvider().getLogger('test-noop');
-    assert(logger instanceof NoopLogger);
+    assert.ok(logger instanceof NoopLogger);
   });
 
   it('calling emit should not crash', () => {

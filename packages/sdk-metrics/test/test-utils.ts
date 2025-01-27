@@ -44,5 +44,5 @@ export async function assertRejects(
       throw err;
     }, expected);
   }
-  assert(rejected, 'Promise not rejected');
+  assert.ok(rejected, 'Promise not rejected');
 }

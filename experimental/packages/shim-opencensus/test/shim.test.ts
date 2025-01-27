@@ -33,7 +33,7 @@ describe('shim', () => {
       installShim();
       const { CoreTracer } = require('@opencensus/core');
       assert.notStrictEqual(CoreTracer, OrigCoreTracer);
-      assert(new CoreTracer() instanceof ShimTracer);
+      assert.ok(new CoreTracer() instanceof ShimTracer);
     });
 
     it('should use the provided Tracer', async () => {
