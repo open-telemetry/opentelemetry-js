@@ -22,11 +22,7 @@ function parseAndValidateTimeoutFromEnv(
   const envTimeout = process.env[timeoutEnvVar]?.trim();
   if (envTimeout != null && envTimeout !== '') {
     const definedTimeout = Number(envTimeout);
-    if (
-      !Number.isNaN(definedTimeout) &&
-      Number.isFinite(definedTimeout) &&
-      definedTimeout > 0
-    ) {
+    if (Number.isFinite(definedTimeout) && definedTimeout > 0) {
       return definedTimeout;
     }
     diag.warn(
