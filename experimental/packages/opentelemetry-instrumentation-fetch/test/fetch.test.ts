@@ -50,6 +50,7 @@ import {
   SEMATTRS_HTTP_URL,
   SEMATTRS_HTTP_USER_AGENT,
   SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+  ATTR_HTTP_REQUEST_HEADER,
 } from '@opentelemetry/semantic-conventions';
 
 class DummySpanExporter implements tracing.SpanExporter {
@@ -1219,6 +1220,24 @@ describe('fetch', () => {
         responseContentLength,
         30,
         `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
+      );
+    });
+  });
+
+  describe('when request headers are applied as attributes', () => {
+    afterEach(() => {
+      clearData();
+    });
+
+    it('applies request headers supplied in config', async () => {
+      await prepareData(url, () => getData(url), {
+        requestHeadersAsAttributes: ['foo', 'Content-Type'],
+      });
+      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      assert.ok(span.attributes[ATTR_HTTP_REQUEST_HEADER('foo')] === 'bar');
+      assert.ok(
+        span.attributes[ATTR_HTTP_REQUEST_HEADER('Content-Type')] ===
+          'application/json'
       );
     });
   });
