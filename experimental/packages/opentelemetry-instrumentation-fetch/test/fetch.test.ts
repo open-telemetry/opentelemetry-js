@@ -51,7 +51,7 @@ import {
   SEMATTRS_HTTP_USER_AGENT,
   SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
 } from '@opentelemetry/semantic-conventions';
-import { FetchRequestCustomAttributeFunction } from '../src/fetch';
+import { FetchRequestHookFunction } from '../src/fetch';
 
 class DummySpanExporter implements tracing.SpanExporter {
   export(spans: any) {}
@@ -968,7 +968,7 @@ describe('fetch', () => {
   describe('requestHook option', () => {
     const prepare = async (
       url: string,
-      requestHook: FetchRequestCustomAttributeFunction
+      requestHook: FetchRequestHookFunction
     ) => {
       const propagateTraceHeaderCorsUrls = [url];
 

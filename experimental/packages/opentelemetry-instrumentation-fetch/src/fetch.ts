@@ -54,7 +54,7 @@ export interface FetchCustomAttributeFunction {
   ): void;
 }
 
-export interface FetchRequestCustomAttributeFunction {
+export interface FetchRequestHookFunction {
   (span: api.Span, request: Request | RequestInit): void;
 }
 
@@ -79,7 +79,7 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
   /** Function for adding custom attributes on the span */
   applyCustomAttributesOnSpan?: FetchCustomAttributeFunction;
   /** Function for adding custom attributes or headers before the request is handled */
-  requestHook?: FetchRequestCustomAttributeFunction;
+  requestHook?: FetchRequestHookFunction;
   // Ignore adding network events as span events
   ignoreNetworkEvents?: boolean;
   /** Measure outgoing request size */
