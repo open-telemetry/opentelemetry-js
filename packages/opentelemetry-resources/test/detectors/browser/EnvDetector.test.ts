@@ -39,6 +39,7 @@ describeBrowser('envDetector() on web browser', () => {
 
     it('should return resource information from environment variable', async () => {
       const resource = envDetector.detect();
+      assert.ok(resource.attributes);
       assertWebEngineResource(resource, {
         name: 'chromium',
         version: '99',

@@ -35,6 +35,7 @@ describeNode('osDetector() on Node.js', () => {
     sinon.stub(os, 'release').returns('2.2.1(0.289/5/3)');
 
     const resource = osDetector.detect();
+    assert.ok(resource.attributes);
 
     assert.strictEqual(resource.attributes[SEMRESATTRS_OS_TYPE], 'windows');
     assert.strictEqual(
@@ -49,6 +50,7 @@ describeNode('osDetector() on Node.js', () => {
     sinon.stub(os, 'platform').returns('some-unknown-platform');
 
     const resource = osDetector.detect();
+    assert.ok(resource.attributes);
 
     assert.strictEqual(
       resource.attributes[SEMRESATTRS_OS_TYPE],
