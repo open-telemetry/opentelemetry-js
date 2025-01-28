@@ -54,6 +54,10 @@ export interface FetchCustomAttributeFunction {
   ): void;
 }
 
+export interface FetchRequestHookFunction {
+  (span: api.Span, request: Request | RequestInit): void;
+}
+
 /**
  * FetchPlugin Config
  */
@@ -74,6 +78,8 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
   ignoreUrls?: Array<string | RegExp>;
   /** Function for adding custom attributes on the span */
   applyCustomAttributesOnSpan?: FetchCustomAttributeFunction;
+  /** Function for adding custom attributes or headers before the request is handled */
+  requestHook?: FetchRequestHookFunction;
   // Ignore adding network events as span events
   ignoreNetworkEvents?: boolean;
   /** Measure outgoing request size */
@@ -416,6 +422,8 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
             api.trace.setSpan(api.context.active(), createdSpan),
             () => {
               plugin._addHeaders(options, url);
+              // Important to execute "_callRequestHook" after "_addHeaders", allowing the consumer code to override the request headers.
+              plugin._callRequestHook(createdSpan, options);
               plugin._tasksCount++;
               // TypeScript complains about arrow function captured a this typed as globalThis
               // ts(7041)
@@ -451,6 +459,23 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           }
 
           this._diag.error('applyCustomAttributesOnSpan', error);
+        },
+        true
+      );
+    }
+  }
+
+  private _callRequestHook(span: api.Span, request: Request | RequestInit) {
+    const requestHook = this.getConfig().requestHook;
+    if (requestHook) {
+      safeExecuteInTheMiddle(
+        () => requestHook(span, request),
+        error => {
+          if (!error) {
+            return;
+          }
+
+          this._diag.error('requestHook', error);
         },
         true
       );
