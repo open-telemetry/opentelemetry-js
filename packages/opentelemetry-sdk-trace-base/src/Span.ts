@@ -157,9 +157,11 @@ export class SpanImpl implements Span {
       return this;
     }
 
+    const { attributeCountLimit } = this._spanLimits;
+
     if (
-      Object.keys(this.attributes).length >=
-        this._spanLimits.attributeCountLimit! &&
+      attributeCountLimit !== undefined &&
+      Object.keys(this.attributes).length >= attributeCountLimit &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
       this._droppedAttributesCount++;
@@ -189,12 +191,19 @@ export class SpanImpl implements Span {
     timeStamp?: TimeInput
   ): this {
     if (this._isSpanEnded()) return this;
-    if (this._spanLimits.eventCountLimit === 0) {
+
+    const { eventCountLimit } = this._spanLimits;
+
+    if (eventCountLimit === 0) {
       diag.warn('No events allowed.');
       this._droppedEventsCount++;
       return this;
     }
-    if (this.events.length >= this._spanLimits.eventCountLimit!) {
+
+    if (
+      eventCountLimit !== undefined &&
+      this.events.length >= eventCountLimit
+    ) {
       if (this._droppedEventsCount === 0) {
         diag.debug('Dropping extra events.');
       }
