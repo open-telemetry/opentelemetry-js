@@ -39,7 +39,10 @@ import type * as http from 'http';
 import type * as https from 'https';
 import { Socket } from 'net';
 import * as url from 'url';
-import { HttpInstrumentationConfig } from './types';
+import {
+  HttpInstrumentationConfig,
+  StartOutgoingSpanCustomAttributeFunction,
+} from './types';
 import { VERSION } from './version';
 import {
   InstrumentationBase,
@@ -89,6 +92,7 @@ import {
   Https,
   SemconvStability,
 } from './internal-types';
+import { StartIncomingSpanCustomAttributeFunction } from './types';
 
 /**
  * This is by no means general-purpose nor completely safe, but for the purpose
@@ -1065,12 +1069,23 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   }
 
   private _callStartSpanHook(
+    request: http.IncomingMessage,
+    hookFunc: StartIncomingSpanCustomAttributeFunction | undefined
+  ): Attributes;
+  private _callStartSpanHook(
+    request: http.RequestOptions,
+    hookFunc: StartOutgoingSpanCustomAttributeFunction | undefined
+  ): Attributes;
+  private _callStartSpanHook(
     request: http.IncomingMessage | http.RequestOptions,
-    hookFunc: Function | undefined
-  ) {
+    hookFunc:
+      | StartIncomingSpanCustomAttributeFunction
+      | StartOutgoingSpanCustomAttributeFunction
+      | undefined
+  ): Attributes | void {
     if (typeof hookFunc === 'function') {
       return safeExecuteInTheMiddle(
-        () => hookFunc(request),
+        () => hookFunc(request as http.IncomingMessage & http.RequestOptions),
         () => {},
         true
       );
