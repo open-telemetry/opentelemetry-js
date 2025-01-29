@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1738157142862,
+  "lastUpdate": 1738173652958,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -24808,6 +24808,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.27%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "godfreykfc@gmail.com",
+            "name": "Godfrey Chan",
+            "username": "chancancode"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "3c040c4ef0ca372dcab9c76693ea5de3e3e79b52",
+          "message": "fix(inst-fetch,inst-xhr) Ignore network events with zero-timing (#5332)",
+          "timestamp": "2025-01-29T17:49:04Z",
+          "tree_id": "c52941b5ec81921c2d996a447bb864c4981faaae",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/3c040c4ef0ca372dcab9c76693ea5de3e3e79b52"
+        },
+        "date": 1738173651990,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1514201,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 16382,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 839044,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 790869,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
