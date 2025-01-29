@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1737997801349,
+  "lastUpdate": 1738128854663,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -24340,6 +24340,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.39%",
             "unit": "ops/sec",
             "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "serkanozal86@gmail.com",
+            "name": "Serkan ÖZAL",
+            "username": "serkan-ozal"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e42fbb985f791e808553ea95f73cde8b949f6b57",
+          "message": "feat(opentelemetry-instrumentation): replace `semver` package with internal semantic versioning check implementation (#5305)\n\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2025-01-28T22:57:04Z",
+          "tree_id": "b396a66058d46c23b27c5c40daf2bbee72d44b8c",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/e42fbb985f791e808553ea95f73cde8b949f6b57"
+        },
+        "date": 1738128853768,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1557460,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 17003,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 844796,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 789453,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
