@@ -17,7 +17,7 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "engines": {
-    "node": ">=14"
+    "node": "^18.19.0 || >=20.6.0"
   },
   "scripts": {
     "compile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
