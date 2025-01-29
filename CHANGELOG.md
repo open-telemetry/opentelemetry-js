@@ -61,6 +61,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :bug: (Bug Fix)
 
+* fix(exporter-zipkin): remove usages of deprecated `url.parse` from `node:url` [#5390](https://github.com/open-telemetry/opentelemetry-js/pull/5390) @chancancode
 * fix(sdk-metrics): do not export from `PeriodicExportingMetricReader` when there are no metrics to export. [#5288](https://github.com/open-telemetry/opentelemetry-js/pull/5288) @jacksonweber
 
 ### :books: (Refine Doc)
