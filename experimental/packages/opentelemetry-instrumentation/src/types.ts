@@ -84,8 +84,8 @@ export interface InstrumentationModuleFile {
   /** Supported versions for the file.
    *
    * A module version is supported if one of the supportedVersions in the array satisfies the module version.
-   * The syntax of the version is checked with the `satisfies` function of "The semantic versioner for npm", see
-   * [`semver` package](https://www.npmjs.com/package/semver)
+   * The syntax of the version is checked with a function compatible
+   * with [node-semver's `satisfies()` function](https://github.com/npm/node-semver#ranges-1).
    * If the version is not supported, we won't apply instrumentation patch.
    * If omitted, all versions of the module will be patched.
    *
@@ -116,8 +116,8 @@ export interface InstrumentationModuleDefinition {
   /** Supported version of module.
    *
    * A module version is supported if one of the supportedVersions in the array satisfies the module version.
-   * The syntax of the version is checked with the `satisfies` function of "The semantic versioner for npm", see
-   * [`semver` package](https://www.npmjs.com/package/semver)
+   * The syntax of the version is checked with the `satisfies` function of
+   * "The [semantic versioner](https://semver.org) for npm".
    * If the version is not supported, we won't apply instrumentation patch (see `enable` method).
    * If omitted, all versions of the module will be patched.
    *
@@ -135,15 +135,12 @@ export interface InstrumentationModuleDefinition {
   includePrerelease?: boolean;
 
   /** Method to patch the instrumentation  */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  patch?:
-    | ((moduleExports: any, moduleVersion?: string | undefined) => any)
-    | undefined;
+  patch?: // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ((moduleExports: any, moduleVersion?: string | undefined) => any) | undefined;
 
   /** Method to unpatch the instrumentation  */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  unpatch?:
-    | ((moduleExports: any, moduleVersion?: string | undefined) => void)
+  unpatch?: // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  | ((moduleExports: any, moduleVersion?: string | undefined) => void)
     | undefined;
 }
 
