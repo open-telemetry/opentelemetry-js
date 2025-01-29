@@ -46,10 +46,9 @@ function getUrlNormalizingAnchor(): HTMLAnchorElement {
  * @param obj
  * @param key
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function hasKey<O extends object>(
   obj: O,
-  key: keyof any
+  key: PropertyKey
 ): key is keyof O {
   return key in obj;
 }
@@ -67,8 +66,8 @@ export function addSpanNetworkEvent(
   entries: PerformanceEntries,
   refPerfName?: string
 ): api.Span | undefined {
-  let perfTime = undefined;
-  let refTime = undefined;
+  let perfTime: number | undefined;
+  let refTime: number | undefined;
   if (
     hasKey(entries, performanceName) &&
     typeof entries[performanceName] === 'number'
