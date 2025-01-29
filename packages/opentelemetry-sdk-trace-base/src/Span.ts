@@ -369,8 +369,13 @@ export class SpanImpl implements Span {
 
   private _isSpanEnded(): boolean {
     if (this._ended) {
+      const error = new Error(
+        `Operation attempted on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`
+      );
+
       diag.warn(
-        `Can not execute the operation on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`
+        `Cannot execute the operation on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`,
+        error
       );
     }
     return this._ended;

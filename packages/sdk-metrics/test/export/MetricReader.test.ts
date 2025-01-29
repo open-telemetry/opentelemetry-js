@@ -130,7 +130,7 @@ describe('MetricReader', () => {
       const collectSpy = sinon.spy(producer, 'collect');
 
       await reader.collect({ timeoutMillis: 20 });
-      assert(collectSpy.calledOnce);
+      assert.ok(collectSpy.calledOnce);
       const args = collectSpy.args[0];
       assert.deepStrictEqual(args, [{ timeoutMillis: 20 }]);
 
