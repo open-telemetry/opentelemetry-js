@@ -75,7 +75,7 @@ export function addSpanNetworkEvent(
   ) {
     perfTime = entries[performanceName];
   }
-  const refName = refPerfName || PTN.START_TIME;
+  const refName = refPerfName || PTN.FETCH_START;
   // Use a reference time which is the earliest possible value so that the performance timings that are earlier should not be added
   // using FETCH START time in case no reference is provided
   if (hasKey(entries, refName) && typeof entries[refName] === 'number') {

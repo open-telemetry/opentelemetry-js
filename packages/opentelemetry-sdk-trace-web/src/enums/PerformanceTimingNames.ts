@@ -35,7 +35,6 @@ export enum PerformanceTimingNames {
   RESPONSE_END = 'responseEnd',
   RESPONSE_START = 'responseStart',
   SECURE_CONNECTION_START = 'secureConnectionStart',
-  START_TIME = 'startTime',
   UNLOAD_EVENT_END = 'unloadEventEnd',
   UNLOAD_EVENT_START = 'unloadEventStart',
 }
