@@ -89,7 +89,7 @@ export class Resource implements IResource {
     for (let i = 0; i < this._rawAttributes.length; i++) {
       const [k, v] = this._rawAttributes[i];
       try {
-        this._rawAttributes[i] = [k, await v];
+        this._rawAttributes[i] = [k, isPromiseLike(v) ? await v : v];
       } catch (err) {
         diag.debug("a resource's async attributes promise rejected: %s", err);
         this._rawAttributes[i] = [k, undefined];
