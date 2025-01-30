@@ -66,7 +66,7 @@ const XHR_TIMEOUT = 2000;
 const getData = (
   req: XMLHttpRequest,
   url: string,
-  callbackAfterSend: Function,
+  callbackAfterSend: () => void,
   async?: boolean
 ) => {
   // eslint-disable-next-line no-async-promise-executor
@@ -101,7 +101,7 @@ const postData = (
   req: XMLHttpRequest,
   url: string,
   data: Document | XMLHttpRequestBodyInit,
-  callbackAfterSend: Function,
+  callbackAfterSend: () => void,
   async?: boolean
 ) => {
   // eslint-disable-next-line no-async-promise-executor
