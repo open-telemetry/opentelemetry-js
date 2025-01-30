@@ -48,7 +48,7 @@ import {
 } from './protobuf-ts-utils';
 
 const memoryExporter = new InMemorySpanExporter();
-const PROTO_PATH = path.resolve(__dirname, './fixtures/grpc-test.proto');
+const PROTO_PATH = path.resolve(__dirname, '../../test/fixtures/grpc-test.proto');
 const NO_ERROR = grpc.status.UNAUTHENTICATED + 1;
 
 /**

@@ -55,6 +55,8 @@ import * as http from 'http';
 import * as https from 'https';
 import { httpsRequest } from '../utils/httpsRequest';
 
+const fixturesDir = path.resolve(__dirname, '../../../test/fixtures');
+
 const applyCustomAttributesOnSpanErrorMessage =
   'bad applyCustomAttributesOnSpan function';
 
@@ -125,8 +127,8 @@ describe('HttpsInstrumentation', () => {
         instrumentation.enable();
         server = https.createServer(
           {
-            key: fs.readFileSync('test/fixtures/server-key.pem'),
-            cert: fs.readFileSync('test/fixtures/server-cert.pem'),
+            key: fs.readFileSync(path.join(fixturesDir, 'server-key.pem')),
+            cert: fs.readFileSync(path.join(fixturesDir, 'server-cert.pem')),
           },
           (request, response) => {
             response.end('Test Server Response');
@@ -203,8 +205,8 @@ describe('HttpsInstrumentation', () => {
         instrumentation.enable();
         server = https.createServer(
           {
-            key: fs.readFileSync('test/fixtures/server-key.pem'),
-            cert: fs.readFileSync('test/fixtures/server-cert.pem'),
+            key: fs.readFileSync(path.join(fixturesDir, 'server-key.pem')),
+            cert: fs.readFileSync(path.join(fixturesDir, 'server-cert.pem')),
           },
           (request, response) => {
             if (request.url?.includes('/ignored')) {
@@ -717,8 +719,8 @@ describe('HttpsInstrumentation', () => {
         instrumentation.enable();
         server = https.createServer(
           {
-            key: fs.readFileSync('test/fixtures/server-key.pem'),
-            cert: fs.readFileSync('test/fixtures/server-cert.pem'),
+            key: fs.readFileSync(path.join(fixturesDir, 'server-key.pem')),
+            cert: fs.readFileSync(path.join(fixturesDir, 'server-cert.pem')),
           },
           (request, response) => {
             response.end('Test Server Response');
@@ -739,8 +741,8 @@ describe('HttpsInstrumentation', () => {
         instrumentation.enable();
         server = https.createServer(
           {
-            key: fs.readFileSync('test/fixtures/server-key.pem'),
-            cert: fs.readFileSync('test/fixtures/server-cert.pem'),
+            key: fs.readFileSync(path.join(fixturesDir, 'server-key.pem')),
+            cert: fs.readFileSync(path.join(fixturesDir, 'server-cert.pem')),
           },
           (request, response) => {
             response.end('Test Server Response');

@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+const assert = require('assert');
 
-import {
+const {
   InstrumentationBase,
-  InstrumentationConfig,
   InstrumentationNodeModuleDefinition,
   InstrumentationNodeModuleFile,
-} from '../../src';
+} = require('../../build/src');
 
 class TestInstrumentationSimple extends InstrumentationBase {
-  constructor(config: InstrumentationConfig) {
+  constructor(config) {
     super('test-scoped-package-instrumentation', '0.0.1', config);
   }
   init() {

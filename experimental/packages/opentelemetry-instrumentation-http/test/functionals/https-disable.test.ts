@@ -16,6 +16,7 @@
 
 import * as assert from 'assert';
 import * as fs from 'fs';
+import * as path from 'path';
 import type { AddressInfo } from 'net';
 import * as nock from 'nock';
 import * as sinon from 'sinon';
@@ -33,6 +34,8 @@ import {
   trace,
   TracerProvider,
 } from '@opentelemetry/api';
+
+const fixturesDir = path.resolve(__dirname, '../../../test/fixtures');
 
 describe('HttpsInstrumentation', () => {
   let server: https.Server;
@@ -60,8 +63,8 @@ describe('HttpsInstrumentation', () => {
 
       server = https.createServer(
         {
-          key: fs.readFileSync('test/fixtures/server-key.pem'),
-          cert: fs.readFileSync('test/fixtures/server-cert.pem'),
+          key: fs.readFileSync(path.join(fixturesDir, 'server-key.pem')),
+          cert: fs.readFileSync(path.join(fixturesDir, 'server-cert.pem')),
         },
         (request, response) => {
           response.end('Test Server Response');
