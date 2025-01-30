@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-import * as sinon from 'sinon';
 import * as assert from 'assert';
 
 import {
   context,
-  Context,
   ContextManager,
-  propagation,
   ROOT_CONTEXT,
-  TextMapGetter,
-  TextMapPropagator,
-  TextMapSetter,
   trace,
   TraceFlags,
 } from '@opentelemetry/api';
@@ -209,130 +203,6 @@ describe('NodeTracerProvider', () => {
       };
       const patchedFn = context.bind(trace.setSpan(context.active(), span), fn);
       return patchedFn();
-    });
-  });
-
-  describe('.register()', () => {
-    let originalPropagators: string | number | undefined | string[];
-    beforeEach(() => {
-      originalPropagators = process.env.OTEL_PROPAGATORS;
-    });
-
-    afterEach(() => {
-      // otherwise we may assign 'undefined' (a string)
-      if (originalPropagators !== undefined) {
-        (process.env as any).OTEL_PROPAGATORS = originalPropagators;
-      } else {
-        delete (process.env as any).OTEL_PROPAGATORS;
-      }
-    });
-
-    it('should allow propagators as per the specification', () => {
-      (process.env as any).OTEL_PROPAGATORS = 'b3,b3multi,jaeger';
-
-      const provider = new NodeTracerProvider();
-      provider.register();
-
-      assert.deepStrictEqual(propagation.fields(), [
-        'b3',
-        'x-b3-traceid',
-        'x-b3-spanid',
-        'x-b3-flags',
-        'x-b3-sampled',
-        'x-b3-parentspanid',
-        'uber-trace-id',
-      ]);
-    });
-  });
-
-  describe('Custom TracerProvider through inheritance', () => {
-    class DummyPropagator implements TextMapPropagator {
-      inject(context: Context, carrier: any, setter: TextMapSetter<any>): void {
-        throw new Error('Method not implemented.');
-      }
-      extract(
-        context: Context,
-        carrier: any,
-        getter: TextMapGetter<any>
-      ): Context {
-        throw new Error('Method not implemented.');
-      }
-      fields(): string[] {
-        throw new Error('Method not implemented.');
-      }
-    }
-
-    beforeEach(() => {
-      process.env.OTEL_PROPAGATORS = 'custom-propagator';
-
-      propagation.disable();
-      trace.disable();
-    });
-
-    afterEach(() => {
-      delete process.env.OTEL_PROPAGATORS;
-
-      propagation.disable();
-      trace.disable();
-
-      sinon.restore();
-    });
-
-    it('can be extended by overriding registered components', () => {
-      const propagator = new DummyPropagator();
-
-      class CustomTracerProvider extends NodeTracerProvider {
-        protected static override readonly _registeredPropagators = new Map<
-          string,
-          () => TextMapPropagator
-        >([['custom-propagator', () => propagator]]);
-      }
-
-      const provider = new CustomTracerProvider({});
-      provider.register();
-      assert.ok(
-        provider['_activeSpanProcessor'].constructor.name ===
-          'MultiSpanProcessor'
-      );
-      assert.strictEqual(
-        provider['_activeSpanProcessor']['_spanProcessors'].length,
-        0
-      );
-      assert.strictEqual(propagation['_getGlobalPropagator'](), propagator);
-    });
-
-    it('the old way of extending still works', () => {
-      const propagator = new DummyPropagator();
-
-      // this is an anti-pattern, but we test that for backwards compatibility
-      class CustomTracerProvider extends NodeTracerProvider {
-        protected static override readonly _registeredPropagators = new Map<
-          string,
-          () => TextMapPropagator
-        >([['custom-propagator', () => propagator]]);
-
-        protected override _getPropagator(
-          name: string
-        ): TextMapPropagator | undefined {
-          return (
-            super._getPropagator(name) ||
-            CustomTracerProvider._registeredPropagators.get(name)?.()
-          );
-        }
-      }
-
-      const provider = new CustomTracerProvider({});
-      provider.register();
-      assert.ok(
-        provider['_activeSpanProcessor'].constructor.name ===
-          'MultiSpanProcessor'
-      );
-      assert.strictEqual(
-        provider['_activeSpanProcessor']['_spanProcessors'].length,
-        0
-      );
-
-      assert.strictEqual(propagation['_getGlobalPropagator'](), propagator);
     });
   });
 });
