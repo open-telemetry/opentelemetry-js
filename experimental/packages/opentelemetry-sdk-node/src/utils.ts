@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
-import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
+import { diag, TextMapPropagator } from '@opentelemetry/api';
+import {
+  CompositePropagator,
+  getEnv,
+  getEnvWithoutDefaults,
+  W3CTraceContextPropagator,
+} from '@opentelemetry/core';
 import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
@@ -35,6 +40,8 @@ import {
   SpanExporter,
   SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
+import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
+import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
@@ -179,4 +186,67 @@ export function getSpanProcessorsFromEnv(): SpanProcessor[] {
   }
 
   return processors;
+}
+
+/**
+ * Get a propagator as defined by environment variables
+ */
+export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
+  // Empty and undefined MUST be treated equal.
+  if (
+    process.env.OTEL_PROPAGATORS === undefined ||
+    process.env.OTEL_PROPAGATORS?.trim() === ''
+  ) {
+    // return undefined to fall back to default
+    return undefined;
+  }
+
+  // Implementation note: this only contains specification required propagators that are actually hosted in this repo.
+  // Any other propagators (like aws, aws-lambda, should go into `@opentelemetry/auto-configuration-propagators` instead).
+  const propagatorsFactory = new Map<string, () => TextMapPropagator>([
+    ['tracecontext', () => new W3CTraceContextPropagator()],
+    ['baggage', () => new W3CTraceContextPropagator()],
+    ['b3', () => new B3Propagator()],
+    [
+      'b3multi',
+      () => new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
+    ],
+    ['jaeger', () => new JaegerPropagator()],
+  ]);
+
+  // Values MUST be deduplicated in order to register a Propagator only once.
+  const uniquePropagatorNames = Array.from(new Set(getEnv().OTEL_PROPAGATORS));
+
+  const propagators = uniquePropagatorNames.map(name => {
+    const propagator = propagatorsFactory.get(name)?.();
+    if (!propagator) {
+      diag.warn(
+        `Propagator "${name}" requested through environment variable is unavailable.`
+      );
+      return undefined;
+    }
+
+    return propagator;
+  });
+
+  const validPropagators = propagators.reduce<TextMapPropagator[]>(
+    (list, item) => {
+      if (item) {
+        list.push(item);
+      }
+      return list;
+    },
+    []
+  );
+
+  if (validPropagators.length === 0) {
+    // null to signal that the default should **not** be used in its place.
+    return null;
+  } else if (uniquePropagatorNames.length === 1) {
+    return validPropagators[0];
+  } else {
+    return new CompositePropagator({
+      propagators: validPropagators,
+    });
+  }
 }

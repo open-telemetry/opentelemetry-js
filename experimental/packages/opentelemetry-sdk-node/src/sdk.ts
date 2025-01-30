@@ -74,6 +74,7 @@ import {
   getResourceDetectorsFromEnv,
   getSpanProcessorsFromEnv,
   filterBlanksAndNulls,
+  getPropagatorFromEnv,
 } from './utils';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
@@ -376,7 +377,9 @@ export class NodeSDK {
           this._tracerProviderConfig?.contextManager ??
           // _tracerProviderConfig may be undefined if trace-specific settings are not provided - fall back to raw config
           this._configuration?.contextManager,
-        propagator: this._tracerProviderConfig?.textMapPropagator,
+        propagator:
+          this._tracerProviderConfig?.textMapPropagator ??
+          getPropagatorFromEnv(),
       });
     }
 
