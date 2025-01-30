@@ -81,7 +81,9 @@ describe('Packages', () => {
       { name: 'superagent', httpPackage: superagent },
     ].forEach(({ name, httpPackage }) => {
       it(`should create a span for GET requests and add propagation headers by using ${name} package`, async () => {
-        nock.load(path.join(__dirname, '../../../test/fixtures/google-http.json'));
+        nock.load(
+          path.join(__dirname, '../../../test/fixtures/google-http.json')
+        );
 
         const urlparsed = url.parse(
           `${protocol}://www.google.com/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8`

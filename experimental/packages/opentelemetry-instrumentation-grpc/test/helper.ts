@@ -52,7 +52,10 @@ import { promisify } from 'util';
 import type { GrpcInstrumentation } from '../src';
 import * as path from 'path';
 
-const PROTO_PATH = path.resolve(__dirname, '../../test/fixtures/grpc-test.proto');
+const PROTO_PATH = path.resolve(
+  __dirname,
+  '../../test/fixtures/grpc-test.proto'
+);
 const memoryExporter = new InMemorySpanExporter();
 
 const options = {

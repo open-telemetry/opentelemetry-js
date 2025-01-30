@@ -334,7 +334,11 @@ describe('InstrumentationBase', () => {
       type Exports = Record<string, unknown>;
       type ExportsPatched = Exports & { __patched?: boolean };
       const moduleName = 'absolutePathTestFixture';
-      const fileName = path.resolve(__dirname, '../../../test/node/fixtures', `${moduleName}.js`);
+      const fileName = path.resolve(
+        __dirname,
+        '../../../test/node/fixtures',
+        `${moduleName}.js`
+      );
       class TestInstrumentation extends InstrumentationBase {
         constructor() {
           super('@opentelemetry/instrumentation-absolute-path-test', '0.0.0', {
