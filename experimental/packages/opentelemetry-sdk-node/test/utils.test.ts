@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { getPropgagatorFromEnv } from '../src/utils';
+import { getPropagatorFromEnv } from '../src/utils';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
@@ -29,7 +29,7 @@ describe('getPropagatorFromEnv', function () {
     it('when not defined', function () {
       delete process.env.OTEL_PROPAGATORS;
 
-      const propagator = getPropgagatorFromEnv();
+      const propagator = getPropagatorFromEnv();
 
       assert.deepStrictEqual(propagator, undefined);
     });
@@ -37,7 +37,7 @@ describe('getPropagatorFromEnv', function () {
     it('on empty string', function () {
       (process.env as any).OTEL_PROPAGATORS = '';
 
-      const propagator = getPropgagatorFromEnv();
+      const propagator = getPropagatorFromEnv();
 
       assert.deepStrictEqual(propagator, undefined);
     });
@@ -45,7 +45,7 @@ describe('getPropagatorFromEnv', function () {
     it('on space-only string', function () {
       (process.env as any).OTEL_PROPAGATORS = '   ';
 
-      const propagator = getPropgagatorFromEnv();
+      const propagator = getPropagatorFromEnv();
 
       assert.deepStrictEqual(propagator, undefined);
     });
@@ -53,7 +53,7 @@ describe('getPropagatorFromEnv', function () {
 
   it('should return the selected propagator when one is in the list', () => {
     process.env.OTEL_PROPAGATORS = 'tracecontext';
-    assert.deepStrictEqual(getPropgagatorFromEnv()?.fields(), [
+    assert.deepStrictEqual(getPropagatorFromEnv()?.fields(), [
       'traceparent',
       'tracestate',
     ]);
@@ -61,7 +61,7 @@ describe('getPropagatorFromEnv', function () {
 
   it('should return the selected propagators when multiple are in the list', () => {
     process.env.OTEL_PROPAGATORS = 'tracecontext,baggage,b3,b3multi,jaeger';
-    assert.deepStrictEqual(getPropgagatorFromEnv()?.fields(), [
+    assert.deepStrictEqual(getPropagatorFromEnv()?.fields(), [
       'traceparent',
       'tracestate',
       'b3',
@@ -78,7 +78,7 @@ describe('getPropagatorFromEnv', function () {
     const warnStub = sinon.stub(diag, 'warn');
 
     process.env.OTEL_PROPAGATORS = 'my, unknown, propagators';
-    assert.deepStrictEqual(getPropgagatorFromEnv(), null);
+    assert.deepStrictEqual(getPropagatorFromEnv(), null);
     sinon.assert.calledWithExactly(
       warnStub,
       'Propagator "my" requested through environment variable is unavailable.'
@@ -97,6 +97,6 @@ describe('getPropagatorFromEnv', function () {
   it('should return null if only "none" is selected', () => {
     process.env.OTEL_PROPAGATORS = 'none';
 
-    assert.deepStrictEqual(getPropgagatorFromEnv(), null);
+    assert.deepStrictEqual(getPropagatorFromEnv(), null);
   });
 });

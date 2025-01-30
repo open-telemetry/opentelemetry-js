@@ -191,7 +191,7 @@ export function getSpanProcessorsFromEnv(): SpanProcessor[] {
 /**
  * Get a propagator as defined by environment variables
  */
-export function getPropgagatorFromEnv(): TextMapPropagator | null | undefined {
+export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
   // Empty and undefined MUST be treated equal.
   if (
     process.env.OTEL_PROPAGATORS === undefined ||
