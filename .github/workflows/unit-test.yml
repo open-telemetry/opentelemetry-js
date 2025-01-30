@@ -17,7 +17,6 @@ jobs:
           - "20.6.0"
           - "20"
           - "22"
-          - "23"
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_UNSAFE_PERM: true
@@ -36,8 +35,7 @@ jobs:
         if: ${{
           matrix.node_version == '20.6.0' ||
           matrix.node_version == '20' ||
-          matrix.node_version == '22' ||
-          matrix.node_version == '23'
+          matrix.node_version == '22'
           }}
 
       # npm@11.0.0 drops support for Node.js v18
