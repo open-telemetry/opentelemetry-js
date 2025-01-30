@@ -17,14 +17,14 @@
 import * as assert from 'assert';
 import {
   AggregationTemporality,
-  MeterProvider,
-  MetricReader,
+  AggregationType,
   DataPoint,
   ExponentialHistogram,
   Histogram,
-  AggregationType,
+  MeterProvider,
 } from '../../src';
 import { TestMetricReader } from '../export/TestMetricReader';
+import { IMetricReader } from '../../src/export/MetricReader';
 
 describe('histogram-recording-nan', () => {
   it('exponential histogram should not count NaN', async () => {
@@ -91,7 +91,7 @@ describe('histogram-recording-nan', () => {
     );
   });
 
-  const collectNoErrors = async (reader: MetricReader) => {
+  const collectNoErrors = async (reader: IMetricReader) => {
     const { resourceMetrics, errors } = await reader.collect();
     assert.strictEqual(errors.length, 0);
     return resourceMetrics;

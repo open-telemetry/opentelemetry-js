@@ -410,7 +410,7 @@ describe('BasicTracerProvider', () => {
       }
 
       const provider = new CustomTracerProvider({});
-      assert(
+      assert.ok(
         provider['_getPropagator']('tracecontext') instanceof
           W3CTraceContextPropagator
       );
@@ -718,7 +718,7 @@ describe('BasicTracerProvider', () => {
         .forceFlush()
         .then(() => {
           sinon.restore();
-          assert(forceFlushStub.calledTwice);
+          assert.ok(forceFlushStub.calledTwice);
           done();
         })
         .catch(error => {

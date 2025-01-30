@@ -45,7 +45,11 @@ export {
 
 export { PushMetricExporter } from './export/MetricExporter';
 
-export { MetricReader, MetricReaderOptions } from './export/MetricReader';
+export {
+  IMetricReader,
+  MetricReader,
+  MetricReaderOptions,
+} from './export/MetricReader';
 
 export {
   PeriodicExportingMetricReader,

@@ -198,7 +198,7 @@ describe('MetricCollector', () => {
         sinon.clock.tick(200);
         const { resourceMetrics, errors } = await future;
         assert.strictEqual(errors.length, 1);
-        assert(errors[0] instanceof TimeoutError);
+        assert.ok(errors[0] instanceof TimeoutError);
         const { scopeMetrics } = resourceMetrics;
         const { metrics } = scopeMetrics[0];
 
@@ -310,7 +310,7 @@ describe('MetricCollector', () => {
         sinon.clock.tick(200);
         const { resourceMetrics, errors } = await future;
         assert.strictEqual(errors.length, 1);
-        assert(errors[0] instanceof TimeoutError);
+        assert.ok(errors[0] instanceof TimeoutError);
         const { scopeMetrics } = resourceMetrics;
         const { metrics } = scopeMetrics[0];
 

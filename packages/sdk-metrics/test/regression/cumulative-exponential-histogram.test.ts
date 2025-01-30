@@ -22,9 +22,9 @@ import {
   AggregationType,
   InstrumentType,
   MeterProvider,
-  MetricReader,
 } from '../../src';
 import { TestMetricReader } from '../export/TestMetricReader';
+import { IMetricReader } from '../../src/export/MetricReader';
 
 describe('cumulative-exponential-histogram', () => {
   let clock: sinon.SinonFakeTimers;
@@ -84,7 +84,7 @@ describe('cumulative-exponential-histogram', () => {
     );
   };
 
-  const collectNoErrors = async (reader: MetricReader) => {
+  const collectNoErrors = async (reader: IMetricReader) => {
     const { resourceMetrics, errors } = await reader.collect();
     assert.strictEqual(errors.length, 0);
     return resourceMetrics;

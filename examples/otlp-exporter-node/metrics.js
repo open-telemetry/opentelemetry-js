@@ -39,15 +39,14 @@ const meterProvider = new MeterProvider({
     [SEMRESATTRS_SERVICE_NAME]: 'basic-metric-service',
   }),
   views: [expHistogramView],
+  readers: [
+    new PeriodicExportingMetricReader({
+      exporter: metricExporter,
+      // exporter: new ConsoleMetricExporter(),
+      exportIntervalMillis: 1000,
+    }),
+  ],
 });
-
-meterProvider.addMetricReader(
-  new PeriodicExportingMetricReader({
-    exporter: metricExporter,
-    // exporter: new ConsoleMetricExporter(),
-    exportIntervalMillis: 1000,
-  })
-);
 
 const meter = meterProvider.getMeter('example-exporter-collector');
 
