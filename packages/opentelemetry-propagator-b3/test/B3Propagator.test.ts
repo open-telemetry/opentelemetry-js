@@ -153,16 +153,20 @@ describe('B3Propagator', () => {
     });
 
     it('extracts multi header b3 using array getter', () => {
-      const context = propagator.extract(ROOT_CONTEXT, b3MultiCarrier, {
-        get(carrier, key) {
-          if (carrier == null || carrier[key] === undefined) {
-            return [];
-          }
-          return [carrier[key]];
-        },
+      const context = propagator.extract<Record<string, string>>(
+        ROOT_CONTEXT,
+        b3MultiCarrier,
+        {
+          get(carrier, key) {
+            if (carrier == null || carrier[key] === undefined) {
+              return [];
+            }
+            return [carrier[key]];
+          },
 
-        keys: defaultTextMapGetter.keys,
-      });
+          keys: defaultTextMapGetter.keys,
+        }
+      );
 
       const extractedSpanContext = trace.getSpanContext(context);
       assert.deepStrictEqual(extractedSpanContext, {

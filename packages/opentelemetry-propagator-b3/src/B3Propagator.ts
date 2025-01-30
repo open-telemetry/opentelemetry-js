@@ -38,10 +38,10 @@ export class B3Propagator implements TextMapPropagator {
     new B3MultiPropagator();
   private readonly _b3SinglePropagator: B3SinglePropagator =
     new B3SinglePropagator();
-  private readonly _inject: (
+  private readonly _inject: <Carrier>(
     context: Context,
-    carrier: unknown,
-    setter: TextMapSetter
+    carrier: Carrier,
+    setter: TextMapSetter<Carrier>
   ) => void;
   public readonly _fields: string[];
 
@@ -55,14 +55,22 @@ export class B3Propagator implements TextMapPropagator {
     }
   }
 
-  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
+  inject<Carrier>(
+    context: Context,
+    carrier: Carrier,
+    setter: TextMapSetter<Carrier>
+  ): void {
     if (isTracingSuppressed(context)) {
       return;
     }
     this._inject(context, carrier, setter);
   }
 
-  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
+  extract<Carrier>(
+    context: Context,
+    carrier: Carrier,
+    getter: TextMapGetter<Carrier>
+  ): Context {
     const header = getter.get(carrier, B3_CONTEXT_HEADER);
     const b3Context = Array.isArray(header) ? header[0] : header;
 

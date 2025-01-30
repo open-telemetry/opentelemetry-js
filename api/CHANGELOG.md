@@ -7,6 +7,11 @@ All notable changes to this project will be documented in this file.
 
 ### :boom: Breaking Change
 
+* feat(api): revamped `TextMapPropagator` TypeScript interface [#5368](https://github.com/open-telemetry/opentelemetry-js/pull/5368) @chancancode
+  * Removed generic parameter from the `TextMapPropagator` interface
+  * Introduced a new `Carrier` generic parameter on its `inject` and `extract` methods
+  * The previous interface implies the implementor of `TextMapPropagator` can specify what carrier type it accepts, this has never been the case in practice; instead, they must treat the carrier as opaque and use the provided getter/setter.
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)

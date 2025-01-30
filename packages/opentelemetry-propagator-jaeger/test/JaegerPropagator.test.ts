@@ -377,7 +377,7 @@ describe('JaegerPropagator', () => {
 });
 
 function makeGetter(value: any) {
-  const getter: TextMapGetter = {
+  const getter: TextMapGetter<unknown> = {
     get(carrier, key) {
       return value;
     },
