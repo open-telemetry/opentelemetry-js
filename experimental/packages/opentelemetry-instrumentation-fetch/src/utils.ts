@@ -117,6 +117,10 @@ function _getBodyNonDestructively(body: ReadableStream) {
   };
 }
 
+function isDocument(value: unknown): value is Document {
+  return typeof Document !== 'undefined' && value instanceof Document;
+}
+
 /**
  * Helper function to determine payload content length for XHR requests
  * @param body
@@ -125,17 +129,17 @@ function _getBodyNonDestructively(body: ReadableStream) {
 export function getXHRBodyLength(
   body: Document | XMLHttpRequestBodyInit
 ): number | undefined {
-  if (typeof Document !== 'undefined' && body instanceof Document) {
+  if (isDocument(body)) {
     return new XMLSerializer().serializeToString(document).length;
   }
+
   // XMLHttpRequestBodyInit expands to the following:
-  if (body instanceof Blob) {
-    return body.size;
+  if (typeof body === 'string') {
+    return getByteLength(body);
   }
 
-  // ArrayBuffer | ArrayBufferView
-  if ((body as any).byteLength !== undefined) {
-    return (body as any).byteLength as number;
+  if (body instanceof Blob) {
+    return body.size;
   }
 
   if (body instanceof FormData) {
@@ -146,8 +150,9 @@ export function getXHRBodyLength(
     return getByteLength(body.toString());
   }
 
-  if (typeof body === 'string') {
-    return getByteLength(body);
+  // ArrayBuffer | ArrayBufferView
+  if (body.byteLength !== undefined) {
+    return body.byteLength;
   }
 
   DIAG_LOGGER.warn('unknown body type');
