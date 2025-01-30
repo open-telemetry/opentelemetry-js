@@ -415,7 +415,7 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
-    it('should register a propagators as defined in OTEL_PROPAGATORS if trace SDK is configured', async () => {
+    it('should register propagators as defined in OTEL_PROPAGATORS if trace SDK is configured', async () => {
       process.env.OTEL_PROPAGATORS = 'b3';
       const sdk = new NodeSDK({
         traceExporter: new ConsoleSpanExporter(),
