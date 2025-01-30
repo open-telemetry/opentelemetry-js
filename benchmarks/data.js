@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1738240920724,
+  "lastUpdate": 1738241239973,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -25016,6 +25016,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.32%",
             "unit": "ops/sec",
             "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "godfreykfc@gmail.com",
+            "name": "Godfrey Chan",
+            "username": "chancancode"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "bb212334c7e2262ef27bfd0e648191d5bea1530d",
+          "message": "refactor(exporter-metrics-otlp-http): fix eslint warning (#5396)",
+          "timestamp": "2025-01-30T12:38:07Z",
+          "tree_id": "69aabdb4565030875e0d4fec331dd2e35ef7a4da",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/bb212334c7e2262ef27bfd0e648191d5bea1530d"
+        },
+        "date": 1738241239113,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1490762,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 17834,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 831213,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 767192,
+            "range": "±0.41%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
