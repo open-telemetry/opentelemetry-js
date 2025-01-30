@@ -21,7 +21,6 @@ import {
   ProxyTracerProvider,
 } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
-import { Tracer } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { StackContextManager, WebTracerProvider } from '../src';
 
@@ -78,7 +77,6 @@ describe('Node Globals Foolproofing', () => {
         generateSpanId: () => getRandomString(16),
       },
     }).getTracer('default');
-
-    assert.ok(tracer instanceof Tracer);
+    assert.ok(tracer);
   });
 });

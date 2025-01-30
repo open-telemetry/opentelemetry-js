@@ -65,6 +65,13 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * (user-facing): only a non-env-var based default is now used on `WebTracerProvider#register()`.
     * propagators can now not be configured via `window.OTEL_PROPAGATORS` anymore, please pass the propagator to `WebTracerProvider#register()` instead.
     * if not configured via code, `WebTracerProvider#register()` will now fall back to defaults (`tracecontext` and `baggage`)
+* feat(sdk-trace-*)!: drop unnecessary exports [#????](https://github.com/open-telemetry/opentelemetry-js/pull/????) @pichlermarc
+  * (user-facing): `EXPORTER_FACTORY` is not used anymore and has been removed
+  * (user-facing): `PROPAGATOR_FACTORY` is not used anymore and has been removed
+  * (user-facing): `ForceFlushState` was intended for internal use and has been removed
+  * (user-facing): the `Tracer` class was unintentionally exported and has been removed
+    * to obtain a `Tracer`, please use `BasicTracerProvider#getTracer()`, `NodeTracerProvider#getTracer()` or `WebTracerProvider#getTracer()`
+    * to reference a `Tracer`, please use the `Tracer` type from `@opentelemetry/api`
 
 ### :rocket: (Enhancement)
 
