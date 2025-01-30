@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import { B3Propagator, B3InjectEncoding } from '@opentelemetry/propagator-b3';
 import {
   BasicTracerProvider,
-  PROPAGATOR_FACTORY,
   SDKRegistrationConfig,
 } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerConfig } from './config';
-import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 
 /**
  * Register this TracerProvider for use with the OpenTelemetry API.
@@ -31,23 +28,6 @@ import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
  * @param config Configuration object for SDK registration
  */
 export class NodeTracerProvider extends BasicTracerProvider {
-  protected static override readonly _registeredPropagators = new Map<
-    string,
-    PROPAGATOR_FACTORY
-  >([
-    ...BasicTracerProvider._registeredPropagators,
-    [
-      'b3',
-      () =>
-        new B3Propagator({ injectEncoding: B3InjectEncoding.SINGLE_HEADER }),
-    ],
-    [
-      'b3multi',
-      () => new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
-    ],
-    ['jaeger', () => new JaegerPropagator()],
-  ]);
-
   constructor(config: NodeTracerConfig = {}) {
     super(config);
   }
