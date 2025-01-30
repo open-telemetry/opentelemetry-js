@@ -154,7 +154,7 @@ describe('B3Propagator', () => {
 
     it('extracts multi header b3 using array getter', () => {
       const context = propagator.extract(ROOT_CONTEXT, b3MultiCarrier, {
-        get(carrier, key) {
+        get(carrier: Record<string, string>, key) {
           if (carrier == null || carrier[key] === undefined) {
             return [];
           }

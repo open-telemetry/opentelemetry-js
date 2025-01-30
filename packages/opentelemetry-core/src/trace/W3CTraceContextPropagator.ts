@@ -71,8 +71,12 @@ export function parseTraceParent(traceParent: string): SpanContext | null {
  * Based on the Trace Context specification:
  * https://www.w3.org/TR/trace-context/
  */
-export class W3CTraceContextPropagator implements TextMapPropagator {
-  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
+export class W3CTraceContextPropagator implements TextMapPropagator<unknown> {
+  inject(
+    context: Context,
+    carrier: unknown,
+    setter: TextMapSetter<unknown>
+  ): void {
     const spanContext = trace.getSpanContext(context);
     if (
       !spanContext ||
@@ -95,7 +99,11 @@ export class W3CTraceContextPropagator implements TextMapPropagator {
     }
   }
 
-  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
+  extract(
+    context: Context,
+    carrier: unknown,
+    getter: TextMapGetter<unknown>
+  ): Context {
     const traceParentHeader = getter.get(carrier, TRACE_PARENT_HEADER);
     if (!traceParentHeader) return context;
     const traceParent = Array.isArray(traceParentHeader)

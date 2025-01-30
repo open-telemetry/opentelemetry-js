@@ -45,7 +45,7 @@ export const UBER_BAGGAGE_HEADER_PREFIX = 'uberctx';
  * One byte bitmap, as two hex digits.
  * Inspired by jaeger-client-node project.
  */
-export class JaegerPropagator implements TextMapPropagator {
+export class JaegerPropagator implements TextMapPropagator<unknown> {
   private readonly _jaegerTraceHeader: string;
   private readonly _jaegerBaggageHeaderPrefix: string;
 
@@ -63,7 +63,11 @@ export class JaegerPropagator implements TextMapPropagator {
     }
   }
 
-  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
+  inject(
+    context: Context,
+    carrier: unknown,
+    setter: TextMapSetter<unknown>
+  ): void {
     const spanContext = trace.getSpanContext(context);
     const baggage = propagation.getBaggage(context);
     if (spanContext && isTracingSuppressed(context) === false) {
@@ -89,7 +93,11 @@ export class JaegerPropagator implements TextMapPropagator {
     }
   }
 
-  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
+  extract(
+    context: Context,
+    carrier: unknown,
+    getter: TextMapGetter<unknown>
+  ): Context {
     const uberTraceIdHeader = getter.get(carrier, this._jaegerTraceHeader);
     const uberTraceId = Array.isArray(uberTraceIdHeader)
       ? uberTraceIdHeader[0]
