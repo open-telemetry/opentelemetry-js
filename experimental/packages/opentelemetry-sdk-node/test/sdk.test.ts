@@ -427,6 +427,7 @@ describe('Node SDK', () => {
       assert.deepStrictEqual(propagation.fields(), ['b3']);
 
       await sdk.shutdown();
+      delete process.env.OTEL_PROPAGATORS;
     });
   });
 
