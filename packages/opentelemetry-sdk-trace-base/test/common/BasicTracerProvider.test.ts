@@ -26,9 +26,10 @@ import {
   TextMapGetter,
   propagation,
   diag,
+  ContextManager,
 } from '@opentelemetry/api';
 import { CompositePropagator } from '@opentelemetry/core';
-import { TraceState, W3CTraceContextPropagator } from '@opentelemetry/core';
+import { TraceState } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -59,6 +60,7 @@ class DummyPropagator implements TextMapPropagator {
 describe('BasicTracerProvider', () => {
   let envSource: Record<string, any>;
   let setGlobalPropagatorStub: sinon.SinonSpy<[TextMapPropagator], boolean>;
+  let setGlobalContextManagerStub: sinon.SinonSpy<[ContextManager], boolean>;
 
   if (global.process?.versions?.node === undefined) {
     envSource = globalThis as unknown as Record<string, any>;
@@ -70,6 +72,7 @@ describe('BasicTracerProvider', () => {
     // to avoid actually registering the TraceProvider and leaking env to other tests
     sinon.stub(trace, 'setGlobalTracerProvider');
     setGlobalPropagatorStub = sinon.spy(propagation, 'setGlobalPropagator');
+    setGlobalContextManagerStub = sinon.spy(context, 'setGlobalContextManager');
 
     context.disable();
   });
@@ -386,97 +389,8 @@ describe('BasicTracerProvider', () => {
     });
   });
 
-  describe('Custom TracerProvider through inheritance', () => {
-    beforeEach(() => {
-      envSource.OTEL_TRACES_EXPORTER = 'custom-exporter';
-      envSource.OTEL_PROPAGATORS = 'custom-propagator';
-    });
-
-    afterEach(() => {
-      delete envSource.OTEL_TRACES_EXPORTER;
-      delete envSource.OTEL_PROPAGATORS;
-      sinon.restore();
-    });
-
-    it('can be extended by overriding registered components', () => {
-      class CustomTracerProvider extends BasicTracerProvider {
-        protected static override readonly _registeredPropagators = new Map<
-          string,
-          () => TextMapPropagator
-        >([
-          ...BasicTracerProvider._registeredPropagators,
-          ['custom-propagator', () => new DummyPropagator()],
-        ]);
-      }
-
-      const provider = new CustomTracerProvider({});
-      assert.ok(
-        provider['_getPropagator']('tracecontext') instanceof
-          W3CTraceContextPropagator
-      );
-      /* BasicTracerProvider has no exporters by default, so skipping testing the exporter getter */
-      provider.register();
-      assert.strictEqual(
-        provider['_activeSpanProcessor']['_spanProcessors'].length,
-        0
-      );
-
-      sinon.assert.calledOnceWithExactly(
-        setGlobalPropagatorStub,
-        sinon.match.instanceOf(DummyPropagator)
-      );
-    });
-
-    it('the old way of extending still works', () => {
-      // this is an anti-pattern, but we test that for backwards compatibility
-      class CustomTracerProvider extends BasicTracerProvider {
-        protected static override readonly _registeredPropagators = new Map<
-          string,
-          () => TextMapPropagator
-        >([['custom-propagator', () => new DummyPropagator()]]);
-
-        protected override _getPropagator(
-          name: string
-        ): TextMapPropagator | undefined {
-          return (
-            super._getPropagator(name) ||
-            CustomTracerProvider._registeredPropagators.get(name)?.()
-          );
-        }
-      }
-
-      const provider = new CustomTracerProvider({});
-      provider.register();
-      assert.strictEqual(
-        provider['_activeSpanProcessor']['_spanProcessors'].length,
-        0
-      );
-
-      sinon.assert.calledOnceWithExactly(
-        setGlobalPropagatorStub,
-        sinon.match.instanceOf(DummyPropagator)
-      );
-    });
-  });
-
   describe('.register()', () => {
     describe('propagator', () => {
-      let originalPropagators: string | number | undefined | string[];
-      beforeEach(() => {
-        originalPropagators = envSource.OTEL_PROPAGATORS;
-      });
-
-      afterEach(() => {
-        sinon.restore();
-
-        // otherwise we may assign 'undefined' (a string)
-        if (originalPropagators !== undefined) {
-          envSource.OTEL_PROPAGATORS = originalPropagators;
-        } else {
-          delete envSource.OTEL_PROPAGATORS;
-        }
-      });
-
       it('should be set to a given value if it it provided', () => {
         const provider = new BasicTracerProvider();
         provider.register({
@@ -489,7 +403,7 @@ describe('BasicTracerProvider', () => {
         );
       });
 
-      it('should be composite if 2 or more propagators provided in an environment variable', () => {
+      it('should use w3c trace context and baggage propagators by default', () => {
         const provider = new BasicTracerProvider();
         provider.register();
 
@@ -503,17 +417,32 @@ describe('BasicTracerProvider', () => {
           'baggage',
         ]);
       });
-
-      it('warns if there is no propagator registered with a given name', () => {
-        const warnStub = sinon.spy(diag, 'warn');
-
-        envSource.OTEL_PROPAGATORS = 'missing-propagator';
-        const provider = new BasicTracerProvider({});
+    });
+    describe('contextManager', () => {
+      it('should not be set if not provided', () => {
+        const provider = new BasicTracerProvider();
         provider.register();
 
+        sinon.assert.notCalled(setGlobalContextManagerStub);
+      });
+
+      it('should be set if provided', () => {
+        const provider = new BasicTracerProvider();
+        const mockContextManager: ContextManager = {
+          active: sinon.stub(),
+          bind: sinon.stub(),
+          disable: sinon.stub(),
+          enable: sinon.stub(),
+          with: sinon.stub(),
+        };
+
+        provider.register({
+          contextManager: mockContextManager,
+        });
+
         sinon.assert.calledOnceWithExactly(
-          warnStub,
-          'Propagator "missing-propagator" requested through environment variable is unavailable.'
+          setGlobalContextManagerStub,
+          mockContextManager
         );
       });
     });
