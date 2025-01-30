@@ -17,4 +17,4 @@
 /* eslint no-restricted-syntax: ["warn", "ExportAllDeclaration"] --
  * TODO: Replace wildcard export with named exports before next major version
  */
-export * from './OTLPLogExporter';
+export { OTLPLogExporter } from './OTLPLogExporter';
