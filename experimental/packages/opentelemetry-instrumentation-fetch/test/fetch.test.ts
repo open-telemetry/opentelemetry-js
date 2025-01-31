@@ -1367,6 +1367,89 @@ describe('fetch', () => {
       });
     });
 
+    describe('`requesthook` config', () => {
+      const tracedFetch = async ({
+        handlers = [
+          msw.http.get('/api/project-headers.json', ({ request }) => {
+            const headers = new Headers();
+
+            for (const [key, value] of request.headers) {
+              headers.set(`x-request-${key}`, value);
+            }
+
+            return msw.HttpResponse.json({ ok: true }, { headers });
+          }),
+        ],
+        callback = () => fetch('/api/project-headers.json'),
+        config,
+      }: {
+        handlers?: msw.RequestHandler[];
+        callback?: () => Promise<Response>;
+        config: FetchInstrumentationConfig &
+          Required<Pick<FetchInstrumentationConfig, 'requestHook'>>;
+      }): Promise<{ rootSpan: api.Span; request: RequestInit }> => {
+        let request: RequestInit | undefined;
+
+        function fakeFetch(
+          input: RequestInfo | Request,
+          init: RequestInit = {}
+        ) {
+          request = init;
+
+          return new Promise(resolve => {
+            resolve(new window.Response('', {}));
+          });
+        }
+
+        // Using a stub to get the actual request object that has been tempered by the
+        // requestHook option.
+        const fetchStub = sinon
+          .stub(window, 'fetch')
+          .callsFake(fakeFetch as any);
+
+        await startWorker(...handlers);
+
+        const rootSpan = await trace(async () => {
+          await callback();
+        }, config);
+
+        fetchStub.reset();
+
+        assert.strictEqual(exportedSpans.length, 1);
+
+        return { rootSpan, request: request as RequestInit };
+      };
+
+      it('applies attributes to the span', async () => {
+        await tracedFetch({
+          config: {
+            requestHook: span => {
+              span.setAttribute('custom.foo', 'bar');
+            },
+          },
+        });
+
+        const span: tracing.ReadableSpan = exportedSpans[0];
+        assert.strictEqual(span.attributes['custom.foo'], 'bar');
+      });
+
+      it('applies headers to the request', async () => {
+        const { request: traceRequest } = await tracedFetch({
+          config: {
+            requestHook: (span, request) => {
+              (request.headers as Record<string, string>)['traceparent'] =
+                'custom-value';
+            },
+          },
+        });
+
+        assert.strictEqual(
+          (traceRequest.headers as Record<string, string>)['traceparent'],
+          'custom-value'
+        );
+      });
+    });
+
     describe('`ignoreUrls` config', () => {
       const tracedFetch = async ({
         handlers = [
