@@ -72,6 +72,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * (user-facing): the `Tracer` class was unintentionally exported and has been removed
     * to obtain a `Tracer`, please use `BasicTracerProvider#getTracer()`, `NodeTracerProvider#getTracer()` or `WebTracerProvider#getTracer()`
     * to reference a `Tracer`, please use the `Tracer` type from `@opentelemetry/api`
+* chore!: Raise the minimum supported Node.js version to `^18.19.0 || >=20.6.0`. Support for Node.js 14, 16, and early minor versions of 18 and 20 have been dropped. This applies to all packages except the 'api' and 'semantic-conventions' packages. [#5395](https://github.com/open-telemetry/opentelemetry-js/issues/5395) @trentm
 * feat(core)!: remove TracesSamplerValues from exports [#5406](https://github.com/open-telemetry/opentelemetry-js/pull/5406) @pichlermarc
   * (user-facing): TracesSamplerValues was only consumed internally and has been removed from exports without replacement
 
