@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1738314158924,
+  "lastUpdate": 1738315644409,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -25328,6 +25328,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.22%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7332f3a863ac8fee99de99794af26817453e95aa",
+          "message": "chore!: bump min-supported node to ^18.19.0 || >=20.6.0 (#5397)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2025-01-31T09:18:27Z",
+          "tree_id": "3370bb0089f5e267e67c7ceb5173daa5136f82f4",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/7332f3a863ac8fee99de99794af26817453e95aa"
+        },
+        "date": 1738315643445,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1509053,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 16501,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 848653,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 783975,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
