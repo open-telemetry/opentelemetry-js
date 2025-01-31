@@ -136,6 +136,8 @@ export class Resource implements IResource {
   public merge(resource: IResource | null): IResource {
     if (resource == null) return this;
 
+    // Order is important
+    // Spec states incoming attributes override existing attributes
     return Resource.FromAttributeList([
       ...resource.getRawAttributes(),
       ...this.getRawAttributes(),
