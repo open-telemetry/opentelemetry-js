@@ -20,6 +20,7 @@ import {
   TextMapPropagator,
   trace,
   TracerProvider,
+  Tracer as ApiTracer,
 } from '@opentelemetry/api';
 import {
   CompositePropagator,
@@ -33,11 +34,7 @@ import { Tracer } from './Tracer';
 import { loadDefaultConfig } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
 import { SDKRegistrationConfig, TracerConfig } from './types';
-import { SpanExporter } from './export/SpanExporter';
 import { reconfigureLimits } from './utility';
-
-export type PROPAGATOR_FACTORY = () => TextMapPropagator;
-export type EXPORTER_FACTORY = () => SpanExporter;
 
 export enum ForceFlushState {
   'resolved',
@@ -84,7 +81,7 @@ export class BasicTracerProvider implements TracerProvider {
     name: string,
     version?: string,
     options?: { schemaUrl?: string }
-  ): Tracer {
+  ): ApiTracer {
     const key = `${name}@${version || ''}:${options?.schemaUrl || ''}`;
     if (!this._tracers.has(key)) {
       this._tracers.set(
