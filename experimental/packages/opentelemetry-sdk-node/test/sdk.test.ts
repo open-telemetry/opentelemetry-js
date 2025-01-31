@@ -414,6 +414,21 @@ describe('Node SDK', () => {
       assert.equal(actualContextManager, expectedContextManager);
       await sdk.shutdown();
     });
+
+    it('should register propagators as defined in OTEL_PROPAGATORS if trace SDK is configured', async () => {
+      process.env.OTEL_PROPAGATORS = 'b3';
+      const sdk = new NodeSDK({
+        traceExporter: new ConsoleSpanExporter(),
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assert.deepStrictEqual(propagation.fields(), ['b3']);
+
+      await sdk.shutdown();
+      delete process.env.OTEL_PROPAGATORS;
+    });
   });
 
   async function waitForNumberOfMetrics(
