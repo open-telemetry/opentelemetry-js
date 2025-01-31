@@ -65,6 +65,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * (user-facing): only a non-env-var based default is now used on `WebTracerProvider#register()`.
     * propagators can now not be configured via `window.OTEL_PROPAGATORS` anymore, please pass the propagator to `WebTracerProvider#register()` instead.
     * if not configured via code, `WebTracerProvider#register()` will now fall back to defaults (`tracecontext` and `baggage`)
+* feat(core)!: remove TracesSamplerValues from exports [#5406](https://github.com/open-telemetry/opentelemetry-js/pull/5406) @pichlermarc
+  * (user-facing): TracesSamplerValues was only consumed internally and has been removed from exports without replacement
 
 ### :rocket: (Enhancement)
 
