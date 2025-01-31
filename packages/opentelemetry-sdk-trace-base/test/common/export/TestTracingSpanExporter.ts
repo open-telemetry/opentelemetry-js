@@ -19,10 +19,10 @@ import {
   BasicTracerProvider,
   InMemorySpanExporter,
   ReadableSpan,
-  Tracer,
   SpanProcessor,
   AlwaysOnSampler,
 } from '../../../src';
+import { Tracer } from '../../../src/Tracer';
 
 /**
  * A test-only span exporter that naively simulates triggering instrumentation

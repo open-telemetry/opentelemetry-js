@@ -111,18 +111,14 @@ function chooseTemporalitySelector(
   return chooseTemporalitySelectorFromEnvironment();
 }
 
+const DEFAULT_AGGREGATION = Object.freeze({
+  type: AggregationType.DEFAULT,
+});
+
 function chooseAggregationSelector(
   config: OTLPMetricExporterOptions | undefined
-) {
-  if (config?.aggregationPreference) {
-    return config.aggregationPreference;
-  } else {
-    return (_instrumentType: any) => {
-      return {
-        type: AggregationType.DEFAULT,
-      };
-    };
-  }
+): AggregationSelector {
+  return config?.aggregationPreference ?? (() => DEFAULT_AGGREGATION);
 }
 
 export class OTLPMetricExporterBase
