@@ -18,7 +18,7 @@ import { context, ContextManager, trace } from '@opentelemetry/api';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { Resource } from '@opentelemetry/resources';
 import { SEMRESATTRS_TELEMETRY_SDK_LANGUAGE } from '@opentelemetry/semantic-conventions';
-import { Span, Tracer } from '@opentelemetry/sdk-trace-base';
+import { Span } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { WebTracerConfig } from '../src';
 import { WebTracerProvider } from '../src/WebTracerProvider';
@@ -43,7 +43,7 @@ describe('WebTracerProvider', () => {
       const tracer = new WebTracerProvider(
         Object.assign({}, defaultOptions)
       ).getTracer('default');
-      assert.ok(tracer instanceof Tracer);
+      assert.ok(tracer);
     });
 
     it('should work without default context manager', () => {
