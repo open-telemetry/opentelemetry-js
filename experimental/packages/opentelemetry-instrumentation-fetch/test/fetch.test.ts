@@ -1373,10 +1373,10 @@ describe('fetch', () => {
           msw.http.get('/api/echo-headers.json', ({ request }) => {
             return msw.HttpResponse.json({
               request: {
-                headers: Object.fromEntries(request.headers)
-              }
+                headers: Object.fromEntries(request.headers),
+              },
             });
-          })
+          }),
         ],
         callback = () => fetch('/api/echo-headers.json'),
         config,
@@ -1418,7 +1418,9 @@ describe('fetch', () => {
           config: {
             requestHook: (span, request) => {
               assert.ok(
-                request !== null && typeof request === 'object' && !(request instanceof Request),
+                request !== null &&
+                  typeof request === 'object' &&
+                  !(request instanceof Request),
                 '`requestHook` should get a `RequestInit` object when no options are passed to `fetch()`'
               );
               request.headers = { 'custom-foo': 'foo' };
@@ -1431,7 +1433,7 @@ describe('fetch', () => {
         assert.strictEqual(
           request.headers['custom-foo'],
           'foo',
-          'header set from requestHook should be sent',
+          'header set from requestHook should be sent'
         );
       });
 
@@ -1452,7 +1454,7 @@ describe('fetch', () => {
               new Request('/api/echo-headers.json', {
                 headers: new Headers({ 'custom-bar': 'bar' }),
               })
-            )
+            ),
         });
 
         const { request } = await response.json();
@@ -1460,12 +1462,12 @@ describe('fetch', () => {
         assert.strictEqual(
           request.headers['custom-foo'],
           'foo',
-          'header set from requestHook should be sent',
+          'header set from requestHook should be sent'
         );
         assert.strictEqual(
           request.headers['custom-bar'],
           'bar',
-          'header set from fetch() should be sent',
+          'header set from fetch() should be sent'
         );
       });
 
@@ -1474,7 +1476,9 @@ describe('fetch', () => {
           config: {
             requestHook: (span, request) => {
               assert.ok(
-                request !== null && typeof request === 'object' && !(request instanceof Request),
+                request !== null &&
+                  typeof request === 'object' &&
+                  !(request instanceof Request),
                 '`requestHook` should get the `RequestInit` object passed to `fetch()`'
               );
 
@@ -1489,7 +1493,7 @@ describe('fetch', () => {
           callback: () =>
             fetch('/api/echo-headers.json', {
               headers: { 'custom-bar': 'bar' },
-            })
+            }),
         });
 
         const { request } = await response.json();
@@ -1497,12 +1501,12 @@ describe('fetch', () => {
         assert.strictEqual(
           request.headers['custom-foo'],
           'foo',
-          'header set from requestHook should be sent',
+          'header set from requestHook should be sent'
         );
         assert.strictEqual(
           request.headers['custom-bar'],
           'bar',
-          'header set from fetch() should be sent',
+          'header set from fetch() should be sent'
         );
       });
     });
