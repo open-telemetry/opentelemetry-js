@@ -1367,60 +1367,40 @@ describe('fetch', () => {
       });
     });
 
-    describe('`requesthook` config', () => {
+    describe('`requestHook` option', () => {
       const tracedFetch = async ({
         handlers = [
-          msw.http.get('/api/project-headers.json', ({ request }) => {
-            const headers = new Headers();
-
-            for (const [key, value] of request.headers) {
-              headers.set(`x-request-${key}`, value);
-            }
-
-            return msw.HttpResponse.json({ ok: true }, { headers });
-          }),
+          msw.http.get('/api/echo-headers.json', ({ request }) => {
+            return msw.HttpResponse.json({
+              request: {
+                headers: Object.fromEntries(request.headers)
+              }
+            });
+          })
         ],
-        callback = () => fetch('/api/project-headers.json'),
+        callback = () => fetch('/api/echo-headers.json'),
         config,
       }: {
         handlers?: msw.RequestHandler[];
         callback?: () => Promise<Response>;
         config: FetchInstrumentationConfig &
           Required<Pick<FetchInstrumentationConfig, 'requestHook'>>;
-      }): Promise<{ rootSpan: api.Span; request: RequestInit }> => {
-        let request: RequestInit | undefined;
-
-        function fakeFetch(
-          input: RequestInfo | Request,
-          init: RequestInit = {}
-        ) {
-          request = init;
-
-          return new Promise(resolve => {
-            resolve(new window.Response('', {}));
-          });
-        }
-
-        // Using a stub to get the actual request object that has been tempered by the
-        // requestHook option.
-        const fetchStub = sinon
-          .stub(window, 'fetch')
-          .callsFake(fakeFetch as any);
+      }): Promise<{ rootSpan: api.Span; response: Response }> => {
+        let response: Response | undefined;
 
         await startWorker(...handlers);
 
         const rootSpan = await trace(async () => {
-          await callback();
+          response = await callback();
         }, config);
 
-        fetchStub.reset();
-
+        assert.ok(response instanceof Response);
         assert.strictEqual(exportedSpans.length, 1);
 
-        return { rootSpan, request: request as RequestInit };
+        return { rootSpan, response };
       };
 
-      it('applies attributes to the span', async () => {
+      it('can apply attributes to the span', async () => {
         await tracedFetch({
           config: {
             requestHook: span => {
@@ -1433,19 +1413,96 @@ describe('fetch', () => {
         assert.strictEqual(span.attributes['custom.foo'], 'bar');
       });
 
-      it('applies headers to the request', async () => {
-        const { request: traceRequest } = await tracedFetch({
+      it('can modify headers when called with a string URL', async () => {
+        const { response } = await tracedFetch({
           config: {
             requestHook: (span, request) => {
-              (request.headers as Record<string, string>)['traceparent'] =
-                'custom-value';
+              assert.ok(
+                request !== null && typeof request === 'object' && !(request instanceof Request),
+                '`requestHook` should get a `RequestInit` object when no options are passed to `fetch()`'
+              );
+              request.headers = { 'custom-foo': 'foo' };
             },
           },
         });
 
+        const { request } = await response.json();
+
         assert.strictEqual(
-          (traceRequest.headers as Record<string, string>)['traceparent'],
-          'custom-value'
+          request.headers['custom-foo'],
+          'foo',
+          'header set from requestHook should be sent',
+        );
+      });
+
+      it('can modify headers when called with a `Request` object', async () => {
+        const { response } = await tracedFetch({
+          config: {
+            requestHook: (span, request) => {
+              assert.ok(
+                request instanceof Request,
+                '`requestHook` should get the `Request` object passed to `fetch()`'
+              );
+
+              request.headers.set('custom-foo', 'foo');
+            },
+          },
+          callback: () =>
+            fetch(
+              new Request('/api/echo-headers.json', {
+                headers: new Headers({ 'custom-bar': 'bar' }),
+              })
+            )
+        });
+
+        const { request } = await response.json();
+
+        assert.strictEqual(
+          request.headers['custom-foo'],
+          'foo',
+          'header set from requestHook should be sent',
+        );
+        assert.strictEqual(
+          request.headers['custom-bar'],
+          'bar',
+          'header set from fetch() should be sent',
+        );
+      });
+
+      it('can modify headers when called with a `RequestInit` object', async () => {
+        const { response } = await tracedFetch({
+          config: {
+            requestHook: (span, request) => {
+              assert.ok(
+                request !== null && typeof request === 'object' && !(request instanceof Request),
+                '`requestHook` should get the `RequestInit` object passed to `fetch()`'
+              );
+
+              assert.ok(
+                request.headers !== null && typeof request.headers === 'object',
+                '`requestHook` should get the `headers` object passed to `fetch()`'
+              );
+
+              (request.headers as Record<string, string>)['custom-foo'] = 'foo';
+            },
+          },
+          callback: () =>
+            fetch('/api/echo-headers.json', {
+              headers: { 'custom-bar': 'bar' },
+            })
+        });
+
+        const { request } = await response.json();
+
+        assert.strictEqual(
+          request.headers['custom-foo'],
+          'foo',
+          'header set from requestHook should be sent',
+        );
+        assert.strictEqual(
+          request.headers['custom-bar'],
+          'bar',
+          'header set from fetch() should be sent',
         );
       });
     });
