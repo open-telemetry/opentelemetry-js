@@ -18,7 +18,7 @@ import { promises as fs } from 'fs';
 import { execAsync } from './execAsync';
 import { diag } from '@opentelemetry/api';
 
-export async function getMachineId(): Promise<string> {
+export async function getMachineId(): Promise<string | undefined> {
   try {
     const result = await fs.readFile('/etc/hostid', { encoding: 'utf8' });
     return result.trim();
@@ -33,5 +33,5 @@ export async function getMachineId(): Promise<string> {
     diag.debug(`error reading machine id: ${e}`);
   }
 
-  return '';
+  return undefined;
 }

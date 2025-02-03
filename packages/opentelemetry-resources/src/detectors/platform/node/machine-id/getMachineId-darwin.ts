@@ -17,7 +17,7 @@
 import { execAsync } from './execAsync';
 import { diag } from '@opentelemetry/api';
 
-export async function getMachineId(): Promise<string> {
+export async function getMachineId(): Promise<string | undefined> {
   try {
     const result = await execAsync('ioreg -rd1 -c "IOPlatformExpertDevice"');
 
@@ -26,7 +26,7 @@ export async function getMachineId(): Promise<string> {
       .find(line => line.includes('IOPlatformUUID'));
 
     if (!idLine) {
-      return '';
+      return undefined;
     }
 
     const parts = idLine.split('" = "');
@@ -37,5 +37,5 @@ export async function getMachineId(): Promise<string> {
     diag.debug(`error reading machine id: ${e}`);
   }
 
-  return '';
+  return undefined;
 }

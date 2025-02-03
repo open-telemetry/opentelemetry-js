@@ -70,7 +70,9 @@ describe('Node Globals Foolproofing', () => {
 
     const tracer = new WebTracerProvider({
       resource: new Resource({
-        'service.name': 'web-core',
+        attributes: {
+          'service.name': 'web-core',
+        },
       }),
       idGenerator: {
         generateTraceId: () => getRandomString(32),

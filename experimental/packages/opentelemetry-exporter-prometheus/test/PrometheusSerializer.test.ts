@@ -704,11 +704,13 @@ describe('PrometheusSerializer', () => {
       const serializer = new PrometheusSerializer(undefined, true);
       const result = serializer['_serializeResource'](
         new Resource({
-          env: 'prod',
-          hostname: 'myhost',
-          datacenter: 'sdc',
-          region: 'europe',
-          owner: 'frontend',
+          attributes: {
+            env: 'prod',
+            hostname: 'myhost',
+            datacenter: 'sdc',
+            region: 'europe',
+            owner: 'frontend',
+          },
         })
       );
 

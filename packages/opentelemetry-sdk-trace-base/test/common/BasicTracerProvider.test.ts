@@ -730,7 +730,7 @@ describe('BasicTracerProvider', () => {
     });
 
     it('should use not use the default if resource passed', function () {
-      const providedResource = new Resource({ foo: 'bar' });
+      const providedResource = new Resource({ attributes: { foo: 'bar' } });
       const tracerProvider = new BasicTracerProvider({
         resource: providedResource,
       });
