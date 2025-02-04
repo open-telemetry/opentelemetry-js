@@ -150,6 +150,7 @@ export class Tracer implements api.Tracer {
       kind: spanKind,
       links,
       parentSpanId,
+      parentSpanContext,
       attributes: initAttributes,
       startTime: options.startTime,
       spanProcessor: this._spanProcessor,

@@ -16,7 +16,7 @@
 
 import * as oc from '@opencensus/core';
 import { ShimTracer } from './ShimTracer';
-import { AttributeValue, Span, SpanStatusCode, diag } from '@opentelemetry/api';
+import { AttributeValue, Span, SpanContext, SpanStatusCode, diag } from '@opentelemetry/api';
 import { mapMessageEvent, reverseMapSpanContext } from './trace-transform';
 
 // Copied from
@@ -33,6 +33,7 @@ interface Options {
   isRootSpan?: boolean | undefined;
   kind?: oc.SpanKind | undefined;
   parentSpanId?: string | undefined;
+  parentSpanContext?: SpanContext;
 }
 
 export class ShimSpan implements oc.Span {
@@ -71,6 +72,7 @@ export class ShimSpan implements oc.Span {
 
   readonly kind: oc.SpanKind;
   readonly parentSpanId: string;
+  readonly parentSpanContext: SpanContext;
 
   get remoteParent(): boolean {
     return this.otelSpan.spanContext().isRemote ?? false;
@@ -83,12 +85,18 @@ export class ShimSpan implements oc.Span {
     isRootSpan = false,
     kind = oc.SpanKind.UNSPECIFIED,
     parentSpanId = '',
+    parentSpanContext = {
+      spanId: '',
+      traceId: '',
+      traceFlags: 0,
+    },
   }: Options) {
     this._shimTracer = shimTracer;
     this.otelSpan = otelSpan;
     this._isRootSpan = isRootSpan;
     this.kind = kind;
     this.parentSpanId = parentSpanId;
+    this.parentSpanContext = parentSpanContext;
   }
 
   /** Returns whether a span is root or not. */

@@ -588,7 +588,7 @@ describe('BasicTracerProvider', () => {
         )
       );
       assert.ok(span instanceof SpanImpl);
-      assert.deepStrictEqual((span as Span).parentSpanId, undefined);
+      assert.deepStrictEqual((span as Span).parentSpanContext?.spanId, undefined);
     });
 
     it('should start a span with name and with invalid spancontext', () => {

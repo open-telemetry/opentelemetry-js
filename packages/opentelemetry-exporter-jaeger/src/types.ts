@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { SpanContext } from "@opentelemetry/api";
+
 /**
  * Options for Jaeger configuration
  */
@@ -95,6 +97,7 @@ export interface ThriftSpan {
   traceIdHigh: Buffer;
   spanId: Buffer;
   parentSpanId: string | Buffer;
+  parentSpanContext: SpanContext;
   operationName: string;
   references: ThriftReference[];
   flags: number;

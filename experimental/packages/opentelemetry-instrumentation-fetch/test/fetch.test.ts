@@ -293,12 +293,164 @@ describe('fetch', () => {
       exportedSpans = [];
     });
 
+<<<<<<< Updated upstream
     const assertPropagationHeaders = async (
       response: Response
     ): Promise<Record<string, string>> => {
       const { request } = await response.json();
 
       const span: tracing.ReadableSpan = exportedSpans[0];
+=======
+    it('should create a span with correct root span', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      assert.strictEqual(
+        span.parentSpanContext,
+        rootSpan.spanContext(),
+        'parent span is not root span'
+      );
+    });
+
+    it('span should have correct name', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      assert.strictEqual(span.name, 'HTTP GET', 'span has wrong name');
+    });
+
+    it('span should have correct kind', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      assert.strictEqual(span.kind, api.SpanKind.CLIENT, 'span has wrong kind');
+    });
+
+    it('span should have correct attributes', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      const attributes = span.attributes;
+      const keys = Object.keys(attributes);
+      assert.notStrictEqual(
+        attributes[AttributeNames.COMPONENT],
+        '',
+        `attributes ${AttributeNames.COMPONENT} is not defined`
+      );
+
+      assert.strictEqual(
+        attributes[SEMATTRS_HTTP_METHOD],
+        'GET',
+        `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
+      );
+      assert.strictEqual(
+        attributes[SEMATTRS_HTTP_URL],
+        url,
+        `attributes ${SEMATTRS_HTTP_URL} is wrong`
+      );
+      assert.strictEqual(
+        attributes[SEMATTRS_HTTP_STATUS_CODE],
+        200,
+        `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
+      );
+      const statusText = attributes[AttributeNames.HTTP_STATUS_TEXT];
+      assert.ok(
+        statusText === 'OK' || statusText === '',
+        `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
+      );
+      assert.ok(
+        (attributes[SEMATTRS_HTTP_HOST] as string).indexOf('localhost') === 0,
+        `attributes ${SEMATTRS_HTTP_HOST} is wrong`
+      );
+
+      const httpScheme = attributes[SEMATTRS_HTTP_SCHEME];
+      assert.ok(
+        httpScheme === 'http' || httpScheme === 'https',
+        `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
+      );
+      assert.notStrictEqual(
+        attributes[SEMATTRS_HTTP_USER_AGENT],
+        '',
+        `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
+      );
+      const requestContentLength = attributes[
+        SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+      ] as number;
+      assert.strictEqual(
+        requestContentLength,
+        undefined,
+        `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
+      );
+      const responseContentLength = attributes[
+        SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
+      ] as number;
+      assert.strictEqual(
+        responseContentLength,
+        30,
+        `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
+      );
+
+      assert.strictEqual(keys.length, 9, 'number of attributes is wrong');
+    });
+
+    it('span should have correct events', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      const events = span.events;
+      assert.strictEqual(events.length, 8, 'number of events is wrong');
+      testForCorrectEvents(events, [
+        PTN.FETCH_START,
+        PTN.DOMAIN_LOOKUP_START,
+        PTN.DOMAIN_LOOKUP_END,
+        PTN.CONNECT_START,
+        PTN.CONNECT_END,
+        PTN.REQUEST_START,
+        PTN.RESPONSE_START,
+        PTN.RESPONSE_END,
+      ]);
+    });
+
+    it('should create a span for preflight request', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+      const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      assert.strictEqual(
+        span.parentSpanContext,
+        parentSpan.spanContext(),
+        'parent span is not root span'
+      );
+    });
+
+    it('preflight request span should have correct name', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+      assert.strictEqual(
+        span.name,
+        'CORS Preflight',
+        'preflight request span has wrong name'
+      );
+    });
+
+    it('preflight request span should have correct kind', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+      assert.strictEqual(
+        span.kind,
+        api.SpanKind.INTERNAL,
+        'span has wrong kind'
+      );
+    });
+
+    it('preflight request span should have correct events', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+      const events = span.events;
+      assert.strictEqual(events.length, 8, 'number of events is wrong');
+      testForCorrectEvents(events, [
+        PTN.FETCH_START,
+        PTN.DOMAIN_LOOKUP_START,
+        PTN.DOMAIN_LOOKUP_END,
+        PTN.CONNECT_START,
+        PTN.CONNECT_END,
+        PTN.REQUEST_START,
+        PTN.RESPONSE_START,
+        PTN.RESPONSE_END,
+      ]);
+    });
+
+    it('should set trace headers', async () => {
+      const span: api.Span = exportSpy.args[1][0][0];
+      assert.ok(lastResponse instanceof Response);
+
+      const { request } = await lastResponse.json();
+>>>>>>> Stashed changes
 
       assert.strictEqual(
         request.headers[X_B3_TRACE_ID],
@@ -1156,6 +1308,21 @@ describe('fetch', () => {
         });
       });
     });
+<<<<<<< Updated upstream
+=======
+    afterEach(() => {
+      clearData();
+    });
+    it('should create a span with correct root span', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      assert.strictEqual(
+        span.parentSpanContext,
+        rootSpan.spanContext(),
+        'parent span is not root span'
+      );
+    });
+  });
+>>>>>>> Stashed changes
 
     describe('secure origin requests', () => {
       const tracedFetch = async ({
@@ -1208,11 +1375,23 @@ describe('fetch', () => {
       });
     });
 
+<<<<<<< Updated upstream
     describe('`applyCustomAttributesOnSpan` hook', () => {
       const tracedFetch = async ({
         handlers = [
           msw.http.get('/api/project-headers.json', ({ request }) => {
             const headers = new Headers();
+=======
+    it('should create a span with correct root span', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      assert.strictEqual(
+        span.parentSpanContext,
+        rootSpan.spanContext(),
+        'parent span is not root span'
+      );
+    });
+  });
+>>>>>>> Stashed changes
 
             for (const [key, value] of request.headers) {
               headers.set(`x-request-${key}`, value);

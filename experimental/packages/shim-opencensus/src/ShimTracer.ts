@@ -117,6 +117,7 @@ export class ShimTracer implements oc.Tracer {
       isRootSpan: true,
       kind,
       parentSpanId: trace.getSpanContext(parentCtx)?.spanId,
+      parentSpanContext: trace.getSpanContext(parentCtx),
     });
 
     let ctx = trace.setSpan(parentCtx, otelSpan);
@@ -148,6 +149,7 @@ export class ShimTracer implements oc.Tracer {
       isRootSpan: false,
       kind,
       parentSpanId: trace.getSpanContext(ctx)?.spanId,
+      parentSpanContext: trace.getSpanContext(ctx),
     });
   }
 

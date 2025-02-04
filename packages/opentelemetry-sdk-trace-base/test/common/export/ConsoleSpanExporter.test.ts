@@ -87,6 +87,7 @@ describe('ConsoleSpanExporter', () => {
           'links',
           'name',
           'parentId',
+          'parentSpanContext',
           'resource',
           'status',
           'timestamp',

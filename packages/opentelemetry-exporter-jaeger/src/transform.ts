@@ -43,9 +43,10 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
   const traceId = span.spanContext().traceId.padStart(32, '0');
   const traceIdHigh = traceId.slice(0, 16);
   const traceIdLow = traceId.slice(16);
-  const parentSpan = span.parentSpanId
+  const parentSpanId = span.parentSpanId
     ? Utils.encodeInt64(span.parentSpanId)
     : ThriftUtils.emptyBuffer;
+  const parentSpan = span.parentSpanContext || ThriftUtils.emptySpanContext;
 
   const tags = Object.keys(span.attributes).map(
     (name): Tag => ({ key: name, value: toTagValue(span.attributes[name]) })
@@ -134,7 +135,8 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
     traceIdLow: Utils.encodeInt64(traceIdLow),
     traceIdHigh: Utils.encodeInt64(traceIdHigh),
     spanId: Utils.encodeInt64(span.spanContext().spanId),
-    parentSpanId: parentSpan,
+    parentSpanId: parentSpanId,
+    parentSpanContext: parentSpan,
     operationName: span.name,
     references: spanLinksToThriftRefs(span.links),
     flags: span.spanContext().traceFlags || DEFAULT_FLAGS,
