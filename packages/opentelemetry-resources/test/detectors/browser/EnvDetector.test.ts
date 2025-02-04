@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
 import { RAW_ENVIRONMENT } from '@opentelemetry/core';
-import { envDetector, IResource } from '../../../src';
+import * as assert from 'assert';
+import { envDetector } from '../../../src';
+import { describeBrowser } from '../../util';
 import {
   assertEmptyResource,
   assertWebEngineResource,
 } from '../../util/resource-assertions';
-import { describeBrowser } from '../../util';
 
 describeBrowser('envDetector() on web browser', () => {
   describe('with valid env', () => {
@@ -38,7 +38,8 @@ describeBrowser('envDetector() on web browser', () => {
     });
 
     it('should return resource information from environment variable', async () => {
-      const resource: IResource = await envDetector.detect();
+      const resource = envDetector.detect();
+      assert.ok(resource.attributes);
       assertWebEngineResource(resource, {
         name: 'chromium',
         version: '99',
@@ -65,7 +66,7 @@ describeBrowser('envDetector() on web browser', () => {
         });
 
         it('should return empty resource', async () => {
-          const resource: IResource = await envDetector.detect();
+          const resource = envDetector.detect();
           assertEmptyResource(resource);
         });
       });
@@ -74,14 +75,14 @@ describeBrowser('envDetector() on web browser', () => {
 
   describe('with empty env', () => {
     it('should return empty resource', async () => {
-      const resource: IResource = await envDetector.detect();
+      const resource = envDetector.detect();
       assertEmptyResource(resource);
     });
   });
 
   describe('with empty env', () => {
     it('should return empty resource', async () => {
-      const resource: IResource = await envDetector.detect();
+      const resource = envDetector.detect();
       assertEmptyResource(resource);
     });
   });

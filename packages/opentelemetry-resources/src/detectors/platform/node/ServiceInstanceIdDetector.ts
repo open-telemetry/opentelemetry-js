@@ -14,28 +14,25 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api';
 import { SEMRESATTRS_SERVICE_INSTANCE_ID } from '@opentelemetry/semantic-conventions';
-import { Resource } from '../../../Resource';
-import { DetectorSync } from '../../../types';
-import { ResourceDetectionConfig } from '../../../config';
 import { randomUUID } from 'crypto';
+import { ResourceDetectionConfig } from '../../../config';
+import { DetectedResource, ResourceDetector } from '../../../types';
 
 /**
- * ServiceInstanceIdDetectorSync detects the resources related to the service instance ID.
+ * ServiceInstanceIdDetector detects the resources related to the service instance ID.
  */
-class ServiceInstanceIdDetectorSync implements DetectorSync {
-  detect(_config?: ResourceDetectionConfig): Resource {
-    const attributes: Attributes = {
-      [SEMRESATTRS_SERVICE_INSTANCE_ID]: randomUUID(),
+class ServiceInstanceIdDetector implements ResourceDetector {
+  detect(_config?: ResourceDetectionConfig): DetectedResource {
+    return {
+      attributes: {
+        [SEMRESATTRS_SERVICE_INSTANCE_ID]: randomUUID(),
+      },
     };
-
-    return new Resource(attributes);
   }
 }
 
 /**
  * @experimental
  */
-export const serviceInstanceIdDetectorSync =
-  new ServiceInstanceIdDetectorSync();
+export const serviceInstanceIdDetector = new ServiceInstanceIdDetector();

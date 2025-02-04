@@ -36,7 +36,6 @@ import {
 import { SpanImpl } from '../../../src/Span';
 import { TestStackContextManager } from './TestStackContextManager';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
-import { Attributes } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import { TestExporterWithDelay } from './TestExporterWithDelay';
 import { Tracer } from '../../../src/Tracer';
@@ -176,12 +175,13 @@ describe('SimpleSpanProcessor', () => {
     it('should await unresolved resources', async () => {
       const processor = new SimpleSpanProcessor(exporter);
       const providerWithAsyncResource = new BasicTracerProvider({
-        resource: new Resource(
-          {},
-          new Promise<Attributes>(resolve => {
-            setTimeout(() => resolve({ async: 'fromasync' }), 1);
-          })
-        ),
+        resource: new Resource({
+          attributes: {
+            async: new Promise<string>(resolve =>
+              setTimeout(() => resolve('fromasync'), 1)
+            ),
+          },
+        }),
       });
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
@@ -222,12 +222,13 @@ describe('SimpleSpanProcessor', () => {
       const processor = new SimpleSpanProcessor(testExporterWithDelay);
 
       const providerWithAsyncResource = new BasicTracerProvider({
-        resource: new Resource(
-          {},
-          new Promise<Attributes>(resolve => {
-            setTimeout(() => resolve({ async: 'fromasync' }), 1);
-          })
-        ),
+        resource: new Resource({
+          attributes: {
+            async: new Promise<string>(resolve =>
+              setTimeout(() => resolve('fromasync'), 1)
+            ),
+          },
+        }),
       });
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
