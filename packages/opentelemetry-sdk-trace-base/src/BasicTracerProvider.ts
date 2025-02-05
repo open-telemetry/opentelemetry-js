@@ -28,10 +28,7 @@ import {
   W3CTraceContextPropagator,
   merge,
 } from '@opentelemetry/core';
-import {
-  DEFAULT_RESOURCE,
-  IResource,
-} from '@opentelemetry/resources';
+import { DEFAULT_RESOURCE, IResource } from '@opentelemetry/resources';
 import { SpanProcessor } from './SpanProcessor';
 import { Tracer } from './Tracer';
 import { loadDefaultConfig } from './config';

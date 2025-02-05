@@ -25,7 +25,11 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { describeBrowser, describeNode } from './util';
-import { DEFAULT_RESOURCE, EMPTY_RESOURCE, resourceFromAttributes } from '../src';
+import {
+  DEFAULT_RESOURCE,
+  EMPTY_RESOURCE,
+  resourceFromAttributes,
+} from '../src';
 
 describe('Resource', () => {
   const resource1 = resourceFromAttributes({

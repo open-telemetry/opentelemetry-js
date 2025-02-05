@@ -141,7 +141,9 @@ export function resourceFromAttributes(
   return Resource.FromAttributeList(Object.entries(attributes));
 }
 
-export function resourceFromDetectedResource(detectedResource: DetectedResource): IResource {
+export function resourceFromDetectedResource(
+  detectedResource: DetectedResource
+): IResource {
   return new Resource(detectedResource);
 }
 

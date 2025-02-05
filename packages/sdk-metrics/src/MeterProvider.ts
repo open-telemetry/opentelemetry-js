@@ -21,10 +21,7 @@ import {
   MeterOptions,
   createNoopMeter,
 } from '@opentelemetry/api';
-import {
-  DEFAULT_RESOURCE,
-  IResource,
-} from '@opentelemetry/resources';
+import { DEFAULT_RESOURCE, IResource } from '@opentelemetry/resources';
 import { IMetricReader } from './export/MetricReader';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { MetricCollector } from './state/MetricCollector';

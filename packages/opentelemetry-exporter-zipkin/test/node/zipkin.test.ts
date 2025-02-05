@@ -23,7 +23,10 @@ import {
   ExportResultCode,
 } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
-import { EMPTY_RESOURCE, resourceFromAttributes } from '@opentelemetry/resources';
+import {
+  EMPTY_RESOURCE,
+  resourceFromAttributes,
+} from '@opentelemetry/resources';
 import { ZipkinExporter } from '../../src';
 import * as zipkinTypes from '../../src/types';
 import { TraceFlags } from '@opentelemetry/api';
