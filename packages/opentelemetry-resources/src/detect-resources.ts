@@ -16,7 +16,7 @@
 
 import { diag } from '@opentelemetry/api';
 import { IResource } from './IResource';
-import { Resource } from './Resource';
+import { EMPTY_RESOURCE, resourceFromDetectedResource } from './Resource';
 import { ResourceDetectionConfig } from './config';
 
 /**
@@ -29,12 +29,12 @@ export const detectResources = (
 ): IResource => {
   const resources: IResource[] = (config.detectors || []).map(d => {
     try {
-      const resource = new Resource(d.detect(config));
+      const resource = resourceFromDetectedResource(d.detect(config));
       diag.debug(`${d.constructor.name} found resource.`, resource);
       return resource;
     } catch (e) {
       diag.debug(`${d.constructor.name} failed: ${e.message}`);
-      return Resource.EMPTY;
+      return EMPTY_RESOURCE;
     }
   });
 
@@ -43,7 +43,7 @@ export const detectResources = (
 
   return resources.reduce(
     (acc, resource) => acc.merge(resource),
-    Resource.EMPTY
+    EMPTY_RESOURCE
   );
 };
 

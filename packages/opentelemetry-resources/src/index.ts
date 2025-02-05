@@ -25,8 +25,12 @@ export {
   serviceInstanceIdDetector,
 } from './detectors';
 export { IResource } from './IResource';
+export {
+  resourceFromAttributes,
+  DEFAULT_RESOURCE,
+  EMPTY_RESOURCE,
+} from './Resource';
 export { defaultServiceName } from './platform';
-export { Resource } from './Resource';
 export {
   ResourceDetector,
   DetectedResource,

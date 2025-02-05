@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import { spanToThrift } from '../src/transform';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
-import { Resource } from '@opentelemetry/resources';
+import { EMPTY_RESOURCE } from '@opentelemetry/resources';
 import * as api from '@opentelemetry/api';
 import { ThriftUtils, Utils, ThriftReferenceType } from '../src/types';
 import { hrTimeToMicroseconds } from '@opentelemetry/core';
@@ -179,7 +179,7 @@ describe('transform', () => {
         links: [],
         events: [],
         duration: [32, 800000000],
-        resource: Resource.EMPTY,
+        resource: EMPTY_RESOURCE,
         instrumentationScope: {
           name: 'default',
           version: '0.0.1',
@@ -249,7 +249,7 @@ describe('transform', () => {
         ],
         events: [],
         duration: [32, 800000000],
-        resource: Resource.EMPTY,
+        resource: EMPTY_RESOURCE,
         instrumentationScope: {
           name: 'default',
           version: '0.0.1',
@@ -297,7 +297,7 @@ describe('transform', () => {
         links: [],
         events: [],
         duration: [32, 800000000],
-        resource: Resource.EMPTY,
+        resource: EMPTY_RESOURCE,
         instrumentationScope: {
           name: 'default',
           version: '0.0.1',

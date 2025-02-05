@@ -24,33 +24,23 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import { IResource } from './IResource';
 import { defaultServiceName } from './platform';
-import { DetectedResource, MaybePromise, RawResourceAttribute } from './types';
+import {
+  DetectedResource,
+  DetectedResourceAttributes,
+  MaybePromise,
+  RawResourceAttribute,
+} from './types';
 import { isPromiseLike } from './utils';
 
-export class Resource implements IResource {
+class Resource implements IResource {
   private _rawAttributes: RawResourceAttribute[];
   private _asyncAttributesPending = false;
 
   private _memoizedAttributes?: Attributes;
 
-  public static EMPTY: IResource = new Resource({ attributes: {} });
-  /**
-   * Returns a Resource that identifies the SDK in use.
-   */
-  static default(): IResource {
-    return new Resource({
-      attributes: {
-        [ATTR_SERVICE_NAME]: defaultServiceName(),
-        [ATTR_TELEMETRY_SDK_LANGUAGE]: SDK_INFO[ATTR_TELEMETRY_SDK_LANGUAGE],
-        [ATTR_TELEMETRY_SDK_NAME]: SDK_INFO[ATTR_TELEMETRY_SDK_NAME],
-        [ATTR_TELEMETRY_SDK_VERSION]: SDK_INFO[ATTR_TELEMETRY_SDK_VERSION],
-      },
-    });
-  }
-
   static FromAttributeList(
     attributes: [string, MaybePromise<AttributeValue | undefined>][]
-  ): Resource {
+  ): IResource {
     const res = new Resource({});
     res._rawAttributes = attributes;
     res._asyncAttributesPending =
@@ -144,3 +134,21 @@ export class Resource implements IResource {
     ]);
   }
 }
+
+export function resourceFromAttributes(
+  attributes: DetectedResourceAttributes
+): IResource {
+  return Resource.FromAttributeList(Object.entries(attributes));
+}
+
+export function resourceFromDetectedResource(detectedResource: DetectedResource): IResource {
+  return new Resource(detectedResource);
+}
+
+export const EMPTY_RESOURCE = resourceFromAttributes({});
+export const DEFAULT_RESOURCE = resourceFromAttributes({
+  [ATTR_SERVICE_NAME]: defaultServiceName(),
+  [ATTR_TELEMETRY_SDK_LANGUAGE]: SDK_INFO[ATTR_TELEMETRY_SDK_LANGUAGE],
+  [ATTR_TELEMETRY_SDK_NAME]: SDK_INFO[ATTR_TELEMETRY_SDK_NAME],
+  [ATTR_TELEMETRY_SDK_VERSION]: SDK_INFO[ATTR_TELEMETRY_SDK_VERSION],
+});
