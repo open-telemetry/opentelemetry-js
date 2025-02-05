@@ -246,12 +246,12 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [David Luna](https://github.com/david-luna), Elastic
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
 - [Martin Kuba](https://github.com/martinkuba), Lightstep
+- [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
 - [Neville Wylie](https://github.com/MSNev), Microsoft
 - [Purvi Kanal](https://github.com/pkanal), Honeycomb
 - [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
-- [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
 
 *Find more about the approver role in the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#approver).*
 
