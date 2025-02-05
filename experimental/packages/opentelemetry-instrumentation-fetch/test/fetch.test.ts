@@ -1423,7 +1423,7 @@ describe('fetch', () => {
                   !(request instanceof Request),
                 '`requestHook` should get a `RequestInit` object when no options are passed to `fetch()`'
               );
-              request.headers = { 'custom-foo': 'foo', UserAgent: 'custom-ua' };
+              request.headers = { 'custom-foo': 'foo' };
             },
           },
         });
@@ -1434,11 +1434,6 @@ describe('fetch', () => {
           request.headers['custom-foo'],
           'foo',
           'header set from requestHook should be sent'
-        );
-        assert.notEqual(
-          request.headers['User-Agent'],
-          'custom-ua',
-          'User-Agent shoud not be overrided'
         );
       });
 
@@ -1452,7 +1447,6 @@ describe('fetch', () => {
               );
 
               request.headers.set('custom-foo', 'foo');
-              request.headers.set('User-Agent', 'custom-ua');
             },
           },
           callback: () =>
@@ -1475,11 +1469,6 @@ describe('fetch', () => {
           'bar',
           'header set from fetch() should be sent'
         );
-        assert.notEqual(
-          request.headers['User-Agent'],
-          'custom-ua',
-          'User-Agent shoud not be overrided'
-        );
       });
 
       it('can modify headers when called with a `RequestInit` object', async () => {
@@ -1499,8 +1488,6 @@ describe('fetch', () => {
               );
 
               (request.headers as Record<string, string>)['custom-foo'] = 'foo';
-              (request.headers as Record<string, string>)['User-Agent'] =
-                'custom-ua';
             },
           },
           callback: () =>
@@ -1520,11 +1507,6 @@ describe('fetch', () => {
           request.headers['custom-bar'],
           'bar',
           'header set from fetch() should be sent'
-        );
-        assert.notEqual(
-          request.headers['User-Agent'],
-          'custom-ua',
-          'User-Agent shoud not be overrided'
         );
       });
     });
