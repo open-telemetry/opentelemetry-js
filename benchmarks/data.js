@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1738780649779,
+  "lastUpdate": 1738798328491,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -25588,6 +25588,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.51%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "34a2dd574c521fa970e2c0cd60c852110823c962",
+          "message": "test: Test Node.js 23 in CI (#5416)",
+          "timestamp": "2025-02-05T20:04:04Z",
+          "tree_id": "e2e20e519d1481c225be9f10d9515ee74395ce6b",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/34a2dd574c521fa970e2c0cd60c852110823c962"
+        },
+        "date": 1738798327543,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1524190,
+            "range": "±0.61%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 17258,
+            "range": "±0.31%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 810603,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 784476,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
