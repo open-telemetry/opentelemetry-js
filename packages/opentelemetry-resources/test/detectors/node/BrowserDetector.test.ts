@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Resource } from '../../../src';
 import { browserDetector } from '../../../src/detectors/BrowserDetector';
+import { resourceFromDetectedResource } from '../../../src/Resource';
 import { describeNode } from '../../util';
 import { assertEmptyResource } from '../../util/resource-assertions';
 
 describeNode('browserDetector()', () => {
   it('should return empty resources if window.document is missing', async () => {
-    const resource = new Resource(browserDetector.detect());
+    const resource = resourceFromDetectedResource(browserDetector.detect());
     assertEmptyResource(resource);
   });
 });

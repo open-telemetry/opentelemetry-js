@@ -30,7 +30,10 @@ import {
 } from '@opentelemetry/api';
 import { CompositePropagator } from '@opentelemetry/core';
 import { TraceState } from '@opentelemetry/core';
-import { DEFAULT_RESOURCE } from '@opentelemetry/resources';
+import {
+  DEFAULT_RESOURCE,
+  resourceFromAttributes,
+} from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
@@ -730,7 +733,7 @@ describe('BasicTracerProvider', () => {
     });
 
     it('should use not use the default if resource passed', function () {
-      const providedResource = new Resource({ attributes: { foo: 'bar' } });
+      const providedResource = resourceFromAttributes({ foo: 'bar' });
       const tracerProvider = new BasicTracerProvider({
         resource: providedResource,
       });

@@ -16,7 +16,7 @@
 
 import { SDK_INFO } from '@opentelemetry/core';
 import * as assert from 'assert';
-import { IResource, Resource } from '@opentelemetry/resources';
+import { IResource } from '@opentelemetry/resources';
 import {
   SEMRESATTRS_CLOUD_ACCOUNT_ID,
   SEMRESATTRS_CLOUD_AVAILABILITY_ZONE,
@@ -57,7 +57,7 @@ import * as semconv from '@opentelemetry/semantic-conventions';
  * @param validations validations for the resource attributes
  */
 export const assertCloudResource = (
-  resource: Resource,
+  resource: IResource,
   validations: {
     provider?: string;
     accountId?: string;
@@ -95,7 +95,7 @@ export const assertCloudResource = (
  * @param validations validations for the resource attributes
  */
 export const assertContainerResource = (
-  resource: Resource,
+  resource: IResource,
   validations: {
     name?: string;
     id?: string;
@@ -133,7 +133,7 @@ export const assertContainerResource = (
  * @param validations validations for the resource attributes
  */
 export const assertHostResource = (
-  resource: Resource,
+  resource: IResource,
   validations: {
     hostName?: string;
     id?: string;
@@ -184,7 +184,7 @@ export const assertHostResource = (
  * @param validations validations for the resource attributes
  */
 export const assertK8sResource = (
-  resource: Resource,
+  resource: IResource,
   validations: {
     clusterName?: string;
     namespaceName?: string;
@@ -222,7 +222,7 @@ export const assertK8sResource = (
  * @param validations validations for the resource attributes
  */
 export const assertTelemetrySDKResource = (
-  resource: Resource,
+  resource: IResource,
   validations: {
     name?: string;
     language?: string;
@@ -295,7 +295,7 @@ export const assertServiceResource = (
  * @param validations validations for the resource attributes
  */
 export const assertProcessResource = (
-  resource: Resource,
+  resource: IResource,
   validations: {
     pid?: number;
     name?: string;
@@ -332,7 +332,7 @@ export const assertProcessResource = (
  *
  * @param resource the Resource to validate
  */
-export const assertEmptyResource = (resource: Resource) => {
+export const assertEmptyResource = (resource: IResource) => {
   assert.strictEqual(Object.keys(resource.attributes).length, 0);
 };
 
@@ -340,7 +340,7 @@ export const assertEmptyResource = (resource: Resource) => {
  * Assert that the `resource` has at least one known attribute with the given
  * `prefix`. By "known", we mean it is an attribute defined in semconv.
  */
-const assertHasOneLabel = (prefix: string, resource: Resource): void => {
+const assertHasOneLabel = (prefix: string, resource: IResource): void => {
   const semconvModPrefix = `SEMRESATTRS_${prefix.toUpperCase()}_`;
   const knownAttrs: Set<string> = new Set(
     Object.entries(semconv)

@@ -17,7 +17,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { InstrumentationScope } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
 import {
   DataPoint,
   DataPointType,
@@ -40,6 +39,7 @@ import {
 } from './util';
 import { ObservableResult, ValueType } from '@opentelemetry/api';
 import { IMetricReader } from '../src/export/MetricReader';
+import { IResource } from '@opentelemetry/resources';
 
 describe('Instruments', () => {
   describe('Counter', () => {
@@ -836,7 +836,7 @@ function setup() {
 }
 
 interface ValidateMetricData {
-  resource?: Resource;
+  resource?: IResource;
   instrumentationScope?: InstrumentationScope;
   descriptor?: InstrumentDescriptor;
   dataPointType?: DataPointType;

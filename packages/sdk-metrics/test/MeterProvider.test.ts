@@ -33,7 +33,10 @@ import * as sinon from 'sinon';
 import { Meter } from '../src/Meter';
 import { createAllowListAttributesProcessor } from '../src/view/AttributesProcessor';
 import { AggregationType } from '../src/view/AggregationOption';
-import { DEFAULT_RESOURCE } from '@opentelemetry/resources';
+import {
+  DEFAULT_RESOURCE,
+  resourceFromAttributes,
+} from '@opentelemetry/resources';
 
 describe('MeterProvider', () => {
   afterEach(() => {
@@ -70,7 +73,7 @@ describe('MeterProvider', () => {
 
     it('should use the resource passed in constructor', async function () {
       const reader = new TestMetricReader();
-      const expectedResource = new Resource({ attributes: { foo: 'bar' } });
+      const expectedResource = resourceFromAttributes({ foo: 'bar' });
 
       const meterProvider = new MeterProvider({
         readers: [reader],
