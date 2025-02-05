@@ -9,7 +9,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
-* feat(sdk-trace-base): parentSpanContext is now available on the Span and ReadableSpan [#5422](https://github.com/open-telemetry/opentelemetry-js/pull/5422) @jacksonweber 
+* feat(sdk-trace-base): parentSpanContext is now available on the Span and ReadableSpan [#5422](https://github.com/open-telemetry/opentelemetry-js/pull/5422) @jacksonweber
 
 ### :bug: (Bug Fix)
 
