@@ -898,7 +898,7 @@ describe('Span', () => {
       spanContext,
       SpanKind.INTERNAL,
       parentId,
-      parentSpanContext,
+      parentSpanContext
     );
 
     assert.strictEqual(span.name, 'my-span');
