@@ -28,7 +28,7 @@ import {
   W3CTraceContextPropagator,
   merge,
 } from '@opentelemetry/core';
-import { DEFAULT_RESOURCE, IResource } from '@opentelemetry/resources';
+import { DEFAULT_RESOURCE, Resource } from '@opentelemetry/resources';
 import { SpanProcessor } from './SpanProcessor';
 import { Tracer } from './Tracer';
 import { loadDefaultConfig } from './config';
@@ -53,7 +53,7 @@ function getDefaultPropagators(): TextMapPropagator[] {
 export class BasicTracerProvider implements TracerProvider {
   private readonly _config: TracerConfig;
   private readonly _tracers: Map<string, Tracer> = new Map();
-  private readonly _resource: IResource;
+  private readonly _resource: Resource;
   private readonly _activeSpanProcessor: MultiSpanProcessor;
 
   constructor(config: TracerConfig = {}) {

@@ -23,7 +23,7 @@ import {
 } from '@opentelemetry/core';
 import {
   DEFAULT_RESOURCE,
-  IResource,
+  Resource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
 
@@ -37,7 +37,7 @@ import { LoggerProviderSharedState } from '../../../src/internal/LoggerProviderS
 import { reconfigureLimits } from '../../../src/config';
 import { TestExporterWithDelay } from './TestExporterWithDelay';
 
-const setup = (exporter: LogRecordExporter, resource?: IResource) => {
+const setup = (exporter: LogRecordExporter, resource?: Resource) => {
   const sharedState = new LoggerProviderSharedState(
     resource || DEFAULT_RESOURCE,
     Infinity,

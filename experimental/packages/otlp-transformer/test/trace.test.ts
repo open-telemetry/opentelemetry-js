@@ -16,7 +16,7 @@
 import * as root from '../src/generated/root';
 import { SpanKind, SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import { TraceState, hexToBinary } from '@opentelemetry/core';
-import { IResource, resourceFromAttributes } from '@opentelemetry/resources';
+import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { toBase64 } from './utils';
@@ -227,7 +227,7 @@ function createExpectedSpanProtobuf() {
 }
 
 describe('Trace', () => {
-  let resource: IResource;
+  let resource: Resource;
   let span: ReadableSpan;
 
   beforeEach(() => {

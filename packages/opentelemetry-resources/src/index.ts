@@ -24,12 +24,12 @@ export {
   processDetector,
   serviceInstanceIdDetector,
 } from './detectors';
-export { IResource } from './IResource';
+export { Resource } from './Resource';
 export {
   resourceFromAttributes,
   DEFAULT_RESOURCE,
   EMPTY_RESOURCE,
-} from './Resource';
+} from './ResourceImpl';
 export { defaultServiceName } from './platform';
 export {
   ResourceDetector,

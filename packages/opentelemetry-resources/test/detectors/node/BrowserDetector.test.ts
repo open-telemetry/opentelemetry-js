@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { browserDetector } from '../../../src/detectors/BrowserDetector';
-import { resourceFromDetectedResource } from '../../../src/Resource';
+import { resourceFromDetectedResource } from '../../../src/ResourceImpl';
 import { describeNode } from '../../util';
 import { assertEmptyResource } from '../../util/resource-assertions';
 

@@ -22,7 +22,7 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { hostDetector } from '../../../src';
-import { resourceFromDetectedResource } from '../../../src/Resource';
+import { resourceFromDetectedResource } from '../../../src/ResourceImpl';
 import { describeNode } from '../../util';
 
 describeNode('hostDetector() on Node.js', () => {

@@ -39,7 +39,7 @@ import {
 } from './util';
 import { ObservableResult, ValueType } from '@opentelemetry/api';
 import { IMetricReader } from '../src/export/MetricReader';
-import { IResource } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 
 describe('Instruments', () => {
   describe('Counter', () => {
@@ -836,7 +836,7 @@ function setup() {
 }
 
 interface ValidateMetricData {
-  resource?: IResource;
+  resource?: Resource;
   instrumentationScope?: InstrumentationScope;
   descriptor?: InstrumentDescriptor;
   dataPointType?: DataPointType;

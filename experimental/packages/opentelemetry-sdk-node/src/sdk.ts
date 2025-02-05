@@ -31,7 +31,7 @@ import {
   detectResources,
   envDetector,
   hostDetector,
-  IResource,
+  Resource,
   processDetector,
   ResourceDetectionConfig,
   ResourceDetector,
@@ -209,7 +209,7 @@ export class NodeSDK {
   private _meterProviderConfig?: MeterProviderConfig;
   private _instrumentations: Instrumentation[];
 
-  private _resource: IResource;
+  private _resource: Resource;
   private _resourceDetectors: Array<ResourceDetector>;
 
   private _autoDetectResources: boolean;

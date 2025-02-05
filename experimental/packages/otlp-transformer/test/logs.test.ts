@@ -15,7 +15,7 @@
  */
 import { HrTime, TraceFlags } from '@opentelemetry/api';
 import { InstrumentationScope, hexToBinary } from '@opentelemetry/core';
-import { IResource, resourceFromAttributes } from '@opentelemetry/resources';
+import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
@@ -143,8 +143,8 @@ function createExpectedLogProtobuf(): IExportLogsServiceRequest {
 }
 
 describe('Logs', () => {
-  let resource_1: IResource;
-  let resource_2: IResource;
+  let resource_1: Resource;
+  let resource_2: Resource;
   let scope_1: InstrumentationScope;
   let scope_2: InstrumentationScope;
 

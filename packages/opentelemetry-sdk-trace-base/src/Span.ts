@@ -42,7 +42,7 @@ import {
   otperformance,
   sanitizeAttributes,
 } from '@opentelemetry/core';
-import { IResource } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 import {
   SEMATTRS_EXCEPTION_MESSAGE,
   SEMATTRS_EXCEPTION_STACKTRACE,
@@ -61,7 +61,7 @@ import { SpanLimits } from './types';
 export type Span = APISpan & ReadableSpan;
 
 interface SpanOptions {
-  resource: IResource;
+  resource: Resource;
   scope: InstrumentationScope;
   context: Context;
   spanContext: SpanContext;
@@ -88,7 +88,7 @@ export class SpanImpl implements Span {
   readonly links: Link[] = [];
   readonly events: TimedEvent[] = [];
   readonly startTime: HrTime;
-  readonly resource: IResource;
+  readonly resource: Resource;
   readonly instrumentationScope: InstrumentationScope;
 
   private _droppedAttributesCount = 0;

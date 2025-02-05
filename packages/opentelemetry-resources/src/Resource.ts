@@ -14,143 +14,44 @@
  * limitations under the License.
  */
 
-import { Attributes, AttributeValue, diag } from '@opentelemetry/api';
-import { SDK_INFO } from '@opentelemetry/core';
-import {
-  ATTR_SERVICE_NAME,
-  ATTR_TELEMETRY_SDK_LANGUAGE,
-  ATTR_TELEMETRY_SDK_NAME,
-  ATTR_TELEMETRY_SDK_VERSION,
-} from '@opentelemetry/semantic-conventions';
-import { IResource } from './IResource';
-import { defaultServiceName } from './platform';
-import {
-  DetectedResource,
-  DetectedResourceAttributes,
-  MaybePromise,
-  RawResourceAttribute,
-} from './types';
-import { isPromiseLike } from './utils';
+import { Attributes } from '@opentelemetry/api';
+import { RawResourceAttribute } from './types';
 
-class Resource implements IResource {
-  private _rawAttributes: RawResourceAttribute[];
-  private _asyncAttributesPending = false;
+/**
+ * An interface that represents a resource. A Resource describes the entity for which signals (metrics or trace) are
+ * collected.
+ *
+ */
+export interface Resource {
+  /**
+   * Check if async attributes have resolved. This is useful to avoid awaiting
+   * waitForAsyncAttributes (which will introduce asynchronous behavior) when not necessary.
+   *
+   * @returns true if the resource "attributes" property is not yet settled to its final value
+   */
+  readonly asyncAttributesPending?: boolean;
 
-  private _memoizedAttributes?: Attributes;
+  /**
+   * @returns the Resource's attributes.
+   */
+  readonly attributes: Attributes;
 
-  static FromAttributeList(
-    attributes: [string, MaybePromise<AttributeValue | undefined>][]
-  ): IResource {
-    const res = new Resource({});
-    res._rawAttributes = attributes;
-    res._asyncAttributesPending =
-      attributes.filter(([_, val]) => isPromiseLike(val)).length > 0;
-    return res;
-  }
+  /**
+   * Returns a promise that will never be rejected. Resolves when all async attributes have finished being added to
+   * this Resource's attributes. This is useful in exporters to block until resource detection
+   * has finished.
+   */
+  waitForAsyncAttributes?(): Promise<void>;
 
-  constructor(
-    /**
-     * A dictionary of attributes with string keys and values that provide
-     * information about the entity as numbers, strings or booleans
-     * TODO: Consider to add check/validation on attributes.
-     */
-    resource: DetectedResource
-  ) {
-    const attributes = resource.attributes ?? {};
-    this._rawAttributes = Object.entries(attributes).map(([k, v]) => {
-      if (isPromiseLike(v)) {
-        // side-effect
-        this._asyncAttributesPending = true;
-      }
+  /**
+   * Returns a new, merged {@link Resource} by merging the current Resource
+   * with the other Resource. In case of a collision, other Resource takes
+   * precedence.
+   *
+   * @param other the Resource that will be merged with this.
+   * @returns the newly merged Resource.
+   */
+  merge(other: Resource | null): Resource;
 
-      return [k, v];
-    });
-  }
-
-  public get asyncAttributesPending(): boolean {
-    return this._asyncAttributesPending;
-  }
-
-  public async waitForAsyncAttributes(): Promise<void> {
-    if (!this.asyncAttributesPending) {
-      return;
-    }
-
-    for (let i = 0; i < this._rawAttributes.length; i++) {
-      const [k, v] = this._rawAttributes[i];
-      try {
-        this._rawAttributes[i] = [k, isPromiseLike(v) ? await v : v];
-      } catch (err) {
-        diag.debug("a resource's async attributes promise rejected: %s", err);
-        this._rawAttributes[i] = [k, undefined];
-      }
-    }
-
-    this._asyncAttributesPending = false;
-  }
-
-  public get attributes(): Attributes {
-    if (this.asyncAttributesPending) {
-      diag.error(
-        'Accessing resource attributes before async attributes settled'
-      );
-    }
-
-    if (this._memoizedAttributes) {
-      return this._memoizedAttributes;
-    }
-
-    const attrs: Attributes = {};
-    for (const [k, v] of this._rawAttributes) {
-      if (isPromiseLike(v)) {
-        diag.debug(`Unsettled resource attribute ${k} skipped`);
-        continue;
-      }
-      if (v != null) {
-        attrs[k] ??= v;
-      }
-    }
-
-    // only memoize output if all attributes are settled
-    if (!this._asyncAttributesPending) {
-      this._memoizedAttributes = attrs;
-    }
-
-    return attrs;
-  }
-
-  public getRawAttributes(): RawResourceAttribute[] {
-    return this._rawAttributes;
-  }
-
-  public merge(resource: IResource | null): IResource {
-    if (resource == null) return this;
-
-    // Order is important
-    // Spec states incoming attributes override existing attributes
-    return Resource.FromAttributeList([
-      ...resource.getRawAttributes(),
-      ...this.getRawAttributes(),
-    ]);
-  }
+  getRawAttributes(): RawResourceAttribute[];
 }
-
-export function resourceFromAttributes(
-  attributes: DetectedResourceAttributes
-): IResource {
-  return Resource.FromAttributeList(Object.entries(attributes));
-}
-
-export function resourceFromDetectedResource(
-  detectedResource: DetectedResource
-): IResource {
-  return new Resource(detectedResource);
-}
-
-export const EMPTY_RESOURCE = resourceFromAttributes({});
-export const DEFAULT_RESOURCE = resourceFromAttributes({
-  [ATTR_SERVICE_NAME]: defaultServiceName(),
-  [ATTR_TELEMETRY_SDK_LANGUAGE]: SDK_INFO[ATTR_TELEMETRY_SDK_LANGUAGE],
-  [ATTR_TELEMETRY_SDK_NAME]: SDK_INFO[ATTR_TELEMETRY_SDK_NAME],
-  [ATTR_TELEMETRY_SDK_VERSION]: SDK_INFO[ATTR_TELEMETRY_SDK_VERSION],
-});
