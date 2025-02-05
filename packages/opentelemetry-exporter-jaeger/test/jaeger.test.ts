@@ -47,7 +47,9 @@ describe('JaegerExporter', () => {
     events: [],
     duration: [32, 800000000],
     resource: new Resource({
-      [SEMRESATTRS_SERVICE_NAME]: 'opentelemetry',
+      attributes: {
+        [SEMRESATTRS_SERVICE_NAME]: 'opentelemetry',
+      },
     }),
     instrumentationScope: {
       name: 'default',

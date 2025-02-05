@@ -70,7 +70,7 @@ describe('MeterProvider', () => {
 
     it('should use the resource passed in constructor', async function () {
       const reader = new TestMetricReader();
-      const expectedResource = new Resource({ foo: 'bar' });
+      const expectedResource = new Resource({ attributes: { foo: 'bar' } });
 
       const meterProvider = new MeterProvider({
         readers: [reader],

@@ -26,12 +26,12 @@ import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/expor
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import {
-  DetectorSync,
-  envDetectorSync,
-  hostDetectorSync,
-  osDetectorSync,
-  processDetectorSync,
-  serviceInstanceIdDetectorSync,
+  envDetector,
+  hostDetector,
+  osDetector,
+  processDetector,
+  ResourceDetector,
+  serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import {
   BatchSpanProcessor,
@@ -49,14 +49,14 @@ const RESOURCE_DETECTOR_OS = 'os';
 const RESOURCE_DETECTOR_PROCESS = 'process';
 const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
 
-export function getResourceDetectorsFromEnv(): Array<DetectorSync> {
+export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   // When updating this list, make sure to also update the section `resourceDetectors` on README.
-  const resourceDetectors = new Map<string, DetectorSync>([
-    [RESOURCE_DETECTOR_ENVIRONMENT, envDetectorSync],
-    [RESOURCE_DETECTOR_HOST, hostDetectorSync],
-    [RESOURCE_DETECTOR_OS, osDetectorSync],
-    [RESOURCE_DETECTOR_SERVICE_INSTANCE_ID, serviceInstanceIdDetectorSync],
-    [RESOURCE_DETECTOR_PROCESS, processDetectorSync],
+  const resourceDetectors = new Map<string, ResourceDetector>([
+    [RESOURCE_DETECTOR_ENVIRONMENT, envDetector],
+    [RESOURCE_DETECTOR_HOST, hostDetector],
+    [RESOURCE_DETECTOR_OS, osDetector],
+    [RESOURCE_DETECTOR_SERVICE_INSTANCE_ID, serviceInstanceIdDetector],
+    [RESOURCE_DETECTOR_PROCESS, processDetector],
   ]);
 
   const resourceDetectorsFromEnv =

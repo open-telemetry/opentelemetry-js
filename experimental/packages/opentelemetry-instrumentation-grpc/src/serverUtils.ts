@@ -108,7 +108,10 @@ function serverStreamAndBidiHandler<RequestType, ResponseType>(
     endSpan();
   });
 
-  // Types of parameters 'call' and 'call' are incompatible.
+  // TODO: Investigate this call/signature – it was inherited from very old
+  // code and the `this: {}` is highly suspicious, and likely isn't doing
+  // anything useful. There is probably a more precise cast we can do here.
+  // eslint-disable-next-line @typescript-eslint/ban-types
   return (original as Function).call({}, call);
 }
 
@@ -149,6 +152,11 @@ function clientStreamAndUnaryHandler<RequestType, ResponseType>(
   };
 
   context.bind(context.active(), call);
+
+  // TODO: Investigate this call/signature – it was inherited from very old
+  // code and the `this: {}` is highly suspicious, and likely isn't doing
+  // anything useful. There is probably a more precise cast we can do here.
+  // eslint-disable-next-line @typescript-eslint/ban-types
   return (original as Function).call({}, call, patchedCallback);
 }
 
@@ -204,10 +212,18 @@ export function handleUntracedServerFunction<RequestType, ResponseType>(
     case 'unary':
     case 'clientStream':
     case 'client_stream':
+      // TODO: Investigate this call/signature – it was inherited from very old
+      // code and the `this: {}` is highly suspicious, and likely isn't doing
+      // anything useful. There is probably a more precise cast we can do here.
+      // eslint-disable-next-line @typescript-eslint/ban-types
       return (originalFunc as Function).call({}, call, callback);
     case 'serverStream':
     case 'server_stream':
     case 'bidi':
+      // TODO: Investigate this call/signature – it was inherited from very old
+      // code and the `this: {}` is highly suspicious, and likely isn't doing
+      // anything useful. There is probably a more precise cast we can do here.
+      // eslint-disable-next-line @typescript-eslint/ban-types
       return (originalFunc as Function).call({}, call);
     default:
       break;

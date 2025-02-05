@@ -23,7 +23,6 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { DiagLogLevel } from '@opentelemetry/api';
-import { TracesSamplerValues } from '../../src';
 
 let lastMock: RAW_ENVIRONMENT = {};
 
@@ -183,15 +182,12 @@ describe('environment', () => {
     it('should remove a mock environment', () => {
       mockEnvironment({
         OTEL_LOG_LEVEL: 'DEBUG',
-        OTEL_TRACES_SAMPLER: TracesSamplerValues.AlwaysOff,
+        OTEL_TRACES_SAMPLER: 'always_off',
       });
       removeMockEnvironment();
       const env = getEnv();
       assert.strictEqual(env.OTEL_LOG_LEVEL, DiagLogLevel.INFO);
-      assert.strictEqual(
-        env.OTEL_TRACES_SAMPLER,
-        TracesSamplerValues.ParentBasedAlwaysOn
-      );
+      assert.strictEqual(env.OTEL_TRACES_SAMPLER, 'parentbased_always_on');
     });
   });
 });
