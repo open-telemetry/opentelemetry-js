@@ -378,6 +378,11 @@ describe('xhr', () => {
             rootSpan.spanContext().spanId,
             'parent span is not root span'
           );
+          assert.strictEqual(
+            span.parentSpanContext?.spanId,
+            rootSpan.spanContext().spanId,
+            'parent span in parent span context is not root span'
+          );
         });
 
         it('span should have correct name', () => {
@@ -481,6 +486,11 @@ describe('xhr', () => {
             span.parentSpanId,
             parentSpan.spanContext().spanId,
             'parent span is not root span'
+          );
+          assert.strictEqual(
+            span.parentSpanContext?.spanId,
+            parentSpan.spanContext().spanId,
+            'parent span in parent span context is not root span'
           );
         });
 
@@ -1574,6 +1584,11 @@ describe('xhr', () => {
             rootSpan.spanContext().spanId,
             'parent span is not root span'
           );
+          assert.strictEqual(
+            span.parentSpanContext?.spanId,
+            rootSpan.spanContext().spanId,
+            'parent span in parent span context is not root span'
+          )
         });
 
         it('span should have correct name', () => {
@@ -1677,6 +1692,11 @@ describe('xhr', () => {
             span.parentSpanId,
             parentSpan.spanContext().spanId,
             'parent span is not root span'
+          );
+          assert.strictEqual(
+            span.parentSpanContext?.spanId,
+            parentSpan.spanContext().spanId,
+            'parent span in parent span context is not root span'
           );
         });
 

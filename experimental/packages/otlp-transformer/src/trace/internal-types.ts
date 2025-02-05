@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { SpanContext } from '@opentelemetry/api';
 import {
   Fixed64,
   IInstrumentationScope,
@@ -64,6 +65,9 @@ export interface ISpan {
 
   /** Span parentSpanId */
   parentSpanId?: string | Uint8Array;
+
+  /** Span parentSpanContext */
+  parentSpanContext?: SpanContext;
 
   /** Span name */
   name: string;

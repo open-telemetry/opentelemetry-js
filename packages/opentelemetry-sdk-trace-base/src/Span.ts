@@ -64,6 +64,7 @@ export class Span implements APISpan, ReadableSpan {
   private readonly _spanContext: SpanContext;
   readonly kind: SpanKind;
   readonly parentSpanId?: string;
+  readonly parentSpanContext?: SpanContext;
   readonly attributes: SpanAttributes = {};
   readonly links: Link[] = [];
   readonly events: TimedEvent[] = [];
@@ -102,6 +103,7 @@ export class Span implements APISpan, ReadableSpan {
     spanContext: SpanContext,
     kind: SpanKind,
     parentSpanId?: string,
+    parentSpanContext?: SpanContext,
     links: Link[] = [],
     startTime?: TimeInput,
     _deprecatedClock?: unknown, // keeping this argument even though it is unused to ensure backwards compatibility
@@ -110,6 +112,7 @@ export class Span implements APISpan, ReadableSpan {
     this.name = spanName;
     this._spanContext = spanContext;
     this.parentSpanId = parentSpanId;
+    this.parentSpanContext = parentSpanContext;
     this.kind = kind;
     this.links = links;
 

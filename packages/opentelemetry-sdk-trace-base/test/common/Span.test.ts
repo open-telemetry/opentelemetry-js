@@ -172,6 +172,7 @@ describe('Span', () => {
       spanContext,
       SpanKind.SERVER,
       undefined,
+      spanContext,
       [],
       startTime
     );
@@ -195,6 +196,7 @@ describe('Span', () => {
         spanContext,
         SpanKind.SERVER,
         undefined,
+        spanContext,
         [],
         startTime
       );
@@ -381,6 +383,7 @@ describe('Span', () => {
             name,
             spanContext,
             SpanKind.CLIENT,
+            undefined,
             undefined,
             undefined,
             undefined,
@@ -883,18 +886,25 @@ describe('Span', () => {
 
   it('should return ReadableSpan', () => {
     const parentId = '5c1c63257de34c67';
+    const parentSpanContext: SpanContext = {
+      traceId: 'e4cda95b652f4a1592b449d5929fda1b',
+      spanId: parentId,
+      traceFlags: TraceFlags.SAMPLED,
+    };
     const span = new Span(
       tracer,
       ROOT_CONTEXT,
       'my-span',
       spanContext,
       SpanKind.INTERNAL,
-      parentId
+      parentId,
+      parentSpanContext,
     );
 
     assert.strictEqual(span.name, 'my-span');
     assert.strictEqual(span.kind, SpanKind.INTERNAL);
     assert.strictEqual(span.parentSpanId, parentId);
+    assert.strictEqual(span.parentSpanContext?.spanId, parentId);
     assert.strictEqual(span.spanContext().traceId, spanContext.traceId);
     assert.deepStrictEqual(span.status, {
       code: SpanStatusCode.UNSET,
@@ -936,6 +946,7 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with links', () => {
+    const parentSpanContext: SpanContext = spanContext;
     const span = new Span(
       tracer,
       ROOT_CONTEXT,
@@ -943,6 +954,7 @@ describe('Span', () => {
       spanContext,
       SpanKind.CLIENT,
       undefined,
+      parentSpanContext,
       [
         { context: linkContext },
         {
@@ -1336,6 +1348,7 @@ describe('Span', () => {
           name,
           spanContext,
           SpanKind.CLIENT,
+          undefined,
           undefined,
           undefined,
           undefined,

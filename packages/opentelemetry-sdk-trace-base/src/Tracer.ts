@@ -145,6 +145,7 @@ export class Tracer implements api.Tracer {
       spanContext,
       spanKind,
       parentSpanId,
+      parentSpanContext,
       links,
       options.startTime,
       undefined,

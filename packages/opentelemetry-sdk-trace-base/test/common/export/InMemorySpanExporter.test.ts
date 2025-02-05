@@ -64,6 +64,9 @@ describe('InMemorySpanExporter', () => {
     );
     assert.strictEqual(span1.parentSpanId, span2.spanContext().spanId);
     assert.strictEqual(span2.parentSpanId, span3.spanContext().spanId);
+    assert.strictEqual(span1.parentSpanId, span1.parentSpanContext?.spanId);
+    assert.strictEqual(span2.parentSpanId, span2.parentSpanContext?.spanId);
+    assert.strictEqual(span1.parentSpanContext?.spanId, span2.spanContext().spanId);
   });
 
   it('should shutdown the exporter', () => {

@@ -228,6 +228,10 @@ describe('Tracer', () => {
     assert.strictEqual((span as Span).parentSpanId, parent.spanId);
     assert.strictEqual(span.spanContext().traceId, parent.traceId);
     assert.strictEqual(span.spanContext().traceState, traceState);
+    
+    assert.strictEqual((span as Span).parentSpanContext?.spanId, parent.spanId);
+    assert.strictEqual((span as Span).parentSpanContext?.traceId, parent.traceId);
+    assert.strictEqual((span as Span).parentSpanContext?.traceState, traceState);
   });
 
   it('should not use spanId from invalid parent', () => {
