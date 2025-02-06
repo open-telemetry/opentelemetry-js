@@ -8,17 +8,20 @@
  *    ./scripts/semconv/generate.sh   # Re-generate the semconv package exports.
  *    ./scripts/semconv/changelog-gen.js [aVer [bVer]]
  *
- * where:
- * - `aVer` is the base version of `@opentelemetry/semantic-conventions` to
- *   which to compare, e.g. "1.28.0". This defaults to the latest version
- *   published to npm.
+ * Include the text from this script in "semantic-conventions/CHANGELOG.md",
+ * and perhaps also in the PR description.
+ *
+ * Arguments to the script:
+ * - `aVer` is the base version of `@opentelemetry/semantic-conventions`
+ *   published to npm to which to compare, e.g. "1.27.0". This defaults to the
+ *   latest version published to npm.
  * - `bVer` is the version being compared against `aVer`. This defaults to
- *   "local", which uses the local build in ../../semantic-conventions in this
+ *   "local", which uses the local build in "../../semantic-conventions" in this
  *   repo.
  *
- * The last command (this script) will output a text block that can be used
- * in "semantic-conventions/CHANGELOG.md" (and also perhaps in the PR
- * description).
+ * Examples:
+ *    ./scripts/semconv/changelog-gen.js  # compare the local build to the latest in npm
+ *    ./scripts/semconv/changelog-gen.js 1.27.0 1.28.0  # compare two versions in npm
  */
 
 const fs = require('fs');
@@ -253,8 +256,9 @@ function semconvChangelogGen(aVer=undefined, bVer=undefined) {
     console.log(`Downloading and extracting @opentelemetry/semantic-conventions@${aVer}`)
     const tarballUrl = `https://registry.npmjs.org/@opentelemetry/semantic-conventions/-/semantic-conventions-${aVer}.tgz`;
     fs.mkdirSync(path.dirname(aDir));
-    execSync(`curl -sf -o - ${tarballUrl} | tar xzf -`,
-      { cwd: path.dirname(aDir) });
+    const cwd = path.dirname(aDir);
+    execSync(`curl -sf -o package.tgz ${tarballUrl}`, { cwd });
+    execSync(`tar xzf package.tgz`, { cwd });
   }
 
   let bDir, bSemconvVer;
@@ -277,8 +281,9 @@ function semconvChangelogGen(aVer=undefined, bVer=undefined) {
     console.log(`Downloading and extracting @opentelemetry/semantic-conventions@${bVer}`)
     const tarballUrl = `https://registry.npmjs.org/@opentelemetry/semantic-conventions/-/semantic-conventions-${bVer}.tgz`;
     fs.mkdirSync(path.dirname(bDir));
-    execSync(`curl -sf -o - ${tarballUrl} | tar xzf -`,
-      { cwd: path.dirname(bDir) });
+    const cwd = path.dirname(bDir);
+    execSync(`curl -sf -o package.tgz ${tarballUrl}`, { cwd });
+    execSync(`tar xzf package.tgz`, { cwd });
   }
 
   console.log(`Comparing exports between versions ${aVer} and ${bVer}`)
