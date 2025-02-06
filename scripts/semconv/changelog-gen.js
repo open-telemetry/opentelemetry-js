@@ -6,7 +6,7 @@
  * Usage:
  *    vi scripts/semconv/generate.sh  # Typically update SPEC_VERSION to latest.
  *    ./scripts/semconv/generate.sh   # Re-generate the semconv package exports.
- *    ./scripts/semconv/changelog-gen.sh [aVer [bVer]]
+ *    ./scripts/semconv/changelog-gen.js [aVer [bVer]]
  *
  * where:
  * - `aVer` is the base version of `@opentelemetry/semantic-conventions` to
