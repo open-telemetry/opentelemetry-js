@@ -30,10 +30,14 @@ import {
   ValueType,
 } from '@opentelemetry/api';
 import {
+  getStringListFromEnv,
   hrTime,
   hrTimeDuration,
   hrTimeToMilliseconds,
   suppressTracing,
+  RPCMetadata,
+  RPCType,
+  setRPCMetadata,
 } from '@opentelemetry/core';
 import type * as http from 'http';
 import type * as https from 'https';
@@ -46,12 +50,6 @@ import {
   InstrumentationNodeModuleDefinition,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
-import {
-  RPCMetadata,
-  RPCType,
-  setRPCMetadata,
-  getEnv,
-} from '@opentelemetry/core';
 import { errorMonitor } from 'events';
 import {
   ATTR_HTTP_REQUEST_METHOD,
@@ -108,7 +106,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     super('@opentelemetry/instrumentation-http', VERSION, config);
     this._headerCapture = this._createHeaderCapture();
 
-    for (const entry of getEnv().OTEL_SEMCONV_STABILITY_OPT_IN) {
+    for (const entry of getStringListFromEnv('OTEL_SEMCONV_STABILITY_OPT_IN') ??
+      []) {
       if (entry.toLowerCase() === 'http/dup') {
         // http/dup takes highest precedence. If it is found, there is no need to read the rest of the list
         this._semconvStability = SemconvStability.DUPLICATE;
