@@ -9,6 +9,16 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: (Enhancement)
 
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.29.0
+
+### :rocket: (Enhancement)
+
 * feat: update semantic conventions to v1.29.0 [#5356](https://github.com/open-telemetry/opentelemetry-js/pull/5356) @trentm
   * Semantic Conventions v1.29.0:
     [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1290) |
@@ -148,13 +158,9 @@ ATTR_VCS_REVISION_DELTA_DIRECTION                     // vcs.revision_delta.dire
 
 </details>
 
-### :bug: (Bug Fix)
-
 ### :books: (Refine Doc)
 
 * docs: Document suggested usage of unstable semconv: copy relevant definitions into your code base. [#5182](https://github.com/open-telemetry/opentelemetry-js/pull/5182) @trentm
-
-### :house: (Internal)
 
 ## 1.28.0
 
