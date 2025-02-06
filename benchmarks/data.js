@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1738808246521,
+  "lastUpdate": 1738841145156,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -25848,6 +25848,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.33%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "241c046ccd214701a3e0bacd09e8affd5e61044c",
+          "message": "chore: remove obsolete comment (#5426)",
+          "timestamp": "2025-02-06T10:23:06Z",
+          "tree_id": "cc5590c611e1f490a5eb10d057bc5a8f5816dc77",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/241c046ccd214701a3e0bacd09e8affd5e61044c"
+        },
+        "date": 1738841144250,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1536033,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 16885,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 835672,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 792510,
+            "range": "±0.45%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
