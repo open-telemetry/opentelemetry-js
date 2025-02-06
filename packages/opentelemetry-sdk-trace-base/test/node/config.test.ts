@@ -24,34 +24,27 @@ import {
 import { buildSamplerFromEnv } from '../../src/config';
 
 describe('config', () => {
-  let envSource: Record<string, any>;
-  if (global.process?.versions?.node === undefined) {
-    envSource = globalThis as unknown as Record<string, any>;
-  } else {
-    envSource = process.env as Record<string, any>;
-  }
-
   describe('buildSamplerFromEnv()', () => {
     afterEach(() => {
-      delete envSource.OTEL_TRACES_SAMPLER;
-      delete envSource.OTEL_TRACES_SAMPLER_ARG;
+      delete process.env.OTEL_TRACES_SAMPLER;
+      delete process.env.OTEL_TRACES_SAMPLER_ARG;
     });
 
     it('should handle always_on case', () => {
-      envSource.OTEL_TRACES_SAMPLER = 'always_on';
+      process.env.OTEL_TRACES_SAMPLER = 'always_on';
       assert.ok(buildSamplerFromEnv() instanceof AlwaysOnSampler);
       assert.strictEqual(buildSamplerFromEnv().toString(), 'AlwaysOnSampler');
     });
 
     it('should handle always_off case', () => {
-      envSource.OTEL_TRACES_SAMPLER = 'always_off';
+      process.env.OTEL_TRACES_SAMPLER = 'always_off';
       assert.ok(buildSamplerFromEnv() instanceof AlwaysOffSampler);
       assert.strictEqual(buildSamplerFromEnv().toString(), 'AlwaysOffSampler');
     });
 
     it('should handle traceidratio case', () => {
-      envSource.OTEL_TRACES_SAMPLER = 'traceidratio';
-      envSource.OTEL_TRACES_SAMPLER_ARG = '0.1';
+      process.env.OTEL_TRACES_SAMPLER = 'traceidratio';
+      process.env.OTEL_TRACES_SAMPLER_ARG = '0.1';
       assert.ok(buildSamplerFromEnv() instanceof TraceIdRatioBasedSampler);
       assert.strictEqual(
         buildSamplerFromEnv().toString(),
@@ -60,7 +53,7 @@ describe('config', () => {
     });
 
     it('should handle parentbased_always_on case', () => {
-      envSource.OTEL_TRACES_SAMPLER = 'parentbased_always_on';
+      process.env.OTEL_TRACES_SAMPLER = 'parentbased_always_on';
       assert.ok(buildSamplerFromEnv() instanceof ParentBasedSampler);
       assert.strictEqual(
         buildSamplerFromEnv().toString(),
@@ -69,7 +62,7 @@ describe('config', () => {
     });
 
     it('should handle parentbased_always_off case', () => {
-      envSource.OTEL_TRACES_SAMPLER = 'parentbased_always_off';
+      process.env.OTEL_TRACES_SAMPLER = 'parentbased_always_off';
       assert.ok(buildSamplerFromEnv() instanceof ParentBasedSampler);
       assert.strictEqual(
         buildSamplerFromEnv().toString(),
@@ -78,8 +71,8 @@ describe('config', () => {
     });
 
     it('should handle parentbased_traceidratio case', () => {
-      envSource.OTEL_TRACES_SAMPLER = 'parentbased_traceidratio';
-      envSource.OTEL_TRACES_SAMPLER_ARG = '0.2';
+      process.env.OTEL_TRACES_SAMPLER = 'parentbased_traceidratio';
+      process.env.OTEL_TRACES_SAMPLER_ARG = '0.2';
       assert.ok(buildSamplerFromEnv() instanceof ParentBasedSampler);
       assert.strictEqual(
         buildSamplerFromEnv().toString(),
