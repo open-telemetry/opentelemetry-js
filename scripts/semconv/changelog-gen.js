@@ -18,7 +18,7 @@
  *
  * The last command (this script) will output a text block that can be used
  * in "semantic-conventions/CHANGELOG.md" (and also perhaps in the PR
- * desciption).
+ * description).
  */
 
 const fs = require('fs');
