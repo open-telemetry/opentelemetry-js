@@ -16,7 +16,6 @@
     "test:webworker": "lerna run test:webworker",
     "test:backcompat": "lerna run test:backcompat",
     "test:bench": "lerna run test:bench",
-    "changelog": "lerna-changelog",
     "predocs-test": "npm run docs",
     "docs": "typedoc --readme none && touch docs/.nojekyll",
     "docs-deploy": "gh-pages --dotfiles --dist docs",
