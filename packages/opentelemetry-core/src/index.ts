@@ -103,7 +103,6 @@ export {
   parseEnvironment,
 } from './utils/environment';
 export { merge } from './utils/merge';
-export { TracesSamplerValues } from './utils/sampling';
 export { TimeoutError, callWithTimeout } from './utils/timeout';
 export { isUrlIgnored, urlMatches } from './utils/url';
 export { isWrapped } from './utils/wrap';

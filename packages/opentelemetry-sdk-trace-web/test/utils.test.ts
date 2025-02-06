@@ -100,6 +100,7 @@ describe('utils', () => {
         setAttribute: setAttributeSpy,
       } as unknown as tracing.Span;
       const entries = {
+        [PTN.START_TIME]: 123,
         [PTN.FETCH_START]: 123,
         [PTN.DOMAIN_LOOKUP_START]: 123,
         [PTN.DOMAIN_LOOKUP_END]: 123,
@@ -113,21 +114,13 @@ describe('utils', () => {
         [PTN.ENCODED_BODY_SIZE]: 61,
       } as PerformanceEntries;
 
+      assert.strictEqual(setAttributeSpy.callCount, 0);
       assert.strictEqual(addEventSpy.callCount, 0);
 
       addSpanNetworkEvents(span, entries);
       assert.strictEqual(setAttributeSpy.callCount, 2);
-      //secure connect start should not be added to non-https resource
-      assert.strictEqual(addEventSpy.callCount, 8);
-      //secure connect start should be added to an https resource
-      addEventSpy.resetHistory();
-      addSpanNetworkEvents(span, {
-        ...entries,
-        name: 'https://foo',
-      } as PerformanceResourceTiming);
       assert.strictEqual(addEventSpy.callCount, 9);
     });
-
     it('should ignore network events when ignoreNetworkEvents is true', () => {
       const addEventSpy = sinon.spy();
       const setAttributeSpy = sinon.spy();
@@ -136,6 +129,7 @@ describe('utils', () => {
         setAttribute: setAttributeSpy,
       } as unknown as tracing.Span;
       const entries = {
+        [PTN.START_TIME]: 123,
         [PTN.FETCH_START]: 123,
         [PTN.DOMAIN_LOOKUP_START]: 123,
         [PTN.DOMAIN_LOOKUP_END]: 123,
@@ -149,12 +143,99 @@ describe('utils', () => {
         [PTN.ENCODED_BODY_SIZE]: 61,
       } as PerformanceEntries;
 
+      assert.strictEqual(setAttributeSpy.callCount, 0);
       assert.strictEqual(addEventSpy.callCount, 0);
 
       addSpanNetworkEvents(span, entries, true);
       assert.strictEqual(setAttributeSpy.callCount, 2);
-      //secure connect start should not be added to non-https resource
       assert.strictEqual(addEventSpy.callCount, 0);
+    });
+    it('should ignore zero timings by default', () => {
+      const addEventSpy = sinon.spy();
+      const setAttributeSpy = sinon.spy();
+      const span = {
+        addEvent: addEventSpy,
+        setAttribute: setAttributeSpy,
+      } as unknown as tracing.Span;
+      const entries = {
+        [PTN.START_TIME]: 123,
+        [PTN.FETCH_START]: 123,
+        [PTN.DOMAIN_LOOKUP_START]: 0,
+        [PTN.DOMAIN_LOOKUP_END]: 0,
+        [PTN.CONNECT_START]: 0,
+        [PTN.SECURE_CONNECTION_START]: 0,
+        [PTN.CONNECT_END]: 0,
+        [PTN.REQUEST_START]: 0,
+        [PTN.RESPONSE_START]: 0,
+        [PTN.RESPONSE_END]: 130,
+        [PTN.DECODED_BODY_SIZE]: 0,
+        [PTN.ENCODED_BODY_SIZE]: 0,
+      } as PerformanceEntries;
+
+      assert.strictEqual(setAttributeSpy.callCount, 0);
+      assert.strictEqual(addEventSpy.callCount, 0);
+
+      addSpanNetworkEvents(span, entries);
+      assert.strictEqual(setAttributeSpy.callCount, 1);
+      assert.strictEqual(addEventSpy.callCount, 2);
+    });
+    it('should not ignore zero timings by default if startTime = 0', () => {
+      const addEventSpy = sinon.spy();
+      const setAttributeSpy = sinon.spy();
+      const span = {
+        addEvent: addEventSpy,
+        setAttribute: setAttributeSpy,
+      } as unknown as tracing.Span;
+      const entries = {
+        [PTN.START_TIME]: 0,
+        [PTN.FETCH_START]: 0,
+        [PTN.DOMAIN_LOOKUP_START]: 0,
+        [PTN.DOMAIN_LOOKUP_END]: 0,
+        [PTN.CONNECT_START]: 0,
+        [PTN.SECURE_CONNECTION_START]: 0,
+        [PTN.CONNECT_END]: 1,
+        [PTN.REQUEST_START]: 2,
+        [PTN.RESPONSE_START]: 3,
+        [PTN.RESPONSE_END]: 4,
+        [PTN.DECODED_BODY_SIZE]: 123,
+        [PTN.ENCODED_BODY_SIZE]: 61,
+      } as PerformanceEntries;
+
+      assert.strictEqual(setAttributeSpy.callCount, 0);
+      assert.strictEqual(addEventSpy.callCount, 0);
+
+      addSpanNetworkEvents(span, entries);
+      assert.strictEqual(setAttributeSpy.callCount, 2);
+      assert.strictEqual(addEventSpy.callCount, 9);
+    });
+    it('should not ignore zero timings if ignoreZeros = false', () => {
+      const addEventSpy = sinon.spy();
+      const setAttributeSpy = sinon.spy();
+      const span = {
+        addEvent: addEventSpy,
+        setAttribute: setAttributeSpy,
+      } as unknown as tracing.Span;
+      const entries = {
+        [PTN.START_TIME]: 123,
+        [PTN.FETCH_START]: 123,
+        [PTN.DOMAIN_LOOKUP_START]: 0,
+        [PTN.DOMAIN_LOOKUP_END]: 0,
+        [PTN.CONNECT_START]: 0,
+        [PTN.SECURE_CONNECTION_START]: 0,
+        [PTN.CONNECT_END]: 0,
+        [PTN.REQUEST_START]: 0,
+        [PTN.RESPONSE_START]: 0,
+        [PTN.RESPONSE_END]: 130,
+        [PTN.DECODED_BODY_SIZE]: 0,
+        [PTN.ENCODED_BODY_SIZE]: 0,
+      } as PerformanceEntries;
+
+      assert.strictEqual(setAttributeSpy.callCount, 0);
+      assert.strictEqual(addEventSpy.callCount, 0);
+
+      addSpanNetworkEvents(span, entries, false, false);
+      assert.strictEqual(setAttributeSpy.callCount, 1);
+      assert.strictEqual(addEventSpy.callCount, 9);
     });
     it('should only include encoded size when content encoding is being used', () => {
       const addEventSpy = sinon.spy();
@@ -177,7 +258,7 @@ describe('utils', () => {
     });
   });
   describe('addSpanNetworkEvent', () => {
-    [0, -2, 123].forEach(value => {
+    [-2, 123].forEach(value => {
       describe(`when entry is ${value}`, () => {
         it('should add event to span', () => {
           const addEventSpy = sinon.spy();
@@ -198,6 +279,42 @@ describe('utils', () => {
           assert.strictEqual(args[0], 'fetchStart');
           assert.strictEqual(args[1], value);
         });
+      });
+    });
+    describe(`when entry is zero`, () => {
+      it('should not add event to span by default', () => {
+        const addEventSpy = sinon.spy();
+        const span = {
+          addEvent: addEventSpy,
+        } as unknown as tracing.Span;
+        const entries = {
+          [PTN.SECURE_CONNECTION_START]: 0,
+        } as PerformanceEntries;
+
+        assert.strictEqual(addEventSpy.callCount, 0);
+
+        addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, entries);
+
+        assert.strictEqual(addEventSpy.callCount, 0);
+      });
+      it('should add event to span if ignoreZeros = false', () => {
+        const addEventSpy = sinon.spy();
+        const span = {
+          addEvent: addEventSpy,
+        } as unknown as tracing.Span;
+        const entries = {
+          [PTN.SECURE_CONNECTION_START]: 0,
+        } as PerformanceEntries;
+
+        assert.strictEqual(addEventSpy.callCount, 0);
+
+        addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, entries, false);
+
+        assert.strictEqual(addEventSpy.callCount, 1);
+        const args = addEventSpy.args[0];
+
+        assert.strictEqual(args[0], 'secureConnectionStart');
+        assert.strictEqual(args[1], 0);
       });
     });
     describe('when entry is not numeric', () => {
@@ -239,82 +356,6 @@ describe('utils', () => {
           addEventSpy.callCount,
           0,
           'should not call addEvent'
-        );
-      });
-    });
-    describe('when entries contain invalid performance timing', () => {
-      it('should only add events with time greater that or equal to reference value to span', () => {
-        const addEventSpy = sinon.spy();
-        const span = {
-          addEvent: addEventSpy,
-        } as unknown as tracing.Span;
-        const entries = {
-          [PTN.FETCH_START]: 123, // default reference time
-          [PTN.CONNECT_START]: 0,
-          [PTN.REQUEST_START]: 140,
-        } as PerformanceEntries;
-
-        assert.strictEqual(addEventSpy.callCount, 0);
-
-        addSpanNetworkEvent(span, PTN.CONNECT_START, entries);
-
-        assert.strictEqual(
-          addEventSpy.callCount,
-          0,
-          'should not call addEvent'
-        );
-
-        addSpanNetworkEvent(span, PTN.REQUEST_START, entries);
-
-        assert.strictEqual(
-          addEventSpy.callCount,
-          1,
-          'should call addEvent for valid value'
-        );
-      });
-    });
-
-    describe('when entries contain invalid performance timing and a reference event', () => {
-      it('should only add events with time greater that or equal to reference value to span', () => {
-        const addEventSpy = sinon.spy();
-        const span = {
-          addEvent: addEventSpy,
-        } as unknown as tracing.Span;
-        const entries = {
-          [PTN.FETCH_START]: 120,
-          [PTN.CONNECT_START]: 120, // this is used as reference time here
-          [PTN.REQUEST_START]: 10,
-        } as PerformanceEntries;
-
-        assert.strictEqual(addEventSpy.callCount, 0);
-
-        addSpanNetworkEvent(
-          span,
-          PTN.REQUEST_START,
-          entries,
-          PTN.CONNECT_START
-        );
-
-        assert.strictEqual(
-          addEventSpy.callCount,
-          0,
-          'should not call addEvent'
-        );
-
-        addSpanNetworkEvent(span, PTN.FETCH_START, entries, PTN.CONNECT_START);
-
-        assert.strictEqual(
-          addEventSpy.callCount,
-          1,
-          'should call addEvent for valid value'
-        );
-
-        addEventSpy.resetHistory();
-        addSpanNetworkEvent(span, PTN.CONNECT_START, entries, 'foo'); // invalid reference , not adding event to span
-        assert.strictEqual(
-          addEventSpy.callCount,
-          0,
-          'should not call addEvent for invalid reference(non-existent)'
         );
       });
     });
