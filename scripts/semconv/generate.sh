@@ -9,7 +9,7 @@ ROOT_DIR="${SCRIPT_DIR}/../../"
 # ... in git@github.com:open-telemetry/semantic-conventions.git
 SPEC_VERSION=v1.29.0
 # ... in git@github.com:open-telemetry/weaver.git
-GENERATOR_VERSION=v0.10.0
+GENERATOR_VERSION=v0.12.0
 
 # When running on windows and you are getting references to ";C" (like Telemetry;C)
 # then this is an issue with the bash shell, so first run the following in your shell:
