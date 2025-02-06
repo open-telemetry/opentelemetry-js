@@ -64,6 +64,16 @@ export const METRIC_CONTAINER_MEMORY_USAGE = 'container.memory.usage' as const;
 export const METRIC_CONTAINER_NETWORK_IO = 'container.network.io' as const;
 
 /**
+ * The time the container has been running
+ * 
+ * @note Instrumentations **SHOULD** use a gauge with type `double` and measure uptime in seconds as a floating point number with the highest precision available.
+ * The actual accuracy would depend on the instrumentation and operating system.
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_CONTAINER_UPTIME = 'container.uptime' as const;
+
+/**
  * The number of connections that are currently in state described by the `state` attribute
  * 
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -208,6 +218,20 @@ export const METRIC_DB_CLIENT_CONNECTIONS_USE_TIME = 'db.client.connections.use_
 export const METRIC_DB_CLIENT_CONNECTIONS_WAIT_TIME = 'db.client.connections.wait_time' as const;
 
 /**
+ * Number of active client instances
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_DB_CLIENT_COSMOSDB_ACTIVE_INSTANCE_COUNT = 'db.client.cosmosdb.active_instance.count' as const;
+
+/**
+ * [Request charge](https://learn.microsoft.com/azure/cosmos-db/request-units) consumed by the operation
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_DB_CLIENT_COSMOSDB_OPERATION_REQUEST_CHARGE = 'db.client.cosmosdb.operation.request_charge' as const;
+
+/**
  * Duration of database client operations.
  * 
  * @note Batch operations **SHOULD** be recorded as a single operation.
@@ -215,6 +239,13 @@ export const METRIC_DB_CLIENT_CONNECTIONS_WAIT_TIME = 'db.client.connections.wai
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_DB_CLIENT_OPERATION_DURATION = 'db.client.operation.duration' as const;
+
+/**
+ * The actual number of records returned by the database operation.
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_DB_CLIENT_RESPONSE_RETURNED_ROWS = 'db.client.response.returned_rows' as const;
 
 /**
  * Measures the time taken to perform a DNS lookup.
@@ -771,6 +802,30 @@ export const METRIC_K8S_NODE_CPU_USAGE = 'k8s.node.cpu.usage' as const;
 export const METRIC_K8S_NODE_MEMORY_USAGE = 'k8s.node.memory.usage' as const;
 
 /**
+ * Node network errors
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_NODE_NETWORK_ERRORS = 'k8s.node.network.errors' as const;
+
+/**
+ * Network bytes for the Node
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_NODE_NETWORK_IO = 'k8s.node.network.io' as const;
+
+/**
+ * The time the Node has been running
+ * 
+ * @note Instrumentations **SHOULD** use a gauge with type `double` and measure uptime in seconds as a floating point number with the highest precision available.
+ * The actual accuracy would depend on the instrumentation and operating system.
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_NODE_UPTIME = 'k8s.node.uptime' as const;
+
+/**
  * Total CPU time consumed
  * 
  * @note Total CPU time consumed by the specific Pod on all available CPU cores
@@ -796,6 +851,30 @@ export const METRIC_K8S_POD_CPU_USAGE = 'k8s.pod.cpu.usage' as const;
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_K8S_POD_MEMORY_USAGE = 'k8s.pod.memory.usage' as const;
+
+/**
+ * Pod network errors
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_POD_NETWORK_ERRORS = 'k8s.pod.network.errors' as const;
+
+/**
+ * Network bytes for the Pod
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_POD_NETWORK_IO = 'k8s.pod.network.io' as const;
+
+/**
+ * The time the Pod has been running
+ * 
+ * @note Instrumentations **SHOULD** use a gauge with type `double` and measure uptime in seconds as a floating point number with the highest precision available.
+ * The actual accuracy would depend on the instrumentation and operating system.
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_POD_UPTIME = 'k8s.pod.uptime' as const;
 
 /**
  * Number of messages that were delivered to the application.
@@ -1042,7 +1121,9 @@ export const METRIC_PROCESS_THREAD_COUNT = 'process.thread.count' as const;
 /**
  * The time the process has been running.
  * 
- * @note Instrumentations **SHOULD** use counter with type `double` and measure uptime with at least millisecond precision
+ * @note Instrumentations **SHOULD** use a gauge with type `double` and measure uptime in seconds as a floating point number with the highest precision available.
+ * The actual accuracy would depend on the instrumentation and operating system.
+ * 
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_PROCESS_UPTIME = 'process.uptime' as const;
@@ -1392,6 +1473,16 @@ export const METRIC_SYSTEM_PROCESS_COUNT = 'system.process.count' as const;
 export const METRIC_SYSTEM_PROCESS_CREATED = 'system.process.created' as const;
 
 /**
+ * The time the system has been running
+ * 
+ * @note Instrumentations **SHOULD** use a gauge with type `double` and measure uptime in seconds as a floating point number with the highest precision available.
+ * The actual accuracy would depend on the instrumentation and operating system.
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_SYSTEM_UPTIME = 'system.uptime' as const;
+
+/**
  * Garbage collection duration.
  * 
  * @note The values can be retrieve from [`perf_hooks.PerformanceObserver(...).observe({ entryTypes: ['gc'] })`](https://nodejs.org/api/perf_hooks.html#performanceobserverobserveoptions)
@@ -1435,4 +1526,74 @@ export const METRIC_V8JS_MEMORY_HEAP_LIMIT = 'v8js.memory.heap.limit' as const;
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_V8JS_MEMORY_HEAP_USED = 'v8js.memory.heap.used' as const;
+
+/**
+ * The number of changes (pull requests/merge requests/changelists) in a repository, categorized by their state (e.g. open or merged)
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_VCS_CHANGE_COUNT = 'vcs.change.count' as const;
+
+/**
+ * The time duration a change (pull request/merge request/changelist) has been in a given state.
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_VCS_CHANGE_DURATION = 'vcs.change.duration' as const;
+
+/**
+ * The amount of time since its creation it took a change (pull request/merge request/changelist) to get the first approval
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_VCS_CHANGE_TIME_TO_APPROVAL = 'vcs.change.time_to_approval' as const;
+
+/**
+ * The number of unique contributors to a repository
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_VCS_CONTRIBUTOR_COUNT = 'vcs.contributor.count' as const;
+
+/**
+ * The number of refs of type branch or tag in a repository
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_VCS_REF_COUNT = 'vcs.ref.count' as const;
+
+/**
+ * The number of lines added/removed in a ref (branch) relative to the ref from the `vcs.ref.base.name` attribute
+ * 
+ * @note This metric should be reported for each `vcs.line_change.type` value. For example if a ref added 3 lines and removed 2 lines,
+ * instrumentation **SHOULD** report two measurements: 3 and 2 (both positive numbers).
+ * If number of lines added/removed should be calculated from the start of time, then `vcs.ref.base.name` **SHOULD** be set to an empty string.
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_VCS_REF_LINES_DELTA = 'vcs.ref.lines_delta' as const;
+
+/**
+ * The number of revisions (commits) a ref (branch) is ahead/behind the branch from the `vcs.ref.base.name` attribute
+ * 
+ * @note This metric should be reported for each `vcs.revision_delta.direction` value. For example if branch `a` is 3 commits behind and 2 commits ahead of `trunk`,
+ * instrumentation **SHOULD** report two measurements: 3 and 2 (both positive numbers) and `vcs.ref.base.name` is set to `trunk`.
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_VCS_REF_REVISIONS_DELTA = 'vcs.ref.revisions_delta' as const;
+
+/**
+ * Time a ref (branch) created from the default branch (trunk) has existed. The `ref.type` attribute will always be `branch`
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_VCS_REF_TIME = 'vcs.ref.time' as const;
+
+/**
+ * The number of repositories in an organization
+ * 
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_VCS_REPOSITORY_COUNT = 'vcs.repository.count' as const;
 
