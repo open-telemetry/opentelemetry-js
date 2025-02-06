@@ -64,7 +64,7 @@ describe('LoggerProvider', () => {
       });
 
       it('should not have default resource if passed', function () {
-        const passedInResource = new Resource({ foo: 'bar' });
+        const passedInResource = new Resource({ attributes: { foo: 'bar' } });
         const provider = new LoggerProvider({
           resource: passedInResource,
         });
@@ -274,7 +274,7 @@ describe('LoggerProvider', () => {
         .forceFlush()
         .then(() => {
           sinon.restore();
-          assert(forceFlushStub.calledTwice);
+          assert.ok(forceFlushStub.calledTwice);
           done();
         })
         .catch(error => {

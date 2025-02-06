@@ -126,22 +126,22 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
           this._wrap(
             moduleExports.Client.prototype,
             'makeUnaryRequest',
-            this._patchClientRequestMethod(moduleExports, false) as any
+            this._patchClientRequestMethod(moduleExports, false)
           );
           this._wrap(
             moduleExports.Client.prototype,
             'makeClientStreamRequest',
-            this._patchClientRequestMethod(moduleExports, false) as any
+            this._patchClientRequestMethod(moduleExports, false)
           );
           this._wrap(
             moduleExports.Client.prototype,
             'makeServerStreamRequest',
-            this._patchClientRequestMethod(moduleExports, true) as any
+            this._patchClientRequestMethod(moduleExports, true)
           );
           this._wrap(
             moduleExports.Client.prototype,
             'makeBidiStreamRequest',
-            this._patchClientRequestMethod(moduleExports, true) as any
+            this._patchClientRequestMethod(moduleExports, true)
           );
           return moduleExports;
         },

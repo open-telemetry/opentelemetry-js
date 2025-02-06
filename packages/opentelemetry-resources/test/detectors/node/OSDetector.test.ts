@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import * as sinon from 'sinon';
-import * as assert from 'assert';
 import {
   SEMRESATTRS_OS_TYPE,
   SEMRESATTRS_OS_VERSION,
 } from '@opentelemetry/semantic-conventions';
+import * as assert from 'assert';
+import * as sinon from 'sinon';
+import { osDetector } from '../../../src';
 import { describeNode } from '../../util';
-import { osDetector, IResource } from '../../../src';
 
 describeNode('osDetector() on Node.js', () => {
   afterEach(() => {
@@ -34,7 +34,8 @@ describeNode('osDetector() on Node.js', () => {
     sinon.stub(os, 'platform').returns('win32');
     sinon.stub(os, 'release').returns('2.2.1(0.289/5/3)');
 
-    const resource: IResource = await osDetector.detect();
+    const resource = osDetector.detect();
+    assert.ok(resource.attributes);
 
     assert.strictEqual(resource.attributes[SEMRESATTRS_OS_TYPE], 'windows');
     assert.strictEqual(
@@ -48,7 +49,8 @@ describeNode('osDetector() on Node.js', () => {
 
     sinon.stub(os, 'platform').returns('some-unknown-platform');
 
-    const resource: IResource = await osDetector.detect();
+    const resource = osDetector.detect();
+    assert.ok(resource.attributes);
 
     assert.strictEqual(
       resource.attributes[SEMRESATTRS_OS_TYPE],

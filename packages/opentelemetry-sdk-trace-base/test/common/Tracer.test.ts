@@ -42,11 +42,11 @@ import {
   SamplingDecision,
   Span,
   SpanProcessor,
-  Tracer,
 } from '../../src';
 import { TestStackContextManager } from './export/TestStackContextManager';
 import * as sinon from 'sinon';
 import { invalidAttributes, validAttributes } from './util';
+import { Tracer } from '../../src/Tracer';
 
 describe('Tracer', () => {
   const tracerProvider = new BasicTracerProvider();
@@ -385,7 +385,7 @@ describe('Tracer', () => {
     assert.strictEqual(
       tracer.startActiveSpan('my-span', span => {
         try {
-          assert(spy.calledWith('my-span'));
+          assert.ok(spy.calledWith('my-span'));
           assert.strictEqual(trace.getSpan(context.active()), span);
           return 1;
         } finally {
@@ -412,7 +412,9 @@ describe('Tracer', () => {
         { attributes: { foo: 'bar' } },
         span => {
           try {
-            assert(spy.calledWith('my-span', { attributes: { foo: 'bar' } }));
+            assert.ok(
+              spy.calledWith('my-span', { attributes: { foo: 'bar' } })
+            );
             assert.strictEqual(trace.getSpan(context.active()), span);
             return 1;
           } finally {
@@ -445,7 +447,7 @@ describe('Tracer', () => {
         ctx,
         span => {
           try {
-            assert(
+            assert.ok(
               spy.calledWith('my-span', { attributes: { foo: 'bar' } }, ctx)
             );
             assert.strictEqual(trace.getSpan(context.active()), span);

@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import * as webpack from 'webpack';
+import { webpack, Stats } from 'webpack';
 import * as path from 'path';
 import { Union } from 'unionfs';
 import { fs as mfs } from 'memfs';
@@ -97,7 +97,7 @@ describe('tree-shaking', function () {
         join: path.join,
       } as any;
 
-      const stats = await new Promise<webpack.Stats>((resolve, reject) => {
+      const stats = await new Promise<Stats>((resolve, reject) => {
         compiler.run((err, stats) => {
           if (err) {
             return reject(err);

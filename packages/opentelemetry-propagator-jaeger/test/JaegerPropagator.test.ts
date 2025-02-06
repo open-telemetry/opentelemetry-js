@@ -251,11 +251,11 @@ describe('JaegerPropagator', () => {
       );
 
       const firstEntry = extractedBaggage?.getEntry('test');
-      assert(typeof firstEntry !== 'undefined');
-      assert(firstEntry.value === 'value');
+      assert.ok(typeof firstEntry !== 'undefined');
+      assert.ok(firstEntry.value === 'value');
       const secondEntry = extractedBaggage?.getEntry('myuser');
-      assert(typeof secondEntry !== 'undefined');
-      assert(secondEntry.value === '%id%');
+      assert.ok(typeof secondEntry !== 'undefined');
+      assert.ok(secondEntry.value === '%id%');
     });
 
     it('should extract baggage with custom prefix from carrier', () => {
@@ -270,11 +270,11 @@ describe('JaegerPropagator', () => {
       );
 
       const firstEntry = extractedBaggage?.getEntry('test');
-      assert(typeof firstEntry !== 'undefined');
-      assert(firstEntry.value === 'value');
+      assert.ok(typeof firstEntry !== 'undefined');
+      assert.ok(firstEntry.value === 'value');
       const secondEntry = extractedBaggage?.getEntry('myuser');
-      assert(typeof secondEntry !== 'undefined');
-      assert(secondEntry.value === '%id%');
+      assert.ok(typeof secondEntry !== 'undefined');
+      assert.ok(secondEntry.value === '%id%');
     });
 
     it('should extract baggage from carrier and not override current one', () => {
@@ -292,14 +292,14 @@ describe('JaegerPropagator', () => {
       );
 
       const firstEntry = extractedBaggage?.getEntry('test');
-      assert(typeof firstEntry !== 'undefined');
-      assert(firstEntry.value === 'value');
+      assert.ok(typeof firstEntry !== 'undefined');
+      assert.ok(firstEntry.value === 'value');
       const secondEntry = extractedBaggage?.getEntry('myuser');
-      assert(typeof secondEntry !== 'undefined');
-      assert(secondEntry.value === '%id%');
+      assert.ok(typeof secondEntry !== 'undefined');
+      assert.ok(secondEntry.value === '%id%');
       const alreadyExistingEntry = extractedBaggage?.getEntry('one');
-      assert(typeof alreadyExistingEntry !== 'undefined');
-      assert(alreadyExistingEntry.value === 'two');
+      assert.ok(typeof alreadyExistingEntry !== 'undefined');
+      assert.ok(alreadyExistingEntry.value === 'two');
     });
 
     it('should handle invalid baggage from carrier (undefined)', () => {
@@ -309,7 +309,7 @@ describe('JaegerPropagator', () => {
       );
 
       const firstEntry = extractedBaggage?.getEntry('test');
-      assert(typeof firstEntry === 'undefined');
+      assert.ok(typeof firstEntry === 'undefined');
     });
 
     it('should handle invalid baggage from carrier (array)', () => {
@@ -319,8 +319,8 @@ describe('JaegerPropagator', () => {
       );
 
       const firstEntry = extractedBaggage?.getEntry('test');
-      assert(typeof firstEntry !== 'undefined');
-      assert(firstEntry.value === 'one');
+      assert.ok(typeof firstEntry !== 'undefined');
+      assert.ok(firstEntry.value === 'one');
     });
 
     it('should 0-pad span and trace id from header', () => {

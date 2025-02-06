@@ -44,6 +44,7 @@ import * as sinon from 'sinon';
 import { BasicTracerProvider, Span, SpanProcessor } from '../../src';
 import { SpanImpl } from '../../src/Span';
 import { invalidAttributes, validAttributes } from './util';
+import { Tracer } from '../../src/Tracer';
 
 const performanceTimeOrigin: HrTime = [1, 1];
 
@@ -63,7 +64,7 @@ describe('Span', () => {
       attributeCountLimit: 100,
       eventCountLimit: 100,
     },
-  }).getTracer('default');
+  }).getTracer('default') as Tracer;
   const name = 'span1';
   const spanContext: SpanContext = {
     traceId: 'd4cda95b652f4a1592b449d5929fda1b',
@@ -281,6 +282,31 @@ describe('Span', () => {
     });
   });
 
+  it('should log a warning attempting to add event to ended span', () => {
+    const span = new SpanImpl({
+      scope: tracer.instrumentationScope,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
+      spanContext,
+      name,
+      kind: SpanKind.CLIENT,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
+    span.end();
+
+    const warnStub = sinon.spy(diag, 'warn');
+
+    span.addEvent('oops, too late');
+
+    sinon.assert.calledOnce(warnStub);
+    sinon.assert.calledWith(
+      warnStub,
+      sinon.match(/Cannot execute the operation on ended Span/),
+      sinon.match.instanceOf(Error)
+    );
+  });
+
   describe('setAttribute', () => {
     describe('when default options set', () => {
       it('should set an attribute', () => {
@@ -333,7 +359,7 @@ describe('Span', () => {
             // Setting count limit
             attributeCountLimit: 100,
           },
-        }).getTracer('default');
+        }).getTracer('default') as Tracer;
 
         const span = new SpanImpl({
           scope: tracer.instrumentationScope,
@@ -368,7 +394,7 @@ describe('Span', () => {
             // Setting attribute value length limit
             attributeValueLengthLimit: 5,
           },
-        }).getTracer('default');
+        }).getTracer('default') as Tracer;
 
         const span = new SpanImpl({
           scope: tracer.instrumentationScope,
@@ -438,7 +464,7 @@ describe('Span', () => {
             // Setting invalid attribute value length limit
             attributeValueLengthLimit: -5,
           },
-        }).getTracer('default');
+        }).getTracer('default') as Tracer;
 
         const span = new SpanImpl({
           scope: tracer.instrumentationScope,
@@ -478,7 +504,7 @@ describe('Span', () => {
             // Setting count limit
             attributeCountLimit: 100,
           },
-        }).getTracer('default');
+        }).getTracer('default') as Tracer;
 
         const span = new SpanImpl({
           scope: tracer.instrumentationScope,
@@ -509,7 +535,7 @@ describe('Span', () => {
             // Setting attribute value length limit
             attributeValueLengthLimit: 5,
           },
-        }).getTracer('default');
+        }).getTracer('default') as Tracer;
 
         const span = new SpanImpl({
           scope: tracer.instrumentationScope,
@@ -564,7 +590,7 @@ describe('Span', () => {
             // Setting invalid attribute value length limit
             attributeValueLengthLimit: -5,
           },
-        }).getTracer('default');
+        }).getTracer('default') as Tracer;
 
         const span = new SpanImpl({
           scope: tracer.instrumentationScope,
@@ -607,7 +633,7 @@ describe('Span', () => {
           spanLimits: {
             attributeCountLimit: 5,
           },
-        }).getTracer('default');
+        }).getTracer('default') as Tracer;
 
         const span = new SpanImpl({
           scope: tracer.instrumentationScope,
@@ -642,7 +668,7 @@ describe('Span', () => {
           spanLimits: {
             attributeCountLimit: DEFAULT_ATTRIBUTE_COUNT_LIMIT,
           },
-        }).getTracer('default');
+        }).getTracer('default') as Tracer;
 
         const span = new SpanImpl({
           scope: tracer.instrumentationScope,
@@ -681,7 +707,7 @@ describe('Span', () => {
             // Setting attribute value length limit
             attributeValueLengthLimit: 5,
           },
-        }).getTracer('default');
+        }).getTracer('default') as Tracer;
 
         const span = new SpanImpl({
           scope: tracer.instrumentationScope,
@@ -740,7 +766,7 @@ describe('Span', () => {
             // Setting attribute value length limit
             attributeValueLengthLimit: DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
           },
-        }).getTracer('default');
+        }).getTracer('default') as Tracer;
 
         const span = new SpanImpl({
           scope: tracer.instrumentationScope,
@@ -903,7 +929,7 @@ describe('Span', () => {
       spanLimits: {
         eventCountLimit: 0,
       },
-    }).getTracer('default');
+    }).getTracer('default') as Tracer;
 
     const span = new SpanImpl({
       scope: tracer.instrumentationScope,

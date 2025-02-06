@@ -504,8 +504,9 @@ const options = { port: 9464 };
 const exporter = new PrometheusExporter(options);
 
 // Creates MeterProvider and installs the exporter as a MetricReader
-const meterProvider = new MeterProvider();
-meterProvider.addMetricReader(exporter);
+const meterProvider = new MeterProvider({
+  readers: [exporter],
+});
 const meter = meterProvider.getMeter('example-prometheus');
 
 // Now, start recording data
@@ -520,7 +521,7 @@ a new http server on port 9464. You can now access the metrics at the endpoint
 <http://localhost:9464/metrics>. This is the URL that can be scraped by Prometheus so it can consumed the metrics collected by OpenTelemetry in your application.
 
 More information about Prometheus and how to configure can be found at:
-[https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config](Prometheus Scraping Config)
+[Prometheus Scraping Config](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config)
 
 For a fully functioning code example for using this exporter, please have a look
 at: <https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/examples/prometheus>
@@ -541,12 +542,14 @@ const collectorOptions = {
   concurrencyLimit: 1, // an optional limit on pending requests
 };
 const exporter = new OTLPMetricExporter(collectorOptions);
-const meterProvider = new MeterProvider({});
-
-meterProvider.addMetricReader(new PeriodicExportingMetricReader({
-  exporter: metricExporter,
-  exportIntervalMillis: 1000,
-}));
+const meterProvider = new MeterProvider({
+  readers: [
+    new PeriodicExportingMetricReader({
+      exporter,
+      exportIntervalMillis: 1000,
+    }),
+  ],
+});
 
 // Now, start recording data
 const meter = meterProvider.getMeter('example-meter');

@@ -53,22 +53,24 @@ module.exports = function setup(serviceName) {
     spanProcessors: [
       new BatchSpanProcessor(new OTLPTraceExporter(), {
         scheduledDelayMillis: 5000,
-      })
-    ]
+      }),
+    ],
   });
   tracerProvider.register();
 
-  const meterProvider = new MeterProvider({ resource });
-  meterProvider.addMetricReader(
-    new PrometheusExporter({
-      metricProducers: [
-        new OpenCensusMetricProducer({
-          openCensusMetricProducerManager:
-            oc.Metrics.getMetricProducerManager(),
-        }),
-      ],
-    })
-  );
+  const meterProvider = new MeterProvider({
+    resource,
+    readers: [
+      new PrometheusExporter({
+        metricProducers: [
+          new OpenCensusMetricProducer({
+            openCensusMetricProducerManager:
+              oc.Metrics.getMetricProducerManager(),
+          }),
+        ],
+      }),
+    ],
+  });
   metrics.setGlobalMeterProvider(meterProvider);
 
   // Start OpenCensus tracing

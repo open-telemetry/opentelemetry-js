@@ -130,7 +130,7 @@ describe('MetricReader', () => {
       const collectSpy = sinon.spy(producer, 'collect');
 
       await reader.collect({ timeoutMillis: 20 });
-      assert(collectSpy.calledOnce);
+      assert.ok(collectSpy.calledOnce);
       const args = collectSpy.args[0];
       assert.deepStrictEqual(args, [{ timeoutMillis: 20 }]);
 
@@ -141,7 +141,9 @@ describe('MetricReader', () => {
       const additionalProducer = new TestMetricProducer({
         resourceMetrics: {
           resource: new Resource({
-            shouldBeDiscarded: 'should-be-discarded',
+            attributes: {
+              shouldBeDiscarded: 'should-be-discarded',
+            },
           }),
           scopeMetrics: testScopeMetrics,
         },
@@ -164,8 +166,8 @@ describe('MetricReader', () => {
       assert.strictEqual(collectionResult.errors.length, 0);
       // Should keep the SDK's Resource only
       assert.deepStrictEqual(
-        collectionResult.resourceMetrics.resource,
-        defaultResource
+        collectionResult.resourceMetrics.resource.attributes,
+        defaultResource.attributes
       );
       assert.strictEqual(
         collectionResult.resourceMetrics.scopeMetrics.length,

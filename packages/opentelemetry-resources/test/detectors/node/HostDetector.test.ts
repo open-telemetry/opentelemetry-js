@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import * as sinon from 'sinon';
-import * as assert from 'assert';
 import {
   SEMRESATTRS_HOST_ARCH,
   SEMRESATTRS_HOST_ID,
   SEMRESATTRS_HOST_NAME,
 } from '@opentelemetry/semantic-conventions';
+import * as assert from 'assert';
+import * as sinon from 'sinon';
+import { hostDetector, Resource } from '../../../src';
 import { describeNode } from '../../util';
-import { hostDetector, IResource } from '../../../src';
 
 describeNode('hostDetector() on Node.js', () => {
   afterEach(() => {
@@ -39,7 +39,7 @@ describeNode('hostDetector() on Node.js', () => {
     sinon.stub(os, 'hostname').returns('opentelemetry-test');
     sinon.stub(mid, 'getMachineId').returns(Promise.resolve(expectedHostId));
 
-    const resource: IResource = await hostDetector.detect();
+    const resource = new Resource(hostDetector.detect());
     await resource.waitForAsyncAttributes?.();
 
     assert.strictEqual(
@@ -58,7 +58,7 @@ describeNode('hostDetector() on Node.js', () => {
 
     sinon.stub(os, 'arch').returns('some-unknown-arch');
 
-    const resource: IResource = await hostDetector.detect();
+    const resource = new Resource(hostDetector.detect());
 
     assert.strictEqual(
       resource.attributes[SEMRESATTRS_HOST_ARCH],
@@ -72,9 +72,9 @@ describeNode('hostDetector() on Node.js', () => {
 
     sinon.stub(os, 'arch').returns('x64');
     sinon.stub(os, 'hostname').returns('opentelemetry-test');
-    sinon.stub(mid, 'getMachineId').returns(Promise.resolve(''));
+    sinon.stub(mid, 'getMachineId').returns(Promise.resolve(undefined));
 
-    const resource: IResource = await hostDetector.detect();
+    const resource = new Resource(hostDetector.detect());
     await resource.waitForAsyncAttributes?.();
 
     assert.strictEqual(

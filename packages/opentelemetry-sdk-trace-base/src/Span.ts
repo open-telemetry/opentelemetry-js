@@ -157,9 +157,11 @@ export class SpanImpl implements Span {
       return this;
     }
 
+    const { attributeCountLimit } = this._spanLimits;
+
     if (
-      Object.keys(this.attributes).length >=
-        this._spanLimits.attributeCountLimit! &&
+      attributeCountLimit !== undefined &&
+      Object.keys(this.attributes).length >= attributeCountLimit &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
       this._droppedAttributesCount++;
@@ -189,12 +191,19 @@ export class SpanImpl implements Span {
     timeStamp?: TimeInput
   ): this {
     if (this._isSpanEnded()) return this;
-    if (this._spanLimits.eventCountLimit === 0) {
+
+    const { eventCountLimit } = this._spanLimits;
+
+    if (eventCountLimit === 0) {
       diag.warn('No events allowed.');
       this._droppedEventsCount++;
       return this;
     }
-    if (this.events.length >= this._spanLimits.eventCountLimit!) {
+
+    if (
+      eventCountLimit !== undefined &&
+      this.events.length >= eventCountLimit
+    ) {
       if (this._droppedEventsCount === 0) {
         diag.debug('Dropping extra events.');
       }
@@ -369,8 +378,13 @@ export class SpanImpl implements Span {
 
   private _isSpanEnded(): boolean {
     if (this._ended) {
+      const error = new Error(
+        `Operation attempted on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`
+      );
+
       diag.warn(
-        `Can not execute the operation on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`
+        `Cannot execute the operation on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`,
+        error
       );
     }
     return this._ended;

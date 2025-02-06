@@ -15,9 +15,10 @@
  */
 
 import * as assert from 'assert';
-import { DataPointType, MeterProvider, MetricReader } from '../../src';
+import { DataPointType, MeterProvider } from '../../src';
 import { TestDeltaMetricReader } from '../export/TestMetricReader';
 import { assertDataPoint, assertMetricData } from '../util';
+import { IMetricReader } from '../../src/export/MetricReader';
 
 // https://github.com/open-telemetry/opentelemetry-js/issues/3664
 
@@ -46,7 +47,7 @@ describe('two-metric-readers-async-instrument', () => {
     await assertCollection(reader1, 9);
     await assertCollection(reader2, 9);
 
-    async function assertCollection(reader: MetricReader, value: number) {
+    async function assertCollection(reader: IMetricReader, value: number) {
       const { errors, resourceMetrics } = await reader.collect();
       assert.strictEqual(errors.length, 0);
 
