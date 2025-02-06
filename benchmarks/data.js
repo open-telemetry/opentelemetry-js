@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1738841145156,
+  "lastUpdate": 1738841214998,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -25900,6 +25900,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.45%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jamieedanielson@gmail.com",
+            "name": "Jamie Danielson",
+            "username": "JamieDanielson"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e9f84cbeef15a70edd61eddfec0ea7eb76e56b8c",
+          "message": "fix(exporter-logs/trace-otlp-grpc): fix error for missing dependency otlp-exporter-base (#5412)",
+          "timestamp": "2025-02-06T10:31:10Z",
+          "tree_id": "fb7471f6079e2d27d6f24db29923d9ba4f89a4f5",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/e9f84cbeef15a70edd61eddfec0ea7eb76e56b8c"
+        },
+        "date": 1738841214134,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1500656,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 17532,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 858945,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 800053,
+            "range": "±0.65%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
