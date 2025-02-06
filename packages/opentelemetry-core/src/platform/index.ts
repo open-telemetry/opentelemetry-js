@@ -21,4 +21,8 @@ export {
   hexToBase64,
   otperformance,
   unrefTimer,
+  getBooleanFromEnv,
+  getStringFromEnv,
+  getNumberFromEnv,
+  getStringListFromEnv,
 } from './node';

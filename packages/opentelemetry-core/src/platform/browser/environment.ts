@@ -32,6 +32,22 @@ export function getEnv(): Required<ENVIRONMENT> {
   return Object.assign({}, DEFAULT_ENVIRONMENT, globalEnv);
 }
 
+export function getStringFromEnv(_: string): string | undefined {
+  return undefined;
+}
+
+export function getBooleanFromEnv(_: string): boolean | undefined {
+  return undefined;
+}
+
+export function getNumberFromEnv(_: string): boolean | undefined {
+  return undefined;
+}
+
+export function getStringListFromEnv(_: string): string[] | undefined {
+  return undefined;
+}
+
 export function getEnvWithoutDefaults(): ENVIRONMENT {
   return parseEnvironment(_globalThis as typeof globalThis & RAW_ENVIRONMENT);
 }
