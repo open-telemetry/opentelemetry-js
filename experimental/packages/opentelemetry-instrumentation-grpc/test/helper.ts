@@ -623,6 +623,10 @@ export const runTests = (
                   rootSpan.spanContext().spanId,
                   clientSpan.parentSpanId
                 );
+                assert.strictEqual(
+                  rootSpan.spanContext().spanId,
+                  clientSpan.parentSpanContext?.spanId
+                );
               }
             })
             .catch((err: ServiceError) => {
@@ -740,6 +744,10 @@ export const runTests = (
               assert.strictEqual(
                 rootSpan.spanContext().spanId,
                 clientSpan.parentSpanId
+              );
+              assert.strictEqual(
+                rootSpan.spanContext().spanId,
+                clientSpan.parentSpanContext?.spanId
               );
             });
         });

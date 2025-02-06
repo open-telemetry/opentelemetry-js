@@ -13,6 +13,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :rocket: (Enhancement)
 
+* feat(sdk-trace-base): parentSpanContext is now available on the Span and ReadableSpan [#5422](https://github.com/open-telemetry/opentelemetry-js/pull/5422) @jacksonweber
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)

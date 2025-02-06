@@ -395,6 +395,11 @@ describe('fetch', () => {
         rootSpan.spanContext().spanId,
         'parent span is not root span'
       );
+      assert.strictEqual(
+        span.parentSpanContext?.spanId,
+        rootSpan.spanContext().spanId,
+        'parent span context span is not root span'
+      );
     });
 
     it('span should have correct name', () => {
@@ -495,6 +500,11 @@ describe('fetch', () => {
         span.parentSpanId,
         parentSpan.spanContext().spanId,
         'parent span is not root span'
+      );
+      assert.strictEqual(
+        span.parentSpanContext?.spanId,
+        parentSpan.spanContext().spanId,
+        'parent span in span context is not root span'
       );
     });
 
@@ -1028,6 +1038,11 @@ describe('fetch', () => {
         rootSpan.spanContext().spanId,
         'parent span is not root span'
       );
+      assert.strictEqual(
+        span.parentSpanContext?.spanId,
+        rootSpan.spanContext().spanId,
+        'parent span in parent span context is not root span'
+      );
     });
   });
 
@@ -1048,6 +1063,11 @@ describe('fetch', () => {
         span.parentSpanId,
         rootSpan.spanContext().spanId,
         'parent span is not root span'
+      );
+      assert.strictEqual(
+        span.parentSpanContext?.spanId,
+        rootSpan.spanContext().spanId,
+        'parent span in parent span context is not root span'
       );
     });
   });
