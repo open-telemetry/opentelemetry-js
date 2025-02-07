@@ -92,7 +92,7 @@
   "dependencies": {
     "@opentelemetry/core": "1.30.0",
     "@opentelemetry/resources": "1.30.0",
-    "@opentelemetry/semantic-conventions": "1.28.0"
+    "@opentelemetry/semantic-conventions": "1.29.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base",
   "sideEffects": false
