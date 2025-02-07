@@ -17,6 +17,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :books: (Refine Doc)
 
+* docs: Update docs links to valid documentation pages. [5438](https://github.com/open-telemetry/opentelemetry-js/pull/5438) @jacksonweber
+
 ### :house: (Internal)
 
 ## 1.30.1
