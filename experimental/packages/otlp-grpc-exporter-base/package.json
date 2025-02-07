@@ -32,7 +32,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=18"
+    "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
     "build/src/**/*.js",
@@ -54,7 +54,7 @@
     "@types/sinon": "17.0.3",
     "cross-var": "1.1.0",
     "lerna": "6.6.2",
-    "mocha": "10.8.2",
+    "mocha": "11.1.0",
     "nyc": "17.1.0",
     "sinon": "15.1.2",
     "ts-loader": "9.5.2",

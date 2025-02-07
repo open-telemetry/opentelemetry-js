@@ -15,10 +15,7 @@
  */
 export {
   hostDetector,
-  hostDetectorSync,
   osDetector,
-  osDetectorSync,
   processDetector,
-  processDetectorSync,
-  serviceInstanceIdDetectorSync,
+  serviceInstanceIdDetector,
 } from './node';

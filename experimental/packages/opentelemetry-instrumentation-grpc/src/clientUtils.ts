@@ -102,7 +102,7 @@ export function patchResponseMetadataEvent(
   call: EventEmitter,
   metadataCapture: metadataCaptureType
 ) {
-  call.on('metadata', (responseMetadata: any) => {
+  call.on('metadata', (responseMetadata: Metadata) => {
     metadataCapture.client.captureResponseMetadata(span, responseMetadata);
   });
 }
