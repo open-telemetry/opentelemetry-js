@@ -21,7 +21,7 @@ import * as api from '@opentelemetry/api';
 import { ThriftProcess } from '../src/types';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { TraceFlags } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 import * as nock from 'nock';
 import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 
@@ -46,10 +46,8 @@ describe('JaegerExporter', () => {
     links: [],
     events: [],
     duration: [32, 800000000],
-    resource: new Resource({
-      attributes: {
-        [SEMRESATTRS_SERVICE_NAME]: 'opentelemetry',
-      },
+    resource: resourceFromAttributes({
+      [SEMRESATTRS_SERVICE_NAME]: 'opentelemetry',
     }),
     instrumentationScope: {
       name: 'default',

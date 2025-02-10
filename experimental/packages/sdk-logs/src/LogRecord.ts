@@ -22,7 +22,7 @@ import {
   isAttributeValue,
   InstrumentationScope,
 } from '@opentelemetry/core';
-import type { IResource } from '@opentelemetry/resources';
+import type { Resource } from '@opentelemetry/resources';
 
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
@@ -33,7 +33,7 @@ export class LogRecord implements ReadableLogRecord {
   readonly hrTime: api.HrTime;
   readonly hrTimeObserved: api.HrTime;
   readonly spanContext?: api.SpanContext;
-  readonly resource: IResource;
+  readonly resource: Resource;
   readonly instrumentationScope: InstrumentationScope;
   readonly attributes: logsAPI.LogAttributes = {};
   private _severityText?: string;

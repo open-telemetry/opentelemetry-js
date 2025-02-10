@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { envDetector, Resource } from '../../../src';
+import { envDetector } from '../../../src';
+import { resourceFromDetectedResource } from '../../../src/ResourceImpl';
 import { describeNode } from '../../util';
 import {
   assertEmptyResource,
@@ -33,7 +34,7 @@ describeNode('envDetector() on Node.js', () => {
     });
 
     it('should return resource information from environment variable', async () => {
-      const resource = new Resource(envDetector.detect());
+      const resource = resourceFromDetectedResource(envDetector.detect());
       assertK8sResource(resource, {
         podName: 'pod-xyz-123',
         clusterName: 'c1',
@@ -57,7 +58,7 @@ describeNode('envDetector() on Node.js', () => {
         });
 
         it('should return empty resource', async () => {
-          const resource = new Resource(envDetector.detect());
+          const resource = resourceFromDetectedResource(envDetector.detect());
           assertEmptyResource(resource);
         });
       });
@@ -66,7 +67,7 @@ describeNode('envDetector() on Node.js', () => {
 
   describe('with empty env', () => {
     it('should return empty resource', async () => {
-      const resource = new Resource(envDetector.detect());
+      const resource = resourceFromDetectedResource(envDetector.detect());
       assertEmptyResource(resource);
     });
   });

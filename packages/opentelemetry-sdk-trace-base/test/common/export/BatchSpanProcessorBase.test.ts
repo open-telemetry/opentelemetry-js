@@ -37,7 +37,7 @@ import { TestRecordOnlySampler } from './TestRecordOnlySampler';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestStackContextManager } from './TestStackContextManager';
 import { BatchSpanProcessorBase } from '../../../src/export/BatchSpanProcessorBase';
-import { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracerProvider({
@@ -440,12 +440,10 @@ describe('BatchSpanProcessorBase', () => {
 
       it('should wait for pending resource on flush', async () => {
         const tracer = new BasicTracerProvider({
-          resource: new Resource({
-            attributes: {
-              async: new Promise<string>(resolve =>
-                setTimeout(() => resolve('fromasync'), 1)
-              ),
-            },
+          resource: resourceFromAttributes({
+            async: new Promise<string>(resolve =>
+              setTimeout(() => resolve('fromasync'), 1)
+            ),
           }),
         }).getTracer('default');
 

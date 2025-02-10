@@ -21,7 +21,8 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { hostDetector, Resource } from '../../../src';
+import { hostDetector } from '../../../src';
+import { resourceFromDetectedResource } from '../../../src/ResourceImpl';
 import { describeNode } from '../../util';
 
 describeNode('hostDetector() on Node.js', () => {
@@ -39,7 +40,7 @@ describeNode('hostDetector() on Node.js', () => {
     sinon.stub(os, 'hostname').returns('opentelemetry-test');
     sinon.stub(mid, 'getMachineId').returns(Promise.resolve(expectedHostId));
 
-    const resource = new Resource(hostDetector.detect());
+    const resource = resourceFromDetectedResource(hostDetector.detect());
     await resource.waitForAsyncAttributes?.();
 
     assert.strictEqual(
@@ -58,7 +59,7 @@ describeNode('hostDetector() on Node.js', () => {
 
     sinon.stub(os, 'arch').returns('some-unknown-arch');
 
-    const resource = new Resource(hostDetector.detect());
+    const resource = resourceFromDetectedResource(hostDetector.detect());
 
     assert.strictEqual(
       resource.attributes[SEMRESATTRS_HOST_ARCH],
@@ -74,7 +75,7 @@ describeNode('hostDetector() on Node.js', () => {
     sinon.stub(os, 'hostname').returns('opentelemetry-test');
     sinon.stub(mid, 'getMachineId').returns(Promise.resolve(undefined));
 
-    const resource = new Resource(hostDetector.detect());
+    const resource = resourceFromDetectedResource(hostDetector.detect());
     await resource.waitForAsyncAttributes?.();
 
     assert.strictEqual(

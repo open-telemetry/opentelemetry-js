@@ -32,7 +32,11 @@ import {
 import { BatchLogRecordProcessorBase } from '../../../src/export/BatchLogRecordProcessorBase';
 import { reconfigureLimits } from '../../../src/config';
 import { LoggerProviderSharedState } from '../../../src/internal/LoggerProviderSharedState';
-import { Resource } from '@opentelemetry/resources';
+import {
+  DEFAULT_RESOURCE,
+  Resource,
+  resourceFromAttributes,
+} from '@opentelemetry/resources';
 
 class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BufferConfig> {
   onInit() {}
@@ -44,7 +48,7 @@ const createLogRecord = (
   resource?: Resource
 ): LogRecord => {
   const sharedState = new LoggerProviderSharedState(
-    resource || Resource.default(),
+    resource || DEFAULT_RESOURCE,
     Infinity,
     reconfigureLimits(limits ?? {})
   );
@@ -314,12 +318,10 @@ describe('BatchLogRecordProcessorBase', () => {
 
     it('should wait for pending resource on flush', async () => {
       const processor = new BatchLogRecordProcessor(exporter);
-      const asyncResource = new Resource({
-        attributes: {
-          async: new Promise<string>(resolve =>
-            setTimeout(() => resolve('fromasync'), 1)
-          ),
-        },
+      const asyncResource = resourceFromAttributes({
+        async: new Promise<string>(resolve =>
+          setTimeout(() => resolve('fromasync'), 1)
+        ),
       });
       const logRecord = createLogRecord(undefined, asyncResource);
       processor.onEmit(logRecord);

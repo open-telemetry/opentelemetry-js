@@ -36,7 +36,7 @@ import {
 } from './utils';
 import { defaultResource } from '../util';
 import { ValueType } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 
 const testScopeMetrics: ScopeMetrics[] = [
   {
@@ -140,10 +140,8 @@ describe('MetricReader', () => {
     it('should collect metrics from the SDK and the additional metricProducers', async () => {
       const additionalProducer = new TestMetricProducer({
         resourceMetrics: {
-          resource: new Resource({
-            attributes: {
-              shouldBeDiscarded: 'should-be-discarded',
-            },
+          resource: resourceFromAttributes({
+            shouldBeDiscarded: 'should-be-discarded',
           }),
           scopeMetrics: testScopeMetrics,
         },

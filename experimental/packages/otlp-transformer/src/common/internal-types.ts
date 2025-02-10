@@ -15,7 +15,7 @@
  */
 
 /** Properties of a Resource. */
-export interface IResource {
+export interface Resource {
   /** Resource attributes */
   attributes: IKeyValue[];
 

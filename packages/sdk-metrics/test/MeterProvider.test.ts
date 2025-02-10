@@ -33,7 +33,10 @@ import * as sinon from 'sinon';
 import { Meter } from '../src/Meter';
 import { createAllowListAttributesProcessor } from '../src/view/AttributesProcessor';
 import { AggregationType } from '../src/view/AggregationOption';
-import { Resource } from '@opentelemetry/resources';
+import {
+  DEFAULT_RESOURCE,
+  resourceFromAttributes,
+} from '@opentelemetry/resources';
 
 describe('MeterProvider', () => {
   afterEach(() => {
@@ -65,12 +68,12 @@ describe('MeterProvider', () => {
 
       // Perform collection.
       const { resourceMetrics } = await reader.collect();
-      assert.deepStrictEqual(resourceMetrics.resource, Resource.default());
+      assert.deepStrictEqual(resourceMetrics.resource, DEFAULT_RESOURCE);
     });
 
     it('should use the resource passed in constructor', async function () {
       const reader = new TestMetricReader();
-      const expectedResource = new Resource({ attributes: { foo: 'bar' } });
+      const expectedResource = resourceFromAttributes({ foo: 'bar' });
 
       const meterProvider = new MeterProvider({
         readers: [reader],
@@ -100,7 +103,7 @@ describe('MeterProvider', () => {
 
       // Perform collection.
       const { resourceMetrics } = await reader.collect();
-      assert.deepStrictEqual(resourceMetrics.resource, Resource.default());
+      assert.deepStrictEqual(resourceMetrics.resource, DEFAULT_RESOURCE);
     });
   });
 

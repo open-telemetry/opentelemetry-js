@@ -27,14 +27,15 @@ import {
   registerInstrumentations,
 } from '@opentelemetry/instrumentation';
 import {
+  DEFAULT_RESOURCE,
   detectResources,
   envDetector,
   hostDetector,
-  IResource,
-  processDetector,
   Resource,
+  processDetector,
   ResourceDetectionConfig,
   ResourceDetector,
+  resourceFromAttributes,
 } from '@opentelemetry/resources';
 import {
   LogRecordProcessor,
@@ -208,7 +209,7 @@ export class NodeSDK {
   private _meterProviderConfig?: MeterProviderConfig;
   private _instrumentations: Instrumentation[];
 
-  private _resource: IResource;
+  private _resource: Resource;
   private _resourceDetectors: Array<ResourceDetector>;
 
   private _autoDetectResources: boolean;
@@ -244,7 +245,7 @@ export class NodeSDK {
 
     this._configuration = configuration;
 
-    this._resource = configuration.resource ?? Resource.default();
+    this._resource = configuration.resource ?? DEFAULT_RESOURCE;
     this._autoDetectResources = configuration.autoDetectResources ?? true;
     if (!this._autoDetectResources) {
       this._resourceDetectors = [];
@@ -352,10 +353,8 @@ export class NodeSDK {
       this._serviceName === undefined
         ? this._resource
         : this._resource.merge(
-            new Resource({
-              attributes: {
-                [ATTR_SERVICE_NAME]: this._serviceName,
-              },
+            resourceFromAttributes({
+              [ATTR_SERVICE_NAME]: this._serviceName,
             })
           );
 

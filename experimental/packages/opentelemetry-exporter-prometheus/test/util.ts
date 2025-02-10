@@ -15,7 +15,7 @@
  */
 
 import * as sinon from 'sinon';
-import { Resource } from '@opentelemetry/resources';
+import { DEFAULT_RESOURCE } from '@opentelemetry/resources';
 import {
   SEMRESATTRS_SERVICE_NAME,
   SEMRESATTRS_TELEMETRY_SDK_LANGUAGE,
@@ -29,19 +29,23 @@ export function mockHrTime() {
   sinon.useFakeTimers(mockedHrTimeMs);
 }
 
-export const serviceName = Resource.default()
-  .attributes[SEMRESATTRS_SERVICE_NAME]?.toString()
+export const serviceName = DEFAULT_RESOURCE.attributes[
+  SEMRESATTRS_SERVICE_NAME
+]?.toString()
   .replace(/\\/g, '\\\\')
   .replace(/\n/g, '\\n');
-export const sdkLanguage = Resource.default()
-  .attributes[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE]?.toString()
+export const sdkLanguage = DEFAULT_RESOURCE.attributes[
+  SEMRESATTRS_TELEMETRY_SDK_LANGUAGE
+]?.toString()
   .replace(/\\/g, '\\\\')
   .replace(/\n/g, '\\n');
-export const sdkName = Resource.default()
-  .attributes[SEMRESATTRS_TELEMETRY_SDK_NAME]?.toString()
+export const sdkName = DEFAULT_RESOURCE.attributes[
+  SEMRESATTRS_TELEMETRY_SDK_NAME
+]?.toString()
   .replace(/\\/g, '\\\\')
   .replace(/\n/g, '\\n');
-export const sdkVersion = Resource.default()
-  .attributes[SEMRESATTRS_TELEMETRY_SDK_VERSION]?.toString()
+export const sdkVersion = DEFAULT_RESOURCE.attributes[
+  SEMRESATTRS_TELEMETRY_SDK_VERSION
+]?.toString()
   .replace(/\\/g, '\\\\')
   .replace(/\n/g, '\\n');
