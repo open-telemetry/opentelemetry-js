@@ -105,7 +105,6 @@ export {
   ENVIRONMENT,
   RAW_ENVIRONMENT,
   parseEnvironment,
-  stringToLogLevel,
 } from './utils/environment';
 export { merge } from './utils/merge';
 export { TimeoutError, callWithTimeout } from './utils/timeout';

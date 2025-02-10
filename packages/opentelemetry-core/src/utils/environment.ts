@@ -316,10 +316,6 @@ const logLevelMap: { [key: string]: DiagLogLevel } = {
   NONE: DiagLogLevel.NONE,
 };
 
-export function stringToLogLevel(value: string): DiagLogLevel | undefined {
-  return logLevelMap[value.toUpperCase()];
-}
-
 /**
  * Environmentally sets log level if valid log level string is provided
  * @param key
