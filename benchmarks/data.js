@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1738956158644,
+  "lastUpdate": 1739180909622,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -26316,6 +26316,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.70%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "3b65dee7bdabe6f207f21e0f46741dc30d737080",
+          "message": "chore: temporarily disable API docs updates while main is frozen for releases (#5436)",
+          "timestamp": "2025-02-10T08:38:25Z",
+          "tree_id": "5df7bec7a74ddb3da907dfec8179840b9ed29caa",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/3b65dee7bdabe6f207f21e0f46741dc30d737080"
+        },
+        "date": 1739180905441,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1532772,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 17166,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 825232,
+            "range": "±0.46%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 785431,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
