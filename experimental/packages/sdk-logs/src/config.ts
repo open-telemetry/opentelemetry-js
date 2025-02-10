@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  DEFAULT_ATTRIBUTE_COUNT_LIMIT,
-  DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
-  getEnv,
-  getEnvWithoutDefaults,
-} from '@opentelemetry/core';
+import { getNumberFromEnv } from '@opentelemetry/core';
 import { LogRecordLimits } from './types';
 
 export function loadDefaultConfig() {
@@ -27,8 +22,10 @@ export function loadDefaultConfig() {
     forceFlushTimeoutMillis: 30000,
     logRecordLimits: {
       attributeValueLengthLimit:
-        getEnv().OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT,
-      attributeCountLimit: getEnv().OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT,
+        getNumberFromEnv('OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT') ??
+        Infinity,
+      attributeCountLimit:
+        getNumberFromEnv('OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT') ?? 128,
     },
     includeTraceContext: true,
   };
@@ -42,24 +39,22 @@ export function loadDefaultConfig() {
 export function reconfigureLimits(
   logRecordLimits: LogRecordLimits
 ): Required<LogRecordLimits> {
-  const parsedEnvConfig = getEnvWithoutDefaults();
-
   return {
     /**
      * Reassign log record attribute count limit to use first non null value defined by user or use default value
      */
     attributeCountLimit:
       logRecordLimits.attributeCountLimit ??
-      parsedEnvConfig.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT ??
-      parsedEnvConfig.OTEL_ATTRIBUTE_COUNT_LIMIT ??
-      DEFAULT_ATTRIBUTE_COUNT_LIMIT,
+      getNumberFromEnv('OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT') ??
+      getNumberFromEnv('OTEL_ATTRIBUTE_COUNT_LIMIT') ??
+      128,
     /**
      * Reassign log record attribute value length limit to use first non null value defined by user or use default value
      */
     attributeValueLengthLimit:
       logRecordLimits.attributeValueLengthLimit ??
-      parsedEnvConfig.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT ??
-      parsedEnvConfig.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT ??
-      DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
+      getNumberFromEnv('OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT') ??
+      getNumberFromEnv('OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT') ??
+      Infinity,
   };
 }

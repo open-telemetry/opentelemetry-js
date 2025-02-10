@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { getEnv } from '../../src/platform';
+import { getEnv } from '../../../src/platform';
 import {
   DEFAULT_ENVIRONMENT,
   ENVIRONMENT,
   RAW_ENVIRONMENT,
-} from '../../src/utils/environment';
+} from '../../../src/utils/environment';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { DiagLogLevel } from '@opentelemetry/api';

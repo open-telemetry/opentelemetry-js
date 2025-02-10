@@ -15,7 +15,11 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { ExportResult, ExportResultCode, getEnv } from '@opentelemetry/core';
+import {
+  ExportResult,
+  ExportResultCode,
+  getStringFromEnv,
+} from '@opentelemetry/core';
 import { SpanExporter, ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { prepareSend } from './platform/index';
 import * as zipkinTypes from './types';
@@ -42,7 +46,10 @@ export class ZipkinExporter implements SpanExporter {
   private _sendingPromises: Promise<unknown>[] = [];
 
   constructor(config: zipkinTypes.ExporterConfig = {}) {
-    this._urlStr = config.url || getEnv().OTEL_EXPORTER_ZIPKIN_ENDPOINT;
+    this._urlStr =
+      config.url ||
+      (getStringFromEnv('OTEL_EXPORTER_ZIPKIN_ENDPOINT') ??
+        'http://localhost:9411/api/v2/spans');
     this._send = prepareSend(this._urlStr, config.headers);
     this._serviceName = config.serviceName;
     this._statusCodeTagName =

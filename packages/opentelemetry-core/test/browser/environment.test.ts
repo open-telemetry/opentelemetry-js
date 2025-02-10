@@ -15,27 +15,11 @@
  */
 
 import * as assert from 'assert';
-import { Deferred } from '../../src/utils/promise';
-import { assertRejects } from '../test-utils';
+import { getEnv } from '../../src/platform/browser/environment';
 
-describe('promise', () => {
-  describe('Deferred', () => {
-    it('should resolve', async () => {
-      const deferred = new Deferred();
-      deferred.resolve(1);
-      deferred.resolve(2);
-      deferred.reject(new Error('foo'));
-
-      const ret = await deferred.promise;
-      assert.strictEqual(ret, 1);
-    });
-
-    it('should reject', async () => {
-      const deferred = new Deferred();
-      deferred.reject(new Error('foo'));
-      deferred.reject(new Error('bar'));
-
-      await assertRejects(deferred.promise, /foo/);
-    });
+describe('getEnv', () => {
+  it('get environments variables in a browser', () => {
+    const env = getEnv();
+    assert.strictEqual(typeof env, 'object');
   });
 });

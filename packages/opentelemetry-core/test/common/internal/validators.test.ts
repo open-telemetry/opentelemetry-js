@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { validateKey, validateValue } from '../../src/internal/validators';
+import { validateKey, validateValue } from '../../../src/internal/validators';
 
 describe('validators', () => {
   describe('validateKey', () => {

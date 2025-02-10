@@ -65,6 +65,10 @@ export {
   _globalThis,
   getEnv,
   getEnvWithoutDefaults,
+  getStringFromEnv,
+  getBooleanFromEnv,
+  getNumberFromEnv,
+  getStringListFromEnv,
   hexToBase64,
   otperformance,
   unrefTimer,
@@ -101,6 +105,7 @@ export {
   ENVIRONMENT,
   RAW_ENVIRONMENT,
   parseEnvironment,
+  stringToLogLevel,
 } from './utils/environment';
 export { merge } from './utils/merge';
 export { TimeoutError, callWithTimeout } from './utils/timeout';

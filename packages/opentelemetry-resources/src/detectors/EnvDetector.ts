@@ -15,10 +15,10 @@
  */
 
 import { Attributes, diag } from '@opentelemetry/api';
-import { getEnv } from '@opentelemetry/core';
 import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { ResourceDetectionConfig } from '../config';
 import { DetectedResource, ResourceDetector } from '../types';
+import { getStringFromEnv } from '@opentelemetry/core';
 
 /**
  * EnvDetector can be used to detect the presence of and create a Resource
@@ -53,10 +53,9 @@ class EnvDetector implements ResourceDetector {
    */
   detect(_config?: ResourceDetectionConfig): DetectedResource {
     const attributes: Attributes = {};
-    const env = getEnv();
 
-    const rawAttributes = env.OTEL_RESOURCE_ATTRIBUTES;
-    const serviceName = env.OTEL_SERVICE_NAME;
+    const rawAttributes = getStringFromEnv('OTEL_RESOURCE_ATTRIBUTES');
+    const serviceName = getStringFromEnv('OTEL_SERVICE_NAME');
 
     if (rawAttributes) {
       try {

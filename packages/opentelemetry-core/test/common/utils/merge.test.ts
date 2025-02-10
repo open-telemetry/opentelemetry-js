@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import * as assert from 'assert';
-import { merge } from '../../src/utils/merge';
+import { merge } from '../../../src/utils/merge';
 
 const tests: TestResult[] = [];
 

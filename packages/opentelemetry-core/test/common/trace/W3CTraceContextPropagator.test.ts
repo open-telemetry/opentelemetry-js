@@ -29,9 +29,9 @@ import {
   W3CTraceContextPropagator,
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
-} from '../../src/trace/W3CTraceContextPropagator';
-import { suppressTracing } from '../../src/trace/suppress-tracing';
-import { TraceState } from '../../src/trace/TraceState';
+} from '../../../src/trace/W3CTraceContextPropagator';
+import { suppressTracing } from '../../../src/trace/suppress-tracing';
+import { TraceState } from '../../../src/trace/TraceState';
 
 describe('W3CTraceContextPropagator', () => {
   const httpTraceContext = new W3CTraceContextPropagator();

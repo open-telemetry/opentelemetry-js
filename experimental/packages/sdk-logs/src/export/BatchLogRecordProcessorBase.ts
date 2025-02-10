@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-import type { ExportResult } from '@opentelemetry/core';
+import { ExportResult, getNumberFromEnv } from '@opentelemetry/core';
 import { diag } from '@opentelemetry/api';
 import {
   ExportResultCode,
-  getEnv,
   globalErrorHandler,
   unrefTimer,
   BindOnceFuture,
@@ -47,14 +46,22 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
     private readonly _exporter: LogRecordExporter,
     config?: T
   ) {
-    const env = getEnv();
     this._maxExportBatchSize =
-      config?.maxExportBatchSize ?? env.OTEL_BLRP_MAX_EXPORT_BATCH_SIZE;
-    this._maxQueueSize = config?.maxQueueSize ?? env.OTEL_BLRP_MAX_QUEUE_SIZE;
+      config?.maxExportBatchSize ??
+      getNumberFromEnv('OTEL_BLRP_MAX_EXPORT_BATCH_SIZE') ??
+      512;
+    this._maxQueueSize =
+      config?.maxQueueSize ??
+      getNumberFromEnv('OTEL_BLRP_MAX_QUEUE_SIZE') ??
+      2048;
     this._scheduledDelayMillis =
-      config?.scheduledDelayMillis ?? env.OTEL_BLRP_SCHEDULE_DELAY;
+      config?.scheduledDelayMillis ??
+      getNumberFromEnv('OTEL_BLRP_SCHEDULE_DELAY') ??
+      5000;
     this._exportTimeoutMillis =
-      config?.exportTimeoutMillis ?? env.OTEL_BLRP_EXPORT_TIMEOUT;
+      config?.exportTimeoutMillis ??
+      getNumberFromEnv('OTEL_BLRP_EXPORT_TIMEOUT') ??
+      30000;
 
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
 
