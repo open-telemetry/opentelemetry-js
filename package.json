@@ -16,7 +16,6 @@
     "test:webworker": "lerna run test:webworker",
     "test:backcompat": "lerna run test:backcompat",
     "test:bench": "lerna run test:bench",
-    "changelog": "lerna-changelog",
     "predocs-test": "npm run docs",
     "docs": "typedoc --readme none && touch docs/.nojekyll",
     "docs-deploy": "gh-pages --dotfiles --dist docs",
@@ -114,19 +113,6 @@
     "typedoc-plugin-missing-exports": "3.1.0",
     "typescript": "5.0.4",
     "util": "0.12.5"
-  },
-  "changelog": {
-    "repo": "open-telemetry/opentelemetry-js",
-    "labels": {
-      "breaking": ":boom: Breaking Change",
-      "enhancement": ":rocket: (Enhancement)",
-      "bug": ":bug: (Bug Fix)",
-      "core": ":wrench: Core",
-      "document": ":books: (Refine Doc)",
-      "feature-request": ":sparkles: (Feature)",
-      "internal": ":house: (Internal)"
-    },
-    "cacheDir": ".changelog"
   },
   "workspaces": [
     "api",
