@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1739279360041,
+  "lastUpdate": 1739282700816,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -26628,6 +26628,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.58%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4fb9c5aba9cbddb939cd348df956a11059bdaf38",
+          "message": "refactor(web-common): add incubating semconv to package (#5446)",
+          "timestamp": "2025-02-11T13:53:04Z",
+          "tree_id": "359b2fba361ee0654318976754b209253f548b5a",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/4fb9c5aba9cbddb939cd348df956a11059bdaf38"
+        },
+        "date": 1739282699810,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1473922,
+            "range": "±0.64%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 17288,
+            "range": "±0.17%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 838005,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 791741,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
