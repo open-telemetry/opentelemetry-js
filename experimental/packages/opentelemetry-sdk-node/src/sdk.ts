@@ -109,10 +109,7 @@ function getValueInMillis(envName: string, defaultValue: number): number {
  */
 function configureMetricProviderFromEnv(): IMetricReader[] {
   const metricReaders: IMetricReader[] = [];
-  const metricsExporterList = process.env.OTEL_METRICS_EXPORTER?.trim();
-  if (!metricsExporterList) {
-    return metricReaders;
-  }
+  const metricsExporterList = process.env.OTEL_METRICS_EXPORTER?.trim() ?? ''; 
   const enabledExporters = filterBlanksAndNulls(metricsExporterList.split(','));
 
   if (enabledExporters.length === 0) {
@@ -447,7 +444,7 @@ export class NodeSDK {
   }
 
   private configureLoggerProviderFromEnv(): void {
-    const logExportersList = process.env.OTEL_LOGS_EXPORTER ?? '';
+    const logExportersList = process.env.OTEL_LOGS_EXPORTER?.trim() ?? '';
     const enabledExporters = filterBlanksAndNulls(logExportersList.split(','));
 
     if (enabledExporters.length === 0) {
