@@ -225,7 +225,7 @@ describe('SimpleSpanProcessor', () => {
         spanId: '5e0c63257de34c92',
         traceFlags: TraceFlags.SAMPLED,
       };
-      const tracer = provider.getTracer('default');
+      const tracer = provider.getTracer('default') as Tracer;
       const span = new SpanImpl({
         scope: tracer.instrumentationScope,
         resource: tracer['_resource'],
