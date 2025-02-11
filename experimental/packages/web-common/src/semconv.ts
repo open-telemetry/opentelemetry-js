@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { hexToBinary } from '../../common/hex-to-binary';
 
-export function hexToBase64(hexStr: string): string {
-  return Buffer.from(hexToBinary(hexStr)).toString('base64');
-}
+/**
+ * A unique id to identify a session.
+ *
+ * @example "00112233-4455-6677-8899-aabbccddeeff"
+ */
+export const ATTR_SESSION_ID = 'session.id' as const;

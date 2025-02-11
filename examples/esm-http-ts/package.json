@@ -38,6 +38,6 @@
     "@opentelemetry/resources": "1.30.0",
     "@opentelemetry/sdk-trace-base": "1.30.0",
     "@opentelemetry/sdk-trace-node": "1.30.0",
-    "@opentelemetry/semantic-conventions": "1.29.0"
+    "@opentelemetry/semantic-conventions": "^1.29.0"
   }
 }
