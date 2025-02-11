@@ -18,7 +18,5 @@
  * A unique id to identify a session.
  *
  * @example "00112233-4455-6677-8899-aabbccddeeff"
- *
- * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ATTR_SESSION_ID = 'session.id' as const;
