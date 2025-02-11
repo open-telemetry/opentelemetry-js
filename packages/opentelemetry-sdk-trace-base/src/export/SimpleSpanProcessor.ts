@@ -37,7 +37,7 @@ import { Resource } from '@opentelemetry/resources';
  */
 export class SimpleSpanProcessor implements SpanProcessor {
   private _shutdownOnce: BindOnceFuture<void>;
-  private _pendingExports: Set<Promise<unknown>>;
+  private _pendingExports: Set<Promise<void>>;
 
   constructor(private readonly _exporter: SpanExporter) {
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
@@ -45,7 +45,6 @@ export class SimpleSpanProcessor implements SpanProcessor {
   }
 
   async forceFlush(): Promise<void> {
-    // await pending exports
     await Promise.all(Array.from(this._pendingExports));
     if (this._exporter.forceFlush) {
       await this._exporter.forceFlush();
@@ -63,7 +62,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
       return;
     }
 
-    const pendingExport = this.doExport(span).catch(err =>
+    const pendingExport = this._doExport(span).catch(err =>
       globalErrorHandler(err)
     );
     // Enqueue this export to the pending list so it can be flushed by the user.
@@ -71,7 +70,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
     pendingExport.finally(() => this._pendingExports.delete(pendingExport));
   }
 
-  private async doExport(span: ReadableSpan): Promise<void> {
+  private async _doExport(span: ReadableSpan): Promise<void> {
     if (span.resource.asyncAttributesPending) {
       // Ensure resource is fully resolved before exporting.
       await (span.resource as Resource).waitForAsyncAttributes?.();
