@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 import * as api from '@opentelemetry/api';
-import { otperformance as performance, isWrapped } from '@opentelemetry/core';
-import { registerInstrumentations } from '@opentelemetry/instrumentation';
+import { otperformance as performance } from '@opentelemetry/core';
+import {
+  registerInstrumentations,
+  isWrapped,
+} from '@opentelemetry/instrumentation';
 import {
   B3Propagator,
   B3InjectEncoding,
