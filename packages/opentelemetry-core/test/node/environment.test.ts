@@ -41,13 +41,13 @@ describe('environment utility functions', function () {
       assert.strictEqual(getStringFromEnv('FOO'), undefined);
     });
 
-    it('should trim extra whitespace', function () {
+    it('should not trim extra whitespace', function () {
       process.env.FOO = 'test-string  ';
-      assert.strictEqual(getStringFromEnv('FOO'), 'test-string');
+      assert.strictEqual(getStringFromEnv('FOO'), 'test-string  ');
       process.env.FOO = '  test-string';
-      assert.strictEqual(getStringFromEnv('FOO'), 'test-string');
+      assert.strictEqual(getStringFromEnv('FOO'), '  test-string');
       process.env.FOO = '  test-string   ';
-      assert.strictEqual(getStringFromEnv('FOO'), 'test-string');
+      assert.strictEqual(getStringFromEnv('FOO'), '  test-string   ');
     });
 
     it('should extract string from env var', function () {

@@ -59,15 +59,14 @@ export function getNumberFromEnv(key: string): number | undefined {
 
 /**
  * Retrieves a string from an environment variable.
- * - Trims leading and trailing whitespace.
  * - Returns `undefined` if the environment variable is empty, unset, or contains only whitespace.
  *
  * @param {string} key - The name of the environment variable to retrieve.
  * @returns {string | undefined} - The string value or `undefined`.
  */
 export function getStringFromEnv(key: string): string | undefined {
-  const raw = process.env[key]?.trim();
-  if (raw == null || raw === '') {
+  const raw = process.env[key];
+  if (raw == null || raw.trim() === '') {
     return undefined;
   }
   return raw;
