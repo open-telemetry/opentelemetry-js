@@ -348,7 +348,8 @@ describe('Trace', () => {
       });
       assert.ok(exportRequest);
       assert.strictEqual(
-        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].parentSpanContext?.spanId,
+        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0]
+          .parentSpanContext?.spanId,
         undefined
       );
     });
@@ -360,7 +361,8 @@ describe('Trace', () => {
       });
       assert.ok(exportRequest);
       assert.strictEqual(
-        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].parentSpanContext?.spanId,
+        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0]
+          .parentSpanContext?.spanId,
         undefined
       );
     });

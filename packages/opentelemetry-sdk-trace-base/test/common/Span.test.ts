@@ -1007,7 +1007,7 @@ describe('Span', () => {
       kind: SpanKind.INTERNAL,
       parentSpanContext: {
         spanId: parentId,
-        traceId: "",
+        traceId: '',
         traceFlags: TraceFlags.SAMPLED,
       },
       spanLimits: tracer.getSpanLimits(),

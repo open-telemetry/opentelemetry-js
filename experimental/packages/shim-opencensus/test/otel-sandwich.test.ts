@@ -38,7 +38,10 @@ describe('OpenTelemetry sandwich', () => {
       childSpan.spanContext().traceId,
       parentSpan.spanContext().traceId
     );
-    assert.strictEqual(childSpan.parentSpanContext?.spanId, parentSpan.spanContext().spanId);
+    assert.strictEqual(
+      childSpan.parentSpanContext?.spanId,
+      parentSpan.spanContext().spanId
+    );
   });
 
   it('should maintain parent-child relationship for OC -> OTel', async () => {
@@ -55,7 +58,10 @@ describe('OpenTelemetry sandwich', () => {
       childSpan.spanContext().traceId,
       parentSpan.spanContext().traceId
     );
-    assert.strictEqual(childSpan.parentSpanContext?.spanId, parentSpan.spanContext().spanId);
+    assert.strictEqual(
+      childSpan.parentSpanContext?.spanId,
+      parentSpan.spanContext().spanId
+    );
   });
 
   it('should maintain structure for OTel -> OC -> OTel', async () => {
@@ -83,6 +89,9 @@ describe('OpenTelemetry sandwich', () => {
       middleSpan.parentSpanContext?.spanId,
       parentSpan.spanContext().spanId
     );
-    assert.strictEqual(childSpan.parentSpanContext?.spanId, middleSpan.spanContext().spanId);
+    assert.strictEqual(
+      childSpan.parentSpanContext?.spanId,
+      middleSpan.spanContext().spanId
+    );
   });
 });
