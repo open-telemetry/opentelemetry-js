@@ -32,7 +32,6 @@ jobs:
             package-lock.json
           node-version: ${{ matrix.node_version }}
 
-      # npm@11.0.0 drops support for Node.js v18
       # Install the latest npm compatible with this version of Node.js
       # - npm@11.1.0 supports: {"node":"^20.17.0 || >=22.9.0"}
       - run: npm install -g npm@"<11.0.0"

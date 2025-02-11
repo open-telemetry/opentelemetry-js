@@ -24,7 +24,7 @@ describe('version', function () {
       this.skip();
     }
 
-    const pjson = require('../../../package.json');
+    const pjson = require('../../../../package.json');
     assert.strictEqual(pjson.version, VERSION);
   });
 

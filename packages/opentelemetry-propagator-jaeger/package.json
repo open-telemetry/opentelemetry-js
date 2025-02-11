@@ -9,7 +9,8 @@
   "scripts": {
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "test": "nyc mocha 'test/**/*.test.ts' --exclude 'test/index-webpack.ts'",
+    "pretest": "tsc --build tsconfig.json",
+    "test": "nyc mocha 'build/test/**/*.test.js' --exclude 'build/test/index-webpack.js'",
     "test:browser": "karma start --single-run",
     "tdd": "npm run tdd:node",
     "tdd:node": "npm run test -- --watch-extensions ts --watch",

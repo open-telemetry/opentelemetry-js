@@ -40,8 +40,8 @@ import * as assert from 'assert';
 
 import { satisfies, SatisfiesOptions } from '../../src/semver';
 
-const rangeInclude = require('./third-party/node-semver/range-include.js');
-const rangeExclude = require('./third-party/node-semver/range-exclude.js');
+const rangeInclude = require('../../../test/common/third-party/node-semver/range-include.js');
+const rangeExclude = require('../../../test/common/third-party/node-semver/range-exclude.js');
 
 describe('SemVer', () => {
   describe('satisfies', () => {

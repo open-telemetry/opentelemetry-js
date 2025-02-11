@@ -14,28 +14,25 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import * as path from 'path';
-import type { OnRequireFn } from 'require-in-the-middle';
-import { RequireInTheMiddleSingleton } from '../../src/platform/node/RequireInTheMiddleSingleton';
+const assert = require('assert');
+const sinon = require('sinon');
+const path = require('path');
+const {
+  RequireInTheMiddleSingleton,
+} = require('../../build/src/platform/node/RequireInTheMiddleSingleton');
 
 const requireInTheMiddleSingleton = RequireInTheMiddleSingleton.getInstance();
 
-type AugmentedExports = {
-  __ritmOnRequires?: string[];
-};
-
-const makeOnRequiresStub = (label: string): sinon.SinonStub =>
-  sinon.stub().callsFake(((exports: AugmentedExports) => {
+const makeOnRequiresStub = label =>
+  sinon.stub().callsFake(exports => {
     exports.__ritmOnRequires ??= [];
     exports.__ritmOnRequires.push(label);
     return exports;
-  }) as OnRequireFn);
+  });
 
 describe('RequireInTheMiddleSingleton', () => {
   describe('register', () => {
-    const onRequireFsStub = makeOnRequiresStub('fs');
+    const onRequireVmStub = makeOnRequiresStub('vm');
     const onRequireFsPromisesStub = makeOnRequiresStub('fs-promises');
     const onRequireCodecovStub = makeOnRequiresStub('codecov');
     const onRequireCodecovLibStub = makeOnRequiresStub('codecov-lib');
@@ -43,7 +40,7 @@ describe('RequireInTheMiddleSingleton', () => {
     const onRequireCpxLibStub = makeOnRequiresStub('test-non-core-module-lib');
 
     before(() => {
-      requireInTheMiddleSingleton.register('fs', onRequireFsStub);
+      requireInTheMiddleSingleton.register('vm', onRequireVmStub);
       requireInTheMiddleSingleton.register(
         'fs/promises',
         onRequireFsPromisesStub
@@ -64,7 +61,7 @@ describe('RequireInTheMiddleSingleton', () => {
     });
 
     beforeEach(() => {
-      onRequireFsStub.resetHistory();
+      onRequireVmStub.resetHistory();
       onRequireFsPromisesStub.resetHistory();
       onRequireCodecovStub.resetHistory();
       onRequireCodecovLibStub.resetHistory();
@@ -85,12 +82,12 @@ describe('RequireInTheMiddleSingleton', () => {
     describe('core module', () => {
       describe('AND module name matches', () => {
         it('should call `onRequire`', () => {
-          const exports = require('fs');
-          assert.deepStrictEqual(exports.__ritmOnRequires, ['fs']);
+          const exports = require('vm');
+          assert.deepStrictEqual(exports.__ritmOnRequires, ['vm']);
           sinon.assert.calledOnceWithExactly(
-            onRequireFsStub,
+            onRequireVmStub,
             exports,
-            'fs',
+            'vm',
             undefined
           );
           sinon.assert.notCalled(onRequireFsPromisesStub);
@@ -100,7 +97,7 @@ describe('RequireInTheMiddleSingleton', () => {
         it('should not call `onRequire`', () => {
           const exports = require('crypto');
           assert.equal(exports.__ritmOnRequires, undefined);
-          sinon.assert.notCalled(onRequireFsStub);
+          sinon.assert.notCalled(onRequireVmStub);
         });
       });
     });
@@ -116,7 +113,7 @@ describe('RequireInTheMiddleSingleton', () => {
             'fs/promises',
             undefined
           );
-          sinon.assert.notCalled(onRequireFsStub);
+          sinon.assert.notCalled(onRequireVmStub);
         });
       });
     });

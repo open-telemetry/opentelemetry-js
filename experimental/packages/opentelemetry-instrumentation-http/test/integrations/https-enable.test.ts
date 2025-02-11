@@ -52,6 +52,8 @@ export const customAttributeFunction = (span: Span): void => {
   span.setAttribute('span kind', SpanKind.CLIENT);
 };
 
+const fixturesDir = path.resolve(__dirname, '../../../test/fixtures');
+
 describe('HttpsInstrumentation Integration tests', () => {
   let mockServerPort = 0;
   let mockServer: https.Server;
@@ -59,12 +61,8 @@ describe('HttpsInstrumentation Integration tests', () => {
   before(done => {
     mockServer = https.createServer(
       {
-        key: fs.readFileSync(
-          path.join(__dirname, '..', 'fixtures', 'server-key.pem')
-        ),
-        cert: fs.readFileSync(
-          path.join(__dirname, '..', 'fixtures', 'server-cert.pem')
-        ),
+        key: fs.readFileSync(path.join(fixturesDir, 'server-key.pem')),
+        cert: fs.readFileSync(path.join(fixturesDir, 'server-cert.pem')),
       },
       (req, res) => {
         res.statusCode = 200;
