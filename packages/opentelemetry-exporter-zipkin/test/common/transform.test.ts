@@ -20,7 +20,6 @@ import {
   hrTimeDuration,
   hrTimeToMicroseconds,
   millisToHrTime,
-  VERSION,
 } from '@opentelemetry/core';
 import { IResource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
@@ -34,6 +33,7 @@ import {
   _toZipkinTags,
 } from '../../src/transform';
 import * as zipkinTypes from '../../src/types';
+import { VERSION } from '../../src/version';
 
 const resource = {
   attributes: {
