@@ -27,15 +27,14 @@ import {
   registerInstrumentations,
 } from '@opentelemetry/instrumentation';
 import {
-  Detector,
-  DetectorSync,
-  detectResourcesSync,
+  detectResources,
   envDetector,
   hostDetector,
   IResource,
   processDetector,
   Resource,
   ResourceDetectionConfig,
+  ResourceDetector,
 } from '@opentelemetry/resources';
 import {
   LogRecordProcessor,
@@ -74,6 +73,7 @@ import {
   getResourceDetectorsFromEnv,
   getSpanProcessorsFromEnv,
   filterBlanksAndNulls,
+  getPropagatorFromEnv,
 } from './utils';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
@@ -209,7 +209,7 @@ export class NodeSDK {
   private _instrumentations: Instrumentation[];
 
   private _resource: IResource;
-  private _resourceDetectors: Array<Detector | DetectorSync>;
+  private _resourceDetectors: Array<ResourceDetector>;
 
   private _autoDetectResources: boolean;
 
@@ -345,9 +345,7 @@ export class NodeSDK {
         detectors: this._resourceDetectors,
       };
 
-      this._resource = this._resource.merge(
-        detectResourcesSync(internalConfig)
-      );
+      this._resource = this._resource.merge(detectResources(internalConfig));
     }
 
     this._resource =
@@ -355,7 +353,9 @@ export class NodeSDK {
         ? this._resource
         : this._resource.merge(
             new Resource({
-              [ATTR_SERVICE_NAME]: this._serviceName,
+              attributes: {
+                [ATTR_SERVICE_NAME]: this._serviceName,
+              },
             })
           );
 
@@ -376,7 +376,9 @@ export class NodeSDK {
           this._tracerProviderConfig?.contextManager ??
           // _tracerProviderConfig may be undefined if trace-specific settings are not provided - fall back to raw config
           this._configuration?.contextManager,
-        propagator: this._tracerProviderConfig?.textMapPropagator,
+        propagator:
+          this._tracerProviderConfig?.textMapPropagator ??
+          getPropagatorFromEnv(),
       });
     }
 

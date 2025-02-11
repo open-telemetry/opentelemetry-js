@@ -80,7 +80,7 @@ type TestGrpcClient = Client & {
 interface TestGrpcCall {
   description: string;
   methodName: string;
-  method: Function;
+  method: (...args: any[]) => unknown;
   request: TestRequestResponse | TestRequestResponse[];
   result: TestRequestResponse | TestRequestResponse[];
   metadata?: Metadata;
@@ -395,6 +395,7 @@ export const runTests = (
           bidiStream.write(element);
         });
 
+        assert.strictEqual(bidiStream.listenerCount('error'), 0);
         bidiStream.on('error', (err: ServiceError) => {
           reject(err);
         });

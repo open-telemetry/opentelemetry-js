@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { Tracer as Tracer } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as oc from '@opencensus/core';
@@ -25,26 +24,34 @@ import {
   SpanKind,
   context,
   createContextKey,
+  Tracer,
 } from '@opentelemetry/api';
 import { withTestTracer, setupNodeContextManager } from './util';
+
+function createStubTracer(): Tracer {
+  return {
+    startSpan: sinon.stub(),
+    startActiveSpan: sinon.stub(),
+  } as unknown as Tracer;
+}
 
 describe('ShimTracer', () => {
   setupNodeContextManager(before, after);
 
   it('should initially be inactive', () => {
-    const shimTracer = new ShimTracer(sinon.createStubInstance(Tracer));
+    const shimTracer = new ShimTracer(createStubTracer());
     assert.ok(!shimTracer.active);
   });
   describe('start', () => {
     it('should set the tracer as active', () => {
-      const shimTracer = new ShimTracer(sinon.createStubInstance(Tracer));
+      const shimTracer = new ShimTracer(createStubTracer());
       shimTracer.start({});
       assert.ok(shimTracer.active);
     });
   });
   describe('stop', () => {
     it('should set the tracer as inactive', () => {
-      const shimTracer = new ShimTracer(sinon.createStubInstance(Tracer));
+      const shimTracer = new ShimTracer(createStubTracer());
       shimTracer.start({});
       assert.ok(shimTracer.active);
     });
@@ -170,7 +177,7 @@ describe('ShimTracer', () => {
 
   describe('wrap', () => {
     it('should bind the provided function to active context at time of wrapping', () => {
-      const shimTracer = new ShimTracer(sinon.createStubInstance(Tracer));
+      const shimTracer = new ShimTracer(createStubTracer());
       const key = createContextKey('key');
       const fnToWrap = () =>
         assert.strictEqual(context.active().getValue(key), 'value');

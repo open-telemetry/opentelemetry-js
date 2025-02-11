@@ -15,7 +15,6 @@
  */
 
 import { DiagLogLevel } from '@opentelemetry/api';
-import { TracesSamplerValues } from './sampling';
 
 const DEFAULT_LIST_SEPARATOR = ',';
 
@@ -208,7 +207,7 @@ export const DEFAULT_ENVIRONMENT: Required<ENVIRONMENT> = {
   OTEL_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT:
     DEFAULT_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT,
   OTEL_TRACES_EXPORTER: '',
-  OTEL_TRACES_SAMPLER: TracesSamplerValues.ParentBasedAlwaysOn,
+  OTEL_TRACES_SAMPLER: 'parentbased_always_on',
   OTEL_TRACES_SAMPLER_ARG: '',
   OTEL_LOGS_EXPORTER: '',
   OTEL_EXPORTER_OTLP_INSECURE: '',

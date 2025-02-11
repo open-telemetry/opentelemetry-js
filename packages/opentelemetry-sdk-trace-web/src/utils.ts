@@ -46,10 +46,9 @@ function getUrlNormalizingAnchor(): HTMLAnchorElement {
  * @param obj
  * @param key
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function hasKey<O extends object>(
   obj: O,
-  key: keyof any
+  key: PropertyKey
 ): key is keyof O {
   return key in obj;
 }
@@ -59,32 +58,22 @@ export function hasKey<O extends object>(
  * @param span
  * @param performanceName name of performance entry for time start
  * @param entries
- * @param refPerfName name of performance entry to use for reference
+ * @param ignoreZeros
  */
 export function addSpanNetworkEvent(
   span: api.Span,
   performanceName: string,
   entries: PerformanceEntries,
-  refPerfName?: string
+  ignoreZeros = true
 ): api.Span | undefined {
-  let perfTime = undefined;
-  let refTime = undefined;
   if (
     hasKey(entries, performanceName) &&
-    typeof entries[performanceName] === 'number'
+    typeof entries[performanceName] === 'number' &&
+    !(ignoreZeros && entries[performanceName] === 0)
   ) {
-    perfTime = entries[performanceName];
+    return span.addEvent(performanceName, entries[performanceName]);
   }
-  const refName = refPerfName || PTN.FETCH_START;
-  // Use a reference time which is the earliest possible value so that the performance timings that are earlier should not be added
-  // using FETCH START time in case no reference is provided
-  if (hasKey(entries, refName) && typeof entries[refName] === 'number') {
-    refTime = entries[refName];
-  }
-  if (perfTime !== undefined && refTime !== undefined && perfTime >= refTime) {
-    span.addEvent(performanceName, perfTime);
-    return span;
-  }
+
   return undefined;
 }
 
@@ -93,32 +82,40 @@ export function addSpanNetworkEvent(
  * @param span
  * @param resource
  * @param ignoreNetworkEvents
+ * @param ignoreZeros
  */
 export function addSpanNetworkEvents(
   span: api.Span,
   resource: PerformanceEntries,
-  ignoreNetworkEvents = false
+  ignoreNetworkEvents = false,
+  ignoreZeros?: boolean
 ): void {
-  if (!ignoreNetworkEvents) {
-    addSpanNetworkEvent(span, PTN.FETCH_START, resource);
-    addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_START, resource);
-    addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_END, resource);
-    addSpanNetworkEvent(span, PTN.CONNECT_START, resource);
-    if (
-      hasKey(resource as PerformanceResourceTiming, 'name') &&
-      (resource as PerformanceResourceTiming)['name'].startsWith('https:')
-    ) {
-      addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, resource);
-    }
-    addSpanNetworkEvent(span, PTN.CONNECT_END, resource);
-    addSpanNetworkEvent(span, PTN.REQUEST_START, resource);
-    addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
-    addSpanNetworkEvent(span, PTN.RESPONSE_END, resource);
+  if (ignoreZeros === undefined) {
+    ignoreZeros = resource[PTN.START_TIME] !== 0;
   }
+
+  if (!ignoreNetworkEvents) {
+    addSpanNetworkEvent(span, PTN.FETCH_START, resource, ignoreZeros);
+    addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_START, resource, ignoreZeros);
+    addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_END, resource, ignoreZeros);
+    addSpanNetworkEvent(span, PTN.CONNECT_START, resource, ignoreZeros);
+    addSpanNetworkEvent(
+      span,
+      PTN.SECURE_CONNECTION_START,
+      resource,
+      ignoreZeros
+    );
+    addSpanNetworkEvent(span, PTN.CONNECT_END, resource, ignoreZeros);
+    addSpanNetworkEvent(span, PTN.REQUEST_START, resource, ignoreZeros);
+    addSpanNetworkEvent(span, PTN.RESPONSE_START, resource, ignoreZeros);
+    addSpanNetworkEvent(span, PTN.RESPONSE_END, resource, ignoreZeros);
+  }
+
   const encodedLength = resource[PTN.ENCODED_BODY_SIZE];
   if (encodedLength !== undefined) {
     span.setAttribute(SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH, encodedLength);
   }
+
   const decodedLength = resource[PTN.DECODED_BODY_SIZE];
   // Spec: Not set if transport encoding not used (in which case encoded and decoded sizes match)
   if (decodedLength !== undefined && encodedLength !== decodedLength) {

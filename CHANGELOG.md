@@ -53,13 +53,44 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * (user-facing): deprecated `AlwaysOffSampler` has moved to `@opentelemetry/sdk-trace-base`
   * (user-facing): deprecated `TraceIdRatioSampler` has moved to `@opentelemetry/sdk-trace-base`
   * (user-facing): deprecated `TraceIdRatioSampler` has moved to  `@opentelemetry/sdk-trace-base`
+* feat(resource): Merge sync and async resource interfaces into a single interface [#5350](https://github.com/open-telemetry/opentelemetry-js/pull/5350) @dyladan
+  * Resource constructor now takes a single argument which contains an optional `attributes` object
+  * Detected resource attribute values may be a promise or a synchronous value
+  * Resources are now merged by the order in which their detectors are configured instead of async attributes being last
+  * Resource detectors now return `DetectedResource` plain objects instead of `new Resource()`
+* feat(sdk-trace-base)!: drop ability to instantiate propagators beyond defaults [#5355](https://github.com/open-telemetry/opentelemetry-js/pull/5355) @pichlermarc
+  * (user-facing): only a non-env-var based default is now used on `BasicTracerProvider#register()`.
+    * propagators can now not be configured via `OTEL_PROPAGATORS` or `window.OTEL_PROPAGATORS` anymore, please pass the propagator to `NodeTracerProvider#register()` instead.
+    * if not configured directly via code, `BasicTracerProvider#register()` will now fall back to defaults (`tracecontext` and `baggage`)
+* feat(sdk-trace-node)!: drop ability to instantiate propagators beyond defaults [#5355](https://github.com/open-telemetry/opentelemetry-js/pull/5355) @pichlermarc
+  * (user-facing): only a non-env-var based default is now used on `NodeTracerProvider#register()`.
+    * propagators can now not be configured via `OTEL_PROPAGATORS` anymore, please pass the propagator to `NodeTracerProvider#register()` instead.
+    * if not configured via code, `NodeTracerProvider#register()` will now fall back to the defaults (`tracecontext` and `baggage`)
+    * if autoconfiguration based on enviornment variables is needed, please use `NodeSDK` from `@opentelemetry/sdk-node`.
+* feat(sdk-trace-web)!: drop ability to instantiate propagators beyond defaults [#5355](https://github.com/open-telemetry/opentelemetry-js/pull/5355) @pichlermarc
+  * (user-facing): only a non-env-var based default is now used on `WebTracerProvider#register()`.
+    * propagators can now not be configured via `window.OTEL_PROPAGATORS` anymore, please pass the propagator to `WebTracerProvider#register()` instead.
+    * if not configured via code, `WebTracerProvider#register()` will now fall back to defaults (`tracecontext` and `baggage`)
+* feat(sdk-trace)!: drop unnecessary exports [#5405](https://github.com/open-telemetry/opentelemetry-js/pull/5405) @pichlermarc
+  * (user-facing): `EXPORTER_FACTORY` is not used anymore and has been removed
+  * (user-facing): `PROPAGATOR_FACTORY` is not used anymore and has been removed
+  * (user-facing): `ForceFlushState` was intended for internal use and has been removed
+  * (user-facing): the `Tracer` class was unintentionally exported and has been removed
+    * to obtain a `Tracer`, please use `BasicTracerProvider#getTracer()`, `NodeTracerProvider#getTracer()` or `WebTracerProvider#getTracer()`
+    * to reference a `Tracer`, please use the `Tracer` type from `@opentelemetry/api`
+* chore!: Raise the minimum supported Node.js version to `^18.19.0 || >=20.6.0`. Support for Node.js 14, 16, and early minor versions of 18 and 20 have been dropped. This applies to all packages except the 'api' and 'semantic-conventions' packages. [#5395](https://github.com/open-telemetry/opentelemetry-js/issues/5395) @trentm
+* feat(core)!: remove TracesSamplerValues from exports [#5406](https://github.com/open-telemetry/opentelemetry-js/pull/5406) @pichlermarc
+  * (user-facing): TracesSamplerValues was only consumed internally and has been removed from exports without replacement
 
 ### :rocket: (Enhancement)
 
+* feat(sdk-trace-web): do not throw when passing extra options [#5357](https://github.com/open-telemetry/opentelemetry-js/pull/5357) @pichlermarc
+  * `WebTracerProvider` constructor now does not throw anymore when `contextManager` or `propagator` are passed as extra options to the constructor
 * feat(sdk-trace-base): add stack trace warning to debug instrumentation [#5363](https://github.com/open-telemetry/opentelemetry-js/pull/5363) @neilfordyce
 
 ### :bug: (Bug Fix)
 
+* fix(exporter-zipkin): remove usages of deprecated `url.parse` from `node:url` [#5390](https://github.com/open-telemetry/opentelemetry-js/pull/5390) @chancancode
 * fix(sdk-metrics): do not export from `PeriodicExportingMetricReader` when there are no metrics to export. [#5288](https://github.com/open-telemetry/opentelemetry-js/pull/5288) @jacksonweber
 
 ### :books: (Refine Doc)
@@ -73,6 +104,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * refactor(sdk-trace-base): rename `BasicTracerProvider.activeSpanProcessor` private property. [#5211](https://github.com/open-telemetry/opentelemetry-js/pull/5211) @david-luna
 * chore(selenium-tests): remove internal selenium-tests/ package, it wasn't being used @trentm
 * chore: update typescript `module` compiler option to `node16`. [#5347](https://github.com/open-telemetry/opentelemetry-js/pull/5347) @david-luna
+* feat(opentelemetry-instrumentation): replace `semver` package with internal semantic versioning check implementation to get rid of `semver` package initialization overhead especially in the AWS Lambda environment during coldstart [#5305](https://github.com/open-telemetry/opentelemetry-js/pull/5305) @serkan-ozal
 
 ## 1.30.0
 

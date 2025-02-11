@@ -12,9 +12,12 @@ jobs:
       fail-fast: false
       matrix:
         node_version:
+          - "18.19.0"
           - "18"
+          - "20.6.0"
           - "20"
           - "22"
+          - "23"
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_UNSAFE_PERM: true
@@ -29,12 +32,21 @@ jobs:
             package-lock.json
           node-version: ${{ matrix.node_version }}
 
-      - run: npm install -g npm@latest
-        if: ${{ matrix.node_version == '20' || matrix.node_version == '22' }}
-
       # npm@11.0.0 drops support for Node.js v18
+      # Install the latest npm compatible with this version of Node.js
+      # - npm@11.1.0 supports: {"node":"^20.17.0 || >=22.9.0"}
       - run: npm install -g npm@"<11.0.0"
-        if: ${{ matrix.node_version == '18'}}
+        if: ${{
+          matrix.node_version == '18.19.0' ||
+          matrix.node_version == '18' ||
+          matrix.node_version == '20.6.0'
+          }}
+      - run: npm install -g npm@latest
+        if: ${{
+          matrix.node_version == '20' ||
+          matrix.node_version == '22' ||
+          matrix.node_version == '23'
+          }}
 
       - name: Bootstrap
         run: npm ci
@@ -42,8 +54,15 @@ jobs:
       - name: Build 🔧
         run: npm run compile
 
-      - name: Unit tests
-        run: npm run test
+      - run: npm test
+        if: ${{ matrix.node_version != '23' }}
+      # Node.js 23 type stripping conflicts with mocha usage of ts-node.
+      # See https://github.com/open-telemetry/opentelemetry-js/issues/5415
+      - run: npm test
+        env:
+          NODE_OPTIONS: '--no-experimental-strip-types'
+        if: ${{ matrix.node_version == '23' }}
+
       - name: Report Coverage
         uses: codecov/codecov-action@v5
         env:
