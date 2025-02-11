@@ -116,6 +116,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * chore(selenium-tests): remove internal selenium-tests/ package, it wasn't being used @trentm
 * chore: update typescript `module` compiler option to `node16`. [#5347](https://github.com/open-telemetry/opentelemetry-js/pull/5347) @david-luna
 * feat(opentelemetry-instrumentation): replace `semver` package with internal semantic versioning check implementation to get rid of `semver` package initialization overhead especially in the AWS Lambda environment during coldstart [#5305](https://github.com/open-telemetry/opentelemetry-js/pull/5305) @serkan-ozal
+* chore: unpin `@opentelemetry/semantic-conventions` dep to allow better de-duplication in installs [#5439](https://github.com/open-telemetry/opentelemetry-js/pull/5439) @trentm
 
 ## 1.30.0
 
