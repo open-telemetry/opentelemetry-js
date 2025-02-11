@@ -77,7 +77,11 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
               {
                 traceId: traceId,
                 spanId: spanId,
-                parentSpanId: parentSpanId,
+                parentSpanContext: {
+                  spanId: parentSpanId,
+                  traceId: traceId,
+                  traceFlags: '01',
+                },
                 traceState: 'span=bar',
                 name: 'span-name',
                 kind: ESpanKind.SPAN_KIND_CLIENT,
@@ -168,7 +172,11 @@ function createExpectedSpanProtobuf() {
                 traceId: traceId,
                 spanId: spanId,
                 traceState: 'span=bar',
-                parentSpanId: parentSpanId,
+                parentSpanContext: {
+                  spanId: parentSpanId,
+                  traceId: traceId,
+                  traceFlags: '01',
+                },
                 name: 'span-name',
                 kind: ESpanKind.SPAN_KIND_CLIENT,
                 links: [
@@ -244,7 +252,11 @@ describe('Trace', () => {
         isRemote: false,
         traceState: new TraceState('span=bar'),
       }),
-      parentSpanId: '0000000000000001',
+      parentSpanContext: {
+        spanId: '0000000000000001',
+        traceId: '',
+        traceFlags: TraceFlags.SAMPLED,
+      },
       attributes: { 'string-attribute': 'some attribute value' },
       duration: [1, 300000000],
       endTime: [1640715558, 642725388],
@@ -330,25 +342,25 @@ describe('Trace', () => {
     });
 
     it('serializes a span without a parent with useHex = true', () => {
-      (span as any).parentSpanId = undefined;
+      (span as any).parentSpanContext = undefined;
       const exportRequest = createExportTraceServiceRequest([span], {
         useHex: true,
       });
       assert.ok(exportRequest);
       assert.strictEqual(
-        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].parentSpanId,
+        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].parentSpanContext?.spanId,
         undefined
       );
     });
 
     it('serializes a span without a parent with useHex = false', () => {
-      (span as any).parentSpanId = undefined;
+      (span as any).parentSpanContext = undefined;
       const exportRequest = createExportTraceServiceRequest([span], {
         useHex: false,
       });
       assert.ok(exportRequest);
       assert.strictEqual(
-        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].parentSpanId,
+        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].parentSpanContext?.spanId,
         undefined
       );
     });

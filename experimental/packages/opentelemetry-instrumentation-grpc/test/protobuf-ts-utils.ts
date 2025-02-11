@@ -103,6 +103,6 @@ export function assertExportedSpans(
       rootSpan?.spanContext().traceId,
       serverSpan.spanContext().traceId
     );
-    assert.strictEqual(rootSpan?.spanContext().spanId, clientSpan.parentSpanId);
+    assert.strictEqual(rootSpan?.spanContext().spanId, clientSpan.parentSpanContext?.spanId);
   }
 }
