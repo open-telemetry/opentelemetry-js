@@ -21,6 +21,7 @@ import {
   parseEnvironment,
 } from '../../utils/environment';
 import { diag } from '@opentelemetry/api';
+import { inspect } from 'util';
 
 /**
  * Gets the environment variables
@@ -40,15 +41,15 @@ export function getEnv(): Required<ENVIRONMENT> {
  * @returns {number | undefined} - The number value or `undefined`.
  */
 export function getNumberFromEnv(key: string): number | undefined {
-  const raw = process.env[key]?.trim();
-  if (raw == null || raw === '') {
+  const raw = process.env[key];
+  if (raw == null || raw.trim() === '') {
     return undefined;
   }
 
   const value = Number(raw);
   if (isNaN(value)) {
     diag.warn(
-      `Unknown value ${raw} for ${key}, expected a number, using defaults`
+      `Unknown value ${inspect(raw)} for ${key}, expected a number, using defaults`
     );
     return undefined;
   }
@@ -92,7 +93,7 @@ export function getBooleanFromEnv(key: string): boolean | undefined {
     return false;
   } else {
     diag.warn(
-      `Unknown value ${raw} for ${key}, expected 'true' or 'false', using defaults`
+      `Unknown value ${inspect(raw)} for ${key}, expected 'true' or 'false', using defaults`
     );
     return undefined;
   }

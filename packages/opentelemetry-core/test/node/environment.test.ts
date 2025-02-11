@@ -64,6 +64,7 @@ describe('environment utility functions', function () {
   describe('getNumberFromEnv', function () {
     afterEach(function () {
       delete process.env.FOO;
+      sinon.restore();
     });
 
     it('should treat empty string as undefined', function () {
@@ -105,6 +106,13 @@ describe('environment utility functions', function () {
     it('should treat NaN as undefined', function () {
       process.env.FOO = String(NaN);
       assert.strictEqual(getNumberFromEnv('FOO'), undefined);
+    });
+
+    it('should ignore bogus data and warn', function () {
+      const warnStub = sinon.stub(diag, 'warn');
+      process.env.FOO = 'forty-two';
+      assert.strictEqual(getNumberFromEnv('FOO'), undefined);
+      sinon.assert.calledOnceWithMatch(warnStub, 'Unknown value');
     });
   });
 
@@ -157,6 +165,7 @@ describe('environment utility functions', function () {
       delete process.env.FOO;
       sinon.restore();
     });
+
     it('should treat empty string as undefined', function () {
       process.env.FOO = '';
       assert.strictEqual(getBooleanFromEnv('FOO'), undefined);
