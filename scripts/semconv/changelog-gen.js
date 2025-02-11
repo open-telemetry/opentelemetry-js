@@ -324,9 +324,7 @@ function semconvChangelogGen(aVer=undefined, bVer=undefined) {
   }
   const changelogEntry = [`
 * feat: update semantic conventions to ${bSemconvVer} [#NNNN]
-  * Semantic Conventions ${bSemconvVer}:
-    [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#${slugify(bSemconvVer)}) |
-    [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * Semantic Conventions ${bSemconvVer}: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#${slugify(bSemconvVer)}) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * \`@opentelemetry/semantic-conventions\` (stable) changes: *${execSummaryFromChInfo(stableChInfo)}*
   * \`@opentelemetry/semantic-conventions/incubating\` (unstable) changes: *${execSummaryFromChInfo(unstableChInfo)}*
 `];

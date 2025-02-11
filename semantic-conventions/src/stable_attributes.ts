@@ -143,6 +143,40 @@ export const ATTR_CLIENT_ADDRESS = 'client.address' as const;
 export const ATTR_CLIENT_PORT = 'client.port' as const;
 
 /**
+ * Name of the garbage collector managed heap generation.
+ *
+ * @example gen0
+ * @example gen1
+ * @example gen2
+ */
+export const ATTR_DOTNET_GC_HEAP_GENERATION = 'dotnet.gc.heap.generation' as const;
+
+/**
+  * Enum value "gen0" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
+  */
+export const DOTNET_GC_HEAP_GENERATION_VALUE_GEN0 = "gen0" as const;
+
+/**
+  * Enum value "gen1" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
+  */
+export const DOTNET_GC_HEAP_GENERATION_VALUE_GEN1 = "gen1" as const;
+
+/**
+  * Enum value "gen2" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
+  */
+export const DOTNET_GC_HEAP_GENERATION_VALUE_GEN2 = "gen2" as const;
+
+/**
+  * Enum value "loh" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
+  */
+export const DOTNET_GC_HEAP_GENERATION_VALUE_LOH = "loh" as const;
+
+/**
+  * Enum value "poh" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
+  */
+export const DOTNET_GC_HEAP_GENERATION_VALUE_POH = "poh" as const;
+
+/**
  * Describes a class of error the operation ended with.
  *
  * @example timeout
@@ -178,24 +212,9 @@ export const ATTR_ERROR_TYPE = 'error.type' as const;
 export const ERROR_TYPE_VALUE_OTHER = "_OTHER" as const;
 
 /**
- * **SHOULD** be set to true if the exception event is recorded at a point where it is known that the exception is escaping the scope of the span.
+ * Indicates that the exception is escaping the scope of the span.
  *
- * @note An exception is considered to have escaped (or left) the scope of a span,
- * if that span is ended while the exception is still logically "in flight".
- * This may be actually "in flight" in some languages (e.g. if the exception
- * is passed to a Context manager's `__exit__` method in Python) but will
- * usually be caught at the point of recording the exception in most languages.
- *
- * It is usually not possible to determine at the point where an exception is thrown
- * whether it will escape the scope of a span.
- * However, it is trivial to know that an exception
- * will escape, if one checks for an active exception just before ending the span,
- * as done in the [example for recording span exceptions](https://opentelemetry.io/docs/specs/semconv/exceptions/exceptions-spans/#recording-an-exception).
- *
- * It follows that an exception may still escape the scope of the span
- * even if the `exception.escaped` attribute was not set or set to false,
- * since the event might have been recorded at a time where it was not
- * clear whether the exception will escape.
+ * @deprecated It's no longer recommended to record exceptions that are handled and do not escape the scope of a span.
  */
 export const ATTR_EXCEPTION_ESCAPED = 'exception.escaped' as const;
 
