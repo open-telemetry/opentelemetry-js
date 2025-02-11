@@ -266,9 +266,25 @@ Members of this team have triager permissions for opentelemetry-js.git and opent
 #### Contrib Triagers ([@open-telemetry/javascript-contrib-triagers](https://github.com/orgs/open-telemetry/teams/javascript-contrib-triagers))
 
 Members of this team have triager permissions for opentelemetry-js-contrib.git.
+Typically, members of this are [component owners](https://github.com/open-telemetry/opentelemetry-js-contrib/blob/main/.github/component_owners.yml) of one or more packages in the contrib repo.
 
-- [Jonathan Munz](https://github.com/jpmunz), Embrace
+- [Aaron Abbott](https://github.com/aabmass), Google
+- [Abhinav Mathur](https://github.com/abhee11), AppDynamics
+- [Bartlomiej Obecny](https://github.com/obecny)
+- [Daniel Li](https://github.com/d4nyll)
 - [Florencia Acosta](https://github.com/facostaembrace), Embrace
+- [Jackson Weber](https://github.com/JacksonWeber), Microsoft
+- [Jaryk](https://github.com/Ugzuzg), Volvo Cars
+- [Jonathan Lee](https://github.com/jj22ee)
+- [Jonathan Munz](https://github.com/jpmunz), Embrace
+- [kirrg001](https://github.com/kirrg001), Instana
+- [MartenH](https://github.com/mhennoch), Splunk
+- [Mike Goldsmith](https://github.com/MikeGoldsmith), Honeycomb
+- [Motti](https://github.com/mottibec)
+- [Punya Biswal](https://github.com/punya), Google
+- [Siim Kallas](https://github.com/seemk), Splunk
+- [Trivikram Kamat](https://github.com/trivikr), AWS
+- [t2t2](https://github.com/t2t2), Splunk
 
 *Find more about the triager role in the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#triager).*
 

@@ -15,7 +15,7 @@
  */
 import { UnresolvedOtlpGrpcConfiguration } from './otlp-grpc-configuration';
 import type { ChannelCredentials, Metadata } from '@grpc/grpc-js';
-import { baggageUtils } from '@opentelemetry/core';
+import { parseKeyPairsIntoRecord } from '@opentelemetry/core';
 import {
   createEmptyMetadata,
   createInsecureCredentials,
@@ -47,10 +47,10 @@ function getMetadataFromEnv(signalIdentifier: string): Metadata | undefined {
   const nonSignalSpecificRawHeaders =
     process.env['OTEL_EXPORTER_OTLP_HEADERS']?.trim();
 
-  const signalSpecificHeaders = baggageUtils.parseKeyPairsIntoRecord(
+  const signalSpecificHeaders = parseKeyPairsIntoRecord(
     signalSpecificRawHeaders
   );
-  const nonSignalSpecificHeaders = baggageUtils.parseKeyPairsIntoRecord(
+  const nonSignalSpecificHeaders = parseKeyPairsIntoRecord(
     nonSignalSpecificRawHeaders
   );
 

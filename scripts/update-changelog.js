@@ -16,15 +16,15 @@ const path = require("path");
 
 const EMPTY_UNRELEASED_SECTION = `## Unreleased
 
-### :boom: Breaking Change
+### :boom: Breaking Changes
 
-### :rocket: (Enhancement)
+### :rocket: Features
 
-### :bug: (Bug Fix)
+### :bug: Bug Fixes
 
-### :books: (Refine Doc)
+### :books: Documentation
 
-### :house: (Internal)
+### :house: Internal
 
 `
 
