@@ -80,6 +80,18 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * chore!: Raise the minimum supported Node.js version to `^18.19.0 || >=20.6.0`. Support for Node.js 14, 16, and early minor versions of 18 and 20 have been dropped. This applies to all packages except the 'api' and 'semantic-conventions' packages. [#5395](https://github.com/open-telemetry/opentelemetry-js/issues/5395) @trentm
 * feat(core)!: remove TracesSamplerValues from exports [#5406](https://github.com/open-telemetry/opentelemetry-js/pull/5406) @pichlermarc
   * (user-facing): TracesSamplerValues was only consumed internally and has been removed from exports without replacement
+* feat(core)!: remove unused and obsolete functions and types [#5444](https://github.com/open-telemetry/opentelemetry-js/pull/5444) @pichlermarc
+  * (user-facing): `VERSION` was an internal constant that was unintentionally exported. It has been removed without replacement.
+  * (user-facing): `isWrapped` has been removed in favor of `isWrapped` from `@opentelemetry/instrumentation`
+  * (user-facing): `ShimWrapped` has been removed in favor of `ShimWrapped` from `@opentelemetry/instrumentation`
+  * (user-facing): `hexToBase64` was a utility function that is not used by the SDK anymore. It has been removed without replacement.
+  * (user-facing): `hexToBinary` was a utility function that now internal to `@opentelemetry/otlp-tranformer`. It has been removed without replacement.
+  * (user-facing): `baggageUtils.getKeyParis` was an internal utility function that was unintentionally exported. It has been removed without replacement.
+  * (user-facing): `baggageUtils.serializeKeyPairs` was an internal utility function that was unintentionally exported. It has been removed without replacement.
+  * (user-facing): `baggageUtils.parseKeyPairsIntoRecord,` has been removed in favor of `parseKeyPairsIntoRecord`
+  * (user-facing): `baggageUtils.parsePairKeyValue` was an internal utility function that was unintentionally exported. It has been removed without replacement.
+  * (user-facing): `TimeOriginLegacy` has been removed without replacement.
+  * (user-facing): `isAttributeKey` was an internal utility function that was unintentionally exported. It has been removed without replacement.
 
 ### :rocket: (Enhancement)
 

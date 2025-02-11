@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { HrTime, TraceFlags } from '@opentelemetry/api';
-import { InstrumentationScope, hexToBinary } from '@opentelemetry/core';
+import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
@@ -29,6 +29,7 @@ import {
 import { createExportLogsServiceRequest } from '../src/logs/internal';
 import { ProtobufLogsSerializer } from '../src/logs/protobuf';
 import { JsonLogsSerializer } from '../src/logs/json';
+import { hexToBinary } from '../src/common/hex-to-binary';
 
 function createExpectedLogJson(
   options: OtlpEncodingOptions
