@@ -92,6 +92,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * (user-facing): `baggageUtils.parsePairKeyValue` was an internal utility function that was unintentionally exported. It has been removed without replacement.
   * (user-facing): `TimeOriginLegacy` has been removed without replacement.
   * (user-facing): `isAttributeKey` was an internal utility function that was unintentionally exported. It has been removed without replacement.
+* feat!: set compilation target to ES2022 for all packages except `@opentelemetry/api` and `@opentelemetry/semantic-conventions` [#5456](https://github.com/open-telemetry/opentelemetry-js/pull/5456)
+  * (user-facing): drops browser runtimes which do not support ES2022 features
 
 ### :rocket: (Enhancement)
 
