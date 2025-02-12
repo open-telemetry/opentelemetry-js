@@ -5,7 +5,17 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ## Unreleased
 
-### :boom: Breaking Change
+### :boom: Breaking Changes
+
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 1.30.0
 
 ### :rocket: (Enhancement)
 
@@ -281,12 +291,6 @@ ATTR_VCS_REPOSITORY_NAME                                 // vcs.repository.name
 ```
 
 </details>
-
-### :bug: (Bug Fix)
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
 
 ## 1.29.0
 
