@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1739318582709,
+  "lastUpdate": 1739321336217,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -26732,6 +26732,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.70%",
             "unit": "ops/sec",
             "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "107717825+opentelemetrybot@users.noreply.github.com",
+            "name": "OpenTelemetry Bot",
+            "username": "opentelemetrybot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "9feaee3ff589e56d7441943ee24a2c0b4061afd9",
+          "message": "chore: prepare next release (#5452)",
+          "timestamp": "2025-02-12T00:34:58Z",
+          "tree_id": "647315ae542d41392d04e5a7e074190a87fcf0a5",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/9feaee3ff589e56d7441943ee24a2c0b4061afd9"
+        },
+        "date": 1739321335436,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1522007,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 17005,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 836684,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 773609,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
