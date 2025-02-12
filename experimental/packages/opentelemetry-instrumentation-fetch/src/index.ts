@@ -16,6 +16,7 @@
 
 export {
   FetchCustomAttributeFunction,
+  FetchRequestHookFunction,
   FetchInstrumentation,
   FetchInstrumentationConfig,
 } from './fetch';

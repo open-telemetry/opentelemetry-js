@@ -66,11 +66,12 @@ See [examples/tracer-web/fetch](https://github.com/open-telemetry/opentelemetry-
 
 Fetch instrumentation plugin has few options available to choose from. You can set the following:
 
-| Options                                                                                                                                                                  | Type                          | Description                                                                             |
-|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------|-----------------------------------------------------------------------------------------|
-| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L75) | `HttpCustomAttributeFunction` | Function for adding custom attributes                                                   |
-| [`ignoreNetworkEvents`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L77)         | `boolean`                     | Disable network events being added as span events (network events are added by default) |
-| [`measureRequestSize`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L79)          | `boolean`                     | Measure outgoing request length (outgoing request length is not measured by default)    |
+| Options | Type | Description |
+| ------- | ---- | ----------- |
+| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L83) | `FetchCustomAttributeFunction` | Function for adding custom attributes |
+| [`requestHook`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L85) | `FetchRequestHookFunction` | Function for adding custom attributes or headers before the request is handled |
+| [`ignoreNetworkEvents`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L87) | `boolean`| Disable network events being added as span events (network events are added by default) |
+| [`measureRequestSize`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L89) | `boolean` | Measure outgoing request length (outgoing request length is not measured by default)    |
 
 ## Semantic Conventions
 
