@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { hexToBinary } from '@opentelemetry/core';
+import { hexToBinary } from '../src/common/hex-to-binary';
 
 /**
  * utility function to convert a string representing a hex value to a base64 string

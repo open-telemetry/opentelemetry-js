@@ -80,7 +80,7 @@ type TestGrpcClient = Client & {
 interface TestGrpcCall {
   description: string;
   methodName: string;
-  method: Function;
+  method: (...args: any[]) => unknown;
   request: TestRequestResponse | TestRequestResponse[];
   result: TestRequestResponse | TestRequestResponse[];
   metadata?: Metadata;

@@ -27,6 +27,7 @@ All notable changes to experimental packages in this project will be documented 
 * fix(instrumentation-grpc): monitor error events with events.errorMonitor [#5369](https://github.com/open-telemetry/opentelemetry-js/pull/5369) @cjihrig
 * fix(exporter-metrics-otlp-http): browser OTLPMetricExporter was not passing config to OTLPMetricExporterBase super class [#5331](https://github.com/open-telemetry/opentelemetry-js/pull/5331) @trentm
 * fix(instrumentation-fetch, instrumentation-xhr): Ignore network events with zero-timings [#5332](https://github.com/open-telemetry/opentelemetry-js/pull/5332) @chancancode
+* fix(exporter-logs/trace-otlp-grpc): fix error for missing dependency otlp-exporter-base [#5412](https://github.com/open-telemetry/opentelemetry-js/pull/5412) @JamieDanielson
 
 ### :books: (Refine Doc)
 
@@ -36,6 +37,7 @@ All notable changes to experimental packages in this project will be documented 
 * refactor(otlp-exporter-base): remove unnecessary isNaN() checks [#5374](https://github.com/open-telemetry/opentelemetry-js/pull/5374) @cjihrig
 * refactor(exporter-prometheus): remove unnecessary isNaN() check [#5377](https://github.com/open-telemetry/opentelemetry-js/pull/5377) @cjihrig
 * refactor(sdk-node): move code to auto-instantiate propagators into utils [#5355](https://github.com/open-telemetry/opentelemetry-js/pull/5355) @pichlermarc
+* chore: unpin `@opentelemetry/semantic-conventions` dep to allow better de-duplication in installs [#5439](https://github.com/open-telemetry/opentelemetry-js/pull/5439) @trentm
 
 ## 0.57.0
 

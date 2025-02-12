@@ -95,7 +95,7 @@ Occasionally, one should review changes to `@opentelemetry/semantic-conventions`
 A considered alternative for using unstable exports is to **pin** the version. I.e., depend on an exact version, rather than on a version range.
 
 ```bash
-npm install --save-exact @opentelemetry/semantic-conventions
+npm install --save-exact @opentelemetry/semantic-conventions  # Don't do this.
 ```
 
 Then, import directly from `@opentelemetry/semantic-conventions/incubating`.

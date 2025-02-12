@@ -63,7 +63,7 @@ export interface XhrMem {
     entries: PerformanceResourceTiming[];
   };
   // callback to remove events from xhr once the span ends
-  callbackToRemoveEvents?: Function;
+  callbackToRemoveEvents?: () => void;
 }
 
 export type PropagateTraceHeaderCorsUrl = string | RegExp;

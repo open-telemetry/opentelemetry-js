@@ -81,17 +81,31 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * feat(core)!: remove TracesSamplerValues from exports [#5406](https://github.com/open-telemetry/opentelemetry-js/pull/5406) @pichlermarc
   * (user-facing): TracesSamplerValues was only consumed internally and has been removed from exports without replacement
 * chore(resources)!: Remove deprecated duplicate browser detector from `@opentelemetry/resource` in favor of `@opentelemetry/opentelemetry-browser-detector` [#5420](https://github.com/open-telemetry/opentelemetry-js/pull/5420)
+* feat(core)!: remove unused and obsolete functions and types [#5444](https://github.com/open-telemetry/opentelemetry-js/pull/5444) @pichlermarc
+  * (user-facing): `VERSION` was an internal constant that was unintentionally exported. It has been removed without replacement.
+  * (user-facing): `isWrapped` has been removed in favor of `isWrapped` from `@opentelemetry/instrumentation`
+  * (user-facing): `ShimWrapped` has been removed in favor of `ShimWrapped` from `@opentelemetry/instrumentation`
+  * (user-facing): `hexToBase64` was a utility function that is not used by the SDK anymore. It has been removed without replacement.
+  * (user-facing): `hexToBinary` was a utility function that now internal to `@opentelemetry/otlp-tranformer`. It has been removed without replacement.
+  * (user-facing): `baggageUtils.getKeyParis` was an internal utility function that was unintentionally exported. It has been removed without replacement.
+  * (user-facing): `baggageUtils.serializeKeyPairs` was an internal utility function that was unintentionally exported. It has been removed without replacement.
+  * (user-facing): `baggageUtils.parseKeyPairsIntoRecord,` has been removed in favor of `parseKeyPairsIntoRecord`
+  * (user-facing): `baggageUtils.parsePairKeyValue` was an internal utility function that was unintentionally exported. It has been removed without replacement.
+  * (user-facing): `TimeOriginLegacy` has been removed without replacement.
+  * (user-facing): `isAttributeKey` was an internal utility function that was unintentionally exported. It has been removed without replacement.
 
 ### :rocket: (Enhancement)
 
 * feat(sdk-trace-web): do not throw when passing extra options [#5357](https://github.com/open-telemetry/opentelemetry-js/pull/5357) @pichlermarc
   * `WebTracerProvider` constructor now does not throw anymore when `contextManager` or `propagator` are passed as extra options to the constructor
 * feat(sdk-trace-base): add stack trace warning to debug instrumentation [#5363](https://github.com/open-telemetry/opentelemetry-js/pull/5363) @neilfordyce
+* feat(core): add more scalable replacements for getEnv(), getEnvWithoutDefaults() [#5443](https://github.com/open-telemetry/opentelemetry-js/pull/5443) @pichlermarc
 
 ### :bug: (Bug Fix)
 
 * fix(exporter-zipkin): remove usages of deprecated `url.parse` from `node:url` [#5390](https://github.com/open-telemetry/opentelemetry-js/pull/5390) @chancancode
 * fix(sdk-metrics): do not export from `PeriodicExportingMetricReader` when there are no metrics to export. [#5288](https://github.com/open-telemetry/opentelemetry-js/pull/5288) @jacksonweber
+* fix(sdk-trace-base): always wait on pending export in SimpleSpanProcessor. [#5303](https://github.com/open-telemetry/opentelemetry-js/pull/5303) @anuraaga
 
 ### :books: (Refine Doc)
 
@@ -105,6 +119,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * chore(selenium-tests): remove internal selenium-tests/ package, it wasn't being used @trentm
 * chore: update typescript `module` compiler option to `node16`. [#5347](https://github.com/open-telemetry/opentelemetry-js/pull/5347) @david-luna
 * feat(opentelemetry-instrumentation): replace `semver` package with internal semantic versioning check implementation to get rid of `semver` package initialization overhead especially in the AWS Lambda environment during coldstart [#5305](https://github.com/open-telemetry/opentelemetry-js/pull/5305) @serkan-ozal
+* chore: unpin `@opentelemetry/semantic-conventions` dep to allow better de-duplication in installs [#5439](https://github.com/open-telemetry/opentelemetry-js/pull/5439) @trentm
 
 ## 1.30.0
 
