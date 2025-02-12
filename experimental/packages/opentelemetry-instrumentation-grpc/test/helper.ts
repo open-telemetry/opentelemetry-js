@@ -51,6 +51,7 @@ import { assertPropagation, assertSpan } from './utils/assertionUtils';
 import { promisify } from 'util';
 import type { GrpcInstrumentation } from '../src';
 import * as path from 'path';
+import { SemconvStability } from '../src/types';
 
 const PROTO_PATH = path.resolve(__dirname, './fixtures/grpc-test.proto');
 const memoryExporter = new InMemorySpanExporter();
@@ -975,6 +976,7 @@ export const runTests = (
             },
           },
         });
+        plugin['_semconvStability'] = SemconvStability.OLD;
 
         plugin.setTracerProvider(provider);
         plugin.enable();
