@@ -92,6 +92,9 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * (user-facing): `baggageUtils.parsePairKeyValue` was an internal utility function that was unintentionally exported. It has been removed without replacement.
   * (user-facing): `TimeOriginLegacy` has been removed without replacement.
   * (user-facing): `isAttributeKey` was an internal utility function that was unintentionally exported. It has been removed without replacement.
+* feat(exporter-zipkin)!: do not read environment variables from window in browsers [#????](https://github.com/open-telemetry/opentelemetry-js/pull/????) @pichlermarc
+  * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore, please pass configuration options to constructors instead.
+    * Note: Node.js environment variable configuration continues to work as-is.
 
 ### :rocket: (Enhancement)
 
