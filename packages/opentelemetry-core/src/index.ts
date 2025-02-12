@@ -44,6 +44,10 @@ export {
   _globalThis,
   getEnv,
   getEnvWithoutDefaults,
+  getStringFromEnv,
+  getBooleanFromEnv,
+  getNumberFromEnv,
+  getStringListFromEnv,
   otperformance,
   unrefTimer,
 } from './platform';
