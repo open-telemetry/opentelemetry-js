@@ -67,7 +67,7 @@ interface SpanOptions {
   spanContext: SpanContext;
   name: string;
   kind: SpanKind;
-  parentSpanId?: string;
+  parentSpanContext?: SpanContext;
   links?: Link[];
   startTime?: TimeInput;
   attributes?: Attributes;
@@ -83,7 +83,7 @@ export class SpanImpl implements Span {
   // purposes but are not intended to be written-to directly.
   private readonly _spanContext: SpanContext;
   readonly kind: SpanKind;
-  readonly parentSpanId?: string;
+  readonly parentSpanContext?: SpanContext;
   readonly attributes: Attributes = {};
   readonly links: Link[] = [];
   readonly events: TimedEvent[] = [];
@@ -127,7 +127,7 @@ export class SpanImpl implements Span {
     this._spanProcessor = opts.spanProcessor;
 
     this.name = opts.name;
-    this.parentSpanId = opts.parentSpanId;
+    this.parentSpanContext = opts.parentSpanContext;
     this.kind = opts.kind;
     this.links = opts.links || [];
     this.startTime = this._getTime(opts.startTime ?? now);

@@ -226,7 +226,7 @@ describe('OpenTracing Shim', () => {
           childOf: span,
         }) as SpanShim;
         assert.strictEqual(
-          (childSpan.getSpan() as Span).parentSpanId,
+          (childSpan.getSpan() as Span).parentSpanContext?.spanId,
           context.toSpanId()
         );
         assert.strictEqual(
@@ -240,7 +240,7 @@ describe('OpenTracing Shim', () => {
           childOf: context,
         }) as SpanShim;
         assert.strictEqual(
-          (childSpan.getSpan() as Span).parentSpanId,
+          (childSpan.getSpan() as Span).parentSpanContext?.spanId,
           context.toSpanId()
         );
         assert.strictEqual(

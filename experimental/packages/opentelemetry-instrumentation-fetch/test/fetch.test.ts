@@ -400,7 +400,7 @@ describe('fetch', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
 
           assert.strictEqual(
-            span.parentSpanId,
+            span.parentSpanContext?.spanId,
             rootSpan!.spanContext().spanId,
             'parent span is not root span'
           );
@@ -775,7 +775,7 @@ describe('fetch', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
 
           assert.strictEqual(
-            span.parentSpanId,
+            span.parentSpanContext?.spanId,
             rootSpan!.spanContext().spanId,
             'parent span is not root span'
           );
@@ -1492,7 +1492,7 @@ describe('fetch', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
 
           assert.strictEqual(
-            span.parentSpanId,
+            span.parentSpanContext?.spanId,
             rootSpan!.spanContext().spanId,
             'parent span is not root span'
           );
@@ -1542,7 +1542,7 @@ describe('fetch', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
 
           assert.strictEqual(
-            span.parentSpanId,
+            span.parentSpanContext?.spanId,
             rootSpan!.spanContext().spanId,
             'parent span is not root span'
           );
@@ -1624,7 +1624,7 @@ describe('fetch', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
 
           assert.strictEqual(
-            span.parentSpanId,
+            span.parentSpanContext?.spanId,
             rootSpan!.spanContext().spanId,
             'parent span is not root span'
           );
@@ -1723,7 +1723,7 @@ describe('fetch', () => {
             const span: tracing.ReadableSpan = exportedSpans[0];
 
             assert.strictEqual(
-              span.parentSpanId,
+              span.parentSpanContext?.spanId,
               rootSpan!.spanContext().spanId,
               'parent span is not root span'
             );
@@ -1781,7 +1781,7 @@ describe('fetch', () => {
             const span: tracing.ReadableSpan = exportedSpans[0];
 
             assert.strictEqual(
-              span.parentSpanId,
+              span.parentSpanContext?.spanId,
               rootSpan!.spanContext().spanId,
               'parent span is not root span'
             );

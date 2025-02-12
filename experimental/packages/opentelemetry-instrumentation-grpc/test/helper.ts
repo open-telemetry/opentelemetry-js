@@ -622,7 +622,7 @@ export const runTests = (
                 );
                 assert.strictEqual(
                   rootSpan.spanContext().spanId,
-                  clientSpan.parentSpanId
+                  clientSpan.parentSpanContext?.spanId
                 );
               }
             })
@@ -740,7 +740,7 @@ export const runTests = (
               );
               assert.strictEqual(
                 rootSpan.spanContext().spanId,
-                clientSpan.parentSpanId
+                clientSpan.parentSpanContext?.spanId
               );
             });
         });

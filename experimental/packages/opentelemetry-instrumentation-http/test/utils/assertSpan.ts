@@ -185,8 +185,8 @@ export const assertSpan = (
       validations.component,
       ' must have http.scheme attribute'
     );
-    assert.ok(typeof span.parentSpanId === 'string');
-    assert.ok(isValidSpanId(span.parentSpanId));
+    assert.ok(typeof span.parentSpanContext?.spanId === 'string');
+    assert.ok(isValidSpanId(span.parentSpanContext.spanId));
   } else if (validations.reqHeaders) {
     assert.ok(validations.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
     assert.ok(validations.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);
