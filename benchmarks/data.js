@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1739356570274,
+  "lastUpdate": 1739359177414,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -26836,6 +26836,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.30%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "fcd96deb78ffe9a906fe50202c2e8a1c9aea654d",
+          "message": "chore: add 'lint:semconv-deps' (#5451)",
+          "timestamp": "2025-02-12T11:08:15Z",
+          "tree_id": "a5a96794af051a05bc987b06b72ff4389e53c5ef",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/fcd96deb78ffe9a906fe50202c2e8a1c9aea654d"
+        },
+        "date": 1739359176559,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1522331,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18581,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 833022,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 771985,
+            "range": "±0.35%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
