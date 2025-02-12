@@ -16,11 +16,7 @@
 
 export { W3CBaggagePropagator } from './baggage/propagation/W3CBaggagePropagator';
 export { AnchoredClock, Clock } from './common/anchored-clock';
-export {
-  isAttributeKey,
-  isAttributeValue,
-  sanitizeAttributes,
-} from './common/attributes';
+export { isAttributeValue, sanitizeAttributes } from './common/attributes';
 export {
   globalErrorHandler,
   setGlobalErrorHandler,
@@ -40,32 +36,14 @@ export {
   millisToHrTime,
   timeInputToHrTime,
 } from './common/time';
-export {
-  ErrorHandler,
-  InstrumentationScope,
-  ShimWrapped,
-  TimeOriginLegacy,
-} from './common/types';
-export { hexToBinary } from './common/hex-to-binary';
+export { ErrorHandler, InstrumentationScope } from './common/types';
 export { ExportResult, ExportResultCode } from './ExportResult';
-import {
-  getKeyPairs,
-  serializeKeyPairs,
-  parseKeyPairsIntoRecord,
-  parsePairKeyValue,
-} from './baggage/utils';
-export const baggageUtils = {
-  getKeyPairs,
-  serializeKeyPairs,
-  parseKeyPairsIntoRecord,
-  parsePairKeyValue,
-};
+export { parseKeyPairsIntoRecord } from './baggage/utils';
 export {
   SDK_INFO,
   _globalThis,
   getEnv,
   getEnvWithoutDefaults,
-  hexToBase64,
   otperformance,
   unrefTimer,
 } from './platform';
@@ -105,9 +83,7 @@ export {
 export { merge } from './utils/merge';
 export { TimeoutError, callWithTimeout } from './utils/timeout';
 export { isUrlIgnored, urlMatches } from './utils/url';
-export { isWrapped } from './utils/wrap';
 export { BindOnceFuture } from './utils/callback';
-export { VERSION } from './version';
 import { _export } from './internal/exporter';
 export const internal = {
   _export,
