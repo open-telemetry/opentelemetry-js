@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-export { browserDetector } from './BrowserDetector';
 export { envDetector } from './EnvDetector';
 export {
   hostDetector,

@@ -17,7 +17,6 @@
 export { ResourceDetectionConfig } from './config';
 export { detectResources } from './detect-resources';
 export {
-  browserDetector,
   envDetector,
   hostDetector,
   osDetector,
