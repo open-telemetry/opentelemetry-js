@@ -50,7 +50,6 @@ import * as superagent from 'superagent';
 import * as nock from 'nock';
 import * as axios from 'axios';
 
-
 const memoryExporter = new InMemorySpanExporter();
 const protocol = 'http';
 const customAttributeFunction = (span: Span): void => {
