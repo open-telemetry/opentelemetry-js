@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 
-import { isUrlIgnored } from '../../src';
+import { isUrlIgnored } from '../../../src';
 
 const urlIgnored = 'url should be ignored';
 const urlNotIgnored = 'url should NOT be ignored';

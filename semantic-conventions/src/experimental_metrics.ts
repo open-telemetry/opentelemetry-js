@@ -19,6 +19,59 @@
 //----------------------------------------------------------------------------------------------------------
 
 /**
+ * Number of active client instances
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_AZURE_COSMOSDB_CLIENT_ACTIVE_INSTANCE_COUNT = 'azure.cosmosdb.client.active_instance.count' as const;
+
+/**
+ * [Request units](https://learn.microsoft.com/azure/cosmos-db/request-units) consumed by the operation
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_AZURE_COSMOSDB_CLIENT_OPERATION_REQUEST_CHARGE = 'azure.cosmosdb.client.operation.request_charge' as const;
+
+/**
+ * The number of pipeline runs currently active in the system by state.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_CICD_PIPELINE_RUN_ACTIVE = 'cicd.pipeline.run.active' as const;
+
+/**
+ * Duration of a pipeline run grouped by pipeline, state and result.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_CICD_PIPELINE_RUN_DURATION = 'cicd.pipeline.run.duration' as const;
+
+/**
+ * The number of errors encountered in pipeline runs (eg. compile, test failures).
+ *
+ * @note There might be errors in a pipeline run that are non fatal (eg. they are suppressed) or in a parallel stage multiple stages could have a fatal error.
+ * This means that this error count might not be the same as the count of metric `cicd.pipeline.run.duration` with run result `failure`.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_CICD_PIPELINE_RUN_ERRORS = 'cicd.pipeline.run.errors' as const;
+
+/**
+ * The number of errors in a component of the CICD system (eg. controller, scheduler, agent).
+ *
+ * @note Errors in pipeline run execution are explicitly excluded. Ie a test failure is not counted in this metric.
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_CICD_SYSTEM_ERRORS = 'cicd.system.errors' as const;
+
+/**
+ * The number of workers on the CICD system by state.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_CICD_WORKER_COUNT = 'cicd.worker.count' as const;
+
+/**
  * Total CPU time consumed
  *
  * @note Total CPU time consumed by the specific container on all available CPU cores
@@ -218,16 +271,20 @@ export const METRIC_DB_CLIENT_CONNECTIONS_USE_TIME = 'db.client.connections.use_
 export const METRIC_DB_CLIENT_CONNECTIONS_WAIT_TIME = 'db.client.connections.wait_time' as const;
 
 /**
- * Number of active client instances
+ * Deprecated, use `azure.cosmosdb.client.active_instance.count` instead.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `azure.cosmosdb.client.active_instance.count`.
  */
 export const METRIC_DB_CLIENT_COSMOSDB_ACTIVE_INSTANCE_COUNT = 'db.client.cosmosdb.active_instance.count' as const;
 
 /**
- * [Request charge](https://learn.microsoft.com/azure/cosmos-db/request-units) consumed by the operation
+ * Deprecated, use `azure.cosmosdb.client.operation.request_charge` instead.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `azure.cosmosdb.client.operation.request_charge`.
  */
 export const METRIC_DB_CLIENT_COSMOSDB_OPERATION_REQUEST_CHARGE = 'db.client.cosmosdb.operation.request_charge' as const;
 
@@ -253,196 +310,6 @@ export const METRIC_DB_CLIENT_RESPONSE_RETURNED_ROWS = 'db.client.response.retur
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_DNS_LOOKUP_DURATION = 'dns.lookup.duration' as const;
-
-/**
- * The number of .NET assemblies that are currently loaded.
- *
- * @note Meter name: `System.Runtime`; Added in: .NET 9.0.
- * This metric reports the same values as calling [`AppDomain.CurrentDomain.GetAssemblies().Length`](https://learn.microsoft.com/dotnet/api/system.appdomain.getassemblies).
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DOTNET_ASSEMBLY_COUNT = 'dotnet.assembly.count' as const;
-
-/**
- * The number of exceptions that have been thrown in managed code.
- *
- * @note Meter name: `System.Runtime`; Added in: .NET 9.0.
- * This metric reports the same values as counting calls to [`AppDomain.CurrentDomain.FirstChanceException`](https://learn.microsoft.com/dotnet/api/system.appdomain.firstchanceexception).
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DOTNET_EXCEPTIONS = 'dotnet.exceptions' as const;
-
-/**
- * The number of garbage collections that have occurred since the process has started.
- *
- * @note Meter name: `System.Runtime`; Added in: .NET 9.0.
- * This metric uses the [`GC.CollectionCount(int generation)`](https://learn.microsoft.com/dotnet/api/system.gc.collectioncount) API to calculate exclusive collections per generation.
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DOTNET_GC_COLLECTIONS = 'dotnet.gc.collections' as const;
-
-/**
- * The *approximate* number of bytes allocated on the managed GC heap since the process has started. The returned value does not include any native allocations.
- *
- * @note Meter name: `System.Runtime`; Added in: .NET 9.0.
- * This metric reports the same values as calling [`GC.GetTotalAllocatedBytes()`](https://learn.microsoft.com/dotnet/api/system.gc.gettotalallocatedbytes).
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DOTNET_GC_HEAP_TOTAL_ALLOCATED = 'dotnet.gc.heap.total_allocated' as const;
-
-/**
- * The heap fragmentation, as observed during the latest garbage collection.
- *
- * @note Meter name: `System.Runtime`; Added in: .NET 9.0.
- * This metric reports the same values as calling [`GC.GetGCMemoryInfo().GenerationInfo.FragmentationAfterBytes`](https://learn.microsoft.com/dotnet/api/system.gcgenerationinfo.fragmentationafterbytes).
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DOTNET_GC_LAST_COLLECTION_HEAP_FRAGMENTATION_SIZE = 'dotnet.gc.last_collection.heap.fragmentation.size' as const;
-
-/**
- * The managed GC heap size (including fragmentation), as observed during the latest garbage collection.
- *
- * @note Meter name: `System.Runtime`; Added in: .NET 9.0.
- * This metric reports the same values as calling [`GC.GetGCMemoryInfo().GenerationInfo.SizeAfterBytes`](https://learn.microsoft.com/dotnet/api/system.gcgenerationinfo.sizeafterbytes).
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DOTNET_GC_LAST_COLLECTION_HEAP_SIZE = 'dotnet.gc.last_collection.heap.size' as const;
-
-/**
- * The amount of committed virtual memory in use by the .NET GC, as observed during the latest garbage collection.
- *
- * @note Meter name: `System.Runtime`; Added in: .NET 9.0.
- * This metric reports the same values as calling [`GC.GetGCMemoryInfo().TotalCommittedBytes`](https://learn.microsoft.com/dotnet/api/system.gcmemoryinfo.totalcommittedbytes). Committed virtual memory may be larger than the heap size because it includes both memory for storing existing objects (the heap size) and some extra memory that is ready to handle newly allocated objects in the future.
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DOTNET_GC_LAST_COLLECTION_MEMORY_COMMITTED_SIZE = 'dotnet.gc.last_collection.memory.committed_size' as const;
-
-/**
- * The total amount of time paused in GC since the process has started.
- *
- * @note Meter name: `System.Runtime`; Added in: .NET 9.0.
- * This metric reports the same values as calling [`GC.GetTotalPauseDuration()`](https://learn.microsoft.com/dotnet/api/system.gc.gettotalpauseduration).
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DOTNET_GC_PAUSE_TIME = 'dotnet.gc.pause.time' as const;
-
-/**
- * The amount of time the JIT compiler has spent compiling methods since the process has started.
- *
- * @note Meter name: `System.Runtime`; Added in: .NET 9.0.
- * This metric reports the same values as calling [`JitInfo.GetCompilationTime()`](https://learn.microsoft.com/dotnet/api/system.runtime.jitinfo.getcompilationtime).
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DOTNET_JIT_COMPILATION_TIME = 'dotnet.jit.compilation.time' as const;
-
-/**
- * Count of bytes of intermediate language that have been compiled since the process has started.
- *
- * @note Meter name: `System.Runtime`; Added in: .NET 9.0.
- * This metric reports the same values as calling [`JitInfo.GetCompiledILBytes()`](https://learn.microsoft.com/dotnet/api/system.runtime.jitinfo.getcompiledilbytes).
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DOTNET_JIT_COMPILED_IL_SIZE = 'dotnet.jit.compiled_il.size' as const;
-
-/**
- * The number of times the JIT compiler (re)compiled methods since the process has started.
- *
- * @note Meter name: `System.Runtime`; Added in: .NET 9.0.
- * This metric reports the same values as calling [`JitInfo.GetCompiledMethodCount()`](https://learn.microsoft.com/dotnet/api/system.runtime.jitinfo.getcompiledmethodcount).
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DOTNET_JIT_COMPILED_METHODS = 'dotnet.jit.compiled_methods' as const;
-
-/**
- * The number of times there was contention when trying to acquire a monitor lock since the process has started.
- *
- * @note Meter name: `System.Runtime`; Added in: .NET 9.0.
- * This metric reports the same values as calling [`Monitor.LockContentionCount`](https://learn.microsoft.com/dotnet/api/system.threading.monitor.lockcontentioncount).
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DOTNET_MONITOR_LOCK_CONTENTIONS = 'dotnet.monitor.lock_contentions' as const;
-
-/**
- * The number of processors available to the process.
- *
- * @note Meter name: `System.Runtime`; Added in: .NET 9.0.
- * This metric reports the same values as accessing [`Environment.ProcessorCount`](https://learn.microsoft.com/dotnet/api/system.environment.processorcount).
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DOTNET_PROCESS_CPU_COUNT = 'dotnet.process.cpu.count' as const;
-
-/**
- * CPU time used by the process.
- *
- * @note Meter name: `System.Runtime`; Added in: .NET 9.0.
- * This metric reports the same values as accessing the corresponding processor time properties on [`System.Diagnostics.Process`](https://learn.microsoft.com/dotnet/api/system.diagnostics.process).
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DOTNET_PROCESS_CPU_TIME = 'dotnet.process.cpu.time' as const;
-
-/**
- * The number of bytes of physical memory mapped to the process context.
- *
- * @note Meter name: `System.Runtime`; Added in: .NET 9.0.
- * This metric reports the same values as calling [`Environment.WorkingSet`](https://learn.microsoft.com/dotnet/api/system.environment.workingset).
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DOTNET_PROCESS_MEMORY_WORKING_SET = 'dotnet.process.memory.working_set' as const;
-
-/**
- * The number of work items that are currently queued to be processed by the thread pool.
- *
- * @note Meter name: `System.Runtime`; Added in: .NET 9.0.
- * This metric reports the same values as calling [`ThreadPool.PendingWorkItemCount`](https://learn.microsoft.com/dotnet/api/system.threading.threadpool.pendingworkitemcount).
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DOTNET_THREAD_POOL_QUEUE_LENGTH = 'dotnet.thread_pool.queue.length' as const;
-
-/**
- * The number of thread pool threads that currently exist.
- *
- * @note Meter name: `System.Runtime`; Added in: .NET 9.0.
- * This metric reports the same values as calling [`ThreadPool.ThreadCount`](https://learn.microsoft.com/dotnet/api/system.threading.threadpool.threadcount).
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DOTNET_THREAD_POOL_THREAD_COUNT = 'dotnet.thread_pool.thread.count' as const;
-
-/**
- * The number of work items that the thread pool has completed since the process has started.
- *
- * @note Meter name: `System.Runtime`; Added in: .NET 9.0.
- * This metric reports the same values as calling [`ThreadPool.CompletedWorkItemCount`](https://learn.microsoft.com/dotnet/api/system.threading.threadpool.completedworkitemcount).
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DOTNET_THREAD_POOL_WORK_ITEM_COUNT = 'dotnet.thread_pool.work_item.count' as const;
-
-/**
- * The number of timer instances that are currently active.
- *
- * @note Meter name: `System.Runtime`; Added in: .NET 9.0.
- * This metric reports the same values as calling [`Timer.ActiveCount`](https://learn.microsoft.com/dotnet/api/system.threading.timer.activecount).
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DOTNET_TIMER_COUNT = 'dotnet.timer.count' as const;
 
 /**
  * Number of invocation cold starts
@@ -713,7 +580,7 @@ export const METRIC_HW_POWER = 'hw.power' as const;
 /**
  * Operational status: `1` (true) or `0` (false) for each of the possible states
  *
- * @note `hw.status` is currently specified as an *UpDownCounter* but would ideally be represented using a [*StateSet* as defined in OpenMetrics](https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#stateset). This semantic convention will be updated once *StateSet* is specified in OpenTelemetry. This planned change is not expected to have any consequence on the way users query their timeseries backend to retrieve the values of `hw.status` over time.
+ * @note `hw.status` is currently specified as an *UpDownCounter* but would ideally be represented using a [*StateSet* as defined in OpenMetrics](https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md#stateset). This semantic convention will be updated once *StateSet* is specified in OpenTelemetry. This planned change is not expected to have any consequence on the way users query their timeseries backend to retrieve the values of `hw.status` over time.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -773,6 +640,212 @@ export const METRIC_JVM_SYSTEM_CPU_LOAD_1M = 'jvm.system.cpu.load_1m' as const;
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_JVM_SYSTEM_CPU_UTILIZATION = 'jvm.system.cpu.utilization' as const;
+
+/**
+ * The number of actively running jobs for a cronjob
+ *
+ * @note This metric aligns with the `active` field of the
+ * [K8s CronJobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#cronjobstatus-v1-batch).
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.cronjob`](../resource/k8s.md#cronjob) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_CRONJOB_ACTIVE_JOBS = 'k8s.cronjob.active_jobs' as const;
+
+/**
+ * Number of nodes that are running at least 1 daemon pod and are supposed to run the daemon pod
+ *
+ * @note This metric aligns with the `currentNumberScheduled` field of the
+ * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps).
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.daemonset`](../resource/k8s.md#daemonset) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_DAEMONSET_CURRENT_SCHEDULED_NODES = 'k8s.daemonset.current_scheduled_nodes' as const;
+
+/**
+ * Number of nodes that should be running the daemon pod (including nodes currently running the daemon pod)
+ *
+ * @note This metric aligns with the `desiredNumberScheduled` field of the
+ * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps).
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.daemonset`](../resource/k8s.md#daemonset) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_DAEMONSET_DESIRED_SCHEDULED_NODES = 'k8s.daemonset.desired_scheduled_nodes' as const;
+
+/**
+ * Number of nodes that are running the daemon pod, but are not supposed to run the daemon pod
+ *
+ * @note This metric aligns with the `numberMisscheduled` field of the
+ * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps).
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.daemonset`](../resource/k8s.md#daemonset) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_DAEMONSET_MISSCHEDULED_NODES = 'k8s.daemonset.misscheduled_nodes' as const;
+
+/**
+ * Number of nodes that should be running the daemon pod and have one or more of the daemon pod running and ready
+ *
+ * @note This metric aligns with the `numberReady` field of the
+ * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps).
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.daemonset`](../resource/k8s.md#daemonset) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_DAEMONSET_READY_NODES = 'k8s.daemonset.ready_nodes' as const;
+
+/**
+ * Total number of available replica pods (ready for at least minReadySeconds) targeted by this deployment
+ *
+ * @note This metric aligns with the `availableReplicas` field of the
+ * [K8s DeploymentStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#deploymentstatus-v1-apps).
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.deployment`](../resource/k8s.md#deployment) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_DEPLOYMENT_AVAILABLE_PODS = 'k8s.deployment.available_pods' as const;
+
+/**
+ * Number of desired replica pods in this deployment
+ *
+ * @note This metric aligns with the `replicas` field of the
+ * [K8s DeploymentSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#deploymentspec-v1-apps).
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.deployment`](../resource/k8s.md#deployment) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_DEPLOYMENT_DESIRED_PODS = 'k8s.deployment.desired_pods' as const;
+
+/**
+ * Current number of replica pods managed by this horizontal pod autoscaler, as last seen by the autoscaler
+ *
+ * @note This metric aligns with the `currentReplicas` field of the
+ * [K8s HorizontalPodAutoscalerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerstatus-v2-autoscaling)
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_HPA_CURRENT_PODS = 'k8s.hpa.current_pods' as const;
+
+/**
+ * Desired number of replica pods managed by this horizontal pod autoscaler, as last calculated by the autoscaler
+ *
+ * @note This metric aligns with the `desiredReplicas` field of the
+ * [K8s HorizontalPodAutoscalerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerstatus-v2-autoscaling)
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_HPA_DESIRED_PODS = 'k8s.hpa.desired_pods' as const;
+
+/**
+ * The upper limit for the number of replica pods to which the autoscaler can scale up
+ *
+ * @note This metric aligns with the `maxReplicas` field of the
+ * [K8s HorizontalPodAutoscalerSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerspec-v2-autoscaling)
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_HPA_MAX_PODS = 'k8s.hpa.max_pods' as const;
+
+/**
+ * The lower limit for the number of replica pods to which the autoscaler can scale down
+ *
+ * @note This metric aligns with the `minReplicas` field of the
+ * [K8s HorizontalPodAutoscalerSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerspec-v2-autoscaling)
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_HPA_MIN_PODS = 'k8s.hpa.min_pods' as const;
+
+/**
+ * The number of pending and actively running pods for a job
+ *
+ * @note This metric aligns with the `active` field of the
+ * [K8s JobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch).
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.job`](../resource/k8s.md#job) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_JOB_ACTIVE_PODS = 'k8s.job.active_pods' as const;
+
+/**
+ * The desired number of successfully finished pods the job should be run with
+ *
+ * @note This metric aligns with the `completions` field of the
+ * [K8s JobSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobspec-v1-batch).
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.job`](../resource/k8s.md#job) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_JOB_DESIRED_SUCCESSFUL_PODS = 'k8s.job.desired_successful_pods' as const;
+
+/**
+ * The number of pods which reached phase Failed for a job
+ *
+ * @note This metric aligns with the `failed` field of the
+ * [K8s JobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch).
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.job`](../resource/k8s.md#job) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_JOB_FAILED_PODS = 'k8s.job.failed_pods' as const;
+
+/**
+ * The max desired number of pods the job should run at any given time
+ *
+ * @note This metric aligns with the `parallelism` field of the
+ * [K8s JobSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobspec-v1-batch.
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.job`](../resource/k8s.md#job) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_JOB_MAX_PARALLEL_PODS = 'k8s.job.max_parallel_pods' as const;
+
+/**
+ * The number of pods which reached phase Succeeded for a job
+ *
+ * @note This metric aligns with the `succeeded` field of the
+ * [K8s JobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch).
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.job`](../resource/k8s.md#job) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_JOB_SUCCESSFUL_PODS = 'k8s.job.successful_pods' as const;
+
+/**
+ * Describes number of K8s namespaces that are currently in a given phase.
+ *
+ * @note This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.namespace`](../resource/k8s.md#namespace) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_NAMESPACE_PHASE = 'k8s.namespace.phase' as const;
 
 /**
  * Total CPU time consumed
@@ -875,6 +948,104 @@ export const METRIC_K8S_POD_NETWORK_IO = 'k8s.pod.network.io' as const;
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_K8S_POD_UPTIME = 'k8s.pod.uptime' as const;
+
+/**
+ * Total number of available replica pods (ready for at least minReadySeconds) targeted by this replicaset
+ *
+ * @note This metric aligns with the `availableReplicas` field of the
+ * [K8s ReplicaSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicasetstatus-v1-apps).
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.replicaset`](../resource/k8s.md#replicaset) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_REPLICASET_AVAILABLE_PODS = 'k8s.replicaset.available_pods' as const;
+
+/**
+ * Number of desired replica pods in this replicaset
+ *
+ * @note This metric aligns with the `replicas` field of the
+ * [K8s ReplicaSetSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicasetspec-v1-apps).
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.replicaset`](../resource/k8s.md#replicaset) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_REPLICASET_DESIRED_PODS = 'k8s.replicaset.desired_pods' as const;
+
+/**
+ * Total number of available replica pods (ready for at least minReadySeconds) targeted by this replication controller
+ *
+ * @note This metric aligns with the `availableReplicas` field of the
+ * [K8s ReplicationControllerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicationcontrollerstatus-v1-core)
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_REPLICATION_CONTROLLER_AVAILABLE_PODS = 'k8s.replication_controller.available_pods' as const;
+
+/**
+ * Number of desired replica pods in this replication controller
+ *
+ * @note This metric aligns with the `replicas` field of the
+ * [K8s ReplicationControllerSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicationcontrollerspec-v1-core)
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_REPLICATION_CONTROLLER_DESIRED_PODS = 'k8s.replication_controller.desired_pods' as const;
+
+/**
+ * The number of replica pods created by the statefulset controller from the statefulset version indicated by currentRevision
+ *
+ * @note This metric aligns with the `currentReplicas` field of the
+ * [K8s StatefulSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps).
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.statefulset`](../resource/k8s.md#statefulset) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_STATEFULSET_CURRENT_PODS = 'k8s.statefulset.current_pods' as const;
+
+/**
+ * Number of desired replica pods in this statefulset
+ *
+ * @note This metric aligns with the `replicas` field of the
+ * [K8s StatefulSetSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetspec-v1-apps).
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.statefulset`](../resource/k8s.md#statefulset) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_STATEFULSET_DESIRED_PODS = 'k8s.statefulset.desired_pods' as const;
+
+/**
+ * The number of replica pods created for this statefulset with a Ready Condition
+ *
+ * @note This metric aligns with the `readyReplicas` field of the
+ * [K8s StatefulSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps).
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.statefulset`](../resource/k8s.md#statefulset) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_STATEFULSET_READY_PODS = 'k8s.statefulset.ready_pods' as const;
+
+/**
+ * Number of replica pods created by the statefulset controller from the statefulset version indicated by updateRevision
+ *
+ * @note This metric aligns with the `updatedReplicas` field of the
+ * [K8s StatefulSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps).
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.statefulset`](../resource/k8s.md#statefulset) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_STATEFULSET_UPDATED_PODS = 'k8s.statefulset.updated_pods' as const;
 
 /**
  * Number of messages that were delivered to the application.
@@ -1242,6 +1413,7 @@ export const METRIC_SYSTEM_CPU_FREQUENCY = 'system.cpu.frequency' as const;
 /**
  * Reports the number of logical (virtual) processor cores created by the operating system to manage multitasking
  *
+ * @note Calculated by multiplying the number of sockets by the number of cores per socket, and then by the number of threads per core
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_SYSTEM_CPU_LOGICAL_COUNT = 'system.cpu.logical.count' as const;
@@ -1249,6 +1421,7 @@ export const METRIC_SYSTEM_CPU_LOGICAL_COUNT = 'system.cpu.logical.count' as con
 /**
  * Reports the number of actual physical processor cores on the hardware
  *
+ * @note Calculated by multiplying the number of sockets by the number of cores per socket
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_SYSTEM_CPU_PHYSICAL_COUNT = 'system.cpu.physical.count' as const;
@@ -1542,11 +1715,18 @@ export const METRIC_VCS_CHANGE_COUNT = 'vcs.change.count' as const;
 export const METRIC_VCS_CHANGE_DURATION = 'vcs.change.duration' as const;
 
 /**
- * The amount of time since its creation it took a change (pull request/merge request/changelist) to get the first approval
+ * The amount of time since its creation it took a change (pull request/merge request/changelist) to get the first approval.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_VCS_CHANGE_TIME_TO_APPROVAL = 'vcs.change.time_to_approval' as const;
+
+/**
+ * The amount of time since its creation it took a change (pull request/merge request/changelist) to get merged into the target(base) ref.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_VCS_CHANGE_TIME_TO_MERGE = 'vcs.change.time_to_merge' as const;
 
 /**
  * The number of unique contributors to a repository
@@ -1556,14 +1736,14 @@ export const METRIC_VCS_CHANGE_TIME_TO_APPROVAL = 'vcs.change.time_to_approval' 
 export const METRIC_VCS_CONTRIBUTOR_COUNT = 'vcs.contributor.count' as const;
 
 /**
- * The number of refs of type branch or tag in a repository
+ * The number of refs of type branch or tag in a repository.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_VCS_REF_COUNT = 'vcs.ref.count' as const;
 
 /**
- * The number of lines added/removed in a ref (branch) relative to the ref from the `vcs.ref.base.name` attribute
+ * The number of lines added/removed in a ref (branch) relative to the ref from the `vcs.ref.base.name` attribute.
  *
  * @note This metric should be reported for each `vcs.line_change.type` value. For example if a ref added 3 lines and removed 2 lines,
  * instrumentation **SHOULD** report two measurements: 3 and 2 (both positive numbers).
@@ -1591,7 +1771,7 @@ export const METRIC_VCS_REF_REVISIONS_DELTA = 'vcs.ref.revisions_delta' as const
 export const METRIC_VCS_REF_TIME = 'vcs.ref.time' as const;
 
 /**
- * The number of repositories in an organization
+ * The number of repositories in an organization.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */

@@ -20,4 +20,8 @@ export {
   getEnvWithoutDefaults,
   otperformance,
   unrefTimer,
+  getBooleanFromEnv,
+  getStringFromEnv,
+  getNumberFromEnv,
+  getStringListFromEnv,
 } from './node';

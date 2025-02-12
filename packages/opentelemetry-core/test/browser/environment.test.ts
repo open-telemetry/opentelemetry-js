@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-const karmaWebpackConfig = require('../../karma.webpack');
-const karmaBaseConfig = require('../../karma.base');
+import * as assert from 'assert';
+import { getEnv } from '../../src/platform/browser/environment';
 
-module.exports = config => {
-  config.set(
-    Object.assign({}, karmaBaseConfig, {
-      webpack: karmaWebpackConfig,
-      files: ['test/browser/index-webpack.ts'],
-      preprocessors: { 'test/browser/index-webpack.ts': ['webpack'] },
-    })
-  );
-};
+describe('getEnv', () => {
+  it('get environments variables in a browser', () => {
+    const env = getEnv();
+    assert.strictEqual(typeof env, 'object');
+  });
+});

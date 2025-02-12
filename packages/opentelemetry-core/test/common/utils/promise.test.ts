@@ -15,8 +15,8 @@
  */
 
 import * as assert from 'assert';
-import { Deferred } from '../../src/utils/promise';
-import { assertRejects } from '../test-utils';
+import { Deferred } from '../../../src/utils/promise';
+import { assertRejects } from '../../test-utils';
 
 describe('promise', () => {
   describe('Deferred', () => {

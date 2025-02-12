@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import { getEnv } from '../../../src/platform/browser/environment';
-
-describe('getEnv', () => {
-  it('get environments variables in a browser', () => {
-    const env = getEnv();
-    assert.strictEqual(typeof env, 'object');
-  });
-});
+/**
+ * A unique id to identify a session.
+ *
+ * @example "00112233-4455-6677-8899-aabbccddeeff"
+ */
+export const ATTR_SESSION_ID = 'session.id' as const;
