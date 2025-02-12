@@ -4,7 +4,8 @@
   "description": "OpenTelemetry is a distributed tracing and stats collection framework.",
   "scripts": {
     "precompile": "lerna run version && npm run submodule",
-    "compile": "lerna run protos:generate && tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "compile:es2017": "lerna run --scope @opentelemetry/api --scope @opentelemetry/semantic-conventions compile",
+    "compile": "lerna run protos:generate && npm run compile:es2017 && tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "prewatch": "npm run precompile",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",

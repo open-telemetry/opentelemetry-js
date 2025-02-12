@@ -3,7 +3,13 @@
   "compilerOptions": {
     "outDir": "build/esm",
     "rootDir": "src",
-    "tsBuildInfoFile": "build/esm/tsconfig.esm.tsbuildinfo"
+    "target": "es2017",
+    "tsBuildInfoFile": "build/esm/tsconfig.esm.tsbuildinfo",
+    "lib": [
+      "es2017",
+      "dom",
+      "dom.iterable"
+    ]
   },
   "include": [
     "src/**/*.ts"

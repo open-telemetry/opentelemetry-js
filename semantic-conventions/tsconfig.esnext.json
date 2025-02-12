@@ -3,7 +3,13 @@
   "compilerOptions": {
     "outDir": "build/esnext",
     "rootDir": "src",
-    "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo"
+    "target": "es2017",
+    "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo",
+    "lib": [
+      "es2017",
+      "dom",
+      "dom.iterable"
+    ]
   },
   "include": [
     "src/**/*.ts"
