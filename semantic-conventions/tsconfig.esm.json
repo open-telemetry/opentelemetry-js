@@ -1,15 +1,15 @@
 {
   "extends": "../tsconfig.base.esm.json",
   "compilerOptions": {
-    "outDir": "build/esm",
-    "rootDir": "src",
-    "target": "es2017",
-    "tsBuildInfoFile": "build/esm/tsconfig.esm.tsbuildinfo",
     "lib": [
       "es2017",
       "dom",
       "dom.iterable"
-    ]
+    ],
+    "outDir": "build/esm",
+    "rootDir": "src",
+    "target": "es2017",
+    "tsBuildInfoFile": "build/esm/tsconfig.esm.tsbuildinfo"
   },
   "include": [
     "src/**/*.ts"

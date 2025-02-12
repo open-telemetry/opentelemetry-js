@@ -1,15 +1,15 @@
 {
   "extends": "../tsconfig.base.esnext.json",
   "compilerOptions": {
-    "outDir": "build/esnext",
-    "rootDir": "src",
-    "target": "es2017",
-    "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo",
     "lib": [
       "es2017",
       "dom",
       "dom.iterable"
-    ]
+    ],
+    "outDir": "build/esnext",
+    "rootDir": "src",
+    "target": "es2017",
+    "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo"
   },
   "include": [
     "src/**/*.ts"

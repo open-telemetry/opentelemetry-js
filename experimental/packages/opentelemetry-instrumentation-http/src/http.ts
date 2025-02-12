@@ -120,7 +120,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   }
 
   protected override _updateMetricInstruments() {
-    console.log('_updateMetricInstruments')
     this._oldHttpServerDurationHistogram = this.meter.createHistogram(
       'http.server.duration',
       {
@@ -172,12 +171,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     oldAttributes: Attributes,
     stableAttributes: Attributes
   ) {
-    console.log('XXXXXX')
-    console.log(this._semconvStability)
-    console.log(this._oldHttpServerDurationHistogram)
-    console.log(this._stableHttpServerDurationHistogram)
-    console.log('XXXXXX')
-
     if (
       (this._semconvStability & SemconvStability.OLD) ===
       SemconvStability.OLD

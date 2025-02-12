@@ -1,14 +1,14 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "build",
-    "rootDir": ".",
-    "target": "es2017",
     "lib": [
       "es2017",
       "dom",
       "dom.iterable"
-    ]
+    ],
+    "outDir": "build",
+    "rootDir": ".",
+    "target": "es2017"
   },
   "files": [],
   "include": [
