@@ -43,8 +43,7 @@ export function isValidSpanId(spanId: string): boolean {
  */
 export function isSpanContextValid(spanContext: SpanContext): boolean {
   return (
-    isValidTraceId(spanContext.traceId) &&
-    isValidSpanId(spanContext.spanId)
+    isValidTraceId(spanContext.traceId) && isValidSpanId(spanContext.spanId)
   );
 }
 
