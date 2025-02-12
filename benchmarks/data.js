@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1739366542446,
+  "lastUpdate": 1739380143804,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -26938,6 +26938,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 780001,
             "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "roshiniprasad10@gmail.com",
+            "name": "Roshini Prasad",
+            "username": "groshiniprasad"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "bc6c4ebb7fdf79f4a4c8fc505262a8c6d894e882",
+          "message": "docs(opentelemetry-readme): Updated circleci badge with github action badge (#5457)",
+          "timestamp": "2025-02-12T16:39:43Z",
+          "tree_id": "f90a1d8673825523f020bf2896be69300e6d8692",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/bc6c4ebb7fdf79f4a4c8fc505262a8c6d894e882"
+        },
+        "date": 1739380142942,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1452410,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 16379,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 854246,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 785789,
+            "range": "±0.48%",
             "unit": "ops/sec",
             "extra": "92 samples"
           }
