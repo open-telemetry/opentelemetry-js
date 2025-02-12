@@ -33,7 +33,6 @@ export function getEnv(): Required<ENVIRONMENT> {
 
 /**
  * Retrieves a number from an environment variable.
- * - Trims leading and trailing whitespace.
  * - Returns `undefined` if the environment variable is empty, unset, contains only whitespace, or is not a number.
  * - Returns a number in all other cases.
  *
@@ -75,16 +74,19 @@ export function getStringFromEnv(key: string): string | undefined {
 /**
  * Retrieves a boolean value from an environment variable.
  * - Trims leading and trailing whitespace and ignores casing.
- * - Returns `undefined` if the environment variable is empty, unset, or contains only whitespace.
- * - Returns `undefined` for strings that cannot be mapped to a boolean.
+ * - Returns `false` if the environment variable is empty, unset, or contains only whitespace.
+ * - Returns `false` for strings that cannot be mapped to a boolean.
  *
  * @param {string} key - The name of the environment variable to retrieve.
- * @returns {boolean | undefined} - The boolean value or `undefined`.
+ * @returns {boolean} - The boolean value or `false` if the environment variable is unset empty, unset, or contains only whitespace.
  */
-export function getBooleanFromEnv(key: string): boolean | undefined {
+export function getBooleanFromEnv(key: string): boolean {
   const raw = process.env[key]?.trim().toLowerCase();
   if (raw == null || raw === '') {
-    return undefined;
+    // NOTE: falling back to `false` instead of `undefined` as required by the specification.
+    // If you have a use-case that requires `undefined`, consider using `getStringFromEnv()` and applying the necessary
+    // normalizations in the consuming code.
+    return false;
   }
   if (raw === 'true') {
     return true;
@@ -92,9 +94,9 @@ export function getBooleanFromEnv(key: string): boolean | undefined {
     return false;
   } else {
     diag.warn(
-      `Unknown value ${inspect(raw)} for ${key}, expected 'true' or 'false', using defaults`
+      `Unknown value ${inspect(raw)} for ${key}, expected 'true' or 'false', falling back to 'false' (default)`
     );
-    return undefined;
+    return false;
   }
 }
 

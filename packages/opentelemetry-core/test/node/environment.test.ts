@@ -166,17 +166,17 @@ describe('environment utility functions', function () {
       sinon.restore();
     });
 
-    it('should treat empty string as undefined', function () {
+    it('should treat empty string as false', function () {
       process.env.FOO = '';
-      assert.strictEqual(getBooleanFromEnv('FOO'), undefined);
+      assert.strictEqual(getBooleanFromEnv('FOO'), false);
 
       process.env.FOO = '  ';
-      assert.strictEqual(getBooleanFromEnv('FOO'), undefined);
+      assert.strictEqual(getBooleanFromEnv('FOO'), false);
     });
 
-    it('should treat not defined as undefined', function () {
+    it('should treat not defined as false', function () {
       delete process.env.FOO;
-      assert.strictEqual(getBooleanFromEnv('FOO'), undefined);
+      assert.strictEqual(getBooleanFromEnv('FOO'), false);
     });
 
     it('should trim extra whitespace', function () {
@@ -200,7 +200,7 @@ describe('environment utility functions', function () {
     it('should ignore bogus data and warn', function () {
       const warnStub = sinon.stub(diag, 'warn');
       process.env.FOO = 'trueFALSE';
-      assert.strictEqual(getBooleanFromEnv('FOO'), undefined);
+      assert.strictEqual(getBooleanFromEnv('FOO'), false);
       sinon.assert.calledOnceWithMatch(warnStub, 'Unknown value');
     });
   });
