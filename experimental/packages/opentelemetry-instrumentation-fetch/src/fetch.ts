@@ -32,6 +32,8 @@ import {
   SEMATTRS_HTTP_URL,
   SEMATTRS_HTTP_METHOD,
   SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+  ATTR_HTTP_REQUEST_HEADER,
+  ATTR_HTTP_RESPONSE_HEADER,
 } from '@opentelemetry/semantic-conventions';
 import { FetchError, FetchResponse, SpanData } from './types';
 import { getFetchBodyLength } from './utils';
@@ -58,26 +60,37 @@ export interface FetchCustomAttributeFunction {
  * FetchPlugin Config
  */
 export interface FetchInstrumentationConfig extends InstrumentationConfig {
-  // the number of timing resources is limited, after the limit
-  // (chrome 250, safari 150) the information is not collected anymore
-  // the only way to prevent that is to regularly clean the resources
-  // whenever it is possible, this is needed only when PerformanceObserver
-  // is not available
+  /** Function for adding custom attributes on the span */
+  applyCustomAttributesOnSpan?: FetchCustomAttributeFunction;
+
+  /**  the number of timing resources is limited, after the limit
+  (chrome 250, safari 150) the information is not collected anymore
+  the only way to prevent that is to regularly clean the resources
+  whenever it is possible, this is needed only when PerformanceObserver
+  is not available */
   clearTimingResources?: boolean;
-  // urls which should include trace headers when origin doesn't match
-  propagateTraceHeaderCorsUrls?: web.PropagateTraceHeaderCorsUrls;
+
+  /** List of request headers to include as attributes on the span. */
+  requestHeadersAsAttributes?: string[];
+
+  /** List of request headers to include as attributes on the span. */
+  responseHeadersAsAttributes?: string[];
+
+  /**  Ignore adding network events as span events */
+  ignoreNetworkEvents?: boolean;
+
   /**
    * URLs that partially match any regex in ignoreUrls will not be traced.
    * In addition, URLs that are _exact matches_ of strings in ignoreUrls will
    * also not be traced.
    */
   ignoreUrls?: Array<string | RegExp>;
-  /** Function for adding custom attributes on the span */
-  applyCustomAttributesOnSpan?: FetchCustomAttributeFunction;
-  // Ignore adding network events as span events
-  ignoreNetworkEvents?: boolean;
+
   /** Measure outgoing request size */
   measureRequestSize?: boolean;
+
+  /**  urls which should include trace headers when origin doesn't match */
+  propagateTraceHeaderCorsUrls?: web.PropagateTraceHeaderCorsUrls;
 }
 
 /**
@@ -343,8 +356,20 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
             });
         }
 
+        const requestHeadersToIncludeAsAttributes =
+          plugin.getConfig().requestHeadersAsAttributes;
+        const responseHeadersToIncludeAsAttributes =
+          plugin.getConfig().responseHeadersAsAttributes;
+
         function endSpanOnError(span: api.Span, error: FetchError) {
           plugin._applyAttributesAfterFetch(span, options, error);
+          if (requestHeadersToIncludeAsAttributes) {
+            plugin._applyRequestHeadersAsAttributes(
+              span,
+              requestHeadersToIncludeAsAttributes,
+              options.headers as Headers
+            );
+          }
           plugin._endSpan(span, spanData, {
             status: error.status || 0,
             statusText: error.message,
@@ -354,6 +379,22 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
 
         function endSpanOnSuccess(span: api.Span, response: Response) {
           plugin._applyAttributesAfterFetch(span, options, response);
+          if (requestHeadersToIncludeAsAttributes) {
+            plugin._applyRequestHeadersAsAttributes(
+              span,
+              requestHeadersToIncludeAsAttributes,
+              options.headers as Headers
+            );
+          }
+
+          if (responseHeadersToIncludeAsAttributes) {
+            plugin._applyResponseHeadersAsAttributes(
+              span,
+              responseHeadersToIncludeAsAttributes,
+              response.headers
+            );
+          }
+
           if (response.status >= 200 && response.status < 400) {
             plugin._endSpan(span, spanData, response);
           } else {
@@ -433,6 +474,32 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         });
       };
     };
+  }
+
+  private _applyRequestHeadersAsAttributes(
+    span: api.Span,
+    headersToInclude: string[],
+    requestHeaders: Headers
+  ) {
+    headersToInclude.forEach(header => {
+      const value = requestHeaders.get(header);
+      if (value) {
+        span.setAttribute(ATTR_HTTP_REQUEST_HEADER(header), value);
+      }
+    });
+  }
+
+  private _applyResponseHeadersAsAttributes(
+    span: api.Span,
+    headersToInclude: string[],
+    responseHeaders: Headers
+  ) {
+    headersToInclude.forEach(header => {
+      const value = responseHeaders.get(header);
+      if (value) {
+        span.setAttribute(ATTR_HTTP_RESPONSE_HEADER(header), value);
+      }
+    });
   }
 
   private _applyAttributesAfterFetch(
