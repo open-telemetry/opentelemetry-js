@@ -51,7 +51,7 @@ const parentSpanContext: api.SpanContext = {
   spanId: '5c1c63257de34c67',
   traceFlags: api.TraceFlags.SAMPLED,
 };
-const parentId = '5c1c63257de34c67';
+// const parentId = '5c1c63257de34c67';
 const spanContext: api.SpanContext = {
   traceId: 'd4cda95b652f4a1592b449d5929fda1b',
   spanId: '6e0c63257de34c92',
@@ -71,7 +71,7 @@ function getSpan(options: Partial<ReadableSpan>): ReadableSpan {
     endTime: options.endTime || endTime,
     duration: options.duration || duration,
     spanContext: () => spanContext,
-    parentSpanContext: options.parentSpanContext || parentSpanContext.spanId,
+    parentSpanContext: options.parentSpanContext || parentSpanContext,
     attributes: options.attributes || {},
     events: options.events || [],
     status: options.status || { code: api.SpanStatusCode.UNSET },
@@ -125,7 +125,7 @@ describe('transform', () => {
           serviceName: 'my-service',
         },
         name: span.name,
-        parentId,
+        parentId: span.parentSpanContext?.spanId,
         tags: {
           key1: 'value1',
           key2: 'value2',
@@ -172,7 +172,7 @@ describe('transform', () => {
             serviceName: 'my-service',
           },
           name: span.name,
-          parentId: undefined,
+          parentId: span.parentSpanContext?.spanId,
           tags: {
             [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
             cost: '112.12',

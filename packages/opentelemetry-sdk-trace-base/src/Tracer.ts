@@ -86,6 +86,7 @@ export class Tracer implements api.Tracer {
 
     const parentSpanContext = parentSpan?.spanContext();
     const spanId = this._idGenerator.generateSpanId();
+    let validParentSpanContext;
     let traceId;
     let traceState;
     if (
@@ -98,6 +99,7 @@ export class Tracer implements api.Tracer {
       // New child span.
       traceId = parentSpanContext.traceId;
       traceState = parentSpanContext.traceState;
+      validParentSpanContext = parentSpanContext;
     }
 
     const spanKind = options.kind ?? api.SpanKind.INTERNAL;
@@ -147,7 +149,7 @@ export class Tracer implements api.Tracer {
       name,
       kind: spanKind,
       links,
-      parentSpanContext: parentSpanContext,
+      parentSpanContext: validParentSpanContext,
       attributes: initAttributes,
       startTime: options.startTime,
       spanProcessor: this._spanProcessor,
