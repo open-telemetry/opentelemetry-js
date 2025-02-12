@@ -98,6 +98,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * feat(sdk-trace-web): do not throw when passing extra options [#5357](https://github.com/open-telemetry/opentelemetry-js/pull/5357) @pichlermarc
   * `WebTracerProvider` constructor now does not throw anymore when `contextManager` or `propagator` are passed as extra options to the constructor
 * feat(sdk-trace-base): add stack trace warning to debug instrumentation [#5363](https://github.com/open-telemetry/opentelemetry-js/pull/5363) @neilfordyce
+* feat(core): add more scalable replacements for getEnv(), getEnvWithoutDefaults() [#5443](https://github.com/open-telemetry/opentelemetry-js/pull/5443) @pichlermarc
 
 ### :bug: (Bug Fix)
 
