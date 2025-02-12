@@ -750,6 +750,7 @@ describe('PrometheusSerializer', () => {
     it('should serialize non-finite values', async () => {
       const serializer = new PrometheusSerializer();
       const cases = [
+        [NaN, 'NaN'],
         [-Infinity, '-Inf'],
         [+Infinity, '+Inf'],
       ] as [number, string][];
@@ -814,11 +815,13 @@ describe('PrometheusSerializer', () => {
       const serializer = new PrometheusSerializer(undefined, true);
       const result = serializer['_serializeResource'](
         new Resource({
-          env: 'prod',
-          hostname: 'myhost',
-          datacenter: 'sdc',
-          region: 'europe',
-          owner: 'frontend',
+          attributes: {
+            env: 'prod',
+            hostname: 'myhost',
+            datacenter: 'sdc',
+            region: 'europe',
+            owner: 'frontend',
+          },
         })
       );
 

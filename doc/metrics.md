@@ -521,7 +521,7 @@ a new http server on port 9464. You can now access the metrics at the endpoint
 <http://localhost:9464/metrics>. This is the URL that can be scraped by Prometheus so it can consumed the metrics collected by OpenTelemetry in your application.
 
 More information about Prometheus and how to configure can be found at:
-[https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config](Prometheus Scraping Config)
+[Prometheus Scraping Config](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config)
 
 For a fully functioning code example for using this exporter, please have a look
 at: <https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/examples/prometheus>

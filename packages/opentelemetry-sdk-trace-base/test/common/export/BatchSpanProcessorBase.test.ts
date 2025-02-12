@@ -32,7 +32,7 @@ import {
   Span,
   SpanExporter,
 } from '../../../src';
-import { Attributes, context } from '@opentelemetry/api';
+import { context } from '@opentelemetry/api';
 import { TestRecordOnlySampler } from './TestRecordOnlySampler';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestStackContextManager } from './TestStackContextManager';
@@ -440,12 +440,13 @@ describe('BatchSpanProcessorBase', () => {
 
       it('should wait for pending resource on flush', async () => {
         const tracer = new BasicTracerProvider({
-          resource: new Resource(
-            {},
-            new Promise<Attributes>(resolve => {
-              setTimeout(() => resolve({ async: 'fromasync' }), 1);
-            })
-          ),
+          resource: new Resource({
+            attributes: {
+              async: new Promise<string>(resolve =>
+                setTimeout(() => resolve('fromasync'), 1)
+              ),
+            },
+          }),
         }).getTracer('default');
 
         const span = tracer.startSpan('test') as Span;

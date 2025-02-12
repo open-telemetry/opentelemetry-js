@@ -13,12 +13,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-export enum TracesSamplerValues {
-  AlwaysOff = 'always_off',
-  AlwaysOn = 'always_on',
-  ParentBasedAlwaysOff = 'parentbased_always_off',
-  ParentBasedAlwaysOn = 'parentbased_always_on',
-  ParentBasedTraceIdRatio = 'parentbased_traceidratio',
-  TraceIdRatio = 'traceidratio',
-}

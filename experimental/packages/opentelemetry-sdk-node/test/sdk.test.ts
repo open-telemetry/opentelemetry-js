@@ -62,11 +62,11 @@ import { NodeSDK } from '../src';
 import { env } from 'process';
 import {
   envDetector,
-  envDetectorSync,
   processDetector,
   hostDetector,
   Resource,
-  serviceInstanceIdDetectorSync,
+  serviceInstanceIdDetector,
+  DetectedResource,
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { logs, ProxyLoggerProvider } from '@opentelemetry/api-logs';
@@ -414,6 +414,21 @@ describe('Node SDK', () => {
       assert.equal(actualContextManager, expectedContextManager);
       await sdk.shutdown();
     });
+
+    it('should register propagators as defined in OTEL_PROPAGATORS if trace SDK is configured', async () => {
+      process.env.OTEL_PROPAGATORS = 'b3';
+      const sdk = new NodeSDK({
+        traceExporter: new ConsoleSpanExporter(),
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assert.deepStrictEqual(propagation.fields(), ['b3']);
+
+      await sdk.shutdown();
+      delete process.env.OTEL_PROPAGATORS;
+    });
   });
 
   async function waitForNumberOfMetrics(
@@ -525,8 +540,10 @@ describe('Node SDK', () => {
           resourceDetectors: [
             processDetector,
             {
-              async detect(): Promise<Resource> {
-                return new Resource({ customAttr: 'someValue' });
+              detect(): DetectedResource {
+                return {
+                  attributes: { customAttr: 'someValue' },
+                };
               },
             },
             envDetector,
@@ -690,7 +707,7 @@ describe('Node SDK', () => {
           await sdk1.shutdown();
 
           const sdk2 = new NodeSDK({
-            resourceDetectors: [envDetectorSync],
+            resourceDetectors: [envDetector],
           });
           sdk2.start();
           await sdk2.shutdown();
@@ -855,7 +872,7 @@ describe('Node SDK', () => {
           processDetector,
           envDetector,
           hostDetector,
-          serviceInstanceIdDetectorSync,
+          serviceInstanceIdDetector,
         ],
       });
 
@@ -925,8 +942,10 @@ describe('Node SDK', () => {
           resourceDetectors: [
             processDetector,
             {
-              async detect(): Promise<Resource> {
-                return new Resource({ customAttr: 'someValue' });
+              detect(): DetectedResource {
+                return {
+                  attributes: { customAttr: 'someValue' },
+                };
               },
             },
             envDetector,

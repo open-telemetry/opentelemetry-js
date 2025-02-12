@@ -32,7 +32,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=18"
+    "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
     "build/src/**/*.js",
@@ -62,7 +62,7 @@
     "@types/sinon": "17.0.3",
     "cross-var": "1.1.0",
     "lerna": "6.6.2",
-    "mocha": "10.8.2",
+    "mocha": "11.1.0",
     "nyc": "17.1.0",
     "sinon": "15.1.2",
     "typescript": "5.0.4"
@@ -72,7 +72,7 @@
   },
   "dependencies": {
     "@opentelemetry/instrumentation": "0.57.0",
-    "@opentelemetry/semantic-conventions": "1.28.0"
+    "@opentelemetry/semantic-conventions": "^1.29.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-grpc",
   "sideEffects": false
