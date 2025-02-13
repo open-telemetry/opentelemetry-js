@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1739474066935,
+  "lastUpdate": 1739474166182,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -27356,6 +27356,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.86%",
             "unit": "ops/sec",
             "extra": "93 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "30336441+marius-a-mueller@users.noreply.github.com",
+            "name": "Marius Müller",
+            "username": "marius-a-mueller"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7a1e1b274f4323813cf734e962554f4d53ac748c",
+          "message": "feat(exporter-prometheus): add additional attributes option (#5317)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2025-02-13T18:57:50Z",
+          "tree_id": "073c85592ae2eb2c9922b18e4f29e085a0014f7b",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/7a1e1b274f4323813cf734e962554f4d53ac748c"
+        },
+        "date": 1739474165205,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1500745,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 16263,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 824407,
+            "range": "±0.30%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 754420,
+            "range": "±0.79%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
           }
         ]
       }
