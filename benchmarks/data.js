@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1739443400321,
+  "lastUpdate": 1739446069678,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -27148,6 +27148,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.50%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dyladan@users.noreply.github.com",
+            "name": "Daniel Dyla",
+            "username": "dyladan"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "4b8ae0c2bfd1f4f739773111aa9911d974725bff",
+          "message": "feat(resource)!: Remove resource class export in favor of functions and types only to aid in cross-version compatibility (#5421)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2025-02-13T11:12:44Z",
+          "tree_id": "870397c86df7c799d7d9b27df1e2e5c068ed4c04",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/4b8ae0c2bfd1f4f739773111aa9911d974725bff"
+        },
+        "date": 1739446068800,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1580433,
+            "range": "±0.63%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18623,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 832723,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 798233,
+            "range": "±0.17%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
