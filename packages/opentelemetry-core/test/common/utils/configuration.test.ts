@@ -48,7 +48,10 @@ describe('stringToLogLevel', function () {
 
   it('should fall back to INFO and warn on input that cannot be mapped', function () {
     const warnStub = sinon.stub(diag, 'warn');
-    assert.strictEqual(diagLogLevelFromString('does not exist'), DiagLogLevel.INFO);
+    assert.strictEqual(
+      diagLogLevelFromString('does not exist'),
+      DiagLogLevel.INFO
+    );
     sinon.assert.calledOnceWithMatch(warnStub, 'Unknown');
   });
 });
