@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sampler-jaeger-remote",
-  "version": "0.57.1",
+  "version": "0.57.2",
   "description": "Jaeger Remote Sampler",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
