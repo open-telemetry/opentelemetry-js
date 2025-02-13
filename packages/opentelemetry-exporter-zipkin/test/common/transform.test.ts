@@ -141,9 +141,9 @@ describe('transform', () => {
       });
       it("should skip parentSpanId if doesn't exist", () => {
         const span = getSpan({
-          parentSpanContext: undefined
+          parentSpanContext: undefined,
         });
-  
+
         const zipkinSpan = toZipkinSpan(
           span,
           'my-service',
