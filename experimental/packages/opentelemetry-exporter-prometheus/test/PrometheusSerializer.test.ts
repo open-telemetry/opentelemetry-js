@@ -34,7 +34,7 @@ import {
   sdkVersion,
   serviceName,
 } from './util';
-import { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 import { AggregationType } from '@opentelemetry/sdk-metrics';
 
 const attributes = {
@@ -703,14 +703,12 @@ describe('PrometheusSerializer', () => {
     it('should serialize resource', () => {
       const serializer = new PrometheusSerializer(undefined, true);
       const result = serializer['_serializeResource'](
-        new Resource({
-          attributes: {
-            env: 'prod',
-            hostname: 'myhost',
-            datacenter: 'sdc',
-            region: 'europe',
-            owner: 'frontend',
-          },
+        resourceFromAttributes({
+          env: 'prod',
+          hostname: 'myhost',
+          datacenter: 'sdc',
+          region: 'europe',
+          owner: 'frontend',
         })
       );
 

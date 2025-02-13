@@ -16,7 +16,7 @@
 
 import { SDK_INFO } from '@opentelemetry/core';
 import * as assert from 'assert';
-import { IResource, Resource } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 import {
   SEMRESATTRS_CLOUD_ACCOUNT_ID,
   SEMRESATTRS_CLOUD_AVAILABILITY_ZONE,
@@ -260,7 +260,7 @@ export const assertTelemetrySDKResource = (
  * @param validations validations for the resource attributes
  */
 export const assertServiceResource = (
-  resource: IResource,
+  resource: Resource,
   validations: {
     name: string;
     instanceId?: string;
@@ -362,7 +362,7 @@ const assertHasOneLabel = (prefix: string, resource: Resource): void => {
   );
 };
 
-export const assertServiceInstanceIdIsUUID = (resource: IResource): void => {
+export const assertServiceInstanceIdIsUUID = (resource: Resource): void => {
   const UUID_REGEX =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   assert.equal(

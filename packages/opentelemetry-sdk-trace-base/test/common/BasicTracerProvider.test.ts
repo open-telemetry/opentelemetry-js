@@ -30,7 +30,10 @@ import {
 } from '@opentelemetry/api';
 import { CompositePropagator } from '@opentelemetry/core';
 import { TraceState } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import {
+  DEFAULT_RESOURCE,
+  resourceFromAttributes,
+} from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
@@ -638,7 +641,7 @@ describe('BasicTracerProvider', () => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span') as Span;
       assert.ok(span);
-      assert.ok(span.resource instanceof Resource);
+      assert.ok(span.resource);
     });
   });
 
@@ -726,11 +729,11 @@ describe('BasicTracerProvider', () => {
   describe('.resource', () => {
     it('should use the default resource when no resource is provided', function () {
       const tracerProvider = new BasicTracerProvider();
-      assert.deepStrictEqual(tracerProvider['_resource'], Resource.default());
+      assert.deepStrictEqual(tracerProvider['_resource'], DEFAULT_RESOURCE);
     });
 
     it('should use not use the default if resource passed', function () {
-      const providedResource = new Resource({ attributes: { foo: 'bar' } });
+      const providedResource = resourceFromAttributes({ foo: 'bar' });
       const tracerProvider = new BasicTracerProvider({
         resource: providedResource,
       });
