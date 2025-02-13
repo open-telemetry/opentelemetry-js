@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
-export { getEnvWithoutDefaults, getEnv } from './environment';
+export {
+  getEnvWithoutDefaults,
+  getEnv,
+  getStringFromEnv,
+  getBooleanFromEnv,
+  getNumberFromEnv,
+  getStringListFromEnv,
+} from './environment';
 export { _globalThis } from './globalThis';
 export { otperformance } from './performance';
 export { SDK_INFO } from './sdk-info';
