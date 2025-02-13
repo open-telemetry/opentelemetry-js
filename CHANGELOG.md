@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD004 -->
 # CHANGELOG
 
-All notable changes to this project will be documented in this file. 
+All notable changes to this project will be documented in this file.
 
 For API changes, see the [API CHANGELOG](api/CHANGELOG.md).
 For experimental package changes, see the [experimental CHANGELOG](experimental/CHANGELOG.md).
