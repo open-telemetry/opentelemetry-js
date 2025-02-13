@@ -22,6 +22,8 @@ All notable changes to experimental packages in this project will be documented 
 * feat(instrumentation-fetch): add a `requestHook` option [#5380](https://github.com/open-telemetry/opentelemetry-js/pull/5380)
 * feat(instrumentation): re-export initialize function from import-in-the-middle [#5123](https://github.com/open-telemetry/opentelemetry-js/pull/5123)
 * feat(sdk-node): lower diagnostic level [#5360](https://github.com/open-telemetry/opentelemetry-js/pull/5360) @cjihrig
+* feat(exporter-prometheus): add additional attributes option [#5317](https://github.com/open-telemetry/opentelemetry-js/pull/5317) @marius-a-mueller
+  * Add `withResourceConstantLabels` option to `ExporterConfig`. It can be used to define a regex pattern to choose which resource attributes will be used as static labels on the metrics. The default is to not set any static labels.
 
 ### :bug: (Bug Fix)
 
