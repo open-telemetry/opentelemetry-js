@@ -93,6 +93,11 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * (user-facing): `baggageUtils.parsePairKeyValue` was an internal utility function that was unintentionally exported. It has been removed without replacement.
   * (user-facing): `TimeOriginLegacy` has been removed without replacement.
   * (user-facing): `isAttributeKey` was an internal utility function that was unintentionally exported. It has been removed without replacement.
+* feat(resource)!: Remove resource class export in favor of functions and types only to aid in cross-version compatibility [#5421](https://github.com/open-telemetry/opentelemetry-js/pull/5421)
+  * Renames `Resource` class to `ResourceImpl` and makes it package-private
+  * Renames `IResource` interface to `Resource`
+  * Export function `resourceFromAttributes` to create a `Resource` from a `DetectedAttributes` object
+  * Only export types and functions. This aids in cross-version compatibility and makes it more easily extensible in the future.
 
 ### :rocket: (Enhancement)
 
