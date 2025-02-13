@@ -3,8 +3,7 @@
   "compilerOptions": {
     "lib": [
       "es2017",
-      "dom",
-      "dom.iterable"
+      "dom"
     ],
     "outDir": "build/esnext",
     "rootDir": "src",
