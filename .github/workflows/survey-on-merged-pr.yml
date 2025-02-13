@@ -35,6 +35,7 @@ jobs:
       - name: Add comment to PR if author is not a member
         if: env.MEMBER_FOUND == 'false'
         run: |
-          gh pr comment ${PR_NUM} --repo open-telemetry/opentelemetry.io --body "Thank you for your contribution @${USERNAME}! 🎉 We would like to hear from you about your experience contributing to OpenTelemetry by taking a few minutes to fill out this [survey](${SURVEY_URL})."
+          USERNAME=$(jq -r '.pull_request.user.login' "$GITHUB_EVENT_PATH")
+          gh pr comment ${PR_NUM} --repo open-telemetry/opentelemetry-js --body "Thank you for your contribution @${USERNAME}! 🎉 We would like to hear from you about your experience contributing to OpenTelemetry by taking a few minutes to fill out this [survey](${SURVEY_URL})."
         env:
           GH_TOKEN: ${{ secrets.OPENTELEMETRYBOT_GITHUB_TOKEN }}
