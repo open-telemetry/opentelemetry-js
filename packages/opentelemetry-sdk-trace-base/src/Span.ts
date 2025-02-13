@@ -63,6 +63,10 @@ export class Span implements APISpan, ReadableSpan {
   // purposes but are not intended to be written-to directly.
   private readonly _spanContext: SpanContext;
   readonly kind: SpanKind;
+  /**
+   * @deprecated
+   * Please use {@link parentSpanContext}'s spanId instead.
+   */
   readonly parentSpanId?: string;
   readonly parentSpanContext?: SpanContext;
   readonly attributes: SpanAttributes = {};

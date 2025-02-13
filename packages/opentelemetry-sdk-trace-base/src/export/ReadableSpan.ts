@@ -30,6 +30,10 @@ export interface ReadableSpan {
   readonly name: string;
   readonly kind: SpanKind;
   readonly spanContext: () => SpanContext;
+  /**
+   * @deprecated
+   * Use {@link parentSpanContext}'s spanId instead.
+   */
   readonly parentSpanId?: string;
   readonly parentSpanContext?: SpanContext;
   readonly startTime: HrTime;
