@@ -11,7 +11,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
-* fix(exporter-logs/trace-otlp-grpc): fix error for missing dependency otlp-exporter-base [#](https://github.com/open-telemetry/opentelemetry-js/pull/) @JamieDanielson
+* fix(exporter-logs/trace-otlp-grpc): fix error for missing dependency otlp-exporter-base [#5470](https://github.com/open-telemetry/opentelemetry-js/pull/5470) @JamieDanielson
 
 ### :books: (Refine Doc)
 
