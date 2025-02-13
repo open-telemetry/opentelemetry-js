@@ -15,20 +15,27 @@
  */
 
 import * as assert from 'assert';
-import { hexToBase64 } from '../../src/platform';
+import { Deferred } from '../../../src/utils/promise';
+import { assertRejects } from '../../test-utils';
 
-describe('hexToBase64', () => {
-  it('convert hex to base64', () => {
-    const id1 = '7deb739e02e44ef2';
-    const id2 = '12abc034d567e89ff26e608c8cf42c80';
-    const id3 = id2.toUpperCase();
-    assert.strictEqual(hexToBase64(id1), 'fetzngLkTvI=');
-    assert.strictEqual(hexToBase64(id2), 'EqvANNVn6J/ybmCMjPQsgA==');
-    assert.strictEqual(hexToBase64(id3), 'EqvANNVn6J/ybmCMjPQsgA==');
-    // Don't use the preallocated path
-    assert.strictEqual(
-      hexToBase64(id2.repeat(2)),
-      'EqvANNVn6J/ybmCMjPQsgBKrwDTVZ+if8m5gjIz0LIA='
-    );
+describe('promise', () => {
+  describe('Deferred', () => {
+    it('should resolve', async () => {
+      const deferred = new Deferred();
+      deferred.resolve(1);
+      deferred.resolve(2);
+      deferred.reject(new Error('foo'));
+
+      const ret = await deferred.promise;
+      assert.strictEqual(ret, 1);
+    });
+
+    it('should reject', async () => {
+      const deferred = new Deferred();
+      deferred.reject(new Error('foo'));
+      deferred.reject(new Error('bar'));
+
+      await assertRejects(deferred.promise, /foo/);
+    });
   });
 });

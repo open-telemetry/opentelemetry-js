@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-import { ShimWrapped } from '../common/types';
+import * as assert from 'assert';
+import { getEnv } from '../../src/platform/browser/environment';
 
-/**
- * Checks if certain function has been already wrapped
- * @param func
- */
-export function isWrapped(func: unknown): func is ShimWrapped {
-  return (
-    typeof func === 'function' &&
-    typeof (func as ShimWrapped).__original === 'function' &&
-    typeof (func as ShimWrapped).__unwrap === 'function' &&
-    (func as ShimWrapped).__wrapped === true
-  );
-}
+describe('getEnv', () => {
+  it('get environments variables in a browser', () => {
+    const env = getEnv();
+    assert.strictEqual(typeof env, 'object');
+  });
+});

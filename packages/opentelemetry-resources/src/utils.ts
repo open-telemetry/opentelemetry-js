@@ -18,7 +18,7 @@ export const isPromiseLike = <R>(val: unknown): val is PromiseLike<R> => {
   return (
     val !== null &&
     typeof val === 'object' &&
-    typeof (val as PromiseLike<R>).then === 'function'
+    typeof (val as Partial<PromiseLike<R>>).then === 'function'
   );
 };
 

@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { hexToBinary } from '../../common/hex-to-binary';
+const testsContext = require.context('../browser', true, /test$/);
+testsContext.keys().forEach(testsContext);
 
-export function hexToBase64(hexStr: string): string {
-  return Buffer.from(hexToBinary(hexStr)).toString('base64');
-}
+const testsContextCommon = require.context('../common', true, /test$/);
+testsContextCommon.keys().forEach(testsContextCommon);
+
+const srcContext = require.context('.', true, /src$/);
+srcContext.keys().forEach(srcContext);
