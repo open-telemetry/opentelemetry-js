@@ -28,7 +28,7 @@ import {
   W3CTraceContextPropagator,
   merge,
 } from '@opentelemetry/core';
-import { DEFAULT_RESOURCE, Resource } from '@opentelemetry/resources';
+import { defaultResource, Resource } from '@opentelemetry/resources';
 import { SpanProcessor } from './SpanProcessor';
 import { Tracer } from './Tracer';
 import { loadDefaultConfig } from './config';
@@ -62,7 +62,7 @@ export class BasicTracerProvider implements TracerProvider {
       loadDefaultConfig(),
       reconfigureLimits(config)
     );
-    this._resource = mergedConfig.resource ?? DEFAULT_RESOURCE;
+    this._resource = mergedConfig.resource ?? defaultResource();
 
     this._config = Object.assign({}, mergedConfig, {
       resource: this._resource,
