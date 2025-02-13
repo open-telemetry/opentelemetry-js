@@ -51,7 +51,6 @@ const parentSpanContext: api.SpanContext = {
   spanId: '5c1c63257de34c67',
   traceFlags: api.TraceFlags.SAMPLED,
 };
-// const parentId = '5c1c63257de34c67';
 const spanContext: api.SpanContext = {
   traceId: 'd4cda95b652f4a1592b449d5929fda1b',
   spanId: '6e0c63257de34c92',
@@ -139,6 +138,42 @@ describe('transform', () => {
         },
         timestamp: hrTimeToMicroseconds(span.startTime),
         traceId: span.spanContext().traceId,
+      });
+      it("should skip parentSpanId if doesn't exist", () => {
+        const span = getSpan({
+          parentSpanContext: undefined
+        });
+  
+        const zipkinSpan = toZipkinSpan(
+          span,
+          'my-service',
+          defaultStatusCodeTagName,
+          defaultStatusErrorTagName
+        );
+        assert.deepStrictEqual(zipkinSpan, {
+          kind: 'SERVER',
+          annotations: undefined,
+          duration: Math.round(
+            hrTimeToMicroseconds(hrTimeDuration(span.startTime, span.endTime))
+          ),
+          id: span.spanContext().spanId,
+          localEndpoint: {
+            serviceName: 'my-service',
+          },
+          name: span.name,
+          parentId: undefined,
+          tags: {
+            [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
+            cost: '112.12',
+            service: 'ui',
+            version: '1',
+            'telemetry.sdk.language': 'nodejs',
+            'telemetry.sdk.name': 'opentelemetry',
+            'telemetry.sdk.version': VERSION,
+          },
+          timestamp: hrTimeToMicroseconds(span.startTime),
+          traceId: span.spanContext().traceId,
+        });
       });
     });
     // SpanKind mapping tests

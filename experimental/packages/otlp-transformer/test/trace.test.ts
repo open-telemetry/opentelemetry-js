@@ -246,7 +246,6 @@ describe('Trace', () => {
         isRemote: false,
         traceState: new TraceState('span=bar'),
       }),
-      // parentSpanId: '0000000000000001',
       parentSpanContext: {
         spanId: '0000000000000001',
         traceId: '00000000000000000000000000000001',
