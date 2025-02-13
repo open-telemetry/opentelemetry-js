@@ -29,23 +29,19 @@ export function mockHrTime() {
   sinon.useFakeTimers(mockedHrTimeMs);
 }
 
-export const serviceName = defaultResource().attributes[
-  SEMRESATTRS_SERVICE_NAME
-]?.toString()
+export const serviceName = defaultResource()
+  .attributes[SEMRESATTRS_SERVICE_NAME]?.toString()
   .replace(/\\/g, '\\\\')
   .replace(/\n/g, '\\n');
-export const sdkLanguage = defaultResource().attributes[
-  SEMRESATTRS_TELEMETRY_SDK_LANGUAGE
-]?.toString()
+export const sdkLanguage = defaultResource()
+  .attributes[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE]?.toString()
   .replace(/\\/g, '\\\\')
   .replace(/\n/g, '\\n');
-export const sdkName = defaultResource().attributes[
-  SEMRESATTRS_TELEMETRY_SDK_NAME
-]?.toString()
+export const sdkName = defaultResource()
+  .attributes[SEMRESATTRS_TELEMETRY_SDK_NAME]?.toString()
   .replace(/\\/g, '\\\\')
   .replace(/\n/g, '\\n');
-export const sdkVersion = defaultResource().attributes[
-  SEMRESATTRS_TELEMETRY_SDK_VERSION
-]?.toString()
+export const sdkVersion = defaultResource()
+  .attributes[SEMRESATTRS_TELEMETRY_SDK_VERSION]?.toString()
   .replace(/\\/g, '\\\\')
   .replace(/\n/g, '\\n');
