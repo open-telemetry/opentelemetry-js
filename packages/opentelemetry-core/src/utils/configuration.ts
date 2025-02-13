@@ -30,7 +30,7 @@ const logLevelMap: { [key: string]: DiagLogLevel } = {
  * Convert a string to a {@link DiagLogLevel}, defaults to {@link DiagLogLevel} if the log level does not exist or undefined if the input is undefined.
  * @param value
  */
-export function stringToLogLevel(
+export function diagLogLevelFromString(
   value: string | undefined
 ): DiagLogLevel | undefined {
   if (value == null) {

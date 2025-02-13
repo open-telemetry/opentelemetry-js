@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { stringToLogLevel } from '../../../src';
+import { diagLogLevelFromString } from '../../../src';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag, DiagLogLevel } from '@opentelemetry/api';
@@ -24,31 +24,31 @@ describe('stringToLogLevel', function () {
   });
 
   it('should map valid string to log level', function () {
-    assert.strictEqual(stringToLogLevel('ALL'), DiagLogLevel.ALL);
-    assert.strictEqual(stringToLogLevel('VERBOSE'), DiagLogLevel.VERBOSE);
-    assert.strictEqual(stringToLogLevel('DEBUG'), DiagLogLevel.DEBUG);
-    assert.strictEqual(stringToLogLevel('INFO'), DiagLogLevel.INFO);
-    assert.strictEqual(stringToLogLevel('WARN'), DiagLogLevel.WARN);
-    assert.strictEqual(stringToLogLevel('ERROR'), DiagLogLevel.ERROR);
-    assert.strictEqual(stringToLogLevel('NONE'), DiagLogLevel.NONE);
+    assert.strictEqual(diagLogLevelFromString('ALL'), DiagLogLevel.ALL);
+    assert.strictEqual(diagLogLevelFromString('VERBOSE'), DiagLogLevel.VERBOSE);
+    assert.strictEqual(diagLogLevelFromString('DEBUG'), DiagLogLevel.DEBUG);
+    assert.strictEqual(diagLogLevelFromString('INFO'), DiagLogLevel.INFO);
+    assert.strictEqual(diagLogLevelFromString('WARN'), DiagLogLevel.WARN);
+    assert.strictEqual(diagLogLevelFromString('ERROR'), DiagLogLevel.ERROR);
+    assert.strictEqual(diagLogLevelFromString('NONE'), DiagLogLevel.NONE);
   });
 
   it('should ignore casing when resolving', function () {
-    assert.strictEqual(stringToLogLevel('error'), DiagLogLevel.ERROR);
-    assert.strictEqual(stringToLogLevel('eRRoR'), DiagLogLevel.ERROR);
+    assert.strictEqual(diagLogLevelFromString('error'), DiagLogLevel.ERROR);
+    assert.strictEqual(diagLogLevelFromString('eRRoR'), DiagLogLevel.ERROR);
   });
 
   it('should return undefined on undefined input', function () {
-    assert.strictEqual(stringToLogLevel(undefined), undefined);
+    assert.strictEqual(diagLogLevelFromString(undefined), undefined);
   });
 
   it('should return undefined on null input', function () {
-    assert.strictEqual(stringToLogLevel(undefined), undefined);
+    assert.strictEqual(diagLogLevelFromString(undefined), undefined);
   });
 
   it('should fall back to INFO and warn on input that cannot be mapped', function () {
     const warnStub = sinon.stub(diag, 'warn');
-    assert.strictEqual(stringToLogLevel('does not exist'), DiagLogLevel.INFO);
+    assert.strictEqual(diagLogLevelFromString('does not exist'), DiagLogLevel.INFO);
     sinon.assert.calledOnceWithMatch(warnStub, 'Unknown');
   });
 });

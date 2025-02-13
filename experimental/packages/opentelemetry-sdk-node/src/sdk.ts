@@ -72,7 +72,7 @@ import { NodeSDKConfiguration } from './types';
 import {
   getBooleanFromEnv,
   getStringFromEnv,
-  stringToLogLevel,
+  diagLogLevelFromString,
 } from '@opentelemetry/core';
 import {
   getResourceDetectorsFromEnv,
@@ -239,7 +239,7 @@ export class NodeSDK {
     const logLevel = getStringFromEnv('OTEL_LOG_LEVEL');
     if (logLevel != null) {
       diag.setLogger(new DiagConsoleLogger(), {
-        logLevel: stringToLogLevel(logLevel),
+        logLevel: diagLogLevelFromString(logLevel),
       });
     }
 
