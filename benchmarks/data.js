@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1739440664165,
+  "lastUpdate": 1739443400321,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -27096,6 +27096,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.34%",
             "unit": "ops/sec",
             "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "patricklafrance@users.noreply.github.com",
+            "name": "Patrick Lafrance",
+            "username": "patricklafrance"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7438735af762d55edcbdc845768ef36b304049bb",
+          "message": "feat(opentelemetry-instrumentation-fetch): added a requestHook option (#5380)\n\nSigned-off-by: patricklafrance <pa.lafrance@gmail.com>",
+          "timestamp": "2025-02-13T09:31:47Z",
+          "tree_id": "70c20a765e317f81976d3463412588cb50bc8c1d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/7438735af762d55edcbdc845768ef36b304049bb"
+        },
+        "date": 1739443399352,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1461809,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 16651,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 833221,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 770777,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
