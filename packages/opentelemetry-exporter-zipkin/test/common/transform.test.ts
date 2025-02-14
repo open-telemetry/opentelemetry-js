@@ -44,7 +44,7 @@ const resource = {
     'telemetry.sdk.language': 'nodejs',
     'telemetry.sdk.name': 'opentelemetry',
     'telemetry.sdk.version': VERSION,
-  }
+  },
 } as unknown as Resource;
 const parentSpanContext: api.SpanContext = {
   traceId: '',
