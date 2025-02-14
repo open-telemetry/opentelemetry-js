@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { ValueType } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 import {
   AggregationTemporality,
   DataPointType,
@@ -302,10 +302,8 @@ describe('Metrics', () => {
   }
 
   function createResourceMetrics(metricData: MetricData[]): ResourceMetrics {
-    const resource = new Resource({
-      attributes: {
-        'resource-attribute': 'resource attribute value',
-      },
+    const resource = resourceFromAttributes({
+      'resource-attribute': 'resource attribute value',
     });
     return {
       resource: resource,

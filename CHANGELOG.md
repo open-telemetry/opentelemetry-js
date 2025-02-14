@@ -80,6 +80,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * chore!: Raise the minimum supported Node.js version to `^18.19.0 || >=20.6.0`. Support for Node.js 14, 16, and early minor versions of 18 and 20 have been dropped. This applies to all packages except the 'api' and 'semantic-conventions' packages. [#5395](https://github.com/open-telemetry/opentelemetry-js/issues/5395) @trentm
 * feat(core)!: remove TracesSamplerValues from exports [#5406](https://github.com/open-telemetry/opentelemetry-js/pull/5406) @pichlermarc
   * (user-facing): TracesSamplerValues was only consumed internally and has been removed from exports without replacement
+* chore(resources)!: Remove deprecated duplicate browser detector from `@opentelemetry/resource` in favor of `@opentelemetry/opentelemetry-browser-detector` [#5420](https://github.com/open-telemetry/opentelemetry-js/pull/5420)
 * feat(core)!: remove unused and obsolete functions and types [#5444](https://github.com/open-telemetry/opentelemetry-js/pull/5444) @pichlermarc
   * (user-facing): `VERSION` was an internal constant that was unintentionally exported. It has been removed without replacement.
   * (user-facing): `isWrapped` has been removed in favor of `isWrapped` from `@opentelemetry/instrumentation`
@@ -92,7 +93,16 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * (user-facing): `baggageUtils.parsePairKeyValue` was an internal utility function that was unintentionally exported. It has been removed without replacement.
   * (user-facing): `TimeOriginLegacy` has been removed without replacement.
   * (user-facing): `isAttributeKey` was an internal utility function that was unintentionally exported. It has been removed without replacement.
-* feat!: set compilation target to ES2022 for all packages except `@opentelemetry/api` and `@opentelemetry/semantic-conventions` [#5456](https://github.com/open-telemetry/opentelemetry-js/pull/5456)
+* feat(resource)!: Remove resource class export in favor of functions and types only to aid in cross-version compatibility [#5421](https://github.com/open-telemetry/opentelemetry-js/pull/5421)
+  * Renames `Resource` class to `ResourceImpl` and makes it package-private
+  * Renames `IResource` interface to `Resource`
+  * Export function `resourceFromAttributes` to create a `Resource` from a `DetectedAttributes` object
+  * Only export types and functions. This aids in cross-version compatibility and makes it more easily extensible in the future.
+* feat(resources)!: do not read environment variables from window in browsers [#5466](https://github.com/open-telemetry/opentelemetry-js/pull/5466) @pichlermarc
+  * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore
+    * If you have been using the `envDetector` in browser environments, please migrate to manually creating a resource.
+    * Note: Node.js environment variable configuration continues to work as-is.
+* feat!: set compilation target to ES2022 for all packages except `@opentelemetry/api` and `@opentelemetry/semantic-conventions` [#5456](https://github.com/open-telemetry/opentelemetry-js/pull/5456) @david-luna
   * (user-facing): drops browser runtimes which do not support ES2022 features
 
 ### :rocket: (Enhancement)
@@ -101,6 +111,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * `WebTracerProvider` constructor now does not throw anymore when `contextManager` or `propagator` are passed as extra options to the constructor
 * feat(sdk-trace-base): add stack trace warning to debug instrumentation [#5363](https://github.com/open-telemetry/opentelemetry-js/pull/5363) @neilfordyce
 * feat(core): add more scalable replacements for getEnv(), getEnvWithoutDefaults() [#5443](https://github.com/open-telemetry/opentelemetry-js/pull/5443) @pichlermarc
+* refactor(exporter-jaeger): migrate away from getEnv() [#5464](https://github.com/open-telemetry/opentelemetry-js/pull/5464) @pichlermarc
 
 ### :bug: (Bug Fix)
 

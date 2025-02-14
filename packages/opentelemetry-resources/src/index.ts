@@ -17,16 +17,19 @@
 export { ResourceDetectionConfig } from './config';
 export { detectResources } from './detect-resources';
 export {
-  browserDetector,
   envDetector,
   hostDetector,
   osDetector,
   processDetector,
   serviceInstanceIdDetector,
 } from './detectors';
-export { IResource } from './IResource';
-export { defaultServiceName } from './platform';
 export { Resource } from './Resource';
+export {
+  resourceFromAttributes,
+  DEFAULT_RESOURCE,
+  EMPTY_RESOURCE,
+} from './ResourceImpl';
+export { defaultServiceName } from './platform';
 export {
   ResourceDetector,
   DetectedResource,

@@ -29,7 +29,6 @@ import {
   AlwaysOnSampler,
   Span,
 } from '@opentelemetry/sdk-trace-base';
-import { Resource } from '@opentelemetry/resources';
 import { SEMRESATTRS_TELEMETRY_SDK_LANGUAGE } from '@opentelemetry/semantic-conventions';
 
 import { NodeTracerProvider } from '../src/NodeTracerProvider';
@@ -138,7 +137,7 @@ describe('NodeTracerProvider', () => {
       provider = new NodeTracerProvider();
       const span = provider.getTracer('default').startSpan('my-span') as Span;
       assert.ok(span);
-      assert.ok(span.resource instanceof Resource);
+      assert.ok(span.resource);
       assert.equal(
         span.resource.attributes[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
         'nodejs'
