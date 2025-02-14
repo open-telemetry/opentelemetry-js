@@ -3,8 +3,7 @@ module.exports = {
     "@typescript-eslint",
     "header",
     "node",
-    "prettier",
-    "es-x"
+    "prettier"
   ],
   extends: ["eslint:recommended", "plugin:prettier/recommended"],
   parser: "@typescript-eslint/parser",
@@ -58,7 +57,6 @@ module.exports = {
         "@typescript-eslint/no-shadow": ["warn"],
         "no-restricted-syntax": ["error", "ExportAllDeclaration"],
         "prefer-rest-params": "off",
-        "es-x/no-top-level-await": "error",
       }
     },
     {
