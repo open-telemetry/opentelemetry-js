@@ -21,7 +21,7 @@ import {
   hrTimeToMicroseconds,
   millisToHrTime,
 } from '@opentelemetry/core';
-import { IResource } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
@@ -44,8 +44,8 @@ const resource = {
     'telemetry.sdk.language': 'nodejs',
     'telemetry.sdk.name': 'opentelemetry',
     'telemetry.sdk.version': VERSION,
-  },
-} as unknown as IResource;
+  }
+} as unknown as Resource;
 const parentSpanContext: api.SpanContext = {
   traceId: '',
   spanId: '5c1c63257de34c67',

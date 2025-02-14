@@ -15,7 +15,7 @@
  */
 import { HrTime, TraceFlags } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
@@ -166,15 +166,11 @@ describe('Logs', () => {
   let log_2_1_1: ReadableLogRecord;
 
   beforeEach(() => {
-    resource_1 = new Resource({
-      attributes: {
-        'resource-attribute': 'some attribute value',
-      },
+    resource_1 = resourceFromAttributes({
+      'resource-attribute': 'some attribute value',
     });
-    resource_2 = new Resource({
-      attributes: {
-        'resource-attribute': 'another attribute value',
-      },
+    resource_2 = resourceFromAttributes({
+      'resource-attribute': 'another attribute value',
     });
     scope_1 = {
       name: 'scope_name_1',
