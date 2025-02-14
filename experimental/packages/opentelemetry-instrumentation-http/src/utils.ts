@@ -78,6 +78,7 @@ import {
   ParsedRequestOptions,
   SemconvStability,
 } from './internal-types';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 import forwardedParse = require('forwarded-parse');
 
 /**
@@ -376,7 +377,7 @@ export const getRequestInfo = (
       try {
         const parsedUrl = new URL(optionsParsed.path, origin);
         pathname = parsedUrl.pathname || '/';
-      } catch (e) {
+      } catch {
         pathname = '/';
       }
     }

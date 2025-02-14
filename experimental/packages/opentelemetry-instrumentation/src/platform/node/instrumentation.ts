@@ -167,7 +167,7 @@ export abstract class InstrumentationBase<
       });
       const version = JSON.parse(json).version;
       return typeof version === 'string' ? version : undefined;
-    } catch (error) {
+    } catch {
       diag.warn('Failed extracting version', baseDir);
     }
 

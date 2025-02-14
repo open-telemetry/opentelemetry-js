@@ -115,7 +115,7 @@ describe('Resource', () => {
       }),
     });
 
-    resource.attributes;
+    assert.ok(resource.attributes);
 
     assert.ok(
       debugStub.calledWithMatch(
