@@ -93,6 +93,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * (user-facing): `baggageUtils.parsePairKeyValue` was an internal utility function that was unintentionally exported. It has been removed without replacement.
   * (user-facing): `TimeOriginLegacy` has been removed without replacement.
   * (user-facing): `isAttributeKey` was an internal utility function that was unintentionally exported. It has been removed without replacement.
+* feat(exporter-zipkin)!: do not read environment variables from window in browsers [#5465](https://github.com/open-telemetry/opentelemetry-js/pull/5465) @pichlermarc
+  * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore, please pass configuration options to constructors instead.
 * feat(resource)!: Remove resource class export in favor of functions and types only to aid in cross-version compatibility [#5421](https://github.com/open-telemetry/opentelemetry-js/pull/5421)
   * Renames `Resource` class to `ResourceImpl` and makes it package-private
   * Renames `IResource` interface to `Resource`
