@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1739789119869,
+  "lastUpdate": 1739789731417,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -27564,6 +27564,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.86%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "52d033171a3864a3b3ed22251951f26087b4a38b",
+          "message": "refactor(instrumentation-http): migrate away from getEnv() (#5469)",
+          "timestamp": "2025-02-17T10:10:38Z",
+          "tree_id": "cdc2ccf6de3134c55f0e8a55433f0f4a4ca4b9d4",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/52d033171a3864a3b3ed22251951f26087b4a38b"
+        },
+        "date": 1739789730554,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1516043,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 16833,
+            "range": "±0.31%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 838204,
+            "range": "±0.65%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 792253,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
