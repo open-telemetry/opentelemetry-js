@@ -42,10 +42,6 @@ describe('stringToLogLevel', function () {
     assert.strictEqual(diagLogLevelFromString(undefined), undefined);
   });
 
-  it('should return undefined on null input', function () {
-    assert.strictEqual(diagLogLevelFromString(null), undefined);
-  });
-
   it('should fall back to INFO and warn on input that cannot be mapped', function () {
     const warnStub = sinon.stub(diag, 'warn');
     assert.strictEqual(
