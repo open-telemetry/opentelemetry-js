@@ -69,7 +69,11 @@ import {
 } from '@opentelemetry/sdk-trace-node';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
-import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
+import {
+  getBooleanFromEnv,
+  getStringFromEnv,
+  diagLogLevelFromString,
+} from '@opentelemetry/core';
 import {
   getResourceDetectorsFromEnv,
   getSpanProcessorsFromEnv,
@@ -226,20 +230,16 @@ export class NodeSDK {
    * Create a new NodeJS SDK instance
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
-    const env = getEnv();
-    const envWithoutDefaults = getEnvWithoutDefaults();
-
-    if (env.OTEL_SDK_DISABLED) {
+    if (getBooleanFromEnv('OTEL_SDK_DISABLED')) {
       this._disabled = true;
       // Functions with possible side-effects are set
       // to no-op via the _disabled flag
     }
 
-    // Default is INFO, use environment without defaults to check
-    // if the user originally set the environment variable.
-    if (envWithoutDefaults.OTEL_LOG_LEVEL) {
+    const logLevel = getStringFromEnv('OTEL_LOG_LEVEL');
+    if (logLevel != null) {
       diag.setLogger(new DiagConsoleLogger(), {
-        logLevel: envWithoutDefaults.OTEL_LOG_LEVEL,
+        logLevel: diagLogLevelFromString(logLevel),
       });
     }
 
