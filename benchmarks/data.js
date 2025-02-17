@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1739789931476,
+  "lastUpdate": 1739792017485,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -27718,6 +27718,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 795625,
             "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e4381fcb18c494a83512e41066f02e3e1b0f365e",
+          "message": "feat(sdk-trace-base)!: do not read environment variables from window (#5455)\n\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2025-02-17T11:19:51Z",
+          "tree_id": "a6b7c5a049e916477e81c53aac885411740da5dd",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/e4381fcb18c494a83512e41066f02e3e1b0f365e"
+        },
+        "date": 1739792016633,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1505394,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 16798,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 853813,
+            "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 797258,
+            "range": "±0.35%",
             "unit": "ops/sec",
             "extra": "98 samples"
           }
