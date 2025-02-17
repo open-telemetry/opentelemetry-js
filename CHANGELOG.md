@@ -93,6 +93,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * (user-facing): `baggageUtils.parsePairKeyValue` was an internal utility function that was unintentionally exported. It has been removed without replacement.
   * (user-facing): `TimeOriginLegacy` has been removed without replacement.
   * (user-facing): `isAttributeKey` was an internal utility function that was unintentionally exported. It has been removed without replacement.
+* feat(exporter-zipkin)!: do not read environment variables from window in browsers [#5465](https://github.com/open-telemetry/opentelemetry-js/pull/5465) @pichlermarc
+  * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore, please pass configuration options to constructors instead.
 * feat(resource)!: Remove resource class export in favor of functions and types only to aid in cross-version compatibility [#5421](https://github.com/open-telemetry/opentelemetry-js/pull/5421)
   * Renames `Resource` class to `ResourceImpl` and makes it package-private
   * Renames `IResource` interface to `Resource`
@@ -100,6 +102,10 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * Export function `defaultResource` to create a default resource [#5467](https://github.com/open-telemetry/opentelemetry-js/pull/5467) @pichlermarc
   * Export function `emptyResource` to create an empty resource [#5467](https://github.com/open-telemetry/opentelemetry-js/pull/5467) @pichlermarc
   * Only export types and functions. This aids in cross-version compatibility and makes it more easily extensible in the future.
+* feat(resources)!: do not read environment variables from window in browsers [#5466](https://github.com/open-telemetry/opentelemetry-js/pull/5466) @pichlermarc
+  * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore
+    * If you have been using the `envDetector` in browser environments, please migrate to manually creating a resource.
+    * Note: Node.js environment variable configuration continues to work as-is.
 
 ### :rocket: (Enhancement)
 
@@ -108,6 +114,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * feat(sdk-trace-base): add stack trace warning to debug instrumentation [#5363](https://github.com/open-telemetry/opentelemetry-js/pull/5363) @neilfordyce
 * feat(core): add more scalable replacements for getEnv(), getEnvWithoutDefaults() [#5443](https://github.com/open-telemetry/opentelemetry-js/pull/5443) @pichlermarc
 * refactor(exporter-jaeger): migrate away from getEnv() [#5464](https://github.com/open-telemetry/opentelemetry-js/pull/5464) @pichlermarc
+* feat(core): add `diagLogLevelFromString` utility [#5475](https://github.com/open-telemetry/opentelemetry-js/pull/5475) @pichlermarc
 
 ### :bug: (Bug Fix)
 
