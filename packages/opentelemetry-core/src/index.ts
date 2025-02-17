@@ -88,6 +88,7 @@ export { merge } from './utils/merge';
 export { TimeoutError, callWithTimeout } from './utils/timeout';
 export { isUrlIgnored, urlMatches } from './utils/url';
 export { BindOnceFuture } from './utils/callback';
+export { diagLogLevelFromString } from './utils/configuration';
 import { _export } from './internal/exporter';
 export const internal = {
   _export,

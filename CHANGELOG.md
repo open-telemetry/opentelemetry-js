@@ -98,6 +98,10 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * Renames `IResource` interface to `Resource`
   * Export function `resourceFromAttributes` to create a `Resource` from a `DetectedAttributes` object
   * Only export types and functions. This aids in cross-version compatibility and makes it more easily extensible in the future.
+* feat(resources)!: do not read environment variables from window in browsers [#5466](https://github.com/open-telemetry/opentelemetry-js/pull/5466) @pichlermarc
+  * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore
+    * If you have been using the `envDetector` in browser environments, please migrate to manually creating a resource.
+    * Note: Node.js environment variable configuration continues to work as-is.
 
 ### :rocket: (Enhancement)
 
@@ -105,6 +109,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * `WebTracerProvider` constructor now does not throw anymore when `contextManager` or `propagator` are passed as extra options to the constructor
 * feat(sdk-trace-base): add stack trace warning to debug instrumentation [#5363](https://github.com/open-telemetry/opentelemetry-js/pull/5363) @neilfordyce
 * feat(core): add more scalable replacements for getEnv(), getEnvWithoutDefaults() [#5443](https://github.com/open-telemetry/opentelemetry-js/pull/5443) @pichlermarc
+* refactor(exporter-jaeger): migrate away from getEnv() [#5464](https://github.com/open-telemetry/opentelemetry-js/pull/5464) @pichlermarc
+* feat(core): add `diagLogLevelFromString` utility [#5475](https://github.com/open-telemetry/opentelemetry-js/pull/5475) @pichlermarc
 
 ### :bug: (Bug Fix)
 
