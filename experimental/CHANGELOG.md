@@ -44,6 +44,7 @@ All notable changes to experimental packages in this project will be documented 
 * refactor(exporter-prometheus): remove unnecessary isNaN() check [#5377](https://github.com/open-telemetry/opentelemetry-js/pull/5377) @cjihrig
 * refactor(sdk-node): move code to auto-instantiate propagators into utils [#5355](https://github.com/open-telemetry/opentelemetry-js/pull/5355) @pichlermarc
 * chore: unpin `@opentelemetry/semantic-conventions` dep to allow better de-duplication in installs [#5439](https://github.com/open-telemetry/opentelemetry-js/pull/5439) @trentm
+* refactor(instrumentation-http): migrate away from getEnv() [#5469](https://github.com/open-telemetry/opentelemetry-js/pull/5469) @pichlermarc
 * refactor(sdk-node): migrate away from getEnv() [#5475](https://github.com/open-telemetry/opentelemetry-js/pull/5475) @pichlermarc
 
 ## 0.57.0
