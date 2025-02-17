@@ -16,7 +16,7 @@
 import * as root from '../src/generated/root';
 import { SpanKind, SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import { TraceState } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { toBase64 } from './utils';
@@ -232,10 +232,8 @@ describe('Trace', () => {
   let span: ReadableSpan;
 
   beforeEach(() => {
-    resource = new Resource({
-      attributes: {
-        'resource-attribute': 'resource attribute value',
-      },
+    resource = resourceFromAttributes({
+      'resource-attribute': 'resource attribute value',
     });
     span = {
       spanContext: () => ({
