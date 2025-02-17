@@ -43,7 +43,7 @@ describe('stringToLogLevel', function () {
   });
 
   it('should return undefined on null input', function () {
-    assert.strictEqual(diagLogLevelFromString(undefined), undefined);
+    assert.strictEqual(diagLogLevelFromString(null), undefined);
   });
 
   it('should fall back to INFO and warn on input that cannot be mapped', function () {
