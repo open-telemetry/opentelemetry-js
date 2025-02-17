@@ -17,7 +17,7 @@
 import type { ContextManager } from '@opentelemetry/api';
 import { TextMapPropagator } from '@opentelemetry/api';
 import { Instrumentation } from '@opentelemetry/instrumentation';
-import { IResource, ResourceDetector } from '@opentelemetry/resources';
+import { Resource, ResourceDetector } from '@opentelemetry/resources';
 import { LogRecordProcessor } from '@opentelemetry/sdk-logs';
 import { IMetricReader, ViewOptions } from '@opentelemetry/sdk-metrics';
 import {
@@ -38,7 +38,7 @@ export interface NodeSDKConfiguration {
   metricReader: IMetricReader;
   views: ViewOptions[];
   instrumentations: (Instrumentation | Instrumentation[])[];
-  resource: IResource;
+  resource: Resource;
   resourceDetectors: Array<ResourceDetector>;
   sampler: Sampler;
   serviceName?: string;
