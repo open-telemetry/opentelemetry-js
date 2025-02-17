@@ -96,7 +96,7 @@ export function buildSamplerFromEnv(): Sampler {
       });
     default:
       diag.error(
-        `OTEL_TRACES_SAMPLER value "${sampler} invalid, defaulting to ${FALLBACK_OTEL_TRACES_SAMPLER}".`
+        `OTEL_TRACES_SAMPLER value "${sampler}" invalid, defaulting to "${FALLBACK_OTEL_TRACES_SAMPLER}".`
       );
       return new AlwaysOnSampler();
   }
