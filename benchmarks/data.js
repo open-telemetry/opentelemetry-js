@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1739476039441,
+  "lastUpdate": 1739789018899,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -27460,6 +27460,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.68%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5b988c892d2e0de074b8cfe8165a89977eee3173",
+          "message": "feat: migrate sdk-node away from getEnv(), introduce diagLogLevelFromString() util (#5475)\n\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2025-02-17T09:49:21Z",
+          "tree_id": "639769686ee58340ffff9a666950f98908869e78",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/5b988c892d2e0de074b8cfe8165a89977eee3173"
+        },
+        "date": 1739789017932,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1553633,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 17345,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 843486,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 785672,
+            "range": "±0.35%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
           }
         ]
       }
