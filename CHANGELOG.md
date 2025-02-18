@@ -11,6 +11,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :boom: Breaking Change
 
+* feat(sdk-trace-base)!: Add `parentSpanContext` and remove `parentSpanId` from `Span` and `ReadableSpan` [#5450](https://github.com/open-telemetry/opentelemetry-js/pull/5450) @JacksonWeber
+  * (user-facing): the SDK's `Span`s `parentSpanId` was replaced by `parentSpanContext`, to migrate to the new property, please replace `span.parentSpanId` -> `span.parentSpanContext?.spanId`
 * feat(sdk-metrics)!: drop deprecated `type` field on `MetricDescriptor` [#5291](https://github.com/open-telemetry/opentelemetry-js/pull/5291) @chancancode
 * feat(sdk-metrics)!: drop deprecated `InstrumentDescriptor` type; use `MetricDescriptor` instead [#5277](https://github.com/open-telemetry/opentelemetry-js/pull/5266) @chancancode
 * feat(sdk-metrics)!: bump minimum version of `@opentelemetry/api` peer dependency to 1.9.0 [#5254](https://github.com/open-telemetry/opentelemetry-js/pull/5254) @chancancode
