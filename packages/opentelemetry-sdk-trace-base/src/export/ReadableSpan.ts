@@ -30,7 +30,7 @@ export interface ReadableSpan {
   readonly name: string;
   readonly kind: SpanKind;
   readonly spanContext: () => SpanContext;
-  readonly parentSpanId?: string;
+  readonly parentSpanContext?: SpanContext;
   readonly startTime: HrTime;
   readonly endTime: HrTime;
   readonly status: SpanStatus;
