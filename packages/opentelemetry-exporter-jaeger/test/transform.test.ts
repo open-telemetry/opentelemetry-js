@@ -238,7 +238,11 @@ describe('transform', () => {
           code: api.SpanStatusCode.OK,
         },
         attributes: {},
-        parentSpanId: '3e0c63257de34c92',
+        parentSpanContext: {
+          traceId: 'a4cda95b652f4a1592b449d5929fda1b',
+          spanId: '3e0c63257de34c92',
+          traceFlags: TraceFlags.SAMPLED,
+        },
         links: [
           {
             context: {

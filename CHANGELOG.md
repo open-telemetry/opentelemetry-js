@@ -11,6 +11,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :boom: Breaking Change
 
+* feat(sdk-trace-base)!: Add `parentSpanContext` and remove `parentSpanId` from `Span` and `ReadableSpan` [#5450](https://github.com/open-telemetry/opentelemetry-js/pull/5450) @JacksonWeber
+  * (user-facing): the SDK's `Span`s `parentSpanId` was replaced by `parentSpanContext`, to migrate to the new property, please replace `span.parentSpanId` -> `span.parentSpanContext?.spanId`
 * feat(sdk-metrics)!: drop deprecated `type` field on `MetricDescriptor` [#5291](https://github.com/open-telemetry/opentelemetry-js/pull/5291) @chancancode
 * feat(sdk-metrics)!: drop deprecated `InstrumentDescriptor` type; use `MetricDescriptor` instead [#5277](https://github.com/open-telemetry/opentelemetry-js/pull/5266) @chancancode
 * feat(sdk-metrics)!: bump minimum version of `@opentelemetry/api` peer dependency to 1.9.0 [#5254](https://github.com/open-telemetry/opentelemetry-js/pull/5254) @chancancode
@@ -93,6 +95,12 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * (user-facing): `baggageUtils.parsePairKeyValue` was an internal utility function that was unintentionally exported. It has been removed without replacement.
   * (user-facing): `TimeOriginLegacy` has been removed without replacement.
   * (user-facing): `isAttributeKey` was an internal utility function that was unintentionally exported. It has been removed without replacement.
+* feat(sdk-trace-base)!: do not read environment variables from window in browsers [#5445](https://github.com/open-telemetry/opentelemetry-js/pull/5455) @pichlermarc
+  * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore, please pass configuration options to constructors instead.
+  * Note: Node.js environment variable configuration continues to work as-is.
+* feat(exporter-zipkin)!: do not read environment variables from window in browsers [#5465](https://github.com/open-telemetry/opentelemetry-js/pull/5465) @pichlermarc
+  * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore, please pass configuration options to constructors instead.
+  * Note: Node.js environment variable configuration continues to work as-is.
 * feat(resource)!: Remove resource class export in favor of functions and types only to aid in cross-version compatibility [#5421](https://github.com/open-telemetry/opentelemetry-js/pull/5421)
   * Renames `Resource` class to `ResourceImpl` and makes it package-private
   * Renames `IResource` interface to `Resource`
@@ -112,6 +120,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * feat(sdk-trace-base): add stack trace warning to debug instrumentation [#5363](https://github.com/open-telemetry/opentelemetry-js/pull/5363) @neilfordyce
 * feat(core): add more scalable replacements for getEnv(), getEnvWithoutDefaults() [#5443](https://github.com/open-telemetry/opentelemetry-js/pull/5443) @pichlermarc
 * refactor(exporter-jaeger): migrate away from getEnv() [#5464](https://github.com/open-telemetry/opentelemetry-js/pull/5464) @pichlermarc
+* feat(core): add `diagLogLevelFromString` utility [#5475](https://github.com/open-telemetry/opentelemetry-js/pull/5475) @pichlermarc
 
 ### :bug: (Bug Fix)
 

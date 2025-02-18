@@ -18,7 +18,6 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
   ExportResultCode,
-  getEnv,
   loggingErrorHandler,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
@@ -117,26 +116,11 @@ describe('BatchLogRecordProcessorBase', () => {
     it('should create a BatchLogRecordProcessor instance with empty config', () => {
       const processor = new BatchLogRecordProcessor(exporter);
 
-      const {
-        OTEL_BSP_MAX_EXPORT_BATCH_SIZE,
-        OTEL_BSP_MAX_QUEUE_SIZE,
-        OTEL_BSP_SCHEDULE_DELAY,
-        OTEL_BSP_EXPORT_TIMEOUT,
-      } = getEnv();
       assert.ok(processor instanceof BatchLogRecordProcessor);
-      assert.strictEqual(
-        processor['_maxExportBatchSize'],
-        OTEL_BSP_MAX_EXPORT_BATCH_SIZE
-      );
-      assert.strictEqual(processor['_maxQueueSize'], OTEL_BSP_MAX_QUEUE_SIZE);
-      assert.strictEqual(
-        processor['_scheduledDelayMillis'],
-        OTEL_BSP_SCHEDULE_DELAY
-      );
-      assert.strictEqual(
-        processor['_exportTimeoutMillis'],
-        OTEL_BSP_EXPORT_TIMEOUT
-      );
+      assert.strictEqual(processor['_maxExportBatchSize'], 512);
+      assert.strictEqual(processor['_maxQueueSize'], 2048);
+      assert.strictEqual(processor['_scheduledDelayMillis'], 5000);
+      assert.strictEqual(processor['_exportTimeoutMillis'], 30000);
       processor.shutdown();
     });
 
