@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1739883220931,
+  "lastUpdate": 1739899733393,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -27876,6 +27876,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.46%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "47067795+JacksonWeber@users.noreply.github.com",
+            "name": "Jackson Weber",
+            "username": "JacksonWeber"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "1afa8ba5140186c8b2338c40e185df6f0b7aff12",
+          "message": "feat(sdk-trace-base)!: Add parentSpanContext and remove parentSpanId (#5450)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2025-02-18T17:08:25Z",
+          "tree_id": "848f947a2458189540110147f9c00c1c1daaee9a",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/1afa8ba5140186c8b2338c40e185df6f0b7aff12"
+        },
+        "date": 1739899732541,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1553287,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18343,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 800904,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 776338,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
