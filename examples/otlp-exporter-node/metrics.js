@@ -11,7 +11,7 @@ const {
   PeriodicExportingMetricReader,
   View,
 } = require('@opentelemetry/sdk-metrics');
-const { Resource } = require('@opentelemetry/resources');
+const { resourceFromAttributes } = require('@opentelemetry/resources');
 const {
   SEMRESATTRS_SERVICE_NAME,
 } = require('@opentelemetry/semantic-conventions');
@@ -35,7 +35,7 @@ const expHistogramView = new View({
 
 // Create an instance of the metric provider
 const meterProvider = new MeterProvider({
-  resource: new Resource({
+  resource: resourceFromAttributes({
     [SEMRESATTRS_SERVICE_NAME]: 'basic-metric-service',
   }),
   views: [expHistogramView],
