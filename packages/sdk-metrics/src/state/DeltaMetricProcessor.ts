@@ -93,6 +93,8 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
             attributes = this._overflowAttributes;
             hashCode = this._overflowHashCode;
             if (this._cumulativeMemoStorage.has(attributes, hashCode)) {
+              // has() returned true, previous is present.
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               const previous = this._cumulativeMemoStorage.get(
                 attributes,
                 hashCode
@@ -103,7 +105,7 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
         }
         // Merge with uncollected active delta.
         if (this._activeCollectionStorage.has(attributes, hashCode)) {
-          // has() returned true, previous is present.
+          // has() returned true, active is present.
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const active = this._activeCollectionStorage.get(
             attributes,

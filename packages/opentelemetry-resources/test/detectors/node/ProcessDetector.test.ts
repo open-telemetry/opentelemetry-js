@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as sinon from 'sinon';
-import { processDetector, IResource } from '../../../src';
-import { assertResource } from '../../util/resource-assertions';
-import { describeNode } from '../../util';
 import * as os from 'os';
+import * as sinon from 'sinon';
+import { processDetector } from '../../../src';
+import { describeNode } from '../../util';
+import { assertResource } from '../../util/resource-assertions';
 
 describeNode('processDetector() on Node.js', () => {
   afterEach(() => {
@@ -36,7 +36,7 @@ describeNode('processDetector() on Node.js', () => {
       .stub(os, 'userInfo')
       .returns({ username: 'appOwner' } as os.UserInfo<string>);
 
-    const resource: IResource = await processDetector.detect();
+    const resource = processDetector.detect();
     assertResource(resource, {
       pid: 1234,
       name: 'otProcess',
@@ -61,7 +61,7 @@ describeNode('processDetector() on Node.js', () => {
     sinon.stub(process, 'title').value('');
     sinon.stub(process, 'argv').value([]);
     sinon.stub(process, 'versions').value({ node: '1.4.1' });
-    const resource: IResource = await processDetector.detect();
+    const resource = processDetector.detect();
     // at a minium we should be able to rely on pid runtime, runtime name, and description
     assertResource(resource, {
       pid: 1234,

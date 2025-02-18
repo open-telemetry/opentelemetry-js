@@ -33,7 +33,10 @@ import * as sinon from 'sinon';
 import { Meter } from '../src/Meter';
 import { createAllowListAttributesProcessor } from '../src/view/AttributesProcessor';
 import { AggregationType } from '../src/view/AggregationOption';
-import { Resource } from '@opentelemetry/resources';
+import {
+  DEFAULT_RESOURCE,
+  resourceFromAttributes,
+} from '@opentelemetry/resources';
 
 describe('MeterProvider', () => {
   afterEach(() => {
@@ -43,12 +46,12 @@ describe('MeterProvider', () => {
   describe('constructor', () => {
     it('should construct without exceptions', () => {
       const meterProvider = new MeterProvider();
-      assert(meterProvider instanceof MeterProvider);
+      assert.ok(meterProvider instanceof MeterProvider);
     });
 
     it('construct with resource', () => {
       const meterProvider = new MeterProvider({ resource: defaultResource });
-      assert(meterProvider instanceof MeterProvider);
+      assert.ok(meterProvider instanceof MeterProvider);
     });
 
     it('should use default resource when no resource is passed', async function () {
@@ -65,12 +68,12 @@ describe('MeterProvider', () => {
 
       // Perform collection.
       const { resourceMetrics } = await reader.collect();
-      assert.deepStrictEqual(resourceMetrics.resource, Resource.default());
+      assert.deepStrictEqual(resourceMetrics.resource, DEFAULT_RESOURCE);
     });
 
     it('should use the resource passed in constructor', async function () {
       const reader = new TestMetricReader();
-      const expectedResource = new Resource({ foo: 'bar' });
+      const expectedResource = resourceFromAttributes({ foo: 'bar' });
 
       const meterProvider = new MeterProvider({
         readers: [reader],
@@ -100,7 +103,7 @@ describe('MeterProvider', () => {
 
       // Perform collection.
       const { resourceMetrics } = await reader.collect();
-      assert.deepStrictEqual(resourceMetrics.resource, Resource.default());
+      assert.deepStrictEqual(resourceMetrics.resource, DEFAULT_RESOURCE);
     });
   });
 
@@ -108,7 +111,7 @@ describe('MeterProvider', () => {
     it('should get a meter', () => {
       const meterProvider = new MeterProvider();
       const meter = meterProvider.getMeter('meter1', '1.0.0');
-      assert(meter instanceof Meter);
+      assert.ok(meter instanceof Meter);
     });
 
     it('should get an identical meter on duplicated calls', () => {

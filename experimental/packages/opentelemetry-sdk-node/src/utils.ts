@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
-import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
+import { diag, TextMapPropagator } from '@opentelemetry/api';
+import {
+  CompositePropagator,
+  getStringFromEnv,
+  getStringListFromEnv,
+  W3CTraceContextPropagator,
+} from '@opentelemetry/core';
 import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import {
-  DetectorSync,
-  envDetectorSync,
-  hostDetectorSync,
-  osDetectorSync,
-  processDetectorSync,
-  serviceInstanceIdDetectorSync,
+  envDetector,
+  hostDetector,
+  osDetector,
+  processDetector,
+  ResourceDetector,
+  serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import {
   BatchSpanProcessor,
@@ -35,6 +40,8 @@ import {
   SpanExporter,
   SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
+import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
+import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
@@ -42,14 +49,14 @@ const RESOURCE_DETECTOR_OS = 'os';
 const RESOURCE_DETECTOR_PROCESS = 'process';
 const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
 
-export function getResourceDetectorsFromEnv(): Array<DetectorSync> {
+export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   // When updating this list, make sure to also update the section `resourceDetectors` on README.
-  const resourceDetectors = new Map<string, DetectorSync>([
-    [RESOURCE_DETECTOR_ENVIRONMENT, envDetectorSync],
-    [RESOURCE_DETECTOR_HOST, hostDetectorSync],
-    [RESOURCE_DETECTOR_OS, osDetectorSync],
-    [RESOURCE_DETECTOR_SERVICE_INSTANCE_ID, serviceInstanceIdDetectorSync],
-    [RESOURCE_DETECTOR_PROCESS, processDetectorSync],
+  const resourceDetectors = new Map<string, ResourceDetector>([
+    [RESOURCE_DETECTOR_ENVIRONMENT, envDetector],
+    [RESOURCE_DETECTOR_HOST, hostDetector],
+    [RESOURCE_DETECTOR_OS, osDetector],
+    [RESOURCE_DETECTOR_SERVICE_INSTANCE_ID, serviceInstanceIdDetector],
+    [RESOURCE_DETECTOR_PROCESS, processDetector],
   ]);
 
   const resourceDetectorsFromEnv =
@@ -79,13 +86,10 @@ export function filterBlanksAndNulls(list: string[]): string[] {
 }
 
 export function getOtlpProtocolFromEnv(): string {
-  const parsedEnvValues = getEnvWithoutDefaults();
-
   return (
-    parsedEnvValues.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL ??
-    parsedEnvValues.OTEL_EXPORTER_OTLP_PROTOCOL ??
-    getEnv().OTEL_EXPORTER_OTLP_TRACES_PROTOCOL ??
-    getEnv().OTEL_EXPORTER_OTLP_PROTOCOL
+    getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL') ??
+    getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL') ??
+    'http/protobuf'
   );
 }
 
@@ -132,7 +136,7 @@ export function getSpanProcessorsFromEnv(): SpanProcessor[] {
   const exporters: SpanExporter[] = [];
   const processors: SpanProcessor[] = [];
   let traceExportersList = filterBlanksAndNulls(
-    Array.from(new Set(getEnv().OTEL_TRACES_EXPORTER.split(',')))
+    Array.from(new Set(getStringListFromEnv('OTEL_TRACES_EXPORTER')))
   );
 
   if (traceExportersList[0] === 'none') {
@@ -143,7 +147,7 @@ export function getSpanProcessorsFromEnv(): SpanProcessor[] {
   }
 
   if (traceExportersList.length === 0) {
-    diag.warn('OTEL_TRACES_EXPORTER is empty. Using default otlp exporter.');
+    diag.debug('OTEL_TRACES_EXPORTER is empty. Using default otlp exporter.');
     traceExportersList = ['otlp'];
   } else if (
     traceExportersList.length > 1 &&
@@ -179,4 +183,65 @@ export function getSpanProcessorsFromEnv(): SpanProcessor[] {
   }
 
   return processors;
+}
+
+/**
+ * Get a propagator as defined by environment variables
+ */
+export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
+  // Empty and undefined MUST be treated equal.
+  const propagatorsEnvVarValue = getStringListFromEnv('OTEL_PROPAGATORS');
+  if (propagatorsEnvVarValue == null) {
+    // return undefined to fall back to default
+    return undefined;
+  }
+
+  // Implementation note: this only contains specification required propagators that are actually hosted in this repo.
+  // Any other propagators (like aws, aws-lambda, should go into `@opentelemetry/auto-configuration-propagators` instead).
+  const propagatorsFactory = new Map<string, () => TextMapPropagator>([
+    ['tracecontext', () => new W3CTraceContextPropagator()],
+    ['baggage', () => new W3CTraceContextPropagator()],
+    ['b3', () => new B3Propagator()],
+    [
+      'b3multi',
+      () => new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
+    ],
+    ['jaeger', () => new JaegerPropagator()],
+  ]);
+
+  // Values MUST be deduplicated in order to register a Propagator only once.
+  const uniquePropagatorNames = Array.from(new Set(propagatorsEnvVarValue));
+
+  const propagators = uniquePropagatorNames.map(name => {
+    const propagator = propagatorsFactory.get(name)?.();
+    if (!propagator) {
+      diag.warn(
+        `Propagator "${name}" requested through environment variable is unavailable.`
+      );
+      return undefined;
+    }
+
+    return propagator;
+  });
+
+  const validPropagators = propagators.reduce<TextMapPropagator[]>(
+    (list, item) => {
+      if (item) {
+        list.push(item);
+      }
+      return list;
+    },
+    []
+  );
+
+  if (validPropagators.length === 0) {
+    // null to signal that the default should **not** be used in its place.
+    return null;
+  } else if (uniquePropagatorNames.length === 1) {
+    return validPropagators[0];
+  } else {
+    return new CompositePropagator({
+      propagators: validPropagators,
+    });
+  }
 }

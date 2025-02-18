@@ -27,15 +27,15 @@ import {
   registerInstrumentations,
 } from '@opentelemetry/instrumentation';
 import {
-  Detector,
-  DetectorSync,
-  detectResourcesSync,
+  DEFAULT_RESOURCE,
+  detectResources,
   envDetector,
   hostDetector,
-  IResource,
-  processDetector,
   Resource,
+  processDetector,
   ResourceDetectionConfig,
+  ResourceDetector,
+  resourceFromAttributes,
 } from '@opentelemetry/resources';
 import {
   LogRecordProcessor,
@@ -54,7 +54,7 @@ import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exp
 import { PrometheusExporter as PrometheusMetricExporter } from '@opentelemetry/exporter-prometheus';
 import {
   MeterProvider,
-  MetricReader,
+  IMetricReader,
   ViewOptions,
   ConsoleMetricExporter,
   PeriodicExportingMetricReader,
@@ -69,11 +69,16 @@ import {
 } from '@opentelemetry/sdk-trace-node';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
-import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
+import {
+  getBooleanFromEnv,
+  getStringFromEnv,
+  diagLogLevelFromString,
+} from '@opentelemetry/core';
 import {
   getResourceDetectorsFromEnv,
   getSpanProcessorsFromEnv,
   filterBlanksAndNulls,
+  getPropagatorFromEnv,
 } from './utils';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
@@ -82,7 +87,7 @@ export type MeterProviderConfig = {
   /**
    * Reference to the MetricReader instance by the NodeSDK
    */
-  reader?: MetricReader;
+  reader?: IMetricReader;
   /**
    * List of {@link ViewOptions}s that should be passed to the MeterProvider
    */
@@ -107,8 +112,8 @@ function getValueInMillis(envName: string, defaultValue: number): number {
  *
  * @returns MetricReader[] if appropriate environment variables are configured
  */
-function configureMetricProviderFromEnv(): MetricReader[] {
-  const metricReaders: MetricReader[] = [];
+function configureMetricProviderFromEnv(): IMetricReader[] {
+  const metricReaders: IMetricReader[] = [];
   const metricsExporterList = process.env.OTEL_METRICS_EXPORTER?.trim();
   if (!metricsExporterList) {
     return metricReaders;
@@ -116,7 +121,7 @@ function configureMetricProviderFromEnv(): MetricReader[] {
   const enabledExporters = filterBlanksAndNulls(metricsExporterList.split(','));
 
   if (enabledExporters.length === 0) {
-    diag.info('OTEL_METRICS_EXPORTER is empty. Using default otlp exporter.');
+    diag.debug('OTEL_METRICS_EXPORTER is empty. Using default otlp exporter.');
   }
 
   if (enabledExporters.includes('none')) {
@@ -208,8 +213,8 @@ export class NodeSDK {
   private _meterProviderConfig?: MeterProviderConfig;
   private _instrumentations: Instrumentation[];
 
-  private _resource: IResource;
-  private _resourceDetectors: Array<Detector | DetectorSync>;
+  private _resource: Resource;
+  private _resourceDetectors: Array<ResourceDetector>;
 
   private _autoDetectResources: boolean;
 
@@ -225,26 +230,22 @@ export class NodeSDK {
    * Create a new NodeJS SDK instance
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
-    const env = getEnv();
-    const envWithoutDefaults = getEnvWithoutDefaults();
-
-    if (env.OTEL_SDK_DISABLED) {
+    if (getBooleanFromEnv('OTEL_SDK_DISABLED')) {
       this._disabled = true;
       // Functions with possible side-effects are set
       // to no-op via the _disabled flag
     }
 
-    // Default is INFO, use environment without defaults to check
-    // if the user originally set the environment variable.
-    if (envWithoutDefaults.OTEL_LOG_LEVEL) {
+    const logLevel = getStringFromEnv('OTEL_LOG_LEVEL');
+    if (logLevel != null) {
       diag.setLogger(new DiagConsoleLogger(), {
-        logLevel: envWithoutDefaults.OTEL_LOG_LEVEL,
+        logLevel: diagLogLevelFromString(logLevel),
       });
     }
 
     this._configuration = configuration;
 
-    this._resource = configuration.resource ?? Resource.default();
+    this._resource = configuration.resource ?? DEFAULT_RESOURCE;
     this._autoDetectResources = configuration.autoDetectResources ?? true;
     if (!this._autoDetectResources) {
       this._resourceDetectors = [];
@@ -345,16 +346,14 @@ export class NodeSDK {
         detectors: this._resourceDetectors,
       };
 
-      this._resource = this._resource.merge(
-        detectResourcesSync(internalConfig)
-      );
+      this._resource = this._resource.merge(detectResources(internalConfig));
     }
 
     this._resource =
       this._serviceName === undefined
         ? this._resource
         : this._resource.merge(
-            new Resource({
+            resourceFromAttributes({
               [ATTR_SERVICE_NAME]: this._serviceName,
             })
           );
@@ -363,7 +362,6 @@ export class NodeSDK {
       ? this._tracerProviderConfig.spanProcessors
       : getSpanProcessorsFromEnv();
 
-    // If the Provider is configured with Env Exporters, we need to check if the SDK had any manual configurations and set them here
     this._tracerProvider = new NodeTracerProvider({
       ...this._configuration,
       resource: this._resource,
@@ -377,7 +375,9 @@ export class NodeSDK {
           this._tracerProviderConfig?.contextManager ??
           // _tracerProviderConfig may be undefined if trace-specific settings are not provided - fall back to raw config
           this._configuration?.contextManager,
-        propagator: this._tracerProviderConfig?.textMapPropagator,
+        propagator:
+          this._tracerProviderConfig?.textMapPropagator ??
+          getPropagatorFromEnv(),
       });
     }
 
@@ -396,16 +396,16 @@ export class NodeSDK {
       logs.setGlobalLoggerProvider(loggerProvider);
     }
 
-    const metricReadersFromEnv: MetricReader[] =
+    const metricReadersFromEnv: IMetricReader[] =
       configureMetricProviderFromEnv();
     if (this._meterProviderConfig || metricReadersFromEnv.length > 0) {
-      const readers: MetricReader[] = [];
+      const readers: IMetricReader[] = [];
       if (this._meterProviderConfig?.reader) {
         readers.push(this._meterProviderConfig.reader);
       }
 
       if (readers.length === 0) {
-        metricReadersFromEnv.forEach((r: MetricReader) => readers.push(r));
+        metricReadersFromEnv.forEach((r: IMetricReader) => readers.push(r));
       }
 
       const meterProvider = new MeterProvider({
@@ -450,7 +450,7 @@ export class NodeSDK {
     const enabledExporters = filterBlanksAndNulls(logExportersList.split(','));
 
     if (enabledExporters.length === 0) {
-      diag.info('OTEL_LOGS_EXPORTER is empty. Using default otlp exporter.');
+      diag.debug('OTEL_LOGS_EXPORTER is empty. Using default otlp exporter.');
       enabledExporters.push('otlp');
     }
 

@@ -16,9 +16,9 @@
 
 import { TraceFlags, SpanStatusCode } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
-import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { Span } from '../src/types';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 
 export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
@@ -39,7 +39,7 @@ export const mockedReadableSpan: ReadableSpan = {
   links: [],
   events: [],
   duration: [0, 8885000],
-  resource: new Resource({
+  resource: resourceFromAttributes({
     service: 'ui',
     version: 1,
     cost: 112.12,

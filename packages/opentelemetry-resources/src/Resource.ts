@@ -14,103 +14,34 @@
  * limitations under the License.
  */
 
-import { Attributes, diag } from '@opentelemetry/api';
-import {
-  SEMRESATTRS_SERVICE_NAME,
-  SEMRESATTRS_TELEMETRY_SDK_LANGUAGE,
-  SEMRESATTRS_TELEMETRY_SDK_NAME,
-  SEMRESATTRS_TELEMETRY_SDK_VERSION,
-} from '@opentelemetry/semantic-conventions';
-import { SDK_INFO } from '@opentelemetry/core';
-import { defaultServiceName } from './platform';
-import { IResource } from './IResource';
+import { Attributes } from '@opentelemetry/api';
+import { RawResourceAttribute } from './types';
 
 /**
- * A Resource describes the entity for which a signals (metrics or trace) are
+ * An interface that represents a resource. A Resource describes the entity for which signals (metrics or trace) are
  * collected.
+ *
  */
-export class Resource implements IResource {
-  static readonly EMPTY = new Resource({});
-  private _syncAttributes?: Attributes;
-  private _asyncAttributesPromise?: Promise<Attributes>;
-  private _attributes?: Attributes;
-
+export interface Resource {
   /**
    * Check if async attributes have resolved. This is useful to avoid awaiting
    * waitForAsyncAttributes (which will introduce asynchronous behavior) when not necessary.
    *
    * @returns true if the resource "attributes" property is not yet settled to its final value
    */
-  public asyncAttributesPending?: boolean;
+  readonly asyncAttributesPending?: boolean;
 
   /**
-   * Returns an empty Resource
+   * @returns the Resource's attributes.
    */
-  static empty(): IResource {
-    return Resource.EMPTY;
-  }
-
-  /**
-   * Returns a Resource that identifies the SDK in use.
-   */
-  static default(): IResource {
-    return new Resource({
-      [SEMRESATTRS_SERVICE_NAME]: defaultServiceName(),
-      [SEMRESATTRS_TELEMETRY_SDK_LANGUAGE]:
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
-      [SEMRESATTRS_TELEMETRY_SDK_NAME]:
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_NAME],
-      [SEMRESATTRS_TELEMETRY_SDK_VERSION]:
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_VERSION],
-    });
-  }
-
-  constructor(
-    /**
-     * A dictionary of attributes with string keys and values that provide
-     * information about the entity as numbers, strings or booleans
-     * TODO: Consider to add check/validation on attributes.
-     */
-    attributes: Attributes,
-    asyncAttributesPromise?: Promise<Attributes>
-  ) {
-    this._attributes = attributes;
-    this.asyncAttributesPending = asyncAttributesPromise != null;
-    this._syncAttributes = this._attributes ?? {};
-    this._asyncAttributesPromise = asyncAttributesPromise?.then(
-      asyncAttributes => {
-        this._attributes = Object.assign({}, this._attributes, asyncAttributes);
-        this.asyncAttributesPending = false;
-        return asyncAttributes;
-      },
-      err => {
-        diag.debug("a resource's async attributes promise rejected: %s", err);
-        this.asyncAttributesPending = false;
-        return {};
-      }
-    );
-  }
-
-  get attributes(): Attributes {
-    if (this.asyncAttributesPending) {
-      diag.error(
-        'Accessing resource attributes before async attributes settled'
-      );
-    }
-
-    return this._attributes ?? {};
-  }
+  readonly attributes: Attributes;
 
   /**
    * Returns a promise that will never be rejected. Resolves when all async attributes have finished being added to
    * this Resource's attributes. This is useful in exporters to block until resource detection
    * has finished.
    */
-  async waitForAsyncAttributes?(): Promise<void> {
-    if (this.asyncAttributesPending) {
-      await this._asyncAttributesPromise;
-    }
-  }
+  waitForAsyncAttributes?(): Promise<void>;
 
   /**
    * Returns a new, merged {@link Resource} by merging the current Resource
@@ -120,36 +51,7 @@ export class Resource implements IResource {
    * @param other the Resource that will be merged with this.
    * @returns the newly merged Resource.
    */
-  merge(other: IResource | null): IResource {
-    if (!other) return this;
+  merge(other: Resource | null): Resource;
 
-    // Attributes from other resource overwrite attributes from this resource.
-    const mergedSyncAttributes = {
-      ...this._syncAttributes,
-      //Support for old resource implementation where _syncAttributes is not defined
-      ...((other as Resource)._syncAttributes ?? other.attributes),
-    };
-
-    if (
-      !this._asyncAttributesPromise &&
-      !(other as Resource)._asyncAttributesPromise
-    ) {
-      return new Resource(mergedSyncAttributes);
-    }
-
-    const mergedAttributesPromise = Promise.all([
-      this._asyncAttributesPromise,
-      (other as Resource)._asyncAttributesPromise,
-    ]).then(([thisAsyncAttributes, otherAsyncAttributes]) => {
-      return {
-        ...this._syncAttributes,
-        ...thisAsyncAttributes,
-        //Support for old resource implementation where _syncAttributes is not defined
-        ...((other as Resource)._syncAttributes ?? other.attributes),
-        ...otherAsyncAttributes,
-      };
-    });
-
-    return new Resource(mergedSyncAttributes, mergedAttributesPromise);
-  }
+  getRawAttributes(): RawResourceAttribute[];
 }

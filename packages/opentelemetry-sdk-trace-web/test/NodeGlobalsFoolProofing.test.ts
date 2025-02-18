@@ -20,10 +20,9 @@ import {
   trace,
   ProxyTracerProvider,
 } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
-import { Tracer } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { StackContextManager, WebTracerProvider } from '../src';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 
 describe('Node Globals Foolproofing', () => {
   const originalProcess = globalThis?.process;
@@ -70,7 +69,7 @@ describe('Node Globals Foolproofing', () => {
     };
 
     const tracer = new WebTracerProvider({
-      resource: new Resource({
+      resource: resourceFromAttributes({
         'service.name': 'web-core',
       }),
       idGenerator: {
@@ -78,7 +77,6 @@ describe('Node Globals Foolproofing', () => {
         generateSpanId: () => getRandomString(16),
       },
     }).getTracer('default');
-
-    assert.ok(tracer instanceof Tracer);
+    assert.ok(tracer);
   });
 });

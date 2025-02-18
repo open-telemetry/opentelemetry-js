@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+/**
+ * @module @opentelemetry/api
+ */
+
 export { BaggageEntry, BaggageEntryMetadata, Baggage } from './baggage/types';
 export { baggageEntryMetadataFromString } from './baggage/utils';
 export { Exception } from './common/Exception';

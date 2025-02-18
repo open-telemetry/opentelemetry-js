@@ -23,7 +23,10 @@ import {
   ExportResultCode,
 } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
+import {
+  EMPTY_RESOURCE,
+  resourceFromAttributes,
+} from '@opentelemetry/resources';
 import { ZipkinExporter } from '../../src';
 import * as zipkinTypes from '../../src/types';
 import { TraceFlags } from '@opentelemetry/api';
@@ -54,7 +57,7 @@ function getReadableSpan() {
     attributes: {},
     links: [],
     events: [],
-    resource: Resource.empty(),
+    resource: EMPTY_RESOURCE,
     instrumentationScope: { name: 'default', version: '0.0.1' },
     droppedAttributesCount: 0,
     droppedEventsCount: 0,
@@ -165,7 +168,7 @@ describe('Zipkin Exporter - node', () => {
             attributes: { key3: 'value3' },
           },
         ],
-        resource: Resource.empty(),
+        resource: EMPTY_RESOURCE,
         instrumentationScope: { name: 'default', version: '0.0.1' },
         droppedAttributesCount: 0,
         droppedEventsCount: 0,
@@ -191,7 +194,7 @@ describe('Zipkin Exporter - node', () => {
         attributes: {},
         links: [],
         events: [],
-        resource: Resource.empty(),
+        resource: EMPTY_RESOURCE,
         instrumentationScope: { name: 'default', version: '0.0.1' },
         droppedAttributesCount: 0,
         droppedEventsCount: 0,
@@ -384,7 +387,7 @@ describe('Zipkin Exporter - node', () => {
           attributes: { key3: 'value3' },
         },
       ],
-      resource: new Resource({
+      resource: resourceFromAttributes({
         [SEMRESATTRS_SERVICE_NAME]: resource_service_name,
       }),
       instrumentationScope: { name: 'default', version: '0.0.1' },
@@ -410,7 +413,7 @@ describe('Zipkin Exporter - node', () => {
       attributes: {},
       links: [],
       events: [],
-      resource: new Resource({
+      resource: resourceFromAttributes({
         [SEMRESATTRS_SERVICE_NAME]: resource_service_name_prime,
       }),
       instrumentationScope: { name: 'default', version: '0.0.1' },
@@ -480,7 +483,7 @@ describe('Zipkin Exporter - node', () => {
           attributes: { key3: 'value3' },
         },
       ],
-      resource: Resource.empty(),
+      resource: EMPTY_RESOURCE,
       instrumentationScope: { name: 'default', version: '0.0.1' },
       droppedAttributesCount: 0,
       droppedEventsCount: 0,
@@ -506,7 +509,7 @@ describe('Zipkin Exporter - node', () => {
       },
       links: [],
       events: [],
-      resource: Resource.empty(),
+      resource: EMPTY_RESOURCE,
       instrumentationScope: { name: 'default', version: '0.0.1' },
       droppedAttributesCount: 0,
       droppedEventsCount: 0,

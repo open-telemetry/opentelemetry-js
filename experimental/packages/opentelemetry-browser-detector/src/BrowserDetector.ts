@@ -16,21 +16,21 @@
 
 import { Attributes, diag } from '@opentelemetry/api';
 import {
-  Detector,
-  IResource,
-  Resource,
+  DetectedResource,
+  ResourceDetector,
   ResourceDetectionConfig,
+  EMPTY_RESOURCE,
 } from '@opentelemetry/resources';
 import { BROWSER_ATTRIBUTES, UserAgentData } from './types';
 
 /**
  * BrowserDetector will be used to detect the resources related to browser.
  */
-class BrowserDetector implements Detector {
-  async detect(config?: ResourceDetectionConfig): Promise<IResource> {
+class BrowserDetector implements ResourceDetector {
+  detect(config?: ResourceDetectionConfig): DetectedResource {
     const isBrowser = typeof navigator !== 'undefined';
     if (!isBrowser) {
-      return Resource.empty();
+      return EMPTY_RESOURCE;
     }
     const browserResource: Attributes = getBrowserAttributes();
     return this._getResourceAttributes(browserResource, config);
@@ -45,7 +45,7 @@ class BrowserDetector implements Detector {
   private _getResourceAttributes(
     browserResource: Attributes,
     _config?: ResourceDetectionConfig
-  ) {
+  ): DetectedResource {
     if (
       !browserResource[BROWSER_ATTRIBUTES.USER_AGENT] &&
       !browserResource[BROWSER_ATTRIBUTES.PLATFORM]
@@ -53,9 +53,9 @@ class BrowserDetector implements Detector {
       diag.debug(
         'BrowserDetector failed: Unable to find required browser resources. '
       );
-      return Resource.empty();
+      return EMPTY_RESOURCE;
     } else {
-      return new Resource(browserResource);
+      return { attributes: browserResource };
     }
   }
 }
@@ -63,8 +63,9 @@ class BrowserDetector implements Detector {
 // Add Browser related attributes to resources
 function getBrowserAttributes(): Attributes {
   const browserAttribs: Attributes = {};
-  const userAgentData: UserAgentData | undefined = (navigator as any)
-    .userAgentData;
+  const userAgentData = (
+    navigator as Navigator & { userAgentData?: UserAgentData }
+  ).userAgentData;
   if (userAgentData) {
     browserAttribs[BROWSER_ATTRIBUTES.PLATFORM] = userAgentData.platform;
     browserAttribs[BROWSER_ATTRIBUTES.BRANDS] = userAgentData.brands.map(

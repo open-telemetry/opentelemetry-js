@@ -36,7 +36,7 @@ import {
 } from './utils';
 import { defaultResource } from '../util';
 import { ValueType } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 
 const testScopeMetrics: ScopeMetrics[] = [
   {
@@ -130,7 +130,7 @@ describe('MetricReader', () => {
       const collectSpy = sinon.spy(producer, 'collect');
 
       await reader.collect({ timeoutMillis: 20 });
-      assert(collectSpy.calledOnce);
+      assert.ok(collectSpy.calledOnce);
       const args = collectSpy.args[0];
       assert.deepStrictEqual(args, [{ timeoutMillis: 20 }]);
 
@@ -140,7 +140,7 @@ describe('MetricReader', () => {
     it('should collect metrics from the SDK and the additional metricProducers', async () => {
       const additionalProducer = new TestMetricProducer({
         resourceMetrics: {
-          resource: new Resource({
+          resource: resourceFromAttributes({
             shouldBeDiscarded: 'should-be-discarded',
           }),
           scopeMetrics: testScopeMetrics,
@@ -164,8 +164,8 @@ describe('MetricReader', () => {
       assert.strictEqual(collectionResult.errors.length, 0);
       // Should keep the SDK's Resource only
       assert.deepStrictEqual(
-        collectionResult.resourceMetrics.resource,
-        defaultResource
+        collectionResult.resourceMetrics.resource.attributes,
+        defaultResource.attributes
       );
       assert.strictEqual(
         collectionResult.resourceMetrics.scopeMetrics.length,

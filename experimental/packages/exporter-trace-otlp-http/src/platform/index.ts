@@ -14,7 +14,4 @@
  * limitations under the License.
  */
 
-/* eslint no-restricted-syntax: ["warn", "ExportAllDeclaration"] --
- * TODO: Replace wildcard export with named exports before next major version
- */
-export * from './node';
+export { OTLPTraceExporter } from './node';

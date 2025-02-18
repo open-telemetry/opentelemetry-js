@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import { ExportResultCode } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
 import * as metrics from '@opentelemetry/api';
 import * as assert from 'assert';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
@@ -23,6 +22,7 @@ import { ResourceMetrics } from '../../src/export/MetricData';
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { MeterProvider } from '../../src/MeterProvider';
 import { defaultResource } from '../util';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 
 async function waitForNumberOfExports(
   exporter: InMemoryMetricExporter,
@@ -69,7 +69,7 @@ describe('InMemoryMetricExporter', () => {
 
   it('should return failed result code', done => {
     exporter.shutdown().then(() => {
-      const resource = new Resource({
+      const resource = resourceFromAttributes({
         'resource-attribute': 'resource attribute value',
       });
       const resourceMetrics: ResourceMetrics = {

@@ -15,7 +15,7 @@
  */
 import * as process from 'process';
 
-let getMachineId: () => Promise<string>;
+let getMachineId: () => Promise<string | undefined>;
 
 switch (process.platform) {
   case 'darwin':

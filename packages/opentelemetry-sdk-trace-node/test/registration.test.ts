@@ -27,10 +27,13 @@ import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-ho
 import { CompositePropagator } from '@opentelemetry/core';
 import { NodeTracerProvider } from '../src';
 
-const assertInstanceOf = (actual: object, ExpectedInstance: Function) => {
+// Here we are looking for a `AnyConstructor` type, and `Function` is a close
+// enough approximation that exists in the standard library.
+// eslint-disable-next-line @typescript-eslint/ban-types
+const assertInstanceOf = (actual: object, ExpectedConstructor: Function) => {
   assert.ok(
-    actual instanceof ExpectedInstance,
-    `Expected ${inspect(actual)} to be instance of ${ExpectedInstance.name}`
+    actual instanceof ExpectedConstructor,
+    `Expected ${inspect(actual)} to be instance of ${ExpectedConstructor.name}`
   );
 };
 

@@ -20,7 +20,7 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "engines": {
-    "node": ">=14"
+    "node": "^18.19.0 || >=20.6.0"
   },
   "scripts": {
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
@@ -68,10 +68,10 @@
   "dependencies": {
     "@opentelemetry/sdk-logs": "0.57.0",
     "@opentelemetry/sdk-trace-base": "1.30.0",
-    "@opentelemetry/semantic-conventions": "1.28.0"
+    "@opentelemetry/semantic-conventions": "^1.29.0"
   },
   "devDependencies": {
-    "@babel/core": "7.26.0",
+    "@babel/core": "7.26.7",
     "@opentelemetry/api": "1.9.0",
     "@opentelemetry/api-events": "0.57.0",
     "@opentelemetry/api-logs": "0.57.0",
@@ -89,7 +89,7 @@
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "5.0.1",
     "lerna": "6.6.2",
-    "mocha": "10.8.2",
+    "mocha": "11.1.0",
     "nyc": "17.1.0",
     "sinon": "15.1.2",
     "ts-loader": "9.5.2",

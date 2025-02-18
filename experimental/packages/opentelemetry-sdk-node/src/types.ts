@@ -17,9 +17,9 @@
 import type { ContextManager } from '@opentelemetry/api';
 import { TextMapPropagator } from '@opentelemetry/api';
 import { Instrumentation } from '@opentelemetry/instrumentation';
-import { Detector, DetectorSync, IResource } from '@opentelemetry/resources';
+import { Resource, ResourceDetector } from '@opentelemetry/resources';
 import { LogRecordProcessor } from '@opentelemetry/sdk-logs';
-import { MetricReader, ViewOptions } from '@opentelemetry/sdk-metrics';
+import { IMetricReader, ViewOptions } from '@opentelemetry/sdk-metrics';
 import {
   Sampler,
   SpanExporter,
@@ -35,11 +35,11 @@ export interface NodeSDKConfiguration {
   /** @deprecated use logRecordProcessors instead*/
   logRecordProcessor: LogRecordProcessor;
   logRecordProcessors?: LogRecordProcessor[];
-  metricReader: MetricReader;
+  metricReader: IMetricReader;
   views: ViewOptions[];
   instrumentations: (Instrumentation | Instrumentation[])[];
-  resource: IResource;
-  resourceDetectors: Array<Detector | DetectorSync>;
+  resource: Resource;
+  resourceDetectors: Array<ResourceDetector>;
   sampler: Sampler;
   serviceName?: string;
   /** @deprecated use spanProcessors instead*/
