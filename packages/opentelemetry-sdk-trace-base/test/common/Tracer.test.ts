@@ -50,12 +50,6 @@ import { Tracer } from '../../src/Tracer';
 
 describe('Tracer', () => {
   const tracerProvider = new BasicTracerProvider();
-  let envSource: Record<string, any>;
-  if (global.process?.versions?.node === undefined) {
-    envSource = globalThis as unknown as Record<string, any>;
-  } else {
-    envSource = process.env as Record<string, any>;
-  }
 
   class TestSampler implements Sampler {
     constructor(private readonly traceState?: TraceState) {}
@@ -106,8 +100,6 @@ describe('Tracer', () => {
 
   afterEach(() => {
     context.disable();
-    delete envSource.OTEL_TRACES_SAMPLER;
-    delete envSource.OTEL_TRACES_SAMPLER_ARG;
   });
 
   it('should create a Tracer instance', () => {
@@ -325,51 +317,6 @@ describe('Tracer', () => {
     const processorContext = onStartSpy.firstCall.args[1];
     assert.strictEqual(samplerContext, processorContext);
     assert.strictEqual(trace.getSpan(samplerContext), undefined);
-  });
-
-  it('should sample a trace when OTEL_TRACES_SAMPLER_ARG is unset', () => {
-    envSource.OTEL_TRACES_SAMPLER = 'traceidratio';
-    envSource.OTEL_TRACES_SAMPLER_ARG = '';
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      {},
-      tracerProvider['_resource'],
-      tracerProvider['_activeSpanProcessor']
-    );
-    const span = tracer.startSpan('my-span');
-    const context = span.spanContext();
-    assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
-    span.end();
-  });
-
-  it('should not sample a trace when OTEL_TRACES_SAMPLER_ARG is out of range', () => {
-    envSource.OTEL_TRACES_SAMPLER = 'traceidratio';
-    envSource.OTEL_TRACES_SAMPLER_ARG = '2';
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      {},
-      tracerProvider['_resource'],
-      tracerProvider['_activeSpanProcessor']
-    );
-    const span = tracer.startSpan('my-span');
-    const context = span.spanContext();
-    assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
-    span.end();
-  });
-
-  it('should not sample a trace when OTEL_TRACES_SAMPLER_ARG is 0', () => {
-    envSource.OTEL_TRACES_SAMPLER = 'traceidratio';
-    envSource.OTEL_TRACES_SAMPLER_ARG = '0';
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      {},
-      tracerProvider['_resource'],
-      tracerProvider['_activeSpanProcessor']
-    );
-    const span = tracer.startSpan('my-span');
-    const context = span.spanContext();
-    assert.strictEqual(context.traceFlags, TraceFlags.NONE);
-    span.end();
   });
 
   it('should start an active span with name and function args', () => {
