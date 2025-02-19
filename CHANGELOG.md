@@ -110,6 +110,14 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore
     * If you have been using the `envDetector` in browser environments, please migrate to manually creating a resource.
     * Note: Node.js environment variable configuration continues to work as-is.
+* feat(core)!: drop `getEnv()`, `getEnvWithoutDefaults()` [#5481](https://github.com/open-telemetry/opentelemetry-js/pull/5481) @pichlermarc
+  * (user-facing): `getEnv()` has been replaced by `getStringFromEnv()`, `getNumberFromEnv()`, `getBooleanFromEnv()`, `getStringListFromEnv()`
+    * these new functions do not include defaults, please inline any defaults if necessary (example: `getStringFromEnv("OTEL_FOO") ?? "my-default"`)
+  * (user-facing): `getEnvWithoutDefaults()` has been replaced by `getStringFromEnv()`, `getNumberFromEnv()`, `getBooleanFromEnv()`, `getStringListFromEnv()`
+  * (user-facing): `DEFAULT_ENVIRONMENT` has been removed, please inline any defaults from now on
+  * (user-facing): `ENVIRONMENT` has been removed without replacement
+  * (user-facing): `RAW_ENVIRONMENT` has been removed without replacement
+  * (user-facing): `parseEnvironment` has been removed without replacement
 
 ### :rocket: (Enhancement)
 
