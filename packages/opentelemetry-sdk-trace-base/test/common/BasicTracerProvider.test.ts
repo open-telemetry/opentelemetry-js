@@ -31,7 +31,7 @@ import {
 import { CompositePropagator } from '@opentelemetry/core';
 import { TraceState } from '@opentelemetry/core';
 import {
-  DEFAULT_RESOURCE,
+  defaultResource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -627,7 +627,7 @@ describe('BasicTracerProvider', () => {
   describe('.resource', () => {
     it('should use the default resource when no resource is provided', function () {
       const tracerProvider = new BasicTracerProvider();
-      assert.deepStrictEqual(tracerProvider['_resource'], DEFAULT_RESOURCE);
+      assert.deepStrictEqual(tracerProvider['_resource'], defaultResource());
     });
 
     it('should use not use the default if resource passed', function () {

@@ -32,7 +32,7 @@ import { BatchLogRecordProcessorBase } from '../../../src/export/BatchLogRecordP
 import { reconfigureLimits } from '../../../src/config';
 import { LoggerProviderSharedState } from '../../../src/internal/LoggerProviderSharedState';
 import {
-  DEFAULT_RESOURCE,
+  defaultResource,
   Resource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
@@ -47,7 +47,7 @@ const createLogRecord = (
   resource?: Resource
 ): LogRecord => {
   const sharedState = new LoggerProviderSharedState(
-    resource || DEFAULT_RESOURCE,
+    resource || defaultResource(),
     Infinity,
     reconfigureLimits(limits ?? {})
   );
