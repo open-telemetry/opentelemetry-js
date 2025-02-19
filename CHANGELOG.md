@@ -105,6 +105,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * Renames `Resource` class to `ResourceImpl` and makes it package-private
   * Renames `IResource` interface to `Resource`
   * Export function `resourceFromAttributes` to create a `Resource` from a `DetectedAttributes` object
+  * Export function `defaultResource` to create a default resource [#5467](https://github.com/open-telemetry/opentelemetry-js/pull/5467) @pichlermarc
+  * Export function `emptyResource` to create an empty resource [#5467](https://github.com/open-telemetry/opentelemetry-js/pull/5467) @pichlermarc
   * Only export types and functions. This aids in cross-version compatibility and makes it more easily extensible in the future.
 * feat(resources)!: do not read environment variables from window in browsers [#5466](https://github.com/open-telemetry/opentelemetry-js/pull/5466) @pichlermarc
   * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore
