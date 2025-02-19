@@ -77,8 +77,11 @@ import {
   IgnoreMatcher,
   ParsedRequestOptions,
   SemconvStability,
+  SYNTHETIC_BOT_NAMES,
+  SYNTHETIC_TEST_NAMES,
 } from './internal-types';
 import forwardedParse = require('forwarded-parse');
+import { ATTR_USER_AGENT_SYNTHETIC_TYPE, USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT, USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST } from '@opentelemetry/semantic-conventions/incubating';
 
 /**
  * Get an absolute url
@@ -485,6 +488,23 @@ export const getOutgoingRequestAttributes = (
     oldAttributes[SEMATTRS_HTTP_USER_AGENT] = userAgent;
   }
 
+  if (newAttributes[ATTR_USER_AGENT_ORIGINAL] != null) {
+    for (const name of SYNTHETIC_TEST_NAMES) {
+      if (String(newAttributes[ATTR_USER_AGENT_ORIGINAL]).includes(name)) {
+        newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
+          USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST;
+        break;
+      }
+    }
+    for (const name of SYNTHETIC_BOT_NAMES) {
+      if (String(newAttributes[ATTR_USER_AGENT_ORIGINAL]).includes(name)) {
+        newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
+          USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT;
+        break;
+      }
+    }
+  }
+
   switch (semconvStability) {
     case SemconvStability.STABLE:
       return Object.assign(newAttributes, options.hookAttributes);
@@ -840,6 +860,23 @@ export const getIncomingRequestAttributes = (
   // conditionally required if request method required case normalization
   if (method !== normalizedMethod) {
     newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
+  }
+
+  if (newAttributes[ATTR_USER_AGENT_ORIGINAL] != null) {
+    for (const name of SYNTHETIC_TEST_NAMES) {
+      if (String(newAttributes[ATTR_USER_AGENT_ORIGINAL]).includes(name)) {
+        newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
+          USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST;
+        break;
+      }
+    }
+    for (const name of SYNTHETIC_BOT_NAMES) {
+      if (String(newAttributes[ATTR_USER_AGENT_ORIGINAL]).includes(name)) {
+        newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
+          USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT;
+        break;
+      }
+    }
   }
 
   const oldAttributes: Attributes = {

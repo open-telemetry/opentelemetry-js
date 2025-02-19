@@ -62,3 +62,13 @@ export const enum SemconvStability {
   /** Emit both stable and old semantic conventions*/
   DUPLICATE = 0x1 | 0x2,
 }
+
+/**
+ * Names of possible synthetic test sources.
+ */
+export const SYNTHETIC_TEST_NAMES = ["AlwaysOn"];
+
+/**
+ * Names of possible synthetic bot sources.
+ */
+export const SYNTHETIC_BOT_NAMES = ["Googlebot", "Bingbot"];
