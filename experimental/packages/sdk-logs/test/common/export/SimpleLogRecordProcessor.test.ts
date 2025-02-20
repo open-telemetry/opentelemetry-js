@@ -22,7 +22,7 @@ import {
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
 import {
-  DEFAULT_RESOURCE,
+  defaultResource,
   Resource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
@@ -39,7 +39,7 @@ import { TestExporterWithDelay } from './TestExporterWithDelay';
 
 const setup = (exporter: LogRecordExporter, resource?: Resource) => {
   const sharedState = new LoggerProviderSharedState(
-    resource || DEFAULT_RESOURCE,
+    resource || defaultResource(),
     Infinity,
     reconfigureLimits({})
   );

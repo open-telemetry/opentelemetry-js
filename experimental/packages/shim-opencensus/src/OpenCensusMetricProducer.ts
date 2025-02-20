@@ -16,7 +16,7 @@
  */
 
 import * as oc from '@opencensus/core';
-import { EMPTY_RESOURCE } from '@opentelemetry/resources';
+import { emptyResource } from '@opentelemetry/resources';
 import {
   CollectionResult,
   MetricData,
@@ -80,7 +80,7 @@ export class OpenCensusMetricProducer implements MetricProducer {
       errors: [],
       resourceMetrics: {
         // Resource is ignored by the SDK, it just uses the SDK's resource
-        resource: EMPTY_RESOURCE,
+        resource: emptyResource(),
         scopeMetrics,
       },
     };

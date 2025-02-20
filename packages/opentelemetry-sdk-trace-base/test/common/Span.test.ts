@@ -1005,14 +1005,18 @@ describe('Span', () => {
       spanContext,
       name: 'my-span',
       kind: SpanKind.INTERNAL,
-      parentSpanId: parentId,
+      parentSpanContext: {
+        spanId: parentId,
+        traceId: '',
+        traceFlags: TraceFlags.SAMPLED,
+      },
       spanLimits: tracer.getSpanLimits(),
       spanProcessor: tracer['_spanProcessor'],
     });
 
     assert.strictEqual(span.name, 'my-span');
     assert.strictEqual(span.kind, SpanKind.INTERNAL);
-    assert.strictEqual(span.parentSpanId, parentId);
+    assert.strictEqual(span.parentSpanContext?.spanId, parentId);
     assert.strictEqual(span.spanContext().traceId, spanContext.traceId);
     assert.deepStrictEqual(span.status, {
       code: SpanStatusCode.UNSET,

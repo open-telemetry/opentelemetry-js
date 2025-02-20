@@ -27,7 +27,7 @@ import {
   registerInstrumentations,
 } from '@opentelemetry/instrumentation';
 import {
-  DEFAULT_RESOURCE,
+  defaultResource,
   detectResources,
   envDetector,
   hostDetector,
@@ -245,7 +245,7 @@ export class NodeSDK {
 
     this._configuration = configuration;
 
-    this._resource = configuration.resource ?? DEFAULT_RESOURCE;
+    this._resource = configuration.resource ?? defaultResource();
     this._autoDetectResources = configuration.autoDetectResources ?? true;
     if (!this._autoDetectResources) {
       this._resourceDetectors = [];
