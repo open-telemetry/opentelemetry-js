@@ -81,7 +81,11 @@ import {
   SYNTHETIC_TEST_NAMES,
 } from './internal-types';
 import forwardedParse = require('forwarded-parse');
-import { ATTR_USER_AGENT_SYNTHETIC_TYPE, USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT, USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST } from '@opentelemetry/semantic-conventions/incubating';
+import {
+  ATTR_USER_AGENT_SYNTHETIC_TYPE,
+  USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
+  USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST,
+} from '@opentelemetry/semantic-conventions/incubating';
 
 /**
  * Get an absolute url
@@ -489,7 +493,7 @@ export const getOutgoingRequestAttributes = (
   }
 
   if (userAgent != null) {
-    const userAgentString: String = String(userAgent).toLowerCase();
+    const userAgentString: string = String(userAgent).toLowerCase();
     for (const name of SYNTHETIC_TEST_NAMES) {
       if (userAgentString.includes(name)) {
         newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
@@ -864,7 +868,7 @@ export const getIncomingRequestAttributes = (
   }
 
   if (userAgent != null) {
-    const userAgentString: String = String(userAgent).toLowerCase();
+    const userAgentString: string = String(userAgent).toLowerCase();
     for (const name of SYNTHETIC_TEST_NAMES) {
       if (userAgentString.includes(name)) {
         newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =

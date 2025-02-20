@@ -66,9 +66,9 @@ export const enum SemconvStability {
 /**
  * Names of possible synthetic test sources.
  */
-export const SYNTHETIC_TEST_NAMES = ["alwayson"];
+export const SYNTHETIC_TEST_NAMES = ['alwayson'];
 
 /**
  * Names of possible synthetic bot sources.
  */
-export const SYNTHETIC_BOT_NAMES = ["googlebot", "bingbot"];
+export const SYNTHETIC_BOT_NAMES = ['googlebot', 'bingbot'];

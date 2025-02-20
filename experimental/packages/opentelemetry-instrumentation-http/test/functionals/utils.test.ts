@@ -28,10 +28,11 @@ import {
   SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
   SEMATTRS_HTTP_ROUTE,
   SEMATTRS_HTTP_TARGET,
-  ATTR_USER_AGENT_ORIGINAL
+  ATTR_USER_AGENT_ORIGINAL,
 } from '@opentelemetry/semantic-conventions';
 import {
-  ATTR_USER_AGENT_SYNTHETIC_TYPE, USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT
+  ATTR_USER_AGENT_SYNTHETIC_TYPE,
+  USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
 } from '@opentelemetry/semantic-conventions/incubating';
 import * as assert from 'assert';
 import { IncomingMessage, ServerResponse } from 'http';
@@ -472,7 +473,7 @@ describe('Utility', () => {
       const request = {
         url: 'http://hostname/user/:id',
         method: 'GET',
-        socket: {}
+        socket: {},
       } as IncomingMessage;
       request.headers = {
         'user-agent': 'Googlebot',
@@ -486,7 +487,10 @@ describe('Utility', () => {
         diag
       );
       assert.strictEqual(attributes[ATTR_USER_AGENT_ORIGINAL], 'Googlebot');
-      assert.strictEqual(attributes[ATTR_USER_AGENT_SYNTHETIC_TYPE], USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT);
+      assert.strictEqual(
+        attributes[ATTR_USER_AGENT_SYNTHETIC_TYPE],
+        USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT
+      );
     });
   });
 
