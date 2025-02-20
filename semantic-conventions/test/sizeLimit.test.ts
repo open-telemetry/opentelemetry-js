@@ -172,6 +172,7 @@ describe('size-limits', function () {
 
   before(() => {
     if (!fs.existsSync(debugPath)) {
+      // @ts-expect-error -- signature not available in es2017 
       fs.mkdirSync(debugPath, { recursive: true });
     }
 
