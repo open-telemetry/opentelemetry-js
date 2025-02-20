@@ -373,7 +373,7 @@ These instrumentations are hosted at <https://github.com/open-telemetry/opentele
 
 ## Useful links
 
-- Upgrade guidelines: [Upgrade Guide](./doc/upgrade-guide.md)
+- [Upgrade to SDK 2.x guide](./doc/upgrade-to-2.x.md)
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 
