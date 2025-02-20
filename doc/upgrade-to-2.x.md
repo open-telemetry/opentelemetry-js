@@ -55,12 +55,14 @@ The **minimum supported Node.js has be raised to `^18.19.0 || >=20.6.0`**. This 
 
 For the time being, the minimum supported Node.js versions for `@opentelemetry/api` (Node.js v8) and `@opentelemetry/semantic-conventions` (Node.js v14) packages is not changing.
 
+Related issues:
 [#5395](https://github.com/open-telemetry/opentelemetry-js/issues/5395)
 
 ## 💥 TypeScript supported versions
 
 The **minimum supported TypeScript version has been raised to 5.0.4**. As well, going forward all packages published from this repository will **drop support for old versions of `typescript` in minor releases**. We will only drop support for versions that are older than 2 years.
 
+Related issues:
 [#5145](https://github.com/open-telemetry/opentelemetry-js/pull/5145)
 
 
@@ -143,10 +145,11 @@ Implementation notes:
 - In general, the OTel JS packages are tending away from exporting *classes* because that results in exporting types with internal details that inhibit later refactoring. See [XXX](https://github.com/open-telemetry/opentelemetry-js/issues/5283) for details.
 - The unification of sync and async resource detectors simplified the API, clarified the behavior for merging results from multiple detectors, and laid the ground work for support OpenTelemetry Entities in the future. See [XXX](https://github.com/open-telemetry/opentelemetry-js/pull/5350) for details.
 
+Related issues:
 [#5421](https://github.com/open-telemetry/opentelemetry-js/pull/5421)
 [#5350](https://github.com/open-telemetry/opentelemetry-js/pull/5350)
-[#5420](https://github.com/open-telemetry/opentelemetry-js/issues/5420]
-[#5217](https://github.com/open-telemetry/opentelemetry-js/issues/5217]
+[#5420](https://github.com/open-telemetry/opentelemetry-js/issues/5420)
+[#5217](https://github.com/open-telemetry/opentelemetry-js/issues/5217)
 
 
 ## 💥 `@opentelemetry/core` API changes
@@ -188,7 +191,8 @@ Implementation notes:
   packages and packages maintained in the separate contrib repository.
   See [#5443](https://github.com/open-telemetry/opentelemetry-js/pull/5443).
 
-[XXX](https://github.com/open-telemetry/opentelemetry-js/pull/5443)
+Related issues:
+[#5443](https://github.com/open-telemetry/opentelemetry-js/pull/5443)
 [#5481](https://github.com/open-telemetry/opentelemetry-js/pull/5481)
 [#5475](https://github.com/open-telemetry/opentelemetry-js/pull/5475)
 
@@ -215,6 +219,7 @@ A number of deprecated, obsolete, unused, and accidentally exported functions an
 - `TimeOriginLegacy`
 - `isAttributeKey` (unintentionally exported)
 
+Related issues:
 [#5309](https://github.com/open-telemetry/opentelemetry-js/pull/5309)
 [#5308](https://github.com/open-telemetry/opentelemetry-js/pull/5308)
 [#5316](https://github.com/open-telemetry/opentelemetry-js/pull/5316)
