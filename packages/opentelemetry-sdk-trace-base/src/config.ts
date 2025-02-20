@@ -98,7 +98,9 @@ export function buildSamplerFromEnv(): Sampler {
       diag.error(
         `OTEL_TRACES_SAMPLER value "${sampler}" invalid, defaulting to "${FALLBACK_OTEL_TRACES_SAMPLER}".`
       );
-      return new AlwaysOnSampler();
+      return new ParentBasedSampler({
+        root: new AlwaysOnSampler(),
+      });
   }
 }
 
