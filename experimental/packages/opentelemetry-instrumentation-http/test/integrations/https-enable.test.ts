@@ -34,24 +34,12 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
-import {
-  AggregationTemporality,
-  InMemoryMetricExporter,
-  MeterProvider,
-} from '@opentelemetry/sdk-metrics';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { HttpInstrumentation } from '../../src';
-import { TestMetricReader } from '../utils/TestMetricReader';
 
 const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
 instrumentation.disable();
-const metricsMemoryExporter = new InMemoryMetricExporter(
-  AggregationTemporality.DELTA
-);
-const metricReader = new TestMetricReader(metricsMemoryExporter);
-const meterProvider = new MeterProvider({ readers: [metricReader] });
-instrumentation.setMeterProvider(meterProvider);
 
 import * as https from 'https';
 import { httpsRequest } from '../utils/httpsRequest';

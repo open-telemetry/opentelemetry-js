@@ -30,11 +30,6 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import {
-  AggregationTemporality,
-  InMemoryMetricExporter,
-  MeterProvider,
-} from '@opentelemetry/sdk-metrics';
-import {
   NETTRANSPORTVALUES_IP_TCP,
   SEMATTRS_HTTP_CLIENT_IP,
   SEMATTRS_HTTP_FLAVOR,
@@ -50,19 +45,11 @@ import * as path from 'path';
 import { HttpInstrumentation } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
-import { TestMetricReader } from '../utils/TestMetricReader';
 import { isWrapped } from '@opentelemetry/instrumentation';
 
 const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
 instrumentation.disable();
-const metricsMemoryExporter = new InMemoryMetricExporter(
-  AggregationTemporality.DELTA
-);
-const metricReader = new TestMetricReader(metricsMemoryExporter);
-const meterProvider = new MeterProvider({ readers: [metricReader] });
-
-instrumentation.setMeterProvider(meterProvider);
 
 import * as http from 'http';
 import * as https from 'https';

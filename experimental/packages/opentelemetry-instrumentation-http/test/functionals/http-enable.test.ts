@@ -24,11 +24,6 @@ import {
   Attributes,
   DiagConsoleLogger,
 } from '@opentelemetry/api';
-import {
-  AggregationTemporality,
-  InMemoryMetricExporter,
-  MeterProvider,
-} from '@opentelemetry/sdk-metrics';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   InMemorySpanExporter,
@@ -75,7 +70,6 @@ import { HttpInstrumentationConfig } from '../../src/types';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
-import { TestMetricReader } from '../utils/TestMetricReader';
 import { ContextManager } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import type {
@@ -90,18 +84,6 @@ import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
 instrumentation.disable();
-const memoryExporter = new InMemorySpanExporter();
-const tracerProvider = new NodeTracerProvider({
-  spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
-});
-const metricsMemoryExporter = new InMemoryMetricExporter(
-  AggregationTemporality.DELTA
-);
-const metricReader = new TestMetricReader(metricsMemoryExporter);
-const meterProvider = new MeterProvider({ readers: [metricReader] });
-
-instrumentation.setTracerProvider(tracerProvider);
-instrumentation.setMeterProvider(meterProvider);
 
 import * as http from 'http';
 import { AttributeNames } from '../../src/enums/AttributeNames';
@@ -117,6 +99,11 @@ const protocol = 'http';
 const hostname = 'localhost';
 const pathname = '/test';
 const serverName = 'my.server.name';
+const memoryExporter = new InMemorySpanExporter();
+const provider = new NodeTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+});
+instrumentation.setTracerProvider(provider);
 
 function doNock(
   hostname: string,
@@ -355,7 +342,7 @@ describe('HttpInstrumentation', () => {
             return;
           }
           if (request.url?.includes('/ignored')) {
-            tracerProvider.getTracer('test').startSpan('some-span').end();
+            provider.getTracer('test').startSpan('some-span').end();
           }
           if (request.url?.includes('/setroute')) {
             const rpcData = getRPCMetadata(context.active());
@@ -493,7 +480,7 @@ describe('HttpInstrumentation', () => {
         const testPath = '/outgoing/rootSpan/childs/1';
         doNock(hostname, testPath, 200, 'Ok');
         const name = 'TestRootSpan';
-        const span = tracerProvider.getTracer('default').startSpan(name);
+        const span = provider.getTracer('default').startSpan(name);
         return context.with(trace.setSpan(context.active(), span), async () => {
           const result = await httpRequest.get(
             `${protocol}://${hostname}${testPath}`
@@ -536,7 +523,7 @@ describe('HttpInstrumentation', () => {
             httpErrorCodes[i].toString()
           );
           const name = 'TestRootSpan';
-          const span = tracerProvider.getTracer('default').startSpan(name);
+          const span = provider.getTracer('default').startSpan(name);
           return context.with(
             trace.setSpan(context.active(), span),
             async () => {
@@ -578,7 +565,7 @@ describe('HttpInstrumentation', () => {
         const num = 5;
         doNock(hostname, testPath, 200, 'Ok', num);
         const name = 'TestRootSpan';
-        const span = tracerProvider.getTracer('default').startSpan(name);
+        const span = provider.getTracer('default').startSpan(name);
         await context.with(trace.setSpan(context.active(), span), async () => {
           for (let i = 0; i < num; i++) {
             await httpRequest.get(`${protocol}://${hostname}${testPath}`);
@@ -1087,7 +1074,7 @@ describe('HttpInstrumentation', () => {
             return;
           }
           if (request.url?.includes('/ignored')) {
-            tracerProvider.getTracer('test').startSpan('some-span').end();
+            provider.getTracer('test').startSpan('some-span').end();
           }
           if (request.url?.includes('/setroute')) {
             const rpcData = getRPCMetadata(context.active());
@@ -1428,7 +1415,7 @@ describe('HttpInstrumentation', () => {
         });
         instrumentation.enable();
         const testPath = '/test/test';
-        const tracer = tracerProvider.getTracer('default');
+        const tracer = provider.getTracer('default');
         const span = tracer.startSpan('parentSpan', {
           kind: SpanKind.INTERNAL,
         });

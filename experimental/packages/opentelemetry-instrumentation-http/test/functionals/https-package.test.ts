@@ -21,35 +21,23 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
-import {
-  AggregationTemporality,
-  InMemoryMetricExporter,
-  MeterProvider,
-} from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as path from 'path';
 import * as url from 'url';
 import { HttpInstrumentation } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
-import { TestMetricReader } from '../utils/TestMetricReader';
 
 const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
 instrumentation.disable();
-const memoryExporter = new InMemorySpanExporter();
-const metricsMemoryExporter = new InMemoryMetricExporter(
-  AggregationTemporality.DELTA
-);
-const metricReader = new TestMetricReader(metricsMemoryExporter);
-const meterProvider = new MeterProvider({ readers: [metricReader] });
-instrumentation.setMeterProvider(meterProvider);
 
 import * as http from 'http';
 import * as superagent from 'superagent';
 import * as nock from 'nock';
 import * as axios from 'axios';
 
+const memoryExporter = new InMemorySpanExporter();
 const customAttributeFunction = (span: Span): void => {
   span.setAttribute('span kind', SpanKind.CLIENT);
 };

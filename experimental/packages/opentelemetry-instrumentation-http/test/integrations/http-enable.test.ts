@@ -26,14 +26,8 @@ import * as assert from 'assert';
 import * as url from 'url';
 import { HttpInstrumentation } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
-import { TestMetricReader } from '../utils/TestMetricReader';
 import * as utils from '../utils/utils';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
-import {
-  AggregationTemporality,
-  InMemoryMetricExporter,
-  MeterProvider,
-} from '@opentelemetry/sdk-metrics';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -43,13 +37,6 @@ import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
 instrumentation.disable();
-const memoryExporter = new InMemorySpanExporter();
-const metricsMemoryExporter = new InMemoryMetricExporter(
-  AggregationTemporality.DELTA
-);
-const metricReader = new TestMetricReader(metricsMemoryExporter);
-const meterProvider = new MeterProvider({ readers: [metricReader] });
-instrumentation.setMeterProvider(meterProvider);
 
 import * as http from 'http';
 import { httpRequest } from '../utils/httpRequest';
@@ -59,6 +46,7 @@ import { sendRequestTwice } from '../utils/rawRequest';
 
 const protocol = 'http';
 const hostname = 'localhost';
+const memoryExporter = new InMemorySpanExporter();
 
 const customAttributeFunction = (span: Span): void => {
   span.setAttribute('span kind', SpanKind.CLIENT);

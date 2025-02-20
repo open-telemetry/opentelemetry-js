@@ -41,27 +41,15 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
-import {
-  AggregationTemporality,
-  InMemoryMetricExporter,
-  MeterProvider,
-} from '@opentelemetry/sdk-metrics';
 
 import { assertSpan } from '../../build/test/utils/assertSpan.js';
-import { TestMetricReader } from '../../build/test/utils/TestMetricReader.js';
 import { HttpInstrumentation } from '../../build/src/index.js';
 
 const memoryExporter = new InMemorySpanExporter();
 const provider = new NodeTracerProvider({
   spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
 });
-const metricsMemoryExporter = new InMemoryMetricExporter(
-  AggregationTemporality.DELTA
-);
-const metricReader = new TestMetricReader(metricsMemoryExporter);
-const meterProvider = new MeterProvider({ readers: [metricReader] });
 const instrumentation = new HttpInstrumentation();
-instrumentation.setMeterProvider(meterProvider);
 instrumentation.setTracerProvider(provider);
 
 const httpImports = [
