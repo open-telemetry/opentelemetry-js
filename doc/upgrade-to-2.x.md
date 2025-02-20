@@ -49,10 +49,6 @@ git ls-files | rg CHANGELOG | while read f; do echo; echo "# $f"; diff -u $f ~/s
 
 
 
-
-
-
-
 ## 💥 Node.js supported versions
 
 The **minimum supported Node.js has be raised to `^18.19.0 || >=20.6.0`**. This means that support Node.js 14 and 16 has been dropped. (The particular minimum *minor* versions of Node.js 18 and 20 was selected to include support for Node.js's `--import` flag and `module.register()` API. It is expected that this will provide a smoother experience for improved automatic ES module instrumentation.)
@@ -61,14 +57,14 @@ For the time being, the minimum supported Node.js versions for `@opentelemetry/a
 
 [#5395](https://github.com/open-telemetry/opentelemetry-js/issues/5395)
 
-## TypeScript supported versions
+## 💥 TypeScript supported versions
 
 The **minimum supported TypeScript version has been raised to 5.0.4**. As well, going forward all packages published from this repository will **drop support for old versions of `typescript` in minor releases**. We will only drop support for versions that are older than 2 years.
 
 [#5145](https://github.com/open-telemetry/opentelemetry-js/pull/5145)
 
 
-## Changes for browser users
+## 💥 Changes for browser users
 
 XXX call out the `window.OTEL_*` thing. See notes in the resources section
 
@@ -96,8 +92,7 @@ XXX
 ```
 
 
-
-## `@opentelemetry/resources` API changes
+## 💥 `@opentelemetry/resources` API changes
 
 Perhaps the most likely API change you will need to update for is from the `@opentelemetry/resources` package.
 
@@ -154,7 +149,7 @@ Implementation notes:
 [#5217](https://github.com/open-telemetry/opentelemetry-js/issues/5217]
 
 
-## `@opentelemetry/core` API changes
+## 💥 `@opentelemetry/core` API changes
 
 The environment variable utilities have changed to not longer have one large load and parse of all possible `OTEL_*` environment variables. Instead there are `get{Type}FromEnv()` utilities to handle the various [specified OpenTelemetry SDK environment variable types](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#configuration-types). The caller should now handle default values.
 
@@ -227,11 +222,11 @@ A number of deprecated, obsolete, unused, and accidentally exported functions an
 [#5444](https://github.com/open-telemetry/opentelemetry-js/pull/5444)
 
 
-## Tracing API changes
+## 💥 Tracing API changes
 
 XXX
 
-## `@opentelemetry/sdk-metrics` API changes
+## 💥 `@opentelemetry/sdk-metrics` API changes
 
 XXX TODO
 
