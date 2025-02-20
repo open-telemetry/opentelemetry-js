@@ -2,22 +2,22 @@
 
 In late February 2025, the OpenTelemetry JavaScript project released the first versions of "JS SDK 2.x" packages. These packages include a number of breaking changes. This document shows the necessary code changes to upgrade to the new 2.x.
 
-Some of the sections below include an "Implementation notes:" section the provides brief background and motivation for particular changes. Feel free to skip these sections if you are not interested.
+Some of the sections below include an "Implementation notes:" section the provides brief background and motivation for some changes. Feel free to skip these sections if you are not interested.
 
 If you have any questions about the 2.x changes, please ask! You can reach the OTel JS community on the [#otel-js](https://cloud-native.slack.com/archives/C01NL1GRPQR) channel of the [CNCF Slack](https://slack.cncf.io/), or [open a Discussion issue](https://github.com/open-telemetry/opentelemetry-js/issues/new?template=discussion.md) on the repository.
 
 
 ## What is JS SDK 2.x?
 
-"JS SDK 2.x" refers to packages from opentelemetry-js.git, except the API and semantic-conventions packages (categories 3 and 4 in the groupings below). The versions of these packages will be `>=2.0.0` for the stable and `>=0.200.0` for the unstable packages. (The jump to `0.200.x` was intentional, to hopefully help signal that these packages are in the "2.x generation".)
+"JS SDK 2.x" encompasses new releases of packages published from the from opentelemetry-js.git repository (except the API and semantic-conventions packages) -- categories 3 and 4 in the groupings below. The package versions for this new major will be `>=2.0.0` for the stable and `>=0.200.0` for the unstable packages. (The jump to `0.200.x` was intentional, to hopefully help signal that these packages are in the "2.x generation".)
 
-The OpenTelemetry JS SIG is responsible for numerous packages -- all published to npm under the `@opentelemetry/` org, and developed in two git repositories: [opentelemetry-js.git](https://github.com/open-telemetry/opentelemetry-js) (sometimes called the "core" repo) and [opentelemetry-js-contrib.git](https://github.com/open-telemetry/opentelemetry-js-contrib) (the "contrib" repo). For the sake of this document, these packages can be grouped into these categories:
+The OpenTelemetry JS SIG is responsible for numerous packages, all published to npm under the `@opentelemetry/` org, and developed in two git repositories: [opentelemetry-js.git](https://github.com/open-telemetry/opentelemetry-js) (sometimes called the "core" repo) and [opentelemetry-js-contrib.git](https://github.com/open-telemetry/opentelemetry-js-contrib) (the "contrib" repo). For the sake of this document, these packages can be grouped into these categories:
 
 1. The [API](../api/) (`@opentelemetry/api`). The API is versioned independently of all other packages. Its version is *not* being changed as part of "JS SDK 2.x".
-2. The [Semantic Conventions](../semantic-conventions/) (`@opentelemetry/semantic-conventions`). This package follows the [versioning](https://github.com/open-telemetry/semantic-conventions/releases) of language-independent Semantic Conventions. It is *not* being changed as part of "JS SDK 2.x".
-3. [Stable packages from opentelemetry-js.git](../packages/). These are packages that have reached "1.x". These packages are all versioned together, at version "1.30.0" at the time of writing.
-4. [Unstable packages from opentelemetry-js.git](../experimental/packages/). These are packages deemed still experimental. They are all at "0.x" versions. These packages are all versioned together, at version "0.57.0" at the time of writing.
-5. All packages from opentelemetry-js-contrib.git. These packages are all versioned independently. These packages are not considered part of the "JS SDK 2.0" release. However, eventually they will update to use JS SDK 2.0 releases.
+2. The [Semantic Conventions](../semantic-conventions/) (`@opentelemetry/semantic-conventions`). This package follows the [versioning](https://github.com/open-telemetry/semantic-conventions/releases) of the language-independent Semantic Conventions. It is *not* being changed as part of "JS SDK 2.x".
+3. [Stable packages from opentelemetry-js.git](../packages/). These are packages that have reached "1.x". These packages are all versioned together, and are at version "1.30.0" at the time of writing.
+4. [Unstable packages from opentelemetry-js.git](../experimental/packages/). These are packages deemed still experimental. They are all at "0.x" versions. These packages are all versioned together, and are at version "0.57.0" at the time of writing.
+5. All packages from opentelemetry-js-contrib.git. These packages are all versioned independently. These packages are not considered part of the "JS SDK 2.0" release. However, eventually they will update to use JS SDK 2.x releases.
 
 "JS SDK 2.x" refers to categories 3 and 4.
 
@@ -31,11 +31,14 @@ The full set of packages is:
 
 ## 💥 Node.js supported versions
 
-The **minimum supported Node.js has be raised to `^18.19.0 || >=20.6.0`**. This means that support Node.js 14 and 16 has been dropped. (The particular minimum *minor* versions of Node.js 18 and 20 was selected to include support for Node.js's `--import` flag and `module.register()` API. It is expected that this will provide a smoother experience for improved automatic ES module instrumentation.)
+The **minimum supported Node.js has be raised to `^18.19.0 || >=20.6.0`**. This means that support Node.js 14 and 16 has been dropped.
 
-For the time being, the minimum supported Node.js versions for `@opentelemetry/api` (Node.js v8) and `@opentelemetry/semantic-conventions` (Node.js v14) packages is not changing.
+(The minimum supported Node.js versions for `@opentelemetry/api` (Node.js v8) and `@opentelemetry/semantic-conventions` (Node.js v14) are *not* changing as part of "JS SDK 2.x".)
 
 > [!NOTE]
+> Implementation notes:
+> - The particular minimum *minor* versions of Node.js 18 and 20 were selected to include support for Node.js's `--import` flag and `module.register()` API. It is expected that this will provide a smoother experience for improved automatic ES module instrumentation.
+>
 > Related issues:
 > [#5395](https://github.com/open-telemetry/opentelemetry-js/issues/5395)
 
@@ -53,7 +56,7 @@ As well, going forward all packages published from this repository will **drop s
 
 ## 💥 ES2022 compilation target
 
-The compilation target for transpiled TypeScript has been raised to ES2022 (from ES2017) for all packages (except `@opentelemetry/api`, `@opentelemetry/api-logs`, `@opentelemetry/api-events`, and `@opentelemetry/semantic-conventions`).
+The **compilation target for transpiled TypeScript has been raised to ES2022** (from ES2017) for all packages (except `@opentelemetry/api`, `@opentelemetry/api-logs`, `@opentelemetry/api-events`, and `@opentelemetry/semantic-conventions`).
 
 For Browser usage, this drops support for any browser versions that do not support ES2022 features.
 For Node.js usage, this already follows from the new minimum supported Node.js versions mentioned above.
@@ -81,7 +84,7 @@ For browser users, support for `window.OTEL_*` environment variable configuratio
 
 Perhaps the most likely API change you will need to update for is from the `@opentelemetry/resources` package.
 
-The `Resource` *class* is no longer exported, in favor of utility functions.
+The `Resource` *class* is no longer exported; instead use new utility functions.
 
 - Creating a resource: `new Resource(...)` -> `resourceFromAttributes(...)`
 - Getting the default resource: `Resource.default()` -> `defaultResource()`
