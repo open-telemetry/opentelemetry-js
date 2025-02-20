@@ -488,16 +488,17 @@ export const getOutgoingRequestAttributes = (
     oldAttributes[SEMATTRS_HTTP_USER_AGENT] = userAgent;
   }
 
-  if (newAttributes[ATTR_USER_AGENT_ORIGINAL] != null) {
+  if (userAgent != null) {
+    const userAgentString: String = String(userAgent).toLowerCase();
     for (const name of SYNTHETIC_TEST_NAMES) {
-      if (String(newAttributes[ATTR_USER_AGENT_ORIGINAL]).includes(name)) {
+      if (userAgentString.includes(name)) {
         newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
           USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST;
         break;
       }
     }
     for (const name of SYNTHETIC_BOT_NAMES) {
-      if (String(newAttributes[ATTR_USER_AGENT_ORIGINAL]).includes(name)) {
+      if (userAgentString.includes(name)) {
         newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
           USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT;
         break;
@@ -862,16 +863,17 @@ export const getIncomingRequestAttributes = (
     newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
   }
 
-  if (newAttributes[ATTR_USER_AGENT_ORIGINAL] != null) {
+  if (userAgent != null) {
+    const userAgentString: String = String(userAgent).toLowerCase();
     for (const name of SYNTHETIC_TEST_NAMES) {
-      if (String(newAttributes[ATTR_USER_AGENT_ORIGINAL]).includes(name)) {
+      if (userAgentString.includes(name)) {
         newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
           USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST;
         break;
       }
     }
     for (const name of SYNTHETIC_BOT_NAMES) {
-      if (String(newAttributes[ATTR_USER_AGENT_ORIGINAL]).includes(name)) {
+      if (userAgentString.includes(name)) {
         newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
           USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT;
         break;
