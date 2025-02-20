@@ -1,23 +1,17 @@
-# Upgrade to OpenTelemetry JS 2.x
+# Upgrade to OpenTelemetry JS SDK 2.x
 
 In late February 2025, the OpenTelemetry JavaScript project released the first versions of "JS SDK 2.x" packages. These packages include a number of breaking changes. This document shows the necessary code changes to upgrade to the new 2.x.
 
-XXX note about "Implementation notes:" sections that can be skipped. The "Why".
+Some of the sections below include an "Implementation notes:" section the provides brief background and motivation for particular changes. Feel free to skip these sections if you are not interested.
 
-XXX note to ask on #otel-js in CNCF slack or open a Discussion issue: https://github.com/open-telemetry/opentelemetry-js/issues/new?template=discussion.md
-
-XXX perhaps TOC, of link to jump straight to the breaking changes prose below
+If you have any questions about the 2.x changes, please ask! You can reach the OTel JS community on the [#otel-js](https://cloud-native.slack.com/archives/C01NL1GRPQR) channel of the [CNCF Slack](https://slack.cncf.io/), or [open a Discussion issue](https://github.com/open-telemetry/opentelemetry-js/issues/new?template=discussion.md) on the repository.
 
 
 ## What is JS SDK 2.x?
 
 "JS SDK 2.x" refers to packages from opentelemetry-js.git, except the API and semantic-conventions packages (categories 3 and 4 in the groupings below). The versions of these packages will be `>=2.0.0` for the stable and `>=0.200.0` for the unstable packages. (The jump to `0.200.x` was intentional, to hopefully help signal that these packages are in the "2.x generation".)
 
-(TODO: Validate that it will be 0.58.0 at release time. XXX going with 0.200.0.)
-
-XXX put this grouping into a disclosure? Perhaps yes.
-
-The OpenTelemetry JS SIG is responsible for numerous packages -- all published to npm under the `@opentelemetry/` org, and developed in two git repositories: [opentelemetry-js.git](XXX) (sometimes called the "core" repo) and [opentelemetry-js-contrib.git](XXX) (the "contrib" repo). For the sake of this document, these packages can be grouped into these categories:
+The OpenTelemetry JS SIG is responsible for numerous packages -- all published to npm under the `@opentelemetry/` org, and developed in two git repositories: [opentelemetry-js.git](https://github.com/open-telemetry/opentelemetry-js) (sometimes called the "core" repo) and [opentelemetry-js-contrib.git](https://github.com/open-telemetry/opentelemetry-js-contrib) (the "contrib" repo). For the sake of this document, these packages can be grouped into these categories:
 
 1. The [API](../api/) (`@opentelemetry/api`). The API is versioned independently of all other packages. Its version is *not* being changed as part of "JS SDK 2.x".
 2. The [Semantic Conventions](../semantic-conventions/) (`@opentelemetry/semantic-conventions`). This package follows the [versioning](https://github.com/open-telemetry/semantic-conventions/releases) of language-independent Semantic Conventions. It is *not* being changed as part of "JS SDK 2.x".
@@ -27,26 +21,12 @@ The OpenTelemetry JS SIG is responsible for numerous packages -- all published t
 
 "JS SDK 2.x" refers to categories 3 and 4.
 
+<!--
+XXX
 The full set of packages is:
 
 (TODO: List full table of "SDK 2.x" packages. The idea is to make it clear whether a given 0.x `@opentelemetry/` package applies. I'm not sure if this is useful. There *will* be upgrades to contrib packages for compat as well, so the line is blurry. Could put this in a disclosure.)
-
-
-## XXX outline
-
-- Am I ready for JS SDK 2.x?  Dropped Node 14 and 16 support. >=18.19.0.
-- The highlights: min node, min TypeScript, moving away from exported *classes* because ...,
-- "Why SDK 2.0?"  I.e. why should a user upgrade, other than this is what will be maintained. We don't *have* to answer this. That is more about "What's New" than covering breaking changes here.
-- Statement on maint of 1.x: how long?
-
-## XXX new changelog entries to merge
-
-```
-git ls-files | rg CHANGELOG | while read f; do echo; echo "# $f"; diff -u $f ~/src/opentelemetry-js/$f ; done
-```
-
-
-
+-->
 
 
 ## 💥 Node.js supported versions
@@ -59,41 +39,42 @@ For the time being, the minimum supported Node.js versions for `@opentelemetry/a
 > Related issues:
 > [#5395](https://github.com/open-telemetry/opentelemetry-js/issues/5395)
 
+
 ## 💥 TypeScript supported versions
 
-The **minimum supported TypeScript version has been raised to 5.0.4**. As well, going forward all packages published from this repository will **drop support for old versions of `typescript` in minor releases**. We will only drop support for versions that are older than 2 years.
+The **minimum supported TypeScript version has been raised to 5.0.4**.
+
+As well, going forward all packages published from this repository will **drop support for old versions of `typescript` in minor releases**. We will only drop support for versions that are older than 2 years.
 
 > [!NOTE]
 > Related issues:
 > [#5145](https://github.com/open-telemetry/opentelemetry-js/pull/5145)
 
 
-## 💥 Changes for browser users
+## 💥 ES2022 compilation target
 
-XXX call out the `window.OTEL_*` thing. See notes in the resources section
+The compilation target for transpiled TypeScript has been raised to ES2022 (from ES2017) for all packages (except `@opentelemetry/api`, `@opentelemetry/api-logs`, `@opentelemetry/api-events`, and `@opentelemetry/semantic-conventions`).
 
-```
-XXX
-+* feat(sdk-trace-base)!: do not read environment variables from window in browsers [#5445](https://github.com/open-telemetry/opentelemetry-js/pull/5455) @pichlermarc
-+  * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore, please pass configuration options to constructors instead.
-+  * Note: Node.js environment variable configuration continues to work as-is.
+For Browser usage, this drops support for any browser versions that do not support ES2022 features.
+For Node.js usage, this already follows from the new minimum supported Node.js versions mentioned above.
 
-+* feat(sdk-logs)!: do not read environment variables from window in browsers [#5472](https://github.com/open-telemetry/opentelemetry-js/pull/5472) @pichlermarc
-+  * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore, please pass configuration options to constructors instead.
-+    * Note: Node.js environment variable configuration continues to work as-is.
-
-+* feat(exporter-zipkin)!: do not read environment variables from window in browsers [#5465](https://github.com/open-telemetry/opentelemetry-js/pull/5465) @pichlermarc
-+  * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore, please pass configuration options to constructors instead.
-+  * Note: Node.js environment variable configuration continues to work as-is.
+> [!NOTE]
+> Related issues:
+> [#5393](https://github.com/open-telemetry/opentelemetry-js/issues/5393)
+> [#5456](https://github.com/open-telemetry/opentelemetry-js/pull/5456)
 
 
-+* feat(exporter-metrics-otlp-http)!: do not read environment variables from window in browsers [#5473](https://github.com/open-telemetry/opentelemetry-js/pull/5473) @pichlermarc
-+  * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore, please pass configuration options to constructors instead.
-+  * Note: Node.js environment variable configuration continues to work as-is.
+## 💥 Drop `window.OTEL_*` support in browsers
 
-(resources)
-...
-```
+For browser users, support for `window.OTEL_*` environment variable configuration (previous handled by the `envDetector`) has been dropped.  OpenTelemetry bootstrap code for the browser should be configured via existing "Environment variable" configuration for *browsers* was always odd and confusing.
+
+> [!NOTE]
+> Related issues:
+> [#5217](https://github.com/open-telemetry/opentelemetry-js/issues/5217)
+> [#5445](https://github.com/open-telemetry/opentelemetry-js/pull/5445)
+> [#5472](https://github.com/open-telemetry/opentelemetry-js/pull/5472)
+> [#5465](https://github.com/open-telemetry/opentelemetry-js/pull/5465)
+> [#5473](https://github.com/open-telemetry/opentelemetry-js/pull/5473)
 
 
 ## 💥 `@opentelemetry/resources` API changes
@@ -134,9 +115,8 @@ The `browserDetector` and `browserDetectorSync` exports were dropped. This resou
 
 - `browserDetector` or `browserDetectorSync` -> `import { browserDetector } from '@opentelemetry/opentelemetry-browser-detector'`
 
-For browser users, support for `window.OTEL_*` environment variable configuration (previous handled by the `envDetector`) has been dropped. "Environment variable" configuration for *browsers* was always an error. See [#5217](https://github.com/open-telemetry/opentelemetry-js/issues/5217) for details.
+As mentioned above, support for `window.OTEL_*` environment variable configuration in browsers has been dropped. This means that the `envDetector` in browsers is now a no-op.
 
-- `window.OTEL_*` usage -> use the relevant SDK APIs for configuration
 - `envDetector` in a browser -> manually create a resource with the API
 
 In TypeScript code, the `ResourceAttributes` type was replaced the `Attributes` type from the 'api' package. While unlikely, this could be a breaking change because it raised the minimum `peerDependencies` entry for `@opentelemetry/api` from `1.0.0` to `1.3.0`.
@@ -145,8 +125,8 @@ In TypeScript code, the `ResourceAttributes` type was replaced the `Attributes` 
 
 > [!NOTE]
 > Implementation notes:
-> - In general, the OTel JS packages are tending away from exporting *classes* because that results in exporting types with internal details that inhibit later refactoring. See [XXX](https://github.com/open-telemetry/opentelemetry-js/issues/5283) for details.
-> - The unification of sync and async resource detectors simplified the API, clarified the behavior for merging results from multiple detectors, and laid the ground work for support OpenTelemetry Entities in the future. See [XXX](https://github.com/open-telemetry/opentelemetry-js/pull/5350) for details.
+> - In general, the OTel JS packages are tending away from exporting *classes* because that results in exporting types with internal details that inhibit later refactoring. See [#5283](https://github.com/open-telemetry/opentelemetry-js/issues/5283) for details.
+> - The unification of sync and async resource detectors simplified the API, clarified the behavior for merging results from multiple detectors, and laid the ground work for support OpenTelemetry Entities in the future. See [#5350](https://github.com/open-telemetry/opentelemetry-js/pull/5350) for details.
 >
 > Related issues:
 > [#5421](https://github.com/open-telemetry/opentelemetry-js/pull/5421)
@@ -347,3 +327,25 @@ XXX can merge these in with above. E.g. grouping the metrics changes.
 - XXX mention that it will take some time for contrib repo packages to migrate
 - XXX `rg`-using tool to list if one needs to look at updating
 - XXX eventually get to all the examples/. They will be like bad docs.
+
+> [!NOTE]
+> Related issues:
+> [#XXX](https://github.com/open-telemetry/opentelemetry-js/issues/XXX)
+> [#XXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXX)
+
+## XXX outline
+
+- Am I ready for JS SDK 2.x?  Dropped Node 14 and 16 support. >=18.19.0.
+- The highlights: min node, min TypeScript, moving away from exported *classes* because ...,
+- "Why SDK 2.0?"  I.e. why should a user upgrade, other than this is what will be maintained. We don't *have* to answer this. That is more about "What's New" than covering breaking changes here.
+- Statement on maint of 1.x: how long?
+
+## XXX new changelog entries to merge
+
+```
+git ls-files | rg CHANGELOG | while read f; do echo; echo "# $f"; diff -u $f ~/src/opentelemetry-js/$f ; done
+```
+
+
+
+
