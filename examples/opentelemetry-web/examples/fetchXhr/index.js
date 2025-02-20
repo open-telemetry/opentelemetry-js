@@ -6,11 +6,11 @@ const { FetchInstrumentation } = require('@opentelemetry/instrumentation-fetch')
 const { XMLHttpRequestInstrumentation } = require('@opentelemetry/instrumentation-xml-http-request');
 const { ZoneContextManager } = require('@opentelemetry/context-zone');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
-const { Resource } = require('@opentelemetry/resources');
+const { resourceFromAttributes } = require('@opentelemetry/resources');
 const { SEMRESATTRS_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 
 const provider = new WebTracerProvider({
-  resource: new Resource({
+  resource: resourceFromAttributes({
     [SEMRESATTRS_SERVICE_NAME]: 'fetch-xhr-web-service'
   }),
   // Note: For production consider using the "BatchSpanProcessor" to reduce the number of requests
