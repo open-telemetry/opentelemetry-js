@@ -85,7 +85,7 @@ import {
   ATTR_USER_AGENT_SYNTHETIC_TYPE,
   USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
   USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST,
-} from '@opentelemetry/semantic-conventions/incubating';
+} from './semconv';
 
 /**
  * Get an absolute url

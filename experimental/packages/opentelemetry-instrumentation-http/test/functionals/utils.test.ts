@@ -33,7 +33,7 @@ import {
 import {
   ATTR_USER_AGENT_SYNTHETIC_TYPE,
   USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
-} from '@opentelemetry/semantic-conventions/incubating';
+} from '../../src/semconv';
 import * as assert from 'assert';
 import { IncomingMessage, ServerResponse } from 'http';
 import { Socket } from 'net';
