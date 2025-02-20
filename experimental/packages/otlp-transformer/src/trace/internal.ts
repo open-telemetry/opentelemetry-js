@@ -37,10 +37,13 @@ import { getOtlpEncoder } from '../common/utils';
 export function sdkSpanToOtlpSpan(span: ReadableSpan, encoder: Encoder): ISpan {
   const ctx = span.spanContext();
   const status = span.status;
+  const parentSpanId = span.parentSpanContext?.spanId
+    ? encoder.encodeSpanContext(span.parentSpanContext?.spanId)
+    : undefined;
   return {
     traceId: encoder.encodeSpanContext(ctx.traceId),
     spanId: encoder.encodeSpanContext(ctx.spanId),
-    parentSpanId: encoder.encodeOptionalSpanContext(span.parentSpanId),
+    parentSpanId: parentSpanId,
     traceState: ctx.traceState?.serialize(),
     name: span.name,
     // Span kind is offset by 1 because the API does not define a value for unset

@@ -1,7 +1,7 @@
 'use strict';
 
 const opentelemetry = require('@opentelemetry/api');
-const { Resource } = require('@opentelemetry/resources');
+const { resourceFromAttributes } = require('@opentelemetry/resources');
 const { SEMRESATTRS_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
@@ -11,7 +11,7 @@ const exporter = new JaegerExporter({
   endpoint: 'http://localhost:14268/api/traces',
 });
 const provider = new BasicTracerProvider({
-  resource: new Resource({
+  resource: resourceFromAttributes({
     [SEMRESATTRS_SERVICE_NAME]: 'basic-service',
   }),
   spanProcessors: [

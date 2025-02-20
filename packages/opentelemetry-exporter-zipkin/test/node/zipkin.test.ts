@@ -24,7 +24,7 @@ import {
 } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import {
-  EMPTY_RESOURCE,
+  emptyResource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
 import { ZipkinExporter } from '../../src';
@@ -57,7 +57,7 @@ function getReadableSpan() {
     attributes: {},
     links: [],
     events: [],
-    resource: EMPTY_RESOURCE,
+    resource: emptyResource(),
     instrumentationScope: { name: 'default', version: '0.0.1' },
     droppedAttributesCount: 0,
     droppedEventsCount: 0,
@@ -141,7 +141,11 @@ describe('Zipkin Exporter - node', () => {
       const span1: ReadableSpan = {
         name: 'my-span',
         kind: api.SpanKind.INTERNAL,
-        parentSpanId,
+        parentSpanContext: {
+          spanId: parentSpanId,
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          traceFlags: TraceFlags.NONE,
+        },
         spanContext: () => {
           return {
             traceId: 'd4cda95b652f4a1592b449d5929fda1b',
@@ -168,7 +172,7 @@ describe('Zipkin Exporter - node', () => {
             attributes: { key3: 'value3' },
           },
         ],
-        resource: EMPTY_RESOURCE,
+        resource: emptyResource(),
         instrumentationScope: { name: 'default', version: '0.0.1' },
         droppedAttributesCount: 0,
         droppedEventsCount: 0,
@@ -194,7 +198,7 @@ describe('Zipkin Exporter - node', () => {
         attributes: {},
         links: [],
         events: [],
-        resource: EMPTY_RESOURCE,
+        resource: emptyResource(),
         instrumentationScope: { name: 'default', version: '0.0.1' },
         droppedAttributesCount: 0,
         droppedEventsCount: 0,
@@ -362,7 +366,11 @@ describe('Zipkin Exporter - node', () => {
     const span1: ReadableSpan = {
       name: 'my-span',
       kind: api.SpanKind.INTERNAL,
-      parentSpanId,
+      parentSpanContext: {
+        spanId: parentSpanId,
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        traceFlags: TraceFlags.NONE,
+      },
       spanContext: () => ({
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',
@@ -457,7 +465,11 @@ describe('Zipkin Exporter - node', () => {
     const span1: ReadableSpan = {
       name: 'my-span',
       kind: api.SpanKind.INTERNAL,
-      parentSpanId,
+      parentSpanContext: {
+        spanId: parentSpanId,
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        traceFlags: TraceFlags.NONE,
+      },
       spanContext: () => ({
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',
@@ -483,7 +495,7 @@ describe('Zipkin Exporter - node', () => {
           attributes: { key3: 'value3' },
         },
       ],
-      resource: EMPTY_RESOURCE,
+      resource: emptyResource(),
       instrumentationScope: { name: 'default', version: '0.0.1' },
       droppedAttributesCount: 0,
       droppedEventsCount: 0,
@@ -509,7 +521,7 @@ describe('Zipkin Exporter - node', () => {
       },
       links: [],
       events: [],
-      resource: EMPTY_RESOURCE,
+      resource: emptyResource(),
       instrumentationScope: { name: 'default', version: '0.0.1' },
       droppedAttributesCount: 0,
       droppedEventsCount: 0,

@@ -147,10 +147,15 @@ export function resourceFromDetectedResource(
   return new ResourceImpl(detectedResource);
 }
 
-export const EMPTY_RESOURCE = resourceFromAttributes({});
-export const DEFAULT_RESOURCE = resourceFromAttributes({
-  [ATTR_SERVICE_NAME]: defaultServiceName(),
-  [ATTR_TELEMETRY_SDK_LANGUAGE]: SDK_INFO[ATTR_TELEMETRY_SDK_LANGUAGE],
-  [ATTR_TELEMETRY_SDK_NAME]: SDK_INFO[ATTR_TELEMETRY_SDK_NAME],
-  [ATTR_TELEMETRY_SDK_VERSION]: SDK_INFO[ATTR_TELEMETRY_SDK_VERSION],
-});
+export function emptyResource(): Resource {
+  return resourceFromAttributes({});
+}
+
+export function defaultResource(): Resource {
+  return resourceFromAttributes({
+    [ATTR_SERVICE_NAME]: defaultServiceName(),
+    [ATTR_TELEMETRY_SDK_LANGUAGE]: SDK_INFO[ATTR_TELEMETRY_SDK_LANGUAGE],
+    [ATTR_TELEMETRY_SDK_NAME]: SDK_INFO[ATTR_TELEMETRY_SDK_NAME],
+    [ATTR_TELEMETRY_SDK_VERSION]: SDK_INFO[ATTR_TELEMETRY_SDK_VERSION],
+  });
+}
