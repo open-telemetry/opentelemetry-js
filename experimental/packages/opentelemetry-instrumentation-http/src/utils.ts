@@ -79,13 +79,11 @@ import {
   SemconvStability,
   SYNTHETIC_BOT_NAMES,
   SYNTHETIC_TEST_NAMES,
-} from './internal-types';
-import forwardedParse = require('forwarded-parse');
-import {
   ATTR_USER_AGENT_SYNTHETIC_TYPE,
   USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
   USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST,
-} from './semconv';
+} from './internal-types';
+import forwardedParse = require('forwarded-parse');
 
 /**
  * Get an absolute url

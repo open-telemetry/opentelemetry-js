@@ -64,6 +64,13 @@ export const enum SemconvStability {
 }
 
 /**
+ * Incubating semantic conventions for synthetics.
+ */
+export const ATTR_USER_AGENT_SYNTHETIC_TYPE = 'http.user_agent.synthetic_type';
+export const USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT = 'bot';
+export const USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST = 'test';
+
+/**
  * Names of possible synthetic test sources.
  */
 export const SYNTHETIC_TEST_NAMES = ['alwayson'];
