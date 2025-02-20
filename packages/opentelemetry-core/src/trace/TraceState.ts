@@ -15,6 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
+import { validateKey, validateValue } from '../internal/validators';
 
 // const MAX_TRACE_STATE_ITEMS = 32;
 // const MAX_TRACE_STATE_LEN = 512;
@@ -38,20 +39,31 @@ export class TraceState implements api.TraceState {
   }
 
   set(key: string, value: string): TraceState {
+    if (!validateKey(key) || !validateValue(value)) {
+      // TODO: warn of invalid key or value???
+      return this;
+    }
+
+    const keyValues = this._state.split(LIST_MEMBERS_SEPARATOR).map(kv => kv.trim());
     const toSearch = `${key}${LIST_MEMBER_KEY_VALUE_SPLITTER}`;
-    const hasKey = this._state?.indexOf(toSearch);
+    const hasKey = keyValues.some(kv => kv.startsWith(toSearch));
 
     if (hasKey) {
-      return new TraceState(this._state);
+      // TODO: warn of exiting key???
+      return this;
     }
 
-    let memberToAdd = `${key}${LIST_MEMBER_KEY_VALUE_SPLITTER}${value}`
-    
-    if (this._state.length > 0) {
-      memberToAdd += LIST_MEMBERS_SEPARATOR;
-    }
+    // Get only the valid ones and append the new one on the front
+    const validKeyValues = keyValues.filter((kv) => {
+      const idx = kv.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
+      if (idx !== -1) {
+        return validateKey(kv.slice(0, idx)) && validateValue(kv.slice(idx + 1));
+      }
+      return false;
+    });
+    validKeyValues.unshift(`${key}${LIST_MEMBER_KEY_VALUE_SPLITTER}${value}`);
 
-    return new TraceState(`${memberToAdd}${this._state}`);
+    return new TraceState(validKeyValues.join(LIST_MEMBERS_SEPARATOR));
   }
 
   unset(key: string): TraceState {
