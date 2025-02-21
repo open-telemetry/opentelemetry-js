@@ -95,10 +95,10 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
   private _headerCapture;
-  private _oldHttpServerDurationHistogram!: Histogram;
-  private _stableHttpServerDurationHistogram!: Histogram;
-  private _oldHttpClientDurationHistogram!: Histogram;
-  private _stableHttpClientDurationHistogram!: Histogram;
+  declare private _oldHttpServerDurationHistogram: Histogram;
+  declare private _stableHttpServerDurationHistogram: Histogram;
+  declare private _oldHttpClientDurationHistogram: Histogram;
+  declare private _stableHttpClientDurationHistogram: Histogram;
 
   private _semconvStability = SemconvStability.OLD;
 
