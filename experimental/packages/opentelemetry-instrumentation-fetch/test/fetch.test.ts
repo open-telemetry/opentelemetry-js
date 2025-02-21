@@ -400,7 +400,7 @@ describe('fetch', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
 
           assert.strictEqual(
-            span.parentSpanId,
+            span.parentSpanContext?.spanId,
             rootSpan!.spanContext().spanId,
             'parent span is not root span'
           );
@@ -775,7 +775,7 @@ describe('fetch', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
 
           assert.strictEqual(
-            span.parentSpanId,
+            span.parentSpanContext?.spanId,
             rootSpan!.spanContext().spanId,
             'parent span is not root span'
           );
@@ -1367,6 +1367,150 @@ describe('fetch', () => {
       });
     });
 
+    describe('`requestHook` option', () => {
+      const tracedFetch = async ({
+        handlers = [
+          msw.http.get('/api/echo-headers.json', ({ request }) => {
+            return msw.HttpResponse.json({
+              request: {
+                headers: Object.fromEntries(request.headers),
+              },
+            });
+          }),
+        ],
+        callback = () => fetch('/api/echo-headers.json'),
+        config,
+      }: {
+        handlers?: msw.RequestHandler[];
+        callback?: () => Promise<Response>;
+        config: FetchInstrumentationConfig &
+          Required<Pick<FetchInstrumentationConfig, 'requestHook'>>;
+      }): Promise<{ rootSpan: api.Span; response: Response }> => {
+        let response: Response | undefined;
+
+        await startWorker(...handlers);
+
+        const rootSpan = await trace(async () => {
+          response = await callback();
+        }, config);
+
+        assert.ok(response instanceof Response);
+        assert.strictEqual(exportedSpans.length, 1);
+
+        return { rootSpan, response };
+      };
+
+      it('can apply attributes to the span', async () => {
+        await tracedFetch({
+          config: {
+            requestHook: span => {
+              span.setAttribute('custom.foo', 'bar');
+            },
+          },
+        });
+
+        const span: tracing.ReadableSpan = exportedSpans[0];
+        assert.strictEqual(span.attributes['custom.foo'], 'bar');
+      });
+
+      it('can modify headers when called with a string URL', async () => {
+        const { response } = await tracedFetch({
+          config: {
+            requestHook: (span, request) => {
+              assert.ok(
+                request !== null &&
+                  typeof request === 'object' &&
+                  !(request instanceof Request),
+                '`requestHook` should get a `RequestInit` object when no options are passed to `fetch()`'
+              );
+              request.headers = { 'custom-foo': 'foo' };
+            },
+          },
+        });
+
+        const { request } = await response.json();
+
+        assert.strictEqual(
+          request.headers['custom-foo'],
+          'foo',
+          'header set from requestHook should be sent'
+        );
+      });
+
+      it('can modify headers when called with a `Request` object', async () => {
+        const { response } = await tracedFetch({
+          config: {
+            requestHook: (span, request) => {
+              assert.ok(
+                request instanceof Request,
+                '`requestHook` should get the `Request` object passed to `fetch()`'
+              );
+
+              request.headers.set('custom-foo', 'foo');
+            },
+          },
+          callback: () =>
+            fetch(
+              new Request('/api/echo-headers.json', {
+                headers: new Headers({ 'custom-bar': 'bar' }),
+              })
+            ),
+        });
+
+        const { request } = await response.json();
+
+        assert.strictEqual(
+          request.headers['custom-foo'],
+          'foo',
+          'header set from requestHook should be sent'
+        );
+        assert.strictEqual(
+          request.headers['custom-bar'],
+          'bar',
+          'header set from fetch() should be sent'
+        );
+      });
+
+      it('can modify headers when called with a `RequestInit` object', async () => {
+        const { response } = await tracedFetch({
+          config: {
+            requestHook: (span, request) => {
+              assert.ok(
+                request !== null &&
+                  typeof request === 'object' &&
+                  !(request instanceof Request),
+                '`requestHook` should get the `RequestInit` object passed to `fetch()`'
+              );
+
+              assert.ok(
+                request.headers !== null && typeof request.headers === 'object',
+                '`requestHook` should get the `headers` object passed to `fetch()`'
+              );
+
+              (request.headers as Record<string, string>)['custom-foo'] = 'foo';
+            },
+          },
+          callback: () =>
+            fetch('/api/echo-headers.json', {
+              headers: { 'custom-bar': 'bar' },
+            }),
+        });
+
+        const { request } = await response.json();
+
+        assert.strictEqual(
+          request.headers['custom-foo'],
+          'foo',
+          'header set from requestHook should be sent'
+        );
+        assert.strictEqual(
+          request.headers['custom-bar'],
+          'bar',
+          'header set from fetch() should be sent'
+        );
+      });
+    });
+
     describe('`ignoreUrls` config', () => {
       const tracedFetch = async ({
         handlers = [
@@ -1492,7 +1636,7 @@ describe('fetch', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
 
           assert.strictEqual(
-            span.parentSpanId,
+            span.parentSpanContext?.spanId,
             rootSpan!.spanContext().spanId,
             'parent span is not root span'
           );
@@ -1542,7 +1686,7 @@ describe('fetch', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
 
           assert.strictEqual(
-            span.parentSpanId,
+            span.parentSpanContext?.spanId,
             rootSpan!.spanContext().spanId,
             'parent span is not root span'
           );
@@ -1624,7 +1768,7 @@ describe('fetch', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
 
           assert.strictEqual(
-            span.parentSpanId,
+            span.parentSpanContext?.spanId,
             rootSpan!.spanContext().spanId,
             'parent span is not root span'
           );
@@ -1723,7 +1867,7 @@ describe('fetch', () => {
             const span: tracing.ReadableSpan = exportedSpans[0];
 
             assert.strictEqual(
-              span.parentSpanId,
+              span.parentSpanContext?.spanId,
               rootSpan!.spanContext().spanId,
               'parent span is not root span'
             );
@@ -1781,7 +1925,7 @@ describe('fetch', () => {
             const span: tracing.ReadableSpan = exportedSpans[0];
 
             assert.strictEqual(
-              span.parentSpanId,
+              span.parentSpanContext?.spanId,
               rootSpan!.spanContext().spanId,
               'parent span is not root span'
             );

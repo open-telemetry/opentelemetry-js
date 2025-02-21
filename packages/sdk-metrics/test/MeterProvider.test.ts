@@ -26,14 +26,17 @@ import {
   assertScopeMetrics,
   assertMetricData,
   assertPartialDeepStrictEqual,
-  defaultResource,
+  testResource,
 } from './util';
 import { TestMetricReader } from './export/TestMetricReader';
 import * as sinon from 'sinon';
 import { Meter } from '../src/Meter';
 import { createAllowListAttributesProcessor } from '../src/view/AttributesProcessor';
 import { AggregationType } from '../src/view/AggregationOption';
-import { Resource } from '@opentelemetry/resources';
+import {
+  defaultResource,
+  resourceFromAttributes,
+} from '@opentelemetry/resources';
 
 describe('MeterProvider', () => {
   afterEach(() => {
@@ -47,7 +50,7 @@ describe('MeterProvider', () => {
     });
 
     it('construct with resource', () => {
-      const meterProvider = new MeterProvider({ resource: defaultResource });
+      const meterProvider = new MeterProvider({ resource: testResource });
       assert.ok(meterProvider instanceof MeterProvider);
     });
 
@@ -65,12 +68,12 @@ describe('MeterProvider', () => {
 
       // Perform collection.
       const { resourceMetrics } = await reader.collect();
-      assert.deepStrictEqual(resourceMetrics.resource, Resource.default());
+      assert.deepStrictEqual(resourceMetrics.resource, defaultResource());
     });
 
     it('should use the resource passed in constructor', async function () {
       const reader = new TestMetricReader();
-      const expectedResource = new Resource({ attributes: { foo: 'bar' } });
+      const expectedResource = resourceFromAttributes({ foo: 'bar' });
 
       const meterProvider = new MeterProvider({
         readers: [reader],
@@ -100,7 +103,7 @@ describe('MeterProvider', () => {
 
       // Perform collection.
       const { resourceMetrics } = await reader.collect();
-      assert.deepStrictEqual(resourceMetrics.resource, Resource.default());
+      assert.deepStrictEqual(resourceMetrics.resource, defaultResource());
     });
   });
 
@@ -129,7 +132,7 @@ describe('MeterProvider', () => {
     it('get meter with same identity', async () => {
       const reader = new TestMetricReader();
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         readers: [reader],
       });
 
@@ -189,7 +192,7 @@ describe('MeterProvider', () => {
     it('with existing instrument should rename', async () => {
       const reader = new TestMetricReader();
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         // Add view to rename 'non-renamed-instrument' to 'renamed-instrument'
         views: [
           {
@@ -259,7 +262,7 @@ describe('MeterProvider', () => {
 
       // Add view to drop all attributes except 'attrib1'
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         views: [
           {
             attributesProcessors: [
@@ -327,7 +330,7 @@ describe('MeterProvider', () => {
 
       // Add view that renames 'test-counter' to 'renamed-instrument'
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         views: [
           {
             name: 'renamed-instrument',
@@ -398,7 +401,7 @@ describe('MeterProvider', () => {
     it('with meter name should apply view to only the selected meter', async () => {
       const reader = new TestMetricReader();
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         views: [
           // Add view that renames 'test-counter' to 'renamed-instrument' on 'meter1'
           {
@@ -471,7 +474,7 @@ describe('MeterProvider', () => {
     it('with different instrument types does not throw', async () => {
       const reader = new TestMetricReader();
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         // Add Views to rename both instruments (of different types) to the same name.
         views: [
           {
@@ -540,7 +543,7 @@ describe('MeterProvider', () => {
       const reader = new TestMetricReader();
 
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         views: [
           {
             instrumentUnit: 'ms',
@@ -608,7 +611,7 @@ describe('MeterProvider', () => {
     it('should respect the aggregationCardinalityLimit', async () => {
       const reader = new TestMetricReader();
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         readers: [reader],
         views: [
           {
@@ -653,7 +656,7 @@ describe('MeterProvider', () => {
     it('should respect the aggregationCardinalityLimit for observable counter', async () => {
       const reader = new TestMetricReader();
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         readers: [reader],
         views: [
           {
@@ -704,7 +707,7 @@ describe('MeterProvider', () => {
         cardinalitySelector: (instrumentType: InstrumentType) => 2, // Set cardinality limit to 2 via cardinalitySelector
       });
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         readers: [reader],
       });
 
@@ -745,7 +748,7 @@ describe('MeterProvider', () => {
     it('should respect the default aggregationCardinalityLimit', async () => {
       const reader = new TestMetricReader();
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         readers: [reader],
       });
 
@@ -789,7 +792,7 @@ describe('MeterProvider', () => {
       const reader1ShutdownSpy = sinon.spy(reader1, 'shutdown');
       const reader2ShutdownSpy = sinon.spy(reader2, 'shutdown');
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         readers: [reader1, reader2],
       });
 
@@ -815,7 +818,7 @@ describe('MeterProvider', () => {
       const reader1ForceFlushSpy = sinon.spy(reader1, 'forceFlush');
       const reader2ForceFlushSpy = sinon.spy(reader2, 'forceFlush');
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         readers: [reader1, reader2],
       });
 

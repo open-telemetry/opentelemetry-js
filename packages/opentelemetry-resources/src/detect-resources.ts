@@ -15,8 +15,8 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { IResource } from './IResource';
 import { Resource } from './Resource';
+import { emptyResource, resourceFromDetectedResource } from './ResourceImpl';
 import { ResourceDetectionConfig } from './config';
 
 /**
@@ -26,15 +26,15 @@ import { ResourceDetectionConfig } from './config';
  */
 export const detectResources = (
   config: ResourceDetectionConfig = {}
-): IResource => {
-  const resources: IResource[] = (config.detectors || []).map(d => {
+): Resource => {
+  const resources: Resource[] = (config.detectors || []).map(d => {
     try {
-      const resource = new Resource(d.detect(config));
+      const resource = resourceFromDetectedResource(d.detect(config));
       diag.debug(`${d.constructor.name} found resource.`, resource);
       return resource;
     } catch (e) {
       diag.debug(`${d.constructor.name} failed: ${e.message}`);
-      return Resource.EMPTY;
+      return emptyResource();
     }
   });
 
@@ -43,7 +43,7 @@ export const detectResources = (
 
   return resources.reduce(
     (acc, resource) => acc.merge(resource),
-    Resource.EMPTY
+    emptyResource()
   );
 };
 
@@ -52,7 +52,7 @@ export const detectResources = (
  *
  * @param resources The array of {@link Resource} that should be logged. Empty entries will be ignored.
  */
-const logResources = (resources: Array<IResource>) => {
+const logResources = (resources: Array<Resource>) => {
   resources.forEach(resource => {
     // Print only populated resources
     if (Object.keys(resource.attributes).length > 0) {

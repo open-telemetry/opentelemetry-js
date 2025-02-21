@@ -34,9 +34,9 @@ import {
   assertAggregationSelector,
   assertAggregationTemporalitySelector,
 } from './utils';
-import { defaultResource } from '../util';
+import { testResource } from '../util';
 import { ValueType } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 
 const testScopeMetrics: ScopeMetrics[] = [
   {
@@ -140,10 +140,8 @@ describe('MetricReader', () => {
     it('should collect metrics from the SDK and the additional metricProducers', async () => {
       const additionalProducer = new TestMetricProducer({
         resourceMetrics: {
-          resource: new Resource({
-            attributes: {
-              shouldBeDiscarded: 'should-be-discarded',
-            },
+          resource: resourceFromAttributes({
+            shouldBeDiscarded: 'should-be-discarded',
           }),
           scopeMetrics: testScopeMetrics,
         },
@@ -152,7 +150,7 @@ describe('MetricReader', () => {
         metricProducers: [additionalProducer],
       });
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         readers: [reader],
       });
 
@@ -167,7 +165,7 @@ describe('MetricReader', () => {
       // Should keep the SDK's Resource only
       assert.deepStrictEqual(
         collectionResult.resourceMetrics.resource.attributes,
-        defaultResource.attributes
+        testResource.attributes
       );
       assert.strictEqual(
         collectionResult.resourceMetrics.scopeMetrics.length,
