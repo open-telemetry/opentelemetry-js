@@ -125,7 +125,6 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * feat(core)!: defer tracestate validation until is modified [#5499](https://github.com/open-telemetry/opentelemetry-js/pull/5499) @david-luna
   * (user-facing): a given `TraceState` cannot be assumed to have valid members unless it's modified.
 
-
 ### :rocket: (Enhancement)
 
 * feat(sdk-trace-web): do not throw when passing extra options [#5357](https://github.com/open-telemetry/opentelemetry-js/pull/5357) @pichlermarc
