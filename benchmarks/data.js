@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1739985113447,
+  "lastUpdate": 1740127992070,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -28084,6 +28084,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.53%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "david.luna@elastic.co",
+            "name": "David Luna",
+            "username": "david-luna"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f2d4e549756a8f864f67cd7f0ff7805f487819ab",
+          "message": "feat!: set compilation target to `es2022` for all packages but api and semantic-conventions (#5456)\n\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2025-02-21T08:16:15Z",
+          "tree_id": "5ae42b6984be5c912eba75866fed55ce6f88bfae",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/f2d4e549756a8f864f67cd7f0ff7805f487819ab"
+        },
+        "date": 1740127991043,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1485951,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18343,
+            "range": "±0.16%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 837622,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "101 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 753943,
+            "range": "±0.68%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
