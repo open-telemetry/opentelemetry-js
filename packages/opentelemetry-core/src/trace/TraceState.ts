@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import type { TraceState as TraceStateApi } from '@opentelemetry/api';
 import { validateKey, validateValue } from '../internal/validators';
 
-// const MAX_TRACE_STATE_ITEMS = 32;
-// const MAX_TRACE_STATE_LEN = 512;
+const MAX_TRACE_STATE_ITEMS = 32;
+const MAX_TRACE_STATE_LEN = 512;
 const LIST_MEMBERS_SEPARATOR = ',';
 const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
 
@@ -31,7 +31,7 @@ const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
  * - The value of any key can be updated. Modified keys MUST be moved to the
  * beginning of the list.
  */
-export class TraceState implements api.TraceState {
+export class TraceState implements TraceStateApi {
   private _state: string;
 
   constructor(rawTraceState?: string) {
@@ -44,124 +44,78 @@ export class TraceState implements api.TraceState {
       return this;
     }
 
-    const keyValues = this._state.split(LIST_MEMBERS_SEPARATOR).map(kv => kv.trim());
-    const toSearch = `${key}${LIST_MEMBER_KEY_VALUE_SPLITTER}`;
-    const hasKey = keyValues.some(kv => kv.startsWith(toSearch));
+    // TODO: here potentially we could remove key/values from other vendors
+    // should we allow this??
+    // if not we should "return this;" if the entry already exists
 
-    if (hasKey) {
-      // TODO: warn of exiting key???
-      return this;
+    const entries = this._getEntries();
+    const index = entries.findIndex(entry => entry.key === key);
+
+    if (index !== -1) {
+      entries.splice(index, 1);
     }
+    entries.unshift({ key, value });
 
-    // Get only the valid ones and append the new one on the front
-    const validKeyValues = keyValues.filter((kv) => {
-      const idx = kv.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
-      if (idx !== -1) {
-        return validateKey(kv.slice(0, idx)) && validateValue(kv.slice(idx + 1));
-      }
-      return false;
-    });
-    validKeyValues.unshift(`${key}${LIST_MEMBER_KEY_VALUE_SPLITTER}${value}`);
-
-    return new TraceState(validKeyValues.join(LIST_MEMBERS_SEPARATOR));
+    return new TraceState(this._serializeEntries(entries));
   }
 
   unset(key: string): TraceState {
-    return this;
+    // TODO: here potentially we could remove key/values from other vendors
+    // should we allow this??
+    // if not we should only
+    // return this;
+
+    const entries = this._getEntries();
+    const index = entries.findIndex(entry => entry.key === key);
+
+    if (index !== -1) {
+      entries.splice(index, 1);
+    }
+
+    return new TraceState(this._serializeEntries(entries));
   }
 
   get(key: string): string | undefined {
-    if (this._state) {
-      const members = this._state.split(LIST_MEMBERS_SEPARATOR);
-      const member = members.find((m) => m.startsWith(key + LIST_MEMBER_KEY_VALUE_SPLITTER));
+    const entries = this._getEntries();
+    const entry = entries.find(e => e.key === key);
 
-      if (member) {
-        const idx = member.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
-        return member.slice(idx + 1);
-      }
-    }
-    return undefined;
+    return entry && entry.value;
   }
 
   serialize(): string {
     return this._state;
   }
+
+  private _getEntries(): Array<{ key: string; value: string }> {
+    // Do not parse/validate if state already surpass max length
+    if (this._state.length > MAX_TRACE_STATE_LEN) {
+      return [];
+    }
+    const entries = [];
+    const members = this._state
+      .split(LIST_MEMBERS_SEPARATOR)
+      .map(m => m.trim());
+    for (const m of members) {
+      const idx = m.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
+      if (idx === -1) {
+        continue;
+      }
+      const key = m.slice(0, idx);
+      const value = m.slice(idx + 1);
+      const isValid = validateKey(key) && validateValue(value);
+      const hasSpace = entries.length < MAX_TRACE_STATE_ITEMS;
+      if (isValid && hasSpace) {
+        entries.push({ key, value });
+      }
+    }
+    return entries;
+  }
+
+  private _serializeEntries(
+    entries: Array<{ key: string; value: string }>
+  ): string {
+    return entries
+      .map(e => `${e.key}${LIST_MEMBER_KEY_VALUE_SPLITTER}${e.value}`)
+      .join(LIST_MEMBERS_SEPARATOR);
+  }
 }
-
-// export class TraceStateOld implements api.TraceState {
-//   private _internalState: Map<string, string> = new Map();
-
-//   constructor(rawTraceState?: string) {
-//     if (rawTraceState) this._parse(rawTraceState);
-//   }
-
-//   set(key: string, value: string): TraceState {
-//     // TODO: Benchmark the different approaches(map vs list) and
-//     // use the faster one.
-//     const traceState = this._clone();
-//     if (traceState._internalState.has(key)) {
-//       traceState._internalState.delete(key);
-//     }
-//     traceState._internalState.set(key, value);
-//     return traceState;
-//   }
-
-//   unset(key: string): TraceState {
-//     const traceState = this._clone();
-//     traceState._internalState.delete(key);
-//     return traceState;
-//   }
-
-//   get(key: string): string | undefined {
-//     return this._internalState.get(key);
-//   }
-
-//   serialize(): string {
-//     return this._keys()
-//       .reduce((agg: string[], key) => {
-//         agg.push(key + LIST_MEMBER_KEY_VALUE_SPLITTER + this.get(key));
-//         return agg;
-//       }, [])
-//       .join(LIST_MEMBERS_SEPARATOR);
-//   }
-
-//   private _parse(rawTraceState: string) {
-//     if (rawTraceState.length > MAX_TRACE_STATE_LEN) return;
-//     this._internalState = rawTraceState
-//       .split(LIST_MEMBERS_SEPARATOR)
-//       .reverse() // Store in reverse so new keys (.set(...)) will be placed at the beginning
-//       .reduce((agg: Map<string, string>, part: string) => {
-//         const listMember = part.trim(); // Optional Whitespace (OWS) handling
-//         const i = listMember.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
-//         if (i !== -1) {
-//           const key = listMember.slice(0, i);
-//           const value = listMember.slice(i + 1, part.length);
-//           if (validateKey(key) && validateValue(value)) {
-//             agg.set(key, value);
-//           } else {
-//             // TODO: Consider to add warning log
-//           }
-//         }
-//         return agg;
-//       }, new Map());
-
-//     // Because of the reverse() requirement, trunc must be done after map is created
-//     if (this._internalState.size > MAX_TRACE_STATE_ITEMS) {
-//       this._internalState = new Map(
-//         Array.from(this._internalState.entries())
-//           .reverse() // Use reverse same as original tracestate parse chain
-//           .slice(0, MAX_TRACE_STATE_ITEMS)
-//       );
-//     }
-//   }
-
-//   private _keys(): string[] {
-//     return Array.from(this._internalState.keys()).reverse();
-//   }
-
-//   private _clone(): TraceState {
-//     const traceState = new TraceState();
-//     traceState._internalState = new Map(this._internalState);
-//     return traceState;
-//   }
-// }
