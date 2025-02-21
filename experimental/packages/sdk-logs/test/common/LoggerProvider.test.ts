@@ -16,7 +16,7 @@
 import { logs, NoopLogger } from '@opentelemetry/api-logs';
 import { diag } from '@opentelemetry/api';
 import {
-  DEFAULT_RESOURCE,
+  defaultResource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -55,7 +55,7 @@ describe('LoggerProvider', () => {
       it('should have default resource if not pass', () => {
         const provider = new LoggerProvider();
         const { resource } = provider['_sharedState'];
-        assert.deepStrictEqual(resource, DEFAULT_RESOURCE);
+        assert.deepStrictEqual(resource, defaultResource());
       });
 
       it('should not have default resource if passed', function () {

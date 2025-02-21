@@ -226,7 +226,7 @@ describe('Tracer', () => {
       undefined,
       trace.setSpanContext(ROOT_CONTEXT, parent)
     );
-    assert.strictEqual((span as Span).parentSpanId, parent.spanId);
+    assert.strictEqual((span as Span).parentSpanContext?.spanId, parent.spanId);
     assert.strictEqual(span.spanContext().traceId, parent.traceId);
     assert.strictEqual(span.spanContext().traceState, traceState);
   });
@@ -248,7 +248,7 @@ describe('Tracer', () => {
       undefined,
       trace.setSpanContext(ROOT_CONTEXT, parent)
     );
-    assert.strictEqual((span as Span).parentSpanId, undefined);
+    assert.strictEqual((span as Span).parentSpanContext?.spanId, undefined);
   });
 
   it('should pass the same context to sampler and spanprocessor', () => {
@@ -274,7 +274,7 @@ describe('Tracer', () => {
       tp['_activeSpanProcessor']
     );
     const span = tracer.startSpan('a', {}, context) as Span;
-    assert.strictEqual(span.parentSpanId, parent.spanId);
+    assert.strictEqual(span.parentSpanContext?.spanId, parent.spanId);
     sinon.assert.calledOnceWithExactly(
       shouldSampleSpy,
       context,
@@ -310,7 +310,7 @@ describe('Tracer', () => {
       tp['_activeSpanProcessor']
     );
     const span = tracer.startSpan('a', { root: true }, context) as Span;
-    assert.strictEqual(span.parentSpanId, undefined);
+    assert.strictEqual(span.parentSpanContext?.spanId, undefined);
     sinon.assert.calledOnce(shouldSampleSpy);
     sinon.assert.calledOnce(onStartSpy);
     const samplerContext = shouldSampleSpy.firstCall.args[0];

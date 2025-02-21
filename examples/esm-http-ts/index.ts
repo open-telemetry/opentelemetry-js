@@ -6,7 +6,7 @@ import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
-import { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import http from 'http';
 
@@ -15,7 +15,7 @@ const exporter = new ConsoleSpanExporter();
 const processor = new SimpleSpanProcessor(exporter);
 
 const tracerProvider = new NodeTracerProvider({
-  resource: new Resource({
+  resource: resourceFromAttributes({
     [SEMRESATTRS_SERVICE_NAME]: 'esm-http-ts-example',
   }),
   spanProcessors: [processor],

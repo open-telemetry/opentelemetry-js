@@ -19,7 +19,7 @@ To integrate the Jaeger Remote Sampler with your application, configure it with 
 
 ```javascript
 const { JaegerRemoteSampler } = require('@opentelemetry/sampler-jaeger-remote');
-const { DEFAULT_RESOURCE, resourceFromAttributes } = require('@opentelemetry/resources');
+const { defaultResource, resourceFromAttributes } = require('@opentelemetry/resources');
 const { NodeTracerProvider } = require('@opentelemetry/node');
 
 // Jaeger agent endpoint
@@ -30,7 +30,7 @@ const sampler = new JaegerRemoteSampler({
   poolingInterval: 60000  // 60 seconds
 });
 const provider = new NodeTracerProvider({
-  resource: DEFAULT_RESOURCE.merge(resourceFromAttributes({
+  resource: defaultResource().merge(resourceFromAttributes({
     'service.name': 'your-service-name'
   })),
   sampler
