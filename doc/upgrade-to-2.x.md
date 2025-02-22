@@ -9,7 +9,10 @@ If you have any questions about the 2.x changes, please ask! You can reach the O
 
 ## What is JS SDK 2.x?
 
-"JS SDK 2.x" encompasses new releases of packages published from the from opentelemetry-js.git repository (except the API and semantic-conventions packages) -- categories 3 and 4 in the groupings below. The package versions for this new major will be `>=2.0.0` for the stable and `>=0.200.0` for the unstable packages. (The jump to `0.200.x` was intentional, to hopefully help signal that these packages are in the "2.x generation".)
+"JS SDK 2.x" encompasses new releases of the `@opentelemetry/*` JavaScript packages published from the from [opentelemetry-js.git](https://github.com/open-telemetry/opentelemetry-js) repository (except the API and semantic-conventions packages) -- categories 3 and 4 in the groupings below. The package versions for this new major will be `>=2.0.0` for the stable and `>=0.200.0` for the unstable packages. (The jump to `0.200.x` was intentional, to hopefully help signal that these packages are in the "2.x generation".)
+
+<details>
+<summary>Categories of OpenTelemetry JS packages</summary>
 
 The OpenTelemetry JS SIG is responsible for numerous packages, all published to npm under the `@opentelemetry/` org, and developed in two git repositories: [opentelemetry-js.git](https://github.com/open-telemetry/opentelemetry-js) (sometimes called the "core" repo) and [opentelemetry-js-contrib.git](https://github.com/open-telemetry/opentelemetry-js-contrib) (the "contrib" repo). For the sake of this document, these packages can be grouped into these categories:
 
@@ -20,6 +23,9 @@ The OpenTelemetry JS SIG is responsible for numerous packages, all published to 
 5. All packages from opentelemetry-js-contrib.git. These packages are all versioned independently. These packages are not considered part of the "JS SDK 2.0" release. However, eventually they will update to use JS SDK 2.x releases.
 
 "JS SDK 2.x" refers to categories 3 and 4.
+
+</details>
+
 
 <!--
 XXX
@@ -218,7 +224,50 @@ A number of deprecated, obsolete, unused, and accidentally exported functions an
 
 ## 💥 Tracing SDK API changes
 
-XXX
+This section describes API changes in the set of packages that implement the tracing SDK: `@opentelemetry/sdk-trace-base`, `@opentelemetry/sdk-trace-node`, `@opentelemetry/sdk-trace-web`.
+
+Tracing was the first signal to have an SDK. Over time, and as the Metrics and Logs SDKs were added, the API design separating functionality between the `{Tracer,Meter,Logs}Provider`s APIs and the higher level `NodeSDK` (in `@opentelemetry/sdk-node`) improved. The Tracing SDK was left with some cruft that is being removed in JS SDK 2.0. (See [#5290](https://github.com/open-telemetry/opentelemetry-js/issues/5290) for motivation.)
+
+- removed `<BasicTracerProvider>.addSpanProcessor(...)` -> use constructor options to the TracerProvider class
+- removed `<BasicTracerProvider>.getActiveSpanProcessor()` private
+- made `<BasicTracerProvider>.resource` private
+- `BasicTracerProvider` and `NodeTracerProvider` will no longer use the `OTEL_TRACES_EXPORTER` envvar to create exporters -> This functionality already resides in `NodeSDK` (from `@opentelemetry/sdk-node`).
+- `BasicTracerProvider` and `NodeTracerProvider` will no longer use the `OTEL_PROPAGATORS` envvar to create propagators -> This functionality already resides in `NodeSDK` (from `@opentelemetry/sdk-node`).
+- The following internal properties were removed from `BasicTracerProvider`: `_registeredExporters`, `_getSpanExporter`, `_buildExporterFromEnv`
+- The following exports were dropped from `@opentelemetry/sdk-trace-*`:
+  - `EXPORTER_FACTORY` is not used anymore and has been removed
+  - `PROPAGATOR_FACTORY` is not used anymore and has been removed
+  - `ForceFlushState` was intended for internal use and has been removed
+  - the `Tracer` class was unintentionally exported and has been removed
+    - to obtain a `Tracer`, please use `BasicTracerProvider#getTracer()`, `NodeTracerProvider#getTracer()` or `WebTracerProvider#getTracer()`
+    - to reference the `Tracer` type, please use the `Tracer` type from `@opentelemetry/api`
+
+The export of the `Span` class has been removed. It was not intended to be used directly. One should always use methods on a `Tracer` instance (e.g. `startSpan()`) for creating spans.
+
+- `new Span(...)` -> use `tracer.startSpan(...)`
+
+The Span fields for referring to the parent span context were changed to adhere to the OTel spec:
+The `Span` `parentSpanId` field was replaced by `parentSpanContext`, to adhere to the OTel spec:
+
+- `span.parentSpanId` -> `span.parentSpanContext?.spanId`
+
+As mentioned above in the "core" section, `InstrumentationLibrary` has been changed to `InstrumentationScope`:
+
+- `Tracer.instrumentationLibrary` -> `Tracer.instrumentationScope`
+- `ReadableSpan.instrumentationLibrary` -> `ReadableSpan.instrumentationScope`
+
+> [!NOTE]
+> Related issues:
+> [#5290](https://github.com/open-telemetry/opentelemetry-js/issues/5290)
+> [#5134](https://github.com/open-telemetry/opentelemetry-js/pull/5134)
+> [#5192](https://github.com/open-telemetry/opentelemetry-js/pull/5192)
+> [#5239](https://github.com/open-telemetry/opentelemetry-js/pull/5239)
+> [#5355](https://github.com/open-telemetry/opentelemetry-js/pull/5355)
+> [#5405](https://github.com/open-telemetry/opentelemetry-js/pull/5405)
+> [#5048](https://github.com/open-telemetry/opentelemetry-js/pull/5048)
+> [#5450](https://github.com/open-telemetry/opentelemetry-js/pull/5450)
+> [#5308](https://github.com/open-telemetry/opentelemetry-js/pull/5308)
+
 
 ## 💥 `@opentelemetry/sdk-metrics` API changes
 
@@ -236,6 +285,10 @@ XXX TODO
   * (user-facing): `MeterProviderOptions` now provides the more general `IMetricReader` type over `MetricReader`
   * If you accept `MetricReader` in your public interface, consider accepting the more general `IMetricReader` instead to avoid unintentional breaking changes
 
+* feat(sdk-node)!: use `IMetricReader` over `MetricReader` [#5311](https://github.com/open-telemetry/opentelemetry-js/pull/5311)
+  * (user-facing): `NodeSDKConfiguration` now provides the more general `IMetricReader` type over `MetricReader`
+
+
 XXX deprecated SpanAttributes removal, requires new min api v1.1.0
 
 * chore(shim-opentracing): replace deprecated SpanAttributes [#4430](https://github.com/open-telemetry/opentelemetry-js/pull/4430) @JamieDanielson
@@ -243,51 +296,6 @@ XXX deprecated SpanAttributes removal, requires new min api v1.1.0
 * chore(otel-resources): replace deprecated SpanAttributes [#4428](https://github.com/open-telemetry/opentelemetry-js/pull/4428) @JamieDanielson
 * refactor(sdk-trace-base)!: replace `SpanAttributes` with `Attributes` [#5009](https://github.com/open-telemetry/opentelemetry-js/pull/5009) @david-luna
 
-XXX  ResourceAttributes -> Attributes, requires new min api v1.3.0
-
-* refactor(resources)!: replace `ResourceAttributes` with `Attributes` [#5016](https://github.com/open-telemetry/opentelemetry-js/pull/5016) @david-luna
-
-
-
-XXX tracing APIs
-
-* refactor(sdk-trace-base)!: remove `new Span` constructor in favor of `Tracer.startSpan` API [#5048](https://github.com/open-telemetry/opentelemetry-js/pull/5048) @david-luna
-* refactor(sdk-trace-base)!: remove `BasicTracerProvider.addSpanProcessor` API in favor of constructor options. [#5134](https://github.com/open-telemetry/opentelemetry-js/pull/5134) @david-luna
-* refactor(sdk-trace-base)!: make `resource` property private in `BasicTracerProvider` and remove `getActiveSpanProcessor` API. [#5192](https://github.com/open-telemetry/opentelemetry-js/pull/5192) @david-luna
-* feat(sdk-trace)!: remove ability to have BasicTracerProvider instantiate exporters [#5239](https://github.com/open-telemetry/opentelemetry-js/pull/5239) @pichlermarc
-  * When extending `BasicTracerProvider`, the class offered multiple methods to facilitate the creation of exporters and auto-pairing with `SpanProcessor`s.
-    * This functionality has been removed - users may now pass `SpanProcessor`s to the base class constructor when extending
-    * (user-facing): `_registeredExporters` has been removed
-    * (user-facing): `_getSpanExporter` has been removed
-    * (user-facing): `_buildExporterFromEnv` has been removed
-* feat(sdk-trace-base)!: replace usages fo `InstrumentationLibrary` with `InstrumentationScope` [#5308](https://github.com/open-telemetry/opentelemetry-js/pull/5308) @pichlermarc
-  * (user-facing) rename `Tracer.instrumentationLibrary` -> `Tracer.instrumentationScope`
-  * (user-facing) rename `ReadableSpan.instrumentationLibrary` -> `ReadableSpan.instrumentationScope`
-    * also renames the property in implementations of `ReadableSpan`
-* feat(sdk-trace-base)!: drop ability to instantiate propagators beyond defaults [#5355](https://github.com/open-telemetry/opentelemetry-js/pull/5355) @pichlermarc
-  * (user-facing): only a non-env-var based default is now used on `BasicTracerProvider#register()`.
-    * propagators can now not be configured via `OTEL_PROPAGATORS` or `window.OTEL_PROPAGATORS` anymore, please pass the propagator to `NodeTracerProvider#register()` instead.
-    * if not configured directly via code, `BasicTracerProvider#register()` will now fall back to defaults (`tracecontext` and `baggage`)
-* feat(sdk-trace-node)!: drop ability to instantiate propagators beyond defaults [#5355](https://github.com/open-telemetry/opentelemetry-js/pull/5355) @pichlermarc
-  * (user-facing): only a non-env-var based default is now used on `NodeTracerProvider#register()`.
-    * propagators can now not be configured via `OTEL_PROPAGATORS` anymore, please pass the propagator to `NodeTracerProvider#register()` instead.
-    * if not configured via code, `NodeTracerProvider#register()` will now fall back to the defaults (`tracecontext` and `baggage`)
-    * if autoconfiguration based on enviornment variables is needed, please use `NodeSDK` from `@opentelemetry/sdk-node`.
-* feat(sdk-trace-web)!: drop ability to instantiate propagators beyond defaults [#5355](https://github.com/open-telemetry/opentelemetry-js/pull/5355) @pichlermarc
-  * (user-facing): only a non-env-var based default is now used on `WebTracerProvider#register()`.
-    * propagators can now not be configured via `window.OTEL_PROPAGATORS` anymore, please pass the propagator to `WebTracerProvider#register()` instead.
-    * if not configured via code, `WebTracerProvider#register()` will now fall back to defaults (`tracecontext` and `baggage`)
-* feat(sdk-trace)!: drop unnecessary exports [#5405](https://github.com/open-telemetry/opentelemetry-js/pull/5405) @pichlermarc
-  * (user-facing): `EXPORTER_FACTORY` is not used anymore and has been removed
-  * (user-facing): `PROPAGATOR_FACTORY` is not used anymore and has been removed
-  * (user-facing): `ForceFlushState` was intended for internal use and has been removed
-  * (user-facing): the `Tracer` class was unintentionally exported and has been removed
-    * to obtain a `Tracer`, please use `BasicTracerProvider#getTracer()`, `NodeTracerProvider#getTracer()` or `WebTracerProvider#getTracer()`
-    * to reference a `Tracer`, please use the `Tracer` type from `@opentelemetry/api`
-
-
-+* feat(sdk-trace-base)!: Add `parentSpanContext` and remove `parentSpanId` from `Span` and `ReadableSpan` [#5450](https://github.com/open-telemetry/opentelemetry-js/pull/5450) @JacksonWeber
-+  * (user-facing): the SDK's `Span`s `parentSpanId` was replaced by `parentSpanContext`, to migrate to the new property, please replace `span.parentSpanId` -> `span.parentSpanContext?.spanId`
 
 
 
@@ -309,9 +317,6 @@ XXX can merge these in with above. E.g. grouping the metrics changes.
   * The internal OpenTelemetry data model dropped the concept of instrument type on exported metrics, therefore mapping it is not necessary anymore.
 * feat(instrumentation-fetch)!: passthrough original response to `applyCustomAttributes` hook [#5281](https://github.com/open-telemetry/opentelemetry-js/pull/5281) @chancancode
   * Previously, the fetch instrumentation code unconditionally clones every `fetch()` response in order to preserve the ability for the `applyCustomAttributes` hook to consume the response body. This is fundamentally unsound, as it forces the browser to buffer and retain the response body until it is fully received and read, which crates unnecessary memory pressure on large or long-running response streams. In extreme cases, this is effectively a memory leak and can cause the browser tab to crash. If your use case for `applyCustomAttributes` requires access to the response body, please chime in on [#5293](https://github.com/open-telemetry/opentelemetry-js/issues/5293).
-
-* feat(sdk-node)!: use `IMetricReader` over `MetricReader` [#5311](https://github.com/open-telemetry/opentelemetry-js/pull/5311)
-  * (user-facing): `NodeSDKConfiguration` now provides the more general `IMetricReader` type over `MetricReader`
 
 
 
