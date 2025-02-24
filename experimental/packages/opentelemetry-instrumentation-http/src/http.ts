@@ -655,6 +655,20 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       const oldMetricAttributes =
         getIncomingRequestMetricAttributes(spanAttributes);
 
+      safeExecuteInTheMiddle(
+        () => instrumentation.getConfig().requestMetricsHook?.(request),
+        (e: unknown, result) => {
+          if (e != null) {
+            instrumentation._diag.error('caught requestMetricsHook error: ', e);
+          }
+          if (result) {
+            Object.assign(oldMetricAttributes, result);
+            Object.assign(stableMetricAttributes, result);
+          }
+        },
+        true
+      );
+
       // request method and url.scheme are both required span attributes
       const stableMetricAttributes: Attributes = {
         [ATTR_HTTP_REQUEST_METHOD]: spanAttributes[ATTR_HTTP_REQUEST_METHOD],
@@ -915,6 +929,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     stableMetricAttributes: Attributes,
     startTime: HrTime
   ) {
+    const instrumentation = this;
     const attributes = getIncomingRequestAttributesOnResponse(
       request,
       response,
@@ -954,6 +969,21 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         true
       );
     }
+
+    safeExecuteInTheMiddle(
+      () =>
+        instrumentation.getConfig().responseMetricsHook?.(request, response),
+      (e: unknown, result) => {
+        if (e != null) {
+          instrumentation._diag.error('caught requestMetricsHook error: ', e);
+        }
+        if (result) {
+          Object.assign(oldMetricAttributes, result);
+          Object.assign(stableMetricAttributes, result);
+        }
+      },
+      true
+    );
 
     this._closeHttpSpan(
       span,

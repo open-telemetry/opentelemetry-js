@@ -42,8 +42,19 @@ export interface HttpRequestCustomAttributeFunction {
   (span: Span, request: ClientRequest | IncomingMessage): void;
 }
 
+export interface HttpRequestMetricsCustomAttributeFunction {
+  (request: ClientRequest | IncomingMessage): Attributes;
+}
+
 export interface HttpResponseCustomAttributeFunction {
   (span: Span, response: IncomingMessage | ServerResponse): void;
+}
+
+export interface HttpResponseMetricsCustomAttributeFunction {
+  (
+    request: ClientRequest | IncomingMessage,
+    response: IncomingMessage | ServerResponse
+  ): Attributes;
 }
 
 export interface StartIncomingSpanCustomAttributeFunction {
@@ -68,10 +79,14 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
   disableOutgoingRequestInstrumentation?: boolean;
   /** Function for adding custom attributes after response is handled */
   applyCustomAttributesOnSpan?: HttpCustomAttributeFunction;
-  /** Function for adding custom attributes before request is handled */
+  /** Function for adding span custom attributes before request is handled */
   requestHook?: HttpRequestCustomAttributeFunction;
+  /** Function for adding metric custom attributes before request is handled */
+  requestMetricsHook?: HttpRequestMetricsCustomAttributeFunction;
   /** Function for adding custom attributes before response is handled */
   responseHook?: HttpResponseCustomAttributeFunction;
+  /** Function for adding metric custom attributes before response is handled */
+  responseMetricsHook?: HttpResponseMetricsCustomAttributeFunction;
   /** Function for adding custom attributes before a span is started in incomingRequest */
   startIncomingSpanHook?: StartIncomingSpanCustomAttributeFunction;
   /** Function for adding custom attributes before a span is started in outgoingRequest */
