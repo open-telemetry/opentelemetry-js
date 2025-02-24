@@ -1,8 +1,12 @@
 {
   "extends": "../tsconfig.base.esm.json",
   "compilerOptions": {
+    "lib": [
+      "es2017"
+    ],
     "outDir": "build/esm",
     "rootDir": "src",
+    "target": "es2017",
     "tsBuildInfoFile": "build/esm/tsconfig.esm.tsbuildinfo"
   },
   "include": [

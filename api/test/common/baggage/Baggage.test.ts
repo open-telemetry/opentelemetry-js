@@ -52,7 +52,9 @@ describe('Baggage', () => {
 
       const entry = bag.getEntry('key');
       assert.ok(entry);
-      entry.value = 'mutated';
+      if (entry) {
+        entry.value = 'mutated';
+      }
 
       assert.strictEqual(bag.getEntry('key')?.value, 'value');
     });
