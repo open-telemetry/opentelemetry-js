@@ -24,6 +24,15 @@ describe('TraceState', () => {
       assert.deepStrictEqual(state.serialize(), 'a=1,b=2');
     });
 
+    it('must not create a new TraceState if key or value is invalid', () => {
+      const orgState = new TraceState('a=1,b=2');
+      const stateOne = orgState.set('***d', '3');
+      const stateTwo = orgState.set('d', '123,456=7');
+      assert.deepStrictEqual(orgState.serialize(), 'a=1,b=2');
+      assert.deepStrictEqual(stateOne.serialize(), 'a=1,b=2');
+      assert.deepStrictEqual(stateTwo.serialize(), 'a=1,b=2');
+    });
+
     it('must create a new TraceState and move updated keys to the front', () => {
       const orgState = new TraceState('a=1,b=2');
       const state = orgState.set('b', '3');
