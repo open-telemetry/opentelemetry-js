@@ -43,7 +43,6 @@
     "prepare_release:semconv:patch": "npm run _check:no_changes && npm run _backup:package-json && npm run _lerna:remove_everything_except_semconv && npm run _lerna:version_patch && npm run _restore:package-json && npm run _changelog:prepare_semconv",
     "prepare_release:semconv:minor": "npm run _check:no_changes && npm run _backup:package-json && npm run _lerna:remove_everything_except_semconv && npm run _lerna:version_minor && npm run _restore:package-json && npm run _changelog:prepare_semconv",
     "prepare_release:all:minor": "npm run _check:no_changes && npm run _backup:package-json && npm run _lerna:remove_api && npm run _lerna:remove_semconv && npm run _lerna:version_minor && cd api/ && npm version minor && cd .. && lerna run align-api-deps && npm run _restore:package-json && npm run _changelog:prepare_all",
-    "release:publish": "lerna publish --concurrency 1 from-package --no-push --no-private --no-git-tag-version --no-verify-access",
     "comment_internal": "echo scripts below this line are for internal use",
     "_check:no_changes": "if [ ! -z \"$(git status -uall --porcelain)\" ]; then echo Please ensure all changes are committed; exit 1; fi",
     "_backup:package-json": "cp package.json package.json.backup",
