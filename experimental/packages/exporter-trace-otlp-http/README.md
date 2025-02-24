@@ -59,7 +59,7 @@ provider.register();
 ## Traces in Node - JSON over http
 
 ```js
-const { BasicTracerProvider, BatchSpanProcessor } = require('@opentelemetry/sdk-trace-base');
+const { NodeTracerProvider, BatchSpanProcessor } = require('@opentelemetry/sdk-trace-node');
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-http');
 
 const collectorOptions = {
@@ -71,7 +71,7 @@ const collectorOptions = {
 };
 
 const exporter = new OTLPTraceExporter(collectorOptions);
-const provider = new BasicTracerProvider({
+const provider = new NodeTracerProvider({
   spanProcessors: [
     new BatchSpanProcessor(exporter, {
       // The maximum queue size. After the size is reached spans are dropped.
