@@ -27,8 +27,6 @@ import {
   AttributeValue,
 } from '@opentelemetry/api';
 import {
-  DEFAULT_ATTRIBUTE_COUNT_LIMIT,
-  DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
   hrTimeDuration,
   hrTimeToMilliseconds,
   hrTimeToNanoseconds,
@@ -666,7 +664,7 @@ describe('Span', () => {
             attributeCountLimit: 10,
           },
           spanLimits: {
-            attributeCountLimit: DEFAULT_ATTRIBUTE_COUNT_LIMIT,
+            attributeCountLimit: 128,
           },
         }).getTracer('default') as Tracer;
 
@@ -686,10 +684,7 @@ describe('Span', () => {
         span.end();
 
         it('should remove / drop all remaining values after the number of values exceeds the span limit', () => {
-          assert.strictEqual(
-            Object.keys(span.attributes).length,
-            DEFAULT_ATTRIBUTE_COUNT_LIMIT
-          );
+          assert.strictEqual(Object.keys(span.attributes).length, 128);
           assert.strictEqual(span.attributes['foo0'], 'bar0');
           assert.strictEqual(span.attributes['foo10'], 'bar10');
           assert.strictEqual(span.attributes['foo127'], 'bar127');
@@ -764,7 +759,7 @@ describe('Span', () => {
           },
           spanLimits: {
             // Setting attribute value length limit
-            attributeValueLengthLimit: DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
+            attributeValueLengthLimit: Infinity,
           },
         }).getTracer('default') as Tracer;
 
