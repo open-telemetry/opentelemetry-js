@@ -17,11 +17,10 @@
 import { buildSamplerFromEnv, loadDefaultConfig } from './config';
 import { Sampler } from './Sampler';
 import { SpanLimits, TracerConfig, GeneralLimits } from './types';
-import {
-  DEFAULT_ATTRIBUTE_COUNT_LIMIT,
-  DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
-  getNumberFromEnv,
-} from '@opentelemetry/core';
+import { getNumberFromEnv } from '@opentelemetry/core';
+
+export const DEFAULT_ATTRIBUTE_COUNT_LIMIT = 128;
+export const DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT = Infinity;
 
 /**
  * Function to merge Default configuration (as specified in './config') with
