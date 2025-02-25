@@ -9,7 +9,7 @@ If you have any questions about the 2.x changes, please ask! You can reach the O
 
 ## What is JS SDK 2.x?
 
-"JS SDK 2.x" encompasses new releases of the `@opentelemetry/*` JavaScript packages published from the from [opentelemetry-js.git](https://github.com/open-telemetry/opentelemetry-js) repository (except the API and semantic-conventions packages) -- categories 3 and 4 in the groupings below. The package versions for this new major will be `>=2.0.0` for the stable and `>=0.200.0` for the unstable packages. (The jump to `0.200.x` was intentional, to hopefully help signal that these packages are in the "2.x generation".)
+"JS SDK 2.x" encompasses new releases of the `@opentelemetry/*` JavaScript packages published from the [opentelemetry-js.git](https://github.com/open-telemetry/opentelemetry-js) repository, except the API and semantic-conventions packages &mdash; categories 3 and 4 in the groupings below. The package versions for this new major will be `>=2.0.0` for the stable and `>=0.200.0` for the unstable packages. (The jump to `0.200.x` was intentional, to hopefully help signal that these packages are in the "2.x generation".)
 
 <details>
 <summary>Categories of OpenTelemetry JS packages</summary>
@@ -26,6 +26,51 @@ The OpenTelemetry JS SIG is responsible for numerous packages, all published to 
 
 </details>
 
+The full set of packages is:
+
+| Package | Version |
+| ------- | ------- |
+| @opentelemetry/sdk-metrics | 1.30.0 |
+| @opentelemetry/shim-opentracing | 1.30.0 |
+| @opentelemetry/sdk-trace-web | 1.30.0 |
+| @opentelemetry/sdk-trace-node | 1.30.0 |
+| @opentelemetry/sdk-trace-base | 1.30.0 |
+| @opentelemetry/resources | 1.30.0 |
+| @opentelemetry/propagator-jaeger | 1.30.0 |
+| @opentelemetry/propagator-b3 | 1.30.0 |
+| @opentelemetry/exporter-zipkin | 1.30.0 |
+| @opentelemetry/exporter-jaeger | 1.30.0 |
+| @opentelemetry/core | 1.30.0 |
+| @opentelemetry/context-zone-peer-dep | 1.30.0 |
+| @opentelemetry/context-zone | 1.30.0 |
+| @opentelemetry/context-async-hooks | 1.30.0 |
+| @opentelemetry/web-common | 0.57.0 |
+| @opentelemetry/shim-opencensus | 0.57.0 |
+| @opentelemetry/sdk-logs | 0.57.0 |
+| @opentelemetry/sdk-events | 0.57.0 |
+| @opentelemetry/sampler-jaeger-remote | 0.57.0 |
+| @opentelemetry/otlp-transformer | 0.57.0 |
+| @opentelemetry/otlp-grpc-exporter-base | 0.57.0 |
+| @opentelemetry/otlp-exporter-base | 0.57.0 |
+| @opentelemetry/sdk-node | 0.57.0 |
+| @opentelemetry/instrumentation-xml-http-request | 0.57.0 |
+| @opentelemetry/instrumentation-http | 0.57.0 |
+| @opentelemetry/instrumentation-grpc | 0.57.0 |
+| @opentelemetry/instrumentation-fetch | 0.57.0 |
+| @opentelemetry/instrumentation | 0.57.0 |
+| @opentelemetry/exporter-prometheus | 0.57.0 |
+| @opentelemetry/exporter-metrics-otlp-proto | 0.57.0 |
+| @opentelemetry/exporter-metrics-otlp-http | 0.57.0 |
+| @opentelemetry/exporter-metrics-otlp-grpc | 0.57.0 |
+| @opentelemetry/opentelemetry-browser-detector | 0.57.0 |
+| @opentelemetry/exporter-trace-otlp-proto | 0.57.0 |
+| @opentelemetry/exporter-trace-otlp-http | 0.57.0 |
+| @opentelemetry/exporter-trace-otlp-grpc | 0.57.0 |
+| @opentelemetry/exporter-logs-otlp-proto | 0.57.0 |
+| @opentelemetry/exporter-logs-otlp-http | 0.57.0 |
+| @opentelemetry/exporter-logs-otlp-grpc | 0.57.0 |
+| @opentelemetry/api-logs | 0.57.0 |
+| @opentelemetry/api-events | 0.57.0 |
 
 <!--
 XXX
@@ -378,7 +423,7 @@ This section describes the remaining breaking changes, not otherwise mentioned i
 
 Usage of the deprecated `SpanAttributes` type from the API package has been changed to use the `Attributes` type.
 
-- bumped minimum version of `@opentelemetry/api` peer dependency to 1.1.0 for the following packages: `@opentelemetry/core` [#4408](https://github.com/open-telemetry/opentelemetry-js/pull/4408), `@opentelemetry/resources` [#4428](https://github.com/open-telemetry/opentelemetry-js/pull/4428), `@opentelemetry/sdk-trace-base` https://github.com/open-telemetry/opentelemetry-js/pull/5009, `@opentelemetry/shim-opentracing` [#4430](https://github.com/open-telemetry/opentelemetry-js/pull/4430)
+- bumped minimum version of `@opentelemetry/api` peer dependency to 1.1.0 for the following packages: `@opentelemetry/core` [#4408](https://github.com/open-telemetry/opentelemetry-js/pull/4408), `@opentelemetry/resources` [#4428](https://github.com/open-telemetry/opentelemetry-js/pull/4428), `@opentelemetry/sdk-trace-base` [#5009](https://github.com/open-telemetry/opentelemetry-js/pull/5009), `@opentelemetry/shim-opentracing` [#4430](https://github.com/open-telemetry/opentelemetry-js/pull/4430)
 
 And:
 
