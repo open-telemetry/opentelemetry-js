@@ -45,7 +45,7 @@ The **minimum supported Node.js has be raised to `^18.19.0 || >=20.6.0`**. This 
 > Implementation notes:
 > - The particular minimum *minor* versions of Node.js 18 and 20 were selected to include support for Node.js's `--import` flag and `module.register()` API. It is expected that this will provide a smoother experience for improved automatic ES module instrumentation.
 >
-> Related issues:
+> Related issues and PRs:
 > [#5395](https://github.com/open-telemetry/opentelemetry-js/issues/5395)
 
 
@@ -56,7 +56,7 @@ The **minimum supported TypeScript version has been raised to 5.0.4**.
 As well, going forward all packages published from this repository will **drop support for old versions of `typescript` in minor releases**. We will only drop support for versions that are older than 2 years.
 
 > [!NOTE]
-> Related issues:
+> Related issues and PRs:
 > [#5145](https://github.com/open-telemetry/opentelemetry-js/pull/5145)
 
 
@@ -68,19 +68,19 @@ For Browser usage, this drops support for any browser versions that do not suppo
 For Node.js usage, this already follows from the new minimum supported Node.js versions mentioned above.
 
 > [!NOTE]
-> Related issues:
+> Related issues and PRs:
 > [#5393](https://github.com/open-telemetry/opentelemetry-js/issues/5393)
 > [#5456](https://github.com/open-telemetry/opentelemetry-js/pull/5456)
 
 
 ## 💥 Drop `window.OTEL_*` support in browsers
 
-For browser users, support for `window.OTEL_*` environment variable configuration (previous handled by the `envDetector`) has been dropped.  OpenTelemetry bootstrap code for the browser should be configured via existing "Environment variable" configuration for *browsers* was always odd and confusing.
+For browser users, support for `window.OTEL_*` environment variable configuration (previous handled by the `envDetector`) has been dropped.  OpenTelemetry bootstrap code for the browser should be configured via code.
 
 > [!NOTE]
-> Related issues:
+> Related issues and PRs:
 > [#5217](https://github.com/open-telemetry/opentelemetry-js/issues/5217)
-> [#5445](https://github.com/open-telemetry/opentelemetry-js/pull/5445)
+> [#5455](https://github.com/open-telemetry/opentelemetry-js/pull/5455)
 > [#5472](https://github.com/open-telemetry/opentelemetry-js/pull/5472)
 > [#5465](https://github.com/open-telemetry/opentelemetry-js/pull/5465)
 > [#5473](https://github.com/open-telemetry/opentelemetry-js/pull/5473)
@@ -137,7 +137,7 @@ In TypeScript code, the `ResourceAttributes` type was replaced the `Attributes` 
 > - In general, the OTel JS packages are tending away from exporting *classes* because that results in exporting types with internal details that inhibit later refactoring. See [#5283](https://github.com/open-telemetry/opentelemetry-js/issues/5283) for details.
 > - The unification of sync and async resource detectors simplified the API, clarified the behavior for merging results from multiple detectors, and laid the ground work for support OpenTelemetry Entities in the future. See [#5350](https://github.com/open-telemetry/opentelemetry-js/pull/5350) for details.
 >
-> Related issues:
+> Related issues and PRs:
 > [#5421](https://github.com/open-telemetry/opentelemetry-js/pull/5421)
 > [#5350](https://github.com/open-telemetry/opentelemetry-js/pull/5350)
 > [#5420](https://github.com/open-telemetry/opentelemetry-js/issues/5420)
@@ -185,7 +185,7 @@ const level = diagLogLevelFromString(getStringFromEnv('OTEL_LOG_LEVEL'));
 >   packages and packages maintained in the separate contrib repository.
 >   See [#5443](https://github.com/open-telemetry/opentelemetry-js/pull/5443).
 >
-> Related issues:
+> Related issues and PRs:
 > [#5443](https://github.com/open-telemetry/opentelemetry-js/pull/5443)
 > [#5481](https://github.com/open-telemetry/opentelemetry-js/pull/5481)
 > [#5475](https://github.com/open-telemetry/opentelemetry-js/pull/5475)
@@ -214,7 +214,7 @@ A number of deprecated, obsolete, unused, and accidentally exported functions an
 - `isAttributeKey` (unintentionally exported)
 
 > [!NOTE]
-> Related issues:
+> Related issues and PRs:
 > [#5309](https://github.com/open-telemetry/opentelemetry-js/pull/5309)
 > [#5308](https://github.com/open-telemetry/opentelemetry-js/pull/5308)
 > [#5316](https://github.com/open-telemetry/opentelemetry-js/pull/5316)
@@ -257,7 +257,7 @@ As mentioned above in the "core" section, `InstrumentationLibrary` has been chan
 - `ReadableSpan.instrumentationLibrary` -> `ReadableSpan.instrumentationScope`
 
 > [!NOTE]
-> Related issues:
+> Related issues and PRs:
 > [#5290](https://github.com/open-telemetry/opentelemetry-js/issues/5290)
 > [#5134](https://github.com/open-telemetry/opentelemetry-js/pull/5134)
 > [#5192](https://github.com/open-telemetry/opentelemetry-js/pull/5192)
@@ -271,22 +271,97 @@ As mentioned above in the "core" section, `InstrumentationLibrary` has been chan
 
 ## 💥 `@opentelemetry/sdk-metrics` API changes
 
-XXX TODO
+The Metrics SDK now uses the `Gauge` and `MetricAdvice` types from the API package, which requires bumping its peer dependency.
 
-* feat(sdk-metrics)!: drop deprecated `type` field on `MetricDescriptor` [#5291](https://github.com/open-telemetry/opentelemetry-js/pull/5291) @chancancode
-* feat(sdk-metrics)!: drop deprecated `InstrumentDescriptor` type; use `MetricDescriptor` instead [#5277](https://github.com/open-telemetry/opentelemetry-js/pull/5266) @chancancode
-* feat(sdk-metrics)!: bump minimum version of `@opentelemetry/api` peer dependency to 1.9.0 [#5254](https://github.com/open-telemetry/opentelemetry-js/pull/5254) @chancancode
-* feat(sdk-metrics)!: remove MeterProvider.addMetricReader() in favor of constructor option [#4419](https://github.com/open-telemetry/opentelemetry-js/pull/4419) @pichlermarc
-* feat(sdk-metrics)!: remove MeterProvider.addMetricReader() in favor of constructor option [#4419](https://github.com/open-telemetry/opentelemetry-js/pull/4419) @pichlermarc
-* feat(sdk-metrics)!: replace attributeKeys with custom processors option [#4532](https://github.com/open-telemetry/opentelemetry-js/pull/4532) @pichlermarc
-* feat(sdk-metrics)!: drop `View` and `Aggregation` in favor of `ViewOptions` and `AggregationOption` [#4931](https://github.com/open-telemetry/opentelemetry-js/pull/4931) @pichlermarc
-    XXX see marc's https://github.com/open-telemetry/opentelemetry-js/pull/5485/files that updates some docs for this usage in oj.
+- bump minimum version of `@opentelemetry/api` peer dependency to 1.9.0
+
+The `Aggregation` and `View` *classes* have been dropped in favor of the `AggregationOption` and `ViewOptions` *types*. (See [#4931](https://github.com/open-telemetry/opentelemetry-js/pull/4931) for motivation.) As well, the `attributeKeys` View option has been replaced with more capable filtering.
+(See [#4532](https://github.com/open-telemetry/opentelemetry-js/pull/4532).)
+
+- removed `View` -> pass in a `type ViewOptions` object to a MeterProvider
+- removed `Aggregation` -> pass in a `type ViewOptions` object to a MeterProvider
+- `attributeKeys` `View` option -> use `attributesProcessors` and `createAllowListAttributesProcessor`
+
+```js
+// Before
+import {MeterProvider, View, InstrumentType, ExplicitBucketHistogramAggregation} from '@opentelemetry/sdk-metrics';
+new MeterProvider({
+  views: [
+    new View({
+      instrumentName: 'http.server.duration',
+      instrumentType: InstrumentType.HISTOGRAM,
+      aggregation: new ExplicitBucketHistogramAggregation([0, 1, 5, 10, 15, 20, 25, 30]),
+    }),
+    new View({
+      attributeKeys: ['attrib1'],
+      instrumentName: '...',
+    })
+  ]
+});
+
+// After
+import {MeterProvider, InstrumentType, AggregationType} from '@opentelemetry/sdk-metrics';
+new MeterProvider({
+  views: [
+    {
+      instrumentName: 'http.server.duration',
+      instrumentType: InstrumentType.HISTOGRAM,
+      aggregation: {
+        type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+        options: {
+          boundaries: [0, 1, 5, 10, 15, 20, 25, 30],
+        }
+      }
+    },
+    {
+      attributesProcessors: [
+        createAllowListAttributesProcessor(['attrib1']),
+      ],
+      instrumentName: '...',
+    }
+  ]
+});
+```
+
+Some deprecated things have been removed:
+
+- drop deprecated `type` field on `MetricDescriptor`
+- drop deprecated `InstrumentDescriptor` type -> use `MetricDescriptor` instead
+
+Other changes:
+
+- removed `MeterProvider.addMetricReader()` -> use constructor option
+
+
+
+> [!NOTE]
+> Related issues and PRs:
+> [#XXX](https://github.com/open-telemetry/opentelemetry-js/issues/XXX)
+> [#5254](https://github.com/open-telemetry/opentelemetry-js/pull/5254)
+> [#5291](https://github.com/open-telemetry/opentelemetry-js/pull/5291)
+> [#5266](https://github.com/open-telemetry/opentelemetry-js/pull/5266)
+> [#4419](https://github.com/open-telemetry/opentelemetry-js/pull/4419)
+> [#4532](https://github.com/open-telemetry/opentelemetry-js/pull/4532)
+> [#4931](https://github.com/open-telemetry/opentelemetry-js/pull/4931)
+> [#XXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXX)
+> [#XXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXX)
+
+
+
+XXX HERE
+
 * feat(sdk-metrics)!: extract `IMetricReader` interface and use it over abstract class [#5311](https://github.com/open-telemetry/opentelemetry-js/pull/5311)
   * (user-facing): `MeterProviderOptions` now provides the more general `IMetricReader` type over `MetricReader`
   * If you accept `MetricReader` in your public interface, consider accepting the more general `IMetricReader` instead to avoid unintentional breaking changes
 
+
+## 💥 `@opentelemetry/sdk-node` API changes
+
+https://github.com/open-telemetry/opentelemetry-js/pull/5311/files
+XXX
 * feat(sdk-node)!: use `IMetricReader` over `MetricReader` [#5311](https://github.com/open-telemetry/opentelemetry-js/pull/5311)
   * (user-facing): `NodeSDKConfiguration` now provides the more general `IMetricReader` type over `MetricReader`
+
 
 
 XXX deprecated SpanAttributes removal, requires new min api v1.1.0
@@ -295,8 +370,6 @@ XXX deprecated SpanAttributes removal, requires new min api v1.1.0
 * chore(otel-core): replace deprecated SpanAttributes [#4408](https://github.com/open-telemetry/opentelemetry-js/pull/4408) @JamieDanielson
 * chore(otel-resources): replace deprecated SpanAttributes [#4428](https://github.com/open-telemetry/opentelemetry-js/pull/4428) @JamieDanielson
 * refactor(sdk-trace-base)!: replace `SpanAttributes` with `Attributes` [#5009](https://github.com/open-telemetry/opentelemetry-js/pull/5009) @david-luna
-
-
 
 
 
@@ -337,7 +410,7 @@ XXX can merge these in with above. E.g. grouping the metrics changes.
 - XXX eventually get to all the examples/. They will be like bad docs.
 
 > [!NOTE]
-> Related issues:
+> Related issues and PRs:
 > [#XXX](https://github.com/open-telemetry/opentelemetry-js/issues/XXX)
 > [#XXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXX)
 
