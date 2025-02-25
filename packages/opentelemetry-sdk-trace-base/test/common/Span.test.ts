@@ -27,8 +27,6 @@ import {
   AttributeValue,
 } from '@opentelemetry/api';
 import {
-  DEFAULT_ATTRIBUTE_COUNT_LIMIT,
-  DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
   hrTimeDuration,
   hrTimeToMilliseconds,
   hrTimeToNanoseconds,
@@ -45,6 +43,10 @@ import { BasicTracerProvider, Span, SpanProcessor } from '../../src';
 import { SpanImpl } from '../../src/Span';
 import { invalidAttributes, validAttributes } from './util';
 import { Tracer } from '../../src/Tracer';
+import {
+  DEFAULT_ATTRIBUTE_COUNT_LIMIT,
+  DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
+} from '../../src/utility';
 
 const performanceTimeOrigin: HrTime = [1, 1];
 
