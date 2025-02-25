@@ -112,11 +112,15 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore
     * If you have been using the `envDetector` in browser environments, please migrate to manually creating a resource.
     * Note: Node.js environment variable configuration continues to work as-is.
+* fix(sdk-trace-base)!: use `ParentBasedAlwaysOnSampler` over `AlwaysOnSampler` when bogus data is supplied to `OTEL_TRACES_SAMPLER`
+  * this aligns the SDK implementation with the specification
 * feat(core)!: drop `getEnv()`, `getEnvWithoutDefaults()` [#5481](https://github.com/open-telemetry/opentelemetry-js/pull/5481) @pichlermarc
   * (user-facing): `getEnv()` has been replaced by `getStringFromEnv()`, `getNumberFromEnv()`, `getBooleanFromEnv()`, `getStringListFromEnv()`
     * these new functions do not include defaults, please inline any defaults if necessary (example: `getStringFromEnv("OTEL_FOO") ?? "my-default"`)
+    * to find the previously used defaults, please see [here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239)
   * (user-facing): `getEnvWithoutDefaults()` has been replaced by `getStringFromEnv()`, `getNumberFromEnv()`, `getBooleanFromEnv()`, `getStringListFromEnv()`
   * (user-facing): `DEFAULT_ENVIRONMENT` has been removed, please inline any defaults from now on
+    * to find the previously used defaults, please see [here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239)
   * (user-facing): `ENVIRONMENT` has been removed without replacement
   * (user-facing): `RAW_ENVIRONMENT` has been removed without replacement
   * (user-facing): `parseEnvironment` has been removed without replacement
@@ -126,6 +130,11 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
     * to register a global context manager, please use `context.setGlobalContextManager()` from `@opentelemetry/api`
 * feat!: set compilation target to ES2022 for all packages except `@opentelemetry/api`, `@opentelemetry/api-logs`, `@opentelemetry/api-events`, and `@opentelemetry/semantic-conventions` [#5456](https://github.com/open-telemetry/opentelemetry-js/pull/5456) @david-luna
   * (user-facing): drops browser runtimes which do not support ES2022 features
+* feat(core)! drop unused constants [#5504](https://github.com/open-telemetry/opentelemetry-js/pull/5504) @pichlermarc
+  * (user-facing): `DEFAULT_ATTRIBUTE_VALUE_LENTGHT_LIMIT` has been removed, please use `Infinity` instead
+  * (user-facing): `DEFAULT_ATTRIBUTE_VALUE_COUNT_LIMIT` has been removed, please use `128` instead
+  * (user-facing): `DEFAULT_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT` has been removed, please use `128` instead
+  * (user-facing): `DEFAULT_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT` has been removed, please use `128` instead
 
 ### :rocket: (Enhancement)
 

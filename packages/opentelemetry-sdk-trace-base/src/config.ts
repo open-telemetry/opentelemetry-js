@@ -31,7 +31,6 @@ const enum TracesSamplerValues {
   TraceIdRatio = 'traceidratio',
 }
 
-const FALLBACK_OTEL_TRACES_SAMPLER = TracesSamplerValues.AlwaysOn;
 const DEFAULT_RATIO = 1;
 
 /**
@@ -96,9 +95,11 @@ export function buildSamplerFromEnv(): Sampler {
       });
     default:
       diag.error(
-        `OTEL_TRACES_SAMPLER value "${sampler}" invalid, defaulting to "${FALLBACK_OTEL_TRACES_SAMPLER}".`
+        `OTEL_TRACES_SAMPLER value "${sampler}" invalid, defaulting to "${TracesSamplerValues.ParentBasedAlwaysOn}".`
       );
-      return new AlwaysOnSampler();
+      return new ParentBasedSampler({
+        root: new AlwaysOnSampler(),
+      });
   }
 }
 
