@@ -2,9 +2,9 @@
 
 In late February 2025, the OpenTelemetry JavaScript project released the first versions of "JS SDK 2.x" packages. These packages include a number of breaking changes. This document shows the necessary code changes to upgrade to the new 2.x.
 
-Some of the sections below include an "Implementation notes:" section the provides brief background and motivation for some changes. Feel free to skip these sections if you are not interested.
+Some of the sections below include a "Note" that provides background, motivation, and links for some changes. Feel free to skip these sections if you are not interested.
 
-If you have any questions about the 2.x changes, please ask! You can reach the OTel JS community on the [#otel-js](https://cloud-native.slack.com/archives/C01NL1GRPQR) channel of the [CNCF Slack](https://slack.cncf.io/), or [open a Discussion issue](https://github.com/open-telemetry/opentelemetry-js/issues/new?template=discussion.md) on the repository.
+If you have any questions about the 2.x changes, please ask! You can reach the OTel JS community on the [#otel-js](https://cloud-native.slack.com/archives/C01NL1GRPQR) channel of the [CNCF Slack](https://slack.cncf.io/), [open a Discussion issue](https://github.com/open-telemetry/opentelemetry-js/issues/new?template=discussion.md) on the repository, or join the weekly [OTel JS SIG zoom call](https://docs.google.com/document/d/1tCyoQK49WVcE-x8oryZOTTToFm7sIeUhxFPm9g-qL1k/edit).
 
 
 ## What is JS SDK 2.x?
@@ -31,59 +31,73 @@ The OpenTelemetry JS SIG is responsible for numerous packages, all published to 
 
 | Package | Version |
 | ------- | ------- |
-| @opentelemetry/sdk-metrics | 2.0.0 |
-| @opentelemetry/shim-opentracing | 2.0.0 |
-| @opentelemetry/sdk-trace-web | 2.0.0 |
-| @opentelemetry/sdk-trace-node | 2.0.0 |
-| @opentelemetry/sdk-trace-base | 2.0.0 |
-| @opentelemetry/resources | 2.0.0 |
-| @opentelemetry/propagator-jaeger | 2.0.0 |
-| @opentelemetry/propagator-b3 | 2.0.0 |
-| @opentelemetry/exporter-zipkin | 2.0.0 |
-| @opentelemetry/exporter-jaeger | 2.0.0 |
-| @opentelemetry/core | 2.0.0 |
-| @opentelemetry/context-zone-peer-dep | 2.0.0 |
-| @opentelemetry/context-zone | 2.0.0 |
 | @opentelemetry/context-async-hooks | 2.0.0 |
-| @opentelemetry/web-common | 0.200.0 |
-| @opentelemetry/shim-opencensus | 0.200.0 |
-| @opentelemetry/sdk-logs | 0.200.0 |
-| @opentelemetry/sdk-events | 0.200.0 |
-| @opentelemetry/sampler-jaeger-remote | 0.200.0 |
-| @opentelemetry/otlp-transformer | 0.200.0 |
-| @opentelemetry/otlp-grpc-exporter-base | 0.200.0 |
-| @opentelemetry/otlp-exporter-base | 0.200.0 |
-| @opentelemetry/sdk-node | 0.200.0 |
-| @opentelemetry/instrumentation-xml-http-request | 0.200.0 |
-| @opentelemetry/instrumentation-http | 0.200.0 |
-| @opentelemetry/instrumentation-grpc | 0.200.0 |
-| @opentelemetry/instrumentation-fetch | 0.200.0 |
-| @opentelemetry/instrumentation | 0.200.0 |
-| @opentelemetry/exporter-prometheus | 0.200.0 |
-| @opentelemetry/exporter-metrics-otlp-proto | 0.200.0 |
-| @opentelemetry/exporter-metrics-otlp-http | 0.200.0 |
-| @opentelemetry/exporter-metrics-otlp-grpc | 0.200.0 |
-| @opentelemetry/opentelemetry-browser-detector | 0.200.0 |
-| @opentelemetry/exporter-trace-otlp-proto | 0.200.0 |
-| @opentelemetry/exporter-trace-otlp-http | 0.200.0 |
-| @opentelemetry/exporter-trace-otlp-grpc | 0.200.0 |
-| @opentelemetry/exporter-logs-otlp-proto | 0.200.0 |
-| @opentelemetry/exporter-logs-otlp-http | 0.200.0 |
-| @opentelemetry/exporter-logs-otlp-grpc | 0.200.0 |
-| @opentelemetry/api-logs | 0.200.0 |
+| @opentelemetry/context-zone | 2.0.0 |
+| @opentelemetry/context-zone-peer-dep | 2.0.0 |
+| @opentelemetry/core | 2.0.0 |
+| @opentelemetry/exporter-jaeger | 2.0.0 |
+| @opentelemetry/exporter-zipkin | 2.0.0 |
+| @opentelemetry/propagator-b3 | 2.0.0 |
+| @opentelemetry/propagator-jaeger | 2.0.0 |
+| @opentelemetry/resources | 2.0.0 |
+| @opentelemetry/sdk-metrics | 2.0.0 |
+| @opentelemetry/sdk-trace-base | 2.0.0 |
+| @opentelemetry/sdk-trace-node | 2.0.0 |
+| @opentelemetry/sdk-trace-web | 2.0.0 |
+| @opentelemetry/shim-opentracing | 2.0.0 |
 | @opentelemetry/api-events | 0.200.0 |
+| @opentelemetry/api-logs | 0.200.0 |
+| @opentelemetry/exporter-logs-otlp-grpc | 0.200.0 |
+| @opentelemetry/exporter-logs-otlp-http | 0.200.0 |
+| @opentelemetry/exporter-logs-otlp-proto | 0.200.0 |
+| @opentelemetry/exporter-metrics-otlp-grpc | 0.200.0 |
+| @opentelemetry/exporter-metrics-otlp-http | 0.200.0 |
+| @opentelemetry/exporter-metrics-otlp-proto | 0.200.0 |
+| @opentelemetry/exporter-prometheus | 0.200.0 |
+| @opentelemetry/exporter-trace-otlp-grpc | 0.200.0 |
+| @opentelemetry/exporter-trace-otlp-http | 0.200.0 |
+| @opentelemetry/exporter-trace-otlp-proto | 0.200.0 |
+| @opentelemetry/instrumentation | 0.200.0 |
+| @opentelemetry/instrumentation-fetch | 0.200.0 |
+| @opentelemetry/instrumentation-grpc | 0.200.0 |
+| @opentelemetry/instrumentation-http | 0.200.0 |
+| @opentelemetry/instrumentation-xml-http-request | 0.200.0 |
+| @opentelemetry/opentelemetry-browser-detector | 0.200.0 |
+| @opentelemetry/otlp-exporter-base | 0.200.0 |
+| @opentelemetry/otlp-grpc-exporter-base | 0.200.0 |
+| @opentelemetry/otlp-transformer | 0.200.0 |
+| @opentelemetry/sampler-jaeger-remote | 0.200.0 |
+| @opentelemetry/sdk-events | 0.200.0 |
+| @opentelemetry/sdk-logs | 0.200.0 |
+| @opentelemetry/sdk-node | 0.200.0 |
+| @opentelemetry/shim-opencensus | 0.200.0 |
+| @opentelemetry/web-common | 0.200.0 |
 
 </details>
 
+## Table of Contents
+
+- [💥 Node.js supported versions][]
+- [💥 TypeScript supported versions][]
+- [💥 ES2022 compilation target][]
+- [💥 Drop `window.OTEL_*` support in browsers][]
+- [💥 `@opentelemetry/resources` API changes][]
+- [💥 `@opentelemetry/core` API changes][]
+- [💥 Tracing SDK API changes][]
+- [💥 `@opentelemetry/sdk-metrics` API changes][]
+- [💥 Other changes][]
+
+<!--
+Command to update ToC:
+rg '^## 💥' doc/upgrade-to-2.x.md | cut -d' ' -f2- | sed -e 's/\(.*\)/- [\1][]/'
+-->
 
 ## 💥 Node.js supported versions
 
 The **minimum supported Node.js has be raised to `^18.19.0 || >=20.6.0`**. This means that support Node.js 14 and 16 has been dropped.
 
-(The minimum supported Node.js versions for `@opentelemetry/api` (Node.js v8) and `@opentelemetry/semantic-conventions` (Node.js v14) are *not* changing as part of "JS SDK 2.x".)
-
 > [!NOTE]
-> Implementation notes:
+> - The minimum supported Node.js versions for `@opentelemetry/api` (Node.js v8) and `@opentelemetry/semantic-conventions` (Node.js v14) are *not* changing as part of "JS SDK 2.x".
 > - The particular minimum *minor* versions of Node.js 18 and 20 were selected to include support for Node.js's `--import` flag and `module.register()` API. It is expected that this will provide a smoother experience for improved automatic ES module instrumentation.
 >
 > Related issues and PRs:
