@@ -77,19 +77,19 @@ The OpenTelemetry JS SIG is responsible for numerous packages, all published to 
 
 ## Table of Contents
 
-- [💥 Node.js supported versions][]
-- [💥 TypeScript supported versions][]
-- [💥 ES2022 compilation target][]
-- [💥 Drop `window.OTEL_*` support in browsers][]
-- [💥 `@opentelemetry/resources` API changes][]
-- [💥 `@opentelemetry/core` API changes][]
-- [💥 Tracing SDK API changes][]
-- [💥 `@opentelemetry/sdk-metrics` API changes][]
-- [💥 Other changes][]
+- [💥 Node.js supported versions]()
+- [💥 TypeScript supported versions]()
+- [💥 ES2022 compilation target]()
+- [💥 Drop `window.OTEL_*` support in browsers]()
+- [💥 `@opentelemetry/resources` API changes]()
+- [💥 `@opentelemetry/core` API changes]()
+- [💥 Tracing SDK API changes]()
+- [💥 `@opentelemetry/sdk-metrics` API changes]()
+- [💥 Other changes]()
 
 <!--
 Command to update ToC:
-rg '^## 💥' doc/upgrade-to-2.x.md | cut -d' ' -f2- | sed -e 's/\(.*\)/- [\1][]/'
+  rg '^## 💥' doc/upgrade-to-2.x.md | cut -d' ' -f2- | sed -e 's/\(.*\)/- [\1]()/'
 -->
 
 ## 💥 Node.js supported versions
