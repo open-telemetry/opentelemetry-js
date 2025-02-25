@@ -26,58 +26,54 @@ The OpenTelemetry JS SIG is responsible for numerous packages, all published to 
 
 </details>
 
-The full set of packages is:
+<details>
+<summary>The full set of "JS SDK 2.x" packages</summary>
 
 | Package | Version |
 | ------- | ------- |
-| @opentelemetry/sdk-metrics | 1.30.0 |
-| @opentelemetry/shim-opentracing | 1.30.0 |
-| @opentelemetry/sdk-trace-web | 1.30.0 |
-| @opentelemetry/sdk-trace-node | 1.30.0 |
-| @opentelemetry/sdk-trace-base | 1.30.0 |
-| @opentelemetry/resources | 1.30.0 |
-| @opentelemetry/propagator-jaeger | 1.30.0 |
-| @opentelemetry/propagator-b3 | 1.30.0 |
-| @opentelemetry/exporter-zipkin | 1.30.0 |
-| @opentelemetry/exporter-jaeger | 1.30.0 |
-| @opentelemetry/core | 1.30.0 |
-| @opentelemetry/context-zone-peer-dep | 1.30.0 |
-| @opentelemetry/context-zone | 1.30.0 |
-| @opentelemetry/context-async-hooks | 1.30.0 |
-| @opentelemetry/web-common | 0.57.0 |
-| @opentelemetry/shim-opencensus | 0.57.0 |
-| @opentelemetry/sdk-logs | 0.57.0 |
-| @opentelemetry/sdk-events | 0.57.0 |
-| @opentelemetry/sampler-jaeger-remote | 0.57.0 |
-| @opentelemetry/otlp-transformer | 0.57.0 |
-| @opentelemetry/otlp-grpc-exporter-base | 0.57.0 |
-| @opentelemetry/otlp-exporter-base | 0.57.0 |
-| @opentelemetry/sdk-node | 0.57.0 |
-| @opentelemetry/instrumentation-xml-http-request | 0.57.0 |
-| @opentelemetry/instrumentation-http | 0.57.0 |
-| @opentelemetry/instrumentation-grpc | 0.57.0 |
-| @opentelemetry/instrumentation-fetch | 0.57.0 |
-| @opentelemetry/instrumentation | 0.57.0 |
-| @opentelemetry/exporter-prometheus | 0.57.0 |
-| @opentelemetry/exporter-metrics-otlp-proto | 0.57.0 |
-| @opentelemetry/exporter-metrics-otlp-http | 0.57.0 |
-| @opentelemetry/exporter-metrics-otlp-grpc | 0.57.0 |
-| @opentelemetry/opentelemetry-browser-detector | 0.57.0 |
-| @opentelemetry/exporter-trace-otlp-proto | 0.57.0 |
-| @opentelemetry/exporter-trace-otlp-http | 0.57.0 |
-| @opentelemetry/exporter-trace-otlp-grpc | 0.57.0 |
-| @opentelemetry/exporter-logs-otlp-proto | 0.57.0 |
-| @opentelemetry/exporter-logs-otlp-http | 0.57.0 |
-| @opentelemetry/exporter-logs-otlp-grpc | 0.57.0 |
-| @opentelemetry/api-logs | 0.57.0 |
-| @opentelemetry/api-events | 0.57.0 |
+| @opentelemetry/sdk-metrics | 2.0.0 |
+| @opentelemetry/shim-opentracing | 2.0.0 |
+| @opentelemetry/sdk-trace-web | 2.0.0 |
+| @opentelemetry/sdk-trace-node | 2.0.0 |
+| @opentelemetry/sdk-trace-base | 2.0.0 |
+| @opentelemetry/resources | 2.0.0 |
+| @opentelemetry/propagator-jaeger | 2.0.0 |
+| @opentelemetry/propagator-b3 | 2.0.0 |
+| @opentelemetry/exporter-zipkin | 2.0.0 |
+| @opentelemetry/exporter-jaeger | 2.0.0 |
+| @opentelemetry/core | 2.0.0 |
+| @opentelemetry/context-zone-peer-dep | 2.0.0 |
+| @opentelemetry/context-zone | 2.0.0 |
+| @opentelemetry/context-async-hooks | 2.0.0 |
+| @opentelemetry/web-common | 0.200.0 |
+| @opentelemetry/shim-opencensus | 0.200.0 |
+| @opentelemetry/sdk-logs | 0.200.0 |
+| @opentelemetry/sdk-events | 0.200.0 |
+| @opentelemetry/sampler-jaeger-remote | 0.200.0 |
+| @opentelemetry/otlp-transformer | 0.200.0 |
+| @opentelemetry/otlp-grpc-exporter-base | 0.200.0 |
+| @opentelemetry/otlp-exporter-base | 0.200.0 |
+| @opentelemetry/sdk-node | 0.200.0 |
+| @opentelemetry/instrumentation-xml-http-request | 0.200.0 |
+| @opentelemetry/instrumentation-http | 0.200.0 |
+| @opentelemetry/instrumentation-grpc | 0.200.0 |
+| @opentelemetry/instrumentation-fetch | 0.200.0 |
+| @opentelemetry/instrumentation | 0.200.0 |
+| @opentelemetry/exporter-prometheus | 0.200.0 |
+| @opentelemetry/exporter-metrics-otlp-proto | 0.200.0 |
+| @opentelemetry/exporter-metrics-otlp-http | 0.200.0 |
+| @opentelemetry/exporter-metrics-otlp-grpc | 0.200.0 |
+| @opentelemetry/opentelemetry-browser-detector | 0.200.0 |
+| @opentelemetry/exporter-trace-otlp-proto | 0.200.0 |
+| @opentelemetry/exporter-trace-otlp-http | 0.200.0 |
+| @opentelemetry/exporter-trace-otlp-grpc | 0.200.0 |
+| @opentelemetry/exporter-logs-otlp-proto | 0.200.0 |
+| @opentelemetry/exporter-logs-otlp-http | 0.200.0 |
+| @opentelemetry/exporter-logs-otlp-grpc | 0.200.0 |
+| @opentelemetry/api-logs | 0.200.0 |
+| @opentelemetry/api-events | 0.200.0 |
 
-<!--
-XXX
-The full set of packages is:
-
-(TODO: List full table of "SDK 2.x" packages. The idea is to make it clear whether a given 0.x `@opentelemetry/` package applies. I'm not sure if this is useful. There *will* be upgrades to contrib packages for compat as well, so the line is blurry. Could put this in a disclosure.)
--->
+</details>
 
 
 ## 💥 Node.js supported versions
