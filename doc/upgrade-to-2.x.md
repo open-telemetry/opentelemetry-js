@@ -372,47 +372,22 @@ The following changes were made to MetricReader-related APIs:
 > [#5311](https://github.com/open-telemetry/opentelemetry-js/pull/5311)
 
 
-## 💥 other changes
+## 💥 Other changes
 
 This section describes the remaining breaking changes, not otherwise mentioned in a section above.
 
-XXX HERE
-
 Usage of the deprecated `SpanAttributes` type from the API package has been changed to use the `Attributes` type.
 
-- bumped minimum version of `@opentelemetry/api` peer dependency to 1.1.0 for the following packages: `@opentelemetry/core`, `@opentelemetry/resources`, `@opentelemetry/sdk-trace-base`, `@opentelemetry/shim-opentracing`
+- bumped minimum version of `@opentelemetry/api` peer dependency to 1.1.0 for the following packages: `@opentelemetry/core` [#4408](https://github.com/open-telemetry/opentelemetry-js/pull/4408), `@opentelemetry/resources` [#4428](https://github.com/open-telemetry/opentelemetry-js/pull/4428), `@opentelemetry/sdk-trace-base` https://github.com/open-telemetry/opentelemetry-js/pull/5009, `@opentelemetry/shim-opentracing` [#4430](https://github.com/open-telemetry/opentelemetry-js/pull/4430)
 
-XXX drop this Because of the `IMetricReader` change in the sdk-metrics package mentioned above, the `NodeSDKConfiguration` type from the `sdk-node` package has changed slightly. [#5311](https://github.com/open-telemetry/opentelemetry-js/pull/5311)
+And:
 
 - `@opentelemetry/sdk-node`: The type of `NodeSDKConfiguration.metricReader` has narrowed slightly from `MetricReader` to `IMetricReader`. [#5311](https://github.com/open-telemetry/opentelemetry-js/pull/5311)
-
-
 - `@opentelemetry/exporter-jaeger`: `ReadableSpan.instrumentationLibrary` -> `ReadableSpan.instrumentationScope` [#5308](https://github.com/open-telemetry/opentelemetry-js/pull/5308)
 - `@opentelemetry/exporter-zipkin`: `ReadableSpan.instrumentationLibrary` -> `ReadableSpan.instrumentationScope` [#5308](https://github.com/open-telemetry/opentelemetry-js/pull/5308)
-
-
-
-- `@opentelemetry/exporter-prometheus`: Any non-monotonic sums will now be treated as counters and will now include the `_total` suffix. [#5291](https://github.com/open-telemetry/opentelemetry-js/pull/5291) [#5266 comment](https://github.com/open-telemetry/opentelemetry-js/pull/5266#issuecomment-2556564698)
+- `@opentelemetry/exporter-prometheus`: Any non-monotonic sums will now be treated as counters and will now include the `_total` suffix. [#5291](https://github.com/open-telemetry/opentelemetry-js/pull/5291) [#5266 (comment)](https://github.com/open-telemetry/opentelemetry-js/pull/5266#issuecomment-2556564698)
 - `@opentelemetry/shim-opencenus`: stop mapping removed Instrument `type` to OpenTelemetry metrics [#5291](https://github.com/open-telemetry/opentelemetry-js/pull/5291)
 - `@opentelemetry/instrumentation-fetch`: Passthrough original response to `applyCustomAttributes` hook, rather than cloning the response. This means it is no longer possibly to consume the response in `applyCustomAttributes`. [#5281](https://github.com/open-telemetry/opentelemetry-js/pull/5281)
-
-
-> [!NOTE]
-> Related issues and PRs:
-> [#4430](https://github.com/open-telemetry/opentelemetry-js/pull/4430)
-> [#4408](https://github.com/open-telemetry/opentelemetry-js/pull/4408)
-> [#4428](https://github.com/open-telemetry/opentelemetry-js/pull/4428)
-> [#5009](https://github.com/open-telemetry/opentelemetry-js/pull/5009)
-> [#5311](https://github.com/open-telemetry/opentelemetry-js/pull/5311)
-
-> [#XXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXX)
-> [#XXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXX)
-> [#XXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXX)
-> [#XXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXX)
-> [#XXX](https://github.com/open-telemetry/opentelemetry-js/issues/XXX)
-> [#XXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXX)
-
-
 
 
 
