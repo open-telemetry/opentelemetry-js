@@ -149,14 +149,16 @@ export async function startServer(proto: any, port: number) {
 
       call.sendMetadata(serverMetadata);
 
-      call.request.num <= MAX_ERROR_STATUS
-        ? callback(
-            getError(
-              'Unary Method with Metadata Error',
-              call.request.num
-            ) as ServiceError
-          )
-        : callback(null, { num: call.request.num });
+      if (call.request.num <= MAX_ERROR_STATUS) {
+        callback(
+          getError(
+            'Unary Method with Metadata Error',
+            call.request.num
+          ) as ServiceError
+        );
+      } else {
+        callback(null, { num: call.request.num });
+      }
     },
 
     // This method returns the request
@@ -164,11 +166,13 @@ export async function startServer(proto: any, port: number) {
       call: ServerUnaryCall<any, any>,
       callback: requestCallback<any>
     ) {
-      call.request.num <= MAX_ERROR_STATUS
-        ? callback(
-            getError('Unary Method Error', call.request.num) as ServiceError
-          )
-        : callback(null, { num: call.request.num });
+      if (call.request.num <= MAX_ERROR_STATUS) {
+        callback(
+          getError('Unary Method Error', call.request.num) as ServiceError
+        );
+      } else {
+        callback(null, { num: call.request.num });
+      }
     },
 
     // This method returns the request
@@ -176,11 +180,13 @@ export async function startServer(proto: any, port: number) {
       call: ServerUnaryCall<any, any>,
       callback: requestCallback<any>
     ) {
-      call.request.num <= MAX_ERROR_STATUS
-        ? callback(
-            getError('Unary Method Error', call.request.num) as ServiceError
-          )
-        : callback(null, { num: call.request.num });
+      if (call.request.num <= MAX_ERROR_STATUS) {
+        callback(
+          getError('Unary Method Error', call.request.num) as ServiceError
+        );
+      } else {
+        callback(null, { num: call.request.num });
+      }
     },
 
     // This method sums the requests
@@ -199,9 +205,11 @@ export async function startServer(proto: any, port: number) {
         }
       });
       call.on('end', () => {
-        hasError
-          ? callback(getError('Client Stream Method Error', code) as any)
-          : callback(null, { num: sum });
+        if (hasError) {
+          callback(getError('Client Stream Method Error', code) as any);
+        } else {
+          callback(null, { num: sum });
+        }
       });
     },
 
