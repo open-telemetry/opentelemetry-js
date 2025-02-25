@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1740422631579,
+  "lastUpdate": 1740476749789,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -28448,6 +28448,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.59%",
             "unit": "ops/sec",
             "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "455a352b6a5dd42dfd7b98a4254fec9837f873e1",
+          "message": "fix(sdk-trace-base)!: use parent-base-always-on on incorrect input (#5494)",
+          "timestamp": "2025-02-25T09:29:38Z",
+          "tree_id": "ad29eb70bcbb354f15b42b0b21340d938f5e9c50",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/455a352b6a5dd42dfd7b98a4254fec9837f873e1"
+        },
+        "date": 1740476748794,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1539896,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 19057,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 809909,
+            "range": "±0.37%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 794860,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
           }
         ]
       }
