@@ -111,7 +111,7 @@ defaultResource();
 emptyResource();
 ```
 
-"Sync" and async resource detectors have been unified. Where before there were both `hostDetector` and `hostDetectorSync`, now there is only `hostDetector` which may be used in all cases.
+"Sync" and async resource detectors have been unified. For example, where before there were both `hostDetector` and `hostDetectorSync`, now there is only `hostDetector` which may be used in all cases.
 
 - `envDetectorSync` -> `envDetector`
 - `hostDetectorSync` -> `hostDetector`
@@ -120,7 +120,7 @@ emptyResource();
 - `serviceInstanceIdDetectorSync` -> `serviceInstanceIdDetector`
 - `detectResourcesSync` -> `detectResources`
 
-The `browserDetector` and `browserDetectorSync` exports were dropped. This resource detector was ago replaced by the (semantic-conventions compliant) browser detector in the separate `@opentelemetry/opentelemetry-browser-detector` package.
+The `browserDetector` and `browserDetectorSync` exports were dropped. This resource detector was long ago replaced by the (semantic-conventions-compliant) browser detector in the separate `@opentelemetry/opentelemetry-browser-detector` package.
 
 - `browserDetector` or `browserDetectorSync` -> `import { browserDetector } from '@opentelemetry/opentelemetry-browser-detector'`
 
@@ -128,14 +128,14 @@ As mentioned above, support for `window.OTEL_*` environment variable configurati
 
 - `envDetector` in a browser -> manually create a resource with the API
 
-In TypeScript code, the `ResourceAttributes` type was replaced the `Attributes` type from the 'api' package. While unlikely, this could be a breaking change because it raised the minimum `peerDependencies` entry for `@opentelemetry/api` from `1.0.0` to `1.3.0`.
+In TypeScript code, the `ResourceAttributes` type was replaced with the `Attributes` type from the 'api' package. Though unlikely, it is possible this could be a breaking change because it raised the minimum `peerDependencies` entry for `@opentelemetry/api` from `1.0.0` to `1.3.0`.
 
 - type `ResourceAttributes` -> `import type { Attributes } from '@opentelemetry/api';`
 
 > [!NOTE]
 > Implementation notes:
-> - In general, the OTel JS packages are tending away from exporting *classes* because that results in exporting types with internal details that inhibit later refactoring. See [#5283](https://github.com/open-telemetry/opentelemetry-js/issues/5283) for details.
-> - The unification of sync and async resource detectors simplified the API, clarified the behavior for merging results from multiple detectors, and laid the ground work for support OpenTelemetry Entities in the future. See [#5350](https://github.com/open-telemetry/opentelemetry-js/pull/5350) for details.
+> - In general, the OTel JS packages are trending away from exporting *classes* because that results in exporting types with internal details that inhibit later refactoring. See [#5283](https://github.com/open-telemetry/opentelemetry-js/issues/5283) for details.
+> - The unification of sync and async resource detectors simplified the API, clarified the behavior for merging results from multiple detectors, and laid the groundwork for supporting OpenTelemetry *Entities* in the future. See [#5350](https://github.com/open-telemetry/opentelemetry-js/pull/5350) for details.
 >
 > Related issues and PRs:
 > [#5421](https://github.com/open-telemetry/opentelemetry-js/pull/5421)
@@ -147,7 +147,7 @@ In TypeScript code, the `ResourceAttributes` type was replaced the `Attributes` 
 
 ## 💥 `@opentelemetry/core` API changes
 
-The environment variable utilities have changed to not longer have one large load and parse of all possible `OTEL_*` environment variables. Instead there are `get{Type}FromEnv()` utilities to handle the various [specified OpenTelemetry SDK environment variable types](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#configuration-types). The caller should now handle default values.
+The environment variable utilities have changed to no longer have one large load and parse of all possible `OTEL_*` environment variables. Instead there are `get{Type}FromEnv()` utilities to handle the various [specified OpenTelemetry SDK environment variable types](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#configuration-types). The caller should now handle default values.
 
 - `getEnv().OTEL_FOO` -> `get{Type}FromEnv('OTEL_FOO') ?? defaultValue`
   - `getStringFromEnv()`
@@ -271,53 +271,80 @@ As mentioned above in the "core" section, `InstrumentationLibrary` has been chan
 
 ## 💥 `@opentelemetry/sdk-metrics` API changes
 
-The Metrics SDK now uses the `Gauge` and `MetricAdvice` types from the API package, which requires bumping its peer dependency.
+The Metrics SDK now internally uses the `Gauge` and `MetricAdvice` types from the API package, which requires bumping its peer dependency.
 
-- bump minimum version of `@opentelemetry/api` peer dependency to 1.9.0
+- bumped minimum version of `@opentelemetry/api` peer dependency to 1.9.0
 
-The `Aggregation` and `View` *classes* have been dropped in favor of the `AggregationOption` and `ViewOptions` *types*. (See [#4931](https://github.com/open-telemetry/opentelemetry-js/pull/4931) for motivation.) As well, the `attributeKeys` View option has been replaced with more capable filtering.
-(See [#4532](https://github.com/open-telemetry/opentelemetry-js/pull/4532).)
+The `View` *class* has been removed in favor of passing an object of `type ViewOptions` to a MeterProvider. As well, the `*Aggregation` classes have been removed in favor of `type AggregationOption` and the `AggregationType` enum. (See [#4931](https://github.com/open-telemetry/opentelemetry-js/pull/4931) for motivation.)
 
-- removed `View` -> pass in a `type ViewOptions` object to a MeterProvider
-- removed `Aggregation` -> pass in a `type ViewOptions` object to a MeterProvider
-- `attributeKeys` `View` option -> use `attributesProcessors` and `createAllowListAttributesProcessor`
+- removed class `View` -> pass a `type ViewOptions` object to a MeterProvider
+- removed `Aggregation` -> pass a `type ViewOptions` object to a MeterProvider
+  - removed `DefaultAggregation` -> pass a ViewOptions object with `type: AggregationType.DEFAULT`
+  - removed `DropAggregation` -> pass a ViewOptions object with `type: AggregationType.DROP`
+  - removed `ExponentialHistogramAggregation` -> pass a ViewOptions object with `type: AggregationType.EXPONENTIAL_HISTOGRAM`
+  - removed `ExplicitBucketHistogramAggregation` -> pass a ViewOptions object with `type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM`
+  - removed `HistogramAggregation` -> pass a ViewOptions object with `type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM`
+  - removed `LastValueAggregation` -> pass a ViewOptions object with `type: AggregationType.LAST_VALUE`
+  - removed `SumAggregation` -> pass a ViewOptions object with `type: AggregationType.SUM`
+
+For example:
 
 ```js
 // Before
 import {MeterProvider, View, InstrumentType, ExplicitBucketHistogramAggregation} from '@opentelemetry/sdk-metrics';
-new MeterProvider({
+const provider = new MeterProvider({
   views: [
     new View({
       instrumentName: 'http.server.duration',
       instrumentType: InstrumentType.HISTOGRAM,
       aggregation: new ExplicitBucketHistogramAggregation([0, 1, 5, 10, 15, 20, 25, 30]),
-    }),
-    new View({
-      attributeKeys: ['attrib1'],
-      instrumentName: '...',
     })
   ]
 });
 
 // After
 import {MeterProvider, InstrumentType, AggregationType} from '@opentelemetry/sdk-metrics';
-new MeterProvider({
+const provider = new MeterProvider({
   views: [
-    {
+    { // type ViewOptions
       instrumentName: 'http.server.duration',
       instrumentType: InstrumentType.HISTOGRAM,
-      aggregation: {
+      aggregation: { // type AggregationOption
         type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
         options: {
           boundaries: [0, 1, 5, 10, 15, 20, 25, 30],
         }
       }
-    },
+    }
+  ]
+});
+```
+
+The `attributeKeys` View option has been replaced with more capable filtering. (See [#4532](https://github.com/open-telemetry/opentelemetry-js/pull/4532).)
+
+- `attributeKeys` `View` option -> use the `attributesProcessors` ViewOptions property, and `createAllowListAttributesProcessor()` or `createDenyListAttributesProcessor()`
+
+For example:
+
+```js
+// Before
+import {MeterProvider, View} from '@opentelemetry/sdk-metrics';
+const provider = new MeterProvider({
+  views: [
+    new View({
+      attributeKeys: ['attrib1'],
+    })
+  ]
+});
+
+// After
+import {MeterProvider, createAllowListAttributesProcessor} from '@opentelemetry/sdk-metrics';
+const provider = new MeterProvider({
+  views: [
     {
       attributesProcessors: [
         createAllowListAttributesProcessor(['attrib1']),
       ],
-      instrumentName: '...',
     }
   ]
 });
@@ -325,37 +352,29 @@ new MeterProvider({
 
 Some deprecated things have been removed:
 
-- drop deprecated `type` field on `MetricDescriptor`
+- drop deprecated `type` field on interface `MetricDescriptor`
 - drop deprecated `InstrumentDescriptor` type -> use `MetricDescriptor` instead
 
-Other changes:
+The following changes were made to MetricReader-related APIs:
 
-- removed `MeterProvider.addMetricReader()` -> use constructor option
-
-
+- removed `MeterProvider.addMetricReader()` -> use the `readers` constructor option
+- extract `IMetricReader` interface -> If you accept `MetricReader` in your public interface, prefer accepting the more general `IMetricReader` type instead to avoid unintentional breaking changes.
 
 > [!NOTE]
 > Related issues and PRs:
-> [#XXX](https://github.com/open-telemetry/opentelemetry-js/issues/XXX)
 > [#5254](https://github.com/open-telemetry/opentelemetry-js/pull/5254)
+> [#4931](https://github.com/open-telemetry/opentelemetry-js/pull/4931)
+> [#4532](https://github.com/open-telemetry/opentelemetry-js/pull/4532)
 > [#5291](https://github.com/open-telemetry/opentelemetry-js/pull/5291)
 > [#5266](https://github.com/open-telemetry/opentelemetry-js/pull/5266)
 > [#4419](https://github.com/open-telemetry/opentelemetry-js/pull/4419)
-> [#4532](https://github.com/open-telemetry/opentelemetry-js/pull/4532)
-> [#4931](https://github.com/open-telemetry/opentelemetry-js/pull/4931)
-> [#XXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXX)
-> [#XXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXX)
-
-
-
-XXX HERE
-
-* feat(sdk-metrics)!: extract `IMetricReader` interface and use it over abstract class [#5311](https://github.com/open-telemetry/opentelemetry-js/pull/5311)
-  * (user-facing): `MeterProviderOptions` now provides the more general `IMetricReader` type over `MetricReader`
-  * If you accept `MetricReader` in your public interface, consider accepting the more general `IMetricReader` instead to avoid unintentional breaking changes
+> [#5311](https://github.com/open-telemetry/opentelemetry-js/pull/5311)
 
 
 ## 💥 `@opentelemetry/sdk-node` API changes
+
+XXX HERE
+
 
 https://github.com/open-telemetry/opentelemetry-js/pull/5311/files
 XXX
