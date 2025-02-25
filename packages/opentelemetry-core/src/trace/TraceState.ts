@@ -44,10 +44,6 @@ export class TraceState implements TraceStateApi {
       return this;
     }
 
-    // TODO: here potentially we could remove key/values from other vendors
-    // should we allow this??
-    // if not we should "return this;" if the entry already exists
-
     const entries = this._getEntries();
     const index = entries.findIndex(entry => entry.key === key);
 
@@ -56,15 +52,11 @@ export class TraceState implements TraceStateApi {
     }
     entries.unshift({ key, value });
 
-    return new TraceState(this._serializeEntries(entries));
+    const state = this._serializeEntries(entries);
+    return new TraceState(state.length > MAX_TRACE_STATE_LEN ? '' : state);
   }
 
   unset(key: string): TraceState {
-    // TODO: here potentially we could remove key/values from other vendors
-    // should we allow this??
-    // if not we should only
-    // return this;
-
     const entries = this._getEntries();
     const index = entries.findIndex(entry => entry.key === key);
 
