@@ -20,15 +20,8 @@ import {
   SpanContext,
   TraceFlags,
   ROOT_CONTEXT,
-  TextMapPropagator,
-  TextMapSetter,
-  Context,
-  TextMapGetter,
-  propagation,
   diag,
-  ContextManager,
 } from '@opentelemetry/api';
-import { CompositePropagator } from '@opentelemetry/core';
 import { TraceState } from '@opentelemetry/core';
 import {
   defaultResource,
@@ -49,28 +42,8 @@ import { SpanImpl } from '../../src/Span';
 import { MultiSpanProcessor } from '../../src/MultiSpanProcessor';
 import { Tracer } from '../../src/Tracer';
 
-class DummyPropagator implements TextMapPropagator {
-  inject(context: Context, carrier: any, setter: TextMapSetter<any>): void {
-    throw new Error('Method not implemented.');
-  }
-  extract(context: Context, carrier: any, getter: TextMapGetter<any>): Context {
-    throw new Error('Method not implemented.');
-  }
-  fields(): string[] {
-    throw new Error('Method not implemented.');
-  }
-}
-
 describe('BasicTracerProvider', () => {
-  let setGlobalPropagatorStub: sinon.SinonSpy<[TextMapPropagator], boolean>;
-  let setGlobalContextManagerStub: sinon.SinonSpy<[ContextManager], boolean>;
-
   beforeEach(() => {
-    // to avoid actually registering the TraceProvider and leaking env to other tests
-    sinon.stub(trace, 'setGlobalTracerProvider');
-    setGlobalPropagatorStub = sinon.spy(propagation, 'setGlobalPropagator');
-    setGlobalContextManagerStub = sinon.spy(context, 'setGlobalContextManager');
-
     context.disable();
   });
 
@@ -308,65 +281,6 @@ describe('BasicTracerProvider', () => {
           assert.strictEqual(spanLimits.attributeValueLengthLimit, 10);
           assert.strictEqual(spanLimits.attributeCountLimit, 20);
         });
-      });
-    });
-  });
-
-  describe('.register()', () => {
-    describe('propagator', () => {
-      it('should be set to a given value if it it provided', () => {
-        const provider = new BasicTracerProvider();
-        provider.register({
-          propagator: new DummyPropagator(),
-        });
-
-        sinon.assert.calledOnceWithExactly(
-          setGlobalPropagatorStub,
-          sinon.match.instanceOf(DummyPropagator)
-        );
-      });
-
-      it('should use w3c trace context and baggage propagators by default', () => {
-        const provider = new BasicTracerProvider();
-        provider.register();
-
-        sinon.assert.calledOnceWithExactly(
-          setGlobalPropagatorStub,
-          sinon.match.instanceOf(CompositePropagator)
-        );
-        assert.deepStrictEqual(setGlobalPropagatorStub.args[0][0].fields(), [
-          'traceparent',
-          'tracestate',
-          'baggage',
-        ]);
-      });
-    });
-    describe('contextManager', () => {
-      it('should not be set if not provided', () => {
-        const provider = new BasicTracerProvider();
-        provider.register();
-
-        sinon.assert.notCalled(setGlobalContextManagerStub);
-      });
-
-      it('should be set if provided', () => {
-        const provider = new BasicTracerProvider();
-        const mockContextManager: ContextManager = {
-          active: sinon.stub(),
-          bind: sinon.stub(),
-          disable: sinon.stub(),
-          enable: sinon.stub(),
-          with: sinon.stub(),
-        };
-
-        provider.register({
-          contextManager: mockContextManager,
-        });
-
-        sinon.assert.calledOnceWithExactly(
-          setGlobalContextManagerStub,
-          mockContextManager
-        );
       });
     });
   });

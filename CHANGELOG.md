@@ -112,6 +112,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore
     * If you have been using the `envDetector` in browser environments, please migrate to manually creating a resource.
     * Note: Node.js environment variable configuration continues to work as-is.
+* fix(sdk-trace-base)!: use `ParentBasedAlwaysOnSampler` over `AlwaysOnSampler` when bogus data is supplied to `OTEL_TRACES_SAMPLER`
+  * this aligns the SDK implementation with the specification
 * feat(core)!: drop `getEnv()`, `getEnvWithoutDefaults()` [#5481](https://github.com/open-telemetry/opentelemetry-js/pull/5481) @pichlermarc
   * (user-facing): `getEnv()` has been replaced by `getStringFromEnv()`, `getNumberFromEnv()`, `getBooleanFromEnv()`, `getStringListFromEnv()`
     * these new functions do not include defaults, please inline any defaults if necessary (example: `getStringFromEnv("OTEL_FOO") ?? "my-default"`)
@@ -122,6 +124,10 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * (user-facing): `ENVIRONMENT` has been removed without replacement
   * (user-facing): `RAW_ENVIRONMENT` has been removed without replacement
   * (user-facing): `parseEnvironment` has been removed without replacement
+* feat(sdk-trace-base): remove `BasicTracerProvider#register()` to improve tree-shaking [#5503](https://github.com/open-telemetry/opentelemetry-js/pull/5503) @pichlermarc
+  * (user-facing): `BasicTracerProvider#register()` has been removed
+    * to register a global propagator, please use `propagation.setGlobalPropagator()` from `@opentelemetry/api`
+    * to register a global context manager, please use `context.setGlobalContextManager()` from `@opentelemetry/api`
 * feat!: set compilation target to ES2022 for all packages except `@opentelemetry/api`, `@opentelemetry/api-logs`, `@opentelemetry/api-events`, and `@opentelemetry/semantic-conventions` [#5456](https://github.com/open-telemetry/opentelemetry-js/pull/5456) @david-luna
   * (user-facing): drops browser runtimes which do not support ES2022 features
 * feat(core)! drop unused constants [#5504](https://github.com/open-telemetry/opentelemetry-js/pull/5504) @pichlermarc
