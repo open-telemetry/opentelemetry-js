@@ -43,6 +43,10 @@ import { BasicTracerProvider, Span, SpanProcessor } from '../../src';
 import { SpanImpl } from '../../src/Span';
 import { invalidAttributes, validAttributes } from './util';
 import { Tracer } from '../../src/Tracer';
+import {
+  DEFAULT_ATTRIBUTE_COUNT_LIMIT,
+  DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
+} from '../../src/utility';
 
 const performanceTimeOrigin: HrTime = [1, 1];
 
@@ -664,7 +668,7 @@ describe('Span', () => {
             attributeCountLimit: 10,
           },
           spanLimits: {
-            attributeCountLimit: 128,
+            attributeCountLimit: DEFAULT_ATTRIBUTE_COUNT_LIMIT,
           },
         }).getTracer('default') as Tracer;
 
@@ -684,7 +688,10 @@ describe('Span', () => {
         span.end();
 
         it('should remove / drop all remaining values after the number of values exceeds the span limit', () => {
-          assert.strictEqual(Object.keys(span.attributes).length, 128);
+          assert.strictEqual(
+            Object.keys(span.attributes).length,
+            DEFAULT_ATTRIBUTE_COUNT_LIMIT
+          );
           assert.strictEqual(span.attributes['foo0'], 'bar0');
           assert.strictEqual(span.attributes['foo10'], 'bar10');
           assert.strictEqual(span.attributes['foo127'], 'bar127');
@@ -759,7 +766,7 @@ describe('Span', () => {
           },
           spanLimits: {
             // Setting attribute value length limit
-            attributeValueLengthLimit: Infinity,
+            attributeValueLengthLimit: DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
           },
         }).getTracer('default') as Tracer;
 
