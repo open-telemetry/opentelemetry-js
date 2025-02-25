@@ -16,7 +16,7 @@
 
 import * as oc from '@opencensus/core';
 import { ValueType } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
+import { emptyResource } from '@opentelemetry/resources';
 import {
   AggregationTemporality,
   DataPointType,
@@ -43,7 +43,7 @@ describe('OpenCensusMetricProducer', () => {
 
     assert.deepStrictEqual(
       resourceMetrics.resourceMetrics.resource,
-      Resource.EMPTY
+      emptyResource()
     );
   });
 

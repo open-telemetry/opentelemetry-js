@@ -14,13 +14,7 @@
  * limitations under the License.
  */
 
-export { Tracer } from './Tracer';
-export {
-  BasicTracerProvider,
-  EXPORTER_FACTORY,
-  ForceFlushState,
-  PROPAGATOR_FACTORY,
-} from './BasicTracerProvider';
+export { BasicTracerProvider } from './BasicTracerProvider';
 export { BatchSpanProcessor, RandomIdGenerator } from './platform';
 export { ConsoleSpanExporter } from './export/ConsoleSpanExporter';
 export { InMemorySpanExporter } from './export/InMemorySpanExporter';

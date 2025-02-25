@@ -80,7 +80,7 @@ type TestGrpcClient = Client & {
 interface TestGrpcCall {
   description: string;
   methodName: string;
-  method: Function;
+  method: (...args: any[]) => unknown;
   request: TestRequestResponse | TestRequestResponse[];
   result: TestRequestResponse | TestRequestResponse[];
   metadata?: Metadata;
@@ -622,7 +622,7 @@ export const runTests = (
                 );
                 assert.strictEqual(
                   rootSpan.spanContext().spanId,
-                  clientSpan.parentSpanId
+                  clientSpan.parentSpanContext?.spanId
                 );
               }
             })
@@ -740,7 +740,7 @@ export const runTests = (
               );
               assert.strictEqual(
                 rootSpan.spanContext().spanId,
-                clientSpan.parentSpanId
+                clientSpan.parentSpanContext?.spanId
               );
             });
         });

@@ -14,20 +14,48 @@
  * limitations under the License.
  */
 
+import { AttributeValue } from '@opentelemetry/api';
 import { ResourceDetectionConfig } from './config';
-import { IResource } from './IResource';
 
 /**
- * @deprecated please use {@link DetectorSync}
+ * Interface for a Resource Detector.
+ * A resource detector returns a set of detected resource attributes.
+ * A detected resource attribute may be an {@link AttributeValue} or a Promise of an AttributeValue.
  */
-export interface Detector {
-  detect(config?: ResourceDetectionConfig): Promise<IResource>;
+export interface ResourceDetector {
+  /**
+   * Detect resource attributes.
+   *
+   * @returns a {@link DetectedResource} object containing detected resource attributes
+   */
+  detect(config?: ResourceDetectionConfig): DetectedResource;
 }
 
+export type DetectedResource = {
+  /**
+   * Detected resource attributes.
+   */
+  attributes?: DetectedResourceAttributes;
+};
+
 /**
- * Interface for a synchronous Resource Detector. In order to detect attributes asynchronously, a detector
- * can pass a Promise as the second parameter to the Resource constructor.
+ * An object representing detected resource attributes.
+ * Value may be {@link AttributeValue}s, a promise to an {@link AttributeValue}, or undefined.
  */
-export interface DetectorSync {
-  detect(config?: ResourceDetectionConfig): IResource;
-}
+type DetectedResourceAttributeValue = MaybePromise<AttributeValue | undefined>;
+
+/**
+ * An object representing detected resource attributes.
+ * Values may be {@link AttributeValue}s or a promise to an {@link AttributeValue}.
+ */
+export type DetectedResourceAttributes = Record<
+  string,
+  DetectedResourceAttributeValue
+>;
+
+export type MaybePromise<T> = T | Promise<T>;
+
+export type RawResourceAttribute = [
+  string,
+  MaybePromise<AttributeValue | undefined>,
+];

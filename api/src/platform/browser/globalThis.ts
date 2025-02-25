@@ -34,5 +34,5 @@ export const _globalThis: typeof globalThis =
       : typeof window === 'object'
         ? window
         : typeof global === 'object'
-          ? global
+          ? (global as unknown as typeof globalThis)
           : ({} as typeof globalThis);

@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 import * as api from '@opentelemetry/api';
-import { otperformance as performance, isWrapped } from '@opentelemetry/core';
-import { registerInstrumentations } from '@opentelemetry/instrumentation';
+import { otperformance as performance } from '@opentelemetry/core';
+import {
+  registerInstrumentations,
+  isWrapped,
+} from '@opentelemetry/instrumentation';
 import {
   B3Propagator,
   B3InjectEncoding,
@@ -66,7 +69,7 @@ const XHR_TIMEOUT = 2000;
 const getData = (
   req: XMLHttpRequest,
   url: string,
-  callbackAfterSend: Function,
+  callbackAfterSend: () => void,
   async?: boolean
 ) => {
   // eslint-disable-next-line no-async-promise-executor
@@ -101,7 +104,7 @@ const postData = (
   req: XMLHttpRequest,
   url: string,
   data: Document | XMLHttpRequestBodyInit,
-  callbackAfterSend: Function,
+  callbackAfterSend: () => void,
   async?: boolean
 ) => {
   // eslint-disable-next-line no-async-promise-executor
@@ -385,7 +388,7 @@ describe('xhr', () => {
         it('should create a span with correct root span', () => {
           const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
           assert.strictEqual(
-            span.parentSpanId,
+            span.parentSpanContext?.spanId,
             rootSpan.spanContext().spanId,
             'parent span is not root span'
           );
@@ -489,7 +492,7 @@ describe('xhr', () => {
           const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
           const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
           assert.strictEqual(
-            span.parentSpanId,
+            span.parentSpanContext?.spanId,
             parentSpan.spanContext().spanId,
             'parent span is not root span'
           );
@@ -1583,7 +1586,7 @@ describe('xhr', () => {
         it('should create a span with correct root span', () => {
           const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
           assert.strictEqual(
-            span.parentSpanId,
+            span.parentSpanContext?.spanId,
             rootSpan.spanContext().spanId,
             'parent span is not root span'
           );
@@ -1687,7 +1690,7 @@ describe('xhr', () => {
           const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
           const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
           assert.strictEqual(
-            span.parentSpanId,
+            span.parentSpanContext?.spanId,
             parentSpan.spanContext().spanId,
             'parent span is not root span'
           );

@@ -31,7 +31,7 @@ const collectorOptions = {
   }, //an optional object containing custom headers to be sent with each request will only work with http
 };
 
-const logProvider = new LoggerProvider({resource: new Resource({'service.name': 'testApp'})});
+const logProvider = new LoggerProvider({resource: resourceFromAttributes({'service.name': 'testApp'})});
 const logExporter = new OTLPLogExporter(collectorOptions);
 logProvider.addLogRecordProcessor(new SimpleLogRecordProcessor(exporter));
 
