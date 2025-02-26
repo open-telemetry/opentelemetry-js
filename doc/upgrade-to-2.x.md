@@ -1,6 +1,6 @@
 # Upgrade to OpenTelemetry JS SDK 2.x
 
-In late February 2025, the OpenTelemetry JavaScript project released the first versions of "JS SDK 2.x" packages. These packages include a number of breaking changes. This document shows how to migrate to the new 2.x. Refer to the changelogs for these releases here:
+In late February 2025, the OpenTelemetry JavaScript project released the first versions of "JS SDK 2.x" packages, which include a number of *breaking changes*. This document shows how to migrate to the new 2.x. For the most part, this document *only covers breaking changes*. Refer to the full changelogs for these releases here:
 
 - [CHANGELOG for stable SDK packages](https://github.com/open-telemetry/opentelemetry-js/blob/main/CHANGELOG.md)
 - [CHANGELOG for experimental SDK packages](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/CHANGELOG.md)
@@ -16,6 +16,8 @@ If you have any questions about the 2.x changes, please ask! You can reach the O
 ## What is JS SDK 2.x?
 
 "JS SDK 2.x" encompasses new releases of the `@opentelemetry/*` JavaScript packages published from the [opentelemetry-js.git](https://github.com/open-telemetry/opentelemetry-js) repository, except the API and semantic-conventions packages &mdash; categories 3 and 4 in the groupings below. The package versions for this new major will be `>=2.0.0` for the stable and `>=0.200.0` for the unstable packages. (The jump to `0.200.x` was intentional, to hopefully help signal that these packages are in the "2.x generation".)
+
+If your usage of OpenTelemetry does not *directly* use these packages, then you most likely will not need to change your code to migrate. You still need to be aware of the new minimum versions of Node.js, TypeScript, and ES that are supported.
 
 <details>
 <summary>Categories of OpenTelemetry JS packages</summary>
@@ -195,6 +197,7 @@ In TypeScript code, the `ResourceAttributes` type was replaced with the `Attribu
 >
 > Related issues and PRs:
 > [#5421](https://github.com/open-telemetry/opentelemetry-js/pull/5421)
+> [#5467](https://github.com/open-telemetry/opentelemetry-js/pull/5467)
 > [#5350](https://github.com/open-telemetry/opentelemetry-js/pull/5350)
 > [#5420](https://github.com/open-telemetry/opentelemetry-js/issues/5420)
 > [#5217](https://github.com/open-telemetry/opentelemetry-js/issues/5217)
@@ -203,7 +206,9 @@ In TypeScript code, the `ResourceAttributes` type was replaced with the `Attribu
 
 ## 💥 `@opentelemetry/core` API changes
 
-The environment variable utilities have changed to no longer have one large load and parse of all possible `OTEL_*` environment variables. Instead there are `get{Type}FromEnv()` utilities to handle the various [specified OpenTelemetry SDK environment variable types](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#configuration-types). The caller should now handle default values.
+The environment variable utilities have changed to no longer have one large load and parse of all possible `OTEL_*` environment variables. Instead there are `get{Type}FromEnv()` utilities to handle the various [specified OpenTelemetry SDK environment variable types](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#configuration-types).
+
+The caller should now handle default values. The authority for default values is the [OpenTelemetry Environment Variable Spec](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#general-sdk-configuration). The previously used defaults in the 1.x code can be seen [here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239).
 
 - `getEnv().OTEL_FOO` -> `get{Type}FromEnv('OTEL_FOO') ?? defaultValue`
   - `getStringFromEnv()`
@@ -256,6 +261,10 @@ A number of deprecated, obsolete, unused, and accidentally exported functions an
 - `baggageUtils.parsePairKeyValue` (unintentionally exported)
 - `TimeOriginLegacy`
 - `isAttributeKey` (unintentionally exported)
+- `DEFAULT_ATTRIBUTE_VALUE_LENTGHT_LIMIT` -> use `Infinity`
+- `DEFAULT_ATTRIBUTE_VALUE_COUNT_LIMIT` -> use `128`
+- `DEFAULT_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT` -> use `128`
+- `DEFAULT_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT` -> use `128`
 
 <br/>
 
@@ -274,6 +283,7 @@ A number of deprecated, obsolete, unused, and accidentally exported functions an
 > [#5316](https://github.com/open-telemetry/opentelemetry-js/pull/5316)
 > [#5406](https://github.com/open-telemetry/opentelemetry-js/pull/5406)
 > [#5444](https://github.com/open-telemetry/opentelemetry-js/pull/5444)
+> [#5504](https://github.com/open-telemetry/opentelemetry-js/pull/5504)
 
 
 ## 💥 Tracing SDK API changes
@@ -282,9 +292,9 @@ This section describes API changes in the set of packages that implement the tra
 
 Tracing was the first signal to have an SDK. Over time, and as the Metrics and Logs SDKs were added, the API design separating functionality between the `{Tracer,Meter,Logs}Provider`s APIs and the higher level `NodeSDK` (in `@opentelemetry/sdk-node`) improved. The Tracing SDK was left with some cruft that is being removed in JS SDK 2.0. (See [#5290](https://github.com/open-telemetry/opentelemetry-js/issues/5290) for motivation.)
 
-- removed `<BasicTracerProvider>.addSpanProcessor(...)` -> use constructor options to the TracerProvider class
-- made `<BasicTracerProvider>.getActiveSpanProcessor()` private
-- made `<BasicTracerProvider>.resource` private
+- removed `BasicTracerProvider#addSpanProcessor(...)` -> use constructor options to the TracerProvider class
+- made `BasicTracerProvider#getActiveSpanProcessor()` private
+- made `BasicTracerProvider#resource` private
 - `BasicTracerProvider` and `NodeTracerProvider` will no longer use the `OTEL_TRACES_EXPORTER` envvar to create exporters -> This functionality already resides in `NodeSDK` (from `@opentelemetry/sdk-node`).
 - `BasicTracerProvider` and `NodeTracerProvider` will no longer use the `OTEL_PROPAGATORS` envvar to create propagators -> This functionality already resides in `NodeSDK` (from `@opentelemetry/sdk-node`).
 - The following internal properties were removed from `BasicTracerProvider`: `_registeredExporters`, `_getSpanExporter`, `_buildExporterFromEnv`
@@ -295,6 +305,7 @@ Tracing was the first signal to have an SDK. Over time, and as the Metrics and L
   - the `Tracer` class was unintentionally exported and has been removed
     - to obtain a `Tracer`, please use `BasicTracerProvider#getTracer()`, `NodeTracerProvider#getTracer()` or `WebTracerProvider#getTracer()`
     - to reference the `Tracer` type, please use the `Tracer` type from `@opentelemetry/api`
+- removed `BasicTracerProvider#register()` -> use `NodeTracerProvider#register()` or `WebTracerProvider#register()`, or call `trace.setGlobalTracerProvider()` et al manually (see [#5503](https://github.com/open-telemetry/opentelemetry-js/pull/5503))
 
 <br/>
 
@@ -304,8 +315,8 @@ The export of the `Span` class has been removed. It was not intended to be used 
 
 <br/>
 
-The Span fields for referring to the parent span context were changed to adhere to the OTel spec:
-The `Span` `parentSpanId` field was replaced by `parentSpanContext`, to adhere to the OTel spec:
+The `Span` `parentSpanId` field was replaced by `parentSpanContext`, to adhere to the OTel spec. [#5450](https://github.com
+/open-telemetry/opentelemetry-js/pull/5450)
 
 - `span.parentSpanId` -> `span.parentSpanContext?.spanId`
 
@@ -318,6 +329,9 @@ As mentioned above in the "core" section, `InstrumentationLibrary` has been chan
 
 <br/>
 
+When bogus data is set on `OTEL_TRACES_SAMPLER`, the SDK now uses `ParentBasedAlwaysOnSampler` rather than `AlwaysOnSampler`, per [spec](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#general-sdk-configuration).
+
+
 > [!NOTE]
 > Related issues and PRs:
 > [#5290](https://github.com/open-telemetry/opentelemetry-js/issues/5290)
@@ -329,6 +343,7 @@ As mentioned above in the "core" section, `InstrumentationLibrary` has been chan
 > [#5048](https://github.com/open-telemetry/opentelemetry-js/pull/5048)
 > [#5450](https://github.com/open-telemetry/opentelemetry-js/pull/5450)
 > [#5308](https://github.com/open-telemetry/opentelemetry-js/pull/5308)
+> [#5503](https://github.com/open-telemetry/opentelemetry-js/pull/5503)
 
 
 ## 💥 `@opentelemetry/sdk-metrics` API changes
