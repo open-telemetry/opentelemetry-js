@@ -75,23 +75,6 @@ The OpenTelemetry JS SIG is responsible for numerous packages, all published to 
 
 </details>
 
-## Table of Contents
-
-- [💥 Node.js supported versions]()
-- [💥 TypeScript supported versions]()
-- [💥 ES2022 compilation target]()
-- [💥 Drop `window.OTEL_*` support in browsers]()
-- [💥 `@opentelemetry/resources` API changes]()
-- [💥 `@opentelemetry/core` API changes]()
-- [💥 Tracing SDK API changes]()
-- [💥 `@opentelemetry/sdk-metrics` API changes]()
-- [💥 Other changes]()
-
-<!--
-Command to update ToC:
-  rg '^## 💥' doc/upgrade-to-2.x.md | cut -d' ' -f2- | sed -e 's/\(.*\)/- [\1]()/'
--->
-
 ## 💥 Node.js supported versions
 
 The **minimum supported Node.js has be raised to `^18.19.0 || >=20.6.0`**. This means that support Node.js 14 and 16 has been dropped.
@@ -284,7 +267,7 @@ This section describes API changes in the set of packages that implement the tra
 Tracing was the first signal to have an SDK. Over time, and as the Metrics and Logs SDKs were added, the API design separating functionality between the `{Tracer,Meter,Logs}Provider`s APIs and the higher level `NodeSDK` (in `@opentelemetry/sdk-node`) improved. The Tracing SDK was left with some cruft that is being removed in JS SDK 2.0. (See [#5290](https://github.com/open-telemetry/opentelemetry-js/issues/5290) for motivation.)
 
 - removed `<BasicTracerProvider>.addSpanProcessor(...)` -> use constructor options to the TracerProvider class
-- removed `<BasicTracerProvider>.getActiveSpanProcessor()` private
+- made `<BasicTracerProvider>.getActiveSpanProcessor()` private
 - made `<BasicTracerProvider>.resource` private
 - `BasicTracerProvider` and `NodeTracerProvider` will no longer use the `OTEL_TRACES_EXPORTER` envvar to create exporters -> This functionality already resides in `NodeSDK` (from `@opentelemetry/sdk-node`).
 - `BasicTracerProvider` and `NodeTracerProvider` will no longer use the `OTEL_PROPAGATORS` envvar to create propagators -> This functionality already resides in `NodeSDK` (from `@opentelemetry/sdk-node`).
