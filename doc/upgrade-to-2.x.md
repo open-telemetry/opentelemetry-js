@@ -1,10 +1,16 @@
 # Upgrade to OpenTelemetry JS SDK 2.x
 
-In late February 2025, the OpenTelemetry JavaScript project released the first versions of "JS SDK 2.x" packages. These packages include a number of breaking changes. This document shows the necessary code changes to upgrade to the new 2.x.
+In late February 2025, the OpenTelemetry JavaScript project released the first versions of "JS SDK 2.x" packages. These packages include a number of breaking changes. This document shows how to migrate to the new 2.x. Refer to the changelogs for these releases here:
 
-Some of the sections below include a "Note" that provides background, motivation, and links for some changes. Feel free to skip these sections if you are not interested.
+- [CHANGELOG for stable SDK packages](https://github.com/open-telemetry/opentelemetry-js/blob/main/CHANGELOG.md)
+- [CHANGELOG for experimental SDK packages](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/CHANGELOG.md)
+
+<!-- TODO: update these changelog links to the 2.0.0 and 0.200.0 anchors when we have a final release. -->
+
+Per [OpenTelemetry guidelines](https://opentelemetry.io/docs/specs/otel/versioning-and-stability/#sdk-support), the 1.x versions of stable SDK packages will be supported for one year from the 2.0.0 release.
 
 If you have any questions about the 2.x changes, please ask! You can reach the OTel JS community on the [#otel-js](https://cloud-native.slack.com/archives/C01NL1GRPQR) channel of the [CNCF Slack](https://slack.cncf.io/), [open a Discussion issue](https://github.com/open-telemetry/opentelemetry-js/issues/new?template=discussion.md) on the repository, or join the weekly [OTel JS SIG zoom call](https://docs.google.com/document/d/1tCyoQK49WVcE-x8oryZOTTToFm7sIeUhxFPm9g-qL1k/edit).
+
 
 
 ## What is JS SDK 2.x?
@@ -461,24 +467,3 @@ And finally:
 - `@opentelemetry/exporter-prometheus`: Any non-monotonic sums will now be treated as counters and will now include the `_total` suffix. [#5291](https://github.com/open-telemetry/opentelemetry-js/pull/5291) [#5266 (comment)](https://github.com/open-telemetry/opentelemetry-js/pull/5266#issuecomment-2556564698)
 - `@opentelemetry/shim-opencenus`: stop mapping removed Instrument `type` to OpenTelemetry metrics [#5291](https://github.com/open-telemetry/opentelemetry-js/pull/5291)
 - `@opentelemetry/instrumentation-fetch`: Passthrough original response to `applyCustomAttributes` hook, rather than cloning the response. This means it is no longer possibly to consume the response in `applyCustomAttributes`. [#5281](https://github.com/open-telemetry/opentelemetry-js/pull/5281)
-
-
-
-## XXX / TODO
-
-- Statement on maint of 1.x: how long?
-- link the 2 changelogs
-- The easy path if just using `@opentelemetry/auto-instrumentations-node/register`. Is this totally unchanged?
-- mention that it will take some time for contrib repo packages to migrate
-- `rg`-using tool to list if one needs to look at updating
-- eventually get to all the examples/. They will be like bad docs.
-
-new changelog entries to merge
-
-```
-git ls-files | rg CHANGELOG | while read f; do echo; echo "# $f"; diff -u $f ~/src/opentelemetry-js/$f ; done
-```
-
-
-
-
