@@ -136,13 +136,13 @@ The `Resource` *class* is no longer exported; instead use new utility functions.
 - TypeScript interface for a resource: `IResource` -> `Resource`
 
 ```ts
-// Before (pre-2.x)
+// Before
 import { Resource } from '@opentelemetry/resources';
 new Resource({ ... });  // Create a resource
 Resource.default();     // Get a resource with the default attributes
 Resource.empty();       // Get an empty resource
 
-// After (2.x)
+// After
 import { resourceFromAttributes, defaultResource, emptyResource } from '@opentelemetry/resources';
 resourceFromAttributes({ ... });
 defaultResource();
@@ -203,13 +203,13 @@ The environment variable utilities have changed to no longer have one large load
 For example:
 
 ```ts
-// Before (pre-2.x)
+// Before
 import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
 const flavor = getEnv().OTEL_EXPORTER_OTLP_PROTOCOL;
 const limit = getEnv().OTEL_BSP_MAX_QUEUE_SIZE;
 const level = getEnv().OTEL_LOG_LEVEL;
 
-// After (2.x)
+// After
 import { getStringFromEnv } from '@opentelemetry/core';
 const flavor = getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL') ?? 'http/protobuf';
 const limit = getNumberFromEnv('OTEL_BSP_MAX_QUEUE_SIZE') ?? 2048;
@@ -329,7 +329,12 @@ For example:
 
 ```js
 // Before
-import {MeterProvider, View, InstrumentType, ExplicitBucketHistogramAggregation} from '@opentelemetry/sdk-metrics';
+import {
+  MeterProvider,
+  View,
+  InstrumentType,
+  ExplicitBucketHistogramAggregation
+} from '@opentelemetry/sdk-metrics';
 const provider = new MeterProvider({
   views: [
     new View({
@@ -357,6 +362,8 @@ const provider = new MeterProvider({
   ]
 });
 ```
+
+---
 
 The `attributeKeys` View option has been replaced with more capable filtering. (See [#4532](https://github.com/open-telemetry/opentelemetry-js/pull/4532).)
 
