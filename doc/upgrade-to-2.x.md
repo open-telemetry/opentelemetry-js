@@ -228,19 +228,6 @@ const limit = getNumberFromEnv('OTEL_BSP_MAX_QUEUE_SIZE') ?? 2048;
 const level = diagLogLevelFromString(getStringFromEnv('OTEL_LOG_LEVEL'));
 ```
 
-> [!NOTE]
-> Implementation notes:
-> - The `getEnv()` et al API changes avoid a problem of requiring an update to
->   `@opentelemetry/core` for any added `OTEL_*` envvars, including in unstable
->   packages and packages maintained in the separate contrib repository.
->   See [#5443](https://github.com/open-telemetry/opentelemetry-js/pull/5443).
->
-> Related issues and PRs:
-> [#5443](https://github.com/open-telemetry/opentelemetry-js/pull/5443)
-> [#5481](https://github.com/open-telemetry/opentelemetry-js/pull/5481)
-> [#5475](https://github.com/open-telemetry/opentelemetry-js/pull/5475)
-
-<br/>
 <br/>
 
 A number of deprecated, obsolete, unused, and accidentally exported functions and variables have been removed from the `core` package. (If there is a replacement, it is mentioned with `-> ...`.)
@@ -264,8 +251,18 @@ A number of deprecated, obsolete, unused, and accidentally exported functions an
 - `TimeOriginLegacy`
 - `isAttributeKey` (unintentionally exported)
 
+<br/>
+
 > [!NOTE]
+> - The `getEnv()` et al API changes avoid a problem of requiring an update to
+>   `@opentelemetry/core` for any added `OTEL_*` envvars, including in unstable
+>   packages and packages maintained in the separate contrib repository.
+>   See [#5443](https://github.com/open-telemetry/opentelemetry-js/pull/5443).
+>
 > Related issues and PRs:
+> [#5443](https://github.com/open-telemetry/opentelemetry-js/pull/5443)
+> [#5481](https://github.com/open-telemetry/opentelemetry-js/pull/5481)
+> [#5475](https://github.com/open-telemetry/opentelemetry-js/pull/5475)
 > [#5309](https://github.com/open-telemetry/opentelemetry-js/pull/5309)
 > [#5308](https://github.com/open-telemetry/opentelemetry-js/pull/5308)
 > [#5316](https://github.com/open-telemetry/opentelemetry-js/pull/5316)
@@ -294,13 +291,11 @@ Tracing was the first signal to have an SDK. Over time, and as the Metrics and L
     - to reference the `Tracer` type, please use the `Tracer` type from `@opentelemetry/api`
 
 <br/>
-<br/>
 
 The export of the `Span` class has been removed. It was not intended to be used directly. One should always use methods on a `Tracer` instance (e.g. `startSpan()`) for creating spans.
 
 - `new Span(...)` -> use `tracer.startSpan(...)`
 
-<br/>
 <br/>
 
 The Span fields for referring to the parent span context were changed to adhere to the OTel spec:
@@ -309,12 +304,13 @@ The `Span` `parentSpanId` field was replaced by `parentSpanContext`, to adhere t
 - `span.parentSpanId` -> `span.parentSpanContext?.spanId`
 
 <br/>
-<br/>
 
 As mentioned above in the "core" section, `InstrumentationLibrary` has been changed to `InstrumentationScope`:
 
 - `Tracer.instrumentationLibrary` -> `Tracer.instrumentationScope`
 - `ReadableSpan.instrumentationLibrary` -> `ReadableSpan.instrumentationScope`
+
+<br/>
 
 > [!NOTE]
 > Related issues and PRs:
@@ -335,7 +331,6 @@ The Metrics SDK now internally uses the `Gauge` and `MetricAdvice` types from th
 
 - bumped minimum version of `@opentelemetry/api` peer dependency to 1.9.0
 
-<br/>
 <br/>
 
 The `View` *class* has been removed in favor of passing an object of `type ViewOptions` to a MeterProvider. As well, the `*Aggregation` classes have been removed in favor of `type AggregationOption` and the `AggregationType` enum. (See [#4931](https://github.com/open-telemetry/opentelemetry-js/pull/4931) for motivation.)
@@ -389,7 +384,6 @@ const provider = new MeterProvider({
 ```
 
 <br/>
-<br/>
 
 The `attributeKeys` View option has been replaced with more capable filtering. (See [#4532](https://github.com/open-telemetry/opentelemetry-js/pull/4532).)
 
@@ -422,7 +416,6 @@ const provider = new MeterProvider({
 ```
 
 <br/>
-<br/>
 
 Some deprecated things have been removed:
 
@@ -430,13 +423,14 @@ Some deprecated things have been removed:
 - drop deprecated `InstrumentDescriptor` type -> use `MetricDescriptor` instead
 
 <br/>
-<br/>
 
 The following changes were made to MetricReader-related APIs:
 
 - removed `MeterProvider.addMetricReader()` -> use the `readers` constructor option
 - new `IMetricReader` interface -> This is preferred to the `MetricReader` abstract class. The `MeterProviderOptions` `readers` constructor option now uses this slightly narrower type.
   - If you accept `MetricReader` in your public interface, prefer accepting the more general `IMetricReader` type instead to avoid unintentional breaking changes.
+
+<br/>
 
 > [!NOTE]
 > Related issues and PRs:
@@ -457,7 +451,6 @@ Usage of the deprecated `SpanAttributes` type from the API package has been chan
 
 - bumped minimum version of `@opentelemetry/api` peer dependency to 1.1.0 for the following packages: `@opentelemetry/core` [#4408](https://github.com/open-telemetry/opentelemetry-js/pull/4408), `@opentelemetry/resources` [#4428](https://github.com/open-telemetry/opentelemetry-js/pull/4428), `@opentelemetry/sdk-trace-base` [#5009](https://github.com/open-telemetry/opentelemetry-js/pull/5009), `@opentelemetry/shim-opentracing` [#4430](https://github.com/open-telemetry/opentelemetry-js/pull/4430)
 
-<br/>
 <br/>
 
 And finally:
