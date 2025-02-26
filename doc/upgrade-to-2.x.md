@@ -99,6 +99,8 @@ The **minimum supported TypeScript version has been raised to 5.0.4**.
 
 As well, going forward all packages published from this repository will **drop support for old versions of `typescript` in minor releases**. We will only drop support for versions that are older than 2 years.
 
+Important: Both of these changes (typescript@5.0.4, dropping old TypeScript versions in minor releases) **also apply to the `@opentelemetry/api` and `@opentelemetry/semantic-conventions` packages**, even though those two packages aren't otherwise considered part of the "JS SDK 2.x" update.
+
 > [!NOTE]
 > Related issues and PRs:
 > [#5145](https://github.com/open-telemetry/opentelemetry-js/pull/5145)
