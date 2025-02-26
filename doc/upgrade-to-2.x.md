@@ -149,6 +149,9 @@ defaultResource();
 emptyResource();
 ```
 
+<br/>
+<br/>
+
 "Sync" and async resource detectors have been unified. For example, where before there were both `hostDetector` and `hostDetectorSync`, now there is only `hostDetector` which may be used in all cases.
 
 - `envDetectorSync` -> `envDetector`
@@ -158,13 +161,22 @@ emptyResource();
 - `serviceInstanceIdDetectorSync` -> `serviceInstanceIdDetector`
 - `detectResourcesSync` -> `detectResources`
 
+<br/>
+<br/>
+
 The `browserDetector` and `browserDetectorSync` exports were dropped. This resource detector was long ago replaced by the (semantic-conventions-compliant) browser detector in the separate `@opentelemetry/opentelemetry-browser-detector` package.
 
 - `browserDetector` or `browserDetectorSync` -> `import { browserDetector } from '@opentelemetry/opentelemetry-browser-detector'`
 
+<br/>
+<br/>
+
 As mentioned above, support for `window.OTEL_*` environment variable configuration in browsers has been dropped. This means that the `envDetector` in browsers is now a no-op.
 
 - `envDetector` in a browser -> manually create a resource with the API
+
+<br/>
+<br/>
 
 In TypeScript code, the `ResourceAttributes` type was replaced with the `Attributes` type from the 'api' package. Though unlikely, it is possible this could be a breaking change because it raised the minimum `peerDependencies` entry for `@opentelemetry/api` from `1.0.0` to `1.3.0`.
 
@@ -228,7 +240,8 @@ const level = diagLogLevelFromString(getStringFromEnv('OTEL_LOG_LEVEL'));
 > [#5481](https://github.com/open-telemetry/opentelemetry-js/pull/5481)
 > [#5475](https://github.com/open-telemetry/opentelemetry-js/pull/5475)
 
----
+<br/>
+<br/>
 
 A number of deprecated, obsolete, unused, and accidentally exported functions and variables have been removed from the `core` package. (If there is a replacement, it is mentioned with `-> ...`.)
 
@@ -280,14 +293,23 @@ Tracing was the first signal to have an SDK. Over time, and as the Metrics and L
     - to obtain a `Tracer`, please use `BasicTracerProvider#getTracer()`, `NodeTracerProvider#getTracer()` or `WebTracerProvider#getTracer()`
     - to reference the `Tracer` type, please use the `Tracer` type from `@opentelemetry/api`
 
+<br/>
+<br/>
+
 The export of the `Span` class has been removed. It was not intended to be used directly. One should always use methods on a `Tracer` instance (e.g. `startSpan()`) for creating spans.
 
 - `new Span(...)` -> use `tracer.startSpan(...)`
+
+<br/>
+<br/>
 
 The Span fields for referring to the parent span context were changed to adhere to the OTel spec:
 The `Span` `parentSpanId` field was replaced by `parentSpanContext`, to adhere to the OTel spec:
 
 - `span.parentSpanId` -> `span.parentSpanContext?.spanId`
+
+<br/>
+<br/>
 
 As mentioned above in the "core" section, `InstrumentationLibrary` has been changed to `InstrumentationScope`:
 
@@ -312,6 +334,9 @@ As mentioned above in the "core" section, `InstrumentationLibrary` has been chan
 The Metrics SDK now internally uses the `Gauge` and `MetricAdvice` types from the API package, which requires bumping its peer dependency.
 
 - bumped minimum version of `@opentelemetry/api` peer dependency to 1.9.0
+
+<br/>
+<br/>
 
 The `View` *class* has been removed in favor of passing an object of `type ViewOptions` to a MeterProvider. As well, the `*Aggregation` classes have been removed in favor of `type AggregationOption` and the `AggregationType` enum. (See [#4931](https://github.com/open-telemetry/opentelemetry-js/pull/4931) for motivation.)
 
@@ -363,7 +388,8 @@ const provider = new MeterProvider({
 });
 ```
 
----
+<br/>
+<br/>
 
 The `attributeKeys` View option has been replaced with more capable filtering. (See [#4532](https://github.com/open-telemetry/opentelemetry-js/pull/4532).)
 
@@ -395,10 +421,16 @@ const provider = new MeterProvider({
 });
 ```
 
+<br/>
+<br/>
+
 Some deprecated things have been removed:
 
 - drop deprecated `type` field on interface `MetricDescriptor`
 - drop deprecated `InstrumentDescriptor` type -> use `MetricDescriptor` instead
+
+<br/>
+<br/>
 
 The following changes were made to MetricReader-related APIs:
 
@@ -425,7 +457,10 @@ Usage of the deprecated `SpanAttributes` type from the API package has been chan
 
 - bumped minimum version of `@opentelemetry/api` peer dependency to 1.1.0 for the following packages: `@opentelemetry/core` [#4408](https://github.com/open-telemetry/opentelemetry-js/pull/4408), `@opentelemetry/resources` [#4428](https://github.com/open-telemetry/opentelemetry-js/pull/4428), `@opentelemetry/sdk-trace-base` [#5009](https://github.com/open-telemetry/opentelemetry-js/pull/5009), `@opentelemetry/shim-opentracing` [#4430](https://github.com/open-telemetry/opentelemetry-js/pull/4430)
 
-And:
+<br/>
+<br/>
+
+And finally:
 
 - `@opentelemetry/sdk-node`: The type of `NodeSDKConfiguration.metricReader` has narrowed slightly from `MetricReader` to `IMetricReader`. [#5311](https://github.com/open-telemetry/opentelemetry-js/pull/5311)
 - `@opentelemetry/exporter-jaeger`: `ReadableSpan.instrumentationLibrary` -> `ReadableSpan.instrumentationScope` [#5308](https://github.com/open-telemetry/opentelemetry-js/pull/5308)
@@ -436,34 +471,16 @@ And:
 
 
 
-## Links
+## XXX / TODO
 
-- XXX the 2 changelogs
-- XXX git link to a full diff, if helpful
-- XXX updated opentelemetry.io getting started guide
-
-
-# scratch
-
-
-- XXX The easy path if just using `@opentelemetry/auto-instrumentations-node/register`. Is this totally unchanged?
-- XXX mention that it will take some time for contrib repo packages to migrate
-- XXX `rg`-using tool to list if one needs to look at updating
-- XXX eventually get to all the examples/. They will be like bad docs.
-
-> [!NOTE]
-> Related issues and PRs:
-> [#XXX](https://github.com/open-telemetry/opentelemetry-js/issues/XXX)
-> [#XXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXX)
-
-## XXX outline
-
-- Am I ready for JS SDK 2.x?  Dropped Node 14 and 16 support. >=18.19.0.
-- The highlights: min node, min TypeScript, moving away from exported *classes* because ...,
-- "Why SDK 2.0?"  I.e. why should a user upgrade, other than this is what will be maintained. We don't *have* to answer this. That is more about "What's New" than covering breaking changes here.
 - Statement on maint of 1.x: how long?
+- link the 2 changelogs
+- The easy path if just using `@opentelemetry/auto-instrumentations-node/register`. Is this totally unchanged?
+- mention that it will take some time for contrib repo packages to migrate
+- `rg`-using tool to list if one needs to look at updating
+- eventually get to all the examples/. They will be like bad docs.
 
-## XXX new changelog entries to merge
+new changelog entries to merge
 
 ```
 git ls-files | rg CHANGELOG | while read f; do echo; echo "# $f"; diff -u $f ~/src/opentelemetry-js/$f ; done
