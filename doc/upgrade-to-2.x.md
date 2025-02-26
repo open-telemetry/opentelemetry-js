@@ -11,8 +11,6 @@ Per [OpenTelemetry guidelines](https://opentelemetry.io/docs/specs/otel/versioni
 
 If you have any questions about the 2.x changes, please ask! You can reach the OTel JS community on the [#otel-js](https://cloud-native.slack.com/archives/C01NL1GRPQR) channel of the [CNCF Slack](https://slack.cncf.io/), [open a Discussion issue](https://github.com/open-telemetry/opentelemetry-js/issues/new?template=discussion.md) on the repository, or join the weekly [OTel JS SIG zoom call](https://docs.google.com/document/d/1tCyoQK49WVcE-x8oryZOTTToFm7sIeUhxFPm9g-qL1k/edit).
 
-
-
 ## What is JS SDK 2.x?
 
 "JS SDK 2.x" encompasses new releases of the `@opentelemetry/*` JavaScript packages published from the [opentelemetry-js.git](https://github.com/open-telemetry/opentelemetry-js) repository, except the API and semantic-conventions packages &mdash; categories 3 and 4 in the groupings below. The package versions for this new major will be `>=2.0.0` for the stable and `>=0.200.0` for the unstable packages. (The jump to `0.200.x` was intentional, to hopefully help signal that these packages are in the "2.x generation".)
@@ -88,12 +86,12 @@ The OpenTelemetry JS SIG is responsible for numerous packages, all published to 
 The **minimum supported Node.js has be raised to `^18.19.0 || >=20.6.0`**. This means that support Node.js 14 and 16 has been dropped.
 
 > [!NOTE]
+>
 > - The minimum supported Node.js versions for `@opentelemetry/api` (Node.js v8) and `@opentelemetry/semantic-conventions` (Node.js v14) are *not* changing as part of "JS SDK 2.x".
 > - The particular minimum *minor* versions of Node.js 18 and 20 were selected to include support for Node.js's `--import` flag and `module.register()` API. It is expected that this will provide a smoother experience for improved automatic ES module instrumentation.
 >
 > Related issues and PRs:
 > [#5395](https://github.com/open-telemetry/opentelemetry-js/issues/5395)
-
 
 ## 💥 TypeScript supported versions
 
@@ -104,7 +102,6 @@ As well, going forward all packages published from this repository will **drop s
 > [!NOTE]
 > Related issues and PRs:
 > [#5145](https://github.com/open-telemetry/opentelemetry-js/pull/5145)
-
 
 ## 💥 ES2022 compilation target
 
@@ -118,7 +115,6 @@ For Node.js usage, this already follows from the new minimum supported Node.js v
 > [#5393](https://github.com/open-telemetry/opentelemetry-js/issues/5393)
 > [#5456](https://github.com/open-telemetry/opentelemetry-js/pull/5456)
 
-
 ## 💥 Drop `window.OTEL_*` support in browsers
 
 For browser users, support for `window.OTEL_*` environment variable configuration (previous handled by the `envDetector`) has been dropped.  OpenTelemetry bootstrap code for the browser should be configured via code.
@@ -130,7 +126,6 @@ For browser users, support for `window.OTEL_*` environment variable configuratio
 > [#5472](https://github.com/open-telemetry/opentelemetry-js/pull/5472)
 > [#5465](https://github.com/open-telemetry/opentelemetry-js/pull/5465)
 > [#5473](https://github.com/open-telemetry/opentelemetry-js/pull/5473)
-
 
 ## 💥 `@opentelemetry/resources` API changes
 
@@ -202,7 +197,6 @@ In TypeScript code, the `ResourceAttributes` type was replaced with the `Attribu
 > [#5420](https://github.com/open-telemetry/opentelemetry-js/issues/5420)
 > [#5217](https://github.com/open-telemetry/opentelemetry-js/issues/5217)
 > [#5016](https://github.com/open-telemetry/opentelemetry-js/issues/5016)
-
 
 ## 💥 `@opentelemetry/core` API changes
 
@@ -285,7 +279,6 @@ A number of deprecated, obsolete, unused, and accidentally exported functions an
 > [#5444](https://github.com/open-telemetry/opentelemetry-js/pull/5444)
 > [#5504](https://github.com/open-telemetry/opentelemetry-js/pull/5504)
 
-
 ## 💥 Tracing SDK API changes
 
 This section describes API changes in the set of packages that implement the tracing SDK: `@opentelemetry/sdk-trace-base`, `@opentelemetry/sdk-trace-node`, `@opentelemetry/sdk-trace-web`.
@@ -331,7 +324,6 @@ As mentioned above in the "core" section, `InstrumentationLibrary` has been chan
 
 When bogus data is set on `OTEL_TRACES_SAMPLER`, the SDK now uses `ParentBasedAlwaysOnSampler` rather than `AlwaysOnSampler`, per [spec](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#general-sdk-configuration).
 
-
 > [!NOTE]
 > Related issues and PRs:
 > [#5290](https://github.com/open-telemetry/opentelemetry-js/issues/5290)
@@ -344,7 +336,6 @@ When bogus data is set on `OTEL_TRACES_SAMPLER`, the SDK now uses `ParentBasedAl
 > [#5450](https://github.com/open-telemetry/opentelemetry-js/pull/5450)
 > [#5308](https://github.com/open-telemetry/opentelemetry-js/pull/5308)
 > [#5503](https://github.com/open-telemetry/opentelemetry-js/pull/5503)
-
 
 ## 💥 `@opentelemetry/sdk-metrics` API changes
 
@@ -462,7 +453,6 @@ The following changes were made to MetricReader-related APIs:
 > [#5266](https://github.com/open-telemetry/opentelemetry-js/pull/5266)
 > [#4419](https://github.com/open-telemetry/opentelemetry-js/pull/4419)
 > [#5311](https://github.com/open-telemetry/opentelemetry-js/pull/5311)
-
 
 ## 💥 Other changes
 
