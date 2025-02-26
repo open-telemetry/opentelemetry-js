@@ -186,7 +186,7 @@ In TypeScript code, the `ResourceAttributes` type was replaced with the `Attribu
 <br/>
 
 > [!NOTE]
-> Implementation notes:
+>
 > - In general, the OTel JS packages are trending away from exporting *classes* because that results in exporting types with internal details that inhibit later refactoring. See [#5283](https://github.com/open-telemetry/opentelemetry-js/issues/5283) for details.
 > - The unification of sync and async resource detectors simplified the API, clarified the behavior for merging results from multiple detectors, and laid the groundwork for supporting OpenTelemetry *Entities* in the future. See [#5350](https://github.com/open-telemetry/opentelemetry-js/pull/5350) for details.
 >
@@ -263,6 +263,7 @@ A number of deprecated, obsolete, unused, and accidentally exported functions an
 <br/>
 
 > [!NOTE]
+>
 > - The `getEnv()` et al API changes avoid a problem of requiring an update to
 >   `@opentelemetry/core` for any added `OTEL_*` envvars, including in unstable
 >   packages and packages maintained in the separate contrib repository.
@@ -308,8 +309,7 @@ The export of the `Span` class has been removed. It was not intended to be used 
 
 <br/>
 
-The `Span` `parentSpanId` field was replaced by `parentSpanContext`, to adhere to the OTel spec. [#5450](https://github.com
-/open-telemetry/opentelemetry-js/pull/5450)
+The `Span` `parentSpanId` field was replaced by `parentSpanContext`, to adhere to the OTel spec. [#5450](https://github.com/open-telemetry/opentelemetry-js/pull/5450)
 
 - `span.parentSpanId` -> `span.parentSpanContext?.spanId`
 
