@@ -39,9 +39,11 @@ import {
   IgnoreMatcher,
   ParsedRequestOptions,
   SemconvStability,
+} from '../../src/internal-types';
+import {
   ATTR_USER_AGENT_SYNTHETIC_TYPE,
   USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
-} from '../../src/internal-types';
+} from '../../src/semconv';
 import * as utils from '../../src/utils';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
