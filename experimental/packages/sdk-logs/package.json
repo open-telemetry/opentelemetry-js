@@ -12,6 +12,30 @@
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
   "types": "build/src/index.d.ts",
+  "exports": {
+    ".": {
+      "module": "./build/esm/index.js",
+      "esnext": "./build/esnext/index.js",
+      "types": "./build/src/index.d.ts",
+      "default": "./build/src/index.js"
+    },
+    "./incubating": {
+      "module": "./build/esm/index_experimental.js",
+      "esnext": "./build/esnext/index_experimental.js",
+      "types": "./build/src/index_experimental.d.ts",
+      "default": "./build/src/index_experimental.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./build/src/index.d.ts"
+      ],
+      "experimental": [
+        "./build/src/index_experimental.d.ts"
+      ]
+    }
+  },
   "browser": {
     "./src/platform/index.ts": "./src/platform/browser/index.ts",
     "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
