@@ -128,6 +128,8 @@ For browser users, support for `window.OTEL_*` environment variable configuratio
 
 Perhaps the most likely API change you will need to update for is from the `@opentelemetry/resources` package.
 
+<br/>
+
 The `Resource` *class* is no longer exported; instead use new utility functions.
 
 - Creating a resource: `new Resource(...)` -> `resourceFromAttributes(...)`
@@ -150,7 +152,6 @@ emptyResource();
 ```
 
 <br/>
-<br/>
 
 "Sync" and async resource detectors have been unified. For example, where before there were both `hostDetector` and `hostDetectorSync`, now there is only `hostDetector` which may be used in all cases.
 
@@ -162,13 +163,11 @@ emptyResource();
 - `detectResourcesSync` -> `detectResources`
 
 <br/>
-<br/>
 
 The `browserDetector` and `browserDetectorSync` exports were dropped. This resource detector was long ago replaced by the (semantic-conventions-compliant) browser detector in the separate `@opentelemetry/opentelemetry-browser-detector` package.
 
 - `browserDetector` or `browserDetectorSync` -> `import { browserDetector } from '@opentelemetry/opentelemetry-browser-detector'`
 
-<br/>
 <br/>
 
 As mentioned above, support for `window.OTEL_*` environment variable configuration in browsers has been dropped. This means that the `envDetector` in browsers is now a no-op.
@@ -176,11 +175,12 @@ As mentioned above, support for `window.OTEL_*` environment variable configurati
 - `envDetector` in a browser -> manually create a resource with the API
 
 <br/>
-<br/>
 
 In TypeScript code, the `ResourceAttributes` type was replaced with the `Attributes` type from the 'api' package. Though unlikely, it is possible this could be a breaking change because it raised the minimum `peerDependencies` entry for `@opentelemetry/api` from `1.0.0` to `1.3.0`.
 
 - type `ResourceAttributes` -> `import type { Attributes } from '@opentelemetry/api';`
+
+<br/>
 
 > [!NOTE]
 > Implementation notes:
