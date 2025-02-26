@@ -317,7 +317,6 @@ The `Span` `parentSpanId` field was replaced by `parentSpanContext`, to adhere t
 
 As mentioned above in the "core" section, `InstrumentationLibrary` has been changed to `InstrumentationScope`:
 
-- `Tracer.instrumentationLibrary` -> `Tracer.instrumentationScope`
 - `ReadableSpan.instrumentationLibrary` -> `ReadableSpan.instrumentationScope`
 
 <br/>
