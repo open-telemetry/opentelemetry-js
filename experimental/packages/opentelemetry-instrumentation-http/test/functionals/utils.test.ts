@@ -78,6 +78,8 @@ describe('Utility', () => {
   describe('getRequestInfo()', () => {
     it('should get options object', () => {
       const webUrl = 'http://u:p@google.fr/aPath?qu=ry';
+      // This is explicitly testing interop with the legacy API
+      // eslint-disable-next-line node/no-deprecated-api
       const urlParsed = url.parse(webUrl);
       const urlParsedWithoutPathname = {
         ...urlParsed,
@@ -152,13 +154,15 @@ describe('Utility', () => {
 
   describe('getAbsoluteUrl()', () => {
     it('should return absolute url with localhost', () => {
-      const path = '/test/1';
-      const result = utils.getAbsoluteUrl(url.parse(path), {});
-      assert.strictEqual(result, `http://localhost${path}`);
+      const result = utils.getAbsoluteUrl({ path: '/test/1' }, {});
+      assert.strictEqual(result, 'http://localhost/test/1');
     });
     it('should return absolute url', () => {
-      const absUrl = 'http://www.google/test/1?query=1';
-      const result = utils.getAbsoluteUrl(url.parse(absUrl), {});
+      const absUrl = 'http://www.google.com/test/1?query=1';
+      const result = utils.getAbsoluteUrl(
+        { protocol: 'http:', host: 'www.google.com', path: '/test/1?query=1' },
+        {}
+      );
       assert.strictEqual(result, absUrl);
     });
     it('should return default url', () => {
@@ -210,7 +214,7 @@ describe('Utility', () => {
         assert.strictEqual(utils.isValidOptionsType(options), false);
       });
     });
-    for (const options of ['url', url.parse('http://url.com'), {}]) {
+    for (const options of ['url', new URL('http://url.com'), {}]) {
       it(`should return true with the following value: ${JSON.stringify(
         options
       )}`, () => {
