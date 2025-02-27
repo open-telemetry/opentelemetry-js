@@ -150,6 +150,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * fix(exporter-zipkin): remove usages of deprecated `url.parse` from `node:url` [#5390](https://github.com/open-telemetry/opentelemetry-js/pull/5390) @chancancode
 * fix(sdk-metrics): do not export from `PeriodicExportingMetricReader` when there are no metrics to export. [#5288](https://github.com/open-telemetry/opentelemetry-js/pull/5288) @jacksonweber
 * fix(sdk-trace-base): always wait on pending export in SimpleSpanProcessor. [#5303](https://github.com/open-telemetry/opentelemetry-js/pull/5303) @anuraaga
+* fix(resource): use dynamic import over require to improve ESM compliance [#5298](https://github.com/open-telemetry/opentelemetry-js/pull/5298) @xiaoxiangmoe
 
 ### :books: (Refine Doc)
 
