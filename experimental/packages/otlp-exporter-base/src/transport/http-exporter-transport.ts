@@ -37,7 +37,7 @@ class HttpExporterTransport implements IExporterTransport {
   constructor(private _parameters: HttpRequestParameters) {}
 
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
-    const { agent, send } = this._loadUtils();
+    const { agent, send } = await this._loadUtils();
 
     return new Promise<ExportResponse>(resolve => {
       send(
@@ -56,16 +56,18 @@ class HttpExporterTransport implements IExporterTransport {
     // intentionally left empty, nothing to do.
   }
 
-  private _loadUtils(): Utils {
+  private async _loadUtils(): Utils {
     let utils = this._utils;
 
     if (utils === null) {
+      const { sendWithHttp, createHttpAgent } = 
       // Lazy require to ensure that http/https is not required before instrumentations can wrap it.
       const {
         sendWithHttp,
         createHttpAgent,
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-      } = require('./http-transport-utils');
+      } = await import(
+        './http-transport-utils'
+      );
 
       utils = this._utils = {
         agent: createHttpAgent(
