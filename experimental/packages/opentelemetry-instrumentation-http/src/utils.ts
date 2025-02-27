@@ -449,7 +449,8 @@ export const getOutgoingRequestAttributes = (
     port: string | number;
     hookAttributes?: Attributes;
   },
-  semconvStability: SemconvStability
+  semconvStability: SemconvStability,
+  enableSyntheticSourceDetection: boolean
 ): Attributes => {
   const hostname = options.hostname;
   const port = options.port;
@@ -492,7 +493,7 @@ export const getOutgoingRequestAttributes = (
     oldAttributes[SEMATTRS_HTTP_USER_AGENT] = userAgent;
   }
 
-  if (userAgent != null) {
+  if (userAgent != null && enableSyntheticSourceDetection) {
     const userAgentString: string = String(userAgent).toLowerCase();
     for (const name of SYNTHETIC_TEST_NAMES) {
       if (userAgentString.includes(name)) {

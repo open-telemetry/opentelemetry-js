@@ -87,4 +87,6 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
     client?: { requestHeaders?: string[]; responseHeaders?: string[] };
     server?: { requestHeaders?: string[]; responseHeaders?: string[] };
   };
+  /** Enable automatic population of synthetic source type based on the user-agent header */
+  enableSyntheticSourceDetection?: boolean;
 }
