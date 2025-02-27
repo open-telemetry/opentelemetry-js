@@ -77,7 +77,14 @@ import {
   IgnoreMatcher,
   ParsedRequestOptions,
   SemconvStability,
+  SYNTHETIC_BOT_NAMES,
+  SYNTHETIC_TEST_NAMES,
 } from './internal-types';
+import {
+  ATTR_USER_AGENT_SYNTHETIC_TYPE,
+  USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
+  USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST,
+} from './semconv';
 import forwardedParse = require('forwarded-parse');
 
 /**
@@ -442,7 +449,8 @@ export const getOutgoingRequestAttributes = (
     port: string | number;
     hookAttributes?: Attributes;
   },
-  semconvStability: SemconvStability
+  semconvStability: SemconvStability,
+  enableSyntheticSourceDetection: boolean
 ): Attributes => {
   const hostname = options.hostname;
   const port = options.port;
@@ -483,6 +491,24 @@ export const getOutgoingRequestAttributes = (
 
   if (userAgent !== undefined) {
     oldAttributes[SEMATTRS_HTTP_USER_AGENT] = userAgent;
+  }
+
+  if (userAgent != null && enableSyntheticSourceDetection) {
+    const userAgentString: string = String(userAgent).toLowerCase();
+    for (const name of SYNTHETIC_TEST_NAMES) {
+      if (userAgentString.includes(name)) {
+        newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
+          USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST;
+        break;
+      }
+    }
+    for (const name of SYNTHETIC_BOT_NAMES) {
+      if (userAgentString.includes(name)) {
+        newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
+          USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT;
+        break;
+      }
+    }
   }
 
   switch (semconvStability) {
@@ -840,6 +866,24 @@ export const getIncomingRequestAttributes = (
   // conditionally required if request method required case normalization
   if (method !== normalizedMethod) {
     newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
+  }
+
+  if (userAgent != null) {
+    const userAgentString: string = String(userAgent).toLowerCase();
+    for (const name of SYNTHETIC_TEST_NAMES) {
+      if (userAgentString.includes(name)) {
+        newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
+          USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST;
+        break;
+      }
+    }
+    for (const name of SYNTHETIC_BOT_NAMES) {
+      if (userAgentString.includes(name)) {
+        newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
+          USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT;
+        break;
+      }
+    }
   }
 
   const oldAttributes: Attributes = {
