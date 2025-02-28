@@ -6,12 +6,12 @@ const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-htt
 // const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-proto');
 // const { ConsoleMetricExporter } = require('@opentelemetry/sdk-metrics');
 const {
-  ExponentialHistogramAggregation,
   MeterProvider,
   PeriodicExportingMetricReader,
   View,
+  AggregationType,
 } = require('@opentelemetry/sdk-metrics');
-const { Resource } = require('@opentelemetry/resources');
+const { resourceFromAttributes } = require('@opentelemetry/resources');
 const {
   SEMRESATTRS_SERVICE_NAME,
 } = require('@opentelemetry/semantic-conventions');
@@ -25,20 +25,18 @@ const metricExporter = new OTLPMetricExporter({
   // },
 });
 
-// Define view for the exponential histogram metric
-const expHistogramView = new View({
-  aggregation: new ExponentialHistogramAggregation(),
-  // Note, the instrumentName is the same as the name that has been passed for
-  // the Meter#createHistogram function for exponentialHistogram.
-  instrumentName: 'test_exponential_histogram',
-});
-
 // Create an instance of the metric provider
 const meterProvider = new MeterProvider({
-  resource: new Resource({
+  resource: resourceFromAttributes({
     [SEMRESATTRS_SERVICE_NAME]: 'basic-metric-service',
   }),
-  views: [expHistogramView],
+  // Define view for the exponential histogram metric
+  views: [{
+      aggregation: { type: AggregationType.EXPONENTIAL_HISTOGRAM },
+      // Note, the instrumentName is the same as the name that has been passed for
+      // the Meter#createHistogram function for exponentialHistogram.
+      instrumentName: 'test_exponential_histogram',
+  }],
   readers: [
     new PeriodicExportingMetricReader({
       exporter: metricExporter,

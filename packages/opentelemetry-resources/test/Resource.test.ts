@@ -25,11 +25,7 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { describeBrowser, describeNode } from './util';
-import {
-  DEFAULT_RESOURCE,
-  EMPTY_RESOURCE,
-  resourceFromAttributes,
-} from '../src';
+import { defaultResource, emptyResource, resourceFromAttributes } from '../src';
 
 describe('Resource', () => {
   const resource1 = resourceFromAttributes({
@@ -45,7 +41,6 @@ describe('Resource', () => {
     'k8s.io/container/name': 'c2',
     'k8s.io/location': 'location1',
   });
-  const emptyResource = resourceFromAttributes({});
 
   it('should return merged resource', () => {
     const expectedResource = resourceFromAttributes({
@@ -79,13 +74,13 @@ describe('Resource', () => {
   });
 
   it('should return merged resource when first resource is empty', () => {
-    const actualResource = emptyResource.merge(resource2);
+    const actualResource = emptyResource().merge(resource2);
     assert.strictEqual(Object.keys(actualResource.attributes).length, 2);
     assert.deepStrictEqual(actualResource.attributes, resource2.attributes);
   });
 
   it('should return merged resource when other resource is empty', () => {
-    const actualResource = resource1.merge(emptyResource);
+    const actualResource = resource1.merge(emptyResource());
     assert.strictEqual(Object.keys(actualResource.attributes).length, 3);
     assert.deepStrictEqual(actualResource.attributes, resource1.attributes);
   });
@@ -131,8 +126,8 @@ describe('Resource', () => {
 
     it('should return false for asyncAttributesPending if no promise provided', () => {
       assert.ok(!resourceFromAttributes({ foo: 'bar' }).asyncAttributesPending);
-      assert.ok(!EMPTY_RESOURCE.asyncAttributesPending);
-      assert.ok(!DEFAULT_RESOURCE.asyncAttributesPending);
+      assert.ok(!emptyResource().asyncAttributesPending);
+      assert.ok(!defaultResource().asyncAttributesPending);
     });
 
     it('should return false for asyncAttributesPending once promise settles', async () => {
@@ -267,7 +262,7 @@ describe('Resource', () => {
 
   describeNode('.default()', () => {
     it('should return a default resource', () => {
-      const resource = DEFAULT_RESOURCE;
+      const resource = defaultResource();
       assert.strictEqual(
         resource.attributes[SEMRESATTRS_TELEMETRY_SDK_NAME],
         SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_NAME]
@@ -289,7 +284,7 @@ describe('Resource', () => {
 
   describeBrowser('.default()', () => {
     it('should return a default resource', () => {
-      const resource = DEFAULT_RESOURCE;
+      const resource = defaultResource();
       assert.strictEqual(
         resource.attributes[SEMRESATTRS_TELEMETRY_SDK_NAME],
         SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_NAME]

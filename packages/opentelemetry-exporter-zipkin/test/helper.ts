@@ -30,7 +30,11 @@ export const mockedReadableSpan: ReadableSpan = {
       traceFlags: TraceFlags.SAMPLED,
     };
   },
-  parentSpanId: '78a8915098864388',
+  parentSpanContext: {
+    spanId: '78a8915098864388',
+    traceId: '1f1008dc8e270e85c40a0d7c3939b278',
+    traceFlags: TraceFlags.SAMPLED,
+  },
   startTime: [1574120165, 429803070],
   endTime: [1574120165, 438688070],
   ended: true,

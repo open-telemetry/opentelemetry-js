@@ -64,7 +64,10 @@ describe('API registration', () => {
   it('should register configured implementations', () => {
     const tracerProvider = new NodeTracerProvider();
 
-    const mockContextManager = { disable() {} } as any;
+    const mockContextManager = {
+      enable() {},
+      disable() {},
+    } as any;
     const mockPropagator = {} as any;
 
     tracerProvider.register({

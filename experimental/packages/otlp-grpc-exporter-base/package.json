@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/otlp-grpc-exporter-base",
-  "version": "0.57.0",
+  "version": "0.200.0-dev.0",
   "description": "OpenTelemetry OTLP-gRPC Exporter base (for internal use only)",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -47,11 +47,11 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "1.9.0",
-    "@opentelemetry/resources": "1.30.0",
-    "@opentelemetry/sdk-trace-base": "1.30.0",
+    "@opentelemetry/resources": "2.0.0-dev.0",
+    "@opentelemetry/sdk-trace-base": "2.0.0-dev.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.6.5",
-    "@types/sinon": "17.0.3",
+    "@types/sinon": "17.0.4",
     "cross-var": "1.1.0",
     "lerna": "6.6.2",
     "mocha": "11.1.0",
@@ -65,9 +65,9 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.7.1",
-    "@opentelemetry/core": "1.30.0",
-    "@opentelemetry/otlp-exporter-base": "0.57.0",
-    "@opentelemetry/otlp-transformer": "0.57.0"
+    "@opentelemetry/core": "2.0.0-dev.0",
+    "@opentelemetry/otlp-exporter-base": "0.200.0-dev.0",
+    "@opentelemetry/otlp-transformer": "0.200.0-dev.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-grpc-exporter-base",
   "sideEffects": false

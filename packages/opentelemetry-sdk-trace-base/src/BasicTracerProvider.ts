@@ -14,26 +14,14 @@
  * limitations under the License.
  */
 
-import {
-  context,
-  propagation,
-  TextMapPropagator,
-  trace,
-  TracerProvider,
-  Tracer as ApiTracer,
-} from '@opentelemetry/api';
-import {
-  CompositePropagator,
-  W3CBaggagePropagator,
-  W3CTraceContextPropagator,
-  merge,
-} from '@opentelemetry/core';
-import { DEFAULT_RESOURCE, Resource } from '@opentelemetry/resources';
+import { TracerProvider, Tracer as ApiTracer } from '@opentelemetry/api';
+import { merge } from '@opentelemetry/core';
+import { defaultResource, Resource } from '@opentelemetry/resources';
 import { SpanProcessor } from './SpanProcessor';
 import { Tracer } from './Tracer';
 import { loadDefaultConfig } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
-import { SDKRegistrationConfig, TracerConfig } from './types';
+import { TracerConfig } from './types';
 import { reconfigureLimits } from './utility';
 
 export enum ForceFlushState {
@@ -41,10 +29,6 @@ export enum ForceFlushState {
   'timeout',
   'error',
   'unresolved',
-}
-
-function getDefaultPropagators(): TextMapPropagator[] {
-  return [new W3CTraceContextPropagator(), new W3CBaggagePropagator()];
 }
 
 /**
@@ -62,7 +46,7 @@ export class BasicTracerProvider implements TracerProvider {
       loadDefaultConfig(),
       reconfigureLimits(config)
     );
-    this._resource = mergedConfig.resource ?? DEFAULT_RESOURCE;
+    this._resource = mergedConfig.resource ?? defaultResource();
 
     this._config = Object.assign({}, mergedConfig, {
       resource: this._resource,
@@ -97,31 +81,6 @@ export class BasicTracerProvider implements TracerProvider {
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this._tracers.get(key)!;
-  }
-
-  /**
-   * Register this TracerProvider for use with the OpenTelemetry API.
-   * Undefined values may be replaced with defaults, and
-   * null values will be skipped.
-   *
-   * @param config Configuration object for SDK registration
-   */
-  register(config: SDKRegistrationConfig = {}): void {
-    trace.setGlobalTracerProvider(this);
-
-    if (config.contextManager) {
-      context.setGlobalContextManager(config.contextManager);
-    }
-
-    // undefined means "unset", null means don't register propagator
-    if (config.propagator !== null) {
-      propagation.setGlobalPropagator(
-        config.propagator ??
-          new CompositePropagator({
-            propagators: getDefaultPropagators(),
-          })
-      );
-    }
   }
 
   forceFlush(): Promise<void> {

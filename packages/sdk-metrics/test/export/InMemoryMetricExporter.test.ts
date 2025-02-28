@@ -21,7 +21,7 @@ import { InMemoryMetricExporter } from '../../src/export/InMemoryMetricExporter'
 import { ResourceMetrics } from '../../src/export/MetricData';
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { MeterProvider } from '../../src/MeterProvider';
-import { defaultResource } from '../util';
+import { testResource } from '../util';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 
 async function waitForNumberOfExports(
@@ -56,7 +56,7 @@ describe('InMemoryMetricExporter', () => {
       exportTimeoutMillis: 100,
     });
     meterProvider = new MeterProvider({
-      resource: defaultResource,
+      resource: testResource,
       readers: [metricReader],
     });
     meter = meterProvider.getMeter('InMemoryMetricExporter', '1.0.0');

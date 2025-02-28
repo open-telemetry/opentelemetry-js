@@ -388,7 +388,7 @@ describe('xhr', () => {
         it('should create a span with correct root span', () => {
           const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
           assert.strictEqual(
-            span.parentSpanId,
+            span.parentSpanContext?.spanId,
             rootSpan.spanContext().spanId,
             'parent span is not root span'
           );
@@ -492,7 +492,7 @@ describe('xhr', () => {
           const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
           const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
           assert.strictEqual(
-            span.parentSpanId,
+            span.parentSpanContext?.spanId,
             parentSpan.spanContext().spanId,
             'parent span is not root span'
           );
@@ -1586,7 +1586,7 @@ describe('xhr', () => {
         it('should create a span with correct root span', () => {
           const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
           assert.strictEqual(
-            span.parentSpanId,
+            span.parentSpanContext?.spanId,
             rootSpan.spanContext().spanId,
             'parent span is not root span'
           );
@@ -1690,7 +1690,7 @@ describe('xhr', () => {
           const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
           const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
           assert.strictEqual(
-            span.parentSpanId,
+            span.parentSpanContext?.spanId,
             parentSpan.spanContext().spanId,
             'parent span is not root span'
           );

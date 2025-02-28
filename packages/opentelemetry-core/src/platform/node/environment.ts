@@ -14,22 +14,8 @@
  * limitations under the License.
  */
 
-import {
-  DEFAULT_ENVIRONMENT,
-  ENVIRONMENT,
-  RAW_ENVIRONMENT,
-  parseEnvironment,
-} from '../../utils/environment';
 import { diag } from '@opentelemetry/api';
 import { inspect } from 'util';
-
-/**
- * Gets the environment variables
- */
-export function getEnv(): Required<ENVIRONMENT> {
-  const processEnv = parseEnvironment(process.env as RAW_ENVIRONMENT);
-  return Object.assign({}, DEFAULT_ENVIRONMENT, processEnv);
-}
 
 /**
  * Retrieves a number from an environment variable.
@@ -116,8 +102,4 @@ export function getStringListFromEnv(key: string): string[] | undefined {
     ?.split(',')
     .map(v => v.trim())
     .filter(s => s !== '');
-}
-
-export function getEnvWithoutDefaults(): ENVIRONMENT {
-  return parseEnvironment(process.env as RAW_ENVIRONMENT);
 }

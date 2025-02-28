@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/integration-tests-api",
-  "version": "1.30.0",
+  "version": "2.0.0-dev.0",
   "private": true,
   "publishConfig": {
     "access": "restricted"
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "^1.3.0",
-    "@opentelemetry/core": "1.30.0",
+    "@opentelemetry/core": "2.0.0-dev.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.6.5",
     "cross-var": "1.1.0",

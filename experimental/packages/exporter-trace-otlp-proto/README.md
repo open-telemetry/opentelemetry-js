@@ -22,7 +22,7 @@ To see documentation and sample code for the metric exporter, see the [exporter-
 ## Traces in Node - PROTO over http
 
 ```js
-const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
+const { NodeTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-node');
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-proto');
 
 const collectorOptions = {
@@ -33,7 +33,7 @@ const collectorOptions = {
 };
 
 const exporter = new OTLPTraceExporter(collectorOptions);
-const provider = new BasicTracerProvider({
+const provider = new NodeTracerProvider({
   spanProcessors: [new SimpleSpanProcessor(exporter)]
 });
 
