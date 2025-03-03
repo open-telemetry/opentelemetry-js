@@ -23,7 +23,6 @@ import {
   SEMATTRS_NET_TRANSPORT,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
-import * as url from 'url';
 import { HttpInstrumentation } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import * as utils from '../utils/utils';
@@ -180,7 +179,7 @@ describe('HttpInstrumentation Integration tests', () => {
       assert.strictEqual(spans.length, 0);
 
       const result = await httpRequest.get(
-        new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`)
+        new URL(`${protocol}://localhost:${mockServerPort}/?query=test`)
       );
 
       spans = memoryExporter.getFinishedSpans();
@@ -207,7 +206,7 @@ describe('HttpInstrumentation Integration tests', () => {
       assert.strictEqual(spans.length, 0);
 
       const result = await httpRequest.get(
-        new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
+        new URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
         {
           headers: { 'x-foo': 'foo' },
         }
@@ -270,7 +269,7 @@ describe('HttpInstrumentation Integration tests', () => {
 
       const headers = { 'x-foo': 'foo' };
       const result = await httpRequest.get(
-        new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
+        new URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
         { headers }
       );
       assert.deepStrictEqual(headers, { 'x-foo': 'foo' });
@@ -284,7 +283,7 @@ describe('HttpInstrumentation Integration tests', () => {
 
       const headers = { 'x-foo': 'foo', forwarded: 'malformed' };
       const result = await httpRequest.get(
-        new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
+        new URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
         { headers }
       );
 
@@ -295,12 +294,14 @@ describe('HttpInstrumentation Integration tests', () => {
     it('should create a span for GET requests and add propagation headers with Expect headers', async () => {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
-      const options = Object.assign(
-        { headers: { Expect: '100-continue' } },
-        url.parse(`${protocol}://localhost:${mockServerPort}/`)
-      );
 
-      const result = await httpRequest.get(options);
+      const result = await httpRequest.get({
+        protocol: `${protocol}:`,
+        host: 'localhost',
+        port: mockServerPort,
+        path: '/',
+        headers: { Expect: '100-continue' },
+      });
       spans = memoryExporter.getFinishedSpans();
       const span = spans.find(s => s.kind === SpanKind.CLIENT);
       assert.ok(span);
