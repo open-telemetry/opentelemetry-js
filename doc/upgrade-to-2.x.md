@@ -243,7 +243,7 @@ A number of deprecated, obsolete, unused, and accidentally exported functions an
 - type `InstrumentationLibrary` (deprecated) -> type `InstrumentationScope`
 - `AlwaysOnSampler` (deprecated) -> moved to `@opentelemetry/sdk-trace-base`
 - `AlwaysOffSampler` (deprecated) -> moved to `@opentelemetry/sdk-trace-base`
-- `TraceIdRatioSampler` (deprecated) -> moved to `@opentelemetry/sdk-trace-base`
+- `ParentBasedSampler` (deprecated) -> moved to `@opentelemetry/sdk-trace-base`
 - `TraceIdRatioSampler` (deprecated) -> moved to  `@opentelemetry/sdk-trace-base`
 - `TracesSamplerValues` (was only used internally)
 - `VERSION`
@@ -251,13 +251,13 @@ A number of deprecated, obsolete, unused, and accidentally exported functions an
 - `ShimWrapped` -> use `ShimWrapped` from `@opentelemetry/instrumentation`
 - `hexToBase64`
 - `hexToBinary`
-- `baggageUtils.getKeyParis` (unintentionally exported)
+- `baggageUtils.getKeyPairs` (unintentionally exported)
 - `baggageUtils.serializeKeyPairs` (unintentionally exported)
 - `baggageUtils.parseKeyPairsIntoRecord` -> `parseKeyPairsIntoRecord`
 - `baggageUtils.parsePairKeyValue` (unintentionally exported)
 - `TimeOriginLegacy`
 - `isAttributeKey` (unintentionally exported)
-- `DEFAULT_ATTRIBUTE_VALUE_LENTGHT_LIMIT` -> use `Infinity`
+- `DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT` -> use `Infinity`
 - `DEFAULT_ATTRIBUTE_VALUE_COUNT_LIMIT` -> use `128`
 - `DEFAULT_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT` -> use `128`
 - `DEFAULT_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT` -> use `128`
