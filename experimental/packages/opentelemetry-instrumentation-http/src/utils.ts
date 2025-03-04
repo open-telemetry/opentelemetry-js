@@ -20,6 +20,7 @@ import {
   context,
   SpanKind,
   DiagLogger,
+  AttributeValue,
 } from '@opentelemetry/api';
 import {
   ATTR_CLIENT_ADDRESS,
@@ -65,6 +66,7 @@ import {
 import {
   IncomingHttpHeaders,
   IncomingMessage,
+  OutgoingHttpHeader,
   OutgoingHttpHeaders,
   RequestOptions,
   ServerResponse,
@@ -493,22 +495,8 @@ export const getOutgoingRequestAttributes = (
     oldAttributes[SEMATTRS_HTTP_USER_AGENT] = userAgent;
   }
 
-  if (userAgent != null && enableSyntheticSourceDetection) {
-    const userAgentString: string = String(userAgent).toLowerCase();
-    for (const name of SYNTHETIC_TEST_NAMES) {
-      if (userAgentString.includes(name)) {
-        newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
-          USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST;
-        break;
-      }
-    }
-    for (const name of SYNTHETIC_BOT_NAMES) {
-      if (userAgentString.includes(name)) {
-        newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
-          USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT;
-        break;
-      }
-    }
+  if (enableSyntheticSourceDetection && userAgent) {
+    newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] = getSyntheticType(userAgent);
   }
 
   switch (semconvStability) {
@@ -519,6 +507,25 @@ export const getOutgoingRequestAttributes = (
   }
 
   return Object.assign(oldAttributes, newAttributes, options.hookAttributes);
+};
+
+/**
+ * Returns the type of synthetic source based on the user agent
+ * @param {OutgoingHttpHeader | undefined} userAgent the user agent string
+ */
+const getSyntheticType = (userAgent: OutgoingHttpHeader | undefined): AttributeValue | undefined => {
+  const userAgentString: string = String(userAgent).toLowerCase();
+  for (const name of SYNTHETIC_TEST_NAMES) {
+    if (userAgentString.includes(name)) {
+      return USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST;
+    }
+  }
+  for (const name of SYNTHETIC_BOT_NAMES) {
+    if (userAgentString.includes(name)) {
+      return USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT;
+    }
+  }
+  return;
 };
 
 /**
@@ -817,6 +824,7 @@ export const getIncomingRequestAttributes = (
     serverName?: string;
     hookAttributes?: Attributes;
     semconvStability: SemconvStability;
+    enableSyntheticSourceDetection: boolean;
   },
   logger: DiagLogger
 ): Attributes => {
@@ -868,22 +876,8 @@ export const getIncomingRequestAttributes = (
     newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
   }
 
-  if (userAgent != null) {
-    const userAgentString: string = String(userAgent).toLowerCase();
-    for (const name of SYNTHETIC_TEST_NAMES) {
-      if (userAgentString.includes(name)) {
-        newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
-          USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST;
-        break;
-      }
-    }
-    for (const name of SYNTHETIC_BOT_NAMES) {
-      if (userAgentString.includes(name)) {
-        newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
-          USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT;
-        break;
-      }
-    }
+  if (options.enableSyntheticSourceDetection && userAgent) {
+    newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] = getSyntheticType(userAgent);
   }
 
   const oldAttributes: Attributes = {

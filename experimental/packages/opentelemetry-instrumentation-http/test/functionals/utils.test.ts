@@ -443,6 +443,7 @@ describe('Utility', () => {
         {
           component: 'http',
           semconvStability: SemconvStability.OLD,
+          enableSyntheticSourceDetection: false,
         },
         diag
       );
@@ -463,6 +464,7 @@ describe('Utility', () => {
         {
           component: 'http',
           semconvStability: SemconvStability.OLD,
+          enableSyntheticSourceDetection: false,
         },
         diag
       );
@@ -483,6 +485,7 @@ describe('Utility', () => {
         {
           component: 'http',
           semconvStability: SemconvStability.STABLE,
+          enableSyntheticSourceDetection: true,
         },
         diag
       );

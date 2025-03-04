@@ -636,6 +636,9 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             instrumentation.getConfig().startIncomingSpanHook
           ),
           semconvStability: instrumentation._semconvStability,
+          enableSyntheticSourceDetection:
+            instrumentation.getConfig().enableSyntheticSourceDetection ||
+            false,
         },
         instrumentation._diag
       );
