@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 
-import { SpanExporter } from './SpanExporter';
+import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import { ReadableSpan } from './ReadableSpan';
-import {
-  ExportResult,
-  ExportResultCode,
-  hrTimeToMicroseconds,
-} from '@opentelemetry/core';
+import { SpanExporter } from './SpanExporter';
 
 /**
  * This is implementation of {@link SpanExporter} that prints spans to the
@@ -74,8 +70,8 @@ export class ConsoleSpanExporter implements SpanExporter {
       name: span.name,
       id: span.spanContext().spanId,
       kind: span.kind,
-      timestamp: hrTimeToMicroseconds(span.startTime),
-      duration: hrTimeToMicroseconds(span.duration),
+      startTimeUnixNano: span.startTimeUnixNano,
+      endTimeUnixNano: span.startTimeUnixNano,
       attributes: span.attributes,
       status: span.status,
       events: span.events,

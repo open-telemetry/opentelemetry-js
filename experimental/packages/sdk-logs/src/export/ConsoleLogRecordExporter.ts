@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ExportResult, hrTimeToMicroseconds } from '@opentelemetry/core';
+import { ExportResult } from '@opentelemetry/core';
 import { ExportResultCode } from '@opentelemetry/core';
 
 import type { ReadableLogRecord } from './ReadableLogRecord';
@@ -58,7 +58,7 @@ export class ConsoleLogRecordExporter implements LogRecordExporter {
         attributes: logRecord.resource.attributes,
       },
       instrumentationScope: logRecord.instrumentationScope,
-      timestamp: hrTimeToMicroseconds(logRecord.hrTime),
+      timestamp: logRecord.timeUnixNano,
       traceId: logRecord.spanContext?.traceId,
       spanId: logRecord.spanContext?.spanId,
       traceFlags: logRecord.spanContext?.traceFlags,

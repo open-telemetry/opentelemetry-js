@@ -250,13 +250,12 @@ describe('Trace', () => {
         traceFlags: TraceFlags.SAMPLED,
       },
       attributes: { 'string-attribute': 'some attribute value' },
-      duration: [1, 300000000],
-      endTime: [1640715558, 642725388],
+      endTimeUnixNano: 1640715558642725388n,
       ended: true,
       events: [
         {
           name: 'some event',
-          time: [1640715558, 542725388],
+          timeUnixNano: 1640715558542725388n,
           attributes: {
             'event-attribute': 'some string value',
           },
@@ -284,7 +283,7 @@ describe('Trace', () => {
       ],
       name: 'span-name',
       resource,
-      startTime: [1640715557, 342725388],
+      startTimeUnixNano: 1640715557342725388n,
       status: {
         code: SpanStatusCode.OK,
       },

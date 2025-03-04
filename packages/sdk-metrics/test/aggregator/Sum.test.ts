@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { AggregationTemporality } from '../../src';
 import { SumAccumulation, SumAggregator } from '../../src/aggregator';
@@ -25,7 +24,7 @@ describe('SumAggregator', () => {
   describe('createAccumulation', () => {
     it('no exceptions on createAccumulation', () => {
       const aggregator = new SumAggregator(true);
-      const accumulation = aggregator.createAccumulation([0, 0]);
+      const accumulation = aggregator.createAccumulation(0n);
       assert.ok(accumulation instanceof SumAccumulation);
     });
   });
@@ -33,15 +32,15 @@ describe('SumAggregator', () => {
   describe('merge', () => {
     it('no exceptions', () => {
       const aggregator = new SumAggregator(true);
-      const prev = aggregator.createAccumulation([0, 0]);
+      const prev = aggregator.createAccumulation(0n);
       prev.record(1);
       prev.record(2);
 
-      const delta = aggregator.createAccumulation([1, 1]);
+      const delta = aggregator.createAccumulation(1_000_000_001n);
       delta.record(3);
       delta.record(4);
 
-      const expected = new SumAccumulation([0, 0], true, 1 + 2 + 3 + 4);
+      const expected = new SumAccumulation(0n, true, 1 + 2 + 3 + 4);
       assert.deepStrictEqual(aggregator.merge(prev, delta), expected);
     });
   });
@@ -49,11 +48,11 @@ describe('SumAggregator', () => {
   describe('diff', () => {
     it('non-monotonic', () => {
       const aggregator = new SumAggregator(false);
-      const prev = aggregator.createAccumulation([0, 0]);
+      const prev = aggregator.createAccumulation(0n);
       prev.record(1);
       prev.record(2);
 
-      const curr = aggregator.createAccumulation([1, 1]);
+      const curr = aggregator.createAccumulation(1_000_000_001n);
       // replay actions performed on prev
       curr.record(1);
       curr.record(2);
@@ -61,21 +60,21 @@ describe('SumAggregator', () => {
       curr.record(3);
       curr.record(4);
 
-      const expected = new SumAccumulation([1, 1], false, 3 + 4);
+      const expected = new SumAccumulation(1_000_000_001n, false, 3 + 4);
       assert.deepStrictEqual(aggregator.diff(prev, curr), expected);
     });
 
     it('monotonic', () => {
       const aggregator = new SumAggregator(true);
-      const prev = aggregator.createAccumulation([0, 0]);
+      const prev = aggregator.createAccumulation(0n);
       prev.record(10);
 
       // Create a new record that indicates a reset.
-      const curr = aggregator.createAccumulation([1, 1]);
+      const curr = aggregator.createAccumulation(1_000_000_001n);
       curr.record(3);
 
       // Diff result detected reset.
-      const expected = new SumAccumulation([1, 1], true, 3, true);
+      const expected = new SumAccumulation(1_000_000_001n, true, 3, true);
       assert.deepStrictEqual(aggregator.diff(prev, curr), expected);
     });
   });
@@ -84,8 +83,8 @@ describe('SumAggregator', () => {
     it('transform without exception', () => {
       const aggregator = new SumAggregator(true);
 
-      const startTime: HrTime = [0, 0];
-      const endTime: HrTime = [1, 1];
+      const startTime = 0n;
+      const endTime = 1_000_000_001n;
       const accumulation = aggregator.createAccumulation(startTime);
       accumulation.record(1);
       accumulation.record(2);
@@ -121,7 +120,7 @@ describe('SumAccumulation', () => {
   describe('record', () => {
     it('no exceptions on record', () => {
       for (const monotonic of [true, false]) {
-        const accumulation = new SumAccumulation([0, 0], monotonic);
+        const accumulation = new SumAccumulation(0n, monotonic);
 
         for (const value of commonValues) {
           accumulation.record(value);
@@ -130,7 +129,7 @@ describe('SumAccumulation', () => {
     });
 
     it('should ignore negative values on monotonic sum', () => {
-      const accumulation = new SumAccumulation([0, 0], true);
+      const accumulation = new SumAccumulation(0n, true);
       accumulation.record(1);
       accumulation.record(-1);
       assert.strictEqual(accumulation.toPointValue(), 1);
@@ -139,9 +138,9 @@ describe('SumAccumulation', () => {
 
   describe('setStartTime', () => {
     it('should set start time', () => {
-      const accumulation = new SumAccumulation([0, 0], true);
-      accumulation.setStartTime([1, 1]);
-      assert.deepStrictEqual(accumulation.startTime, [1, 1]);
+      const accumulation = new SumAccumulation(0n, true);
+      accumulation.setStartTime(1_000_000_001n);
+      assert.deepStrictEqual(accumulation.startTime, 1_000_000_001n);
     });
   });
 });

@@ -14,16 +14,6 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import * as opentracing from 'opentracing';
-import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
-import { SpanContextShim, SpanShim, TracerShim } from '../src/shim';
-import {
-  CompositePropagator,
-  W3CBaggagePropagator,
-  W3CTraceContextPropagator,
-  hrTimeToMilliseconds,
-} from '@opentelemetry/core';
 import {
   defaultTextMapGetter,
   defaultTextMapSetter,
@@ -33,14 +23,24 @@ import {
   SpanStatusCode,
   trace,
 } from '@opentelemetry/api';
-import { performance } from 'perf_hooks';
+import {
+  CompositePropagator,
+  millisecondsToNanoseconds,
+  W3CBaggagePropagator,
+  W3CTraceContextPropagator,
+} from '@opentelemetry/core';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
+import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
 import {
   SEMATTRS_EXCEPTION_MESSAGE,
   SEMATTRS_EXCEPTION_STACKTRACE,
   SEMATTRS_EXCEPTION_TYPE,
 } from '@opentelemetry/semantic-conventions';
+import * as assert from 'assert';
+import * as opentracing from 'opentracing';
+import { performance } from 'perf_hooks';
+import { SpanContextShim, SpanShim, TracerShim } from '../src/shim';
 
 describe('OpenTracing Shim', () => {
   const compositePropagator = new CompositePropagator({
@@ -260,12 +260,11 @@ describe('OpenTracing Shim', () => {
 
         const otSpan = (span as SpanShim).getSpan() as Span;
 
-        const adjustment = (otSpan as any)['_performanceOffset'];
-
         assert.strictEqual(otSpan.links.length, 1);
         assert.deepStrictEqual(
-          hrTimeToMilliseconds(otSpan.startTime),
-          now + adjustment + performance.timeOrigin
+          otSpan.startTimeUnixNano,
+          millisecondsToNanoseconds(now) +
+            (otSpan as any)['_performanceOffsetNanos']
         );
         assert.deepStrictEqual(otSpan.attributes, opentracingOptions.tags);
       });
@@ -413,15 +412,15 @@ describe('OpenTracing Shim', () => {
       });
 
       describe('key-value pairs', () => {
-        const tomorrow = new Date().setDate(new Date().getDate() + 1);
+        const tomorrow = Date.now() + 86_400_000;
 
         it('names event after event attribute', () => {
           const kvLogs = { event: 'fun-time', user: 'meow', value: 123 };
           span.log(kvLogs, tomorrow);
           assert.strictEqual(otSpan.events[0].name, 'fun-time');
           assert.strictEqual(
-            otSpan.events[0].time[0],
-            Math.trunc(tomorrow / 1000)
+            otSpan.events[0].timeUnixNano,
+            millisecondsToNanoseconds(tomorrow)
           );
           assert.deepStrictEqual(otSpan.events[0].attributes, kvLogs);
         });
@@ -431,8 +430,8 @@ describe('OpenTracing Shim', () => {
           span.log(kvLogs, tomorrow);
           assert.strictEqual(otSpan.events[0].name, 'log');
           assert.strictEqual(
-            otSpan.events[0].time[0],
-            Math.trunc(tomorrow / 1000)
+            otSpan.events[0].timeUnixNano,
+            millisecondsToNanoseconds(tomorrow)
           );
           assert.deepStrictEqual(otSpan.events[0].attributes, kvLogs);
         });
@@ -446,8 +445,8 @@ describe('OpenTracing Shim', () => {
           span.log(kvLogs, tomorrow);
           assert.strictEqual(otSpan.events[0].name, 'exception');
           assert.strictEqual(
-            otSpan.events[0].time[0],
-            Math.trunc(tomorrow / 1000)
+            otSpan.events[0].timeUnixNano,
+            millisecondsToNanoseconds(tomorrow)
           );
           const expectedAttributes = {
             [SEMATTRS_EXCEPTION_MESSAGE]: 'boom',
@@ -469,8 +468,8 @@ describe('OpenTracing Shim', () => {
           span.log(kvLogs, tomorrow);
           assert.strictEqual(otSpan.events[0].name, 'exception');
           assert.strictEqual(
-            otSpan.events[0].time[0],
-            Math.trunc(tomorrow / 1000)
+            otSpan.events[0].timeUnixNano,
+            millisecondsToNanoseconds(tomorrow)
           );
           const expectedAttributes = {
             event: 'error',
@@ -496,10 +495,10 @@ describe('OpenTracing Shim', () => {
     it('sets explicit end timestamp', () => {
       const now = performance.now();
       span.finish(now);
-      const adjustment = (otSpan as any)['_performanceOffset'];
       assert.deepStrictEqual(
-        hrTimeToMilliseconds(otSpan.endTime),
-        now + adjustment + performance.timeOrigin
+        otSpan.endTimeUnixNano,
+        millisecondsToNanoseconds(now) +
+          (otSpan as any)['_performanceOffsetNanos']
       );
     });
 

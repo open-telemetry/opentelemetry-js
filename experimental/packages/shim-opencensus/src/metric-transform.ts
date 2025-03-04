@@ -15,7 +15,8 @@
  */
 
 import * as oc from '@opencensus/core';
-import { Attributes, HrTime, ValueType, diag } from '@opentelemetry/api';
+import { Attributes, ValueType, diag } from '@opentelemetry/api';
+import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import {
   AggregationTemporality,
   DataPoint,
@@ -34,7 +35,6 @@ interface MappedType {
     | DataPointType.SUM
     | DataPointType.HISTOGRAM;
 }
-const ZEROED_HRTIME: HrTime = [0, 0];
 
 export function mapOcMetric(metric: oc.Metric): MetricData | null {
   const { description, name, unit, type } = metric.descriptor;
@@ -169,7 +169,7 @@ function dataPoints<T>(
     const attributes = zipOcLabels(metric.descriptor.labelKeys, ts.labelValues);
 
     // use zeroed hrTime if it is undefined, which probably shouldn't happen
-    const startTime = ocTimestampToHrTime(ts.startTimestamp) ?? ZEROED_HRTIME;
+    const startTime = ocTimestampToHrTime(ts.startTimestamp) ?? 0n;
 
     // points should be an array with a single value, so this will return a single point per
     // attribute set.
@@ -178,17 +178,17 @@ function dataPoints<T>(
         startTime,
         attributes,
         value: valueMapper(point.value),
-        endTime: ocTimestampToHrTime(point.timestamp) ?? ZEROED_HRTIME,
+        endTime: ocTimestampToHrTime(point.timestamp) ?? 0n,
       })
     );
   });
 }
 
-function ocTimestampToHrTime(ts: oc.Timestamp | undefined): HrTime | null {
+function ocTimestampToHrTime(ts: oc.Timestamp | undefined): bigint | null {
   if (ts === undefined || ts.seconds === null) {
     return null;
   }
-  return [ts.seconds, ts.nanos ?? 0];
+  return hrTimeToNanoseconds([ts.seconds, ts.nanos ?? 0]);
 }
 
 function zipOcLabels(

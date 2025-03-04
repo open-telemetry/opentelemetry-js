@@ -47,10 +47,10 @@ function getReadableSpan() {
         traceFlags: TraceFlags.NONE,
       };
     },
-    startTime: [startTime, 0],
-    endTime: [startTime + duration, 0],
+    startTimeUnixNano: BigInt(startTime) * 1_000_000n,
+    endTimeUnixNano:
+      BigInt(startTime) * 1_000_000n + BigInt(duration) * 1_000_000n,
     ended: true,
-    duration: [duration, 0],
     status: {
       code: api.SpanStatusCode.OK,
     },
@@ -153,10 +153,11 @@ describe('Zipkin Exporter - node', () => {
             traceFlags: TraceFlags.NONE,
           };
         },
-        startTime: [startTime, 0],
-        endTime: [startTime + duration, 0],
+        startTimeUnixNano: BigInt(startTime) * 1_000_000_000n,
+        endTimeUnixNano:
+          BigInt(startTime) * 1_000_000_000n +
+          BigInt(duration) * 1_000_000_000n,
         ended: true,
-        duration: [duration, 0],
         status: {
           code: api.SpanStatusCode.OK,
         },
@@ -168,7 +169,7 @@ describe('Zipkin Exporter - node', () => {
         events: [
           {
             name: 'my-event',
-            time: [startTime + 10, 0],
+            timeUnixNano: BigInt(startTime) * 1_000_000_000n + 10_000_000_000n,
             attributes: { key3: 'value3' },
           },
         ],
@@ -188,10 +189,11 @@ describe('Zipkin Exporter - node', () => {
             traceFlags: TraceFlags.NONE,
           };
         },
-        startTime: [startTime, 0],
-        endTime: [startTime + duration, 0],
+        startTimeUnixNano: BigInt(startTime) * 1_000_000_000n,
+        endTimeUnixNano:
+          BigInt(startTime) * 1_000_000_000n +
+          BigInt(duration) * 1_000_000_000n,
         ended: true,
-        duration: [duration, 0],
         status: {
           code: api.SpanStatusCode.OK,
         },
@@ -376,10 +378,10 @@ describe('Zipkin Exporter - node', () => {
         spanId: '6e0c63257de34c92',
         traceFlags: TraceFlags.NONE,
       }),
-      startTime: [startTime, 0],
-      endTime: [startTime + duration, 0],
+      startTimeUnixNano: BigInt(startTime) * 1_000_000n,
+      endTimeUnixNano:
+        BigInt(startTime) * 1_000_000n + BigInt(duration) * 1_000_000n,
       ended: true,
-      duration: [duration, 0],
       status: {
         code: api.SpanStatusCode.OK,
       },
@@ -391,7 +393,7 @@ describe('Zipkin Exporter - node', () => {
       events: [
         {
           name: 'my-event',
-          time: [startTime + 10, 0],
+          timeUnixNano: BigInt(startTime) * 1_000_000n + 10_000_000_000n,
           attributes: { key3: 'value3' },
         },
       ],
@@ -411,10 +413,10 @@ describe('Zipkin Exporter - node', () => {
         spanId: '6e0c63257de34c92',
         traceFlags: TraceFlags.NONE,
       }),
-      startTime: [startTime, 0],
-      endTime: [startTime + duration, 0],
+      startTimeUnixNano: BigInt(startTime) * 1_000_000n,
+      endTimeUnixNano:
+        BigInt(startTime) * 1_000_000n + BigInt(duration) * 1_000_000n,
       ended: true,
-      duration: [duration, 0],
       status: {
         code: api.SpanStatusCode.OK,
       },
@@ -475,10 +477,10 @@ describe('Zipkin Exporter - node', () => {
         spanId: '6e0c63257de34c92',
         traceFlags: TraceFlags.NONE,
       }),
-      startTime: [startTime, 0],
-      endTime: [startTime + duration, 0],
+      startTimeUnixNano: BigInt(startTime) * 1_000_000n,
+      endTimeUnixNano:
+        BigInt(startTime) * 1_000_000n + BigInt(duration) * 1_000_000n,
       ended: true,
-      duration: [duration, 0],
       status: {
         code: api.SpanStatusCode.OK,
       },
@@ -491,7 +493,7 @@ describe('Zipkin Exporter - node', () => {
       events: [
         {
           name: 'my-event',
-          time: [startTime + 10, 0],
+          timeUnixNano: BigInt(startTime) * 1_000_000n + 10_000_000_000n,
           attributes: { key3: 'value3' },
         },
       ],
@@ -509,10 +511,10 @@ describe('Zipkin Exporter - node', () => {
         spanId: '6e0c63257de34c92',
         traceFlags: TraceFlags.NONE,
       }),
-      startTime: [startTime, 0],
-      endTime: [startTime + duration, 0],
+      startTimeUnixNano: BigInt(startTime) * 1_000_000n,
+      endTimeUnixNano:
+        BigInt(startTime) * 1_000_000n + BigInt(duration) * 1_000_000n,
       ended: true,
-      duration: [duration, 0],
       status: {
         code: api.SpanStatusCode.OK,
       },

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HrTime, Attributes, ValueType } from '@opentelemetry/api';
+import { Attributes, ValueType } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { AggregationTemporality } from './AggregationTemporality';
@@ -153,16 +153,16 @@ export enum DataPointType {
  */
 export interface DataPoint<T> {
   /**
-   * The start epoch timestamp of the DataPoint, usually the time when
+   * The start epoch timestamp in nanoseconds of the DataPoint, usually the time when
    * the metric was created when the preferred AggregationTemporality is
    * CUMULATIVE, or last collection time otherwise.
    */
-  readonly startTime: HrTime;
+  readonly startTime: bigint;
   /**
-   * The end epoch timestamp when data were collected, usually it represents
+   * The end epoch timestamp in nanoseconds when data were collected, usually it represents
    * the moment when `MetricReader.collect` was called.
    */
-  readonly endTime: HrTime;
+  readonly endTime: bigint;
   /**
    * The attributes associated with this DataPoint.
    */

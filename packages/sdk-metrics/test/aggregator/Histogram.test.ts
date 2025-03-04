@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HrTime, ValueType } from '@opentelemetry/api';
+import { ValueType } from '@opentelemetry/api';
 import * as assert from 'assert';
 import {
   AggregationTemporality,
@@ -32,7 +32,7 @@ describe('HistogramAggregator', () => {
   describe('createAccumulation', () => {
     it('no exceptions on createAccumulation', () => {
       const aggregator = new HistogramAggregator([1, 10, 100], true);
-      const accumulation = aggregator.createAccumulation([0, 0]);
+      const accumulation = aggregator.createAccumulation(0n);
       assert.ok(accumulation instanceof HistogramAccumulation);
     });
   });
@@ -40,15 +40,15 @@ describe('HistogramAggregator', () => {
   describe('merge', () => {
     it('no exceptions', () => {
       const aggregator = new HistogramAggregator([1, 10, 100], true);
-      const prev = aggregator.createAccumulation([0, 0]);
+      const prev = aggregator.createAccumulation(0n);
       prev.record(0);
       prev.record(1);
 
-      const delta = aggregator.createAccumulation([1, 1]);
+      const delta = aggregator.createAccumulation(1_000_000_001n);
       delta.record(2);
       delta.record(11);
 
-      const expected = aggregator.createAccumulation([0, 0]);
+      const expected = aggregator.createAccumulation(0n);
       // replay actions on prev
       expected.record(0);
       expected.record(1);
@@ -61,11 +61,11 @@ describe('HistogramAggregator', () => {
 
     it('with only negatives', () => {
       const aggregator = new HistogramAggregator([1, 10, 100], true);
-      const prev = aggregator.createAccumulation([0, 0]);
+      const prev = aggregator.createAccumulation(0n);
       prev.record(-10);
       prev.record(-20);
 
-      const delta = aggregator.createAccumulation([1, 1]);
+      const delta = aggregator.createAccumulation(1_000_000_001n);
       delta.record(-5);
       delta.record(-30);
 
@@ -84,15 +84,15 @@ describe('HistogramAggregator', () => {
 
     it('with single bucket', function () {
       const aggregator = new HistogramAggregator([], true);
-      const prev = aggregator.createAccumulation([0, 0]);
+      const prev = aggregator.createAccumulation(0n);
       prev.record(0);
       prev.record(1);
 
-      const delta = aggregator.createAccumulation([1, 1]);
+      const delta = aggregator.createAccumulation(1_000_000_001n);
       delta.record(2);
       delta.record(11);
 
-      const expected = new HistogramAccumulation([0, 0], [], true, {
+      const expected = new HistogramAccumulation(0n, [], true, {
         buckets: {
           boundaries: [],
           counts: [4],
@@ -110,11 +110,11 @@ describe('HistogramAggregator', () => {
   describe('diff', () => {
     it('no exceptions', () => {
       const aggregator = new HistogramAggregator([1, 10, 100], true);
-      const prev = aggregator.createAccumulation([0, 0]);
+      const prev = aggregator.createAccumulation(0n);
       prev.record(0);
       prev.record(1);
 
-      const curr = aggregator.createAccumulation([1, 1]);
+      const curr = aggregator.createAccumulation(1_000_000_001n);
       // replay actions on prev
       curr.record(0);
       curr.record(1);
@@ -122,28 +122,33 @@ describe('HistogramAggregator', () => {
       curr.record(2);
       curr.record(11);
 
-      const expected = new HistogramAccumulation([1, 1], [1, 10, 100], true, {
-        buckets: {
-          boundaries: [1, 10, 100],
-          counts: [0, 1, 1, 0],
-        },
-        count: 2,
-        sum: 13,
-        hasMinMax: false,
-        min: Infinity,
-        max: -Infinity,
-      });
+      const expected = new HistogramAccumulation(
+        1_000_000_001n,
+        [1, 10, 100],
+        true,
+        {
+          buckets: {
+            boundaries: [1, 10, 100],
+            counts: [0, 1, 1, 0],
+          },
+          count: 2,
+          sum: 13,
+          hasMinMax: false,
+          min: Infinity,
+          max: -Infinity,
+        }
+      );
 
       assert.deepStrictEqual(aggregator.diff(prev, curr), expected);
     });
 
     it('with single bucket', function () {
       const aggregator = new HistogramAggregator([], true);
-      const prev = aggregator.createAccumulation([0, 0]);
+      const prev = aggregator.createAccumulation(0n);
       prev.record(0);
       prev.record(1);
 
-      const curr = aggregator.createAccumulation([1, 1]);
+      const curr = aggregator.createAccumulation(1_000_000_001n);
       // replay actions on prev
       curr.record(0);
       curr.record(1);
@@ -151,7 +156,7 @@ describe('HistogramAggregator', () => {
       curr.record(2);
       curr.record(11);
 
-      const expected = new HistogramAccumulation([1, 1], [], true, {
+      const expected = new HistogramAccumulation(1_000_000_001n, [], true, {
         buckets: {
           boundaries: [],
           counts: [2],
@@ -171,8 +176,8 @@ describe('HistogramAggregator', () => {
     it('should transform to expected data with recordMinMax = true', () => {
       const aggregator = new HistogramAggregator([1, 10, 100], true);
 
-      const startTime: HrTime = [0, 0];
-      const endTime: HrTime = [1, 1];
+      const startTime = 0n;
+      const endTime = 1_000_000_001n;
       const accumulation = aggregator.createAccumulation(startTime);
       accumulation.record(0);
       accumulation.record(1);
@@ -213,8 +218,8 @@ describe('HistogramAggregator', () => {
     it('should transform to expected data with recordMinMax = false', () => {
       const aggregator = new HistogramAggregator([1, 10, 100], false);
 
-      const startTime: HrTime = [0, 0];
-      const endTime: HrTime = [1, 1];
+      const startTime = 0n;
+      const endTime = 1_000_000_001n;
       const accumulation = aggregator.createAccumulation(startTime);
       accumulation.record(0);
       accumulation.record(1);
@@ -255,8 +260,8 @@ describe('HistogramAggregator', () => {
     it('should transform to expected data with empty boundaries', () => {
       const aggregator = new HistogramAggregator([], false);
 
-      const startTime: HrTime = [0, 0];
-      const endTime: HrTime = [1, 1];
+      const startTime = 0n;
+      const endTime = 1_000_000_001n;
       const accumulation = aggregator.createAccumulation(startTime);
       accumulation.record(0);
       accumulation.record(1);
@@ -297,8 +302,8 @@ describe('HistogramAggregator', () => {
     function testSum(instrumentType: InstrumentType, expectSum: boolean) {
       const aggregator = new HistogramAggregator([1, 10, 100], true);
 
-      const startTime: HrTime = [0, 0];
-      const endTime: HrTime = [1, 1];
+      const startTime = 0n;
+      const endTime = 1_000_000_001n;
 
       const accumulation = aggregator.createAccumulation(startTime);
       accumulation.record(0);
@@ -347,7 +352,7 @@ describe('HistogramAggregator', () => {
 describe('HistogramAccumulation', () => {
   describe('record', () => {
     it('no exceptions on record', () => {
-      const accumulation = new HistogramAccumulation([0, 0], [1, 10, 100]);
+      const accumulation = new HistogramAccumulation(0n, [1, 10, 100]);
 
       for (const value of commonValues) {
         accumulation.record(value);
@@ -355,7 +360,7 @@ describe('HistogramAccumulation', () => {
     });
 
     it('ignores NaN', () => {
-      const accumulation = new HistogramAccumulation([0, 0], [1, 10, 100]);
+      const accumulation = new HistogramAccumulation(0n, [1, 10, 100]);
 
       accumulation.record(NaN);
 
@@ -370,9 +375,9 @@ describe('HistogramAccumulation', () => {
 
   describe('setStartTime', () => {
     it('should set start time', () => {
-      const accumulation = new HistogramAccumulation([0, 0], [1, 10, 100]);
-      accumulation.setStartTime([1, 1]);
-      assert.deepStrictEqual(accumulation.startTime, [1, 1]);
+      const accumulation = new HistogramAccumulation(0n, [1, 10, 100]);
+      accumulation.setStartTime(1_000_000_001n);
+      assert.deepStrictEqual(accumulation.startTime, 1_000_000_001n);
     });
   });
 });

@@ -94,8 +94,8 @@ function logRecordsToResourceLogs(
 
 function toLogRecord(log: ReadableLogRecord, encoder: Encoder): ILogRecord {
   return {
-    timeUnixNano: encoder.encodeHrTime(log.hrTime),
-    observedTimeUnixNano: encoder.encodeHrTime(log.hrTimeObserved),
+    timeUnixNano: encoder.encodeBigIntNanos(log.timeUnixNano),
+    observedTimeUnixNano: encoder.encodeBigIntNanos(log.timeUnixNanoObserved),
     severityNumber: toSeverityNumber(log.severityNumber),
     severityText: log.severityText,
     body: toAnyValue(log.body),

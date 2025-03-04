@@ -66,7 +66,7 @@ describe('ShimSpan', () => {
       });
 
       assert.strictEqual(span.events.length, 1);
-      const [{ time, ...event }] = span.events;
+      const [{ timeUnixNano, ...event }] = span.events;
       assert.deepStrictEqual(event, {
         attributes: {
           foo: 'bar',
@@ -85,7 +85,7 @@ describe('ShimSpan', () => {
       });
 
       assert.strictEqual(span.events.length, 1);
-      const [{ time, ...event }] = span.events;
+      const [{ timeUnixNano, ...event }] = span.events;
       assert.deepStrictEqual(event, {
         attributes: {
           'message.event.size.compressed': 15,

@@ -55,8 +55,8 @@ describe('metric-transform', () => {
       dataPoints: [
         {
           attributes: { key1: 'value1', key2: 'value2' },
-          endTime: [20, 20],
-          startTime: [10, 10],
+          endTime: 20_000_000_020n,
+          startTime: 10_000_000_010n,
           value: 5,
         },
       ],
@@ -97,8 +97,8 @@ describe('metric-transform', () => {
       dataPoints: [
         {
           attributes: { key1: 'value1', key2: 'value2' },
-          endTime: [20, 20],
-          startTime: [10, 10],
+          endTime: 20_000_000_020n,
+          startTime: 10_000_000_010n,
           value: 5.5,
         },
       ],
@@ -159,8 +159,8 @@ describe('metric-transform', () => {
       dataPoints: [
         {
           attributes: { key1: 'value1', key2: 'value2' },
-          endTime: [20, 20],
-          startTime: [10, 10],
+          endTime: 20_000_000_020n,
+          startTime: 10_000_000_010n,
           value: {
             buckets: {
               boundaries: [1, 10, 100],
@@ -207,8 +207,8 @@ describe('metric-transform', () => {
       dataPoints: [
         {
           attributes: { key1: 'value1', key2: 'value2' },
-          endTime: [20, 20],
-          startTime: [10, 10],
+          endTime: 20_000_000_020n,
+          startTime: 10_000_000_010n,
           value: 5,
         },
       ],
@@ -248,8 +248,8 @@ describe('metric-transform', () => {
       dataPoints: [
         {
           attributes: { key1: 'value1', key2: 'value2' },
-          endTime: [20, 20],
-          startTime: [10, 10],
+          endTime: 20_000_000_020n,
+          startTime: 10_000_000_010n,
           value: 5.5,
         },
       ],

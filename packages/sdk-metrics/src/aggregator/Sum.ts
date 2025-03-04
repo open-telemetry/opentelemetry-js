@@ -21,7 +21,6 @@ import {
   Accumulation,
   AccumulationRecord,
 } from './types';
-import { HrTime } from '@opentelemetry/api';
 import { DataPointType, SumMetricData } from '../export/MetricData';
 import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
@@ -29,7 +28,7 @@ import { InstrumentDescriptor } from '../InstrumentDescriptor';
 
 export class SumAccumulation implements Accumulation {
   constructor(
-    public startTime: HrTime,
+    public startTime: bigint,
     public monotonic: boolean,
     private _current: number = 0,
     public reset = false
@@ -42,7 +41,7 @@ export class SumAccumulation implements Accumulation {
     this._current += value;
   }
 
-  setStartTime(startTime: HrTime): void {
+  setStartTime(startTime: bigint): void {
     this.startTime = startTime;
   }
 
@@ -57,7 +56,7 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
 
   constructor(public monotonic: boolean) {}
 
-  createAccumulation(startTime: HrTime) {
+  createAccumulation(startTime: bigint) {
     return new SumAccumulation(startTime, this.monotonic);
   }
 
@@ -112,7 +111,7 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
     descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<SumAccumulation>[],
-    endTime: HrTime
+    endTime: bigint
   ): Maybe<SumMetricData> {
     return {
       descriptor,

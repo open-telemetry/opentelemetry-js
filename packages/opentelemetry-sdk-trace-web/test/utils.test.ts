@@ -53,9 +53,8 @@ function createResource(
   startTime: HrTime,
   addToStart: number
 ): PerformanceResourceTiming {
-  const fetchStart = core.hrTimeToNanoseconds(startTime) + 1;
+  const fetchStart = core.hrTimeToMilliseconds(startTime) + 1;
   const responseEnd = fetchStart + addToStart;
-  const million = 1000 * 1000; // used to convert nano to milli
   const defaultResource = {
     connectEnd: 0,
     connectStart: 0,
@@ -63,13 +62,13 @@ function createResource(
     domainLookupEnd: 0,
     domainLookupStart: 0,
     encodedBodySize: 0,
-    fetchStart: fetchStart / million,
+    fetchStart,
     initiatorType: 'xmlhttprequest',
     nextHopProtocol: '',
     redirectEnd: 0,
     redirectStart: 0,
     requestStart: 0,
-    responseEnd: responseEnd / million,
+    responseEnd: responseEnd,
     responseStart: 0,
     secureConnectionStart: 0,
     transferSize: 0,
@@ -366,7 +365,11 @@ describe('utils', () => {
     beforeEach(() => {
       const time = createHrTime(startTime, 500);
       sinon.stub(performance, 'timeOrigin').value(0);
-      sinon.stub(performance, 'now').callsFake(() => hrTimeToNanoseconds(time));
+      sinon
+        .stub(performance, 'now')
+        .callsFake(() =>
+          core.nanosecondsToMilliseconds(hrTimeToNanoseconds(time))
+        );
     });
 
     describe('when resources are empty', () => {

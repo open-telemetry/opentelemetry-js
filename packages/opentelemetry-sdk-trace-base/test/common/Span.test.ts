@@ -15,21 +15,18 @@
  */
 
 import {
+  Attributes,
+  AttributeValue,
   diag,
-  SpanStatusCode,
   Exception,
   ROOT_CONTEXT,
   SpanContext,
   SpanKind,
+  SpanStatusCode,
   TraceFlags,
-  HrTime,
-  Attributes,
-  AttributeValue,
 } from '@opentelemetry/api';
 import {
-  hrTimeDuration,
-  hrTimeToMilliseconds,
-  hrTimeToNanoseconds,
+  nanosecondsToMilliseconds,
   otperformance as performance,
 } from '@opentelemetry/core';
 import {
@@ -41,20 +38,20 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { BasicTracerProvider, Span, SpanProcessor } from '../../src';
 import { SpanImpl } from '../../src/Span';
-import { invalidAttributes, validAttributes } from './util';
 import { Tracer } from '../../src/Tracer';
 import {
   DEFAULT_ATTRIBUTE_COUNT_LIMIT,
   DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
 } from '../../src/utility';
+import { invalidAttributes, validAttributes } from './util';
 
-const performanceTimeOrigin: HrTime = [1, 1];
+const performanceTimeOrigin = 1_000_000_001n;
 
 describe('Span', () => {
   beforeEach(() => {
     sinon
       .stub(performance, 'timeOrigin')
-      .value(hrTimeToMilliseconds(performanceTimeOrigin));
+      .value(nanosecondsToMilliseconds(performanceTimeOrigin));
   });
   afterEach(() => {
     sinon.restore();
@@ -105,10 +102,7 @@ describe('Span', () => {
       spanLimits: tracer.getSpanLimits(),
       spanProcessor: tracer['_spanProcessor'],
     });
-    assert.ok(
-      hrTimeToMilliseconds(span.startTime) >
-        hrTimeToMilliseconds(performanceTimeOrigin)
-    );
+    assert.ok(span.startTimeUnixNano > performanceTimeOrigin);
   });
 
   it('should have valid endTime', () => {
@@ -123,14 +117,14 @@ describe('Span', () => {
       spanProcessor: tracer['_spanProcessor'],
     });
     span.end();
+    assert.ok(span.endTimeUnixNano != null);
     assert.ok(
-      hrTimeToNanoseconds(span.endTime) >= hrTimeToNanoseconds(span.startTime),
+      span.endTimeUnixNano >= span.startTimeUnixNano,
       'end time must be bigger or equal start time'
     );
 
     assert.ok(
-      hrTimeToMilliseconds(span.endTime) >
-        hrTimeToMilliseconds(performanceTimeOrigin),
+      span.endTimeUnixNano > performanceTimeOrigin,
       'end time must be bigger than time origin'
     );
   });
@@ -147,7 +141,8 @@ describe('Span', () => {
       spanProcessor: tracer['_spanProcessor'],
     });
     span.end();
-    assert.ok(hrTimeToNanoseconds(span.duration) >= 0);
+    assert.ok(span.endTimeUnixNano != null);
+    assert.ok(span.endTimeUnixNano > span.startTimeUnixNano);
   });
 
   it('should ensure duration is never negative even if provided with inconsistent times', () => {
@@ -162,12 +157,12 @@ describe('Span', () => {
       spanProcessor: tracer['_spanProcessor'],
     });
     // @ts-expect-error writing readonly property. performance time origin is mocked to return ms value of [1,1]
-    span['_performanceOffset'] = 0;
-    span.end(hrTimeToMilliseconds(span.startTime) - 1);
-    assert.ok(hrTimeToNanoseconds(span.duration) >= 0);
+    span['_performanceOffsetNanos'] = 0n;
+    span.end(span.startTimeUnixNano - 1n);
+    assert.ok(span.endTimeUnixNano! >= span.startTimeUnixNano);
   });
 
-  it('should have valid event.time', () => {
+  it('should have valid event.timeUnixNano', () => {
     const span = new SpanImpl({
       scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
@@ -179,10 +174,7 @@ describe('Span', () => {
       spanProcessor: tracer['_spanProcessor'],
     });
     span.addEvent('my-event');
-    assert.ok(
-      hrTimeToMilliseconds(span.events[0].time) >
-        hrTimeToMilliseconds(performanceTimeOrigin)
-    );
+    assert.ok(span.events[0].timeUnixNano > performanceTimeOrigin);
   });
 
   it('should have an entered time for event', () => {
@@ -198,14 +190,15 @@ describe('Span', () => {
       spanLimits: tracer.getSpanLimits(),
       spanProcessor: tracer['_spanProcessor'],
     });
-    const eventTimeMS = 123;
-    const spanStartTime = hrTimeToMilliseconds(span.startTime);
-    const eventTime = spanStartTime + eventTimeMS;
+    const eventTimeNS = 123n;
+    const eventTime = span.startTimeUnixNano + eventTimeNS;
 
     span.addEvent('my-event', undefined, eventTime);
 
-    const diff = hrTimeDuration(span.startTime, span.events[0].time);
-    assert.strictEqual(hrTimeToMilliseconds(diff), 123);
+    assert.strictEqual(
+      span.events[0].timeUnixNano - span.startTimeUnixNano,
+      123n
+    );
   });
 
   describe('when 2nd param is "TimeInput" type', () => {
@@ -222,14 +215,15 @@ describe('Span', () => {
         spanLimits: tracer.getSpanLimits(),
         spanProcessor: tracer['_spanProcessor'],
       });
-      const eventTimeMS = 123;
-      const spanStartTime = hrTimeToMilliseconds(span.startTime);
-      const eventTime = spanStartTime + eventTimeMS;
+      const eventTimeNS = 123n;
+      const eventTime = span.startTimeUnixNano + eventTimeNS;
 
       span.addEvent('my-event', eventTime);
 
-      const diff = hrTimeDuration(span.startTime, span.events[0].time);
-      assert.strictEqual(hrTimeToMilliseconds(diff), 123);
+      assert.strictEqual(
+        span.events[0].timeUnixNano - span.startTimeUnixNano,
+        123n
+      );
     });
   });
 
@@ -1168,21 +1162,21 @@ describe('Span', () => {
     const [event] = span.events;
     assert.deepStrictEqual(event.name, 'sent');
     assert.deepStrictEqual(event.attributes, {});
-    assert.ok(event.time[0] > 0);
+    assert.ok(event.timeUnixNano > span.startTimeUnixNano);
 
     span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
     assert.strictEqual(span.events.length, 2);
     const [event1, event2] = span.events;
     assert.deepStrictEqual(event1.name, 'sent');
     assert.deepStrictEqual(event1.attributes, {});
-    assert.ok(event1.time[0] > 0);
+    assert.ok(event1.timeUnixNano > span.startTimeUnixNano);
     assert.deepStrictEqual(event2.name, 'rev');
     assert.deepStrictEqual(event2.attributes, {
       attr1: 'value',
       attr2: 123,
       attr3: true,
     });
-    assert.ok(event2.time[0] > 0);
+    assert.ok(event2.timeUnixNano > span.startTimeUnixNano);
 
     span.end();
     // shouldn't add new event
@@ -1230,8 +1224,9 @@ describe('Span', () => {
     });
     const endTime = Date.now();
     span.end(endTime);
+    const spanEndTime = span.endTimeUnixNano;
     span.end(endTime + 10);
-    assert.deepStrictEqual(span.endTime[0], Math.trunc(endTime / 1000));
+    assert.strictEqual(span.endTimeUnixNano, spanEndTime);
   });
 
   it('should update name', () => {
@@ -1402,7 +1397,7 @@ describe('Span', () => {
         assert.deepStrictEqual(event.attributes, {
           'exception.message': 'boom',
         });
-        assert.ok(event.time[0] > 0);
+        assert.ok(event.timeUnixNano > span.startTimeUnixNano);
       });
     });
 
@@ -1434,7 +1429,7 @@ describe('Span', () => {
           span.recordException(error);
 
           const event = span.events[0];
-          assert.ok(event.time[0] > 0);
+          assert.ok(event.timeUnixNano > span.startTimeUnixNano);
           assert.strictEqual(event.name, 'exception');
 
           assert.ok(event.attributes);
@@ -1464,11 +1459,11 @@ describe('Span', () => {
           spanProcessor: tracer['_spanProcessor'],
         });
         // @ts-expect-error writing readonly property. performance time origin is mocked to return ms value of [1,1]
-        span['_performanceOffset'] = 0;
+        span['_performanceOffsetNanos'] = 0n;
         assert.strictEqual(span.events.length, 0);
         span.recordException('boom', [0, 123]);
         const event = span.events[0];
-        assert.deepStrictEqual(event.time, [0, 123]);
+        assert.deepStrictEqual(event.timeUnixNano, 123n);
       });
     });
 

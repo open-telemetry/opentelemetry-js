@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, Attributes } from '@opentelemetry/api';
+import { Context, Attributes } from '@opentelemetry/api';
 import { WritableMetricStorage } from './WritableMetricStorage';
 
 /**
@@ -27,7 +27,7 @@ export class MultiMetricStorage implements WritableMetricStorage {
     value: number,
     attributes: Attributes,
     context: Context,
-    recordTime: HrTime
+    recordTime: bigint
   ) {
     this._backingStorages.forEach(it => {
       it.record(value, attributes, context, recordTime);

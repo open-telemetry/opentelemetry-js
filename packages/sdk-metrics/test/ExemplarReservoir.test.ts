@@ -20,13 +20,13 @@ import {
   TraceFlags,
   trace,
 } from '@opentelemetry/api';
-import { hrTime } from '@opentelemetry/core';
 import * as assert from 'assert';
 
 import {
   SimpleFixedSizeExemplarReservoir,
   AlignedHistogramBucketExemplarReservoir,
 } from '../src/exemplar';
+import { getTimeOrigin, millisecondsToNanoseconds } from '@opentelemetry/core';
 
 describe('ExemplarReservoir', () => {
   const TRACE_ID = 'd4cda95b652f4a1592b449d5929fda1b';
@@ -47,7 +47,12 @@ describe('ExemplarReservoir', () => {
       };
       const ctx = trace.setSpanContext(ROOT_CONTEXT, spanContext);
 
-      reservoir.offer(1, hrTime(), {}, ctx);
+      reservoir.offer(
+        1,
+        millisecondsToNanoseconds(performance.now() + getTimeOrigin()),
+        {},
+        ctx
+      );
       const exemplars = reservoir.collect({});
       assert.strictEqual(exemplars.length, 1);
       assert.strictEqual(exemplars[0].traceId, TRACE_ID);
@@ -59,7 +64,7 @@ describe('ExemplarReservoir', () => {
     const reservoir = new SimpleFixedSizeExemplarReservoir(1);
     reservoir.offer(
       1,
-      hrTime(),
+      millisecondsToNanoseconds(performance.now() + getTimeOrigin()),
       { key1: 'value1', key2: 'value2' },
       ROOT_CONTEXT
     );
@@ -72,9 +77,24 @@ describe('ExemplarReservoir', () => {
       const reservoir = new AlignedHistogramBucketExemplarReservoir([
         0, 5, 10, 25, 50, 75,
       ]);
-      reservoir.offer(52, hrTime(), { bucket: '5' }, ROOT_CONTEXT);
-      reservoir.offer(7, hrTime(), { bucket: '3' }, ROOT_CONTEXT);
-      reservoir.offer(6, hrTime(), { bucket: '3' }, ROOT_CONTEXT);
+      reservoir.offer(
+        52,
+        millisecondsToNanoseconds(performance.now() + getTimeOrigin()),
+        { bucket: '5' },
+        ROOT_CONTEXT
+      );
+      reservoir.offer(
+        7,
+        millisecondsToNanoseconds(performance.now() + getTimeOrigin()),
+        { bucket: '3' },
+        ROOT_CONTEXT
+      );
+      reservoir.offer(
+        6,
+        millisecondsToNanoseconds(performance.now() + getTimeOrigin()),
+        { bucket: '3' },
+        ROOT_CONTEXT
+      );
       const exemplars = reservoir.collect({ bucket: '3' });
       assert.strictEqual(exemplars.length, 2);
       assert.strictEqual(exemplars[0].value, 6);

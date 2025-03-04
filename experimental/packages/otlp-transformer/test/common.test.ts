@@ -72,7 +72,7 @@ describe('common', () => {
   describe('otlp encoder', () => {
     it('defaults to long timestamps and binary encoding given no options', () => {
       const encoder = getOtlpEncoder();
-      assert.deepStrictEqual(encoder.encodeHrTime([1697978649, 99870675]), {
+      assert.deepStrictEqual(encoder.encodeBigIntNanos(1697978649099870675n), {
         low: 3352011219,
         high: 395341461,
       });
@@ -92,7 +92,7 @@ describe('common', () => {
 
     it('defaults to long timestamps and base64 encoding given empty options', () => {
       const encoder = getOtlpEncoder({});
-      assert.deepStrictEqual(encoder.encodeHrTime([1697978649, 99870675]), {
+      assert.deepStrictEqual(encoder.encodeBigIntNanos(1697978649099870675n), {
         low: 3352011219,
         high: 395341461,
       });
@@ -107,14 +107,6 @@ describe('common', () => {
       assert.deepStrictEqual(
         encoder.encodeOptionalSpanContext(undefined),
         undefined
-      );
-    });
-
-    it('can encode HrTime as string', () => {
-      const encoder = getOtlpEncoder({ useLongBits: false });
-      assert.deepStrictEqual(
-        encoder.encodeHrTime([1697978649, 99870675]),
-        '1697978649099870675'
       );
     });
 

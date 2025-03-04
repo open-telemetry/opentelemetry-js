@@ -25,7 +25,6 @@ import {
   HistogramMetricData,
   InstrumentType,
 } from '../export/MetricData';
-import { HrTime } from '@opentelemetry/api';
 import { binarySearchUB, Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
@@ -65,7 +64,7 @@ function createNewEmptyCheckpoint(boundaries: number[]): InternalHistogram {
 
 export class HistogramAccumulation implements Accumulation {
   constructor(
-    public startTime: HrTime,
+    public startTime: bigint,
     private readonly _boundaries: number[],
     private _recordMinMax = true,
     private _current: InternalHistogram = createNewEmptyCheckpoint(_boundaries)
@@ -91,7 +90,7 @@ export class HistogramAccumulation implements Accumulation {
     this._current.buckets.counts[idx] += 1;
   }
 
-  setStartTime(startTime: HrTime): void {
+  setStartTime(startTime: bigint): void {
     this.startTime = startTime;
   }
 
@@ -116,7 +115,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
     private readonly _recordMinMax: boolean
   ) {}
 
-  createAccumulation(startTime: HrTime) {
+  createAccumulation(startTime: bigint) {
     return new HistogramAccumulation(
       startTime,
       this._boundaries,
@@ -220,7 +219,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
     descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<HistogramAccumulation>[],
-    endTime: HrTime
+    endTime: bigint
   ): Maybe<HistogramMetricData> {
     return {
       descriptor,

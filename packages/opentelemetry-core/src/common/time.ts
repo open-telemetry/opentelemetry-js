@@ -36,6 +36,9 @@ export function millisToHrTime(epochMillis: number): api.HrTime {
   return [seconds, nanos];
 }
 
+/**
+ * start time of the process in milliseconds since the epoch
+ */
 export function getTimeOrigin(): number {
   let timeOrigin = performance.timeOrigin;
   if (typeof timeOrigin !== 'number') {
@@ -50,12 +53,11 @@ export function getTimeOrigin(): number {
  * @param performanceNow
  */
 export function hrTime(performanceNow?: number): api.HrTime {
-  const timeOrigin = millisToHrTime(getTimeOrigin());
   const now = millisToHrTime(
     typeof performanceNow === 'number' ? performanceNow : performance.now()
   );
 
-  return addHrTimes(timeOrigin, now);
+  return addHrTimes(millisToHrTime(getTimeOrigin()), now);
 }
 
 /**
@@ -64,19 +66,27 @@ export function hrTime(performanceNow?: number): api.HrTime {
  * @param time
  */
 export function timeInputToHrTime(time: api.TimeInput): api.HrTime {
-  // process.hrtime
+  return nanosToHrTime(timeInputToNano(time));
+}
+
+/**
+ *
+ * Converts a TimeInput to a nanosecond unix timestamp
+ * @param time
+ */
+export function timeInputToNano(time: api.TimeInput): bigint {
   if (isTimeInputHrTime(time)) {
-    return time as api.HrTime;
+    return hrTimeToNanoseconds(time);
   } else if (typeof time === 'number') {
     // Must be a performance.now() if it's smaller than process start time.
     if (time < getTimeOrigin()) {
-      return hrTime(time);
+      return millisecondsToNanoseconds(time + getTimeOrigin());
     } else {
       // epoch milliseconds or performance.timeOrigin
-      return millisToHrTime(time);
+      return millisecondsToNanoseconds(time);
     }
   } else if (time instanceof Date) {
-    return millisToHrTime(time.getTime());
+    return millisecondsToNanoseconds(time.getTime());
   } else {
     throw TypeError('Invalid input type');
   }
@@ -120,8 +130,31 @@ export function hrTimeToTimeStamp(time: api.HrTime): string {
  * Convert hrTime to nanoseconds.
  * @param time
  */
-export function hrTimeToNanoseconds(time: api.HrTime): number {
-  return time[0] * SECOND_TO_NANOSECONDS + time[1];
+export function hrTimeToNanoseconds(time: api.HrTime): bigint {
+  return BigInt(time[0]) * 1_000_000_000n + BigInt(time[1]);
+}
+
+export function millisecondsToNanoseconds(millis: number): bigint {
+  if (Number.isInteger(millis)) {
+    return BigInt(millis) * 1_000_000n;
+  } else {
+    const out =
+      BigInt(Math.round(millis)) * 1000000n +
+      BigInt(Math.round((millis % 1) * 1000000));
+    return out;
+  }
+}
+
+export function nanosecondsToMilliseconds(nanos: bigint): number {
+  return Number(nanos / 1_000_000n);
+}
+
+export function nanosecondsToMicroseconds(nanos: bigint): number {
+  return Number(nanos / 1_000n);
+}
+
+export function nanosToHrTime(nanos: bigint): api.HrTime {
+  return [Number(nanos / 1_000_000_000n), Number(nanos % 1_000_000_000n)];
 }
 
 /**
@@ -163,6 +196,7 @@ export function isTimeInput(
   return (
     isTimeInputHrTime(value) ||
     typeof value === 'number' ||
+    typeof value === 'bigint' ||
     value instanceof Date
   );
 }

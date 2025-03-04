@@ -23,8 +23,8 @@ import {
   DataPoint,
   Histogram,
 } from '@opentelemetry/sdk-metrics';
-import { hrTimeToMilliseconds } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
+import { nanosecondsToMilliseconds } from '@opentelemetry/core';
 
 type PrometheusDataTypeLiteral =
   | 'counter'
@@ -282,7 +282,7 @@ export class PrometheusSerializer {
 
     name = enforcePrometheusNamingConvention(name, data);
     const { value, attributes } = dataPoint;
-    const timestamp = hrTimeToMilliseconds(dataPoint.endTime);
+    const timestamp = nanosecondsToMilliseconds(dataPoint.endTime);
     results += stringify(
       name,
       attributes,
@@ -303,7 +303,7 @@ export class PrometheusSerializer {
     name = enforcePrometheusNamingConvention(name, data);
     const attributes = dataPoint.attributes;
     const histogram = dataPoint.value;
-    const timestamp = hrTimeToMilliseconds(dataPoint.endTime);
+    const timestamp = nanosecondsToMilliseconds(dataPoint.endTime);
     /** Histogram["bucket"] is not typed with `number` */
     for (const key of ['count', 'sum'] as ('count' | 'sum')[]) {
       const value = histogram[key];

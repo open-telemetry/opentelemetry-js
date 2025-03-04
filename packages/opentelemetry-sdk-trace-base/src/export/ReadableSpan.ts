@@ -15,15 +15,14 @@
  */
 
 import {
-  SpanKind,
-  SpanStatus,
   Attributes,
-  HrTime,
   Link,
   SpanContext,
+  SpanKind,
+  SpanStatus,
 } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
 import { InstrumentationScope } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
 import { TimedEvent } from '../TimedEvent';
 
 export interface ReadableSpan {
@@ -31,13 +30,12 @@ export interface ReadableSpan {
   readonly kind: SpanKind;
   readonly spanContext: () => SpanContext;
   readonly parentSpanContext?: SpanContext;
-  readonly startTime: HrTime;
-  readonly endTime: HrTime;
+  readonly startTimeUnixNano: bigint;
+  readonly endTimeUnixNano: bigint;
   readonly status: SpanStatus;
   readonly attributes: Attributes;
   readonly links: Link[];
   readonly events: TimedEvent[];
-  readonly duration: HrTime;
   readonly ended: boolean;
   readonly resource: Resource;
   readonly instrumentationScope: InstrumentationScope;

@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import { spanToThrift } from '../src/transform';
-import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import * as api from '@opentelemetry/api';
+import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
+import { nanosecondsToMicroseconds } from '@opentelemetry/core';
 import {
   emptyResource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
-import * as api from '@opentelemetry/api';
-import { ThriftUtils, Utils, ThriftReferenceType } from '../src/types';
-import { hrTimeToMicroseconds } from '@opentelemetry/core';
-import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
+import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import * as assert from 'assert';
+import { spanToThrift } from '../src/transform';
+import { ThriftReferenceType, ThriftUtils, Utils } from '../src/types';
 
 describe('transform', () => {
   const spanContext = () => {
@@ -41,8 +41,8 @@ describe('transform', () => {
         name: 'my-span',
         kind: api.SpanKind.INTERNAL,
         spanContext,
-        startTime: [1566156729, 709],
-        endTime: [1566156731, 709],
+        startTimeUnixNano: 1566156729000000709n,
+        endTimeUnixNano: 1566156731000000709n,
         ended: true,
         status: {
           code: api.SpanStatusCode.OK,
@@ -72,10 +72,9 @@ describe('transform', () => {
             attributes: {
               error: true,
             },
-            time: [1566156729, 809],
+            timeUnixNano: 1566156729000000809n,
           },
         ],
-        duration: [32, 800000000],
         resource: resourceFromAttributes({
           service: 'ui',
           version: 1,
@@ -110,7 +109,9 @@ describe('transform', () => {
       assert.deepStrictEqual(thriftSpan.flags, 1);
       assert.deepStrictEqual(
         thriftSpan.startTime,
-        Utils.encodeInt64(hrTimeToMicroseconds(readableSpan.startTime))
+        Utils.encodeInt64(
+          nanosecondsToMicroseconds(readableSpan.startTimeUnixNano)
+        )
       );
       assert.strictEqual(thriftSpan.tags.length, 9);
       const [tag1, tag2, tag3, tag4, tag5, tag6, tag7] = thriftSpan.tags;
@@ -169,8 +170,8 @@ describe('transform', () => {
         name: 'my-span1',
         kind: api.SpanKind.CLIENT,
         spanContext,
-        startTime: [1566156729, 709],
-        endTime: [1566156731, 709],
+        startTimeUnixNano: 1566156729000000709n,
+        endTimeUnixNano: 1566156731000000709n,
         ended: true,
         status: {
           code: api.SpanStatusCode.ERROR,
@@ -179,7 +180,6 @@ describe('transform', () => {
         attributes: {},
         links: [],
         events: [],
-        duration: [32, 800000000],
         resource: emptyResource(),
         instrumentationScope: {
           name: 'default',
@@ -231,8 +231,8 @@ describe('transform', () => {
         name: 'my-span',
         kind: api.SpanKind.INTERNAL,
         spanContext,
-        startTime: [1566156729, 709],
-        endTime: [1566156731, 709],
+        startTimeUnixNano: 1566156729000000709n,
+        endTimeUnixNano: 1566156731000000709n,
         ended: true,
         status: {
           code: api.SpanStatusCode.OK,
@@ -253,7 +253,6 @@ describe('transform', () => {
           },
         ],
         events: [],
-        duration: [32, 800000000],
         resource: emptyResource(),
         instrumentationScope: {
           name: 'default',
@@ -291,8 +290,8 @@ describe('transform', () => {
             traceFlags: TraceFlags.NONE,
           };
         },
-        startTime: [1566156729, 709],
-        endTime: [1566156731, 709],
+        startTimeUnixNano: 1566156729000000709n,
+        endTimeUnixNano: 1566156731000000709n,
         ended: true,
         status: {
           code: api.SpanStatusCode.ERROR,
@@ -301,7 +300,6 @@ describe('transform', () => {
         attributes: {},
         links: [],
         events: [],
-        duration: [32, 800000000],
         resource: emptyResource(),
         instrumentationScope: {
           name: 'default',
@@ -328,8 +326,8 @@ describe('transform', () => {
         name: 'my-span',
         kind: api.SpanKind.INTERNAL,
         spanContext,
-        startTime: [1566156729, 709],
-        endTime: [1566156731, 709],
+        startTimeUnixNano: 1566156729000000709n,
+        endTimeUnixNano: 1566156731000000709n,
         ended: true,
         status: {
           code: api.SpanStatusCode.OK,
@@ -359,10 +357,9 @@ describe('transform', () => {
             attributes: {
               error: true,
             },
-            time: [1566156729, 809],
+            timeUnixNano: 1566156729000000809n,
           },
         ],
-        duration: [32, 800000000],
         resource: resourceFromAttributes({
           service: 'ui',
           version: 1,

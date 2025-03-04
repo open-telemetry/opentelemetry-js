@@ -25,8 +25,6 @@ import {
   TraceFlags,
 } from '@opentelemetry/api';
 import * as logsAPI from '@opentelemetry/api-logs';
-import type { HrTime } from '@opentelemetry/api';
-import { hrTimeToMilliseconds, timeInputToHrTime } from '@opentelemetry/core';
 import { defaultResource } from '@opentelemetry/resources';
 
 import {
@@ -38,8 +36,11 @@ import {
 import { invalidAttributes, validAttributes } from './utils';
 import { LoggerProviderSharedState } from '../../src/internal/LoggerProviderSharedState';
 import { reconfigureLimits } from '../../src/config';
-
-const performanceTimeOrigin: HrTime = [1, 1];
+import {
+  millisecondsToNanoseconds,
+  timeInputToNano,
+  getTimeOrigin,
+} from '@opentelemetry/core/src/common/time';
 
 const setup = (logRecordLimits?: LogRecordLimits, data?: logsAPI.LogRecord) => {
   const instrumentationScope = {
@@ -70,10 +71,9 @@ describe('LogRecord', () => {
 
     it('should have a default timestamp', () => {
       const { logRecord } = setup();
-      assert.ok(logRecord.hrTime !== undefined);
+      assert.ok(logRecord.timeUnixNano !== undefined);
       assert.ok(
-        hrTimeToMilliseconds(logRecord.hrTime) >
-          hrTimeToMilliseconds(performanceTimeOrigin)
+        logRecord.timeUnixNano > millisecondsToNanoseconds(getTimeOrigin())
       );
     });
 
@@ -100,8 +100,8 @@ describe('LogRecord', () => {
         logRecordData
       );
       assert.deepStrictEqual(
-        logRecord.hrTime,
-        timeInputToHrTime(logRecordData.timestamp!)
+        logRecord.timeUnixNano,
+        timeInputToNano(logRecordData.timestamp!)
       );
       assert.strictEqual(
         logRecord.severityNumber,

@@ -30,11 +30,16 @@ export {
   hrTimeToMicroseconds,
   hrTimeToMilliseconds,
   hrTimeToNanoseconds,
+  millisecondsToNanoseconds,
+  nanosecondsToMilliseconds,
+  nanosecondsToMicroseconds,
+  nanosToHrTime,
   hrTimeToTimeStamp,
   isTimeInput,
   isTimeInputHrTime,
   millisToHrTime,
   timeInputToHrTime,
+  timeInputToNano,
 } from './common/time';
 export { ErrorHandler, InstrumentationScope } from './common/types';
 export { ExportResult, ExportResultCode } from './ExportResult';

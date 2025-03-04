@@ -16,10 +16,8 @@
 
 import * as api from '@opentelemetry/api';
 import {
-  hrTime,
-  hrTimeDuration,
-  hrTimeToMicroseconds,
-  millisToHrTime,
+  millisecondsToNanoseconds,
+  nanosecondsToMicroseconds,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
@@ -58,17 +56,15 @@ const spanContext: api.SpanContext = {
 };
 const currentTime = Date.now();
 const durationMs = 10;
-const startTime = hrTime(currentTime - durationMs);
-const endTime = hrTime(currentTime);
-const duration = millisToHrTime(durationMs);
+const startTime = millisecondsToNanoseconds(currentTime - durationMs);
+const endTime = millisecondsToNanoseconds(currentTime);
 
 function getSpan(options: Partial<ReadableSpan>): ReadableSpan {
   const span = {
     name: options.name || 'my-span',
     kind: typeof options.kind === 'number' ? options.kind : api.SpanKind.SERVER,
-    startTime: options.startTime || startTime,
-    endTime: options.endTime || endTime,
-    duration: options.duration || duration,
+    startTimeUnixNano: options.startTimeUnixNano || startTime,
+    endTimeUnixNano: options.endTimeUnixNano || endTime,
     spanContext: () => spanContext,
     parentSpanContext: options.parentSpanContext || parentSpanContext,
     attributes: options.attributes || {},
@@ -96,7 +92,7 @@ describe('transform', () => {
         events: [
           {
             name: 'my-event',
-            time: hrTime(Date.now() + 5),
+            timeUnixNano: millisecondsToNanoseconds(Date.now() + 5),
             attributes: { key3: 'value 3' },
           },
         ],
@@ -113,11 +109,11 @@ describe('transform', () => {
         annotations: [
           {
             value: 'my-event',
-            timestamp: Math.round(hrTimeToMicroseconds(span.events[0].time)),
+            timestamp: nanosecondsToMicroseconds(span.events[0].timeUnixNano),
           },
         ],
-        duration: Math.round(
-          hrTimeToMicroseconds(hrTimeDuration(span.startTime, span.endTime))
+        duration: nanosecondsToMicroseconds(
+          span.endTimeUnixNano - span.startTimeUnixNano
         ),
         id: span.spanContext().spanId,
         localEndpoint: {
@@ -136,7 +132,7 @@ describe('transform', () => {
           'telemetry.sdk.name': 'opentelemetry',
           'telemetry.sdk.version': VERSION,
         },
-        timestamp: hrTimeToMicroseconds(span.startTime),
+        timestamp: nanosecondsToMicroseconds(span.startTimeUnixNano),
         traceId: span.spanContext().traceId,
       });
       it("should skip parentSpanId if doesn't exist", () => {
@@ -153,8 +149,8 @@ describe('transform', () => {
         assert.deepStrictEqual(zipkinSpan, {
           kind: 'SERVER',
           annotations: undefined,
-          duration: Math.round(
-            hrTimeToMicroseconds(hrTimeDuration(span.startTime, span.endTime))
+          duration: nanosecondsToMicroseconds(
+            span.endTimeUnixNano - span.startTimeUnixNano
           ),
           id: span.spanContext().spanId,
           localEndpoint: {
@@ -171,7 +167,7 @@ describe('transform', () => {
             'telemetry.sdk.name': 'opentelemetry',
             'telemetry.sdk.version': VERSION,
           },
-          timestamp: hrTimeToMicroseconds(span.startTime),
+          timestamp: Number(span.startTimeUnixNano / 1_000n),
           traceId: span.spanContext().traceId,
         });
       });
@@ -200,7 +196,7 @@ describe('transform', () => {
           kind: item.zipkin,
           annotations: undefined,
           duration: Math.round(
-            hrTimeToMicroseconds(hrTimeDuration(span.startTime, span.endTime))
+            Number((span.endTimeUnixNano - span.startTimeUnixNano) / 1000n)
           ),
           id: span.spanContext().spanId,
           localEndpoint: {
@@ -217,7 +213,7 @@ describe('transform', () => {
             'telemetry.sdk.name': 'opentelemetry',
             'telemetry.sdk.version': VERSION,
           },
-          timestamp: hrTimeToMicroseconds(span.startTime),
+          timestamp: nanosecondsToMicroseconds(span.startTimeUnixNano),
           traceId: span.spanContext().traceId,
         });
       })
@@ -335,12 +331,16 @@ describe('transform', () => {
 
   describe('_toZipkinAnnotations', () => {
     it('should convert OpenTelemetry events to Zipkin annotations', () => {
+      const now = Date.now();
       const span = getSpan({
         events: [
-          { name: 'my-event1', time: hrTime(Date.now()) },
+          {
+            name: 'my-event1',
+            timeUnixNano: BigInt(now) * 1_000_000n,
+          },
           {
             name: 'my-event2',
-            time: hrTime(Date.now()),
+            timeUnixNano: BigInt(now + 10) * 1_000_000n,
             attributes: { key1: 'value1' },
           },
         ],
@@ -350,11 +350,11 @@ describe('transform', () => {
       assert.deepStrictEqual(annotations, [
         {
           value: 'my-event1',
-          timestamp: Math.round(hrTimeToMicroseconds(span.events[0].time)),
+          timestamp: Math.round(Number(span.events[0].timeUnixNano / 1000n)),
         },
         {
           value: 'my-event2',
-          timestamp: Math.round(hrTimeToMicroseconds(span.events[1].time)),
+          timestamp: Math.round(Number(span.events[1].timeUnixNano / 1000n)),
         },
       ]);
     });

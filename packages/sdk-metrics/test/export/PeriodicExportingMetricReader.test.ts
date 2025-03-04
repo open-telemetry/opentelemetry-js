@@ -149,8 +149,8 @@ describe('PeriodicExportingMetricReader', () => {
           dataPoints: [
             {
               // Sample hr time datapoints.
-              startTime: [12345, 678901234],
-              endTime: [12345, 678901234],
+              startTime: 12345678901234n,
+              endTime: 12345678901234n,
               attributes: {},
               value: 1,
             },

@@ -15,12 +15,10 @@
  */
 
 import * as assert from 'assert';
-import { otperformance as performance } from '../../src/platform';
 import * as sinon from 'sinon';
 import * as api from '@opentelemetry/api';
 import {
   hrTime,
-  timeInputToHrTime,
   hrTimeDuration,
   hrTimeToNanoseconds,
   hrTimeToMilliseconds,
@@ -28,6 +26,9 @@ import {
   hrTimeToTimeStamp,
   isTimeInput,
   addHrTimes,
+  millisecondsToNanoseconds,
+  timeInputToNano,
+  timeInputToHrTime,
 } from '../../src/common/time';
 
 describe('time', () => {
@@ -150,6 +151,54 @@ describe('time', () => {
     });
   });
 
+  describe('#timeInputToNano', () => {
+    it('should convert Date hrTime', () => {
+      const timeInput = new Date(1609297640313);
+      const output = timeInputToNano(timeInput);
+      assert.deepStrictEqual(output, 1609297640313000000n);
+    });
+
+    it('should convert epoch milliseconds hrTime', () => {
+      const timeInput = Date.now();
+      const output = timeInputToNano(timeInput);
+      assert.deepStrictEqual(output, millisecondsToNanoseconds(timeInput));
+    });
+
+    it('should convert arbitrary epoch milliseconds (with sub-millis precision) hrTime', () => {
+      sinon.stub(performance, 'timeOrigin').value(111.5);
+      const inputs = [
+        // [ input, expected ]
+        [1609297640313, 1609297640313000000n],
+        // inevitable precision loss without decimal arithmetics.
+        [1609297640313.333, 1609297640313333008n],
+        // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
+        [1609297640313.333333333, 1609297640313333252n],
+      ] as const;
+      for (const [idx, input] of inputs.entries()) {
+        const output = timeInputToNano(input[0]);
+        assert.deepStrictEqual(output, input[1], `input[${idx}]: ${input}`);
+      }
+    });
+
+    it('should convert performance.now() hrTime', () => {
+      sinon.stub(performance, 'timeOrigin').value(111.5);
+
+      const timeInput = 11.9;
+      const output = timeInputToNano(timeInput);
+
+      assert.deepStrictEqual(output, 123400000n);
+    });
+
+    it('should not convert hrtime hrTime', () => {
+      sinon.stub(performance, 'timeOrigin').value(111.5);
+
+      const timeInput: [number, number] = [3138971, 245466222];
+      const output = timeInputToNano(timeInput);
+
+      assert.deepStrictEqual(output, 3138971245466222n);
+    });
+  });
+
   describe('#hrTimeDuration', () => {
     it('should return duration', () => {
       const startTime: api.HrTime = [22, 400000000];
@@ -180,7 +229,17 @@ describe('time', () => {
   describe('#hrTimeToNanoseconds', () => {
     it('should return nanoseconds', () => {
       const output = hrTimeToNanoseconds([1, 200000000]);
-      assert.deepStrictEqual(output, 1200000000);
+      assert.deepStrictEqual(output, 1200000000n);
+    });
+  });
+
+  describe('#millisecondsToNanoseconds', () => {
+    it('should convert to nanoseconds', () => {
+      assert.strictEqual(millisecondsToNanoseconds(123), 123_000_000n);
+      assert.strictEqual(
+        millisecondsToNanoseconds(123.123_456_789),
+        123_123_457n
+      );
     });
   });
 
@@ -205,7 +264,7 @@ describe('time', () => {
       assert.strictEqual(isTimeInput(new Date()), true);
     });
     it('should return true for an array with 2 elements type number', () => {
-      assert.strictEqual(isTimeInput([1, 1]), true);
+      assert.strictEqual(isTimeInput(1_000_000_001n), true);
     });
     it('should return FALSE for different cases for an array ', () => {
       assert.strictEqual(isTimeInput([1, 1, 1]), false);

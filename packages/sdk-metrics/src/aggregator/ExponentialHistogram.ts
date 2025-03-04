@@ -26,7 +26,7 @@ import {
   ExponentialHistogramMetricData,
   InstrumentType,
 } from '../export/MetricData';
-import { diag, HrTime } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
@@ -65,7 +65,7 @@ const MIN_MAX_SIZE = 2;
 
 export class ExponentialHistogramAccumulation implements Accumulation {
   constructor(
-    public startTime: HrTime = startTime,
+    public startTime: bigint = startTime,
     private _maxSize = DEFAULT_MAX_SIZE,
     private _recordMinMax = true,
     private _sum = 0,
@@ -94,15 +94,15 @@ export class ExponentialHistogramAccumulation implements Accumulation {
 
   /**
    * Sets the start time for this accumulation
-   * @param {HrTime} startTime
+   * @param {bigint} startTime
    */
-  setStartTime(startTime: HrTime): void {
+  setStartTime(startTime: bigint): void {
     this.startTime = startTime;
   }
 
   /**
    * Returns the datapoint representation of this accumulation
-   * @param {HrTime} startTime
+   * @param {bigint} startTime
    */
   toPointValue(): InternalHistogram {
     return {
@@ -531,7 +531,7 @@ export class ExponentialHistogramAggregator
     private readonly _recordMinMax: boolean
   ) {}
 
-  createAccumulation(startTime: HrTime) {
+  createAccumulation(startTime: bigint) {
     return new ExponentialHistogramAccumulation(
       startTime,
       this._maxSize,
@@ -569,7 +569,7 @@ export class ExponentialHistogramAggregator
     descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<ExponentialHistogramAccumulation>[],
-    endTime: HrTime
+    endTime: bigint
   ): Maybe<ExponentialHistogramMetricData> {
     return {
       descriptor,

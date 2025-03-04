@@ -36,8 +36,8 @@ describe('JaegerExporter', () => {
         traceFlags: TraceFlags.NONE,
       };
     },
-    startTime: [1566156729, 709],
-    endTime: [1566156731, 709],
+    startTimeUnixNano: 1566156729000000709n,
+    endTimeUnixNano: 1566156731000000709n,
     ended: true,
     status: {
       code: api.SpanStatusCode.ERROR,
@@ -45,7 +45,6 @@ describe('JaegerExporter', () => {
     attributes: {},
     links: [],
     events: [],
-    duration: [32, 800000000],
     resource: resourceFromAttributes({
       [SEMRESATTRS_SERVICE_NAME]: 'opentelemetry',
     }),

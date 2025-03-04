@@ -17,8 +17,8 @@
 import { Link, SpanStatusCode, SpanKind } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import {
-  hrTimeToMilliseconds,
-  hrTimeToMicroseconds,
+  nanosecondsToMicroseconds,
+  nanosecondsToMilliseconds,
 } from '@opentelemetry/core';
 import {
   ThriftSpan,
@@ -126,7 +126,7 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
         value: event.droppedAttributesCount,
       });
     }
-    return { timestamp: hrTimeToMilliseconds(event.time), fields };
+    return { timestamp: nanosecondsToMilliseconds(event.timeUnixNano), fields };
   });
   const spanLogs: ThriftLog[] = ThriftUtils.getThriftLogs(logs);
 
@@ -138,8 +138,12 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
     operationName: span.name,
     references: spanLinksToThriftRefs(span.links),
     flags: span.spanContext().traceFlags || DEFAULT_FLAGS,
-    startTime: Utils.encodeInt64(hrTimeToMicroseconds(span.startTime)),
-    duration: Utils.encodeInt64(hrTimeToMicroseconds(span.duration)),
+    startTime: Utils.encodeInt64(
+      nanosecondsToMicroseconds(span.startTimeUnixNano)
+    ),
+    duration: Utils.encodeInt64(
+      nanosecondsToMicroseconds(span.endTimeUnixNano - span.startTimeUnixNano)
+    ),
     tags: spanTags,
     logs: spanLogs,
   };

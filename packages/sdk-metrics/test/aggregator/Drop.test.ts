@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { AggregationTemporality } from '../../src';
 import { DropAggregator } from '../../src/aggregator';
@@ -51,7 +50,7 @@ describe('DropAggregator', () => {
     it('no exceptions', () => {
       const aggregator = new DropAggregator();
 
-      const endTime: HrTime = [1, 1];
+      const endTime = 1_000_000_001n;
 
       assert.strictEqual(
         aggregator.toMetricData(

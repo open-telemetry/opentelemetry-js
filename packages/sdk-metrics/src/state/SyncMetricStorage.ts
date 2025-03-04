@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, Attributes } from '@opentelemetry/api';
+import { Context, Attributes } from '@opentelemetry/api';
 import { WritableMetricStorage } from './WritableMetricStorage';
 import { Accumulation, Aggregator } from '../aggregator/types';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
@@ -60,7 +60,7 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>>
     value: number,
     attributes: Attributes,
     context: Context,
-    recordTime: HrTime
+    recordTime: bigint
   ) {
     attributes = this._attributesProcessor.process(attributes, context);
     this._deltaMetricStorage.record(value, attributes, context, recordTime);
@@ -74,7 +74,7 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>>
    */
   collect(
     collector: MetricCollectorHandle,
-    collectionTime: HrTime
+    collectionTime: bigint
   ): Maybe<MetricData> {
     const accumulations = this._deltaMetricStorage.collect();
 

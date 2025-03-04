@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, Attributes } from '@opentelemetry/api';
+import { Context, Attributes } from '@opentelemetry/api';
 import { FixedSizeExemplarReservoirBase } from './ExemplarReservoir';
 
 /**
@@ -31,7 +31,7 @@ export class AlignedHistogramBucketExemplarReservoir extends FixedSizeExemplarRe
 
   private _findBucketIndex(
     value: number,
-    _timestamp: HrTime,
+    _timestamp: bigint,
     _attributes: Attributes,
     _ctx: Context
   ) {
@@ -45,7 +45,7 @@ export class AlignedHistogramBucketExemplarReservoir extends FixedSizeExemplarRe
 
   offer(
     value: number,
-    timestamp: HrTime,
+    timestamp: bigint,
     attributes: Attributes,
     ctx: Context
   ): void {

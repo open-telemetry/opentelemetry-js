@@ -16,7 +16,6 @@
 
 import type { OtlpEncodingOptions, Fixed64, LongBits } from './internal-types';
 import { HrTime } from '@opentelemetry/api';
-import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { hexToBinary } from './hex-to-binary';
 
 export function hrTimeToNanos(hrTime: HrTime): bigint {
@@ -30,20 +29,15 @@ export function toLongBits(value: bigint): LongBits {
   return { low, high };
 }
 
-export function encodeAsLongBits(hrTime: HrTime): LongBits {
-  const nanos = hrTimeToNanos(hrTime);
+export function encodeAsLongBits(nanos: bigint): LongBits {
   return toLongBits(nanos);
 }
 
-export function encodeAsString(hrTime: HrTime): string {
-  const nanos = hrTimeToNanos(hrTime);
+export function encodeAsString(nanos: bigint): string {
   return nanos.toString();
 }
 
-const encodeTimestamp =
-  typeof BigInt !== 'undefined' ? encodeAsString : hrTimeToNanoseconds;
-
-export type HrTimeEncodeFunction = (hrTime: HrTime) => Fixed64;
+export type EncodeBigIntNanoFunction = (nanos: bigint) => Fixed64;
 export type SpanContextEncodeFunction = (
   spanContext: string
 ) => string | Uint8Array;
@@ -52,7 +46,7 @@ export type OptionalSpanContextEncodeFunction = (
 ) => string | Uint8Array | undefined;
 
 export interface Encoder {
-  encodeHrTime: HrTimeEncodeFunction;
+  encodeBigIntNanos: EncodeBigIntNanoFunction;
   encodeSpanContext: SpanContextEncodeFunction;
   encodeOptionalSpanContext: OptionalSpanContextEncodeFunction;
 }
@@ -67,7 +61,7 @@ function optionalHexToBinary(str: string | undefined): Uint8Array | undefined {
 }
 
 const DEFAULT_ENCODER: Encoder = {
-  encodeHrTime: encodeAsLongBits,
+  encodeBigIntNanos: toLongBits,
   encodeSpanContext: hexToBinary,
   encodeOptionalSpanContext: optionalHexToBinary,
 };
@@ -80,7 +74,7 @@ export function getOtlpEncoder(options?: OtlpEncodingOptions): Encoder {
   const useLongBits = options.useLongBits ?? true;
   const useHex = options.useHex ?? false;
   return {
-    encodeHrTime: useLongBits ? encodeAsLongBits : encodeTimestamp,
+    encodeBigIntNanos: useLongBits ? toLongBits : encodeAsString,
     encodeSpanContext: useHex ? identity : hexToBinary,
     encodeOptionalSpanContext: useHex ? identity : optionalHexToBinary,
   };

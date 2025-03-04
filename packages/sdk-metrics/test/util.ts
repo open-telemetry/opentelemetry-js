@@ -36,7 +36,6 @@ import {
   ScopeMetrics,
 } from '../src/export/MetricData';
 import { isNotNullish } from '../src/utils';
-import { HrTime } from '@opentelemetry/api';
 import { Histogram } from '../src/aggregator/types';
 import { AggregationTemporality } from '../src/export/AggregationTemporality';
 
@@ -125,8 +124,8 @@ export function assertDataPoint(
   actual: unknown,
   attributes: Attributes,
   point: Histogram | number,
-  startTime?: HrTime,
-  endTime?: HrTime
+  startTime?: bigint,
+  endTime?: bigint
 ): asserts actual is DataPoint<unknown> {
   const it = actual as DataPoint<unknown>;
   assert.deepStrictEqual(it.attributes, attributes);
@@ -138,14 +137,12 @@ export function assertDataPoint(
       'startTime should be equal'
     );
   } else {
-    assert.ok(Array.isArray(it.startTime));
-    assert.strictEqual(it.startTime.length, 2, 'startTime should be equal');
+    assert.ok(typeof it.startTime === 'bigint');
   }
   if (endTime) {
     assert.deepStrictEqual(it.endTime, endTime, 'endTime should be equal');
   } else {
-    assert.ok(Array.isArray(it.endTime));
-    assert.strictEqual(it.endTime.length, 2, 'endTime should be equal');
+    assert.ok(typeof it.endTime === 'bigint');
   }
 }
 

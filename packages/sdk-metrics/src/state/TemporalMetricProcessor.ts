@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { HrTime } from '@opentelemetry/api';
 import {
   Accumulation,
   AccumulationRecord,
@@ -38,7 +37,7 @@ interface LastReportedHistory<T extends Maybe<Accumulation>> {
   /**
    * The timestamp the data was reported.
    */
-  collectionTime: HrTime;
+  collectionTime: bigint;
   /**
    * The AggregationTemporality used to aggregate reports.
    */
@@ -83,7 +82,7 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
     collector: MetricCollectorHandle,
     instrumentDescriptor: InstrumentDescriptor,
     currentAccumulations: AttributeHashMap<T>,
-    collectionTime: HrTime
+    collectionTime: bigint
   ): Maybe<MetricData> {
     this._stashAccumulations(currentAccumulations);
     const unreportedAccumulations =
@@ -211,7 +210,7 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
   static calibrateStartTime<T extends Maybe<Accumulation>>(
     last: AttributeHashMap<T>,
     current: AttributeHashMap<T>,
-    lastCollectionTime: HrTime
+    lastCollectionTime: bigint
   ) {
     for (const [key, hash] of last.keys()) {
       const currentAccumulation = current.get(key, hash);

@@ -16,7 +16,6 @@
 
 import {
   Context,
-  HrTime,
   isSpanContextValid,
   trace,
   Attributes,
@@ -30,7 +29,7 @@ export interface ExemplarReservoir {
   /** Offers a measurement to be sampled. */
   offer(
     value: number,
-    timestamp: HrTime,
+    timestamp: bigint,
     attributes: Attributes,
     ctx: Context
   ): void;
@@ -49,14 +48,14 @@ export interface ExemplarReservoir {
 class ExemplarBucket {
   private value: number = 0;
   private attributes: Attributes = {};
-  private timestamp: HrTime = [0, 0];
+  private timestamp: bigint = 0n;
   private spanId?: string;
   private traceId?: string;
   private _offered: boolean = false;
 
   offer(
     value: number,
-    timestamp: HrTime,
+    timestamp: bigint,
     attributes: Attributes,
     ctx: Context
   ) {
@@ -89,7 +88,7 @@ class ExemplarBucket {
     };
     this.attributes = {};
     this.value = 0;
-    this.timestamp = [0, 0];
+    this.timestamp = 0n;
     this.spanId = undefined;
     this.traceId = undefined;
     this._offered = false;
@@ -113,7 +112,7 @@ export abstract class FixedSizeExemplarReservoirBase
 
   abstract offer(
     value: number,
-    timestamp: HrTime,
+    timestamp: bigint,
     attributes: Attributes,
     ctx: Context
   ): void;

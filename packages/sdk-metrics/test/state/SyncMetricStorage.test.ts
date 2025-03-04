@@ -53,7 +53,7 @@ describe('SyncMetricStorage', () => {
 
       for (const value of commonValues) {
         for (const attributes of commonAttributes) {
-          metricStorage.record(value, attributes, api.context.active(), [0, 0]);
+          metricStorage.record(value, attributes, api.context.active(), 0n);
         }
       }
     });
@@ -69,31 +69,37 @@ describe('SyncMetricStorage', () => {
           [deltaCollector]
         );
 
-        metricStorage.record(1, {}, api.context.active(), [0, 0]);
-        metricStorage.record(2, {}, api.context.active(), [1, 1]);
-        metricStorage.record(3, {}, api.context.active(), [2, 2]);
+        metricStorage.record(1, {}, api.context.active(), 0n);
+        metricStorage.record(2, {}, api.context.active(), 1_000_000_001n);
+        metricStorage.record(3, {}, api.context.active(), 2_000_000_002n);
         {
-          const metric = metricStorage.collect(deltaCollector, [3, 3]);
+          const metric = metricStorage.collect(deltaCollector, 3_000_000_003n);
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 6, [0, 0], [3, 3]);
+          assertDataPoint(metric.dataPoints[0], {}, 6, 0n, 3_000_000_003n);
         }
 
         // The attributes should not be memorized.
         {
-          const metric = metricStorage.collect(deltaCollector, [4, 4]);
+          const metric = metricStorage.collect(deltaCollector, 4_000_000_004n);
 
           assert.strictEqual(metric, undefined);
         }
 
-        metricStorage.record(1, {}, api.context.active(), [5, 5]);
+        metricStorage.record(1, {}, api.context.active(), 5_000_000_005n);
         {
-          const metric = metricStorage.collect(deltaCollector, [6, 6]);
+          const metric = metricStorage.collect(deltaCollector, 6_000_000_006n);
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 1, [5, 5], [6, 6]);
+          assertDataPoint(
+            metric.dataPoints[0],
+            {},
+            1,
+            5_000_000_005n,
+            6_000_000_006n
+          );
         }
       });
     });
@@ -106,33 +112,42 @@ describe('SyncMetricStorage', () => {
           createNoopAttributesProcessor(),
           [cumulativeCollector]
         );
-        metricStorage.record(1, {}, api.context.active(), [0, 0]);
-        metricStorage.record(2, {}, api.context.active(), [1, 1]);
-        metricStorage.record(3, {}, api.context.active(), [2, 2]);
+        metricStorage.record(1, {}, api.context.active(), 0n);
+        metricStorage.record(2, {}, api.context.active(), 1_000_000_001n);
+        metricStorage.record(3, {}, api.context.active(), 2_000_000_002n);
         {
-          const metric = metricStorage.collect(cumulativeCollector, [3, 3]);
+          const metric = metricStorage.collect(
+            cumulativeCollector,
+            3_000_000_003n
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 6, [0, 0], [3, 3]);
+          assertDataPoint(metric.dataPoints[0], {}, 6, 0n, 3_000_000_003n);
         }
 
         // The attributes should be memorized.
         {
-          const metric = metricStorage.collect(cumulativeCollector, [4, 4]);
+          const metric = metricStorage.collect(
+            cumulativeCollector,
+            4_000_000_004n
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 6, [0, 0], [4, 4]);
+          assertDataPoint(metric.dataPoints[0], {}, 6, 0n, 4_000_000_004n);
         }
 
-        metricStorage.record(1, {}, api.context.active(), [5, 5]);
+        metricStorage.record(1, {}, api.context.active(), 5_000_000_005n);
         {
-          const metric = metricStorage.collect(cumulativeCollector, [6, 6]);
+          const metric = metricStorage.collect(
+            cumulativeCollector,
+            6_000_000_006n
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 7, [0, 0], [6, 6]);
+          assertDataPoint(metric.dataPoints[0], {}, 7, 0n, 6_000_000_006n);
         }
       });
     });

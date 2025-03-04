@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HrTime, ValueType } from '@opentelemetry/api';
+import { ValueType } from '@opentelemetry/api';
 import {
   AggregationTemporality,
   DataPointType,
@@ -45,7 +45,7 @@ describe('ExponentialHistogramAccumulation', () => {
      * this must finish with offset=-1 (all scales).
      */
     it('handles alternating growth: scenario 1', () => {
-      const accumulation = new ExponentialHistogramAccumulation([0, 0], 4);
+      const accumulation = new ExponentialHistogramAccumulation(0n, 4);
       accumulation.record(2);
       accumulation.record(4);
       accumulation.record(1);
@@ -62,7 +62,7 @@ describe('ExponentialHistogramAccumulation', () => {
      * holds range [4, 16).
      */
     it('handles alternating growth: scenario 2', () => {
-      const accumulation = new ExponentialHistogramAccumulation([0, 0], 4);
+      const accumulation = new ExponentialHistogramAccumulation(0n, 4);
       accumulation.record(2);
       accumulation.record(2);
       accumulation.record(4);
@@ -84,7 +84,7 @@ describe('ExponentialHistogramAccumulation', () => {
         [0.5, 1, 2],
         [0.5, 2, 1],
       ].forEach(row => {
-        const accumulation = new ExponentialHistogramAccumulation([0, 0], 2);
+        const accumulation = new ExponentialHistogramAccumulation(0n, 2);
         row.forEach(value => {
           accumulation.record(value);
         });
@@ -106,7 +106,7 @@ describe('ExponentialHistogramAccumulation', () => {
         [4, 1, 2],
         [4, 2, 1],
       ].forEach(row => {
-        const accumulation = new ExponentialHistogramAccumulation([0, 0], 2);
+        const accumulation = new ExponentialHistogramAccumulation(0n, 2);
         row.forEach(value => {
           accumulation.record(value);
         });
@@ -129,7 +129,7 @@ describe('ExponentialHistogramAccumulation', () => {
           [0.25, 1, 0.5],
           [0.25, 0.5, 1],
         ].forEach(row => {
-          const accumulation = new ExponentialHistogramAccumulation([0, 0], 2);
+          const accumulation = new ExponentialHistogramAccumulation(0n, 2);
           row.forEach(value => {
             accumulation.record(value);
           });
@@ -152,7 +152,7 @@ describe('ExponentialHistogramAccumulation', () => {
             for (const initScale of [0, 4]) {
               for (let step = maxSize; step < 4 * maxSize; step++) {
                 const accumulation = new ExponentialHistogramAccumulation(
-                  [0, 0],
+                  0n,
                   maxSize
                 );
                 let mapper = getMapping(initScale);
@@ -217,7 +217,7 @@ describe('ExponentialHistogramAccumulation', () => {
     });
 
     it('ignores NaN', () => {
-      const accumulation = new ExponentialHistogramAccumulation([0, 0], 1);
+      const accumulation = new ExponentialHistogramAccumulation(0n, 1);
 
       accumulation.record(NaN);
 
@@ -232,9 +232,9 @@ describe('ExponentialHistogramAccumulation', () => {
   });
   describe('merge', () => {
     it('handles simple (even) case', () => {
-      const acc0 = new ExponentialHistogramAccumulation([0, 0], 4);
-      const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
-      const acc2 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc0 = new ExponentialHistogramAccumulation(0n, 4);
+      const acc1 = new ExponentialHistogramAccumulation(0n, 4);
+      const acc2 = new ExponentialHistogramAccumulation(0n, 4);
 
       for (let i = 0; i < 4; i++) {
         const v1 = 2 << i;
@@ -267,9 +267,9 @@ describe('ExponentialHistogramAccumulation', () => {
     });
 
     it('handles simple (odd) case', () => {
-      const acc0 = new ExponentialHistogramAccumulation([0, 0], 4);
-      const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
-      const acc2 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc0 = new ExponentialHistogramAccumulation(0n, 4);
+      const acc1 = new ExponentialHistogramAccumulation(0n, 4);
+      const acc2 = new ExponentialHistogramAccumulation(0n, 4);
 
       for (let i = 0; i < 4; i++) {
         const v1 = 2 << i;
@@ -312,9 +312,9 @@ describe('ExponentialHistogramAccumulation', () => {
         size: number,
         incr: number
       ) => {
-        const aHist = new ExponentialHistogramAccumulation([0, 0], size);
-        const bHist = new ExponentialHistogramAccumulation([0, 0], size);
-        const cHist = new ExponentialHistogramAccumulation([0, 0], size);
+        const aHist = new ExponentialHistogramAccumulation(0n, size);
+        const bHist = new ExponentialHistogramAccumulation(0n, size);
+        const cHist = new ExponentialHistogramAccumulation(0n, size);
 
         a.forEach(av => {
           aHist.updateByIncrement(av, incr);
@@ -361,8 +361,8 @@ describe('ExponentialHistogramAccumulation', () => {
   });
   describe('diff', () => {
     it('handles simple case', () => {
-      const acc0 = new ExponentialHistogramAccumulation([0, 0], 4);
-      const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc0 = new ExponentialHistogramAccumulation(0n, 4);
+      const acc1 = new ExponentialHistogramAccumulation(0n, 4);
 
       for (let i = 0; i < 4; i++) {
         const v1 = 2 << i;
@@ -387,9 +387,9 @@ describe('ExponentialHistogramAccumulation', () => {
     });
 
     it('trims trailing 0 buckets after diff', () => {
-      const acc0 = new ExponentialHistogramAccumulation([0, 0], 4);
-      const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
-      const acc2 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc0 = new ExponentialHistogramAccumulation(0n, 4);
+      const acc1 = new ExponentialHistogramAccumulation(0n, 4);
+      const acc2 = new ExponentialHistogramAccumulation(0n, 4);
 
       for (let i = 0; i < 4; i++) {
         const v1 = 2 << i;
@@ -423,9 +423,9 @@ describe('ExponentialHistogramAccumulation', () => {
     });
 
     it('trims leading 0 buckets after diff', () => {
-      const acc0 = new ExponentialHistogramAccumulation([0, 0], 4);
-      const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
-      const acc2 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc0 = new ExponentialHistogramAccumulation(0n, 4);
+      const acc1 = new ExponentialHistogramAccumulation(0n, 4);
+      const acc2 = new ExponentialHistogramAccumulation(0n, 4);
 
       for (let i = 0; i < 4; i++) {
         const v1 = 2 << i;
@@ -458,9 +458,9 @@ describe('ExponentialHistogramAccumulation', () => {
     });
 
     it('handles all zero bucket case', () => {
-      const acc0 = new ExponentialHistogramAccumulation([0, 0], 4);
-      const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
-      const acc2 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc0 = new ExponentialHistogramAccumulation(0n, 4);
+      const acc1 = new ExponentialHistogramAccumulation(0n, 4);
+      const acc2 = new ExponentialHistogramAccumulation(0n, 4);
 
       for (let i = 0; i < 4; i++) {
         const v1 = 2 << i;
@@ -487,8 +487,8 @@ describe('ExponentialHistogramAccumulation', () => {
   });
   describe('clone()', () => {
     it('makes a deep copy', () => {
-      const acc0 = new ExponentialHistogramAccumulation([0, 0], 4);
-      const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc0 = new ExponentialHistogramAccumulation(0n, 4);
+      const acc1 = new ExponentialHistogramAccumulation(0n, 4);
 
       for (let i = 0; i < 4; i++) {
         const v = 2 << i;
@@ -523,7 +523,7 @@ describe('ExponentialHistogramAccumulation', () => {
 
   describe('toPointValue()', () => {
     it('returns representation of histogram internals', () => {
-      const acc = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc = new ExponentialHistogramAccumulation(0n, 4);
 
       for (let i = 0; i < 4; i++) {
         acc.record(2 << i);
@@ -546,7 +546,7 @@ describe('ExponentialHistogramAccumulation', () => {
 
   describe('min max size', () => {
     it('auto-corrects to min max', () => {
-      const acc: any = new ExponentialHistogramAccumulation([0, 0], 0);
+      const acc: any = new ExponentialHistogramAccumulation(0n, 0);
       assert.strictEqual(acc['_maxSize'], 2);
     });
   });
@@ -556,9 +556,9 @@ describe('ExponentialHistogramAggregation', () => {
   describe('merge', () => {
     it('merges and does not mutate args', () => {
       const agg = new ExponentialHistogramAggregator(4, true);
-      const acc0 = agg.createAccumulation([0, 0]);
-      const acc1 = agg.createAccumulation([0, 0]);
-      const acc2 = agg.createAccumulation([0, 0]);
+      const acc0 = agg.createAccumulation(0n);
+      const acc1 = agg.createAccumulation(0n);
+      const acc2 = agg.createAccumulation(0n);
 
       acc0.record(2 << 0);
       acc0.record(2 << 1);
@@ -591,18 +591,18 @@ describe('ExponentialHistogramAggregation', () => {
 
     it("keeps the previous point's startTime", () => {
       const agg = new ExponentialHistogramAggregator(4, true);
-      const acc0 = agg.createAccumulation([0, 0]);
-      const acc1 = agg.createAccumulation([3, 0]);
+      const acc0 = agg.createAccumulation(0n);
+      const acc1 = agg.createAccumulation(3_000_000_000n);
 
       const result = agg.merge(acc0, acc1);
       assert.strictEqual(result.startTime, acc0.startTime);
     });
     it('handles zero-length buckets in source histogram', () => {
       // https://github.com/open-telemetry/opentelemetry-js/issues/4450
-      const delta = new ExponentialHistogramAccumulation([0, 0], 160);
+      const delta = new ExponentialHistogramAccumulation(0n, 160);
       delta.updateByIncrement(0.0, 2); // A histogram with zero count of two and empty buckets
 
-      const previous = new ExponentialHistogramAccumulation([0, 0], 160);
+      const previous = new ExponentialHistogramAccumulation(0n, 160);
       previous.updateByIncrement(0, 1);
       previous.updateByIncrement(0.000979, 41); //Bucket: (0.00097656, 0.0010198], Count: 41, Index: -160
       previous.updateByIncrement(0.001959, 17); //Bucket: (0.00195313, 0.0020396], Count: 17, Index: -144
@@ -645,9 +645,9 @@ describe('ExponentialHistogramAggregation', () => {
   describe('diff', () => {
     it('diffs and does not mutate args', () => {
       const agg = new ExponentialHistogramAggregator(4, true);
-      const acc0 = agg.createAccumulation([0, 0]);
-      const acc1 = agg.createAccumulation([0, 0]);
-      const acc2 = agg.createAccumulation([0, 0]);
+      const acc0 = agg.createAccumulation(0n);
+      const acc1 = agg.createAccumulation(0n);
+      const acc2 = agg.createAccumulation(0n);
 
       acc0.record(2 << 0);
       acc0.record(2 << 1);
@@ -681,8 +681,8 @@ describe('ExponentialHistogramAggregation', () => {
 
   describe('toMetricData', () => {
     it('should transform to expected data with recordMinMax = true', () => {
-      const startTime: HrTime = [0, 0];
-      const endTime: HrTime = [1, 1];
+      const startTime = 0n;
+      const endTime = 1_000_000_001n;
 
       const agg = new ExponentialHistogramAggregator(4, true);
       const acc = agg.createAccumulation(startTime);
@@ -732,8 +732,8 @@ describe('ExponentialHistogramAggregation', () => {
     });
 
     it('should transform to expected data with recordMinMax = false', () => {
-      const startTime: HrTime = [0, 0];
-      const endTime: HrTime = [1, 1];
+      const startTime = 0n;
+      const endTime = 1_000_000_001n;
 
       const agg = new ExponentialHistogramAggregator(4, false);
       const acc = agg.createAccumulation(startTime);
@@ -785,8 +785,8 @@ describe('ExponentialHistogramAggregation', () => {
     function testSum(instrumentType: InstrumentType, expectSum: boolean) {
       const agg = new ExponentialHistogramAggregator(4, true);
 
-      const startTime: HrTime = [0, 0];
-      const endTime: HrTime = [1, 1];
+      const startTime = 0n;
+      const endTime = 1_000_000_001n;
 
       const acc = agg.createAccumulation(startTime);
       acc.record(0);

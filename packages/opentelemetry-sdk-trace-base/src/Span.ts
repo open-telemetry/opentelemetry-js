@@ -15,14 +15,14 @@
  */
 
 import {
+  Span as APISpan,
+  Attributes,
+  AttributeValue,
   Context,
   diag,
   Exception,
   HrTime,
   Link,
-  Span as APISpan,
-  Attributes,
-  AttributeValue,
   SpanContext,
   SpanKind,
   SpanStatus,
@@ -30,15 +30,13 @@ import {
   TimeInput,
 } from '@opentelemetry/api';
 import {
-  addHrTimes,
-  millisToHrTime,
-  getTimeOrigin,
-  hrTime,
-  hrTimeDuration,
+  hrTimeToNanoseconds,
   InstrumentationScope,
   isAttributeValue,
   isTimeInput,
   isTimeInputHrTime,
+  millisecondsToNanoseconds,
+  nanosToHrTime,
   otperformance,
   sanitizeAttributes,
 } from '@opentelemetry/core';
@@ -48,8 +46,8 @@ import {
   SEMATTRS_EXCEPTION_STACKTRACE,
   SEMATTRS_EXCEPTION_TYPE,
 } from '@opentelemetry/semantic-conventions';
-import { ReadableSpan } from './export/ReadableSpan';
 import { ExceptionEventName } from './enums';
+import { ReadableSpan } from './export/ReadableSpan';
 import { SpanProcessor } from './SpanProcessor';
 import { TimedEvent } from './TimedEvent';
 import { SpanLimits } from './types';
@@ -87,7 +85,6 @@ export class SpanImpl implements Span {
   readonly attributes: Attributes = {};
   readonly links: Link[] = [];
   readonly events: TimedEvent[] = [];
-  readonly startTime: HrTime;
   readonly resource: Resource;
   readonly instrumentationScope: InstrumentationScope;
 
@@ -99,15 +96,16 @@ export class SpanImpl implements Span {
   status: SpanStatus = {
     code: SpanStatusCode.UNSET,
   };
-  endTime: HrTime = [0, 0];
   private _ended = false;
-  private _duration: HrTime = [-1, -1];
+  private _startTime: bigint;
+  private _endTime: bigint = -1n;
+
   private readonly _spanProcessor: SpanProcessor;
   private readonly _spanLimits: SpanLimits;
   private readonly _attributeValueLengthLimit: number;
 
   private readonly _performanceStartTime: number;
-  private readonly _performanceOffset: number;
+  private readonly _performanceOffsetNanos: bigint;
   private readonly _startTimeProvided: boolean;
 
   /**
@@ -118,8 +116,9 @@ export class SpanImpl implements Span {
 
     this._spanContext = opts.spanContext;
     this._performanceStartTime = otperformance.now();
-    this._performanceOffset =
-      now - (this._performanceStartTime + getTimeOrigin());
+    this._performanceOffsetNanos = millisecondsToNanoseconds(
+      now - this._performanceStartTime
+    );
     this._startTimeProvided = opts.startTime != null;
     this._spanLimits = opts.spanLimits;
     this._attributeValueLengthLimit =
@@ -130,7 +129,7 @@ export class SpanImpl implements Span {
     this.parentSpanContext = opts.parentSpanContext;
     this.kind = opts.kind;
     this.links = opts.links || [];
-    this.startTime = this._getTime(opts.startTime ?? now);
+    this._startTime = this._getTime(opts.startTime ?? now);
     this.resource = opts.resource;
     this.instrumentationScope = opts.scope;
 
@@ -139,6 +138,22 @@ export class SpanImpl implements Span {
     }
 
     this._spanProcessor.onStart(this, opts.context);
+  }
+
+  get startTimeUnixNano(): bigint {
+    return this._startTime;
+  }
+
+  get startTime(): HrTime {
+    return nanosToHrTime(this._startTime);
+  }
+
+  get endTimeUnixNano(): bigint {
+    return this._endTime;
+  }
+
+  get endTime(): HrTime {
+    return nanosToHrTime(this._endTime);
   }
 
   spanContext(): SpanContext {
@@ -223,7 +238,7 @@ export class SpanImpl implements Span {
     this.events.push({
       name,
       attributes,
-      time: this._getTime(timeStamp),
+      timeUnixNano: this._getTime(timeStamp),
       droppedAttributesCount: 0,
     });
     return this;
@@ -272,17 +287,15 @@ export class SpanImpl implements Span {
     }
     this._ended = true;
 
-    this.endTime = this._getTime(endTime);
-    this._duration = hrTimeDuration(this.startTime, this.endTime);
+    this._endTime = this._getTime(endTime);
 
-    if (this._duration[0] < 0) {
+    if (this._endTime < this._startTime) {
       diag.warn(
         'Inconsistent start and end time, startTime > endTime. Setting span duration to 0ms.',
-        this.startTime,
-        this.endTime
+        this._startTime,
+        this._endTime
       );
-      this.endTime = this.startTime.slice() as HrTime;
-      this._duration = [0, 0];
+      this._endTime = this._startTime;
     }
 
     if (this._droppedEventsCount > 0) {
@@ -294,33 +307,44 @@ export class SpanImpl implements Span {
     this._spanProcessor.onEnd(this);
   }
 
-  private _getTime(inp?: TimeInput): HrTime {
+  /**
+   *
+   * @param inp time input from the user
+   * @returns timestamp in nanoseconds from the epoch
+   */
+  private _getTime(inp?: TimeInput): bigint {
     if (typeof inp === 'number' && inp <= otperformance.now()) {
       // must be a performance timestamp
       // apply correction and convert to hrtime
-      return hrTime(inp + this._performanceOffset);
+      return millisecondsToNanoseconds(inp) + this._performanceOffsetNanos;
     }
 
     if (typeof inp === 'number') {
-      return millisToHrTime(inp);
+      return millisecondsToNanoseconds(inp);
+    }
+
+    if (typeof inp === 'bigint') {
+      return inp;
     }
 
     if (inp instanceof Date) {
-      return millisToHrTime(inp.getTime());
+      return millisecondsToNanoseconds(inp.getTime());
     }
 
     if (isTimeInputHrTime(inp)) {
-      return inp;
+      return hrTimeToNanoseconds(inp);
     }
 
     if (this._startTimeProvided) {
       // if user provided a time for the start manually
       // we can't use duration to calculate event/end times
-      return millisToHrTime(Date.now());
+      return millisecondsToNanoseconds(Date.now());
     }
 
-    const msDuration = otperformance.now() - this._performanceStartTime;
-    return addHrTimes(this.startTime, millisToHrTime(msDuration));
+    const nanoDuration = millisecondsToNanoseconds(
+      otperformance.now() - this._performanceStartTime
+    );
+    return this._startTime + nanoDuration;
   }
 
   isRecording(): boolean {
@@ -354,10 +378,6 @@ export class SpanImpl implements Span {
     } else {
       diag.warn(`Failed to record an exception ${exception}`);
     }
-  }
-
-  get duration(): HrTime {
-    return this._duration;
   }
 
   get ended(): boolean {

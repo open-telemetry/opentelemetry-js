@@ -30,7 +30,6 @@ import {
   ObservableCallbackDelegate,
 } from '../util';
 import { ObservableInstrument } from '../../src/Instruments';
-import { HrTime } from '@opentelemetry/api';
 
 const deltaCollector: MetricCollectorHandle = {
   selectAggregationTemporality: () => AggregationTemporality.DELTA,
@@ -69,7 +68,7 @@ describe('AsyncMetricStorage', () => {
           observableResult.observe(3, { key: '3' });
         });
         {
-          const collectionTime: HrTime = [0, 0];
+          const collectionTime = 0n;
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(deltaCollector, collectionTime);
 
@@ -101,7 +100,7 @@ describe('AsyncMetricStorage', () => {
         delegate.setDelegate(observableResult => {});
         // The attributes should not be memorized if no measurement was reported.
         {
-          const collectionTime: HrTime = [1, 1];
+          const collectionTime = 1_000_000_001n;
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(deltaCollector, collectionTime);
 
@@ -114,7 +113,7 @@ describe('AsyncMetricStorage', () => {
           observableResult.observe(6, { key: '3' });
         });
         {
-          const collectionTime: HrTime = [2, 2];
+          const collectionTime = 2_000_000_002n;
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(deltaCollector, collectionTime);
 
@@ -167,9 +166,9 @@ describe('AsyncMetricStorage', () => {
         delegate.setDelegate(observableResult => {
           observableResult.observe(100, { key: '1' });
         });
-        let lastCollectionTime: HrTime;
+        let lastCollectionTime: bigint;
         {
-          const collectionTime: HrTime = [0, 0];
+          const collectionTime = 0n;
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(deltaCollector, collectionTime);
 
@@ -191,7 +190,7 @@ describe('AsyncMetricStorage', () => {
         });
         // The result data should not be diff-ed to be a negative value
         {
-          const collectionTime: HrTime = [1, 1];
+          const collectionTime = 1_000_000_001n;
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(deltaCollector, collectionTime);
 
@@ -213,7 +212,7 @@ describe('AsyncMetricStorage', () => {
         });
         // The result data should now be a delta to the previous collection
         {
-          const collectionTime: HrTime = [2, 2];
+          const collectionTime = 2_000_000_002n;
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(deltaCollector, collectionTime);
 
@@ -251,9 +250,9 @@ describe('AsyncMetricStorage', () => {
         delegate.setDelegate(observableResult => {
           observableResult.observe(100, { key: '1' });
         });
-        let lastCollectionTime: HrTime;
+        let lastCollectionTime: bigint;
         {
-          const collectionTime: HrTime = [0, 0];
+          const collectionTime = 0n;
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(deltaCollector, collectionTime);
 
@@ -275,7 +274,7 @@ describe('AsyncMetricStorage', () => {
         });
         // The result data should be a delta to the previous collection
         {
-          const collectionTime: HrTime = [0, 0];
+          const collectionTime = 0n;
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(deltaCollector, collectionTime);
 
@@ -297,7 +296,7 @@ describe('AsyncMetricStorage', () => {
         });
         // The result data should be a delta to the previous collection
         {
-          const collectionTime: HrTime = [2, 2];
+          const collectionTime = 2_000_000_002n;
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(deltaCollector, collectionTime);
 
@@ -338,9 +337,9 @@ describe('AsyncMetricStorage', () => {
           observableResult.observe(2, { key: '2' });
           observableResult.observe(3, { key: '3' });
         });
-        let startTime: HrTime;
+        let startTime: bigint;
         {
-          const collectionTime: HrTime = [0, 0];
+          const collectionTime = 0n;
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             cumulativeCollector,
@@ -376,7 +375,7 @@ describe('AsyncMetricStorage', () => {
         delegate.setDelegate(observableResult => {});
         // The attributes should be memorized even if no measurement was reported.
         {
-          const collectionTime: HrTime = [1, 1];
+          const collectionTime = 1_000_000_001n;
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             cumulativeCollector,
@@ -414,7 +413,7 @@ describe('AsyncMetricStorage', () => {
           observableResult.observe(6, { key: '3' });
         });
         {
-          const collectionTime: HrTime = [2, 2];
+          const collectionTime = 2_000_000_002n;
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             cumulativeCollector,
@@ -469,9 +468,9 @@ describe('AsyncMetricStorage', () => {
         delegate.setDelegate(observableResult => {
           observableResult.observe(100, { key: '1' });
         });
-        let startTime: HrTime;
+        let startTime: bigint;
         {
-          const collectionTime: HrTime = [0, 0];
+          const collectionTime = 0n;
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             cumulativeCollector,
@@ -496,7 +495,7 @@ describe('AsyncMetricStorage', () => {
         });
         // The result data should not be diff-ed to be a negative value
         {
-          const collectionTime: HrTime = [1, 1];
+          const collectionTime = 1_000_000_001n;
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             cumulativeCollector,
@@ -522,7 +521,7 @@ describe('AsyncMetricStorage', () => {
         });
         // The result data should now be a delta to the previous collection
         {
-          const collectionTime: HrTime = [2, 2];
+          const collectionTime = 2_000_000_002n;
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             cumulativeCollector,
@@ -563,9 +562,9 @@ describe('AsyncMetricStorage', () => {
         delegate.setDelegate(observableResult => {
           observableResult.observe(100, { key: '1' });
         });
-        let startTime: HrTime;
+        let startTime: bigint;
         {
-          const collectionTime: HrTime = [0, 0];
+          const collectionTime = 0n;
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             cumulativeCollector,
@@ -590,7 +589,7 @@ describe('AsyncMetricStorage', () => {
         });
         // The result data should be a delta to the previous collection
         {
-          const collectionTime: HrTime = [1, 1];
+          const collectionTime = 1_000_000_001n;
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             cumulativeCollector,
@@ -615,7 +614,7 @@ describe('AsyncMetricStorage', () => {
         });
         // The result data should be a delta to the previous collection
         {
-          const collectionTime: HrTime = [2, 2];
+          const collectionTime = 2_000_000_002n;
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             cumulativeCollector,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HrTime, Attributes } from '@opentelemetry/api';
+import { Attributes } from '@opentelemetry/api';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 import { MetricData } from '../export/MetricData';
 import { Maybe } from '../utils';
@@ -85,7 +85,7 @@ export interface ExponentialHistogram {
  * An Aggregator accumulation state.
  */
 export interface Accumulation {
-  setStartTime(startTime: HrTime): void;
+  setStartTime(startTime: bigint): void;
   record(value: number): void;
 }
 
@@ -102,7 +102,7 @@ export interface Aggregator<T> {
   /**
    * Create a clean state of accumulation.
    */
-  createAccumulation(startTime: HrTime): T;
+  createAccumulation(startTime: bigint): T;
 
   /**
    * Returns the result of the merge of the given accumulations.
@@ -138,6 +138,6 @@ export interface Aggregator<T> {
     descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<T>[],
-    endTime: HrTime
+    endTime: bigint
   ): Maybe<MetricData>;
 }
