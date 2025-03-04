@@ -513,7 +513,9 @@ export const getOutgoingRequestAttributes = (
  * Returns the type of synthetic source based on the user agent
  * @param {OutgoingHttpHeader | undefined} userAgent the user agent string
  */
-const getSyntheticType = (userAgent: OutgoingHttpHeader | undefined): AttributeValue | undefined => {
+const getSyntheticType = (
+  userAgent: OutgoingHttpHeader | undefined
+): AttributeValue | undefined => {
   const userAgentString: string = String(userAgent).toLowerCase();
   for (const name of SYNTHETIC_TEST_NAMES) {
     if (userAgentString.includes(name)) {

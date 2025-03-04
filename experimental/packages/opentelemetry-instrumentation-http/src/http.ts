@@ -637,8 +637,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           ),
           semconvStability: instrumentation._semconvStability,
           enableSyntheticSourceDetection:
-            instrumentation.getConfig().enableSyntheticSourceDetection ||
-            false,
+            instrumentation.getConfig().enableSyntheticSourceDetection || false,
         },
         instrumentation._diag
       );
