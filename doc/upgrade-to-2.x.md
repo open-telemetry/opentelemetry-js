@@ -311,7 +311,7 @@ The export of the `Span` class has been removed. It was not intended to be used 
 
 <br/>
 
-The `Span` `parentSpanId` field was replaced by `parentSpanContext`, to adhere to the OTel spec. [#5450](https://github.com/open-telemetry/opentelemetry-js/pull/5450)
+The `parentSpanId` field on the `Span` and `ReadableSpan` interfaces was replaced by `parentSpanContext`, to adhere to the OTel spec. [#5450](https://github.com/open-telemetry/opentelemetry-js/pull/5450)
 
 - `span.parentSpanId` -> `span.parentSpanContext?.spanId`
 
