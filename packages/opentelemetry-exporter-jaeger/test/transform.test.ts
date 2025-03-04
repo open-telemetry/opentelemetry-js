@@ -43,6 +43,8 @@ describe('transform', () => {
         spanContext,
         startTimeUnixNano: 1566156729000000709n,
         endTimeUnixNano: 1566156731000000709n,
+        startTime: [0,0], // wrong on purpose - included for compatibility. should not be used
+        endTime: [0,0], // wrong on purpose - included for compatibility. should not be used
         ended: true,
         status: {
           code: api.SpanStatusCode.OK,
@@ -172,6 +174,8 @@ describe('transform', () => {
         spanContext,
         startTimeUnixNano: 1566156729000000709n,
         endTimeUnixNano: 1566156731000000709n,
+        startTime: [1566156729, 709],
+        endTime: [1566156731, 709],
         ended: true,
         status: {
           code: api.SpanStatusCode.ERROR,
@@ -233,6 +237,8 @@ describe('transform', () => {
         spanContext,
         startTimeUnixNano: 1566156729000000709n,
         endTimeUnixNano: 1566156731000000709n,
+        startTime: [1566156729, 709],
+        endTime: [1566156731, 709],
         ended: true,
         status: {
           code: api.SpanStatusCode.OK,
@@ -292,6 +298,8 @@ describe('transform', () => {
         },
         startTimeUnixNano: 1566156729000000709n,
         endTimeUnixNano: 1566156731000000709n,
+        startTime: [1566156729, 709],
+        endTime: [1566156731, 709],
         ended: true,
         status: {
           code: api.SpanStatusCode.ERROR,
@@ -328,6 +336,8 @@ describe('transform', () => {
         spanContext,
         startTimeUnixNano: 1566156729000000709n,
         endTimeUnixNano: 1566156731000000709n,
+        startTime: [1566156729, 709],
+        endTime: [1566156731, 709],
         ended: true,
         status: {
           code: api.SpanStatusCode.OK,
