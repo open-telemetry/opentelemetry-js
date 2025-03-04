@@ -323,7 +323,7 @@ As mentioned above in the "core" section, `InstrumentationLibrary` has been chan
 
 <br/>
 
-When bogus data is set on `OTEL_TRACES_SAMPLER`, the SDK now uses `ParentBasedAlwaysOnSampler` rather than `AlwaysOnSampler`, per [spec](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#general-sdk-configuration).
+When invalid data is set on `OTEL_TRACES_SAMPLER`, the SDK now uses `ParentBasedAlwaysOnSampler` rather than `AlwaysOnSampler`, per [spec](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#general-sdk-configuration).
 
 > [!NOTE]
 > Related issues and PRs:
