@@ -37,8 +37,8 @@ export const mockedReadableSpan: ReadableSpan = {
   },
   startTimeUnixNano: 1574120165429803070n,
   endTimeUnixNano: 1574120165438688070n,
-  startTime: [0,0], // wrong on purpose - included for compatibility. should not be used
-  endTime: [0,0], // wrong on purpose - included for compatibility. should not be used
+  startTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
+  endTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
   ended: true,
   status: { code: SpanStatusCode.OK },
   attributes: { component: 'foo' },

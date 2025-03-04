@@ -43,8 +43,8 @@ describe('transform', () => {
         spanContext,
         startTimeUnixNano: 1566156729000000709n,
         endTimeUnixNano: 1566156731000000709n,
-        startTime: [0,0], // wrong on purpose - included for compatibility. should not be used
-        endTime: [0,0], // wrong on purpose - included for compatibility. should not be used
+        startTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
+        endTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
         ended: true,
         status: {
           code: api.SpanStatusCode.OK,

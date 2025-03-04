@@ -290,8 +290,8 @@ describe('Trace', () => {
       droppedAttributesCount: 0,
       droppedEventsCount: 0,
       droppedLinksCount: 0,
-      startTime: [0,0], // wrong on purpose - included for compatibility. should not be used
-      endTime: [0,0], // wrong on purpose - included for compatibility. should not be used
+      startTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
+      endTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
     };
   });
 

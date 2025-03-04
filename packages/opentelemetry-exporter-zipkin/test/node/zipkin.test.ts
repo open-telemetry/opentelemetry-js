@@ -48,8 +48,8 @@ function getReadableSpan() {
       };
     },
     startTimeUnixNano: BigInt(startTime) * 1_000_000n,
-      startTime: [0,0], // wrong on purpose - included for compatibility. should not be used
-      endTime: [0,0], // wrong on purpose - included for compatibility. should not be used
+    startTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
+    endTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
     endTimeUnixNano:
       BigInt(startTime) * 1_000_000n + BigInt(duration) * 1_000_000n,
     ended: true,
@@ -156,11 +156,11 @@ describe('Zipkin Exporter - node', () => {
           };
         },
         startTimeUnixNano: BigInt(startTime) * 1_000_000n,
-          startTime: [0,0], // wrong on purpose - included for compatibility. should not be used
-      endTime: [0,0], // wrong on purpose - included for compatibility. should not be used
+        startTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
+        endTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
         endTimeUnixNano:
           BigInt(startTime) * 1_000_000n + BigInt(duration) * 1_000_000n,
-  
+
         ended: true,
         status: {
           code: api.SpanStatusCode.OK,
@@ -194,11 +194,11 @@ describe('Zipkin Exporter - node', () => {
           };
         },
         startTimeUnixNano: BigInt(startTime) * 1_000_000n,
-          startTime: [0,0], // wrong on purpose - included for compatibility. should not be used
-      endTime: [0,0], // wrong on purpose - included for compatibility. should not be used
+        startTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
+        endTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
         endTimeUnixNano:
           BigInt(startTime) * 1_000_000n + BigInt(duration) * 1_000_000n,
-  
+
         ended: true,
         status: {
           code: api.SpanStatusCode.OK,
@@ -385,8 +385,8 @@ describe('Zipkin Exporter - node', () => {
         traceFlags: TraceFlags.NONE,
       }),
       startTimeUnixNano: BigInt(startTime) * 1_000_000n,
-        startTime: [0,0], // wrong on purpose - included for compatibility. should not be used
-      endTime: [0,0], // wrong on purpose - included for compatibility. should not be used
+      startTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
+      endTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
       endTimeUnixNano:
         BigInt(startTime) * 1_000_000n + BigInt(duration) * 1_000_000n,
 
@@ -423,8 +423,8 @@ describe('Zipkin Exporter - node', () => {
         traceFlags: TraceFlags.NONE,
       }),
       startTimeUnixNano: BigInt(startTime) * 1_000_000n,
-        startTime: [0,0], // wrong on purpose - included for compatibility. should not be used
-      endTime: [0,0], // wrong on purpose - included for compatibility. should not be used
+      startTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
+      endTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
       endTimeUnixNano:
         BigInt(startTime) * 1_000_000n + BigInt(duration) * 1_000_000n,
 
@@ -490,8 +490,8 @@ describe('Zipkin Exporter - node', () => {
         traceFlags: TraceFlags.NONE,
       }),
       startTimeUnixNano: BigInt(startTime) * 1_000_000n,
-        startTime: [0,0], // wrong on purpose - included for compatibility. should not be used
-      endTime: [0,0], // wrong on purpose - included for compatibility. should not be used
+      startTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
+      endTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
       endTimeUnixNano:
         BigInt(startTime) * 1_000_000n + BigInt(duration) * 1_000_000n,
 
@@ -527,8 +527,8 @@ describe('Zipkin Exporter - node', () => {
         traceFlags: TraceFlags.NONE,
       }),
       startTimeUnixNano: BigInt(startTime) * 1_000_000n,
-        startTime: [0,0], // wrong on purpose - included for compatibility. should not be used
-      endTime: [0,0], // wrong on purpose - included for compatibility. should not be used
+      startTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
+      endTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
       endTimeUnixNano:
         BigInt(startTime) * 1_000_000n + BigInt(duration) * 1_000_000n,
 
