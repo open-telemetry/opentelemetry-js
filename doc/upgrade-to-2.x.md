@@ -229,7 +229,7 @@ const limit = getEnv().OTEL_BSP_MAX_QUEUE_SIZE;
 const level = getEnv().OTEL_LOG_LEVEL;
 
 // After
-import { getStringFromEnv } from '@opentelemetry/core';
+import { getStringFromEnv, getNumberFromEnv, diagLogLevelFromString } from '@opentelemetry/core';
 const flavor = getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL') ?? 'http/protobuf';
 const limit = getNumberFromEnv('OTEL_BSP_MAX_QUEUE_SIZE') ?? 2048;
 const level = diagLogLevelFromString(getStringFromEnv('OTEL_LOG_LEVEL'));
