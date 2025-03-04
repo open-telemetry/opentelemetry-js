@@ -83,7 +83,7 @@ The OpenTelemetry JS SIG is responsible for numerous packages, all published to 
 
 ## 💥 Node.js supported versions
 
-The **minimum supported Node.js has been raised to `^18.19.0 || >=20.6.0`**. This means that support Node.js 14 and 16 has been dropped.
+The **minimum supported Node.js has been raised to `^18.19.0 || >=20.6.0`**. This means that support for Node.js 14 and 16 has been dropped.
 
 > [!NOTE]
 >
