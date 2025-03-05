@@ -173,7 +173,9 @@ describe('Zipkin Exporter - node', () => {
         events: [
           {
             name: 'my-event',
-            timeUnixNano: millisecondsToNanoseconds(startTime) + millisecondsToNanoseconds(10),
+            timeUnixNano:
+              millisecondsToNanoseconds(startTime) +
+              millisecondsToNanoseconds(10),
             attributes: { key3: 'value3' },
           },
         ],
