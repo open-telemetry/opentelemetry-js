@@ -494,12 +494,15 @@ describe('OpenTracing Shim', () => {
 
     it('sets explicit end timestamp', () => {
       const now = performance.now();
-      span.finish(now);
-      assert.deepStrictEqual(
-        otSpan.endTimeUnixNano,
+      const expected =
         millisecondsToNanoseconds(now) +
-          (otSpan as any)['_performanceOffsetNanos']
-      );
+        (otSpan as any)['_performanceOffsetNanos'];
+      console.log('now   ', now);
+      console.log('nanos ', millisecondsToNanoseconds(now));
+      console.log('offset', (otSpan as any)['_performanceOffsetNanos']);
+      span.finish(now);
+      console.log('span start time', otSpan.startTimeUnixNano);
+      assert.deepStrictEqual(otSpan.endTimeUnixNano, expected);
     });
 
     it('can set and retrieve baggage', () => {
