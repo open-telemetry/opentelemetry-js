@@ -66,6 +66,9 @@ export function hrTime(performanceNow?: number): api.HrTime {
  * @param time
  */
 export function timeInputToHrTime(time: api.TimeInput): api.HrTime {
+  if (isTimeInputHrTime(time)) {
+    return time as api.HrTime;
+  }
   return nanosToHrTime(timeInputToNano(time));
 }
 
