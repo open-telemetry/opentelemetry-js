@@ -19,8 +19,8 @@ import * as nock from 'nock';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import {
   ExportResult,
-  hrTimeToMicroseconds,
   ExportResultCode,
+  millisecondsToNanoseconds,
 } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import {
@@ -31,8 +31,6 @@ import { ZipkinExporter } from '../../src';
 import * as zipkinTypes from '../../src/types';
 import { TraceFlags } from '@opentelemetry/api';
 import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
-
-const MICROS_PER_SECS = 1e6;
 
 function getReadableSpan() {
   const startTime = 1566156729709;
@@ -47,11 +45,12 @@ function getReadableSpan() {
         traceFlags: TraceFlags.NONE,
       };
     },
-    startTimeUnixNano: BigInt(startTime) * 1_000_000n,
+    startTimeUnixNano: millisecondsToNanoseconds(startTime),
     startTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
     endTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
     endTimeUnixNano:
-      BigInt(startTime) * 1_000_000n + BigInt(duration) * 1_000_000n,
+      millisecondsToNanoseconds(startTime) +
+      millisecondsToNanoseconds(duration),
     ended: true,
     status: {
       code: api.SpanStatusCode.OK,
@@ -155,11 +154,12 @@ describe('Zipkin Exporter - node', () => {
             traceFlags: TraceFlags.NONE,
           };
         },
-        startTimeUnixNano: BigInt(startTime) * 1_000_000n,
+        startTimeUnixNano: millisecondsToNanoseconds(startTime),
         startTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
         endTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
         endTimeUnixNano:
-          BigInt(startTime) * 1_000_000n + BigInt(duration) * 1_000_000n,
+          millisecondsToNanoseconds(startTime) +
+          millisecondsToNanoseconds(duration),
 
         ended: true,
         status: {
@@ -173,7 +173,7 @@ describe('Zipkin Exporter - node', () => {
         events: [
           {
             name: 'my-event',
-            timeUnixNano: BigInt(startTime) * 1_000_000_000n + 10_000_000_000n,
+            timeUnixNano: millisecondsToNanoseconds(startTime) + millisecondsToNanoseconds(10),
             attributes: { key3: 'value3' },
           },
         ],
@@ -193,11 +193,12 @@ describe('Zipkin Exporter - node', () => {
             traceFlags: TraceFlags.NONE,
           };
         },
-        startTimeUnixNano: BigInt(startTime) * 1_000_000n,
+        startTimeUnixNano: millisecondsToNanoseconds(startTime),
         startTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
         endTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
         endTimeUnixNano:
-          BigInt(startTime) * 1_000_000n + BigInt(duration) * 1_000_000n,
+          millisecondsToNanoseconds(startTime) +
+          millisecondsToNanoseconds(duration),
 
         ended: true,
         status: {
@@ -226,10 +227,10 @@ describe('Zipkin Exporter - node', () => {
             annotations: [
               {
                 value: 'my-event',
-                timestamp: (startTime + 10) * MICROS_PER_SECS,
+                timestamp: (startTime + 10) * 1000,
               },
             ],
-            duration: duration * MICROS_PER_SECS,
+            duration: duration * 1000,
             id: span1.spanContext().spanId,
             localEndpoint: {
               serviceName: 'my-service',
@@ -241,12 +242,12 @@ describe('Zipkin Exporter - node', () => {
               key2: 'value2',
               'otel.status_code': 'OK',
             },
-            timestamp: startTime * MICROS_PER_SECS,
+            timestamp: startTime * 1000,
             traceId: span1.spanContext().traceId,
           },
           // Span 2
           {
-            duration: duration * MICROS_PER_SECS,
+            duration: duration * 1000,
             id: span2.spanContext().spanId,
             kind: 'SERVER',
             localEndpoint: {
@@ -256,7 +257,7 @@ describe('Zipkin Exporter - node', () => {
             tags: {
               'otel.status_code': 'OK',
             },
-            timestamp: hrTimeToMicroseconds([startTime, 0]),
+            timestamp: startTime * 1000,
             traceId: span2.spanContext().traceId,
           },
         ]);
@@ -384,11 +385,12 @@ describe('Zipkin Exporter - node', () => {
         spanId: '6e0c63257de34c92',
         traceFlags: TraceFlags.NONE,
       }),
-      startTimeUnixNano: BigInt(startTime) * 1_000_000n,
+      startTimeUnixNano: millisecondsToNanoseconds(startTime),
       startTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
       endTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
       endTimeUnixNano:
-        BigInt(startTime) * 1_000_000n + BigInt(duration) * 1_000_000n,
+        millisecondsToNanoseconds(startTime) +
+        millisecondsToNanoseconds(duration),
 
       ended: true,
       status: {
@@ -402,7 +404,7 @@ describe('Zipkin Exporter - node', () => {
       events: [
         {
           name: 'my-event',
-          timeUnixNano: BigInt(startTime) * 1_000_000n + 10_000_000_000n,
+          timeUnixNano: millisecondsToNanoseconds(startTime) + 10_000_000_000n,
           attributes: { key3: 'value3' },
         },
       ],
@@ -422,11 +424,12 @@ describe('Zipkin Exporter - node', () => {
         spanId: '6e0c63257de34c92',
         traceFlags: TraceFlags.NONE,
       }),
-      startTimeUnixNano: BigInt(startTime) * 1_000_000n,
+      startTimeUnixNano: millisecondsToNanoseconds(startTime),
       startTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
       endTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
       endTimeUnixNano:
-        BigInt(startTime) * 1_000_000n + BigInt(duration) * 1_000_000n,
+        millisecondsToNanoseconds(startTime) +
+        millisecondsToNanoseconds(duration),
 
       ended: true,
       status: {
@@ -489,11 +492,12 @@ describe('Zipkin Exporter - node', () => {
         spanId: '6e0c63257de34c92',
         traceFlags: TraceFlags.NONE,
       }),
-      startTimeUnixNano: BigInt(startTime) * 1_000_000n,
+      startTimeUnixNano: millisecondsToNanoseconds(startTime),
       startTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
       endTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
       endTimeUnixNano:
-        BigInt(startTime) * 1_000_000n + BigInt(duration) * 1_000_000n,
+        millisecondsToNanoseconds(startTime) +
+        millisecondsToNanoseconds(duration),
 
       ended: true,
       status: {
@@ -508,7 +512,7 @@ describe('Zipkin Exporter - node', () => {
       events: [
         {
           name: 'my-event',
-          timeUnixNano: BigInt(startTime) * 1_000_000n + 10_000_000_000n,
+          timeUnixNano: millisecondsToNanoseconds(startTime) + 10_000_000_000n,
           attributes: { key3: 'value3' },
         },
       ],
@@ -526,11 +530,12 @@ describe('Zipkin Exporter - node', () => {
         spanId: '6e0c63257de34c92',
         traceFlags: TraceFlags.NONE,
       }),
-      startTimeUnixNano: BigInt(startTime) * 1_000_000n,
+      startTimeUnixNano: millisecondsToNanoseconds(startTime),
       startTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
       endTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
       endTimeUnixNano:
-        BigInt(startTime) * 1_000_000n + BigInt(duration) * 1_000_000n,
+        millisecondsToNanoseconds(startTime) +
+        millisecondsToNanoseconds(duration),
 
       ended: true,
       status: {

@@ -112,7 +112,7 @@ export function _toZipkinAnnotations(
   events: TimedEvent[]
 ): zipkinTypes.Annotation[] {
   return events.map(event => ({
-    timestamp: Math.round(Number(event.timeUnixNano / 1_000n)),
+    timestamp: nanosecondsToMicroseconds(event.timeUnixNano),
     value: event.name,
   }));
 }
