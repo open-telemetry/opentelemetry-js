@@ -115,7 +115,7 @@ describe('TemporalMetricProcessor', () => {
             deltaCollector1,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
-            5_000_000_000_000n
+            5_000_000_005n
           );
 
           // nothing recorded -> nothing collected
