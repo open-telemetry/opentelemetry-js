@@ -295,8 +295,10 @@ describe('OpenTracing Shim', () => {
     });
 
     beforeEach(() => {
+      const startTime = performance.now();
+      console.log(startTime);
       span = shimTracer.startSpan('my-span', {
-        startTime: performance.now(),
+        startTime: startTime,
       }) as SpanShim;
       otSpan = (span as SpanShim).getSpan() as Span;
     });
