@@ -64,9 +64,9 @@ import {
   envDetector,
   processDetector,
   hostDetector,
-  Resource,
   serviceInstanceIdDetector,
   DetectedResource,
+  defaultResource,
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { logs, ProxyLoggerProvider } from '@opentelemetry/api-logs';
@@ -956,7 +956,7 @@ describe('Node SDK', () => {
         const resource = sdk['_resource'];
         await resource.waitForAsyncAttributes?.();
 
-        assert.deepStrictEqual(resource, Resource.default());
+        assert.deepStrictEqual(resource, defaultResource());
         await sdk.shutdown();
       });
     });

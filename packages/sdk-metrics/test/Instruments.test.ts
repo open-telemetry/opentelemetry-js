@@ -17,7 +17,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { InstrumentationScope } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
 import {
   DataPoint,
   DataPointType,
@@ -36,10 +35,11 @@ import {
   commonAttributes,
   commonValues,
   defaultInstrumentationScope,
-  defaultResource,
+  testResource,
 } from './util';
 import { ObservableResult, ValueType } from '@opentelemetry/api';
 import { IMetricReader } from '../src/export/MetricReader';
+import { Resource } from '@opentelemetry/resources';
 
 describe('Instruments', () => {
   describe('Counter', () => {
@@ -816,7 +816,7 @@ function setup() {
   const deltaReader = new TestDeltaMetricReader();
   const cumulativeReader = new TestMetricReader();
   const meterProvider = new MeterProvider({
-    resource: defaultResource,
+    resource: testResource,
     readers: [deltaReader, cumulativeReader],
   });
   const meter = meterProvider.getMeter(
@@ -858,7 +858,7 @@ async function validateExport(
   const { scope, metrics } = scopeMetrics[0];
 
   assert.ok(!resource.asyncAttributesPending);
-  assert.deepStrictEqual(resource.attributes, defaultResource.attributes);
+  assert.deepStrictEqual(resource.attributes, testResource.attributes);
   assert.deepStrictEqual(scope, defaultInstrumentationScope);
 
   const metric = metrics[0];

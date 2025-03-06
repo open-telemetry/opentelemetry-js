@@ -36,9 +36,9 @@ import {
 import { SpanImpl } from '../../../src/Span';
 import { TestStackContextManager } from './TestStackContextManager';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
-import { Resource } from '@opentelemetry/resources';
 import { TestExporterWithDelay } from './TestExporterWithDelay';
 import { Tracer } from '../../../src/Tracer';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 
 describe('SimpleSpanProcessor', () => {
   let provider: BasicTracerProvider;
@@ -175,12 +175,10 @@ describe('SimpleSpanProcessor', () => {
     it('should await unresolved resources', async () => {
       const processor = new SimpleSpanProcessor(exporter);
       const providerWithAsyncResource = new BasicTracerProvider({
-        resource: new Resource({
-          attributes: {
-            async: new Promise<string>(resolve =>
-              setTimeout(() => resolve('fromasync'), 1)
-            ),
-          },
+        resource: resourceFromAttributes({
+          async: new Promise<string>(resolve =>
+            setTimeout(() => resolve('fromasync'), 1)
+          ),
         }),
       });
       const spanContext: SpanContext = {
@@ -217,17 +215,48 @@ describe('SimpleSpanProcessor', () => {
       );
     });
 
-    it('should await doExport() and delete from _unresolvedExports', async () => {
+    it('should await doExport() and delete from _pendingExports', async () => {
+      const testExporterWithDelay = new TestExporterWithDelay();
+      const processor = new SimpleSpanProcessor(testExporterWithDelay);
+      const spanContext: SpanContext = {
+        traceId: 'a3cda95b652f4a1592b449d5929fda1b',
+        spanId: '5e0c63257de34c92',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+      const tracer = provider.getTracer('default') as Tracer;
+      const span = new SpanImpl({
+        scope: tracer.instrumentationScope,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
+        spanContext,
+        name: 'span-name',
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
+      processor.onStart(span, ROOT_CONTEXT);
+      processor.onEnd(span);
+
+      assert.strictEqual(processor['_pendingExports'].size, 1);
+
+      await processor.forceFlush();
+
+      assert.strictEqual(processor['_pendingExports'].size, 0);
+
+      const exportedSpans = testExporterWithDelay.getFinishedSpans();
+
+      assert.strictEqual(exportedSpans.length, 1);
+    });
+
+    it('should await doExport() and delete from _pendingExports with async resource', async () => {
       const testExporterWithDelay = new TestExporterWithDelay();
       const processor = new SimpleSpanProcessor(testExporterWithDelay);
 
       const providerWithAsyncResource = new BasicTracerProvider({
-        resource: new Resource({
-          attributes: {
-            async: new Promise<string>(resolve =>
-              setTimeout(() => resolve('fromasync'), 1)
-            ),
-          },
+        resource: resourceFromAttributes({
+          async: new Promise<string>(resolve =>
+            setTimeout(() => resolve('fromasync'), 1)
+          ),
         }),
       });
       const spanContext: SpanContext = {
@@ -249,11 +278,11 @@ describe('SimpleSpanProcessor', () => {
       processor.onStart(span, ROOT_CONTEXT);
       processor.onEnd(span);
 
-      assert.strictEqual(processor['_unresolvedExports'].size, 1);
+      assert.strictEqual(processor['_pendingExports'].size, 1);
 
       await processor.forceFlush();
 
-      assert.strictEqual(processor['_unresolvedExports'].size, 0);
+      assert.strictEqual(processor['_pendingExports'].size, 0);
 
       const exportedSpans = testExporterWithDelay.getFinishedSpans();
 

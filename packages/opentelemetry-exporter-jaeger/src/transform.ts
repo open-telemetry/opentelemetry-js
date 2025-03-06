@@ -43,8 +43,8 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
   const traceId = span.spanContext().traceId.padStart(32, '0');
   const traceIdHigh = traceId.slice(0, 16);
   const traceIdLow = traceId.slice(16);
-  const parentSpan = span.parentSpanId
-    ? Utils.encodeInt64(span.parentSpanId)
+  const parentSpan = span.parentSpanContext?.spanId
+    ? Utils.encodeInt64(span.parentSpanContext.spanId)
     : ThriftUtils.emptyBuffer;
 
   const tags = Object.keys(span.attributes).map(

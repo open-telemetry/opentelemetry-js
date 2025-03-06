@@ -23,7 +23,7 @@ import { MeterProviderSharedState } from '../../src/state/MeterProviderSharedSta
 import { MetricCollector } from '../../src/state/MetricCollector';
 import {
   defaultInstrumentationScope,
-  defaultResource,
+  testResource,
   assertMetricData,
   assertDataPoint,
   ObservableCallbackDelegate,
@@ -42,7 +42,7 @@ describe('MetricCollector', () => {
   describe('constructor', () => {
     it('should construct MetricCollector without exceptions', () => {
       const meterProviderSharedState = new MeterProviderSharedState(
-        defaultResource
+        testResource
       );
       const readers = [new TestMetricReader(), new TestDeltaMetricReader()];
       for (const reader of readers) {
@@ -57,7 +57,7 @@ describe('MetricCollector', () => {
     function setupInstruments() {
       const reader = new TestMetricReader();
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         readers: [reader],
       });
 

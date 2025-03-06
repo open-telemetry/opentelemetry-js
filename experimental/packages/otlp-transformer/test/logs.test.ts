@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 import { HrTime, TraceFlags } from '@opentelemetry/api';
-import { InstrumentationScope, hexToBinary } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import { InstrumentationScope } from '@opentelemetry/core';
+import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
@@ -29,6 +29,7 @@ import {
 import { createExportLogsServiceRequest } from '../src/logs/internal';
 import { ProtobufLogsSerializer } from '../src/logs/protobuf';
 import { JsonLogsSerializer } from '../src/logs/json';
+import { hexToBinary } from '../src/common/hex-to-binary';
 
 function createExpectedLogJson(
   options: OtlpEncodingOptions
@@ -165,15 +166,11 @@ describe('Logs', () => {
   let log_2_1_1: ReadableLogRecord;
 
   beforeEach(() => {
-    resource_1 = new Resource({
-      attributes: {
-        'resource-attribute': 'some attribute value',
-      },
+    resource_1 = resourceFromAttributes({
+      'resource-attribute': 'some attribute value',
     });
-    resource_2 = new Resource({
-      attributes: {
-        'resource-attribute': 'another attribute value',
-      },
+    resource_2 = resourceFromAttributes({
+      'resource-attribute': 'another attribute value',
     });
     scope_1 = {
       name: 'scope_name_1',

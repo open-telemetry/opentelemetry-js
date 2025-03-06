@@ -15,7 +15,10 @@
  */
 import { logs, NoopLogger } from '@opentelemetry/api-logs';
 import { diag } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
+import {
+  defaultResource,
+  resourceFromAttributes,
+} from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
@@ -26,14 +29,6 @@ import { MultiLogRecordProcessor } from '../../src/MultiLogRecordProcessor';
 import { Logger } from '../../src/Logger';
 
 describe('LoggerProvider', () => {
-  let envSource: Record<string, any>;
-
-  if (global.process?.versions?.node === undefined) {
-    envSource = globalThis as unknown as Record<string, any>;
-  } else {
-    envSource = process.env as Record<string, any>;
-  }
-
   beforeEach(() => {
     // to avoid actually registering the LoggerProvider and leaking env to other tests
     sinon.stub(logs, 'setGlobalLoggerProvider');
@@ -60,11 +55,11 @@ describe('LoggerProvider', () => {
       it('should have default resource if not pass', () => {
         const provider = new LoggerProvider();
         const { resource } = provider['_sharedState'];
-        assert.deepStrictEqual(resource, Resource.default());
+        assert.deepStrictEqual(resource, defaultResource());
       });
 
       it('should not have default resource if passed', function () {
-        const passedInResource = new Resource({ attributes: { foo: 'bar' } });
+        const passedInResource = resourceFromAttributes({ foo: 'bar' });
         const provider = new LoggerProvider({
           resource: passedInResource,
         });
@@ -131,21 +126,7 @@ describe('LoggerProvider', () => {
         });
       });
 
-      describe('when attribute value length limit is defined via env', () => {
-        it('should have attribute value length limit as default of Infinity', () => {
-          envSource.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = 'Infinity';
-          const loggerProvider = new LoggerProvider();
-          const logRecordLimits =
-            loggerProvider['_sharedState'].logRecordLimits;
-          assert.strictEqual(
-            logRecordLimits.attributeValueLengthLimit,
-            Infinity
-          );
-          delete envSource.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT;
-        });
-      });
-
-      describe('when attribute value length limit is not defined via env', () => {
+      describe('when attribute value length limit is not defined', () => {
         it('should use default value of Infinity', () => {
           const loggerProvider = new LoggerProvider();
           const logRecordLimits =
@@ -157,26 +138,7 @@ describe('LoggerProvider', () => {
         });
       });
 
-      describe('when attribute count limit is defined via env', () => {
-        it('should have attribute count limits as defined in env', () => {
-          envSource.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '35';
-          const loggerProvider = new LoggerProvider();
-          const logRecordLimits =
-            loggerProvider['_sharedState'].logRecordLimits;
-          assert.strictEqual(logRecordLimits.attributeCountLimit, 35);
-          delete envSource.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT;
-        });
-        it('should have attribute count limit as default of 128', () => {
-          envSource.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '128';
-          const loggerProvider = new LoggerProvider();
-          const logRecordLimits =
-            loggerProvider['_sharedState'].logRecordLimits;
-          assert.strictEqual(logRecordLimits.attributeCountLimit, 128);
-          delete envSource.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT;
-        });
-      });
-
-      describe('when attribute count limit is not defined via env', () => {
+      describe('when attribute count limit is not defined', () => {
         it('should use default value of 128', () => {
           const loggerProvider = new LoggerProvider();
           const logRecordLimits =

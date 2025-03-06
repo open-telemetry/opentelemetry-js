@@ -1,23 +1,16 @@
 'use strict';
 
 const opentelemetry = require('@opentelemetry/api');
-const { Resource } = require('@opentelemetry/resources');
+const { resourceFromAttributes } = require('@opentelemetry/resources');
 const { SEMRESATTRS_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
+const { AsyncLocalStorageContextManager } = require("@opentelemetry/context-async-hooks");
+const {CompositePropagator, W3CTraceContextPropagator, W3CBaggagePropagator} = require("@opentelemetry/core");
 
 // Configure span processor to send spans to the exporter
 const exporter = new JaegerExporter({
   endpoint: 'http://localhost:14268/api/traces',
-});
-const provider = new BasicTracerProvider({
-  resource: new Resource({
-    [SEMRESATTRS_SERVICE_NAME]: 'basic-service',
-  }),
-  spanProcessors: [
-    new SimpleSpanProcessor(exporter),
-    new SimpleSpanProcessor(new ConsoleSpanExporter()),
-  ]
 });
 
 /**
@@ -29,7 +22,21 @@ const provider = new BasicTracerProvider({
  * do not register a global tracer provider, instrumentation which calls these
  * methods will receive no-op implementations.
  */
-provider.register();
+opentelemetry.trace.setGlobalTracerProvider(new BasicTracerProvider({
+  resource: resourceFromAttributes({
+    [SEMRESATTRS_SERVICE_NAME]: 'basic-service',
+  }),
+  spanProcessors: [
+    new SimpleSpanProcessor(exporter),
+    new SimpleSpanProcessor(new ConsoleSpanExporter()),
+  ]
+}));
+opentelemetry.context.setGlobalContextManager(new AsyncLocalStorageContextManager());
+opentelemetry.propagation.setGlobalPropagator(new CompositePropagator({ propagators: [
+  new W3CTraceContextPropagator(),
+    new W3CBaggagePropagator()]
+}));
+
 const tracer = opentelemetry.trace.getTracer('example-basic-tracer-node');
 
 // Create a span. A span must be closed.

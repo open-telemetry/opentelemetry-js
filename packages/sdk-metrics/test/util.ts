@@ -22,7 +22,10 @@ import {
   ValueType,
 } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import {
+  defaultResource,
+  resourceFromAttributes,
+} from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { InstrumentDescriptor } from '../src/InstrumentDescriptor';
 import {
@@ -43,10 +46,8 @@ export type Measurement = {
   context?: Context;
 };
 
-export const defaultResource = Resource.default().merge(
-  new Resource({
-    attributes: { resourceKey: 'my-resource' },
-  })
+export const testResource = defaultResource().merge(
+  resourceFromAttributes({ resourceKey: 'my-resource' })
 );
 
 export const defaultInstrumentDescriptor: InstrumentDescriptor = {
