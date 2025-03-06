@@ -240,7 +240,7 @@ describe('time', () => {
         millisecondsToNanoseconds(123.123_456_789),
         123_123_457n
       );
-      assert.strictEqual(millisecondsToNanoseconds(1066.969834), 1066969834);
+      assert.strictEqual(millisecondsToNanoseconds(1066.969834), 1066969834n);
     });
   });
 
