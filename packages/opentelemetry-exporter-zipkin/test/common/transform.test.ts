@@ -93,6 +93,7 @@ describe('transform', () => {
           {
             name: 'my-event',
             timeUnixNano: millisecondsToNanoseconds(Date.now() + 5),
+            time: [0, 0],
             attributes: { key3: 'value 3' },
           },
         ],
@@ -337,10 +338,12 @@ describe('transform', () => {
           {
             name: 'my-event1',
             timeUnixNano: BigInt(now) * 1_000_000n,
+            time: [0, 0],
           },
           {
             name: 'my-event2',
             timeUnixNano: BigInt(now + 10) * 1_000_000n,
+            time: [0, 0],
             attributes: { key1: 'value1' },
           },
         ],

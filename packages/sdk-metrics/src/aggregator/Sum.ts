@@ -25,10 +25,11 @@ import { DataPointType, SumMetricData } from '../export/MetricData';
 import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
+import { nanosToHrTime } from '@opentelemetry/core';
 
 export class SumAccumulation implements Accumulation {
   constructor(
-    public startTime: bigint,
+    public startTimeUnixNano: bigint,
     public monotonic: boolean,
     private _current: number = 0,
     public reset = false
@@ -41,8 +42,8 @@ export class SumAccumulation implements Accumulation {
     this._current += value;
   }
 
-  setStartTime(startTime: bigint): void {
-    this.startTime = startTime;
+  setStartTime(startTimeUnixNano: bigint): void {
+    this.startTimeUnixNano = startTimeUnixNano;
   }
 
   toPointValue(): Sum {
@@ -56,8 +57,8 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
 
   constructor(public monotonic: boolean) {}
 
-  createAccumulation(startTime: bigint) {
-    return new SumAccumulation(startTime, this.monotonic);
+  createAccumulation(startTimeUnixNano: bigint) {
+    return new SumAccumulation(startTimeUnixNano, this.monotonic);
   }
 
   /**
@@ -68,14 +69,14 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
     const deltaPv = delta.toPointValue();
     if (delta.reset) {
       return new SumAccumulation(
-        delta.startTime,
+        delta.startTimeUnixNano,
         this.monotonic,
         deltaPv,
         delta.reset
       );
     }
     return new SumAccumulation(
-      previous.startTime,
+      previous.startTimeUnixNano,
       this.monotonic,
       prevPv + deltaPv
     );
@@ -94,14 +95,14 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
      */
     if (this.monotonic && prevPv > currPv) {
       return new SumAccumulation(
-        current.startTime,
+        current.startTimeUnixNano,
         this.monotonic,
         currPv,
         true
       );
     }
     return new SumAccumulation(
-      current.startTime,
+      current.startTimeUnixNano,
       this.monotonic,
       currPv - prevPv
     );
@@ -111,7 +112,7 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
     descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<SumAccumulation>[],
-    endTime: bigint
+    endTimeUnixNano: bigint
   ): Maybe<SumMetricData> {
     return {
       descriptor,
@@ -120,8 +121,10 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
       dataPoints: accumulationByAttributes.map(([attributes, accumulation]) => {
         return {
           attributes,
-          startTime: accumulation.startTime,
-          endTime,
+          startTimeUnixNano: accumulation.startTimeUnixNano,
+          startTime: nanosToHrTime(accumulation.startTimeUnixNano),
+          endTimeUnixNano,
+          endTime: nanosToHrTime(endTimeUnixNano),
           value: accumulation.toPointValue(),
         };
       }),

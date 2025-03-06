@@ -36,12 +36,12 @@ describe('cumulative-exponential-histogram', () => {
     sinon.restore();
   });
 
-  it('Cumulative Histogram should have the same startTime every collection', async () => {
+  it('Cumulative Histogram should have the same startTimeUnixNano every collection', async () => {
     // Works fine and passes
     await doTest({ type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM });
   });
 
-  it('Cumulative ExponentialHistogram should have the same startTime every collection', async () => {
+  it('Cumulative ExponentialHistogram should have the same startTimeUnixNano every collection', async () => {
     // Fails
     await doTest({ type: AggregationType.EXPONENTIAL_HISTOGRAM });
   });
@@ -78,8 +78,8 @@ describe('cumulative-exponential-histogram', () => {
       resourceMetrics2.scopeMetrics[0].metrics[0].dataPoints[0];
 
     assert.deepStrictEqual(
-      dataPoint1.startTime,
-      dataPoint2.startTime,
+      dataPoint1.startTimeUnixNano,
+      dataPoint2.startTimeUnixNano,
       'The start time should be the same across cumulative collections'
     );
   };

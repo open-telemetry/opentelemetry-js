@@ -149,7 +149,7 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
       instrumentDescriptor,
       aggregationTemporality,
       accumulationRecords,
-      /* endTime */ collectionTime
+      /* endTimeUnixNano */ collectionTime
     );
   }
 

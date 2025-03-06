@@ -282,7 +282,7 @@ export class PrometheusSerializer {
 
     name = enforcePrometheusNamingConvention(name, data);
     const { value, attributes } = dataPoint;
-    const timestamp = nanosecondsToMilliseconds(dataPoint.endTime);
+    const timestamp = nanosecondsToMilliseconds(dataPoint.endTimeUnixNano);
     results += stringify(
       name,
       attributes,
@@ -303,7 +303,7 @@ export class PrometheusSerializer {
     name = enforcePrometheusNamingConvention(name, data);
     const attributes = dataPoint.attributes;
     const histogram = dataPoint.value;
-    const timestamp = nanosecondsToMilliseconds(dataPoint.endTime);
+    const timestamp = nanosecondsToMilliseconds(dataPoint.endTimeUnixNano);
     /** Histogram["bucket"] is not typed with `number` */
     for (const key of ['count', 'sum'] as ('count' | 'sum')[]) {
       const value = histogram[key];

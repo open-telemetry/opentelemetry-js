@@ -50,14 +50,14 @@ describe('DropAggregator', () => {
     it('no exceptions', () => {
       const aggregator = new DropAggregator();
 
-      const endTime = 1_000_000_001n;
+      const endTimeUnixNano = 1_000_000_001n;
 
       assert.strictEqual(
         aggregator.toMetricData(
           defaultInstrumentDescriptor,
           AggregationTemporality.CUMULATIVE,
           [[{}, undefined]],
-          endTime
+          endTimeUnixNano
         ),
         undefined
       );

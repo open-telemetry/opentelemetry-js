@@ -256,6 +256,7 @@ describe('Trace', () => {
         {
           name: 'some event',
           timeUnixNano: 1640715558542725388n,
+          time: [0, 0],
           attributes: {
             'event-attribute': 'some string value',
           },

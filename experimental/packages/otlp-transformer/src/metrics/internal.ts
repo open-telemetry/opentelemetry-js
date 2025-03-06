@@ -118,8 +118,8 @@ function toSingularDataPoint(
 ) {
   const out: INumberDataPoint = {
     attributes: toAttributes(dataPoint.attributes),
-    startTimeUnixNano: encoder.encodeBigIntNanos(dataPoint.startTime),
-    timeUnixNano: encoder.encodeBigIntNanos(dataPoint.endTime),
+    startTimeUnixNano: encoder.encodeBigIntNanos(dataPoint.startTimeUnixNano),
+    timeUnixNano: encoder.encodeBigIntNanos(dataPoint.endTimeUnixNano),
   };
 
   switch (valueType) {
@@ -161,8 +161,8 @@ function toHistogramDataPoints(
       sum: histogram.sum,
       min: histogram.min,
       max: histogram.max,
-      startTimeUnixNano: encoder.encodeBigIntNanos(dataPoint.startTime),
-      timeUnixNano: encoder.encodeBigIntNanos(dataPoint.endTime),
+      startTimeUnixNano: encoder.encodeBigIntNanos(dataPoint.startTimeUnixNano),
+      timeUnixNano: encoder.encodeBigIntNanos(dataPoint.endTimeUnixNano),
     };
   });
 }
@@ -189,8 +189,8 @@ function toExponentialHistogramDataPoints(
       },
       scale: histogram.scale,
       zeroCount: histogram.zeroCount,
-      startTimeUnixNano: encoder.encodeBigIntNanos(dataPoint.startTime),
-      timeUnixNano: encoder.encodeBigIntNanos(dataPoint.endTime),
+      startTimeUnixNano: encoder.encodeBigIntNanos(dataPoint.startTimeUnixNano),
+      timeUnixNano: encoder.encodeBigIntNanos(dataPoint.endTimeUnixNano),
     };
   });
 }

@@ -72,7 +72,7 @@ describe('LastValueAggregator', () => {
       assert.deepStrictEqual(
         aggregator.merge(accumulation1, accumulation2),
         new LastValueAccumulation(
-          accumulation1.startTime,
+          accumulation1.startTimeUnixNano,
           4,
           accumulation1.sampleTime
         )
@@ -80,7 +80,7 @@ describe('LastValueAggregator', () => {
       assert.deepStrictEqual(
         aggregator.merge(accumulation2, accumulation1),
         new LastValueAccumulation(
-          accumulation2.startTime,
+          accumulation2.startTimeUnixNano,
           4,
           accumulation1.sampleTime
         )
@@ -120,7 +120,7 @@ describe('LastValueAggregator', () => {
       assert.deepStrictEqual(
         aggregator.diff(accumulation1, accumulation2),
         new LastValueAccumulation(
-          accumulation2.startTime,
+          accumulation2.startTimeUnixNano,
           4,
           accumulation1.sampleTime
         )
@@ -128,7 +128,7 @@ describe('LastValueAggregator', () => {
       assert.deepStrictEqual(
         aggregator.diff(accumulation2, accumulation1),
         new LastValueAccumulation(
-          accumulation1.startTime,
+          accumulation1.startTimeUnixNano,
           4,
           accumulation1.sampleTime
         )
@@ -140,9 +140,9 @@ describe('LastValueAggregator', () => {
     it('transform without exception', () => {
       const aggregator = new LastValueAggregator();
 
-      const startTime = 0n;
-      const endTime = 1_000_000_001n;
-      const accumulation = aggregator.createAccumulation(startTime);
+      const startTimeUnixNano = 0n;
+      const endTimeUnixNano = 1_000_000_001n;
+      const accumulation = aggregator.createAccumulation(startTimeUnixNano);
       accumulation.record(1);
       accumulation.record(2);
       accumulation.record(1);
@@ -155,8 +155,10 @@ describe('LastValueAggregator', () => {
         dataPoints: [
           {
             attributes: {},
-            startTime,
-            endTime,
+            startTimeUnixNano,
+            endTimeUnixNano,
+            startTime: [0, 0],
+            endTime: [1, 1],
             value: 4,
           },
         ],
@@ -166,7 +168,7 @@ describe('LastValueAggregator', () => {
           defaultInstrumentDescriptor,
           AggregationTemporality.CUMULATIVE,
           [[{}, accumulation]],
-          endTime
+          endTimeUnixNano
         ),
         expected
       );
@@ -189,7 +191,7 @@ describe('LastValueAccumulation', () => {
     it('should set start time', () => {
       const accumulation = new LastValueAccumulation(0n);
       accumulation.setStartTime(1_000_000_001n);
-      assert.deepStrictEqual(accumulation.startTime, 1_000_000_001n);
+      assert.deepStrictEqual(accumulation.startTimeUnixNano, 1_000_000_001n);
     });
   });
 });

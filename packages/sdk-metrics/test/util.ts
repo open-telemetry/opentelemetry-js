@@ -124,25 +124,29 @@ export function assertDataPoint(
   actual: unknown,
   attributes: Attributes,
   point: Histogram | number,
-  startTime?: bigint,
-  endTime?: bigint
+  startTimeUnixNano?: bigint,
+  endTimeUnixNano?: bigint
 ): asserts actual is DataPoint<unknown> {
   const it = actual as DataPoint<unknown>;
   assert.deepStrictEqual(it.attributes, attributes);
   assert.deepStrictEqual(it.value, point);
-  if (startTime) {
+  if (startTimeUnixNano) {
     assert.deepStrictEqual(
-      it.startTime,
-      startTime,
-      'startTime should be equal'
+      it.startTimeUnixNano,
+      startTimeUnixNano,
+      'startTimeUnixNano should be equal'
     );
   } else {
-    assert.ok(typeof it.startTime === 'bigint');
+    assert.ok(typeof it.startTimeUnixNano === 'bigint');
   }
-  if (endTime) {
-    assert.deepStrictEqual(it.endTime, endTime, 'endTime should be equal');
+  if (endTimeUnixNano) {
+    assert.deepStrictEqual(
+      it.endTimeUnixNano,
+      endTimeUnixNano,
+      'endTimeUnixNano should be equal'
+    );
   } else {
-    assert.ok(typeof it.endTime === 'bigint');
+    assert.ok(typeof it.endTimeUnixNano === 'bigint');
   }
 }
 

@@ -589,13 +589,13 @@ describe('ExponentialHistogramAggregation', () => {
       assert.deepStrictEqual(acc1.toPointValue(), acc1Snapshot);
     });
 
-    it("keeps the previous point's startTime", () => {
+    it("keeps the previous point's startTimeUnixNano", () => {
       const agg = new ExponentialHistogramAggregator(4, true);
       const acc0 = agg.createAccumulation(0n);
       const acc1 = agg.createAccumulation(3_000_000_000n);
 
       const result = agg.merge(acc0, acc1);
-      assert.strictEqual(result.startTime, acc0.startTime);
+      assert.strictEqual(result.startTimeUnixNano, acc0.startTimeUnixNano);
     });
     it('handles zero-length buckets in source histogram', () => {
       // https://github.com/open-telemetry/opentelemetry-js/issues/4450
@@ -681,11 +681,11 @@ describe('ExponentialHistogramAggregation', () => {
 
   describe('toMetricData', () => {
     it('should transform to expected data with recordMinMax = true', () => {
-      const startTime = 0n;
-      const endTime = 1_000_000_001n;
+      const startTimeUnixNano = 0n;
+      const endTimeUnixNano = 1_000_000_001n;
 
       const agg = new ExponentialHistogramAggregator(4, true);
-      const acc = agg.createAccumulation(startTime);
+      const acc = agg.createAccumulation(startTimeUnixNano);
 
       acc.record(2);
       acc.record(-2);
@@ -696,7 +696,7 @@ describe('ExponentialHistogramAggregation', () => {
         defaultInstrumentDescriptor,
         AggregationTemporality.CUMULATIVE,
         [[{}, acc]],
-        endTime
+        endTimeUnixNano
       );
 
       const expected: MetricData = {
@@ -706,8 +706,10 @@ describe('ExponentialHistogramAggregation', () => {
         dataPoints: [
           {
             attributes: {},
-            startTime,
-            endTime,
+            startTimeUnixNano,
+            endTimeUnixNano,
+            startTime: [0, 0],
+            endTime: [1, 1],
             value: {
               min: -4,
               max: 4,
@@ -732,11 +734,11 @@ describe('ExponentialHistogramAggregation', () => {
     });
 
     it('should transform to expected data with recordMinMax = false', () => {
-      const startTime = 0n;
-      const endTime = 1_000_000_001n;
+      const startTimeUnixNano = 0n;
+      const endTimeUnixNano = 1_000_000_001n;
 
       const agg = new ExponentialHistogramAggregator(4, false);
-      const acc = agg.createAccumulation(startTime);
+      const acc = agg.createAccumulation(startTimeUnixNano);
 
       acc.record(2);
       acc.record(-2);
@@ -747,7 +749,7 @@ describe('ExponentialHistogramAggregation', () => {
         defaultInstrumentDescriptor,
         AggregationTemporality.CUMULATIVE,
         [[{}, acc]],
-        endTime
+        endTimeUnixNano
       );
 
       const expected: MetricData = {
@@ -757,8 +759,10 @@ describe('ExponentialHistogramAggregation', () => {
         dataPoints: [
           {
             attributes: {},
-            startTime,
-            endTime,
+            startTimeUnixNano,
+            endTimeUnixNano,
+            startTime: [0, 0],
+            endTime: [1, 1],
             value: {
               min: undefined,
               max: undefined,
@@ -785,10 +789,10 @@ describe('ExponentialHistogramAggregation', () => {
     function testSum(instrumentType: InstrumentType, expectSum: boolean) {
       const agg = new ExponentialHistogramAggregator(4, true);
 
-      const startTime = 0n;
-      const endTime = 1_000_000_001n;
+      const startTimeUnixNano = 0n;
+      const endTimeUnixNano = 1_000_000_001n;
 
-      const acc = agg.createAccumulation(startTime);
+      const acc = agg.createAccumulation(startTimeUnixNano);
       acc.record(0);
       acc.record(1);
       acc.record(4);
@@ -804,7 +808,7 @@ describe('ExponentialHistogramAggregation', () => {
         },
         AggregationTemporality.CUMULATIVE,
         [[{}, acc]],
-        endTime
+        endTimeUnixNano
       );
 
       assert.notStrictEqual(aggregatedData, undefined);

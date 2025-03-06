@@ -176,9 +176,9 @@ describe('HistogramAggregator', () => {
     it('should transform to expected data with recordMinMax = true', () => {
       const aggregator = new HistogramAggregator([1, 10, 100], true);
 
-      const startTime = 0n;
-      const endTime = 1_000_000_001n;
-      const accumulation = aggregator.createAccumulation(startTime);
+      const startTimeUnixNano = 0n;
+      const endTimeUnixNano = 1_000_000_001n;
+      const accumulation = aggregator.createAccumulation(startTimeUnixNano);
       accumulation.record(0);
       accumulation.record(1);
 
@@ -189,8 +189,10 @@ describe('HistogramAggregator', () => {
         dataPoints: [
           {
             attributes: {},
-            startTime,
-            endTime,
+            startTimeUnixNano,
+            endTimeUnixNano,
+            startTime: [0, 0],
+            endTime: [1, 1],
             value: {
               buckets: {
                 boundaries: [1, 10, 100],
@@ -209,7 +211,7 @@ describe('HistogramAggregator', () => {
           defaultInstrumentDescriptor,
           AggregationTemporality.CUMULATIVE,
           [[{}, accumulation]],
-          endTime
+          endTimeUnixNano
         ),
         expected
       );
@@ -218,9 +220,9 @@ describe('HistogramAggregator', () => {
     it('should transform to expected data with recordMinMax = false', () => {
       const aggregator = new HistogramAggregator([1, 10, 100], false);
 
-      const startTime = 0n;
-      const endTime = 1_000_000_001n;
-      const accumulation = aggregator.createAccumulation(startTime);
+      const startTimeUnixNano = 0n;
+      const endTimeUnixNano = 1_000_000_001n;
+      const accumulation = aggregator.createAccumulation(startTimeUnixNano);
       accumulation.record(0);
       accumulation.record(1);
 
@@ -231,8 +233,10 @@ describe('HistogramAggregator', () => {
         dataPoints: [
           {
             attributes: {},
-            startTime,
-            endTime,
+            startTimeUnixNano,
+            endTimeUnixNano,
+            startTime: [0, 0],
+            endTime: [1, 1],
             value: {
               buckets: {
                 boundaries: [1, 10, 100],
@@ -251,7 +255,7 @@ describe('HistogramAggregator', () => {
           defaultInstrumentDescriptor,
           AggregationTemporality.CUMULATIVE,
           [[{}, accumulation]],
-          endTime
+          endTimeUnixNano
         ),
         expected
       );
@@ -260,9 +264,9 @@ describe('HistogramAggregator', () => {
     it('should transform to expected data with empty boundaries', () => {
       const aggregator = new HistogramAggregator([], false);
 
-      const startTime = 0n;
-      const endTime = 1_000_000_001n;
-      const accumulation = aggregator.createAccumulation(startTime);
+      const startTimeUnixNano = 0n;
+      const endTimeUnixNano = 1_000_000_001n;
+      const accumulation = aggregator.createAccumulation(startTimeUnixNano);
       accumulation.record(0);
       accumulation.record(1);
 
@@ -273,8 +277,10 @@ describe('HistogramAggregator', () => {
         dataPoints: [
           {
             attributes: {},
-            startTime,
-            endTime,
+            startTimeUnixNano,
+            endTimeUnixNano,
+            startTime: [0, 0],
+            endTime: [1, 1],
             value: {
               buckets: {
                 boundaries: [],
@@ -293,7 +299,7 @@ describe('HistogramAggregator', () => {
           defaultInstrumentDescriptor,
           AggregationTemporality.CUMULATIVE,
           [[{}, accumulation]],
-          endTime
+          endTimeUnixNano
         ),
         expected
       );
@@ -302,10 +308,10 @@ describe('HistogramAggregator', () => {
     function testSum(instrumentType: InstrumentType, expectSum: boolean) {
       const aggregator = new HistogramAggregator([1, 10, 100], true);
 
-      const startTime = 0n;
-      const endTime = 1_000_000_001n;
+      const startTimeUnixNano = 0n;
+      const endTimeUnixNano = 1_000_000_001n;
 
-      const accumulation = aggregator.createAccumulation(startTime);
+      const accumulation = aggregator.createAccumulation(startTimeUnixNano);
       accumulation.record(0);
       accumulation.record(1);
       accumulation.record(4);
@@ -321,7 +327,7 @@ describe('HistogramAggregator', () => {
         },
         AggregationTemporality.CUMULATIVE,
         [[{}, accumulation]],
-        endTime
+        endTimeUnixNano
       );
 
       assert.notStrictEqual(aggregatedData, undefined);
@@ -377,7 +383,7 @@ describe('HistogramAccumulation', () => {
     it('should set start time', () => {
       const accumulation = new HistogramAccumulation(0n, [1, 10, 100]);
       accumulation.setStartTime(1_000_000_001n);
-      assert.deepStrictEqual(accumulation.startTime, 1_000_000_001n);
+      assert.deepStrictEqual(accumulation.startTimeUnixNano, 1_000_000_001n);
     });
   });
 });

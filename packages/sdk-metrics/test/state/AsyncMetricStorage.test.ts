@@ -337,7 +337,7 @@ describe('AsyncMetricStorage', () => {
           observableResult.observe(2, { key: '2' });
           observableResult.observe(3, { key: '3' });
         });
-        let startTime: bigint;
+        let startTimeUnixNano: bigint;
         {
           const collectionTime = 0n;
           await observableRegistry.observe(collectionTime);
@@ -346,28 +346,28 @@ describe('AsyncMetricStorage', () => {
             collectionTime
           );
 
-          startTime = collectionTime;
+          startTimeUnixNano = collectionTime;
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 3);
           assertDataPoint(
             metric.dataPoints[0],
             { key: '1' },
             1,
-            startTime,
+            startTimeUnixNano,
             collectionTime
           );
           assertDataPoint(
             metric.dataPoints[1],
             { key: '2' },
             2,
-            startTime,
+            startTimeUnixNano,
             collectionTime
           );
           assertDataPoint(
             metric.dataPoints[2],
             { key: '3' },
             3,
-            startTime,
+            startTimeUnixNano,
             collectionTime
           );
         }
@@ -388,21 +388,21 @@ describe('AsyncMetricStorage', () => {
             metric.dataPoints[0],
             { key: '1' },
             1,
-            startTime,
+            startTimeUnixNano,
             collectionTime
           );
           assertDataPoint(
             metric.dataPoints[1],
             { key: '2' },
             2,
-            startTime,
+            startTimeUnixNano,
             collectionTime
           );
           assertDataPoint(
             metric.dataPoints[2],
             { key: '3' },
             3,
-            startTime,
+            startTimeUnixNano,
             collectionTime
           );
         }
@@ -426,21 +426,21 @@ describe('AsyncMetricStorage', () => {
             metric.dataPoints[0],
             { key: '1' },
             4,
-            startTime,
+            startTimeUnixNano,
             collectionTime
           );
           assertDataPoint(
             metric.dataPoints[1],
             { key: '2' },
             5,
-            startTime,
+            startTimeUnixNano,
             collectionTime
           );
           assertDataPoint(
             metric.dataPoints[2],
             { key: '3' },
             6,
-            startTime,
+            startTimeUnixNano,
             collectionTime
           );
         }
@@ -468,7 +468,7 @@ describe('AsyncMetricStorage', () => {
         delegate.setDelegate(observableResult => {
           observableResult.observe(100, { key: '1' });
         });
-        let startTime: bigint;
+        let startTimeUnixNano: bigint;
         {
           const collectionTime = 0n;
           await observableRegistry.observe(collectionTime);
@@ -477,14 +477,14 @@ describe('AsyncMetricStorage', () => {
             collectionTime
           );
 
-          startTime = collectionTime;
+          startTimeUnixNano = collectionTime;
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(
             metric.dataPoints[0],
             { key: '1' },
             100,
-            startTime,
+            startTimeUnixNano,
             collectionTime
           );
         }
@@ -504,7 +504,7 @@ describe('AsyncMetricStorage', () => {
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
-          // The startTime should be reset.
+          // The startTimeUnixNano should be reset.
           assertDataPoint(
             metric.dataPoints[0],
             { key: '1' },
@@ -512,7 +512,7 @@ describe('AsyncMetricStorage', () => {
             collectionTime,
             collectionTime
           );
-          startTime = collectionTime;
+          startTimeUnixNano = collectionTime;
         }
 
         // Observe a new data point
@@ -534,7 +534,7 @@ describe('AsyncMetricStorage', () => {
             metric.dataPoints[0],
             { key: '1' },
             50,
-            startTime,
+            startTimeUnixNano,
             collectionTime
           );
         }
@@ -562,7 +562,7 @@ describe('AsyncMetricStorage', () => {
         delegate.setDelegate(observableResult => {
           observableResult.observe(100, { key: '1' });
         });
-        let startTime: bigint;
+        let startTimeUnixNano: bigint;
         {
           const collectionTime = 0n;
           await observableRegistry.observe(collectionTime);
@@ -571,14 +571,14 @@ describe('AsyncMetricStorage', () => {
             collectionTime
           );
 
-          startTime = collectionTime;
+          startTimeUnixNano = collectionTime;
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(
             metric.dataPoints[0],
             { key: '1' },
             100,
-            startTime,
+            startTimeUnixNano,
             collectionTime
           );
         }
@@ -598,12 +598,12 @@ describe('AsyncMetricStorage', () => {
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
-          // No reset on the value or the startTime
+          // No reset on the value or the startTimeUnixNano
           assertDataPoint(
             metric.dataPoints[0],
             { key: '1' },
             1,
-            startTime,
+            startTimeUnixNano,
             collectionTime
           );
         }
@@ -627,7 +627,7 @@ describe('AsyncMetricStorage', () => {
             metric.dataPoints[0],
             { key: '1' },
             50,
-            startTime,
+            startTimeUnixNano,
             collectionTime
           );
         }

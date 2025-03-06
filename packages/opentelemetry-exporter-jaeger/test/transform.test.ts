@@ -75,6 +75,7 @@ describe('transform', () => {
               error: true,
             },
             timeUnixNano: 1566156729000000809n,
+            time: [0, 0],
           },
         ],
         resource: resourceFromAttributes({
@@ -368,6 +369,7 @@ describe('transform', () => {
               error: true,
             },
             timeUnixNano: 1566156729000000809n,
+            time: [0, 0],
           },
         ],
         resource: resourceFromAttributes({

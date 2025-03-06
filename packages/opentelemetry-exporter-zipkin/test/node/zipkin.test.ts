@@ -176,6 +176,7 @@ describe('Zipkin Exporter - node', () => {
             timeUnixNano:
               millisecondsToNanoseconds(startTime) +
               millisecondsToNanoseconds(10),
+            time: [0, 0],
             attributes: { key3: 'value3' },
           },
         ],
@@ -407,6 +408,7 @@ describe('Zipkin Exporter - node', () => {
         {
           name: 'my-event',
           timeUnixNano: millisecondsToNanoseconds(startTime) + 10_000_000_000n,
+          time: [0, 0],
           attributes: { key3: 'value3' },
         },
       ],
@@ -515,6 +517,7 @@ describe('Zipkin Exporter - node', () => {
         {
           name: 'my-event',
           timeUnixNano: millisecondsToNanoseconds(startTime) + 10_000_000_000n,
+          time: [0, 0],
           attributes: { key3: 'value3' },
         },
       ],

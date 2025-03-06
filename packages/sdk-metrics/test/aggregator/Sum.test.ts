@@ -83,9 +83,9 @@ describe('SumAggregator', () => {
     it('transform without exception', () => {
       const aggregator = new SumAggregator(true);
 
-      const startTime = 0n;
-      const endTime = 1_000_000_001n;
-      const accumulation = aggregator.createAccumulation(startTime);
+      const startTimeUnixNano = 0n;
+      const endTimeUnixNano = 1_000_000_001n;
+      const accumulation = aggregator.createAccumulation(startTimeUnixNano);
       accumulation.record(1);
       accumulation.record(2);
 
@@ -97,8 +97,10 @@ describe('SumAggregator', () => {
         dataPoints: [
           {
             attributes: {},
-            startTime,
-            endTime,
+            startTimeUnixNano,
+            endTimeUnixNano,
+            startTime: [0, 0],
+            endTime: [1, 1],
             value: 3,
           },
         ],
@@ -108,7 +110,7 @@ describe('SumAggregator', () => {
           defaultInstrumentDescriptor,
           AggregationTemporality.CUMULATIVE,
           [[{}, accumulation]],
-          endTime
+          endTimeUnixNano
         ),
         expected
       );
@@ -140,7 +142,7 @@ describe('SumAccumulation', () => {
     it('should set start time', () => {
       const accumulation = new SumAccumulation(0n, true);
       accumulation.setStartTime(1_000_000_001n);
-      assert.deepStrictEqual(accumulation.startTime, 1_000_000_001n);
+      assert.deepStrictEqual(accumulation.startTimeUnixNano, 1_000_000_001n);
     });
   });
 });

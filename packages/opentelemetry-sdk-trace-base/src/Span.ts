@@ -234,11 +234,13 @@ export class SpanImpl implements Span {
     }
 
     const attributes = sanitizeAttributes(attributesOrStartTime);
+    const timeUnixNano = this._getTime(timeStamp);
 
     this.events.push({
       name,
       attributes,
-      timeUnixNano: this._getTime(timeStamp),
+      timeUnixNano,
+      time: nanosToHrTime(timeUnixNano),
       droppedAttributesCount: 0,
     });
     return this;

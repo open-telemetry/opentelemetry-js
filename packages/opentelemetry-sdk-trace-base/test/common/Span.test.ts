@@ -141,7 +141,7 @@ describe('Span', () => {
       spanProcessor: tracer['_spanProcessor'],
     });
     // browsers may return the same timestamp twice if performance timer is called in quick succession to prevent timing attacks
-    await new Promise((resolve) => setTimeout(resolve, 10));
+    await new Promise(resolve => setTimeout(resolve, 10));
     span.end();
     assert.ok(span.endTimeUnixNano != null);
     assert.ok(span.endTimeUnixNano > span.startTimeUnixNano);
