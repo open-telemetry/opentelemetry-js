@@ -366,7 +366,9 @@ describe('utils', () => {
     beforeEach(() => {
       const time = createHrTime(startTime, 500);
       sinon.stub(performance, 'timeOrigin').value(0);
-      sinon.stub(performance, 'now').callsFake(() => Number(hrTimeToNanoseconds(time)));
+      sinon
+        .stub(performance, 'now')
+        .callsFake(() => Number(hrTimeToNanoseconds(time)));
     });
 
     describe('when resources are empty', () => {
