@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { TraceFlags } from '@opentelemetry/api';
+import { HrTime, TraceFlags } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -183,6 +183,8 @@ describe('Logs', () => {
     const log_fragment_1 = {
       timeUnixNano: 1680253513123241635n,
       timeUnixNanoObserved: 1683526948965142784n,
+      hrTime: [1680253513, 123241635] as HrTime,
+      hrTimeObserved: [1683526948, 965142784] as HrTime,
       attributes: {
         'some-attribute': 'some attribute value',
       },
@@ -199,6 +201,8 @@ describe('Logs', () => {
     const log_fragment_2 = {
       timeUnixNano: 1680253797687038506n,
       timeUnixNanoObserved: 1680253797687038506n,
+      hrTime: [1680253797, 687038506] as HrTime,
+      hrTimeObserved: [1680253797, 687038506] as HrTime,
       attributes: {
         'another-attribute': 'another attribute value',
       },

@@ -17,7 +17,11 @@
 import { AttributeValue, diag } from '@opentelemetry/api';
 import type * as logsAPI from '@opentelemetry/api-logs';
 import * as api from '@opentelemetry/api';
-import { isAttributeValue, InstrumentationScope } from '@opentelemetry/core';
+import {
+  isAttributeValue,
+  InstrumentationScope,
+  nanosToHrTime,
+} from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
@@ -25,6 +29,7 @@ import type { LogRecordLimits } from './types';
 import { AnyValue, LogAttributes, LogBody } from '@opentelemetry/api-logs';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 import { timeInputToNano } from '@opentelemetry/core';
+import { HrTime } from '@opentelemetry/api';
 
 export class LogRecord implements ReadableLogRecord {
   readonly timeUnixNano: bigint;
@@ -73,6 +78,14 @@ export class LogRecord implements ReadableLogRecord {
 
   get droppedAttributesCount(): number {
     return this.totalAttributesCount - Object.keys(this.attributes).length;
+  }
+
+  get hrTime(): HrTime {
+    return nanosToHrTime(this.timeUnixNano);
+  }
+
+  get hrTimeObserved(): HrTime {
+    return nanosToHrTime(this.timeUnixNanoObserved);
   }
 
   constructor(
