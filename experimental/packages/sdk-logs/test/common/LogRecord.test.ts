@@ -40,7 +40,7 @@ import {
   millisecondsToNanoseconds,
   timeInputToNano,
   getTimeOrigin,
-} from '@opentelemetry/core/src/common/time';
+} from '@opentelemetry/core';
 
 const setup = (logRecordLimits?: LogRecordLimits, data?: logsAPI.LogRecord) => {
   const instrumentationScope = {

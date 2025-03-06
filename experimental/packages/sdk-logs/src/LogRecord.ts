@@ -24,7 +24,7 @@ import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
 import { AnyValue, LogAttributes, LogBody } from '@opentelemetry/api-logs';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
-import { timeInputToNano } from '@opentelemetry/core/src/common/time';
+import { timeInputToNano } from '@opentelemetry/core';
 
 export class LogRecord implements ReadableLogRecord {
   readonly timeUnixNano: bigint;
