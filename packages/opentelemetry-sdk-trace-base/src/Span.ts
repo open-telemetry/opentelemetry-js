@@ -290,9 +290,6 @@ export class SpanImpl implements Span {
     this._endTime = this._getTime(endTime);
 
     if (this._endTime < this._startTime) {
-      console.log('inconsistent');
-      console.log(this.startTime);
-      console.log(this.endTime);
       diag.warn(
         'Inconsistent start and end time, startTime > endTime. Setting span duration to 0ms.',
         this._startTime,
@@ -319,11 +316,7 @@ export class SpanImpl implements Span {
     if (typeof inp === 'number' && inp <= otperformance.now()) {
       // must be a performance timestamp
       // apply correction and convert to hrtime
-      console.log('perf timestamp', inp);
-      const nanos = millisecondsToNanoseconds(inp);
-      console.log('nanos', nanos)
-      console.log('offset', this._performanceOffsetNanos);
-      return nanos + this._performanceOffsetNanos;
+      return millisecondsToNanoseconds(inp) + this._performanceOffsetNanos;
     }
 
     if (typeof inp === 'number') {

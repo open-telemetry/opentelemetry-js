@@ -295,10 +295,8 @@ describe('OpenTracing Shim', () => {
     });
 
     beforeEach(() => {
-      const startTime = performance.now();
-      console.log(startTime);
       span = shimTracer.startSpan('my-span', {
-        startTime: startTime,
+        startTime: performance.now(),
       }) as SpanShim;
       otSpan = (span as SpanShim).getSpan() as Span;
     });
@@ -499,11 +497,7 @@ describe('OpenTracing Shim', () => {
       const expected =
         millisecondsToNanoseconds(now) +
         (otSpan as any)['_performanceOffsetNanos'];
-      console.log('now   ', now);
-      console.log('nanos ', millisecondsToNanoseconds(now));
-      console.log('offset', (otSpan as any)['_performanceOffsetNanos']);
       span.finish(now);
-      console.log('span start time', otSpan.startTimeUnixNano);
       assert.deepStrictEqual(otSpan.endTimeUnixNano, expected);
     });
 
