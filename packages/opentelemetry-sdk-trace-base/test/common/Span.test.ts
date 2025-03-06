@@ -129,7 +129,7 @@ describe('Span', () => {
     );
   });
 
-  it('should have a duration', () => {
+  it('should have a duration', async () => {
     const span = new SpanImpl({
       scope: tracer.instrumentationScope,
       resource: tracer['_resource'],
@@ -140,6 +140,8 @@ describe('Span', () => {
       spanLimits: tracer.getSpanLimits(),
       spanProcessor: tracer['_spanProcessor'],
     });
+    // browsers may return the same timestamp twice if performance timer is called in quick succession to prevent timing attacks
+    await new Promise((resolve) => setTimeout(resolve, 10));
     span.end();
     assert.ok(span.endTimeUnixNano != null);
     assert.ok(span.endTimeUnixNano > span.startTimeUnixNano);
@@ -1162,21 +1164,21 @@ describe('Span', () => {
     const [event] = span.events;
     assert.deepStrictEqual(event.name, 'sent');
     assert.deepStrictEqual(event.attributes, {});
-    assert.ok(event.timeUnixNano > span.startTimeUnixNano);
+    assert.ok(event.timeUnixNano >= span.startTimeUnixNano);
 
     span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
     assert.strictEqual(span.events.length, 2);
     const [event1, event2] = span.events;
     assert.deepStrictEqual(event1.name, 'sent');
     assert.deepStrictEqual(event1.attributes, {});
-    assert.ok(event1.timeUnixNano > span.startTimeUnixNano);
+    assert.ok(event1.timeUnixNano >= span.startTimeUnixNano);
     assert.deepStrictEqual(event2.name, 'rev');
     assert.deepStrictEqual(event2.attributes, {
       attr1: 'value',
       attr2: 123,
       attr3: true,
     });
-    assert.ok(event2.timeUnixNano > span.startTimeUnixNano);
+    assert.ok(event2.timeUnixNano >= span.startTimeUnixNano);
 
     span.end();
     // shouldn't add new event
@@ -1397,7 +1399,7 @@ describe('Span', () => {
         assert.deepStrictEqual(event.attributes, {
           'exception.message': 'boom',
         });
-        assert.ok(event.timeUnixNano > span.startTimeUnixNano);
+        assert.ok(event.timeUnixNano >= span.startTimeUnixNano);
       });
     });
 
@@ -1429,7 +1431,7 @@ describe('Span', () => {
           span.recordException(error);
 
           const event = span.events[0];
-          assert.ok(event.timeUnixNano > span.startTimeUnixNano);
+          assert.ok(event.timeUnixNano >= span.startTimeUnixNano);
           assert.strictEqual(event.name, 'exception');
 
           assert.ok(event.attributes);
