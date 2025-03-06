@@ -142,7 +142,7 @@ export function millisecondsToNanoseconds(millis: number): bigint {
     return BigInt(millis) * 1_000_000n;
   } else {
     const out =
-      BigInt(Math.round(millis)) * 1000000n +
+      BigInt(Math.trunc(millis)) * 1000000n +
       BigInt(Math.round((millis % 1) * 1000000));
     return out;
   }
