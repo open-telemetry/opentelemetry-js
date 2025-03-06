@@ -290,6 +290,9 @@ export class SpanImpl implements Span {
     this._endTime = this._getTime(endTime);
 
     if (this._endTime < this._startTime) {
+      console.log('inconsistent');
+      console.log(this.startTime);
+      console.log(this.endTime);
       diag.warn(
         'Inconsistent start and end time, startTime > endTime. Setting span duration to 0ms.',
         this._startTime,
