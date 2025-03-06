@@ -319,7 +319,11 @@ export class SpanImpl implements Span {
     if (typeof inp === 'number' && inp <= otperformance.now()) {
       // must be a performance timestamp
       // apply correction and convert to hrtime
-      return millisecondsToNanoseconds(inp) + this._performanceOffsetNanos;
+      console.log('perf timestamp', inp);
+      const nanos = millisecondsToNanoseconds(inp);
+      console.log('nanos', nanos)
+      console.log('offset', this._performanceOffsetNanos);
+      return nanos + this._performanceOffsetNanos;
     }
 
     if (typeof inp === 'number') {
