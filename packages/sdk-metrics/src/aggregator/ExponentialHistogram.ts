@@ -103,7 +103,6 @@ export class ExponentialHistogramAccumulation implements Accumulation {
 
   /**
    * Returns the datapoint representation of this accumulation
-   * @param {bigint} startTimeUnixNano
    */
   toPointValue(): InternalHistogram {
     return {
