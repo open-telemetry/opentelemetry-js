@@ -30,13 +30,13 @@ import {
   ObservableGauge,
   ObservableUpDownCounter,
 } from '@opentelemetry/api';
-import { millisToHrTime } from '@opentelemetry/core';
 import { InstrumentDescriptor } from './InstrumentDescriptor';
 import { ObservableRegistry } from './state/ObservableRegistry';
 import {
   AsyncWritableMetricStorage,
   WritableMetricStorage,
 } from './state/WritableMetricStorage';
+import { millisecondsToNanoseconds } from '@opentelemetry/core';
 
 export class SyncInstrument {
   constructor(
@@ -72,7 +72,7 @@ export class SyncInstrument {
       value,
       attributes,
       context,
-      millisToHrTime(Date.now())
+      millisecondsToNanoseconds(Date.now())
     );
   }
 }

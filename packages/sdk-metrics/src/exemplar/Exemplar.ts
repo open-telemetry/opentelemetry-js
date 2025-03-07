@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HrTime, Attributes } from '@opentelemetry/api';
+import { Attributes } from '@opentelemetry/api';
 
 /**
  * A representation of an exemplar, which is a sample input measurement.
@@ -31,8 +31,8 @@ export type Exemplar = {
   // The value of the measurement that was recorded.
   value: number;
 
-  // timestamp is the exact time when this exemplar was recorded
-  timestamp: HrTime;
+  // timestamp is the exact time when this exemplar was recorded in nanoseconds
+  timestamp: bigint;
 
   // (Optional) Span ID of the exemplar trace.
   // span_id may be missing if the measurement is not recorded inside a trace
