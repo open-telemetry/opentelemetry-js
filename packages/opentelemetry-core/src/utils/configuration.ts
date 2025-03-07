@@ -41,7 +41,7 @@ export function diagLogLevelFromString(
 
   if (resolvedLogLevel == null) {
     diag.warn(
-      `Unknown log level ${value}, expected one of ${Object.keys(logLevelMap)}, using default`
+      `Unknown log level "${value}", expected one of ${Object.keys(logLevelMap)}, using default`
     );
     return DiagLogLevel.INFO;
   }
