@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-import { HrTime, Attributes } from '@opentelemetry/api';
+import { Attributes, HrTime } from '@opentelemetry/api';
 
 /**
  * Represents a timed event.
  * A timed event is an event with a timestamp.
  */
 export interface TimedEvent {
+  /** the timestamp of the event */
+  timeUnixNano: bigint;
+  /** @deprecated please use timeUnixNano */
   time: HrTime;
   /** The name of the event. */
   name: string;

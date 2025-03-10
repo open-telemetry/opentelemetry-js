@@ -35,14 +35,15 @@ export const mockedReadableSpan: ReadableSpan = {
     traceId: '1f1008dc8e270e85c40a0d7c3939b278',
     traceFlags: TraceFlags.SAMPLED,
   },
-  startTime: [1574120165, 429803070],
-  endTime: [1574120165, 438688070],
+  startTimeUnixNano: 1574120165429803070n,
+  endTimeUnixNano: 1574120165438688070n,
+  startTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
+  endTime: [0, 0], // wrong on purpose - included for compatibility. should not be used
   ended: true,
   status: { code: SpanStatusCode.OK },
   attributes: { component: 'foo' },
   links: [],
   events: [],
-  duration: [0, 8885000],
   resource: resourceFromAttributes({
     service: 'ui',
     version: 1,

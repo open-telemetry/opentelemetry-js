@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { HrTime } from '@opentelemetry/api';
 import { Accumulation, Aggregator } from '../aggregator/types';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { MetricStorage } from './MetricStorage';
@@ -57,7 +56,7 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>>
     );
   }
 
-  record(measurements: AttributeHashMap<number>, observationTime: HrTime) {
+  record(measurements: AttributeHashMap<number>, observationTime: bigint) {
     const processed = new AttributeHashMap<number>();
     Array.from(measurements.entries()).forEach(([attributes, value]) => {
       processed.set(this._attributesProcessor.process(attributes), value);
@@ -74,7 +73,7 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>>
    */
   collect(
     collector: MetricCollectorHandle,
-    collectionTime: HrTime
+    collectionTime: bigint
   ): Maybe<MetricData> {
     const accumulations = this._deltaMetricStorage.collect();
 

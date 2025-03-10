@@ -24,7 +24,11 @@ import type {
 } from '@opentelemetry/api-logs';
 
 export interface ReadableLogRecord {
+  readonly timeUnixNano: bigint;
+  readonly timeUnixNanoObserved: bigint;
+  /** @deprecated please use timeUnixNano */
   readonly hrTime: HrTime;
+  /** @deprecated please use timeUnixNanoObserved */
   readonly hrTimeObserved: HrTime;
   readonly spanContext?: SpanContext;
   readonly severityText?: string;
