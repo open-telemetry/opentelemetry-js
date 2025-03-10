@@ -34,6 +34,9 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: (Bug Fix)
 
+* fix(otlp-exporter-base): use dynamic imports over require for lazy-loading http transport utils [#5220](https://github.com/open-telemetry/opentelemetry-js/pull/5220) @pichlermarc
+  * enables bundling of Node.js HTTP exporters with rollup
+    * Limitation: if a single-file bundle is built the dynamically loaded file needs to be inlined via rollup's `inlineDynamicImports: true` setting. However, doing so may lead to `@opentelemetry/instrumentation-http` not generating telemetry.
 * fix(instrumentation-grpc): monitor error events with events.errorMonitor [#5369](https://github.com/open-telemetry/opentelemetry-js/pull/5369) @cjihrig
 * fix(exporter-metrics-otlp-http): browser OTLPMetricExporter was not passing config to OTLPMetricExporterBase super class [#5331](https://github.com/open-telemetry/opentelemetry-js/pull/5331) @trentm
 * fix(instrumentation-fetch, instrumentation-xhr): Ignore network events with zero-timings [#5332](https://github.com/open-telemetry/opentelemetry-js/pull/5332) @chancancode
