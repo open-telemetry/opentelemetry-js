@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1741609887964,
+  "lastUpdate": 1741611451083,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -28864,6 +28864,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.17%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "5e20647ffe68984f01378727a6529563912ef838",
+          "message": "fix(deps): update dependency axios to v1.8.2 [security] (#5532)",
+          "timestamp": "2025-03-10T12:48:55Z",
+          "tree_id": "76ebbced6aafba303bca7f5047816234f766b0ef",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/5e20647ffe68984f01378727a6529563912ef838"
+        },
+        "date": 1741611450063,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1561031,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18608,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 805177,
+            "range": "±0.31%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 750159,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
