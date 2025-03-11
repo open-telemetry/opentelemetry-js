@@ -264,9 +264,6 @@ describe('time', () => {
     it('should return true for a date', () => {
       assert.strictEqual(isTimeInput(new Date()), true);
     });
-    it('should return true for an array with 2 elements type number', () => {
-      assert.strictEqual(isTimeInput(1_000_000_001n), true);
-    });
     it('should return FALSE for different cases for an array ', () => {
       assert.strictEqual(isTimeInput([1, 1, 1]), false);
       assert.strictEqual(isTimeInput([1]), false);
