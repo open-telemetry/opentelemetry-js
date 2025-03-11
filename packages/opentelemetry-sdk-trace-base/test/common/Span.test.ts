@@ -160,8 +160,8 @@ describe('Span', () => {
     });
     // @ts-expect-error writing readonly property. performance time origin is mocked to return ms value of [1,1]
     span['_performanceOffsetNanos'] = 0n;
-    span.end(span.startTimeUnixNano - 1n);
-    assert.ok(span.endTimeUnixNano! >= span.startTimeUnixNano);
+    span.end(nanosecondsToMilliseconds(span.startTimeUnixNano) - 1);
+    assert.ok(span.endTimeUnixNano! === span.startTimeUnixNano);
   });
 
   it('should have valid event.timeUnixNano', () => {
@@ -192,14 +192,13 @@ describe('Span', () => {
       spanLimits: tracer.getSpanLimits(),
       spanProcessor: tracer['_spanProcessor'],
     });
-    const eventTimeNS = 123n;
-    const eventTime = span.startTimeUnixNano + eventTimeNS;
+    const eventTime = nanosecondsToMilliseconds(span.startTimeUnixNano) + 123;
 
     span.addEvent('my-event', undefined, eventTime);
 
     assert.strictEqual(
       span.events[0].timeUnixNano - span.startTimeUnixNano,
-      123n
+      123_000_000n
     );
   });
 
@@ -217,14 +216,13 @@ describe('Span', () => {
         spanLimits: tracer.getSpanLimits(),
         spanProcessor: tracer['_spanProcessor'],
       });
-      const eventTimeNS = 123n;
-      const eventTime = span.startTimeUnixNano + eventTimeNS;
+      const eventTime = nanosecondsToMilliseconds(span.startTimeUnixNano) + 123;
 
       span.addEvent('my-event', eventTime);
-
+  
       assert.strictEqual(
         span.events[0].timeUnixNano - span.startTimeUnixNano,
-        123n
+        123_000_000n
       );
     });
   });
