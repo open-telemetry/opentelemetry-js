@@ -37,7 +37,7 @@ export function encodeAsString(nanos: bigint): string {
   return nanos.toString();
 }
 
-export type EncodeBigIntNanoFunction = (nanos: bigint) => Fixed64;
+export type UnixNanosEncodeFunction = (nanos: bigint) => Fixed64;
 export type SpanContextEncodeFunction = (
   spanContext: string
 ) => string | Uint8Array;
@@ -46,7 +46,7 @@ export type OptionalSpanContextEncodeFunction = (
 ) => string | Uint8Array | undefined;
 
 export interface Encoder {
-  encodeBigIntNanos: EncodeBigIntNanoFunction;
+  encodeBigIntNanos: UnixNanosEncodeFunction;
   encodeSpanContext: SpanContextEncodeFunction;
   encodeOptionalSpanContext: OptionalSpanContextEncodeFunction;
 }

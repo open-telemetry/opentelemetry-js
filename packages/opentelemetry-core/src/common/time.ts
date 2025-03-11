@@ -199,7 +199,6 @@ export function isTimeInput(
   return (
     isTimeInputHrTime(value) ||
     typeof value === 'number' ||
-    typeof value === 'bigint' ||
     value instanceof Date
   );
 }
