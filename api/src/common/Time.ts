@@ -36,4 +36,4 @@ export type HrTime = [number, number];
  *
  * @since 1.0.0
  */
-export type TimeInput = HrTime | number | Date | bigint;
+export type TimeInput = HrTime | number | Date;
