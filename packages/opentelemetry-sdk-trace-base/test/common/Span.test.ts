@@ -219,7 +219,7 @@ describe('Span', () => {
       const eventTime = nanosecondsToMilliseconds(span.startTimeUnixNano) + 123;
 
       span.addEvent('my-event', eventTime);
-  
+
       assert.strictEqual(
         span.events[0].timeUnixNano - span.startTimeUnixNano,
         123_000_000n
