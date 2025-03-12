@@ -459,7 +459,6 @@ The following changes were made to MetricReader-related APIs:
 > [#4419](https://github.com/open-telemetry/opentelemetry-js/pull/4419)
 > [#5311](https://github.com/open-telemetry/opentelemetry-js/pull/5311)
 
-
 ## 💥 `@opentelemetry/resources` changes for *implementors* of Resource Detectors
 
 If you maintain an *implementation* of a resource detector, then you will need to update for JS SDK 2.x.  If you have a class that `implements DetectorSync` (or the deprecated `Detector`) interface from `@opentelemetry/resources`, then this section applies to you. There are two cases: if your detector can gather all attribute data *synchronously* (this is the easy case), or if your detector needs to *asynchronously* gather some attribute data.
@@ -601,7 +600,6 @@ This shows **one way** that can localize all code changes to the `.detect()` met
 
 A concrete example of this can be found in [this commit](https://github.com/open-telemetry/opentelemetry-js-contrib/commit/e6c5dbacc2a105ad1f2006504b6984fac97838d7#diff-7c36e5027a21a15157754a62c4b1b7cac3714d92ba263b843af8124c76fb58e1) that migrated the `InstanaAgentDetector` in the `@opentelemetry/resource-detector-instana` package.
 
-
 ### Resource Detector test changes
 
 In your tests, you may need to change how to get a `Resource` instance for assertions.
@@ -622,8 +620,6 @@ const resource = detectResources({ detectors: [fooDetector] });
 await resource.waitForAsyncAttributes?.();
 assert.deepStrictEqual(resource.attributes, { ... });
 ```
-
-
 
 ## 💥 Other changes
 
