@@ -503,7 +503,7 @@ class FooDetector implements ResourceDetector {
     // 2. The `.detect()` method now returns a vanilla JS object with the
     //    attributes, rather than building a `Resource` instance. The
     //    type is `DetectedResource` rather than `IResource`.
-    return attributes;
+    return { attributes };
   }
 }
 
@@ -579,8 +579,8 @@ class FooDetector implements ResourceDetector {
     return { attributes };
   }
 
-  // 5. Other than the change in function name return type, this is unchanged
-  //    from the `_getAttributes` above.
+  // 5. Other than the change in function name and return type, this method is
+  //    unchanged from the `_getAttributes` above.
   private async _gatherData(): Promise<DetectedResourceAttributes> {
     try {
       const data = await this._someAsyncFunctionToGatherData();
