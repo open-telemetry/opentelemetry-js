@@ -133,7 +133,7 @@ export class ExplicitBucketHistogramAggregation implements Aggregation {
 
 export class ExponentialHistogramAggregation implements Aggregation {
   constructor(
-    private readonly _maxSize: number = 160,
+    private readonly _maxSize = 160,
     private readonly _recordMinMax = true
   ) {}
   createAggregator(_instrument: InstrumentDescriptor) {
