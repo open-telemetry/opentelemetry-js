@@ -16,7 +16,6 @@
 
 import {
   Context,
-  HrTime,
   isSpanContextValid,
   trace,
   TraceFlags,
@@ -27,7 +26,7 @@ import { ExemplarFilter } from './ExemplarFilter';
 export class WithTraceExemplarFilter implements ExemplarFilter {
   shouldSample(
     value: number,
-    timestamp: HrTime,
+    timestamp: bigint,
     attributes: Attributes,
     ctx: Context
   ): boolean {

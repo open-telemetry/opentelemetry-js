@@ -19,10 +19,6 @@ import * as assert from 'assert';
 import type { status as GrpcStatus } from '@grpc/grpc-js';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import {
-  hrTimeToMilliseconds,
-  hrTimeToMicroseconds,
-} from '@opentelemetry/core';
-import {
   SEMATTRS_NET_PEER_NAME,
   SEMATTRS_NET_PEER_PORT,
   SEMATTRS_RPC_GRPC_STATUS_CODE,
@@ -52,13 +48,11 @@ export const assertSpan = (
   assert.strictEqual(span.spanContext().spanId.length, 16);
   assert.strictEqual(span.kind, kind);
 
-  assert.ok(span.endTime);
+  assert.ok(span.endTimeUnixNano);
   assert.strictEqual(span.links.length, 0);
 
-  assert.ok(
-    hrTimeToMicroseconds(span.startTime) < hrTimeToMicroseconds(span.endTime)
-  );
-  assert.ok(hrTimeToMilliseconds(span.endTime) > 0);
+  assert.ok(span.startTimeUnixNano < span.endTimeUnixNano);
+  assert.ok(span.endTimeUnixNano > 0);
 
   if (span.kind === SpanKind.SERVER) {
     assert.ok(span.spanContext());

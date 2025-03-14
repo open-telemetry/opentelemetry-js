@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, Attributes } from '@opentelemetry/api';
+import { Context, Attributes } from '@opentelemetry/api';
 import { Maybe, hashAttributes } from '../utils';
 import { Accumulation, Aggregator } from '../aggregator/types';
 import { AttributeHashMap } from './HashMap';
@@ -47,7 +47,7 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
     value: number,
     attributes: Attributes,
     _context: Context,
-    collectionTime: HrTime
+    collectionTime: bigint
   ) {
     let accumulation = this._activeCollectionStorage.get(attributes);
 
@@ -70,7 +70,7 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
 
   batchCumulate(
     measurements: AttributeHashMap<number>,
-    collectionTime: HrTime
+    collectionTime: bigint
   ) {
     Array.from(measurements.entries()).forEach(
       ([attributes, value, hashCode]) => {

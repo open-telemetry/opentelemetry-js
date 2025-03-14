@@ -48,8 +48,8 @@ export function sdkSpanToOtlpSpan(span: ReadableSpan, encoder: Encoder): ISpan {
     name: span.name,
     // Span kind is offset by 1 because the API does not define a value for unset
     kind: span.kind == null ? 0 : span.kind + 1,
-    startTimeUnixNano: encoder.encodeHrTime(span.startTime),
-    endTimeUnixNano: encoder.encodeHrTime(span.endTime),
+    startTimeUnixNano: encoder.encodeBigIntNanos(span.startTimeUnixNano),
+    endTimeUnixNano: encoder.encodeBigIntNanos(span.endTimeUnixNano),
     attributes: toAttributes(span.attributes),
     droppedAttributesCount: span.droppedAttributesCount,
     events: span.events.map(event => toOtlpSpanEvent(event, encoder)),
@@ -83,7 +83,7 @@ export function toOtlpSpanEvent(
       ? toAttributes(timedEvent.attributes)
       : [],
     name: timedEvent.name,
-    timeUnixNano: encoder.encodeHrTime(timedEvent.time),
+    timeUnixNano: encoder.encodeBigIntNanos(timedEvent.timeUnixNano),
     droppedAttributesCount: timedEvent.droppedAttributesCount || 0,
   };
 }

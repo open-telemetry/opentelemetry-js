@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { HrTime } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { MetricCollectOptions } from '../export/MetricProducer';
 import { ScopeMetrics } from '../export/MetricData';
@@ -73,13 +72,13 @@ export class MeterSharedState {
 
   /**
    * @param collector opaque handle of {@link MetricCollector} which initiated the collection.
-   * @param collectionTime the HrTime at which the collection was initiated.
+   * @param collectionTime the time in nanoseconds at which the collection was initiated.
    * @param options options for collection.
    * @returns the list of metric data collected.
    */
   async collect(
     collector: MetricCollectorHandle,
-    collectionTime: HrTime,
+    collectionTime: bigint,
     options?: MetricCollectOptions
   ): Promise<ScopeMetricsResult | null> {
     /**
