@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1741793148642,
+  "lastUpdate": 1741960246079,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -29020,6 +29020,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.49%",
             "unit": "ops/sec",
             "extra": "87 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "ecd67debdbc48d73612ddfb404b2afaf43a1dc8f",
+          "message": "doc: add section to SDK 2.x migration guide for implementors of resource detectors (#5535)",
+          "timestamp": "2025-03-14T13:29:52Z",
+          "tree_id": "042c4816c373131346e6e72408a7172f2dbe6565",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/ecd67debdbc48d73612ddfb404b2afaf43a1dc8f"
+        },
+        "date": 1741960245035,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1556314,
+            "range": "±0.62%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18656,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 806706,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 743701,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
