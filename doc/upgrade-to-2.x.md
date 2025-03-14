@@ -187,6 +187,10 @@ In TypeScript code, the `ResourceAttributes` type was replaced with the `Attribu
 
 <br/>
 
+If you maintain an *implementation* of a resource detector, i.e. if you have a class that `implements DetectorSync` (or the deprecated `Detector`) interface from `@opentelemetry/resources`, then please see the [section below for implementors of resource detectors](#-opentelemetryresources-changes-for-implementors-of-resource-detectors).
+
+- `class ... implements DetectorSync` -> see section below for implementation changes
+
 > [!NOTE]
 >
 > - In general, the OTel JS packages are trending away from exporting *classes* because that results in exporting types with internal details that inhibit later refactoring. See [#5283](https://github.com/open-telemetry/opentelemetry-js/issues/5283) for details.
@@ -454,6 +458,168 @@ The following changes were made to MetricReader-related APIs:
 > [#5266](https://github.com/open-telemetry/opentelemetry-js/pull/5266)
 > [#4419](https://github.com/open-telemetry/opentelemetry-js/pull/4419)
 > [#5311](https://github.com/open-telemetry/opentelemetry-js/pull/5311)
+
+## 💥 `@opentelemetry/resources` changes for *implementors* of Resource Detectors
+
+If you maintain an *implementation* of a resource detector, then you will need to update for JS SDK 2.x.  If you have a class that `implements DetectorSync` (or the deprecated `Detector`) interface from `@opentelemetry/resources`, then this section applies to you. There are two cases: if your detector can gather all attribute data *synchronously* (this is the easy case), or if your detector needs to *asynchronously* gather some attribute data.
+
+### Synchronous Resource Detector migration
+
+Before:
+
+```ts
+import {
+  DetectorSync,
+  Resource,
+  IResource,
+} from '@opentelemetry/resources';
+
+class FooDetector implements DetectorSync {
+  detect(): IResource {
+    const attributes = {
+      'foo.bar': process.env.FOO_BAR,
+      'foo.baz': process.env.FOO_BAZ,
+    };
+    return new Resource(attributes);
+  }
+}
+
+export const fooDetector = new FooDetector();
+```
+
+After:
+
+```ts
+import { ResourceDetector, DetectedResource } from '@opentelemetry/resources';
+
+// 1. `ResourceDetector` is the interface name now
+class FooDetector implements ResourceDetector {
+  detect(): DetectedResource { // 2.
+    const attributes = {
+      'foo.bar': process.env.FOO_BAR,
+      'foo.baz': process.env.FOO_BAZ,
+    };
+    // 2. The `.detect()` method now returns a vanilla JS object with the
+    //    attributes, rather than building a `Resource` instance. The
+    //    type is `DetectedResource` rather than `IResource`.
+    return { attributes };
+  }
+}
+
+export const fooDetector = new FooDetector();
+```
+
+### Asynchronous Resource Detector migration
+
+If your resource detector implementation *asynchronously* gathers attribute data, then the migration to JS SDK 2.x will be a little bit more work. In the newer `@opentelemetry/resources`, the `ResourceDetector#detect()` method must *synchronously* return every attribute *name* that it *may* provide. Any of those attribute *values* can be a Promise that resolves to a value or to `undefined` if not applicable.
+
+Before:
+
+```ts
+import {
+  DetectorSync,
+  Resource,
+  IResource,
+  ResourceAttributes,
+} from '@opentelemetry/resources';
+
+class FooDetector implements DetectorSync {
+  detect(): IResource {
+    // A common pattern was to asynchronously gather attributes in a separate
+    // async function and pass that Promise to the second argument to
+    // `new Resource(...)`.
+    return new Resource({}, this._getAttributes());
+  }
+
+  private async _getAttributes(): Promise<ResourceAttributes> {
+    try {
+      const data = await this._someAsyncFunctionToGatherData();
+      return {
+        'foo.pid': data.pid,
+        'foo.agentUuid': data.agentUuid,
+      };
+    } catch {
+      return {};
+    }
+  }
+}
+
+export const fooDetector = new FooDetector();
+```
+
+After:
+
+```ts
+import {
+  ResourceDetector,
+  DetectedResource,
+  DetectedResourceAttributes,
+} from '@opentelemetry/resources';
+
+// 1. `ResourceDetector` is the interface name now.
+class FooDetector implements ResourceDetector {
+  // 2. `DetectedResource` is the return type now.
+  detect(): DetectedResource {
+    // 3. Get all attributes, as before. Cannot `await` them.
+    const dataPromise = this._gatherData();
+
+    // 4. List all the possible attribute names returned by this detector.
+    const attrNames = [
+      'foo.pid',
+      'foo.agentUuid',
+    ];
+
+    const attributes = {} as DetectedResourceAttributes;
+    attrNames.forEach(name => {
+      // Each resource attribute is determined asynchronously in _gatherData().
+      attributes[name] = dataPromise.then(data => data[name]);
+    });
+
+    return { attributes };
+  }
+
+  // 5. Other than the change in function name and return type, this method is
+  //    unchanged from the `_getAttributes` above.
+  private async _gatherData(): Promise<DetectedResourceAttributes> {
+    try {
+      const data = await this._someAsyncFunctionToGatherData();
+      return {
+        'foo.pid': data.pid,
+        'foo.agentUuid': data.agentUuid,
+      };
+    } catch {
+      return {};
+    }
+  }
+}
+
+export const fooDetector = new FooDetector();
+```
+
+This shows **one way** that can localize all code changes to the `.detect()` method.
+
+A concrete example of this can be found in [this commit](https://github.com/open-telemetry/opentelemetry-js-contrib/commit/e6c5dbacc2a105ad1f2006504b6984fac97838d7#diff-7c36e5027a21a15157754a62c4b1b7cac3714d92ba263b843af8124c76fb58e1) that migrated the `InstanaAgentDetector` in the `@opentelemetry/resource-detector-instana` package.
+
+### Resource Detector test changes
+
+In your tests, you may need to change how to get a `Resource` instance for assertions.
+
+Before:
+
+```ts
+const resource = await fooDetector.detect();
+assert.deepStrictEqual(resource.attributes, { ... });
+```
+
+After:
+
+```ts
+import { detectResources } from '@opentelemetry/resources';
+
+const resource = detectResources({ detectors: [fooDetector] });
+await resource.waitForAsyncAttributes?.();
+assert.deepStrictEqual(resource.attributes, { ... });
+```
 
 ## 💥 Other changes
 
