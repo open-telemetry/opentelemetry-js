@@ -23,6 +23,7 @@ import {
   trace,
   Attributes,
   DiagConsoleLogger,
+  createContextKey,
 } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
@@ -66,7 +67,10 @@ import * as assert from 'assert';
 import * as nock from 'nock';
 import * as path from 'path';
 import { HttpInstrumentation } from '../../src/http';
-import { HttpInstrumentationConfig } from '../../src/types';
+import {
+  HttpCustomContextFunction,
+  HttpInstrumentationConfig,
+} from '../../src/types';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
@@ -122,6 +126,13 @@ function doNock(
 export const customAttributeFunction = (span: ISpan): void => {
   span.setAttribute('span kind', SpanKind.CLIENT);
 };
+
+const contextHookExampleKey = createContextKey('example -key');
+
+export const contextHookFunction: HttpCustomContextFunction = (
+  context,
+  request
+) => context.setValue(contextHookExampleKey, request.headers['x-test-header']);
 
 export const requestHookFunction = (
   span: ISpan,
@@ -315,6 +326,7 @@ describe('HttpInstrumentation', () => {
             return false;
           },
           applyCustomAttributesOnSpan: customAttributeFunction,
+          contextHook: contextHookFunction,
           requestHook: requestHookFunction,
           responseHook: responseHookFunction,
           startIncomingSpanHook: startIncomingSpanHookFunction,
@@ -359,6 +371,13 @@ describe('HttpInstrumentation', () => {
           }
           if (request.url?.includes('/withQuery')) {
             assert.match(request.url, /withQuery\?foo=bar$/);
+          }
+          if (request.url?.includes('/withCustomContext')) {
+            const ctx = context.active();
+            assert.strictEqual(
+              ctx.getValue(contextHookExampleKey),
+              'custom-context'
+            );
           }
           response.end('Test Server Response');
         });
@@ -1042,6 +1061,13 @@ describe('HttpInstrumentation', () => {
 
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(spans.length, 1);
+      });
+
+      it('should keep make the context from contextHook available', async () => {
+        await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}/withCustomContext`,
+          { headers: { 'x-test-header': 'custom-context' } }
+        );
       });
     });
 
