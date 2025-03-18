@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
+import { Attributes, diag } from '@opentelemetry/api';
 import { Resource } from './Resource';
 import { emptyResource, resourceFromDetectedResource } from './ResourceImpl';
 import { ResourceDetectionConfig } from './config';
+import { isPromiseLike } from './utils';
 
 /**
  * Runs all resource detectors and returns the results merged into a single Resource.
@@ -53,11 +54,19 @@ export const detectResources = (
  * @param resources The array of {@link Resource} that should be logged. Empty entries will be ignored.
  */
 const logResources = (resources: Array<Resource>) => {
-  resources.forEach(resource => {
-    // Print only populated resources
-    if (Object.keys(resource.attributes).length > 0) {
-      const resourceDebugString = JSON.stringify(resource.attributes, null, 4);
-      diag.verbose(resourceDebugString);
+  for (const resource of resources) {
+    const detectedAttributes: Attributes = {};
+    for (const [k, v] of resource.getRawAttributes()) {
+      if (isPromiseLike(v)) {
+        detectedAttributes[k] = '<promise>';
+      } else {
+        detectedAttributes[k] = v;
+      }
     }
-  });
+
+    diag.verbose(
+      'Detected resource attributes: %s',
+      JSON.stringify(detectedAttributes, null, 4)
+    );
+  }
 };
