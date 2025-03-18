@@ -80,12 +80,7 @@ class ResourceImpl implements Resource {
 
     for (let i = 0; i < this._rawAttributes.length; i++) {
       const [k, v] = this._rawAttributes[i];
-      try {
-        this._rawAttributes[i] = [k, isPromiseLike(v) ? await v : v];
-      } catch (err) {
-        diag.debug('promise rejection for resource attribute: %s', err);
-        this._rawAttributes[i] = [k, undefined];
-      }
+      this._rawAttributes[i] = [k, isPromiseLike(v) ? await v : v];
     }
 
     this._asyncAttributesPending = false;
