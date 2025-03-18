@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1742314316456,
+  "lastUpdate": 1742340342003,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -29176,6 +29176,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.82%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "yesmeck@gmail.com",
+            "name": "Wei Zhu",
+            "username": "yesmeck"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0590a5c08af6095a1a50980cbe07cd2056e448cb",
+          "message": "docs: use ATTR_SERVICE_NAME in readme (#5542)\n\nCo-authored-by: Daniel Dyla <dyladan@users.noreply.github.com>",
+          "timestamp": "2025-03-18T23:16:32Z",
+          "tree_id": "c2cd59901a1c2b34f5bce81076d4b240a4fdab65",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/0590a5c08af6095a1a50980cbe07cd2056e448cb"
+        },
+        "date": 1742340340932,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1550497,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18262,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 805685,
+            "range": "±0.40%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 806990,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
           }
         ]
       }
