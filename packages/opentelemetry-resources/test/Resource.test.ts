@@ -274,12 +274,16 @@ describe('Resource', () => {
         noUnhandledRejection = false;
       }
       process.once('unhandledRejection', onUnhandledRejection);
-      ee.emit('fail', 'resource attribute value promise rejected');
-      // yield to event loop to make sure we don't miss anything
-      await new Promise((resolve, reject) => setTimeout(resolve, 1));
-      assert.ok(noUnhandledRejection);
-      await res.waitForAsyncAttributes?.();
-      assert.notDeepStrictEqual(res.attributes, { goodAttribute: 'fail' });
+      try {
+        ee.emit('fail', 'resource attribute value promise rejected');
+        // yield to event loop to make sure we don't miss anything
+        await new Promise((resolve, reject) => setTimeout(resolve, 1));
+        assert.ok(noUnhandledRejection);
+        await res.waitForAsyncAttributes?.();
+        assert.notDeepStrictEqual(res.attributes, { goodAttribute: 'fail' });
+      } finally {
+        process.removeListener('unhandledRejection', onUnhandledRejection);
+      }
     });
   });
 
