@@ -75,9 +75,7 @@ describe('detectResources', () => {
       await resource.waitForAsyncAttributes?.();
 
       assert.ok(
-        debugStub.calledWithMatch(
-          "a resource's async attributes promise rejected"
-        )
+        debugStub.calledWithMatch('promise rejection for resource attribute')
       );
 
       assert.deepStrictEqual(resource.attributes, {
