@@ -403,7 +403,6 @@ describe('HttpInstrumentation', () => {
           { span: outgoingSpan, kind: SpanKind.CLIENT },
         ].forEach(({ span, kind }) => {
           assert.strictEqual(span.attributes[ATTR_NETWORK_PROTOCOL_VERSION], '1.1');
-          // TODO: fix
           assert.strictEqual(
             span.attributes[ATTR_NETWORK_TRANSPORT],
             NET_TRANSPORT_VALUE_IP_TCP
