@@ -17,7 +17,6 @@
 import { MetricStorageRegistry } from '../../src/state/MetricStorageRegistry';
 import { diag, ValueType } from '@opentelemetry/api';
 import { MetricStorage } from '../../src/state/MetricStorage';
-import { HrTime } from '@opentelemetry/api';
 import { MetricCollectorHandle } from '../../src/state/MetricCollector';
 import { MetricData, InstrumentType } from '../../src';
 import { Maybe } from '../../src/utils';
@@ -34,7 +33,7 @@ import { InstrumentDescriptor } from '../../src/InstrumentDescriptor';
 class TestMetricStorage extends MetricStorage {
   collect(
     collector: MetricCollectorHandle,
-    collectionTime: HrTime
+    collectionTime: bigint
   ): Maybe<MetricData> {
     return undefined;
   }

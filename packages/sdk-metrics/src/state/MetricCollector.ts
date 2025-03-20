@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { millisToHrTime } from '@opentelemetry/core';
+import { millisecondsToNanoseconds } from '@opentelemetry/core';
 import { AggregationTemporalitySelector } from '../export/AggregationSelector';
 import {
   CollectionResult,
@@ -38,7 +38,7 @@ export class MetricCollector implements MetricProducer {
   ) {}
 
   async collect(options?: MetricCollectOptions): Promise<CollectionResult> {
-    const collectionTime = millisToHrTime(Date.now());
+    const collectionTime = millisecondsToNanoseconds(Date.now());
     const scopeMetrics: ScopeMetrics[] = [];
     const errors: unknown[] = [];
 

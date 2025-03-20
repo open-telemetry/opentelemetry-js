@@ -28,12 +28,7 @@ describe('DeltaMetricProcessor', () => {
 
       for (const value of commonValues) {
         for (const attributes of commonAttributes) {
-          metricProcessor.record(
-            value,
-            attributes,
-            api.context.active(),
-            [0, 0]
-          );
+          metricProcessor.record(value, attributes, api.context.active(), 0n);
         }
       }
     });
@@ -43,12 +38,7 @@ describe('DeltaMetricProcessor', () => {
 
       for (const value of commonValues) {
         for (const attributes of commonAttributes) {
-          metricProcessor.record(
-            value,
-            attributes,
-            api.context.active(),
-            [0, 0]
-          );
+          metricProcessor.record(value, attributes, api.context.active(), 0n);
         }
       }
     });
@@ -64,7 +54,7 @@ describe('DeltaMetricProcessor', () => {
           measurements.set(attributes, value);
         }
       }
-      metricProcessor.batchCumulate(measurements, [0, 0]);
+      metricProcessor.batchCumulate(measurements, 0n);
     });
 
     it('no exceptions on record with no-drop aggregator', () => {
@@ -76,7 +66,7 @@ describe('DeltaMetricProcessor', () => {
           measurements.set(attributes, value);
         }
       }
-      metricProcessor.batchCumulate(measurements, [0, 0]);
+      metricProcessor.batchCumulate(measurements, 0n);
     });
 
     it('should compute the diff of accumulations', () => {
@@ -85,7 +75,7 @@ describe('DeltaMetricProcessor', () => {
       {
         const measurements = new AttributeHashMap<number>();
         measurements.set({}, 10);
-        metricProcessor.batchCumulate(measurements, [0, 0]);
+        metricProcessor.batchCumulate(measurements, 0n);
         const accumulations = metricProcessor.collect();
         const accumulation = accumulations.get({});
         assert.strictEqual(accumulation?.toPointValue(), 10);
@@ -94,7 +84,7 @@ describe('DeltaMetricProcessor', () => {
       {
         const measurements = new AttributeHashMap<number>();
         measurements.set({}, 21);
-        metricProcessor.batchCumulate(measurements, [0, 0]);
+        metricProcessor.batchCumulate(measurements, 0n);
         const accumulations = metricProcessor.collect();
         const accumulation = accumulations.get({});
         assert.strictEqual(accumulation?.toPointValue(), 11);
@@ -107,13 +97,13 @@ describe('DeltaMetricProcessor', () => {
       {
         const measurements = new AttributeHashMap<number>();
         measurements.set({}, 10);
-        metricProcessor.batchCumulate(measurements, [0, 0]);
+        metricProcessor.batchCumulate(measurements, 0n);
       }
 
       {
         const measurements = new AttributeHashMap<number>();
         measurements.set({}, 20);
-        metricProcessor.batchCumulate(measurements, [1, 1]);
+        metricProcessor.batchCumulate(measurements, 1_000_000_001n);
       }
 
       const accumulations = metricProcessor.collect();
@@ -133,7 +123,7 @@ describe('DeltaMetricProcessor', () => {
         measurements.set({ attribute: '1' }, 10);
         measurements.set({ attribute: '2' }, 20);
         measurements.set({ attribute: '3' }, 30);
-        metricProcessor.batchCumulate(measurements, [0, 0]);
+        metricProcessor.batchCumulate(measurements, 0n);
       }
 
       const accumulations = metricProcessor.collect();
@@ -155,9 +145,19 @@ describe('DeltaMetricProcessor', () => {
     it('should export', () => {
       const metricProcessor = new DeltaMetricProcessor(new SumAggregator(true));
 
-      metricProcessor.record(1, { attribute: '1' }, api.ROOT_CONTEXT, [0, 0]);
-      metricProcessor.record(2, { attribute: '1' }, api.ROOT_CONTEXT, [1, 1]);
-      metricProcessor.record(1, { attribute: '2' }, api.ROOT_CONTEXT, [2, 2]);
+      metricProcessor.record(1, { attribute: '1' }, api.ROOT_CONTEXT, 0n);
+      metricProcessor.record(
+        2,
+        { attribute: '1' },
+        api.ROOT_CONTEXT,
+        1_000_000_001n
+      );
+      metricProcessor.record(
+        1,
+        { attribute: '2' },
+        api.ROOT_CONTEXT,
+        2_000_000_002n
+      );
 
       let accumulations = metricProcessor.collect();
       assert.strictEqual(accumulations.size, 2);
