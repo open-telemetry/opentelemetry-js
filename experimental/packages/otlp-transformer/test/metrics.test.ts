@@ -858,6 +858,12 @@ describe('Metrics', () => {
         1
       );
     });
+
+    it('does not throw when deserializing an empty response', () => {
+      assert.doesNotThrow(() =>
+        ProtobufMetricsSerializer.deserializeResponse(new Uint8Array([]))
+      );
+    });
   });
 
   describe('JsonMetricsSerializer', function () {
@@ -927,6 +933,12 @@ describe('Metrics', () => {
       assert.equal(
         Number(deserializedResponse.partialSuccess.rejectedDataPoints),
         1
+      );
+    });
+
+    it('does not throw when deserializing an empty response', () => {
+      assert.doesNotThrow(() =>
+        JsonMetricsSerializer.deserializeResponse(new Uint8Array([]))
       );
     });
   });
