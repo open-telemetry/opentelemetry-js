@@ -46,7 +46,6 @@ import {
   ATTR_URL_QUERY,
   ATTR_URL_SCHEME,
   HTTP_REQUEST_METHOD_VALUE_GET,
-  NETTRANSPORTVALUES_IP_TCP,
 } from '@opentelemetry/semantic-conventions';
 import {
   NET_TRANSPORT_VALUE_IP_TCP,
@@ -1105,7 +1104,7 @@ describe('HttpInstrumentation', () => {
           // added these attributes
           // QUESTION: is this duplicate?
           [ATTR_NETWORK_PROTOCOL_NAME]: '1.1',
-          [ATTR_NETWORK_TRANSPORT]: NETTRANSPORTVALUES_IP_TCP
+          [ATTR_NETWORK_TRANSPORT]: NET_TRANSPORT_VALUE_IP_TCP
         });
       });
 
@@ -1132,6 +1131,8 @@ describe('HttpInstrumentation', () => {
           [ATTR_URL_PATH]: pathname,
           [ATTR_URL_SCHEME]: protocol,
           [ATTR_URL_QUERY]: "",
+          [ATTR_NETWORK_TRANSPORT]: NET_TRANSPORT_VALUE_IP_TCP,
+          [ATTR_NETWORK_PROTOCOL_NAME]: '1.1'
         });
       });
 
@@ -1159,6 +1160,8 @@ describe('HttpInstrumentation', () => {
           [ATTR_URL_PATH]: `${pathname}/setroute`,
           [ATTR_URL_SCHEME]: protocol,
           [ATTR_URL_QUERY]: "",
+          [ATTR_NETWORK_PROTOCOL_NAME]: '1.1',
+          [ATTR_NETWORK_TRANSPORT]: NET_TRANSPORT_VALUE_IP_TCP
         });
       });
     });
