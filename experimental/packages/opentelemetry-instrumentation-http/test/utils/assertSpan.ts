@@ -24,14 +24,20 @@ import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import {
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
-  ATTR_NETWORK_LOCAL_ADDRESS,
   ATTR_NETWORK_PEER_ADDRESS,
   ATTR_SERVER_ADDRESS,
   ATTR_SERVER_PORT,
   ATTR_URL_FULL,
   ATTR_URL_SCHEME,
   ATTR_USER_AGENT_ORIGINAL,
+  ATTR_URL_PATH,
+  ATTR_HTTP_REQUEST_HEADER,
+  // ATTR_HTTP_RESPONSE_HEADER,
 } from '@opentelemetry/semantic-conventions';
+import {
+  ATTR_HTTP_REQUEST_BODY_SIZE,
+  // ATTR_HTTP_RESPONSE_BODY_SIZE
+} from '@opentelemetry/semantic-conventions/incubating';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as utils from '../../src/utils';
@@ -60,20 +66,15 @@ export const assertSpan = (
   assert.strictEqual(span.kind, kind);
   assert.strictEqual(span.name, validations.httpMethod);
 
-  // QUESTION: no longer need to test?
-  //  assert.strictEqual(
-  //   span.attributes[AttributeNames.HTTP_ERROR_MESSAGE],
-  //   span.status.message
-  // );
   assert.strictEqual(
     span.attributes[ATTR_HTTP_REQUEST_METHOD],
     validations.httpMethod
   );
-  // TODO: use correct variable
-  // assert.strictEqual(
-  //   span.attributes[ATTR_URL_PATH],
-  //   validations.path || validations.pathname
-  // );
+
+  assert.strictEqual(
+    span.attributes[ATTR_URL_PATH],
+    validations.path || validations.pathname
+  );
   assert.strictEqual(
     span.attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
     validations.httpStatusCode
@@ -113,25 +114,27 @@ export const assertSpan = (
     }
   }
   if (span.kind === SpanKind.CLIENT) {
-    if (validations.resHeaders['content-length']) {
-      // const contentLength = Number(validations.resHeaders['content-length']);
+    // QUESTION: is this valid anymore if setResponseContentLengthAttribute is deprecated?
+    // if (validations.resHeaders['content-length']) {
+    //   const contentLength = Number(validations.resHeaders['content-length']);
 
-      // TODO: fix
-      if (
-        validations.resHeaders['content-encoding'] &&
-        validations.resHeaders['content-encoding'] !== 'identity'
-      ) {
-        // assert.strictEqual(
-        //   span.attributes[ATTR_HTTP_RESPONSE_HEADER],
-        //   contentLength
-        // );
-      } else {
-        // assert.strictEqual(
-        //   span.attributes[SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED],
-        //   contentLength
-        // );
-      }
-    }
+    //   if (
+    //     validations.resHeaders['content-encoding'] &&
+    //     validations.resHeaders['content-encoding'] !== 'identity'
+    //   ) {
+    //     assert.strictEqual(
+    //       span.attributes[ATTR_HTTP_RESPONSE_HEADER('content_length')],
+    //       contentLength
+    //     );
+    //   } else {
+    //     // TODO: why isn't this being imported
+    //     assert.strictEqual(
+    //       // span.attributes[SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED],
+    //       span.attributes['http.response.body.size'],
+    //       contentLength
+    //     );
+    //   }
+    // }
     assert.strictEqual(
       span.attributes[ATTR_SERVER_ADDRESS],
       validations.hostname,
@@ -150,33 +153,31 @@ export const assertSpan = (
   }
   if (span.kind === SpanKind.SERVER) {
     if (validations.reqHeaders && validations.reqHeaders['content-length']) {
-      // const contentLength = validations.reqHeaders['content-length'];
+      const contentLength = validations.reqHeaders['content-length'];
 
-      // TODO: fix
       if (
         validations.reqHeaders['content-encoding'] &&
         validations.reqHeaders['content-encoding'] !== 'identity'
       ) {
-        // assert.strictEqual(
-        //   span.attributes[ATTR_HTTP_REQUEST_HEADER],
-        //   contentLength
-        // );
+        assert.strictEqual(
+          span.attributes[ATTR_HTTP_REQUEST_HEADER(('content_length'))],
+          contentLength
+        );
       } else {
-        // assert.strictEqual(
-        //   span.attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
-        //   contentLength
-        // );
+        assert.strictEqual(
+          span.attributes[ATTR_HTTP_REQUEST_BODY_SIZE],
+          contentLength
+        );
       }
     }
     if (validations.serverName) {
-      // QUESTION: do we need this now since this is a legacy attribute?
-      // assert.strictEqual(
-      //   span.attributes[ATTR_SERVER_ADDRESS],
-      //   validations.serverName,
-      //   ' must have serverName attribute'
-      // );
+      // QUESTION: shouldn't server address be equal to hostname
+      assert.strictEqual(
+        span.attributes[ATTR_SERVER_ADDRESS],
+        validations.hostname,
+        ' must have serverName attribute'
+      );
       assert.ok(span.attributes[ATTR_SERVER_PORT], 'must have HOST_PORT');
-      assert.ok(span.attributes[ATTR_NETWORK_LOCAL_ADDRESS], 'must have HOST_IP');
     }
     assert.strictEqual(
       span.attributes[ATTR_URL_SCHEME],

@@ -89,9 +89,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
   private _headerCapture;
-  // declare private _oldHttpServerDurationHistogram: Histogram;
   declare private _stableHttpServerDurationHistogram: Histogram;
-  // declare private _oldHttpClientDurationHistogram: Histogram;
   declare private _stableHttpClientDurationHistogram: Histogram;
 
   constructor(config: HttpInstrumentationConfig = {}) {
@@ -100,23 +98,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   }
 
   protected override _updateMetricInstruments() {
-    // QUESTION: do we need these two histograms?
-    // this._oldHttpServerDurationHistogram = this.meter.createHistogram(
-    //   'http.server.duration',
-    //   {
-    //     description: 'Measures the duration of inbound HTTP requests.',
-    //     unit: 'ms',
-    //     valueType: ValueType.DOUBLE,
-    //   }
-    // );
-    // this._oldHttpClientDurationHistogram = this.meter.createHistogram(
-    //   'http.client.duration',
-    //   {
-    //     description: 'Measures the duration of outbound HTTP requests.',
-    //     unit: 'ms',
-    //     valueType: ValueType.DOUBLE,
-    //   }
-    // );
     this._stableHttpServerDurationHistogram = this.meter.createHistogram(
       METRIC_HTTP_SERVER_REQUEST_DURATION,
       {

@@ -19,9 +19,11 @@ import {
   ATTR_NETWORK_PROTOCOL_NAME,
   ATTR_NETWORK_TRANSPORT,
   ATTR_SERVER_ADDRESS,
-  HTTPFLAVORVALUES_HTTP_1_1,
-  NETTRANSPORTVALUES_IP_TCP,
 } from '@opentelemetry/semantic-conventions';
+import {
+  NET_TRANSPORT_VALUE_IP_TCP,
+  HTTP_FLAVOR_VALUE_HTTP_1_1,
+} from '@opentelemetry/semantic-conventions/incubating';
 import * as assert from 'assert';
 import * as url from 'url';
 import { HttpInstrumentation } from '../../src/http';
@@ -232,11 +234,11 @@ describe('HttpInstrumentation Integration tests', () => {
       assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
       assert.strictEqual(
         span.attributes[ATTR_NETWORK_PROTOCOL_NAME],
-        HTTPFLAVORVALUES_HTTP_1_1
+        HTTP_FLAVOR_VALUE_HTTP_1_1
       );
       assert.strictEqual(
         span.attributes[ATTR_NETWORK_TRANSPORT],
-        NETTRANSPORTVALUES_IP_TCP
+        NET_TRANSPORT_VALUE_IP_TCP
       );
       assertSpan(span, SpanKind.CLIENT, validations);
     });
@@ -405,11 +407,7 @@ describe('HttpInstrumentation Integration tests', () => {
       const span = spans.find(s => s.kind === SpanKind.CLIENT);
       assert.ok(span);
       assert.strictEqual(span.name, 'GET');
-      // TODO: fix
-      // assert.strictEqual(
-      //   span.attributes[ATTR_SERVER_ADDRESS],
-      //   `localhost:${mockServerPort}`
-      // );
+      // QUESTION: should this be localhost or `localhost:${mockServerPort}`
       assert.strictEqual(
         span.attributes[ATTR_SERVER_ADDRESS],
         `localhost`

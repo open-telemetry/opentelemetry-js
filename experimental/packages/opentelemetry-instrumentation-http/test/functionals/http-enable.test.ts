@@ -34,7 +34,6 @@ import {
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
   ATTR_HTTP_ROUTE,
-  ATTR_NETWORK_LOCAL_ADDRESS,
   ATTR_NETWORK_PEER_ADDRESS,
   ATTR_NETWORK_PEER_PORT,
   ATTR_NETWORK_PROTOCOL_NAME,
@@ -49,6 +48,9 @@ import {
   HTTP_REQUEST_METHOD_VALUE_GET,
   NETTRANSPORTVALUES_IP_TCP,
 } from '@opentelemetry/semantic-conventions';
+import {
+  NET_TRANSPORT_VALUE_IP_TCP,
+} from '@opentelemetry/semantic-conventions/incubating';
 import * as assert from 'assert';
 import * as nock from 'nock';
 import * as path from 'path';
@@ -402,10 +404,10 @@ describe('HttpInstrumentation', () => {
         ].forEach(({ span, kind }) => {
           assert.strictEqual(span.attributes[ATTR_NETWORK_PROTOCOL_VERSION], '1.1');
           // TODO: fix
-          // assert.strictEqual(
-          //   span.attributes[ATTR_NETWORK_TRANSPORT],
-          //   NETTRANSPORTVALUES_IP_TCP
-          // );
+          assert.strictEqual(
+            span.attributes[ATTR_NETWORK_TRANSPORT],
+            NET_TRANSPORT_VALUE_IP_TCP
+          );
           assertSpan(span, kind, validations);
         });
       });
@@ -1100,6 +1102,7 @@ describe('HttpInstrumentation', () => {
           [ATTR_NETWORK_PEER_ADDRESS]: response.address,
           [ATTR_NETWORK_PEER_PORT]: serverPort,
           [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
+          [ATTR_URL_PATH]: pathname,
           // added these attributes
           // QUESTION: is this duplicate?
           [ATTR_NETWORK_PROTOCOL_NAME]: '1.1',
@@ -1125,7 +1128,6 @@ describe('HttpInstrumentation', () => {
           [ATTR_SERVER_PORT]: serverPort,
           [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
           [ATTR_NETWORK_PEER_ADDRESS]: body.address,
-          [ATTR_NETWORK_LOCAL_ADDRESS]: body.address,
           [ATTR_NETWORK_PEER_PORT]: response.clientRemotePort,
           [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
           [ATTR_URL_PATH]: pathname,
@@ -1152,7 +1154,6 @@ describe('HttpInstrumentation', () => {
           [ATTR_HTTP_ROUTE]: 'TheRoute',
           [ATTR_SERVER_PORT]: serverPort,
           [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
-          [ATTR_NETWORK_LOCAL_ADDRESS]: body.address,
           [ATTR_NETWORK_PEER_ADDRESS]: body.address,
           [ATTR_NETWORK_PEER_PORT]: response.clientRemotePort,
           [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',

@@ -28,7 +28,6 @@ import {
   ATTR_HTTP_REQUEST_METHOD_ORIGINAL,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
   ATTR_HTTP_ROUTE,
-  ATTR_NETWORK_LOCAL_ADDRESS,
   ATTR_NETWORK_PEER_ADDRESS,
   ATTR_NETWORK_PEER_PORT,
   ATTR_NETWORK_PROTOCOL_NAME,
@@ -41,9 +40,13 @@ import {
   ATTR_URL_QUERY,
   ATTR_URL_SCHEME,
   ATTR_USER_AGENT_ORIGINAL,
-  NETTRANSPORTVALUES_IP_TCP,
-  NETTRANSPORTVALUES_IP_UDP
+  ATTR_HTTP_REQUEST_HEADER,
 } from '@opentelemetry/semantic-conventions';
+import {
+  NET_TRANSPORT_VALUE_IP_TCP,
+  NET_TRANSPORT_VALUE_IP_UDP,
+  ATTR_HTTP_RESPONSE_BODY_SIZE,
+} from '@opentelemetry/semantic-conventions/incubating';
 import {
   IncomingHttpHeaders,
   IncomingMessage,
@@ -142,6 +145,39 @@ export const setSpanWithError = (
   span.setStatus({ code: SpanStatusCode.ERROR, message });
   span.recordException(error);
 };
+
+/**
+ * Adds attributes for request content-length and content-encoding HTTP headers
+ * @param { IncomingMessage } Request object whose headers will be analyzed
+ * @param { Attributes } Attributes object to be modified
+ */
+// Question: is this suppose to be deprecated too if setResponseContentLengthAttribute
+// is deprecated?
+export const setRequestContentLengthAttribute = (
+  request: IncomingMessage,
+  attributes: Attributes
+): void => {
+  const length = getContentLength(request.headers);
+  if (length === null) return;
+
+  if (isCompressed(request.headers)) {
+    attributes[ATTR_HTTP_REQUEST_HEADER('content_length')] = length;
+  } else {
+    attributes[ATTR_HTTP_RESPONSE_BODY_SIZE] = length;
+  }
+};
+
+function getContentLength(
+  headers: OutgoingHttpHeaders | IncomingHttpHeaders
+): number | null {
+  const contentLengthHeader = headers['content-length'];
+  if (contentLengthHeader === undefined) return null;
+
+  const contentLength = parseInt(contentLengthHeader as string, 10);
+  if (isNaN(contentLength)) return null;
+
+  return contentLength;
+}
 
 export const isCompressed = (
   headers: OutgoingHttpHeaders | IncomingHttpHeaders
@@ -374,6 +410,7 @@ export const getOutgoingRequestAttributes = (
     [ATTR_SERVER_ADDRESS]: hostname,
     [ATTR_SERVER_PORT]: Number(port),
     [ATTR_URL_FULL]: urlFull,
+    [ATTR_URL_PATH]: requestOptions.path || '/',
     [ATTR_USER_AGENT_ORIGINAL]: userAgent,
     // leaving out protocol version, it is not yet negotiated
     // leaving out protocol name, it is only required when protocol version is set
@@ -401,10 +438,9 @@ export const setAttributesFromHttpKind = (
   if (kind) {
     attributes[ATTR_NETWORK_PROTOCOL_NAME] = kind;
     if (kind.toUpperCase() !== 'QUIC') {
-      // TODO: use new attributes for this
-      attributes[ATTR_NETWORK_TRANSPORT] =   NETTRANSPORTVALUES_IP_TCP;
+      attributes[ATTR_NETWORK_TRANSPORT] =   NET_TRANSPORT_VALUE_IP_TCP;
     } else {
-      attributes[ATTR_NETWORK_TRANSPORT] = NETTRANSPORTVALUES_IP_UDP;
+      attributes[ATTR_NETWORK_TRANSPORT] = NET_TRANSPORT_VALUE_IP_UDP;
     }
   }
 };
@@ -429,16 +465,9 @@ export const getOutgoingRequestAttributesOnResponse = (
     // Recommended
     stableAttributes[ATTR_NETWORK_PEER_ADDRESS] = remoteAddress;
     stableAttributes[ATTR_NETWORK_PEER_PORT] = remotePort;
-
-    // QUESTION: do I capture local address here to replace SEMATTRS_NET_HOST_IP?
-    // is this remote address or local address?
-    // stableAttributes[ATTR_NETWORK_LOCAL_ADDRESS] = remoteAddress;
-
     stableAttributes[ATTR_NETWORK_PROTOCOL_VERSION] = response.httpVersion;
   }
 
-  // QUESTION: is this for old attributes only?
-  // setAttributesFromHttpKind(httpVersion, oldAttributes);
   setAttributesFromHttpKind(httpVersion, stableAttributes);
 
   return Object.assign(stableAttributes);
@@ -671,8 +700,6 @@ export const getIncomingRequestAttributes = (
 
   if (parsedUrl?.pathname != null) {
     newAttributes[ATTR_URL_PATH] = parsedUrl.pathname;
-
-    // QUESTION: does this need query?
     newAttributes[ATTR_URL_QUERY] = parsedUrl.search;
   }
 
@@ -689,6 +716,7 @@ export const getIncomingRequestAttributes = (
     newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
   }
 
+  setRequestContentLengthAttribute(request, newAttributes);
   return Object.assign(newAttributes, options.hookAttributes);
 };
 
@@ -720,7 +748,7 @@ export const getIncomingRequestAttributesOnResponse = (
 ): Attributes => {
   // take socket from the request,
   // since it may be detached from the response object in keep-alive mode
-  const { socket } = request;
+  // const { socket } = request;
   const { statusCode } = response;
 
   const newAttributes: Attributes = {
@@ -728,12 +756,6 @@ export const getIncomingRequestAttributesOnResponse = (
   };
 
   const rpcMetadata = getRPCMetadata(context.active());
-  if (socket) {
-    const { localAddress } = socket;
-
-  // QUESTION: is this the right place to put this?
-  newAttributes[ATTR_NETWORK_LOCAL_ADDRESS]= localAddress
-  }
 
   if (rpcMetadata?.type === RPCType.HTTP && rpcMetadata.route !== undefined) {
     newAttributes[ATTR_HTTP_ROUTE] = rpcMetadata.route;

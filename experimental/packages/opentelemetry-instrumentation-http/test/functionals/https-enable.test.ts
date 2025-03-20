@@ -34,8 +34,10 @@ import {
   ATTR_HTTP_RESPONSE_STATUS_CODE,
   ATTR_NETWORK_TRANSPORT,
   ATTR_SERVER_PORT,
-  NETTRANSPORTVALUES_IP_TCP,
 } from '@opentelemetry/semantic-conventions';
+import {
+  NET_TRANSPORT_VALUE_IP_TCP,
+} from '@opentelemetry/semantic-conventions/incubating';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as nock from 'nock';
@@ -266,14 +268,13 @@ describe('HttpsInstrumentation', () => {
           { span: outgoingSpan, kind: SpanKind.CLIENT },
         ].forEach(({ span, kind }) => {
           console.log("validiations", validations);
-          console.log(ATTR_NETWORK_TRANSPORT, NETTRANSPORTVALUES_IP_TCP);
-          // TODO: fix test
-          // assert.strictEqual(span.attributes[ATTR_NETWORK_TRANSPORT], '1.1');
-          // assert.strictEqual(
-          //   span.attributes[ATTR_NETWORK_TRANSPORT],
-          //   NETTRANSPORTVALUES_IP_TCP
-          // );
-          // assertSpan(span, kind, validations);
+          console.log(ATTR_NETWORK_TRANSPORT, NET_TRANSPORT_VALUE_IP_TCP);
+          assert.strictEqual(span.attributes[ATTR_NETWORK_TRANSPORT], '1.1');
+          assert.strictEqual(
+            span.attributes[ATTR_NETWORK_TRANSPORT],
+            NET_TRANSPORT_VALUE_IP_TCP
+          );
+          assertSpan(span, kind, validations);
         });
       });
 

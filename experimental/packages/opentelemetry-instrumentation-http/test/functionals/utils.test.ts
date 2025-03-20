@@ -181,14 +181,9 @@ describe('Utility', () => {
       } as unknown as Span;
       const mock = sinon.mock(span);
 
-      // TODO: double check this
       mock
         .expects('setAttribute')
-        // .calledWithExactly(AttributeNames.HTTP_ERROR_NAME, 'error');
         .calledWithExactly(ATTR_ERROR_TYPE, 'Error');
-      // mock
-      //   .expects('setAttribute')
-      //   .calledWithExactly(AttributeNames.HTTP_ERROR_MESSAGE, errorMessage);
       mock.expects('setStatus').calledWithExactly({
         code: SpanStatusCode.ERROR,
         message: errorMessage,
