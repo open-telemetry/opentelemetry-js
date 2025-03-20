@@ -677,6 +677,7 @@ export const getIncomingRequestAttributes = (
   const headers = request.headers;
   const userAgent = headers['user-agent'];
   const method = request.method;
+  const httpVersion = request.httpVersion;
   const normalizedMethod = normalizeMethod(method);
 
   const serverAddress = getServerAddress(request, options.component);
@@ -717,6 +718,7 @@ export const getIncomingRequestAttributes = (
   }
 
   setRequestContentLengthAttribute(request, newAttributes);
+  setAttributesFromHttpKind(httpVersion, newAttributes);
   return Object.assign(newAttributes, options.hookAttributes);
 };
 
