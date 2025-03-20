@@ -264,7 +264,7 @@ tests.push({
 });
 
 class A {
-  constructor(private _name: string = 'foo') {}
+  constructor(private _name = 'foo') {}
 
   getName() {
     return this._name;

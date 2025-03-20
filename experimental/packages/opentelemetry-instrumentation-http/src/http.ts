@@ -232,6 +232,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'http',
       ['*'],
       (moduleExports: Http): Http => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const isESM = (moduleExports as any)[Symbol.toStringTag] === 'Module';
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           const patchedRequest = this._wrap(
@@ -247,7 +248,9 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           if (isESM) {
             // To handle `import http from 'http'`, which returns the default
             // export, we need to set `module.default.*`.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (moduleExports as any).default.request = patchedRequest;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (moduleExports as any).default.get = patchedGet;
           }
         }
@@ -279,6 +282,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'https',
       ['*'],
       (moduleExports: Https): Https => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const isESM = (moduleExports as any)[Symbol.toStringTag] === 'Module';
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           const patchedRequest = this._wrap(
@@ -294,7 +298,9 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           if (isESM) {
             // To handle `import https from 'https'`, which returns the default
             // export, we need to set `module.default.*`.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (moduleExports as any).default.request = patchedRequest;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (moduleExports as any).default.get = patchedGet;
           }
         }
