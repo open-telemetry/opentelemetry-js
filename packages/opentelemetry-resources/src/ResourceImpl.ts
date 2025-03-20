@@ -42,7 +42,7 @@ class ResourceImpl implements Resource {
     attributes: [string, MaybePromise<AttributeValue | undefined>][]
   ): Resource {
     const res = new ResourceImpl({});
-    res._rawAttributes = attributes;
+    res._rawAttributes = guardedRawAttributes(attributes);
     res._asyncAttributesPending =
       attributes.filter(([_, val]) => isPromiseLike(val)).length > 0;
     return res;
@@ -65,6 +65,8 @@ class ResourceImpl implements Resource {
 
       return [k, v];
     });
+
+    this._rawAttributes = guardedRawAttributes(this._rawAttributes);
   }
 
   public get asyncAttributesPending(): boolean {
@@ -78,12 +80,7 @@ class ResourceImpl implements Resource {
 
     for (let i = 0; i < this._rawAttributes.length; i++) {
       const [k, v] = this._rawAttributes[i];
-      try {
-        this._rawAttributes[i] = [k, isPromiseLike(v) ? await v : v];
-      } catch (err) {
-        diag.debug("a resource's async attributes promise rejected: %s", err);
-        this._rawAttributes[i] = [k, undefined];
-      }
+      this._rawAttributes[i] = [k, isPromiseLike(v) ? await v : v];
     }
 
     this._asyncAttributesPending = false;
@@ -157,5 +154,26 @@ export function defaultResource(): Resource {
     [ATTR_TELEMETRY_SDK_LANGUAGE]: SDK_INFO[ATTR_TELEMETRY_SDK_LANGUAGE],
     [ATTR_TELEMETRY_SDK_NAME]: SDK_INFO[ATTR_TELEMETRY_SDK_NAME],
     [ATTR_TELEMETRY_SDK_VERSION]: SDK_INFO[ATTR_TELEMETRY_SDK_VERSION],
+  });
+}
+
+function guardedRawAttributes(
+  attributes: RawResourceAttribute[]
+): RawResourceAttribute[] {
+  return attributes.map(([k, v]) => {
+    if (isPromiseLike(v)) {
+      return [
+        k,
+        v.catch(err => {
+          diag.debug(
+            'promise rejection for resource attribute: %s - %s',
+            k,
+            err
+          );
+          return undefined;
+        }),
+      ];
+    }
+    return [k, v];
   });
 }
