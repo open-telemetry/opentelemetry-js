@@ -76,14 +76,14 @@ const opentelemetry = require('@opentelemetry/sdk-node');
 const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
 const { ConsoleSpanExporter } = require('@opentelemetry/sdk-trace-base');
 const { resourceFromAttributes } = require('@opentelemetry/resources');
-const { SEMRESATTRS_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
+const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 
 // configure the SDK to export telemetry data to the console
 // enable all auto-instrumentations from the meta package
 const traceExporter = new ConsoleSpanExporter();
 const sdk = new opentelemetry.NodeSDK({
   resource: resourceFromAttributes({
-    [SEMRESATTRS_SERVICE_NAME]: 'my-service',
+    [ATTR_SERVICE_NAME]: 'my-service',
   }),
   traceExporter,
   instrumentations: [getNodeAutoInstrumentations()]
@@ -164,6 +164,7 @@ The below table describes which versions of each set of packages are expected to
 
 | Stable Packages | Experimental Packages |
 |-----------------|-----------------------|
+| 2.0.x           | 0.200.x               |
 | 1.30.x          | 0.57.x                |
 | 1.29.x          | 0.56.x                |
 | 1.28.x          | 0.55.x                |

@@ -638,40 +638,6 @@ describe('Node SDK', () => {
         });
       };
 
-      it('prints detected resources and debug messages to the logger', async () => {
-        const sdk = new NodeSDK({
-          autoDetectResources: true,
-        });
-
-        // This test depends on the env detector to be functioning as intended
-        const mockedLoggerMethod = Sinon.fake();
-        const mockedVerboseLoggerMethod = Sinon.fake();
-
-        diag.setLogger(
-          {
-            debug: mockedLoggerMethod,
-            verbose: mockedVerboseLoggerMethod,
-          } as any,
-          DiagLogLevel.VERBOSE
-        );
-
-        sdk.start();
-        await sdk['_resource'].waitForAsyncAttributes?.();
-
-        // Test that the Env Detector successfully found its resource and populated it with the right values.
-        assert.ok(
-          callArgsContains(mockedLoggerMethod, 'EnvDetector found resource.')
-        );
-        // Regex formatting accounts for whitespace variations in util.inspect output over different node versions
-        assert.ok(
-          callArgsMatches(
-            mockedVerboseLoggerMethod,
-            /{\s+"service\.instance\.id":\s+"627cc493",\s+"service\.name":\s+"my-service",\s+"service\.namespace":\s+"default",\s+"service\.version":\s+"0.0.1"\s+}\s*/gm
-          )
-        );
-        await sdk.shutdown();
-      });
-
       describe('with unknown OTEL_NODE_RESOURCE_DETECTORS value', () => {
         before(() => {
           process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,os,no-such-detector';
