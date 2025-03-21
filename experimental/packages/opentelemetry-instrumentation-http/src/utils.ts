@@ -663,7 +663,6 @@ function getInfoFromIncomingMessage(
  * Returns incoming request attributes scoped to the request data
  * @param {IncomingMessage} request the request object
  * @param {{ component: string, serverName?: string, hookAttributes?: Attributes }} options used to pass data needed to create attributes
- * @param {SemconvStability} semconvStability determines which semconv version to use
  */
 export const getIncomingRequestAttributes = (
   request: IncomingMessage,
@@ -767,20 +766,6 @@ export const getIncomingRequestAttributesOnResponse = (
  * Returns incoming request Metric attributes scoped to the request data
  * @param {Attributes} spanAttributes the span attributes
  */
-export const getIncomingRequestMetricAttributesOnResponse = (
-  spanAttributes: Attributes
-): Attributes => {
-  const metricAttributes: Attributes = {};
-  metricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] =
-    spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
-  metricAttributes[ATTR_SERVER_PORT] =
-    spanAttributes[ATTR_SERVER_PORT];
-  if (spanAttributes[ATTR_HTTP_ROUTE] !== undefined) {
-    metricAttributes[ATTR_HTTP_ROUTE] = spanAttributes[ATTR_HTTP_ROUTE];
-  }
-  return metricAttributes;
-};
-
 export const getIncomingStableRequestMetricAttributesOnResponse = (
   spanAttributes: Attributes
 ): Attributes => {

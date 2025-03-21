@@ -250,13 +250,13 @@ describe('Utility', () => {
     });
   });
 
-  describe('getIncomingRequestMetricAttributesOnResponse()', () => {
+  describe('getIncomingStableRequestMetricAttributesOnResponse()', () => {
     it('should correctly add http_route if span has it', () => {
       const spanAttributes: Attributes = {
         [ATTR_HTTP_ROUTE]: '/user/:id',
       };
       const metricAttributes =
-        utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
+        utils.getIncomingStableRequestMetricAttributesOnResponse(spanAttributes);
 
       assert.deepStrictEqual(
         metricAttributes[ATTR_HTTP_ROUTE],
@@ -267,7 +267,7 @@ describe('Utility', () => {
     it('should skip http_route if span does not have it', () => {
       const spanAttributes: Attributes = {};
       const metricAttributes =
-        utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
+        utils.getIncomingStableRequestMetricAttributesOnResponse(spanAttributes);
       assert.deepEqual(metricAttributes[ATTR_HTTP_ROUTE], undefined);
     });
   });
