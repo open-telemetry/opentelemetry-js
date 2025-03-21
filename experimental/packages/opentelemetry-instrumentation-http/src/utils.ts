@@ -30,38 +30,23 @@ import {
   ATTR_HTTP_ROUTE,
   ATTR_NETWORK_PEER_ADDRESS,
   ATTR_NETWORK_PEER_PORT,
+  ATTR_NETWORK_PROTOCOL_NAME,
   ATTR_NETWORK_PROTOCOL_VERSION,
+  ATTR_NETWORK_TRANSPORT,
   ATTR_SERVER_ADDRESS,
   ATTR_SERVER_PORT,
   ATTR_URL_FULL,
   ATTR_URL_PATH,
+  ATTR_URL_QUERY,
   ATTR_URL_SCHEME,
   ATTR_USER_AGENT_ORIGINAL,
-  NETTRANSPORTVALUES_IP_TCP,
-  NETTRANSPORTVALUES_IP_UDP,
-  SEMATTRS_HTTP_CLIENT_IP,
-  SEMATTRS_HTTP_FLAVOR,
-  SEMATTRS_HTTP_HOST,
-  SEMATTRS_HTTP_METHOD,
-  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
-  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
-  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-  SEMATTRS_HTTP_ROUTE,
-  SEMATTRS_HTTP_SCHEME,
-  SEMATTRS_HTTP_SERVER_NAME,
-  SEMATTRS_HTTP_STATUS_CODE,
-  SEMATTRS_HTTP_TARGET,
-  SEMATTRS_HTTP_URL,
-  SEMATTRS_HTTP_USER_AGENT,
-  SEMATTRS_NET_HOST_IP,
-  SEMATTRS_NET_HOST_NAME,
-  SEMATTRS_NET_HOST_PORT,
-  SEMATTRS_NET_PEER_IP,
-  SEMATTRS_NET_PEER_NAME,
-  SEMATTRS_NET_PEER_PORT,
-  SEMATTRS_NET_TRANSPORT,
+  ATTR_HTTP_REQUEST_HEADER,
 } from '@opentelemetry/semantic-conventions';
+import {
+  NET_TRANSPORT_VALUE_IP_TCP,
+  NET_TRANSPORT_VALUE_IP_UDP,
+  ATTR_HTTP_RESPONSE_BODY_SIZE,
+} from '@opentelemetry/semantic-conventions/incubating';
 import {
   IncomingHttpHeaders,
   IncomingMessage,
@@ -71,12 +56,10 @@ import {
 } from 'http';
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 import * as url from 'url';
-import { AttributeNames } from './enums/AttributeNames';
 import {
   Err,
   IgnoreMatcher,
   ParsedRequestOptions,
-  SemconvStability,
 } from './internal-types';
 import forwardedParse = require('forwarded-parse');
 
@@ -151,26 +134,13 @@ export const satisfiesPattern = (
  * Sets the span with the error passed in params
  * @param {Span} span the span that need to be set
  * @param {Error} error error that will be set to span
- * @param {SemconvStability} semconvStability determines which semconv version to use
  */
 export const setSpanWithError = (
   span: Span,
-  error: Err,
-  semconvStability: SemconvStability
+  error: Err
 ): void => {
   const message = error.message;
-
-  if ((semconvStability & SemconvStability.OLD) === SemconvStability.OLD) {
-    span.setAttribute(AttributeNames.HTTP_ERROR_NAME, error.name);
-    span.setAttribute(AttributeNames.HTTP_ERROR_MESSAGE, message);
-  }
-
-  if (
-    (semconvStability & SemconvStability.STABLE) ===
-    SemconvStability.STABLE
-  ) {
-    span.setAttribute(ATTR_ERROR_TYPE, error.name);
-  }
+  span.setAttribute(ATTR_ERROR_TYPE, error.name);
 
   span.setStatus({ code: SpanStatusCode.ERROR, message });
   span.recordException(error);
@@ -181,6 +151,8 @@ export const setSpanWithError = (
  * @param { IncomingMessage } Request object whose headers will be analyzed
  * @param { Attributes } Attributes object to be modified
  */
+// Question: is this suppose to be deprecated too if setResponseContentLengthAttribute
+// is deprecated?
 export const setRequestContentLengthAttribute = (
   request: IncomingMessage,
   attributes: Attributes
@@ -189,30 +161,9 @@ export const setRequestContentLengthAttribute = (
   if (length === null) return;
 
   if (isCompressed(request.headers)) {
-    attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH] = length;
+    attributes[ATTR_HTTP_REQUEST_HEADER('content_length')] = length;
   } else {
-    attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED] = length;
-  }
-};
-
-/**
- * Adds attributes for response content-length and content-encoding HTTP headers
- * @param { IncomingMessage } Response object whose headers will be analyzed
- * @param { Attributes } Attributes object to be modified
- *
- * @deprecated this is for an older version of semconv. It is retained for compatibility using OTEL_SEMCONV_STABILITY_OPT_IN
- */
-export const setResponseContentLengthAttribute = (
-  response: IncomingMessage,
-  attributes: Attributes
-): void => {
-  const length = getContentLength(response.headers);
-  if (length === null) return;
-
-  if (isCompressed(response.headers)) {
-    attributes[SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH] = length;
-  } else {
-    attributes[SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED] = length;
+    attributes[ATTR_HTTP_RESPONSE_BODY_SIZE] = length;
   }
 };
 
@@ -432,7 +383,6 @@ export const extractHostnameAndPort = (
  * Returns outgoing request attributes scoped to the options passed to the request
  * @param {ParsedRequestOptions} requestOptions the same options used to make the request
  * @param {{ component: string, hostname: string, hookAttributes?: Attributes }} options used to pass data needed to create attributes
- * @param {SemconvStability} semconvStability determines which semconv version to use
  */
 export const getOutgoingRequestAttributes = (
   requestOptions: ParsedRequestOptions,
@@ -442,7 +392,6 @@ export const getOutgoingRequestAttributes = (
     port: string | number;
     hookAttributes?: Attributes;
   },
-  semconvStability: SemconvStability
 ): Attributes => {
   const hostname = options.hostname;
   const port = options.port;
@@ -455,20 +404,14 @@ export const getOutgoingRequestAttributes = (
     headers,
     `${options.component}:`
   );
-  const oldAttributes: Attributes = {
-    [SEMATTRS_HTTP_URL]: urlFull,
-    [SEMATTRS_HTTP_METHOD]: method,
-    [SEMATTRS_HTTP_TARGET]: requestOptions.path || '/',
-    [SEMATTRS_NET_PEER_NAME]: hostname,
-    [SEMATTRS_HTTP_HOST]: headers.host ?? `${hostname}:${port}`,
-  };
-
   const newAttributes: Attributes = {
     // Required attributes
     [ATTR_HTTP_REQUEST_METHOD]: normalizedMethod,
     [ATTR_SERVER_ADDRESS]: hostname,
     [ATTR_SERVER_PORT]: Number(port),
     [ATTR_URL_FULL]: urlFull,
+    [ATTR_URL_PATH]: requestOptions.path || '/',
+    [ATTR_USER_AGENT_ORIGINAL]: userAgent,
     // leaving out protocol version, it is not yet negotiated
     // leaving out protocol name, it is only required when protocol version is set
     // retries and redirects not supported
@@ -481,33 +424,7 @@ export const getOutgoingRequestAttributes = (
     newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
   }
 
-  if (userAgent !== undefined) {
-    oldAttributes[SEMATTRS_HTTP_USER_AGENT] = userAgent;
-  }
-
-  switch (semconvStability) {
-    case SemconvStability.STABLE:
-      return Object.assign(newAttributes, options.hookAttributes);
-    case SemconvStability.OLD:
-      return Object.assign(oldAttributes, options.hookAttributes);
-  }
-
-  return Object.assign(oldAttributes, newAttributes, options.hookAttributes);
-};
-
-/**
- * Returns outgoing request Metric attributes scoped to the request data
- * @param {Attributes} spanAttributes the span attributes
- */
-export const getOutgoingRequestMetricAttributes = (
-  spanAttributes: Attributes
-): Attributes => {
-  const metricAttributes: Attributes = {};
-  metricAttributes[SEMATTRS_HTTP_METHOD] = spanAttributes[SEMATTRS_HTTP_METHOD];
-  metricAttributes[SEMATTRS_NET_PEER_NAME] =
-    spanAttributes[SEMATTRS_NET_PEER_NAME];
-  //TODO: http.url attribute, it should substitute any parameters to avoid high cardinality.
-  return metricAttributes;
+  return Object.assign(newAttributes, options.hookAttributes);
 };
 
 /**
@@ -519,11 +436,11 @@ export const setAttributesFromHttpKind = (
   attributes: Attributes
 ): void => {
   if (kind) {
-    attributes[SEMATTRS_HTTP_FLAVOR] = kind;
+    attributes[ATTR_NETWORK_PROTOCOL_NAME] = kind;
     if (kind.toUpperCase() !== 'QUIC') {
-      attributes[SEMATTRS_NET_TRANSPORT] = NETTRANSPORTVALUES_IP_TCP;
+      attributes[ATTR_NETWORK_TRANSPORT] =   NET_TRANSPORT_VALUE_IP_TCP;
     } else {
-      attributes[SEMATTRS_NET_TRANSPORT] = NETTRANSPORTVALUES_IP_UDP;
+      attributes[ATTR_NETWORK_TRANSPORT] = NET_TRANSPORT_VALUE_IP_UDP;
     }
   }
 };
@@ -531,14 +448,11 @@ export const setAttributesFromHttpKind = (
 /**
  * Returns outgoing request attributes scoped to the response data
  * @param {IncomingMessage} response the response object
- * @param {SemconvStability} semconvStability determines which semconv version to use
  */
 export const getOutgoingRequestAttributesOnResponse = (
   response: IncomingMessage,
-  semconvStability: SemconvStability
 ): Attributes => {
-  const { statusCode, statusMessage, httpVersion, socket } = response;
-  const oldAttributes: Attributes = {};
+  const { statusCode,httpVersion, socket } = response;
   const stableAttributes: Attributes = {};
 
   if (statusCode != null) {
@@ -547,49 +461,16 @@ export const getOutgoingRequestAttributesOnResponse = (
 
   if (socket) {
     const { remoteAddress, remotePort } = socket;
-    oldAttributes[SEMATTRS_NET_PEER_IP] = remoteAddress;
-    oldAttributes[SEMATTRS_NET_PEER_PORT] = remotePort;
 
     // Recommended
     stableAttributes[ATTR_NETWORK_PEER_ADDRESS] = remoteAddress;
     stableAttributes[ATTR_NETWORK_PEER_PORT] = remotePort;
     stableAttributes[ATTR_NETWORK_PROTOCOL_VERSION] = response.httpVersion;
   }
-  setResponseContentLengthAttribute(response, oldAttributes);
 
-  if (statusCode) {
-    oldAttributes[SEMATTRS_HTTP_STATUS_CODE] = statusCode;
-    oldAttributes[AttributeNames.HTTP_STATUS_TEXT] = (
-      statusMessage || ''
-    ).toUpperCase();
-  }
+  setAttributesFromHttpKind(httpVersion, stableAttributes);
 
-  setAttributesFromHttpKind(httpVersion, oldAttributes);
-
-  switch (semconvStability) {
-    case SemconvStability.STABLE:
-      return stableAttributes;
-    case SemconvStability.OLD:
-      return oldAttributes;
-  }
-
-  return Object.assign(oldAttributes, stableAttributes);
-};
-
-/**
- * Returns outgoing request Metric attributes scoped to the response data
- * @param {Attributes} spanAttributes the span attributes
- */
-export const getOutgoingRequestMetricAttributesOnResponse = (
-  spanAttributes: Attributes
-): Attributes => {
-  const metricAttributes: Attributes = {};
-  metricAttributes[SEMATTRS_NET_PEER_PORT] =
-    spanAttributes[SEMATTRS_NET_PEER_PORT];
-  metricAttributes[SEMATTRS_HTTP_STATUS_CODE] =
-    spanAttributes[SEMATTRS_HTTP_STATUS_CODE];
-  metricAttributes[SEMATTRS_HTTP_FLAVOR] = spanAttributes[SEMATTRS_HTTP_FLAVOR];
-  return metricAttributes;
+  return Object.assign(stableAttributes);
 };
 
 function parseHostHeader(
@@ -782,7 +663,6 @@ function getInfoFromIncomingMessage(
  * Returns incoming request attributes scoped to the request data
  * @param {IncomingMessage} request the request object
  * @param {{ component: string, serverName?: string, hookAttributes?: Attributes }} options used to pass data needed to create attributes
- * @param {SemconvStability} semconvStability determines which semconv version to use
  */
 export const getIncomingRequestAttributes = (
   request: IncomingMessage,
@@ -790,23 +670,16 @@ export const getIncomingRequestAttributes = (
     component: 'http' | 'https';
     serverName?: string;
     hookAttributes?: Attributes;
-    semconvStability: SemconvStability;
   },
   logger: DiagLogger
 ): Attributes => {
   const headers = request.headers;
   const userAgent = headers['user-agent'];
-  const ips = headers['x-forwarded-for'];
-  const httpVersion = request.httpVersion;
-  const host = headers.host;
-  const hostname = host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') || 'localhost';
-
   const method = request.method;
+  const httpVersion = request.httpVersion;
   const normalizedMethod = normalizeMethod(method);
 
   const serverAddress = getServerAddress(request, options.component);
-  const serverName = options.serverName;
-
   const remoteClientAddress = getRemoteClientAddress(request);
 
   const newAttributes: Attributes = {
@@ -827,10 +700,11 @@ export const getIncomingRequestAttributes = (
 
   if (parsedUrl?.pathname != null) {
     newAttributes[ATTR_URL_PATH] = parsedUrl.pathname;
+    newAttributes[ATTR_URL_QUERY] = parsedUrl.search;
   }
 
   if (remoteClientAddress != null) {
-    newAttributes[ATTR_CLIENT_ADDRESS] = remoteClientAddress;
+    newAttributes[ATTR_CLIENT_ADDRESS] = remoteClientAddress.split(',')[0];
   }
 
   if (serverAddress?.port != null) {
@@ -842,41 +716,9 @@ export const getIncomingRequestAttributes = (
     newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
   }
 
-  const oldAttributes: Attributes = {
-    [SEMATTRS_HTTP_URL]: parsedUrl.toString(),
-    [SEMATTRS_HTTP_HOST]: host,
-    [SEMATTRS_NET_HOST_NAME]: hostname,
-    [SEMATTRS_HTTP_METHOD]: method,
-    [SEMATTRS_HTTP_SCHEME]: options.component,
-  };
-
-  if (typeof ips === 'string') {
-    oldAttributes[SEMATTRS_HTTP_CLIENT_IP] = ips.split(',')[0];
-  }
-
-  if (typeof serverName === 'string') {
-    oldAttributes[SEMATTRS_HTTP_SERVER_NAME] = serverName;
-  }
-
-  if (parsedUrl?.pathname) {
-    oldAttributes[SEMATTRS_HTTP_TARGET] =
-      parsedUrl?.pathname + parsedUrl?.search || '/';
-  }
-
-  if (userAgent !== undefined) {
-    oldAttributes[SEMATTRS_HTTP_USER_AGENT] = userAgent;
-  }
-  setRequestContentLengthAttribute(request, oldAttributes);
-  setAttributesFromHttpKind(httpVersion, oldAttributes);
-
-  switch (options.semconvStability) {
-    case SemconvStability.STABLE:
-      return Object.assign(newAttributes, options.hookAttributes);
-    case SemconvStability.OLD:
-      return Object.assign(oldAttributes, options.hookAttributes);
-  }
-
-  return Object.assign(oldAttributes, newAttributes, options.hookAttributes);
+  setRequestContentLengthAttribute(request, newAttributes);
+  setAttributesFromHttpKind(httpVersion, newAttributes);
+  return Object.assign(newAttributes, options.hookAttributes);
 };
 
 /**
@@ -888,11 +730,11 @@ export const getIncomingRequestMetricAttributes = (
   spanAttributes: Attributes
 ): Attributes => {
   const metricAttributes: Attributes = {};
-  metricAttributes[SEMATTRS_HTTP_SCHEME] = spanAttributes[SEMATTRS_HTTP_SCHEME];
-  metricAttributes[SEMATTRS_HTTP_METHOD] = spanAttributes[SEMATTRS_HTTP_METHOD];
-  metricAttributes[SEMATTRS_NET_HOST_NAME] =
-    spanAttributes[SEMATTRS_NET_HOST_NAME];
-  metricAttributes[SEMATTRS_HTTP_FLAVOR] = spanAttributes[SEMATTRS_HTTP_FLAVOR];
+  metricAttributes[ATTR_URL_SCHEME] = spanAttributes[ATTR_URL_SCHEME];
+  metricAttributes[ATTR_URL_SCHEME] = spanAttributes[ATTR_URL_SCHEME];
+  metricAttributes[ATTR_SERVER_ADDRESS] =
+    spanAttributes[ATTR_SERVER_ADDRESS];
+  metricAttributes[ATTR_NETWORK_PROTOCOL_NAME] = spanAttributes[ATTR_NETWORK_PROTOCOL_NAME];
   //TODO: http.target attribute, it should substitute any parameters to avoid high cardinality.
   return metricAttributes;
 };
@@ -904,70 +746,32 @@ export const getIncomingRequestMetricAttributes = (
 export const getIncomingRequestAttributesOnResponse = (
   request: IncomingMessage,
   response: ServerResponse,
-  semconvStability: SemconvStability
 ): Attributes => {
-  // take socket from the request,
-  // since it may be detached from the response object in keep-alive mode
-  const { socket } = request;
-  const { statusCode, statusMessage } = response;
+  const { statusCode } = response;
 
   const newAttributes: Attributes = {
     [ATTR_HTTP_RESPONSE_STATUS_CODE]: statusCode,
   };
 
   const rpcMetadata = getRPCMetadata(context.active());
-  const oldAttributes: Attributes = {};
-  if (socket) {
-    const { localAddress, localPort, remoteAddress, remotePort } = socket;
-    oldAttributes[SEMATTRS_NET_HOST_IP] = localAddress;
-    oldAttributes[SEMATTRS_NET_HOST_PORT] = localPort;
-    oldAttributes[SEMATTRS_NET_PEER_IP] = remoteAddress;
-    oldAttributes[SEMATTRS_NET_PEER_PORT] = remotePort;
-  }
-  oldAttributes[SEMATTRS_HTTP_STATUS_CODE] = statusCode;
-  oldAttributes[AttributeNames.HTTP_STATUS_TEXT] = (
-    statusMessage || ''
-  ).toUpperCase();
 
   if (rpcMetadata?.type === RPCType.HTTP && rpcMetadata.route !== undefined) {
-    oldAttributes[SEMATTRS_HTTP_ROUTE] = rpcMetadata.route;
     newAttributes[ATTR_HTTP_ROUTE] = rpcMetadata.route;
   }
 
-  switch (semconvStability) {
-    case SemconvStability.STABLE:
-      return newAttributes;
-    case SemconvStability.OLD:
-      return oldAttributes;
-  }
-
-  return Object.assign(oldAttributes, newAttributes);
+  return newAttributes;
 };
 
 /**
  * Returns incoming request Metric attributes scoped to the request data
  * @param {Attributes} spanAttributes the span attributes
  */
-export const getIncomingRequestMetricAttributesOnResponse = (
-  spanAttributes: Attributes
-): Attributes => {
-  const metricAttributes: Attributes = {};
-  metricAttributes[SEMATTRS_HTTP_STATUS_CODE] =
-    spanAttributes[SEMATTRS_HTTP_STATUS_CODE];
-  metricAttributes[SEMATTRS_NET_HOST_PORT] =
-    spanAttributes[SEMATTRS_NET_HOST_PORT];
-  if (spanAttributes[SEMATTRS_HTTP_ROUTE] !== undefined) {
-    metricAttributes[SEMATTRS_HTTP_ROUTE] = spanAttributes[SEMATTRS_HTTP_ROUTE];
-  }
-  return metricAttributes;
-};
-
 export const getIncomingStableRequestMetricAttributesOnResponse = (
   spanAttributes: Attributes
 ): Attributes => {
   const metricAttributes: Attributes = {};
   if (spanAttributes[ATTR_HTTP_ROUTE] !== undefined) {
-    metricAttributes[ATTR_HTTP_ROUTE] = spanAttributes[SEMATTRS_HTTP_ROUTE];
+    metricAttributes[ATTR_HTTP_ROUTE] = spanAttributes[ATTR_HTTP_ROUTE];
   }
 
   // required if and only if one was sent, same as span requirement
