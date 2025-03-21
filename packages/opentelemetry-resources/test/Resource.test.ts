@@ -26,6 +26,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { describeBrowser, describeNode } from './util';
 import { defaultResource, emptyResource, resourceFromAttributes } from '../src';
+import * as EventEmitter from 'events';
 
 describe('Resource', () => {
   const resource1 = resourceFromAttributes({
@@ -253,10 +254,36 @@ describe('Resource', () => {
       await resource.waitForAsyncAttributes?.();
 
       assert.ok(
-        debugStub.calledWithMatch(
-          "a resource's async attributes promise rejected"
-        )
+        debugStub.calledWithMatch('promise rejection for resource attribute')
       );
+    });
+
+    it('should guard against asynchronous attribute rejections', async () => {
+      const ee = new EventEmitter();
+      const badAttribute = new Promise<string>((resolve, reject) => {
+        ee.on('fail', reason => reject(reason));
+      });
+      const goodAttribute = new Promise<string>((resolve, reject) => {
+        ee.on('fail', reason => resolve(reason));
+      });
+
+      const res = resourceFromAttributes({ badAttribute, goodAttribute });
+
+      let noUnhandledRejection = true;
+      function onUnhandledRejection() {
+        noUnhandledRejection = false;
+      }
+      process.once('unhandledRejection', onUnhandledRejection);
+      try {
+        ee.emit('fail', 'resource attribute value promise rejected');
+        // yield to event loop to make sure we don't miss anything
+        await new Promise((resolve, reject) => setTimeout(resolve, 1));
+        assert.ok(noUnhandledRejection);
+        await res.waitForAsyncAttributes?.();
+        assert.notDeepStrictEqual(res.attributes, { goodAttribute: 'fail' });
+      } finally {
+        process.removeListener('unhandledRejection', onUnhandledRejection);
+      }
     });
   });
 
