@@ -748,9 +748,6 @@ export const getIncomingRequestAttributesOnResponse = (
   request: IncomingMessage,
   response: ServerResponse,
 ): Attributes => {
-  // take socket from the request,
-  // since it may be detached from the response object in keep-alive mode
-  // const { socket } = request;
   const { statusCode } = response;
 
   const newAttributes: Attributes = {

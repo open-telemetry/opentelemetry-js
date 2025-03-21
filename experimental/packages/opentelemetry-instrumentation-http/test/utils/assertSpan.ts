@@ -32,11 +32,9 @@ import {
   ATTR_USER_AGENT_ORIGINAL,
   ATTR_URL_PATH,
   ATTR_HTTP_REQUEST_HEADER,
-  // ATTR_HTTP_RESPONSE_HEADER,
 } from '@opentelemetry/semantic-conventions';
 import {
   ATTR_HTTP_REQUEST_BODY_SIZE,
-  // ATTR_HTTP_RESPONSE_BODY_SIZE
 } from '@opentelemetry/semantic-conventions/incubating';
 import * as assert from 'assert';
 import * as http from 'http';
@@ -114,27 +112,6 @@ export const assertSpan = (
     }
   }
   if (span.kind === SpanKind.CLIENT) {
-    // QUESTION: is this valid anymore if setResponseContentLengthAttribute is deprecated?
-    // if (validations.resHeaders['content-length']) {
-    //   const contentLength = Number(validations.resHeaders['content-length']);
-
-    //   if (
-    //     validations.resHeaders['content-encoding'] &&
-    //     validations.resHeaders['content-encoding'] !== 'identity'
-    //   ) {
-    //     assert.strictEqual(
-    //       span.attributes[ATTR_HTTP_RESPONSE_HEADER('content_length')],
-    //       contentLength
-    //     );
-    //   } else {
-    //     // TODO: why isn't this being imported
-    //     assert.strictEqual(
-    //       // span.attributes[SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED],
-    //       span.attributes['http.response.body.size'],
-    //       contentLength
-    //     );
-    //   }
-    // }
     assert.strictEqual(
       span.attributes[ATTR_SERVER_ADDRESS],
       validations.hostname,
