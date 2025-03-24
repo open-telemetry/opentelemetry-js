@@ -84,7 +84,6 @@ const serverPort = 22346;
 const protocol = 'http';
 const hostname = 'localhost';
 const pathname = '/test';
-const serverName = 'my.server.name';
 const memoryExporter = new InMemorySpanExporter();
 const provider = new NodeTracerProvider({
   spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
@@ -305,7 +304,6 @@ describe('HttpInstrumentation', () => {
           responseHook: responseHookFunction,
           startIncomingSpanHook: startIncomingSpanHookFunction,
           startOutgoingSpanHook: startOutgoingSpanHookFunction,
-          serverName,
         });
         instrumentation.enable();
         server = http.createServer((request, response) => {
@@ -381,7 +379,6 @@ describe('HttpInstrumentation', () => {
           resHeaders: result.resHeaders,
           reqHeaders: result.reqHeaders,
           component: 'http',
-          serverName,
         };
 
         assert.strictEqual(spans.length, 2);
@@ -1101,8 +1098,6 @@ describe('HttpInstrumentation', () => {
           [ATTR_NETWORK_PEER_PORT]: serverPort,
           [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
           [ATTR_URL_PATH]: pathname,
-          // added these attributes
-          // QUESTION: is this duplicate?
           [ATTR_NETWORK_PROTOCOL_NAME]: '1.1',
           [ATTR_NETWORK_TRANSPORT]: NET_TRANSPORT_VALUE_IP_TCP
         });

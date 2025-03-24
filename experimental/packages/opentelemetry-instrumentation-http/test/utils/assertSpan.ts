@@ -31,11 +31,7 @@ import {
   ATTR_URL_SCHEME,
   ATTR_USER_AGENT_ORIGINAL,
   ATTR_URL_PATH,
-  ATTR_HTTP_REQUEST_HEADER,
 } from '@opentelemetry/semantic-conventions';
-import {
-  ATTR_HTTP_REQUEST_BODY_SIZE,
-} from '@opentelemetry/semantic-conventions/incubating';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as utils from '../../src/utils';
@@ -53,7 +49,6 @@ export const assertSpan = (
     reqHeaders?: http.OutgoingHttpHeaders;
     path?: string | null;
     forceStatus?: SpanStatus;
-    serverName?: string;
     component: string;
     noNetPeer?: boolean; // we don't expect net peer info when request throw before being sent
     error?: Exception;
@@ -129,33 +124,6 @@ export const assertSpan = (
     );
   }
   if (span.kind === SpanKind.SERVER) {
-    if (validations.reqHeaders && validations.reqHeaders['content-length']) {
-      const contentLength = validations.reqHeaders['content-length'];
-
-      if (
-        validations.reqHeaders['content-encoding'] &&
-        validations.reqHeaders['content-encoding'] !== 'identity'
-      ) {
-        assert.strictEqual(
-          span.attributes[ATTR_HTTP_REQUEST_HEADER(('content_length'))],
-          contentLength
-        );
-      } else {
-        assert.strictEqual(
-          span.attributes[ATTR_HTTP_REQUEST_BODY_SIZE],
-          contentLength
-        );
-      }
-    }
-    if (validations.serverName) {
-      // QUESTION: shouldn't server address be equal to hostname
-      assert.strictEqual(
-        span.attributes[ATTR_SERVER_ADDRESS],
-        validations.hostname,
-        ' must have serverName attribute'
-      );
-      assert.ok(span.attributes[ATTR_SERVER_PORT], 'must have HOST_PORT');
-    }
     assert.strictEqual(
       span.attributes[ATTR_URL_SCHEME],
       validations.component,

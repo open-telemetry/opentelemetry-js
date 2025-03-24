@@ -553,7 +553,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         request,
         {
           component: component,
-          serverName: instrumentation.getConfig().serverName,
           hookAttributes: instrumentation._callStartSpanHook(
             request,
             instrumentation.getConfig().startIncomingSpanHook

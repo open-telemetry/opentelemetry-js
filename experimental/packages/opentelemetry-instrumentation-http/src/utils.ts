@@ -40,12 +40,10 @@ import {
   ATTR_URL_QUERY,
   ATTR_URL_SCHEME,
   ATTR_USER_AGENT_ORIGINAL,
-  ATTR_HTTP_REQUEST_HEADER,
 } from '@opentelemetry/semantic-conventions';
 import {
   NET_TRANSPORT_VALUE_IP_TCP,
   NET_TRANSPORT_VALUE_IP_UDP,
-  ATTR_HTTP_RESPONSE_BODY_SIZE,
 } from '@opentelemetry/semantic-conventions/incubating';
 import {
   IncomingHttpHeaders,
@@ -145,39 +143,6 @@ export const setSpanWithError = (
   span.setStatus({ code: SpanStatusCode.ERROR, message });
   span.recordException(error);
 };
-
-/**
- * Adds attributes for request content-length and content-encoding HTTP headers
- * @param { IncomingMessage } Request object whose headers will be analyzed
- * @param { Attributes } Attributes object to be modified
- */
-// Question: is this suppose to be deprecated too if setResponseContentLengthAttribute
-// is deprecated?
-export const setRequestContentLengthAttribute = (
-  request: IncomingMessage,
-  attributes: Attributes
-): void => {
-  const length = getContentLength(request.headers);
-  if (length === null) return;
-
-  if (isCompressed(request.headers)) {
-    attributes[ATTR_HTTP_REQUEST_HEADER('content_length')] = length;
-  } else {
-    attributes[ATTR_HTTP_RESPONSE_BODY_SIZE] = length;
-  }
-};
-
-function getContentLength(
-  headers: OutgoingHttpHeaders | IncomingHttpHeaders
-): number | null {
-  const contentLengthHeader = headers['content-length'];
-  if (contentLengthHeader === undefined) return null;
-
-  const contentLength = parseInt(contentLengthHeader as string, 10);
-  if (isNaN(contentLength)) return null;
-
-  return contentLength;
-}
 
 export const isCompressed = (
   headers: OutgoingHttpHeaders | IncomingHttpHeaders
@@ -662,13 +627,12 @@ function getInfoFromIncomingMessage(
 /**
  * Returns incoming request attributes scoped to the request data
  * @param {IncomingMessage} request the request object
- * @param {{ component: string, serverName?: string, hookAttributes?: Attributes }} options used to pass data needed to create attributes
+ * @param {{ component: string, hookAttributes?: Attributes }} options used to pass data needed to create attributes
  */
 export const getIncomingRequestAttributes = (
   request: IncomingMessage,
   options: {
     component: 'http' | 'https';
-    serverName?: string;
     hookAttributes?: Attributes;
   },
   logger: DiagLogger
@@ -716,7 +680,6 @@ export const getIncomingRequestAttributes = (
     newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
   }
 
-  setRequestContentLengthAttribute(request, newAttributes);
   setAttributesFromHttpKind(httpVersion, newAttributes);
   return Object.assign(newAttributes, options.hookAttributes);
 };

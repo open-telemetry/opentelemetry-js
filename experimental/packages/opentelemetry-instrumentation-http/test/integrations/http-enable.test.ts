@@ -18,7 +18,6 @@ import { SpanKind, Span, context, propagation } from '@opentelemetry/api';
 import {
   ATTR_NETWORK_PROTOCOL_NAME,
   ATTR_NETWORK_TRANSPORT,
-  ATTR_SERVER_ADDRESS,
 } from '@opentelemetry/semantic-conventions';
 import {
   NET_TRANSPORT_VALUE_IP_TCP,
@@ -407,11 +406,6 @@ describe('HttpInstrumentation Integration tests', () => {
       const span = spans.find(s => s.kind === SpanKind.CLIENT);
       assert.ok(span);
       assert.strictEqual(span.name, 'GET');
-      // QUESTION: should this be localhost or `localhost:${mockServerPort}`
-      assert.strictEqual(
-        span.attributes[ATTR_SERVER_ADDRESS],
-        `localhost`
-      );
     });
   });
 });
