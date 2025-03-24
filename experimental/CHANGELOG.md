@@ -7,6 +7,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ## Unreleased
 
 ### :boom: Breaking Changes
+* feat(instrumentation-http): Remove legacy http span attributes [#5552] (https://github.com/open-telemetry/opentelemetry-js/pull/5552) @svetlanabrennan
 
 ### :rocket: Features
 
