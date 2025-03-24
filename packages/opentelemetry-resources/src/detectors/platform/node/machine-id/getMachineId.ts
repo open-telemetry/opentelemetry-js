@@ -17,6 +17,7 @@ import * as process from 'process';
 
 let getMachineId: () => Promise<string | undefined>;
 
+/* eslint-disable @typescript-eslint/no-require-imports */
 switch (process.platform) {
   case 'darwin':
     ({ getMachineId } = require('./getMachineId-darwin'));
@@ -33,5 +34,6 @@ switch (process.platform) {
   default:
     ({ getMachineId } = require('./getMachineId-unsupported'));
 }
+/* eslint-enable @typescript-eslint/no-require-imports */
 
 export { getMachineId };
