@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1742463783788,
+  "lastUpdate": 1742824137733,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -29436,6 +29436,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.19%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "me@martinholman.co.nz",
+            "name": "Martin Holman",
+            "username": "martin308"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b322a24b4a3296577fb908c0bc9b33efc57c501e",
+          "message": "fix: npm links (#5553)",
+          "timestamp": "2025-03-24T12:45:28Z",
+          "tree_id": "27e41204309127f58ae3f26377b2b6acc6c4680a",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/b322a24b4a3296577fb908c0bc9b33efc57c501e"
+        },
+        "date": 1742824136608,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1507392,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18197,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 833274,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 795695,
+            "range": "±0.27%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
           }
         ]
       }
