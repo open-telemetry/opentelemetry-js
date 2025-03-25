@@ -636,6 +636,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             instrumentation.getConfig().startIncomingSpanHook
           ),
           semconvStability: instrumentation._semconvStability,
+          enableSyntheticSourceDetection:
+            instrumentation.getConfig().enableSyntheticSourceDetection || false,
         },
         instrumentation._diag
       );
@@ -794,7 +796,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             instrumentation.getConfig().startOutgoingSpanHook
           ),
         },
-        instrumentation._semconvStability
+        instrumentation._semconvStability,
+        instrumentation.getConfig().enableSyntheticSourceDetection || false
       );
 
       const startTime = hrTime();
