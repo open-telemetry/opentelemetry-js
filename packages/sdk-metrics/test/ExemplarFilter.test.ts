@@ -35,20 +35,14 @@ describe('ExemplarFilter', () => {
   describe('AlwaysSampleExemplarFilter', () => {
     it('should return true always for shouldSample', () => {
       const filter = new AlwaysSampleExemplarFilter();
-      assert.strictEqual(
-        filter.shouldSample(10, [0, 0], {}, ROOT_CONTEXT),
-        true
-      );
+      assert.strictEqual(filter.shouldSample(10, 0n, {}, ROOT_CONTEXT), true);
     });
   });
 
   describe('NeverSampleExemplarFilter', () => {
     it('should return false always for shouldSample', () => {
       const filter = new NeverSampleExemplarFilter();
-      assert.strictEqual(
-        filter.shouldSample(1, [0, 0], {}, ROOT_CONTEXT),
-        false
-      );
+      assert.strictEqual(filter.shouldSample(1, 0n, {}, ROOT_CONTEXT), false);
     });
   });
 
@@ -61,7 +55,7 @@ describe('ExemplarFilter', () => {
         traceFlags: TraceFlags.NONE,
       };
       const ctx = trace.setSpanContext(ROOT_CONTEXT, spanContext);
-      assert.strictEqual(filter.shouldSample(5.3, [0, 0], {}, ctx), false);
+      assert.strictEqual(filter.shouldSample(5.3, 0n, {}, ctx), false);
     });
 
     it('should return true for shouldSample when the trace is sampled', () => {
@@ -72,7 +66,7 @@ describe('ExemplarFilter', () => {
         traceFlags: TraceFlags.SAMPLED,
       };
       const ctx = trace.setSpanContext(ROOT_CONTEXT, spanContext);
-      assert.strictEqual(filter.shouldSample(5.3, [0, 0], {}, ctx), true);
+      assert.strictEqual(filter.shouldSample(5.3, 0n, {}, ctx), true);
     });
   });
 });
