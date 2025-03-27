@@ -32,7 +32,6 @@ import {
   ATTR_NETWORK_PEER_PORT,
   ATTR_NETWORK_PROTOCOL_NAME,
   ATTR_NETWORK_PROTOCOL_VERSION,
-  ATTR_NETWORK_TRANSPORT,
   ATTR_SERVER_ADDRESS,
   ATTR_SERVER_PORT,
   ATTR_URL_FULL,
@@ -42,10 +41,6 @@ import {
   ATTR_USER_AGENT_ORIGINAL,
 } from '@opentelemetry/semantic-conventions';
 import {
-  NET_TRANSPORT_VALUE_IP_TCP,
-  NET_TRANSPORT_VALUE_IP_UDP,
-} from '@opentelemetry/semantic-conventions/incubating';
-import {
   IncomingHttpHeaders,
   IncomingMessage,
   OutgoingHttpHeaders,
@@ -54,11 +49,7 @@ import {
 } from 'http';
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 import * as url from 'url';
-import {
-  Err,
-  IgnoreMatcher,
-  ParsedRequestOptions,
-} from './internal-types';
+import { Err, IgnoreMatcher, ParsedRequestOptions } from './internal-types';
 import forwardedParse = require('forwarded-parse');
 
 /**
@@ -133,10 +124,7 @@ export const satisfiesPattern = (
  * @param {Span} span the span that need to be set
  * @param {Error} error error that will be set to span
  */
-export const setSpanWithError = (
-  span: Span,
-  error: Err
-): void => {
+export const setSpanWithError = (span: Span, error: Err): void => {
   const message = error.message;
   span.setAttribute(ATTR_ERROR_TYPE, error.name);
 
@@ -356,14 +344,13 @@ export const getOutgoingRequestAttributes = (
     hostname: string;
     port: string | number;
     hookAttributes?: Attributes;
-  },
+  }
 ): Attributes => {
   const hostname = options.hostname;
   const port = options.port;
   const method = requestOptions.method ?? 'GET';
   const normalizedMethod = normalizeMethod(method);
   const headers = requestOptions.headers || {};
-  const userAgent = headers['user-agent'];
   const urlFull = getAbsoluteUrl(
     requestOptions,
     headers,
@@ -375,8 +362,6 @@ export const getOutgoingRequestAttributes = (
     [ATTR_SERVER_ADDRESS]: hostname,
     [ATTR_SERVER_PORT]: Number(port),
     [ATTR_URL_FULL]: urlFull,
-    [ATTR_URL_PATH]: requestOptions.path || '/',
-    [ATTR_USER_AGENT_ORIGINAL]: userAgent,
     // leaving out protocol version, it is not yet negotiated
     // leaving out protocol name, it is only required when protocol version is set
     // retries and redirects not supported
@@ -402,11 +387,6 @@ export const setAttributesFromHttpKind = (
 ): void => {
   if (kind) {
     attributes[ATTR_NETWORK_PROTOCOL_NAME] = kind;
-    if (kind.toUpperCase() !== 'QUIC') {
-      attributes[ATTR_NETWORK_TRANSPORT] =   NET_TRANSPORT_VALUE_IP_TCP;
-    } else {
-      attributes[ATTR_NETWORK_TRANSPORT] = NET_TRANSPORT_VALUE_IP_UDP;
-    }
   }
 };
 
@@ -415,9 +395,9 @@ export const setAttributesFromHttpKind = (
  * @param {IncomingMessage} response the response object
  */
 export const getOutgoingRequestAttributesOnResponse = (
-  response: IncomingMessage,
+  response: IncomingMessage
 ): Attributes => {
-  const { statusCode,httpVersion, socket } = response;
+  const { statusCode, httpVersion, socket } = response;
   const stableAttributes: Attributes = {};
 
   if (statusCode != null) {
@@ -435,7 +415,7 @@ export const getOutgoingRequestAttributesOnResponse = (
 
   setAttributesFromHttpKind(httpVersion, stableAttributes);
 
-  return Object.assign(stableAttributes);
+  return stableAttributes;
 };
 
 function parseHostHeader(
@@ -664,6 +644,9 @@ export const getIncomingRequestAttributes = (
 
   if (parsedUrl?.pathname != null) {
     newAttributes[ATTR_URL_PATH] = parsedUrl.pathname;
+  }
+
+  if (parsedUrl?.search != null) {
     newAttributes[ATTR_URL_QUERY] = parsedUrl.search;
   }
 
@@ -685,30 +668,12 @@ export const getIncomingRequestAttributes = (
 };
 
 /**
- * Returns incoming request Metric attributes scoped to the request data
- * @param {Attributes} spanAttributes the span attributes
- * @param {{ component: string }} options used to pass data needed to create attributes
- */
-export const getIncomingRequestMetricAttributes = (
-  spanAttributes: Attributes
-): Attributes => {
-  const metricAttributes: Attributes = {};
-  metricAttributes[ATTR_URL_SCHEME] = spanAttributes[ATTR_URL_SCHEME];
-  metricAttributes[ATTR_URL_SCHEME] = spanAttributes[ATTR_URL_SCHEME];
-  metricAttributes[ATTR_SERVER_ADDRESS] =
-    spanAttributes[ATTR_SERVER_ADDRESS];
-  metricAttributes[ATTR_NETWORK_PROTOCOL_NAME] = spanAttributes[ATTR_NETWORK_PROTOCOL_NAME];
-  //TODO: http.target attribute, it should substitute any parameters to avoid high cardinality.
-  return metricAttributes;
-};
-
-/**
  * Returns incoming request attributes scoped to the response data
  * @param {(ServerResponse & { socket: Socket; })} response the response object
  */
 export const getIncomingRequestAttributesOnResponse = (
   request: IncomingMessage,
-  response: ServerResponse,
+  response: ServerResponse
 ): Attributes => {
   const { statusCode } = response;
 

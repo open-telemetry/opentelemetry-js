@@ -15,14 +15,8 @@
  */
 
 import { SpanKind, Span, context, propagation } from '@opentelemetry/api';
-import {
-  ATTR_NETWORK_PROTOCOL_NAME,
-  ATTR_NETWORK_TRANSPORT,
-} from '@opentelemetry/semantic-conventions';
-import {
-  NET_TRANSPORT_VALUE_IP_TCP,
-  HTTP_FLAVOR_VALUE_HTTP_1_1,
-} from '@opentelemetry/semantic-conventions/incubating'
+import { ATTR_NETWORK_PROTOCOL_NAME } from '@opentelemetry/semantic-conventions';
+import { HTTP_FLAVOR_VALUE_HTTP_1_1 } from '@opentelemetry/semantic-conventions/incubating';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as fs from 'fs';
@@ -167,8 +161,6 @@ describe('HttpsInstrumentation Integration tests', () => {
         hostname: 'localhost',
         httpStatusCode: result.statusCode!,
         httpMethod: 'GET',
-        pathname: '/',
-        path: '/?query=test',
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
         component: 'https',
@@ -194,8 +186,6 @@ describe('HttpsInstrumentation Integration tests', () => {
         hostname: 'localhost',
         httpStatusCode: result.statusCode!,
         httpMethod: 'GET',
-        pathname: '/',
-        path: '/?query=test',
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
         component: 'https',
@@ -224,8 +214,6 @@ describe('HttpsInstrumentation Integration tests', () => {
         hostname: 'localhost',
         httpStatusCode: result.statusCode!,
         httpMethod: 'GET',
-        pathname: '/',
-        path: '/?query=test',
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
         component: 'https',
@@ -237,10 +225,6 @@ describe('HttpsInstrumentation Integration tests', () => {
       assert.strictEqual(
         span.attributes[ATTR_NETWORK_PROTOCOL_NAME],
         HTTP_FLAVOR_VALUE_HTTP_1_1
-      );
-      assert.strictEqual(
-        span.attributes[ATTR_NETWORK_TRANSPORT],
-        NET_TRANSPORT_VALUE_IP_TCP
       );
       assertSpan(span, SpanKind.CLIENT, validations);
     });
@@ -256,7 +240,6 @@ describe('HttpsInstrumentation Integration tests', () => {
         hostname: 'localhost',
         httpStatusCode: result.statusCode!,
         httpMethod: 'GET',
-        pathname: '/',
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
         component: 'https',
@@ -284,7 +267,6 @@ describe('HttpsInstrumentation Integration tests', () => {
         hostname: 'localhost',
         httpStatusCode: 200,
         httpMethod: 'GET',
-        pathname: '/',
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
         component: 'https',

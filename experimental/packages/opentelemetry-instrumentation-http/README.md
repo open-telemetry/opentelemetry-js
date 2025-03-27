@@ -72,7 +72,6 @@ Http instrumentation has few options available to choose from. You can set the f
 
 This package emits Semantic Convention [Version 1.27.0](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-spans.md).
 
-### Stable Semantic Conventions 1.27
 Follow all requirements and recommendations of HTTP Client and Server Semantic Conventions Version 1.27.0 for [spans](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-spans.md) and [metrics](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-metrics.md), including all required and recommended attributes.
 
 Metrics Exported:

@@ -74,13 +74,7 @@ import {
   parseResponseStatus,
   setSpanWithError,
 } from './utils';
-import {
-  Err,
-  Func,
-  Http,
-  HttpRequestArgs,
-  Https,
-} from './internal-types';
+import { Err, Func, Http, HttpRequestArgs, Https } from './internal-types';
 
 /**
  * `node:http` and `node:https` instrumentation for OpenTelemetry
@@ -389,9 +383,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         if (request.listenerCount('response') <= 1) {
           response.resume();
         }
-        const responseAttributes = getOutgoingRequestAttributesOnResponse(
-          response,
-        );
+        const responseAttributes =
+          getOutgoingRequestAttributesOnResponse(response);
         span.setAttributes(responseAttributes);
 
         if (this.getConfig().responseHook) {
@@ -556,7 +549,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           hookAttributes: instrumentation._callStartSpanHook(
             request,
             instrumentation.getConfig().startIncomingSpanHook
-          )
+          ),
         },
         instrumentation._diag
       );
@@ -633,10 +626,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             () => original.apply(this, [event, ...args]),
             error => {
               if (error) {
-                setSpanWithError(
-                  span,
-                  error,
-                );
+                setSpanWithError(span, error);
                 instrumentation._closeHttpSpan(
                   span,
                   SpanKind.SERVER,
@@ -698,18 +688,15 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
       const { hostname, port } = extractHostnameAndPort(optionsParsed);
 
-      const attributes = getOutgoingRequestAttributes(
-        optionsParsed,
-        {
-          component,
-          port,
-          hostname,
-          hookAttributes: instrumentation._callStartSpanHook(
-            optionsParsed,
-            instrumentation.getConfig().startOutgoingSpanHook
-          ),
-        }
-      );
+      const attributes = getOutgoingRequestAttributes(optionsParsed, {
+        component,
+        port,
+        hostname,
+        hookAttributes: instrumentation._callStartSpanHook(
+          optionsParsed,
+          instrumentation.getConfig().startOutgoingSpanHook
+        ),
+      });
 
       const startTime = hrTime();
 
@@ -910,15 +897,9 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     // Record metrics
     const duration = hrTimeToMilliseconds(hrTimeDuration(startTime, hrTime()));
     if (spanKind === SpanKind.SERVER) {
-      this._recordServerDuration(
-        duration,
-        stableMetricAttributes
-      );
+      this._recordServerDuration(duration, stableMetricAttributes);
     } else if (spanKind === SpanKind.CLIENT) {
-      this._recordClientDuration(
-        duration,
-        stableMetricAttributes
-      );
+      this._recordClientDuration(duration, stableMetricAttributes);
     }
   }
 

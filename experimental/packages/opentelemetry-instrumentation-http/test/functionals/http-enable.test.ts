@@ -38,7 +38,6 @@ import {
   ATTR_NETWORK_PEER_PORT,
   ATTR_NETWORK_PROTOCOL_NAME,
   ATTR_NETWORK_PROTOCOL_VERSION,
-  ATTR_NETWORK_TRANSPORT,
   ATTR_SERVER_ADDRESS,
   ATTR_SERVER_PORT,
   ATTR_URL_FULL,
@@ -47,9 +46,6 @@ import {
   ATTR_URL_SCHEME,
   HTTP_REQUEST_METHOD_VALUE_GET,
 } from '@opentelemetry/semantic-conventions';
-import {
-  NET_TRANSPORT_VALUE_IP_TCP,
-} from '@opentelemetry/semantic-conventions/incubating';
 import * as assert from 'assert';
 import * as nock from 'nock';
 import * as path from 'path';
@@ -398,10 +394,9 @@ describe('HttpInstrumentation', () => {
           { span: incomingSpan, kind: SpanKind.SERVER },
           { span: outgoingSpan, kind: SpanKind.CLIENT },
         ].forEach(({ span, kind }) => {
-          assert.strictEqual(span.attributes[ATTR_NETWORK_PROTOCOL_VERSION], '1.1');
           assert.strictEqual(
-            span.attributes[ATTR_NETWORK_TRANSPORT],
-            NET_TRANSPORT_VALUE_IP_TCP
+            span.attributes[ATTR_NETWORK_PROTOCOL_VERSION],
+            '1.1'
           );
           assertSpan(span, kind, validations);
         });
@@ -832,7 +827,10 @@ describe('HttpInstrumentation', () => {
             const [span] = spans;
             assert.strictEqual(spans.length, 1);
             assert.ok(Object.keys(span.attributes).length > 6);
-            assert.strictEqual(span.attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 404);
+            assert.strictEqual(
+              span.attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+              404
+            );
             assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
             done();
           });
@@ -1028,7 +1026,7 @@ describe('HttpInstrumentation', () => {
       });
     });
 
-    describe('with semconv stability set to http', () => {
+    describe('with semconv stability', () => {
       beforeEach(() => {
         memoryExporter.reset();
       });
@@ -1097,9 +1095,7 @@ describe('HttpInstrumentation', () => {
           [ATTR_NETWORK_PEER_ADDRESS]: response.address,
           [ATTR_NETWORK_PEER_PORT]: serverPort,
           [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
-          [ATTR_URL_PATH]: pathname,
           [ATTR_NETWORK_PROTOCOL_NAME]: '1.1',
-          [ATTR_NETWORK_TRANSPORT]: NET_TRANSPORT_VALUE_IP_TCP
         });
       });
 
@@ -1125,9 +1121,8 @@ describe('HttpInstrumentation', () => {
           [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
           [ATTR_URL_PATH]: pathname,
           [ATTR_URL_SCHEME]: protocol,
-          [ATTR_URL_QUERY]: "",
-          [ATTR_NETWORK_TRANSPORT]: NET_TRANSPORT_VALUE_IP_TCP,
-          [ATTR_NETWORK_PROTOCOL_NAME]: '1.1'
+          [ATTR_URL_QUERY]: '',
+          [ATTR_NETWORK_PROTOCOL_NAME]: '1.1',
         });
       });
 
@@ -1154,9 +1149,8 @@ describe('HttpInstrumentation', () => {
           [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
           [ATTR_URL_PATH]: `${pathname}/setroute`,
           [ATTR_URL_SCHEME]: protocol,
-          [ATTR_URL_QUERY]: "",
+          [ATTR_URL_QUERY]: '',
           [ATTR_NETWORK_PROTOCOL_NAME]: '1.1',
-          [ATTR_NETWORK_TRANSPORT]: NET_TRANSPORT_VALUE_IP_TCP
         });
       });
     });

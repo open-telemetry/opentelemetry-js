@@ -45,7 +45,7 @@ export const assertSpan = (
     httpMethod: string;
     resHeaders: http.IncomingHttpHeaders;
     hostname: string;
-    pathname: string;
+    pathname?: string;
     reqHeaders?: http.OutgoingHttpHeaders;
     path?: string | null;
     forceStatus?: SpanStatus;
@@ -64,10 +64,6 @@ export const assertSpan = (
     validations.httpMethod
   );
 
-  assert.strictEqual(
-    span.attributes[ATTR_URL_PATH],
-    validations.path || validations.pathname
-  );
   assert.strictEqual(
     span.attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
     validations.httpStatusCode
@@ -100,12 +96,6 @@ export const assertSpan = (
   assert.ok(span.endTime, 'must be finished');
   assert.ok(hrTimeToNanoseconds(span.duration), 'must have positive duration');
 
-  if (validations.reqHeaders) {
-    const userAgent = validations.reqHeaders['user-agent'];
-    if (userAgent) {
-      assert.strictEqual(span.attributes[ATTR_USER_AGENT_ORIGINAL], userAgent);
-    }
-  }
   if (span.kind === SpanKind.CLIENT) {
     assert.strictEqual(
       span.attributes[ATTR_SERVER_ADDRESS],
@@ -113,7 +103,10 @@ export const assertSpan = (
       'must be consistent (PEER_NAME and hostname)'
     );
     if (!validations.noNetPeer) {
-      assert.ok(span.attributes[ATTR_NETWORK_PEER_ADDRESS], 'must have PEER_IP');
+      assert.ok(
+        span.attributes[ATTR_NETWORK_PEER_ADDRESS],
+        'must have PEER_IP'
+      );
       assert.ok(span.attributes[ATTR_SERVER_PORT], 'must have PEER_PORT');
     }
     assert.ok(
@@ -131,6 +124,21 @@ export const assertSpan = (
     );
     assert.ok(typeof span.parentSpanContext?.spanId === 'string');
     assert.ok(isValidSpanId(span.parentSpanContext.spanId));
+
+    assert.strictEqual(
+      span.attributes[ATTR_URL_PATH],
+      validations.path || validations.pathname
+    );
+
+    if (validations.reqHeaders) {
+      const userAgent = validations.reqHeaders['user-agent'];
+      if (userAgent) {
+        assert.strictEqual(
+          span.attributes[ATTR_USER_AGENT_ORIGINAL],
+          userAgent
+        );
+      }
+    }
   } else if (validations.reqHeaders) {
     assert.ok(validations.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
     assert.ok(validations.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);

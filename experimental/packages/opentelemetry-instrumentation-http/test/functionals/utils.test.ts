@@ -32,10 +32,7 @@ import { IncomingMessage, ServerResponse } from 'http';
 import { Socket } from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
-import {
-  IgnoreMatcher,
-  ParsedRequestOptions,
-} from '../../src/internal-types';
+import { IgnoreMatcher, ParsedRequestOptions } from '../../src/internal-types';
 import * as utils from '../../src/utils';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
@@ -181,9 +178,7 @@ describe('Utility', () => {
       } as unknown as Span;
       const mock = sinon.mock(span);
 
-      mock
-        .expects('setAttribute')
-        .calledWithExactly(ATTR_ERROR_TYPE, 'Error');
+      mock.expects('setAttribute').calledWithExactly(ATTR_ERROR_TYPE, 'Error');
       mock.expects('setStatus').calledWithExactly({
         code: SpanStatusCode.ERROR,
         message: errorMessage,
@@ -227,7 +222,7 @@ describe('Utility', () => {
         () => {
           const attributes = utils.getIncomingRequestAttributesOnResponse(
             request,
-            {} as ServerResponse,
+            {} as ServerResponse
           );
           assert.deepStrictEqual(attributes[ATTR_HTTP_ROUTE], '/user/:id');
           context.disable();
@@ -240,12 +235,9 @@ describe('Utility', () => {
       const request = {
         socket: {},
       } as IncomingMessage;
-      const attributes = utils.getIncomingRequestAttributesOnResponse(
-        request,
-        {
-          socket: {},
-        } as ServerResponse & { socket: Socket },
-      );
+      const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
+        socket: {},
+      } as ServerResponse & { socket: Socket });
       assert.deepEqual(attributes[ATTR_HTTP_ROUTE], undefined);
     });
   });
@@ -256,18 +248,19 @@ describe('Utility', () => {
         [ATTR_HTTP_ROUTE]: '/user/:id',
       };
       const metricAttributes =
-        utils.getIncomingStableRequestMetricAttributesOnResponse(spanAttributes);
+        utils.getIncomingStableRequestMetricAttributesOnResponse(
+          spanAttributes
+        );
 
-      assert.deepStrictEqual(
-        metricAttributes[ATTR_HTTP_ROUTE],
-        '/user/:id'
-      );
+      assert.deepStrictEqual(metricAttributes[ATTR_HTTP_ROUTE], '/user/:id');
     });
 
     it('should skip http_route if span does not have it', () => {
       const spanAttributes: Attributes = {};
       const metricAttributes =
-        utils.getIncomingStableRequestMetricAttributesOnResponse(spanAttributes);
+        utils.getIncomingStableRequestMetricAttributesOnResponse(
+          spanAttributes
+        );
       assert.deepEqual(metricAttributes[ATTR_HTTP_ROUTE], undefined);
     });
   });

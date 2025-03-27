@@ -32,13 +32,11 @@ import {
 import {
   ATTR_CLIENT_ADDRESS,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
-  ATTR_NETWORK_TRANSPORT,
+  // ATTR_NETWORK_TRANSPORT,
   ATTR_SERVER_PORT,
   ATTR_NETWORK_PROTOCOL_NAME,
 } from '@opentelemetry/semantic-conventions';
-import {
-  NET_TRANSPORT_VALUE_IP_TCP,
-} from '@opentelemetry/semantic-conventions/incubating';
+// import { NET_TRANSPORT_VALUE_IP_TCP } from '@opentelemetry/semantic-conventions/incubating';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as nock from 'nock';
@@ -265,10 +263,9 @@ describe('HttpsInstrumentation', () => {
           { span: incomingSpan, kind: SpanKind.SERVER },
           { span: outgoingSpan, kind: SpanKind.CLIENT },
         ].forEach(({ span, kind }) => {
-          assert.strictEqual(span.attributes[ATTR_NETWORK_PROTOCOL_NAME], '1.1');
           assert.strictEqual(
-            span.attributes[ATTR_NETWORK_TRANSPORT],
-            NET_TRANSPORT_VALUE_IP_TCP
+            span.attributes[ATTR_NETWORK_PROTOCOL_NAME],
+            '1.1'
           );
           assertSpan(span, kind, validations);
         });
@@ -664,7 +661,10 @@ describe('HttpsInstrumentation', () => {
             const [span] = spans;
             assert.strictEqual(spans.length, 1);
             assert.ok(Object.keys(span.attributes).length > 6);
-            assert.strictEqual(span.attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 404);
+            assert.strictEqual(
+              span.attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+              404
+            );
             assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
             done();
           });
