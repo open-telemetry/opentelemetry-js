@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import { diag, DiagLogLevel } from '@opentelemetry/api';
-import { inspect } from 'util';
 
 const logLevelMap: { [key: string]: DiagLogLevel } = {
   ALL: DiagLogLevel.ALL,
@@ -42,7 +41,7 @@ export function diagLogLevelFromString(
 
   if (resolvedLogLevel == null) {
     diag.warn(
-      `Unknown log level ${inspect(value)}, expected one of ${inspect(Object.keys(logLevelMap))}, using default`
+      `Unknown log level "${value}", expected one of ${Object.keys(logLevelMap)}, using default`
     );
     return DiagLogLevel.INFO;
   }
