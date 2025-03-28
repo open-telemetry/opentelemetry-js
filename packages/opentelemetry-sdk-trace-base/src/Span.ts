@@ -327,7 +327,17 @@ export class SpanImpl implements Span {
     return this._ended === false;
   }
 
-  recordException(exception: Exception, time?: TimeInput): void {
+  recordException(exception: Exception, time?: TimeInput): void;
+  recordException(
+    exception: Exception,
+    attributes: Attributes | undefined,
+    time?: TimeInput
+  ): void;
+  recordException(
+    exception: Exception,
+    attributesOrTime?: Attributes | TimeInput,
+    time?: TimeInput
+  ): void {
     const attributes: Attributes = {};
     if (typeof exception === 'string') {
       attributes[SEMATTRS_EXCEPTION_MESSAGE] = exception;
@@ -343,6 +353,12 @@ export class SpanImpl implements Span {
       if (exception.stack) {
         attributes[SEMATTRS_EXCEPTION_STACKTRACE] = exception.stack;
       }
+    }
+
+    if (isTimeInput(attributesOrTime)) {
+      time = attributesOrTime;
+    } else {
+      Object.assign(attributes, sanitizeAttributes(attributesOrTime));
     }
 
     // these are minimum requirements from spec
