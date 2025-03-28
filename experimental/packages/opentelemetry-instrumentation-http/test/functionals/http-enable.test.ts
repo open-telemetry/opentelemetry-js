@@ -394,9 +394,9 @@ describe('HttpInstrumentation', () => {
           { span: incomingSpan, kind: SpanKind.SERVER },
           { span: outgoingSpan, kind: SpanKind.CLIENT },
         ].forEach(({ span, kind }) => {
-          assert.strictEqual(
-            span.attributes[ATTR_NETWORK_PROTOCOL_VERSION],
-            '1.1'
+          assert.ok(
+            !span.attributes[ATTR_NETWORK_PROTOCOL_NAME],
+            'should not be added for HTTP kind'
           );
           assertSpan(span, kind, validations);
         });
@@ -1095,7 +1095,6 @@ describe('HttpInstrumentation', () => {
           [ATTR_NETWORK_PEER_ADDRESS]: response.address,
           [ATTR_NETWORK_PEER_PORT]: serverPort,
           [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
-          [ATTR_NETWORK_PROTOCOL_NAME]: '1.1',
         });
       });
 
@@ -1122,7 +1121,6 @@ describe('HttpInstrumentation', () => {
           [ATTR_URL_PATH]: pathname,
           [ATTR_URL_SCHEME]: protocol,
           [ATTR_URL_QUERY]: '',
-          [ATTR_NETWORK_PROTOCOL_NAME]: '1.1',
         });
       });
 
@@ -1150,7 +1148,6 @@ describe('HttpInstrumentation', () => {
           [ATTR_URL_PATH]: `${pathname}/setroute`,
           [ATTR_URL_SCHEME]: protocol,
           [ATTR_URL_QUERY]: '',
-          [ATTR_NETWORK_PROTOCOL_NAME]: '1.1',
         });
       });
     });

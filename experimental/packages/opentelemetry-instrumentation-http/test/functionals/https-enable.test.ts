@@ -263,9 +263,9 @@ describe('HttpsInstrumentation', () => {
           { span: incomingSpan, kind: SpanKind.SERVER },
           { span: outgoingSpan, kind: SpanKind.CLIENT },
         ].forEach(({ span, kind }) => {
-          assert.strictEqual(
-            span.attributes[ATTR_NETWORK_PROTOCOL_NAME],
-            '1.1'
+          assert.ok(
+            !span.attributes[ATTR_NETWORK_PROTOCOL_NAME],
+            'should not be added for HTTP kind'
           );
           assertSpan(span, kind, validations);
         });

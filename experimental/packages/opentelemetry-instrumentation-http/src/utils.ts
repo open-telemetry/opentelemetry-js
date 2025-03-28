@@ -386,7 +386,10 @@ export const setAttributesFromHttpKind = (
   attributes: Attributes
 ): void => {
   if (kind) {
-    attributes[ATTR_NETWORK_PROTOCOL_NAME] = kind;
+    const httpKinds = new Set(['1.0', '1.1', '2']);
+    if (!httpKinds.has(kind)) {
+      attributes[ATTR_NETWORK_PROTOCOL_NAME] = kind.toLowerCase();
+    }
   }
 };
 

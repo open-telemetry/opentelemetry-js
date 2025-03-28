@@ -16,7 +16,6 @@
 
 import { SpanKind, Span, context, propagation } from '@opentelemetry/api';
 import { ATTR_NETWORK_PROTOCOL_NAME } from '@opentelemetry/semantic-conventions';
-import { HTTP_FLAVOR_VALUE_HTTP_1_1 } from '@opentelemetry/semantic-conventions/incubating';
 import * as assert from 'assert';
 import * as url from 'url';
 import { HttpInstrumentation } from '../../src/http';
@@ -225,9 +224,9 @@ describe('HttpInstrumentation Integration tests', () => {
       assert.strictEqual(spans.length, 2);
       assert.strictEqual(span.name, 'GET');
       assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
-      assert.strictEqual(
-        span.attributes[ATTR_NETWORK_PROTOCOL_NAME],
-        HTTP_FLAVOR_VALUE_HTTP_1_1
+      assert.ok(
+        !span.attributes[ATTR_NETWORK_PROTOCOL_NAME],
+        'should not be added for HTTP kind'
       );
       assertSpan(span, SpanKind.CLIENT, validations);
     });
