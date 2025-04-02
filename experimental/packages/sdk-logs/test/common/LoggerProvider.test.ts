@@ -225,12 +225,11 @@ describe('LoggerProvider', () => {
       );
       forceFlushStub.resolves();
 
-      const provider = new LoggerProvider();
       const logRecordProcessorOne = new NoopLogRecordProcessor();
       const logRecordProcessorTwo = new NoopLogRecordProcessor();
-
-      provider.addLogRecordProcessor(logRecordProcessorOne);
-      provider.addLogRecordProcessor(logRecordProcessorTwo);
+      const provider = new LoggerProvider({
+        processors: [logRecordProcessorOne, logRecordProcessorTwo],
+      });
 
       provider
         .forceFlush()
@@ -254,12 +253,11 @@ describe('LoggerProvider', () => {
       );
       forceFlushStub.returns(Promise.reject('Error'));
 
-      const provider = new LoggerProvider();
       const logRecordProcessorOne = new NoopLogRecordProcessor();
       const logRecordProcessorTwo = new NoopLogRecordProcessor();
-
-      provider.addLogRecordProcessor(logRecordProcessorOne);
-      provider.addLogRecordProcessor(logRecordProcessorTwo);
+      const provider = new LoggerProvider({
+        processors: [logRecordProcessorOne, logRecordProcessorTwo],
+      });
 
       provider
         .forceFlush()
@@ -277,9 +275,8 @@ describe('LoggerProvider', () => {
 
   describe('.shutdown()', () => {
     it('should trigger shutdown when manually invoked', () => {
-      const provider = new LoggerProvider();
       const processor = new NoopLogRecordProcessor();
-      provider.addLogRecordProcessor(processor);
+      const provider = new LoggerProvider({ processors: [processor] });
       const shutdownStub = sinon.stub(processor, 'shutdown');
       provider.shutdown();
       sinon.assert.calledOnce(shutdownStub);
@@ -294,9 +291,10 @@ describe('LoggerProvider', () => {
     });
 
     it('should not force flush on shutdown', () => {
-      const provider = new LoggerProvider();
       const logRecordProcessor = new NoopLogRecordProcessor();
-      provider.addLogRecordProcessor(logRecordProcessor);
+      const provider = new LoggerProvider({
+        processors: [logRecordProcessor],
+      });
       const forceFlushStub = sinon.stub(logRecordProcessor, 'forceFlush');
       const warnStub = sinon.spy(diag, 'warn');
       provider.shutdown();
@@ -306,9 +304,10 @@ describe('LoggerProvider', () => {
     });
 
     it('should not shutdown on shutdown', () => {
-      const provider = new LoggerProvider();
       const logRecordProcessor = new NoopLogRecordProcessor();
-      provider.addLogRecordProcessor(logRecordProcessor);
+      const provider = new LoggerProvider({
+        processors: [logRecordProcessor],
+      });
       const shutdownStub = sinon.stub(logRecordProcessor, 'shutdown');
       const warnStub = sinon.spy(diag, 'warn');
       provider.shutdown();

@@ -62,10 +62,9 @@ describe('OTLPLogExporter', () => {
         buff = Buffer.concat([buff, chunk]);
       });
 
-      const loggerProvider = new LoggerProvider();
-      loggerProvider.addLogRecordProcessor(
-        new SimpleLogRecordProcessor(new OTLPLogExporter())
-      );
+      const loggerProvider = new LoggerProvider({
+        processors: [new SimpleLogRecordProcessor(new OTLPLogExporter())],
+      });
 
       loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });
       loggerProvider.shutdown();

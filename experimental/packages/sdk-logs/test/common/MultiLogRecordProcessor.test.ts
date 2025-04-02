@@ -60,8 +60,7 @@ describe('MultiLogRecordProcessor', () => {
   describe('onEmit', () => {
     it('should handle empty log record processor', () => {
       const { multiProcessor } = setup();
-      const provider = new LoggerProvider();
-      provider.addLogRecordProcessor(multiProcessor);
+      const provider = new LoggerProvider({ processors: [multiProcessor] });
       const logger = provider.getLogger('default');
       logger.emit({ body: 'one' });
       multiProcessor.shutdown();
@@ -70,8 +69,7 @@ describe('MultiLogRecordProcessor', () => {
     it('should handle one log record processor', () => {
       const processor1 = new TestProcessor();
       const { multiProcessor } = setup([processor1]);
-      const provider = new LoggerProvider();
-      provider.addLogRecordProcessor(multiProcessor);
+      const provider = new LoggerProvider({ processors: [multiProcessor] });
       const logger = provider.getLogger('default');
       assert.strictEqual(processor1.logRecords.length, 0);
 
@@ -84,8 +82,7 @@ describe('MultiLogRecordProcessor', () => {
       const processor1 = new TestProcessor();
       const processor2 = new TestProcessor();
       const { multiProcessor } = setup([processor1, processor2]);
-      const provider = new LoggerProvider();
-      provider.addLogRecordProcessor(multiProcessor);
+      const provider = new LoggerProvider({ processors: [multiProcessor] });
       const logger = provider.getLogger('default');
 
       assert.strictEqual(processor1.logRecords.length, 0);
@@ -186,8 +183,7 @@ describe('MultiLogRecordProcessor', () => {
       const processor1 = new TestProcessor();
       const processor2 = new TestProcessor();
       const { multiProcessor } = setup([processor1, processor2]);
-      const provider = new LoggerProvider();
-      provider.addLogRecordProcessor(multiProcessor);
+      const provider = new LoggerProvider({ processors: [multiProcessor] });
       const logger = provider.getLogger('default');
 
       assert.strictEqual(processor1.logRecords.length, 0);

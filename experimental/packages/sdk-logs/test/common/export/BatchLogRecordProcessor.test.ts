@@ -49,7 +49,8 @@ const createLogRecord = (
   const sharedState = new LoggerProviderSharedState(
     resource || defaultResource(),
     Infinity,
-    reconfigureLimits(limits ?? {})
+    reconfigureLimits(limits ?? {}),
+    []
   );
   const logRecord = new LogRecord(
     sharedState,

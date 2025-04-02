@@ -51,7 +51,8 @@ const setup = (logRecordLimits?: LogRecordLimits, data?: logsAPI.LogRecord) => {
   const sharedState = new LoggerProviderSharedState(
     resource,
     Infinity,
-    reconfigureLimits(logRecordLimits ?? {})
+    reconfigureLimits(logRecordLimits ?? {}),
+    []
   );
   const logRecord = new LogRecord(
     sharedState,
@@ -424,8 +425,7 @@ describe('LogRecord', () => {
         forceFlush: () => Promise.resolve(),
         shutdown: () => Promise.resolve(),
       };
-      const provider = new LoggerProvider();
-      provider.addLogRecordProcessor(processor);
+      const provider = new LoggerProvider({ processors: [processor] });
       provider.getLogger('default').emit({ body: 'test' });
       assert.ok(emitted);
     });
