@@ -115,7 +115,7 @@ function getValueInMillis(envName: string, defaultValue: number): number {
  */
 function configureMetricProviderFromEnv(): IMetricReader[] {
   const metricReaders: IMetricReader[] = [];
-  const enabledExporters = getStringListFromEnv('OTEL_METRICS_EXPORTER')
+  const enabledExporters = getStringListFromEnv('OTEL_METRICS_EXPORTER');
   if (!enabledExporters) {
     return metricReaders;
   }
