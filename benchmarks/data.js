@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1743615730863,
+  "lastUpdate": 1743629589536,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -29904,6 +29904,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.39%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "95973267+Assstra@users.noreply.github.com",
+            "name": "Asstra",
+            "username": "Assstra"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "3c452f4b20f69383167712553a8c869d36b388dc",
+          "message": "fix(examples): use correct node tracer provider function (#5586)\n\nSigned-off-by: Adrien Raimbault <adrien.raimbault@etu.umontpellier.fr>",
+          "timestamp": "2025-04-02T21:22:58Z",
+          "tree_id": "d12c14e42f537451d3689f0fdb0d19b6c7695be3",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/3c452f4b20f69383167712553a8c869d36b388dc"
+        },
+        "date": 1743629588520,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1484343,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18384,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 828340,
+            "range": "±0.31%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 782607,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
