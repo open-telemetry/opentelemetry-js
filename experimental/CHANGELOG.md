@@ -16,6 +16,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+- update node sdk to use env var util
+
 ## 0.200.0
 
 ### Summary
