@@ -72,6 +72,7 @@ import { NodeSDKConfiguration } from './types';
 import {
   getBooleanFromEnv,
   getStringFromEnv,
+  getStringListFromEnv,
   diagLogLevelFromString,
   getStringListFromEnv,
 } from '@opentelemetry/core';
@@ -115,11 +116,10 @@ function getValueInMillis(envName: string, defaultValue: number): number {
  */
 function configureMetricProviderFromEnv(): IMetricReader[] {
   const metricReaders: IMetricReader[] = [];
-  const metricsExporterList = process.env.OTEL_METRICS_EXPORTER?.trim();
-  if (!metricsExporterList) {
+  const enabledExporters = getStringListFromEnv('OTEL_METRICS_EXPORTER')
+  if (!enabledExporters) {
     return metricReaders;
   }
-  const enabledExporters = filterBlanksAndNulls(metricsExporterList.split(','));
 
   if (enabledExporters.length === 0) {
     diag.debug('OTEL_METRICS_EXPORTER is empty. Using default otlp exporter.');
