@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1743615498875,
+  "lastUpdate": 1743615730863,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -29852,6 +29852,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.46%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "okpedersen@gmail.com",
+            "name": "Ole Kristian Pedersen",
+            "username": "okpedersen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "efc640eefa9dbb7262afd0f1b2ebebbdf14bdb57",
+          "message": "test(@opentelemetry/sdk-trace-node): refactor tests to allow use of mocha context (#5587)",
+          "timestamp": "2025-04-02T17:31:06Z",
+          "tree_id": "95e6da60b1faaf9a17e6804aa6076a58ec6d4c44",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/efc640eefa9dbb7262afd0f1b2ebebbdf14bdb57"
+        },
+        "date": 1743615729855,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1545582,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18838,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 872167,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 802641,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
