@@ -27,7 +27,7 @@ export const diagLoggerFunctions = [
   'warn',
   'error',
 ] as const;
-describe('DiagLogger functions', function() {
+describe('DiagLogger functions', function () {
   const calledArgs: any = {
     error: null,
     warn: null,
@@ -59,9 +59,9 @@ describe('DiagLogger functions', function() {
     diag.disable();
   });
 
-  describe('constructor', function() {
+  describe('constructor', function () {
     diagLoggerFunctions.forEach(fName => {
-      it(`should log with ${fName} message`, function() {
+      it(`should log with ${fName} message`, function () {
         const testLogger = dummyLogger;
         testLogger[fName](`${fName} called %s`, 'param1');
         diagLoggerFunctions.forEach(lName => {
@@ -76,7 +76,7 @@ describe('DiagLogger functions', function() {
         });
       });
 
-      it(`diag should log with ${fName} message`, function() {
+      it(`diag should log with ${fName} message`, function () {
         diag.setLogger(dummyLogger, DiagLogLevel.ALL);
         restoreCallHistory();
         diag[fName](`${fName} called %s`, 'param1');
@@ -92,7 +92,7 @@ describe('DiagLogger functions', function() {
         });
       });
 
-      it(`NoopLogger should implement all functions and not throw when ${fName} called`, function() {
+      it(`NoopLogger should implement all functions and not throw when ${fName} called`, function () {
         const testLogger = createNoopDiagLogger();
 
         assert.ok(typeof testLogger[fName], 'function');
@@ -101,12 +101,12 @@ describe('DiagLogger functions', function() {
     });
   });
 
-  describe('diag is used as the diag logger in setLogger', function() {
-    it('should not throw', function() {
+  describe('diag is used as the diag logger in setLogger', function () {
+    it('should not throw', function () {
       diag.setLogger(diag);
     });
 
-    it('should use the previously registered logger to log the error', function() {
+    it('should use the previously registered logger to log the error', function () {
       const error = sinon.stub();
       diag.setLogger({
         verbose: () => {},

@@ -28,7 +28,7 @@ class SpyLogger implements DiagLogger {
 
 const loggerFunctions = ['verbose', 'debug', 'info', 'warn', 'error'];
 
-describe('ComponentLogger', function() {
+describe('ComponentLogger', function () {
   let logger: DiagLogger;
 
   const sandbox = sinon.createSandbox();
@@ -47,7 +47,7 @@ describe('ComponentLogger', function() {
 
   loggerFunctions.forEach(name => {
     const fName = name as keyof SpyLogger;
-    it(`should call global logger function "${name}" with namespace as first param`, function() {
+    it(`should call global logger function "${name}" with namespace as first param`, function () {
       const componentLogger = diag.createComponentLogger({ namespace: 'foo' });
       componentLogger[fName]('test');
 

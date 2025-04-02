@@ -16,16 +16,16 @@
 
 import { Counter, UpDownCounter, Histogram } from '../../../src';
 
-describe('Metric', function() {
-  describe('Counter', function() {
-    it('enable not to define any type', function() {
+describe('Metric', function () {
+  describe('Counter', function () {
+    it('enable not to define any type', function () {
       const counter: Counter = {
         add(_value: number, _attribute: unknown) {},
       };
       counter.add(1, { 'some-attribute': 'value' });
     });
 
-    it('enable to use with type', function() {
+    it('enable to use with type', function () {
       type Attributes = {
         'some-attribute': string;
       };
@@ -35,7 +35,7 @@ describe('Metric', function() {
       counter.add(1, { 'some-attribute': 'value' });
     });
 
-    it('disable wrong attributes by typing', function() {
+    it('disable wrong attributes by typing', function () {
       type Attributes = {
         'some-attribute': string;
       };
@@ -47,15 +47,15 @@ describe('Metric', function() {
     });
   });
 
-  describe('UpDownCounter', function() {
-    it('enable not to define any type', function() {
+  describe('UpDownCounter', function () {
+    it('enable not to define any type', function () {
       const counter: UpDownCounter = {
         add(_value: number, _attribute: unknown) {},
       };
       counter.add(1, { 'some-attribute': 'value' });
     });
 
-    it('enable to use with type', function() {
+    it('enable to use with type', function () {
       type Attributes = {
         'some-attribute': string;
       };
@@ -65,7 +65,7 @@ describe('Metric', function() {
       counter.add(1, { 'some-attribute': 'value' });
     });
 
-    it('disable wrong attributes by typing', function() {
+    it('disable wrong attributes by typing', function () {
       type Attributes = {
         'some-attribute': string;
       };
@@ -77,15 +77,15 @@ describe('Metric', function() {
     });
   });
 
-  describe('Histogram', function() {
-    it('enable not to define any type', function() {
+  describe('Histogram', function () {
+    it('enable not to define any type', function () {
       const counter: Histogram = {
         record(_value: number, _attribute: unknown) {},
       };
       counter.record(1, { 'some-attribute': 'value' });
     });
 
-    it('enable to use with type', function() {
+    it('enable to use with type', function () {
       type Attributes = {
         'some-attribute': string;
       };
@@ -95,7 +95,7 @@ describe('Metric', function() {
       counter.record(1, { 'some-attribute': 'value' });
     });
 
-    it('disable wrong attributes by typing', function() {
+    it('disable wrong attributes by typing', function () {
       type Attributes = {
         'some-attribute': string;
       };

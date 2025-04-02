@@ -34,13 +34,13 @@ const options = {
   description: 'the testing package',
 };
 
-describe('NoopMeter', function() {
-  it('constructor should not crash', function() {
+describe('NoopMeter', function () {
+  it('constructor should not crash', function () {
     const meter = new NoopMeterProvider().getMeter('test-noop');
     assert.ok(meter instanceof NoopMeter);
   });
 
-  it('counter should not crash', function() {
+  it('counter should not crash', function () {
     const meter = new NoopMeterProvider().getMeter('test-noop');
     const counter = meter.createCounter('some-name');
 
@@ -54,7 +54,7 @@ describe('NoopMeter', function() {
     assert.strictEqual(counterWithOptions, NOOP_COUNTER_METRIC);
   });
 
-  it('histogram should not crash', function() {
+  it('histogram should not crash', function () {
     const meter = new NoopMeterProvider().getMeter('test-noop');
     const histogram = meter.createHistogram('some-name');
     histogram.record(1, attributes);
@@ -66,7 +66,7 @@ describe('NoopMeter', function() {
     assert.strictEqual(histogramWithOptions, NOOP_HISTOGRAM_METRIC);
   });
 
-  it('up down counter should not crash', function() {
+  it('up down counter should not crash', function () {
     const meter = new NoopMeterProvider().getMeter('test-noop');
     const upDownCounter = meter.createUpDownCounter('some-name');
     upDownCounter.add(1, attributes);
@@ -81,7 +81,7 @@ describe('NoopMeter', function() {
     assert.strictEqual(upDownCounterWithOptions, NOOP_UP_DOWN_COUNTER_METRIC);
   });
 
-  it('observable counter should not crash', function() {
+  it('observable counter should not crash', function () {
     const meter = new NoopMeterProvider().getMeter('test-noop');
     const observableCounter = meter.createObservableCounter('some-name');
     observableCounter.addCallback(() => {});
@@ -99,7 +99,7 @@ describe('NoopMeter', function() {
     );
   });
 
-  it('observable gauge should not crash', function() {
+  it('observable gauge should not crash', function () {
     const meter = new NoopMeterProvider().getMeter('test-noop');
     const observableGauge = meter.createObservableGauge('some-name');
     observableGauge.addCallback(() => {});
@@ -117,7 +117,7 @@ describe('NoopMeter', function() {
     );
   });
 
-  it('gauge should not crash', function() {
+  it('gauge should not crash', function () {
     const meter = new NoopMeterProvider().getMeter('test-noop');
     const observableGauge = meter.createGauge('some-name');
 
@@ -128,7 +128,7 @@ describe('NoopMeter', function() {
     assert.strictEqual(gaugeWithOptions, NOOP_GAUGE_METRIC);
   });
 
-  it('observable up down counter should not crash', function() {
+  it('observable up down counter should not crash', function () {
     const meter = new NoopMeterProvider().getMeter('test-noop');
     const observableUpDownCounter =
       meter.createObservableUpDownCounter('some-name');
@@ -148,15 +148,15 @@ describe('NoopMeter', function() {
     );
   });
 
-  it('batch callback should not crash', function() {
+  it('batch callback should not crash', function () {
     const meter = new NoopMeterProvider().getMeter('test-noop');
     meter.addBatchObservableCallback(() => {}, []);
     meter.removeBatchObservableCallback(() => {}, []);
   });
 });
 
-describe('createNoopMeter', function() {
-  it('should return NoopMeter', function() {
+describe('createNoopMeter', function () {
+  it('should return NoopMeter', function () {
     assert.ok(createNoopMeter() instanceof NoopMeter);
   });
 });
