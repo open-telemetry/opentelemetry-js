@@ -74,7 +74,6 @@ import {
   getStringFromEnv,
   getStringListFromEnv,
   diagLogLevelFromString,
-  getStringListFromEnv,
 } from '@opentelemetry/core';
 import {
   getResourceDetectorsFromEnv,
