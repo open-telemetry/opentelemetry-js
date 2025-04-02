@@ -45,10 +45,9 @@ describe('ConsoleLogRecordExporter', () => {
         const consoleExporter = new ConsoleLogRecordExporter();
         const spyConsole = sinon.spy(console, 'dir');
         const spyExport = sinon.spy(consoleExporter, 'export');
-        const provider = new LoggerProvider();
-        provider.addLogRecordProcessor(
-          new SimpleLogRecordProcessor(consoleExporter)
-        );
+        const provider = new LoggerProvider({
+          processors: [new SimpleLogRecordProcessor(consoleExporter)],
+        });
 
         provider
           .getLogger(instrumentationScopeName, instrumentationScopeVersion)
