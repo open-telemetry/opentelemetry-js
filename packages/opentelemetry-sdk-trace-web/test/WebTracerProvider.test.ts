@@ -22,8 +22,8 @@ import * as assert from 'assert';
 import { WebTracerConfig } from '../src';
 import { WebTracerProvider } from '../src/WebTracerProvider';
 
-describe('WebTracerProvider', () => {
-  describe('constructor', () => {
+describe('WebTracerProvider', function () {
+  describe('constructor', function () {
     let defaultOptions: WebTracerConfig;
     let contextManager: ContextManager;
 
@@ -38,20 +38,20 @@ describe('WebTracerProvider', () => {
       context.disable();
     });
 
-    it('should construct an instance with required only options', () => {
+    it('should construct an instance with required only options', function () {
       const tracer = new WebTracerProvider(
         Object.assign({}, defaultOptions)
       ).getTracer('default');
       assert.ok(tracer);
     });
 
-    it('should work without default context manager', () => {
+    it('should work without default context manager', function () {
       assert.doesNotThrow(() => {
         new WebTracerProvider({});
       });
     });
 
-    describe('when contextManager is "ZoneContextManager"', () => {
+    describe('when contextManager is "ZoneContextManager"', function () {
       it('should correctly return the contexts for 2 parallel actions', done => {
         const webTracerWithZone = new WebTracerProvider().getTracer('default');
 
@@ -89,8 +89,8 @@ describe('WebTracerProvider', () => {
       });
     });
 
-    describe('.startSpan()', () => {
-      it('should assign resource to span', () => {
+    describe('.startSpan()', function () {
+      it('should assign resource to span', function () {
         const provider = new WebTracerProvider();
         const span = provider.getTracer('default').startSpan('my-span') as Span;
         assert.ok(span);

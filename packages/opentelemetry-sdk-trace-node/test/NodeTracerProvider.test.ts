@@ -38,7 +38,7 @@ const sleep = (time: number) =>
     return setTimeout(resolve, time);
   });
 
-describe('NodeTracerProvider', () => {
+describe('NodeTracerProvider', function () {
   let provider: NodeTracerProvider;
   let contextManager: ContextManager;
 
@@ -52,18 +52,18 @@ describe('NodeTracerProvider', () => {
     context.disable();
   });
 
-  describe('constructor', () => {
-    it('should construct an instance with required only options', () => {
+  describe('constructor', function () {
+    it('should construct an instance with required only options', function () {
       provider = new NodeTracerProvider();
       assert.ok(provider instanceof NodeTracerProvider);
     });
 
-    it('should construct an instance with logger', () => {
+    it('should construct an instance with logger', function () {
       provider = new NodeTracerProvider();
       assert.ok(provider instanceof NodeTracerProvider);
     });
 
-    it('should construct an instance with sampler', () => {
+    it('should construct an instance with sampler', function () {
       provider = new NodeTracerProvider({
         sampler: new AlwaysOnSampler(),
       });
@@ -71,20 +71,20 @@ describe('NodeTracerProvider', () => {
     });
   });
 
-  describe('.startSpan()', () => {
-    it('should start a span with name only', () => {
+  describe('.startSpan()', function () {
+    it('should start a span with name only', function () {
       provider = new NodeTracerProvider();
       const span = provider.getTracer('default').startSpan('my-span');
       assert.ok(span);
     });
 
-    it('should start a span with name and options', () => {
+    it('should start a span with name and options', function () {
       provider = new NodeTracerProvider();
       const span = provider.getTracer('default').startSpan('my-span', {});
       assert.ok(span);
     });
 
-    it('should return a default span with no sampling (AlwaysOffSampler)', () => {
+    it('should return a default span with no sampling (AlwaysOffSampler)', function () {
       provider = new NodeTracerProvider({
         sampler: new AlwaysOffSampler(),
       });
@@ -93,7 +93,7 @@ describe('NodeTracerProvider', () => {
       assert.strictEqual(span.isRecording(), false);
     });
 
-    it('should start a recording span with always sampling (AlwaysOnSampler)', () => {
+    it('should start a recording span with always sampling (AlwaysOnSampler)', function () {
       provider = new NodeTracerProvider({
         sampler: new AlwaysOnSampler(),
       });
@@ -102,7 +102,7 @@ describe('NodeTracerProvider', () => {
       assert.strictEqual(span.isRecording(), true);
     });
 
-    it('should sample with AlwaysOnSampler if parent was not sampled', () => {
+    it('should sample with AlwaysOnSampler if parent was not sampled', function () {
       provider = new NodeTracerProvider({
         sampler: new AlwaysOnSampler(),
       });
@@ -133,7 +133,7 @@ describe('NodeTracerProvider', () => {
       assert.strictEqual(span.isRecording(), true);
     });
 
-    it('should assign resource to span', () => {
+    it('should assign resource to span', function () {
       provider = new NodeTracerProvider();
       const span = provider.getTracer('default').startSpan('my-span') as Span;
       assert.ok(span);
@@ -145,7 +145,7 @@ describe('NodeTracerProvider', () => {
     });
   });
 
-  describe('.withSpan()', () => {
+  describe('.withSpan()', function () {
     it('should run context with AsyncHooksContextManager context manager', done => {
       provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
@@ -178,7 +178,7 @@ describe('NodeTracerProvider', () => {
       assert.deepStrictEqual(trace.getSpan(context.active()), undefined);
     });
 
-    it('should find correct context with promises', async () => {
+    it('should find correct context with promises', async function () {
       provider = new NodeTracerProvider();
       const span = provider.getTracer('default').startSpan('my-span');
       await context.with(trace.setSpan(context.active(), span), async () => {
@@ -192,7 +192,7 @@ describe('NodeTracerProvider', () => {
     });
   });
 
-  describe('.bind()', () => {
+  describe('.bind()', function () {
     it('should bind context with AsyncHooksContextManager context manager', done => {
       const provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');

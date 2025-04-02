@@ -30,7 +30,7 @@ import {
 import { NonRecordingSpan } from '../../../src/trace/NonRecordingSpan';
 import { NoopTracer } from '../../../src/trace/NoopTracer';
 
-describe('ProxyTracer', () => {
+describe('ProxyTracer', function () {
   let provider: ProxyTracerProvider;
   const sandbox = sinon.createSandbox();
 
@@ -42,14 +42,14 @@ describe('ProxyTracer', () => {
     sandbox.restore();
   });
 
-  describe('when no delegate is set', () => {
-    it('should return proxy tracers', () => {
+  describe('when no delegate is set', function () {
+    it('should return proxy tracers', function () {
       const tracer = provider.getTracer('test');
 
       assert.ok(tracer instanceof ProxyTracer);
     });
 
-    it('startSpan should return Noop Spans', () => {
+    it('startSpan should return Noop Spans', function () {
       const tracer = provider.getTracer('test');
 
       assert.ok(tracer.startSpan('span-name') instanceof NonRecordingSpan);
@@ -64,7 +64,7 @@ describe('ProxyTracer', () => {
     });
   });
 
-  describe('when delegate is set before getTracer', () => {
+  describe('when delegate is set before getTracer', function () {
     let delegate: TracerProvider;
     let getTracerStub: sinon.SinonStub;
 
@@ -76,7 +76,7 @@ describe('ProxyTracer', () => {
       provider.setDelegate(delegate);
     });
 
-    it('should return tracers directly from the delegate', () => {
+    it('should return tracers directly from the delegate', function () {
       const tracer = provider.getTracer('test', 'v0');
 
       sandbox.assert.calledOnce(getTracerStub);
@@ -88,7 +88,7 @@ describe('ProxyTracer', () => {
       ]);
     });
 
-    it('should return tracers directly from the delegate with schema url', () => {
+    it('should return tracers directly from the delegate with schema url', function () {
       const tracer = provider.getTracer('test', 'v0', {
         schemaUrl: 'https://opentelemetry.io/schemas/1.7.0',
       });
@@ -103,7 +103,7 @@ describe('ProxyTracer', () => {
     });
   });
 
-  describe('when delegate is set after getTracer', () => {
+  describe('when delegate is set after getTracer', function () {
     let tracer: Tracer;
     let delegate: TracerProvider;
     let delegateSpan: Span;
@@ -131,13 +131,13 @@ describe('ProxyTracer', () => {
       provider.setDelegate(delegate);
     });
 
-    it('should create spans using the delegate tracer', () => {
+    it('should create spans using the delegate tracer', function () {
       const span = tracer.startSpan('test');
 
       assert.strictEqual(span, delegateSpan);
     });
 
-    it('should create active spans using the delegate tracer', () => {
+    it('should create active spans using the delegate tracer', function () {
       // sinon types are broken with overloads, hence the any
       // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/36436
       const startActiveSpanStub = sinon.stub<Tracer, any>(
@@ -165,7 +165,7 @@ describe('ProxyTracer', () => {
       assert.strictEqual(tracer.startActiveSpan(name, opts, ctx, fn), 3);
     });
 
-    it('should pass original arguments to DelegateTracer#startSpan', () => {
+    it('should pass original arguments to DelegateTracer#startSpan', function () {
       const startSpanStub = sandbox.stub(delegateTracer, 'startSpan');
 
       const name = 'name1';
