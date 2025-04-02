@@ -20,7 +20,7 @@
 {% endif -%}
 
 {%- if obj is deprecated %}
-  {%- set deprecated_jsdoc = "\n@deprecated " ~ strong_rfc2119(obj.deprecated) -%}
+  {%- set deprecated_jsdoc = "\n@deprecated " ~ strong_rfc2119(obj.deprecated.note) -%}
 {%- endif -%}
 
 {{ [
