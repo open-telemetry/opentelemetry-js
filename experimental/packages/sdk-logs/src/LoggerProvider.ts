@@ -76,6 +76,8 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
   }
 
   /**
+   * @deprecated add your processors in the constructors instead.
+   * 
    * Adds a new {@link LogRecordProcessor} to this logger.
    * @param processor the new LogRecordProcessor to be added.
    */
