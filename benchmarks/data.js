@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1743612720682,
+  "lastUpdate": 1743613255565,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -29644,6 +29644,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.61%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "wdb@innerfuse.biz",
+            "name": "Weyert de Boer",
+            "username": "weyert"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "27eb7f12cf7e2954f44736aa598a56f1af8c73cb",
+          "message": "refactor: use get*FromEnv() for logging setup (#5580)\n\nSigned-off-by: Weyert de Boer <wdb@innerfuse.biz>\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2025-04-02T16:53:09Z",
+          "tree_id": "404983f071f5a33726aae77c0e443619bce29714",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/27eb7f12cf7e2954f44736aa598a56f1af8c73cb"
+        },
+        "date": 1743613254513,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1497981,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18220,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 829878,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 760772,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
