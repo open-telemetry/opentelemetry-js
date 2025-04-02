@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1743471423072,
+  "lastUpdate": 1743601749213,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -29540,6 +29540,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.64%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "390243e3089b71e4146c093172fda4b66ce8c119",
+          "message": "chore(deps): update github/codeql-action action to v3.28.13 (#5568)",
+          "timestamp": "2025-04-02T13:06:39Z",
+          "tree_id": "47ce46a9264d47fcfa0f64c27885de01fe0ef4ff",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/390243e3089b71e4146c093172fda4b66ce8c119"
+        },
+        "date": 1743601748069,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1492483,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 17825,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 821124,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 763172,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
