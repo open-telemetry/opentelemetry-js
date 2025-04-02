@@ -78,7 +78,6 @@ import {
 import {
   getResourceDetectorsFromEnv,
   getSpanProcessorsFromEnv,
-  filterBlanksAndNulls,
   getPropagatorFromEnv,
 } from './utils';
 
