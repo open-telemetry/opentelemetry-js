@@ -60,7 +60,7 @@ export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   ]);
 
   const resourceDetectorsFromEnv =
-    process.env.OTEL_NODE_RESOURCE_DETECTORS?.split(',') ?? ['all'];
+    getStringListFromEnv('OTEL_NODE_RESOURCE_DETECTORS') ?? ['all'];
 
   if (resourceDetectorsFromEnv.includes('all')) {
     return [...resourceDetectors.values()].flat();
