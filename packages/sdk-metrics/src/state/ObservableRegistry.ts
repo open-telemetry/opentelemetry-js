@@ -16,7 +16,6 @@
 
 import {
   diag,
-  HrTime,
   BatchObservableCallback,
   Observable,
   ObservableCallback,
@@ -119,7 +118,7 @@ export class ObservableRegistry {
    * @returns a promise of rejected reasons for invoking callbacks.
    */
   async observe(
-    collectionTime: HrTime,
+    collectionTime: bigint,
     timeoutMillis?: number
   ): Promise<unknown[]> {
     const callbackFutures = this._observeCallbacks(
@@ -142,7 +141,7 @@ export class ObservableRegistry {
     return rejections;
   }
 
-  private _observeCallbacks(observationTime: HrTime, timeoutMillis?: number) {
+  private _observeCallbacks(observationTime: bigint, timeoutMillis?: number) {
     return this._callbacks.map(async ({ callback, instrument }) => {
       const observableResult = new ObservableResultImpl(
         instrument._descriptor.name,
@@ -162,7 +161,7 @@ export class ObservableRegistry {
   }
 
   private _observeBatchCallbacks(
-    observationTime: HrTime,
+    observationTime: bigint,
     timeoutMillis?: number
   ) {
     return this._batchCallbacks.map(async ({ callback, instruments }) => {
