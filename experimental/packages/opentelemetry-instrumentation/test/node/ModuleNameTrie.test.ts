@@ -18,8 +18,8 @@ import * as assert from 'assert';
 import { Hooked } from '../../src/platform/node/RequireInTheMiddleSingleton';
 import { ModuleNameTrie } from '../../src/platform/node/ModuleNameTrie';
 
-describe('ModuleNameTrie', () => {
-  describe('search', () => {
+describe('ModuleNameTrie', function () {
+  describe('search', function () {
     const trie = new ModuleNameTrie();
     const inserts = [
       { moduleName: 'a', onRequire: () => {} },
@@ -30,20 +30,20 @@ describe('ModuleNameTrie', () => {
     ] as Hooked[];
     inserts.forEach(trie.insert.bind(trie));
 
-    it('should return a list of exact matches (no results)', () => {
+    it('should return a list of exact matches (no results)', function () {
       assert.deepEqual(trie.search('e'), []);
     });
 
-    it('should return a list of exact matches (one result)', () => {
+    it('should return a list of exact matches (one result)', function () {
       assert.deepEqual(trie.search('d'), [inserts[4]]);
     });
 
-    it('should return a list of exact matches (more than one result)', () => {
+    it('should return a list of exact matches (more than one result)', function () {
       assert.deepEqual(trie.search('a'), [inserts[0], inserts[2]]);
     });
 
-    describe('maintainInsertionOrder = false', () => {
-      it('should return a list of matches in prefix order', () => {
+    describe('maintainInsertionOrder = false', function () {
+      it('should return a list of matches in prefix order', function () {
         assert.deepEqual(trie.search('a/b'), [
           inserts[0],
           inserts[2],
@@ -52,8 +52,8 @@ describe('ModuleNameTrie', () => {
       });
     });
 
-    describe('maintainInsertionOrder = true', () => {
-      it('should return a list of matches in insertion order', () => {
+    describe('maintainInsertionOrder = true', function () {
+      it('should return a list of matches in insertion order', function () {
         assert.deepEqual(trie.search('a/b', { maintainInsertionOrder: true }), [
           inserts[0],
           inserts[1],
@@ -62,8 +62,8 @@ describe('ModuleNameTrie', () => {
       });
     });
 
-    describe('fullOnly = false', () => {
-      it('should return a list of matches for prefixes', () => {
+    describe('fullOnly = false', function () {
+      it('should return a list of matches for prefixes', function () {
         assert.deepEqual(trie.search('a/b'), [
           inserts[0],
           inserts[2],
@@ -72,8 +72,8 @@ describe('ModuleNameTrie', () => {
       });
     });
 
-    describe('fullOnly = true', () => {
-      it('should return a list of matches for full values only', () => {
+    describe('fullOnly = true', function () {
+      it('should return a list of matches for full values only', function () {
         assert.deepEqual(trie.search('a', { fullOnly: true }), [
           inserts[0],
           inserts[2],

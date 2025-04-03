@@ -43,8 +43,8 @@ import { satisfies, SatisfiesOptions } from '../../src/semver';
 const rangeInclude = require('./third-party/node-semver/range-include.js');
 const rangeExclude = require('./third-party/node-semver/range-exclude.js');
 
-describe('SemVer', () => {
-  describe('satisfies', () => {
+describe('SemVer', function () {
+  describe('satisfies', function () {
     function isOptionsSupported(options: any): boolean {
       // We don't support
       // - boolean typed options
@@ -55,7 +55,7 @@ describe('SemVer', () => {
       return true;
     }
 
-    it('when range is included', () => {
+    it('when range is included', function () {
       rangeInclude.forEach(([range, ver, options]: [string, string, any]) => {
         if (!isOptionsSupported(options)) {
           return;
@@ -66,7 +66,7 @@ describe('SemVer', () => {
         );
       });
     });
-    it('when range is not included', () => {
+    it('when range is not included', function () {
       rangeExclude.forEach(([range, ver, options]: [string, string, any]) => {
         if (!isOptionsSupported(options)) {
           return;
@@ -77,7 +77,7 @@ describe('SemVer', () => {
         );
       });
     });
-    it('invalid ranges never satisfied (but do not throw)', () => {
+    it('invalid ranges never satisfied (but do not throw)', function () {
       const cases = [
         ['blerg', '1.2.3'],
         ['git+https://user:password0123@github.com/foo', '123.0.0', true],
