@@ -22,7 +22,7 @@ npm install --save @opentelemetry/instrumentation-http
 
 ## Usage
 
-OpenTelemetry HTTP Instrumentation allows the user to automatically collect trace data and export them to their backend of choice, to give observability to distributed systems.
+OpenTelemetry HTTP Instrumentation allows the user to automatically collect telemetry and export it to their backend of choice, to give observability to distributed systems.
 
 To load a specific instrumentation (HTTP in this case), specify it in the Node Tracer's configuration.
 
@@ -35,9 +35,10 @@ const {
 } = require('@opentelemetry/sdk-trace-node');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 
-const provider = new NodeTracerProvider();
+const provider = new NodeTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
+});
 
-provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.register();
 
 registerInstrumentations({
@@ -68,15 +69,7 @@ Http instrumentation has few options available to choose from. You can set the f
 | [`requireParentforIncomingSpans`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L105) | Boolean | Require that is a parent span to create new span for incoming requests. |
 | [`headersToSpanAttributes`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L107) | `object` | List of case insensitive HTTP headers to convert to span attributes. Client (outgoing requests, incoming responses) and server (incoming requests, outgoing responses) headers will be converted to span attributes in the form of `http.{request\|response}.header.header_name`, e.g. `http.response.header.content_length` |
 
-The following options are deprecated:
-
-| Options | Type | Description |
-| ------- | ---- | ----------- |
-| `ignoreIncomingPaths` | `IgnoreMatcher[]` | Http instrumentation will not trace all incoming requests that match paths |
-
 ## Semantic Conventions
-
-### Client and Server Spans
 
 Prior to version `0.54`, this instrumentation created spans targeting an experimental semantic convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md).
 
@@ -86,21 +79,19 @@ The values `http` and `http/dup` control this instrumentation.
 See details for the behavior of each of these values below.
 If neither `http` or `http/dup` is included in `OTEL_SEMCONV_STABILITY_OPT_IN`, the old experimental semantic conventions will be used by default.
 
-#### Stable Semantic Conventions 1.27
+### Stable Semantic Conventions 1.27
 
 Enabled when `OTEL_SEMCONV_STABILITY_OPT_IN` contains `http` OR `http/dup`.
 This is the recommended configuration, and will soon become the default behavior.
 
-Follow all requirements and recommendations of HTTP Client and Server Span Semantic Conventions [Version 1.27.0](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-spans.md), including all required and recommended attributes.
+Follow all requirements and recommendations of HTTP Client and Server Semantic Conventions Version 1.27.0 for [spans](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-spans.md) and [metrics](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-metrics.md), including all required and recommended attributes.
 
-#### Legacy Behavior (default)
+Metrics Exported:
 
-Enabled when `OTEL_SEMCONV_STABILITY_OPT_IN` contains `http/dup` or DOES NOT CONTAIN `http`.
-This is the current default behavior.
+- [`http.server.request.duration`](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-metrics.md#metric-httpserverrequestduration)
+- [`http.client.request.duration`](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-metrics.md#metric-httpclientrequestduration)
 
-Create HTTP client spans which implement Semantic Convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md).
-
-#### Upgrading Semantic Conventions
+### Upgrading Semantic Conventions
 
 When upgrading to the new semantic conventions, it is recommended to do so in the following order:
 
@@ -111,9 +102,16 @@ When upgrading to the new semantic conventions, it is recommended to do so in th
 
 This will cause both the old and new semantic conventions to be emitted during the transition period.
 
-### Server Spans
+### Legacy Behavior (default)
 
-This package uses `@opentelemetry/semantic-conventions` version `1.22+`, which implements Semantic Convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md).
+Enabled when `OTEL_SEMCONV_STABILITY_OPT_IN` contains `http/dup` or DOES NOT CONTAIN `http`.
+This is the current default behavior.
+
+Create HTTP client spans which implement Semantic Convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md).
+
+#### Server Spans (legacy)
+
+When `OTEL_SEMCONV_STABILITY_OPT_IN` is not set or includes `http/dup`, this module implements Semantic Convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md).
 
 Attributes collected:
 

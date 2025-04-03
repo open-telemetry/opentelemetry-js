@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import { MetricDescriptor } from './export/MetricData';
-
 export {
   Sum,
   LastValue,
@@ -36,6 +34,7 @@ export {
   SumMetricData,
   GaugeMetricData,
   HistogramMetricData,
+  InstrumentType,
   ExponentialHistogramMetricData,
   ResourceMetrics,
   ScopeMetrics,
@@ -46,7 +45,11 @@ export {
 
 export { PushMetricExporter } from './export/MetricExporter';
 
-export { MetricReader, MetricReaderOptions } from './export/MetricReader';
+export {
+  IMetricReader,
+  MetricReader,
+  MetricReaderOptions,
+} from './export/MetricReader';
 
 export {
   PeriodicExportingMetricReader,
@@ -59,25 +62,16 @@ export { ConsoleMetricExporter } from './export/ConsoleMetricExporter';
 
 export { MetricCollectOptions, MetricProducer } from './export/MetricProducer';
 
-export { InstrumentType } from './InstrumentDescriptor';
-/**
- * @deprecated Use {@link MetricDescriptor} instead.
- */
-export type InstrumentDescriptor = MetricDescriptor;
-
 export { MeterProvider, MeterProviderOptions } from './MeterProvider';
 
-export {
-  DefaultAggregation,
-  ExplicitBucketHistogramAggregation,
-  ExponentialHistogramAggregation,
-  DropAggregation,
-  HistogramAggregation,
-  LastValueAggregation,
-  SumAggregation,
-  Aggregation,
-} from './view/Aggregation';
+export { AggregationOption, AggregationType } from './view/AggregationOption';
 
-export { View, ViewOptions } from './view/View';
+export { ViewOptions } from './view/View';
+
+export {
+  IAttributesProcessor,
+  createAllowListAttributesProcessor,
+  createDenyListAttributesProcessor,
+} from './view/AttributesProcessor';
 
 export { TimeoutError } from './utils';

@@ -17,34 +17,45 @@
 import * as api from '@opentelemetry/api';
 import { AggregationTemporality } from './AggregationTemporality';
 import { MetricProducer } from './MetricProducer';
-import { CollectionResult } from './MetricData';
-import { FlatMap, callWithTimeout } from '../utils';
-import { InstrumentType } from '../InstrumentDescriptor';
+import { CollectionResult, InstrumentType } from './MetricData';
+import { callWithTimeout, FlatMap } from '../utils';
 import {
   CollectionOptions,
   ForceFlushOptions,
   ShutdownOptions,
 } from '../types';
-import { Aggregation } from '../view/Aggregation';
 import {
   AggregationSelector,
   AggregationTemporalitySelector,
   DEFAULT_AGGREGATION_SELECTOR,
   DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
 } from './AggregationSelector';
+import { AggregationOption } from '../view/AggregationOption';
+import { CardinalitySelector } from './CardinalitySelector';
 
 export interface MetricReaderOptions {
   /**
    * Aggregation selector based on metric instrument types. If no views are
    * configured for a metric instrument, a per-metric-reader aggregation is
    * selected with this selector.
+   *
+   * <p> NOTE: the provided function MUST be pure
    */
   aggregationSelector?: AggregationSelector;
   /**
    * Aggregation temporality selector based on metric instrument types. If
    * not configured, cumulative is used for all instruments.
+   *
+   * <p> NOTE: the provided function MUST be pure
    */
   aggregationTemporalitySelector?: AggregationTemporalitySelector;
+  /**
+   * Cardinality selector based on metric instrument types. If not configured,
+   * a default value is used.
+   *
+   * <p> NOTE: the provided function MUST be pure
+   */
+  cardinalitySelector?: CardinalitySelector;
   /**
    * **Note, this option is experimental**. Additional MetricProducers to use as a source of
    * aggregated metric data in addition to the SDK's metric data. The resource returned by
@@ -55,10 +66,74 @@ export interface MetricReaderOptions {
 }
 
 /**
+ * Reads metrics from the SDK. Implementations MUST follow the Metric Reader Specification as well as the requirements
+ * listed in this interface. Consider extending {@link MetricReader} to get a specification-compliant base implementation
+ * of this interface
+ */
+export interface IMetricReader {
+  /**
+   * Set the {@link MetricProducer} used by this instance. **This should only be called once by the
+   * SDK and should be considered internal.**
+   *
+   * <p> NOTE: implementations MUST throw when called more than once
+   *
+   * @param metricProducer
+   */
+  setMetricProducer(metricProducer: MetricProducer): void;
+
+  /**
+   * Select the {@link AggregationOption} for the given {@link InstrumentType} for this
+   * reader.
+   *
+   * <p> NOTE: implementations MUST be pure
+   */
+  selectAggregation(instrumentType: InstrumentType): AggregationOption;
+
+  /**
+   * Select the {@link AggregationTemporality} for the given
+   * {@link InstrumentType} for this reader.
+   *
+   * <p> NOTE: implementations MUST be pure
+   */
+  selectAggregationTemporality(
+    instrumentType: InstrumentType
+  ): AggregationTemporality;
+
+  /**
+   * Select the cardinality limit for the given {@link InstrumentType} for this
+   * reader.
+   *
+   * <p> NOTE: implementations MUST be pure
+   */
+  selectCardinalityLimit(instrumentType: InstrumentType): number;
+
+  /**
+   * Collect all metrics from the associated {@link MetricProducer}
+   */
+  collect(options?: CollectionOptions): Promise<CollectionResult>;
+
+  /**
+   * Shuts down the metric reader, the promise will reject after the optional timeout or resolve after completion.
+   *
+   * <p> NOTE: this operation MAY continue even after the promise rejects due to a timeout.
+   * @param options options with timeout.
+   */
+  shutdown(options?: ShutdownOptions): Promise<void>;
+
+  /**
+   * Flushes metrics read by this reader, the promise will reject after the optional timeout or resolve after completion.
+   *
+   * <p> NOTE: this operation MAY continue even after the promise rejects due to a timeout.
+   * @param options options with timeout.
+   */
+  forceFlush(options?: ForceFlushOptions): Promise<void>;
+}
+
+/**
  * A registered reader of metrics that, when linked to a {@link MetricProducer}, offers global
  * control over metrics.
  */
-export abstract class MetricReader {
+export abstract class MetricReader implements IMetricReader {
   // Tracks the shutdown state.
   // TODO: use BindOncePromise here once a new version of @opentelemetry/core is available.
   private _shutdown = false;
@@ -68,6 +143,7 @@ export abstract class MetricReader {
   private _sdkMetricProducer?: MetricProducer;
   private readonly _aggregationTemporalitySelector: AggregationTemporalitySelector;
   private readonly _aggregationSelector: AggregationSelector;
+  private readonly _cardinalitySelector?: CardinalitySelector;
 
   constructor(options?: MetricReaderOptions) {
     this._aggregationSelector =
@@ -76,18 +152,9 @@ export abstract class MetricReader {
       options?.aggregationTemporalitySelector ??
       DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR;
     this._metricProducers = options?.metricProducers ?? [];
+    this._cardinalitySelector = options?.cardinalitySelector;
   }
 
-  /**
-   * Set the {@link MetricProducer} used by this instance. **This should only be called by the
-   * SDK and should be considered internal.**
-   *
-   * To add additional {@link MetricProducer}s to a {@link MetricReader}, pass them to the
-   * constructor as {@link MetricReaderOptions.metricProducers}.
-   *
-   * @internal
-   * @param metricProducer
-   */
   setMetricProducer(metricProducer: MetricProducer) {
     if (this._sdkMetricProducer) {
       throw new Error(
@@ -98,22 +165,20 @@ export abstract class MetricReader {
     this.onInitialized();
   }
 
-  /**
-   * Select the {@link Aggregation} for the given {@link InstrumentType} for this
-   * reader.
-   */
-  selectAggregation(instrumentType: InstrumentType): Aggregation {
+  selectAggregation(instrumentType: InstrumentType): AggregationOption {
     return this._aggregationSelector(instrumentType);
   }
 
-  /**
-   * Select the {@link AggregationTemporality} for the given
-   * {@link InstrumentType} for this reader.
-   */
   selectAggregationTemporality(
     instrumentType: InstrumentType
   ): AggregationTemporality {
     return this._aggregationTemporalitySelector(instrumentType);
+  }
+
+  selectCardinalityLimit(instrumentType: InstrumentType): number {
+    return this._cardinalitySelector
+      ? this._cardinalitySelector(instrumentType)
+      : 2000; // default value if no selector is provided
   }
 
   /**
@@ -141,9 +206,6 @@ export abstract class MetricReader {
    */
   protected abstract onForceFlush(): Promise<void>;
 
-  /**
-   * Collect all metrics from the associated {@link MetricProducer}
-   */
   async collect(options?: CollectionOptions): Promise<CollectionResult> {
     if (this._sdkMetricProducer === undefined) {
       throw new Error('MetricReader is not bound to a MetricProducer');
@@ -187,12 +249,6 @@ export abstract class MetricReader {
     };
   }
 
-  /**
-   * Shuts down the metric reader, the promise will reject after the optional timeout or resolve after completion.
-   *
-   * <p> NOTE: this operation will continue even after the promise rejects due to a timeout.
-   * @param options options with timeout.
-   */
   async shutdown(options?: ShutdownOptions): Promise<void> {
     // Do not call shutdown again if it has already been called.
     if (this._shutdown) {
@@ -210,12 +266,6 @@ export abstract class MetricReader {
     this._shutdown = true;
   }
 
-  /**
-   * Flushes metrics read by this reader, the promise will reject after the optional timeout or resolve after completion.
-   *
-   * <p> NOTE: this operation will continue even after the promise rejects due to a timeout.
-   * @param options options with timeout.
-   */
   async forceFlush(options?: ForceFlushOptions): Promise<void> {
     if (this._shutdown) {
       api.diag.warn('Cannot forceFlush on already shutdown MetricReader.');

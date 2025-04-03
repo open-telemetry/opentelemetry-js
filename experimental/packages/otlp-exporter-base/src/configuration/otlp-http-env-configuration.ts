@@ -13,21 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { baggageUtils } from '@opentelemetry/core';
+import { parseKeyPairsIntoRecord } from '@opentelemetry/core';
 import { diag } from '@opentelemetry/api';
 import { getSharedConfigurationFromEnvironment } from './shared-env-configuration';
 import { OtlpHttpConfiguration } from './otlp-http-configuration';
+import { wrapStaticHeadersInFunction } from './shared-configuration';
 
-function getHeadersFromEnv(signalIdentifier: string) {
+function getStaticHeadersFromEnv(
+  signalIdentifier: string
+): Record<string, string> | undefined {
   const signalSpecificRawHeaders =
     process.env[`OTEL_EXPORTER_OTLP_${signalIdentifier}_HEADERS`]?.trim();
   const nonSignalSpecificRawHeaders =
     process.env['OTEL_EXPORTER_OTLP_HEADERS']?.trim();
 
-  const signalSpecificHeaders = baggageUtils.parseKeyPairsIntoRecord(
+  const signalSpecificHeaders = parseKeyPairsIntoRecord(
     signalSpecificRawHeaders
   );
-  const nonSignalSpecificHeaders = baggageUtils.parseKeyPairsIntoRecord(
+  const nonSignalSpecificHeaders = parseKeyPairsIntoRecord(
     nonSignalSpecificRawHeaders
   );
 
@@ -42,8 +45,8 @@ function getHeadersFromEnv(signalIdentifier: string) {
   // the non-specific ones.
   return Object.assign(
     {},
-    baggageUtils.parseKeyPairsIntoRecord(nonSignalSpecificRawHeaders),
-    baggageUtils.parseKeyPairsIntoRecord(signalSpecificRawHeaders)
+    parseKeyPairsIntoRecord(nonSignalSpecificRawHeaders),
+    parseKeyPairsIntoRecord(signalSpecificRawHeaders)
   );
 }
 
@@ -126,6 +129,8 @@ export function getHttpConfigurationFromEnvironment(
     url:
       getSpecificUrlFromEnv(signalIdentifier) ??
       getNonSpecificUrlFromEnv(signalResourcePath),
-    headers: getHeadersFromEnv(signalIdentifier),
+    headers: wrapStaticHeadersInFunction(
+      getStaticHeadersFromEnv(signalIdentifier)
+    ),
   };
 }

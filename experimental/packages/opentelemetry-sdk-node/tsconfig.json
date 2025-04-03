@@ -25,6 +25,12 @@
       "path": "../../../packages/opentelemetry-exporter-zipkin"
     },
     {
+      "path": "../../../packages/opentelemetry-propagator-b3"
+    },
+    {
+      "path": "../../../packages/opentelemetry-propagator-jaeger"
+    },
+    {
       "path": "../../../packages/opentelemetry-resources"
     },
     {
@@ -59,6 +65,18 @@
     },
     {
       "path": "../exporter-trace-otlp-proto"
+    },
+    {
+      "path": "../opentelemetry-exporter-metrics-otlp-grpc"
+    },
+    {
+      "path": "../opentelemetry-exporter-metrics-otlp-http"
+    },
+    {
+      "path": "../opentelemetry-exporter-metrics-otlp-proto"
+    },
+    {
+      "path": "../opentelemetry-exporter-prometheus"
     },
     {
       "path": "../opentelemetry-instrumentation"

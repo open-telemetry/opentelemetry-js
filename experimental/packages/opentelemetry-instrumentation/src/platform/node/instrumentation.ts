@@ -17,7 +17,7 @@
 import * as types from '../../types';
 import * as path from 'path';
 import { types as utilTypes } from 'util';
-import { satisfies } from 'semver';
+import { satisfies } from '../../semver';
 import { wrap, unwrap, massWrap, massUnwrap } from 'shimmer';
 import { InstrumentationAbstract } from '../../instrumentation';
 import {
@@ -287,6 +287,11 @@ export abstract class InstrumentationBase<
     this._warnOnPreloadedModules();
     for (const module of this._modules) {
       const hookFn: HookFn = (exports, name, baseDir) => {
+        if (!baseDir && path.isAbsolute(name)) {
+          const parsedPath = path.parse(name);
+          name = parsedPath.name;
+          baseDir = parsedPath.dir;
+        }
         return this._onRequire<typeof exports>(module, exports, name, baseDir);
       };
       const onRequire: OnRequireFn = (exports, name, baseDir) => {

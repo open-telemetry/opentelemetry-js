@@ -80,7 +80,7 @@ type TestGrpcClient = Client & {
 interface TestGrpcCall {
   description: string;
   methodName: string;
-  method: Function;
+  method: (...args: any[]) => unknown;
   request: TestRequestResponse | TestRequestResponse[];
   result: TestRequestResponse | TestRequestResponse[];
   metadata?: Metadata;
@@ -106,8 +106,8 @@ const checkEqual =
     x instanceof Array && y instanceof Array
       ? arrayIsEqual(requestEqual)(x as any)(y as any)
       : !(x instanceof Array) && !(y instanceof Array)
-      ? requestEqual(x)(y)
-      : false;
+        ? requestEqual(x)(y)
+        : false;
 
 const replicate = (request: TestRequestResponse) => {
   const result: TestRequestResponse[] = [];
@@ -395,6 +395,7 @@ export const runTests = (
           bidiStream.write(element);
         });
 
+        assert.strictEqual(bidiStream.listenerCount('error'), 0);
         bidiStream.on('error', (err: ServiceError) => {
           reject(err);
         });
@@ -621,7 +622,7 @@ export const runTests = (
                 );
                 assert.strictEqual(
                   rootSpan.spanContext().spanId,
-                  clientSpan.parentSpanId
+                  clientSpan.parentSpanContext?.spanId
                 );
               }
             })
@@ -739,7 +740,7 @@ export const runTests = (
               );
               assert.strictEqual(
                 rootSpan.spanContext().spanId,
-                clientSpan.parentSpanId
+                clientSpan.parentSpanContext?.spanId
               );
             });
         });
@@ -755,8 +756,9 @@ export const runTests = (
     };
 
     describe('enable()', () => {
-      const provider = new NodeTracerProvider();
-      provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+      const provider = new NodeTracerProvider({
+        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      });
       beforeEach(() => {
         memoryExporter.reset();
       });
@@ -799,8 +801,9 @@ export const runTests = (
     });
 
     describe('disable()', () => {
-      const provider = new NodeTracerProvider();
-      provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+      const provider = new NodeTracerProvider({
+        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      });
       beforeEach(() => {
         memoryExporter.reset();
       });
@@ -830,8 +833,9 @@ export const runTests = (
     });
 
     describe('Test filtering requests using metadata', () => {
-      const provider = new NodeTracerProvider();
-      provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+      const provider = new NodeTracerProvider({
+        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      });
       beforeEach(() => {
         memoryExporter.reset();
       });
@@ -859,7 +863,9 @@ export const runTests = (
     });
 
     describe('Test filtering requests using options', () => {
-      const provider = new NodeTracerProvider();
+      const provider = new NodeTracerProvider({
+        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      });
       const checkSpans: { [key: string]: boolean } = {
         unaryMethod: false,
         UnaryMethod: false,
@@ -868,7 +874,6 @@ export const runTests = (
         ServerStreamMethod: true,
         BidiStreamMethod: false,
       };
-      provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
       beforeEach(() => {
         memoryExporter.reset();
       });
@@ -936,8 +941,9 @@ export const runTests = (
     });
 
     describe('Test capturing metadata', () => {
-      const provider = new NodeTracerProvider();
-      provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+      const provider = new NodeTracerProvider({
+        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      });
 
       const clientMetadata = new Metadata();
       clientMetadata.add('client_metadata_key', 'client_metadata_value');

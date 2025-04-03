@@ -14,25 +14,21 @@
  * limitations under the License.
  */
 import { ValueType } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 import {
   AggregationTemporality,
   DataPointType,
-  InstrumentType,
   MetricData,
   ResourceMetrics,
 } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
-import { createExportMetricsServiceRequest } from '../src/metrics';
-import { EAggregationTemporality } from '../src/metrics/types';
+import { createExportMetricsServiceRequest } from '../src/metrics/internal';
+import { EAggregationTemporality } from '../src/metrics/internal-types';
 import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
-import {
-  encodeAsString,
-  encodeAsLongBits,
-  ProtobufMetricsSerializer,
-  JsonMetricsSerializer,
-} from '../src';
 import * as root from '../src/generated/root';
+import { encodeAsLongBits, encodeAsString } from '../src/common/utils';
+import { ProtobufMetricsSerializer } from '../src/metrics/protobuf';
+import { JsonMetricsSerializer } from '../src/metrics/json';
 
 const START_TIME = hrTime();
 const END_TIME = hrTime();
@@ -113,7 +109,6 @@ describe('Metrics', () => {
     return {
       descriptor: {
         description: 'this is a description',
-        type: InstrumentType.COUNTER,
         name: 'counter',
         unit: '1',
         valueType: ValueType.INT,
@@ -139,7 +134,6 @@ describe('Metrics', () => {
     return {
       descriptor: {
         description: 'this is a description',
-        type: InstrumentType.UP_DOWN_COUNTER,
         name: 'up-down-counter',
         unit: '1',
         valueType: ValueType.INT,
@@ -165,7 +159,6 @@ describe('Metrics', () => {
     return {
       descriptor: {
         description: 'this is a description',
-        type: InstrumentType.OBSERVABLE_COUNTER,
         name: 'observable-counter',
         unit: '1',
         valueType: ValueType.INT,
@@ -191,7 +184,6 @@ describe('Metrics', () => {
     return {
       descriptor: {
         description: 'this is a description',
-        type: InstrumentType.OBSERVABLE_UP_DOWN_COUNTER,
         name: 'observable-up-down-counter',
         unit: '1',
         valueType: ValueType.INT,
@@ -214,7 +206,6 @@ describe('Metrics', () => {
     return {
       descriptor: {
         description: 'this is a description',
-        type: InstrumentType.OBSERVABLE_GAUGE,
         name: 'gauge',
         unit: '1',
         valueType: ValueType.DOUBLE,
@@ -244,7 +235,6 @@ describe('Metrics', () => {
     return {
       descriptor: {
         description: 'this is a description',
-        type: InstrumentType.HISTOGRAM,
         name: 'hist',
         unit: '1',
         valueType: ValueType.INT,
@@ -285,7 +275,6 @@ describe('Metrics', () => {
     return {
       descriptor: {
         description: 'this is a description',
-        type: InstrumentType.HISTOGRAM,
         name: 'xhist',
         unit: '1',
         valueType: ValueType.INT,
@@ -313,7 +302,7 @@ describe('Metrics', () => {
   }
 
   function createResourceMetrics(metricData: MetricData[]): ResourceMetrics {
-    const resource = new Resource({
+    const resource = resourceFromAttributes({
       'resource-attribute': 'resource attribute value',
     });
     return {
@@ -788,11 +777,11 @@ describe('Metrics', () => {
 
   describe('ProtobufMetricsSerializer', function () {
     it('serializes an export request', () => {
-      const serialized = ProtobufMetricsSerializer.serializeRequest([
+      const serialized = ProtobufMetricsSerializer.serializeRequest(
         createResourceMetrics([
           createCounterData(10, AggregationTemporality.DELTA),
-        ]),
-      ]);
+        ])
+      );
       assert.ok(serialized, 'serialized response is undefined');
       const decoded =
         root.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.decode(
@@ -873,11 +862,11 @@ describe('Metrics', () => {
 
   describe('JsonMetricsSerializer', function () {
     it('serializes an export request', () => {
-      const serialized = JsonMetricsSerializer.serializeRequest([
+      const serialized = JsonMetricsSerializer.serializeRequest(
         createResourceMetrics([
           createCounterData(10, AggregationTemporality.DELTA),
-        ]),
-      ]);
+        ])
+      );
 
       const decoder = new TextDecoder();
       const expected = {

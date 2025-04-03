@@ -362,13 +362,15 @@ for the resulting metric. The first step is select to the metrics to whom the Vi
 is relevant, the second step is to configure the customizations for the the selected
 metrics.
 
-A Metric View is a class that can be instantiated via:
+A Metric View can be added to a `MeterProvider` like so
 
 ````typescript
-const view = new View({
-  name: 'metric-view', // optionally, give the view a unique name
-  // select instruments with a specific name
-  instrumentName: 'http.server.duration',
+new MeterProvider({
+  views: [{
+    name: 'metric-view', // optionally, give the view a unique name
+    // select instruments with a specific name
+    instrumentName: 'http.server.duration',
+  }]
 });
 ````
 
@@ -396,20 +398,22 @@ should be used to define the bucket sizes for the Histogram instrument.
 Below an example is given how you can define explicit buckets for a histogram.
 
 ```typescript
-// Define view for the histogram metric
-const histogramView = new View({
-  aggregation: new ExplicitBucketHistogramAggregation([0, 1, 5, 10, 15, 20, 25, 30]),
-  instrumentName: 'http.server.duration',
-  instrumentType: InstrumentType.HISTOGRAM,
-});
-
-// Note, the instrumentName is the same as the name that has been passed for
-// the Meter#createHistogram function
-
 // Create an instance of the metric provider
 const meterProvider = new MeterProvider({
   views: [
-    histogramView
+    // Define view for the histogram metric
+    {
+      aggregation: {
+        type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+        options: {
+          boundaries: [0, 1, 5, 10, 15, 20, 25, 30],
+        }
+      },
+      // Note, the instrumentName is the same as the name that has been passed for
+      // the Meter#createHistogram function
+      instrumentName: 'http.server.duration',
+      instrumentType: InstrumentType.HISTOGRAM,
+    }
   ]
 });
 
@@ -441,20 +445,20 @@ instruments with a specific name:
 The following view drops all instruments that are associated with a meter named `pubsub`:
 
 ```typescript
-const dropView = new View({
-  aggregation: new DropAggregation(),
+{
+  aggregation: { type: AggregationType.DROP },
   meterName: 'pubsub',
-});
+}
 ```
 
 Alternatively, you can also drop instruments with a specific instrument name,
 for example, all instruments of which the name starts with `http`:
 
 ```typescript
-const dropView = new View({
-  aggregation: new DropAggregation(),
+{
+  aggregation: { type: AggregationType.DROP },
   instrumentName: 'http*',
-});
+}
 ```
 
 ### Customizing the metric attributes of instrument
@@ -467,12 +471,12 @@ In the example below will drop all attributes except attribute `environment` for
 all instruments.
 
 ```typescript
-new View({
+{
   // only export the attribute 'environment'
   attributeKeys: ['environment'],
   // apply the view to all instruments
   instrumentName: '*',
-})
+}
 ```
 
 ## Exporting measurements
@@ -483,7 +487,7 @@ that are used are Prometheus and OTLP.
 
 The latter is the [OpenTelemetry protocol format](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md)
 which is supported by the OpenTelemetry Collector. The former is based on the [OpenMetrics
-format](https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md) can be consumed by Prometheus and Thanos or other OpenMetrics compatible
+format](https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md) can be consumed by Prometheus and Thanos or other OpenMetrics compatible
 backends.
 
 _Note_: Both OpenTelemetry JavaScript and OpenTelemetry Collector support
@@ -504,8 +508,9 @@ const options = { port: 9464 };
 const exporter = new PrometheusExporter(options);
 
 // Creates MeterProvider and installs the exporter as a MetricReader
-const meterProvider = new MeterProvider();
-meterProvider.addMetricReader(exporter);
+const meterProvider = new MeterProvider({
+  readers: [exporter],
+});
 const meter = meterProvider.getMeter('example-prometheus');
 
 // Now, start recording data
@@ -520,7 +525,7 @@ a new http server on port 9464. You can now access the metrics at the endpoint
 <http://localhost:9464/metrics>. This is the URL that can be scraped by Prometheus so it can consumed the metrics collected by OpenTelemetry in your application.
 
 More information about Prometheus and how to configure can be found at:
-[https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config](Prometheus Scraping Config)
+[Prometheus Scraping Config](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config)
 
 For a fully functioning code example for using this exporter, please have a look
 at: <https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/examples/prometheus>
@@ -541,12 +546,14 @@ const collectorOptions = {
   concurrencyLimit: 1, // an optional limit on pending requests
 };
 const exporter = new OTLPMetricExporter(collectorOptions);
-const meterProvider = new MeterProvider({});
-
-meterProvider.addMetricReader(new PeriodicExportingMetricReader({
-  exporter: metricExporter,
-  exportIntervalMillis: 1000,
-}));
+const meterProvider = new MeterProvider({
+  readers: [
+    new PeriodicExportingMetricReader({
+      exporter,
+      exportIntervalMillis: 1000,
+    }),
+  ],
+});
 
 // Now, start recording data
 const meter = meterProvider.getMeter('example-meter');

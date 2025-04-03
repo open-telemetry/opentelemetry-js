@@ -22,18 +22,18 @@ import {
   ValueType,
 } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import {
+  defaultResource,
+  resourceFromAttributes,
+} from '@opentelemetry/resources';
 import * as assert from 'assert';
+import { InstrumentDescriptor } from '../src/InstrumentDescriptor';
 import {
-  InstrumentDescriptor,
   InstrumentType,
-} from '../src/InstrumentDescriptor';
-import {
   MetricData,
   DataPoint,
   DataPointType,
   ScopeMetrics,
-  MetricDescriptor,
 } from '../src/export/MetricData';
 import { isNotNullish } from '../src/utils';
 import { HrTime } from '@opentelemetry/api';
@@ -46,10 +46,8 @@ export type Measurement = {
   context?: Context;
 };
 
-export const defaultResource = Resource.default().merge(
-  new Resource({
-    resourceKey: 'my-resource',
-  })
+export const testResource = defaultResource().merge(
+  resourceFromAttributes({ resourceKey: 'my-resource' })
 );
 
 export const defaultInstrumentDescriptor: InstrumentDescriptor = {
@@ -99,13 +97,13 @@ export function assertScopeMetrics(
 ): asserts actual is ScopeMetrics {
   const it = actual as ScopeMetrics;
   assertPartialDeepStrictEqual(it.scope, instrumentationScope);
-  assert(Array.isArray(it.metrics));
+  assert.ok(Array.isArray(it.metrics));
 }
 
 export function assertMetricData(
   actual: unknown,
   dataPointType?: DataPointType,
-  metricDescriptor: Partial<MetricDescriptor> | null = defaultInstrumentDescriptor,
+  metricDescriptor: Partial<InstrumentDescriptor> | null = defaultInstrumentDescriptor,
   aggregationTemporality?: AggregationTemporality
 ): asserts actual is MetricData {
   const it = actual as MetricData;
@@ -115,12 +113,12 @@ export function assertMetricData(
   if (isNotNullish(dataPointType)) {
     assert.strictEqual(it.dataPointType, dataPointType);
   } else {
-    assert(isNotNullish(DataPointType[it.dataPointType]));
+    assert.ok(isNotNullish(DataPointType[it.dataPointType]));
   }
   if (aggregationTemporality != null) {
     assert.strictEqual(aggregationTemporality, it.aggregationTemporality);
   }
-  assert(Array.isArray(it.dataPoints));
+  assert.ok(Array.isArray(it.dataPoints));
 }
 
 export function assertDataPoint(
@@ -140,13 +138,13 @@ export function assertDataPoint(
       'startTime should be equal'
     );
   } else {
-    assert(Array.isArray(it.startTime));
+    assert.ok(Array.isArray(it.startTime));
     assert.strictEqual(it.startTime.length, 2, 'startTime should be equal');
   }
   if (endTime) {
     assert.deepStrictEqual(it.endTime, endTime, 'endTime should be equal');
   } else {
-    assert(Array.isArray(it.endTime));
+    assert.ok(Array.isArray(it.endTime));
     assert.strictEqual(it.endTime.length, 2, 'endTime should be equal');
   }
 }
@@ -157,7 +155,7 @@ export function assertMeasurementEqual(
 ): asserts actual is Measurement {
   // NOTE: Node.js v8 assert.strictEquals treat two NaN as different values.
   if (Number.isNaN(expected.value)) {
-    assert(Number.isNaN((actual as Measurement).value));
+    assert.ok(Number.isNaN((actual as Measurement).value));
   } else {
     assert.strictEqual((actual as Measurement).value, expected.value);
   }

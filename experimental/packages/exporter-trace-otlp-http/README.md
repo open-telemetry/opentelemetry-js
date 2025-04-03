@@ -36,18 +36,21 @@ const collectorOptions = {
   concurrencyLimit: 10, // an optional limit on pending requests
 };
 
-const provider = new WebTracerProvider();
 const exporter = new OTLPTraceExporter(collectorOptions);
-provider.addSpanProcessor(new BatchSpanProcessor(exporter, {
-  // The maximum queue size. After the size is reached spans are dropped.
-  maxQueueSize: 100,
-  // The maximum batch size of every export. It must be smaller or equal to maxQueueSize.
-  maxExportBatchSize: 10,
-  // The interval between two consecutive exports
-  scheduledDelayMillis: 500,
-  // How long the export can run before it is cancelled
-  exportTimeoutMillis: 30000,
-}));
+const provider = new WebTracerProvider({
+  spanProcessors: [
+    new BatchSpanProcessor(exporter, {
+      // The maximum queue size. After the size is reached spans are dropped.
+      maxQueueSize: 100,
+      // The maximum batch size of every export. It must be smaller or equal to maxQueueSize.
+      maxExportBatchSize: 10,
+      // The interval between two consecutive exports
+      scheduledDelayMillis: 500,
+      // How long the export can run before it is cancelled
+      exportTimeoutMillis: 30000,
+    })
+  ]
+});
 
 provider.register();
 
@@ -56,7 +59,7 @@ provider.register();
 ## Traces in Node - JSON over http
 
 ```js
-const { BasicTracerProvider, BatchSpanProcessor } = require('@opentelemetry/sdk-trace-base');
+const { NodeTracerProvider, BatchSpanProcessor } = require('@opentelemetry/sdk-trace-node');
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-http');
 
 const collectorOptions = {
@@ -67,14 +70,17 @@ const collectorOptions = {
   concurrencyLimit: 10, // an optional limit on pending requests
 };
 
-const provider = new BasicTracerProvider();
 const exporter = new OTLPTraceExporter(collectorOptions);
-provider.addSpanProcessor(new BatchSpanProcessor(exporter, {
-  // The maximum queue size. After the size is reached spans are dropped.
-  maxQueueSize: 1000,
-  // The interval between two consecutive exports
-  scheduledDelayMillis: 30000,
-}));
+const provider = new NodeTracerProvider({
+  spanProcessors: [
+    new BatchSpanProcessor(exporter, {
+      // The maximum queue size. After the size is reached spans are dropped.
+      maxQueueSize: 1000,
+      // The interval between two consecutive exports
+      scheduledDelayMillis: 30000,
+    })
+  ]
+});
 
 provider.register();
 

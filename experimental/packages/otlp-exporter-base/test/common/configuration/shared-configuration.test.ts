@@ -19,6 +19,7 @@ import {
   mergeOtlpSharedConfigurationWithDefaults,
   OtlpSharedConfiguration,
 } from '../../../src';
+import { validateTimeoutMillis } from '../../../src/configuration/shared-configuration';
 
 export function testSharedConfigBehavior<T extends OtlpSharedConfiguration>(
   sut: (
@@ -132,5 +133,17 @@ describe('mergeOtlpSharedConfigurationWithDefaults', function () {
     timeoutMillis: 1,
     compression: 'none',
     concurrencyLimit: 2,
+  });
+});
+
+describe('validateTimeoutMillis', function () {
+  it('throws if timeout is not a positive number', () => {
+    const values = [null, '1', true, NaN, Infinity, -Infinity, -1, 0];
+
+    for (let i = 0; i < values.length; ++i) {
+      assert.throws(() => {
+        validateTimeoutMillis(values[i] as any);
+      }, /Configuration: timeoutMillis is invalid/);
+    }
   });
 });

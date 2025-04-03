@@ -19,15 +19,15 @@ import * as sinon from 'sinon';
 import {
   MeterProvider,
   DataPointType,
-  View,
-  Aggregation,
-  MetricReader,
+  IMetricReader,
   InstrumentType,
+  AggregationType,
+  ViewOptions,
 } from '../../src';
 import {
   assertMetricData,
   defaultInstrumentationScope,
-  defaultResource,
+  testResource,
   sleep,
 } from '../util';
 import {
@@ -44,9 +44,9 @@ describe('MeterSharedState', () => {
   });
 
   describe('registerMetricStorage', () => {
-    function setupMeter(views?: View[], readers?: MetricReader[]) {
+    function setupMeter(views?: ViewOptions[], readers?: IMetricReader[]) {
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         views,
         readers: readers,
       });
@@ -69,7 +69,7 @@ describe('MeterSharedState', () => {
         },
       });
       const { meter, meterSharedState, collectors } = setupMeter(
-        [new View({ instrumentName: 'test-counter' })],
+        [{ instrumentName: 'test-counter' }],
         [reader]
       );
 
@@ -92,7 +92,7 @@ describe('MeterSharedState', () => {
         },
       });
       const { meter, meterSharedState, collectors } = setupMeter(
-        [new View({ instrumentName: 'test-counter' })],
+        [{ instrumentName: 'test-counter' }],
         [reader]
       );
 
@@ -111,7 +111,7 @@ describe('MeterSharedState', () => {
     it('should register metric storages with the collector', () => {
       const reader = new TestMetricReader({
         aggregationSelector: (instrumentType: InstrumentType) => {
-          return Aggregation.Drop();
+          return { type: AggregationType.DROP };
         },
       });
       const readerAggregationSelectorSpy = sinon.spy(
@@ -141,12 +141,12 @@ describe('MeterSharedState', () => {
     it('should register metric storages with collectors', () => {
       const reader = new TestMetricReader({
         aggregationSelector: (instrumentType: InstrumentType) => {
-          return Aggregation.Drop();
+          return { type: AggregationType.DROP };
         },
       });
       const reader2 = new TestMetricReader({
         aggregationSelector: (instrumentType: InstrumentType) => {
-          return Aggregation.LastValue();
+          return { type: AggregationType.LAST_VALUE };
         },
       });
 
@@ -184,12 +184,12 @@ describe('MeterSharedState', () => {
   });
 
   describe('collect', () => {
-    function setupInstruments(views?: View[]) {
+    function setupInstruments(views?: ViewOptions[]) {
       const cumulativeReader = new TestMetricReader();
       const deltaReader = new TestDeltaMetricReader();
 
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         views: views,
         readers: [cumulativeReader, deltaReader],
       });
@@ -245,8 +245,8 @@ describe('MeterSharedState', () => {
     it('should collect sync metrics with views', async () => {
       /** preparing test instrumentations */
       const { metricCollectors, meter } = setupInstruments([
-        new View({ name: 'foo', instrumentName: 'test' }),
-        new View({ name: 'bar', instrumentName: 'test' }),
+        { name: 'foo', instrumentName: 'test' },
+        { name: 'bar', instrumentName: 'test' },
       ]);
 
       /** creating metric events */
@@ -314,8 +314,8 @@ describe('MeterSharedState', () => {
     it('should call observable callback once with view-ed async instruments', async () => {
       /** preparing test instrumentations */
       const { metricCollectors, meter } = setupInstruments([
-        new View({ name: 'foo', instrumentName: 'test' }),
-        new View({ name: 'bar', instrumentName: 'test' }),
+        { name: 'foo', instrumentName: 'test' },
+        { name: 'bar', instrumentName: 'test' },
       ]);
 
       /** creating metric events */

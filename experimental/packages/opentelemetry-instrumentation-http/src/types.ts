@@ -14,39 +14,13 @@
  * limitations under the License.
  */
 import { Span, Attributes } from '@opentelemetry/api';
-import type * as http from 'http';
-import type * as https from 'https';
 import {
   ClientRequest,
-  get,
   IncomingMessage,
-  request,
   ServerResponse,
   RequestOptions,
 } from 'http';
-import * as url from 'url';
 import { InstrumentationConfig } from '@opentelemetry/instrumentation';
-
-export type IgnoreMatcher = string | RegExp | ((url: string) => boolean);
-export type HttpCallback = (res: IncomingMessage) => void;
-export type RequestFunction = typeof request;
-export type GetFunction = typeof get;
-
-export type HttpCallbackOptional = HttpCallback | undefined;
-
-// from node 10+
-export type RequestSignature = [http.RequestOptions, HttpCallbackOptional] &
-  HttpCallback;
-
-export type HttpRequestArgs = Array<HttpCallbackOptional | RequestSignature>;
-
-export type ParsedRequestOptions =
-  | (http.RequestOptions & Partial<url.UrlWithParsedQuery>)
-  | http.RequestOptions;
-export type Http = typeof http;
-export type Https = typeof https;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Func<T> = (...args: any[]) => T;
 
 export interface HttpCustomAttributeFunction {
   (
@@ -84,18 +58,8 @@ export interface StartOutgoingSpanCustomAttributeFunction {
  * Options available for the HTTP instrumentation (see [documentation](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-http#http-instrumentation-options))
  */
 export interface HttpInstrumentationConfig extends InstrumentationConfig {
-  /**
-   * Not trace all incoming requests that match paths
-   * @deprecated use `ignoreIncomingRequestHook` instead
-   */
-  ignoreIncomingPaths?: IgnoreMatcher[];
   /** Not trace all incoming requests that matched with custom function */
   ignoreIncomingRequestHook?: IgnoreIncomingRequestFunction;
-  /**
-   * Not trace all outgoing requests that match urls
-   * @deprecated use `ignoreOutgoingRequestHook` instead
-   */
-  ignoreOutgoingUrls?: IgnoreMatcher[];
   /** Not trace all outgoing requests that matched with custom function */
   ignoreOutgoingRequestHook?: IgnoreOutgoingRequestFunction;
   /** If set to true, incoming requests will not be instrumented at all. */
@@ -123,27 +87,4 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
     client?: { requestHeaders?: string[]; responseHeaders?: string[] };
     server?: { requestHeaders?: string[]; responseHeaders?: string[] };
   };
-}
-
-export interface Err extends Error {
-  errno?: number;
-  code?: string;
-  path?: string;
-  syscall?: string;
-  stack?: string;
-}
-
-/**
- * Tracks whether this instrumentation emits old experimental,
- * new stable, or both semantic conventions.
- *
- * Enum values chosen such that the enum may be used as a bitmask.
- */
-export const enum SemconvStability {
-  /** Emit only stable semantic conventions */
-  STABLE = 0x1,
-  /** Emit only old semantic convetions */
-  OLD = 0x2,
-  /** Emit both stable and old semantic convetions */
-  DUPLICATE = 0x1 | 0x2,
 }

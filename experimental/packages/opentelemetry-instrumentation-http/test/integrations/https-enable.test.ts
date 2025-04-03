@@ -46,8 +46,6 @@ import { httpsRequest } from '../utils/httpsRequest';
 import { DummyPropagation } from '../utils/DummyPropagation';
 
 const protocol = 'https';
-const serverPort = 42345;
-const hostname = 'localhost';
 const memoryExporter = new InMemorySpanExporter();
 
 export const customAttributeFunction = (span: Span): void => {
@@ -131,23 +129,17 @@ describe('HttpsInstrumentation Integration tests', () => {
         done();
       });
     });
-    const provider = new NodeTracerProvider();
-    provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    const provider = new NodeTracerProvider({
+      spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+    });
     instrumentation.setTracerProvider(provider);
     beforeEach(() => {
       memoryExporter.reset();
     });
 
     before(() => {
-      const ignoreConfig = [
-        `${protocol}://${hostname}:${serverPort}/ignored/string`,
-        /\/ignored\/regexp$/i,
-        (url: string) => url.endsWith('/ignored/function'),
-      ];
       propagation.setGlobalPropagator(new DummyPropagation());
       instrumentation.setConfig({
-        ignoreIncomingPaths: ignoreConfig,
-        ignoreOutgoingUrls: ignoreConfig,
         applyCustomAttributesOnSpan: customAttributeFunction,
       });
       instrumentation.enable();

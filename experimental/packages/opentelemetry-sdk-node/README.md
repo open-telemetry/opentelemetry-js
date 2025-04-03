@@ -88,7 +88,7 @@ Detect resources automatically from the environment using the default resource d
 
 ### contextManager
 
-Use a custom context manager. Default: [AsyncHooksContextManager](../../../packages/opentelemetry-context-async-hooks/README.md)
+Use a custom context manager. Default: [AsyncLocalStorageContextManager](../../../packages/opentelemetry-context-async-hooks/README.md)
 
 ### textMapPropagator
 
@@ -101,6 +101,11 @@ Deprecated, please use [logRecordProcessors](#logrecordprocessors) instead.
 ### logRecordProcessors
 
 An array of log record processors to register to the logger provider.
+
+### mergeResourceWithDefaults
+
+Merge user-provided resources with the default resource. Default `true`.
+The default will change to `false` in a future iteration of this package.
 
 ### metricReader
 
@@ -207,6 +212,9 @@ This is an alternative to programmatically configuring an exporter or span proce
 | OTEL_EXPORTER_OTLP_TRACES_PROTOCOL  | The transport protocol to use on OTLP trace requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`.                  |
 | OTEL_EXPORTER_OTLP_METRICS_PROTOCOL | The transport protocol to use on OTLP metric requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`.                 |
 | OTEL_EXPORTER_OTLP_LOGS_PROTOCOL    | The transport protocol to use on OTLP log requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`.                    |
+| OTEL_METRICS_EXPORTER    | Metrics exporter to be used. options are `otlp`, `prometheus`, `console` or `none`.                    |
+| OTEL_METRIC_EXPORT_INTERVAL    | The export interval when using a push Metric Reader. Default is `60000`.                     |
+| OTEL_METRIC_EXPORT_TIMEOUT    | The export timeout when using a push Metric Reader. Default is `30000`.                     |
 
 Additionally, you can specify other applicable environment variables that apply to each exporter such as the following:
 

@@ -53,59 +53,25 @@ describe('MultiSpanProcessor', () => {
     }
   });
 
-  it('should handle empty span processor', () => {
-    const multiSpanProcessor = new MultiSpanProcessor([]);
-
-    const tracerProvider = new BasicTracerProvider();
-    tracerProvider.addSpanProcessor(multiSpanProcessor);
-    const tracer = tracerProvider.getTracer('default');
-    const span = tracer.startSpan('one');
-    span.end();
-    multiSpanProcessor.shutdown();
-  });
-
   it('should handle one span processor', () => {
     const processor1 = new TestProcessor();
-    const multiSpanProcessor = new MultiSpanProcessor([processor1]);
-
-    const tracerProvider = new BasicTracerProvider();
-    tracerProvider.addSpanProcessor(multiSpanProcessor);
+    const tracerProvider = new BasicTracerProvider({
+      spanProcessors: [processor1],
+    });
     const tracer = tracerProvider.getTracer('default');
     const span = tracer.startSpan('one');
     assert.strictEqual(processor1.spans.length, 0);
     span.end();
     assert.strictEqual(processor1.spans.length, 1);
-    multiSpanProcessor.shutdown();
+    tracerProvider['_activeSpanProcessor'].shutdown();
   });
 
   it('should handle two span processor', async () => {
     const processor1 = new TestProcessor();
     const processor2 = new TestProcessor();
-    const multiSpanProcessor = new MultiSpanProcessor([processor1, processor2]);
-
-    const tracerProvider = new BasicTracerProvider();
-    tracerProvider.addSpanProcessor(multiSpanProcessor);
-    const tracer = tracerProvider.getTracer('default');
-    const span = tracer.startSpan('one');
-    assert.strictEqual(processor1.spans.length, 0);
-    assert.strictEqual(processor1.spans.length, processor2.spans.length);
-
-    span.end();
-    assert.strictEqual(processor1.spans.length, 1);
-    assert.strictEqual(processor1.spans.length, processor2.spans.length);
-
-    await multiSpanProcessor.shutdown();
-    assert.strictEqual(processor1.spans.length, 0);
-    assert.strictEqual(processor1.spans.length, processor2.spans.length);
-  });
-
-  it('should export spans on manual shutdown from two span processor', () => {
-    const processor1 = new TestProcessor();
-    const processor2 = new TestProcessor();
-    const multiSpanProcessor = new MultiSpanProcessor([processor1, processor2]);
-
-    const tracerProvider = new BasicTracerProvider();
-    tracerProvider.addSpanProcessor(multiSpanProcessor);
+    const tracerProvider = new BasicTracerProvider({
+      spanProcessors: [processor1, processor2],
+    });
     const tracer = tracerProvider.getTracer('default');
     const span = tracer.startSpan('one');
     assert.strictEqual(processor1.spans.length, 0);
@@ -124,10 +90,30 @@ describe('MultiSpanProcessor', () => {
   it('should export spans on manual shutdown from two span processor', () => {
     const processor1 = new TestProcessor();
     const processor2 = new TestProcessor();
-    const multiSpanProcessor = new MultiSpanProcessor([processor1, processor2]);
+    const tracerProvider = new BasicTracerProvider({
+      spanProcessors: [processor1, processor2],
+    });
+    const tracer = tracerProvider.getTracer('default');
+    const span = tracer.startSpan('one');
+    assert.strictEqual(processor1.spans.length, 0);
+    assert.strictEqual(processor1.spans.length, processor2.spans.length);
 
-    const tracerProvider = new BasicTracerProvider();
-    tracerProvider.addSpanProcessor(multiSpanProcessor);
+    span.end();
+    assert.strictEqual(processor1.spans.length, 1);
+    assert.strictEqual(processor1.spans.length, processor2.spans.length);
+
+    tracerProvider.shutdown().then(() => {
+      assert.strictEqual(processor1.spans.length, 0);
+      assert.strictEqual(processor1.spans.length, processor2.spans.length);
+    });
+  });
+
+  it('should export spans on manual shutdown from two span processor', () => {
+    const processor1 = new TestProcessor();
+    const processor2 = new TestProcessor();
+    const tracerProvider = new BasicTracerProvider({
+      spanProcessors: [processor1, processor2],
+    });
     const tracer = tracerProvider.getTracer('default');
     const span = tracer.startSpan('one');
     assert.strictEqual(processor1.spans.length, 0);

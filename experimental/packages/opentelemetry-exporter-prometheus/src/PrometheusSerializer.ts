@@ -17,7 +17,6 @@
 import { diag, Attributes, AttributeValue } from '@opentelemetry/api';
 import {
   ResourceMetrics,
-  InstrumentType,
   DataPointType,
   ScopeMetrics,
   MetricData,
@@ -25,7 +24,7 @@ import {
   Histogram,
 } from '@opentelemetry/sdk-metrics';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
-import { IResource } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 
 type PrometheusDataTypeLiteral =
   | 'counter'
@@ -90,10 +89,14 @@ function sanitizePrometheusMetricName(name: string): string {
  */
 function enforcePrometheusNamingConvention(
   name: string,
-  type: InstrumentType
+  data: MetricData
 ): string {
   // Prometheus requires that metrics of the Counter kind have "_total" suffix
-  if (!name.endsWith('_total') && type === InstrumentType.COUNTER) {
+  if (
+    !name.endsWith('_total') &&
+    data.dataPointType === DataPointType.SUM &&
+    data.isMonotonic
+  ) {
     name = name + '_total';
   }
 
@@ -101,15 +104,12 @@ function enforcePrometheusNamingConvention(
 }
 
 function valueString(value: number) {
-  if (Number.isNaN(value)) {
-    return 'NaN';
-  } else if (!Number.isFinite(value)) {
-    if (value < 0) {
-      return '-Inf';
-    } else {
-      return '+Inf';
-    }
+  if (value === Infinity) {
+    return '+Inf';
+  } else if (value === -Infinity) {
+    return '-Inf';
   } else {
+    // Handle finite numbers and NaN.
     return `${value}`;
   }
 }
@@ -171,16 +171,28 @@ const NO_REGISTERED_METRICS = '# no registered metrics';
 export class PrometheusSerializer {
   private _prefix: string | undefined;
   private _appendTimestamp: boolean;
+  private _additionalAttributes: Attributes | undefined;
+  private _withResourceConstantLabels: RegExp | undefined;
 
-  constructor(prefix?: string, appendTimestamp = false) {
+  constructor(
+    prefix?: string,
+    appendTimestamp = false,
+    withResourceConstantLabels?: RegExp
+  ) {
     if (prefix) {
       this._prefix = prefix + '_';
     }
     this._appendTimestamp = appendTimestamp;
+    this._withResourceConstantLabels = withResourceConstantLabels;
   }
 
   serialize(resourceMetrics: ResourceMetrics): string {
     let str = '';
+
+    this._additionalAttributes = this._filterResourceConstantLabels(
+      resourceMetrics.resource.attributes,
+      this._withResourceConstantLabels
+    );
 
     for (const scopeMetrics of resourceMetrics.scopeMetrics) {
       str += this._serializeScopeMetrics(scopeMetrics);
@@ -191,6 +203,22 @@ export class PrometheusSerializer {
     }
 
     return this._serializeResource(resourceMetrics.resource) + str;
+  }
+
+  private _filterResourceConstantLabels(
+    attributes: Attributes,
+    pattern: RegExp | undefined
+  ) {
+    if (pattern) {
+      const filteredAttributes: Attributes = {};
+      for (const [key, value] of Object.entries(attributes)) {
+        if (key.match(pattern)) {
+          filteredAttributes[key] = value;
+        }
+      }
+      return filteredAttributes;
+    }
+    return;
   }
 
   private _serializeScopeMetrics(scopeMetrics: ScopeMetrics) {
@@ -210,7 +238,7 @@ export class PrometheusSerializer {
     }
     const dataPointType = metricData.dataPointType;
 
-    name = enforcePrometheusNamingConvention(name, metricData.descriptor.type);
+    name = enforcePrometheusNamingConvention(name, metricData);
 
     const help = `# HELP ${name} ${escapeString(
       metricData.descriptor.description || 'description missing'
@@ -225,25 +253,13 @@ export class PrometheusSerializer {
       case DataPointType.SUM:
       case DataPointType.GAUGE: {
         results = metricData.dataPoints
-          .map(it =>
-            this._serializeSingularDataPoint(
-              name,
-              metricData.descriptor.type,
-              it
-            )
-          )
+          .map(it => this._serializeSingularDataPoint(name, metricData, it))
           .join('');
         break;
       }
       case DataPointType.HISTOGRAM: {
         results = metricData.dataPoints
-          .map(it =>
-            this._serializeHistogramDataPoint(
-              name,
-              metricData.descriptor.type,
-              it
-            )
-          )
+          .map(it => this._serializeHistogramDataPoint(name, metricData, it))
           .join('');
         break;
       }
@@ -259,12 +275,12 @@ export class PrometheusSerializer {
 
   private _serializeSingularDataPoint(
     name: string,
-    type: InstrumentType,
+    data: MetricData,
     dataPoint: DataPoint<number>
   ): string {
     let results = '';
 
-    name = enforcePrometheusNamingConvention(name, type);
+    name = enforcePrometheusNamingConvention(name, data);
     const { value, attributes } = dataPoint;
     const timestamp = hrTimeToMilliseconds(dataPoint.endTime);
     results += stringify(
@@ -272,19 +288,19 @@ export class PrometheusSerializer {
       attributes,
       value,
       this._appendTimestamp ? timestamp : undefined,
-      undefined
+      this._additionalAttributes
     );
     return results;
   }
 
   private _serializeHistogramDataPoint(
     name: string,
-    type: InstrumentType,
+    data: MetricData,
     dataPoint: DataPoint<Histogram>
   ): string {
     let results = '';
 
-    name = enforcePrometheusNamingConvention(name, type);
+    name = enforcePrometheusNamingConvention(name, data);
     const attributes = dataPoint.attributes;
     const histogram = dataPoint.value;
     const timestamp = hrTimeToMilliseconds(dataPoint.endTime);
@@ -297,7 +313,7 @@ export class PrometheusSerializer {
           attributes,
           value,
           this._appendTimestamp ? timestamp : undefined,
-          undefined
+          this._additionalAttributes
         );
     }
 
@@ -324,19 +340,19 @@ export class PrometheusSerializer {
         attributes,
         cumulativeSum,
         this._appendTimestamp ? timestamp : undefined,
-        {
+        Object.assign({}, this._additionalAttributes ?? {}, {
           le:
             upperBound === undefined || upperBound === Infinity
               ? '+Inf'
               : String(upperBound),
-        }
+        })
       );
     }
 
     return results;
   }
 
-  protected _serializeResource(resource: IResource): string {
+  protected _serializeResource(resource: Resource): string {
     const name = 'target_info';
     const help = `# HELP ${name} Target metadata`;
     const type = `# TYPE ${name} gauge`;

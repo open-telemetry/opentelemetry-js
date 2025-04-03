@@ -15,7 +15,7 @@
  */
 
 import { Logger } from '@opentelemetry/api-logs';
-import { IResource } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 import { LogRecordProcessor } from '../LogRecordProcessor';
 import { LogRecordLimits } from '../types';
 import { NoopLogRecordProcessor } from '../export/NoopLogRecordProcessor';
@@ -26,7 +26,7 @@ export class LoggerProviderSharedState {
   readonly registeredLogRecordProcessors: LogRecordProcessor[] = [];
 
   constructor(
-    readonly resource: IResource,
+    readonly resource: Resource,
     readonly forceFlushTimeoutMillis: number,
     readonly logRecordLimits: Required<LogRecordLimits>
   ) {

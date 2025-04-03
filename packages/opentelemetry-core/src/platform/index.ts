@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 export {
-  RandomIdGenerator,
   SDK_INFO,
   _globalThis,
-  getEnv,
-  getEnvWithoutDefaults,
-  hexToBase64,
   otperformance,
   unrefTimer,
+  getBooleanFromEnv,
+  getStringFromEnv,
+  getNumberFromEnv,
+  getStringListFromEnv,
 } from './node';

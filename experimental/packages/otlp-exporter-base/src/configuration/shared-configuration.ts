@@ -29,16 +29,22 @@ export interface OtlpSharedConfiguration {
 }
 
 export function validateTimeoutMillis(timeoutMillis: number) {
-  if (
-    !Number.isNaN(timeoutMillis) &&
-    Number.isFinite(timeoutMillis) &&
-    timeoutMillis > 0
-  ) {
+  if (Number.isFinite(timeoutMillis) && timeoutMillis > 0) {
     return timeoutMillis;
   }
   throw new Error(
     `Configuration: timeoutMillis is invalid, expected number greater than 0 (actual: '${timeoutMillis}')`
   );
+}
+
+export function wrapStaticHeadersInFunction(
+  headers: Record<string, string> | undefined
+): (() => Record<string, string>) | undefined {
+  if (headers == null) {
+    return undefined;
+  }
+
+  return () => headers;
 }
 
 /**
