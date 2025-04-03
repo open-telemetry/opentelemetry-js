@@ -16,7 +16,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
-- update node sdk to use env var util
+* chore(sdk-node): Refactored using `get*FromEnv` utility function instead of `process.env` for NodeSDK's logging setup. [#5582](https://github.com/open-telemetry/opentelemetry-js/issues/5582) @beeme1mr
 
 ## 0.200.0
 
