@@ -29,6 +29,7 @@ import { Context } from '../context/types';
  *
  * @since 1.0.0
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface TextMapPropagator<Carrier = any> {
   /**
    * Injects values from a given `Context` into a carrier.
@@ -79,6 +80,7 @@ export interface TextMapPropagator<Carrier = any> {
  *
  * @since 1.0.0
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface TextMapSetter<Carrier = any> {
   /**
    * Callback used to set a key/value pair on an object.
@@ -99,6 +101,7 @@ export interface TextMapSetter<Carrier = any> {
  *
  * @since 1.0.0
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface TextMapGetter<Carrier = any> {
   /**
    * Get a list of all keys available on the carrier.

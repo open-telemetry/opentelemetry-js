@@ -29,7 +29,7 @@ import { NodeTracerProvider } from '../src';
 
 // Here we are looking for a `AnyConstructor` type, and `Function` is a close
 // enough approximation that exists in the standard library.
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 const assertInstanceOf = (actual: object, ExpectedConstructor: Function) => {
   assert.ok(
     actual instanceof ExpectedConstructor,

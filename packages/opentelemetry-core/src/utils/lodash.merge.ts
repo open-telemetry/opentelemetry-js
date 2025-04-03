@@ -136,7 +136,7 @@ function getRawTag(value: any) {
   try {
     value[symToStringTag as any] = undefined;
     unmasked = true;
-  } catch (e) {
+  } catch {
     // silence
   }
 
