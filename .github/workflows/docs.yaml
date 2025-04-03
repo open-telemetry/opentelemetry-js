@@ -16,7 +16,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: '20'
+          node-version: '22'
 
       - name: Install and Build 🔧
         run: |
