@@ -42,7 +42,7 @@ import {
   SEMRESATTRS_PROCESS_OWNER,
   SEMRESATTRS_PROCESS_PID,
   SEMRESATTRS_PROCESS_RUNTIME_DESCRIPTION,
-  SEMRESATTRS_PROCESS_RUNTIME_NAME,
+  ATTR_PROCESS_RUNTIME_NAME,
   SEMRESATTRS_PROCESS_RUNTIME_VERSION,
   SEMRESATTRS_SERVICE_INSTANCE_ID,
   SEMRESATTRS_SERVICE_NAME,
@@ -358,7 +358,7 @@ export const assertResource = (
   }
   if (validations.runtimeName) {
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_PROCESS_RUNTIME_NAME],
+      resource.attributes?.[ATTR_PROCESS_RUNTIME_NAME],
       validations.runtimeName
     );
   }

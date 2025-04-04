@@ -23,7 +23,7 @@ import {
   SEMRESATTRS_PROCESS_OWNER,
   SEMRESATTRS_PROCESS_PID,
   SEMRESATTRS_PROCESS_RUNTIME_DESCRIPTION,
-  SEMRESATTRS_PROCESS_RUNTIME_NAME,
+  ATTR_PROCESS_RUNTIME_NAME,
   SEMRESATTRS_PROCESS_RUNTIME_VERSION,
 } from '@opentelemetry/semantic-conventions';
 import * as os from 'os';
@@ -46,7 +46,7 @@ class ProcessDetector implements ResourceDetector {
         ...process.argv.slice(1),
       ],
       [SEMRESATTRS_PROCESS_RUNTIME_VERSION]: process.versions.node,
-      [SEMRESATTRS_PROCESS_RUNTIME_NAME]: 'nodejs',
+      [ATTR_PROCESS_RUNTIME_NAME]: 'nodejs',
       [SEMRESATTRS_PROCESS_RUNTIME_DESCRIPTION]: 'Node.js',
     };
 
