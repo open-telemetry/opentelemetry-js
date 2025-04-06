@@ -88,7 +88,7 @@ describe('OTLPMetricsExporter', function () {
 
     // act
     meterProvider.getMeter('test-meter').createCounter('test-counter').add(1);
-    await meterProvider.forceFlush();
+    await meterProvider.shutdown();
 
     // assert
     assert.strictEqual(serverTestContext.requests.length, 1);
