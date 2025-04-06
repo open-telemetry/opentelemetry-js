@@ -15,7 +15,7 @@
  */
 import { UnresolvedOtlpGrpcConfiguration } from './otlp-grpc-configuration';
 import type { ChannelCredentials, Metadata } from '@grpc/grpc-js';
-import { parseKeyPairsIntoRecord } from '@opentelemetry/core';
+import { getStringFromEnv, parseKeyPairsIntoRecord } from '@opentelemetry/core';
 import {
   createEmptyMetadata,
   createInsecureCredentials,
@@ -43,9 +43,9 @@ function fallbackIfNullishOrBlank(
 
 function getMetadataFromEnv(signalIdentifier: string): Metadata | undefined {
   const signalSpecificRawHeaders =
-    process.env[`OTEL_EXPORTER_OTLP_${signalIdentifier}_HEADERS`]?.trim();
+    getStringFromEnv(`OTEL_EXPORTER_OTLP_${signalIdentifier}_HEADERS`);
   const nonSignalSpecificRawHeaders =
-    process.env['OTEL_EXPORTER_OTLP_HEADERS']?.trim();
+    getStringFromEnv('OTEL_EXPORTER_OTLP_HEADERS');
 
   const signalSpecificHeaders = parseKeyPairsIntoRecord(
     signalSpecificRawHeaders
@@ -100,9 +100,9 @@ function getUrlFromEnv(signalIdentifier: string) {
   // - https://example.test:4317 -> use secure credentials from environment (or provided via code)
 
   const specificEndpoint =
-    process.env[`OTEL_EXPORTER_OTLP_${signalIdentifier}_ENDPOINT`]?.trim();
+    getStringFromEnv(`OTEL_EXPORTER_OTLP_${signalIdentifier}_ENDPOINT`);
   const nonSpecificEndpoint =
-    process.env[`OTEL_EXPORTER_OTLP_ENDPOINT`]?.trim();
+    getStringFromEnv(`OTEL_EXPORTER_OTLP_ENDPOINT`);
 
   return fallbackIfNullishOrBlank(specificEndpoint, nonSpecificEndpoint);
 }
@@ -128,16 +128,12 @@ function getUrlFromEnv(signalIdentifier: string) {
  * @param signalIdentifier
  */
 function getInsecureSettingFromEnv(signalIdentifier: string): boolean {
-  const signalSpecificInsecureValue = process.env[
-    `OTEL_EXPORTER_OTLP_${signalIdentifier}_INSECURE`
-  ]
-    ?.toLowerCase()
-    .trim();
-  const nonSignalSpecificInsecureValue = process.env[
+  const signalSpecificInsecureValue = getStringFromEnv(
+    `OTEL_EXPORTER_OTLP_${signalIdentifier}_INSECURE`)?.toLowerCase();
+  const nonSignalSpecificInsecureValue = getStringFromEnv(
     `OTEL_EXPORTER_OTLP_INSECURE`
-  ]
-    ?.toLowerCase()
-    .trim();
+  )
+    ?.toLowerCase();
 
   return (
     fallbackIfNullishOrBlank(
@@ -152,8 +148,8 @@ function readFileFromEnv(
   nonSignalSpecificEnvVar: string,
   warningMessage: string
 ): Buffer | undefined {
-  const signalSpecificPath = process.env[signalSpecificEnvVar]?.trim();
-  const nonSignalSpecificPath = process.env[nonSignalSpecificEnvVar]?.trim();
+  const signalSpecificPath = getStringFromEnv(signalSpecificEnvVar);
+  const nonSignalSpecificPath = getStringFromEnv(nonSignalSpecificEnvVar);
 
   const filePath = fallbackIfNullishOrBlank(
     signalSpecificPath,
