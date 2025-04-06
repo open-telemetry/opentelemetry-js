@@ -22,10 +22,12 @@ import { wrapStaticHeadersInFunction } from './shared-configuration';
 function getStaticHeadersFromEnv(
   signalIdentifier: string
 ): Record<string, string> | undefined {
-  const signalSpecificRawHeaders =
-    getStringFromEnv(`OTEL_EXPORTER_OTLP_${signalIdentifier}_HEADERS`);
-  const nonSignalSpecificRawHeaders =
-    getStringFromEnv('OTEL_EXPORTER_OTLP_HEADERS');
+  const signalSpecificRawHeaders = getStringFromEnv(
+    `OTEL_EXPORTER_OTLP_${signalIdentifier}_HEADERS`
+  );
+  const nonSignalSpecificRawHeaders = getStringFromEnv(
+    'OTEL_EXPORTER_OTLP_HEADERS'
+  );
 
   const signalSpecificHeaders = parseKeyPairsIntoRecord(
     signalSpecificRawHeaders
@@ -106,8 +108,9 @@ function getNonSpecificUrlFromEnv(
 }
 
 function getSpecificUrlFromEnv(signalIdentifier: string): string | undefined {
-  const envUrl =
-    getStringFromEnv(`OTEL_EXPORTER_OTLP_${signalIdentifier}_ENDPOINT`);
+  const envUrl = getStringFromEnv(
+    `OTEL_EXPORTER_OTLP_${signalIdentifier}_ENDPOINT`
+  );
   if (envUrl == null || envUrl === '') {
     return undefined;
   }
