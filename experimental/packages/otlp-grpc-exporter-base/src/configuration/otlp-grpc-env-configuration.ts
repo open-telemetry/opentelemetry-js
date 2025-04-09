@@ -42,10 +42,12 @@ function fallbackIfNullishOrBlank(
 }
 
 function getMetadataFromEnv(signalIdentifier: string): Metadata | undefined {
-  const signalSpecificRawHeaders =
-    getStringFromEnv(`OTEL_EXPORTER_OTLP_${signalIdentifier}_HEADERS`);
-  const nonSignalSpecificRawHeaders =
-    getStringFromEnv('OTEL_EXPORTER_OTLP_HEADERS');
+  const signalSpecificRawHeaders = getStringFromEnv(
+    `OTEL_EXPORTER_OTLP_${signalIdentifier}_HEADERS`
+  );
+  const nonSignalSpecificRawHeaders = getStringFromEnv(
+    'OTEL_EXPORTER_OTLP_HEADERS'
+  );
 
   const signalSpecificHeaders = parseKeyPairsIntoRecord(
     signalSpecificRawHeaders
@@ -99,10 +101,10 @@ function getUrlFromEnv(signalIdentifier: string) {
   // - http://example.test:4317 -> use insecure credentials if nothing else is provided
   // - https://example.test:4317 -> use secure credentials from environment (or provided via code)
 
-  const specificEndpoint =
-    getStringFromEnv(`OTEL_EXPORTER_OTLP_${signalIdentifier}_ENDPOINT`);
-  const nonSpecificEndpoint =
-    getStringFromEnv(`OTEL_EXPORTER_OTLP_ENDPOINT`);
+  const specificEndpoint = getStringFromEnv(
+    `OTEL_EXPORTER_OTLP_${signalIdentifier}_ENDPOINT`
+  );
+  const nonSpecificEndpoint = getStringFromEnv(`OTEL_EXPORTER_OTLP_ENDPOINT`);
 
   return fallbackIfNullishOrBlank(specificEndpoint, nonSpecificEndpoint);
 }
@@ -129,11 +131,11 @@ function getUrlFromEnv(signalIdentifier: string) {
  */
 function getInsecureSettingFromEnv(signalIdentifier: string): boolean {
   const signalSpecificInsecureValue = getStringFromEnv(
-    `OTEL_EXPORTER_OTLP_${signalIdentifier}_INSECURE`)?.toLowerCase();
+    `OTEL_EXPORTER_OTLP_${signalIdentifier}_INSECURE`
+  )?.toLowerCase();
   const nonSignalSpecificInsecureValue = getStringFromEnv(
     `OTEL_EXPORTER_OTLP_INSECURE`
-  )
-    ?.toLowerCase();
+  )?.toLowerCase();
 
   return (
     fallbackIfNullishOrBlank(
