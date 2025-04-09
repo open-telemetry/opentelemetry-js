@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1744232747090,
+  "lastUpdate": 1744233236275,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -30372,6 +30372,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.31%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "28ddef3868f771fdf1a8784154f23ea0722b47a0",
+          "message": "chore(deps): update dependency node to v22 (#5554)\n\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2025-04-09T21:03:45Z",
+          "tree_id": "478c613a4be6de8bd41ce1df9c80773952960b68",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/28ddef3868f771fdf1a8784154f23ea0722b47a0"
+        },
+        "date": 1744233235192,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1544053,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18920,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 838873,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 772597,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
