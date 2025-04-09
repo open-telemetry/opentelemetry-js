@@ -28,12 +28,12 @@ import {
 import { NonRecordingSpan } from '../../../src/trace/NonRecordingSpan';
 import { NoopTracer } from '../../../src/trace/NoopTracer';
 
-describe('NoopTracer', () => {
+describe('NoopTracer', function () {
   afterEach(() => {
     sinon.restore();
   });
 
-  it('should not crash', () => {
+  it('should not crash', function () {
     const tracer = new NoopTracer();
 
     assert.ok(tracer.startSpan('span-name') instanceof NonRecordingSpan);
@@ -47,7 +47,7 @@ describe('NoopTracer', () => {
     );
   });
 
-  it('should propagate valid spanContext on the span (from context)', () => {
+  it('should propagate valid spanContext on the span (from context)', function () {
     const tracer = new NoopTracer();
     const parent: SpanContext = {
       traceId: 'd4cda95b652f4a1592b449dd92ffda3b',
@@ -64,7 +64,7 @@ describe('NoopTracer', () => {
     assert.ok(span.spanContext().traceFlags === parent.traceFlags);
   });
 
-  it('should propagate valid spanContext on the span (from current context)', () => {
+  it('should propagate valid spanContext on the span (from current context)', function () {
     const tracer = new NoopTracer();
     const parent: SpanContext = {
       traceId: 'd4cda95b652f4a1592b449dd92ffda3b',
@@ -81,7 +81,7 @@ describe('NoopTracer', () => {
     assert.ok(span.spanContext().traceFlags === parent.traceFlags);
   });
 
-  it('should accept 2 to 4 args and start an active span', () => {
+  it('should accept 2 to 4 args and start an active span', function () {
     const tracer = new NoopTracer();
     const name = 'span-name';
     const fn = (span: Span) => {

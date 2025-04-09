@@ -86,13 +86,13 @@ function createResource(
   ) as PerformanceResourceTiming;
 }
 
-describe('utils', () => {
+describe('utils', function () {
   afterEach(() => {
     sinon.restore();
   });
 
-  describe('addSpanNetworkEvents', () => {
-    it('should add all network events to span', () => {
+  describe('addSpanNetworkEvents', function () {
+    it('should add all network events to span', function () {
       const addEventSpy = sinon.spy();
       const setAttributeSpy = sinon.spy();
       const span = {
@@ -121,7 +121,7 @@ describe('utils', () => {
       assert.strictEqual(setAttributeSpy.callCount, 2);
       assert.strictEqual(addEventSpy.callCount, 9);
     });
-    it('should ignore network events when ignoreNetworkEvents is true', () => {
+    it('should ignore network events when ignoreNetworkEvents is true', function () {
       const addEventSpy = sinon.spy();
       const setAttributeSpy = sinon.spy();
       const span = {
@@ -150,7 +150,7 @@ describe('utils', () => {
       assert.strictEqual(setAttributeSpy.callCount, 2);
       assert.strictEqual(addEventSpy.callCount, 0);
     });
-    it('should ignore zero timings by default', () => {
+    it('should ignore zero timings by default', function () {
       const addEventSpy = sinon.spy();
       const setAttributeSpy = sinon.spy();
       const span = {
@@ -179,7 +179,7 @@ describe('utils', () => {
       assert.strictEqual(setAttributeSpy.callCount, 1);
       assert.strictEqual(addEventSpy.callCount, 2);
     });
-    it('should not ignore zero timings by default if startTime = 0', () => {
+    it('should not ignore zero timings by default if startTime = 0', function () {
       const addEventSpy = sinon.spy();
       const setAttributeSpy = sinon.spy();
       const span = {
@@ -208,7 +208,7 @@ describe('utils', () => {
       assert.strictEqual(setAttributeSpy.callCount, 2);
       assert.strictEqual(addEventSpy.callCount, 9);
     });
-    it('should not ignore zero timings if ignoreZeros = false', () => {
+    it('should not ignore zero timings if ignoreZeros = false', function () {
       const addEventSpy = sinon.spy();
       const setAttributeSpy = sinon.spy();
       const span = {
@@ -237,7 +237,7 @@ describe('utils', () => {
       assert.strictEqual(setAttributeSpy.callCount, 1);
       assert.strictEqual(addEventSpy.callCount, 9);
     });
-    it('should only include encoded size when content encoding is being used', () => {
+    it('should only include encoded size when content encoding is being used', function () {
       const addEventSpy = sinon.spy();
       const setAttributeSpy = sinon.spy();
       const span = {
@@ -257,10 +257,10 @@ describe('utils', () => {
       assert.strictEqual(setAttributeSpy.callCount, 1);
     });
   });
-  describe('addSpanNetworkEvent', () => {
+  describe('addSpanNetworkEvent', function () {
     [-2, 123].forEach(value => {
-      describe(`when entry is ${value}`, () => {
-        it('should add event to span', () => {
+      describe(`when entry is ${value}`, function () {
+        it('should add event to span', function () {
           const addEventSpy = sinon.spy();
           const span = {
             addEvent: addEventSpy,
@@ -281,8 +281,8 @@ describe('utils', () => {
         });
       });
     });
-    describe(`when entry is zero`, () => {
-      it('should not add event to span by default', () => {
+    describe(`when entry is zero`, function () {
+      it('should not add event to span by default', function () {
         const addEventSpy = sinon.spy();
         const span = {
           addEvent: addEventSpy,
@@ -297,7 +297,7 @@ describe('utils', () => {
 
         assert.strictEqual(addEventSpy.callCount, 0);
       });
-      it('should add event to span if ignoreZeros = false', () => {
+      it('should add event to span if ignoreZeros = false', function () {
         const addEventSpy = sinon.spy();
         const span = {
           addEvent: addEventSpy,
@@ -317,8 +317,8 @@ describe('utils', () => {
         assert.strictEqual(args[1], 0);
       });
     });
-    describe('when entry is not numeric', () => {
-      it('should NOT add event to span', () => {
+    describe('when entry is not numeric', function () {
+      it('should NOT add event to span', function () {
         const addEventSpy = sinon.spy();
         const span = {
           addEvent: addEventSpy,
@@ -338,8 +338,8 @@ describe('utils', () => {
         assert.strictEqual(addEventSpy.callCount, 0);
       });
     });
-    describe('when entries does NOT contain the performance', () => {
-      it('should NOT add event to span', () => {
+    describe('when entries does NOT contain the performance', function () {
+      it('should NOT add event to span', function () {
         const addEventSpy = sinon.spy();
         const span = {
           addEvent: addEventSpy,
@@ -361,7 +361,7 @@ describe('utils', () => {
     });
   });
 
-  describe('getResource', () => {
+  describe('getResource', function () {
     const startTime = [0, 123123123] as HrTime;
     beforeEach(() => {
       const time = createHrTime(startTime, 500);
@@ -369,8 +369,8 @@ describe('utils', () => {
       sinon.stub(performance, 'now').callsFake(() => hrTimeToNanoseconds(time));
     });
 
-    describe('when resources are empty', () => {
-      it('should return undefined', () => {
+    describe('when resources are empty', function () {
+      it('should return undefined', function () {
         const spanStartTime = createHrTime(startTime, 1);
         const spanEndTime = createHrTime(startTime, 100);
         const spanUrl = 'http://foo.com/bar.json';
@@ -391,8 +391,8 @@ describe('utils', () => {
       });
     });
 
-    describe('when resources has correct entry', () => {
-      it('should return the closest one', () => {
+    describe('when resources has correct entry', function () {
+      it('should return the closest one', function () {
         const spanStartTime = createHrTime(startTime, 1);
         const spanEndTime = createHrTime(startTime, 402);
         const spanUrl = 'http://foo.com/bar.json';
@@ -444,8 +444,8 @@ describe('utils', () => {
           'main request should be defined'
         );
       });
-      describe('But one resource has been already used', () => {
-        it('should return the next closest', () => {
+      describe('But one resource has been already used', function () {
+        it('should return the next closest', function () {
           const spanStartTime = createHrTime(startTime, 1);
           const spanEndTime = createHrTime(startTime, 402);
           const spanUrl = 'http://foo.com/bar.json';
@@ -514,8 +514,8 @@ describe('utils', () => {
       });
     });
 
-    describe('when there are multiple resources from CorsPreflight requests', () => {
-      it('should return main request and cors preflight request', () => {
+    describe('when there are multiple resources from CorsPreflight requests', function () {
+      it('should return main request and cors preflight request', function () {
         const spanStartTime = createHrTime(startTime, 1);
         const spanEndTime = createHrTime(startTime, 182);
         const spanUrl = 'http://foo.com/bar.json';
@@ -588,41 +588,41 @@ describe('utils', () => {
     });
   });
 
-  describe('shouldPropagateTraceHeaders', () => {
-    it('should propagate trace when url is the same as origin', () => {
+  describe('shouldPropagateTraceHeaders', function () {
+    it('should propagate trace when url is the same as origin', function () {
       const result = shouldPropagateTraceHeaders(
         `${globalThis.location.origin}/foo/bar`
       );
       assert.strictEqual(result, true);
     });
-    it('should propagate trace when url match', () => {
+    it('should propagate trace when url match', function () {
       const result = shouldPropagateTraceHeaders(
         'http://foo.com',
         'http://foo.com'
       );
       assert.strictEqual(result, true);
     });
-    it('should propagate trace when url match regexp', () => {
+    it('should propagate trace when url match regexp', function () {
       const result = shouldPropagateTraceHeaders('http://foo.com', /foo.+/);
       assert.strictEqual(result, true);
     });
-    it('should propagate trace when url match array of string', () => {
+    it('should propagate trace when url match array of string', function () {
       const result = shouldPropagateTraceHeaders('http://foo.com', [
         'http://foo.com',
       ]);
       assert.strictEqual(result, true);
     });
-    it('should propagate trace when url match array of regexp', () => {
+    it('should propagate trace when url match array of regexp', function () {
       const result = shouldPropagateTraceHeaders('http://foo.com', [/foo.+/]);
       assert.strictEqual(result, true);
     });
-    it("should NOT propagate trace when url doesn't match", () => {
+    it("should NOT propagate trace when url doesn't match", function () {
       const result = shouldPropagateTraceHeaders('http://foo.com');
       assert.strictEqual(result, false);
     });
   });
 
-  describe('parseUrl', () => {
+  describe('parseUrl', function () {
     const urlFields: Array<keyof URLLike> = [
       'hash',
       'host',
@@ -636,14 +636,14 @@ describe('utils', () => {
       'search',
       'username',
     ];
-    it('should parse url', () => {
+    it('should parse url', function () {
       const url = parseUrl('https://opentelemetry.io/foo');
       urlFields.forEach(field => {
         assert.strictEqual(typeof url[field], 'string');
       });
     });
 
-    it('should parse relative url', () => {
+    it('should parse relative url', function () {
       const url = parseUrl('/foo');
       urlFields.forEach(field => {
         assert.strictEqual(typeof url[field], 'string');
@@ -651,13 +651,13 @@ describe('utils', () => {
     });
   });
 
-  describe('normalizeUrl', () => {
-    it('should normalize url', () => {
+  describe('normalizeUrl', function () {
+    it('should normalize url', function () {
       const url = normalizeUrl('https://opentelemetry.io/你好');
       assert.strictEqual(url, 'https://opentelemetry.io/%E4%BD%A0%E5%A5%BD');
     });
 
-    it('should normalize relative url', () => {
+    it('should normalize relative url', function () {
       const url = normalizeUrl('/你好');
       const urlObj = new URL(url);
       assert.strictEqual(urlObj.pathname, '/%E4%BD%A0%E5%A5%BD');
