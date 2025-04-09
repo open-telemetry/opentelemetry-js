@@ -78,14 +78,15 @@ describe('OTLPLogExporter', function () {
 
   it('successfully exports data', async () => {
     // arrange
-    const loggerProvider = new LoggerProvider();
-    loggerProvider.addLogRecordProcessor(
-      new SimpleLogRecordProcessor(
-        new OTLPLogExporter({
-          url: 'http://localhost:1503',
-        })
-      )
-    );
+    const loggerProvider = new LoggerProvider({
+      processors: [
+        new SimpleLogRecordProcessor(
+          new OTLPLogExporter({
+            url: 'http://localhost:1503',
+          })
+        ),
+      ],
+    });
 
     // act
     loggerProvider.getLogger('test-logger').emit({
