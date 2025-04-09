@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1744228792555,
+  "lastUpdate": 1744230660893,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -30268,6 +30268,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.45%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sebastian@bejga.de",
+            "name": "Sebastian Bejga",
+            "username": "SBejga"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "e46bd39e8db5545a5fb2a302a24f185e5afaec8a",
+          "message": "refactor(opentelemetry-sdk-node): use new get*FromEnv() function in NodeSDK's metrics setup (#5578)\n\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2025-04-09T20:07:39Z",
+          "tree_id": "7cf3d4123e9e299013cca2a576aca84d6a5983d1",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/e46bd39e8db5545a5fb2a302a24f185e5afaec8a"
+        },
+        "date": 1744230659833,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1486486,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18247,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 845735,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 752881,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
