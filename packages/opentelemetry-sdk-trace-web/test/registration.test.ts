@@ -24,14 +24,14 @@ import { CompositePropagator } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { StackContextManager, WebTracerProvider } from '../src';
 
-describe('API registration', () => {
+describe('API registration', function () {
   beforeEach(() => {
     context.disable();
     trace.disable();
     propagation.disable();
   });
 
-  it('should register default implementations', () => {
+  it('should register default implementations', function () {
     const tracerProvider = new WebTracerProvider();
     tracerProvider.register();
 
@@ -43,7 +43,7 @@ describe('API registration', () => {
     assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 
-  it('should register configured implementations', () => {
+  it('should register configured implementations', function () {
     const tracerProvider = new WebTracerProvider();
 
     const contextManager = { disable() {}, enable() {} } as any;
@@ -61,7 +61,7 @@ describe('API registration', () => {
     assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 
-  it('should skip null context manager', () => {
+  it('should skip null context manager', function () {
     const ctxManager = context['_getContextManager']();
     const tracerProvider = new WebTracerProvider();
     tracerProvider.register({
@@ -81,7 +81,7 @@ describe('API registration', () => {
     assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 
-  it('should skip null propagator', () => {
+  it('should skip null propagator', function () {
     const propagator = propagation['_getGlobalPropagator']();
     const tracerProvider = new WebTracerProvider();
     tracerProvider.register({

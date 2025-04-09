@@ -21,22 +21,22 @@ import {
 } from '../../../src/internal/semver';
 import { VERSION } from '../../../src/version';
 
-describe('semver', () => {
-  it('should be compatible if versions are equal', () => {
+describe('semver', function () {
+  it('should be compatible if versions are equal', function () {
     assert.ok(isCompatible(VERSION));
   });
 
-  it('returns false if own version cannot be parsed', () => {
+  it('returns false if own version cannot be parsed', function () {
     const check = _makeCompatibilityCheck('this is not semver');
     assert.ok(!check('1.0.0'));
   });
 
-  it('incompatible if other version cannot be parsed', () => {
+  it('incompatible if other version cannot be parsed', function () {
     const check = _makeCompatibilityCheck('0.1.2');
     assert.ok(!check('this is not semver'));
   });
 
-  describe('>= 1.0.0', () => {
+  describe('>= 1.0.0', function () {
     const globalVersion = '5.5.5';
     const vers: [string, boolean][] = [
       // same major/minor run should be compatible
@@ -81,7 +81,7 @@ describe('semver', () => {
     test(globalVersion, vers);
   });
 
-  describe('< 1.0.0', () => {
+  describe('< 1.0.0', function () {
     const globalVersion = '0.5.5';
     const vers: [string, boolean][] = [
       // same minor/patch should be compatible
@@ -119,7 +119,7 @@ describe('semver', () => {
     test(globalVersion, vers);
   });
 
-  describe('global version is prerelease', () => {
+  describe('global version is prerelease', function () {
     const globalVersion = '1.0.0-rc.3';
     const vers: [string, boolean][] = [
       // must match exactly
@@ -135,11 +135,11 @@ describe('semver', () => {
 });
 
 function test(globalVersion: string, vers: [string, boolean][]) {
-  describe(`global version is ${globalVersion}`, () => {
+  describe(`global version is ${globalVersion}`, function () {
     for (const [version, compatible] of vers) {
       it(`API version ${version} ${
         compatible ? 'should' : 'should not'
-      } be able to access global`, () => {
+      } be able to access global`, function () {
         const check = _makeCompatibilityCheck(version);
         assert.strictEqual(check(globalVersion), compatible);
       });
