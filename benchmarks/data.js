@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1744206228255,
+  "lastUpdate": 1744206331790,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -30112,6 +30112,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.78%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "95973267+Assstra@users.noreply.github.com",
+            "name": "Asstra",
+            "username": "Assstra"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0f6619e0ccb8163c464ae2d01fbd16150408ce72",
+          "message": "refactor(instrumentation): change tests to allow use of mocha context (#5591)\n\nSigned-off-by: Adrien Raimbault <adrien.raimbault@etu.umontpellier.fr>",
+          "timestamp": "2025-04-09T13:10:27Z",
+          "tree_id": "efb338305d18af2c35c441d3af1dcf7280831eb5",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/0f6619e0ccb8163c464ae2d01fbd16150408ce72"
+        },
+        "date": 1744206330744,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1544992,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 19012,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 860858,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 816675,
+            "range": "±0.45%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
