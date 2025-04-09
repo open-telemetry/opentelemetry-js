@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1744206117306,
+  "lastUpdate": 1744206228255,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -30060,6 +30060,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.40%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "mateo.fernandez73@gmail.com",
+            "name": "Matéo Fernandez",
+            "username": "mfernd"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "080837346580ad987f18978e5be7b5c6c57dcd5d",
+          "message": "feat(@opentelemetry/sdk-logs): align LoggerProvider constructor options with Trace and Metrics SDK (#5588)\n\nSigned-off-by: Matéo Fernandez <mateo.fernandez73@gmail.com>",
+          "timestamp": "2025-04-09T13:06:39Z",
+          "tree_id": "e1547f21c842637b06fe8a2b0e4ab4d43c9a3c46",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/080837346580ad987f18978e5be7b5c6c57dcd5d"
+        },
+        "date": 1744206227247,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1494176,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18412,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 827712,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 764268,
+            "range": "±0.78%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
