@@ -106,7 +106,10 @@ function getUrlFromEnv(signalIdentifier: string) {
   );
   const nonSpecificEndpoint = getStringFromEnv(`OTEL_EXPORTER_OTLP_ENDPOINT`);
 
-  return fallbackIfNullishOrBlank(specificEndpoint, nonSpecificEndpoint);
+  return fallbackIfNullishOrBlank(
+    specificEndpoint?.trim(),
+    nonSpecificEndpoint?.trim()
+  );
 }
 
 /**
