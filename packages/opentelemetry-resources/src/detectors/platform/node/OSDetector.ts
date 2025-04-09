@@ -15,10 +15,7 @@
  */
 
 import { Attributes } from '@opentelemetry/api';
-import {
-  SEMRESATTRS_OS_TYPE,
-  SEMRESATTRS_OS_VERSION,
-} from '@opentelemetry/semantic-conventions';
+import { ATTR_OS_TYPE, ATTR_OS_VERSION } from '../../../semconv';
 import { platform, release } from 'os';
 import { ResourceDetectionConfig } from '../../../config';
 import { DetectedResource, ResourceDetector } from '../../../types';
@@ -31,8 +28,8 @@ import { normalizeType } from './utils';
 class OSDetector implements ResourceDetector {
   detect(_config?: ResourceDetectionConfig): DetectedResource {
     const attributes: Attributes = {
-      [SEMRESATTRS_OS_TYPE]: normalizeType(platform()),
-      [SEMRESATTRS_OS_VERSION]: release(),
+      [ATTR_OS_TYPE]: normalizeType(platform()),
+      [ATTR_OS_VERSION]: release(),
     };
     return { attributes };
   }

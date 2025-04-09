@@ -73,6 +73,7 @@ import {
   getBooleanFromEnv,
   getStringFromEnv,
   diagLogLevelFromString,
+  getStringListFromEnv,
 } from '@opentelemetry/core';
 import {
   getResourceDetectorsFromEnv,
@@ -384,12 +385,8 @@ export class NodeSDK {
     if (this._loggerProviderConfig) {
       const loggerProvider = new LoggerProvider({
         resource: this._resource,
+        processors: this._loggerProviderConfig.logRecordProcessors,
       });
-
-      for (const logRecordProcessor of this._loggerProviderConfig
-        .logRecordProcessors) {
-        loggerProvider.addLogRecordProcessor(logRecordProcessor);
-      }
 
       this._loggerProvider = loggerProvider;
 
@@ -446,8 +443,7 @@ export class NodeSDK {
   }
 
   private configureLoggerProviderFromEnv(): void {
-    const logExportersList = process.env.OTEL_LOGS_EXPORTER ?? '';
-    const enabledExporters = filterBlanksAndNulls(logExportersList.split(','));
+    const enabledExporters = getStringListFromEnv('OTEL_LOGS_EXPORTER') ?? [];
 
     if (enabledExporters.length === 0) {
       diag.debug('OTEL_LOGS_EXPORTER is empty. Using default otlp exporter.');
@@ -466,8 +462,8 @@ export class NodeSDK {
     enabledExporters.forEach(exporter => {
       if (exporter === 'otlp') {
         const protocol = (
-          process.env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL ??
-          process.env.OTEL_EXPORTER_OTLP_PROTOCOL
+          getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_PROTOCOL') ??
+          getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL')
         )?.trim();
 
         switch (protocol) {

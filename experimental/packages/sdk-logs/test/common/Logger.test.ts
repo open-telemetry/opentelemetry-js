@@ -23,9 +23,8 @@ import { LogRecord as ApiLogRecord } from '@opentelemetry/api-logs';
 import { Logger } from '../../src/Logger';
 
 const setup = () => {
-  const loggerProvider = new LoggerProvider();
   const logProcessor = new NoopLogRecordProcessor();
-  loggerProvider.addLogRecordProcessor(logProcessor);
+  const loggerProvider = new LoggerProvider({ processors: [logProcessor] });
   const logger = loggerProvider.getLogger('test name', 'test version', {
     schemaUrl: 'test schema url',
   }) as Logger;
