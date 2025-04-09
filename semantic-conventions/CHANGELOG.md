@@ -9,7 +9,7 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
-* feat: update semantic conventions to v1.32.0
+* feat: update semantic conventions to v1.32.0 [#5603](https://github.com/open-telemetry/opentelemetry-js/pull/5603) @trentm
   * Semantic Conventions v1.32.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1320) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * `@opentelemetry/semantic-conventions` (stable) changes: *none*
   * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *2 newly deprecated exports, 65 added exports*
@@ -119,7 +119,7 @@ ATTR_VCS_PROVIDER_NAME                                      // vcs.provider.name
 
 ### :rocket: Features
 
-* feat: update semantic conventions to v1.31.0
+* feat: update semantic conventions to v1.31.0 [#5589](https://github.com/open-telemetry/opentelemetry-js/pull/5589) @trentm
   * Semantic Conventions v1.31.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1310) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * `@opentelemetry/semantic-conventions` (stable) changes: *none*
   * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *8 newly deprecated exports, 1 newly undeprecated export, 63 added exports*
