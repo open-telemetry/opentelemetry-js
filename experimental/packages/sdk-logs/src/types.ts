@@ -15,6 +15,7 @@
  */
 
 import type { Resource } from '@opentelemetry/resources';
+import { LogRecordProcessor } from './LogRecordProcessor';
 
 export interface LoggerProviderConfig {
   /** Resource associated with trace telemetry  */
@@ -28,6 +29,9 @@ export interface LoggerProviderConfig {
 
   /** Log Record Limits*/
   logRecordLimits?: LogRecordLimits;
+
+  /** Log Record Processors */
+  processors?: LogRecordProcessor[];
 }
 
 export interface LogRecordLimits {
