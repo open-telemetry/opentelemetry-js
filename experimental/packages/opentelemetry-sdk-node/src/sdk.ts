@@ -385,12 +385,8 @@ export class NodeSDK {
     if (this._loggerProviderConfig) {
       const loggerProvider = new LoggerProvider({
         resource: this._resource,
+        processors: this._loggerProviderConfig.logRecordProcessors,
       });
-
-      for (const logRecordProcessor of this._loggerProviderConfig
-        .logRecordProcessors) {
-        loggerProvider.addLogRecordProcessor(logRecordProcessor);
-      }
 
       this._loggerProvider = loggerProvider;
 
