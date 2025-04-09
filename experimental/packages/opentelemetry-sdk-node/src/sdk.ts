@@ -250,7 +250,7 @@ export class NodeSDK {
       this._resourceDetectors = [];
     } else if (configuration.resourceDetectors != null) {
       this._resourceDetectors = configuration.resourceDetectors;
-    } else if (process.env.OTEL_NODE_RESOURCE_DETECTORS != null) {
+    } else if (getStringFromEnv('OTEL_NODE_RESOURCE_DETECTORS')) {
       this._resourceDetectors = getResourceDetectorsFromEnv();
     } else {
       this._resourceDetectors = [envDetector, processDetector, hostDetector];
