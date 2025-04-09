@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1744230660893,
+  "lastUpdate": 1744232747090,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -30320,6 +30320,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.56%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "beeme1mr@users.noreply.github.com",
+            "name": "Michael Beemer",
+            "username": "beeme1mr"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "78f9260bd51413d5018be7af1d2a260e34e6f959",
+          "message": "refactor(sdk-node): update node sdk to use env var util (#5582)\n\nSigned-off-by: Michael Beemer <michael.beemer@dynatrace.com>\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2025-04-09T20:28:59Z",
+          "tree_id": "048219da45cdfa5f8729dca9edacd58fb2c33b3b",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/78f9260bd51413d5018be7af1d2a260e34e6f959"
+        },
+        "date": 1744232746054,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1549112,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 19017,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 819188,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 809847,
+            "range": "±0.31%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
