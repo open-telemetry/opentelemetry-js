@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { HrTime } from '@opentelemetry/api';
 import { MetricData } from '../export/MetricData';
 import { Maybe } from '../utils';
 import { MetricCollectorHandle } from './MetricCollector';
@@ -39,7 +38,7 @@ export abstract class MetricStorage {
    */
   abstract collect(
     collector: MetricCollectorHandle,
-    collectionTime: HrTime
+    collectionTime: bigint
   ): Maybe<MetricData>;
 
   getInstrumentDescriptor(): Readonly<InstrumentDescriptor> {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, Attributes } from '@opentelemetry/api';
+import { Attributes, Context } from '@opentelemetry/api';
 
 /**
  * This interface represents a ExemplarFilter. Exemplar filters are
@@ -32,7 +32,7 @@ export interface ExemplarFilter {
    */
   shouldSample(
     value: number,
-    timestamp: HrTime,
+    timestamp: bigint,
     attributes: Attributes,
     ctx: Context
   ): boolean;

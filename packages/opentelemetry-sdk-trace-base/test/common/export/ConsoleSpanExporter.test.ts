@@ -79,7 +79,7 @@ describe('ConsoleSpanExporter', () => {
 
         const expectedKeys = [
           'attributes',
-          'duration',
+          'endTimeUnixNano',
           'events',
           'id',
           'instrumentationScope',
@@ -88,21 +88,23 @@ describe('ConsoleSpanExporter', () => {
           'name',
           'parentSpanContext',
           'resource',
+          'startTimeUnixNano',
           'status',
-          'timestamp',
           'traceId',
           'traceState',
         ].join(',');
 
-        assert.ok(firstSpan.name === 'foo');
-        assert.ok(firstEvent.name === 'foobar');
-        assert.ok(consoleSpan.id === firstSpan.spanContext().spanId);
-        assert.ok(keys === expectedKeys, 'expectedKeys');
-        assert.ok(
-          firstSpan.instrumentationScope.name === instrumentationScopeName
+        assert.strictEqual(firstSpan.name, 'foo');
+        assert.strictEqual(firstEvent.name, 'foobar');
+        assert.strictEqual(consoleSpan.id, firstSpan.spanContext().spanId);
+        assert.strictEqual(keys, expectedKeys);
+        assert.strictEqual(
+          firstSpan.instrumentationScope.name,
+          instrumentationScopeName
         );
-        assert.ok(
-          firstSpan.instrumentationScope.version === instrumentationScopeVersion
+        assert.strictEqual(
+          firstSpan.instrumentationScope.version,
+          instrumentationScopeVersion
         );
 
         assert.ok(spyExport.calledOnce);
