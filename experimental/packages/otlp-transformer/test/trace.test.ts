@@ -495,6 +495,12 @@ describe('Trace', () => {
         1
       );
     });
+
+    it('does not throw when deserializing an empty response', () => {
+      assert.doesNotThrow(() =>
+        ProtobufTraceSerializer.deserializeResponse(new Uint8Array([]))
+      );
+    });
   });
 
   describe('JsonTracesSerializer', function () {
@@ -535,6 +541,12 @@ describe('Trace', () => {
       assert.equal(
         Number(deserializedResponse.partialSuccess.rejectedSpans),
         1
+      );
+    });
+
+    it('does not throw when deserializing an empty response', () => {
+      assert.doesNotThrow(() =>
+        JsonTraceSerializer.deserializeResponse(new Uint8Array([]))
       );
     });
   });
