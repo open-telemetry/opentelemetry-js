@@ -12,9 +12,7 @@ const {
   AggregationType,
 } = require('@opentelemetry/sdk-metrics');
 const { resourceFromAttributes } = require('@opentelemetry/resources');
-const {
-  SEMRESATTRS_SERVICE_NAME,
-} = require('@opentelemetry/semantic-conventions');
+const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 
 // Optional and only needed to see the internal diagnostic logging (during development)
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
@@ -28,7 +26,7 @@ const metricExporter = new OTLPMetricExporter({
 // Create an instance of the metric provider
 const meterProvider = new MeterProvider({
   resource: resourceFromAttributes({
-    [SEMRESATTRS_SERVICE_NAME]: 'basic-metric-service',
+    [ATTR_SERVICE_NAME]: 'basic-metric-service',
   }),
   // Define view for the exponential histogram metric
   views: [{

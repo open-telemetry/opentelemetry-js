@@ -68,14 +68,14 @@ body:
         const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
         const { ConsoleSpanExporter } = require('@opentelemetry/sdk-trace-base');
         const { resourceFromAttributes } = require('@opentelemetry/resources');
-        const { SEMRESATTRS_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
+        const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 
         // configure the SDK to export telemetry data to the console
         // enable all auto-instrumentations from the meta package
         const traceExporter = new ConsoleSpanExporter();
         const sdk = new opentelemetry.NodeSDK({
           resource: resourceFromAttributes({
-            [SEMRESATTRS_SERVICE_NAME]: 'my-service',
+            [ATTR_SERVICE_NAME]: 'my-service',
           }),
           traceExporter,
           instrumentations: [getNodeAutoInstrumentations()]

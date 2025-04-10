@@ -82,7 +82,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: '20'
+          node-version: '22'
 
       - run: npm install -g npm@latest
 
