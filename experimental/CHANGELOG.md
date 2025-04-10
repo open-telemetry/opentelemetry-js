@@ -17,7 +17,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :house: Internal
 
 * chore(sdk-node): Refactored using `get*FromEnv` utility function instead of `process.env` for NodeSDK's logging setup. [#5563](https://github.com/open-telemetry/opentelemetry-js/issues/5563) @weyert
-* refactor: use get*FromEnv() for otlp exporter config. [#5583](https://github.com/open-telemetry/opentelemetry-js/issues/5583) @weyert
+* refactor(otlp-exporter-base): use get*FromEnv() for otlp exporter config. [#5583](https://github.com/open-telemetry/opentelemetry-js/issues/5583) @weyert
 
 ## 0.200.0
 
