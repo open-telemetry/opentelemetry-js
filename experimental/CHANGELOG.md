@@ -18,6 +18,9 @@ fix(otlp-transformer): do not throw when deserializing empty JSON response [#555
 
 ### :house: Internal
 
+* chore(sdk-node): Refactored using `get*FromEnv` utility function instead of `process.env` for NodeSDK's resource detector setup. [#5582](https://github.com/open-telemetry/opentelemetry-js/pull/5582) @beeme1mr
+* chore(sdk-node): Refactored using `get*FromEnv` utility function instead of `process.env` for NodeSDK's logging setup. [#5563](https://github.com/open-telemetry/opentelemetry-js/issues/5563) @weyert
+
 ## 0.200.0
 
 ### Summary

@@ -26,9 +26,7 @@ const {
 } = require('@opentelemetry/exporter-trace-otlp-grpc');
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 const { resourceFromAttributes } = require('@opentelemetry/resources');
-const {
-  SEMRESATTRS_SERVICE_NAME,
-} = require('@opentelemetry/semantic-conventions');
+const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 const { OpenCensusMetricProducer } = require('@opentelemetry/shim-opencensus');
 const instrumentationHttp = require('@opencensus/instrumentation-http');
 const { TracingBase } = require('@opencensus/nodejs-base');
@@ -46,7 +44,7 @@ module.exports = function setup(serviceName) {
   tracing.tracer = new oc.CoreTracer();
 
   const resource = resourceFromAttributes({
-    [SEMRESATTRS_SERVICE_NAME]: serviceName,
+    [ATTR_SERVICE_NAME]: serviceName,
   });
   const tracerProvider = new NodeTracerProvider({
     resource,
