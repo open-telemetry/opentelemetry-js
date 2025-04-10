@@ -16,11 +16,11 @@ npm install --save @opentelemetry/resources
 ## Usage
 
 ```typescript
-import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 
 const resource = resourceFromAttributes({
-    [SEMRESATTRS_SERVICE_NAME]: 'api-service',
+    [ATTR_SERVICE_NAME]: 'api-service',
 });
 
 const anotherResource = resourceFromAttributes({
