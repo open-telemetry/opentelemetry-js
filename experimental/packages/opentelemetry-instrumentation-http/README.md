@@ -64,25 +64,13 @@ Http instrumentation has few options available to choose from. You can set the f
 | `ignoreOutgoingRequestHook` | `IgnoreOutgoingRequestFunction` | Http instrumentation will not trace all outgoing requests that matched with custom function |
 | `disableOutgoingRequestInstrumentation` | `boolean` | Set to true to avoid instrumenting outgoing requests at all. This can be helpful when another instrumentation handles outgoing requests. |
 | `disableIncomingRequestInstrumentation` | `boolean` | Set to true to avoid instrumenting incoming requests at all. This can be helpful when another instrumentation handles incoming requests. |
-| [`serverName`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L101) | `string` | The primary server name of the matched virtual host. |
 | [`requireParentforOutgoingSpans`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L103) | Boolean | Require that is a parent span to create new span for outgoing requests. |
 | [`requireParentforIncomingSpans`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L105) | Boolean | Require that is a parent span to create new span for incoming requests. |
 | [`headersToSpanAttributes`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L107) | `object` | List of case insensitive HTTP headers to convert to span attributes. Client (outgoing requests, incoming responses) and server (incoming requests, outgoing responses) headers will be converted to span attributes in the form of `http.{request\|response}.header.header_name`, e.g. `http.response.header.content_length` |
 
 ## Semantic Conventions
 
-Prior to version `0.54`, this instrumentation created spans targeting an experimental semantic convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md).
-
-This package is capable of emitting both Semantic Convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md) and [Version 1.27.0](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-spans.md).
-It is controlled using the environment variable `OTEL_SEMCONV_STABILITY_OPT_IN`, which is a comma separated list of values.
-The values `http` and `http/dup` control this instrumentation.
-See details for the behavior of each of these values below.
-If neither `http` or `http/dup` is included in `OTEL_SEMCONV_STABILITY_OPT_IN`, the old experimental semantic conventions will be used by default.
-
-### Stable Semantic Conventions 1.27
-
-Enabled when `OTEL_SEMCONV_STABILITY_OPT_IN` contains `http` OR `http/dup`.
-This is the recommended configuration, and will soon become the default behavior.
+This package emits Semantic Convention [Version 1.27.0](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-spans.md).
 
 Follow all requirements and recommendations of HTTP Client and Server Semantic Conventions Version 1.27.0 for [spans](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-spans.md) and [metrics](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-metrics.md), including all required and recommended attributes.
 
@@ -90,57 +78,6 @@ Metrics Exported:
 
 - [`http.server.request.duration`](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-metrics.md#metric-httpserverrequestduration)
 - [`http.client.request.duration`](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-metrics.md#metric-httpclientrequestduration)
-
-### Upgrading Semantic Conventions
-
-When upgrading to the new semantic conventions, it is recommended to do so in the following order:
-
-1. Upgrade `@opentelemetry/instrumentation-http` to the latest version
-2. Set `OTEL_SEMCONV_STABILITY_OPT_IN=http/dup` to emit both old and new semantic conventions
-3. Modify alerts, dashboards, metrics, and other processes to expect the new semantic conventions
-4. Set `OTEL_SEMCONV_STABILITY_OPT_IN=http` to emit only the new semantic conventions
-
-This will cause both the old and new semantic conventions to be emitted during the transition period.
-
-### Legacy Behavior (default)
-
-Enabled when `OTEL_SEMCONV_STABILITY_OPT_IN` contains `http/dup` or DOES NOT CONTAIN `http`.
-This is the current default behavior.
-
-Create HTTP client spans which implement Semantic Convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md).
-
-#### Server Spans (legacy)
-
-When `OTEL_SEMCONV_STABILITY_OPT_IN` is not set or includes `http/dup`, this module implements Semantic Convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md).
-
-Attributes collected:
-
-| Attribute                                   | Short Description                                                              |
-| ------------------------------------------- | ------------------------------------------------------------------------------ |
-| `ip_tcp`                                    | Transport protocol used                                                        |
-| `ip_udp`                                    | Transport protocol used                                                        |
-| `http.client_ip`                            | The IP address of the original client behind all proxies, if known             |
-| `http.flavor`                               | Kind of HTTP protocol used                                                     |
-| `http.host`                                 | The value of the HTTP host header                                              |
-| `http.method`                               | HTTP request method                                                            |
-| `http.request_content_length`               | The size of the request payload body in bytes                                  |
-| `http.request_content_length_uncompressed`  | The size of the uncompressed request payload body after transport decoding     |
-| `http.response_content_length`              | The size of the response payload body in bytes                                 |
-| `http.response_content_length_uncompressed` | The size of the uncompressed response payload body after transport decoding    |
-| `http.route`                                | The matched route (path template).                                             |
-| `http.scheme`                               | The URI scheme identifying the used protocol                                   |
-| `http.server_name`                          | The primary server name of the matched virtual host                            |
-| `http.status_code`                          | HTTP response status code                                                      |
-| `http.target`                               | The full request target as passed in a HTTP request line or equivalent         |
-| `http.url`                                  | Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]` |
-| `http.user_agent`                           | Value of the HTTP User-Agent header sent by the client                         |
-| `net.host.ip`                               | Like net.peer.ip but for the host IP. Useful in case of a multi-IP host        |
-| `net.host.name`                             | Local hostname or similar                                                      |
-| `net.host.port`                             | Like net.peer.port but for the host port                                       |
-| `net.peer.ip.`                              | Remote address of the peer (dotted decimal for IPv4 or RFC5952 for IPv6)       |
-| `net.peer.name`                             | Remote hostname or similar                                                     |
-| `net.peer.port`                             | Remote port number                                                             |
-| `net.transport`                             | Transport protocol used                                                        |
 
 ## Useful links
 
