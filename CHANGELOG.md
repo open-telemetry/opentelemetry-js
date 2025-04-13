@@ -24,6 +24,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+* test(sdk-metrics): fix multiple problematic assertRejects() calls [#5611](https://github.com/open-telemetry/opentelemetry-js/pull/5611) @cjihrig
+
 ## 2.0.0
 
 ### Summary
