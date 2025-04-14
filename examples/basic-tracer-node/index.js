@@ -2,7 +2,7 @@
 
 const opentelemetry = require('@opentelemetry/api');
 const { resourceFromAttributes } = require('@opentelemetry/resources');
-const { SEMRESATTRS_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
+const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { AsyncLocalStorageContextManager } = require("@opentelemetry/context-async-hooks");
@@ -24,7 +24,7 @@ const exporter = new JaegerExporter({
  */
 opentelemetry.trace.setGlobalTracerProvider(new BasicTracerProvider({
   resource: resourceFromAttributes({
-    [SEMRESATTRS_SERVICE_NAME]: 'basic-service',
+    [ATTR_SERVICE_NAME]: 'basic-service',
   }),
   spanProcessors: [
     new SimpleSpanProcessor(exporter),
