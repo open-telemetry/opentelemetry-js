@@ -344,6 +344,12 @@ describe('Logs', () => {
         1
       );
     });
+
+    it('does not throw when deserializing an empty response', () => {
+      assert.doesNotThrow(() =>
+        ProtobufLogsSerializer.deserializeResponse(new Uint8Array([]))
+      );
+    });
   });
 
   describe('JsonLogsSerializer', function () {
@@ -381,6 +387,12 @@ describe('Logs', () => {
       assert.equal(
         Number(deserializedResponse.partialSuccess.rejectedLogRecords),
         1
+      );
+    });
+
+    it('does not throw when deserializing an empty response', () => {
+      assert.doesNotThrow(() =>
+        JsonLogsSerializer.deserializeResponse(new Uint8Array([]))
       );
     });
   });
