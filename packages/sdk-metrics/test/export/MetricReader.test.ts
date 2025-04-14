@@ -119,7 +119,7 @@ describe('MetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
 
       await reader.shutdown();
-      assertRejects(reader.collect(), /MetricReader is shutdown/);
+      await assertRejects(reader.collect(), /MetricReader is shutdown/);
     });
 
     it('should call MetricProducer.collect with timeout', async () => {

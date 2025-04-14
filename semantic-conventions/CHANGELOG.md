@@ -15,6 +15,229 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :house: Internal
 
+## 1.32.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.32.0 [#5603](https://github.com/open-telemetry/opentelemetry-js/pull/5603) @trentm
+  * Semantic Conventions v1.32.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1320) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *none*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *2 newly deprecated exports, 65 added exports*
+
+#### Unstable changes in v1.32.0
+
+<details>
+<summary>2 newly deprecated exports</summary>
+
+```js
+ATTR_FEATURE_FLAG_EVALUATION_REASON // feature_flag.evaluation.reason: Replaced by `feature_flag.result.reason`.
+ATTR_FEATURE_FLAG_VARIANT           // feature_flag.variant: Replaced by `feature_flag.result.variant`.
+```
+
+</details>
+
+<details>
+<summary>65 added exports</summary>
+
+```js
+METRIC_CPYTHON_GC_COLLECTED_OBJECTS                         // cpython.gc.collected_objects
+METRIC_CPYTHON_GC_COLLECTIONS                               // cpython.gc.collections
+METRIC_CPYTHON_GC_UNCOLLECTABLE_OBJECTS                     // cpython.gc.uncollectable_objects
+
+METRIC_OTEL_SDK_EXPORTER_LOG_EXPORTED                       // otel.sdk.exporter.log.exported
+METRIC_OTEL_SDK_EXPORTER_LOG_INFLIGHT                       // otel.sdk.exporter.log.inflight
+METRIC_OTEL_SDK_LOG_CREATED                                 // otel.sdk.log.created
+METRIC_OTEL_SDK_PROCESSOR_LOG_PROCESSED                     // otel.sdk.processor.log.processed
+METRIC_OTEL_SDK_PROCESSOR_LOG_QUEUE_CAPACITY                // otel.sdk.processor.log.queue.capacity
+METRIC_OTEL_SDK_PROCESSOR_LOG_QUEUE_SIZE                    // otel.sdk.processor.log.queue.size
+
+ATTR_APP_INSTALLATION_ID                                    // app.installation.id
+
+ATTR_CPYTHON_GC_GENERATION                                  // cpython.gc.generation
+  CPYTHON_GC_GENERATION_VALUE_GENERATION_0                    // 0
+  CPYTHON_GC_GENERATION_VALUE_GENERATION_1                    // 1
+  CPYTHON_GC_GENERATION_VALUE_GENERATION_2                    // 2
+
+ATTR_DB_STORED_PROCEDURE_NAME                               // db.stored_procedure.name
+
+ATTR_ERROR_MESSAGE                                          // error.message
+
+ATTR_FEATURE_FLAG_RESULT_REASON                             // feature_flag.result.reason
+  FEATURE_FLAG_RESULT_REASON_VALUE_CACHED                     // "cached"
+  FEATURE_FLAG_RESULT_REASON_VALUE_DEFAULT                    // "default"
+  FEATURE_FLAG_RESULT_REASON_VALUE_DISABLED                   // "disabled"
+  FEATURE_FLAG_RESULT_REASON_VALUE_ERROR                      // "error"
+  FEATURE_FLAG_RESULT_REASON_VALUE_SPLIT                      // "split"
+  FEATURE_FLAG_RESULT_REASON_VALUE_STALE                      // "stale"
+  FEATURE_FLAG_RESULT_REASON_VALUE_STATIC                     // "static"
+  FEATURE_FLAG_RESULT_REASON_VALUE_TARGETING_MATCH            // "targeting_match"
+  FEATURE_FLAG_RESULT_REASON_VALUE_UNKNOWN                    // "unknown"
+ATTR_FEATURE_FLAG_RESULT_VARIANT                            // feature_flag.result.variant
+
+ATTR_GCP_APPHUB_APPLICATION_CONTAINER                       // gcp.apphub.application.container
+ATTR_GCP_APPHUB_APPLICATION_ID                              // gcp.apphub.application.id
+ATTR_GCP_APPHUB_APPLICATION_LOCATION                        // gcp.apphub.application.location
+ATTR_GCP_APPHUB_SERVICE_CRITICALITY_TYPE                    // gcp.apphub.service.criticality_type
+  GCP_APPHUB_SERVICE_CRITICALITY_TYPE_VALUE_HIGH              // "HIGH"
+  GCP_APPHUB_SERVICE_CRITICALITY_TYPE_VALUE_LOW               // "LOW"
+  GCP_APPHUB_SERVICE_CRITICALITY_TYPE_VALUE_MEDIUM            // "MEDIUM"
+  GCP_APPHUB_SERVICE_CRITICALITY_TYPE_VALUE_MISSION_CRITICAL  // "MISSION_CRITICAL"
+ATTR_GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE                    // gcp.apphub.service.environment_type
+  GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_VALUE_DEVELOPMENT       // "DEVELOPMENT"
+  GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_VALUE_PRODUCTION        // "PRODUCTION"
+  GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_VALUE_STAGING           // "STAGING"
+  GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_VALUE_TEST              // "TEST"
+ATTR_GCP_APPHUB_SERVICE_ID                                  // gcp.apphub.service.id
+ATTR_GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE                   // gcp.apphub.workload.criticality_type
+  GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_VALUE_HIGH             // "HIGH"
+  GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_VALUE_LOW              // "LOW"
+  GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_VALUE_MEDIUM           // "MEDIUM"
+  GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_VALUE_MISSION_CRITICAL // "MISSION_CRITICAL"
+ATTR_GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE                   // gcp.apphub.workload.environment_type
+  GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_VALUE_DEVELOPMENT      // "DEVELOPMENT"
+  GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_VALUE_PRODUCTION       // "PRODUCTION"
+  GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_VALUE_STAGING          // "STAGING"
+  GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_VALUE_TEST             // "TEST"
+ATTR_GCP_APPHUB_WORKLOAD_ID                                 // gcp.apphub.workload.id
+
+OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR            // "batching_log_processor"
+OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_LOG_EXPORTER            // "otlp_grpc_log_exporter"
+OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_LOG_EXPORTER       // "otlp_http_json_log_exporter"
+OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_LOG_EXPORTER            // "otlp_http_log_exporter"
+OTEL_COMPONENT_TYPE_VALUE_SIMPLE_LOG_PROCESSOR              // "simple_log_processor"
+
+PROFILE_FRAME_TYPE_VALUE_GO                                 // "go"
+PROFILE_FRAME_TYPE_VALUE_RUST                               // "rust"
+
+ATTR_VCS_OWNER_NAME                                         // vcs.owner.name
+ATTR_VCS_PROVIDER_NAME                                      // vcs.provider.name
+  VCS_PROVIDER_NAME_VALUE_BITBUCKET                           // "bitbucket"
+  VCS_PROVIDER_NAME_VALUE_GITHUB                              // "github"
+  VCS_PROVIDER_NAME_VALUE_GITLAB                              // "gitlab"
+  VCS_PROVIDER_NAME_VALUE_GITTEA                              // "gittea"
+```
+
+</details>
+
+## 1.31.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.31.0 [#5589](https://github.com/open-telemetry/opentelemetry-js/pull/5589) @trentm
+  * Semantic Conventions v1.31.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1310) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *none*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *8 newly deprecated exports, 1 newly undeprecated export, 63 added exports*
+
+#### Unstable changes in v1.31.0
+
+<details>
+<summary>8 newly deprecated exports</summary>
+
+```js
+METRIC_K8S_REPLICATION_CONTROLLER_AVAILABLE_PODS // k8s.replication_controller.available_pods: Replaced by `k8s.replicationcontroller.available_pods`.
+METRIC_K8S_REPLICATION_CONTROLLER_DESIRED_PODS   // k8s.replication_controller.desired_pods: Replaced by `k8s.replicationcontroller.desired_pods`.
+METRIC_SYSTEM_CPU_FREQUENCY                      // system.cpu.frequency: Replaced by `cpu.frequency`.
+METRIC_SYSTEM_CPU_TIME                           // system.cpu.time: Replaced by `cpu.time`.
+METRIC_SYSTEM_CPU_UTILIZATION                    // system.cpu.utilization: Replaced by `cpu.utilization`.
+ATTR_CODE_FILEPATH                               // code.filepath: Replaced by `code.file.path`
+ATTR_CODE_NAMESPACE                              // code.namespace: Value should be included in `code.function.name` which is expected to be a fully-qualified name.
+ATTR_GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT       // gen_ai.openai.request.response_format: Replaced by `gen_ai.output.type`.
+```
+
+</details>
+
+<details>
+<summary>1 newly undeprecated export</summary>
+
+```js
+ATTR_ENDUSER_ID // enduser.id
+```
+
+</details>
+
+<details>
+<summary>63 added exports</summary>
+
+```js
+METRIC_CPU_FREQUENCY                                   // cpu.frequency
+METRIC_CPU_TIME                                        // cpu.time
+METRIC_CPU_UTILIZATION                                 // cpu.utilization
+
+METRIC_HW_HOST_AMBIENT_TEMPERATURE                     // hw.host.ambient_temperature
+METRIC_HW_HOST_ENERGY                                  // hw.host.energy
+METRIC_HW_HOST_HEATING_MARGIN                          // hw.host.heating_margin
+METRIC_HW_HOST_POWER                                   // hw.host.power
+
+METRIC_K8S_REPLICATIONCONTROLLER_AVAILABLE_PODS        // k8s.replicationcontroller.available_pods
+METRIC_K8S_REPLICATIONCONTROLLER_DESIRED_PODS          // k8s.replicationcontroller.desired_pods
+
+METRIC_OTEL_SDK_EXPORTER_SPAN_EXPORTED_COUNT           // otel.sdk.exporter.span.exported.count
+METRIC_OTEL_SDK_EXPORTER_SPAN_INFLIGHT_COUNT           // otel.sdk.exporter.span.inflight.count
+METRIC_OTEL_SDK_PROCESSOR_SPAN_PROCESSED_COUNT         // otel.sdk.processor.span.processed.count
+METRIC_OTEL_SDK_PROCESSOR_SPAN_QUEUE_CAPACITY          // otel.sdk.processor.span.queue.capacity
+METRIC_OTEL_SDK_PROCESSOR_SPAN_QUEUE_SIZE              // otel.sdk.processor.span.queue.size
+METRIC_OTEL_SDK_SPAN_ENDED_COUNT                       // otel.sdk.span.ended.count
+METRIC_OTEL_SDK_SPAN_LIVE_COUNT                        // otel.sdk.span.live.count
+
+ATTR_ANDROID_APP_STATE                                 // android.app.state
+  ANDROID_APP_STATE_VALUE_BACKGROUND                     // "background"
+  ANDROID_APP_STATE_VALUE_CREATED                        // "created"
+  ANDROID_APP_STATE_VALUE_FOREGROUND                     // "foreground"
+
+ATTR_CICD_PIPELINE_RUN_URL_FULL                        // cicd.pipeline.run.url.full
+
+ATTR_CPU_LOGICAL_NUMBER                                // cpu.logical_number
+
+ATTR_ENDUSER_PSEUDO_ID                                 // enduser.pseudo.id
+
+ATTR_GEN_AI_AGENT_DESCRIPTION                          // gen_ai.agent.description
+ATTR_GEN_AI_AGENT_ID                                   // gen_ai.agent.id
+ATTR_GEN_AI_AGENT_NAME                                 // gen_ai.agent.name
+GEN_AI_OPERATION_NAME_VALUE_CREATE_AGENT               // "create_agent"
+GEN_AI_OPERATION_NAME_VALUE_EXECUTE_TOOL               // "execute_tool"
+ATTR_GEN_AI_OUTPUT_TYPE                                // gen_ai.output.type
+  GEN_AI_OUTPUT_TYPE_VALUE_IMAGE                         // "image"
+  GEN_AI_OUTPUT_TYPE_VALUE_JSON                          // "json"
+  GEN_AI_OUTPUT_TYPE_VALUE_SPEECH                        // "speech"
+  GEN_AI_OUTPUT_TYPE_VALUE_TEXT                          // "text"
+ATTR_GEN_AI_REQUEST_CHOICE_COUNT                       // gen_ai.request.choice.count
+GEN_AI_TOKEN_TYPE_VALUE_OUTPUT                         // "output"
+ATTR_GEN_AI_TOOL_CALL_ID                               // gen_ai.tool.call.id
+ATTR_GEN_AI_TOOL_NAME                                  // gen_ai.tool.name
+ATTR_GEN_AI_TOOL_TYPE                                  // gen_ai.tool.type
+
+ATTR_IOS_APP_STATE                                     // ios.app.state
+  IOS_APP_STATE_VALUE_ACTIVE                             // "active"
+  IOS_APP_STATE_VALUE_BACKGROUND                         // "background"
+  IOS_APP_STATE_VALUE_FOREGROUND                         // "foreground"
+  IOS_APP_STATE_VALUE_INACTIVE                           // "inactive"
+  IOS_APP_STATE_VALUE_TERMINATE                          // "terminate"
+
+ATTR_K8S_HPA_NAME                                      // k8s.hpa.name
+ATTR_K8S_HPA_UID                                       // k8s.hpa.uid
+ATTR_K8S_REPLICATIONCONTROLLER_NAME                    // k8s.replicationcontroller.name
+ATTR_K8S_REPLICATIONCONTROLLER_UID                     // k8s.replicationcontroller.uid
+ATTR_K8S_RESOURCEQUOTA_NAME                            // k8s.resourcequota.name
+ATTR_K8S_RESOURCEQUOTA_UID                             // k8s.resourcequota.uid
+
+ATTR_OTEL_COMPONENT_NAME                               // otel.component.name
+ATTR_OTEL_COMPONENT_TYPE                               // otel.component.type
+  OTEL_COMPONENT_TYPE_VALUE_BATCHING_SPAN_PROCESSOR      // "batching_span_processor"
+  OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_SPAN_EXPORTER      // "otlp_grpc_span_exporter"
+  OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_SPAN_EXPORTER // "otlp_http_json_span_exporter"
+  OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_SPAN_EXPORTER      // "otlp_http_span_exporter"
+  OTEL_COMPONENT_TYPE_VALUE_SIMPLE_SPAN_PROCESSOR        // "simple_span_processor"
+ATTR_OTEL_SPAN_SAMPLING_RESULT                         // otel.span.sampling_result
+  OTEL_SPAN_SAMPLING_RESULT_VALUE_DROP                   // "DROP"
+  OTEL_SPAN_SAMPLING_RESULT_VALUE_RECORD_AND_SAMPLE      // "RECORD_AND_SAMPLE"
+  OTEL_SPAN_SAMPLING_RESULT_VALUE_RECORD_ONLY            // "RECORD_ONLY"
+
+ATTR_USER_AGENT_OS_NAME                                // user_agent.os.name
+ATTR_USER_AGENT_OS_VERSION                             // user_agent.os.version
+```
+
+</details>
+
 ## 1.30.0
 
 ### :rocket: (Enhancement)

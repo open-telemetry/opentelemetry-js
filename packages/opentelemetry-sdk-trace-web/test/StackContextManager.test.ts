@@ -18,7 +18,7 @@ import { createContextKey, ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { StackContextManager } from '../src';
 
-describe('StackContextManager', () => {
+describe('StackContextManager', function () {
   let contextManager: StackContextManager;
   const key1 = createContextKey('test key 1');
 
@@ -31,8 +31,8 @@ describe('StackContextManager', () => {
     contextManager.disable();
   });
 
-  describe('.enable()', () => {
-    it('should work', () => {
+  describe('.enable()', function () {
+    it('should work', function () {
       assert.doesNotThrow(() => {
         assert.ok(
           contextManager.enable() === contextManager,
@@ -46,8 +46,8 @@ describe('StackContextManager', () => {
     });
   });
 
-  describe('.disable()', () => {
-    it('should work', () => {
+  describe('.disable()', function () {
+    it('should work', function () {
       assert.doesNotThrow(() => {
         assert.ok(
           contextManager.disable() === contextManager,
@@ -61,7 +61,7 @@ describe('StackContextManager', () => {
     });
   });
 
-  describe('.with()', () => {
+  describe('.with()', function () {
     it('should run the callback (null as target)', done => {
       contextManager.with(null, done);
     });
@@ -133,7 +133,7 @@ describe('StackContextManager', () => {
       assert.strictEqual(contextManager.active(), globalThis);
     });
 
-    it('should forward this, arguments and return value', () => {
+    it('should forward this, arguments and return value', function () {
       function fnWithThis(this: string, a: string, b: number): string {
         assert.strictEqual(this, 'that');
         assert.strictEqual(arguments.length, 2);
@@ -158,8 +158,8 @@ describe('StackContextManager', () => {
     });
   });
 
-  describe('.bind(function)', () => {
-    it('should call the function with previously assigned context', () => {
+  describe('.bind(function)', function () {
+    it('should call the function with previously assigned context', function () {
       class Obj {
         title: string;
 
@@ -180,7 +180,7 @@ describe('StackContextManager', () => {
       assert.ok(wrapper(), 'a2');
     });
 
-    it('should return the same target (when enabled)', () => {
+    it('should return the same target (when enabled)', function () {
       const test = ROOT_CONTEXT.setValue(key1, 1);
       assert.deepStrictEqual(
         contextManager.bind(contextManager.active(), test),
@@ -188,7 +188,7 @@ describe('StackContextManager', () => {
       );
     });
 
-    it('should return the same target (when disabled)', () => {
+    it('should return the same target (when disabled)', function () {
       contextManager.disable();
       const test = ROOT_CONTEXT.setValue(key1, 1);
       assert.deepStrictEqual(

@@ -41,7 +41,8 @@ const setup = (exporter: LogRecordExporter, resource?: Resource) => {
   const sharedState = new LoggerProviderSharedState(
     resource || defaultResource(),
     Infinity,
-    reconfigureLimits({})
+    reconfigureLimits({}),
+    []
   );
   const logRecord = new LogRecord(
     sharedState,
