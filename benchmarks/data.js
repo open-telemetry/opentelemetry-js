@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1744618975083,
+  "lastUpdate": 1744623680335,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -30736,6 +30736,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.56%",
             "unit": "ops/sec",
             "extra": "91 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "cjihrig@gmail.com",
+            "name": "Colin Ihrig",
+            "username": "cjihrig"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c89cb38d0fec39d54cf3fcb35c429a8129e9c909",
+          "message": "test(sdk-metrics): fix multiple problematic assertRejects() calls (#5611)",
+          "timestamp": "2025-04-14T09:32:53Z",
+          "tree_id": "0e085d16bcfbef8aec88d14615f6b4be09161681",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/c89cb38d0fec39d54cf3fcb35c429a8129e9c909"
+        },
+        "date": 1744623679374,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1481540,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18095,
+            "range": "±0.16%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 842115,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 773474,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
           }
         ]
       }
