@@ -32,11 +32,16 @@ describe('utils', () => {
 
   describe('callWithTimeout', () => {
     it('should reject if given promise not settled before timeout', async () => {
-      sinon.useFakeTimers();
+      const clock = sinon.useFakeTimers();
       const promise = new Promise(() => {
         /** promise never settles */
       });
-      assertRejects(callWithTimeout(promise, 100), TimeoutError);
+      const assertion = assertRejects(
+        callWithTimeout(promise, 100),
+        TimeoutError
+      );
+      clock.tick(101);
+      await assertion;
     });
   });
 

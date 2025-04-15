@@ -15,11 +15,115 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :house: Internal
 
+## 1.32.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.32.0 [#5603](https://github.com/open-telemetry/opentelemetry-js/pull/5603) @trentm
+  * Semantic Conventions v1.32.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1320) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *none*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *2 newly deprecated exports, 65 added exports*
+
+#### Unstable changes in v1.32.0
+
+<details>
+<summary>2 newly deprecated exports</summary>
+
+```js
+ATTR_FEATURE_FLAG_EVALUATION_REASON // feature_flag.evaluation.reason: Replaced by `feature_flag.result.reason`.
+ATTR_FEATURE_FLAG_VARIANT           // feature_flag.variant: Replaced by `feature_flag.result.variant`.
+```
+
+</details>
+
+<details>
+<summary>65 added exports</summary>
+
+```js
+METRIC_CPYTHON_GC_COLLECTED_OBJECTS                         // cpython.gc.collected_objects
+METRIC_CPYTHON_GC_COLLECTIONS                               // cpython.gc.collections
+METRIC_CPYTHON_GC_UNCOLLECTABLE_OBJECTS                     // cpython.gc.uncollectable_objects
+
+METRIC_OTEL_SDK_EXPORTER_LOG_EXPORTED                       // otel.sdk.exporter.log.exported
+METRIC_OTEL_SDK_EXPORTER_LOG_INFLIGHT                       // otel.sdk.exporter.log.inflight
+METRIC_OTEL_SDK_LOG_CREATED                                 // otel.sdk.log.created
+METRIC_OTEL_SDK_PROCESSOR_LOG_PROCESSED                     // otel.sdk.processor.log.processed
+METRIC_OTEL_SDK_PROCESSOR_LOG_QUEUE_CAPACITY                // otel.sdk.processor.log.queue.capacity
+METRIC_OTEL_SDK_PROCESSOR_LOG_QUEUE_SIZE                    // otel.sdk.processor.log.queue.size
+
+ATTR_APP_INSTALLATION_ID                                    // app.installation.id
+
+ATTR_CPYTHON_GC_GENERATION                                  // cpython.gc.generation
+  CPYTHON_GC_GENERATION_VALUE_GENERATION_0                    // 0
+  CPYTHON_GC_GENERATION_VALUE_GENERATION_1                    // 1
+  CPYTHON_GC_GENERATION_VALUE_GENERATION_2                    // 2
+
+ATTR_DB_STORED_PROCEDURE_NAME                               // db.stored_procedure.name
+
+ATTR_ERROR_MESSAGE                                          // error.message
+
+ATTR_FEATURE_FLAG_RESULT_REASON                             // feature_flag.result.reason
+  FEATURE_FLAG_RESULT_REASON_VALUE_CACHED                     // "cached"
+  FEATURE_FLAG_RESULT_REASON_VALUE_DEFAULT                    // "default"
+  FEATURE_FLAG_RESULT_REASON_VALUE_DISABLED                   // "disabled"
+  FEATURE_FLAG_RESULT_REASON_VALUE_ERROR                      // "error"
+  FEATURE_FLAG_RESULT_REASON_VALUE_SPLIT                      // "split"
+  FEATURE_FLAG_RESULT_REASON_VALUE_STALE                      // "stale"
+  FEATURE_FLAG_RESULT_REASON_VALUE_STATIC                     // "static"
+  FEATURE_FLAG_RESULT_REASON_VALUE_TARGETING_MATCH            // "targeting_match"
+  FEATURE_FLAG_RESULT_REASON_VALUE_UNKNOWN                    // "unknown"
+ATTR_FEATURE_FLAG_RESULT_VARIANT                            // feature_flag.result.variant
+
+ATTR_GCP_APPHUB_APPLICATION_CONTAINER                       // gcp.apphub.application.container
+ATTR_GCP_APPHUB_APPLICATION_ID                              // gcp.apphub.application.id
+ATTR_GCP_APPHUB_APPLICATION_LOCATION                        // gcp.apphub.application.location
+ATTR_GCP_APPHUB_SERVICE_CRITICALITY_TYPE                    // gcp.apphub.service.criticality_type
+  GCP_APPHUB_SERVICE_CRITICALITY_TYPE_VALUE_HIGH              // "HIGH"
+  GCP_APPHUB_SERVICE_CRITICALITY_TYPE_VALUE_LOW               // "LOW"
+  GCP_APPHUB_SERVICE_CRITICALITY_TYPE_VALUE_MEDIUM            // "MEDIUM"
+  GCP_APPHUB_SERVICE_CRITICALITY_TYPE_VALUE_MISSION_CRITICAL  // "MISSION_CRITICAL"
+ATTR_GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE                    // gcp.apphub.service.environment_type
+  GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_VALUE_DEVELOPMENT       // "DEVELOPMENT"
+  GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_VALUE_PRODUCTION        // "PRODUCTION"
+  GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_VALUE_STAGING           // "STAGING"
+  GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_VALUE_TEST              // "TEST"
+ATTR_GCP_APPHUB_SERVICE_ID                                  // gcp.apphub.service.id
+ATTR_GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE                   // gcp.apphub.workload.criticality_type
+  GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_VALUE_HIGH             // "HIGH"
+  GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_VALUE_LOW              // "LOW"
+  GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_VALUE_MEDIUM           // "MEDIUM"
+  GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_VALUE_MISSION_CRITICAL // "MISSION_CRITICAL"
+ATTR_GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE                   // gcp.apphub.workload.environment_type
+  GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_VALUE_DEVELOPMENT      // "DEVELOPMENT"
+  GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_VALUE_PRODUCTION       // "PRODUCTION"
+  GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_VALUE_STAGING          // "STAGING"
+  GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_VALUE_TEST             // "TEST"
+ATTR_GCP_APPHUB_WORKLOAD_ID                                 // gcp.apphub.workload.id
+
+OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR            // "batching_log_processor"
+OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_LOG_EXPORTER            // "otlp_grpc_log_exporter"
+OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_LOG_EXPORTER       // "otlp_http_json_log_exporter"
+OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_LOG_EXPORTER            // "otlp_http_log_exporter"
+OTEL_COMPONENT_TYPE_VALUE_SIMPLE_LOG_PROCESSOR              // "simple_log_processor"
+
+PROFILE_FRAME_TYPE_VALUE_GO                                 // "go"
+PROFILE_FRAME_TYPE_VALUE_RUST                               // "rust"
+
+ATTR_VCS_OWNER_NAME                                         // vcs.owner.name
+ATTR_VCS_PROVIDER_NAME                                      // vcs.provider.name
+  VCS_PROVIDER_NAME_VALUE_BITBUCKET                           // "bitbucket"
+  VCS_PROVIDER_NAME_VALUE_GITHUB                              // "github"
+  VCS_PROVIDER_NAME_VALUE_GITLAB                              // "gitlab"
+  VCS_PROVIDER_NAME_VALUE_GITTEA                              // "gittea"
+```
+
+</details>
+
 ## 1.31.0
 
 ### :rocket: Features
 
-* feat: update semantic conventions to v1.31.0
+* feat: update semantic conventions to v1.31.0 [#5589](https://github.com/open-telemetry/opentelemetry-js/pull/5589) @trentm
   * Semantic Conventions v1.31.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1310) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * `@opentelemetry/semantic-conventions` (stable) changes: *none*
   * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *8 newly deprecated exports, 1 newly undeprecated export, 63 added exports*

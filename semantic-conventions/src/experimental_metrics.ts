@@ -148,6 +148,33 @@ export const METRIC_CPU_TIME = 'cpu.time' as const;
 export const METRIC_CPU_UTILIZATION = 'cpu.utilization' as const;
 
 /**
+ * The total number of objects collected inside a generation since interpreter start.
+ *
+ * @note This metric reports data from [`gc.stats()`](https://docs.python.org/3/library/gc.html#gc.get_stats).
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_CPYTHON_GC_COLLECTED_OBJECTS = 'cpython.gc.collected_objects' as const;
+
+/**
+ * The number of times a generation was collected since interpreter start.
+ *
+ * @note This metric reports data from [`gc.stats()`](https://docs.python.org/3/library/gc.html#gc.get_stats).
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_CPYTHON_GC_COLLECTIONS = 'cpython.gc.collections' as const;
+
+/**
+ * The total number of objects which were found to be uncollectable inside a generation since interpreter start.
+ *
+ * @note This metric reports data from [`gc.stats()`](https://docs.python.org/3/library/gc.html#gc.get_stats).
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_CPYTHON_GC_UNCOLLECTABLE_OBJECTS = 'cpython.gc.uncollectable_objects' as const;
+
+/**
  * The number of connections that are currently in state described by the `state` attribute
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -1321,6 +1348,26 @@ export const METRIC_NODEJS_EVENTLOOP_TIME = 'nodejs.eventloop.time' as const;
 export const METRIC_NODEJS_EVENTLOOP_UTILIZATION = 'nodejs.eventloop.utilization' as const;
 
 /**
+ * The number of log records for which the export has finished, either successful or failed
+ *
+ * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` must contain the failure cause.
+ * For exporters with partial success semantics (e.g. OTLP with `rejected_log_records`), rejected log records must count as failed and only non-rejected log records count as success.
+ * If no rejection reason is available, `rejected` **SHOULD** be used as value for `error.type`.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_EXPORTER_LOG_EXPORTED = 'otel.sdk.exporter.log.exported' as const;
+
+/**
+ * The number of log records which were passed to the exporter, but that have not been exported yet (neither successful, nor failed)
+ *
+ * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` must contain the failure cause.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_EXPORTER_LOG_INFLIGHT = 'otel.sdk.exporter.log.inflight' as const;
+
+/**
  * The number of spans for which the export has finished, either successful or failed
  *
  * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` must contain the failure cause.
@@ -1339,6 +1386,42 @@ export const METRIC_OTEL_SDK_EXPORTER_SPAN_EXPORTED_COUNT = 'otel.sdk.exporter.s
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_OTEL_SDK_EXPORTER_SPAN_INFLIGHT_COUNT = 'otel.sdk.exporter.span.inflight.count' as const;
+
+/**
+ * The number of logs submitted to enabled SDK Loggers
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_LOG_CREATED = 'otel.sdk.log.created' as const;
+
+/**
+ * The number of log records for which the processing has finished, either successful or failed
+ *
+ * @note For successful processing, `error.type` **MUST NOT** be set. For failed processing, `error.type` must contain the failure cause.
+ * For the SDK Simple and Batching Log Record Processor a log record is considered to be processed already when it has been submitted to the exporter,
+ * not when the corresponding export call has finished.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_PROCESSOR_LOG_PROCESSED = 'otel.sdk.processor.log.processed' as const;
+
+/**
+ * The maximum number of log records the queue of a given instance of an SDK Log Record processor can hold
+ *
+ * @note Only applies to Log Record processors which use a queue, e.g. the SDK Batching Log Record Processor.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_PROCESSOR_LOG_QUEUE_CAPACITY = 'otel.sdk.processor.log.queue.capacity' as const;
+
+/**
+ * The number of log records in the queue of a given instance of an SDK log processor
+ *
+ * @note Only applies to log record processors which use a queue, e.g. the SDK Batching Log Record Processor.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_PROCESSOR_LOG_QUEUE_SIZE = 'otel.sdk.processor.log.queue.size' as const;
 
 /**
  * The number of spans for which the processing has finished, either successful or failed
@@ -1833,7 +1916,7 @@ export const METRIC_SYSTEM_UPTIME = 'system.uptime' as const;
 /**
  * Garbage collection duration.
  *
- * @note The values can be retrieve from [`perf_hooks.PerformanceObserver(...).observe({ entryTypes: ['gc'] })`](https://nodejs.org/api/perf_hooks.html#performanceobserverobserveoptions)
+ * @note The values can be retrieved from [`perf_hooks.PerformanceObserver(...).observe({ entryTypes: ['gc'] })`](https://nodejs.org/api/perf_hooks.html#performanceobserverobserveoptions)
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */

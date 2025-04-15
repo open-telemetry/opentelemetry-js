@@ -81,6 +81,33 @@ export const ANDROID_STATE_VALUE_CREATED = "created" as const;
 export const ANDROID_STATE_VALUE_FOREGROUND = "foreground" as const;
 
 /**
+ * A unique identifier representing the installation of an application on a specific device
+ *
+ * @example 2ab2916d-a51f-4ac8-80ee-45ac31a28092
+ *
+ * @note Its value **SHOULD** persist across launches of the same application installation, including through application upgrades.
+ * It **SHOULD** change if the application is uninstalled or if all applications of the vendor are uninstalled.
+ * Additionally, users might be able to reset this value (e.g. by clearing application data).
+ * If an app is installed multiple times on the same device (e.g. in different accounts on Android), each `app.installation.id` **SHOULD** have a different value.
+ * If multiple OpenTelemetry SDKs are used within the same application, they **SHOULD** use the same value for `app.installation.id`.
+ * Hardware IDs (e.g. serial number, IMEI, MAC address) **MUST NOT** be used as the `app.installation.id`.
+ *
+ * For iOS, this value **SHOULD** be equal to the [vendor identifier](https://developer.apple.com/documentation/uikit/uidevice/identifierforvendor).
+ *
+ * For Android, examples of `app.installation.id` implementations include:
+ *
+ *   - [Firebase Installation ID](https://firebase.google.com/docs/projects/manage-installations).
+ *   - A globally unique UUID which is persisted across sessions in your application.
+ *   - [App set ID](https://developer.android.com/identity/app-set-id).
+ *   - [`Settings.getString(Settings.Secure.ANDROID_ID)`](https://developer.android.com/reference/android/provider/Settings.Secure#ANDROID_ID).
+ *
+ * More information about Android identifier best practices can be found [here](https://developer.android.com/training/articles/user-data-ids).
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_APP_INSTALLATION_ID = 'app.installation.id' as const;
+
+/**
  * The provenance filename of the built attestation which directly relates to the build artifact filename. This filename **SHOULD** accompany the artifact at publish time. See the [SLSA Relationship](https://slsa.dev/spec/v1.0/distributing-provenance#relationship-between-artifacts-and-attestations) specification for more information.
  *
  * @example golang-binary-amd64-v0.1.0.attestation
@@ -1631,7 +1658,7 @@ export const ATTR_CODE_FUNCTION = 'code.function' as const;
  *   - Java method: `com.example.MyHttpService.serveRequest`
  *   - Java anonymous class method: `com.mycompany.Main$1.myMethod`
  *   - Java lambda method: `com.mycompany.Main$$Lambda/0x0000748ae4149c00.myMethod`
- *   - PHP function: `GuzzleHttp\\Client::transfer
+ *   - PHP function: `GuzzleHttp\Client::transfer`
  *   - Go function: `github.com/my/repo/pkg.foo.func5`
  *   - Elixir: `OpenTelemetry.Ctx.new`
  *   - Erlang: `opentelemetry_ctx:new`
@@ -1909,6 +1936,32 @@ export const CPU_MODE_VALUE_SYSTEM = "system" as const;
   * Enum value "user" for attribute {@link ATTR_CPU_MODE}.
   */
 export const CPU_MODE_VALUE_USER = "user" as const;
+
+/**
+ * Value of the garbage collector collection generation.
+ *
+ * @example 0
+ * @example 1
+ * @example 2
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_CPYTHON_GC_GENERATION = 'cpython.gc.generation' as const;
+
+/**
+  * Enum value 0 for attribute {@link ATTR_CPYTHON_GC_GENERATION}.
+  */
+export const CPYTHON_GC_GENERATION_VALUE_GENERATION_0 = 0 as const;
+
+/**
+  * Enum value 1 for attribute {@link ATTR_CPYTHON_GC_GENERATION}.
+  */
+export const CPYTHON_GC_GENERATION_VALUE_GENERATION_1 = 1 as const;
+
+/**
+  * Enum value 2 for attribute {@link ATTR_CPYTHON_GC_GENERATION}.
+  */
+export const CPYTHON_GC_GENERATION_VALUE_GENERATION_2 = 2 as const;
 
 /**
  * Deprecated, use `cassandra.consistency.level` instead.
@@ -2494,6 +2547,9 @@ export const ATTR_DB_OPERATION_BATCH_SIZE = 'db.operation.batch.size' as const;
  * The operation name **SHOULD NOT** be extracted from `db.query.text`,
  * when the database system supports cross-table queries in non-batch operations.
  *
+ * If spaces can occur in the operation name, multiple consecutive spaces
+ * **SHOULD** be normalized to a single space.
+ *
  * For batch operations, if the individual operations are known to have the same operation name
  * then that operation name **SHOULD** be used prepended by `BATCH `,
  * otherwise `db.operation.name` **SHOULD** be `BATCH` or some other database
@@ -2511,6 +2567,7 @@ export const ATTR_DB_OPERATION_NAME = 'db.operation.name' as const;
  *
  * @note If a parameter has no name and instead is referenced only by index, then `<key>` **SHOULD** be the 0-based index.
  * If `db.query.text` is also captured, then `db.operation.parameter.<key>` **SHOULD** match up with the parameterized placeholders present in `db.query.text`.
+ * `db.operation.parameter.<key>` **SHOULD NOT** be captured on batch operations.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2596,13 +2653,13 @@ export const ATTR_DB_RESPONSE_RETURNED_ROWS = 'db.response.returned_rows' as con
 export const ATTR_DB_RESPONSE_STATUS_CODE = 'db.response.status_code' as const;
 
 /**
- * Deprecated, use `db.collection.name` instead.
+ * Deprecated, use `db.collection.name` instead, but only if not extracting the value from `db.query.text`.
  *
  * @example "mytable"
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Replaced by `db.collection.name`.
+ * @deprecated Replaced by `db.collection.name`, but only if not extracting the value from `db.query.text`.
  */
 export const ATTR_DB_SQL_TABLE = 'db.sql.table' as const;
 
@@ -2617,6 +2674,21 @@ export const ATTR_DB_SQL_TABLE = 'db.sql.table' as const;
  * @deprecated Replaced by `db.query.text`.
  */
 export const ATTR_DB_STATEMENT = 'db.statement' as const;
+
+/**
+ * The name of a stored procedure within the database.
+ *
+ * @example GetCustomer
+ *
+ * @note It is **RECOMMENDED** to capture the value as provided by the application
+ * without attempting to do any case normalization.
+ *
+ * For batch operations, if the individual operations are known to have the same
+ * stored procedure name then that stored procedure name **SHOULD** be used.
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_DB_STORED_PROCEDURE_NAME = 'db.stored_procedure.name' as const;
 
 /**
  * Deprecated, use `db.system.name` instead.
@@ -3215,9 +3287,19 @@ export const ATTR_DESTINATION_PORT = 'destination.port' as const;
 /**
  * A unique identifier representing the device
  *
- * @example 2ab2916d-a51f-4ac8-80ee-45ac31a28092
+ * @example 123456789012345
+ * @example 01:23:45:67:89:AB
  *
- * @note The device identifier **MUST** only be defined using the values outlined below. This value is not an advertising identifier and **MUST NOT** be used as such. On iOS (Swift or Objective-C), this value **MUST** be equal to the [vendor identifier](https://developer.apple.com/documentation/uikit/uidevice/1620059-identifierforvendor). On Android (Java or Kotlin), this value **MUST** be equal to the Firebase Installation ID or a globally unique UUID which is persisted across sessions in your application. More information can be found [here](https://developer.android.com/training/articles/user-data-ids) on best practices and exact implementation details. Caution should be taken when storing personal data or anything which can identify a user. GDPR and data protection laws may apply, ensure you do your own due diligence.
+ * @note Its value **SHOULD** be identical for all apps on a device and it **SHOULD NOT** change if an app is uninstalled and re-installed.
+ * However, it might be resettable by the user for all apps on a device.
+ * Hardware IDs (e.g. vendor-specific serial number, IMEI or MAC address) **MAY** be used as values.
+ *
+ * More information about Android identifier best practices can be found [here](https://developer.android.com/training/articles/user-data-ids).
+ *
+ * > [!WARNING]> This attribute may contain sensitive (PII) information. Caution should be taken when storing personal data or anything which can identify a user. GDPR and data protection laws may apply,
+ * > ensure you do your own due diligence.> Due to these reasons, this identifier is not recommended for consumer applications and will likely result in rejection from both Google Play and App Store.
+ * > However, it may be appropriate for specific enterprise scenarios, such as kiosk devices or enterprise-managed devices, with appropriate compliance clearance.
+ * > Any instrumentation providing this identifier **> MUST**>  implement it as an opt-in feature.> See [`app.installation.id`](/docs/attributes-registry/app.md#app-installation-id)>  for a more privacy-preserving alternative.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3348,6 +3430,22 @@ export const ATTR_ENDUSER_ROLE = 'enduser.role' as const;
  * @deprecated Removed.
  */
 export const ATTR_ENDUSER_SCOPE = 'enduser.scope' as const;
+
+/**
+ * A message providing more detail about an error in human-readable form.
+ *
+ * @example Unexpected input type: string
+ * @example The user has exceeded their storage quota
+ *
+ * @note `error.message` should provide additional context and detail about an error.
+ * It is NOT **RECOMMENDED** to duplicate the value of `error.type` in `error.message`.
+ * It is also NOT **RECOMMENDED** to duplicate the value of `exception.message` in `error.message`.
+ *
+ * `error.message` is NOT **RECOMMENDED** for metrics or spans due to its unbounded cardinality and overlap with span status.
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_ERROR_MESSAGE = 'error.message' as const;
 
 /**
  * Identifies the class / type of event.
@@ -3622,7 +3720,7 @@ export const ATTR_FEATURE_FLAG_CONTEXT_ID = 'feature_flag.context.id' as const;
 export const ATTR_FEATURE_FLAG_EVALUATION_ERROR_MESSAGE = 'feature_flag.evaluation.error.message' as const;
 
 /**
- * The reason code which shows how a feature flag value was determined.
+ * Deprecated, use `feature_flag.result.reason` instead.
  *
  * @example static
  * @example targeting_match
@@ -3630,6 +3728,8 @@ export const ATTR_FEATURE_FLAG_EVALUATION_ERROR_MESSAGE = 'feature_flag.evaluati
  * @example default
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `feature_flag.result.reason`.
  */
 export const ATTR_FEATURE_FLAG_EVALUATION_REASON = 'feature_flag.evaluation.reason' as const;
 
@@ -3697,15 +3797,61 @@ export const ATTR_FEATURE_FLAG_KEY = 'feature_flag.key' as const;
 export const ATTR_FEATURE_FLAG_PROVIDER_NAME = 'feature_flag.provider_name' as const;
 
 /**
- * The identifier of the [flag set](https://openfeature.dev/specification/glossary/#flag-set) to which the feature flag belongs.
+ * The reason code which shows how a feature flag value was determined.
  *
- * @example proj-1
- * @example ab98sgs
- * @example service1/dev
+ * @example static
+ * @example targeting_match
+ * @example error
+ * @example default
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_FEATURE_FLAG_SET_ID = 'feature_flag.set.id' as const;
+export const ATTR_FEATURE_FLAG_RESULT_REASON = 'feature_flag.result.reason' as const;
+
+/**
+  * Enum value "cached" for attribute {@link ATTR_FEATURE_FLAG_RESULT_REASON}.
+  */
+export const FEATURE_FLAG_RESULT_REASON_VALUE_CACHED = "cached" as const;
+
+/**
+  * Enum value "default" for attribute {@link ATTR_FEATURE_FLAG_RESULT_REASON}.
+  */
+export const FEATURE_FLAG_RESULT_REASON_VALUE_DEFAULT = "default" as const;
+
+/**
+  * Enum value "disabled" for attribute {@link ATTR_FEATURE_FLAG_RESULT_REASON}.
+  */
+export const FEATURE_FLAG_RESULT_REASON_VALUE_DISABLED = "disabled" as const;
+
+/**
+  * Enum value "error" for attribute {@link ATTR_FEATURE_FLAG_RESULT_REASON}.
+  */
+export const FEATURE_FLAG_RESULT_REASON_VALUE_ERROR = "error" as const;
+
+/**
+  * Enum value "split" for attribute {@link ATTR_FEATURE_FLAG_RESULT_REASON}.
+  */
+export const FEATURE_FLAG_RESULT_REASON_VALUE_SPLIT = "split" as const;
+
+/**
+  * Enum value "stale" for attribute {@link ATTR_FEATURE_FLAG_RESULT_REASON}.
+  */
+export const FEATURE_FLAG_RESULT_REASON_VALUE_STALE = "stale" as const;
+
+/**
+  * Enum value "static" for attribute {@link ATTR_FEATURE_FLAG_RESULT_REASON}.
+  */
+export const FEATURE_FLAG_RESULT_REASON_VALUE_STATIC = "static" as const;
+
+/**
+  * Enum value "targeting_match" for attribute {@link ATTR_FEATURE_FLAG_RESULT_REASON}.
+  */
+export const FEATURE_FLAG_RESULT_REASON_VALUE_TARGETING_MATCH = "targeting_match" as const;
+
+/**
+  * Enum value "unknown" for attribute {@link ATTR_FEATURE_FLAG_RESULT_REASON}.
+  */
+export const FEATURE_FLAG_RESULT_REASON_VALUE_UNKNOWN = "unknown" as const;
 
 /**
  * A semantic identifier for an evaluated flag value.
@@ -3719,6 +3865,30 @@ export const ATTR_FEATURE_FLAG_SET_ID = 'feature_flag.set.id' as const;
  * provide additional context for understanding the meaning behind a value.
  * For example, the variant `red` maybe be used for the value `#c05543`.
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_FEATURE_FLAG_RESULT_VARIANT = 'feature_flag.result.variant' as const;
+
+/**
+ * The identifier of the [flag set](https://openfeature.dev/specification/glossary/#flag-set) to which the feature flag belongs.
+ *
+ * @example proj-1
+ * @example ab98sgs
+ * @example service1/dev
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_FEATURE_FLAG_SET_ID = 'feature_flag.set.id' as const;
+
+/**
+ * Deprecated, use `feature_flag.result.variant` instead.
+ *
+ * @example red
+ * @example true
+ * @example on
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `feature_flag.result.variant`.
  */
 export const ATTR_FEATURE_FLAG_VARIANT = 'feature_flag.variant' as const;
 
@@ -3909,6 +4079,167 @@ export const ATTR_FILE_SIZE = 'file.size' as const;
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ATTR_FILE_SYMBOLIC_LINK_TARGET_PATH = 'file.symbolic_link.target_path' as const;
+
+/**
+ * The container within GCP where the AppHub application is defined.
+ *
+ * @example projects/my-container-project
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_GCP_APPHUB_APPLICATION_CONTAINER = 'gcp.apphub.application.container' as const;
+
+/**
+ * The name of the application as configured in AppHub.
+ *
+ * @example my-application
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_GCP_APPHUB_APPLICATION_ID = 'gcp.apphub.application.id' as const;
+
+/**
+ * The GCP zone or region where the application is defined.
+ *
+ * @example us-central1
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_GCP_APPHUB_APPLICATION_LOCATION = 'gcp.apphub.application.location' as const;
+
+/**
+ * Criticality of a service indicates its importance to the business.
+ *
+ * @note [See AppHub type enum](https://cloud.google.com/app-hub/docs/reference/rest/v1/Attributes#type)
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_GCP_APPHUB_SERVICE_CRITICALITY_TYPE = 'gcp.apphub.service.criticality_type' as const;
+
+/**
+  * Enum value "HIGH" for attribute {@link ATTR_GCP_APPHUB_SERVICE_CRITICALITY_TYPE}.
+  */
+export const GCP_APPHUB_SERVICE_CRITICALITY_TYPE_VALUE_HIGH = "HIGH" as const;
+
+/**
+  * Enum value "LOW" for attribute {@link ATTR_GCP_APPHUB_SERVICE_CRITICALITY_TYPE}.
+  */
+export const GCP_APPHUB_SERVICE_CRITICALITY_TYPE_VALUE_LOW = "LOW" as const;
+
+/**
+  * Enum value "MEDIUM" for attribute {@link ATTR_GCP_APPHUB_SERVICE_CRITICALITY_TYPE}.
+  */
+export const GCP_APPHUB_SERVICE_CRITICALITY_TYPE_VALUE_MEDIUM = "MEDIUM" as const;
+
+/**
+  * Enum value "MISSION_CRITICAL" for attribute {@link ATTR_GCP_APPHUB_SERVICE_CRITICALITY_TYPE}.
+  */
+export const GCP_APPHUB_SERVICE_CRITICALITY_TYPE_VALUE_MISSION_CRITICAL = "MISSION_CRITICAL" as const;
+
+/**
+ * Environment of a service is the stage of a software lifecycle.
+ *
+ * @note [See AppHub environment type](https://cloud.google.com/app-hub/docs/reference/rest/v1/Attributes#type_1)
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE = 'gcp.apphub.service.environment_type' as const;
+
+/**
+  * Enum value "DEVELOPMENT" for attribute {@link ATTR_GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE}.
+  */
+export const GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_VALUE_DEVELOPMENT = "DEVELOPMENT" as const;
+
+/**
+  * Enum value "PRODUCTION" for attribute {@link ATTR_GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE}.
+  */
+export const GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_VALUE_PRODUCTION = "PRODUCTION" as const;
+
+/**
+  * Enum value "STAGING" for attribute {@link ATTR_GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE}.
+  */
+export const GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_VALUE_STAGING = "STAGING" as const;
+
+/**
+  * Enum value "TEST" for attribute {@link ATTR_GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE}.
+  */
+export const GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_VALUE_TEST = "TEST" as const;
+
+/**
+ * The name of the service as configured in AppHub.
+ *
+ * @example my-service
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_GCP_APPHUB_SERVICE_ID = 'gcp.apphub.service.id' as const;
+
+/**
+ * Criticality of a workload indicates its importance to the business.
+ *
+ * @note [See AppHub type enum](https://cloud.google.com/app-hub/docs/reference/rest/v1/Attributes#type)
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE = 'gcp.apphub.workload.criticality_type' as const;
+
+/**
+  * Enum value "HIGH" for attribute {@link ATTR_GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE}.
+  */
+export const GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_VALUE_HIGH = "HIGH" as const;
+
+/**
+  * Enum value "LOW" for attribute {@link ATTR_GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE}.
+  */
+export const GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_VALUE_LOW = "LOW" as const;
+
+/**
+  * Enum value "MEDIUM" for attribute {@link ATTR_GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE}.
+  */
+export const GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_VALUE_MEDIUM = "MEDIUM" as const;
+
+/**
+  * Enum value "MISSION_CRITICAL" for attribute {@link ATTR_GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE}.
+  */
+export const GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_VALUE_MISSION_CRITICAL = "MISSION_CRITICAL" as const;
+
+/**
+ * Environment of a workload is the stage of a software lifecycle.
+ *
+ * @note [See AppHub environment type](https://cloud.google.com/app-hub/docs/reference/rest/v1/Attributes#type_1)
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE = 'gcp.apphub.workload.environment_type' as const;
+
+/**
+  * Enum value "DEVELOPMENT" for attribute {@link ATTR_GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE}.
+  */
+export const GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_VALUE_DEVELOPMENT = "DEVELOPMENT" as const;
+
+/**
+  * Enum value "PRODUCTION" for attribute {@link ATTR_GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE}.
+  */
+export const GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_VALUE_PRODUCTION = "PRODUCTION" as const;
+
+/**
+  * Enum value "STAGING" for attribute {@link ATTR_GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE}.
+  */
+export const GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_VALUE_STAGING = "STAGING" as const;
+
+/**
+  * Enum value "TEST" for attribute {@link ATTR_GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE}.
+  */
+export const GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_VALUE_TEST = "TEST" as const;
+
+/**
+ * The name of the workload as configured in AppHub.
+ *
+ * @example my-workload
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_GCP_APPHUB_WORKLOAD_ID = 'gcp.apphub.workload.id' as const;
 
 /**
  * Identifies the Google Cloud service for which the official client library is intended.
@@ -7079,9 +7410,19 @@ export const ATTR_OTEL_COMPONENT_NAME = 'otel.component.name' as const;
 export const ATTR_OTEL_COMPONENT_TYPE = 'otel.component.type' as const;
 
 /**
+  * Enum value "batching_log_processor" for attribute {@link ATTR_OTEL_COMPONENT_TYPE}.
+  */
+export const OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR = "batching_log_processor" as const;
+
+/**
   * Enum value "batching_span_processor" for attribute {@link ATTR_OTEL_COMPONENT_TYPE}.
   */
 export const OTEL_COMPONENT_TYPE_VALUE_BATCHING_SPAN_PROCESSOR = "batching_span_processor" as const;
+
+/**
+  * Enum value "otlp_grpc_log_exporter" for attribute {@link ATTR_OTEL_COMPONENT_TYPE}.
+  */
+export const OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_LOG_EXPORTER = "otlp_grpc_log_exporter" as const;
 
 /**
   * Enum value "otlp_grpc_span_exporter" for attribute {@link ATTR_OTEL_COMPONENT_TYPE}.
@@ -7089,14 +7430,29 @@ export const OTEL_COMPONENT_TYPE_VALUE_BATCHING_SPAN_PROCESSOR = "batching_span_
 export const OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_SPAN_EXPORTER = "otlp_grpc_span_exporter" as const;
 
 /**
+  * Enum value "otlp_http_json_log_exporter" for attribute {@link ATTR_OTEL_COMPONENT_TYPE}.
+  */
+export const OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_LOG_EXPORTER = "otlp_http_json_log_exporter" as const;
+
+/**
   * Enum value "otlp_http_json_span_exporter" for attribute {@link ATTR_OTEL_COMPONENT_TYPE}.
   */
 export const OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_SPAN_EXPORTER = "otlp_http_json_span_exporter" as const;
 
 /**
+  * Enum value "otlp_http_log_exporter" for attribute {@link ATTR_OTEL_COMPONENT_TYPE}.
+  */
+export const OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_LOG_EXPORTER = "otlp_http_log_exporter" as const;
+
+/**
   * Enum value "otlp_http_span_exporter" for attribute {@link ATTR_OTEL_COMPONENT_TYPE}.
   */
 export const OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_SPAN_EXPORTER = "otlp_http_span_exporter" as const;
+
+/**
+  * Enum value "simple_log_processor" for attribute {@link ATTR_OTEL_COMPONENT_TYPE}.
+  */
+export const OTEL_COMPONENT_TYPE_VALUE_SIMPLE_LOG_PROCESSOR = "simple_log_processor" as const;
 
 /**
   * Enum value "simple_span_processor" for attribute {@link ATTR_OTEL_COMPONENT_TYPE}.
@@ -7549,6 +7905,11 @@ export const PROFILE_FRAME_TYPE_VALUE_CPYTHON = "cpython" as const;
 export const PROFILE_FRAME_TYPE_VALUE_DOTNET = "dotnet" as const;
 
 /**
+  * Enum value "go" for attribute {@link ATTR_PROFILE_FRAME_TYPE}.
+  */
+export const PROFILE_FRAME_TYPE_VALUE_GO = "go" as const;
+
+/**
   * Enum value "jvm" for attribute {@link ATTR_PROFILE_FRAME_TYPE}.
   */
 export const PROFILE_FRAME_TYPE_VALUE_JVM = "jvm" as const;
@@ -7577,6 +7938,11 @@ export const PROFILE_FRAME_TYPE_VALUE_PHP = "php" as const;
   * Enum value "ruby" for attribute {@link ATTR_PROFILE_FRAME_TYPE}.
   */
 export const PROFILE_FRAME_TYPE_VALUE_RUBY = "ruby" as const;
+
+/**
+  * Enum value "rust" for attribute {@link ATTR_PROFILE_FRAME_TYPE}.
+  */
+export const PROFILE_FRAME_TYPE_VALUE_RUST = "rust" as const;
 
 /**
   * Enum value "v8js" for attribute {@link ATTR_PROFILE_FRAME_TYPE}.
@@ -9241,6 +9607,49 @@ export const VCS_LINE_CHANGE_TYPE_VALUE_ADDED = "added" as const;
   * Enum value "removed" for attribute {@link ATTR_VCS_LINE_CHANGE_TYPE}.
   */
 export const VCS_LINE_CHANGE_TYPE_VALUE_REMOVED = "removed" as const;
+
+/**
+ * The group owner within the version control system.
+ *
+ * @example my-org
+ * @example myteam
+ * @example business-unit
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_VCS_OWNER_NAME = 'vcs.owner.name' as const;
+
+/**
+ * The name of the version control system provider.
+ *
+ * @example github
+ * @example gitlab
+ * @example gittea
+ * @example bitbucket
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_VCS_PROVIDER_NAME = 'vcs.provider.name' as const;
+
+/**
+  * Enum value "bitbucket" for attribute {@link ATTR_VCS_PROVIDER_NAME}.
+  */
+export const VCS_PROVIDER_NAME_VALUE_BITBUCKET = "bitbucket" as const;
+
+/**
+  * Enum value "github" for attribute {@link ATTR_VCS_PROVIDER_NAME}.
+  */
+export const VCS_PROVIDER_NAME_VALUE_GITHUB = "github" as const;
+
+/**
+  * Enum value "gitlab" for attribute {@link ATTR_VCS_PROVIDER_NAME}.
+  */
+export const VCS_PROVIDER_NAME_VALUE_GITLAB = "gitlab" as const;
+
+/**
+  * Enum value "gittea" for attribute {@link ATTR_VCS_PROVIDER_NAME}.
+  */
+export const VCS_PROVIDER_NAME_VALUE_GITTEA = "gittea" as const;
 
 /**
  * The name of the [reference](https://git-scm.com/docs/gitglossary#def_ref) such as **branch** or **tag** in the repository.
