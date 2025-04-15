@@ -35,10 +35,6 @@
 
 ---
 
-> [!WARNING]
-> This is the working branch for the work in progress 2.0 SDK, see [this tracking issue](https://github.com/open-telemetry/opentelemetry-js/issues/5148) for details.
-> If you are a user looking for the current released state, you are probably looking for the [1.x SDK](https://github.com/open-telemetry/opentelemetry-js/tree/v1.x) on the v1.x branch.
-
 ## About this project
 
 This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a framework for collecting traces, metrics, and logs from applications.
