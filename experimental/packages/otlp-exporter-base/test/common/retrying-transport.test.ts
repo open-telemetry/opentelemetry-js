@@ -19,7 +19,6 @@ import * as assert from 'assert';
 import { IExporterTransport } from '../../src';
 import { createRetryingTransport } from '../../src/retrying-transport';
 import { ExportResponse } from '../../src';
-import { assertRejects } from '../testHelper';
 
 const timeoutMillis = 1000000;
 
@@ -94,7 +93,7 @@ describe('RetryingTransport', function () {
       const transport = createRetryingTransport({ transport: mockTransport });
 
       // act
-      await assertRejects(() => transport.send(mockData, timeoutMillis));
+      await assert.rejects(() => transport.send(mockData, timeoutMillis));
 
       // assert
       sinon.assert.calledOnceWithExactly(
@@ -165,7 +164,7 @@ describe('RetryingTransport', function () {
       const transport = createRetryingTransport({ transport: mockTransport });
 
       // act
-      await assertRejects(() => transport.send(mockData, timeoutMillis));
+      await assert.rejects(() => transport.send(mockData, timeoutMillis));
 
       // assert
       sinon.assert.calledTwice(transportStubs.send);
