@@ -37,7 +37,6 @@ import {
   ExportResultCode,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
-import { assertRejects } from '../test-utils';
 import { TestMetricProducer } from './TestMetricProducer';
 import {
   assertAggregationSelector,
@@ -474,7 +473,7 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-      await assertRejects(
+      await assert.rejects(
         () => reader.forceFlush({ timeoutMillis: 20 }),
         TimeoutError
       );
@@ -491,7 +490,10 @@ describe('PeriodicExportingMetricReader', () => {
       });
       reader.setMetricProducer(new TestMetricProducer());
 
-      await assertRejects(() => reader.forceFlush(), /Error during forceFlush/);
+      await assert.rejects(
+        () => reader.forceFlush(),
+        /Error during forceFlush/
+      );
     });
 
     it('should not forceFlush exporter after shutdown', async () => {
@@ -604,7 +606,7 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-      await assertRejects(
+      await assert.rejects(
         () => reader.shutdown({ timeoutMillis: 20 }),
         TimeoutError
       );
@@ -638,7 +640,7 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 80,
       });
 
-      await assertRejects(() => reader.shutdown(), /Error during forceFlush/);
+      await assert.rejects(() => reader.shutdown(), /Error during forceFlush/);
     });
   });
 });
