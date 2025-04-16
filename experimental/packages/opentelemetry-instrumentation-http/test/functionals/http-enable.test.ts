@@ -223,6 +223,25 @@ describe('HttpInstrumentation', () => {
           serverPort
         );
       });
+
+      it('should remove auth from the `http.url` attribute (client side and server side)', async () => {
+        await httpRequest.get(
+          `${protocol}://user:pass@${hostname}:${serverPort}${pathname}`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        const [incomingSpan, outgoingSpan] = spans;
+        assert.strictEqual(spans.length, 2);
+        assert.strictEqual(incomingSpan.kind, SpanKind.SERVER);
+        assert.strictEqual(outgoingSpan.kind, SpanKind.CLIENT);
+        assert.strictEqual(
+          incomingSpan.attributes[SEMATTRS_HTTP_URL],
+          `${protocol}://${hostname}:${serverPort}${pathname}`
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes[SEMATTRS_HTTP_URL],
+          `${protocol}://${hostname}:${serverPort}${pathname}`
+        );
+      });
     });
 
     describe('partially disable instrumentation', () => {
@@ -1122,6 +1141,20 @@ describe('HttpInstrumentation', () => {
           [ATTR_URL_SCHEME]: protocol,
           [ATTR_URL_QUERY]: '',
         });
+      });
+
+      it('should remove auth from the `url.full` attribute (client side and server side)', async () => {
+        await httpRequest.get(
+          `${protocol}://user:pass@${hostname}:${serverPort}${pathname}`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        const [_, outgoingSpan] = spans;
+        assert.strictEqual(spans.length, 2);
+        assert.strictEqual(outgoingSpan.kind, SpanKind.CLIENT);
+        assert.strictEqual(
+          outgoingSpan.attributes[ATTR_URL_FULL],
+          `${protocol}://${hostname}:${serverPort}${pathname}`
+        );
       });
 
       it('should generate semconv 1.27 server spans with route when RPC metadata is available', async () => {
