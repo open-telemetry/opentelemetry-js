@@ -30,7 +30,6 @@ import {
   ATTR_HTTP_ROUTE,
   ATTR_NETWORK_PEER_ADDRESS,
   ATTR_NETWORK_PEER_PORT,
-  ATTR_NETWORK_PROTOCOL_NAME,
   ATTR_NETWORK_PROTOCOL_VERSION,
   ATTR_SERVER_ADDRESS,
   ATTR_SERVER_PORT,
@@ -378,29 +377,13 @@ export const getOutgoingRequestAttributes = (
 };
 
 /**
- * Returns attributes related to the kind of HTTP protocol used
- * @param {string} [kind] Kind of HTTP protocol used: "1.0", "1.1", "2", "SPDY" or "QUIC".
- */
-export const setAttributesFromHttpKind = (
-  kind: string | undefined,
-  attributes: Attributes
-): void => {
-  if (kind) {
-    const httpKinds = new Set(['1.0', '1.1', '2']);
-    if (!httpKinds.has(kind)) {
-      attributes[ATTR_NETWORK_PROTOCOL_NAME] = kind.toLowerCase();
-    }
-  }
-};
-
-/**
  * Returns outgoing request attributes scoped to the response data
  * @param {IncomingMessage} response the response object
  */
 export const getOutgoingRequestAttributesOnResponse = (
   response: IncomingMessage
 ): Attributes => {
-  const { statusCode, httpVersion, socket } = response;
+  const { statusCode, socket } = response;
   const stableAttributes: Attributes = {};
 
   if (statusCode != null) {
@@ -415,8 +398,6 @@ export const getOutgoingRequestAttributesOnResponse = (
     stableAttributes[ATTR_NETWORK_PEER_PORT] = remotePort;
     stableAttributes[ATTR_NETWORK_PROTOCOL_VERSION] = response.httpVersion;
   }
-
-  setAttributesFromHttpKind(httpVersion, stableAttributes);
 
   return stableAttributes;
 };
@@ -623,7 +604,6 @@ export const getIncomingRequestAttributes = (
   const headers = request.headers;
   const userAgent = headers['user-agent'];
   const method = request.method;
-  const httpVersion = request.httpVersion;
   const normalizedMethod = normalizeMethod(method);
 
   const serverAddress = getServerAddress(request, options.component);
@@ -666,7 +646,6 @@ export const getIncomingRequestAttributes = (
     newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
   }
 
-  setAttributesFromHttpKind(httpVersion, newAttributes);
   return Object.assign(newAttributes, options.hookAttributes);
 };
 

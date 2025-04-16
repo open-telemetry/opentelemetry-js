@@ -32,11 +32,9 @@ import {
 import {
   ATTR_CLIENT_ADDRESS,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
-  // ATTR_NETWORK_TRANSPORT,
   ATTR_SERVER_PORT,
   ATTR_NETWORK_PROTOCOL_NAME,
 } from '@opentelemetry/semantic-conventions';
-// import { NET_TRANSPORT_VALUE_IP_TCP } from '@opentelemetry/semantic-conventions/incubating';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as nock from 'nock';
