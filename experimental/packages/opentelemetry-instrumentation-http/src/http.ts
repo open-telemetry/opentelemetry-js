@@ -661,7 +661,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           spanAttributes[ATTR_NETWORK_PROTOCOL_VERSION];
       }
 
-      const ctx = propagation.extract(ROOT_CONTEXT, headers);
+      let ctx = propagation.extract(ROOT_CONTEXT, headers);
+      ctx = instrumentation.getConfig().contextHook?.(ctx, request) || ctx;
       const span = instrumentation._startHttpSpan(method, spanOptions, ctx);
       const rpcMetadata: RPCMetadata = {
         type: RPCType.HTTP,
