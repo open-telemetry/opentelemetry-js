@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1744733611392,
+  "lastUpdate": 1744829705804,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -30944,6 +30944,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.59%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "156056997+alumni55748@users.noreply.github.com",
+            "name": "miguel11nines",
+            "username": "alumni55748"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "fb2fdd293fcd2a4479d0ee10f1dfef12283225d7",
+          "message": "[core] migrate away from deprecated constants in sdk-info.ts (#5593)\n\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2025-04-16T18:45:44Z",
+          "tree_id": "c4006aa16ee5e8afc059d0964e8453044cc5afcd",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/fb2fdd293fcd2a4479d0ee10f1dfef12283225d7"
+        },
+        "date": 1744829704664,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1498210,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18388,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 830220,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 770081,
+            "range": "±0.67%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
