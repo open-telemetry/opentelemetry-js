@@ -53,7 +53,7 @@ function createResource(
   startTime: HrTime,
   addToStart: number
 ): PerformanceResourceTiming {
-  const fetchStart = core.hrTimeToNanoseconds(startTime) + 1;
+  const fetchStart = Number(core.hrTimeToNanoseconds(startTime)) + 1;
   const responseEnd = fetchStart + addToStart;
   const million = 1000 * 1000; // used to convert nano to milli
   const defaultResource = {
@@ -366,7 +366,9 @@ describe('utils', function () {
     beforeEach(() => {
       const time = createHrTime(startTime, 500);
       sinon.stub(performance, 'timeOrigin').value(0);
-      sinon.stub(performance, 'now').callsFake(() => hrTimeToNanoseconds(time));
+      sinon
+        .stub(performance, 'now')
+        .callsFake(() => Number(hrTimeToNanoseconds(time)));
     });
 
     describe('when resources are empty', function () {

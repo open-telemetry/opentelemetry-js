@@ -150,6 +150,8 @@ describe('PeriodicExportingMetricReader', () => {
               // Sample hr time datapoints.
               startTime: [12345, 678901234],
               endTime: [12345, 678901234],
+              startTimeUnixNano: 12345678901234n,
+              endTimeUnixNano: 12345678901234n,
               attributes: {},
               value: 1,
             },

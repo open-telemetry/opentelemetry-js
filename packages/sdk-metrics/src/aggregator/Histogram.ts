@@ -25,10 +25,10 @@ import {
   HistogramMetricData,
   InstrumentType,
 } from '../export/MetricData';
-import { HrTime } from '@opentelemetry/api';
 import { binarySearchUB, Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
+import { nanosToHrTime } from '@opentelemetry/core';
 
 /**
  * Internal value type for HistogramAggregation.
@@ -65,7 +65,7 @@ function createNewEmptyCheckpoint(boundaries: number[]): InternalHistogram {
 
 export class HistogramAccumulation implements Accumulation {
   constructor(
-    public startTime: HrTime,
+    public startTimeUnixNano: bigint,
     private readonly _boundaries: number[],
     private _recordMinMax = true,
     private _current: InternalHistogram = createNewEmptyCheckpoint(_boundaries)
@@ -91,8 +91,8 @@ export class HistogramAccumulation implements Accumulation {
     this._current.buckets.counts[idx] += 1;
   }
 
-  setStartTime(startTime: HrTime): void {
-    this.startTime = startTime;
+  setStartTime(startTimeUnixNano: bigint): void {
+    this.startTimeUnixNano = startTimeUnixNano;
   }
 
   toPointValue(): InternalHistogram {
@@ -116,9 +116,9 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
     private readonly _recordMinMax: boolean
   ) {}
 
-  createAccumulation(startTime: HrTime) {
+  createAccumulation(startTimeUnixNano: bigint) {
     return new HistogramAccumulation(
-      startTime,
+      startTimeUnixNano,
       this._boundaries,
       this._recordMinMax
     );
@@ -161,7 +161,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
     }
 
     return new HistogramAccumulation(
-      previous.startTime,
+      previous.startTimeUnixNano,
       previousValue.buckets.boundaries,
       this._recordMinMax,
       {
@@ -199,7 +199,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
     }
 
     return new HistogramAccumulation(
-      current.startTime,
+      current.startTimeUnixNano,
       previousValue.buckets.boundaries,
       this._recordMinMax,
       {
@@ -220,7 +220,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
     descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<HistogramAccumulation>[],
-    endTime: HrTime
+    endTimeUnixNano: bigint
   ): Maybe<HistogramMetricData> {
     return {
       descriptor,
@@ -238,8 +238,10 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
 
         return {
           attributes,
-          startTime: accumulation.startTime,
-          endTime,
+          startTimeUnixNano: accumulation.startTimeUnixNano,
+          startTime: nanosToHrTime(accumulation.startTimeUnixNano),
+          endTimeUnixNano,
+          endTime: nanosToHrTime(endTimeUnixNano),
           value: {
             min: pointValue.hasMinMax ? pointValue.min : undefined,
             max: pointValue.hasMinMax ? pointValue.max : undefined,

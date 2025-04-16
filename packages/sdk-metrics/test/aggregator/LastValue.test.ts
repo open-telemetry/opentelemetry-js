@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { AggregationTemporality } from '../../src';
@@ -39,7 +38,7 @@ describe('LastValueAggregator', () => {
   describe('createAccumulation', () => {
     it('no exceptions on createAccumulation', () => {
       const aggregator = new LastValueAggregator();
-      const accumulation = aggregator.createAccumulation([0, 0]);
+      const accumulation = aggregator.createAccumulation(0n);
       assert.ok(accumulation instanceof LastValueAccumulation);
     });
   });
@@ -47,21 +46,21 @@ describe('LastValueAggregator', () => {
   describe('merge', () => {
     it('no exceptions', () => {
       const aggregator = new LastValueAggregator();
-      const prev = aggregator.createAccumulation([0, 0]);
-      const delta = aggregator.createAccumulation([1, 1]);
+      const prev = aggregator.createAccumulation(0n);
+      const delta = aggregator.createAccumulation(1_000_000_001n);
 
       prev.record(2);
       delta.record(3);
 
-      const expected = new LastValueAccumulation([0, 0], 3, delta.sampleTime);
+      const expected = new LastValueAccumulation(0n, 3, delta.sampleTime);
 
       assert.deepStrictEqual(aggregator.merge(prev, delta), expected);
     });
 
     it('return the newly sampled accumulation', () => {
       const aggregator = new LastValueAggregator();
-      const accumulation1 = aggregator.createAccumulation([0, 0]);
-      const accumulation2 = aggregator.createAccumulation([1, 1]);
+      const accumulation1 = aggregator.createAccumulation(0n);
+      const accumulation2 = aggregator.createAccumulation(1_000_000_001n);
 
       accumulation1.record(2);
       clock.tick(100);
@@ -73,7 +72,7 @@ describe('LastValueAggregator', () => {
       assert.deepStrictEqual(
         aggregator.merge(accumulation1, accumulation2),
         new LastValueAccumulation(
-          accumulation1.startTime,
+          accumulation1.startTimeUnixNano,
           4,
           accumulation1.sampleTime
         )
@@ -81,7 +80,7 @@ describe('LastValueAggregator', () => {
       assert.deepStrictEqual(
         aggregator.merge(accumulation2, accumulation1),
         new LastValueAccumulation(
-          accumulation2.startTime,
+          accumulation2.startTimeUnixNano,
           4,
           accumulation1.sampleTime
         )
@@ -92,21 +91,25 @@ describe('LastValueAggregator', () => {
   describe('diff', () => {
     it('no exceptions', () => {
       const aggregator = new LastValueAggregator();
-      const prev = aggregator.createAccumulation([0, 0]);
-      const curr = aggregator.createAccumulation([1, 1]);
+      const prev = aggregator.createAccumulation(0n);
+      const curr = aggregator.createAccumulation(1_000_000_001n);
 
       prev.record(2);
       curr.record(3);
 
-      const expected = new LastValueAccumulation([1, 1], 3, curr.sampleTime);
+      const expected = new LastValueAccumulation(
+        1_000_000_001n,
+        3,
+        curr.sampleTime
+      );
 
       assert.deepStrictEqual(aggregator.diff(prev, curr), expected);
     });
 
     it('return the newly sampled accumulation', () => {
       const aggregator = new LastValueAggregator();
-      const accumulation1 = aggregator.createAccumulation([0, 0]);
-      const accumulation2 = aggregator.createAccumulation([1, 1]);
+      const accumulation1 = aggregator.createAccumulation(0n);
+      const accumulation2 = aggregator.createAccumulation(1_000_000_001n);
 
       accumulation1.record(2);
       accumulation2.record(3);
@@ -117,7 +120,7 @@ describe('LastValueAggregator', () => {
       assert.deepStrictEqual(
         aggregator.diff(accumulation1, accumulation2),
         new LastValueAccumulation(
-          accumulation2.startTime,
+          accumulation2.startTimeUnixNano,
           4,
           accumulation1.sampleTime
         )
@@ -125,7 +128,7 @@ describe('LastValueAggregator', () => {
       assert.deepStrictEqual(
         aggregator.diff(accumulation2, accumulation1),
         new LastValueAccumulation(
-          accumulation1.startTime,
+          accumulation1.startTimeUnixNano,
           4,
           accumulation1.sampleTime
         )
@@ -137,9 +140,9 @@ describe('LastValueAggregator', () => {
     it('transform without exception', () => {
       const aggregator = new LastValueAggregator();
 
-      const startTime: HrTime = [0, 0];
-      const endTime: HrTime = [1, 1];
-      const accumulation = aggregator.createAccumulation(startTime);
+      const startTimeUnixNano = 0n;
+      const endTimeUnixNano = 1_000_000_001n;
+      const accumulation = aggregator.createAccumulation(startTimeUnixNano);
       accumulation.record(1);
       accumulation.record(2);
       accumulation.record(1);
@@ -152,8 +155,10 @@ describe('LastValueAggregator', () => {
         dataPoints: [
           {
             attributes: {},
-            startTime,
-            endTime,
+            startTimeUnixNano,
+            endTimeUnixNano,
+            startTime: [0, 0],
+            endTime: [1, 1],
             value: 4,
           },
         ],
@@ -163,7 +168,7 @@ describe('LastValueAggregator', () => {
           defaultInstrumentDescriptor,
           AggregationTemporality.CUMULATIVE,
           [[{}, accumulation]],
-          endTime
+          endTimeUnixNano
         ),
         expected
       );
@@ -174,7 +179,7 @@ describe('LastValueAggregator', () => {
 describe('LastValueAccumulation', () => {
   describe('record', () => {
     it('no exceptions on record', () => {
-      const accumulation = new LastValueAccumulation([0, 0]);
+      const accumulation = new LastValueAccumulation(0n);
 
       for (const value of commonValues) {
         accumulation.record(value);
@@ -184,9 +189,9 @@ describe('LastValueAccumulation', () => {
 
   describe('setStartTime', () => {
     it('should set start time', () => {
-      const accumulation = new LastValueAccumulation([0, 0]);
-      accumulation.setStartTime([1, 1]);
-      assert.deepStrictEqual(accumulation.startTime, [1, 1]);
+      const accumulation = new LastValueAccumulation(0n);
+      accumulation.setStartTime(1_000_000_001n);
+      assert.deepStrictEqual(accumulation.startTimeUnixNano, 1_000_000_001n);
     });
   });
 });

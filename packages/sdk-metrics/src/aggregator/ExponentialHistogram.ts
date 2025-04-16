@@ -26,7 +26,7 @@ import {
   ExponentialHistogramMetricData,
   InstrumentType,
 } from '../export/MetricData';
-import { diag, HrTime } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
@@ -34,6 +34,7 @@ import { Buckets } from './exponential-histogram/Buckets';
 import { getMapping } from './exponential-histogram/mapping/getMapping';
 import { Mapping } from './exponential-histogram/mapping/types';
 import { nextGreaterSquare } from './exponential-histogram/util';
+import { nanosToHrTime } from '@opentelemetry/core';
 
 /**
  * Internal value type for ExponentialHistogramAggregation.
@@ -65,7 +66,7 @@ const MIN_MAX_SIZE = 2;
 
 export class ExponentialHistogramAccumulation implements Accumulation {
   constructor(
-    public startTime: HrTime = startTime,
+    public startTimeUnixNano: bigint = startTimeUnixNano,
     private _maxSize = DEFAULT_MAX_SIZE,
     private _recordMinMax = true,
     private _sum = 0,
@@ -94,15 +95,14 @@ export class ExponentialHistogramAccumulation implements Accumulation {
 
   /**
    * Sets the start time for this accumulation
-   * @param {HrTime} startTime
+   * @param {bigint} startTimeUnixNano
    */
-  setStartTime(startTime: HrTime): void {
-    this.startTime = startTime;
+  setStartTime(startTimeUnixNano: bigint): void {
+    this.startTimeUnixNano = startTimeUnixNano;
   }
 
   /**
    * Returns the datapoint representation of this accumulation
-   * @param {HrTime} startTime
    */
   toPointValue(): InternalHistogram {
     return {
@@ -239,7 +239,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
       }
     }
 
-    this.startTime = previous.startTime;
+    this.startTimeUnixNano = previous.startTimeUnixNano;
     this._sum += previous.sum;
     this._count += previous.count;
     this._zeroCount += previous.zeroCount;
@@ -277,7 +277,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
    */
   clone(): ExponentialHistogramAccumulation {
     return new ExponentialHistogramAccumulation(
-      this.startTime,
+      this.startTimeUnixNano,
       this._maxSize,
       this._recordMinMax,
       this._sum,
@@ -531,9 +531,9 @@ export class ExponentialHistogramAggregator
     private readonly _recordMinMax: boolean
   ) {}
 
-  createAccumulation(startTime: HrTime) {
+  createAccumulation(startTimeUnixNano: bigint) {
     return new ExponentialHistogramAccumulation(
-      startTime,
+      startTimeUnixNano,
       this._maxSize,
       this._recordMinMax
     );
@@ -569,7 +569,7 @@ export class ExponentialHistogramAggregator
     descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<ExponentialHistogramAccumulation>[],
-    endTime: HrTime
+    endTimeUnixNano: bigint
   ): Maybe<ExponentialHistogramMetricData> {
     return {
       descriptor,
@@ -587,8 +587,10 @@ export class ExponentialHistogramAggregator
 
         return {
           attributes,
-          startTime: accumulation.startTime,
-          endTime,
+          startTimeUnixNano: accumulation.startTimeUnixNano,
+          startTime: nanosToHrTime(accumulation.startTimeUnixNano),
+          endTimeUnixNano,
+          endTime: nanosToHrTime(endTimeUnixNano),
           value: {
             min: pointValue.hasMinMax ? pointValue.min : undefined,
             max: pointValue.hasMinMax ? pointValue.max : undefined,

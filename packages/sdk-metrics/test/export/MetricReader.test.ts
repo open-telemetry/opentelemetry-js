@@ -50,7 +50,9 @@ const testScopeMetrics: ScopeMetrics[] = [
           {
             attributes: {},
             value: 1,
+            startTimeUnixNano: 0n,
             startTime: [0, 0],
+            endTimeUnixNano: 1_000_000_000n,
             endTime: [1, 0],
           },
         ],
