@@ -1160,7 +1160,6 @@ describe('HttpInstrumentation', () => {
           [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
           [ATTR_URL_PATH]: `${pathname}/setroute`,
           [ATTR_URL_SCHEME]: protocol,
-          [ATTR_URL_QUERY]: '',
         });
       });
     });
