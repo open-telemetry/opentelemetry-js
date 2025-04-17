@@ -304,7 +304,7 @@ describe('Utility', () => {
       );
       const path = String(attributes[ATTR_URL_PATH] ?? '');
       const query = String(attributes[ATTR_URL_QUERY] ?? '');
-      assert.strictEqual(path + query, '/user/?q=val');
+      assert.strictEqual(path + '?' + query, '/user/?q=val');
     });
   });
 
