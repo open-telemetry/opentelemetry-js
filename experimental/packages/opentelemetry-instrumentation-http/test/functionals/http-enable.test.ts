@@ -42,7 +42,6 @@ import {
   ATTR_SERVER_PORT,
   ATTR_URL_FULL,
   ATTR_URL_PATH,
-  ATTR_URL_QUERY,
   ATTR_URL_SCHEME,
   HTTP_REQUEST_METHOD_VALUE_GET,
 } from '@opentelemetry/semantic-conventions';

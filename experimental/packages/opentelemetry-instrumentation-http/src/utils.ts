@@ -629,8 +629,9 @@ export const getIncomingRequestAttributes = (
     newAttributes[ATTR_URL_PATH] = parsedUrl.pathname;
   }
 
-  if (parsedUrl?.search != null) {
-    newAttributes[ATTR_URL_QUERY] = parsedUrl.search;
+  if (parsedUrl.search) {
+    // Remove leading '?' from URL search (https://developer.mozilla.org/en-US/docs/Web/API/URL/search).
+    newAttributes[ATTR_URL_QUERY] = parsedUrl.search.slice(1);  
   }
 
   if (remoteClientAddress != null) {
