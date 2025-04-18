@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, AttributeValue, diag } from '@opentelemetry/api';
+import { Attributes, diag } from '@opentelemetry/api';
 import { SDK_INFO } from '@opentelemetry/core';
 import {
   ATTR_SERVICE_NAME,
@@ -27,10 +27,11 @@ import { defaultServiceName } from './platform';
 import {
   DetectedResource,
   DetectedResourceAttributes,
-  MaybePromise,
+  EntityRef,
   RawResourceAttribute,
 } from './types';
 import { isPromiseLike } from './utils';
+import { Entity, mergeEntities } from './entity';
 
 class ResourceImpl implements Resource {
   private _rawAttributes: RawResourceAttribute[];
@@ -38,39 +39,45 @@ class ResourceImpl implements Resource {
 
   private _memoizedAttributes?: Attributes;
 
-  static FromAttributeList(
-    attributes: [string, MaybePromise<AttributeValue | undefined>][]
-  ): Resource {
-    const res = new ResourceImpl({});
-    res._rawAttributes = guardedRawAttributes(attributes);
-    res._asyncAttributesPending =
-      attributes.filter(([_, val]) => isPromiseLike(val)).length > 0;
-    return res;
-  }
+  private _entities: Entity[];
+  private _entityRefs: EntityRef[];
 
-  constructor(
-    /**
-     * A dictionary of attributes with string keys and values that provide
-     * information about the entity as numbers, strings or booleans
-     * TODO: Consider to add check/validation on attributes.
-     */
-    resource: DetectedResource
-  ) {
-    const attributes = resource.attributes ?? {};
-    this._rawAttributes = Object.entries(attributes).map(([k, v]) => {
-      if (isPromiseLike(v)) {
+  constructor(rawAttributes: RawResourceAttribute[], entities: Entity[]) {
+    this._rawAttributes = rawAttributes;
+    this._entities = entities;
+
+    for (const attr of rawAttributes) {
+      if (isPromiseLike(attr[1])) {
         // side-effect
         this._asyncAttributesPending = true;
       }
+    }
 
-      return [k, v];
+    this._entityRefs = this._entities.map(entity => {
+      if (entity.asyncAttributesPending) {
+        this._asyncAttributesPending = true;
+      }
+
+      return {
+        type: entity.type,
+        identifyingAttributeKeys: Object.keys(entity.identifier),
+        descriptiveAttributeKeys: entity.attributes
+          ? Object.keys(entity.attributes)
+          : [],
+      };
     });
 
     this._rawAttributes = guardedRawAttributes(this._rawAttributes);
   }
 
   public get asyncAttributesPending(): boolean {
-    return this._asyncAttributesPending;
+    return (
+      this._asyncAttributesPending ||
+      this._entities.reduce<boolean>(
+        (p, c) => p || c.asyncAttributesPending,
+        false
+      )
+    );
   }
 
   public async waitForAsyncAttributes(): Promise<void> {
@@ -81,6 +88,10 @@ class ResourceImpl implements Resource {
     for (let i = 0; i < this._rawAttributes.length; i++) {
       const [k, v] = this._rawAttributes[i];
       this._rawAttributes[i] = [k, isPromiseLike(v) ? await v : v];
+    }
+
+    for (const e of this._entities) {
+      await e.waitForAsyncAttributes();
     }
 
     this._asyncAttributesPending = false;
@@ -98,6 +109,20 @@ class ResourceImpl implements Resource {
     }
 
     const attrs: Attributes = {};
+
+    for (const e of this._entities) {
+      for (const [k, v] of Object.entries(e.identifier)) {
+        if (v != null) {
+          attrs[k] = v;
+        }
+      }
+      if (e.attributes) {
+        for (const [k, v] of Object.entries(e.attributes)) {
+          attrs[k] ??= v;
+        }
+      }
+    }
+
     for (const [k, v] of this._rawAttributes) {
       if (isPromiseLike(v)) {
         diag.debug(`Unsettled resource attribute ${k} skipped`);
@@ -116,6 +141,14 @@ class ResourceImpl implements Resource {
     return attrs;
   }
 
+  public get entityRefs() {
+    return this._entityRefs;
+  }
+
+  public get entities() {
+    return this._entities;
+  }
+
   public getRawAttributes(): RawResourceAttribute[] {
     return this._rawAttributes;
   }
@@ -125,23 +158,27 @@ class ResourceImpl implements Resource {
 
     // Order is important
     // Spec states incoming attributes override existing attributes
-    return ResourceImpl.FromAttributeList([
-      ...resource.getRawAttributes(),
-      ...this.getRawAttributes(),
-    ]);
+    const attrs = [...resource.getRawAttributes(), ...this.getRawAttributes()];
+
+    // TODO order opposite?
+    const entities = mergeEntities(...this._entities, ...resource.entities);
+
+    return new ResourceImpl(attrs, entities);
   }
 }
 
 export function resourceFromAttributes(
   attributes: DetectedResourceAttributes
 ): Resource {
-  return ResourceImpl.FromAttributeList(Object.entries(attributes));
+  return new ResourceImpl(Object.entries(attributes), []);
 }
 
 export function resourceFromDetectedResource(
   detectedResource: DetectedResource
 ): Resource {
-  return new ResourceImpl(detectedResource);
+  const entities = (detectedResource.entities ?? []).map(e => new Entity(e));
+  const rawAttributes = Object.entries(detectedResource.attributes ?? {});
+  return new ResourceImpl(rawAttributes, entities);
 }
 
 export function emptyResource(): Resource {
