@@ -629,6 +629,8 @@ Usage of the deprecated `SpanAttributes` and `MetricAttributes` types from the A
 
 - bumped minimum version of `@opentelemetry/api` peer dependency to 1.1.0 for the following packages: `@opentelemetry/core` [#4408](https://github.com/open-telemetry/opentelemetry-js/pull/4408), `@opentelemetry/resources` [#4428](https://github.com/open-telemetry/opentelemetry-js/pull/4428), `@opentelemetry/sdk-trace-base` [#5009](https://github.com/open-telemetry/opentelemetry-js/pull/5009), `@opentelemetry/shim-opentracing` [#4430](https://github.com/open-telemetry/opentelemetry-js/pull/4430)
 
+- if using the Jest test framework, Jest v29.4 or higher is required due to several packages using submodule imports. Look for test failures of the form `Cannot find module @opentelemetry/foo/bar from @opentelemetry/...` where you can see that the `@opentelemetry/foo` package is installed. The issue is that earlier versions of `jest-resolve` cannot find the nested module import.  [#5618](https://github.com/open-telemetry/opentelemetry-js/issues/5618)
+
 <br/>
 
 And finally:
