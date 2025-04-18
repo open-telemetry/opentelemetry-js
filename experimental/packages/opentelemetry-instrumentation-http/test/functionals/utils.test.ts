@@ -469,6 +469,10 @@ describe('Utility', () => {
         diag
       );
       assert.strictEqual(attributes[SEMATTRS_HTTP_TARGET], '/user/?q=val');
+      assert.strictEqual(
+        attributes[ATTR_USER_AGENT_SYNTHETIC_TYPE],
+        undefined
+      );
     });
 
     it('should set synthetic attributes on requests', () => {
