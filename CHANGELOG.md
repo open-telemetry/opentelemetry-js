@@ -23,6 +23,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :books: Documentation
 
+* refactor(metrics): Updated metrics samples to no longer treat `sdk.start()` as async [#5617](https://github.com/open-telemetry/opentelemetry-js/pull/5617) @JacksonWeber
+
 ### :house: Internal
 
 * test(sdk-metrics): fix multiple problematic assertRejects() calls [#5611](https://github.com/open-telemetry/opentelemetry-js/pull/5611) @cjihrig
