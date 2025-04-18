@@ -20,6 +20,7 @@ import {
   context,
   SpanKind,
   DiagLogger,
+  AttributeValue,
 } from '@opentelemetry/api';
 import {
   ATTR_CLIENT_ADDRESS,
@@ -65,6 +66,7 @@ import {
 import {
   IncomingHttpHeaders,
   IncomingMessage,
+  OutgoingHttpHeader,
   OutgoingHttpHeaders,
   RequestOptions,
   ServerResponse,
@@ -77,7 +79,14 @@ import {
   IgnoreMatcher,
   ParsedRequestOptions,
   SemconvStability,
+  SYNTHETIC_BOT_NAMES,
+  SYNTHETIC_TEST_NAMES,
 } from './internal-types';
+import {
+  ATTR_USER_AGENT_SYNTHETIC_TYPE,
+  USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
+  USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST,
+} from './semconv';
 import forwardedParse = require('forwarded-parse');
 
 /**
@@ -442,7 +451,8 @@ export const getOutgoingRequestAttributes = (
     port: string | number;
     hookAttributes?: Attributes;
   },
-  semconvStability: SemconvStability
+  semconvStability: SemconvStability,
+  enableSyntheticSourceDetection: boolean
 ): Attributes => {
   const hostname = options.hostname;
   const port = options.port;
@@ -485,6 +495,10 @@ export const getOutgoingRequestAttributes = (
     oldAttributes[SEMATTRS_HTTP_USER_AGENT] = userAgent;
   }
 
+  if (enableSyntheticSourceDetection && userAgent) {
+    newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] = getSyntheticType(userAgent);
+  }
+
   switch (semconvStability) {
     case SemconvStability.STABLE:
       return Object.assign(newAttributes, options.hookAttributes);
@@ -493,6 +507,27 @@ export const getOutgoingRequestAttributes = (
   }
 
   return Object.assign(oldAttributes, newAttributes, options.hookAttributes);
+};
+
+/**
+ * Returns the type of synthetic source based on the user agent
+ * @param {OutgoingHttpHeader} userAgent the user agent string
+ */
+const getSyntheticType = (
+  userAgent: OutgoingHttpHeader
+): AttributeValue | undefined => {
+  const userAgentString: string = String(userAgent).toLowerCase();
+  for (const name of SYNTHETIC_TEST_NAMES) {
+    if (userAgentString.includes(name)) {
+      return USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST;
+    }
+  }
+  for (const name of SYNTHETIC_BOT_NAMES) {
+    if (userAgentString.includes(name)) {
+      return USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT;
+    }
+  }
+  return;
 };
 
 /**
@@ -791,6 +826,7 @@ export const getIncomingRequestAttributes = (
     serverName?: string;
     hookAttributes?: Attributes;
     semconvStability: SemconvStability;
+    enableSyntheticSourceDetection: boolean;
   },
   logger: DiagLogger
 ): Attributes => {
@@ -840,6 +876,10 @@ export const getIncomingRequestAttributes = (
   // conditionally required if request method required case normalization
   if (method !== normalizedMethod) {
     newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
+  }
+
+  if (options.enableSyntheticSourceDetection && userAgent) {
+    newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] = getSyntheticType(userAgent);
   }
 
   const oldAttributes: Attributes = {

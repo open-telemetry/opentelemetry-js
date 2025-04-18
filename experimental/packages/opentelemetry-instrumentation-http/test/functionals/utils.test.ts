@@ -28,6 +28,7 @@ import {
   SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
   SEMATTRS_HTTP_ROUTE,
   SEMATTRS_HTTP_TARGET,
+  ATTR_USER_AGENT_ORIGINAL,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import { IncomingMessage, ServerResponse } from 'http';
@@ -39,6 +40,10 @@ import {
   ParsedRequestOptions,
   SemconvStability,
 } from '../../src/internal-types';
+import {
+  ATTR_USER_AGENT_SYNTHETIC_TYPE,
+  USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
+} from '../../src/semconv';
 import * as utils from '../../src/utils';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
@@ -438,6 +443,7 @@ describe('Utility', () => {
         {
           component: 'http',
           semconvStability: SemconvStability.OLD,
+          enableSyntheticSourceDetection: false,
         },
         diag
       );
@@ -458,10 +464,40 @@ describe('Utility', () => {
         {
           component: 'http',
           semconvStability: SemconvStability.OLD,
+          enableSyntheticSourceDetection: false,
         },
         diag
       );
       assert.strictEqual(attributes[SEMATTRS_HTTP_TARGET], '/user/?q=val');
+      assert.strictEqual(
+        attributes[ATTR_USER_AGENT_SYNTHETIC_TYPE],
+        undefined
+      );
+    });
+
+    it('should set synthetic attributes on requests', () => {
+      const request = {
+        url: 'http://hostname/user/:id',
+        method: 'GET',
+        socket: {},
+      } as IncomingMessage;
+      request.headers = {
+        'user-agent': 'Googlebot',
+      };
+      const attributes = utils.getIncomingRequestAttributes(
+        request,
+        {
+          component: 'http',
+          semconvStability: SemconvStability.STABLE,
+          enableSyntheticSourceDetection: true,
+        },
+        diag
+      );
+      assert.strictEqual(attributes[ATTR_USER_AGENT_ORIGINAL], 'Googlebot');
+      assert.strictEqual(
+        attributes[ATTR_USER_AGENT_SYNTHETIC_TYPE],
+        USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT
+      );
     });
   });
 
