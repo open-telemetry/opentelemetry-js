@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-import { VERSION } from '../../version';
-import {
-  ATTR_TELEMETRY_SDK_NAME,
-  ATTR_TELEMETRY_SDK_LANGUAGE,
-  TELEMETRY_SDK_LANGUAGE_VALUE_WEBJS,
-  ATTR_TELEMETRY_SDK_VERSION,
-} from '@opentelemetry/semantic-conventions';
-import { ATTR_PROCESS_RUNTIME_NAME } from '../../semconv';
+/*
+ * This file contains a copy of unstable semantic convention definitions
+ * used by this package.
+ * @see https://github.com/open-telemetry/opentelemetry-js/tree/main/semantic-conventions#unstable-semconv
+ */
 
-/** Constants describing the SDK in use */
-export const SDK_INFO = {
-  [ATTR_TELEMETRY_SDK_NAME]: 'opentelemetry',
-  [ATTR_PROCESS_RUNTIME_NAME]: 'browser',
-  [ATTR_TELEMETRY_SDK_LANGUAGE]: TELEMETRY_SDK_LANGUAGE_VALUE_WEBJS,
-  [ATTR_TELEMETRY_SDK_VERSION]: VERSION,
-};
+/**
+ * The name of the runtime of this process.
+ *
+ * @example OpenJDK Runtime Environment
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_PROCESS_RUNTIME_NAME = 'process.runtime.name' as const;
