@@ -489,7 +489,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
                   request,
                   response
                 ),
-              () => {},
+              () => { },
               true
             );
           }
@@ -735,7 +735,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       }
       const extraOptions =
         typeof args[0] === 'object' &&
-        (typeof options === 'string' || options instanceof url.URL)
+          (typeof options === 'string' || options instanceof url.URL)
           ? (args.shift() as http.RequestOptions)
           : undefined;
       const { method, invalidUrl, optionsParsed } = getRequestInfo(
@@ -817,9 +817,24 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       } else {
         // Make a copy of the headers object to avoid mutating an object the
         // caller might have a reference to.
-        optionsParsed.headers = Object.assign({}, optionsParsed.headers);
+        if (optionsParsed.headers instanceof Array) {
+          optionsParsed.headers = [...optionsParsed.headers];
+        } else {
+          optionsParsed.headers = Object.assign({}, optionsParsed.headers);
+        }
       }
-      propagation.inject(requestContext, optionsParsed.headers);
+
+      if (optionsParsed.headers instanceof Array) {
+          debugger;
+        propagation.inject(requestContext, optionsParsed.headers, {
+          set(carrier, key, value) {
+            // We copied the array earlier so we are not actually modifying the original array
+            (carrier as string[]).push(key, value);
+          },
+        });
+      } else {
+        propagation.inject(requestContext, optionsParsed.headers);
+      }
 
       return context.with(requestContext, () => {
         /*
@@ -916,7 +931,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             request,
             response
           ),
-        () => {},
+        () => { },
         true
       );
     }
@@ -1013,7 +1028,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   ) {
     safeExecuteInTheMiddle(
       () => this.getConfig().responseHook!(span, response),
-      () => {},
+      () => { },
       true
     );
   }
@@ -1024,7 +1039,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   ) {
     safeExecuteInTheMiddle(
       () => this.getConfig().requestHook!(span, request),
-      () => {},
+      () => { },
       true
     );
   }
@@ -1036,7 +1051,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     if (typeof hookFunc === 'function') {
       return safeExecuteInTheMiddle(
         () => hookFunc(request),
-        () => {},
+        () => { },
         true
       );
     }

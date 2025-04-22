@@ -88,7 +88,7 @@ instrumentation.disable();
 
 import * as http from 'http';
 import { AttributeNames } from '../../src/enums/AttributeNames';
-import { getRemoteClientAddress } from '../../src/utils';
+import { getRemoteClientAddress, normalizeHeaders } from '../../src/utils';
 
 const applyCustomAttributesOnSpanErrorMessage =
   'bad applyCustomAttributesOnSpan function';
@@ -148,13 +148,13 @@ export const responseHookFunction = (
 export const startIncomingSpanHookFunction = (
   request: IncomingMessage
 ): Attributes => {
-  return { guid: request.headers?.guid };
+  return { guid: normalizeHeaders(request.headers).guid };
 };
 
 export const startOutgoingSpanHookFunction = (
   request: RequestOptions
 ): Attributes => {
-  return { guid: request.headers?.guid };
+  return { guid: normalizeHeaders(request.headers).guid };
 };
 
 describe('HttpInstrumentation', () => {
@@ -216,6 +216,40 @@ describe('HttpInstrumentation', () => {
             headers: {
               'user-agent': 'tester',
             },
+          }
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        const [incomingSpan, outgoingSpan] = spans;
+        const validations = {
+          hostname,
+          httpStatusCode: result.statusCode!,
+          httpMethod: result.method!,
+          pathname,
+          resHeaders: result.resHeaders,
+          reqHeaders: result.reqHeaders,
+          component: 'http',
+        };
+
+        assert.strictEqual(spans.length, 2);
+        assertSpan(incomingSpan, SpanKind.SERVER, validations);
+        assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
+        assert.strictEqual(
+          incomingSpan.attributes[ATTR_NET_HOST_PORT],
+          serverPort
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes[ATTR_NET_PEER_PORT],
+          serverPort
+        );
+      });
+
+      it('should generate valid spans with array headers (client side and server side)', async () => {
+        const result = await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${pathname}`,
+          {
+            headers: [
+              'user-agent', 'tester',
+            ],
           }
         );
         const spans = memoryExporter.getFinishedSpans();
@@ -325,9 +359,10 @@ describe('HttpInstrumentation', () => {
             );
           },
           ignoreOutgoingRequestHook: request => {
-            if (request.headers?.['user-agent'] != null) {
+            const headers = normalizeHeaders(request.headers);
+            if (headers['user-agent'] != null) {
               return (
-                `${request.headers['user-agent']}`.match('ignored-string') !=
+                `${headers['user-agent']}`.match('ignored-string') !=
                 null
               );
             }
@@ -862,7 +897,7 @@ describe('HttpInstrumentation', () => {
         nock(host).get('/').reply(404);
         const req = http.request(`${host}/`);
         req.on('response', response => {
-          response.on('data', () => {});
+          response.on('data', () => { });
           response.on('end', () => {
             const spans = memoryExporter.getFinishedSpans();
             const [span] = spans;
@@ -944,8 +979,8 @@ describe('HttpInstrumentation', () => {
           const req = http.get(
             `${protocol}://${hostname}:${serverPort}/hang`,
             res => {
-              res.on('close', () => {});
-              res.on('error', () => {});
+              res.on('close', () => { });
+              res.on('error', () => { });
             }
           );
           // close the socket.
@@ -953,7 +988,7 @@ describe('HttpInstrumentation', () => {
             req.destroy();
           }, 10);
 
-          req.on('error', () => {});
+          req.on('error', () => { });
 
           req.on('close', () => {
             // yield to server to end the span.
@@ -1016,16 +1051,16 @@ describe('HttpInstrumentation', () => {
               method: 'POST',
             },
             res => {
-              res.on('end', () => {});
+              res.on('end', () => { });
               res.on('close', () => {
                 resolve();
               });
-              res.on('error', () => {});
+              res.on('error', () => { });
             }
           );
           // force flush http request header to trigger client response callback
           req.write('');
-          req.on('error', () => {});
+          req.on('error', () => { });
         });
 
         await promise;
@@ -1459,11 +1494,11 @@ describe('HttpInstrumentation', () => {
               span.end();
               assert.ok(
                 result.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY] !==
-                  undefined
+                undefined
               );
               assert.ok(
                 result.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY] !==
-                  undefined
+                undefined
               );
               const spans = memoryExporter.getFinishedSpans();
               assert.strictEqual(spans.length, 2);

@@ -428,6 +428,28 @@ export const extractHostnameAndPort = (
   return { hostname, port };
 };
 
+export const normalizeHeaders = (headers: ParsedRequestOptions['headers']): OutgoingHttpHeaders => {
+  if (headers === undefined) {
+    return {};
+  }
+
+  if (!(headers instanceof Array)) {
+    return headers;
+  }
+
+  const result: Record<string, string> = {};
+  for (let i = 0; i < headers.length; i += 2) {
+    const key = headers[i];
+    const value = headers[i + 1];
+
+    if (key !== undefined && value !== undefined) {
+      result[key] = value;
+    }
+  }
+
+  return result;
+};
+
 /**
  * Returns outgoing request attributes scoped to the options passed to the request
  * @param {ParsedRequestOptions} requestOptions the same options used to make the request
@@ -449,7 +471,7 @@ export const getOutgoingRequestAttributes = (
   const port = options.port;
   const method = requestOptions.method ?? 'GET';
   const normalizedMethod = normalizeMethod(method);
-  const headers = requestOptions.headers || {};
+  const headers = normalizeHeaders(requestOptions.headers);
   const userAgent = headers['user-agent'];
   const urlFull = getAbsoluteUrl(
     requestOptions,
@@ -807,7 +829,7 @@ function getInfoFromIncomingMessage(
       return {
         pathname: unsafeParsedUrl.pathname,
         search: unsafeParsedUrl.search,
-        toString: function () {
+        toString: function() {
           // we cannot use the result of unsafeParsedUrl.toString as it's potentially wrong.
           return unsafeParsedUrl.pathname + unsafeParsedUrl.search;
         },
