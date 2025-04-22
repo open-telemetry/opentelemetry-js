@@ -402,6 +402,19 @@ export const getOutgoingRequestAttributesOnResponse = (
   return stableAttributes;
 };
 
+/**
+ * Returns outgoing request Metric attributes scoped to the response data
+ * @param {Attributes} spanAttributes the span attributes
+ */
+export const getOutgoingRequestMetricAttributesOnResponse = (
+  spanAttributes: Attributes
+): Attributes => {
+  return {
+    [ATTR_HTTP_RESPONSE_STATUS_CODE]:
+      spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+  };
+};
+
 function parseHostHeader(
   hostHeader: string,
   proto?: string
