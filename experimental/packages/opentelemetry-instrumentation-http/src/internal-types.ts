@@ -49,21 +49,6 @@ export interface Err extends Error {
 }
 
 /**
- * Tracks whether this instrumentation emits old experimental,
- * new stable, or both semantic conventions.
- *
- * Enum values chosen such that the enum may be used as a bitmask.
- */
-export const enum SemconvStability {
-  /** Emit only stable semantic conventions */
-  STABLE = 0x1,
-  /** Emit only old semantic conventions*/
-  OLD = 0x2,
-  /** Emit both stable and old semantic conventions*/
-  DUPLICATE = 0x1 | 0x2,
-}
-
-/**
  * Names of possible synthetic test sources.
  */
 export const SYNTHETIC_TEST_NAMES = ['alwayson'];
