@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1745325901856,
+  "lastUpdate": 1745341879176,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -31048,6 +31048,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.39%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "50715937+svetlanabrennan@users.noreply.github.com",
+            "name": "Svetlana Brennan",
+            "username": "svetlanabrennan"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8efceed28cfe6d2fe2928d4698ae6b788a12fd55",
+          "message": "feat(instrumentation-http)!: Remove legacy http span attributes and metrics (#5552)\n\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2025-04-22T17:01:41Z",
+          "tree_id": "93ab028ea990667e6e913b87fd6d8e5d5ab310da",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/8efceed28cfe6d2fe2928d4698ae6b788a12fd55"
+        },
+        "date": 1745341878159,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1537971,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18593,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 807878,
+            "range": "±0.37%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 776779,
+            "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
