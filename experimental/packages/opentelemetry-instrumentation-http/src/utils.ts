@@ -51,10 +51,7 @@ import {
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 import * as url from 'url';
 import { Err, IgnoreMatcher, ParsedRequestOptions } from './internal-types';
-import {
-  SYNTHETIC_BOT_NAMES,
-  SYNTHETIC_TEST_NAMES,
-} from './internal-types';
+import { SYNTHETIC_BOT_NAMES, SYNTHETIC_TEST_NAMES } from './internal-types';
 import {
   ATTR_USER_AGENT_SYNTHETIC_TYPE,
   USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
