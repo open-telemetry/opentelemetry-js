@@ -14,35 +14,17 @@
  * limitations under the License.
  */
 
-/**
- * Changes to this file should be applied to opentelemetry-core/test/test-utils.ts too.
+/*
+ * This file contains a copy of unstable semantic convention definitions
+ * used by this package.
+ * @see https://github.com/open-telemetry/opentelemetry-js/tree/main/semantic-conventions#unstable-semconv
  */
 
-import * as assert from 'assert';
-
-interface ErrorLikeConstructor {
-  new (): Error;
-}
-
 /**
- * Node.js v8.x and browser compatible `assert.rejects`.
+ * The name of the runtime of this process.
+ *
+ * @example OpenJDK Runtime Environment
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export async function assertRejects(
-  actual: any,
-  expected: RegExp | ErrorLikeConstructor
-) {
-  let rejected;
-  try {
-    if (typeof actual === 'function') {
-      await actual();
-    } else {
-      await actual;
-    }
-  } catch (err) {
-    rejected = true;
-    assert.throws(() => {
-      throw err;
-    }, expected);
-  }
-  assert.ok(rejected, 'Promise not rejected');
-}
+export const ATTR_PROCESS_RUNTIME_NAME = 'process.runtime.name' as const;

@@ -30,13 +30,10 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import {
-  NETTRANSPORTVALUES_IP_TCP,
-  SEMATTRS_HTTP_CLIENT_IP,
-  SEMATTRS_HTTP_FLAVOR,
-  SEMATTRS_HTTP_STATUS_CODE,
-  SEMATTRS_NET_HOST_PORT,
-  SEMATTRS_NET_PEER_PORT,
-  SEMATTRS_NET_TRANSPORT,
+  ATTR_CLIENT_ADDRESS,
+  ATTR_HTTP_RESPONSE_STATUS_CODE,
+  ATTR_SERVER_PORT,
+  ATTR_NETWORK_PROTOCOL_NAME,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as fs from 'fs';
@@ -62,7 +59,6 @@ let server: https.Server;
 const serverPort = 32345;
 const protocol = 'https';
 const hostname = 'localhost';
-const serverName = 'my.server.name';
 const pathname = '/test';
 const memoryExporter = new InMemorySpanExporter();
 const provider = new BasicTracerProvider({
@@ -166,11 +162,11 @@ describe('HttpsInstrumentation', () => {
         assertSpan(incomingSpan, SpanKind.SERVER, validations);
         assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
         assert.strictEqual(
-          incomingSpan.attributes[SEMATTRS_NET_HOST_PORT],
+          incomingSpan.attributes[ATTR_SERVER_PORT],
           serverPort
         );
         assert.strictEqual(
-          outgoingSpan.attributes[SEMATTRS_NET_PEER_PORT],
+          outgoingSpan.attributes[ATTR_SERVER_PORT],
           serverPort
         );
       });
@@ -198,7 +194,6 @@ describe('HttpsInstrumentation', () => {
             return false;
           },
           applyCustomAttributesOnSpan: customAttributeFunction,
-          serverName,
         });
         instrumentation.enable();
         server = https.createServer(
@@ -246,20 +241,19 @@ describe('HttpsInstrumentation', () => {
           resHeaders: result.resHeaders,
           reqHeaders: result.reqHeaders,
           component: 'https',
-          serverName,
         };
 
         assert.strictEqual(spans.length, 2);
         assert.strictEqual(
-          incomingSpan.attributes[SEMATTRS_HTTP_CLIENT_IP],
+          incomingSpan.attributes[ATTR_CLIENT_ADDRESS],
           '<client>'
         );
         assert.strictEqual(
-          incomingSpan.attributes[SEMATTRS_NET_HOST_PORT],
+          incomingSpan.attributes[ATTR_SERVER_PORT],
           serverPort
         );
         assert.strictEqual(
-          outgoingSpan.attributes[SEMATTRS_NET_PEER_PORT],
+          outgoingSpan.attributes[ATTR_SERVER_PORT],
           serverPort
         );
 
@@ -267,10 +261,9 @@ describe('HttpsInstrumentation', () => {
           { span: incomingSpan, kind: SpanKind.SERVER },
           { span: outgoingSpan, kind: SpanKind.CLIENT },
         ].forEach(({ span, kind }) => {
-          assert.strictEqual(span.attributes[SEMATTRS_HTTP_FLAVOR], '1.1');
-          assert.strictEqual(
-            span.attributes[SEMATTRS_NET_TRANSPORT],
-            NETTRANSPORTVALUES_IP_TCP
+          assert.ok(
+            !span.attributes[ATTR_NETWORK_PROTOCOL_NAME],
+            'should not be added for HTTP kind'
           );
           assertSpan(span, kind, validations);
         });
@@ -613,7 +606,7 @@ describe('HttpsInstrumentation', () => {
         const [span] = spans;
         assert.strictEqual(spans.length, 1);
         assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
-        assert.ok(Object.keys(span.attributes).length >= 6);
+        assert.ok(Object.keys(span.attributes).length >= 5);
       });
 
       it('should have 1 ended span when request is aborted after receiving response', async () => {
@@ -666,7 +659,10 @@ describe('HttpsInstrumentation', () => {
             const [span] = spans;
             assert.strictEqual(spans.length, 1);
             assert.ok(Object.keys(span.attributes).length > 6);
-            assert.strictEqual(span.attributes[SEMATTRS_HTTP_STATUS_CODE], 404);
+            assert.strictEqual(
+              span.attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+              404
+            );
             assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
             done();
           });
