@@ -20,6 +20,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(resource): do not trigger `Accessing resource attributes before async attributes settled` warning when detecting resources [#5546](https://github.com/open-telemetry/opentelemetry-js/pull/5546) @dyladan
   * verbose logging of detected resource removed
 * fix(resource): use dynamic import over require to improve ESM compliance [#5298](https://github.com/open-telemetry/opentelemetry-js/pull/5298) @xiaoxiangmoe
+* fix(sdk-metrics): improve PeriodicExportingMetricReader() constructor input validation [#5621](https://github.com/open-telemetry/opentelemetry-js/pull/5621) @cjihrig
 
 ### :books: Documentation
 

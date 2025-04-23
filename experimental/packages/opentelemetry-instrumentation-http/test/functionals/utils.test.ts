@@ -22,25 +22,18 @@ import {
   diag,
 } from '@opentelemetry/api';
 import {
-  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
-  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
-  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-  SEMATTRS_HTTP_ROUTE,
-  SEMATTRS_HTTP_TARGET,
+  ATTR_ERROR_TYPE,
+  ATTR_HTTP_ROUTE,
+  ATTR_URL_PATH,
+  ATTR_URL_QUERY,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import { IncomingMessage, ServerResponse } from 'http';
 import { Socket } from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
-import {
-  IgnoreMatcher,
-  ParsedRequestOptions,
-  SemconvStability,
-} from '../../src/internal-types';
+import { IgnoreMatcher, ParsedRequestOptions } from '../../src/internal-types';
 import * as utils from '../../src/utils';
-import { AttributeNames } from '../../src/enums/AttributeNames';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { extractHostnameAndPort } from '../../src/utils';
@@ -185,19 +178,14 @@ describe('Utility', () => {
       } as unknown as Span;
       const mock = sinon.mock(span);
 
-      mock
-        .expects('setAttribute')
-        .calledWithExactly(AttributeNames.HTTP_ERROR_NAME, 'error');
-      mock
-        .expects('setAttribute')
-        .calledWithExactly(AttributeNames.HTTP_ERROR_MESSAGE, errorMessage);
+      mock.expects('setAttribute').calledWithExactly(ATTR_ERROR_TYPE, 'Error');
       mock.expects('setStatus').calledWithExactly({
         code: SpanStatusCode.ERROR,
         message: errorMessage,
       });
       mock.expects('recordException').calledWithExactly(error);
 
-      utils.setSpanWithError(span, error, SemconvStability.OLD);
+      utils.setSpanWithError(span, error);
       mock.verify();
     });
   });
@@ -234,10 +222,9 @@ describe('Utility', () => {
         () => {
           const attributes = utils.getIncomingRequestAttributesOnResponse(
             request,
-            {} as ServerResponse,
-            SemconvStability.OLD
+            {} as ServerResponse
           );
-          assert.deepStrictEqual(attributes[SEMATTRS_HTTP_ROUTE], '/user/:id');
+          assert.deepStrictEqual(attributes[ATTR_HTTP_ROUTE], '/user/:id');
           context.disable();
           return done();
         }
@@ -248,177 +235,33 @@ describe('Utility', () => {
       const request = {
         socket: {},
       } as IncomingMessage;
-      const attributes = utils.getIncomingRequestAttributesOnResponse(
-        request,
-        {
-          socket: {},
-        } as ServerResponse & { socket: Socket },
-        SemconvStability.OLD
-      );
-      assert.deepEqual(attributes[SEMATTRS_HTTP_ROUTE], undefined);
+      const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
+        socket: {},
+      } as ServerResponse & { socket: Socket });
+      assert.deepEqual(attributes[ATTR_HTTP_ROUTE], undefined);
     });
   });
 
-  describe('getIncomingRequestMetricAttributesOnResponse()', () => {
+  describe('getIncomingStableRequestMetricAttributesOnResponse()', () => {
     it('should correctly add http_route if span has it', () => {
       const spanAttributes: Attributes = {
-        [SEMATTRS_HTTP_ROUTE]: '/user/:id',
+        [ATTR_HTTP_ROUTE]: '/user/:id',
       };
       const metricAttributes =
-        utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
+        utils.getIncomingStableRequestMetricAttributesOnResponse(
+          spanAttributes
+        );
 
-      assert.deepStrictEqual(
-        metricAttributes[SEMATTRS_HTTP_ROUTE],
-        '/user/:id'
-      );
+      assert.deepStrictEqual(metricAttributes[ATTR_HTTP_ROUTE], '/user/:id');
     });
 
     it('should skip http_route if span does not have it', () => {
       const spanAttributes: Attributes = {};
       const metricAttributes =
-        utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
-      assert.deepEqual(metricAttributes[SEMATTRS_HTTP_ROUTE], undefined);
-    });
-  });
-  // Verify the key in the given attributes is set to the given value,
-  // and that no other HTTP Content Length attributes are set.
-  function verifyValueInAttributes(
-    attributes: Attributes,
-    key: string | undefined,
-    value: number
-  ) {
-    const SemanticAttributess = [
-      SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-      SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
-      SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-      SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
-    ];
-
-    for (const attr of SemanticAttributess) {
-      if (attr === key) {
-        assert.strictEqual(attributes[attr], value);
-      } else {
-        assert.strictEqual(attributes[attr], undefined);
-      }
-    }
-  }
-
-  describe('setRequestContentLengthAttributes()', () => {
-    it('should set request content-length uncompressed attribute with no content-encoding header', () => {
-      const attributes: Attributes = {};
-      const request = {} as IncomingMessage;
-
-      request.headers = {
-        'content-length': '1200',
-      };
-      utils.setRequestContentLengthAttribute(request, attributes);
-
-      verifyValueInAttributes(
-        attributes,
-        SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-        1200
-      );
-    });
-
-    it('should set request content-length uncompressed attribute with "identity" content-encoding header', () => {
-      const attributes: Attributes = {};
-      const request = {} as IncomingMessage;
-      request.headers = {
-        'content-length': '1200',
-        'content-encoding': 'identity',
-      };
-      utils.setRequestContentLengthAttribute(request, attributes);
-
-      verifyValueInAttributes(
-        attributes,
-        SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-        1200
-      );
-    });
-
-    it('should set request content-length compressed attribute with "gzip" content-encoding header', () => {
-      const attributes: Attributes = {};
-      const request = {} as IncomingMessage;
-      request.headers = {
-        'content-length': '1200',
-        'content-encoding': 'gzip',
-      };
-      utils.setRequestContentLengthAttribute(request, attributes);
-
-      verifyValueInAttributes(
-        attributes,
-        SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
-        1200
-      );
-    });
-  });
-
-  describe('setResponseContentLengthAttributes()', () => {
-    it('should set response content-length uncompressed attribute with no content-encoding header', () => {
-      const attributes: Attributes = {};
-
-      const response = {} as IncomingMessage;
-
-      response.headers = {
-        'content-length': '1200',
-      };
-      utils.setResponseContentLengthAttribute(response, attributes);
-
-      verifyValueInAttributes(
-        attributes,
-        SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-        1200
-      );
-    });
-
-    it('should set response content-length uncompressed attribute with "identity" content-encoding header', () => {
-      const attributes: Attributes = {};
-
-      const response = {} as IncomingMessage;
-
-      response.headers = {
-        'content-length': '1200',
-        'content-encoding': 'identity',
-      };
-
-      utils.setResponseContentLengthAttribute(response, attributes);
-
-      verifyValueInAttributes(
-        attributes,
-        SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-        1200
-      );
-    });
-
-    it('should set response content-length compressed attribute with "gzip" content-encoding header', () => {
-      const attributes: Attributes = {};
-
-      const response = {} as IncomingMessage;
-
-      response.headers = {
-        'content-length': '1200',
-        'content-encoding': 'gzip',
-      };
-
-      utils.setResponseContentLengthAttribute(response, attributes);
-
-      verifyValueInAttributes(
-        attributes,
-        SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
-        1200
-      );
-    });
-
-    it('should set no attributes with no content-length header', () => {
-      const attributes: Attributes = {};
-      const message = {} as IncomingMessage;
-
-      message.headers = {
-        'content-encoding': 'gzip',
-      };
-      utils.setResponseContentLengthAttribute(message, attributes);
-
-      verifyValueInAttributes(attributes, undefined, 1200);
+        utils.getIncomingStableRequestMetricAttributesOnResponse(
+          spanAttributes
+        );
+      assert.deepEqual(metricAttributes[ATTR_HTTP_ROUTE], undefined);
     });
   });
 
@@ -437,11 +280,10 @@ describe('Utility', () => {
         request,
         {
           component: 'http',
-          semconvStability: SemconvStability.OLD,
         },
         diag
       );
-      assert.strictEqual(attributes[SEMATTRS_HTTP_ROUTE], undefined);
+      assert.strictEqual(attributes[ATTR_HTTP_ROUTE], undefined);
     });
 
     it('should set http.target as path in http span attributes', () => {
@@ -457,11 +299,12 @@ describe('Utility', () => {
         request,
         {
           component: 'http',
-          semconvStability: SemconvStability.OLD,
         },
         diag
       );
-      assert.strictEqual(attributes[SEMATTRS_HTTP_TARGET], '/user/?q=val');
+      const path = String(attributes[ATTR_URL_PATH] ?? '');
+      const query = String(attributes[ATTR_URL_QUERY] ?? '');
+      assert.strictEqual(path + '?' + query, '/user/?q=val');
     });
   });
 
