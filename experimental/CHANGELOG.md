@@ -15,6 +15,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :bug: Bug Fixes
 
 fix(otlp-transformer): do not throw when deserializing empty JSON response [#5551](https://github.com/open-telemetry/opentelemetry-js/pull/5551) @pichlermarc
+* fix(instrumentation): remove dependency on the shimmer module [#xxxx](https://github.com/open-telemetry/opentelemetry-js/pull/xxxx) @cjihrig
 
 ### :books: Documentation
 
