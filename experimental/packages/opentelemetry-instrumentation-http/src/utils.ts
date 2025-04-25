@@ -409,10 +409,19 @@ export const getOutgoingRequestAttributesOnResponse = (
 export const getOutgoingRequestMetricAttributesOnResponse = (
   spanAttributes: Attributes
 ): Attributes => {
-  return {
-    [ATTR_HTTP_RESPONSE_STATUS_CODE]:
-      spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-  };
+  const stableAttributes: Attributes = {};
+
+  if (spanAttributes[ATTR_NETWORK_PROTOCOL_VERSION]) {
+    stableAttributes[ATTR_NETWORK_PROTOCOL_VERSION] =
+      spanAttributes[ATTR_NETWORK_PROTOCOL_VERSION];
+  }
+
+  if (spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE]) {
+    stableAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] =
+      spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
+  }
+
+  return stableAttributes;
 };
 
 function parseHostHeader(
