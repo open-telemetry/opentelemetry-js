@@ -71,28 +71,27 @@ const sdk = new opentelemetry.NodeSDK({
 
 // You can optionally detect resources asynchronously from the environment.
 // Detected resources are merged with the resources provided in the SDK configuration.
-sdk.start().then(() => {
-  // Resources have been detected and SDK is started
-  console.log(`SDK started`)
+sdk.start();
+// Resources have been detected and SDK is started
+console.log(`SDK started`)
 
 // Start the http server
-  const fastify = require('fastify')({
+const fastify = require('fastify')({
     logger: true
-  })
+})
 
-  fastify.get('/', function (request, reply) {
+fastify.get('/', function (request, reply) {
     reply.send({ hello: 'world' })
-  })
+})
 
-  fastify.listen({ port: 3000 }, function (err, address) {
+fastify.listen({ port: 3000 }, function (err, address) {
     if (err) {
-      fastify.log.error(err)
-      process.exit(1)
+        fastify.log.error(err)
+        process.exit(1)
     }
 
     console.log(`Server is now listening on ${address}`)
-  })
-});
+})
 
 // You can also use the shutdown method to gracefully shut down the SDK before process shutdown
 // or on some operating system signal.
@@ -159,35 +158,34 @@ const sdk = new opentelemetry.NodeSDK({
 
 // You can optionally detect resources asynchronously from the environment.
 // Detected resources are merged with the resources provided in the SDK configuration.
-sdk.start().then(() => {
-  // Resources have been detected and SDK is started
-  console.log(`SDK started`)
+sdk.start();
+// Resources have been detected and SDK is started
+console.log(`SDK started`)
 
-  // Create Meter with the name `http-server`
-  const appMeter = api.metrics.getMeter('http-server')
-  // Use the created Meter to create a counter instrument
-  const numberOfRequests = appMeter.createCounter('request-counter')
+// Create Meter with the name `http-server`
+const appMeter = api.metrics.getMeter('http-server')
+// Use the created Meter to create a counter instrument
+const numberOfRequests = appMeter.createCounter('request-counter')
 
-  // Start the http server
-  const fastify = require('fastify')({
+// Start the http server
+const fastify = require('fastify')({
     logger: true
-  })
+})
 
-  fastify.get('/', function (request, reply) {
+fastify.get('/', function (request, reply) {
     // Increase the counter by 1 each time the `/` endpoint is requested
     numberOfRequests.add(1)
     reply.send({ hello: 'world' })
-  })
+})
 
-  fastify.listen({ port: 3000 }, function (err, address) {
+fastify.listen({ port: 3000 }, function (err, address) {
     if (err) {
-      fastify.log.error(err)
-      process.exit(1)
+        fastify.log.error(err)
+        process.exit(1)
     }
 
     console.log(`Server is now listening on ${address}`)
-  })
-});
+})
 
 // You can also use the shutdown method to gracefully shut down the SDK before process shutdown
 // or on some operating system signal.
