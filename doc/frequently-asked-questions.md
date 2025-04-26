@@ -10,12 +10,13 @@ Test suite failures of the form:
 Cannot find module @opentelemetry/foo/bar from @opentelemetry/...
 ```
 
-but package `@opentelemetry/foo` is installed occur with Jest < v29.4. Upgrade
-to a newer version of Jest to resolve the issue. Earlier versions of
-`jest-resolve` cannot find the nested module imports used by some OpenTelemetry
-packages since version 0.56 and higher. [#5618](https://github.com/open-telemetry/opentelemetry-js/issues/5618)
+but package `@opentelemetry/foo` is installed may occur with Jest < v29.4.
+This is because older versions of `jest-resolve` cannot find the nested module
+imports used by some OpenTelemetry packages since version 0.56 and higher.
+See [#5618](https://github.com/open-telemetry/opentelemetry-js/issues/5618)
 
-Here is a workaround for older versions of Jest using a `moduleNameMapper` rule.
+Either upgrade to a newer version of Jest to resolve the issue, or use this
+workaround for older versions of Jest by adding a `moduleNameMapper` rule.
 Add this line to your `jest.config.js`:
 
 ``` javascript
