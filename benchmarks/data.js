@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1745840882018,
+  "lastUpdate": 1745843321530,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -31568,6 +31568,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.29%",
             "unit": "ops/sec",
             "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron@serendipity.cx",
+            "name": "Aaron Stone",
+            "username": "sodabrew"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "aca743b4996e8d3cfcc084bc503a49c468ce6668",
+          "message": "[docs] Upgrade note with Jest version requirements and workaround for older versions of Jest (#5619)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2025-04-28T12:19:55Z",
+          "tree_id": "f8ed418a75dfc634d0e39f79e5cb833cf33540df",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/aca743b4996e8d3cfcc084bc503a49c468ce6668"
+        },
+        "date": 1745843320485,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1528839,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18382,
+            "range": "±0.17%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 842304,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 767189,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
