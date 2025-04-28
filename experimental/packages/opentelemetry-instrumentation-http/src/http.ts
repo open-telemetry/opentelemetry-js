@@ -555,6 +555,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             request,
             instrumentation.getConfig().startIncomingSpanHook
           ),
+          enableSyntheticSourceDetection:
+            instrumentation.getConfig().enableSyntheticSourceDetection || false,
         },
         instrumentation._diag
       );
@@ -692,16 +694,19 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       }
 
       const { hostname, port } = extractHostnameAndPort(optionsParsed);
-
-      const attributes = getOutgoingRequestAttributes(optionsParsed, {
-        component,
-        port,
-        hostname,
-        hookAttributes: instrumentation._callStartSpanHook(
-          optionsParsed,
-          instrumentation.getConfig().startOutgoingSpanHook
-        ),
-      });
+      const attributes = getOutgoingRequestAttributes(
+        optionsParsed,
+        {
+          component,
+          port,
+          hostname,
+          hookAttributes: instrumentation._callStartSpanHook(
+            optionsParsed,
+            instrumentation.getConfig().startOutgoingSpanHook
+          ),
+        },
+        instrumentation.getConfig().enableSyntheticSourceDetection || false
+      );
 
       const startTime = hrTime();
 

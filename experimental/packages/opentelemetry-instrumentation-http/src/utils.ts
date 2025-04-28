@@ -20,6 +20,7 @@ import {
   context,
   SpanKind,
   DiagLogger,
+  AttributeValue,
 } from '@opentelemetry/api';
 import {
   ATTR_CLIENT_ADDRESS,
@@ -42,6 +43,7 @@ import {
 import {
   IncomingHttpHeaders,
   IncomingMessage,
+  OutgoingHttpHeader,
   OutgoingHttpHeaders,
   RequestOptions,
   ServerResponse,
@@ -49,6 +51,12 @@ import {
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 import * as url from 'url';
 import { Err, IgnoreMatcher, ParsedRequestOptions } from './internal-types';
+import { SYNTHETIC_BOT_NAMES, SYNTHETIC_TEST_NAMES } from './internal-types';
+import {
+  ATTR_USER_AGENT_SYNTHETIC_TYPE,
+  USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
+  USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST,
+} from './semconv';
 import forwardedParse = require('forwarded-parse');
 
 /**
@@ -343,13 +351,15 @@ export const getOutgoingRequestAttributes = (
     hostname: string;
     port: string | number;
     hookAttributes?: Attributes;
-  }
+  },
+  enableSyntheticSourceDetection: boolean
 ): Attributes => {
   const hostname = options.hostname;
   const port = options.port;
   const method = requestOptions.method ?? 'GET';
   const normalizedMethod = normalizeMethod(method);
   const headers = requestOptions.headers || {};
+  const userAgent = headers['user-agent'];
   const urlFull = getAbsoluteUrl(
     requestOptions,
     headers,
@@ -361,6 +371,7 @@ export const getOutgoingRequestAttributes = (
     [ATTR_SERVER_ADDRESS]: hostname,
     [ATTR_SERVER_PORT]: Number(port),
     [ATTR_URL_FULL]: urlFull,
+    [ATTR_USER_AGENT_ORIGINAL]: userAgent,
     // leaving out protocol version, it is not yet negotiated
     // leaving out protocol name, it is only required when protocol version is set
     // retries and redirects not supported
@@ -373,7 +384,31 @@ export const getOutgoingRequestAttributes = (
     newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
   }
 
+  if (enableSyntheticSourceDetection && userAgent) {
+    newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] = getSyntheticType(userAgent);
+  }
   return Object.assign(newAttributes, options.hookAttributes);
+};
+
+/**
+ * Returns the type of synthetic source based on the user agent
+ * @param {OutgoingHttpHeader} userAgent the user agent string
+ */
+const getSyntheticType = (
+  userAgent: OutgoingHttpHeader
+): AttributeValue | undefined => {
+  const userAgentString: string = String(userAgent).toLowerCase();
+  for (const name of SYNTHETIC_TEST_NAMES) {
+    if (userAgentString.includes(name)) {
+      return USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST;
+    }
+  }
+  for (const name of SYNTHETIC_BOT_NAMES) {
+    if (userAgentString.includes(name)) {
+      return USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT;
+    }
+  }
+  return;
 };
 
 /**
@@ -620,6 +655,7 @@ export const getIncomingRequestAttributes = (
   options: {
     component: 'http' | 'https';
     hookAttributes?: Attributes;
+    enableSyntheticSourceDetection: boolean;
   },
   logger: DiagLogger
 ): Attributes => {
@@ -669,6 +705,9 @@ export const getIncomingRequestAttributes = (
     newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
   }
 
+  if (options.enableSyntheticSourceDetection && userAgent) {
+    newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] = getSyntheticType(userAgent);
+  }
   return Object.assign(newAttributes, options.hookAttributes);
 };
 
