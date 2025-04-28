@@ -144,6 +144,8 @@ describe('metrics', () => {
         [ATTR_HTTP_REQUEST_METHOD]: 'GET',
         [ATTR_SERVER_ADDRESS]: 'localhost',
         [ATTR_SERVER_PORT]: 22346,
+        [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
+        [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
       });
     });
   });
