@@ -68,6 +68,7 @@ import {
   getIncomingStableRequestMetricAttributesOnResponse,
   getOutgoingRequestAttributes,
   getOutgoingRequestAttributesOnResponse,
+  getOutgoingRequestMetricAttributesOnResponse,
   getRequestInfo,
   headerCapture,
   isValidOptionsType,
@@ -386,6 +387,10 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         const responseAttributes =
           getOutgoingRequestAttributesOnResponse(response);
         span.setAttributes(responseAttributes);
+        stableMetricAttributes = Object.assign(
+          stableMetricAttributes,
+          getOutgoingRequestMetricAttributesOnResponse(responseAttributes)
+        );
 
         if (this.getConfig().responseHook) {
           this._callResponseHook(span, response);

@@ -437,6 +437,28 @@ export const getOutgoingRequestAttributesOnResponse = (
   return stableAttributes;
 };
 
+/**
+ * Returns outgoing request Metric attributes scoped to the response data
+ * @param {Attributes} spanAttributes the span attributes
+ */
+export const getOutgoingRequestMetricAttributesOnResponse = (
+  spanAttributes: Attributes
+): Attributes => {
+  const stableAttributes: Attributes = {};
+
+  if (spanAttributes[ATTR_NETWORK_PROTOCOL_VERSION]) {
+    stableAttributes[ATTR_NETWORK_PROTOCOL_VERSION] =
+      spanAttributes[ATTR_NETWORK_PROTOCOL_VERSION];
+  }
+
+  if (spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE]) {
+    stableAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] =
+      spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
+  }
+
+  return stableAttributes;
+};
+
 function parseHostHeader(
   hostHeader: string,
   proto?: string
