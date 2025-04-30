@@ -127,6 +127,54 @@ export const METRIC_CONTAINER_NETWORK_IO = 'container.network.io' as const;
 export const METRIC_CONTAINER_UPTIME = 'container.uptime' as const;
 
 /**
+ * Operating frequency of the logical CPU in Hertz.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_CPU_FREQUENCY = 'cpu.frequency' as const;
+
+/**
+ * Seconds each logical CPU spent on each mode
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_CPU_TIME = 'cpu.time' as const;
+
+/**
+ * For each logical CPU, the utilization is calculated as the change in cumulative CPU time (cpu.time) over a measurement interval, divided by the elapsed time.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_CPU_UTILIZATION = 'cpu.utilization' as const;
+
+/**
+ * The total number of objects collected inside a generation since interpreter start.
+ *
+ * @note This metric reports data from [`gc.stats()`](https://docs.python.org/3/library/gc.html#gc.get_stats).
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_CPYTHON_GC_COLLECTED_OBJECTS = 'cpython.gc.collected_objects' as const;
+
+/**
+ * The number of times a generation was collected since interpreter start.
+ *
+ * @note This metric reports data from [`gc.stats()`](https://docs.python.org/3/library/gc.html#gc.get_stats).
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_CPYTHON_GC_COLLECTIONS = 'cpython.gc.collections' as const;
+
+/**
+ * The total number of objects which were found to be uncollectable inside a generation since interpreter start.
+ *
+ * @note This metric reports data from [`gc.stats()`](https://docs.python.org/3/library/gc.html#gc.get_stats).
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_CPYTHON_GC_UNCOLLECTABLE_OBJECTS = 'cpython.gc.uncollectable_objects' as const;
+
+/**
  * The number of connections that are currently in state described by the `state` attribute
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -569,6 +617,38 @@ export const METRIC_HW_ENERGY = 'hw.energy' as const;
 export const METRIC_HW_ERRORS = 'hw.errors' as const;
 
 /**
+ * Ambient (external) temperature of the physical host
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_HW_HOST_AMBIENT_TEMPERATURE = 'hw.host.ambient_temperature' as const;
+
+/**
+ * Total energy consumed by the entire physical host, in joules
+ *
+ * @note The overall energy usage of a host **MUST** be reported using the specific `hw.host.energy` and `hw.host.power` metrics **only**, instead of the generic `hw.energy` and `hw.power` described in the previous section, to prevent summing up overlapping values.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_HW_HOST_ENERGY = 'hw.host.energy' as const;
+
+/**
+ * By how many degrees Celsius the temperature of the physical host can be increased, before reaching a warning threshold on one of the internal sensors
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_HW_HOST_HEATING_MARGIN = 'hw.host.heating_margin' as const;
+
+/**
+ * Instantaneous power consumed by the entire physical host in Watts (`hw.host.energy` is preferred)
+ *
+ * @note The overall energy usage of a host **MUST** be reported using the specific `hw.host.energy` and `hw.host.power` metrics **only**, instead of the generic `hw.energy` and `hw.power` described in the previous section, to prevent summing up overlapping values.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_HW_HOST_POWER = 'hw.host.power' as const;
+
+/**
  * Instantaneous power consumed by the component
  *
  * @note It is recommended to report `hw.energy` instead of `hw.power` when possible.
@@ -738,6 +818,9 @@ export const METRIC_K8S_DEPLOYMENT_DESIRED_PODS = 'k8s.deployment.desired_pods' 
  * @note This metric aligns with the `currentReplicas` field of the
  * [K8s HorizontalPodAutoscalerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerstatus-v2-autoscaling)
  *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.hpa`](../resource/k8s.md#horizontalpodautoscaler) resource.
+ *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_K8S_HPA_CURRENT_PODS = 'k8s.hpa.current_pods' as const;
@@ -747,6 +830,9 @@ export const METRIC_K8S_HPA_CURRENT_PODS = 'k8s.hpa.current_pods' as const;
  *
  * @note This metric aligns with the `desiredReplicas` field of the
  * [K8s HorizontalPodAutoscalerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerstatus-v2-autoscaling)
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.hpa`](../resource/k8s.md#horizontalpodautoscaler) resource.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -758,6 +844,9 @@ export const METRIC_K8S_HPA_DESIRED_PODS = 'k8s.hpa.desired_pods' as const;
  * @note This metric aligns with the `maxReplicas` field of the
  * [K8s HorizontalPodAutoscalerSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerspec-v2-autoscaling)
  *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.hpa`](../resource/k8s.md#horizontalpodautoscaler) resource.
+ *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_K8S_HPA_MAX_PODS = 'k8s.hpa.max_pods' as const;
@@ -767,6 +856,9 @@ export const METRIC_K8S_HPA_MAX_PODS = 'k8s.hpa.max_pods' as const;
  *
  * @note This metric aligns with the `minReplicas` field of the
  * [K8s HorizontalPodAutoscalerSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerspec-v2-autoscaling)
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.hpa`](../resource/k8s.md#horizontalpodautoscaler) resource.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -815,7 +907,7 @@ export const METRIC_K8S_JOB_FAILED_PODS = 'k8s.job.failed_pods' as const;
  * The max desired number of pods the job should run at any given time
  *
  * @note This metric aligns with the `parallelism` field of the
- * [K8s JobSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobspec-v1-batch.
+ * [K8s JobSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobspec-v1-batch).
  *
  * This metric **SHOULD**, at a minimum, be reported against a
  * [`k8s.job`](../resource/k8s.md#job) resource.
@@ -976,14 +1068,47 @@ export const METRIC_K8S_REPLICASET_AVAILABLE_PODS = 'k8s.replicaset.available_po
 export const METRIC_K8S_REPLICASET_DESIRED_PODS = 'k8s.replicaset.desired_pods' as const;
 
 /**
+ * Deprecated, use `k8s.replicationcontroller.available_pods` instead.
+ *
+ * @note This metric aligns with the `availableReplicas` field of the
+ * [K8s ReplicationControllerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicationcontrollerstatus-v1-core)
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.replicationcontroller`](../resource/k8s.md#replicationcontroller) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `k8s.replicationcontroller.available_pods`.
+ */
+export const METRIC_K8S_REPLICATION_CONTROLLER_AVAILABLE_PODS = 'k8s.replication_controller.available_pods' as const;
+
+/**
+ * Deprecated, use `k8s.replicationcontroller.desired_pods` instead.
+ *
+ * @note This metric aligns with the `replicas` field of the
+ * [K8s ReplicationControllerSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicationcontrollerspec-v1-core)
+ *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.replicationcontroller`](../resource/k8s.md#replicationcontroller) resource.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `k8s.replicationcontroller.desired_pods`.
+ */
+export const METRIC_K8S_REPLICATION_CONTROLLER_DESIRED_PODS = 'k8s.replication_controller.desired_pods' as const;
+
+/**
  * Total number of available replica pods (ready for at least minReadySeconds) targeted by this replication controller
  *
  * @note This metric aligns with the `availableReplicas` field of the
  * [K8s ReplicationControllerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicationcontrollerstatus-v1-core)
  *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.replicationcontroller`](../resource/k8s.md#replicationcontroller) resource.
+ *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_K8S_REPLICATION_CONTROLLER_AVAILABLE_PODS = 'k8s.replication_controller.available_pods' as const;
+export const METRIC_K8S_REPLICATIONCONTROLLER_AVAILABLE_PODS = 'k8s.replicationcontroller.available_pods' as const;
 
 /**
  * Number of desired replica pods in this replication controller
@@ -991,9 +1116,12 @@ export const METRIC_K8S_REPLICATION_CONTROLLER_AVAILABLE_PODS = 'k8s.replication
  * @note This metric aligns with the `replicas` field of the
  * [K8s ReplicationControllerSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicationcontrollerspec-v1-core)
  *
+ * This metric **SHOULD**, at a minimum, be reported against a
+ * [`k8s.replicationcontroller`](../resource/k8s.md#replicationcontroller) resource.
+ *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_K8S_REPLICATION_CONTROLLER_DESIRED_PODS = 'k8s.replication_controller.desired_pods' as const;
+export const METRIC_K8S_REPLICATIONCONTROLLER_DESIRED_PODS = 'k8s.replicationcontroller.desired_pods' as const;
 
 /**
  * The number of replica pods created by the statefulset controller from the statefulset version indicated by currentRevision
@@ -1220,6 +1348,130 @@ export const METRIC_NODEJS_EVENTLOOP_TIME = 'nodejs.eventloop.time' as const;
 export const METRIC_NODEJS_EVENTLOOP_UTILIZATION = 'nodejs.eventloop.utilization' as const;
 
 /**
+ * The number of log records for which the export has finished, either successful or failed
+ *
+ * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` must contain the failure cause.
+ * For exporters with partial success semantics (e.g. OTLP with `rejected_log_records`), rejected log records must count as failed and only non-rejected log records count as success.
+ * If no rejection reason is available, `rejected` **SHOULD** be used as value for `error.type`.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_EXPORTER_LOG_EXPORTED = 'otel.sdk.exporter.log.exported' as const;
+
+/**
+ * The number of log records which were passed to the exporter, but that have not been exported yet (neither successful, nor failed)
+ *
+ * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` must contain the failure cause.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_EXPORTER_LOG_INFLIGHT = 'otel.sdk.exporter.log.inflight' as const;
+
+/**
+ * The number of spans for which the export has finished, either successful or failed
+ *
+ * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` must contain the failure cause.
+ * For exporters with partial success semantics (e.g. OTLP with `rejected_spans`), rejected spans must count as failed and only non-rejected spans count as success.
+ * If no rejection reason is available, `rejected` **SHOULD** be used as value for `error.type`.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_EXPORTER_SPAN_EXPORTED_COUNT = 'otel.sdk.exporter.span.exported.count' as const;
+
+/**
+ * The number of spans which were passed to the exporter, but that have not been exported yet (neither successful, nor failed)
+ *
+ * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` must contain the failure cause.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_EXPORTER_SPAN_INFLIGHT_COUNT = 'otel.sdk.exporter.span.inflight.count' as const;
+
+/**
+ * The number of logs submitted to enabled SDK Loggers
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_LOG_CREATED = 'otel.sdk.log.created' as const;
+
+/**
+ * The number of log records for which the processing has finished, either successful or failed
+ *
+ * @note For successful processing, `error.type` **MUST NOT** be set. For failed processing, `error.type` must contain the failure cause.
+ * For the SDK Simple and Batching Log Record Processor a log record is considered to be processed already when it has been submitted to the exporter,
+ * not when the corresponding export call has finished.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_PROCESSOR_LOG_PROCESSED = 'otel.sdk.processor.log.processed' as const;
+
+/**
+ * The maximum number of log records the queue of a given instance of an SDK Log Record processor can hold
+ *
+ * @note Only applies to Log Record processors which use a queue, e.g. the SDK Batching Log Record Processor.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_PROCESSOR_LOG_QUEUE_CAPACITY = 'otel.sdk.processor.log.queue.capacity' as const;
+
+/**
+ * The number of log records in the queue of a given instance of an SDK log processor
+ *
+ * @note Only applies to log record processors which use a queue, e.g. the SDK Batching Log Record Processor.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_PROCESSOR_LOG_QUEUE_SIZE = 'otel.sdk.processor.log.queue.size' as const;
+
+/**
+ * The number of spans for which the processing has finished, either successful or failed
+ *
+ * @note For successful processing, `error.type` **MUST NOT** be set. For failed processing, `error.type` must contain the failure cause.
+ * For the SDK Simple and Batching Span Processor a span is considered to be processed already when it has been submitted to the exporter, not when the corresponding export call has finished.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_PROCESSOR_SPAN_PROCESSED_COUNT = 'otel.sdk.processor.span.processed.count' as const;
+
+/**
+ * The maximum number of spans the queue of a given instance of an SDK span processor can hold
+ *
+ * @note Only applies to span processors which use a queue, e.g. the SDK Batching Span Processor.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_PROCESSOR_SPAN_QUEUE_CAPACITY = 'otel.sdk.processor.span.queue.capacity' as const;
+
+/**
+ * The number of spans in the queue of a given instance of an SDK span processor
+ *
+ * @note Only applies to span processors which use a queue, e.g. the SDK Batching Span Processor.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_PROCESSOR_SPAN_QUEUE_SIZE = 'otel.sdk.processor.span.queue.size' as const;
+
+/**
+ * The number of created spans for which the end operation was called
+ *
+ * @note For spans with `recording=true`: Implementations **MUST** record both `otel.sdk.span.live.count` and `otel.sdk.span.ended.count`.
+ * For spans with `recording=false`: If implementations decide to record this metric, they **MUST** also record `otel.sdk.span.live.count`.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_SPAN_ENDED_COUNT = 'otel.sdk.span.ended.count' as const;
+
+/**
+ * The number of created spans for which the end operation has not been called yet
+ *
+ * @note For spans with `recording=true`: Implementations **MUST** record both `otel.sdk.span.live.count` and `otel.sdk.span.ended.count`.
+ * For spans with `recording=false`: If implementations decide to record this metric, they **MUST** also record `otel.sdk.span.ended.count`.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_SPAN_LIVE_COUNT = 'otel.sdk.span.live.count' as const;
+
+/**
  * Number of times the process has been context switched.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -1404,9 +1656,11 @@ export const METRIC_RPC_SERVER_RESPONSE_SIZE = 'rpc.server.response.size' as con
 export const METRIC_RPC_SERVER_RESPONSES_PER_RPC = 'rpc.server.responses_per_rpc' as const;
 
 /**
- * Reports the current frequency of the CPU in Hz
+ * Deprecated. Use `cpu.frequency` instead.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `cpu.frequency`.
  */
 export const METRIC_SYSTEM_CPU_FREQUENCY = 'system.cpu.frequency' as const;
 
@@ -1427,16 +1681,20 @@ export const METRIC_SYSTEM_CPU_LOGICAL_COUNT = 'system.cpu.logical.count' as con
 export const METRIC_SYSTEM_CPU_PHYSICAL_COUNT = 'system.cpu.physical.count' as const;
 
 /**
- * Seconds each logical CPU spent on each mode
+ * Deprecated. Use `cpu.time` instead.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `cpu.time`.
  */
 export const METRIC_SYSTEM_CPU_TIME = 'system.cpu.time' as const;
 
 /**
- * Difference in system.cpu.time since the last measurement, divided by the elapsed time and number of logical CPUs
+ * Deprecated. Use `cpu.utilization` instead.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `cpu.utilization`.
  */
 export const METRIC_SYSTEM_CPU_UTILIZATION = 'system.cpu.utilization' as const;
 
@@ -1658,7 +1916,7 @@ export const METRIC_SYSTEM_UPTIME = 'system.uptime' as const;
 /**
  * Garbage collection duration.
  *
- * @note The values can be retrieve from [`perf_hooks.PerformanceObserver(...).observe({ entryTypes: ['gc'] })`](https://nodejs.org/api/perf_hooks.html#performanceobserverobserveoptions)
+ * @note The values can be retrieved from [`perf_hooks.PerformanceObserver(...).observe({ entryTypes: ['gc'] })`](https://nodejs.org/api/perf_hooks.html#performanceobserverobserveoptions)
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */

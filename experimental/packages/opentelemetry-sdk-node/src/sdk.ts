@@ -72,13 +72,12 @@ import { NodeSDKConfiguration } from './types';
 import {
   getBooleanFromEnv,
   getStringFromEnv,
-  diagLogLevelFromString,
   getStringListFromEnv,
+  diagLogLevelFromString,
 } from '@opentelemetry/core';
 import {
   getResourceDetectorsFromEnv,
   getSpanProcessorsFromEnv,
-  filterBlanksAndNulls,
   getPropagatorFromEnv,
 } from './utils';
 
@@ -115,11 +114,10 @@ function getValueInMillis(envName: string, defaultValue: number): number {
  */
 function configureMetricProviderFromEnv(): IMetricReader[] {
   const metricReaders: IMetricReader[] = [];
-  const metricsExporterList = process.env.OTEL_METRICS_EXPORTER?.trim();
-  if (!metricsExporterList) {
+  const enabledExporters = getStringListFromEnv('OTEL_METRICS_EXPORTER');
+  if (!enabledExporters) {
     return metricReaders;
   }
-  const enabledExporters = filterBlanksAndNulls(metricsExporterList.split(','));
 
   if (enabledExporters.length === 0) {
     diag.debug('OTEL_METRICS_EXPORTER is empty. Using default otlp exporter.');
@@ -252,7 +250,7 @@ export class NodeSDK {
       this._resourceDetectors = [];
     } else if (configuration.resourceDetectors != null) {
       this._resourceDetectors = configuration.resourceDetectors;
-    } else if (process.env.OTEL_NODE_RESOURCE_DETECTORS != null) {
+    } else if (getStringFromEnv('OTEL_NODE_RESOURCE_DETECTORS')) {
       this._resourceDetectors = getResourceDetectorsFromEnv();
     } else {
       this._resourceDetectors = [envDetector, processDetector, hostDetector];
@@ -385,12 +383,8 @@ export class NodeSDK {
     if (this._loggerProviderConfig) {
       const loggerProvider = new LoggerProvider({
         resource: this._resource,
+        processors: this._loggerProviderConfig.logRecordProcessors,
       });
-
-      for (const logRecordProcessor of this._loggerProviderConfig
-        .logRecordProcessors) {
-        loggerProvider.addLogRecordProcessor(logRecordProcessor);
-      }
 
       this._loggerProvider = loggerProvider;
 
