@@ -24,14 +24,17 @@ import {
 import {
   ATTR_ERROR_TYPE,
   ATTR_HTTP_ROUTE,
-  ATTR_URL_PATH,
-  ATTR_URL_QUERY,
+  ATTR_USER_AGENT_ORIGINAL,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import { IncomingMessage, ServerResponse } from 'http';
 import { Socket } from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
+import {
+  ATTR_USER_AGENT_SYNTHETIC_TYPE,
+  USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
+} from '../../src/semconv';
 import { IgnoreMatcher, ParsedRequestOptions } from '../../src/internal-types';
 import * as utils from '../../src/utils';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
@@ -280,6 +283,7 @@ describe('Utility', () => {
         request,
         {
           component: 'http',
+          enableSyntheticSourceDetection: false,
         },
         diag
       );
@@ -299,12 +303,35 @@ describe('Utility', () => {
         request,
         {
           component: 'http',
+          enableSyntheticSourceDetection: false,
         },
         diag
       );
-      const path = String(attributes[ATTR_URL_PATH] ?? '');
-      const query = String(attributes[ATTR_URL_QUERY] ?? '');
-      assert.strictEqual(path + '?' + query, '/user/?q=val');
+      assert.strictEqual(attributes[ATTR_USER_AGENT_SYNTHETIC_TYPE], undefined);
+    });
+
+    it('should set synthetic attributes on requests', () => {
+      const request = {
+        url: 'http://hostname/user/:id',
+        method: 'GET',
+        socket: {},
+      } as IncomingMessage;
+      request.headers = {
+        'user-agent': 'Googlebot',
+      };
+      const attributes = utils.getIncomingRequestAttributes(
+        request,
+        {
+          component: 'http',
+          enableSyntheticSourceDetection: true,
+        },
+        diag
+      );
+      assert.strictEqual(attributes[ATTR_USER_AGENT_ORIGINAL], 'Googlebot');
+      assert.strictEqual(
+        attributes[ATTR_USER_AGENT_SYNTHETIC_TYPE],
+        USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT
+      );
     });
   });
 
