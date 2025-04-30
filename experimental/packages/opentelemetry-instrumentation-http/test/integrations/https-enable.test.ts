@@ -15,12 +15,7 @@
  */
 
 import { SpanKind, Span, context, propagation } from '@opentelemetry/api';
-import {
-  HTTPFLAVORVALUES_HTTP_1_1,
-  NETTRANSPORTVALUES_IP_TCP,
-  SEMATTRS_HTTP_FLAVOR,
-  SEMATTRS_NET_TRANSPORT,
-} from '@opentelemetry/semantic-conventions';
+import { ATTR_NETWORK_PROTOCOL_NAME } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as fs from 'fs';
@@ -165,8 +160,6 @@ describe('HttpsInstrumentation Integration tests', () => {
         hostname: 'localhost',
         httpStatusCode: result.statusCode!,
         httpMethod: 'GET',
-        pathname: '/',
-        path: '/?query=test',
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
         component: 'https',
@@ -192,8 +185,6 @@ describe('HttpsInstrumentation Integration tests', () => {
         hostname: 'localhost',
         httpStatusCode: result.statusCode!,
         httpMethod: 'GET',
-        pathname: '/',
-        path: '/?query=test',
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
         component: 'https',
@@ -222,8 +213,6 @@ describe('HttpsInstrumentation Integration tests', () => {
         hostname: 'localhost',
         httpStatusCode: result.statusCode!,
         httpMethod: 'GET',
-        pathname: '/',
-        path: '/?query=test',
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
         component: 'https',
@@ -232,13 +221,9 @@ describe('HttpsInstrumentation Integration tests', () => {
       assert.strictEqual(spans.length, 2);
       assert.strictEqual(span.name, 'GET');
       assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
-      assert.strictEqual(
-        span.attributes[SEMATTRS_HTTP_FLAVOR],
-        HTTPFLAVORVALUES_HTTP_1_1
-      );
-      assert.strictEqual(
-        span.attributes[SEMATTRS_NET_TRANSPORT],
-        NETTRANSPORTVALUES_IP_TCP
+      assert.ok(
+        !span.attributes[ATTR_NETWORK_PROTOCOL_NAME],
+        'should not be added for HTTP kind'
       );
       assertSpan(span, SpanKind.CLIENT, validations);
     });
@@ -254,7 +239,6 @@ describe('HttpsInstrumentation Integration tests', () => {
         hostname: 'localhost',
         httpStatusCode: result.statusCode!,
         httpMethod: 'GET',
-        pathname: '/',
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
         component: 'https',
@@ -282,7 +266,6 @@ describe('HttpsInstrumentation Integration tests', () => {
         hostname: 'localhost',
         httpStatusCode: 200,
         httpMethod: 'GET',
-        pathname: '/',
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
         component: 'https',

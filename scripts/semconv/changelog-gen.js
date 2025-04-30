@@ -100,14 +100,6 @@ function summarizeChanges({prev, curr, prevSrc, currSrc}) {
       return a !== b;
     }
   };
-  const isNewlyDeprecated = (k) => {
-    const isPrevDeprecated = prevNames.has(k) && isDeprecated(prevSrc, k);
-    const isCurrDeprecated = currNames.has(k) && isDeprecated(currSrc, k);
-    if (isPrevDeprecated && !isCurrDeprecated) {
-      throw new Error(`semconv export '${k}' was *un*-deprecated in this release!? Wassup?`);
-    }
-    return (!isPrevDeprecated && isCurrDeprecated);
-  };
 
   // Determine changes.
   const changes = [];
@@ -120,9 +112,12 @@ function summarizeChanges({prev, curr, prevSrc, currSrc}) {
     } else if (valChanged(curr[k], prev[k])) {
       changes.push({type: 'changed', k, v: curr[k], prevV: prev[k]});
     } else {
-      const deprecatedResult = isNewlyDeprecated(k);
-      if (deprecatedResult) {
-        changes.push({type: 'deprecated', k, v: curr[k], deprecatedResult});
+      const isPrevDeprecated = prevNames.has(k) && isDeprecated(prevSrc, k);
+      const isCurrDeprecated = currNames.has(k) && isDeprecated(currSrc, k);
+      if (!isPrevDeprecated && isCurrDeprecated) {
+        changes.push({type: 'deprecated', k, v: curr[k], deprecatedResult: isCurrDeprecated});
+      } else if (isPrevDeprecated && !isCurrDeprecated) {
+        changes.push({type: 'undeprecated', k, v: curr[k]});
       }
     }
   }
@@ -138,19 +133,21 @@ function summarizeChanges({prev, curr, prevSrc, currSrc}) {
     removed: [],
     changed: [],
     deprecated: [],
+    undeprecated: [],
     added: [],
   }
   const execSummaryFromChangeType = {
     removed: null,
     changed: null,
     deprecated: null,
+    undeprecated: null,
     added: null,
   };
 
   const removed = changes.filter(ch => ch.type === 'removed');
   let summary = summaryFromChangeType.removed;
   if (removed.length) {
-    execSummaryFromChangeType.removed = `${removed.length} removed exports`;
+    execSummaryFromChangeType.removed = `${removed.length} removed export${removed.length === 1 ? '' : 's'}`;
     if (summary.length) { summary.push(''); }
     let last;
     const longest = removed.reduce((acc, ch) => Math.max(acc, ch.k.length), 0);
@@ -168,7 +165,7 @@ function summarizeChanges({prev, curr, prevSrc, currSrc}) {
   const changed = changes.filter(ch => ch.type === 'changed');
   summary = summaryFromChangeType.changed;
   if (changed.length) {
-    execSummaryFromChangeType.changed = `${changed.length} exported values changed`;
+    execSummaryFromChangeType.changed = `${changed.length} exported value${changed.length === 1 ? '' : 's'} changed`;
     if (summary.length) { summary.push(''); }
     let last;
     const longest = changed.reduce((acc, ch) => Math.max(acc, ch.k.length), 0);
@@ -187,7 +184,7 @@ function summarizeChanges({prev, curr, prevSrc, currSrc}) {
   const deprecated = changes.filter(ch => ch.type === 'deprecated');
   summary = summaryFromChangeType.deprecated;
   if (deprecated.length) {
-    execSummaryFromChangeType.deprecated = `${deprecated.length} newly deprecated exports`;
+    execSummaryFromChangeType.deprecated = `${deprecated.length} newly deprecated export${deprecated.length === 1 ? '': 's'}`;
     if (summary.length) { summary.push(''); }
     let last;
     const longest = deprecated.reduce((acc, ch) => Math.max(acc, ch.k.length), 0);
@@ -205,10 +202,27 @@ function summarizeChanges({prev, curr, prevSrc, currSrc}) {
     });
   }
 
+  const undeprecated = changes.filter(ch => ch.type === 'undeprecated');
+  summary = summaryFromChangeType.undeprecated;
+  if (undeprecated.length) {
+    execSummaryFromChangeType.undeprecated = `${undeprecated.length} newly undeprecated export${undeprecated.length === 1 ? '': 's'}`;
+    if (summary.length) { summary.push(''); }
+    let last;
+    const longest = undeprecated.reduce((acc, ch) => Math.max(acc, ch.k.length), 0);
+    undeprecated.forEach(ch => {
+      if (last && ch.ns !== last.ns) { summary.push(''); }
+      const cindent = ' '.repeat(longest - ch.k.length + 1);
+
+      summary.push(`${ch.k}${cindent}// ${ch.v}`);
+
+      last = ch;
+    });
+  }
+
   const added = changes.filter(ch => ch.type === 'added');
   summary = summaryFromChangeType.added;
   if (added.length) {
-    execSummaryFromChangeType.added = `${added.length} added exports`;
+    execSummaryFromChangeType.added = `${added.length} added export${added.length === 1 ? '': 's'}`;
     let last, lastAttr;
     const longest = added.reduce((acc, ch) => Math.max(acc, ch.k.length), 0);
     added.forEach(ch => {
@@ -311,7 +325,7 @@ function semconvChangelogGen(aVer=undefined, bVer=undefined) {
   });
 
   // Render the "change info" into a Markdown summary for the changelog.
-  const changeTypes = ['removed', 'changed', 'deprecated', 'added'];
+  const changeTypes = ['removed', 'changed', 'deprecated', 'undeprecated', 'added'];
   let execSummaryFromChInfo = (chInfo) => {
     const parts = changeTypes
       .map(chType => chInfo.execSummaryFromChangeType[chType])

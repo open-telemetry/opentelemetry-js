@@ -37,7 +37,6 @@ import {
   ExportResultCode,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
-import { assertRejects } from '../test-utils';
 import { TestMetricProducer } from './TestMetricProducer';
 import {
   assertAggregationSelector,
@@ -224,6 +223,26 @@ describe('PeriodicExportingMetricReader', () => {
             exporter: exporter,
             exportIntervalMillis: 100,
             exportTimeoutMillis: 200,
+          }),
+        /exportIntervalMillis must be greater than or equal to exportTimeoutMillis/
+      );
+      assert.throws(
+        () =>
+          new PeriodicExportingMetricReader({
+            exporter: exporter,
+            exportIntervalMillis: 100,
+            // exportTimeoutMillis defaults to 30 seconds, which is greater than exportIntervalMillis.
+            exportTimeoutMillis: undefined,
+          }),
+        /exportIntervalMillis must be greater than or equal to exportTimeoutMillis/
+      );
+      assert.throws(
+        () =>
+          new PeriodicExportingMetricReader({
+            exporter: exporter,
+            // exportIntervalMillis defaults to 60 seconds, which is less than exportTimeoutMillis.
+            exportIntervalMillis: undefined,
+            exportTimeoutMillis: 90_000,
           }),
         /exportIntervalMillis must be greater than or equal to exportTimeoutMillis/
       );
@@ -474,7 +493,7 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-      await assertRejects(
+      await assert.rejects(
         () => reader.forceFlush({ timeoutMillis: 20 }),
         TimeoutError
       );
@@ -491,7 +510,10 @@ describe('PeriodicExportingMetricReader', () => {
       });
       reader.setMetricProducer(new TestMetricProducer());
 
-      await assertRejects(() => reader.forceFlush(), /Error during forceFlush/);
+      await assert.rejects(
+        () => reader.forceFlush(),
+        /Error during forceFlush/
+      );
     });
 
     it('should not forceFlush exporter after shutdown', async () => {
@@ -604,7 +626,7 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-      await assertRejects(
+      await assert.rejects(
         () => reader.shutdown({ timeoutMillis: 20 }),
         TimeoutError
       );
@@ -638,7 +660,7 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 80,
       });
 
-      await assertRejects(() => reader.shutdown(), /Error during forceFlush/);
+      await assert.rejects(() => reader.shutdown(), /Error during forceFlush/);
     });
   });
 });

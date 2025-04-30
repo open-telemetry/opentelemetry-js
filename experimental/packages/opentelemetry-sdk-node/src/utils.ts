@@ -19,6 +19,7 @@ import {
   CompositePropagator,
   getStringFromEnv,
   getStringListFromEnv,
+  W3CBaggagePropagator,
   W3CTraceContextPropagator,
 } from '@opentelemetry/core';
 import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
@@ -59,8 +60,9 @@ export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
     [RESOURCE_DETECTOR_PROCESS, processDetector],
   ]);
 
-  const resourceDetectorsFromEnv =
-    process.env.OTEL_NODE_RESOURCE_DETECTORS?.split(',') ?? ['all'];
+  const resourceDetectorsFromEnv = getStringListFromEnv(
+    'OTEL_NODE_RESOURCE_DETECTORS'
+  ) ?? ['all'];
 
   if (resourceDetectorsFromEnv.includes('all')) {
     return [...resourceDetectors.values()].flat();
@@ -200,7 +202,7 @@ export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
   // Any other propagators (like aws, aws-lambda, should go into `@opentelemetry/auto-configuration-propagators` instead).
   const propagatorsFactory = new Map<string, () => TextMapPropagator>([
     ['tracecontext', () => new W3CTraceContextPropagator()],
-    ['baggage', () => new W3CTraceContextPropagator()],
+    ['baggage', () => new W3CBaggagePropagator()],
     ['b3', () => new B3Propagator()],
     [
       'b3multi',
