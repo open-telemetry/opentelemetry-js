@@ -28,7 +28,7 @@ export {
   resourceFromAttributes,
   defaultResource,
   emptyResource,
-} from './ResourceImpl';
+} from './resource-impl';
 export { defaultServiceName } from './platform';
 export {
   ResourceDetector,
