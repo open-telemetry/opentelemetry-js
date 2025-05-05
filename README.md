@@ -256,7 +256,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 Members of this team have triager permissions for opentelemetry-js.git and opentelemetry-js-contrib.git.
 
-- (none currently)
+- [Jackson Weber](https://github.com/JacksonWeber), Microsoft
 
 *Find more about the triager role in the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#triager).*
 
