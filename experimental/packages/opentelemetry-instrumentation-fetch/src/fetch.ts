@@ -25,14 +25,14 @@ import * as core from '@opentelemetry/core';
 import * as web from '@opentelemetry/sdk-trace-web';
 import { AttributeNames } from './enums/AttributeNames';
 import {
-  SEMATTRS_HTTP_STATUS_CODE,
-  SEMATTRS_HTTP_HOST,
-  SEMATTRS_HTTP_USER_AGENT,
-  SEMATTRS_HTTP_SCHEME,
-  SEMATTRS_HTTP_URL,
-  SEMATTRS_HTTP_METHOD,
-  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-} from '@opentelemetry/semantic-conventions';
+  ATTR_HTTP_STATUS_CODE,
+  ATTR_HTTP_HOST,
+  ATTR_HTTP_USER_AGENT,
+  ATTR_HTTP_SCHEME,
+  ATTR_HTTP_URL,
+  ATTR_HTTP_METHOD,
+  ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+} from '../src/semconv';
 import { FetchError, FetchResponse, SpanData } from './types';
 import { getFetchBodyLength } from './utils';
 import { VERSION } from './version';
@@ -138,17 +138,14 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     response: FetchResponse
   ): void {
     const parsedUrl = web.parseUrl(response.url);
-    span.setAttribute(SEMATTRS_HTTP_STATUS_CODE, response.status);
+    span.setAttribute(ATTR_HTTP_STATUS_CODE, response.status);
     if (response.statusText != null) {
       span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, response.statusText);
     }
-    span.setAttribute(SEMATTRS_HTTP_HOST, parsedUrl.host);
-    span.setAttribute(
-      SEMATTRS_HTTP_SCHEME,
-      parsedUrl.protocol.replace(':', '')
-    );
+    span.setAttribute(ATTR_HTTP_HOST, parsedUrl.host);
+    span.setAttribute(ATTR_HTTP_SCHEME, parsedUrl.protocol.replace(':', ''));
     if (typeof navigator !== 'undefined') {
-      span.setAttribute(SEMATTRS_HTTP_USER_AGENT, navigator.userAgent);
+      span.setAttribute(ATTR_HTTP_USER_AGENT, navigator.userAgent);
     }
   }
 
@@ -223,8 +220,8 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       kind: api.SpanKind.CLIENT,
       attributes: {
         [AttributeNames.COMPONENT]: this.moduleName,
-        [SEMATTRS_HTTP_METHOD]: method,
-        [SEMATTRS_HTTP_URL]: url,
+        [ATTR_HTTP_METHOD]: method,
+        [ATTR_HTTP_URL]: url,
       },
     });
   }
@@ -340,7 +337,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
               if (!length) return;
 
               createdSpan.setAttribute(
-                SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
                 length
               );
             })
