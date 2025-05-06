@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { runTests } from './helper';
+import { runTestsWithSemconvStabilityLevels } from './helper';
 import { GrpcInstrumentation } from '../src';
 
 const instrumentation = new GrpcInstrumentation();
@@ -24,5 +24,5 @@ instrumentation.disable();
 import '@grpc/grpc-js';
 
 describe('#grpc-js', () => {
-  runTests(instrumentation, 'grpc', 12346);
+  runTestsWithSemconvStabilityLevels(instrumentation, 'grpc', 12346);
 });
