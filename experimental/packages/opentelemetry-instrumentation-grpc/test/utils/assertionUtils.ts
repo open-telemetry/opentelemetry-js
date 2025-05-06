@@ -22,11 +22,20 @@ import {
   hrTimeToMilliseconds,
   hrTimeToMicroseconds,
 } from '@opentelemetry/core';
+
+// stable http attributes
+// net.peer.name → server.address
+// net.peer.port → server.port
+// import {
+//   ATTR_SERVER_ADDRESS,
+//   ATTR_SERVER_PORT,
+// } from '@opentelemetry/semantic-conventions';
+
 import {
-  SEMATTRS_NET_PEER_NAME,
-  SEMATTRS_NET_PEER_PORT,
-  SEMATTRS_RPC_GRPC_STATUS_CODE,
-} from '@opentelemetry/semantic-conventions';
+  ATTR_NET_PEER_NAME,
+  ATTR_NET_PEER_PORT,
+  ATTR_RPC_GRPC_STATUS_CODE,
+} from '../../src/semconv';
 
 export const grpcStatusCodeToOpenTelemetryStatusCode = (
   status: GrpcStatus
@@ -70,11 +79,11 @@ export const assertSpan = (
     validations.netPeerPort !== undefined
   ) {
     assert.strictEqual(
-      span.attributes[SEMATTRS_NET_PEER_NAME],
+      span.attributes[ATTR_NET_PEER_NAME],
       validations.netPeerName
     );
     assert.strictEqual(
-      span.attributes[SEMATTRS_NET_PEER_PORT],
+      span.attributes[ATTR_NET_PEER_PORT],
       validations.netPeerPort
     );
   }
@@ -86,7 +95,7 @@ export const assertSpan = (
     grpcStatusCodeToOpenTelemetryStatusCode(validations.status)
   );
   assert.strictEqual(
-    span.attributes[SEMATTRS_RPC_GRPC_STATUS_CODE],
+    span.attributes[ATTR_RPC_GRPC_STATUS_CODE],
     validations.status
   );
 };
