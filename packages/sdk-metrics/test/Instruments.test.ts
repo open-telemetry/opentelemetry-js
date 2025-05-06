@@ -876,8 +876,8 @@ async function validateExport(
       metric.dataPoints[idx],
       expectedDataPoint.attributes ?? {},
       expectedDataPoint.value as any,
-      expectedDataPoint.startTime,
-      expectedDataPoint.endTime
+      expectedDataPoint.startTimeUnixNano,
+      expectedDataPoint.endTimeUnixNano
     );
   }
 }

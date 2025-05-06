@@ -170,6 +170,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
   * (user-facing): `DEFAULT_ATTRIBUTE_VALUE_COUNT_LIMIT` has been removed, please use `128` instead
   * (user-facing): `DEFAULT_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT` has been removed, please use `128` instead
   * (user-facing): `DEFAULT_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT` has been removed, please use `128` instead
+* refactor!: convert all SDK timestamps from HrTime to bigint [#5522](https://github.com/open-telemetry/opentelemetry-js/pull/5522) @dyladan
+  * Times are now internally represented as `bigint` literals. This simplifies time math and makes the export pipeline more efficient.
 
 ### :rocket: (Enhancement)
 

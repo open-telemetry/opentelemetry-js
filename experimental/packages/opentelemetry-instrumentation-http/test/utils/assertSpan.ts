@@ -19,7 +19,6 @@ import {
   SpanStatus,
   Exception,
 } from '@opentelemetry/api';
-import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import {
   ATTR_HTTP_REQUEST_METHOD,
@@ -93,8 +92,11 @@ export const assertSpan = (
     }
   );
 
-  assert.ok(span.endTime, 'must be finished');
-  assert.ok(hrTimeToNanoseconds(span.duration), 'must have positive duration');
+  assert.ok(span.ended, 'must be finished');
+  assert.ok(
+    span.endTimeUnixNano > span.startTimeUnixNano,
+    'must have positive duration'
+  );
 
   if (span.kind === SpanKind.CLIENT) {
     assert.strictEqual(
