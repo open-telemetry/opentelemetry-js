@@ -83,22 +83,27 @@ HTTP semantic conventions (semconv) were stabilized in v1.23.0, and a [migration
 To select which semconv version(s) is emitted from this instrumentation, use the `semconvStabilityOptIn` configuration option. This option works [as described for `OTEL_SEMCONV_STABILITY_OPT_IN`](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md):
 
 - `http`: emit the new (stable) v1.23.0 semantics
-- `http/dep`: emit **both** the old v1.7.0 and the new (stable) v1.23.0 semantics
+- `http/dup`: emit **both** the old v1.7.0 and the new (stable) v1.23.0 semantics
 - By default, if `semconvStabilityOptIn` includes neither of the above tokens, the old v1.7.0 semconv is used.
 
-**Span name:** With the old v1.7.0 semconv the span name is `HTTP {method}` (for example 'HTTP GET'). Using the stable [semconv v1.23 for HTTP span names](https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#name), the span name is `{method}` (for example 'GET'). (This instrumentation does not currently support adding an `{http.route}` to the span name.)
+**Span name:** With the old v1.7.0 semconv the span name is `HTTP {method}` (for example 'HTTP GET'). Using the stable [semconv v1.23 for HTTP span names](https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#name), the span name is `{method}` (for example 'GET'). If both semconv versions are being emitted, the *old* name wins. (This instrumentation does not currently support adding an `{http.route}` to the span name.)
+
+**Span status:** When the stable semconv is selected, the [span status](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#status) is set to ERROR when the response status code is `>=400`. When just the old semconv is select, the span status is not set.
 
 **Span attributes:**
 
 | v1.7.0 semconv         | v1.23.0 semconv                    | Notes |
 | ---------------------- | ---------------------------------- | -------------------------------------------------------------- |
-| `http.status_code`     | `http.response.status_code`        | HTTP response status code |
+| `http.method`          | `http.request.method`              | HTTP request method. With v1.23.0 semconv [`http.request.method_original` may also be included](https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#common-attributes). |
+| `http.url`             | `url.full`                         | Full HTTP request URL |
 | `http.host`            | `server.address` and `server.port` | The hostname and port of the request URL |
+| `http.status_code`     | `http.response.status_code`        | HTTP response status code |
+| `http.request_content_length_uncompressed` | `http.request.body.size` | This is only added if `measureRequestSize` is `true`. |
+| (no equivalent)        | `error.type`                       | The response status (as a string), if the response status was `>=400`. |
 | `http.user_agent`      | (not included)                     | Stable HTTP semconv would use `user_agent.original`, but this is an [`Opt-In` attribute](https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#http-client), so would require adding a configuration option to this instrumentation to enable. |
 | `http.scheme`          | (not included)                     | Stable HTTP semconv would use `url.scheme`, but this is an [`Opt-In` attribute](https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#http-client), so would require adding a configuration option to this instrumentation to enable. |
-| `http.url`             | `url.full`                         | Full HTTP request URL |
-| `http.method`          | `http.request.method` | HTTP request method. With v1.23.0 semconv [`http.request.method_original` may also be included](https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#common-attributes). |
-| `http.request_content_length_uncompressed` | (not included) | Stable HTTP semconv would use `http.request.body.size`, but this is an [`Opt-In` attribute](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#http-client), so would require adding a configuration option to this instrumentation to enable. As well, the distinction between compressed and uncompressed size is less clear. |
+| `http.status_text`     | (not included)                     | This is no longer a documented semantic conventions attribute. |
+| `component`            | (no replacement)                   | `component` was an ancient Span "tag" that was never formalized. |
 
 ## Useful links
 

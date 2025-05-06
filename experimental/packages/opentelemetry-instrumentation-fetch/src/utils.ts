@@ -18,6 +18,8 @@
 // These may be unified in the future.
 
 import * as api from '@opentelemetry/api';
+import { getStringListFromEnv } from '@opentelemetry/core';
+import { URLLike } from '@opentelemetry/sdk-trace-web';
 
 const DIAG_LOGGER = api.diag.createComponentLogger({
   namespace: '@opentelemetry/opentelemetry-instrumentation-fetch/utils',
@@ -175,4 +177,97 @@ function getFormDataSize(formData: FormData): number {
     }
   }
   return size;
+}
+
+/**
+ * Tracks whether this instrumentation emits old experimental,
+ * new stable, or both semantic conventions.
+ *
+ * Enum values chosen such that the enum may be used as a bitmask.
+ */
+export const enum SemconvStability {
+  /** Emit only stable semantic conventions */
+  STABLE = 0x1,
+  /** Emit only old semantic conventions*/
+  OLD = 0x2,
+  /** Emit both stable and old semantic conventions*/
+  DUPLICATE = 0x1 | 0x2,
+}
+
+export function httpSemconvStabilityFromStr(str: string | undefined) {
+  let semconvStability = SemconvStability.OLD;
+
+  // The same parsing of `str` as `getStringListFromEnv` from the core pkg.
+  const entries = str
+    ?.split(',')
+    .map(v => v.trim())
+    .filter(s => s !== '');
+  for (const entry of entries ?? []) {
+    if (entry.toLowerCase() === 'http/dup') {
+      // http/dup takes highest precedence.
+      semconvStability = SemconvStability.DUPLICATE;
+      break;
+    } else if (entry.toLowerCase() === 'http') {
+      semconvStability = SemconvStability.STABLE;
+    }
+  }
+
+  return semconvStability;
+}
+
+/**
+ * Normalize an HTTP request method string per `http.request.method` spec
+ * https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#http-client-span
+ */
+export function normalizeHttpRequestMethod(method: string): string {
+  const knownMethods = getKnownMethods();
+  const methUpper = method.toUpperCase();
+  if (methUpper in knownMethods) {
+    return methUpper;
+  } else {
+    return '_OTHER';
+  }
+}
+
+const DEFAULT_KNOWN_METHODS = {
+  CONNECT: true,
+  DELETE: true,
+  GET: true,
+  HEAD: true,
+  OPTIONS: true,
+  PATCH: true,
+  POST: true,
+  PUT: true,
+  TRACE: true,
+};
+let knownMethods: { [key: string]: boolean };
+function getKnownMethods() {
+  if (knownMethods === undefined) {
+    const cfgMethods = getStringListFromEnv(
+      'OTEL_INSTRUMENTATION_HTTP_KNOWN_METHODS'
+    );
+    if (cfgMethods && cfgMethods.length > 0) {
+      knownMethods = {};
+      cfgMethods.forEach(m => {
+        knownMethods[m] = true;
+      });
+    } else {
+      knownMethods = DEFAULT_KNOWN_METHODS;
+    }
+  }
+  return knownMethods;
+}
+
+const HTTP_PORT_FROM_PROTOCOL: { [key: string]: string } = {
+  'https:': '443',
+  'http:': '80',
+};
+export function serverPortFromUrl(url: URLLike): number | undefined {
+  const serverPort = Number(url.port || HTTP_PORT_FROM_PROTOCOL[url.protocol]);
+  // Guard with `if (serverPort)` because `Number('') === 0`.
+  if (serverPort && !isNaN(serverPort)) {
+    return serverPort;
+  } else {
+    return undefined;
+  }
 }
