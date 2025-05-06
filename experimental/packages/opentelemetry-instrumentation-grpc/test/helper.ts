@@ -50,6 +50,7 @@ import {
 import { assertPropagation, assertSpan } from './utils/assertionUtils';
 import { promisify } from 'util';
 import type { GrpcInstrumentation } from '../src';
+import { SemconvStability } from '../src/types';
 import * as path from 'path';
 
 const PROTO_PATH = path.resolve(__dirname, './fixtures/grpc-test.proto');
@@ -423,6 +424,10 @@ export const runTests = (
     let contextManager: ContextManager;
 
     before(() => {
+      // change semconvStability to see validation failures and make changes
+      // for each option in SemconvStability
+      // should pass on OLD and DUPLICATE, change to NEW will fail
+      plugin['_semconvStability'] = SemconvStability.DUPLICATE;
       propagation.setGlobalPropagator(new W3CTraceContextPropagator());
     });
 

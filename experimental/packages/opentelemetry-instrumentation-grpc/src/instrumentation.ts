@@ -26,8 +26,9 @@ import type {
   loadPackageDefinition,
   GrpcObject,
 } from '@grpc/grpc-js';
-
 import type * as grpcJs from '@grpc/grpc-js';
+
+import { getStringFromEnv } from '@opentelemetry/core';
 
 import type {
   ServerCallWithMeta,
@@ -40,7 +41,7 @@ import type {
   ClientRequestFunction,
   metadataCaptureType,
 } from './internal-types';
-import type { GrpcInstrumentationConfig } from './types';
+import { type GrpcInstrumentationConfig, SemconvStability } from './types';
 
 import {
   context,
@@ -50,6 +51,7 @@ import {
   SpanKind,
   trace,
   Span,
+  type Attributes,
 } from '@opentelemetry/api';
 import {
   InstrumentationNodeModuleDefinition,
@@ -59,10 +61,10 @@ import {
 // stable http attributes
 // net.peer.name → server.address
 // net.peer.port → server.port
-// import {
-//   ATTR_SERVER_ADDRESS,
-//   ATTR_SERVER_PORT,
-// } from '@opentelemetry/semantic-conventions';
+import {
+  ATTR_SERVER_ADDRESS,
+  ATTR_SERVER_PORT,
+} from '@opentelemetry/semantic-conventions';
 
 import {
   ATTR_NET_PEER_NAME,
@@ -98,10 +100,18 @@ import { VERSION } from './version';
 
 export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentationConfig> {
   private _metadataCapture: metadataCaptureType;
+  private _semconvStability = SemconvStability.OLD;
 
   constructor(config: GrpcInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-grpc', VERSION, config);
     this._metadataCapture = this._createMetadataCapture();
+
+    const entry = getStringFromEnv('OTEL_SEMCONV_STABILITY_OPT_IN');
+    if (entry?.toLowerCase() === 'http/dup') {
+      this._semconvStability = SemconvStability.DUPLICATE;
+    } else if (entry?.toLowerCase() === 'http') {
+      this._semconvStability = SemconvStability.STABLE;
+    }
   }
 
   init() {
@@ -335,7 +345,11 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
           service,
           metadata
         );
-        instrumentation.extractNetMetadata(this, span);
+        instrumentation.extractNetMetadata(
+          this,
+          span,
+          instrumentation._semconvStability
+        );
 
         // Callback is only present when there is no responseStream
         if (!hasResponseStream) {
@@ -448,7 +462,11 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
             [ATTR_RPC_METHOD]: method,
             [ATTR_RPC_SERVICE]: service,
           });
-        instrumentation.extractNetMetadata(this, span);
+        instrumentation.extractNetMetadata(
+          this,
+          span,
+          instrumentation._semconvStability
+        );
 
         instrumentation._metadataCapture.client.captureRequestMetadata(
           span,
@@ -500,12 +518,37 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
     return span;
   }
 
-  private extractNetMetadata(client: grpcJs.Client, span: Span) {
+  private extractNetMetadata(
+    client: grpcJs.Client,
+    span: Span,
+    semconvStability: SemconvStability
+  ) {
     // set net.peer.* from target (e.g., "dns:otel-productcatalogservice:8080") as a hint to APMs
     const parsedUri = URI_REGEX.exec(client.getChannel().getTarget());
-    if (parsedUri != null && parsedUri.groups != null) {
-      span.setAttribute(ATTR_NET_PEER_NAME, parsedUri.groups['name']);
-      span.setAttribute(ATTR_NET_PEER_PORT, parseInt(parsedUri.groups['port']));
+    const hostname = parsedUri?.groups?.name;
+    const port = parseInt(parsedUri?.groups?.port ?? '');
+
+    const oldAttributes: Attributes = {
+      [ATTR_NET_PEER_NAME]: hostname,
+      [ATTR_NET_PEER_PORT]: port,
+    };
+    const newAttributes: Attributes = {
+      [ATTR_SERVER_ADDRESS]: hostname,
+      [ATTR_SERVER_PORT]: port,
+    };
+
+    switch (semconvStability) {
+      case SemconvStability.STABLE:
+        span.setAttributes(newAttributes);
+        break;
+      case SemconvStability.OLD:
+        span.setAttributes(oldAttributes);
+        break;
+      case SemconvStability.DUPLICATE:
+        span.setAttributes({ ...oldAttributes, ...newAttributes });
+        break;
+      default:
+        span.setAttributes(oldAttributes);
     }
   }
 
