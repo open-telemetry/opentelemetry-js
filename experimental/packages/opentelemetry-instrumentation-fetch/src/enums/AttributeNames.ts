@@ -19,8 +19,5 @@
  */
 export enum AttributeNames {
   COMPONENT = 'component',
-  // XXX
-  HTTP_ERROR_NAME = 'http.error_name',
-  // XXX
   HTTP_STATUS_TEXT = 'http.status_text',
 }

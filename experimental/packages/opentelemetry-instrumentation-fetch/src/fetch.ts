@@ -32,6 +32,7 @@ import {
   ATTR_HTTP_URL,
   ATTR_HTTP_METHOD,
   ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+  ATTR_HTTP_REQUEST_BODY_SIZE,
 } from '../src/semconv';
 import {
   ATTR_ERROR_TYPE,
@@ -52,8 +53,6 @@ import {
 } from './utils';
 import { VERSION } from './version';
 import { _globalThis } from '@opentelemetry/core';
-// XXX incubating
-import { ATTR_HTTP_REQUEST_BODY_SIZE } from '@opentelemetry/semantic-conventions/incubating';
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
