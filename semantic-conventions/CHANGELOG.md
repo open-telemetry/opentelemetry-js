@@ -9,6 +9,16 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 1.33.0
+
+### :rocket: Features
+
 * feat: update semantic conventions to v1.33.0 [#NNNN]
   * Semantic Conventions v1.33.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1330) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * `@opentelemetry/semantic-conventions` (stable) changes: *56 added exports*
@@ -189,12 +199,6 @@ VCS_PROVIDER_NAME_VALUE_GITEA                            // "gitea"
 ```
 
 </details>
-
-### :bug: Bug Fixes
-
-### :books: Documentation
-
-### :house: Internal
 
 ## 1.32.0
 
