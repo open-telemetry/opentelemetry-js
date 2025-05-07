@@ -35,10 +35,6 @@
 
 ---
 
-> [!WARNING]
-> This is the working branch for the work in progress 2.0 SDK, see [this tracking issue](https://github.com/open-telemetry/opentelemetry-js/issues/5148) for details.
-> If you are a user looking for the current released state, you are probably looking for the [1.x SDK](https://github.com/open-telemetry/opentelemetry-js/tree/v1.x) on the v1.x branch.
-
 ## About this project
 
 This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a framework for collecting traces, metrics, and logs from applications.
@@ -260,7 +256,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 Members of this team have triager permissions for opentelemetry-js.git and opentelemetry-js-contrib.git.
 
-- (none currently)
+- [Jackson Weber](https://github.com/JacksonWeber), Microsoft
 
 *Find more about the triager role in the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#triager).*
 

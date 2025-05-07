@@ -76,8 +76,6 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
   startIncomingSpanHook?: StartIncomingSpanCustomAttributeFunction;
   /** Function for adding custom attributes before a span is started in outgoingRequest */
   startOutgoingSpanHook?: StartOutgoingSpanCustomAttributeFunction;
-  /** The primary server name of the matched virtual host. */
-  serverName?: string;
   /** Require parent to create span for outgoing requests */
   requireParentforOutgoingSpans?: boolean;
   /** Require parent to create span for incoming requests */
@@ -87,4 +85,9 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
     client?: { requestHeaders?: string[]; responseHeaders?: string[] };
     server?: { requestHeaders?: string[]; responseHeaders?: string[] };
   };
+  /**
+   * Enable automatic population of synthetic source type based on the user-agent header
+   * @experimental
+   **/
+  enableSyntheticSourceDetection?: boolean;
 }

@@ -73,7 +73,7 @@
     "sinon": "15.1.2",
     "ts-loader": "9.5.2",
     "typescript": "5.0.4",
-    "webpack": "5.96.1"
+    "webpack": "5.99.7"
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0"
