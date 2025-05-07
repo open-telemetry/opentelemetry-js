@@ -50,10 +50,12 @@ import {
   ATTR_HTTP_URL,
   ATTR_HTTP_USER_AGENT,
   ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+  ATTR_HTTP_REQUEST_BODY_SIZE,
 } from '../src/semconv';
 
 import * as msw from 'msw';
 import { setupWorker } from 'msw/browser';
+import { httpSemconvStabilityFromStr, SemconvStability } from '../src/utils';
 
 // This should match the unexported constant with the same name in fetch.ts
 const OBSERVER_WAIT_TIME_MS = 300;
@@ -1038,14 +1040,26 @@ describe('fetch', () => {
         };
 
         const assertHasRequestContentLength = (
+          config: FetchInstrumentationConfig,
           body = JSON.stringify(DEFAULT_BODY)
         ) => {
           const span: tracing.ReadableSpan = exportedSpans[0];
 
-          assert.strictEqual(
-            span.attributes[ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
-            body.length
+          const semconvStability = httpSemconvStabilityFromStr(
+            config.semconvStabilityOptIn
           );
+          if (semconvStability & SemconvStability.OLD) {
+            assert.strictEqual(
+              span.attributes[ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
+              body.length
+            );
+          }
+          if (semconvStability & SemconvStability.STABLE) {
+            assert.strictEqual(
+              span.attributes[ATTR_HTTP_REQUEST_BODY_SIZE],
+              body.length
+            );
+          }
         };
 
         describe('when `measureRequestSize` is not set', () => {
@@ -1069,11 +1083,34 @@ describe('fetch', () => {
         describe('with `measureRequestSize: `true`', () => {
           describe('with url and init object', () => {
             it('should measure request body size', async () => {
-              const { response } = await tracedFetch({
-                config: { measureRequestSize: true },
-              });
+              const config = { measureRequestSize: true };
+              const { response } = await tracedFetch({ config });
               assertJSONBody(response);
-              assertHasRequestContentLength();
+              assertHasRequestContentLength(config);
+            });
+          });
+
+          describe('with url and init object (semconvStabilityOptIn=http)', () => {
+            it('should measure request body size', async () => {
+              const config = {
+                measureRequestSize: true,
+                semconvStabilityOptIn: 'http',
+              };
+              const { response } = await tracedFetch({ config });
+              assertJSONBody(response);
+              assertHasRequestContentLength(config);
+            });
+          });
+
+          describe('with url and init object (semconvStabilityOptIn=http/dup)', () => {
+            it('should measure request body size', async () => {
+              const config = {
+                measureRequestSize: true,
+                semconvStabilityOptIn: 'http',
+              };
+              const { response } = await tracedFetch({ config });
+              assertJSONBody(response);
+              assertHasRequestContentLength(config);
             });
           });
 
@@ -1090,6 +1127,7 @@ describe('fetch', () => {
                   controller.close();
                 },
               });
+              const config = { measureRequestSize: true };
               const { response } = await tracedFetch({
                 callback: () =>
                   fetch('/api/echo-body.json', {
@@ -1102,15 +1140,16 @@ describe('fetch', () => {
                     // https://developer.chrome.com/docs/capabilities/web-apis/fetch-streaming-requests#half_duplex
                     duplex: 'half',
                   }),
-                config: { measureRequestSize: true },
+                config,
               });
               assertJSONBody(response);
-              assertHasRequestContentLength();
+              assertHasRequestContentLength(config);
             });
           });
 
           describe('with a Request object', () => {
             it('should measure request body size', async () => {
+              const config = { measureRequestSize: true };
               const { response } = await tracedFetch({
                 callback: () =>
                   fetch(
@@ -1122,15 +1161,16 @@ describe('fetch', () => {
                       body: JSON.stringify(DEFAULT_BODY),
                     })
                   ),
-                config: { measureRequestSize: true },
+                config,
               });
               assertJSONBody(response);
-              assertHasRequestContentLength();
+              assertHasRequestContentLength(config);
             });
           });
 
           describe('with a Request object and a URLSearchParams body', () => {
             it('should measure request body size', async () => {
+              const config = { measureRequestSize: true };
               const { response } = await tracedFetch({
                 callback: () =>
                   fetch(
@@ -1142,7 +1182,7 @@ describe('fetch', () => {
                       body: new URLSearchParams(DEFAULT_BODY),
                     })
                   ),
-                config: { measureRequestSize: true },
+                config,
               });
               const { request } = await response.json();
               assert.strictEqual(
@@ -1150,7 +1190,7 @@ describe('fetch', () => {
                 'application/x-www-form-urlencoded'
               );
               assert.strictEqual(request.body, 'hello=world');
-              assertHasRequestContentLength('hello=world');
+              assertHasRequestContentLength(config, 'hello=world');
             });
           });
         });
