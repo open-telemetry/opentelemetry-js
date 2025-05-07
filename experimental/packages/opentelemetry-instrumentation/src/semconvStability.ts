@@ -85,10 +85,24 @@ function _semconvStabilityFromStr(marker: string, str: string | undefined) {
   return semconvStability;
 }
 
+/**
+ * Determine appropriate 'http' semconv stability per
+ * https://opentelemetry.io/docs/specs/semconv/non-normative/http-migration/
+ *
+ * Note: This method will be removed after OTel JS HTTP semconv migration is
+ * complete (https://github.com/open-telemetry/opentelemetry-js/issues/5646).
+ */
 export function httpSemconvStabilityFromStr(str: string | undefined) {
   return _semconvStabilityFromStr('http', str);
 }
 
+/**
+ * Determine appropriate 'http' semconv stability per
+ * https://opentelemetry.io/docs/specs/semconv/non-normative/http-migration/
+ *
+ * Note: This method will be removed after OTel JS DB semconv migration is
+ * complete (https://github.com/open-telemetry/opentelemetry-js/issues/5646).
+ */
 export function databaseSemconvStabilityFromStr(str: string | undefined) {
   return _semconvStabilityFromStr('database', str);
 }
