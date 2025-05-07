@@ -456,10 +456,6 @@ export const runTests = (
     let contextManager: ContextManager;
 
     before(() => {
-      // change semconvStability to see validation failures and make changes
-      // for each option in SemconvStability
-      // should pass on OLD and DUPLICATE, change to NEW will fail
-      plugin['_semconvStability'] = SemconvStability.DUPLICATE;
       propagation.setGlobalPropagator(new W3CTraceContextPropagator());
     });
 
