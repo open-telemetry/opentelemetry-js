@@ -32,3 +32,8 @@ export {
   safeExecuteInTheMiddle,
   safeExecuteInTheMiddleAsync,
 } from './utils';
+export {
+  SemconvStability,
+  httpSemconvStabilityFromStr,
+  databaseSemconvStabilityFromStr,
+} from './semconvStability';
