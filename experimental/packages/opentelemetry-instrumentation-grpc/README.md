@@ -79,6 +79,17 @@ To select which semconv version(s) is emitted from this instrumentation, use the
 | `rpc.service`   |                  | The full (logical) name of the service being called, including its package name, if applicable.               |
 | `rpc.system`    |                  | A string identifying the remoting system.                                                                     |
 
+### Upgrading Semantic Conventions
+
+When upgrading to the new semantic conventions, it is recommended to do so in the following order:
+
+1. Upgrade `@opentelemetry/instrumentation-http` to the latest version
+2. Set `OTEL_SEMCONV_STABILITY_OPT_IN=http/dup` to emit both old and new semantic conventions
+3. Modify alerts, dashboards, metrics, and other processes to expect the new semantic conventions
+4. Set `OTEL_SEMCONV_STABILITY_OPT_IN=http` to emit only the new semantic conventions
+
+This will cause both the old and new semantic conventions to be emitted during the transition period.
+
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
