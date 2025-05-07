@@ -28,7 +28,7 @@ import type {
 } from '@grpc/grpc-js';
 import type * as grpcJs from '@grpc/grpc-js';
 
-import { getStringFromEnv } from '@opentelemetry/core';
+import { getStringListFromEnv } from '@opentelemetry/core';
 
 import type {
   ServerCallWithMeta,
@@ -106,10 +106,10 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
     super('@opentelemetry/instrumentation-grpc', VERSION, config);
     this._metadataCapture = this._createMetadataCapture();
 
-    const entry = getStringFromEnv('OTEL_SEMCONV_STABILITY_OPT_IN');
-    if (entry?.toLowerCase() === 'http/dup') {
+    const entries = getStringListFromEnv('OTEL_SEMCONV_STABILITY_OPT_IN');
+    if (entries?.some(entry => entry?.toLowerCase() === 'http/dup')) {
       this._semconvStability = SemconvStability.DUPLICATE;
-    } else if (entry?.toLowerCase() === 'http') {
+    } else if (entries?.some(entry => entry?.toLowerCase() === 'http')) {
       this._semconvStability = SemconvStability.STABLE;
     }
   }

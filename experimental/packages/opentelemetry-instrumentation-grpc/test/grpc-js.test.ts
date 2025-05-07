@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import * as assert from 'assert';
 import { runTestsWithSemconvStabilityLevels } from './helper';
 import { GrpcInstrumentation } from '../src';
+import { SemconvStability } from '../src/types';
 
 const instrumentation = new GrpcInstrumentation();
 instrumentation.enable();
@@ -25,4 +26,71 @@ import '@grpc/grpc-js';
 
 describe('#grpc-js', () => {
   runTestsWithSemconvStabilityLevels(instrumentation, 'grpc', 12346);
+});
+
+describe('grpc-js semconv stability', () => {
+  afterEach(() => {
+    delete process.env.OTEL_SEMCONV_STABILITY_OPT_IN;
+  });
+
+  it('should set semconvStability to OLD when OTEL_SEMCONV_STABILITY_OPT_IN is unset (default)', () => {
+    const grpcInstrumentation = new GrpcInstrumentation();
+    assert.strictEqual(
+      grpcInstrumentation['_semconvStability'],
+      SemconvStability.OLD
+    );
+  });
+  it('should set semconvStability to STABLE when OTEL_SEMCONV_STABILITY_OPT_IN is "http"', () => {
+    process.env.OTEL_SEMCONV_STABILITY_OPT_IN = 'http';
+    const grpcInstrumentation = new GrpcInstrumentation();
+    assert.strictEqual(
+      grpcInstrumentation['_semconvStability'],
+      SemconvStability.STABLE
+    );
+  });
+
+  it('should set semconvStability to DUPLICATE when OTEL_SEMCONV_STABILITY_OPT_IN is "http/dup"', () => {
+    process.env.OTEL_SEMCONV_STABILITY_OPT_IN = 'http/dup';
+    const grpcInstrumentation = new GrpcInstrumentation();
+    assert.strictEqual(
+      grpcInstrumentation['_semconvStability'],
+      SemconvStability.DUPLICATE
+    );
+  });
+
+  it('should set semconvStability to OLD when OTEL_SEMCONV_STABILITY_OPT_IN is "old"', () => {
+    process.env.OTEL_SEMCONV_STABILITY_OPT_IN = 'old';
+    const grpcInstrumentation = new GrpcInstrumentation();
+    assert.strictEqual(
+      grpcInstrumentation['_semconvStability'],
+      SemconvStability.OLD
+    );
+  });
+
+  it('should set semconvStability to OLD when OTEL_SEMCONV_STABILITY_OPT_IN is "nonsense"', () => {
+    process.env.OTEL_SEMCONV_STABILITY_OPT_IN = 'only,nonsense,here';
+    const grpcInstrumentation = new GrpcInstrumentation();
+    assert.strictEqual(
+      grpcInstrumentation['_semconvStability'],
+      SemconvStability.OLD
+    );
+  });
+
+  it('should set semconvStability to STABLE when OTEL_SEMCONV_STABILITY_OPT_IN includes "http" among other values', () => {
+    process.env.OTEL_SEMCONV_STABILITY_OPT_IN = 'db,http,messaging';
+    const grpcInstrumentation = new GrpcInstrumentation();
+    assert.strictEqual(
+      grpcInstrumentation['_semconvStability'],
+      SemconvStability.STABLE
+    );
+  });
+
+  it('should set semconvStability to DUPLICATE when OTEL_SEMCONV_STABILITY_OPT_IN includes "http/dup" among other values', () => {
+    process.env.OTEL_SEMCONV_STABILITY_OPT_IN = 'db,http/dup,messaging';
+    const grpcInstrumentation = new GrpcInstrumentation();
+    assert.strictEqual(
+      grpcInstrumentation['_semconvStability'],
+      SemconvStability.DUPLICATE
+    );
+  });
 });
