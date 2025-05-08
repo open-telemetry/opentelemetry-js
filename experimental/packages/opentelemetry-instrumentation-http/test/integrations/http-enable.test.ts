@@ -15,7 +15,13 @@
  */
 
 import { SpanKind, Span, context, propagation } from '@opentelemetry/api';
-import { ATTR_NETWORK_PROTOCOL_NAME } from '@opentelemetry/semantic-conventions';
+import {
+  HTTPFLAVORVALUES_HTTP_1_1,
+  NETTRANSPORTVALUES_IP_TCP,
+  SEMATTRS_HTTP_FLAVOR,
+  SEMATTRS_HTTP_HOST,
+  SEMATTRS_NET_TRANSPORT,
+} from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as url from 'url';
 import { HttpInstrumentation } from '../../src/http';
@@ -224,9 +230,13 @@ describe('HttpInstrumentation Integration tests', () => {
       assert.strictEqual(spans.length, 2);
       assert.strictEqual(span.name, 'GET');
       assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
-      assert.ok(
-        !span.attributes[ATTR_NETWORK_PROTOCOL_NAME],
-        'should not be added for HTTP kind'
+      assert.strictEqual(
+        span.attributes[SEMATTRS_HTTP_FLAVOR],
+        HTTPFLAVORVALUES_HTTP_1_1
+      );
+      assert.strictEqual(
+        span.attributes[SEMATTRS_NET_TRANSPORT],
+        NETTRANSPORTVALUES_IP_TCP
       );
       assertSpan(span, SpanKind.CLIENT, validations);
     });
@@ -395,6 +405,10 @@ describe('HttpInstrumentation Integration tests', () => {
       const span = spans.find(s => s.kind === SpanKind.CLIENT);
       assert.ok(span);
       assert.strictEqual(span.name, 'GET');
+      assert.strictEqual(
+        span.attributes[SEMATTRS_HTTP_HOST],
+        `localhost:${mockServerPort}`
+      );
     });
   });
 });
