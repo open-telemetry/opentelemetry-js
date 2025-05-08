@@ -1311,7 +1311,7 @@ describe('fetch', () => {
             it('should measure request body size', async () => {
               const config = {
                 measureRequestSize: true,
-                semconvStabilityOptIn: 'http',
+                semconvStabilityOptIn: 'http/dup',
               };
               const { response } = await tracedFetch({ config });
               assertJSONBody(response);
