@@ -337,15 +337,6 @@ export const METRIC_DB_CLIENT_COSMOSDB_ACTIVE_INSTANCE_COUNT = 'db.client.cosmos
 export const METRIC_DB_CLIENT_COSMOSDB_OPERATION_REQUEST_CHARGE = 'db.client.cosmosdb.operation.request_charge' as const;
 
 /**
- * Duration of database client operations.
- *
- * @note Batch operations **SHOULD** be recorded as a single operation.
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DB_CLIENT_OPERATION_DURATION = 'db.client.operation.duration' as const;
-
-/**
  * The actual number of records returned by the database operation.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -695,6 +686,13 @@ export const METRIC_JVM_BUFFER_MEMORY_USAGE = 'jvm.buffer.memory.usage' as const
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_JVM_BUFFER_MEMORY_USED = 'jvm.buffer.memory.used' as const;
+
+/**
+ * Number of open file descriptors as reported by the JVM.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_JVM_FILE_DESCRIPTOR_COUNT = 'jvm.file_descriptor.count' as const;
 
 /**
  * Measure of initial memory requested.
@@ -1350,8 +1348,8 @@ export const METRIC_NODEJS_EVENTLOOP_UTILIZATION = 'nodejs.eventloop.utilization
 /**
  * The number of log records for which the export has finished, either successful or failed
  *
- * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` must contain the failure cause.
- * For exporters with partial success semantics (e.g. OTLP with `rejected_log_records`), rejected log records must count as failed and only non-rejected log records count as success.
+ * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` **MUST** contain the failure cause.
+ * For exporters with partial success semantics (e.g. OTLP with `rejected_log_records`), rejected log records **MUST** count as failed and only non-rejected log records count as success.
  * If no rejection reason is available, `rejected` **SHOULD** be used as value for `error.type`.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -1361,29 +1359,78 @@ export const METRIC_OTEL_SDK_EXPORTER_LOG_EXPORTED = 'otel.sdk.exporter.log.expo
 /**
  * The number of log records which were passed to the exporter, but that have not been exported yet (neither successful, nor failed)
  *
- * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` must contain the failure cause.
+ * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` **MUST** contain the failure cause.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_OTEL_SDK_EXPORTER_LOG_INFLIGHT = 'otel.sdk.exporter.log.inflight' as const;
 
 /**
- * The number of spans for which the export has finished, either successful or failed
+ * The number of metric data points for which the export has finished, either successful or failed
  *
- * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` must contain the failure cause.
- * For exporters with partial success semantics (e.g. OTLP with `rejected_spans`), rejected spans must count as failed and only non-rejected spans count as success.
+ * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` **MUST** contain the failure cause.
+ * For exporters with partial success semantics (e.g. OTLP with `rejected_data_points`), rejected data points **MUST** count as failed and only non-rejected data points count as success.
  * If no rejection reason is available, `rejected` **SHOULD** be used as value for `error.type`.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED = 'otel.sdk.exporter.metric_data_point.exported' as const;
+
+/**
+ * The number of metric data points which were passed to the exporter, but that have not been exported yet (neither successful, nor failed)
+ *
+ * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` **MUST** contain the failure cause.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_EXPORTER_METRIC_DATA_POINT_INFLIGHT = 'otel.sdk.exporter.metric_data_point.inflight' as const;
+
+/**
+ * The duration of exporting a batch of telemetry records.
+ *
+ * @note This metric defines successful operations using the full success definitions for [http](https://github.com/open-telemetry/opentelemetry-proto/blob/v1.5.0/docs/specification.md#full-success-1)
+ * and [grpc](https://github.com/open-telemetry/opentelemetry-proto/blob/v1.5.0/docs/specification.md#full-success). Anything else is defined as an unsuccessful operation. For successful
+ * operations, `error.type` **MUST NOT** be set. For unsuccessful export operations, `error.type` **MUST** contain a relevant failure cause.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_EXPORTER_OPERATION_DURATION = 'otel.sdk.exporter.operation.duration' as const;
+
+/**
+ * The number of spans for which the export has finished, either successful or failed
+ *
+ * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` **MUST** contain the failure cause.
+ * For exporters with partial success semantics (e.g. OTLP with `rejected_spans`), rejected spans **MUST** count as failed and only non-rejected spans count as success.
+ * If no rejection reason is available, `rejected` **SHOULD** be used as value for `error.type`.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_EXPORTER_SPAN_EXPORTED = 'otel.sdk.exporter.span.exported' as const;
+
+/**
+ * Deprecated, use `otel.sdk.exporter.span.exported` instead.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Renamed to `otel.sdk.exporter.span.exported`.
  */
 export const METRIC_OTEL_SDK_EXPORTER_SPAN_EXPORTED_COUNT = 'otel.sdk.exporter.span.exported.count' as const;
 
 /**
  * The number of spans which were passed to the exporter, but that have not been exported yet (neither successful, nor failed)
  *
- * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` must contain the failure cause.
+ * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` **MUST** contain the failure cause.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_EXPORTER_SPAN_INFLIGHT = 'otel.sdk.exporter.span.inflight' as const;
+
+/**
+ * Deprecated, use `otel.sdk.exporter.span.inflight` instead.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Renamed to `otel.sdk.exporter.span.inflight`.
  */
 export const METRIC_OTEL_SDK_EXPORTER_SPAN_INFLIGHT_COUNT = 'otel.sdk.exporter.span.inflight.count' as const;
 
@@ -1395,9 +1442,19 @@ export const METRIC_OTEL_SDK_EXPORTER_SPAN_INFLIGHT_COUNT = 'otel.sdk.exporter.s
 export const METRIC_OTEL_SDK_LOG_CREATED = 'otel.sdk.log.created' as const;
 
 /**
+ * The duration of the collect operation of the metric reader.
+ *
+ * @note For successful collections, `error.type` **MUST NOT** be set. For failed collections, `error.type` **SHOULD** contain the failure cause.
+ * It can happen that metrics collection is successful for some MetricProducers, while others fail. In that case `error.type` **SHOULD** be set to any of the failure causes.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_METRIC_READER_COLLECTION_DURATION = 'otel.sdk.metric_reader.collection.duration' as const;
+
+/**
  * The number of log records for which the processing has finished, either successful or failed
  *
- * @note For successful processing, `error.type` **MUST NOT** be set. For failed processing, `error.type` must contain the failure cause.
+ * @note For successful processing, `error.type` **MUST NOT** be set. For failed processing, `error.type` **MUST** contain the failure cause.
  * For the SDK Simple and Batching Log Record Processor a log record is considered to be processed already when it has been submitted to the exporter,
  * not when the corresponding export call has finished.
  *
@@ -1426,10 +1483,19 @@ export const METRIC_OTEL_SDK_PROCESSOR_LOG_QUEUE_SIZE = 'otel.sdk.processor.log.
 /**
  * The number of spans for which the processing has finished, either successful or failed
  *
- * @note For successful processing, `error.type` **MUST NOT** be set. For failed processing, `error.type` must contain the failure cause.
+ * @note For successful processing, `error.type` **MUST NOT** be set. For failed processing, `error.type` **MUST** contain the failure cause.
  * For the SDK Simple and Batching Span Processor a span is considered to be processed already when it has been submitted to the exporter, not when the corresponding export call has finished.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_PROCESSOR_SPAN_PROCESSED = 'otel.sdk.processor.span.processed' as const;
+
+/**
+ * Deprecated, use `otel.sdk.processor.span.processed` instead.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Renamed to `otel.sdk.processor.span.processed`.
  */
 export const METRIC_OTEL_SDK_PROCESSOR_SPAN_PROCESSED_COUNT = 'otel.sdk.processor.span.processed.count' as const;
 
@@ -1454,20 +1520,38 @@ export const METRIC_OTEL_SDK_PROCESSOR_SPAN_QUEUE_SIZE = 'otel.sdk.processor.spa
 /**
  * The number of created spans for which the end operation was called
  *
- * @note For spans with `recording=true`: Implementations **MUST** record both `otel.sdk.span.live.count` and `otel.sdk.span.ended.count`.
- * For spans with `recording=false`: If implementations decide to record this metric, they **MUST** also record `otel.sdk.span.live.count`.
+ * @note For spans with `recording=true`: Implementations **MUST** record both `otel.sdk.span.live` and `otel.sdk.span.ended`.
+ * For spans with `recording=false`: If implementations decide to record this metric, they **MUST** also record `otel.sdk.span.live`.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_SPAN_ENDED = 'otel.sdk.span.ended' as const;
+
+/**
+ * Deprecated, use `otel.sdk.span.ended` instead.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Renamed to `otel.sdk.span.ended`.
  */
 export const METRIC_OTEL_SDK_SPAN_ENDED_COUNT = 'otel.sdk.span.ended.count' as const;
 
 /**
  * The number of created spans for which the end operation has not been called yet
  *
- * @note For spans with `recording=true`: Implementations **MUST** record both `otel.sdk.span.live.count` and `otel.sdk.span.ended.count`.
- * For spans with `recording=false`: If implementations decide to record this metric, they **MUST** also record `otel.sdk.span.ended.count`.
+ * @note For spans with `recording=true`: Implementations **MUST** record both `otel.sdk.span.live` and `otel.sdk.span.ended`.
+ * For spans with `recording=false`: If implementations decide to record this metric, they **MUST** also record `otel.sdk.span.ended`.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_SPAN_LIVE = 'otel.sdk.span.live' as const;
+
+/**
+ * Deprecated, use `otel.sdk.span.live` instead.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Renamed to `otel.sdk.span.live`.
  */
 export const METRIC_OTEL_SDK_SPAN_LIVE_COUNT = 'otel.sdk.span.live.count' as const;
 
