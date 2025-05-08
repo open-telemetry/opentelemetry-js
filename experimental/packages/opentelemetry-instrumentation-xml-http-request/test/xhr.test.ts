@@ -29,22 +29,22 @@ import {
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import * as tracing from '@opentelemetry/sdk-trace-base';
 import {
-  SEMATTRS_HTTP_HOST,
-  SEMATTRS_HTTP_METHOD,
-  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
-  SEMATTRS_HTTP_SCHEME,
-  SEMATTRS_HTTP_STATUS_CODE,
-  SEMATTRS_HTTP_URL,
-  SEMATTRS_HTTP_USER_AGENT,
-  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-} from '@opentelemetry/semantic-conventions';
-import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
   parseUrl,
 } from '@opentelemetry/sdk-trace-web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import {
+  ATTR_HTTP_HOST,
+  ATTR_HTTP_METHOD,
+  ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
+  ATTR_HTTP_SCHEME,
+  ATTR_HTTP_STATUS_CODE,
+  ATTR_HTTP_URL,
+  ATTR_HTTP_USER_AGENT,
+  ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+} from '../src/semconv';
 import { EventNames } from '../src/enums/EventNames';
 import {
   XMLHttpRequestInstrumentation,
@@ -414,35 +414,35 @@ describe('xhr', () => {
           const keys = Object.keys(attributes);
 
           assert.strictEqual(
-            attributes[SEMATTRS_HTTP_METHOD],
+            attributes[ATTR_HTTP_METHOD],
             'GET',
-            `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
+            `attributes ${ATTR_HTTP_METHOD} is wrong`
           );
           assert.strictEqual(
-            attributes[SEMATTRS_HTTP_URL],
+            attributes[ATTR_HTTP_URL],
             url,
-            `attributes ${SEMATTRS_HTTP_URL} is wrong`
+            `attributes ${ATTR_HTTP_URL} is wrong`
           );
           const requestContentLength = attributes[
-            SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+            ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
           ] as number;
           assert.strictEqual(
             requestContentLength,
             undefined,
-            `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
+            `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
           );
           const responseContentLength = attributes[
-            SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
+            ATTR_HTTP_RESPONSE_CONTENT_LENGTH
           ] as number;
           assert.strictEqual(
             responseContentLength,
             60,
-            `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
+            `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
           );
           assert.strictEqual(
-            attributes[SEMATTRS_HTTP_STATUS_CODE],
+            attributes[ATTR_HTTP_STATUS_CODE],
             200,
-            `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
+            `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
           );
           assert.strictEqual(
             attributes[AttributeNames.HTTP_STATUS_TEXT],
@@ -450,20 +450,20 @@ describe('xhr', () => {
             `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
           );
           assert.strictEqual(
-            attributes[SEMATTRS_HTTP_HOST],
+            attributes[ATTR_HTTP_HOST],
             parseUrl(url).host,
-            `attributes ${SEMATTRS_HTTP_HOST} is wrong`
+            `attributes ${ATTR_HTTP_HOST} is wrong`
           );
 
-          const httpScheme = attributes[SEMATTRS_HTTP_SCHEME];
+          const httpScheme = attributes[ATTR_HTTP_SCHEME];
           assert.ok(
             httpScheme === 'http' || httpScheme === 'https',
-            `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
+            `attributes ${ATTR_HTTP_SCHEME} is wrong`
           );
           assert.notStrictEqual(
-            attributes[SEMATTRS_HTTP_USER_AGENT],
+            attributes[ATTR_HTTP_USER_AGENT],
             '',
-            `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
+            `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
           );
 
           assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
@@ -788,7 +788,7 @@ describe('xhr', () => {
             assert.strictEqual(
               attributes[keys[1]],
               secondUrl,
-              `attribute ${SEMATTRS_HTTP_URL} is wrong`
+              `attribute ${ATTR_HTTP_URL} is wrong`
             );
           });
         });
@@ -852,9 +852,9 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_URL],
+              attributes[ATTR_HTTP_URL],
               location.origin + '/get',
-              `attributes ${SEMATTRS_HTTP_URL} is wrong`
+              `attributes ${ATTR_HTTP_URL} is wrong`
             );
           });
         });
@@ -876,12 +876,12 @@ describe('xhr', () => {
             const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
             const attributes = span.attributes;
             const responseContentLength = attributes[
-              SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
+              ATTR_HTTP_RESPONSE_CONTENT_LENGTH
             ] as number;
             assert.strictEqual(
               responseContentLength,
               60,
-              `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
+              `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
             );
           });
         });
@@ -1042,35 +1042,35 @@ describe('xhr', () => {
             const keys = Object.keys(attributes);
 
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_METHOD],
+              attributes[ATTR_HTTP_METHOD],
               'GET',
-              `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
+              `attributes ${ATTR_HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_URL],
+              attributes[ATTR_HTTP_URL],
               url,
-              `attributes ${SEMATTRS_HTTP_URL} is wrong`
+              `attributes ${ATTR_HTTP_URL} is wrong`
             );
             const requestContentLength = attributes[
-              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+              ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
             ] as number;
             assert.strictEqual(
               requestContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
+              `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
             );
             const responseContentLength = attributes[
-              SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
+              ATTR_HTTP_RESPONSE_CONTENT_LENGTH
             ] as number;
             assert.strictEqual(
               responseContentLength,
               30,
-              `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
+              `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_STATUS_CODE],
+              attributes[ATTR_HTTP_STATUS_CODE],
               400,
-              `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
+              `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
               attributes[AttributeNames.HTTP_STATUS_TEXT],
@@ -1078,20 +1078,20 @@ describe('xhr', () => {
               `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_HOST],
+              attributes[ATTR_HTTP_HOST],
               'raw.githubusercontent.com',
-              `attributes ${SEMATTRS_HTTP_HOST} is wrong`
+              `attributes ${ATTR_HTTP_HOST} is wrong`
             );
 
-            const httpScheme = attributes[SEMATTRS_HTTP_SCHEME];
+            const httpScheme = attributes[ATTR_HTTP_SCHEME];
             assert.ok(
               httpScheme === 'http' || httpScheme === 'https',
-              `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
+              `attributes ${ATTR_HTTP_SCHEME} is wrong`
             );
             assert.notStrictEqual(
-              attributes[SEMATTRS_HTTP_USER_AGENT],
+              attributes[ATTR_HTTP_USER_AGENT],
               '',
-              `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
+              `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
             );
 
             assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
@@ -1130,19 +1130,19 @@ describe('xhr', () => {
             const keys = Object.keys(attributes);
 
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_METHOD],
+              attributes[ATTR_HTTP_METHOD],
               'GET',
-              `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
+              `attributes ${ATTR_HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_URL],
+              attributes[ATTR_HTTP_URL],
               url,
-              `attributes ${SEMATTRS_HTTP_URL} is wrong`
+              `attributes ${ATTR_HTTP_URL} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_STATUS_CODE],
+              attributes[ATTR_HTTP_STATUS_CODE],
               0,
-              `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
+              `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
               attributes[AttributeNames.HTTP_STATUS_TEXT],
@@ -1150,36 +1150,36 @@ describe('xhr', () => {
               `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_HOST],
+              attributes[ATTR_HTTP_HOST],
               'raw.githubusercontent.com',
-              `attributes ${SEMATTRS_HTTP_HOST} is wrong`
+              `attributes ${ATTR_HTTP_HOST} is wrong`
             );
 
-            const httpScheme = attributes[SEMATTRS_HTTP_SCHEME];
+            const httpScheme = attributes[ATTR_HTTP_SCHEME];
             assert.ok(
               httpScheme === 'http' || httpScheme === 'https',
-              `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
+              `attributes ${ATTR_HTTP_SCHEME} is wrong`
             );
             assert.notStrictEqual(
-              attributes[SEMATTRS_HTTP_USER_AGENT],
+              attributes[ATTR_HTTP_USER_AGENT],
               '',
-              `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
+              `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
             );
             const requestContentLength = attributes[
-              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+              ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
             ] as number;
             assert.strictEqual(
               requestContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
+              `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
             );
             const responseContentLength = attributes[
-              SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
+              ATTR_HTTP_RESPONSE_CONTENT_LENGTH
             ] as number;
             assert.strictEqual(
               responseContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
+              `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
             );
 
             assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
@@ -1215,19 +1215,19 @@ describe('xhr', () => {
             const keys = Object.keys(attributes);
 
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_METHOD],
+              attributes[ATTR_HTTP_METHOD],
               'GET',
-              `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
+              `attributes ${ATTR_HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_URL],
+              attributes[ATTR_HTTP_URL],
               url,
-              `attributes ${SEMATTRS_HTTP_URL} is wrong`
+              `attributes ${ATTR_HTTP_URL} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_STATUS_CODE],
+              attributes[ATTR_HTTP_STATUS_CODE],
               0,
-              `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
+              `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
               attributes[AttributeNames.HTTP_STATUS_TEXT],
@@ -1235,36 +1235,36 @@ describe('xhr', () => {
               `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_HOST],
+              attributes[ATTR_HTTP_HOST],
               'raw.githubusercontent.com',
-              `attributes ${SEMATTRS_HTTP_HOST} is wrong`
+              `attributes ${ATTR_HTTP_HOST} is wrong`
             );
 
-            const httpScheme = attributes[SEMATTRS_HTTP_SCHEME];
+            const httpScheme = attributes[ATTR_HTTP_SCHEME];
             assert.ok(
               httpScheme === 'http' || httpScheme === 'https',
-              `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
+              `attributes ${ATTR_HTTP_SCHEME} is wrong`
             );
             assert.notStrictEqual(
-              attributes[SEMATTRS_HTTP_USER_AGENT],
+              attributes[ATTR_HTTP_USER_AGENT],
               '',
-              `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
+              `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
             );
             const requestContentLength = attributes[
-              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+              ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
             ] as number;
             assert.strictEqual(
               requestContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
+              `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
             );
             const responseContentLength = attributes[
-              SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
+              ATTR_HTTP_RESPONSE_CONTENT_LENGTH
             ] as number;
             assert.strictEqual(
               responseContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
+              `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
             );
 
             assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
@@ -1300,19 +1300,19 @@ describe('xhr', () => {
             const keys = Object.keys(attributes);
 
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_METHOD],
+              attributes[ATTR_HTTP_METHOD],
               'GET',
-              `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
+              `attributes ${ATTR_HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_URL],
+              attributes[ATTR_HTTP_URL],
               url,
-              `attributes ${SEMATTRS_HTTP_URL} is wrong`
+              `attributes ${ATTR_HTTP_URL} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_STATUS_CODE],
+              attributes[ATTR_HTTP_STATUS_CODE],
               0,
-              `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
+              `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
               attributes[AttributeNames.HTTP_STATUS_TEXT],
@@ -1320,36 +1320,36 @@ describe('xhr', () => {
               `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_HOST],
+              attributes[ATTR_HTTP_HOST],
               'raw.githubusercontent.com',
-              `attributes ${SEMATTRS_HTTP_HOST} is wrong`
+              `attributes ${ATTR_HTTP_HOST} is wrong`
             );
 
-            const httpScheme = attributes[SEMATTRS_HTTP_SCHEME];
+            const httpScheme = attributes[ATTR_HTTP_SCHEME];
             assert.ok(
               httpScheme === 'http' || httpScheme === 'https',
-              `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
+              `attributes ${ATTR_HTTP_SCHEME} is wrong`
             );
             assert.notStrictEqual(
-              attributes[SEMATTRS_HTTP_USER_AGENT],
+              attributes[ATTR_HTTP_USER_AGENT],
               '',
-              `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
+              `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
             );
             const requestContentLength = attributes[
-              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+              ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
             ] as number;
             assert.strictEqual(
               requestContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
+              `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
             );
             const responseContentLength = attributes[
-              SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
+              ATTR_HTTP_RESPONSE_CONTENT_LENGTH
             ] as number;
             assert.strictEqual(
               responseContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
+              `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
             );
 
             assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
@@ -1612,35 +1612,35 @@ describe('xhr', () => {
           const keys = Object.keys(attributes);
 
           assert.strictEqual(
-            attributes[SEMATTRS_HTTP_METHOD],
+            attributes[ATTR_HTTP_METHOD],
             'POST',
-            `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
+            `attributes ${ATTR_HTTP_METHOD} is wrong`
           );
           assert.strictEqual(
-            attributes[SEMATTRS_HTTP_URL],
+            attributes[ATTR_HTTP_URL],
             url,
-            `attributes ${SEMATTRS_HTTP_URL} is wrong`
+            `attributes ${ATTR_HTTP_URL} is wrong`
           );
           const requestContentLength = attributes[
-            SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+            ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
           ] as number;
           assert.strictEqual(
             requestContentLength,
             19,
-            `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} !== 19`
+            `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} !== 19`
           );
           const responseContentLength = attributes[
-            SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
+            ATTR_HTTP_RESPONSE_CONTENT_LENGTH
           ] as number;
           assert.strictEqual(
             responseContentLength,
             60,
-            `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
+            `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
           );
           assert.strictEqual(
-            attributes[SEMATTRS_HTTP_STATUS_CODE],
+            attributes[ATTR_HTTP_STATUS_CODE],
             200,
-            `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
+            `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
           );
           assert.strictEqual(
             attributes[AttributeNames.HTTP_STATUS_TEXT],
@@ -1648,20 +1648,20 @@ describe('xhr', () => {
             `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
           );
           assert.strictEqual(
-            attributes[SEMATTRS_HTTP_HOST],
+            attributes[ATTR_HTTP_HOST],
             parseUrl(url).host,
-            `attributes ${SEMATTRS_HTTP_HOST} is wrong`
+            `attributes ${ATTR_HTTP_HOST} is wrong`
           );
 
-          const httpScheme = attributes[SEMATTRS_HTTP_SCHEME];
+          const httpScheme = attributes[ATTR_HTTP_SCHEME];
           assert.ok(
             httpScheme === 'http' || httpScheme === 'https',
-            `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
+            `attributes ${ATTR_HTTP_SCHEME} is wrong`
           );
           assert.notStrictEqual(
-            attributes[SEMATTRS_HTTP_USER_AGENT],
+            attributes[ATTR_HTTP_USER_AGENT],
             '',
-            `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
+            `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
           );
 
           assert.strictEqual(keys.length, 9, 'number of attributes is wrong');
@@ -1988,7 +1988,7 @@ describe('xhr', () => {
             assert.strictEqual(
               attributes[keys[1]],
               secondUrl,
-              `attribute ${SEMATTRS_HTTP_URL} is wrong`
+              `attribute ${ATTR_HTTP_URL} is wrong`
             );
           });
         });
@@ -2052,9 +2052,9 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_URL],
+              attributes[ATTR_HTTP_URL],
               location.origin + '/get',
-              `attributes ${SEMATTRS_HTTP_URL} is wrong`
+              `attributes ${ATTR_HTTP_URL} is wrong`
             );
           });
         });
@@ -2226,35 +2226,35 @@ describe('xhr', () => {
             const keys = Object.keys(attributes);
 
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_METHOD],
+              attributes[ATTR_HTTP_METHOD],
               'POST',
-              `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
+              `attributes ${ATTR_HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_URL],
+              attributes[ATTR_HTTP_URL],
               url,
-              `attributes ${SEMATTRS_HTTP_URL} is wrong`
+              `attributes ${ATTR_HTTP_URL} is wrong`
             );
             const requestContentLength = attributes[
-              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+              ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
             ] as number;
             assert.strictEqual(
               requestContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
+              `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
             );
             const responseContentLength = attributes[
-              SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
+              ATTR_HTTP_RESPONSE_CONTENT_LENGTH
             ] as number;
             assert.strictEqual(
               responseContentLength,
               30,
-              `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
+              `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_STATUS_CODE],
+              attributes[ATTR_HTTP_STATUS_CODE],
               400,
-              `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
+              `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
               attributes[AttributeNames.HTTP_STATUS_TEXT],
@@ -2262,20 +2262,20 @@ describe('xhr', () => {
               `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_HOST],
+              attributes[ATTR_HTTP_HOST],
               'raw.githubusercontent.com',
-              `attributes ${SEMATTRS_HTTP_HOST} is wrong`
+              `attributes ${ATTR_HTTP_HOST} is wrong`
             );
 
-            const httpScheme = attributes[SEMATTRS_HTTP_SCHEME];
+            const httpScheme = attributes[ATTR_HTTP_SCHEME];
             assert.ok(
               httpScheme === 'http' || httpScheme === 'https',
-              `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
+              `attributes ${ATTR_HTTP_SCHEME} is wrong`
             );
             assert.notStrictEqual(
-              attributes[SEMATTRS_HTTP_USER_AGENT],
+              attributes[ATTR_HTTP_USER_AGENT],
               '',
-              `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
+              `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
             );
 
             assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
@@ -2314,19 +2314,19 @@ describe('xhr', () => {
             const keys = Object.keys(attributes);
 
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_METHOD],
+              attributes[ATTR_HTTP_METHOD],
               'POST',
-              `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
+              `attributes ${ATTR_HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_URL],
+              attributes[ATTR_HTTP_URL],
               url,
-              `attributes ${SEMATTRS_HTTP_URL} is wrong`
+              `attributes ${ATTR_HTTP_URL} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_STATUS_CODE],
+              attributes[ATTR_HTTP_STATUS_CODE],
               0,
-              `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
+              `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
               attributes[AttributeNames.HTTP_STATUS_TEXT],
@@ -2334,36 +2334,36 @@ describe('xhr', () => {
               `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_HOST],
+              attributes[ATTR_HTTP_HOST],
               'raw.githubusercontent.com',
-              `attributes ${SEMATTRS_HTTP_HOST} is wrong`
+              `attributes ${ATTR_HTTP_HOST} is wrong`
             );
 
-            const httpScheme = attributes[SEMATTRS_HTTP_SCHEME];
+            const httpScheme = attributes[ATTR_HTTP_SCHEME];
             assert.ok(
               httpScheme === 'http' || httpScheme === 'https',
-              `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
+              `attributes ${ATTR_HTTP_SCHEME} is wrong`
             );
             assert.notStrictEqual(
-              attributes[SEMATTRS_HTTP_USER_AGENT],
+              attributes[ATTR_HTTP_USER_AGENT],
               '',
-              `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
+              `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
             );
             const requestContentLength = attributes[
-              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+              ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
             ] as number;
             assert.strictEqual(
               requestContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
+              `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
             );
             const responseContentLength = attributes[
-              SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
+              ATTR_HTTP_RESPONSE_CONTENT_LENGTH
             ] as number;
             assert.strictEqual(
               responseContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
+              `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
             );
 
             assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
@@ -2399,19 +2399,19 @@ describe('xhr', () => {
             const keys = Object.keys(attributes);
 
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_METHOD],
+              attributes[ATTR_HTTP_METHOD],
               'POST',
-              `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
+              `attributes ${ATTR_HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_URL],
+              attributes[ATTR_HTTP_URL],
               url,
-              `attributes ${SEMATTRS_HTTP_URL} is wrong`
+              `attributes ${ATTR_HTTP_URL} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_STATUS_CODE],
+              attributes[ATTR_HTTP_STATUS_CODE],
               0,
-              `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
+              `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
               attributes[AttributeNames.HTTP_STATUS_TEXT],
@@ -2419,36 +2419,36 @@ describe('xhr', () => {
               `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_HOST],
+              attributes[ATTR_HTTP_HOST],
               'raw.githubusercontent.com',
-              `attributes ${SEMATTRS_HTTP_HOST} is wrong`
+              `attributes ${ATTR_HTTP_HOST} is wrong`
             );
 
-            const httpScheme = attributes[SEMATTRS_HTTP_SCHEME];
+            const httpScheme = attributes[ATTR_HTTP_SCHEME];
             assert.ok(
               httpScheme === 'http' || httpScheme === 'https',
-              `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
+              `attributes ${ATTR_HTTP_SCHEME} is wrong`
             );
             assert.notStrictEqual(
-              attributes[SEMATTRS_HTTP_USER_AGENT],
+              attributes[ATTR_HTTP_USER_AGENT],
               '',
-              `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
+              `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
             );
             const requestContentLength = attributes[
-              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+              ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
             ] as number;
             assert.strictEqual(
               requestContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
+              `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
             );
             const responseContentLength = attributes[
-              SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
+              ATTR_HTTP_RESPONSE_CONTENT_LENGTH
             ] as number;
             assert.strictEqual(
               responseContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
+              `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
             );
 
             assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
@@ -2484,19 +2484,19 @@ describe('xhr', () => {
             const keys = Object.keys(attributes);
 
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_METHOD],
+              attributes[ATTR_HTTP_METHOD],
               'POST',
-              `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
+              `attributes ${ATTR_HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_URL],
+              attributes[ATTR_HTTP_URL],
               url,
-              `attributes ${SEMATTRS_HTTP_URL} is wrong`
+              `attributes ${ATTR_HTTP_URL} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_STATUS_CODE],
+              attributes[ATTR_HTTP_STATUS_CODE],
               0,
-              `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
+              `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
               attributes[AttributeNames.HTTP_STATUS_TEXT],
@@ -2504,36 +2504,36 @@ describe('xhr', () => {
               `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
-              attributes[SEMATTRS_HTTP_HOST],
+              attributes[ATTR_HTTP_HOST],
               'raw.githubusercontent.com',
-              `attributes ${SEMATTRS_HTTP_HOST} is wrong`
+              `attributes ${ATTR_HTTP_HOST} is wrong`
             );
 
-            const httpScheme = attributes[SEMATTRS_HTTP_SCHEME];
+            const httpScheme = attributes[ATTR_HTTP_SCHEME];
             assert.ok(
               httpScheme === 'http' || httpScheme === 'https',
-              `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
+              `attributes ${ATTR_HTTP_SCHEME} is wrong`
             );
             assert.notStrictEqual(
-              attributes[SEMATTRS_HTTP_USER_AGENT],
+              attributes[ATTR_HTTP_USER_AGENT],
               '',
-              `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
+              `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
             );
             const requestContentLength = attributes[
-              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+              ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
             ] as number;
             assert.strictEqual(
               requestContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
+              `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
             );
             const responseContentLength = attributes[
-              SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
+              ATTR_HTTP_RESPONSE_CONTENT_LENGTH
             ] as number;
             assert.strictEqual(
               responseContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
+              `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
             );
 
             assert.strictEqual(keys.length, 7, 'number of attributes is wrong');

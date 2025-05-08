@@ -23,21 +23,21 @@ import {
 } from '@opentelemetry/instrumentation';
 import { hrTime, isUrlIgnored, otperformance } from '@opentelemetry/core';
 import {
-  SEMATTRS_HTTP_HOST,
-  SEMATTRS_HTTP_METHOD,
-  SEMATTRS_HTTP_SCHEME,
-  SEMATTRS_HTTP_STATUS_CODE,
-  SEMATTRS_HTTP_URL,
-  SEMATTRS_HTTP_USER_AGENT,
-  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-} from '@opentelemetry/semantic-conventions';
-import {
   addSpanNetworkEvents,
   getResource,
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
   parseUrl,
 } from '@opentelemetry/sdk-trace-web';
+import {
+  ATTR_HTTP_HOST,
+  ATTR_HTTP_METHOD,
+  ATTR_HTTP_SCHEME,
+  ATTR_HTTP_STATUS_CODE,
+  ATTR_HTTP_URL,
+  ATTR_HTTP_USER_AGENT,
+  ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+} from './semconv';
 import { EventNames } from './enums/EventNames';
 import {
   OpenFunction,
@@ -169,20 +169,17 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     if (typeof spanUrl === 'string') {
       const parsedUrl = parseUrl(spanUrl);
       if (xhrMem.status !== undefined) {
-        span.setAttribute(SEMATTRS_HTTP_STATUS_CODE, xhrMem.status);
+        span.setAttribute(ATTR_HTTP_STATUS_CODE, xhrMem.status);
       }
       if (xhrMem.statusText !== undefined) {
         span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, xhrMem.statusText);
       }
-      span.setAttribute(SEMATTRS_HTTP_HOST, parsedUrl.host);
-      span.setAttribute(
-        SEMATTRS_HTTP_SCHEME,
-        parsedUrl.protocol.replace(':', '')
-      );
+      span.setAttribute(ATTR_HTTP_HOST, parsedUrl.host);
+      span.setAttribute(ATTR_HTTP_SCHEME, parsedUrl.protocol.replace(':', ''));
 
       // @TODO do we want to collect this or it will be collected earlier once only or
       //    maybe when parent span is not available ?
-      span.setAttribute(SEMATTRS_HTTP_USER_AGENT, navigator.userAgent);
+      span.setAttribute(ATTR_HTTP_USER_AGENT, navigator.userAgent);
     }
   }
 
@@ -348,8 +345,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     const currentSpan = this.tracer.startSpan(spanName, {
       kind: api.SpanKind.CLIENT,
       attributes: {
-        [SEMATTRS_HTTP_METHOD]: method,
-        [SEMATTRS_HTTP_URL]: parseUrl(url).toString(),
+        [ATTR_HTTP_METHOD]: method,
+        [ATTR_HTTP_URL]: parseUrl(url).toString(),
       },
     });
 
@@ -499,7 +496,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
             const bodyLength = getXHRBodyLength(body);
             if (bodyLength !== undefined) {
               currentSpan.setAttribute(
-                SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
                 bodyLength
               );
             }

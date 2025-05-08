@@ -15,9 +15,9 @@
  */
 import { Span } from '@opentelemetry/api';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
-import { SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH } from '@opentelemetry/semantic-conventions';
 import { ReadableSpan, SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
+import { ATTR_HTTP_RESPONSE_CONTENT_LENGTH } from '../src/semconv';
 import { XMLHttpRequestInstrumentation } from '../src';
 import * as assert from 'assert';
 
@@ -66,7 +66,7 @@ describe('unmocked xhr', () => {
         // content length comes from the PerformanceTiming resource; this ensures that our
         // matching logic found the right one
         assert.ok(
-          (span.attributes[SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH] as any) > 0
+          (span.attributes[ATTR_HTTP_RESPONSE_CONTENT_LENGTH] as any) > 0
         );
         done();
       }, 500);
