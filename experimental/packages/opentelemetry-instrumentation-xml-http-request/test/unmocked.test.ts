@@ -17,7 +17,6 @@ import { Span } from '@opentelemetry/api';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import { ReadableSpan, SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
-import { ATTR_HTTP_RESPONSE_CONTENT_LENGTH } from '../src/semconv';
 import { XMLHttpRequestInstrumentation } from '../src';
 import * as assert from 'assert';
 
@@ -46,7 +45,11 @@ describe('unmocked xhr', () => {
       spanProcessors: [testSpans],
     });
     registerInstrumentations({
-      instrumentations: [new XMLHttpRequestInstrumentation()],
+      instrumentations: [
+        new XMLHttpRequestInstrumentation({
+          semconvStabilityOptIn: 'http',
+        }),
+      ],
       tracerProvider: provider,
     });
   });
@@ -63,11 +66,12 @@ describe('unmocked xhr', () => {
       setTimeout(() => {
         assert.strictEqual(testSpans.spans.length, 1);
         const span = testSpans.spans[0];
-        // content length comes from the PerformanceTiming resource; this ensures that our
-        // matching logic found the right one
-        assert.ok(
-          (span.attributes[ATTR_HTTP_RESPONSE_CONTENT_LENGTH] as any) > 0
-        );
+        // Ensure the PerformanceTiming resource was found and used.
+        // `fetchStart` is one of its events.
+        const fetchStartEvent = span?.events.filter(
+          e => e.name === 'fetchStart'
+        )[0];
+        assert.ok(fetchStartEvent);
         done();
       }, 500);
     });

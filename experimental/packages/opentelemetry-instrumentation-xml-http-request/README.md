@@ -3,9 +3,9 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-**Note: This is an experimental package under active development. New releases may include breaking changes.**
+**Note: This is an experimental package. New releases may include breaking changes.**
 
-This module provides auto instrumentation for web using XMLHttpRequest .
+This module provides auto instrumentation for web using XMLHttpRequest.
 
 ## Installation
 
@@ -87,13 +87,8 @@ To select which semconv version(s) is emitted from this instrumentation, use the
 - `http/dup`: emit **both** the old v1.7.0 and the new (stable) v1.23.0 semantics
 - By default, if `semconvStabilityOptIn` includes neither of the above tokens, the old v1.7.0 semconv is used.
 
-XXX
-**Span name:** With the old v1.7.0 semconv the span name is `HTTP {method}` (for example 'HTTP GET'). Using the stable [semconv v1.23 for HTTP span names](https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#name), the span name is `{method}` (for example 'GET'). If both semconv versions are being emitted, the *old* name wins. (This instrumentation does not currently support adding an `{http.route}` to the span name.)
+**Span status:** When the stable semconv is selected, the [span status](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#status) is set to ERROR when the response status code is `>=400` or when the response fails with an 'error' or 'timeout' XHR event. When just the old semconv is select, the span status is not set.
 
-XXX
-**Span status:** When the stable semconv is selected, the [span status](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#status) is set to ERROR when the response status code is `>=400`. When just the old semconv is select, the span status is not set.
-
-XXX
 **Span attributes:**
 
 | v1.7.0 semconv         | v1.23.0 semconv                    | Notes |
@@ -105,24 +100,10 @@ XXX
 | `http.request_content_length_uncompressed` | `http.request.body.size` | This is only added if `measureRequestSize` is `true`. |
 | `http.response_content_length_uncompressed` | (not included) | Stable HTTP semconv would use `http.response.body.size`, but this is an [`Opt-In` attribute](https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#http-client), so would require adding a configuration option to this instrumentation to enable. |
 | `http.response_content_length` | (not included)              | Stable HTTP semconv would use `http.response.header.<key>`, but this is an [`Opt-In` attribute](https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#http-client), so would require adding a configuration option to this instrumentation to enable. |
-| (no equivalent)        | `error.type`                       | The response status (as a string), if the response status was `>=400`. |
+| (no equivalent)        | `error.type`                       | The response status (as a string), if the response status was `>=400`, or one of these possible request errors: 'timeout' and 'error'.|
 | `http.user_agent`      | (not included)                     | Stable HTTP semconv would use `user_agent.original`, but this is an [`Opt-In` attribute](https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#http-client), so would require adding a configuration option to this instrumentation to enable. |
 | `http.scheme`          | (not included)                     | Stable HTTP semconv would use `url.scheme`, but this is an [`Opt-In` attribute](https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#http-client), so would require adding a configuration option to this instrumentation to enable. |
 | `http.status_text`     | (not included)                     | This is no longer a documented semantic conventions attribute. |
-| `component`            | (no replacement)                   | `component` was an ancient Span "tag" that was never formalized. |
-
-
-XXX
-| Attribute                                   | Short Description                                                              |
-| ------------------------------------------- | ------------------------------------------------------------------------------ |
-| `http.status_code`                          | HTTP response status code                                                      |
-| `http.host`                                 | The value of the HTTP host header                                              |
-| `http.user_agent`                           | Value of the HTTP User-Agent header sent by the client                         |
-| `http.scheme`                               | The URI scheme identifying the used protocol                                   |
-| `http.url`                                  | Full HTTP request URL                                                          |
-| `http.method`                               | HTTP request method                                                            |
-| `http.request_content_length_uncompressed`  | Uncompressed size of the request body, if any body exists                      |
-
 
 ## Example Screenshots
 
