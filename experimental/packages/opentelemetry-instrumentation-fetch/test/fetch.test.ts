@@ -53,6 +53,7 @@ import {
   ATTR_HTTP_REQUEST_BODY_SIZE,
 } from '../src/semconv';
 import {
+  ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
   ATTR_SERVER_ADDRESS,
@@ -361,6 +362,12 @@ describe('fetch', () => {
               },
             });
           }),
+          msw.http.get('/no-such-path', () => {
+            return new msw.HttpResponse(null, { status: 404 });
+          }),
+          msw.http.get('/boom', () => {
+            return new msw.HttpResponse(null, { status: 500 });
+          }),
         ],
         callback = () => fetch('/api/status.json'),
         config = {},
@@ -617,7 +624,7 @@ describe('fetch', () => {
           assert.strictEqual(span.name, 'GET', 'span has wrong name');
         });
 
-        it('span should have correct attributes (old and stable semconv)', () => {
+        it('span should have correct attributes (stable semconv)', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
           const attributes = span.attributes;
           const keys = Object.keys(attributes);
@@ -639,6 +646,55 @@ describe('fetch', () => {
           );
 
           assert.strictEqual(keys.length, 5, 'number of attributes is wrong');
+        });
+      });
+
+      describe('404 request (semconvStabilityOptIn=http)', () => {
+        beforeEach(async () => {
+          await tracedFetch({
+            callback: () => fetch('/no-such-path'),
+            config: {
+              semconvStabilityOptIn: 'http',
+            },
+          });
+        });
+
+        it('span should have correct attributes (stable semconv)', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          const attributes = span.attributes;
+
+          assert.strictEqual(
+            attributes[ATTR_URL_FULL],
+            `${ORIGIN}/no-such-path`
+          );
+          assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 404);
+          assert.strictEqual(attributes[ATTR_ERROR_TYPE], '404');
+
+          const keys = Object.keys(attributes);
+          assert.strictEqual(keys.length, 6);
+        });
+      });
+
+      describe('500 request (semconvStabilityOptIn=http)', () => {
+        beforeEach(async () => {
+          await tracedFetch({
+            callback: () => fetch('/boom'),
+            config: {
+              semconvStabilityOptIn: 'http',
+            },
+          });
+        });
+
+        it('span should have correct attributes (stable semconv)', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          const attributes = span.attributes;
+
+          assert.strictEqual(attributes[ATTR_URL_FULL], `${ORIGIN}/boom`);
+          assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 500);
+          assert.strictEqual(attributes[ATTR_ERROR_TYPE], '500');
+
+          const keys = Object.keys(attributes);
+          assert.strictEqual(keys.length, 6);
         });
       });
 
