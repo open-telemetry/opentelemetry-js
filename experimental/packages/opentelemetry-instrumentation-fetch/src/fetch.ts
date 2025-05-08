@@ -141,10 +141,15 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       },
       api.trace.setSpan(api.context.active(), span)
     );
+    const skipOldSemconvContentLengthAttrs = !(
+      this._semconvStability & SemconvStability.OLD
+    );
     web.addSpanNetworkEvents(
       childSpan,
       corsPreFlightRequest,
-      this.getConfig().ignoreNetworkEvents
+      this.getConfig().ignoreNetworkEvents,
+      undefined,
+      skipOldSemconvContentLengthAttrs
     );
     childSpan.end(
       corsPreFlightRequest[web.PerformanceTimingNames.RESPONSE_END]
@@ -252,7 +257,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       return;
     }
 
-    let name = 'unnamed'; // 'unnamed' is a sentinel, it should never get used.
+    let name = '';
     const attributes = {} as api.Attributes;
     if (this._semconvStability & SemconvStability.OLD) {
       const method = (options.method || 'GET').toUpperCase();
@@ -323,10 +328,15 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         this._addChildSpan(span, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
+      const skipOldSemconvContentLengthAttrs = !(
+        this._semconvStability & SemconvStability.OLD
+      );
       web.addSpanNetworkEvents(
         span,
         mainRequest,
-        this.getConfig().ignoreNetworkEvents
+        this.getConfig().ignoreNetworkEvents,
+        undefined,
+        skipOldSemconvContentLengthAttrs
       );
     }
   }

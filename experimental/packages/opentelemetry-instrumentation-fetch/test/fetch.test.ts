@@ -52,6 +52,13 @@ import {
   ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
   ATTR_HTTP_REQUEST_BODY_SIZE,
 } from '../src/semconv';
+import {
+  ATTR_HTTP_REQUEST_METHOD,
+  ATTR_HTTP_RESPONSE_STATUS_CODE,
+  ATTR_SERVER_ADDRESS,
+  ATTR_SERVER_PORT,
+  ATTR_URL_FULL,
+} from '@opentelemetry/semantic-conventions';
 
 import * as msw from 'msw';
 import { setupWorker } from 'msw/browser';
@@ -91,10 +98,9 @@ function testForCorrectEvents(
   }
 }
 
-// "http://localhost:9876"
-const ORIGIN = location.origin;
-// "localhost:9876"
-const ORIGIN_HOST = new URL(ORIGIN).host;
+const ORIGIN = location.origin; // "http://localhost:9876"
+const ORIGIN_URL = new URL(ORIGIN);
+const ORIGIN_HOST = ORIGIN_URL.host; // "localhost:9876"
 
 interface Resolvers<T> {
   promise: Promise<T>;
@@ -495,6 +501,144 @@ describe('fetch', () => {
             PTN.RESPONSE_START,
             PTN.RESPONSE_END,
           ]);
+        });
+      });
+
+      describe('simple request (semconvStabilityOptIn=http/dup)', () => {
+        let response: Response | undefined;
+
+        beforeEach(async () => {
+          const result = await tracedFetch({
+            config: {
+              semconvStabilityOptIn: 'http/dup',
+            },
+          });
+          response = result.response;
+        });
+
+        afterEach(() => {
+          response = undefined;
+        });
+
+        it('span should have correct name', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          // With *both* semconv versions being used the span name for the
+          // *old* semconv wins.
+          assert.strictEqual(span.name, 'HTTP GET', 'span has wrong name');
+        });
+
+        it('span should have correct attributes (old and stable semconv)', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          const attributes = span.attributes;
+          const keys = Object.keys(attributes);
+          assert.notStrictEqual(
+            attributes[AttributeNames.COMPONENT],
+            '',
+            `attributes ${AttributeNames.COMPONENT} is not defined`
+          );
+
+          assert.strictEqual(
+            attributes[ATTR_HTTP_METHOD],
+            'GET',
+            `attributes ${ATTR_HTTP_METHOD} is wrong`
+          );
+          assert.strictEqual(
+            attributes[ATTR_HTTP_URL],
+            `${ORIGIN}/api/status.json`,
+            `attributes ${ATTR_HTTP_URL} is wrong`
+          );
+          assert.strictEqual(
+            attributes[ATTR_HTTP_STATUS_CODE],
+            200,
+            `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
+          );
+          assert.strictEqual(
+            attributes[AttributeNames.HTTP_STATUS_TEXT],
+            'OK',
+            `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
+          );
+          assert.strictEqual(
+            attributes[ATTR_HTTP_HOST],
+            ORIGIN_HOST,
+            `attributes ${ATTR_HTTP_HOST} is wrong`
+          );
+
+          assert.ok(
+            attributes[ATTR_HTTP_SCHEME] === 'http',
+            `attributes ${ATTR_HTTP_SCHEME} is wrong`
+          );
+          assert.notStrictEqual(
+            attributes[ATTR_HTTP_USER_AGENT],
+            '',
+            `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
+          );
+          assert.strictEqual(
+            attributes[ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
+            undefined,
+            `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
+          );
+          assert.strictEqual(
+            attributes[ATTR_HTTP_RESPONSE_CONTENT_LENGTH],
+            parseInt(response!.headers.get('content-length')!),
+            `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is incorrect`
+          );
+
+          // Stable semconv attributes.
+          assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
+          assert.strictEqual(
+            attributes[ATTR_URL_FULL],
+            `${ORIGIN}/api/status.json`
+          );
+          assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 200);
+          assert.strictEqual(
+            attributes[ATTR_SERVER_ADDRESS],
+            ORIGIN_URL.hostname
+          );
+          assert.strictEqual(
+            attributes[ATTR_SERVER_PORT],
+            Number(ORIGIN_URL.port)
+          );
+
+          assert.strictEqual(keys.length, 14, 'number of attributes is wrong');
+        });
+      });
+
+      describe('simple request (semconvStabilityOptIn=http)', () => {
+        beforeEach(async () => {
+          await tracedFetch({
+            config: {
+              semconvStabilityOptIn: 'http',
+            },
+          });
+        });
+
+        it('span should have correct name', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          assert.strictEqual(span.name, 'GET', 'span has wrong name');
+        });
+
+        it('span should have correct attributes (old and stable semconv)', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          const attributes = span.attributes;
+          const keys = Object.keys(attributes);
+
+          // Stable semconv attributes.
+          assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
+          assert.strictEqual(
+            attributes[ATTR_URL_FULL],
+            `${ORIGIN}/api/status.json`
+          );
+          assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 200);
+          assert.strictEqual(
+            attributes[ATTR_SERVER_ADDRESS],
+            ORIGIN_URL.hostname
+          );
+          assert.strictEqual(
+            attributes[ATTR_SERVER_PORT],
+            Number(ORIGIN_URL.port)
+          );
+
+          assert.strictEqual(keys.length, 5, 'number of attributes is wrong');
         });
       });
 
@@ -1035,6 +1179,10 @@ describe('fetch', () => {
 
           assert.strictEqual(
             span.attributes[ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
+            undefined
+          );
+          assert.strictEqual(
+            span.attributes[ATTR_HTTP_REQUEST_BODY_SIZE],
             undefined
           );
         };
@@ -1783,7 +1931,9 @@ describe('fetch', () => {
             .stub(performance, 'getEntriesByType')
             .throws();
 
-          const result = await tracedFetch();
+          const result = await tracedFetch({
+            config: { semconvStabilityOptIn: 'http/dup' },
+          });
           rootSpan = result.rootSpan;
         });
 
@@ -1830,12 +1980,19 @@ describe('fetch', () => {
           ]);
         });
 
-        it('span should have correct (absolute) http.url attribute', () => {
+        it('span should have correct (absolute) url attribute(s)', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
+          // SemconvStability.OLD
           assert.strictEqual(
             span.attributes[ATTR_HTTP_URL],
             `${ORIGIN}/api/status.json`,
             `attributes ${ATTR_HTTP_URL} is wrong`
+          );
+          // SemconvStability.STABLE
+          assert.strictEqual(
+            span.attributes[ATTR_URL_FULL],
+            `${ORIGIN}/api/status.json`,
+            `attributes ${ATTR_URL_FULL} is wrong`
           );
         });
       });
@@ -1882,7 +2039,11 @@ describe('fetch', () => {
 
             getEntriesByTypeSpy = sinon.spy(performance, 'getEntriesByType');
 
-            const result = await tracedFetch();
+            const result = await tracedFetch({
+              config: {
+                semconvStabilityOptIn: 'http/dup',
+              },
+            });
             rootSpan = result.rootSpan;
           });
 
@@ -1936,6 +2097,10 @@ describe('fetch', () => {
               `${ORIGIN}/api/status.json`,
               `attributes ${ATTR_HTTP_URL} is wrong`
             );
+            assert.strictEqual(
+              span.attributes[ATTR_URL_FULL],
+              `${ORIGIN}/api/status.json`
+            );
           });
         });
 
@@ -1947,7 +2112,11 @@ describe('fetch', () => {
           beforeEach(async () => {
             sinon.stub(performance, 'getEntriesByType').value(undefined);
 
-            const result = await tracedFetch();
+            const result = await tracedFetch({
+              config: {
+                semconvStabilityOptIn: 'http/dup',
+              },
+            });
             rootSpan = result.rootSpan;
           });
 
@@ -1990,6 +2159,10 @@ describe('fetch', () => {
               200,
               `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
             );
+            assert.strictEqual(
+              span.attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+              200
+            );
           });
 
           it('span should have correct (absolute) http.url attribute', () => {
@@ -1998,6 +2171,10 @@ describe('fetch', () => {
               span.attributes[ATTR_HTTP_URL],
               `${ORIGIN}/api/status.json`,
               `attributes ${ATTR_HTTP_URL} is wrong`
+            );
+            assert.strictEqual(
+              span.attributes[ATTR_URL_FULL],
+              `${ORIGIN}/api/status.json`
             );
           });
         });
@@ -2115,7 +2292,10 @@ describe('fetch', () => {
 
         beforeEach(async () => {
           const result = await tracedFetch({
-            config: { ignoreNetworkEvents: true },
+            config: {
+              ignoreNetworkEvents: true,
+              semconvStabilityOptIn: 'http/dup',
+            },
           });
           response = result.response;
         });
@@ -2140,6 +2320,13 @@ describe('fetch', () => {
             parseInt(response!.headers.get('content-length')!),
             `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
           );
+          assert.strictEqual(
+            span.attributes[ATTR_HTTP_RESPONSE_CONTENT_LENGTH],
+            parseInt(response!.headers.get('content-length')!),
+            `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
+          );
+          // Using 'http/dup', but should *not* have `http.response.body.size`
+          // attribute, because it is Opt-In.
         });
       });
     });
