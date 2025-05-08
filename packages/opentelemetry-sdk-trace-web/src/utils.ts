@@ -85,7 +85,7 @@ export function addSpanNetworkEvents(
   resource: PerformanceEntries,
   ignoreNetworkEvents = false,
   ignoreZeros?: boolean,
-  skipOldSemconvContentLengthAttrs?: boolean,
+  skipOldSemconvContentLengthAttrs?: boolean
 ): void {
   if (ignoreZeros === undefined) {
     ignoreZeros = resource[PTN.START_TIME] !== 0;
