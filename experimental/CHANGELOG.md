@@ -15,7 +15,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(instrumentation): New utilities for semconv stability migration for instrumentations that produce 'http' and 'db' telemetry. @trentm
   * See [semconv stability usage guide](./packages/opentelemetry-instrumentation/src/semconvStability.ts).
 * feat(instrumentation-http): capture synthetic source type on requests [#5488](https://github.com/open-telemetry/opentelemetry-js/pull/5488) @JacksonWeber
-* feat(instrumentation-grpc): support migration to stable HTTP semconv [#9659](https://github.com/open-telemetry/opentelemetry-js/pull/9659) @JamieDanielson
+* feat(instrumentation-grpc): support migration to stable HTTP semconv [#5653](https://github.com/open-telemetry/opentelemetry-js/pull/5653) @JamieDanielson
 
 ### :bug: Bug Fixes
 

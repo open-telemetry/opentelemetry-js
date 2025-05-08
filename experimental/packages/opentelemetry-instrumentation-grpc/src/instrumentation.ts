@@ -58,9 +58,6 @@ import {
   httpSemconvStabilityFromStr,
 } from '@opentelemetry/instrumentation';
 
-// stable http attributes
-// net.peer.name → server.address
-// net.peer.port → server.port
 import {
   ATTR_SERVER_ADDRESS,
   ATTR_SERVER_PORT,
