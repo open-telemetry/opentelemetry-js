@@ -506,11 +506,6 @@ describe('xhr', () => {
               attributes[ATTR_SERVER_PORT],
               Number(parseUrl(url).port)
             );
-
-            // XXX add one for http.response_content_length until we get the sdk-trace-web update from instr-fetch PR
-            if (!(semconvStability & SemconvStability.OLD)) {
-              expectedNumAttrs += 1;
-            }
           }
 
           assert.strictEqual(
@@ -939,14 +934,20 @@ describe('xhr', () => {
           it('should still add the CONTENT_LENGTH attribute', () => {
             const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
             const attributes = span.attributes;
-            const responseContentLength = attributes[
-              ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-            ] as number;
-            assert.strictEqual(
-              responseContentLength,
-              60,
-              `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
+            const semconvStability = httpSemconvStabilityFromStr(
+              test.semconvStabilityOptIn
             );
+
+            if (semconvStability & SemconvStability.OLD) {
+              const responseContentLength = attributes[
+                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
+              ] as number;
+              assert.strictEqual(
+                responseContentLength,
+                60,
+                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
+              );
+            }
           });
         });
       });
@@ -1191,11 +1192,6 @@ describe('xhr', () => {
                 'server.port'
               );
               assert.strictEqual(attributes[ATTR_ERROR_TYPE], '400');
-
-              // XXX add one for http.response_content_length until we get the sdk-trace-web update from instr-fetch PR
-              if (!(semconvStability & SemconvStability.OLD)) {
-                expectedNumAttrs += 1;
-              }
             }
 
             assert.strictEqual(
@@ -1899,11 +1895,6 @@ describe('xhr', () => {
               'server.port'
             );
             assert.strictEqual(attributes[ATTR_HTTP_REQUEST_BODY_SIZE], 19);
-
-            // XXX add one for http.response_content_length until we get the sdk-trace-web update from instr-fetch PR
-            if (!(semconvStability & SemconvStability.OLD)) {
-              expectedNumAttrs += 1;
-            }
           }
 
           assert.strictEqual(
@@ -2570,11 +2561,6 @@ describe('xhr', () => {
                 'server.port'
               );
               assert.strictEqual(attributes[ATTR_ERROR_TYPE], '400');
-
-              // XXX add one for http.response_content_length until we get the sdk-trace-web update from instr-fetch PR
-              if (!(semconvStability & SemconvStability.OLD)) {
-                expectedNumAttrs += 1;
-              }
             }
 
             assert.strictEqual(

@@ -171,16 +171,15 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       const childSpan = this.tracer.startSpan('CORS Preflight', {
         startTime: corsPreFlightRequest[PTN.FETCH_START],
       });
-      // const skipOldSemconvContentLengthAttrs = !(
-      //   this._semconvStability & SemconvStability.OLD
-      // );
+      const skipOldSemconvContentLengthAttrs = !(
+        this._semconvStability & SemconvStability.OLD
+      );
       addSpanNetworkEvents(
         childSpan,
         corsPreFlightRequest,
         this.getConfig().ignoreNetworkEvents,
-        undefined
-        // XXX waiting on merge of instr-fetch change with sdk-trace-web update
-        // skipOldSemconvContentLengthAttrs
+        undefined,
+        skipOldSemconvContentLengthAttrs
       );
       childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
     });
@@ -340,17 +339,15 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         this._addChildSpan(span, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
-      // XXX
-      // const skipOldSemconvContentLengthAttrs = !(
-      //   this._semconvStability & SemconvStability.OLD
-      // );
+      const skipOldSemconvContentLengthAttrs = !(
+        this._semconvStability & SemconvStability.OLD
+      );
       addSpanNetworkEvents(
         span,
         mainRequest,
         this.getConfig().ignoreNetworkEvents,
-        undefined
-        // XXX waiting on merge of instr-fetch change with sdk-trace-web update
-        // skipOldSemconvContentLengthAttrs
+        undefined,
+        skipOldSemconvContentLengthAttrs
       );
     }
   }
