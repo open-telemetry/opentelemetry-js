@@ -16,6 +16,8 @@
 
 import * as api from '@opentelemetry/api';
 import {
+  SemconvStability,
+  httpSemconvStabilityFromStr,
   isWrapped,
   registerInstrumentations,
 } from '@opentelemetry/instrumentation';
@@ -63,7 +65,6 @@ import {
 
 import * as msw from 'msw';
 import { setupWorker } from 'msw/browser';
-import { httpSemconvStabilityFromStr, SemconvStability } from '../src/utils';
 
 // This should match the unexported constant with the same name in fetch.ts
 const OBSERVER_WAIT_TIME_MS = 300;
