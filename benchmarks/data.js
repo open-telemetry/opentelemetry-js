@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1746739835324,
+  "lastUpdate": 1746742747001,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -32036,6 +32036,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.61%",
             "unit": "ops/sec",
             "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5954fdeb908ca2123c8dd6e9d51958147b434618",
+          "message": "feat(instrumentation-fetch): support migration to stable HTTP semconv, v1.23.1 (#5651)",
+          "timestamp": "2025-05-08T22:09:16Z",
+          "tree_id": "be4e05cae888cd32382b65074e7729ba5ffc3b89",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/5954fdeb908ca2123c8dd6e9d51958147b434618"
+        },
+        "date": 1746742745937,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1518818,
+            "range": "±0.64%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 17723,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 831236,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 809406,
+            "range": "±0.31%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
