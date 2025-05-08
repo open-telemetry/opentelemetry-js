@@ -93,7 +93,7 @@ To select which semconv version(s) is emitted from this instrumentation, use the
 **Span attributes:**
 
 | v1.7.0 semconv         | v1.23.0 semconv                    | Notes |
-| ---------------------- | ---------------------------------- | -------------------------------------------------------------- |
+| ---------------------- | ---------------------------------- | ----- |
 | `http.method`          | `http.request.method`              | HTTP request method. With v1.23.0 semconv [`http.request.method_original` may also be included](https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#common-attributes). |
 | `http.url`             | `url.full`                         | Full HTTP request URL |
 | `http.host`            | `server.address` and `server.port` | The hostname and port of the request URL |
