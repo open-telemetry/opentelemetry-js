@@ -454,7 +454,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             return;
           }
           responseFinished = true;
-          this._onIncomingResponseError(
+          this._onOutgoingRequestError(
             span,
             stableMetricAttributes,
             startTime,
@@ -482,7 +482,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         return;
       }
       responseFinished = true;
-      this._onIncomingResponseError(
+      this._onOutgoingRequestError(
         span,
         stableMetricAttributes,
         startTime,
@@ -763,7 +763,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           },
           error => {
             if (error) {
-              instrumentation._onIncomingResponseError(
+              instrumentation._onOutgoingRequestError(
                 span,
                 stableMetricAttributes,
                 startTime,
@@ -838,7 +838,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     );
   }
 
-  private _onIncomingResponseError(
+  private _onOutgoingRequestError(
     span: Span,
     stableMetricAttributes: Attributes,
     startTime: HrTime,
