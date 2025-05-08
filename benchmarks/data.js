@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1746712537851,
+  "lastUpdate": 1746739835324,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -31984,6 +31984,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.38%",
             "unit": "ops/sec",
             "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jamiedanielson@honeycomb.io",
+            "name": "Jamie Danielson",
+            "username": "JamieDanielson"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "e1ec4026edae53a2dea3a9a604d6d21bb5e8d99f",
+          "message": "feat(instrumentation-grpc): support migration to stable HTTP semconv (#5653)",
+          "timestamp": "2025-05-08T21:20:13Z",
+          "tree_id": "11ecf5193202999d5a3ab5586e2bb6cf6d7f318e",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/e1ec4026edae53a2dea3a9a604d6d21bb5e8d99f"
+        },
+        "date": 1746739834135,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1535403,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 19080,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 816473,
+            "range": "±0.41%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 778333,
+            "range": "±0.61%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
