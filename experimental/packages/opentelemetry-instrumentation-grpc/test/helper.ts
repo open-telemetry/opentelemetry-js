@@ -50,7 +50,7 @@ import {
 import { assertPropagation, assertSpan } from './utils/assertionUtils';
 import { promisify } from 'util';
 import type { GrpcInstrumentation } from '../src';
-import { SemconvStability } from '../src/types';
+import { SemconvStability } from '@opentelemetry/instrumentation';
 import * as path from 'path';
 
 const PROTO_PATH = path.resolve(__dirname, './fixtures/grpc-test.proto');

@@ -34,7 +34,7 @@ import {
   ATTR_RPC_GRPC_STATUS_CODE,
 } from '../../src/semconv';
 
-import { SemconvStability } from '../../src/types';
+import { SemconvStability } from '@opentelemetry/instrumentation';
 
 export const grpcStatusCodeToOpenTelemetryStatusCode = (
   status: GrpcStatus

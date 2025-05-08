@@ -28,8 +28,6 @@ import type {
 } from '@grpc/grpc-js';
 import type * as grpcJs from '@grpc/grpc-js';
 
-import { getStringListFromEnv } from '@opentelemetry/core';
-
 import type {
   ServerCallWithMeta,
   SendUnaryDataCallback,
@@ -41,7 +39,7 @@ import type {
   ClientRequestFunction,
   metadataCaptureType,
 } from './internal-types';
-import { type GrpcInstrumentationConfig, SemconvStability } from './types';
+import { type GrpcInstrumentationConfig } from './types';
 
 import {
   context,
@@ -56,6 +54,8 @@ import {
 import {
   InstrumentationNodeModuleDefinition,
   InstrumentationBase,
+  SemconvStability,
+  httpSemconvStabilityFromStr,
 } from '@opentelemetry/instrumentation';
 
 // stable http attributes
@@ -100,18 +100,15 @@ import { VERSION } from './version';
 
 export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentationConfig> {
   private _metadataCapture: metadataCaptureType;
-  private _semconvStability = SemconvStability.OLD;
+  private _semconvStability: SemconvStability;
 
   constructor(config: GrpcInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-grpc', VERSION, config);
     this._metadataCapture = this._createMetadataCapture();
 
-    const entries = getStringListFromEnv('OTEL_SEMCONV_STABILITY_OPT_IN');
-    if (entries?.some(entry => entry?.toLowerCase() === 'http/dup')) {
-      this._semconvStability = SemconvStability.DUPLICATE;
-    } else if (entries?.some(entry => entry?.toLowerCase() === 'http')) {
-      this._semconvStability = SemconvStability.STABLE;
-    }
+    this._semconvStability = httpSemconvStabilityFromStr(
+      process.env.OTEL_SEMCONV_STABILITY_OPT_IN
+    );
   }
 
   init() {
