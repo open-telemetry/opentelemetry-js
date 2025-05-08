@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1746640410457,
+  "lastUpdate": 1746712537851,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -31932,6 +31932,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.21%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "eb4ce206b764f0347bdec3b2d29330606ed5f8c9",
+          "message": "feat(instrumentation): New utilities for semconv stability migration for instrumentations that produce 'http' and 'db' telemetry. (#5659)\n\nCo-authored-by: Jamie Danielson <jamiedanielson@honeycomb.io>",
+          "timestamp": "2025-05-08T13:42:30Z",
+          "tree_id": "7a50820ce55b3b97f9f2fa816a8b95786d4a9e89",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/eb4ce206b764f0347bdec3b2d29330606ed5f8c9"
+        },
+        "date": 1746712532387,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1485587,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18306,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 849283,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 786226,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
           }
         ]
       }
