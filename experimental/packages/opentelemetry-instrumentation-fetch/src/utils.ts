@@ -180,42 +180,6 @@ function getFormDataSize(formData: FormData): number {
 }
 
 /**
- * Tracks whether this instrumentation emits old experimental,
- * new stable, or both semantic conventions.
- *
- * Enum values chosen such that the enum may be used as a bitmask.
- */
-export const enum SemconvStability {
-  /** Emit only stable semantic conventions */
-  STABLE = 0x1,
-  /** Emit only old semantic conventions*/
-  OLD = 0x2,
-  /** Emit both stable and old semantic conventions*/
-  DUPLICATE = 0x1 | 0x2,
-}
-
-export function httpSemconvStabilityFromStr(str: string | undefined) {
-  let semconvStability = SemconvStability.OLD;
-
-  // The same parsing of `str` as `getStringListFromEnv` from the core pkg.
-  const entries = str
-    ?.split(',')
-    .map(v => v.trim())
-    .filter(s => s !== '');
-  for (const entry of entries ?? []) {
-    if (entry.toLowerCase() === 'http/dup') {
-      // http/dup takes highest precedence.
-      semconvStability = SemconvStability.DUPLICATE;
-      break;
-    } else if (entry.toLowerCase() === 'http') {
-      semconvStability = SemconvStability.STABLE;
-    }
-  }
-
-  return semconvStability;
-}
-
-/**
  * Normalize an HTTP request method string per `http.request.method` spec
  * https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#http-client-span
  */

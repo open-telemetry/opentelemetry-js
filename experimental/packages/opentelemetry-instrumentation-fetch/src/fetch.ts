@@ -16,6 +16,8 @@
 
 import * as api from '@opentelemetry/api';
 import {
+  SemconvStability,
+  httpSemconvStabilityFromStr,
   isWrapped,
   InstrumentationBase,
   InstrumentationConfig,
@@ -46,9 +48,7 @@ import {
 import { FetchError, FetchResponse, SpanData } from './types';
 import {
   getFetchBodyLength,
-  httpSemconvStabilityFromStr,
   normalizeHttpRequestMethod,
-  SemconvStability,
   serverPortFromUrl,
 } from './utils';
 import { VERSION } from './version';
