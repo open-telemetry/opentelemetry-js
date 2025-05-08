@@ -97,11 +97,11 @@ export function httpSemconvStabilityFromStr(str: string | undefined) {
 }
 
 /**
- * Determine appropriate 'http' semconv stability per
- * https://opentelemetry.io/docs/specs/semconv/non-normative/http-migration/
+ * Determine appropriate 'database' semconv stability per
+ * https://opentelemetry.io/docs/specs/semconv/non-normative/db-migration/
  *
  * Note: This method will be removed after OTel JS DB semconv migration is
- * complete (https://github.com/open-telemetry/opentelemetry-js/issues/5646).
+ * complete (https://github.com/open-telemetry/opentelemetry-js/issues/5658).
  */
 export function databaseSemconvStabilityFromStr(str: string | undefined) {
   return _semconvStabilityFromStr('database', str);
