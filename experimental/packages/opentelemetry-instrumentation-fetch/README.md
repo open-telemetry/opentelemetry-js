@@ -72,7 +72,7 @@ Fetch instrumentation plugin has few options available to choose from. You can s
 | [`requestHook`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L85) | `FetchRequestHookFunction` | Function for adding custom attributes or headers before the request is handled |
 | [`ignoreNetworkEvents`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L87) | `boolean`| Disable network events being added as span events (network events are added by default) |
 | [`measureRequestSize`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L89) | `boolean` | Measure outgoing request length (outgoing request length is not measured by default)    |
-| `semconvStabilityOptIn` | string | A comma-separated string of tokens as described for `OTEL_SEMCONV_STABILITY_OPT_IN` in the [HTTP semantic convention stability migration](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md). See the "Semantic Conventions" section below. |
+| `semconvStabilityOptIn` | string | A comma-separated string of tokens as described for `OTEL_SEMCONV_STABILITY_OPT_IN` in the [HTTP semantic convention stability migration](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md) guide. See the "Semantic Conventions" section below. |
 
 ## Semantic Conventions
 
