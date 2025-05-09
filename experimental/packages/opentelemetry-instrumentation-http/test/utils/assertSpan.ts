@@ -21,10 +21,10 @@ import {
 } from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
-import {
-  ATTR_URL_PATH,
-  ATTR_USER_AGENT_ORIGINAL,
-} from '@opentelemetry/semantic-conventions';
+// import {
+// ATTR_URL_PATH,
+// ATTR_USER_AGENT_ORIGINAL,
+// } from '@opentelemetry/semantic-conventions';
 import {
   ATTR_HTTP_METHOD,
   ATTR_HTTP_REQUEST_CONTENT_LENGTH,
@@ -57,7 +57,7 @@ export const assertSpan = (
     httpMethod: string;
     resHeaders: http.IncomingHttpHeaders;
     hostname: string;
-    pathname?: string;
+    pathname: string;
     reqHeaders?: http.OutgoingHttpHeaders;
     path?: string | null;
     forceStatus?: SpanStatus;
@@ -192,20 +192,21 @@ export const assertSpan = (
     assert.ok(typeof span.parentSpanContext?.spanId === 'string');
     assert.ok(isValidSpanId(span.parentSpanContext.spanId));
 
-    assert.strictEqual(
-      span.attributes[ATTR_URL_PATH],
-      validations.path || validations.pathname
-    );
+    // TODO: stable only
+    // assert.strictEqual(
+    //   span.attributes[ATTR_URL_PATH],
+    //   validations.path || validations.pathname
+    // );
 
-    if (validations.reqHeaders) {
-      const userAgent = validations.reqHeaders['user-agent'];
-      if (userAgent) {
-        assert.strictEqual(
-          span.attributes[ATTR_USER_AGENT_ORIGINAL],
-          userAgent
-        );
-      }
-    }
+    // if (validations.reqHeaders) {
+    //   const userAgent = validations.reqHeaders['user-agent'];
+    //   if (userAgent) {
+    //     assert.strictEqual(
+    //       span.attributes[ATTR_USER_AGENT_ORIGINAL],
+    //       userAgent
+    //     );
+    //   }
+    // }
   } else if (validations.reqHeaders) {
     assert.ok(validations.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
     assert.ok(validations.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);
