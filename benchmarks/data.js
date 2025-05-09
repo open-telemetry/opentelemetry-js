@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1746819564365,
+  "lastUpdate": 1746819646071,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -32296,6 +32296,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.42%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "4d3f899532e4b6f27c1db1bb0638e87f27636bbe",
+          "message": "refactor(sdk-trace-web): update semconv usage to ATTR_ exports (#5672)",
+          "timestamp": "2025-05-09T19:29:44Z",
+          "tree_id": "97c3e93ea6f927ba20463345745f6ed7c9679f8d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/4d3f899532e4b6f27c1db1bb0638e87f27636bbe"
+        },
+        "date": 1746819644987,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1458503,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18512,
+            "range": "±0.15%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 852468,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 802785,
+            "range": "±0.37%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
