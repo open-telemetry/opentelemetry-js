@@ -28,6 +28,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+* refactor(sdk-trace-base): update semconv usage to ATTR_ exports [#5669](https://github.com/open-telemetry/opentelemetry-js/pull/5669) @trentm
 * refactor(resources): update semconv usage to ATTR_ exports [#5666](https://github.com/open-telemetry/opentelemetry-js/pull/5666) @trentm
 * test(sdk-metrics): fix multiple problematic assertRejects() calls [#5611](https://github.com/open-telemetry/opentelemetry-js/pull/5611) @cjihrig
 * refactor: replace assertRejects() with assert.rejects() [#5614](https://github.com/open-telemetry/opentelemetry-js/pull/5614) @cjihrig
