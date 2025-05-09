@@ -479,7 +479,7 @@ describe('Utility', () => {
         request,
         {
           component: 'http',
-          semconvStability: SemconvStability.OLD,
+          semconvStability: SemconvStability.STABLE,
           enableSyntheticSourceDetection: true,
         },
         diag

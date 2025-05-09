@@ -617,6 +617,24 @@ export const getOutgoingRequestMetricAttributesOnResponse = (
   metricAttributes[ATTR_HTTP_STATUS_CODE] =
     spanAttributes[ATTR_HTTP_STATUS_CODE];
   metricAttributes[ATTR_HTTP_FLAVOR] = spanAttributes[ATTR_HTTP_FLAVOR];
+
+  return metricAttributes;
+};
+
+export const getOutgoingStableRequestMetricAttributesOnResponse = (
+  spanAttributes: Attributes
+): Attributes => {
+  const metricAttributes: Attributes = {};
+
+  if (spanAttributes[ATTR_NETWORK_PROTOCOL_VERSION]) {
+    metricAttributes[ATTR_NETWORK_PROTOCOL_VERSION] =
+      spanAttributes[ATTR_NETWORK_PROTOCOL_VERSION];
+  }
+
+  if (spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE]) {
+    metricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] =
+      spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
+  }
   return metricAttributes;
 };
 

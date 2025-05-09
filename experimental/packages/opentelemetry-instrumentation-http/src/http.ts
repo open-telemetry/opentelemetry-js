@@ -74,6 +74,7 @@ import {
   getOutgoingRequestAttributesOnResponse,
   getOutgoingRequestMetricAttributes,
   getOutgoingRequestMetricAttributesOnResponse,
+  getOutgoingStableRequestMetricAttributesOnResponse,
   getRequestInfo,
   headerCapture,
   isValidOptionsType,
@@ -452,6 +453,10 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         oldMetricAttributes = Object.assign(
           oldMetricAttributes,
           getOutgoingRequestMetricAttributesOnResponse(responseAttributes)
+        );
+        stableMetricAttributes = Object.assign(
+          stableMetricAttributes,
+          getOutgoingStableRequestMetricAttributesOnResponse(responseAttributes)
         );
 
         if (this.getConfig().responseHook) {
