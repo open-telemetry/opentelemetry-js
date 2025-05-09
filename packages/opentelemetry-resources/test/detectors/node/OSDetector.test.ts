@@ -15,9 +15,9 @@
  */
 
 import {
-  SEMRESATTRS_OS_TYPE,
-  SEMRESATTRS_OS_VERSION,
-} from '@opentelemetry/semantic-conventions';
+  ATTR_OS_TYPE,
+  ATTR_OS_VERSION,
+} from '@opentelemetry/semantic-conventions/incubating';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { osDetector } from '../../../src';
@@ -37,9 +37,9 @@ describeNode('osDetector() on Node.js', () => {
     const resource = osDetector.detect();
     assert.ok(resource.attributes);
 
-    assert.strictEqual(resource.attributes[SEMRESATTRS_OS_TYPE], 'windows');
+    assert.strictEqual(resource.attributes[ATTR_OS_TYPE], 'windows');
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_OS_VERSION],
+      resource.attributes[ATTR_OS_VERSION],
       '2.2.1(0.289/5/3)'
     );
   });
@@ -53,7 +53,7 @@ describeNode('osDetector() on Node.js', () => {
     assert.ok(resource.attributes);
 
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_OS_TYPE],
+      resource.attributes[ATTR_OS_TYPE],
       'some-unknown-platform'
     );
   });
