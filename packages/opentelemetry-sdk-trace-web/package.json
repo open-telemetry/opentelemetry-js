@@ -59,6 +59,7 @@
     "@opentelemetry/api": ">=1.0.0 <1.10.0",
     "@opentelemetry/context-zone": "2.0.0",
     "@opentelemetry/resources": "2.0.0",
+    "@opentelemetry/semantic-conventions": "^1.29.0",
     "@types/jquery": "3.5.32",
     "@types/mocha": "10.0.10",
     "@types/node": "18.6.5",
@@ -89,8 +90,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "2.0.0",
-    "@opentelemetry/sdk-trace-base": "2.0.0",
-    "@opentelemetry/semantic-conventions": "^1.29.0"
+    "@opentelemetry/sdk-trace-base": "2.0.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-web",
   "sideEffects": false
