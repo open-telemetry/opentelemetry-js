@@ -39,3 +39,253 @@ export const USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT = 'bot' as const;
  * Enum value "test" for attribute {@link ATTR_USER_AGENT_SYNTHETIC_TYPE}.
  */
 export const USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST = 'test' as const;
+
+/**
+ * Deprecated, use `client.address` instead.
+ *
+ * @example "83.164.160.102"
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `client.address`.
+ */
+export const ATTR_HTTP_CLIENT_IP = 'http.client_ip' as const;
+
+/**
+ * Deprecated, use `network.protocol.name` instead.
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `network.protocol.name`.
+ */
+export const ATTR_HTTP_FLAVOR = 'http.flavor' as const;
+
+/**
+ * Deprecated, use one of `server.address`, `client.address` or `http.request.header.host` instead, depending on the usage.
+ *
+ * @example www.example.org
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by one of `server.address`, `client.address` or `http.request.header.host`, depending on the usage.
+ */
+export const ATTR_HTTP_HOST = 'http.host' as const;
+
+/**
+ * Deprecated, use `http.request.method` instead.
+ *
+ * @example GET
+ * @example POST
+ * @example HEAD
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `http.request.method`.
+ */
+export const ATTR_HTTP_METHOD = 'http.method' as const;
+
+/**
+ * Deprecated, use `http.request.header.<key>` instead.
+ *
+ * @example 3495
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `http.request.header.<key>`.
+ */
+export const ATTR_HTTP_REQUEST_CONTENT_LENGTH =
+  'http.request_content_length' as const;
+
+/**
+ * Deprecated, use `http.request.body.size` instead.
+ *
+ * @example 5493
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `http.request.body.size`.
+ */
+export const ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED =
+  'http.request_content_length_uncompressed' as const;
+
+/**
+ * Deprecated, use `http.response.header.<key>` instead.
+ *
+ * @example 3495
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `http.response.header.<key>`.
+ */
+export const ATTR_HTTP_RESPONSE_CONTENT_LENGTH =
+  'http.response_content_length' as const;
+
+/**
+ * Deprecated, use `http.response.body.size` instead.
+ *
+ * @example 5493
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replace by `http.response.body.size`.
+ */
+export const ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED =
+  'http.response_content_length_uncompressed' as const;
+
+/**
+ * Deprecated, use `url.scheme` instead.
+ *
+ * @example http
+ * @example https
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `url.scheme` instead.
+ */
+export const ATTR_HTTP_SCHEME = 'http.scheme' as const;
+
+/**
+ * Deprecated, use `server.address` instead.
+ *
+ * @example example.com
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `server.address`.
+ */
+export const ATTR_HTTP_SERVER_NAME = 'http.server_name' as const;
+
+/**
+ * Deprecated, use `http.response.status_code` instead.
+ *
+ * @example 200
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `http.response.status_code`.
+ */
+export const ATTR_HTTP_STATUS_CODE = 'http.status_code' as const;
+
+/**
+ * Deprecated, use `url.path` and `url.query` instead.
+ *
+ * @example /search?q=OpenTelemetry#SemConv
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Split to `url.path` and `url.query.
+ */
+export const ATTR_HTTP_TARGET = 'http.target' as const;
+
+/**
+ * Deprecated, use `url.full` instead.
+ *
+ * @example https://www.foo.bar/search?q=OpenTelemetry#SemConv
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `url.full`.
+ */
+export const ATTR_HTTP_URL = 'http.url' as const;
+
+/**
+ * Deprecated, use `user_agent.original` instead.
+ *
+ * @example CERN-LineMode/2.15 libwww/2.17b3
+ * @example Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `user_agent.original`.
+ */
+export const ATTR_HTTP_USER_AGENT = 'http.user_agent' as const;
+
+/**
+ * Deprecated, use `network.local.address`.
+ *
+ * @example "192.168.0.1"
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `network.local.address`.
+ */
+export const ATTR_NET_HOST_IP = 'net.host.ip' as const;
+
+/**
+ * Deprecated, use `server.address`.
+ *
+ * @example example.com
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `server.address`.
+ */
+export const ATTR_NET_HOST_NAME = 'net.host.name' as const;
+
+/**
+ * Deprecated, use `server.port`.
+ *
+ * @example 8080
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `server.port`.
+ */
+export const ATTR_NET_HOST_PORT = 'net.host.port' as const;
+
+/**
+ * Deprecated, use `network.peer.address`.
+ *
+ * @example "127.0.0.1"
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `network.peer.address`.
+ */
+export const ATTR_NET_PEER_IP = 'net.peer.ip' as const;
+
+/**
+ * Deprecated, use `server.address` on client spans and `client.address` on server spans.
+ *
+ * @example example.com
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `server.address` on client spans and `client.address` on server spans.
+ */
+export const ATTR_NET_PEER_NAME = 'net.peer.name' as const;
+
+/**
+ * Deprecated, use `server.port` on client spans and `client.port` on server spans.
+ *
+ * @example 8080
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `server.port` on client spans and `client.port` on server spans.
+ */
+export const ATTR_NET_PEER_PORT = 'net.peer.port' as const;
+
+/**
+ * Deprecated, use `network.transport`.
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `network.transport`.
+ */
+export const ATTR_NET_TRANSPORT = 'net.transport' as const;
+
+/**
+ * Enum value "ip_tcp" for attribute {@link ATTR_NET_TRANSPORT}.
+ */
+export const NET_TRANSPORT_VALUE_IP_TCP = 'ip_tcp' as const;
+
+/**
+ * Enum value "ip_udp" for attribute {@link ATTR_NET_TRANSPORT}.
+ */
+export const NET_TRANSPORT_VALUE_IP_UDP = 'ip_udp' as const;
+
+/**
+ * Enum value "1.1" for attribute {@link ATTR_HTTP_FLAVOR}.
+ */
+export const HTTP_FLAVOR_VALUE_HTTP_1_1 = '1.1' as const;
