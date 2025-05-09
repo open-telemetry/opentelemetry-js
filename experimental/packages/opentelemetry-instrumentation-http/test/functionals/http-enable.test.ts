@@ -43,24 +43,26 @@ import {
   ATTR_URL_PATH,
   ATTR_URL_SCHEME,
   HTTP_REQUEST_METHOD_VALUE_GET,
-  NETTRANSPORTVALUES_IP_TCP,
-  SEMATTRS_HTTP_CLIENT_IP,
-  SEMATTRS_HTTP_FLAVOR,
-  SEMATTRS_HTTP_HOST,
-  SEMATTRS_HTTP_METHOD,
-  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-  SEMATTRS_HTTP_SCHEME,
-  SEMATTRS_HTTP_STATUS_CODE,
-  SEMATTRS_HTTP_TARGET,
-  SEMATTRS_HTTP_URL,
-  SEMATTRS_NET_HOST_IP,
-  SEMATTRS_NET_HOST_NAME,
-  SEMATTRS_NET_HOST_PORT,
-  SEMATTRS_NET_PEER_IP,
-  SEMATTRS_NET_PEER_NAME,
-  SEMATTRS_NET_PEER_PORT,
-  SEMATTRS_NET_TRANSPORT,
 } from '@opentelemetry/semantic-conventions';
+import {
+  ATTR_HTTP_CLIENT_IP,
+  ATTR_HTTP_FLAVOR,
+  ATTR_HTTP_HOST,
+  ATTR_HTTP_METHOD,
+  ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+  ATTR_HTTP_SCHEME,
+  ATTR_HTTP_STATUS_CODE,
+  ATTR_HTTP_TARGET,
+  ATTR_HTTP_URL,
+  ATTR_NET_HOST_IP,
+  ATTR_NET_HOST_NAME,
+  ATTR_NET_HOST_PORT,
+  ATTR_NET_PEER_IP,
+  ATTR_NET_PEER_NAME,
+  ATTR_NET_PEER_PORT,
+  ATTR_NET_TRANSPORT,
+  NET_TRANSPORT_VALUE_IP_TCP,
+} from '../../src/semconv';
 import * as assert from 'assert';
 import * as nock from 'nock';
 import * as path from 'path';
@@ -77,7 +79,7 @@ import type {
   ServerResponse,
   RequestOptions,
 } from 'http';
-import { isWrapped } from '@opentelemetry/instrumentation';
+import { isWrapped, SemconvStability } from '@opentelemetry/instrumentation';
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 
 const instrumentation = new HttpInstrumentation();
@@ -87,7 +89,6 @@ instrumentation.disable();
 import * as http from 'http';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import { getRemoteClientAddress } from '../../src/utils';
-import { SemconvStability } from '@opentelemetry/instrumentation';
 
 const applyCustomAttributesOnSpanErrorMessage =
   'bad applyCustomAttributesOnSpan function';
@@ -233,11 +234,11 @@ describe('HttpInstrumentation', () => {
         assertSpan(incomingSpan, SpanKind.SERVER, validations);
         assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
         assert.strictEqual(
-          incomingSpan.attributes[SEMATTRS_NET_HOST_PORT],
+          incomingSpan.attributes[ATTR_NET_HOST_PORT],
           serverPort
         );
         assert.strictEqual(
-          outgoingSpan.attributes[SEMATTRS_NET_PEER_PORT],
+          outgoingSpan.attributes[ATTR_NET_PEER_PORT],
           serverPort
         );
       });
@@ -252,11 +253,11 @@ describe('HttpInstrumentation', () => {
         assert.strictEqual(incomingSpan.kind, SpanKind.SERVER);
         assert.strictEqual(outgoingSpan.kind, SpanKind.CLIENT);
         assert.strictEqual(
-          incomingSpan.attributes[SEMATTRS_HTTP_URL],
+          incomingSpan.attributes[ATTR_HTTP_URL],
           `${protocol}://${hostname}:${serverPort}${pathname}`
         );
         assert.strictEqual(
-          outgoingSpan.attributes[SEMATTRS_HTTP_URL],
+          outgoingSpan.attributes[ATTR_HTTP_URL],
           `${protocol}://${hostname}:${serverPort}${pathname}`
         );
       });
@@ -418,25 +419,25 @@ describe('HttpInstrumentation', () => {
 
         assert.strictEqual(spans.length, 2);
         assert.strictEqual(
-          incomingSpan.attributes[SEMATTRS_HTTP_CLIENT_IP],
+          incomingSpan.attributes[ATTR_HTTP_CLIENT_IP],
           '<client>'
         );
         assert.strictEqual(
-          incomingSpan.attributes[SEMATTRS_NET_HOST_PORT],
+          incomingSpan.attributes[ATTR_NET_HOST_PORT],
           serverPort
         );
         assert.strictEqual(
-          outgoingSpan.attributes[SEMATTRS_NET_PEER_PORT],
+          outgoingSpan.attributes[ATTR_NET_PEER_PORT],
           serverPort
         );
         [
           { span: incomingSpan, kind: SpanKind.SERVER },
           { span: outgoingSpan, kind: SpanKind.CLIENT },
         ].forEach(({ span, kind }) => {
-          assert.strictEqual(span.attributes[SEMATTRS_HTTP_FLAVOR], '1.1');
+          assert.strictEqual(span.attributes[ATTR_HTTP_FLAVOR], '1.1');
           assert.strictEqual(
-            span.attributes[SEMATTRS_NET_TRANSPORT],
-            NETTRANSPORTVALUES_IP_TCP
+            span.attributes[ATTR_NET_TRANSPORT],
+            NET_TRANSPORT_VALUE_IP_TCP
           );
           assertSpan(span, kind, validations);
         });
@@ -867,7 +868,7 @@ describe('HttpInstrumentation', () => {
             const [span] = spans;
             assert.strictEqual(spans.length, 1);
             assert.ok(Object.keys(span.attributes).length > 6);
-            assert.strictEqual(span.attributes[SEMATTRS_HTTP_STATUS_CODE], 404);
+            assert.strictEqual(span.attributes[ATTR_HTTP_STATUS_CODE], 404);
             assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
             done();
           });
@@ -1254,18 +1255,18 @@ describe('HttpInstrumentation', () => {
           [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
 
           // 1.7 attributes
-          [SEMATTRS_HTTP_FLAVOR]: '1.1',
-          [SEMATTRS_HTTP_HOST]: `${hostname}:${serverPort}`,
-          [SEMATTRS_HTTP_METHOD]: 'GET',
-          [SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED]:
+          [ATTR_HTTP_FLAVOR]: '1.1',
+          [ATTR_HTTP_HOST]: `${hostname}:${serverPort}`,
+          [ATTR_HTTP_METHOD]: 'GET',
+          [ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED]:
             response.data.length,
-          [SEMATTRS_HTTP_STATUS_CODE]: 200,
-          [SEMATTRS_HTTP_TARGET]: '/test',
-          [SEMATTRS_HTTP_URL]: `http://${hostname}:${serverPort}${pathname}`,
-          [SEMATTRS_NET_PEER_IP]: response.address,
-          [SEMATTRS_NET_PEER_NAME]: hostname,
-          [SEMATTRS_NET_PEER_PORT]: serverPort,
-          [SEMATTRS_NET_TRANSPORT]: 'ip_tcp',
+          [ATTR_HTTP_STATUS_CODE]: 200,
+          [ATTR_HTTP_TARGET]: '/test',
+          [ATTR_HTTP_URL]: `http://${hostname}:${serverPort}${pathname}`,
+          [ATTR_NET_PEER_IP]: response.address,
+          [ATTR_NET_PEER_NAME]: hostname,
+          [ATTR_NET_PEER_PORT]: serverPort,
+          [ATTR_NET_TRANSPORT]: 'ip_tcp',
 
           // unspecified old names
           [AttributeNames.HTTP_STATUS_TEXT]: 'OK',
@@ -1296,19 +1297,19 @@ describe('HttpInstrumentation', () => {
           [ATTR_URL_SCHEME]: protocol,
 
           // 1.7 attributes
-          [SEMATTRS_HTTP_FLAVOR]: '1.1',
-          [SEMATTRS_HTTP_HOST]: `${hostname}:${serverPort}`,
-          [SEMATTRS_HTTP_METHOD]: 'GET',
-          [SEMATTRS_HTTP_SCHEME]: protocol,
-          [SEMATTRS_HTTP_STATUS_CODE]: 200,
-          [SEMATTRS_HTTP_TARGET]: '/test',
-          [SEMATTRS_HTTP_URL]: `http://${hostname}:${serverPort}${pathname}`,
-          [SEMATTRS_NET_TRANSPORT]: 'ip_tcp',
-          [SEMATTRS_NET_HOST_IP]: body.address,
-          [SEMATTRS_NET_HOST_NAME]: hostname,
-          [SEMATTRS_NET_HOST_PORT]: serverPort,
-          [SEMATTRS_NET_PEER_IP]: body.address,
-          [SEMATTRS_NET_PEER_PORT]: response.clientRemotePort,
+          [ATTR_HTTP_FLAVOR]: '1.1',
+          [ATTR_HTTP_HOST]: `${hostname}:${serverPort}`,
+          [ATTR_HTTP_METHOD]: 'GET',
+          [ATTR_HTTP_SCHEME]: protocol,
+          [ATTR_HTTP_STATUS_CODE]: 200,
+          [ATTR_HTTP_TARGET]: '/test',
+          [ATTR_HTTP_URL]: `http://${hostname}:${serverPort}${pathname}`,
+          [ATTR_NET_TRANSPORT]: 'ip_tcp',
+          [ATTR_NET_HOST_IP]: body.address,
+          [ATTR_NET_HOST_NAME]: hostname,
+          [ATTR_NET_HOST_PORT]: serverPort,
+          [ATTR_NET_PEER_IP]: body.address,
+          [ATTR_NET_PEER_PORT]: response.clientRemotePort,
 
           // unspecified old names
           [AttributeNames.HTTP_STATUS_TEXT]: 'OK',
@@ -1340,19 +1341,19 @@ describe('HttpInstrumentation', () => {
           [ATTR_HTTP_ROUTE]: 'TheRoute',
 
           // 1.7 attributes
-          [SEMATTRS_HTTP_FLAVOR]: '1.1',
-          [SEMATTRS_HTTP_HOST]: `${hostname}:${serverPort}`,
-          [SEMATTRS_HTTP_METHOD]: 'GET',
-          [SEMATTRS_HTTP_SCHEME]: protocol,
-          [SEMATTRS_HTTP_STATUS_CODE]: 200,
-          [SEMATTRS_HTTP_TARGET]: `${pathname}/setroute`,
-          [SEMATTRS_HTTP_URL]: `http://${hostname}:${serverPort}${pathname}/setroute`,
-          [SEMATTRS_NET_TRANSPORT]: 'ip_tcp',
-          [SEMATTRS_NET_HOST_IP]: body.address,
-          [SEMATTRS_NET_HOST_NAME]: hostname,
-          [SEMATTRS_NET_HOST_PORT]: serverPort,
-          [SEMATTRS_NET_PEER_IP]: body.address,
-          [SEMATTRS_NET_PEER_PORT]: response.clientRemotePort,
+          [ATTR_HTTP_FLAVOR]: '1.1',
+          [ATTR_HTTP_HOST]: `${hostname}:${serverPort}`,
+          [ATTR_HTTP_METHOD]: 'GET',
+          [ATTR_HTTP_SCHEME]: protocol,
+          [ATTR_HTTP_STATUS_CODE]: 200,
+          [ATTR_HTTP_TARGET]: `${pathname}/setroute`,
+          [ATTR_HTTP_URL]: `http://${hostname}:${serverPort}${pathname}/setroute`,
+          [ATTR_NET_TRANSPORT]: 'ip_tcp',
+          [ATTR_NET_HOST_IP]: body.address,
+          [ATTR_NET_HOST_NAME]: hostname,
+          [ATTR_NET_HOST_PORT]: serverPort,
+          [ATTR_NET_PEER_IP]: body.address,
+          [ATTR_NET_PEER_PORT]: response.clientRemotePort,
 
           // unspecified old names
           [AttributeNames.HTTP_STATUS_TEXT]: 'OK',

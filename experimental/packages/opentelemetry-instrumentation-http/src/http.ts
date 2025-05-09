@@ -56,12 +56,12 @@ import {
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
   ATTR_NETWORK_PROTOCOL_VERSION,
+  ATTR_HTTP_ROUTE,
   ATTR_SERVER_ADDRESS,
   ATTR_SERVER_PORT,
   ATTR_URL_SCHEME,
   METRIC_HTTP_CLIENT_REQUEST_DURATION,
   METRIC_HTTP_SERVER_REQUEST_DURATION,
-  SEMATTRS_HTTP_ROUTE,
 } from '@opentelemetry/semantic-conventions';
 import {
   extractHostnameAndPort,
@@ -909,7 +909,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       code: parseResponseStatus(SpanKind.SERVER, response.statusCode),
     });
 
-    const route = attributes[SEMATTRS_HTTP_ROUTE];
+    const route = attributes[ATTR_HTTP_ROUTE];
     if (route) {
       span.updateName(`${request.method || 'GET'} ${route}`);
     }

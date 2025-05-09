@@ -24,11 +24,6 @@ import {
 import {
   ATTR_HTTP_ROUTE,
   ATTR_USER_AGENT_ORIGINAL,
-  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
-  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
-  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-  SEMATTRS_HTTP_TARGET,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import { IncomingMessage, ServerResponse } from 'http';
@@ -36,6 +31,11 @@ import { Socket } from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
 import {
+  ATTR_HTTP_REQUEST_CONTENT_LENGTH,
+  ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+  ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
+  ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+  ATTR_HTTP_TARGET,
   ATTR_USER_AGENT_SYNTHETIC_TYPE,
   USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
 } from '../../src/semconv';
@@ -287,10 +287,10 @@ describe('Utility', () => {
     value: number
   ) {
     const SemanticAttributess = [
-      SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-      SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
-      SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-      SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
+      ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+      ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
+      ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+      ATTR_HTTP_REQUEST_CONTENT_LENGTH,
     ];
 
     for (const attr of SemanticAttributess) {
@@ -314,7 +314,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+        ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
         1200
       );
     });
@@ -330,7 +330,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+        ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
         1200
       );
     });
@@ -346,7 +346,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
+        ATTR_HTTP_REQUEST_CONTENT_LENGTH,
         1200
       );
     });
@@ -365,7 +365,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+        ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
         1200
       );
     });
@@ -384,7 +384,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+        ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
         1200
       );
     });
@@ -403,7 +403,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
+        ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
         1200
       );
     });
@@ -462,7 +462,7 @@ describe('Utility', () => {
         },
         diag
       );
-      assert.strictEqual(attributes[SEMATTRS_HTTP_TARGET], '/user/?q=val');
+      assert.strictEqual(attributes[ATTR_HTTP_TARGET], '/user/?q=val');
       assert.strictEqual(attributes[ATTR_USER_AGENT_SYNTHETIC_TYPE], undefined);
     });
 
