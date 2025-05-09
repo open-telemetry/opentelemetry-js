@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-import {
-  ATTR_OS_TYPE,
-  ATTR_OS_VERSION,
-} from '@opentelemetry/semantic-conventions/incubating';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { osDetector } from '../../../src';
 import { describeNode } from '../../util';
+import { ATTR_OS_TYPE, ATTR_OS_VERSION } from '../../../src/semconv';
 
 describeNode('osDetector() on Node.js', () => {
   afterEach(() => {

@@ -16,6 +16,13 @@
 
 import { SDK_INFO } from '@opentelemetry/core';
 import {
+  ATTR_SERVICE_NAME,
+  ATTR_SERVICE_VERSION,
+  ATTR_TELEMETRY_SDK_LANGUAGE,
+  ATTR_TELEMETRY_SDK_NAME,
+  ATTR_TELEMETRY_SDK_VERSION,
+} from '@opentelemetry/semantic-conventions';
+import {
   ATTR_CLOUD_ACCOUNT_ID,
   ATTR_CLOUD_AVAILABILITY_ZONE,
   ATTR_CLOUD_PROVIDER,
@@ -36,14 +43,7 @@ import {
   ATTR_K8S_POD_NAME,
   ATTR_SERVICE_INSTANCE_ID,
   ATTR_SERVICE_NAMESPACE,
-} from '@opentelemetry/semantic-conventions/incubating';
-import {
-  ATTR_SERVICE_NAME,
-  ATTR_SERVICE_VERSION,
-  ATTR_TELEMETRY_SDK_LANGUAGE,
-  ATTR_TELEMETRY_SDK_NAME,
-  ATTR_TELEMETRY_SDK_VERSION,
-} from '@opentelemetry/semantic-conventions';
+} from '../src/semconv';
 import {
   assertCloudResource,
   assertContainerResource,

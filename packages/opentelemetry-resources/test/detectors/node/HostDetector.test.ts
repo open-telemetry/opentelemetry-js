@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import {
-  ATTR_HOST_ARCH,
-  ATTR_HOST_ID,
-  ATTR_HOST_NAME,
-} from '@opentelemetry/semantic-conventions/incubating';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { hostDetector } from '../../../src';
 import { resourceFromDetectedResource } from '../../../src/ResourceImpl';
 import { describeNode } from '../../util';
+import {
+  ATTR_HOST_ARCH,
+  ATTR_HOST_ID,
+  ATTR_HOST_NAME,
+} from '../../../src/semconv';
 
 describeNode('hostDetector() on Node.js', () => {
   afterEach(() => {

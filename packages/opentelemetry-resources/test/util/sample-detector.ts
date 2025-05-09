@@ -21,7 +21,7 @@ import {
   ATTR_CLOUD_REGION,
   ATTR_HOST_ID,
   ATTR_HOST_TYPE,
-} from '@opentelemetry/semantic-conventions/incubating';
+} from '../../src/semconv';
 import { ResourceDetector } from '../../src';
 import { DetectedResource } from '../../src/types';
 

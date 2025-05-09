@@ -17,6 +17,15 @@
 import { SDK_INFO } from '@opentelemetry/core';
 import * as assert from 'assert';
 import {
+  ATTR_SERVICE_NAME,
+  ATTR_SERVICE_VERSION,
+  ATTR_TELEMETRY_SDK_LANGUAGE,
+  ATTR_TELEMETRY_SDK_NAME,
+  ATTR_TELEMETRY_SDK_VERSION,
+} from '@opentelemetry/semantic-conventions';
+import * as semconvIncubating from '@opentelemetry/semantic-conventions/incubating';
+
+import {
   ATTR_CLOUD_ACCOUNT_ID,
   ATTR_CLOUD_AVAILABILITY_ZONE,
   ATTR_CLOUD_PROVIDER,
@@ -49,15 +58,7 @@ import {
   ATTR_WEBENGINE_DESCRIPTION,
   ATTR_WEBENGINE_NAME,
   ATTR_WEBENGINE_VERSION,
-} from '@opentelemetry/semantic-conventions/incubating';
-import {
-  ATTR_SERVICE_NAME,
-  ATTR_SERVICE_VERSION,
-  ATTR_TELEMETRY_SDK_LANGUAGE,
-  ATTR_TELEMETRY_SDK_NAME,
-  ATTR_TELEMETRY_SDK_VERSION,
-} from '@opentelemetry/semantic-conventions';
-import * as semconvIncubating from '@opentelemetry/semantic-conventions/incubating';
+} from '../../src/semconv';
 import { DetectedResource } from '../../src/types';
 
 /**
