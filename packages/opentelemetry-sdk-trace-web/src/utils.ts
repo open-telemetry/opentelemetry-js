@@ -27,9 +27,9 @@ import {
   urlMatches,
 } from '@opentelemetry/core';
 import {
-  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
-  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-} from '@opentelemetry/semantic-conventions';
+  ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
+  ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+} from './semconv';
 
 // Used to normalize relative URLs
 let urlNormalizingAnchor: HTMLAnchorElement | undefined;
@@ -113,14 +113,14 @@ export function addSpanNetworkEvents(
     // *old* HTTP semconv (v1.7.0).
     const encodedLength = resource[PTN.ENCODED_BODY_SIZE];
     if (encodedLength !== undefined) {
-      span.setAttribute(SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH, encodedLength);
+      span.setAttribute(ATTR_HTTP_RESPONSE_CONTENT_LENGTH, encodedLength);
     }
 
     const decodedLength = resource[PTN.DECODED_BODY_SIZE];
     // Spec: Not set if transport encoding not used (in which case encoded and decoded sizes match)
     if (decodedLength !== undefined && encodedLength !== decodedLength) {
       span.setAttribute(
-        SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+        ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
         decodedLength
       );
     }
