@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Span, Attributes } from '@opentelemetry/api';
+import { Span, Attributes, Context } from '@opentelemetry/api';
 import {
   ClientRequest,
   IncomingMessage,
@@ -36,6 +36,10 @@ export interface IgnoreIncomingRequestFunction {
 
 export interface IgnoreOutgoingRequestFunction {
   (request: RequestOptions): boolean;
+}
+
+export interface HttpCustomContextFunction {
+  (context: Context, request: IncomingMessage): Context;
 }
 
 export interface HttpRequestCustomAttributeFunction {
@@ -68,6 +72,8 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
   disableOutgoingRequestInstrumentation?: boolean;
   /** Function for adding custom attributes after response is handled */
   applyCustomAttributesOnSpan?: HttpCustomAttributeFunction;
+  /** Functions for adding modifying the context of incoming requests */
+  contextHook?: HttpCustomContextFunction;
   /** Function for adding custom attributes before request is handled */
   requestHook?: HttpRequestCustomAttributeFunction;
   /** Function for adding custom attributes before response is handled */
