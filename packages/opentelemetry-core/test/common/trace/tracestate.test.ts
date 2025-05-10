@@ -24,6 +24,15 @@ describe('TraceState', () => {
       assert.deepStrictEqual(state.serialize(), 'a=1,b=2');
     });
 
+    it('must not create a new TraceState if key or value is invalid', () => {
+      const orgState = new TraceState('a=1,b=2');
+      const stateOne = orgState.set('***d', '3');
+      const stateTwo = orgState.set('d', '123,456=7');
+      assert.deepStrictEqual(orgState.serialize(), 'a=1,b=2');
+      assert.deepStrictEqual(stateOne.serialize(), 'a=1,b=2');
+      assert.deepStrictEqual(stateTwo.serialize(), 'a=1,b=2');
+    });
+
     it('must create a new TraceState and move updated keys to the front', () => {
       const orgState = new TraceState('a=1,b=2');
       const state = orgState.set('b', '3');
@@ -66,7 +75,24 @@ describe('TraceState', () => {
     });
 
     it('must drop states when the items are too long', () => {
-      const state = new TraceState('a=' + 'b'.repeat(512));
+      const raw = 'a=' + 'b'.repeat(512);
+      const state = new TraceState(raw);
+      assert.deepStrictEqual(state.get('a'), undefined);
+      assert.deepStrictEqual(state.serialize(), raw);
+    });
+
+    it('must drop states when setting an item that make them too long', () => {
+      const orgState = new TraceState(
+        new Array(5)
+          .fill(0)
+          .map((_: null, num: number) => `a${num}=${num.toString().repeat(97)}`)
+          .join(',')
+      );
+      assert.deepStrictEqual(orgState.get('a0'), '0'.repeat(97));
+      assert.deepStrictEqual(orgState.serialize().length, 504); // 500 key/value + 4 separators
+
+      // pass the max length with a new key/value
+      const state = orgState.set('a5', '5'.repeat(97));
       assert.deepStrictEqual(state.get('a'), undefined);
       assert.deepStrictEqual(state.serialize(), '');
     });
@@ -76,7 +102,7 @@ describe('TraceState', () => {
       assert.deepStrictEqual(state.get('a'), '1');
       assert.deepStrictEqual(state.get('b'), undefined);
       assert.deepStrictEqual(state.get('c'), '3');
-      assert.deepStrictEqual(state.serialize(), 'a=1,c=3');
+      assert.deepStrictEqual(state.serialize(), 'a=1,b,c=3');
     });
 
     it('must skip states that only have a single value with an equal sign', () => {
@@ -105,7 +131,7 @@ describe('TraceState', () => {
           .map((_: null, num: number) => `a${num}=${num}`)
           .join(',')
       );
-      assert.deepStrictEqual(state['_keys']().length, 32);
+      assert.deepStrictEqual(state.serialize().split(',').length, 33);
       assert.deepStrictEqual(state.get('a0'), '0');
       assert.deepStrictEqual(state.get('a31'), '31');
       assert.deepStrictEqual(
@@ -127,7 +153,7 @@ describe('TraceState', () => {
 
       const state = new TraceState(tracestate.join(','));
 
-      assert.deepStrictEqual(state['_keys']().length, 32);
+      assert.deepStrictEqual(state.serialize().split(',').length, 37);
       assert.deepStrictEqual(state.get('a0'), '0');
       assert.deepStrictEqual(state.get('a31'), '31');
       assert.deepStrictEqual(state.get('invalid.middle.key.a'), undefined);
