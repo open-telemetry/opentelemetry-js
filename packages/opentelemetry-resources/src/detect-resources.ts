@@ -16,7 +16,7 @@
 
 import { diag } from '@opentelemetry/api';
 import { Resource } from './Resource';
-import { emptyResource, resourceFromDetectedResource } from './ResourceImpl';
+import { emptyResource, resourceFromDetectedResource } from './resource-impl';
 import { ResourceDetectionConfig } from './config';
 
 /**
