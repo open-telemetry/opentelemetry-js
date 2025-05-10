@@ -21,6 +21,7 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
+  ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
   ATTR_HTTP_ROUTE,
@@ -96,10 +97,10 @@ describe('metrics', () => {
         );
       }
       await metricReader.collectAndExport();
-      const resourceMetrics = metricsMemoryExporter.getMetrics();
-      const scopeMetrics = resourceMetrics[0].scopeMetrics;
+      let resourceMetrics = metricsMemoryExporter.getMetrics();
+      let scopeMetrics = resourceMetrics[0].scopeMetrics;
       assert.strictEqual(scopeMetrics.length, 1, 'scopeMetrics count');
-      const metrics = scopeMetrics[0].metrics;
+      let metrics = scopeMetrics[0].metrics;
       assert.strictEqual(metrics.length, 2, 'metrics count');
       assert.strictEqual(metrics[0].dataPointType, DataPointType.HISTOGRAM);
       assert.strictEqual(
@@ -146,6 +147,43 @@ describe('metrics', () => {
         [ATTR_SERVER_PORT]: 22346,
         [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
         [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
+      });
+
+      metricsMemoryExporter.reset();
+
+      assert.throws(() =>
+        http.request({
+          hostname,
+          port: serverPort,
+          pathname,
+          headers: { cookie: undefined },
+        })
+      );
+
+      await metricReader.collectAndExport();
+      resourceMetrics = metricsMemoryExporter.getMetrics();
+      scopeMetrics = resourceMetrics[0].scopeMetrics;
+      assert.strictEqual(scopeMetrics.length, 1, 'scopeMetrics count');
+      metrics = scopeMetrics[0].metrics;
+      assert.strictEqual(metrics.length, 1, 'metrics count');
+      assert.strictEqual(metrics[0].dataPointType, DataPointType.HISTOGRAM);
+      assert.strictEqual(
+        metrics[0].descriptor.description,
+        'Duration of HTTP client requests.'
+      );
+      assert.strictEqual(
+        metrics[0].descriptor.name,
+        'http.client.request.duration'
+      );
+      assert.strictEqual(metrics[0].descriptor.unit, 's');
+      assert.strictEqual(metrics[0].dataPoints.length, 1);
+      assert.strictEqual((metrics[0].dataPoints[0].value as any).count, 1);
+
+      assert.deepStrictEqual(metrics[0].dataPoints[0].attributes, {
+        [ATTR_HTTP_REQUEST_METHOD]: 'GET',
+        [ATTR_SERVER_ADDRESS]: 'localhost',
+        [ATTR_SERVER_PORT]: 22346,
+        [ATTR_ERROR_TYPE]: 'TypeError',
       });
     });
   });
