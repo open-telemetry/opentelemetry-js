@@ -8,8 +8,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
-* feat(instrumentation-http)!: Remove legacy http span attributes and metrics [#5552](https://github.com/open-telemetry/opentelemetry-js/pull/5552) @svetlanabrennan
-
 ### :rocket: Features
 
 * feat(instrumentation-xml-http-request): support migration to stable HTTP semconv, v1.23.1  [#5662](https://github.com/open-telemetry/opentelemetry-js/pull/5662) @trentm
@@ -31,6 +29,9 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+* refactor(instrumentation-http): Remove legacy http span attributes and metrics [#5552](https://github.com/open-telemetry/opentelemetry-js/pull/5552) @svetlanabrennan
+* refactor(instrumentation-http): Add back support for http semconv [#5665](https://github.com/open-telemetry/opentelemetry-js/pull/5665) @JamieDanielson
+  * Note: We initially removed support for legacy http attributes and metrics, but then added back for an additional 6 months to ensure all instrumentations could be updated and kept consistent. There should be no net new change in this instrumentation related to these semantic conventions. See [#5646](https://github.com/open-telemetry/opentelemetry-js/issues/5646) for details.
 * refactor(sdk-node): update semconv usage to `ATTR_` exports [#5668](https://github.com/open-telemetry/opentelemetry-js/pull/5668) @trentm
 * chore(sdk-node): Refactored using `get*FromEnv` utility function instead of `process.env` for NodeSDK's resource detector setup. [#5582](https://github.com/open-telemetry/opentelemetry-js/pull/5582) @beeme1mr
 * chore(sdk-node): Refactored using `get*FromEnv` utility function instead of `process.env` for NodeSDK's logging setup. [#5563](https://github.com/open-telemetry/opentelemetry-js/issues/5563) @weyert
