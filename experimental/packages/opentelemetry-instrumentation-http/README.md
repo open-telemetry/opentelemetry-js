@@ -87,30 +87,30 @@ To select which semconv version(s) is emitted from this instrumentation, use the
 
 ### Attributes collected
 
-| v1.7.0 semconv                              | v1.23.0 semconv             | Short Description                                                              |
-| ------------------------------------------- | --------------------------- | ------------------------------------------------------------------------------ |
-| `http.client_ip`                            | `client.address`            | The IP address of the original client behind all proxies, if known             |
-| `http.flavor`                               | `network.protocol.version`  | Kind of HTTP protocol used                                                     |
-| `http.host`                                 | `server.address`            | The value of the HTTP host header                                              |
-| `http.method`                               | `http.request.method`       | HTTP request method                                                            |
-| `http.request_content_length`               | (opt-in, `headersToSpanAttributes`) | The size of the request payload body in bytes. For newer semconv, use the `headersToSpanAttributes: ` option to capture this as `http.request.header.content_length`. |
-| `http.request_content_length_uncompressed`  | (not included)              | The size of the uncompressed request payload body after transport decoding. (In semconv v1.23.0 this is defined by `http.request.body.size`, which is experimental and opt-in.)    |
-| `http.response_content_length`              | (opt-in, `headersToSpanAttributes`) | The size of the response payload body in bytes. For newer semconv, use the `headersToSpanAttributes: ` option to capture this as `http.response.header.content_length`. |
-| `http.response_content_length_uncompressed` | (not included)              | The size of the uncompressed response payload body after transport decoding. (In semconv v1.23.0 this is defined by `http.response.body.size`, which is experimental and opt-in.)    |
-| `http.route`                                | no change                   | The matched route (path template).                                             |
-| `http.scheme`                               | `url.scheme`                | The URI scheme identifying the used protocol                                   |
-| `http.server_name`                          | `server.address`            | The primary server name of the matched virtual host                            |
-| `http.status_code`                          | `http.response.status_code` | HTTP response status code                                                      |
-| `http.target`                               | `url.path` and `url.query`  | The URI path and query component                                               |
-| `http.url`                                  | `url.full`                  | Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]` |
-| `http.user_agent`                           | `user_agent.original`       | Value of the HTTP User-Agent header sent by the client                         |
-| `net.host.ip`                               | `network.local.address`     | Like net.peer.ip but for the host IP. Useful in case of a multi-IP host        |
-| `net.host.name`                             | `server.address`            | Local hostname or similar                                                      |
-| `net.host.port`                             | `server.port`               | Like net.peer.port but for the host port                                       |
-| `net.peer.ip.`                              | `network.peer.address`      | Remote address of the peer (dotted decimal for IPv4 or RFC5952 for IPv6)       |
-| `net.peer.name`                             | `server.address`            | Server domain name if available without reverse DNS lookup                     |
-| `net.peer.port`                             | `server.port`               | Server port number                                                             |
-| `net.transport`                             | `network.transport`         | Transport protocol used                                                        |
+| v1.7.0 semconv                              | v1.23.0 semconv                     | Short Description                                                                                                                                                                 |
+| ------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `http.client_ip`                            | `client.address`                    | The IP address of the original client behind all proxies, if known                                                                                                                |
+| `http.flavor`                               | `network.protocol.version`          | Kind of HTTP protocol used                                                                                                                                                        |
+| `http.host`                                 | `server.address`                    | The value of the HTTP host header                                                                                                                                                 |
+| `http.method`                               | `http.request.method`               | HTTP request method                                                                                                                                                               |
+| `http.request_content_length`               | (opt-in, `headersToSpanAttributes`) | The size of the request payload body in bytes. For newer semconv, use the `headersToSpanAttributes: ` option to capture this as `http.request.header.content_length`.             |
+| `http.request_content_length_uncompressed`  | (not included)                      | The size of the uncompressed request payload body after transport decoding. (In semconv v1.23.0 this is defined by `http.request.body.size`, which is experimental and opt-in.)   |
+| `http.response_content_length`              | (opt-in, `headersToSpanAttributes`) | The size of the response payload body in bytes. For newer semconv, use the `headersToSpanAttributes: ` option to capture this as `http.response.header.content_length`.           |
+| `http.response_content_length_uncompressed` | (not included)                      | The size of the uncompressed response payload body after transport decoding. (In semconv v1.23.0 this is defined by `http.response.body.size`, which is experimental and opt-in.) |
+| `http.route`                                | no change                           | The matched route (path template).                                                                                                                                                |
+| `http.scheme`                               | `url.scheme`                        | The URI scheme identifying the used protocol                                                                                                                                      |
+| `http.server_name`                          | `server.address`                    | The primary server name of the matched virtual host                                                                                                                               |
+| `http.status_code`                          | `http.response.status_code`         | HTTP response status code                                                                                                                                                         |
+| `http.target`                               | `url.path` and `url.query`          | The URI path and query component                                                                                                                                                  |
+| `http.url`                                  | `url.full`                          | Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]`                                                                                                    |
+| `http.user_agent`                           | `user_agent.original`               | Value of the HTTP User-Agent header sent by the client                                                                                                                            |
+| `net.host.ip`                               | `network.local.address`             | Like net.peer.ip but for the host IP. Useful in case of a multi-IP host                                                                                                           |
+| `net.host.name`                             | `server.address`                    | Local hostname or similar                                                                                                                                                         |
+| `net.host.port`                             | `server.port`                       | Like net.peer.port but for the host port                                                                                                                                          |
+| `net.peer.ip.`                              | `network.peer.address`              | Remote address of the peer (dotted decimal for IPv4 or RFC5952 for IPv6)                                                                                                          |
+| `net.peer.name`                             | `server.address`                    | Server domain name if available without reverse DNS lookup                                                                                                                        |
+| `net.peer.port`                             | `server.port`                       | Server port number                                                                                                                                                                |
+| `net.transport`                             | `network.transport`                 | Transport protocol used                                                                                                                                                           |
 
 Metrics Exported:
 
