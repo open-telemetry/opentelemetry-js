@@ -20,6 +20,7 @@ import {
   SemconvStability,
   httpSemconvStabilityFromStr,
   databaseSemconvStabilityFromStr,
+  messagingSemconvStabilityFromStr,
 } from '../../src';
 
 describe('httpSemconvStabilityFromStr', function () {
@@ -54,6 +55,24 @@ describe('databaseSemconvStabilityFromStr', function () {
   for (const { str, expected } of table) {
     it(`str: ${inspect(str)}`, function () {
       assert.strictEqual(databaseSemconvStabilityFromStr(str), expected);
+    });
+  }
+});
+
+describe('messagingSemconvStabilityFromStr', function () {
+  const table = [
+    { str: undefined, expected: SemconvStability.OLD },
+    { str: '', expected: SemconvStability.OLD },
+    { str: 'messaging', expected: SemconvStability.STABLE },
+    { str: 'messaging/dup', expected: SemconvStability.DUPLICATE },
+    { str: ', messaging/dup,bar', expected: SemconvStability.DUPLICATE },
+    { str: ', messaging/dup\t ,blah', expected: SemconvStability.DUPLICATE },
+    { str: 'http', expected: SemconvStability.OLD },
+    { str: 'just,bogus,values', expected: SemconvStability.OLD },
+  ];
+  for (const { str, expected } of table) {
+    it(`str: ${inspect(str)}`, function () {
+      assert.strictEqual(messagingSemconvStabilityFromStr(str), expected);
     });
   }
 });

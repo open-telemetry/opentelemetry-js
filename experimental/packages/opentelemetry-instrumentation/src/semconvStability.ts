@@ -106,3 +106,13 @@ export function httpSemconvStabilityFromStr(str: string | undefined) {
 export function databaseSemconvStabilityFromStr(str: string | undefined) {
   return _semconvStabilityFromStr('database', str);
 }
+
+/**
+ * Determine appropriate 'messaging' semconv stability.
+ *
+ * At the time of writing, `messaging` semconv is not yet stabilized. This
+ * function exists in anticipation of that coming.
+ */
+export function messagingSemconvStabilityFromStr(str: string | undefined) {
+  return _semconvStabilityFromStr('messaging', str);
+}

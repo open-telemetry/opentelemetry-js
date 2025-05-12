@@ -36,4 +36,5 @@ export {
   SemconvStability,
   httpSemconvStabilityFromStr,
   databaseSemconvStabilityFromStr,
+  messagingSemconvStabilityFromStr,
 } from './semconvStability';
