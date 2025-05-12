@@ -164,15 +164,12 @@ export const setSpanWithError = (
 ): void => {
   const message = error.message;
 
-  if ((semconvStability & SemconvStability.OLD) === SemconvStability.OLD) {
+  if (semconvStability & SemconvStability.OLD) {
     span.setAttribute(AttributeNames.HTTP_ERROR_NAME, error.name);
     span.setAttribute(AttributeNames.HTTP_ERROR_MESSAGE, message);
   }
 
-  if (
-    (semconvStability & SemconvStability.STABLE) ===
-    SemconvStability.STABLE
-  ) {
+  if (semconvStability & SemconvStability.STABLE) {
     span.setAttribute(ATTR_ERROR_TYPE, error.name);
   }
 

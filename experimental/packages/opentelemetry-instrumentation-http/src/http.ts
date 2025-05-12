@@ -157,18 +157,12 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     oldAttributes: Attributes,
     stableAttributes: Attributes
   ) {
-    if (
-      (this._semconvStability & SemconvStability.OLD) ===
-      SemconvStability.OLD
-    ) {
+    if (this._semconvStability & SemconvStability.OLD) {
       // old histogram is counted in MS
       this._oldHttpServerDurationHistogram.record(durationMs, oldAttributes);
     }
 
-    if (
-      (this._semconvStability & SemconvStability.STABLE) ===
-      SemconvStability.STABLE
-    ) {
+    if (this._semconvStability & SemconvStability.STABLE) {
       // stable histogram is counted in S
       this._stableHttpServerDurationHistogram.record(
         durationMs / 1000,
@@ -182,18 +176,12 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     oldAttributes: Attributes,
     stableAttributes: Attributes
   ) {
-    if (
-      (this._semconvStability & SemconvStability.OLD) ===
-      SemconvStability.OLD
-    ) {
+    if (this._semconvStability & SemconvStability.OLD) {
       // old histogram is counted in MS
       this._oldHttpClientDurationHistogram.record(durationMs, oldAttributes);
     }
 
-    if (
-      (this._semconvStability & SemconvStability.STABLE) ===
-      SemconvStability.STABLE
-    ) {
+    if (this._semconvStability & SemconvStability.STABLE) {
       // stable histogram is counted in S
       this._stableHttpClientDurationHistogram.record(
         durationMs / 1000,
