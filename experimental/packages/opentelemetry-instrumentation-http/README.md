@@ -93,10 +93,10 @@ To select which semconv version(s) is emitted from this instrumentation, use the
 | `http.flavor`                               | `network.protocol.version`  | Kind of HTTP protocol used                                                     |
 | `http.host`                                 | `server.address`            | The value of the HTTP host header                                              |
 | `http.method`                               | `http.request.method`       | HTTP request method                                                            |
-| `http.request_content_length`               | no change, not yet stable   | The size of the request payload body in bytes                                  |
-| `http.request_content_length_uncompressed`  | `http.request.body.size`    | The size of the uncompressed request payload body after transport decoding     |
-| `http.response_content_length`              | no change, not yet stable   | The size of the response payload body in bytes                                 |
-| `http.response_content_length_uncompressed` | `http.request.body.size`    | The size of the uncompressed response payload body after transport decoding    |
+| `http.request_content_length`               | (opt-in, `headersToSpanAttributes`) | The size of the request payload body in bytes. For newer semconv, use the `headersToSpanAttributes: ` option to capture this as `http.request.header.content_length`. |
+| `http.request_content_length_uncompressed`  | (not included)              | The size of the uncompressed request payload body after transport decoding. (In semconv v1.23.0 this is defined by `http.request.body.size`, which is experimental and opt-in.)    |
+| `http.response_content_length`              | (opt-in, `headersToSpanAttributes`) | The size of the response payload body in bytes. For newer semconv, use the `headersToSpanAttributes: ` option to capture this as `http.response.header.content_length`. |
+| `http.response_content_length_uncompressed` | (not included)              | The size of the uncompressed response payload body after transport decoding. (In semconv v1.23.0 this is defined by `http.response.body.size`, which is experimental and opt-in.)    |
 | `http.route`                                | no change                   | The matched route (path template).                                             |
 | `http.scheme`                               | `url.scheme`                | The URI scheme identifying the used protocol                                   |
 | `http.server_name`                          | `server.address`            | The primary server name of the matched virtual host                            |
