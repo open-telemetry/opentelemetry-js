@@ -51,6 +51,7 @@ import {
 } from '@opentelemetry/instrumentation';
 import { errorMonitor } from 'events';
 import {
+  ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
   ATTR_HTTP_ROUTE,
@@ -453,16 +454,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             return;
           }
           responseFinished = true;
-          setSpanWithError(span, error);
-          span.setStatus({
-            code: SpanStatusCode.ERROR,
-            message: error.message,
-          });
-          this._closeHttpSpan(
+          this._onOutgoingRequestError(
             span,
-            SpanKind.CLIENT,
+            stableMetricAttributes,
             startTime,
-            stableMetricAttributes
+            error
           );
         });
       }
@@ -486,13 +482,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         return;
       }
       responseFinished = true;
-      setSpanWithError(span, error);
-
-      this._closeHttpSpan(
+      this._onOutgoingRequestError(
         span,
-        SpanKind.CLIENT,
+        stableMetricAttributes,
         startTime,
-        stableMetricAttributes
+        error
       );
     });
 
@@ -633,12 +627,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             () => original.apply(this, [event, ...args]),
             error => {
               if (error) {
-                setSpanWithError(span, error);
-                instrumentation._closeHttpSpan(
+                instrumentation._onServerResponseError(
                   span,
-                  SpanKind.SERVER,
+                  stableMetricAttributes,
                   startTime,
-                  stableMetricAttributes
+                  error
                 );
                 throw error;
               }
@@ -770,13 +763,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           },
           error => {
             if (error) {
-              setSpanWithError(span, error);
-
-              instrumentation._closeHttpSpan(
+              instrumentation._onOutgoingRequestError(
                 span,
-                SpanKind.CLIENT,
+                stableMetricAttributes,
                 startTime,
-                stableMetricAttributes
+                error
               );
               throw error;
             }
@@ -847,6 +838,22 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     );
   }
 
+  private _onOutgoingRequestError(
+    span: Span,
+    stableMetricAttributes: Attributes,
+    startTime: HrTime,
+    error: Err
+  ) {
+    setSpanWithError(span, error);
+    stableMetricAttributes[ATTR_ERROR_TYPE] = error.name;
+    this._closeHttpSpan(
+      span,
+      SpanKind.CLIENT,
+      startTime,
+      stableMetricAttributes
+    );
+  }
+
   private _onServerResponseError(
     span: Span,
     stableMetricAttributes: Attributes,
@@ -854,7 +861,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     error: Err
   ) {
     setSpanWithError(span, error);
-    // TODO get error attributes for metrics
+    stableMetricAttributes[ATTR_ERROR_TYPE] = error.name;
     this._closeHttpSpan(
       span,
       SpanKind.SERVER,
