@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1747059796595,
+  "lastUpdate": 1747081663641,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -32556,6 +32556,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.98%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jamiedanielson@honeycomb.io",
+            "name": "Jamie Danielson",
+            "username": "JamieDanielson"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "697e1d31bdacfa947f84dd985d9f3663df01f05b",
+          "message": "refactor(instrumentation-http): Add back support for http semconv (#5665)\n\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2025-05-12T20:18:25Z",
+          "tree_id": "81a2beece3e76d5a75c0458f73a11adee0d9a368",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/697e1d31bdacfa947f84dd985d9f3663df01f05b"
+        },
+        "date": 1747081662566,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1562351,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18910,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 834786,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 788902,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
