@@ -78,11 +78,11 @@ export function testSharedConfigurationFromEnvironment(
       sinon.assert.calledTwice(spyLoggerWarn);
       sinon.assert.calledWithExactly(
         spyLoggerWarn,
-        'Configuration: OTEL_EXPORTER_OTLP_METRICS_TIMEOUT is invalid, expected number greater than 0 (actual: NaN)'
+        `Unknown value 'NaN' for OTEL_EXPORTER_OTLP_METRICS_TIMEOUT, expected a number, using defaults`
       );
       sinon.assert.calledWithExactly(
         spyLoggerWarn,
-        'Configuration: OTEL_EXPORTER_OTLP_TIMEOUT is invalid, expected number greater than 0 (actual: foo)'
+        `Unknown value 'foo' for OTEL_EXPORTER_OTLP_TIMEOUT, expected a number, using defaults`
       );
       assert.strictEqual(config.timeoutMillis, undefined);
     });
@@ -96,7 +96,7 @@ export function testSharedConfigurationFromEnvironment(
       sinon.assert.calledTwice(spyLoggerWarn);
       sinon.assert.calledWithExactly(
         spyLoggerWarn,
-        'Configuration: OTEL_EXPORTER_OTLP_METRICS_TIMEOUT is invalid, expected number greater than 0 (actual: -Infinitiy)'
+        `Unknown value '-Infinitiy' for OTEL_EXPORTER_OTLP_METRICS_TIMEOUT, expected a number, using defaults`
       );
       sinon.assert.calledWithExactly(
         spyLoggerWarn,
