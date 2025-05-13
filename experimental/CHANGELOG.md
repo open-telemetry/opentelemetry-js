@@ -2,8 +2,50 @@
 # CHANGELOG
 
 All notable changes to experimental packages in this project will be documented in this file.
+For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2.x.md).
 
 ## Unreleased
+
+### :boom: Breaking Changes
+
+### :rocket: Features
+
+* feat(instrumentation-xml-http-request): support migration to stable HTTP semconv, v1.23.1  [#5662](https://github.com/open-telemetry/opentelemetry-js/pull/5662) @trentm
+  * Configure the instrumentation with `semconvStabilityOptIn: 'http'` to use the new, stable semconv v1.23.1 semantics or `'http/dup'` for both old (v1.7.0) and stable semantics. When `semconvStabilityOptIn` is not specified (or does not contain these values), it uses the old semconv v1.7.0. I.e. the default behavior is unchanged.
+* feat(instrumentation-fetch): support migration to stable HTTP semconv, v1.23.1  [#5651](https://github.com/open-telemetry/opentelemetry-js/pull/5651) @trentm
+  * Configure the instrumentation with `semconvStabilityOptIn: 'http'` to use the new, stable semconv v1.23.1 semantics or `'http/dup'` for both old (v1.7.0) and stable semantics. When `semconvStabilityOptIn` is not specified (or does not contain these values), it uses the old semconv v1.7.0. I.e. the default behavior is unchanged.
+* feat(instrumentation): New utilities for semconv stability migration for instrumentations that produce 'http' and 'db' telemetry. [#5659](https://github.com/open-telemetry/opentelemetry-js/pull/5659) @trentm
+  * See [semconv stability usage guide](./packages/opentelemetry-instrumentation/src/semconvStability.ts).
+* feat(instrumentation-grpc): support migration to stable HTTP semconv [#5653](https://github.com/open-telemetry/opentelemetry-js/pull/5653) @JamieDanielson
+* feat(instrumentation-http): capture synthetic source type on requests [#5488](https://github.com/open-telemetry/opentelemetry-js/pull/5488) @JacksonWeber
+
+### :bug: Bug Fixes
+
+* fix(otlp-transformer): do not throw when deserializing empty JSON response [#5551](https://github.com/open-telemetry/opentelemetry-js/pull/5551) @pichlermarc
+* fix(instrumentation-http): report stable client metrics response code [#9586](https://github.com/open-telemetry/opentelemetry-js/pull/9586) @jtescher
+* fix(sdk-node): instantiate baggage processor when env var is set [#5634](https://github.com/open-telemetry/opentelemetry-js/pull/5634) @pichlermarc
+
+### :books: Documentation
+
+### :house: Internal
+
+* refactor(instrumentation-http): Remove legacy http span attributes and metrics [#5552](https://github.com/open-telemetry/opentelemetry-js/pull/5552) @svetlanabrennan
+* refactor(instrumentation-http): Add back support for http semconv [#5665](https://github.com/open-telemetry/opentelemetry-js/pull/5665) @JamieDanielson
+  * Note: We initially removed support for legacy http attributes and metrics, but then added back for an additional 6 months to ensure all instrumentations could be updated and kept consistent. There should be no net new change in this instrumentation related to these semantic conventions. See [#5646](https://github.com/open-telemetry/opentelemetry-js/issues/5646) for details.
+* refactor(sdk-node): update semconv usage to `ATTR_` exports [#5668](https://github.com/open-telemetry/opentelemetry-js/pull/5668) @trentm
+* chore(sdk-node): Refactored using `get*FromEnv` utility function instead of `process.env` for NodeSDK's resource detector setup. [#5582](https://github.com/open-telemetry/opentelemetry-js/pull/5582) @beeme1mr
+* chore(sdk-node): Refactored using `get*FromEnv` utility function instead of `process.env` for NodeSDK's logging setup. [#5563](https://github.com/open-telemetry/opentelemetry-js/issues/5563) @weyert
+
+## 0.200.0
+
+### Summary
+
+- The **minimum supported Node.js has been raised to `^18.19.0 || >=20.6.0`**. This means that support for Node.js 14 and 16 has been dropped.
+- The **minimum supported TypeScript version has been raised to 5.0.4**.
+- The **compilation target for transpiled TypeScript has been raised to ES2022** (from ES2017).
+- The **public interface has changed**
+  - for notes on migrating to 2.x / 0.200.x see [the upgrade guide](https://github.com/open-telemetry/opentelemetry-js/tree/main/doc/upgrade-to-2.x.md)
+- Only stable versions `2.0.0` are compatible with this release
 
 ### :boom: Breaking Change
 
@@ -37,8 +79,6 @@ All notable changes to experimental packages in this project will be documented 
 * fix(exporter-metrics-otlp-http): browser OTLPMetricExporter was not passing config to OTLPMetricExporterBase super class [#5331](https://github.com/open-telemetry/opentelemetry-js/pull/5331) @trentm
 * fix(instrumentation-fetch, instrumentation-xhr): Ignore network events with zero-timings [#5332](https://github.com/open-telemetry/opentelemetry-js/pull/5332) @chancancode
 * fix(exporter-logs/trace-otlp-grpc): fix error for missing dependency otlp-exporter-base [#5412](https://github.com/open-telemetry/opentelemetry-js/pull/5412) @JamieDanielson
-
-### :books: (Refine Doc)
 
 ### :house: (Internal)
 

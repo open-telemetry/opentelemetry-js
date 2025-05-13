@@ -7,7 +7,7 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import { resourceFromAttributes } from '@opentelemetry/resources';
-import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import http from 'http';
 
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
@@ -16,7 +16,7 @@ const processor = new SimpleSpanProcessor(exporter);
 
 const tracerProvider = new NodeTracerProvider({
   resource: resourceFromAttributes({
-    [SEMRESATTRS_SERVICE_NAME]: 'esm-http-ts-example',
+    [ATTR_SERVICE_NAME]: 'esm-http-ts-example',
   }),
   spanProcessors: [processor],
 });

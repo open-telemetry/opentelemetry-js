@@ -37,14 +37,14 @@ const assertInstanceOf = (actual: object, ExpectedConstructor: Function) => {
   );
 };
 
-describe('API registration', () => {
+describe('API registration', function () {
   beforeEach(() => {
     context.disable();
     trace.disable();
     propagation.disable();
   });
 
-  it('should register default implementations', () => {
+  it('should register default implementations', function () {
     const tracerProvider = new NodeTracerProvider();
     tracerProvider.register();
 
@@ -61,7 +61,7 @@ describe('API registration', () => {
     assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 
-  it('should register configured implementations', () => {
+  it('should register configured implementations', function () {
     const tracerProvider = new NodeTracerProvider();
 
     const mockContextManager = {
@@ -82,7 +82,7 @@ describe('API registration', () => {
     assert.strictEqual(apiTracerProvider.getDelegate(), tracerProvider);
   });
 
-  it('should skip null context manager', () => {
+  it('should skip null context manager', function () {
     const tracerProvider = new NodeTracerProvider();
     const ctxManager = context['_getContextManager']();
     tracerProvider.register({
@@ -104,7 +104,7 @@ describe('API registration', () => {
     assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 
-  it('should skip null propagator', () => {
+  it('should skip null propagator', function () {
     const propagator = propagation['_getGlobalPropagator']();
 
     const tracerProvider = new NodeTracerProvider();

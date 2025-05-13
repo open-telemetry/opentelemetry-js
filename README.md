@@ -35,10 +35,6 @@
 
 ---
 
-> [!WARNING]
-> This is the working branch for the work in progress 2.0 SDK, see [this tracking issue](https://github.com/open-telemetry/opentelemetry-js/issues/5148) for details.
-> If you are a user looking for the current released state, you are probably looking for the [1.x SDK](https://github.com/open-telemetry/opentelemetry-js/tree/v1.x) on the v1.x branch.
-
 ## About this project
 
 This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a framework for collecting traces, metrics, and logs from applications.
@@ -76,14 +72,14 @@ const opentelemetry = require('@opentelemetry/sdk-node');
 const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
 const { ConsoleSpanExporter } = require('@opentelemetry/sdk-trace-base');
 const { resourceFromAttributes } = require('@opentelemetry/resources');
-const { SEMRESATTRS_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
+const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 
 // configure the SDK to export telemetry data to the console
 // enable all auto-instrumentations from the meta package
 const traceExporter = new ConsoleSpanExporter();
 const sdk = new opentelemetry.NodeSDK({
   resource: resourceFromAttributes({
-    [SEMRESATTRS_SERVICE_NAME]: 'my-service',
+    [ATTR_SERVICE_NAME]: 'my-service',
   }),
   traceExporter,
   instrumentations: [getNodeAutoInstrumentations()]
@@ -164,6 +160,7 @@ The below table describes which versions of each set of packages are expected to
 
 | Stable Packages | Experimental Packages |
 |-----------------|-----------------------|
+| 2.0.x           | 0.200.x               |
 | 1.30.x          | 0.57.x                |
 | 1.29.x          | 0.56.x                |
 | 1.28.x          | 0.55.x                |
@@ -259,7 +256,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 Members of this team have triager permissions for opentelemetry-js.git and opentelemetry-js-contrib.git.
 
-- (none currently)
+- [Jackson Weber](https://github.com/JacksonWeber), Microsoft
 
 *Find more about the triager role in the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#triager).*
 
@@ -373,7 +370,7 @@ These instrumentations are hosted at <https://github.com/open-telemetry/opentele
 
 ## Useful links
 
-- Upgrade guidelines: [Upgrade Guide](./doc/upgrade-guide.md)
+- [Upgrade to SDK 2.x guide](./doc/upgrade-to-2.x.md)
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 

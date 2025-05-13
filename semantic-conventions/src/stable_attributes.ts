@@ -143,6 +143,393 @@ export const ATTR_CLIENT_ADDRESS = 'client.address' as const;
 export const ATTR_CLIENT_PORT = 'client.port' as const;
 
 /**
+ * The column number in `code.file.path` best representing the operation. It **SHOULD** point within the code unit named in `code.function.name`. This attribute **MUST NOT** be used on the Profile signal since the data is already captured in 'message Line'. This constraint is imposed to prevent redundancy and maintain data integrity.
+ *
+ * @example 16
+ */
+export const ATTR_CODE_COLUMN_NUMBER = 'code.column.number' as const;
+
+/**
+ * The source code file name that identifies the code unit as uniquely as possible (preferably an absolute file path). This attribute **MUST NOT** be used on the Profile signal since the data is already captured in 'message Function'. This constraint is imposed to prevent redundancy and maintain data integrity.
+ *
+ * @example "/usr/local/MyApplication/content_root/app/index.php"
+ */
+export const ATTR_CODE_FILE_PATH = 'code.file.path' as const;
+
+/**
+ * The method or function fully-qualified name without arguments. The value should fit the natural representation of the language runtime, which is also likely the same used within `code.stacktrace` attribute value. This attribute **MUST NOT** be used on the Profile signal since the data is already captured in 'message Function'. This constraint is imposed to prevent redundancy and maintain data integrity.
+ *
+ * @example com.example.MyHttpService.serveRequest
+ * @example GuzzleHttp\\Client::transfer
+ * @example fopen
+ *
+ * @note Values and format depends on each language runtime, thus it is impossible to provide an exhaustive list of examples.
+ * The values are usually the same (or prefixes of) the ones found in native stack trace representation stored in
+ * `code.stacktrace` without information on arguments.
+ *
+ * Examples:
+ *
+ *   - Java method: `com.example.MyHttpService.serveRequest`
+ *   - Java anonymous class method: `com.mycompany.Main$1.myMethod`
+ *   - Java lambda method: `com.mycompany.Main$$Lambda/0x0000748ae4149c00.myMethod`
+ *   - PHP function: `GuzzleHttp\Client::transfer`
+ *   - Go function: `github.com/my/repo/pkg.foo.func5`
+ *   - Elixir: `OpenTelemetry.Ctx.new`
+ *   - Erlang: `opentelemetry_ctx:new`
+ *   - Rust: `playground::my_module::my_cool_func`
+ *   - C function: `fopen`
+ */
+export const ATTR_CODE_FUNCTION_NAME = 'code.function.name' as const;
+
+/**
+ * The line number in `code.file.path` best representing the operation. It **SHOULD** point within the code unit named in `code.function.name`. This attribute **MUST NOT** be used on the Profile signal since the data is already captured in 'message Line'. This constraint is imposed to prevent redundancy and maintain data integrity.
+ *
+ * @example 42
+ */
+export const ATTR_CODE_LINE_NUMBER = 'code.line.number' as const;
+
+/**
+ * A stacktrace as a string in the natural representation for the language runtime. The representation is identical to [`exception.stacktrace`](/docs/exceptions/exceptions-spans.md#stacktrace-representation). This attribute **MUST NOT** be used on the Profile signal since the data is already captured in 'message Location'. This constraint is imposed to prevent redundancy and maintain data integrity.
+ *
+ * @example "at com.example.GenerateTrace.methodB(GenerateTrace.java:13)\\n at com.example.GenerateTrace.methodA(GenerateTrace.java:9)\\n at com.example.GenerateTrace.main(GenerateTrace.java:5)\\n"
+ */
+export const ATTR_CODE_STACKTRACE = 'code.stacktrace' as const;
+
+/**
+ * The name of a collection (table, container) within the database.
+ *
+ * @example public.users
+ * @example customers
+ *
+ * @note It is **RECOMMENDED** to capture the value as provided by the application
+ * without attempting to do any case normalization.
+ *
+ * The collection name **SHOULD NOT** be extracted from `db.query.text`,
+ * when the database system supports query text with multiple collections
+ * in non-batch operations.
+ *
+ * For batch operations, if the individual operations are known to have the same
+ * collection name then that collection name **SHOULD** be used.
+ */
+export const ATTR_DB_COLLECTION_NAME = 'db.collection.name' as const;
+
+/**
+ * The name of the database, fully qualified within the server address and port.
+ *
+ * @example customers
+ * @example test.users
+ *
+ * @note If a database system has multiple namespace components, they **SHOULD** be concatenated from the most general to the most specific namespace component, using `|` as a separator between the components. Any missing components (and their associated separators) **SHOULD** be omitted.
+ * Semantic conventions for individual database systems **SHOULD** document what `db.namespace` means in the context of that system.
+ * It is **RECOMMENDED** to capture the value as provided by the application without attempting to do any case normalization.
+ */
+export const ATTR_DB_NAMESPACE = 'db.namespace' as const;
+
+/**
+ * The number of queries included in a batch operation.
+ *
+ * @example 2
+ * @example 3
+ * @example 4
+ *
+ * @note Operations are only considered batches when they contain two or more operations, and so `db.operation.batch.size` **SHOULD** never be `1`.
+ */
+export const ATTR_DB_OPERATION_BATCH_SIZE = 'db.operation.batch.size' as const;
+
+/**
+ * The name of the operation or command being executed.
+ *
+ * @example findAndModify
+ * @example HMSET
+ * @example SELECT
+ *
+ * @note It is **RECOMMENDED** to capture the value as provided by the application
+ * without attempting to do any case normalization.
+ *
+ * The operation name **SHOULD NOT** be extracted from `db.query.text`,
+ * when the database system supports query text with multiple operations
+ * in non-batch operations.
+ *
+ * If spaces can occur in the operation name, multiple consecutive spaces
+ * **SHOULD** be normalized to a single space.
+ *
+ * For batch operations, if the individual operations are known to have the same operation name
+ * then that operation name **SHOULD** be used prepended by `BATCH `,
+ * otherwise `db.operation.name` **SHOULD** be `BATCH` or some other database
+ * system specific term if more applicable.
+ */
+export const ATTR_DB_OPERATION_NAME = 'db.operation.name' as const;
+
+/**
+ * Low cardinality summary of a database query.
+ *
+ * @example SELECT wuser_table
+ * @example INSERT shipping_details SELECT orders
+ * @example get user by id
+ *
+ * @note The query summary describes a class of database queries and is useful
+ * as a grouping key, especially when analyzing telemetry for database
+ * calls involving complex queries.
+ *
+ * Summary may be available to the instrumentation through
+ * instrumentation hooks or other means. If it is not available, instrumentations
+ * that support query parsing **SHOULD** generate a summary following
+ * [Generating query summary](/docs/database/database-spans.md#generating-a-summary-of-the-query)
+ * section.
+ */
+export const ATTR_DB_QUERY_SUMMARY = 'db.query.summary' as const;
+
+/**
+ * The database query being executed.
+ *
+ * @example SELECT * FROM wuser_table where username = ?
+ * @example SET mykey ?
+ *
+ * @note For sanitization see [Sanitization of `db.query.text`](/docs/database/database-spans.md#sanitization-of-dbquerytext).
+ * For batch operations, if the individual operations are known to have the same query text then that query text **SHOULD** be used, otherwise all of the individual query texts **SHOULD** be concatenated with separator `; ` or some other database system specific separator if more applicable.
+ * Parameterized query text **SHOULD NOT** be sanitized. Even though parameterized query text can potentially have sensitive data, by using a parameterized query the user is giving a strong signal that any sensitive data will be passed as parameter values, and the benefit to observability of capturing the static part of the query text by default outweighs the risk.
+ */
+export const ATTR_DB_QUERY_TEXT = 'db.query.text' as const;
+
+/**
+ * Database response status code.
+ *
+ * @example 102
+ * @example ORA-17002
+ * @example 08P01
+ * @example 404
+ *
+ * @note The status code returned by the database. Usually it represents an error code, but may also represent partial success, warning, or differentiate between various types of successful outcomes.
+ * Semantic conventions for individual database systems **SHOULD** document what `db.response.status_code` means in the context of that system.
+ */
+export const ATTR_DB_RESPONSE_STATUS_CODE = 'db.response.status_code' as const;
+
+/**
+ * The name of a stored procedure within the database.
+ *
+ * @example GetCustomer
+ *
+ * @note It is **RECOMMENDED** to capture the value as provided by the application
+ * without attempting to do any case normalization.
+ *
+ * For batch operations, if the individual operations are known to have the same
+ * stored procedure name then that stored procedure name **SHOULD** be used.
+ */
+export const ATTR_DB_STORED_PROCEDURE_NAME = 'db.stored_procedure.name' as const;
+
+/**
+ * The database management system (DBMS) product as identified by the client instrumentation.
+ *
+ * @note The actual DBMS may differ from the one identified by the client. For example, when using PostgreSQL client libraries to connect to a CockroachDB, the `db.system.name` is set to `postgresql` based on the instrumentation's best knowledge.
+ */
+export const ATTR_DB_SYSTEM_NAME = 'db.system.name' as const;
+
+/**
+  * Enum value "actian.ingres" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_ACTIAN_INGRES = "actian.ingres" as const;
+
+/**
+  * Enum value "aws.dynamodb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_AWS_DYNAMODB = "aws.dynamodb" as const;
+
+/**
+  * Enum value "aws.redshift" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_AWS_REDSHIFT = "aws.redshift" as const;
+
+/**
+  * Enum value "azure.cosmosdb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_AZURE_COSMOSDB = "azure.cosmosdb" as const;
+
+/**
+  * Enum value "cassandra" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_CASSANDRA = "cassandra" as const;
+
+/**
+  * Enum value "clickhouse" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_CLICKHOUSE = "clickhouse" as const;
+
+/**
+  * Enum value "cockroachdb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_COCKROACHDB = "cockroachdb" as const;
+
+/**
+  * Enum value "couchbase" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_COUCHBASE = "couchbase" as const;
+
+/**
+  * Enum value "couchdb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_COUCHDB = "couchdb" as const;
+
+/**
+  * Enum value "derby" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_DERBY = "derby" as const;
+
+/**
+  * Enum value "elasticsearch" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_ELASTICSEARCH = "elasticsearch" as const;
+
+/**
+  * Enum value "firebirdsql" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_FIREBIRDSQL = "firebirdsql" as const;
+
+/**
+  * Enum value "gcp.spanner" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_GCP_SPANNER = "gcp.spanner" as const;
+
+/**
+  * Enum value "geode" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_GEODE = "geode" as const;
+
+/**
+  * Enum value "h2database" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_H2DATABASE = "h2database" as const;
+
+/**
+  * Enum value "hbase" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_HBASE = "hbase" as const;
+
+/**
+  * Enum value "hive" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_HIVE = "hive" as const;
+
+/**
+  * Enum value "hsqldb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_HSQLDB = "hsqldb" as const;
+
+/**
+  * Enum value "ibm.db2" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_IBM_DB2 = "ibm.db2" as const;
+
+/**
+  * Enum value "ibm.informix" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_IBM_INFORMIX = "ibm.informix" as const;
+
+/**
+  * Enum value "ibm.netezza" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_IBM_NETEZZA = "ibm.netezza" as const;
+
+/**
+  * Enum value "influxdb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_INFLUXDB = "influxdb" as const;
+
+/**
+  * Enum value "instantdb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_INSTANTDB = "instantdb" as const;
+
+/**
+  * Enum value "intersystems.cache" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_INTERSYSTEMS_CACHE = "intersystems.cache" as const;
+
+/**
+  * Enum value "mariadb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_MARIADB = "mariadb" as const;
+
+/**
+  * Enum value "memcached" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_MEMCACHED = "memcached" as const;
+
+/**
+  * Enum value "microsoft.sql_server" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_MICROSOFT_SQL_SERVER = "microsoft.sql_server" as const;
+
+/**
+  * Enum value "mongodb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_MONGODB = "mongodb" as const;
+
+/**
+  * Enum value "mysql" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_MYSQL = "mysql" as const;
+
+/**
+  * Enum value "neo4j" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_NEO4J = "neo4j" as const;
+
+/**
+  * Enum value "opensearch" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_OPENSEARCH = "opensearch" as const;
+
+/**
+  * Enum value "oracle.db" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_ORACLE_DB = "oracle.db" as const;
+
+/**
+  * Enum value "other_sql" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_OTHER_SQL = "other_sql" as const;
+
+/**
+  * Enum value "postgresql" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_POSTGRESQL = "postgresql" as const;
+
+/**
+  * Enum value "redis" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_REDIS = "redis" as const;
+
+/**
+  * Enum value "sap.hana" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_SAP_HANA = "sap.hana" as const;
+
+/**
+  * Enum value "sap.maxdb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_SAP_MAXDB = "sap.maxdb" as const;
+
+/**
+  * Enum value "softwareag.adabas" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_SOFTWAREAG_ADABAS = "softwareag.adabas" as const;
+
+/**
+  * Enum value "sqlite" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_SQLITE = "sqlite" as const;
+
+/**
+  * Enum value "teradata" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_TERADATA = "teradata" as const;
+
+/**
+  * Enum value "trino" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+  */
+export const DB_SYSTEM_NAME_VALUE_TRINO = "trino" as const;
+
+/**
  * Name of the garbage collector managed heap generation.
  *
  * @example gen0
@@ -244,12 +631,25 @@ export const ATTR_EXCEPTION_TYPE = 'exception.type' as const;
 /**
  * HTTP request headers, `<key>` being the normalized HTTP Header name (lowercase), the value being the header values.
  *
- * @example http.request.header.content-type=["application/json"]
- * @example http.request.header.x-forwarded-for=["1.2.3.4", "1.2.3.5"]
+ * @example ["application/json"]
+ * @example ["1.2.3.4", "1.2.3.5"]
  *
- * @note Instrumentations **SHOULD** require an explicit configuration of which headers are to be captured. Including all request headers can be a security risk - explicit configuration helps avoid leaking sensitive information.
- * The `User-Agent` header is already captured in the `user_agent.original` attribute. Users **MAY** explicitly configure instrumentations to capture them even though it is not recommended.
- * The attribute value **MUST** consist of either multiple header values as an array of strings or a single-item array containing a possibly comma-concatenated string, depending on the way the HTTP library provides access to headers.
+ * @note Instrumentations **SHOULD** require an explicit configuration of which headers are to be captured.
+ * Including all request headers can be a security risk - explicit configuration helps avoid leaking sensitive information.
+ *
+ * The `User-Agent` header is already captured in the `user_agent.original` attribute.
+ * Users **MAY** explicitly configure instrumentations to capture them even though it is not recommended.
+ *
+ * The attribute value **MUST** consist of either multiple header values as an array of strings
+ * or a single-item array containing a possibly comma-concatenated string, depending on the way
+ * the HTTP library provides access to headers.
+ *
+ * Examples:
+ *
+ *   - A header `Content-Type: application/json` **SHOULD** be recorded as the `http.request.header.content-type`
+ *     attribute with value `["application/json"]`.
+ *   - A header `X-Forwarded-For: 1.2.3.4, 1.2.3.5` **SHOULD** be recorded as the `http.request.header.x-forwarded-for`
+ *     attribute with value `["1.2.3.4", "1.2.3.5"]` or `["1.2.3.4, 1.2.3.5"]` depending on the HTTP library.
  */
 export const ATTR_HTTP_REQUEST_HEADER = (key: string) => `http.request.header.${key}`;
 
@@ -348,12 +748,24 @@ export const ATTR_HTTP_REQUEST_RESEND_COUNT = 'http.request.resend_count' as con
 /**
  * HTTP response headers, `<key>` being the normalized HTTP Header name (lowercase), the value being the header values.
  *
- * @example http.response.header.content-type=["application/json"]
- * @example http.response.header.my-custom-header=["abc", "def"]
+ * @example ["application/json"]
+ * @example ["abc", "def"]
  *
- * @note Instrumentations **SHOULD** require an explicit configuration of which headers are to be captured. Including all response headers can be a security risk - explicit configuration helps avoid leaking sensitive information.
+ * @note Instrumentations **SHOULD** require an explicit configuration of which headers are to be captured.
+ * Including all response headers can be a security risk - explicit configuration helps avoid leaking sensitive information.
+ *
  * Users **MAY** explicitly configure instrumentations to capture them even though it is not recommended.
- * The attribute value **MUST** consist of either multiple header values as an array of strings or a single-item array containing a possibly comma-concatenated string, depending on the way the HTTP library provides access to headers.
+ *
+ * The attribute value **MUST** consist of either multiple header values as an array of strings
+ * or a single-item array containing a possibly comma-concatenated string, depending on the way
+ * the HTTP library provides access to headers.
+ *
+ * Examples:
+ *
+ *   - A header `Content-Type: application/json` header **SHOULD** be recorded as the `http.request.response.content-type`
+ *     attribute with value `["application/json"]`.
+ *   - A header `My-custom-header: abc, def` header **SHOULD** be recorded as the `http.response.header.my-custom-header`
+ *     attribute with value `["abc", "def"]` or `["abc, def"]` depending on the HTTP library.
  */
 export const ATTR_HTTP_RESPONSE_HEADER = (key: string) => `http.response.header.${key}`;
 

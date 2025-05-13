@@ -44,7 +44,7 @@ const expectedConsoleMap: { [n: string]: keyof Console } = {
   verbose: 'trace',
 };
 
-describe('DiagConsoleLogger', () => {
+describe('DiagConsoleLogger', function () {
   const origConsole = console;
   const orig: any = {};
   const calledArgs: any = {};
@@ -92,9 +92,9 @@ describe('DiagConsoleLogger', () => {
     });
   });
 
-  describe('constructor', () => {
+  describe('constructor', function () {
     diagLoggerFunctions.forEach(fName => {
-      it(`console logger should provide ${fName} function`, () => {
+      it(`console logger should provide ${fName} function`, function () {
         const consoleLogger: any = new DiagConsoleLogger();
         consoleLogger[fName](`${fName} called %s`, 'param1');
         assert.ok(
@@ -103,7 +103,7 @@ describe('DiagConsoleLogger', () => {
         );
       });
 
-      it(`should log ${expectedConsoleMap[fName]} message with ${fName} call only`, () => {
+      it(`should log ${expectedConsoleMap[fName]} message with ${fName} call only`, function () {
         const consoleLogger: any = new DiagConsoleLogger();
         consoleLogger[fName](`${fName} called %s`, 'param1');
 
@@ -126,7 +126,7 @@ describe('DiagConsoleLogger', () => {
       });
 
       consoleFuncs.forEach(cName => {
-        it(`should log ${fName} message even when console doesn't support ${cName} call before construction`, () => {
+        it(`should log ${fName} message even when console doesn't support ${cName} call before construction`, function () {
           // @ts-expect-error removing a console property is not allowed by types
           console[cName] = undefined;
           const consoleLogger: any = new DiagConsoleLogger();
@@ -141,7 +141,7 @@ describe('DiagConsoleLogger', () => {
           }
         });
 
-        it(`should log ${fName} message even when console doesn't support ${cName} call after construction`, () => {
+        it(`should log ${fName} message even when console doesn't support ${cName} call after construction`, function () {
           const consoleLogger: any = new DiagConsoleLogger();
           // @ts-expect-error removing a console property is not allowed by types
           console[cName] = undefined;
@@ -161,7 +161,7 @@ describe('DiagConsoleLogger', () => {
     if (canMockConsole) {
       diagLoggerFunctions.forEach(fName => {
         const cName = expectedConsoleMap[fName];
-        it(`should not throw even when console is not supported for ${fName} call`, () => {
+        it(`should not throw even when console is not supported for ${fName} call`, function () {
           // eslint-disable-next-line no-global-assign
           (console as any) = undefined;
           const consoleLogger: any = new DiagConsoleLogger();
@@ -170,7 +170,7 @@ describe('DiagConsoleLogger', () => {
           assert.deepStrictEqual(calledArgs.log, null);
         });
 
-        it(`should not throw even when console is disabled after construction for ${fName} call`, () => {
+        it(`should not throw even when console is disabled after construction for ${fName} call`, function () {
           const consoleLogger: any = new DiagConsoleLogger();
           // eslint-disable-next-line no-global-assign
           (console as any) = undefined;
@@ -179,7 +179,7 @@ describe('DiagConsoleLogger', () => {
           assert.deepStrictEqual(calledArgs.log, null);
         });
 
-        it(`should not throw even when console is invalid after construction for ${fName} call`, () => {
+        it(`should not throw even when console is invalid after construction for ${fName} call`, function () {
           const invalidConsole = {
             debug: 1,
             warn: 2,
@@ -197,7 +197,7 @@ describe('DiagConsoleLogger', () => {
           assert.deepStrictEqual(calledArgs.log, null);
         });
 
-        it(`should not throw even when console is invalid before construction for ${fName} call`, () => {
+        it(`should not throw even when console is invalid before construction for ${fName} call`, function () {
           const invalidConsole = {
             debug: 1,
             warn: 2,
