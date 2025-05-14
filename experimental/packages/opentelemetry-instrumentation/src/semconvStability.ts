@@ -23,6 +23,10 @@ export const enum SemconvStability {
   DUPLICATE = 0x1 | 0x2,
 }
 
+// Common namespaces mentioned in semantic-conventions docs, but allow
+// other custom strings.
+type SemConvStabilityNamespace = "http" | "messaging" | "database" | "k8s" | (string & {});
+
 /**
  * Determine the appropriate semconv stability for the given namespace.
  *
@@ -70,7 +74,7 @@ export const enum SemconvStability {
  *
  */
 export function semconvStabilityFromStr(
-  namespace: string,
+  namespace: SemConvStabilityNamespace,
   str: string | undefined
 ) {
   let semconvStability = SemconvStability.OLD;
