@@ -16,7 +16,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
-## 0.200.1
+## 0.201.0
 
 ### :rocket: Features
 
