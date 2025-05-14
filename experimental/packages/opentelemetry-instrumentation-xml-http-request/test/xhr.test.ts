@@ -18,7 +18,7 @@ import { otperformance as performance } from '@opentelemetry/core';
 import {
   registerInstrumentations,
   isWrapped,
-  httpSemconvStabilityFromStr,
+  semconvStabilityFromStr,
   SemconvStability,
 } from '@opentelemetry/instrumentation';
 import {
@@ -431,7 +431,8 @@ describe('xhr', () => {
           const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
           const attributes = span.attributes;
           let expectedNumAttrs = 0;
-          const semconvStability = httpSemconvStabilityFromStr(
+          const semconvStability = semconvStabilityFromStr(
+            'http',
             test.semconvStabilityOptIn
           );
 
@@ -897,7 +898,8 @@ describe('xhr', () => {
             const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const attributes = span.attributes;
 
-            const semconvStability = httpSemconvStabilityFromStr(
+            const semconvStability = semconvStabilityFromStr(
+              'http',
               test.semconvStabilityOptIn
             );
 
@@ -934,7 +936,8 @@ describe('xhr', () => {
           it('should still add the CONTENT_LENGTH attribute', () => {
             const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
             const attributes = span.attributes;
-            const semconvStability = httpSemconvStabilityFromStr(
+            const semconvStability = semconvStabilityFromStr(
+              'http',
               test.semconvStabilityOptIn
             );
 
@@ -1110,7 +1113,8 @@ describe('xhr', () => {
             const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const attributes = span.attributes;
             let expectedNumAttrs = 0;
-            const semconvStability = httpSemconvStabilityFromStr(
+            const semconvStability = semconvStabilityFromStr(
+              'http',
               test.semconvStabilityOptIn
             );
 
@@ -1233,7 +1237,8 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = httpSemconvStabilityFromStr(
+            const semconvStability = semconvStabilityFromStr(
+              'http',
               test.semconvStabilityOptIn
             );
 
@@ -1353,7 +1358,8 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = httpSemconvStabilityFromStr(
+            const semconvStability = semconvStabilityFromStr(
+              'http',
               test.semconvStabilityOptIn
             );
 
@@ -1471,7 +1477,8 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = httpSemconvStabilityFromStr(
+            const semconvStability = semconvStabilityFromStr(
+              'http',
               test.semconvStabilityOptIn
             );
 
@@ -1818,7 +1825,8 @@ describe('xhr', () => {
           const attributes = span.attributes;
 
           let expectedNumAttrs = 0;
-          const semconvStability = httpSemconvStabilityFromStr(
+          const semconvStability = semconvStabilityFromStr(
+            'http',
             test.semconvStabilityOptIn
           );
 
@@ -2288,7 +2296,8 @@ describe('xhr', () => {
             const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const attributes = span.attributes;
 
-            const semconvStability = httpSemconvStabilityFromStr(
+            const semconvStability = semconvStabilityFromStr(
+              'http',
               test.semconvStabilityOptIn
             );
 
@@ -2480,7 +2489,8 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = httpSemconvStabilityFromStr(
+            const semconvStability = semconvStabilityFromStr(
+              'http',
               test.semconvStabilityOptIn
             );
 
@@ -2602,7 +2612,8 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = httpSemconvStabilityFromStr(
+            const semconvStability = semconvStabilityFromStr(
+              'http',
               test.semconvStabilityOptIn
             );
 
@@ -2720,7 +2731,8 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = httpSemconvStabilityFromStr(
+            const semconvStability = semconvStabilityFromStr(
+              'http',
               test.semconvStabilityOptIn
             );
 
@@ -2838,7 +2850,8 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = httpSemconvStabilityFromStr(
+            const semconvStability = semconvStabilityFromStr(
+              'http',
               test.semconvStabilityOptIn
             );
 
