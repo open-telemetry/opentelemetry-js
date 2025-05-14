@@ -55,7 +55,7 @@ import {
   InstrumentationNodeModuleDefinition,
   InstrumentationBase,
   SemconvStability,
-  httpSemconvStabilityFromStr,
+  semconvStabilityFromStr,
 } from '@opentelemetry/instrumentation';
 
 import {
@@ -103,7 +103,8 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
     super('@opentelemetry/instrumentation-grpc', VERSION, config);
     this._metadataCapture = this._createMetadataCapture();
 
-    this._semconvStability = httpSemconvStabilityFromStr(
+    this._semconvStability = semconvStabilityFromStr(
+      'http',
       process.env.OTEL_SEMCONV_STABILITY_OPT_IN
     );
   }

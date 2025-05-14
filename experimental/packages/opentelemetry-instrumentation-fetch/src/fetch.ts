@@ -17,7 +17,7 @@
 import * as api from '@opentelemetry/api';
 import {
   SemconvStability,
-  httpSemconvStabilityFromStr,
+  semconvStabilityFromStr,
   isWrapped,
   InstrumentationBase,
   InstrumentationConfig,
@@ -118,7 +118,8 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
 
   constructor(config: FetchInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-fetch', VERSION, config);
-    this._semconvStability = httpSemconvStabilityFromStr(
+    this._semconvStability = semconvStabilityFromStr(
+      'http',
       config?.semconvStabilityOptIn
     );
   }

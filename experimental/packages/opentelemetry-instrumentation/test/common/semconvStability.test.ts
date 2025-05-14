@@ -16,44 +16,67 @@
 
 import { inspect } from 'util';
 import * as assert from 'assert';
-import {
-  SemconvStability,
-  httpSemconvStabilityFromStr,
-  databaseSemconvStabilityFromStr,
-} from '../../src';
+import { SemconvStability, semconvStabilityFromStr } from '../../src';
 
-describe('httpSemconvStabilityFromStr', function () {
+describe('semconvStabilityFromStr', function () {
   const table = [
-    { str: undefined, expected: SemconvStability.OLD },
-    { str: '', expected: SemconvStability.OLD },
-    { str: 'http', expected: SemconvStability.STABLE },
-    { str: 'http/dup', expected: SemconvStability.DUPLICATE },
-    { str: ', http/dup,bar', expected: SemconvStability.DUPLICATE },
-    { str: ', http/dup\t ,blah', expected: SemconvStability.DUPLICATE },
-    { str: 'database', expected: SemconvStability.OLD },
-    { str: 'just,bogus,values', expected: SemconvStability.OLD },
-  ];
-  for (const { str, expected } of table) {
-    it(`str: ${inspect(str)}`, function () {
-      assert.strictEqual(httpSemconvStabilityFromStr(str), expected);
-    });
-  }
-});
+    { namespace: 'http', str: undefined, expected: SemconvStability.OLD },
+    { namespace: 'http', str: '', expected: SemconvStability.OLD },
+    { namespace: 'http', str: 'http', expected: SemconvStability.STABLE },
+    {
+      namespace: 'http',
+      str: 'http/dup',
+      expected: SemconvStability.DUPLICATE,
+    },
+    {
+      namespace: 'http',
+      str: ', http/dup,bar',
+      expected: SemconvStability.DUPLICATE,
+    },
+    {
+      namespace: 'http',
+      str: ', http/dup\t ,blah',
+      expected: SemconvStability.DUPLICATE,
+    },
+    { namespace: 'http', str: 'database', expected: SemconvStability.OLD },
+    {
+      namespace: 'http',
+      str: 'just,bogus,values',
+      expected: SemconvStability.OLD,
+    },
 
-describe('databaseSemconvStabilityFromStr', function () {
-  const table = [
-    { str: undefined, expected: SemconvStability.OLD },
-    { str: '', expected: SemconvStability.OLD },
-    { str: 'database', expected: SemconvStability.STABLE },
-    { str: 'database/dup', expected: SemconvStability.DUPLICATE },
-    { str: ', database/dup,bar', expected: SemconvStability.DUPLICATE },
-    { str: ', database/dup\t ,blah', expected: SemconvStability.DUPLICATE },
-    { str: 'http', expected: SemconvStability.OLD },
-    { str: 'just,bogus,values', expected: SemconvStability.OLD },
+    { namespace: 'database', str: undefined, expected: SemconvStability.OLD },
+    { namespace: 'database', str: '', expected: SemconvStability.OLD },
+    {
+      namespace: 'database',
+      str: 'database',
+      expected: SemconvStability.STABLE,
+    },
+    {
+      namespace: 'database',
+      str: 'database/dup',
+      expected: SemconvStability.DUPLICATE,
+    },
+    {
+      namespace: 'database',
+      str: ', database/dup,bar',
+      expected: SemconvStability.DUPLICATE,
+    },
+    {
+      namespace: 'database',
+      str: ', database/dup\t ,blah',
+      expected: SemconvStability.DUPLICATE,
+    },
+    { namespace: 'database', str: 'http', expected: SemconvStability.OLD },
+    {
+      namespace: 'database',
+      str: 'just,bogus,values',
+      expected: SemconvStability.OLD,
+    },
   ];
-  for (const { str, expected } of table) {
+  for (const { namespace, str, expected } of table) {
     it(`str: ${inspect(str)}`, function () {
-      assert.strictEqual(databaseSemconvStabilityFromStr(str), expected);
+      assert.strictEqual(semconvStabilityFromStr(namespace, str), expected);
     });
   }
 });
