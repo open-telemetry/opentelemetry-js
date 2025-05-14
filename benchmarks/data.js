@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1747081663641,
+  "lastUpdate": 1747231125982,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -32608,6 +32608,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.26%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "cjihrig@gmail.com",
+            "name": "Colin Ihrig",
+            "username": "cjihrig"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "56610a0c6f815db6c2fdd9fe5fca28e7a39e71b6",
+          "message": "test: test Node.js 24 in CI (#5661)\n\nCo-authored-by: Chengzhong Wu <legendecas@gmail.com>",
+          "timestamp": "2025-05-14T13:47:42Z",
+          "tree_id": "886cf773c5566fb7afe108a86868b0a2c432cb5a",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/56610a0c6f815db6c2fdd9fe5fca28e7a39e71b6"
+        },
+        "date": 1747231124771,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1486274,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18076,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 830806,
+            "range": "±0.27%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 774250,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
