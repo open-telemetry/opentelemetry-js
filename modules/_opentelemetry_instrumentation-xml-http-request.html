@@ -1,11 +1,11 @@
 <!DOCTYPE html><html class="default" lang="en" data-base=".."><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>@opentelemetry/instrumentation-xml-http-request | OpenTelemetry SDK</title><meta name="description" content="Documentation for OpenTelemetry SDK"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/icons.js" id="tsd-icons-script"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script><script async src="../assets/hierarchy.js" id="tsd-hierarchy-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><div class="table-cell" id="tsd-search"><div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-search"></use></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div><div class="field"><div id="tsd-toolbar-links"></div></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="../index.html" class="title">OpenTelemetry SDK</a></div><div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-menu"></use></svg></a></div></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><ul class="tsd-breadcrumb"><li><a href="../index.html">OpenTelemetry SDK</a></li><li><a href="_opentelemetry_instrumentation-xml-http-request.html">@opentelemetry/instrumentation-xml-http-request</a></li></ul><h1>Module @opentelemetry/instrumentation-xml-http-request</h1></div><section class="tsd-panel tsd-typography"><a id="opentelemetry-xmlhttprequest-instrumentation-for-web" class="tsd-anchor"></a><h1 class="tsd-anchor-link">OpenTelemetry XMLHttpRequest Instrumentation for web<a href="#opentelemetry-xmlhttprequest-instrumentation-for-web" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><p><a href="https://www.npmjs.com/package/@opentelemetry/instrumentation-xml-http-request"><img src="https://badge.fury.io/js/%40opentelemetry%2Finstrumentation-xml-http-request.svg" alt="NPM Published Version"></a>
 <a href="https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat"><img src="https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat" alt="Apache License"></a></p>
-<p><strong>Note: This is an experimental package under active development. New releases may include breaking changes.</strong></p>
-<p>This module provides auto instrumentation for web using XMLHttpRequest .</p>
+<p><strong>Note: This is an experimental package. New releases may include breaking changes.</strong></p>
+<p>This module provides auto instrumentation for web using XMLHttpRequest.</p>
 <a id="installation" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Installation<a href="#installation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><pre><code class="bash"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><span class="hl-1"> </span><span class="hl-3">--save</span><span class="hl-1"> </span><span class="hl-2">@opentelemetry/instrumentation-xml-http-request</span>
 </code><button type="button">Copy</button></pre>
 
-<a id="usage" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Usage<a href="#usage" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><pre><code class="js"><span class="hl-7">import</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-6">ConsoleSpanExporter</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">SimpleSpanProcessor</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">WebTracerProvider</span><span class="hl-1">,</span><br/><span class="hl-1">} </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@opentelemetry/sdk-trace-web&#39;</span><span class="hl-1">;</span><br/><span class="hl-7">import</span><span class="hl-1"> { </span><span class="hl-6">XMLHttpRequestInstrumentation</span><span class="hl-1"> } </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@opentelemetry/instrumentation-xml-http-request&#39;</span><span class="hl-1">;</span><br/><span class="hl-7">import</span><span class="hl-1"> { </span><span class="hl-6">ZoneContextManager</span><span class="hl-1"> } </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@opentelemetry/context-zone&#39;</span><span class="hl-1">;</span><br/><span class="hl-7">import</span><span class="hl-1"> { </span><span class="hl-6">registerInstrumentations</span><span class="hl-1"> } </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@opentelemetry/instrumentation&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">providerWithZone</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">WebTracerProvider</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-6">spanProcessors:</span><span class="hl-1"> [</span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">SimpleSpanProcessor</span><span class="hl-1">(</span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">ConsoleSpanExporter</span><span class="hl-1">())]</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-6">providerWithZone</span><span class="hl-1">.</span><span class="hl-0">register</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-6">contextManager:</span><span class="hl-1"> </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">ZoneContextManager</span><span class="hl-1">(),</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-0">registerInstrumentations</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-6">instrumentations:</span><span class="hl-1"> [</span><br/><span class="hl-1">    </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">XMLHttpRequestInstrumentation</span><span class="hl-1">({</span><br/><span class="hl-1">      </span><span class="hl-6">propagateTraceHeaderCorsUrls:</span><span class="hl-1"> [</span><span class="hl-2">&#39;http://localhost:8090&#39;</span><span class="hl-1">]</span><br/><span class="hl-1">    }),</span><br/><span class="hl-1">  ],</span><br/><span class="hl-1">});</span><br/><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">webTracerWithZone</span><span class="hl-1"> = </span><span class="hl-6">providerWithZone</span><span class="hl-1">.</span><span class="hl-0">getTracer</span><span class="hl-1">(</span><span class="hl-2">&#39;default&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-5">/////////////////////////////////////////</span><br/><br/><span class="hl-5">// or plugin can be also initialised separately and then set the tracer provider or meter provider</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">xmlHttpRequestInstrumentation</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">XMLHttpRequestInstrumentation</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-6">propagateTraceHeaderCorsUrls:</span><span class="hl-1"> [</span><span class="hl-2">&#39;http://localhost:8090&#39;</span><span class="hl-1">]</span><br/><span class="hl-1">});</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">providerWithZone</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">WebTracerProvider</span><span class="hl-1">();</span><br/><span class="hl-6">providerWithZone</span><span class="hl-1">.</span><span class="hl-0">register</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-6">contextManager:</span><span class="hl-1"> </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">ZoneContextManager</span><span class="hl-1">(),</span><br/><span class="hl-1">});</span><br/><span class="hl-6">xmlHttpRequestInstrumentation</span><span class="hl-1">.</span><span class="hl-0">setTracerProvider</span><span class="hl-1">(</span><span class="hl-6">providerWithZone</span><span class="hl-1">);</span><br/><span class="hl-5">/////////////////////////////////////////</span><br/><br/><br/><span class="hl-5">// and some test</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">req</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">XMLHttpRequest</span><span class="hl-1">();</span><br/><span class="hl-6">req</span><span class="hl-1">.</span><span class="hl-0">open</span><span class="hl-1">(</span><span class="hl-2">&#39;GET&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;http://localhost:8090/xml-http-request.js&#39;</span><span class="hl-1">, </span><span class="hl-3">true</span><span class="hl-1">);</span><br/><span class="hl-6">req</span><span class="hl-1">.</span><span class="hl-0">send</span><span class="hl-1">();</span><br/>
+<a id="usage" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Usage<a href="#usage" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><pre><code class="js"><span class="hl-7">import</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-6">ConsoleSpanExporter</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">SimpleSpanProcessor</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">WebTracerProvider</span><span class="hl-1">,</span><br/><span class="hl-1">} </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@opentelemetry/sdk-trace-web&#39;</span><span class="hl-1">;</span><br/><span class="hl-7">import</span><span class="hl-1"> { </span><span class="hl-6">XMLHttpRequestInstrumentation</span><span class="hl-1"> } </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@opentelemetry/instrumentation-xml-http-request&#39;</span><span class="hl-1">;</span><br/><span class="hl-7">import</span><span class="hl-1"> { </span><span class="hl-6">ZoneContextManager</span><span class="hl-1"> } </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@opentelemetry/context-zone&#39;</span><span class="hl-1">;</span><br/><span class="hl-7">import</span><span class="hl-1"> { </span><span class="hl-6">registerInstrumentations</span><span class="hl-1"> } </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@opentelemetry/instrumentation&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">providerWithZone</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">WebTracerProvider</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-6">spanProcessors:</span><span class="hl-1"> [</span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">SimpleSpanProcessor</span><span class="hl-1">(</span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">ConsoleSpanExporter</span><span class="hl-1">())]</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-6">providerWithZone</span><span class="hl-1">.</span><span class="hl-0">register</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-6">contextManager:</span><span class="hl-1"> </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">ZoneContextManager</span><span class="hl-1">(),</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-0">registerInstrumentations</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-6">instrumentations:</span><span class="hl-1"> [</span><br/><span class="hl-1">    </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">XMLHttpRequestInstrumentation</span><span class="hl-1">({</span><br/><span class="hl-1">      </span><span class="hl-6">propagateTraceHeaderCorsUrls:</span><span class="hl-1"> [</span><span class="hl-2">&#39;http://localhost:8090&#39;</span><span class="hl-1">]</span><br/><span class="hl-1">    }),</span><br/><span class="hl-1">  ],</span><br/><span class="hl-1">});</span><br/><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">webTracerWithZone</span><span class="hl-1"> = </span><span class="hl-6">providerWithZone</span><span class="hl-1">.</span><span class="hl-0">getTracer</span><span class="hl-1">(</span><span class="hl-2">&#39;default&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-5">/////////////////////////////////////////</span><br/><br/><span class="hl-5">// or plugin can be also initialised separately and then set the tracer provider or meter provider</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">xmlHttpRequestInstrumentation</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">XMLHttpRequestInstrumentation</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-6">propagateTraceHeaderCorsUrls:</span><span class="hl-1"> [</span><span class="hl-2">&#39;http://localhost:8090&#39;</span><span class="hl-1">]</span><br/><span class="hl-1">});</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">providerWithZone</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">WebTracerProvider</span><span class="hl-1">();</span><br/><span class="hl-6">providerWithZone</span><span class="hl-1">.</span><span class="hl-0">register</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-6">contextManager:</span><span class="hl-1"> </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">ZoneContextManager</span><span class="hl-1">(),</span><br/><span class="hl-1">});</span><br/><span class="hl-6">xmlHttpRequestInstrumentation</span><span class="hl-1">.</span><span class="hl-0">setTracerProvider</span><span class="hl-1">(</span><span class="hl-6">providerWithZone</span><span class="hl-1">);</span><br/><span class="hl-5">/////////////////////////////////////////</span><br/><br/><br/><span class="hl-5">// and some test</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">req</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">XMLHttpRequest</span><span class="hl-1">();</span><br/><span class="hl-6">req</span><span class="hl-1">.</span><span class="hl-0">open</span><span class="hl-1">(</span><span class="hl-2">&#39;GET&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;http://localhost:8090/xml-http-request.js&#39;</span><span class="hl-1">, </span><span class="hl-3">true</span><span class="hl-1">);</span><br/><span class="hl-6">req</span><span class="hl-1">.</span><span class="hl-0">send</span><span class="hl-1">();</span>
 </code><button type="button">Copy</button></pre>
 
 <a id="xhr-instrumentation-options" class="tsd-anchor"></a><h3 class="tsd-anchor-link">XHR Instrumentation options<a href="#xhr-instrumentation-options" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>XHR instrumentation plugin has few options available to choose from. You can set the following:</p>
@@ -19,59 +19,100 @@
 </thead>
 <tbody>
 <tr>
-<td><a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L85"><code>applyCustomAttributesOnSpan</code></a></td>
+<td><code>applyCustomAttributesOnSpan</code></td>
 <td><code>XHRCustomAttributeFunction</code></td>
 <td>Function for adding custom attributes</td>
 </tr>
 <tr>
-<td><a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L87"><code>ignoreNetworkEvents</code></a></td>
-<td><code>boolean</code></td>
+<td><code>ignoreNetworkEvents</code></td>
+<td>boolean</td>
 <td>Disable network events being added as span events (network events are added by default)</td>
 </tr>
 <tr>
-<td><a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L89"><code>measureRequestSize</code></a></td>
-<td><code>boolean</code></td>
+<td><code>measureRequestSize</code></td>
+<td>boolean</td>
 <td>Measure outgoing request length (outgoing request length is not measured by default)</td>
+</tr>
+<tr>
+<td><code>semconvStabilityOptIn</code></td>
+<td>string</td>
+<td>A comma-separated string of tokens as described for <code>OTEL_SEMCONV_STABILITY_OPT_IN</code> in the <a href="https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md">HTTP semantic convention stability migration</a> guide. See the &quot;Semantic Conventions&quot; section below.</td>
 </tr>
 </tbody>
 </table>
-<a id="semantic-conventions" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Semantic Conventions<a href="#semantic-conventions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>This package uses <code>@opentelemetry/semantic-conventions</code> version <code>1.22+</code>, which implements Semantic Convention <a href="https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md">Version 1.7.0</a></p>
-<p>Attributes collected:</p>
+<a id="semantic-conventions" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Semantic Conventions<a href="#semantic-conventions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Up to and including v0.200.0, <code>instrumentation-xml-http-request</code> generates telemetry using <a href="https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md">Semantic Conventions v1.7.0</a>.</p>
+<p>HTTP semantic conventions (semconv) were stabilized in semconv v1.23.0, and a <a href="https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md#http-semantic-convention-stability-migration">migration process</a> was defined. <code>instrumentation-xml-http-request</code> versions 0.201.0 and later include support for migrating to stable HTTP semantic conventions, as described below. The intent is to provide an approximate 6 month time window for users of this instrumentation to migrate to the new HTTP semconv, after which a new minor version will change to use the <em>new</em> semconv by default and drop support for the old semconv. See the <a href="https://github.com/open-telemetry/opentelemetry-js/issues/5646">HTTP semconv migration plan for OpenTelemetry JS instrumentations</a>.</p>
+<p>To select which semconv version(s) is emitted from this instrumentation, use the <code>semconvStabilityOptIn</code> configuration option. This option works <a href="https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md">as described for <code>OTEL_SEMCONV_STABILITY_OPT_IN</code></a>:</p>
+<ul>
+<li><code>http</code>: emit the new (stable) v1.23.0 semantics</li>
+<li><code>http/dup</code>: emit <strong>both</strong> the old v1.7.0 and the new (stable) v1.23.0 semantics</li>
+<li>By default, if <code>semconvStabilityOptIn</code> includes neither of the above tokens, the old v1.7.0 semconv is used.</li>
+</ul>
+<p><strong>Span status:</strong> When the stable semconv is selected, the <a href="https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#status">span status</a> is set to ERROR when the response status code is <code>&gt;=400</code> or when the response fails with an 'error' or 'timeout' XHR event. When just the old semconv is select, the span status is not set.</p>
+<p><strong>Span attributes:</strong></p>
 <table>
 <thead>
 <tr>
-<th>Attribute</th>
-<th>Short Description</th>
+<th>v1.7.0 semconv</th>
+<th>v1.23.0 semconv</th>
+<th>Notes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>http.status_code</code></td>
-<td>HTTP response status code</td>
-</tr>
-<tr>
-<td><code>http.host</code></td>
-<td>The value of the HTTP host header</td>
-</tr>
-<tr>
-<td><code>http.user_agent</code></td>
-<td>Value of the HTTP User-Agent header sent by the client</td>
-</tr>
-<tr>
-<td><code>http.scheme</code></td>
-<td>The URI scheme identifying the used protocol</td>
+<td><code>http.method</code></td>
+<td><code>http.request.method</code></td>
+<td>HTTP request method. With v1.23.0 semconv <a href="https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#common-attributes"><code>http.request.method_original</code> may also be included</a>.</td>
 </tr>
 <tr>
 <td><code>http.url</code></td>
+<td><code>url.full</code></td>
 <td>Full HTTP request URL</td>
 </tr>
 <tr>
-<td><code>http.method</code></td>
-<td>HTTP request method</td>
+<td><code>http.host</code></td>
+<td><code>server.address</code> and <code>server.port</code></td>
+<td>The hostname and port of the request URL</td>
+</tr>
+<tr>
+<td><code>http.status_code</code></td>
+<td><code>http.response.status_code</code></td>
+<td>HTTP response status code</td>
 </tr>
 <tr>
 <td><code>http.request_content_length_uncompressed</code></td>
-<td>Uncompressed size of the request body, if any body exists</td>
+<td><code>http.request.body.size</code></td>
+<td>This is only added if <code>measureRequestSize</code> is <code>true</code>.</td>
+</tr>
+<tr>
+<td><code>http.response_content_length_uncompressed</code></td>
+<td>(not included)</td>
+<td>Stable HTTP semconv would use <code>http.response.body.size</code>, but this is an <a href="https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#http-client"><code>Opt-In</code> attribute</a>, so would require adding a configuration option to this instrumentation to enable.</td>
+</tr>
+<tr>
+<td><code>http.response_content_length</code></td>
+<td>(not included)</td>
+<td>Stable HTTP semconv would use <code>http.response.header.&lt;key&gt;</code>, but this is an <a href="https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#http-client"><code>Opt-In</code> attribute</a>, so would require adding a configuration option to this instrumentation to enable.</td>
+</tr>
+<tr>
+<td>(no equivalent)</td>
+<td><code>error.type</code></td>
+<td>The response status (as a string), if the response status was <code>&gt;=400</code>, or one of these possible request errors: 'timeout' and 'error'.</td>
+</tr>
+<tr>
+<td><code>http.user_agent</code></td>
+<td>(not included)</td>
+<td>Stable HTTP semconv would use <code>user_agent.original</code>, but this is an <a href="https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#http-client"><code>Opt-In</code> attribute</a>, so would require adding a configuration option to this instrumentation to enable.</td>
+</tr>
+<tr>
+<td><code>http.scheme</code></td>
+<td>(not included)</td>
+<td>Stable HTTP semconv would use <code>url.scheme</code>, but this is an <a href="https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#http-client"><code>Opt-In</code> attribute</a>, so would require adding a configuration option to this instrumentation to enable.</td>
+</tr>
+<tr>
+<td><code>http.status_text</code></td>
+<td>(not included)</td>
+<td>This is no longer a documented semantic conventions attribute.</td>
 </tr>
 </tbody>
 </table>

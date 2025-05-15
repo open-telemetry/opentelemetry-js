@@ -16,7 +16,8 @@
 </code><button type="button">Copy</button></pre>
 
 <p>See <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/http">examples/http</a> for a short example.</p>
-<a id="http-instrumentation-options" class="tsd-anchor"></a><h3 class="tsd-anchor-link">Http instrumentation Options<a href="#http-instrumentation-options" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Http instrumentation has few options available to choose from. You can set the following:</p>
+<a id="http-instrumentation-options" class="tsd-anchor"></a><h3 class="tsd-anchor-link">Http instrumentation Options<a href="#http-instrumentation-options" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Http instrumentation has a few <a href="https://github.com/open-telemetry/opentelemetry-js/blob/e1ec4026edae53a2dea3a9a604d6d21bb5e8d99f/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L60-L93">configuration options</a> available to choose from.
+You can set the following:</p>
 <table>
 <thead>
 <tr>
@@ -27,27 +28,27 @@
 </thead>
 <tbody>
 <tr>
-<td><a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L91"><code>applyCustomAttributesOnSpan</code></a></td>
+<td><code>applyCustomAttributesOnSpan</code></td>
 <td><code>HttpCustomAttributeFunction</code></td>
 <td>Function for adding custom attributes</td>
 </tr>
 <tr>
-<td><a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#93"><code>requestHook</code></a></td>
+<td><code>requestHook</code></td>
 <td><code>HttpRequestCustomAttributeFunction</code></td>
 <td>Function for adding custom attributes before request is handled</td>
 </tr>
 <tr>
-<td><a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L95"><code>responseHook</code></a></td>
+<td><code>responseHook</code></td>
 <td><code>HttpResponseCustomAttributeFunction</code></td>
 <td>Function for adding custom attributes before response is handled</td>
 </tr>
 <tr>
-<td><a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L97"><code>startIncomingSpanHook</code></a></td>
+<td><code>startIncomingSpanHook</code></td>
 <td><code>StartIncomingSpanCustomAttributeFunction</code></td>
 <td>Function for adding custom attributes before a span is started in incomingRequest</td>
 </tr>
 <tr>
-<td><a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L99"><code>startOutgoingSpanHook</code></a></td>
+<td><code>startOutgoingSpanHook</code></td>
 <td><code>StartOutgoingSpanCustomAttributeFunction</code></td>
 <td>Function for adding custom attributes before a span is started in outgoingRequest</td>
 </tr>
@@ -72,33 +73,176 @@
 <td>Set to true to avoid instrumenting incoming requests at all. This can be helpful when another instrumentation handles incoming requests.</td>
 </tr>
 <tr>
-<td><a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L103"><code>requireParentforOutgoingSpans</code></a></td>
+<td><code>serverName</code></td>
+<td><code>string</code></td>
+<td>The primary server name of the matched virtual host.</td>
+</tr>
+<tr>
+<td><code>requireParentforOutgoingSpans</code></td>
 <td>Boolean</td>
 <td>Require that is a parent span to create new span for outgoing requests.</td>
 </tr>
 <tr>
-<td><a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L105"><code>requireParentforIncomingSpans</code></a></td>
+<td><code>requireParentforIncomingSpans</code></td>
 <td>Boolean</td>
 <td>Require that is a parent span to create new span for incoming requests.</td>
 </tr>
 <tr>
-<td><a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L107"><code>headersToSpanAttributes</code></a></td>
+<td><code>headersToSpanAttributes</code></td>
 <td><code>object</code></td>
 <td>List of case insensitive HTTP headers to convert to span attributes. Client (outgoing requests, incoming responses) and server (incoming requests, outgoing responses) headers will be converted to span attributes in the form of <code>http.{request|response}.header.header_name</code>, e.g. <code>http.response.header.content_length</code></td>
 </tr>
 </tbody>
 </table>
-<a id="semantic-conventions" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Semantic Conventions<a href="#semantic-conventions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>This package emits Semantic Convention <a href="https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-spans.md">Version 1.27.0</a>.</p>
-<p>Follow all requirements and recommendations of HTTP Client and Server Semantic Conventions Version 1.27.0 for <a href="https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-spans.md">spans</a> and <a href="https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-metrics.md">metrics</a>, including all required and recommended attributes.</p>
+<a id="semantic-conventions" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Semantic Conventions<a href="#semantic-conventions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Prior to version <code>0.54.0</code>, this instrumentation created spans targeting an experimental semantic convention <a href="https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md">Version 1.7.0</a>.</p>
+<p>HTTP semantic conventions (semconv) were stabilized in v1.23.0, and a <a href="https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md#http-semantic-convention-stability-migration">migration process</a> was defined.
+<code>instrumentation-http</code> versions 0.54.0 and later include support for migrating to stable HTTP semantic conventions, as described below.
+The intent is to provide an approximate 6 month time window for users of this instrumentation to migrate to the new HTTP semconv, after which a new minor version will use the <em>new</em> semconv by default and drop support for the old semconv.
+See the <a href="https://github.com/open-telemetry/opentelemetry-js/issues/5646">HTTP semconv migration plan for OpenTelemetry JS instrumentations</a>.</p>
+<p>To select which semconv version(s) is emitted from this instrumentation, use the <code>OTEL_SEMCONV_STABILITY_OPT_IN</code> environment variable.</p>
+<ul>
+<li><code>http</code>: emit the new (stable) v1.23.0+ semantics</li>
+<li><code>http/dep</code>: emit <strong>both</strong> the old v1.7.0 and the new (stable) v1.23.0+ semantics</li>
+<li>By default, if <code>OTEL_SEMCONV_STABILITY_OPT_IN</code> includes neither of the above tokens, the old v1.7.0 semconv is used.</li>
+</ul>
+<a id="attributes-collected" class="tsd-anchor"></a><h3 class="tsd-anchor-link">Attributes collected<a href="#attributes-collected" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><table>
+<thead>
+<tr>
+<th>v1.7.0 semconv</th>
+<th>v1.23.0 semconv</th>
+<th>Short Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>http.client_ip</code></td>
+<td><code>client.address</code></td>
+<td>The IP address of the original client behind all proxies, if known</td>
+</tr>
+<tr>
+<td><code>http.flavor</code></td>
+<td><code>network.protocol.version</code></td>
+<td>Kind of HTTP protocol used</td>
+</tr>
+<tr>
+<td><code>http.host</code></td>
+<td><code>server.address</code></td>
+<td>The value of the HTTP host header</td>
+</tr>
+<tr>
+<td><code>http.method</code></td>
+<td><code>http.request.method</code></td>
+<td>HTTP request method</td>
+</tr>
+<tr>
+<td><code>http.request_content_length</code></td>
+<td>(opt-in, <code>headersToSpanAttributes</code>)</td>
+<td>The size of the request payload body in bytes. For newer semconv, use the <code>headersToSpanAttributes:</code> option to capture this as <code>http.request.header.content_length</code>.</td>
+</tr>
+<tr>
+<td><code>http.request_content_length_uncompressed</code></td>
+<td>(not included)</td>
+<td>The size of the uncompressed request payload body after transport decoding. (In semconv v1.23.0 this is defined by <code>http.request.body.size</code>, which is experimental and opt-in.)</td>
+</tr>
+<tr>
+<td><code>http.response_content_length</code></td>
+<td>(opt-in, <code>headersToSpanAttributes</code>)</td>
+<td>The size of the response payload body in bytes. For newer semconv, use the <code>headersToSpanAttributes:</code> option to capture this as <code>http.response.header.content_length</code>.</td>
+</tr>
+<tr>
+<td><code>http.response_content_length_uncompressed</code></td>
+<td>(not included)</td>
+<td>The size of the uncompressed response payload body after transport decoding. (In semconv v1.23.0 this is defined by <code>http.response.body.size</code>, which is experimental and opt-in.)</td>
+</tr>
+<tr>
+<td><code>http.route</code></td>
+<td>no change</td>
+<td>The matched route (path template).</td>
+</tr>
+<tr>
+<td><code>http.scheme</code></td>
+<td><code>url.scheme</code></td>
+<td>The URI scheme identifying the used protocol</td>
+</tr>
+<tr>
+<td><code>http.server_name</code></td>
+<td><code>server.address</code></td>
+<td>The primary server name of the matched virtual host</td>
+</tr>
+<tr>
+<td><code>http.status_code</code></td>
+<td><code>http.response.status_code</code></td>
+<td>HTTP response status code</td>
+</tr>
+<tr>
+<td><code>http.target</code></td>
+<td><code>url.path</code> and <code>url.query</code></td>
+<td>The URI path and query component</td>
+</tr>
+<tr>
+<td><code>http.url</code></td>
+<td><code>url.full</code></td>
+<td>Full HTTP request URL in the form <code>scheme://host[:port]/path?query[#fragment]</code></td>
+</tr>
+<tr>
+<td><code>http.user_agent</code></td>
+<td><code>user_agent.original</code></td>
+<td>Value of the HTTP User-Agent header sent by the client</td>
+</tr>
+<tr>
+<td><code>net.host.ip</code></td>
+<td><code>network.local.address</code></td>
+<td>Like net.peer.ip but for the host IP. Useful in case of a multi-IP host</td>
+</tr>
+<tr>
+<td><code>net.host.name</code></td>
+<td><code>server.address</code></td>
+<td>Local hostname or similar</td>
+</tr>
+<tr>
+<td><code>net.host.port</code></td>
+<td><code>server.port</code></td>
+<td>Like net.peer.port but for the host port</td>
+</tr>
+<tr>
+<td><code>net.peer.ip.</code></td>
+<td><code>network.peer.address</code></td>
+<td>Remote address of the peer (dotted decimal for IPv4 or RFC5952 for IPv6)</td>
+</tr>
+<tr>
+<td><code>net.peer.name</code></td>
+<td><code>server.address</code></td>
+<td>Server domain name if available without reverse DNS lookup</td>
+</tr>
+<tr>
+<td><code>net.peer.port</code></td>
+<td><code>server.port</code></td>
+<td>Server port number</td>
+</tr>
+<tr>
+<td><code>net.transport</code></td>
+<td><code>network.transport</code></td>
+<td>Transport protocol used</td>
+</tr>
+</tbody>
+</table>
 <p>Metrics Exported:</p>
 <ul>
 <li><a href="https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-metrics.md#metric-httpserverrequestduration"><code>http.server.request.duration</code></a></li>
 <li><a href="https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-metrics.md#metric-httpclientrequestduration"><code>http.client.request.duration</code></a></li>
 </ul>
+<a id="upgrading-semantic-conventions" class="tsd-anchor"></a><h3 class="tsd-anchor-link">Upgrading Semantic Conventions<a href="#upgrading-semantic-conventions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>When upgrading to the new semantic conventions, it is recommended to do so in the following order:</p>
+<ol>
+<li>Upgrade <code>@opentelemetry/instrumentation-http</code> to the latest version</li>
+<li>Set <code>OTEL_SEMCONV_STABILITY_OPT_IN=http/dup</code> to emit both old and new semantic conventions</li>
+<li>Modify alerts, dashboards, metrics, and other processes to expect the new semantic conventions</li>
+<li>Set <code>OTEL_SEMCONV_STABILITY_OPT_IN=http</code> to emit only the new semantic conventions</li>
+</ol>
+<p>This will cause both the old and new semantic conventions to be emitted during the transition period.</p>
 <a id="useful-links" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Useful links<a href="#useful-links" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
 <li>For more information on OpenTelemetry, visit: <a href="https://opentelemetry.io/">https://opentelemetry.io/</a></li>
 <li>For more about OpenTelemetry JavaScript: <a href="https://github.com/open-telemetry/opentelemetry-js">https://github.com/open-telemetry/opentelemetry-js</a></li>
 <li>For help or feedback on this project, join us in <a href="https://github.com/open-telemetry/opentelemetry-js/discussions">GitHub Discussions</a></li>
 </ul>
 <a id="license" class="tsd-anchor"></a><h2 class="tsd-anchor-link">License<a href="#license" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Apache 2.0 - See <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE">LICENSE</a> for more information.</p>
-</section><details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Classes"><h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg> Classes</h2></summary><dl class="tsd-member-summaries"><dt class="tsd-member-summary"><a id="httpinstrumentation" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Class"><use href="../assets/icons.svg#icon-128"></use></svg><a href="../classes/_opentelemetry_instrumentation-http.HttpInstrumentation.html">HttpInstrumentation</a><a href="#httpinstrumentation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd></dl></details><details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Interfaces"><h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg> Interfaces</h2></summary><dl class="tsd-member-summaries"><dt class="tsd-member-summary"><a id="httpcustomattributefunction" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><a href="../interfaces/_opentelemetry_instrumentation-http.HttpCustomAttributeFunction.html">HttpCustomAttributeFunction</a><a href="#httpcustomattributefunction" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd><dt class="tsd-member-summary"><a id="httpinstrumentationconfig" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><a href="../interfaces/_opentelemetry_instrumentation-http.HttpInstrumentationConfig.html">HttpInstrumentationConfig</a><a href="#httpinstrumentationconfig" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd><dt class="tsd-member-summary"><a id="httprequestcustomattributefunction" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><a href="../interfaces/_opentelemetry_instrumentation-http.HttpRequestCustomAttributeFunction.html">HttpRequestCustomAttributeFunction</a><a href="#httprequestcustomattributefunction" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd><dt class="tsd-member-summary"><a id="httpresponsecustomattributefunction" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><a href="../interfaces/_opentelemetry_instrumentation-http.HttpResponseCustomAttributeFunction.html">HttpResponseCustomAttributeFunction</a><a href="#httpresponsecustomattributefunction" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd><dt class="tsd-member-summary"><a id="ignoreincomingrequestfunction" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><a href="../interfaces/_opentelemetry_instrumentation-http.IgnoreIncomingRequestFunction.html">IgnoreIncomingRequestFunction</a><a href="#ignoreincomingrequestfunction" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd><dt class="tsd-member-summary"><a id="ignoreoutgoingrequestfunction" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><a href="../interfaces/_opentelemetry_instrumentation-http.IgnoreOutgoingRequestFunction.html">IgnoreOutgoingRequestFunction</a><a href="#ignoreoutgoingrequestfunction" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd><dt class="tsd-member-summary"><a id="startincomingspancustomattributefunction" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><a href="../interfaces/_opentelemetry_instrumentation-http.StartIncomingSpanCustomAttributeFunction.html">StartIncomingSpanCustomAttributeFunction</a><a href="#startincomingspancustomattributefunction" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd><dt class="tsd-member-summary"><a id="startoutgoingspancustomattributefunction" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><a href="../interfaces/_opentelemetry_instrumentation-http.StartOutgoingSpanCustomAttributeFunction.html">StartOutgoingSpanCustomAttributeFunction</a><a href="#startoutgoingspancustomattributefunction" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd></dl></details></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#opentelemetry-http-and-https-instrumentation-for-nodejs"><span>Open<wbr/>Telemetry HTTP and HTTPS <wbr/>Instrumentation for <wbr/>Node.js</span></a><ul><li><a href="#installation"><span>Installation</span></a></li><li><a href="#supported-versions"><span>Supported <wbr/>Versions</span></a></li><li><a href="#usage"><span>Usage</span></a></li><li><ul><li><a href="#http-instrumentation-options"><span>Http instrumentation <wbr/>Options</span></a></li></ul></li><li><a href="#semantic-conventions"><span>Semantic <wbr/>Conventions</span></a></li><li><a href="#useful-links"><span>Useful links</span></a></li><li><a href="#license"><span>License</span></a></li></ul><details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Classes"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Classes</summary><div><a href="#httpinstrumentation" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Class"><use href="../assets/icons.svg#icon-128"></use></svg><span>Http<wbr/>Instrumentation</span></a></div></details><details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Interfaces"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Interfaces</summary><div><a href="#httpcustomattributefunction" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><span>Http<wbr/>Custom<wbr/>Attribute<wbr/>Function</span></a><a href="#httpinstrumentationconfig" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><span>Http<wbr/>Instrumentation<wbr/>Config</span></a><a href="#httprequestcustomattributefunction" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><span>Http<wbr/>Request<wbr/>Custom<wbr/>Attribute<wbr/>Function</span></a><a href="#httpresponsecustomattributefunction" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><span>Http<wbr/>Response<wbr/>Custom<wbr/>Attribute<wbr/>Function</span></a><a href="#ignoreincomingrequestfunction" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><span>Ignore<wbr/>Incoming<wbr/>Request<wbr/>Function</span></a><a href="#ignoreoutgoingrequestfunction" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><span>Ignore<wbr/>Outgoing<wbr/>Request<wbr/>Function</span></a><a href="#startincomingspancustomattributefunction" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><span>Start<wbr/>Incoming<wbr/>Span<wbr/>Custom<wbr/>Attribute<wbr/>Function</span></a><a href="#startoutgoingspancustomattributefunction" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><span>Start<wbr/>Outgoing<wbr/>Span<wbr/>Custom<wbr/>Attribute<wbr/>Function</span></a></div></details></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="../index.html">OpenTelemetry SDK</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer><div class="overlay"></div></body></html>
+</section><details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Classes"><h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg> Classes</h2></summary><dl class="tsd-member-summaries"><dt class="tsd-member-summary"><a id="httpinstrumentation" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Class"><use href="../assets/icons.svg#icon-128"></use></svg><a href="../classes/_opentelemetry_instrumentation-http.HttpInstrumentation.html">HttpInstrumentation</a><a href="#httpinstrumentation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd></dl></details><details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Interfaces"><h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg> Interfaces</h2></summary><dl class="tsd-member-summaries"><dt class="tsd-member-summary"><a id="httpcustomattributefunction" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><a href="../interfaces/_opentelemetry_instrumentation-http.HttpCustomAttributeFunction.html">HttpCustomAttributeFunction</a><a href="#httpcustomattributefunction" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd><dt class="tsd-member-summary"><a id="httpinstrumentationconfig" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><a href="../interfaces/_opentelemetry_instrumentation-http.HttpInstrumentationConfig.html">HttpInstrumentationConfig</a><a href="#httpinstrumentationconfig" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd><dt class="tsd-member-summary"><a id="httprequestcustomattributefunction" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><a href="../interfaces/_opentelemetry_instrumentation-http.HttpRequestCustomAttributeFunction.html">HttpRequestCustomAttributeFunction</a><a href="#httprequestcustomattributefunction" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd><dt class="tsd-member-summary"><a id="httpresponsecustomattributefunction" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><a href="../interfaces/_opentelemetry_instrumentation-http.HttpResponseCustomAttributeFunction.html">HttpResponseCustomAttributeFunction</a><a href="#httpresponsecustomattributefunction" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd><dt class="tsd-member-summary"><a id="ignoreincomingrequestfunction" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><a href="../interfaces/_opentelemetry_instrumentation-http.IgnoreIncomingRequestFunction.html">IgnoreIncomingRequestFunction</a><a href="#ignoreincomingrequestfunction" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd><dt class="tsd-member-summary"><a id="ignoreoutgoingrequestfunction" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><a href="../interfaces/_opentelemetry_instrumentation-http.IgnoreOutgoingRequestFunction.html">IgnoreOutgoingRequestFunction</a><a href="#ignoreoutgoingrequestfunction" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd><dt class="tsd-member-summary"><a id="startincomingspancustomattributefunction" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><a href="../interfaces/_opentelemetry_instrumentation-http.StartIncomingSpanCustomAttributeFunction.html">StartIncomingSpanCustomAttributeFunction</a><a href="#startincomingspancustomattributefunction" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd><dt class="tsd-member-summary"><a id="startoutgoingspancustomattributefunction" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><a href="../interfaces/_opentelemetry_instrumentation-http.StartOutgoingSpanCustomAttributeFunction.html">StartOutgoingSpanCustomAttributeFunction</a><a href="#startoutgoingspancustomattributefunction" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd></dl></details></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#opentelemetry-http-and-https-instrumentation-for-nodejs"><span>Open<wbr/>Telemetry HTTP and HTTPS <wbr/>Instrumentation for <wbr/>Node.js</span></a><ul><li><a href="#installation"><span>Installation</span></a></li><li><a href="#supported-versions"><span>Supported <wbr/>Versions</span></a></li><li><a href="#usage"><span>Usage</span></a></li><li><ul><li><a href="#http-instrumentation-options"><span>Http instrumentation <wbr/>Options</span></a></li></ul></li><li><a href="#semantic-conventions"><span>Semantic <wbr/>Conventions</span></a></li><li><ul><li><a href="#attributes-collected"><span>Attributes collected</span></a></li><li><a href="#upgrading-semantic-conventions"><span>Upgrading <wbr/>Semantic <wbr/>Conventions</span></a></li></ul></li><li><a href="#useful-links"><span>Useful links</span></a></li><li><a href="#license"><span>License</span></a></li></ul><details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Classes"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Classes</summary><div><a href="#httpinstrumentation" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Class"><use href="../assets/icons.svg#icon-128"></use></svg><span>Http<wbr/>Instrumentation</span></a></div></details><details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Interfaces"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Interfaces</summary><div><a href="#httpcustomattributefunction" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><span>Http<wbr/>Custom<wbr/>Attribute<wbr/>Function</span></a><a href="#httpinstrumentationconfig" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><span>Http<wbr/>Instrumentation<wbr/>Config</span></a><a href="#httprequestcustomattributefunction" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><span>Http<wbr/>Request<wbr/>Custom<wbr/>Attribute<wbr/>Function</span></a><a href="#httpresponsecustomattributefunction" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><span>Http<wbr/>Response<wbr/>Custom<wbr/>Attribute<wbr/>Function</span></a><a href="#ignoreincomingrequestfunction" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><span>Ignore<wbr/>Incoming<wbr/>Request<wbr/>Function</span></a><a href="#ignoreoutgoingrequestfunction" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><span>Ignore<wbr/>Outgoing<wbr/>Request<wbr/>Function</span></a><a href="#startincomingspancustomattributefunction" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><span>Start<wbr/>Incoming<wbr/>Span<wbr/>Custom<wbr/>Attribute<wbr/>Function</span></a><a href="#startoutgoingspancustomattributefunction" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Interface"><use href="../assets/icons.svg#icon-256"></use></svg><span>Start<wbr/>Outgoing<wbr/>Span<wbr/>Custom<wbr/>Attribute<wbr/>Function</span></a></div></details></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="../index.html">OpenTelemetry SDK</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer><div class="overlay"></div></body></html>

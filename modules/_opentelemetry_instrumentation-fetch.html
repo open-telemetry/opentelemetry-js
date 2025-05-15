@@ -43,45 +43,92 @@
 <td><code>boolean</code></td>
 <td>Measure outgoing request length (outgoing request length is not measured by default)</td>
 </tr>
+<tr>
+<td><code>semconvStabilityOptIn</code></td>
+<td>string</td>
+<td>A comma-separated string of tokens as described for <code>OTEL_SEMCONV_STABILITY_OPT_IN</code> in the <a href="https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md">HTTP semantic convention stability migration</a> guide. See the &quot;Semantic Conventions&quot; section below.</td>
+</tr>
 </tbody>
 </table>
-<a id="semantic-conventions" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Semantic Conventions<a href="#semantic-conventions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>This package uses <code>@opentelemetry/semantic-conventions</code> version <code>1.22+</code>, which implements Semantic Convention <a href="https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md">Version 1.7.0</a></p>
-<p>Attributes collected:</p>
+<a id="semantic-conventions" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Semantic Conventions<a href="#semantic-conventions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Up to and including v0.200.0, <code>instrumentation-fetch</code> generates telemetry using <a href="https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md">Semantic Conventions v1.7.0</a>.</p>
+<p>HTTP semantic conventions (semconv) were stabilized in semconv v1.23.0, and a <a href="https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md#http-semantic-convention-stability-migration">migration process</a> was defined. <code>instrumentation-fetch</code> versions 0.201.0 and later include support for migrating to stable HTTP semantic conventions, as described below. The intent is to provide an approximate 6 month time window for users of this instrumentation to migrate to the new HTTP semconv, after which a new minor version will change to use the <em>new</em> semconv by default and drop support for the old semconv. See the <a href="https://github.com/open-telemetry/opentelemetry-js/issues/5646">HTTP semconv migration plan for OpenTelemetry JS instrumentations</a>.</p>
+<p>To select which semconv version(s) is emitted from this instrumentation, use the <code>semconvStabilityOptIn</code> configuration option. This option works <a href="https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md">as described for <code>OTEL_SEMCONV_STABILITY_OPT_IN</code></a>:</p>
+<ul>
+<li><code>http</code>: emit the new (stable) v1.23.0 semantics</li>
+<li><code>http/dup</code>: emit <strong>both</strong> the old v1.7.0 and the new (stable) v1.23.0 semantics</li>
+<li>By default, if <code>semconvStabilityOptIn</code> includes neither of the above tokens, the old v1.7.0 semconv is used.</li>
+</ul>
+<p><strong>Span name:</strong> With the old v1.7.0 semconv the span name is <code>HTTP {method}</code> (for example 'HTTP GET'). Using the stable <a href="https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#name">semconv v1.23 for HTTP span names</a>, the span name is <code>{method}</code> (for example 'GET'). If both semconv versions are being emitted, the <em>old</em> name wins. (This instrumentation does not currently support adding an <code>{http.route}</code> to the span name.)</p>
+<p><strong>Span status:</strong> When the stable semconv is selected, the <a href="https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#status">span status</a> is set to ERROR when the response status code is <code>&gt;=400</code>. When just the old semconv is select, the span status is not set.</p>
+<p><strong>Span attributes:</strong></p>
 <table>
 <thead>
 <tr>
-<th>Attribute</th>
-<th>Short Description</th>
+<th>v1.7.0 semconv</th>
+<th>v1.23.0 semconv</th>
+<th>Notes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>http.status_code</code></td>
-<td>HTTP response status code</td>
-</tr>
-<tr>
-<td><code>http.host</code></td>
-<td>The value of the HTTP host header</td>
-</tr>
-<tr>
-<td><code>http.user_agent</code></td>
-<td>Value of the HTTP User-Agent header sent by the client</td>
-</tr>
-<tr>
-<td><code>http.scheme</code></td>
-<td>The URI scheme identifying the used protocol</td>
+<td><code>http.method</code></td>
+<td><code>http.request.method</code></td>
+<td>HTTP request method. With v1.23.0 semconv <a href="https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#common-attributes"><code>http.request.method_original</code> may also be included</a>.</td>
 </tr>
 <tr>
 <td><code>http.url</code></td>
+<td><code>url.full</code></td>
 <td>Full HTTP request URL</td>
 </tr>
 <tr>
-<td><code>http.method</code></td>
-<td>HTTP request method</td>
+<td><code>http.host</code></td>
+<td><code>server.address</code> and <code>server.port</code></td>
+<td>The hostname and port of the request URL</td>
+</tr>
+<tr>
+<td><code>http.status_code</code></td>
+<td><code>http.response.status_code</code></td>
+<td>HTTP response status code</td>
 </tr>
 <tr>
 <td><code>http.request_content_length_uncompressed</code></td>
-<td>Uncompressed size of the request body, if any body exists</td>
+<td><code>http.request.body.size</code></td>
+<td>This is only added if <code>measureRequestSize</code> is <code>true</code>.</td>
+</tr>
+<tr>
+<td><code>http.response_content_length_uncompressed</code></td>
+<td>(not included)</td>
+<td>Stable HTTP semconv would use <code>http.response.body.size</code>, but this is an <a href="https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#http-client"><code>Opt-In</code> attribute</a>, so would require adding a configuration option to this instrumentation to enable.</td>
+</tr>
+<tr>
+<td><code>http.response_content_length</code></td>
+<td>(not included)</td>
+<td>Stable HTTP semconv would use <code>http.response.header.&lt;key&gt;</code>, but this is an <a href="https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#http-client"><code>Opt-In</code> attribute</a>, so would require adding a configuration option to this instrumentation to enable.</td>
+</tr>
+<tr>
+<td>(no equivalent)</td>
+<td><code>error.type</code></td>
+<td>The response status (as a string), if the response status was <code>&gt;=400</code>.</td>
+</tr>
+<tr>
+<td><code>http.user_agent</code></td>
+<td>(not included)</td>
+<td>Stable HTTP semconv would use <code>user_agent.original</code>, but this is an <a href="https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#http-client"><code>Opt-In</code> attribute</a>, so would require adding a configuration option to this instrumentation to enable.</td>
+</tr>
+<tr>
+<td><code>http.scheme</code></td>
+<td>(not included)</td>
+<td>Stable HTTP semconv would use <code>url.scheme</code>, but this is an <a href="https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#http-client"><code>Opt-In</code> attribute</a>, so would require adding a configuration option to this instrumentation to enable.</td>
+</tr>
+<tr>
+<td><code>http.status_text</code></td>
+<td>(not included)</td>
+<td>This is no longer a documented semantic conventions attribute.</td>
+</tr>
+<tr>
+<td><code>component</code></td>
+<td>(no replacement)</td>
+<td><code>component</code> was an ancient Span &quot;tag&quot; that was never formalized.</td>
 </tr>
 </tbody>
 </table>
