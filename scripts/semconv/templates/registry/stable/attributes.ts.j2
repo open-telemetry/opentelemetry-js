@@ -33,8 +33,8 @@ export const ATTR_{{ attribute.name | screaming_snake_case }} = (key: string) =>
 {% if attribute.type is mapping %}
 {% for espec in attribute.type.members | sort(attribute='value') %}
 /**
-  * Enum value {{ espec.value | print_member_value }} for attribute {@link ATTR_{{ attribute.name | screaming_snake_case }}}.
-  */
+ * Enum value {{ espec.value | print_member_value }} for attribute {@link ATTR_{{ attribute.name | screaming_snake_case }}}.
+ */
 export const {{ attribute.name | screaming_snake_case }}_VALUE_{{ espec.id | screaming_snake_case }} = {{ espec.value | print_member_value }} as const;
 
 {% endfor %}
