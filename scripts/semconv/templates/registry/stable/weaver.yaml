@@ -22,39 +22,38 @@ default_comment_format: jsdoc
 #   (e.g. https://github.com/open-telemetry/semantic-conventions/issues/1777).
 templates:
   - pattern: attributes.ts.j2
-    # Remove file name prefix when per-pattern params are available https://github.com/open-telemetry/weaver/issues/288
+    file_name: "stable_attributes.ts"
     filter: >
       semconv_attributes({
         "stable_only": true
       }) | {
-        stability: "stable",
         attributes: .
       }
     application_mode: single
   - pattern: attributes.ts.j2
+    file_name: "experimental_attributes.ts"
     filter: >
       semconv_attributes({
         "exclude_stability": ["stable", "", null]
       }) | {
-        stability: "experimental",
         attributes: .
       }
     application_mode: single
   - pattern: metrics.ts.j2
+    file_name: "stable_metrics.ts"
     filter: >
       semconv_metrics({
         "stable_only": true
       }) | {
-        stability: "stable",
         metrics: .
       }
     application_mode: single
   - pattern: metrics.ts.j2
+    file_name: "experimental_metrics.ts"
     filter: >
       semconv_metrics({
         "exclude_stability": ["stable", "", null]
       }) | {
-        stability: "experimental",
         metrics: .
       }
     application_mode: single
