@@ -1,3 +1,6 @@
+# ts-experimental/... generates the "semantic-conventions/src/experimental_*.ts"
+# files.
+
 # Notes:
 # - Use `""` and `null` with `exclude_stability` to skip attributes/metrics that
 #   accidentally do not have a stability set
@@ -5,6 +8,9 @@
 templates:
   - pattern: attributes.ts.j2
     file_name: "experimental_attributes.ts"
+    # This "exclude_stability" does *not* exclude "stable" because it needs
+    # to process *stable* enums that might have *unstable* members. (e.g.,
+    # `db.system.name` is stable, but some of its enum values are not.)
     filter: >
       semconv_attributes({
         "exclude_stability": ["", null]

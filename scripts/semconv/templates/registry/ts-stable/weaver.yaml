@@ -1,3 +1,5 @@
+# ts-stable/... generates the "semantic-conventions/src/stable_*.ts" files.
+
 templates:
   - pattern: attributes.ts.j2
     file_name: "stable_attributes.ts"
