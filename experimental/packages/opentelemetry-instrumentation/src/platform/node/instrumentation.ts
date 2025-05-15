@@ -18,7 +18,7 @@ import * as types from '../../types';
 import * as path from 'path';
 import { types as utilTypes } from 'util';
 import { satisfies } from '../../semver';
-import { wrap, unwrap, massWrap, massUnwrap } from 'shimmer';
+import { wrap, unwrap, massWrap, massUnwrap } from '../../shimmer';
 import { InstrumentationAbstract } from '../../instrumentation';
 import {
   RequireInTheMiddleSingleton,
