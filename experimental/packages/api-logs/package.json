@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/api-logs",
-  "version": "0.200.0-dev.0",
+  "version": "0.200.0",
   "description": "Public logs API for OpenTelemetry",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -79,7 +79,7 @@
     "nyc": "17.1.0",
     "ts-loader": "9.5.2",
     "typescript": "5.0.4",
-    "webpack": "5.96.1"
+    "webpack": "5.99.7"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/api-logs",
   "sideEffects": false

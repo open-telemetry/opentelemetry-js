@@ -38,26 +38,8 @@ export const detectResources = (
     }
   });
 
-  // Future check if verbose logging is enabled issue #1903
-  logResources(resources);
-
   return resources.reduce(
     (acc, resource) => acc.merge(resource),
     emptyResource()
   );
-};
-
-/**
- * Writes debug information about the detected resources to the logger defined in the resource detection config, if one is provided.
- *
- * @param resources The array of {@link Resource} that should be logged. Empty entries will be ignored.
- */
-const logResources = (resources: Array<Resource>) => {
-  resources.forEach(resource => {
-    // Print only populated resources
-    if (Object.keys(resource.attributes).length > 0) {
-      const resourceDebugString = JSON.stringify(resource.attributes, null, 4);
-      diag.verbose(resourceDebugString);
-    }
-  });
 };

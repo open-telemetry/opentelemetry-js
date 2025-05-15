@@ -13,4 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export const GRPC_STATUS_CODE_OK = 0;
+
+/*
+ * This file contains a copy of unstable semantic convention definitions
+ * used by this package.
+ * @see https://github.com/open-telemetry/opentelemetry-js/tree/main/semantic-conventions#unstable-semconv
+ */
+
+/**
+ * The name of the runtime of this process.
+ *
+ * @example OpenJDK Runtime Environment
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_PROCESS_RUNTIME_NAME = 'process.runtime.name' as const;

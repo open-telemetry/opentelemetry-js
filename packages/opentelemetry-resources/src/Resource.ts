@@ -21,6 +21,11 @@ import { RawResourceAttribute } from './types';
  * An interface that represents a resource. A Resource describes the entity for which signals (metrics or trace) are
  * collected.
  *
+ * This interface is NOT user-implementable. Valid ways to obtain a {@link Resource} are by using either of these functions
+ *  - {@link resourceFromAttributes}
+ *  - {@link emptyResource}
+ *  - {@link defaultResource}
+ *  - {@link detectResources}
  */
 export interface Resource {
   /**

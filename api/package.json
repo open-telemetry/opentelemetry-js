@@ -75,7 +75,7 @@
   "devDependencies": {
     "@types/mocha": "10.0.10",
     "@types/node": "^8.10.66",
-    "@types/sinon": "17.0.3",
+    "@types/sinon": "17.0.4",
     "@types/webpack": "5.28.5",
     "@types/webpack-env": "1.16.3",
     "babel-plugin-istanbul": "7.0.0",
@@ -96,7 +96,7 @@
     "ts-loader": "9.5.2",
     "typescript": "5.0.4",
     "unionfs": "4.5.4",
-    "webpack": "5.96.1"
+    "webpack": "5.99.7"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/api",
   "sideEffects": false

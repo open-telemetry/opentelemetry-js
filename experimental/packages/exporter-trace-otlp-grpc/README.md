@@ -24,7 +24,7 @@ To see documentation and sample code for the metric exporter, see the [exporter-
 The OTLPTraceExporter in Node expects the URL to only be the hostname. It will not work with `/v1/traces`.
 
 ```js
-const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
+const { NodeTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-node');
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
 
 const collectorOptions = {
@@ -34,7 +34,7 @@ const collectorOptions = {
 };
 
 const exporter = new OTLPTraceExporter(collectorOptions);
-const provider = new BasicTracerProvider({
+const provider = new NodeTracerProvider({
   spanProcessors: [new SimpleSpanProcessor(exporter)]
 });
 
@@ -50,7 +50,7 @@ By default, plaintext connection is used. In order to use TLS in Node.js, provid
 const fs = require('fs');
 const grpc = require('@grpc/grpc-js');
 
-const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
+const { NodeTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-node');
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
 
 const collectorOptions = {
@@ -61,7 +61,7 @@ const collectorOptions = {
 };
 
 const exporter = new OTLPTraceExporter(collectorOptions);
-const provider = new BasicTracerProvider({
+const provider = new NodeTracerProvider({
   spanProcessors: [new SimpleSpanProcessor(exporter)]
 });
 
@@ -88,7 +88,7 @@ The exporter can be configured to send custom metadata with each request as in t
 ```js
 const grpc = require('@grpc/grpc-js');
 
-const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
+const { NodeTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-node');
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
 
 const metadata = new grpc.Metadata();
@@ -103,7 +103,7 @@ const collectorOptions = {
 };
 
 const exporter = new OTLPTraceExporter(collectorOptions);
-const provider = new BasicTracerProvider({
+const provider = new NodeTracerProvider({
   spanProcessors: [new SimpleSpanProcessor(exporter)]
 });
 

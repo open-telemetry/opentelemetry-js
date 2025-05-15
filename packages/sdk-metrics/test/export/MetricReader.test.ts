@@ -17,7 +17,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MeterProvider } from '../../src/MeterProvider';
-import { assertRejects } from '../test-utils';
 import { emptyResourceMetrics, TestMetricProducer } from './TestMetricProducer';
 import { TestMetricReader } from './TestMetricReader';
 import {
@@ -107,7 +106,7 @@ describe('MetricReader', () => {
     it('should throw on non-initialized instance', async () => {
       const reader = new TestMetricReader();
 
-      await assertRejects(
+      await assert.rejects(
         () => reader.collect(),
         /MetricReader is not bound to a MetricProducer/
       );
@@ -119,7 +118,7 @@ describe('MetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
 
       await reader.shutdown();
-      assertRejects(reader.collect(), /MetricReader is shutdown/);
+      await assert.rejects(reader.collect(), /MetricReader is shutdown/);
     });
 
     it('should call MetricProducer.collect with timeout', async () => {

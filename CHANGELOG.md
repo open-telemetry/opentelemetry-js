@@ -6,8 +6,45 @@ All notable changes to this project will be documented in this file.
 For API changes, see the [API CHANGELOG](api/CHANGELOG.md).
 For experimental package changes, see the [experimental CHANGELOG](experimental/CHANGELOG.md).
 For semantic convention package changes, see the [semconv CHANGELOG](packages/semantic-conventions/CHANGELOG.md).
+For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2.x.md).
 
 ## Unreleased
+
+### :boom: Breaking Changes
+
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+* fix(resources): guard asynchronous resource attribute rejections from causing unhandled promise rejection [#5544](https://github.com/open-telemetry/opentelemetry-js/pull/5544) @dyladan
+* fix(resource): do not trigger `Accessing resource attributes before async attributes settled` warning when detecting resources [#5546](https://github.com/open-telemetry/opentelemetry-js/pull/5546) @dyladan
+  * verbose logging of detected resource removed
+* fix(resource): use dynamic import over require to improve ESM compliance [#5298](https://github.com/open-telemetry/opentelemetry-js/pull/5298) @xiaoxiangmoe
+
+### :books: Documentation
+
+* refactor(metrics): Updated metrics samples to no longer treat `sdk.start()` as async [#5617](https://github.com/open-telemetry/opentelemetry-js/pull/5617) @JacksonWeber
+
+### :house: Internal
+
+* refactor(sdk-trace-base): update semconv usage to ATTR_ exports [#5669](https://github.com/open-telemetry/opentelemetry-js/pull/5669) @trentm
+* refactor(sdk-trace-web): update semconv usage to ATTR_ exports [#5672](https://github.com/open-telemetry/opentelemetry-js/pull/5672) @trentm
+* refactor(resources): update semconv usage to ATTR_ exports [#5666](https://github.com/open-telemetry/opentelemetry-js/pull/5666) @trentm
+* test(sdk-metrics): fix multiple problematic assertRejects() calls [#5611](https://github.com/open-telemetry/opentelemetry-js/pull/5611) @cjihrig
+* refactor: replace assertRejects() with assert.rejects() [#5614](https://github.com/open-telemetry/opentelemetry-js/pull/5614) @cjihrig
+* refactor(core): migrate from deprecated semconv constants [#5575](https://github.com/open-telemetry/opentelemetry-js/pull/5575) @alumni55748
+* refactor(opentelemetry-core): simplify `parseKeyPairsIntoRecord()` [#5610](https://github.com/open-telemetry/opentelemetry-js/pull/5610) @cjihrig
+
+## 2.0.0
+
+### Summary
+
+- The **minimum supported Node.js has been raised to `^18.19.0 || >=20.6.0`**. This means that support for Node.js 14 and 16 has been dropped.
+- The **minimum supported TypeScript version has been raised to 5.0.4**.
+- The **compilation target for transpiled TypeScript has been raised to ES2022** (from ES2017).
+- The **public interface has changed**
+  - for notes on migrating to 2.x / 0.200.x see [the upgrade guide](https://github.com/open-telemetry/opentelemetry-js/tree/main/doc/upgrade-to-2.x.md)
+- Only experimental versions `0.200.0` are compatible with this release
 
 ### :boom: Breaking Change
 
@@ -52,7 +89,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * feat(core)!: remove deprecated samplers [#5316](https://github.com/open-telemetry/opentelemetry-js/pull/5316) @pichlermarc
   * (user-facing): deprecated `AlwaysOnSampler` has moved to `@opentelemetry/sdk-trace-base`
   * (user-facing): deprecated `AlwaysOffSampler` has moved to `@opentelemetry/sdk-trace-base`
-  * (user-facing): deprecated `TraceIdRatioSampler` has moved to `@opentelemetry/sdk-trace-base`
+  * (user-facing): deprecated `ParentBasedSampler` has moved to `@opentelemetry/sdk-trace-base`
   * (user-facing): deprecated `TraceIdRatioSampler` has moved to  `@opentelemetry/sdk-trace-base`
 * feat(resource): Merge sync and async resource interfaces into a single interface [#5350](https://github.com/open-telemetry/opentelemetry-js/pull/5350) @dyladan
   * Resource constructor now takes a single argument which contains an optional `attributes` object
@@ -112,16 +149,29 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore
     * If you have been using the `envDetector` in browser environments, please migrate to manually creating a resource.
     * Note: Node.js environment variable configuration continues to work as-is.
+* fix(sdk-trace-base)!: use `ParentBasedAlwaysOnSampler` over `AlwaysOnSampler` when bogus data is supplied to `OTEL_TRACES_SAMPLER`
+  * this aligns the SDK implementation with the specification
 * feat(core)!: drop `getEnv()`, `getEnvWithoutDefaults()` [#5481](https://github.com/open-telemetry/opentelemetry-js/pull/5481) @pichlermarc
   * (user-facing): `getEnv()` has been replaced by `getStringFromEnv()`, `getNumberFromEnv()`, `getBooleanFromEnv()`, `getStringListFromEnv()`
     * these new functions do not include defaults, please inline any defaults if necessary (example: `getStringFromEnv("OTEL_FOO") ?? "my-default"`)
+    * to find the previously used defaults, please see [here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239)
   * (user-facing): `getEnvWithoutDefaults()` has been replaced by `getStringFromEnv()`, `getNumberFromEnv()`, `getBooleanFromEnv()`, `getStringListFromEnv()`
   * (user-facing): `DEFAULT_ENVIRONMENT` has been removed, please inline any defaults from now on
+    * to find the previously used defaults, please see [here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239)
   * (user-facing): `ENVIRONMENT` has been removed without replacement
   * (user-facing): `RAW_ENVIRONMENT` has been removed without replacement
   * (user-facing): `parseEnvironment` has been removed without replacement
+* feat(sdk-trace-base): remove `BasicTracerProvider#register()` to improve tree-shaking [#5503](https://github.com/open-telemetry/opentelemetry-js/pull/5503) @pichlermarc
+  * (user-facing): `BasicTracerProvider#register()` has been removed
+    * to register a global propagator, please use `propagation.setGlobalPropagator()` from `@opentelemetry/api`
+    * to register a global context manager, please use `context.setGlobalContextManager()` from `@opentelemetry/api`
 * feat!: set compilation target to ES2022 for all packages except `@opentelemetry/api`, `@opentelemetry/api-logs`, `@opentelemetry/api-events`, and `@opentelemetry/semantic-conventions` [#5456](https://github.com/open-telemetry/opentelemetry-js/pull/5456) @david-luna
   * (user-facing): drops browser runtimes which do not support ES2022 features
+* feat(core)! drop unused constants [#5504](https://github.com/open-telemetry/opentelemetry-js/pull/5504) @pichlermarc
+  * (user-facing): `DEFAULT_ATTRIBUTE_VALUE_LENTGHT_LIMIT` has been removed, please use `Infinity` instead
+  * (user-facing): `DEFAULT_ATTRIBUTE_VALUE_COUNT_LIMIT` has been removed, please use `128` instead
+  * (user-facing): `DEFAULT_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT` has been removed, please use `128` instead
+  * (user-facing): `DEFAULT_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT` has been removed, please use `128` instead
 
 ### :rocket: (Enhancement)
 
@@ -137,8 +187,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * fix(exporter-zipkin): remove usages of deprecated `url.parse` from `node:url` [#5390](https://github.com/open-telemetry/opentelemetry-js/pull/5390) @chancancode
 * fix(sdk-metrics): do not export from `PeriodicExportingMetricReader` when there are no metrics to export. [#5288](https://github.com/open-telemetry/opentelemetry-js/pull/5288) @jacksonweber
 * fix(sdk-trace-base): always wait on pending export in SimpleSpanProcessor. [#5303](https://github.com/open-telemetry/opentelemetry-js/pull/5303) @anuraaga
-
-### :books: (Refine Doc)
+* fix(core): avoid using util in configuration.ts for browser compatibility [#5524](https://github.com/open-telemetry/opentelemetry-js/pull/5524) @sriraamas
 
 ### :house: (Internal)
 
