@@ -7,6 +7,9 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :boom: Breaking Changes
 
+* fix: Remove some unstable exports from the *meant to be stable* `@opentelemetry/semantic-conventions` entry point. [#5690](https://github.com/open-telemetry/opentelemetry-js/pull/5690)
+  * Some `DB_SYSTEM_NAME_VALUE_*` exports (enum values for the stable `db.system.name` attribute, erroneously included in v1.33.0) and `NETWORK_TRANSPORT_VALUE_QUIC` (errorneously include since v1.26.0) have been moved back to the *unstable* endpoint (`@opentelemetry/semantic-conventions/incubating`). See the PR description for a full list.
+
 ### :rocket: Features
 
 ### :bug: Bug Fixes
