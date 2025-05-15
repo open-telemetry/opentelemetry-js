@@ -1,6 +1,3 @@
-#XXX
-# "exclude_stability": ["stable", "", null]
-
 # Notes:
 # - Use `""` and `null` with `exclude_stability` to skip attributes/metrics that
 #   accidentally do not have a stability set
