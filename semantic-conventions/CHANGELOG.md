@@ -15,6 +15,191 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :house: Internal
 
+## 1.33.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.33.0 [#5654](https://github.com/open-telemetry/opentelemetry-js/pull/5654) @trentm
+  * Semantic Conventions v1.33.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1330) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *56 added exports*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *1 exported value changed, 6 newly deprecated exports, 1 newly undeprecated export, 57 added exports*
+
+#### Stable changes in v1.33.0
+
+<details open>
+<summary>56 added exports</summary>
+
+```js
+METRIC_DB_CLIENT_OPERATION_DURATION       // db.client.operation.duration
+
+ATTR_CODE_COLUMN_NUMBER                   // code.column.number
+ATTR_CODE_FILE_PATH                       // code.file.path
+ATTR_CODE_FUNCTION_NAME                   // code.function.name
+ATTR_CODE_LINE_NUMBER                     // code.line.number
+ATTR_CODE_STACKTRACE                      // code.stacktrace
+
+ATTR_DB_COLLECTION_NAME                   // db.collection.name
+ATTR_DB_NAMESPACE                         // db.namespace
+ATTR_DB_OPERATION_BATCH_SIZE              // db.operation.batch.size
+ATTR_DB_OPERATION_NAME                    // db.operation.name
+ATTR_DB_QUERY_SUMMARY                     // db.query.summary
+ATTR_DB_QUERY_TEXT                        // db.query.text
+ATTR_DB_RESPONSE_STATUS_CODE              // db.response.status_code
+ATTR_DB_STORED_PROCEDURE_NAME             // db.stored_procedure.name
+ATTR_DB_SYSTEM_NAME                       // db.system.name
+  DB_SYSTEM_NAME_VALUE_ACTIAN_INGRES        // "actian.ingres"
+  DB_SYSTEM_NAME_VALUE_AWS_DYNAMODB         // "aws.dynamodb"
+  DB_SYSTEM_NAME_VALUE_AWS_REDSHIFT         // "aws.redshift"
+  DB_SYSTEM_NAME_VALUE_AZURE_COSMOSDB       // "azure.cosmosdb"
+  DB_SYSTEM_NAME_VALUE_CASSANDRA            // "cassandra"
+  DB_SYSTEM_NAME_VALUE_CLICKHOUSE           // "clickhouse"
+  DB_SYSTEM_NAME_VALUE_COCKROACHDB          // "cockroachdb"
+  DB_SYSTEM_NAME_VALUE_COUCHBASE            // "couchbase"
+  DB_SYSTEM_NAME_VALUE_COUCHDB              // "couchdb"
+  DB_SYSTEM_NAME_VALUE_DERBY                // "derby"
+  DB_SYSTEM_NAME_VALUE_ELASTICSEARCH        // "elasticsearch"
+  DB_SYSTEM_NAME_VALUE_FIREBIRDSQL          // "firebirdsql"
+  DB_SYSTEM_NAME_VALUE_GCP_SPANNER          // "gcp.spanner"
+  DB_SYSTEM_NAME_VALUE_GEODE                // "geode"
+  DB_SYSTEM_NAME_VALUE_H2DATABASE           // "h2database"
+  DB_SYSTEM_NAME_VALUE_HBASE                // "hbase"
+  DB_SYSTEM_NAME_VALUE_HIVE                 // "hive"
+  DB_SYSTEM_NAME_VALUE_HSQLDB               // "hsqldb"
+  DB_SYSTEM_NAME_VALUE_IBM_DB2              // "ibm.db2"
+  DB_SYSTEM_NAME_VALUE_IBM_INFORMIX         // "ibm.informix"
+  DB_SYSTEM_NAME_VALUE_IBM_NETEZZA          // "ibm.netezza"
+  DB_SYSTEM_NAME_VALUE_INFLUXDB             // "influxdb"
+  DB_SYSTEM_NAME_VALUE_INSTANTDB            // "instantdb"
+  DB_SYSTEM_NAME_VALUE_INTERSYSTEMS_CACHE   // "intersystems.cache"
+  DB_SYSTEM_NAME_VALUE_MARIADB              // "mariadb"
+  DB_SYSTEM_NAME_VALUE_MEMCACHED            // "memcached"
+  DB_SYSTEM_NAME_VALUE_MICROSOFT_SQL_SERVER // "microsoft.sql_server"
+  DB_SYSTEM_NAME_VALUE_MONGODB              // "mongodb"
+  DB_SYSTEM_NAME_VALUE_MYSQL                // "mysql"
+  DB_SYSTEM_NAME_VALUE_NEO4J                // "neo4j"
+  DB_SYSTEM_NAME_VALUE_OPENSEARCH           // "opensearch"
+  DB_SYSTEM_NAME_VALUE_ORACLE_DB            // "oracle.db"
+  DB_SYSTEM_NAME_VALUE_OTHER_SQL            // "other_sql"
+  DB_SYSTEM_NAME_VALUE_POSTGRESQL           // "postgresql"
+  DB_SYSTEM_NAME_VALUE_REDIS                // "redis"
+  DB_SYSTEM_NAME_VALUE_SAP_HANA             // "sap.hana"
+  DB_SYSTEM_NAME_VALUE_SAP_MAXDB            // "sap.maxdb"
+  DB_SYSTEM_NAME_VALUE_SOFTWAREAG_ADABAS    // "softwareag.adabas"
+  DB_SYSTEM_NAME_VALUE_SQLITE               // "sqlite"
+  DB_SYSTEM_NAME_VALUE_TERADATA             // "teradata"
+  DB_SYSTEM_NAME_VALUE_TRINO                // "trino"
+```
+
+</details>
+
+#### Unstable changes in v1.33.0
+
+<details>
+<summary>1 exported value changed</summary>
+
+```js
+ATTR_FEATURE_FLAG_PROVIDER_NAME // feature_flag.provider_name -> feature_flag.provider.name
+```
+
+</details>
+
+<details>
+<summary>6 newly deprecated exports</summary>
+
+```js
+METRIC_OTEL_SDK_EXPORTER_SPAN_EXPORTED_COUNT   // otel.sdk.exporter.span.exported.count: Renamed to `otel.sdk.exporter.span.exported`.
+METRIC_OTEL_SDK_EXPORTER_SPAN_INFLIGHT_COUNT   // otel.sdk.exporter.span.inflight.count: Renamed to `otel.sdk.exporter.span.inflight`.
+METRIC_OTEL_SDK_PROCESSOR_SPAN_PROCESSED_COUNT // otel.sdk.processor.span.processed.count: Renamed to `otel.sdk.processor.span.processed`.
+METRIC_OTEL_SDK_SPAN_ENDED_COUNT               // otel.sdk.span.ended.count: Renamed to `otel.sdk.span.ended`.
+METRIC_OTEL_SDK_SPAN_LIVE_COUNT                // otel.sdk.span.live.count: Renamed to `otel.sdk.span.live`.
+ATTR_FEATURE_FLAG_EVALUATION_ERROR_MESSAGE     // feature_flag.evaluation.error.message: Replaced by `error.message`.
+```
+
+</details>
+
+<details>
+<summary>1 newly undeprecated export</summary>
+
+```js
+ATTR_DB_QUERY_PARAMETER // (key) => `db.query.parameter.${key}`
+```
+
+</details>
+
+<details>
+<summary>57 added exports</summary>
+
+```js
+METRIC_JVM_FILE_DESCRIPTOR_COUNT                         // jvm.file_descriptor.count
+
+METRIC_OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED      // otel.sdk.exporter.metric_data_point.exported
+METRIC_OTEL_SDK_EXPORTER_METRIC_DATA_POINT_INFLIGHT      // otel.sdk.exporter.metric_data_point.inflight
+METRIC_OTEL_SDK_EXPORTER_OPERATION_DURATION              // otel.sdk.exporter.operation.duration
+METRIC_OTEL_SDK_EXPORTER_SPAN_EXPORTED                   // otel.sdk.exporter.span.exported
+METRIC_OTEL_SDK_EXPORTER_SPAN_INFLIGHT                   // otel.sdk.exporter.span.inflight
+METRIC_OTEL_SDK_METRIC_READER_COLLECTION_DURATION        // otel.sdk.metric_reader.collection.duration
+METRIC_OTEL_SDK_PROCESSOR_SPAN_PROCESSED                 // otel.sdk.processor.span.processed
+METRIC_OTEL_SDK_SPAN_ENDED                               // otel.sdk.span.ended
+METRIC_OTEL_SDK_SPAN_LIVE                                // otel.sdk.span.live
+
+ATTR_APP_SCREEN_COORDINATE_X                             // app.screen.coordinate.x
+ATTR_APP_SCREEN_COORDINATE_Y                             // app.screen.coordinate.y
+ATTR_APP_WIDGET_ID                                       // app.widget.id
+ATTR_APP_WIDGET_NAME                                     // app.widget.name
+
+ATTR_CICD_PIPELINE_ACTION_NAME                           // cicd.pipeline.action.name
+  CICD_PIPELINE_ACTION_NAME_VALUE_BUILD                    // "BUILD"
+  CICD_PIPELINE_ACTION_NAME_VALUE_RUN                      // "RUN"
+  CICD_PIPELINE_ACTION_NAME_VALUE_SYNC                     // "SYNC"
+ATTR_CICD_PIPELINE_TASK_RUN_RESULT                       // cicd.pipeline.task.run.result
+  CICD_PIPELINE_TASK_RUN_RESULT_VALUE_CANCELLATION         // "cancellation"
+  CICD_PIPELINE_TASK_RUN_RESULT_VALUE_ERROR                // "error"
+  CICD_PIPELINE_TASK_RUN_RESULT_VALUE_FAILURE              // "failure"
+  CICD_PIPELINE_TASK_RUN_RESULT_VALUE_SKIP                 // "skip"
+  CICD_PIPELINE_TASK_RUN_RESULT_VALUE_SUCCESS              // "success"
+  CICD_PIPELINE_TASK_RUN_RESULT_VALUE_TIMEOUT              // "timeout"
+ATTR_CICD_WORKER_ID                                      // cicd.worker.id
+ATTR_CICD_WORKER_NAME                                    // cicd.worker.name
+ATTR_CICD_WORKER_URL_FULL                                // cicd.worker.url.full
+
+GEN_AI_OPERATION_NAME_VALUE_GENERATE_CONTENT             // "generate_content"
+GEN_AI_OPERATION_NAME_VALUE_INVOKE_AGENT                 // "invoke_agent"
+GEN_AI_SYSTEM_VALUE_GCP_GEMINI                           // "gcp.gemini"
+GEN_AI_SYSTEM_VALUE_GCP_GEN_AI                           // "gcp.gen_ai"
+GEN_AI_SYSTEM_VALUE_GCP_VERTEX_AI                        // "gcp.vertex_ai"
+ATTR_GEN_AI_TOOL_DESCRIPTION                             // gen_ai.tool.description
+
+ATTR_JVM_GC_CAUSE                                        // jvm.gc.cause
+
+ATTR_K8S_CRONJOB_ANNOTATION                              // (key) => `k8s.cronjob.annotation.${key}`
+ATTR_K8S_CRONJOB_LABEL                                   // (key) => `k8s.cronjob.label.${key}`
+ATTR_K8S_DAEMONSET_ANNOTATION                            // (key) => `k8s.daemonset.annotation.${key}`
+ATTR_K8S_DAEMONSET_LABEL                                 // (key) => `k8s.daemonset.label.${key}`
+ATTR_K8S_DEPLOYMENT_ANNOTATION                           // (key) => `k8s.deployment.annotation.${key}`
+ATTR_K8S_DEPLOYMENT_LABEL                                // (key) => `k8s.deployment.label.${key}`
+ATTR_K8S_JOB_ANNOTATION                                  // (key) => `k8s.job.annotation.${key}`
+ATTR_K8S_JOB_LABEL                                       // (key) => `k8s.job.label.${key}`
+ATTR_K8S_NAMESPACE_ANNOTATION                            // (key) => `k8s.namespace.annotation.${key}`
+ATTR_K8S_NAMESPACE_LABEL                                 // (key) => `k8s.namespace.label.${key}`
+ATTR_K8S_NODE_ANNOTATION                                 // (key) => `k8s.node.annotation.${key}`
+ATTR_K8S_NODE_LABEL                                      // (key) => `k8s.node.label.${key}`
+ATTR_K8S_REPLICASET_ANNOTATION                           // (key) => `k8s.replicaset.annotation.${key}`
+ATTR_K8S_REPLICASET_LABEL                                // (key) => `k8s.replicaset.label.${key}`
+ATTR_K8S_STATEFULSET_ANNOTATION                          // (key) => `k8s.statefulset.annotation.${key}`
+ATTR_K8S_STATEFULSET_LABEL                               // (key) => `k8s.statefulset.label.${key}`
+
+OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_METRIC_EXPORTER      // "otlp_grpc_metric_exporter"
+OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_METRIC_EXPORTER // "otlp_http_json_metric_exporter"
+OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER      // "otlp_http_metric_exporter"
+OTEL_COMPONENT_TYPE_VALUE_PERIODIC_METRIC_READER         // "periodic_metric_reader"
+
+ATTR_PROCESS_ENVIRONMENT_VARIABLE                        // (key) => `process.environment_variable.${key}`
+
+VCS_PROVIDER_NAME_VALUE_GITEA                            // "gitea"
+```
+
+</details>
+
 ## 1.32.0
 
 ### :rocket: Features

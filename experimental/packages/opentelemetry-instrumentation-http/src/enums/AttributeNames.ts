@@ -13,4 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export const GRPC_STATUS_CODE_OK = 0;
+
+/**
+ * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/http.md
+ */
+export enum AttributeNames {
+  HTTP_ERROR_NAME = 'http.error_name',
+  HTTP_ERROR_MESSAGE = 'http.error_message',
+  HTTP_STATUS_TEXT = 'http.status_text',
+}

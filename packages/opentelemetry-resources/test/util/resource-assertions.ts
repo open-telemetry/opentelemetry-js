@@ -17,45 +17,48 @@
 import { SDK_INFO } from '@opentelemetry/core';
 import * as assert from 'assert';
 import {
-  SEMRESATTRS_CLOUD_ACCOUNT_ID,
-  SEMRESATTRS_CLOUD_AVAILABILITY_ZONE,
-  SEMRESATTRS_CLOUD_PROVIDER,
-  SEMRESATTRS_CLOUD_REGION,
-  SEMRESATTRS_CONTAINER_ID,
-  SEMRESATTRS_CONTAINER_IMAGE_NAME,
-  SEMRESATTRS_CONTAINER_IMAGE_TAG,
-  SEMRESATTRS_CONTAINER_NAME,
-  SEMRESATTRS_HOST_ID,
-  SEMRESATTRS_HOST_IMAGE_ID,
-  SEMRESATTRS_HOST_IMAGE_NAME,
-  SEMRESATTRS_HOST_IMAGE_VERSION,
-  SEMRESATTRS_HOST_NAME,
-  SEMRESATTRS_HOST_TYPE,
-  SEMRESATTRS_K8S_CLUSTER_NAME,
-  SEMRESATTRS_K8S_DEPLOYMENT_NAME,
-  SEMRESATTRS_K8S_NAMESPACE_NAME,
-  SEMRESATTRS_K8S_POD_NAME,
-  SEMRESATTRS_PROCESS_COMMAND,
-  SEMRESATTRS_PROCESS_COMMAND_ARGS,
-  SEMRESATTRS_PROCESS_EXECUTABLE_NAME,
-  SEMRESATTRS_PROCESS_EXECUTABLE_PATH,
-  SEMRESATTRS_PROCESS_OWNER,
-  SEMRESATTRS_PROCESS_PID,
-  SEMRESATTRS_PROCESS_RUNTIME_DESCRIPTION,
-  SEMRESATTRS_PROCESS_RUNTIME_NAME,
-  SEMRESATTRS_PROCESS_RUNTIME_VERSION,
-  SEMRESATTRS_SERVICE_INSTANCE_ID,
-  SEMRESATTRS_SERVICE_NAME,
-  SEMRESATTRS_SERVICE_NAMESPACE,
-  SEMRESATTRS_SERVICE_VERSION,
-  SEMRESATTRS_TELEMETRY_SDK_LANGUAGE,
-  SEMRESATTRS_TELEMETRY_SDK_NAME,
-  SEMRESATTRS_TELEMETRY_SDK_VERSION,
-  SEMRESATTRS_WEBENGINE_DESCRIPTION,
-  SEMRESATTRS_WEBENGINE_NAME,
-  SEMRESATTRS_WEBENGINE_VERSION,
+  ATTR_SERVICE_NAME,
+  ATTR_SERVICE_VERSION,
+  ATTR_TELEMETRY_SDK_LANGUAGE,
+  ATTR_TELEMETRY_SDK_NAME,
+  ATTR_TELEMETRY_SDK_VERSION,
 } from '@opentelemetry/semantic-conventions';
-import * as semconv from '@opentelemetry/semantic-conventions';
+import * as semconvIncubating from '@opentelemetry/semantic-conventions/incubating';
+
+import {
+  ATTR_CLOUD_ACCOUNT_ID,
+  ATTR_CLOUD_AVAILABILITY_ZONE,
+  ATTR_CLOUD_PROVIDER,
+  ATTR_CLOUD_REGION,
+  ATTR_CONTAINER_ID,
+  ATTR_CONTAINER_IMAGE_NAME,
+  ATTR_CONTAINER_IMAGE_TAGS,
+  ATTR_CONTAINER_NAME,
+  ATTR_HOST_ID,
+  ATTR_HOST_IMAGE_ID,
+  ATTR_HOST_IMAGE_NAME,
+  ATTR_HOST_IMAGE_VERSION,
+  ATTR_HOST_NAME,
+  ATTR_HOST_TYPE,
+  ATTR_K8S_CLUSTER_NAME,
+  ATTR_K8S_DEPLOYMENT_NAME,
+  ATTR_K8S_NAMESPACE_NAME,
+  ATTR_K8S_POD_NAME,
+  ATTR_PROCESS_COMMAND,
+  ATTR_PROCESS_COMMAND_ARGS,
+  ATTR_PROCESS_EXECUTABLE_NAME,
+  ATTR_PROCESS_EXECUTABLE_PATH,
+  ATTR_PROCESS_OWNER,
+  ATTR_PROCESS_PID,
+  ATTR_PROCESS_RUNTIME_DESCRIPTION,
+  ATTR_PROCESS_RUNTIME_NAME,
+  ATTR_PROCESS_RUNTIME_VERSION,
+  ATTR_SERVICE_INSTANCE_ID,
+  ATTR_SERVICE_NAMESPACE,
+  ATTR_WEBENGINE_DESCRIPTION,
+  ATTR_WEBENGINE_NAME,
+  ATTR_WEBENGINE_VERSION,
+} from '../../src/semconv';
 import { DetectedResource } from '../../src/types';
 
 /**
@@ -76,22 +79,22 @@ export const assertCloudResource = (
   assertHasOneLabel('CLOUD', resource);
   if (validations.provider)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_CLOUD_PROVIDER],
+      resource.attributes?.[ATTR_CLOUD_PROVIDER],
       validations.provider
     );
   if (validations.accountId)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_CLOUD_ACCOUNT_ID],
+      resource.attributes?.[ATTR_CLOUD_ACCOUNT_ID],
       validations.accountId
     );
   if (validations.region)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_CLOUD_REGION],
+      resource.attributes?.[ATTR_CLOUD_REGION],
       validations.region
     );
   if (validations.zone)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_CLOUD_AVAILABILITY_ZONE],
+      resource.attributes?.[ATTR_CLOUD_AVAILABILITY_ZONE],
       validations.zone
     );
 };
@@ -108,29 +111,29 @@ export const assertContainerResource = (
     name?: string;
     id?: string;
     imageName?: string;
-    imageTag?: string;
+    imageTags?: string[];
   }
 ) => {
   assertHasOneLabel('CONTAINER', resource);
   if (validations.name)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_CONTAINER_NAME],
+      resource.attributes?.[ATTR_CONTAINER_NAME],
       validations.name
     );
   if (validations.id)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_CONTAINER_ID],
+      resource.attributes?.[ATTR_CONTAINER_ID],
       validations.id
     );
   if (validations.imageName)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_CONTAINER_IMAGE_NAME],
+      resource.attributes?.[ATTR_CONTAINER_IMAGE_NAME],
       validations.imageName
     );
-  if (validations.imageTag)
-    assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_CONTAINER_IMAGE_TAG],
-      validations.imageTag
+  if (validations.imageTags)
+    assert.deepStrictEqual(
+      resource.attributes?.[ATTR_CONTAINER_IMAGE_TAGS],
+      validations.imageTags
     );
 };
 
@@ -154,33 +157,27 @@ export const assertHostResource = (
 ) => {
   assertHasOneLabel('HOST', resource);
   if (validations.id)
-    assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_HOST_ID],
-      validations.id
-    );
+    assert.strictEqual(resource.attributes?.[ATTR_HOST_ID], validations.id);
   if (validations.name)
-    assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_HOST_NAME],
-      validations.name
-    );
+    assert.strictEqual(resource.attributes?.[ATTR_HOST_NAME], validations.name);
   if (validations.hostType)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_HOST_TYPE],
+      resource.attributes?.[ATTR_HOST_TYPE],
       validations.hostType
     );
   if (validations.imageName)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_HOST_IMAGE_NAME],
+      resource.attributes?.[ATTR_HOST_IMAGE_NAME],
       validations.imageName
     );
   if (validations.imageId)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_HOST_IMAGE_ID],
+      resource.attributes?.[ATTR_HOST_IMAGE_ID],
       validations.imageId
     );
   if (validations.imageVersion)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_HOST_IMAGE_VERSION],
+      resource.attributes?.[ATTR_HOST_IMAGE_VERSION],
       validations.imageVersion
     );
 };
@@ -203,22 +200,22 @@ export const assertK8sResource = (
   assertHasOneLabel('K8S', resource);
   if (validations.clusterName)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_K8S_CLUSTER_NAME],
+      resource.attributes?.[ATTR_K8S_CLUSTER_NAME],
       validations.clusterName
     );
   if (validations.namespaceName)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_K8S_NAMESPACE_NAME],
+      resource.attributes?.[ATTR_K8S_NAMESPACE_NAME],
       validations.namespaceName
     );
   if (validations.podName)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_K8S_POD_NAME],
+      resource.attributes?.[ATTR_K8S_POD_NAME],
       validations.podName
     );
   if (validations.deploymentName)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_K8S_DEPLOYMENT_NAME],
+      resource.attributes?.[ATTR_K8S_DEPLOYMENT_NAME],
       validations.deploymentName
     );
 };
@@ -238,25 +235,25 @@ export const assertTelemetrySDKResource = (
   }
 ) => {
   const defaults = {
-    name: SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_NAME],
-    language: SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
-    version: SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_VERSION],
+    name: SDK_INFO[ATTR_TELEMETRY_SDK_NAME],
+    language: SDK_INFO[ATTR_TELEMETRY_SDK_LANGUAGE],
+    version: SDK_INFO[ATTR_TELEMETRY_SDK_VERSION],
   };
   validations = { ...defaults, ...validations };
 
   if (validations.name)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_TELEMETRY_SDK_NAME],
+      resource.attributes?.[ATTR_TELEMETRY_SDK_NAME],
       validations.name
     );
   if (validations.language)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
+      resource.attributes?.[ATTR_TELEMETRY_SDK_LANGUAGE],
       validations.language
     );
   if (validations.version)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_TELEMETRY_SDK_VERSION],
+      resource.attributes?.[ATTR_TELEMETRY_SDK_VERSION],
       validations.version
     );
 };
@@ -277,21 +274,21 @@ export const assertServiceResource = (
   }
 ) => {
   assert.strictEqual(
-    resource.attributes?.[SEMRESATTRS_SERVICE_NAME],
+    resource.attributes?.[ATTR_SERVICE_NAME],
     validations.name
   );
   assert.strictEqual(
-    resource.attributes?.[SEMRESATTRS_SERVICE_INSTANCE_ID],
+    resource.attributes?.[ATTR_SERVICE_INSTANCE_ID],
     validations.instanceId
   );
   if (validations.namespace)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_SERVICE_NAMESPACE],
+      resource.attributes?.[ATTR_SERVICE_NAMESPACE],
       validations.namespace
     );
   if (validations.version)
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_SERVICE_VERSION],
+      resource.attributes?.[ATTR_SERVICE_VERSION],
       validations.version
     );
 };
@@ -316,55 +313,52 @@ export const assertResource = (
     runtimeDescription?: string;
   }
 ) => {
-  assert.strictEqual(
-    resource.attributes?.[SEMRESATTRS_PROCESS_PID],
-    validations.pid
-  );
+  assert.strictEqual(resource.attributes?.[ATTR_PROCESS_PID], validations.pid);
   if (validations.name) {
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_PROCESS_EXECUTABLE_NAME],
+      resource.attributes?.[ATTR_PROCESS_EXECUTABLE_NAME],
       validations.name
     );
   }
   if (validations.command) {
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_PROCESS_COMMAND],
+      resource.attributes?.[ATTR_PROCESS_COMMAND],
       validations.command
     );
   }
   if (validations.commandArgs) {
     assert.deepStrictEqual(
-      resource.attributes?.[SEMRESATTRS_PROCESS_COMMAND_ARGS],
+      resource.attributes?.[ATTR_PROCESS_COMMAND_ARGS],
       validations.commandArgs
     );
   }
   if (validations.executablePath) {
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_PROCESS_EXECUTABLE_PATH],
+      resource.attributes?.[ATTR_PROCESS_EXECUTABLE_PATH],
       validations.executablePath
     );
   }
   if (validations.owner) {
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_PROCESS_OWNER],
+      resource.attributes?.[ATTR_PROCESS_OWNER],
       validations.owner
     );
   }
   if (validations.version) {
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_PROCESS_RUNTIME_VERSION],
+      resource.attributes?.[ATTR_PROCESS_RUNTIME_VERSION],
       validations.version
     );
   }
   if (validations.runtimeName) {
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_PROCESS_RUNTIME_NAME],
+      resource.attributes?.[ATTR_PROCESS_RUNTIME_NAME],
       validations.runtimeName
     );
   }
   if (validations.runtimeDescription) {
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_PROCESS_RUNTIME_DESCRIPTION],
+      resource.attributes?.[ATTR_PROCESS_RUNTIME_DESCRIPTION],
       validations.runtimeDescription
     );
   }
@@ -380,19 +374,19 @@ export const assertWebEngineResource = (
 ) => {
   if (validations.name) {
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_WEBENGINE_NAME],
+      resource.attributes?.[ATTR_WEBENGINE_NAME],
       validations.name
     );
   }
   if (validations.version) {
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_WEBENGINE_VERSION],
+      resource.attributes?.[ATTR_WEBENGINE_VERSION],
       validations.version
     );
   }
   if (validations.description) {
     assert.strictEqual(
-      resource.attributes?.[SEMRESATTRS_WEBENGINE_DESCRIPTION],
+      resource.attributes?.[ATTR_WEBENGINE_DESCRIPTION],
       validations.description
     );
   }
@@ -415,9 +409,11 @@ const assertHasOneLabel = (
   prefix: string,
   resource: DetectedResource
 ): void => {
-  const semconvModPrefix = `SEMRESATTRS_${prefix.toUpperCase()}_`;
+  const semconvModPrefix = `ATTR_${prefix.toUpperCase()}_`;
+  // Look at exports from the "incubating" entry-point because it includes both
+  // stable and unstable semconv exports.
   const knownAttrs: Set<string> = new Set(
-    Object.entries(semconv)
+    Object.entries(semconvIncubating)
       .filter(
         ([k, v]) => typeof v === 'string' && k.startsWith(semconvModPrefix)
       )
@@ -432,6 +428,6 @@ const assertHasOneLabel = (
       prefix +
       '] matching the following attributes: ' +
       Array.from(knownAttrs).join(', ') +
-      JSON.stringify(Object.keys(semconv))
+      JSON.stringify(Object.keys(semconvIncubating))
   );
 };
