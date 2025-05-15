@@ -27,6 +27,7 @@ git fetch origin "${SPEC_VERSION}" --depth=1
 git reset --hard FETCH_HEAD
 cd ${SCRIPT_DIR}
 
+# Generate "semantic-conventions/src/stable_*.ts".
 docker run --rm --platform linux/amd64 \
   -v ${SCRIPT_DIR}/semantic-conventions/model:/source \
   -v ${SCRIPT_DIR}/templates:/weaver/templates \
@@ -35,7 +36,19 @@ docker run --rm --platform linux/amd64 \
   registry generate \
   --registry=/source \
   --templates=/weaver/templates \
-  stable \
+  ts-stable \
+  /output/
+
+# Generate "semantic-conventions/src/experimental_*.ts".
+docker run --rm --platform linux/amd64 \
+  -v ${SCRIPT_DIR}/semantic-conventions/model:/source \
+  -v ${SCRIPT_DIR}/templates:/weaver/templates \
+  -v ${ROOT_DIR}/semantic-conventions/src/:/output \
+  otel/weaver:$GENERATOR_VERSION \
+  registry generate \
+  --registry=/source \
+  --templates=/weaver/templates \
+  ts-experimental \
   /output/
 
 # Ensure semconv compiles

@@ -325,134 +325,9 @@ export const ATTR_DB_STORED_PROCEDURE_NAME = 'db.stored_procedure.name' as const
 export const ATTR_DB_SYSTEM_NAME = 'db.system.name' as const;
 
 /**
- * Enum value "actian.ingres" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_ACTIAN_INGRES = "actian.ingres" as const;
-
-/**
- * Enum value "aws.dynamodb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_AWS_DYNAMODB = "aws.dynamodb" as const;
-
-/**
- * Enum value "aws.redshift" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_AWS_REDSHIFT = "aws.redshift" as const;
-
-/**
- * Enum value "azure.cosmosdb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_AZURE_COSMOSDB = "azure.cosmosdb" as const;
-
-/**
- * Enum value "cassandra" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_CASSANDRA = "cassandra" as const;
-
-/**
- * Enum value "clickhouse" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_CLICKHOUSE = "clickhouse" as const;
-
-/**
- * Enum value "cockroachdb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_COCKROACHDB = "cockroachdb" as const;
-
-/**
- * Enum value "couchbase" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_COUCHBASE = "couchbase" as const;
-
-/**
- * Enum value "couchdb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_COUCHDB = "couchdb" as const;
-
-/**
- * Enum value "derby" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_DERBY = "derby" as const;
-
-/**
- * Enum value "elasticsearch" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_ELASTICSEARCH = "elasticsearch" as const;
-
-/**
- * Enum value "firebirdsql" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_FIREBIRDSQL = "firebirdsql" as const;
-
-/**
- * Enum value "gcp.spanner" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_GCP_SPANNER = "gcp.spanner" as const;
-
-/**
- * Enum value "geode" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_GEODE = "geode" as const;
-
-/**
- * Enum value "h2database" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_H2DATABASE = "h2database" as const;
-
-/**
- * Enum value "hbase" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_HBASE = "hbase" as const;
-
-/**
- * Enum value "hive" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_HIVE = "hive" as const;
-
-/**
- * Enum value "hsqldb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_HSQLDB = "hsqldb" as const;
-
-/**
- * Enum value "ibm.db2" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_IBM_DB2 = "ibm.db2" as const;
-
-/**
- * Enum value "ibm.informix" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_IBM_INFORMIX = "ibm.informix" as const;
-
-/**
- * Enum value "ibm.netezza" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_IBM_NETEZZA = "ibm.netezza" as const;
-
-/**
- * Enum value "influxdb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_INFLUXDB = "influxdb" as const;
-
-/**
- * Enum value "instantdb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_INSTANTDB = "instantdb" as const;
-
-/**
- * Enum value "intersystems.cache" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_INTERSYSTEMS_CACHE = "intersystems.cache" as const;
-
-/**
  * Enum value "mariadb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
  */
 export const DB_SYSTEM_NAME_VALUE_MARIADB = "mariadb" as const;
-
-/**
- * Enum value "memcached" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_MEMCACHED = "memcached" as const;
 
 /**
  * Enum value "microsoft.sql_server" for attribute {@link ATTR_DB_SYSTEM_NAME}.
@@ -460,74 +335,14 @@ export const DB_SYSTEM_NAME_VALUE_MEMCACHED = "memcached" as const;
 export const DB_SYSTEM_NAME_VALUE_MICROSOFT_SQL_SERVER = "microsoft.sql_server" as const;
 
 /**
- * Enum value "mongodb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_MONGODB = "mongodb" as const;
-
-/**
  * Enum value "mysql" for attribute {@link ATTR_DB_SYSTEM_NAME}.
  */
 export const DB_SYSTEM_NAME_VALUE_MYSQL = "mysql" as const;
 
 /**
- * Enum value "neo4j" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_NEO4J = "neo4j" as const;
-
-/**
- * Enum value "opensearch" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_OPENSEARCH = "opensearch" as const;
-
-/**
- * Enum value "oracle.db" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_ORACLE_DB = "oracle.db" as const;
-
-/**
- * Enum value "other_sql" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_OTHER_SQL = "other_sql" as const;
-
-/**
  * Enum value "postgresql" for attribute {@link ATTR_DB_SYSTEM_NAME}.
  */
 export const DB_SYSTEM_NAME_VALUE_POSTGRESQL = "postgresql" as const;
-
-/**
- * Enum value "redis" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_REDIS = "redis" as const;
-
-/**
- * Enum value "sap.hana" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_SAP_HANA = "sap.hana" as const;
-
-/**
- * Enum value "sap.maxdb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_SAP_MAXDB = "sap.maxdb" as const;
-
-/**
- * Enum value "softwareag.adabas" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_SOFTWAREAG_ADABAS = "softwareag.adabas" as const;
-
-/**
- * Enum value "sqlite" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_SQLITE = "sqlite" as const;
-
-/**
- * Enum value "teradata" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_TERADATA = "teradata" as const;
-
-/**
- * Enum value "trino" for attribute {@link ATTR_DB_SYSTEM_NAME}.
- */
-export const DB_SYSTEM_NAME_VALUE_TRINO = "trino" as const;
 
 /**
  * Name of the garbage collector managed heap generation.
@@ -948,11 +763,6 @@ export const ATTR_NETWORK_TRANSPORT = 'network.transport' as const;
  * Enum value "pipe" for attribute {@link ATTR_NETWORK_TRANSPORT}.
  */
 export const NETWORK_TRANSPORT_VALUE_PIPE = "pipe" as const;
-
-/**
- * Enum value "quic" for attribute {@link ATTR_NETWORK_TRANSPORT}.
- */
-export const NETWORK_TRANSPORT_VALUE_QUIC = "quic" as const;
 
 /**
  * Enum value "tcp" for attribute {@link ATTR_NETWORK_TRANSPORT}.
