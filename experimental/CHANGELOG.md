@@ -8,6 +8,19 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* feat(oltp-transformer)!: move each serializer to its own entrypoint [#5263](https://github.com/open-telemetry/opentelemetry-js/pull/5263) @pichlermarc
+  * This package depends on all signals, as well as `protobuf.js`, so some bundlers like rollup would issue warnings even if the user made a conscious decision to not use a protobuf exporter
+  * (user-facing) All types except for `ISerializer` were removed from the main entrypoint, to get previously exported types, use the following entrypoints
+    * `@opentelemetry/otlp-transformer/metrics`: metrics export service return types
+    * `@opentelemetry/otlp-transformer/metrics/json`: metrics json serializer
+    * `@opentelemetry/otlp-transformer/metrics/protobuf`: metrics protobuf serializer
+    * `@opentelemetry/otlp-transformer/trace`: trace export service return types
+    * `@opentelemetry/otlp-transformer/trace/trace`: trace json serializer
+    * `@opentelemetry/otlp-transformer/trace/protobuf`: trace protobuf serializer
+    * `@opentelemetry/otlp-transformer/experimental/logs`: logs export service return types
+    * `@opentelemetry/otlp-transformer/experimental/logs/trace`: logs export service return types
+    * `@opentelemetry/otlp-transformer/experimental/logs/protobuf`: logs export service return types
+
 ### :rocket: Features
 
 * feat(instrumentation-xml-http-request): support migration to stable HTTP semconv, v1.23.1  [#5662](https://github.com/open-telemetry/opentelemetry-js/pull/5662) @trentm
@@ -59,18 +72,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * chore!: Raise the minimum supported Node.js version to `^18.19.0 || >=20.6.0`. Support for Node.js 14, 16, and early minor versions of 18 and 20 have been dropped. This applies to all packages except the 'api' and 'semantic-conventions' packages. [#5395](https://github.com/open-telemetry/opentelemetry-js/issues/5395) @trentm
 * feat(sdk-node)!: use `IMetricReader` over `MetricReader` [#5311](https://github.com/open-telemetry/opentelemetry-js/pull/5311)
   * (user-facing): `NodeSDKConfiguration` now provides the more general `IMetricReader` type over `MetricReader`
-* feat(oltp-transformer)!: move each serializer to its own entrypoint [#5263](https://github.com/open-telemetry/opentelemetry-js/pull/5263) @pichlermarc
-  * This package depends on all signals, as well as `protobuf.js`, so some bundlers like rollup would issue warnings even if the user made a conscious decision to not use a protobuf exporter
-  * (user-facing) All types except for `ISerializer` were removed from the main entrypoint, to get previously exported types, use the following entrypoints
-    * `@opentelemetry/otlp-transformer/metrics`: metrics export service return types
-    * `@opentelemetry/otlp-transformer/metrics/json`: metrics json serializer
-    * `@opentelemetry/otlp-transformer/metrics/protobuf`: metrics protobuf serializer
-    * `@opentelemetry/otlp-transformer/trace`: trace export service return types
-    * `@opentelemetry/otlp-transformer/trace/trace`: trace json serializer
-    * `@opentelemetry/otlp-transformer/trace/protobuf`: trace protobuf serializer
-    * `@opentelemetry/otlp-transformer/logs`: logs export service return types
-    * `@opentelemetry/otlp-transformer/logs/trace`: logs export service return types
-    * `@opentelemetry/otlp-transformer/logs/protobuf`: logs export service return types
 * feat(exporter-metrics-otlp-http)!: do not read environment variables from window in browsers [#5473](https://github.com/open-telemetry/opentelemetry-js/pull/5473) @pichlermarc
   * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore, please pass configuration options to constructors instead.
   * Note: Node.js environment variable configuration continues to work as-is.
