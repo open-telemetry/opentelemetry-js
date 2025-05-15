@@ -56,16 +56,12 @@ class HttpExporterTransport implements IExporterTransport {
     // intentionally left empty, nothing to do.
   }
 
-  private async _loadUtils(): Utils {
+  private async _loadUtils(): Promise<Utils> {
     let utils = this._utils;
 
     if (utils === null) {
-      const { sendWithHttp, createHttpAgent } = 
       // Lazy require to ensure that http/https is not required before instrumentations can wrap it.
-      const {
-        sendWithHttp,
-        createHttpAgent,
-      } = await import(
+      const { sendWithHttp, createHttpAgent } = await import(
         './http-transport-utils'
       );
 
