@@ -33,7 +33,8 @@ export const ATTR_{{ attribute.name | screaming_snake_case }} = (key: string) =>
 {% endif %}
 {% if attribute.type is mapping %}
 {% for espec in attribute.type.members | sort(attribute='value') %}
-{% if espec is not stable %}
+{#- Grandfather NETWORK_TRANSPORT_VALUE_QUIC as stable until v1.34.0 is released. #}
+{% if espec is not stable and not (attribute.name == 'network.transport' and espec.value == 'quic') %}
 /**
  * Enum value {{ espec.value | print_member_value }} for attribute {@link ATTR_{{ attribute.name | screaming_snake_case }}}.
  */

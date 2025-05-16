@@ -7439,11 +7439,6 @@ export const NETWORK_IO_DIRECTION_VALUE_RECEIVE = "receive" as const;
 export const NETWORK_IO_DIRECTION_VALUE_TRANSMIT = "transmit" as const;
 
 /**
- * Enum value "quic" for attribute {@link ATTR_NETWORK_TRANSPORT}.
- */
-export const NETWORK_TRANSPORT_VALUE_QUIC = "quic" as const;
-
-/**
  * The state of event loop time.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.

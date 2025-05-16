@@ -765,6 +765,11 @@ export const ATTR_NETWORK_TRANSPORT = 'network.transport' as const;
 export const NETWORK_TRANSPORT_VALUE_PIPE = "pipe" as const;
 
 /**
+ * Enum value "quic" for attribute {@link ATTR_NETWORK_TRANSPORT}.
+ */
+export const NETWORK_TRANSPORT_VALUE_QUIC = "quic" as const;
+
+/**
  * Enum value "tcp" for attribute {@link ATTR_NETWORK_TRANSPORT}.
  */
 export const NETWORK_TRANSPORT_VALUE_TCP = "tcp" as const;
