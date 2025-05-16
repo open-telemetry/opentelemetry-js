@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1747345903839,
+  "lastUpdate": 1747429780447,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -32972,6 +32972,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.52%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4e2703c3e01a3c15f21e25c4afa1d6a04f54d6ea",
+          "message": "fix(instrumentation): change `SemconvStability` export from `const enum` to `enum` (#5692)",
+          "timestamp": "2025-05-16T21:00:10Z",
+          "tree_id": "1d356ee95257d675e343dccddb4c4a2ffd19119d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/4e2703c3e01a3c15f21e25c4afa1d6a04f54d6ea"
+        },
+        "date": 1747429779338,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1488505,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18575,
+            "range": "±0.15%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 787207,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 724321,
+            "range": "±0.16%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
