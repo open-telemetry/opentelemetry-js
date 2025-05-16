@@ -21,6 +21,7 @@
 
 {% for attribute in ctx.attributes | attribute_sort %}
 {% if attribute.name not in params.excluded_attributes %}
+{% if attribute is not stable %}
 {{d.docstring(attribute, "attribute")}}
 {% if attribute.type is not template_type %}
 export const ATTR_{{ attribute.name | screaming_snake_case }} = '{{attribute.name}}' as const;
@@ -29,13 +30,17 @@ export const ATTR_{{ attribute.name | screaming_snake_case }} = '{{attribute.nam
 export const ATTR_{{ attribute.name | screaming_snake_case }} = (key: string) => `{{attribute.name}}.${key}`;
 
 {% endif %}
+{% endif %}
 {% if attribute.type is mapping %}
 {% for espec in attribute.type.members | sort(attribute='value') %}
+{#- Grandfather NETWORK_TRANSPORT_VALUE_QUIC as stable until v1.34.0 is released. #}
+{% if espec is not stable and not (attribute.name == 'network.transport' and espec.value == 'quic') %}
 /**
  * Enum value {{ espec.value | print_member_value }} for attribute {@link ATTR_{{ attribute.name | screaming_snake_case }}}.
  */
 export const {{ attribute.name | screaming_snake_case }}_VALUE_{{ espec.id | screaming_snake_case }} = {{ espec.value | print_member_value }} as const;
 
+{% endif %}
 {% endfor %}
 {% endif %}
 {% endif %}
