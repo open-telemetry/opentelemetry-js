@@ -180,6 +180,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
   * (user-facing): `DEFAULT_ATTRIBUTE_VALUE_COUNT_LIMIT` has been removed, please use `128` instead
   * (user-facing): `DEFAULT_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT` has been removed, please use `128` instead
   * (user-facing): `DEFAULT_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT` has been removed, please use `128` instead
+* feat(core)!: defer tracestate validation until is modified [#5499](https://github.com/open-telemetry/opentelemetry-js/pull/5499) @david-luna
+  * (user-facing): a given `TraceState` cannot be assumed to have valid members unless it's modified.
 
 ### :rocket: (Enhancement)
 
