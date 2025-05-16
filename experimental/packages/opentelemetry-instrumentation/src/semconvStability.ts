@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export const enum SemconvStability {
+export enum SemconvStability {
   /** Emit only stable semantic conventions. */
   STABLE = 0x1,
   /** Emit only old semantic conventions. */
