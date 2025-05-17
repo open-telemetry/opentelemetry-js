@@ -54,6 +54,7 @@ instrumentation.disable();
 import * as http from 'http';
 import * as https from 'https';
 import { httpsRequest } from '../utils/httpsRequest';
+import { normalizeHeaders } from '../../src/utils';
 
 const applyCustomAttributesOnSpanErrorMessage =
   'bad applyCustomAttributesOnSpan function';
@@ -189,9 +190,10 @@ describe('HttpsInstrumentation', () => {
             );
           },
           ignoreOutgoingRequestHook: request => {
-            if (request.headers?.['user-agent'] != null) {
+            const headers = normalizeHeaders(request.headers);
+            if (headers['user-agent'] != null) {
               return (
-                `${request.headers['user-agent']}`.match('ignored-string') !=
+                `${headers['user-agent']}`.match('ignored-string') !=
                 null
               );
             }
@@ -536,7 +538,7 @@ describe('HttpsInstrumentation', () => {
 
         const promiseRequest = new Promise((resolve, _reject) => {
           const req = https.request(options, (resp: http.IncomingMessage) => {
-            resp.on('data', () => {});
+            resp.on('data', () => { });
             resp.on('end', () => {
               resolve({});
             });
@@ -660,7 +662,7 @@ describe('HttpsInstrumentation', () => {
         nock(host).get('/').reply(404);
         const req = https.request(`${host}/`);
         req.on('response', response => {
-          response.on('data', () => {});
+          response.on('data', () => { });
           response.on('end', () => {
             const spans = memoryExporter.getFinishedSpans();
             const [span] = spans;
