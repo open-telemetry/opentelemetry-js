@@ -18,23 +18,27 @@
  * @module @opentelemetry/api
  */
 
-export { BaggageEntry, BaggageEntryMetadata, Baggage } from './baggage/types';
+export type {
+  BaggageEntry,
+  BaggageEntryMetadata,
+  Baggage,
+} from './baggage/types';
 export { baggageEntryMetadataFromString } from './baggage/utils';
-export { Exception } from './common/Exception';
-export { HrTime, TimeInput } from './common/Time';
-export { Attributes, AttributeValue } from './common/Attributes';
+export type { Exception } from './common/Exception';
+export type { HrTime, TimeInput } from './common/Time';
+export type { Attributes, AttributeValue } from './common/Attributes';
 
 // Context APIs
 export { createContextKey, ROOT_CONTEXT } from './context/context';
-export { Context, ContextManager } from './context/types';
+export type { Context, ContextManager } from './context/types';
 export type { ContextAPI } from './api/context';
 
 // Diag APIs
 export { DiagConsoleLogger } from './diag/consoleLogger';
-export {
+export { DiagLogLevel } from './diag/types';
+export type {
   DiagLogFunction,
   DiagLogger,
-  DiagLogLevel,
   ComponentLoggerOptions,
   DiagLoggerOptions,
 } from './diag/types';
@@ -42,10 +46,10 @@ export type { DiagAPI } from './api/diag';
 
 // Metrics APIs
 export { createNoopMeter } from './metrics/NoopMeter';
-export { MeterOptions, Meter } from './metrics/Meter';
-export { MeterProvider } from './metrics/MeterProvider';
-export {
-  ValueType,
+export type { MeterOptions, Meter } from './metrics/Meter';
+export type { MeterProvider } from './metrics/MeterProvider';
+export { ValueType } from './metrics/Metric';
+export type {
   Counter,
   Gauge,
   Histogram,
@@ -61,7 +65,7 @@ export {
   MetricAttributeValue,
   ObservableCallback,
 } from './metrics/Metric';
-export {
+export type {
   BatchObservableResult,
   ObservableResult,
 } from './metrics/ObservableResult';
@@ -69,32 +73,34 @@ export type { MetricsAPI } from './api/metrics';
 
 // Propagation APIs
 export {
+  defaultTextMapGetter,
+  defaultTextMapSetter,
+} from './propagation/TextMapPropagator';
+export type {
   TextMapPropagator,
   TextMapSetter,
   TextMapGetter,
-  defaultTextMapGetter,
-  defaultTextMapSetter,
 } from './propagation/TextMapPropagator';
 export type { PropagationAPI } from './api/propagation';
 
 // Trace APIs
-export { SpanAttributes, SpanAttributeValue } from './trace/attributes';
-export { Link } from './trace/link';
-export { ProxyTracer, TracerDelegator } from './trace/ProxyTracer';
+export type { SpanAttributes, SpanAttributeValue } from './trace/attributes';
+export type { Link } from './trace/link';
+export { ProxyTracer, type TracerDelegator } from './trace/ProxyTracer';
 export { ProxyTracerProvider } from './trace/ProxyTracerProvider';
-export { Sampler } from './trace/Sampler';
-export { SamplingDecision, SamplingResult } from './trace/SamplingResult';
-export { SpanContext } from './trace/span_context';
+export type { Sampler } from './trace/Sampler';
+export { SamplingDecision, type SamplingResult } from './trace/SamplingResult';
+export type { SpanContext } from './trace/span_context';
 export { SpanKind } from './trace/span_kind';
-export { Span } from './trace/span';
-export { SpanOptions } from './trace/SpanOptions';
-export { SpanStatus, SpanStatusCode } from './trace/status';
+export type { Span } from './trace/span';
+export type { SpanOptions } from './trace/SpanOptions';
+export { type SpanStatus, SpanStatusCode } from './trace/status';
 export { TraceFlags } from './trace/trace_flags';
-export { TraceState } from './trace/trace_state';
+export type { TraceState } from './trace/trace_state';
 export { createTraceState } from './trace/internal/utils';
-export { TracerProvider } from './trace/tracer_provider';
-export { Tracer } from './trace/tracer';
-export { TracerOptions } from './trace/tracer_options';
+export type { TracerProvider } from './trace/tracer_provider';
+export type { Tracer } from './trace/tracer';
+export type { TracerOptions } from './trace/tracer_options';
 export {
   isSpanContextValid,
   isValidTraceId,
