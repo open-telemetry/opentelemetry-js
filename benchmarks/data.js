@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1747753271584,
+  "lastUpdate": 1747757451947,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -33232,6 +33232,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.63%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "1c8ec3b291f7df63d08506f41f5d076e9a9cdcac",
+          "message": "fix(semantic-conventions): Remove the subset of `DB_SYSTEM_NAME_VALUE_*` exports that are unstable from the `@opentelemetry/semantic-conventions` entry point. (#5690)",
+          "timestamp": "2025-05-20T15:59:50Z",
+          "tree_id": "703f0ddd6ff29844c3491c308d00c9ea623ef8a7",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/1c8ec3b291f7df63d08506f41f5d076e9a9cdcac"
+        },
+        "date": 1747757450877,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1495009,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18341,
+            "range": "±0.17%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 832737,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 775352,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
