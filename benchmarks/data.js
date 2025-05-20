@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1747726762875,
+  "lastUpdate": 1747753271584,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -33178,6 +33178,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 809964,
             "range": "±0.35%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "deejay1@srem.org",
+            "name": "Łukasz Jernaś",
+            "username": "deejay1"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "85f1bcc256c5a4ef7788f0e3cbbdf67a3d86edd3",
+          "message": "chore(opentelemetry-instrumentation-http): Fix link to docs (#5699)\n\nSigned-off-by: Łukasz Jernaś <lukasz.jernas@allegro.com>",
+          "timestamp": "2025-05-20T14:52:06Z",
+          "tree_id": "775a8bac22061e56e669ce445eb68737eb873dcc",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/85f1bcc256c5a4ef7788f0e3cbbdf67a3d86edd3"
+        },
+        "date": 1747753270493,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1552314,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18572,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 807589,
+            "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 751873,
+            "range": "±0.63%",
             "unit": "ops/sec",
             "extra": "97 samples"
           }
