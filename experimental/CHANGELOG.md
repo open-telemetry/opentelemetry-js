@@ -8,6 +8,19 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* feat(oltp-transformer)!: move each serializer to its own entrypoint [#5263](https://github.com/open-telemetry/opentelemetry-js/pull/5263) @pichlermarc
+  * This package depends on all signals, as well as `protobuf.js`, so some bundlers like rollup would issue warnings even if the user made a conscious decision to not use a protobuf exporter
+  * (user-facing) All types except for `ISerializer` were removed from the main entrypoint, to get previously exported types, use the following entrypoints
+    * `@opentelemetry/otlp-transformer/metrics`: metrics export service return types
+    * `@opentelemetry/otlp-transformer/metrics/json`: metrics json serializer
+    * `@opentelemetry/otlp-transformer/metrics/protobuf`: metrics protobuf serializer
+    * `@opentelemetry/otlp-transformer/trace`: trace export service return types
+    * `@opentelemetry/otlp-transformer/trace/trace`: trace json serializer
+    * `@opentelemetry/otlp-transformer/trace/protobuf`: trace protobuf serializer
+    * `@opentelemetry/otlp-transformer/experimental/logs`: logs export service return types
+    * `@opentelemetry/otlp-transformer/experimental/logs/trace`: logs export service return types
+    * `@opentelemetry/otlp-transformer/experimental/logs/protobuf`: logs export service return types
+
 ### :rocket: Features
 
 ### :bug: Bug Fixes
