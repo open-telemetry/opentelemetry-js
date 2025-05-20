@@ -7,9 +7,6 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :boom: Breaking Changes
 
-* fix: Remove the subset of `DB_SYSTEM_NAME_VALUE_*` exports that are unstable from the `@opentelemetry/semantic-conventions` entry point. [#5690](https://github.com/open-telemetry/opentelemetry-js/pull/5690)
-  * Version 1.33.0 erroneously included all `DB_SYSTEM_NAME_VALUE_*` constants in the stable entry point. Some of those enum values are not yet stable. They have been moved back to the unstable `@opentelemetry/semantic-conventions/incubating` entry point. See the PR description for a full list.
-
 ### :rocket: Features
 
 ### :bug: Bug Fixes
@@ -17,6 +14,13 @@ All notable changes to the semantic-conventions package will be documented in th
 ### :books: Documentation
 
 ### :house: Internal
+
+## 1.33.1
+
+### :boom: Breaking Changes
+
+* fix: Remove the subset of `DB_SYSTEM_NAME_VALUE_*` exports that are unstable from the `@opentelemetry/semantic-conventions` entry point. [#5690](https://github.com/open-telemetry/opentelemetry-js/pull/5690)
+  * Version 1.33.0 erroneously included all `DB_SYSTEM_NAME_VALUE_*` constants in the stable entry point. Some of those enum values are not yet stable. They have been moved back to the unstable `@opentelemetry/semantic-conventions/incubating` entry point. See the PR description for a full list.
 
 ## 1.33.0
 
