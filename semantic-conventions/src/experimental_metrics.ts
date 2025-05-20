@@ -242,7 +242,7 @@ export const METRIC_DB_CLIENT_CONNECTION_WAIT_TIME = 'db.client.connection.wait_
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Replaced by `db.client.connection.create_time`. Note: the unit also changed from `ms` to `s`.
+ * @deprecated Replaced by `db.client.connection.create_time` with unit `s`.
  */
 export const METRIC_DB_CLIENT_CONNECTIONS_CREATE_TIME = 'db.client.connections.create_time' as const;
 
@@ -305,7 +305,7 @@ export const METRIC_DB_CLIENT_CONNECTIONS_USAGE = 'db.client.connections.usage' 
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Replaced by `db.client.connection.use_time`. Note: the unit also changed from `ms` to `s`.
+ * @deprecated Replaced by `db.client.connection.use_time` with unit `s`.
  */
 export const METRIC_DB_CLIENT_CONNECTIONS_USE_TIME = 'db.client.connections.use_time' as const;
 
@@ -314,7 +314,7 @@ export const METRIC_DB_CLIENT_CONNECTIONS_USE_TIME = 'db.client.connections.use_
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Replaced by `db.client.connection.wait_time`. Note: the unit also changed from `ms` to `s`.
+ * @deprecated Replaced by `db.client.connection.wait_time` with unit `s`.
  */
 export const METRIC_DB_CLIENT_CONNECTIONS_WAIT_TIME = 'db.client.connections.wait_time' as const;
 
@@ -1068,12 +1068,6 @@ export const METRIC_K8S_REPLICASET_DESIRED_PODS = 'k8s.replicaset.desired_pods' 
 /**
  * Deprecated, use `k8s.replicationcontroller.available_pods` instead.
  *
- * @note This metric aligns with the `availableReplicas` field of the
- * [K8s ReplicationControllerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicationcontrollerstatus-v1-core)
- *
- * This metric **SHOULD**, at a minimum, be reported against a
- * [`k8s.replicationcontroller`](../resource/k8s.md#replicationcontroller) resource.
- *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
  * @deprecated Replaced by `k8s.replicationcontroller.available_pods`.
@@ -1082,12 +1076,6 @@ export const METRIC_K8S_REPLICATION_CONTROLLER_AVAILABLE_PODS = 'k8s.replication
 
 /**
  * Deprecated, use `k8s.replicationcontroller.desired_pods` instead.
- *
- * @note This metric aligns with the `replicas` field of the
- * [K8s ReplicationControllerSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicationcontrollerspec-v1-core)
- *
- * This metric **SHOULD**, at a minimum, be reported against a
- * [`k8s.replicationcontroller`](../resource/k8s.md#replicationcontroller) resource.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -1238,11 +1226,11 @@ export const METRIC_MESSAGING_PROCESS_MESSAGES = 'messaging.process.messages' as
 export const METRIC_MESSAGING_PUBLISH_DURATION = 'messaging.publish.duration' as const;
 
 /**
- * Deprecated. Use `messaging.client.produced.messages` instead.
+ * Deprecated. Use `messaging.client.sent.messages` instead.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Replaced by `messaging.client.produced.messages`.
+ * @deprecated Replaced by `messaging.client.sent.messages`.
  */
 export const METRIC_MESSAGING_PUBLISH_MESSAGES = 'messaging.publish.messages' as const;
 
@@ -1412,7 +1400,7 @@ export const METRIC_OTEL_SDK_EXPORTER_SPAN_EXPORTED = 'otel.sdk.exporter.span.ex
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Renamed to `otel.sdk.exporter.span.exported`.
+ * @deprecated Replaced by `otel.sdk.exporter.span.exported`.
  */
 export const METRIC_OTEL_SDK_EXPORTER_SPAN_EXPORTED_COUNT = 'otel.sdk.exporter.span.exported.count' as const;
 
@@ -1430,7 +1418,7 @@ export const METRIC_OTEL_SDK_EXPORTER_SPAN_INFLIGHT = 'otel.sdk.exporter.span.in
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Renamed to `otel.sdk.exporter.span.inflight`.
+ * @deprecated Replaced by `otel.sdk.exporter.span.inflight`.
  */
 export const METRIC_OTEL_SDK_EXPORTER_SPAN_INFLIGHT_COUNT = 'otel.sdk.exporter.span.inflight.count' as const;
 
@@ -1495,7 +1483,7 @@ export const METRIC_OTEL_SDK_PROCESSOR_SPAN_PROCESSED = 'otel.sdk.processor.span
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Renamed to `otel.sdk.processor.span.processed`.
+ * @deprecated Replaced by `otel.sdk.processor.span.processed`.
  */
 export const METRIC_OTEL_SDK_PROCESSOR_SPAN_PROCESSED_COUNT = 'otel.sdk.processor.span.processed.count' as const;
 
@@ -1532,7 +1520,7 @@ export const METRIC_OTEL_SDK_SPAN_ENDED = 'otel.sdk.span.ended' as const;
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Renamed to `otel.sdk.span.ended`.
+ * @deprecated Replaced by `otel.sdk.span.ended`.
  */
 export const METRIC_OTEL_SDK_SPAN_ENDED_COUNT = 'otel.sdk.span.ended.count' as const;
 
@@ -1551,7 +1539,7 @@ export const METRIC_OTEL_SDK_SPAN_LIVE = 'otel.sdk.span.live' as const;
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Renamed to `otel.sdk.span.live`.
+ * @deprecated Replaced by `otel.sdk.span.live`.
  */
 export const METRIC_OTEL_SDK_SPAN_LIVE_COUNT = 'otel.sdk.span.live.count' as const;
 
