@@ -55,7 +55,7 @@ export interface StartOutgoingSpanCustomAttributeFunction {
 }
 
 /**
- * Options available for the HTTP instrumentation (see [documentation](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-http#http-instrumentation-options))
+ * Options available for the HTTP instrumentation (see [documentation](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-http#http-instrumentation-options))
  */
 export interface HttpInstrumentationConfig extends InstrumentationConfig {
   /** Not trace all incoming requests that matched with custom function */
