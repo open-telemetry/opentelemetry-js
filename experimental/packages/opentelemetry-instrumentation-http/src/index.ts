@@ -15,7 +15,7 @@
  */
 
 export { HttpInstrumentation } from './http';
-export {
+export type {
   HttpCustomAttributeFunction,
   HttpInstrumentationConfig,
   HttpRequestCustomAttributeFunction,
