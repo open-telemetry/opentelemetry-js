@@ -9,6 +9,16 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 1.34.0
+
+### :rocket: Features
+
 * feat: update semantic conventions to v1.34.0 [#5703](https://github.com/open-telemetry/opentelemetry-js/pull/5703) @trentm
   * Semantic Conventions v1.34.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1340) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * `@opentelemetry/semantic-conventions` (stable) changes: *none*
@@ -37,12 +47,6 @@ ATTR_GEN_AI_DATA_SOURCE_ID                // gen_ai.data_source.id
 ```
 
 </details>
-
-### :bug: Bug Fixes
-
-### :books: Documentation
-
-### :house: Internal
 
 ## 1.33.1
 
