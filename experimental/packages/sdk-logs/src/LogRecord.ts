@@ -39,6 +39,7 @@ export class LogRecord implements ReadableLogRecord {
   private _severityText?: string;
   private _severityNumber?: logsAPI.SeverityNumber;
   private _body?: LogBody;
+  private _eventName?: string;
   private totalAttributesCount: number = 0;
 
   private _isReadonly: boolean = false;
@@ -74,6 +75,16 @@ export class LogRecord implements ReadableLogRecord {
     return this._body;
   }
 
+  get eventName(): string | undefined {
+    return this._eventName;
+  }
+  set eventName(eventName: string | undefined) {
+    if (this._isLogRecordReadonly()) {
+      return;
+    }
+    this._eventName = eventName;
+  }
+
   get droppedAttributesCount(): number {
     return this.totalAttributesCount - Object.keys(this.attributes).length;
   }
@@ -86,6 +97,7 @@ export class LogRecord implements ReadableLogRecord {
     const {
       timestamp,
       observedTimestamp,
+      eventName,
       severityNumber,
       severityText,
       body,
@@ -109,6 +121,7 @@ export class LogRecord implements ReadableLogRecord {
     this.resource = _sharedState.resource;
     this.instrumentationScope = instrumentationScope;
     this._logRecordLimits = _sharedState.logRecordLimits;
+    this._eventName = eventName;
     this.setAttributes(attributes);
   }
 
