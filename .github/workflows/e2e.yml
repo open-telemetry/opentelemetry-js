@@ -65,6 +65,10 @@ jobs:
       - name: Run E2E Tests
         run: make test
         working-directory: e2e
+      - name: kill collector
+        run: |
+          pkill -f otelcol-contrib
+        working-directory: e2e
       - name: Print output
         run: jq --indent 2 '.' otel-collector-output.json
         working-directory: e2e
