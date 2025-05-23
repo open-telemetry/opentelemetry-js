@@ -18,10 +18,9 @@ run-collector: create-output-json
 		$(COLLECTOR_IMAGE) --config /etc/otelcol/config.yaml
 	@sleep 5
 
-test: run-collector
+test:
 	@echo "Running tests..."
 	node $(TEST_SCRIPT)
-	$(MAKE) stop-collector
 
 stop-collector:
 	@echo "Stopping OpenTelemetry Collector Docker container..."
