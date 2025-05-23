@@ -53,6 +53,8 @@ jobs:
       - name: Build 🔧
         run: npm run compile
 
+
+      - run: cd e2e
       - name: Run E2E Tests
         run: make test
       - name: Print output
