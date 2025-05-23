@@ -1,0 +1,21 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: e2e
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run E2E Tests
+        run: make test
+      - name: Print output
+        run: jq --indent 2 '.' otel-collector-output.json
+      - name: verify span name
+        run: verify.sh

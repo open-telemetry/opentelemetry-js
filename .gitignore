@@ -11,6 +11,9 @@ yarn-error.log*
 # Filter Logs singal files
 !experimental/examples/logs
 
+# test files
+e2e/otel-collector-output.json
+
 # Runtime data
 pids
 *.pid

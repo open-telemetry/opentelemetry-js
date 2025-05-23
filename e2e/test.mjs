@@ -54,8 +54,8 @@ async function main() {
 
     // Create a metric
     const meter = metrics.getMeter('example-meter');
-    const gauge = meter.createUpDownCounter('example_gauge');
-    gauge.add(42, { foo: 'bar' });
+    const counter = meter.createUpDownCounter('example_counter');
+    counter.add(42, { foo: 'bar' });
 
     // Create a log
     const logger = logs.getLogger('example-logger');
