@@ -3,9 +3,6 @@
     "private": true,
     "description": "End-to-end tests for OpenTelemetry JS",
     "version": "0.0.0",
-    "scripts": {
-        "test": "node test/index.js"
-    },
     "dependencies": {
         "@opentelemetry/api": "*",
         "@opentelemetry/api-logs": "*",
