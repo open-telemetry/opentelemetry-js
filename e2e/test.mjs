@@ -61,7 +61,7 @@ async function main() {
     const logger = logs.getLogger('example-logger');
     logger.emit({
         severityText: 'INFO',
-        body: 'This is an example log message',
+        body: 'test-log-body',
         attributes: { foo: 'bar' },
     });
 
