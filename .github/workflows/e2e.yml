@@ -69,9 +69,9 @@ jobs:
         run: |
           pkill -f otelcol-contrib
         working-directory: e2e
-      - name: Print output
-        run: jq --indent 2 '.' otel-collector-output.json
-        working-directory: e2e
       - name: verify span name
         run: verify.sh
+        working-directory: e2e
+      - name: Print output
+        run: jq --indent 2 'select( . != null )' otel-collector-output.json
         working-directory: e2e
