@@ -14,38 +14,37 @@
  * limitations under the License.
  */
 
-import * as sinon from 'sinon';
-import * as assert from 'assert';
+import { diag } from '@opentelemetry/api';
 import { SDK_INFO } from '@opentelemetry/core';
-import { Resource } from '../src';
 import {
-  SEMRESATTRS_SERVICE_NAME,
-  SEMRESATTRS_TELEMETRY_SDK_LANGUAGE,
-  SEMRESATTRS_TELEMETRY_SDK_NAME,
-  SEMRESATTRS_TELEMETRY_SDK_VERSION,
+  ATTR_SERVICE_NAME,
+  ATTR_TELEMETRY_SDK_LANGUAGE,
+  ATTR_TELEMETRY_SDK_NAME,
+  ATTR_TELEMETRY_SDK_VERSION,
 } from '@opentelemetry/semantic-conventions';
+import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { describeBrowser, describeNode } from './util';
-import { Attributes, diag } from '@opentelemetry/api';
-import { Resource as Resource190 } from '@opentelemetry/resources_1.9.0';
+import { defaultResource, emptyResource, resourceFromAttributes } from '../src';
+import * as EventEmitter from 'events';
 
 describe('Resource', () => {
-  const resource1 = new Resource({
+  const resource1 = resourceFromAttributes({
     'k8s.io/container/name': 'c1',
     'k8s.io/namespace/name': 'default',
     'k8s.io/pod/name': 'pod-xyz-123',
   });
-  const resource2 = new Resource({
+  const resource2 = resourceFromAttributes({
     'k8s.io/zone': 'zone1',
     'k8s.io/location': 'location',
   });
-  const resource3 = new Resource({
+  const resource3 = resourceFromAttributes({
     'k8s.io/container/name': 'c2',
     'k8s.io/location': 'location1',
   });
-  const emptyResource = new Resource({});
 
   it('should return merged resource', () => {
-    const expectedResource = new Resource({
+    const expectedResource = resourceFromAttributes({
       'k8s.io/container/name': 'c1',
       'k8s.io/namespace/name': 'default',
       'k8s.io/pod/name': 'pod-xyz-123',
@@ -54,11 +53,14 @@ describe('Resource', () => {
     });
     const actualResource = resource1.merge(resource2);
     assert.strictEqual(Object.keys(actualResource.attributes).length, 5);
-    assert.deepStrictEqual(actualResource, expectedResource);
+    assert.deepStrictEqual(
+      actualResource.attributes,
+      expectedResource.attributes
+    );
   });
 
   it('should return merged resource when collision in attributes', () => {
-    const expectedResource = new Resource({
+    const expectedResource = resourceFromAttributes({
       'k8s.io/container/name': 'c2',
       'k8s.io/namespace/name': 'default',
       'k8s.io/pod/name': 'pod-xyz-123',
@@ -66,29 +68,32 @@ describe('Resource', () => {
     });
     const actualResource = resource1.merge(resource3);
     assert.strictEqual(Object.keys(actualResource.attributes).length, 4);
-    assert.deepStrictEqual(actualResource, expectedResource);
+    assert.deepStrictEqual(
+      actualResource.attributes,
+      expectedResource.attributes
+    );
   });
 
   it('should return merged resource when first resource is empty', () => {
-    const actualResource = emptyResource.merge(resource2);
+    const actualResource = emptyResource().merge(resource2);
     assert.strictEqual(Object.keys(actualResource.attributes).length, 2);
-    assert.deepStrictEqual(actualResource, resource2);
+    assert.deepStrictEqual(actualResource.attributes, resource2.attributes);
   });
 
   it('should return merged resource when other resource is empty', () => {
-    const actualResource = resource1.merge(emptyResource);
+    const actualResource = resource1.merge(emptyResource());
     assert.strictEqual(Object.keys(actualResource.attributes).length, 3);
-    assert.deepStrictEqual(actualResource, resource1);
+    assert.deepStrictEqual(actualResource.attributes, resource1.attributes);
   });
 
   it('should return merged resource when other resource is null', () => {
     const actualResource = resource1.merge(null);
     assert.strictEqual(Object.keys(actualResource.attributes).length, 3);
-    assert.deepStrictEqual(actualResource, resource1);
+    assert.deepStrictEqual(actualResource.attributes, resource1.attributes);
   });
 
   it('should accept string, number, and boolean values', () => {
-    const resource = new Resource({
+    const resource = resourceFromAttributes({
       'custom.string': 'strvalue',
       'custom.number': 42,
       'custom.boolean': true,
@@ -100,12 +105,11 @@ describe('Resource', () => {
 
   it('should log when accessing attributes before async attributes promise has settled', () => {
     const debugStub = sinon.spy(diag, 'error');
-    const resource = new Resource(
-      {},
-      new Promise(resolve => {
+    const resource = resourceFromAttributes({
+      async: new Promise(resolve => {
         setTimeout(resolve, 1);
-      })
-    );
+      }),
+    });
 
     resource.attributes;
 
@@ -116,93 +120,71 @@ describe('Resource', () => {
     );
   });
 
-  describe('.empty()', () => {
-    it('should return an empty resource (except required service name)', () => {
-      const resource = Resource.empty();
-      assert.deepStrictEqual(Object.keys(resource.attributes), []);
-    });
-
-    it('should return the same empty resource', () => {
-      assert.strictEqual(Resource.empty(), Resource.empty());
-    });
-
-    it('should return false for asyncAttributesPending immediately', () => {
-      assert.ok(!Resource.empty().asyncAttributesPending);
-    });
-  });
-
   describe('asynchronous attributes', () => {
     afterEach(() => {
       sinon.restore();
     });
 
     it('should return false for asyncAttributesPending if no promise provided', () => {
-      assert.ok(!new Resource({ foo: 'bar' }).asyncAttributesPending);
-      assert.ok(!Resource.empty().asyncAttributesPending);
-      assert.ok(!Resource.default().asyncAttributesPending);
+      assert.ok(!resourceFromAttributes({ foo: 'bar' }).asyncAttributesPending);
+      assert.ok(!emptyResource().asyncAttributesPending);
+      assert.ok(!defaultResource().asyncAttributesPending);
     });
 
     it('should return false for asyncAttributesPending once promise settles', async () => {
-      const clock = sinon.useFakeTimers();
-      const resourceResolve = new Resource(
-        {},
-        new Promise(resolve => {
+      const resourceResolve = resourceFromAttributes({
+        async: new Promise(resolve => {
           setTimeout(resolve, 1);
-        })
-      );
-      const resourceReject = new Resource(
-        {},
-        new Promise((_, reject) => {
-          setTimeout(reject, 1);
-        })
-      );
+        }),
+      });
+      const resourceReject = resourceFromAttributes({
+        async: new Promise((_, reject) => {
+          setTimeout(() => {
+            reject(new Error('reject'));
+          }, 1);
+        }),
+      });
 
       for (const resource of [resourceResolve, resourceReject]) {
         assert.ok(resource.asyncAttributesPending);
-        await clock.nextAsync();
         await resource.waitForAsyncAttributes?.();
         assert.ok(!resource.asyncAttributesPending);
       }
     });
 
     it('should merge async attributes into sync attributes once resolved', async () => {
-      //async attributes that resolve after 1 ms
-      const asyncAttributes = new Promise<Attributes>(resolve => {
-        setTimeout(
-          () => resolve({ async: 'fromasync', shared: 'fromasync' }),
-          1
-        );
+      const resource = resourceFromAttributes({
+        sync: 'fromsync',
+        // async attribute resolves after 1ms
+        async: new Promise(resolve =>
+          setTimeout(() => resolve('fromasync'), 1)
+        ),
       });
-
-      const resource = new Resource(
-        { sync: 'fromsync', shared: 'fromsync' },
-        asyncAttributes
-      );
 
       await resource.waitForAsyncAttributes?.();
       assert.deepStrictEqual(resource.attributes, {
         sync: 'fromsync',
-        // async takes precedence
-        shared: 'fromasync',
         async: 'fromasync',
       });
     });
 
     it('should merge async attributes when both resources have promises', async () => {
-      const resource1 = new Resource(
-        {},
-        Promise.resolve({ promise1: 'promise1val', shared: 'promise1val' })
-      );
-      const resource2 = new Resource(
-        {},
-        Promise.resolve({ promise2: 'promise2val', shared: 'promise2val' })
-      );
+      const resource1 = resourceFromAttributes({
+        promise1: Promise.resolve('promise1val'),
+        shared: Promise.resolve('promise1val'),
+      });
+      const resource2 = resourceFromAttributes({
+        promise2: Promise.resolve('promise2val'),
+        shared: Promise.resolve('promise2val'),
+      });
       // this one rejects
-      const resource3 = new Resource({}, Promise.reject(new Error('reject')));
-      const resource4 = new Resource(
-        {},
-        Promise.resolve({ promise4: 'promise4val', shared: 'promise4val' })
-      );
+      const resource3 = resourceFromAttributes({
+        err: Promise.reject(new Error('reject')),
+      });
+      const resource4 = resourceFromAttributes({
+        promise4: Promise.resolve('promise4val'),
+        shared: Promise.resolve('promise4val'),
+      });
 
       const merged = resource1
         .merge(resource2)
@@ -220,12 +202,12 @@ describe('Resource', () => {
     });
 
     it('should merge async attributes correctly when resource1 fulfils after resource2', async () => {
-      const resource1 = new Resource(
-        {},
-        Promise.resolve({ promise1: 'promise1val', shared: 'promise1val' })
-      );
+      const resource1 = resourceFromAttributes({
+        promise1: Promise.resolve('promise1val'),
+        shared: Promise.resolve('promise1val'),
+      });
 
-      const resource2 = new Resource({
+      const resource2 = resourceFromAttributes({
         promise2: 'promise2val',
         shared: 'promise2val',
       });
@@ -242,19 +224,15 @@ describe('Resource', () => {
     });
 
     it('should merge async attributes correctly when resource2 fulfils after resource1', async () => {
-      const resource1 = new Resource(
-        { shared: 'promise1val' },
-        Promise.resolve({ promise1: 'promise1val' })
-      );
-
-      //async attributes that resolve after 1 ms
-      const asyncAttributes = new Promise<Attributes>(resolve => {
-        setTimeout(
-          () => resolve({ promise2: 'promise2val', shared: 'promise2val' }),
-          1
-        );
+      const resource1 = resourceFromAttributes({
+        promise1: Promise.resolve('promise1val'),
+        shared: 'promise1val',
       });
-      const resource2 = new Resource({}, asyncAttributes);
+
+      const resource2 = resourceFromAttributes({
+        promise2: new Promise(res => setTimeout(() => res('promise2val'), 1)),
+        shared: new Promise(res => setTimeout(() => res('promise2val'), 1)),
+      });
 
       const merged = resource1.merge(resource2);
 
@@ -270,34 +248,62 @@ describe('Resource', () => {
     it('should log when promise rejects', async () => {
       const debugStub = sinon.spy(diag, 'debug');
 
-      const resource = new Resource({}, Promise.reject(new Error('rejected')));
+      const resource = resourceFromAttributes({
+        rejected: Promise.reject(new Error('rejected')),
+      });
       await resource.waitForAsyncAttributes?.();
 
       assert.ok(
-        debugStub.calledWithMatch(
-          "a resource's async attributes promise rejected"
-        )
+        debugStub.calledWithMatch('promise rejection for resource attribute')
       );
+    });
+
+    it('should guard against asynchronous attribute rejections', async () => {
+      const ee = new EventEmitter();
+      const badAttribute = new Promise<string>((resolve, reject) => {
+        ee.on('fail', reason => reject(reason));
+      });
+      const goodAttribute = new Promise<string>((resolve, reject) => {
+        ee.on('fail', reason => resolve(reason));
+      });
+
+      const res = resourceFromAttributes({ badAttribute, goodAttribute });
+
+      let noUnhandledRejection = true;
+      function onUnhandledRejection() {
+        noUnhandledRejection = false;
+      }
+      process.once('unhandledRejection', onUnhandledRejection);
+      try {
+        ee.emit('fail', 'resource attribute value promise rejected');
+        // yield to event loop to make sure we don't miss anything
+        await new Promise((resolve, reject) => setTimeout(resolve, 1));
+        assert.ok(noUnhandledRejection);
+        await res.waitForAsyncAttributes?.();
+        assert.notDeepStrictEqual(res.attributes, { goodAttribute: 'fail' });
+      } finally {
+        process.removeListener('unhandledRejection', onUnhandledRejection);
+      }
     });
   });
 
   describeNode('.default()', () => {
     it('should return a default resource', () => {
-      const resource = Resource.default();
+      const resource = defaultResource();
       assert.strictEqual(
-        resource.attributes[SEMRESATTRS_TELEMETRY_SDK_NAME],
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_NAME]
+        resource.attributes[ATTR_TELEMETRY_SDK_NAME],
+        SDK_INFO[ATTR_TELEMETRY_SDK_NAME]
       );
       assert.strictEqual(
-        resource.attributes[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE]
+        resource.attributes[ATTR_TELEMETRY_SDK_LANGUAGE],
+        SDK_INFO[ATTR_TELEMETRY_SDK_LANGUAGE]
       );
       assert.strictEqual(
-        resource.attributes[SEMRESATTRS_TELEMETRY_SDK_VERSION],
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_VERSION]
+        resource.attributes[ATTR_TELEMETRY_SDK_VERSION],
+        SDK_INFO[ATTR_TELEMETRY_SDK_VERSION]
       );
       assert.strictEqual(
-        resource.attributes[SEMRESATTRS_SERVICE_NAME],
+        resource.attributes[ATTR_SERVICE_NAME],
         `unknown_service:${process.argv0}`
       );
     });
@@ -305,48 +311,23 @@ describe('Resource', () => {
 
   describeBrowser('.default()', () => {
     it('should return a default resource', () => {
-      const resource = Resource.default();
+      const resource = defaultResource();
       assert.strictEqual(
-        resource.attributes[SEMRESATTRS_TELEMETRY_SDK_NAME],
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_NAME]
+        resource.attributes[ATTR_TELEMETRY_SDK_NAME],
+        SDK_INFO[ATTR_TELEMETRY_SDK_NAME]
       );
       assert.strictEqual(
-        resource.attributes[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE]
+        resource.attributes[ATTR_TELEMETRY_SDK_LANGUAGE],
+        SDK_INFO[ATTR_TELEMETRY_SDK_LANGUAGE]
       );
       assert.strictEqual(
-        resource.attributes[SEMRESATTRS_TELEMETRY_SDK_VERSION],
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_VERSION]
+        resource.attributes[ATTR_TELEMETRY_SDK_VERSION],
+        SDK_INFO[ATTR_TELEMETRY_SDK_VERSION]
       );
       assert.strictEqual(
-        resource.attributes[SEMRESATTRS_SERVICE_NAME],
+        resource.attributes[ATTR_SERVICE_NAME],
         'unknown_service'
       );
-    });
-  });
-
-  describe('compatibility', () => {
-    it('should merge resource with old implementation', () => {
-      const resource = Resource.EMPTY;
-      const oldResource = new Resource190({ fromold: 'fromold' });
-
-      const mergedResource = resource.merge(oldResource);
-
-      assert.strictEqual(mergedResource.attributes['fromold'], 'fromold');
-    });
-
-    it('should merge resource containing async attributes with old implementation', async () => {
-      const resource = new Resource(
-        {},
-        Promise.resolve({ fromnew: 'fromnew' })
-      );
-      const oldResource = new Resource190({ fromold: 'fromold' });
-
-      const mergedResource = resource.merge(oldResource);
-      assert.strictEqual(mergedResource.attributes['fromold'], 'fromold');
-
-      await mergedResource.waitForAsyncAttributes?.();
-      assert.strictEqual(mergedResource.attributes['fromnew'], 'fromnew');
     });
   });
 });

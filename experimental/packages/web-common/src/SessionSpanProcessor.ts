@@ -20,7 +20,7 @@ import {
   Span,
   ReadableSpan,
 } from '@opentelemetry/sdk-trace-base';
-import { ATTR_SESSION_ID } from '@opentelemetry/semantic-conventions/incubating';
+import { ATTR_SESSION_ID } from './semconv';
 import { SessionProvider } from './types/SessionProvider';
 
 /**

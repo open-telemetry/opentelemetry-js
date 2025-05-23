@@ -20,16 +20,13 @@ import {
   SpanContext,
   TraceFlags,
   ROOT_CONTEXT,
-  TextMapPropagator,
-  TextMapSetter,
-  Context,
-  TextMapGetter,
-  propagation,
   diag,
 } from '@opentelemetry/api';
-import { CompositePropagator } from '@opentelemetry/core';
-import { TraceState, W3CTraceContextPropagator } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import { TraceState } from '@opentelemetry/core';
+import {
+  defaultResource,
+  resourceFromAttributes,
+} from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
@@ -43,34 +40,10 @@ import {
 } from '../../src';
 import { SpanImpl } from '../../src/Span';
 import { MultiSpanProcessor } from '../../src/MultiSpanProcessor';
-
-class DummyPropagator implements TextMapPropagator {
-  inject(context: Context, carrier: any, setter: TextMapSetter<any>): void {
-    throw new Error('Method not implemented.');
-  }
-  extract(context: Context, carrier: any, getter: TextMapGetter<any>): Context {
-    throw new Error('Method not implemented.');
-  }
-  fields(): string[] {
-    throw new Error('Method not implemented.');
-  }
-}
+import { Tracer } from '../../src/Tracer';
 
 describe('BasicTracerProvider', () => {
-  let envSource: Record<string, any>;
-  let setGlobalPropagatorStub: sinon.SinonSpy<[TextMapPropagator], boolean>;
-
-  if (global.process?.versions?.node === undefined) {
-    envSource = globalThis as unknown as Record<string, any>;
-  } else {
-    envSource = process.env as Record<string, any>;
-  }
-
   beforeEach(() => {
-    // to avoid actually registering the TraceProvider and leaking env to other tests
-    sinon.stub(trace, 'setGlobalTracerProvider');
-    setGlobalPropagatorStub = sinon.spy(propagation, 'setGlobalPropagator');
-
     context.disable();
   });
 
@@ -134,7 +107,9 @@ describe('BasicTracerProvider', () => {
     describe('generalLimits', () => {
       describe('when not defined default values', () => {
         it('should have tracer with default values', () => {
-          const tracer = new BasicTracerProvider({}).getTracer('default');
+          const tracer = new BasicTracerProvider({}).getTracer(
+            'default'
+          ) as Tracer;
           assert.deepStrictEqual(tracer.getGeneralLimits(), {
             attributeValueLengthLimit: Infinity,
             attributeCountLimit: 128,
@@ -148,7 +123,7 @@ describe('BasicTracerProvider', () => {
             generalLimits: {
               attributeCountLimit: 100,
             },
-          }).getTracer('default');
+          }).getTracer('default') as Tracer;
           const generalLimits = tracer.getGeneralLimits();
           assert.strictEqual(generalLimits.attributeCountLimit, 100);
         });
@@ -160,7 +135,7 @@ describe('BasicTracerProvider', () => {
             generalLimits: {
               attributeValueLengthLimit: 10,
             },
-          }).getTracer('default');
+          }).getTracer('default') as Tracer;
           const generalLimits = tracer.getGeneralLimits();
           assert.strictEqual(generalLimits.attributeValueLengthLimit, 10);
         });
@@ -170,7 +145,7 @@ describe('BasicTracerProvider', () => {
             generalLimits: {
               attributeValueLengthLimit: -10,
             },
-          }).getTracer('default');
+          }).getTracer('default') as Tracer;
           const generalLimits = tracer.getGeneralLimits();
           assert.strictEqual(generalLimits.attributeValueLengthLimit, -10);
         });
@@ -180,7 +155,9 @@ describe('BasicTracerProvider', () => {
     describe('spanLimits', () => {
       describe('when not defined default values', () => {
         it('should have tracer with default values', () => {
-          const tracer = new BasicTracerProvider({}).getTracer('default');
+          const tracer = new BasicTracerProvider({}).getTracer(
+            'default'
+          ) as Tracer;
           assert.deepStrictEqual(tracer.getSpanLimits(), {
             attributeValueLengthLimit: Infinity,
             attributeCountLimit: 128,
@@ -198,7 +175,7 @@ describe('BasicTracerProvider', () => {
             spanLimits: {
               attributeCountLimit: 100,
             },
-          }).getTracer('default');
+          }).getTracer('default') as Tracer;
           const spanLimits = tracer.getSpanLimits();
           assert.strictEqual(spanLimits.attributeCountLimit, 100);
         });
@@ -210,7 +187,7 @@ describe('BasicTracerProvider', () => {
             spanLimits: {
               attributeValueLengthLimit: 10,
             },
-          }).getTracer('default');
+          }).getTracer('default') as Tracer;
           const spanLimits = tracer.getSpanLimits();
           assert.strictEqual(spanLimits.attributeValueLengthLimit, 10);
         });
@@ -220,56 +197,17 @@ describe('BasicTracerProvider', () => {
             spanLimits: {
               attributeValueLengthLimit: -10,
             },
-          }).getTracer('default');
+          }).getTracer('default') as Tracer;
           const spanLimits = tracer.getSpanLimits();
           assert.strictEqual(spanLimits.attributeValueLengthLimit, -10);
         });
       });
 
-      describe('when attribute value length limit is defined via env', () => {
-        it('should have general attribute value length limits value as defined with env', () => {
-          envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '115';
-          const tracer = new BasicTracerProvider().getTracer('default');
-          const generalLimits = tracer.getGeneralLimits();
-          assert.strictEqual(generalLimits.attributeValueLengthLimit, 115);
-          delete envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
-        });
-        it('should have span attribute value length limit value same as general limit value', () => {
-          envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '125';
-          const tracer = new BasicTracerProvider().getTracer('default');
-          const generalLimits = tracer.getGeneralLimits();
-          const spanLimits = tracer.getSpanLimits();
-          assert.strictEqual(generalLimits.attributeValueLengthLimit, 125);
-          assert.strictEqual(spanLimits.attributeValueLengthLimit, 125);
-          delete envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
-        });
-        it('should have span and general attribute value length limits as defined in env', () => {
-          envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '125';
-          envSource.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT = '109';
-          const tracer = new BasicTracerProvider().getTracer('default');
-          const spanLimits = tracer.getSpanLimits();
-          const generalLimits = tracer.getGeneralLimits();
-          assert.strictEqual(generalLimits.attributeValueLengthLimit, 125);
-          assert.strictEqual(spanLimits.attributeValueLengthLimit, 109);
-          delete envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
-          delete envSource.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT;
-        });
-        it('should have span attribute value length limit as default of Infinity', () => {
-          envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '125';
-          envSource.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT = 'Infinity';
-          const tracer = new BasicTracerProvider().getTracer('default');
-          const spanLimits = tracer.getSpanLimits();
-          const generalLimits = tracer.getGeneralLimits();
-          assert.strictEqual(generalLimits.attributeValueLengthLimit, 125);
-          assert.strictEqual(spanLimits.attributeValueLengthLimit, Infinity);
-          delete envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
-          delete envSource.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT;
-        });
-      });
-
-      describe('when attribute value length limit is not defined via env', () => {
+      describe('when attribute value length limit is not defined', () => {
         it('should use default value of Infinity', () => {
-          const tracer = new BasicTracerProvider().getTracer('default');
+          const tracer = new BasicTracerProvider().getTracer(
+            'default'
+          ) as Tracer;
           const spanLimits = tracer.getSpanLimits();
           const generalLimits = tracer.getGeneralLimits();
           assert.strictEqual(generalLimits.attributeValueLengthLimit, Infinity);
@@ -277,50 +215,11 @@ describe('BasicTracerProvider', () => {
         });
       });
 
-      describe('when attribute count limit is defined via env', () => {
-        it('should general attribute count limit as defined with env', () => {
-          envSource.OTEL_ATTRIBUTE_COUNT_LIMIT = '25';
-          const tracer = new BasicTracerProvider({}).getTracer('default');
-          const generalLimits = tracer.getGeneralLimits();
-          assert.strictEqual(generalLimits.attributeCountLimit, 25);
-          delete envSource.OTEL_ATTRIBUTE_COUNT_LIMIT;
-        });
-        it('should have span attribute count limit value same as general limit value', () => {
-          envSource.OTEL_ATTRIBUTE_COUNT_LIMIT = '20';
-          const tracer = new BasicTracerProvider().getTracer('default');
-          const generalLimits = tracer.getGeneralLimits();
-          const spanLimits = tracer.getSpanLimits();
-          assert.strictEqual(generalLimits.attributeCountLimit, 20);
-          assert.strictEqual(spanLimits.attributeCountLimit, 20);
-          delete envSource.OTEL_ATTRIBUTE_COUNT_LIMIT;
-        });
-        it('should have span and general attribute count limits as defined in env', () => {
-          envSource.OTEL_ATTRIBUTE_COUNT_LIMIT = '20';
-          envSource.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT = '35';
-          const tracer = new BasicTracerProvider().getTracer('default');
-          const spanLimits = tracer.getSpanLimits();
-          const generalLimits = tracer.getGeneralLimits();
-          assert.strictEqual(generalLimits.attributeCountLimit, 20);
-          assert.strictEqual(spanLimits.attributeCountLimit, 35);
-          delete envSource.OTEL_ATTRIBUTE_COUNT_LIMIT;
-          delete envSource.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT;
-        });
-        it('should have span attribute count limit as default of 128', () => {
-          envSource.OTEL_ATTRIBUTE_COUNT_LIMIT = '20';
-          envSource.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT = '128';
-          const tracer = new BasicTracerProvider().getTracer('default');
-          const spanLimits = tracer.getSpanLimits();
-          const generalLimits = tracer.getGeneralLimits();
-          assert.strictEqual(generalLimits.attributeCountLimit, 20);
-          assert.strictEqual(spanLimits.attributeCountLimit, 128);
-          delete envSource.OTEL_ATTRIBUTE_COUNT_LIMIT;
-          delete envSource.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT;
-        });
-      });
-
-      describe('when attribute count limit is not defined via env', () => {
+      describe('when attribute count limit is not defined', () => {
         it('should use default value of 128', () => {
-          const tracer = new BasicTracerProvider().getTracer('default');
+          const tracer = new BasicTracerProvider().getTracer(
+            'default'
+          ) as Tracer;
           const spanLimits = tracer.getSpanLimits();
           const generalLimits = tracer.getGeneralLimits();
           assert.strictEqual(generalLimits.attributeCountLimit, 128);
@@ -334,7 +233,7 @@ describe('BasicTracerProvider', () => {
             spanLimits: {
               eventCountLimit: 300,
             },
-          }).getTracer('default');
+          }).getTracer('default') as Tracer;
           const spanLimits = tracer.getSpanLimits();
           assert.strictEqual(spanLimits.eventCountLimit, 300);
         });
@@ -346,7 +245,7 @@ describe('BasicTracerProvider', () => {
             spanLimits: {
               linkCountLimit: 10,
             },
-          }).getTracer('default');
+          }).getTracer('default') as Tracer;
           const spanLimits = tracer.getSpanLimits();
           assert.strictEqual(spanLimits.linkCountLimit, 10);
         });
@@ -359,7 +258,7 @@ describe('BasicTracerProvider', () => {
               attributeValueLengthLimit: 100,
               attributeCountLimit: 200,
             },
-          }).getTracer('default');
+          }).getTracer('default') as Tracer;
           const spanLimits = tracer.getSpanLimits();
           assert.strictEqual(spanLimits.attributeValueLengthLimit, 100);
           assert.strictEqual(spanLimits.attributeCountLimit, 200);
@@ -377,144 +276,11 @@ describe('BasicTracerProvider', () => {
               attributeValueLengthLimit: 10,
               attributeCountLimit: 20,
             },
-          }).getTracer('default');
+          }).getTracer('default') as Tracer;
           const spanLimits = tracer.getSpanLimits();
           assert.strictEqual(spanLimits.attributeValueLengthLimit, 10);
           assert.strictEqual(spanLimits.attributeCountLimit, 20);
         });
-      });
-    });
-  });
-
-  describe('Custom TracerProvider through inheritance', () => {
-    beforeEach(() => {
-      envSource.OTEL_TRACES_EXPORTER = 'custom-exporter';
-      envSource.OTEL_PROPAGATORS = 'custom-propagator';
-    });
-
-    afterEach(() => {
-      delete envSource.OTEL_TRACES_EXPORTER;
-      delete envSource.OTEL_PROPAGATORS;
-      sinon.restore();
-    });
-
-    it('can be extended by overriding registered components', () => {
-      class CustomTracerProvider extends BasicTracerProvider {
-        protected static override readonly _registeredPropagators = new Map<
-          string,
-          () => TextMapPropagator
-        >([
-          ...BasicTracerProvider._registeredPropagators,
-          ['custom-propagator', () => new DummyPropagator()],
-        ]);
-      }
-
-      const provider = new CustomTracerProvider({});
-      assert.ok(
-        provider['_getPropagator']('tracecontext') instanceof
-          W3CTraceContextPropagator
-      );
-      /* BasicTracerProvider has no exporters by default, so skipping testing the exporter getter */
-      provider.register();
-      assert.strictEqual(
-        provider['_activeSpanProcessor']['_spanProcessors'].length,
-        0
-      );
-
-      sinon.assert.calledOnceWithExactly(
-        setGlobalPropagatorStub,
-        sinon.match.instanceOf(DummyPropagator)
-      );
-    });
-
-    it('the old way of extending still works', () => {
-      // this is an anti-pattern, but we test that for backwards compatibility
-      class CustomTracerProvider extends BasicTracerProvider {
-        protected static override readonly _registeredPropagators = new Map<
-          string,
-          () => TextMapPropagator
-        >([['custom-propagator', () => new DummyPropagator()]]);
-
-        protected override _getPropagator(
-          name: string
-        ): TextMapPropagator | undefined {
-          return (
-            super._getPropagator(name) ||
-            CustomTracerProvider._registeredPropagators.get(name)?.()
-          );
-        }
-      }
-
-      const provider = new CustomTracerProvider({});
-      provider.register();
-      assert.strictEqual(
-        provider['_activeSpanProcessor']['_spanProcessors'].length,
-        0
-      );
-
-      sinon.assert.calledOnceWithExactly(
-        setGlobalPropagatorStub,
-        sinon.match.instanceOf(DummyPropagator)
-      );
-    });
-  });
-
-  describe('.register()', () => {
-    describe('propagator', () => {
-      let originalPropagators: string | number | undefined | string[];
-      beforeEach(() => {
-        originalPropagators = envSource.OTEL_PROPAGATORS;
-      });
-
-      afterEach(() => {
-        sinon.restore();
-
-        // otherwise we may assign 'undefined' (a string)
-        if (originalPropagators !== undefined) {
-          envSource.OTEL_PROPAGATORS = originalPropagators;
-        } else {
-          delete envSource.OTEL_PROPAGATORS;
-        }
-      });
-
-      it('should be set to a given value if it it provided', () => {
-        const provider = new BasicTracerProvider();
-        provider.register({
-          propagator: new DummyPropagator(),
-        });
-
-        sinon.assert.calledOnceWithExactly(
-          setGlobalPropagatorStub,
-          sinon.match.instanceOf(DummyPropagator)
-        );
-      });
-
-      it('should be composite if 2 or more propagators provided in an environment variable', () => {
-        const provider = new BasicTracerProvider();
-        provider.register();
-
-        sinon.assert.calledOnceWithExactly(
-          setGlobalPropagatorStub,
-          sinon.match.instanceOf(CompositePropagator)
-        );
-        assert.deepStrictEqual(setGlobalPropagatorStub.args[0][0].fields(), [
-          'traceparent',
-          'tracestate',
-          'baggage',
-        ]);
-      });
-
-      it('warns if there is no propagator registered with a given name', () => {
-        const warnStub = sinon.spy(diag, 'warn');
-
-        envSource.OTEL_PROPAGATORS = 'missing-propagator';
-        const provider = new BasicTracerProvider({});
-        provider.register();
-
-        sinon.assert.calledOnceWithExactly(
-          warnStub,
-          'Propagator "missing-propagator" requested through environment variable is unavailable.'
-        );
       });
     });
   });
@@ -529,7 +295,7 @@ describe('BasicTracerProvider', () => {
 
     it('should propagate resources', () => {
       const tracerProvider = new BasicTracerProvider();
-      const tracer = tracerProvider.getTracer('default');
+      const tracer = tracerProvider.getTracer('default') as Tracer;
       const span = tracer.startSpan('my-span') as Span;
       assert.strictEqual(tracer['_resource'], tracerProvider['_resource']);
       assert.strictEqual(span.resource, tracerProvider['_resource']);
@@ -634,7 +400,10 @@ describe('BasicTracerProvider', () => {
         )
       );
       assert.ok(span instanceof SpanImpl);
-      assert.deepStrictEqual((span as Span).parentSpanId, undefined);
+      assert.deepStrictEqual(
+        (span as Span).parentSpanContext?.spanId,
+        undefined
+      );
     });
 
     it('should start a span with name and with invalid spancontext', () => {
@@ -684,7 +453,7 @@ describe('BasicTracerProvider', () => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span') as Span;
       assert.ok(span);
-      assert.ok(span.resource instanceof Resource);
+      assert.ok(span.resource);
     });
   });
 
@@ -772,11 +541,11 @@ describe('BasicTracerProvider', () => {
   describe('.resource', () => {
     it('should use the default resource when no resource is provided', function () {
       const tracerProvider = new BasicTracerProvider();
-      assert.deepStrictEqual(tracerProvider['_resource'], Resource.default());
+      assert.deepStrictEqual(tracerProvider['_resource'], defaultResource());
     });
 
     it('should use not use the default if resource passed', function () {
-      const providedResource = new Resource({ foo: 'bar' });
+      const providedResource = resourceFromAttributes({ foo: 'bar' });
       const tracerProvider = new BasicTracerProvider({
         resource: providedResource,
       });

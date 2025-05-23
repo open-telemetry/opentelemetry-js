@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-export { Exemplar } from './Exemplar';
-export { ExemplarFilter } from './ExemplarFilter';
+export type { Exemplar } from './Exemplar';
+export type { ExemplarFilter } from './ExemplarFilter';
 export { AlwaysSampleExemplarFilter } from './AlwaysSampleExemplarFilter';
 export { NeverSampleExemplarFilter } from './NeverSampleExemplarFilter';
 export { WithTraceExemplarFilter } from './WithTraceExemplarFilter';
-export {
-  ExemplarReservoir,
-  FixedSizeExemplarReservoirBase,
-} from './ExemplarReservoir';
+export type { ExemplarReservoir } from './ExemplarReservoir';
+export { FixedSizeExemplarReservoirBase } from './ExemplarReservoir';
 export { AlignedHistogramBucketExemplarReservoir } from './AlignedHistogramBucketExemplarReservoir';
 export { SimpleFixedSizeExemplarReservoir } from './SimpleFixedSizeExemplarReservoir';

@@ -27,7 +27,7 @@ import {
 import * as logsAPI from '@opentelemetry/api-logs';
 import type { HrTime } from '@opentelemetry/api';
 import { hrTimeToMilliseconds, timeInputToHrTime } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import { defaultResource } from '@opentelemetry/resources';
 
 import {
   LogRecordLimits,
@@ -47,11 +47,12 @@ const setup = (logRecordLimits?: LogRecordLimits, data?: logsAPI.LogRecord) => {
     version: 'test version',
     schemaUrl: 'test schema url',
   };
-  const resource = Resource.default();
+  const resource = defaultResource();
   const sharedState = new LoggerProviderSharedState(
     resource,
     Infinity,
-    reconfigureLimits(logRecordLimits ?? {})
+    reconfigureLimits(logRecordLimits ?? {}),
+    []
   );
   const logRecord = new LogRecord(
     sharedState,
@@ -424,8 +425,7 @@ describe('LogRecord', () => {
         forceFlush: () => Promise.resolve(),
         shutdown: () => Promise.resolve(),
       };
-      const provider = new LoggerProvider();
-      provider.addLogRecordProcessor(processor);
+      const provider = new LoggerProvider({ processors: [processor] });
       provider.getLogger('default').emit({ body: 'test' });
       assert.ok(emitted);
     });

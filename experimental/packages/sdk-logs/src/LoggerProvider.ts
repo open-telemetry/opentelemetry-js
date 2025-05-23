@@ -16,15 +16,15 @@
 import { diag } from '@opentelemetry/api';
 import type * as logsAPI from '@opentelemetry/api-logs';
 import { NOOP_LOGGER } from '@opentelemetry/api-logs';
-import { Resource } from '@opentelemetry/resources';
+import { defaultResource } from '@opentelemetry/resources';
 import { BindOnceFuture, merge } from '@opentelemetry/core';
 
 import type { LoggerProviderConfig } from './types';
-import type { LogRecordProcessor } from './LogRecordProcessor';
 import { Logger } from './Logger';
 import { loadDefaultConfig, reconfigureLimits } from './config';
-import { MultiLogRecordProcessor } from './MultiLogRecordProcessor';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
+import { LogRecordProcessor } from './LogRecordProcessor';
+import { MultiLogRecordProcessor } from './MultiLogRecordProcessor';
 
 export const DEFAULT_LOGGER_NAME = 'unknown';
 
@@ -34,11 +34,12 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
 
   constructor(config: LoggerProviderConfig = {}) {
     const mergedConfig = merge({}, loadDefaultConfig(), config);
-    const resource = config.resource ?? Resource.default();
+    const resource = config.resource ?? defaultResource();
     this._sharedState = new LoggerProviderSharedState(
       resource,
       mergedConfig.forceFlushTimeoutMillis,
-      reconfigureLimits(mergedConfig.logRecordLimits)
+      reconfigureLimits(mergedConfig.logRecordLimits),
+      config?.processors ?? []
     );
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
   }
@@ -75,6 +76,8 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
   }
 
   /**
+   * @deprecated add your processors in the constructors instead.
+   *
    * Adds a new {@link LogRecordProcessor} to this logger.
    * @param processor the new LogRecordProcessor to be added.
    */

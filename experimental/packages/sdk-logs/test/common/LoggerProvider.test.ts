@@ -15,7 +15,10 @@
  */
 import { logs, NoopLogger } from '@opentelemetry/api-logs';
 import { diag } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
+import {
+  defaultResource,
+  resourceFromAttributes,
+} from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
@@ -26,14 +29,6 @@ import { MultiLogRecordProcessor } from '../../src/MultiLogRecordProcessor';
 import { Logger } from '../../src/Logger';
 
 describe('LoggerProvider', () => {
-  let envSource: Record<string, any>;
-
-  if (global.process?.versions?.node === undefined) {
-    envSource = globalThis as unknown as Record<string, any>;
-  } else {
-    envSource = process.env as Record<string, any>;
-  }
-
   beforeEach(() => {
     // to avoid actually registering the LoggerProvider and leaking env to other tests
     sinon.stub(logs, 'setGlobalLoggerProvider');
@@ -60,11 +55,11 @@ describe('LoggerProvider', () => {
       it('should have default resource if not pass', () => {
         const provider = new LoggerProvider();
         const { resource } = provider['_sharedState'];
-        assert.deepStrictEqual(resource, Resource.default());
+        assert.deepStrictEqual(resource, defaultResource());
       });
 
       it('should not have default resource if passed', function () {
-        const passedInResource = new Resource({ foo: 'bar' });
+        const passedInResource = resourceFromAttributes({ foo: 'bar' });
         const provider = new LoggerProvider({
           resource: passedInResource,
         });
@@ -131,21 +126,7 @@ describe('LoggerProvider', () => {
         });
       });
 
-      describe('when attribute value length limit is defined via env', () => {
-        it('should have attribute value length limit as default of Infinity', () => {
-          envSource.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = 'Infinity';
-          const loggerProvider = new LoggerProvider();
-          const logRecordLimits =
-            loggerProvider['_sharedState'].logRecordLimits;
-          assert.strictEqual(
-            logRecordLimits.attributeValueLengthLimit,
-            Infinity
-          );
-          delete envSource.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT;
-        });
-      });
-
-      describe('when attribute value length limit is not defined via env', () => {
+      describe('when attribute value length limit is not defined', () => {
         it('should use default value of Infinity', () => {
           const loggerProvider = new LoggerProvider();
           const logRecordLimits =
@@ -157,26 +138,7 @@ describe('LoggerProvider', () => {
         });
       });
 
-      describe('when attribute count limit is defined via env', () => {
-        it('should have attribute count limits as defined in env', () => {
-          envSource.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '35';
-          const loggerProvider = new LoggerProvider();
-          const logRecordLimits =
-            loggerProvider['_sharedState'].logRecordLimits;
-          assert.strictEqual(logRecordLimits.attributeCountLimit, 35);
-          delete envSource.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT;
-        });
-        it('should have attribute count limit as default of 128', () => {
-          envSource.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '128';
-          const loggerProvider = new LoggerProvider();
-          const logRecordLimits =
-            loggerProvider['_sharedState'].logRecordLimits;
-          assert.strictEqual(logRecordLimits.attributeCountLimit, 128);
-          delete envSource.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT;
-        });
-      });
-
-      describe('when attribute count limit is not defined via env', () => {
+      describe('when attribute count limit is not defined', () => {
         it('should use default value of 128', () => {
           const loggerProvider = new LoggerProvider();
           const logRecordLimits =
@@ -263,12 +225,11 @@ describe('LoggerProvider', () => {
       );
       forceFlushStub.resolves();
 
-      const provider = new LoggerProvider();
       const logRecordProcessorOne = new NoopLogRecordProcessor();
       const logRecordProcessorTwo = new NoopLogRecordProcessor();
-
-      provider.addLogRecordProcessor(logRecordProcessorOne);
-      provider.addLogRecordProcessor(logRecordProcessorTwo);
+      const provider = new LoggerProvider({
+        processors: [logRecordProcessorOne, logRecordProcessorTwo],
+      });
 
       provider
         .forceFlush()
@@ -292,12 +253,11 @@ describe('LoggerProvider', () => {
       );
       forceFlushStub.returns(Promise.reject('Error'));
 
-      const provider = new LoggerProvider();
       const logRecordProcessorOne = new NoopLogRecordProcessor();
       const logRecordProcessorTwo = new NoopLogRecordProcessor();
-
-      provider.addLogRecordProcessor(logRecordProcessorOne);
-      provider.addLogRecordProcessor(logRecordProcessorTwo);
+      const provider = new LoggerProvider({
+        processors: [logRecordProcessorOne, logRecordProcessorTwo],
+      });
 
       provider
         .forceFlush()
@@ -315,9 +275,8 @@ describe('LoggerProvider', () => {
 
   describe('.shutdown()', () => {
     it('should trigger shutdown when manually invoked', () => {
-      const provider = new LoggerProvider();
       const processor = new NoopLogRecordProcessor();
-      provider.addLogRecordProcessor(processor);
+      const provider = new LoggerProvider({ processors: [processor] });
       const shutdownStub = sinon.stub(processor, 'shutdown');
       provider.shutdown();
       sinon.assert.calledOnce(shutdownStub);
@@ -332,9 +291,10 @@ describe('LoggerProvider', () => {
     });
 
     it('should not force flush on shutdown', () => {
-      const provider = new LoggerProvider();
       const logRecordProcessor = new NoopLogRecordProcessor();
-      provider.addLogRecordProcessor(logRecordProcessor);
+      const provider = new LoggerProvider({
+        processors: [logRecordProcessor],
+      });
       const forceFlushStub = sinon.stub(logRecordProcessor, 'forceFlush');
       const warnStub = sinon.spy(diag, 'warn');
       provider.shutdown();
@@ -344,9 +304,10 @@ describe('LoggerProvider', () => {
     });
 
     it('should not shutdown on shutdown', () => {
-      const provider = new LoggerProvider();
       const logRecordProcessor = new NoopLogRecordProcessor();
-      provider.addLogRecordProcessor(logRecordProcessor);
+      const provider = new LoggerProvider({
+        processors: [logRecordProcessor],
+      });
       const shutdownStub = sinon.stub(logRecordProcessor, 'shutdown');
       const warnStub = sinon.spy(diag, 'warn');
       provider.shutdown();

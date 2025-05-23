@@ -26,33 +26,23 @@ import type * as http from 'http';
 import { ExportResponse } from '../export-response';
 import { IExporterTransport } from '../exporter-transport';
 
+interface Utils {
+  agent: http.Agent | https.Agent;
+  send: sendWithHttp;
+}
+
 class HttpExporterTransport implements IExporterTransport {
-  private _send: sendWithHttp | null = null;
-  private _agent: http.Agent | https.Agent | null = null;
+  private _utils: Utils | null = null;
 
   constructor(private _parameters: HttpRequestParameters) {}
 
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
-    if (this._send == null) {
-      // Lazy require to ensure that http/https is not required before instrumentations can wrap it.
-      const {
-        sendWithHttp,
-        createHttpAgent,
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-      } = require('./http-transport-utils');
-      this._agent = createHttpAgent(
-        this._parameters.url,
-        this._parameters.agentOptions
-      );
-      this._send = sendWithHttp;
-    }
+    const { agent, send } = this._loadUtils();
 
     return new Promise<ExportResponse>(resolve => {
-      // this will always be defined
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this._send?.(
+      send(
         this._parameters,
-        this._agent!,
+        agent,
         data,
         result => {
           resolve(result);
@@ -61,8 +51,32 @@ class HttpExporterTransport implements IExporterTransport {
       );
     });
   }
+
   shutdown() {
     // intentionally left empty, nothing to do.
+  }
+
+  private _loadUtils(): Utils {
+    let utils = this._utils;
+
+    if (utils === null) {
+      // Lazy require to ensure that http/https is not required before instrumentations can wrap it.
+      const {
+        sendWithHttp,
+        createHttpAgent,
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+      } = require('./http-transport-utils');
+
+      utils = this._utils = {
+        agent: createHttpAgent(
+          this._parameters.url,
+          this._parameters.agentOptions
+        ),
+        send: sendWithHttp,
+      };
+    }
+
+    return utils;
   }
 }
 

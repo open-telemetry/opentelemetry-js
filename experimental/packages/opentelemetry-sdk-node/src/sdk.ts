@@ -27,15 +27,15 @@ import {
   registerInstrumentations,
 } from '@opentelemetry/instrumentation';
 import {
-  Detector,
-  DetectorSync,
-  detectResourcesSync,
+  defaultResource,
+  detectResources,
   envDetector,
   hostDetector,
-  IResource,
-  processDetector,
   Resource,
+  processDetector,
   ResourceDetectionConfig,
+  ResourceDetector,
+  resourceFromAttributes,
 } from '@opentelemetry/resources';
 import {
   LogRecordProcessor,
@@ -69,11 +69,16 @@ import {
 } from '@opentelemetry/sdk-trace-node';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
-import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
+import {
+  getBooleanFromEnv,
+  getStringFromEnv,
+  getStringListFromEnv,
+  diagLogLevelFromString,
+} from '@opentelemetry/core';
 import {
   getResourceDetectorsFromEnv,
   getSpanProcessorsFromEnv,
-  filterBlanksAndNulls,
+  getPropagatorFromEnv,
 } from './utils';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
@@ -109,11 +114,10 @@ function getValueInMillis(envName: string, defaultValue: number): number {
  */
 function configureMetricProviderFromEnv(): IMetricReader[] {
   const metricReaders: IMetricReader[] = [];
-  const metricsExporterList = process.env.OTEL_METRICS_EXPORTER?.trim();
-  if (!metricsExporterList) {
+  const enabledExporters = getStringListFromEnv('OTEL_METRICS_EXPORTER');
+  if (!enabledExporters) {
     return metricReaders;
   }
-  const enabledExporters = filterBlanksAndNulls(metricsExporterList.split(','));
 
   if (enabledExporters.length === 0) {
     diag.debug('OTEL_METRICS_EXPORTER is empty. Using default otlp exporter.');
@@ -208,8 +212,8 @@ export class NodeSDK {
   private _meterProviderConfig?: MeterProviderConfig;
   private _instrumentations: Instrumentation[];
 
-  private _resource: IResource;
-  private _resourceDetectors: Array<Detector | DetectorSync>;
+  private _resource: Resource;
+  private _resourceDetectors: Array<ResourceDetector>;
 
   private _autoDetectResources: boolean;
 
@@ -225,32 +229,28 @@ export class NodeSDK {
    * Create a new NodeJS SDK instance
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
-    const env = getEnv();
-    const envWithoutDefaults = getEnvWithoutDefaults();
-
-    if (env.OTEL_SDK_DISABLED) {
+    if (getBooleanFromEnv('OTEL_SDK_DISABLED')) {
       this._disabled = true;
       // Functions with possible side-effects are set
       // to no-op via the _disabled flag
     }
 
-    // Default is INFO, use environment without defaults to check
-    // if the user originally set the environment variable.
-    if (envWithoutDefaults.OTEL_LOG_LEVEL) {
+    const logLevel = getStringFromEnv('OTEL_LOG_LEVEL');
+    if (logLevel != null) {
       diag.setLogger(new DiagConsoleLogger(), {
-        logLevel: envWithoutDefaults.OTEL_LOG_LEVEL,
+        logLevel: diagLogLevelFromString(logLevel),
       });
     }
 
     this._configuration = configuration;
 
-    this._resource = configuration.resource ?? Resource.default();
+    this._resource = configuration.resource ?? defaultResource();
     this._autoDetectResources = configuration.autoDetectResources ?? true;
     if (!this._autoDetectResources) {
       this._resourceDetectors = [];
     } else if (configuration.resourceDetectors != null) {
       this._resourceDetectors = configuration.resourceDetectors;
-    } else if (process.env.OTEL_NODE_RESOURCE_DETECTORS != null) {
+    } else if (getStringFromEnv('OTEL_NODE_RESOURCE_DETECTORS')) {
       this._resourceDetectors = getResourceDetectorsFromEnv();
     } else {
       this._resourceDetectors = [envDetector, processDetector, hostDetector];
@@ -345,16 +345,14 @@ export class NodeSDK {
         detectors: this._resourceDetectors,
       };
 
-      this._resource = this._resource.merge(
-        detectResourcesSync(internalConfig)
-      );
+      this._resource = this._resource.merge(detectResources(internalConfig));
     }
 
     this._resource =
       this._serviceName === undefined
         ? this._resource
         : this._resource.merge(
-            new Resource({
+            resourceFromAttributes({
               [ATTR_SERVICE_NAME]: this._serviceName,
             })
           );
@@ -376,19 +374,17 @@ export class NodeSDK {
           this._tracerProviderConfig?.contextManager ??
           // _tracerProviderConfig may be undefined if trace-specific settings are not provided - fall back to raw config
           this._configuration?.contextManager,
-        propagator: this._tracerProviderConfig?.textMapPropagator,
+        propagator:
+          this._tracerProviderConfig?.textMapPropagator ??
+          getPropagatorFromEnv(),
       });
     }
 
     if (this._loggerProviderConfig) {
       const loggerProvider = new LoggerProvider({
         resource: this._resource,
+        processors: this._loggerProviderConfig.logRecordProcessors,
       });
-
-      for (const logRecordProcessor of this._loggerProviderConfig
-        .logRecordProcessors) {
-        loggerProvider.addLogRecordProcessor(logRecordProcessor);
-      }
 
       this._loggerProvider = loggerProvider;
 
@@ -445,8 +441,7 @@ export class NodeSDK {
   }
 
   private configureLoggerProviderFromEnv(): void {
-    const logExportersList = process.env.OTEL_LOGS_EXPORTER ?? '';
-    const enabledExporters = filterBlanksAndNulls(logExportersList.split(','));
+    const enabledExporters = getStringListFromEnv('OTEL_LOGS_EXPORTER') ?? [];
 
     if (enabledExporters.length === 0) {
       diag.debug('OTEL_LOGS_EXPORTER is empty. Using default otlp exporter.');
@@ -465,8 +460,8 @@ export class NodeSDK {
     enabledExporters.forEach(exporter => {
       if (exporter === 'otlp') {
         const protocol = (
-          process.env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL ??
-          process.env.OTEL_EXPORTER_OTLP_PROTOCOL
+          getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_PROTOCOL') ??
+          getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL')
         )?.trim();
 
         switch (protocol) {

@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-export { WebTracerConfig, WebTracerProvider } from './WebTracerProvider';
+export { WebTracerProvider } from './WebTracerProvider';
+export type { WebTracerConfig } from './WebTracerProvider';
 export { StackContextManager } from './StackContextManager';
 export { PerformanceTimingNames } from './enums/PerformanceTimingNames';
-export {
+export type {
   PerformanceEntries,
   PerformanceLegacy,
   PerformanceResourceTimingInfo,
   PropagateTraceHeaderCorsUrls,
 } from './types';
 export {
-  URLLike,
   addSpanNetworkEvent,
   addSpanNetworkEvents,
   getElementXPath,
@@ -35,35 +35,34 @@ export {
   shouldPropagateTraceHeaders,
   sortResources,
 } from './utils';
+export type { URLLike } from './utils';
 export {
   AlwaysOffSampler,
   AlwaysOnSampler,
   BasicTracerProvider,
   BatchSpanProcessor,
-  BatchSpanProcessorBrowserConfig,
-  BufferConfig,
   ConsoleSpanExporter,
-  EXPORTER_FACTORY,
-  ForceFlushState,
-  GeneralLimits,
-  IdGenerator,
   InMemorySpanExporter,
   NoopSpanProcessor,
   ParentBasedSampler,
-  PROPAGATOR_FACTORY,
   RandomIdGenerator,
+  SamplingDecision,
+  SimpleSpanProcessor,
+  TraceIdRatioBasedSampler,
+} from '@opentelemetry/sdk-trace-base';
+export type {
+  BatchSpanProcessorBrowserConfig,
+  BufferConfig,
+  GeneralLimits,
+  IdGenerator,
   ReadableSpan,
   Sampler,
-  SamplingDecision,
   SamplingResult,
   SDKRegistrationConfig,
-  SimpleSpanProcessor,
   Span,
   SpanExporter,
   SpanLimits,
   SpanProcessor,
   TimedEvent,
-  TraceIdRatioBasedSampler,
-  Tracer,
   TracerConfig,
 } from '@opentelemetry/sdk-trace-base';
