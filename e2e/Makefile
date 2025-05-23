@@ -1,5 +1,5 @@
 COLLECTOR_IMAGE=otel/opentelemetry-collector-contrib:latest
-COLLECTOR_CONFIG=otel-collector-config.yaml
+COLLECTOR_CONFIG=docker-collector-config.yaml
 TEST_SCRIPT=test.mjs
 COLLECTOR_CONTAINER=otelcol-e2e
 

@@ -12,9 +12,9 @@ if [ "$METRIC_NAME" != "example_counter" ]; then
     exit 1
 fi
 
-METRIC_VALUE=$(jq -r 'select(has("resourceMetrics")) | .resourceMetrics[0].scopeMetrics[0].metrics[0].sum.dataPoints[0].value' otel-collector-output.json)
-if [ "$METRIC_VALUE" != "1" ]; then
-    echo "Expected metric value '1', but got '$METRIC_VALUE'"
+METRIC_VALUE=$(jq -r 'select(has("resourceMetrics")) | .resourceMetrics[0].scopeMetrics[0].metrics[0].sum.dataPoints[0].asDouble' otel-collector-output.json)
+if [ "$METRIC_VALUE" != "42" ]; then
+    echo "Expected metric value '42', but got '$METRIC_VALUE'"
     exit 1
 fi
 

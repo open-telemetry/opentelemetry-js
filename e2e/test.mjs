@@ -26,6 +26,7 @@ const metricExporter = new OTLPMetricExporter({
 const metricReader = new PeriodicExportingMetricReader({
     exporter: metricExporter,
     exportIntervalMillis: 1000,
+    exportTimeoutMillis: 1000,
 });
 
 // Set up log exporter
