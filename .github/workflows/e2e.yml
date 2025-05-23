@@ -54,10 +54,12 @@ jobs:
         run: npm run compile
 
 
-      - run: cd e2e
       - name: Run E2E Tests
         run: make test
+        working-directory: e2e
       - name: Print output
         run: jq --indent 2 '.' otel-collector-output.json
+        working-directory: e2e
       - name: verify span name
         run: verify.sh
+        working-directory: e2e
