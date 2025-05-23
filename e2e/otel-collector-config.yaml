@@ -6,7 +6,7 @@ receivers:
 
 exporters:
   file:
-    path: /tmp/otel-collector-output.json
+    path: ./otel-collector-output.json
 
 service:
   pipelines:
