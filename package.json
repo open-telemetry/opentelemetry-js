@@ -118,6 +118,7 @@
     "api",
     "packages/*",
     "semantic-conventions",
+    "e2e",
     "experimental/packages/*",
     "experimental/examples/*",
     "experimental/backwards-compatibility/*",
