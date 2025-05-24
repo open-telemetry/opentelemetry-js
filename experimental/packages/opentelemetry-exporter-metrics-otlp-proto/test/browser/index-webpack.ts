@@ -13,5 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+const testsContext = require.context('../browser', true, /test$/);
+testsContext.keys().forEach(testsContext);
 
-export { OTLPMetricExporter } from './platform';
+const srcContext = require.context('.', true, /src$/);
+srcContext.keys().forEach(srcContext);
