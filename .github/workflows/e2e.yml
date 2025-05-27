@@ -54,21 +54,21 @@ jobs:
         run: |
           curl -sSL -o otelcol-contrib.tar.gz https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.126.0/otelcol-contrib_0.126.0_linux_amd64.tar.gz
           tar -xzf otelcol-contrib.tar.gz
-        working-directory: e2e
+        working-directory: e2e-tests
       - name: run collector in background
         run: |
           ./otelcol-contrib --config collector-config.yaml &
-        working-directory: e2e
+        working-directory: e2e-tests
       - name: Run E2E Tests
         run: make test
-        working-directory: e2e
+        working-directory: e2e-tests
       - name: kill collector
         run: |
           pkill -f otelcol-contrib
-        working-directory: e2e
+        working-directory: e2e-tests
       - name: Print output
         run: cat collector-output.json
-        working-directory: e2e
+        working-directory: e2e-tests
       - name: verify exported telemetry
         run: node verify.js
-        working-directory: e2e
+        working-directory: e2e-tests
