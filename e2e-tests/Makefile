@@ -3,9 +3,9 @@ COLLECTOR_CONFIG=collector-config.yaml
 TEST_SCRIPT=test.mjs
 COLLECTOR_CONTAINER=otelcol-e2e
 
-.PHONY: all create-output-json run-collector test stop-collector
+.PHONY: all create-output-json run-collector test stop-collector verify
 
-all: create-output-json run-collector test stop-collector
+all: create-output-json run-collector test stop-collector verify
 create-output-json:
 	@> collector-output.json
 
@@ -26,3 +26,8 @@ test:
 stop-collector:
 	@echo "Stopping OpenTelemetry Collector Docker container..."
 	@docker stop $(COLLECTOR_CONTAINER) || true
+
+
+verify:
+	@echo "Verifying output..."
+	@node verify.js
