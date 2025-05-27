@@ -1,5 +1,5 @@
 {
-  "name": "opentelemetry-e2e-test",
+  "name": "@opentelemetry/e2e-test",
   "private": true,
   "description": "End-to-end tests for OpenTelemetry JS",
   "version": "0.0.0",
