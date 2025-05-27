@@ -5,7 +5,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides a logs-exporter for OTLP (http/protobuf) using protocol version `v1.6.0`.
+This module provides a logs-exporter for OTLP (http/protobuf) using protocol version `v1.7.0`.
 
 ## Installation
 
