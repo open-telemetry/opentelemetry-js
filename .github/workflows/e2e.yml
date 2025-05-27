@@ -73,5 +73,5 @@ jobs:
         run: cat otel-collector-output.json
         working-directory: e2e
       - name: verify exported telemetry
-        run: ./verify.sh
+        run: node verify.sh
         working-directory: e2e
