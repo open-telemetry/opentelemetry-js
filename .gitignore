@@ -12,7 +12,7 @@ yarn-error.log*
 !experimental/examples/logs
 
 # test files
-e2e/otel-collector-output.json
+e2e/collector-output.json
 
 # Runtime data
 pids

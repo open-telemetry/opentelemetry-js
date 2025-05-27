@@ -60,7 +60,7 @@ jobs:
         working-directory: e2e
       - name: run collector in background
         run: |
-          ./otelcol-contrib --config otel-collector-config.yaml &
+          ./otelcol-contrib --config collector-config.yaml &
         working-directory: e2e
       - name: Run E2E Tests
         run: make test
@@ -70,7 +70,7 @@ jobs:
           pkill -f otelcol-contrib
         working-directory: e2e
       - name: Print output
-        run: cat otel-collector-output.json
+        run: cat collector-output.json
         working-directory: e2e
       - name: verify exported telemetry
         run: node verify.js

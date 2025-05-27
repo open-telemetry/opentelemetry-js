@@ -1,7 +1,7 @@
 'use strict';
 
 const fs = require('fs');
-const data = fs.readFileSync('otel-collector-output.json', 'utf8');
+const data = fs.readFileSync('collector-output.json', 'utf8');
 
 let verifiedSpan = false;
 let verifiedMetric = false;
