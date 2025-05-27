@@ -35,6 +35,7 @@
     "hook.mjs",
     "doc",
     "LICENSE",
+    "LICENSES/**/*",
     "README.md"
   ],
   "scripts": {
