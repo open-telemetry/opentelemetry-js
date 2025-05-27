@@ -72,6 +72,6 @@ jobs:
       - name: Print output
         run: cat otel-collector-output.json
         working-directory: e2e
-      - name: verify span name
+      - name: verify exported telemetry
         run: ./verify.sh
         working-directory: e2e
