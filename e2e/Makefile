@@ -3,9 +3,9 @@ COLLECTOR_CONFIG=docker-collector-config.yaml
 TEST_SCRIPT=test.mjs
 COLLECTOR_CONTAINER=otelcol-e2e
 
-.PHONY: all run-collector test stop-collector
+.PHONY: all create-output-json run-collector test stop-collector
 
-all: run-collector test stop-collector
+all: create-output-json run-collector test stop-collector
 create-output-json:
 	@> otel-collector-output.json
 

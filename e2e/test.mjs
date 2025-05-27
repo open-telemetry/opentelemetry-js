@@ -33,19 +33,17 @@ const metricReader = new PeriodicExportingMetricReader({
 const logExporter = new OTLPLogExporter({
     url: `${collectorUrl}/logs`,
 });
-const loggerProvider = new LoggerProvider({
-    processors: [new SimpleLogRecordProcessor(logExporter)],
-});
+const logRecordProcessors = [new SimpleLogRecordProcessor(logExporter)];
 
 // Set up OpenTelemetry SDK
 const sdk = new NodeSDK({
     spanProcessors,
     metricReader,
-    loggerProvider,
+    logRecordProcessors,
 });
 
 async function main() {
-    await sdk.start();
+    sdk.start();
 
     // Create a span
     const tracer = trace.getTracer('example-tracer');
