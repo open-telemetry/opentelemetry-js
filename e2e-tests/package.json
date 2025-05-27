@@ -1,22 +1,22 @@
 {
-    "name": "opentelemetry-e2e-test",
-    "private": true,
-    "description": "End-to-end tests for OpenTelemetry JS",
-    "version": "0.0.0",
-    "scripts": {
-        "test:e2e": "make all",
-        "lint": "eslint . --ext .mjs",
-        "lint:fix": "eslint . --ext .mjs --fix"
-    },
-    "dependencies": {
-        "@opentelemetry/api": "*",
-        "@opentelemetry/api-logs": "*",
-        "@opentelemetry/sdk-node": "*",
-        "@opentelemetry/exporter-trace-otlp-proto": "*",
-        "@opentelemetry/exporter-metrics-otlp-proto": "*",
-        "@opentelemetry/exporter-logs-otlp-proto": "*",
-        "@opentelemetry/sdk-metrics": "*",
-        "@opentelemetry/sdk-logs": "*",
-        "@opentelemetry/sdk-trace-base": "*"
-    }
+  "name": "opentelemetry-e2e-test",
+  "private": true,
+  "description": "End-to-end tests for OpenTelemetry JS",
+  "version": "0.0.0",
+  "scripts": {
+    "test:e2e": "make all",
+    "lint": "eslint . --ext .mjs",
+    "lint:fix": "eslint . --ext .mjs --fix"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "*",
+    "@opentelemetry/api-logs": "*",
+    "@opentelemetry/sdk-node": "*",
+    "@opentelemetry/exporter-trace-otlp-proto": "*",
+    "@opentelemetry/exporter-metrics-otlp-proto": "*",
+    "@opentelemetry/exporter-logs-otlp-proto": "*",
+    "@opentelemetry/sdk-metrics": "*",
+    "@opentelemetry/sdk-logs": "*",
+    "@opentelemetry/sdk-trace-base": "*"
+  }
 }
