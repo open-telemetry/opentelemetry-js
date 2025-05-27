@@ -30,4 +30,4 @@ stop-collector:
 
 verify:
 	@echo "Verifying output..."
-	@node verify.js
+	@node verify.mjs

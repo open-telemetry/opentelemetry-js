@@ -70,5 +70,5 @@ jobs:
         run: cat collector-output.json
         working-directory: e2e-tests
       - name: verify exported telemetry
-        run: node verify.js
+        run: make verify
         working-directory: e2e-tests
