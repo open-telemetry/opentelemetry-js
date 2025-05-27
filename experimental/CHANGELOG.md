@@ -9,6 +9,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :boom: Breaking Changes
 
 ### :rocket: Features
+* feat(exporter-otlp-*): update proto to `v1.7.0`
 
 ### :bug: Bug Fixes
 
@@ -34,7 +35,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
   * See [the utility comment](https://github.com/trentm/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation/src/semconvStability.ts).
 * feat(instrumentation-grpc): support migration to stable HTTP semconv [#5653](https://github.com/open-telemetry/opentelemetry-js/pull/5653) @JamieDanielson
 * feat(instrumentation-http): capture synthetic source type on requests [#5488](https://github.com/open-telemetry/opentelemetry-js/pull/5488) @JacksonWeber
-* feat(exporter-otlp-*): update proto to `v1.6.0`
 
 ### :bug: Bug Fixes
 
