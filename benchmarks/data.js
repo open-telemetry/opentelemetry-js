@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1748023295741,
+  "lastUpdate": 1748336879329,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -33648,6 +33648,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.63%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jhaugusty@gmail.com",
+            "name": "YangJH",
+            "username": "YangJonghun"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4919fd17115a6bccf3b48f3e6660958e05c08e36",
+          "message": "feat(exporter-metrics-otlp-proto): Support to protobuf in browser metrics (#5710)",
+          "timestamp": "2025-05-27T08:59:33Z",
+          "tree_id": "d21b78770773e08af927ec67e217beb7538fa0db",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/4919fd17115a6bccf3b48f3e6660958e05c08e36"
+        },
+        "date": 1748336878161,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1567885,
+            "range": "±0.63%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18742,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 814690,
+            "range": "±0.40%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 745061,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
