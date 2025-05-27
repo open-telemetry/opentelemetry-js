@@ -4,7 +4,7 @@
     "description": "End-to-end tests for OpenTelemetry JS",
     "version": "0.0.0",
     "scripts": {
-        "test": "make all",
+        "test:e2e": "make all",
         "lint": "eslint . --ext .mjs",
         "lint:fix": "eslint . --ext .mjs --fix"
     },
