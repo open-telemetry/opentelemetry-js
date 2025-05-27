@@ -15,7 +15,7 @@
  */
 
 // IMPORTANT: exports added here are public
-export {
+export type {
   IExportTracePartialSuccess,
   IExportTraceServiceResponse,
 } from './export-response';

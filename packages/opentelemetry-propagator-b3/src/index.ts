@@ -23,4 +23,5 @@ export {
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
 } from './constants';
-export { B3InjectEncoding, B3PropagatorConfig } from './types';
+export { B3InjectEncoding } from './types';
+export type { B3PropagatorConfig } from './types';

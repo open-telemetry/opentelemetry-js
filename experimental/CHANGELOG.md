@@ -8,10 +8,31 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
-* feat(instrumentation-http)!: Remove legacy http span attributes and metrics [#5552](https://github.com/open-telemetry/opentelemetry-js/pull/5552) @svetlanabrennan
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 0.201.1
+
+### :bug: Bug Fixes
+
+* fix(instrumentation): Change `SemconvStability` export from `const enum` to `enum` to allow single-file transpilation tooling to work with code that uses `SemconvStability`. [#5691](https://github.com/open-telemetry/opentelemetry-js/issues/5691) @trentm
+
+## 0.201.0
 
 ### :rocket: Features
 
+* feat(instrumentation-xml-http-request): support migration to stable HTTP semconv, v1.23.1  [#5662](https://github.com/open-telemetry/opentelemetry-js/pull/5662) @trentm
+  * Configure the instrumentation with `semconvStabilityOptIn: 'http'` to use the new, stable semconv v1.23.1 semantics or `'http/dup'` for both old (v1.7.0) and stable semantics. When `semconvStabilityOptIn` is not specified (or does not contain these values), it uses the old semconv v1.7.0. I.e. the default behavior is unchanged.
+* feat(instrumentation-fetch): support migration to stable HTTP semconv, v1.23.1  [#5651](https://github.com/open-telemetry/opentelemetry-js/pull/5651) @trentm
+  * Configure the instrumentation with `semconvStabilityOptIn: 'http'` to use the new, stable semconv v1.23.1 semantics or `'http/dup'` for both old (v1.7.0) and stable semantics. When `semconvStabilityOptIn` is not specified (or does not contain these values), it uses the old semconv v1.7.0. I.e. the default behavior is unchanged.
+* feat(instrumentation): New `semconvStabilityFromStr()` utility for semconv stability migration in instrumentations. [#5684](https://github.com/open-telemetry/opentelemetry-js/pull/5684) @trentm
+  * See [the utility comment](https://github.com/trentm/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation/src/semconvStability.ts).
+* feat(instrumentation-grpc): support migration to stable HTTP semconv [#5653](https://github.com/open-telemetry/opentelemetry-js/pull/5653) @JamieDanielson
 * feat(instrumentation-http): capture synthetic source type on requests [#5488](https://github.com/open-telemetry/opentelemetry-js/pull/5488) @JacksonWeber
 * feat(exporter-otlp-*): update proto to `v1.6.0`
 
@@ -21,12 +42,15 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(instrumentation-http): report stable client metrics response code [#9586](https://github.com/open-telemetry/opentelemetry-js/pull/9586) @jtescher
 * fix(sdk-node): instantiate baggage processor when env var is set [#5634](https://github.com/open-telemetry/opentelemetry-js/pull/5634) @pichlermarc
 
-### :books: Documentation
-
 ### :house: Internal
 
+* refactor(instrumentation-http): Remove legacy http span attributes and metrics [#5552](https://github.com/open-telemetry/opentelemetry-js/pull/5552) @svetlanabrennan
+* refactor(instrumentation-http): Add back support for http semconv [#5665](https://github.com/open-telemetry/opentelemetry-js/pull/5665) @JamieDanielson
+  * Note: We initially removed support for legacy http attributes and metrics, but then added back for an additional 6 months to ensure all instrumentations could be updated and kept consistent. There should be no net new change in this instrumentation related to these semantic conventions. See [#5646](https://github.com/open-telemetry/opentelemetry-js/issues/5646) for details.
+* refactor(sdk-node): update semconv usage to `ATTR_` exports [#5668](https://github.com/open-telemetry/opentelemetry-js/pull/5668) @trentm
 * chore(sdk-node): Refactored using `get*FromEnv` utility function instead of `process.env` for NodeSDK's resource detector setup. [#5582](https://github.com/open-telemetry/opentelemetry-js/pull/5582) @beeme1mr
 * chore(sdk-node): Refactored using `get*FromEnv` utility function instead of `process.env` for NodeSDK's logging setup. [#5563](https://github.com/open-telemetry/opentelemetry-js/issues/5563) @weyert
+* test: test Node.js 24 in CI [#5661](https://github.com/open-telemetry/opentelemetry-js/pull/5661) @cjihrig
 
 ## 0.200.0
 
