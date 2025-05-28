@@ -63,7 +63,7 @@ jobs:
         run: npm run export-telemetry
         working-directory: e2e-tests
       - name: stop collector
-        run: npm run stop-collector
+        run: pkill -f otelcol-contrib
         working-directory: e2e-tests
       - name: Print output
         run: cat collector-output.json
