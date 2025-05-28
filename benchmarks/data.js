@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1748336879329,
+  "lastUpdate": 1748429122755,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -33700,6 +33700,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.47%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "cjihrig@gmail.com",
+            "name": "Colin Ihrig",
+            "username": "cjihrig"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c1935022c18c00cc8f945889b5ccf8cf73a4ae06",
+          "message": "fix(instrumentation): remove dependency on the shimmer module (#5652)",
+          "timestamp": "2025-05-28T10:38:03Z",
+          "tree_id": "38ee04c2c7d371fef4d6777012fc86887877d5f9",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/c1935022c18c00cc8f945889b5ccf8cf73a4ae06"
+        },
+        "date": 1748429121609,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1562801,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18620,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 816319,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 775682,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
