@@ -23,7 +23,7 @@ An exception is granted for dependencies on `@opentelemetry/api`, which, if used
 
 ## Third-Party Library Dependencies
 
-Packages categorized as third-party and listed under the `"dependencies"` section (e.g., @grpc/grpc-js, @grpc/proto-loader, shimmer, etc.) should remain unpinned and utilize the caret (`^`) symbol. This approach offers several advantages:
+Packages categorized as third-party and listed under the `"dependencies"` section (e.g., @grpc/grpc-js, @grpc/proto-loader, etc.) should remain unpinned and utilize the caret (`^`) symbol. This approach offers several advantages:
 
 - Our users could get bug fixes of those 3rd-party packages easily, without waiting for us to update our library.
 - In cases where multiple packages have dependencies on different versions of the same package, npm will opt for the most recent version, saving space and preventing potential disruptions.
