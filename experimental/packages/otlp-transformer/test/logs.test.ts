@@ -75,7 +75,7 @@ function createExpectedLogJson(
                 severityNumber: ESeverityNumber.SEVERITY_NUMBER_ERROR,
                 severityText: 'error',
                 body: { stringValue: 'some_log_body' },
-                eventName: "some.event.name",
+                eventName: 'some.event.name',
 
                 attributes: [
                   {
