@@ -14,4 +14,12 @@
  * limitations under the License.
  */
 
-export { OTLPMetricExporter } from './platform';
+module.exports = {
+  env: {
+    node: true,
+  },
+  ...require('../eslint.base.js'),
+  rules: {
+    'no-console': 'off',
+  },
+};

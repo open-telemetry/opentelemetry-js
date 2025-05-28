@@ -18,7 +18,7 @@ import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-
 import { OTLPMetricExporterBase } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { ProtobufMetricsSerializer } from '@opentelemetry/otlp-transformer';
-import { VERSION } from './version';
+import { VERSION } from '../../version';
 import {
   convertLegacyHttpOptions,
   createOtlpHttpExportDelegate,

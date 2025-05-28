@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-export { OTLPMetricExporter } from './platform';
+export { OTLPMetricExporter } from './OTLPMetricExporter';
