@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* feat(api): improve isValidSpanId, isValidTraceId performance [#5714](https://github.com/open-telemetry/opentelemetry-js/pull/5714) @seemk
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
