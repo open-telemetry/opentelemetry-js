@@ -59,16 +59,15 @@ jobs:
         run: |
           ./otelcol-contrib --config collector-config.yaml &
         working-directory: e2e-tests
-      - name: Run E2E Tests
-        run: make test
+      - name: Export telemetry to collector
+        run: npm run export-telemetry
         working-directory: e2e-tests
-      - name: kill collector
-        run: |
-          pkill -f otelcol-contrib
+      - name: stop collector
+        run: npm run stop-collector
         working-directory: e2e-tests
       - name: Print output
         run: cat collector-output.json
         working-directory: e2e-tests
       - name: verify exported telemetry
-        run: make verify
+        run: npm run verify
         working-directory: e2e-tests
