@@ -27,8 +27,7 @@ make
 
 Each step of the tests can also be run separately:
 
-
-#### `make all`
+#### `make all` (default target)
 
 Runs the full E2E test workflow in sequence: prepares the output file, starts the Collector, runs the tests, stops the Collector, and verifies the results.
 
