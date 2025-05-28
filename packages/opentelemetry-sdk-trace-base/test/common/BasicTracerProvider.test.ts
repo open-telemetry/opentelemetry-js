@@ -17,6 +17,7 @@
 import {
   context,
   trace,
+  SpanContext,
   TraceFlags,
   ROOT_CONTEXT,
   diag,
@@ -393,11 +394,10 @@ describe('BasicTracerProvider', () => {
       const span = tracer.startSpan(
         'my-span',
         {},
-        trace.setSpanContext(ROOT_CONTEXT, {
-          traceId: 'invalid',
-          spanId: '1',
-          traceFlags: TraceFlags.SAMPLED,
-        })
+        trace.setSpanContext(
+          ROOT_CONTEXT,
+          'invalid-parent' as unknown as SpanContext
+        )
       );
       assert.ok(span instanceof SpanImpl);
       assert.deepStrictEqual(

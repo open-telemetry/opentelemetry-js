@@ -18,6 +18,7 @@ import { NonRecordingSpan } from './NonRecordingSpan';
 import { Span } from './span';
 import { SpanContext } from './span_context';
 
+// Valid characters (0-9, a-f, A-F) are marked as 1.
 const isHex = [
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1,
@@ -27,10 +28,13 @@ const isHex = [
 ] as const;
 
 function isValidHex(id: string, length: number): boolean {
-  if (id.length !== length) return false;
+  // As of 1.9.0 the id was allowed to be undefined,
+  // even though it was not possible in the types.
+  if (id === undefined || id.length !== length) return false;
 
   let r = 0;
   for (let i = 0; i < id.length; i += 4) {
+    // Mask by 0x7f (127) to avoid LUT overflow.
     r +=
       isHex[id.charCodeAt(i) & 0x7f] +
       isHex[id.charCodeAt(i + 1) & 0x7f] +
