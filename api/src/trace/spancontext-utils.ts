@@ -28,9 +28,9 @@ const isHex = [
 ] as const;
 
 function isValidHex(id: string, length: number): boolean {
-  // As of 1.9.0 the id was allowed to be undefined,
+  // As of 1.9.0 the id was allowed to be a non-string value,
   // even though it was not possible in the types.
-  if (id === undefined || id.length !== length) return false;
+  if (typeof id !== 'string' || id.length !== length) return false;
 
   let r = 0;
   for (let i = 0; i < id.length; i += 4) {
