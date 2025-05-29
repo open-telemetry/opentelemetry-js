@@ -73,6 +73,7 @@ export function convertLegacyHttpOptions(
       timeoutMillis: config.timeoutMillis,
       compression: config.compression,
       agentOptions: convertLegacyAgentOptions(config),
+      agent: config.httpAgent,
     },
     getHttpConfigurationFromEnvironment(signalIdentifier, signalResourcePath),
     getHttpConfigurationDefaults(requiredHeaders, signalResourcePath)
