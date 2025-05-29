@@ -179,6 +179,11 @@ export class LogRecord implements ReadableLogRecord {
     return this;
   }
 
+  public setEventName(eventName: string) {
+    this.eventName = eventName;
+    return this;
+  }
+
   public setSeverityNumber(severityNumber: logsAPI.SeverityNumber) {
     this.severityNumber = severityNumber;
     return this;
