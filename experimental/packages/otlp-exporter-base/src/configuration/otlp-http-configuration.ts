@@ -29,6 +29,7 @@ export interface OtlpHttpConfiguration extends OtlpSharedConfiguration {
   url: string;
   headers: () => Record<string, string>;
   agentOptions: http.AgentOptions | https.AgentOptions;
+  agent?: http.Agent | https.Agent;
 }
 
 function mergeHeaders(

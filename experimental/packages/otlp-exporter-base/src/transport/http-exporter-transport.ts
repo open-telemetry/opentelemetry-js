@@ -68,10 +68,9 @@ class HttpExporterTransport implements IExporterTransport {
       } = require('./http-transport-utils');
 
       utils = this._utils = {
-        agent: createHttpAgent(
-          this._parameters.url,
-          this._parameters.agentOptions
-        ),
+        agent:
+          this._parameters.agent ??
+          createHttpAgent(this._parameters.url, this._parameters.agentOptions),
         send: sendWithHttp,
       };
     }
