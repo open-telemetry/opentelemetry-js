@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* feat(api): add attributes argument to recordException API [#5333](https://github.com/open-telemetry/opentelemetry-js/pull/5333) @brianphillips
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
