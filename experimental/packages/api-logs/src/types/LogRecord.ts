@@ -50,6 +50,11 @@ export enum SeverityNumber {
 
 export interface LogRecord {
   /**
+   * The unique identifier for the log record.
+   */
+  eventName?: string;
+
+  /**
    * The time when the log record occurred as UNIX Epoch time in nanoseconds.
    */
   timestamp?: TimeInput;

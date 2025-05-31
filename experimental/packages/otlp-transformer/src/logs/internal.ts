@@ -99,6 +99,7 @@ function toLogRecord(log: ReadableLogRecord, encoder: Encoder): ILogRecord {
     severityNumber: toSeverityNumber(log.severityNumber),
     severityText: log.severityText,
     body: toAnyValue(log.body),
+    eventName: log.eventName,
     attributes: toLogAttributes(log.attributes),
     droppedAttributesCount: log.droppedAttributesCount,
     flags: log.spanContext?.traceFlags,

@@ -83,6 +83,9 @@ export interface ILogRecord {
 
   /** LogRecord spanId */
   spanId?: string | Uint8Array;
+
+  /** LogRecord eventName */
+  eventName?: string;
 }
 
 /**
