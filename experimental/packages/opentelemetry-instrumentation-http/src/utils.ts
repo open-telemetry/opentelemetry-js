@@ -82,6 +82,7 @@ import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
 import { Err, IgnoreMatcher, ParsedRequestOptions } from './internal-types';
 import { SYNTHETIC_BOT_NAMES, SYNTHETIC_TEST_NAMES } from './internal-types';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 import forwardedParse = require('forwarded-parse');
 
 /**
@@ -376,7 +377,7 @@ export const getRequestInfo = (
       try {
         const parsedUrl = new URL(optionsParsed.path, origin);
         pathname = parsedUrl.pathname || '/';
-      } catch (e) {
+      } catch {
         pathname = '/';
       }
     }

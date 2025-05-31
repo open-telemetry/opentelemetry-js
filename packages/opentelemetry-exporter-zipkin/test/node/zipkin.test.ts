@@ -433,7 +433,7 @@ describe('Zipkin Exporter - node', () => {
     const exporter = new ZipkinExporter({});
 
     exporter.export([span1, span2], (result: ExportResult) => {
-      requestBody;
+      assert.ok(requestBody);
       scope.done();
       assert.equal(
         requestBody[0].localEndpoint.serviceName,
@@ -531,7 +531,7 @@ describe('Zipkin Exporter - node', () => {
     const exporter = new ZipkinExporter({});
 
     exporter.export([span1, span2], (result: ExportResult) => {
-      requestBody;
+      assert.ok(requestBody);
       scope.done();
       assert.equal(requestBody[0].localEndpoint.serviceName, span_service_name);
       assert.equal(

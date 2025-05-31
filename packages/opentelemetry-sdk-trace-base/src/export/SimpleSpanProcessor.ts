@@ -66,7 +66,9 @@ export class SimpleSpanProcessor implements SpanProcessor {
     );
     // Enqueue this export to the pending list so it can be flushed by the user.
     this._pendingExports.add(pendingExport);
-    pendingExport.finally(() => this._pendingExports.delete(pendingExport));
+    void pendingExport.finally(() =>
+      this._pendingExports.delete(pendingExport)
+    );
   }
 
   private async _doExport(span: ReadableSpan): Promise<void> {

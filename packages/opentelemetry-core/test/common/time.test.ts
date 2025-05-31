@@ -122,7 +122,7 @@ describe('time', () => {
         [1609297640313, [1609297640, 313000000]],
         // inevitable precision loss without decimal arithmetics.
         [1609297640313.333, [1609297640, 313333008]],
-        // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
+        // eslint-disable-next-line no-loss-of-precision
         [1609297640313.333333333, [1609297640, 313333252]],
       ] as const;
       for (const [idx, input] of inputs.entries()) {
