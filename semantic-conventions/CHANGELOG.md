@@ -15,6 +15,46 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :house: Internal
 
+## 1.34.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.34.0 [#5703](https://github.com/open-telemetry/opentelemetry-js/pull/5703) @trentm
+  * Semantic Conventions v1.34.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1340) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *none*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *12 added exports*
+
+#### Unstable changes in v1.34.0
+
+<details>
+<summary>12 added exports</summary>
+
+```js
+ATTR_AWS_BEDROCK_GUARDRAIL_ID             // aws.bedrock.guardrail.id
+ATTR_AWS_BEDROCK_KNOWLEDGE_BASE_ID        // aws.bedrock.knowledge_base.id
+ATTR_AWS_KINESIS_STREAM_NAME              // aws.kinesis.stream_name
+ATTR_AWS_LAMBDA_RESOURCE_MAPPING_ID       // aws.lambda.resource_mapping.id
+ATTR_AWS_SECRETSMANAGER_SECRET_ARN        // aws.secretsmanager.secret.arn
+ATTR_AWS_SNS_TOPIC_ARN                    // aws.sns.topic.arn
+ATTR_AWS_SQS_QUEUE_URL                    // aws.sqs.queue.url
+ATTR_AWS_STEP_FUNCTIONS_ACTIVITY_ARN      // aws.step_functions.activity.arn
+ATTR_AWS_STEP_FUNCTIONS_STATE_MACHINE_ARN // aws.step_functions.state_machine.arn
+
+ATTR_FEATURE_FLAG_RESULT_VALUE            // feature_flag.result.value
+
+ATTR_GEN_AI_CONVERSATION_ID               // gen_ai.conversation.id
+ATTR_GEN_AI_DATA_SOURCE_ID                // gen_ai.data_source.id
+```
+
+</details>
+
+## 1.33.1
+
+### :boom: Breaking Changes
+
+* fix: Remove the subset of `DB_SYSTEM_NAME_VALUE_*` exports that are unstable from the `@opentelemetry/semantic-conventions` entry point. [#5690](https://github.com/open-telemetry/opentelemetry-js/pull/5690)
+  * Version 1.33.0 erroneously included all `DB_SYSTEM_NAME_VALUE_*` constants in the stable entry point. Some of those enum values are not yet stable. They have been moved back to the unstable `@opentelemetry/semantic-conventions/incubating` entry point. See the PR description for a full list.
+
 ## 1.33.0
 
 ### :rocket: Features

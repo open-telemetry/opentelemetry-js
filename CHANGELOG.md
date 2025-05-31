@@ -16,6 +16,16 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+### :books: Documentation
+
+### :house: Internal
+
+* chore: enable tsconfig isolatedModules [#5697](https://github.com/open-telemetry/opentelemetry-js/pull/5697) @legendecas
+
+## 2.0.1
+
+### :bug: Bug Fixes
+
 * fix(resources): guard asynchronous resource attribute rejections from causing unhandled promise rejection [#5544](https://github.com/open-telemetry/opentelemetry-js/pull/5544) @dyladan
 * fix(resource): do not trigger `Accessing resource attributes before async attributes settled` warning when detecting resources [#5546](https://github.com/open-telemetry/opentelemetry-js/pull/5546) @dyladan
   * verbose logging of detected resource removed

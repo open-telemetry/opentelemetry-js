@@ -17,7 +17,7 @@
 import * as api from '@opentelemetry/api';
 import {
   SemconvStability,
-  httpSemconvStabilityFromStr,
+  semconvStabilityFromStr,
   isWrapped,
   InstrumentationBase,
   InstrumentationConfig,
@@ -122,7 +122,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
 
   constructor(config: XMLHttpRequestInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-xml-http-request', VERSION, config);
-    this._semconvStability = httpSemconvStabilityFromStr(
+    this._semconvStability = semconvStabilityFromStr(
+      'http',
       config?.semconvStabilityOptIn
     );
   }

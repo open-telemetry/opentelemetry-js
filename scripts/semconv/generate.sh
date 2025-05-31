@@ -7,7 +7,7 @@ ROOT_DIR="${SCRIPT_DIR}/../../"
 
 # Get latest version by running `git tag -l --sort=version:refname | tail -1`
 # ... in git@github.com:open-telemetry/semantic-conventions.git
-SPEC_VERSION=v1.33.0
+SPEC_VERSION=v1.34.0
 # ... in git@github.com:open-telemetry/weaver.git
 GENERATOR_VERSION=v0.15.0
 
@@ -27,6 +27,7 @@ git fetch origin "${SPEC_VERSION}" --depth=1
 git reset --hard FETCH_HEAD
 cd ${SCRIPT_DIR}
 
+# Generate "semantic-conventions/src/stable_*.ts".
 docker run --rm --platform linux/amd64 \
   -v ${SCRIPT_DIR}/semantic-conventions/model:/source \
   -v ${SCRIPT_DIR}/templates:/weaver/templates \
@@ -35,7 +36,19 @@ docker run --rm --platform linux/amd64 \
   registry generate \
   --registry=/source \
   --templates=/weaver/templates \
-  stable \
+  ts-stable \
+  /output/
+
+# Generate "semantic-conventions/src/experimental_*.ts".
+docker run --rm --platform linux/amd64 \
+  -v ${SCRIPT_DIR}/semantic-conventions/model:/source \
+  -v ${SCRIPT_DIR}/templates:/weaver/templates \
+  -v ${ROOT_DIR}/semantic-conventions/src/:/output \
+  otel/weaver:$GENERATOR_VERSION \
+  registry generate \
+  --registry=/source \
+  --templates=/weaver/templates \
+  ts-experimental \
   /output/
 
 # Ensure semconv compiles

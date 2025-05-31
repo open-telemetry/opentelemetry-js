@@ -15,5 +15,5 @@
  */
 
 export { prepareSend } from './platform';
-export { ExporterConfig } from './types';
+export type { ExporterConfig } from './types';
 export { ZipkinExporter } from './zipkin';

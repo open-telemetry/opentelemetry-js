@@ -48,7 +48,7 @@ import {
   InstrumentationBase,
   InstrumentationNodeModuleDefinition,
   SemconvStability,
-  httpSemconvStabilityFromStr,
+  semconvStabilityFromStr,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import { errorMonitor } from 'events';
@@ -100,7 +100,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   constructor(config: HttpInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-http', VERSION, config);
     this._headerCapture = this._createHeaderCapture();
-    this._semconvStability = httpSemconvStabilityFromStr(
+    this._semconvStability = semconvStabilityFromStr(
+      'http',
       process.env.OTEL_SEMCONV_STABILITY_OPT_IN
     );
   }

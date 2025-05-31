@@ -14,27 +14,26 @@
  * limitations under the License.
  */
 
-export {
+export type {
   Sum,
   LastValue,
   Histogram,
   ExponentialHistogram,
 } from './aggregator/types';
 
-export {
+export type {
   AggregationSelector,
   AggregationTemporalitySelector,
 } from './export/AggregationSelector';
 
 export { AggregationTemporality } from './export/AggregationTemporality';
 
-export {
+export { DataPointType, InstrumentType } from './export/MetricData';
+export type {
   DataPoint,
-  DataPointType,
   SumMetricData,
   GaugeMetricData,
   HistogramMetricData,
-  InstrumentType,
   ExponentialHistogramMetricData,
   ResourceMetrics,
   ScopeMetrics,
@@ -43,33 +42,33 @@ export {
   CollectionResult,
 } from './export/MetricData';
 
-export { PushMetricExporter } from './export/MetricExporter';
+export type { PushMetricExporter } from './export/MetricExporter';
 
-export {
-  IMetricReader,
-  MetricReader,
-  MetricReaderOptions,
-} from './export/MetricReader';
+export { MetricReader } from './export/MetricReader';
+export type { IMetricReader, MetricReaderOptions } from './export/MetricReader';
 
-export {
-  PeriodicExportingMetricReader,
-  PeriodicExportingMetricReaderOptions,
-} from './export/PeriodicExportingMetricReader';
+export { PeriodicExportingMetricReader } from './export/PeriodicExportingMetricReader';
+export type { PeriodicExportingMetricReaderOptions } from './export/PeriodicExportingMetricReader';
 
 export { InMemoryMetricExporter } from './export/InMemoryMetricExporter';
 
 export { ConsoleMetricExporter } from './export/ConsoleMetricExporter';
 
-export { MetricCollectOptions, MetricProducer } from './export/MetricProducer';
+export type {
+  MetricCollectOptions,
+  MetricProducer,
+} from './export/MetricProducer';
 
-export { MeterProvider, MeterProviderOptions } from './MeterProvider';
+export { MeterProvider } from './MeterProvider';
+export type { MeterProviderOptions } from './MeterProvider';
 
-export { AggregationOption, AggregationType } from './view/AggregationOption';
+export { AggregationType } from './view/AggregationOption';
+export type { AggregationOption } from './view/AggregationOption';
 
-export { ViewOptions } from './view/View';
+export type { ViewOptions } from './view/View';
 
+export type { IAttributesProcessor } from './view/AttributesProcessor';
 export {
-  IAttributesProcessor,
   createAllowListAttributesProcessor,
   createDenyListAttributesProcessor,
 } from './view/AttributesProcessor';

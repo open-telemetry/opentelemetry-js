@@ -17,7 +17,7 @@
 import * as api from '@opentelemetry/api';
 import {
   SemconvStability,
-  httpSemconvStabilityFromStr,
+  semconvStabilityFromStr,
   isWrapped,
   registerInstrumentations,
 } from '@opentelemetry/instrumentation';
@@ -1250,7 +1250,8 @@ describe('fetch', () => {
         ) => {
           const span: tracing.ReadableSpan = exportedSpans[0];
 
-          const semconvStability = httpSemconvStabilityFromStr(
+          const semconvStability = semconvStabilityFromStr(
+            'http',
             config.semconvStabilityOptIn
           );
           if (semconvStability & SemconvStability.OLD) {

@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
 
-import { OTLPMetricExporter } from '../src/';
+import { OTLPMetricExporter } from '../../src/platform/node';
 import {
   MeterProvider,
   PeriodicExportingMetricReader,
