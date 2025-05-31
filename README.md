@@ -245,7 +245,6 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Martin Kuba](https://github.com/martinkuba), Lightstep
 - [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
 - [Matthew Wear](https://github.com/mwear), LightStep
-- [Naseem K. Ullah](https://github.com/naseemkullah), Transit
 - [Neville Wylie](https://github.com/MSNev), Microsoft
 - [Purvi Kanal](https://github.com/pkanal), Honeycomb
 - [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
@@ -299,6 +298,7 @@ Typically, members of this are [component owners](https://github.com/open-teleme
 - [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal, Approver
 - [Gerhard Stöbich](https://github.com/Flarna), Dynatrace, Approver
 - [Haddas Bronfman](https://github.com/haddasbronfman), Cisco, Approver
+- [Naseem K. Ullah](https://github.com/naseemkullah), Transit, Approver
 
 *Find more about the emeritus role in [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#emeritus-maintainerapprovertriager).*
 
