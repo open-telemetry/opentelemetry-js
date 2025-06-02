@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* feat(api): Integrate @opentelemetry/api-logs package into @opentelemetry/api as experimental [#4862](https://github.com/open-telemetry/opentelemetry-js/pull/4862) @hectorhdzg
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
