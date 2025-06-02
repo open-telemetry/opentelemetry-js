@@ -15,7 +15,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :books: Documentation
 
 ### :house: Internal
-* refactor: refactor: Removed `api-events` and `sdk-events` [#5737](https://github.com/open-telemetry/opentelemetry-js/pull/5737) @svetlanabrennan
+* refactor: Removed `api-events` and `sdk-events` [#5737](https://github.com/open-telemetry/opentelemetry-js/pull/5737) @svetlanabrennan
 
 ## 0.202.0
 
