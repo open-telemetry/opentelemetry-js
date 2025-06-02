@@ -59,42 +59,45 @@ export class PeriodicExportingMetricReader extends MetricReader {
   private readonly _exportTimeout: number;
 
   constructor(options: PeriodicExportingMetricReaderOptions) {
+    const { exporter, exportIntervalMillis = 60000, metricProducers } = options;
+    let { exportTimeoutMillis = 30000 } = options;
+
     super({
-      aggregationSelector: options.exporter.selectAggregation?.bind(
-        options.exporter
-      ),
+      aggregationSelector: exporter.selectAggregation?.bind(exporter),
       aggregationTemporalitySelector:
-        options.exporter.selectAggregationTemporality?.bind(options.exporter),
-      metricProducers: options.metricProducers,
+        exporter.selectAggregationTemporality?.bind(exporter),
+      metricProducers,
     });
 
-    if (
-      options.exportIntervalMillis !== undefined &&
-      options.exportIntervalMillis <= 0
-    ) {
+    if (exportIntervalMillis <= 0) {
       throw Error('exportIntervalMillis must be greater than 0');
     }
 
-    if (
-      options.exportTimeoutMillis !== undefined &&
-      options.exportTimeoutMillis <= 0
-    ) {
+    if (exportTimeoutMillis <= 0) {
       throw Error('exportTimeoutMillis must be greater than 0');
     }
 
-    if (
-      options.exportTimeoutMillis !== undefined &&
-      options.exportIntervalMillis !== undefined &&
-      options.exportIntervalMillis < options.exportTimeoutMillis
-    ) {
-      throw Error(
-        'exportIntervalMillis must be greater than or equal to exportTimeoutMillis'
-      );
+    if (exportIntervalMillis < exportTimeoutMillis) {
+      if (
+        'exportIntervalMillis' in options &&
+        'exportTimeoutMillis' in options
+      ) {
+        // An invalid combination of values was explicitly provided.
+        throw Error(
+          'exportIntervalMillis must be greater than or equal to exportTimeoutMillis'
+        );
+      } else {
+        // An invalid combination of value was implicitly provided.
+        api.diag.warn(
+          `Timeout of ${exportTimeoutMillis} exceeds the interval of ${exportIntervalMillis}. Clamping timeout to interval duration.`
+        );
+        exportTimeoutMillis = exportIntervalMillis;
+      }
     }
 
-    this._exportInterval = options.exportIntervalMillis ?? 60000;
-    this._exportTimeout = options.exportTimeoutMillis ?? 30000;
-    this._exporter = options.exporter;
+    this._exportInterval = exportIntervalMillis;
+    this._exportTimeout = exportTimeoutMillis;
+    this._exporter = exporter;
   }
 
   private async _runOnce(): Promise<void> {
