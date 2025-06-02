@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1748876644757,
+  "lastUpdate": 1748886328009,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -34012,6 +34012,58 @@ window.BENCHMARK_DATA = {
             "range": "±1.25%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dyladan@users.noreply.github.com",
+            "name": "Daniel Dyla",
+            "username": "dyladan"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "56df3c03468303d7f7767ff5244c9e190144082b",
+          "message": "feat: add event name to event API and SDK (#5707)\n\nCo-authored-by: Marc Pichler <marcpi@edu.aau.at>",
+          "timestamp": "2025-06-02T17:37:06Z",
+          "tree_id": "5d95b1e031126f1735ffaba3399603b786cf3e31",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/56df3c03468303d7f7767ff5244c9e190144082b"
+        },
+        "date": 1748886322934,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1489762,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 17898,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 806361,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 783117,
+            "range": "±0.64%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
