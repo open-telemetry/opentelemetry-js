@@ -19,13 +19,12 @@ import { Span } from './span';
 import { SpanContext } from './span_context';
 
 // Valid characters (0-9, a-f, A-F) are marked as 1.
-const isHex = [
+const isHex = new Uint8Array([
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0,
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-] as const;
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
+]);
 
 function isValidHex(id: string, length: number): boolean {
   // As of 1.9.0 the id was allowed to be a non-string value,
@@ -34,12 +33,11 @@ function isValidHex(id: string, length: number): boolean {
 
   let r = 0;
   for (let i = 0; i < id.length; i += 4) {
-    // Mask by 0x7f (127) to avoid LUT overflow.
     r +=
-      isHex[id.charCodeAt(i) & 0x7f] +
-      isHex[id.charCodeAt(i + 1) & 0x7f] +
-      isHex[id.charCodeAt(i + 2) & 0x7f] +
-      isHex[id.charCodeAt(i + 3) & 0x7f];
+      (isHex[id.charCodeAt(i)] | 0) +
+      (isHex[id.charCodeAt(i + 1)] | 0) +
+      (isHex[id.charCodeAt(i + 2)] | 0) +
+      (isHex[id.charCodeAt(i + 3)] | 0);
   }
 
   return r === length;
