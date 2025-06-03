@@ -18,7 +18,8 @@
 import type * as http from 'http';
 import type * as https from 'https';
 
-import { OTLPExporterConfigBase } from './legacy-base-configuration';
+import type { OTLPExporterConfigBase } from './legacy-base-configuration';
+import type { HttpAgentFactory } from './otlp-http-configuration';
 
 /**
  * Collector Exporter node base config
@@ -26,18 +27,7 @@ import { OTLPExporterConfigBase } from './legacy-base-configuration';
 export interface OTLPExporterNodeConfigBase extends OTLPExporterConfigBase {
   keepAlive?: boolean;
   compression?: CompressionAlgorithm;
-  httpAgentOptions?: http.AgentOptions | https.AgentOptions;
-  /**
-   * {@link httpAgentOptions} should be preferred in almost all cases.
-   *
-   * This option exists to allow passing an instance of a custom HTTP agent
-   * class for advanced use cases.
-   * Great care must be taken not to require the `http` module before it is
-   * instrumented (for instance by importing the `Agent` class to extend it)
-   * in CommonJS code, as this will break the instrumentation and no telemetry
-   * data will be collected.
-   */
-  httpAgent?: http.Agent | https.Agent;
+  httpAgentOptions?: http.AgentOptions | https.AgentOptions | HttpAgentFactory;
 }
 
 export enum CompressionAlgorithm {

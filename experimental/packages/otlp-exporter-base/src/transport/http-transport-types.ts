@@ -17,6 +17,7 @@
 import type * as http from 'http';
 import type * as https from 'https';
 import { ExportResponse } from '../export-response';
+import { HttpAgentFactory } from '../configuration/otlp-http-configuration';
 
 export type sendWithHttp = (
   params: HttpRequestParameters,
@@ -30,6 +31,5 @@ export interface HttpRequestParameters {
   url: string;
   headers: () => Record<string, string>;
   compression: 'gzip' | 'none';
-  agentOptions: http.AgentOptions | https.AgentOptions;
-  agent?: http.Agent | https.Agent;
+  agent: HttpAgentFactory;
 }

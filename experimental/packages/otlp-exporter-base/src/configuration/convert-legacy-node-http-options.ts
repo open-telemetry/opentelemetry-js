@@ -16,18 +16,22 @@
 import { OTLPExporterNodeConfigBase } from './legacy-node-configuration';
 import {
   getHttpConfigurationDefaults,
+  HttpAgentFactory,
+  httpAgentFactoryFromOptions,
   mergeOtlpHttpConfigurationWithDefaults,
   OtlpHttpConfiguration,
 } from './otlp-http-configuration';
 import { getHttpConfigurationFromEnvironment } from './otlp-http-env-configuration';
-import type * as http from 'http';
-import type * as https from 'https';
 import { diag } from '@opentelemetry/api';
 import { wrapStaticHeadersInFunction } from './shared-configuration';
 
 function convertLegacyAgentOptions(
   config: OTLPExporterNodeConfigBase
-): http.AgentOptions | https.AgentOptions | undefined {
+): HttpAgentFactory | undefined {
+  if (typeof config.httpAgentOptions === 'function') {
+    return config.httpAgentOptions;
+  }
+
   // populate keepAlive for use with new settings
   if (config?.keepAlive != null) {
     if (config.httpAgentOptions != null) {
@@ -44,7 +48,11 @@ function convertLegacyAgentOptions(
     }
   }
 
-  return config.httpAgentOptions;
+  if (config.httpAgentOptions != null) {
+    return httpAgentFactoryFromOptions(config.httpAgentOptions);
+  } else {
+    return undefined;
+  }
 }
 
 /**
@@ -72,8 +80,7 @@ export function convertLegacyHttpOptions(
       concurrencyLimit: config.concurrencyLimit,
       timeoutMillis: config.timeoutMillis,
       compression: config.compression,
-      agentOptions: convertLegacyAgentOptions(config),
-      agent: config.httpAgent,
+      agent: convertLegacyAgentOptions(config),
     },
     getHttpConfigurationFromEnvironment(signalIdentifier, signalResourcePath),
     getHttpConfigurationDefaults(requiredHeaders, signalResourcePath)
