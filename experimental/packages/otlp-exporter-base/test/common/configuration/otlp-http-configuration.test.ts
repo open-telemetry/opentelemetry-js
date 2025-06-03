@@ -19,7 +19,6 @@ import {
   OtlpHttpConfiguration,
 } from '../../../src/configuration/otlp-http-configuration';
 import * as assert from 'assert';
-import * as http from 'http';
 import { testSharedConfigBehavior } from './shared-configuration.test';
 
 describe('mergeOtlpHttpConfigurationWithDefaults', function () {
@@ -29,7 +28,7 @@ describe('mergeOtlpHttpConfigurationWithDefaults', function () {
     compression: 'none',
     concurrencyLimit: 2,
     headers: () => ({ 'User-Agent': 'default-user-agent' }),
-    agent: () => new http.Agent({ keepAlive: true }),
+    agent: () => null!,
   };
 
   describe('headers', function () {
