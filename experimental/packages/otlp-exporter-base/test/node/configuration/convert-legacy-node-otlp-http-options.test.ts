@@ -41,6 +41,20 @@ describe('convertLegacyHttpOptions', function () {
     );
   });
 
+  it('should keep agent factory as-is', function () {
+    // act
+    const factory = () => null!;
+    const options = convertLegacyHttpOptions(
+      { httpAgentOptions: factory },
+      'SIGNAL',
+      'v1/signal',
+      {}
+    );
+
+    // assert
+    assert.strictEqual(options.agent, factory);
+  });
+
   it('should keep specific keepAlive', async () => {
     // act
     const options = convertLegacyHttpOptions(
