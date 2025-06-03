@@ -22,4 +22,4 @@ export {
 } from './ExponentialHistogram';
 export { LastValueAccumulation, LastValueAggregator } from './LastValue';
 export { SumAccumulation, SumAggregator } from './Sum';
-export { Aggregator } from './types';
+export type { Aggregator } from './types';

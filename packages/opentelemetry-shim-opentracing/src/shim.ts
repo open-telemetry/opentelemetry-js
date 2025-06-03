@@ -23,9 +23,9 @@ import {
 } from '@opentelemetry/api';
 import * as opentracing from 'opentracing';
 import {
-  SEMATTRS_EXCEPTION_MESSAGE,
-  SEMATTRS_EXCEPTION_STACKTRACE,
-  SEMATTRS_EXCEPTION_TYPE,
+  ATTR_EXCEPTION_MESSAGE,
+  ATTR_EXCEPTION_STACKTRACE,
+  ATTR_EXCEPTION_TYPE,
 } from '@opentelemetry/semantic-conventions';
 
 function translateReferences(references: opentracing.Reference[]): api.Link[] {
@@ -329,15 +329,15 @@ export class SpanShim extends opentracing.Span {
       for (const [k, v] of entries) {
         switch (k) {
           case 'error.kind': {
-            mappedAttributes[SEMATTRS_EXCEPTION_TYPE] = v;
+            mappedAttributes[ATTR_EXCEPTION_TYPE] = v;
             break;
           }
           case 'message': {
-            mappedAttributes[SEMATTRS_EXCEPTION_MESSAGE] = v;
+            mappedAttributes[ATTR_EXCEPTION_MESSAGE] = v;
             break;
           }
           case 'stack': {
-            mappedAttributes[SEMATTRS_EXCEPTION_STACKTRACE] = v;
+            mappedAttributes[ATTR_EXCEPTION_STACKTRACE] = v;
             break;
           }
           default: {

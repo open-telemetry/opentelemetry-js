@@ -48,14 +48,14 @@ const diagLoggerFunctions = [
   'error',
 ] as const;
 
-describe('API', () => {
-  it('should expose a tracer provider via getTracerProvider', () => {
+describe('API', function () {
+  it('should expose a tracer provider via getTracerProvider', function () {
     const tracer = api.trace.getTracerProvider();
     assert.ok(tracer);
     assert.strictEqual(typeof tracer, 'object');
   });
 
-  it('getActiveSpan should get the current span', () => {
+  it('getActiveSpan should get the current span', function () {
     const span = new NonRecordingSpan();
     const ctx = trace.setSpan(ROOT_CONTEXT, span);
     context.setGlobalContextManager({
@@ -69,8 +69,8 @@ describe('API', () => {
     context.disable();
   });
 
-  describe('Context', () => {
-    it('with should forward this, arguments and return value', () => {
+  describe('Context', function () {
+    it('with should forward this, arguments and return value', function () {
       function fnWithThis(this: string, a: string, b: number): string {
         assert.strictEqual(this, 'that');
         assert.strictEqual(arguments.length, 2);
@@ -89,7 +89,7 @@ describe('API', () => {
     });
   });
 
-  describe('GlobalTracerProvider', () => {
+  describe('GlobalTracerProvider', function () {
     const spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',
@@ -103,14 +103,14 @@ describe('API', () => {
       propagation.disable();
     });
 
-    it('should use the global tracer provider', () => {
+    it('should use the global tracer provider', function () {
       api.trace.setGlobalTracerProvider(new TestTracerProvider());
       const tracer = api.trace.getTracerProvider().getTracer('name');
       const span = tracer.startSpan('test');
       assert.deepStrictEqual(span, dummySpan);
     });
 
-    it('should set delegate only on success', () => {
+    it('should set delegate only on success', function () {
       assert.strictEqual(
         api.trace.setGlobalTracerProvider(new TestTracerProvider()),
         true
@@ -134,7 +134,7 @@ describe('API', () => {
       }
     }
 
-    describe('should use the global propagation', () => {
+    describe('should use the global propagation', function () {
       const testKey = Symbol('kTestKey');
 
       interface Carrier {
@@ -169,7 +169,7 @@ describe('API', () => {
         }
       }
 
-      it('inject', () => {
+      it('inject', function () {
         api.propagation.setGlobalPropagator(new TestTextMapPropagation());
 
         const context = ROOT_CONTEXT.setValue(testKey, 15);
@@ -186,7 +186,7 @@ describe('API', () => {
         assert.strictEqual(carrier.setter, setter);
       });
 
-      it('extract', () => {
+      it('extract', function () {
         api.propagation.setGlobalPropagator(new TestTextMapPropagation());
 
         const carrier: Carrier = {};
@@ -209,7 +209,7 @@ describe('API', () => {
         assert.strictEqual(data.getter, getter);
       });
 
-      it('fields', () => {
+      it('fields', function () {
         api.propagation.setGlobalPropagator(new TestTextMapPropagation());
 
         const fields = api.propagation.fields();
@@ -218,15 +218,15 @@ describe('API', () => {
     });
   });
 
-  describe('Global diag', () => {
-    it('initialization', () => {
+  describe('Global diag', function () {
+    it('initialization', function () {
       const inst = DiagAPI.instance();
 
       assert.deepStrictEqual(diag, inst);
     });
 
     diagLoggerFunctions.forEach(fName => {
-      it(`no argument logger ${fName} message doesn't throw`, () => {
+      it(`no argument logger ${fName} message doesn't throw`, function () {
         //@ts-expect-error an undefined logger is not allowed
         diag.setLogger();
         assert.doesNotThrow(() => {
@@ -234,21 +234,21 @@ describe('API', () => {
         });
       });
 
-      it(`null logger ${fName} message doesn't throw`, () => {
+      it(`null logger ${fName} message doesn't throw`, function () {
         diag.setLogger(null as any);
         assert.doesNotThrow(() => {
           diag[fName](`${fName} message`);
         });
       });
 
-      it(`undefined logger ${fName} message doesn't throw`, () => {
+      it(`undefined logger ${fName} message doesn't throw`, function () {
         diag.setLogger(undefined as any);
         assert.doesNotThrow(() => {
           diag[fName](`${fName} message`);
         });
       });
 
-      it(`empty logger ${fName} message doesn't throw`, () => {
+      it(`empty logger ${fName} message doesn't throw`, function () {
         diag.setLogger({} as any);
         assert.doesNotThrow(() => {
           diag[fName](`${fName} message`);
@@ -257,21 +257,21 @@ describe('API', () => {
     });
   });
 
-  describe('Global metrics', () => {
-    it('should expose a meter provider via getMeterProvider', () => {
+  describe('Global metrics', function () {
+    it('should expose a meter provider via getMeterProvider', function () {
       const meter = metrics.getMeterProvider();
       assert.ok(meter);
       assert.strictEqual(typeof meter, 'object');
     });
 
-    describe('GlobalMeterProvider', () => {
+    describe('GlobalMeterProvider', function () {
       const dummyMeter = new NoopMeter();
 
       beforeEach(() => {
         metrics.disable();
       });
 
-      it('should use the global meter provider', () => {
+      it('should use the global meter provider', function () {
         metrics.setGlobalMeterProvider(new TestMeterProvider());
         const meter = metrics.getMeterProvider().getMeter('name');
         assert.deepStrictEqual(meter, dummyMeter);

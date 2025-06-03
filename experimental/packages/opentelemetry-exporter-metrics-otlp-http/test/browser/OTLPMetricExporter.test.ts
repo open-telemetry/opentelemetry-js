@@ -57,7 +57,6 @@ describe('OTLPMetricExporter', function () {
           .getMeter('test-meter')
           .createCounter('test-counter')
           .add(1);
-        await meterProvider.forceFlush();
         await meterProvider.shutdown();
 
         // assert
@@ -97,7 +96,6 @@ describe('OTLPMetricExporter', function () {
           .createCounter('test-counter')
           .add(1);
 
-        await meterProvider.forceFlush();
         await meterProvider.shutdown();
 
         // assert

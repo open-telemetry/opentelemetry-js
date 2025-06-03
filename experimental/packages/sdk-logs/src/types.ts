@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-import type { IResource } from '@opentelemetry/resources';
+import type { Resource } from '@opentelemetry/resources';
+import { LogRecordProcessor } from './LogRecordProcessor';
 
 export interface LoggerProviderConfig {
   /** Resource associated with trace telemetry  */
-  resource?: IResource;
+  resource?: Resource;
 
   /**
    * How long the forceFlush can run before it is cancelled.
@@ -28,6 +29,9 @@ export interface LoggerProviderConfig {
 
   /** Log Record Limits*/
   logRecordLimits?: LogRecordLimits;
+
+  /** Log Record Processors */
+  processors?: LogRecordProcessor[];
 }
 
 export interface LogRecordLimits {

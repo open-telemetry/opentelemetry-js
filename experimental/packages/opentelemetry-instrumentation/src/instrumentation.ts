@@ -26,7 +26,7 @@ import {
   Span,
 } from '@opentelemetry/api';
 import { Logger, LoggerProvider, logs } from '@opentelemetry/api-logs';
-import * as shimmer from 'shimmer';
+import * as shimmer from './shimmer';
 import {
   InstrumentationModuleDefinition,
   Instrumentation,

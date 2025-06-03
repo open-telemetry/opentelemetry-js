@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import { webpack, Stats } from 'webpack';
 import * as path from 'path';
-import { Union } from 'unionfs';
+import { IFS, Union } from 'unionfs';
 import { fs as mfs } from 'memfs';
 import * as realFs from 'fs';
 
@@ -86,7 +86,7 @@ describe('tree-shaking', function () {
       });
 
       const fs = new Union();
-      fs.use(mfs as any).use(realFs);
+      fs.use(mfs as any).use(realFs as unknown as IFS);
 
       // direct webpack to use unionfs for file input
       // needs workaround from https://github.com/webpack/webpack/issues/18242#issuecomment-2018116985 since webpack 5.91.0

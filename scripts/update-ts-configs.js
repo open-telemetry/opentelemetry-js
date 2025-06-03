@@ -44,6 +44,7 @@ const tsConfigMergeKeys = [
 // Make `extends` the first field.
 const tsConfigPriorityKeys = ['extends'];
 const ignoredLernaProjects = [
+  'e2e-tests',
   'experimental/examples/*',
   'experimental/backwards-compatibility/*',
   'integration-tests/*',

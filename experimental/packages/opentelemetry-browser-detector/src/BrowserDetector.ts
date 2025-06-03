@@ -18,8 +18,8 @@ import { Attributes, diag } from '@opentelemetry/api';
 import {
   DetectedResource,
   ResourceDetector,
-  Resource,
   ResourceDetectionConfig,
+  emptyResource,
 } from '@opentelemetry/resources';
 import { BROWSER_ATTRIBUTES, UserAgentData } from './types';
 
@@ -30,7 +30,7 @@ class BrowserDetector implements ResourceDetector {
   detect(config?: ResourceDetectionConfig): DetectedResource {
     const isBrowser = typeof navigator !== 'undefined';
     if (!isBrowser) {
-      return Resource.EMPTY;
+      return emptyResource();
     }
     const browserResource: Attributes = getBrowserAttributes();
     return this._getResourceAttributes(browserResource, config);
@@ -53,7 +53,7 @@ class BrowserDetector implements ResourceDetector {
       diag.debug(
         'BrowserDetector failed: Unable to find required browser resources. '
       );
-      return Resource.EMPTY;
+      return emptyResource();
     } else {
       return { attributes: browserResource };
     }

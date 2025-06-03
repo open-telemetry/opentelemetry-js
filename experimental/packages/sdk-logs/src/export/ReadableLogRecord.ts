@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { IResource } from '@opentelemetry/resources';
+import type { Resource } from '@opentelemetry/resources';
 import type { HrTime, SpanContext } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import type {
@@ -30,7 +30,8 @@ export interface ReadableLogRecord {
   readonly severityText?: string;
   readonly severityNumber?: SeverityNumber;
   readonly body?: LogBody;
-  readonly resource: IResource;
+  readonly eventName?: string;
+  readonly resource: Resource;
   readonly instrumentationScope: InstrumentationScope;
   readonly attributes: LogAttributes;
   readonly droppedAttributesCount: number;

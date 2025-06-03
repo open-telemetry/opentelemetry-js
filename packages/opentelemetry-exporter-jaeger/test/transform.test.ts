@@ -17,7 +17,10 @@
 import * as assert from 'assert';
 import { spanToThrift } from '../src/transform';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
-import { Resource } from '@opentelemetry/resources';
+import {
+  emptyResource,
+  resourceFromAttributes,
+} from '@opentelemetry/resources';
 import * as api from '@opentelemetry/api';
 import { ThriftUtils, Utils, ThriftReferenceType } from '../src/types';
 import { hrTimeToMicroseconds } from '@opentelemetry/core';
@@ -73,12 +76,10 @@ describe('transform', () => {
           },
         ],
         duration: [32, 800000000],
-        resource: new Resource({
-          attributes: {
-            service: 'ui',
-            version: 1,
-            cost: 112.12,
-          },
+        resource: resourceFromAttributes({
+          service: 'ui',
+          version: 1,
+          cost: 112.12,
         }),
         instrumentationScope: {
           name: 'default',
@@ -179,7 +180,7 @@ describe('transform', () => {
         links: [],
         events: [],
         duration: [32, 800000000],
-        resource: Resource.EMPTY,
+        resource: emptyResource(),
         instrumentationScope: {
           name: 'default',
           version: '0.0.1',
@@ -237,7 +238,11 @@ describe('transform', () => {
           code: api.SpanStatusCode.OK,
         },
         attributes: {},
-        parentSpanId: '3e0c63257de34c92',
+        parentSpanContext: {
+          traceId: 'a4cda95b652f4a1592b449d5929fda1b',
+          spanId: '3e0c63257de34c92',
+          traceFlags: TraceFlags.SAMPLED,
+        },
         links: [
           {
             context: {
@@ -249,7 +254,7 @@ describe('transform', () => {
         ],
         events: [],
         duration: [32, 800000000],
-        resource: Resource.EMPTY,
+        resource: emptyResource(),
         instrumentationScope: {
           name: 'default',
           version: '0.0.1',
@@ -297,7 +302,7 @@ describe('transform', () => {
         links: [],
         events: [],
         duration: [32, 800000000],
-        resource: Resource.EMPTY,
+        resource: emptyResource(),
         instrumentationScope: {
           name: 'default',
           version: '0.0.1',
@@ -358,12 +363,10 @@ describe('transform', () => {
           },
         ],
         duration: [32, 800000000],
-        resource: new Resource({
-          attributes: {
-            service: 'ui',
-            version: 1,
-            cost: 112.12,
-          },
+        resource: resourceFromAttributes({
+          service: 'ui',
+          version: 1,
+          cost: 112.12,
         }),
         instrumentationScope: {
           name: 'default',

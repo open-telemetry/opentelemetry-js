@@ -40,14 +40,16 @@ import type {
 import type { IgnoreMatcher } from './types';
 
 import { context, SpanStatusCode } from '@opentelemetry/api';
-import { SEMATTRS_RPC_GRPC_STATUS_CODE } from '@opentelemetry/semantic-conventions';
 
 import {
   _grpcStatusCodeToOpenTelemetryStatusCode,
   _methodIsIgnored,
 } from './utils';
 import { AttributeNames } from './enums/AttributeNames';
-import { GRPC_STATUS_CODE_OK } from './status-code';
+import {
+  ATTR_RPC_GRPC_STATUS_CODE,
+  RPC_GRPC_STATUS_CODE_VALUE_OK,
+} from '../src/semconv';
 
 export const CALL_SPAN_ENDED = Symbol('opentelemetry call span ended');
 
@@ -83,7 +85,7 @@ function serverStreamAndBidiHandler<RequestType, ResponseType>(
     span.setStatus({
       code: SpanStatusCode.UNSET,
     });
-    span.setAttribute(SEMATTRS_RPC_GRPC_STATUS_CODE, GRPC_STATUS_CODE_OK);
+    span.setAttribute(ATTR_RPC_GRPC_STATUS_CODE, RPC_GRPC_STATUS_CODE_VALUE_OK);
 
     endSpan();
   });
@@ -103,7 +105,7 @@ function serverStreamAndBidiHandler<RequestType, ResponseType>(
     span.setAttributes({
       [AttributeNames.GRPC_ERROR_NAME]: err.name,
       [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
-      [SEMATTRS_RPC_GRPC_STATUS_CODE]: err.code,
+      [ATTR_RPC_GRPC_STATUS_CODE]: err.code,
     });
     endSpan();
   });
@@ -136,7 +138,7 @@ function clientStreamAndUnaryHandler<RequestType, ResponseType>(
           code: _grpcStatusCodeToOpenTelemetryStatusCode(err.code),
           message: err.message,
         });
-        span.setAttribute(SEMATTRS_RPC_GRPC_STATUS_CODE, err.code);
+        span.setAttribute(ATTR_RPC_GRPC_STATUS_CODE, err.code);
       }
       span.setAttributes({
         [AttributeNames.GRPC_ERROR_NAME]: err.name,
@@ -144,7 +146,10 @@ function clientStreamAndUnaryHandler<RequestType, ResponseType>(
       });
     } else {
       span.setStatus({ code: SpanStatusCode.UNSET });
-      span.setAttribute(SEMATTRS_RPC_GRPC_STATUS_CODE, GRPC_STATUS_CODE_OK);
+      span.setAttribute(
+        ATTR_RPC_GRPC_STATUS_CODE,
+        RPC_GRPC_STATUS_CODE_VALUE_OK
+      );
     }
 
     span.end();

@@ -245,6 +245,8 @@ Instrumentations for external modules (e.g. express, mongodb,...) hooks the `req
 
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
+Third-party licenses and copyright notices can be found in the [LICENSES directory](./LICENSES).
+
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

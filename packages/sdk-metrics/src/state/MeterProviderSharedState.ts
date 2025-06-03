@@ -15,7 +15,7 @@
  */
 
 import { InstrumentationScope } from '@opentelemetry/core';
-import { IResource } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 import { instrumentationScopeId } from '../utils';
 import { ViewRegistry } from '../view/ViewRegistry';
 import { MeterSharedState } from './MeterSharedState';
@@ -34,7 +34,7 @@ export class MeterProviderSharedState {
 
   meterSharedStates: Map<string, MeterSharedState> = new Map();
 
-  constructor(public resource: IResource) {}
+  constructor(public resource: Resource) {}
 
   getMeterSharedState(instrumentationScope: InstrumentationScope) {
     const id = instrumentationScopeId(instrumentationScope);

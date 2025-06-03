@@ -7,10 +7,13 @@ The `tracing` module contains the foundation for all tracing SDKs of [openteleme
 
 Used standalone, this module provides methods for manual instrumentation of code, offering full control over span creation for client-side JavaScript (browser) and Node.js.
 
-It does **not** provide automated instrumentation of known libraries, context propagation for asynchronous invocations or distributed-context out-of-the-box.
+It does **not** provide automated instrumentation of known libraries, context propagation or distributed-context out-of-the-box.
 
-For automated instrumentation for Node.js, please see
+For a `TracerProvider` that includes default context management and propagation for Node.js, please see
 [@opentelemetry/sdk-trace-node](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node).
+
+For a `TracerProvider` that includes default context management and propagation for Browser, please see
+[@opentelemetry/sdk-trace-web](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-web).
 
 ## Installation
 
@@ -22,16 +25,20 @@ npm install --save @opentelemetry/sdk-trace-base
 ## Usage
 
 ```js
-const opentelemetry = require('@opentelemetry/api');
+const { trace } = require('@opentelemetry/api');
 const { BasicTracerProvider } = require('@opentelemetry/sdk-trace-base');
 
 // To start a trace, you first need to initialize the Tracer provider.
 // NOTE: The default OpenTelemetry tracer provider does not record any tracing information.
 //       Registering a working tracer provider allows the API methods to record traces.
-new BasicTracerProvider().register();
+trace.setGlobalTracerProvider(new BasicTracerProvider());
+
+// Important: requires a context manager and propagator to be registered manually.
+// propagation.setGlobalPropagator(propagator);     // replace `propagator` with your `TextMapPropagator`, for example: `W3CTraceContextPropagator` from `@openetelemetry/core`
+// context.setGlobalContextManager(contextManager); // replace `contextManager` with your `ContextManager`: `AsyncLocalStorageContextManager` from `@openetelemetry/async-hooks`
 
 // To create a span in a trace, we used the global singleton tracer to start a new span.
-const span = opentelemetry.trace.getTracer('default').startSpan('foo');
+const span = trace.getTracer('default').startSpan('foo');
 
 // Set a span attribute
 span.setAttribute('key', 'value');

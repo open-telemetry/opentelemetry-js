@@ -66,4 +66,12 @@ export interface ExporterConfig {
    * @experimental
    */
   metricProducers?: MetricProducer[];
+
+  /**
+   * Regex pattern for defining which resource attributes will be applied
+   * as constant labels to the metrics.
+   * e.g. 'telemetry_.+' for all attributes starting with 'telemetry'.
+   * @default undefined (no resource attributes are applied)
+   */
+  withResourceConstantLabels?: RegExp;
 }

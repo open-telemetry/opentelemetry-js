@@ -25,7 +25,6 @@ import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
 import { ReadableSpan } from './ReadableSpan';
 import { SpanExporter } from './SpanExporter';
-import { Resource } from '@opentelemetry/resources';
 
 /**
  * An implementation of the {@link SpanProcessor} that converts the {@link Span}
@@ -73,7 +72,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
   private async _doExport(span: ReadableSpan): Promise<void> {
     if (span.resource.asyncAttributesPending) {
       // Ensure resource is fully resolved before exporting.
-      await (span.resource as Resource).waitForAsyncAttributes?.();
+      await span.resource.waitForAsyncAttributes?.();
     }
 
     const result = await internal._export(this._exporter, [span]);

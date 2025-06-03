@@ -107,7 +107,7 @@ describe('ShimSpan', () => {
 
       assert.strictEqual(childSpan.name, 'span');
       assert.deepStrictEqual(
-        childSpan.parentSpanId,
+        childSpan.parentSpanContext?.spanId,
         parentSpan.spanContext().spanId
       );
     });
@@ -120,7 +120,7 @@ describe('ShimSpan', () => {
 
       assert.strictEqual(childSpan.name, 'child');
       assert.deepStrictEqual(
-        childSpan.parentSpanId,
+        childSpan.parentSpanContext?.spanId,
         parentSpan.spanContext().spanId
       );
     });

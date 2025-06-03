@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { ValueType } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 import {
   AggregationTemporality,
   DataPointType,
@@ -302,10 +302,8 @@ describe('Metrics', () => {
   }
 
   function createResourceMetrics(metricData: MetricData[]): ResourceMetrics {
-    const resource = new Resource({
-      attributes: {
-        'resource-attribute': 'resource attribute value',
-      },
+    const resource = resourceFromAttributes({
+      'resource-attribute': 'resource attribute value',
     });
     return {
       resource: resource,
@@ -860,6 +858,12 @@ describe('Metrics', () => {
         1
       );
     });
+
+    it('does not throw when deserializing an empty response', () => {
+      assert.doesNotThrow(() =>
+        ProtobufMetricsSerializer.deserializeResponse(new Uint8Array([]))
+      );
+    });
   });
 
   describe('JsonMetricsSerializer', function () {
@@ -929,6 +933,12 @@ describe('Metrics', () => {
       assert.equal(
         Number(deserializedResponse.partialSuccess.rejectedDataPoints),
         1
+      );
+    });
+
+    it('does not throw when deserializing an empty response', () => {
+      assert.doesNotThrow(() =>
+        JsonMetricsSerializer.deserializeResponse(new Uint8Array([]))
       );
     });
   });

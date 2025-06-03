@@ -15,8 +15,8 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { IResource } from './IResource';
 import { Resource } from './Resource';
+import { emptyResource, resourceFromDetectedResource } from './ResourceImpl';
 import { ResourceDetectionConfig } from './config';
 
 /**
@@ -26,38 +26,20 @@ import { ResourceDetectionConfig } from './config';
  */
 export const detectResources = (
   config: ResourceDetectionConfig = {}
-): IResource => {
-  const resources: IResource[] = (config.detectors || []).map(d => {
+): Resource => {
+  const resources: Resource[] = (config.detectors || []).map(d => {
     try {
-      const resource = new Resource(d.detect(config));
+      const resource = resourceFromDetectedResource(d.detect(config));
       diag.debug(`${d.constructor.name} found resource.`, resource);
       return resource;
     } catch (e) {
       diag.debug(`${d.constructor.name} failed: ${e.message}`);
-      return Resource.EMPTY;
+      return emptyResource();
     }
   });
-
-  // Future check if verbose logging is enabled issue #1903
-  logResources(resources);
 
   return resources.reduce(
     (acc, resource) => acc.merge(resource),
-    Resource.EMPTY
+    emptyResource()
   );
-};
-
-/**
- * Writes debug information about the detected resources to the logger defined in the resource detection config, if one is provided.
- *
- * @param resources The array of {@link Resource} that should be logged. Empty entries will be ignored.
- */
-const logResources = (resources: Array<IResource>) => {
-  resources.forEach(resource => {
-    // Print only populated resources
-    if (Object.keys(resource.attributes).length > 0) {
-      const resourceDebugString = JSON.stringify(resource.attributes, null, 4);
-      diag.verbose(resourceDebugString);
-    }
-  });
 };

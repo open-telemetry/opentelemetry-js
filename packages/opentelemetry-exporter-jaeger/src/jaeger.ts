@@ -19,11 +19,12 @@ import {
   BindOnceFuture,
   ExportResult,
   ExportResultCode,
-  getEnv,
+  getNumberFromEnv,
+  getStringFromEnv,
 } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { Socket } from 'dgram';
-import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { spanToThrift } from './transform';
 import * as jaegerTypes from './types';
 
@@ -60,15 +61,21 @@ export class JaegerExporter implements SpanExporter {
     // to the endpoint via HTTP, making the OTEL_EXPORTER_JAEGER_AGENT_HOST and JAEGER_AGENT_PORT unused. If OTEL_EXPORTER_JAEGER_ENDPOINT is secured,
     // HTTP basic authentication can be performed by setting the OTEL_EXPORTER_JAEGER_USER and OTEL_EXPORTER_JAEGER_PASSWORD environment variables.
 
-    const env = getEnv();
     localConfig.endpoint =
-      localConfig.endpoint || env.OTEL_EXPORTER_JAEGER_ENDPOINT;
+      localConfig.endpoint ||
+      (getStringFromEnv('OTEL_EXPORTER_JAEGER_ENDPOINT') ?? '');
     localConfig.username =
-      localConfig.username || env.OTEL_EXPORTER_JAEGER_USER;
+      localConfig.username ||
+      (getStringFromEnv('OTEL_EXPORTER_JAEGER_USER') ?? '');
     localConfig.password =
-      localConfig.password || env.OTEL_EXPORTER_JAEGER_PASSWORD;
-    localConfig.host = localConfig.host || env.OTEL_EXPORTER_JAEGER_AGENT_HOST;
-    localConfig.port = localConfig.port || env.OTEL_EXPORTER_JAEGER_AGENT_PORT;
+      localConfig.password ||
+      (getStringFromEnv('OTEL_EXPORTER_JAEGER_PASSWORD') ?? '');
+    localConfig.host =
+      localConfig.host ||
+      (getStringFromEnv('OTEL_EXPORTER_JAEGER_AGENT_HOST') ?? '');
+    localConfig.port =
+      localConfig.port ||
+      (getNumberFromEnv('OTEL_EXPORTER_JAEGER_AGENT_PORT') ?? 6832);
 
     this._localConfig = localConfig;
 
@@ -167,9 +174,7 @@ export class JaegerExporter implements SpanExporter {
       sender._client.unref();
     }
 
-    const serviceNameTag = span.tags.find(
-      t => t.key === SEMRESATTRS_SERVICE_NAME
-    );
+    const serviceNameTag = span.tags.find(t => t.key === ATTR_SERVICE_NAME);
     const serviceName = serviceNameTag?.vStr || 'unknown_service';
 
     sender.setProcess({

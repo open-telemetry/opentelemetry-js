@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SEMRESATTRS_SERVICE_INSTANCE_ID } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_INSTANCE_ID } from '../../../semconv';
 import { randomUUID } from 'crypto';
 import { ResourceDetectionConfig } from '../../../config';
 import { DetectedResource, ResourceDetector } from '../../../types';
@@ -26,7 +26,7 @@ class ServiceInstanceIdDetector implements ResourceDetector {
   detect(_config?: ResourceDetectionConfig): DetectedResource {
     return {
       attributes: {
-        [SEMRESATTRS_SERVICE_INSTANCE_ID]: randomUUID(),
+        [ATTR_SERVICE_INSTANCE_ID]: randomUUID(),
       },
     };
   }

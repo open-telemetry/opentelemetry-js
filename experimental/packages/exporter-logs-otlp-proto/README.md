@@ -5,7 +5,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides a logs-exporter for OTLP (http/protobuf) using protocol version `v0.20.0`.
+This module provides a logs-exporter for OTLP (http/protobuf) using protocol version `v1.7.0`.
 
 ## Installation
 
@@ -31,7 +31,7 @@ const collectorOptions = {
   }, //an optional object containing custom headers to be sent with each request will only work with http
 };
 
-const logProvider = new LoggerProvider({resource: new Resource({'service.name': 'testApp'})});
+const logProvider = new LoggerProvider({resource: resourceFromAttributes({'service.name': 'testApp'})});
 const logExporter = new OTLPLogExporter(collectorOptions);
 logProvider.addLogRecordProcessor(new SimpleLogRecordProcessor(exporter));
 

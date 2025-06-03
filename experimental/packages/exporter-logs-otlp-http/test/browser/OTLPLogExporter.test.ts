@@ -39,10 +39,9 @@ describe('OTLPLogExporter', function () {
       it('should successfully send data using sendBeacon', async function () {
         // arrange
         const stubBeacon = sinon.stub(navigator, 'sendBeacon');
-        const loggerProvider = new LoggerProvider();
-        loggerProvider.addLogRecordProcessor(
-          new SimpleLogRecordProcessor(new OTLPLogExporter())
-        );
+        const loggerProvider = new LoggerProvider({
+          processors: [new SimpleLogRecordProcessor(new OTLPLogExporter())],
+        });
 
         // act
         loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });
@@ -68,10 +67,9 @@ describe('OTLPLogExporter', function () {
       it('should successfully send data using XMLHttpRequest', async function () {
         // arrange
         const server = sinon.fakeServer.create();
-        const loggerProvider = new LoggerProvider();
-        loggerProvider.addLogRecordProcessor(
-          new SimpleLogRecordProcessor(new OTLPLogExporter())
-        );
+        const loggerProvider = new LoggerProvider({
+          processors: [new SimpleLogRecordProcessor(new OTLPLogExporter())],
+        });
 
         // act
         loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });

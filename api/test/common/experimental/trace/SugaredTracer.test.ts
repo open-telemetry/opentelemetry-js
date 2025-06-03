@@ -20,7 +20,7 @@ import { NoopTracer } from '../../../../src/trace/NoopTracer';
 import { Span } from '../../../../src';
 import { Context, context, SpanOptions } from '../../../../src';
 
-describe('SugaredTracer', () => {
+describe('SugaredTracer', function () {
   class TestTracer extends NoopTracer {
     public calls: IArguments[] = [];
 
@@ -57,8 +57,8 @@ describe('SugaredTracer', () => {
     tracer.calls = [];
   });
 
-  describe('wrapTracer()', () => {
-    it('still provides standard tracer functions', () => {
+  describe('wrapTracer()', function () {
+    it('still provides standard tracer functions', function () {
       assert.ok(
         typeof sugaredTracer.startSpan === 'function',
         'startSpan is missing'
@@ -70,8 +70,8 @@ describe('SugaredTracer', () => {
     });
   });
 
-  describe('withActiveSpan()', () => {
-    it('proxies value with minimal args', () => {
+  describe('withActiveSpan()', function () {
+    it('proxies value with minimal args', function () {
       const result = sugaredTracer.withActiveSpan('test', span => {
         return 'result';
       });
@@ -81,7 +81,7 @@ describe('SugaredTracer', () => {
       assert.strictEqual(tracer.calls.length, 2); // ensure that startActiveSpan and startSpan is called
     });
 
-    it('proxies value with context', () => {
+    it('proxies value with context', function () {
       const result = sugaredTracer.withActiveSpan(
         'test',
         { onException: e => e },
@@ -95,7 +95,7 @@ describe('SugaredTracer', () => {
       assert.strictEqual(tracer.calls.length, 2); // ensure that startActiveSpan and startSpan is called
     });
 
-    it('proxies value with context', () => {
+    it('proxies value with context', function () {
       const result = sugaredTracer.withActiveSpan(
         'test',
         { onException: e => e },
@@ -110,7 +110,7 @@ describe('SugaredTracer', () => {
       assert.strictEqual(tracer.calls.length, 2); // ensure that startActiveSpan and startSpan is called
     });
 
-    it('returns promise if wrapped function returns promise', async () => {
+    it('returns promise if wrapped function returns promise', async function () {
       const result = sugaredTracer.withActiveSpan('test', span => {
         return Promise.resolve('result');
       });
@@ -119,7 +119,7 @@ describe('SugaredTracer', () => {
       assert.strictEqual(await result, 'result', 'Unexpected result');
     });
 
-    it('returns void', () => {
+    it('returns void', function () {
       const result = sugaredTracer.withActiveSpan('test', (span: Span) => {
         return;
       });
@@ -128,8 +128,8 @@ describe('SugaredTracer', () => {
     });
   });
 
-  describe('withSpan()', () => {
-    it('proxies value', () => {
+  describe('withSpan()', function () {
+    it('proxies value', function () {
       const result = sugaredTracer.withSpan('test', span => {
         return 'result';
       });
@@ -137,7 +137,7 @@ describe('SugaredTracer', () => {
       assert.strictEqual(result, 'result', 'Unexpected result');
     });
 
-    it('returns promise if wrapped function returns promise', async () => {
+    it('returns promise if wrapped function returns promise', async function () {
       const result = sugaredTracer.withSpan('test', span => {
         return Promise.resolve('result');
       });
@@ -146,7 +146,7 @@ describe('SugaredTracer', () => {
       assert.strictEqual(await result, 'result', 'Unexpected result');
     });
 
-    it('returns void', () => {
+    it('returns void', function () {
       const result = sugaredTracer.withSpan('test', (span: Span) => {
         return;
       });

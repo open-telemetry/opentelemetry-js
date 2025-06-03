@@ -1,0 +1,21 @@
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+
+exporters:
+  file:
+    path: ./collector-output.json
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [file]
+    metrics:
+      receivers: [otlp]
+      exporters: [file]
+    logs:
+      receivers: [otlp]
+      exporters: [file]

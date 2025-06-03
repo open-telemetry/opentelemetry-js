@@ -64,6 +64,7 @@ describe('getPropagatorFromEnv', function () {
     assert.deepStrictEqual(getPropagatorFromEnv()?.fields(), [
       'traceparent',
       'tracestate',
+      'baggage',
       'b3',
       'x-b3-traceid',
       'x-b3-spanid',

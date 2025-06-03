@@ -15,8 +15,6 @@
  */
 
 export {
-  getEnvWithoutDefaults,
-  getEnv,
   getStringFromEnv,
   getBooleanFromEnv,
   getNumberFromEnv,

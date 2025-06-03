@@ -13,11 +13,8 @@ propagation.setGlobalPropagator(new W3CTraceContextPropagator());
 // set global context manager
 context.setGlobalContextManager(new AsyncHooksContextManager());
 
-// Create a provider for activating and tracking spans
-const tracerProvider = new BasicTracerProvider();
-
-// Register the tracer
-tracerProvider.register();
+// set global tracer provider
+trace.setGlobalTracerProvider(new BasicTracerProvider());
 
 // Get a tracer
 const tracer = trace.getTracer("w3c-tests");

@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  SEMRESATTRS_HOST_ARCH,
-  SEMRESATTRS_HOST_ID,
-  SEMRESATTRS_HOST_NAME,
-} from '@opentelemetry/semantic-conventions';
+import { ATTR_HOST_ARCH, ATTR_HOST_ID, ATTR_HOST_NAME } from '../../../semconv';
 import { arch, hostname } from 'os';
 import { ResourceDetectionConfig } from '../../../config';
 import {
@@ -36,9 +32,9 @@ import { normalizeArch } from './utils';
 class HostDetector implements ResourceDetector {
   detect(_config?: ResourceDetectionConfig): DetectedResource {
     const attributes: DetectedResourceAttributes = {
-      [SEMRESATTRS_HOST_NAME]: hostname(),
-      [SEMRESATTRS_HOST_ARCH]: normalizeArch(arch()),
-      [SEMRESATTRS_HOST_ID]: getMachineId(),
+      [ATTR_HOST_NAME]: hostname(),
+      [ATTR_HOST_ARCH]: normalizeArch(arch()),
+      [ATTR_HOST_ID]: getMachineId(),
     };
 
     return { attributes };

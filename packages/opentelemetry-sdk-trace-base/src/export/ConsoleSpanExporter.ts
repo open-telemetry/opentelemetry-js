@@ -69,7 +69,7 @@ export class ConsoleSpanExporter implements SpanExporter {
       },
       instrumentationScope: span.instrumentationScope,
       traceId: span.spanContext().traceId,
-      parentId: span.parentSpanId,
+      parentSpanContext: span.parentSpanContext,
       traceState: span.spanContext().traceState?.serialize(),
       name: span.name,
       id: span.spanContext().spanId,

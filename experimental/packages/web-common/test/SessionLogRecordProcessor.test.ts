@@ -36,9 +36,9 @@ describe('SessionLogRecordProcessor', function () {
 
     const exporter = new InMemoryLogRecordExporter();
     const processor = new SessionLogRecordProcessor(sessionProvider);
-    const provider = new LoggerProvider();
-    provider.addLogRecordProcessor(processor);
-    provider.addLogRecordProcessor(new SimpleLogRecordProcessor(exporter));
+    const provider = new LoggerProvider({
+      processors: [processor, new SimpleLogRecordProcessor(exporter)],
+    });
 
     const logger = provider.getLogger('session-testing');
     logger.emit({ body: 'test-body' });
@@ -56,9 +56,9 @@ describe('SessionLogRecordProcessor', function () {
 
     const exporter = new InMemoryLogRecordExporter();
     const processor = new SessionLogRecordProcessor(sessionProvider);
-    const provider = new LoggerProvider();
-    provider.addLogRecordProcessor(processor);
-    provider.addLogRecordProcessor(new SimpleLogRecordProcessor(exporter));
+    const provider = new LoggerProvider({
+      processors: [processor, new SimpleLogRecordProcessor(exporter)],
+    });
 
     const logger = provider.getLogger('session-testing');
     logger.emit({ body: 'test-body' });
@@ -70,9 +70,9 @@ describe('SessionLogRecordProcessor', function () {
   it('does not add session.id attribute when there is no provider', function () {
     const exporter = new InMemoryLogRecordExporter();
     const processor = new SessionLogRecordProcessor(null as any);
-    const provider = new LoggerProvider();
-    provider.addLogRecordProcessor(processor);
-    provider.addLogRecordProcessor(new SimpleLogRecordProcessor(exporter));
+    const provider = new LoggerProvider({
+      processors: [processor, new SimpleLogRecordProcessor(exporter)],
+    });
 
     const logger = provider.getLogger('session-testing');
     logger.emit({ body: 'test-body' });

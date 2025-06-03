@@ -17,13 +17,13 @@ import type {
   IAnyValue,
   IInstrumentationScope,
   IKeyValue,
-  IResource,
+  Resource,
 } from './internal-types';
 import { Attributes } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
-import { IResource as ISdkResource } from '@opentelemetry/resources';
+import { Resource as ISdkResource } from '@opentelemetry/resources';
 
-export function createResource(resource: ISdkResource): IResource {
+export function createResource(resource: ISdkResource): Resource {
   return {
     attributes: toAttributes(resource.attributes),
     droppedAttributesCount: 0,

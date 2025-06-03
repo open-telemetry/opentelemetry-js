@@ -21,7 +21,11 @@ import {
   loggingErrorHandler,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import {
+  defaultResource,
+  Resource,
+  resourceFromAttributes,
+} from '@opentelemetry/resources';
 
 import {
   InMemoryLogRecordExporter,
@@ -35,9 +39,10 @@ import { TestExporterWithDelay } from './TestExporterWithDelay';
 
 const setup = (exporter: LogRecordExporter, resource?: Resource) => {
   const sharedState = new LoggerProviderSharedState(
-    resource || Resource.default(),
+    resource || defaultResource(),
     Infinity,
-    reconfigureLimits({})
+    reconfigureLimits({}),
+    []
   );
   const logRecord = new LogRecord(
     sharedState,
@@ -118,12 +123,10 @@ describe('SimpleLogRecordProcessor', () => {
   describe('force flush', () => {
     it('should await unresolved resources', async () => {
       const exporter = new InMemoryLogRecordExporter();
-      const asyncResource = new Resource({
-        attributes: {
-          async: new Promise<string>(resolve =>
-            setTimeout(() => resolve('fromasync'), 1)
-          ),
-        },
+      const asyncResource = resourceFromAttributes({
+        async: new Promise<string>(resolve =>
+          setTimeout(() => resolve('fromasync'), 1)
+        ),
       });
       const { processor, logRecord } = setup(exporter, asyncResource);
       assert.strictEqual(exporter.getFinishedLogRecords().length, 0);
@@ -141,12 +144,10 @@ describe('SimpleLogRecordProcessor', () => {
 
     it('should await doExport() and delete from _unresolvedExports', async () => {
       const testExporterWithDelay = new TestExporterWithDelay();
-      const asyncResource = new Resource({
-        attributes: {
-          async: new Promise<string>(resolve =>
-            setTimeout(() => resolve('fromasync'), 1)
-          ),
-        },
+      const asyncResource = resourceFromAttributes({
+        async: new Promise<string>(resolve =>
+          setTimeout(() => resolve('fromasync'), 1)
+        ),
       });
       const processor = new SimpleLogRecordProcessor(testExporterWithDelay);
       const { logRecord } = setup(testExporterWithDelay, asyncResource);

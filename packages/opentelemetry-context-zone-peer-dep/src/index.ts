@@ -15,4 +15,4 @@
  */
 
 export { ZoneContextManager } from './ZoneContextManager';
-export { Func, TargetWithEvents } from './types';
+export type { Func, TargetWithEvents } from './types';

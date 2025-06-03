@@ -27,17 +27,15 @@ import {
   AttributeValue,
 } from '@opentelemetry/api';
 import {
-  DEFAULT_ATTRIBUTE_COUNT_LIMIT,
-  DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
   hrTimeDuration,
   hrTimeToMilliseconds,
   hrTimeToNanoseconds,
   otperformance as performance,
 } from '@opentelemetry/core';
 import {
-  SEMATTRS_EXCEPTION_MESSAGE,
-  SEMATTRS_EXCEPTION_STACKTRACE,
-  SEMATTRS_EXCEPTION_TYPE,
+  ATTR_EXCEPTION_MESSAGE,
+  ATTR_EXCEPTION_STACKTRACE,
+  ATTR_EXCEPTION_TYPE,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -45,6 +43,10 @@ import { BasicTracerProvider, Span, SpanProcessor } from '../../src';
 import { SpanImpl } from '../../src/Span';
 import { invalidAttributes, validAttributes } from './util';
 import { Tracer } from '../../src/Tracer';
+import {
+  DEFAULT_ATTRIBUTE_COUNT_LIMIT,
+  DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
+} from '../../src/utility';
 
 const performanceTimeOrigin: HrTime = [1, 1];
 
@@ -1005,14 +1007,18 @@ describe('Span', () => {
       spanContext,
       name: 'my-span',
       kind: SpanKind.INTERNAL,
-      parentSpanId: parentId,
+      parentSpanContext: {
+        spanId: parentId,
+        traceId: '',
+        traceFlags: TraceFlags.SAMPLED,
+      },
       spanLimits: tracer.getSpanLimits(),
       spanProcessor: tracer['_spanProcessor'],
     });
 
     assert.strictEqual(span.name, 'my-span');
     assert.strictEqual(span.kind, SpanKind.INTERNAL);
-    assert.strictEqual(span.parentSpanId, parentId);
+    assert.strictEqual(span.parentSpanContext?.spanId, parentId);
     assert.strictEqual(span.spanContext().traceId, spanContext.traceId);
     assert.deepStrictEqual(span.status, {
       code: SpanStatusCode.UNSET,
@@ -1433,10 +1439,10 @@ describe('Span', () => {
 
           assert.ok(event.attributes);
 
-          const type = event.attributes[SEMATTRS_EXCEPTION_TYPE];
-          const message = event.attributes[SEMATTRS_EXCEPTION_MESSAGE];
+          const type = event.attributes[ATTR_EXCEPTION_TYPE];
+          const message = event.attributes[ATTR_EXCEPTION_MESSAGE];
           const stacktrace = String(
-            event.attributes[SEMATTRS_EXCEPTION_STACKTRACE]
+            event.attributes[ATTR_EXCEPTION_STACKTRACE]
           );
           assert.strictEqual(type, 'Error');
           assert.strictEqual(message, 'boom');
@@ -1482,7 +1488,7 @@ describe('Span', () => {
         span.recordException({ code: 12 });
         const event = span.events[0];
         assert.deepStrictEqual(event.attributes, {
-          [SEMATTRS_EXCEPTION_TYPE]: '12',
+          [ATTR_EXCEPTION_TYPE]: '12',
         });
       });
     });

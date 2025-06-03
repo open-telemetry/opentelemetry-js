@@ -27,7 +27,7 @@ import {
 import {
   assertMetricData,
   defaultInstrumentationScope,
-  defaultResource,
+  testResource,
   sleep,
 } from '../util';
 import {
@@ -46,7 +46,7 @@ describe('MeterSharedState', () => {
   describe('registerMetricStorage', () => {
     function setupMeter(views?: ViewOptions[], readers?: IMetricReader[]) {
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         views,
         readers: readers,
       });
@@ -189,7 +189,7 @@ describe('MeterSharedState', () => {
       const deltaReader = new TestDeltaMetricReader();
 
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         views: views,
         readers: [cumulativeReader, deltaReader],
       });

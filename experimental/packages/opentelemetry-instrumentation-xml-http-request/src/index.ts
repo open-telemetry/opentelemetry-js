@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-export {
+export { XMLHttpRequestInstrumentation } from './xhr';
+export type {
   XHRCustomAttributeFunction,
-  XMLHttpRequestInstrumentation,
   XMLHttpRequestInstrumentationConfig,
 } from './xhr';

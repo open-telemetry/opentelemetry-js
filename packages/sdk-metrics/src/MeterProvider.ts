@@ -21,7 +21,7 @@ import {
   MeterOptions,
   createNoopMeter,
 } from '@opentelemetry/api';
-import { IResource, Resource } from '@opentelemetry/resources';
+import { defaultResource, Resource } from '@opentelemetry/resources';
 import { IMetricReader } from './export/MetricReader';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { MetricCollector } from './state/MetricCollector';
@@ -33,7 +33,7 @@ import { View, ViewOptions } from './view/View';
  */
 export interface MeterProviderOptions {
   /** Resource associated with metric telemetry  */
-  resource?: IResource;
+  resource?: Resource;
   views?: ViewOptions[];
   readers?: IMetricReader[];
 }
@@ -47,7 +47,7 @@ export class MeterProvider implements IMeterProvider {
 
   constructor(options?: MeterProviderOptions) {
     this._sharedState = new MeterProviderSharedState(
-      options?.resource ?? Resource.default()
+      options?.resource ?? defaultResource()
     );
     if (options?.views != null && options.views.length > 0) {
       for (const viewOption of options.views) {

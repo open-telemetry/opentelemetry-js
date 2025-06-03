@@ -109,10 +109,10 @@ describe('Packages', () => {
         switch (name) {
           case 'axios':
             assert.ok(
-              result.request._headers[DummyPropagation.TRACE_CONTEXT_KEY]
+              result.request.getHeader(DummyPropagation.TRACE_CONTEXT_KEY)
             );
             assert.ok(
-              result.request._headers[DummyPropagation.SPAN_CONTEXT_KEY]
+              result.request.getHeader(DummyPropagation.SPAN_CONTEXT_KEY)
             );
             break;
           case 'superagent':

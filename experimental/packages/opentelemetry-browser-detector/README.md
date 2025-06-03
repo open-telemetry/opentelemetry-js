@@ -13,13 +13,13 @@ npm install --save @opentelemetry/opentelemetry-browser-detector
 ## Usage
 
 ```js
-import { Resource, detectResources } from '@opentelemetry/resources';
-import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { resourceFromAttributes, detectResources } from '@opentelemetry/resources';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { browserDetector } from '@opentelemetry/opentelemetry-browser-detector';
 
 async function start(){
-  let resource= new Resource({
-    [SEMRESATTRS_SERVICE_NAME]: 'Test App Name',
+  let resource = resourceFromAttributes({
+    [ATTR_SERVICE_NAME]: 'Test App Name',
   });
   let detectedResources= await detectResources({detectors:[browserDetector]});
   resource=resource.merge(detectedResources);

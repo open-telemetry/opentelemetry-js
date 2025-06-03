@@ -92,7 +92,10 @@ describe('ShimTracer', () => {
         otelSpans[0].spanContext().traceId,
         '9e7ecdc193765065fee1efe757fdd874'
       );
-      assert.strictEqual(otelSpans[0].parentSpanId, '4bf6239d37d8b0f0');
+      assert.strictEqual(
+        otelSpans[0].parentSpanContext?.spanId,
+        '4bf6239d37d8b0f0'
+      );
     });
 
     it('should set the span as root span in context', async () => {
@@ -154,7 +157,7 @@ describe('ShimTracer', () => {
         parent.end();
       });
       assert.strictEqual(
-        childSpan.parentSpanId,
+        childSpan.parentSpanContext?.spanId,
         parentSpan.spanContext().spanId
       );
     });
@@ -171,7 +174,10 @@ describe('ShimTracer', () => {
           }
         );
       });
-      assert.strictEqual(childSpan.parentSpanId, rootSpan.spanContext().spanId);
+      assert.strictEqual(
+        childSpan.parentSpanContext?.spanId,
+        rootSpan.spanContext().spanId
+      );
     });
   });
 

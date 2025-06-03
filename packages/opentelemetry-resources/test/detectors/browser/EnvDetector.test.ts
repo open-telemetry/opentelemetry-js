@@ -14,76 +14,13 @@
  * limitations under the License.
  */
 
-import { RAW_ENVIRONMENT } from '@opentelemetry/core';
-import * as assert from 'assert';
 import { envDetector } from '../../../src';
 import { describeBrowser } from '../../util';
-import {
-  assertEmptyResource,
-  assertWebEngineResource,
-} from '../../util/resource-assertions';
+import { assertEmptyResource } from '../../util/resource-assertions';
 
 describeBrowser('envDetector() on web browser', () => {
-  describe('with valid env', () => {
-    before(() => {
-      (
-        globalThis as typeof globalThis & RAW_ENVIRONMENT
-      ).OTEL_RESOURCE_ATTRIBUTES =
-        'webengine.name="chromium",webengine.version="99",webengine.description="Chromium",custom.key="custom%20value"';
-    });
-
-    after(() => {
-      delete (globalThis as typeof globalThis & RAW_ENVIRONMENT)
-        .OTEL_RESOURCE_ATTRIBUTES;
-    });
-
-    it('should return resource information from environment variable', async () => {
-      const resource = envDetector.detect();
-      assert.ok(resource.attributes);
-      assertWebEngineResource(resource, {
-        name: 'chromium',
-        version: '99',
-        description: 'Chromium',
-      });
-      assert.strictEqual(resource.attributes['custom.key'], 'custom value');
-    });
-  });
-
-  describe('with invalid env', () => {
-    const values = ['webengine.description="with spaces"'];
-
-    for (const value of values) {
-      describe(`value: '${value}'`, () => {
-        before(() => {
-          (
-            globalThis as typeof globalThis & RAW_ENVIRONMENT
-          ).OTEL_RESOURCE_ATTRIBUTES = value;
-        });
-
-        after(() => {
-          delete (globalThis as typeof globalThis & RAW_ENVIRONMENT)
-            .OTEL_RESOURCE_ATTRIBUTES;
-        });
-
-        it('should return empty resource', async () => {
-          const resource = envDetector.detect();
-          assertEmptyResource(resource);
-        });
-      });
-    }
-  });
-
-  describe('with empty env', () => {
-    it('should return empty resource', async () => {
-      const resource = envDetector.detect();
-      assertEmptyResource(resource);
-    });
-  });
-
-  describe('with empty env', () => {
-    it('should return empty resource', async () => {
-      const resource = envDetector.detect();
-      assertEmptyResource(resource);
-    });
+  it('should return empty resource', async () => {
+    const resource = envDetector.detect();
+    assertEmptyResource(resource);
   });
 });

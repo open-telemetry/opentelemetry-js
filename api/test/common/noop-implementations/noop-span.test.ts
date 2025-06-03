@@ -23,8 +23,8 @@ import {
 } from '../../../src';
 import { NonRecordingSpan } from '../../../src/trace/NonRecordingSpan';
 
-describe('NonRecordingSpan', () => {
-  it('do not crash', () => {
+describe('NonRecordingSpan', function () {
+  it('do not crash', function () {
     const span = new NonRecordingSpan();
     span.setAttribute('my_string_attribute', 'foo');
     span.setAttribute('my_number_attribute', 123);

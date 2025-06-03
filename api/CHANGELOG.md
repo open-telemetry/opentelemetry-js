@@ -18,6 +18,7 @@ fix(api): prioritize `esnext` export condition as it is more specific [#5458](ht
 ### :house: (Internal)
 
 * refactor(api): remove "export *" in favor of explicit named exports [#4880](https://github.com/open-telemetry/opentelemetry-js/pull/4880) @robbkidd
+* chore: enable tsconfig isolatedModules [#5697](https://github.com/open-telemetry/opentelemetry-js/pull/5697) @legendecas
 
 ## 1.9.0
 

@@ -1,11 +1,8 @@
 name: Deploy API Documentation
 
-# Disable API doc updates from "main" while "main" is frozen for https://github.com/open-telemetry/opentelemetry-js/milestone/17
-# TODO: renable this once ready for releases from "main" again.
-# on:
-#   release:
-#     types: [published]
-on: []
+on:
+  release:
+    types: [published]
 
 jobs:
   build-and-deploy:
@@ -19,7 +16,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: '20'
+          node-version: '22'
 
       - name: Install and Build 🔧
         run: |

@@ -17,7 +17,7 @@ import {
   Fixed64,
   IInstrumentationScope,
   IKeyValue,
-  IResource,
+  Resource,
 } from '../common/internal-types';
 
 /** Properties of an ExportMetricsServiceRequest. */
@@ -29,7 +29,7 @@ export interface IExportMetricsServiceRequest {
 /** Properties of a ResourceMetrics. */
 export interface IResourceMetrics {
   /** ResourceMetrics resource */
-  resource?: IResource;
+  resource?: Resource;
 
   /** ResourceMetrics scopeMetrics */
   scopeMetrics: IScopeMetrics[];

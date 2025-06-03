@@ -73,6 +73,13 @@ export const METRIC_ASPNETCORE_RATE_LIMITING_REQUESTS = 'aspnetcore.rate_limitin
 export const METRIC_ASPNETCORE_ROUTING_MATCH_ATTEMPTS = 'aspnetcore.routing.match_attempts' as const;
 
 /**
+ * Duration of database client operations.
+ *
+ * @note Batch operations **SHOULD** be recorded as a single operation.
+ */
+export const METRIC_DB_CLIENT_OPERATION_DURATION = 'db.client.operation.duration' as const;
+
+/**
  * The number of .NET assemblies that are currently loaded.
  *
  * @note Meter name: `System.Runtime`; Added in: .NET 9.0.

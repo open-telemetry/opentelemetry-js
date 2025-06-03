@@ -17,8 +17,9 @@
 import { diag, TextMapPropagator } from '@opentelemetry/api';
 import {
   CompositePropagator,
-  getEnv,
-  getEnvWithoutDefaults,
+  getStringFromEnv,
+  getStringListFromEnv,
+  W3CBaggagePropagator,
   W3CTraceContextPropagator,
 } from '@opentelemetry/core';
 import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
@@ -59,8 +60,9 @@ export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
     [RESOURCE_DETECTOR_PROCESS, processDetector],
   ]);
 
-  const resourceDetectorsFromEnv =
-    process.env.OTEL_NODE_RESOURCE_DETECTORS?.split(',') ?? ['all'];
+  const resourceDetectorsFromEnv = getStringListFromEnv(
+    'OTEL_NODE_RESOURCE_DETECTORS'
+  ) ?? ['all'];
 
   if (resourceDetectorsFromEnv.includes('all')) {
     return [...resourceDetectors.values()].flat();
@@ -86,13 +88,10 @@ export function filterBlanksAndNulls(list: string[]): string[] {
 }
 
 export function getOtlpProtocolFromEnv(): string {
-  const parsedEnvValues = getEnvWithoutDefaults();
-
   return (
-    parsedEnvValues.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL ??
-    parsedEnvValues.OTEL_EXPORTER_OTLP_PROTOCOL ??
-    getEnv().OTEL_EXPORTER_OTLP_TRACES_PROTOCOL ??
-    getEnv().OTEL_EXPORTER_OTLP_PROTOCOL
+    getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL') ??
+    getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL') ??
+    'http/protobuf'
   );
 }
 
@@ -139,7 +138,7 @@ export function getSpanProcessorsFromEnv(): SpanProcessor[] {
   const exporters: SpanExporter[] = [];
   const processors: SpanProcessor[] = [];
   let traceExportersList = filterBlanksAndNulls(
-    Array.from(new Set(getEnv().OTEL_TRACES_EXPORTER.split(',')))
+    Array.from(new Set(getStringListFromEnv('OTEL_TRACES_EXPORTER')))
   );
 
   if (traceExportersList[0] === 'none') {
@@ -193,10 +192,8 @@ export function getSpanProcessorsFromEnv(): SpanProcessor[] {
  */
 export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
   // Empty and undefined MUST be treated equal.
-  if (
-    process.env.OTEL_PROPAGATORS === undefined ||
-    process.env.OTEL_PROPAGATORS?.trim() === ''
-  ) {
+  const propagatorsEnvVarValue = getStringListFromEnv('OTEL_PROPAGATORS');
+  if (propagatorsEnvVarValue == null) {
     // return undefined to fall back to default
     return undefined;
   }
@@ -205,7 +202,7 @@ export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
   // Any other propagators (like aws, aws-lambda, should go into `@opentelemetry/auto-configuration-propagators` instead).
   const propagatorsFactory = new Map<string, () => TextMapPropagator>([
     ['tracecontext', () => new W3CTraceContextPropagator()],
-    ['baggage', () => new W3CTraceContextPropagator()],
+    ['baggage', () => new W3CBaggagePropagator()],
     ['b3', () => new B3Propagator()],
     [
       'b3multi',
@@ -215,7 +212,7 @@ export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
   ]);
 
   // Values MUST be deduplicated in order to register a Propagator only once.
-  const uniquePropagatorNames = Array.from(new Set(getEnv().OTEL_PROPAGATORS));
+  const uniquePropagatorNames = Array.from(new Set(propagatorsEnvVarValue));
 
   const propagators = uniquePropagatorNames.map(name => {
     const propagator = propagatorsFactory.get(name)?.();

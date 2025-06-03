@@ -27,7 +27,7 @@ import { SpanProcessor } from './SpanProcessor';
 import { Sampler } from './Sampler';
 import { IdGenerator } from './IdGenerator';
 import { RandomIdGenerator } from './platform';
-import { IResource } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 
 /**
  * This class represents a basic tracer.
@@ -39,7 +39,7 @@ export class Tracer implements api.Tracer {
   private readonly _idGenerator: IdGenerator;
   readonly instrumentationScope: InstrumentationScope;
 
-  private readonly _resource: IResource;
+  private readonly _resource: Resource;
   private readonly _spanProcessor: SpanProcessor;
 
   /**
@@ -48,7 +48,7 @@ export class Tracer implements api.Tracer {
   constructor(
     instrumentationScope: InstrumentationScope,
     config: TracerConfig,
-    resource: IResource,
+    resource: Resource,
     spanProcessor: SpanProcessor
   ) {
     const localConfig = mergeConfig(config);
@@ -86,9 +86,9 @@ export class Tracer implements api.Tracer {
 
     const parentSpanContext = parentSpan?.spanContext();
     const spanId = this._idGenerator.generateSpanId();
+    let validParentSpanContext;
     let traceId;
     let traceState;
-    let parentSpanId;
     if (
       !parentSpanContext ||
       !api.trace.isSpanContextValid(parentSpanContext)
@@ -99,7 +99,7 @@ export class Tracer implements api.Tracer {
       // New child span.
       traceId = parentSpanContext.traceId;
       traceState = parentSpanContext.traceState;
-      parentSpanId = parentSpanContext.spanId;
+      validParentSpanContext = parentSpanContext;
     }
 
     const spanKind = options.kind ?? api.SpanKind.INTERNAL;
@@ -149,7 +149,7 @@ export class Tracer implements api.Tracer {
       name,
       kind: spanKind,
       links,
-      parentSpanId,
+      parentSpanContext: validParentSpanContext,
       attributes: initAttributes,
       startTime: options.startTime,
       spanProcessor: this._spanProcessor,

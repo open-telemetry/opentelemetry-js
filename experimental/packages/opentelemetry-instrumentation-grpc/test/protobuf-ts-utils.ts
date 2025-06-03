@@ -21,10 +21,8 @@ import {
   ReadableSpan,
 } from '@opentelemetry/sdk-trace-base';
 import { assertPropagation, assertSpan } from './utils/assertionUtils';
-import {
-  SEMATTRS_RPC_METHOD,
-  SEMATTRS_RPC_SERVICE,
-} from '@opentelemetry/semantic-conventions';
+
+import { ATTR_RPC_METHOD, ATTR_RPC_SERVICE } from '../src/semconv';
 
 export type SpanAssertionFunction = (
   exporter: InMemorySpanExporter,
@@ -63,8 +61,8 @@ function validateSpans(
 
   assertSpan('grpc', serverSpan, SpanKind.SERVER, validations);
   assertSpan('grpc', clientSpan, SpanKind.CLIENT, validations);
-  assert.strictEqual(clientSpan.attributes[SEMATTRS_RPC_METHOD], rpcMethod);
-  assert.strictEqual(clientSpan.attributes[SEMATTRS_RPC_SERVICE], rpcService);
+  assert.strictEqual(clientSpan.attributes[ATTR_RPC_METHOD], rpcMethod);
+  assert.strictEqual(clientSpan.attributes[ATTR_RPC_SERVICE], rpcService);
 }
 
 export function assertNoSpansExported(
@@ -103,6 +101,9 @@ export function assertExportedSpans(
       rootSpan?.spanContext().traceId,
       serverSpan.spanContext().traceId
     );
-    assert.strictEqual(rootSpan?.spanContext().spanId, clientSpan.parentSpanId);
+    assert.strictEqual(
+      rootSpan?.spanContext().spanId,
+      clientSpan.parentSpanContext?.spanId
+    );
   }
 }
