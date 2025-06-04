@@ -15,7 +15,7 @@
  */
 
 // This is a meta-package, and these exist in to re-export *all* items from
-// the individual packages as individual _namespaces_, so `export *` is
+// the individual packages as individual _namespaces_, so wildcard exports are
 // appropriate here. Otherwise, it'd be a pain to enumerate and keep things
 // in-sync with all the upstream packages.
 
