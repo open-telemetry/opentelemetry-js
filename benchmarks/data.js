@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1748886328009,
+  "lastUpdate": 1749030850022,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -34064,6 +34064,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.64%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "loganrosen@gmail.com",
+            "name": "Logan Rosen",
+            "username": "loganrosen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "3578f68c743b581f66574b1f972656b7eebe19c1",
+          "message": "chore: upgrade to typescript-eslint v8 (#5478)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2025-06-04T09:45:10Z",
+          "tree_id": "7ad5d94be895ee84602eb297c3d2bd8f2101b7ab",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/3578f68c743b581f66574b1f972656b7eebe19c1"
+        },
+        "date": 1749030848866,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1486516,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18204,
+            "range": "±0.15%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 832227,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 797143,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
