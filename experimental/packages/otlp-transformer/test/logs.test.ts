@@ -75,6 +75,7 @@ function createExpectedLogJson(
                 severityNumber: ESeverityNumber.SEVERITY_NUMBER_ERROR,
                 severityText: 'error',
                 body: { stringValue: 'some_log_body' },
+                eventName: 'some.event.name',
 
                 attributes: [
                   {
@@ -122,7 +123,7 @@ function createExpectedLogProtobuf(): IExportLogsServiceRequest {
                 severityNumber: ESeverityNumber.SEVERITY_NUMBER_ERROR,
                 severityText: 'error',
                 body: { stringValue: 'some_log_body' },
-
+                eventName: 'some.event.name',
                 attributes: [
                   {
                     key: 'some-attribute',
@@ -190,6 +191,7 @@ describe('Logs', () => {
       severityNumber: SeverityNumber.ERROR,
       severityText: 'error',
       body: 'some_log_body',
+      eventName: 'some.event.name',
       spanContext: {
         spanId: '0000000000000002',
         traceFlags: TraceFlags.SAMPLED,

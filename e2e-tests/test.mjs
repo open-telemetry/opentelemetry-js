@@ -83,6 +83,7 @@ async function main() {
     severityText: 'INFO',
     body: 'test-log-body',
     attributes: { foo: 'bar' },
+    eventName: 'test-log-event',
   });
 
   // flushes exporters and shuts down the SDK

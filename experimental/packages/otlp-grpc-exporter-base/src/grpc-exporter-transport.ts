@@ -39,7 +39,7 @@ export function createInsecureCredentials(): ChannelCredentials {
   // Lazy-load so that we don't need to require/import '@grpc/grpc-js' before it can be wrapped by instrumentation.
   const {
     credentials,
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
   } = require('@grpc/grpc-js');
   return credentials.createInsecure();
 }
@@ -52,7 +52,7 @@ export function createSslCredentials(
   // Lazy-load so that we don't need to require/import '@grpc/grpc-js' before it can be wrapped by instrumentation.
   const {
     credentials,
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
   } = require('@grpc/grpc-js');
   return credentials.createSsl(rootCert, privateKey, certChain);
 }
@@ -61,7 +61,7 @@ export function createEmptyMetadata(): Metadata {
   // Lazy-load so that we don't need to require/import '@grpc/grpc-js' before it can be wrapped by instrumentation.
   const {
     Metadata,
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
   } = require('@grpc/grpc-js');
   return new Metadata();
 }
@@ -108,7 +108,7 @@ export class GrpcExporterTransport implements IExporterTransport {
       // Lazy require to ensure that grpc is not loaded before instrumentations can wrap it
       const {
         createServiceClientConstructor,
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
       } = require('./create-service-client-constructor');
 
       try {
