@@ -16,6 +16,18 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+## 0.202.0
+
+### :rocket: Features
+
+* feat(exporter-otlp-\*): update proto to `v1.7.0`
+* feat(exporter-metrics-otlp-proto): Support to protobuf in browser metrics. [#5710](https://github.com/open-telemetry/opentelemetry-js/pull/5710) @YangJonghun
+* feat(logs): add eventName to emit [#5707](https://github.com/open-telemetry/opentelemetry-js/pull/5707)
+
+### :bug: Bug Fixes
+
+* fix(instrumentation): remove dependency on the shimmer module [#5652](https://github.com/open-telemetry/opentelemetry-js/pull/5652) @cjihrig
+
 ## 0.201.1
 
 ### :bug: Bug Fixes
