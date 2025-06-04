@@ -96,10 +96,10 @@ export const getAbsoluteUrl = (
   const reqUrlObject = requestUrl || {};
   const protocol = reqUrlObject.protocol || fallbackProtocol;
   const port = (reqUrlObject.port || '').toString();
-  const path = reqUrlObject.path || '/';
+  let path = reqUrlObject.path || '/';
   let host =
     reqUrlObject.host || reqUrlObject.hostname || headers.host || 'localhost';
-
+  const STR_REDACTED = 'REDACTED';
   // if there is no port in host and there is a port
   // it should be displayed if it's not 80 and 443 (default ports)
   if (
@@ -110,8 +110,34 @@ export const getAbsoluteUrl = (
   ) {
     host += `:${port}`;
   }
-
-  return `${protocol}//${host}${path}`;
+  // Redact sensitive query parameters
+  if (path.includes('?')) {
+    const [pathname, query] = path.split('?', 2);
+    const redactedParams = query.split('&').map(param => {
+      // List of sensitive parameter names to redact
+      // Add more as needed
+      const sensitiveParams = [
+        'sig',
+        'Signature',
+        'AWSAccessKeyId',
+        'X-Goog-Signature',
+      ] as const;
+      const paramParts = param.split('=', 2);
+      const paramName = paramParts[0];
+      // Check if this parameter should be redacted
+      if (
+        sensitiveParams.some(sensitive =>
+          paramName.toLowerCase().includes(sensitive.toLowerCase())
+        )
+      ) {
+        return `${paramName}=${STR_REDACTED}`;
+      }
+      return param;
+    });
+    path = `${pathname}?${redactedParams.join('&')}`;
+  }
+  const authPart = reqUrlObject.auth ? `${STR_REDACTED}:${STR_REDACTED}@` : '';
+  return `${protocol}//${authPart}${host}${path}`;
 };
 
 /**

@@ -243,7 +243,7 @@ describe('HttpInstrumentation', () => {
         );
       });
 
-      it('should remove auth from the `http.url` attribute (client side and server side)', async () => {
+      it('should redact auth from the `http.url` attribute (client side and server side)', async () => {
         await httpRequest.get(
           `${protocol}://user:pass@${hostname}:${serverPort}${pathname}`
         );
@@ -258,7 +258,7 @@ describe('HttpInstrumentation', () => {
         );
         assert.strictEqual(
           outgoingSpan.attributes[ATTR_HTTP_URL],
-          `${protocol}://${hostname}:${serverPort}${pathname}`
+          `${protocol}://REDACTED:REDACTED@${hostname}:${serverPort}${pathname}`
         );
       });
     });
@@ -1162,7 +1162,7 @@ describe('HttpInstrumentation', () => {
         });
       });
 
-      it('should remove auth from the `url.full` attribute (client side and server side)', async () => {
+      it('should redact auth from the `url.full` attribute (client side and server side)', async () => {
         await httpRequest.get(
           `${protocol}://user:pass@${hostname}:${serverPort}${pathname}`
         );
@@ -1172,7 +1172,7 @@ describe('HttpInstrumentation', () => {
         assert.strictEqual(outgoingSpan.kind, SpanKind.CLIENT);
         assert.strictEqual(
           outgoingSpan.attributes[ATTR_URL_FULL],
-          `${protocol}://${hostname}:${serverPort}${pathname}`
+          `${protocol}://REDACTED:REDACTED@${hostname}:${serverPort}${pathname}`
         );
       });
 
@@ -1595,6 +1595,113 @@ describe('HttpInstrumentation', () => {
       assert.strictEqual(
         outgoingSpan.attributes['http.response.header.x_server_header2'],
         undefined
+      );
+    });
+  });
+  describe('URL Redaction', () => {
+    beforeEach(() => {
+      memoryExporter.reset();
+    });
+
+    before(async () => {
+      instrumentation.setConfig({});
+      instrumentation.enable();
+      server = http.createServer((request, response) => {
+        response.end('Test Server Response');
+      });
+      await new Promise<void>(resolve => server.listen(serverPort, resolve));
+    });
+
+    after(() => {
+      server.close();
+      instrumentation.disable();
+    });
+
+    it('should redact authentication credentials from URLs', async () => {
+      await httpRequest.get(
+        `${protocol}://user:password@${hostname}:${serverPort}${pathname}`
+      );
+      const spans = memoryExporter.getFinishedSpans();
+      const [incomingSpan, outgoingSpan] = spans;
+
+      assert.strictEqual(spans.length, 2);
+      assert.strictEqual(incomingSpan.kind, SpanKind.SERVER);
+      assert.strictEqual(outgoingSpan.kind, SpanKind.CLIENT);
+
+      // Server shouldn't see auth in URL
+      assert.strictEqual(
+        incomingSpan.attributes[ATTR_HTTP_URL],
+        `${protocol}://${hostname}:${serverPort}${pathname}`
+      );
+
+      // Client should have redacted auth
+      assert.strictEqual(
+        outgoingSpan.attributes[ATTR_HTTP_URL],
+        `${protocol}://REDACTED:REDACTED@${hostname}:${serverPort}${pathname}`
+      );
+    });
+
+    it('should redact sensitive query parameters', async () => {
+      await httpRequest.get(
+        `${protocol}://${hostname}:${serverPort}${pathname}?sig=value`
+      );
+      const spans = memoryExporter.getFinishedSpans();
+      const [_, outgoingSpan] = spans;
+
+      assert.strictEqual(
+        outgoingSpan.attributes[ATTR_HTTP_URL],
+        `${protocol}://${hostname}:${serverPort}${pathname}?sig=REDACTED`
+      );
+    });
+
+    it('should redact specific query strings', async () => {
+      await httpRequest.get(
+        `${protocol}://${hostname}:${serverPort}${pathname}?X-Goog-Signature=xyz789&normal=value`
+      );
+      const spans = memoryExporter.getFinishedSpans();
+      const [_, outgoingSpan] = spans;
+
+      assert.strictEqual(
+        outgoingSpan.attributes[ATTR_HTTP_URL],
+        `${protocol}://${hostname}:${serverPort}${pathname}?X-Goog-Signature=REDACTED&normal=value`
+      );
+    });
+
+    it('should handle both auth credentials and sensitive query parameters', async () => {
+      await httpRequest.get(
+        `${protocol}://username:password@${hostname}:${serverPort}${pathname}?AWSAccessKeyId=secret`
+      );
+      const spans = memoryExporter.getFinishedSpans();
+      const [_, outgoingSpan] = spans;
+
+      assert.strictEqual(
+        outgoingSpan.attributes[ATTR_HTTP_URL],
+        `${protocol}://REDACTED:REDACTED@${hostname}:${serverPort}${pathname}?AWSAccessKeyId=REDACTED`
+      );
+    });
+    it('should handle URLs with special characters in auth and query', async () => {
+      await httpRequest.get(
+        `${protocol}://user%40domain:p%40ssword@${hostname}:${serverPort}${pathname}?sig=abc%3Ddef`
+      );
+      const spans = memoryExporter.getFinishedSpans();
+      const [_, outgoingSpan] = spans;
+
+      assert.strictEqual(
+        outgoingSpan.attributes[ATTR_HTTP_URL],
+        `${protocol}://REDACTED:REDACTED@${hostname}:${serverPort}${pathname}?sig=REDACTED`
+      );
+    });
+
+    it('should handle malformed query strings', async () => {
+      await httpRequest.get(
+        `${protocol}://${hostname}:${serverPort}${pathname}?X-Goog-Signature=value&=nokey&malformed=`
+      );
+      const spans = memoryExporter.getFinishedSpans();
+      const [_, outgoingSpan] = spans;
+
+      assert.strictEqual(
+        outgoingSpan.attributes[ATTR_HTTP_URL],
+        `${protocol}://${hostname}:${serverPort}${pathname}?X-Goog-Signature=REDACTED&=nokey&malformed=`
       );
     });
   });
