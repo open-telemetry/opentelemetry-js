@@ -94,4 +94,11 @@ function verifyLog(log) {
     );
     process.exit(1);
   }
+
+  if (log.eventName !== 'test-log-event') {
+    console.error(
+      `Expected log event name 'test-log-event', but got '${log.eventName}'`
+    );
+    process.exit(1);
+  }
 }
