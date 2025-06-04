@@ -22,6 +22,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * feat(exporter-otlp-\*): update proto to `v1.7.0`
 * feat(exporter-metrics-otlp-proto): Support to protobuf in browser metrics. [#5710](https://github.com/open-telemetry/opentelemetry-js/pull/5710) @YangJonghun
+* feat(logs): add eventName to emit [#5707](https://github.com/open-telemetry/opentelemetry-js/pull/5707)
 
 ### :bug: Bug Fixes
 

@@ -99,11 +99,15 @@ export class NoopTracer implements Tracer {
   }
 }
 
-function isSpanContext(spanContext: any): spanContext is SpanContext {
+function isSpanContext(spanContext: unknown): spanContext is SpanContext {
   return (
+    spanContext !== null &&
     typeof spanContext === 'object' &&
+    'spanId' in spanContext &&
     typeof spanContext['spanId'] === 'string' &&
+    'traceId' in spanContext &&
     typeof spanContext['traceId'] === 'string' &&
+    'traceFlags' in spanContext &&
     typeof spanContext['traceFlags'] === 'number'
   );
 }
