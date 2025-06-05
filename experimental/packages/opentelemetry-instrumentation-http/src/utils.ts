@@ -84,6 +84,13 @@ import { Err, IgnoreMatcher, ParsedRequestOptions } from './internal-types';
 import { SYNTHETIC_BOT_NAMES, SYNTHETIC_TEST_NAMES } from './internal-types';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import forwardedParse = require('forwarded-parse');
+const STR_REDACTED = 'REDACTED';
+const sensitiveParams = [
+  'sig',
+  'Signature',
+  'AWSAccessKeyId',
+  'X-Goog-Signature',
+] as const;
 
 /**
  * Get an absolute url
@@ -99,7 +106,6 @@ export const getAbsoluteUrl = (
   let path = reqUrlObject.path || '/';
   let host =
     reqUrlObject.host || reqUrlObject.hostname || headers.host || 'localhost';
-  const STR_REDACTED = 'REDACTED';
   // if there is no port in host and there is a port
   // it should be displayed if it's not 80 and 443 (default ports)
   if (
@@ -113,28 +119,17 @@ export const getAbsoluteUrl = (
   // Redact sensitive query parameters
   if (path.includes('?')) {
     const [pathname, query] = path.split('?', 2);
-    const redactedParams = query.split('&').map(param => {
-      // List of sensitive parameter names to redact
-      // Add more as needed
-      const sensitiveParams = [
-        'sig',
-        'Signature',
-        'AWSAccessKeyId',
-        'X-Goog-Signature',
-      ] as const;
-      const paramParts = param.split('=', 2);
-      const paramName = paramParts[0];
-      // Check if this parameter should be redacted
-      if (
-        sensitiveParams.some(sensitive =>
-          paramName.toLowerCase().includes(sensitive.toLowerCase())
-        )
-      ) {
-        return `${paramName}=${STR_REDACTED}`;
+    const searchParams = new URLSearchParams(query);
+
+    for (let i = 0; i < sensitiveParams.length; i++) {
+      const sensitiveParam = sensitiveParams[i];
+      if (searchParams.has(sensitiveParam)) {
+        searchParams.set(sensitiveParam, STR_REDACTED);
       }
-      return param;
-    });
-    path = `${pathname}?${redactedParams.join('&')}`;
+    }
+
+    const redactedQuery = searchParams.toString();
+    path = `${pathname}?${redactedQuery}`;
   }
   const authPart = reqUrlObject.auth ? `${STR_REDACTED}:${STR_REDACTED}@` : '';
   return `${protocol}//${authPart}${host}${path}`;
