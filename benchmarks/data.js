@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1749030850022,
+  "lastUpdate": 1749140893962,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -34116,6 +34116,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.54%",
             "unit": "ops/sec",
             "extra": "93 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "smokeonthewater222@yahoo.co.jp",
+            "name": "yoshi-taka",
+            "username": "yoshi-taka"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7e30af4c15017f48cbdffa054889c62b2006e4ed",
+          "message": "fix typo (#5745)\n\nCo-authored-by: Marylia Gutierrez <maryliag@gmail.com>",
+          "timestamp": "2025-06-05T16:07:23Z",
+          "tree_id": "c0e5b62c07194669ca0f02fd9e7fd6f4d5eab1a8",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/7e30af4c15017f48cbdffa054889c62b2006e4ed"
+        },
+        "date": 1749140892711,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1544321,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18799,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 831737,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 804672,
+            "range": "±0.30%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
