@@ -18,7 +18,7 @@ import * as types from '../../types';
 import * as path from 'path';
 import { types as utilTypes } from 'util';
 import { satisfies } from '../../semver';
-import { wrap, unwrap, massWrap, massUnwrap } from 'shimmer';
+import { wrap, unwrap, massWrap, massUnwrap } from '../../shimmer';
 import { InstrumentationAbstract } from '../../instrumentation';
 import {
   RequireInTheMiddleSingleton,
@@ -167,7 +167,7 @@ export abstract class InstrumentationBase<
       });
       const version = JSON.parse(json).version;
       return typeof version === 'string' ? version : undefined;
-    } catch (error) {
+    } catch {
       diag.warn('Failed extracting version', baseDir);
     }
 

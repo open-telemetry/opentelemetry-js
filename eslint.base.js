@@ -32,7 +32,7 @@ module.exports = {
       // Enable typescript-eslint for ts files.
       extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:prettier/recommended"],
       parserOptions: {
-        "project": "./tsconfig.json"
+        "projectService": true
       },
       rules: {
         "@typescript-eslint/no-floating-promises": "error",
@@ -49,11 +49,7 @@ module.exports = {
         "@typescript-eslint/no-unused-vars": ["error", {"argsIgnorePattern": "^_", "args": "after-used"}],
         "@typescript-eslint/no-inferrable-types": ["error", { ignoreProperties: true }],
         "@typescript-eslint/no-empty-function": ["off"],
-        "@typescript-eslint/ban-types": ["warn", {
-          "types": {
-            "Function": null,
-          }
-        }],
+        "@typescript-eslint/no-unsafe-function-type": ["warn"],
         "@typescript-eslint/no-shadow": ["warn"],
         "no-restricted-syntax": ["error", "ExportAllDeclaration"],
         "prefer-rest-params": "off",
@@ -64,20 +60,16 @@ module.exports = {
       // Enable typescript-eslint for ts files.
       extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:prettier/recommended"],
       parserOptions: {
-        "project": "./tsconfig.json"
+        "projectService": true
       },
       rules: {
         "no-empty": "off",
         "@typescript-eslint/ban-ts-ignore": "off",
-        "@typescript-eslint/ban-types": ["warn", {
-          "types": {
-            "Function": null,
-          }
-        }],
+        "@typescript-eslint/no-unsafe-function-type": ["warn"],
         "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-unused-vars": "off",
-        "@typescript-eslint/no-var-requires": "off",
+        "@typescript-eslint/no-require-imports": "off",
         "@typescript-eslint/no-shadow": ["off"],
         "@typescript-eslint/no-floating-promises": ["off"],
         "@typescript-eslint/no-non-null-assertion": ["off"],

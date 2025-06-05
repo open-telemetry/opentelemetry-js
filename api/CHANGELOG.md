@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 ### :rocket: (Enhancement)
 
 * feat(api): add attributes argument to recordException API [#5333](https://github.com/open-telemetry/opentelemetry-js/pull/5333) @brianphillips
+* feat(diag): change types in `DiagComponentLogger` from `any` to `unknown`[#5478](https://github.com/open-telemetry/opentelemetry-js/pull/5478) @loganrosen
 
 ### :bug: (Bug Fix)
 
@@ -18,6 +19,7 @@ All notable changes to this project will be documented in this file.
 ### :house: (Internal)
 
 * refactor(api): remove "export *" in favor of explicit named exports [#4880](https://github.com/open-telemetry/opentelemetry-js/pull/4880) @robbkidd
+* chore: enable tsconfig isolatedModules [#5697](https://github.com/open-telemetry/opentelemetry-js/pull/5697) @legendecas
 
 ## 1.9.0
 

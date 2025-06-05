@@ -30,7 +30,7 @@ import {
 import { ZipkinExporter } from '../../src';
 import * as zipkinTypes from '../../src/types';
 import { TraceFlags } from '@opentelemetry/api';
-import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 
 const MICROS_PER_SECS = 1e6;
 
@@ -396,7 +396,7 @@ describe('Zipkin Exporter - node', () => {
         },
       ],
       resource: resourceFromAttributes({
-        [SEMRESATTRS_SERVICE_NAME]: resource_service_name,
+        [ATTR_SERVICE_NAME]: resource_service_name,
       }),
       instrumentationScope: { name: 'default', version: '0.0.1' },
       droppedAttributesCount: 0,
@@ -422,7 +422,7 @@ describe('Zipkin Exporter - node', () => {
       links: [],
       events: [],
       resource: resourceFromAttributes({
-        [SEMRESATTRS_SERVICE_NAME]: resource_service_name_prime,
+        [ATTR_SERVICE_NAME]: resource_service_name_prime,
       }),
       instrumentationScope: { name: 'default', version: '0.0.1' },
       droppedAttributesCount: 0,
@@ -433,7 +433,7 @@ describe('Zipkin Exporter - node', () => {
     const exporter = new ZipkinExporter({});
 
     exporter.export([span1, span2], (result: ExportResult) => {
-      requestBody;
+      assert.ok(requestBody);
       scope.done();
       assert.equal(
         requestBody[0].localEndpoint.serviceName,
@@ -485,7 +485,7 @@ describe('Zipkin Exporter - node', () => {
       attributes: {
         key1: 'value1',
         key2: 'value2',
-        [SEMRESATTRS_SERVICE_NAME]: span_service_name,
+        [ATTR_SERVICE_NAME]: span_service_name,
       },
       links: [],
       events: [
@@ -517,7 +517,7 @@ describe('Zipkin Exporter - node', () => {
         code: api.SpanStatusCode.OK,
       },
       attributes: {
-        [SEMRESATTRS_SERVICE_NAME]: span_service_name_prime,
+        [ATTR_SERVICE_NAME]: span_service_name_prime,
       },
       links: [],
       events: [],
@@ -531,7 +531,7 @@ describe('Zipkin Exporter - node', () => {
     const exporter = new ZipkinExporter({});
 
     exporter.export([span1, span2], (result: ExportResult) => {
-      requestBody;
+      assert.ok(requestBody);
       scope.done();
       assert.equal(requestBody[0].localEndpoint.serviceName, span_service_name);
       assert.equal(
