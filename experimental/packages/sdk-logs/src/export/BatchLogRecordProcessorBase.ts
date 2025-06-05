@@ -26,7 +26,7 @@ import {
 } from '@opentelemetry/core';
 
 import type { BufferConfig } from '../types';
-import type { LogRecord } from '../LogRecord';
+import type { LogRecord } from '../export/LogRecord';
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
 

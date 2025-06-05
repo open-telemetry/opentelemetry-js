@@ -36,6 +36,7 @@ import {
   Resource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
+import { LogRecordImpl } from '../../../src/LogRecordImpl';
 
 class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BufferConfig> {
   onInit() {}
@@ -52,7 +53,7 @@ const createLogRecord = (
     reconfigureLimits(limits ?? {}),
     []
   );
-  const logRecord = new LogRecord(
+  const logRecord = new LogRecordImpl(
     sharedState,
     {
       name: 'test name',

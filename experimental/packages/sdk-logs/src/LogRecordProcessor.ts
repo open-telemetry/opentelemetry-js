@@ -16,7 +16,7 @@
 
 import { Context } from '@opentelemetry/api';
 
-import { LogRecord } from './LogRecord';
+import { LogRecord } from './export/LogRecord';
 
 export interface LogRecordProcessor {
   /**

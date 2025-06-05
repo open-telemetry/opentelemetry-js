@@ -23,7 +23,7 @@ import {
 } from '@opentelemetry/core';
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
-import type { LogRecord } from './../LogRecord';
+import type { LogRecord } from '../export/LogRecord';
 
 export class SimpleLogRecordProcessor implements LogRecordProcessor {
   private _shutdownOnce: BindOnceFuture<void>;
