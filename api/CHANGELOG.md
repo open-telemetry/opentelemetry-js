@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* feat(api): add attributes argument to recordException API [#5333](https://github.com/open-telemetry/opentelemetry-js/pull/5333) @brianphillips
 * feat(diag): change types in `DiagComponentLogger` from `any` to `unknown`[#5478](https://github.com/open-telemetry/opentelemetry-js/pull/5478) @loganrosen
 
 ### :bug: (Bug Fix)
