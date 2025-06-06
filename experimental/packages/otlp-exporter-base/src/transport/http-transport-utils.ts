@@ -141,12 +141,3 @@ function readableFromUint8Array(buff: string | Uint8Array): Readable {
 
   return readable;
 }
-
-export function createHttpAgent(
-  rawUrl: string,
-  agentOptions: http.AgentOptions | https.AgentOptions
-) {
-  const parsedUrl = new URL(rawUrl);
-  const Agent = parsedUrl.protocol === 'http:' ? http.Agent : https.Agent;
-  return new Agent(agentOptions);
-}
