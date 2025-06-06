@@ -3,7 +3,6 @@ const { pathToFileURL } = require('url');
 
 require('ts-node/register');
 
-const shouldPatchEsm = process.execArgv.every(arg => !arg.includes('loader'));
-if (shouldPatchEsm) {
+if (process.env.MOCHA_DONT_PATCH_ESM == null) {
   register('ts-node/esm', pathToFileURL(__filename));
 }
