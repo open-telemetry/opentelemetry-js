@@ -25,7 +25,7 @@ import {
 import {
   BufferConfig,
   LogRecordLimits,
-  LogRecord,
+  SdkLogRecord,
   InMemoryLogRecordExporter,
 } from '../../../src';
 import { BatchLogRecordProcessorBase } from '../../../src/export/BatchLogRecordProcessorBase';
@@ -46,7 +46,7 @@ class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BufferConfig> 
 const createLogRecord = (
   limits?: LogRecordLimits,
   resource?: Resource
-): LogRecord => {
+): SdkLogRecord => {
   const sharedState = new LoggerProviderSharedState(
     resource || defaultResource(),
     Infinity,

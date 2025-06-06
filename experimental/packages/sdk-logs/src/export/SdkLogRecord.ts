@@ -31,7 +31,7 @@ import type { Resource } from '@opentelemetry/resources';
  * To produce logs, use {@link Logger#emit}. To consume logs, implement {@link LogRecordProcessor#onEmit}.
  * LogRecord instances are created and managed by the SDK.
  */
-export interface LogRecord {
+export interface SdkLogRecord {
   /** Time when the event occurred. */
   readonly hrTime: api.HrTime;
 
@@ -77,40 +77,40 @@ export interface LogRecord {
    * @param value The attribute value.
    * @returns The updated LogRecord.
    */
-  setAttribute(key: string, value?: AnyValue): LogRecord;
+  setAttribute(key: string, value?: AnyValue): SdkLogRecord;
 
   /**
    * Sets multiple attributes on the log record.
    * @param attributes The attributes to set.
    * @returns The updated LogRecord.
    */
-  setAttributes(attributes: LogAttributes): LogRecord;
+  setAttributes(attributes: LogAttributes): SdkLogRecord;
 
   /**
    * Sets the body of the log record.
    * @param body The log body.
    * @returns The updated LogRecord.
    */
-  setBody(body: LogBody): LogRecord;
+  setBody(body: LogBody): SdkLogRecord;
 
   /**
    * Sets the event name for the log record.
    * @param eventName The event name.
    * @returns The updated LogRecord.
    */
-  setEventName(eventName: string): LogRecord;
+  setEventName(eventName: string): SdkLogRecord;
 
   /**
    * Sets the severity number for the log record.
    * @param severityNumber The severity number.
    * @returns The updated LogRecord.
    */
-  setSeverityNumber(severityNumber: logsAPI.SeverityNumber): LogRecord;
+  setSeverityNumber(severityNumber: logsAPI.SeverityNumber): SdkLogRecord;
 
   /**
    * Sets the severity text (log level) for the log record.
    * @param severityText The severity text.
    * @returns The updated LogRecord.
    */
-  setSeverityText(severityText: string): LogRecord;
+  setSeverityText(severityText: string): SdkLogRecord;
 }
