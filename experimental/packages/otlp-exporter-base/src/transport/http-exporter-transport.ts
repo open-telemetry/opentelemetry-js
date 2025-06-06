@@ -33,11 +33,12 @@ interface Utils {
 
 class HttpExporterTransport implements IExporterTransport {
   private _utils: Utils | null = null;
+  private _loadingUtils: Promise<Utils> | null = null;
 
   constructor(private _parameters: HttpRequestParameters) {}
 
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
-    const { agent, send } = this._loadUtils();
+    const { agent, send } = await this._loadUtils();
 
     return new Promise<ExportResponse>(resolve => {
       send(
@@ -56,27 +57,28 @@ class HttpExporterTransport implements IExporterTransport {
     // intentionally left empty, nothing to do.
   }
 
-  private _loadUtils(): Utils {
-    let utils = this._utils;
-
-    if (utils === null) {
-      // Lazy require to ensure that http/https is not required before instrumentations can wrap it.
-      const {
-        sendWithHttp,
-        createHttpAgent,
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-      } = require('./http-transport-utils');
-
-      utils = this._utils = {
-        agent: createHttpAgent(
-          this._parameters.url,
-          this._parameters.agentOptions
-        ),
-        send: sendWithHttp,
-      };
+  private async _loadUtils(): Promise<Utils> {
+    if (this._utils) {
+      return this._utils;
     }
 
-    return utils;
+    if (this._loadingUtils) {
+      return this._loadingUtils;
+    }
+
+    // Lazy require to ensure that http/https is not required before instrumentations can wrap it.
+    return (this._loadingUtils = import('./http-transport-utils').then(
+      ({ sendWithHttp, createHttpAgent }) => {
+        this._loadingUtils = null;
+        return (this._utils = {
+          agent: createHttpAgent(
+            this._parameters.url,
+            this._parameters.agentOptions
+          ),
+          send: sendWithHttp,
+        });
+      }
+    ));
   }
 }
 
