@@ -251,6 +251,17 @@ describe('xhr', () => {
     { async: false, semconvStabilityOptIn: 'http' },
     { async: false, semconvStabilityOptIn: 'http/dup' },
   ];
+
+  let timer: sinon.SinonFakeTimers;
+
+  beforeEach(function () {
+    timer = sinon.useFakeTimers();
+  });
+
+  afterEach(function () {
+    sinon.restore();
+  });
+
   asyncTests.forEach(test => {
     const testAsync = test.async;
     describe(`when async='${testAsync}', semconvStabilityOptIn=${test.semconvStabilityOptIn}`, () => {
@@ -291,8 +302,9 @@ describe('xhr', () => {
         let xmlHttpRequestInstrumentation: XMLHttpRequestInstrumentation;
 
         clearData = () => {
-          requests = [];
           sinon.restore();
+          timer = sinon.useFakeTimers();
+          requests = [];
         };
 
         const prepareData = (
@@ -304,7 +316,6 @@ describe('xhr', () => {
           fakeXhr.onCreate = function (xhr: any) {
             requests.push(xhr);
           };
-          sinon.useFakeTimers();
 
           sinon.stub(performance, 'timeOrigin').value(0);
           sinon.stub(performance, 'now').callsFake(() => fakeNow);
@@ -364,7 +375,7 @@ describe('xhr', () => {
                 testAsync
               ).then(() => {
                 fakeNow = 0;
-                sinon.clock.tick(1000);
+                timer.tick(1000);
                 done();
               });
               assert.strictEqual(requests.length, 1, 'request not called');
@@ -378,7 +389,7 @@ describe('xhr', () => {
           );
         };
 
-        beforeEach(done => {
+        beforeEach(function (done) {
           const propagateTraceHeaderCorsUrls = [window.location.origin];
           prepareData(done, url, {
             propagateTraceHeaderCorsUrls,
@@ -702,11 +713,11 @@ describe('xhr', () => {
           () => {
             let spyDebug: sinon.SinonSpy;
             beforeEach(done => {
+              clearData();
               const diagLogger = new api.DiagConsoleLogger();
               spyDebug = sinon.spy();
               diagLogger.debug = spyDebug;
               api.diag.setLogger(diagLogger, api.DiagLogLevel.ALL);
-              clearData();
               prepareData(
                 done,
                 'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json'
@@ -791,7 +802,7 @@ describe('xhr', () => {
                   testAsync
                 ).then(() => {
                   fakeNow = 0;
-                  sinon.clock.tick(1000);
+                  timer.tick(1000);
                 });
               }
             );
@@ -808,7 +819,7 @@ describe('xhr', () => {
                   testAsync
                 ).then(() => {
                   fakeNow = 0;
-                  sinon.clock.tick(1000);
+                  timer.tick(1000);
                   done();
                 });
 
@@ -974,8 +985,6 @@ describe('xhr', () => {
             requests.push(xhr);
           };
 
-          sinon.useFakeTimers();
-
           sinon.stub(performance, 'timeOrigin').value(0);
           sinon.stub(performance, 'now').callsFake(() => fakeNow);
 
@@ -1031,12 +1040,12 @@ describe('xhr', () => {
                 new XMLHttpRequest(),
                 url,
                 () => {
-                  sinon.clock.tick(XHR_TIMEOUT);
+                  timer.tick(XHR_TIMEOUT);
                 },
                 testAsync
               ).then(() => {
                 fakeNow = 0;
-                sinon.clock.tick(1000);
+                timer.tick(1000);
                 done();
               });
             }
@@ -1050,7 +1059,7 @@ describe('xhr', () => {
               void getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
                 () => {
                   fakeNow = 0;
-                  sinon.clock.tick(1000);
+                  timer.tick(1000);
                   done();
                 }
               );
@@ -1074,7 +1083,7 @@ describe('xhr', () => {
                 testAsync
               ).then(() => {
                 fakeNow = 0;
-                sinon.clock.tick(1000);
+                timer.tick(1000);
                 done();
               });
               assert.strictEqual(requests.length, 1, 'request not called');
@@ -1094,7 +1103,7 @@ describe('xhr', () => {
               void getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
                 () => {
                   fakeNow = 0;
-                  sinon.clock.tick(1000);
+                  timer.tick(1000);
                   done();
                 }
               );
@@ -1109,6 +1118,7 @@ describe('xhr', () => {
           beforeEach(done => {
             erroredRequest(done);
           });
+
           it('span should have correct attributes and status', () => {
             const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const attributes = span.attributes;
@@ -1684,8 +1694,9 @@ describe('xhr', () => {
         let xmlHttpRequestInstrumentation: XMLHttpRequestInstrumentation;
 
         clearData = () => {
-          requests = [];
           sinon.restore();
+          timer = sinon.useFakeTimers();
+          requests = [];
         };
 
         const prepareData = (
@@ -1697,7 +1708,6 @@ describe('xhr', () => {
           fakeXhr.onCreate = function (xhr: any) {
             requests.push(xhr);
           };
-          sinon.useFakeTimers();
 
           sinon.stub(performance, 'timeOrigin').value(0);
           sinon.stub(performance, 'now').callsFake(() => fakeNow);
@@ -1757,7 +1767,7 @@ describe('xhr', () => {
                 testAsync
               ).then(() => {
                 fakeNow = 0;
-                sinon.clock.tick(1000);
+                timer.tick(1000);
                 done();
               });
               assert.strictEqual(requests.length, 1, 'request not called');
@@ -1772,6 +1782,7 @@ describe('xhr', () => {
         };
 
         beforeEach(done => {
+          clearData();
           const propagateTraceHeaderCorsUrls = [window.location.origin];
           prepareData(done, url, {
             propagateTraceHeaderCorsUrls,
@@ -2098,11 +2109,11 @@ describe('xhr', () => {
           () => {
             let spyDebug: sinon.SinonSpy;
             beforeEach(done => {
+              clearData();
               const diagLogger = new api.DiagConsoleLogger();
               spyDebug = sinon.spy();
               diagLogger.debug = spyDebug;
               api.diag.setLogger(diagLogger, api.DiagLogLevel.ALL);
-              clearData();
               prepareData(
                 done,
                 'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json'
@@ -2188,7 +2199,7 @@ describe('xhr', () => {
                   testAsync
                 ).then(() => {
                   fakeNow = 0;
-                  sinon.clock.tick(1000);
+                  timer.tick(1000);
                 });
               }
             );
@@ -2206,7 +2217,7 @@ describe('xhr', () => {
                   testAsync
                 ).then(() => {
                   fakeNow = 0;
-                  sinon.clock.tick(1000);
+                  timer.tick(1000);
                   done();
                 });
 
@@ -2338,8 +2349,6 @@ describe('xhr', () => {
             requests.push(xhr);
           };
 
-          sinon.useFakeTimers();
-
           sinon.stub(performance, 'timeOrigin').value(0);
           sinon.stub(performance, 'now').callsFake(() => fakeNow);
 
@@ -2397,12 +2406,12 @@ describe('xhr', () => {
                 url,
                 '{"embedded":"data"}',
                 () => {
-                  sinon.clock.tick(XHR_TIMEOUT);
+                  timer.tick(XHR_TIMEOUT);
                 },
                 testAsync
               ).then(() => {
                 fakeNow = 0;
-                sinon.clock.tick(1000);
+                timer.tick(1000);
                 done();
               });
             }
@@ -2421,7 +2430,7 @@ describe('xhr', () => {
                 testAsync
               ).then(() => {
                 fakeNow = 0;
-                sinon.clock.tick(1000);
+                timer.tick(1000);
                 done();
               });
 
@@ -2445,7 +2454,7 @@ describe('xhr', () => {
                 testAsync
               ).then(() => {
                 fakeNow = 0;
-                sinon.clock.tick(1000);
+                timer.tick(1000);
                 done();
               });
               assert.strictEqual(requests.length, 1, 'request not called');
@@ -2470,7 +2479,7 @@ describe('xhr', () => {
                 testAsync
               ).then(() => {
                 fakeNow = 0;
-                sinon.clock.tick(1000);
+                timer.tick(1000);
                 done();
               });
 
