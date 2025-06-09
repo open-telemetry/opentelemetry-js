@@ -14,61 +14,36 @@
  * limitations under the License.
  */
 
-import type * as logsAPI from '@opentelemetry/api-logs';
-import * as api from '@opentelemetry/api';
-import {
-  InstrumentationScope,
-} from '@opentelemetry/core';
-import { AnyValue, LogAttributes, LogBody } from '@opentelemetry/api-logs';
+import type { HrTime, SpanContext } from '@opentelemetry/api';
+import { InstrumentationScope } from '@opentelemetry/core';
+import type {
+  AnyValue,
+  LogBody,
+  LogAttributes,
+  SeverityNumber,
+} from '@opentelemetry/api-logs';
 import type { Resource } from '@opentelemetry/resources';
 
 /**
- * A recording of a event. Typically the record includes a timestamp indicating when the 
+ * A recording of a event. Typically the record includes a timestamp indicating when the
  * event happened as well as other data that describes what happened, where it happened, etc.
- * 
+ *
  * @remarks
  * This interface is **not intended to be implemented by users**.
  * To produce logs, use {@link Logger#emit}. To consume logs, implement {@link LogRecordProcessor#onEmit}.
  * LogRecord instances are created and managed by the SDK.
  */
 export interface SdkLogRecord {
-  /** Time when the event occurred. */
-  readonly hrTime: api.HrTime;
-
-  /** Time when the event was observed. */
-  readonly hrTimeObserved: api.HrTime;
-
-  /** Span context of a log */
-  readonly spanContext?: api.SpanContext;
-
-  /** Describes the source of the log. */
+  readonly hrTime: HrTime;
+  readonly hrTimeObserved: HrTime;
+  readonly spanContext?: SpanContext;
   readonly resource: Resource;
-
-  /** Describes the scope that emitted the log. */
   readonly instrumentationScope: InstrumentationScope;
-
-  /**
-   * Attributes that define the log record.
-   */
-  readonly attributes: logsAPI.LogAttributes;
-
-  /** The severity text (also known as log level). */
+  readonly attributes: LogAttributes;
   severityText?: string;
-
-  /** Numerical value of the severity. */
-  severityNumber?: logsAPI.SeverityNumber;
-
-  /**
-   * A value containing the body of the log record.
-   */
+  severityNumber?: SeverityNumber;
   body?: LogBody;
-
-  /**
-   * The unique identifier for the log record.
-   */
   eventName?: string;
-  
-  /** Dropped attribute countfor the log record */
   droppedAttributesCount: number;
 
   /**
@@ -105,7 +80,7 @@ export interface SdkLogRecord {
    * @param severityNumber The severity number.
    * @returns The updated LogRecord.
    */
-  setSeverityNumber(severityNumber: logsAPI.SeverityNumber): SdkLogRecord;
+  setSeverityNumber(severityNumber: SeverityNumber): SdkLogRecord;
 
   /**
    * Sets the severity text (log level) for the log record.
