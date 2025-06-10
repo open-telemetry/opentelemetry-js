@@ -82,15 +82,9 @@ import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
 import { Err, IgnoreMatcher, ParsedRequestOptions } from './internal-types';
 import { SYNTHETIC_BOT_NAMES, SYNTHETIC_TEST_NAMES } from './internal-types';
+import { SENSITIVE_URL_PARAMS, STR_REDACTED } from './internal-types';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import forwardedParse = require('forwarded-parse');
-const STR_REDACTED = 'REDACTED';
-const sensitiveParams = [
-  'sig',
-  'Signature',
-  'AWSAccessKeyId',
-  'X-Goog-Signature',
-] as const;
 
 /**
  * Get an absolute url
@@ -121,9 +115,12 @@ export const getAbsoluteUrl = (
     const [pathname, query] = path.split('?', 2);
     const searchParams = new URLSearchParams(query);
 
-    for (let i = 0; i < sensitiveParams.length; i++) {
-      const sensitiveParam = sensitiveParams[i];
-      if (searchParams.has(sensitiveParam)) {
+    for (let i = 0; i < SENSITIVE_URL_PARAMS.length; i++) {
+      const sensitiveParam = SENSITIVE_URL_PARAMS[i];
+      if (
+        searchParams.has(sensitiveParam) &&
+        searchParams.get(sensitiveParam) !== ''
+      ) {
         searchParams.set(sensitiveParam, STR_REDACTED);
       }
     }
