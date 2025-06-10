@@ -59,7 +59,7 @@
     "lerna": "6.6.2",
     "mocha": "11.1.0",
     "nyc": "17.1.0",
-    "sinon": "15.1.2",
+    "sinon": "18.0.1",
     "typescript": "5.0.4"
   },
   "peerDependencies": {
