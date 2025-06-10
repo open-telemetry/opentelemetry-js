@@ -1704,5 +1704,56 @@ describe('HttpInstrumentation', () => {
         `${protocol}://${hostname}:${serverPort}${pathname}?X-Goog-Signature=REDACTED&=nokey&malformed=`
       );
     });
+    it('should not modify URLs without auth or sensitive query parameters', async () => {
+      await httpRequest.get(
+        `${protocol}://${hostname}:${serverPort}${pathname}?param=value&another=123`
+      );
+      const spans = memoryExporter.getFinishedSpans();
+      const [_, outgoingSpan] = spans;
+
+      assert.strictEqual(
+        outgoingSpan.attributes[ATTR_HTTP_URL],
+        `${protocol}://${hostname}:${serverPort}${pathname}?param=value&another=123`
+      );
+    });
+
+    it('should not modify URLs with no query string', async () => {
+      await httpRequest.get(
+        `${protocol}://${hostname}:${serverPort}${pathname}`
+      );
+      const spans = memoryExporter.getFinishedSpans();
+      const [_, outgoingSpan] = spans;
+
+      assert.strictEqual(
+        outgoingSpan.attributes[ATTR_HTTP_URL],
+        `${protocol}://${hostname}:${serverPort}${pathname}`
+      );
+    });
+
+    it('should not modify URLs with empty query parameters', async () => {
+      await httpRequest.get(
+        `${protocol}://${hostname}:${serverPort}${pathname}?sig=&empty=`
+      );
+      const spans = memoryExporter.getFinishedSpans();
+      const [_, outgoingSpan] = spans;
+
+      assert.strictEqual(
+        outgoingSpan.attributes[ATTR_HTTP_URL],
+        `${protocol}://${hostname}:${serverPort}${pathname}?sig=&empty=`
+      );
+    });
+
+    it('should preserve non-sensitive query parameters when sensitive ones are redacted', async () => {
+      await httpRequest.get(
+        `${protocol}://${hostname}:${serverPort}${pathname}?normal=value&Signature=secret&other=data`
+      );
+      const spans = memoryExporter.getFinishedSpans();
+      const [_, outgoingSpan] = spans;
+
+      assert.strictEqual(
+        outgoingSpan.attributes[ATTR_HTTP_URL],
+        `${protocol}://${hostname}:${serverPort}${pathname}?normal=value&Signature=REDACTED&other=data`
+      );
+    });
   });
 });
