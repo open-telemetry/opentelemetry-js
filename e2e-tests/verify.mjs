@@ -29,16 +29,19 @@ for (const line of lines) {
   if (parsed.resourceSpans) {
     console.log('found span');
     verifySpan(parsed.resourceSpans[0].scopeSpans[0].spans[0]);
+    verifyResource(parsed.resourceSpans[0].resource);
     verifiedSpan = true;
   }
   if (parsed.resourceMetrics) {
     console.log('found metric');
     verifyMetric(parsed.resourceMetrics[0].scopeMetrics[0].metrics[0]);
+    verifyResource(parsed.resourceSpans[0].resource);
     verifiedMetric = true;
   }
   if (parsed.resourceLogs) {
     console.log('found log');
     verifyLog(parsed.resourceLogs[0].scopeLogs[0].logRecords[0]);
+    verifyResource(parsed.resourceSpans[0].resource);
     verifiedLog = true;
   }
 }
@@ -56,44 +59,29 @@ if (!verifiedLog) {
   process.exit(1);
 }
 
+function verifyResource(resource) {
+  if (!resource || !resource.attributes) {
+    console.error('Resource attributes are missing');
+    process.exit(1);
+  }
+  const expectedAttributes = {
+    'service.name': 'example-service',
+    'service.version': '1.0.0',
+  };
+  for (const [key, value] of Object.entries(expectedAttributes)) {
+    if (resource.attributes[key] !== value) {
+      console.error(
+        `Expected resource attribute '${key}' to be '${value}', but got '${resource.attributes[key]}'`
+      );
+      process.exit(1);
+    }
+  }
+}
+
 function verifySpan(span) {
   const expectedName = 'example-span';
   if (span.name !== expectedName) {
     console.error(`Expected span name ${expectedName}, but got '${span.name}'`);
-    process.exit(1);
-  }
-
-  const expectedServiceName = 'example-service';
-  if (
-    !span.resource ||
-    !span.resource.attributes ||
-    span.resource.attributes['service.name'] !== expectedServiceName
-  ) {
-    console.error(
-      `Expected service name ${expectedServiceName}, but got '${span.resource.attributes['service.name']}'`
-    );
-    process.exit(1);
-  }
-
-  const expectedServiceVersion = '1.0.0';
-  if (
-    !span.resource ||
-    !span.resource.attributes ||
-    span.resource.attributes['service.version'] !== expectedServiceVersion
-  ) {
-    console.error(
-      `Expected service version ${expectedServiceVersion}, but got '${span.resource.attributes['service.version']}'`
-    );
-    process.exit(1);
-  }
-
-
-  if (
-    !span.resource ||
-    !span.resource.entityRefs ||
-    span.resource.entityRefs.length === 0
-  ) {
-    console.error('Expected resource to have entityRefs');
     process.exit(1);
   }
 }

@@ -77,6 +77,8 @@ const sdk = new NodeSDK({
 async function main() {
   sdk.start();
 
+  console.log(sdk.resource)
+
   // Create a span
   const tracer = trace.getTracer('example-tracer');
   const span = tracer.startSpan('example-span');
