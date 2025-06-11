@@ -28,6 +28,7 @@ import {
   metrics,
 } from '@opentelemetry/api';
 import { logs } from '@opentelemetry/api-logs';
+import { resourceFromDetectedResource } from '@opentelemetry/resources';
 
 // Enable diagnostic logging (optional)
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.INFO);
@@ -61,6 +62,16 @@ const sdk = new NodeSDK({
   spanProcessors,
   metricReader,
   logRecordProcessors,
+  resource: resourceFromDetectedResource({
+    entities: [
+      {
+        type: 'service',
+        identifier: { 'service.name': 'example-service' },
+        attributes: { 'service.version': '1.0.0' },
+        schemaUrl: 'https://opentelemetry.io/schemas/1.0.0/service',
+      },
+    ],
+  }),
 });
 
 async function main() {

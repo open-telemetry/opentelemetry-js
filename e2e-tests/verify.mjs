@@ -62,6 +62,40 @@ function verifySpan(span) {
     console.error(`Expected span name ${expectedName}, but got '${span.name}'`);
     process.exit(1);
   }
+
+  const expectedServiceName = 'example-service';
+  if (
+    !span.resource ||
+    !span.resource.attributes ||
+    span.resource.attributes['service.name'] !== expectedServiceName
+  ) {
+    console.error(
+      `Expected service name ${expectedServiceName}, but got '${span.resource.attributes['service.name']}'`
+    );
+    process.exit(1);
+  }
+
+  const expectedServiceVersion = '1.0.0';
+  if (
+    !span.resource ||
+    !span.resource.attributes ||
+    span.resource.attributes['service.version'] !== expectedServiceVersion
+  ) {
+    console.error(
+      `Expected service version ${expectedServiceVersion}, but got '${span.resource.attributes['service.version']}'`
+    );
+    process.exit(1);
+  }
+
+
+  if (
+    !span.resource ||
+    !span.resource.entityRefs ||
+    span.resource.entityRefs.length === 0
+  ) {
+    console.error('Expected resource to have entityRefs');
+    process.exit(1);
+  }
 }
 
 function verifyMetric(metric) {
