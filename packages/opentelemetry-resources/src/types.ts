@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { AttributeValue } from '@opentelemetry/api';
+import { Attributes, AttributeValue } from '@opentelemetry/api';
 import { ResourceDetectionConfig } from './config';
 
 /**
@@ -36,13 +36,33 @@ export type DetectedResource = {
    * Detected resource attributes.
    */
   attributes?: DetectedResourceAttributes;
+
+  /**
+   * Detected entities
+   */
+  entities?: DetectedEntity[];
+};
+
+export type EntityRef = {
+  type: string;
+  identifyingAttributeKeys: string[];
+  descriptiveAttributeKeys: string[];
+};
+
+export type DetectedEntity = {
+  type: string;
+  schemaUrl?: string;
+  identifier: Attributes;
+  attributes?: DetectedResourceAttributes;
 };
 
 /**
  * An object representing detected resource attributes.
  * Value may be {@link AttributeValue}s, a promise to an {@link AttributeValue}, or undefined.
  */
-type DetectedResourceAttributeValue = MaybePromise<AttributeValue | undefined>;
+export type DetectedResourceAttributeValue = MaybePromise<
+  AttributeValue | undefined
+>;
 
 /**
  * An object representing detected resource attributes.

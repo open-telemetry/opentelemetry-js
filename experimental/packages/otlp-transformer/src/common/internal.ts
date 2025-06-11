@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import type {
+  EntityRef,
   IAnyValue,
   IInstrumentationScope,
   IKeyValue,
@@ -21,13 +22,26 @@ import type {
 } from './internal-types';
 import { Attributes } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
-import { Resource as ISdkResource } from '@opentelemetry/resources';
+import {
+  Resource as ISdkResource,
+  Entity as ISdkEntity,
+} from '@opentelemetry/resources';
 
 export function createResource(resource: ISdkResource): Resource {
   return {
     attributes: toAttributes(resource.attributes),
     droppedAttributesCount: 0,
+    entityRefs: toEntityRefs(resource.entities),
   };
+}
+
+export function toEntityRefs(entityRefs: ISdkEntity[]): EntityRef[] {
+  return entityRefs.map(ref => ({
+    schemaUrl: ref.schemaUrl,
+    type: ref.type,
+    idKeys: Object.keys(ref.identifier),
+    descriptionKeys: Object.keys(ref.attributes),
+  }));
 }
 
 export function createInstrumentationScope(

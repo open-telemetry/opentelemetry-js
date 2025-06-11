@@ -21,6 +21,15 @@ export interface Resource {
 
   /** Resource droppedAttributesCount */
   droppedAttributesCount: number;
+
+  entityRefs?: EntityRef[];
+}
+
+export interface EntityRef {
+  schemaUrl?: string;
+  type: string;
+  idKeys: string[];
+  descriptionKeys: string[];
 }
 
 /** Properties of an InstrumentationScope. */
