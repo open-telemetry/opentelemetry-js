@@ -64,17 +64,23 @@ function verifyResource(resource) {
     console.error('Resource attributes are missing');
     process.exit(1);
   }
-  const expectedAttributes = {
-    'service.name': 'example-service',
-    'service.version': '1.0.0',
-  };
-  for (const [key, value] of Object.entries(expectedAttributes)) {
-    if (resource.attributes[key] !== value) {
-      console.error(
-        `Expected resource attribute '${key}' to be '${value}', but got '${resource.attributes[key]}'`
-      );
-      process.exit(1);
-    }
+  const name = resource.attributes.find(
+    (attr) => attr.key === 'service.name'
+  );
+  if (!name || name.value.stringValue !== 'example-service') {
+    console.error(
+      `Expected service.name to be 'example-service', but got '${name?.value.stringValue}'`
+    );
+    process.exit(1);
+  }
+  const version = resource.attributes.find(
+    (attr) => attr.key === 'service.version'
+  );
+  if (!version || version.value.stringValue !== '1.0.0') {
+    console.error(
+      `Expected service.version to be '1.0.0', but got '${version?.value.stringValue}'`
+    );
+    process.exit(1);
   }
 }
 
