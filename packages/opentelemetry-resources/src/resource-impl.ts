@@ -177,7 +177,9 @@ export function resourceFromAttributes(
 export function resourceFromDetectedResource(
   detectedResource: DetectedResource
 ): Resource {
-  const entities = (detectedResource.entities ?? []).map(e => new EntityImpl(e));
+  const entities = (detectedResource.entities ?? []).map(
+    e => new EntityImpl(e)
+  );
   const rawAttributes = Object.entries(detectedResource.attributes ?? {});
   return new ResourceImpl(rawAttributes, entities);
 }

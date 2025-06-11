@@ -15,7 +15,11 @@
  */
 import { HrTime, TraceFlags } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
-import { Resource, resourceFromAttributes, resourceFromDetectedResource } from '@opentelemetry/resources';
+import {
+  Resource,
+  resourceFromAttributes,
+  resourceFromDetectedResource,
+} from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
@@ -117,12 +121,14 @@ function createExpectedLogProtobuf(): IExportLogsServiceRequest {
             },
           ],
           droppedAttributesCount: 0,
-          entityRefs: [{
-            descriptionKeys: ['attr_key_1'],
-            idKeys: ['id_key_1'],
-            schemaUrl: 'http://url.to.schema',
-            type: 'entity_type_1',
-          }],
+          entityRefs: [
+            {
+              descriptionKeys: ['attr_key_1'],
+              idKeys: ['id_key_1'],
+              schemaUrl: 'http://url.to.schema',
+              type: 'entity_type_1',
+            },
+          ],
         },
         scopeLogs: [
           {
@@ -178,7 +184,7 @@ describe('Logs', () => {
   // using `resource_2`, `scope_1`, `log_fragment_1`
   let log_2_1_1: ReadableLogRecord;
   // using `resource_3`, `scope_1`, `log_fragment_1`
-  let log_3_1_1: ReadableLogRecord
+  let log_3_1_1: ReadableLogRecord;
 
   beforeEach(() => {
     resource_1 = resourceFromAttributes({
@@ -254,7 +260,7 @@ describe('Logs', () => {
       ...log_fragment_1,
       resource: resource_3,
       instrumentationScope: scope_1,
-    }
+    };
   });
 
   describe('createExportLogsServiceRequest', () => {

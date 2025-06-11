@@ -68,7 +68,7 @@ describe('Metrics', () => {
         idKeys: ['resource-entity-id'],
         schemaUrl: 'http://url.to.resource.schema',
         type: 'resource-entity-type',
-      }
+      },
     ],
     droppedAttributesCount: 0,
   };
@@ -326,16 +326,18 @@ describe('Metrics', () => {
       attributes: {
         'resource-attribute': 'resource attribute value',
       },
-      entities: [{
-        identifier: {
-          'resource-entity-id': 'resource entity value',
+      entities: [
+        {
+          identifier: {
+            'resource-entity-id': 'resource entity value',
+          },
+          type: 'resource-entity-type',
+          attributes: {
+            'resource-entity-attribute': 'resource entity attribute value',
+          },
+          schemaUrl: 'http://url.to.resource.schema',
         },
-        type: 'resource-entity-type',
-        attributes: {
-          'resource-entity-attribute': 'resource entity attribute value',
-        },
-        schemaUrl: 'http://url.to.resource.schema',
-      }],
+      ],
     });
     return {
       resource: resource,
