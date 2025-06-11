@@ -21,7 +21,7 @@ import { Entity } from './entity';
 
 export class EntityImpl implements Entity {
   private _type: string;
-  private _schema_url?: string;
+  private _schemaUrl?: string;
   private _identifier: Attributes;
   private _asyncAttributesPending = false;
   private _rawAttributes: [string, DetectedResourceAttributeValue][];
@@ -29,7 +29,7 @@ export class EntityImpl implements Entity {
 
   constructor(entity: DetectedEntity) {
     this._type = entity.type;
-    this._schema_url = entity.schema_url;
+    this._schemaUrl = entity.schemaUrl;
     this._identifier = entity.identifier;
 
     if (entity.attributes) {
@@ -61,8 +61,8 @@ export class EntityImpl implements Entity {
     return this._type;
   }
 
-  get schema_url() {
-    return this._schema_url;
+  get schemaUrl() {
+    return this._schemaUrl;
   }
 
   get identifier() {
@@ -133,12 +133,12 @@ export function mergeEntities(...entities: Entity[]): Entity[] {
         continue;
       }
 
-      // If the entity identity is the same, but schema_url is different: drop the new entity d' Note: We could offer configuration in this case
-      if (entity.schema_url !== prevEntity.schema_url) {
+      // If the entity identity is the same, but schemaUrl is different: drop the new entity d' Note: We could offer configuration in this case
+      if (entity.schemaUrl !== prevEntity.schemaUrl) {
         continue;
       }
 
-      // If the entity identiy and schema_url are the same, merge the descriptive attributes of d' into e':
+      // If the entity identiy and schemaUrl are the same, merge the descriptive attributes of d' into e':
       // For each descriptive attribute da' in d'
       for (const [k, v] of Object.entries(entity.attributes)) {
         // If da'.key does not exist in e', then add da' to ei

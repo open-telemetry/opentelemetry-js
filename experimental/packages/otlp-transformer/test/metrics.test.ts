@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { ValueType } from '@opentelemetry/api';
-import { resourceFromAttributes } from '@opentelemetry/resources';
+import { resourceFromDetectedResource } from '@opentelemetry/resources';
 import {
   AggregationTemporality,
   DataPointType,
@@ -44,11 +44,31 @@ describe('Metrics', () => {
   const expectedResource = {
     attributes: [
       {
+        key: 'resource-entity-id',
+        value: {
+          stringValue: 'resource entity value',
+        },
+      },
+      {
+        key: 'resource-entity-attribute',
+        value: {
+          stringValue: 'resource entity attribute value',
+        },
+      },
+      {
         key: 'resource-attribute',
         value: {
           stringValue: 'resource attribute value',
         },
       },
+    ],
+    entityRefs: [
+      {
+        descriptionKeys: ['resource-entity-attribute'],
+        idKeys: ['resource-entity-id'],
+        schemaUrl: 'http://url.to.resource.schema',
+        type: 'resource-entity-type',
+      }
     ],
     droppedAttributesCount: 0,
   };
@@ -302,8 +322,20 @@ describe('Metrics', () => {
   }
 
   function createResourceMetrics(metricData: MetricData[]): ResourceMetrics {
-    const resource = resourceFromAttributes({
-      'resource-attribute': 'resource attribute value',
+    const resource = resourceFromDetectedResource({
+      attributes: {
+        'resource-attribute': 'resource attribute value',
+      },
+      entities: [{
+        identifier: {
+          'resource-entity-id': 'resource entity value',
+        },
+        type: 'resource-entity-type',
+        attributes: {
+          'resource-entity-attribute': 'resource entity attribute value',
+        },
+        schemaUrl: 'http://url.to.resource.schema',
+      }],
     });
     return {
       resource: resource,

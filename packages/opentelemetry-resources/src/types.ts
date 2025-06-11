@@ -51,7 +51,7 @@ export type EntityRef = {
 
 export type DetectedEntity = {
   type: string;
-  schema_url?: string;
+  schemaUrl?: string;
   identifier: Attributes;
   attributes?: DetectedResourceAttributes;
 };

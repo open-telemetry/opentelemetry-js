@@ -16,7 +16,10 @@
 import * as root from '../src/generated/root';
 import { SpanKind, SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import { TraceState } from '@opentelemetry/core';
-import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
+import {
+  Resource,
+  resourceFromDetectedResource,
+} from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { toBase64 } from './utils';
@@ -62,8 +65,30 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
         resource: {
           attributes: [
             {
+              key: 'resource-entity-id',
+              value: {
+                stringValue: 'resource entity value',
+              },
+            },
+            {
+              key: 'resource-entity-attribute',
+              value: {
+                stringValue: 'resource entity attribute value',
+              },
+            },
+            {
               key: 'resource-attribute',
-              value: { stringValue: 'resource attribute value' },
+              value: {
+                stringValue: 'resource attribute value',
+              },
+            },
+          ],
+          entityRefs: [
+            {
+              descriptionKeys: ['resource-entity-attribute'],
+              idKeys: ['resource-entity-id'],
+              schemaUrl: 'http://url.to.resource.schema',
+              type: 'resource-entity-type',
             },
           ],
           droppedAttributesCount: 0,
@@ -156,8 +181,30 @@ function createExpectedSpanProtobuf() {
         resource: {
           attributes: [
             {
+              key: 'resource-entity-id',
+              value: {
+                stringValue: 'resource entity value',
+              },
+            },
+            {
+              key: 'resource-entity-attribute',
+              value: {
+                stringValue: 'resource entity attribute value',
+              },
+            },
+            {
               key: 'resource-attribute',
-              value: { stringValue: 'resource attribute value' },
+              value: {
+                stringValue: 'resource attribute value',
+              },
+            },
+          ],
+          entityRefs: [
+            {
+              descriptionKeys: ['resource-entity-attribute'],
+              idKeys: ['resource-entity-id'],
+              schemaUrl: 'http://url.to.resource.schema',
+              type: 'resource-entity-type',
             },
           ],
           droppedAttributesCount: 0,
@@ -233,8 +280,22 @@ describe('Trace', () => {
   let span: ReadableSpan;
 
   beforeEach(() => {
-    resource = resourceFromAttributes({
-      'resource-attribute': 'resource attribute value',
+    resource = resourceFromDetectedResource({
+      attributes: {
+        'resource-attribute': 'resource attribute value',
+      },
+      entities: [
+        {
+          identifier: {
+            'resource-entity-id': 'resource entity value',
+          },
+          type: 'resource-entity-type',
+          attributes: {
+            'resource-entity-attribute': 'resource entity attribute value',
+          },
+          schemaUrl: 'http://url.to.resource.schema',
+        },
+      ],
     });
     span = {
       spanContext: () => ({

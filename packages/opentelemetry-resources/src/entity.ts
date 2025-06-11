@@ -4,7 +4,7 @@ export interface Entity {
   type: string;
   identifier: Attributes;
   attributes: Attributes;
-  schema_url?: string;
+  schemaUrl?: string;
   asyncAttributesPending: boolean;
   waitForAsyncAttributes(): Promise<void>;
 }
