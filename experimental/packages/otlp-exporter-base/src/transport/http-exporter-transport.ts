@@ -64,7 +64,7 @@ class HttpExporterTransport implements IExporterTransport {
       const {
         sendWithHttp,
         createHttpAgent,
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
       } = require('./http-transport-utils');
 
       utils = this._utils = {
