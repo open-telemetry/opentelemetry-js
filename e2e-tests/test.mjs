@@ -74,7 +74,7 @@ const sdk = new NodeSDK({
   metricReader,
   logRecordProcessors,
   resource,
-  resourceDetectors: [],
+  autoDetectResources: false, // Disable automatic resource detection
 });
 
 async function main() {
