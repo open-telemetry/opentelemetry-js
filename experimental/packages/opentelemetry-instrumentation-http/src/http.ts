@@ -30,7 +30,6 @@ import {
   ValueType,
 } from '@opentelemetry/api';
 import {
-  getStringListFromEnv,
   hrTime,
   hrTimeDuration,
   hrTimeToMilliseconds,
@@ -48,6 +47,8 @@ import { VERSION } from './version';
 import {
   InstrumentationBase,
   InstrumentationNodeModuleDefinition,
+  SemconvStability,
+  semconvStabilityFromStr,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import { errorMonitor } from 'events';
@@ -55,12 +56,12 @@ import {
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
   ATTR_NETWORK_PROTOCOL_VERSION,
+  ATTR_HTTP_ROUTE,
   ATTR_SERVER_ADDRESS,
   ATTR_SERVER_PORT,
   ATTR_URL_SCHEME,
   METRIC_HTTP_CLIENT_REQUEST_DURATION,
   METRIC_HTTP_SERVER_REQUEST_DURATION,
-  SEMATTRS_HTTP_ROUTE,
 } from '@opentelemetry/semantic-conventions';
 import {
   extractHostnameAndPort,
@@ -73,20 +74,14 @@ import {
   getOutgoingRequestAttributesOnResponse,
   getOutgoingRequestMetricAttributes,
   getOutgoingRequestMetricAttributesOnResponse,
+  getOutgoingStableRequestMetricAttributesOnResponse,
   getRequestInfo,
   headerCapture,
   isValidOptionsType,
   parseResponseStatus,
   setSpanWithError,
 } from './utils';
-import {
-  Err,
-  Func,
-  Http,
-  HttpRequestArgs,
-  Https,
-  SemconvStability,
-} from './internal-types';
+import { Err, Func, Http, HttpRequestArgs, Https } from './internal-types';
 
 /**
  * `node:http` and `node:https` instrumentation for OpenTelemetry
@@ -100,22 +95,15 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   declare private _oldHttpClientDurationHistogram: Histogram;
   declare private _stableHttpClientDurationHistogram: Histogram;
 
-  private _semconvStability = SemconvStability.OLD;
+  private _semconvStability: SemconvStability = SemconvStability.OLD;
 
   constructor(config: HttpInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-http', VERSION, config);
     this._headerCapture = this._createHeaderCapture();
-
-    for (const entry of getStringListFromEnv('OTEL_SEMCONV_STABILITY_OPT_IN') ??
-      []) {
-      if (entry.toLowerCase() === 'http/dup') {
-        // http/dup takes highest precedence. If it is found, there is no need to read the rest of the list
-        this._semconvStability = SemconvStability.DUPLICATE;
-        break;
-      } else if (entry.toLowerCase() === 'http') {
-        this._semconvStability = SemconvStability.STABLE;
-      }
-    }
+    this._semconvStability = semconvStabilityFromStr(
+      'http',
+      process.env.OTEL_SEMCONV_STABILITY_OPT_IN
+    );
   }
 
   protected override _updateMetricInstruments() {
@@ -170,18 +158,12 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     oldAttributes: Attributes,
     stableAttributes: Attributes
   ) {
-    if (
-      (this._semconvStability & SemconvStability.OLD) ===
-      SemconvStability.OLD
-    ) {
+    if (this._semconvStability & SemconvStability.OLD) {
       // old histogram is counted in MS
       this._oldHttpServerDurationHistogram.record(durationMs, oldAttributes);
     }
 
-    if (
-      (this._semconvStability & SemconvStability.STABLE) ===
-      SemconvStability.STABLE
-    ) {
+    if (this._semconvStability & SemconvStability.STABLE) {
       // stable histogram is counted in S
       this._stableHttpServerDurationHistogram.record(
         durationMs / 1000,
@@ -195,18 +177,12 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     oldAttributes: Attributes,
     stableAttributes: Attributes
   ) {
-    if (
-      (this._semconvStability & SemconvStability.OLD) ===
-      SemconvStability.OLD
-    ) {
+    if (this._semconvStability & SemconvStability.OLD) {
       // old histogram is counted in MS
       this._oldHttpClientDurationHistogram.record(durationMs, oldAttributes);
     }
 
-    if (
-      (this._semconvStability & SemconvStability.STABLE) ===
-      SemconvStability.STABLE
-    ) {
+    if (this._semconvStability & SemconvStability.STABLE) {
       // stable histogram is counted in S
       this._stableHttpClientDurationHistogram.record(
         durationMs / 1000,
@@ -232,6 +208,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'http',
       ['*'],
       (moduleExports: Http): Http => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const isESM = (moduleExports as any)[Symbol.toStringTag] === 'Module';
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           const patchedRequest = this._wrap(
@@ -247,7 +224,9 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           if (isESM) {
             // To handle `import http from 'http'`, which returns the default
             // export, we need to set `module.default.*`.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (moduleExports as any).default.request = patchedRequest;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (moduleExports as any).default.get = patchedGet;
           }
         }
@@ -279,6 +258,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'https',
       ['*'],
       (moduleExports: Https): Https => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const isESM = (moduleExports as any)[Symbol.toStringTag] === 'Module';
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           const patchedRequest = this._wrap(
@@ -294,7 +274,9 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           if (isESM) {
             // To handle `import https from 'https'`, which returns the default
             // export, we need to set `module.default.*`.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (moduleExports as any).default.request = patchedRequest;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (moduleExports as any).default.get = patchedGet;
           }
         }
@@ -467,6 +449,10 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           oldMetricAttributes,
           getOutgoingRequestMetricAttributesOnResponse(responseAttributes)
         );
+        stableMetricAttributes = Object.assign(
+          stableMetricAttributes,
+          getOutgoingStableRequestMetricAttributesOnResponse(responseAttributes)
+        );
 
         if (this.getConfig().responseHook) {
           this._callResponseHook(span, response);
@@ -566,6 +552,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       }
       responseFinished = true;
       setSpanWithError(span, error, this._semconvStability);
+
       this._closeHttpSpan(
         span,
         SpanKind.CLIENT,
@@ -636,6 +623,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             instrumentation.getConfig().startIncomingSpanHook
           ),
           semconvStability: instrumentation._semconvStability,
+          enableSyntheticSourceDetection:
+            instrumentation.getConfig().enableSyntheticSourceDetection || false,
         },
         instrumentation._diag
       );
@@ -782,7 +771,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       }
 
       const { hostname, port } = extractHostnameAndPort(optionsParsed);
-
       const attributes = getOutgoingRequestAttributes(
         optionsParsed,
         {
@@ -794,7 +782,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             instrumentation.getConfig().startOutgoingSpanHook
           ),
         },
-        instrumentation._semconvStability
+        instrumentation._semconvStability,
+        instrumentation.getConfig().enableSyntheticSourceDetection || false
       );
 
       const startTime = hrTime();
@@ -862,6 +851,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           error => {
             if (error) {
               setSpanWithError(span, error, instrumentation._semconvStability);
+
               instrumentation._closeHttpSpan(
                 span,
                 SpanKind.CLIENT,
@@ -919,7 +909,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       code: parseResponseStatus(SpanKind.SERVER, response.statusCode),
     });
 
-    const route = attributes[SEMATTRS_HTTP_ROUTE];
+    const route = attributes[ATTR_HTTP_ROUTE];
     if (route) {
       span.updateName(`${request.method || 'GET'} ${route}`);
     }

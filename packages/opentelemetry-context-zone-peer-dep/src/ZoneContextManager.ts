@@ -54,7 +54,7 @@ export class ZoneContextManager implements ContextManager {
    * @param context A context (span) to be executed within target function
    * @param target Function to be executed within the context
    */
-  // eslint-disable-next-line @typescript-eslint/ban-types
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   private _bindFunction<T extends Function>(context: Context, target: T): T {
     const manager = this;
     const contextWrapper = function (this: unknown, ...args: unknown[]) {

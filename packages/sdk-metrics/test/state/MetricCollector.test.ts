@@ -166,7 +166,7 @@ describe('MetricCollector', () => {
     });
 
     it('should collect observer metrics with timeout', async () => {
-      sinon.useFakeTimers();
+      const timer = sinon.useFakeTimers();
       /** preparing test instrumentations */
       const { metricCollector, meter } = setupInstruments();
 
@@ -195,7 +195,7 @@ describe('MetricCollector', () => {
         const future = metricCollector.collect({
           timeoutMillis: 100,
         });
-        sinon.clock.tick(200);
+        timer.tick(200);
         const { resourceMetrics, errors } = await future;
         assert.strictEqual(errors.length, 1);
         assert.ok(errors[0] instanceof TimeoutError);
@@ -222,7 +222,7 @@ describe('MetricCollector', () => {
         const future = metricCollector.collect({
           timeoutMillis: 100,
         });
-        sinon.clock.tick(100);
+        timer.tick(100);
         const { resourceMetrics, errors } = await future;
         assert.strictEqual(errors.length, 0);
         const { scopeMetrics } = resourceMetrics;
@@ -274,7 +274,7 @@ describe('MetricCollector', () => {
     });
 
     it('should collect batch observer metrics with timeout', async () => {
-      sinon.useFakeTimers();
+      const timer = sinon.useFakeTimers();
       /** preparing test instrumentations */
       const { metricCollector, meter } = setupInstruments();
 
@@ -307,7 +307,7 @@ describe('MetricCollector', () => {
         const future = metricCollector.collect({
           timeoutMillis: 100,
         });
-        sinon.clock.tick(200);
+        timer.tick(200);
         const { resourceMetrics, errors } = await future;
         assert.strictEqual(errors.length, 1);
         assert.ok(errors[0] instanceof TimeoutError);
@@ -332,7 +332,7 @@ describe('MetricCollector', () => {
         const future = metricCollector.collect({
           timeoutMillis: 100,
         });
-        sinon.clock.tick(100);
+        timer.tick(100);
         const { resourceMetrics, errors } = await future;
         assert.strictEqual(errors.length, 0);
         const { scopeMetrics } = resourceMetrics;

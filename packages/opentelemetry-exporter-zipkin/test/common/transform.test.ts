@@ -24,7 +24,7 @@ import {
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import {
   defaultStatusCodeTagName,
   defaultStatusErrorTagName,
@@ -37,7 +37,7 @@ import { VERSION } from '../../src/version';
 
 const resource = {
   attributes: {
-    [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
+    [ATTR_SERVICE_NAME]: 'zipkin-test',
     cost: '112.12',
     service: 'ui',
     version: '1',
@@ -128,7 +128,7 @@ describe('transform', () => {
         tags: {
           key1: 'value1',
           key2: 'value2',
-          [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
+          [ATTR_SERVICE_NAME]: 'zipkin-test',
           cost: '112.12',
           service: 'ui',
           version: '1',
@@ -163,7 +163,7 @@ describe('transform', () => {
           name: span.name,
           parentId: undefined,
           tags: {
-            [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
+            [ATTR_SERVICE_NAME]: 'zipkin-test',
             cost: '112.12',
             service: 'ui',
             version: '1',
@@ -209,7 +209,7 @@ describe('transform', () => {
           name: span.name,
           parentId: span.parentSpanContext?.spanId,
           tags: {
-            [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
+            [ATTR_SERVICE_NAME]: 'zipkin-test',
             cost: '112.12',
             service: 'ui',
             version: '1',
@@ -241,7 +241,7 @@ describe('transform', () => {
       assert.deepStrictEqual(tags, {
         key1: 'value1',
         key2: 'value2',
-        [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
+        [ATTR_SERVICE_NAME]: 'zipkin-test',
         'telemetry.sdk.language': 'nodejs',
         'telemetry.sdk.name': 'opentelemetry',
         'telemetry.sdk.version': VERSION,
@@ -267,7 +267,7 @@ describe('transform', () => {
       assert.deepStrictEqual(tags, {
         key1: 'value1',
         key2: 'value2',
-        [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
+        [ATTR_SERVICE_NAME]: 'zipkin-test',
         'telemetry.sdk.language': 'nodejs',
         'telemetry.sdk.name': 'opentelemetry',
         'telemetry.sdk.version': VERSION,
@@ -294,7 +294,7 @@ describe('transform', () => {
         key1: 'value1',
         key2: 'value2',
         [defaultStatusCodeTagName]: 'ERROR',
-        [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
+        [ATTR_SERVICE_NAME]: 'zipkin-test',
         'telemetry.sdk.language': 'nodejs',
         'telemetry.sdk.name': 'opentelemetry',
         'telemetry.sdk.version': VERSION,
@@ -322,7 +322,7 @@ describe('transform', () => {
         key2: 'value2',
         [defaultStatusCodeTagName]: 'ERROR',
         [defaultStatusErrorTagName]: 'my-message',
-        [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
+        [ATTR_SERVICE_NAME]: 'zipkin-test',
         'telemetry.sdk.language': 'nodejs',
         'telemetry.sdk.name': 'opentelemetry',
         'telemetry.sdk.version': VERSION,

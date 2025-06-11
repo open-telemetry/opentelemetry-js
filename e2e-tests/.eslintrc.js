@@ -13,4 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export const GRPC_STATUS_CODE_OK = 0;
+
+module.exports = {
+  env: {
+    node: true,
+  },
+  ...require('../eslint.base.js'),
+  rules: {
+    'no-console': 'off',
+  },
+};

@@ -28,7 +28,7 @@ import {
   defaultStatusCodeTagName,
   defaultStatusErrorTagName,
 } from './transform';
-import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { prepareGetHeaders } from './utils';
 
 /**
@@ -74,7 +74,7 @@ export class ZipkinExporter implements SpanExporter {
   ): void {
     const serviceName = String(
       this._serviceName ||
-        spans[0].resource.attributes[SEMRESATTRS_SERVICE_NAME] ||
+        spans[0].resource.attributes[ATTR_SERVICE_NAME] ||
         this.DEFAULT_SERVICE_NAME
     );
 
@@ -98,7 +98,7 @@ export class ZipkinExporter implements SpanExporter {
     this._sendingPromises.push(promise);
     const popPromise = () => {
       const index = this._sendingPromises.indexOf(promise);
-      this._sendingPromises.splice(index, 1);
+      void this._sendingPromises.splice(index, 1);
     };
     promise.then(popPromise, popPromise);
   }
@@ -147,8 +147,8 @@ export class ZipkinExporter implements SpanExporter {
       toZipkinSpan(
         span,
         String(
-          span.attributes[SEMRESATTRS_SERVICE_NAME] ||
-            span.resource.attributes[SEMRESATTRS_SERVICE_NAME] ||
+          span.attributes[ATTR_SERVICE_NAME] ||
+            span.resource.attributes[ATTR_SERVICE_NAME] ||
             serviceName
         ),
         this._statusCodeTagName,

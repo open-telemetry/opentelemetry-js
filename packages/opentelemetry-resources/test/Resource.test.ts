@@ -17,10 +17,10 @@
 import { diag } from '@opentelemetry/api';
 import { SDK_INFO } from '@opentelemetry/core';
 import {
-  SEMRESATTRS_SERVICE_NAME,
-  SEMRESATTRS_TELEMETRY_SDK_LANGUAGE,
-  SEMRESATTRS_TELEMETRY_SDK_NAME,
-  SEMRESATTRS_TELEMETRY_SDK_VERSION,
+  ATTR_SERVICE_NAME,
+  ATTR_TELEMETRY_SDK_LANGUAGE,
+  ATTR_TELEMETRY_SDK_NAME,
+  ATTR_TELEMETRY_SDK_VERSION,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -111,7 +111,7 @@ describe('Resource', () => {
       }),
     });
 
-    resource.attributes;
+    assert.ok(resource.attributes);
 
     assert.ok(
       debugStub.calledWithMatch(
@@ -291,19 +291,19 @@ describe('Resource', () => {
     it('should return a default resource', () => {
       const resource = defaultResource();
       assert.strictEqual(
-        resource.attributes[SEMRESATTRS_TELEMETRY_SDK_NAME],
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_NAME]
+        resource.attributes[ATTR_TELEMETRY_SDK_NAME],
+        SDK_INFO[ATTR_TELEMETRY_SDK_NAME]
       );
       assert.strictEqual(
-        resource.attributes[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE]
+        resource.attributes[ATTR_TELEMETRY_SDK_LANGUAGE],
+        SDK_INFO[ATTR_TELEMETRY_SDK_LANGUAGE]
       );
       assert.strictEqual(
-        resource.attributes[SEMRESATTRS_TELEMETRY_SDK_VERSION],
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_VERSION]
+        resource.attributes[ATTR_TELEMETRY_SDK_VERSION],
+        SDK_INFO[ATTR_TELEMETRY_SDK_VERSION]
       );
       assert.strictEqual(
-        resource.attributes[SEMRESATTRS_SERVICE_NAME],
+        resource.attributes[ATTR_SERVICE_NAME],
         `unknown_service:${process.argv0}`
       );
     });
@@ -313,19 +313,19 @@ describe('Resource', () => {
     it('should return a default resource', () => {
       const resource = defaultResource();
       assert.strictEqual(
-        resource.attributes[SEMRESATTRS_TELEMETRY_SDK_NAME],
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_NAME]
+        resource.attributes[ATTR_TELEMETRY_SDK_NAME],
+        SDK_INFO[ATTR_TELEMETRY_SDK_NAME]
       );
       assert.strictEqual(
-        resource.attributes[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE]
+        resource.attributes[ATTR_TELEMETRY_SDK_LANGUAGE],
+        SDK_INFO[ATTR_TELEMETRY_SDK_LANGUAGE]
       );
       assert.strictEqual(
-        resource.attributes[SEMRESATTRS_TELEMETRY_SDK_VERSION],
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_VERSION]
+        resource.attributes[ATTR_TELEMETRY_SDK_VERSION],
+        SDK_INFO[ATTR_TELEMETRY_SDK_VERSION]
       );
       assert.strictEqual(
-        resource.attributes[SEMRESATTRS_SERVICE_NAME],
+        resource.attributes[ATTR_SERVICE_NAME],
         'unknown_service'
       );
     });

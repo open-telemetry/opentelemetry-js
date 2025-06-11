@@ -71,28 +71,27 @@ const sdk = new opentelemetry.NodeSDK({
 
 // You can optionally detect resources asynchronously from the environment.
 // Detected resources are merged with the resources provided in the SDK configuration.
-sdk.start().then(() => {
-  // Resources have been detected and SDK is started
-  console.log(`SDK started`)
+sdk.start();
+// Resources have been detected and SDK is started
+console.log(`SDK started`)
 
 // Start the http server
-  const fastify = require('fastify')({
+const fastify = require('fastify')({
     logger: true
-  })
+})
 
-  fastify.get('/', function (request, reply) {
+fastify.get('/', function (request, reply) {
     reply.send({ hello: 'world' })
-  })
+})
 
-  fastify.listen({ port: 3000 }, function (err, address) {
+fastify.listen({ port: 3000 }, function (err, address) {
     if (err) {
-      fastify.log.error(err)
-      process.exit(1)
+        fastify.log.error(err)
+        process.exit(1)
     }
 
     console.log(`Server is now listening on ${address}`)
-  })
-});
+})
 
 // You can also use the shutdown method to gracefully shut down the SDK before process shutdown
 // or on some operating system signal.
@@ -159,35 +158,34 @@ const sdk = new opentelemetry.NodeSDK({
 
 // You can optionally detect resources asynchronously from the environment.
 // Detected resources are merged with the resources provided in the SDK configuration.
-sdk.start().then(() => {
-  // Resources have been detected and SDK is started
-  console.log(`SDK started`)
+sdk.start();
+// Resources have been detected and SDK is started
+console.log(`SDK started`)
 
-  // Create Meter with the name `http-server`
-  const appMeter = api.metrics.getMeter('http-server')
-  // Use the created Meter to create a counter instrument
-  const numberOfRequests = appMeter.createCounter('request-counter')
+// Create Meter with the name `http-server`
+const appMeter = api.metrics.getMeter('http-server')
+// Use the created Meter to create a counter instrument
+const numberOfRequests = appMeter.createCounter('request-counter')
 
-  // Start the http server
-  const fastify = require('fastify')({
+// Start the http server
+const fastify = require('fastify')({
     logger: true
-  })
+})
 
-  fastify.get('/', function (request, reply) {
+fastify.get('/', function (request, reply) {
     // Increase the counter by 1 each time the `/` endpoint is requested
     numberOfRequests.add(1)
     reply.send({ hello: 'world' })
-  })
+})
 
-  fastify.listen({ port: 3000 }, function (err, address) {
+fastify.listen({ port: 3000 }, function (err, address) {
     if (err) {
-      fastify.log.error(err)
-      process.exit(1)
+        fastify.log.error(err)
+        process.exit(1)
     }
 
     console.log(`Server is now listening on ${address}`)
-  })
-});
+})
 
 // You can also use the shutdown method to gracefully shut down the SDK before process shutdown
 // or on some operating system signal.
@@ -295,10 +293,10 @@ can be used to information about the record measurement itself.
 
 ```typescript
 async function myTask() {
-  const httpServerDuration = meter.createHistogram("http.server.duration", {
-    description: 'A http server duration',
-    unit: 'milliseconds',
-    valueType: ValueType.INT
+  const httpServerDuration = meter.createHistogram("my.http.server.request.duration", {
+    description: 'HTTP server request duration',
+    unit: 's',
+    valueType: ValueType.DOUBLE
   });
   const startTime = new Date().getTime()
   try {
@@ -307,12 +305,12 @@ async function myTask() {
   } catch (err) {
   } finally {
     const endTime = new Date().getTime()
-    const executionTime = endTime - startTime
+    const executionTime = (endTime - startTime) / 1000
 
     httpServerDuration.record(executionTime, {
-      [SemanticAttributes.HTTP_METHOD]: 'POST',
-      [SemanticAttributes.HTTP_STATUS_CODE]: '200',
-      [SemanticAttributes.HTTP_SCHEME]: 'https',
+      [ATTR_HTTP_REQUEST_METHOD]: 'POST',
+      [ATTR_HTTP_RESPONSE_STATUS_CODE]: '200',
+      [ATTR_URL_SCHEME]: 'https',
     })
   }
 }
@@ -418,17 +416,17 @@ const meterProvider = new MeterProvider({
 });
 
 // Create histogram metric
-const httpServerDuration = meter.createHistogram("http.server.duration", {
-  description: 'A http server duration',
-  unit: 'milliseconds',
-  valueType: ValueType.INT
+const httpServerDuration = meter.createHistogram('my.http.server.request.duration', {
+  description: 'HTTP server request duration',
+  unit: 's',
+  valueType: ValueType.DOUBLE
 });
 
 // Record measurement for histogram
 httpServerDuration.record(50, {
-  [SemanticAttributes.HTTP_METHOD]: 'POST',
-  [SemanticAttributes.HTTP_STATUS_CODE]: '200',
-  [SemanticAttributes.HTTP_SCHEME]: 'https',
+  [ATTR_HTTP_REQUEST_METHOD]: 'POST',
+  [ATTR_HTTP_RESPONSE_STATUS_CODE]: '200',
+  [ATTR_URL_SCHEME]: 'https',
 });
 ```
 
