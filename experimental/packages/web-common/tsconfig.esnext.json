@@ -19,9 +19,6 @@
       "path": "../../../semantic-conventions"
     },
     {
-      "path": "../api-events"
-    },
-    {
       "path": "../api-logs"
     },
     {
