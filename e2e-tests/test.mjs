@@ -57,27 +57,28 @@ const logExporter = new OTLPLogExporter({
 });
 const logRecordProcessors = [new SimpleLogRecordProcessor(logExporter)];
 
+const resource = resourceFromDetectedResource({
+  entities: [
+    {
+      type: 'service',
+      identifier: { 'service.name': 'example-service' },
+      attributes: { 'service.version': '1.0.0' },
+      schemaUrl: 'https://opentelemetry.io/schemas/1.0.0/service',
+    },
+  ],
+});
+
 // Set up OpenTelemetry SDK
 const sdk = new NodeSDK({
   spanProcessors,
   metricReader,
   logRecordProcessors,
-  resource: resourceFromDetectedResource({
-    entities: [
-      {
-        type: 'service',
-        identifier: { 'service.name': 'example-service' },
-        attributes: { 'service.version': '1.0.0' },
-        schemaUrl: 'https://opentelemetry.io/schemas/1.0.0/service',
-      },
-    ],
-  }),
+  resource,
+  resourceDetectors: [],
 });
 
 async function main() {
   sdk.start();
-
-  console.log(sdk.resource)
 
   // Create a span
   const tracer = trace.getTracer('example-tracer');

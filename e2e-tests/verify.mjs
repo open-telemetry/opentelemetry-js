@@ -35,13 +35,13 @@ for (const line of lines) {
   if (parsed.resourceMetrics) {
     console.log('found metric');
     verifyMetric(parsed.resourceMetrics[0].scopeMetrics[0].metrics[0]);
-    verifyResource(parsed.resourceSpans[0].resource);
+    verifyResource(parsed.resourceMetrics[0].resource);
     verifiedMetric = true;
   }
   if (parsed.resourceLogs) {
     console.log('found log');
     verifyLog(parsed.resourceLogs[0].scopeLogs[0].logRecords[0]);
-    verifyResource(parsed.resourceSpans[0].resource);
+    verifyResource(parsed.resourceLogs[0].resource);
     verifiedLog = true;
   }
 }
