@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1749679900862,
+  "lastUpdate": 1749696144102,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -34324,6 +34324,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.59%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "107717825+opentelemetrybot@users.noreply.github.com",
+            "name": "OpenTelemetry Bot",
+            "username": "opentelemetrybot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "995d708729d6ab0ca12ca9708e0df85c52dd9da6",
+          "message": "Use more specific self-hosted runner name (#5747)\n\nCo-authored-by: otelbot <197425009+otelbot@users.noreply.github.com>\nCo-authored-by: Trask Stalnaker <trask.stalnaker@gmail.com>",
+          "timestamp": "2025-06-12T02:21:16Z",
+          "tree_id": "747d81dd0ef72d2539d146196648373cfb4e516c",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/995d708729d6ab0ca12ca9708e0df85c52dd9da6"
+        },
+        "date": 1749696142945,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1487153,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 17873,
+            "range": "±0.16%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 846012,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 784421,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
