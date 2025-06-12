@@ -203,15 +203,16 @@ describe('LoggerProvider', () => {
 
   describe('addLogRecordProcessor', () => {
     it('should add logRecord processor', () => {
+      const logRecordProcessor = new NoopLogRecordProcessor();
       const provider = new LoggerProvider({
-        processors: [new NoopLogRecordProcessor()],
+        processors: [logRecordProcessor],
       });
       const sharedState = provider['_sharedState'];
       assert.ok(sharedState.activeProcessor instanceof MultiLogRecordProcessor);
       assert.strictEqual(sharedState.activeProcessor.processors.length, 1);
       assert.strictEqual(
         sharedState.activeProcessor.processors[0],
-        provider['processors'][0]
+        logRecordProcessor
       );
     });
   });
