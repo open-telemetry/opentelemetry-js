@@ -59,4 +59,11 @@ export interface Resource {
   merge(other: Resource | null): Resource;
 
   getRawAttributes(): RawResourceAttribute[];
+
+  /**
+   * Get the schema URL for this resource.
+   *
+   * @returns the schema URL or undefined if not set
+   */
+  getSchemaUrl?(): string | undefined;
 }
