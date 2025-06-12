@@ -14,6 +14,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(opentelemetry-resources): add schema url [#5070](https://github.com/open-telemetry/opentelemetry-js/pull/5753) @c-ehrlich
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
