@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1749696144102,
+  "lastUpdate": 1749803736257,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -34376,6 +34376,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.22%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "benstav@miggo.io",
+            "name": "Zirak",
+            "username": "Zirak"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "62fbfd3d0d658893bb9ab91578d6a4f56468649e",
+          "message": "docs(exporter-logs-otlp-proto): Fixup markdown table (#5740)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\nCo-authored-by: Raphaël Thériault <113933910+raphael-theriault-swi@users.noreply.github.com>",
+          "timestamp": "2025-06-13T08:14:51Z",
+          "tree_id": "a3c5d5e1cf21909a4a22d44e272b34360de678dc",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/62fbfd3d0d658893bb9ab91578d6a4f56468649e"
+        },
+        "date": 1749803735122,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1546930,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18552,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 814236,
+            "range": "±0.27%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 762217,
+            "range": "±0.72%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
