@@ -23,7 +23,7 @@ import {
 } from '@opentelemetry/core';
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
-import type { LogRecord } from './../LogRecord';
+import type { SdkLogRecord } from './SdkLogRecord';
 
 export class SimpleLogRecordProcessor implements LogRecordProcessor {
   private _shutdownOnce: BindOnceFuture<void>;
@@ -34,7 +34,7 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
     this._unresolvedExports = new Set<Promise<void>>();
   }
 
-  public onEmit(logRecord: LogRecord): void {
+  public onEmit(logRecord: SdkLogRecord): void {
     if (this._shutdownOnce.isCalled) {
       return;
     }

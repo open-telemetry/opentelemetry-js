@@ -16,7 +16,7 @@
 
 import { Context } from '@opentelemetry/api';
 
-import { LogRecord } from './LogRecord';
+import { SdkLogRecord } from './export/SdkLogRecord';
 
 export interface LogRecordProcessor {
   /**
@@ -29,7 +29,7 @@ export interface LogRecordProcessor {
    * @param logRecord the ReadWriteLogRecord that just emitted.
    * @param context the current Context, or an empty Context if the Logger was obtained with include_trace_context=false
    */
-  onEmit(logRecord: LogRecord, context?: Context): void;
+  onEmit(logRecord: SdkLogRecord, context?: Context): void;
 
   /**
    * Shuts down the processor. Called when SDK is shut down. This is an

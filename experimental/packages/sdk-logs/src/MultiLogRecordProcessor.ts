@@ -17,7 +17,7 @@
 import { callWithTimeout } from '@opentelemetry/core';
 import type { Context } from '@opentelemetry/api';
 import type { LogRecordProcessor } from './LogRecordProcessor';
-import type { LogRecord } from './LogRecord';
+import type { SdkLogRecord } from './export/SdkLogRecord';
 
 /**
  * Implementation of the {@link LogRecordProcessor} that simply forwards all
@@ -38,7 +38,7 @@ export class MultiLogRecordProcessor implements LogRecordProcessor {
     );
   }
 
-  public onEmit(logRecord: LogRecord, context?: Context): void {
+  public onEmit(logRecord: SdkLogRecord, context?: Context): void {
     this.processors.forEach(processors =>
       processors.onEmit(logRecord, context)
     );

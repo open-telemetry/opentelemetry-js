@@ -15,7 +15,7 @@
  */
 
 import { Context } from '@opentelemetry/api';
-import { LogRecord, LogRecordProcessor } from '@opentelemetry/sdk-logs';
+import { SdkLogRecord, LogRecordProcessor } from '@opentelemetry/sdk-logs';
 import { ATTR_SESSION_ID } from './semconv';
 import { SessionProvider } from './types/SessionProvider';
 
@@ -29,7 +29,7 @@ export class SessionLogRecordProcessor implements LogRecordProcessor {
     this._sessionIdProvider = sessionIdProvider;
   }
 
-  onEmit(logRecord: LogRecord, _context?: Context | undefined): void {
+  onEmit(logRecord: SdkLogRecord, _context?: Context | undefined): void {
     const sessionId = this._sessionIdProvider?.getSessionId();
     if (sessionId) {
       logRecord.setAttribute(ATTR_SESSION_ID, sessionId);

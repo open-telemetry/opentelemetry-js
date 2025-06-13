@@ -21,7 +21,7 @@ export type {
   BatchLogRecordProcessorBrowserConfig,
 } from './types';
 export { LoggerProvider } from './LoggerProvider';
-export { LogRecord } from './LogRecord';
+export type { SdkLogRecord } from './export/SdkLogRecord';
 export type { LogRecordProcessor } from './LogRecordProcessor';
 export type { ReadableLogRecord } from './export/ReadableLogRecord';
 export { NoopLogRecordProcessor } from './export/NoopLogRecordProcessor';

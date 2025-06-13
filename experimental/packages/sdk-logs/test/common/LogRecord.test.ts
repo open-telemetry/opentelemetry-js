@@ -32,12 +32,12 @@ import { defaultResource } from '@opentelemetry/resources';
 import {
   LogRecordLimits,
   LogRecordProcessor,
-  LogRecord,
   LoggerProvider,
 } from './../../src';
 import { invalidAttributes, validAttributes } from './utils';
 import { LoggerProviderSharedState } from '../../src/internal/LoggerProviderSharedState';
 import { reconfigureLimits } from '../../src/config';
+import { LogRecordImpl } from '../../src/LogRecordImpl';
 
 const performanceTimeOrigin: HrTime = [1, 1];
 
@@ -54,7 +54,7 @@ const setup = (logRecordLimits?: LogRecordLimits, data?: logsAPI.LogRecord) => {
     reconfigureLimits(logRecordLimits ?? {}),
     []
   );
-  const logRecord = new LogRecord(
+  const logRecord = new LogRecordImpl(
     sharedState,
     instrumentationScope,
     data ?? {}
@@ -66,7 +66,7 @@ describe('LogRecord', () => {
   describe('constructor', () => {
     it('should create an instance', () => {
       const { logRecord } = setup();
-      assert.ok(logRecord instanceof LogRecord);
+      assert.ok(logRecord instanceof LogRecordImpl);
     });
 
     it('should have a default timestamp', () => {
