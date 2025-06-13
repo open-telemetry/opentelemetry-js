@@ -287,6 +287,116 @@ describe('Resource', () => {
     });
   });
 
+  describe('schema URL support', () => {
+    it('should create resource with schema URL', () => {
+      const schemaUrl = 'https://example.com/schema';
+      const resource = resourceFromAttributes({ attr: 'value' }, schemaUrl);
+
+      assert.strictEqual(resource.getSchemaUrl?.(), schemaUrl);
+    });
+
+    it('should create resource without schema URL', () => {
+      const resource = resourceFromAttributes({ attr: 'value' });
+
+      assert.strictEqual(resource.getSchemaUrl?.(), undefined);
+    });
+
+    it('should merge resources with schema URL priority given to other resource', () => {
+      const resource1 = resourceFromAttributes(
+        { attr1: 'value1' },
+        'https://schema1.com'
+      );
+      const resource2 = resourceFromAttributes(
+        { attr2: 'value2' },
+        'https://schema2.com'
+      );
+
+      const mergedResource = resource1.merge(resource2);
+
+      assert.strictEqual(
+        mergedResource.getSchemaUrl?.(),
+        'https://schema2.com'
+      );
+    });
+
+    it('should retain schema URL from base resource when other has no schema URL', () => {
+      const schemaUrl = 'https://example.com/schema';
+      const resource1 = resourceFromAttributes({ attr1: 'value1' }, schemaUrl);
+      const resource2 = resourceFromAttributes({ attr2: 'value2' });
+
+      const mergedResource = resource1.merge(resource2);
+
+      assert.strictEqual(mergedResource.getSchemaUrl?.(), schemaUrl);
+    });
+
+    it('should retain schema URL from the resource that has it when merging', () => {
+      const resource1 = resourceFromAttributes({ attr1: 'value1' }, '');
+      const resource2 = resourceFromAttributes(
+        { attr2: 'value2' },
+        'https://example.com/schema'
+      );
+
+      const mergedResource = resource1.merge(resource2);
+
+      assert.strictEqual(
+        mergedResource.getSchemaUrl?.(),
+        'https://example.com/schema'
+      );
+    });
+
+    it('should have empty schema URL when merging resources with no schema URL', () => {
+      const resource1 = resourceFromAttributes({ attr1: 'value1' }, '');
+      const resource2 = resourceFromAttributes({ attr2: 'value2' }, '');
+
+      const mergedResource = resource1.merge(resource2);
+
+      assert.strictEqual(mergedResource.getSchemaUrl?.(), undefined);
+    });
+
+    it('should handle merging with empty string schema URLs', () => {
+      const resource1 = resourceFromAttributes({ attr1: 'value1' }, '');
+      const resource2 = resourceFromAttributes(
+        { attr2: 'value2' },
+        'https://valid.schema'
+      );
+
+      const mergedResource = resource1.merge(resource2);
+
+      assert.strictEqual(
+        mergedResource.getSchemaUrl?.(),
+        'https://valid.schema'
+      );
+    });
+
+    it('should maintain backward compatibility - getSchemaUrl is optional', () => {
+      const resource = emptyResource();
+
+      // This should not throw even if getSchemaUrl is not implemented
+      const schemaUrl = resource.getSchemaUrl?.();
+      assert.strictEqual(schemaUrl, undefined);
+    });
+
+    it('should work with async attributes and schema URLs', async () => {
+      const resource = resourceFromAttributes(
+        {
+          sync: 'fromsync',
+          async: new Promise(resolve =>
+            setTimeout(() => resolve('fromasync'), 1)
+          ),
+        },
+        'https://async.schema'
+      );
+
+      await resource.waitForAsyncAttributes?.();
+
+      assert.deepStrictEqual(resource.attributes, {
+        sync: 'fromsync',
+        async: 'fromasync',
+      });
+      assert.strictEqual(resource.getSchemaUrl?.(), 'https://async.schema');
+    });
+  });
+
   describeNode('.default()', () => {
     it('should return a default resource', () => {
       const resource = defaultResource();

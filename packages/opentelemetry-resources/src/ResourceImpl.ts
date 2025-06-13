@@ -35,13 +35,15 @@ import { isPromiseLike } from './utils';
 class ResourceImpl implements Resource {
   private _rawAttributes: RawResourceAttribute[];
   private _asyncAttributesPending = false;
+  private _schemaUrl?: string;
 
   private _memoizedAttributes?: Attributes;
 
   static FromAttributeList(
-    attributes: [string, MaybePromise<AttributeValue | undefined>][]
+    attributes: [string, MaybePromise<AttributeValue | undefined>][],
+    schemaUrl?: string
   ): Resource {
-    const res = new ResourceImpl({});
+    const res = new ResourceImpl({}, schemaUrl);
     res._rawAttributes = guardedRawAttributes(attributes);
     res._asyncAttributesPending =
       attributes.filter(([_, val]) => isPromiseLike(val)).length > 0;
@@ -54,7 +56,8 @@ class ResourceImpl implements Resource {
      * information about the entity as numbers, strings or booleans
      * TODO: Consider to add check/validation on attributes.
      */
-    resource: DetectedResource
+    resource: DetectedResource,
+    schemaUrl?: string
   ) {
     const attributes = resource.attributes ?? {};
     this._rawAttributes = Object.entries(attributes).map(([k, v]) => {
@@ -67,6 +70,7 @@ class ResourceImpl implements Resource {
     });
 
     this._rawAttributes = guardedRawAttributes(this._rawAttributes);
+    this._schemaUrl = schemaUrl;
   }
 
   public get asyncAttributesPending(): boolean {
@@ -120,28 +124,35 @@ class ResourceImpl implements Resource {
     return this._rawAttributes;
   }
 
+  public getSchemaUrl(): string | undefined {
+    return this._schemaUrl;
+  }
+
   public merge(resource: Resource | null): Resource {
     if (resource == null) return this;
 
     // Order is important
     // Spec states incoming attributes override existing attributes
-    return ResourceImpl.FromAttributeList([
-      ...resource.getRawAttributes(),
-      ...this.getRawAttributes(),
-    ]);
+    const mergedSchemaUrl = mergeSchemaUrl(this, resource);
+    return ResourceImpl.FromAttributeList(
+      [...resource.getRawAttributes(), ...this.getRawAttributes()],
+      mergedSchemaUrl
+    );
   }
 }
 
 export function resourceFromAttributes(
-  attributes: DetectedResourceAttributes
+  attributes: DetectedResourceAttributes,
+  schemaUrl?: string
 ): Resource {
-  return ResourceImpl.FromAttributeList(Object.entries(attributes));
+  return ResourceImpl.FromAttributeList(Object.entries(attributes), schemaUrl);
 }
 
 export function resourceFromDetectedResource(
-  detectedResource: DetectedResource
+  detectedResource: DetectedResource,
+  schemaUrl?: string
 ): Resource {
-  return new ResourceImpl(detectedResource);
+  return new ResourceImpl(detectedResource, schemaUrl);
 }
 
 export function emptyResource(): Resource {
@@ -176,4 +187,25 @@ function guardedRawAttributes(
     }
     return [k, v];
   });
+}
+
+function mergeSchemaUrl(
+  base: Resource,
+  other: Resource | null
+): string | undefined {
+  if (other?.getSchemaUrl) {
+    const otherSchemaUrl = other.getSchemaUrl();
+    if (otherSchemaUrl !== undefined && otherSchemaUrl !== '') {
+      return otherSchemaUrl;
+    }
+  }
+
+  if (base?.getSchemaUrl) {
+    const baseSchemaUrl = base.getSchemaUrl();
+    if (baseSchemaUrl !== undefined && baseSchemaUrl !== '') {
+      return baseSchemaUrl;
+    }
+  }
+
+  return undefined;
 }
