@@ -290,7 +290,7 @@ describe('Resource', () => {
   describe('schema URL support', () => {
     it('should create resource with schema URL', () => {
       const schemaUrl = 'https://example.com/schema';
-      const resource = resourceFromAttributes({ attr: 'value' }, schemaUrl);
+      const resource = resourceFromAttributes({ attr: 'value' }, { schemaUrl });
 
       assert.strictEqual(resource.getSchemaUrl?.(), schemaUrl);
     });
@@ -301,27 +301,28 @@ describe('Resource', () => {
       assert.strictEqual(resource.getSchemaUrl?.(), undefined);
     });
 
-    it('should merge resources with schema URL priority given to other resource', () => {
+    it('should handle schema URL conflicts by returning undefined', () => {
       const resource1 = resourceFromAttributes(
         { attr1: 'value1' },
-        'https://schema1.com'
+        { schemaUrl: 'https://schema1.com' }
       );
       const resource2 = resourceFromAttributes(
         { attr2: 'value2' },
-        'https://schema2.com'
+        { schemaUrl: 'https://schema2.com' }
       );
 
       const mergedResource = resource1.merge(resource2);
 
-      assert.strictEqual(
-        mergedResource.getSchemaUrl?.(),
-        'https://schema2.com'
-      );
+      // When both resources have different non-empty schema URLs, return undefined
+      assert.strictEqual(mergedResource.getSchemaUrl?.(), undefined);
     });
 
     it('should retain schema URL from base resource when other has no schema URL', () => {
       const schemaUrl = 'https://example.com/schema';
-      const resource1 = resourceFromAttributes({ attr1: 'value1' }, schemaUrl);
+      const resource1 = resourceFromAttributes(
+        { attr1: 'value1' },
+        { schemaUrl }
+      );
       const resource2 = resourceFromAttributes({ attr2: 'value2' });
 
       const mergedResource = resource1.merge(resource2);
@@ -330,10 +331,13 @@ describe('Resource', () => {
     });
 
     it('should retain schema URL from the resource that has it when merging', () => {
-      const resource1 = resourceFromAttributes({ attr1: 'value1' }, '');
+      const resource1 = resourceFromAttributes(
+        { attr1: 'value1' },
+        { schemaUrl: '' }
+      );
       const resource2 = resourceFromAttributes(
         { attr2: 'value2' },
-        'https://example.com/schema'
+        { schemaUrl: 'https://example.com/schema' }
       );
 
       const mergedResource = resource1.merge(resource2);
@@ -345,8 +349,14 @@ describe('Resource', () => {
     });
 
     it('should have empty schema URL when merging resources with no schema URL', () => {
-      const resource1 = resourceFromAttributes({ attr1: 'value1' }, '');
-      const resource2 = resourceFromAttributes({ attr2: 'value2' }, '');
+      const resource1 = resourceFromAttributes(
+        { attr1: 'value1' },
+        { schemaUrl: '' }
+      );
+      const resource2 = resourceFromAttributes(
+        { attr2: 'value2' },
+        { schemaUrl: '' }
+      );
 
       const mergedResource = resource1.merge(resource2);
 
@@ -354,10 +364,13 @@ describe('Resource', () => {
     });
 
     it('should handle merging with empty string schema URLs', () => {
-      const resource1 = resourceFromAttributes({ attr1: 'value1' }, '');
+      const resource1 = resourceFromAttributes(
+        { attr1: 'value1' },
+        { schemaUrl: '' }
+      );
       const resource2 = resourceFromAttributes(
         { attr2: 'value2' },
-        'https://valid.schema'
+        { schemaUrl: 'https://valid.schema' }
       );
 
       const mergedResource = resource1.merge(resource2);
@@ -384,7 +397,7 @@ describe('Resource', () => {
             setTimeout(() => resolve('fromasync'), 1)
           ),
         },
-        'https://async.schema'
+        { schemaUrl: 'https://async.schema' }
       );
 
       await resource.waitForAsyncAttributes?.();

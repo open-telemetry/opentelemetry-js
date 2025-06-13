@@ -29,6 +29,7 @@ import {
   DetectedResourceAttributes,
   MaybePromise,
   RawResourceAttribute,
+  ResourceOptions,
 } from './types';
 import { isPromiseLike } from './utils';
 
@@ -41,9 +42,9 @@ class ResourceImpl implements Resource {
 
   static FromAttributeList(
     attributes: [string, MaybePromise<AttributeValue | undefined>][],
-    schemaUrl?: string
+    options?: ResourceOptions
   ): Resource {
-    const res = new ResourceImpl({}, schemaUrl);
+    const res = new ResourceImpl({}, options);
     res._rawAttributes = guardedRawAttributes(attributes);
     res._asyncAttributesPending =
       attributes.filter(([_, val]) => isPromiseLike(val)).length > 0;
@@ -57,7 +58,7 @@ class ResourceImpl implements Resource {
      * TODO: Consider to add check/validation on attributes.
      */
     resource: DetectedResource,
-    schemaUrl?: string
+    options?: ResourceOptions
   ) {
     const attributes = resource.attributes ?? {};
     this._rawAttributes = Object.entries(attributes).map(([k, v]) => {
@@ -70,7 +71,7 @@ class ResourceImpl implements Resource {
     });
 
     this._rawAttributes = guardedRawAttributes(this._rawAttributes);
-    this._schemaUrl = schemaUrl;
+    this._schemaUrl = options?.schemaUrl;
   }
 
   public get asyncAttributesPending(): boolean {
@@ -134,25 +135,29 @@ class ResourceImpl implements Resource {
     // Order is important
     // Spec states incoming attributes override existing attributes
     const mergedSchemaUrl = mergeSchemaUrl(this, resource);
+    const mergedOptions: ResourceOptions | undefined = mergedSchemaUrl
+      ? { schemaUrl: mergedSchemaUrl }
+      : undefined;
+
     return ResourceImpl.FromAttributeList(
       [...resource.getRawAttributes(), ...this.getRawAttributes()],
-      mergedSchemaUrl
+      mergedOptions
     );
   }
 }
 
 export function resourceFromAttributes(
   attributes: DetectedResourceAttributes,
-  schemaUrl?: string
+  options?: ResourceOptions
 ): Resource {
-  return ResourceImpl.FromAttributeList(Object.entries(attributes), schemaUrl);
+  return ResourceImpl.FromAttributeList(Object.entries(attributes), options);
 }
 
 export function resourceFromDetectedResource(
   detectedResource: DetectedResource,
-  schemaUrl?: string
+  options?: ResourceOptions
 ): Resource {
-  return new ResourceImpl(detectedResource, schemaUrl);
+  return new ResourceImpl(detectedResource, options);
 }
 
 export function emptyResource(): Resource {
