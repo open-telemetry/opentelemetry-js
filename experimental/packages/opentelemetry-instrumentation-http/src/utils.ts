@@ -82,6 +82,7 @@ import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
 import { Err, IgnoreMatcher, ParsedRequestOptions } from './internal-types';
 import { SYNTHETIC_BOT_NAMES, SYNTHETIC_TEST_NAMES } from './internal-types';
+import { SENSITIVE_URL_PARAMS, STR_REDACTED } from './internal-types';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import forwardedParse = require('forwarded-parse');
 
@@ -96,10 +97,9 @@ export const getAbsoluteUrl = (
   const reqUrlObject = requestUrl || {};
   const protocol = reqUrlObject.protocol || fallbackProtocol;
   const port = (reqUrlObject.port || '').toString();
-  const path = reqUrlObject.path || '/';
+  let path = reqUrlObject.path || '/';
   let host =
     reqUrlObject.host || reqUrlObject.hostname || headers.host || 'localhost';
-
   // if there is no port in host and there is a port
   // it should be displayed if it's not 80 and 443 (default ports)
   if (
@@ -110,8 +110,26 @@ export const getAbsoluteUrl = (
   ) {
     host += `:${port}`;
   }
+  // Redact sensitive query parameters
+  if (path.includes('?')) {
+    const [pathname, query] = path.split('?', 2);
+    const searchParams = new URLSearchParams(query);
 
-  return `${protocol}//${host}${path}`;
+    for (let i = 0; i < SENSITIVE_URL_PARAMS.length; i++) {
+      const sensitiveParam = SENSITIVE_URL_PARAMS[i];
+      if (
+        searchParams.has(sensitiveParam) &&
+        searchParams.get(sensitiveParam) !== ''
+      ) {
+        searchParams.set(sensitiveParam, STR_REDACTED);
+      }
+    }
+
+    const redactedQuery = searchParams.toString();
+    path = `${pathname}?${redactedQuery}`;
+  }
+  const authPart = reqUrlObject.auth ? `${STR_REDACTED}:${STR_REDACTED}@` : '';
+  return `${protocol}//${authPart}${host}${path}`;
 };
 
 /**
