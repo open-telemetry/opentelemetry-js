@@ -195,22 +195,33 @@ function guardedRawAttributes(
 }
 
 function mergeSchemaUrl(
-  base: Resource,
-  other: Resource | null
+  old: Resource,
+  updating: Resource | null
 ): string | undefined {
-  if (other?.getSchemaUrl) {
-    const otherSchemaUrl = other.getSchemaUrl();
-    if (otherSchemaUrl !== undefined && otherSchemaUrl !== '') {
-      return otherSchemaUrl;
-    }
+  const oldSchemaUrl = old?.getSchemaUrl?.();
+  const updatingSchemaUrl = updating?.getSchemaUrl?.();
+
+  const isOldEmpty = oldSchemaUrl === undefined || oldSchemaUrl === '';
+  const isUpdatingEmpty =
+    updatingSchemaUrl === undefined || updatingSchemaUrl === '';
+
+  if (isOldEmpty) {
+    return updatingSchemaUrl;
   }
 
-  if (base?.getSchemaUrl) {
-    const baseSchemaUrl = base.getSchemaUrl();
-    if (baseSchemaUrl !== undefined && baseSchemaUrl !== '') {
-      return baseSchemaUrl;
-    }
+  if (isUpdatingEmpty) {
+    return oldSchemaUrl;
   }
+
+  if (oldSchemaUrl === updatingSchemaUrl) {
+    return oldSchemaUrl;
+  }
+
+  diag.warn(
+    'Schema URL merge conflict: old resource has "%s", updating resource has "%s". Resulting resource will have undefined Schema URL.',
+    oldSchemaUrl,
+    updatingSchemaUrl
+  );
 
   return undefined;
 }

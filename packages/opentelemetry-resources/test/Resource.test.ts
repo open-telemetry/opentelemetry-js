@@ -408,6 +408,47 @@ describe('Resource', () => {
       });
       assert.strictEqual(resource.getSchemaUrl?.(), 'https://async.schema');
     });
+
+    it('should merge schema URLs according to OpenTelemetry spec - same URLs', () => {
+      const resource1 = resourceFromAttributes(
+        { attr1: 'value1' },
+        { schemaUrl: 'https://same.schema' }
+      );
+      const resource2 = resourceFromAttributes(
+        { attr2: 'value2' },
+        { schemaUrl: 'https://same.schema' }
+      );
+
+      const mergedResource = resource1.merge(resource2);
+
+      assert.strictEqual(
+        mergedResource.getSchemaUrl?.(),
+        'https://same.schema'
+      );
+    });
+
+    it('should merge schema URLs according to OpenTelemetry spec - conflict case', () => {
+      const warnStub = sinon.spy(diag, 'warn');
+
+      const resource1 = resourceFromAttributes(
+        { attr1: 'value1' },
+        { schemaUrl: 'https://schema1.com' }
+      );
+      const resource2 = resourceFromAttributes(
+        { attr2: 'value2' },
+        { schemaUrl: 'https://schema2.com' }
+      );
+
+      const mergedResource = resource1.merge(resource2);
+
+      // Implementation-specific: we return undefined to indicate error state
+      // This aligns with Go, Java, and PHP SDKs which return null/empty for conflicts
+      assert.strictEqual(mergedResource.getSchemaUrl?.(), undefined);
+      // Should log a warning about the conflict
+      assert.ok(warnStub.calledWithMatch('Schema URL merge conflict'));
+
+      warnStub.restore();
+    });
   });
 
   describeNode('.default()', () => {
