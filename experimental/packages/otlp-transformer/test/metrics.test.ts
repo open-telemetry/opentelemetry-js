@@ -773,6 +773,38 @@ describe('Metrics', () => {
         });
       });
     });
+
+    it('serializes a metric record with resource schema URL', () => {
+      const resourceWithSchema = resourceFromAttributes(
+        {},
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
+      );
+
+      const resourceMetricsWithSchema: ResourceMetrics = {
+        resource: resourceWithSchema,
+        scopeMetrics: [
+          {
+            scope: {
+              name: 'mylib',
+              version: '0.1.0',
+              schemaUrl: expectedSchemaUrl,
+            },
+            metrics: [createCounterData(10, AggregationTemporality.DELTA)],
+          },
+        ],
+      };
+
+      const exportRequest = createExportMetricsServiceRequest([
+        resourceMetricsWithSchema,
+      ]);
+
+      assert.ok(exportRequest);
+      assert.strictEqual(exportRequest.resourceMetrics?.length, 1);
+      assert.strictEqual(
+        exportRequest.resourceMetrics?.[0].schemaUrl,
+        'https://opentelemetry.test/schemas/1.2.3'
+      );
+    });
   });
 
   describe('ProtobufMetricsSerializer', function () {

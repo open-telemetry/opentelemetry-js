@@ -292,6 +292,29 @@ describe('Logs', () => {
       assert.ok(exportRequest);
       assert.strictEqual(exportRequest.resourceLogs?.length, 2);
     });
+
+    it('supports schema URL on resource', () => {
+      const resourceWithSchema = resourceFromAttributes(
+        {},
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
+      );
+
+      const logWithSchema: ReadableLogRecord = {
+        ...log_1_1_1,
+        resource: resourceWithSchema,
+      };
+
+      const exportRequest = createExportLogsServiceRequest([logWithSchema], {
+        useHex: true,
+      });
+
+      assert.ok(exportRequest);
+      assert.strictEqual(exportRequest.resourceLogs?.length, 1);
+      assert.strictEqual(
+        exportRequest.resourceLogs?.[0].schemaUrl,
+        'https://opentelemetry.test/schemas/1.2.3'
+      );
+    });
   });
 
   describe('ProtobufLogsSerializer', function () {

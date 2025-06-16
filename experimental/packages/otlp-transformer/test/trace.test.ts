@@ -443,6 +443,29 @@ describe('Trace', () => {
         );
       });
     });
+
+    it('serializes a span with resource schema URL', () => {
+      const resourceWithSchema = resourceFromAttributes(
+        { 'resource-attribute': 'resource attribute value' },
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
+      );
+
+      const spanWithSchema: ReadableSpan = {
+        ...span,
+        resource: resourceWithSchema,
+      };
+
+      const exportRequest = createExportTraceServiceRequest([spanWithSchema], {
+        useHex: true,
+      });
+
+      assert.ok(exportRequest);
+      assert.strictEqual(exportRequest.resourceSpans?.length, 1);
+      assert.strictEqual(
+        exportRequest.resourceSpans?.[0].schemaUrl,
+        'https://opentelemetry.test/schemas/1.2.3'
+      );
+    });
   });
 
   describe('ProtobufTracesSerializer', function () {
