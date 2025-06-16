@@ -232,11 +232,8 @@ describe('Trace', () => {
   let resource: Resource;
   let span: ReadableSpan;
 
-  beforeEach(() => {
-    resource = resourceFromAttributes({
-      'resource-attribute': 'resource attribute value',
-    });
-    span = {
+  function createSpanWithResource(spanResource: Resource): ReadableSpan {
+    return {
       spanContext: () => ({
         spanId: '0000000000000002',
         traceFlags: TraceFlags.SAMPLED,
@@ -283,7 +280,7 @@ describe('Trace', () => {
         },
       ],
       name: 'span-name',
-      resource,
+      resource: spanResource,
       startTime: [1640715557, 342725388],
       status: {
         code: SpanStatusCode.OK,
@@ -292,6 +289,13 @@ describe('Trace', () => {
       droppedEventsCount: 0,
       droppedLinksCount: 0,
     };
+  }
+
+  beforeEach(() => {
+    resource = resourceFromAttributes({
+      'resource-attribute': 'resource attribute value',
+    });
+    span = createSpanWithResource(resource);
   });
 
   describe('createExportTraceServiceRequest', () => {
@@ -444,18 +448,16 @@ describe('Trace', () => {
       });
     });
 
-    it('serializes a span with resource schema URL', () => {
+    it('supports schema URL on resource', () => {
       const resourceWithSchema = resourceFromAttributes(
         { 'resource-attribute': 'resource attribute value' },
         { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
       );
 
-      const spanWithSchema: ReadableSpan = {
-        ...span,
-        resource: resourceWithSchema,
-      };
+      // Create span as if it came from SDK with this resource
+      const spanFromSDK = createSpanWithResource(resourceWithSchema);
 
-      const exportRequest = createExportTraceServiceRequest([spanWithSchema], {
+      const exportRequest = createExportTraceServiceRequest([spanFromSDK], {
         useHex: true,
       });
 

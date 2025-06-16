@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { ValueType } from '@opentelemetry/api';
-import { resourceFromAttributes } from '@opentelemetry/resources';
+import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
 import {
   AggregationTemporality,
   DataPointType,
@@ -301,10 +301,16 @@ describe('Metrics', () => {
     };
   }
 
-  function createResourceMetrics(metricData: MetricData[]): ResourceMetrics {
-    const resource = resourceFromAttributes({
-      'resource-attribute': 'resource attribute value',
-    });
+  function createResourceMetrics(
+    metricData: MetricData[],
+    customResource?: Resource
+  ): ResourceMetrics {
+    const resource =
+      customResource ||
+      resourceFromAttributes({
+        'resource-attribute': 'resource attribute value',
+      });
+
     return {
       resource: resource,
       scopeMetrics: [
@@ -774,28 +780,19 @@ describe('Metrics', () => {
       });
     });
 
-    it('serializes a metric record with resource schema URL', () => {
+    it('supports schema URL on resource', () => {
       const resourceWithSchema = resourceFromAttributes(
         {},
         { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
       );
 
-      const resourceMetricsWithSchema: ResourceMetrics = {
-        resource: resourceWithSchema,
-        scopeMetrics: [
-          {
-            scope: {
-              name: 'mylib',
-              version: '0.1.0',
-              schemaUrl: expectedSchemaUrl,
-            },
-            metrics: [createCounterData(10, AggregationTemporality.DELTA)],
-          },
-        ],
-      };
+      const resourceMetrics = createResourceMetrics(
+        [createCounterData(10, AggregationTemporality.DELTA)],
+        resourceWithSchema
+      );
 
       const exportRequest = createExportMetricsServiceRequest([
-        resourceMetricsWithSchema,
+        resourceMetrics,
       ]);
 
       assert.ok(exportRequest);
