@@ -362,7 +362,6 @@ describe('Resource', () => {
     it('should maintain backward compatibility - getSchemaUrl is optional', () => {
       const resource = emptyResource();
 
-      // This should not throw even if getSchemaUrl is not implemented
       const schemaUrl = resource.getSchemaUrl?.();
       assert.strictEqual(schemaUrl, undefined);
     });
@@ -408,7 +407,7 @@ describe('Resource', () => {
       );
     });
 
-    it('should merge schema URLs according to OpenTelemetry spec - conflict case', () => {
+    it('should merge schema URLs according to OpenTelemetry spec - conflict case (undefined behavior)', () => {
       const warnStub = sinon.spy(diag, 'warn');
 
       const resource1 = resourceFromAttributes(

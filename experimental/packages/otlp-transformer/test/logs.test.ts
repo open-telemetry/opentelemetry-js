@@ -225,7 +225,6 @@ describe('Logs', () => {
       droppedAttributesCount: 0,
     };
 
-    // Use helper function for log creation
     log_1_1_1 = createLogWithResource(resource_1, scope_1, log_fragment_1);
     log_1_1_2 = createLogWithResource(resource_1, scope_1, log_fragment_2);
     log_1_2_1 = createLogWithResource(resource_1, scope_2, log_fragment_1);
@@ -299,7 +298,7 @@ describe('Logs', () => {
 
     it('supports schema URL on resource', () => {
       const resourceWithSchema = resourceFromAttributes(
-        { 'resource-attribute': 'some attribute value' },
+        {},
         { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
       );
 

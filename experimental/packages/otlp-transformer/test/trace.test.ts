@@ -454,7 +454,6 @@ describe('Trace', () => {
         { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
       );
 
-      // Create span as if it came from SDK with this resource
       const spanFromSDK = createSpanWithResource(resourceWithSchema);
 
       const exportRequest = createExportTraceServiceRequest([spanFromSDK], {
