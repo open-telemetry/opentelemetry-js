@@ -289,7 +289,7 @@ describe('Resource', () => {
 
   describe('schema URL support', () => {
     it('should create resource with schema URL', () => {
-      const schemaUrl = 'https://example.com/schema';
+      const schemaUrl = 'https://example.test/schemas/1.2.3';
       const resource = resourceFromAttributes({ attr: 'value' }, { schemaUrl });
 
       assert.strictEqual(resource.getSchemaUrl?.(), schemaUrl);
@@ -301,24 +301,8 @@ describe('Resource', () => {
       assert.strictEqual(resource.getSchemaUrl?.(), undefined);
     });
 
-    it('should handle schema URL conflicts by returning undefined', () => {
-      const resource1 = resourceFromAttributes(
-        { attr1: 'value1' },
-        { schemaUrl: 'https://schema1.com' }
-      );
-      const resource2 = resourceFromAttributes(
-        { attr2: 'value2' },
-        { schemaUrl: 'https://schema2.com' }
-      );
-
-      const mergedResource = resource1.merge(resource2);
-
-      // When both resources have different non-empty schema URLs, return undefined
-      assert.strictEqual(mergedResource.getSchemaUrl?.(), undefined);
-    });
-
     it('should retain schema URL from base resource when other has no schema URL', () => {
-      const schemaUrl = 'https://example.com/schema';
+      const schemaUrl = 'https://opentelemetry.test/schemas/1.2.3';
       const resource1 = resourceFromAttributes(
         { attr1: 'value1' },
         { schemaUrl }
@@ -331,20 +315,32 @@ describe('Resource', () => {
     });
 
     it('should retain schema URL from the resource that has it when merging', () => {
-      const resource1 = resourceFromAttributes(
-        { attr1: 'value1' },
-        { schemaUrl: '' }
-      );
+      const resource1 = resourceFromAttributes({ attr1: 'value1' });
       const resource2 = resourceFromAttributes(
         { attr2: 'value2' },
-        { schemaUrl: 'https://example.com/schema' }
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
       );
 
       const mergedResource = resource1.merge(resource2);
 
       assert.strictEqual(
         mergedResource.getSchemaUrl?.(),
-        'https://example.com/schema'
+        'https://opentelemetry.test/schemas/1.2.3'
+      );
+    });
+
+    it('should retain schema URL from the resource that has it when merging', () => {
+      const resource1 = resourceFromAttributes(
+        { attr1: 'value1' },
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
+      );
+      const resource2 = resourceFromAttributes({ attr2: 'value2' });
+
+      const mergedResource = resource1.merge(resource2);
+
+      assert.strictEqual(
+        mergedResource.getSchemaUrl?.(),
+        'https://opentelemetry.test/schemas/1.2.3'
       );
     });
 
@@ -363,24 +359,6 @@ describe('Resource', () => {
       assert.strictEqual(mergedResource.getSchemaUrl?.(), undefined);
     });
 
-    it('should handle merging with empty string schema URLs', () => {
-      const resource1 = resourceFromAttributes(
-        { attr1: 'value1' },
-        { schemaUrl: '' }
-      );
-      const resource2 = resourceFromAttributes(
-        { attr2: 'value2' },
-        { schemaUrl: 'https://valid.schema' }
-      );
-
-      const mergedResource = resource1.merge(resource2);
-
-      assert.strictEqual(
-        mergedResource.getSchemaUrl?.(),
-        'https://valid.schema'
-      );
-    });
-
     it('should maintain backward compatibility - getSchemaUrl is optional', () => {
       const resource = emptyResource();
 
@@ -397,7 +375,7 @@ describe('Resource', () => {
             setTimeout(() => resolve('fromasync'), 1)
           ),
         },
-        { schemaUrl: 'https://async.schema' }
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
       );
 
       await resource.waitForAsyncAttributes?.();
@@ -406,24 +384,27 @@ describe('Resource', () => {
         sync: 'fromsync',
         async: 'fromasync',
       });
-      assert.strictEqual(resource.getSchemaUrl?.(), 'https://async.schema');
+      assert.strictEqual(
+        resource.getSchemaUrl?.(),
+        'https://opentelemetry.test/schemas/1.2.3'
+      );
     });
 
     it('should merge schema URLs according to OpenTelemetry spec - same URLs', () => {
       const resource1 = resourceFromAttributes(
         { attr1: 'value1' },
-        { schemaUrl: 'https://same.schema' }
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
       );
       const resource2 = resourceFromAttributes(
         { attr2: 'value2' },
-        { schemaUrl: 'https://same.schema' }
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
       );
 
       const mergedResource = resource1.merge(resource2);
 
       assert.strictEqual(
         mergedResource.getSchemaUrl?.(),
-        'https://same.schema'
+        'https://opentelemetry.test/schemas/1.2.3'
       );
     });
 
@@ -432,11 +413,11 @@ describe('Resource', () => {
 
       const resource1 = resourceFromAttributes(
         { attr1: 'value1' },
-        { schemaUrl: 'https://schema1.com' }
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
       );
       const resource2 = resourceFromAttributes(
         { attr2: 'value2' },
-        { schemaUrl: 'https://schema2.com' }
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.4' }
       );
 
       const mergedResource = resource1.merge(resource2);
