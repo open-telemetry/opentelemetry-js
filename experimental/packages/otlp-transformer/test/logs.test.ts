@@ -166,22 +166,12 @@ describe('Logs', () => {
   // using `resource_2`, `scope_1`, `log_fragment_1`
   let log_2_1_1: ReadableLogRecord;
 
-  beforeEach(() => {
-    resource_1 = resourceFromAttributes({
-      'resource-attribute': 'some attribute value',
-    });
-    resource_2 = resourceFromAttributes({
-      'resource-attribute': 'another attribute value',
-    });
-    scope_1 = {
-      name: 'scope_name_1',
-      version: '0.1.0',
-      schemaUrl: 'http://url.to.schema',
-    };
-    scope_2 = {
-      name: 'scope_name_2',
-    };
-    const log_fragment_1 = {
+  function createLogWithResource(
+    resource: Resource,
+    scope: InstrumentationScope,
+    logFragment?: Partial<ReadableLogRecord>
+  ): ReadableLogRecord {
+    const defaultFragment = {
       hrTime: [1680253513, 123241635] as HrTime,
       hrTimeObserved: [1683526948, 965142784] as HrTime,
       attributes: {
@@ -198,6 +188,31 @@ describe('Logs', () => {
         traceId: '00000000000000000000000000000001',
       },
     };
+
+    return {
+      ...defaultFragment,
+      ...logFragment,
+      resource: resource,
+      instrumentationScope: scope,
+    };
+  }
+
+  beforeEach(() => {
+    resource_1 = resourceFromAttributes({
+      'resource-attribute': 'some attribute value',
+    });
+    resource_2 = resourceFromAttributes({
+      'resource-attribute': 'another attribute value',
+    });
+    scope_1 = {
+      name: 'scope_name_1',
+      version: '0.1.0',
+      schemaUrl: 'http://url.to.schema',
+    };
+    scope_2 = {
+      name: 'scope_name_2',
+    };
+
     const log_fragment_2 = {
       hrTime: [1680253797, 687038506] as HrTime,
       hrTimeObserved: [1680253797, 687038506] as HrTime,
@@ -206,26 +221,12 @@ describe('Logs', () => {
       },
       droppedAttributesCount: 0,
     };
-    log_1_1_1 = {
-      ...log_fragment_1,
-      resource: resource_1,
-      instrumentationScope: scope_1,
-    };
-    log_1_1_2 = {
-      ...log_fragment_2,
-      resource: resource_1,
-      instrumentationScope: scope_1,
-    };
-    log_1_2_1 = {
-      ...log_fragment_1,
-      resource: resource_1,
-      instrumentationScope: scope_2,
-    };
-    log_2_1_1 = {
-      ...log_fragment_1,
-      resource: resource_2,
-      instrumentationScope: scope_1,
-    };
+
+    // Use helper function for log creation (log_fragment_1 is the default)
+    log_1_1_1 = createLogWithResource(resource_1, scope_1);
+    log_1_1_2 = createLogWithResource(resource_1, scope_1, log_fragment_2);
+    log_1_2_1 = createLogWithResource(resource_1, scope_2);
+    log_2_1_1 = createLogWithResource(resource_2, scope_1);
   });
 
   describe('createExportLogsServiceRequest', () => {
@@ -295,14 +296,11 @@ describe('Logs', () => {
 
     it('supports schema URL on resource', () => {
       const resourceWithSchema = resourceFromAttributes(
-        {},
+        { 'resource-attribute': 'some attribute value' },
         { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
       );
 
-      const logWithSchema: ReadableLogRecord = {
-        ...log_1_1_1,
-        resource: resourceWithSchema,
-      };
+      const logWithSchema = createLogWithResource(resourceWithSchema, scope_1);
 
       const exportRequest = createExportLogsServiceRequest([logWithSchema], {
         useHex: true,
