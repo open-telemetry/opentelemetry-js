@@ -187,7 +187,7 @@ describe('Logs', () => {
   // using `resource_2`, `scope_1`, `log_fragment_1`
   let log_2_1_1: ReadableLogRecord;
 
-  function createLogWithResource(
+  function createReadableLogRecord(
     resource: Resource,
     scope: InstrumentationScope,
     logFragment: Omit<ReadableLogRecord, 'resource' | 'instrumentationScope'>
@@ -225,10 +225,10 @@ describe('Logs', () => {
       droppedAttributesCount: 0,
     };
 
-    log_1_1_1 = createLogWithResource(resource_1, scope_1, log_fragment_1);
-    log_1_1_2 = createLogWithResource(resource_1, scope_1, log_fragment_2);
-    log_1_2_1 = createLogWithResource(resource_1, scope_2, log_fragment_1);
-    log_2_1_1 = createLogWithResource(resource_2, scope_1, log_fragment_1);
+    log_1_1_1 = createReadableLogRecord(resource_1, scope_1, log_fragment_1);
+    log_1_1_2 = createReadableLogRecord(resource_1, scope_1, log_fragment_2);
+    log_1_2_1 = createReadableLogRecord(resource_1, scope_2, log_fragment_1);
+    log_2_1_1 = createReadableLogRecord(resource_2, scope_1, log_fragment_1);
   });
 
   describe('createExportLogsServiceRequest', () => {
@@ -302,7 +302,7 @@ describe('Logs', () => {
         { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
       );
 
-      const logWithSchema = createLogWithResource(
+      const logWithSchema = createReadableLogRecord(
         resourceWithSchema,
         scope_1,
         DEFAULT_LOG_FRAGMENT
