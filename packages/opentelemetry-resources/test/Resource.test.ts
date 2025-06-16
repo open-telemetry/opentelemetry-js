@@ -424,7 +424,7 @@ describe('Resource', () => {
       // Implementation-specific: we return undefined to indicate error state
       // This aligns with Go, Java, and PHP SDKs which return null/empty for conflicts
       assert.strictEqual(mergedResource.getSchemaUrl?.(), undefined);
-      // Should log a warning about the conflict
+
       assert.ok(warnStub.calledWithMatch('Schema URL merge conflict'));
 
       warnStub.restore();
