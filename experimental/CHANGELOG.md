@@ -16,6 +16,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+* feat(sdk-logs)!: Changed `LogRecord` class to be an interface [#5749](https://github.com/open-telemetry/opentelemetry-js/pull/5749) @svetlanabrennan
+  * user-facing: `LogRecord` class is now not exported anymore. A newly exported interface `SdkLogRecord` is used in its place.
 * refactor: Removed `api-events` and `sdk-events` [#5737](https://github.com/open-telemetry/opentelemetry-js/pull/5737) @svetlanabrennan
 * chore: Regenerated certs [#5752](https://github.com/open-telemetry/opentelemetry-js/pull/5752) @svetlanabrennan
 
