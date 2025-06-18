@@ -66,7 +66,7 @@ export const STR_REDACTED = 'REDACTED';
 /**
  * List of URL query keys that are considered sensitive and whose value should be redacted.
  */
-export const SENSITIVE_URL_PARAMS = [
+export const DEFAULT_QUERY_STRINGS_TO_REDACT = [
   'sig',
   'Signature',
   'AWSAccessKeyId',
