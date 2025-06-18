@@ -82,7 +82,10 @@ import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
 import { Err, IgnoreMatcher, ParsedRequestOptions } from './internal-types';
 import { SYNTHETIC_BOT_NAMES, SYNTHETIC_TEST_NAMES } from './internal-types';
-import { SENSITIVE_URL_PARAMS, STR_REDACTED } from './internal-types';
+import {
+  DEFAULT_QUERY_STRINGS_TO_REDACT,
+  STR_REDACTED,
+} from './internal-types';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import forwardedParse = require('forwarded-parse');
 
@@ -92,7 +95,8 @@ import forwardedParse = require('forwarded-parse');
 export const getAbsoluteUrl = (
   requestUrl: ParsedRequestOptions | null,
   headers: IncomingHttpHeaders | OutgoingHttpHeaders,
-  fallbackProtocol = 'http:'
+  fallbackProtocol = 'http:',
+  redactedQueryParams: string[] = []
 ): string => {
   const reqUrlObject = requestUrl || {};
   const protocol = reqUrlObject.protocol || fallbackProtocol;
@@ -114,9 +118,13 @@ export const getAbsoluteUrl = (
   if (path.includes('?')) {
     const [pathname, query] = path.split('?', 2);
     const searchParams = new URLSearchParams(query);
+    const sensitiveParamsToRedact = [
+      ...DEFAULT_QUERY_STRINGS_TO_REDACT,
+      ...redactedQueryParams,
+    ];
 
-    for (let i = 0; i < SENSITIVE_URL_PARAMS.length; i++) {
-      const sensitiveParam = SENSITIVE_URL_PARAMS[i];
+    for (let i = 0; i < sensitiveParamsToRedact.length; i++) {
+      const sensitiveParam = sensitiveParamsToRedact[i];
       if (
         searchParams.has(sensitiveParam) &&
         searchParams.get(sensitiveParam) !== ''
@@ -460,6 +468,7 @@ export const getOutgoingRequestAttributes = (
     hostname: string;
     port: string | number;
     hookAttributes?: Attributes;
+    redactedQueryParams?: string[];
   },
   semconvStability: SemconvStability,
   enableSyntheticSourceDetection: boolean
@@ -473,7 +482,8 @@ export const getOutgoingRequestAttributes = (
   const urlFull = getAbsoluteUrl(
     requestOptions,
     headers,
-    `${options.component}:`
+    `${options.component}:`,
+    options.redactedQueryParams
   );
 
   const oldAttributes: Attributes = {

@@ -1755,5 +1755,41 @@ describe('HttpInstrumentation', () => {
         `${protocol}://${hostname}:${serverPort}${pathname}?normal=value&Signature=REDACTED&other=data`
       );
     });
+    it('should redact both default and custom query parameters', async () => {
+      // Set additional parameters while keeping the default ones
+      instrumentation.setConfig({
+        redactedQueryParams: ['authorize', 'session_id'],
+      });
+
+      await httpRequest.get(
+        `${protocol}://${hostname}:${serverPort}${pathname}?sig=abc123&authorize=xyz789&normal=value`
+      );
+      const spans = memoryExporter.getFinishedSpans();
+      const [_, outgoingSpan] = spans;
+
+      assert.strictEqual(
+        outgoingSpan.attributes[ATTR_HTTP_URL],
+        `${protocol}://${hostname}:${serverPort}${pathname}?sig=REDACTED&authorize=REDACTED&normal=value`
+      );
+    });
+    it('should use only default parameters when custom strings are not provided', async () => {
+      // Override default parameters with completely custom list
+      instrumentation.setConfig({
+        redactedQueryParams: [],
+      });
+
+      // URL with both default sensitive params and custom ones
+      await httpRequest.get(
+        `${protocol}://${hostname}:${serverPort}${pathname}?X-Goog-Signature=secret&api_key=12345&normal=value`
+      );
+      const spans = memoryExporter.getFinishedSpans();
+      const [_, outgoingSpan] = spans;
+
+      // Only custom params should be redacted, not default ones
+      assert.strictEqual(
+        outgoingSpan.attributes[ATTR_HTTP_URL],
+        `${protocol}://${hostname}:${serverPort}${pathname}?X-Goog-Signature=REDACTED&api_key=12345&normal=value`
+      );
+    });
   });
 });
