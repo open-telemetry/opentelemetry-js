@@ -71,7 +71,7 @@ class ResourceImpl implements Resource {
     });
 
     this._rawAttributes = guardedRawAttributes(this._rawAttributes);
-    this._schemaUrl = options?.schemaUrl;
+    this._schemaUrl = validateSchemaUrl(options?.schemaUrl);
   }
 
   public get asyncAttributesPending(): boolean {
@@ -192,6 +192,32 @@ function guardedRawAttributes(
     }
     return [k, v];
   });
+}
+
+function validateSchemaUrl(schemaUrl?: string): string | undefined {
+  if (schemaUrl === undefined || schemaUrl === '') {
+    return schemaUrl;
+  }
+
+  try {
+    const url = new URL(schemaUrl);
+
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+      diag.warn(
+        'Invalid schema URL format: "%s". Schema URL must be a valid URI with http:// or https://. Schema URL will be ignored.',
+        schemaUrl
+      );
+      return undefined;
+    }
+
+    return schemaUrl;
+  } catch {
+    diag.warn(
+      'Invalid schema URL format: "%s". Schema URL must be a valid URI with http:// or https://. Schema URL will be ignored.',
+      schemaUrl
+    );
+    return undefined;
+  }
 }
 
 function mergeSchemaUrl(

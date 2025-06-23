@@ -414,6 +414,68 @@ describe('Resource', () => {
 
       warnStub.restore();
     });
+
+    it('should accept valid schema URL formats', () => {
+      const validSchemaUrls = [
+        'https://opentelemetry.test/schemas/1.2.3',
+        'http://example.test/schema',
+        'https://schemas.opentelemetry.test/path/to/schema/1.21.0',
+        'https://example.test:8080/path/to/schema',
+      ];
+
+      validSchemaUrls.forEach(validUrl => {
+        const resource = resourceFromAttributes(
+          { attr: 'value' },
+          { schemaUrl: validUrl }
+        );
+
+        assert.strictEqual(
+          resource.getSchemaUrl?.(),
+          validUrl,
+          `Expected valid schema URL to be preserved: ${validUrl}`
+        );
+      });
+    });
+
+    it('should handle invalid schema URL formats gracefully', () => {
+      const warnStub = sinon.spy(diag, 'warn');
+
+      const invalidSchemaUrls = [
+        'not-a-url',
+        'relative/path',
+        'http://',
+        'https://',
+        '://missing-scheme.test',
+        'http://[invalid-ipv6',
+        'https://invalid space.test',
+        'ht tp://space-in-scheme.test',
+        'http://example.test:invalid-port',
+        'ftp://example.test/schema',
+        'custom://example.test/schema',
+        'file:///path/to/schema',
+        'ws://example.test/schema',
+      ];
+
+      invalidSchemaUrls.forEach(invalidUrl => {
+        const resource = resourceFromAttributes(
+          { attr: 'value' },
+          { schemaUrl: invalidUrl }
+        );
+
+        // Invalid schema URLs should be ignored (set to undefined)
+        assert.strictEqual(
+          resource.getSchemaUrl?.(),
+          undefined,
+          `Expected undefined for invalid schema URL: ${invalidUrl}`
+        );
+      });
+
+      // Should have logged warnings for each invalid URL
+      assert.strictEqual(warnStub.callCount, invalidSchemaUrls.length);
+      assert.ok(warnStub.alwaysCalledWithMatch('Invalid schema URL format'));
+
+      warnStub.restore();
+    });
   });
 
   describeNode('.default()', () => {
