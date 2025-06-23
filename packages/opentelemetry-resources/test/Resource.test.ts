@@ -314,27 +314,12 @@ describe('Resource', () => {
       assert.strictEqual(mergedResource.getSchemaUrl?.(), schemaUrl);
     });
 
-    it('should retain schema URL from the resource that has it when merging', () => {
+    it('should retain schema URL from other resource when base has no schema URL', () => {
       const resource1 = resourceFromAttributes({ attr1: 'value1' });
       const resource2 = resourceFromAttributes(
         { attr2: 'value2' },
         { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
       );
-
-      const mergedResource = resource1.merge(resource2);
-
-      assert.strictEqual(
-        mergedResource.getSchemaUrl?.(),
-        'https://opentelemetry.test/schemas/1.2.3'
-      );
-    });
-
-    it('should retain schema URL from the resource that has it when merging', () => {
-      const resource1 = resourceFromAttributes(
-        { attr1: 'value1' },
-        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
-      );
-      const resource2 = resourceFromAttributes({ attr2: 'value2' });
 
       const mergedResource = resource1.merge(resource2);
 
