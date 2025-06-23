@@ -292,13 +292,13 @@ describe('Resource', () => {
       const schemaUrl = 'https://example.test/schemas/1.2.3';
       const resource = resourceFromAttributes({ attr: 'value' }, { schemaUrl });
 
-      assert.strictEqual(resource.getSchemaUrl?.(), schemaUrl);
+      assert.strictEqual(resource.schemaUrl, schemaUrl);
     });
 
     it('should create resource without schema URL', () => {
       const resource = resourceFromAttributes({ attr: 'value' });
 
-      assert.strictEqual(resource.getSchemaUrl?.(), undefined);
+      assert.strictEqual(resource.schemaUrl, undefined);
     });
 
     it('should retain schema URL from base resource when other has no schema URL', () => {
@@ -311,7 +311,7 @@ describe('Resource', () => {
 
       const mergedResource = resource1.merge(resource2);
 
-      assert.strictEqual(mergedResource.getSchemaUrl?.(), schemaUrl);
+      assert.strictEqual(mergedResource.schemaUrl, schemaUrl);
     });
 
     it('should retain schema URL from other resource when base has no schema URL', () => {
@@ -324,7 +324,7 @@ describe('Resource', () => {
       const mergedResource = resource1.merge(resource2);
 
       assert.strictEqual(
-        mergedResource.getSchemaUrl?.(),
+        mergedResource.schemaUrl,
         'https://opentelemetry.test/schemas/1.2.3'
       );
     });
@@ -341,13 +341,13 @@ describe('Resource', () => {
 
       const mergedResource = resource1.merge(resource2);
 
-      assert.strictEqual(mergedResource.getSchemaUrl?.(), undefined);
+      assert.strictEqual(mergedResource.schemaUrl, undefined);
     });
 
-    it('should maintain backward compatibility - getSchemaUrl is optional', () => {
+    it('should maintain backward compatibility - schemaUrl is optional', () => {
       const resource = emptyResource();
 
-      const schemaUrl = resource.getSchemaUrl?.();
+      const schemaUrl = resource.schemaUrl;
       assert.strictEqual(schemaUrl, undefined);
     });
 
@@ -369,7 +369,7 @@ describe('Resource', () => {
         async: 'fromasync',
       });
       assert.strictEqual(
-        resource.getSchemaUrl?.(),
+        resource.schemaUrl,
         'https://opentelemetry.test/schemas/1.2.3'
       );
     });
@@ -387,7 +387,7 @@ describe('Resource', () => {
       const mergedResource = resource1.merge(resource2);
 
       assert.strictEqual(
-        mergedResource.getSchemaUrl?.(),
+        mergedResource.schemaUrl,
         'https://opentelemetry.test/schemas/1.2.3'
       );
     });
@@ -408,7 +408,7 @@ describe('Resource', () => {
 
       // Implementation-specific: we return undefined to indicate error state
       // This aligns with Go, Java, and PHP SDKs which return null/empty for conflicts
-      assert.strictEqual(mergedResource.getSchemaUrl?.(), undefined);
+      assert.strictEqual(mergedResource.schemaUrl, undefined);
 
       assert.ok(warnStub.calledWithMatch('Schema URL merge conflict'));
 
@@ -430,7 +430,7 @@ describe('Resource', () => {
         );
 
         assert.strictEqual(
-          resource.getSchemaUrl?.(),
+          resource.schemaUrl,
           validUrl,
           `Expected valid schema URL to be preserved: ${validUrl}`
         );
@@ -464,7 +464,7 @@ describe('Resource', () => {
 
         // Invalid schema URLs should be ignored (set to undefined)
         assert.strictEqual(
-          resource.getSchemaUrl?.(),
+          resource.schemaUrl,
           undefined,
           `Expected undefined for invalid schema URL: ${invalidUrl}`
         );

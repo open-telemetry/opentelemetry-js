@@ -125,7 +125,7 @@ class ResourceImpl implements Resource {
     return this._rawAttributes;
   }
 
-  public getSchemaUrl(): string | undefined {
+  public get schemaUrl(): string | undefined {
     return this._schemaUrl;
   }
 
@@ -224,8 +224,8 @@ function mergeSchemaUrl(
   old: Resource,
   updating: Resource | null
 ): string | undefined {
-  const oldSchemaUrl = old?.getSchemaUrl?.();
-  const updatingSchemaUrl = updating?.getSchemaUrl?.();
+  const oldSchemaUrl = old?.schemaUrl;
+  const updatingSchemaUrl = updating?.schemaUrl;
 
   const isOldEmpty = oldSchemaUrl === undefined || oldSchemaUrl === '';
   const isUpdatingEmpty =

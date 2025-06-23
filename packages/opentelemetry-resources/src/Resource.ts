@@ -42,6 +42,11 @@ export interface Resource {
   readonly attributes: Attributes;
 
   /**
+   * @returns the Resource's schema URL or undefined if not set.
+   */
+  readonly schemaUrl?: string;
+
+  /**
    * Returns a promise that will never be rejected. Resolves when all async attributes have finished being added to
    * this Resource's attributes. This is useful in exporters to block until resource detection
    * has finished.
@@ -59,11 +64,4 @@ export interface Resource {
   merge(other: Resource | null): Resource;
 
   getRawAttributes(): RawResourceAttribute[];
-
-  /**
-   * Get the schema URL for this resource.
-   *
-   * @returns the schema URL or undefined if not set
-   */
-  getSchemaUrl?(): string | undefined;
 }

@@ -29,7 +29,7 @@ export function createResource(resource: ISdkResource): Resource {
     droppedAttributesCount: 0,
   };
 
-  const schemaUrl = resource.getSchemaUrl?.();
+  const schemaUrl = resource.schemaUrl;
   if (schemaUrl && schemaUrl !== '') result.schemaUrl = schemaUrl;
 
   return result;
