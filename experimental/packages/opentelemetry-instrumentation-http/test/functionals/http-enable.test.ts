@@ -1791,5 +1791,62 @@ describe('HttpInstrumentation', () => {
         `${protocol}://${hostname}:${serverPort}${pathname}?X-Goog-Signature=REDACTED&api_key=12345&normal=value`
       );
     });
+    it('should use only default parameters when custom strings are not provided', async () => {
+      // Override default parameters with completely custom list
+      instrumentation.setConfig({
+        redactedQueryParams: [],
+      });
+
+      // URL with both default sensitive params and custom ones
+      await httpRequest.get(
+        `${protocol}://${hostname}:${serverPort}${pathname}?X-Goog-Signature=secret&api_key=12345&normal=value`
+      );
+      const spans = memoryExporter.getFinishedSpans();
+      const [_, outgoingSpan] = spans;
+
+      // Only custom params should be redacted, not default ones
+      assert.strictEqual(
+        outgoingSpan.attributes[ATTR_HTTP_URL],
+        `${protocol}://${hostname}:${serverPort}${pathname}?X-Goog-Signature=REDACTED&api_key=12345&normal=value`
+      );
+    });
+    it('should handle case-sensitive query parameter names correctly', async () => {
+      instrumentation.setConfig({
+        redactedQueryParams: ['TOKEN'],
+      });
+
+      await httpRequest.get(
+        `${protocol}://${hostname}:${serverPort}${pathname}?token=lowercase&TOKEN=uppercase`
+      );
+      const spans = memoryExporter.getFinishedSpans();
+      const [_, outgoingSpan] = spans;
+
+      // This tests whether parameter name matching is case-sensitive or case-insensitive
+      assert.strictEqual(
+        outgoingSpan.attributes[ATTR_HTTP_URL],
+        `${protocol}://${hostname}:${serverPort}${pathname}?token=lowercase&TOKEN=REDACTED`
+      );
+    });
+    it('should handle very complex URLs with multiple redaction points', async () => {
+      instrumentation.setConfig({
+        redactedQueryParams: ['api_key', 'token'],
+      });
+
+      const complexUrl =
+        `${protocol}://user:pass@${hostname}:${serverPort}${pathname}?` +
+        'sig=abc123&api_key=secret&normal=value&Signature=xyz&' +
+        'token=sensitive&X-Goog-Signature=gcp&AWSAccessKeyId=aws';
+
+      await httpRequest.get(complexUrl);
+      const spans = memoryExporter.getFinishedSpans();
+      const [_, outgoingSpan] = spans;
+
+      const expectedUrl =
+        `${protocol}://REDACTED:REDACTED@${hostname}:${serverPort}${pathname}?` +
+        'sig=REDACTED&api_key=REDACTED&normal=value&Signature=REDACTED&' +
+        'token=REDACTED&X-Goog-Signature=REDACTED&AWSAccessKeyId=REDACTED';
+
+      assert.strictEqual(outgoingSpan.attributes[ATTR_HTTP_URL], expectedUrl);
+    });
   });
 });
