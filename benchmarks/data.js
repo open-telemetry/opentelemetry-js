@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1750838667931,
+  "lastUpdate": 1750871433942,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -34584,6 +34584,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.52%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8505a6147e3834e04ce546dfc50e5d8fc50b1837",
+          "message": "fix(sdk-metrics): remove invalid default value for 'startTime' param to ExponentialHistogramAccumulation (#5763)",
+          "timestamp": "2025-06-25T17:02:01Z",
+          "tree_id": "5549addea05390bac5bff833e5357e4919aec3a1",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/8505a6147e3834e04ce546dfc50e5d8fc50b1837"
+        },
+        "date": 1750871432820,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1520786,
+            "range": "±0.72%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18093,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 840403,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 764539,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
