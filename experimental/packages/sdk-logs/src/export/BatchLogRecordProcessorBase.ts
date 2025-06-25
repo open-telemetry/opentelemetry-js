@@ -26,7 +26,7 @@ import {
 } from '@opentelemetry/core';
 
 import type { BufferConfig } from '../types';
-import type { LogRecord } from '../LogRecord';
+import type { SdkLogRecord } from './SdkLogRecord';
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
 
@@ -38,7 +38,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   private readonly _scheduledDelayMillis: number;
   private readonly _exportTimeoutMillis: number;
 
-  private _finishedLogRecords: LogRecord[] = [];
+  private _finishedLogRecords: SdkLogRecord[] = [];
   private _timer: NodeJS.Timeout | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
 
@@ -73,7 +73,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
     }
   }
 
-  public onEmit(logRecord: LogRecord): void {
+  public onEmit(logRecord: SdkLogRecord): void {
     if (this._shutdownOnce.isCalled) {
       return;
     }
@@ -98,7 +98,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   }
 
   /** Add a LogRecord in the buffer. */
-  private _addToBuffer(logRecord: LogRecord) {
+  private _addToBuffer(logRecord: SdkLogRecord) {
     if (this._finishedLogRecords.length >= this._maxQueueSize) {
       return;
     }
@@ -171,7 +171,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
     }
   }
 
-  private _export(logRecords: LogRecord[]): Promise<void> {
+  private _export(logRecords: SdkLogRecord[]): Promise<void> {
     const doExport = () =>
       internal
         ._export(this._exporter, logRecords)
