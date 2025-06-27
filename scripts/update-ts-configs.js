@@ -40,6 +40,7 @@ const tsConfigMergeKeys = [
   'compilerOptions',
   'include',
   'files',
+  "ts-node",
 ];
 // Make `extends` the first field.
 const tsConfigPriorityKeys = ['extends'];
