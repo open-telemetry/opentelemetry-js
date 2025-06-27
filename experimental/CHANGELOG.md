@@ -20,6 +20,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
   * user-facing: `LogRecord` class is now not exported anymore. A newly exported interface `SdkLogRecord` is used in its place.
 * refactor: Removed `api-events` and `sdk-events` [#5737](https://github.com/open-telemetry/opentelemetry-js/pull/5737) @svetlanabrennan
 * chore: Regenerated certs [#5752](https://github.com/open-telemetry/opentelemetry-js/pull/5752) @svetlanabrennan
+* fix(api-logs,sdk-logs): allow AnyValue attributes for logs and handle circular references [#5765](https://github.com/open-telemetry/opentelemetry-js/pull/5765) @alec2435
 
 ## 0.202.0
 

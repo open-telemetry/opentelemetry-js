@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-import { AttributeValue, diag } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import type * as logsAPI from '@opentelemetry/api-logs';
 import * as api from '@opentelemetry/api';
 import {
   timeInputToHrTime,
-  isAttributeValue,
   InstrumentationScope,
 } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
-import { AnyValue, LogAttributes, LogBody } from '@opentelemetry/api-logs';
+import { AnyValue, LogAttributes, LogBody, isLogAttributeValue } from '@opentelemetry/api-logs';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 
 export class LogRecordImpl implements ReadableLogRecord {
@@ -129,21 +128,11 @@ export class LogRecordImpl implements ReadableLogRecord {
     if (this._isLogRecordReadonly()) {
       return this;
     }
-    if (value === null) {
-      return this;
-    }
     if (key.length === 0) {
       api.diag.warn(`Invalid attribute key: ${key}`);
       return this;
     }
-    if (
-      !isAttributeValue(value) &&
-      !(
-        typeof value === 'object' &&
-        !Array.isArray(value) &&
-        Object.keys(value).length > 0
-      )
-    ) {
+    if (!isLogAttributeValue(value)) {
       api.diag.warn(`Invalid attribute value set for key: ${key}`);
       return this;
     }
@@ -159,11 +148,7 @@ export class LogRecordImpl implements ReadableLogRecord {
       }
       return this;
     }
-    if (isAttributeValue(value)) {
-      this.attributes[key] = this._truncateToSize(value);
-    } else {
-      this.attributes[key] = value;
-    }
+    this.attributes[key] = this._truncateToSize(value);
     return this;
   }
 
@@ -203,7 +188,7 @@ export class LogRecordImpl implements ReadableLogRecord {
     this._isReadonly = true;
   }
 
-  private _truncateToSize(value: AttributeValue): AttributeValue {
+  private _truncateToSize(value: AnyValue): AnyValue {
     const limit = this._logRecordLimits.attributeValueLengthLimit;
     // Check limit
     if (limit <= 0) {
@@ -212,19 +197,36 @@ export class LogRecordImpl implements ReadableLogRecord {
       return value;
     }
 
+    // null/undefined - no truncation needed
+    if (value == null) {
+      return value;
+    }
+
     // String
     if (typeof value === 'string') {
       return this._truncateToLimitUtil(value, limit);
     }
 
-    // Array of strings
-    if (Array.isArray(value)) {
-      return (value as []).map(val =>
-        typeof val === 'string' ? this._truncateToLimitUtil(val, limit) : val
-      );
+    // Byte arrays - no truncation needed
+    if (value instanceof Uint8Array) {
+      return value;
     }
 
-    // Other types, no need to apply value length limit
+    // Arrays (can contain any AnyValue types)
+    if (Array.isArray(value)) {
+      return value.map(val => this._truncateToSize(val));
+    }
+
+    // Objects/Maps - recursively truncate nested values
+    if (typeof value === 'object') {
+      const truncatedObj: Record<string, AnyValue> = {};
+      for (const [k, v] of Object.entries(value as Record<string, AnyValue>)) {
+        truncatedObj[k] = this._truncateToSize(v);
+      }
+      return truncatedObj;
+    }
+
+    // Other types (number, boolean), no need to apply value length limit
     return value;
   }
 
