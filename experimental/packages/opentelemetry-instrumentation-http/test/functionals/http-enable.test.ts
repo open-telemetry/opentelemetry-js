@@ -1755,7 +1755,7 @@ describe('HttpInstrumentation', () => {
         `${protocol}://${hostname}:${serverPort}${pathname}?normal=value&Signature=REDACTED&other=data`
       );
     });
-    it('should redact both default and custom query parameters', async () => {
+    it('should redact only custom query parameters when user provides a populated config', async () => {
       // Set additional parameters while keeping the default ones
       instrumentation.setConfig({
         redactedQueryParams: ['authorize', 'session_id'],
@@ -1769,26 +1769,7 @@ describe('HttpInstrumentation', () => {
 
       assert.strictEqual(
         outgoingSpan.attributes[ATTR_HTTP_URL],
-        `${protocol}://${hostname}:${serverPort}${pathname}?sig=REDACTED&authorize=REDACTED&normal=value`
-      );
-    });
-    it('should use only default parameters when custom strings are not provided', async () => {
-      // Override default parameters with completely custom list
-      instrumentation.setConfig({
-        redactedQueryParams: [],
-      });
-
-      // URL with both default sensitive params and custom ones
-      await httpRequest.get(
-        `${protocol}://${hostname}:${serverPort}${pathname}?X-Goog-Signature=secret&api_key=12345&normal=value`
-      );
-      const spans = memoryExporter.getFinishedSpans();
-      const [_, outgoingSpan] = spans;
-
-      // Only custom params should be redacted, not default ones
-      assert.strictEqual(
-        outgoingSpan.attributes[ATTR_HTTP_URL],
-        `${protocol}://${hostname}:${serverPort}${pathname}?X-Goog-Signature=REDACTED&api_key=12345&normal=value`
+        `${protocol}://${hostname}:${serverPort}${pathname}?sig=abc123&authorize=REDACTED&normal=value`
       );
     });
     it('should use only default parameters when custom strings are not provided', async () => {
@@ -1816,7 +1797,7 @@ describe('HttpInstrumentation', () => {
       });
 
       await httpRequest.get(
-        `${protocol}://${hostname}:${serverPort}${pathname}?token=lowercase&TOKEN=uppercase`
+        `${protocol}://${hostname}:${serverPort}${pathname}?token=lowercase&TOKEN=uppercase&sig=secret`
       );
       const spans = memoryExporter.getFinishedSpans();
       const [_, outgoingSpan] = spans;
@@ -1824,10 +1805,10 @@ describe('HttpInstrumentation', () => {
       // This tests whether parameter name matching is case-sensitive or case-insensitive
       assert.strictEqual(
         outgoingSpan.attributes[ATTR_HTTP_URL],
-        `${protocol}://${hostname}:${serverPort}${pathname}?token=lowercase&TOKEN=REDACTED`
+        `${protocol}://${hostname}:${serverPort}${pathname}?token=lowercase&TOKEN=REDACTED&sig=secret`
       );
     });
-    it('should handle very complex URLs with multiple redaction points', async () => {
+    it('should handle very complex URLs with multiple redaction points and if custom query strings are provided only redact those', async () => {
       instrumentation.setConfig({
         redactedQueryParams: ['api_key', 'token'],
       });
@@ -1843,8 +1824,8 @@ describe('HttpInstrumentation', () => {
 
       const expectedUrl =
         `${protocol}://REDACTED:REDACTED@${hostname}:${serverPort}${pathname}?` +
-        'sig=REDACTED&api_key=REDACTED&normal=value&Signature=REDACTED&' +
-        'token=REDACTED&X-Goog-Signature=REDACTED&AWSAccessKeyId=REDACTED';
+        'sig=abc123&api_key=REDACTED&normal=value&Signature=xyz&' +
+        'token=REDACTED&X-Goog-Signature=gcp&AWSAccessKeyId=aws';
 
       assert.strictEqual(outgoingSpan.attributes[ATTR_HTTP_URL], expectedUrl);
     });

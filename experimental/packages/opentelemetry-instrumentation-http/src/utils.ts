@@ -120,7 +120,7 @@ export const getAbsoluteUrl = (
     const searchParams = new URLSearchParams(query);
     const sensitiveParamsToRedact =
       redactedQueryParams.length > 0
-        ? [...DEFAULT_QUERY_STRINGS_TO_REDACT, ...redactedQueryParams]
+        ? redactedQueryParams
         : DEFAULT_QUERY_STRINGS_TO_REDACT;
     for (let i = 0; i < sensitiveParamsToRedact.length; i++) {
       const sensitiveParam = sensitiveParamsToRedact[i];
