@@ -65,7 +65,7 @@ const MIN_MAX_SIZE = 2;
 
 export class ExponentialHistogramAccumulation implements Accumulation {
   constructor(
-    public startTime: HrTime = startTime,
+    public startTime: HrTime,
     private _maxSize = DEFAULT_MAX_SIZE,
     private _recordMinMax = true,
     private _sum = 0,
