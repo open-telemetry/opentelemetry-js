@@ -29,7 +29,7 @@ import type { LogRecordLimits } from './types';
 import { AnyValue, LogAttributes, LogBody } from '@opentelemetry/api-logs';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 
-export class LogRecord implements ReadableLogRecord {
+export class LogRecordImpl implements ReadableLogRecord {
   readonly hrTime: api.HrTime;
   readonly hrTimeObserved: api.HrTime;
   readonly spanContext?: api.SpanContext;
