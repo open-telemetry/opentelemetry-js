@@ -23,8 +23,6 @@ import type { LoggerProviderConfig } from './types';
 import { Logger } from './Logger';
 import { loadDefaultConfig, reconfigureLimits } from './config';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
-import { LogRecordProcessor } from './LogRecordProcessor';
-import { MultiLogRecordProcessor } from './MultiLogRecordProcessor';
 
 export const DEFAULT_LOGGER_NAME = 'unknown';
 
@@ -73,32 +71,6 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
     }
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this._sharedState.loggers.get(key)!;
-  }
-
-  /**
-   * @deprecated add your processors in the constructors instead.
-   *
-   * Adds a new {@link LogRecordProcessor} to this logger.
-   * @param processor the new LogRecordProcessor to be added.
-   */
-  public addLogRecordProcessor(processor: LogRecordProcessor) {
-    if (this._sharedState.registeredLogRecordProcessors.length === 0) {
-      // since we might have enabled by default a batchProcessor, we disable it
-      // before adding the new one
-      this._sharedState.activeProcessor
-        .shutdown()
-        .catch(err =>
-          diag.error(
-            'Error while trying to shutdown current log record processor',
-            err
-          )
-        );
-    }
-    this._sharedState.registeredLogRecordProcessors.push(processor);
-    this._sharedState.activeProcessor = new MultiLogRecordProcessor(
-      this._sharedState.registeredLogRecordProcessors,
-      this._sharedState.forceFlushTimeoutMillis
-    );
   }
 
   /**

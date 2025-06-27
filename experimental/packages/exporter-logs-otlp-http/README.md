@@ -37,9 +37,9 @@ const collectorOptions = {
   concurrencyLimit: 1, // an optional limit on pending requests
 };
 const logExporter = new OTLPLogExporter(collectorOptions);
-const loggerProvider = new LoggerProvider();
-
-loggerProvider.addLogRecordProcessor(new BatchLogRecordProcessor(logExporter));
+const loggerProvider = new LoggerProvider({
+  processors: [new BatchRecordProcessor(logExporter)]
+});
 
 const logger = loggerProvider.getLogger('default', '1.0.0');
 // Emit a log
@@ -66,9 +66,9 @@ const collectorOptions = {
   concurrencyLimit: 1, // an optional limit on pending requests
 };
 const logExporter = new OTLPLogExporter(collectorOptions);
-const loggerProvider = new LoggerProvider();
-
-loggerProvider.addLogRecordProcessor(new BatchLogRecordProcessor(logExporter));
+const loggerProvider = new LoggerProvider({
+  processors: [new BatchRecordProcessor(logExporter)]
+});
 
 const logger = loggerProvider.getLogger('default', '1.0.0');
 // Emit a log
