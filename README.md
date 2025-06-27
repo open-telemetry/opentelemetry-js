@@ -236,7 +236,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Marc Pichler](https://github.com/pichlermarc), Dynatrace
 - [Trent Mick](https://github.com/trentm), Elastic
 
-For more information about the maintainer role, see the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).
+For more information about the maintainer role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#maintainer).
 
 #### Approvers
 
@@ -249,7 +249,7 @@ For more information about the maintainer role, see the [community repository](h
 - [Purvi Kanal](https://github.com/pkanal), Honeycomb
 - [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
 
-For more information about the approver role, see the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).
+For more information about the approver role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#approver).
 
 #### Triagers
 
@@ -257,7 +257,7 @@ Members of this team have triager permissions for opentelemetry-js.git and opent
 
 - [Jackson Weber](https://github.com/JacksonWeber), Microsoft
 
-For more information about the triager role, see the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#triagers).
+For more information about the triager role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#triager).
 
 #### Contrib Triagers
 
@@ -282,7 +282,7 @@ Typically, members of this are [component owners](https://github.com/open-teleme
 - [Trivikram Kamat](https://github.com/trivikr), AWS
 - [t2t2](https://github.com/t2t2), Splunk
 
-For more information about the triager role, see the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#triagers).
+For more information about the triager role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#triager).
 
 #### Emeriti
 
