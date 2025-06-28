@@ -54,7 +54,7 @@
     "mocha": "11.1.0",
     "nock": "13.5.6",
     "nyc": "17.1.0",
-    "sinon": "18.0.1",
+    "sinon": "21.0.0",
     "typescript": "5.0.4"
   },
   "peerDependencies": {
