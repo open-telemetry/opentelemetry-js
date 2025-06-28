@@ -225,9 +225,7 @@ instructions to build and make changes to this project, see the
 
 We have a weekly SIG meeting! See the [community page](https://github.com/open-telemetry/community#javascript-sdk) for meeting details and notes.
 
-### Community members
-
-#### Maintainers
+### Maintainers
 
 - [Amir Blum](https://github.com/blumamir), Odigos
 - [Chengzhong Wu](https://github.com/legendecas), Bloomberg
@@ -238,7 +236,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 For more information about the maintainer role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#maintainer).
 
-#### Approvers
+### Approvers
 
 - [David Luna](https://github.com/david-luna), Elastic
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
@@ -251,7 +249,7 @@ For more information about the maintainer role, see the [community repository](h
 
 For more information about the approver role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#approver).
 
-#### Triagers
+### Triagers
 
 Members of this team have triager permissions for opentelemetry-js.git and opentelemetry-js-contrib.git.
 
@@ -259,7 +257,7 @@ Members of this team have triager permissions for opentelemetry-js.git and opent
 
 For more information about the triager role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#triager).
 
-#### Contrib Triagers
+### Contrib Triagers
 
 Members of this team have triager permissions for opentelemetry-js-contrib.git.
 Typically, members of this are [component owners](https://github.com/open-telemetry/opentelemetry-js-contrib/blob/main/.github/component_owners.yml) of one or more packages in the contrib repo.
@@ -284,7 +282,7 @@ Typically, members of this are [component owners](https://github.com/open-teleme
 
 For more information about the triager role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#triager).
 
-#### Emeriti
+### Emeriti
 
 - [Bartlomiej Obecny](https://github.com/obecny), LightStep, Maintainer
 - [Daniel Khan](https://github.com/dkhan), Dynatrace, Maintainer
