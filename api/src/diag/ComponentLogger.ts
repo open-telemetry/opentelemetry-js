@@ -15,7 +15,7 @@
  */
 
 import { getGlobal } from '../internal/global-utils';
-import { ComponentLoggerOptions, DiagLogger, DiagLogFunction } from './types';
+import { ComponentLoggerOptions, DiagLogger } from './types';
 
 /**
  * Component Logger which is meant to be used as part of any component which
@@ -65,6 +65,5 @@ function logProxy(
     return;
   }
 
-  args.unshift(namespace);
-  return logger[funcName](...(args as Parameters<DiagLogFunction>));
+  return logger[funcName](namespace, ...args);
 }
