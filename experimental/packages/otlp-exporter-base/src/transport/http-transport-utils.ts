@@ -92,10 +92,10 @@ export function sendWithHttp(
       error: new Error('Request Timeout'),
     });
   });
-  req.on('error', (error: Error | any) => {
+  req.on('error', (error: Error) => {
     onDone({
       status: 'failure',
-      error: error,
+      error,
     });
   });
 

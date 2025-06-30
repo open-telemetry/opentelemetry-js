@@ -17,11 +17,10 @@
 import { buildSamplerFromEnv, loadDefaultConfig } from './config';
 import { Sampler } from './Sampler';
 import { SpanLimits, TracerConfig, GeneralLimits } from './types';
-import {
-  DEFAULT_ATTRIBUTE_COUNT_LIMIT,
-  DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
-  getEnvWithoutDefaults,
-} from '@opentelemetry/core';
+import { getNumberFromEnv } from '@opentelemetry/core';
+
+export const DEFAULT_ATTRIBUTE_COUNT_LIMIT = 128;
+export const DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT = Infinity;
 
 /**
  * Function to merge Default configuration (as specified in './config') with
@@ -68,16 +67,14 @@ export function mergeConfig(userConfig: TracerConfig): TracerConfig & {
 export function reconfigureLimits(userConfig: TracerConfig): TracerConfig {
   const spanLimits = Object.assign({}, userConfig.spanLimits);
 
-  const parsedEnvConfig = getEnvWithoutDefaults();
-
   /**
    * Reassign span attribute count limit to use first non null value defined by user or use default value
    */
   spanLimits.attributeCountLimit =
     userConfig.spanLimits?.attributeCountLimit ??
     userConfig.generalLimits?.attributeCountLimit ??
-    parsedEnvConfig.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT ??
-    parsedEnvConfig.OTEL_ATTRIBUTE_COUNT_LIMIT ??
+    getNumberFromEnv('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT') ??
+    getNumberFromEnv('OTEL_ATTRIBUTE_COUNT_LIMIT') ??
     DEFAULT_ATTRIBUTE_COUNT_LIMIT;
 
   /**
@@ -86,8 +83,8 @@ export function reconfigureLimits(userConfig: TracerConfig): TracerConfig {
   spanLimits.attributeValueLengthLimit =
     userConfig.spanLimits?.attributeValueLengthLimit ??
     userConfig.generalLimits?.attributeValueLengthLimit ??
-    parsedEnvConfig.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT ??
-    parsedEnvConfig.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT ??
+    getNumberFromEnv('OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT') ??
+    getNumberFromEnv('OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT') ??
     DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT;
 
   return Object.assign({}, userConfig, { spanLimits });

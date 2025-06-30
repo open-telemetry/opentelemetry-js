@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-import type { ExportResult } from '@opentelemetry/core';
+import { ExportResult, getNumberFromEnv } from '@opentelemetry/core';
 import { diag } from '@opentelemetry/api';
 import {
   ExportResultCode,
-  getEnv,
   globalErrorHandler,
   unrefTimer,
   BindOnceFuture,
@@ -27,7 +26,7 @@ import {
 } from '@opentelemetry/core';
 
 import type { BufferConfig } from '../types';
-import type { LogRecord } from '../LogRecord';
+import type { SdkLogRecord } from './SdkLogRecord';
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
 
@@ -39,7 +38,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   private readonly _scheduledDelayMillis: number;
   private readonly _exportTimeoutMillis: number;
 
-  private _finishedLogRecords: LogRecord[] = [];
+  private _finishedLogRecords: SdkLogRecord[] = [];
   private _timer: NodeJS.Timeout | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
 
@@ -47,14 +46,22 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
     private readonly _exporter: LogRecordExporter,
     config?: T
   ) {
-    const env = getEnv();
     this._maxExportBatchSize =
-      config?.maxExportBatchSize ?? env.OTEL_BLRP_MAX_EXPORT_BATCH_SIZE;
-    this._maxQueueSize = config?.maxQueueSize ?? env.OTEL_BLRP_MAX_QUEUE_SIZE;
+      config?.maxExportBatchSize ??
+      getNumberFromEnv('OTEL_BLRP_MAX_EXPORT_BATCH_SIZE') ??
+      512;
+    this._maxQueueSize =
+      config?.maxQueueSize ??
+      getNumberFromEnv('OTEL_BLRP_MAX_QUEUE_SIZE') ??
+      2048;
     this._scheduledDelayMillis =
-      config?.scheduledDelayMillis ?? env.OTEL_BLRP_SCHEDULE_DELAY;
+      config?.scheduledDelayMillis ??
+      getNumberFromEnv('OTEL_BLRP_SCHEDULE_DELAY') ??
+      5000;
     this._exportTimeoutMillis =
-      config?.exportTimeoutMillis ?? env.OTEL_BLRP_EXPORT_TIMEOUT;
+      config?.exportTimeoutMillis ??
+      getNumberFromEnv('OTEL_BLRP_EXPORT_TIMEOUT') ??
+      30000;
 
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
 
@@ -66,7 +73,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
     }
   }
 
-  public onEmit(logRecord: LogRecord): void {
+  public onEmit(logRecord: SdkLogRecord): void {
     if (this._shutdownOnce.isCalled) {
       return;
     }
@@ -91,7 +98,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   }
 
   /** Add a LogRecord in the buffer. */
-  private _addToBuffer(logRecord: LogRecord) {
+  private _addToBuffer(logRecord: SdkLogRecord) {
     if (this._finishedLogRecords.length >= this._maxQueueSize) {
       return;
     }
@@ -164,7 +171,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
     }
   }
 
-  private _export(logRecords: LogRecord[]): Promise<void> {
+  private _export(logRecords: SdkLogRecord[]): Promise<void> {
     const doExport = () =>
       internal
         ._export(this._exporter, logRecords)

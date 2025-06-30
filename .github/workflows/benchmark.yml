@@ -11,7 +11,7 @@ jobs:
       matrix:
         node_version:
           - "22"
-    runs-on: self-hosted
+    runs-on: equinix-bare-metal
     timeout-minutes: 10
     env:
       NPM_CONFIG_UNSAFE_PERM: true

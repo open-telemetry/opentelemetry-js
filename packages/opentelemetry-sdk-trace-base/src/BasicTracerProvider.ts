@@ -14,32 +14,15 @@
  * limitations under the License.
  */
 
-import {
-  context,
-  diag,
-  propagation,
-  TextMapPropagator,
-  trace,
-  TracerProvider,
-} from '@opentelemetry/api';
-import {
-  CompositePropagator,
-  W3CBaggagePropagator,
-  W3CTraceContextPropagator,
-  getEnv,
-  merge,
-} from '@opentelemetry/core';
-import { IResource, Resource } from '@opentelemetry/resources';
+import { TracerProvider, Tracer as ApiTracer } from '@opentelemetry/api';
+import { merge } from '@opentelemetry/core';
+import { defaultResource, Resource } from '@opentelemetry/resources';
 import { SpanProcessor } from './SpanProcessor';
 import { Tracer } from './Tracer';
 import { loadDefaultConfig } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
-import { SDKRegistrationConfig, TracerConfig } from './types';
-import { SpanExporter } from './export/SpanExporter';
+import { TracerConfig } from './types';
 import { reconfigureLimits } from './utility';
-
-export type PROPAGATOR_FACTORY = () => TextMapPropagator;
-export type EXPORTER_FACTORY = () => SpanExporter;
 
 export enum ForceFlushState {
   'resolved',
@@ -52,17 +35,9 @@ export enum ForceFlushState {
  * This class represents a basic tracer provider which platform libraries can extend
  */
 export class BasicTracerProvider implements TracerProvider {
-  protected static readonly _registeredPropagators = new Map<
-    string,
-    PROPAGATOR_FACTORY
-  >([
-    ['tracecontext', () => new W3CTraceContextPropagator()],
-    ['baggage', () => new W3CBaggagePropagator()],
-  ]);
-
   private readonly _config: TracerConfig;
   private readonly _tracers: Map<string, Tracer> = new Map();
-  private readonly _resource: IResource;
+  private readonly _resource: Resource;
   private readonly _activeSpanProcessor: MultiSpanProcessor;
 
   constructor(config: TracerConfig = {}) {
@@ -71,7 +46,7 @@ export class BasicTracerProvider implements TracerProvider {
       loadDefaultConfig(),
       reconfigureLimits(config)
     );
-    this._resource = mergedConfig.resource ?? Resource.default();
+    this._resource = mergedConfig.resource ?? defaultResource();
 
     this._config = Object.assign({}, mergedConfig, {
       resource: this._resource,
@@ -90,7 +65,7 @@ export class BasicTracerProvider implements TracerProvider {
     name: string,
     version?: string,
     options?: { schemaUrl?: string }
-  ): Tracer {
+  ): ApiTracer {
     const key = `${name}@${version || ''}:${options?.schemaUrl || ''}`;
     if (!this._tracers.has(key)) {
       this._tracers.set(
@@ -106,28 +81,6 @@ export class BasicTracerProvider implements TracerProvider {
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this._tracers.get(key)!;
-  }
-
-  /**
-   * Register this TracerProvider for use with the OpenTelemetry API.
-   * Undefined values may be replaced with defaults, and
-   * null values will be skipped.
-   *
-   * @param config Configuration object for SDK registration
-   */
-  register(config: SDKRegistrationConfig = {}): void {
-    trace.setGlobalTracerProvider(this);
-    if (config.propagator === undefined) {
-      config.propagator = this._buildPropagatorFromEnv();
-    }
-
-    if (config.contextManager) {
-      context.setGlobalContextManager(config.contextManager);
-    }
-
-    if (config.propagator) {
-      propagation.setGlobalPropagator(config.propagator);
-    }
   }
 
   forceFlush(): Promise<void> {
@@ -181,55 +134,5 @@ export class BasicTracerProvider implements TracerProvider {
 
   shutdown(): Promise<void> {
     return this._activeSpanProcessor.shutdown();
-  }
-
-  /**
-   * TS cannot yet infer the type of this.constructor:
-   * https://github.com/Microsoft/TypeScript/issues/3841#issuecomment-337560146
-   * There is no need to override either of the getters in your child class.
-   * The type of the registered component maps should be the same across all
-   * classes in the inheritance tree.
-   */
-  protected _getPropagator(name: string): TextMapPropagator | undefined {
-    return (
-      this.constructor as typeof BasicTracerProvider
-    )._registeredPropagators.get(name)?.();
-  }
-
-  protected _buildPropagatorFromEnv(): TextMapPropagator | undefined {
-    // per spec, propagators from env must be deduplicated
-    const uniquePropagatorNames = Array.from(
-      new Set(getEnv().OTEL_PROPAGATORS)
-    );
-
-    const propagators = uniquePropagatorNames.map(name => {
-      const propagator = this._getPropagator(name);
-      if (!propagator) {
-        diag.warn(
-          `Propagator "${name}" requested through environment variable is unavailable.`
-        );
-      }
-
-      return propagator;
-    });
-    const validPropagators = propagators.reduce<TextMapPropagator[]>(
-      (list, item) => {
-        if (item) {
-          list.push(item);
-        }
-        return list;
-      },
-      []
-    );
-
-    if (validPropagators.length === 0) {
-      return;
-    } else if (uniquePropagatorNames.length === 1) {
-      return validPropagators[0];
-    } else {
-      return new CompositePropagator({
-        propagators: validPropagators,
-      });
-    }
   }
 }

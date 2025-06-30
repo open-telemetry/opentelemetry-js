@@ -62,11 +62,11 @@ import { NodeSDK } from '../src';
 import { env } from 'process';
 import {
   envDetector,
-  envDetectorSync,
   processDetector,
   hostDetector,
-  Resource,
-  serviceInstanceIdDetectorSync,
+  serviceInstanceIdDetector,
+  DetectedResource,
+  defaultResource,
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { logs, ProxyLoggerProvider } from '@opentelemetry/api-logs';
@@ -82,11 +82,9 @@ import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
-import {
-  SEMRESATTRS_HOST_NAME,
-  SEMRESATTRS_PROCESS_PID,
-} from '@opentelemetry/semantic-conventions';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
+
+import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from './semconv';
 
 describe('Node SDK', () => {
   let ctxManager: any;
@@ -414,6 +412,21 @@ describe('Node SDK', () => {
       assert.equal(actualContextManager, expectedContextManager);
       await sdk.shutdown();
     });
+
+    it('should register propagators as defined in OTEL_PROPAGATORS if trace SDK is configured', async () => {
+      process.env.OTEL_PROPAGATORS = 'b3';
+      const sdk = new NodeSDK({
+        traceExporter: new ConsoleSpanExporter(),
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assert.deepStrictEqual(propagation.fields(), ['b3']);
+
+      await sdk.shutdown();
+      delete process.env.OTEL_PROPAGATORS;
+    });
   });
 
   async function waitForNumberOfMetrics(
@@ -525,8 +538,10 @@ describe('Node SDK', () => {
           resourceDetectors: [
             processDetector,
             {
-              async detect(): Promise<Resource> {
-                return new Resource({ customAttr: 'someValue' });
+              detect(): DetectedResource {
+                return {
+                  attributes: { customAttr: 'someValue' },
+                };
               },
             },
             envDetector,
@@ -563,11 +578,8 @@ describe('Node SDK', () => {
           version: '0.0.1',
         });
 
-        assert.notEqual(
-          resource.attributes[SEMRESATTRS_PROCESS_PID],
-          undefined
-        );
-        assert.notEqual(resource.attributes[SEMRESATTRS_HOST_NAME], undefined);
+        assert.notEqual(resource.attributes[ATTR_PROCESS_PID], undefined);
+        assert.notEqual(resource.attributes[ATTR_HOST_NAME], undefined);
       });
     });
 
@@ -621,40 +633,6 @@ describe('Node SDK', () => {
         });
       };
 
-      it('prints detected resources and debug messages to the logger', async () => {
-        const sdk = new NodeSDK({
-          autoDetectResources: true,
-        });
-
-        // This test depends on the env detector to be functioning as intended
-        const mockedLoggerMethod = Sinon.fake();
-        const mockedVerboseLoggerMethod = Sinon.fake();
-
-        diag.setLogger(
-          {
-            debug: mockedLoggerMethod,
-            verbose: mockedVerboseLoggerMethod,
-          } as any,
-          DiagLogLevel.VERBOSE
-        );
-
-        sdk.start();
-        await sdk['_resource'].waitForAsyncAttributes?.();
-
-        // Test that the Env Detector successfully found its resource and populated it with the right values.
-        assert.ok(
-          callArgsContains(mockedLoggerMethod, 'EnvDetector found resource.')
-        );
-        // Regex formatting accounts for whitespace variations in util.inspect output over different node versions
-        assert.ok(
-          callArgsMatches(
-            mockedVerboseLoggerMethod,
-            /{\s+"service\.instance\.id":\s+"627cc493",\s+"service\.name":\s+"my-service",\s+"service\.namespace":\s+"default",\s+"service\.version":\s+"0.0.1"\s+}\s*/gm
-          )
-        );
-        await sdk.shutdown();
-      });
-
       describe('with unknown OTEL_NODE_RESOURCE_DETECTORS value', () => {
         before(() => {
           process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,os,no-such-detector';
@@ -690,7 +668,7 @@ describe('Node SDK', () => {
           await sdk1.shutdown();
 
           const sdk2 = new NodeSDK({
-            resourceDetectors: [envDetectorSync],
+            resourceDetectors: [envDetector],
           });
           sdk2.start();
           await sdk2.shutdown();
@@ -855,7 +833,7 @@ describe('Node SDK', () => {
           processDetector,
           envDetector,
           hostDetector,
-          serviceInstanceIdDetectorSync,
+          serviceInstanceIdDetector,
         ],
       });
 
@@ -925,8 +903,10 @@ describe('Node SDK', () => {
           resourceDetectors: [
             processDetector,
             {
-              async detect(): Promise<Resource> {
-                return new Resource({ customAttr: 'someValue' });
+              detect(): DetectedResource {
+                return {
+                  attributes: { customAttr: 'someValue' },
+                };
               },
             },
             envDetector,
@@ -937,7 +917,7 @@ describe('Node SDK', () => {
         const resource = sdk['_resource'];
         await resource.waitForAsyncAttributes?.();
 
-        assert.deepStrictEqual(resource, Resource.default());
+        assert.deepStrictEqual(resource, defaultResource());
         await sdk.shutdown();
       });
     });

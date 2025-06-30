@@ -30,14 +30,14 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import {
-  NETTRANSPORTVALUES_IP_TCP,
-  SEMATTRS_HTTP_CLIENT_IP,
-  SEMATTRS_HTTP_FLAVOR,
-  SEMATTRS_HTTP_STATUS_CODE,
-  SEMATTRS_NET_HOST_PORT,
-  SEMATTRS_NET_PEER_PORT,
-  SEMATTRS_NET_TRANSPORT,
-} from '@opentelemetry/semantic-conventions';
+  ATTR_HTTP_CLIENT_IP,
+  ATTR_HTTP_FLAVOR,
+  ATTR_HTTP_STATUS_CODE,
+  ATTR_NET_HOST_PORT,
+  ATTR_NET_PEER_PORT,
+  ATTR_NET_TRANSPORT,
+  NET_TRANSPORT_VALUE_IP_TCP,
+} from '../../src/semconv';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as nock from 'nock';
@@ -166,11 +166,11 @@ describe('HttpsInstrumentation', () => {
         assertSpan(incomingSpan, SpanKind.SERVER, validations);
         assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
         assert.strictEqual(
-          incomingSpan.attributes[SEMATTRS_NET_HOST_PORT],
+          incomingSpan.attributes[ATTR_NET_HOST_PORT],
           serverPort
         );
         assert.strictEqual(
-          outgoingSpan.attributes[SEMATTRS_NET_PEER_PORT],
+          outgoingSpan.attributes[ATTR_NET_PEER_PORT],
           serverPort
         );
       });
@@ -251,15 +251,15 @@ describe('HttpsInstrumentation', () => {
 
         assert.strictEqual(spans.length, 2);
         assert.strictEqual(
-          incomingSpan.attributes[SEMATTRS_HTTP_CLIENT_IP],
+          incomingSpan.attributes[ATTR_HTTP_CLIENT_IP],
           '<client>'
         );
         assert.strictEqual(
-          incomingSpan.attributes[SEMATTRS_NET_HOST_PORT],
+          incomingSpan.attributes[ATTR_NET_HOST_PORT],
           serverPort
         );
         assert.strictEqual(
-          outgoingSpan.attributes[SEMATTRS_NET_PEER_PORT],
+          outgoingSpan.attributes[ATTR_NET_PEER_PORT],
           serverPort
         );
 
@@ -267,10 +267,10 @@ describe('HttpsInstrumentation', () => {
           { span: incomingSpan, kind: SpanKind.SERVER },
           { span: outgoingSpan, kind: SpanKind.CLIENT },
         ].forEach(({ span, kind }) => {
-          assert.strictEqual(span.attributes[SEMATTRS_HTTP_FLAVOR], '1.1');
+          assert.strictEqual(span.attributes[ATTR_HTTP_FLAVOR], '1.1');
           assert.strictEqual(
-            span.attributes[SEMATTRS_NET_TRANSPORT],
-            NETTRANSPORTVALUES_IP_TCP
+            span.attributes[ATTR_NET_TRANSPORT],
+            NET_TRANSPORT_VALUE_IP_TCP
           );
           assertSpan(span, kind, validations);
         });
@@ -666,7 +666,7 @@ describe('HttpsInstrumentation', () => {
             const [span] = spans;
             assert.strictEqual(spans.length, 1);
             assert.ok(Object.keys(span.attributes).length > 6);
-            assert.strictEqual(span.attributes[SEMATTRS_HTTP_STATUS_CODE], 404);
+            assert.strictEqual(span.attributes[ATTR_HTTP_STATUS_CODE], 404);
             assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
             done();
           });

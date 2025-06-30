@@ -18,7 +18,7 @@ import * as process from 'process';
 import { execAsync } from './execAsync';
 import { diag } from '@opentelemetry/api';
 
-export async function getMachineId(): Promise<string> {
+export async function getMachineId(): Promise<string | undefined> {
   const args =
     'QUERY HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography /v MachineGuid';
   let command = '%windir%\\System32\\REG.exe';
@@ -36,5 +36,5 @@ export async function getMachineId(): Promise<string> {
     diag.debug(`error reading machine id: ${e}`);
   }
 
-  return '';
+  return undefined;
 }

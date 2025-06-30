@@ -64,7 +64,7 @@ function validateUserProvidedUrl(url: string | undefined): string | undefined {
   try {
     new URL(url);
     return url;
-  } catch (e) {
+  } catch {
     throw new Error(
       `Configuration: Could not parse user-provided export URL: '${url}'`
     );

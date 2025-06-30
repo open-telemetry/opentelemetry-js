@@ -21,7 +21,7 @@ import {
   ILogRecord,
   IResourceLogs,
 } from './internal-types';
-import { IResource } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 import { Encoder, getOtlpEncoder } from '../common/utils';
 import {
   createInstrumentationScope,
@@ -45,9 +45,9 @@ export function createExportLogsServiceRequest(
 
 function createResourceMap(
   logRecords: ReadableLogRecord[]
-): Map<IResource, Map<string, ReadableLogRecord[]>> {
+): Map<Resource, Map<string, ReadableLogRecord[]>> {
   const resourceMap: Map<
-    IResource,
+    Resource,
     Map<string, ReadableLogRecord[]>
   > = new Map();
 
@@ -99,6 +99,7 @@ function toLogRecord(log: ReadableLogRecord, encoder: Encoder): ILogRecord {
     severityNumber: toSeverityNumber(log.severityNumber),
     severityText: log.severityText,
     body: toAnyValue(log.body),
+    eventName: log.eventName,
     attributes: toLogAttributes(log.attributes),
     droppedAttributesCount: log.droppedAttributesCount,
     flags: log.spanContext?.traceFlags,

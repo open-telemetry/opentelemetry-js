@@ -2,8 +2,84 @@
 # CHANGELOG
 
 All notable changes to experimental packages in this project will be documented in this file.
+For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2.x.md).
 
 ## Unreleased
+
+### :boom: Breaking Changes
+
+* feat(sdk-logs)!: Removed deprecated LoggerProvider#addLogRecordProcessor() [#5764](https://github.com/open-telemetry/opentelemetry-js/pull/5764) @svetlanabrennan
+
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+* feat(sdk-logs)!: Changed `LogRecord` class to be an interface [#5749](https://github.com/open-telemetry/opentelemetry-js/pull/5749) @svetlanabrennan
+  * user-facing: `LogRecord` class is now not exported anymore. A newly exported interface `SdkLogRecord` is used in its place.
+* refactor: Removed `api-events` and `sdk-events` [#5737](https://github.com/open-telemetry/opentelemetry-js/pull/5737) @svetlanabrennan
+* chore: Regenerated certs [#5752](https://github.com/open-telemetry/opentelemetry-js/pull/5752) @svetlanabrennan
+
+## 0.202.0
+
+### :rocket: Features
+
+* feat(exporter-otlp-\*): update proto to `v1.7.0`
+* feat(exporter-metrics-otlp-proto): Support to protobuf in browser metrics. [#5710](https://github.com/open-telemetry/opentelemetry-js/pull/5710) @YangJonghun
+* feat(logs): add eventName to emit [#5707](https://github.com/open-telemetry/opentelemetry-js/pull/5707)
+
+### :bug: Bug Fixes
+
+* fix(instrumentation): remove dependency on the shimmer module [#5652](https://github.com/open-telemetry/opentelemetry-js/pull/5652) @cjihrig
+
+## 0.201.1
+
+### :bug: Bug Fixes
+
+* fix(instrumentation): Change `SemconvStability` export from `const enum` to `enum` to allow single-file transpilation tooling to work with code that uses `SemconvStability`. [#5691](https://github.com/open-telemetry/opentelemetry-js/issues/5691) @trentm
+
+## 0.201.0
+
+### :rocket: Features
+
+* feat(instrumentation-xml-http-request): support migration to stable HTTP semconv, v1.23.1  [#5662](https://github.com/open-telemetry/opentelemetry-js/pull/5662) @trentm
+  * Configure the instrumentation with `semconvStabilityOptIn: 'http'` to use the new, stable semconv v1.23.1 semantics or `'http/dup'` for both old (v1.7.0) and stable semantics. When `semconvStabilityOptIn` is not specified (or does not contain these values), it uses the old semconv v1.7.0. I.e. the default behavior is unchanged.
+* feat(instrumentation-fetch): support migration to stable HTTP semconv, v1.23.1  [#5651](https://github.com/open-telemetry/opentelemetry-js/pull/5651) @trentm
+  * Configure the instrumentation with `semconvStabilityOptIn: 'http'` to use the new, stable semconv v1.23.1 semantics or `'http/dup'` for both old (v1.7.0) and stable semantics. When `semconvStabilityOptIn` is not specified (or does not contain these values), it uses the old semconv v1.7.0. I.e. the default behavior is unchanged.
+* feat(instrumentation): New `semconvStabilityFromStr()` utility for semconv stability migration in instrumentations. [#5684](https://github.com/open-telemetry/opentelemetry-js/pull/5684) @trentm
+  * See [the utility comment](https://github.com/trentm/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation/src/semconvStability.ts).
+* feat(instrumentation-grpc): support migration to stable HTTP semconv [#5653](https://github.com/open-telemetry/opentelemetry-js/pull/5653) @JamieDanielson
+* feat(instrumentation-http): capture synthetic source type on requests [#5488](https://github.com/open-telemetry/opentelemetry-js/pull/5488) @JacksonWeber
+
+### :bug: Bug Fixes
+
+* fix(otlp-transformer): do not throw when deserializing empty JSON response [#5551](https://github.com/open-telemetry/opentelemetry-js/pull/5551) @pichlermarc
+* fix(instrumentation-http): report stable client metrics response code [#9586](https://github.com/open-telemetry/opentelemetry-js/pull/9586) @jtescher
+* fix(sdk-node): instantiate baggage processor when env var is set [#5634](https://github.com/open-telemetry/opentelemetry-js/pull/5634) @pichlermarc
+
+### :house: Internal
+
+* refactor(instrumentation-http): Remove legacy http span attributes and metrics [#5552](https://github.com/open-telemetry/opentelemetry-js/pull/5552) @svetlanabrennan
+* refactor(instrumentation-http): Add back support for http semconv [#5665](https://github.com/open-telemetry/opentelemetry-js/pull/5665) @JamieDanielson
+  * Note: We initially removed support for legacy http attributes and metrics, but then added back for an additional 6 months to ensure all instrumentations could be updated and kept consistent. There should be no net new change in this instrumentation related to these semantic conventions. See [#5646](https://github.com/open-telemetry/opentelemetry-js/issues/5646) for details.
+* refactor(sdk-node): update semconv usage to `ATTR_` exports [#5668](https://github.com/open-telemetry/opentelemetry-js/pull/5668) @trentm
+* chore(sdk-node): Refactored using `get*FromEnv` utility function instead of `process.env` for NodeSDK's resource detector setup. [#5582](https://github.com/open-telemetry/opentelemetry-js/pull/5582) @beeme1mr
+* chore(sdk-node): Refactored using `get*FromEnv` utility function instead of `process.env` for NodeSDK's logging setup. [#5563](https://github.com/open-telemetry/opentelemetry-js/issues/5563) @weyert
+* test: test Node.js 24 in CI [#5661](https://github.com/open-telemetry/opentelemetry-js/pull/5661) @cjihrig
+
+## 0.200.0
+
+### Summary
+
+- The **minimum supported Node.js has been raised to `^18.19.0 || >=20.6.0`**. This means that support for Node.js 14 and 16 has been dropped.
+- The **minimum supported TypeScript version has been raised to 5.0.4**.
+- The **compilation target for transpiled TypeScript has been raised to ES2022** (from ES2017).
+- The **public interface has changed**
+  - for notes on migrating to 2.x / 0.200.x see [the upgrade guide](https://github.com/open-telemetry/opentelemetry-js/tree/main/doc/upgrade-to-2.x.md)
+- Only stable versions `2.0.0` are compatible with this release
 
 ### :boom: Breaking Change
 
@@ -13,26 +89,40 @@ All notable changes to experimental packages in this project will be documented 
   * The internal OpenTelemetry data model dropped the concept of instrument type on exported metrics, therefore mapping it is not necessary anymore.
 * feat(instrumentation-fetch)!: passthrough original response to `applyCustomAttributes` hook [#5281](https://github.com/open-telemetry/opentelemetry-js/pull/5281) @chancancode
   * Previously, the fetch instrumentation code unconditionally clones every `fetch()` response in order to preserve the ability for the `applyCustomAttributes` hook to consume the response body. This is fundamentally unsound, as it forces the browser to buffer and retain the response body until it is fully received and read, which crates unnecessary memory pressure on large or long-running response streams. In extreme cases, this is effectively a memory leak and can cause the browser tab to crash. If your use case for `applyCustomAttributes` requires access to the response body, please chime in on [#5293](https://github.com/open-telemetry/opentelemetry-js/issues/5293).
+* chore!: Raise the minimum supported Node.js version to `^18.19.0 || >=20.6.0`. Support for Node.js 14, 16, and early minor versions of 18 and 20 have been dropped. This applies to all packages except the 'api' and 'semantic-conventions' packages. [#5395](https://github.com/open-telemetry/opentelemetry-js/issues/5395) @trentm
 * feat(sdk-node)!: use `IMetricReader` over `MetricReader` [#5311](https://github.com/open-telemetry/opentelemetry-js/pull/5311)
   * (user-facing): `NodeSDKConfiguration` now provides the more general `IMetricReader` type over `MetricReader`
+* feat(exporter-metrics-otlp-http)!: do not read environment variables from window in browsers [#5473](https://github.com/open-telemetry/opentelemetry-js/pull/5473) @pichlermarc
+  * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore, please pass configuration options to constructors instead.
+  * Note: Node.js environment variable configuration continues to work as-is.
+* feat(sdk-logs)!: do not read environment variables from window in browsers [#5472](https://github.com/open-telemetry/opentelemetry-js/pull/5472) @pichlermarc
+  * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore, please pass configuration options to constructors instead.
+    * Note: Node.js environment variable configuration continues to work as-is.
 
 ### :rocket: (Enhancement)
 
+* feat(instrumentation-fetch): add a `requestHook` option [#5380](https://github.com/open-telemetry/opentelemetry-js/pull/5380)
 * feat(instrumentation): re-export initialize function from import-in-the-middle [#5123](https://github.com/open-telemetry/opentelemetry-js/pull/5123)
 * feat(sdk-node): lower diagnostic level [#5360](https://github.com/open-telemetry/opentelemetry-js/pull/5360) @cjihrig
+* feat(exporter-prometheus): add additional attributes option [#5317](https://github.com/open-telemetry/opentelemetry-js/pull/5317) @marius-a-mueller
+  * Add `withResourceConstantLabels` option to `ExporterConfig`. It can be used to define a regex pattern to choose which resource attributes will be used as static labels on the metrics. The default is to not set any static labels.
 
 ### :bug: (Bug Fix)
 
 * fix(instrumentation-grpc): monitor error events with events.errorMonitor [#5369](https://github.com/open-telemetry/opentelemetry-js/pull/5369) @cjihrig
 * fix(exporter-metrics-otlp-http): browser OTLPMetricExporter was not passing config to OTLPMetricExporterBase super class [#5331](https://github.com/open-telemetry/opentelemetry-js/pull/5331) @trentm
-
-### :books: (Refine Doc)
+* fix(instrumentation-fetch, instrumentation-xhr): Ignore network events with zero-timings [#5332](https://github.com/open-telemetry/opentelemetry-js/pull/5332) @chancancode
+* fix(exporter-logs/trace-otlp-grpc): fix error for missing dependency otlp-exporter-base [#5412](https://github.com/open-telemetry/opentelemetry-js/pull/5412) @JamieDanielson
 
 ### :house: (Internal)
 
 * chore(instrumentation-grpc): remove unused findIndex() function [#5372](https://github.com/open-telemetry/opentelemetry-js/pull/5372) @cjihrig
 * refactor(otlp-exporter-base): remove unnecessary isNaN() checks [#5374](https://github.com/open-telemetry/opentelemetry-js/pull/5374) @cjihrig
 * refactor(exporter-prometheus): remove unnecessary isNaN() check [#5377](https://github.com/open-telemetry/opentelemetry-js/pull/5377) @cjihrig
+* refactor(sdk-node): move code to auto-instantiate propagators into utils [#5355](https://github.com/open-telemetry/opentelemetry-js/pull/5355) @pichlermarc
+* chore: unpin `@opentelemetry/semantic-conventions` dep to allow better de-duplication in installs [#5439](https://github.com/open-telemetry/opentelemetry-js/pull/5439) @trentm
+* refactor(instrumentation-http): migrate away from getEnv() [#5469](https://github.com/open-telemetry/opentelemetry-js/pull/5469) @pichlermarc
+* refactor(sdk-node): migrate away from getEnv() [#5475](https://github.com/open-telemetry/opentelemetry-js/pull/5475) @pichlermarc
 
 ## 0.57.0
 

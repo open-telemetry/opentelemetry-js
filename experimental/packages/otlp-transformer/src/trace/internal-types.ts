@@ -18,7 +18,7 @@ import {
   Fixed64,
   IInstrumentationScope,
   IKeyValue,
-  IResource,
+  Resource,
 } from '../common/internal-types';
 
 /** Properties of an ExportTraceServiceRequest. */
@@ -30,7 +30,7 @@ export interface IExportTraceServiceRequest {
 /** Properties of a ResourceSpans. */
 export interface IResourceSpans {
   /** ResourceSpans resource */
-  resource?: IResource;
+  resource?: Resource;
 
   /** ResourceSpans scopeSpans */
   scopeSpans: IScopeSpans[];

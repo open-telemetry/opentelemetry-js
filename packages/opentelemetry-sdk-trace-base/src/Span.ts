@@ -42,11 +42,11 @@ import {
   otperformance,
   sanitizeAttributes,
 } from '@opentelemetry/core';
-import { IResource } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 import {
-  SEMATTRS_EXCEPTION_MESSAGE,
-  SEMATTRS_EXCEPTION_STACKTRACE,
-  SEMATTRS_EXCEPTION_TYPE,
+  ATTR_EXCEPTION_MESSAGE,
+  ATTR_EXCEPTION_STACKTRACE,
+  ATTR_EXCEPTION_TYPE,
 } from '@opentelemetry/semantic-conventions';
 import { ReadableSpan } from './export/ReadableSpan';
 import { ExceptionEventName } from './enums';
@@ -61,13 +61,13 @@ import { SpanLimits } from './types';
 export type Span = APISpan & ReadableSpan;
 
 interface SpanOptions {
-  resource: IResource;
+  resource: Resource;
   scope: InstrumentationScope;
   context: Context;
   spanContext: SpanContext;
   name: string;
   kind: SpanKind;
-  parentSpanId?: string;
+  parentSpanContext?: SpanContext;
   links?: Link[];
   startTime?: TimeInput;
   attributes?: Attributes;
@@ -83,12 +83,12 @@ export class SpanImpl implements Span {
   // purposes but are not intended to be written-to directly.
   private readonly _spanContext: SpanContext;
   readonly kind: SpanKind;
-  readonly parentSpanId?: string;
+  readonly parentSpanContext?: SpanContext;
   readonly attributes: Attributes = {};
   readonly links: Link[] = [];
   readonly events: TimedEvent[] = [];
   readonly startTime: HrTime;
-  readonly resource: IResource;
+  readonly resource: Resource;
   readonly instrumentationScope: InstrumentationScope;
 
   private _droppedAttributesCount = 0;
@@ -127,7 +127,7 @@ export class SpanImpl implements Span {
     this._spanProcessor = opts.spanProcessor;
 
     this.name = opts.name;
-    this.parentSpanId = opts.parentSpanId;
+    this.parentSpanContext = opts.parentSpanContext;
     this.kind = opts.kind;
     this.links = opts.links || [];
     this.startTime = this._getTime(opts.startTime ?? now);
@@ -157,9 +157,11 @@ export class SpanImpl implements Span {
       return this;
     }
 
+    const { attributeCountLimit } = this._spanLimits;
+
     if (
-      Object.keys(this.attributes).length >=
-        this._spanLimits.attributeCountLimit! &&
+      attributeCountLimit !== undefined &&
+      Object.keys(this.attributes).length >= attributeCountLimit &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
       this._droppedAttributesCount++;
@@ -189,12 +191,19 @@ export class SpanImpl implements Span {
     timeStamp?: TimeInput
   ): this {
     if (this._isSpanEnded()) return this;
-    if (this._spanLimits.eventCountLimit === 0) {
+
+    const { eventCountLimit } = this._spanLimits;
+
+    if (eventCountLimit === 0) {
       diag.warn('No events allowed.');
       this._droppedEventsCount++;
       return this;
     }
-    if (this.events.length >= this._spanLimits.eventCountLimit!) {
+
+    if (
+      eventCountLimit !== undefined &&
+      this.events.length >= eventCountLimit
+    ) {
       if (this._droppedEventsCount === 0) {
         diag.debug('Dropping extra events.');
       }
@@ -321,26 +330,23 @@ export class SpanImpl implements Span {
   recordException(exception: Exception, time?: TimeInput): void {
     const attributes: Attributes = {};
     if (typeof exception === 'string') {
-      attributes[SEMATTRS_EXCEPTION_MESSAGE] = exception;
+      attributes[ATTR_EXCEPTION_MESSAGE] = exception;
     } else if (exception) {
       if (exception.code) {
-        attributes[SEMATTRS_EXCEPTION_TYPE] = exception.code.toString();
+        attributes[ATTR_EXCEPTION_TYPE] = exception.code.toString();
       } else if (exception.name) {
-        attributes[SEMATTRS_EXCEPTION_TYPE] = exception.name;
+        attributes[ATTR_EXCEPTION_TYPE] = exception.name;
       }
       if (exception.message) {
-        attributes[SEMATTRS_EXCEPTION_MESSAGE] = exception.message;
+        attributes[ATTR_EXCEPTION_MESSAGE] = exception.message;
       }
       if (exception.stack) {
-        attributes[SEMATTRS_EXCEPTION_STACKTRACE] = exception.stack;
+        attributes[ATTR_EXCEPTION_STACKTRACE] = exception.stack;
       }
     }
 
     // these are minimum requirements from spec
-    if (
-      attributes[SEMATTRS_EXCEPTION_TYPE] ||
-      attributes[SEMATTRS_EXCEPTION_MESSAGE]
-    ) {
+    if (attributes[ATTR_EXCEPTION_TYPE] || attributes[ATTR_EXCEPTION_MESSAGE]) {
       this.addEvent(ExceptionEventName, attributes, time);
     } else {
       diag.warn(`Failed to record an exception ${exception}`);

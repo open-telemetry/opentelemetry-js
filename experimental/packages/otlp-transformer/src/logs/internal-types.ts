@@ -19,7 +19,7 @@ import type {
   IAnyValue,
   IInstrumentationScope,
   IKeyValue,
-  IResource,
+  Resource,
 } from '../common/internal-types';
 
 /** Properties of an ExportLogsServiceRequest. */
@@ -31,7 +31,7 @@ export interface IExportLogsServiceRequest {
 /** Properties of a ResourceLogs. */
 export interface IResourceLogs {
   /** ResourceLogs resource */
-  resource?: IResource;
+  resource?: Resource;
 
   /** ResourceLogs scopeLogs */
   scopeLogs: IScopeLogs[];
@@ -83,6 +83,9 @@ export interface ILogRecord {
 
   /** LogRecord spanId */
   spanId?: string | Uint8Array;
+
+  /** LogRecord eventName */
+  eventName?: string;
 }
 
 /**

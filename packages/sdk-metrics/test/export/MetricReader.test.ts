@@ -17,7 +17,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MeterProvider } from '../../src/MeterProvider';
-import { assertRejects } from '../test-utils';
 import { emptyResourceMetrics, TestMetricProducer } from './TestMetricProducer';
 import { TestMetricReader } from './TestMetricReader';
 import {
@@ -34,9 +33,9 @@ import {
   assertAggregationSelector,
   assertAggregationTemporalitySelector,
 } from './utils';
-import { defaultResource } from '../util';
+import { testResource } from '../util';
 import { ValueType } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 
 const testScopeMetrics: ScopeMetrics[] = [
   {
@@ -107,7 +106,7 @@ describe('MetricReader', () => {
     it('should throw on non-initialized instance', async () => {
       const reader = new TestMetricReader();
 
-      await assertRejects(
+      await assert.rejects(
         () => reader.collect(),
         /MetricReader is not bound to a MetricProducer/
       );
@@ -119,7 +118,7 @@ describe('MetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
 
       await reader.shutdown();
-      assertRejects(reader.collect(), /MetricReader is shutdown/);
+      await assert.rejects(reader.collect(), /MetricReader is shutdown/);
     });
 
     it('should call MetricProducer.collect with timeout', async () => {
@@ -140,7 +139,7 @@ describe('MetricReader', () => {
     it('should collect metrics from the SDK and the additional metricProducers', async () => {
       const additionalProducer = new TestMetricProducer({
         resourceMetrics: {
-          resource: new Resource({
+          resource: resourceFromAttributes({
             shouldBeDiscarded: 'should-be-discarded',
           }),
           scopeMetrics: testScopeMetrics,
@@ -150,7 +149,7 @@ describe('MetricReader', () => {
         metricProducers: [additionalProducer],
       });
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         readers: [reader],
       });
 
@@ -164,8 +163,8 @@ describe('MetricReader', () => {
       assert.strictEqual(collectionResult.errors.length, 0);
       // Should keep the SDK's Resource only
       assert.deepStrictEqual(
-        collectionResult.resourceMetrics.resource,
-        defaultResource
+        collectionResult.resourceMetrics.resource.attributes,
+        testResource.attributes
       );
       assert.strictEqual(
         collectionResult.resourceMetrics.scopeMetrics.length,
