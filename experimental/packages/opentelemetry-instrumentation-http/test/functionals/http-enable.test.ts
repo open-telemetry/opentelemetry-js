@@ -1640,21 +1640,7 @@ describe('HttpInstrumentation', () => {
         `${protocol}://REDACTED:REDACTED@${hostname}:${serverPort}${pathname}`
       );
     });
-
-    it('should redact sensitive query parameters', async () => {
-      await httpRequest.get(
-        `${protocol}://${hostname}:${serverPort}${pathname}?sig=value`
-      );
-      const spans = memoryExporter.getFinishedSpans();
-      const [_, outgoingSpan] = spans;
-
-      assert.strictEqual(
-        outgoingSpan.attributes[ATTR_HTTP_URL],
-        `${protocol}://${hostname}:${serverPort}${pathname}?sig=REDACTED`
-      );
-    });
-
-    it('should redact specific query strings', async () => {
+    it('should redact default query strings', async () => {
       await httpRequest.get(
         `${protocol}://${hostname}:${serverPort}${pathname}?X-Goog-Signature=xyz789&normal=value`
       );
@@ -1667,7 +1653,7 @@ describe('HttpInstrumentation', () => {
       );
     });
 
-    it('should handle both auth credentials and sensitive query parameters', async () => {
+    it('should handle both auth credentials and sensitive default query parameters', async () => {
       await httpRequest.get(
         `${protocol}://username:password@${hostname}:${serverPort}${pathname}?AWSAccessKeyId=secret`
       );
@@ -1772,8 +1758,7 @@ describe('HttpInstrumentation', () => {
         `${protocol}://${hostname}:${serverPort}${pathname}?sig=abc123&authorize=REDACTED&normal=value`
       );
     });
-    it('should use only default parameters when custom strings are not provided', async () => {
-      // Override default parameters with completely custom list
+    it('should not redact query strings when redactedQueryParams is empty', async () => {
       instrumentation.setConfig({
         redactedQueryParams: [],
       });
@@ -1785,10 +1770,9 @@ describe('HttpInstrumentation', () => {
       const spans = memoryExporter.getFinishedSpans();
       const [_, outgoingSpan] = spans;
 
-      // Only custom params should be redacted, not default ones
       assert.strictEqual(
         outgoingSpan.attributes[ATTR_HTTP_URL],
-        `${protocol}://${hostname}:${serverPort}${pathname}?X-Goog-Signature=REDACTED&api_key=12345&normal=value`
+        `${protocol}://${hostname}:${serverPort}${pathname}?X-Goog-Signature=secret&api_key=12345&normal=value`
       );
     });
     it('should handle case-sensitive query parameter names correctly', async () => {

@@ -95,7 +95,7 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
   /**
    * [Optional] Additional query parameters to redact.
    * Use this to specify custom query strings that contain sensitive information.
-   * These will be replace/overwrite the default query strings that are to be redacted.
+   * These will replace/overwrite the default query strings that are to be redacted.
    * @example default strings ['sig','Signature','AWSAccessKeyId','X-Goog-Signature']
    * @experimental
    */

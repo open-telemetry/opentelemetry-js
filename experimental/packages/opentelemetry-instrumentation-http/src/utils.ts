@@ -96,7 +96,7 @@ export const getAbsoluteUrl = (
   requestUrl: ParsedRequestOptions | null,
   headers: IncomingHttpHeaders | OutgoingHttpHeaders,
   fallbackProtocol = 'http:',
-  redactedQueryParams: string[] = []
+  redactedQueryParams?: string[]
 ): string => {
   const reqUrlObject = requestUrl || {};
   const protocol = reqUrlObject.protocol || fallbackProtocol;
@@ -118,12 +118,16 @@ export const getAbsoluteUrl = (
   if (path.includes('?')) {
     const [pathname, query] = path.split('?', 2);
     const searchParams = new URLSearchParams(query);
-    const sensitiveParamsToRedact =
-      redactedQueryParams.length > 0
-        ? redactedQueryParams
-        : DEFAULT_QUERY_STRINGS_TO_REDACT;
-    for (let i = 0; i < sensitiveParamsToRedact.length; i++) {
-      const sensitiveParam = sensitiveParamsToRedact[i];
+    let sensitiveParamsToRedact: string[];
+
+    if (redactedQueryParams === undefined) {
+      sensitiveParamsToRedact = Array.from(DEFAULT_QUERY_STRINGS_TO_REDACT); // If redactedQueryParams is not provided, use default redacted query params
+    } else if (redactedQueryParams.length === 0) {
+      sensitiveParamsToRedact = []; // If redactedQueryParams is empty, do not redact any query string params
+    } else {
+      sensitiveParamsToRedact = redactedQueryParams;
+    }
+    for (const sensitiveParam of sensitiveParamsToRedact) {
       if (
         searchParams.has(sensitiveParam) &&
         searchParams.get(sensitiveParam) !== ''
