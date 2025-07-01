@@ -3,10 +3,17 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   label-release:
+    permissions:
+      pull-requests: write # required for adding labels to PRs
     if: ${{ startsWith(github.event.pull_request.title, 'release:') }}
     runs-on: ubuntu-latest
     steps:
       - run: echo this is a release PR
       - run: gh pr edit ${{ github.event.pull_request.number }} --add-label release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

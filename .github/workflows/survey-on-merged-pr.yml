@@ -4,6 +4,9 @@ on:
   pull_request_target:
     types: [closed]
 
+permissions:
+  contents: read
+
 env:
   PR_NUM: ${{ github.event.pull_request.number }}
   SURVEY_URL: https://docs.google.com/forms/d/e/1FAIpQLSf2FfCsW-DimeWzdQgfl0KDzT2UEAqu69_f7F2BVPSxVae1cQ/viewform?entry.1540511742=open-telemetry/opentelemetry-js
