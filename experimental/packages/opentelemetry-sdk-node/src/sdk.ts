@@ -21,7 +21,7 @@ import {
   diag,
   DiagConsoleLogger,
 } from '@opentelemetry/api';
-import { logs } from '@opentelemetry/api-logs';
+import { logs } from '@opentelemetry/api/experimental';
 import {
   Instrumentation,
   registerInstrumentations,

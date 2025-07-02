@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type * as logsAPI from '@opentelemetry/api-logs';
+import type * as logsAPI from '@opentelemetry/api/experimental';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import { context } from '@opentelemetry/api';
 

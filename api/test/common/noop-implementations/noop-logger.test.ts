@@ -13,8 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const testsContext = require.context('.', true, /test$/);
-testsContext.keys().forEach(testsContext);
 
-const srcContext = require.context('.', true, /src$/);
-srcContext.keys().forEach(srcContext);
+import * as assert from 'assert';
+import {
+  SeverityNumber,
+  NoopLogger,
+  NoopLoggerProvider,
+} from '../../../src/experimental/';
+
+describe('NoopLogger', () => {
+  it('constructor should not crash', () => {
+    const logger = new NoopLoggerProvider().getLogger('test-noop');
+    assert(logger instanceof NoopLogger);
+  });
+
+  it('calling emit should not crash', () => {
+    const logger = new NoopLoggerProvider().getLogger('test-noop');
+    logger.emit({
+      severityNumber: SeverityNumber.TRACE,
+      body: 'log body',
+    });
+  });
+});

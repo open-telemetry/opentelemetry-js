@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { logs, NoopLogger } from '@opentelemetry/api-logs';
+const { logs, NoopLogger } = require('@opentelemetry/api/experimental');
 import { diag } from '@opentelemetry/api';
 import {
   defaultResource,

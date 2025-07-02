@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { SeverityNumber } from '@opentelemetry/api-logs';
+import { SeverityNumber } from '@opentelemetry/api/experimental';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 
 import {

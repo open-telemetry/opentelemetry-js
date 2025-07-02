@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Logger } from '@opentelemetry/api-logs';
+import { Logger } from '@opentelemetry/api/experimental';
 import { Resource } from '@opentelemetry/resources';
 import { LogRecordProcessor } from '../LogRecordProcessor';
 import { LogRecordLimits } from '../types';

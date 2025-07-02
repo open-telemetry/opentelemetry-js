@@ -69,7 +69,7 @@ import {
   defaultResource,
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { logs, ProxyLoggerProvider } from '@opentelemetry/api-logs';
+import { logs, ProxyLoggerProvider } from '@opentelemetry/api/experimental';
 import {
   SimpleLogRecordProcessor,
   InMemoryLogRecordExporter,

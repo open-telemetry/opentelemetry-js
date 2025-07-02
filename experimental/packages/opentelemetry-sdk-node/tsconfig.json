@@ -46,9 +46,6 @@
       "path": "../../../semantic-conventions"
     },
     {
-      "path": "../api-logs"
-    },
-    {
       "path": "../exporter-logs-otlp-grpc"
     },
     {

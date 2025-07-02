@@ -14,15 +14,15 @@
   },
   "exports": {
     ".": {
+      "types": "./build/src/index.d.ts",
       "module": "./build/esm/index.js",
       "esnext": "./build/esnext/index.js",
-      "types": "./build/src/index.d.ts",
       "default": "./build/src/index.js"
     },
     "./experimental": {
+      "types": "./build/src/experimental/index.d.ts",
       "module": "./build/esm/experimental/index.js",
       "esnext": "./build/esnext/experimental/index.js",
-      "types": "./build/src/experimental/index.d.ts",
       "default": "./build/src/experimental/index.js"
     }
   },
@@ -34,7 +34,7 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "lint": "eslint . --ext .ts",
     "test:browser": "karma start --single-run",
-    "test": "nyc mocha 'test/**/*.test.ts'",
+    "test": "nyc mocha test/**/*.test.ts",
     "test:webworker": "karma start karma.worker.js --single-run",
     "cycle-check": "dpdm --exit-code circular:1 src/index.ts",
     "version": "node ../scripts/version-update.js",

@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file.
 
 ### :boom: Breaking Change
 
+* feat(api): Integrate @opentelemetry/api-logs package into @opentelemetry/api as experimental [#4862](https://github.com/open-telemetry/opentelemetry-js/pull/4862) @hectorhdzg
+
 ### :rocket: (Enhancement)
 
 * feat(api): improve isValidSpanId, isValidTraceId performance [#5714](https://github.com/open-telemetry/opentelemetry-js/pull/5714) @seemk
