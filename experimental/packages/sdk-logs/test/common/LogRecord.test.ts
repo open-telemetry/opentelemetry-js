@@ -617,6 +617,66 @@ describe('LogRecord', () => {
     });
   });
 
+  describe('should reject empty attribute keys', () => {
+    it('should not set attributes with empty string keys', () => {
+      const warnStub = sinon.spy(diag, 'warn');
+      const { logRecord } = setup();
+      
+      // Try to set an attribute with an empty key
+      logRecord.setAttribute('', 'value');
+      
+      // The attribute should not be set
+      assert.strictEqual(logRecord.attributes[''], undefined);
+      assert.deepStrictEqual(logRecord.attributes, {});
+      
+      // A warning should be logged
+      sinon.assert.calledWith(warnStub, 'Invalid attribute key: ');
+      warnStub.restore();
+    });
+
+    it('should reject empty keys but accept other valid attributes', () => {
+      const warnStub = sinon.spy(diag, 'warn');
+      const { logRecord } = setup();
+      
+      // Set some valid attributes
+      logRecord.setAttribute('valid1', 'value1');
+      logRecord.setAttribute('', 'should not be set');
+      logRecord.setAttribute('valid2', 'value2');
+      
+      // Only valid attributes should be set
+      assert.deepStrictEqual(logRecord.attributes, {
+        valid1: 'value1',
+        valid2: 'value2'
+      });
+      
+      // Warning should be logged for empty key
+      sinon.assert.calledWith(warnStub, 'Invalid attribute key: ');
+      warnStub.restore();
+    });
+
+    it('should reject empty keys in setAttributes', () => {
+      const warnStub = sinon.spy(diag, 'warn');
+      const { logRecord } = setup();
+      
+      // Try to set multiple attributes including empty keys
+      logRecord.setAttributes({
+        valid: 'value',
+        '': 'empty key',
+        anotherValid: 'another value'
+      });
+      
+      // Only valid attributes should be set
+      assert.deepStrictEqual(logRecord.attributes, {
+        valid: 'value',
+        anotherValid: 'another value'
+      });
+      
+      // Warning should be logged for empty key
+      sinon.assert.calledWith(warnStub, 'Invalid attribute key: ');
+      warnStub.restore();
+    });
+  });
+
   describe('log record processor', () => {
     it('should call onEmit synchronously when log record is emitted', () => {
       let emitted = false;

@@ -128,6 +128,30 @@ describe('isLogAttributeValue', () => {
     it('should accept objects with byte arrays', () => {
       assert.strictEqual(isLogAttributeValue({ bytes: new Uint8Array([1, 2, 3]) }), true);
     });
+
+    it('should accept plain objects without prototypes', () => {
+      const objWithoutProto = Object.create(null);
+      objWithoutProto.key = 'value';
+      objWithoutProto.number = 42;
+      assert.strictEqual(isLogAttributeValue(objWithoutProto), true);
+    });
+
+    it('should accept nested objects without prototypes', () => {
+      const parent = Object.create(null);
+      const child = Object.create(null);
+      child.deep = 'value';
+      parent.nested = child;
+      parent.regular = { withProto: true };
+      assert.strictEqual(isLogAttributeValue(parent), true);
+    });
+
+    it('should accept objects without prototypes containing arrays', () => {
+      const obj = Object.create(null);
+      obj.strings = ['a', 'b', 'c'];
+      obj.mixed = [1, 'two', true];
+      obj.bytes = new Uint8Array([1, 2, 3]);
+      assert.strictEqual(isLogAttributeValue(obj), true);
+    });
   });
 
   describe('should accept complex combinations', () => {
@@ -193,16 +217,40 @@ describe('isLogAttributeValue', () => {
       assert.strictEqual(isLogAttributeValue(new TestClass()), false);
     });
 
+    it('should reject Map objects', () => {
+      assert.strictEqual(isLogAttributeValue(new Map()), false);
+      assert.strictEqual(isLogAttributeValue(new Map([['key', 'value']])), false);
+      
+      const nestedMap = new Map();
+      nestedMap.set('nested', new Map([['inner', 'value']]));
+      assert.strictEqual(isLogAttributeValue(nestedMap), false);
+    });
+
+    it('should reject Set objects', () => {
+      assert.strictEqual(isLogAttributeValue(new Set()), false);
+      assert.strictEqual(isLogAttributeValue(new Set([1, 2, 3])), false);
+      assert.strictEqual(isLogAttributeValue(new Set(['a', 'b', 'c'])), false);
+    });
+
+    it('should reject WeakMap and WeakSet objects', () => {
+      assert.strictEqual(isLogAttributeValue(new WeakMap()), false);
+      assert.strictEqual(isLogAttributeValue(new WeakSet()), false);
+    });
+
     it('should reject arrays containing invalid values', () => {
       assert.strictEqual(isLogAttributeValue(['valid', () => {}]), false);
       assert.strictEqual(isLogAttributeValue([Symbol('test'), 'valid']), false);
       assert.strictEqual(isLogAttributeValue([new Date()]), false);
+      assert.strictEqual(isLogAttributeValue([new Map()]), false);
+      assert.strictEqual(isLogAttributeValue(['valid', new Set([1, 2, 3])]), false);
     });
 
     it('should reject objects containing invalid values', () => {
       assert.strictEqual(isLogAttributeValue({ valid: 'test', invalid: () => {} }), false);
       assert.strictEqual(isLogAttributeValue({ symbol: Symbol('test') }), false);
       assert.strictEqual(isLogAttributeValue({ date: new Date() }), false);
+      assert.strictEqual(isLogAttributeValue({ map: new Map([['key', 'value']]) }), false);
+      assert.strictEqual(isLogAttributeValue({ set: new Set([1, 2, 3]) }), false);
     });
 
     it('should reject deeply nested invalid values', () => {
