@@ -82,6 +82,10 @@ import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
 import { Err, IgnoreMatcher, ParsedRequestOptions } from './internal-types';
 import { SYNTHETIC_BOT_NAMES, SYNTHETIC_TEST_NAMES } from './internal-types';
+import {
+  DEFAULT_QUERY_STRINGS_TO_REDACT,
+  STR_REDACTED,
+} from './internal-types';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import forwardedParse = require('forwarded-parse');
 
@@ -91,15 +95,15 @@ import forwardedParse = require('forwarded-parse');
 export const getAbsoluteUrl = (
   requestUrl: ParsedRequestOptions | null,
   headers: IncomingHttpHeaders | OutgoingHttpHeaders,
-  fallbackProtocol = 'http:'
+  fallbackProtocol = 'http:',
+  redactedQueryParams?: string[]
 ): string => {
   const reqUrlObject = requestUrl || {};
   const protocol = reqUrlObject.protocol || fallbackProtocol;
   const port = (reqUrlObject.port || '').toString();
-  const path = reqUrlObject.path || '/';
+  let path = reqUrlObject.path || '/';
   let host =
     reqUrlObject.host || reqUrlObject.hostname || headers.host || 'localhost';
-
   // if there is no port in host and there is a port
   // it should be displayed if it's not 80 and 443 (default ports)
   if (
@@ -110,8 +114,33 @@ export const getAbsoluteUrl = (
   ) {
     host += `:${port}`;
   }
+  // Redact sensitive query parameters
+  if (path.includes('?')) {
+    const [pathname, query] = path.split('?', 2);
+    const searchParams = new URLSearchParams(query);
+    let sensitiveParamsToRedact: string[];
 
-  return `${protocol}//${host}${path}`;
+    if (redactedQueryParams === undefined) {
+      sensitiveParamsToRedact = Array.from(DEFAULT_QUERY_STRINGS_TO_REDACT); // If redactedQueryParams is not provided, use default redacted query params
+    } else if (redactedQueryParams.length === 0) {
+      sensitiveParamsToRedact = []; // If redactedQueryParams is empty, do not redact any query string params
+    } else {
+      sensitiveParamsToRedact = redactedQueryParams;
+    }
+    for (const sensitiveParam of sensitiveParamsToRedact) {
+      if (
+        searchParams.has(sensitiveParam) &&
+        searchParams.get(sensitiveParam) !== ''
+      ) {
+        searchParams.set(sensitiveParam, STR_REDACTED);
+      }
+    }
+
+    const redactedQuery = searchParams.toString();
+    path = `${pathname}?${redactedQuery}`;
+  }
+  const authPart = reqUrlObject.auth ? `${STR_REDACTED}:${STR_REDACTED}@` : '';
+  return `${protocol}//${authPart}${host}${path}`;
 };
 
 /**
@@ -442,6 +471,7 @@ export const getOutgoingRequestAttributes = (
     hostname: string;
     port: string | number;
     hookAttributes?: Attributes;
+    redactedQueryParams?: string[];
   },
   semconvStability: SemconvStability,
   enableSyntheticSourceDetection: boolean
@@ -455,7 +485,8 @@ export const getOutgoingRequestAttributes = (
   const urlFull = getAbsoluteUrl(
     requestOptions,
     headers,
-    `${options.component}:`
+    `${options.component}:`,
+    options.redactedQueryParams
   );
 
   const oldAttributes: Attributes = {

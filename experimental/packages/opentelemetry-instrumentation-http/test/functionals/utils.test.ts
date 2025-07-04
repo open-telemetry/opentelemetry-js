@@ -174,6 +174,43 @@ describe('Utility', () => {
       );
       assert.strictEqual(result, 'http://localhost:8080/helloworld');
     });
+    it('should return auth credentials as REDACTED to avoid leaking sensitive information', () => {
+      const result = utils.getAbsoluteUrl(
+        { path: '/helloworld', port: 8080, auth: 'user:password' },
+        {}
+      );
+      assert.strictEqual(
+        result,
+        'http://REDACTED:REDACTED@localhost:8080/helloworld'
+      );
+    });
+    it('should return auth credentials and particular query strings as REDACTED', () => {
+      const result = utils.getAbsoluteUrl(
+        {
+          path: '/registers?X-Goog-Signature=secret123',
+          port: 8080,
+          auth: 'user:pass',
+        },
+        {}
+      );
+      assert.strictEqual(
+        result,
+        'http://REDACTED:REDACTED@localhost:8080/registers?X-Goog-Signature=REDACTED'
+      );
+    });
+    it('should return particular query strings as REDACTED', () => {
+      const result = utils.getAbsoluteUrl(
+        {
+          path: '/registers?AWSAccessKeyId=secret123',
+          port: 8080,
+        },
+        {}
+      );
+      assert.strictEqual(
+        result,
+        'http://localhost:8080/registers?AWSAccessKeyId=REDACTED'
+      );
+    });
   });
 
   describe('setSpanWithError()', () => {
