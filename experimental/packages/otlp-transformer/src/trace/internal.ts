@@ -170,11 +170,11 @@ function spanRecordsToResourceSpans(
       }
       ilmEntry = ilmIterator.next();
     }
-    // TODO SDK types don't provide resource schema URL at this time
+    const processedResource = createResource(resource);
     const transformedSpans: IResourceSpans = {
-      resource: createResource(resource),
+      resource: processedResource,
       scopeSpans: scopeResourceSpans,
-      schemaUrl: undefined,
+      schemaUrl: processedResource.schemaUrl,
     };
 
     out.push(transformedSpans);
