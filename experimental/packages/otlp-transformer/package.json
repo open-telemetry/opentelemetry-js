@@ -81,7 +81,6 @@
     "webpack": "5.99.9"
   },
   "dependencies": {
-    "@opentelemetry/api-logs": "0.202.0",
     "@opentelemetry/core": "2.0.1",
     "@opentelemetry/resources": "2.0.1",
     "@opentelemetry/sdk-logs": "0.202.0",

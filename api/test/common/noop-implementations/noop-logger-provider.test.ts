@@ -15,21 +15,21 @@
  */
 
 import * as assert from 'assert';
-import { SeverityNumber } from '../../src';
-import { NoopLogger } from '../../src/NoopLogger';
-import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
+import { NoopLogger } from '../../../src/experimental/logs/NoopLogger';
+import { NoopLoggerProvider } from '../../../src/experimental/logs/NoopLoggerProvider';
 
-describe('NoopLogger', () => {
-  it('constructor should not crash', () => {
-    const logger = new NoopLoggerProvider().getLogger('test-noop');
-    assert.ok(logger instanceof NoopLogger);
-  });
+describe('NoopLoggerProvider', () => {
+  it('should not crash', () => {
+    const loggerProvider = new NoopLoggerProvider();
 
-  it('calling emit should not crash', () => {
-    const logger = new NoopLoggerProvider().getLogger('test-noop');
-    logger.emit({
-      severityNumber: SeverityNumber.TRACE,
-      body: 'log body',
-    });
+    assert.ok(loggerProvider.getLogger('logger-name') instanceof NoopLogger);
+    assert.ok(
+      loggerProvider.getLogger('logger-name', 'v1') instanceof NoopLogger
+    );
+    assert.ok(
+      loggerProvider.getLogger('logger-name', 'v1', {
+        schemaUrl: 'https://opentelemetry.io/schemas/1.7.0',
+      }) instanceof NoopLogger
+    );
   });
 });

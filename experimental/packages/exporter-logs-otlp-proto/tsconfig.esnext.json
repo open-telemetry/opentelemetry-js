@@ -22,9 +22,6 @@
       "path": "../../../packages/opentelemetry-sdk-trace-base"
     },
     {
-      "path": "../api-logs"
-    },
-    {
       "path": "../otlp-exporter-base"
     },
     {

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { logs } from '@opentelemetry/api-logs';
+import { logs } from '@opentelemetry/api/experimental';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 

@@ -21,3 +21,22 @@
 
 export { wrapTracer, SugaredTracer } from './trace/SugaredTracer';
 export type { SugaredSpanOptions } from './trace/SugaredOptions';
+
+// Logs Experimental API
+export type { Logger } from './logs/types/Logger';
+export type { LoggerProvider } from './logs/types/LoggerProvider';
+export { SeverityNumber } from './logs/types/LogRecord';
+export type { LogAttributes, LogBody, LogRecord } from './logs/types/LogRecord';
+export type { LoggerOptions } from './logs/types/LoggerOptions';
+export type { AnyValue, AnyValueMap } from './logs/types/AnyValue';
+export { NOOP_LOGGER, NoopLogger } from './logs/NoopLogger';
+export {
+  NOOP_LOGGER_PROVIDER,
+  NoopLoggerProvider,
+} from './logs/NoopLoggerProvider';
+export { ProxyLogger } from './logs/ProxyLogger';
+export { ProxyLoggerProvider } from './logs/ProxyLoggerProvider';
+
+import { LogsAPI } from './logs/api/logs';
+export { LogsAPI };
+export const logs = LogsAPI.getInstance();

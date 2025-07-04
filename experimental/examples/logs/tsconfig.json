@@ -10,9 +10,6 @@
       "path": "../../../api"
     },
     {
-      "path": "../../../experimental/packages/api-logs"
-    },
-    {
       "path": "../../../experimental/packages/sdk-logs"
     }
   ]

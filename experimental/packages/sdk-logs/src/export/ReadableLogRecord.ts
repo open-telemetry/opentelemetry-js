@@ -21,7 +21,7 @@ import type {
   LogBody,
   LogAttributes,
   SeverityNumber,
-} from '@opentelemetry/api-logs';
+} from '@opentelemetry/api/experimental';
 
 export interface ReadableLogRecord {
   readonly hrTime: HrTime;

@@ -27,7 +27,7 @@ import {
   trace,
   metrics,
 } from '@opentelemetry/api';
-import { logs } from '@opentelemetry/api-logs';
+import { logs } from '@opentelemetry/api/experimental';
 
 // Enable diagnostic logging (optional)
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.INFO);

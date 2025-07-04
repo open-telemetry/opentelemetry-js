@@ -21,7 +21,7 @@ import type {
   LogBody,
   LogAttributes,
   SeverityNumber,
-} from '@opentelemetry/api-logs';
+} from '@opentelemetry/api/experimental';
 import type { Resource } from '@opentelemetry/resources';
 
 /**
