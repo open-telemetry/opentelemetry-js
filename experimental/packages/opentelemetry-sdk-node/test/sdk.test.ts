@@ -322,6 +322,131 @@ describe('Node SDK', () => {
       delete env.OTEL_TRACES_EXPORTER;
     });
 
+    it('should register a meter provider if multiple readers are provided', async () => {
+      // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
+      // which sets up an exporter and affects the context manager
+      env.OTEL_TRACES_EXPORTER = 'none';
+      const consoleExporter = new ConsoleMetricExporter();
+      const inMemoryExporter = new InMemoryMetricExporter(
+        AggregationTemporality.CUMULATIVE
+      );
+      const metricReader1 = new PeriodicExportingMetricReader({
+        exporter: consoleExporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+      const metricReader2 = new PeriodicExportingMetricReader({
+        exporter: inMemoryExporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+
+      const sdk = new NodeSDK({
+        metricReaders: [metricReader1, metricReader2],
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assert.strictEqual(
+        context['_getContextManager'](),
+        ctxManager,
+        'context manager should not change'
+      );
+      assert.strictEqual(
+        propagation['_getGlobalPropagator'](),
+        propagator,
+        'propagator should not change'
+      );
+      assert.strictEqual(
+        (trace.getTracerProvider() as ProxyTracerProvider).getDelegate(),
+        delegate,
+        'tracer provider should not have changed'
+      );
+
+      const meterProvider = metrics.getMeterProvider() as MeterProvider;
+      assert.ok(meterProvider instanceof MeterProvider);
+
+      // Verify that both metric readers are registered
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert.strictEqual(sharedState.metricCollectors.length, 2);
+
+      await sdk.shutdown();
+      delete env.OTEL_TRACES_EXPORTER;
+    });
+
+    it('should show deprecation warning when using metricReader option', async () => {
+      // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
+      // which sets up an exporter and affects the context manager
+      env.OTEL_TRACES_EXPORTER = 'none';
+      const exporter = new ConsoleMetricExporter();
+      const metricReader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+
+      const warnSpy = Sinon.spy(diag, 'warn');
+
+      const sdk = new NodeSDK({
+        metricReader: metricReader,
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      // Verify deprecation warning was shown
+      const metricReaderDeprecationWarnings = warnSpy
+        .getCalls()
+        .filter(
+          call =>
+            call.args[0] ===
+            "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
+        );
+      assert.strictEqual(metricReaderDeprecationWarnings.length, 1);
+
+      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+
+      await sdk.shutdown();
+      delete env.OTEL_TRACES_EXPORTER;
+    });
+
+    it('should not show deprecation warning when using metricReaders option', async () => {
+      // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
+      // which sets up an exporter and affects the context manager
+      env.OTEL_TRACES_EXPORTER = 'none';
+      const exporter = new ConsoleMetricExporter();
+      const metricReader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+
+      const warnSpy = Sinon.spy(diag, 'warn');
+
+      const sdk = new NodeSDK({
+        metricReaders: [metricReader],
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      // Verify no metricReader deprecation warning was shown
+      const metricReaderDeprecationWarnings = warnSpy
+        .getCalls()
+        .filter(
+          call =>
+            call.args[0] ===
+            "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
+        );
+      assert.strictEqual(metricReaderDeprecationWarnings.length, 0);
+
+      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+
+      await sdk.shutdown();
+      delete env.OTEL_TRACES_EXPORTER;
+    });
+
     it('should register a logger provider if a log record processor is provided', async () => {
       env.OTEL_TRACES_EXPORTER = 'none';
       const logRecordExporter = new InMemoryLogRecordExporter();
