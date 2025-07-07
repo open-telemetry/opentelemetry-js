@@ -12,7 +12,7 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "tdd": "npm run test -- --watch-extensions ts --watch",
-    "test": "nyc mocha 'test/**/*.test.ts'",
+    "test": "nyc mocha test/**/*.test.ts",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --watch --build",
     "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
