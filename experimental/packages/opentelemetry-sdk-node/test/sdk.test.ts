@@ -352,8 +352,9 @@ describe('Node SDK', () => {
       );
 
       assert.ok(
-        (logs.getLoggerProvider() as ProxyLoggerProvider).getDelegate() instanceof
-          LoggerProvider
+        (
+          logs.getLoggerProvider() as ProxyLoggerProvider
+        ).getDelegate() instanceof LoggerProvider
       );
       await sdk.shutdown();
       delete env.OTEL_TRACES_EXPORTER;
