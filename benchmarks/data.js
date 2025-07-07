@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1751649178336,
+  "lastUpdate": 1751878429936,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -34844,6 +34844,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.24%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sceee@users.noreply.github.com",
+            "name": "sceee",
+            "username": "sceee"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5c4057bb8d522a2116d32701e963a11f315e9f1b",
+          "message": "fix(docs): fix minimum ECMAScript language support in Readme to ES2022 (#5774)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2025-07-07T08:45:46Z",
+          "tree_id": "768d5a8cec86e08e75604f24872b4b27695e3b59",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/5c4057bb8d522a2116d32701e963a11f315e9f1b"
+        },
+        "date": 1751878428849,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1501626,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18564,
+            "range": "±0.15%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 822963,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 777569,
+            "range": "±0.63%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
           }
         ]
       }
