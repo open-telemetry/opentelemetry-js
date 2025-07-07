@@ -30,6 +30,15 @@ export interface MetricAdvice {
    * aggregated with a HistogramAggregator.
    */
   explicitBucketBoundaries?: number[];
+
+  /**
+   * @experimental
+   * An allow-list of attribute keys for this instrument. Only these keys will be kept
+   * on measurements recorded by this instrument. If not provided, all attributes are kept.
+   *
+   * See: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#instrument-advisory-parameter-attributes
+   */
+  attributes?: string[];
 }
 
 /**
