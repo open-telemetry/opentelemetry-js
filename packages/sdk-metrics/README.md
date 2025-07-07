@@ -36,6 +36,29 @@ const counter = opentelemetry.metrics.getMeter('default').createCounter('foo');
 counter.add(1, { attributeKey: 'attribute-value' });
 ```
 
+### Advisory Attributes Parameter (Experimental)
+
+The Metrics API supports an optional `attributes` advisory parameter in the `advice` configuration when creating instruments. This parameter acts as an allow-list for attribute keys, filtering out all attributes that are not in the specified list:
+
+```js
+const counter = opentelemetry.metrics.getMeter('default').createCounter('filtered-counter', {
+  description: 'A counter with attribute filtering',
+  advice: {
+    attributes: ['service', 'version'], // @experimental: Only these keys will be kept
+  },
+});
+
+// Only 'service' and 'version' attributes will be recorded, others are filtered out
+counter.add(1, { 
+  service: 'api-gateway', 
+  version: '1.0.0', 
+  region: 'us-west', // This will be filtered out
+  method: 'GET'      // This will be filtered out
+});
+```
+
+**Note:** This feature is experimental and may change in future versions. The advisory attributes parameter only applies when no Views are configured for the instrument. If Views are present, they take precedence over the instrument's advisory attributes.
+
 In conditions, we may need to setup an async instrument to observe costly events:
 
 ```js
