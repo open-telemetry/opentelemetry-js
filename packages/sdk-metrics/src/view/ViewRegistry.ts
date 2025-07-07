@@ -19,6 +19,7 @@ import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { InstrumentSelector } from './InstrumentSelector';
 import { MeterSelector } from './MeterSelector';
 import { View } from './View';
+import { createAllowListAttributesProcessor } from './AttributesProcessor';
 
 export class ViewRegistry {
   private _registeredViews: View[] = [];
@@ -38,7 +39,30 @@ export class ViewRegistry {
       );
     });
 
+    // If no registered views match, create a default view with instrument's advisory attributes
+    if (views.length === 0) {
+      const defaultView = this._createDefaultView(instrument);
+      return [defaultView];
+    }
+
     return views;
+  }
+
+  private _createDefaultView(instrument: InstrumentDescriptor): View {
+    // Create default view with instrument's advisory attributes as an allow-list
+    const viewOptions: any = {
+      instrumentName: instrument.name,
+      instrumentType: instrument.type,
+      instrumentUnit: instrument.unit,
+    };
+    
+    // If instrument has advisory attributes, use them as an allow-list
+    if (instrument.advice.attributes && instrument.advice.attributes.length > 0) {
+      viewOptions.attributesProcessors = [createAllowListAttributesProcessor(instrument.advice.attributes)];
+    }
+    
+    // Create a view that matches this specific instrument
+    return new View(viewOptions);
   }
 
   private _matchInstrument(
