@@ -6,9 +6,6 @@
       "path": "api/tsconfig.esm.json"
     },
     {
-      "path": "experimental/packages/api-logs/tsconfig.esm.json"
-    },
-    {
       "path": "experimental/packages/exporter-logs-otlp-http/tsconfig.esm.json"
     },
     {

@@ -100,7 +100,6 @@
     "@opentelemetry/api": "^1.3.0"
   },
   "dependencies": {
-    "@opentelemetry/api-logs": "0.202.0",
     "@opentelemetry/core": "2.0.1",
     "@opentelemetry/otlp-exporter-base": "0.202.0",
     "@opentelemetry/otlp-transformer": "0.202.0",

@@ -69,7 +69,7 @@ import {
   defaultResource,
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { logs, ProxyLoggerProvider } from '@opentelemetry/api-logs';
+import { logs, ProxyLoggerProvider } from '@opentelemetry/api/experimental';
 import {
   SimpleLogRecordProcessor,
   InMemoryLogRecordExporter,
@@ -352,8 +352,9 @@ describe('Node SDK', () => {
       );
 
       assert.ok(
-        (logs.getLoggerProvider() as ProxyLoggerProvider) instanceof
-          LoggerProvider
+        (
+          logs.getLoggerProvider() as ProxyLoggerProvider
+        ).getDelegate() instanceof LoggerProvider
       );
       await sdk.shutdown();
       delete env.OTEL_TRACES_EXPORTER;
@@ -376,8 +377,8 @@ describe('Node SDK', () => {
 
       sdk.start();
 
-      const loggerProvider = logs.getLoggerProvider();
-      const sharedState = (loggerProvider as any)['_sharedState'];
+      const loggerProvider = logs.getLoggerProvider() as ProxyLoggerProvider;
+      const sharedState = (loggerProvider.getDelegate() as any)['_sharedState'];
       assert.ok(sharedState.registeredLogRecordProcessors.length === 2);
       assert.ok(
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof
@@ -982,8 +983,8 @@ describe('Node SDK', () => {
     it('should use otlp with http/protobuf by default', async () => {
       const sdk = new NodeSDK();
       sdk.start();
-      const loggerProvider = logs.getLoggerProvider();
-      const sharedState = (loggerProvider as any)['_sharedState'];
+      const loggerProvider = logs.getLoggerProvider() as ProxyLoggerProvider;
+      const sharedState = (loggerProvider.getDelegate() as any)['_sharedState'];
       assert.ok(
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof
           OTLPProtoLogExporter
@@ -997,8 +998,8 @@ describe('Node SDK', () => {
 
       sdk.start();
 
-      const loggerProvider = logs.getLoggerProvider();
-      const sharedState = (loggerProvider as any)['_sharedState'];
+      const loggerProvider = logs.getLoggerProvider() as ProxyLoggerProvider;
+      const sharedState = (loggerProvider.getDelegate() as any)['_sharedState'];
       assert.ok(sharedState.registeredLogRecordProcessors.length === 2);
       assert.ok(
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof
@@ -1027,8 +1028,8 @@ describe('Node SDK', () => {
 
       sdk.start();
 
-      const loggerProvider = logs.getLoggerProvider();
-      const sharedState = (loggerProvider as any)['_sharedState'];
+      const loggerProvider = logs.getLoggerProvider() as ProxyLoggerProvider;
+      const sharedState = (loggerProvider.getDelegate() as any)['_sharedState'];
       assert.ok(sharedState.registeredLogRecordProcessors.length === 1);
       assert.ok(
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof
@@ -1044,8 +1045,8 @@ describe('Node SDK', () => {
 
       sdk.start();
 
-      const loggerProvider = logs.getLoggerProvider();
-      const sharedState = (loggerProvider as any)['_sharedState'];
+      const loggerProvider = logs.getLoggerProvider() as ProxyLoggerProvider;
+      const sharedState = (loggerProvider.getDelegate() as any)['_sharedState'];
       assert.ok(sharedState.registeredLogRecordProcessors.length === 1);
       assert.ok(
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof
@@ -1061,8 +1062,8 @@ describe('Node SDK', () => {
 
       sdk.start();
 
-      const loggerProvider = logs.getLoggerProvider();
-      const sharedState = (loggerProvider as any)['_sharedState'];
+      const loggerProvider = logs.getLoggerProvider() as ProxyLoggerProvider;
+      const sharedState = (loggerProvider.getDelegate() as any)['_sharedState'];
       assert.ok(sharedState.registeredLogRecordProcessors.length === 1);
       assert.ok(
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof
@@ -1078,8 +1079,8 @@ describe('Node SDK', () => {
 
       sdk.start();
 
-      const loggerProvider = logs.getLoggerProvider();
-      const sharedState = (loggerProvider as any)['_sharedState'];
+      const loggerProvider = logs.getLoggerProvider() as ProxyLoggerProvider;
+      const sharedState = (loggerProvider.getDelegate() as any)['_sharedState'];
       assert.ok(sharedState.registeredLogRecordProcessors.length === 1);
       assert.ok(
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof

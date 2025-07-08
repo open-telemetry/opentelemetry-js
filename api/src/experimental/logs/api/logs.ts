@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
+import { DiagAPI } from '../../../api/diag';
 import {
-  API_BACKWARDS_COMPATIBILITY_VERSION,
-  GLOBAL_LOGS_API_KEY,
-  _global,
-  makeGetter,
-} from '../internal/global-utils';
-import { LoggerProvider } from '../types/LoggerProvider';
-import { NOOP_LOGGER_PROVIDER } from '../NoopLoggerProvider';
+  registerGlobal,
+  getGlobal,
+  unregisterGlobal,
+} from '../../../internal/global-utils';
+import { ProxyLoggerProvider } from '../ProxyLoggerProvider';
 import { Logger } from '../types/Logger';
 import { LoggerOptions } from '../types/LoggerOptions';
-import { ProxyLoggerProvider } from '../ProxyLoggerProvider';
+import { LoggerProvider } from '../types/LoggerProvider';
+
+const API_NAME = 'logs';
 
 export class LogsAPI {
   private static _instance?: LogsAPI;
@@ -41,19 +42,16 @@ export class LogsAPI {
     return this._instance;
   }
 
-  public setGlobalLoggerProvider(provider: LoggerProvider): LoggerProvider {
-    if (_global[GLOBAL_LOGS_API_KEY]) {
-      return this.getLoggerProvider();
-    }
-
-    _global[GLOBAL_LOGS_API_KEY] = makeGetter<LoggerProvider>(
-      API_BACKWARDS_COMPATIBILITY_VERSION,
-      provider,
-      NOOP_LOGGER_PROVIDER
+  public setGlobalLoggerProvider(provider: LoggerProvider): boolean {
+    const success = registerGlobal(
+      API_NAME,
+      this._proxyLoggerProvider,
+      DiagAPI.instance()
     );
-    this._proxyLoggerProvider.setDelegate(provider);
-
-    return provider;
+    if (success) {
+      this._proxyLoggerProvider.setDelegate(provider);
+    }
+    return success;
   }
 
   /**
@@ -62,10 +60,7 @@ export class LogsAPI {
    * @returns LoggerProvider
    */
   public getLoggerProvider(): LoggerProvider {
-    return (
-      _global[GLOBAL_LOGS_API_KEY]?.(API_BACKWARDS_COMPATIBILITY_VERSION) ??
-      this._proxyLoggerProvider
-    );
+    return getGlobal(API_NAME) || this._proxyLoggerProvider;
   }
 
   /**
@@ -83,7 +78,7 @@ export class LogsAPI {
 
   /** Remove the global logger provider */
   public disable(): void {
-    delete _global[GLOBAL_LOGS_API_KEY];
+    unregisterGlobal(API_NAME, DiagAPI.instance());
     this._proxyLoggerProvider = new ProxyLoggerProvider();
   }
 }

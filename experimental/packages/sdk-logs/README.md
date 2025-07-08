@@ -14,7 +14,7 @@ It does **not** provide automated instrumentation of known libraries or host env
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/api-logs
+npm install --save @opentelemetry/api
 npm install --save @opentelemetry/sdk-logs
 ```
 
@@ -23,7 +23,7 @@ npm install --save @opentelemetry/sdk-logs
 The basic setup of the SDK can be seen as followings:
 
 ```js
-const logsAPI = require('@opentelemetry/api-logs');
+const logsAPI = require('@opentelemetry/api/experimental');
 const {
   LoggerProvider,
   SimpleLogRecordProcessor,

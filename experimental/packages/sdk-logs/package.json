@@ -32,7 +32,7 @@
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "test": "nyc mocha 'test/**/*.test.ts'",
+    "test": "nyc mocha test/**/*.test.ts",
     "test:browser": "karma start --single-run",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
@@ -96,7 +96,6 @@
     "webpack-cli": "6.0.1"
   },
   "dependencies": {
-    "@opentelemetry/api-logs": "0.202.0",
     "@opentelemetry/core": "2.0.1",
     "@opentelemetry/resources": "2.0.1"
   }

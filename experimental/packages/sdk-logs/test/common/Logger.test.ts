@@ -20,7 +20,7 @@ import * as sinon from 'sinon';
 import { LoggerProvider, NoopLogRecordProcessor } from '../../src';
 import { LogRecordImpl } from '../../src/LogRecordImpl';
 import { ROOT_CONTEXT, TraceFlags, context, trace } from '@opentelemetry/api';
-import { LogRecord as ApiLogRecord } from '@opentelemetry/api-logs';
+import { LogRecord as ApiLogRecord } from '@opentelemetry/api/experimental';
 import { Logger } from '../../src/Logger';
 
 const setup = () => {

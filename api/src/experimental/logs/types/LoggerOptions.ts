@@ -13,8 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const testsContext = require.context('.', true, /test$/);
-testsContext.keys().forEach(testsContext);
 
-const srcContext = require.context('.', true, /src$/);
-srcContext.keys().forEach(srcContext);
+import { Attributes } from '../../../common/Attributes';
+
+export interface LoggerOptions {
+  /**
+   * The schemaUrl of the tracer or instrumentation library
+   * @default ''
+   */
+  schemaUrl?: string;
+
+  /**
+   * The instrumentation scope attributes to associate with emitted telemetry
+   */
+  scopeAttributes?: Attributes;
+
+  /**
+   * Specifies whether the Trace Context should automatically be passed on to the LogRecords emitted by the Logger.
+   * @default true
+   */
+  includeTraceContext?: boolean;
+}

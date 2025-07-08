@@ -18,7 +18,7 @@ import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
-import { SeverityNumber } from '@opentelemetry/api-logs';
+import { SeverityNumber } from '@opentelemetry/api/experimental';
 import { toBase64 } from './utils';
 import * as root from '../src/generated/root';
 import { OtlpEncodingOptions } from '../src/common/internal-types';

@@ -15,7 +15,7 @@
  */
 
 import { AttributeValue, diag } from '@opentelemetry/api';
-import type * as logsAPI from '@opentelemetry/api-logs';
+import type * as logsAPI from '@opentelemetry/api/experimental';
 import * as api from '@opentelemetry/api';
 import {
   timeInputToHrTime,
@@ -26,7 +26,11 @@ import type { Resource } from '@opentelemetry/resources';
 
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
-import { AnyValue, LogAttributes, LogBody } from '@opentelemetry/api-logs';
+import {
+  AnyValue,
+  LogAttributes,
+  LogBody,
+} from '@opentelemetry/api/experimental';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 
 export class LogRecordImpl implements ReadableLogRecord {

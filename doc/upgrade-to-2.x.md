@@ -52,7 +52,6 @@ The OpenTelemetry JS SIG is responsible for numerous packages, all published to 
 | @opentelemetry/sdk-trace-web | 2.0.0 |
 | @opentelemetry/shim-opentracing | 2.0.0 |
 | @opentelemetry/api-events | 0.200.0 |
-| @opentelemetry/api-logs | 0.200.0 |
 | @opentelemetry/exporter-logs-otlp-grpc | 0.200.0 |
 | @opentelemetry/exporter-logs-otlp-http | 0.200.0 |
 | @opentelemetry/exporter-logs-otlp-proto | 0.200.0 |
@@ -107,7 +106,7 @@ Important: Both of these changes (typescript@5.0.4, dropping old TypeScript vers
 
 ## 💥 ES2022 compilation target
 
-The **compilation target for transpiled TypeScript has been raised to ES2022** (from ES2017) for all packages (except `@opentelemetry/api`, `@opentelemetry/api-logs`, `@opentelemetry/api-events`, and `@opentelemetry/semantic-conventions`).
+The **compilation target for transpiled TypeScript has been raised to ES2022** (from ES2017) for all packages (except `@opentelemetry/api`, `@opentelemetry/api-events`, and `@opentelemetry/semantic-conventions`).
 
 For Browser usage, this drops support for any browser versions that do not support ES2022 features.
 For Node.js usage, this already follows from the new minimum supported Node.js versions mentioned above.

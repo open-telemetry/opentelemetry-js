@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { Context, TimeInput } from '@opentelemetry/api';
+import { TimeInput } from '../../../common/Time';
+import { Context } from '../../../context/types';
 import { AnyValue, AnyValueMap } from './AnyValue';
 
 export type LogBody = AnyValue;

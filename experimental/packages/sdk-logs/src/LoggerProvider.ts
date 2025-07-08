@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 import { diag } from '@opentelemetry/api';
-import type * as logsAPI from '@opentelemetry/api-logs';
-import { NOOP_LOGGER } from '@opentelemetry/api-logs';
+import type * as logsAPI from '@opentelemetry/api/experimental';
+import { NOOP_LOGGER } from '@opentelemetry/api/experimental';
 import { defaultResource } from '@opentelemetry/resources';
 import { BindOnceFuture, merge } from '@opentelemetry/core';
 

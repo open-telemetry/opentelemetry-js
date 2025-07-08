@@ -29,9 +29,9 @@ import {
   toAnyValue,
   toKeyValue,
 } from '../common/internal';
-import { SeverityNumber } from '@opentelemetry/api-logs';
+import { SeverityNumber } from '@opentelemetry/api/experimental';
 import { OtlpEncodingOptions, IKeyValue } from '../common/internal-types';
-import { LogAttributes } from '@opentelemetry/api-logs';
+import { LogAttributes } from '@opentelemetry/api/experimental';
 
 export function createExportLogsServiceRequest(
   logRecords: ReadableLogRecord[],
