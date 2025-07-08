@@ -14,6 +14,11 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(metrics): add advisory attributes parameter to metric instruments [#4365](https://github.com/open-telemetry/opentelemetry-js/issues/4365)
+  * Added experimental `attributes` parameter to `MetricAdvice` for filtering measurement attributes
+  * Only applies when no Views are configured for the instrument
+  * Views take precedence over advisory attributes when present
+
 ### :bug: Bug Fixes
 
 * fix(sdk-metrics): Remove invalid default value for `startTime` param to ExponentialHistogramAccumulation. This only impacted the closurescript compiler. [#5763](https://github.com/open-telemetry/opentelemetry-js/pull/5763) @trentm

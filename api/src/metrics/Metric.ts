@@ -35,6 +35,11 @@ export interface MetricAdvice {
    * @experimental
    * An allow-list of attribute keys for this instrument. Only these keys will be kept
    * on measurements recorded by this instrument. If not provided, all attributes are kept.
+   *
+   * @example <caption>only keep 'service' and 'version' attributes</caption>
+   * attributes: ['service', 'version']
+   * @example <caption>keep all attributes (default behavior)</caption>
+   * attributes: undefined
    */
   attributes?: string[];
 }
