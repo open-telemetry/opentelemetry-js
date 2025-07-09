@@ -1,6 +1,6 @@
 {
   "name": "backcompat-node14",
-  "version": "0.202.0",
+  "version": "0.203.0",
   "private": true,
   "description": "Backwards compatibility app for node 14 types and the OpenTelemetry Node.js SDK",
   "main": "index.js",
@@ -10,7 +10,7 @@
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },
   "dependencies": {
-    "@opentelemetry/sdk-node": "0.202.0",
+    "@opentelemetry/sdk-node": "0.203.0",
     "@opentelemetry/sdk-trace-base": "2.0.1"
   },
   "devDependencies": {

@@ -9,7 +9,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :boom: Breaking Changes
 
 * feat(sdk-logs)!: Removed deprecated LoggerProvider#addLogRecordProcessor() [#5764](https://github.com/open-telemetry/opentelemetry-js/pull/5764) @svetlanabrennan
-
 * feat(api-logs)!: Marked private methods as "conventionally private". [#5789](https://github.com/open-telemetry/opentelemetry-js/pull/5789)
 
 ### :rocket: Features
@@ -20,10 +19,19 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+## 0.203.0
+
+### :boom: Breaking Changes
+
+* feat(sdk-logs)!: Removed deprecated LoggerProvider#addLogRecordProcessor() [#5764](https://github.com/open-telemetry/opentelemetry-js/pull/5764) @svetlanabrennan
 * feat(sdk-logs)!: Changed `LogRecord` class to be an interface [#5749](https://github.com/open-telemetry/opentelemetry-js/pull/5749) @svetlanabrennan
   * user-facing: `LogRecord` class is now not exported anymore. A newly exported interface `SdkLogRecord` is used in its place.
-* refactor: Removed `api-events` and `sdk-events` [#5737](https://github.com/open-telemetry/opentelemetry-js/pull/5737) @svetlanabrennan
+* feat!: Removed `api-events` and `sdk-events` [#5737](https://github.com/open-telemetry/opentelemetry-js/pull/5737) @svetlanabrennan
+
+### :house: Internal
+
 * chore: Regenerated certs [#5752](https://github.com/open-telemetry/opentelemetry-js/pull/5752) @svetlanabrennan
+* refactor(otlp-exporter-base): remove compatibility code that was intended for now unsupported runtime Node.js v14 @pichlermarc
 
 ## 0.202.0
 
