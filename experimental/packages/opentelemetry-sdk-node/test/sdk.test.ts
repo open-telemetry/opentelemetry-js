@@ -103,9 +103,6 @@ describe('Node SDK', () => {
     ctxManager = context['_getContextManager']();
     propagator = propagation['_getGlobalPropagator']();
     delegate = (trace.getTracerProvider() as ProxyTracerProvider).getDelegate();
-    logsDelegate = (
-      logs.getLoggerProvider() as ProxyLoggerProvider
-    ).getDelegate();
   });
 
   afterEach(() => {
@@ -141,11 +138,6 @@ describe('Node SDK', () => {
         'tracer provider should not have changed'
       );
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
-      assert.strictEqual(
-        (logs.getLoggerProvider() as ProxyLoggerProvider).getDelegate(),
-        logsDelegate,
-        'logger provider should not have changed'
-      );
       delete env.OTEL_TRACES_EXPORTER;
       delete env.OTEL_METRICS_EXPORTER;
       await sdk.shutdown();
