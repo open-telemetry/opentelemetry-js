@@ -41,7 +41,6 @@ export function sendWithHttp(
   timeoutMillis: number
 ): void {
   const parsedUrl = new URL(params.url);
-  const nodeVersion = Number(process.versions.node.split('.')[0]);
 
   const options: http.RequestOptions | https.RequestOptions = {
     hostname: parsedUrl.hostname,
@@ -92,18 +91,11 @@ export function sendWithHttp(
       error: new Error('Request Timeout'),
     });
   });
+
   req.on('error', (error: Error) => {
     onDone({
       status: 'failure',
       error,
-    });
-  });
-
-  const reportTimeoutErrorEvent = nodeVersion >= 14 ? 'close' : 'abort';
-  req.on(reportTimeoutErrorEvent, () => {
-    onDone({
-      status: 'failure',
-      error: new Error('Request timed out'),
     });
   });
 
