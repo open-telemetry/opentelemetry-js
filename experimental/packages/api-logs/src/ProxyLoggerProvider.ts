@@ -17,7 +17,6 @@
 import { LoggerProvider } from './types/LoggerProvider';
 import { Logger } from './types/Logger';
 import { LoggerOptions } from './types/LoggerOptions';
-import { NOOP_LOGGER_PROVIDER } from './NoopLoggerProvider';
 import { ProxyLogger } from './ProxyLogger';
 
 export class ProxyLoggerProvider implements LoggerProvider {
@@ -29,23 +28,19 @@ export class ProxyLoggerProvider implements LoggerProvider {
     options?: LoggerOptions | undefined
   ): Logger {
     return (
-      this.getDelegateLogger(name, version, options) ??
+      this._getDelegateLogger(name, version, options) ??
       new ProxyLogger(this, name, version, options)
     );
-  }
-
-  getDelegate(): LoggerProvider {
-    return this._delegate ?? NOOP_LOGGER_PROVIDER;
   }
 
   /**
    * Set the delegate logger provider
    */
-  setDelegate(delegate: LoggerProvider) {
+  _setDelegate(delegate: LoggerProvider) {
     this._delegate = delegate;
   }
 
-  getDelegateLogger(
+  _getDelegateLogger(
     name: string,
     version?: string | undefined,
     options?: LoggerOptions | undefined
