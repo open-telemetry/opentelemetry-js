@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1752175500970,
+  "lastUpdate": 1752180734598,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -35364,6 +35364,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.27%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "287d46353dfbebe7df159b0c8a99aa5c5978ca2a",
+          "message": "docs(semantic-conventions): correct placement of semconv 1.36.0 changes in changelog (#5794)",
+          "timestamp": "2025-07-10T20:43:00Z",
+          "tree_id": "a88061bbf394eb5bc7b7230fd0e09c1adee48a48",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/287d46353dfbebe7df159b0c8a99aa5c5978ca2a"
+        },
+        "date": 1752180733545,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1539536,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18861,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 820536,
+            "range": "±0.45%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 806525,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
