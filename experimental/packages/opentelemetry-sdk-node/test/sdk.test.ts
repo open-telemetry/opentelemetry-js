@@ -428,14 +428,10 @@ describe('Node SDK', () => {
       sdk.start();
 
       // Verify no metricReader deprecation warning was shown
-      const metricReaderDeprecationWarnings = warnSpy
-        .getCalls()
-        .filter(
-          call =>
-            call.args[0] ===
-            "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
-        );
-      assert.strictEqual(metricReaderDeprecationWarnings.length, 0);
+      sinon.assert.neverCalledWith(
+        warnSpy,
+        "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
+      );
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
 
