@@ -7,11 +7,12 @@ on:
   pull_request:
 
 permissions:
-  security-events: write
   contents: read
 
 jobs:
   CodeQL-Build:
+    permissions:
+      security-events: write
     runs-on: ubuntu-latest
 
     steps:
