@@ -9,16 +9,6 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
-### :bug: Bug Fixes
-
-### :books: Documentation
-
-### :house: Internal
-
-## 1.35.0
-
-### :rocket: Features
-
 * feat: update semantic conventions to v1.36.0 [#5779](https://github.com/open-telemetry/opentelemetry-js/pull/5779) @trentm
   * Semantic Conventions v1.36.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1360) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * `@opentelemetry/semantic-conventions` (stable) changes: *none*
@@ -173,6 +163,21 @@ ATTR_ZOS_SYSPLEX_NAME                                           // zos.sysplex.n
 ```
 
 </details>
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 1.35.0
+
+**Known issue:** Changes from semantic conventions **v1.36.0** where accidentally released in this JS package with version **1.35.0**. Please use `@opentelemetry/semantic-conventions@1.36.0`.
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.36.0 [#5779](https://github.com/open-telemetry/opentelemetry-js/pull/5779) @trentm
+  * Changes from semantic conventions **v1.36.0** were incorrectly included in this release. See note above.
 
 * feat: improve the jsdoc comment on exported constants for enum values [#5784](https://github.com/open-telemetry/opentelemetry-js/pull/5784) @trentm
   * The jsdoc comment for enum values now includes the 'brief', an
