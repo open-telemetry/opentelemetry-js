@@ -4,8 +4,13 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: read
+
 jobs:
   build-and-deploy:
+    permissions:
+      contents: write # required for deploying documentation to gh-pages
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

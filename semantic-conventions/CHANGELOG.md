@@ -164,6 +164,11 @@ ATTR_ZOS_SYSPLEX_NAME                                           // zos.sysplex.n
 
 </details>
 
+* feat: improve the jsdoc comment on exported constants for enum values [#5784](https://github.com/open-telemetry/opentelemetry-js/pull/5784) @trentm
+  * The jsdoc comment for enum values now includes the 'brief', an
+    `@experimental` tag, and a `@deprecated` tag if the corresponding fields
+    exist on the semconv definition.
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
