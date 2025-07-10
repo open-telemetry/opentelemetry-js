@@ -90,7 +90,6 @@ describe('Node SDK', () => {
   let ctxManager: any;
   let propagator: any;
   let delegate: any;
-  let logsDelegate: any;
 
   beforeEach(() => {
     diag.disable();
