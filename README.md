@@ -277,26 +277,26 @@ Typically, members of this are [component owners](https://github.com/open-teleme
 - [Motti](https://github.com/mottibec)
 - [Punya Biswal](https://github.com/punya), Google
 - [Siim Kallas](https://github.com/seemk), Splunk
-- [Trivikram Kamat](https://github.com/trivikr), AWS
 - [t2t2](https://github.com/t2t2), Splunk
+- [Trivikram Kamat](https://github.com/trivikr), AWS
 
 For more information about the triager role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#triager).
 
 ### Emeriti
 
-- [Bartlomiej Obecny](https://github.com/obecny), LightStep, Maintainer
-- [Daniel Khan](https://github.com/dkhan), Dynatrace, Maintainer
-- [Mayur Kale](https://github.com/mayurkale22), Google, Maintainer
+- [Bartlomiej Obecny](https://github.com/obecny), Maintainer
+- [Brandon Gonzalez](https://github.com/bg451), Approver
+- [Daniel Khan](https://github.com/dkhan), Maintainer
+- [Gerhard Stöbich](https://github.com/Flarna), Approver
+- [Haddas Bronfman](https://github.com/haddasbronfman), Approver
+- [John Bley](https://github.com/johnbley), Approver
+- [Mark Wolff](https://github.com/markwolff), Approver
+- [Mayur Kale](https://github.com/mayurkale22), Maintainer
+- [Naseem K. Ullah](https://github.com/naseemkullah), Approver
+- [Olivier Albertini](https://github.com/OlivierAlbertini), Approver
 - [Rauno Viskus](https://github.com/rauno56), Maintainer
+- [Roch Devost](https://github.com/rochdev), Approver
 - [Valentin Marchaud](https://github.com/vmarchaud), Maintainer
-- [Brandon Gonzalez](https://github.com/bg451), LightStep, Approver
-- [Roch Devost](https://github.com/rochdev), DataDog, Approver
-- [John Bley](https://github.com/johnbley), Splunk, Approver
-- [Mark Wolff](https://github.com/markwolff), Microsoft, Approver
-- [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal, Approver
-- [Gerhard Stöbich](https://github.com/Flarna), Dynatrace, Approver
-- [Haddas Bronfman](https://github.com/haddasbronfman), Cisco, Approver
-- [Naseem K. Ullah](https://github.com/naseemkullah), Transit, Approver
 
 For more information about the emeritus role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#emeritus-maintainerapprovertriager).
 
