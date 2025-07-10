@@ -164,7 +164,6 @@ ATTR_ZOS_SYSPLEX_NAME                                           // zos.sysplex.n
 
 </details>
 
-
 ### :bug: Bug Fixes
 
 ### :books: Documentation
