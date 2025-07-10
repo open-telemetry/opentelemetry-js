@@ -9,6 +9,16 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 1.35.0
+
+### :rocket: Features
+
 * feat: update semantic conventions to v1.36.0 [#5779](https://github.com/open-telemetry/opentelemetry-js/pull/5779) @trentm
   * Semantic Conventions v1.36.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1360) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * `@opentelemetry/semantic-conventions` (stable) changes: *none*
@@ -168,12 +178,6 @@ ATTR_ZOS_SYSPLEX_NAME                                           // zos.sysplex.n
   * The jsdoc comment for enum values now includes the 'brief', an
     `@experimental` tag, and a `@deprecated` tag if the corresponding fields
     exist on the semconv definition.
-
-### :bug: Bug Fixes
-
-### :books: Documentation
-
-### :house: Internal
 
 ## 1.34.0
 
