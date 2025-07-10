@@ -781,6 +781,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             optionsParsed,
             instrumentation.getConfig().startOutgoingSpanHook
           ),
+          redactedQueryParams: instrumentation.getConfig().redactedQueryParams, // Added config for adding custom query strings
         },
         instrumentation._semconvStability,
         instrumentation.getConfig().enableSyntheticSourceDetection || false
