@@ -109,20 +109,20 @@ The default will change to `false` in a future iteration of this package.
 
 ### metricReader
 
-Add a [MetricReader](../opentelemetry-sdk-metrics/src/export/MetricReader.ts)
+Add a [MetricReader](../../../packages/sdk-metrics/src/export/MetricReader.ts)
 that will be passed to the `MeterProvider`. If `metricReader` is not configured,
 the metrics SDK will not be initialized and registered.
 
 ### views
 
 A list of views to be passed to the `MeterProvider`.
-Accepts an array of [View](../opentelemetry-sdk-metrics/src/view/View.ts)-instances.
+Accepts an array of [View](../../../packages/sdk-metrics/src/view/View.ts)-instances.
 This parameter can be used to configure explicit bucket sizes of histogram metrics.
 
 ### instrumentations
 
 Configure instrumentations. By default none of the instrumentation is enabled,
-if you want to enable them you can use either [metapackage](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/metapackages/auto-instrumentations-node)
+if you want to enable them you can use either [metapackage](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/packages/auto-instrumentations-node)
 or configure each instrumentation individually.
 
 ### resource
@@ -173,7 +173,7 @@ Configure tracing parameters. These are the same trace parameters used to [confi
 
 ### serviceName
 
-Configure the [service name](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service).
+Configure the [service name](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/registry/attributes/service.md#service-name).
 
 ## Disable the SDK from the environment
 
