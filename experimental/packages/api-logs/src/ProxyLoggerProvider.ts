@@ -36,6 +36,7 @@ export class ProxyLoggerProvider implements LoggerProvider {
 
   /**
    * Get the delegate logger provider.
+   * Used by tests only.
    * @internal
    */
   _getDelegate(): LoggerProvider {
