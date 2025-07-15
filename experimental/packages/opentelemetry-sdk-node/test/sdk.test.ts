@@ -141,6 +141,11 @@ describe('Node SDK', () => {
         'tracer provider should not have changed'
       );
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
+      assert.strictEqual(
+        (logs.getLoggerProvider() as ProxyLoggerProvider)._getDelegate(),
+        logsDelegate,
+        'logger provider should not have changed'
+      );
       delete env.OTEL_TRACES_EXPORTER;
       delete env.OTEL_METRICS_EXPORTER;
       await sdk.shutdown();
