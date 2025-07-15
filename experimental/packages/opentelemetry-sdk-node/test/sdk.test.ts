@@ -90,6 +90,7 @@ describe('Node SDK', () => {
   let ctxManager: any;
   let propagator: any;
   let delegate: any;
+  let logsDelegate: any;
 
   beforeEach(() => {
     diag.disable();
@@ -102,6 +103,9 @@ describe('Node SDK', () => {
     ctxManager = context['_getContextManager']();
     propagator = propagation['_getGlobalPropagator']();
     delegate = (trace.getTracerProvider() as ProxyTracerProvider).getDelegate();
+    logsDelegate = (
+      logs.getLoggerProvider() as ProxyLoggerProvider
+    )._getDelegate();
   });
 
   afterEach(() => {
