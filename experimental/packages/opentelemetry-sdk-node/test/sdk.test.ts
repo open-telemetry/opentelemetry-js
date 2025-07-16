@@ -396,7 +396,7 @@ describe('Node SDK', () => {
       sdk.start();
 
       // Verify deprecation warning was shown
-      sinon.assert.calledWith(
+      Sinon.assert.calledWith(
         warnSpy,
         "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
       );
@@ -428,7 +428,7 @@ describe('Node SDK', () => {
       sdk.start();
 
       // Verify no metricReader deprecation warning was shown
-      sinon.assert.neverCalledWith(
+      Sinon.assert.neverCalledWith(
         warnSpy,
         "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
       );
@@ -734,7 +734,7 @@ describe('Node SDK', () => {
       // Local functions to test if a mocked method is ever called with a specific argument or regex matching for an argument.
       // Needed because of race condition with parallel detectors.
       const callArgsContains = (
-        mockedFunction: sinon.SinonSpy,
+        mockedFunction: Sinon.SinonSpy,
         arg: any
       ): boolean => {
         return mockedFunction.getCalls().some(call => {
@@ -742,7 +742,7 @@ describe('Node SDK', () => {
         });
       };
       const callArgsMatches = (
-        mockedFunction: sinon.SinonSpy,
+        mockedFunction: Sinon.SinonSpy,
         regex: RegExp
       ): boolean => {
         return mockedFunction.getCalls().some(call => {
