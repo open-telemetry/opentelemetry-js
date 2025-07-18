@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1752524220061,
+  "lastUpdate": 1752870251334,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -35520,6 +35520,58 @@ window.BENCHMARK_DATA = {
             "range": "±1.16%",
             "unit": "ops/sec",
             "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "kurtaking@gmail.com",
+            "name": "Kurt King",
+            "username": "kurtaking"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d63dfaef095102a6b28bc49f2e49993d2efd1da6",
+          "message": "fix: broken sdk-metrics and auto-instrumentations-node links in node-sdk README (#5796)\n\nSigned-off-by: Kurt King <kurtaking@gmail.com>",
+          "timestamp": "2025-07-18T20:15:16Z",
+          "tree_id": "9e3731218f037ce552e62006b3b779ed59e80e8d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/d63dfaef095102a6b28bc49f2e49993d2efd1da6"
+        },
+        "date": 1752870250164,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1559905,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18382,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 811573,
+            "range": "±0.69%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 762306,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
