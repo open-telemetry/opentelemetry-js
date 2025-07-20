@@ -3,6 +3,9 @@ name: Publish packages to NPM
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   release-to-npm:
     runs-on: ubuntu-latest
