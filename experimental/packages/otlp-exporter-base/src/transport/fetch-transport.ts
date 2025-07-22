@@ -37,15 +37,20 @@ class FetchTransport implements IExporterTransport {
         ? setTimeout(() => abortController.abort(), timeoutMillis)
         : undefined;
 
-      const base = globalThis.location.href;
-      const url = new URL(this._parameters.url ?? '/v1/traces', base);
-      const response = await fetch(this._parameters.url ?? '/v1/traces', {
+      const base = globalThis.location?.href;
+      // NOTE: In non-browser environments, `globalThis.location` will be `undefined`.
+      const isBrowserEnvironment = !!base;
+      const url = new URL(this._parameters.url, base);
+      const response = await fetch(url.href, {
         method: 'POST',
         headers: this._parameters.headers(),
         body: data,
         signal: abortController.signal,
-        mode:
-          globalThis.location.origin === url.origin ? 'same-origin' : 'cors',
+        mode: isBrowserEnvironment
+          ? globalThis.location?.origin === url.origin
+            ? 'same-origin'
+            : 'cors'
+          : 'no-cors',
       });
       clearTimeout(timeout);
 
