@@ -11,7 +11,7 @@ This section refers to `"dependencies"` and `"devDependencies"` entries in `pack
 **Example:** `^1.2.3` might inadvertently lead to version `1.2.6` which includes unintended breaking changes).
 
 > [!NOTE]
-> As this approach might leave our project with outdated tooling, we adopt `renovate-bot`. This automated dependency update tool proactively opens pull requests upon the release of new patch/minor/major versions. The complete configuration for renovate-bot can be found in [renovate.json](../renovate.json) file.
+> As this approach might leave our project with outdated tooling, we adopt `renovate-bot`. This automated dependency update tool proactively opens pull requests upon the release of new patch/minor/major versions. The complete configuration for renovate-bot can be found in [renovate.json](../../renovate.json) file.
 
 ## @opentelemetry/* dependencies
 
