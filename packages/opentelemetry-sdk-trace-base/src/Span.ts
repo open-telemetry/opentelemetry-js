@@ -38,7 +38,6 @@ import {
   InstrumentationScope,
   isAttributeValue,
   isTimeInput,
-  isTimeInputHrTime,
   otperformance,
   sanitizeAttributes,
 } from '@opentelemetry/core';
@@ -106,9 +105,7 @@ export class SpanImpl implements Span {
   private readonly _spanLimits: SpanLimits;
   private readonly _attributeValueLengthLimit: number;
 
-  private readonly _performanceStartTime: number;
-  private readonly _performanceOffset: number;
-  private readonly _startTimeProvided: boolean;
+  private readonly _performance?: { startTime: number };
 
   /**
    * Constructs a new SpanImpl instance.
@@ -117,10 +114,18 @@ export class SpanImpl implements Span {
     const now = Date.now();
 
     this._spanContext = opts.spanContext;
-    this._performanceStartTime = otperformance.now();
-    this._performanceOffset =
-      now - (this._performanceStartTime + getTimeOrigin());
-    this._startTimeProvided = opts.startTime != null;
+
+    if (opts.startTime) {
+      this.startTime = this._getHrTimeFromInput(opts.startTime);
+    } else {
+      const startTime = otperformance.now();
+      const offsetFromDate = now - (startTime - getTimeOrigin());
+      this.startTime = hrTime(startTime + offsetFromDate);
+      // Store an HR start time, possibly drifted, to calculate the HR duration of the span.
+      // Do not use this directly. Use _getDriftCorrectedHrTime() to get the current corrected HR time.
+      this._performance = { startTime };
+    }
+
     this._spanLimits = opts.spanLimits;
     this._attributeValueLengthLimit =
       this._spanLimits.attributeValueLengthLimit || 0;
@@ -130,7 +135,6 @@ export class SpanImpl implements Span {
     this.parentSpanContext = opts.parentSpanContext;
     this.kind = opts.kind;
     this.links = opts.links || [];
-    this.startTime = this._getTime(opts.startTime ?? now);
     this.resource = opts.resource;
     this.instrumentationScope = opts.scope;
 
@@ -223,7 +227,7 @@ export class SpanImpl implements Span {
     this.events.push({
       name,
       attributes,
-      time: this._getTime(timeStamp),
+      time: this._getHrTime(timeStamp),
       droppedAttributesCount: 0,
     });
     return this;
@@ -272,7 +276,8 @@ export class SpanImpl implements Span {
     }
     this._ended = true;
 
-    this.endTime = this._getTime(endTime);
+    this.endTime = this._getHrTime(endTime);
+
     this._duration = hrTimeDuration(this.startTime, this.endTime);
 
     if (this._duration[0] < 0) {
@@ -294,33 +299,42 @@ export class SpanImpl implements Span {
     this._spanProcessor.onEnd(this);
   }
 
-  private _getTime(inp?: TimeInput): HrTime {
-    if (typeof inp === 'number' && inp <= otperformance.now()) {
-      // must be a performance timestamp
-      // apply correction and convert to hrtime
-      return hrTime(inp + this._performanceOffset);
+  private _getHrTime(input?: TimeInput): HrTime {
+    return input === undefined
+      ? this._getDriftCorrectedHrTime()
+      : this._getHrTimeFromInput(input);
+  }
+
+  private _getHrTimeFromInput(input: TimeInput): HrTime {
+    if (typeof input === 'number') {
+      if (input <= otperformance.now()) {
+        // must be the result of `performance.now`, which is the time since program start
+        // translate it to an actual timestamp with hight resolution
+        return hrTime(input);
+      } else {
+        return millisToHrTime(input);
+      }
     }
 
-    if (typeof inp === 'number') {
-      return millisToHrTime(inp);
+    if (input instanceof Date) {
+      return millisToHrTime(input.getTime());
     }
 
-    if (inp instanceof Date) {
-      return millisToHrTime(inp.getTime());
-    }
+    // It is already an HR time array
+    return input;
+  }
 
-    if (isTimeInputHrTime(inp)) {
-      return inp;
-    }
-
-    if (this._startTimeProvided) {
-      // if user provided a time for the start manually
-      // we can't use duration to calculate event/end times
+  private _getDriftCorrectedHrTime(): HrTime {
+    if (!this._performance) {
+      // We can't apply drift correction, user provided the start time
+      // so we don't have any baseline. Falling back to low precision but drift free Date.now
       return millisToHrTime(Date.now());
     }
 
-    const msDuration = otperformance.now() - this._performanceStartTime;
-    return addHrTimes(this.startTime, millisToHrTime(msDuration));
+    // Calculate actual time based on the elapsed time and the corrected start time.
+    // This way, we avoid clock drifting of HR times.
+    const duration = otperformance.now() - this._performance.startTime;
+    return addHrTimes(this.startTime, millisToHrTime(duration));
   }
 
   isRecording(): boolean {
