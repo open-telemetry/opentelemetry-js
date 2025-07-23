@@ -105,7 +105,7 @@ describe('Node SDK', () => {
     delegate = (trace.getTracerProvider() as ProxyTracerProvider).getDelegate();
     logsDelegate = (
       logs.getLoggerProvider() as ProxyLoggerProvider
-    ).getDelegate();
+    )._getDelegate();
   });
 
   afterEach(() => {
@@ -142,7 +142,7 @@ describe('Node SDK', () => {
       );
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
       assert.strictEqual(
-        (logs.getLoggerProvider() as ProxyLoggerProvider).getDelegate(),
+        (logs.getLoggerProvider() as ProxyLoggerProvider)._getDelegate(),
         logsDelegate,
         'logger provider should not have changed'
       );
