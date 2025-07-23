@@ -21,10 +21,18 @@ const SESSION_STORAGE_KEY = 'opentelemetry-session';
 
 export class LocalStorageSessionStore implements SessionStore {
   save(session: Session): void {
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
     localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
   }
 
   get(): Session | null {
+    if (typeof localStorage === 'undefined') {
+      return null;
+    }
+
     const sessionData = localStorage.getItem(SESSION_STORAGE_KEY);
     if (sessionData) {
       return JSON.parse(sessionData) as Session;
