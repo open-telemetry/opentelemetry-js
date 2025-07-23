@@ -202,11 +202,10 @@ function validateSchemaUrl(schemaUrl?: string): string | undefined {
     return schemaUrl;
   }
 
-  if (
-    schemaUrl.includes(' ') ||
-    schemaUrl.includes('\t') ||
-    schemaUrl.includes('\n')
-  ) {
+  // Reject any ASCII C0 control (0x00–0x1F), SPACE (0x20) or DEL (0x7F)
+  // This ensures consistent behavior across Node.js and browser environments
+  // eslint-disable-next-line no-control-regex
+  if (/[\x00-\x20\x7F]/.test(schemaUrl)) {
     diag.warn(INVALID_SCHEMA_URL_MESSAGE, schemaUrl);
     return undefined;
   }
