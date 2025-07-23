@@ -33,6 +33,9 @@ import {
 } from './types';
 import { isPromiseLike } from './utils';
 
+const INVALID_SCHEMA_URL_MESSAGE =
+  'Invalid schema URL format: "%s". Schema URL must be a valid URI with http:// or https://. Schema URL will be ignored.';
+
 class ResourceImpl implements Resource {
   private _rawAttributes: RawResourceAttribute[];
   private _asyncAttributesPending = false;
@@ -199,23 +202,26 @@ function validateSchemaUrl(schemaUrl?: string): string | undefined {
     return schemaUrl;
   }
 
+  if (
+    schemaUrl.includes(' ') ||
+    schemaUrl.includes('\t') ||
+    schemaUrl.includes('\n')
+  ) {
+    diag.warn(INVALID_SCHEMA_URL_MESSAGE, schemaUrl);
+    return undefined;
+  }
+
   try {
     const url = new URL(schemaUrl);
 
     if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-      diag.warn(
-        'Invalid schema URL format: "%s". Schema URL must be a valid URI with http:// or https://. Schema URL will be ignored.',
-        schemaUrl
-      );
+      diag.warn(INVALID_SCHEMA_URL_MESSAGE, schemaUrl);
       return undefined;
     }
 
     return schemaUrl;
   } catch {
-    diag.warn(
-      'Invalid schema URL format: "%s". Schema URL must be a valid URI with http:// or https://. Schema URL will be ignored.',
-      schemaUrl
-    );
+    diag.warn(INVALID_SCHEMA_URL_MESSAGE, schemaUrl);
     return undefined;
   }
 }
