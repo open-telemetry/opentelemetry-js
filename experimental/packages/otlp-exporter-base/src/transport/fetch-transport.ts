@@ -31,9 +31,10 @@ class FetchTransport implements IExporterTransport {
   constructor(private _parameters: FetchTransportParameters) {}
 
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
+    let timeout: ReturnType<typeof setTimeout> | undefined;
     try {
       const abortController = new AbortController();
-      const timeout = timeoutMillis
+      timeout = timeoutMillis
         ? setTimeout(() => abortController.abort(), timeoutMillis)
         : undefined;
 
@@ -52,7 +53,6 @@ class FetchTransport implements IExporterTransport {
             : 'cors'
           : 'no-cors',
       });
-      clearTimeout(timeout);
 
       if (response.status >= 200 && response.status <= 299) {
         diag.debug('response success');
@@ -77,6 +77,8 @@ class FetchTransport implements IExporterTransport {
         status: 'failure',
         error: new Error('Fetch request errored', { cause: error }),
       };
+    } finally {
+      clearTimeout(timeout);
     }
   }
 
