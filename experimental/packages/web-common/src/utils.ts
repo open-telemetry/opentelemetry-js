@@ -20,6 +20,8 @@ import { SessionSpanProcessor } from './SessionSpanProcessor';
 import { LogRecordProcessor } from '@opentelemetry/sdk-logs';
 import { SessionLogRecordProcessor } from './SessionLogRecordProcessor';
 import { SessionManager, SessionManagerConfig } from './SessionManager';
+import { SessionIdGenerator } from './types/SessionIdGenerator';
+import { DefaultIdGenerator } from './DefaultIdGenerator';
 
 export function createSessionSpanProcessor(
   sessionProvider: SessionProvider
@@ -39,4 +41,8 @@ export async function createSessionManager(
   const manager = new SessionManager(config);
   await manager.start();
   return manager;
+}
+
+export function createDefaultSessionIdGenerator(): SessionIdGenerator {
+  return new DefaultIdGenerator();
 }

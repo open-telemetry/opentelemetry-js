@@ -26,4 +26,3 @@ export type { SessionPublisher } from './types/SessionPublisher';
 export type { SessionObserver } from './types/SessionObserver';
 export type { SessionStore } from './types/SessionStore';
 export { LocalStorageSessionStore } from './LocalStorageSessionStore';
-export { DefaultIdGenerator } from './DefaultIdGenerator';
