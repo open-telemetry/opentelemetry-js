@@ -40,9 +40,9 @@ export class ProxyMeter implements Meter {
 
   constructor(
     private _provider: MeterDelegator,
-    public readonly name: string,
-    public readonly version?: string,
-    public readonly options?: MeterOptions
+    private readonly _name: string,
+    private readonly _version?: string,
+    private readonly _options?: MeterOptions
   ) {}
 
   /**
@@ -133,9 +133,9 @@ export class ProxyMeter implements Meter {
     }
 
     const meter = this._provider.getDelegateMeter(
-      this.name,
-      this.version,
-      this.options
+      this._name,
+      this._version,
+      this._options
     );
 
     if (!meter) {
