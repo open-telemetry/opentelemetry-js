@@ -18,6 +18,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+* chore(sdk-logs): refactored imports [#5801](https://github.com/open-telemetry/opentelemetry-js/pull/5801) @svetlanabrennan
+
 ## 0.203.0
 
 ### :boom: Breaking Changes
