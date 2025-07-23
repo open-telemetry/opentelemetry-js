@@ -15,6 +15,7 @@
  */
 import { ISerializer } from '@opentelemetry/otlp-transformer';
 import {
+  createOtlpFetchExportDelegate,
   createOtlpSendBeaconExportDelegate,
   createOtlpXhrExportDelegate,
 } from '../otlp-browser-http-export-delegate';
@@ -36,6 +37,8 @@ export function createLegacyOtlpBrowserExportDelegate<Internal, Response>(
   requiredHeaders: Record<string, string>
 ): IOtlpExportDelegate<Internal> {
   const useXhr = !!config.headers || typeof navigator.sendBeacon !== 'function';
+  // NOTE: XMLHttpRequest and navigator.sendBeacon are undefined in service workers for instance.
+  const useFetch = useXhr && typeof XMLHttpRequest === 'undefined';
 
   const options = convertLegacyBrowserHttpOptions(
     config,
@@ -43,7 +46,9 @@ export function createLegacyOtlpBrowserExportDelegate<Internal, Response>(
     requiredHeaders
   );
 
-  if (useXhr) {
+  if (useFetch) {
+    return createOtlpFetchExportDelegate(options, serializer);
+  } else if (useXhr) {
     return createOtlpXhrExportDelegate(options, serializer);
   } else {
     return createOtlpSendBeaconExportDelegate(options, serializer);
