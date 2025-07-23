@@ -30,11 +30,12 @@ class MockSessionIdGenerator implements SessionIdGenerator {
 
 class MockSessionStore implements SessionStore {
   private _session: Session | null = null;
-  save(session: Session): void {
+  save(session: Session): Promise<void> {
     this._session = session;
+    return Promise.resolve();
   }
-  get(): Session | null {
-    return this._session;
+  get(): Promise<Session | null> {
+    return Promise.resolve(this._session);
   }
 }
 
@@ -72,11 +73,11 @@ describe('SessionManager', () => {
     sessionManager.shutdown();
   });
 
-  it('should start a new session if none exists', () => {
+  it('should start a new session if none exists', async () => {
     sessionManager = new SessionManager(config);
     const session = sessionManager.getSession();
     assert.strictEqual(session?.id, 'session-1');
-    assert.strictEqual(store.get()?.id, 'session-1');
+    assert.strictEqual((await store.get())?.id, 'session-1');
   });
 
   it('should return the same session ID if session exists', () => {
@@ -168,10 +169,10 @@ describe('SessionManager', () => {
     assert.strictEqual(observer.endedSessions.length, 1);
   });
 
-  it('should persist session in store', () => {
+  it('should persist session in store', async () => {
     sessionManager = new SessionManager(config);
     const sessionId = sessionManager.getSessionId();
-    assert.strictEqual(store.get()?.id, sessionId);
+    assert.strictEqual((await store.get())?.id, sessionId);
   });
 });
 

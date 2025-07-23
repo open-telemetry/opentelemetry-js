@@ -55,13 +55,15 @@ export class SessionManager implements SessionProvider, SessionPublisher {
     this._store = config.sessionStore;
     this._maxDuration = config.maxDuration;
     this._inactivityTimeout = config.inactivityTimeout;
-
     this._observers = [];
+  }
 
-    this._session = this._store.get();
-    if (this._session) {
-      this.resetTimers();
+  async start(): Promise<void> {
+    this._session = await this._store.get();
+    if (!this._session) {
+      this._session = await this.startSession();
     }
+    this.resetTimers();
   }
 
   addObserver(observer: SessionObserver): void {
@@ -109,6 +111,7 @@ export class SessionManager implements SessionProvider, SessionPublisher {
       startTimestamp: Date.now(),
     };
 
+    // this is async call, but we don't wait for it
     this._store.save(session);
 
     for (const observer of this._observers) {

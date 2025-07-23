@@ -19,6 +19,7 @@ import { SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { SessionSpanProcessor } from './SessionSpanProcessor';
 import { LogRecordProcessor } from '@opentelemetry/sdk-logs';
 import { SessionLogRecordProcessor } from './SessionLogRecordProcessor';
+import { SessionManager, SessionManagerConfig } from './SessionManager';
 
 export function createSessionSpanProcessor(
   sessionProvider: SessionProvider
@@ -30,4 +31,12 @@ export function createSessionLogRecordProcessor(
   sessionProvider: SessionProvider
 ): LogRecordProcessor {
   return new SessionLogRecordProcessor(sessionProvider);
+}
+
+export async function createSessionManager(
+  config: SessionManagerConfig
+): Promise<SessionManager> {
+  const manager = new SessionManager(config);
+  await manager.start();
+  return manager;
 }
