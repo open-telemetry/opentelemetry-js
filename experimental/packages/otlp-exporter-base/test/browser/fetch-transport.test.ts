@@ -36,13 +36,6 @@ const requestTimeout = 1000;
 const testPayload = Uint8Array.from([1, 2, 3]);
 
 describe('FetchTransport', function () {
-  function fakeResponse(
-    status: number,
-    body: string,
-    headers?: Record<string, string>
-  ) {
-    return Promise.resolve(new Response(body, { status, headers }));
-  }
   afterEach(() => {
     sinon.restore();
   });
@@ -52,7 +45,7 @@ describe('FetchTransport', function () {
       // arrange
       const fetchStub = sinon
         .stub(globalThis, 'fetch')
-        .returns(fakeResponse(200, 'test response'));
+        .resolves(new Response('test response', { status: 200 }));
       const transport = createFetchTransport(testTransportParameters);
 
       //act
@@ -87,7 +80,9 @@ describe('FetchTransport', function () {
 
     it('returns failure when request fails', function (done) {
       // arrange
-      sinon.stub(globalThis, 'fetch').returns(fakeResponse(404, ''));
+      sinon
+        .stub(globalThis, 'fetch')
+        .resolves(new Response('', { status: 404 }));
       const transport = createFetchTransport(testTransportParameters);
 
       //act
@@ -106,7 +101,9 @@ describe('FetchTransport', function () {
       // arrange
       sinon
         .stub(globalThis, 'fetch')
-        .returns(fakeResponse(503, '', { 'Retry-After': '5' }));
+        .resolves(
+          new Response('', { status: 503, headers: { 'Retry-After': '5' } })
+        );
       const transport = createFetchTransport(testTransportParameters);
 
       //act
