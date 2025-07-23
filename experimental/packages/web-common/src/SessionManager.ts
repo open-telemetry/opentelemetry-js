@@ -112,7 +112,7 @@ export class SessionManager implements SessionProvider, SessionPublisher {
     };
 
     // this is async call, but we don't wait for it
-    this._store.save(session);
+    void this._store.save(session);
 
     for (const observer of this._observers) {
       observer.onSessionStarted(session, this._session ?? undefined);
