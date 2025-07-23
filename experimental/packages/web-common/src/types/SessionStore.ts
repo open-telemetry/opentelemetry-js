@@ -17,6 +17,6 @@
 import { Session } from './Session';
 
 export interface SessionStore {
-  save(session: Session): void;
-  get(): Session | null;
+  save(session: Session): Promise<void>;
+  get(): Promise<Session | null>;
 }
