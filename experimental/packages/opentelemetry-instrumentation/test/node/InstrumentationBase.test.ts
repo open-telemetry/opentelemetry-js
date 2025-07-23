@@ -17,12 +17,12 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as path from 'path';
+import { InstrumentationBase } from '../../src';
 import {
-  InstrumentationBase,
-  InstrumentationModuleDefinition,
   InstrumentationNodeModuleDefinition,
+  InstrumentationModuleDefinition,
   InstrumentationNodeModuleFile,
-} from '../../src';
+} from '../../src/';
 
 const MODULE_NAME = 'test-module';
 const MODULE_FILE_NAME = 'test-module-file';
@@ -39,8 +39,8 @@ class TestInstrumentation extends InstrumentationBase {
   init() {}
 }
 
-describe('InstrumentationBase', () => {
-  describe('_onRequire - core module', () => {
+describe('InstrumentationBase', function () {
+  describe('_onRequire - core module', function () {
     let instrumentation: TestInstrumentation;
     let modulePatchSpy: sinon.SinonSpy;
     beforeEach(() => {
@@ -48,8 +48,8 @@ describe('InstrumentationBase', () => {
       modulePatchSpy = sinon.spy();
     });
 
-    describe('AND module is not enabled', () => {
-      it('should not patch the module', () => {
+    describe('AND module is not enabled', function () {
+      it('should not patch the module', function () {
         // @ts-expect-error access internal property for testing
         instrumentation._enabled = false;
         const moduleExports = {};
@@ -71,8 +71,8 @@ describe('InstrumentationBase', () => {
       });
     });
 
-    describe('AND module is enabled', () => {
-      it('should patch the module', () => {
+    describe('AND module is enabled', function () {
+      it('should patch the module', function () {
         // @ts-expect-error access internal property for testing
         instrumentation._enabled = true;
         const moduleExports = {};
@@ -95,7 +95,7 @@ describe('InstrumentationBase', () => {
     });
   });
 
-  describe('_onRequire - module version is not available', () => {
+  describe('_onRequire - module version is not available', function () {
     // For all of these cases, there is no indication of the actual module version,
     // so we require there to be a wildcard supported version.
 
@@ -109,9 +109,9 @@ describe('InstrumentationBase', () => {
       modulePatchSpy = sinon.spy();
     });
 
-    describe('when patching a module', () => {
-      describe('AND there is no wildcard supported version', () => {
-        it('should not patch module', () => {
+    describe('when patching a module', function () {
+      describe('AND there is no wildcard supported version', function () {
+        it('should not patch module', function () {
           const moduleExports = {};
           const instrumentationModule = {
             supportedVersions: [`^${MODULE_VERSION}`],
@@ -133,8 +133,8 @@ describe('InstrumentationBase', () => {
         });
       });
 
-      describe('AND there is a wildcard supported version', () => {
-        it('should patch module', () => {
+      describe('AND there is a wildcard supported version', function () {
+        it('should patch module', function () {
           const moduleExports = {};
           const instrumentationModule = {
             supportedVersions: [`^${MODULE_VERSION}`, WILDCARD_VERSION],
@@ -164,15 +164,15 @@ describe('InstrumentationBase', () => {
       });
     });
 
-    describe('when patching module files', () => {
+    describe('when patching module files', function () {
       let filePatchSpy: sinon.SinonSpy;
 
       beforeEach(() => {
         filePatchSpy = sinon.stub().callsFake(exports => exports);
       });
 
-      describe('AND there is no wildcard supported version', () => {
-        it('should not patch module file', () => {
+      describe('AND there is no wildcard supported version', function () {
+        it('should not patch module file', function () {
           const moduleExports = {};
           const supportedVersions = [`^${MODULE_VERSION}`];
           const instrumentationModule = {
@@ -203,8 +203,8 @@ describe('InstrumentationBase', () => {
         });
       });
 
-      describe('AND there is a wildcard supported version', () => {
-        it('should patch module file', () => {
+      describe('AND there is a wildcard supported version', function () {
+        it('should patch module file', function () {
           const moduleExports = {};
           const supportedVersions = [`^${MODULE_VERSION}`, WILDCARD_VERSION];
           const instrumentationModule = {
@@ -242,8 +242,8 @@ describe('InstrumentationBase', () => {
         });
       });
 
-      describe('AND there is multiple patches for the same file', () => {
-        it('should patch the same file twice', () => {
+      describe('AND there is multiple patches for the same file', function () {
+        it('should patch the same file twice', function () {
           const moduleExports = {};
           const supportedVersions = [`^${MODULE_VERSION}`, WILDCARD_VERSION];
           const instrumentationModule = {
@@ -288,8 +288,8 @@ describe('InstrumentationBase', () => {
     });
   });
 
-  describe('enable/disable', () => {
-    describe('AND a normal module name', () => {
+  describe('enable/disable', function () {
+    describe('AND a normal module name', function () {
       type Exports = Record<string, unknown>;
       type ExportsPatched = Exports & { __patched?: boolean };
       const moduleName = 'net';
@@ -319,7 +319,7 @@ describe('InstrumentationBase', () => {
 
       const instrumentation = new TestInstrumentation();
 
-      it('should patch the module', () => {
+      it('should patch the module', function () {
         instrumentation.enable();
         const exportsPatched = require(moduleName);
         assert.equal(exportsPatched.__patched, true, 'after enable');
@@ -330,7 +330,7 @@ describe('InstrumentationBase', () => {
       });
     });
 
-    describe('AND an absolute path module name', () => {
+    describe('AND an absolute path module name', function () {
       type Exports = Record<string, unknown>;
       type ExportsPatched = Exports & { __patched?: boolean };
       const moduleName = 'absolutePathTestFixture';
@@ -369,7 +369,7 @@ describe('InstrumentationBase', () => {
 
       const instrumentation = new TestInstrumentation();
 
-      it('should patch the module', () => {
+      it('should patch the module', function () {
         instrumentation.enable();
         const exportsPatched = require(fileName);
         assert.equal(exportsPatched.__patched, true, 'after enable');

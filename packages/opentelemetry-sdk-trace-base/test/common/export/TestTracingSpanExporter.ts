@@ -19,10 +19,10 @@ import {
   BasicTracerProvider,
   InMemorySpanExporter,
   ReadableSpan,
-  Tracer,
   SpanProcessor,
   AlwaysOnSampler,
 } from '../../../src';
+import { Tracer } from '../../../src/Tracer';
 
 /**
  * A test-only span exporter that naively simulates triggering instrumentation
@@ -34,8 +34,6 @@ export class TestTracingSpanExporter extends InMemorySpanExporter {
 
   constructor() {
     super();
-
-    const tracerProvider = new BasicTracerProvider();
 
     const spanProcessor: SpanProcessor = {
       forceFlush: () => {
@@ -50,12 +48,15 @@ export class TestTracingSpanExporter extends InMemorySpanExporter {
       },
     };
 
-    tracerProvider.addSpanProcessor(spanProcessor);
+    const tracerProvider = new BasicTracerProvider({
+      spanProcessors: [spanProcessor],
+    });
 
     this._tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new AlwaysOnSampler() },
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
   }
 

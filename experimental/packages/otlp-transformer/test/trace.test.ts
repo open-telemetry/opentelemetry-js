@@ -15,19 +15,18 @@
  */
 import * as root from '../src/generated/root';
 import { SpanKind, SpanStatusCode, TraceFlags } from '@opentelemetry/api';
-import { TraceState, hexToBinary } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import { TraceState } from '@opentelemetry/core';
+import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import {
-  OtlpEncodingOptions,
-  createExportTraceServiceRequest,
-  ESpanKind,
-  EStatusCode,
-  ProtobufTraceSerializer,
-  JsonTraceSerializer,
-} from '../src';
 import { toBase64 } from './utils';
+import { OtlpEncodingOptions } from '../src/common/internal-types';
+import { ESpanKind, EStatusCode } from '../src/trace/internal-types';
+import { createExportTraceServiceRequest } from '../src/trace/internal';
+import { ProtobufTraceSerializer } from '../src/trace/protobuf';
+import { JsonTraceSerializer } from '../src/trace/json';
+import { hexToBinary } from '../src/common/hex-to-binary';
+import { ISpan } from '../src/trace/internal-types';
 
 function createExpectedSpanJson(options: OtlpEncodingOptions) {
   const useHex = options.useHex ?? false;
@@ -234,7 +233,7 @@ describe('Trace', () => {
   let span: ReadableSpan;
 
   beforeEach(() => {
-    resource = new Resource({
+    resource = resourceFromAttributes({
       'resource-attribute': 'resource attribute value',
     });
     span = {
@@ -245,7 +244,11 @@ describe('Trace', () => {
         isRemote: false,
         traceState: new TraceState('span=bar'),
       }),
-      parentSpanId: '0000000000000001',
+      parentSpanContext: {
+        spanId: '0000000000000001',
+        traceId: '00000000000000000000000000000001',
+        traceFlags: TraceFlags.SAMPLED,
+      },
       attributes: { 'string-attribute': 'some attribute value' },
       duration: [1, 300000000],
       endTime: [1640715558, 642725388],
@@ -259,7 +262,7 @@ describe('Trace', () => {
           },
         },
       ],
-      instrumentationLibrary: {
+      instrumentationScope: {
         name: 'myLib',
         version: '0.1.0',
         schemaUrl: 'http://url.to.schema',
@@ -331,25 +334,27 @@ describe('Trace', () => {
     });
 
     it('serializes a span without a parent with useHex = true', () => {
-      (span as any).parentSpanId = undefined;
+      (span as any).parentSpanContext.spanId = undefined;
       const exportRequest = createExportTraceServiceRequest([span], {
         useHex: true,
       });
       assert.ok(exportRequest);
       assert.strictEqual(
-        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].parentSpanId,
+        (exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0] as ISpan)
+          .parentSpanId,
         undefined
       );
     });
 
     it('serializes a span without a parent with useHex = false', () => {
-      (span as any).parentSpanId = undefined;
+      (span as any).parentSpanContext.spanId = undefined;
       const exportRequest = createExportTraceServiceRequest([span], {
         useHex: false,
       });
       assert.ok(exportRequest);
       assert.strictEqual(
-        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].parentSpanId,
+        (exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0] as ISpan)
+          .parentSpanId,
         undefined
       );
     });
@@ -448,7 +453,6 @@ describe('Trace', () => {
         root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest.decode(
           serialized
         );
-
       const expected = createExpectedSpanProtobuf();
       const decodedObj =
         root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest.toObject(
@@ -463,7 +467,6 @@ describe('Trace', () => {
             bytes: String,
           }
         );
-
       assert.deepStrictEqual(decodedObj, expected);
     });
 
@@ -490,6 +493,12 @@ describe('Trace', () => {
       assert.equal(
         Number(deserializedResponse.partialSuccess.rejectedSpans),
         1
+      );
+    });
+
+    it('does not throw when deserializing an empty response', () => {
+      assert.doesNotThrow(() =>
+        ProtobufTraceSerializer.deserializeResponse(new Uint8Array([]))
       );
     });
   });
@@ -532,6 +541,12 @@ describe('Trace', () => {
       assert.equal(
         Number(deserializedResponse.partialSuccess.rejectedSpans),
         1
+      );
+    });
+
+    it('does not throw when deserializing an empty response', () => {
+      assert.doesNotThrow(() =>
+        JsonTraceSerializer.deserializeResponse(new Uint8Array([]))
       );
     });
   });

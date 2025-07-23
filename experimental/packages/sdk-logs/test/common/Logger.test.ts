@@ -17,15 +17,15 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-import { LogRecord, LoggerProvider, NoopLogRecordProcessor } from '../../src';
+import { LoggerProvider, NoopLogRecordProcessor } from '../../src';
+import { LogRecordImpl } from '../../src/LogRecordImpl';
 import { ROOT_CONTEXT, TraceFlags, context, trace } from '@opentelemetry/api';
 import { LogRecord as ApiLogRecord } from '@opentelemetry/api-logs';
 import { Logger } from '../../src/Logger';
 
 const setup = () => {
-  const loggerProvider = new LoggerProvider();
   const logProcessor = new NoopLogRecordProcessor();
-  loggerProvider.addLogRecordProcessor(logProcessor);
+  const loggerProvider = new LoggerProvider({ processors: [logProcessor] });
   const logger = loggerProvider.getLogger('test name', 'test version', {
     schemaUrl: 'test schema url',
   }) as Logger;
@@ -52,7 +52,7 @@ describe('Logger', () => {
 
     it('should make log record instance readonly after emit it', () => {
       const { logger } = setup();
-      const makeOnlySpy = sinon.spy(LogRecord.prototype, '_makeReadonly');
+      const makeOnlySpy = sinon.spy(LogRecordImpl.prototype, '_makeReadonly');
       logger.emit({
         body: 'test log body',
       });

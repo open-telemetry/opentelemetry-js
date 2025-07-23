@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-export * from './Drop';
-export * from './Histogram';
-export * from './ExponentialHistogram';
-export * from './LastValue';
-export * from './Sum';
-export { Aggregator } from './types';
+export { DropAggregator } from './Drop';
+export { HistogramAccumulation, HistogramAggregator } from './Histogram';
+export {
+  ExponentialHistogramAccumulation,
+  ExponentialHistogramAggregator,
+} from './ExponentialHistogram';
+export { LastValueAccumulation, LastValueAggregator } from './LastValue';
+export { SumAccumulation, SumAggregator } from './Sum';
+export type { Aggregator } from './types';

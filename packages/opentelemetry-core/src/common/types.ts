@@ -33,22 +33,10 @@ export interface TimeOriginLegacy {
  */
 export interface ShimWrapped extends Function {
   __wrapped: boolean;
-  // eslint-disable-next-line @typescript-eslint/ban-types
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   __unwrap: Function;
-  // eslint-disable-next-line @typescript-eslint/ban-types
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   __original: Function;
-}
-
-/**
- * An instrumentation library consists of the name and optional version
- * used to obtain a tracer or meter from a provider. This metadata is made
- * available on ReadableSpan and MetricRecord for use by the export pipeline.
- * @deprecated Use {@link InstrumentationScope} instead.
- */
-export interface InstrumentationLibrary {
-  readonly name: string;
-  readonly version?: string;
-  readonly schemaUrl?: string;
 }
 
 /**

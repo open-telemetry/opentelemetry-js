@@ -13,21 +13,29 @@ npm install --save @opentelemetry/opentelemetry-browser-detector
 ## Usage
 
 ```js
-import { Resource, detectResources } from '@opentelemetry/resources';
-import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { resourceFromAttributes, detectResources } from '@opentelemetry/resources';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { browserDetector } from '@opentelemetry/opentelemetry-browser-detector';
 
 async function start(){
-  let resource= new Resource({
-    [SEMRESATTRS_SERVICE_NAME]: 'Test App Name',
+  let resource = resourceFromAttributes({
+    [ATTR_SERVICE_NAME]: 'Test App Name',
   });
   let detectedResources= await detectResources({detectors:[browserDetector]});
   resource=resource.merge(detectedResources);
   const provider = new WebTracerProvider({
-    resource
+    resource,
+    spanProcessors: [
+      new BatchSpanProcessor(
+        new OTLPTraceExporter({ url:CONF.url, headers: {} }),
+        {
+          exportTimeoutMillis: CONF.timeOutMillis,
+          scheduledDelayMillis:CONF.delayMillis
+        }
+      )
+    ]
   });
 
-  provider.addSpanProcessor(new BatchSpanProcessor(new OTLPTraceExporter( {url:CONF.url ,headers:{}}),{exportTimeoutMillis:CONF.timeOutMillis,scheduledDelayMillis:CONF.delayMillis}));
   provider.register({
     // Changing default contextManager to use ZoneContextManager - supports asynchronous operations - optional
     contextManager: new ZoneContextManager(),

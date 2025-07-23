@@ -23,37 +23,35 @@ import {
   trace,
   ProxyTracerProvider,
 } from '@opentelemetry/api';
-import {
-  AsyncHooksContextManager,
-  AsyncLocalStorageContextManager,
-} from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { CompositePropagator } from '@opentelemetry/core';
 import { NodeTracerProvider } from '../src';
-import * as semver from 'semver';
 
-const assertInstanceOf = (actual: object, ExpectedInstance: Function) => {
+// Here we are looking for a `AnyConstructor` type, and `Function` is a close
+// enough approximation that exists in the standard library.
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+const assertInstanceOf = (actual: object, ExpectedConstructor: Function) => {
   assert.ok(
-    actual instanceof ExpectedInstance,
-    `Expected ${inspect(actual)} to be instance of ${ExpectedInstance.name}`
+    actual instanceof ExpectedConstructor,
+    `Expected ${inspect(actual)} to be instance of ${ExpectedConstructor.name}`
   );
 };
 
-const DefaultContextManager = semver.gte(process.version, '14.8.0')
-  ? AsyncLocalStorageContextManager
-  : AsyncHooksContextManager;
-
-describe('API registration', () => {
+describe('API registration', function () {
   beforeEach(() => {
     context.disable();
     trace.disable();
     propagation.disable();
   });
 
-  it('should register default implementations', () => {
+  it('should register default implementations', function () {
     const tracerProvider = new NodeTracerProvider();
     tracerProvider.register();
 
-    assertInstanceOf(context['_getContextManager'](), DefaultContextManager);
+    assertInstanceOf(
+      context['_getContextManager'](),
+      AsyncLocalStorageContextManager
+    );
     assertInstanceOf(
       propagation['_getGlobalPropagator'](),
       CompositePropagator
@@ -63,10 +61,13 @@ describe('API registration', () => {
     assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 
-  it('should register configured implementations', () => {
+  it('should register configured implementations', function () {
     const tracerProvider = new NodeTracerProvider();
 
-    const mockContextManager = { disable() {} } as any;
+    const mockContextManager = {
+      enable() {},
+      disable() {},
+    } as any;
     const mockPropagator = {} as any;
 
     tracerProvider.register({
@@ -81,7 +82,7 @@ describe('API registration', () => {
     assert.strictEqual(apiTracerProvider.getDelegate(), tracerProvider);
   });
 
-  it('should skip null context manager', () => {
+  it('should skip null context manager', function () {
     const tracerProvider = new NodeTracerProvider();
     const ctxManager = context['_getContextManager']();
     tracerProvider.register({
@@ -103,7 +104,7 @@ describe('API registration', () => {
     assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 
-  it('should skip null propagator', () => {
+  it('should skip null propagator', function () {
     const propagator = propagation['_getGlobalPropagator']();
 
     const tracerProvider = new NodeTracerProvider();
@@ -113,7 +114,10 @@ describe('API registration', () => {
 
     assert.strictEqual(propagation['_getGlobalPropagator'](), propagator);
 
-    assertInstanceOf(context['_getContextManager'](), DefaultContextManager);
+    assertInstanceOf(
+      context['_getContextManager'](),
+      AsyncLocalStorageContextManager
+    );
 
     const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
     assert.ok(apiTracerProvider.getDelegate() === tracerProvider);

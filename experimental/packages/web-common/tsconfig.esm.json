@@ -1,0 +1,28 @@
+{
+  "extends": "../../../tsconfig.base.esm.json",
+  "compilerOptions": {
+    "outDir": "build/esm",
+    "rootDir": "src",
+    "tsBuildInfoFile": "build/esm/tsconfig.esm.tsbuildinfo"
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../../../api"
+    },
+    {
+      "path": "../../../packages/opentelemetry-sdk-trace-base"
+    },
+    {
+      "path": "../../../semantic-conventions"
+    },
+    {
+      "path": "../api-logs"
+    },
+    {
+      "path": "../sdk-logs"
+    }
+  ]
+}

@@ -29,8 +29,9 @@ describe('InMemorySpanExporter', () => {
 
   beforeEach(() => {
     memoryExporter = new InMemorySpanExporter();
-    provider = new BasicTracerProvider();
-    provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    provider = new BasicTracerProvider({
+      spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+    });
   });
 
   it('should get finished spans', () => {
@@ -62,8 +63,14 @@ describe('InMemorySpanExporter', () => {
       span2.spanContext().traceId,
       span3.spanContext().traceId
     );
-    assert.strictEqual(span1.parentSpanId, span2.spanContext().spanId);
-    assert.strictEqual(span2.parentSpanId, span3.spanContext().spanId);
+    assert.strictEqual(
+      span1.parentSpanContext?.spanId,
+      span2.spanContext().spanId
+    );
+    assert.strictEqual(
+      span2.parentSpanContext?.spanId,
+      span3.spanContext().spanId
+    );
   });
 
   it('should shutdown the exporter', () => {
@@ -91,6 +98,21 @@ describe('InMemorySpanExporter', () => {
       memoryExporter = new InMemorySpanExporter();
       await memoryExporter.forceFlush();
     });
+  });
+
+  it('should reset spans when reset is called', () => {
+    const root = provider.getTracer('default').startSpan('root');
+
+    provider
+      .getTracer('default')
+      .startSpan('child', {}, trace.setSpan(context.active(), root))
+      .end();
+    root.end();
+    assert.strictEqual(memoryExporter.getFinishedSpans().length, 2);
+
+    memoryExporter.reset();
+
+    assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
   });
 
   it('should return the success result', () => {

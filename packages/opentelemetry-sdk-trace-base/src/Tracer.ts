@@ -16,19 +16,18 @@
 
 import * as api from '@opentelemetry/api';
 import {
-  InstrumentationLibrary,
+  InstrumentationScope,
   sanitizeAttributes,
   isTracingSuppressed,
 } from '@opentelemetry/core';
-import { IResource } from '@opentelemetry/resources';
-import { BasicTracerProvider } from './BasicTracerProvider';
-import { Span } from './Span';
+import { SpanImpl } from './Span';
 import { GeneralLimits, SpanLimits, TracerConfig } from './types';
 import { mergeConfig } from './utility';
 import { SpanProcessor } from './SpanProcessor';
 import { Sampler } from './Sampler';
 import { IdGenerator } from './IdGenerator';
 import { RandomIdGenerator } from './platform';
+import { Resource } from '@opentelemetry/resources';
 
 /**
  * This class represents a basic tracer.
@@ -38,24 +37,28 @@ export class Tracer implements api.Tracer {
   private readonly _generalLimits: GeneralLimits;
   private readonly _spanLimits: SpanLimits;
   private readonly _idGenerator: IdGenerator;
-  readonly resource: IResource;
-  readonly instrumentationLibrary: InstrumentationLibrary;
+  readonly instrumentationScope: InstrumentationScope;
+
+  private readonly _resource: Resource;
+  private readonly _spanProcessor: SpanProcessor;
 
   /**
    * Constructs a new Tracer instance.
    */
   constructor(
-    instrumentationLibrary: InstrumentationLibrary,
+    instrumentationScope: InstrumentationScope,
     config: TracerConfig,
-    private _tracerProvider: BasicTracerProvider
+    resource: Resource,
+    spanProcessor: SpanProcessor
   ) {
     const localConfig = mergeConfig(config);
     this._sampler = localConfig.sampler;
     this._generalLimits = localConfig.generalLimits;
     this._spanLimits = localConfig.spanLimits;
     this._idGenerator = config.idGenerator || new RandomIdGenerator();
-    this.resource = _tracerProvider.resource;
-    this.instrumentationLibrary = instrumentationLibrary;
+    this._resource = resource;
+    this._spanProcessor = spanProcessor;
+    this.instrumentationScope = instrumentationScope;
   }
 
   /**
@@ -83,9 +86,9 @@ export class Tracer implements api.Tracer {
 
     const parentSpanContext = parentSpan?.spanContext();
     const spanId = this._idGenerator.generateSpanId();
+    let validParentSpanContext;
     let traceId;
     let traceState;
-    let parentSpanId;
     if (
       !parentSpanContext ||
       !api.trace.isSpanContextValid(parentSpanContext)
@@ -96,7 +99,7 @@ export class Tracer implements api.Tracer {
       // New child span.
       traceId = parentSpanContext.traceId;
       traceState = parentSpanContext.traceState;
-      parentSpanId = parentSpanContext.spanId;
+      validParentSpanContext = parentSpanContext;
     }
 
     const spanKind = options.kind ?? api.SpanKind.INTERNAL;
@@ -138,18 +141,20 @@ export class Tracer implements api.Tracer {
       Object.assign(attributes, samplingResult.attributes)
     );
 
-    const span = new Span(
-      this,
+    const span = new SpanImpl({
+      resource: this._resource,
+      scope: this.instrumentationScope,
       context,
-      name,
       spanContext,
-      spanKind,
-      parentSpanId,
+      name,
+      kind: spanKind,
       links,
-      options.startTime,
-      undefined,
-      initAttributes
-    );
+      parentSpanContext: validParentSpanContext,
+      attributes: initAttributes,
+      startTime: options.startTime,
+      spanProcessor: this._spanProcessor,
+      spanLimits: this._spanLimits,
+    });
     return span;
   }
 
@@ -249,9 +254,5 @@ export class Tracer implements api.Tracer {
   /** Returns the active {@link SpanLimits}. */
   getSpanLimits(): SpanLimits {
     return this._spanLimits;
-  }
-
-  getActiveSpanProcessor(): SpanProcessor {
-    return this._tracerProvider.getActiveSpanProcessor();
   }
 }

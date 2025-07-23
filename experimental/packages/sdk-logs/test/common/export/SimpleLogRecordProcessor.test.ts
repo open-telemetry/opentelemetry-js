@@ -21,26 +21,30 @@ import {
   loggingErrorHandler,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
-import { Resource, ResourceAttributes } from '@opentelemetry/resources';
-import { Resource as Resource190 } from '@opentelemetry/resources_1.9.0';
+import {
+  defaultResource,
+  Resource,
+  resourceFromAttributes,
+} from '@opentelemetry/resources';
 
 import {
   InMemoryLogRecordExporter,
   LogRecordExporter,
   SimpleLogRecordProcessor,
-  LogRecord,
 } from './../../../src';
 import { LoggerProviderSharedState } from '../../../src/internal/LoggerProviderSharedState';
 import { reconfigureLimits } from '../../../src/config';
 import { TestExporterWithDelay } from './TestExporterWithDelay';
+import { LogRecordImpl } from '../../../src/LogRecordImpl';
 
 const setup = (exporter: LogRecordExporter, resource?: Resource) => {
   const sharedState = new LoggerProviderSharedState(
-    resource || Resource.default(),
+    resource || defaultResource(),
     Infinity,
-    reconfigureLimits({})
+    reconfigureLimits({}),
+    []
   );
-  const logRecord = new LogRecord(
+  const logRecord = new LogRecordImpl(
     sharedState,
     {
       name: 'test name',
@@ -119,12 +123,11 @@ describe('SimpleLogRecordProcessor', () => {
   describe('force flush', () => {
     it('should await unresolved resources', async () => {
       const exporter = new InMemoryLogRecordExporter();
-      const asyncResource = new Resource(
-        {},
-        new Promise<ResourceAttributes>(resolve => {
-          setTimeout(() => resolve({ async: 'fromasync' }), 1);
-        })
-      );
+      const asyncResource = resourceFromAttributes({
+        async: new Promise<string>(resolve =>
+          setTimeout(() => resolve('fromasync'), 1)
+        ),
+      });
       const { processor, logRecord } = setup(exporter, asyncResource);
       assert.strictEqual(exporter.getFinishedLogRecords().length, 0);
       processor.onEmit(logRecord);
@@ -141,12 +144,11 @@ describe('SimpleLogRecordProcessor', () => {
 
     it('should await doExport() and delete from _unresolvedExports', async () => {
       const testExporterWithDelay = new TestExporterWithDelay();
-      const asyncResource = new Resource(
-        {},
-        new Promise<ResourceAttributes>(resolve => {
-          setTimeout(() => resolve({ async: 'fromasync' }), 1);
-        })
-      );
+      const asyncResource = resourceFromAttributes({
+        async: new Promise<string>(resolve =>
+          setTimeout(() => resolve('fromasync'), 1)
+        ),
+      });
       const processor = new SimpleLogRecordProcessor(testExporterWithDelay);
       const { logRecord } = setup(testExporterWithDelay, asyncResource);
 
@@ -156,24 +158,6 @@ describe('SimpleLogRecordProcessor', () => {
       assert.strictEqual(processor['_unresolvedExports'].size, 0);
       const exportedLogRecords = testExporterWithDelay.getFinishedLogRecords();
       assert.strictEqual(exportedLogRecords.length, 1);
-    });
-  });
-
-  describe('compatibility', () => {
-    it('should export when using old resource implementation', async () => {
-      const exporter = new InMemoryLogRecordExporter();
-      const { processor, logRecord } = setup(
-        exporter,
-        new Resource190({ fromold: 'fromold' })
-      );
-      assert.strictEqual(exporter.getFinishedLogRecords().length, 0);
-      processor.onEmit(logRecord);
-      const exportedLogs = exporter.getFinishedLogRecords();
-      assert.strictEqual(exportedLogs.length, 1);
-      assert.strictEqual(
-        exportedLogs[0].resource.attributes['fromold'],
-        'fromold'
-      );
     });
   });
 });

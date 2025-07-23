@@ -389,9 +389,9 @@ describe('PrometheusExporter', () => {
 
       assert.deepStrictEqual(lines, [
         ...serializedDefaultResourceLines,
-        '# HELP metric_observable_counter a test description',
-        '# TYPE metric_observable_counter counter',
-        'metric_observable_counter{key1="attributeValue1"} 20',
+        '# HELP metric_observable_counter_total a test description',
+        '# TYPE metric_observable_counter_total counter',
+        'metric_observable_counter_total{key1="attributeValue1"} 20',
         '',
       ]);
     });
@@ -550,6 +550,40 @@ describe('PrometheusExporter', () => {
         '# HELP counter_total description missing',
         '# TYPE counter_total counter',
         `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
+        '',
+      ]);
+    });
+
+    it('should export a metric with all resource attributes', async () => {
+      exporter = new PrometheusExporter({
+        withResourceConstantLabels: /.*/,
+      });
+      setup(exporter);
+      const body = await request('http://localhost:9464/metrics');
+      const lines = body.split('\n');
+
+      assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
+        '# HELP counter_total description missing',
+        '# TYPE counter_total counter',
+        `counter_total{key1="attributeValue1",service_name="${serviceName}",telemetry_sdk_language="${sdkLanguage}",telemetry_sdk_name="${sdkName}",telemetry_sdk_version="${sdkVersion}"} 10`,
+        '',
+      ]);
+    });
+
+    it('should export a metric with two resource attributes', async () => {
+      exporter = new PrometheusExporter({
+        withResourceConstantLabels: /telemetry.sdk.language|telemetry.sdk.name/,
+      });
+      setup(exporter);
+      const body = await request('http://localhost:9464/metrics');
+      const lines = body.split('\n');
+
+      assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
+        '# HELP counter_total description missing',
+        '# TYPE counter_total counter',
+        `counter_total{key1="attributeValue1",telemetry_sdk_language="${sdkLanguage}",telemetry_sdk_name="${sdkName}"} 10`,
         '',
       ]);
     });

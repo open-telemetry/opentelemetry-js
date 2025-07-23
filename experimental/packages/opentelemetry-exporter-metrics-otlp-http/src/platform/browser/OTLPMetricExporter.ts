@@ -14,43 +14,25 @@
  * limitations under the License.
  */
 
-import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporterOptions } from '../../OTLPMetricExporterOptions';
 import { OTLPMetricExporterBase } from '../../OTLPMetricExporterBase';
-import {
-  OTLPExporterBrowserBase,
-  OTLPExporterConfigBase,
-} from '@opentelemetry/otlp-exporter-base';
-import {
-  IExportMetricsServiceResponse,
-  JsonMetricsSerializer,
-} from '@opentelemetry/otlp-transformer';
-
-const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/metrics';
-const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
-
-class OTLPExporterBrowserProxy extends OTLPExporterBrowserBase<
-  ResourceMetrics,
-  IExportMetricsServiceResponse
-> {
-  constructor(config?: OTLPMetricExporterOptions & OTLPExporterConfigBase) {
-    super(config, JsonMetricsSerializer, 'application/json');
-  }
-
-  getDefaultUrl(config: OTLPExporterConfigBase): string {
-    if (typeof config.url === 'string') {
-      return config.url;
-    }
-
-    return DEFAULT_COLLECTOR_URL;
-  }
-}
+import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { JsonMetricsSerializer } from '@opentelemetry/otlp-transformer';
+import { createLegacyOtlpBrowserExportDelegate } from '@opentelemetry/otlp-exporter-base/browser-http';
 
 /**
  * Collector Metric Exporter for Web
  */
-export class OTLPMetricExporter extends OTLPMetricExporterBase<OTLPExporterBrowserProxy> {
+export class OTLPMetricExporter extends OTLPMetricExporterBase {
   constructor(config?: OTLPExporterConfigBase & OTLPMetricExporterOptions) {
-    super(new OTLPExporterBrowserProxy(config), config);
+    super(
+      createLegacyOtlpBrowserExportDelegate(
+        config ?? {},
+        JsonMetricsSerializer,
+        'v1/metrics',
+        { 'Content-Type': 'application/json' }
+      ),
+      config
+    );
   }
 }

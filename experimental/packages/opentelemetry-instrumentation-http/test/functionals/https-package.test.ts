@@ -33,12 +33,9 @@ instrumentation.enable();
 instrumentation.disable();
 
 import * as http from 'http';
-import * as request from 'request-promise-native';
 import * as superagent from 'superagent';
-// Temporarily removed. See https://github.com/open-telemetry/opentelemetry-js/issues/3344
-// import * as got from 'got';
 import * as nock from 'nock';
-import axios, { AxiosResponse } from 'axios';
+import * as axios from 'axios';
 
 const memoryExporter = new InMemorySpanExporter();
 const customAttributeFunction = (span: Span): void => {
@@ -55,8 +52,9 @@ describe('Packages', () => {
     context.disable();
   });
   describe('get', () => {
-    const provider = new NodeTracerProvider();
-    provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    const provider = new NodeTracerProvider({
+      spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+    });
     instrumentation.setTracerProvider(provider);
     beforeEach(() => {
       memoryExporter.reset();
@@ -81,35 +79,16 @@ describe('Packages', () => {
     [
       { name: 'axios', httpPackage: axios }, //keep first
       { name: 'superagent', httpPackage: superagent },
-      // { name: 'got', httpPackage: { get: (url: string) => got(url) } },
-      {
-        name: 'request',
-        httpPackage: { get: (url: string) => request(url) },
-      },
     ].forEach(({ name, httpPackage }) => {
       it(`should create a span for GET requests and add propagation headers by using ${name} package`, async () => {
-        if (process.versions.node.startsWith('12') && name === 'got') {
-          // got complains with nock and node version 12+
-          // > RequestError: The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type function
-          // so let's make a real call
-          nock.cleanAll();
-          nock.enableNetConnect();
-        } else {
-          nock.load(path.join(__dirname, '../', '/fixtures/google-https.json'));
-        }
+        nock.load(path.join(__dirname, '../', '/fixtures/google-https.json'));
 
         const urlparsed = url.parse(
-          name === 'got' && process.versions.node.startsWith('12')
-            ? // there is an issue with got 9.6 version and node 12 when redirecting so url above will not work
-              // https://github.com/nock/nock/pull/1551
-              // https://github.com/sindresorhus/got/commit/bf1aa5492ae2bc78cbbec6b7d764906fb156e6c2#diff-707a4781d57c42085155dcb27edb9ccbR258
-              // TODO: check if this is still the case when new version
-              'https://www.google.com'
-            : 'https://www.google.com/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8'
+          'https://www.google.com/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8'
         );
         const result = await httpPackage.get(urlparsed.href!);
         if (!resHeaders) {
-          const res = result as AxiosResponse<unknown>;
+          const res = result as axios.AxiosResponse<unknown>;
           resHeaders = res.headers as any;
         }
         const spans = memoryExporter.getFinishedSpans();
@@ -130,13 +109,12 @@ describe('Packages', () => {
         switch (name) {
           case 'axios':
             assert.ok(
-              result.request._headers[DummyPropagation.TRACE_CONTEXT_KEY]
+              result.request.getHeader(DummyPropagation.TRACE_CONTEXT_KEY)
             );
             assert.ok(
-              result.request._headers[DummyPropagation.SPAN_CONTEXT_KEY]
+              result.request.getHeader(DummyPropagation.SPAN_CONTEXT_KEY)
             );
             break;
-          case 'got':
           case 'superagent':
             break;
           default:

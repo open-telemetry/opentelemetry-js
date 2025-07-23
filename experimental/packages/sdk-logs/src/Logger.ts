@@ -18,7 +18,7 @@ import type * as logsAPI from '@opentelemetry/api-logs';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import { context } from '@opentelemetry/api';
 
-import { LogRecord } from './LogRecord';
+import { LogRecordImpl } from './LogRecordImpl';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 
 export class Logger implements logsAPI.Logger {
@@ -34,7 +34,7 @@ export class Logger implements logsAPI.Logger {
      * the LogRecords it emits MUST automatically include the Trace Context from the active Context,
      * if Context has not been explicitly set.
      */
-    const logRecordInstance = new LogRecord(
+    const logRecordInstance = new LogRecordImpl(
       this._sharedState,
       this.instrumentationScope,
       {

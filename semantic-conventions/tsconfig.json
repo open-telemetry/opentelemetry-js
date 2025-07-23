@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": [
+      "es2017"
+    ],
+    "outDir": "build",
+    "rootDir": ".",
+    "target": "es2017"
+  },
+  "files": [],
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ],
+  "references": []
+}

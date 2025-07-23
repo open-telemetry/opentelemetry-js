@@ -50,6 +50,7 @@ import {
 import { assertPropagation, assertSpan } from './utils/assertionUtils';
 import { promisify } from 'util';
 import type { GrpcInstrumentation } from '../src';
+import { SemconvStability } from '@opentelemetry/instrumentation';
 import * as path from 'path';
 
 const PROTO_PATH = path.resolve(__dirname, './fixtures/grpc-test.proto');
@@ -80,7 +81,7 @@ type TestGrpcClient = Client & {
 interface TestGrpcCall {
   description: string;
   methodName: string;
-  method: Function;
+  method: (...args: any[]) => unknown;
   request: TestRequestResponse | TestRequestResponse[];
   result: TestRequestResponse | TestRequestResponse[];
   metadata?: Metadata;
@@ -106,8 +107,8 @@ const checkEqual =
     x instanceof Array && y instanceof Array
       ? arrayIsEqual(requestEqual)(x as any)(y as any)
       : !(x instanceof Array) && !(y instanceof Array)
-      ? requestEqual(x)(y)
-      : false;
+        ? requestEqual(x)(y)
+        : false;
 
 const replicate = (request: TestRequestResponse) => {
   const result: TestRequestResponse[] = [];
@@ -149,14 +150,16 @@ export async function startServer(proto: any, port: number) {
 
       call.sendMetadata(serverMetadata);
 
-      call.request.num <= MAX_ERROR_STATUS
-        ? callback(
-            getError(
-              'Unary Method with Metadata Error',
-              call.request.num
-            ) as ServiceError
-          )
-        : callback(null, { num: call.request.num });
+      if (call.request.num <= MAX_ERROR_STATUS) {
+        callback(
+          getError(
+            'Unary Method with Metadata Error',
+            call.request.num
+          ) as ServiceError
+        );
+      } else {
+        callback(null, { num: call.request.num });
+      }
     },
 
     // This method returns the request
@@ -164,11 +167,13 @@ export async function startServer(proto: any, port: number) {
       call: ServerUnaryCall<any, any>,
       callback: requestCallback<any>
     ) {
-      call.request.num <= MAX_ERROR_STATUS
-        ? callback(
-            getError('Unary Method Error', call.request.num) as ServiceError
-          )
-        : callback(null, { num: call.request.num });
+      if (call.request.num <= MAX_ERROR_STATUS) {
+        callback(
+          getError('Unary Method Error', call.request.num) as ServiceError
+        );
+      } else {
+        callback(null, { num: call.request.num });
+      }
     },
 
     // This method returns the request
@@ -176,11 +181,13 @@ export async function startServer(proto: any, port: number) {
       call: ServerUnaryCall<any, any>,
       callback: requestCallback<any>
     ) {
-      call.request.num <= MAX_ERROR_STATUS
-        ? callback(
-            getError('Unary Method Error', call.request.num) as ServiceError
-          )
-        : callback(null, { num: call.request.num });
+      if (call.request.num <= MAX_ERROR_STATUS) {
+        callback(
+          getError('Unary Method Error', call.request.num) as ServiceError
+        );
+      } else {
+        callback(null, { num: call.request.num });
+      }
     },
 
     // This method sums the requests
@@ -199,9 +206,11 @@ export async function startServer(proto: any, port: number) {
         }
       });
       call.on('end', () => {
-        hasError
-          ? callback(getError('Client Stream Method Error', code) as any)
-          : callback(null, { num: sum });
+        if (hasError) {
+          callback(getError('Client Stream Method Error', code) as any);
+        } else {
+          callback(null, { num: sum });
+        }
       });
     },
 
@@ -246,6 +255,38 @@ export async function startServer(proto: any, port: number) {
   server.start();
   return server;
 }
+
+export const runTestsWithSemconvStabilityLevels = (
+  plugin: GrpcInstrumentation,
+  moduleName: string,
+  grpcPort: number
+) => {
+  describe('GrpcInstrumentation with different semconvStability levels', () => {
+    describe('OLD semantic conventions', () => {
+      before(() => {
+        plugin['_semconvStability'] = SemconvStability.OLD;
+      });
+
+      runTests(plugin, moduleName, grpcPort);
+    });
+
+    describe('STABLE semantic conventions', () => {
+      before(() => {
+        plugin['_semconvStability'] = SemconvStability.STABLE;
+      });
+
+      runTests(plugin, moduleName, grpcPort);
+    });
+
+    describe('DUPLICATE semantic conventions', () => {
+      before(() => {
+        plugin['_semconvStability'] = SemconvStability.DUPLICATE;
+      });
+
+      runTests(plugin, moduleName, grpcPort);
+    });
+  });
+};
 
 export const runTests = (
   plugin: GrpcInstrumentation,
@@ -395,6 +436,7 @@ export const runTests = (
           bidiStream.write(element);
         });
 
+        assert.strictEqual(bidiStream.listenerCount('error'), 0);
         bidiStream.on('error', (err: ServiceError) => {
           reject(err);
         });
@@ -504,12 +546,24 @@ export const runTests = (
       const validations = {
         name: `grpc.pkg_test.GrpcTester/${methodName}`,
         status: GrpcStatus.OK,
-        netPeerName: 'localhost',
-        netPeerPort: grpcPort,
+        host: 'localhost',
+        port: grpcPort,
       };
 
-      assertSpan(moduleName, serverSpan, SpanKind.SERVER, validations);
-      assertSpan(moduleName, clientSpan, SpanKind.CLIENT, validations);
+      assertSpan(
+        moduleName,
+        serverSpan,
+        SpanKind.SERVER,
+        validations,
+        plugin['_semconvStability']
+      );
+      assertSpan(
+        moduleName,
+        clientSpan,
+        SpanKind.CLIENT,
+        validations,
+        plugin['_semconvStability']
+      );
 
       assertPropagation(serverSpan, clientSpan);
 
@@ -621,7 +675,7 @@ export const runTests = (
                 );
                 assert.strictEqual(
                   rootSpan.spanContext().spanId,
-                  clientSpan.parentSpanId
+                  clientSpan.parentSpanContext?.spanId
                 );
               }
             })
@@ -688,13 +742,25 @@ export const runTests = (
             const validations = {
               name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
               status: errorCode,
-              netPeerName: 'localhost',
-              netPeerPort: grpcPort,
+              host: 'localhost',
+              port: grpcPort,
             };
             const serverRoot = spans[0];
             const clientRoot = spans[1];
-            assertSpan(moduleName, serverRoot, SpanKind.SERVER, validations);
-            assertSpan(moduleName, clientRoot, SpanKind.CLIENT, validations);
+            assertSpan(
+              moduleName,
+              serverRoot,
+              SpanKind.SERVER,
+              validations,
+              plugin['_semconvStability']
+            );
+            assertSpan(
+              moduleName,
+              clientRoot,
+              SpanKind.CLIENT,
+              validations,
+              plugin['_semconvStability']
+            );
             assertPropagation(serverRoot, clientRoot);
           });
       });
@@ -727,11 +793,23 @@ export const runTests = (
               const validations = {
                 name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
                 status: errorCode,
-                netPeerName: 'localhost',
-                netPeerPort: grpcPort,
+                host: 'localhost',
+                port: grpcPort,
               };
-              assertSpan(moduleName, serverSpan, SpanKind.SERVER, validations);
-              assertSpan(moduleName, clientSpan, SpanKind.CLIENT, validations);
+              assertSpan(
+                moduleName,
+                serverSpan,
+                SpanKind.SERVER,
+                validations,
+                plugin['_semconvStability']
+              );
+              assertSpan(
+                moduleName,
+                clientSpan,
+                SpanKind.CLIENT,
+                validations,
+                plugin['_semconvStability']
+              );
               assertPropagation(serverSpan, clientSpan);
               assert.strictEqual(
                 rootSpan.spanContext().traceId,
@@ -739,7 +817,7 @@ export const runTests = (
               );
               assert.strictEqual(
                 rootSpan.spanContext().spanId,
-                clientSpan.parentSpanId
+                clientSpan.parentSpanContext?.spanId
               );
             });
         });
@@ -755,8 +833,9 @@ export const runTests = (
     };
 
     describe('enable()', () => {
-      const provider = new NodeTracerProvider();
-      provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+      const provider = new NodeTracerProvider({
+        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      });
       beforeEach(() => {
         memoryExporter.reset();
       });
@@ -799,8 +878,9 @@ export const runTests = (
     });
 
     describe('disable()', () => {
-      const provider = new NodeTracerProvider();
-      provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+      const provider = new NodeTracerProvider({
+        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      });
       beforeEach(() => {
         memoryExporter.reset();
       });
@@ -830,8 +910,9 @@ export const runTests = (
     });
 
     describe('Test filtering requests using metadata', () => {
-      const provider = new NodeTracerProvider();
-      provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+      const provider = new NodeTracerProvider({
+        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      });
       beforeEach(() => {
         memoryExporter.reset();
       });
@@ -859,7 +940,9 @@ export const runTests = (
     });
 
     describe('Test filtering requests using options', () => {
-      const provider = new NodeTracerProvider();
+      const provider = new NodeTracerProvider({
+        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      });
       const checkSpans: { [key: string]: boolean } = {
         unaryMethod: false,
         UnaryMethod: false,
@@ -868,7 +951,6 @@ export const runTests = (
         ServerStreamMethod: true,
         BidiStreamMethod: false,
       };
-      provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
       beforeEach(() => {
         memoryExporter.reset();
       });
@@ -936,8 +1018,9 @@ export const runTests = (
     });
 
     describe('Test capturing metadata', () => {
-      const provider = new NodeTracerProvider();
-      provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+      const provider = new NodeTracerProvider({
+        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      });
 
       const clientMetadata = new Metadata();
       clientMetadata.add('client_metadata_key', 'client_metadata_value');

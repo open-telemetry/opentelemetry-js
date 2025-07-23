@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, MetricAttributes } from '@opentelemetry/api';
-import { Maybe } from '../utils';
+import { Context, HrTime, Attributes } from '@opentelemetry/api';
+import { Maybe, hashAttributes } from '../utils';
 import { Accumulation, Aggregator } from '../aggregator/types';
 import { AttributeHashMap } from './HashMap';
 
@@ -31,19 +31,40 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
   // TODO: find a reasonable mean to clean the memo;
   // https://github.com/open-telemetry/opentelemetry-specification/pull/2208
   private _cumulativeMemoStorage = new AttributeHashMap<T>();
+  private _cardinalityLimit: number;
+  private _overflowAttributes = { 'otel.metric.overflow': true };
+  private _overflowHashCode: string;
 
-  constructor(private _aggregator: Aggregator<T>) {}
+  constructor(
+    private _aggregator: Aggregator<T>,
+    aggregationCardinalityLimit?: number
+  ) {
+    this._cardinalityLimit = (aggregationCardinalityLimit ?? 2000) - 1;
+    this._overflowHashCode = hashAttributes(this._overflowAttributes);
+  }
 
   record(
     value: number,
-    attributes: MetricAttributes,
+    attributes: Attributes,
     _context: Context,
     collectionTime: HrTime
   ) {
-    const accumulation = this._activeCollectionStorage.getOrDefault(
-      attributes,
-      () => this._aggregator.createAccumulation(collectionTime)
-    );
+    let accumulation = this._activeCollectionStorage.get(attributes);
+
+    if (!accumulation) {
+      if (this._activeCollectionStorage.size >= this._cardinalityLimit) {
+        const overflowAccumulation = this._activeCollectionStorage.getOrDefault(
+          this._overflowAttributes,
+          () => this._aggregator.createAccumulation(collectionTime)
+        );
+        overflowAccumulation?.record(value);
+        return;
+      }
+
+      accumulation = this._aggregator.createAccumulation(collectionTime);
+      this._activeCollectionStorage.set(attributes, accumulation);
+    }
+
     accumulation?.record(value);
   }
 
@@ -66,10 +87,25 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
             hashCode
           )!;
           delta = this._aggregator.diff(previous, accumulation);
+        } else {
+          // If the cardinality limit is reached, we need to change the attributes
+          if (this._cumulativeMemoStorage.size >= this._cardinalityLimit) {
+            attributes = this._overflowAttributes;
+            hashCode = this._overflowHashCode;
+            if (this._cumulativeMemoStorage.has(attributes, hashCode)) {
+              // has() returned true, previous is present.
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              const previous = this._cumulativeMemoStorage.get(
+                attributes,
+                hashCode
+              )!;
+              delta = this._aggregator.diff(previous, accumulation);
+            }
+          }
         }
         // Merge with uncollected active delta.
         if (this._activeCollectionStorage.has(attributes, hashCode)) {
-          // has() returned true, previous is present.
+          // has() returned true, active is present.
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const active = this._activeCollectionStorage.get(
             attributes,
@@ -92,6 +128,7 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
   collect() {
     const unreportedDelta = this._activeCollectionStorage;
     this._activeCollectionStorage = new AttributeHashMap();
+
     return unreportedDelta;
   }
 }

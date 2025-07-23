@@ -52,8 +52,8 @@ class FooInstrumentation extends InstrumentationBase {
   override disable() {}
 }
 
-describe('autoLoader', () => {
-  // eslint-disable-next-line @typescript-eslint/ban-types
+describe('autoLoader', function () {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   let unload: Function | undefined;
 
   afterEach(() => {
@@ -64,8 +64,8 @@ describe('autoLoader', () => {
     }
   });
 
-  describe('registerInstrumentations', () => {
-    describe('InstrumentationBase', () => {
+  describe('registerInstrumentations', function () {
+    describe('InstrumentationBase', function () {
       let instrumentation: InstrumentationBase;
       let enableSpy: sinon.SinonSpy;
       let setTracerProviderSpy: sinon.SinonSpy;
@@ -96,7 +96,7 @@ describe('autoLoader', () => {
         }
       });
 
-      it('should enable disabled instrumentation', () => {
+      it('should enable disabled instrumentation', function () {
         if (typeof unload === 'function') {
           unload();
           unload = undefined;
@@ -117,23 +117,23 @@ describe('autoLoader', () => {
         assert.strictEqual(enableSpy.callCount, 1);
       });
 
-      it('should NOT enable enabled instrumentation', () => {
+      it('should NOT enable enabled instrumentation', function () {
         assert.strictEqual(enableSpy.callCount, 0);
       });
 
-      it('should set TracerProvider', () => {
+      it('should set TracerProvider', function () {
         assert.strictEqual(setTracerProviderSpy.callCount, 1);
         assert.ok(setTracerProviderSpy.lastCall.args[0] === tracerProvider);
         assert.strictEqual(setTracerProviderSpy.lastCall.args.length, 1);
       });
 
-      it('should set MeterProvider', () => {
+      it('should set MeterProvider', function () {
         assert.strictEqual(setMeterProviderSpy.callCount, 1);
         assert.ok(setMeterProviderSpy.lastCall.args[0] === meterProvider);
         assert.strictEqual(setMeterProviderSpy.lastCall.args.length, 1);
       });
 
-      it('should set LoggerProvider', () => {
+      it('should set LoggerProvider', function () {
         assert.strictEqual(setLoggerProviderSpy.callCount, 1);
         assert.ok(setLoggerProviderSpy.lastCall.args[0] === loggerProvider);
         assert.strictEqual(setLoggerProviderSpy.lastCall.args.length, 1);

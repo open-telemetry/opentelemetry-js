@@ -1,0 +1,44 @@
+{%- import 'docstring.ts.j2' as d %}
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+//----------------------------------------------------------------------------------------------------------
+// DO NOT EDIT, this is an Auto-generated file from scripts/semconv/templates/registry/stable/attributes.ts.j2
+//----------------------------------------------------------------------------------------------------------
+
+{% for attribute in ctx.attributes | attribute_sort %}
+{% if attribute.name not in params.excluded_attributes %}
+{% if attribute is not stable %}
+{{d.docstring(attribute, "attribute")}}
+{% if attribute.type is not template_type %}
+export const ATTR_{{ attribute.name | screaming_snake_case }} = '{{attribute.name}}' as const;
+
+{% else %}
+export const ATTR_{{ attribute.name | screaming_snake_case }} = (key: string) => `{{attribute.name}}.${key}`;
+
+{% endif %}
+{% endif %}
+{% if attribute.type is mapping %}
+{% for member in attribute.type.members | sort(attribute='value') %}
+{% if member is not stable %}
+{{d.docstring_enum_value(member, attribute)}}
+export const {{ attribute.name | screaming_snake_case }}_VALUE_{{ member.id | screaming_snake_case }} = {{ member.value | print_member_value }} as const;
+
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% endfor %}

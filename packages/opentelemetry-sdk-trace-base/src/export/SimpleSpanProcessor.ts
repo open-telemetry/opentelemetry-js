@@ -20,13 +20,11 @@ import {
   ExportResultCode,
   globalErrorHandler,
   BindOnceFuture,
-  ExportResult,
 } from '@opentelemetry/core';
 import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
 import { ReadableSpan } from './ReadableSpan';
 import { SpanExporter } from './SpanExporter';
-import { Resource } from '@opentelemetry/resources';
 
 /**
  * An implementation of the {@link SpanProcessor} that converts the {@link Span}
@@ -38,16 +36,15 @@ import { Resource } from '@opentelemetry/resources';
  */
 export class SimpleSpanProcessor implements SpanProcessor {
   private _shutdownOnce: BindOnceFuture<void>;
-  private _unresolvedExports: Set<Promise<void>>;
+  private _pendingExports: Set<Promise<void>>;
 
   constructor(private readonly _exporter: SpanExporter) {
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
-    this._unresolvedExports = new Set<Promise<void>>();
+    this._pendingExports = new Set<Promise<void>>();
   }
 
   async forceFlush(): Promise<void> {
-    // await unresolved resources before resolving
-    await Promise.all(Array.from(this._unresolvedExports));
+    await Promise.all(Array.from(this._pendingExports));
     if (this._exporter.forceFlush) {
       await this._exporter.forceFlush();
     }
@@ -64,43 +61,28 @@ export class SimpleSpanProcessor implements SpanProcessor {
       return;
     }
 
-    const doExport = () =>
-      internal
-        ._export(this._exporter, [span])
-        .then((result: ExportResult) => {
-          if (result.code !== ExportResultCode.SUCCESS) {
-            globalErrorHandler(
-              result.error ??
-                new Error(
-                  `SimpleSpanProcessor: span export failed (status ${result})`
-                )
-            );
-          }
-        })
-        .catch(error => {
-          globalErrorHandler(error);
-        });
+    const pendingExport = this._doExport(span).catch(err =>
+      globalErrorHandler(err)
+    );
+    // Enqueue this export to the pending list so it can be flushed by the user.
+    this._pendingExports.add(pendingExport);
+    void pendingExport.finally(() =>
+      this._pendingExports.delete(pendingExport)
+    );
+  }
 
-    // Avoid scheduling a promise to make the behavior more predictable and easier to test
+  private async _doExport(span: ReadableSpan): Promise<void> {
     if (span.resource.asyncAttributesPending) {
-      const exportPromise = (span.resource as Resource)
-        .waitForAsyncAttributes?.()
-        .then(
-          () => {
-            if (exportPromise != null) {
-              this._unresolvedExports.delete(exportPromise);
-            }
-            return doExport();
-          },
-          err => globalErrorHandler(err)
-        );
+      // Ensure resource is fully resolved before exporting.
+      await span.resource.waitForAsyncAttributes?.();
+    }
 
-      // store the unresolved exports
-      if (exportPromise != null) {
-        this._unresolvedExports.add(exportPromise);
-      }
-    } else {
-      void doExport();
+    const result = await internal._export(this._exporter, [span]);
+    if (result.code !== ExportResultCode.SUCCESS) {
+      throw (
+        result.error ??
+        new Error(`SimpleSpanProcessor: span export failed (status ${result})`)
+      );
     }
   }
 

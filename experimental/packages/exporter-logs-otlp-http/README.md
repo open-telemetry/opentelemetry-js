@@ -5,7 +5,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides a logs-exporter for OTLP (http/json) using protocol version `v0.20.0`.
+This module provides a logs-exporter for OTLP (http/json) using protocol version `v1.7.0`.
 
 ## Installation
 
@@ -37,9 +37,9 @@ const collectorOptions = {
   concurrencyLimit: 1, // an optional limit on pending requests
 };
 const logExporter = new OTLPLogExporter(collectorOptions);
-const loggerProvider = new LoggerProvider();
-
-loggerProvider.addLogRecordProcessor(new BatchLogRecordProcessor(logExporter));
+const loggerProvider = new LoggerProvider({
+  processors: [new BatchRecordProcessor(logExporter)]
+});
 
 const logger = loggerProvider.getLogger('default', '1.0.0');
 // Emit a log
@@ -66,9 +66,9 @@ const collectorOptions = {
   concurrencyLimit: 1, // an optional limit on pending requests
 };
 const logExporter = new OTLPLogExporter(collectorOptions);
-const loggerProvider = new LoggerProvider();
-
-loggerProvider.addLogRecordProcessor(new BatchLogRecordProcessor(logExporter));
+const loggerProvider = new LoggerProvider({
+  processors: [new BatchRecordProcessor(logExporter)]
+});
 
 const logger = loggerProvider.getLogger('default', '1.0.0');
 // Emit a log

@@ -25,10 +25,8 @@ const {
   OTLPTraceExporter,
 } = require('@opentelemetry/exporter-trace-otlp-grpc');
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
-const { Resource } = require('@opentelemetry/resources');
-const {
-  SEMRESATTRS_SERVICE_NAME,
-} = require('@opentelemetry/semantic-conventions');
+const { resourceFromAttributes } = require('@opentelemetry/resources');
+const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 const { OpenCensusMetricProducer } = require('@opentelemetry/shim-opencensus');
 const instrumentationHttp = require('@opencensus/instrumentation-http');
 const { TracingBase } = require('@opencensus/nodejs-base');
@@ -45,28 +43,32 @@ module.exports = function setup(serviceName) {
   const tracing = new TracingBase(['http']);
   tracing.tracer = new oc.CoreTracer();
 
-  const resource = new Resource({
-    [SEMRESATTRS_SERVICE_NAME]: serviceName,
+  const resource = resourceFromAttributes({
+    [ATTR_SERVICE_NAME]: serviceName,
   });
-  const tracerProvider = new NodeTracerProvider({ resource });
-  tracerProvider.addSpanProcessor(
-    new BatchSpanProcessor(new OTLPTraceExporter(), {
-      scheduledDelayMillis: 5000,
-    })
-  );
+  const tracerProvider = new NodeTracerProvider({
+    resource,
+    spanProcessors: [
+      new BatchSpanProcessor(new OTLPTraceExporter(), {
+        scheduledDelayMillis: 5000,
+      }),
+    ],
+  });
   tracerProvider.register();
 
-  const meterProvider = new MeterProvider({ resource });
-  meterProvider.addMetricReader(
-    new PrometheusExporter({
-      metricProducers: [
-        new OpenCensusMetricProducer({
-          openCensusMetricProducerManager:
-            oc.Metrics.getMetricProducerManager(),
-        }),
-      ],
-    })
-  );
+  const meterProvider = new MeterProvider({
+    resource,
+    readers: [
+      new PrometheusExporter({
+        metricProducers: [
+          new OpenCensusMetricProducer({
+            openCensusMetricProducerManager:
+              oc.Metrics.getMetricProducerManager(),
+          }),
+        ],
+      }),
+    ],
+  });
   metrics.setGlobalMeterProvider(meterProvider);
 
   // Start OpenCensus tracing

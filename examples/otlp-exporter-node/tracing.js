@@ -1,8 +1,9 @@
 'use strict';
 
-const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
-const { Resource } = require('@opentelemetry/resources');
-const { SEMRESATTRS_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
+const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node')
+const { ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
+const { resourceFromAttributes } = require('@opentelemetry/resources');
+const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 const {
   diag,
   trace,
@@ -22,13 +23,15 @@ const exporter = new OTLPTraceExporter({
   // },
 });
 
-const provider = new BasicTracerProvider({
-  resource: new Resource({
-    [SEMRESATTRS_SERVICE_NAME]: 'basic-service',
+const provider = new NodeTracerProvider({
+  resource: resourceFromAttributes({
+    [ATTR_SERVICE_NAME]: 'basic-service',
   }),
+  spanProcessors: [
+    new SimpleSpanProcessor(exporter),
+    new SimpleSpanProcessor(new ConsoleSpanExporter()),
+  ]
 });
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
-provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.register();
 
 const tracer = trace.getTracer('example-otlp-exporter-node');

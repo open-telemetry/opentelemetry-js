@@ -18,7 +18,6 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
   ExportResultCode,
-  getEnv,
   loggingErrorHandler,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
@@ -26,13 +25,18 @@ import {
 import {
   BufferConfig,
   LogRecordLimits,
-  LogRecord,
+  SdkLogRecord,
   InMemoryLogRecordExporter,
 } from '../../../src';
 import { BatchLogRecordProcessorBase } from '../../../src/export/BatchLogRecordProcessorBase';
 import { reconfigureLimits } from '../../../src/config';
 import { LoggerProviderSharedState } from '../../../src/internal/LoggerProviderSharedState';
-import { Resource, ResourceAttributes } from '@opentelemetry/resources';
+import {
+  defaultResource,
+  Resource,
+  resourceFromAttributes,
+} from '@opentelemetry/resources';
+import { LogRecordImpl } from '../../../src/LogRecordImpl';
 
 class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BufferConfig> {
   onInit() {}
@@ -42,13 +46,14 @@ class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BufferConfig> 
 const createLogRecord = (
   limits?: LogRecordLimits,
   resource?: Resource
-): LogRecord => {
+): SdkLogRecord => {
   const sharedState = new LoggerProviderSharedState(
-    resource || Resource.default(),
+    resource || defaultResource(),
     Infinity,
-    reconfigureLimits(limits ?? {})
+    reconfigureLimits(limits ?? {}),
+    []
   );
-  const logRecord = new LogRecord(
+  const logRecord = new LogRecordImpl(
     sharedState,
     {
       name: 'test name',
@@ -113,26 +118,11 @@ describe('BatchLogRecordProcessorBase', () => {
     it('should create a BatchLogRecordProcessor instance with empty config', () => {
       const processor = new BatchLogRecordProcessor(exporter);
 
-      const {
-        OTEL_BSP_MAX_EXPORT_BATCH_SIZE,
-        OTEL_BSP_MAX_QUEUE_SIZE,
-        OTEL_BSP_SCHEDULE_DELAY,
-        OTEL_BSP_EXPORT_TIMEOUT,
-      } = getEnv();
       assert.ok(processor instanceof BatchLogRecordProcessor);
-      assert.strictEqual(
-        processor['_maxExportBatchSize'],
-        OTEL_BSP_MAX_EXPORT_BATCH_SIZE
-      );
-      assert.strictEqual(processor['_maxQueueSize'], OTEL_BSP_MAX_QUEUE_SIZE);
-      assert.strictEqual(
-        processor['_scheduledDelayMillis'],
-        OTEL_BSP_SCHEDULE_DELAY
-      );
-      assert.strictEqual(
-        processor['_exportTimeoutMillis'],
-        OTEL_BSP_EXPORT_TIMEOUT
-      );
+      assert.strictEqual(processor['_maxExportBatchSize'], 512);
+      assert.strictEqual(processor['_maxQueueSize'], 2048);
+      assert.strictEqual(processor['_scheduledDelayMillis'], 5000);
+      assert.strictEqual(processor['_exportTimeoutMillis'], 30000);
       processor.shutdown();
     });
 
@@ -314,12 +304,11 @@ describe('BatchLogRecordProcessorBase', () => {
 
     it('should wait for pending resource on flush', async () => {
       const processor = new BatchLogRecordProcessor(exporter);
-      const asyncResource = new Resource(
-        {},
-        new Promise<ResourceAttributes>(resolve => {
-          setTimeout(() => resolve({ async: 'fromasync' }), 1);
-        })
-      );
+      const asyncResource = resourceFromAttributes({
+        async: new Promise<string>(resolve =>
+          setTimeout(() => resolve('fromasync'), 1)
+        ),
+      });
       const logRecord = createLogRecord(undefined, asyncResource);
       processor.onEmit(logRecord);
       await processor.forceFlush();

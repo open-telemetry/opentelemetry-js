@@ -22,7 +22,7 @@
     "opentracing"
   ],
   "engines": {
-    "node": ">=14"
+    "node": "^18.19.0 || >=20.6.0"
   },
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
@@ -30,7 +30,7 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/api": "^1.0.2",
+    "@opentelemetry/api": "^1.3.0",
     "@opentelemetry/exporter-jaeger": "0.25.0",
     "@opentelemetry/exporter-zipkin": "0.25.0",
     "@opentelemetry/instrumentation": "0.25.0",

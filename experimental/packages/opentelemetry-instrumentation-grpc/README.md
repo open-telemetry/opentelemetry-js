@@ -31,9 +31,10 @@ const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
 const { GrpcInstrumentation } = require('@opentelemetry/instrumentation-grpc');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 
-const provider = new NodeTracerProvider();
+const provider = new NodeTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
+});
 
-provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.register();
 
 registerInstrumentations({
@@ -52,6 +53,45 @@ gRPC instrumentation accepts the following configuration:
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [`ignoreGrpcMethods`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-grpc/src/types.ts#L25)        | `IgnoreMatcher[]` | gRPC instrumentation will not trace any methods that match anything in this list. You may pass a string (case-insensitive match), a `RegExp` object, or a filter function.                                                                                                           |
 | [`metadataToSpanAttributes`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-grpc/src/types.ts#L27) | `object`          | List of case insensitive metadata to convert to span attributes. Client and server (outgoing requests, incoming responses) metadata attributes will be converted to span attributes in the form of `rpc.{request\response}.metadata.metadata_key`, e.g. `rpc.response.metadata.date` |
+
+## Semantic Conventions
+
+Up to and including v0.200.0, `instrumentation-grpc` generates telemetry using [Semantic Conventions v1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md).
+
+HTTP semantic conventions (semconv) were stabilized in v1.23.0, and a [migration process](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md#http-semantic-convention-stability-migration) was defined.
+`instrumentation-grpc` versions 0.201.0 and later include support for migrating to stable HTTP semantic conventions, as described below.
+The intent is to provide an approximate 6 month time window for users of this instrumentation to migrate to the new HTTP semconv, after which a new minor version will use the *new* semconv by default and drop support for the old semconv.
+See the [HTTP semconv migration plan for OpenTelemetry JS instrumentations](https://github.com/open-telemetry/opentelemetry-js/issues/5646).
+
+To select which semconv version(s) is emitted from this instrumentation, use the `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable.
+
+- `http`: emit the new (stable) v1.23.0 semantics
+- `http/dup`: emit **both** the old v1.7.0 and the new (stable) v1.23.0 semantics
+- By default, if `OTEL_SEMCONV_STABILITY_OPT_IN` includes neither of the above tokens, the old v1.7.0 semconv is used.
+
+### Attributes collected
+
+| v1.7.0 semconv  | v1.23.0 semconv  | Short Description                                          |
+| --------------- | ---------------- | ---------------------------------------------------------- |
+| `net.peer.name` | `server.address` | Server domain name if available without reverse DNS lookup |
+| `net.peer.port` | `server.port`    | Server port number                                         |
+
+| Attribute     | Short Description                                                                                  |
+| ------------- | -------------------------------------------------------------------------------------------------- |
+| `rpc.method`  | The name of the (logical) method being called, must be equal to the $method part in the span name. |
+| `rpc.service` | The full (logical) name of the service being called, including its package name, if applicable.    |
+| `rpc.system`  | A string identifying the remoting system.                                                          |
+
+### Upgrading Semantic Conventions
+
+When upgrading to the new semantic conventions, it is recommended to do so in the following order:
+
+1. Upgrade `@opentelemetry/instrumentation-grpc` to the latest version
+2. Set `OTEL_SEMCONV_STABILITY_OPT_IN=http/dup` to emit both old and new semantic conventions
+3. Modify alerts, dashboards, metrics, and other processes to expect the new semantic conventions
+4. Set `OTEL_SEMCONV_STABILITY_OPT_IN=http` to emit only the new semantic conventions
+
+This will cause both the old and new semantic conventions to be emitted during the transition period.
 
 ## Useful links
 

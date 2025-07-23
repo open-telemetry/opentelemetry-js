@@ -6,7 +6,7 @@ For a high-level overview of OpenTelemetry metrics in general and definitions of
 
 _Metrics API Specification: <https://github.com/open-telemetry/opentelemetry-specification/blob/v1.14.0/specification/metrics/api.md>_
 
-_Metrics API Reference: <https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_api.MetricsAPI.html>_
+_Metrics API Reference: <https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_api._opentelemetry_api.MetricsAPI.html>_
 
 - [Getting Started](#getting-started)
 - [Acquiring a Meter](#acquiring-a-meter)
@@ -71,28 +71,27 @@ const sdk = new opentelemetry.NodeSDK({
 
 // You can optionally detect resources asynchronously from the environment.
 // Detected resources are merged with the resources provided in the SDK configuration.
-sdk.start().then(() => {
-  // Resources have been detected and SDK is started
-  console.log(`SDK started`)
+sdk.start();
+// Resources have been detected and SDK is started
+console.log(`SDK started`)
 
 // Start the http server
-  const fastify = require('fastify')({
+const fastify = require('fastify')({
     logger: true
-  })
+})
 
-  fastify.get('/', function (request, reply) {
+fastify.get('/', function (request, reply) {
     reply.send({ hello: 'world' })
-  })
+})
 
-  fastify.listen({ port: 3000 }, function (err, address) {
+fastify.listen({ port: 3000 }, function (err, address) {
     if (err) {
-      fastify.log.error(err)
-      process.exit(1)
+        fastify.log.error(err)
+        process.exit(1)
     }
 
     console.log(`Server is now listening on ${address}`)
-  })
-});
+})
 
 // You can also use the shutdown method to gracefully shut down the SDK before process shutdown
 // or on some operating system signal.
@@ -159,35 +158,34 @@ const sdk = new opentelemetry.NodeSDK({
 
 // You can optionally detect resources asynchronously from the environment.
 // Detected resources are merged with the resources provided in the SDK configuration.
-sdk.start().then(() => {
-  // Resources have been detected and SDK is started
-  console.log(`SDK started`)
+sdk.start();
+// Resources have been detected and SDK is started
+console.log(`SDK started`)
 
-  // Create Meter with the name `http-server`
-  const appMeter = api.metrics.getMeter('http-server')
-  // Use the created Meter to create a counter instrument
-  const numberOfRequests = appMeter.createCounter('request-counter')
+// Create Meter with the name `http-server`
+const appMeter = api.metrics.getMeter('http-server')
+// Use the created Meter to create a counter instrument
+const numberOfRequests = appMeter.createCounter('request-counter')
 
-  // Start the http server
-  const fastify = require('fastify')({
+// Start the http server
+const fastify = require('fastify')({
     logger: true
-  })
+})
 
-  fastify.get('/', function (request, reply) {
+fastify.get('/', function (request, reply) {
     // Increase the counter by 1 each time the `/` endpoint is requested
     numberOfRequests.add(1)
     reply.send({ hello: 'world' })
-  })
+})
 
-  fastify.listen({ port: 3000 }, function (err, address) {
+fastify.listen({ port: 3000 }, function (err, address) {
     if (err) {
-      fastify.log.error(err)
-      process.exit(1)
+        fastify.log.error(err)
+        process.exit(1)
     }
 
     console.log(`Server is now listening on ${address}`)
-  })
-});
+})
 
 // You can also use the shutdown method to gracefully shut down the SDK before process shutdown
 // or on some operating system signal.
@@ -233,7 +231,7 @@ example you see that we accessed our `/` endpoint six times.
 
 ## Acquiring a Meter
 
-In OpenTelemetry, Instruments that allow for measurement operations are acquired through a _meter_. You can get a meter by calling [`getMeter`](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api.MeterProvider.html#getMeter) on the global meter provider. `getMeter` takes the name and version of the application or library acquiring the meter, and provides a meter which can be used to create instruments.
+In OpenTelemetry, Instruments that allow for measurement operations are acquired through a _meter_. You can get a meter by calling [`getMeter`](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api._opentelemetry_api.MeterProvider.html#getmeter) on the global meter provider. `getMeter` takes the name and version of the application or library acquiring the meter, and provides a meter which can be used to create instruments.
 
 ```typescript
 import { metrics } from '@opentelemetry/api';
@@ -243,7 +241,7 @@ const meter = metrics.getMeter("my-application", "0.1.0");
 
 ## Create a metric instrument
 
-In OpenTelemetry, all _metrics_ are composed of [`Instruments`](https://open-telemetry.github.io/opentelemetry-js/enums/_opentelemetry_sdk_metrics.InstrumentType.html). An instrument is responsible for reporting measurements,
+In OpenTelemetry, all _metrics_ are composed of [`Instruments`](https://open-telemetry.github.io/opentelemetry-js/enums/_opentelemetry_sdk-metrics.InstrumentType.html). An instrument is responsible for reporting measurements,
 there are four types of instruments that can be created:
 
 - Counter, a synchronous instrument which supports non-negative increments
@@ -253,7 +251,7 @@ there are four types of instruments that can be created:
 - UpDownCounter, a synchronous instrument which supports increments and decrements, such as number of active requests
 - Asynchronous UpDownCounter, an asynchronous instrument which supports increments and decrements
 
-You can create a Counter instrument by calling [`Meter#createCounter`](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api.Meter.html#createCounter). The only required argument to `createCounter` is the _instrument name_, which should describe the item that is being measurement.
+You can create a Counter instrument by calling [`Meter#createCounter`](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api._opentelemetry_api.Meter.html#createcounter). The only required argument to `createCounter` is the _instrument name_, which should describe the item that is being measurement.
 
 ```typescript
 const counter = meter.createCounter("events.counter");
@@ -295,10 +293,10 @@ can be used to information about the record measurement itself.
 
 ```typescript
 async function myTask() {
-  const httpServerDuration = meter.createHistogram("http.server.duration", {
-    description: 'A http server duration',
-    unit: 'milliseconds',
-    valueType: ValueType.INT
+  const httpServerDuration = meter.createHistogram("my.http.server.request.duration", {
+    description: 'HTTP server request duration',
+    unit: 's',
+    valueType: ValueType.DOUBLE
   });
   const startTime = new Date().getTime()
   try {
@@ -307,12 +305,12 @@ async function myTask() {
   } catch (err) {
   } finally {
     const endTime = new Date().getTime()
-    const executionTime = endTime - startTime
+    const executionTime = (endTime - startTime) / 1000
 
     httpServerDuration.record(executionTime, {
-      [SemanticAttributes.HTTP_METHOD]: 'POST',
-      [SemanticAttributes.HTTP_STATUS_CODE]: '200',
-      [SemanticAttributes.HTTP_SCHEME]: 'https',
+      [ATTR_HTTP_REQUEST_METHOD]: 'POST',
+      [ATTR_HTTP_RESPONSE_STATUS_CODE]: '200',
+      [ATTR_URL_SCHEME]: 'https',
     })
   }
 }
@@ -362,13 +360,15 @@ for the resulting metric. The first step is select to the metrics to whom the Vi
 is relevant, the second step is to configure the customizations for the the selected
 metrics.
 
-A Metric View is a class that can be instantiated via:
+A Metric View can be added to a `MeterProvider` like so
 
 ````typescript
-const view = new View({
-  name: 'metric-view', // optionally, give the view a unique name
-  // select instruments with a specific name
-  instrumentName: 'http.server.duration',
+new MeterProvider({
+  views: [{
+    name: 'metric-view', // optionally, give the view a unique name
+    // select instruments with a specific name
+    instrumentName: 'http.server.duration',
+  }]
 });
 ````
 
@@ -396,35 +396,37 @@ should be used to define the bucket sizes for the Histogram instrument.
 Below an example is given how you can define explicit buckets for a histogram.
 
 ```typescript
-// Define view for the histogram metric
-const histogramView = new View({
-  aggregation: new ExplicitBucketHistogramAggregation([0, 1, 5, 10, 15, 20, 25, 30]),
-  instrumentName: 'http.server.duration',
-  instrumentType: InstrumentType.HISTOGRAM,
-});
-
-// Note, the instrumentName is the same as the name that has been passed for
-// the Meter#createHistogram function
-
 // Create an instance of the metric provider
 const meterProvider = new MeterProvider({
   views: [
-    histogramView
+    // Define view for the histogram metric
+    {
+      aggregation: {
+        type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+        options: {
+          boundaries: [0, 1, 5, 10, 15, 20, 25, 30],
+        }
+      },
+      // Note, the instrumentName is the same as the name that has been passed for
+      // the Meter#createHistogram function
+      instrumentName: 'http.server.duration',
+      instrumentType: InstrumentType.HISTOGRAM,
+    }
   ]
 });
 
 // Create histogram metric
-const httpServerDuration = meter.createHistogram("http.server.duration", {
-  description: 'A http server duration',
-  unit: 'milliseconds',
-  valueType: ValueType.INT
+const httpServerDuration = meter.createHistogram('my.http.server.request.duration', {
+  description: 'HTTP server request duration',
+  unit: 's',
+  valueType: ValueType.DOUBLE
 });
 
 // Record measurement for histogram
 httpServerDuration.record(50, {
-  [SemanticAttributes.HTTP_METHOD]: 'POST',
-  [SemanticAttributes.HTTP_STATUS_CODE]: '200',
-  [SemanticAttributes.HTTP_SCHEME]: 'https',
+  [ATTR_HTTP_REQUEST_METHOD]: 'POST',
+  [ATTR_HTTP_RESPONSE_STATUS_CODE]: '200',
+  [ATTR_URL_SCHEME]: 'https',
 });
 ```
 
@@ -441,20 +443,20 @@ instruments with a specific name:
 The following view drops all instruments that are associated with a meter named `pubsub`:
 
 ```typescript
-const dropView = new View({
-  aggregation: new DropAggregation(),
+{
+  aggregation: { type: AggregationType.DROP },
   meterName: 'pubsub',
-});
+}
 ```
 
 Alternatively, you can also drop instruments with a specific instrument name,
 for example, all instruments of which the name starts with `http`:
 
 ```typescript
-const dropView = new View({
-  aggregation: new DropAggregation(),
+{
+  aggregation: { type: AggregationType.DROP },
   instrumentName: 'http*',
-});
+}
 ```
 
 ### Customizing the metric attributes of instrument
@@ -467,12 +469,12 @@ In the example below will drop all attributes except attribute `environment` for
 all instruments.
 
 ```typescript
-new View({
+{
   // only export the attribute 'environment'
   attributeKeys: ['environment'],
   // apply the view to all instruments
   instrumentName: '*',
-})
+}
 ```
 
 ## Exporting measurements
@@ -483,7 +485,7 @@ that are used are Prometheus and OTLP.
 
 The latter is the [OpenTelemetry protocol format](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md)
 which is supported by the OpenTelemetry Collector. The former is based on the [OpenMetrics
-format](https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md) can be consumed by Prometheus and Thanos or other OpenMetrics compatible
+format](https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md) can be consumed by Prometheus and Thanos or other OpenMetrics compatible
 backends.
 
 _Note_: Both OpenTelemetry JavaScript and OpenTelemetry Collector support
@@ -504,8 +506,9 @@ const options = { port: 9464 };
 const exporter = new PrometheusExporter(options);
 
 // Creates MeterProvider and installs the exporter as a MetricReader
-const meterProvider = new MeterProvider();
-meterProvider.addMetricReader(exporter);
+const meterProvider = new MeterProvider({
+  readers: [exporter],
+});
 const meter = meterProvider.getMeter('example-prometheus');
 
 // Now, start recording data
@@ -520,7 +523,7 @@ a new http server on port 9464. You can now access the metrics at the endpoint
 <http://localhost:9464/metrics>. This is the URL that can be scraped by Prometheus so it can consumed the metrics collected by OpenTelemetry in your application.
 
 More information about Prometheus and how to configure can be found at:
-[https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config](Prometheus Scraping Config)
+[Prometheus Scraping Config](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config)
 
 For a fully functioning code example for using this exporter, please have a look
 at: <https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/examples/prometheus>
@@ -541,12 +544,14 @@ const collectorOptions = {
   concurrencyLimit: 1, // an optional limit on pending requests
 };
 const exporter = new OTLPMetricExporter(collectorOptions);
-const meterProvider = new MeterProvider({});
-
-meterProvider.addMetricReader(new PeriodicExportingMetricReader({
-  exporter: metricExporter,
-  exportIntervalMillis: 1000,
-}));
+const meterProvider = new MeterProvider({
+  readers: [
+    new PeriodicExportingMetricReader({
+      exporter,
+      exportIntervalMillis: 1000,
+    }),
+  ],
+});
 
 // Now, start recording data
 const meter = meterProvider.getMeter('example-meter');

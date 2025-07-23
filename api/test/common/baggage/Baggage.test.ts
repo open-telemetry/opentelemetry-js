@@ -22,15 +22,15 @@ import {
   baggageEntryMetadataFromString,
 } from '../../../src';
 
-describe('Baggage', () => {
-  describe('create', () => {
-    it('should create an empty bag', () => {
+describe('Baggage', function () {
+  describe('create', function () {
+    it('should create an empty bag', function () {
       const bag = propagation.createBaggage();
 
       assert.deepStrictEqual(bag.getAllEntries(), []);
     });
 
-    it('should create a bag with entries', () => {
+    it('should create a bag with entries', function () {
       const meta = baggageEntryMetadataFromString('opaque string');
       const bag = propagation.createBaggage({
         key1: { value: 'value1' },
@@ -44,22 +44,24 @@ describe('Baggage', () => {
     });
   });
 
-  describe('get', () => {
-    it('should not allow modification of returned entries', () => {
+  describe('get', function () {
+    it('should not allow modification of returned entries', function () {
       const bag = propagation
         .createBaggage()
         .setEntry('key', { value: 'value' });
 
       const entry = bag.getEntry('key');
       assert.ok(entry);
-      entry.value = 'mutated';
+      if (entry) {
+        entry.value = 'mutated';
+      }
 
       assert.strictEqual(bag.getEntry('key')?.value, 'value');
     });
   });
 
-  describe('set', () => {
-    it('should create a new bag when an entry is added', () => {
+  describe('set', function () {
+    it('should create a new bag when an entry is added', function () {
       const bag = propagation.createBaggage();
 
       const bag2 = bag.setEntry('key', { value: 'value' });
@@ -72,8 +74,8 @@ describe('Baggage', () => {
     });
   });
 
-  describe('remove', () => {
-    it('should create a new bag when an entry is removed', () => {
+  describe('remove', function () {
+    it('should create a new bag when an entry is removed', function () {
       const bag = propagation.createBaggage({
         key: { value: 'value' },
       });
@@ -87,7 +89,7 @@ describe('Baggage', () => {
       assert.deepStrictEqual(bag2.getAllEntries(), []);
     });
 
-    it('should create an empty bag multiple keys are removed', () => {
+    it('should create an empty bag multiple keys are removed', function () {
       const bag = propagation.createBaggage({
         key: { value: 'value' },
         key1: { value: 'value1' },
@@ -107,7 +109,7 @@ describe('Baggage', () => {
       ]);
     });
 
-    it('should create an empty bag when it cleared', () => {
+    it('should create an empty bag when it cleared', function () {
       const bag = propagation.createBaggage({
         key: { value: 'value' },
         key1: { value: 'value1' },
@@ -124,8 +126,8 @@ describe('Baggage', () => {
     });
   });
 
-  describe('context', () => {
-    it('should set and get a baggage from a context', () => {
+  describe('context', function () {
+    it('should set and get a baggage from a context', function () {
       const bag = propagation.createBaggage();
 
       const ctx = propagation.setBaggage(ROOT_CONTEXT, bag);
@@ -133,7 +135,7 @@ describe('Baggage', () => {
       assert.strictEqual(bag, propagation.getBaggage(ctx));
     });
 
-    it('should get the current baggage', () => {
+    it('should get the current baggage', function () {
       const entries = {
         banana: { value: 'boats' },
       };
@@ -151,21 +153,21 @@ describe('Baggage', () => {
     });
   });
 
-  describe('metadata', () => {
-    it('should create an opaque object which returns the string unchanged', () => {
+  describe('metadata', function () {
+    it('should create an opaque object which returns the string unchanged', function () {
       const meta = baggageEntryMetadataFromString('this is a string');
 
       assert.strictEqual(meta.toString(), 'this is a string');
     });
 
-    it('should return an empty string if input is invalid', () => {
+    it('should return an empty string if input is invalid', function () {
       //@ts-expect-error only accepts string values
       const meta = baggageEntryMetadataFromString(1);
 
       assert.strictEqual(meta.toString(), '');
     });
 
-    it('should retain metadata', () => {
+    it('should retain metadata', function () {
       const bag = propagation.createBaggage({
         key: {
           value: 'value',

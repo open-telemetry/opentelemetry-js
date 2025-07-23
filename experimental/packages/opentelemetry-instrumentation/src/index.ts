@@ -18,6 +18,18 @@ export { registerInstrumentations } from './autoLoader';
 export { InstrumentationBase } from './platform/index';
 export { InstrumentationNodeModuleDefinition } from './instrumentationNodeModuleDefinition';
 export { InstrumentationNodeModuleFile } from './instrumentationNodeModuleFile';
-export * from './types';
-export * from './types_internal';
-export * from './utils';
+export type {
+  Instrumentation,
+  InstrumentationConfig,
+  InstrumentationModuleDefinition,
+  InstrumentationModuleFile,
+  ShimWrapped,
+  SpanCustomizationHook,
+} from './types';
+export type { AutoLoaderOptions, AutoLoaderResult } from './types_internal';
+export {
+  isWrapped,
+  safeExecuteInTheMiddle,
+  safeExecuteInTheMiddleAsync,
+} from './utils';
+export { SemconvStability, semconvStabilityFromStr } from './semconvStability';

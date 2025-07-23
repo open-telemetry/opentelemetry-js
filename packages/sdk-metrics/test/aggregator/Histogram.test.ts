@@ -33,7 +33,7 @@ describe('HistogramAggregator', () => {
     it('no exceptions on createAccumulation', () => {
       const aggregator = new HistogramAggregator([1, 10, 100], true);
       const accumulation = aggregator.createAccumulation([0, 0]);
-      assert(accumulation instanceof HistogramAccumulation);
+      assert.ok(accumulation instanceof HistogramAccumulation);
     });
   });
 
@@ -189,7 +189,7 @@ describe('HistogramAggregator', () => {
             value: {
               buckets: {
                 boundaries: [1, 10, 100],
-                counts: [1, 1, 0, 0],
+                counts: [2, 0, 0, 0],
               },
               count: 2,
               sum: 1,
@@ -231,7 +231,7 @@ describe('HistogramAggregator', () => {
             value: {
               buckets: {
                 boundaries: [1, 10, 100],
-                counts: [1, 1, 0, 0],
+                counts: [2, 0, 0, 0],
               },
               count: 2,
               sum: 1,
@@ -312,6 +312,7 @@ describe('HistogramAggregator', () => {
           type: instrumentType,
           unit: '1',
           valueType: ValueType.DOUBLE,
+          advice: {},
         },
         AggregationTemporality.CUMULATIVE,
         [[{}, accumulation]],

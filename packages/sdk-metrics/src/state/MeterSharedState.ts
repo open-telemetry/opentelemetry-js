@@ -32,7 +32,10 @@ import { MultiMetricStorage } from './MultiWritableMetricStorage';
 import { ObservableRegistry } from './ObservableRegistry';
 import { SyncMetricStorage } from './SyncMetricStorage';
 import { Accumulation, Aggregator } from '../aggregator/types';
-import { AttributesProcessor } from '../view/AttributesProcessor';
+import {
+  createNoopAttributesProcessor,
+  IAttributesProcessor,
+} from '../view/AttributesProcessor';
 import { MetricStorage } from './MetricStorage';
 
 /**
@@ -142,7 +145,8 @@ export class MeterSharedState {
         viewDescriptor,
         aggregator,
         view.attributesProcessor,
-        this._meterProviderSharedState.metricCollectors
+        this._meterProviderSharedState.metricCollectors,
+        view.aggregationCardinalityLimit
       ) as R;
       this.metricStorageRegistry.register(viewStorage);
       return viewStorage;
@@ -162,12 +166,17 @@ export class MeterSharedState {
           if (compatibleStorage != null) {
             return compatibleStorage;
           }
+
           const aggregator = aggregation.createAggregator(descriptor);
+          const cardinalityLimit = collector.selectCardinalityLimit(
+            descriptor.type
+          );
           const storage = new MetricStorageType(
             descriptor,
             aggregator,
-            AttributesProcessor.Noop(),
-            [collector]
+            createNoopAttributesProcessor(),
+            [collector],
+            cardinalityLimit
           ) as R;
           this.metricStorageRegistry.registerForCollector(collector, storage);
           return storage;
@@ -189,7 +198,8 @@ interface MetricStorageConstructor {
   new (
     instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<Maybe<Accumulation>>,
-    attributesProcessor: AttributesProcessor,
-    collectors: MetricCollectorHandle[]
+    attributesProcessor: IAttributesProcessor,
+    collectors: MetricCollectorHandle[],
+    aggregationCardinalityLimit?: number
   ): MetricStorage;
 }

@@ -30,9 +30,9 @@ interface TestInstrumentationConfig extends InstrumentationConfig {
   isActive?: boolean;
 }
 
-class TestInstrumentation extends InstrumentationBase {
-  constructor(config: TestInstrumentationConfig & InstrumentationConfig = {}) {
-    super('test', '1.0.0', Object.assign({}, config));
+class TestInstrumentation extends InstrumentationBase<TestInstrumentationConfig> {
+  constructor(config = {}) {
+    super('test', '1.0.0', config);
   }
   override enable() {}
   override disable() {}
@@ -45,26 +45,26 @@ class TestInstrumentation extends InstrumentationBase {
   }
 }
 
-describe('BaseInstrumentation', () => {
+describe('BaseInstrumentation', function () {
   let instrumentation: Instrumentation;
   beforeEach(() => {
     instrumentation = new TestInstrumentation();
   });
 
-  it('should create an instance', () => {
+  it('should create an instance', function () {
     assert.ok(instrumentation instanceof InstrumentationBase);
   });
 
-  it('should have a name', () => {
+  it('should have a name', function () {
     assert.deepStrictEqual(instrumentation.instrumentationName, 'test');
   });
 
-  it('should have a version', () => {
+  it('should have a version', function () {
     assert.deepStrictEqual(instrumentation.instrumentationVersion, '1.0.0');
   });
 
-  describe('constructor', () => {
-    it('should enable instrumentation by default', () => {
+  describe('constructor', function () {
+    it('should enable instrumentation by default', function () {
       let enableCalled = false;
       let updateMetricInstrumentsCalled = false;
       class TestInstrumentation2 extends TestInstrumentation {
@@ -81,12 +81,12 @@ describe('BaseInstrumentation', () => {
     });
   });
 
-  describe('setMeterProvider', () => {
+  describe('setMeterProvider', function () {
     let otelTestingMeterProvider: MeterProvider;
     beforeEach(() => {
       otelTestingMeterProvider = new MeterProvider();
     });
-    it('should call _updateMetricInstruments', () => {
+    it('should call _updateMetricInstruments', function () {
       let called = true;
       class TestInstrumentation2 extends TestInstrumentation {
         override _updateMetricInstruments() {
@@ -99,8 +99,8 @@ describe('BaseInstrumentation', () => {
     });
   });
 
-  describe('setLoggerProvider', () => {
-    it('should get a logger from provider', () => {
+  describe('setLoggerProvider', function () {
+    it('should get a logger from provider', function () {
       let called = true;
       class TestLoggerProvider extends LoggerProvider {
         override getLogger(name: any, version?: any, options?: any) {
@@ -116,8 +116,8 @@ describe('BaseInstrumentation', () => {
     });
   });
 
-  describe('getConfig', () => {
-    it('should return instrumentation config', () => {
+  describe('getConfig', function () {
+    it('should return instrumentation config, "enabled" should be true by default', function () {
       const instrumentation: Instrumentation = new TestInstrumentation({
         isActive: false,
       });
@@ -125,11 +125,12 @@ describe('BaseInstrumentation', () => {
         instrumentation.getConfig() as TestInstrumentationConfig;
       assert.notStrictEqual(configuration, null);
       assert.strictEqual(configuration.isActive, false);
+      assert.strictEqual(configuration.enabled, true);
     });
   });
 
-  describe('setConfig', () => {
-    it('should set a new config for instrumentation', () => {
+  describe('setConfig', function () {
+    it('should set a new config for instrumentation', function () {
       const instrumentation: Instrumentation = new TestInstrumentation();
       const config: TestInstrumentationConfig = {
         isActive: true,
@@ -139,9 +140,21 @@ describe('BaseInstrumentation', () => {
         instrumentation.getConfig() as TestInstrumentationConfig;
       assert.strictEqual(configuration.isActive, true);
     });
+
+    it('should ensure "enabled" defaults to true', function () {
+      const instrumentation: Instrumentation = new TestInstrumentation();
+      const config: TestInstrumentationConfig = {
+        isActive: true,
+      };
+      instrumentation.setConfig(config);
+      const configuration =
+        instrumentation.getConfig() as TestInstrumentationConfig;
+      assert.strictEqual(configuration.enabled, true);
+      assert.strictEqual(configuration.isActive, true);
+    });
   });
 
-  describe('getModuleDefinitions', () => {
+  describe('getModuleDefinitions', function () {
     const moduleDefinition: InstrumentationModuleDefinition = {
       name: 'foo',
       patch: moduleExports => {},
@@ -151,7 +164,7 @@ describe('BaseInstrumentation', () => {
       supportedVersions: ['*'],
     };
 
-    it('should return single module definition from init() as array ', () => {
+    it('should return single module definition from init() as array ', function () {
       class TestInstrumentation2 extends TestInstrumentation {
         override init() {
           return moduleDefinition;
@@ -164,7 +177,7 @@ describe('BaseInstrumentation', () => {
       ]);
     });
 
-    it('should return multiple module definitions from init() as array ', () => {
+    it('should return multiple module definitions from init() as array ', function () {
       class TestInstrumentation2 extends TestInstrumentation {
         override init() {
           return [moduleDefinition, moduleDefinition, moduleDefinition];
@@ -179,7 +192,7 @@ describe('BaseInstrumentation', () => {
       ]);
     });
 
-    it('should return void from init() as empty array ', () => {
+    it('should return void from init() as empty array ', function () {
       class TestInstrumentation2 extends TestInstrumentation {
         override init() {
           return;
@@ -190,8 +203,8 @@ describe('BaseInstrumentation', () => {
       assert.deepStrictEqual(instrumentation.getModuleDefinitions(), []);
     });
 
-    describe('runInstrumentationEventHook', () => {
-      it('should call the hook', () => {
+    describe('runInstrumentationEventHook', function () {
+      it('should call the hook', function () {
         const instrumentation = new TestInstrumentation({});
         let called = false;
         const hook = () => {
@@ -201,12 +214,12 @@ describe('BaseInstrumentation', () => {
         assert.strictEqual(called, true);
       });
 
-      it('empty hook should work', () => {
+      it('empty hook should work', function () {
         const instrumentation = new TestInstrumentation({});
         instrumentation.testRunHook(undefined);
       });
 
-      it('exception in hook should not crash', () => {
+      it('exception in hook should not crash', function () {
         const instrumentation = new TestInstrumentation({});
         const hook = () => {
           throw new Error('test');

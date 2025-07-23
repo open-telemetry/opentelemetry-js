@@ -16,7 +16,7 @@
  */
 
 import * as oc from '@opencensus/core';
-import { Resource } from '@opentelemetry/resources';
+import { emptyResource } from '@opentelemetry/resources';
 import {
   CollectionResult,
   MetricData,
@@ -46,12 +46,13 @@ interface OpenCensusMetricProducerOptions {
  *
  * @example
  * ```
- * const meterProvider = new MeterProvider();
  * const reader = new PeriodicExportingMetricReader({
  *   metricProducers: [new OpenCensusMetricProducer()],
  *   exporter: exporter,
  * });
- * meterProvider.addMetricReader(reader);
+ * const meterProvider = new MeterProvider({
+ *   readers: [reader],
+ * });
  * ```
  */
 export class OpenCensusMetricProducer implements MetricProducer {
@@ -79,7 +80,7 @@ export class OpenCensusMetricProducer implements MetricProducer {
       errors: [],
       resourceMetrics: {
         // Resource is ignored by the SDK, it just uses the SDK's resource
-        resource: Resource.EMPTY,
+        resource: emptyResource(),
         scopeMetrics,
       },
     };

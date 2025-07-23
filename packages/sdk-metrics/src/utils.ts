@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { MetricAttributes } from '@opentelemetry/api';
+import { Attributes } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
 
 export type Maybe<T> = T | undefined;
@@ -25,9 +25,9 @@ export function isNotNullish<T>(item: Maybe<T>): item is T {
 
 /**
  * Converting the unordered attributes into unique identifier string.
- * @param attributes user provided unordered MetricAttributes.
+ * @param attributes user provided unordered Attributes.
  */
-export function hashAttributes(attributes: MetricAttributes): string {
+export function hashAttributes(attributes: Attributes): string {
   let keys = Object.keys(attributes);
   if (keys.length === 0) return '';
 
@@ -165,30 +165,27 @@ export function setEquals(lhs: Set<unknown>, rhs: Set<unknown>): boolean {
 }
 
 /**
- * Binary search the sorted array to the find lower bound for the value.
+ * Binary search the sorted array to the find upper bound for the value.
  * @param arr
  * @param value
  * @returns
  */
-export function binarySearchLB(arr: number[], value: number): number {
+export function binarySearchUB(arr: number[], value: number): number {
   let lo = 0;
   let hi = arr.length - 1;
+  let ret = arr.length;
 
-  while (hi - lo > 1) {
-    const mid = Math.trunc((hi + lo) / 2);
-    if (arr[mid] <= value) {
-      lo = mid;
+  while (hi >= lo) {
+    const mid = lo + Math.trunc((hi - lo) / 2);
+    if (arr[mid] < value) {
+      lo = mid + 1;
     } else {
+      ret = mid;
       hi = mid - 1;
     }
   }
 
-  if (arr[hi] <= value) {
-    return hi;
-  } else if (arr[lo] <= value) {
-    return lo;
-  }
-  return -1;
+  return ret;
 }
 
 export function equalsCaseInsensitive(lhs: string, rhs: string): boolean {

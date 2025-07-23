@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 import { HrTime, TraceFlags } from '@opentelemetry/api';
-import { InstrumentationScope, hexToBinary } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import { InstrumentationScope } from '@opentelemetry/core';
+import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
 import * as assert from 'assert';
-import {
-  createExportLogsServiceRequest,
-  ESeverityNumber,
-  IExportLogsServiceRequest,
-  ProtobufLogsSerializer,
-  JsonLogsSerializer,
-  OtlpEncodingOptions,
-} from '../src';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import { toBase64 } from './utils';
 import * as root from '../src/generated/root';
+import { OtlpEncodingOptions } from '../src/common/internal-types';
+import {
+  ESeverityNumber,
+  IExportLogsServiceRequest,
+} from '../src/logs/internal-types';
+import { createExportLogsServiceRequest } from '../src/logs/internal';
+import { ProtobufLogsSerializer } from '../src/logs/protobuf';
+import { JsonLogsSerializer } from '../src/logs/json';
+import { hexToBinary } from '../src/common/hex-to-binary';
 
 function createExpectedLogJson(
   options: OtlpEncodingOptions
@@ -74,6 +75,7 @@ function createExpectedLogJson(
                 severityNumber: ESeverityNumber.SEVERITY_NUMBER_ERROR,
                 severityText: 'error',
                 body: { stringValue: 'some_log_body' },
+                eventName: 'some.event.name',
 
                 attributes: [
                   {
@@ -121,7 +123,7 @@ function createExpectedLogProtobuf(): IExportLogsServiceRequest {
                 severityNumber: ESeverityNumber.SEVERITY_NUMBER_ERROR,
                 severityText: 'error',
                 body: { stringValue: 'some_log_body' },
-
+                eventName: 'some.event.name',
                 attributes: [
                   {
                     key: 'some-attribute',
@@ -165,10 +167,10 @@ describe('Logs', () => {
   let log_2_1_1: ReadableLogRecord;
 
   beforeEach(() => {
-    resource_1 = new Resource({
+    resource_1 = resourceFromAttributes({
       'resource-attribute': 'some attribute value',
     });
-    resource_2 = new Resource({
+    resource_2 = resourceFromAttributes({
       'resource-attribute': 'another attribute value',
     });
     scope_1 = {
@@ -189,6 +191,7 @@ describe('Logs', () => {
       severityNumber: SeverityNumber.ERROR,
       severityText: 'error',
       body: 'some_log_body',
+      eventName: 'some.event.name',
       spanContext: {
         spanId: '0000000000000002',
         traceFlags: TraceFlags.SAMPLED,
@@ -343,6 +346,12 @@ describe('Logs', () => {
         1
       );
     });
+
+    it('does not throw when deserializing an empty response', () => {
+      assert.doesNotThrow(() =>
+        ProtobufLogsSerializer.deserializeResponse(new Uint8Array([]))
+      );
+    });
   });
 
   describe('JsonLogsSerializer', function () {
@@ -380,6 +389,12 @@ describe('Logs', () => {
       assert.equal(
         Number(deserializedResponse.partialSuccess.rejectedLogRecords),
         1
+      );
+    });
+
+    it('does not throw when deserializing an empty response', () => {
+      assert.doesNotThrow(() =>
+        JsonLogsSerializer.deserializeResponse(new Uint8Array([]))
       );
     });
   });

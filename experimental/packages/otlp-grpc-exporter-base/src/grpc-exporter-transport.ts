@@ -39,7 +39,7 @@ export function createInsecureCredentials(): ChannelCredentials {
   // Lazy-load so that we don't need to require/import '@grpc/grpc-js' before it can be wrapped by instrumentation.
   const {
     credentials,
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
   } = require('@grpc/grpc-js');
   return credentials.createInsecure();
 }
@@ -52,7 +52,7 @@ export function createSslCredentials(
   // Lazy-load so that we don't need to require/import '@grpc/grpc-js' before it can be wrapped by instrumentation.
   const {
     credentials,
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
   } = require('@grpc/grpc-js');
   return credentials.createSsl(rootCert, privateKey, certChain);
 }
@@ -61,7 +61,7 @@ export function createEmptyMetadata(): Metadata {
   // Lazy-load so that we don't need to require/import '@grpc/grpc-js' before it can be wrapped by instrumentation.
   const {
     Metadata,
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
   } = require('@grpc/grpc-js');
   return new Metadata();
 }
@@ -88,7 +88,6 @@ export interface GrpcExporterTransportParameters {
    */
   metadata: () => Metadata;
   compression: 'gzip' | 'none';
-  timeoutMillis: number;
 }
 
 export class GrpcExporterTransport implements IExporterTransport {
@@ -101,7 +100,7 @@ export class GrpcExporterTransport implements IExporterTransport {
     this._client?.close();
   }
 
-  send(data: Uint8Array): Promise<ExportResponse> {
+  send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
     // We need to make a for gRPC
     const buffer = Buffer.from(data);
 
@@ -109,7 +108,7 @@ export class GrpcExporterTransport implements IExporterTransport {
       // Lazy require to ensure that grpc is not loaded before instrumentations can wrap it
       const {
         createServiceClientConstructor,
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
       } = require('./create-service-client-constructor');
 
       try {
@@ -145,9 +144,7 @@ export class GrpcExporterTransport implements IExporterTransport {
     }
 
     return new Promise<ExportResponse>(resolve => {
-      // this will always be defined
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const deadline = Date.now() + this._parameters.timeoutMillis;
+      const deadline = Date.now() + timeoutMillis;
 
       // this should never happen
       if (this._metadata == null) {
@@ -179,4 +176,10 @@ export class GrpcExporterTransport implements IExporterTransport {
       );
     });
   }
+}
+
+export function createOtlpGrpcExporterTransport(
+  options: GrpcExporterTransportParameters
+): IExporterTransport {
+  return new GrpcExporterTransport(options);
 }

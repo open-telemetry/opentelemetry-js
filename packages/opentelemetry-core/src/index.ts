@@ -14,35 +14,69 @@
  * limitations under the License.
  */
 
-export * from './baggage/propagation/W3CBaggagePropagator';
-export * from './common/anchored-clock';
-export * from './common/attributes';
-export * from './common/global-error-handler';
-export * from './common/logging-error-handler';
-export * from './common/time';
-export * from './common/types';
-export * from './common/hex-to-binary';
-export * from './ExportResult';
-export * as baggageUtils from './baggage/utils';
-export * from './platform';
-export * from './propagation/composite';
-export * from './trace/W3CTraceContextPropagator';
-export * from './trace/IdGenerator';
-export * from './trace/rpc-metadata';
-export * from './trace/sampler/AlwaysOffSampler';
-export * from './trace/sampler/AlwaysOnSampler';
-export * from './trace/sampler/ParentBasedSampler';
-export * from './trace/sampler/TraceIdRatioBasedSampler';
-export * from './trace/suppress-tracing';
-export * from './trace/TraceState';
-export * from './utils/environment';
-export * from './utils/merge';
-export * from './utils/sampling';
-export * from './utils/timeout';
-export * from './utils/url';
-export * from './utils/wrap';
-export * from './utils/callback';
-export * from './version';
+export { W3CBaggagePropagator } from './baggage/propagation/W3CBaggagePropagator';
+export { AnchoredClock } from './common/anchored-clock';
+export type { Clock } from './common/anchored-clock';
+export { isAttributeValue, sanitizeAttributes } from './common/attributes';
+export {
+  globalErrorHandler,
+  setGlobalErrorHandler,
+} from './common/global-error-handler';
+export { loggingErrorHandler } from './common/logging-error-handler';
+export {
+  addHrTimes,
+  getTimeOrigin,
+  hrTime,
+  hrTimeDuration,
+  hrTimeToMicroseconds,
+  hrTimeToMilliseconds,
+  hrTimeToNanoseconds,
+  hrTimeToTimeStamp,
+  isTimeInput,
+  isTimeInputHrTime,
+  millisToHrTime,
+  timeInputToHrTime,
+} from './common/time';
+export type { ErrorHandler, InstrumentationScope } from './common/types';
+export { ExportResultCode } from './ExportResult';
+export type { ExportResult } from './ExportResult';
+export { parseKeyPairsIntoRecord } from './baggage/utils';
+export {
+  SDK_INFO,
+  _globalThis,
+  getStringFromEnv,
+  getBooleanFromEnv,
+  getNumberFromEnv,
+  getStringListFromEnv,
+  otperformance,
+  unrefTimer,
+} from './platform';
+export { CompositePropagator } from './propagation/composite';
+export type { CompositePropagatorConfig } from './propagation/composite';
+export {
+  TRACE_PARENT_HEADER,
+  TRACE_STATE_HEADER,
+  W3CTraceContextPropagator,
+  parseTraceParent,
+} from './trace/W3CTraceContextPropagator';
+export {
+  RPCType,
+  deleteRPCMetadata,
+  getRPCMetadata,
+  setRPCMetadata,
+} from './trace/rpc-metadata';
+export type { RPCMetadata } from './trace/rpc-metadata';
+export {
+  isTracingSuppressed,
+  suppressTracing,
+  unsuppressTracing,
+} from './trace/suppress-tracing';
+export { TraceState } from './trace/TraceState';
+export { merge } from './utils/merge';
+export { TimeoutError, callWithTimeout } from './utils/timeout';
+export { isUrlIgnored, urlMatches } from './utils/url';
+export { BindOnceFuture } from './utils/callback';
+export { diagLogLevelFromString } from './utils/configuration';
 import { _export } from './internal/exporter';
 export const internal = {
   _export,

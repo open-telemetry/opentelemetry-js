@@ -9,6 +9,9 @@ This package provides the full OpenTelemetry SDK for Node.js including tracing a
 
 ## Quick Start
 
+**Note: Much of OpenTelemetry JS documentation is written assuming the compiled application is run as CommonJS.**
+For more details on ECMAScript Modules vs CommonJS, refer to [esm-support](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-support.md).
+
 To get started you need to install `@opentelemetry/sdk-node`, a metrics and/or tracing exporter, and any appropriate instrumentation for the node modules used by your application.
 
 ### Installation
@@ -85,28 +88,41 @@ Detect resources automatically from the environment using the default resource d
 
 ### contextManager
 
-Use a custom context manager. Default: [AsyncHooksContextManager](../../../packages/opentelemetry-context-async-hooks/README.md)
+Use a custom context manager. Default: [AsyncLocalStorageContextManager](../../../packages/opentelemetry-context-async-hooks/README.md)
 
 ### textMapPropagator
 
 Use a custom propagator. Default: [CompositePropagator](../../../packages/opentelemetry-core/src/propagation/composite.ts) using [W3C Trace Context](../../../packages/opentelemetry-core/README.md#w3ctracecontextpropagator-propagator) and [Baggage](../../../packages/opentelemetry-core/README.md#baggage-propagator)
 
+### logRecordProcessor
+
+Deprecated, please use [logRecordProcessors](#logrecordprocessors) instead.
+
+### logRecordProcessors
+
+An array of log record processors to register to the logger provider.
+
+### mergeResourceWithDefaults
+
+Merge user-provided resources with the default resource. Default `true`.
+The default will change to `false` in a future iteration of this package.
+
 ### metricReader
 
-Add a [MetricReader](../opentelemetry-sdk-metrics/src/export/MetricReader.ts)
+Add a [MetricReader](../../../packages/sdk-metrics/src/export/MetricReader.ts)
 that will be passed to the `MeterProvider`. If `metricReader` is not configured,
 the metrics SDK will not be initialized and registered.
 
 ### views
 
 A list of views to be passed to the `MeterProvider`.
-Accepts an array of [View](../opentelemetry-sdk-metrics/src/view/View.ts)-instances.
+Accepts an array of [View](../../../packages/sdk-metrics/src/view/View.ts)-instances.
 This parameter can be used to configure explicit bucket sizes of histogram metrics.
 
 ### instrumentations
 
 Configure instrumentations. By default none of the instrumentation is enabled,
-if you want to enable them you can use either [metapackage](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/metapackages/auto-instrumentations-node)
+if you want to enable them you can use either [metapackage](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/packages/auto-instrumentations-node)
 or configure each instrumentation individually.
 
 ### resource
@@ -157,7 +173,7 @@ Configure tracing parameters. These are the same trace parameters used to [confi
 
 ### serviceName
 
-Configure the [service name](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service).
+Configure the [service name](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/registry/attributes/service.md#service-name).
 
 ## Disable the SDK from the environment
 
@@ -177,23 +193,28 @@ Set the log level by setting the `OTEL_LOG_LEVEL` environment variable to enums:
 
 The default level is `INFO`.
 
-## Configure Trace Exporter from environment
+## Configure Exporters from environment
 
-This is an alternative to programmatically configuring an exporter or span processor. This package will auto setup the default `otlp` exporter with `http/protobuf` protocol if `traceExporter` or `spanProcessor` hasn't been passed into the `NodeSDK` constructor.
+This is an alternative to programmatically configuring an exporter or span processor. For traces this package will auto setup the default `otlp` exporter with `http/protobuf` protocol if `traceExporter` or `spanProcessor` hasn't been passed into the `NodeSDK` constructor.
 
 ### Exporters
 
-| Environment variable | Description |
-|----------------------|-------------|
+| Environment variable | Description                                                                                                                                                                        |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | OTEL_TRACES_EXPORTER | List of exporters to be used for tracing, separated by commas. Options include `otlp`, `jaeger`, `zipkin`, and `none`. Default is `otlp`. `none` means no autoconfigured exporter. |
+| OTEL_LOGS_EXPORTER   | List of exporters to be used for logging, separated by commas. Options include `otlp`, `console` and `none`. Default is `otlp`. `none` means no autoconfigured exporter.           |
 
 ### OTLP Exporter
 
-| Environment variable | Description |
-|----------------------|-------------|
-| OTEL_EXPORTER_OTLP_PROTOCOL | The transport protocol to use on OTLP trace, metric, and log requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`. |
-| OTEL_EXPORTER_OTLP_TRACES_PROTOCOL | The transport protocol to use on OTLP trace requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`. |
-| OTEL_EXPORTER_OTLP_METRICS_PROTOCOL | The transport protocol to use on OTLP metric requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`. |
+| Environment variable                | Description                                                                                                                                                  |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| OTEL_EXPORTER_OTLP_PROTOCOL         | The transport protocol to use on OTLP trace, metric, and log requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`. |
+| OTEL_EXPORTER_OTLP_TRACES_PROTOCOL  | The transport protocol to use on OTLP trace requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`.                  |
+| OTEL_EXPORTER_OTLP_METRICS_PROTOCOL | The transport protocol to use on OTLP metric requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`.                 |
+| OTEL_EXPORTER_OTLP_LOGS_PROTOCOL    | The transport protocol to use on OTLP log requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`.                    |
+| OTEL_METRICS_EXPORTER    | Metrics exporter to be used. options are `otlp`, `prometheus`, `console` or `none`.                    |
+| OTEL_METRIC_EXPORT_INTERVAL    | The export interval when using a push Metric Reader. Default is `60000`.                     |
+| OTEL_METRIC_EXPORT_TIMEOUT    | The export timeout when using a push Metric Reader. Default is `30000`.                     |
 
 Additionally, you can specify other applicable environment variables that apply to each exporter such as the following:
 
