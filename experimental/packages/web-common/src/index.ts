@@ -18,12 +18,12 @@ export type { SessionProvider } from './types/SessionProvider';
 export {
   createSessionSpanProcessor,
   createSessionLogRecordProcessor,
+  createSessionManager,
 } from './utils';
-export { Session } from './types/Session';
-export { SessionIdGenerator } from './types/SessionIdGenerator';
-export { SessionPublisher } from './types/SessionPublisher';
-export { SessionObserver } from './types/SessionObserver';
-export { SessionStore } from './types/SessionStore';
-export { SessionManager } from './SessionManager';
+export type { Session } from './types/Session';
+export type { SessionIdGenerator } from './types/SessionIdGenerator';
+export type { SessionPublisher } from './types/SessionPublisher';
+export type { SessionObserver } from './types/SessionObserver';
+export type { SessionStore } from './types/SessionStore';
 export { LocalStorageSessionStore } from './LocalStorageSessionStore';
 export { DefaultIdGenerator } from './DefaultIdGenerator';
