@@ -18,9 +18,11 @@ import * as assert from 'assert';
 import {
   createSessionLogRecordProcessor,
   createSessionSpanProcessor,
+  createDefaultSessionIdGenerator,
 } from '../src/utils';
 import { SessionSpanProcessor } from '../src/SessionSpanProcessor';
 import { SessionLogRecordProcessor } from '../src/SessionLogRecordProcessor';
+import { SessionIdGenerator } from '../src/types/SessionIdGenerator';
 
 describe('createSessionSpanProcessor', function () {
   it('returns an instance of a SessionSpanProcessor', function () {
@@ -41,5 +43,17 @@ describe('createSessionLogRecordProcessor', function () {
       },
     });
     assert.ok(processor as SessionLogRecordProcessor);
+  });
+});
+
+describe('createDefaultSessionIdGenerator', function () {
+  it('returns an instance of a SessionIdGenerator', function () {
+    const generator = createDefaultSessionIdGenerator();
+    assert.ok(generator as SessionIdGenerator);
+
+    const sessionId = generator.generateSessionId();
+    assert.ok(sessionId);
+    assert.ok(typeof sessionId === 'string');
+    assert.ok(sessionId.length > 0);
   });
 });
