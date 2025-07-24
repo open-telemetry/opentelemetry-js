@@ -15,6 +15,7 @@
  */
 
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { SessionManager, SessionManagerConfig } from '../src/SessionManager';
 import { SessionIdGenerator } from '../src/types/SessionIdGenerator';
 import { SessionStore } from '../src/types/SessionStore';
@@ -58,8 +59,10 @@ describe('SessionManager', () => {
   let idGenerator: MockSessionIdGenerator;
   let observer: MockSessionObserver;
   let sessionManager: SessionManager;
+  let clock: sinon.SinonFakeTimers;
 
   beforeEach(() => {
+    clock = sinon.useFakeTimers();
     idGenerator = new MockSessionIdGenerator();
     store = new MockSessionStore();
     observer = new MockSessionObserver();
@@ -71,6 +74,7 @@ describe('SessionManager', () => {
 
   afterEach(() => {
     sessionManager.shutdown();
+    clock.restore();
   });
 
   it('should start a new session if none exists', async () => {
@@ -96,7 +100,7 @@ describe('SessionManager', () => {
     sessionManager = new SessionManager(config);
 
     sessionManager.getSessionId(); // Starts session-1
-    await wait(600);
+    clock.tick(600);
     const sessionId = sessionManager.getSessionId();
     assert.strictEqual(sessionId, 'session-2');
   });
@@ -109,13 +113,13 @@ describe('SessionManager', () => {
     };
     sessionManager = new SessionManager(config);
     sessionManager.getSessionId(); // Starts session-1
-    await wait(400);
+    clock.tick(400);
 
     // create a new manager with the same store
     sessionManager.shutdown();
     sessionManager = new SessionManager(config);
 
-    await wait(300);
+    clock.tick(300);
     const sessionId = sessionManager.getSessionId();
     assert.strictEqual(sessionId, 'session-2');
   });
@@ -130,7 +134,7 @@ describe('SessionManager', () => {
     sessionManager = new SessionManager(config);
 
     sessionManager.getSessionId(); // Starts session-1
-    await wait(600);
+    clock.tick(600);
     const sessionId = sessionManager.getSessionId();
     assert.strictEqual(sessionId, 'session-2');
   });
@@ -146,11 +150,11 @@ describe('SessionManager', () => {
 
     sessionManager.getSessionId(); // Starts session-1
 
-    await wait(300);
+    clock.tick(300);
     let sessionId = sessionManager.getSessionId(); // extends session-1
     assert.strictEqual(sessionId, 'session-1');
 
-    await wait(600);
+    clock.tick(600);
     sessionId = sessionManager.getSessionId();
     assert.strictEqual(sessionId, 'session-2');
   });
@@ -175,11 +179,3 @@ describe('SessionManager', () => {
     assert.strictEqual((await store.get())?.id, sessionId);
   });
 });
-
-function wait(timeInMs: number) {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(true);
-    }, timeInMs);
-  });
-}
