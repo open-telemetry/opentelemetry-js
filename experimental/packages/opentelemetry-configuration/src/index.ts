@@ -14,5 +14,5 @@
  * limitations under the License.
  */
 
-export { ConfigProvider } from "./ConfigProvider";
-export type { Configuration } from "./config";
+export { ConfigProvider } from './ConfigProvider';
+export type { Configuration } from './config';

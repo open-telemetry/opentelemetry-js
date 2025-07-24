@@ -14,37 +14,45 @@
  * limitations under the License.
  */
 
-import { Configuration, initializeDefaultConfiguration } from "./config";
-import { diagLogLevelFromString } from "./utils/diagLogLevel";
-import { getBooleanFromEnv, getStringFromEnv, getStringListFromEnv } from "./utils/environment";
+import { DiagLogLevel } from '@opentelemetry/api';
+import { Configuration, initializeDefaultConfiguration } from './config';
+import { diagLogLevelFromString } from './utils/diagLogLevel';
+import {
+  getBooleanFromEnv,
+  getStringFromEnv,
+  getStringListFromEnv,
+} from './utils/environment';
 
 /**
  * ConfigProvider provides a configuration.
  */
 export class ConfigProvider {
-    private _config: Configuration;
+  private _config: Configuration;
 
-    constructor() {
-        this._config = initializeDefaultConfiguration();
-        this._config.disable = getBooleanFromEnv('OTEL_SDK_DISABLED');
+  constructor() {
+    this._config = initializeDefaultConfiguration();
+    this._config.disable = getBooleanFromEnv('OTEL_SDK_DISABLED');
 
-        const logLevel = getStringFromEnv('OTEL_LOG_LEVEL');
-        if (logLevel) {
-            this._config.log_level = diagLogLevelFromString(logLevel);
-        }
-
-        const nodeResourceDetectors = getStringListFromEnv('OTEL_NODE_RESOURCE_DETECTORS');
-        if (nodeResourceDetectors) {
-            this._config.node_resource_detectors = nodeResourceDetectors;
-        }
-
-        const resourceAttrList = getStringFromEnv('OTEL_RESOURCE_ATTRIBUTES');
-        if (resourceAttrList) {
-            this._config.resource.attributes_list = resourceAttrList;
-        }
+    const logLevel = getStringFromEnv('OTEL_LOG_LEVEL');
+    if (logLevel) {
+      this._config.log_level =
+        diagLogLevelFromString(logLevel) ?? DiagLogLevel.INFO;
     }
 
-    getConfig() {
-        return this._config;
+    const nodeResourceDetectors = getStringListFromEnv(
+      'OTEL_NODE_RESOURCE_DETECTORS'
+    );
+    if (nodeResourceDetectors) {
+      this._config.node_resource_detectors = nodeResourceDetectors;
     }
+
+    const resourceAttrList = getStringFromEnv('OTEL_RESOURCE_ATTRIBUTES');
+    if (resourceAttrList) {
+      this._config.resource.attributes_list = resourceAttrList;
+    }
+  }
+
+  getConfig() {
+    return this._config;
+  }
 }

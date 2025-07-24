@@ -20,10 +20,10 @@ import { ConfigProvider, Configuration } from '../src';
 import { DiagLogLevel } from '@opentelemetry/api';
 
 const defaultConfig: Configuration = {
-    disable: false,
-    log_level: DiagLogLevel.INFO,
-    node_resource_detectors: ['all'],
-    resource: {},
+  disable: false,
+  log_level: DiagLogLevel.INFO,
+  node_resource_detectors: ['all'],
+  resource: {},
 };
 
 describe('ConfigProvider', function () {
@@ -41,45 +41,47 @@ describe('ConfigProvider', function () {
     });
 
     it('should return config with disable true', function () {
-        process.env.OTEL_SDK_DISABLED = 'true'
-        const expectedConfig: Configuration = {
-            ...defaultConfig,
-            disable: true
-        }
-        const configProvider = new ConfigProvider();
-        assert.deepStrictEqual(configProvider.getConfig(), expectedConfig);
+      process.env.OTEL_SDK_DISABLED = 'true';
+      const expectedConfig: Configuration = {
+        ...defaultConfig,
+        disable: true,
+      };
+      const configProvider = new ConfigProvider();
+      assert.deepStrictEqual(configProvider.getConfig(), expectedConfig);
     });
 
     it('should return config with log level as debug', function () {
-        process.env.OTEL_LOG_LEVEL = 'DEBUG'
-        const expectedConfig: Configuration = {
-            ...defaultConfig,
-            log_level: DiagLogLevel.DEBUG
-        }
-        const configProvider = new ConfigProvider();
-        assert.deepStrictEqual(configProvider.getConfig(), expectedConfig);
+      process.env.OTEL_LOG_LEVEL = 'DEBUG';
+      const expectedConfig: Configuration = {
+        ...defaultConfig,
+        log_level: DiagLogLevel.DEBUG,
+      };
+      const configProvider = new ConfigProvider();
+      assert.deepStrictEqual(configProvider.getConfig(), expectedConfig);
     });
 
     it('should return config with a list of options for node resource detectors', function () {
-        process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,host, serviceinstance'
-        const expectedConfig: Configuration = {
-            ...defaultConfig,
-            node_resource_detectors: ['env', 'host', 'serviceinstance']
-        }
-        const configProvider = new ConfigProvider();
-        assert.deepStrictEqual(configProvider.getConfig(), expectedConfig);
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,host, serviceinstance';
+      const expectedConfig: Configuration = {
+        ...defaultConfig,
+        node_resource_detectors: ['env', 'host', 'serviceinstance'],
+      };
+      const configProvider = new ConfigProvider();
+      assert.deepStrictEqual(configProvider.getConfig(), expectedConfig);
     });
 
     it('should return config with a resource attribute list', function () {
-        process.env.OTEL_RESOURCE_ATTRIBUTES = 'service.namespace=my-namespace,service.version=1.0.0';
-        const expectedConfig: Configuration = {
-            ...defaultConfig,
-            resource: {
-                attributes_list: 'service.namespace=my-namespace,service.version=1.0.0'
-            }
-        }
-        const configProvider = new ConfigProvider();
-        assert.deepStrictEqual(configProvider.getConfig(), expectedConfig);
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.namespace=my-namespace,service.version=1.0.0';
+      const expectedConfig: Configuration = {
+        ...defaultConfig,
+        resource: {
+          attributes_list:
+            'service.namespace=my-namespace,service.version=1.0.0',
+        },
+      };
+      const configProvider = new ConfigProvider();
+      assert.deepStrictEqual(configProvider.getConfig(), expectedConfig);
     });
   });
 });
