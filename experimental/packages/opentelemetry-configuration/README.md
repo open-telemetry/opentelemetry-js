@@ -16,8 +16,8 @@ To get started you need to install `@opentelemetry/configuration`.
 ### Installation
 
 ```sh
-$ # Install the package
-$ npm install @opentelemetry/configuration
+# Install the package
+npm install @opentelemetry/configuration
 ```
 
 ## Useful links
