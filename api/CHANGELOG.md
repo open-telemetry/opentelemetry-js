@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* feat(metrics): add advisory attributes parameter to metric instruments [#4365](https://github.com/open-telemetry/opentelemetry-js/issues/4365)
+  * Added experimental `attributes` parameter to `MetricAdvice` interface
+  * Allows specifying an allow-list of attribute keys for metric instruments
+
 * feat(api): improve isValidSpanId, isValidTraceId performance [#5714](https://github.com/open-telemetry/opentelemetry-js/pull/5714) @seemk
 * feat(diag): change types in `DiagComponentLogger` from `any` to `unknown`[#5478](https://github.com/open-telemetry/opentelemetry-js/pull/5478) @loganrosen
 
