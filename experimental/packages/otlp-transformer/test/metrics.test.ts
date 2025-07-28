@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { ValueType } from '@opentelemetry/api';
-import { resourceFromAttributes } from '@opentelemetry/resources';
+import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
 import {
   AggregationTemporality,
   DataPointType,
@@ -301,10 +301,16 @@ describe('Metrics', () => {
     };
   }
 
-  function createResourceMetrics(metricData: MetricData[]): ResourceMetrics {
-    const resource = resourceFromAttributes({
-      'resource-attribute': 'resource attribute value',
-    });
+  function createResourceMetrics(
+    metricData: MetricData[],
+    customResource?: Resource
+  ): ResourceMetrics {
+    const resource =
+      customResource ||
+      resourceFromAttributes({
+        'resource-attribute': 'resource attribute value',
+      });
+
     return {
       resource: resource,
       scopeMetrics: [
@@ -772,6 +778,29 @@ describe('Metrics', () => {
           ],
         });
       });
+    });
+
+    it('supports schema URL on resource', () => {
+      const resourceWithSchema = resourceFromAttributes(
+        {},
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
+      );
+
+      const resourceMetrics = createResourceMetrics(
+        [createCounterData(10, AggregationTemporality.DELTA)],
+        resourceWithSchema
+      );
+
+      const exportRequest = createExportMetricsServiceRequest([
+        resourceMetrics,
+      ]);
+
+      assert.ok(exportRequest);
+      assert.strictEqual(exportRequest.resourceMetrics?.length, 1);
+      assert.strictEqual(
+        exportRequest.resourceMetrics?.[0].schemaUrl,
+        'https://opentelemetry.test/schemas/1.2.3'
+      );
     });
   });
 
