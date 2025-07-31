@@ -37,7 +37,10 @@ describe('ConfigProvider', function () {
 
     it('should initialize config with default values', function () {
       const configProvider = new ConfigProvider();
-      assert.deepStrictEqual(configProvider.getInstrumentationConfig(), defaultConfig);
+      assert.deepStrictEqual(
+        configProvider.getInstrumentationConfig(),
+        defaultConfig
+      );
     });
 
     it('should return config with disable true', function () {
@@ -47,7 +50,10 @@ describe('ConfigProvider', function () {
         disable: true,
       };
       const configProvider = new ConfigProvider();
-      assert.deepStrictEqual(configProvider.getInstrumentationConfig(), expectedConfig);
+      assert.deepStrictEqual(
+        configProvider.getInstrumentationConfig(),
+        expectedConfig
+      );
     });
 
     it('should return config with log level as debug', function () {
@@ -57,7 +63,10 @@ describe('ConfigProvider', function () {
         log_level: DiagLogLevel.DEBUG,
       };
       const configProvider = new ConfigProvider();
-      assert.deepStrictEqual(configProvider.getInstrumentationConfig(), expectedConfig);
+      assert.deepStrictEqual(
+        configProvider.getInstrumentationConfig(),
+        expectedConfig
+      );
     });
 
     it('should return config with a list of options for node resource detectors', function () {
@@ -67,7 +76,10 @@ describe('ConfigProvider', function () {
         node_resource_detectors: ['env', 'host', 'serviceinstance'],
       };
       const configProvider = new ConfigProvider();
-      assert.deepStrictEqual(configProvider.getInstrumentationConfig(), expectedConfig);
+      assert.deepStrictEqual(
+        configProvider.getInstrumentationConfig(),
+        expectedConfig
+      );
     });
 
     it('should return config with a resource attribute list', function () {
@@ -81,7 +93,10 @@ describe('ConfigProvider', function () {
         },
       };
       const configProvider = new ConfigProvider();
-      assert.deepStrictEqual(configProvider.getInstrumentationConfig(), expectedConfig);
+      assert.deepStrictEqual(
+        configProvider.getInstrumentationConfig(),
+        expectedConfig
+      );
     });
   });
 });

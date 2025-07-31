@@ -15,7 +15,10 @@
  */
 
 import { DiagLogLevel } from '@opentelemetry/api';
-import { ConfigurationModel, initializeDefaultConfiguration } from './configModel';
+import {
+  ConfigurationModel,
+  initializeDefaultConfiguration,
+} from './configModel';
 import {
   getBooleanFromEnv,
   getStringFromEnv,
