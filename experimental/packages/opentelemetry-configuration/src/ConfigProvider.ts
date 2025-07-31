@@ -52,7 +52,7 @@ export class ConfigProvider {
     }
   }
 
-  getConfig() {
+  getInstrumentationConfig() {
     return this._config;
   }
 }
