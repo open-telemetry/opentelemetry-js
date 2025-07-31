@@ -16,12 +16,12 @@
 
 import { DiagLogLevel } from '@opentelemetry/api';
 import { ConfigurationModel, initializeDefaultConfiguration } from './configModel';
-import { diagLogLevelFromString } from './utils/diagLogLevel';
 import {
   getBooleanFromEnv,
   getStringFromEnv,
   getStringListFromEnv,
-} from './utils/environment';
+  diagLogLevelFromString,
+} from '@opentelemetry/core';
 
 /**
  * ConfigProvider provides a configuration.
