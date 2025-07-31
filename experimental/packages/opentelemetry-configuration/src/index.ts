@@ -15,4 +15,4 @@
  */
 
 export { ConfigProvider } from './ConfigProvider';
-export type { Configuration } from './config';
+export type { ConfigurationModel as Configuration } from './configModel';

@@ -16,7 +16,7 @@
 'use strict';
 
 import { DiagLogLevel } from '@opentelemetry/api';
-export interface Configuration {
+export interface ConfigurationModel {
   /**
    * Configure if the SDK is disabled or not.
    * If omitted or null, false is used.
@@ -42,8 +42,8 @@ export interface Configuration {
   resource: ConfigResources;
 }
 
-export function initializeDefaultConfiguration(): Configuration {
-  const config: Configuration = {
+export function initializeDefaultConfiguration(): ConfigurationModel {
+  const config: ConfigurationModel = {
     disable: false,
     log_level: DiagLogLevel.INFO,
     node_resource_detectors: ['all'],

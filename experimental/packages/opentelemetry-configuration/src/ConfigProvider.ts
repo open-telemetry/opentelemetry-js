@@ -15,7 +15,7 @@
  */
 
 import { DiagLogLevel } from '@opentelemetry/api';
-import { Configuration, initializeDefaultConfiguration } from './config';
+import { ConfigurationModel, initializeDefaultConfiguration } from './configModel';
 import { diagLogLevelFromString } from './utils/diagLogLevel';
 import {
   getBooleanFromEnv,
@@ -27,7 +27,7 @@ import {
  * ConfigProvider provides a configuration.
  */
 export class ConfigProvider {
-  private _config: Configuration;
+  private _config: ConfigurationModel;
 
   constructor() {
     this._config = initializeDefaultConfiguration();
