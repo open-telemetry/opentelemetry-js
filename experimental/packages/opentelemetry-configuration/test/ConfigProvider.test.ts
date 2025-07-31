@@ -27,7 +27,7 @@ const defaultConfig: Configuration = {
 };
 
 describe('ConfigProvider', function () {
-  describe('getStringFromEnv', function () {
+  describe('get values from environment variables', function () {
     afterEach(function () {
       delete process.env.OTEL_SDK_DISABLED;
       delete process.env.OTEL_LOG_LEVEL;
