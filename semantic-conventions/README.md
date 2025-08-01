@@ -23,10 +23,11 @@ This package has 2 separate entry-points:
 Exported constants follow this naming scheme:
 
 - `ATTR_${attributeName}` for attributes
+- `${attributeName}_VALUE_{$enumValue}` for enumerations of attribute values
 - `METRIC_${metricName}` for metric names
-- `${attributeName}_VALUE_{$enumValue}` for enumerations
+- `EVENT_${eventName}` for event names
 
-The `ATTR`, `METRIC`, and `VALUE` static strings were used to facilitate readability and filtering in auto-complete lists in IDEs.
+The `ATTR`, `METRIC`, `EVENT`, and `VALUE` static strings were used to facilitate readability and filtering in auto-complete lists in IDEs.
 
 ## Usage
 

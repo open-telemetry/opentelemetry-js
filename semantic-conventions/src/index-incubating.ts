@@ -18,5 +18,7 @@
 // backward compatibility between minor version releases
 export * from './stable_attributes';
 export * from './stable_metrics';
+export * from './stable_events';
 export * from './experimental_attributes';
 export * from './experimental_metrics';
+export * from './experimental_events';
