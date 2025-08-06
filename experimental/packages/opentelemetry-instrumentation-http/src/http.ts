@@ -53,6 +53,7 @@ import {
 } from '@opentelemetry/instrumentation';
 import { errorMonitor } from 'events';
 import {
+  ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
   ATTR_NETWORK_PROTOCOL_VERSION,
@@ -516,17 +517,12 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             return;
           }
           responseFinished = true;
-          setSpanWithError(span, error, this._semconvStability);
-          span.setStatus({
-            code: SpanStatusCode.ERROR,
-            message: error.message,
-          });
-          this._closeHttpSpan(
+          this._onOutgoingRequestError(
             span,
-            SpanKind.CLIENT,
-            startTime,
             oldMetricAttributes,
-            stableMetricAttributes
+            stableMetricAttributes,
+            startTime,
+            error
           );
         });
       }
@@ -551,14 +547,12 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         return;
       }
       responseFinished = true;
-      setSpanWithError(span, error, this._semconvStability);
-
-      this._closeHttpSpan(
+      this._onOutgoingRequestError(
         span,
-        SpanKind.CLIENT,
-        startTime,
         oldMetricAttributes,
-        stableMetricAttributes
+        stableMetricAttributes,
+        startTime,
+        error
       );
     });
 
@@ -705,17 +699,12 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             () => original.apply(this, [event, ...args]),
             error => {
               if (error) {
-                setSpanWithError(
+                instrumentation._onServerResponseError(
                   span,
-                  error,
-                  instrumentation._semconvStability
-                );
-                instrumentation._closeHttpSpan(
-                  span,
-                  SpanKind.SERVER,
-                  startTime,
                   oldMetricAttributes,
-                  stableMetricAttributes
+                  stableMetricAttributes,
+                  startTime,
+                  error
                 );
                 throw error;
               }
@@ -851,14 +840,12 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           },
           error => {
             if (error) {
-              setSpanWithError(span, error, instrumentation._semconvStability);
-
-              instrumentation._closeHttpSpan(
+              instrumentation._onOutgoingRequestError(
                 span,
-                SpanKind.CLIENT,
-                startTime,
                 oldMetricAttributes,
-                stableMetricAttributes
+                stableMetricAttributes,
+                startTime,
+                error
               );
               throw error;
             }
@@ -937,6 +924,25 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     );
   }
 
+  private _onOutgoingRequestError(
+    span: Span,
+    oldMetricAttributes: Attributes,
+    stableMetricAttributes: Attributes,
+    startTime: HrTime,
+    error: Err
+  ) {
+    setSpanWithError(span, error, this._semconvStability);
+    stableMetricAttributes[ATTR_ERROR_TYPE] = error.name;
+
+    this._closeHttpSpan(
+      span,
+      SpanKind.CLIENT,
+      startTime,
+      oldMetricAttributes,
+      stableMetricAttributes
+    );
+  }
+
   private _onServerResponseError(
     span: Span,
     oldMetricAttributes: Attributes,
@@ -945,7 +951,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     error: Err
   ) {
     setSpanWithError(span, error, this._semconvStability);
-    // TODO get error attributes for metrics
+    stableMetricAttributes[ATTR_ERROR_TYPE] = error.name;
+
     this._closeHttpSpan(
       span,
       SpanKind.SERVER,
