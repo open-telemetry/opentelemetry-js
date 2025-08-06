@@ -109,7 +109,7 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
     );
   }
 
-  init() {
+  protected override init() {
     return [
       new InstrumentationNodeModuleDefinition(
         '@grpc/grpc-js',
