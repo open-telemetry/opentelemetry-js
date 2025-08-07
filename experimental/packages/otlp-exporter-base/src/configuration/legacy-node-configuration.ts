@@ -18,7 +18,8 @@
 import type * as http from 'http';
 import type * as https from 'https';
 
-import { OTLPExporterConfigBase } from './legacy-base-configuration';
+import type { OTLPExporterConfigBase } from './legacy-base-configuration';
+import type { HttpAgentFactory } from './otlp-http-configuration';
 
 /**
  * Collector Exporter node base config
@@ -26,7 +27,7 @@ import { OTLPExporterConfigBase } from './legacy-base-configuration';
 export interface OTLPExporterNodeConfigBase extends OTLPExporterConfigBase {
   keepAlive?: boolean;
   compression?: CompressionAlgorithm;
-  httpAgentOptions?: http.AgentOptions | https.AgentOptions;
+  httpAgentOptions?: http.AgentOptions | https.AgentOptions | HttpAgentFactory;
 }
 
 export enum CompressionAlgorithm {

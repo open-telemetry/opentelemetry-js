@@ -55,7 +55,7 @@ describe('createOtlpHttpExportDelegate', function () {
     const delegate = createOtlpHttpExportDelegate(
       {
         url: 'http://localhost:8083',
-        agentOptions: {},
+        agent: () => new http.Agent(),
         compression: 'none',
         concurrencyLimit: 30,
         headers: () => ({}),

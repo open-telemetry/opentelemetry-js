@@ -28,7 +28,7 @@ describe('mergeOtlpHttpConfigurationWithDefaults', function () {
     compression: 'none',
     concurrencyLimit: 2,
     headers: () => ({ 'User-Agent': 'default-user-agent' }),
-    agentOptions: { keepAlive: true },
+    agent: () => null!,
   };
 
   describe('headers', function () {
