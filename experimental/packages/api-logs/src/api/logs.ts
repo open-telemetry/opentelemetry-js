@@ -51,7 +51,7 @@ export class LogsAPI {
       provider,
       NOOP_LOGGER_PROVIDER
     );
-    this._proxyLoggerProvider.setDelegate(provider);
+    this._proxyLoggerProvider._setDelegate(provider);
 
     return provider;
   }

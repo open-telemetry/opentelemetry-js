@@ -52,7 +52,7 @@ describe('ProxyLogger', () => {
       delegate = {
         getLogger: getLoggerStub,
       };
-      provider.setDelegate(delegate);
+      provider._setDelegate(delegate);
     });
 
     it('should return loggers directly from the delegate', () => {
@@ -104,7 +104,7 @@ describe('ProxyLogger', () => {
           return delegateLogger;
         },
       };
-      provider.setDelegate(delegateProvider);
+      provider._setDelegate(delegateProvider);
     });
 
     it('should emit from the delegate logger', () => {

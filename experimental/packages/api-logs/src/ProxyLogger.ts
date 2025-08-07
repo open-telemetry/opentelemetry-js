@@ -47,7 +47,7 @@ export class ProxyLogger implements Logger {
     if (this._delegate) {
       return this._delegate;
     }
-    const logger = this._provider.getDelegateLogger(
+    const logger = this._provider._getDelegateLogger(
       this.name,
       this.version,
       this.options
@@ -61,7 +61,7 @@ export class ProxyLogger implements Logger {
 }
 
 export interface LoggerDelegator {
-  getDelegateLogger(
+  _getDelegateLogger(
     name: string,
     version?: string,
     options?: LoggerOptions
