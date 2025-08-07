@@ -59,3 +59,10 @@ export type RawResourceAttribute = [
   string,
   MaybePromise<AttributeValue | undefined>,
 ];
+
+/**
+ * Options for creating a {@link Resource}.
+ */
+export type ResourceOptions = {
+  schemaUrl?: string;
+};
