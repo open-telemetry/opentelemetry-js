@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-import { ExportResult, hrTimeToMicroseconds } from '@opentelemetry/core';
-import { ExportResultCode } from '@opentelemetry/core';
+import {
+  ExportResultCode,
+  ExportResult,
+  hrTimeToMicroseconds,
+} from '@opentelemetry/core';
 
 import type { ReadableLogRecord } from './ReadableLogRecord';
 import type { LogRecordExporter } from './LogRecordExporter';
