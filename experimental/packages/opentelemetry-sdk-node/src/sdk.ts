@@ -331,7 +331,7 @@ export class NodeSDK {
   /**
    * Call this method to construct SDK components and register them with the OpenTelemetry API.
    */
-  public start(): void {
+  public async start(): Promise<void> {
     if (this._disabled) {
       return;
     }
@@ -345,7 +345,9 @@ export class NodeSDK {
         detectors: this._resourceDetectors,
       };
 
-      this._resource = this._resource.merge(detectResources(internalConfig));
+      this._resource = this._resource.merge(
+        await detectResources(internalConfig)
+      );
     }
 
     this._resource =
