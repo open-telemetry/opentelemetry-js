@@ -8,20 +8,20 @@
   "types": "build/src/index.d.ts",
   "exports": {
     ".": {
-      "module": "./build/esm/index.js",
       "esnext": "./build/esnext/index.js",
+      "module": "./build/esm/index.js",
       "types": "./build/src/index.d.ts",
       "default": "./build/src/index.js"
     },
     "./node-http": {
-      "module": "./build/esm/index-node-http.js",
       "esnext": "./build/esnext/index-node-http.js",
+      "module": "./build/esm/index-node-http.js",
       "types": "./build/src/index-node-http.d.ts",
       "default": "./build/src/index-node-http.js"
     },
     "./browser-http": {
-      "module": "./build/esm/index-browser-http.js",
       "esnext": "./build/esnext/index-browser-http.js",
+      "module": "./build/esm/index-browser-http.js",
       "types": "./build/src/index-browser-http.d.ts",
       "default": "./build/src/index-browser-http.js"
     }
