@@ -128,7 +128,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     );
   }
 
-  init() {}
+  protected override init() {}
 
   /**
    * Adds custom headers to XMLHttpRequest
