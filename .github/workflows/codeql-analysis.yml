@@ -6,8 +6,13 @@ on:
     branches: [ main ]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   CodeQL-Build:
+    permissions:
+      security-events: write
     runs-on: ubuntu-latest
 
     steps:

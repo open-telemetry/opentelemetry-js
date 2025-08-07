@@ -25,8 +25,9 @@ describe('API', () => {
   it('should expose a logger provider via getLoggerProvider', () => {
     assert.ok(logs.getLoggerProvider() instanceof ProxyLoggerProvider);
     assert.ok(
-      (logs.getLoggerProvider() as ProxyLoggerProvider).getDelegate() instanceof
-        NoopLoggerProvider
+      (
+        logs.getLoggerProvider() as ProxyLoggerProvider
+      )._getDelegate() instanceof NoopLoggerProvider
     );
   });
 
