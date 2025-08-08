@@ -1,0 +1,80 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import {
+  Attributes,
+  Context,
+  isSpanContextValid,
+  Link,
+  SpanKind,
+  TraceFlags,
+} from '@opentelemetry/api';
+import { getSpanContext } from '../../../../api/src/trace/context-utils';
+import { ConsistentSampler } from './sampler';
+import { ComposableSampler, SamplingIntent } from './types';
+import { parseOtelTraceState } from './tracestate';
+import { INVALID_THRESHOLD, isValidThreshold, MIN_THRESHOLD } from './util';
+
+export class ConsistentParentBasedSampler extends ConsistentSampler {
+  private readonly description: string;
+
+  constructor(private readonly rootSampler: ComposableSampler) {
+    super();
+    this.description = `ConsistentParentBasedSampler(root_sampler=${rootSampler})`;
+  }
+
+  override getSamplingIntent(
+    context: Context,
+    traceId: string,
+    spanName: string,
+    spanKind: SpanKind,
+    attributes: Attributes,
+    links: Link[]
+  ): SamplingIntent {
+    const parentSpanContext = getSpanContext(context);
+    if (!parentSpanContext || !isSpanContextValid(parentSpanContext)) {
+      return this.rootSampler.getSamplingIntent(
+        context,
+        traceId,
+        spanName,
+        spanKind,
+        attributes,
+        links
+      );
+    }
+
+    const otTraceState = parseOtelTraceState(parentSpanContext.traceState);
+
+    if (isValidThreshold(otTraceState.threshold)) {
+      return {
+        threshold: otTraceState.threshold,
+      };
+    }
+
+    const threshold =
+      parentSpanContext.traceFlags & TraceFlags.SAMPLED
+        ? MIN_THRESHOLD
+        : INVALID_THRESHOLD;
+    return {
+      threshold,
+      adjustedCountUnreliable: true,
+    };
+  }
+
+  override toString(): string {
+    return this.description;
+  }
+}
