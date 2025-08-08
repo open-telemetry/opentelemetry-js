@@ -1,6 +1,5 @@
 # OpenTelemetry Consistent Sampling
 
-
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 

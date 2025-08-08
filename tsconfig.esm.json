@@ -39,13 +39,13 @@
       "path": "experimental/packages/opentelemetry-instrumentation-xml-http-request/tsconfig.esm.json"
     },
     {
-      "path": "experimental/packages/opentelemetry-sampler-consistent/tsconfig.esm.json"
-    },
-    {
       "path": "experimental/packages/otlp-exporter-base/tsconfig.esm.json"
     },
     {
       "path": "experimental/packages/otlp-transformer/tsconfig.esm.json"
+    },
+    {
+      "path": "experimental/packages/sampler-consistent/tsconfig.esm.json"
     },
     {
       "path": "experimental/packages/sdk-logs/tsconfig.esm.json"
