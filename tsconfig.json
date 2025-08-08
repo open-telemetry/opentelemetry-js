@@ -22,6 +22,7 @@
       "experimental/packages/opentelemetry-instrumentation-grpc",
       "experimental/packages/opentelemetry-instrumentation-http",
       "experimental/packages/opentelemetry-instrumentation-xml-http-request",
+      "experimental/packages/opentelemetry-sampler-consistent",
       "experimental/packages/opentelemetry-sdk-node",
       "experimental/packages/otlp-exporter-base",
       "experimental/packages/otlp-grpc-exporter-base",
@@ -110,6 +111,9 @@
     },
     {
       "path": "experimental/packages/opentelemetry-instrumentation-xml-http-request"
+    },
+    {
+      "path": "experimental/packages/opentelemetry-sampler-consistent"
     },
     {
       "path": "experimental/packages/opentelemetry-sdk-node"
