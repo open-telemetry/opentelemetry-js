@@ -3,6 +3,9 @@ name: Benchmark Tests
 on:
   push:
     branches: [ main ]
+  # XXX just adding this to try the benchmark run on this PR. Normally we only run the benchmarks for merges to main.
+  # TODO: remove this on.pull_request before merging.
+  pull_request:
 
 permissions:
   contents: read
@@ -16,7 +19,9 @@ jobs:
       matrix:
         node_version:
           - "22"
-    runs-on: equinix-bare-metal
+    runs-on: oracle-bare-metal-64cpu-512gb-x86-64
+    container:
+      image: ubuntu:24.04
     timeout-minutes: 10
     env:
       NPM_CONFIG_UNSAFE_PERM: true
