@@ -28,12 +28,17 @@ jobs:
     steps:
       # Apt packages:
       # - git: Needed for 'npm run submodule'
+      # XXX try without curl, build-essential
       - name: Setup container environment
         run: |
-          apt-get update && apt-get install --fix-missing -y build-essential curl git
+          apt-get update && apt-get install --fix-missing -y git
 
       - name: Checkout
         uses: actions/checkout@v4
+
+      # Avoid "detected dubious ownership in repository" error when running
+      # `npm run submodule`.
+      - run: git config --global --add safe.directory $GITHUB_WORKSPACE
 
       - uses: actions/setup-node@v4
         with:
