@@ -15,13 +15,13 @@
  */
 
 import { TracerProvider, Tracer as ApiTracer } from '@opentelemetry/api';
-import { merge } from '@opentelemetry/core';
+import { InstrumentationScope, merge } from '@opentelemetry/core';
 import { defaultResource, Resource } from '@opentelemetry/resources';
 import { SpanProcessor } from './SpanProcessor';
 import { Tracer } from './Tracer';
 import { loadDefaultConfig } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
-import { TracerConfig } from './types';
+import { TracerConfig, TracerFactory } from './types';
 import { reconfigureLimits } from './utility';
 
 export enum ForceFlushState {
@@ -31,14 +31,24 @@ export enum ForceFlushState {
   'unresolved',
 }
 
+function defaultTracerFactory(
+  instrumentationScope: InstrumentationScope,
+  config: TracerConfig,
+  resource: Resource,
+  spanProcessor: SpanProcessor
+) {
+  return new Tracer(instrumentationScope, config, resource, spanProcessor);
+}
+
 /**
  * This class represents a basic tracer provider which platform libraries can extend
  */
 export class BasicTracerProvider implements TracerProvider {
   private readonly _config: TracerConfig;
-  private readonly _tracers: Map<string, Tracer> = new Map();
+  private readonly _tracers: Map<string, ApiTracer> = new Map();
   private readonly _resource: Resource;
   private readonly _activeSpanProcessor: MultiSpanProcessor;
+  private readonly _tracerFactory: TracerFactory;
 
   constructor(config: TracerConfig = {}) {
     const mergedConfig = merge(
@@ -47,6 +57,7 @@ export class BasicTracerProvider implements TracerProvider {
       reconfigureLimits(config)
     );
     this._resource = mergedConfig.resource ?? defaultResource();
+    this._tracerFactory = mergedConfig.tracerFactory ?? defaultTracerFactory;
 
     this._config = Object.assign({}, mergedConfig, {
       resource: this._resource,
@@ -70,7 +81,7 @@ export class BasicTracerProvider implements TracerProvider {
     if (!this._tracers.has(key)) {
       this._tracers.set(
         key,
-        new Tracer(
+        this._tracerFactory(
           { name, version, schemaUrl: options?.schemaUrl },
           this._config,
           this._resource,

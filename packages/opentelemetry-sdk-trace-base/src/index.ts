@@ -38,5 +38,6 @@ export type {
   SDKRegistrationConfig,
   SpanLimits,
   TracerConfig,
+  TracerFactory,
 } from './types';
 export type { IdGenerator } from './IdGenerator';
