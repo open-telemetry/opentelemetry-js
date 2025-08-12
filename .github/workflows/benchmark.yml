@@ -26,6 +26,12 @@ jobs:
     env:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
+      # Apt packages:
+      # - git: Needed for 'npm run submodule'
+      - name: Setup container environment
+        run: |
+          apt-get update && apt-get install --fix-missing -y build-essential curl git
+
       - name: Checkout
         uses: actions/checkout@v4
 
