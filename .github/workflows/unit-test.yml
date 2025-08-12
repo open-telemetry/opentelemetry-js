@@ -60,13 +60,13 @@ jobs:
         run: npm run compile
 
       - run: npm test
-        if: ${{ matrix.node_version != '23' && matrix.node_version != '24' }}
+        if: ${{ matrix.node_version != '22' && matrix.node_version != '23' && matrix.node_version != '24' }}
       # Node.js >= 23 type stripping conflicts with mocha usage of ts-node.
       # See https://github.com/open-telemetry/opentelemetry-js/issues/5415
       - run: npm test
         env:
           NODE_OPTIONS: '--no-experimental-strip-types'
-        if: ${{ matrix.node_version == '23' || matrix.node_version == '24' }}
+        if: ${{ matrix.node_version == '22' || matrix.node_version == '23' || matrix.node_version == '24' }}
 
       - name: Report Coverage
         uses: codecov/codecov-action@v5
