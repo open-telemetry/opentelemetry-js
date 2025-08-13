@@ -14,5 +14,6 @@
  * limitations under the License.
  */
 
-export { ConfigProvider } from './ConfigProvider';
+export { EnvironmentConfigProvider } from './EnvironmentConfigProvider';
+export type { ConfigProvider } from './IConfigProvider';
 export type { ConfigurationModel as Configuration } from './configModel';

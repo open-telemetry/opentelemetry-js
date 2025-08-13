@@ -14,53 +14,9 @@
  * limitations under the License.
  */
 
-import { DiagLogLevel } from '@opentelemetry/api';
-import {
-  ConfigurationModel,
-  initializeDefaultConfiguration,
-} from './configModel';
-import {
-  getBooleanFromEnv,
-  getStringFromEnv,
-  getStringListFromEnv,
-  diagLogLevelFromString,
-} from '@opentelemetry/core';
-import { IConfigProvider } from './IConfigProvider';
+import { ConfigProvider } from './IConfigProvider';
+import { EnvironmentConfigProvider } from './EnvironmentConfigProvider';
 
-export function getConfigProvider(): IConfigProvider {
-  return new ConfigProvider();
-}
-
-/**
- * ConfigProvider provides a configuration.
- */
-export class ConfigProvider implements IConfigProvider {
-  private _config: ConfigurationModel;
-
-  constructor() {
-    this._config = initializeDefaultConfiguration();
-    this._config.disable = getBooleanFromEnv('OTEL_SDK_DISABLED');
-
-    const logLevel = getStringFromEnv('OTEL_LOG_LEVEL');
-    if (logLevel) {
-      this._config.log_level =
-        diagLogLevelFromString(logLevel) ?? DiagLogLevel.INFO;
-    }
-
-    const nodeResourceDetectors = getStringListFromEnv(
-      'OTEL_NODE_RESOURCE_DETECTORS'
-    );
-    if (nodeResourceDetectors) {
-      this._config.node_resource_detectors = nodeResourceDetectors;
-    }
-
-    const resourceAttrList = getStringFromEnv('OTEL_RESOURCE_ATTRIBUTES');
-    if (resourceAttrList) {
-      this._config.resource.attributes_list = resourceAttrList;
-    }
-  }
-
-  getInstrumentationConfig(): ConfigurationModel {
-    return this._config;
-  }
+export function getConfigProvider(): ConfigProvider {
+  return new EnvironmentConfigProvider();
 }

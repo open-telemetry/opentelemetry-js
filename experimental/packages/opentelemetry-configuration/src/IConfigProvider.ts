@@ -16,7 +16,7 @@
 
 import { ConfigurationModel } from './configModel';
 
-export interface IConfigProvider {
+export interface ConfigProvider {
   /**
    * Returns a ConfigurationModel, used for instrumentation configuration
    *
