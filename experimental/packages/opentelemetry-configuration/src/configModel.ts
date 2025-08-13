@@ -78,7 +78,6 @@ export interface ConfigResources {
   /**
    * Configure resource attributes. Entries have lower priority than entries from .resource.attributes.
    * The value is a list of comma separated key-value pairs matching the format of OTEL_RESOURCE_ATTRIBUTES.
-   * See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration for details.
    * If omitted or null, no resource attributes are added.
    */
   attributes_list?: string;
