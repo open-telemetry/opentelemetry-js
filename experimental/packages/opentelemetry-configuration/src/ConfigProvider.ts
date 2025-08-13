@@ -25,11 +25,16 @@ import {
   getStringListFromEnv,
   diagLogLevelFromString,
 } from '@opentelemetry/core';
+import { IConfigProvider } from './IConfigProvider';
+
+export function getConfigProvider(): IConfigProvider {
+  return new ConfigProvider();
+}
 
 /**
  * ConfigProvider provides a configuration.
  */
-export class ConfigProvider {
+export class ConfigProvider implements IConfigProvider {
   private _config: ConfigurationModel;
 
   constructor() {
@@ -55,7 +60,7 @@ export class ConfigProvider {
     }
   }
 
-  getInstrumentationConfig() {
+  getInstrumentationConfig(): ConfigurationModel {
     return this._config;
   }
 }

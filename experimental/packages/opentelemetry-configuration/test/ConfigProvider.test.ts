@@ -17,6 +17,7 @@
 import * as assert from 'assert';
 import { ConfigProvider, Configuration } from '../src';
 import { DiagLogLevel } from '@opentelemetry/api';
+import { getConfigProvider } from '../src/ConfigProvider';
 
 const defaultConfig: Configuration = {
   disable: false,
@@ -35,7 +36,7 @@ describe('ConfigProvider', function () {
     });
 
     it('should initialize config with default values', function () {
-      const configProvider = new ConfigProvider();
+      const configProvider = getConfigProvider();
       assert.deepStrictEqual(
         configProvider.getInstrumentationConfig(),
         defaultConfig
@@ -48,7 +49,7 @@ describe('ConfigProvider', function () {
         ...defaultConfig,
         disable: true,
       };
-      const configProvider = new ConfigProvider();
+      const configProvider = getConfigProvider();
       assert.deepStrictEqual(
         configProvider.getInstrumentationConfig(),
         expectedConfig
@@ -61,7 +62,7 @@ describe('ConfigProvider', function () {
         ...defaultConfig,
         log_level: DiagLogLevel.DEBUG,
       };
-      const configProvider = new ConfigProvider();
+      const configProvider = getConfigProvider();
       assert.deepStrictEqual(
         configProvider.getInstrumentationConfig(),
         expectedConfig
@@ -74,7 +75,7 @@ describe('ConfigProvider', function () {
         ...defaultConfig,
         node_resource_detectors: ['env', 'host', 'serviceinstance'],
       };
-      const configProvider = new ConfigProvider();
+      const configProvider = getConfigProvider();
       assert.deepStrictEqual(
         configProvider.getInstrumentationConfig(),
         expectedConfig
@@ -91,7 +92,7 @@ describe('ConfigProvider', function () {
             'service.namespace=my-namespace,service.version=1.0.0',
         },
       };
-      const configProvider = new ConfigProvider();
+      const configProvider = getConfigProvider();
       assert.deepStrictEqual(
         configProvider.getInstrumentationConfig(),
         expectedConfig
