@@ -16,13 +16,25 @@ jobs:
       matrix:
         node_version:
           - "22"
-    runs-on: equinix-bare-metal
+    runs-on: oracle-bare-metal-64cpu-512gb-x86-64
+    container:
+      image: ubuntu:24.04
     timeout-minutes: 10
     env:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
+      # Apt packages:
+      # - git: Needed for 'npm run submodule'
+      - name: Setup container environment
+        run: |
+          apt-get update && apt-get install --fix-missing -y git
+
       - name: Checkout
         uses: actions/checkout@v4
+
+      # Avoid "detected dubious ownership in repository" error when running
+      # `npm run submodule`.
+      - run: git config --global --add safe.directory $GITHUB_WORKSPACE
 
       - uses: actions/setup-node@v4
         with:
