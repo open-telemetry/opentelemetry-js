@@ -14,14 +14,14 @@
   },
   "exports": {
     ".": {
-      "module": "./build/esm/index.js",
       "esnext": "./build/esnext/index.js",
+      "module": "./build/esm/index.js",
       "types": "./build/src/index.d.ts",
       "default": "./build/src/index.js"
     },
     "./experimental": {
-      "module": "./build/esm/experimental/index.js",
       "esnext": "./build/esnext/experimental/index.js",
+      "module": "./build/esm/experimental/index.js",
       "types": "./build/src/experimental/index.d.ts",
       "default": "./build/src/experimental/index.js"
     }

@@ -8,14 +8,14 @@
   "types": "build/src/index.d.ts",
   "exports": {
     ".": {
-      "module": "./build/esm/index.js",
       "esnext": "./build/esnext/index.js",
+      "module": "./build/esm/index.js",
       "types": "./build/src/index.d.ts",
       "default": "./build/src/index.js"
     },
     "./incubating": {
-      "module": "./build/esm/index-incubating.js",
       "esnext": "./build/esnext/index-incubating.js",
+      "module": "./build/esm/index-incubating.js",
       "types": "./build/src/index-incubating.d.ts",
       "default": "./build/src/index-incubating.js"
     }
