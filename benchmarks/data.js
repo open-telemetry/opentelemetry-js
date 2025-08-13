@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1753285336241,
+  "lastUpdate": 1755105588097,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -35676,6 +35676,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.93%",
             "unit": "ops/sec",
             "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "927032ffd956eac73d0a1a98212aded9bf8a0107",
+          "message": "benchmarks: switch baremetal runner to Oracle cloud (#5849)",
+          "timestamp": "2025-08-13T17:08:23Z",
+          "tree_id": "163310bdb1711e04f023069e9770a905fcf33451",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/927032ffd956eac73d0a1a98212aded9bf8a0107"
+        },
+        "date": 1755105587155,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 670538,
+            "range": "±0.75%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8480,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 293010,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 284364,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
