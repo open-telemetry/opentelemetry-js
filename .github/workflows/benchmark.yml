@@ -3,9 +3,6 @@ name: Benchmark Tests
 on:
   push:
     branches: [ main ]
-  # XXX just adding this to try the benchmark run on this PR. Normally we only run the benchmarks for merges to main.
-  # TODO: remove this on.pull_request before merging.
-  pull_request:
 
 permissions:
   contents: read
@@ -28,7 +25,6 @@ jobs:
     steps:
       # Apt packages:
       # - git: Needed for 'npm run submodule'
-      # XXX try without curl, build-essential
       - name: Setup container environment
         run: |
           apt-get update && apt-get install --fix-missing -y git
