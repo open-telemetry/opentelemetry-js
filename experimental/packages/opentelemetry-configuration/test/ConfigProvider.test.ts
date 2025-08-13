@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { ConfigProvider, Configuration } from '../src';
+import { Configuration } from '../src';
 import { DiagLogLevel } from '@opentelemetry/api';
 import { getConfigProvider } from '../src/ConfigProvider';
 
