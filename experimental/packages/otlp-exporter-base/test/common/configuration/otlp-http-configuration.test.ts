@@ -196,13 +196,14 @@ describe('mergeOtlpHttpConfigurationWithDefaults', function () {
       ];
 
       invalidUrlsWithSpaces.forEach(url => {
-        assert.throws(() => {
-          mergeOtlpHttpConfigurationWithDefaults(
-            { url },
-            {},
-            testDefaults
-          );
-        }, new RegExp(`Configuration: Could not parse user-provided export URL: '${url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`));
+        assert.throws(
+          () => {
+            mergeOtlpHttpConfigurationWithDefaults({ url }, {}, testDefaults);
+          },
+          new RegExp(
+            `Configuration: Could not parse user-provided export URL: '${url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`
+          )
+        );
       });
     });
 
@@ -231,13 +232,14 @@ describe('mergeOtlpHttpConfigurationWithDefaults', function () {
       ];
 
       invalidUrls.forEach(url => {
-        assert.throws(() => {
-          mergeOtlpHttpConfigurationWithDefaults(
-            { url },
-            {},
-            testDefaults
-          );
-        }, new RegExp(`Configuration: Could not parse user-provided export URL: '${url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`));
+        assert.throws(
+          () => {
+            mergeOtlpHttpConfigurationWithDefaults({ url }, {}, testDefaults);
+          },
+          new RegExp(
+            `Configuration: Could not parse user-provided export URL: '${url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`
+          )
+        );
       });
     });
 
@@ -295,9 +297,9 @@ describe('mergeOtlpHttpConfigurationWithDefaults', function () {
         '.', // current directory
         '..', // parent directory
         '/', // root
-        './.',  // current directory with extra dot
+        './.', // current directory with extra dot
         '../.', // parent directory with extra dot
-        './..',  // current then parent
+        './..', // current then parent
         '../..', // multiple levels up
         './././', // multiple current directory references
         '../../../', // deep relative path

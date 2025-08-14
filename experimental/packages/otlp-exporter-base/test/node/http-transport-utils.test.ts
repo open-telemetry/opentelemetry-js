@@ -17,7 +17,10 @@ import * as http from 'http';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { EventEmitter } from 'events';
-import { compressAndSend, sendWithHttp } from '../../src/transport/http-transport-utils';
+import {
+  compressAndSend,
+  sendWithHttp,
+} from '../../src/transport/http-transport-utils';
 import { ExportResponse } from '../../src/export-response';
 import { HttpRequestParameters } from '../../src/transport/http-transport-types';
 
@@ -66,7 +69,7 @@ describe('sendWithHttp', function () {
         assert.strictEqual(options.hostname, 'localhost');
         assert.strictEqual(options.port, '4318');
         assert.strictEqual(options.path, '/v1/logs');
-        
+
         // Create a minimal request mock that just needs to handle piping
         const mockRequest = Object.assign(new EventEmitter(), {
           setTimeout: sinon.stub(),
@@ -76,28 +79,28 @@ describe('sendWithHttp', function () {
           end: sinon.stub(),
           destroy: sinon.stub(),
         });
-        
+
         // When anything is piped to this request, ignore it
         const originalEmit = mockRequest.emit.bind(mockRequest);
-        mockRequest.emit = function(event: string, ...args: any[]) {
+        mockRequest.emit = function (event: string, ...args: any[]) {
           return originalEmit(event, ...args);
         };
-        
+
         // Simulate a response after a short delay
         setImmediate(() => {
           const mockResponse = Object.assign(new EventEmitter(), {
             statusCode: 200,
             headers: {},
           });
-          
+
           if (callback) callback(mockResponse);
-          
+
           setImmediate(() => {
             mockResponse.emit('data', Buffer.from('test response'));
             mockResponse.emit('end');
           });
         });
-        
+
         return mockRequest;
       } catch (e) {
         done(e);
@@ -138,7 +141,7 @@ describe('sendWithHttp', function () {
         // Verify that http.request was called with localhost and the resolved path
         assert.strictEqual(options.hostname, 'localhost');
         assert.strictEqual(options.path, '/api/logs');
-        
+
         // Create a minimal request mock that just needs to handle piping
         const mockRequest = Object.assign(new EventEmitter(), {
           setTimeout: sinon.stub(),
@@ -148,22 +151,22 @@ describe('sendWithHttp', function () {
           end: sinon.stub(),
           destroy: sinon.stub(),
         });
-        
+
         // Simulate a response after a short delay
         setImmediate(() => {
           const mockResponse = Object.assign(new EventEmitter(), {
             statusCode: 200,
             headers: {},
           });
-          
+
           if (callback) callback(mockResponse);
-          
+
           setImmediate(() => {
             mockResponse.emit('data', Buffer.from('test response'));
             mockResponse.emit('end');
           });
         });
-        
+
         return mockRequest;
       } catch (e) {
         done(e);
@@ -206,18 +209,26 @@ describe('sendWithHttp', function () {
     ];
 
     let completedTests = 0;
-    
+
     testCases.forEach(({ input, expectedPath }, index) => {
       // Reset stub for each test case
       httpRequestStub.resetHistory();
-      
+
       // Mock http.request to capture the options
       httpRequestStub.callsFake((options, callback) => {
         try {
           // Verify that http.request was called with the expected resolved path
-          assert.strictEqual(options.hostname, 'localhost', `Failed for input: ${input}`);
-          assert.strictEqual(options.path, expectedPath, `Failed for input: ${input}`);
-          
+          assert.strictEqual(
+            options.hostname,
+            'localhost',
+            `Failed for input: ${input}`
+          );
+          assert.strictEqual(
+            options.path,
+            expectedPath,
+            `Failed for input: ${input}`
+          );
+
           // Create a minimal request mock
           const mockRequest = Object.assign(new EventEmitter(), {
             setTimeout: sinon.stub(),
@@ -227,22 +238,22 @@ describe('sendWithHttp', function () {
             end: sinon.stub(),
             destroy: sinon.stub(),
           });
-          
+
           // Simulate a response
           setImmediate(() => {
             const mockResponse = Object.assign(new EventEmitter(), {
               statusCode: 200,
               headers: {},
             });
-            
+
             if (callback) callback(mockResponse);
-            
+
             setImmediate(() => {
               mockResponse.emit('data', Buffer.from('test response'));
               mockResponse.emit('end');
             });
           });
-          
+
           return mockRequest;
         } catch (e) {
           done(e);
@@ -265,8 +276,12 @@ describe('sendWithHttp', function () {
         new Uint8Array([1, 2, 3]),
         (response: ExportResponse) => {
           try {
-            assert.strictEqual(response.status, 'success', `Failed for input: ${input}`);
-            
+            assert.strictEqual(
+              response.status,
+              'success',
+              `Failed for input: ${input}`
+            );
+
             completedTests++;
             if (completedTests === testCases.length) {
               done();
@@ -294,7 +309,7 @@ describe('sendWithHttp', function () {
             assert.strictEqual(response.status, 'failure');
             assert.ok(response.error);
             assert.match(response.error.message, /Invalid URL/);
-            
+
             // Verify that http.request was not called for invalid URLs
             assert.strictEqual(httpRequestStub.callCount, 0);
             done();
@@ -306,7 +321,10 @@ describe('sendWithHttp', function () {
       );
     } catch (e) {
       // If an error is thrown synchronously, catch it and pass the test
-      assert.match(e.message, /Invalid URL|Cannot read properties of undefined/);
+      assert.match(
+        e.message,
+        /Invalid URL|Cannot read properties of undefined/
+      );
       done();
     }
   });
@@ -315,7 +333,7 @@ describe('sendWithHttp', function () {
     // This tests the case where new URL() fails for both the original URL and the localhost resolution
     // Reset the stub call count from previous tests
     httpRequestStub.resetHistory();
-    
+
     const params = createTestParams('://invalid-protocol');
 
     try {
@@ -328,7 +346,7 @@ describe('sendWithHttp', function () {
             assert.strictEqual(response.status, 'failure');
             assert.ok(response.error);
             assert.match(response.error.message, /Invalid URL/);
-            
+
             // Verify that http.request was not called for invalid URLs
             assert.strictEqual(httpRequestStub.callCount, 0);
             done();
@@ -340,7 +358,10 @@ describe('sendWithHttp', function () {
       );
     } catch (e) {
       // If an error is thrown synchronously, catch it and pass the test
-      assert.match(e.message, /Invalid URL|Cannot read properties of undefined/);
+      assert.match(
+        e.message,
+        /Invalid URL|Cannot read properties of undefined/
+      );
       done();
     }
   });
