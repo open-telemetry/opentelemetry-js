@@ -9,7 +9,7 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
-* feat: add `EVENT_*` exports for event names in Semantic Conventions [#XXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXX) @trentm
+* feat: add `EVENT_*` exports for event names in Semantic Conventions [#5832](https://github.com/open-telemetry/opentelemetry-js/pull/5832) @trentm
 
 ### :bug: Bug Fixes
 
