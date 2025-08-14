@@ -13,6 +13,8 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :bug: Bug Fixes
 
+* fix: prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
+
 ### :books: Documentation
 
 ### :house: Internal
