@@ -45,7 +45,7 @@
       "path": "experimental/packages/otlp-transformer/tsconfig.esnext.json"
     },
     {
-      "path": "experimental/packages/sampler-consistent/tsconfig.esnext.json"
+      "path": "experimental/packages/sampler-composite/tsconfig.esnext.json"
     },
     {
       "path": "experimental/packages/sdk-logs/tsconfig.esnext.json"

@@ -1,11 +1,11 @@
 {
-  "name": "@opentelemetry/sampler-consistent",
+  "name": "@opentelemetry/sampler-composite",
   "private": false,
   "publishConfig": {
     "access": "public"
   },
   "version": "0.203.0",
-  "description": "Consistent sampling for OpenTelemetry tracing",
+  "description": "Composite samplers for OpenTelemetry tracing",
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
   "types": "build/src/index.d.ts",
