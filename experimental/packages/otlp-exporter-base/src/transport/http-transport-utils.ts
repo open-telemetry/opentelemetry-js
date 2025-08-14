@@ -41,7 +41,7 @@ export function sendWithHttp(
   timeoutMillis: number
 ): void {
   let parsedUrl: URL;
-  
+
   try {
     parsedUrl = new URL(params.url);
   } catch {

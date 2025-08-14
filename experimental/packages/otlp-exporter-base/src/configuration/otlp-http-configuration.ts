@@ -61,7 +61,7 @@ function validateUserProvidedUrl(url: string | undefined): string | undefined {
   if (url == null) {
     return undefined;
   }
-  
+
   // If it looks like an absolute URL (contains ://), validate it strictly
   if (url.includes('://')) {
     try {
@@ -73,19 +73,24 @@ function validateUserProvidedUrl(url: string | undefined): string | undefined {
       );
     }
   }
-  
+
   // For relative URLs, do basic validation
   // Allow paths that start with ./, ../, /, or are simple paths without spaces
   if (url.match(/^(\.\.?\/|\/|[a-zA-Z0-9._-]+)/)) {
     // Check for obvious invalid characters that would make it not a valid path
-    if (url.includes(' ') && !url.startsWith('./') && !url.startsWith('../') && !url.startsWith('/')) {
+    if (
+      url.includes(' ') &&
+      !url.startsWith('./') &&
+      !url.startsWith('../') &&
+      !url.startsWith('/')
+    ) {
       throw new Error(
         `Configuration: Could not parse user-provided export URL: '${url}'`
       );
     }
     return url;
   }
-  
+
   // If it doesn't match our relative URL patterns, reject it
   throw new Error(
     `Configuration: Could not parse user-provided export URL: '${url}'`

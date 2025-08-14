@@ -183,13 +183,18 @@ describe('mergeOtlpHttpConfigurationWithDefaults', function () {
       ];
 
       invalidUrls.forEach(invalidUrl => {
-        assert.throws(() => {
-          mergeOtlpHttpConfigurationWithDefaults(
-            { url: invalidUrl },
-            {},
-            testDefaults
-          );
-        }, new RegExp(`Configuration: Could not parse user-provided export URL: '${invalidUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`));
+        assert.throws(
+          () => {
+            mergeOtlpHttpConfigurationWithDefaults(
+              { url: invalidUrl },
+              {},
+              testDefaults
+            );
+          },
+          new RegExp(
+            `Configuration: Could not parse user-provided export URL: '${invalidUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`
+          )
+        );
       });
     });
   });
