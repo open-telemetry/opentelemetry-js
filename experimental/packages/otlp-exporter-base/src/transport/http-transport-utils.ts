@@ -40,7 +40,25 @@ export function sendWithHttp(
   onDone: (response: ExportResponse) => void,
   timeoutMillis: number
 ): void {
-  const parsedUrl = new URL(params.url);
+  let parsedUrl: URL;
+  
+  try {
+    parsedUrl = new URL(params.url);
+  } catch {
+    // If URL parsing fails, it might be a relative URL. Try to resolve it against localhost.
+    // This provides a sensible default for Node.js environments where relative URLs
+    // are commonly used to target the same host.
+    try {
+      parsedUrl = new URL(params.url, 'http://localhost/');
+    } catch {
+      // If it still fails, throw a more descriptive error
+      onDone({
+        status: 'failure',
+        error: new Error(`Invalid URL: ${params.url}`),
+      });
+      return;
+    }
+  }
 
   const options: http.RequestOptions | https.RequestOptions = {
     hostname: parsedUrl.hostname,

@@ -129,6 +129,69 @@ describe('mergeOtlpHttpConfigurationWithDefaults', function () {
         );
       }, new Error("Configuration: Could not parse user-provided export URL: 'this is not a URL'"));
     });
+
+    it('allows relative URLs', function () {
+      const config = mergeOtlpHttpConfigurationWithDefaults(
+        { url: './api/logs' },
+        {},
+        testDefaults
+      );
+      assert.strictEqual(config.url, './api/logs');
+    });
+
+    it('allows relative URLs with different formats', function () {
+      const testCases = [
+        './api/logs',
+        '../logs',
+        '/api/logs',
+        'api/logs',
+        './v1/logs',
+      ];
+
+      testCases.forEach(relativeUrl => {
+        const config = mergeOtlpHttpConfigurationWithDefaults(
+          { url: relativeUrl },
+          {},
+          testDefaults
+        );
+        assert.strictEqual(config.url, relativeUrl);
+      });
+    });
+
+    it('validates absolute URLs properly', function () {
+      const validUrls = [
+        'http://localhost:4318',
+        'https://example.com/api/logs',
+        'http://192.168.1.1:8080/logs',
+      ];
+
+      validUrls.forEach(absoluteUrl => {
+        const config = mergeOtlpHttpConfigurationWithDefaults(
+          { url: absoluteUrl },
+          {},
+          testDefaults
+        );
+        assert.strictEqual(config.url, absoluteUrl);
+      });
+    });
+
+    it('throws error for malformed absolute URLs', function () {
+      const invalidUrls = [
+        'http://',
+        'https://[invalid',
+        'http://[::1:8080', // malformed IPv6
+      ];
+
+      invalidUrls.forEach(invalidUrl => {
+        assert.throws(() => {
+          mergeOtlpHttpConfigurationWithDefaults(
+            { url: invalidUrl },
+            {},
+            testDefaults
+          );
+        }, new RegExp(`Configuration: Could not parse user-provided export URL: '${invalidUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`));
+      });
+    });
   });
 
   testSharedConfigBehavior(
