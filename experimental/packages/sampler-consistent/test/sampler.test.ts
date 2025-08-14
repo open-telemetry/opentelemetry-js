@@ -20,10 +20,11 @@ import { context, SpanContext, SpanKind, TraceFlags } from '@opentelemetry/api';
 import { SamplingDecision } from '@opentelemetry/sdk-trace-base';
 
 import {
-  ConsistentAlwaysOffSampler,
-  ConsistentAlwaysOnSampler,
-  ConsistentParentBasedSampler,
-  ConsistentFixedThresholdSampler,
+  CompositeSampler,
+  ComposableAlwaysOffSampler,
+  ComposableAlwaysOnSampler,
+  ComposableParentThresholdSampler,
+  ComposableTraceIDRatioBasedSampler,
 } from '../src';
 import { INVALID_RANDOM_VALUE, INVALID_THRESHOLD } from '../src/util';
 import {
@@ -40,7 +41,7 @@ describe('ConsistentSampler', () => {
 
   [
     {
-      sampler: new ConsistentAlwaysOnSampler(),
+      sampler: new ComposableAlwaysOnSampler(),
       parentSampled: true,
       parentThreshold: undefined,
       parentRandomValue: undefined,
@@ -50,7 +51,7 @@ describe('ConsistentSampler', () => {
       testId: 'min threshold no parent random value',
     },
     {
-      sampler: new ConsistentAlwaysOnSampler(),
+      sampler: new ComposableAlwaysOnSampler(),
       parentSampled: true,
       parentThreshold: undefined,
       parentRandomValue: 0x7f99aa40c02744n,
@@ -60,7 +61,7 @@ describe('ConsistentSampler', () => {
       testId: 'min threshold with parent random value',
     },
     {
-      sampler: new ConsistentAlwaysOffSampler(),
+      sampler: new ComposableAlwaysOffSampler(),
       parentSampled: true,
       parentThreshold: undefined,
       parentRandomValue: undefined,
@@ -70,8 +71,8 @@ describe('ConsistentSampler', () => {
       testId: 'max threshold',
     },
     {
-      sampler: new ConsistentParentBasedSampler(
-        new ConsistentAlwaysOnSampler()
+      sampler: new ComposableParentThresholdSampler(
+        new ComposableAlwaysOnSampler()
       ),
       parentSampled: false,
       parentThreshold: 0x7f99aa40c02744n,
@@ -82,8 +83,8 @@ describe('ConsistentSampler', () => {
       testId: 'parent based in consistent mode',
     },
     {
-      sampler: new ConsistentParentBasedSampler(
-        new ConsistentAlwaysOnSampler()
+      sampler: new ComposableParentThresholdSampler(
+        new ComposableAlwaysOnSampler()
       ),
       parentSampled: true,
       parentThreshold: undefined,
@@ -94,7 +95,7 @@ describe('ConsistentSampler', () => {
       testId: 'parent based in legacy mode',
     },
     {
-      sampler: new ConsistentFixedThresholdSampler(0.5),
+      sampler: new ComposableTraceIDRatioBasedSampler(0.5),
       parentSampled: true,
       parentThreshold: undefined,
       parentRandomValue: 0x7fffffffffffffn,
@@ -104,7 +105,7 @@ describe('ConsistentSampler', () => {
       testId: 'half threshold not sampled',
     },
     {
-      sampler: new ConsistentFixedThresholdSampler(0.5),
+      sampler: new ComposableTraceIDRatioBasedSampler(0.5),
       parentSampled: false,
       parentThreshold: undefined,
       parentRandomValue: 0x80000000000000n,
@@ -114,7 +115,7 @@ describe('ConsistentSampler', () => {
       testId: 'half threshold sampled',
     },
     {
-      sampler: new ConsistentFixedThresholdSampler(1.0),
+      sampler: new ComposableTraceIDRatioBasedSampler(1.0),
       parentSampled: false,
       parentThreshold: 0x80000000000000n,
       parentRandomValue: 0x80000000000000n,
@@ -158,7 +159,7 @@ describe('ConsistentSampler', () => {
           parentSpanContext
         );
 
-        const result = sampler.shouldSample(
+        const result = new CompositeSampler(sampler).shouldSample(
           parentContext,
           traceId,
           'name',

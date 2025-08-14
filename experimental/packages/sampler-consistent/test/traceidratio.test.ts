@@ -18,41 +18,43 @@ import * as assert from 'assert';
 import { context, SpanKind } from '@opentelemetry/api';
 import { SamplingDecision } from '@opentelemetry/sdk-trace-base';
 
-import { ConsistentFixedThresholdSampler } from '../src';
+import { CompositeSampler, ComposableTraceIDRatioBasedSampler } from '../src';
 import { traceIdGenerator } from './util';
 import { parseOtelTraceState } from '../src/tracestate';
 import { INVALID_RANDOM_VALUE } from '../src/util';
 
-describe('ConsistentFixedThresholdSampler', () => {
+describe('ComposableTraceIDRatioBasedSampler', () => {
   [
-    { probability: 1.0, thresholdStr: '0' },
-    { probability: 0.5, thresholdStr: '8' },
-    { probability: 0.25, thresholdStr: 'c' },
-    { probability: 1e-300, thresholdStr: 'max' },
-    { probability: 0, thresholdStr: 'max' },
-  ].forEach(({ probability, thresholdStr }) => {
-    it(`should have a description for probability ${probability}`, () => {
-      const sampler = new ConsistentFixedThresholdSampler(probability);
+    { ratio: 1.0, thresholdStr: '0' },
+    { ratio: 0.5, thresholdStr: '8' },
+    { ratio: 0.25, thresholdStr: 'c' },
+    { ratio: 1e-300, thresholdStr: 'max' },
+    { ratio: 0, thresholdStr: 'max' },
+  ].forEach(({ ratio, thresholdStr }) => {
+    it(`should have a description for ratio ${ratio}`, () => {
+      const sampler = new ComposableTraceIDRatioBasedSampler(ratio);
       assert.strictEqual(
         sampler.toString(),
-        `ConsistentFixedThresholdSampler(threshold=${thresholdStr}, sampling probability=${probability})`
+        `ComposableTraceIDRatioBasedSampler(threshold=${thresholdStr}, ratio=${ratio})`
       );
     });
   });
 
   [
-    { probability: 1.0, threshold: 0n },
-    { probability: 0.5, threshold: 36028797018963968n },
-    { probability: 0.25, threshold: 54043195528445952n },
-    { probability: 0.125, threshold: 63050394783186944n },
-    { probability: 0.0, threshold: 72057594037927936n },
-    { probability: 0.45, threshold: 39631676720860364n },
-    { probability: 0.2, threshold: 57646075230342348n },
-    { probability: 0.13, threshold: 62690106812997304n },
-    { probability: 0.05, threshold: 68454714336031539n },
-  ].forEach(({ probability, threshold }) => {
-    it(`should sample spans with probability ${probability}`, () => {
-      const sampler = new ConsistentFixedThresholdSampler(probability);
+    { ratio: 1.0, threshold: 0n },
+    { ratio: 0.5, threshold: 36028797018963968n },
+    { ratio: 0.25, threshold: 54043195528445952n },
+    { ratio: 0.125, threshold: 63050394783186944n },
+    { ratio: 0.0, threshold: 72057594037927936n },
+    { ratio: 0.45, threshold: 39631676720860364n },
+    { ratio: 0.2, threshold: 57646075230342348n },
+    { ratio: 0.13, threshold: 62690106812997304n },
+    { ratio: 0.05, threshold: 68454714336031539n },
+  ].forEach(({ ratio, threshold }) => {
+    it(`should sample spans with ratio ${ratio}`, () => {
+      const sampler = new CompositeSampler(
+        new ComposableTraceIDRatioBasedSampler(ratio)
+      );
 
       const generator = traceIdGenerator();
       let numSampled = 0;
@@ -72,7 +74,7 @@ describe('ConsistentFixedThresholdSampler', () => {
           assert.strictEqual(otTraceState?.randomValue, INVALID_RANDOM_VALUE);
         }
       }
-      const expectedNumSampled = 10000 * probability;
+      const expectedNumSampled = 10000 * ratio;
       assert.ok(
         Math.abs(numSampled - expectedNumSampled) < 50,
         `expected ${expectedNumSampled}, have ${numSampled}`

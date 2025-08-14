@@ -14,36 +14,43 @@
  * limitations under the License.
  */
 
-import { ConsistentSampler } from './sampler';
-import { SamplingIntent } from './types';
+import { ComposableSampler, SamplingIntent } from './types';
 import { INVALID_THRESHOLD, MAX_THRESHOLD } from './util';
 import { serializeTh } from './tracestate';
 
-export class ConsistentFixedThresholdSampler extends ConsistentSampler {
+export class ComposableTraceIDRatioBasedSampler implements ComposableSampler {
   private readonly intent: SamplingIntent;
   private readonly description: string;
 
-  constructor(samplingProbability: number) {
-    super();
-    if (samplingProbability < 0 || samplingProbability > 1) {
+  constructor(ratio: number) {
+    if (ratio < 0 || ratio > 1) {
       throw new Error(
-        `Invalid sampling probability: ${samplingProbability}. Must be between 0 and 1.`
+        `Invalid sampling probability: ${ratio}. Must be between 0 and 1.`
       );
     }
-    const threshold = calculateThreshold(samplingProbability);
+    const threshold = calculateThreshold(ratio);
     const thresholdStr =
       threshold === MAX_THRESHOLD ? 'max' : serializeTh(threshold);
-    this.intent = {
-      threshold: threshold === MAX_THRESHOLD ? INVALID_THRESHOLD : threshold,
-    };
-    this.description = `ConsistentFixedThresholdSampler(threshold=${thresholdStr}, sampling probability=${samplingProbability})`;
+    if (threshold !== MAX_THRESHOLD) {
+      this.intent = {
+        threshold: threshold,
+        thresholdReliable: true,
+      };
+    } else {
+      // Same as AlwaysOff, notably the threshold is not considered reliable
+      this.intent = {
+        threshold: INVALID_THRESHOLD,
+        thresholdReliable: false,
+      };
+    }
+    this.description = `ComposableTraceIDRatioBasedSampler(threshold=${thresholdStr}, ratio=${ratio})`;
   }
 
-  override getSamplingIntent(): SamplingIntent {
+  getSamplingIntent(): SamplingIntent {
     return this.intent;
   }
 
-  override toString(): string {
+  toString(): string {
     return this.description;
   }
 }

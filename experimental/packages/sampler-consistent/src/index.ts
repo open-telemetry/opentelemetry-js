@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-export { ConsistentAlwaysOffSampler } from './alwaysoff';
-export { ConsistentAlwaysOnSampler } from './alwayson';
-export { ConsistentFixedThresholdSampler } from './fixedthreshold';
-export { ConsistentParentBasedSampler } from './parentbased';
-export { ConsistentSampler } from './sampler';
+export { ComposableAlwaysOffSampler } from './alwaysoff';
+export { ComposableAlwaysOnSampler } from './alwayson';
+export { ComposableTraceIDRatioBasedSampler } from './traceidratio';
+export { ComposableParentThresholdSampler } from './parentthreshold';
+export { CompositeSampler } from './composite';
 export type { ComposableSampler, SamplingIntent } from './types';

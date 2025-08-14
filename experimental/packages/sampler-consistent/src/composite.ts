@@ -26,7 +26,7 @@ import {
   SamplingDecision,
   SamplingResult,
 } from '@opentelemetry/sdk-trace-base';
-import { ComposableSampler, SamplingIntent } from './types';
+import { ComposableSampler } from './types';
 import { getSpanContext } from '../../../../api/src/trace/context-utils';
 import { parseOtelTraceState, serializeTraceState } from './tracestate';
 import {
@@ -35,7 +35,9 @@ import {
   isValidThreshold,
 } from './util';
 
-export abstract class ConsistentSampler implements Sampler, ComposableSampler {
+export class CompositeSampler implements Sampler {
+  constructor(private readonly delegate: ComposableSampler) {}
+
   shouldSample(
     context: Context,
     traceId: string,
@@ -49,7 +51,7 @@ export abstract class ConsistentSampler implements Sampler, ComposableSampler {
     const traceState = spanContext?.traceState;
     const otTraceState = parseOtelTraceState(traceState);
 
-    const intent = this.getSamplingIntent(
+    const intent = this.delegate.getSamplingIntent(
       context,
       traceId,
       spanName,
@@ -61,7 +63,7 @@ export abstract class ConsistentSampler implements Sampler, ComposableSampler {
     let adjustedCountCorrect = false;
     let sampled = false;
     if (isValidThreshold(intent.threshold)) {
-      adjustedCountCorrect = intent.adjustedCountUnreliable !== true;
+      adjustedCountCorrect = intent.thresholdReliable;
       let randomness: bigint;
       if (isValidRandomValue(otTraceState.randomValue)) {
         randomness = otTraceState.randomValue;
@@ -103,13 +105,4 @@ export abstract class ConsistentSampler implements Sampler, ComposableSampler {
       traceState: newTraceState,
     };
   }
-
-  abstract getSamplingIntent(
-    context: Context,
-    traceId: string,
-    spanName: string,
-    spanKind: SpanKind,
-    attributes: Attributes,
-    links: Link[]
-  ): SamplingIntent;
 }

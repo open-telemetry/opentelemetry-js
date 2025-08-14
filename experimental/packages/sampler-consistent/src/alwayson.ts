@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ConsistentSampler } from './sampler';
-import type { SamplingIntent } from './types';
+import type { ComposableSampler, SamplingIntent } from './types';
 import { MIN_THRESHOLD } from './util';
 
 const intent: SamplingIntent = {
   threshold: MIN_THRESHOLD,
+  thresholdReliable: true,
 };
 
 /**
- * A consistent sampler that samples all span.
+ * A composable sampler that samples all span.
  */
-export class ConsistentAlwaysOnSampler extends ConsistentSampler {
-  override getSamplingIntent(): SamplingIntent {
+export class ComposableAlwaysOnSampler implements ComposableSampler {
+  getSamplingIntent(): SamplingIntent {
     return intent;
   }
 
-  override toString(): string {
-    return 'ConsistentAlwaysOnSampler';
+  toString(): string {
+    return 'ComposableAlwaysOnSampler';
   }
 }

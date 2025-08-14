@@ -23,20 +23,18 @@ import {
   TraceFlags,
 } from '@opentelemetry/api';
 import { getSpanContext } from '../../../../api/src/trace/context-utils';
-import { ConsistentSampler } from './sampler';
 import { ComposableSampler, SamplingIntent } from './types';
 import { parseOtelTraceState } from './tracestate';
 import { INVALID_THRESHOLD, isValidThreshold, MIN_THRESHOLD } from './util';
 
-export class ConsistentParentBasedSampler extends ConsistentSampler {
+export class ComposableParentThresholdSampler implements ComposableSampler {
   private readonly description: string;
 
   constructor(private readonly rootSampler: ComposableSampler) {
-    super();
-    this.description = `ConsistentParentBasedSampler(root_sampler=${rootSampler})`;
+    this.description = `ComposableParentThresholdSampler(root_sampler=${rootSampler})`;
   }
 
-  override getSamplingIntent(
+  getSamplingIntent(
     context: Context,
     traceId: string,
     spanName: string,
@@ -61,6 +59,7 @@ export class ConsistentParentBasedSampler extends ConsistentSampler {
     if (isValidThreshold(otTraceState.threshold)) {
       return {
         threshold: otTraceState.threshold,
+        thresholdReliable: true,
       };
     }
 
@@ -70,11 +69,11 @@ export class ConsistentParentBasedSampler extends ConsistentSampler {
         : INVALID_THRESHOLD;
     return {
       threshold,
-      adjustedCountUnreliable: true,
+      thresholdReliable: false,
     };
   }
 
-  override toString(): string {
+  toString(): string {
     return this.description;
   }
 }

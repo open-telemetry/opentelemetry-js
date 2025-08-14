@@ -17,12 +17,13 @@
 import { Attributes, TraceState } from '@opentelemetry/api';
 import { type Sampler } from '@opentelemetry/sdk-trace-base';
 
+/** Information to make a sampling decision. */
 export type SamplingIntent = {
-  /** The threshold which a random value must pass to be sampled. */
+  /** The sampling threshold value. A lower threshold increases the likelihood of sampling. */
   threshold: bigint;
 
-  /** Whether the adjusted count cannot be computed reliably for the sampler. */
-  adjustedCountUnreliable?: boolean;
+  /** Whether the threshold can be reliably used for Span-to-Metrics estimation. */
+  thresholdReliable: boolean;
 
   /** Any attributes to add to the span for the sampling result. */
   attributes?: Attributes;
@@ -31,9 +32,9 @@ export type SamplingIntent = {
   updateTraceState?: (ts: TraceState | undefined) => TraceState | undefined;
 };
 
-/** A sampler that can be composed to make a final sampling decision consistent across a trace. */
+/** A sampler that can be composed to make a final sampling decision. */
 export interface ComposableSampler {
-  /** Returns the information to make a consistent sampling decision. */
+  /** Returns the information to make a sampling decision. */
   getSamplingIntent(
     ...args: Parameters<Sampler['shouldSample']>
   ): SamplingIntent;
