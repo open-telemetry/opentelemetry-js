@@ -65,7 +65,7 @@ jobs:
       contents: write
     steps:
       - name: Download artifact from generate-sboms
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: SBOM.zip
       - name: Upload release asset
