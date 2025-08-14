@@ -19,12 +19,5 @@
     {
       "path": "../otlp-transformer"
     }
-  ],
-  "ts-node": {
-    "experimentalResolver": true,
-    "compilerOptions": {
-      "module": "commonjs",
-      "moduleResolution": "node10"
-    }
-  }
+  ]
 }

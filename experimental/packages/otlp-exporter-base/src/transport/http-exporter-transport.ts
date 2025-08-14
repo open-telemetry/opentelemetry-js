@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-import type {
-  HttpRequestParameters,
-  sendWithHttp,
-} from './http-transport-types';
+import type { HttpRequestParameters } from './http-transport-types';
 
 // NOTE: do not change these type imports to actual imports. Doing so WILL break `@opentelemetry/instrumentation-http`,
 // as they'd be imported before the http/https modules can be wrapped.
@@ -25,10 +22,11 @@ import type * as https from 'https';
 import type * as http from 'http';
 import { ExportResponse } from '../export-response';
 import { IExporterTransport } from '../exporter-transport';
+import { sendWithHttp } from './http-transport-utils';
 
 interface Utils {
   agent: http.Agent | https.Agent;
-  send: sendWithHttp;
+  request: typeof http.request | typeof https.request;
 }
 
 class HttpExporterTransport implements IExporterTransport {
@@ -37,10 +35,11 @@ class HttpExporterTransport implements IExporterTransport {
   constructor(private _parameters: HttpRequestParameters) {}
 
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
-    const { agent, send } = await this._loadUtils();
+    const { agent, request } = await this._loadUtils();
 
     return new Promise<ExportResponse>(resolve => {
-      send(
+      sendWithHttp(
+        request,
         this._parameters,
         agent,
         data,
@@ -60,21 +59,23 @@ class HttpExporterTransport implements IExporterTransport {
     let utils = this._utils;
 
     if (utils === null) {
-      // Lazy import to ensure that http/https is not required before instrumentations can wrap it.
-      const imported = await import('./http-transport-utils.js');
-
+      const protocol = new URL(this._parameters.url).protocol;
       utils = this._utils = {
-        agent: await this._parameters.agent(
-          new URL(this._parameters.url).protocol
-        ),
-        // @ts-expect-error dynamic imports are never transpiled, but named exports only work when
-        // dynamically importing an esm file, and the utils file might be transpiled to cjs
-        send: imported.sendWithHttp ?? imported.default.sendWithHttp,
+        agent: await this._parameters.agentFactory(protocol),
+        request: await requestFactory(protocol),
       };
     }
 
     return utils;
   }
+}
+
+async function requestFactory(
+  protocol: string
+): Promise<typeof http.request | typeof https.request> {
+  const module = protocol === 'http:' ? import('http') : import('https');
+  const { request } = await module;
+  return request;
 }
 
 export function createHttpExporterTransport(

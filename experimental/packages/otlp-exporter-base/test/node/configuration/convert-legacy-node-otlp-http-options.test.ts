@@ -52,7 +52,7 @@ describe('convertLegacyHttpOptions', function () {
     );
 
     // assert
-    assert.strictEqual(options.agent, factory);
+    assert.strictEqual(options.agentFactory, factory);
   });
 
   it('should keep specific keepAlive', async () => {
@@ -65,7 +65,7 @@ describe('convertLegacyHttpOptions', function () {
       'v1/signal',
       {}
     );
-    const agent = (await options.agent('https:')) as https.Agent;
+    const agent = (await options.agentFactory('https:')) as https.Agent;
 
     // assert
     assert.ok(agent.options.keepAlive);
@@ -85,7 +85,7 @@ describe('convertLegacyHttpOptions', function () {
       'v1/signal',
       {}
     );
-    const agent = (await options.agent('https:')) as https.Agent;
+    const agent = (await options.agentFactory('https:')) as https.Agent;
 
     // assert
     assert.ok(agent.options.keepAlive);

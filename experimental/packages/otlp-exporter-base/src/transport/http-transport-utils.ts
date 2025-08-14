@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as http from 'http';
-import * as https from 'https';
+import type * as http from 'http';
+import type * as https from 'https';
 import * as zlib from 'zlib';
 import { Readable } from 'stream';
 import { HttpRequestParameters } from './http-transport-types';
@@ -27,6 +27,7 @@ import { OTLPExporterError } from '../types';
 
 /**
  * Sends data using http
+ * @param requestFunction
  * @param params
  * @param agent
  * @param data
@@ -34,6 +35,7 @@ import { OTLPExporterError } from '../types';
  * @param timeoutMillis
  */
 export function sendWithHttp(
+  request: typeof https.request | typeof http.request,
   params: HttpRequestParameters,
   agent: http.Agent | https.Agent,
   data: Uint8Array,
@@ -52,8 +54,6 @@ export function sendWithHttp(
     },
     agent: agent,
   };
-
-  const request = parsedUrl.protocol === 'http:' ? http.request : https.request;
 
   const req = request(options, (res: http.IncomingMessage) => {
     const responseData: Buffer[] = [];

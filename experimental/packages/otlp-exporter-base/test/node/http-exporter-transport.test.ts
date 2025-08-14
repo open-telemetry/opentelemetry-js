@@ -58,7 +58,7 @@ describe('HttpExporterTransport', function () {
         url: 'http://localhost:8080',
         headers: () => ({}),
         compression: 'none',
-        agent: () => new http.Agent(),
+        agentFactory: () => new http.Agent(),
       });
 
       // act
@@ -95,7 +95,7 @@ describe('HttpExporterTransport', function () {
         url: 'http://jocajhost:8080',
         headers: () => ({}),
         compression: 'none',
-        agent: protocol => {
+        agentFactory: protocol => {
           assert.strictEqual(protocol, 'http:');
           return new SedAgent();
         },
@@ -124,7 +124,7 @@ describe('HttpExporterTransport', function () {
         url: 'http://localhost:8080',
         headers: () => ({}),
         compression: 'none',
-        agent: () => new http.Agent(),
+        agentFactory: () => new http.Agent(),
       });
 
       // act
@@ -148,7 +148,7 @@ describe('HttpExporterTransport', function () {
         url: 'http://localhost:8080',
         headers: () => ({}),
         compression: 'none',
-        agent: () => new http.Agent(),
+        agentFactory: () => new http.Agent(),
       });
 
       const result = await transport.send(sampleRequestData, 1000);
@@ -173,7 +173,7 @@ describe('HttpExporterTransport', function () {
         url: 'http://localhost:8080',
         headers: () => ({}),
         compression: 'none',
-        agent: () => new http.Agent(),
+        agentFactory: () => new http.Agent(),
       });
 
       // act
@@ -210,7 +210,7 @@ describe('HttpExporterTransport', function () {
         url: 'http://localhost:8080',
         headers: () => ({}),
         compression: 'none',
-        agent: () => new http.Agent(),
+        agentFactory: () => new http.Agent(),
       });
 
       // act
@@ -243,7 +243,7 @@ describe('HttpExporterTransport', function () {
         url: 'http://localhost:8080',
         headers: () => ({}),
         compression: 'none',
-        agent: () => new http.Agent(),
+        agentFactory: () => new http.Agent(),
       });
 
       // act
@@ -264,7 +264,7 @@ describe('HttpExporterTransport', function () {
         url: 'http://example.test',
         headers: () => ({}),
         compression: 'none',
-        agent: () => new http.Agent(),
+        agentFactory: () => new http.Agent(),
       });
 
       // act
@@ -314,7 +314,7 @@ describe('HttpExporterTransport', function () {
         url: 'http://localhost:8080',
         headers: () => ({ foo: 'foo-value', bar: 'bar-value' }),
         compression: 'none',
-        agent: () => new http.Agent(),
+        agentFactory: () => new http.Agent(),
       });
 
       // assert
@@ -363,7 +363,7 @@ describe('HttpExporterTransport', function () {
         url: 'http://localhost:8080',
         headers: () => ({ foo: 'foo-value', bar: 'bar-value' }),
         compression: 'gzip',
-        agent: () => new http.Agent(),
+        agentFactory: () => new http.Agent(),
       });
 
       // act

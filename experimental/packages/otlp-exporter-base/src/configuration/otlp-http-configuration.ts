@@ -34,7 +34,7 @@ export type HttpAgentFactory =
 export interface OtlpHttpConfiguration extends OtlpSharedConfiguration {
   url: string;
   headers: () => Record<string, string>;
-  agent: HttpAgentFactory;
+  agentFactory: HttpAgentFactory;
 }
 
 function mergeHeaders(
@@ -81,8 +81,8 @@ export function httpAgentFactoryFromOptions(
   options: http.AgentOptions | https.AgentOptions
 ): HttpAgentFactory {
   return async protocol => {
-    const { Agent } =
-      protocol === 'http:' ? await import('http') : await import('https');
+    const module = protocol === 'http:' ? import('http') : import('https');
+    const { Agent } = await module;
     return new Agent(options);
   };
 }
@@ -112,10 +112,10 @@ export function mergeOtlpHttpConfigurationWithDefaults(
       validateUserProvidedUrl(userProvidedConfiguration.url) ??
       fallbackConfiguration.url ??
       defaultConfiguration.url,
-    agent:
-      userProvidedConfiguration.agent ??
-      fallbackConfiguration.agent ??
-      defaultConfiguration.agent,
+    agentFactory:
+      userProvidedConfiguration.agentFactory ??
+      fallbackConfiguration.agentFactory ??
+      defaultConfiguration.agentFactory,
   };
 }
 
@@ -127,6 +127,6 @@ export function getHttpConfigurationDefaults(
     ...getSharedConfigurationDefaults(),
     headers: () => requiredHeaders,
     url: 'http://localhost:4318/' + signalResourcePath,
-    agent: httpAgentFactoryFromOptions({ keepAlive: true }),
+    agentFactory: httpAgentFactoryFromOptions({ keepAlive: true }),
   };
 }
