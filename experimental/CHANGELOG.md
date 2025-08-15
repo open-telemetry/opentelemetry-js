@@ -15,6 +15,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :bug: Bug Fixes
 
 * fix(otlp-exporter-base): prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
+* fix(otlp-exporter-base): accept relative logging endpoint URLs [#5852](https://github.com/open-telemetry/opentelemetry-js/pull/5852)
 
 ### :books: Documentation
 
