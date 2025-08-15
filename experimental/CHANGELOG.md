@@ -20,7 +20,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
       ```js
       const sdk = new NodeSDK({ metricReaders: [myMetricReader] });
       ```
-  * Users should migrate to the new `metricReaders` array option for future compatibility. The old option will continue to work but is deprecated.
+  * Users should migrate to the new `metricReaders` array option for future compatibility. The old option will be removed in an upcoming experimental version.
 
 ### :bug: Bug Fixes
 
