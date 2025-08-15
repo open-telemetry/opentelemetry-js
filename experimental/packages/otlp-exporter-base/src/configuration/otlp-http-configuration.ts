@@ -25,10 +25,16 @@ import { validateAndNormalizeHeaders } from '../util';
 import type * as http from 'http';
 import type * as https from 'https';
 
+export type HttpAgentFactory =
+  | ((protocol: string) => http.Agent)
+  | ((protocol: string) => https.Agent)
+  | ((protocol: string) => Promise<http.Agent>)
+  | ((protocol: string) => Promise<https.Agent>);
+
 export interface OtlpHttpConfiguration extends OtlpSharedConfiguration {
   url: string;
   headers: () => Record<string, string>;
-  agentOptions: http.AgentOptions | https.AgentOptions;
+  agentFactory: HttpAgentFactory;
 }
 
 function mergeHeaders(
@@ -71,6 +77,16 @@ function validateUserProvidedUrl(url: string | undefined): string | undefined {
   }
 }
 
+export function httpAgentFactoryFromOptions(
+  options: http.AgentOptions | https.AgentOptions
+): HttpAgentFactory {
+  return async protocol => {
+    const module = protocol === 'http:' ? import('http') : import('https');
+    const { Agent } = await module;
+    return new Agent(options);
+  };
+}
+
 /**
  * @param userProvidedConfiguration  Configuration options provided by the user in code.
  * @param fallbackConfiguration Fallback to use when the {@link userProvidedConfiguration} does not specify an option.
@@ -96,10 +112,10 @@ export function mergeOtlpHttpConfigurationWithDefaults(
       validateUserProvidedUrl(userProvidedConfiguration.url) ??
       fallbackConfiguration.url ??
       defaultConfiguration.url,
-    agentOptions:
-      userProvidedConfiguration.agentOptions ??
-      fallbackConfiguration.agentOptions ??
-      defaultConfiguration.agentOptions,
+    agentFactory:
+      userProvidedConfiguration.agentFactory ??
+      fallbackConfiguration.agentFactory ??
+      defaultConfiguration.agentFactory,
   };
 }
 
@@ -111,6 +127,6 @@ export function getHttpConfigurationDefaults(
     ...getSharedConfigurationDefaults(),
     headers: () => requiredHeaders,
     url: 'http://localhost:4318/' + signalResourcePath,
-    agentOptions: { keepAlive: true },
+    agentFactory: httpAgentFactoryFromOptions({ keepAlive: true }),
   };
 }

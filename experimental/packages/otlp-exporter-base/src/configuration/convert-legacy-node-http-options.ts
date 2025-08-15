@@ -16,35 +16,32 @@
 import { OTLPExporterNodeConfigBase } from './legacy-node-configuration';
 import {
   getHttpConfigurationDefaults,
+  HttpAgentFactory,
+  httpAgentFactoryFromOptions,
   mergeOtlpHttpConfigurationWithDefaults,
   OtlpHttpConfiguration,
 } from './otlp-http-configuration';
 import { getHttpConfigurationFromEnvironment } from './otlp-http-env-configuration';
-import type * as http from 'http';
-import type * as https from 'https';
 import { diag } from '@opentelemetry/api';
 import { wrapStaticHeadersInFunction } from './shared-configuration';
 
 function convertLegacyAgentOptions(
   config: OTLPExporterNodeConfigBase
-): http.AgentOptions | https.AgentOptions | undefined {
-  // populate keepAlive for use with new settings
-  if (config?.keepAlive != null) {
-    if (config.httpAgentOptions != null) {
-      if (config.httpAgentOptions.keepAlive == null) {
-        // specific setting is not set, populate with non-specific setting.
-        config.httpAgentOptions.keepAlive = config.keepAlive;
-      }
-      // do nothing, use specific setting otherwise
-    } else {
-      // populate specific option if AgentOptions does not exist.
-      config.httpAgentOptions = {
-        keepAlive: config.keepAlive,
-      };
-    }
+): HttpAgentFactory | undefined {
+  if (typeof config.httpAgentOptions === 'function') {
+    return config.httpAgentOptions;
   }
 
-  return config.httpAgentOptions;
+  let legacy = config.httpAgentOptions;
+  if (config.keepAlive != null) {
+    legacy = { keepAlive: config.keepAlive, ...legacy };
+  }
+
+  if (legacy != null) {
+    return httpAgentFactoryFromOptions(legacy);
+  } else {
+    return undefined;
+  }
 }
 
 /**
@@ -72,7 +69,7 @@ export function convertLegacyHttpOptions(
       concurrencyLimit: config.concurrencyLimit,
       timeoutMillis: config.timeoutMillis,
       compression: config.compression,
-      agentOptions: convertLegacyAgentOptions(config),
+      agentFactory: convertLegacyAgentOptions(config),
     },
     getHttpConfigurationFromEnvironment(signalIdentifier, signalResourcePath),
     getHttpConfigurationDefaults(requiredHeaders, signalResourcePath)

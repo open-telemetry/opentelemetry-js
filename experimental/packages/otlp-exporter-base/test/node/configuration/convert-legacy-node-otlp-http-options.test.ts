@@ -16,6 +16,7 @@
 
 import * as sinon from 'sinon';
 import * as assert from 'assert';
+import type * as https from 'https';
 import { convertLegacyHttpOptions } from '../../../src/configuration/convert-legacy-node-http-options';
 import { registerMockDiagLogger } from '../../common/test-utils';
 
@@ -40,7 +41,21 @@ describe('convertLegacyHttpOptions', function () {
     );
   });
 
-  it('should keep specific keepAlive', () => {
+  it('should keep agent factory as-is', function () {
+    // act
+    const factory = () => null!;
+    const options = convertLegacyHttpOptions(
+      { httpAgentOptions: factory },
+      'SIGNAL',
+      'v1/signal',
+      {}
+    );
+
+    // assert
+    assert.strictEqual(options.agentFactory, factory);
+  });
+
+  it('should keep specific keepAlive', async () => {
     // act
     const options = convertLegacyHttpOptions(
       {
@@ -50,12 +65,13 @@ describe('convertLegacyHttpOptions', function () {
       'v1/signal',
       {}
     );
+    const agent = (await options.agentFactory('https:')) as https.Agent;
 
     // assert
-    assert.ok(options.agentOptions.keepAlive);
+    assert.ok(agent.options.keepAlive);
   });
 
-  it('should set keepAlive on AgentOptions when not explicitly set in AgentOptions but set in config', () => {
+  it('should set keepAlive on AgentOptions when not explicitly set in AgentOptions but set in config', async () => {
     // act
     const options = convertLegacyHttpOptions(
       {
@@ -69,9 +85,10 @@ describe('convertLegacyHttpOptions', function () {
       'v1/signal',
       {}
     );
+    const agent = (await options.agentFactory('https:')) as https.Agent;
 
     // assert
-    assert.ok(options.agentOptions.keepAlive);
-    assert.strictEqual(options.agentOptions.port, 1234);
+    assert.ok(agent.options.keepAlive);
+    assert.strictEqual(agent.options.port, 1234);
   });
 });
