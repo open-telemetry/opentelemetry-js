@@ -27,6 +27,15 @@ templates:
         metrics: .
       }
     application_mode: single
+  - pattern: events.ts.j2
+    file_name: "experimental_events.ts"
+    filter: >
+      semconv_signal("event"; {
+        "exclude_stability": ["stable", "", null]
+      })
+      | sort_by(.name)
+      | { events: .  }
+    application_mode: single
 
 params:
   excluded_attributes: ["messaging.client_id"]
