@@ -21,6 +21,9 @@ export interface Resource {
 
   /** Resource droppedAttributesCount */
   droppedAttributesCount: number;
+
+  /** Resource schemaUrl */
+  schemaUrl?: string;
 }
 
 /** Properties of an InstrumentationScope. */
