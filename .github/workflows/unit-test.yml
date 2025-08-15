@@ -101,6 +101,8 @@ jobs:
 
       - name: Unit tests
         run: npm run test
+        env:
+          NODE_OPTIONS: '--no-experimental-strip-types'
   browser-tests:
     runs-on: ubuntu-latest
     env:
