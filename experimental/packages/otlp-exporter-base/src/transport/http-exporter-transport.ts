@@ -60,17 +60,18 @@ class HttpExporterTransport implements IExporterTransport {
 
     if (utils === null) {
       const protocol = new URL(this._parameters.url).protocol;
-      utils = this._utils = {
-        agent: await this._parameters.agentFactory(protocol),
-        request: await requestFactory(protocol),
-      };
+      const [agent, request] = await Promise.all([
+        this._parameters.agentFactory(protocol),
+        requestFunctionFactory(protocol),
+      ]);
+      utils = this._utils = { agent, request };
     }
 
     return utils;
   }
 }
 
-async function requestFactory(
+async function requestFunctionFactory(
   protocol: string
 ): Promise<typeof http.request | typeof https.request> {
   const module = protocol === 'http:' ? import('http') : import('https');
