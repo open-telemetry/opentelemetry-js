@@ -18,7 +18,8 @@ import { InstrumentationScope } from '@opentelemetry/core';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { InstrumentSelector } from './InstrumentSelector';
 import { MeterSelector } from './MeterSelector';
-import { View } from './View';
+import { View, ViewOptions } from './View';
+import { createAllowListAttributesProcessor } from './AttributesProcessor';
 
 export class ViewRegistry {
   private _registeredViews: View[] = [];
@@ -38,7 +39,39 @@ export class ViewRegistry {
       );
     });
 
+    // Only create a default view if advisory attributes are set and non-empty
+    if (views.length === 0) {
+      if (
+        instrument.advice &&
+        Array.isArray(instrument.advice.attributes) &&
+        instrument.advice.attributes.length > 0
+      ) {
+        return [this._createDefaultView(instrument)];
+      }
+      // No matching views and no advisory attributes: return empty array for backward compatibility
+      return [];
+    }
+
     return views;
+  }
+
+  private _createDefaultView(instrument: InstrumentDescriptor): View {
+    const viewOptions: ViewOptions = {
+      instrumentName: instrument.name,
+      instrumentType: instrument.type,
+      instrumentUnit: instrument.unit,
+    };
+
+    if (
+      instrument.advice.attributes &&
+      instrument.advice.attributes.length > 0
+    ) {
+      viewOptions.attributesProcessors = [
+        createAllowListAttributesProcessor(instrument.advice.attributes),
+      ];
+    }
+
+    return new View(viewOptions);
   }
 
   private _matchInstrument(
