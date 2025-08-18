@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import { Configuration } from '../src';
 import { DiagLogLevel } from '@opentelemetry/api';
-import { getConfigProvider } from '../src/ConfigProvider';
+import { createConfigProvider } from '../src/ConfigProvider';
 
 const defaultConfig: Configuration = {
   disable: false,
@@ -36,7 +36,7 @@ describe('ConfigProvider', function () {
     });
 
     it('should initialize config with default values', function () {
-      const configProvider = getConfigProvider();
+      const configProvider = createConfigProvider();
       assert.deepStrictEqual(
         configProvider.getInstrumentationConfig(),
         defaultConfig
@@ -49,7 +49,7 @@ describe('ConfigProvider', function () {
         ...defaultConfig,
         disable: true,
       };
-      const configProvider = getConfigProvider();
+      const configProvider = createConfigProvider();
       assert.deepStrictEqual(
         configProvider.getInstrumentationConfig(),
         expectedConfig
@@ -62,7 +62,7 @@ describe('ConfigProvider', function () {
         ...defaultConfig,
         log_level: DiagLogLevel.DEBUG,
       };
-      const configProvider = getConfigProvider();
+      const configProvider = createConfigProvider();
       assert.deepStrictEqual(
         configProvider.getInstrumentationConfig(),
         expectedConfig
@@ -75,7 +75,7 @@ describe('ConfigProvider', function () {
         ...defaultConfig,
         node_resource_detectors: ['env', 'host', 'serviceinstance'],
       };
-      const configProvider = getConfigProvider();
+      const configProvider = createConfigProvider();
       assert.deepStrictEqual(
         configProvider.getInstrumentationConfig(),
         expectedConfig
@@ -92,7 +92,7 @@ describe('ConfigProvider', function () {
             'service.namespace=my-namespace,service.version=1.0.0',
         },
       };
-      const configProvider = getConfigProvider();
+      const configProvider = createConfigProvider();
       assert.deepStrictEqual(
         configProvider.getInstrumentationConfig(),
         expectedConfig

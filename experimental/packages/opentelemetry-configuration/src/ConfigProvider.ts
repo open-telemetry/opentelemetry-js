@@ -17,6 +17,6 @@
 import { ConfigProvider } from './IConfigProvider';
 import { EnvironmentConfigProvider } from './EnvironmentConfigProvider';
 
-export function getConfigProvider(): ConfigProvider {
+export function createConfigProvider(): ConfigProvider {
   return new EnvironmentConfigProvider();
 }
