@@ -20,7 +20,7 @@ jobs:
       pull-requests: write
     if: github.event.pull_request.merged == true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Check if user is a member of the org
         id: check-membership
         run: |

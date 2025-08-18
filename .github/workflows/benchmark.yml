@@ -30,7 +30,7 @@ jobs:
           apt-get update && apt-get install --fix-missing -y git
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Avoid "detected dubious ownership in repository" error when running
       # `npm run submodule`.
