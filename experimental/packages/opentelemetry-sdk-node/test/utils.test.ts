@@ -66,11 +66,11 @@ describe('getPropagatorFromEnv', function () {
       'tracestate',
       'baggage',
       'b3',
-      'x-b3-traceid',
-      'x-b3-spanid',
-      'x-b3-flags',
-      'x-b3-sampled',
-      'x-b3-parentspanid',
+      'X-B3-TraceId',
+      'X-B3-SpanId',
+      'X-B3-Flags',
+      'X-B3-Sampled',
+      'X-B3-ParentSpanId',
       'uber-trace-id',
     ]);
   });
