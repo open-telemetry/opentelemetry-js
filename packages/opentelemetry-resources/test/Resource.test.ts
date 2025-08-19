@@ -444,8 +444,8 @@ describe('Resource', () => {
         null,
         123,
         12345678901234567890n,
-        { foo: 'bar' },
-        ['foo'],
+        { schemaUrl: 'http://example.test/schema' },
+        ['http://example.test/schema'],
       ];
 
       invalidSchemaUrls.forEach(invalidUrl => {
