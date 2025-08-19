@@ -18,8 +18,8 @@
 export const B3_CONTEXT_HEADER = 'b3';
 
 /* b3 multi-header keys */
-export const X_B3_TRACE_ID = 'x-b3-traceid';
-export const X_B3_SPAN_ID = 'x-b3-spanid';
-export const X_B3_SAMPLED = 'x-b3-sampled';
-export const X_B3_PARENT_SPAN_ID = 'x-b3-parentspanid';
-export const X_B3_FLAGS = 'x-b3-flags';
+export const X_B3_TRACE_ID = 'X-B3-TraceId';
+export const X_B3_SPAN_ID = 'X-B3-SpanId';
+export const X_B3_SAMPLED = 'X-B3-Sampled';
+export const X_B3_PARENT_SPAN_ID = 'X-B3-ParentSpanId';
+export const X_B3_FLAGS = 'X-B3-Flags';
