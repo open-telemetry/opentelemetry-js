@@ -33,9 +33,6 @@ import {
 } from './types';
 import { isPromiseLike } from './utils';
 
-const INVALID_SCHEMA_URL_MESSAGE =
-  'Invalid schema URL format: "%s". Schema URL must be a valid URI with http:// or https://. Schema URL will be ignored.';
-
 class ResourceImpl implements Resource {
   private _rawAttributes: RawResourceAttribute[];
   private _asyncAttributesPending = false;
@@ -198,31 +195,17 @@ function guardedRawAttributes(
 }
 
 function validateSchemaUrl(schemaUrl?: string): string | undefined {
-  if (schemaUrl === undefined || schemaUrl === '') {
+  const schemaUrlType = typeof schemaUrl;
+  if (schemaUrlType === 'string' || schemaUrlType === 'undefined') {
     return schemaUrl;
   }
 
-  // Reject any ASCII C0 control (0x00–0x1F), SPACE (0x20) or DEL (0x7F)
-  // This ensures consistent behavior across Node.js and browser environments
-  // eslint-disable-next-line no-control-regex
-  if (/[\x00-\x20\x7F]/.test(schemaUrl)) {
-    diag.warn(INVALID_SCHEMA_URL_MESSAGE, schemaUrl);
-    return undefined;
-  }
+  diag.warn(
+    'Schema URL must be string or undefined, got %s. Schema URL will be ignored.',
+    schemaUrl
+  );
 
-  try {
-    const url = new URL(schemaUrl);
-
-    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-      diag.warn(INVALID_SCHEMA_URL_MESSAGE, schemaUrl);
-      return undefined;
-    }
-
-    return schemaUrl;
-  } catch {
-    diag.warn(INVALID_SCHEMA_URL_MESSAGE, schemaUrl);
-    return undefined;
-  }
+  return undefined;
 }
 
 function mergeSchemaUrl(

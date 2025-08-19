@@ -441,24 +441,17 @@ describe('Resource', () => {
       const warnStub = sinon.spy(diag, 'warn');
 
       const invalidSchemaUrls = [
-        'not-a-url',
-        'relative/path',
-        'http://',
-        'https://',
-        '://missing-scheme.test',
-        'http://[invalid-ipv6',
-        'https://invalid space.test',
-        'ht tp://space-in-scheme.test',
-        'http://example.test:invalid-port',
-        'ftp://example.test/schema',
-        'custom://example.test/schema',
-        'file:///path/to/schema',
-        'ws://example.test/schema',
+        null,
+        123,
+        12345678901234567890n,
+        { foo: 'bar' },
+        ['foo'],
       ];
 
       invalidSchemaUrls.forEach(invalidUrl => {
         const resource = resourceFromAttributes(
           { attr: 'value' },
+          // @ts-expect-error the function signature doesn't allow these, but can still happen at runtime
           { schemaUrl: invalidUrl }
         );
 
@@ -472,7 +465,9 @@ describe('Resource', () => {
 
       // Should have logged warnings for each invalid URL
       assert.strictEqual(warnStub.callCount, invalidSchemaUrls.length);
-      assert.ok(warnStub.alwaysCalledWithMatch('Invalid schema URL format'));
+      assert.ok(
+        warnStub.alwaysCalledWithMatch('Schema URL must be string or undefined')
+      );
 
       warnStub.restore();
     });
