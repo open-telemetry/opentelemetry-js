@@ -155,6 +155,27 @@ describe('B3MultiPropagator', () => {
       assert.strictEqual(carrier[X_B3_FLAGS], undefined);
       assert.strictEqual(carrier[X_B3_PARENT_SPAN_ID], undefined);
     });
+
+    it('should inject headers with proper case format', () => {
+      const spanContext: SpanContext = {
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+
+      b3Propagator.inject(
+        trace.setSpanContext(ROOT_CONTEXT, spanContext),
+        carrier,
+        defaultTextMapSetter
+      );
+
+      // Verify headers are injected with standardized case format
+      assert.strictEqual(carrier['X-B3-TraceId'], 'd4cda95b652f4a1592b449d5929fda1b');
+      assert.strictEqual(carrier['X-B3-SpanId'], '6e0c63257de34c92');
+      assert.strictEqual(carrier['X-B3-Sampled'], '1');
+      assert.strictEqual(carrier['x-b3-traceid'], undefined);
+      assert.strictEqual(carrier['x-b3-spanid'], undefined);
+    });
   });
 
   describe('.extract()', () => {
@@ -521,6 +542,83 @@ describe('B3MultiPropagator', () => {
         traceFlags: TraceFlags.SAMPLED,
       });
       assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
+    });
+
+    describe('case insensitive header extraction', () => {
+      it('should extract context from lowercase headers', () => {
+        carrier['x-b3-traceid'] = '0af7651916cd43dd8448eb211c80319c';
+        carrier['x-b3-spanid'] = 'b7ad6b7169203331';
+        carrier['x-b3-sampled'] = '1';
+        const context = b3Propagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        );
+        const extractedSpanContext = trace.getSpanContext(context);
+        assert.deepStrictEqual(extractedSpanContext, {
+          spanId: 'b7ad6b7169203331',
+          traceId: '0af7651916cd43dd8448eb211c80319c',
+          isRemote: true,
+          traceFlags: TraceFlags.SAMPLED,
+        });
+      });
+
+      it('should extract context from mixed case headers', () => {
+        carrier['X-B3-TraceId'] = '0af7651916cd43dd8448eb211c80319c';
+        carrier['x-b3-spanid'] = 'b7ad6b7169203331';
+        carrier['X-b3-Sampled'] = '0';
+        const context = b3Propagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        );
+        const extractedSpanContext = trace.getSpanContext(context);
+        assert.deepStrictEqual(extractedSpanContext, {
+          spanId: 'b7ad6b7169203331',
+          traceId: '0af7651916cd43dd8448eb211c80319c',
+          isRemote: true,
+          traceFlags: TraceFlags.NONE,
+        });
+      });
+
+      it('should prioritize standard case over lowercase when both exist', () => {
+        carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+        carrier['x-b3-traceid'] = 'ffffffffffffffffffffffffffffffff';
+        carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+        carrier[X_B3_SAMPLED] = '1';
+        const context = b3Propagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        );
+        const extractedSpanContext = trace.getSpanContext(context);
+        // Should use the standard case header value, not lowercase
+        assert.deepStrictEqual(extractedSpanContext, {
+          spanId: 'b7ad6b7169203331',
+          traceId: '0af7651916cd43dd8448eb211c80319c',
+          isRemote: true,
+          traceFlags: TraceFlags.SAMPLED,
+        });
+      });
+
+      it('should extract context from lowercase debug flag', () => {
+        carrier['x-b3-traceid'] = '0af7651916cd43dd8448eb211c80319c';
+        carrier['x-b3-spanid'] = 'b7ad6b7169203331';
+        carrier['x-b3-flags'] = '1';
+        const context = b3Propagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        );
+        const extractedSpanContext = trace.getSpanContext(context);
+        assert.deepStrictEqual(extractedSpanContext, {
+          spanId: 'b7ad6b7169203331',
+          traceId: '0af7651916cd43dd8448eb211c80319c',
+          isRemote: true,
+          traceFlags: TraceFlags.SAMPLED,
+        });
+        assert.strictEqual(context.getValue(B3_DEBUG_FLAG_KEY), '1');
+      });
     });
   });
 });
