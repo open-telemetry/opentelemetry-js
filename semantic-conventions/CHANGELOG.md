@@ -9,6 +9,8 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
+* feat: add `EVENT_*` exports for event names in Semantic Conventions [#5832](https://github.com/open-telemetry/opentelemetry-js/pull/5832) @trentm
+
 ### :bug: Bug Fixes
 
 * fix: prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)

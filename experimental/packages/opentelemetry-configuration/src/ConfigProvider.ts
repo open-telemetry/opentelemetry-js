@@ -14,16 +14,9 @@
  * limitations under the License.
  */
 
-/* eslint-disable no-restricted-syntax --
- * These re-exports are only of constants, only two-levels deep, and
- * should not cause problems for tree-shakers.
- */
+import { ConfigProvider } from './IConfigProvider';
+import { EnvironmentConfigProvider } from './EnvironmentConfigProvider';
 
-// Deprecated. These are kept around for compatibility purposes
-export * from './trace';
-export * from './resource';
-
-// Use these instead
-export * from './stable_attributes';
-export * from './stable_metrics';
-export * from './stable_events';
+export function createConfigProvider(): ConfigProvider {
+  return new EnvironmentConfigProvider();
+}
