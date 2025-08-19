@@ -16,7 +16,11 @@
 
 import { ConfigProvider } from './IConfigProvider';
 import { EnvironmentConfigProvider } from './EnvironmentConfigProvider';
+import { FileConfigProvider, hasValidConfigFile } from './FileConfigProvider';
 
 export function createConfigProvider(): ConfigProvider {
+  if (hasValidConfigFile()) {
+    return new FileConfigProvider();
+  }
   return new EnvironmentConfigProvider();
 }

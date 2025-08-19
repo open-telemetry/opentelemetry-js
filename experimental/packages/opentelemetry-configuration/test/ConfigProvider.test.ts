@@ -99,4 +99,27 @@ describe('ConfigProvider', function () {
       );
     });
   });
+
+  describe('get values from config file', function () {
+    afterEach(function () {
+      delete process.env.OTEL_EXPERIMENTAL_CONFIG_FILE;
+    });
+
+    it('should initialize config with default values from valid config file', function () {
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
+        'test/fixtures/kitchen-sink.yaml';
+      const configProvider = createConfigProvider();
+      assert.deepStrictEqual(
+        configProvider.getInstrumentationConfig(),
+        defaultConfig
+      );
+    });
+
+    it('should return error from invalid config file', function () {
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = './fixtures/kitchen-sink.txt';
+      assert.throws(() => {
+        createConfigProvider();
+      });
+    });
+  });
 });
