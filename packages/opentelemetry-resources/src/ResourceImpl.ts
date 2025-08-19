@@ -195,8 +195,7 @@ function guardedRawAttributes(
 }
 
 function validateSchemaUrl(schemaUrl?: string): string | undefined {
-  const schemaUrlType = typeof schemaUrl;
-  if (schemaUrlType === 'string' || schemaUrlType === 'undefined') {
+  if (typeof schemaUrl === 'string' || schemaUrl === undefined) {
     return schemaUrl;
   }
 
