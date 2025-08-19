@@ -170,7 +170,10 @@ describe('B3MultiPropagator', () => {
       );
 
       // Verify headers are injected with standardized case format
-      assert.strictEqual(carrier['X-B3-TraceId'], 'd4cda95b652f4a1592b449d5929fda1b');
+      assert.strictEqual(
+        carrier['X-B3-TraceId'],
+        'd4cda95b652f4a1592b449d5929fda1b'
+      );
       assert.strictEqual(carrier['X-B3-SpanId'], '6e0c63257de34c92');
       assert.strictEqual(carrier['X-B3-Sampled'], '1');
       assert.strictEqual(carrier['x-b3-traceid'], undefined);

@@ -47,7 +47,8 @@ function parseHeader(header: unknown) {
 }
 
 function getHeaderValue(carrier: unknown, getter: TextMapGetter, key: string) {
-  const header = getter.get(carrier, key) ?? getter.get(carrier, key.toLowerCase());
+  const header =
+    getter.get(carrier, key) ?? getter.get(carrier, key.toLowerCase());
   return parseHeader(header);
 }
 
