@@ -25,15 +25,23 @@ import { validateAndNormalizeHeaders } from '../util';
 import type * as http from 'http';
 import type * as https from 'https';
 
-export type HttpAgentFactory =
-  | ((protocol: string) => http.Agent)
-  | ((protocol: string) => https.Agent)
-  | ((protocol: string) => Promise<http.Agent>)
-  | ((protocol: string) => Promise<https.Agent>);
+export type HttpAgentFactory = (
+  protocol: string
+) => http.Agent | https.Agent | Promise<http.Agent> | Promise<https.Agent>;
 
 export interface OtlpHttpConfiguration extends OtlpSharedConfiguration {
   url: string;
   headers: () => Record<string, string>;
+  /**
+   * Factory function for creating agents.
+   *
+   * @remarks
+   * Prefer using {@link httpAgentFactoryFromOptions} over manually writing a factory function wherever possible.
+   * If using a factory function (`HttpAgentFactory`), **do not import `http.Agent` or `https.Agent`
+   * statically at the top of the file**.
+   * Instead, use dynamic `import()` or `require()` to load the module. This ensures that the `http` or `https`
+   * module is not loaded before `@opentelemetry/instrumentation-http` can instrument it.
+   */
   agentFactory: HttpAgentFactory;
 }
 
