@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1755708571862,
+  "lastUpdate": 1755710050417,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -36037,6 +36037,58 @@ window.BENCHMARK_DATA = {
           {
             "name": "BatchSpanProcessor process span",
             "value": 283166,
+            "range": "±0.66%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "29139614+renovate[bot]@users.noreply.github.com",
+            "name": "renovate[bot]",
+            "username": "renovate[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "60b701dc9de62425918938054a0330bd42173caf",
+          "message": "fix(deps): update dependency express to v5 (#5780)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+          "timestamp": "2025-08-20T16:59:40Z",
+          "tree_id": "11e881b40ed0282c4a7518c1b94be7ec66c41be0",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/60b701dc9de62425918938054a0330bd42173caf"
+        },
+        "date": 1755710049449,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 706460,
+            "range": "±0.67%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8874,
+            "range": "±0.87%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 294263,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 276452,
             "range": "±0.66%",
             "unit": "ops/sec",
             "extra": "91 samples"
