@@ -20,14 +20,13 @@ jobs:
           - "20.6.0"
           - "20"
           - "22"
-          - "23"
           - "24"
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - uses: actions/setup-node@v4
         with:
@@ -49,7 +48,6 @@ jobs:
         if: ${{
           matrix.node_version == '20' ||
           matrix.node_version == '22' ||
-          matrix.node_version == '23' ||
           matrix.node_version == '24'
           }}
 
@@ -60,13 +58,13 @@ jobs:
         run: npm run compile
 
       - run: npm test
-        if: ${{ matrix.node_version != '22' && matrix.node_version != '23' && matrix.node_version != '24' }}
-      # Node.js >= 23 type stripping conflicts with mocha usage of ts-node.
+        if: ${{ matrix.node_version != '22' && matrix.node_version != '24' }}
+      # Node.js type stripping conflicts with mocha usage of ts-node.
       # See https://github.com/open-telemetry/opentelemetry-js/issues/5415
       - run: npm test
         env:
           NODE_OPTIONS: '--no-experimental-strip-types'
-        if: ${{ matrix.node_version == '22' || matrix.node_version == '23' || matrix.node_version == '24' }}
+        if: ${{ matrix.node_version == '22' || matrix.node_version == '24' }}
 
       - name: Report Coverage
         uses: codecov/codecov-action@v5
@@ -80,7 +78,7 @@ jobs:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - uses: actions/setup-node@v4
         with:
@@ -101,13 +99,15 @@ jobs:
 
       - name: Unit tests
         run: npm run test
+        env:
+          NODE_OPTIONS: '--no-experimental-strip-types'
   browser-tests:
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - uses: actions/setup-node@v4
         with:
@@ -136,7 +136,7 @@ jobs:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - uses: actions/setup-node@v4
         with:
           cache: 'npm'
