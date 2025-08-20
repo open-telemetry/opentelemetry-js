@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1755710189964,
+  "lastUpdate": 1755718220607,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -36144,6 +36144,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.52%",
             "unit": "ops/sec",
             "extra": "93 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "113933910+raphael-theriault-swi@users.noreply.github.com",
+            "name": "Raphaël Thériault",
+            "username": "raphael-theriault-swi"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d627fff7b0607baf6e958f08477bfa45215a8978",
+          "message": "feat(exporter-otlp-*)!: support custom HTTP agents (#5719)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2025-08-20T19:20:07Z",
+          "tree_id": "05dd352b0ae6b692c6c1b600209001bc92481ad2",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/d627fff7b0607baf6e958f08477bfa45215a8978"
+        },
+        "date": 1755718219612,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 699812,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8814,
+            "range": "±0.87%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 298848,
+            "range": "±0.46%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 284164,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
           }
         ]
       }
