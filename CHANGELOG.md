@@ -10,7 +10,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ## Unreleased
 
-* feat(b3-propagator): implement case-insensitive carrier handling [#5859](https://github.com/open-telemetry/opentelemetry-js/pull/5859) @YangJonghun
+* feat(b3-propagator)!: implement case-insensitive carrier handling [#5859](https://github.com/open-telemetry/opentelemetry-js/pull/5859) @YangJonghun
 
 * feat(instrumentation-http): Added support for redacting specific url query string values and url credentials in instrumentations [#5743](https://github.com/open-telemetry/opentelemetry-js/pull/5743) @rads-1996
 
