@@ -121,5 +121,23 @@ describe('ConfigProvider', function () {
         createConfigProvider();
       });
     });
+
+    it('should initialize config with default values with empty string for config file', function () {
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = '';
+      const configProvider = createConfigProvider();
+      assert.deepStrictEqual(
+        configProvider.getInstrumentationConfig(),
+        defaultConfig
+      );
+    });
+
+    it('should initialize config with default values with all whitespace for config file', function () {
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = '  ';
+      const configProvider = createConfigProvider();
+      assert.deepStrictEqual(
+        configProvider.getInstrumentationConfig(),
+        defaultConfig
+      );
+    });
   });
 });
