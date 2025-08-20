@@ -25,6 +25,7 @@ import {
   OTLPExporterError,
 } from '../../src';
 import * as zlib from 'zlib';
+import { createConnection, TcpNetConnectOpts } from 'net';
 
 const sampleRequestData = new Uint8Array([1, 2, 3]);
 
@@ -57,7 +58,47 @@ describe('HttpExporterTransport', function () {
         url: 'http://localhost:8080',
         headers: () => ({}),
         compression: 'none',
-        agentOptions: {},
+        agentFactory: () => new http.Agent(),
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 1000);
+
+      // assert
+      assert.strictEqual(result.status, 'success');
+      assert.deepEqual(
+        (result as ExportResponseSuccess).data,
+        expectedResponseData
+      );
+    });
+
+    it('returns success on success status with custom agent', async function () {
+      // arrange
+      const expectedResponseData = Buffer.from([4, 5, 6]);
+      server = http.createServer((_, res) => {
+        res.statusCode = 200;
+        res.write(expectedResponseData);
+        res.end();
+      });
+      server.listen(8080);
+
+      class SedAgent extends http.Agent {
+        createConnection(options: TcpNetConnectOpts, listener: () => void) {
+          return createConnection(
+            { ...options, host: options.host?.replaceAll('j', 'l') },
+            listener
+          );
+        }
+      }
+
+      const transport = createHttpExporterTransport({
+        url: 'http://jocajhost:8080',
+        headers: () => ({}),
+        compression: 'none',
+        agentFactory: protocol => {
+          assert.strictEqual(protocol, 'http:');
+          return new SedAgent();
+        },
       });
 
       // act
@@ -83,7 +124,7 @@ describe('HttpExporterTransport', function () {
         url: 'http://localhost:8080',
         headers: () => ({}),
         compression: 'none',
-        agentOptions: {},
+        agentFactory: () => new http.Agent(),
       });
 
       // act
@@ -107,7 +148,7 @@ describe('HttpExporterTransport', function () {
         url: 'http://localhost:8080',
         headers: () => ({}),
         compression: 'none',
-        agentOptions: {},
+        agentFactory: () => new http.Agent(),
       });
 
       const result = await transport.send(sampleRequestData, 1000);
@@ -132,7 +173,7 @@ describe('HttpExporterTransport', function () {
         url: 'http://localhost:8080',
         headers: () => ({}),
         compression: 'none',
-        agentOptions: {},
+        agentFactory: () => new http.Agent(),
       });
 
       // act
@@ -169,7 +210,7 @@ describe('HttpExporterTransport', function () {
         url: 'http://localhost:8080',
         headers: () => ({}),
         compression: 'none',
-        agentOptions: {},
+        agentFactory: () => new http.Agent(),
       });
 
       // act
@@ -202,7 +243,7 @@ describe('HttpExporterTransport', function () {
         url: 'http://localhost:8080',
         headers: () => ({}),
         compression: 'none',
-        agentOptions: {},
+        agentFactory: () => new http.Agent(),
       });
 
       // act
@@ -223,7 +264,7 @@ describe('HttpExporterTransport', function () {
         url: 'http://example.test',
         headers: () => ({}),
         compression: 'none',
-        agentOptions: {},
+        agentFactory: () => new http.Agent(),
       });
 
       // act
@@ -273,7 +314,7 @@ describe('HttpExporterTransport', function () {
         url: 'http://localhost:8080',
         headers: () => ({ foo: 'foo-value', bar: 'bar-value' }),
         compression: 'none',
-        agentOptions: {},
+        agentFactory: () => new http.Agent(),
       });
 
       // assert
@@ -322,7 +363,7 @@ describe('HttpExporterTransport', function () {
         url: 'http://localhost:8080',
         headers: () => ({ foo: 'foo-value', bar: 'bar-value' }),
         compression: 'gzip',
-        agentOptions: {},
+        agentFactory: () => new http.Agent(),
       });
 
       // act
