@@ -14,12 +14,6 @@ Currently `ComposableRuleBased` an `ComposableAnnotating` are not implemented.
 
 To get started you will need to install a compatible OpenTelemetry SDK.
 
-### Install Peer Dependencies
-
-```sh
-npm install @opentelemetry/sdk-trace-node # Or web
-```
-
 ### Samplers
 
 This module exports samplers that follow the general behavior of the standard SDK samplers, but ensuring

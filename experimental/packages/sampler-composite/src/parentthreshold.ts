@@ -21,8 +21,8 @@ import {
   Link,
   SpanKind,
   TraceFlags,
+  trace,
 } from '@opentelemetry/api';
-import { getSpanContext } from '../../../../api/src/trace/context-utils';
 import { ComposableSampler, SamplingIntent } from './types';
 import { parseOtelTraceState } from './tracestate';
 import { INVALID_THRESHOLD, isValidThreshold, MIN_THRESHOLD } from './util';
@@ -42,7 +42,7 @@ export class ComposableParentThresholdSampler implements ComposableSampler {
     attributes: Attributes,
     links: Link[]
   ): SamplingIntent {
-    const parentSpanContext = getSpanContext(context);
+    const parentSpanContext = trace.getSpanContext(context);
     if (!parentSpanContext || !isSpanContextValid(parentSpanContext)) {
       return this.rootSampler.getSamplingIntent(
         context,

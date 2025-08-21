@@ -8,8 +8,6 @@
   "files": [],
   "include": [
     "src/**/*.ts",
-    "src/generated/*.js",
-    "src/generated/*.ts",
     "test/**/*.ts"
   ],
   "references": [

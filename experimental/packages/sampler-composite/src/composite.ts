@@ -19,6 +19,7 @@ import {
   Attributes,
   Link,
   TraceState,
+  trace,
 } from '@opentelemetry/api';
 import { TraceState as CoreTraceState } from '@opentelemetry/core';
 import {
@@ -27,7 +28,6 @@ import {
   SamplingResult,
 } from '@opentelemetry/sdk-trace-base';
 import { ComposableSampler } from './types';
-import { getSpanContext } from '../../../../api/src/trace/context-utils';
 import { parseOtelTraceState, serializeTraceState } from './tracestate';
 import {
   INVALID_THRESHOLD,
@@ -46,7 +46,7 @@ export class CompositeSampler implements Sampler {
     attributes: Attributes,
     links: Link[]
   ): SamplingResult {
-    const spanContext = getSpanContext(context);
+    const spanContext = trace.getSpanContext(context);
 
     const traceState = spanContext?.traceState;
     const otTraceState = parseOtelTraceState(traceState);
