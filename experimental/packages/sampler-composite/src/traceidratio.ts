@@ -55,6 +55,9 @@ class ComposableTraceIDRatioBasedSampler implements ComposableSampler {
   }
 }
 
+/**
+ * Returns a composable sampler that samples each span with a fixed ratio.
+ */
 export function composable_trace_id_ratio_based_sampler(
   ratio: number
 ): ComposableSampler {

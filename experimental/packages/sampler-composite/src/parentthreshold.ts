@@ -78,6 +78,10 @@ class ComposableParentThresholdSampler implements ComposableSampler {
   }
 }
 
+/**
+ * Returns a composable sampler that respects the sampling decision of the
+ * parent span or falls back to the given sampler if it is a root span.
+ */
 export function composable_parent_threshold_sampler(
   rootSampler: ComposableSampler
 ): ComposableSampler {

@@ -107,6 +107,10 @@ class CompositeSampler implements Sampler {
   }
 }
 
+/**
+ * Returns a composite sampler that uses a composable sampler to make its
+ * sampling decisions while handling tracestate.
+ */
 export function composite_sampler(delegate: ComposableSampler): Sampler {
   return new CompositeSampler(delegate);
 }

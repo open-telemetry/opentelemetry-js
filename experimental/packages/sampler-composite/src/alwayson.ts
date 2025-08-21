@@ -21,9 +21,6 @@ const intent: SamplingIntent = {
   thresholdReliable: true,
 };
 
-/**
- * A composable sampler that samples all span.
- */
 class ComposableAlwaysOnSampler implements ComposableSampler {
   getSamplingIntent(): SamplingIntent {
     return intent;
@@ -36,6 +33,9 @@ class ComposableAlwaysOnSampler implements ComposableSampler {
 
 const _sampler = new ComposableAlwaysOnSampler();
 
+/**
+ * Returns a composable sampler that samples all span.
+ */
 export function composable_always_on_sampler(): ComposableSampler {
   return _sampler;
 }
