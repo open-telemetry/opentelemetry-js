@@ -9,8 +9,15 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :boom: Breaking Changes
 
 * feat(api-logs)!: Marked private methods as "conventionally private". [#5789](https://github.com/open-telemetry/opentelemetry-js/pull/5789)
+* feat(exporter-otlp-\*): support custom HTTP agents [#5719](https://github.com/open-telemetry/opentelemetry-js/pull/5719) @raphael-theriault-swi
+  * `OtlpHttpConfiguration.agentOptions` has been removed and functionality has been rolled into `OtlpHttpConfiguration.agentFactory`
+    * (old) `{ agentOptions: myOptions }`
+    * (new) `{ agentFactory: httpAgentFactoryFromOptions(myOptions) }`
 
 ### :rocket: Features
+
+*feat(opentelemetry-configuration): creation of basic ConfigProvider [#5809](https://github.com/open-telemetry/opentelemetry-js/pull/5809) @maryliag
+*feat(opentelemetry-configuration): creation of basic FileConfigProvider [#5863](https://github.com/open-telemetry/opentelemetry-js/pull/5863) @maryliag
 
 ### :bug: Bug Fixes
 
