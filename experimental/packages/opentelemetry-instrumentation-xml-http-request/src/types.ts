@@ -39,7 +39,7 @@ export type SendBody =
   | ArrayBufferView
   | ArrayBuffer
   | FormData
-  // eslint-disable-next-line node/no-unsupported-features/node-builtins
+  // eslint-disable-next-line n/no-unsupported-features/node-builtins
   | URLSearchParams
   | ReadableStream<Uint8Array>
   | null;
