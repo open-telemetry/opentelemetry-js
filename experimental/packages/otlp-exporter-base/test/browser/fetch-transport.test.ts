@@ -36,7 +36,7 @@ const requestTimeout = 1000;
 const testPayload = Uint8Array.from([1, 2, 3]);
 
 describe('FetchTransport', function () {
-  afterEach(() => {
+  afterEach(function () {
     sinon.restore();
   });
 
