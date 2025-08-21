@@ -36,9 +36,7 @@ export function createLegacyOtlpBrowserExportDelegate<Internal, Response>(
   signalResourcePath: string,
   requiredHeaders: Record<string, string>
 ): IOtlpExportDelegate<Internal> {
-  const useXhr = !!config.headers || typeof navigator.sendBeacon !== 'function';
-  // NOTE: XMLHttpRequest and navigator.sendBeacon are undefined in service workers for instance.
-  const useFetch = useXhr && typeof XMLHttpRequest === 'undefined';
+  const createOtlpExportDelegate = inferExportDelegateToUse(config.headers);
 
   const options = convertLegacyBrowserHttpOptions(
     config,
@@ -46,11 +44,17 @@ export function createLegacyOtlpBrowserExportDelegate<Internal, Response>(
     requiredHeaders
   );
 
-  if (useFetch) {
-    return createOtlpFetchExportDelegate(options, serializer);
-  } else if (useXhr) {
-    return createOtlpXhrExportDelegate(options, serializer);
+  return createOtlpExportDelegate(options, serializer);
+}
+
+export function inferExportDelegateToUse(
+  configHeaders: OTLPExporterConfigBase['headers']
+) {
+  if (!configHeaders && typeof navigator.sendBeacon === 'function') {
+    return createOtlpSendBeaconExportDelegate;
+  } else if (typeof globalThis.fetch !== 'undefined') {
+    return createOtlpFetchExportDelegate;
   } else {
-    return createOtlpSendBeaconExportDelegate(options, serializer);
+    return createOtlpXhrExportDelegate;
   }
 }

@@ -15,76 +15,79 @@
  */
 
 import * as assert from 'assert';
-import { JsonLogsSerializer } from '@opentelemetry/otlp-transformer';
-import {
-  convertLegacyBrowserHttpOptions,
-  createLegacyOtlpBrowserExportDelegate,
-} from '../../src/index-browser-http';
+import { inferExportDelegateToUse } from '../../src/configuration/create-legacy-browser-delegate';
 import {
   createOtlpFetchExportDelegate,
   createOtlpSendBeaconExportDelegate,
   createOtlpXhrExportDelegate,
 } from '../../src/otlp-browser-http-export-delegate';
-import { OTLPExporterConfigBase } from '../../src';
 
-describe.only('createLegacyBrowserDelegate', function () {
-  const config = {
-    url: 'https://example.com',
-    headers: () => ({ test: 'custom-header' }),
-  } as unknown as OTLPExporterConfigBase;
-  const serializer = JsonLogsSerializer;
-  const signalResourcePath = 'example/of/path';
-  const requiredHeaders = { test: 'custom-header' };
-  const options = convertLegacyBrowserHttpOptions(
-    config,
-    signalResourcePath,
-    requiredHeaders
-  );
-  const fetchDelegate = createOtlpFetchExportDelegate(options, serializer);
-  const xhrDelegate = createOtlpXhrExportDelegate(options, serializer);
-  const beaconDelegate = createOtlpSendBeaconExportDelegate(
-    options,
-    serializer
-  );
-  function createDelegate() {
-    return createLegacyOtlpBrowserExportDelegate(
-      config,
-      serializer,
-      signalResourcePath,
-      requiredHeaders
-    );
-  }
+describe('createLegacyBrowserDelegate', function () {
+  describe('when beacon and fetch are available', function () {
+    it('uses the beacon delegate when no headers are provided', function () {
+      const delegate = inferExportDelegateToUse(undefined);
+      assert.equal(delegate, createOtlpSendBeaconExportDelegate);
+    });
 
-  describe('when beacon is available', function () {
-    it('uses the beacon delegate', function () {
-      const delegate = createDelegate();
-      assert.ok(delegate instanceof beaconDelegate.constructor);
+    it('uses the fetch delegate when headers are provided', function () {
+      const delegate = inferExportDelegateToUse({ foo: 'bar' });
+      assert.equal(delegate, createOtlpFetchExportDelegate);
     });
   });
 
-  describe('when beacon is not available', function () {
+  describe('when beacon is unavailable', function () {
+    const sendBeacon = window.navigator.sendBeacon;
     beforeEach(function () {
-      // fake sendBeacon being available
+      // fake sendBeacon being unavailable
       (window.navigator as any).sendBeacon = undefined;
     });
+    afterEach(() => {
+      (window.navigator as any).sendBeacon = sendBeacon;
+    });
 
-    it('uses the xhr delegate', function () {
-      const delegate = createDelegate();
-      assert.ok(delegate instanceof xhrDelegate.constructor);
+    describe('when fetch is available', function () {
+      it('uses the fetch delegate', function () {
+        const delegate = inferExportDelegateToUse(undefined);
+        assert.equal(delegate, createOtlpFetchExportDelegate);
+      });
+    });
+
+    describe('when fetch is unavailable', function () {
+      const fetch = window.fetch;
+      beforeEach(function () {
+        // fake fetch being unavailable
+        (window as any).fetch = undefined;
+      });
+      afterEach(() => {
+        window.fetch = fetch;
+      });
+
+      it('uses xhr delegate', function () {
+        const delegate = inferExportDelegateToUse(undefined);
+        assert.equal(delegate, createOtlpXhrExportDelegate);
+      });
     });
   });
 
-  describe('when beacon and xhr are not available', function () {
+  describe('when fetch is unavailable but beacon and xhr are', function () {
+    const fetch = window.fetch;
     beforeEach(function () {
-      // fake sendBeacon being available
-      (window.navigator as any).sendBeacon = undefined;
+      // fake fetch being unavailable
+      (window as any).fetch = undefined;
+    });
+    afterEach(function () {
+      window.fetch = fetch;
+    });
+
+    it('uses xhr when beacon is available but headers are provided', function () {
+      const fetch = window.fetch;
       // @ts-expect-error one should not be able to mutate the window but this is a test.
-      window.XMLHttpRequest = undefined;
-    });
+      window.fetch = undefined;
 
-    it('uses the fetch delegate', function () {
-      const delegate = createDelegate();
-      assert.ok(delegate instanceof fetchDelegate.constructor);
+      const delegate = inferExportDelegateToUse({ foo: 'bar' });
+      assert.equal(delegate, createOtlpXhrExportDelegate);
+
+      window.fetch = fetch;
     });
   });
 });
