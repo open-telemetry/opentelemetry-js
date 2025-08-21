@@ -91,7 +91,7 @@
     "eslint": "8.57.1",
     "eslint-config-prettier": "10.0.2",
     "eslint-plugin-header": "3.1.1",
-    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-n": "14.0.0",
     "eslint-plugin-prettier": "5.0.1",
     "gh-pages": "6.3.0",
     "glob": "^11.0.0",
