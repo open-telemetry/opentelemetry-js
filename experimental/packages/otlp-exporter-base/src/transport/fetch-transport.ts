@@ -31,13 +31,9 @@ class FetchTransport implements IExporterTransport {
   constructor(private _parameters: FetchTransportParameters) {}
 
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
-    let timeout: ReturnType<typeof setTimeout> | undefined;
+    const abortController = new AbortController();
+    const timeout = setTimeout(() => abortController.abort(), timeoutMillis);
     try {
-      const abortController = new AbortController();
-      timeout = timeoutMillis
-        ? setTimeout(() => abortController.abort(), timeoutMillis)
-        : undefined;
-
       const base = globalThis.location?.href;
       // NOTE: In non-browser environments, `globalThis.location` will be `undefined`.
       const isBrowserEnvironment = !!base;
