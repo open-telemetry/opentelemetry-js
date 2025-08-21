@@ -22,6 +22,9 @@ import { createSendBeaconTransport } from './transport/send-beacon-transport';
 import { createOtlpNetworkExportDelegate } from './otlp-network-export-delegate';
 import { createFetchTransport } from './transport/fetch-transport';
 
+/**
+ * @deprecated use {@link createOtlpFetchExportDelegate}
+ */
 export function createOtlpXhrExportDelegate<Internal, Response>(
   options: OtlpHttpConfiguration,
   serializer: ISerializer<Internal, Response>
