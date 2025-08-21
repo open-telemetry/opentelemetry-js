@@ -17,7 +17,7 @@
     "tdd": "karma start",
     "test:browser": "karma start --single-run",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
+    "precompile": "lerna run version --scope @opentelemetry/context-zone-peer-dep --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../scripts/align-api-deps.js"
@@ -63,7 +63,6 @@
     "@types/zone.js": "0.5.12",
     "babel-loader": "10.0.0",
     "babel-plugin-istanbul": "7.0.0",
-    "cross-var": "1.1.0",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",
