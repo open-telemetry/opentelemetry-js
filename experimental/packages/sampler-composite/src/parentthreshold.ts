@@ -27,7 +27,7 @@ import { ComposableSampler, SamplingIntent } from './types';
 import { parseOtelTraceState } from './tracestate';
 import { INVALID_THRESHOLD, isValidThreshold, MIN_THRESHOLD } from './util';
 
-export class ComposableParentThresholdSampler implements ComposableSampler {
+class ComposableParentThresholdSampler implements ComposableSampler {
   private readonly description: string;
 
   constructor(private readonly rootSampler: ComposableSampler) {
@@ -76,4 +76,10 @@ export class ComposableParentThresholdSampler implements ComposableSampler {
   toString(): string {
     return this.description;
   }
+}
+
+export function composable_parent_threshold_sampler(
+  rootSampler: ComposableSampler
+): ComposableSampler {
+  return new ComposableParentThresholdSampler(rootSampler);
 }

@@ -24,7 +24,7 @@ const intent: SamplingIntent = {
 /**
  * A composable sampler that does not sample any span.
  */
-export class ComposableAlwaysOffSampler implements ComposableSampler {
+class ComposableAlwaysOffSampler implements ComposableSampler {
   getSamplingIntent(): SamplingIntent {
     return intent;
   }
@@ -32,4 +32,10 @@ export class ComposableAlwaysOffSampler implements ComposableSampler {
   toString(): string {
     return 'ComposableAlwaysOffSampler';
   }
+}
+
+const _sampler = new ComposableAlwaysOffSampler();
+
+export function composable_always_off_sampler(): ComposableSampler {
+  return _sampler;
 }

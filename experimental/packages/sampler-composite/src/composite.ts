@@ -35,7 +35,7 @@ import {
   isValidThreshold,
 } from './util';
 
-export class CompositeSampler implements Sampler {
+class CompositeSampler implements Sampler {
   constructor(private readonly delegate: ComposableSampler) {}
 
   shouldSample(
@@ -105,4 +105,8 @@ export class CompositeSampler implements Sampler {
       traceState: newTraceState,
     };
   }
+}
+
+export function composite_sampler(delegate: ComposableSampler): Sampler {
+  return new CompositeSampler(delegate);
 }
