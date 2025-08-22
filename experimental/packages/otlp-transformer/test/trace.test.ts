@@ -232,11 +232,8 @@ describe('Trace', () => {
   let resource: Resource;
   let span: ReadableSpan;
 
-  beforeEach(() => {
-    resource = resourceFromAttributes({
-      'resource-attribute': 'resource attribute value',
-    });
-    span = {
+  function createSpanWithResource(spanResource: Resource): ReadableSpan {
+    return {
       spanContext: () => ({
         spanId: '0000000000000002',
         traceFlags: TraceFlags.SAMPLED,
@@ -283,7 +280,7 @@ describe('Trace', () => {
         },
       ],
       name: 'span-name',
-      resource,
+      resource: spanResource,
       startTime: [1640715557, 342725388],
       status: {
         code: SpanStatusCode.OK,
@@ -292,6 +289,13 @@ describe('Trace', () => {
       droppedEventsCount: 0,
       droppedLinksCount: 0,
     };
+  }
+
+  beforeEach(() => {
+    resource = resourceFromAttributes({
+      'resource-attribute': 'resource attribute value',
+    });
+    span = createSpanWithResource(resource);
   });
 
   describe('createExportTraceServiceRequest', () => {
@@ -443,6 +447,26 @@ describe('Trace', () => {
         );
       });
     });
+
+    it('supports schema URL on resource', () => {
+      const resourceWithSchema = resourceFromAttributes(
+        { 'resource-attribute': 'resource attribute value' },
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
+      );
+
+      const spanFromSDK = createSpanWithResource(resourceWithSchema);
+
+      const exportRequest = createExportTraceServiceRequest([spanFromSDK], {
+        useHex: true,
+      });
+
+      assert.ok(exportRequest);
+      assert.strictEqual(exportRequest.resourceSpans?.length, 1);
+      assert.strictEqual(
+        exportRequest.resourceSpans?.[0].schemaUrl,
+        'https://opentelemetry.test/schemas/1.2.3'
+      );
+    });
   });
 
   describe('ProtobufTracesSerializer', function () {
@@ -495,6 +519,12 @@ describe('Trace', () => {
         1
       );
     });
+
+    it('does not throw when deserializing an empty response', () => {
+      assert.doesNotThrow(() =>
+        ProtobufTraceSerializer.deserializeResponse(new Uint8Array([]))
+      );
+    });
   });
 
   describe('JsonTracesSerializer', function () {
@@ -535,6 +565,12 @@ describe('Trace', () => {
       assert.equal(
         Number(deserializedResponse.partialSuccess.rejectedSpans),
         1
+      );
+    });
+
+    it('does not throw when deserializing an empty response', () => {
+      assert.doesNotThrow(() =>
+        JsonTraceSerializer.deserializeResponse(new Uint8Array([]))
       );
     });
   });

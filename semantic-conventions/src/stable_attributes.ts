@@ -27,23 +27,31 @@
 export const ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT = 'aspnetcore.diagnostics.exception.result' as const;
 
 /**
-  * Enum value "aborted" for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
-  */
+ * Enum value "aborted" for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
+ *
+ * Exception handling didn't run because the request was aborted.
+ */
 export const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_ABORTED = "aborted" as const;
 
 /**
-  * Enum value "handled" for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
-  */
+ * Enum value "handled" for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
+ *
+ * Exception was handled by the exception handling middleware.
+ */
 export const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_HANDLED = "handled" as const;
 
 /**
-  * Enum value "skipped" for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
-  */
+ * Enum value "skipped" for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
+ *
+ * Exception handling was skipped because the response had started.
+ */
 export const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_SKIPPED = "skipped" as const;
 
 /**
-  * Enum value "unhandled" for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
-  */
+ * Enum value "unhandled" for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
+ *
+ * Exception was not handled by the exception handling middleware.
+ */
 export const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_UNHANDLED = "unhandled" as const;
 
 /**
@@ -71,23 +79,31 @@ export const ATTR_ASPNETCORE_RATE_LIMITING_POLICY = 'aspnetcore.rate_limiting.po
 export const ATTR_ASPNETCORE_RATE_LIMITING_RESULT = 'aspnetcore.rate_limiting.result' as const;
 
 /**
-  * Enum value "acquired" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
-  */
+ * Enum value "acquired" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
+ *
+ * Lease was acquired
+ */
 export const ASPNETCORE_RATE_LIMITING_RESULT_VALUE_ACQUIRED = "acquired" as const;
 
 /**
-  * Enum value "endpoint_limiter" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
-  */
+ * Enum value "endpoint_limiter" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
+ *
+ * Lease request was rejected by the endpoint limiter
+ */
 export const ASPNETCORE_RATE_LIMITING_RESULT_VALUE_ENDPOINT_LIMITER = "endpoint_limiter" as const;
 
 /**
-  * Enum value "global_limiter" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
-  */
+ * Enum value "global_limiter" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
+ *
+ * Lease request was rejected by the global limiter
+ */
 export const ASPNETCORE_RATE_LIMITING_RESULT_VALUE_GLOBAL_LIMITER = "global_limiter" as const;
 
 /**
-  * Enum value "request_canceled" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
-  */
+ * Enum value "request_canceled" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
+ *
+ * Lease request was canceled
+ */
 export const ASPNETCORE_RATE_LIMITING_RESULT_VALUE_REQUEST_CANCELED = "request_canceled" as const;
 
 /**
@@ -113,13 +129,17 @@ export const ATTR_ASPNETCORE_ROUTING_IS_FALLBACK = 'aspnetcore.routing.is_fallba
 export const ATTR_ASPNETCORE_ROUTING_MATCH_STATUS = 'aspnetcore.routing.match_status' as const;
 
 /**
-  * Enum value "failure" for attribute {@link ATTR_ASPNETCORE_ROUTING_MATCH_STATUS}.
-  */
+ * Enum value "failure" for attribute {@link ATTR_ASPNETCORE_ROUTING_MATCH_STATUS}.
+ *
+ * Match failed
+ */
 export const ASPNETCORE_ROUTING_MATCH_STATUS_VALUE_FAILURE = "failure" as const;
 
 /**
-  * Enum value "success" for attribute {@link ATTR_ASPNETCORE_ROUTING_MATCH_STATUS}.
-  */
+ * Enum value "success" for attribute {@link ATTR_ASPNETCORE_ROUTING_MATCH_STATUS}.
+ *
+ * Match succeeded
+ */
 export const ASPNETCORE_ROUTING_MATCH_STATUS_VALUE_SUCCESS = "success" as const;
 
 /**
@@ -143,6 +163,216 @@ export const ATTR_CLIENT_ADDRESS = 'client.address' as const;
 export const ATTR_CLIENT_PORT = 'client.port' as const;
 
 /**
+ * The column number in `code.file.path` best representing the operation. It **SHOULD** point within the code unit named in `code.function.name`. This attribute **MUST NOT** be used on the Profile signal since the data is already captured in 'message Line'. This constraint is imposed to prevent redundancy and maintain data integrity.
+ *
+ * @example 16
+ */
+export const ATTR_CODE_COLUMN_NUMBER = 'code.column.number' as const;
+
+/**
+ * The source code file name that identifies the code unit as uniquely as possible (preferably an absolute file path). This attribute **MUST NOT** be used on the Profile signal since the data is already captured in 'message Function'. This constraint is imposed to prevent redundancy and maintain data integrity.
+ *
+ * @example "/usr/local/MyApplication/content_root/app/index.php"
+ */
+export const ATTR_CODE_FILE_PATH = 'code.file.path' as const;
+
+/**
+ * The method or function fully-qualified name without arguments. The value should fit the natural representation of the language runtime, which is also likely the same used within `code.stacktrace` attribute value. This attribute **MUST NOT** be used on the Profile signal since the data is already captured in 'message Function'. This constraint is imposed to prevent redundancy and maintain data integrity.
+ *
+ * @example com.example.MyHttpService.serveRequest
+ * @example GuzzleHttp\\Client::transfer
+ * @example fopen
+ *
+ * @note Values and format depends on each language runtime, thus it is impossible to provide an exhaustive list of examples.
+ * The values are usually the same (or prefixes of) the ones found in native stack trace representation stored in
+ * `code.stacktrace` without information on arguments.
+ *
+ * Examples:
+ *
+ *   - Java method: `com.example.MyHttpService.serveRequest`
+ *   - Java anonymous class method: `com.mycompany.Main$1.myMethod`
+ *   - Java lambda method: `com.mycompany.Main$$Lambda/0x0000748ae4149c00.myMethod`
+ *   - PHP function: `GuzzleHttp\Client::transfer`
+ *   - Go function: `github.com/my/repo/pkg.foo.func5`
+ *   - Elixir: `OpenTelemetry.Ctx.new`
+ *   - Erlang: `opentelemetry_ctx:new`
+ *   - Rust: `playground::my_module::my_cool_func`
+ *   - C function: `fopen`
+ */
+export const ATTR_CODE_FUNCTION_NAME = 'code.function.name' as const;
+
+/**
+ * The line number in `code.file.path` best representing the operation. It **SHOULD** point within the code unit named in `code.function.name`. This attribute **MUST NOT** be used on the Profile signal since the data is already captured in 'message Line'. This constraint is imposed to prevent redundancy and maintain data integrity.
+ *
+ * @example 42
+ */
+export const ATTR_CODE_LINE_NUMBER = 'code.line.number' as const;
+
+/**
+ * A stacktrace as a string in the natural representation for the language runtime. The representation is identical to [`exception.stacktrace`](/docs/exceptions/exceptions-spans.md#stacktrace-representation). This attribute **MUST NOT** be used on the Profile signal since the data is already captured in 'message Location'. This constraint is imposed to prevent redundancy and maintain data integrity.
+ *
+ * @example "at com.example.GenerateTrace.methodB(GenerateTrace.java:13)\\n at com.example.GenerateTrace.methodA(GenerateTrace.java:9)\\n at com.example.GenerateTrace.main(GenerateTrace.java:5)\\n"
+ */
+export const ATTR_CODE_STACKTRACE = 'code.stacktrace' as const;
+
+/**
+ * The name of a collection (table, container) within the database.
+ *
+ * @example public.users
+ * @example customers
+ *
+ * @note It is **RECOMMENDED** to capture the value as provided by the application
+ * without attempting to do any case normalization.
+ *
+ * The collection name **SHOULD NOT** be extracted from `db.query.text`,
+ * when the database system supports query text with multiple collections
+ * in non-batch operations.
+ *
+ * For batch operations, if the individual operations are known to have the same
+ * collection name then that collection name **SHOULD** be used.
+ */
+export const ATTR_DB_COLLECTION_NAME = 'db.collection.name' as const;
+
+/**
+ * The name of the database, fully qualified within the server address and port.
+ *
+ * @example customers
+ * @example test.users
+ *
+ * @note If a database system has multiple namespace components, they **SHOULD** be concatenated from the most general to the most specific namespace component, using `|` as a separator between the components. Any missing components (and their associated separators) **SHOULD** be omitted.
+ * Semantic conventions for individual database systems **SHOULD** document what `db.namespace` means in the context of that system.
+ * It is **RECOMMENDED** to capture the value as provided by the application without attempting to do any case normalization.
+ */
+export const ATTR_DB_NAMESPACE = 'db.namespace' as const;
+
+/**
+ * The number of queries included in a batch operation.
+ *
+ * @example 2
+ * @example 3
+ * @example 4
+ *
+ * @note Operations are only considered batches when they contain two or more operations, and so `db.operation.batch.size` **SHOULD** never be `1`.
+ */
+export const ATTR_DB_OPERATION_BATCH_SIZE = 'db.operation.batch.size' as const;
+
+/**
+ * The name of the operation or command being executed.
+ *
+ * @example findAndModify
+ * @example HMSET
+ * @example SELECT
+ *
+ * @note It is **RECOMMENDED** to capture the value as provided by the application
+ * without attempting to do any case normalization.
+ *
+ * The operation name **SHOULD NOT** be extracted from `db.query.text`,
+ * when the database system supports query text with multiple operations
+ * in non-batch operations.
+ *
+ * If spaces can occur in the operation name, multiple consecutive spaces
+ * **SHOULD** be normalized to a single space.
+ *
+ * For batch operations, if the individual operations are known to have the same operation name
+ * then that operation name **SHOULD** be used prepended by `BATCH `,
+ * otherwise `db.operation.name` **SHOULD** be `BATCH` or some other database
+ * system specific term if more applicable.
+ */
+export const ATTR_DB_OPERATION_NAME = 'db.operation.name' as const;
+
+/**
+ * Low cardinality summary of a database query.
+ *
+ * @example SELECT wuser_table
+ * @example INSERT shipping_details SELECT orders
+ * @example get user by id
+ *
+ * @note The query summary describes a class of database queries and is useful
+ * as a grouping key, especially when analyzing telemetry for database
+ * calls involving complex queries.
+ *
+ * Summary may be available to the instrumentation through
+ * instrumentation hooks or other means. If it is not available, instrumentations
+ * that support query parsing **SHOULD** generate a summary following
+ * [Generating query summary](/docs/database/database-spans.md#generating-a-summary-of-the-query)
+ * section.
+ */
+export const ATTR_DB_QUERY_SUMMARY = 'db.query.summary' as const;
+
+/**
+ * The database query being executed.
+ *
+ * @example SELECT * FROM wuser_table where username = ?
+ * @example SET mykey ?
+ *
+ * @note For sanitization see [Sanitization of `db.query.text`](/docs/database/database-spans.md#sanitization-of-dbquerytext).
+ * For batch operations, if the individual operations are known to have the same query text then that query text **SHOULD** be used, otherwise all of the individual query texts **SHOULD** be concatenated with separator `; ` or some other database system specific separator if more applicable.
+ * Parameterized query text **SHOULD NOT** be sanitized. Even though parameterized query text can potentially have sensitive data, by using a parameterized query the user is giving a strong signal that any sensitive data will be passed as parameter values, and the benefit to observability of capturing the static part of the query text by default outweighs the risk.
+ */
+export const ATTR_DB_QUERY_TEXT = 'db.query.text' as const;
+
+/**
+ * Database response status code.
+ *
+ * @example 102
+ * @example ORA-17002
+ * @example 08P01
+ * @example 404
+ *
+ * @note The status code returned by the database. Usually it represents an error code, but may also represent partial success, warning, or differentiate between various types of successful outcomes.
+ * Semantic conventions for individual database systems **SHOULD** document what `db.response.status_code` means in the context of that system.
+ */
+export const ATTR_DB_RESPONSE_STATUS_CODE = 'db.response.status_code' as const;
+
+/**
+ * The name of a stored procedure within the database.
+ *
+ * @example GetCustomer
+ *
+ * @note It is **RECOMMENDED** to capture the value as provided by the application
+ * without attempting to do any case normalization.
+ *
+ * For batch operations, if the individual operations are known to have the same
+ * stored procedure name then that stored procedure name **SHOULD** be used.
+ */
+export const ATTR_DB_STORED_PROCEDURE_NAME = 'db.stored_procedure.name' as const;
+
+/**
+ * The database management system (DBMS) product as identified by the client instrumentation.
+ *
+ * @note The actual DBMS may differ from the one identified by the client. For example, when using PostgreSQL client libraries to connect to a CockroachDB, the `db.system.name` is set to `postgresql` based on the instrumentation's best knowledge.
+ */
+export const ATTR_DB_SYSTEM_NAME = 'db.system.name' as const;
+
+/**
+ * Enum value "mariadb" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+ *
+ * [MariaDB](https://mariadb.org/)
+ */
+export const DB_SYSTEM_NAME_VALUE_MARIADB = "mariadb" as const;
+
+/**
+ * Enum value "microsoft.sql_server" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+ *
+ * [Microsoft SQL Server](https://www.microsoft.com/sql-server)
+ */
+export const DB_SYSTEM_NAME_VALUE_MICROSOFT_SQL_SERVER = "microsoft.sql_server" as const;
+
+/**
+ * Enum value "mysql" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+ *
+ * [MySQL](https://www.mysql.com/)
+ */
+export const DB_SYSTEM_NAME_VALUE_MYSQL = "mysql" as const;
+
+/**
+ * Enum value "postgresql" for attribute {@link ATTR_DB_SYSTEM_NAME}.
+ *
+ * [PostgreSQL](https://www.postgresql.org/)
+ */
+export const DB_SYSTEM_NAME_VALUE_POSTGRESQL = "postgresql" as const;
+
+/**
  * Name of the garbage collector managed heap generation.
  *
  * @example gen0
@@ -152,28 +382,38 @@ export const ATTR_CLIENT_PORT = 'client.port' as const;
 export const ATTR_DOTNET_GC_HEAP_GENERATION = 'dotnet.gc.heap.generation' as const;
 
 /**
-  * Enum value "gen0" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
-  */
+ * Enum value "gen0" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
+ *
+ * Generation 0
+ */
 export const DOTNET_GC_HEAP_GENERATION_VALUE_GEN0 = "gen0" as const;
 
 /**
-  * Enum value "gen1" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
-  */
+ * Enum value "gen1" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
+ *
+ * Generation 1
+ */
 export const DOTNET_GC_HEAP_GENERATION_VALUE_GEN1 = "gen1" as const;
 
 /**
-  * Enum value "gen2" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
-  */
+ * Enum value "gen2" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
+ *
+ * Generation 2
+ */
 export const DOTNET_GC_HEAP_GENERATION_VALUE_GEN2 = "gen2" as const;
 
 /**
-  * Enum value "loh" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
-  */
+ * Enum value "loh" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
+ *
+ * Large Object Heap
+ */
 export const DOTNET_GC_HEAP_GENERATION_VALUE_LOH = "loh" as const;
 
 /**
-  * Enum value "poh" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
-  */
+ * Enum value "poh" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
+ *
+ * Pinned Object Heap
+ */
 export const DOTNET_GC_HEAP_GENERATION_VALUE_POH = "poh" as const;
 
 /**
@@ -207,8 +447,10 @@ export const DOTNET_GC_HEAP_GENERATION_VALUE_POH = "poh" as const;
 export const ATTR_ERROR_TYPE = 'error.type' as const;
 
 /**
-  * Enum value "_OTHER" for attribute {@link ATTR_ERROR_TYPE}.
-  */
+ * Enum value "_OTHER" for attribute {@link ATTR_ERROR_TYPE}.
+ *
+ * A fallback error value to be used when the instrumentation doesn't define a custom value.
+ */
 export const ERROR_TYPE_VALUE_OTHER = "_OTHER" as const;
 
 /**
@@ -244,12 +486,25 @@ export const ATTR_EXCEPTION_TYPE = 'exception.type' as const;
 /**
  * HTTP request headers, `<key>` being the normalized HTTP Header name (lowercase), the value being the header values.
  *
- * @example http.request.header.content-type=["application/json"]
- * @example http.request.header.x-forwarded-for=["1.2.3.4", "1.2.3.5"]
+ * @example ["application/json"]
+ * @example ["1.2.3.4", "1.2.3.5"]
  *
- * @note Instrumentations **SHOULD** require an explicit configuration of which headers are to be captured. Including all request headers can be a security risk - explicit configuration helps avoid leaking sensitive information.
- * The `User-Agent` header is already captured in the `user_agent.original` attribute. Users **MAY** explicitly configure instrumentations to capture them even though it is not recommended.
- * The attribute value **MUST** consist of either multiple header values as an array of strings or a single-item array containing a possibly comma-concatenated string, depending on the way the HTTP library provides access to headers.
+ * @note Instrumentations **SHOULD** require an explicit configuration of which headers are to be captured.
+ * Including all request headers can be a security risk - explicit configuration helps avoid leaking sensitive information.
+ *
+ * The `User-Agent` header is already captured in the `user_agent.original` attribute.
+ * Users **MAY** explicitly configure instrumentations to capture them even though it is not recommended.
+ *
+ * The attribute value **MUST** consist of either multiple header values as an array of strings
+ * or a single-item array containing a possibly comma-concatenated string, depending on the way
+ * the HTTP library provides access to headers.
+ *
+ * Examples:
+ *
+ *   - A header `Content-Type: application/json` **SHOULD** be recorded as the `http.request.header.content-type`
+ *     attribute with value `["application/json"]`.
+ *   - A header `X-Forwarded-For: 1.2.3.4, 1.2.3.5` **SHOULD** be recorded as the `http.request.header.x-forwarded-for`
+ *     attribute with value `["1.2.3.4", "1.2.3.5"]` or `["1.2.3.4, 1.2.3.5"]` depending on the HTTP library.
  */
 export const ATTR_HTTP_REQUEST_HEADER = (key: string) => `http.request.header.${key}`;
 
@@ -278,53 +533,73 @@ export const ATTR_HTTP_REQUEST_HEADER = (key: string) => `http.request.header.${
 export const ATTR_HTTP_REQUEST_METHOD = 'http.request.method' as const;
 
 /**
-  * Enum value "_OTHER" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
-  */
+ * Enum value "_OTHER" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+ *
+ * Any HTTP method that the instrumentation has no prior knowledge of.
+ */
 export const HTTP_REQUEST_METHOD_VALUE_OTHER = "_OTHER" as const;
 
 /**
-  * Enum value "CONNECT" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
-  */
+ * Enum value "CONNECT" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+ *
+ * CONNECT method.
+ */
 export const HTTP_REQUEST_METHOD_VALUE_CONNECT = "CONNECT" as const;
 
 /**
-  * Enum value "DELETE" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
-  */
+ * Enum value "DELETE" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+ *
+ * DELETE method.
+ */
 export const HTTP_REQUEST_METHOD_VALUE_DELETE = "DELETE" as const;
 
 /**
-  * Enum value "GET" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
-  */
+ * Enum value "GET" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+ *
+ * GET method.
+ */
 export const HTTP_REQUEST_METHOD_VALUE_GET = "GET" as const;
 
 /**
-  * Enum value "HEAD" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
-  */
+ * Enum value "HEAD" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+ *
+ * HEAD method.
+ */
 export const HTTP_REQUEST_METHOD_VALUE_HEAD = "HEAD" as const;
 
 /**
-  * Enum value "OPTIONS" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
-  */
+ * Enum value "OPTIONS" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+ *
+ * OPTIONS method.
+ */
 export const HTTP_REQUEST_METHOD_VALUE_OPTIONS = "OPTIONS" as const;
 
 /**
-  * Enum value "PATCH" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
-  */
+ * Enum value "PATCH" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+ *
+ * PATCH method.
+ */
 export const HTTP_REQUEST_METHOD_VALUE_PATCH = "PATCH" as const;
 
 /**
-  * Enum value "POST" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
-  */
+ * Enum value "POST" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+ *
+ * POST method.
+ */
 export const HTTP_REQUEST_METHOD_VALUE_POST = "POST" as const;
 
 /**
-  * Enum value "PUT" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
-  */
+ * Enum value "PUT" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+ *
+ * PUT method.
+ */
 export const HTTP_REQUEST_METHOD_VALUE_PUT = "PUT" as const;
 
 /**
-  * Enum value "TRACE" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
-  */
+ * Enum value "TRACE" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+ *
+ * TRACE method.
+ */
 export const HTTP_REQUEST_METHOD_VALUE_TRACE = "TRACE" as const;
 
 /**
@@ -348,12 +623,24 @@ export const ATTR_HTTP_REQUEST_RESEND_COUNT = 'http.request.resend_count' as con
 /**
  * HTTP response headers, `<key>` being the normalized HTTP Header name (lowercase), the value being the header values.
  *
- * @example http.response.header.content-type=["application/json"]
- * @example http.response.header.my-custom-header=["abc", "def"]
+ * @example ["application/json"]
+ * @example ["abc", "def"]
  *
- * @note Instrumentations **SHOULD** require an explicit configuration of which headers are to be captured. Including all response headers can be a security risk - explicit configuration helps avoid leaking sensitive information.
+ * @note Instrumentations **SHOULD** require an explicit configuration of which headers are to be captured.
+ * Including all response headers can be a security risk - explicit configuration helps avoid leaking sensitive information.
+ *
  * Users **MAY** explicitly configure instrumentations to capture them even though it is not recommended.
- * The attribute value **MUST** consist of either multiple header values as an array of strings or a single-item array containing a possibly comma-concatenated string, depending on the way the HTTP library provides access to headers.
+ *
+ * The attribute value **MUST** consist of either multiple header values as an array of strings
+ * or a single-item array containing a possibly comma-concatenated string, depending on the way
+ * the HTTP library provides access to headers.
+ *
+ * Examples:
+ *
+ *   - A header `Content-Type: application/json` header **SHOULD** be recorded as the `http.request.response.content-type`
+ *     attribute with value `["application/json"]`.
+ *   - A header `My-custom-header: abc, def` header **SHOULD** be recorded as the `http.response.header.my-custom-header`
+ *     attribute with value `["abc", "def"]` or `["abc, def"]` depending on the HTTP library.
  */
 export const ATTR_HTTP_RESPONSE_HEADER = (key: string) => `http.response.header.${key}`;
 
@@ -415,13 +702,17 @@ export const ATTR_JVM_MEMORY_POOL_NAME = 'jvm.memory.pool.name' as const;
 export const ATTR_JVM_MEMORY_TYPE = 'jvm.memory.type' as const;
 
 /**
-  * Enum value "heap" for attribute {@link ATTR_JVM_MEMORY_TYPE}.
-  */
+ * Enum value "heap" for attribute {@link ATTR_JVM_MEMORY_TYPE}.
+ *
+ * Heap memory.
+ */
 export const JVM_MEMORY_TYPE_VALUE_HEAP = "heap" as const;
 
 /**
-  * Enum value "non_heap" for attribute {@link ATTR_JVM_MEMORY_TYPE}.
-  */
+ * Enum value "non_heap" for attribute {@link ATTR_JVM_MEMORY_TYPE}.
+ *
+ * Non-heap memory
+ */
 export const JVM_MEMORY_TYPE_VALUE_NON_HEAP = "non_heap" as const;
 
 /**
@@ -438,33 +729,45 @@ export const ATTR_JVM_THREAD_DAEMON = 'jvm.thread.daemon' as const;
 export const ATTR_JVM_THREAD_STATE = 'jvm.thread.state' as const;
 
 /**
-  * Enum value "blocked" for attribute {@link ATTR_JVM_THREAD_STATE}.
-  */
+ * Enum value "blocked" for attribute {@link ATTR_JVM_THREAD_STATE}.
+ *
+ * A thread that is blocked waiting for a monitor lock is in this state.
+ */
 export const JVM_THREAD_STATE_VALUE_BLOCKED = "blocked" as const;
 
 /**
-  * Enum value "new" for attribute {@link ATTR_JVM_THREAD_STATE}.
-  */
+ * Enum value "new" for attribute {@link ATTR_JVM_THREAD_STATE}.
+ *
+ * A thread that has not yet started is in this state.
+ */
 export const JVM_THREAD_STATE_VALUE_NEW = "new" as const;
 
 /**
-  * Enum value "runnable" for attribute {@link ATTR_JVM_THREAD_STATE}.
-  */
+ * Enum value "runnable" for attribute {@link ATTR_JVM_THREAD_STATE}.
+ *
+ * A thread executing in the Java virtual machine is in this state.
+ */
 export const JVM_THREAD_STATE_VALUE_RUNNABLE = "runnable" as const;
 
 /**
-  * Enum value "terminated" for attribute {@link ATTR_JVM_THREAD_STATE}.
-  */
+ * Enum value "terminated" for attribute {@link ATTR_JVM_THREAD_STATE}.
+ *
+ * A thread that has exited is in this state.
+ */
 export const JVM_THREAD_STATE_VALUE_TERMINATED = "terminated" as const;
 
 /**
-  * Enum value "timed_waiting" for attribute {@link ATTR_JVM_THREAD_STATE}.
-  */
+ * Enum value "timed_waiting" for attribute {@link ATTR_JVM_THREAD_STATE}.
+ *
+ * A thread that is waiting for another thread to perform an action for up to a specified waiting time is in this state.
+ */
 export const JVM_THREAD_STATE_VALUE_TIMED_WAITING = "timed_waiting" as const;
 
 /**
-  * Enum value "waiting" for attribute {@link ATTR_JVM_THREAD_STATE}.
-  */
+ * Enum value "waiting" for attribute {@link ATTR_JVM_THREAD_STATE}.
+ *
+ * A thread that is waiting indefinitely for another thread to perform a particular action is in this state.
+ */
 export const JVM_THREAD_STATE_VALUE_WAITING = "waiting" as const;
 
 /**
@@ -533,28 +836,38 @@ export const ATTR_NETWORK_PROTOCOL_VERSION = 'network.protocol.version' as const
 export const ATTR_NETWORK_TRANSPORT = 'network.transport' as const;
 
 /**
-  * Enum value "pipe" for attribute {@link ATTR_NETWORK_TRANSPORT}.
-  */
+ * Enum value "pipe" for attribute {@link ATTR_NETWORK_TRANSPORT}.
+ *
+ * Named or anonymous pipe.
+ */
 export const NETWORK_TRANSPORT_VALUE_PIPE = "pipe" as const;
 
 /**
-  * Enum value "quic" for attribute {@link ATTR_NETWORK_TRANSPORT}.
-  */
+ * Enum value "quic" for attribute {@link ATTR_NETWORK_TRANSPORT}.
+ *
+ * QUIC
+ */
 export const NETWORK_TRANSPORT_VALUE_QUIC = "quic" as const;
 
 /**
-  * Enum value "tcp" for attribute {@link ATTR_NETWORK_TRANSPORT}.
-  */
+ * Enum value "tcp" for attribute {@link ATTR_NETWORK_TRANSPORT}.
+ *
+ * TCP
+ */
 export const NETWORK_TRANSPORT_VALUE_TCP = "tcp" as const;
 
 /**
-  * Enum value "udp" for attribute {@link ATTR_NETWORK_TRANSPORT}.
-  */
+ * Enum value "udp" for attribute {@link ATTR_NETWORK_TRANSPORT}.
+ *
+ * UDP
+ */
 export const NETWORK_TRANSPORT_VALUE_UDP = "udp" as const;
 
 /**
-  * Enum value "unix" for attribute {@link ATTR_NETWORK_TRANSPORT}.
-  */
+ * Enum value "unix" for attribute {@link ATTR_NETWORK_TRANSPORT}.
+ *
+ * Unix domain socket
+ */
 export const NETWORK_TRANSPORT_VALUE_UNIX = "unix" as const;
 
 /**
@@ -568,13 +881,17 @@ export const NETWORK_TRANSPORT_VALUE_UNIX = "unix" as const;
 export const ATTR_NETWORK_TYPE = 'network.type' as const;
 
 /**
-  * Enum value "ipv4" for attribute {@link ATTR_NETWORK_TYPE}.
-  */
+ * Enum value "ipv4" for attribute {@link ATTR_NETWORK_TYPE}.
+ *
+ * IPv4
+ */
 export const NETWORK_TYPE_VALUE_IPV4 = "ipv4" as const;
 
 /**
-  * Enum value "ipv6" for attribute {@link ATTR_NETWORK_TYPE}.
-  */
+ * Enum value "ipv6" for attribute {@link ATTR_NETWORK_TYPE}.
+ *
+ * IPv6
+ */
 export const NETWORK_TYPE_VALUE_IPV6 = "ipv6" as const;
 
 /**
@@ -597,13 +914,17 @@ export const ATTR_OTEL_SCOPE_VERSION = 'otel.scope.version' as const;
 export const ATTR_OTEL_STATUS_CODE = 'otel.status_code' as const;
 
 /**
-  * Enum value "ERROR" for attribute {@link ATTR_OTEL_STATUS_CODE}.
-  */
+ * Enum value "ERROR" for attribute {@link ATTR_OTEL_STATUS_CODE}.
+ *
+ * The operation contains an error.
+ */
 export const OTEL_STATUS_CODE_VALUE_ERROR = "ERROR" as const;
 
 /**
-  * Enum value "OK" for attribute {@link ATTR_OTEL_STATUS_CODE}.
-  */
+ * Enum value "OK" for attribute {@link ATTR_OTEL_STATUS_CODE}.
+ *
+ * The operation has been validated by an Application developer or Operator to have completed successfully.
+ */
 export const OTEL_STATUS_CODE_VALUE_OK = "OK" as const;
 
 /**
@@ -661,18 +982,24 @@ export const ATTR_SERVICE_VERSION = 'service.version' as const;
 export const ATTR_SIGNALR_CONNECTION_STATUS = 'signalr.connection.status' as const;
 
 /**
-  * Enum value "app_shutdown" for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
-  */
+ * Enum value "app_shutdown" for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
+ *
+ * The connection was closed because the app is shutting down.
+ */
 export const SIGNALR_CONNECTION_STATUS_VALUE_APP_SHUTDOWN = "app_shutdown" as const;
 
 /**
-  * Enum value "normal_closure" for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
-  */
+ * Enum value "normal_closure" for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
+ *
+ * The connection was closed normally.
+ */
 export const SIGNALR_CONNECTION_STATUS_VALUE_NORMAL_CLOSURE = "normal_closure" as const;
 
 /**
-  * Enum value "timeout" for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
-  */
+ * Enum value "timeout" for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
+ *
+ * The connection was closed due to a timeout.
+ */
 export const SIGNALR_CONNECTION_STATUS_VALUE_TIMEOUT = "timeout" as const;
 
 /**
@@ -684,18 +1011,24 @@ export const SIGNALR_CONNECTION_STATUS_VALUE_TIMEOUT = "timeout" as const;
 export const ATTR_SIGNALR_TRANSPORT = 'signalr.transport' as const;
 
 /**
-  * Enum value "long_polling" for attribute {@link ATTR_SIGNALR_TRANSPORT}.
-  */
+ * Enum value "long_polling" for attribute {@link ATTR_SIGNALR_TRANSPORT}.
+ *
+ * LongPolling protocol
+ */
 export const SIGNALR_TRANSPORT_VALUE_LONG_POLLING = "long_polling" as const;
 
 /**
-  * Enum value "server_sent_events" for attribute {@link ATTR_SIGNALR_TRANSPORT}.
-  */
+ * Enum value "server_sent_events" for attribute {@link ATTR_SIGNALR_TRANSPORT}.
+ *
+ * ServerSentEvents protocol
+ */
 export const SIGNALR_TRANSPORT_VALUE_SERVER_SENT_EVENTS = "server_sent_events" as const;
 
 /**
-  * Enum value "web_sockets" for attribute {@link ATTR_SIGNALR_TRANSPORT}.
-  */
+ * Enum value "web_sockets" for attribute {@link ATTR_SIGNALR_TRANSPORT}.
+ *
+ * WebSockets protocol
+ */
 export const SIGNALR_TRANSPORT_VALUE_WEB_SOCKETS = "web_sockets" as const;
 
 /**
@@ -704,63 +1037,63 @@ export const SIGNALR_TRANSPORT_VALUE_WEB_SOCKETS = "web_sockets" as const;
 export const ATTR_TELEMETRY_SDK_LANGUAGE = 'telemetry.sdk.language' as const;
 
 /**
-  * Enum value "cpp" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
+ * Enum value "cpp" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_CPP = "cpp" as const;
 
 /**
-  * Enum value "dotnet" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
+ * Enum value "dotnet" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_DOTNET = "dotnet" as const;
 
 /**
-  * Enum value "erlang" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
+ * Enum value "erlang" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_ERLANG = "erlang" as const;
 
 /**
-  * Enum value "go" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
+ * Enum value "go" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_GO = "go" as const;
 
 /**
-  * Enum value "java" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
+ * Enum value "java" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_JAVA = "java" as const;
 
 /**
-  * Enum value "nodejs" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
+ * Enum value "nodejs" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_NODEJS = "nodejs" as const;
 
 /**
-  * Enum value "php" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
+ * Enum value "php" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_PHP = "php" as const;
 
 /**
-  * Enum value "python" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
+ * Enum value "python" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_PYTHON = "python" as const;
 
 /**
-  * Enum value "ruby" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
+ * Enum value "ruby" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_RUBY = "ruby" as const;
 
 /**
-  * Enum value "rust" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
+ * Enum value "rust" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_RUST = "rust" as const;
 
 /**
-  * Enum value "swift" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
+ * Enum value "swift" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_SWIFT = "swift" as const;
 
 /**
-  * Enum value "webjs" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
-  */
+ * Enum value "webjs" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_WEBJS = "webjs" as const;
 
 /**

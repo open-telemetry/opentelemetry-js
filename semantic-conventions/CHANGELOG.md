@@ -9,17 +9,523 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
+* feat: add `EVENT_*` exports for event names in Semantic Conventions [#5832](https://github.com/open-telemetry/opentelemetry-js/pull/5832) @trentm
+
 ### :bug: Bug Fixes
+
+* fix: prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
 
 ### :books: Documentation
 
 ### :house: Internal
 
+## 1.36.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.36.0 [#5779](https://github.com/open-telemetry/opentelemetry-js/pull/5779) @trentm
+  * Semantic Conventions v1.36.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1360) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *none*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *8 exported values changed, 7 newly deprecated exports, 3 newly undeprecated exports, 88 added exports*
+
+#### Unstable changes in v1.36.0
+
+<details>
+<summary>8 exported values changed</summary>
+
+```js
+CLOUD_PLATFORM_VALUE_AZURE_AKS                 // "azure_aks" -> "azure.aks"
+CLOUD_PLATFORM_VALUE_AZURE_APP_SERVICE         // "azure_app_service" -> "azure.app_service"
+CLOUD_PLATFORM_VALUE_AZURE_CONTAINER_APPS      // "azure_container_apps" -> "azure.container_apps"
+CLOUD_PLATFORM_VALUE_AZURE_CONTAINER_INSTANCES // "azure_container_instances" -> "azure.container_instances"
+CLOUD_PLATFORM_VALUE_AZURE_FUNCTIONS           // "azure_functions" -> "azure.functions"
+CLOUD_PLATFORM_VALUE_AZURE_OPENSHIFT           // "azure_openshift" -> "azure.openshift"
+CLOUD_PLATFORM_VALUE_AZURE_VM                  // "azure_vm" -> "azure.vm"
+GEN_AI_SYSTEM_VALUE_AZ_AI_OPENAI               // "az.ai.openai" -> "azure.ai.openai"
+```
+
+</details>
+
+<details>
+<summary>7 newly deprecated exports</summary>
+
+```js
+METRIC_CPU_FREQUENCY              // cpu.frequency: Replaced by `system.cpu.frequency`.
+METRIC_CPU_TIME                   // cpu.time: Replaced by `system.cpu.time`.
+METRIC_CPU_UTILIZATION            // cpu.utilization: Replaced by `system.cpu.utilization`.
+METRIC_OTEL_SDK_SPAN_ENDED        // otel.sdk.span.ended: Obsoleted.
+METRIC_SYSTEM_NETWORK_CONNECTIONS // system.network.connections: Replaced by `system.network.connection.count`.
+ATTR_AZ_NAMESPACE                 // az.namespace: Replaced by `azure.resource_provider.namespace`.
+ATTR_AZ_SERVICE_REQUEST_ID        // az.service_request_id: Replaced by `azure.service.request.id`.
+```
+
+</details>
+
+<details>
+<summary>3 newly undeprecated exports</summary>
+
+```js
+METRIC_SYSTEM_CPU_FREQUENCY   // system.cpu.frequency
+METRIC_SYSTEM_CPU_TIME        // system.cpu.time
+METRIC_SYSTEM_CPU_UTILIZATION // system.cpu.utilization
+```
+
+</details>
+
+<details>
+<summary>88 added exports</summary>
+
+```js
+METRIC_K8S_CONTAINER_CPU_LIMIT                                  // k8s.container.cpu.limit
+METRIC_K8S_CONTAINER_CPU_REQUEST                                // k8s.container.cpu.request
+METRIC_K8S_CONTAINER_EPHEMERAL_STORAGE_LIMIT                    // k8s.container.ephemeral_storage.limit
+METRIC_K8S_CONTAINER_EPHEMERAL_STORAGE_REQUEST                  // k8s.container.ephemeral_storage.request
+METRIC_K8S_CONTAINER_MEMORY_LIMIT                               // k8s.container.memory.limit
+METRIC_K8S_CONTAINER_MEMORY_REQUEST                             // k8s.container.memory.request
+METRIC_K8S_CONTAINER_READY                                      // k8s.container.ready
+METRIC_K8S_CONTAINER_RESTART_COUNT                              // k8s.container.restart.count
+METRIC_K8S_CONTAINER_STATUS_REASON                              // k8s.container.status.reason
+METRIC_K8S_CONTAINER_STATUS_STATE                               // k8s.container.status.state
+METRIC_K8S_CONTAINER_STORAGE_LIMIT                              // k8s.container.storage.limit
+METRIC_K8S_CONTAINER_STORAGE_REQUEST                            // k8s.container.storage.request
+METRIC_K8S_HPA_METRIC_TARGET_CPU_AVERAGE_UTILIZATION            // k8s.hpa.metric.target.cpu.average_utilization
+METRIC_K8S_HPA_METRIC_TARGET_CPU_AVERAGE_VALUE                  // k8s.hpa.metric.target.cpu.average_value
+METRIC_K8S_HPA_METRIC_TARGET_CPU_VALUE                          // k8s.hpa.metric.target.cpu.value
+METRIC_K8S_NODE_ALLOCATABLE_CPU                                 // k8s.node.allocatable.cpu
+METRIC_K8S_NODE_ALLOCATABLE_EPHEMERAL_STORAGE                   // k8s.node.allocatable.ephemeral_storage
+METRIC_K8S_NODE_ALLOCATABLE_MEMORY                              // k8s.node.allocatable.memory
+METRIC_K8S_NODE_ALLOCATABLE_PODS                                // k8s.node.allocatable.pods
+METRIC_K8S_NODE_CONDITION_STATUS                                // k8s.node.condition.status
+METRIC_K8S_RESOURCEQUOTA_CPU_LIMIT_HARD                         // k8s.resourcequota.cpu.limit.hard
+METRIC_K8S_RESOURCEQUOTA_CPU_LIMIT_USED                         // k8s.resourcequota.cpu.limit.used
+METRIC_K8S_RESOURCEQUOTA_CPU_REQUEST_HARD                       // k8s.resourcequota.cpu.request.hard
+METRIC_K8S_RESOURCEQUOTA_CPU_REQUEST_USED                       // k8s.resourcequota.cpu.request.used
+METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_LIMIT_HARD           // k8s.resourcequota.ephemeral_storage.limit.hard
+METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_LIMIT_USED           // k8s.resourcequota.ephemeral_storage.limit.used
+METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_REQUEST_HARD         // k8s.resourcequota.ephemeral_storage.request.hard
+METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_REQUEST_USED         // k8s.resourcequota.ephemeral_storage.request.used
+METRIC_K8S_RESOURCEQUOTA_HUGEPAGE_COUNT_REQUEST_HARD            // k8s.resourcequota.hugepage_count.request.hard
+METRIC_K8S_RESOURCEQUOTA_HUGEPAGE_COUNT_REQUEST_USED            // k8s.resourcequota.hugepage_count.request.used
+METRIC_K8S_RESOURCEQUOTA_MEMORY_LIMIT_HARD                      // k8s.resourcequota.memory.limit.hard
+METRIC_K8S_RESOURCEQUOTA_MEMORY_LIMIT_USED                      // k8s.resourcequota.memory.limit.used
+METRIC_K8S_RESOURCEQUOTA_MEMORY_REQUEST_HARD                    // k8s.resourcequota.memory.request.hard
+METRIC_K8S_RESOURCEQUOTA_MEMORY_REQUEST_USED                    // k8s.resourcequota.memory.request.used
+METRIC_K8S_RESOURCEQUOTA_OBJECT_COUNT_HARD                      // k8s.resourcequota.object_count.hard
+METRIC_K8S_RESOURCEQUOTA_OBJECT_COUNT_USED                      // k8s.resourcequota.object_count.used
+METRIC_K8S_RESOURCEQUOTA_PERSISTENTVOLUMECLAIM_COUNT_HARD       // k8s.resourcequota.persistentvolumeclaim_count.hard
+METRIC_K8S_RESOURCEQUOTA_PERSISTENTVOLUMECLAIM_COUNT_USED       // k8s.resourcequota.persistentvolumeclaim_count.used
+METRIC_K8S_RESOURCEQUOTA_STORAGE_REQUEST_HARD                   // k8s.resourcequota.storage.request.hard
+METRIC_K8S_RESOURCEQUOTA_STORAGE_REQUEST_USED                   // k8s.resourcequota.storage.request.used
+
+METRIC_OTEL_SDK_SPAN_STARTED                                    // otel.sdk.span.started
+
+METRIC_SYSTEM_NETWORK_CONNECTION_COUNT                          // system.network.connection.count
+
+ATTR_AZURE_RESOURCE_PROVIDER_NAMESPACE                          // azure.resource_provider.namespace
+ATTR_AZURE_SERVICE_REQUEST_ID                                   // azure.service.request.id
+
+ATTR_DNS_ANSWERS                                                // dns.answers
+
+GEN_AI_SYSTEM_VALUE_AZURE_AI_INFERENCE                          // "azure.ai.inference"
+GEN_AI_SYSTEM_VALUE_AZURE_AI_OPENAI                             // "azure.ai.openai"
+
+ATTR_K8S_CONTAINER_STATUS_REASON                                // k8s.container.status.reason
+  K8S_CONTAINER_STATUS_REASON_VALUE_COMPLETED                     // "Completed"
+  K8S_CONTAINER_STATUS_REASON_VALUE_CONTAINER_CANNOT_RUN          // "ContainerCannotRun"
+  K8S_CONTAINER_STATUS_REASON_VALUE_CONTAINER_CREATING            // "ContainerCreating"
+  K8S_CONTAINER_STATUS_REASON_VALUE_CRASH_LOOP_BACK_OFF           // "CrashLoopBackOff"
+  K8S_CONTAINER_STATUS_REASON_VALUE_CREATE_CONTAINER_CONFIG_ERROR // "CreateContainerConfigError"
+  K8S_CONTAINER_STATUS_REASON_VALUE_ERR_IMAGE_PULL                // "ErrImagePull"
+  K8S_CONTAINER_STATUS_REASON_VALUE_ERROR                         // "Error"
+  K8S_CONTAINER_STATUS_REASON_VALUE_IMAGE_PULL_BACK_OFF           // "ImagePullBackOff"
+  K8S_CONTAINER_STATUS_REASON_VALUE_OOM_KILLED                    // "OOMKilled"
+ATTR_K8S_CONTAINER_STATUS_STATE                                 // k8s.container.status.state
+  K8S_CONTAINER_STATUS_STATE_VALUE_RUNNING                        // "running"
+  K8S_CONTAINER_STATUS_STATE_VALUE_TERMINATED                     // "terminated"
+  K8S_CONTAINER_STATUS_STATE_VALUE_WAITING                        // "waiting"
+ATTR_K8S_HPA_METRIC_TYPE                                        // k8s.hpa.metric.type
+ATTR_K8S_HPA_SCALETARGETREF_API_VERSION                         // k8s.hpa.scaletargetref.api_version
+ATTR_K8S_HPA_SCALETARGETREF_KIND                                // k8s.hpa.scaletargetref.kind
+ATTR_K8S_HPA_SCALETARGETREF_NAME                                // k8s.hpa.scaletargetref.name
+ATTR_K8S_HUGEPAGE_SIZE                                          // k8s.hugepage.size
+ATTR_K8S_NODE_CONDITION_STATUS                                  // k8s.node.condition.status
+  K8S_NODE_CONDITION_STATUS_VALUE_CONDITION_FALSE                 // "false"
+  K8S_NODE_CONDITION_STATUS_VALUE_CONDITION_TRUE                  // "true"
+  K8S_NODE_CONDITION_STATUS_VALUE_CONDITION_UNKNOWN               // "unknown"
+ATTR_K8S_NODE_CONDITION_TYPE                                    // k8s.node.condition.type
+  K8S_NODE_CONDITION_TYPE_VALUE_DISK_PRESSURE                     // "DiskPressure"
+  K8S_NODE_CONDITION_TYPE_VALUE_MEMORY_PRESSURE                   // "MemoryPressure"
+  K8S_NODE_CONDITION_TYPE_VALUE_NETWORK_UNAVAILABLE               // "NetworkUnavailable"
+  K8S_NODE_CONDITION_TYPE_VALUE_PID_PRESSURE                      // "PIDPressure"
+  K8S_NODE_CONDITION_TYPE_VALUE_READY                             // "Ready"
+ATTR_K8S_RESOURCEQUOTA_RESOURCE_NAME                            // k8s.resourcequota.resource_name
+ATTR_K8S_STORAGECLASS_NAME                                      // k8s.storageclass.name
+
+ATTR_MAINFRAME_LPAR_NAME                                        // mainframe.lpar.name
+
+OS_TYPE_VALUE_ZOS                                               // "zos"
+
+OTEL_COMPONENT_TYPE_VALUE_PROMETHEUS_HTTP_TEXT_METRIC_EXPORTER  // "prometheus_http_text_metric_exporter"
+OTEL_COMPONENT_TYPE_VALUE_ZIPKIN_HTTP_SPAN_EXPORTER             // "zipkin_http_span_exporter"
+ATTR_OTEL_SPAN_PARENT_ORIGIN                                    // otel.span.parent.origin
+  OTEL_SPAN_PARENT_ORIGIN_VALUE_LOCAL                             // "local"
+  OTEL_SPAN_PARENT_ORIGIN_VALUE_NONE                              // "none"
+  OTEL_SPAN_PARENT_ORIGIN_VALUE_REMOTE                            // "remote"
+
+ATTR_ZOS_SMF_ID                                                 // zos.smf.id
+ATTR_ZOS_SYSPLEX_NAME                                           // zos.sysplex.name
+```
+
+</details>
+
+## 1.35.0
+
+**Known issue:** Changes from semantic conventions **v1.36.0** where accidentally released in this JS package with version **1.35.0**. Please use `@opentelemetry/semantic-conventions@1.36.0`.
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.36.0 [#5779](https://github.com/open-telemetry/opentelemetry-js/pull/5779) @trentm
+  * Changes from semantic conventions **v1.36.0** were incorrectly included in this release. See note above.
+
+* feat: improve the jsdoc comment on exported constants for enum values [#5784](https://github.com/open-telemetry/opentelemetry-js/pull/5784) @trentm
+  * The jsdoc comment for enum values now includes the 'brief', an
+    `@experimental` tag, and a `@deprecated` tag if the corresponding fields
+    exist on the semconv definition.
+
+## 1.34.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.34.0 [#5703](https://github.com/open-telemetry/opentelemetry-js/pull/5703) @trentm
+  * Semantic Conventions v1.34.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1340) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *none*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *12 added exports*
+
+#### Unstable changes in v1.34.0
+
+<details>
+<summary>12 added exports</summary>
+
+```js
+ATTR_AWS_BEDROCK_GUARDRAIL_ID             // aws.bedrock.guardrail.id
+ATTR_AWS_BEDROCK_KNOWLEDGE_BASE_ID        // aws.bedrock.knowledge_base.id
+ATTR_AWS_KINESIS_STREAM_NAME              // aws.kinesis.stream_name
+ATTR_AWS_LAMBDA_RESOURCE_MAPPING_ID       // aws.lambda.resource_mapping.id
+ATTR_AWS_SECRETSMANAGER_SECRET_ARN        // aws.secretsmanager.secret.arn
+ATTR_AWS_SNS_TOPIC_ARN                    // aws.sns.topic.arn
+ATTR_AWS_SQS_QUEUE_URL                    // aws.sqs.queue.url
+ATTR_AWS_STEP_FUNCTIONS_ACTIVITY_ARN      // aws.step_functions.activity.arn
+ATTR_AWS_STEP_FUNCTIONS_STATE_MACHINE_ARN // aws.step_functions.state_machine.arn
+
+ATTR_FEATURE_FLAG_RESULT_VALUE            // feature_flag.result.value
+
+ATTR_GEN_AI_CONVERSATION_ID               // gen_ai.conversation.id
+ATTR_GEN_AI_DATA_SOURCE_ID                // gen_ai.data_source.id
+```
+
+</details>
+
+## 1.33.1
+
+### :boom: Breaking Changes
+
+* fix: Remove the subset of `DB_SYSTEM_NAME_VALUE_*` exports that are unstable from the `@opentelemetry/semantic-conventions` entry point. [#5690](https://github.com/open-telemetry/opentelemetry-js/pull/5690)
+  * Version 1.33.0 erroneously included all `DB_SYSTEM_NAME_VALUE_*` constants in the stable entry point. Some of those enum values are not yet stable. They have been moved back to the unstable `@opentelemetry/semantic-conventions/incubating` entry point. See the PR description for a full list.
+
+## 1.33.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.33.0 [#5654](https://github.com/open-telemetry/opentelemetry-js/pull/5654) @trentm
+  * Semantic Conventions v1.33.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1330) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *56 added exports*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *1 exported value changed, 6 newly deprecated exports, 1 newly undeprecated export, 57 added exports*
+
+#### Stable changes in v1.33.0
+
+<details open>
+<summary>56 added exports</summary>
+
+```js
+METRIC_DB_CLIENT_OPERATION_DURATION       // db.client.operation.duration
+
+ATTR_CODE_COLUMN_NUMBER                   // code.column.number
+ATTR_CODE_FILE_PATH                       // code.file.path
+ATTR_CODE_FUNCTION_NAME                   // code.function.name
+ATTR_CODE_LINE_NUMBER                     // code.line.number
+ATTR_CODE_STACKTRACE                      // code.stacktrace
+
+ATTR_DB_COLLECTION_NAME                   // db.collection.name
+ATTR_DB_NAMESPACE                         // db.namespace
+ATTR_DB_OPERATION_BATCH_SIZE              // db.operation.batch.size
+ATTR_DB_OPERATION_NAME                    // db.operation.name
+ATTR_DB_QUERY_SUMMARY                     // db.query.summary
+ATTR_DB_QUERY_TEXT                        // db.query.text
+ATTR_DB_RESPONSE_STATUS_CODE              // db.response.status_code
+ATTR_DB_STORED_PROCEDURE_NAME             // db.stored_procedure.name
+ATTR_DB_SYSTEM_NAME                       // db.system.name
+  DB_SYSTEM_NAME_VALUE_ACTIAN_INGRES        // "actian.ingres"
+  DB_SYSTEM_NAME_VALUE_AWS_DYNAMODB         // "aws.dynamodb"
+  DB_SYSTEM_NAME_VALUE_AWS_REDSHIFT         // "aws.redshift"
+  DB_SYSTEM_NAME_VALUE_AZURE_COSMOSDB       // "azure.cosmosdb"
+  DB_SYSTEM_NAME_VALUE_CASSANDRA            // "cassandra"
+  DB_SYSTEM_NAME_VALUE_CLICKHOUSE           // "clickhouse"
+  DB_SYSTEM_NAME_VALUE_COCKROACHDB          // "cockroachdb"
+  DB_SYSTEM_NAME_VALUE_COUCHBASE            // "couchbase"
+  DB_SYSTEM_NAME_VALUE_COUCHDB              // "couchdb"
+  DB_SYSTEM_NAME_VALUE_DERBY                // "derby"
+  DB_SYSTEM_NAME_VALUE_ELASTICSEARCH        // "elasticsearch"
+  DB_SYSTEM_NAME_VALUE_FIREBIRDSQL          // "firebirdsql"
+  DB_SYSTEM_NAME_VALUE_GCP_SPANNER          // "gcp.spanner"
+  DB_SYSTEM_NAME_VALUE_GEODE                // "geode"
+  DB_SYSTEM_NAME_VALUE_H2DATABASE           // "h2database"
+  DB_SYSTEM_NAME_VALUE_HBASE                // "hbase"
+  DB_SYSTEM_NAME_VALUE_HIVE                 // "hive"
+  DB_SYSTEM_NAME_VALUE_HSQLDB               // "hsqldb"
+  DB_SYSTEM_NAME_VALUE_IBM_DB2              // "ibm.db2"
+  DB_SYSTEM_NAME_VALUE_IBM_INFORMIX         // "ibm.informix"
+  DB_SYSTEM_NAME_VALUE_IBM_NETEZZA          // "ibm.netezza"
+  DB_SYSTEM_NAME_VALUE_INFLUXDB             // "influxdb"
+  DB_SYSTEM_NAME_VALUE_INSTANTDB            // "instantdb"
+  DB_SYSTEM_NAME_VALUE_INTERSYSTEMS_CACHE   // "intersystems.cache"
+  DB_SYSTEM_NAME_VALUE_MARIADB              // "mariadb"
+  DB_SYSTEM_NAME_VALUE_MEMCACHED            // "memcached"
+  DB_SYSTEM_NAME_VALUE_MICROSOFT_SQL_SERVER // "microsoft.sql_server"
+  DB_SYSTEM_NAME_VALUE_MONGODB              // "mongodb"
+  DB_SYSTEM_NAME_VALUE_MYSQL                // "mysql"
+  DB_SYSTEM_NAME_VALUE_NEO4J                // "neo4j"
+  DB_SYSTEM_NAME_VALUE_OPENSEARCH           // "opensearch"
+  DB_SYSTEM_NAME_VALUE_ORACLE_DB            // "oracle.db"
+  DB_SYSTEM_NAME_VALUE_OTHER_SQL            // "other_sql"
+  DB_SYSTEM_NAME_VALUE_POSTGRESQL           // "postgresql"
+  DB_SYSTEM_NAME_VALUE_REDIS                // "redis"
+  DB_SYSTEM_NAME_VALUE_SAP_HANA             // "sap.hana"
+  DB_SYSTEM_NAME_VALUE_SAP_MAXDB            // "sap.maxdb"
+  DB_SYSTEM_NAME_VALUE_SOFTWAREAG_ADABAS    // "softwareag.adabas"
+  DB_SYSTEM_NAME_VALUE_SQLITE               // "sqlite"
+  DB_SYSTEM_NAME_VALUE_TERADATA             // "teradata"
+  DB_SYSTEM_NAME_VALUE_TRINO                // "trino"
+```
+
+</details>
+
+#### Unstable changes in v1.33.0
+
+<details>
+<summary>1 exported value changed</summary>
+
+```js
+ATTR_FEATURE_FLAG_PROVIDER_NAME // feature_flag.provider_name -> feature_flag.provider.name
+```
+
+</details>
+
+<details>
+<summary>6 newly deprecated exports</summary>
+
+```js
+METRIC_OTEL_SDK_EXPORTER_SPAN_EXPORTED_COUNT   // otel.sdk.exporter.span.exported.count: Renamed to `otel.sdk.exporter.span.exported`.
+METRIC_OTEL_SDK_EXPORTER_SPAN_INFLIGHT_COUNT   // otel.sdk.exporter.span.inflight.count: Renamed to `otel.sdk.exporter.span.inflight`.
+METRIC_OTEL_SDK_PROCESSOR_SPAN_PROCESSED_COUNT // otel.sdk.processor.span.processed.count: Renamed to `otel.sdk.processor.span.processed`.
+METRIC_OTEL_SDK_SPAN_ENDED_COUNT               // otel.sdk.span.ended.count: Renamed to `otel.sdk.span.ended`.
+METRIC_OTEL_SDK_SPAN_LIVE_COUNT                // otel.sdk.span.live.count: Renamed to `otel.sdk.span.live`.
+ATTR_FEATURE_FLAG_EVALUATION_ERROR_MESSAGE     // feature_flag.evaluation.error.message: Replaced by `error.message`.
+```
+
+</details>
+
+<details>
+<summary>1 newly undeprecated export</summary>
+
+```js
+ATTR_DB_QUERY_PARAMETER // (key) => `db.query.parameter.${key}`
+```
+
+</details>
+
+<details>
+<summary>57 added exports</summary>
+
+```js
+METRIC_JVM_FILE_DESCRIPTOR_COUNT                         // jvm.file_descriptor.count
+
+METRIC_OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED      // otel.sdk.exporter.metric_data_point.exported
+METRIC_OTEL_SDK_EXPORTER_METRIC_DATA_POINT_INFLIGHT      // otel.sdk.exporter.metric_data_point.inflight
+METRIC_OTEL_SDK_EXPORTER_OPERATION_DURATION              // otel.sdk.exporter.operation.duration
+METRIC_OTEL_SDK_EXPORTER_SPAN_EXPORTED                   // otel.sdk.exporter.span.exported
+METRIC_OTEL_SDK_EXPORTER_SPAN_INFLIGHT                   // otel.sdk.exporter.span.inflight
+METRIC_OTEL_SDK_METRIC_READER_COLLECTION_DURATION        // otel.sdk.metric_reader.collection.duration
+METRIC_OTEL_SDK_PROCESSOR_SPAN_PROCESSED                 // otel.sdk.processor.span.processed
+METRIC_OTEL_SDK_SPAN_ENDED                               // otel.sdk.span.ended
+METRIC_OTEL_SDK_SPAN_LIVE                                // otel.sdk.span.live
+
+ATTR_APP_SCREEN_COORDINATE_X                             // app.screen.coordinate.x
+ATTR_APP_SCREEN_COORDINATE_Y                             // app.screen.coordinate.y
+ATTR_APP_WIDGET_ID                                       // app.widget.id
+ATTR_APP_WIDGET_NAME                                     // app.widget.name
+
+ATTR_CICD_PIPELINE_ACTION_NAME                           // cicd.pipeline.action.name
+  CICD_PIPELINE_ACTION_NAME_VALUE_BUILD                    // "BUILD"
+  CICD_PIPELINE_ACTION_NAME_VALUE_RUN                      // "RUN"
+  CICD_PIPELINE_ACTION_NAME_VALUE_SYNC                     // "SYNC"
+ATTR_CICD_PIPELINE_TASK_RUN_RESULT                       // cicd.pipeline.task.run.result
+  CICD_PIPELINE_TASK_RUN_RESULT_VALUE_CANCELLATION         // "cancellation"
+  CICD_PIPELINE_TASK_RUN_RESULT_VALUE_ERROR                // "error"
+  CICD_PIPELINE_TASK_RUN_RESULT_VALUE_FAILURE              // "failure"
+  CICD_PIPELINE_TASK_RUN_RESULT_VALUE_SKIP                 // "skip"
+  CICD_PIPELINE_TASK_RUN_RESULT_VALUE_SUCCESS              // "success"
+  CICD_PIPELINE_TASK_RUN_RESULT_VALUE_TIMEOUT              // "timeout"
+ATTR_CICD_WORKER_ID                                      // cicd.worker.id
+ATTR_CICD_WORKER_NAME                                    // cicd.worker.name
+ATTR_CICD_WORKER_URL_FULL                                // cicd.worker.url.full
+
+GEN_AI_OPERATION_NAME_VALUE_GENERATE_CONTENT             // "generate_content"
+GEN_AI_OPERATION_NAME_VALUE_INVOKE_AGENT                 // "invoke_agent"
+GEN_AI_SYSTEM_VALUE_GCP_GEMINI                           // "gcp.gemini"
+GEN_AI_SYSTEM_VALUE_GCP_GEN_AI                           // "gcp.gen_ai"
+GEN_AI_SYSTEM_VALUE_GCP_VERTEX_AI                        // "gcp.vertex_ai"
+ATTR_GEN_AI_TOOL_DESCRIPTION                             // gen_ai.tool.description
+
+ATTR_JVM_GC_CAUSE                                        // jvm.gc.cause
+
+ATTR_K8S_CRONJOB_ANNOTATION                              // (key) => `k8s.cronjob.annotation.${key}`
+ATTR_K8S_CRONJOB_LABEL                                   // (key) => `k8s.cronjob.label.${key}`
+ATTR_K8S_DAEMONSET_ANNOTATION                            // (key) => `k8s.daemonset.annotation.${key}`
+ATTR_K8S_DAEMONSET_LABEL                                 // (key) => `k8s.daemonset.label.${key}`
+ATTR_K8S_DEPLOYMENT_ANNOTATION                           // (key) => `k8s.deployment.annotation.${key}`
+ATTR_K8S_DEPLOYMENT_LABEL                                // (key) => `k8s.deployment.label.${key}`
+ATTR_K8S_JOB_ANNOTATION                                  // (key) => `k8s.job.annotation.${key}`
+ATTR_K8S_JOB_LABEL                                       // (key) => `k8s.job.label.${key}`
+ATTR_K8S_NAMESPACE_ANNOTATION                            // (key) => `k8s.namespace.annotation.${key}`
+ATTR_K8S_NAMESPACE_LABEL                                 // (key) => `k8s.namespace.label.${key}`
+ATTR_K8S_NODE_ANNOTATION                                 // (key) => `k8s.node.annotation.${key}`
+ATTR_K8S_NODE_LABEL                                      // (key) => `k8s.node.label.${key}`
+ATTR_K8S_REPLICASET_ANNOTATION                           // (key) => `k8s.replicaset.annotation.${key}`
+ATTR_K8S_REPLICASET_LABEL                                // (key) => `k8s.replicaset.label.${key}`
+ATTR_K8S_STATEFULSET_ANNOTATION                          // (key) => `k8s.statefulset.annotation.${key}`
+ATTR_K8S_STATEFULSET_LABEL                               // (key) => `k8s.statefulset.label.${key}`
+
+OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_METRIC_EXPORTER      // "otlp_grpc_metric_exporter"
+OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_METRIC_EXPORTER // "otlp_http_json_metric_exporter"
+OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER      // "otlp_http_metric_exporter"
+OTEL_COMPONENT_TYPE_VALUE_PERIODIC_METRIC_READER         // "periodic_metric_reader"
+
+ATTR_PROCESS_ENVIRONMENT_VARIABLE                        // (key) => `process.environment_variable.${key}`
+
+VCS_PROVIDER_NAME_VALUE_GITEA                            // "gitea"
+```
+
+</details>
+
+## 1.32.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.32.0 [#5603](https://github.com/open-telemetry/opentelemetry-js/pull/5603) @trentm
+  * Semantic Conventions v1.32.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1320) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *none*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *2 newly deprecated exports, 65 added exports*
+
+#### Unstable changes in v1.32.0
+
+<details>
+<summary>2 newly deprecated exports</summary>
+
+```js
+ATTR_FEATURE_FLAG_EVALUATION_REASON // feature_flag.evaluation.reason: Replaced by `feature_flag.result.reason`.
+ATTR_FEATURE_FLAG_VARIANT           // feature_flag.variant: Replaced by `feature_flag.result.variant`.
+```
+
+</details>
+
+<details>
+<summary>65 added exports</summary>
+
+```js
+METRIC_CPYTHON_GC_COLLECTED_OBJECTS                         // cpython.gc.collected_objects
+METRIC_CPYTHON_GC_COLLECTIONS                               // cpython.gc.collections
+METRIC_CPYTHON_GC_UNCOLLECTABLE_OBJECTS                     // cpython.gc.uncollectable_objects
+
+METRIC_OTEL_SDK_EXPORTER_LOG_EXPORTED                       // otel.sdk.exporter.log.exported
+METRIC_OTEL_SDK_EXPORTER_LOG_INFLIGHT                       // otel.sdk.exporter.log.inflight
+METRIC_OTEL_SDK_LOG_CREATED                                 // otel.sdk.log.created
+METRIC_OTEL_SDK_PROCESSOR_LOG_PROCESSED                     // otel.sdk.processor.log.processed
+METRIC_OTEL_SDK_PROCESSOR_LOG_QUEUE_CAPACITY                // otel.sdk.processor.log.queue.capacity
+METRIC_OTEL_SDK_PROCESSOR_LOG_QUEUE_SIZE                    // otel.sdk.processor.log.queue.size
+
+ATTR_APP_INSTALLATION_ID                                    // app.installation.id
+
+ATTR_CPYTHON_GC_GENERATION                                  // cpython.gc.generation
+  CPYTHON_GC_GENERATION_VALUE_GENERATION_0                    // 0
+  CPYTHON_GC_GENERATION_VALUE_GENERATION_1                    // 1
+  CPYTHON_GC_GENERATION_VALUE_GENERATION_2                    // 2
+
+ATTR_DB_STORED_PROCEDURE_NAME                               // db.stored_procedure.name
+
+ATTR_ERROR_MESSAGE                                          // error.message
+
+ATTR_FEATURE_FLAG_RESULT_REASON                             // feature_flag.result.reason
+  FEATURE_FLAG_RESULT_REASON_VALUE_CACHED                     // "cached"
+  FEATURE_FLAG_RESULT_REASON_VALUE_DEFAULT                    // "default"
+  FEATURE_FLAG_RESULT_REASON_VALUE_DISABLED                   // "disabled"
+  FEATURE_FLAG_RESULT_REASON_VALUE_ERROR                      // "error"
+  FEATURE_FLAG_RESULT_REASON_VALUE_SPLIT                      // "split"
+  FEATURE_FLAG_RESULT_REASON_VALUE_STALE                      // "stale"
+  FEATURE_FLAG_RESULT_REASON_VALUE_STATIC                     // "static"
+  FEATURE_FLAG_RESULT_REASON_VALUE_TARGETING_MATCH            // "targeting_match"
+  FEATURE_FLAG_RESULT_REASON_VALUE_UNKNOWN                    // "unknown"
+ATTR_FEATURE_FLAG_RESULT_VARIANT                            // feature_flag.result.variant
+
+ATTR_GCP_APPHUB_APPLICATION_CONTAINER                       // gcp.apphub.application.container
+ATTR_GCP_APPHUB_APPLICATION_ID                              // gcp.apphub.application.id
+ATTR_GCP_APPHUB_APPLICATION_LOCATION                        // gcp.apphub.application.location
+ATTR_GCP_APPHUB_SERVICE_CRITICALITY_TYPE                    // gcp.apphub.service.criticality_type
+  GCP_APPHUB_SERVICE_CRITICALITY_TYPE_VALUE_HIGH              // "HIGH"
+  GCP_APPHUB_SERVICE_CRITICALITY_TYPE_VALUE_LOW               // "LOW"
+  GCP_APPHUB_SERVICE_CRITICALITY_TYPE_VALUE_MEDIUM            // "MEDIUM"
+  GCP_APPHUB_SERVICE_CRITICALITY_TYPE_VALUE_MISSION_CRITICAL  // "MISSION_CRITICAL"
+ATTR_GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE                    // gcp.apphub.service.environment_type
+  GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_VALUE_DEVELOPMENT       // "DEVELOPMENT"
+  GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_VALUE_PRODUCTION        // "PRODUCTION"
+  GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_VALUE_STAGING           // "STAGING"
+  GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_VALUE_TEST              // "TEST"
+ATTR_GCP_APPHUB_SERVICE_ID                                  // gcp.apphub.service.id
+ATTR_GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE                   // gcp.apphub.workload.criticality_type
+  GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_VALUE_HIGH             // "HIGH"
+  GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_VALUE_LOW              // "LOW"
+  GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_VALUE_MEDIUM           // "MEDIUM"
+  GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_VALUE_MISSION_CRITICAL // "MISSION_CRITICAL"
+ATTR_GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE                   // gcp.apphub.workload.environment_type
+  GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_VALUE_DEVELOPMENT      // "DEVELOPMENT"
+  GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_VALUE_PRODUCTION       // "PRODUCTION"
+  GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_VALUE_STAGING          // "STAGING"
+  GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_VALUE_TEST             // "TEST"
+ATTR_GCP_APPHUB_WORKLOAD_ID                                 // gcp.apphub.workload.id
+
+OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR            // "batching_log_processor"
+OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_LOG_EXPORTER            // "otlp_grpc_log_exporter"
+OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_LOG_EXPORTER       // "otlp_http_json_log_exporter"
+OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_LOG_EXPORTER            // "otlp_http_log_exporter"
+OTEL_COMPONENT_TYPE_VALUE_SIMPLE_LOG_PROCESSOR              // "simple_log_processor"
+
+PROFILE_FRAME_TYPE_VALUE_GO                                 // "go"
+PROFILE_FRAME_TYPE_VALUE_RUST                               // "rust"
+
+ATTR_VCS_OWNER_NAME                                         // vcs.owner.name
+ATTR_VCS_PROVIDER_NAME                                      // vcs.provider.name
+  VCS_PROVIDER_NAME_VALUE_BITBUCKET                           // "bitbucket"
+  VCS_PROVIDER_NAME_VALUE_GITHUB                              // "github"
+  VCS_PROVIDER_NAME_VALUE_GITLAB                              // "gitlab"
+  VCS_PROVIDER_NAME_VALUE_GITTEA                              // "gittea"
+```
+
+</details>
+
 ## 1.31.0
 
 ### :rocket: Features
 
-* feat: update semantic conventions to v1.31.0
+* feat: update semantic conventions to v1.31.0 [#5589](https://github.com/open-telemetry/opentelemetry-js/pull/5589) @trentm
   * Semantic Conventions v1.31.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1310) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * `@opentelemetry/semantic-conventions` (stable) changes: *none*
   * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *8 newly deprecated exports, 1 newly undeprecated export, 63 added exports*

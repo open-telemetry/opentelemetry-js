@@ -19,6 +19,7 @@ import {
   CompositePropagator,
   getStringFromEnv,
   getStringListFromEnv,
+  W3CBaggagePropagator,
   W3CTraceContextPropagator,
 } from '@opentelemetry/core';
 import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
@@ -117,7 +118,7 @@ function getJaegerExporter() {
   // environments. By delaying the require statement to here, we only crash when
   // the exporter is actually used in such an environment.
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
     return new JaegerExporter();
   } catch (e) {
@@ -201,7 +202,7 @@ export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
   // Any other propagators (like aws, aws-lambda, should go into `@opentelemetry/auto-configuration-propagators` instead).
   const propagatorsFactory = new Map<string, () => TextMapPropagator>([
     ['tracecontext', () => new W3CTraceContextPropagator()],
-    ['baggage', () => new W3CTraceContextPropagator()],
+    ['baggage', () => new W3CBaggagePropagator()],
     ['b3', () => new B3Propagator()],
     [
       'b3multi',

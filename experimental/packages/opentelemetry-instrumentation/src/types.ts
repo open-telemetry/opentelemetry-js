@@ -69,9 +69,9 @@ export interface InstrumentationConfig {
  */
 export interface ShimWrapped extends Function {
   __wrapped: boolean;
-  // eslint-disable-next-line @typescript-eslint/ban-types
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   __unwrap: Function;
-  // eslint-disable-next-line @typescript-eslint/ban-types
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   __original: Function;
 }
 

@@ -32,12 +32,12 @@ import { defaultResource } from '@opentelemetry/resources';
 import {
   LogRecordLimits,
   LogRecordProcessor,
-  LogRecord,
   LoggerProvider,
 } from './../../src';
 import { invalidAttributes, validAttributes } from './utils';
 import { LoggerProviderSharedState } from '../../src/internal/LoggerProviderSharedState';
 import { reconfigureLimits } from '../../src/config';
+import { LogRecordImpl } from '../../src/LogRecordImpl';
 
 const performanceTimeOrigin: HrTime = [1, 1];
 
@@ -54,7 +54,7 @@ const setup = (logRecordLimits?: LogRecordLimits, data?: logsAPI.LogRecord) => {
     reconfigureLimits(logRecordLimits ?? {}),
     []
   );
-  const logRecord = new LogRecord(
+  const logRecord = new LogRecordImpl(
     sharedState,
     instrumentationScope,
     data ?? {}
@@ -66,7 +66,7 @@ describe('LogRecord', () => {
   describe('constructor', () => {
     it('should create an instance', () => {
       const { logRecord } = setup();
-      assert.ok(logRecord instanceof LogRecord);
+      assert.ok(logRecord instanceof LogRecordImpl);
     });
 
     it('should have a default timestamp', () => {
@@ -88,6 +88,7 @@ describe('LogRecord', () => {
 
       const logRecordData: logsAPI.LogRecord = {
         timestamp: new Date().getTime(),
+        eventName: 'test event',
         severityNumber: logsAPI.SeverityNumber.DEBUG,
         severityText: 'DEBUG',
         body: 'this is a body',
@@ -108,6 +109,7 @@ describe('LogRecord', () => {
         logRecord.severityNumber,
         logRecordData.severityNumber
       );
+      assert.strictEqual(logRecord.eventName, logRecordData.eventName);
       assert.strictEqual(logRecord.severityText, logRecordData.severityText);
       assert.strictEqual(logRecord.body, logRecordData.body);
       assert.deepStrictEqual(logRecord.attributes, logRecordData.attributes);
@@ -320,6 +322,7 @@ describe('LogRecord', () => {
     const newBody = 'this is a new body';
     const newSeverityNumber = logsAPI.SeverityNumber.INFO;
     const newSeverityText = 'INFO';
+    const newName = 'new name';
 
     it('should rewrite directly through the property method', () => {
       const { logRecord } = setup(undefined, logRecordData);
@@ -327,10 +330,12 @@ describe('LogRecord', () => {
       logRecord.body = newBody;
       logRecord.severityNumber = newSeverityNumber;
       logRecord.severityText = newSeverityText;
+      logRecord.eventName = newName;
 
       assert.deepStrictEqual(logRecord.body, newBody);
       assert.deepStrictEqual(logRecord.severityNumber, newSeverityNumber);
       assert.deepStrictEqual(logRecord.severityText, newSeverityText);
+      assert.deepStrictEqual(logRecord.eventName, newName);
     });
 
     it('should rewrite using the set method', () => {
@@ -339,14 +344,16 @@ describe('LogRecord', () => {
       logRecord.setBody(newBody);
       logRecord.setSeverityNumber(newSeverityNumber);
       logRecord.setSeverityText(newSeverityText);
+      logRecord.setEventName(newName);
 
       assert.deepStrictEqual(logRecord.body, newBody);
       assert.deepStrictEqual(logRecord.severityNumber, newSeverityNumber);
       assert.deepStrictEqual(logRecord.severityText, newSeverityText);
+      assert.deepStrictEqual(logRecord.eventName, newName);
     });
   });
 
-  describe('should be read-only(body/severityNumber/severityText) if makeReadonly has been called', () => {
+  describe('should be read-only(body/severityNumber/severityText/eventName) if makeReadonly has been called', () => {
     const currentTime = new Date().getTime();
     const logRecordData: logsAPI.LogRecord = {
       timestamp: currentTime,
@@ -361,6 +368,7 @@ describe('LogRecord', () => {
     const newBody = 'this is a new body';
     const newSeverityNumber = logsAPI.SeverityNumber.INFO;
     const newSeverityText = 'INFO';
+    const newName = 'new name';
 
     it('should not rewrite directly through the property method', () => {
       const warnStub = sinon.spy(diag, 'warn');
@@ -370,8 +378,10 @@ describe('LogRecord', () => {
       logRecord.body = newBody;
       logRecord.severityNumber = newSeverityNumber;
       logRecord.severityText = newSeverityText;
+      logRecord.eventName = newName;
 
       assert.deepStrictEqual(logRecord.body, logRecordData.body);
+      assert.deepStrictEqual(logRecord.eventName, logRecordData.eventName);
       assert.deepStrictEqual(
         logRecord.severityNumber,
         logRecordData.severityNumber
@@ -380,7 +390,7 @@ describe('LogRecord', () => {
         logRecord.severityText,
         logRecordData.severityText
       );
-      sinon.assert.callCount(warnStub, 3);
+      sinon.assert.callCount(warnStub, 4);
       sinon.assert.alwaysCalledWith(
         warnStub,
         'Can not execute the operation on emitted log record'
@@ -396,8 +406,10 @@ describe('LogRecord', () => {
       logRecord.setBody(newBody);
       logRecord.setSeverityNumber(newSeverityNumber);
       logRecord.setSeverityText(newSeverityText);
+      logRecord.setEventName(newName);
 
       assert.deepStrictEqual(logRecord.body, logRecordData.body);
+      assert.deepStrictEqual(logRecord.eventName, logRecordData.eventName);
       assert.deepStrictEqual(
         logRecord.severityNumber,
         logRecordData.severityNumber
@@ -406,7 +418,7 @@ describe('LogRecord', () => {
         logRecord.severityText,
         logRecordData.severityText
       );
-      sinon.assert.callCount(warnStub, 3);
+      sinon.assert.callCount(warnStub, 4);
       sinon.assert.alwaysCalledWith(
         warnStub,
         'Can not execute the operation on emitted log record'

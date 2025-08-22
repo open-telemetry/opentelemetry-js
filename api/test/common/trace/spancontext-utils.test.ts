@@ -37,6 +37,17 @@ describe('spancontext-utils', function () {
     assert.ok(!context.isSpanContextValid(spanContext));
   });
 
+  it('should return false when traceId is malformed', function () {
+    // 0x4141 is not a hex character, but doing a bitwise AND with 0xFF
+    // would yield a valid character 'A'.
+    const spanContext = {
+      traceId: 'd4cda95b652f4a1592b449d5929fda1\u4141',
+      spanId: '6e0c63257de34c92',
+      traceFlags: TraceFlags.NONE,
+    };
+    assert.ok(!context.isSpanContextValid(spanContext));
+  });
+
   it('should return false when spanId is invalid', function () {
     const spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',

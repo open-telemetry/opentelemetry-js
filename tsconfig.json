@@ -5,7 +5,6 @@
     "entryPointStrategy": "packages",
     "entryPoints": [
       "api",
-      "experimental/packages/api-events",
       "experimental/packages/api-logs",
       "experimental/packages/exporter-logs-otlp-grpc",
       "experimental/packages/exporter-logs-otlp-http",
@@ -28,7 +27,6 @@
       "experimental/packages/otlp-grpc-exporter-base",
       "experimental/packages/otlp-transformer",
       "experimental/packages/sampler-jaeger-remote",
-      "experimental/packages/sdk-events",
       "experimental/packages/sdk-logs",
       "experimental/packages/shim-opencensus",
       "experimental/packages/web-common",
@@ -63,9 +61,6 @@
       "path": "api"
     },
     {
-      "path": "experimental/packages/api-events"
-    },
-    {
       "path": "experimental/packages/api-logs"
     },
     {
@@ -88,6 +83,9 @@
     },
     {
       "path": "experimental/packages/opentelemetry-browser-detector"
+    },
+    {
+      "path": "experimental/packages/opentelemetry-configuration"
     },
     {
       "path": "experimental/packages/opentelemetry-exporter-metrics-otlp-grpc"
@@ -130,9 +128,6 @@
     },
     {
       "path": "experimental/packages/sampler-jaeger-remote"
-    },
-    {
-      "path": "experimental/packages/sdk-events"
     },
     {
       "path": "experimental/packages/sdk-logs"

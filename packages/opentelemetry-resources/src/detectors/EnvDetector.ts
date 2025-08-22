@@ -15,7 +15,7 @@
  */
 
 import { Attributes, diag } from '@opentelemetry/api';
-import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { ResourceDetectionConfig } from '../config';
 import { DetectedResource, ResourceDetector } from '../types';
 import { getStringFromEnv } from '@opentelemetry/core';
@@ -67,7 +67,7 @@ class EnvDetector implements ResourceDetector {
     }
 
     if (serviceName) {
-      attributes[SEMRESATTRS_SERVICE_NAME] = serviceName;
+      attributes[ATTR_SERVICE_NAME] = serviceName;
     }
 
     return { attributes };

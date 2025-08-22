@@ -22,7 +22,6 @@ import {
   hashAttributes,
   TimeoutError,
 } from '../src/utils';
-import { assertRejects } from './test-utils';
 import { Attributes } from '@opentelemetry/api';
 
 describe('utils', () => {
@@ -32,11 +31,16 @@ describe('utils', () => {
 
   describe('callWithTimeout', () => {
     it('should reject if given promise not settled before timeout', async () => {
-      sinon.useFakeTimers();
+      const clock = sinon.useFakeTimers();
       const promise = new Promise(() => {
         /** promise never settles */
       });
-      assertRejects(callWithTimeout(promise, 100), TimeoutError);
+      const assertion = assert.rejects(
+        callWithTimeout(promise, 100),
+        TimeoutError
+      );
+      clock.tick(101);
+      await assertion;
     });
   });
 

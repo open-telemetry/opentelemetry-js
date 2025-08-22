@@ -16,7 +16,6 @@
 
 import * as assert from 'assert';
 import { Deferred } from '../../../src/utils/promise';
-import { assertRejects } from '../../test-utils';
 
 describe('promise', () => {
   describe('Deferred', () => {
@@ -35,7 +34,7 @@ describe('promise', () => {
       deferred.reject(new Error('foo'));
       deferred.reject(new Error('bar'));
 
-      await assertRejects(deferred.promise, /foo/);
+      await assert.rejects(deferred.promise, /foo/);
     });
   });
 });

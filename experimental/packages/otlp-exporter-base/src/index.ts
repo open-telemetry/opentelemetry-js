@@ -17,25 +17,23 @@
 export { OTLPExporterBase } from './OTLPExporterBase';
 export { OTLPExporterError } from './types';
 
-export {
+export type {
   ExportResponse,
   ExportResponseFailure,
   ExportResponseSuccess,
   ExportResponseRetryable,
 } from './export-response';
 
-export { IExporterTransport } from './exporter-transport';
+export type { IExporterTransport } from './exporter-transport';
 
 export {
-  OtlpSharedConfiguration,
   mergeOtlpSharedConfigurationWithDefaults,
   getSharedConfigurationDefaults,
 } from './configuration/shared-configuration';
+export type { OtlpSharedConfiguration } from './configuration/shared-configuration';
 
-export {
-  OTLPExporterNodeConfigBase,
-  CompressionAlgorithm,
-} from './configuration/legacy-node-configuration';
-export { OTLPExporterConfigBase } from './configuration/legacy-base-configuration';
-export { IOtlpExportDelegate } from './otlp-export-delegate';
+export { CompressionAlgorithm } from './configuration/legacy-node-configuration';
+export type { OTLPExporterNodeConfigBase } from './configuration/legacy-node-configuration';
+export type { OTLPExporterConfigBase } from './configuration/legacy-base-configuration';
+export type { IOtlpExportDelegate } from './otlp-export-delegate';
 export { createOtlpNetworkExportDelegate } from './otlp-network-export-delegate';

@@ -23,7 +23,7 @@ import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { TraceFlags } from '@opentelemetry/api';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import * as nock from 'nock';
-import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 
 describe('JaegerExporter', () => {
   const readableSpan: ReadableSpan = {
@@ -47,7 +47,7 @@ describe('JaegerExporter', () => {
     events: [],
     duration: [32, 800000000],
     resource: resourceFromAttributes({
-      [SEMRESATTRS_SERVICE_NAME]: 'opentelemetry',
+      [ATTR_SERVICE_NAME]: 'opentelemetry',
     }),
     instrumentationScope: {
       name: 'default',

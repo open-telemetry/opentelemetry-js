@@ -15,23 +15,31 @@
  */
 import * as process from 'process';
 
-let getMachineId: () => Promise<string | undefined>;
+let getMachineIdImpl: undefined | (() => Promise<string | undefined>);
 
-switch (process.platform) {
-  case 'darwin':
-    ({ getMachineId } = require('./getMachineId-darwin'));
-    break;
-  case 'linux':
-    ({ getMachineId } = require('./getMachineId-linux'));
-    break;
-  case 'freebsd':
-    ({ getMachineId } = require('./getMachineId-bsd'));
-    break;
-  case 'win32':
-    ({ getMachineId } = require('./getMachineId-win'));
-    break;
-  default:
-    ({ getMachineId } = require('./getMachineId-unsupported'));
+export async function getMachineId(): Promise<string | undefined> {
+  if (!getMachineIdImpl) {
+    switch (process.platform) {
+      case 'darwin':
+        getMachineIdImpl = (await import('./getMachineId-darwin.js'))
+          .getMachineId;
+        break;
+      case 'linux':
+        getMachineIdImpl = (await import('./getMachineId-linux.js'))
+          .getMachineId;
+        break;
+      case 'freebsd':
+        getMachineIdImpl = (await import('./getMachineId-bsd.js')).getMachineId;
+        break;
+      case 'win32':
+        getMachineIdImpl = (await import('./getMachineId-win.js')).getMachineId;
+        break;
+      default:
+        getMachineIdImpl = (await import('./getMachineId-unsupported.js'))
+          .getMachineId;
+        break;
+    }
+  }
+
+  return getMachineIdImpl();
 }
-
-export { getMachineId };

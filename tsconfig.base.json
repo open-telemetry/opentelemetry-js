@@ -8,6 +8,7 @@
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
     "inlineSources": true,
+    "isolatedModules": true,
     "module": "node16",
     "moduleResolution": "node16",
     "esModuleInterop": false,

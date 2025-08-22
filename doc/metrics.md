@@ -6,7 +6,7 @@ For a high-level overview of OpenTelemetry metrics in general and definitions of
 
 _Metrics API Specification: <https://github.com/open-telemetry/opentelemetry-specification/blob/v1.14.0/specification/metrics/api.md>_
 
-_Metrics API Reference: <https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_api.MetricsAPI.html>_
+_Metrics API Reference: <https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_api._opentelemetry_api.MetricsAPI.html>_
 
 - [Getting Started](#getting-started)
 - [Acquiring a Meter](#acquiring-a-meter)
@@ -71,28 +71,27 @@ const sdk = new opentelemetry.NodeSDK({
 
 // You can optionally detect resources asynchronously from the environment.
 // Detected resources are merged with the resources provided in the SDK configuration.
-sdk.start().then(() => {
-  // Resources have been detected and SDK is started
-  console.log(`SDK started`)
+sdk.start();
+// Resources have been detected and SDK is started
+console.log(`SDK started`)
 
 // Start the http server
-  const fastify = require('fastify')({
+const fastify = require('fastify')({
     logger: true
-  })
+})
 
-  fastify.get('/', function (request, reply) {
+fastify.get('/', function (request, reply) {
     reply.send({ hello: 'world' })
-  })
+})
 
-  fastify.listen({ port: 3000 }, function (err, address) {
+fastify.listen({ port: 3000 }, function (err, address) {
     if (err) {
-      fastify.log.error(err)
-      process.exit(1)
+        fastify.log.error(err)
+        process.exit(1)
     }
 
     console.log(`Server is now listening on ${address}`)
-  })
-});
+})
 
 // You can also use the shutdown method to gracefully shut down the SDK before process shutdown
 // or on some operating system signal.
@@ -159,35 +158,34 @@ const sdk = new opentelemetry.NodeSDK({
 
 // You can optionally detect resources asynchronously from the environment.
 // Detected resources are merged with the resources provided in the SDK configuration.
-sdk.start().then(() => {
-  // Resources have been detected and SDK is started
-  console.log(`SDK started`)
+sdk.start();
+// Resources have been detected and SDK is started
+console.log(`SDK started`)
 
-  // Create Meter with the name `http-server`
-  const appMeter = api.metrics.getMeter('http-server')
-  // Use the created Meter to create a counter instrument
-  const numberOfRequests = appMeter.createCounter('request-counter')
+// Create Meter with the name `http-server`
+const appMeter = api.metrics.getMeter('http-server')
+// Use the created Meter to create a counter instrument
+const numberOfRequests = appMeter.createCounter('request-counter')
 
-  // Start the http server
-  const fastify = require('fastify')({
+// Start the http server
+const fastify = require('fastify')({
     logger: true
-  })
+})
 
-  fastify.get('/', function (request, reply) {
+fastify.get('/', function (request, reply) {
     // Increase the counter by 1 each time the `/` endpoint is requested
     numberOfRequests.add(1)
     reply.send({ hello: 'world' })
-  })
+})
 
-  fastify.listen({ port: 3000 }, function (err, address) {
+fastify.listen({ port: 3000 }, function (err, address) {
     if (err) {
-      fastify.log.error(err)
-      process.exit(1)
+        fastify.log.error(err)
+        process.exit(1)
     }
 
     console.log(`Server is now listening on ${address}`)
-  })
-});
+})
 
 // You can also use the shutdown method to gracefully shut down the SDK before process shutdown
 // or on some operating system signal.
@@ -233,7 +231,7 @@ example you see that we accessed our `/` endpoint six times.
 
 ## Acquiring a Meter
 
-In OpenTelemetry, Instruments that allow for measurement operations are acquired through a _meter_. You can get a meter by calling [`getMeter`](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api.MeterProvider.html#getMeter) on the global meter provider. `getMeter` takes the name and version of the application or library acquiring the meter, and provides a meter which can be used to create instruments.
+In OpenTelemetry, Instruments that allow for measurement operations are acquired through a _meter_. You can get a meter by calling [`getMeter`](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api._opentelemetry_api.MeterProvider.html#getmeter) on the global meter provider. `getMeter` takes the name and version of the application or library acquiring the meter, and provides a meter which can be used to create instruments.
 
 ```typescript
 import { metrics } from '@opentelemetry/api';
@@ -243,7 +241,7 @@ const meter = metrics.getMeter("my-application", "0.1.0");
 
 ## Create a metric instrument
 
-In OpenTelemetry, all _metrics_ are composed of [`Instruments`](https://open-telemetry.github.io/opentelemetry-js/enums/_opentelemetry_sdk_metrics.InstrumentType.html). An instrument is responsible for reporting measurements,
+In OpenTelemetry, all _metrics_ are composed of [`Instruments`](https://open-telemetry.github.io/opentelemetry-js/enums/_opentelemetry_sdk-metrics.InstrumentType.html). An instrument is responsible for reporting measurements,
 there are four types of instruments that can be created:
 
 - Counter, a synchronous instrument which supports non-negative increments
@@ -253,7 +251,7 @@ there are four types of instruments that can be created:
 - UpDownCounter, a synchronous instrument which supports increments and decrements, such as number of active requests
 - Asynchronous UpDownCounter, an asynchronous instrument which supports increments and decrements
 
-You can create a Counter instrument by calling [`Meter#createCounter`](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api.Meter.html#createCounter). The only required argument to `createCounter` is the _instrument name_, which should describe the item that is being measurement.
+You can create a Counter instrument by calling [`Meter#createCounter`](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api._opentelemetry_api.Meter.html#createcounter). The only required argument to `createCounter` is the _instrument name_, which should describe the item that is being measurement.
 
 ```typescript
 const counter = meter.createCounter("events.counter");
@@ -295,10 +293,10 @@ can be used to information about the record measurement itself.
 
 ```typescript
 async function myTask() {
-  const httpServerDuration = meter.createHistogram("http.server.duration", {
-    description: 'A http server duration',
-    unit: 'milliseconds',
-    valueType: ValueType.INT
+  const httpServerDuration = meter.createHistogram("my.http.server.request.duration", {
+    description: 'HTTP server request duration',
+    unit: 's',
+    valueType: ValueType.DOUBLE
   });
   const startTime = new Date().getTime()
   try {
@@ -307,12 +305,12 @@ async function myTask() {
   } catch (err) {
   } finally {
     const endTime = new Date().getTime()
-    const executionTime = endTime - startTime
+    const executionTime = (endTime - startTime) / 1000
 
     httpServerDuration.record(executionTime, {
-      [SemanticAttributes.HTTP_METHOD]: 'POST',
-      [SemanticAttributes.HTTP_STATUS_CODE]: '200',
-      [SemanticAttributes.HTTP_SCHEME]: 'https',
+      [ATTR_HTTP_REQUEST_METHOD]: 'POST',
+      [ATTR_HTTP_RESPONSE_STATUS_CODE]: '200',
+      [ATTR_URL_SCHEME]: 'https',
     })
   }
 }
@@ -418,17 +416,17 @@ const meterProvider = new MeterProvider({
 });
 
 // Create histogram metric
-const httpServerDuration = meter.createHistogram("http.server.duration", {
-  description: 'A http server duration',
-  unit: 'milliseconds',
-  valueType: ValueType.INT
+const httpServerDuration = meter.createHistogram('my.http.server.request.duration', {
+  description: 'HTTP server request duration',
+  unit: 's',
+  valueType: ValueType.DOUBLE
 });
 
 // Record measurement for histogram
 httpServerDuration.record(50, {
-  [SemanticAttributes.HTTP_METHOD]: 'POST',
-  [SemanticAttributes.HTTP_STATUS_CODE]: '200',
-  [SemanticAttributes.HTTP_SCHEME]: 'https',
+  [ATTR_HTTP_REQUEST_METHOD]: 'POST',
+  [ATTR_HTTP_RESPONSE_STATUS_CODE]: '200',
+  [ATTR_URL_SCHEME]: 'https',
 });
 ```
 

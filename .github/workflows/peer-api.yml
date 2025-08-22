@@ -7,6 +7,9 @@ on:
   pull_request:
   merge_group:
 
+permissions:
+  contents: read
+
 jobs:
   peer-api-check:
     runs-on: ubuntu-latest
@@ -14,7 +17,7 @@ jobs:
       image: node:22
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install lerna
         run: npm install -g lerna@6.6.2

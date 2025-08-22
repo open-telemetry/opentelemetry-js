@@ -31,6 +31,9 @@ export const JsonTraceSerializer: ISerializer<
     return encoder.encode(JSON.stringify(request));
   },
   deserializeResponse: (arg: Uint8Array) => {
+    if (arg.length === 0) {
+      return {};
+    }
     const decoder = new TextDecoder();
     return JSON.parse(decoder.decode(arg)) as IExportTraceServiceResponse;
   },

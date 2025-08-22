@@ -16,4 +16,4 @@
 
 export { PrometheusExporter } from './PrometheusExporter';
 export { PrometheusSerializer } from './PrometheusSerializer';
-export { ExporterConfig } from './export/types';
+export type { ExporterConfig } from './export/types';

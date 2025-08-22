@@ -27,9 +27,9 @@ import {
   urlMatches,
 } from '@opentelemetry/core';
 import {
-  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
-  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-} from '@opentelemetry/semantic-conventions';
+  ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
+  ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+} from './semconv';
 
 // Used to normalize relative URLs
 let urlNormalizingAnchor: HTMLAnchorElement | undefined;
@@ -78,17 +78,14 @@ export function addSpanNetworkEvent(
 }
 
 /**
- * Helper function for adding network events and content length attributes
- * @param span
- * @param resource
- * @param ignoreNetworkEvents
- * @param ignoreZeros
+ * Helper function for adding network events and content length attributes.
  */
 export function addSpanNetworkEvents(
   span: api.Span,
   resource: PerformanceEntries,
   ignoreNetworkEvents = false,
-  ignoreZeros?: boolean
+  ignoreZeros?: boolean,
+  skipOldSemconvContentLengthAttrs?: boolean
 ): void {
   if (ignoreZeros === undefined) {
     ignoreZeros = resource[PTN.START_TIME] !== 0;
@@ -111,18 +108,22 @@ export function addSpanNetworkEvents(
     addSpanNetworkEvent(span, PTN.RESPONSE_END, resource, ignoreZeros);
   }
 
-  const encodedLength = resource[PTN.ENCODED_BODY_SIZE];
-  if (encodedLength !== undefined) {
-    span.setAttribute(SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH, encodedLength);
-  }
+  if (!skipOldSemconvContentLengthAttrs) {
+    // This block adds content-length-related span attributes using the
+    // *old* HTTP semconv (v1.7.0).
+    const encodedLength = resource[PTN.ENCODED_BODY_SIZE];
+    if (encodedLength !== undefined) {
+      span.setAttribute(ATTR_HTTP_RESPONSE_CONTENT_LENGTH, encodedLength);
+    }
 
-  const decodedLength = resource[PTN.DECODED_BODY_SIZE];
-  // Spec: Not set if transport encoding not used (in which case encoded and decoded sizes match)
-  if (decodedLength !== undefined && encodedLength !== decodedLength) {
-    span.setAttribute(
-      SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-      decodedLength
-    );
+    const decodedLength = resource[PTN.DECODED_BODY_SIZE];
+    // Spec: Not set if transport encoding not used (in which case encoded and decoded sizes match)
+    if (decodedLength !== undefined && encodedLength !== decodedLength) {
+      span.setAttribute(
+        ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+        decodedLength
+      );
+    }
   }
 }
 

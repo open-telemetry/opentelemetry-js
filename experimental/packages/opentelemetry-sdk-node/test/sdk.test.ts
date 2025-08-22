@@ -82,11 +82,9 @@ import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
-import {
-  SEMRESATTRS_HOST_NAME,
-  SEMRESATTRS_PROCESS_PID,
-} from '@opentelemetry/semantic-conventions';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
+
+import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from './semconv';
 
 describe('Node SDK', () => {
   let ctxManager: any;
@@ -107,7 +105,7 @@ describe('Node SDK', () => {
     delegate = (trace.getTracerProvider() as ProxyTracerProvider).getDelegate();
     logsDelegate = (
       logs.getLoggerProvider() as ProxyLoggerProvider
-    ).getDelegate();
+    )._getDelegate();
   });
 
   afterEach(() => {
@@ -144,7 +142,7 @@ describe('Node SDK', () => {
       );
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
       assert.strictEqual(
-        (logs.getLoggerProvider() as ProxyLoggerProvider).getDelegate(),
+        (logs.getLoggerProvider() as ProxyLoggerProvider)._getDelegate(),
         logsDelegate,
         'logger provider should not have changed'
       );
@@ -580,11 +578,8 @@ describe('Node SDK', () => {
           version: '0.0.1',
         });
 
-        assert.notEqual(
-          resource.attributes[SEMRESATTRS_PROCESS_PID],
-          undefined
-        );
-        assert.notEqual(resource.attributes[SEMRESATTRS_HOST_NAME], undefined);
+        assert.notEqual(resource.attributes[ATTR_PROCESS_PID], undefined);
+        assert.notEqual(resource.attributes[ATTR_HOST_NAME], undefined);
       });
     });
 

@@ -22,12 +22,8 @@ import {
   diag,
 } from '@opentelemetry/api';
 import {
-  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
-  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
-  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-  SEMATTRS_HTTP_ROUTE,
-  SEMATTRS_HTTP_TARGET,
+  ATTR_HTTP_ROUTE,
+  ATTR_USER_AGENT_ORIGINAL,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import { IncomingMessage, ServerResponse } from 'http';
@@ -35,15 +31,21 @@ import { Socket } from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
 import {
-  IgnoreMatcher,
-  ParsedRequestOptions,
-  SemconvStability,
-} from '../../src/internal-types';
+  ATTR_HTTP_REQUEST_CONTENT_LENGTH,
+  ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+  ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
+  ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+  ATTR_HTTP_TARGET,
+  ATTR_USER_AGENT_SYNTHETIC_TYPE,
+  USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
+} from '../../src/semconv';
+import { IgnoreMatcher, ParsedRequestOptions } from '../../src/internal-types';
 import * as utils from '../../src/utils';
-import { AttributeNames } from '../../src/enums/AttributeNames';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { SemconvStability } from '@opentelemetry/instrumentation';
 import { extractHostnameAndPort } from '../../src/utils';
+import { AttributeNames } from '../../src/enums/AttributeNames';
 
 describe('Utility', () => {
   describe('parseResponseStatus()', () => {
@@ -172,6 +174,43 @@ describe('Utility', () => {
       );
       assert.strictEqual(result, 'http://localhost:8080/helloworld');
     });
+    it('should return auth credentials as REDACTED to avoid leaking sensitive information', () => {
+      const result = utils.getAbsoluteUrl(
+        { path: '/helloworld', port: 8080, auth: 'user:password' },
+        {}
+      );
+      assert.strictEqual(
+        result,
+        'http://REDACTED:REDACTED@localhost:8080/helloworld'
+      );
+    });
+    it('should return auth credentials and particular query strings as REDACTED', () => {
+      const result = utils.getAbsoluteUrl(
+        {
+          path: '/registers?X-Goog-Signature=secret123',
+          port: 8080,
+          auth: 'user:pass',
+        },
+        {}
+      );
+      assert.strictEqual(
+        result,
+        'http://REDACTED:REDACTED@localhost:8080/registers?X-Goog-Signature=REDACTED'
+      );
+    });
+    it('should return particular query strings as REDACTED', () => {
+      const result = utils.getAbsoluteUrl(
+        {
+          path: '/registers?AWSAccessKeyId=secret123',
+          port: 8080,
+        },
+        {}
+      );
+      assert.strictEqual(
+        result,
+        'http://localhost:8080/registers?AWSAccessKeyId=REDACTED'
+      );
+    });
   });
 
   describe('setSpanWithError()', () => {
@@ -184,7 +223,6 @@ describe('Utility', () => {
         recordException: () => undefined,
       } as unknown as Span;
       const mock = sinon.mock(span);
-
       mock
         .expects('setAttribute')
         .calledWithExactly(AttributeNames.HTTP_ERROR_NAME, 'error');
@@ -237,7 +275,7 @@ describe('Utility', () => {
             {} as ServerResponse,
             SemconvStability.OLD
           );
-          assert.deepStrictEqual(attributes[SEMATTRS_HTTP_ROUTE], '/user/:id');
+          assert.deepStrictEqual(attributes[ATTR_HTTP_ROUTE], '/user/:id');
           context.disable();
           return done();
         }
@@ -255,31 +293,29 @@ describe('Utility', () => {
         } as ServerResponse & { socket: Socket },
         SemconvStability.OLD
       );
-      assert.deepEqual(attributes[SEMATTRS_HTTP_ROUTE], undefined);
+      assert.deepEqual(attributes[ATTR_HTTP_ROUTE], undefined);
     });
   });
 
   describe('getIncomingRequestMetricAttributesOnResponse()', () => {
     it('should correctly add http_route if span has it', () => {
       const spanAttributes: Attributes = {
-        [SEMATTRS_HTTP_ROUTE]: '/user/:id',
+        [ATTR_HTTP_ROUTE]: '/user/:id',
       };
       const metricAttributes =
         utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
 
-      assert.deepStrictEqual(
-        metricAttributes[SEMATTRS_HTTP_ROUTE],
-        '/user/:id'
-      );
+      assert.deepStrictEqual(metricAttributes[ATTR_HTTP_ROUTE], '/user/:id');
     });
 
     it('should skip http_route if span does not have it', () => {
       const spanAttributes: Attributes = {};
       const metricAttributes =
         utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
-      assert.deepEqual(metricAttributes[SEMATTRS_HTTP_ROUTE], undefined);
+      assert.deepEqual(metricAttributes[ATTR_HTTP_ROUTE], undefined);
     });
   });
+
   // Verify the key in the given attributes is set to the given value,
   // and that no other HTTP Content Length attributes are set.
   function verifyValueInAttributes(
@@ -288,10 +324,10 @@ describe('Utility', () => {
     value: number
   ) {
     const SemanticAttributess = [
-      SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-      SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
-      SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-      SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
+      ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+      ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
+      ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+      ATTR_HTTP_REQUEST_CONTENT_LENGTH,
     ];
 
     for (const attr of SemanticAttributess) {
@@ -315,7 +351,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+        ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
         1200
       );
     });
@@ -331,7 +367,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+        ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
         1200
       );
     });
@@ -347,7 +383,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
+        ATTR_HTTP_REQUEST_CONTENT_LENGTH,
         1200
       );
     });
@@ -366,7 +402,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+        ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
         1200
       );
     });
@@ -385,7 +421,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+        ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
         1200
       );
     });
@@ -404,7 +440,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
+        ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
         1200
       );
     });
@@ -438,10 +474,11 @@ describe('Utility', () => {
         {
           component: 'http',
           semconvStability: SemconvStability.OLD,
+          enableSyntheticSourceDetection: false,
         },
         diag
       );
-      assert.strictEqual(attributes[SEMATTRS_HTTP_ROUTE], undefined);
+      assert.strictEqual(attributes[ATTR_HTTP_ROUTE], undefined);
     });
 
     it('should set http.target as path in http span attributes', () => {
@@ -458,10 +495,37 @@ describe('Utility', () => {
         {
           component: 'http',
           semconvStability: SemconvStability.OLD,
+          enableSyntheticSourceDetection: false,
         },
         diag
       );
-      assert.strictEqual(attributes[SEMATTRS_HTTP_TARGET], '/user/?q=val');
+      assert.strictEqual(attributes[ATTR_HTTP_TARGET], '/user/?q=val');
+      assert.strictEqual(attributes[ATTR_USER_AGENT_SYNTHETIC_TYPE], undefined);
+    });
+
+    it('should set synthetic attributes on requests', () => {
+      const request = {
+        url: 'http://hostname/user/:id',
+        method: 'GET',
+        socket: {},
+      } as IncomingMessage;
+      request.headers = {
+        'user-agent': 'Googlebot',
+      };
+      const attributes = utils.getIncomingRequestAttributes(
+        request,
+        {
+          component: 'http',
+          semconvStability: SemconvStability.STABLE,
+          enableSyntheticSourceDetection: true,
+        },
+        diag
+      );
+      assert.strictEqual(attributes[ATTR_USER_AGENT_ORIGINAL], 'Googlebot');
+      assert.strictEqual(
+        attributes[ATTR_USER_AGENT_SYNTHETIC_TYPE],
+        USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT
+      );
     });
   });
 

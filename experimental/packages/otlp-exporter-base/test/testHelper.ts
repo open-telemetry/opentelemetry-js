@@ -77,36 +77,3 @@ export function ensureHeadersContain(
     );
   });
 }
-
-/**
- * Changes to the below code should be applied to opentelemetry-core/test/test-utils.ts too.
- */
-
-interface ErrorLikeConstructor {
-  new (): Error;
-}
-
-/**
- * Node.js v8.x and browser compatible `assert.rejects`.
- */
-export async function assertRejects(
-  actual: any,
-  expected?: RegExp | ErrorLikeConstructor
-) {
-  let rejected;
-  try {
-    if (typeof actual === 'function') {
-      await actual();
-    } else {
-      await actual;
-    }
-  } catch (err) {
-    rejected = true;
-    if (expected != null) {
-      assert.throws(() => {
-        throw err;
-      }, expected);
-    }
-  }
-  assert.ok(rejected, 'Promise not rejected');
-}
