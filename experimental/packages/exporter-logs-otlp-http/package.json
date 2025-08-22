@@ -40,7 +40,7 @@
     "test:browser": "karma start --single-run",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
+    "precompile": "lerna run version --scope @opentelemetry/exporter-logs-otlp-http --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
@@ -80,7 +80,6 @@
     "@types/webpack-env": "1.16.3",
     "babel-loader": "10.0.0",
     "babel-plugin-istanbul": "7.0.0",
-    "cross-var": "1.1.0",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",

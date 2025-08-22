@@ -15,7 +15,7 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
+    "precompile": "lerna run version --scope @opentelemetry/configuration --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
@@ -49,7 +49,6 @@
     "@types/mocha": "10.0.10",
     "@types/node": "18.6.5",
     "@types/sinon": "17.0.4",
-    "cross-var": "1.1.0",
     "lerna": "6.6.2",
     "mocha": "11.1.0",
     "nyc": "17.1.0",
