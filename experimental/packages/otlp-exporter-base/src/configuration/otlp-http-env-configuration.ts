@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { parseKeyPairsIntoRecord } from '@opentelemetry/core';
+import { getStringFromEnv, parseKeyPairsIntoRecord } from '@opentelemetry/core';
 import { diag } from '@opentelemetry/api';
 import { getSharedConfigurationFromEnvironment } from './shared-env-configuration';
 import { OtlpHttpConfiguration } from './otlp-http-configuration';
@@ -22,10 +22,12 @@ import { wrapStaticHeadersInFunction } from './shared-configuration';
 function getStaticHeadersFromEnv(
   signalIdentifier: string
 ): Record<string, string> | undefined {
-  const signalSpecificRawHeaders =
-    process.env[`OTEL_EXPORTER_OTLP_${signalIdentifier}_HEADERS`]?.trim();
-  const nonSignalSpecificRawHeaders =
-    process.env['OTEL_EXPORTER_OTLP_HEADERS']?.trim();
+  const signalSpecificRawHeaders = getStringFromEnv(
+    `OTEL_EXPORTER_OTLP_${signalIdentifier}_HEADERS`
+  );
+  const nonSignalSpecificRawHeaders = getStringFromEnv(
+    'OTEL_EXPORTER_OTLP_HEADERS'
+  );
 
   const signalSpecificHeaders = parseKeyPairsIntoRecord(
     signalSpecificRawHeaders
@@ -98,17 +100,18 @@ function appendResourcePathToUrl(
 function getNonSpecificUrlFromEnv(
   signalResourcePath: string
 ): string | undefined {
-  const envUrl = process.env.OTEL_EXPORTER_OTLP_ENDPOINT?.trim();
-  if (envUrl == null || envUrl === '') {
+  const envUrl = getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT');
+  if (envUrl === undefined) {
     return undefined;
   }
   return appendResourcePathToUrl(envUrl, signalResourcePath);
 }
 
 function getSpecificUrlFromEnv(signalIdentifier: string): string | undefined {
-  const envUrl =
-    process.env[`OTEL_EXPORTER_OTLP_${signalIdentifier}_ENDPOINT`]?.trim();
-  if (envUrl == null || envUrl === '') {
+  const envUrl = getStringFromEnv(
+    `OTEL_EXPORTER_OTLP_${signalIdentifier}_ENDPOINT`
+  );
+  if (envUrl === undefined) {
     return undefined;
   }
   return appendRootPathToUrlIfNeeded(envUrl);
