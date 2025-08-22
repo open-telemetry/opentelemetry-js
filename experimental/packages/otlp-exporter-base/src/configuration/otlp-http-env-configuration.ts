@@ -101,7 +101,7 @@ function getNonSpecificUrlFromEnv(
   signalResourcePath: string
 ): string | undefined {
   const envUrl = getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT');
-  if (envUrl == null || envUrl === '') {
+  if (envUrl === undefined) {
     return undefined;
   }
   return appendResourcePathToUrl(envUrl, signalResourcePath);
