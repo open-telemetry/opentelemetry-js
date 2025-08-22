@@ -26,7 +26,6 @@ import {
 import { ConfigProvider } from './IConfigProvider';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
-import { DiagLogLevel } from '@opentelemetry/api';
 
 export class FileConfigProvider implements ConfigProvider {
   private _config: ConfigurationModel;
@@ -67,19 +66,35 @@ function ParseConfigFile(config: ConfigurationModel) {
     parsedContent['file_format'] &&
     supportedFileVersions.includes(parsedContent['file_format'])
   ) {
-    config.disabled = setValue(config.disabled, parsedContent['disabled']);
-    config.log_level = setValue(
+    const disabled = getValue(config.disabled, parsedContent['disabled']);
+    if (disabled || disabled === false) {
+      config.disabled = disabled;
+    }
+
+    const logLevel = getValue(
       config.log_level,
-      diagLogLevelFromString(parsedContent['log_level']) ?? DiagLogLevel.INFO
+      diagLogLevelFromString(parsedContent['log_level'])
     );
-    config.resource.attributes_list = setValue(
+    if (logLevel) {
+      config.log_level = logLevel;
+    }
+
+    const attrList = getValue(
       config.resource.attributes_list,
       parsedContent['resource']?.['attributes_list']
     );
-    config.resource.schema_url = setValue(
+    if (attrList) {
+      config.resource.attributes_list = attrList;
+    }
+
+    const schemaUrl = getValue(
       config.resource.schema_url,
       parsedContent['resource']?.['schema_url']
     );
+    if (schemaUrl) {
+      config.resource.schema_url = schemaUrl;
+    }
+
     setResourceAttributes(config, parsedContent['resource']?.['attributes']);
 
     setValuesFromEnvVariables(config);
@@ -91,17 +106,14 @@ function ParseConfigFile(config: ConfigurationModel) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function setValue(obj: unknown, value: unknown): any {
-  if (value) {
-    return value;
-  }
+function getValue(obj: unknown, value: unknown): any {
   if (typeof obj === 'boolean') {
     const raw = String(value)?.trim().toLowerCase();
     if (raw === 'false') {
       return false;
     }
   }
-  return obj;
+  return value;
 }
 
 /**

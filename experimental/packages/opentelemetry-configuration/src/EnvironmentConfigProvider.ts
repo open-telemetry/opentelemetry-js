@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { DiagLogLevel } from '@opentelemetry/api';
 import {
   ConfigurationModel,
   initializeDefaultConfiguration,
@@ -37,10 +36,9 @@ export class EnvironmentConfigProvider implements ConfigProvider {
     this._config = initializeDefaultConfiguration();
     this._config.disabled = getBooleanFromEnv('OTEL_SDK_DISABLED');
 
-    const logLevel = getStringFromEnv('OTEL_LOG_LEVEL');
+    const logLevel = diagLogLevelFromString(getStringFromEnv('OTEL_LOG_LEVEL'));
     if (logLevel) {
-      this._config.log_level =
-        diagLogLevelFromString(logLevel) ?? DiagLogLevel.INFO;
+      this._config.log_level = logLevel;
     }
 
     const nodeResourceDetectors = getStringListFromEnv(

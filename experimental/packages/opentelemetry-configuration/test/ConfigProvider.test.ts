@@ -160,6 +160,7 @@ describe('ConfigProvider', function () {
   describe('get values from config file', function () {
     afterEach(function () {
       delete process.env.OTEL_EXPERIMENTAL_CONFIG_FILE;
+      delete process.env.OTEL_NODE_RESOURCE_DETECTORS;
     });
 
     it('should initialize config with default values from valid config file', function () {
@@ -174,6 +175,13 @@ describe('ConfigProvider', function () {
 
     it('should return error from invalid config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = './fixtures/kitchen-sink.txt';
+      assert.throws(() => {
+        createConfigProvider();
+      });
+    });
+
+    it('should return error from invalid config file format', function () {
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
       assert.throws(() => {
         createConfigProvider();
       });
@@ -194,6 +202,31 @@ describe('ConfigProvider', function () {
       assert.deepStrictEqual(
         configProvider.getInstrumentationConfig(),
         defaultConfig
+      );
+    });
+
+    it('should initialize config with default values from valid short config file', function () {
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
+        'test/fixtures/short-config.yml';
+      const configProvider = createConfigProvider();
+      assert.deepStrictEqual(
+        configProvider.getInstrumentationConfig(),
+        defaultConfig
+      );
+    });
+
+    it('should initialize config with default values from valid config file and node resources', function () {
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
+        'test/fixtures/short-config.yml';
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,host, serviceinstance';
+      const expectedConfig = {
+        ...defaultConfig,
+        node_resource_detectors: ['env', 'host', 'serviceinstance'],
+      };
+      const configProvider = createConfigProvider();
+      assert.deepStrictEqual(
+        configProvider.getInstrumentationConfig(),
+        expectedConfig
       );
     });
   });
