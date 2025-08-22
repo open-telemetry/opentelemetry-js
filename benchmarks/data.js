@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1755866373613,
+  "lastUpdate": 1755898422550,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -36352,6 +36352,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.58%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "weyert@gmail.com",
+            "name": "Weyert de Boer",
+            "username": "weyert"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "806e56b38845ac21e826cfd08c2f39c48bb681d2",
+          "message": "refactor(otlp-exporter-base): use `getStringFromEnv` instead of  `process.env` (#5594)\n\nSigned-off-by: Weyert de Boer <wdb@innerfuse.biz>\nCo-authored-by: David Luna <david.luna@elastic.co>\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2025-08-22T21:24:28Z",
+          "tree_id": "5f585a1b102e1abd0b486a86f8b8a73f50a6b60b",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/806e56b38845ac21e826cfd08c2f39c48bb681d2"
+        },
+        "date": 1755898421521,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 667474,
+            "range": "±0.91%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8352,
+            "range": "±0.70%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 302968,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 281610,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
           }
         ]
       }
