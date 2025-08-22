@@ -110,7 +110,7 @@
     "semver": "7.6.3",
     "ts-node": "10.9.2",
     "typedoc": "0.27.9",
-    "typedoc-plugin-missing-exports": "3.1.0",
+    "typedoc-plugin-missing-exports": "4.1.0",
     "typescript": "5.0.4",
     "util": "0.12.5"
   },
