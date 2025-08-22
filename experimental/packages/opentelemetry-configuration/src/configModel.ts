@@ -21,7 +21,7 @@ export interface ConfigurationModel {
    * Configure if the SDK is disabled or not.
    * If omitted or null, false is used.
    */
-  disable: boolean;
+  disabled: boolean;
 
   /**
    * Configure the log level of the internal logger used by the SDK.
@@ -44,7 +44,7 @@ export interface ConfigurationModel {
 
 export function initializeDefaultConfiguration(): ConfigurationModel {
   const config: ConfigurationModel = {
-    disable: false,
+    disabled: true,
     log_level: DiagLogLevel.INFO,
     node_resource_detectors: ['all'],
     resource: {},
@@ -56,7 +56,7 @@ export function initializeDefaultConfiguration(): ConfigurationModel {
 export interface ConfigAttributes {
   name: string;
   value: string | boolean | number | string[] | boolean[] | number[];
-  type?:
+  type:
     | 'string'
     | 'bool'
     | 'int'

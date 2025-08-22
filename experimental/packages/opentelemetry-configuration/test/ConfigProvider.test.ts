@@ -20,10 +20,67 @@ import { DiagLogLevel } from '@opentelemetry/api';
 import { createConfigProvider } from '../src/ConfigProvider';
 
 const defaultConfig: Configuration = {
-  disable: false,
+  disabled: false,
   log_level: DiagLogLevel.INFO,
   node_resource_detectors: ['all'],
   resource: {},
+};
+
+const configFromFile: Configuration = {
+  disabled: false,
+  log_level: DiagLogLevel.DEBUG,
+  node_resource_detectors: ['all'],
+  resource: {
+    schema_url: 'https://opentelemetry.io/schemas/1.16.0',
+    attributes_list: 'service.namespace=my-namespace,service.version=1.0.0',
+    attributes: [
+      {
+        name: 'service.name',
+        value: 'unknown_service',
+        type: 'string',
+      },
+      {
+        name: 'string_key',
+        value: 'value',
+        type: 'string',
+      },
+      {
+        name: 'bool_key',
+        value: true,
+        type: 'bool',
+      },
+      {
+        name: 'int_key',
+        value: 1,
+        type: 'int',
+      },
+      {
+        name: 'double_key',
+        value: 1.1,
+        type: 'double',
+      },
+      {
+        name: 'string_array_key',
+        value: ['value1', 'value2'],
+        type: 'string_array',
+      },
+      {
+        name: 'bool_array_key',
+        value: [true, false],
+        type: 'bool_array',
+      },
+      {
+        name: 'int_array_key',
+        value: [1, 2],
+        type: 'int_array',
+      },
+      {
+        name: 'double_array_key',
+        value: [1.1, 2.2],
+        type: 'double_array',
+      },
+    ],
+  },
 };
 
 describe('ConfigProvider', function () {
@@ -47,7 +104,7 @@ describe('ConfigProvider', function () {
       process.env.OTEL_SDK_DISABLED = 'true';
       const expectedConfig: Configuration = {
         ...defaultConfig,
-        disable: true,
+        disabled: true,
       };
       const configProvider = createConfigProvider();
       assert.deepStrictEqual(
@@ -111,7 +168,7 @@ describe('ConfigProvider', function () {
       const configProvider = createConfigProvider();
       assert.deepStrictEqual(
         configProvider.getInstrumentationConfig(),
-        defaultConfig
+        configFromFile
       );
     });
 

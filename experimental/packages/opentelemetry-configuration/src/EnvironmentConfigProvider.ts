@@ -35,7 +35,7 @@ export class EnvironmentConfigProvider implements ConfigProvider {
 
   constructor() {
     this._config = initializeDefaultConfiguration();
-    this._config.disable = getBooleanFromEnv('OTEL_SDK_DISABLED');
+    this._config.disabled = getBooleanFromEnv('OTEL_SDK_DISABLED');
 
     const logLevel = getStringFromEnv('OTEL_LOG_LEVEL');
     if (logLevel) {

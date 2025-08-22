@@ -41,7 +41,8 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/core": "^2.0.1"
+    "@opentelemetry/core": "^2.0.1",
+    "yaml": "^1.10.2"
   },
   "devDependencies": {
     "@opentelemetry/api": "^1.9.0",
