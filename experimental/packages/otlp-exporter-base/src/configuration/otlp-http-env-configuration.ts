@@ -111,7 +111,7 @@ function getSpecificUrlFromEnv(signalIdentifier: string): string | undefined {
   const envUrl = getStringFromEnv(
     `OTEL_EXPORTER_OTLP_${signalIdentifier}_ENDPOINT`
   );
-  if (envUrl == null || envUrl === '') {
+  if (envUrl === undefined) {
     return undefined;
   }
   return appendRootPathToUrlIfNeeded(envUrl);
