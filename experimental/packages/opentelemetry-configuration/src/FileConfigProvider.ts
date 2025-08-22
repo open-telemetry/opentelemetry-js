@@ -84,7 +84,6 @@ function ParseConfigFile(config: ConfigurationModel) {
 
     setValuesFromEnvVariables(config);
   } else {
-    console.log(`Unsupported File Format: ${parsedContent['file_format']}. It must be one of the following: ${supportedFileVersions}`);
     throw new Error(
       `Unsupported File Format: ${parsedContent['file_format']}. It must be one of the following: ${supportedFileVersions}`
     );
