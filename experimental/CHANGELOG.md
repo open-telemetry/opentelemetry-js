@@ -16,12 +16,14 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
-*feat(opentelemetry-configuration): creation of basic ConfigProvider [#5809](https://github.com/open-telemetry/opentelemetry-js/pull/5809) @maryliag
-*feat(opentelemetry-configuration): creation of basic FileConfigProvider [#5863](https://github.com/open-telemetry/opentelemetry-js/pull/5863) @maryliag
+* feat(otlp-exporter-base): Add fetch transport for fetch-only environments like service workers. [#5807](https://github.com/open-telemetry/opentelemetry-js/pull/5807)
+* feat(opentelemetry-configuration): creation of basic ConfigProvider [#5809](https://github.com/open-telemetry/opentelemetry-js/pull/5809) @maryliag
+* feat(opentelemetry-configuration): creation of basic FileConfigProvider [#5863](https://github.com/open-telemetry/opentelemetry-js/pull/5863) @maryliag
 
 ### :bug: Bug Fixes
 
 * fix(otlp-exporter-base): prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
+* fix(otlp-http-configuration): consider relative urls as valid in browser environments #5453
 
 ### :books: Documentation
 
