@@ -69,5 +69,24 @@ describe('OTLPLogExporter', () => {
       loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });
       loggerProvider.shutdown();
     });
+
+    it('accepts relative URLs', () => {
+      // Test that relative URLs are accepted during construction without throwing
+      assert.doesNotThrow(() => {
+        new OTLPLogExporter({ url: './api/logs' });
+      }, 'Expected relative URL to be accepted');
+
+      assert.doesNotThrow(() => {
+        new OTLPLogExporter({ url: '../logs' });
+      }, 'Expected relative URL to be accepted');
+
+      assert.doesNotThrow(() => {
+        new OTLPLogExporter({ url: '/api/logs' });
+      }, 'Expected relative URL to be accepted');
+
+      assert.doesNotThrow(() => {
+        new OTLPLogExporter({ url: 'api/logs' });
+      }, 'Expected relative URL to be accepted');
+    });
   });
 });
