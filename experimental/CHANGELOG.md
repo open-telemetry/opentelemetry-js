@@ -29,6 +29,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+* refactor(otlp-exporter-base): use getStringFromEnv instead of process.env [#5594](https://github.com/open-telemetry/opentelemetry-js/pull/5594) @weyert
 * chore(sdk-logs): refactored imports [#5801](https://github.com/open-telemetry/opentelemetry-js/pull/5801) @svetlanabrennan
 
 ## 0.203.0
