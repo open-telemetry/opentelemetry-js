@@ -1,54 +1,25 @@
 'use strict';
 
-const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node')
-const { ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
-const { resourceFromAttributes } = require('@opentelemetry/resources');
-const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 const {
-  diag,
   trace,
   context,
-  DiagConsoleLogger,
-  DiagLogLevel,
 } = require('@opentelemetry/api');
-const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
-// const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc');
-// const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-proto');
 
-diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
-
-const exporter = new OTLPTraceExporter({
-  // headers: {
-  //   foo: 'bar'
-  // },
-});
-
-const provider = new NodeTracerProvider({
-  resource: resourceFromAttributes({
-    [ATTR_SERVICE_NAME]: 'basic-service',
-  }),
-  spanProcessors: [
-    new SimpleSpanProcessor(exporter),
-    new SimpleSpanProcessor(new ConsoleSpanExporter()),
-  ]
-});
-provider.register();
-
+// Metrics SDK and exporter were registered globally in ./opentelemetry-traces.js, so you can access it via `trace`
+// from `@opentelemetry/api` - in your application code outside of setup, you should never refer to any
+// `@opentelemetry/sdk-trace-*` types.
+// Note: getting a tracer may be an expensive operation - so you should create it once, and then hold on to it for the
+// lifetime of your process. You should avoid getting new tracers on hot-paths.
 const tracer = trace.getTracer('example-otlp-exporter-node');
 
-// Create a span. A span must be closed.
+// Create a span. A span MUST be ended eventually.
 const parentSpan = tracer.startSpan('main');
 for (let i = 0; i < 10; i += 1) {
   doWork(parentSpan);
 }
-// Be sure to end the span.
-parentSpan.end();
 
-// give some time before it is closed
-setTimeout(() => {
-  // flush and close the connection.
-  exporter.shutdown();
-}, 2000);
+// Be sure to end the span - this makes it ready for export. Not ending spans may cause memory leaks.
+parentSpan.end();
 
 function doWork(parent) {
   // Start another span. In this example, the main method already started a
