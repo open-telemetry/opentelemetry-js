@@ -25,10 +25,24 @@ import { validateAndNormalizeHeaders } from '../util';
 import type * as http from 'http';
 import type * as https from 'https';
 
+export type HttpAgentFactory = (
+  protocol: string
+) => http.Agent | https.Agent | Promise<http.Agent> | Promise<https.Agent>;
+
 export interface OtlpHttpConfiguration extends OtlpSharedConfiguration {
   url: string;
   headers: () => Record<string, string>;
-  agentOptions: http.AgentOptions | https.AgentOptions;
+  /**
+   * Factory function for creating agents.
+   *
+   * @remarks
+   * Prefer using {@link httpAgentFactoryFromOptions} over manually writing a factory function wherever possible.
+   * If using a factory function (`HttpAgentFactory`), **do not import `http.Agent` or `https.Agent`
+   * statically at the top of the file**.
+   * Instead, use dynamic `import()` or `require()` to load the module. This ensures that the `http` or `https`
+   * module is not loaded before `@opentelemetry/instrumentation-http` can instrument it.
+   */
+  agentFactory: HttpAgentFactory;
 }
 
 function mergeHeaders(
@@ -97,6 +111,16 @@ function validateUserProvidedUrl(url: string | undefined): string | undefined {
   );
 }
 
+export function httpAgentFactoryFromOptions(
+  options: http.AgentOptions | https.AgentOptions
+): HttpAgentFactory {
+  return async protocol => {
+    const module = protocol === 'http:' ? import('http') : import('https');
+    const { Agent } = await module;
+    return new Agent(options);
+  };
+}
+
 /**
  * @param userProvidedConfiguration  Configuration options provided by the user in code.
  * @param fallbackConfiguration Fallback to use when the {@link userProvidedConfiguration} does not specify an option.
@@ -122,10 +146,10 @@ export function mergeOtlpHttpConfigurationWithDefaults(
       validateUserProvidedUrl(userProvidedConfiguration.url) ??
       fallbackConfiguration.url ??
       defaultConfiguration.url,
-    agentOptions:
-      userProvidedConfiguration.agentOptions ??
-      fallbackConfiguration.agentOptions ??
-      defaultConfiguration.agentOptions,
+    agentFactory:
+      userProvidedConfiguration.agentFactory ??
+      fallbackConfiguration.agentFactory ??
+      defaultConfiguration.agentFactory,
   };
 }
 
@@ -137,6 +161,6 @@ export function getHttpConfigurationDefaults(
     ...getSharedConfigurationDefaults(),
     headers: () => requiredHeaders,
     url: 'http://localhost:4318/' + signalResourcePath,
-    agentOptions: { keepAlive: true },
+    agentFactory: httpAgentFactoryFromOptions({ keepAlive: true }),
   };
 }

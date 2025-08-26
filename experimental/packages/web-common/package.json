@@ -29,7 +29,7 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "prepublishOnly": "npm run compile",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
+    "precompile": "lerna run version --scope @opentelemetry/web-common --include-dependencies",
     "prewatch": "npm run precompile",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
@@ -80,7 +80,6 @@
     "@types/webpack-env": "1.16.3",
     "babel-loader": "10.0.0",
     "babel-plugin-istanbul": "7.0.0",
-    "cross-var": "1.1.0",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",
@@ -93,7 +92,7 @@
     "sinon": "18.0.1",
     "ts-loader": "9.5.2",
     "typescript": "5.0.4",
-    "webpack": "5.99.9",
+    "webpack": "5.101.3",
     "webpack-cli": "6.0.1"
   }
 }

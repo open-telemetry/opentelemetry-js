@@ -16,6 +16,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(opentelemetry-resources): add schema url [#5070](https://github.com/open-telemetry/opentelemetry-js/pull/5753) @c-ehrlich
+
 ### :bug: Bug Fixes
 
 * fix(sdk-metrics): Remove invalid default value for `startTime` param to ExponentialHistogramAccumulation. This only impacted the closurescript compiler. [#5763](https://github.com/open-telemetry/opentelemetry-js/pull/5763) @trentm
@@ -34,6 +36,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(resource): do not trigger `Accessing resource attributes before async attributes settled` warning when detecting resources [#5546](https://github.com/open-telemetry/opentelemetry-js/pull/5546) @dyladan
   * verbose logging of detected resource removed
 * fix(resource): use dynamic import over require to improve ESM compliance [#5298](https://github.com/open-telemetry/opentelemetry-js/pull/5298) @xiaoxiangmoe
+* fix(core): `getNumberFromEnv` should return number | undefined [#5874](https://github.com/open-telemetry/opentelemetry-js/pull/5874) @shubham-vunet
 
 ### :books: Documentation
 

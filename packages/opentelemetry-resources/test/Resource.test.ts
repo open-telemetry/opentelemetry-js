@@ -287,6 +287,192 @@ describe('Resource', () => {
     });
   });
 
+  describe('schema URL support', () => {
+    it('should create resource with schema URL', () => {
+      const schemaUrl = 'https://example.test/schemas/1.2.3';
+      const resource = resourceFromAttributes({ attr: 'value' }, { schemaUrl });
+
+      assert.strictEqual(resource.schemaUrl, schemaUrl);
+    });
+
+    it('should create resource without schema URL', () => {
+      const resource = resourceFromAttributes({ attr: 'value' });
+
+      assert.strictEqual(resource.schemaUrl, undefined);
+    });
+
+    it('should retain schema URL from base resource when other has no schema URL', () => {
+      const schemaUrl = 'https://opentelemetry.test/schemas/1.2.3';
+      const resource1 = resourceFromAttributes(
+        { attr1: 'value1' },
+        { schemaUrl }
+      );
+      const resource2 = resourceFromAttributes({ attr2: 'value2' });
+
+      const mergedResource = resource1.merge(resource2);
+
+      assert.strictEqual(mergedResource.schemaUrl, schemaUrl);
+    });
+
+    it('should retain schema URL from other resource when base has no schema URL', () => {
+      const resource1 = resourceFromAttributes({ attr1: 'value1' });
+      const resource2 = resourceFromAttributes(
+        { attr2: 'value2' },
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
+      );
+
+      const mergedResource = resource1.merge(resource2);
+
+      assert.strictEqual(
+        mergedResource.schemaUrl,
+        'https://opentelemetry.test/schemas/1.2.3'
+      );
+    });
+
+    it('should have empty schema URL when merging resources with no schema URL', () => {
+      const resource1 = resourceFromAttributes(
+        { attr1: 'value1' },
+        { schemaUrl: '' }
+      );
+      const resource2 = resourceFromAttributes(
+        { attr2: 'value2' },
+        { schemaUrl: '' }
+      );
+
+      const mergedResource = resource1.merge(resource2);
+
+      assert.strictEqual(mergedResource.schemaUrl, undefined);
+    });
+
+    it('should maintain backward compatibility - schemaUrl is optional', () => {
+      const resource = emptyResource();
+
+      const schemaUrl = resource.schemaUrl;
+      assert.strictEqual(schemaUrl, undefined);
+    });
+
+    it('should work with async attributes and schema URLs', async () => {
+      const resource = resourceFromAttributes(
+        {
+          sync: 'fromsync',
+          async: new Promise(resolve =>
+            setTimeout(() => resolve('fromasync'), 1)
+          ),
+        },
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
+      );
+
+      await resource.waitForAsyncAttributes?.();
+
+      assert.deepStrictEqual(resource.attributes, {
+        sync: 'fromsync',
+        async: 'fromasync',
+      });
+      assert.strictEqual(
+        resource.schemaUrl,
+        'https://opentelemetry.test/schemas/1.2.3'
+      );
+    });
+
+    it('should merge schema URLs according to OpenTelemetry spec - same URLs', () => {
+      const resource1 = resourceFromAttributes(
+        { attr1: 'value1' },
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
+      );
+      const resource2 = resourceFromAttributes(
+        { attr2: 'value2' },
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
+      );
+
+      const mergedResource = resource1.merge(resource2);
+
+      assert.strictEqual(
+        mergedResource.schemaUrl,
+        'https://opentelemetry.test/schemas/1.2.3'
+      );
+    });
+
+    it('should merge schema URLs according to OpenTelemetry spec - conflict case (undefined behavior)', () => {
+      const warnStub = sinon.spy(diag, 'warn');
+
+      const resource1 = resourceFromAttributes(
+        { attr1: 'value1' },
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
+      );
+      const resource2 = resourceFromAttributes(
+        { attr2: 'value2' },
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.4' }
+      );
+
+      const mergedResource = resource1.merge(resource2);
+
+      // Implementation-specific: we return undefined to indicate error state
+      // This aligns with Go, Java, and PHP SDKs which return null/empty for conflicts
+      assert.strictEqual(mergedResource.schemaUrl, undefined);
+
+      assert.ok(warnStub.calledWithMatch('Schema URL merge conflict'));
+
+      warnStub.restore();
+    });
+
+    it('should accept valid schema URL formats', () => {
+      const validSchemaUrls = [
+        'https://opentelemetry.test/schemas/1.2.3',
+        'http://example.test/schema',
+        'https://schemas.opentelemetry.test/path/to/schema/1.21.0',
+        'https://example.test:8080/path/to/schema',
+      ];
+
+      validSchemaUrls.forEach(validUrl => {
+        const resource = resourceFromAttributes(
+          { attr: 'value' },
+          { schemaUrl: validUrl }
+        );
+
+        assert.strictEqual(
+          resource.schemaUrl,
+          validUrl,
+          `Expected valid schema URL to be preserved: ${validUrl}`
+        );
+      });
+    });
+
+    it('should handle invalid schema URL formats gracefully', () => {
+      const warnStub = sinon.spy(diag, 'warn');
+
+      const invalidSchemaUrls = [
+        null,
+        123,
+        12345678901234567890n,
+        { schemaUrl: 'http://example.test/schema' },
+        ['http://example.test/schema'],
+      ];
+
+      invalidSchemaUrls.forEach(invalidUrl => {
+        const resource = resourceFromAttributes(
+          { attr: 'value' },
+          // @ts-expect-error the function signature doesn't allow these, but can still happen at runtime
+          { schemaUrl: invalidUrl }
+        );
+
+        // Invalid schema URLs should be ignored (set to undefined)
+        assert.strictEqual(
+          resource.schemaUrl,
+          undefined,
+          `Expected undefined for invalid schema URL: ${invalidUrl}`
+        );
+      });
+
+      // Should have logged warnings for each invalid URL
+      assert.strictEqual(warnStub.callCount, invalidSchemaUrls.length);
+      assert.ok(
+        warnStub.alwaysCalledWithMatch('Schema URL must be string or undefined')
+      );
+
+      warnStub.restore();
+    });
+  });
+
   describeNode('.default()', () => {
     it('should return a default resource', () => {
       const resource = defaultResource();
