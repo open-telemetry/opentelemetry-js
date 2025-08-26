@@ -15,7 +15,7 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
+    "precompile": "lerna run version --scope @opentelemetry/context-zone --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../scripts/align-api-deps.js"
@@ -51,7 +51,6 @@
     "access": "public"
   },
   "devDependencies": {
-    "cross-var": "1.1.0",
     "lerna": "6.6.2",
     "typescript": "5.0.4"
   },

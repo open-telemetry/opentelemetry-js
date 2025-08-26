@@ -85,6 +85,9 @@
       "path": "experimental/packages/opentelemetry-browser-detector"
     },
     {
+      "path": "experimental/packages/opentelemetry-configuration"
+    },
+    {
       "path": "experimental/packages/opentelemetry-exporter-metrics-otlp-grpc"
     },
     {

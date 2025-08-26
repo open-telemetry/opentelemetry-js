@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import { ExportResult, getNumberFromEnv } from '@opentelemetry/core';
 import { diag } from '@opentelemetry/api';
 import {
+  ExportResult,
   ExportResultCode,
+  getNumberFromEnv,
   globalErrorHandler,
   unrefTimer,
   BindOnceFuture,

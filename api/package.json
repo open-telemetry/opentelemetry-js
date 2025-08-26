@@ -14,14 +14,14 @@
   },
   "exports": {
     ".": {
-      "module": "./build/esm/index.js",
       "esnext": "./build/esnext/index.js",
+      "module": "./build/esm/index.js",
       "types": "./build/src/index.d.ts",
       "default": "./build/src/index.js"
     },
     "./experimental": {
-      "module": "./build/esm/experimental/index.js",
       "esnext": "./build/esnext/experimental/index.js",
+      "module": "./build/esm/experimental/index.js",
       "types": "./build/src/experimental/index.d.ts",
       "default": "./build/src/experimental/index.js"
     }
@@ -29,7 +29,7 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
+    "precompile": "lerna run version --scope @opentelemetry/api --include-dependencies",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "lint:fix": "eslint . --ext .ts --fix",
     "lint": "eslint . --ext .ts",
@@ -79,7 +79,6 @@
     "@types/webpack": "5.28.5",
     "@types/webpack-env": "1.16.3",
     "babel-plugin-istanbul": "7.0.0",
-    "cross-var": "1.1.0",
     "dpdm": "3.13.1",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
