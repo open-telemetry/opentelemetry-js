@@ -21,13 +21,17 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(sdk-node): Add support for multiple metric readers via the new `metricReaders` option in NodeSDK configuration. Users can now register multiple metric readers (e.g., Console, Prometheus) directly through the NodeSDK constructor. The old `metricReader` (singular) option is now deprecated and will show a warning if used, but remains supported for backward compatibility. Comprehensive tests and documentation have been added. [#5760](https://github.com/open-telemetry/opentelemetry-js/issues/5760)
   * **Migration:**
     - Before:
+
       ```js
       const sdk = new NodeSDK({ metricReader: myMetricReader });
       ```
+
     - After:
+
       ```js
       const sdk = new NodeSDK({ metricReaders: [myMetricReader] });
       ```
+
   * Users should migrate to the new `metricReaders` array option for future compatibility. The old option will be removed in an upcoming experimental version.
 
 ### :bug: Bug Fixes
