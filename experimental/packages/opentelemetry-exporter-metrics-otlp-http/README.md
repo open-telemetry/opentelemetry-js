@@ -5,7 +5,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides a metrics-exporter for OTLP (http/json) using protocol version `v0.20.0`.
+This module provides a metrics-exporter for OTLP (http/json) using protocol version `v1.7.0`.
 
 ## Installation
 

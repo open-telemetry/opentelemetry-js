@@ -15,4 +15,4 @@
  */
 
 // IMPORTANT: exports added here are public
-export { ISerializer } from './i-serializer';
+export type { ISerializer } from './i-serializer';

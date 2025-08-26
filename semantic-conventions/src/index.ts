@@ -26,3 +26,4 @@ export * from './resource';
 // Use these instead
 export * from './stable_attributes';
 export * from './stable_metrics';
+export * from './stable_events';

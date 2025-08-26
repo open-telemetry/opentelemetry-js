@@ -30,6 +30,7 @@ export interface ReadableLogRecord {
   readonly severityText?: string;
   readonly severityNumber?: SeverityNumber;
   readonly body?: LogBody;
+  readonly eventName?: string;
   readonly resource: Resource;
   readonly instrumentationScope: InstrumentationScope;
   readonly attributes: LogAttributes;

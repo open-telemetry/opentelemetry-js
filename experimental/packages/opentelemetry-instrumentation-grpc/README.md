@@ -66,7 +66,7 @@ See the [HTTP semconv migration plan for OpenTelemetry JS instrumentations](http
 To select which semconv version(s) is emitted from this instrumentation, use the `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable.
 
 - `http`: emit the new (stable) v1.23.0 semantics
-- `http/dep`: emit **both** the old v1.7.0 and the new (stable) v1.23.0 semantics
+- `http/dup`: emit **both** the old v1.7.0 and the new (stable) v1.23.0 semantics
 - By default, if `OTEL_SEMCONV_STABILITY_OPT_IN` includes neither of the above tokens, the old v1.7.0 semconv is used.
 
 ### Attributes collected

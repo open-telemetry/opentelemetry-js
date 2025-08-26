@@ -18,6 +18,9 @@ on:
           - all # all release packages, including API, excluding semconv
           - semconv # only semantic convention package
 
+permissions:
+  contents: read
+
 jobs:
   create-or-update-release-pr:
     runs-on: ubuntu-latest
@@ -27,7 +30,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.OPENTELEMETRYBOT_GITHUB_TOKEN }}
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: opentelemetrybot/opentelemetry-js
           ref: main

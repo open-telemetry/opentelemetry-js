@@ -15,10 +15,8 @@
  */
 
 export { OTLPMetricExporter } from './platform';
-export {
-  OTLPMetricExporterOptions,
-  AggregationTemporalityPreference,
-} from './OTLPMetricExporterOptions';
+export { AggregationTemporalityPreference } from './OTLPMetricExporterOptions';
+export type { OTLPMetricExporterOptions } from './OTLPMetricExporterOptions';
 export {
   CumulativeTemporalitySelector,
   DeltaTemporalitySelector,

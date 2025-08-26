@@ -5,7 +5,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides a logs-exporter for OTLP (gRPC) using protocol version `v0.20.0`.
+This module provides a logs-exporter for OTLP (gRPC) using protocol version `v1.7.0`.
 
 ## Installation
 
@@ -39,11 +39,9 @@ const collectorOptions = {
 };
 
 const loggerExporter = new OTLPLogExporter(collectorOptions);
-const loggerProvider = new LoggerProvider();
-
-loggerProvider.addLogRecordProcessor(
-  new BatchLogRecordProcessor(loggerExporter)
-);
+const loggerProvider = new LoggerProvider({
+  processors: [new BatchRecordProcessor(loggerExporter)]
+});
 
 ['SIGINT', 'SIGTERM'].forEach(signal => {
   process.on(signal, () => loggerProvider.shutdown().catch(console.error));

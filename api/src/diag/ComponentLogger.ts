@@ -15,7 +15,7 @@
  */
 
 import { getGlobal } from '../internal/global-utils';
-import { ComponentLoggerOptions, DiagLogger, DiagLogFunction } from './types';
+import { ComponentLoggerOptions, DiagLogger } from './types';
 
 /**
  * Component Logger which is meant to be used as part of any component which
@@ -33,23 +33,23 @@ export class DiagComponentLogger implements DiagLogger {
     this._namespace = props.namespace || 'DiagComponentLogger';
   }
 
-  public debug(...args: any[]): void {
+  public debug(...args: unknown[]): void {
     return logProxy('debug', this._namespace, args);
   }
 
-  public error(...args: any[]): void {
+  public error(...args: unknown[]): void {
     return logProxy('error', this._namespace, args);
   }
 
-  public info(...args: any[]): void {
+  public info(...args: unknown[]): void {
     return logProxy('info', this._namespace, args);
   }
 
-  public warn(...args: any[]): void {
+  public warn(...args: unknown[]): void {
     return logProxy('warn', this._namespace, args);
   }
 
-  public verbose(...args: any[]): void {
+  public verbose(...args: unknown[]): void {
     return logProxy('verbose', this._namespace, args);
   }
 }
@@ -57,7 +57,7 @@ export class DiagComponentLogger implements DiagLogger {
 function logProxy(
   funcName: keyof DiagLogger,
   namespace: string,
-  args: any
+  args: unknown[]
 ): void {
   const logger = getGlobal('diag');
   // shortcut if logger not set
@@ -65,6 +65,5 @@ function logProxy(
     return;
   }
 
-  args.unshift(namespace);
-  return logger[funcName](...(args as Parameters<DiagLogFunction>));
+  return logger[funcName](namespace, ...args);
 }

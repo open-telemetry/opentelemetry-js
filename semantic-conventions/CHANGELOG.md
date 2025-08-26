@@ -9,11 +9,228 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
+* feat: add `EVENT_*` exports for event names in Semantic Conventions [#5832](https://github.com/open-telemetry/opentelemetry-js/pull/5832) @trentm
+
 ### :bug: Bug Fixes
+
+* fix: prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
 
 ### :books: Documentation
 
 ### :house: Internal
+
+## 1.36.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.36.0 [#5779](https://github.com/open-telemetry/opentelemetry-js/pull/5779) @trentm
+  * Semantic Conventions v1.36.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1360) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *none*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *8 exported values changed, 7 newly deprecated exports, 3 newly undeprecated exports, 88 added exports*
+
+#### Unstable changes in v1.36.0
+
+<details>
+<summary>8 exported values changed</summary>
+
+```js
+CLOUD_PLATFORM_VALUE_AZURE_AKS                 // "azure_aks" -> "azure.aks"
+CLOUD_PLATFORM_VALUE_AZURE_APP_SERVICE         // "azure_app_service" -> "azure.app_service"
+CLOUD_PLATFORM_VALUE_AZURE_CONTAINER_APPS      // "azure_container_apps" -> "azure.container_apps"
+CLOUD_PLATFORM_VALUE_AZURE_CONTAINER_INSTANCES // "azure_container_instances" -> "azure.container_instances"
+CLOUD_PLATFORM_VALUE_AZURE_FUNCTIONS           // "azure_functions" -> "azure.functions"
+CLOUD_PLATFORM_VALUE_AZURE_OPENSHIFT           // "azure_openshift" -> "azure.openshift"
+CLOUD_PLATFORM_VALUE_AZURE_VM                  // "azure_vm" -> "azure.vm"
+GEN_AI_SYSTEM_VALUE_AZ_AI_OPENAI               // "az.ai.openai" -> "azure.ai.openai"
+```
+
+</details>
+
+<details>
+<summary>7 newly deprecated exports</summary>
+
+```js
+METRIC_CPU_FREQUENCY              // cpu.frequency: Replaced by `system.cpu.frequency`.
+METRIC_CPU_TIME                   // cpu.time: Replaced by `system.cpu.time`.
+METRIC_CPU_UTILIZATION            // cpu.utilization: Replaced by `system.cpu.utilization`.
+METRIC_OTEL_SDK_SPAN_ENDED        // otel.sdk.span.ended: Obsoleted.
+METRIC_SYSTEM_NETWORK_CONNECTIONS // system.network.connections: Replaced by `system.network.connection.count`.
+ATTR_AZ_NAMESPACE                 // az.namespace: Replaced by `azure.resource_provider.namespace`.
+ATTR_AZ_SERVICE_REQUEST_ID        // az.service_request_id: Replaced by `azure.service.request.id`.
+```
+
+</details>
+
+<details>
+<summary>3 newly undeprecated exports</summary>
+
+```js
+METRIC_SYSTEM_CPU_FREQUENCY   // system.cpu.frequency
+METRIC_SYSTEM_CPU_TIME        // system.cpu.time
+METRIC_SYSTEM_CPU_UTILIZATION // system.cpu.utilization
+```
+
+</details>
+
+<details>
+<summary>88 added exports</summary>
+
+```js
+METRIC_K8S_CONTAINER_CPU_LIMIT                                  // k8s.container.cpu.limit
+METRIC_K8S_CONTAINER_CPU_REQUEST                                // k8s.container.cpu.request
+METRIC_K8S_CONTAINER_EPHEMERAL_STORAGE_LIMIT                    // k8s.container.ephemeral_storage.limit
+METRIC_K8S_CONTAINER_EPHEMERAL_STORAGE_REQUEST                  // k8s.container.ephemeral_storage.request
+METRIC_K8S_CONTAINER_MEMORY_LIMIT                               // k8s.container.memory.limit
+METRIC_K8S_CONTAINER_MEMORY_REQUEST                             // k8s.container.memory.request
+METRIC_K8S_CONTAINER_READY                                      // k8s.container.ready
+METRIC_K8S_CONTAINER_RESTART_COUNT                              // k8s.container.restart.count
+METRIC_K8S_CONTAINER_STATUS_REASON                              // k8s.container.status.reason
+METRIC_K8S_CONTAINER_STATUS_STATE                               // k8s.container.status.state
+METRIC_K8S_CONTAINER_STORAGE_LIMIT                              // k8s.container.storage.limit
+METRIC_K8S_CONTAINER_STORAGE_REQUEST                            // k8s.container.storage.request
+METRIC_K8S_HPA_METRIC_TARGET_CPU_AVERAGE_UTILIZATION            // k8s.hpa.metric.target.cpu.average_utilization
+METRIC_K8S_HPA_METRIC_TARGET_CPU_AVERAGE_VALUE                  // k8s.hpa.metric.target.cpu.average_value
+METRIC_K8S_HPA_METRIC_TARGET_CPU_VALUE                          // k8s.hpa.metric.target.cpu.value
+METRIC_K8S_NODE_ALLOCATABLE_CPU                                 // k8s.node.allocatable.cpu
+METRIC_K8S_NODE_ALLOCATABLE_EPHEMERAL_STORAGE                   // k8s.node.allocatable.ephemeral_storage
+METRIC_K8S_NODE_ALLOCATABLE_MEMORY                              // k8s.node.allocatable.memory
+METRIC_K8S_NODE_ALLOCATABLE_PODS                                // k8s.node.allocatable.pods
+METRIC_K8S_NODE_CONDITION_STATUS                                // k8s.node.condition.status
+METRIC_K8S_RESOURCEQUOTA_CPU_LIMIT_HARD                         // k8s.resourcequota.cpu.limit.hard
+METRIC_K8S_RESOURCEQUOTA_CPU_LIMIT_USED                         // k8s.resourcequota.cpu.limit.used
+METRIC_K8S_RESOURCEQUOTA_CPU_REQUEST_HARD                       // k8s.resourcequota.cpu.request.hard
+METRIC_K8S_RESOURCEQUOTA_CPU_REQUEST_USED                       // k8s.resourcequota.cpu.request.used
+METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_LIMIT_HARD           // k8s.resourcequota.ephemeral_storage.limit.hard
+METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_LIMIT_USED           // k8s.resourcequota.ephemeral_storage.limit.used
+METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_REQUEST_HARD         // k8s.resourcequota.ephemeral_storage.request.hard
+METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_REQUEST_USED         // k8s.resourcequota.ephemeral_storage.request.used
+METRIC_K8S_RESOURCEQUOTA_HUGEPAGE_COUNT_REQUEST_HARD            // k8s.resourcequota.hugepage_count.request.hard
+METRIC_K8S_RESOURCEQUOTA_HUGEPAGE_COUNT_REQUEST_USED            // k8s.resourcequota.hugepage_count.request.used
+METRIC_K8S_RESOURCEQUOTA_MEMORY_LIMIT_HARD                      // k8s.resourcequota.memory.limit.hard
+METRIC_K8S_RESOURCEQUOTA_MEMORY_LIMIT_USED                      // k8s.resourcequota.memory.limit.used
+METRIC_K8S_RESOURCEQUOTA_MEMORY_REQUEST_HARD                    // k8s.resourcequota.memory.request.hard
+METRIC_K8S_RESOURCEQUOTA_MEMORY_REQUEST_USED                    // k8s.resourcequota.memory.request.used
+METRIC_K8S_RESOURCEQUOTA_OBJECT_COUNT_HARD                      // k8s.resourcequota.object_count.hard
+METRIC_K8S_RESOURCEQUOTA_OBJECT_COUNT_USED                      // k8s.resourcequota.object_count.used
+METRIC_K8S_RESOURCEQUOTA_PERSISTENTVOLUMECLAIM_COUNT_HARD       // k8s.resourcequota.persistentvolumeclaim_count.hard
+METRIC_K8S_RESOURCEQUOTA_PERSISTENTVOLUMECLAIM_COUNT_USED       // k8s.resourcequota.persistentvolumeclaim_count.used
+METRIC_K8S_RESOURCEQUOTA_STORAGE_REQUEST_HARD                   // k8s.resourcequota.storage.request.hard
+METRIC_K8S_RESOURCEQUOTA_STORAGE_REQUEST_USED                   // k8s.resourcequota.storage.request.used
+
+METRIC_OTEL_SDK_SPAN_STARTED                                    // otel.sdk.span.started
+
+METRIC_SYSTEM_NETWORK_CONNECTION_COUNT                          // system.network.connection.count
+
+ATTR_AZURE_RESOURCE_PROVIDER_NAMESPACE                          // azure.resource_provider.namespace
+ATTR_AZURE_SERVICE_REQUEST_ID                                   // azure.service.request.id
+
+ATTR_DNS_ANSWERS                                                // dns.answers
+
+GEN_AI_SYSTEM_VALUE_AZURE_AI_INFERENCE                          // "azure.ai.inference"
+GEN_AI_SYSTEM_VALUE_AZURE_AI_OPENAI                             // "azure.ai.openai"
+
+ATTR_K8S_CONTAINER_STATUS_REASON                                // k8s.container.status.reason
+  K8S_CONTAINER_STATUS_REASON_VALUE_COMPLETED                     // "Completed"
+  K8S_CONTAINER_STATUS_REASON_VALUE_CONTAINER_CANNOT_RUN          // "ContainerCannotRun"
+  K8S_CONTAINER_STATUS_REASON_VALUE_CONTAINER_CREATING            // "ContainerCreating"
+  K8S_CONTAINER_STATUS_REASON_VALUE_CRASH_LOOP_BACK_OFF           // "CrashLoopBackOff"
+  K8S_CONTAINER_STATUS_REASON_VALUE_CREATE_CONTAINER_CONFIG_ERROR // "CreateContainerConfigError"
+  K8S_CONTAINER_STATUS_REASON_VALUE_ERR_IMAGE_PULL                // "ErrImagePull"
+  K8S_CONTAINER_STATUS_REASON_VALUE_ERROR                         // "Error"
+  K8S_CONTAINER_STATUS_REASON_VALUE_IMAGE_PULL_BACK_OFF           // "ImagePullBackOff"
+  K8S_CONTAINER_STATUS_REASON_VALUE_OOM_KILLED                    // "OOMKilled"
+ATTR_K8S_CONTAINER_STATUS_STATE                                 // k8s.container.status.state
+  K8S_CONTAINER_STATUS_STATE_VALUE_RUNNING                        // "running"
+  K8S_CONTAINER_STATUS_STATE_VALUE_TERMINATED                     // "terminated"
+  K8S_CONTAINER_STATUS_STATE_VALUE_WAITING                        // "waiting"
+ATTR_K8S_HPA_METRIC_TYPE                                        // k8s.hpa.metric.type
+ATTR_K8S_HPA_SCALETARGETREF_API_VERSION                         // k8s.hpa.scaletargetref.api_version
+ATTR_K8S_HPA_SCALETARGETREF_KIND                                // k8s.hpa.scaletargetref.kind
+ATTR_K8S_HPA_SCALETARGETREF_NAME                                // k8s.hpa.scaletargetref.name
+ATTR_K8S_HUGEPAGE_SIZE                                          // k8s.hugepage.size
+ATTR_K8S_NODE_CONDITION_STATUS                                  // k8s.node.condition.status
+  K8S_NODE_CONDITION_STATUS_VALUE_CONDITION_FALSE                 // "false"
+  K8S_NODE_CONDITION_STATUS_VALUE_CONDITION_TRUE                  // "true"
+  K8S_NODE_CONDITION_STATUS_VALUE_CONDITION_UNKNOWN               // "unknown"
+ATTR_K8S_NODE_CONDITION_TYPE                                    // k8s.node.condition.type
+  K8S_NODE_CONDITION_TYPE_VALUE_DISK_PRESSURE                     // "DiskPressure"
+  K8S_NODE_CONDITION_TYPE_VALUE_MEMORY_PRESSURE                   // "MemoryPressure"
+  K8S_NODE_CONDITION_TYPE_VALUE_NETWORK_UNAVAILABLE               // "NetworkUnavailable"
+  K8S_NODE_CONDITION_TYPE_VALUE_PID_PRESSURE                      // "PIDPressure"
+  K8S_NODE_CONDITION_TYPE_VALUE_READY                             // "Ready"
+ATTR_K8S_RESOURCEQUOTA_RESOURCE_NAME                            // k8s.resourcequota.resource_name
+ATTR_K8S_STORAGECLASS_NAME                                      // k8s.storageclass.name
+
+ATTR_MAINFRAME_LPAR_NAME                                        // mainframe.lpar.name
+
+OS_TYPE_VALUE_ZOS                                               // "zos"
+
+OTEL_COMPONENT_TYPE_VALUE_PROMETHEUS_HTTP_TEXT_METRIC_EXPORTER  // "prometheus_http_text_metric_exporter"
+OTEL_COMPONENT_TYPE_VALUE_ZIPKIN_HTTP_SPAN_EXPORTER             // "zipkin_http_span_exporter"
+ATTR_OTEL_SPAN_PARENT_ORIGIN                                    // otel.span.parent.origin
+  OTEL_SPAN_PARENT_ORIGIN_VALUE_LOCAL                             // "local"
+  OTEL_SPAN_PARENT_ORIGIN_VALUE_NONE                              // "none"
+  OTEL_SPAN_PARENT_ORIGIN_VALUE_REMOTE                            // "remote"
+
+ATTR_ZOS_SMF_ID                                                 // zos.smf.id
+ATTR_ZOS_SYSPLEX_NAME                                           // zos.sysplex.name
+```
+
+</details>
+
+## 1.35.0
+
+**Known issue:** Changes from semantic conventions **v1.36.0** where accidentally released in this JS package with version **1.35.0**. Please use `@opentelemetry/semantic-conventions@1.36.0`.
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.36.0 [#5779](https://github.com/open-telemetry/opentelemetry-js/pull/5779) @trentm
+  * Changes from semantic conventions **v1.36.0** were incorrectly included in this release. See note above.
+
+* feat: improve the jsdoc comment on exported constants for enum values [#5784](https://github.com/open-telemetry/opentelemetry-js/pull/5784) @trentm
+  * The jsdoc comment for enum values now includes the 'brief', an
+    `@experimental` tag, and a `@deprecated` tag if the corresponding fields
+    exist on the semconv definition.
+
+## 1.34.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.34.0 [#5703](https://github.com/open-telemetry/opentelemetry-js/pull/5703) @trentm
+  * Semantic Conventions v1.34.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1340) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *none*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *12 added exports*
+
+#### Unstable changes in v1.34.0
+
+<details>
+<summary>12 added exports</summary>
+
+```js
+ATTR_AWS_BEDROCK_GUARDRAIL_ID             // aws.bedrock.guardrail.id
+ATTR_AWS_BEDROCK_KNOWLEDGE_BASE_ID        // aws.bedrock.knowledge_base.id
+ATTR_AWS_KINESIS_STREAM_NAME              // aws.kinesis.stream_name
+ATTR_AWS_LAMBDA_RESOURCE_MAPPING_ID       // aws.lambda.resource_mapping.id
+ATTR_AWS_SECRETSMANAGER_SECRET_ARN        // aws.secretsmanager.secret.arn
+ATTR_AWS_SNS_TOPIC_ARN                    // aws.sns.topic.arn
+ATTR_AWS_SQS_QUEUE_URL                    // aws.sqs.queue.url
+ATTR_AWS_STEP_FUNCTIONS_ACTIVITY_ARN      // aws.step_functions.activity.arn
+ATTR_AWS_STEP_FUNCTIONS_STATE_MACHINE_ARN // aws.step_functions.state_machine.arn
+
+ATTR_FEATURE_FLAG_RESULT_VALUE            // feature_flag.result.value
+
+ATTR_GEN_AI_CONVERSATION_ID               // gen_ai.conversation.id
+ATTR_GEN_AI_DATA_SOURCE_ID                // gen_ai.data_source.id
+```
+
+</details>
+
+## 1.33.1
+
+### :boom: Breaking Changes
+
+* fix: Remove the subset of `DB_SYSTEM_NAME_VALUE_*` exports that are unstable from the `@opentelemetry/semantic-conventions` entry point. [#5690](https://github.com/open-telemetry/opentelemetry-js/pull/5690)
+  * Version 1.33.0 erroneously included all `DB_SYSTEM_NAME_VALUE_*` constants in the stable entry point. Some of those enum values are not yet stable. They have been moved back to the unstable `@opentelemetry/semantic-conventions/incubating` entry point. See the PR description for a full list.
 
 ## 1.33.0
 

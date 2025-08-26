@@ -113,7 +113,7 @@ function serverStreamAndBidiHandler<RequestType, ResponseType>(
   // TODO: Investigate this call/signature – it was inherited from very old
   // code and the `this: {}` is highly suspicious, and likely isn't doing
   // anything useful. There is probably a more precise cast we can do here.
-  // eslint-disable-next-line @typescript-eslint/ban-types
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   return (original as Function).call({}, call);
 }
 
@@ -161,7 +161,7 @@ function clientStreamAndUnaryHandler<RequestType, ResponseType>(
   // TODO: Investigate this call/signature – it was inherited from very old
   // code and the `this: {}` is highly suspicious, and likely isn't doing
   // anything useful. There is probably a more precise cast we can do here.
-  // eslint-disable-next-line @typescript-eslint/ban-types
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   return (original as Function).call({}, call, patchedCallback);
 }
 
@@ -220,7 +220,7 @@ export function handleUntracedServerFunction<RequestType, ResponseType>(
       // TODO: Investigate this call/signature – it was inherited from very old
       // code and the `this: {}` is highly suspicious, and likely isn't doing
       // anything useful. There is probably a more precise cast we can do here.
-      // eslint-disable-next-line @typescript-eslint/ban-types
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
       return (originalFunc as Function).call({}, call, callback);
     case 'serverStream':
     case 'server_stream':
@@ -228,7 +228,7 @@ export function handleUntracedServerFunction<RequestType, ResponseType>(
       // TODO: Investigate this call/signature – it was inherited from very old
       // code and the `this: {}` is highly suspicious, and likely isn't doing
       // anything useful. There is probably a more precise cast we can do here.
-      // eslint-disable-next-line @typescript-eslint/ban-types
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
       return (originalFunc as Function).call({}, call);
     default:
       break;

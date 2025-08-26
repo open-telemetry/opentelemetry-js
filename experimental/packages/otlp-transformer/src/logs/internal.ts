@@ -79,17 +79,20 @@ function logRecordsToResourceLogs(
   encoder: Encoder
 ): IResourceLogs[] {
   const resourceMap = createResourceMap(logRecords);
-  return Array.from(resourceMap, ([resource, ismMap]) => ({
-    resource: createResource(resource),
-    scopeLogs: Array.from(ismMap, ([, scopeLogs]) => {
-      return {
-        scope: createInstrumentationScope(scopeLogs[0].instrumentationScope),
-        logRecords: scopeLogs.map(log => toLogRecord(log, encoder)),
-        schemaUrl: scopeLogs[0].instrumentationScope.schemaUrl,
-      };
-    }),
-    schemaUrl: undefined,
-  }));
+  return Array.from(resourceMap, ([resource, ismMap]) => {
+    const processedResource = createResource(resource);
+    return {
+      resource: processedResource,
+      scopeLogs: Array.from(ismMap, ([, scopeLogs]) => {
+        return {
+          scope: createInstrumentationScope(scopeLogs[0].instrumentationScope),
+          logRecords: scopeLogs.map(log => toLogRecord(log, encoder)),
+          schemaUrl: scopeLogs[0].instrumentationScope.schemaUrl,
+        };
+      }),
+      schemaUrl: processedResource.schemaUrl,
+    };
+  });
 }
 
 function toLogRecord(log: ReadableLogRecord, encoder: Encoder): ILogRecord {
@@ -99,6 +102,7 @@ function toLogRecord(log: ReadableLogRecord, encoder: Encoder): ILogRecord {
     severityNumber: toSeverityNumber(log.severityNumber),
     severityText: log.severityText,
     body: toAnyValue(log.body),
+    eventName: log.eventName,
     attributes: toLogAttributes(log.attributes),
     droppedAttributesCount: log.droppedAttributesCount,
     flags: log.spanContext?.traceFlags,

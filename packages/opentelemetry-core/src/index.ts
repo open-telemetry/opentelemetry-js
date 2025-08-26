@@ -15,7 +15,8 @@
  */
 
 export { W3CBaggagePropagator } from './baggage/propagation/W3CBaggagePropagator';
-export { AnchoredClock, Clock } from './common/anchored-clock';
+export { AnchoredClock } from './common/anchored-clock';
+export type { Clock } from './common/anchored-clock';
 export { isAttributeValue, sanitizeAttributes } from './common/attributes';
 export {
   globalErrorHandler,
@@ -36,8 +37,9 @@ export {
   millisToHrTime,
   timeInputToHrTime,
 } from './common/time';
-export { ErrorHandler, InstrumentationScope } from './common/types';
-export { ExportResult, ExportResultCode } from './ExportResult';
+export type { ErrorHandler, InstrumentationScope } from './common/types';
+export { ExportResultCode } from './ExportResult';
+export type { ExportResult } from './ExportResult';
 export { parseKeyPairsIntoRecord } from './baggage/utils';
 export {
   SDK_INFO,
@@ -49,10 +51,8 @@ export {
   otperformance,
   unrefTimer,
 } from './platform';
-export {
-  CompositePropagator,
-  CompositePropagatorConfig,
-} from './propagation/composite';
+export { CompositePropagator } from './propagation/composite';
+export type { CompositePropagatorConfig } from './propagation/composite';
 export {
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
@@ -60,12 +60,12 @@ export {
   parseTraceParent,
 } from './trace/W3CTraceContextPropagator';
 export {
-  RPCMetadata,
   RPCType,
   deleteRPCMetadata,
   getRPCMetadata,
   setRPCMetadata,
 } from './trace/rpc-metadata';
+export type { RPCMetadata } from './trace/rpc-metadata';
 export {
   isTracingSuppressed,
   suppressTracing,

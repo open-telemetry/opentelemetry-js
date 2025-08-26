@@ -1,0 +1,72 @@
+# ts-experimental/... generates the "semantic-conventions/src/experimental_*.ts"
+# files.
+
+# Notes:
+# - Use `""` and `null` with `exclude_stability` to skip attributes/metrics that
+#   accidentally do not have a stability set
+#   (e.g. https://github.com/open-telemetry/semantic-conventions/issues/1777).
+templates:
+  - pattern: attributes.ts.j2
+    file_name: "experimental_attributes.ts"
+    # This "exclude_stability" does *not* exclude "stable" because it needs
+    # to process *stable* enums that might have *unstable* members. (e.g.,
+    # `db.system.name` is stable, but some of its enum values are not.)
+    filter: >
+      semconv_attributes({
+        "exclude_stability": ["", null]
+      }) | {
+        attributes: .
+      }
+    application_mode: single
+  - pattern: metrics.ts.j2
+    file_name: "experimental_metrics.ts"
+    filter: >
+      semconv_metrics({
+        "exclude_stability": ["stable", "", null]
+      }) | {
+        metrics: .
+      }
+    application_mode: single
+  - pattern: events.ts.j2
+    file_name: "experimental_events.ts"
+    filter: >
+      semconv_signal("event"; {
+        "exclude_stability": ["stable", "", null]
+      })
+      | sort_by(.name)
+      | { events: .  }
+    application_mode: single
+
+params:
+  excluded_attributes: ["messaging.client_id"]
+
+##
+# Everything below here is expected to be the same as in "../ts-*/weaver.yaml".
+##
+
+# https://github.com/open-telemetry/weaver/blob/main/crates/weaver_forge/README.md#comment-filter
+comment_formats:
+  jsdoc:
+    format: markdown
+    header: '/**'
+    # Note: This results in trailing whitespace on empty lines. IMHO the
+    # 'comment' filter should handle those.
+    prefix: ' * '
+    footer: ' */'
+    trim: true
+    indent_first_level_list_items: true
+    escape_backslashes: true
+default_comment_format: jsdoc
+
+# Whitespace control settings to simplify the definition of templates
+whitespace_control:
+  trim_blocks: true
+  lstrip_blocks: true
+
+text_maps:
+  js_types:
+    int: number
+    double: number
+    boolean: boolean
+    string: string
+    string[]: string[]

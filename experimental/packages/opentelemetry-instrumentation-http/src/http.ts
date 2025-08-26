@@ -53,6 +53,7 @@ import {
 } from '@opentelemetry/instrumentation';
 import { errorMonitor } from 'events';
 import {
+  ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
   ATTR_NETWORK_PROTOCOL_VERSION,
@@ -208,6 +209,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'http',
       ['*'],
       (moduleExports: Http): Http => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const isESM = (moduleExports as any)[Symbol.toStringTag] === 'Module';
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           const patchedRequest = this._wrap(
@@ -223,7 +225,9 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           if (isESM) {
             // To handle `import http from 'http'`, which returns the default
             // export, we need to set `module.default.*`.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (moduleExports as any).default.request = patchedRequest;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (moduleExports as any).default.get = patchedGet;
           }
         }
@@ -255,6 +259,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'https',
       ['*'],
       (moduleExports: Https): Https => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const isESM = (moduleExports as any)[Symbol.toStringTag] === 'Module';
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           const patchedRequest = this._wrap(
@@ -270,7 +275,9 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           if (isESM) {
             // To handle `import https from 'https'`, which returns the default
             // export, we need to set `module.default.*`.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (moduleExports as any).default.request = patchedRequest;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (moduleExports as any).default.get = patchedGet;
           }
         }
@@ -350,7 +357,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     return (original: Func<http.ClientRequest>): Func<http.ClientRequest> => {
       const instrumentation = this;
       return function httpsOutgoingRequest(
-        // eslint-disable-next-line node/no-unsupported-features/node-builtins
+        // eslint-disable-next-line n/no-unsupported-features/node-builtins
         options: https.RequestOptions | string | URL,
         ...args: HttpRequestArgs
       ): http.ClientRequest {
@@ -378,7 +385,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   /** Patches HTTPS outgoing get requests */
   private _getPatchHttpsOutgoingGetFunction(
     clientRequest: (
-      // eslint-disable-next-line node/no-unsupported-features/node-builtins
+      // eslint-disable-next-line n/no-unsupported-features/node-builtins
       options: http.RequestOptions | string | URL,
       ...args: HttpRequestArgs
     ) => http.ClientRequest
@@ -386,7 +393,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     return (original: Func<http.ClientRequest>): Func<http.ClientRequest> => {
       const instrumentation = this;
       return function httpsOutgoingRequest(
-        // eslint-disable-next-line node/no-unsupported-features/node-builtins
+        // eslint-disable-next-line n/no-unsupported-features/node-builtins
         options: https.RequestOptions | string | URL,
         ...args: HttpRequestArgs
       ): http.ClientRequest {
@@ -510,17 +517,12 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             return;
           }
           responseFinished = true;
-          setSpanWithError(span, error, this._semconvStability);
-          span.setStatus({
-            code: SpanStatusCode.ERROR,
-            message: error.message,
-          });
-          this._closeHttpSpan(
+          this._onOutgoingRequestError(
             span,
-            SpanKind.CLIENT,
-            startTime,
             oldMetricAttributes,
-            stableMetricAttributes
+            stableMetricAttributes,
+            startTime,
+            error
           );
         });
       }
@@ -545,14 +547,12 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         return;
       }
       responseFinished = true;
-      setSpanWithError(span, error, this._semconvStability);
-
-      this._closeHttpSpan(
+      this._onOutgoingRequestError(
         span,
-        SpanKind.CLIENT,
-        startTime,
         oldMetricAttributes,
-        stableMetricAttributes
+        stableMetricAttributes,
+        startTime,
+        error
       );
     });
 
@@ -699,17 +699,12 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             () => original.apply(this, [event, ...args]),
             error => {
               if (error) {
-                setSpanWithError(
+                instrumentation._onServerResponseError(
                   span,
-                  error,
-                  instrumentation._semconvStability
-                );
-                instrumentation._closeHttpSpan(
-                  span,
-                  SpanKind.SERVER,
-                  startTime,
                   oldMetricAttributes,
-                  stableMetricAttributes
+                  stableMetricAttributes,
+                  startTime,
+                  error
                 );
                 throw error;
               }
@@ -775,6 +770,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             optionsParsed,
             instrumentation.getConfig().startOutgoingSpanHook
           ),
+          redactedQueryParams: instrumentation.getConfig().redactedQueryParams, // Added config for adding custom query strings
         },
         instrumentation._semconvStability,
         instrumentation.getConfig().enableSyntheticSourceDetection || false
@@ -844,14 +840,12 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           },
           error => {
             if (error) {
-              setSpanWithError(span, error, instrumentation._semconvStability);
-
-              instrumentation._closeHttpSpan(
+              instrumentation._onOutgoingRequestError(
                 span,
-                SpanKind.CLIENT,
-                startTime,
                 oldMetricAttributes,
-                stableMetricAttributes
+                stableMetricAttributes,
+                startTime,
+                error
               );
               throw error;
             }
@@ -930,6 +924,25 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     );
   }
 
+  private _onOutgoingRequestError(
+    span: Span,
+    oldMetricAttributes: Attributes,
+    stableMetricAttributes: Attributes,
+    startTime: HrTime,
+    error: Err
+  ) {
+    setSpanWithError(span, error, this._semconvStability);
+    stableMetricAttributes[ATTR_ERROR_TYPE] = error.name;
+
+    this._closeHttpSpan(
+      span,
+      SpanKind.CLIENT,
+      startTime,
+      oldMetricAttributes,
+      stableMetricAttributes
+    );
+  }
+
   private _onServerResponseError(
     span: Span,
     oldMetricAttributes: Attributes,
@@ -938,7 +951,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     error: Err
   ) {
     setSpanWithError(span, error, this._semconvStability);
-    // TODO get error attributes for metrics
+    stableMetricAttributes[ATTR_ERROR_TYPE] = error.name;
+
     this._closeHttpSpan(
       span,
       SpanKind.SERVER,

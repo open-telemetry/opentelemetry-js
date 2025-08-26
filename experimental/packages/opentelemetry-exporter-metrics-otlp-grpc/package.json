@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-metrics-otlp-grpc",
-  "version": "0.200.0",
+  "version": "0.203.0",
   "description": "OpenTelemetry Collector Metrics Exporter allows user to send collected metrics to the OpenTelemetry Collector",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -15,7 +15,7 @@
     "test": "nyc mocha 'test/**/*.test.ts'",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc -w",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
+    "precompile": "lerna run version --scope @opentelemetry/exporter-metrics-otlp-grpc --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
@@ -52,11 +52,10 @@
     "@types/mocha": "10.0.10",
     "@types/node": "18.6.5",
     "@types/sinon": "17.0.4",
-    "cross-var": "1.1.0",
     "lerna": "6.6.2",
     "mocha": "11.1.0",
     "nyc": "17.1.0",
-    "sinon": "15.1.2",
+    "sinon": "18.0.1",
     "ts-loader": "9.5.2",
     "typescript": "5.0.4"
   },
@@ -65,13 +64,13 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.7.1",
-    "@opentelemetry/core": "2.0.0",
-    "@opentelemetry/exporter-metrics-otlp-http": "0.200.0",
-    "@opentelemetry/otlp-exporter-base": "0.200.0",
-    "@opentelemetry/otlp-grpc-exporter-base": "0.200.0",
-    "@opentelemetry/otlp-transformer": "0.200.0",
-    "@opentelemetry/resources": "2.0.0",
-    "@opentelemetry/sdk-metrics": "2.0.0"
+    "@opentelemetry/core": "2.0.1",
+    "@opentelemetry/exporter-metrics-otlp-http": "0.203.0",
+    "@opentelemetry/otlp-exporter-base": "0.203.0",
+    "@opentelemetry/otlp-grpc-exporter-base": "0.203.0",
+    "@opentelemetry/otlp-transformer": "0.203.0",
+    "@opentelemetry/resources": "2.0.1",
+    "@opentelemetry/sdk-metrics": "2.0.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-grpc",
   "sideEffects": false

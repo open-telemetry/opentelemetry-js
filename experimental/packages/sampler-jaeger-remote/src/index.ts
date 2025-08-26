@@ -15,4 +15,5 @@
  */
 
 export { JaegerRemoteSampler } from './JaegerRemoteSampler';
-export { StrategyType, ProbabilisticSamplingOptions } from './types';
+export { StrategyType } from './types';
+export type { ProbabilisticSamplingOptions } from './types';

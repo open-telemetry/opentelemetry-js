@@ -15,4 +15,4 @@
  */
 
 export { JaegerExporter } from './jaeger';
-export { ExporterConfig } from './types';
+export type { ExporterConfig } from './types';
