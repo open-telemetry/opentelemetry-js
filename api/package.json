@@ -92,7 +92,7 @@
     "mocha": "11.1.0",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
-    "ts-loader": "9.5.2",
+    "ts-loader": "9.5.4",
     "typescript": "5.0.4",
     "unionfs": "4.5.4",
     "webpack": "5.101.3"
