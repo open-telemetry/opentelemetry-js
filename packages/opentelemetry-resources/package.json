@@ -81,7 +81,7 @@
     "nyc": "17.1.0",
     "sinon": "18.0.1",
     "typescript": "5.0.4",
-    "webpack": "5.99.9",
+    "webpack": "5.101.3",
     "webpack-cli": "6.0.1"
   },
   "peerDependencies": {
