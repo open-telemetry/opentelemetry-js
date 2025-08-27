@@ -57,7 +57,7 @@ describe('sendWithHttp', function () {
       url,
       headers: () => ({ 'Content-Type': 'application/json' }),
       compression: 'none' as const,
-      agentOptions: { keepAlive: true },
+      agentFactory: () => mockAgent,
     };
   }
 
@@ -118,6 +118,7 @@ describe('sendWithHttp', function () {
     const params = createTestParams('http://localhost:4318/v1/logs');
 
     sendWithHttp(
+      http.request,
       params,
       mockAgent,
       new Uint8Array([1, 2, 3]),
@@ -184,6 +185,7 @@ describe('sendWithHttp', function () {
     const params = createTestParams('./api/logs');
 
     sendWithHttp(
+      http.request,
       params,
       mockAgent,
       new Uint8Array([1, 2, 3]),
@@ -271,6 +273,7 @@ describe('sendWithHttp', function () {
       const params = createTestParams(input);
 
       sendWithHttp(
+        http.request,
         params,
         mockAgent,
         new Uint8Array([1, 2, 3]),
@@ -301,6 +304,7 @@ describe('sendWithHttp', function () {
 
     try {
       sendWithHttp(
+        http.request,
         params,
         mockAgent,
         new Uint8Array([1, 2, 3]),
@@ -338,6 +342,7 @@ describe('sendWithHttp', function () {
 
     try {
       sendWithHttp(
+        http.request,
         params,
         mockAgent,
         new Uint8Array([1, 2, 3]),
