@@ -17,6 +17,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :rocket: Features
 
 * feat(otlp-exporter-base): Add fetch transport for fetch-only environments like service workers. [#5807](https://github.com/open-telemetry/opentelemetry-js/pull/5807)
+  * when using headers, the Browser exporter now prefers `fetch` over `XMLHttpRequest` if present. Sending via `XMLHttpRequest` will be removed in a future release.
+
 * feat(opentelemetry-configuration): creation of basic ConfigProvider [#5809](https://github.com/open-telemetry/opentelemetry-js/pull/5809) @maryliag
 * feat(opentelemetry-configuration): creation of basic FileConfigProvider [#5863](https://github.com/open-telemetry/opentelemetry-js/pull/5863) @maryliag
 
