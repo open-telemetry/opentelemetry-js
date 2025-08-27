@@ -197,7 +197,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     this._headerCapture = this._createHeaderCapture();
   }
 
-  init(): [
+  protected override init(): [
     InstrumentationNodeModuleDefinition,
     InstrumentationNodeModuleDefinition,
   ] {
