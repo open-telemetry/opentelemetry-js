@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1756307485238,
+  "lastUpdate": 1756310581053,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -36768,6 +36768,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.57%",
             "unit": "ops/sec",
             "extra": "91 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "29139614+renovate[bot]@users.noreply.github.com",
+            "name": "renovate[bot]",
+            "username": "renovate[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "7328a78e5fcc6bf267182c809ba5083bbc372aef",
+          "message": "chore(deps): update dependency eslint-plugin-prettier to v5.5.4 (#5882)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+          "timestamp": "2025-08-27T15:53:49Z",
+          "tree_id": "b2cdf547498bc16275ad4091049db074390af81c",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/7328a78e5fcc6bf267182c809ba5083bbc372aef"
+        },
+        "date": 1756310580017,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 702333,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8768,
+            "range": "±0.75%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 299136,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 285558,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
