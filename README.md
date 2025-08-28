@@ -58,7 +58,7 @@ npm install --save @opentelemetry/sdk-node
 npm install --save @opentelemetry/auto-instrumentations-node
 ```
 
-**Note:** `auto-instrumentations-node` is a meta package from [opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/metapackages/auto-instrumentations-node) that provides a simple way to initialize multiple Node.js instrumentations.
+**Note:** `auto-instrumentations-node` is a meta package from [opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/packages/auto-instrumentations-node) that provides a simple way to initialize multiple Node.js instrumentations.
 
 ### Set up Tracing
 
