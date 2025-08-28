@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1756370536223,
+  "lastUpdate": 1756371674471,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -37026,6 +37026,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 275890,
             "range": "±0.68%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "29139614+renovate[bot]@users.noreply.github.com",
+            "name": "renovate[bot]",
+            "username": "renovate[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "95b40aa58ed2cc1dceec028c032c2582268423c3",
+          "message": "chore(deps): update dependency @protobuf-ts/runtime-rpc to v2.11.1 (#5890)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+          "timestamp": "2025-08-28T08:52:08Z",
+          "tree_id": "e163b1c6e05e62ad6638eac90857362638d3927b",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/95b40aa58ed2cc1dceec028c032c2582268423c3"
+        },
+        "date": 1756371673427,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 675018,
+            "range": "±1.09%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8411,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 294717,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 276898,
+            "range": "±0.57%",
             "unit": "ops/sec",
             "extra": "94 samples"
           }
