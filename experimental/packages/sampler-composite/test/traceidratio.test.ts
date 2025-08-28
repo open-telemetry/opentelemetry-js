@@ -19,8 +19,8 @@ import { context, SpanKind } from '@opentelemetry/api';
 import { SamplingDecision } from '@opentelemetry/sdk-trace-base';
 
 import {
-  composite_sampler,
-  composable_trace_id_ratio_based_sampler,
+  createCompositeSampler,
+  createComposableTraceIDRatioBasedSampler,
 } from '../src';
 import { traceIdGenerator } from './util';
 import { parseOtelTraceState } from '../src/tracestate';
@@ -35,7 +35,7 @@ describe('ComposableTraceIDRatioBasedSampler', () => {
     { ratio: 0, thresholdStr: 'max' },
   ].forEach(({ ratio, thresholdStr }) => {
     it(`should have a description for ratio ${ratio}`, () => {
-      const sampler = composable_trace_id_ratio_based_sampler(ratio);
+      const sampler = createComposableTraceIDRatioBasedSampler(ratio);
       assert.strictEqual(
         sampler.toString(),
         `ComposableTraceIDRatioBasedSampler(threshold=${thresholdStr}, ratio=${ratio})`
@@ -55,8 +55,8 @@ describe('ComposableTraceIDRatioBasedSampler', () => {
     { ratio: 0.05, threshold: 68454714336031539n },
   ].forEach(({ ratio, threshold }) => {
     it(`should sample spans with ratio ${ratio}`, () => {
-      const sampler = composite_sampler(
-        composable_trace_id_ratio_based_sampler(ratio)
+      const sampler = createCompositeSampler(
+        createComposableTraceIDRatioBasedSampler(ratio)
       );
 
       const generator = traceIdGenerator();

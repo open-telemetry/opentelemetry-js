@@ -49,7 +49,7 @@ class CompositeSampler implements Sampler {
     const spanContext = trace.getSpanContext(context);
 
     const traceState = spanContext?.traceState;
-    const otTraceState = parseOtelTraceState(traceState);
+    let otTraceState = parseOtelTraceState(traceState);
 
     const intent = this.delegate.getSamplingIntent(
       context,
@@ -78,9 +78,15 @@ class CompositeSampler implements Sampler {
       ? SamplingDecision.RECORD_AND_SAMPLED
       : SamplingDecision.NOT_RECORD;
     if (sampled && adjustedCountCorrect) {
-      otTraceState.threshold = intent.threshold;
+      otTraceState = {
+        ...otTraceState,
+        threshold: intent.threshold,
+      };
     } else {
-      otTraceState.threshold = INVALID_THRESHOLD;
+      otTraceState = {
+        ...otTraceState,
+        threshold: INVALID_THRESHOLD,
+      };
     }
 
     const otts = serializeTraceState(otTraceState);
@@ -105,12 +111,16 @@ class CompositeSampler implements Sampler {
       traceState: newTraceState,
     };
   }
+
+  toString(): string {
+    return this.delegate.toString();
+  }
 }
 
 /**
  * Returns a composite sampler that uses a composable sampler to make its
  * sampling decisions while handling tracestate.
  */
-export function composite_sampler(delegate: ComposableSampler): Sampler {
+export function createCompositeSampler(delegate: ComposableSampler): Sampler {
   return new CompositeSampler(delegate);
 }

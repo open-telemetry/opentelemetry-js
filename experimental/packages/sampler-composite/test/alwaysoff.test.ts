@@ -19,11 +19,14 @@ import * as assert from 'assert';
 import { context, SpanKind } from '@opentelemetry/api';
 import { SamplingDecision } from '@opentelemetry/sdk-trace-base';
 
-import { composite_sampler, composable_always_off_sampler } from '../src';
+import {
+  createCompositeSampler,
+  createComposableAlwaysOffSampler,
+} from '../src';
 import { traceIdGenerator } from './util';
 
 describe('ComposableAlwaysOffSampler', () => {
-  const composableSampler = composable_always_off_sampler();
+  const composableSampler = createComposableAlwaysOffSampler();
 
   it('should have a description', () => {
     assert.strictEqual(
@@ -47,7 +50,7 @@ describe('ComposableAlwaysOffSampler', () => {
   });
 
   it('should never sample', () => {
-    const sampler = composite_sampler(composableSampler);
+    const sampler = createCompositeSampler(composableSampler);
     const generator = traceIdGenerator();
     let numSampled = 0;
     for (let i = 0; i < 10000; i++) {

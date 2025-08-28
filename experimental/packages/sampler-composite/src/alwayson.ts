@@ -36,6 +36,6 @@ const _sampler = new ComposableAlwaysOnSampler();
 /**
  * Returns a composable sampler that samples all span.
  */
-export function composable_always_on_sampler(): ComposableSampler {
+export function createComposableAlwaysOnSampler(): ComposableSampler {
   return _sampler;
 }

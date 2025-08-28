@@ -22,20 +22,20 @@ in exported spans to reconstruct population metrics.
 
 ```typescript
 import {
-  CompositeSampler,
-  ComposableAlwaysOffSampler,
-  ComposableAlwaysOnSampler,
-  ComposableParentThresholdSampler,
-  ComposableTraceIDRatioBasedSampler,
+  createCompositeSampler,
+  createComposableAlwaysOffSampler,
+  createComposableAlwaysOnSampler,
+  createComposableParentThresholdSampler,
+  createComposableTraceIDRatioBasedSampler,
 } from '@opentelemetry/sampler-composite';
 
 // never sample
-const sampler = new CompositeSampler(new ComposableAlwaysOffSampler());
+const sampler = createCompositeSampler(createComposableAlwaysOffSampler());
 // always sample
-const sampler = new CompositeSampler(new ComposableAlwaysOnSampler());
+const sampler = createCompositeSampler(createComposableAlwaysOnSampler());
 // follow the parent, or otherwise sample with a probability if root
-const sampler = new CompositeSampler(
-    new ComposableParentThresholdSampler(new ComposableTraceIDRatioBasedSampler(0.3)));
+const sampler = createCompositeSampler(
+    createComposableParentThresholdSampler(createComposableTraceIDRatioBasedSampler(0.3)));
 ```
 
 ## Useful links

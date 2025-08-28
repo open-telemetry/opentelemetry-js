@@ -16,24 +16,29 @@
 
 import * as assert from 'assert';
 
-import { context, SpanContext, SpanKind, TraceFlags } from '@opentelemetry/api';
+import {
+  context,
+  SpanContext,
+  SpanKind,
+  TraceFlags,
+  trace,
+} from '@opentelemetry/api';
 import { SamplingDecision } from '@opentelemetry/sdk-trace-base';
 
 import {
-  composite_sampler,
-  composable_always_off_sampler,
-  composable_always_on_sampler,
-  composable_parent_threshold_sampler,
-  composable_trace_id_ratio_based_sampler,
+  createCompositeSampler,
+  createComposableAlwaysOffSampler,
+  createComposableAlwaysOnSampler,
+  createComposableParentThresholdSampler,
+  createComposableTraceIDRatioBasedSampler,
 } from '../src';
 import { INVALID_RANDOM_VALUE, INVALID_THRESHOLD } from '../src/util';
 import {
-  invalidTraceState,
+  INVALID_TRACE_STATE,
   parseOtelTraceState,
   serializeTraceState,
 } from '../src/tracestate';
 import { TraceState } from '@opentelemetry/core';
-import { setSpanContext } from '../../../../api/src/trace/context-utils';
 
 describe('ConsistentSampler', () => {
   const traceId = '00112233445566778800000000000000';
@@ -41,7 +46,7 @@ describe('ConsistentSampler', () => {
 
   [
     {
-      sampler: composable_always_on_sampler(),
+      sampler: createComposableAlwaysOnSampler(),
       parentSampled: true,
       parentThreshold: undefined,
       parentRandomValue: undefined,
@@ -51,7 +56,7 @@ describe('ConsistentSampler', () => {
       testId: 'min threshold no parent random value',
     },
     {
-      sampler: composable_always_on_sampler(),
+      sampler: createComposableAlwaysOnSampler(),
       parentSampled: true,
       parentThreshold: undefined,
       parentRandomValue: 0x7f99aa40c02744n,
@@ -61,7 +66,7 @@ describe('ConsistentSampler', () => {
       testId: 'min threshold with parent random value',
     },
     {
-      sampler: composable_always_off_sampler(),
+      sampler: createComposableAlwaysOffSampler(),
       parentSampled: true,
       parentThreshold: undefined,
       parentRandomValue: undefined,
@@ -71,8 +76,8 @@ describe('ConsistentSampler', () => {
       testId: 'max threshold',
     },
     {
-      sampler: composable_parent_threshold_sampler(
-        composable_always_on_sampler()
+      sampler: createComposableParentThresholdSampler(
+        createComposableAlwaysOnSampler()
       ),
       parentSampled: false,
       parentThreshold: 0x7f99aa40c02744n,
@@ -83,8 +88,8 @@ describe('ConsistentSampler', () => {
       testId: 'parent based in consistent mode',
     },
     {
-      sampler: composable_parent_threshold_sampler(
-        composable_always_on_sampler()
+      sampler: createComposableParentThresholdSampler(
+        createComposableAlwaysOnSampler()
       ),
       parentSampled: true,
       parentThreshold: undefined,
@@ -95,7 +100,7 @@ describe('ConsistentSampler', () => {
       testId: 'parent based in legacy mode',
     },
     {
-      sampler: composable_trace_id_ratio_based_sampler(0.5),
+      sampler: createComposableTraceIDRatioBasedSampler(0.5),
       parentSampled: true,
       parentThreshold: undefined,
       parentRandomValue: 0x7fffffffffffffn,
@@ -105,7 +110,7 @@ describe('ConsistentSampler', () => {
       testId: 'half threshold not sampled',
     },
     {
-      sampler: composable_trace_id_ratio_based_sampler(0.5),
+      sampler: createComposableTraceIDRatioBasedSampler(0.5),
       parentSampled: false,
       parentThreshold: undefined,
       parentRandomValue: 0x80000000000000n,
@@ -115,7 +120,7 @@ describe('ConsistentSampler', () => {
       testId: 'half threshold sampled',
     },
     {
-      sampler: composable_trace_id_ratio_based_sampler(1.0),
+      sampler: createComposableTraceIDRatioBasedSampler(1.0),
       parentSampled: false,
       parentThreshold: 0x80000000000000n,
       parentRandomValue: 0x80000000000000n,
@@ -136,12 +141,18 @@ describe('ConsistentSampler', () => {
       testId,
     }) => {
       it(`should sample with ${testId}`, () => {
-        const parentOtTraceState = invalidTraceState();
+        let parentOtTraceState = INVALID_TRACE_STATE;
         if (parentThreshold !== undefined) {
-          parentOtTraceState.threshold = parentThreshold;
+          parentOtTraceState = {
+            ...parentOtTraceState,
+            threshold: parentThreshold,
+          };
         }
         if (parentRandomValue !== undefined) {
-          parentOtTraceState.randomValue = parentRandomValue;
+          parentOtTraceState = {
+            ...parentOtTraceState,
+            randomValue: parentRandomValue,
+          };
         }
         const parentOt = serializeTraceState(parentOtTraceState);
         const parentTraceState = parentOt
@@ -154,12 +165,12 @@ describe('ConsistentSampler', () => {
           traceFlags,
           traceState: parentTraceState,
         };
-        const parentContext = setSpanContext(
+        const parentContext = trace.setSpanContext(
           context.active(),
           parentSpanContext
         );
 
-        const result = composite_sampler(sampler).shouldSample(
+        const result = createCompositeSampler(sampler).shouldSample(
           parentContext,
           traceId,
           'name',

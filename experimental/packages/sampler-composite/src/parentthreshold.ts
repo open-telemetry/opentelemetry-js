@@ -31,7 +31,7 @@ class ComposableParentThresholdSampler implements ComposableSampler {
   private readonly description: string;
 
   constructor(private readonly rootSampler: ComposableSampler) {
-    this.description = `ComposableParentThresholdSampler(root_sampler=${rootSampler})`;
+    this.description = `ComposableParentThresholdSampler(rootSampler=${rootSampler})`;
   }
 
   getSamplingIntent(
@@ -82,7 +82,7 @@ class ComposableParentThresholdSampler implements ComposableSampler {
  * Returns a composable sampler that respects the sampling decision of the
  * parent span or falls back to the given sampler if it is a root span.
  */
-export function composable_parent_threshold_sampler(
+export function createComposableParentThresholdSampler(
   rootSampler: ComposableSampler
 ): ComposableSampler {
   return new ComposableParentThresholdSampler(rootSampler);

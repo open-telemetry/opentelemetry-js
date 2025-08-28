@@ -32,12 +32,10 @@ export type OtelTraceState = {
   rest?: string[];
 };
 
-export function invalidTraceState(): OtelTraceState {
-  return {
-    randomValue: INVALID_RANDOM_VALUE,
-    threshold: INVALID_THRESHOLD,
-  };
-}
+export const INVALID_TRACE_STATE: OtelTraceState = {
+  randomValue: INVALID_RANDOM_VALUE,
+  threshold: INVALID_THRESHOLD,
+};
 
 const TRACE_STATE_SIZE_LIMIT = 256;
 const MAX_VALUE_LENGTH = 14; // 56 bits, 4 bits per hex digit
@@ -47,12 +45,13 @@ export function parseOtelTraceState(
 ): OtelTraceState {
   const ot = traceState?.get('ot');
   if (!ot || ot.length > TRACE_STATE_SIZE_LIMIT) {
-    return invalidTraceState();
+    return INVALID_TRACE_STATE;
   }
 
   let threshold = INVALID_THRESHOLD;
   let randomValue = INVALID_RANDOM_VALUE;
 
+  // Parse based on https://opentelemetry.io/docs/specs/otel/trace/tracestate-handling/
   const members = ot.split(';');
   let rest: string[] | undefined;
   for (const member of members) {
@@ -115,15 +114,11 @@ function parseTh(value: string, defaultValue: bigint): bigint {
     return defaultValue;
   }
 
-  let parsed: bigint;
   try {
-    parsed = BigInt(`0x${value}`);
+    return BigInt('0x' + value.padEnd(MAX_VALUE_LENGTH, '0'));
   } catch {
     return defaultValue;
   }
-
-  const trailingZeros = MAX_VALUE_LENGTH - value.length;
-  return parsed << BigInt(trailingZeros * 4);
 }
 
 function parseRv(value: string, defaultValue: bigint): bigint {

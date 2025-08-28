@@ -37,7 +37,9 @@ class ComposableTraceIDRatioBasedSampler implements ComposableSampler {
         thresholdReliable: true,
       };
     } else {
-      // Same as AlwaysOff, notably the threshold is not considered reliable
+      // Same as AlwaysOff, notably the threshold is not considered reliable. The spec mentions
+      // returning an instance of ComposableAlwaysOffSampler in this case but it seems clearer
+      // if the description of the sampler matches the user's request.
       this.intent = {
         threshold: INVALID_THRESHOLD,
         thresholdReliable: false,
@@ -58,7 +60,7 @@ class ComposableTraceIDRatioBasedSampler implements ComposableSampler {
 /**
  * Returns a composable sampler that samples each span with a fixed ratio.
  */
-export function composable_trace_id_ratio_based_sampler(
+export function createComposableTraceIDRatioBasedSampler(
   ratio: number
 ): ComposableSampler {
   return new ComposableTraceIDRatioBasedSampler(ratio);

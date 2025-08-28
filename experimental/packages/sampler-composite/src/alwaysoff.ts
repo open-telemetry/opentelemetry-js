@@ -36,6 +36,6 @@ const _sampler = new ComposableAlwaysOffSampler();
 /**
  * Returns a composable sampler that does not sample any span.
  */
-export function composable_always_off_sampler(): ComposableSampler {
+export function createComposableAlwaysOffSampler(): ComposableSampler {
   return _sampler;
 }
