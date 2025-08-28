@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-export type { SessionProvider } from './types/SessionProvider';
-export {
-  createSessionSpanProcessor,
-  createSessionLogRecordProcessor,
-  createSessionManager,
-} from './utils';
-export type { Session } from './types/Session';
-export type { SessionIdGenerator } from './types/SessionIdGenerator';
-export type { SessionPublisher } from './types/SessionPublisher';
-export type { SessionObserver } from './types/SessionObserver';
-export type { SessionStore } from './types/SessionStore';
-export { LocalStorageSessionStore } from './LocalStorageSessionStore';
+import { SessionObserver } from './SessionObserver';
+
+export interface SessionPublisher {
+  addObserver(observer: SessionObserver): void;
+}
