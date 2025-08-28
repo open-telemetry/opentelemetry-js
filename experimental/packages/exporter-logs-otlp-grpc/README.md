@@ -39,11 +39,9 @@ const collectorOptions = {
 };
 
 const loggerExporter = new OTLPLogExporter(collectorOptions);
-const loggerProvider = new LoggerProvider();
-
-loggerProvider.addLogRecordProcessor(
-  new BatchLogRecordProcessor(loggerExporter)
-);
+const loggerProvider = new LoggerProvider({
+  processors: [new BatchRecordProcessor(loggerExporter)]
+});
 
 ['SIGINT', 'SIGTERM'].forEach(signal => {
   process.on(signal, () => loggerProvider.shutdown().catch(console.error));

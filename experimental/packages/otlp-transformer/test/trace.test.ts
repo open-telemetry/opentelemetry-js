@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as root from '../src/generated/root';
 import { SpanKind, SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import { TraceState } from '@opentelemetry/core';
 import {
   Resource,
+  resourceFromAttributes,
   resourceFromDetectedResource,
 } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import { toBase64 } from './utils';
-import { OtlpEncodingOptions } from '../src/common/internal-types';
-import { ESpanKind, EStatusCode } from '../src/trace/internal-types';
-import { createExportTraceServiceRequest } from '../src/trace/internal';
-import { ProtobufTraceSerializer } from '../src/trace/protobuf';
-import { JsonTraceSerializer } from '../src/trace/json';
 import { hexToBinary } from '../src/common/hex-to-binary';
-import { ISpan } from '../src/trace/internal-types';
+import { OtlpEncodingOptions } from '../src/common/internal-types';
+import * as root from '../src/generated/root';
+import { createExportTraceServiceRequest } from '../src/trace/internal';
+import { ESpanKind, EStatusCode, ISpan } from '../src/trace/internal-types';
+import { JsonTraceSerializer } from '../src/trace/json';
+import { ProtobufTraceSerializer } from '../src/trace/protobuf';
+import { toBase64 } from './utils';
 
 function createExpectedSpanJson(options: OtlpEncodingOptions) {
   const useHex = options.useHex ?? false;
@@ -279,25 +279,8 @@ describe('Trace', () => {
   let resource: Resource;
   let span: ReadableSpan;
 
-  beforeEach(() => {
-    resource = resourceFromDetectedResource({
-      attributes: {
-        'resource-attribute': 'resource attribute value',
-      },
-      entities: [
-        {
-          identifier: {
-            'resource-entity-id': 'resource entity value',
-          },
-          type: 'resource-entity-type',
-          attributes: {
-            'resource-entity-attribute': 'resource entity attribute value',
-          },
-          schemaUrl: 'http://url.to.resource.schema',
-        },
-      ],
-    });
-    span = {
+  function createSpanWithResource(spanResource: Resource): ReadableSpan {
+    return {
       spanContext: () => ({
         spanId: '0000000000000002',
         traceFlags: TraceFlags.SAMPLED,
@@ -344,7 +327,7 @@ describe('Trace', () => {
         },
       ],
       name: 'span-name',
-      resource,
+      resource: spanResource,
       startTime: [1640715557, 342725388],
       status: {
         code: SpanStatusCode.OK,
@@ -353,6 +336,27 @@ describe('Trace', () => {
       droppedEventsCount: 0,
       droppedLinksCount: 0,
     };
+  }
+
+  beforeEach(() => {
+    resource = resourceFromDetectedResource({
+      attributes: {
+        'resource-attribute': 'resource attribute value',
+      },
+      entities: [
+        {
+          identifier: {
+            'resource-entity-id': 'resource entity value',
+          },
+          type: 'resource-entity-type',
+          attributes: {
+            'resource-entity-attribute': 'resource entity attribute value',
+          },
+          schemaUrl: 'http://url.to.resource.schema',
+        },
+      ],
+    });
+    span = createSpanWithResource(resource);
   });
 
   describe('createExportTraceServiceRequest', () => {
@@ -503,6 +507,26 @@ describe('Trace', () => {
           ESpanKind.SPAN_KIND_UNSPECIFIED
         );
       });
+    });
+
+    it('supports schema URL on resource', () => {
+      const resourceWithSchema = resourceFromAttributes(
+        { 'resource-attribute': 'resource attribute value' },
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
+      );
+
+      const spanFromSDK = createSpanWithResource(resourceWithSchema);
+
+      const exportRequest = createExportTraceServiceRequest([spanFromSDK], {
+        useHex: true,
+      });
+
+      assert.ok(exportRequest);
+      assert.strictEqual(exportRequest.resourceSpans?.length, 1);
+      assert.strictEqual(
+        exportRequest.resourceSpans?.[0].schemaUrl,
+        'https://opentelemetry.test/schemas/1.2.3'
+      );
     });
   });
 

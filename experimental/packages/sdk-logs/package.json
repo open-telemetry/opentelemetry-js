@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-logs",
-  "version": "0.202.0",
+  "version": "0.203.0",
   "publishConfig": {
     "access": "public"
   },
@@ -40,7 +40,7 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
+    "precompile": "lerna run version --scope @opentelemetry/sdk-logs --include-dependencies",
     "prewatch": "node ../../../scripts/version-update.js",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
@@ -79,7 +79,6 @@
     "@types/node": "18.6.5",
     "@types/sinon": "17.0.4",
     "babel-plugin-istanbul": "7.0.0",
-    "cross-var": "1.1.0",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",
@@ -90,13 +89,13 @@
     "mocha": "11.1.0",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
-    "ts-loader": "9.5.2",
+    "ts-loader": "9.5.4",
     "typescript": "5.0.4",
-    "webpack": "5.99.9",
+    "webpack": "5.101.3",
     "webpack-cli": "6.0.1"
   },
   "dependencies": {
-    "@opentelemetry/api-logs": "0.202.0",
+    "@opentelemetry/api-logs": "0.203.0",
     "@opentelemetry/core": "2.0.1",
     "@opentelemetry/resources": "2.0.1"
   }

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation",
-  "version": "0.202.0",
+  "version": "0.203.0",
   "description": "Base class for node which OpenTelemetry instrumentation modules extend",
   "author": "OpenTelemetry Authors",
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation",
@@ -53,7 +53,7 @@
     "test:browser": "karma start --single-run",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
+    "precompile": "lerna run version --scope @opentelemetry/instrumentation --include-dependencies",
     "prewatch": "node ../../../scripts/version-update.js",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
@@ -71,7 +71,7 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/api-logs": "0.202.0",
+    "@opentelemetry/api-logs": "0.203.0",
     "import-in-the-middle": "^1.8.1",
     "require-in-the-middle": "^7.1.1"
   },
@@ -90,7 +90,6 @@
     "babel-loader": "10.0.0",
     "babel-plugin-istanbul": "7.0.0",
     "codecov": "3.8.3",
-    "cross-var": "1.1.0",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",
@@ -101,9 +100,9 @@
     "mocha": "11.1.0",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
-    "ts-loader": "9.5.2",
+    "ts-loader": "9.5.4",
     "typescript": "5.0.4",
-    "webpack": "5.99.9",
+    "webpack": "5.101.3",
     "webpack-cli": "6.0.1"
   },
   "engines": {

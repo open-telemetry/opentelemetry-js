@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation-xml-http-request",
-  "version": "0.202.0",
+  "version": "0.203.0",
   "description": "OpenTelemetry instrumentation for XMLHttpRequest http client in web browsers",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -17,7 +17,7 @@
     "tdd": "karma start",
     "test:browser": "karma start --single-run",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
+    "precompile": "lerna run version --scope @opentelemetry/instrumentation-xml-http-request --include-dependencies",
     "prewatch": "node ../../../scripts/version-update.js",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
@@ -66,7 +66,6 @@
     "@types/webpack-env": "1.16.3",
     "babel-loader": "10.0.0",
     "babel-plugin-istanbul": "7.0.0",
-    "cross-var": "1.1.0",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",
@@ -77,9 +76,9 @@
     "mocha": "11.1.0",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
-    "ts-loader": "9.5.2",
+    "ts-loader": "9.5.4",
     "typescript": "5.0.4",
-    "webpack": "5.99.9",
+    "webpack": "5.101.3",
     "webpack-cli": "6.0.1"
   },
   "peerDependencies": {
@@ -87,7 +86,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "2.0.1",
-    "@opentelemetry/instrumentation": "0.202.0",
+    "@opentelemetry/instrumentation": "0.203.0",
     "@opentelemetry/sdk-trace-web": "2.0.1",
     "@opentelemetry/semantic-conventions": "^1.29.0"
   },

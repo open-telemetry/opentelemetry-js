@@ -28,11 +28,16 @@ import {
 } from '@opentelemetry/resources';
 
 export function createResource(resource: ISdkResource): Resource {
-  return {
+  const result: Resource = {
     attributes: toAttributes(resource.attributes),
     droppedAttributesCount: 0,
     entityRefs: toEntityRefs(resource.entities),
   };
+
+  const schemaUrl = resource.schemaUrl;
+  if (schemaUrl && schemaUrl !== '') result.schemaUrl = schemaUrl;
+
+  return result;
 }
 
 export function toEntityRefs(entityRefs: ISdkEntity[]): EntityRef[] {

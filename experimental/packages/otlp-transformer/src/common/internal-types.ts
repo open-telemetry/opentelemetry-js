@@ -22,6 +22,10 @@ export interface Resource {
   /** Resource droppedAttributesCount */
   droppedAttributesCount: number;
 
+  /** Resource schemaUrl */
+  schemaUrl?: string;
+
+  /** Resource entity references */
   entityRefs?: EntityRef[];
 }
 

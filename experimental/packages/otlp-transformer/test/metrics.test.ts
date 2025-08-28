@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 import { ValueType } from '@opentelemetry/api';
-import { resourceFromDetectedResource } from '@opentelemetry/resources';
+import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
+import {
+  Resource,
+  resourceFromAttributes,
+  resourceFromDetectedResource,
+} from '@opentelemetry/resources';
 import {
   AggregationTemporality,
   DataPointType,
@@ -22,13 +27,12 @@ import {
   ResourceMetrics,
 } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
+import { encodeAsLongBits, encodeAsString } from '../src/common/utils';
+import * as root from '../src/generated/root';
 import { createExportMetricsServiceRequest } from '../src/metrics/internal';
 import { EAggregationTemporality } from '../src/metrics/internal-types';
-import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
-import * as root from '../src/generated/root';
-import { encodeAsLongBits, encodeAsString } from '../src/common/utils';
-import { ProtobufMetricsSerializer } from '../src/metrics/protobuf';
 import { JsonMetricsSerializer } from '../src/metrics/json';
+import { ProtobufMetricsSerializer } from '../src/metrics/protobuf';
 
 const START_TIME = hrTime();
 const END_TIME = hrTime();
@@ -321,24 +325,30 @@ describe('Metrics', () => {
     };
   }
 
-  function createResourceMetrics(metricData: MetricData[]): ResourceMetrics {
-    const resource = resourceFromDetectedResource({
-      attributes: {
-        'resource-attribute': 'resource attribute value',
-      },
-      entities: [
-        {
-          identifier: {
-            'resource-entity-id': 'resource entity value',
-          },
-          type: 'resource-entity-type',
-          attributes: {
-            'resource-entity-attribute': 'resource entity attribute value',
-          },
-          schemaUrl: 'http://url.to.resource.schema',
+  function createResourceMetrics(
+    metricData: MetricData[],
+    customResource?: Resource
+  ): ResourceMetrics {
+    const resource =
+      customResource ||
+      resourceFromDetectedResource({
+        attributes: {
+          'resource-attribute': 'resource attribute value',
         },
-      ],
-    });
+        entities: [
+          {
+            identifier: {
+              'resource-entity-id': 'resource entity value',
+            },
+            type: 'resource-entity-type',
+            attributes: {
+              'resource-entity-attribute': 'resource entity attribute value',
+            },
+            schemaUrl: 'http://url.to.resource.schema',
+          },
+        ],
+      });
+
     return {
       resource: resource,
       scopeMetrics: [
@@ -806,6 +816,29 @@ describe('Metrics', () => {
           ],
         });
       });
+    });
+
+    it('supports schema URL on resource', () => {
+      const resourceWithSchema = resourceFromAttributes(
+        {},
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
+      );
+
+      const resourceMetrics = createResourceMetrics(
+        [createCounterData(10, AggregationTemporality.DELTA)],
+        resourceWithSchema
+      );
+
+      const exportRequest = createExportMetricsServiceRequest([
+        resourceMetrics,
+      ]);
+
+      assert.ok(exportRequest);
+      assert.strictEqual(exportRequest.resourceMetrics?.length, 1);
+      assert.strictEqual(
+        exportRequest.resourceMetrics?.[0].schemaUrl,
+        'https://opentelemetry.test/schemas/1.2.3'
+      );
     });
   });
 

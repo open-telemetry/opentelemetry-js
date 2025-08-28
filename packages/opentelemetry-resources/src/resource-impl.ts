@@ -29,6 +29,7 @@ import {
   DetectedResourceAttributes,
   EntityRef,
   RawResourceAttribute,
+  ResourceOptions,
 } from './types';
 import { isPromiseLike } from './utils';
 import { EntityImpl, mergeEntities } from './entity-impl';
@@ -37,23 +38,43 @@ import { Entity } from './entity';
 class ResourceImpl implements Resource {
   private _rawAttributes: RawResourceAttribute[];
   private _asyncAttributesPending = false;
+  private _schemaUrl?: string;
 
   private _memoizedAttributes?: Attributes;
 
   private _entities: Entity[];
   private _entityRefs: EntityRef[];
 
-  constructor(rawAttributes: RawResourceAttribute[], entities: Entity[]) {
-    this._rawAttributes = rawAttributes;
-    this._entities = entities;
+  static FromAttributeList(
+    attributes: RawResourceAttribute[],
+    options?: ResourceOptions
+  ): Resource {
+    const res = new ResourceImpl([], [], options);
+    res._rawAttributes = guardedRawAttributes(attributes);
+    res._asyncAttributesPending =
+      attributes.filter(([_, val]) => isPromiseLike(val)).length > 0;
+    return res;
+  }
 
-    for (const attr of rawAttributes) {
-      if (isPromiseLike(attr[1])) {
+  constructor(
+    /**
+     * A dictionary of attributes with string keys and values that provide
+     * information about the entity as numbers, strings or booleans
+     * TODO: Consider to add check/validation on attributes.
+     */
+    attributes: RawResourceAttribute[],
+    entities: Entity[],
+    options?: ResourceOptions
+  ) {
+    this._rawAttributes = attributes.map(([k, v]) => {
+      if (isPromiseLike(v)) {
         // side-effect
         this._asyncAttributesPending = true;
       }
-    }
+      return [k, v];
+    });
 
+    this._entities = entities;
     this._entityRefs = this._entities.map(entity => {
       if (entity.asyncAttributesPending) {
         this._asyncAttributesPending = true;
@@ -69,6 +90,7 @@ class ResourceImpl implements Resource {
     });
 
     this._rawAttributes = guardedRawAttributes(this._rawAttributes);
+    this._schemaUrl = validateSchemaUrl(options?.schemaUrl);
   }
 
   public get asyncAttributesPending(): boolean {
@@ -154,6 +176,10 @@ class ResourceImpl implements Resource {
     return this._rawAttributes;
   }
 
+  public get schemaUrl(): string | undefined {
+    return this._schemaUrl;
+  }
+
   public merge(resource: Resource | null): Resource {
     if (resource == null) return this;
 
@@ -164,24 +190,31 @@ class ResourceImpl implements Resource {
     // TODO order opposite?
     const entities = mergeEntities(...this._entities, ...resource.entities);
 
-    return new ResourceImpl(attrs, entities);
+    const mergedSchemaUrl = mergeSchemaUrl(this, resource);
+    const mergedOptions: ResourceOptions | undefined = mergedSchemaUrl
+      ? { schemaUrl: mergedSchemaUrl }
+      : undefined;
+
+    return new ResourceImpl(attrs, entities, mergedOptions);
   }
 }
 
 export function resourceFromAttributes(
-  attributes: DetectedResourceAttributes
+  attributes: DetectedResourceAttributes,
+  options?: ResourceOptions
 ): Resource {
-  return new ResourceImpl(Object.entries(attributes), []);
+  return ResourceImpl.FromAttributeList(Object.entries(attributes), options);
 }
 
 export function resourceFromDetectedResource(
-  detectedResource: DetectedResource
+  detectedResource: DetectedResource,
+  options?: ResourceOptions
 ): Resource {
   const entities = (detectedResource.entities ?? []).map(
     e => new EntityImpl(e)
   );
   const rawAttributes = Object.entries(detectedResource.attributes ?? {});
-  return new ResourceImpl(rawAttributes, entities);
+  return new ResourceImpl(rawAttributes, entities, options);
 }
 
 export function emptyResource(): Resource {
@@ -216,4 +249,49 @@ function guardedRawAttributes(
     }
     return [k, v];
   });
+}
+
+function validateSchemaUrl(schemaUrl?: string): string | undefined {
+  if (typeof schemaUrl === 'string' || schemaUrl === undefined) {
+    return schemaUrl;
+  }
+
+  diag.warn(
+    'Schema URL must be string or undefined, got %s. Schema URL will be ignored.',
+    schemaUrl
+  );
+
+  return undefined;
+}
+
+function mergeSchemaUrl(
+  old: Resource,
+  updating: Resource | null
+): string | undefined {
+  const oldSchemaUrl = old?.schemaUrl;
+  const updatingSchemaUrl = updating?.schemaUrl;
+
+  const isOldEmpty = oldSchemaUrl === undefined || oldSchemaUrl === '';
+  const isUpdatingEmpty =
+    updatingSchemaUrl === undefined || updatingSchemaUrl === '';
+
+  if (isOldEmpty) {
+    return updatingSchemaUrl;
+  }
+
+  if (isUpdatingEmpty) {
+    return oldSchemaUrl;
+  }
+
+  if (oldSchemaUrl === updatingSchemaUrl) {
+    return oldSchemaUrl;
+  }
+
+  diag.warn(
+    'Schema URL merge conflict: old resource has "%s", updating resource has "%s". Resulting resource will have undefined Schema URL.',
+    oldSchemaUrl,
+    updatingSchemaUrl
+  );
+
+  return undefined;
 }

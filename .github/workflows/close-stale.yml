@@ -3,8 +3,14 @@ on:
   schedule:
     - cron: '30 6 * * 1'
 
+permissions:
+  contents: read
+
 jobs:
   stale:
+    permissions:
+      issues: write # required for closing stale issues
+      pull-requests: write # required for closing stale PRs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/stale@v9

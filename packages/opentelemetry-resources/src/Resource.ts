@@ -43,6 +43,11 @@ export interface Resource {
   readonly attributes: Attributes;
 
   /**
+   * @returns the Resource's schema URL or undefined if not set.
+   */
+  readonly schemaUrl?: string;
+
+  /**
    * @returns a list of Entities associated with the resource
    */
   readonly entities: Entity[];
