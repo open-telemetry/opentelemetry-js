@@ -11,7 +11,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ## Unreleased
 
 * feat(instrumentation-http): Added support for redacting specific url query string values and url credentials in instrumentations [#5743](https://github.com/open-telemetry/opentelemetry-js/pull/5743) @rads-1996
-* feat(sampler-consistent): Added experimental implementations of draft consistent sampling spec [#5839](https://github.com/open-telemetry/opentelemetry-js/pull/5839) @anuraaga
+* feat(sampler-composite): Added experimental implementations of draft composite sampling spec [#5839](https://github.com/open-telemetry/opentelemetry-js/pull/5839) @anuraaga
 
 ### :boom: Breaking Changes
 
