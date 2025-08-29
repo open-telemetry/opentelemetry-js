@@ -21,7 +21,13 @@ import {
   isExportRetryable,
   parseRetryAfterToMills,
 } from '../is-export-retryable';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { createFetchTransport } from './fetch-transport';
 
+/**
+ * @deprecated favor the fetch transport
+ * @see {@link createFetchTransport}
+ */
 export interface XhrRequestParameters {
   url: string;
   headers: () => Record<string, string>;
@@ -91,6 +97,8 @@ class XhrTransport implements IExporterTransport {
 }
 
 /**
+ * @deprecated use {@link createFetchTransport} instead
+ *
  * Creates an exporter transport that uses XHR to send the data
  * @param parameters applied to each request made by transport
  */
