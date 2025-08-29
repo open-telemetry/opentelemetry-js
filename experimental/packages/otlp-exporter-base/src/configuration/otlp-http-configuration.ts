@@ -102,18 +102,11 @@ function validateUserProvidedUrl(url: string | undefined): string | undefined {
       );
     }
 
-    // Check for control characters and other dangerous characters in the decoded URL
+    // Check for spaces in the decoded URL
     // Allow spaces only for URLs that start with ./, ../, or /
-    const controlChars = /[\x00-\x1f\x7f-\x9f]/; // control chars, DEL, and extended control chars
     const hasSpaces = /\s/.test(decodedUrl);
     const allowsSpaces =
       url.startsWith('./') || url.startsWith('../') || url.startsWith('/');
-
-    if (controlChars.test(decodedUrl)) {
-      throw new Error(
-        `Configuration: Could not parse user-provided export URL: '${url}'`
-      );
-    }
 
     if (hasSpaces && !allowsSpaces) {
       throw new Error(
