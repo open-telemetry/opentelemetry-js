@@ -410,7 +410,6 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           getFetchBodyLength(...args)
             .then(bodyLength => {
               if (!bodyLength) return;
-
               if (plugin._semconvStability & SemconvStability.OLD) {
                 createdSpan.setAttribute(
                   ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
@@ -451,16 +450,60 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           }
         }
 
+        function withCancelPropagation(
+          body: ReadableStream<Uint8Array> | null,
+          readerClone: ReadableStreamDefaultReader<Uint8Array>
+        ): ReadableStream<Uint8Array> | null {
+          if (!body) return null;
+
+          const reader = body.getReader();
+
+          return new ReadableStream({
+            async pull(controller) {
+              try {
+                const { value, done } = await reader.read();
+                if (done) {
+                  reader.releaseLock();
+                  controller.close();
+                } else {
+                  controller.enqueue(value);
+                }
+              } catch (err) {
+                controller.error(err);
+                reader.cancel(err).catch((_) => {});
+
+                try { reader.releaseLock() } catch(_) {};
+              }
+            },
+            cancel(reason) {
+              readerClone.cancel(reason).catch((_) => {});
+              return reader.cancel(reason);
+            }
+          });
+        }
+
         function onSuccess(
           span: api.Span,
           resolve: (value: Response | PromiseLike<Response>) => void,
           response: Response
         ): void {
+
+          let proxiedResponse: Response | null = null;
+
           try {
             const resClone = response.clone();
             const body = resClone.body;
             if (body) {
               const reader = body.getReader();
+
+              const wrappedBody = withCancelPropagation(response.body, reader);
+
+              proxiedResponse = new Response(wrappedBody, {
+                status: response.status,
+                statusText: response.statusText,
+                headers: response.headers,
+              });
+
               const read = (): void => {
                 reader.read().then(
                   ({ done }) => {
@@ -481,7 +524,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
               endSpanOnSuccess(span, response);
             }
           } finally {
-            resolve(response);
+            resolve(proxiedResponse ?? response);
           }
         }
 
@@ -502,11 +545,9 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
             api.trace.setSpan(api.context.active(), createdSpan),
             () => {
               plugin._addHeaders(options, url);
-              // Important to execute "_callRequestHook" after "_addHeaders", allowing the consumer code to override the request headers.
               plugin._callRequestHook(createdSpan, options);
               plugin._tasksCount++;
-              // TypeScript complains about arrow function captured a this typed as globalThis
-              // ts(7041)
+
               return original
                 .apply(
                   self,
