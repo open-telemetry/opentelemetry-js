@@ -470,15 +470,25 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
                 }
               } catch (err) {
                 controller.error(err);
-                reader.cancel(err).catch((_) => {});
+                reader.cancel(err).catch(_ => {});
 
-                try { reader.releaseLock() } catch(_) {};
+                try {
+                  reader.releaseLock();
+                } catch {
+                  // Spec reference:
+                  // https://streams.spec.whatwg.org/#default-reader-release-lock
+                  //
+                  // releaseLock() only throws if called on an invalid reader
+                  // (i.e. reader.[[stream]] is undefined, meaning the lock is already released
+                  // or the reader was never associated). In normal use this cannot happen.
+                  // This catch is defensive only.
+                }
               }
             },
             cancel(reason) {
-              readerClone.cancel(reason).catch((_) => {});
+              readerClone.cancel(reason).catch(_ => {});
               return reader.cancel(reason);
-            }
+            },
           });
         }
 
@@ -487,7 +497,6 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           resolve: (value: Response | PromiseLike<Response>) => void,
           response: Response
         ): void {
-
           let proxiedResponse: Response | null = null;
 
           try {
