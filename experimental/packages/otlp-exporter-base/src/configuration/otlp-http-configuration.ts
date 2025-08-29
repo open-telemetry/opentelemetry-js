@@ -101,32 +101,33 @@ function validateUserProvidedUrl(url: string | undefined): string | undefined {
         `Configuration: Could not parse user-provided export URL: '${url}'`
       );
     }
-    
+
     // Check for control characters and other dangerous characters in the decoded URL
     // Allow spaces only for URLs that start with ./, ../, or /
     const controlChars = /[\x00-\x1f\x7f-\x9f]/; // control chars, DEL, and extended control chars
     const hasSpaces = /\s/.test(decodedUrl);
-    const allowsSpaces = url.startsWith('./') || url.startsWith('../') || url.startsWith('/');
-    
+    const allowsSpaces =
+      url.startsWith('./') || url.startsWith('../') || url.startsWith('/');
+
     if (controlChars.test(decodedUrl)) {
       throw new Error(
         `Configuration: Could not parse user-provided export URL: '${url}'`
       );
     }
-    
+
     if (hasSpaces && !allowsSpaces) {
       throw new Error(
         `Configuration: Could not parse user-provided export URL: '${url}'`
       );
     }
-    
+
     // Additional check: ensure the decoded URL doesn't introduce path traversal beyond what was originally allowed
     // This prevents cases like "normal%2E%2E%2Fpath" which decodes to "normal../path"
     // Allow spaces in the pattern for URLs that start with ./, ../, or /
-    const validPattern = allowsSpaces 
+    const validPattern = allowsSpaces
       ? /^(\.\.?\/.*|\/.*|[a-zA-Z0-9._\s/-]+)$/
       : /^(\.\.?\/.*|\/.*|[a-zA-Z0-9._/-]+)$/;
-    
+
     if (!decodedUrl.match(validPattern)) {
       throw new Error(
         `Configuration: Could not parse user-provided export URL: '${url}'`
