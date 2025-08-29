@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1756471349609,
+  "lastUpdate": 1756474287322,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -37132,6 +37132,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.54%",
             "unit": "ops/sec",
             "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "29139614+renovate[bot]@users.noreply.github.com",
+            "name": "renovate[bot]",
+            "username": "renovate[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f689830253525137b2ba2ef9f9245161c7f1714f",
+          "message": "chore(deps): update dependency @protobuf-ts/grpc-transport to v2.11.1 (#5888)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+          "timestamp": "2025-08-29T12:57:47Z",
+          "tree_id": "07965270a928fbc47e7e8d0e6b565ee131cda80c",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/f689830253525137b2ba2ef9f9245161c7f1714f"
+        },
+        "date": 1756474286249,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 665577,
+            "range": "±0.72%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8258,
+            "range": "±0.40%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 293663,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 280534,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
           }
         ]
       }
