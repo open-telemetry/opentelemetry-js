@@ -303,51 +303,43 @@ describe('fetch', () => {
       exportedSpans = [];
     });
 
-    const assertPropagationHeaders = async (
-      response: Response
-    ): Promise<Record<string, string>> => {
-      const { request } = await response.json();
-
+    const assertPropagationHeaders = (response: Response): Headers => {
       const span: tracing.ReadableSpan = exportedSpans[0];
 
       assert.strictEqual(
-        request.headers[X_B3_TRACE_ID],
+        response.headers.get(X_B3_TRACE_ID),
         span.spanContext().traceId,
         `trace header '${X_B3_TRACE_ID}' not set`
       );
       assert.strictEqual(
-        request.headers[X_B3_SPAN_ID],
+        response.headers.get(X_B3_SPAN_ID),
         span.spanContext().spanId,
         `trace header '${X_B3_SPAN_ID}' not set`
       );
       assert.strictEqual(
-        request.headers[X_B3_SAMPLED],
+        response.headers.get(X_B3_SAMPLED),
         String(span.spanContext().traceFlags),
         `trace header '${X_B3_SAMPLED}' not set`
       );
 
-      return request.headers;
+      return response.headers;
     };
 
-    const assertNoPropagationHeaders = async (
-      response: Response
-    ): Promise<Record<string, string>> => {
-      const { request } = await response.json();
-
+    const assertNoPropagationHeaders = (response: Response): Headers => {
       assert.ok(
-        !(X_B3_TRACE_ID in request.headers),
+        !response.headers.has(X_B3_TRACE_ID),
         `trace header '${X_B3_TRACE_ID}' should not be set`
       );
       assert.ok(
-        !(X_B3_SPAN_ID in request.headers),
+        !response.headers.has(X_B3_SPAN_ID),
         `trace header '${X_B3_SPAN_ID}' should not be set`
       );
       assert.ok(
-        !(X_B3_SAMPLED in request.headers),
+        !response.headers.has(X_B3_SAMPLED),
         `trace header '${X_B3_SAMPLED}' should not be set`
       );
 
-      return request.headers;
+      return response.headers;
     };
 
     describe('same origin requests', () => {
@@ -357,11 +349,10 @@ describe('fetch', () => {
             return msw.HttpResponse.json({ ok: true });
           }),
           msw.http.get('/api/echo-headers.json', ({ request }) => {
-            return msw.HttpResponse.json({
-              request: {
-                headers: Object.fromEntries(request.headers),
-              },
-            });
+            return msw.HttpResponse.json(
+              { ok: true },
+              { headers: request.headers }
+            );
           }),
           msw.http.get('/no-such-path', () => {
             return new msw.HttpResponse(null, { status: 404 });
@@ -718,7 +709,7 @@ describe('fetch', () => {
               callback: () => fetch('/api/echo-headers.json'),
             });
 
-            await assertPropagationHeaders(response);
+            assertPropagationHeaders(response);
           });
 
           it('should set trace propagation headers with a request object', async () => {
@@ -726,7 +717,7 @@ describe('fetch', () => {
               callback: () => fetch(new Request('/api/echo-headers.json')),
             });
 
-            await assertPropagationHeaders(response);
+            assertPropagationHeaders(response);
           });
 
           it('should keep custom headers with a request object and a headers object', async () => {
@@ -739,9 +730,9 @@ describe('fetch', () => {
                 ),
             });
 
-            const headers = await assertPropagationHeaders(response);
+            const headers = assertPropagationHeaders(response);
 
-            assert.strictEqual(headers['foo'], 'bar');
+            assert.strictEqual(headers.get('foo'), 'bar');
           });
 
           it('should keep custom headers with url, untyped request object and typed (Headers) headers object', async () => {
@@ -752,9 +743,9 @@ describe('fetch', () => {
                 }),
             });
 
-            const headers = await assertPropagationHeaders(response);
+            const headers = assertPropagationHeaders(response);
 
-            assert.strictEqual(headers['foo'], 'bar');
+            assert.strictEqual(headers.get('foo'), 'bar');
           });
 
           it('should keep custom headers with url, untyped request object and untyped headers object', async () => {
@@ -765,9 +756,9 @@ describe('fetch', () => {
                 }),
             });
 
-            const headers = await assertPropagationHeaders(response);
+            const headers = assertPropagationHeaders(response);
 
-            assert.strictEqual(headers['foo'], 'bar');
+            assert.strictEqual(headers.get('foo'), 'bar');
           });
 
           it('should keep custom headers with url, untyped request object and typed (Map) headers object', async () => {
@@ -779,9 +770,9 @@ describe('fetch', () => {
                 }),
             });
 
-            const headers = await assertPropagationHeaders(response);
+            const headers = assertPropagationHeaders(response);
 
-            assert.strictEqual(headers['foo'], 'bar');
+            assert.strictEqual(headers.get('foo'), 'bar');
           });
         });
 
@@ -791,7 +782,7 @@ describe('fetch', () => {
               callback: () => fetch('/api/echo-headers.json'),
             });
 
-            await assertNoPropagationHeaders(response);
+            assertNoPropagationHeaders(response);
           });
 
           it('should not set trace propagation headers with a request object', async () => {
@@ -799,7 +790,7 @@ describe('fetch', () => {
               callback: () => fetch(new Request('/api/echo-headers.json')),
             });
 
-            await assertNoPropagationHeaders(response);
+            assertNoPropagationHeaders(response);
           });
 
           it('should keep custom headers with a request object and a headers object', async () => {
@@ -814,7 +805,7 @@ describe('fetch', () => {
 
             const headers = await assertNoPropagationHeaders(response);
 
-            assert.strictEqual(headers['foo'], 'bar');
+            assert.strictEqual(headers.get('foo'), 'bar');
           });
 
           it('should keep custom headers with url, untyped request object and typed (Headers) headers object', async () => {
@@ -827,7 +818,7 @@ describe('fetch', () => {
 
             const headers = await assertNoPropagationHeaders(response);
 
-            assert.strictEqual(headers['foo'], 'bar');
+            assert.strictEqual(headers.get('foo'), 'bar');
           });
 
           it('should keep custom headers with url, untyped request object and untyped headers object', async () => {
@@ -840,7 +831,7 @@ describe('fetch', () => {
 
             const headers = await assertNoPropagationHeaders(response);
 
-            assert.strictEqual(headers['foo'], 'bar');
+            assert.strictEqual(headers.get('foo'), 'bar');
           });
 
           it('should keep custom headers with url, untyped request object and typed (Map) headers object', async () => {
@@ -854,7 +845,7 @@ describe('fetch', () => {
 
             const headers = await assertNoPropagationHeaders(response);
 
-            assert.strictEqual(headers['foo'], 'bar');
+            assert.strictEqual(headers.get('foo'), 'bar');
           });
         });
       });
@@ -919,11 +910,10 @@ describe('fetch', () => {
           msw.http.get(
             'http://example.com/api/echo-headers.json',
             ({ request }) => {
-              return msw.HttpResponse.json({
-                request: {
-                  headers: Object.fromEntries(request.headers),
-                },
-              });
+              return msw.HttpResponse.json(
+                { ok: true },
+                { headers: request.headers }
+              );
             }
           ),
         ],
@@ -1161,7 +1151,7 @@ describe('fetch', () => {
             },
           });
 
-          await assertPropagationHeaders(response);
+          assertPropagationHeaders(response);
 
           assertNoDebugMessages();
         });
