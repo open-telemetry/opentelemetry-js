@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1756371674471,
+  "lastUpdate": 1756471349609,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -37080,6 +37080,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.57%",
             "unit": "ops/sec",
             "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "92589074+SacDeNoeuds@users.noreply.github.com",
+            "name": "Thomas",
+            "username": "SacDeNoeuds"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "3dcdba6c902c8208f122e32c77bc73e7acd01b8d",
+          "message": "feat(browser otlp exporter): add fetch transport for fetch-only environments (#5807)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2025-08-29T12:32:53Z",
+          "tree_id": "10a0a6f974202524ed3e01f0cd42d584d82e1a8e",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/3dcdba6c902c8208f122e32c77bc73e7acd01b8d"
+        },
+        "date": 1756471348621,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 662707,
+            "range": "±0.74%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8075,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 290430,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 275001,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
           }
         ]
       }
