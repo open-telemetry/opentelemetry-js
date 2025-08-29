@@ -28,6 +28,7 @@
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "precompile": "lerna run version --scope @opentelemetry/core --include-dependencies",
     "prewatch": "npm run precompile",
+    "test:bench": "node test/performance/benchmark/index.js",
     "peer-api-check": "node ../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../scripts/align-api-deps.js"
   },

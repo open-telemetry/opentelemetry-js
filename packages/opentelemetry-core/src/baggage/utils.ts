@@ -57,24 +57,35 @@ export function getKeyPairs(baggage: Baggage): string[] {
 export function parsePairKeyValue(
   entry: string
 ): ParsedBaggageKeyValue | undefined {
-  const valueProps = entry.split(BAGGAGE_PROPERTIES_SEPARATOR);
-  if (valueProps.length <= 0) return;
-  const keyPairPart = valueProps.shift();
-  if (!keyPairPart) return;
+  if (!entry) return;
+  const metadataSeparatorIndex = entry.indexOf(BAGGAGE_PROPERTIES_SEPARATOR);
+  const keyPairPart = metadataSeparatorIndex === -1 
+    ? entry 
+    : entry.substring(0, metadataSeparatorIndex);
+
   const separatorIndex = keyPairPart.indexOf(BAGGAGE_KEY_PAIR_SEPARATOR);
   if (separatorIndex <= 0) return;
-  const key = decodeURIComponent(
-    keyPairPart.substring(0, separatorIndex).trim()
-  );
-  const value = decodeURIComponent(
-    keyPairPart.substring(separatorIndex + 1).trim()
-  );
-  let metadata;
-  if (valueProps.length > 0) {
-    metadata = baggageEntryMetadataFromString(
-      valueProps.join(BAGGAGE_PROPERTIES_SEPARATOR)
-    );
+
+  const rawKey = keyPairPart.substring(0, separatorIndex).trim();
+  const rawValue = keyPairPart.substring(separatorIndex + 1).trim();
+
+  if (!rawKey || !rawValue) return;
+  
+  let key: string;
+  let value: string;
+  try {
+    key = decodeURIComponent(rawKey);
+    value = decodeURIComponent(rawValue);
+  } catch {
+    return;
   }
+
+  let metadata;
+  if (metadataSeparatorIndex !== -1 && metadataSeparatorIndex < entry.length - 1) {
+    const metadataString = entry.substring(metadataSeparatorIndex + 1);
+    metadata = baggageEntryMetadataFromString(metadataString);
+  }
+  
   return { key, value, metadata };
 }
 
