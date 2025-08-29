@@ -46,7 +46,7 @@
 {% endif -%}
 
 {%- if member.deprecated %}
-  {%- set deprecated_jsdoc = "\n@deprecated " ~ strong_rfc2119(member.deprecated) -%}
+  {%- set deprecated_jsdoc = "\n@deprecated " ~ strong_rfc2119(member.deprecated.note) -%}
 {%- endif -%}
 
 {%- set enum_jsdoc = "Enum value " ~ member.value | print_member_value ~ " for attribute {@link ATTR_" ~ attribute.name | screaming_snake_case ~ "}." -%}

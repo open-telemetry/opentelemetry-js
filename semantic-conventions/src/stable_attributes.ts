@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------------------------------------
 
 /**
- * ASP.NET Core exception middleware handling result
+ * ASP.NET Core exception middleware handling result.
  *
  * @example handled
  * @example unhandled
@@ -141,6 +141,13 @@ export const ASPNETCORE_ROUTING_MATCH_STATUS_VALUE_FAILURE = "failure" as const;
  * Match succeeded
  */
 export const ASPNETCORE_ROUTING_MATCH_STATUS_VALUE_SUCCESS = "success" as const;
+
+/**
+ * A value that indicates whether the user is authenticated.
+ *
+ * @example true
+ */
+export const ATTR_ASPNETCORE_USER_IS_AUTHENTICATED = 'aspnetcore.user.is_authenticated' as const;
 
 /**
  * Client address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
