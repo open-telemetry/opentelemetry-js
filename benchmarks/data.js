@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1756485904743,
+  "lastUpdate": 1756717962519,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -37236,6 +37236,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.71%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "29139614+renovate[bot]@users.noreply.github.com",
+            "name": "renovate[bot]",
+            "username": "renovate[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "90ad17b8a46d46cc716637ba56e956229b7238fe",
+          "message": "chore(deps): update dependency semver to v7.7.2 (#5892)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+          "timestamp": "2025-09-01T08:44:12Z",
+          "tree_id": "0f2454899fb188e6eaaa1edc4ada911c7be0762b",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/90ad17b8a46d46cc716637ba56e956229b7238fe"
+        },
+        "date": 1756717961516,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 706070,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8848,
+            "range": "±0.70%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 293063,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 279839,
+            "range": "±0.62%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
           }
         ]
       }
