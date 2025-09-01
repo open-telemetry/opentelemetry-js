@@ -72,12 +72,9 @@ describe('OTLPTraceExporter', () => {
         (window.navigator as any).sendBeacon = false;
       });
 
-      it('should successfully send data using XMLHttpRequest', async function () {
+      it('should successfully send data using fetch', async function () {
         // arrange
-        const server = sinon.fakeServer.create();
-        server.respondWith('OK');
-        server.respondImmediately = true;
-        server.autoRespond = true;
+        const stubFetch = sinon.stub(window, 'fetch');
         const meterProvider = new MeterProvider({
           readers: [
             new PeriodicExportingMetricReader({
@@ -95,10 +92,10 @@ describe('OTLPTraceExporter', () => {
         await meterProvider.shutdown();
 
         // assert
-        const request = server.requests[0];
-        const body = request.requestBody as unknown as Uint8Array;
+        const request = new Request(...stubFetch.args[0]);
+        const body = await request.text();
         assert.throws(
-          () => JSON.parse(new TextDecoder().decode(body)),
+          () => JSON.parse(body),
           'expected requestBody to be in protobuf format, but parsing as JSON succeeded'
         );
       });

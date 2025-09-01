@@ -76,8 +76,9 @@ function validateUserProvidedUrl(url: string | undefined): string | undefined {
     return undefined;
   }
   try {
-    new URL(url);
-    return url;
+    // NOTE: In non-browser environments, `globalThis.location` will be `undefined`.
+    const base = globalThis.location?.href;
+    return new URL(url, base).href;
   } catch {
     throw new Error(
       `Configuration: Could not parse user-provided export URL: '${url}'`
