@@ -35,7 +35,9 @@ export interface NodeSDKConfiguration {
   /** @deprecated use logRecordProcessors instead*/
   logRecordProcessor: LogRecordProcessor;
   logRecordProcessors?: LogRecordProcessor[];
+  /** @deprecated use metricReaders instead*/
   metricReader: IMetricReader;
+  metricReaders?: IMetricReader[];
   views: ViewOptions[];
   instrumentations: (Instrumentation | Instrumentation[])[];
   resource: Resource;
