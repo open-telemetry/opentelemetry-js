@@ -74,11 +74,11 @@
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "5.0.1",
     "lerna": "6.6.2",
-    "mocha": "11.1.0",
+    "mocha": "11.7.2",
     "nyc": "17.1.0",
-    "ts-loader": "9.5.2",
+    "ts-loader": "9.5.4",
     "typescript": "5.0.4",
-    "webpack": "5.99.9"
+    "webpack": "5.101.3"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/api-logs",
   "sideEffects": false

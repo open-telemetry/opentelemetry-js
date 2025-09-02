@@ -9,6 +9,16 @@
       "matchPackageNames": ["!prettier"]
     },
     {
+      "groupName": "@protobuf-ts packages",
+      "matchPackagePatterns": ["^@protobuf-ts/"],
+      "matchUpdateTypes": ["minor", "major"]
+    },
+    {
+      "groupName": "typedoc packages",
+      "matchPackagePatterns": ["^typedoc"],
+      "matchUpdateTypes": ["minor", "major"]
+    },
+    {
       "matchUpdateTypes": ["minor"],
       "dependencyDashboardApproval": true
     },
@@ -35,5 +45,6 @@
     "npm": ">10.8.0"
   },
   "assignees": ["@blumamir", "@dyladan", "@legendecas", "@pichlermarc"],
-  "labels": ["dependencies"]
+  "labels": ["dependencies"],
+  "postUpdateOptions": ["npmDedupe"]
 }
