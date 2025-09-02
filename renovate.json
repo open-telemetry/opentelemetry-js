@@ -10,13 +10,13 @@
     },
     {
       "groupName": "@protobuf-ts packages",
-      "matchPackagePatterns": ["^@protobuf-ts/"],
-      "matchUpdateTypes": ["minor", "major"]
+      "matchUpdateTypes": ["minor", "major"],
+      "matchPackageNames": ["/^@protobuf-ts//"]
     },
     {
       "groupName": "typedoc packages",
-      "matchPackagePatterns": ["^typedoc"],
-      "matchUpdateTypes": ["minor", "major"]
+      "matchUpdateTypes": ["minor", "major"],
+      "matchPackageNames": ["/^typedoc/"]
     },
     {
       "matchUpdateTypes": ["minor"],
