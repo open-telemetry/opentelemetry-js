@@ -9,6 +9,16 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 1.37.0
+
+### :rocket: Features
+
 * feat: add `EVENT_*` exports for event names in Semantic Conventions [#5832](https://github.com/open-telemetry/opentelemetry-js/pull/5832) @trentm
 
 * feat: update semantic conventions to v1.37.0 [#5879](https://github.com/open-telemetry/opentelemetry-js/pull/5879) @trentm
@@ -333,10 +343,6 @@ ATTR_OTEL_SCOPE_SCHEMA_URL                                                      
 ### :bug: Bug Fixes
 
 * fix: prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
-
-### :books: Documentation
-
-### :house: Internal
 
 ## 1.36.0
 
