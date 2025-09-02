@@ -11,6 +11,325 @@ All notable changes to the semantic-conventions package will be documented in th
 
 * feat: add `EVENT_*` exports for event names in Semantic Conventions [#5832](https://github.com/open-telemetry/opentelemetry-js/pull/5832) @trentm
 
+* feat: update semantic conventions to v1.37.0 [#5879](https://github.com/open-telemetry/opentelemetry-js/pull/5879) @trentm
+  * Semantic Conventions v1.37.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1370) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *2 added exports*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *1 exported value changed, 6 newly deprecated exports, 1 newly undeprecated export, 246 added exports*
+
+#### Stable changes in v1.37.0
+
+<details open>
+<summary>2 added exports</summary>
+
+```js
+EVENT_EXCEPTION                       // exception
+
+ATTR_ASPNETCORE_USER_IS_AUTHENTICATED // aspnetcore.user.is_authenticated
+```
+
+</details>
+
+#### Unstable changes in v1.37.0
+
+<details>
+<summary>1 exported value changed</summary>
+
+```js
+GEN_AI_SYSTEM_VALUE_AZ_AI_OPENAI // "azure.ai.openai" -> "az.ai.openai"
+```
+
+</details>
+
+<details>
+<summary>6 newly deprecated exports</summary>
+
+```js
+ATTR_CONTAINER_RUNTIME                         // container.runtime: Replaced by `container.runtime.name`.
+ATTR_GEN_AI_OPENAI_REQUEST_SERVICE_TIER        // gen_ai.openai.request.service_tier: Replaced by `openai.request.service_tier`.
+ATTR_GEN_AI_OPENAI_RESPONSE_SERVICE_TIER       // gen_ai.openai.response.service_tier: Replaced by `openai.response.service_tier`.
+ATTR_GEN_AI_OPENAI_RESPONSE_SYSTEM_FINGERPRINT // gen_ai.openai.response.system_fingerprint: Replaced by `openai.response.system_fingerprint`.
+ATTR_GEN_AI_SYSTEM                             // gen_ai.system: Replaced by `gen_ai.provider.name`.
+GEN_AI_SYSTEM_VALUE_XAI                        // xai: Replaced by `x_ai`.
+```
+
+</details>
+
+<details>
+<summary>1 newly undeprecated export</summary>
+
+```js
+GEN_AI_SYSTEM_VALUE_AZ_AI_INFERENCE // az.ai.inference
+```
+
+</details>
+
+<details>
+<summary>246 added exports</summary>
+
+```js
+METRIC_ASPNETCORE_AUTHENTICATION_AUTHENTICATE_DURATION                            // aspnetcore.authentication.authenticate.duration
+METRIC_ASPNETCORE_AUTHENTICATION_CHALLENGES                                       // aspnetcore.authentication.challenges
+METRIC_ASPNETCORE_AUTHENTICATION_FORBIDS                                          // aspnetcore.authentication.forbids
+METRIC_ASPNETCORE_AUTHENTICATION_SIGN_INS                                         // aspnetcore.authentication.sign_ins
+METRIC_ASPNETCORE_AUTHENTICATION_SIGN_OUTS                                        // aspnetcore.authentication.sign_outs
+METRIC_ASPNETCORE_AUTHORIZATION_ATTEMPTS                                          // aspnetcore.authorization.attempts
+METRIC_ASPNETCORE_IDENTITY_SIGN_IN_AUTHENTICATE_DURATION                          // aspnetcore.identity.sign_in.authenticate.duration
+METRIC_ASPNETCORE_IDENTITY_SIGN_IN_CHECK_PASSWORD_ATTEMPTS                        // aspnetcore.identity.sign_in.check_password_attempts
+METRIC_ASPNETCORE_IDENTITY_SIGN_IN_SIGN_INS                                       // aspnetcore.identity.sign_in.sign_ins
+METRIC_ASPNETCORE_IDENTITY_SIGN_IN_SIGN_OUTS                                      // aspnetcore.identity.sign_in.sign_outs
+METRIC_ASPNETCORE_IDENTITY_SIGN_IN_TWO_FACTOR_CLIENTS_FORGOTTEN                   // aspnetcore.identity.sign_in.two_factor_clients_forgotten
+METRIC_ASPNETCORE_IDENTITY_SIGN_IN_TWO_FACTOR_CLIENTS_REMEMBERED                  // aspnetcore.identity.sign_in.two_factor_clients_remembered
+METRIC_ASPNETCORE_IDENTITY_USER_CHECK_PASSWORD_ATTEMPTS                           // aspnetcore.identity.user.check_password_attempts
+METRIC_ASPNETCORE_IDENTITY_USER_CREATE_DURATION                                   // aspnetcore.identity.user.create.duration
+METRIC_ASPNETCORE_IDENTITY_USER_DELETE_DURATION                                   // aspnetcore.identity.user.delete.duration
+METRIC_ASPNETCORE_IDENTITY_USER_GENERATED_TOKENS                                  // aspnetcore.identity.user.generated_tokens
+METRIC_ASPNETCORE_IDENTITY_USER_UPDATE_DURATION                                   // aspnetcore.identity.user.update.duration
+METRIC_ASPNETCORE_IDENTITY_USER_VERIFY_TOKEN_ATTEMPTS                             // aspnetcore.identity.user.verify_token_attempts
+METRIC_ASPNETCORE_MEMORY_POOL_ALLOCATED                                           // aspnetcore.memory_pool.allocated
+METRIC_ASPNETCORE_MEMORY_POOL_EVICTED                                             // aspnetcore.memory_pool.evicted
+METRIC_ASPNETCORE_MEMORY_POOL_POOLED                                              // aspnetcore.memory_pool.pooled
+METRIC_ASPNETCORE_MEMORY_POOL_RENTED                                              // aspnetcore.memory_pool.rented
+
+METRIC_CONTAINER_FILESYSTEM_AVAILABLE                                             // container.filesystem.available
+METRIC_CONTAINER_FILESYSTEM_CAPACITY                                              // container.filesystem.capacity
+METRIC_CONTAINER_FILESYSTEM_USAGE                                                 // container.filesystem.usage
+
+METRIC_HW_BATTERY_CHARGE                                                          // hw.battery.charge
+METRIC_HW_BATTERY_CHARGE_LIMIT                                                    // hw.battery.charge.limit
+METRIC_HW_BATTERY_TIME_LEFT                                                       // hw.battery.time_left
+METRIC_HW_CPU_SPEED                                                               // hw.cpu.speed
+METRIC_HW_CPU_SPEED_LIMIT                                                         // hw.cpu.speed.limit
+METRIC_HW_FAN_SPEED                                                               // hw.fan.speed
+METRIC_HW_FAN_SPEED_LIMIT                                                         // hw.fan.speed.limit
+METRIC_HW_FAN_SPEED_RATIO                                                         // hw.fan.speed_ratio
+METRIC_HW_GPU_IO                                                                  // hw.gpu.io
+METRIC_HW_GPU_MEMORY_LIMIT                                                        // hw.gpu.memory.limit
+METRIC_HW_GPU_MEMORY_USAGE                                                        // hw.gpu.memory.usage
+METRIC_HW_GPU_MEMORY_UTILIZATION                                                  // hw.gpu.memory.utilization
+METRIC_HW_GPU_UTILIZATION                                                         // hw.gpu.utilization
+METRIC_HW_LOGICAL_DISK_LIMIT                                                      // hw.logical_disk.limit
+METRIC_HW_LOGICAL_DISK_USAGE                                                      // hw.logical_disk.usage
+METRIC_HW_LOGICAL_DISK_UTILIZATION                                                // hw.logical_disk.utilization
+METRIC_HW_MEMORY_SIZE                                                             // hw.memory.size
+METRIC_HW_NETWORK_BANDWIDTH_LIMIT                                                 // hw.network.bandwidth.limit
+METRIC_HW_NETWORK_BANDWIDTH_UTILIZATION                                           // hw.network.bandwidth.utilization
+METRIC_HW_NETWORK_IO                                                              // hw.network.io
+METRIC_HW_NETWORK_PACKETS                                                         // hw.network.packets
+METRIC_HW_NETWORK_UP                                                              // hw.network.up
+METRIC_HW_PHYSICAL_DISK_ENDURANCE_UTILIZATION                                     // hw.physical_disk.endurance_utilization
+METRIC_HW_PHYSICAL_DISK_SIZE                                                      // hw.physical_disk.size
+METRIC_HW_PHYSICAL_DISK_SMART                                                     // hw.physical_disk.smart
+METRIC_HW_POWER_SUPPLY_LIMIT                                                      // hw.power_supply.limit
+METRIC_HW_POWER_SUPPLY_USAGE                                                      // hw.power_supply.usage
+METRIC_HW_POWER_SUPPLY_UTILIZATION                                                // hw.power_supply.utilization
+METRIC_HW_TAPE_DRIVE_OPERATIONS                                                   // hw.tape_drive.operations
+METRIC_HW_TEMPERATURE                                                             // hw.temperature
+METRIC_HW_TEMPERATURE_LIMIT                                                       // hw.temperature.limit
+METRIC_HW_VOLTAGE                                                                 // hw.voltage
+METRIC_HW_VOLTAGE_LIMIT                                                           // hw.voltage.limit
+METRIC_HW_VOLTAGE_NOMINAL                                                         // hw.voltage.nominal
+
+METRIC_K8S_NODE_FILESYSTEM_AVAILABLE                                              // k8s.node.filesystem.available
+METRIC_K8S_NODE_FILESYSTEM_CAPACITY                                               // k8s.node.filesystem.capacity
+METRIC_K8S_NODE_FILESYSTEM_USAGE                                                  // k8s.node.filesystem.usage
+METRIC_K8S_POD_FILESYSTEM_AVAILABLE                                               // k8s.pod.filesystem.available
+METRIC_K8S_POD_FILESYSTEM_CAPACITY                                                // k8s.pod.filesystem.capacity
+METRIC_K8S_POD_FILESYSTEM_USAGE                                                   // k8s.pod.filesystem.usage
+METRIC_K8S_POD_VOLUME_AVAILABLE                                                   // k8s.pod.volume.available
+METRIC_K8S_POD_VOLUME_CAPACITY                                                    // k8s.pod.volume.capacity
+METRIC_K8S_POD_VOLUME_INODE_COUNT                                                 // k8s.pod.volume.inode.count
+METRIC_K8S_POD_VOLUME_INODE_FREE                                                  // k8s.pod.volume.inode.free
+METRIC_K8S_POD_VOLUME_INODE_USED                                                  // k8s.pod.volume.inode.used
+METRIC_K8S_POD_VOLUME_USAGE                                                       // k8s.pod.volume.usage
+
+METRIC_SYSTEM_NETWORK_PACKET_COUNT                                                // system.network.packet.count
+METRIC_SYSTEM_NETWORK_PACKET_DROPPED                                              // system.network.packet.dropped
+
+EVENT_APP_JANK                                                                    // app.jank
+EVENT_APP_SCREEN_CLICK                                                            // app.screen.click
+EVENT_APP_WIDGET_CLICK                                                            // app.widget.click
+EVENT_AZ_RESOURCE_LOG                                                             // az.resource.log
+EVENT_AZURE_RESOURCE_LOG                                                          // azure.resource.log
+EVENT_BROWSER_WEB_VITAL                                                           // browser.web_vital
+EVENT_DEVICE_APP_LIFECYCLE                                                        // device.app.lifecycle
+EVENT_FEATURE_FLAG_EVALUATION                                                     // feature_flag.evaluation
+EVENT_GEN_AI_ASSISTANT_MESSAGE                                                    // gen_ai.assistant.message
+EVENT_GEN_AI_CHOICE                                                               // gen_ai.choice
+EVENT_GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS                                   // gen_ai.client.inference.operation.details
+EVENT_GEN_AI_SYSTEM_MESSAGE                                                       // gen_ai.system.message
+EVENT_GEN_AI_TOOL_MESSAGE                                                         // gen_ai.tool.message
+EVENT_GEN_AI_USER_MESSAGE                                                         // gen_ai.user.message
+EVENT_RPC_MESSAGE                                                                 // rpc.message
+EVENT_SESSION_END                                                                 // session.end
+EVENT_SESSION_START                                                               // session.start
+
+ATTR_APP_BUILD_ID                                                                 // app.build_id
+ATTR_APP_JANK_FRAME_COUNT                                                         // app.jank.frame_count
+ATTR_APP_JANK_PERIOD                                                              // app.jank.period
+ATTR_APP_JANK_THRESHOLD                                                           // app.jank.threshold
+
+ATTR_ASPNETCORE_AUTHENTICATION_RESULT                                             // aspnetcore.authentication.result
+  ASPNETCORE_AUTHENTICATION_RESULT_VALUE_FAILURE                                    // "failure"
+  ASPNETCORE_AUTHENTICATION_RESULT_VALUE_NONE                                       // "none"
+  ASPNETCORE_AUTHENTICATION_RESULT_VALUE_SUCCESS                                    // "success"
+ATTR_ASPNETCORE_AUTHENTICATION_SCHEME                                             // aspnetcore.authentication.scheme
+ATTR_ASPNETCORE_AUTHORIZATION_POLICY                                              // aspnetcore.authorization.policy
+ATTR_ASPNETCORE_AUTHORIZATION_RESULT                                              // aspnetcore.authorization.result
+  ASPNETCORE_AUTHORIZATION_RESULT_VALUE_FAILURE                                     // "failure"
+  ASPNETCORE_AUTHORIZATION_RESULT_VALUE_SUCCESS                                     // "success"
+ATTR_ASPNETCORE_IDENTITY_ERROR_CODE                                               // aspnetcore.identity.error_code
+ATTR_ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT                                    // aspnetcore.identity.password_check_result
+  ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_FAILURE                           // "failure"
+  ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_PASSWORD_MISSING                  // "password_missing"
+  ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_SUCCESS                           // "success"
+  ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_SUCCESS_REHASH_NEEDED             // "success_rehash_needed"
+  ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_USER_MISSING                      // "user_missing"
+ATTR_ASPNETCORE_IDENTITY_RESULT                                                   // aspnetcore.identity.result
+  ASPNETCORE_IDENTITY_RESULT_VALUE_FAILURE                                          // "failure"
+  ASPNETCORE_IDENTITY_RESULT_VALUE_SUCCESS                                          // "success"
+ATTR_ASPNETCORE_IDENTITY_SIGN_IN_RESULT                                           // aspnetcore.identity.sign_in.result
+  ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_FAILURE                                  // "failure"
+  ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_LOCKED_OUT                               // "locked_out"
+  ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_NOT_ALLOWED                              // "not_allowed"
+  ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_REQUIRES_TWO_FACTOR                      // "requires_two_factor"
+  ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_SUCCESS                                  // "success"
+ATTR_ASPNETCORE_IDENTITY_SIGN_IN_TYPE                                             // aspnetcore.identity.sign_in.type
+  ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_EXTERNAL                                   // "external"
+  ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_PASSKEY                                    // "passkey"
+  ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_PASSWORD                                   // "password"
+  ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_TWO_FACTOR                                 // "two_factor"
+  ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_TWO_FACTOR_AUTHENTICATOR                   // "two_factor_authenticator"
+  ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_TWO_FACTOR_RECOVERY_CODE                   // "two_factor_recovery_code"
+ATTR_ASPNETCORE_IDENTITY_TOKEN_PURPOSE                                            // aspnetcore.identity.token_purpose
+  ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_OTHER                                     // "_OTHER"
+  ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_CHANGE_EMAIL                              // "change_email"
+  ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_CHANGE_PHONE_NUMBER                       // "change_phone_number"
+  ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_EMAIL_CONFIRMATION                        // "email_confirmation"
+  ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_RESET_PASSWORD                            // "reset_password"
+  ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_TWO_FACTOR                                // "two_factor"
+ATTR_ASPNETCORE_IDENTITY_TOKEN_VERIFIED                                           // aspnetcore.identity.token_verified
+  ASPNETCORE_IDENTITY_TOKEN_VERIFIED_VALUE_FAILURE                                  // "failure"
+  ASPNETCORE_IDENTITY_TOKEN_VERIFIED_VALUE_SUCCESS                                  // "success"
+ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE                                         // aspnetcore.identity.user.update_type
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_OTHER                                  // "_OTHER"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ACCESS_FAILED                          // "access_failed"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ADD_CLAIMS                             // "add_claims"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ADD_LOGIN                              // "add_login"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ADD_PASSWORD                           // "add_password"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ADD_TO_ROLES                           // "add_to_roles"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_CHANGE_EMAIL                           // "change_email"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_CHANGE_PASSWORD                        // "change_password"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_CHANGE_PHONE_NUMBER                    // "change_phone_number"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_CONFIRM_EMAIL                          // "confirm_email"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_GENERATE_NEW_TWO_FACTOR_RECOVERY_CODES // "generate_new_two_factor_recovery_codes"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_PASSWORD_REHASH                        // "password_rehash"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REDEEM_TWO_FACTOR_RECOVERY_CODE        // "redeem_two_factor_recovery_code"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_AUTHENTICATION_TOKEN            // "remove_authentication_token"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_CLAIMS                          // "remove_claims"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_FROM_ROLES                      // "remove_from_roles"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_LOGIN                           // "remove_login"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_PASSKEY                         // "remove_passkey"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_PASSWORD                        // "remove_password"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REPLACE_CLAIM                          // "replace_claim"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_RESET_ACCESS_FAILED_COUNT              // "reset_access_failed_count"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_RESET_AUTHENTICATOR_KEY                // "reset_authenticator_key"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_RESET_PASSWORD                         // "reset_password"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SECURITY_STAMP                         // "security_stamp"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_AUTHENTICATION_TOKEN               // "set_authentication_token"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_EMAIL                              // "set_email"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_LOCKOUT_ENABLED                    // "set_lockout_enabled"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_LOCKOUT_END_DATE                   // "set_lockout_end_date"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_PASSKEY                            // "set_passkey"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_PHONE_NUMBER                       // "set_phone_number"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_TWO_FACTOR_ENABLED                 // "set_two_factor_enabled"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_UPDATE                                 // "update"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_USER_NAME                              // "user_name"
+ATTR_ASPNETCORE_IDENTITY_USER_TYPE                                                // aspnetcore.identity.user_type
+ATTR_ASPNETCORE_MEMORY_POOL_OWNER                                                 // aspnetcore.memory_pool.owner
+ATTR_ASPNETCORE_SIGN_IN_IS_PERSISTENT                                             // aspnetcore.sign_in.is_persistent
+
+ATTR_CONTAINER_RUNTIME_DESCRIPTION                                                // container.runtime.description
+ATTR_CONTAINER_RUNTIME_NAME                                                       // container.runtime.name
+ATTR_CONTAINER_RUNTIME_VERSION                                                    // container.runtime.version
+
+ATTR_GEN_AI_INPUT_MESSAGES                                                        // gen_ai.input.messages
+ATTR_GEN_AI_OUTPUT_MESSAGES                                                       // gen_ai.output.messages
+ATTR_GEN_AI_PROVIDER_NAME                                                         // gen_ai.provider.name
+  GEN_AI_PROVIDER_NAME_VALUE_ANTHROPIC                                              // "anthropic"
+  GEN_AI_PROVIDER_NAME_VALUE_AWS_BEDROCK                                            // "aws.bedrock"
+  GEN_AI_PROVIDER_NAME_VALUE_AZURE_AI_INFERENCE                                     // "azure.ai.inference"
+  GEN_AI_PROVIDER_NAME_VALUE_AZURE_AI_OPENAI                                        // "azure.ai.openai"
+  GEN_AI_PROVIDER_NAME_VALUE_COHERE                                                 // "cohere"
+  GEN_AI_PROVIDER_NAME_VALUE_DEEPSEEK                                               // "deepseek"
+  GEN_AI_PROVIDER_NAME_VALUE_GCP_GEMINI                                             // "gcp.gemini"
+  GEN_AI_PROVIDER_NAME_VALUE_GCP_GEN_AI                                             // "gcp.gen_ai"
+  GEN_AI_PROVIDER_NAME_VALUE_GCP_VERTEX_AI                                          // "gcp.vertex_ai"
+  GEN_AI_PROVIDER_NAME_VALUE_GROQ                                                   // "groq"
+  GEN_AI_PROVIDER_NAME_VALUE_IBM_WATSONX_AI                                         // "ibm.watsonx.ai"
+  GEN_AI_PROVIDER_NAME_VALUE_MISTRAL_AI                                             // "mistral_ai"
+  GEN_AI_PROVIDER_NAME_VALUE_OPENAI                                                 // "openai"
+  GEN_AI_PROVIDER_NAME_VALUE_PERPLEXITY                                             // "perplexity"
+  GEN_AI_PROVIDER_NAME_VALUE_X_AI                                                   // "x_ai"
+ATTR_GEN_AI_SYSTEM_INSTRUCTIONS                                                   // gen_ai.system_instructions
+
+ATTR_HW_BATTERY_CAPACITY                                                          // hw.battery.capacity
+ATTR_HW_BATTERY_CHEMISTRY                                                         // hw.battery.chemistry
+ATTR_HW_BATTERY_STATE                                                             // hw.battery.state
+  HW_BATTERY_STATE_VALUE_CHARGING                                                   // "charging"
+  HW_BATTERY_STATE_VALUE_DISCHARGING                                                // "discharging"
+ATTR_HW_BIOS_VERSION                                                              // hw.bios_version
+ATTR_HW_DRIVER_VERSION                                                            // hw.driver_version
+ATTR_HW_ENCLOSURE_TYPE                                                            // hw.enclosure.type
+ATTR_HW_FIRMWARE_VERSION                                                          // hw.firmware_version
+ATTR_HW_GPU_TASK                                                                  // hw.gpu.task
+  HW_GPU_TASK_VALUE_DECODER                                                         // "decoder"
+  HW_GPU_TASK_VALUE_ENCODER                                                         // "encoder"
+  HW_GPU_TASK_VALUE_GENERAL                                                         // "general"
+ATTR_HW_LIMIT_TYPE                                                                // hw.limit_type
+  HW_LIMIT_TYPE_VALUE_CRITICAL                                                      // "critical"
+  HW_LIMIT_TYPE_VALUE_DEGRADED                                                      // "degraded"
+  HW_LIMIT_TYPE_VALUE_HIGH_CRITICAL                                                 // "high.critical"
+  HW_LIMIT_TYPE_VALUE_HIGH_DEGRADED                                                 // "high.degraded"
+  HW_LIMIT_TYPE_VALUE_LOW_CRITICAL                                                  // "low.critical"
+  HW_LIMIT_TYPE_VALUE_LOW_DEGRADED                                                  // "low.degraded"
+  HW_LIMIT_TYPE_VALUE_MAX                                                           // "max"
+  HW_LIMIT_TYPE_VALUE_THROTTLED                                                     // "throttled"
+  HW_LIMIT_TYPE_VALUE_TURBO                                                         // "turbo"
+ATTR_HW_LOGICAL_DISK_RAID_LEVEL                                                   // hw.logical_disk.raid_level
+ATTR_HW_LOGICAL_DISK_STATE                                                        // hw.logical_disk.state
+  HW_LOGICAL_DISK_STATE_VALUE_FREE                                                  // "free"
+  HW_LOGICAL_DISK_STATE_VALUE_USED                                                  // "used"
+ATTR_HW_MEMORY_TYPE                                                               // hw.memory.type
+ATTR_HW_MODEL                                                                     // hw.model
+ATTR_HW_NETWORK_LOGICAL_ADDRESSES                                                 // hw.network.logical_addresses
+ATTR_HW_NETWORK_PHYSICAL_ADDRESS                                                  // hw.network.physical_address
+ATTR_HW_PHYSICAL_DISK_SMART_ATTRIBUTE                                             // hw.physical_disk.smart_attribute
+ATTR_HW_PHYSICAL_DISK_STATE                                                       // hw.physical_disk.state
+  HW_PHYSICAL_DISK_STATE_VALUE_REMAINING                                            // "remaining"
+ATTR_HW_PHYSICAL_DISK_TYPE                                                        // hw.physical_disk.type
+ATTR_HW_SENSOR_LOCATION                                                           // hw.sensor_location
+ATTR_HW_SERIAL_NUMBER                                                             // hw.serial_number
+HW_STATE_VALUE_NEEDS_CLEANING                                                     // "needs_cleaning"
+HW_STATE_VALUE_PREDICTED_FAILURE                                                  // "predicted_failure"
+ATTR_HW_TAPE_DRIVE_OPERATION_TYPE                                                 // hw.tape_drive.operation_type
+  HW_TAPE_DRIVE_OPERATION_TYPE_VALUE_CLEAN                                          // "clean"
+  HW_TAPE_DRIVE_OPERATION_TYPE_VALUE_MOUNT                                          // "mount"
+  HW_TAPE_DRIVE_OPERATION_TYPE_VALUE_UNMOUNT                                        // "unmount"
+ATTR_HW_VENDOR                                                                    // hw.vendor
+
+MESSAGING_SYSTEM_VALUE_AWS_SNS                                                    // "aws.sns"
+
+ATTR_OPENAI_REQUEST_SERVICE_TIER                                                  // openai.request.service_tier
+  OPENAI_REQUEST_SERVICE_TIER_VALUE_AUTO                                            // "auto"
+  OPENAI_REQUEST_SERVICE_TIER_VALUE_DEFAULT                                         // "default"
+ATTR_OPENAI_RESPONSE_SERVICE_TIER                                                 // openai.response.service_tier
+ATTR_OPENAI_RESPONSE_SYSTEM_FINGERPRINT                                           // openai.response.system_fingerprint
+
+ATTR_OTEL_SCOPE_SCHEMA_URL                                                        // otel.scope.schema_url
+```
+
+</details>
+
 ### :bug: Bug Fixes
 
 * fix: prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
