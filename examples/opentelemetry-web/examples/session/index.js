@@ -15,7 +15,7 @@ const {
 } = require('@opentelemetry/web-common');
 
 // session manager
-const sessionManager = new SessionManager({
+const sessionManager = await createSessionManager({
   sessionIdGenerator: new DefaultIdGenerator(),
   sessionStore: new LocalStorageSessionStore(),
   maxDuration: 20,
