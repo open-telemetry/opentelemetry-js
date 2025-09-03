@@ -687,7 +687,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * fix(sdk-node)!: remove the explicit dependency on @opentelemetry/exporter-jaeger that was kept on the previous release
   * '@opentelemetry/exporter-jaeger' is no longer be a dependency of this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.
-    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to one of the alternatives described [here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
+    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to [one of the alternatives described here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
 * fix(otlp-transformer)!: OTLP json encoding [#4220](https://github.com/open-telemetry/opentelemetry-js/pull/4220) @seemk
   * Fixes a bug in the OTLP (http/json) exporters where timestamps were not encoded as strings, causing the export to
     be rejected by OTLP endpoints
@@ -699,7 +699,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(exporter-logs-otlp-proto): change OTLPLogExporter to OTLPLogExporter [#4140](https://github.com/open-telemetry/opentelemetry-js/pull/4140) @Vunovati
 * fix(sdk-node): remove explicit dependency on @opentelemetry/exporter-jaeger
   * '@opentelemetry/exporter-jaeger' is no longer be a dependency of this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.
-    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to one of the alternatives described [here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
+    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to [one of the alternatives described here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
 * fix(sdk-logs): hide internal methods with internal shared state [#3865](https://github.com/open-telemetry/opentelemetry-js/pull/3865) @legendecas
 
 ### :rocket: (Enhancement)
@@ -733,7 +733,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
     * `NodeSDK.detectResources()`, this is not necessary anymore, resources are now auto-detected on startup.
 * chore(sdk-node): add notice that '@opentelemetry/exporter-jaeger' has to be installed manually in the next version [#4068](https://github.com/open-telemetry/opentelemetry-js/pull/4068) @pichlermarc
   * Starting with 0.43.0 '@opentelemetry/exporter-jaeger' will no longer be a dependency of this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.
-    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to one of the alternatives described [here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
+    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to [one of the alternatives described here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
 
 ### :rocket: (Enhancement)
 
