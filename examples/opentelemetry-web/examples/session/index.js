@@ -8,15 +8,14 @@ const {
 const {
   createSessionSpanProcessor,
   createSessionLogRecordProcessor,
-  Session,
-  SessionManager,
-  DefaultIdGenerator,
+  createSessionManager,
+  createDefaultSessionIdGenerator,
   LocalStorageSessionStore
 } = require('@opentelemetry/web-common');
 
 // session manager
-const sessionManager = await createSessionManager({
-  sessionIdGenerator: new DefaultIdGenerator(),
+const sessionManager = createSessionManager({
+  sessionIdGenerator: createDefaultSessionIdGenerator(),
   sessionStore: new LocalStorageSessionStore(),
   maxDuration: 20,
   inactivityTimeout: 10
@@ -31,19 +30,28 @@ sessionManager.addObserver({
   }
 });
 
+// restore or start session
+sessionManager.start();
+
 // configure tracer
-const provider = new WebTracerProvider();
-provider.addSpanProcessor(createSessionSpanProcessor(sessionManager));
-provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-provider.register();
-const tracer = provider.getTracer('example');
+const tracerProvider = new WebTracerProvider({
+  spanProcessors: [
+    createSessionSpanProcessor(sessionManager),
+    new SimpleSpanProcessor(new ConsoleSpanExporter())
+  ]
+});
+
+tracerProvider.register();
+const tracer = tracerProvider.getTracer('example');
 
 // configure logger
-const loggerProvider = new LoggerProvider();
-loggerProvider.addLogRecordProcessor(createSessionLogRecordProcessor(sessionManager));
-loggerProvider.addLogRecordProcessor(
-  new SimpleLogRecordProcessor(new ConsoleLogRecordExporter())
-);
+const loggerProvider = new LoggerProvider({
+  processors: [
+    createSessionLogRecordProcessor(sessionManager),
+    new SimpleLogRecordProcessor(new ConsoleLogRecordExporter())
+  ]
+});
+
 const logger = loggerProvider.getLogger('example');
 
 window.addEventListener('load', () => {

@@ -30,26 +30,37 @@ Example:
 const {
   createSessionSpanProcessor,
   createSessionLogRecordProcessor,
+  createDefaultSessionIdGenerator,
+  createSessionManager,
   SessionManager,
   DefaultIdGenerator,
   LocalStorageSessionStore
 } = require('@opentelemetry/web-common');
 
 // session manager
-const sessionManager = new SessionManager({
-  sessionIdGenerator: new DefaultIdGenerator(),
+const sessionManager = createSessionManager({
+  sessionIdGenerator: createDefaultSessionIdGenerator(),
   sessionStore: new LocalStorageSessionStore(),
   maxDuration: 7200, // 4 hours
   inactivityTimeout: 1800 // 30 minutes
 });
 
+// restore or start session
+sessionManager.start();
+
 // configure tracer
-const provider = new WebTracerProvider();
-provider.addSpanProcessor(createSessionSpanProcessor(sessionManager));
+const tracerProvider = new WebTracerProvider({
+  spanProcessors: [
+    createSessionSpanProcessor(sessionManager),
+  ]
+});
 
 // configure logger
-const loggerProvider = new LoggerProvider();
-loggerProvider.addLogRecordProcessor(createSessionLogRecordProcessor(sessionManager));
+const loggerProvider = new LoggerProvider({
+  processors: [
+    createSessionLogRecordProcessor(sessionManager),
+  ]
+});
 ```
 
 The above implementation can be customized by providing different implementations of SessionStore and SessionIdGenerator.
@@ -79,16 +90,22 @@ function getSessionId() {
 }
 
 // configure tracer
-const provider = new WebTracerProvider();
-provider.addSpanProcessor(createSessionSpanProcessor({
-  getSessionId: getSessionId
-}));
+const tracerProvider = new WebTracerProvider({
+  spanProcessors: [
+    createSessionSpanProcessor({
+      getSessionId: getSessionId
+    }),
+  ]
+});
 
 // configure logger
-const loggerProvider = new LoggerProvider();
-loggerProvider.addLogRecordProcessor(createSessionLogRecordProcessor({
-  getSessionId: getSessionId
-}));
+const loggerProvider = new LoggerProvider({
+  processors: [
+    createSessionLogRecordProcessor({
+      getSessionId: getSessionId
+    }),
+  ]
+});
 ```
 
 ## Useful links

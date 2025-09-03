@@ -35,11 +35,10 @@ export function createSessionLogRecordProcessor(
   return new SessionLogRecordProcessor(sessionProvider);
 }
 
-export async function createSessionManager(
+export function createSessionManager(
   config: SessionManagerConfig
-): Promise<SessionManager> {
+): SessionManager {
   const manager = new SessionManager(config);
-  await manager.start();
   return manager;
 }
 
