@@ -14,13 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  ContextManager,
-  TextMapPropagator,
-  metrics,
-  diag,
-  DiagConsoleLogger,
-} from '@opentelemetry/api';
+import { metrics, trace, diag, DiagConsoleLogger } from '@opentelemetry/api';
 import { logs } from '@opentelemetry/api-logs';
 import {
   Instrumentation,
@@ -79,9 +73,14 @@ import {
   getResourceDetectorsFromEnv,
   getSpanProcessorsFromEnv,
   getPropagatorFromEnv,
+  setupPropagator,
+  setupContextManager,
 } from './utils';
 
-/** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
+type TracerProviderConfig = {
+  tracerConfig: NodeTracerConfig;
+  spanProcessors: SpanProcessor[];
+};
 
 export type MeterProviderConfig = {
   /**
@@ -129,6 +128,7 @@ function configureMetricProviderFromEnv(): IMetricReader[] {
     );
     return metricReaders;
   }
+
   enabledExporters.forEach(exporter => {
     if (exporter === 'otlp') {
       const protocol =
@@ -201,13 +201,15 @@ function configureMetricProviderFromEnv(): IMetricReader[] {
 
   return metricReaders;
 }
+
+/**
+ * Core distribution of the OpenTelemetry JS SDK.
+ * @example
+ * <caption> Register SDK via using environment variables </caption>
+ *
+ */
 export class NodeSDK {
-  private _tracerProviderConfig?: {
-    tracerConfig: NodeTracerConfig;
-    spanProcessors: SpanProcessor[];
-    contextManager?: ContextManager;
-    textMapPropagator?: TextMapPropagator;
-  };
+  private _tracerProviderConfig?: TracerProviderConfig;
   private _loggerProviderConfig?: LoggerProviderConfig;
   private _meterProviderConfig?: MeterProviderConfig;
   private _instrumentations: Instrumentation[];
@@ -292,8 +294,6 @@ export class NodeSDK {
       this._tracerProviderConfig = {
         tracerConfig: tracerProviderConfig,
         spanProcessors,
-        contextManager: configuration.contextManager,
-        textMapPropagator: configuration.textMapPropagator,
       };
     }
 
@@ -361,23 +361,14 @@ export class NodeSDK {
       ? this._tracerProviderConfig.spanProcessors
       : getSpanProcessorsFromEnv();
 
-    this._tracerProvider = new NodeTracerProvider({
-      ...this._configuration,
-      resource: this._resource,
-      spanProcessors,
-    });
-
     // Only register if there is a span processor
     if (spanProcessors.length > 0) {
-      this._tracerProvider.register({
-        contextManager:
-          this._tracerProviderConfig?.contextManager ??
-          // _tracerProviderConfig may be undefined if trace-specific settings are not provided - fall back to raw config
-          this._configuration?.contextManager,
-        propagator:
-          this._tracerProviderConfig?.textMapPropagator ??
-          getPropagatorFromEnv(),
+      this._tracerProvider = new NodeTracerProvider({
+        ...this._configuration,
+        resource: this._resource,
+        spanProcessors,
       });
+      trace.setGlobalTracerProvider(this._tracerProvider);
     }
 
     if (this._loggerProviderConfig) {
@@ -419,6 +410,13 @@ export class NodeSDK {
         instrumentation.setMeterProvider(metrics.getMeterProvider());
       }
     }
+
+    setupContextManager(this._configuration?.contextManager);
+    setupPropagator(
+      this._configuration?.textMapPropagator === null
+        ? null // null means don't set, so we cannot fall back to env config.
+        : (this._configuration?.textMapPropagator ?? getPropagatorFromEnv())
+    );
   }
 
   public shutdown(): Promise<void> {
