@@ -4,6 +4,8 @@ about: Suggest instrumentation for a module or framework
 labels: instrumentation
 ---
 
+<!-- markdownlint-disable MD059 -->
+
 <!--
 **NB:** Before opening an instrumentation support request against this repo, consider whether the instrumentation should reside in the [contrib repository](https://github.com/open-telemetry/opentelemetry-js-contrib).
 
