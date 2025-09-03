@@ -19,7 +19,7 @@ export {
   createSessionSpanProcessor,
   createSessionLogRecordProcessor,
   createSessionManager,
-  createDefaultSessionIdGenerator
+  createDefaultSessionIdGenerator,
 } from './utils';
 export type { Session } from './types/Session';
 export type { SessionIdGenerator } from './types/SessionIdGenerator';
