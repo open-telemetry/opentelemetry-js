@@ -57,7 +57,7 @@ export const ANDROID_APP_STATE_VALUE_CREATED = "created" as const;
 export const ANDROID_APP_STATE_VALUE_FOREGROUND = "foreground" as const;
 
 /**
- * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found [here](https://developer.android.com/guide/topics/manifest/uses-sdk-element#ApiLevels).
+ * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found in the [Android API levels documentation](https://developer.android.com/guide/topics/manifest/uses-sdk-element#ApiLevels).
  *
  * @example 33
  * @example 32
@@ -67,11 +67,11 @@ export const ANDROID_APP_STATE_VALUE_FOREGROUND = "foreground" as const;
 export const ATTR_ANDROID_OS_API_LEVEL = 'android.os.api_level' as const;
 
 /**
- * Deprecated. Use `android.app.state` body field instead.
+ * Deprecated. Use `android.app.state` attribute instead.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Use `android.app.state` body field instead.
+ * @deprecated Replaced by `android.app.state`.
  */
 export const ATTR_ANDROID_STATE = 'android.state' as const;
 
@@ -103,6 +103,17 @@ export const ANDROID_STATE_VALUE_CREATED = "created" as const;
 export const ANDROID_STATE_VALUE_FOREGROUND = "foreground" as const;
 
 /**
+ * Unique identifier for a particular build or compilation of the application.
+ *
+ * @example 6cff0a7e-cefc-4668-96f5-1273d8b334d0
+ * @example 9f2b833506aa6973a92fde9733e6271f
+ * @example my-app-1.0.0-code-123
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_APP_BUILD_ID = 'app.build_id' as const;
+
+/**
  * A unique identifier representing the installation of an application on a specific device
  *
  * @example 2ab2916d-a51f-4ac8-80ee-45ac31a28092
@@ -123,11 +134,45 @@ export const ANDROID_STATE_VALUE_FOREGROUND = "foreground" as const;
  *   - [App set ID](https://developer.android.com/identity/app-set-id).
  *   - [`Settings.getString(Settings.Secure.ANDROID_ID)`](https://developer.android.com/reference/android/provider/Settings.Secure#ANDROID_ID).
  *
- * More information about Android identifier best practices can be found [here](https://developer.android.com/training/articles/user-data-ids).
+ * More information about Android identifier best practices can be found in the [Android user data IDs guide](https://developer.android.com/training/articles/user-data-ids).
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ATTR_APP_INSTALLATION_ID = 'app.installation.id' as const;
+
+/**
+ * A number of frame renders that experienced jank.
+ *
+ * @example 9
+ * @example 42
+ *
+ * @note Depending on platform limitations, the value provided **MAY** be approximation.
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_APP_JANK_FRAME_COUNT = 'app.jank.frame_count' as const;
+
+/**
+ * The time period, in seconds, for which this jank is being reported.
+ *
+ * @example 1.0
+ * @example 5.0
+ * @example 10.24
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_APP_JANK_PERIOD = 'app.jank.period' as const;
+
+/**
+ * The minimum rendering threshold for this jank, in seconds.
+ *
+ * @example 0.016
+ * @example 0.7
+ * @example 1.024
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_APP_JANK_THRESHOLD = 'app.jank.threshold' as const;
 
 /**
  * The x (horizontal) coordinate of a screen coordinate, in screen pixels.
@@ -259,6 +304,729 @@ export const ATTR_ARTIFACT_PURL = 'artifact.purl' as const;
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ATTR_ARTIFACT_VERSION = 'artifact.version' as const;
+
+/**
+ * The result of the authentication operation.
+ *
+ * @example success
+ * @example failure
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_ASPNETCORE_AUTHENTICATION_RESULT = 'aspnetcore.authentication.result' as const;
+
+/**
+ * Enum value "failure" for attribute {@link ATTR_ASPNETCORE_AUTHENTICATION_RESULT}.
+ *
+ * Authentication failed.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_AUTHENTICATION_RESULT_VALUE_FAILURE = "failure" as const;
+
+/**
+ * Enum value "none" for attribute {@link ATTR_ASPNETCORE_AUTHENTICATION_RESULT}.
+ *
+ * No authentication information returned.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_AUTHENTICATION_RESULT_VALUE_NONE = "none" as const;
+
+/**
+ * Enum value "success" for attribute {@link ATTR_ASPNETCORE_AUTHENTICATION_RESULT}.
+ *
+ * Authentication was successful.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_AUTHENTICATION_RESULT_VALUE_SUCCESS = "success" as const;
+
+/**
+ * The identifier that names a particular authentication handler.
+ *
+ * @example Cookies
+ * @example Bearer
+ * @example Identity.Application
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_ASPNETCORE_AUTHENTICATION_SCHEME = 'aspnetcore.authentication.scheme' as const;
+
+/**
+ * The name of the authorization policy.
+ *
+ * @example RequireAdminRole
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_ASPNETCORE_AUTHORIZATION_POLICY = 'aspnetcore.authorization.policy' as const;
+
+/**
+ * The result of calling the authorization service.
+ *
+ * @example success
+ * @example failure
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_ASPNETCORE_AUTHORIZATION_RESULT = 'aspnetcore.authorization.result' as const;
+
+/**
+ * Enum value "failure" for attribute {@link ATTR_ASPNETCORE_AUTHORIZATION_RESULT}.
+ *
+ * Authorization failed.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_AUTHORIZATION_RESULT_VALUE_FAILURE = "failure" as const;
+
+/**
+ * Enum value "success" for attribute {@link ATTR_ASPNETCORE_AUTHORIZATION_RESULT}.
+ *
+ * Authorization was successful.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_AUTHORIZATION_RESULT_VALUE_SUCCESS = "success" as const;
+
+/**
+ * The error code for a failed identity operation.
+ *
+ * @example DefaultError
+ * @example PasswordMismatch
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_ASPNETCORE_IDENTITY_ERROR_CODE = 'aspnetcore.identity.error_code' as const;
+
+/**
+ * The result from checking the password.
+ *
+ * @example success
+ * @example failure
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT = 'aspnetcore.identity.password_check_result' as const;
+
+/**
+ * Enum value "failure" for attribute {@link ATTR_ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT}.
+ *
+ * Password check failed.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_FAILURE = "failure" as const;
+
+/**
+ * Enum value "password_missing" for attribute {@link ATTR_ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT}.
+ *
+ * Password check couldn't proceed because the password was missing from the user.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_PASSWORD_MISSING = "password_missing" as const;
+
+/**
+ * Enum value "success" for attribute {@link ATTR_ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT}.
+ *
+ * Password check was successful.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_SUCCESS = "success" as const;
+
+/**
+ * Enum value "success_rehash_needed" for attribute {@link ATTR_ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT}.
+ *
+ * Password check was successful however the password was encoded using a deprecated algorithm and should be rehashed and updated.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_SUCCESS_REHASH_NEEDED = "success_rehash_needed" as const;
+
+/**
+ * Enum value "user_missing" for attribute {@link ATTR_ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT}.
+ *
+ * Password check couldn't proceed because the user was missing.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_USER_MISSING = "user_missing" as const;
+
+/**
+ * The result of the identity operation.
+ *
+ * @example success
+ * @example failure
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_ASPNETCORE_IDENTITY_RESULT = 'aspnetcore.identity.result' as const;
+
+/**
+ * Enum value "failure" for attribute {@link ATTR_ASPNETCORE_IDENTITY_RESULT}.
+ *
+ * Identity operation failed.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_RESULT_VALUE_FAILURE = "failure" as const;
+
+/**
+ * Enum value "success" for attribute {@link ATTR_ASPNETCORE_IDENTITY_RESULT}.
+ *
+ * Identity operation was successful.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_RESULT_VALUE_SUCCESS = "success" as const;
+
+/**
+ * Whether the sign in result was success or failure.
+ *
+ * @example password
+ * @example two_factor
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_ASPNETCORE_IDENTITY_SIGN_IN_RESULT = 'aspnetcore.identity.sign_in.result' as const;
+
+/**
+ * Enum value "failure" for attribute {@link ATTR_ASPNETCORE_IDENTITY_SIGN_IN_RESULT}.
+ *
+ * Sign in failed.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_FAILURE = "failure" as const;
+
+/**
+ * Enum value "locked_out" for attribute {@link ATTR_ASPNETCORE_IDENTITY_SIGN_IN_RESULT}.
+ *
+ * User is locked out.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_LOCKED_OUT = "locked_out" as const;
+
+/**
+ * Enum value "not_allowed" for attribute {@link ATTR_ASPNETCORE_IDENTITY_SIGN_IN_RESULT}.
+ *
+ * User is not allowed to sign in.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_NOT_ALLOWED = "not_allowed" as const;
+
+/**
+ * Enum value "requires_two_factor" for attribute {@link ATTR_ASPNETCORE_IDENTITY_SIGN_IN_RESULT}.
+ *
+ * User requires two factory authentication to sign in.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_REQUIRES_TWO_FACTOR = "requires_two_factor" as const;
+
+/**
+ * Enum value "success" for attribute {@link ATTR_ASPNETCORE_IDENTITY_SIGN_IN_RESULT}.
+ *
+ * Sign in was successful.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_SUCCESS = "success" as const;
+
+/**
+ * The authentication type.
+ *
+ * @example password
+ * @example two_factor
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_ASPNETCORE_IDENTITY_SIGN_IN_TYPE = 'aspnetcore.identity.sign_in.type' as const;
+
+/**
+ * Enum value "external" for attribute {@link ATTR_ASPNETCORE_IDENTITY_SIGN_IN_TYPE}.
+ *
+ * Sign in with a previously registered third-party login.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_EXTERNAL = "external" as const;
+
+/**
+ * Enum value "passkey" for attribute {@link ATTR_ASPNETCORE_IDENTITY_SIGN_IN_TYPE}.
+ *
+ * Sign in with passkey.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_PASSKEY = "passkey" as const;
+
+/**
+ * Enum value "password" for attribute {@link ATTR_ASPNETCORE_IDENTITY_SIGN_IN_TYPE}.
+ *
+ * Sign in with password.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_PASSWORD = "password" as const;
+
+/**
+ * Enum value "two_factor" for attribute {@link ATTR_ASPNETCORE_IDENTITY_SIGN_IN_TYPE}.
+ *
+ * Sign in with a two factor provider.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_TWO_FACTOR = "two_factor" as const;
+
+/**
+ * Enum value "two_factor_authenticator" for attribute {@link ATTR_ASPNETCORE_IDENTITY_SIGN_IN_TYPE}.
+ *
+ * Sign in with two factor authenticator app.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_TWO_FACTOR_AUTHENTICATOR = "two_factor_authenticator" as const;
+
+/**
+ * Enum value "two_factor_recovery_code" for attribute {@link ATTR_ASPNETCORE_IDENTITY_SIGN_IN_TYPE}.
+ *
+ * Sign in with two factory recovery code.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_TWO_FACTOR_RECOVERY_CODE = "two_factor_recovery_code" as const;
+
+/**
+ * What the token will be used for.
+ *
+ * @example success
+ * @example failure
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_ASPNETCORE_IDENTITY_TOKEN_PURPOSE = 'aspnetcore.identity.token_purpose' as const;
+
+/**
+ * Enum value "_OTHER" for attribute {@link ATTR_ASPNETCORE_IDENTITY_TOKEN_PURPOSE}.
+ *
+ * Any token purpose that the instrumentation has no prior knowledge of.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_OTHER = "_OTHER" as const;
+
+/**
+ * Enum value "change_email" for attribute {@link ATTR_ASPNETCORE_IDENTITY_TOKEN_PURPOSE}.
+ *
+ * The token is for changing the user email address.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_CHANGE_EMAIL = "change_email" as const;
+
+/**
+ * Enum value "change_phone_number" for attribute {@link ATTR_ASPNETCORE_IDENTITY_TOKEN_PURPOSE}.
+ *
+ * The token is for changing a user phone number.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_CHANGE_PHONE_NUMBER = "change_phone_number" as const;
+
+/**
+ * Enum value "email_confirmation" for attribute {@link ATTR_ASPNETCORE_IDENTITY_TOKEN_PURPOSE}.
+ *
+ * The token is for confirming user email address.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_EMAIL_CONFIRMATION = "email_confirmation" as const;
+
+/**
+ * Enum value "reset_password" for attribute {@link ATTR_ASPNETCORE_IDENTITY_TOKEN_PURPOSE}.
+ *
+ * The token is for resetting a user password.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_RESET_PASSWORD = "reset_password" as const;
+
+/**
+ * Enum value "two_factor" for attribute {@link ATTR_ASPNETCORE_IDENTITY_TOKEN_PURPOSE}.
+ *
+ * The token is for changing user two factor settings.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_TWO_FACTOR = "two_factor" as const;
+
+/**
+ * The result of token verification.
+ *
+ * @example success
+ * @example failure
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_ASPNETCORE_IDENTITY_TOKEN_VERIFIED = 'aspnetcore.identity.token_verified' as const;
+
+/**
+ * Enum value "failure" for attribute {@link ATTR_ASPNETCORE_IDENTITY_TOKEN_VERIFIED}.
+ *
+ * Token verification failed.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_TOKEN_VERIFIED_VALUE_FAILURE = "failure" as const;
+
+/**
+ * Enum value "success" for attribute {@link ATTR_ASPNETCORE_IDENTITY_TOKEN_VERIFIED}.
+ *
+ * Token verification was successful.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_TOKEN_VERIFIED_VALUE_SUCCESS = "success" as const;
+
+/**
+ * The user update type.
+ *
+ * @example update
+ * @example user_name
+ * @example reset_password
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE = 'aspnetcore.identity.user.update_type' as const;
+
+/**
+ * Enum value "_OTHER" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Any update type that the instrumentation has no prior knowledge of.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_OTHER = "_OTHER" as const;
+
+/**
+ * Enum value "access_failed" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user access failure recorded.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ACCESS_FAILED = "access_failed" as const;
+
+/**
+ * Enum value "add_claims" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user claims added.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ADD_CLAIMS = "add_claims" as const;
+
+/**
+ * Enum value "add_login" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user login added.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ADD_LOGIN = "add_login" as const;
+
+/**
+ * Enum value "add_password" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user password added.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ADD_PASSWORD = "add_password" as const;
+
+/**
+ * Enum value "add_to_roles" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user added to roles.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ADD_TO_ROLES = "add_to_roles" as const;
+
+/**
+ * Enum value "change_email" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user email changed.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_CHANGE_EMAIL = "change_email" as const;
+
+/**
+ * Enum value "change_password" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user password changed.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_CHANGE_PASSWORD = "change_password" as const;
+
+/**
+ * Enum value "change_phone_number" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user phone number changed.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_CHANGE_PHONE_NUMBER = "change_phone_number" as const;
+
+/**
+ * Enum value "confirm_email" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user email confirmed.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_CONFIRM_EMAIL = "confirm_email" as const;
+
+/**
+ * Enum value "generate_new_two_factor_recovery_codes" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user new two-factor recovery codes generated.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_GENERATE_NEW_TWO_FACTOR_RECOVERY_CODES = "generate_new_two_factor_recovery_codes" as const;
+
+/**
+ * Enum value "password_rehash" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user password rehashed.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_PASSWORD_REHASH = "password_rehash" as const;
+
+/**
+ * Enum value "redeem_two_factor_recovery_code" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user two-factor recovery code redeemed.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REDEEM_TWO_FACTOR_RECOVERY_CODE = "redeem_two_factor_recovery_code" as const;
+
+/**
+ * Enum value "remove_authentication_token" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user authentication token removed.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_AUTHENTICATION_TOKEN = "remove_authentication_token" as const;
+
+/**
+ * Enum value "remove_claims" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user claims removed.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_CLAIMS = "remove_claims" as const;
+
+/**
+ * Enum value "remove_from_roles" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user removed from roles.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_FROM_ROLES = "remove_from_roles" as const;
+
+/**
+ * Enum value "remove_login" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user login removed.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_LOGIN = "remove_login" as const;
+
+/**
+ * Enum value "remove_passkey" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user passkey removed.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_PASSKEY = "remove_passkey" as const;
+
+/**
+ * Enum value "remove_password" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user password removed.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_PASSWORD = "remove_password" as const;
+
+/**
+ * Enum value "replace_claim" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user claim replaced.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REPLACE_CLAIM = "replace_claim" as const;
+
+/**
+ * Enum value "reset_access_failed_count" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user access failure count reset.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_RESET_ACCESS_FAILED_COUNT = "reset_access_failed_count" as const;
+
+/**
+ * Enum value "reset_authenticator_key" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user authenticator key reset.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_RESET_AUTHENTICATOR_KEY = "reset_authenticator_key" as const;
+
+/**
+ * Enum value "reset_password" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user password reset.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_RESET_PASSWORD = "reset_password" as const;
+
+/**
+ * Enum value "security_stamp" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user security stamp updated.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SECURITY_STAMP = "security_stamp" as const;
+
+/**
+ * Enum value "set_authentication_token" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user authentication token set.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_AUTHENTICATION_TOKEN = "set_authentication_token" as const;
+
+/**
+ * Enum value "set_email" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user email set.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_EMAIL = "set_email" as const;
+
+/**
+ * Enum value "set_lockout_enabled" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user lockout enabled or disabled.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_LOCKOUT_ENABLED = "set_lockout_enabled" as const;
+
+/**
+ * Enum value "set_lockout_end_date" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user lockout end date set.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_LOCKOUT_END_DATE = "set_lockout_end_date" as const;
+
+/**
+ * Enum value "set_passkey" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user passkey set.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_PASSKEY = "set_passkey" as const;
+
+/**
+ * Enum value "set_phone_number" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user phone number set.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_PHONE_NUMBER = "set_phone_number" as const;
+
+/**
+ * Enum value "set_two_factor_enabled" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user two-factor authentication enabled or disabled.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_TWO_FACTOR_ENABLED = "set_two_factor_enabled" as const;
+
+/**
+ * Enum value "update" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user updated.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_UPDATE = "update" as const;
+
+/**
+ * Enum value "user_name" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
+ *
+ * Identity user name updated.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_USER_NAME = "user_name" as const;
+
+/**
+ * The full name of the identity user type.
+ *
+ * @example Contoso.ContosoUser
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_ASPNETCORE_IDENTITY_USER_TYPE = 'aspnetcore.identity.user_type' as const;
+
+/**
+ * The name of the library or subsystem using the memory pool instance.
+ *
+ * @example kestrel
+ * @example iis
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_ASPNETCORE_MEMORY_POOL_OWNER = 'aspnetcore.memory_pool.owner' as const;
+
+/**
+ * A flag indicating whether the sign in is persistent.
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_ASPNETCORE_SIGN_IN_IS_PERSISTENT = 'aspnetcore.sign_in.is_persistent' as const;
 
 /**
  * The unique identifier of the AWS Bedrock Guardrail. A [guardrail](https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html) helps safeguard and prevent unwanted behavior from model responses or user messages.
@@ -506,12 +1274,16 @@ export const ATTR_AWS_ECS_LAUNCHTYPE = 'aws.ecs.launchtype' as const;
 /**
  * Enum value "ec2" for attribute {@link ATTR_AWS_ECS_LAUNCHTYPE}.
  *
+ * Amazon EC2
+ *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const AWS_ECS_LAUNCHTYPE_VALUE_EC2 = "ec2" as const;
 
 /**
  * Enum value "fargate" for attribute {@link ATTR_AWS_ECS_LAUNCHTYPE}.
+ *
+ * Amazon Fargate
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -874,12 +1646,16 @@ export const ATTR_AZURE_COSMOSDB_CONSISTENCY_LEVEL = 'azure.cosmosdb.consistency
 /**
  * Enum value "BoundedStaleness" for attribute {@link ATTR_AZURE_COSMOSDB_CONSISTENCY_LEVEL}.
  *
+ * Bounded Staleness
+ *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const AZURE_COSMOSDB_CONSISTENCY_LEVEL_VALUE_BOUNDED_STALENESS = "BoundedStaleness" as const;
 
 /**
  * Enum value "ConsistentPrefix" for attribute {@link ATTR_AZURE_COSMOSDB_CONSISTENCY_LEVEL}.
+ *
+ * Consistent Prefix
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -888,6 +1664,8 @@ export const AZURE_COSMOSDB_CONSISTENCY_LEVEL_VALUE_CONSISTENT_PREFIX = "Consist
 /**
  * Enum value "Eventual" for attribute {@link ATTR_AZURE_COSMOSDB_CONSISTENCY_LEVEL}.
  *
+ * Eventual
+ *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const AZURE_COSMOSDB_CONSISTENCY_LEVEL_VALUE_EVENTUAL = "Eventual" as const;
@@ -895,12 +1673,16 @@ export const AZURE_COSMOSDB_CONSISTENCY_LEVEL_VALUE_EVENTUAL = "Eventual" as con
 /**
  * Enum value "Session" for attribute {@link ATTR_AZURE_COSMOSDB_CONSISTENCY_LEVEL}.
  *
+ * Session
+ *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const AZURE_COSMOSDB_CONSISTENCY_LEVEL_VALUE_SESSION = "Session" as const;
 
 /**
  * Enum value "Strong" for attribute {@link ATTR_AZURE_COSMOSDB_CONSISTENCY_LEVEL}.
+ *
+ * Strong
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1022,12 +1804,16 @@ export const ATTR_CASSANDRA_CONSISTENCY_LEVEL = 'cassandra.consistency.level' as
 /**
  * Enum value "all" for attribute {@link ATTR_CASSANDRA_CONSISTENCY_LEVEL}.
  *
+ * All
+ *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CASSANDRA_CONSISTENCY_LEVEL_VALUE_ALL = "all" as const;
 
 /**
  * Enum value "any" for attribute {@link ATTR_CASSANDRA_CONSISTENCY_LEVEL}.
+ *
+ * Any
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1036,12 +1822,16 @@ export const CASSANDRA_CONSISTENCY_LEVEL_VALUE_ANY = "any" as const;
 /**
  * Enum value "each_quorum" for attribute {@link ATTR_CASSANDRA_CONSISTENCY_LEVEL}.
  *
+ * Each Quorum
+ *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CASSANDRA_CONSISTENCY_LEVEL_VALUE_EACH_QUORUM = "each_quorum" as const;
 
 /**
  * Enum value "local_one" for attribute {@link ATTR_CASSANDRA_CONSISTENCY_LEVEL}.
+ *
+ * Local One
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1050,12 +1840,16 @@ export const CASSANDRA_CONSISTENCY_LEVEL_VALUE_LOCAL_ONE = "local_one" as const;
 /**
  * Enum value "local_quorum" for attribute {@link ATTR_CASSANDRA_CONSISTENCY_LEVEL}.
  *
+ * Local Quorum
+ *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CASSANDRA_CONSISTENCY_LEVEL_VALUE_LOCAL_QUORUM = "local_quorum" as const;
 
 /**
  * Enum value "local_serial" for attribute {@link ATTR_CASSANDRA_CONSISTENCY_LEVEL}.
+ *
+ * Local Serial
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1064,12 +1858,16 @@ export const CASSANDRA_CONSISTENCY_LEVEL_VALUE_LOCAL_SERIAL = "local_serial" as 
 /**
  * Enum value "one" for attribute {@link ATTR_CASSANDRA_CONSISTENCY_LEVEL}.
  *
+ * One
+ *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CASSANDRA_CONSISTENCY_LEVEL_VALUE_ONE = "one" as const;
 
 /**
  * Enum value "quorum" for attribute {@link ATTR_CASSANDRA_CONSISTENCY_LEVEL}.
+ *
+ * Quorum
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1078,6 +1876,8 @@ export const CASSANDRA_CONSISTENCY_LEVEL_VALUE_QUORUM = "quorum" as const;
 /**
  * Enum value "serial" for attribute {@link ATTR_CASSANDRA_CONSISTENCY_LEVEL}.
  *
+ * Serial
+ *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CASSANDRA_CONSISTENCY_LEVEL_VALUE_SERIAL = "serial" as const;
@@ -1085,12 +1885,16 @@ export const CASSANDRA_CONSISTENCY_LEVEL_VALUE_SERIAL = "serial" as const;
 /**
  * Enum value "three" for attribute {@link ATTR_CASSANDRA_CONSISTENCY_LEVEL}.
  *
+ * Three
+ *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CASSANDRA_CONSISTENCY_LEVEL_VALUE_THREE = "three" as const;
 
 /**
  * Enum value "two" for attribute {@link ATTR_CASSANDRA_CONSISTENCY_LEVEL}.
+ *
+ * Two
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2389,8 +3193,39 @@ export const ATTR_CONTAINER_NAME = 'container.name' as const;
  * @example rkt
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `container.runtime.name`.
  */
 export const ATTR_CONTAINER_RUNTIME = 'container.runtime' as const;
+
+/**
+ * A description about the runtime which could include, for example details about the CRI/API version being used or other customisations.
+ *
+ * @example docker://19.3.1 - CRI: 1.22.0
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_CONTAINER_RUNTIME_DESCRIPTION = 'container.runtime.description' as const;
+
+/**
+ * The container runtime managing this container.
+ *
+ * @example docker
+ * @example containerd
+ * @example rkt
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_CONTAINER_RUNTIME_NAME = 'container.runtime.name' as const;
+
+/**
+ * The version of the runtime of this process, as returned by the runtime without modification.
+ *
+ * @example "1.0.0"
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_CONTAINER_RUNTIME_VERSION = 'container.runtime.version' as const;
 
 /**
  * The logical CPU number [0..n-1]
@@ -2414,12 +3249,16 @@ export const ATTR_CPU_MODE = 'cpu.mode' as const;
 /**
  * Enum value "idle" for attribute {@link ATTR_CPU_MODE}.
  *
+ * Idle
+ *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CPU_MODE_VALUE_IDLE = "idle" as const;
 
 /**
  * Enum value "interrupt" for attribute {@link ATTR_CPU_MODE}.
+ *
+ * Interrupt
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2428,12 +3267,16 @@ export const CPU_MODE_VALUE_INTERRUPT = "interrupt" as const;
 /**
  * Enum value "iowait" for attribute {@link ATTR_CPU_MODE}.
  *
+ * IO Wait
+ *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CPU_MODE_VALUE_IOWAIT = "iowait" as const;
 
 /**
  * Enum value "kernel" for attribute {@link ATTR_CPU_MODE}.
+ *
+ * Kernel
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2442,12 +3285,16 @@ export const CPU_MODE_VALUE_KERNEL = "kernel" as const;
 /**
  * Enum value "nice" for attribute {@link ATTR_CPU_MODE}.
  *
+ * Nice
+ *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CPU_MODE_VALUE_NICE = "nice" as const;
 
 /**
  * Enum value "steal" for attribute {@link ATTR_CPU_MODE}.
+ *
+ * Steal
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2456,12 +3303,16 @@ export const CPU_MODE_VALUE_STEAL = "steal" as const;
 /**
  * Enum value "system" for attribute {@link ATTR_CPU_MODE}.
  *
+ * System
+ *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CPU_MODE_VALUE_SYSTEM = "system" as const;
 
 /**
  * Enum value "user" for attribute {@link ATTR_CPU_MODE}.
+ *
+ * User
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3270,7 +4121,7 @@ export const DB_SYSTEM_VALUE_COCKROACHDB = "cockroachdb" as const;
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Removed.
+ * @deprecated Obsoleted.
  */
 export const DB_SYSTEM_VALUE_COLDFUSION = "coldfusion" as const;
 
@@ -3535,7 +4386,7 @@ export const DB_SYSTEM_VALUE_MSSQL = "mssql" as const;
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Removed, use `other_sql` instead.
+ * @deprecated Replaced by `other_sql`.
  */
 export const DB_SYSTEM_VALUE_MSSQLCOMPACT = "mssqlcompact" as const;
 
@@ -4047,7 +4898,7 @@ export const DB_SYSTEM_NAME_VALUE_TRINO = "trino" as const;
 export const ATTR_DB_USER = 'db.user' as const;
 
 /**
- * 'Deprecated, use `deployment.environment.name` instead.'
+ * Deprecated, use `deployment.environment.name` instead.
  *
  * @example staging
  * @example production
@@ -4153,7 +5004,7 @@ export const ATTR_DESTINATION_PORT = 'destination.port' as const;
  * However, it might be resettable by the user for all apps on a device.
  * Hardware IDs (e.g. vendor-specific serial number, IMEI or MAC address) **MAY** be used as values.
  *
- * More information about Android identifier best practices can be found [here](https://developer.android.com/training/articles/user-data-ids).
+ * More information about Android identifier best practices can be found in the [Android user data IDs guide](https://developer.android.com/training/articles/user-data-ids).
  *
  * > [!WARNING]> This attribute may contain sensitive (PII) information. Caution should be taken when storing personal data or anything which can identify a user. GDPR and data protection laws may apply,
  * > ensure you do your own due diligence.> Due to these reasons, this identifier is not recommended for consumer applications and will likely result in rejection from both Google Play and App Store.
@@ -4288,7 +5139,7 @@ export const ATTR_ENDUSER_PSEUDO_ID = 'enduser.pseudo.id' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Use `user.roles` attribute instead.
+ * @deprecated Replaced by `user.roles`.
  */
 export const ATTR_ENDUSER_ROLE = 'enduser.role' as const;
 
@@ -4986,7 +5837,7 @@ export const ATTR_FILE_EXTENSION = 'file.extension' as const;
 /**
  * Name of the fork. A fork is additional data associated with a filesystem object.
  *
- * @example Zone.Identifer
+ * @example Zone.Identifier
  *
  * @note On Linux, a resource fork is used to store additional data with a filesystem object. A file always has at least one fork for the data portion, and additional forks may exist.
  * On NTFS, this is analogous to an Alternate Data Stream (ADS), and the default data stream for a file is just called $DATA. Zone.Identifier is commonly used by Windows to track contents downloaded from the Internet. An ADS is typically of the form: C:\\path\\to\\filename.extension:some_fork_name, and some_fork_name is the value that should populate `fork_name`. `filename.extension` should populate `file.name`, and `extension` should populate `file.extension`. The full path, `file.path`, will include the fork name.
@@ -5436,6 +6287,63 @@ export const ATTR_GEN_AI_CONVERSATION_ID = 'gen_ai.conversation.id' as const;
 export const ATTR_GEN_AI_DATA_SOURCE_ID = 'gen_ai.data_source.id' as const;
 
 /**
+ * The chat history provided to the model as an input.
+ *
+ * @example [
+ * {
+ * "role": "user",
+ * "parts": [
+ * {
+ * "type": "text",
+ * "content": "Weather in Paris?"
+ * }
+ * ]
+ * },
+ * {
+ * "role": "assistant",
+ * "parts": [
+ * {
+ * "type": "tool_call",
+ * "id": "call_VSPygqKTWdrhaFErNvMV18Yl",
+ * "name": "get_weather",
+ * "arguments": {
+ * "location": "Paris"
+ * }
+ * }
+ * ]
+ * },
+ * {
+ * "role": "tool",
+ * "parts": [
+ * {
+ * "type": "tool_call_response",
+ * "id": " call_VSPygqKTWdrhaFErNvMV18Yl",
+ * "result": "rainy, 57°F"
+ * }
+ * ]
+ * }
+ * ]
+ *
+ * @note Instrumentations **MUST** follow [Input messages JSON schema](/docs/gen-ai/gen-ai-input-messages.json).
+ * When the attribute is recorded on events, it **MUST** be recorded in structured
+ * form. When recorded on spans, it **MAY** be recorded as a JSON string if structured
+ * format is not supported and **SHOULD** be recorded in structured form otherwise.
+ *
+ * Messages **MUST** be provided in the order they were sent to the model.
+ * Instrumentations **MAY** provide a way for users to filter or truncate
+ * input messages.
+ *
+ * > [!Warning]
+ * > This attribute is likely to contain sensitive information including user/PII data.
+ *
+ * See [Recording content on attributes](/docs/gen-ai/gen-ai-spans.md#recording-content-on-attributes)
+ * section for more details.
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_GEN_AI_INPUT_MESSAGES = 'gen_ai.input.messages' as const;
+
+/**
  * Deprecated, use `gen_ai.output.type`.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -5483,12 +6391,11 @@ export const GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT_VALUE_TEXT = "text" as const;
 export const ATTR_GEN_AI_OPENAI_REQUEST_SEED = 'gen_ai.openai.request.seed' as const;
 
 /**
- * The service tier requested. May be a specific tier, default, or auto.
- *
- * @example auto
- * @example default
+ * Deprecated, use `openai.request.service_tier`.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `openai.request.service_tier`.
  */
 export const ATTR_GEN_AI_OPENAI_REQUEST_SERVICE_TIER = 'gen_ai.openai.request.service_tier' as const;
 
@@ -5511,21 +6418,25 @@ export const GEN_AI_OPENAI_REQUEST_SERVICE_TIER_VALUE_AUTO = "auto" as const;
 export const GEN_AI_OPENAI_REQUEST_SERVICE_TIER_VALUE_DEFAULT = "default" as const;
 
 /**
- * The service tier used for the response.
+ * Deprecated, use `openai.response.service_tier`.
  *
  * @example scale
  * @example default
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `openai.response.service_tier`.
  */
 export const ATTR_GEN_AI_OPENAI_RESPONSE_SERVICE_TIER = 'gen_ai.openai.response.service_tier' as const;
 
 /**
- * A fingerprint to track any eventual change in the Generative AI environment.
+ * Deprecated, use `openai.response.system_fingerprint`.
  *
  * @example fp_44709d6fcb
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `openai.response.system_fingerprint`.
  */
 export const ATTR_GEN_AI_OPENAI_RESPONSE_SYSTEM_FINGERPRINT = 'gen_ai.openai.response.system_fingerprint' as const;
 
@@ -5602,6 +6513,46 @@ export const GEN_AI_OPERATION_NAME_VALUE_INVOKE_AGENT = "invoke_agent" as const;
 export const GEN_AI_OPERATION_NAME_VALUE_TEXT_COMPLETION = "text_completion" as const;
 
 /**
+ * Messages returned by the model where each message represents a specific model response (choice, candidate).
+ *
+ * @example [
+ * {
+ * "role": "assistant",
+ * "parts": [
+ * {
+ * "type": "text",
+ * "content": "The weather in Paris is currently rainy with a temperature of 57°F."
+ * }
+ * ],
+ * "finish_reason": "stop"
+ * }
+ * ]
+ *
+ * @note Instrumentations **MUST** follow [Output messages JSON schema](/docs/gen-ai/gen-ai-output-messages.json)
+ *
+ * Each message represents a single output choice/candidate generated by
+ * the model. Each message corresponds to exactly one generation
+ * (choice/candidate) and vice versa - one choice cannot be split across
+ * multiple messages or one message cannot contain parts from multiple choices.
+ *
+ * When the attribute is recorded on events, it **MUST** be recorded in structured
+ * form. When recorded on spans, it **MAY** be recorded as a JSON string if structured
+ * format is not supported and **SHOULD** be recorded in structured form otherwise.
+ *
+ * Instrumentations **MAY** provide a way for users to filter or truncate
+ * output messages.
+ *
+ * > [!Warning]
+ * > This attribute is likely to contain sensitive information including user/PII data.
+ *
+ * See [Recording content on attributes](/docs/gen-ai/gen-ai-spans.md#recording-content-on-attributes)
+ * section for more details.
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_GEN_AI_OUTPUT_MESSAGES = 'gen_ai.output.messages' as const;
+
+/**
  * Represents the content type requested by the client.
  *
  * @note This attribute **SHOULD** be used when the client requests output of a specific type. The model may return zero or more outputs of this type.
@@ -5658,6 +6609,167 @@ export const GEN_AI_OUTPUT_TYPE_VALUE_TEXT = "text" as const;
  * @deprecated Removed, no replacement at this time.
  */
 export const ATTR_GEN_AI_PROMPT = 'gen_ai.prompt' as const;
+
+/**
+ * The Generative AI provider as identified by the client or server instrumentation.
+ *
+ * @note The attribute **SHOULD** be set based on the instrumentation's best
+ * knowledge and may differ from the actual model provider.
+ *
+ * Multiple providers, including Azure OpenAI, Gemini, and AI hosting platforms
+ * are accessible using the OpenAI REST API and corresponding client libraries,
+ * but may proxy or host models from different providers.
+ *
+ * The `gen_ai.request.model`, `gen_ai.response.model`, and `server.address`
+ * attributes may help identify the actual system in use.
+ *
+ * The `gen_ai.provider.name` attribute acts as a discriminator that
+ * identifies the GenAI telemetry format flavor specific to that provider
+ * within GenAI semantic conventions.
+ * It **SHOULD** be set consistently with provider-specific attributes and signals.
+ * For example, GenAI spans, metrics, and events related to AWS Bedrock
+ * should have the `gen_ai.provider.name` set to `aws.bedrock` and include
+ * applicable `aws.bedrock.*` attributes and are not expected to include
+ * `openai.*` attributes.
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_GEN_AI_PROVIDER_NAME = 'gen_ai.provider.name' as const;
+
+/**
+ * Enum value "anthropic" for attribute {@link ATTR_GEN_AI_PROVIDER_NAME}.
+ *
+ * [Anthropic](https://www.anthropic.com/)
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const GEN_AI_PROVIDER_NAME_VALUE_ANTHROPIC = "anthropic" as const;
+
+/**
+ * Enum value "aws.bedrock" for attribute {@link ATTR_GEN_AI_PROVIDER_NAME}.
+ *
+ * [AWS Bedrock](https://aws.amazon.com/bedrock)
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const GEN_AI_PROVIDER_NAME_VALUE_AWS_BEDROCK = "aws.bedrock" as const;
+
+/**
+ * Enum value "azure.ai.inference" for attribute {@link ATTR_GEN_AI_PROVIDER_NAME}.
+ *
+ * Azure AI Inference
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const GEN_AI_PROVIDER_NAME_VALUE_AZURE_AI_INFERENCE = "azure.ai.inference" as const;
+
+/**
+ * Enum value "azure.ai.openai" for attribute {@link ATTR_GEN_AI_PROVIDER_NAME}.
+ *
+ * [Azure OpenAI](https://azure.microsoft.com/products/ai-services/openai-service/)
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const GEN_AI_PROVIDER_NAME_VALUE_AZURE_AI_OPENAI = "azure.ai.openai" as const;
+
+/**
+ * Enum value "cohere" for attribute {@link ATTR_GEN_AI_PROVIDER_NAME}.
+ *
+ * [Cohere](https://cohere.com/)
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const GEN_AI_PROVIDER_NAME_VALUE_COHERE = "cohere" as const;
+
+/**
+ * Enum value "deepseek" for attribute {@link ATTR_GEN_AI_PROVIDER_NAME}.
+ *
+ * [DeepSeek](https://www.deepseek.com/)
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const GEN_AI_PROVIDER_NAME_VALUE_DEEPSEEK = "deepseek" as const;
+
+/**
+ * Enum value "gcp.gemini" for attribute {@link ATTR_GEN_AI_PROVIDER_NAME}.
+ *
+ * [Gemini](https://cloud.google.com/products/gemini)
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const GEN_AI_PROVIDER_NAME_VALUE_GCP_GEMINI = "gcp.gemini" as const;
+
+/**
+ * Enum value "gcp.gen_ai" for attribute {@link ATTR_GEN_AI_PROVIDER_NAME}.
+ *
+ * Any Google generative AI endpoint
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const GEN_AI_PROVIDER_NAME_VALUE_GCP_GEN_AI = "gcp.gen_ai" as const;
+
+/**
+ * Enum value "gcp.vertex_ai" for attribute {@link ATTR_GEN_AI_PROVIDER_NAME}.
+ *
+ * [Vertex AI](https://cloud.google.com/vertex-ai)
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const GEN_AI_PROVIDER_NAME_VALUE_GCP_VERTEX_AI = "gcp.vertex_ai" as const;
+
+/**
+ * Enum value "groq" for attribute {@link ATTR_GEN_AI_PROVIDER_NAME}.
+ *
+ * [Groq](https://groq.com/)
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const GEN_AI_PROVIDER_NAME_VALUE_GROQ = "groq" as const;
+
+/**
+ * Enum value "ibm.watsonx.ai" for attribute {@link ATTR_GEN_AI_PROVIDER_NAME}.
+ *
+ * [IBM Watsonx AI](https://www.ibm.com/products/watsonx-ai)
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const GEN_AI_PROVIDER_NAME_VALUE_IBM_WATSONX_AI = "ibm.watsonx.ai" as const;
+
+/**
+ * Enum value "mistral_ai" for attribute {@link ATTR_GEN_AI_PROVIDER_NAME}.
+ *
+ * [Mistral AI](https://mistral.ai/)
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const GEN_AI_PROVIDER_NAME_VALUE_MISTRAL_AI = "mistral_ai" as const;
+
+/**
+ * Enum value "openai" for attribute {@link ATTR_GEN_AI_PROVIDER_NAME}.
+ *
+ * [OpenAI](https://openai.com/)
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const GEN_AI_PROVIDER_NAME_VALUE_OPENAI = "openai" as const;
+
+/**
+ * Enum value "perplexity" for attribute {@link ATTR_GEN_AI_PROVIDER_NAME}.
+ *
+ * [Perplexity](https://www.perplexity.ai/)
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const GEN_AI_PROVIDER_NAME_VALUE_PERPLEXITY = "perplexity" as const;
+
+/**
+ * Enum value "x_ai" for attribute {@link ATTR_GEN_AI_PROVIDER_NAME}.
+ *
+ * [xAI](https://x.ai/)
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const GEN_AI_PROVIDER_NAME_VALUE_X_AI = "x_ai" as const;
 
 /**
  * The target number of candidate completions to return.
@@ -5790,23 +6902,11 @@ export const ATTR_GEN_AI_RESPONSE_ID = 'gen_ai.response.id' as const;
 export const ATTR_GEN_AI_RESPONSE_MODEL = 'gen_ai.response.model' as const;
 
 /**
- * The Generative AI product as identified by the client or server instrumentation.
- *
- * @example "openai"
- *
- * @note The `gen_ai.system` describes a family of GenAI models with specific model identified
- * by `gen_ai.request.model` and `gen_ai.response.model` attributes.
- *
- * The actual GenAI product may differ from the one identified by the client.
- * Multiple systems, including Azure OpenAI and Gemini, are accessible by OpenAI client
- * libraries. In such cases, the `gen_ai.system` is set to `openai` based on the
- * instrumentation's best knowledge, instead of the actual system. The `server.address`
- * attribute may help identify the actual system in use for `openai`.
- *
- * For custom model, a custom friendly name **SHOULD** be used.
- * If none of these options apply, the `gen_ai.system` **SHOULD** be set to `_OTHER`.
+ * Deprecated, use `gen_ai.provider.name` instead.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `gen_ai.provider.name`.
  */
 export const ATTR_GEN_AI_SYSTEM = 'gen_ai.system' as const;
 
@@ -5834,10 +6934,17 @@ export const GEN_AI_SYSTEM_VALUE_AWS_BEDROCK = "aws.bedrock" as const;
  * Azure AI Inference
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Replaced by azure.ai.inference
  */
 export const GEN_AI_SYSTEM_VALUE_AZ_AI_INFERENCE = "az.ai.inference" as const;
+
+/**
+ * Enum value "az.ai.openai" for attribute {@link ATTR_GEN_AI_SYSTEM}.
+ *
+ * Azure OpenAI
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const GEN_AI_SYSTEM_VALUE_AZ_AI_OPENAI = "az.ai.openai" as const;
 
 /**
  * Enum value "azure.ai.inference" for attribute {@link ATTR_GEN_AI_SYSTEM}.
@@ -5856,17 +6963,6 @@ export const GEN_AI_SYSTEM_VALUE_AZURE_AI_INFERENCE = "azure.ai.inference" as co
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const GEN_AI_SYSTEM_VALUE_AZURE_AI_OPENAI = "azure.ai.openai" as const;
-
-/**
- * Enum value "azure.ai.openai" for attribute {@link ATTR_GEN_AI_SYSTEM}.
- *
- * Azure OpenAI
- *
- * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Replaced by azure.ai.openai
- */
-export const GEN_AI_SYSTEM_VALUE_AZ_AI_OPENAI = "azure.ai.openai" as const;
 
 /**
  * Enum value "cohere" for attribute {@link ATTR_GEN_AI_SYSTEM}.
@@ -5920,7 +7016,7 @@ export const GEN_AI_SYSTEM_VALUE_GCP_VERTEX_AI = "gcp.vertex_ai" as const;
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Use 'gcp.gemini' instead.
+ * @deprecated Replaced by `gcp.gemini`.
  */
 export const GEN_AI_SYSTEM_VALUE_GEMINI = "gemini" as const;
 
@@ -5976,7 +7072,7 @@ export const GEN_AI_SYSTEM_VALUE_PERPLEXITY = "perplexity" as const;
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Use 'gcp.vertex_ai' instead.
+ * @deprecated Replaced by `gcp.vertex_ai`.
  */
 export const GEN_AI_SYSTEM_VALUE_VERTEX_AI = "vertex_ai" as const;
 
@@ -5986,8 +7082,56 @@ export const GEN_AI_SYSTEM_VALUE_VERTEX_AI = "vertex_ai" as const;
  * xAI
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `x_ai`.
  */
 export const GEN_AI_SYSTEM_VALUE_XAI = "xai" as const;
+
+/**
+ * The system message or instructions provided to the GenAI model separately from the chat history.
+ *
+ * @example [
+ * {
+ * "type": "text",
+ * "content": "You are an Agent that greet users, always use greetings tool to respond"
+ * }
+ * ]
+ *
+ * @example [
+ * {
+ * "type": "text",
+ * "content": "You are a language translator."
+ * },
+ * {
+ * "type": "text",
+ * "content": "Your mission is to translate text in English to French."
+ * }
+ * ]
+ *
+ * @note This attribute **SHOULD** be used when the corresponding provider or API
+ * allows to provide system instructions or messages separately from the
+ * chat history.
+ *
+ * Instructions that are part of the chat history **SHOULD** be recorded in
+ * `gen_ai.input.messages` attribute instead.
+ *
+ * Instrumentations **MUST** follow [System instructions JSON schema](/docs/gen-ai/gen-ai-system-instructions.json).
+ *
+ * When recorded on spans, it **MAY** be recorded as a JSON string if structured
+ * format is not supported and **SHOULD** be recorded in structured form otherwise.
+ *
+ * Instrumentations **MAY** provide a way for users to filter or truncate
+ * system instructions.
+ *
+ * > [!Warning]
+ * > This attribute may contain sensitive information.
+ *
+ * See [Recording content on attributes](/docs/gen-ai/gen-ai-spans.md#recording-content-on-attributes)
+ * section for more details.
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_GEN_AI_SYSTEM_INSTRUCTIONS = 'gen_ai.system_instructions' as const;
 
 /**
  * The type of token being counted.
@@ -6839,6 +7983,123 @@ export const ATTR_HTTP_URL = 'http.url' as const;
 export const ATTR_HTTP_USER_AGENT = 'http.user_agent' as const;
 
 /**
+ * Design capacity in Watts-hours or Amper-hours
+ *
+ * @example 9.3Ah
+ * @example 50Wh
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_BATTERY_CAPACITY = 'hw.battery.capacity' as const;
+
+/**
+ * Battery [chemistry](https://schemas.dmtf.org/wbem/cim-html/2.31.0/CIM_Battery.html), e.g. Lithium-Ion, Nickel-Cadmium, etc.
+ *
+ * @example Li-ion
+ * @example NiMH
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_BATTERY_CHEMISTRY = 'hw.battery.chemistry' as const;
+
+/**
+ * The current state of the battery
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_BATTERY_STATE = 'hw.battery.state' as const;
+
+/**
+ * Enum value "charging" for attribute {@link ATTR_HW_BATTERY_STATE}.
+ *
+ * Charging
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_BATTERY_STATE_VALUE_CHARGING = "charging" as const;
+
+/**
+ * Enum value "discharging" for attribute {@link ATTR_HW_BATTERY_STATE}.
+ *
+ * Discharging
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_BATTERY_STATE_VALUE_DISCHARGING = "discharging" as const;
+
+/**
+ * BIOS version of the hardware component
+ *
+ * @example 1.2.3
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_BIOS_VERSION = 'hw.bios_version' as const;
+
+/**
+ * Driver version for the hardware component
+ *
+ * @example 10.2.1-3
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_DRIVER_VERSION = 'hw.driver_version' as const;
+
+/**
+ * Type of the enclosure (useful for modular systems)
+ *
+ * @example Computer
+ * @example Storage
+ * @example Switch
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_ENCLOSURE_TYPE = 'hw.enclosure.type' as const;
+
+/**
+ * Firmware version of the hardware component
+ *
+ * @example 2.0.1
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_FIRMWARE_VERSION = 'hw.firmware_version' as const;
+
+/**
+ * Type of task the GPU is performing
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_GPU_TASK = 'hw.gpu.task' as const;
+
+/**
+ * Enum value "decoder" for attribute {@link ATTR_HW_GPU_TASK}.
+ *
+ * Decoder
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_GPU_TASK_VALUE_DECODER = "decoder" as const;
+
+/**
+ * Enum value "encoder" for attribute {@link ATTR_HW_GPU_TASK}.
+ *
+ * Encoder
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_GPU_TASK_VALUE_ENCODER = "encoder" as const;
+
+/**
+ * Enum value "general" for attribute {@link ATTR_HW_GPU_TASK}.
+ *
+ * General
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_GPU_TASK_VALUE_GENERAL = "general" as const;
+
+/**
  * An identifier for the hardware component, unique within the monitored host
  *
  * @example win32battery_battery_testsysa33_1
@@ -6846,6 +8107,152 @@ export const ATTR_HTTP_USER_AGENT = 'http.user_agent' as const;
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ATTR_HW_ID = 'hw.id' as const;
+
+/**
+ * Type of limit for hardware components
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_LIMIT_TYPE = 'hw.limit_type' as const;
+
+/**
+ * Enum value "critical" for attribute {@link ATTR_HW_LIMIT_TYPE}.
+ *
+ * Critical
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_LIMIT_TYPE_VALUE_CRITICAL = "critical" as const;
+
+/**
+ * Enum value "degraded" for attribute {@link ATTR_HW_LIMIT_TYPE}.
+ *
+ * Degraded
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_LIMIT_TYPE_VALUE_DEGRADED = "degraded" as const;
+
+/**
+ * Enum value "high.critical" for attribute {@link ATTR_HW_LIMIT_TYPE}.
+ *
+ * High Critical
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_LIMIT_TYPE_VALUE_HIGH_CRITICAL = "high.critical" as const;
+
+/**
+ * Enum value "high.degraded" for attribute {@link ATTR_HW_LIMIT_TYPE}.
+ *
+ * High Degraded
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_LIMIT_TYPE_VALUE_HIGH_DEGRADED = "high.degraded" as const;
+
+/**
+ * Enum value "low.critical" for attribute {@link ATTR_HW_LIMIT_TYPE}.
+ *
+ * Low Critical
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_LIMIT_TYPE_VALUE_LOW_CRITICAL = "low.critical" as const;
+
+/**
+ * Enum value "low.degraded" for attribute {@link ATTR_HW_LIMIT_TYPE}.
+ *
+ * Low Degraded
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_LIMIT_TYPE_VALUE_LOW_DEGRADED = "low.degraded" as const;
+
+/**
+ * Enum value "max" for attribute {@link ATTR_HW_LIMIT_TYPE}.
+ *
+ * Maximum
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_LIMIT_TYPE_VALUE_MAX = "max" as const;
+
+/**
+ * Enum value "throttled" for attribute {@link ATTR_HW_LIMIT_TYPE}.
+ *
+ * Throttled
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_LIMIT_TYPE_VALUE_THROTTLED = "throttled" as const;
+
+/**
+ * Enum value "turbo" for attribute {@link ATTR_HW_LIMIT_TYPE}.
+ *
+ * Turbo
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_LIMIT_TYPE_VALUE_TURBO = "turbo" as const;
+
+/**
+ * RAID Level of the logical disk
+ *
+ * @example RAID0+1
+ * @example RAID5
+ * @example RAID10
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_LOGICAL_DISK_RAID_LEVEL = 'hw.logical_disk.raid_level' as const;
+
+/**
+ * State of the logical disk space usage
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_LOGICAL_DISK_STATE = 'hw.logical_disk.state' as const;
+
+/**
+ * Enum value "free" for attribute {@link ATTR_HW_LOGICAL_DISK_STATE}.
+ *
+ * Free
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_LOGICAL_DISK_STATE_VALUE_FREE = "free" as const;
+
+/**
+ * Enum value "used" for attribute {@link ATTR_HW_LOGICAL_DISK_STATE}.
+ *
+ * Used
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_LOGICAL_DISK_STATE_VALUE_USED = "used" as const;
+
+/**
+ * Type of the memory module
+ *
+ * @example DDR4
+ * @example DDR5
+ * @example LPDDR5
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_MEMORY_TYPE = 'hw.memory.type' as const;
+
+/**
+ * Descriptive model name of the hardware component
+ *
+ * @example PERC H740P
+ * @example Intel(R) Core(TM) i7-10700K
+ * @example Dell XPS 15 Battery
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_MODEL = 'hw.model' as const;
 
 /**
  * An easily-recognizable name for the hardware component
@@ -6857,6 +8264,24 @@ export const ATTR_HW_ID = 'hw.id' as const;
 export const ATTR_HW_NAME = 'hw.name' as const;
 
 /**
+ * Logical addresses of the adapter (e.g. IP address, or WWPN)
+ *
+ * @example ["172.16.8.21", "57.11.193.42"]
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_NETWORK_LOGICAL_ADDRESSES = 'hw.network.logical_addresses' as const;
+
+/**
+ * Physical address of the adapter (e.g. MAC address, or WWNN)
+ *
+ * @example 00-90-F5-E9-7B-36
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_NETWORK_PHYSICAL_ADDRESS = 'hw.network.physical_address' as const;
+
+/**
  * Unique identifier of the parent component (typically the `hw.id` attribute of the enclosure, or disk controller)
  *
  * @example dellStorage_perc_0
@@ -6864,6 +8289,70 @@ export const ATTR_HW_NAME = 'hw.name' as const;
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ATTR_HW_PARENT = 'hw.parent' as const;
+
+/**
+ * [S.M.A.R.T.](https://wikipedia.org/wiki/S.M.A.R.T.) (Self-Monitoring, Analysis, and Reporting Technology) attribute of the physical disk
+ *
+ * @example Spin Retry Count
+ * @example Seek Error Rate
+ * @example Raw Read Error Rate
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_PHYSICAL_DISK_SMART_ATTRIBUTE = 'hw.physical_disk.smart_attribute' as const;
+
+/**
+ * State of the physical disk endurance utilization
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_PHYSICAL_DISK_STATE = 'hw.physical_disk.state' as const;
+
+/**
+ * Enum value "remaining" for attribute {@link ATTR_HW_PHYSICAL_DISK_STATE}.
+ *
+ * Remaining
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_PHYSICAL_DISK_STATE_VALUE_REMAINING = "remaining" as const;
+
+/**
+ * Type of the physical disk
+ *
+ * @example HDD
+ * @example SSD
+ * @example 10K
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_PHYSICAL_DISK_TYPE = 'hw.physical_disk.type' as const;
+
+/**
+ * Location of the sensor
+ *
+ * @example cpu0
+ * @example ps1
+ * @example INLET
+ * @example CPU0_DIE
+ * @example AMBIENT
+ * @example MOTHERBOARD
+ * @example PS0 V3_3
+ * @example MAIN_12V
+ * @example CPU_VCORE
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_SENSOR_LOCATION = 'hw.sensor_location' as const;
+
+/**
+ * Serial number of the hardware component
+ *
+ * @example CNFCP0123456789
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_SERIAL_NUMBER = 'hw.serial_number' as const;
 
 /**
  * The current state of the component
@@ -6891,13 +8380,65 @@ export const HW_STATE_VALUE_DEGRADED = "degraded" as const;
 export const HW_STATE_VALUE_FAILED = "failed" as const;
 
 /**
+ * Enum value "needs_cleaning" for attribute {@link ATTR_HW_STATE}.
+ *
+ * Needs Cleaning
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_STATE_VALUE_NEEDS_CLEANING = "needs_cleaning" as const;
+
+/**
  * Enum value "ok" for attribute {@link ATTR_HW_STATE}.
  *
- * Ok
+ * OK
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const HW_STATE_VALUE_OK = "ok" as const;
+
+/**
+ * Enum value "predicted_failure" for attribute {@link ATTR_HW_STATE}.
+ *
+ * Predicted Failure
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_STATE_VALUE_PREDICTED_FAILURE = "predicted_failure" as const;
+
+/**
+ * Type of tape drive operation
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_TAPE_DRIVE_OPERATION_TYPE = 'hw.tape_drive.operation_type' as const;
+
+/**
+ * Enum value "clean" for attribute {@link ATTR_HW_TAPE_DRIVE_OPERATION_TYPE}.
+ *
+ * Clean
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_TAPE_DRIVE_OPERATION_TYPE_VALUE_CLEAN = "clean" as const;
+
+/**
+ * Enum value "mount" for attribute {@link ATTR_HW_TAPE_DRIVE_OPERATION_TYPE}.
+ *
+ * Mount
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_TAPE_DRIVE_OPERATION_TYPE_VALUE_MOUNT = "mount" as const;
+
+/**
+ * Enum value "unmount" for attribute {@link ATTR_HW_TAPE_DRIVE_OPERATION_TYPE}.
+ *
+ * Unmount
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const HW_TAPE_DRIVE_OPERATION_TYPE_VALUE_UNMOUNT = "unmount" as const;
 
 /**
  * Type of the component
@@ -7035,6 +8576,20 @@ export const HW_TYPE_VALUE_TEMPERATURE = "temperature" as const;
 export const HW_TYPE_VALUE_VOLTAGE = "voltage" as const;
 
 /**
+ * Vendor name of the hardware component
+ *
+ * @example Dell
+ * @example HP
+ * @example Intel
+ * @example AMD
+ * @example LSI
+ * @example Lenovo
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_VENDOR = 'hw.vendor' as const;
+
+/**
  * This attribute represents the state of the application.
  *
  * @note The iOS lifecycle states are defined in the [UIApplicationDelegate documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate), and from which the `OS terminology` column values are derived.
@@ -7089,11 +8644,13 @@ export const IOS_APP_STATE_VALUE_INACTIVE = "inactive" as const;
 export const IOS_APP_STATE_VALUE_TERMINATE = "terminate" as const;
 
 /**
+ * Deprecated. Use the `ios.app.state` attribute.
+ *
  * @note The iOS lifecycle states are defined in the [UIApplicationDelegate documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate), and from which the `OS terminology` column values are derived.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Replaced by the `ios.app.state` event body field.
+ * @deprecated Replaced by `ios.app.state`.
  */
 export const ATTR_IOS_STATE = 'ios.state' as const;
 
@@ -8973,6 +10530,15 @@ export const ATTR_MESSAGING_SYSTEM = 'messaging.system' as const;
 export const MESSAGING_SYSTEM_VALUE_ACTIVEMQ = "activemq" as const;
 
 /**
+ * Enum value "aws.sns" for attribute {@link ATTR_MESSAGING_SYSTEM}.
+ *
+ * Amazon Simple Notification Service (SNS)
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const MESSAGING_SYSTEM_VALUE_AWS_SNS = "aws.sns" as const;
+
+/**
  * Enum value "aws_sqs" for attribute {@link ATTR_MESSAGING_SYSTEM}.
  *
  * Amazon Simple Queue Service (SQS)
@@ -9729,6 +11295,53 @@ export const NODEJS_EVENTLOOP_STATE_VALUE_IDLE = "idle" as const;
 export const ATTR_OCI_MANIFEST_DIGEST = 'oci.manifest.digest' as const;
 
 /**
+ * The service tier requested. May be a specific tier, default, or auto.
+ *
+ * @example auto
+ * @example default
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_OPENAI_REQUEST_SERVICE_TIER = 'openai.request.service_tier' as const;
+
+/**
+ * Enum value "auto" for attribute {@link ATTR_OPENAI_REQUEST_SERVICE_TIER}.
+ *
+ * The system will utilize scale tier credits until they are exhausted.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const OPENAI_REQUEST_SERVICE_TIER_VALUE_AUTO = "auto" as const;
+
+/**
+ * Enum value "default" for attribute {@link ATTR_OPENAI_REQUEST_SERVICE_TIER}.
+ *
+ * The system will utilize the default scale tier.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const OPENAI_REQUEST_SERVICE_TIER_VALUE_DEFAULT = "default" as const;
+
+/**
+ * The service tier used for the response.
+ *
+ * @example scale
+ * @example default
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_OPENAI_RESPONSE_SERVICE_TIER = 'openai.response.service_tier' as const;
+
+/**
+ * A fingerprint to track any eventual change in the Generative AI environment.
+ *
+ * @example fp_44709d6fcb
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_OPENAI_RESPONSE_SYSTEM_FINGERPRINT = 'openai.response.system_fingerprint' as const;
+
+/**
  * Parent-child Reference type
  *
  * @note The causal relationship between a child Span and a parent Span.
@@ -10116,6 +11729,15 @@ export const ATTR_OTEL_LIBRARY_NAME = 'otel.library.name' as const;
  * @deprecated Replaced by `otel.scope.version`.
  */
 export const ATTR_OTEL_LIBRARY_VERSION = 'otel.library.version' as const;
+
+/**
+ * The schema URL of the instrumentation scope.
+ *
+ * @example https://opentelemetry.io/schemas/1.31.0
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_OTEL_SCOPE_SCHEMA_URL = 'otel.scope.schema_url' as const;
 
 /**
  * Determines whether the span has a parent span, and if so, [whether it is a remote parent](https://opentelemetry.io/docs/specs/otel/trace/api/#isremote)
@@ -11616,6 +13238,8 @@ export const SYSTEM_MEMORY_STATE_VALUE_SHARED = "shared" as const;
 
 /**
  * Enum value "used" for attribute {@link ATTR_SYSTEM_MEMORY_STATE}.
+ *
+ * Actual used virtual memory in bytes.
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
