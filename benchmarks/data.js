@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1756917995147,
+  "lastUpdate": 1756973650618,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -37756,6 +37756,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.61%",
             "unit": "ops/sec",
             "extra": "93 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "29139614+renovate[bot]@users.noreply.github.com",
+            "name": "renovate[bot]",
+            "username": "renovate[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4636de6a16d338a418ee901ee6b685b887585c4f",
+          "message": "chore(deps): update dependency markdownlint-cli2 to v0.18.1 (#5891)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2025-09-04T08:04:55Z",
+          "tree_id": "53348edcb610437564fa0ca5a922dc036d0a011a",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/4636de6a16d338a418ee901ee6b685b887585c4f"
+        },
+        "date": 1756973649595,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 699616,
+            "range": "±0.91%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8759,
+            "range": "±0.81%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 294019,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 284439,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
