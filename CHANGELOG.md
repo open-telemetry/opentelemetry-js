@@ -10,9 +10,19 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ## Unreleased
 
-* feat(instrumentation-http): Added support for redacting specific url query string values and url credentials in instrumentations [#5743](https://github.com/open-telemetry/opentelemetry-js/pull/5743) @rads-1996
-
 ### :boom: Breaking Changes
+
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 2.1.0
+
+* feat(instrumentation-http): Added support for redacting specific url query string values and url credentials in instrumentations [#5743](https://github.com/open-telemetry/opentelemetry-js/pull/5743) @rads-1996
 
 ### :rocket: Features
 
@@ -21,8 +31,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :bug: Bug Fixes
 
 * fix(sdk-metrics): Remove invalid default value for `startTime` param to ExponentialHistogramAccumulation. This only impacted the closurescript compiler. [#5763](https://github.com/open-telemetry/opentelemetry-js/pull/5763) @trentm
-
-### :books: Documentation
 
 ### :house: Internal
 
