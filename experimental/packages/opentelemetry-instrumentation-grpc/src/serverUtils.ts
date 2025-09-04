@@ -49,7 +49,7 @@ import { AttributeNames } from './enums/AttributeNames';
 import {
   ATTR_RPC_GRPC_STATUS_CODE,
   RPC_GRPC_STATUS_CODE_VALUE_OK,
-} from '../src/semconv';
+} from './semconv';
 
 export const CALL_SPAN_ENDED = Symbol('opentelemetry call span ended');
 

@@ -32,10 +32,10 @@ export type OtelTraceState = {
   rest?: string[];
 };
 
-export const INVALID_TRACE_STATE: OtelTraceState = {
+export const INVALID_TRACE_STATE: OtelTraceState = Object.freeze({
   randomValue: INVALID_RANDOM_VALUE,
   threshold: INVALID_THRESHOLD,
-};
+});
 
 const TRACE_STATE_SIZE_LIMIT = 256;
 const MAX_VALUE_LENGTH = 14; // 56 bits, 4 bits per hex digit

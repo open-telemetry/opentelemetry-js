@@ -69,7 +69,7 @@ import {
   ATTR_RPC_METHOD,
   ATTR_RPC_SERVICE,
   ATTR_RPC_SYSTEM,
-} from '../src/semconv';
+} from './semconv';
 
 import {
   shouldNotTraceServerCall,
