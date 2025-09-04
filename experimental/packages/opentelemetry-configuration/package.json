@@ -1,7 +1,7 @@
 {
   "name": "@opentelemetry/configuration",
   "private": true,
-  "version": "0.203.0",
+  "version": "0.204.0",
   "description": "OpenTelemetry Configuration",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/core": "^2.0.1"
+    "@opentelemetry/core": "2.1.0"
   },
   "devDependencies": {
     "@opentelemetry/api": "^1.9.0",
