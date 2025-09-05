@@ -59,9 +59,10 @@ export function parsePairKeyValue(
 ): ParsedBaggageKeyValue | undefined {
   if (!entry) return;
   const metadataSeparatorIndex = entry.indexOf(BAGGAGE_PROPERTIES_SEPARATOR);
-  const keyPairPart = metadataSeparatorIndex === -1 
-    ? entry 
-    : entry.substring(0, metadataSeparatorIndex);
+  const keyPairPart =
+    metadataSeparatorIndex === -1
+      ? entry
+      : entry.substring(0, metadataSeparatorIndex);
 
   const separatorIndex = keyPairPart.indexOf(BAGGAGE_KEY_PAIR_SEPARATOR);
   if (separatorIndex <= 0) return;
@@ -70,7 +71,6 @@ export function parsePairKeyValue(
   const rawValue = keyPairPart.substring(separatorIndex + 1).trim();
 
   if (!rawKey || !rawValue) return;
-  
   let key: string;
   let value: string;
   try {
@@ -81,11 +81,14 @@ export function parsePairKeyValue(
   }
 
   let metadata;
-  if (metadataSeparatorIndex !== -1 && metadataSeparatorIndex < entry.length - 1) {
+  if (
+    metadataSeparatorIndex !== -1 &&
+    metadataSeparatorIndex < entry.length - 1
+  ) {
     const metadataString = entry.substring(metadataSeparatorIndex + 1);
     metadata = baggageEntryMetadataFromString(metadataString);
   }
-  
+
   return { key, value, metadata };
 }
 
