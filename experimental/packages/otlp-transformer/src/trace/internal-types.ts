@@ -97,6 +97,9 @@ export interface ISpan {
 
   /** Span status */
   status: IStatus;
+
+  /** Span flags */
+  flags?: number;
 }
 
 /**
@@ -185,4 +188,7 @@ export interface ILink {
 
   /** Link droppedAttributesCount */
   droppedAttributesCount: number;
+
+  /** Link flags */
+  flags?: number;
 }
