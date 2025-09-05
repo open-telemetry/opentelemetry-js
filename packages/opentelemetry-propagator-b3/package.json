@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/propagator-b3",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "OpenTelemetry B3 propagator provides context propagation for systems that are using the B3 header format",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -51,7 +51,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/core": "2.0.1"
+    "@opentelemetry/core": "2.1.0"
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0"

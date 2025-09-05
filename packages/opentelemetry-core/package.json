@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/core",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "OpenTelemetry Core provides constants and utilities shared by all OpenTelemetry SDK packages.",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",

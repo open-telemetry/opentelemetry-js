@@ -208,7 +208,7 @@ If you maintain an *implementation* of a resource detector, i.e. if you have a c
 
 The environment variable utilities have changed to no longer have one large load and parse of all possible `OTEL_*` environment variables. Instead there are `get{Type}FromEnv()` utilities to handle the various [specified OpenTelemetry SDK environment variable types](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#configuration-types).
 
-The caller should now handle default values. The authority for default values is the [OpenTelemetry Environment Variable Spec](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#general-sdk-configuration). The previously used defaults in the 1.x code can be seen [here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239).
+The caller should now handle default values. The authority for default values is the [OpenTelemetry Environment Variable Spec](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#general-sdk-configuration). See [the previously used defaults in the 1.x code here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239).
 
 - `getEnv().OTEL_FOO` -> `get{Type}FromEnv('OTEL_FOO') ?? defaultValue`
   - `getStringFromEnv()`
