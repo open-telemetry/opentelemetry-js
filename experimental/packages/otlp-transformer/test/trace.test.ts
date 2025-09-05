@@ -97,6 +97,7 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
                         },
                       },
                     ],
+                    flags: 0x100, // SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK
                   },
                 ],
                 startTimeUnixNano: startTime,
@@ -129,6 +130,7 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
                   code: EStatusCode.STATUS_CODE_OK,
                   message: undefined,
                 },
+                flags: 0x100, // SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK
               },
             ],
             schemaUrl: 'http://url.to.schema',
@@ -187,6 +189,7 @@ function createExpectedSpanProtobuf() {
                         },
                       },
                     ],
+                    flags: 0x100, // SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK
                   },
                 ],
                 startTimeUnixNano: startTime,
@@ -218,6 +221,7 @@ function createExpectedSpanProtobuf() {
                 status: {
                   code: EStatusCode.STATUS_CODE_OK,
                 },
+                flags: 0x100, // SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK
               },
             ],
             schemaUrl: 'http://url.to.schema',
@@ -572,6 +576,76 @@ describe('Trace', () => {
       assert.doesNotThrow(() =>
         JsonTraceSerializer.deserializeResponse(new Uint8Array([]))
       );
+    });
+  });
+
+  describe('span flags', () => {
+    it('sets flags to 0x100 for local parent span context', () => {
+      const exportRequest = createExportTraceServiceRequest([span], {
+        useHex: true,
+      });
+      assert.ok(exportRequest);
+      const spanFlags = exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].flags;
+      assert.strictEqual(spanFlags, 0x100); // SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK
+    });
+
+    it('sets flags to 0x300 for remote parent span context', () => {
+      // Create a span with a remote parent context
+      const remoteParentSpanContext = {
+        spanId: '0000000000000001',
+        traceId: '00000000000000000000000000000001',
+        traceFlags: TraceFlags.SAMPLED,
+        isRemote: true, // This is the key difference
+      };
+
+      const spanWithRemoteParent = {
+        ...span,
+        parentSpanContext: remoteParentSpanContext,
+      };
+
+      const exportRequest = createExportTraceServiceRequest([spanWithRemoteParent], {
+        useHex: true,
+      });
+      assert.ok(exportRequest);
+      const spanFlags = exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].flags;
+      assert.strictEqual(spanFlags, 0x300); // SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK | SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK
+    });
+
+    it('sets flags to 0x100 for links with local context', () => {
+      const exportRequest = createExportTraceServiceRequest([span], {
+        useHex: true,
+      });
+      assert.ok(exportRequest);
+      const linkFlags = exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].links?.[0].flags;
+      assert.strictEqual(linkFlags, 0x100); // SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK
+    });
+
+    it('sets flags to 0x300 for links with remote context', () => {
+      // Create a span with a remote link context
+      const remoteLinkContext = {
+        spanId: '0000000000000003',
+        traceId: '00000000000000000000000000000002',
+        traceFlags: TraceFlags.SAMPLED,
+        isRemote: true, // This is the key difference
+      };
+
+      const remoteLink = {
+        context: remoteLinkContext,
+        attributes: { 'link-attribute': 'string value' },
+        droppedAttributesCount: 0,
+      };
+
+      const spanWithRemoteLink = {
+        ...span,
+        links: [remoteLink],
+      };
+
+      const exportRequest = createExportTraceServiceRequest([spanWithRemoteLink], {
+        useHex: true,
+      });
+      assert.ok(exportRequest);
+      const linkFlags = exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].links?.[0].flags;
+      assert.strictEqual(linkFlags, 0x300); // SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK | SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK
     });
   });
 });
