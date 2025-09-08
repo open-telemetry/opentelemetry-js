@@ -36,7 +36,7 @@ module.exports = {
       // because the `util` package expects there to be a global variable named `process`.
       // Thanks to https://stackoverflow.com/a/65018686/14239942
       // NOTE: I wish there was a better way as this pollutes the tests with a defined 'process' global.
-      process: 'process/browser'
+      process: 'process/browser.js'
     })
   ],
   module: {

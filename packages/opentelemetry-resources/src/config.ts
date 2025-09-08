@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import type { Detector, DetectorSync } from './types';
+import type { ResourceDetector } from './types';
 
 /**
  * ResourceDetectionConfig provides an interface for configuring resource auto-detection.
  */
 export interface ResourceDetectionConfig {
-  detectors?: Array<Detector | DetectorSync>;
+  detectors?: Array<ResourceDetector>;
 }

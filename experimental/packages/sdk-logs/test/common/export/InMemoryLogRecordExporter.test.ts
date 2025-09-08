@@ -25,9 +25,10 @@ import {
 } from '../../../src';
 
 const setup = () => {
-  const provider = new LoggerProvider();
   const memoryExporter = new InMemoryLogRecordExporter();
-  provider.addLogRecordProcessor(new SimpleLogRecordProcessor(memoryExporter));
+  const provider = new LoggerProvider({
+    processors: [new SimpleLogRecordProcessor(memoryExporter)],
+  });
   return { provider, memoryExporter };
 };
 

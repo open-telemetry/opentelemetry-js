@@ -16,11 +16,11 @@
 
 import { SpanKind, Span, context, propagation } from '@opentelemetry/api';
 import {
-  HTTPFLAVORVALUES_HTTP_1_1,
-  NETTRANSPORTVALUES_IP_TCP,
-  SEMATTRS_HTTP_FLAVOR,
-  SEMATTRS_NET_TRANSPORT,
-} from '@opentelemetry/semantic-conventions';
+  HTTP_FLAVOR_VALUE_HTTP_1_1,
+  NET_TRANSPORT_VALUE_IP_TCP,
+  ATTR_HTTP_FLAVOR,
+  ATTR_NET_TRANSPORT,
+} from '../../src/semconv';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as fs from 'fs';
@@ -46,8 +46,6 @@ import { httpsRequest } from '../utils/httpsRequest';
 import { DummyPropagation } from '../utils/DummyPropagation';
 
 const protocol = 'https';
-const serverPort = 42345;
-const hostname = 'localhost';
 const memoryExporter = new InMemorySpanExporter();
 
 export const customAttributeFunction = (span: Span): void => {
@@ -131,23 +129,17 @@ describe('HttpsInstrumentation Integration tests', () => {
         done();
       });
     });
-    const provider = new NodeTracerProvider();
-    provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    const provider = new NodeTracerProvider({
+      spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+    });
     instrumentation.setTracerProvider(provider);
     beforeEach(() => {
       memoryExporter.reset();
     });
 
     before(() => {
-      const ignoreConfig = [
-        `${protocol}://${hostname}:${serverPort}/ignored/string`,
-        /\/ignored\/regexp$/i,
-        (url: string) => url.endsWith('/ignored/function'),
-      ];
       propagation.setGlobalPropagator(new DummyPropagation());
       instrumentation.setConfig({
-        ignoreIncomingPaths: ignoreConfig,
-        ignoreOutgoingUrls: ignoreConfig,
         applyCustomAttributesOnSpan: customAttributeFunction,
       });
       instrumentation.enable();
@@ -241,12 +233,12 @@ describe('HttpsInstrumentation Integration tests', () => {
       assert.strictEqual(span.name, 'GET');
       assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
       assert.strictEqual(
-        span.attributes[SEMATTRS_HTTP_FLAVOR],
-        HTTPFLAVORVALUES_HTTP_1_1
+        span.attributes[ATTR_HTTP_FLAVOR],
+        HTTP_FLAVOR_VALUE_HTTP_1_1
       );
       assert.strictEqual(
-        span.attributes[SEMATTRS_NET_TRANSPORT],
-        NETTRANSPORTVALUES_IP_TCP
+        span.attributes[ATTR_NET_TRANSPORT],
+        NET_TRANSPORT_VALUE_IP_TCP
       );
       assertSpan(span, SpanKind.CLIENT, validations);
     });

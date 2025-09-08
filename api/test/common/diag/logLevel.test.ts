@@ -31,7 +31,7 @@ export const diagLoggerFunctions = [
   'error',
 ] as const;
 
-describe('LogLevelFilter DiagLogger', () => {
+describe('LogLevelFilter DiagLogger', function () {
   const calledArgs: any = {
     error: null,
     warn: null,
@@ -77,7 +77,7 @@ describe('LogLevelFilter DiagLogger', () => {
 
   const levelMap: Array<{
     message: string;
-    level: DiagLogLevel;
+    level: number;
     ignoreFuncs: Array<keyof DiagLogger>;
   }> = [
     { message: 'ALL', level: DiagLogLevel.ALL, ignoreFuncs: [] },
@@ -117,10 +117,10 @@ describe('LogLevelFilter DiagLogger', () => {
   ];
 
   levelMap.forEach(map => {
-    describe(`with ${map.message} log level`, () => {
+    describe(`with ${map.message} log level`, function () {
       diagLoggerFunctions.forEach(fName => {
-        describe(`calling ${fName} message`, () => {
-          it('should log', () => {
+        describe(`calling ${fName} message`, function () {
+          it('should log', function () {
             const testLogger = createLogLevelDiagLogger(map.level, dummyLogger);
             testLogger[fName](`${fName} called %s`, 'param1');
             diagLoggerFunctions.forEach(lName => {
@@ -135,7 +135,7 @@ describe('LogLevelFilter DiagLogger', () => {
             });
           });
 
-          it('should be noop for null with explicit noop Logger log', () => {
+          it('should be noop for null with explicit noop Logger log', function () {
             const testLogger = createLogLevelDiagLogger(
               map.level,
               createNoopDiagLogger()
@@ -146,7 +146,7 @@ describe('LogLevelFilter DiagLogger', () => {
             });
           });
 
-          it('should be noop and not throw for null and no default Logger log', () => {
+          it('should be noop and not throw for null and no default Logger log', function () {
             // @ts-expect-error null logger is not allowed
             const testLogger = createLogLevelDiagLogger(map.level, null);
             testLogger[fName](`${fName} called %s`, 'param1');
@@ -155,7 +155,7 @@ describe('LogLevelFilter DiagLogger', () => {
             });
           });
 
-          it('should be noop and not throw for undefined and no default Logger log', () => {
+          it('should be noop and not throw for undefined and no default Logger log', function () {
             // @ts-expect-error undefined logger is not allowed
             const testLogger = createLogLevelDiagLogger(map.level, undefined);
             testLogger[fName](`${fName} called %s`, 'param1');
@@ -165,8 +165,8 @@ describe('LogLevelFilter DiagLogger', () => {
           });
 
           levelMap.forEach(masterLevelMap => {
-            describe(`when diag logger is set to ${masterLevelMap.message}`, () => {
-              it('diag.setLogger level is ignored when using a specific logger', () => {
+            describe(`when diag logger is set to ${masterLevelMap.message}`, function () {
+              it('diag.setLogger level is ignored when using a specific logger', function () {
                 diag.setLogger(dummyLogger, masterLevelMap.level);
 
                 const testLogger = createLogLevelDiagLogger(
@@ -192,7 +192,7 @@ describe('LogLevelFilter DiagLogger', () => {
             });
           });
 
-          it('diag.setLogger level and logger should log', () => {
+          it('diag.setLogger level and logger should log', function () {
             diag.setLogger(dummyLogger, map.level);
             restoreCallHistory();
             diag[fName](`${fName} called %s`, 'param1');
@@ -208,7 +208,7 @@ describe('LogLevelFilter DiagLogger', () => {
             });
           });
 
-          it('should not throw with an invalid DiagLogger', () => {
+          it('should not throw with an invalid DiagLogger', function () {
             const invalidLogger = {
               debug: 1,
               warn: 2,

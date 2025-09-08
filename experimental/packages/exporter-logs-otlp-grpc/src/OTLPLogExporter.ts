@@ -15,62 +15,29 @@
  */
 
 import { LogRecordExporter, ReadableLogRecord } from '@opentelemetry/sdk-logs';
-import { baggageUtils, getEnv } from '@opentelemetry/core';
 import {
+  convertLegacyOtlpGrpcOptions,
+  createOtlpGrpcExportDelegate,
   OTLPGRPCExporterConfigNode,
-  OTLPGRPCExporterNodeBase,
-  validateAndNormalizeUrl,
-  DEFAULT_COLLECTOR_URL,
 } from '@opentelemetry/otlp-grpc-exporter-base';
-import {
-  IExportLogsServiceResponse,
-  ProtobufLogsSerializer,
-} from '@opentelemetry/otlp-transformer';
-import { VERSION } from './version';
-
-const USER_AGENT = {
-  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
-};
+import { ProtobufLogsSerializer } from '@opentelemetry/otlp-transformer';
+import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 
 /**
  * OTLP Logs Exporter for Node
  */
 export class OTLPLogExporter
-  extends OTLPGRPCExporterNodeBase<
-    ReadableLogRecord,
-    IExportLogsServiceResponse
-  >
+  extends OTLPExporterBase<ReadableLogRecord[]>
   implements LogRecordExporter
 {
   constructor(config: OTLPGRPCExporterConfigNode = {}) {
-    const signalSpecificMetadata = {
-      ...USER_AGENT,
-      ...baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
-      ),
-    };
     super(
-      config,
-      signalSpecificMetadata,
-      'LogsExportService',
-      '/opentelemetry.proto.collector.logs.v1.LogsService/Export',
-      ProtobufLogsSerializer
-    );
-  }
-
-  getDefaultUrl(config: OTLPGRPCExporterConfigNode) {
-    return validateAndNormalizeUrl(this.getUrlFromConfig(config));
-  }
-
-  getUrlFromConfig(config: OTLPGRPCExporterConfigNode): string {
-    if (typeof config.url === 'string') {
-      return config.url;
-    }
-
-    return (
-      getEnv().OTEL_EXPORTER_OTLP_LOGS_ENDPOINT ||
-      getEnv().OTEL_EXPORTER_OTLP_ENDPOINT ||
-      DEFAULT_COLLECTOR_URL
+      createOtlpGrpcExportDelegate(
+        convertLegacyOtlpGrpcOptions(config, 'LOGS'),
+        ProtobufLogsSerializer,
+        'LogsExportService',
+        '/opentelemetry.proto.collector.logs.v1.LogsService/Export'
+      )
     );
   }
 }

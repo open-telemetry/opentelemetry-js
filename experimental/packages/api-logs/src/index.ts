@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-export * from './types/Logger';
-export * from './types/LoggerProvider';
-export * from './types/LogRecord';
-export * from './types/LoggerOptions';
-export * from './types/AnyValue';
-export * from './NoopLogger';
-export * from './NoopLoggerProvider';
+export type { Logger } from './types/Logger';
+export type { LoggerProvider } from './types/LoggerProvider';
+export { SeverityNumber } from './types/LogRecord';
+export type { LogAttributes, LogBody, LogRecord } from './types/LogRecord';
+export type { LoggerOptions } from './types/LoggerOptions';
+export type { AnyValue, AnyValueMap } from './types/AnyValue';
+export { NOOP_LOGGER, NoopLogger } from './NoopLogger';
+export { NOOP_LOGGER_PROVIDER, NoopLoggerProvider } from './NoopLoggerProvider';
+export { ProxyLogger } from './ProxyLogger';
+export { ProxyLoggerProvider } from './ProxyLoggerProvider';
 
 import { LogsAPI } from './api/logs';
 export const logs = LogsAPI.getInstance();

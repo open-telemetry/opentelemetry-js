@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import {
-  SpanAttributes,
+  Attributes,
   Context,
   context,
   createContextKey,
@@ -29,7 +29,7 @@ import {
   TraceState,
 } from '@opentelemetry/api';
 import {
-  InstrumentationLibrary,
+  InstrumentationScope,
   sanitizeAttributes,
   suppressTracing,
 } from '@opentelemetry/core';
@@ -42,20 +42,14 @@ import {
   SamplingDecision,
   Span,
   SpanProcessor,
-  Tracer,
 } from '../../src';
 import { TestStackContextManager } from './export/TestStackContextManager';
 import * as sinon from 'sinon';
 import { invalidAttributes, validAttributes } from './util';
+import { Tracer } from '../../src/Tracer';
 
 describe('Tracer', () => {
   const tracerProvider = new BasicTracerProvider();
-  let envSource: Record<string, any>;
-  if (global.process?.versions?.node === undefined) {
-    envSource = globalThis as unknown as Record<string, any>;
-  } else {
-    envSource = process.env as Record<string, any>;
-  }
 
   class TestSampler implements Sampler {
     constructor(private readonly traceState?: TraceState) {}
@@ -65,7 +59,7 @@ describe('Tracer', () => {
       _traceId: string,
       _spanName: string,
       _spanKind: SpanKind,
-      attributes: SpanAttributes,
+      attributes: Attributes,
       links: Link[]
     ) {
       // The attributes object should be valid.
@@ -82,7 +76,7 @@ describe('Tracer', () => {
           testAttribute: 'foobar',
           // invalid attributes should be sanitized.
           ...invalidAttributes,
-        } as unknown as SpanAttributes,
+        } as unknown as Attributes,
         traceState: this.traceState,
       };
     }
@@ -106,15 +100,14 @@ describe('Tracer', () => {
 
   afterEach(() => {
     context.disable();
-    delete envSource.OTEL_TRACES_SAMPLER;
-    delete envSource.OTEL_TRACES_SAMPLER_ARG;
   });
 
   it('should create a Tracer instance', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       {},
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
     assert.ok(tracer instanceof Tracer);
   });
@@ -123,7 +116,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       {},
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
     assert.strictEqual(
       tracer['_sampler'].toString(),
@@ -135,7 +129,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new AlwaysOffSampler() },
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan('span1');
     assert.ok(!span.isRecording());
@@ -146,7 +141,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new AlwaysOnSampler() },
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan('span2');
     assert.ok(span.isRecording());
@@ -157,7 +153,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan('span3');
     assert.strictEqual((span as Span).attributes.testAttribute, 'foobar');
@@ -169,20 +166,22 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler(traceState) },
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan('stateSpan');
     assert.strictEqual(span.spanContext().traceState, traceState);
   });
 
-  it('should have an instrumentationLibrary', () => {
+  it('should have an instrumentationScope', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       {},
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
 
-    const lib: InstrumentationLibrary = tracer.instrumentationLibrary;
+    const lib: InstrumentationScope = tracer.instrumentationScope;
 
     assert.strictEqual(lib.name, 'default');
     assert.strictEqual(lib.version, '0.0.1');
@@ -195,7 +194,8 @@ describe('Tracer', () => {
       const tracer = new Tracer(
         { name: 'default', version: '0.0.1' },
         { sampler: new TestSampler() },
-        tracerProvider
+        tracerProvider['_resource'],
+        tracerProvider['_activeSpanProcessor']
       );
 
       const span = tracer.startSpan('span3', undefined, context);
@@ -218,14 +218,15 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       {},
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan(
       'aSpan',
       undefined,
       trace.setSpanContext(ROOT_CONTEXT, parent)
     );
-    assert.strictEqual((span as Span).parentSpanId, parent.spanId);
+    assert.strictEqual((span as Span).parentSpanContext?.spanId, parent.spanId);
     assert.strictEqual(span.spanContext().traceId, parent.traceId);
     assert.strictEqual(span.spanContext().traceState, traceState);
   });
@@ -239,14 +240,15 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       {},
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan(
       'aSpan',
       undefined,
       trace.setSpanContext(ROOT_CONTEXT, parent)
     );
-    assert.strictEqual((span as Span).parentSpanId, undefined);
+    assert.strictEqual((span as Span).parentSpanContext?.spanId, undefined);
   });
 
   it('should pass the same context to sampler and spanprocessor', () => {
@@ -259,14 +261,20 @@ describe('Tracer', () => {
 
     const sp: SpanProcessor = new DummySpanProcessor();
     const onStartSpy = sinon.spy(sp, 'onStart');
-    const tp = new BasicTracerProvider();
-    tp.addSpanProcessor(sp);
+    const tp = new BasicTracerProvider({
+      spanProcessors: [sp],
+    });
 
     const sampler: Sampler = new AlwaysOnSampler();
     const shouldSampleSpy = sinon.spy(sampler, 'shouldSample');
-    const tracer = new Tracer({ name: 'default' }, { sampler }, tp);
+    const tracer = new Tracer(
+      { name: 'default' },
+      { sampler },
+      tp['_resource'],
+      tp['_activeSpanProcessor']
+    );
     const span = tracer.startSpan('a', {}, context) as Span;
-    assert.strictEqual(span.parentSpanId, parent.spanId);
+    assert.strictEqual(span.parentSpanContext?.spanId, parent.spanId);
     sinon.assert.calledOnceWithExactly(
       shouldSampleSpy,
       context,
@@ -289,14 +297,20 @@ describe('Tracer', () => {
 
     const sp: SpanProcessor = new DummySpanProcessor();
     const onStartSpy = sinon.spy(sp, 'onStart');
-    const tp = new BasicTracerProvider();
-    tp.addSpanProcessor(sp);
+    const tp = new BasicTracerProvider({
+      spanProcessors: [sp],
+    });
 
     const sampler: Sampler = new AlwaysOnSampler();
     const shouldSampleSpy = sinon.spy(sampler, 'shouldSample');
-    const tracer = new Tracer({ name: 'default' }, { sampler }, tp);
+    const tracer = new Tracer(
+      { name: 'default' },
+      { sampler },
+      tp['_resource'],
+      tp['_activeSpanProcessor']
+    );
     const span = tracer.startSpan('a', { root: true }, context) as Span;
-    assert.strictEqual(span.parentSpanId, undefined);
+    assert.strictEqual(span.parentSpanContext?.spanId, undefined);
     sinon.assert.calledOnce(shouldSampleSpy);
     sinon.assert.calledOnce(onStartSpy);
     const samplerContext = shouldSampleSpy.firstCall.args[0];
@@ -305,53 +319,12 @@ describe('Tracer', () => {
     assert.strictEqual(trace.getSpan(samplerContext), undefined);
   });
 
-  it('should sample a trace when OTEL_TRACES_SAMPLER_ARG is unset', () => {
-    envSource.OTEL_TRACES_SAMPLER = 'traceidratio';
-    envSource.OTEL_TRACES_SAMPLER_ARG = '';
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      {},
-      tracerProvider
-    );
-    const span = tracer.startSpan('my-span');
-    const context = span.spanContext();
-    assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
-    span.end();
-  });
-
-  it('should not sample a trace when OTEL_TRACES_SAMPLER_ARG is out of range', () => {
-    envSource.OTEL_TRACES_SAMPLER = 'traceidratio';
-    envSource.OTEL_TRACES_SAMPLER_ARG = '2';
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      {},
-      tracerProvider
-    );
-    const span = tracer.startSpan('my-span');
-    const context = span.spanContext();
-    assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
-    span.end();
-  });
-
-  it('should not sample a trace when OTEL_TRACES_SAMPLER_ARG is 0', () => {
-    envSource.OTEL_TRACES_SAMPLER = 'traceidratio';
-    envSource.OTEL_TRACES_SAMPLER_ARG = '0';
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      {},
-      tracerProvider
-    );
-    const span = tracer.startSpan('my-span');
-    const context = span.spanContext();
-    assert.strictEqual(context.traceFlags, TraceFlags.NONE);
-    span.end();
-  });
-
   it('should start an active span with name and function args', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
 
     const spy = sinon.spy(tracer, 'startSpan');
@@ -359,7 +332,7 @@ describe('Tracer', () => {
     assert.strictEqual(
       tracer.startActiveSpan('my-span', span => {
         try {
-          assert(spy.calledWith('my-span'));
+          assert.ok(spy.calledWith('my-span'));
           assert.strictEqual(trace.getSpan(context.active()), span);
           return 1;
         } finally {
@@ -374,7 +347,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
 
     const spy = sinon.spy(tracer, 'startSpan');
@@ -385,7 +359,9 @@ describe('Tracer', () => {
         { attributes: { foo: 'bar' } },
         span => {
           try {
-            assert(spy.calledWith('my-span', { attributes: { foo: 'bar' } }));
+            assert.ok(
+              spy.calledWith('my-span', { attributes: { foo: 'bar' } })
+            );
             assert.strictEqual(trace.getSpan(context.active()), span);
             return 1;
           } finally {
@@ -401,7 +377,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
 
     const ctxKey = createContextKey('foo');
@@ -417,7 +394,7 @@ describe('Tracer', () => {
         ctx,
         span => {
           try {
-            assert(
+            assert.ok(
               spy.calledWith('my-span', { attributes: { foo: 'bar' } }, ctx)
             );
             assert.strictEqual(trace.getSpan(context.active()), span);
@@ -436,13 +413,14 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
 
     const attributes = {
       ...validAttributes,
       ...invalidAttributes,
-    } as unknown as SpanAttributes;
+    } as unknown as Attributes;
     const links = [
       {
         context: {

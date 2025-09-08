@@ -13,40 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Span, SpanAttributes } from '@opentelemetry/api';
-import type * as http from 'http';
-import type * as https from 'https';
+import { Span, Attributes } from '@opentelemetry/api';
 import {
   ClientRequest,
-  get,
   IncomingMessage,
-  request,
   ServerResponse,
   RequestOptions,
 } from 'http';
-import * as url from 'url';
 import { InstrumentationConfig } from '@opentelemetry/instrumentation';
-
-export type IgnoreMatcher = string | RegExp | ((url: string) => boolean);
-export type HttpCallback = (res: IncomingMessage) => void;
-export type RequestFunction = typeof request;
-export type GetFunction = typeof get;
-
-export type HttpCallbackOptional = HttpCallback | undefined;
-
-// from node 10+
-export type RequestSignature = [http.RequestOptions, HttpCallbackOptional] &
-  HttpCallback;
-
-export type HttpRequestArgs = Array<HttpCallbackOptional | RequestSignature>;
-
-export type ParsedRequestOptions =
-  | (http.RequestOptions & Partial<url.UrlWithParsedQuery>)
-  | http.RequestOptions;
-export type Http = typeof http;
-export type Https = typeof https;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Func<T> = (...args: any[]) => T;
 
 export interface HttpCustomAttributeFunction {
   (
@@ -73,31 +47,25 @@ export interface HttpResponseCustomAttributeFunction {
 }
 
 export interface StartIncomingSpanCustomAttributeFunction {
-  (request: IncomingMessage): SpanAttributes;
+  (request: IncomingMessage): Attributes;
 }
 
 export interface StartOutgoingSpanCustomAttributeFunction {
-  (request: RequestOptions): SpanAttributes;
+  (request: RequestOptions): Attributes;
 }
 
 /**
- * Options available for the HTTP instrumentation (see [documentation](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-http#http-instrumentation-options))
+ * Options available for the HTTP instrumentation (see [documentation](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-http#http-instrumentation-options))
  */
 export interface HttpInstrumentationConfig extends InstrumentationConfig {
-  /**
-   * Not trace all incoming requests that match paths
-   * @deprecated use `ignoreIncomingRequestHook` instead
-   */
-  ignoreIncomingPaths?: IgnoreMatcher[];
   /** Not trace all incoming requests that matched with custom function */
   ignoreIncomingRequestHook?: IgnoreIncomingRequestFunction;
-  /**
-   * Not trace all outgoing requests that match urls
-   * @deprecated use `ignoreOutgoingRequestHook` instead
-   */
-  ignoreOutgoingUrls?: IgnoreMatcher[];
   /** Not trace all outgoing requests that matched with custom function */
   ignoreOutgoingRequestHook?: IgnoreOutgoingRequestFunction;
+  /** If set to true, incoming requests will not be instrumented at all. */
+  disableIncomingRequestInstrumentation?: boolean;
+  /** If set to true, outgoing requests will not be instrumented at all. */
+  disableOutgoingRequestInstrumentation?: boolean;
   /** Function for adding custom attributes after response is handled */
   applyCustomAttributesOnSpan?: HttpCustomAttributeFunction;
   /** Function for adding custom attributes before request is handled */
@@ -119,12 +87,17 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
     client?: { requestHeaders?: string[]; responseHeaders?: string[] };
     server?: { requestHeaders?: string[]; responseHeaders?: string[] };
   };
-}
-
-export interface Err extends Error {
-  errno?: number;
-  code?: string;
-  path?: string;
-  syscall?: string;
-  stack?: string;
+  /**
+   * Enable automatic population of synthetic source type based on the user-agent header
+   * @experimental
+   **/
+  enableSyntheticSourceDetection?: boolean;
+  /**
+   * [Optional] Additional query parameters to redact.
+   * Use this to specify custom query strings that contain sensitive information.
+   * These will replace/overwrite the default query strings that are to be redacted.
+   * @example default strings ['sig','Signature','AWSAccessKeyId','X-Goog-Signature']
+   * @experimental
+   */
+  redactedQueryParams?: string[];
 }

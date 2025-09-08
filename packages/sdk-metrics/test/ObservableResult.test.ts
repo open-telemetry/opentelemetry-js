@@ -52,7 +52,7 @@ describe('ObservableResultImpl', () => {
       observableResult.observe(2, {});
 
       assert.strictEqual(observableResult._buffer.size, 1);
-      assert(observableResult._buffer.has({}));
+      assert.ok(observableResult._buffer.has({}));
       assert.strictEqual(observableResult._buffer.get({}), 2);
     });
 
@@ -113,8 +113,8 @@ describe('BatchObservableResultImpl', () => {
       observableResult.observe(observable2, 4, {});
 
       assert.strictEqual(observableResult._buffer.size, 2);
-      assert(observableResult._buffer.has(observable1));
-      assert(observableResult._buffer.has(observable2));
+      assert.ok(observableResult._buffer.has(observable1));
+      assert.ok(observableResult._buffer.has(observable2));
 
       const observable1Buffer = observableResult._buffer.get(observable1);
       const observable2Buffer = observableResult._buffer.get(observable2);

@@ -25,6 +25,8 @@ import { SpanKind } from './span_kind';
  * This interface represent a sampler. Sampling is a mechanism to control the
  * noise and overhead introduced by OpenTelemetry by reducing the number of
  * samples of traces collected and sent to the backend.
+ *
+ * @since 1.0.0
  */
 export interface Sampler {
   /**

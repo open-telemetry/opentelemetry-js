@@ -18,8 +18,8 @@ import * as assert from 'assert';
 import { NoopTracer } from '../../../src/trace/NoopTracer';
 import { NoopTracerProvider } from '../../../src/trace/NoopTracerProvider';
 
-describe('NoopTracerProvider', () => {
-  it('should not crash', () => {
+describe('NoopTracerProvider', function () {
+  it('should not crash', function () {
     const tracerProvider = new NoopTracerProvider();
 
     assert.ok(tracerProvider.getTracer('tracer-name') instanceof NoopTracer);

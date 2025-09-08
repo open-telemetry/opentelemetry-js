@@ -1,12 +1,22 @@
 {
-  "extends": ["config:base"],
+  "extends": ["config:recommended"],
   "packageRules": [
     {
       "groupName": "all patch versions",
       "groupSlug": "all-patch",
       "matchUpdateTypes": ["patch"],
-      "excludePackageNames": ["prettier"],
-      "schedule": ["before 3am every weekday"]
+      "schedule": ["before 3am every weekday"],
+      "matchPackageNames": ["!prettier"]
+    },
+    {
+      "groupName": "@protobuf-ts packages",
+      "matchUpdateTypes": ["minor", "major"],
+      "matchPackageNames": ["/^@protobuf-ts//"]
+    },
+    {
+      "groupName": "typedoc packages",
+      "matchUpdateTypes": ["minor", "major"],
+      "matchPackageNames": ["/^typedoc/"]
     },
     {
       "matchUpdateTypes": ["minor"],
@@ -26,7 +36,15 @@
     "schedule": ["before 3am on Monday"]
   },
   "rebaseWhen": "conflicted",
-  "ignoreDeps": ["@opentelemetry/api", "@opentelemetry/resources_1.9.0", "@types/node"],
+  "ignoreDeps": [
+    "@opentelemetry/api",
+    "@opentelemetry/resources_1.9.0",
+    "@types/node"
+  ],
+  "constraints": {
+    "npm": ">10.8.0"
+  },
   "assignees": ["@blumamir", "@dyladan", "@legendecas", "@pichlermarc"],
-  "labels": ["dependencies"]
+  "labels": ["dependencies"],
+  "postUpdateOptions": ["npmDedupe"]
 }

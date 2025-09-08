@@ -18,13 +18,15 @@ function stopMetrics() {
 function startMetrics() {
   console.log('STARTING METRICS');
 
-  const meterProvider = new MeterProvider();
+  const meterProvider = new MeterProvider({
+    readers: [
+      new PeriodicExportingMetricReader({
+        exporter: new OTLPMetricExporter(),
+        exportIntervalMillis: 1000
+      }),
+    ],
+  });
   metrics.setGlobalMeterProvider(meterProvider);
-
-  meterProvider.addMetricReader(new PeriodicExportingMetricReader({
-    exporter: new OTLPMetricExporter(),
-    exportIntervalMillis: 1000
-  }));
 
   meter = meterProvider.getMeter('example-exporter-collector')
 

@@ -33,14 +33,14 @@ const makeOnRequiresStub = (label: string): sinon.SinonStub =>
     return exports;
   }) as OnRequireFn);
 
-describe('RequireInTheMiddleSingleton', () => {
-  describe('register', () => {
+describe('RequireInTheMiddleSingleton', function () {
+  describe('register', function () {
     const onRequireFsStub = makeOnRequiresStub('fs');
     const onRequireFsPromisesStub = makeOnRequiresStub('fs-promises');
     const onRequireCodecovStub = makeOnRequiresStub('codecov');
     const onRequireCodecovLibStub = makeOnRequiresStub('codecov-lib');
-    const onRequireCpxStub = makeOnRequiresStub('cpx2');
-    const onRequireCpxLibStub = makeOnRequiresStub('cpx2-lib');
+    const onRequireCpxStub = makeOnRequiresStub('test-non-core-module');
+    const onRequireCpxLibStub = makeOnRequiresStub('test-non-core-module-lib');
 
     before(() => {
       requireInTheMiddleSingleton.register('fs', onRequireFsStub);
@@ -53,9 +53,12 @@ describe('RequireInTheMiddleSingleton', () => {
         'codecov/lib/codecov.js',
         onRequireCodecovLibStub
       );
-      requireInTheMiddleSingleton.register('cpx2', onRequireCpxStub);
       requireInTheMiddleSingleton.register(
-        'cpx2/lib/copy-sync.js',
+        'test-non-core-module',
+        onRequireCpxStub
+      );
+      requireInTheMiddleSingleton.register(
+        'test-non-core-module/lib/copy-sync.js',
         onRequireCpxLibStub
       );
     });
@@ -69,7 +72,7 @@ describe('RequireInTheMiddleSingleton', () => {
       onRequireCpxLibStub.resetHistory();
     });
 
-    it('should return a hooked object', () => {
+    it('should return a hooked object', function () {
       const moduleName = 'm';
       const onRequire = makeOnRequiresStub('m');
       const hooked = requireInTheMiddleSingleton.register(
@@ -79,9 +82,9 @@ describe('RequireInTheMiddleSingleton', () => {
       assert.deepStrictEqual(hooked, { moduleName, onRequire });
     });
 
-    describe('core module', () => {
-      describe('AND module name matches', () => {
-        it('should call `onRequire`', () => {
+    describe('core module', function () {
+      describe('AND module name matches', function () {
+        it('should call `onRequire`', function () {
           const exports = require('fs');
           assert.deepStrictEqual(exports.__ritmOnRequires, ['fs']);
           sinon.assert.calledOnceWithExactly(
@@ -93,8 +96,8 @@ describe('RequireInTheMiddleSingleton', () => {
           sinon.assert.notCalled(onRequireFsPromisesStub);
         });
       });
-      describe('AND module name does not match', () => {
-        it('should not call `onRequire`', () => {
+      describe('AND module name does not match', function () {
+        it('should not call `onRequire`', function () {
           const exports = require('crypto');
           assert.equal(exports.__ritmOnRequires, undefined);
           sinon.assert.notCalled(onRequireFsStub);
@@ -102,9 +105,9 @@ describe('RequireInTheMiddleSingleton', () => {
       });
     });
 
-    describe('core module with sub-path', () => {
-      describe('AND module name matches', () => {
-        it('should call `onRequire`', () => {
+    describe('core module with sub-path', function () {
+      describe('AND module name matches', function () {
+        it('should call `onRequire`', function () {
           const exports = require('fs/promises');
           assert.deepStrictEqual(exports.__ritmOnRequires, ['fs-promises']);
           sinon.assert.calledOnceWithExactly(
@@ -118,11 +121,15 @@ describe('RequireInTheMiddleSingleton', () => {
       });
     });
 
-    describe('non-core module', () => {
-      describe('AND module name matches', () => {
-        const baseDir = path.dirname(require.resolve('codecov'));
-        const modulePath = path.join('codecov', 'lib', 'codecov.js');
-        it('should call `onRequire`', () => {
+    describe('non-core module', function () {
+      describe('AND module name matches', function () {
+        const baseDir = path.normalize(
+          path.dirname(require.resolve('codecov'))
+        );
+        const modulePath = path.normalize(
+          path.join('codecov', 'lib', 'codecov.js')
+        );
+        it('should call `onRequire`', function () {
           const exports = require('codecov');
           assert.deepStrictEqual(exports.__ritmOnRequires, ['codecov']);
           sinon.assert.calledWithExactly(
@@ -147,22 +154,31 @@ describe('RequireInTheMiddleSingleton', () => {
       });
     });
 
-    describe('non-core module with sub-path', () => {
-      describe('AND module name matches', () => {
-        const baseDir = path.resolve(
-          path.dirname(require.resolve('cpx2')),
-          '..'
+    describe('non-core module with sub-path', function () {
+      describe('AND module name matches', function () {
+        const baseDir = path.normalize(
+          path.resolve(
+            path.dirname(require.resolve('test-non-core-module')),
+            '..'
+          )
         );
-        const modulePath = path.join('cpx2', 'lib', 'copy-sync.js');
-        it('should call `onRequire`', () => {
-          const exports = require('cpx2/lib/copy-sync');
+        const modulePath = path.normalize(
+          path.join('test-non-core-module', 'lib', 'copy-sync.js')
+        );
+        it('should call `onRequire`', function () {
+          const exports = require('test-non-core-module/lib/copy-sync');
           assert.deepStrictEqual(exports.__ritmOnRequires, [
-            'cpx2',
-            'cpx2-lib',
+            'test-non-core-module',
+            'test-non-core-module-lib',
           ]);
           sinon.assert.calledWithMatch(
             onRequireCpxStub,
-            { __ritmOnRequires: ['cpx2', 'cpx2-lib'] },
+            {
+              __ritmOnRequires: [
+                'test-non-core-module',
+                'test-non-core-module-lib',
+              ],
+            },
             modulePath,
             baseDir
           );

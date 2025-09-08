@@ -15,6 +15,7 @@
  */
 
 import * as assert from 'assert';
+import { InstrumentType } from '../../src';
 import {
   Aggregator,
   DropAggregator,
@@ -22,47 +23,17 @@ import {
   LastValueAggregator,
   SumAggregator,
 } from '../../src/aggregator';
+import { InstrumentDescriptor } from '../../src/InstrumentDescriptor';
 import {
-  InstrumentDescriptor,
-  InstrumentType,
-} from '../../src/InstrumentDescriptor';
-import {
-  Aggregation,
   DefaultAggregation,
-  DropAggregation,
   ExplicitBucketHistogramAggregation,
   HistogramAggregation,
-  LastValueAggregation,
-  SumAggregation,
 } from '../../src/view/Aggregation';
 import { defaultInstrumentDescriptor } from '../util';
-
-interface AggregationConstructor {
-  new (...args: any[]): Aggregation;
-}
 
 interface AggregatorConstructor {
   new (...args: any[]): Aggregator<unknown>;
 }
-
-describe('Aggregation', () => {
-  it('static aggregations', () => {
-    const staticMembers: [keyof typeof Aggregation, AggregationConstructor][] =
-      [
-        ['Drop', DropAggregation],
-        ['Sum', SumAggregation],
-        ['LastValue', LastValueAggregation],
-        ['Histogram', HistogramAggregation],
-        ['Default', DefaultAggregation],
-      ];
-
-    for (const [key, type] of staticMembers) {
-      const aggregation = (Aggregation[key] as () => Aggregation)();
-      assert(aggregation instanceof type);
-      assert(aggregation.createAggregator(defaultInstrumentDescriptor));
-    }
-  });
-});
 
 describe('DefaultAggregation', () => {
   describe('createAggregator', () => {
@@ -117,7 +88,7 @@ describe('DefaultAggregation', () => {
 
       const aggregation = new DefaultAggregation();
       for (const [instrumentDescriptor, type] of expectations) {
-        assert(
+        assert.ok(
           aggregation.createAggregator(instrumentDescriptor) instanceof type,
           `${InstrumentType[instrumentDescriptor.type]}`
         );
@@ -132,7 +103,7 @@ describe('HistogramAggregator', () => {
       const aggregator = new HistogramAggregation().createAggregator(
         defaultInstrumentDescriptor
       );
-      assert(aggregator instanceof HistogramAggregator);
+      assert.ok(aggregator instanceof HistogramAggregator);
       assert.deepStrictEqual(
         aggregator['_boundaries'],
         [
@@ -153,7 +124,7 @@ describe('ExplicitBucketHistogramAggregation', () => {
     ];
     for (const boundaries of cases) {
       const aggregation = new ExplicitBucketHistogramAggregation(boundaries);
-      assert(aggregation instanceof ExplicitBucketHistogramAggregation);
+      assert.ok(aggregation instanceof ExplicitBucketHistogramAggregation);
       assert.deepStrictEqual(aggregation['_boundaries'], [1, 10, 100]);
     }
   });
@@ -180,7 +151,7 @@ describe('ExplicitBucketHistogramAggregation', () => {
   it('constructor should not modify inputs', () => {
     const boundaries = [100, 10, 1];
     const aggregation = new ExplicitBucketHistogramAggregation(boundaries);
-    assert(aggregation instanceof ExplicitBucketHistogramAggregation);
+    assert.ok(aggregation instanceof ExplicitBucketHistogramAggregation);
     assert.deepStrictEqual(aggregation['_boundaries'], [1, 10, 100]);
     assert.deepStrictEqual(boundaries, [100, 10, 1]);
   });
@@ -190,7 +161,7 @@ describe('ExplicitBucketHistogramAggregation', () => {
       const aggregator1 = new ExplicitBucketHistogramAggregation([
         100, 10, 1,
       ]).createAggregator(defaultInstrumentDescriptor);
-      assert(aggregator1 instanceof HistogramAggregator);
+      assert.ok(aggregator1 instanceof HistogramAggregator);
       assert.deepStrictEqual(aggregator1['_boundaries'], [1, 10, 100]);
 
       const aggregator2 = new ExplicitBucketHistogramAggregation([
@@ -202,7 +173,7 @@ describe('ExplicitBucketHistogramAggregation', () => {
         Infinity,
         Infinity,
       ]).createAggregator(defaultInstrumentDescriptor);
-      assert(aggregator2 instanceof HistogramAggregator);
+      assert.ok(aggregator2 instanceof HistogramAggregator);
       assert.deepStrictEqual(aggregator2['_boundaries'], [10, 100, 1000]);
     });
 

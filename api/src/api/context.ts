@@ -28,6 +28,8 @@ const NOOP_CONTEXT_MANAGER = new NoopContextManager();
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Context API
+ *
+ * @since 1.0.0
  */
 export class ContextAPI {
   private static _instance?: ContextAPI;

@@ -14,22 +14,29 @@
  * limitations under the License.
  */
 
-export * from './Tracer';
-export * from './BasicTracerProvider';
-export * from './platform';
-export * from './export/ConsoleSpanExporter';
-export * from './export/InMemorySpanExporter';
-export * from './export/ReadableSpan';
-export * from './export/SimpleSpanProcessor';
-export * from './export/SpanExporter';
-export * from './export/NoopSpanProcessor';
-export * from './sampler/AlwaysOffSampler';
-export * from './sampler/AlwaysOnSampler';
-export * from './sampler/ParentBasedSampler';
-export * from './sampler/TraceIdRatioBasedSampler';
-export * from './Sampler';
-export * from './Span';
-export * from './SpanProcessor';
-export * from './TimedEvent';
-export * from './types';
-export * from './IdGenerator';
+export { BasicTracerProvider } from './BasicTracerProvider';
+export { BatchSpanProcessor, RandomIdGenerator } from './platform';
+export { ConsoleSpanExporter } from './export/ConsoleSpanExporter';
+export { InMemorySpanExporter } from './export/InMemorySpanExporter';
+export type { ReadableSpan } from './export/ReadableSpan';
+export { SimpleSpanProcessor } from './export/SimpleSpanProcessor';
+export type { SpanExporter } from './export/SpanExporter';
+export { NoopSpanProcessor } from './export/NoopSpanProcessor';
+export { AlwaysOffSampler } from './sampler/AlwaysOffSampler';
+export { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
+export { ParentBasedSampler } from './sampler/ParentBasedSampler';
+export { TraceIdRatioBasedSampler } from './sampler/TraceIdRatioBasedSampler';
+export { SamplingDecision } from './Sampler';
+export type { Sampler, SamplingResult } from './Sampler';
+export type { Span } from './Span';
+export type { SpanProcessor } from './SpanProcessor';
+export type { TimedEvent } from './TimedEvent';
+export type {
+  BatchSpanProcessorBrowserConfig,
+  BufferConfig,
+  GeneralLimits,
+  SDKRegistrationConfig,
+  SpanLimits,
+  TracerConfig,
+} from './types';
+export type { IdGenerator } from './IdGenerator';

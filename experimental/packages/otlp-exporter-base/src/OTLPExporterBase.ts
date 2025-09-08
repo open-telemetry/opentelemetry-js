@@ -14,55 +14,11 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
-import {
-  ExportResult,
-  ExportResultCode,
-  BindOnceFuture,
-} from '@opentelemetry/core';
-import {
-  OTLPExporterError,
-  OTLPExporterConfigBase,
-  ExportServiceError,
-} from './types';
-import { configureExporterTimeout } from './util';
+import { ExportResult } from '@opentelemetry/core';
+import { IOtlpExportDelegate } from './otlp-export-delegate';
 
-/**
- * Collector Exporter abstract base class
- */
-export abstract class OTLPExporterBase<
-  T extends OTLPExporterConfigBase,
-  ExportItem,
-> {
-  public readonly url: string;
-  public readonly hostname: string | undefined;
-  public readonly timeoutMillis: number;
-  protected _concurrencyLimit: number;
-  protected _sendingPromises: Promise<unknown>[] = [];
-  protected _shutdownOnce: BindOnceFuture<void>;
-
-  /**
-   * @param config
-   */
-  constructor(config: T = {} as T) {
-    this.url = this.getDefaultUrl(config);
-    if (typeof config.hostname === 'string') {
-      this.hostname = config.hostname;
-    }
-
-    this.shutdown = this.shutdown.bind(this);
-    this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
-
-    this._concurrencyLimit =
-      typeof config.concurrencyLimit === 'number'
-        ? config.concurrencyLimit
-        : 30;
-
-    this.timeoutMillis = configureExporterTimeout(config.timeoutMillis);
-
-    // platform dependent
-    this.onInit(config);
-  }
+export class OTLPExporterBase<Internal> {
+  constructor(private _delegate: IOtlpExportDelegate<Internal>) {}
 
   /**
    * Export items.
@@ -70,76 +26,17 @@ export abstract class OTLPExporterBase<
    * @param resultCallback
    */
   export(
-    items: ExportItem[],
+    items: Internal,
     resultCallback: (result: ExportResult) => void
   ): void {
-    if (this._shutdownOnce.isCalled) {
-      resultCallback({
-        code: ExportResultCode.FAILED,
-        error: new Error('Exporter has been shutdown'),
-      });
-      return;
-    }
-
-    if (this._sendingPromises.length >= this._concurrencyLimit) {
-      resultCallback({
-        code: ExportResultCode.FAILED,
-        error: new Error('Concurrent export limit reached'),
-      });
-      return;
-    }
-
-    this._export(items)
-      .then(() => {
-        resultCallback({ code: ExportResultCode.SUCCESS });
-      })
-      .catch((error: ExportServiceError) => {
-        resultCallback({ code: ExportResultCode.FAILED, error });
-      });
+    this._delegate.export(items, resultCallback);
   }
 
-  private _export(items: ExportItem[]): Promise<unknown> {
-    return new Promise<void>((resolve, reject) => {
-      try {
-        diag.debug('items to be sent', items);
-        this.send(items, resolve, reject);
-      } catch (e) {
-        reject(e);
-      }
-    });
-  }
-
-  /**
-   * Shutdown the exporter.
-   */
-  shutdown(): Promise<void> {
-    return this._shutdownOnce.call();
-  }
-
-  /**
-   * Exports any pending spans in the exporter
-   */
   forceFlush(): Promise<void> {
-    return Promise.all(this._sendingPromises).then(() => {
-      /** ignore resolved values */
-    });
+    return this._delegate.forceFlush();
   }
 
-  /**
-   * Called by _shutdownOnce with BindOnceFuture
-   */
-  private _shutdown(): Promise<void> {
-    diag.debug('shutdown started');
-    this.onShutdown();
-    return this.forceFlush();
+  shutdown(): Promise<void> {
+    return this._delegate.shutdown();
   }
-
-  abstract onShutdown(): void;
-  abstract onInit(config: T): void;
-  abstract send(
-    items: ExportItem[],
-    onSuccess: () => void,
-    onError: (error: OTLPExporterError) => void
-  ): void;
-  abstract getDefaultUrl(config: T): string;
 }

@@ -18,7 +18,6 @@ import { diag } from '@opentelemetry/api';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import * as http from 'http';
 import * as https from 'https';
-import * as url from 'url';
 import * as zipkinTypes from '../../types';
 
 /**
@@ -31,18 +30,15 @@ export function prepareSend(
   urlStr: string,
   headers?: Record<string, string>
 ): zipkinTypes.SendFn {
-  const urlOpts = url.parse(urlStr);
+  const url = new URL(urlStr);
 
-  const reqOpts: http.RequestOptions = Object.assign(
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers,
-      },
+  const reqOpts: http.RequestOptions = Object.assign({
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers,
     },
-    urlOpts
-  );
+  });
 
   /**
    * Send spans to the remote Zipkin service.
@@ -56,8 +52,8 @@ export function prepareSend(
       return done({ code: ExportResultCode.SUCCESS });
     }
 
-    const { request } = reqOpts.protocol === 'http:' ? http : https;
-    const req = request(reqOpts, (res: http.IncomingMessage) => {
+    const { request } = url.protocol === 'http:' ? http : https;
+    const req = request(url, reqOpts, (res: http.IncomingMessage) => {
       let rawData = '';
       res.on('data', chunk => {
         rawData += chunk;

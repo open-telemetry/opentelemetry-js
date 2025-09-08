@@ -29,6 +29,7 @@ import {
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
 import { CompositePropagator } from '@opentelemetry/core';
+import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 import {
   AggregationTemporality,
   ConsoleMetricExporter,
@@ -36,8 +37,11 @@ import {
   InstrumentType,
   MeterProvider,
   PeriodicExportingMetricReader,
-  View,
 } from '@opentelemetry/sdk-metrics';
+import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
+import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
+import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
+import { PrometheusExporter as PrometheusMetricExporter } from '@opentelemetry/exporter-prometheus';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   assertServiceInstanceIdIsUUID,
@@ -50,40 +54,43 @@ import {
   NoopSpanProcessor,
   IdGenerator,
   AlwaysOffSampler,
+  SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import * as semver from 'semver';
 import * as Sinon from 'sinon';
 import { NodeSDK } from '../src';
 import { env } from 'process';
-import { TracerProviderWithEnvExporters } from '../src/TracerProviderWithEnvExporter';
 import {
   envDetector,
   processDetector,
   hostDetector,
-  Resource,
-  serviceInstanceIdDetectorSync,
+  serviceInstanceIdDetector,
+  DetectedResource,
+  defaultResource,
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { logs } from '@opentelemetry/api-logs';
+import { logs, ProxyLoggerProvider } from '@opentelemetry/api-logs';
 import {
   SimpleLogRecordProcessor,
   InMemoryLogRecordExporter,
   LoggerProvider,
+  ConsoleLogRecordExporter,
+  BatchLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
-import {
-  SEMRESATTRS_HOST_NAME,
-  SEMRESATTRS_PROCESS_PID,
-} from '@opentelemetry/semantic-conventions';
+import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
+import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
+import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
+import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
+import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
+import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
-const DefaultContextManager = semver.gte(process.version, '14.8.0')
-  ? AsyncLocalStorageContextManager
-  : AsyncHooksContextManager;
+import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from './semconv';
 
 describe('Node SDK', () => {
   let ctxManager: any;
   let propagator: any;
   let delegate: any;
+  let logsDelegate: any;
 
   beforeEach(() => {
     diag.disable();
@@ -91,10 +98,14 @@ describe('Node SDK', () => {
     trace.disable();
     propagation.disable();
     metrics.disable();
+    logs.disable();
 
     ctxManager = context['_getContextManager']();
     propagator = propagation['_getGlobalPropagator']();
     delegate = (trace.getTracerProvider() as ProxyTracerProvider).getDelegate();
+    logsDelegate = (
+      logs.getLoggerProvider() as ProxyLoggerProvider
+    )._getDelegate();
   });
 
   afterEach(() => {
@@ -106,6 +117,8 @@ describe('Node SDK', () => {
       // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
       // which sets up an exporter and affects the context manager
       env.OTEL_TRACES_EXPORTER = 'none';
+      env.OTEL_LOGS_EXPORTER = 'none';
+      env.OTEL_METRIC_EXPORTER = 'none';
       const sdk = new NodeSDK({
         autoDetectResources: false,
       });
@@ -128,8 +141,13 @@ describe('Node SDK', () => {
         'tracer provider should not have changed'
       );
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
-      assert.ok(!(logs.getLoggerProvider() instanceof LoggerProvider));
+      assert.strictEqual(
+        (logs.getLoggerProvider() as ProxyLoggerProvider)._getDelegate(),
+        logsDelegate,
+        'logger provider should not have changed'
+      );
       delete env.OTEL_TRACES_EXPORTER;
+      delete env.OTEL_METRICS_EXPORTER;
       await sdk.shutdown();
     });
 
@@ -179,7 +197,7 @@ describe('Node SDK', () => {
 
       assert.ok(
         context['_getContextManager']().constructor.name ===
-          DefaultContextManager.name
+          AsyncLocalStorageContextManager.name
       );
       assert.ok(
         propagation['_getGlobalPropagator']() instanceof CompositePropagator
@@ -202,7 +220,7 @@ describe('Node SDK', () => {
 
       assert.ok(
         context['_getContextManager']().constructor.name ===
-          DefaultContextManager.name
+          AsyncLocalStorageContextManager.name
       );
       assert.ok(
         propagation['_getGlobalPropagator']() instanceof CompositePropagator
@@ -232,23 +250,35 @@ describe('Node SDK', () => {
 
       assert.ok(
         context['_getContextManager']().constructor.name ===
-          DefaultContextManager.name
+          AsyncLocalStorageContextManager.name
       );
       assert.ok(
         propagation['_getGlobalPropagator']() instanceof CompositePropagator
       );
       const apiTracerProvider =
         trace.getTracerProvider() as ProxyTracerProvider;
-      assert.ok(apiTracerProvider.getDelegate() instanceof NodeTracerProvider);
+      const nodeTracerProvider = apiTracerProvider.getDelegate();
 
-      const listOfProcessors =
-        sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+      assert.ok(nodeTracerProvider instanceof NodeTracerProvider);
 
-      assert(sdk['_tracerProvider'] instanceof NodeTracerProvider);
-      assert(listOfProcessors.length === 3);
-      assert(listOfProcessors[0] instanceof NoopSpanProcessor);
-      assert(listOfProcessors[1] instanceof SimpleSpanProcessor);
-      assert(listOfProcessors[2] instanceof BatchSpanProcessor);
+      const spanProcessor = nodeTracerProvider['_activeSpanProcessor'] as any;
+
+      assert.ok(
+        spanProcessor.constructor.name === 'MultiSpanProcessor',
+        'is MultiSpanProcessor'
+      );
+
+      const listOfProcessors = spanProcessor[
+        '_spanProcessors'
+      ] as SpanProcessor[];
+
+      assert.ok(
+        listOfProcessors.length === 3,
+        'it has the right amount of processors'
+      );
+      assert.ok(listOfProcessors[0] instanceof NoopSpanProcessor);
+      assert.ok(listOfProcessors[1] instanceof SimpleSpanProcessor);
+      assert.ok(listOfProcessors[2] instanceof BatchSpanProcessor);
       await sdk.shutdown();
     });
 
@@ -292,6 +322,123 @@ describe('Node SDK', () => {
       delete env.OTEL_TRACES_EXPORTER;
     });
 
+    it('should register a meter provider if multiple readers are provided', async () => {
+      // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
+      // which sets up an exporter and affects the context manager
+      env.OTEL_TRACES_EXPORTER = 'none';
+      const consoleExporter = new ConsoleMetricExporter();
+      const inMemoryExporter = new InMemoryMetricExporter(
+        AggregationTemporality.CUMULATIVE
+      );
+      const metricReader1 = new PeriodicExportingMetricReader({
+        exporter: consoleExporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+      const metricReader2 = new PeriodicExportingMetricReader({
+        exporter: inMemoryExporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+
+      const sdk = new NodeSDK({
+        metricReaders: [metricReader1, metricReader2],
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assert.strictEqual(
+        context['_getContextManager'](),
+        ctxManager,
+        'context manager should not change'
+      );
+      assert.strictEqual(
+        propagation['_getGlobalPropagator'](),
+        propagator,
+        'propagator should not change'
+      );
+      assert.strictEqual(
+        (trace.getTracerProvider() as ProxyTracerProvider).getDelegate(),
+        delegate,
+        'tracer provider should not have changed'
+      );
+
+      const meterProvider = metrics.getMeterProvider() as MeterProvider;
+      assert.ok(meterProvider instanceof MeterProvider);
+
+      // Verify that both metric readers are registered
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert.strictEqual(sharedState.metricCollectors.length, 2);
+
+      await sdk.shutdown();
+      delete env.OTEL_TRACES_EXPORTER;
+    });
+
+    it('should show deprecation warning when using metricReader option', async () => {
+      // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
+      // which sets up an exporter and affects the context manager
+      env.OTEL_TRACES_EXPORTER = 'none';
+      const exporter = new ConsoleMetricExporter();
+      const metricReader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+
+      const warnSpy = Sinon.spy(diag, 'warn');
+
+      const sdk = new NodeSDK({
+        metricReader: metricReader,
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      // Verify deprecation warning was shown
+      Sinon.assert.calledWith(
+        warnSpy,
+        "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
+      );
+
+      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+
+      await sdk.shutdown();
+      delete env.OTEL_TRACES_EXPORTER;
+    });
+
+    it('should not show deprecation warning when using metricReaders option', async () => {
+      // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
+      // which sets up an exporter and affects the context manager
+      env.OTEL_TRACES_EXPORTER = 'none';
+      const exporter = new ConsoleMetricExporter();
+      const metricReader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+
+      const warnSpy = Sinon.spy(diag, 'warn');
+
+      const sdk = new NodeSDK({
+        metricReaders: [metricReader],
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      // Verify no metricReader deprecation warning was shown
+      Sinon.assert.neverCalledWith(
+        warnSpy,
+        "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
+      );
+
+      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+
+      await sdk.shutdown();
+      delete env.OTEL_TRACES_EXPORTER;
+    });
+
     it('should register a logger provider if a log record processor is provided', async () => {
       env.OTEL_TRACES_EXPORTER = 'none';
       const logRecordExporter = new InMemoryLogRecordExporter();
@@ -321,9 +468,50 @@ describe('Node SDK', () => {
         'tracer provider should not have changed'
       );
 
-      assert.ok(logs.getLoggerProvider() instanceof LoggerProvider);
+      assert.ok(
+        (logs.getLoggerProvider() as ProxyLoggerProvider) instanceof
+          LoggerProvider
+      );
       await sdk.shutdown();
       delete env.OTEL_TRACES_EXPORTER;
+    });
+
+    it('should register a logger provider if multiple log record processors are provided', async () => {
+      const logRecordExporter = new InMemoryLogRecordExporter();
+      const simpleLogRecordProcessor = new SimpleLogRecordProcessor(
+        logRecordExporter
+      );
+      const batchLogRecordProcessor = new BatchLogRecordProcessor(
+        logRecordExporter
+      );
+      const sdk = new NodeSDK({
+        logRecordProcessors: [
+          simpleLogRecordProcessor,
+          batchLogRecordProcessor,
+        ],
+      });
+
+      sdk.start();
+
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert.ok(sharedState.registeredLogRecordProcessors.length === 2);
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+          InMemoryLogRecordExporter
+      );
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[0] instanceof
+          SimpleLogRecordProcessor
+      );
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[1]._exporter instanceof
+          InMemoryLogRecordExporter
+      );
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[1] instanceof
+          BatchLogRecordProcessor
+      );
     });
 
     it('should register a context manager if only a context manager is provided', async () => {
@@ -340,6 +528,21 @@ describe('Node SDK', () => {
       const actualContextManager = context['_getContextManager']();
       assert.equal(actualContextManager, expectedContextManager);
       await sdk.shutdown();
+    });
+
+    it('should register propagators as defined in OTEL_PROPAGATORS if trace SDK is configured', async () => {
+      process.env.OTEL_PROPAGATORS = 'b3';
+      const sdk = new NodeSDK({
+        traceExporter: new ConsoleSpanExporter(),
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assert.deepStrictEqual(propagation.fields(), ['b3']);
+
+      await sdk.shutdown();
+      delete process.env.OTEL_PROPAGATORS;
     });
   });
 
@@ -375,11 +578,11 @@ describe('Node SDK', () => {
     const sdk = new NodeSDK({
       metricReader: metricReader,
       views: [
-        new View({
+        {
           name: 'test-view',
           instrumentName: 'test_counter',
           instrumentType: InstrumentType.COUNTER,
-        }),
+        },
       ],
       autoDetectResources: false,
     });
@@ -452,8 +655,10 @@ describe('Node SDK', () => {
           resourceDetectors: [
             processDetector,
             {
-              async detect(): Promise<Resource> {
-                return new Resource({ customAttr: 'someValue' });
+              detect(): DetectedResource {
+                return {
+                  attributes: { customAttr: 'someValue' },
+                };
               },
             },
             envDetector,
@@ -490,11 +695,8 @@ describe('Node SDK', () => {
           version: '0.0.1',
         });
 
-        assert.notEqual(
-          resource.attributes[SEMRESATTRS_PROCESS_PID],
-          undefined
-        );
-        assert.notEqual(resource.attributes[SEMRESATTRS_HOST_NAME], undefined);
+        assert.notEqual(resource.attributes[ATTR_PROCESS_PID], undefined);
+        assert.notEqual(resource.attributes[ATTR_HOST_NAME], undefined);
       });
     });
 
@@ -528,11 +730,11 @@ describe('Node SDK', () => {
       });
     });
 
-    describe('with a debug logger', () => {
+    describe('with a diag logger', () => {
       // Local functions to test if a mocked method is ever called with a specific argument or regex matching for an argument.
       // Needed because of race condition with parallel detectors.
       const callArgsContains = (
-        mockedFunction: sinon.SinonSpy,
+        mockedFunction: Sinon.SinonSpy,
         arg: any
       ): boolean => {
         return mockedFunction.getCalls().some(call => {
@@ -540,7 +742,7 @@ describe('Node SDK', () => {
         });
       };
       const callArgsMatches = (
-        mockedFunction: sinon.SinonSpy,
+        mockedFunction: Sinon.SinonSpy,
         regex: RegExp
       ): boolean => {
         return mockedFunction.getCalls().some(call => {
@@ -548,38 +750,51 @@ describe('Node SDK', () => {
         });
       };
 
-      it('prints detected resources and debug messages to the logger', async () => {
-        const sdk = new NodeSDK({
-          autoDetectResources: true,
+      describe('with unknown OTEL_NODE_RESOURCE_DETECTORS value', () => {
+        before(() => {
+          process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,os,no-such-detector';
         });
 
-        // This test depends on the env detector to be functioning as intended
-        const mockedLoggerMethod = Sinon.fake();
-        const mockedVerboseLoggerMethod = Sinon.fake();
+        after(() => {
+          delete process.env.OTEL_NODE_RESOURCE_DETECTORS;
+        });
 
-        diag.setLogger(
-          {
-            debug: mockedLoggerMethod,
-            verbose: mockedVerboseLoggerMethod,
-          } as any,
-          DiagLogLevel.VERBOSE
-        );
+        // 1. If not auto-detecting resources, then NodeSDK should not
+        //    complain about `OTEL_NODE_RESOURCE_DETECTORS` values.
+        // 2. If given resourceDetectors, then NodeSDK should not complain
+        //    about `OTEL_NODE_RESOURCE_DETECTORS` values.
+        //
+        // Practically, these tests help ensure that there is no spurious
+        // diag error message when using OTEL_NODE_RESOURCE_DETECTORS with
+        // @opentelemetry/auto-instrumentations-node, which supports more values
+        // than this package (e.g. 'gcp').
+        it('does not diag.warn when not using the envvar', async () => {
+          const diagMocks = {
+            error: Sinon.fake(),
+            warn: Sinon.fake(),
+            info: Sinon.fake(),
+            debug: Sinon.fake(),
+            verbose: Sinon.fake(),
+          };
+          diag.setLogger(diagMocks, DiagLogLevel.DEBUG);
 
-        sdk.start();
-        await sdk['_resource'].waitForAsyncAttributes?.();
+          const sdk1 = new NodeSDK({
+            autoDetectResources: false,
+          });
+          sdk1.start();
+          await sdk1.shutdown();
 
-        // Test that the Env Detector successfully found its resource and populated it with the right values.
-        assert.ok(
-          callArgsContains(mockedLoggerMethod, 'EnvDetector found resource.')
-        );
-        // Regex formatting accounts for whitespace variations in util.inspect output over different node versions
-        assert.ok(
-          callArgsMatches(
-            mockedVerboseLoggerMethod,
-            /{\s+"service\.instance\.id":\s+"627cc493",\s+"service\.name":\s+"my-service",\s+"service\.namespace":\s+"default",\s+"service\.version":\s+"0.0.1"\s+}\s*/gm
-          )
-        );
-        await sdk.shutdown();
+          const sdk2 = new NodeSDK({
+            resourceDetectors: [envDetector],
+          });
+          sdk2.start();
+          await sdk2.shutdown();
+
+          assert.ok(
+            !callArgsMatches(diagMocks.error, /no-such-detector/),
+            'diag.error() messages do not mention "no-such-detector"'
+          );
+        });
       });
 
       describe('with a faulty environment variable', () => {
@@ -735,7 +950,7 @@ describe('Node SDK', () => {
           processDetector,
           envDetector,
           hostDetector,
-          serviceInstanceIdDetectorSync,
+          serviceInstanceIdDetector,
         ],
       });
 
@@ -805,8 +1020,10 @@ describe('Node SDK', () => {
           resourceDetectors: [
             processDetector,
             {
-              async detect(): Promise<Resource> {
-                return new Resource({ customAttr: 'someValue' });
+              detect(): DetectedResource {
+                return {
+                  attributes: { customAttr: 'someValue' },
+                };
               },
             },
             envDetector,
@@ -817,7 +1034,7 @@ describe('Node SDK', () => {
         const resource = sdk['_resource'];
         await resource.waitForAsyncAttributes?.();
 
-        assert.deepStrictEqual(resource, Resource.empty());
+        assert.deepStrictEqual(resource, defaultResource());
         await sdk.shutdown();
       });
     });
@@ -850,196 +1067,564 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
   });
+
+  describe('configuring logger provider from env', () => {
+    let stubLogger: Sinon.SinonStub;
+
+    beforeEach(() => {
+      stubLogger = Sinon.stub(diag, 'info');
+    });
+
+    afterEach(() => {
+      stubLogger.reset();
+      delete env.OTEL_LOGS_EXPORTER;
+      delete env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL;
+      delete env.OTEL_EXPORTER_OTLP_PROTOCOL;
+    });
+
+    it('should not register the provider if OTEL_LOGS_EXPORTER contains none', async () => {
+      const logsAPIStub = Sinon.spy(logs, 'setGlobalLoggerProvider');
+      env.OTEL_LOGS_EXPORTER = 'console,none';
+      const sdk = new NodeSDK();
+      sdk.start();
+      assert.strictEqual(
+        stubLogger.args[0][0],
+        'OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.'
+      );
+
+      Sinon.assert.notCalled(logsAPIStub);
+      await sdk.shutdown();
+    });
+
+    it('should use otlp with http/protobuf by default', async () => {
+      const sdk = new NodeSDK();
+      sdk.start();
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+          OTLPProtoLogExporter
+      );
+      await sdk.shutdown();
+    });
+
+    it('should set up all allowed exporters', async () => {
+      env.OTEL_LOGS_EXPORTER = 'console,otlp';
+      const sdk = new NodeSDK();
+
+      sdk.start();
+
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert.ok(sharedState.registeredLogRecordProcessors.length === 2);
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+          ConsoleLogRecordExporter
+      );
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[0] instanceof
+          SimpleLogRecordProcessor
+      );
+      // defaults to http/protobuf
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[1]._exporter instanceof
+          OTLPProtoLogExporter
+      );
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[1] instanceof
+          BatchLogRecordProcessor
+      );
+      await sdk.shutdown();
+    });
+
+    it('should use OTEL_EXPORTER_OTLP_LOGS_PROTOCOL for otlp protocol', async () => {
+      env.OTEL_LOGS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL = 'grpc';
+      const sdk = new NodeSDK();
+
+      sdk.start();
+
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert.ok(sharedState.registeredLogRecordProcessors.length === 1);
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+          OTLPGrpcLogExporter
+      );
+      await sdk.shutdown();
+    });
+
+    it('should use OTLPHttpLogExporter when http/json is set', async () => {
+      env.OTEL_LOGS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL = 'http/json';
+      const sdk = new NodeSDK();
+
+      sdk.start();
+
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert.ok(sharedState.registeredLogRecordProcessors.length === 1);
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+          OTLPHttpLogExporter
+      );
+      await sdk.shutdown();
+    });
+
+    it('should fall back to OTEL_EXPORTER_OTLP_PROTOCOL', async () => {
+      env.OTEL_LOGS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_PROTOCOL = 'grpc';
+      const sdk = new NodeSDK();
+
+      sdk.start();
+
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert.ok(sharedState.registeredLogRecordProcessors.length === 1);
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+          OTLPGrpcLogExporter
+      );
+      await sdk.shutdown();
+    });
+
+    it('should fall back to http/protobuf if invalid protocol is set', async () => {
+      env.OTEL_LOGS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL = 'grpc2';
+      const sdk = new NodeSDK();
+
+      sdk.start();
+
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert.ok(sharedState.registeredLogRecordProcessors.length === 1);
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+          OTLPProtoLogExporter
+      );
+      await sdk.shutdown();
+    });
+  });
+
+  describe('configuring metric provider from env', () => {
+    let stubLogger: Sinon.SinonStub;
+
+    beforeEach(() => {
+      stubLogger = Sinon.stub(diag, 'info');
+    });
+
+    afterEach(() => {
+      stubLogger.reset();
+      delete env.OTEL_METRICS_EXPORTER;
+      delete env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL;
+      delete env.OTEL_EXPORTER_METRICS_PROTOCOL;
+    });
+
+    it('should not register the provider if OTEL_METRICS_EXPORTER is not set', async () => {
+      const sdk = new NodeSDK();
+      sdk.start();
+      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
+      await sdk.shutdown();
+    });
+
+    it('should not register the provider if OTEL_METRICS_EXPORTER contains none', async () => {
+      env.OTEL_METRICS_EXPORTER = 'console,none';
+      const sdk = new NodeSDK();
+      sdk.start();
+      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
+      assert.strictEqual(
+        stubLogger.args[0][0],
+        'OTEL_METRICS_EXPORTER contains "none". Metric provider will not be initialized.'
+      );
+      await sdk.shutdown();
+    });
+
+    it('should use console with default interval and timeout', async () => {
+      env.OTEL_METRICS_EXPORTER = 'console';
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert.ok(
+        sharedState.metricCollectors[0]._metricReader._exporter instanceof
+          ConsoleMetricExporter
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportInterval,
+        60000
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportTimeout,
+        30000
+      );
+      await sdk.shutdown();
+    });
+
+    it('should use otlp with gRPC and default interval and timeout', async () => {
+      env.OTEL_METRICS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'grpc';
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert.ok(
+        sharedState.metricCollectors[0]._metricReader._exporter instanceof
+          OTLPGrpcMetricExporter
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportInterval,
+        60000
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportTimeout,
+        30000
+      );
+      await sdk.shutdown();
+    });
+
+    it('should use otlp with http/protobuf and default interval and timeout', async () => {
+      env.OTEL_METRICS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'http/protobuf';
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert.ok(
+        sharedState.metricCollectors[0]._metricReader._exporter instanceof
+          OTLPProtoMetricExporter
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportInterval,
+        60000
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportTimeout,
+        30000
+      );
+      await sdk.shutdown();
+    });
+
+    it('should use otlp with http/json and default interval and timeout', async () => {
+      env.OTEL_METRICS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'http/json';
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert.ok(
+        sharedState.metricCollectors[0]._metricReader._exporter instanceof
+          OTLPHttpMetricExporter
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportInterval,
+        60000
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportTimeout,
+        30000
+      );
+      await sdk.shutdown();
+    });
+
+    it('should fall back to OTEL_EXPORTER_OTLP_PROTOCOL', async () => {
+      env.OTEL_METRICS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'grpc';
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert.ok(
+        sharedState.metricCollectors[0]._metricReader._exporter instanceof
+          OTLPGrpcMetricExporter
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportInterval,
+        60000
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportTimeout,
+        30000
+      );
+      await sdk.shutdown();
+    });
+
+    it('should fall back to http/protobuf if invalid protocol is set', async () => {
+      env.OTEL_METRICS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'grpcx';
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert.ok(
+        sharedState.metricCollectors[0]._metricReader._exporter instanceof
+          OTLPProtoMetricExporter
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportInterval,
+        60000
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportTimeout,
+        30000
+      );
+      await sdk.shutdown();
+    });
+
+    it('should fall back to http/protobuf if protocol is not  set', async () => {
+      env.OTEL_METRICS_EXPORTER = 'otlp';
+      delete env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL;
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert.ok(
+        sharedState.metricCollectors[0]._metricReader._exporter instanceof
+          OTLPProtoMetricExporter
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportInterval,
+        60000
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportTimeout,
+        30000
+      );
+      await sdk.shutdown();
+    });
+
+    it('should use otlp with http/protobuf and and use user defined flushing settings', async () => {
+      env.OTEL_METRICS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'http/protobuf';
+      env.OTEL_METRIC_EXPORT_INTERVAL = '200';
+      env.OTEL_METRIC_EXPORT_TIMEOUT = '150';
+      delete env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL;
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert.ok(
+        sharedState.metricCollectors[0]._metricReader._exporter instanceof
+          OTLPProtoMetricExporter
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportInterval,
+        200
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportTimeout,
+        150
+      );
+      await sdk.shutdown();
+      delete env.OTEL_METRIC_EXPORT_INTERVAL;
+      delete env.OTEL_METRIC_EXPORT_TIMEOUT;
+    });
+
+    it('should use prometheus if that is set ', async () => {
+      env.OTEL_METRICS_EXPORTER = 'prometheus';
+      delete env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL;
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert.ok(
+        sharedState.metricCollectors[0]._metricReader instanceof
+          PrometheusMetricExporter
+      );
+      await sdk.shutdown();
+    });
+  });
 });
 
 describe('setup exporter from env', () => {
-  let spyGetOtlpProtocol: Sinon.SinonSpy;
   let stubLoggerError: Sinon.SinonStub;
 
+  const getSdkSpanProcessors = (sdk: NodeSDK) => {
+    const tracerProvider = sdk['_tracerProvider'];
+
+    assert.ok(tracerProvider instanceof NodeTracerProvider);
+
+    const activeSpanProcessor = tracerProvider['_activeSpanProcessor'];
+
+    assert.ok(activeSpanProcessor.constructor.name === 'MultiSpanProcessor');
+
+    return (activeSpanProcessor as any)['_spanProcessors'] as SpanProcessor[];
+  };
+
   beforeEach(() => {
-    spyGetOtlpProtocol = Sinon.spy(
-      TracerProviderWithEnvExporters,
-      'getOtlpProtocol'
-    );
     stubLoggerError = Sinon.stub(diag, 'warn');
   });
   afterEach(() => {
-    spyGetOtlpProtocol.restore();
     stubLoggerError.restore();
   });
-  it('use default exporter TracerProviderWithEnvExporters when user does not provide span processor or trace exporter to sdk config', async () => {
+
+  it('should use default exporter when nor env neither SDK config is given', async () => {
     const sdk = new NodeSDK();
     sdk.start();
-    const listOfProcessors =
-      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(
+      listOfProcessors[0]['_exporter'] instanceof OTLPProtoTraceExporter
+    );
     await sdk.shutdown();
   });
-  it('ignore env exporter when user provides exporter to sdk config', async () => {
+
+  it('should ignore default env exporter when user provides exporter in sdk config', async () => {
     const traceExporter = new ConsoleSpanExporter();
     const sdk = new NodeSDK({
       traceExporter,
     });
     sdk.start();
-    const listOfProcessors =
-      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(
-      sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters === false
-    );
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof SimpleSpanProcessor === false);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
     await sdk.shutdown();
   });
-  it('ignores default env exporter when user provides span processor to sdk config', async () => {
+
+  it('should ignore default env exporter when user provides span processor in sdk config', async () => {
     const traceExporter = new ConsoleSpanExporter();
     const spanProcessor = new SimpleSpanProcessor(traceExporter);
     const sdk = new NodeSDK({
       spanProcessor,
     });
     sdk.start();
-    const listOfProcessors =
-      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(
-      sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters === false
-    );
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof SimpleSpanProcessor);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor === false);
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof SimpleSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
     await sdk.shutdown();
   });
-  it('ignores env exporter when user provides tracer exporter to sdk config and sets exporter via env', async () => {
+
+  it('should ignore exporter form env if another is provided in sdk config', async () => {
     env.OTEL_TRACES_EXPORTER = 'console';
     const traceExporter = new OTLPTraceExporter();
     const sdk = new NodeSDK({
       traceExporter,
     });
     sdk.start();
-    const listOfProcessors =
-      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(
-      sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters === false
-    );
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof SimpleSpanProcessor === false);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof OTLPTraceExporter);
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
   });
+
   it('should only create one span processor when configured using env vars and config', async () => {
     env.OTEL_TRACES_EXPORTER = 'console';
     const sdk = new NodeSDK({
       sampler: new AlwaysOffSampler(),
     });
     sdk.start();
-    const listOfProcessors =
-      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
-    assert.ok(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
+    const listOfProcessors = getSdkSpanProcessors(sdk);
+
     assert.ok(
       sdk['_tracerProvider']!['_config']?.sampler instanceof AlwaysOffSampler
     );
     assert.strictEqual(listOfProcessors.length, 1);
+    assert.ok(listOfProcessors[0] instanceof SimpleSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
   });
-  it('use otlp exporter and defined exporter protocol env value', async () => {
+
+  it('should use otlp exporter and defined exporter protocol env value', async () => {
     env.OTEL_TRACES_EXPORTER = 'otlp';
     env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
     const sdk = new NodeSDK();
     sdk.start();
+    const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    const listOfProcessors =
-      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
-    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(
+      listOfProcessors[0]['_exporter'] instanceof OTLPGrpcTraceExporter
+    );
     delete env.OTEL_TRACES_EXPORTER;
     delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     await sdk.shutdown();
   });
-  it('use noop span processor when user sets env exporter to none', async () => {
-    env.OTEL_TRACES_EXPORTER = 'none';
+
+  it('sohuld use exporter and processor from env, signal specific env for protocol takes precedence', async () => {
+    env.OTEL_TRACES_EXPORTER = 'otlp';
+    env.OTEL_EXPORTER_OTLP_PROTOCOL = 'http/protobuf';
+    env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
     const sdk = new NodeSDK();
     sdk.start();
+    const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    const listOfProcessors =
-      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
-    const activeProcessor = sdk['_tracerProvider']?.getActiveSpanProcessor();
-
-    assert(listOfProcessors.length === 0);
-    assert(activeProcessor instanceof NoopSpanProcessor);
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(
+      listOfProcessors[0]['_exporter'] instanceof OTLPGrpcTraceExporter
+    );
     delete env.OTEL_TRACES_EXPORTER;
+    delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     await sdk.shutdown();
   });
-  it('log warning that sdk will not be initialized when exporter is set to none', async () => {
+
+  it('should use empty span processor when user sets env exporter to none', async () => {
     env.OTEL_TRACES_EXPORTER = 'none';
     const sdk = new NodeSDK();
     sdk.start();
 
+    // should warn
     assert.strictEqual(
       stubLoggerError.args[0][0],
       'OTEL_TRACES_EXPORTER contains "none". SDK will not be initialized.'
     );
-    delete env.OTEL_TRACES_EXPORTER;
-    await sdk.shutdown();
-  });
-  it('use default otlp exporter when user does not set exporter via env or config', async () => {
-    const sdk = new NodeSDK();
-    sdk.start();
 
-    const listOfProcessors =
-      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
-    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
-    await sdk.shutdown();
-  });
-  it('use default otlp exporter when empty value is provided for exporter via env', async () => {
-    env.OTEL_TRACES_EXPORTER = '';
-    const sdk = new NodeSDK();
-    sdk.start();
-
-    const listOfProcessors =
-      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
-    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
-    env.OTEL_TRACES_EXPORTER = '';
-    await sdk.shutdown();
-  });
-
-  it('use only default exporter when none value is provided with other exporters', async () => {
-    env.OTEL_TRACES_EXPORTER = 'otlp,zipkin,none';
-    const sdk = new NodeSDK();
-    sdk.start();
-
-    const listOfProcessors =
-      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
-    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
+    const listOfProcessors = getSdkSpanProcessors(sdk);
+    assert.strictEqual(listOfProcessors.length, 0);
 
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
   });
-  it('log warning that only default exporter will be used since exporter list contains none with other exports ', async () => {
+
+  it('should use default otlp exporter when empty value is provided for exporter via env', async () => {
+    env.OTEL_TRACES_EXPORTER = '';
+    const sdk = new NodeSDK();
+    sdk.start();
+
+    const listOfProcessors = getSdkSpanProcessors(sdk);
+
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(
+      listOfProcessors[0]['_exporter'] instanceof OTLPProtoTraceExporter
+    );
+    env.OTEL_TRACES_EXPORTER = '';
+    await sdk.shutdown();
+  });
+
+  it('should use only default exporter when none value is provided with other exporters', async () => {
     env.OTEL_TRACES_EXPORTER = 'otlp,zipkin,none';
     const sdk = new NodeSDK();
     sdk.start();
 
+    // also it should warn
     assert.strictEqual(
       stubLoggerError.args[0][0],
       'OTEL_TRACES_EXPORTER contains "none" along with other exporters. Using default otlp exporter.'
     );
+
+    const listOfProcessors = getSdkSpanProcessors(sdk);
+
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(
+      listOfProcessors[0]['_exporter'] instanceof OTLPProtoTraceExporter
+    );
+
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
   });
+
   it('should warn that provided exporter value is unrecognized and not able to be set up', async () => {
     env.OTEL_TRACES_EXPORTER = 'invalid';
     const sdk = new NodeSDK();
@@ -1058,35 +1643,151 @@ describe('setup exporter from env', () => {
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
   });
-  it('setup zipkin, jaeger and otlp exporters', async () => {
-    env.OTEL_TRACES_EXPORTER = 'zipkin, otlp, jaeger';
+
+  it('should be able to setup zipkin exporter', async () => {
+    env.OTEL_TRACES_EXPORTER = 'zipkin';
     env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
     const sdk = new NodeSDK();
     sdk.start();
 
-    const listOfProcessors =
-      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
-    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
-    assert(listOfProcessors.length === 3);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
-    assert(listOfProcessors[1] instanceof BatchSpanProcessor);
-    assert(listOfProcessors[2] instanceof BatchSpanProcessor);
+    const listOfProcessors = getSdkSpanProcessors(sdk);
+
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof ZipkinExporter);
 
     delete env.OTEL_TRACES_EXPORTER;
     delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     await sdk.shutdown();
   });
-  it('use the console exporter', async () => {
+
+  it('should be able to setup zipkin and otlp exporters', async () => {
+    env.OTEL_TRACES_EXPORTER = 'zipkin, otlp';
+    env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
+    const sdk = new NodeSDK();
+    sdk.start();
+
+    const listOfProcessors = getSdkSpanProcessors(sdk);
+
+    assert.ok(listOfProcessors.length === 2);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof ZipkinExporter);
+    assert.ok(listOfProcessors[1] instanceof BatchSpanProcessor);
+    assert.ok(
+      listOfProcessors[1]['_exporter'] instanceof OTLPGrpcTraceExporter
+    );
+
+    delete env.OTEL_TRACES_EXPORTER;
+    delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
+    await sdk.shutdown();
+  });
+
+  it('should be able to setup jaeger exporter', async () => {
+    env.OTEL_TRACES_EXPORTER = 'jaeger';
+    env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
+    const sdk = new NodeSDK();
+    sdk.start();
+
+    const listOfProcessors = getSdkSpanProcessors(sdk);
+
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof JaegerExporter);
+
+    delete env.OTEL_TRACES_EXPORTER;
+    delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
+    await sdk.shutdown();
+  });
+
+  it('should be able to setup jaeger and otlp exporters', async () => {
+    env.OTEL_TRACES_EXPORTER = 'otlp, jaeger';
+    env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
+    const sdk = new NodeSDK();
+    sdk.start();
+
+    const listOfProcessors = getSdkSpanProcessors(sdk);
+
+    assert.ok(listOfProcessors.length === 2);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(
+      listOfProcessors[0]['_exporter'] instanceof OTLPGrpcTraceExporter
+    );
+    assert.ok(listOfProcessors[1] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors[1]['_exporter'] instanceof JaegerExporter);
+
+    delete env.OTEL_TRACES_EXPORTER;
+    delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
+    await sdk.shutdown();
+  });
+
+  it('should be able to setup zipkin, jaeger and otlp exporters', async () => {
+    env.OTEL_TRACES_EXPORTER = 'zipkin, otlp, jaeger';
+    env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
+    const sdk = new NodeSDK();
+    sdk.start();
+
+    const listOfProcessors = getSdkSpanProcessors(sdk);
+
+    assert.ok(listOfProcessors.length === 3);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof ZipkinExporter);
+    assert.ok(listOfProcessors[1] instanceof BatchSpanProcessor);
+    assert.ok(
+      listOfProcessors[1]['_exporter'] instanceof OTLPGrpcTraceExporter
+    );
+    assert.ok(listOfProcessors[2] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors[2]['_exporter'] instanceof JaegerExporter);
+
+    delete env.OTEL_TRACES_EXPORTER;
+    delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
+    await sdk.shutdown();
+  });
+
+  it('should be able to use console and otlp exporters', async () => {
     env.OTEL_TRACES_EXPORTER = 'console, otlp';
     const sdk = new NodeSDK();
     sdk.start();
 
-    const listOfProcessors =
-      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
-    assert(listOfProcessors.length === 2);
-    assert(listOfProcessors[0] instanceof SimpleSpanProcessor);
-    assert(listOfProcessors[1] instanceof BatchSpanProcessor);
+    const listOfProcessors = getSdkSpanProcessors(sdk);
+
+    assert.ok(listOfProcessors.length === 2);
+    assert.ok(listOfProcessors[0] instanceof SimpleSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
+    assert.ok(listOfProcessors[1] instanceof BatchSpanProcessor);
+    assert.ok(
+      listOfProcessors[1]['_exporter'] instanceof OTLPProtoTraceExporter
+    );
     delete env.OTEL_TRACES_EXPORTER;
+    await sdk.shutdown();
+  });
+
+  it('should be able to use console exporter but not http/json exporter', async () => {
+    env.OTEL_TRACES_EXPORTER = 'console, http/json';
+    const sdk = new NodeSDK();
+    sdk.start();
+
+    const listOfProcessors = getSdkSpanProcessors(sdk);
+
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof SimpleSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
+    delete env.OTEL_TRACES_EXPORTER;
+    await sdk.shutdown();
+  });
+
+  it('should ignore the protocol from env when use the console exporter', async () => {
+    env.OTEL_TRACES_EXPORTER = 'console';
+    env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
+    const sdk = new NodeSDK();
+    sdk.start();
+
+    const listOfProcessors = getSdkSpanProcessors(sdk);
+
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof SimpleSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
+    delete env.OTEL_TRACES_EXPORTER;
+    delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     await sdk.shutdown();
   });
 });

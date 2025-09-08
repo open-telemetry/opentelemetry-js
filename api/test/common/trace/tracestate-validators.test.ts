@@ -20,8 +20,8 @@ import {
   validateValue,
 } from '../../../src/trace/internal/tracestate-validators';
 
-describe('validators', () => {
-  describe('validateKey', () => {
+describe('validators', function () {
+  describe('validateKey', function () {
     const validKeysTestCases = [
       'abcdefghijklmnopqrstuvwxyz0123456789-_*/',
       'baz-',
@@ -34,7 +34,7 @@ describe('validators', () => {
       '6cab5bb-29a@dt',
     ];
     validKeysTestCases.forEach(testCase =>
-      it(`returns true when key contains valid chars ${testCase}`, () => {
+      it(`returns true when key contains valid chars ${testCase}`, function () {
         assert.ok(validateKey(testCase), `${testCase} should be valid`);
       })
     );
@@ -50,13 +50,13 @@ describe('validators', () => {
       '6num',
     ];
     invalidKeysTestCases.forEach(testCase =>
-      it(`returns true when key contains invalid chars ${testCase}`, () => {
+      it(`returns true when key contains invalid chars ${testCase}`, function () {
         assert.ok(!validateKey(testCase), `${testCase} should be invalid`);
       })
     );
   });
 
-  describe('validateValue', () => {
+  describe('validateValue', function () {
     const validValuesTestCases = [
       'first second',
       'baz*',
@@ -71,7 +71,7 @@ describe('validators', () => {
       'TRACESTATE',
     ];
     validValuesTestCases.forEach(testCase =>
-      it(`returns true when value contains valid chars ${testCase}`, () => {
+      it(`returns true when value contains valid chars ${testCase}`, function () {
         assert.ok(validateValue(testCase));
       })
     );
@@ -87,7 +87,7 @@ describe('validators', () => {
       '',
     ];
     invalidValuesTestCases.forEach(testCase =>
-      it(`returns true when value contains invalid chars ${testCase}`, () => {
+      it(`returns true when value contains invalid chars ${testCase}`, function () {
         assert.ok(!validateValue(testCase));
       })
     );

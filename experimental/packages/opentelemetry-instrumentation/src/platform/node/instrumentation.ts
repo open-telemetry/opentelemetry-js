@@ -17,8 +17,8 @@
 import * as types from '../../types';
 import * as path from 'path';
 import { types as utilTypes } from 'util';
-import { satisfies } from 'semver';
-import { wrap, unwrap, massWrap, massUnwrap } from 'shimmer';
+import { satisfies } from '../../semver';
+import { wrap, unwrap, massWrap, massUnwrap } from '../../shimmer';
 import { InstrumentationAbstract } from '../../instrumentation';
 import {
   RequireInTheMiddleSingleton,
@@ -66,14 +66,6 @@ export abstract class InstrumentationBase<
 
     this._modules = (modules as InstrumentationModuleDefinition[]) || [];
 
-    if (this._modules.length === 0) {
-      diag.debug(
-        'No modules instrumentation has been defined for ' +
-          `'${this.instrumentationName}@${this.instrumentationVersion}'` +
-          ', nothing will be patched'
-      );
-    }
-
     if (this._config.enabled) {
       this.enable();
     }
@@ -87,10 +79,10 @@ export abstract class InstrumentationBase<
       return wrap(moduleExports, name, wrapper);
     } else {
       const wrapped = wrap(Object.assign({}, moduleExports), name, wrapper);
-
-      return Object.defineProperty(moduleExports, name, {
+      Object.defineProperty(moduleExports, name, {
         value: wrapped,
       });
+      return wrapped;
     }
   };
 
@@ -175,7 +167,7 @@ export abstract class InstrumentationBase<
       });
       const version = JSON.parse(json).version;
       return typeof version === 'string' ? version : undefined;
-    } catch (error) {
+    } catch {
       diag.warn('Failed extracting version', baseDir);
     }
 
@@ -295,6 +287,11 @@ export abstract class InstrumentationBase<
     this._warnOnPreloadedModules();
     for (const module of this._modules) {
       const hookFn: HookFn = (exports, name, baseDir) => {
+        if (!baseDir && path.isAbsolute(name)) {
+          const parsedPath = path.parse(name);
+          name = parsedPath.name;
+          baseDir = parsedPath.dir;
+        }
         return this._onRequire<typeof exports>(module, exports, name, baseDir);
       };
       const onRequire: OnRequireFn = (exports, name, baseDir) => {

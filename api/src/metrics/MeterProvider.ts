@@ -18,6 +18,8 @@ import { Meter, MeterOptions } from './Meter';
 
 /**
  * A registry for creating named {@link Meter}s.
+ *
+ * @since 1.3.0
  */
 export interface MeterProvider {
   /**

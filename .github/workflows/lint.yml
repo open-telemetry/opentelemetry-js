@@ -7,19 +7,22 @@ on:
   pull_request:
   merge_group:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+        uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: '20'
+          node-version: '22'
 
       - name: Bootstrap
         run: npm ci
@@ -28,7 +31,6 @@ jobs:
         run: |
           npm run lint
           npm run lint:examples
-          npm run lint:markdown
 
       - name: Lint doc files
         run: |

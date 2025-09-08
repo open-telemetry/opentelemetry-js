@@ -43,19 +43,21 @@ describe('ConsoleSpanExporter', () => {
   describe('.export()', () => {
     it('should export information about span', () => {
       assert.doesNotThrow(() => {
+        consoleExporter = new ConsoleSpanExporter();
         const basicTracerProvider = new BasicTracerProvider({
           sampler: new AlwaysOnSampler(),
+          spanProcessors: [new SimpleSpanProcessor(consoleExporter)],
         });
-        consoleExporter = new ConsoleSpanExporter();
 
         const spyConsole = sinon.spy(console, 'dir');
         const spyExport = sinon.spy(consoleExporter, 'export');
 
-        basicTracerProvider.addSpanProcessor(
-          new SimpleSpanProcessor(consoleExporter)
+        const instrumentationScopeName = '@opentelemetry/sdk-trace-base/test';
+        const instrumentationScopeVersion = '1.2.3';
+        const tracer = basicTracerProvider.getTracer(
+          instrumentationScopeName,
+          instrumentationScopeVersion
         );
-
-        const tracer = basicTracerProvider.getTracer('default');
         const context: SpanContext = {
           traceId: 'a3cda95b652f4a1592b449d5929fda1b',
           spanId: '5e0c63257de34c92',
@@ -80,10 +82,11 @@ describe('ConsoleSpanExporter', () => {
           'duration',
           'events',
           'id',
+          'instrumentationScope',
           'kind',
           'links',
           'name',
-          'parentId',
+          'parentSpanContext',
           'resource',
           'status',
           'timestamp',
@@ -95,6 +98,12 @@ describe('ConsoleSpanExporter', () => {
         assert.ok(firstEvent.name === 'foobar');
         assert.ok(consoleSpan.id === firstSpan.spanContext().spanId);
         assert.ok(keys === expectedKeys, 'expectedKeys');
+        assert.ok(
+          firstSpan.instrumentationScope.name === instrumentationScopeName
+        );
+        assert.ok(
+          firstSpan.instrumentationScope.version === instrumentationScopeVersion
+        );
 
         assert.ok(spyExport.calledOnce);
       });

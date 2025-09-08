@@ -19,8 +19,8 @@
     <img alt="license" src="https://img.shields.io/badge/license-Apache_2.0-green.svg?style=for-the-badge">
   </a>
   <br/>
-  <a href="https://circleci.com/gh/open-telemetry/opentelemetry-js">
-    <img alt="Build Status" src="https://circleci.com/gh/open-telemetry/opentelemetry-js.svg?style=shield">
+    <a href="https://github.com/open-telemetry/opentelemetry-js/actions">
+    <img alt="Build Status" src="https://github.com/open-telemetry/opentelemetry-js/actions/workflows/unit-test.yml/badge.svg?style=shield">
   </a>
   <img alt="Beta" src="https://img.shields.io/badge/status-beta-informational?logo=data:image/png;base64,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">
 </p>
@@ -41,6 +41,9 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 ## Quick Start
 
+**Much of OpenTelemetry JS documentation is written assuming the compiled application is run as CommonJS.**
+For more details on ECMAScript Modules vs CommonJS, refer to [esm-support](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-support.md).
+
 The following describes how to set up tracing for a basic web application.
 For more detailed documentation, see the website at <https://opentelemetry.io/docs/instrumentation/js/>.
 
@@ -55,7 +58,7 @@ npm install --save @opentelemetry/sdk-node
 npm install --save @opentelemetry/auto-instrumentations-node
 ```
 
-**Note:** `auto-instrumentations-node` is a meta package from [opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/metapackages/auto-instrumentations-node) that provides a simple way to initialize multiple Node.js instrumentations.
+**Note:** `auto-instrumentations-node` is a meta package from [opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/packages/auto-instrumentations-node) that provides a simple way to initialize multiple Node.js instrumentations.
 
 ### Set up Tracing
 
@@ -68,15 +71,15 @@ const process = require('process');
 const opentelemetry = require('@opentelemetry/sdk-node');
 const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
 const { ConsoleSpanExporter } = require('@opentelemetry/sdk-trace-base');
-const { Resource } = require('@opentelemetry/resources');
-const { SEMRESATTRS_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
+const { resourceFromAttributes } = require('@opentelemetry/resources');
+const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 
 // configure the SDK to export telemetry data to the console
 // enable all auto-instrumentations from the meta package
 const traceExporter = new ConsoleSpanExporter();
 const sdk = new opentelemetry.NodeSDK({
-  resource: new Resource({
-    [SEMRESATTRS_SERVICE_NAME]: 'my-service',
+  resource: resourceFromAttributes({
+    [ATTR_SERVICE_NAME]: 'my-service',
   }),
   traceExporter,
   instrumentations: [getNodeAutoInstrumentations()]
@@ -110,12 +113,10 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 ## Supported Runtimes
 
 | Platform Version    | Supported                                     |
-|---------------------|-----------------------------------------------|
+| ------------------- | --------------------------------------------- |
 | Node.JS `v22`       | :heavy_check_mark:                            |
 | Node.JS `v20`       | :heavy_check_mark:                            |
 | Node.JS `v18`       | :heavy_check_mark:                            |
-| Node.JS `v16`       | :heavy_check_mark:                            |
-| Node.JS `v14`       | :heavy_check_mark:                            |
 | Older Node Versions | See [Node Support](#node-support)             |
 | Web Browsers        | See [Browser Support](#browser-support) below |
 
@@ -123,8 +124,6 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 Only Node.js Active or Maintenance LTS versions are supported.
 Previous versions of node *may* work, but they are not tested by OpenTelemetry and they are not guaranteed to work.
-Note that versions of Node.JS v8 prior to `v8.12.0` will NOT work, because OpenTelemetry Node depends on the
-`perf_hooks` module introduced in `v8.5.0` and `performance.timeOrigin` that is set correctly starting in `v8.12.0`.
 
 ### Browser Support
 
@@ -132,8 +131,24 @@ Note that versions of Node.JS v8 prior to `v8.12.0` will NOT work, because OpenT
 > Client instrumentation for the browser is **experimental** and mostly **unspecified**. If you are interested in
 > helping out, get in touch with the [Client Instrumentation SIG][client-instrumentation-sig].
 
-There is currently no list of officially supported browsers. OpenTelemetry is developed using standard web
-technologies and aims to work in currently supported versions of major browsers.
+Rather than define versions of specific browsers / runtimes, OpenTelemetry sets the minimum supported version based on the
+underlying language features used.
+
+The current minumum language feature support is set as [ECMAScript 2022](https://262.ecma-international.org/13.0/) that are available
+in all modern browsers / runtimes.
+
+This means that if you are targeting or your end-users are using a browser / runtime that does not support ES2022, you will need
+to transpile the code and provide any necessary polyfills for the missing features to ensure compatibility with your target
+environments. Any support issues that arise from using a browser or runtime that does not support ES2022 will be closed as "won't fix".
+
+This minimum support level is subject to change as the project evolves and as the underlying language features evolve.
+
+## TypeScript Support
+
+OpenTelemetry JavaScript is built with TypeScript `v5.0.4`. If you have a TypeScript project (app, library, instrumentation, etc.)
+that depends on it, we recommend using same or higher version to compile the project.
+
+OpenTelemetry JavaScript will follows DefinitelyType's [support policy for TypeScript](https://github.com/DefinitelyTyped/DefinitelyTyped#support-window) which sets a support window of 2 years. Support for TypeScript versions older than 2 years will be dropped in minor releases of OpenTelemetry JavaScript.
 
 ## Package Version Compatibility
 
@@ -143,19 +158,28 @@ There may also be API packages for experimental signals in the experimental dire
 All stable packages are released with the same version, and all experimental packages are released with the same version.
 The below table describes which versions of each set of packages are expected to work together.
 
-| Stable Packages                                                 | Experimental Packages |
-|-----------------------------------------------------------------|-----------------------|
-| 1.21.x                                                          | 0.48.x                |
-| 1.20.x                                                          | 0.47.x                |
-| 1.19.x                                                          | 0.46.x                |
-| 1.18.x                                                          | 0.45.x                |
-| 1.17.x                                                          | 0.44.x                |
+| Stable Packages | Experimental Packages |
+|-----------------|-----------------------|
+| 2.0.x           | 0.200.x               |
+| 1.30.x          | 0.57.x                |
+| 1.29.x          | 0.56.x                |
+| 1.28.x          | 0.55.x                |
+| 1.27.x          | 0.54.x                |
+| 1.25.x          | 0.52.x                |
 
 <details>
 <summary>Older version compatibility matrix</summary>
 
 <table>
 <tr><th>Stable Packages</th>                            <th>Experimental Packages</th></tr>
+<tr><td>1.24.x</td>                                                    <td>0.51.x</td></tr>
+<tr><td>1.23.x</td>                                                    <td>0.50.x</td></tr>
+<tr><td>1.22.x</td>                                                    <td>0.49.x</td></tr>
+<tr><td>1.21.x</td>                                                    <td>0.48.x</td></tr>
+<tr><td>1.20.x</td>                                                    <td>0.47.x</td></tr>
+<tr><td>1.19.x</td>                                                    <td>0.46.x</td></tr>
+<tr><td>1.18.x</td>                                                    <td>0.45.x</td></tr>
+<tr><td>1.17.x</td>                                                    <td>0.43.x, 0.44.x</td></tr>
 <tr><td>1.16.x</td>                                                    <td>0.42.x</td></tr>
 <tr><td>1.15.x</td>                                                    <td>0.41.x</td></tr>
 <tr><td>1.14.x</td>                                                    <td>0.40.x</td></tr>
@@ -201,59 +225,85 @@ instructions to build and make changes to this project, see the
 
 We have a weekly SIG meeting! See the [community page](https://github.com/open-telemetry/community#javascript-sdk) for meeting details and notes.
 
-### Community members
-
-#### Maintainers ([@open-telemetry/javascript-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers))
+### Maintainers
 
 - [Amir Blum](https://github.com/blumamir), Odigos
 - [Chengzhong Wu](https://github.com/legendecas), Bloomberg
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
-- [Marc Pichler](https://github.com/pichlermarc), Dynatrace
-
-*Find more about the maintainer role in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).*
-
-#### Approvers ([@open-telemetry/javascript-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers))
-
-- [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
 - [Jamie Danielson](https://github.com/JamieDanielson), Honeycomb
+- [Marc Pichler](https://github.com/pichlermarc), Dynatrace
+- [Trent Mick](https://github.com/trentm), Elastic
+
+For more information about the maintainer role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#maintainer).
+
+### Approvers
+
+- [David Luna](https://github.com/david-luna), Elastic
+- [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
 - [Martin Kuba](https://github.com/martinkuba), Lightstep
+- [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
 - [Matthew Wear](https://github.com/mwear), LightStep
-- [Naseem K. Ullah](https://github.com/naseemkullah), Transit
 - [Neville Wylie](https://github.com/MSNev), Microsoft
 - [Purvi Kanal](https://github.com/pkanal), Honeycomb
 - [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
-- [Trent Mick](https://github.com/trentm), Elastic
-- [David Luna](https://github.com/david-luna), Elastic
 
-*Find more about the approver role in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
+For more information about the approver role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#approver).
 
-#### Triager ([@open-telemetry/javascript-triagers](https://github.com/orgs/open-telemetry/teams/javascript-triagers))
+### Triagers
 
-- N/A
+Members of this team have triager permissions for opentelemetry-js.git and opentelemetry-js-contrib.git.
 
-*Find more about the triager role in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#triager).*
+- [Jackson Weber](https://github.com/JacksonWeber), Microsoft
 
-#### Emeriti
+For more information about the triager role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#triager).
 
-- [Bartlomiej Obecny](https://github.com/obecny), LightStep, Maintainer
-- [Daniel Khan](https://github.com/dkhan), Dynatrace, Maintainer
-- [Mayur Kale](https://github.com/mayurkale22), Google, Maintainer
+### Contrib Triagers
+
+Members of this team have triager permissions for opentelemetry-js-contrib.git.
+Typically, members of this are [component owners](https://github.com/open-telemetry/opentelemetry-js-contrib/blob/main/.github/component_owners.yml) of one or more packages in the contrib repo.
+
+- [Aaron Abbott](https://github.com/aabmass), Google
+- [Abhinav Mathur](https://github.com/abhee11), AppDynamics
+- [Bartlomiej Obecny](https://github.com/obecny)
+- [Daniel Li](https://github.com/d4nyll)
+- [Florencia Acosta](https://github.com/facostaembrace), Embrace
+- [Jackson Weber](https://github.com/JacksonWeber), Microsoft
+- [Jaryk](https://github.com/Ugzuzg), Volvo Cars
+- [Jonathan Lee](https://github.com/jj22ee)
+- [Jonathan Munz](https://github.com/jpmunz), Embrace
+- [kirrg001](https://github.com/kirrg001), Instana
+- [MartenH](https://github.com/mhennoch), Splunk
+- [Mike Goldsmith](https://github.com/MikeGoldsmith), Honeycomb
+- [Motti](https://github.com/mottibec)
+- [Punya Biswal](https://github.com/punya), Google
+- [Siim Kallas](https://github.com/seemk), Splunk
+- [t2t2](https://github.com/t2t2), Splunk
+- [Trivikram Kamat](https://github.com/trivikr), AWS
+
+For more information about the triager role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#triager).
+
+### Emeriti
+
+- [Bartlomiej Obecny](https://github.com/obecny), Maintainer
+- [Brandon Gonzalez](https://github.com/bg451), Approver
+- [Daniel Khan](https://github.com/dkhan), Maintainer
+- [Gerhard Stöbich](https://github.com/Flarna), Approver
+- [Haddas Bronfman](https://github.com/haddasbronfman), Approver
+- [John Bley](https://github.com/johnbley), Approver
+- [Mark Wolff](https://github.com/markwolff), Approver
+- [Mayur Kale](https://github.com/mayurkale22), Maintainer
+- [Naseem K. Ullah](https://github.com/naseemkullah), Approver
+- [Olivier Albertini](https://github.com/OlivierAlbertini), Approver
 - [Rauno Viskus](https://github.com/rauno56), Maintainer
+- [Roch Devost](https://github.com/rochdev), Approver
 - [Valentin Marchaud](https://github.com/vmarchaud), Maintainer
-- [Brandon Gonzalez](https://github.com/bg451), LightStep, Approver
-- [Roch Devost](https://github.com/rochdev), DataDog, Approver
-- [John Bley](https://github.com/johnbley), Splunk, Approver
-- [Mark Wolff](https://github.com/markwolff), Microsoft, Approver
-- [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal, Approver
-- [Gerhard Stöbich](https://github.com/Flarna), Dynatrace, Approver
-- [Haddas Bronfman](https://github.com/haddasbronfman), Cisco, Approver
 
-*Find more about the emeritus role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#emeritus-maintainerapprovertriager).*
+For more information about the emeritus role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#emeritus-maintainerapprovertriager).
 
-#### Thanks to all the people who already contributed
+### Thanks to all of our contributors!
 
 <a href="https://github.com/open-telemetry/opentelemetry-js/graphs/contributors">
-  <img alt="Repo contributors" src="https://contributors-img.web.app/image?repo=open-telemetry/opentelemetry-js" />
+  <img alt="Repo contributors" src="https://contrib.rocks/image?repo=open-telemetry/opentelemetry-js" />
 </a>
 
 ## Packages
@@ -318,7 +368,7 @@ These instrumentations are hosted at <https://github.com/open-telemetry/opentele
 
 ## Useful links
 
-- Upgrade guidelines: [Upgrade Guide](./doc/upgrade-guide.md)
+- [Upgrade to SDK 2.x guide](./doc/upgrade-to-2.x.md)
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 

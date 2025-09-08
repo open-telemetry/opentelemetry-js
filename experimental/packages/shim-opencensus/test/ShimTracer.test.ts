@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { Tracer as Tracer } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as oc from '@opencensus/core';
@@ -25,28 +24,36 @@ import {
   SpanKind,
   context,
   createContextKey,
+  Tracer,
 } from '@opentelemetry/api';
 import { withTestTracer, setupNodeContextManager } from './util';
+
+function createStubTracer(): Tracer {
+  return {
+    startSpan: sinon.stub(),
+    startActiveSpan: sinon.stub(),
+  } as unknown as Tracer;
+}
 
 describe('ShimTracer', () => {
   setupNodeContextManager(before, after);
 
   it('should initially be inactive', () => {
-    const shimTracer = new ShimTracer(sinon.createStubInstance(Tracer));
-    assert(!shimTracer.active);
+    const shimTracer = new ShimTracer(createStubTracer());
+    assert.ok(!shimTracer.active);
   });
   describe('start', () => {
     it('should set the tracer as active', () => {
-      const shimTracer = new ShimTracer(sinon.createStubInstance(Tracer));
+      const shimTracer = new ShimTracer(createStubTracer());
       shimTracer.start({});
-      assert(shimTracer.active);
+      assert.ok(shimTracer.active);
     });
   });
   describe('stop', () => {
     it('should set the tracer as inactive', () => {
-      const shimTracer = new ShimTracer(sinon.createStubInstance(Tracer));
+      const shimTracer = new ShimTracer(createStubTracer());
       shimTracer.start({});
-      assert(shimTracer.active);
+      assert.ok(shimTracer.active);
     });
   });
 
@@ -85,7 +92,10 @@ describe('ShimTracer', () => {
         otelSpans[0].spanContext().traceId,
         '9e7ecdc193765065fee1efe757fdd874'
       );
-      assert.strictEqual(otelSpans[0].parentSpanId, '4bf6239d37d8b0f0');
+      assert.strictEqual(
+        otelSpans[0].parentSpanContext?.spanId,
+        '4bf6239d37d8b0f0'
+      );
     });
 
     it('should set the span as root span in context', async () => {
@@ -147,7 +157,7 @@ describe('ShimTracer', () => {
         parent.end();
       });
       assert.strictEqual(
-        childSpan.parentSpanId,
+        childSpan.parentSpanContext?.spanId,
         parentSpan.spanContext().spanId
       );
     });
@@ -164,13 +174,16 @@ describe('ShimTracer', () => {
           }
         );
       });
-      assert.strictEqual(childSpan.parentSpanId, rootSpan.spanContext().spanId);
+      assert.strictEqual(
+        childSpan.parentSpanContext?.spanId,
+        rootSpan.spanContext().spanId
+      );
     });
   });
 
   describe('wrap', () => {
     it('should bind the provided function to active context at time of wrapping', () => {
-      const shimTracer = new ShimTracer(sinon.createStubInstance(Tracer));
+      const shimTracer = new ShimTracer(createStubTracer());
       const key = createContextKey('key');
       const fnToWrap = () =>
         assert.strictEqual(context.active().getValue(key), 'value');

@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-import { ExportResult, hrTimeToMicroseconds } from '@opentelemetry/core';
-import { ExportResultCode } from '@opentelemetry/core';
+import {
+  ExportResultCode,
+  ExportResult,
+  hrTimeToMicroseconds,
+} from '@opentelemetry/core';
 
 import type { ReadableLogRecord } from './ReadableLogRecord';
 import type { LogRecordExporter } from './LogRecordExporter';
@@ -23,6 +26,8 @@ import type { LogRecordExporter } from './LogRecordExporter';
 /**
  * This is implementation of {@link LogRecordExporter} that prints LogRecords to the
  * console. This class can be used for diagnostic purposes.
+ *
+ * NOTE: This {@link LogRecordExporter} is intended for diagnostics use only, output rendered to the console may change at any time.
  */
 
 /* eslint-disable no-console */
@@ -55,6 +60,7 @@ export class ConsoleLogRecordExporter implements LogRecordExporter {
       resource: {
         attributes: logRecord.resource.attributes,
       },
+      instrumentationScope: logRecord.instrumentationScope,
       timestamp: hrTimeToMicroseconds(logRecord.hrTime),
       traceId: logRecord.spanContext?.traceId,
       spanId: logRecord.spanContext?.spanId,

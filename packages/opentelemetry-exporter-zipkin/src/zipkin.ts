@@ -15,7 +15,11 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { ExportResult, ExportResultCode, getEnv } from '@opentelemetry/core';
+import {
+  ExportResult,
+  ExportResultCode,
+  getStringFromEnv,
+} from '@opentelemetry/core';
 import { SpanExporter, ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { prepareSend } from './platform/index';
 import * as zipkinTypes from './types';
@@ -24,7 +28,7 @@ import {
   defaultStatusCodeTagName,
   defaultStatusErrorTagName,
 } from './transform';
-import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { prepareGetHeaders } from './utils';
 
 /**
@@ -42,7 +46,10 @@ export class ZipkinExporter implements SpanExporter {
   private _sendingPromises: Promise<unknown>[] = [];
 
   constructor(config: zipkinTypes.ExporterConfig = {}) {
-    this._urlStr = config.url || getEnv().OTEL_EXPORTER_ZIPKIN_ENDPOINT;
+    this._urlStr =
+      config.url ||
+      (getStringFromEnv('OTEL_EXPORTER_ZIPKIN_ENDPOINT') ??
+        'http://localhost:9411/api/v2/spans');
     this._send = prepareSend(this._urlStr, config.headers);
     this._serviceName = config.serviceName;
     this._statusCodeTagName =
@@ -67,7 +74,7 @@ export class ZipkinExporter implements SpanExporter {
   ): void {
     const serviceName = String(
       this._serviceName ||
-        spans[0].resource.attributes[SEMRESATTRS_SERVICE_NAME] ||
+        spans[0].resource.attributes[ATTR_SERVICE_NAME] ||
         this.DEFAULT_SERVICE_NAME
     );
 
@@ -91,7 +98,7 @@ export class ZipkinExporter implements SpanExporter {
     this._sendingPromises.push(promise);
     const popPromise = () => {
       const index = this._sendingPromises.indexOf(promise);
-      this._sendingPromises.splice(index, 1);
+      void this._sendingPromises.splice(index, 1);
     };
     promise.then(popPromise, popPromise);
   }
@@ -140,8 +147,8 @@ export class ZipkinExporter implements SpanExporter {
       toZipkinSpan(
         span,
         String(
-          span.attributes[SEMRESATTRS_SERVICE_NAME] ||
-            span.resource.attributes[SEMRESATTRS_SERVICE_NAME] ||
+          span.attributes[ATTR_SERVICE_NAME] ||
+            span.resource.attributes[ATTR_SERVICE_NAME] ||
             serviceName
         ),
         this._statusCodeTagName,

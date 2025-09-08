@@ -14,28 +14,55 @@
  * limitations under the License.
  */
 
+import { AttributeValue } from '@opentelemetry/api';
 import { ResourceDetectionConfig } from './config';
-import { SpanAttributes } from '@opentelemetry/api';
-import { IResource } from './IResource';
 
 /**
- * Interface for Resource attributes.
- * General `Attributes` interface is added in api v1.1.0.
- * To backward support older api (1.0.x), the deprecated `SpanAttributes` is used here.
+ * Interface for a Resource Detector.
+ * A resource detector returns a set of detected resource attributes.
+ * A detected resource attribute may be an {@link AttributeValue} or a Promise of an AttributeValue.
  */
-export type ResourceAttributes = SpanAttributes;
-
-/**
- * @deprecated please use {@link DetectorSync}
- */
-export interface Detector {
-  detect(config?: ResourceDetectionConfig): Promise<IResource>;
+export interface ResourceDetector {
+  /**
+   * Detect resource attributes.
+   *
+   * @returns a {@link DetectedResource} object containing detected resource attributes
+   */
+  detect(config?: ResourceDetectionConfig): DetectedResource;
 }
 
+export type DetectedResource = {
+  /**
+   * Detected resource attributes.
+   */
+  attributes?: DetectedResourceAttributes;
+};
+
 /**
- * Interface for a synchronous Resource Detector. In order to detect attributes asynchronously, a detector
- * can pass a Promise as the second parameter to the Resource constructor.
+ * An object representing detected resource attributes.
+ * Value may be {@link AttributeValue}s, a promise to an {@link AttributeValue}, or undefined.
  */
-export interface DetectorSync {
-  detect(config?: ResourceDetectionConfig): IResource;
-}
+type DetectedResourceAttributeValue = MaybePromise<AttributeValue | undefined>;
+
+/**
+ * An object representing detected resource attributes.
+ * Values may be {@link AttributeValue}s or a promise to an {@link AttributeValue}.
+ */
+export type DetectedResourceAttributes = Record<
+  string,
+  DetectedResourceAttributeValue
+>;
+
+export type MaybePromise<T> = T | Promise<T>;
+
+export type RawResourceAttribute = [
+  string,
+  MaybePromise<AttributeValue | undefined>,
+];
+
+/**
+ * Options for creating a {@link Resource}.
+ */
+export type ResourceOptions = {
+  schemaUrl?: string;
+};

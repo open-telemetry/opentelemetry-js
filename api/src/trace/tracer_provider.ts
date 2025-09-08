@@ -19,6 +19,8 @@ import { TracerOptions } from './tracer_options';
 
 /**
  * A registry for creating named {@link Tracer}s.
+ *
+ * @since 1.0.0
  */
 export interface TracerProvider {
   /**

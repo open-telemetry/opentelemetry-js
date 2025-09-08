@@ -7,7 +7,7 @@ Before creating a pull request, please make sure:
 - You have read the guide for contributing
   - See https://github.com/open-telemetry/opentelemetry-js/blob/main/CONTRIBUTING.md
 - You signed all your commits (otherwise we won't be able to merge the PR)
-  - See https://github.com/open-telemetry/community/blob/master/CONTRIBUTING.md#sign-the-cla
+  - See https://github.com/open-telemetry/community/blob/main/guides/contributor#sign-the-cla
 - You added unit tests for the new functionality
 - You mention in the PR description which issue it is addressing, e.g. "Fixes #xxx". This will auto-close
   the issue that your PR fixes (if such)

@@ -23,18 +23,15 @@ import {
 } from './types';
 import { HrTime } from '@opentelemetry/api';
 import { millisToHrTime, hrTimeToMicroseconds } from '@opentelemetry/core';
-import {
-  DataPointType,
-  GaugeMetricData,
-  MetricDescriptor,
-} from '../export/MetricData';
+import { DataPointType, GaugeMetricData } from '../export/MetricData';
 import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
+import { InstrumentDescriptor } from '../InstrumentDescriptor';
 
 export class LastValueAccumulation implements Accumulation {
   constructor(
     public startTime: HrTime,
-    private _current: number = 0,
+    private _current = 0,
     public sampleTime: HrTime = [0, 0]
   ) {}
 
@@ -106,7 +103,7 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
   }
 
   toMetricData(
-    descriptor: MetricDescriptor,
+    descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<LastValueAccumulation>[],
     endTime: HrTime

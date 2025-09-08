@@ -63,12 +63,12 @@ const fixture = `
 </div>
 `;
 
-describe('utils', () => {
+describe('utils', function () {
   afterEach(() => {
     sinon.restore();
   });
 
-  describe('getElementXPath', () => {
+  describe('getElementXPath', function () {
     let $fixture: any;
     let child: any;
     before(() => {
@@ -83,7 +83,7 @@ describe('utils', () => {
       child.parentNode.removeChild(child);
     });
 
-    it('should return correct path for element with id and optimise = true', () => {
+    it('should return correct path for element with id and optimise = true', function () {
       const element = getElementXPath($fixture.find('#btn22')[0], true);
       assert.strictEqual(element, '//*[@id="btn22"]');
       assert.strictEqual(
@@ -95,7 +95,7 @@ describe('utils', () => {
     it(
       'should return correct path for element with id and surrounded by the' +
         ' same type',
-      () => {
+      function () {
         const element = getElementXPath($fixture.find('#btn22')[0]);
         assert.strictEqual(element, '//html/body/div/div[4]/div[5]/button[3]');
         assert.strictEqual(
@@ -108,7 +108,7 @@ describe('utils', () => {
     it(
       'should return correct path for element with id and and surrounded by' +
         ' text nodes mixed with cnode',
-      () => {
+      function () {
         const element = getElementXPath($fixture.find('#btn23')[0]);
         assert.strictEqual(element, '//html/body/div/div[4]/div[6]/button');
         assert.strictEqual(
@@ -121,7 +121,7 @@ describe('utils', () => {
     it(
       'should return correct path for text node element surrounded by cdata' +
         ' nodes',
-      () => {
+      function () {
         const text = $fixture.find('#cdata')[0];
         const textNode = document.createTextNode('foobar');
         text.appendChild(textNode);
@@ -131,7 +131,7 @@ describe('utils', () => {
       }
     );
 
-    it('should return correct path when element is text node', () => {
+    it('should return correct path when element is text node', function () {
       const text = $fixture.find('#text')[0];
       const textNode = document.createTextNode('foobar');
       text.appendChild(textNode);
@@ -140,7 +140,7 @@ describe('utils', () => {
       assert.strictEqual(textNode, getElementByXpath(element));
     });
 
-    it('should return correct path when element is comment node', () => {
+    it('should return correct path when element is comment node', function () {
       const comment = $fixture.find('#comment')[0];
       const node = document.createComment('foobar');
       comment.appendChild(node);
@@ -150,7 +150,7 @@ describe('utils', () => {
     });
   });
 
-  describe('parseUrl', () => {
+  describe('parseUrl', function () {
     const urlFields: Array<keyof URLLike> = [
       'hash',
       'host',
@@ -164,7 +164,7 @@ describe('utils', () => {
       'search',
       'username',
     ];
-    it('should parse url with fallback', () => {
+    it('should parse url with fallback', function () {
       sinon.stub(globalThis, 'URL').value(undefined);
       const url = parseUrl('https://opentelemetry.io/foo');
       urlFields.forEach(field => {
@@ -172,15 +172,15 @@ describe('utils', () => {
       });
     });
 
-    it('should correctly parse relative url in presence of base tag', () => {
+    it('should correctly parse relative url in presence of base tag', function () {
       sinon.stub(globalThis.document, 'baseURI').value('http://foobar.com');
       const url = parseUrl('foo/bar');
       assert.strictEqual(url.href, 'http://foobar.com/foo/bar');
     });
   });
 
-  describe('normalizeUrl', () => {
-    it('should parse url with fallback', () => {
+  describe('normalizeUrl', function () {
+    it('should parse url with fallback', function () {
       sinon.stub(globalThis, 'URL').value(undefined);
       const url = normalizeUrl('https://opentelemetry.io/你好');
       assert.strictEqual(url, 'https://opentelemetry.io/%E4%BD%A0%E5%A5%BD');

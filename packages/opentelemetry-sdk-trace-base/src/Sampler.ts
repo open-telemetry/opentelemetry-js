@@ -17,7 +17,7 @@
 import {
   Context,
   Link,
-  SpanAttributes,
+  Attributes,
   SpanKind,
   TraceState,
 } from '@opentelemetry/api';
@@ -58,7 +58,7 @@ export interface SamplingResult {
    * Caller may call {@link Sampler}.shouldSample any number of times and
    * can safely cache the returned value.
    */
-  attributes?: Readonly<SpanAttributes>;
+  attributes?: Readonly<Attributes>;
   /**
    * A {@link TraceState} that will be associated with the {@link Span} through
    * the new {@link SpanContext}. Samplers SHOULD return the TraceState from
@@ -83,7 +83,7 @@ export interface Sampler {
    *     span to be created starts a new trace.
    * @param spanName of the span to be created.
    * @param spanKind of the span to be created.
-   * @param attributes Initial set of SpanAttributes for the Span being constructed.
+   * @param attributes Initial set of Attributes for the Span being constructed.
    * @param links Collection of links that will be associated with the Span to
    *     be created. Typically useful for batch operations.
    * @returns a {@link SamplingResult}.
@@ -93,7 +93,7 @@ export interface Sampler {
     traceId: string,
     spanName: string,
     spanKind: SpanKind,
-    attributes: SpanAttributes,
+    attributes: Attributes,
     links: Link[]
   ): SamplingResult;
 

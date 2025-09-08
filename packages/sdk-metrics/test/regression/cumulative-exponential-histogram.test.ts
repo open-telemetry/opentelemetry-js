@@ -17,13 +17,14 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
-  Aggregation,
+  AggregationOption,
   AggregationTemporality,
+  AggregationType,
   InstrumentType,
   MeterProvider,
-  MetricReader,
 } from '../../src';
 import { TestMetricReader } from '../export/TestMetricReader';
+import { IMetricReader } from '../../src/export/MetricReader';
 
 describe('cumulative-exponential-histogram', () => {
   let clock: sinon.SinonFakeTimers;
@@ -37,15 +38,15 @@ describe('cumulative-exponential-histogram', () => {
 
   it('Cumulative Histogram should have the same startTime every collection', async () => {
     // Works fine and passes
-    await doTest(Aggregation.Histogram());
+    await doTest({ type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM });
   });
 
   it('Cumulative ExponentialHistogram should have the same startTime every collection', async () => {
     // Fails
-    await doTest(Aggregation.ExponentialHistogram());
+    await doTest({ type: AggregationType.EXPONENTIAL_HISTOGRAM });
   });
 
-  const doTest = async (histogramAggregation: Aggregation) => {
+  const doTest = async (histogramAggregation: AggregationOption) => {
     const reader = new TestMetricReader({
       aggregationTemporalitySelector() {
         return AggregationTemporality.CUMULATIVE;
@@ -53,7 +54,7 @@ describe('cumulative-exponential-histogram', () => {
       aggregationSelector(type) {
         return type === InstrumentType.HISTOGRAM
           ? histogramAggregation
-          : Aggregation.Default();
+          : { type: AggregationType.DEFAULT };
       },
     });
     const meterProvider = new MeterProvider({
@@ -83,7 +84,7 @@ describe('cumulative-exponential-histogram', () => {
     );
   };
 
-  const collectNoErrors = async (reader: MetricReader) => {
+  const collectNoErrors = async (reader: IMetricReader) => {
     const { resourceMetrics, errors } = await reader.collect();
     assert.strictEqual(errors.length, 0);
     return resourceMetrics;

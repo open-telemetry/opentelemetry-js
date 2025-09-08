@@ -15,12 +15,19 @@
  */
 
 import * as assert from 'assert';
-import { context } from '@opentelemetry/api';
-import { NoopAttributesProcessor } from '../../src/view/AttributesProcessor';
-import { FilteringAttributesProcessor } from '../../src/view/AttributesProcessor';
+import { Attributes, context } from '@opentelemetry/api';
+import {
+  IAttributesProcessor,
+  createMultiAttributesProcessor,
+  createNoopAttributesProcessor,
+  createAllowListAttributesProcessor,
+  createDenyListAttributesProcessor,
+} from '../../src/view/AttributesProcessor';
+
+import * as sinon from 'sinon';
 
 describe('NoopAttributesProcessor', () => {
-  const processor = new NoopAttributesProcessor();
+  const processor = createNoopAttributesProcessor();
 
   it('should return identical attributes on process', () => {
     assert.deepStrictEqual(
@@ -32,14 +39,14 @@ describe('NoopAttributesProcessor', () => {
   });
 });
 
-describe('FilteringAttributesProcessor', () => {
+describe('AllowListProcessor', () => {
   it('should not add keys when attributes do not exist', () => {
-    const processor = new FilteringAttributesProcessor(['foo', 'bar']);
+    const processor = createAllowListAttributesProcessor(['foo', 'bar']);
     assert.deepStrictEqual(processor.process({}, context.active()), {});
   });
 
   it('should only keep allowed attributes', () => {
-    const processor = new FilteringAttributesProcessor(['foo', 'bar']);
+    const processor = createAllowListAttributesProcessor(['foo', 'bar']);
     assert.deepStrictEqual(
       processor.process(
         {
@@ -54,5 +61,65 @@ describe('FilteringAttributesProcessor', () => {
         bar: 'barValue',
       }
     );
+  });
+});
+
+describe('DenyListProcessor', () => {
+  it('should drop denie attributes', () => {
+    const processor = createDenyListAttributesProcessor(['foo', 'bar']);
+    assert.deepStrictEqual(
+      processor.process(
+        {
+          foo: 'fooValue',
+          bar: 'barValue',
+          baz: 'bazValue',
+        },
+        context.active()
+      ),
+      {
+        baz: 'bazValue',
+      }
+    );
+  });
+});
+
+describe('MultiAttributesProcessor', () => {
+  it('should apply in order', () => {
+    // arrange
+    const firstProcessorOutput: Attributes = { foo: 'firstProcessorFoo' };
+    const secondProcessorOutput: Attributes = {
+      foo: 'secondProcessorFoo',
+      bar: 'secondProcessorBar',
+    };
+    const firstMockProcessorStubs = {
+      process: sinon.stub().returns(firstProcessorOutput),
+    };
+    const firstMockProcessor = firstMockProcessorStubs as IAttributesProcessor;
+
+    const secondMockProcessorStubs = {
+      process: sinon.stub().returns(secondProcessorOutput),
+    };
+    const secondMockProcessor =
+      secondMockProcessorStubs as IAttributesProcessor;
+
+    const processor = createMultiAttributesProcessor([
+      firstMockProcessor,
+      secondMockProcessor,
+    ]);
+
+    // act
+    const input: Attributes = { foo: 'bar' };
+    const result = processor.process(input, context.active());
+
+    // assert
+    firstMockProcessorStubs.process.calledOnceWithExactly(
+      input,
+      context.active()
+    );
+    secondMockProcessorStubs.process.calledOnceWithExactly(
+      firstProcessorOutput,
+      context.active()
+    );
+    assert.deepStrictEqual(result, secondProcessorOutput);
   });
 });

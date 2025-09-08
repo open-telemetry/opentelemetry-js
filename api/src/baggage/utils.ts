@@ -37,6 +37,7 @@ export function createBaggage(
  *
  * @param str string metadata. Format is currently not defined by the spec and has no special meaning.
  *
+ * @since 1.0.0
  */
 export function baggageEntryMetadataFromString(
   str: string

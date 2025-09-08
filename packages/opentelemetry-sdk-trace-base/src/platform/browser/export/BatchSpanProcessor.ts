@@ -17,6 +17,7 @@
 import { BatchSpanProcessorBase } from '../../../export/BatchSpanProcessorBase';
 import { SpanExporter } from '../../../export/SpanExporter';
 import { BatchSpanProcessorBrowserConfig } from '../../../types';
+import { globalErrorHandler } from '@opentelemetry/core';
 
 export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcessorBrowserConfig> {
   private _visibilityChangeListener?: () => void;
@@ -37,11 +38,15 @@ export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcesso
     ) {
       this._visibilityChangeListener = () => {
         if (document.visibilityState === 'hidden') {
-          void this.forceFlush();
+          this.forceFlush().catch(error => {
+            globalErrorHandler(error);
+          });
         }
       };
       this._pageHideListener = () => {
-        void this.forceFlush();
+        this.forceFlush().catch(error => {
+          globalErrorHandler(error);
+        });
       };
       document.addEventListener(
         'visibilitychange',

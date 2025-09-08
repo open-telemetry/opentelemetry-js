@@ -1,0 +1,44 @@
+name: Publish packages to NPM
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-to-npm:
+    runs-on: ubuntu-latest
+    permissions:
+      # needed for NPM provenance
+      id-token: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 18
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: npm ci
+
+      # NOTE: in the past, we've had situations where the compiled files were missing as the `prepublishOnly` script was
+      # missing in some packages. `npx lerna publish` *should* also run compile, but this is intended as a safeguard
+      # when that does not happen for whatever reason.
+      - run: npm run compile
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          NPM_CONFIG_PROVENANCE: true
+        # NOTE: using --concurrency 1 to reduce the likelihood of a race when publishing,
+        # which happens when the npm registry is not fully consistent yet. This can cause the publishing of a package to be
+        # rejected because dependencies are not available yet. `lerna` does ensure that this is not the case locally
+        # (packages are in-fact published in the correct order), but the race on the registry still applies.
+        # If this happens, run the workflow again - there should be enough time for everything to settle until this workflow
+        # attempts to publish again.
+        run: npx lerna publish --concurrency 1 from-package --no-push --no-private --no-git-tag-version --no-verify-access --dist-tag=latest --yes

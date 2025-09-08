@@ -21,7 +21,7 @@ import {
   defaultInstrumentationScope,
   defaultInstrumentDescriptor,
 } from '../util';
-import { View } from '../../src';
+import { View } from '../../src/view/View';
 
 describe('ViewRegistry', () => {
   describe('findViews', () => {

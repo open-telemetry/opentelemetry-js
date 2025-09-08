@@ -16,7 +16,7 @@
 import { promises as fs } from 'fs';
 import { diag } from '@opentelemetry/api';
 
-export async function getMachineId(): Promise<string> {
+export async function getMachineId(): Promise<string | undefined> {
   const paths = ['/etc/machine-id', '/var/lib/dbus/machine-id'];
 
   for (const path of paths) {
@@ -28,5 +28,5 @@ export async function getMachineId(): Promise<string> {
     }
   }
 
-  return '';
+  return undefined;
 }

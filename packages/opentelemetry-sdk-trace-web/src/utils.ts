@@ -27,9 +27,9 @@ import {
   urlMatches,
 } from '@opentelemetry/core';
 import {
-  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
-  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-} from '@opentelemetry/semantic-conventions';
+  ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
+  ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+} from './semconv';
 
 // Used to normalize relative URLs
 let urlNormalizingAnchor: HTMLAnchorElement | undefined;
@@ -46,10 +46,9 @@ function getUrlNormalizingAnchor(): HTMLAnchorElement {
  * @param obj
  * @param key
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function hasKey<O extends object>(
   obj: O,
-  key: keyof any
+  key: PropertyKey
 ): key is keyof O {
   return key in obj;
 }
@@ -59,69 +58,72 @@ export function hasKey<O extends object>(
  * @param span
  * @param performanceName name of performance entry for time start
  * @param entries
- * @param refPerfName name of performance entry to use for reference
+ * @param ignoreZeros
  */
 export function addSpanNetworkEvent(
   span: api.Span,
   performanceName: string,
   entries: PerformanceEntries,
-  refPerfName?: string
+  ignoreZeros = true
 ): api.Span | undefined {
-  let perfTime = undefined;
-  let refTime = undefined;
   if (
     hasKey(entries, performanceName) &&
-    typeof entries[performanceName] === 'number'
+    typeof entries[performanceName] === 'number' &&
+    !(ignoreZeros && entries[performanceName] === 0)
   ) {
-    perfTime = entries[performanceName];
+    return span.addEvent(performanceName, entries[performanceName]);
   }
-  const refName = refPerfName || PTN.FETCH_START;
-  // Use a reference time which is the earliest possible value so that the performance timings that are earlier should not be added
-  // using FETCH START time in case no reference is provided
-  if (hasKey(entries, refName) && typeof entries[refName] === 'number') {
-    refTime = entries[refName];
-  }
-  if (perfTime !== undefined && refTime !== undefined && perfTime >= refTime) {
-    span.addEvent(performanceName, perfTime);
-    return span;
-  }
+
   return undefined;
 }
 
 /**
- * Helper function for adding network events
- * @param span
- * @param resource
+ * Helper function for adding network events and content length attributes.
  */
 export function addSpanNetworkEvents(
   span: api.Span,
-  resource: PerformanceEntries
+  resource: PerformanceEntries,
+  ignoreNetworkEvents = false,
+  ignoreZeros?: boolean,
+  skipOldSemconvContentLengthAttrs?: boolean
 ): void {
-  addSpanNetworkEvent(span, PTN.FETCH_START, resource);
-  addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_START, resource);
-  addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_END, resource);
-  addSpanNetworkEvent(span, PTN.CONNECT_START, resource);
-  if (
-    hasKey(resource as PerformanceResourceTiming, 'name') &&
-    (resource as PerformanceResourceTiming)['name'].startsWith('https:')
-  ) {
-    addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, resource);
+  if (ignoreZeros === undefined) {
+    ignoreZeros = resource[PTN.START_TIME] !== 0;
   }
-  addSpanNetworkEvent(span, PTN.CONNECT_END, resource);
-  addSpanNetworkEvent(span, PTN.REQUEST_START, resource);
-  addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
-  addSpanNetworkEvent(span, PTN.RESPONSE_END, resource);
-  const encodedLength = resource[PTN.ENCODED_BODY_SIZE];
-  if (encodedLength !== undefined) {
-    span.setAttribute(SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH, encodedLength);
-  }
-  const decodedLength = resource[PTN.DECODED_BODY_SIZE];
-  // Spec: Not set if transport encoding not used (in which case encoded and decoded sizes match)
-  if (decodedLength !== undefined && encodedLength !== decodedLength) {
-    span.setAttribute(
-      SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-      decodedLength
+
+  if (!ignoreNetworkEvents) {
+    addSpanNetworkEvent(span, PTN.FETCH_START, resource, ignoreZeros);
+    addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_START, resource, ignoreZeros);
+    addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_END, resource, ignoreZeros);
+    addSpanNetworkEvent(span, PTN.CONNECT_START, resource, ignoreZeros);
+    addSpanNetworkEvent(
+      span,
+      PTN.SECURE_CONNECTION_START,
+      resource,
+      ignoreZeros
     );
+    addSpanNetworkEvent(span, PTN.CONNECT_END, resource, ignoreZeros);
+    addSpanNetworkEvent(span, PTN.REQUEST_START, resource, ignoreZeros);
+    addSpanNetworkEvent(span, PTN.RESPONSE_START, resource, ignoreZeros);
+    addSpanNetworkEvent(span, PTN.RESPONSE_END, resource, ignoreZeros);
+  }
+
+  if (!skipOldSemconvContentLengthAttrs) {
+    // This block adds content-length-related span attributes using the
+    // *old* HTTP semconv (v1.7.0).
+    const encodedLength = resource[PTN.ENCODED_BODY_SIZE];
+    if (encodedLength !== undefined) {
+      span.setAttribute(ATTR_HTTP_RESPONSE_CONTENT_LENGTH, encodedLength);
+    }
+
+    const decodedLength = resource[PTN.DECODED_BODY_SIZE];
+    // Spec: Not set if transport encoding not used (in which case encoded and decoded sizes match)
+    if (decodedLength !== undefined && encodedLength !== decodedLength) {
+      span.setAttribute(
+        ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+        decodedLength
+      );
+    }
   }
 }
 
@@ -333,8 +335,8 @@ export function parseUrl(url: string): URLLike {
       typeof document !== 'undefined'
         ? document.baseURI
         : typeof location !== 'undefined' // Some JS runtimes (e.g. Deno) don't define this
-        ? location.href
-        : undefined
+          ? location.href
+          : undefined
     );
   }
   const element = getUrlNormalizingAnchor();

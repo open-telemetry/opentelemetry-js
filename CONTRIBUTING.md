@@ -29,9 +29,9 @@ detailed instructions, see [development](#development) below.
 ```sh
 git clone https://github.com/open-telemetry/opentelemetry-js.git
 cd opentelemetry-js
-npm install
+npm ci
 npm run compile
-npm test
+npm run test
 ```
 
 ## Pull Request Merge Guidelines
@@ -79,21 +79,14 @@ Reporting bugs is an important contribution. Please make sure to include:
 ### Before you start
 
 Please read project contribution
-[guide](https://github.com/open-telemetry/community/blob/master/CONTRIBUTING.md)
+[guide](https://github.com/open-telemetry/community/blob/main/guides/contributor)
 for general practices for OpenTelemetry project.
 
 #### Conventional commit
 
-The Conventional Commits specification is a lightweight convention on top of commit messages. It provides an easy set of rules for creating an explicit commit history; which makes it easier to write automated tools on top of. This convention dovetails with SemVer, by describing the features, fixes, and breaking changes made in commit messages. You can see examples [here](https://www.conventionalcommits.org/en/v1.0.0-beta.4/#examples).
-We use [commitlint](https://github.com/conventional-changelog/commitlint) and [husky](https://github.com/typicode/husky) to prevent bad commit message.
-For example, you want to submit the following commit message `git commit -s -am "my bad commit"`.
-You will receive the following error :
+The Conventional Commits specification is a lightweight convention on top of commit messages. It provides an easy set of rules for creating an explicit commit history; which makes it easier to write automated tools on top of. This convention dovetails with SemVer, by describing the features, fixes, and breaking changes made in commit messages. See [example commit messages here](https://www.conventionalcommits.org/en/v1.0.0-beta.4/#examples).
 
-```text
-✖   type must be one of [ci, feat, fix, docs, style, refactor, perf, test, revert, chore] [type-enum]
-```
-
-Here an example that will pass the verification: `git commit -s -am "chore(opentelemetry-core): update deps"`
+It is recommended to have your commit messages follow the Conventional Commits specification, with possible types listed in [.commitlint.rc.yml](.commitlintrc.yml). Here an example that uses the recommended format: `git commit -s -am "chore(opentelemetry-core): update deps"`
 
 ### Changelog
 
@@ -145,7 +138,7 @@ git merge upstream/main
 
 Remember to always work in a branch of your local copy, as you might otherwise have to contend with conflicts in main.
 
-Please also see [GitHub workflow](https://github.com/open-telemetry/community/blob/master/CONTRIBUTING.md#github-workflow) section of general project contributing guide.
+Please also see [GitHub workflow](https://github.com/open-telemetry/community/blob/main/guides/contributor/processes.md#github-workflow) section of general project contributing guide.
 
 ## Development
 
@@ -164,7 +157,7 @@ Most of the commands needed for development are accessed as [npm scripts](https:
 This will install all dependencies for the root project and all modules managed by `npm workspaces`.
 
 ```sh
-npm install
+npm ci
 ```
 
 ### Compile modules
@@ -203,6 +196,15 @@ cd packages/opentelemetry-module-name
 npm run watch
 ```
 
+#### TypeScript version & update policy
+
+TypeScript version used to compile the pacakges is `v5.0.4`. If you plan to use any of the packages from this
+repository to make your own application or package instrumentation make sure to use same version or higher.
+
+<!-- Ref: https://github.com/open-telemetry/opentelemetry-js/pull/5145#issuecomment-2518263890 -->
+As update policy OpenTelemetry JS will follow DefinitelyType's [support policy for TypeScript](https://github.com/DefinitelyTyped/DefinitelyTyped#support-window)
+which sets a support window of 2 years.
+
 ### Running tests
 
 Similar to compilations, tests can be run from the root to run all tests or from a single module to run only the tests for that module.
@@ -221,6 +223,16 @@ To run the unit tests continuously in watch mode while developing, use:
 ```sh
 # Run test in watch mode
 npm run tdd
+```
+
+Packages that are expected to run in the browser have browser specific tests:
+
+```sh
+# Run browser-specific test
+npm run test:browser
+
+# Run web worker test
+npm run test:webworker
 ```
 
 ### Linting
@@ -247,11 +259,19 @@ cd packages/opentelemetry-module-name
 npm run lint:fix
 ```
 
-Similarly, Markdown files (such as README.md files) can be linted:
+The default lint command will check majority of files, including Markdown files (such as README.md files), but you
+also have the option to check just the Markdown files with:
 
 ```sh
 npm run lint:markdown
 npm run lint:markdown:fix # can automatically fix some Markdown rules
+```
+
+The default command doesn't check the examples folder. To lint just the examples, use the script:
+
+```sh
+npm run lint:examples
+npm run lint:examples:fix # can automatically fix some errors
 ```
 
 ### Generating docs
@@ -293,10 +313,10 @@ export const _globalThis = typeof globalThis === 'object' ? globalThis : global;
 /// packages/opentelemetry-core/src/platform/browser/globalThis.ts
 export const _globalThis: typeof globalThis =
   typeof globalThis === 'object' ? globalThis :
-  typeof self === 'object' ? self :
-  typeof window === 'object' ? window :
-  typeof global === 'object' ? global :
-  {} as typeof globalThis;
+    typeof self === 'object' ? self :
+      typeof window === 'object' ? window :
+        typeof global === 'object' ? global :
+          {} as typeof globalThis;
 ```
 
 Even though the implementation may differ, the exported names must be aligned.

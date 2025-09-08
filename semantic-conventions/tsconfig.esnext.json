@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.base.esnext.json",
+  "compilerOptions": {
+    "lib": [
+      "es2017"
+    ],
+    "outDir": "build/esnext",
+    "rootDir": "src",
+    "target": "es2017",
+    "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo"
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "references": []
+}

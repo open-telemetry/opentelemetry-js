@@ -13,9 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { IAnyValue, IInstrumentationScope, IKeyValue } from './types';
+import type {
+  IAnyValue,
+  IInstrumentationScope,
+  IKeyValue,
+  Resource,
+} from './internal-types';
 import { Attributes } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
+import { Resource as ISdkResource } from '@opentelemetry/resources';
+
+export function createResource(resource: ISdkResource): Resource {
+  const result: Resource = {
+    attributes: toAttributes(resource.attributes),
+    droppedAttributesCount: 0,
+  };
+
+  const schemaUrl = resource.schemaUrl;
+  if (schemaUrl && schemaUrl !== '') result.schemaUrl = schemaUrl;
+
+  return result;
+}
 
 export function createInstrumentationScope(
   scope: InstrumentationScope

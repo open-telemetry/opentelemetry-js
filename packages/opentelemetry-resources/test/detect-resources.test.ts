@@ -17,45 +17,34 @@
 import { diag } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { Resource, Detector, detectResourcesSync, DetectorSync } from '../src';
+import { detectResources, ResourceDetector } from '../src';
+import { isPromiseLike } from '../src/utils';
 import { describeNode } from './util';
 
-describe('detectResourcesSync', () => {
+describe('detectResources', () => {
   afterEach(() => {
     sinon.restore();
   });
 
-  it('handles resource detectors which return Promise<Resource>', async () => {
-    const detector: Detector = {
-      async detect() {
-        return new Resource({ sync: 'fromsync' });
-      },
-    };
-    const resource = detectResourcesSync({
-      detectors: [detector],
-    });
-
-    await resource.waitForAsyncAttributes?.();
-    assert.deepStrictEqual(resource.attributes, {
-      sync: 'fromsync',
-    });
+  it('reliably detects promises', () => {
+    assert.ok(isPromiseLike(Promise.resolve()));
   });
 
-  it('handles resource detectors which return Resource with a promise inside', async () => {
-    const detector: DetectorSync = {
+  it('handles resource detectors which return Promise<Resource>', async () => {
+    const detector: ResourceDetector = {
       detect() {
-        return new Resource(
-          { sync: 'fromsync' },
-          Promise.resolve({ async: 'fromasync' })
-        );
+        return {
+          attributes: {
+            sync: 'fromsync',
+            async: Promise.resolve().then(() => 'fromasync'),
+          },
+        };
       },
     };
-    const resource = detectResourcesSync({
+    const resource = detectResources({
       detectors: [detector],
     });
 
-    // before waiting, it should already have the sync resources
-    assert.deepStrictEqual(resource.attributes, { sync: 'fromsync' });
     await resource.waitForAsyncAttributes?.();
     assert.deepStrictEqual(resource.attributes, {
       sync: 'fromsync',
@@ -68,34 +57,30 @@ describe('detectResourcesSync', () => {
       const debugStub = sinon.spy(diag, 'debug');
 
       // use a class so it has a name
-      class DetectorRejects implements DetectorSync {
+      class DetectorRejects implements ResourceDetector {
         detect() {
-          return new Resource(
-            { sync: 'fromsync' },
-            Promise.reject(new Error('reject'))
-          );
-        }
-      }
-      class DetectorOk implements DetectorSync {
-        detect() {
-          return new Resource(
-            { sync: 'fromsync' },
-            Promise.resolve({ async: 'fromasync' })
-          );
+          return {
+            attributes: {
+              sync: 'fromsync',
+              async: Promise.reject(new Error('reject')),
+            },
+          };
         }
       }
 
-      const resource = detectResourcesSync({
-        detectors: [new DetectorRejects(), new DetectorOk()],
+      const resource = detectResources({
+        detectors: [new DetectorRejects()],
       });
 
       await resource.waitForAsyncAttributes?.();
 
       assert.ok(
-        debugStub.calledWithMatch(
-          "a resource's async attributes promise rejected"
-        )
+        debugStub.calledWithMatch('promise rejection for resource attribute')
       );
+
+      assert.deepStrictEqual(resource.attributes, {
+        sync: 'fromsync',
+      });
     });
   });
 });

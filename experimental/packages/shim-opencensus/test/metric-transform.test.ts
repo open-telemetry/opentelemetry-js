@@ -23,7 +23,6 @@ import {
   DataPointType,
   GaugeMetricData,
   HistogramMetricData,
-  InstrumentType,
   SumMetricData,
 } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
@@ -64,7 +63,6 @@ describe('metric-transform', () => {
       descriptor: {
         description: 'ocDescription',
         name: 'ocMetricName',
-        type: InstrumentType.COUNTER,
         unit: 'ocUnit',
         valueType: ValueType.INT,
       },
@@ -107,7 +105,6 @@ describe('metric-transform', () => {
       descriptor: {
         description: 'ocDescription',
         name: 'ocMetricName',
-        type: InstrumentType.COUNTER,
         unit: 'ocUnit',
         valueType: ValueType.DOUBLE,
       },
@@ -177,7 +174,6 @@ describe('metric-transform', () => {
       descriptor: {
         description: 'ocDescription',
         name: 'ocMetricName',
-        type: InstrumentType.HISTOGRAM,
         unit: 'ocUnit',
         valueType: ValueType.DOUBLE,
       },
@@ -219,7 +215,6 @@ describe('metric-transform', () => {
       descriptor: {
         description: 'ocDescription',
         name: 'ocMetricName',
-        type: InstrumentType.OBSERVABLE_GAUGE,
         unit: 'ocUnit',
         valueType: ValueType.INT,
       },
@@ -261,7 +256,6 @@ describe('metric-transform', () => {
       descriptor: {
         description: 'ocDescription',
         name: 'ocMetricName',
-        type: InstrumentType.OBSERVABLE_GAUGE,
         unit: 'ocUnit',
         valueType: ValueType.DOUBLE,
       },

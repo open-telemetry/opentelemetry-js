@@ -1,0 +1,64 @@
+# ts-stable/... generates the "semantic-conventions/src/stable_*.ts" files.
+
+templates:
+  - pattern: attributes.ts.j2
+    file_name: "stable_attributes.ts"
+    filter: >
+      semconv_attributes({
+        "stable_only": true
+      }) | {
+        attributes: .
+      }
+    application_mode: single
+  - pattern: metrics.ts.j2
+    file_name: "stable_metrics.ts"
+    filter: >
+      semconv_metrics({
+        "stable_only": true
+      }) | {
+        metrics: .
+      }
+    application_mode: single
+  - pattern: events.ts.j2
+    file_name: "stable_events.ts"
+    filter: >
+      semconv_signal("event"; {
+        "stable_only": true
+      })
+      | sort_by(.name)
+      | { events: .  }
+    application_mode: single
+
+params:
+  excluded_attributes: ["messaging.client_id"]
+
+##
+# Everything below here is expected to be the same as in "../ts-*/weaver.yaml".
+##
+
+# https://github.com/open-telemetry/weaver/blob/main/crates/weaver_forge/README.md#comment-filter
+comment_formats:
+  jsdoc:
+    format: markdown
+    header: '/**'
+    # Note: This results in trailing whitespace on empty lines. IMHO the
+    # 'comment' filter should handle those.
+    prefix: ' * '
+    footer: ' */'
+    trim: true
+    indent_first_level_list_items: true
+    escape_backslashes: true
+default_comment_format: jsdoc
+
+# Whitespace control settings to simplify the definition of templates
+whitespace_control:
+  trim_blocks: true
+  lstrip_blocks: true
+
+text_maps:
+  js_types:
+    int: number
+    double: number
+    boolean: boolean
+    string: string
+    string[]: string[]

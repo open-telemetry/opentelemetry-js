@@ -23,12 +23,12 @@ import {
 import {
   DataPointType,
   HistogramMetricData,
-  MetricDescriptor,
+  InstrumentType,
 } from '../export/MetricData';
 import { HrTime } from '@opentelemetry/api';
-import { InstrumentType } from '../InstrumentDescriptor';
-import { binarySearchLB, Maybe } from '../utils';
+import { binarySearchUB, Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
+import { InstrumentDescriptor } from '../InstrumentDescriptor';
 
 /**
  * Internal value type for HistogramAggregation.
@@ -87,8 +87,8 @@ export class HistogramAccumulation implements Accumulation {
       this._current.hasMinMax = true;
     }
 
-    const idx = binarySearchLB(this._boundaries, value);
-    this._current.buckets.counts[idx + 1] += 1;
+    const idx = binarySearchUB(this._boundaries, value);
+    this._current.buckets.counts[idx] += 1;
   }
 
   setStartTime(startTime: HrTime): void {
@@ -217,7 +217,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
   }
 
   toMetricData(
-    descriptor: MetricDescriptor,
+    descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<HistogramAccumulation>[],
     endTime: HrTime

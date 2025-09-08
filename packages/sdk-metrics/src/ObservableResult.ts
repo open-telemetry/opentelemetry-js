@@ -17,7 +17,7 @@
 import {
   diag,
   ObservableResult,
-  MetricAttributes,
+  Attributes,
   ValueType,
   BatchObservableResult,
   Observable,
@@ -42,7 +42,7 @@ export class ObservableResultImpl implements ObservableResult {
   /**
    * Observe a measurement of the value associated with the given attributes.
    */
-  observe(value: number, attributes: MetricAttributes = {}): void {
+  observe(value: number, attributes: Attributes = {}): void {
     if (typeof value !== 'number') {
       diag.warn(
         `non-number value provided to metric ${this._instrumentName}: ${value}`
@@ -78,7 +78,7 @@ export class BatchObservableResultImpl implements BatchObservableResult {
   observe(
     metric: Observable,
     value: number,
-    attributes: MetricAttributes = {}
+    attributes: Attributes = {}
   ): void {
     if (!isObservableInstrument(metric)) {
       return;

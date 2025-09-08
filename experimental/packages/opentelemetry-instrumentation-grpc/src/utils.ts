@@ -23,21 +23,6 @@ import type { IgnoreMatcher } from './types';
 export const URI_REGEX =
   /(?:([A-Za-z0-9+.-]+):(?:\/\/)?)?(?<name>[A-Za-z0-9+.-]+):(?<port>[0-9+.-]+)$/;
 
-// Equivalent to lodash _.findIndex
-export const findIndex: <T>(args: T[], fn: (arg: T) => boolean) => number = (
-  args,
-  fn
-) => {
-  let index = -1;
-  for (const arg of args) {
-    index++;
-    if (fn(arg)) {
-      return index;
-    }
-  }
-  return -1;
-};
-
 /**
  * Convert a grpc status code to an opentelemetry SpanStatus code.
  * @param status

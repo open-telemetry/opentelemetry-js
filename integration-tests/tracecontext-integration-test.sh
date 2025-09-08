@@ -8,6 +8,8 @@ mkdir -p target
 rm -rf ./target/trace-context
 git clone https://github.com/w3c/trace-context ./target/trace-context
 cd ./target/trace-context && git checkout $TRACECONTEXT_GIT_TAG && cd -
+python3 -m venv ./.venv
+source ./.venv/bin/activate
 pip3 install setuptools;
 pip3 install aiohttp; 
 node ./integration-tests/propagation-validation-server/validation-server.js 1>&2 &

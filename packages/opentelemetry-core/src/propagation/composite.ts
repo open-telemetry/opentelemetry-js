@@ -91,7 +91,7 @@ export class CompositePropagator implements TextMapPropagator {
         return propagator.extract(ctx, carrier, getter);
       } catch (err) {
         diag.warn(
-          `Failed to inject with ${propagator.constructor.name}. Err: ${err.message}`
+          `Failed to extract with ${propagator.constructor.name}. Err: ${err.message}`
         );
       }
       return ctx;

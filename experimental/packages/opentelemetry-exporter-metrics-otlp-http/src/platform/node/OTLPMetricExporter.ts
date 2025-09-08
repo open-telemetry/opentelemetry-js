@@ -14,66 +14,34 @@
  * limitations under the License.
  */
 
-import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
-import { getEnv, baggageUtils } from '@opentelemetry/core';
 import { OTLPMetricExporterOptions } from '../../OTLPMetricExporterOptions';
 import { OTLPMetricExporterBase } from '../../OTLPMetricExporterBase';
-import {
-  OTLPExporterNodeBase,
-  OTLPExporterNodeConfigBase,
-  appendResourcePathToUrl,
-  appendRootPathToUrlIfNeeded,
-  parseHeaders,
-} from '@opentelemetry/otlp-exporter-base';
-import {
-  IExportMetricsServiceResponse,
-  JsonMetricsSerializer,
-} from '@opentelemetry/otlp-transformer';
+import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { JsonMetricsSerializer } from '@opentelemetry/otlp-transformer';
 import { VERSION } from '../../version';
+import {
+  convertLegacyHttpOptions,
+  createOtlpHttpExportDelegate,
+} from '@opentelemetry/otlp-exporter-base/node-http';
 
-const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/metrics';
-const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 const USER_AGENT = {
   'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
 };
 
-class OTLPExporterNodeProxy extends OTLPExporterNodeBase<
-  ResourceMetrics,
-  IExportMetricsServiceResponse
-> {
-  constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
-    super(config, JsonMetricsSerializer, 'application/json');
-    this.headers = {
-      ...this.headers,
-      ...USER_AGENT,
-      ...baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
-      ),
-      ...parseHeaders(config?.headers),
-    };
-  }
-
-  getDefaultUrl(config: OTLPExporterNodeConfigBase): string {
-    return typeof config.url === 'string'
-      ? config.url
-      : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0
-      ? appendRootPathToUrlIfNeeded(
-          getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
-        )
-      : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-      ? appendResourcePathToUrl(
-          getEnv().OTEL_EXPORTER_OTLP_ENDPOINT,
-          DEFAULT_COLLECTOR_RESOURCE_PATH
-        )
-      : DEFAULT_COLLECTOR_URL;
-  }
-}
-
 /**
- * Collector Metric Exporter for Node
+ * OTLP Metric Exporter for Node.js
  */
-export class OTLPMetricExporter extends OTLPMetricExporterBase<OTLPExporterNodeProxy> {
+export class OTLPMetricExporter extends OTLPMetricExporterBase {
   constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
-    super(new OTLPExporterNodeProxy(config), config);
+    super(
+      createOtlpHttpExportDelegate(
+        convertLegacyHttpOptions(config ?? {}, 'METRICS', 'v1/metrics', {
+          ...USER_AGENT,
+          'Content-Type': 'application/json',
+        }),
+        JsonMetricsSerializer
+      ),
+      config
+    );
   }
 }

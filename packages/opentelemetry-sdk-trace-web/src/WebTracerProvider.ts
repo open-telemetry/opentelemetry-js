@@ -20,6 +20,60 @@ import {
   TracerConfig,
 } from '@opentelemetry/sdk-trace-base';
 import { StackContextManager } from './StackContextManager';
+import {
+  trace,
+  context,
+  ContextManager,
+  propagation,
+  TextMapPropagator,
+} from '@opentelemetry/api';
+import {
+  CompositePropagator,
+  W3CBaggagePropagator,
+  W3CTraceContextPropagator,
+} from '@opentelemetry/core';
+
+function setupContextManager(
+  contextManager: ContextManager | null | undefined
+) {
+  // null means 'do not register'
+  if (contextManager === null) {
+    return;
+  }
+
+  // undefined means 'register default'
+  if (contextManager === undefined) {
+    const defaultContextManager = new StackContextManager();
+    defaultContextManager.enable();
+    context.setGlobalContextManager(defaultContextManager);
+    return;
+  }
+
+  contextManager.enable();
+  context.setGlobalContextManager(contextManager);
+}
+
+function setupPropagator(propagator: TextMapPropagator | null | undefined) {
+  // null means 'do not register'
+  if (propagator === null) {
+    return;
+  }
+
+  // undefined means 'register default'
+  if (propagator === undefined) {
+    propagation.setGlobalPropagator(
+      new CompositePropagator({
+        propagators: [
+          new W3CTraceContextPropagator(),
+          new W3CBaggagePropagator(),
+        ],
+      })
+    );
+    return;
+  }
+
+  propagation.setGlobalPropagator(propagator);
+}
 
 /**
  * WebTracerConfig provides an interface for configuring a Web Tracer.
@@ -36,16 +90,6 @@ export class WebTracerProvider extends BasicTracerProvider {
    */
   constructor(config: WebTracerConfig = {}) {
     super(config);
-
-    if ((config as SDKRegistrationConfig).contextManager) {
-      throw (
-        'contextManager should be defined in register method not in' +
-        ' constructor'
-      );
-    }
-    if ((config as SDKRegistrationConfig).propagator) {
-      throw 'propagator should be defined in register method not in constructor';
-    }
   }
 
   /**
@@ -55,14 +99,9 @@ export class WebTracerProvider extends BasicTracerProvider {
    *
    * @param config Configuration object for SDK registration
    */
-  override register(config: SDKRegistrationConfig = {}): void {
-    if (config.contextManager === undefined) {
-      config.contextManager = new StackContextManager();
-    }
-    if (config.contextManager) {
-      config.contextManager.enable();
-    }
-
-    super.register(config);
+  register(config: SDKRegistrationConfig = {}): void {
+    trace.setGlobalTracerProvider(this);
+    setupPropagator(config.propagator);
+    setupContextManager(config.contextManager);
   }
 }

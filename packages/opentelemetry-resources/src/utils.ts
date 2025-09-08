@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-export const isPromiseLike = <R>(val: any): val is PromiseLike<R> => {
+export const isPromiseLike = <R>(val: unknown): val is PromiseLike<R> => {
   return (
-    val !== null && typeof val === 'object' && typeof val.then === 'function'
+    val !== null &&
+    typeof val === 'object' &&
+    typeof (val as Partial<PromiseLike<R>>).then === 'function'
   );
 };
+
+export function identity<T>(_: T): T {
+  return _;
+}

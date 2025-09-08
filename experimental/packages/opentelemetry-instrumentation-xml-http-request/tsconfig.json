@@ -29,7 +29,7 @@
       "path": "../../../packages/opentelemetry-sdk-trace-web"
     },
     {
-      "path": "../../../packages/opentelemetry-semantic-conventions"
+      "path": "../../../semantic-conventions"
     },
     {
       "path": "../opentelemetry-instrumentation"

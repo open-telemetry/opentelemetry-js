@@ -25,14 +25,14 @@
  */
 
 /** only globals that common to node and browsers are allowed */
-// eslint-disable-next-line node/no-unsupported-features/es-builtins, no-undef
+// eslint-disable-next-line n/no-unsupported-features/es-builtins, no-undef
 export const _globalThis: typeof globalThis =
   typeof globalThis === 'object'
     ? globalThis
     : typeof self === 'object'
-    ? self
-    : typeof window === 'object'
-    ? window
-    : typeof global === 'object'
-    ? global
-    : ({} as typeof globalThis);
+      ? self
+      : typeof window === 'object'
+        ? window
+        : typeof global === 'object'
+          ? (global as unknown as typeof globalThis)
+          : ({} as typeof globalThis);

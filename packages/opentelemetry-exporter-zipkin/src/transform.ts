@@ -43,7 +43,7 @@ export function toZipkinSpan(
 ): zipkinTypes.Span {
   const zipkinSpan: zipkinTypes.Span = {
     traceId: span.spanContext().traceId,
-    parentId: span.parentSpanId,
+    parentId: span.parentSpanContext?.spanId,
     name: span.name,
     id: span.spanContext().spanId,
     kind: ZIPKIN_SPAN_KIND_MAPPING[span.kind],

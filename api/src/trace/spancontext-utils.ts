@@ -18,20 +18,50 @@ import { NonRecordingSpan } from './NonRecordingSpan';
 import { Span } from './span';
 import { SpanContext } from './span_context';
 
-const VALID_TRACEID_REGEX = /^([0-9a-f]{32})$/i;
-const VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
+// Valid characters (0-9, a-f, A-F) are marked as 1.
+const isHex = new Uint8Array([
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
+]);
 
-export function isValidTraceId(traceId: string): boolean {
-  return VALID_TRACEID_REGEX.test(traceId) && traceId !== INVALID_TRACEID;
+function isValidHex(id: string, length: number): boolean {
+  // As of 1.9.0 the id was allowed to be a non-string value,
+  // even though it was not possible in the types.
+  if (typeof id !== 'string' || id.length !== length) return false;
+
+  let r = 0;
+  for (let i = 0; i < id.length; i += 4) {
+    r +=
+      (isHex[id.charCodeAt(i)] | 0) +
+      (isHex[id.charCodeAt(i + 1)] | 0) +
+      (isHex[id.charCodeAt(i + 2)] | 0) +
+      (isHex[id.charCodeAt(i + 3)] | 0);
+  }
+
+  return r === length;
 }
 
+/**
+ * @since 1.0.0
+ */
+export function isValidTraceId(traceId: string): boolean {
+  return isValidHex(traceId, 32) && traceId !== INVALID_TRACEID;
+}
+
+/**
+ * @since 1.0.0
+ */
 export function isValidSpanId(spanId: string): boolean {
-  return VALID_SPANID_REGEX.test(spanId) && spanId !== INVALID_SPANID;
+  return isValidHex(spanId, 16) && spanId !== INVALID_SPANID;
 }
 
 /**
  * Returns true if this {@link SpanContext} is valid.
  * @return true if this {@link SpanContext} is valid.
+ *
+ * @since 1.0.0
  */
 export function isSpanContextValid(spanContext: SpanContext): boolean {
   return (

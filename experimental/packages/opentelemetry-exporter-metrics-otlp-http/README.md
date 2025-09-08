@@ -5,7 +5,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides a metrics-exporter for OTLP (http/json) using protocol version `v0.20.0`.
+This module provides a metrics-exporter for OTLP (http/json) using protocol version `v1.7.0`.
 
 ## Installation
 
@@ -35,12 +35,14 @@ const collectorOptions = {
   concurrencyLimit: 1, // an optional limit on pending requests
 };
 const metricExporter = new OTLPMetricExporter(collectorOptions);
-const meterProvider = new MeterProvider({});
-
-meterProvider.addMetricReader(new PeriodicExportingMetricReader({
-  exporter: metricExporter,
-  exportIntervalMillis: 1000,
-}));
+const meterProvider = new MeterProvider({
+  readers: [
+    new PeriodicExportingMetricReader({
+      exporter: metricExporter,
+      exportIntervalMillis: 1000,
+    }),
+  ],
+});
 
 // Now, start recording data
 const meter = meterProvider.getMeter('example-meter');
@@ -58,12 +60,14 @@ const collectorOptions = {
   concurrencyLimit: 1, // an optional limit on pending requests
 };
 const metricExporter = new OTLPMetricExporter(collectorOptions);
-const meterProvider = new MeterProvider({});
-
-meterProvider.addMetricReader(new PeriodicExportingMetricReader({
-  exporter: metricExporter,
-  exportIntervalMillis: 1000,
-}));
+const meterProvider = new MeterProvider({
+  readers: [
+    new PeriodicExportingMetricReader({
+      exporter: metricExporter,
+      exportIntervalMillis: 1000,
+    }),
+  ],
+});
 
 // Now, start recording data
 const meter = meterProvider.getMeter('example-meter');

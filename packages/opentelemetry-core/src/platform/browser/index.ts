@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-export { getEnvWithoutDefaults, getEnv } from './environment';
-export * from './globalThis';
-export * from './hex-to-base64';
-export * from './RandomIdGenerator';
-export * from './performance';
-export * from './sdk-info';
-export * from './timer-util';
+export {
+  getStringFromEnv,
+  getBooleanFromEnv,
+  getNumberFromEnv,
+  getStringListFromEnv,
+} from './environment';
+export { _globalThis } from './globalThis';
+export { otperformance } from './performance';
+export { SDK_INFO } from './sdk-info';
+export { unrefTimer } from './timer-util';

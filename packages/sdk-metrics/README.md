@@ -64,9 +64,17 @@ Views can be registered when instantiating a `MeterProvider`:
 const meterProvider = new MeterProvider({
   views: [
     // override the bucket boundaries on `my.histogram` to [0, 50, 100]
-    new View({ aggregation: new ExplicitBucketHistogramAggregation([0, 50, 100]), instrumentName: 'my.histogram'}),
+    {
+      aggregation: {
+        type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+        options: {
+          boundaries: [0, 50, 100]
+        }
+      },
+      instrumentName: 'my.histogram'
+    },
     // rename 'my.counter' to 'my.renamed.counter'
-    new View({ name: 'my.renamed.counter', instrumentName: 'my.counter'})
+    { name: 'my.renamed.counter', instrumentName: 'my.counter'}
   ]
 })
 ```

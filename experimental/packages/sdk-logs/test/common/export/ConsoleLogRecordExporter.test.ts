@@ -40,19 +40,22 @@ describe('ConsoleLogRecordExporter', () => {
   describe('export', () => {
     it('should export information about log record', () => {
       assert.doesNotThrow(() => {
+        const instrumentationScopeName = '@opentelemetry/sdk-logs/test';
+        const instrumentationScopeVersion = '1.2.3';
         const consoleExporter = new ConsoleLogRecordExporter();
         const spyConsole = sinon.spy(console, 'dir');
         const spyExport = sinon.spy(consoleExporter, 'export');
-        const provider = new LoggerProvider();
-        provider.addLogRecordProcessor(
-          new SimpleLogRecordProcessor(consoleExporter)
-        );
-
-        provider.getLogger('default').emit({
-          body: 'body1',
-          severityNumber: SeverityNumber.DEBUG,
-          severityText: 'DEBUG',
+        const provider = new LoggerProvider({
+          processors: [new SimpleLogRecordProcessor(consoleExporter)],
         });
+
+        provider
+          .getLogger(instrumentationScopeName, instrumentationScopeVersion)
+          .emit({
+            body: 'body1',
+            severityNumber: SeverityNumber.DEBUG,
+            severityText: 'DEBUG',
+          });
 
         const logRecords = spyExport.args[0];
         const firstLogRecord = logRecords[0][0];
@@ -63,6 +66,7 @@ describe('ConsoleLogRecordExporter', () => {
         const expectedKeys = [
           'attributes',
           'body',
+          'instrumentationScope',
           'resource',
           'severityNumber',
           'severityText',
@@ -76,6 +80,13 @@ describe('ConsoleLogRecordExporter', () => {
         assert.ok(firstLogRecord.severityNumber === SeverityNumber.DEBUG);
         assert.ok(firstLogRecord.severityText === 'DEBUG');
         assert.ok(keys === expectedKeys, 'expectedKeys');
+        assert.ok(
+          firstLogRecord.instrumentationScope.name === instrumentationScopeName
+        );
+        assert.ok(
+          firstLogRecord.instrumentationScope.version ===
+            instrumentationScopeVersion
+        );
 
         assert.ok(spyExport.calledOnce);
       });

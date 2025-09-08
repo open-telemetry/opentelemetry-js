@@ -16,13 +16,19 @@
 
 import { PatternPredicate } from './Predicate';
 import {
-  AttributesProcessor,
-  FilteringAttributesProcessor,
+  createMultiAttributesProcessor,
+  createNoopAttributesProcessor,
+  IAttributesProcessor,
 } from './AttributesProcessor';
 import { InstrumentSelector } from './InstrumentSelector';
 import { MeterSelector } from './MeterSelector';
 import { Aggregation } from './Aggregation';
-import { InstrumentType } from '../InstrumentDescriptor';
+import {
+  AggregationOption,
+  AggregationType,
+  toAggregation,
+} from './AggregationOption';
+import { InstrumentType } from '../export/MetricData';
 
 export type ViewOptions = {
   /**
@@ -42,25 +48,37 @@ export type ViewOptions = {
   description?: string;
   /**
    * Alters the metric stream:
-   * If provided, the attributes that are not in the list will be ignored.
+   * If provided, the attributes will be modified as defined by the processors in the list. Processors are applied
+   * in the order they're provided.
    * If not provided, all attribute keys will be used by default.
    *
    * @example <caption>drops all attributes with top-level keys except for 'myAttr' and 'myOtherAttr'</caption>
-   * attributeKeys: ['myAttr', 'myOtherAttr']
+   * attributesProcessors: [createAllowListProcessor(['myAttr', 'myOtherAttr'])]
    * @example <caption>drops all attributes</caption>
-   * attributeKeys: []
+   * attributesProcessors: [createAllowListProcessor([])]
+   * @example <caption>allows all attributes except for 'myAttr'</caption>
+   * attributesProcessors: [createDenyListProcessor(['myAttr']]
    */
-  attributeKeys?: string[];
+  attributesProcessors?: IAttributesProcessor[];
   /**
    * Alters the metric stream:
-   * Alters the {@link Aggregation} of the metric stream.
+   * Alters the Aggregation of the metric stream.
    *
    * @example <caption>changes the aggregation of the selected instrument(s) to ExplicitBucketHistogramAggregation</caption>
-   * aggregation: new ExplicitBucketHistogramAggregation([1, 10, 100])
+   * aggregation: { type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM, options: { boundaries: [1, 10, 100] } }
    * @example <caption>changes the aggregation of the selected instrument(s) to LastValueAggregation</caption>
-   * aggregation: new LastValueAggregation()
+   * aggregation: { type: AggregationType.LAST_VALUE, options: { boundaries: [1, 10, 100] } }
    */
-  aggregation?: Aggregation;
+  aggregation?: AggregationOption;
+  /**
+   * Alters the metric stream:
+   * Sets a limit on the number of unique attribute combinations (cardinality) that can be aggregated.
+   * If not provided, the default limit will be used.
+   *
+   * @example <caption>sets the cardinality limit to 1000</caption>
+   * aggregationCardinalityLimit: 1000
+   */
+  aggregationCardinalityLimit?: number;
   /**
    * Instrument selection criteria:
    * The original type of the Instrument(s).
@@ -128,6 +146,26 @@ function isSelectorNotProvided(options: ViewOptions): boolean {
   );
 }
 
+function validateViewOptions(viewOptions: ViewOptions) {
+  // If no criteria is provided, the SDK SHOULD treat it as an error.
+  // It is recommended that the SDK implementations fail fast.
+  if (isSelectorNotProvided(viewOptions)) {
+    throw new Error('Cannot create view with no selector arguments supplied');
+  }
+
+  // the SDK SHOULD NOT allow Views with a specified name to be declared with instrument selectors that
+  // may select more than one instrument (e.g. wild card instrument name) in the same Meter.
+  if (
+    viewOptions.name != null &&
+    (viewOptions?.instrumentName == null ||
+      PatternPredicate.hasWildcard(viewOptions.instrumentName))
+  ) {
+    throw new Error(
+      'Views with a specified name must be declared with an instrument selector that selects at most one instrument per meter.'
+    );
+  }
+}
+
 /**
  * Can be passed to a {@link MeterProvider} to select instruments and alter their metric stream.
  */
@@ -135,9 +173,10 @@ export class View {
   readonly name?: string;
   readonly description?: string;
   readonly aggregation: Aggregation;
-  readonly attributesProcessor: AttributesProcessor;
+  readonly attributesProcessor: IAttributesProcessor;
   readonly instrumentSelector: InstrumentSelector;
   readonly meterSelector: MeterSelector;
+  readonly aggregationCardinalityLimit?: number;
 
   /**
    * Create a new {@link View} instance.
@@ -157,10 +196,14 @@ export class View {
    * Alters the metric stream:
    *  This will be used as the description of the metrics stream.
    *  If not provided, the original Instrument description will be used by default.
-   * @param viewOptions.attributeKeys
+   * @param viewOptions.attributesProcessors
    * Alters the metric stream:
-   *  If provided, the attributes that are not in the list will be ignored.
+   *  If provided, the attributes will be modified as defined by the added processors.
    *  If not provided, all attribute keys will be used by default.
+   * @param viewOptions.aggregationCardinalityLimit
+   * Alters the metric stream:
+   *  Sets a limit on the number of unique attribute combinations (cardinality) that can be aggregated.
+   *  If not provided, the default limit of 2000 will be used.
    * @param viewOptions.aggregation
    * Alters the metric stream:
    *  Alters the {@link Aggregation} of the metric stream.
@@ -192,36 +235,22 @@ export class View {
    * })
    */
   constructor(viewOptions: ViewOptions) {
-    // If no criteria is provided, the SDK SHOULD treat it as an error.
-    // It is recommended that the SDK implementations fail fast.
-    if (isSelectorNotProvided(viewOptions)) {
-      throw new Error('Cannot create view with no selector arguments supplied');
-    }
+    validateViewOptions(viewOptions);
 
-    // the SDK SHOULD NOT allow Views with a specified name to be declared with instrument selectors that
-    // may select more than one instrument (e.g. wild card instrument name) in the same Meter.
-    if (
-      viewOptions.name != null &&
-      (viewOptions?.instrumentName == null ||
-        PatternPredicate.hasWildcard(viewOptions.instrumentName))
-    ) {
-      throw new Error(
-        'Views with a specified name must be declared with an instrument selector that selects at most one instrument per meter.'
-      );
-    }
-
-    // Create AttributesProcessor if attributeKeys are defined set.
-    if (viewOptions.attributeKeys != null) {
-      this.attributesProcessor = new FilteringAttributesProcessor(
-        viewOptions.attributeKeys
+    // Create multi-processor if attributesProcessors are defined.
+    if (viewOptions.attributesProcessors != null) {
+      this.attributesProcessor = createMultiAttributesProcessor(
+        viewOptions.attributesProcessors
       );
     } else {
-      this.attributesProcessor = AttributesProcessor.Noop();
+      this.attributesProcessor = createNoopAttributesProcessor();
     }
 
     this.name = viewOptions.name;
     this.description = viewOptions.description;
-    this.aggregation = viewOptions.aggregation ?? Aggregation.Default();
+    this.aggregation = toAggregation(
+      viewOptions.aggregation ?? { type: AggregationType.DEFAULT }
+    );
     this.instrumentSelector = new InstrumentSelector({
       name: viewOptions.instrumentName,
       type: viewOptions.instrumentType,
@@ -232,5 +261,6 @@ export class View {
       version: viewOptions.meterVersion,
       schemaUrl: viewOptions.meterSchemaUrl,
     });
+    this.aggregationCardinalityLimit = viewOptions.aggregationCardinalityLimit;
   }
 }

@@ -15,10 +15,11 @@
  */
 
 import { Logger } from '@opentelemetry/api-logs';
-import { IResource } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 import { LogRecordProcessor } from '../LogRecordProcessor';
 import { LogRecordLimits } from '../types';
 import { NoopLogRecordProcessor } from '../export/NoopLogRecordProcessor';
+import { MultiLogRecordProcessor } from '../MultiLogRecordProcessor';
 
 export class LoggerProviderSharedState {
   readonly loggers: Map<string, Logger> = new Map();
@@ -26,10 +27,19 @@ export class LoggerProviderSharedState {
   readonly registeredLogRecordProcessors: LogRecordProcessor[] = [];
 
   constructor(
-    readonly resource: IResource,
+    readonly resource: Resource,
     readonly forceFlushTimeoutMillis: number,
-    readonly logRecordLimits: Required<LogRecordLimits>
+    readonly logRecordLimits: Required<LogRecordLimits>,
+    readonly processors: LogRecordProcessor[]
   ) {
-    this.activeProcessor = new NoopLogRecordProcessor();
+    if (processors.length > 0) {
+      this.registeredLogRecordProcessors = processors;
+      this.activeProcessor = new MultiLogRecordProcessor(
+        this.registeredLogRecordProcessors,
+        this.forceFlushTimeoutMillis
+      );
+    } else {
+      this.activeProcessor = new NoopLogRecordProcessor();
+    }
   }
 }

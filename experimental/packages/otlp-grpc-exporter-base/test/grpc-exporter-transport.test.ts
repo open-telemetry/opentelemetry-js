@@ -16,6 +16,7 @@
 import {
   createEmptyMetadata,
   createInsecureCredentials,
+  createOtlpGrpcExporterTransport,
   createSslCredentials,
   GrpcExporterTransport,
   GrpcExporterTransportParameters,
@@ -23,13 +24,13 @@ import {
 import * as assert from 'assert';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
-import sinon = require('sinon');
+import * as sinon from 'sinon';
 import { Metadata, Server, ServerCredentials } from '@grpc/grpc-js';
 import { types } from 'util';
 import {
   ExportResponseFailure,
   ExportResponseSuccess,
-} from '../src/export-response';
+} from '@opentelemetry/otlp-exporter-base';
 
 const testServiceDefinition = {
   export: {
@@ -57,13 +58,14 @@ const simpleClientConfig: GrpcExporterTransportParameters = {
     metadata.set('foo', 'bar');
     return metadata;
   },
-  timeoutMillis: 100,
   grpcPath: '/test/Export',
   grpcName: 'name',
   credentials: createInsecureCredentials,
   compression: 'none',
   address: 'localhost:1234',
 };
+
+const timeoutMillis = 100;
 
 interface ExportedData {
   request: Buffer;
@@ -95,6 +97,40 @@ function startServer(context: ServerTestContext): Promise<() => void> {
   return new Promise<() => void>((resolve, reject) => {
     server.bindAsync(
       'localhost:1234',
+      ServerCredentials.createInsecure(),
+      (error, port) => {
+        server.start();
+        if (error != null) {
+          reject(error);
+        }
+        resolve(() => {
+          server.forceShutdown();
+        });
+      }
+    );
+  });
+}
+
+/**
+ * Starts a customizable server that saves all responses to context.responses
+ * Returns data as defined in context.ServerResponseProvider
+ *
+ * @return shutdown handle, needs to be called to ensure that mocha exits
+ * @param context context for storing responses and to define server behavior.
+ */
+function startUdsServer(context: ServerTestContext): Promise<() => void> {
+  const server = new Server();
+  server.addService(testServiceDefinition, {
+    export: (data: ExportedData, callback: any) => {
+      context.requests.push(data);
+      const response = context.serverResponseProvider();
+      callback(response.error, response.buffer);
+    },
+  });
+
+  return new Promise<() => void>((resolve, reject) => {
+    server.bindAsync(
+      'unix:///tmp/otlp-test.sock',
       ServerCredentials.createInsecure(),
       (error, port) => {
         server.start();
@@ -176,7 +212,7 @@ describe('GrpcExporterTransport', function () {
     });
 
     it('before send() does not error', function () {
-      const transport = new GrpcExporterTransport(simpleClientConfig);
+      const transport = createOtlpGrpcExporterTransport(simpleClientConfig);
       transport.shutdown();
 
       // no assertions, just checking that it does not throw any errors.
@@ -185,7 +221,7 @@ describe('GrpcExporterTransport', function () {
     it('calls _client.close() if client is defined', async function () {
       const transport = new GrpcExporterTransport(simpleClientConfig);
       // send something so that client is defined
-      await transport.send(Buffer.from([1, 2, 3]));
+      await transport.send(Buffer.from([1, 2, 3]), timeoutMillis);
       assert.ok(transport['_client'], '_client is not defined after send()');
       const closeSpy = sinon.spy(transport['_client'], 'close');
 
@@ -197,142 +233,202 @@ describe('GrpcExporterTransport', function () {
     });
   });
   describe('send', function () {
-    let shutdownHandle: () => void | undefined;
-    const serverTestContext: ServerTestContext = {
-      requests: [],
-      serverResponseProvider: () => {
-        return { error: null, buffer: Buffer.from([]) };
-      },
-    };
-
-    beforeEach(async function () {
-      shutdownHandle = await startServer(serverTestContext);
-    });
-
-    afterEach(function () {
-      shutdownHandle();
-
-      // clear context
-      serverTestContext.requests = [];
-      serverTestContext.serverResponseProvider = () => {
-        return { error: null, buffer: Buffer.from([]) };
+    describe('http2', function () {
+      let shutdownHandle: () => void | undefined;
+      const serverTestContext: ServerTestContext = {
+        requests: [],
+        serverResponseProvider: () => {
+          return { error: null, buffer: Buffer.from([]) };
+        },
       };
-    });
 
-    it('sends data', async function () {
-      const transport = new GrpcExporterTransport(simpleClientConfig);
+      beforeEach(async function () {
+        shutdownHandle = await startServer(serverTestContext);
+      });
 
-      const result = (await transport.send(
-        Buffer.from([1, 2, 3])
-      )) as ExportResponseSuccess;
+      afterEach(function () {
+        shutdownHandle();
 
-      assert.strictEqual(result.status, 'success');
-      assert.deepEqual(result.data, Buffer.from([]));
-      assert.strictEqual(serverTestContext.requests.length, 1);
-      assert.deepEqual(
-        serverTestContext.requests[0].request,
-        Buffer.from([1, 2, 3])
-      );
-      assert.deepEqual(
-        serverTestContext.requests[0].metadata.get('foo'),
-        simpleClientConfig.metadata().get('foo')
-      );
-    });
-
-    it('forwards response', async function () {
-      const expectedResponseData = Buffer.from([1, 2, 3]);
-      serverTestContext.serverResponseProvider = () => {
-        return {
-          buffer: expectedResponseData,
-          error: null,
+        // clear context
+        serverTestContext.requests = [];
+        serverTestContext.serverResponseProvider = () => {
+          return { error: null, buffer: Buffer.from([]) };
         };
-      };
-      const transport = new GrpcExporterTransport(simpleClientConfig);
+      });
 
-      const result = (await transport.send(
-        Buffer.from([])
-      )) as ExportResponseSuccess;
+      it('sends data', async function () {
+        const transport = createOtlpGrpcExporterTransport(simpleClientConfig);
 
-      assert.strictEqual(result.status, 'success');
-      assert.deepEqual(result.data, expectedResponseData);
-    });
+        const result = (await transport.send(
+          Buffer.from([1, 2, 3]),
+          timeoutMillis
+        )) as ExportResponseSuccess;
 
-    it('forwards handled server error as failure', async function () {
-      serverTestContext.serverResponseProvider = () => {
-        return {
-          buffer: Buffer.from([]),
-          error: new Error('handled server error'),
+        assert.strictEqual(result.status, 'success');
+        assert.deepEqual(result.data, Buffer.from([]));
+        assert.strictEqual(serverTestContext.requests.length, 1);
+        assert.deepEqual(
+          serverTestContext.requests[0].request,
+          Buffer.from([1, 2, 3])
+        );
+        assert.deepEqual(
+          serverTestContext.requests[0].metadata.get('foo'),
+          simpleClientConfig.metadata().get('foo')
+        );
+      });
+
+      it('forwards response', async function () {
+        const expectedResponseData = Buffer.from([1, 2, 3]);
+        serverTestContext.serverResponseProvider = () => {
+          return {
+            buffer: expectedResponseData,
+            error: null,
+          };
         };
-      };
-      const transport = new GrpcExporterTransport(simpleClientConfig);
+        const transport = createOtlpGrpcExporterTransport(simpleClientConfig);
 
-      const result = (await transport.send(
-        Buffer.from([])
-      )) as ExportResponseFailure;
+        const result = (await transport.send(
+          Buffer.from([]),
+          timeoutMillis
+        )) as ExportResponseSuccess;
 
-      assert.strictEqual(result.status, 'failure');
-      assert.ok(types.isNativeError(result.error));
+        assert.strictEqual(result.status, 'success');
+        assert.deepEqual(result.data, expectedResponseData);
+      });
+
+      it('forwards handled server error as failure', async function () {
+        serverTestContext.serverResponseProvider = () => {
+          return {
+            buffer: Buffer.from([]),
+            error: new Error('handled server error'),
+          };
+        };
+        const transport = createOtlpGrpcExporterTransport(simpleClientConfig);
+
+        const result = (await transport.send(
+          Buffer.from([]),
+          timeoutMillis
+        )) as ExportResponseFailure;
+
+        assert.strictEqual(result.status, 'failure');
+        assert.ok(types.isNativeError(result.error));
+      });
+
+      it('forwards unhandled server error as failure', async function () {
+        serverTestContext.serverResponseProvider = () => {
+          throw new Error('unhandled server error');
+        };
+        const transport = createOtlpGrpcExporterTransport(simpleClientConfig);
+
+        const result = (await transport.send(
+          Buffer.from([]),
+          timeoutMillis
+        )) as ExportResponseFailure;
+        assert.strictEqual(result.status, 'failure');
+        assert.ok(types.isNativeError(result.error));
+      });
+
+      it('forwards metadataProvider error as failure', async function () {
+        const expectedError = new Error('metadata provider error');
+        const config = Object.assign({}, simpleClientConfig);
+        config.metadata = () => {
+          throw expectedError;
+        };
+
+        const transport = createOtlpGrpcExporterTransport(config);
+
+        const result = (await transport.send(
+          Buffer.from([]),
+          timeoutMillis
+        )) as ExportResponseFailure;
+        assert.strictEqual(result.status, 'failure');
+        assert.strictEqual(result.error, expectedError);
+      });
+
+      it('forwards metadataProvider returns null value as failure', async function () {
+        const expectedError = new Error('metadata was null');
+        const config = Object.assign({}, simpleClientConfig);
+        config.metadata = () => {
+          return null as unknown as Metadata;
+        };
+
+        const transport = createOtlpGrpcExporterTransport(config);
+
+        const result = (await transport.send(
+          Buffer.from([]),
+          timeoutMillis
+        )) as ExportResponseFailure;
+        assert.strictEqual(result.status, 'failure');
+        assert.deepEqual(result.error, expectedError);
+      });
+
+      it('forwards credential error as failure', async function () {
+        const expectedError = new Error('credential provider error');
+        const config = Object.assign({}, simpleClientConfig);
+        config.credentials = () => {
+          throw expectedError;
+        };
+
+        const transport = createOtlpGrpcExporterTransport(config);
+
+        const result = (await transport.send(
+          Buffer.from([]),
+          timeoutMillis
+        )) as ExportResponseFailure;
+        assert.strictEqual(result.status, 'failure');
+        assert.strictEqual(result.error, expectedError);
+      });
     });
-
-    it('forwards unhandled server error as failure', async function () {
-      serverTestContext.serverResponseProvider = () => {
-        throw new Error('unhandled server error');
-      };
-      const transport = new GrpcExporterTransport(simpleClientConfig);
-
-      const result = (await transport.send(
-        Buffer.from([])
-      )) as ExportResponseFailure;
-      assert.strictEqual(result.status, 'failure');
-      assert.ok(types.isNativeError(result.error));
-    });
-
-    it('forwards metadataProvider error as failure', async function () {
-      const expectedError = new Error('metadata provider error');
-      const config = Object.assign({}, simpleClientConfig);
-      config.metadata = () => {
-        throw expectedError;
+    describe('uds', function () {
+      let shutdownHandle: (() => void) | undefined;
+      const serverTestContext: ServerTestContext = {
+        requests: [],
+        serverResponseProvider: () => {
+          return { error: null, buffer: Buffer.from([]) };
+        },
       };
 
-      const transport = new GrpcExporterTransport(config);
+      beforeEach(async function () {
+        // skip uds tests on windows
+        if (process.platform === 'win32') {
+          this.skip();
+        }
+        shutdownHandle = await startUdsServer(serverTestContext);
+      });
 
-      const result = (await transport.send(
-        Buffer.from([])
-      )) as ExportResponseFailure;
-      assert.strictEqual(result.status, 'failure');
-      assert.strictEqual(result.error, expectedError);
-    });
+      afterEach(function () {
+        shutdownHandle?.();
 
-    it('forwards metadataProvider returns null value as failure', async function () {
-      const expectedError = new Error('metadata was null');
-      const config = Object.assign({}, simpleClientConfig);
-      config.metadata = () => {
-        return null as unknown as Metadata;
-      };
+        // clear context
+        serverTestContext.requests = [];
+        serverTestContext.serverResponseProvider = () => {
+          return { error: null, buffer: Buffer.from([]) };
+        };
+      });
 
-      const transport = new GrpcExporterTransport(config);
+      it('sends data', async function () {
+        const transport = createOtlpGrpcExporterTransport({
+          ...simpleClientConfig,
+          address: 'unix:///tmp/otlp-test.sock',
+        });
 
-      const result = (await transport.send(
-        Buffer.from([])
-      )) as ExportResponseFailure;
-      assert.strictEqual(result.status, 'failure');
-      assert.deepEqual(result.error, expectedError);
-    });
+        const result = (await transport.send(
+          Buffer.from([1, 2, 3]),
+          timeoutMillis
+        )) as ExportResponseSuccess;
 
-    it('forwards credential error as failure', async function () {
-      const expectedError = new Error('credential provider error');
-      const config = Object.assign({}, simpleClientConfig);
-      config.credentials = () => {
-        throw expectedError;
-      };
-
-      const transport = new GrpcExporterTransport(config);
-
-      const result = (await transport.send(
-        Buffer.from([])
-      )) as ExportResponseFailure;
-      assert.strictEqual(result.status, 'failure');
-      assert.strictEqual(result.error, expectedError);
+        assert.strictEqual(result.status, 'success');
+        assert.deepEqual(result.data, Buffer.from([]));
+        assert.strictEqual(serverTestContext.requests.length, 1);
+        assert.deepEqual(
+          serverTestContext.requests[0].request,
+          Buffer.from([1, 2, 3])
+        );
+        assert.deepEqual(
+          serverTestContext.requests[0].metadata.get('foo'),
+          simpleClientConfig.metadata().get('foo')
+        );
+      });
     });
   });
 });

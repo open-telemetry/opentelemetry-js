@@ -31,7 +31,7 @@ import { MeterProviderSharedState } from '../src/state/MeterProviderSharedState'
 import { MeterSharedState } from '../src/state/MeterSharedState';
 import {
   defaultInstrumentationScope,
-  defaultResource,
+  testResource,
   invalidNames,
   validNames,
 } from './util';
@@ -44,84 +44,84 @@ describe('Meter', () => {
   describe('createCounter', () => {
     testWithNames('counter', name => {
       const meterSharedState = new MeterSharedState(
-        new MeterProviderSharedState(defaultResource),
+        new MeterProviderSharedState(testResource),
         defaultInstrumentationScope
       );
       const meter = new Meter(meterSharedState);
       const counter = meter.createCounter(name);
-      assert(counter instanceof CounterInstrument);
+      assert.ok(counter instanceof CounterInstrument);
     });
   });
 
   describe('createUpDownCounter', () => {
     testWithNames('UpDownCounter', name => {
       const meterSharedState = new MeterSharedState(
-        new MeterProviderSharedState(defaultResource),
+        new MeterProviderSharedState(testResource),
         defaultInstrumentationScope
       );
       const meter = new Meter(meterSharedState);
       const upDownCounter = meter.createUpDownCounter(name);
-      assert(upDownCounter instanceof UpDownCounterInstrument);
+      assert.ok(upDownCounter instanceof UpDownCounterInstrument);
     });
   });
 
   describe('createHistogram', () => {
     testWithNames('Histogram', name => {
       const meterSharedState = new MeterSharedState(
-        new MeterProviderSharedState(defaultResource),
+        new MeterProviderSharedState(testResource),
         defaultInstrumentationScope
       );
       const meter = new Meter(meterSharedState);
       const histogram = meter.createHistogram(name);
-      assert(histogram instanceof HistogramInstrument);
+      assert.ok(histogram instanceof HistogramInstrument);
     });
   });
 
   describe('createObservableGauge', () => {
     testWithNames('ObservableGauge', name => {
       const meterSharedState = new MeterSharedState(
-        new MeterProviderSharedState(defaultResource),
+        new MeterProviderSharedState(testResource),
         defaultInstrumentationScope
       );
       const meter = new Meter(meterSharedState);
       const observableGauge = meter.createObservableGauge(name);
-      assert(observableGauge instanceof ObservableGaugeInstrument);
+      assert.ok(observableGauge instanceof ObservableGaugeInstrument);
     });
   });
 
   describe('createGauge', () => {
     testWithNames('Gauge', name => {
       const meterSharedState = new MeterSharedState(
-        new MeterProviderSharedState(defaultResource),
+        new MeterProviderSharedState(testResource),
         defaultInstrumentationScope
       );
       const meter = new Meter(meterSharedState);
       const Gauge = meter.createGauge(name);
-      assert(Gauge instanceof GaugeInstrument);
+      assert.ok(Gauge instanceof GaugeInstrument);
     });
   });
 
   describe('createObservableCounter', () => {
     testWithNames('ObservableCounter', name => {
       const meterSharedState = new MeterSharedState(
-        new MeterProviderSharedState(defaultResource),
+        new MeterProviderSharedState(testResource),
         defaultInstrumentationScope
       );
       const meter = new Meter(meterSharedState);
       const observableCounter = meter.createObservableCounter(name);
-      assert(observableCounter instanceof ObservableCounterInstrument);
+      assert.ok(observableCounter instanceof ObservableCounterInstrument);
     });
   });
 
   describe('createObservableUpDownCounter', () => {
     testWithNames('ObservableUpDownCounter', name => {
       const meterSharedState = new MeterSharedState(
-        new MeterProviderSharedState(defaultResource),
+        new MeterProviderSharedState(testResource),
         defaultInstrumentationScope
       );
       const meter = new Meter(meterSharedState);
       const observableUpDownCounter = meter.createObservableUpDownCounter(name);
-      assert(
+      assert.ok(
         observableUpDownCounter instanceof ObservableUpDownCounterInstrument
       );
     });
@@ -130,7 +130,7 @@ describe('Meter', () => {
   describe('addBatchObservableCallback', () => {
     it('should register callback without exception', () => {
       const meterSharedState = new MeterSharedState(
-        new MeterProviderSharedState(defaultResource),
+        new MeterProviderSharedState(testResource),
         defaultInstrumentationScope
       );
       const meter = new Meter(meterSharedState);
@@ -149,7 +149,7 @@ describe('Meter', () => {
 
     it('should be tolerant with unknown observables', () => {
       const meterSharedState = new MeterSharedState(
-        new MeterProviderSharedState(defaultResource),
+        new MeterProviderSharedState(testResource),
         defaultInstrumentationScope
       );
       const meter = new Meter(meterSharedState);
@@ -162,7 +162,7 @@ describe('Meter', () => {
   describe('removeBatchObservableCallback', () => {
     it('should remove callback without exception', () => {
       const meterSharedState = new MeterSharedState(
-        new MeterProviderSharedState(defaultResource),
+        new MeterProviderSharedState(testResource),
         defaultInstrumentationScope
       );
       const meter = new Meter(meterSharedState);

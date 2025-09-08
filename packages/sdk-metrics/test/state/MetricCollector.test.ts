@@ -23,7 +23,7 @@ import { MeterProviderSharedState } from '../../src/state/MeterProviderSharedSta
 import { MetricCollector } from '../../src/state/MetricCollector';
 import {
   defaultInstrumentationScope,
-  defaultResource,
+  testResource,
   assertMetricData,
   assertDataPoint,
   ObservableCallbackDelegate,
@@ -42,7 +42,7 @@ describe('MetricCollector', () => {
   describe('constructor', () => {
     it('should construct MetricCollector without exceptions', () => {
       const meterProviderSharedState = new MeterProviderSharedState(
-        defaultResource
+        testResource
       );
       const readers = [new TestMetricReader(), new TestDeltaMetricReader()];
       for (const reader of readers) {
@@ -57,7 +57,7 @@ describe('MetricCollector', () => {
     function setupInstruments() {
       const reader = new TestMetricReader();
       const meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         readers: [reader],
       });
 
@@ -166,7 +166,7 @@ describe('MetricCollector', () => {
     });
 
     it('should collect observer metrics with timeout', async () => {
-      sinon.useFakeTimers();
+      const timer = sinon.useFakeTimers();
       /** preparing test instrumentations */
       const { metricCollector, meter } = setupInstruments();
 
@@ -195,10 +195,10 @@ describe('MetricCollector', () => {
         const future = metricCollector.collect({
           timeoutMillis: 100,
         });
-        sinon.clock.tick(200);
+        timer.tick(200);
         const { resourceMetrics, errors } = await future;
         assert.strictEqual(errors.length, 1);
-        assert(errors[0] instanceof TimeoutError);
+        assert.ok(errors[0] instanceof TimeoutError);
         const { scopeMetrics } = resourceMetrics;
         const { metrics } = scopeMetrics[0];
 
@@ -222,7 +222,7 @@ describe('MetricCollector', () => {
         const future = metricCollector.collect({
           timeoutMillis: 100,
         });
-        sinon.clock.tick(100);
+        timer.tick(100);
         const { resourceMetrics, errors } = await future;
         assert.strictEqual(errors.length, 0);
         const { scopeMetrics } = resourceMetrics;
@@ -274,7 +274,7 @@ describe('MetricCollector', () => {
     });
 
     it('should collect batch observer metrics with timeout', async () => {
-      sinon.useFakeTimers();
+      const timer = sinon.useFakeTimers();
       /** preparing test instrumentations */
       const { metricCollector, meter } = setupInstruments();
 
@@ -307,10 +307,10 @@ describe('MetricCollector', () => {
         const future = metricCollector.collect({
           timeoutMillis: 100,
         });
-        sinon.clock.tick(200);
+        timer.tick(200);
         const { resourceMetrics, errors } = await future;
         assert.strictEqual(errors.length, 1);
-        assert(errors[0] instanceof TimeoutError);
+        assert.ok(errors[0] instanceof TimeoutError);
         const { scopeMetrics } = resourceMetrics;
         const { metrics } = scopeMetrics[0];
 
@@ -332,7 +332,7 @@ describe('MetricCollector', () => {
         const future = metricCollector.collect({
           timeoutMillis: 100,
         });
-        sinon.clock.tick(100);
+        timer.tick(100);
         const { resourceMetrics, errors } = await future;
         assert.strictEqual(errors.length, 0);
         const { scopeMetrics } = resourceMetrics;

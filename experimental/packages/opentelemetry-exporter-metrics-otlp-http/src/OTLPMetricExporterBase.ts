@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-import { ExportResult, getEnv } from '@opentelemetry/core';
+import { getStringFromEnv } from '@opentelemetry/core';
 import {
   AggregationTemporality,
   AggregationTemporalitySelector,
   InstrumentType,
   PushMetricExporter,
   ResourceMetrics,
-  Aggregation,
   AggregationSelector,
+  AggregationOption,
+  AggregationType,
 } from '@opentelemetry/sdk-metrics';
 import {
   AggregationTemporalityPreference,
   OTLPMetricExporterOptions,
 } from './OTLPMetricExporterOptions';
-import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
+import {
+  IOtlpExportDelegate,
+  OTLPExporterBase,
+} from '@opentelemetry/otlp-exporter-base';
 import { diag } from '@opentelemetry/api';
 
 export const CumulativeTemporalitySelector: AggregationTemporalitySelector =
@@ -67,9 +71,10 @@ export const LowMemoryTemporalitySelector: AggregationTemporalitySelector = (
 };
 
 function chooseTemporalitySelectorFromEnvironment() {
-  const env = getEnv();
-  const configuredTemporality =
-    env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE.trim().toLowerCase();
+  const configuredTemporality = (
+    getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE') ??
+    'cumulative'
+  ).toLowerCase();
 
   if (configuredTemporality === 'cumulative') {
     return CumulativeTemporalitySelector;
@@ -82,7 +87,7 @@ function chooseTemporalitySelectorFromEnvironment() {
   }
 
   diag.warn(
-    `OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE is set to '${env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE}', but only 'cumulative' and 'delta' are allowed. Using default ('cumulative') instead.`
+    `OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE is set to '${configuredTemporality}', but only 'cumulative' and 'delta' are allowed. Using default ('cumulative') instead.`
   );
   return CumulativeTemporalitySelector;
 }
@@ -107,48 +112,35 @@ function chooseTemporalitySelector(
   return chooseTemporalitySelectorFromEnvironment();
 }
 
+const DEFAULT_AGGREGATION = Object.freeze({
+  type: AggregationType.DEFAULT,
+});
+
 function chooseAggregationSelector(
   config: OTLPMetricExporterOptions | undefined
-) {
-  if (config?.aggregationPreference) {
-    return config.aggregationPreference;
-  } else {
-    return (_instrumentType: any) => Aggregation.Default();
-  }
+): AggregationSelector {
+  return config?.aggregationPreference ?? (() => DEFAULT_AGGREGATION);
 }
 
-export class OTLPMetricExporterBase<
-  T extends OTLPExporterBase<OTLPMetricExporterOptions, ResourceMetrics>,
-> implements PushMetricExporter
+export class OTLPMetricExporterBase
+  extends OTLPExporterBase<ResourceMetrics>
+  implements PushMetricExporter
 {
-  public _otlpExporter: T;
-  private _aggregationTemporalitySelector: AggregationTemporalitySelector;
-  private _aggregationSelector: AggregationSelector;
+  private readonly _aggregationTemporalitySelector: AggregationTemporalitySelector;
+  private readonly _aggregationSelector: AggregationSelector;
 
-  constructor(exporter: T, config?: OTLPMetricExporterOptions) {
-    this._otlpExporter = exporter;
+  constructor(
+    delegate: IOtlpExportDelegate<ResourceMetrics>,
+    config?: OTLPMetricExporterOptions
+  ) {
+    super(delegate);
     this._aggregationSelector = chooseAggregationSelector(config);
     this._aggregationTemporalitySelector = chooseTemporalitySelector(
       config?.temporalityPreference
     );
   }
 
-  export(
-    metrics: ResourceMetrics,
-    resultCallback: (result: ExportResult) => void
-  ): void {
-    this._otlpExporter.export([metrics], resultCallback);
-  }
-
-  async shutdown(): Promise<void> {
-    await this._otlpExporter.shutdown();
-  }
-
-  forceFlush(): Promise<void> {
-    return Promise.resolve();
-  }
-
-  selectAggregation(instrumentType: InstrumentType): Aggregation {
+  selectAggregation(instrumentType: InstrumentType): AggregationOption {
     return this._aggregationSelector(instrumentType);
   }
 

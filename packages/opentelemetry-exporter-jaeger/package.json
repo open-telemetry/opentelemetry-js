@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-jaeger",
-  "version": "1.25.1",
+  "version": "2.1.0",
   "description": "OpenTelemetry Exporter Jaeger allows user to send collected traces to Jaeger",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -9,14 +9,13 @@
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
-    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
+    "test": "nyc mocha 'test/**/*.test.ts'",
     "tdd": "npm run test -- --watch-extensions ts --watch",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
     "watch": "tsc --build --watch",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
+    "precompile": "lerna run version --scope @opentelemetry/exporter-jaeger --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../scripts/align-api-deps.js"
@@ -31,7 +30,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=14"
+    "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
     "build/src/**/*.js",
@@ -46,27 +45,24 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "^1.0.0",
-    "@opentelemetry/resources": "1.25.1",
-    "@types/mocha": "10.0.6",
+    "@opentelemetry/resources": "2.1.0",
+    "@types/mocha": "10.0.10",
     "@types/node": "18.6.5",
-    "@types/sinon": "17.0.3",
-    "codecov": "3.8.3",
-    "cross-var": "1.1.0",
+    "@types/sinon": "17.0.4",
     "lerna": "6.6.2",
-    "mocha": "10.2.0",
-    "nock": "13.3.8",
-    "nyc": "15.1.0",
-    "sinon": "15.1.2",
-    "ts-mocha": "10.0.0",
-    "typescript": "4.4.4"
+    "mocha": "11.7.2",
+    "nock": "13.5.6",
+    "nyc": "17.1.0",
+    "sinon": "18.0.1",
+    "typescript": "5.0.4"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "1.25.1",
-    "@opentelemetry/sdk-trace-base": "1.25.1",
-    "@opentelemetry/semantic-conventions": "1.25.1",
+    "@opentelemetry/core": "2.1.0",
+    "@opentelemetry/sdk-trace-base": "2.1.0",
+    "@opentelemetry/semantic-conventions": "^1.29.0",
     "jaeger-client": "^3.15.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-exporter-jaeger",

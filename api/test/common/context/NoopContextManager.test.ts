@@ -18,14 +18,14 @@ import * as assert from 'assert';
 import { createContextKey, ROOT_CONTEXT } from '../../../src/context/context';
 import { NoopContextManager } from '../../../src/context/NoopContextManager';
 
-describe('NoopContextManager', () => {
+describe('NoopContextManager', function () {
   let contextManager: NoopContextManager;
 
-  describe('.enable()', () => {
-    it('should work', () => {
+  describe('.enable()', function () {
+    it('should work', function () {
       assert.doesNotThrow(() => {
         contextManager = new NoopContextManager();
-        assert(
+        assert.ok(
           contextManager.enable() === contextManager,
           'should return this'
         );
@@ -33,10 +33,10 @@ describe('NoopContextManager', () => {
     });
   });
 
-  describe('.disable()', () => {
-    it('should work', () => {
+  describe('.disable()', function () {
+    it('should work', function () {
       assert.doesNotThrow(() => {
-        assert(
+        assert.ok(
           contextManager.disable() === contextManager,
           'should return this'
         );
@@ -45,7 +45,7 @@ describe('NoopContextManager', () => {
     });
   });
 
-  describe('.with()', () => {
+  describe('.with()', function () {
     it('should run the callback (ROOT_CONTEXT as target)', done => {
       contextManager.with(ROOT_CONTEXT, done);
     });
@@ -53,7 +53,7 @@ describe('NoopContextManager', () => {
     it('should run the callback (object as target)', done => {
       const key = createContextKey('test key 1');
       const test = ROOT_CONTEXT.setValue(key, 1);
-      contextManager.with(test, () => {
+      contextManager.with(test, function () {
         assert.strictEqual(
           contextManager.active(),
           ROOT_CONTEXT,
@@ -65,13 +65,13 @@ describe('NoopContextManager', () => {
 
     it('should run the callback (when disabled)', done => {
       contextManager.disable();
-      contextManager.with(ROOT_CONTEXT, () => {
+      contextManager.with(ROOT_CONTEXT, function () {
         contextManager.enable();
         return done();
       });
     });
 
-    it('should forward this, arguments and return value', () => {
+    it('should forward this, arguments and return value', function () {
       function fnWithThis(this: string, a: string, b: number): string {
         assert.strictEqual(this, 'that');
         assert.strictEqual(arguments.length, 2);
@@ -96,8 +96,8 @@ describe('NoopContextManager', () => {
     });
   });
 
-  describe('.active()', () => {
-    it('should always return ROOT_CONTEXT (when enabled)', () => {
+  describe('.active()', function () {
+    it('should always return ROOT_CONTEXT (when enabled)', function () {
       assert.strictEqual(
         contextManager.active(),
         ROOT_CONTEXT,
@@ -105,7 +105,7 @@ describe('NoopContextManager', () => {
       );
     });
 
-    it('should always return ROOT_CONTEXT (when disabled)', () => {
+    it('should always return ROOT_CONTEXT (when disabled)', function () {
       contextManager.disable();
       assert.strictEqual(
         contextManager.active(),
@@ -116,8 +116,8 @@ describe('NoopContextManager', () => {
     });
   });
 
-  describe('.bind()', () => {
-    it('should return the same target (when enabled)', () => {
+  describe('.bind()', function () {
+    it('should return the same target (when enabled)', function () {
       const test = { a: 1 };
       assert.deepStrictEqual(
         contextManager.bind(contextManager.active(), test),
@@ -125,7 +125,7 @@ describe('NoopContextManager', () => {
       );
     });
 
-    it('should return the same target (when disabled)', () => {
+    it('should return the same target (when disabled)', function () {
       contextManager.disable();
       const test = { a: 1 };
       assert.deepStrictEqual(

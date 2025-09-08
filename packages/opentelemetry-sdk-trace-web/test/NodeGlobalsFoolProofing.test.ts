@@ -20,12 +20,11 @@ import {
   trace,
   ProxyTracerProvider,
 } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
-import { Tracer } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { StackContextManager, WebTracerProvider } from '../src';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 
-describe('Node Globals Foolproofing', () => {
+describe('Node Globals Foolproofing', function () {
   const originalProcess = globalThis?.process;
   before(() => {
     Object.assign(globalThis, { process: false });
@@ -41,7 +40,7 @@ describe('Node Globals Foolproofing', () => {
     propagation.disable();
   });
 
-  it('Can get TraceProvider without node globals such as process', () => {
+  it('Can get TraceProvider without node globals such as process', function () {
     const propagator = propagation['_getGlobalPropagator']();
     const tracerProvider = new WebTracerProvider();
     tracerProvider.register({
@@ -59,7 +58,7 @@ describe('Node Globals Foolproofing', () => {
     assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 
-  it('Can get TraceProvider with custom id generator and without node globals such as process', () => {
+  it('Can get TraceProvider with custom id generator and without node globals such as process', function () {
     const getRandomString = (length: number) => {
       const alphanumericsList = 'abcdefghijklmnopqrstuvwxyz0123456789'.split(
         ''
@@ -70,7 +69,7 @@ describe('Node Globals Foolproofing', () => {
     };
 
     const tracer = new WebTracerProvider({
-      resource: new Resource({
+      resource: resourceFromAttributes({
         'service.name': 'web-core',
       }),
       idGenerator: {
@@ -78,7 +77,6 @@ describe('Node Globals Foolproofing', () => {
         generateSpanId: () => getRandomString(16),
       },
     }).getTracer('default');
-
-    assert.ok(tracer instanceof Tracer);
+    assert.ok(tracer);
   });
 });

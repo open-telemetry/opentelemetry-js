@@ -17,6 +17,7 @@
 import {
   Meter as IMeter,
   MetricOptions,
+  Gauge,
   Histogram,
   Counter,
   UpDownCounter,
@@ -26,10 +27,7 @@ import {
   BatchObservableCallback,
   Observable,
 } from '@opentelemetry/api';
-import {
-  createInstrumentDescriptor,
-  InstrumentType,
-} from './InstrumentDescriptor';
+import { createInstrumentDescriptor } from './InstrumentDescriptor';
 import {
   CounterInstrument,
   GaugeInstrument,
@@ -40,7 +38,7 @@ import {
   UpDownCounterInstrument,
 } from './Instruments';
 import { MeterSharedState } from './state/MeterSharedState';
-import { Gauge } from './types';
+import { InstrumentType } from './export/MetricData';
 
 /**
  * This class implements the {@link IMeter} interface.

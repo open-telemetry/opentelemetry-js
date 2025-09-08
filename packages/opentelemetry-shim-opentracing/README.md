@@ -48,6 +48,12 @@ See [examples/opentracing-shim](https://github.com/open-telemetry/opentelemetry-
 
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
+## Limitation
+
+The OpenTracing shim does not currently include a scope manager.
+This feature was never implemented in OpenTracing JS therefore the
+shim does not provide that feature.
+
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

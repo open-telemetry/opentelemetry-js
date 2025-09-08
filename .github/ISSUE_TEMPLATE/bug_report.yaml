@@ -5,38 +5,61 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
-        Please make sure to fill out the entire form below,
-        providing as much context as you can in order to help us
-        triage and track down your bug as quickly as possible.
+        > [!IMPORTANT]
+        > **Please read all parts of this form carefully.** By following the instructions carefully, you ensure that we
+        > can get started fixing your bug, instead of being stuck at trying to reproduce your issue. Please provide
+        > all requested information, even if you think it does not apply to your problem.
+        >
+        >  **If you use a third-party package that re-distributes OpenTelemetry, open the bug ticket with that third party unless you can provide steps to reproduce this with pure OpenTelemetry.**
+        >  Digging into third-party distributions of OpenTelemetry is not in scope for this project.
 
-        Before filing a bug, please be sure you have searched through
-        [existing bugs](https://github.com/open-telemetry/opentelemetry-js/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3Abug)
-        to see if your bug is already addressed.
-
-        If your bug is related to an instrumentation or plugin in [opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib)
-        please be sure to file it there.
+        Before filing a bug, please be sure you have searched through [existing open bugs](https://github.com/open-telemetry/opentelemetry-js/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3Abug)
+        to see if this bug has already been filed.
+  - type: markdown
+    attributes:
+      value: |
+        ## Bug Reproduction
   - type: textarea
     attributes:
       label: What happened?
-      description: Please provide as much detail as you reasonably can.
+      description: |
+        > [!IMPORTANT]
+        > **Please provide as much detail as you reasonably can.**
+        > We all know the complexities of developing with JavaScript/TypeScript. **Be specific** about your setup and **DO NOT** assume that the person handling your bug report knows how to use your specific combination of tooling. Always provide build instructions and config files.
       value: |
         ## Steps to Reproduce
-
+          <!--
+            The most effective way to solve a bug is to provide a link to a reproducer repository. It is extremely difficult to exactly reproduce problems
+            and doing so can take multiple hours for us. You know your tooling and setup and we know OpenTelemetry JavaScript internals.
+            Let's help each other! :)
+         -->
         ## Expected Result
 
         ## Actual Result
 
         ## Additional Details
+         <!--
+           Anything you can think of that will help us reproduce and understand your problem:
+              - details about the behavior of the bug
+              - code to reproduce, if not provided via a repository above (including setting up any frameworks you may be using, we likely don't use the same tech-stack that you're using on the daily)
+              - which tooling you use and how you're using it
+              - config files for your tooling (typescript, bundlers, ...)
+              - how you run your code (example: `node -r otel.js ./index.js`).
+              - which module type you are you using (`module` or `commonjs`)
+         -->
+
 
     validations:
       required: true
   - type: textarea
     attributes:
       label: OpenTelemetry Setup Code
-      description: Please provide the code you use to set up OpenTelemetry
+      description: |
+        Please provide the code you use to set up OpenTelemetry.
+        If you use `@opentelemetry/auto-instrumentations-node/register`, please state so here.
+        You may omit this step if you have provided a reproducer repository.
       placeholder: | # This comes from our README.md
-        // tracing.js
+        // otel.js
 
         'use strict'
 
@@ -44,15 +67,15 @@ body:
         const opentelemetry = require('@opentelemetry/sdk-node');
         const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
         const { ConsoleSpanExporter } = require('@opentelemetry/sdk-trace-base');
-        const { Resource } = require('@opentelemetry/resources');
-        const { SEMRESATTRS_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
+        const { resourceFromAttributes } = require('@opentelemetry/resources');
+        const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 
         // configure the SDK to export telemetry data to the console
         // enable all auto-instrumentations from the meta package
         const traceExporter = new ConsoleSpanExporter();
         const sdk = new opentelemetry.NodeSDK({
-          resource: new Resource({
-            [SEMRESATTRS_SERVICE_NAME]: 'my-service',
+          resource: resourceFromAttributes({
+            [ATTR_SERVICE_NAME]: 'my-service',
           }),
           traceExporter,
           instrumentations: [getNodeAutoInstrumentations()]
@@ -75,13 +98,15 @@ body:
   - type: textarea
     attributes:
       label: package.json
-      description: If possible, please provide your full package.json. If not, please provide at least your list of dependencies and their versions, especially OpenTelemetry versions.
+      description: |
+        Please provide your the full package.json needed to reproduce the issue.
+        You may omit this step if you provided a reproducer repository.
       render: "JSON"
       placeholder: |
         {
           "name": "my-app",
           "scripts": {
-            "start": "node -r tracing.js app.js"
+            "start": "node -r otel.js app.js"
           },
           "dependencies": {
             "@opentelemetry/api": "^1.3.0",
@@ -95,3 +120,27 @@ body:
       description: |
         Please copy and paste any relevant log output.
       render: shell
+  - type: markdown
+    attributes:
+      value: |
+        ## System Details
+        System Details help us when we cannot reproduce your problem with the information provided above. Sometimes bugs only surface on specific platforms and runtime versions.
+  - type: textarea
+    attributes:
+      label: Operating System and Version
+      placeholder: Ubuntu 24.04, Windows 11 Build 26100.2033, macOS 15.0.1
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Runtime and Version
+      placeholder: Node.js v20.12.1, Node.js v18.18.2, Firefox 130, Chrome 132, ...
+    validations:
+      required: false
+  - type: dropdown
+    attributes:
+      label: Tip
+      description: This element is static, used to render a helpful sub-heading for end-users and community members to help prioritize issues. Please leave as is.
+      options:
+        - <sub>[React](https://github.blog/news-insights/product-news/add-reactions-to-pull-requests-issues-and-comments/) with 👍 to help prioritize this issue. Please use comments to provide useful context, avoiding `+1` or `me too`, to help us triage it. [Learn more here](https://opentelemetry.io/community/end-user/issue-participation/).</sub>
+      default: 0

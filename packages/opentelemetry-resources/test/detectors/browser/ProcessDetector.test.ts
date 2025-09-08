@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 import * as sinon from 'sinon';
-import { processDetector, IResource } from '../../../src';
-import { assertEmptyResource } from '../../util/resource-assertions';
+import { processDetector } from '../../../src';
 import { describeBrowser } from '../../util';
+import { assertEmptyResource } from '../../util/resource-assertions';
+import { resourceFromDetectedResource } from '../../../src/ResourceImpl';
 
 describeBrowser('processDetector() on web browser', () => {
   afterEach(() => {
@@ -24,7 +25,7 @@ describeBrowser('processDetector() on web browser', () => {
   });
 
   it('should return empty resource', async () => {
-    const resource: IResource = await processDetector.detect();
+    const resource = resourceFromDetectedResource(processDetector.detect());
     assertEmptyResource(resource);
   });
 });

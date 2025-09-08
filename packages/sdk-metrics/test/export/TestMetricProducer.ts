@@ -16,10 +16,10 @@
 
 import { CollectionResult, ResourceMetrics } from '../../src/export/MetricData';
 import { MetricProducer } from '../../src/export/MetricProducer';
-import { defaultResource } from '../util';
+import { testResource } from '../util';
 
 export const emptyResourceMetrics = {
-  resource: defaultResource,
+  resource: testResource,
   scopeMetrics: [],
 };
 

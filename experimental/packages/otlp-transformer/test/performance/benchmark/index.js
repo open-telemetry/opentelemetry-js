@@ -15,11 +15,13 @@
  */
 
 const Benchmark = require('benchmark');
-const { createExportTraceServiceRequest } = require('../../../build/src');
+const {
+  createExportTraceServiceRequest,
+} = require('../../../build/src/trace/internal');
 const { BasicTracerProvider } = require('@opentelemetry/sdk-trace-base');
 
 const tracerProvider = new BasicTracerProvider();
-const tracer = tracerProvider.getTracer('test')
+const tracer = tracerProvider.getTracer('test');
 
 const suite = new Benchmark.Suite();
 
@@ -33,11 +35,11 @@ suite.on('cycle', event => {
   console.log(String(event.target));
 });
 
-suite.add('transform 1 span', function() {
+suite.add('transform 1 span', function () {
   createExportTraceServiceRequest([span]);
 });
 
-suite.add('transform 100 spans', function() {
+suite.add('transform 100 spans', function () {
   createExportTraceServiceRequest(spans);
 });
 

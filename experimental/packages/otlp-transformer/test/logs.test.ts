@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 import { HrTime, TraceFlags } from '@opentelemetry/api';
-import { InstrumentationScope, hexToBinary } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import { InstrumentationScope } from '@opentelemetry/core';
+import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
 import * as assert from 'assert';
-import {
-  createExportLogsServiceRequest,
-  ESeverityNumber,
-  IExportLogsServiceRequest,
-  ProtobufLogsSerializer,
-  JsonLogsSerializer,
-  OtlpEncodingOptions,
-} from '../src';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import { toBase64 } from './utils';
 import * as root from '../src/generated/root';
+import { OtlpEncodingOptions } from '../src/common/internal-types';
+import {
+  ESeverityNumber,
+  IExportLogsServiceRequest,
+} from '../src/logs/internal-types';
+import { createExportLogsServiceRequest } from '../src/logs/internal';
+import { ProtobufLogsSerializer } from '../src/logs/protobuf';
+import { JsonLogsSerializer } from '../src/logs/json';
+import { hexToBinary } from '../src/common/hex-to-binary';
 
 function createExpectedLogJson(
   options: OtlpEncodingOptions
@@ -74,6 +75,7 @@ function createExpectedLogJson(
                 severityNumber: ESeverityNumber.SEVERITY_NUMBER_ERROR,
                 severityText: 'error',
                 body: { stringValue: 'some_log_body' },
+                eventName: 'some.event.name',
 
                 attributes: [
                   {
@@ -121,7 +123,7 @@ function createExpectedLogProtobuf(): IExportLogsServiceRequest {
                 severityNumber: ESeverityNumber.SEVERITY_NUMBER_ERROR,
                 severityText: 'error',
                 body: { stringValue: 'some_log_body' },
-
+                eventName: 'some.event.name',
                 attributes: [
                   {
                     key: 'some-attribute',
@@ -141,6 +143,27 @@ function createExpectedLogProtobuf(): IExportLogsServiceRequest {
     ],
   };
 }
+
+const DEFAULT_LOG_FRAGMENT: Omit<
+  ReadableLogRecord,
+  'resource' | 'instrumentationScope'
+> = {
+  hrTime: [1680253513, 123241635] as HrTime,
+  hrTimeObserved: [1683526948, 965142784] as HrTime,
+  attributes: {
+    'some-attribute': 'some attribute value',
+  },
+  droppedAttributesCount: 0,
+  severityNumber: SeverityNumber.ERROR,
+  severityText: 'error',
+  body: 'some_log_body',
+  eventName: 'some.event.name',
+  spanContext: {
+    spanId: '0000000000000002',
+    traceFlags: TraceFlags.SAMPLED,
+    traceId: '00000000000000000000000000000001',
+  },
+} as const;
 
 describe('Logs', () => {
   let resource_1: Resource;
@@ -164,11 +187,23 @@ describe('Logs', () => {
   // using `resource_2`, `scope_1`, `log_fragment_1`
   let log_2_1_1: ReadableLogRecord;
 
+  function createReadableLogRecord(
+    resource: Resource,
+    scope: InstrumentationScope,
+    logFragment: Omit<ReadableLogRecord, 'resource' | 'instrumentationScope'>
+  ): ReadableLogRecord {
+    return {
+      ...logFragment,
+      resource: resource,
+      instrumentationScope: scope,
+    } as ReadableLogRecord;
+  }
+
   beforeEach(() => {
-    resource_1 = new Resource({
+    resource_1 = resourceFromAttributes({
       'resource-attribute': 'some attribute value',
     });
-    resource_2 = new Resource({
+    resource_2 = resourceFromAttributes({
       'resource-attribute': 'another attribute value',
     });
     scope_1 = {
@@ -179,22 +214,8 @@ describe('Logs', () => {
     scope_2 = {
       name: 'scope_name_2',
     };
-    const log_fragment_1 = {
-      hrTime: [1680253513, 123241635] as HrTime,
-      hrTimeObserved: [1683526948, 965142784] as HrTime,
-      attributes: {
-        'some-attribute': 'some attribute value',
-      },
-      droppedAttributesCount: 0,
-      severityNumber: SeverityNumber.ERROR,
-      severityText: 'error',
-      body: 'some_log_body',
-      spanContext: {
-        spanId: '0000000000000002',
-        traceFlags: TraceFlags.SAMPLED,
-        traceId: '00000000000000000000000000000001',
-      },
-    };
+
+    const log_fragment_1 = DEFAULT_LOG_FRAGMENT;
     const log_fragment_2 = {
       hrTime: [1680253797, 687038506] as HrTime,
       hrTimeObserved: [1680253797, 687038506] as HrTime,
@@ -203,26 +224,11 @@ describe('Logs', () => {
       },
       droppedAttributesCount: 0,
     };
-    log_1_1_1 = {
-      ...log_fragment_1,
-      resource: resource_1,
-      instrumentationScope: scope_1,
-    };
-    log_1_1_2 = {
-      ...log_fragment_2,
-      resource: resource_1,
-      instrumentationScope: scope_1,
-    };
-    log_1_2_1 = {
-      ...log_fragment_1,
-      resource: resource_1,
-      instrumentationScope: scope_2,
-    };
-    log_2_1_1 = {
-      ...log_fragment_1,
-      resource: resource_2,
-      instrumentationScope: scope_1,
-    };
+
+    log_1_1_1 = createReadableLogRecord(resource_1, scope_1, log_fragment_1);
+    log_1_1_2 = createReadableLogRecord(resource_1, scope_1, log_fragment_2);
+    log_1_2_1 = createReadableLogRecord(resource_1, scope_2, log_fragment_1);
+    log_2_1_1 = createReadableLogRecord(resource_2, scope_1, log_fragment_1);
   });
 
   describe('createExportLogsServiceRequest', () => {
@@ -289,6 +295,30 @@ describe('Logs', () => {
       assert.ok(exportRequest);
       assert.strictEqual(exportRequest.resourceLogs?.length, 2);
     });
+
+    it('supports schema URL on resource', () => {
+      const resourceWithSchema = resourceFromAttributes(
+        {},
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
+      );
+
+      const logWithSchema = createReadableLogRecord(
+        resourceWithSchema,
+        scope_1,
+        DEFAULT_LOG_FRAGMENT
+      );
+
+      const exportRequest = createExportLogsServiceRequest([logWithSchema], {
+        useHex: true,
+      });
+
+      assert.ok(exportRequest);
+      assert.strictEqual(exportRequest.resourceLogs?.length, 1);
+      assert.strictEqual(
+        exportRequest.resourceLogs?.[0].schemaUrl,
+        'https://opentelemetry.test/schemas/1.2.3'
+      );
+    });
   });
 
   describe('ProtobufLogsSerializer', function () {
@@ -343,6 +373,12 @@ describe('Logs', () => {
         1
       );
     });
+
+    it('does not throw when deserializing an empty response', () => {
+      assert.doesNotThrow(() =>
+        ProtobufLogsSerializer.deserializeResponse(new Uint8Array([]))
+      );
+    });
   });
 
   describe('JsonLogsSerializer', function () {
@@ -380,6 +416,12 @@ describe('Logs', () => {
       assert.equal(
         Number(deserializedResponse.partialSuccess.rejectedLogRecords),
         1
+      );
+    });
+
+    it('does not throw when deserializing an empty response', () => {
+      assert.doesNotThrow(() =>
+        JsonLogsSerializer.deserializeResponse(new Uint8Array([]))
       );
     });
   });

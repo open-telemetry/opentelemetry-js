@@ -16,14 +16,12 @@
 import { diag } from '@opentelemetry/api';
 import type * as logsAPI from '@opentelemetry/api-logs';
 import { NOOP_LOGGER } from '@opentelemetry/api-logs';
-import { Resource } from '@opentelemetry/resources';
+import { defaultResource } from '@opentelemetry/resources';
 import { BindOnceFuture, merge } from '@opentelemetry/core';
 
 import type { LoggerProviderConfig } from './types';
-import type { LogRecordProcessor } from './LogRecordProcessor';
 import { Logger } from './Logger';
 import { loadDefaultConfig, reconfigureLimits } from './config';
-import { MultiLogRecordProcessor } from './MultiLogRecordProcessor';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 
 export const DEFAULT_LOGGER_NAME = 'unknown';
@@ -34,13 +32,12 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
 
   constructor(config: LoggerProviderConfig = {}) {
     const mergedConfig = merge({}, loadDefaultConfig(), config);
-    const resource = Resource.default().merge(
-      mergedConfig.resource ?? Resource.empty()
-    );
+    const resource = config.resource ?? defaultResource();
     this._sharedState = new LoggerProviderSharedState(
       resource,
       mergedConfig.forceFlushTimeoutMillis,
-      reconfigureLimits(mergedConfig.logRecordLimits)
+      reconfigureLimits(mergedConfig.logRecordLimits),
+      config?.processors ?? []
     );
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
   }
@@ -74,30 +71,6 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
     }
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this._sharedState.loggers.get(key)!;
-  }
-
-  /**
-   * Adds a new {@link LogRecordProcessor} to this logger.
-   * @param processor the new LogRecordProcessor to be added.
-   */
-  public addLogRecordProcessor(processor: LogRecordProcessor) {
-    if (this._sharedState.registeredLogRecordProcessors.length === 0) {
-      // since we might have enabled by default a batchProcessor, we disable it
-      // before adding the new one
-      this._sharedState.activeProcessor
-        .shutdown()
-        .catch(err =>
-          diag.error(
-            'Error while trying to shutdown current log record processor',
-            err
-          )
-        );
-    }
-    this._sharedState.registeredLogRecordProcessors.push(processor);
-    this._sharedState.activeProcessor = new MultiLogRecordProcessor(
-      this._sharedState.registeredLogRecordProcessors,
-      this._sharedState.forceFlushTimeoutMillis
-    );
   }
 
   /**

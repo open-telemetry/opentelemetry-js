@@ -27,8 +27,9 @@ import {
 } from '@opentelemetry/sdk-trace-web';
 import { ZoneContextManager } from '@opentelemetry/context-zone-peer-dep';
 
-const providerWithZone = new WebTracerProvider();
-providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+const providerWithZone = new WebTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
+});
 providerWithZone.register({
   contextManager: new ZoneContextManager()
 });

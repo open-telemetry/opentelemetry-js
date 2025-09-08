@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+/**
+ * @since 1.0.0
+ */
 export type DiagLogFunction = (message: string, ...args: unknown[]) => void;
 
 /**
@@ -23,6 +26,8 @@ export type DiagLogFunction = (message: string, ...args: unknown[]) => void;
  * - a No-Op {@link createNoopDiagLogger}
  * - a {@link DiagLogLevel} filtering wrapper {@link createLogLevelDiagLogger}
  * - a general Console {@link DiagConsoleLogger} version.
+ *
+ * @since 1.0.0
  */
 export interface DiagLogger {
   /** Log an error scenario that was not expected and caused the requested operation to fail. */
@@ -92,11 +97,16 @@ export enum DiagLogLevel {
 
 /**
  * Defines options for ComponentLogger
+ *
+ * @since 1.0.0
  */
 export interface ComponentLoggerOptions {
   namespace: string;
 }
 
+/**
+ * @since 1.4.1
+ */
 export interface DiagLoggerOptions {
   /**
    * The {@link DiagLogLevel} used to filter logs sent to the logger.

@@ -8,6 +8,9 @@ This module provides *automated instrumentation and tracing* for Node.js applica
 For manual instrumentation see the
 [@opentelemetry/sdk-trace-base](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base) package.
 
+**Note: Much of OpenTelemetry JS documentation is written assuming the compiled application is run as CommonJS.**
+For more details on ECMAScript Modules vs CommonJS, refer to [esm-support](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-support.md).
+
 ## How auto instrumentation works
 
 This package exposes a `NodeTracerProvider`.

@@ -29,7 +29,7 @@ export interface MetricCollectOptions {
 }
 
 /**
- * This is a public interface that represent an export state of a MetricReader.
+ * This is a public interface that represent an export state of a IMetricReader.
  */
 export interface MetricProducer {
   /**

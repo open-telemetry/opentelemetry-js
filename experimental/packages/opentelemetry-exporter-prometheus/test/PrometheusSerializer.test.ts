@@ -15,19 +15,14 @@
  */
 
 import * as assert from 'assert';
-import { MetricAttributes, UpDownCounter } from '@opentelemetry/api';
+import { Attributes, UpDownCounter } from '@opentelemetry/api';
 import {
-  Aggregation,
   AggregationTemporality,
   DataPoint,
   DataPointType,
-  ExplicitBucketHistogramAggregation,
   Histogram,
-  LastValueAggregation,
   MeterProvider,
   MetricReader,
-  SumAggregation,
-  View,
 } from '@opentelemetry/sdk-metrics';
 import * as sinon from 'sinon';
 import { PrometheusSerializer } from '../src';
@@ -39,24 +34,29 @@ import {
   sdkVersion,
   serviceName,
 } from './util';
-import { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
+import { AggregationType } from '@opentelemetry/sdk-metrics';
 
 const attributes = {
   foo1: 'bar1',
   foo2: 'bar2',
 };
 
+const resourceAttributes = `service_name="${serviceName}",telemetry_sdk_language="${sdkLanguage}",telemetry_sdk_name="${sdkName}",telemetry_sdk_version="${sdkVersion}"`;
+
 const serializedDefaultResource =
   '# HELP target_info Target metadata\n' +
   '# TYPE target_info gauge\n' +
-  `target_info{service_name="${serviceName}",telemetry_sdk_language="${sdkLanguage}",telemetry_sdk_name="${sdkName}",telemetry_sdk_version="${sdkVersion}"} 1\n`;
+  `target_info{${resourceAttributes}} 1\n`;
 
 class TestMetricReader extends MetricReader {
   constructor() {
     super({
       aggregationTemporalitySelector: _instrumentType =>
         AggregationTemporality.CUMULATIVE,
-      aggregationSelector: _instrumentType => Aggregation.Default(),
+      aggregationSelector: _instrumentType => {
+        return { type: AggregationType.DEFAULT };
+      },
     });
   }
 
@@ -76,7 +76,7 @@ describe('PrometheusSerializer', () => {
   describe('constructor', () => {
     it('should construct a serializer', () => {
       const serializer = new PrometheusSerializer();
-      assert(serializer instanceof PrometheusSerializer);
+      assert.ok(serializer instanceof PrometheusSerializer);
     });
   });
 
@@ -86,10 +86,10 @@ describe('PrometheusSerializer', () => {
         const reader = new TestMetricReader();
         const meterProvider = new MeterProvider({
           views: [
-            new View({
-              aggregation: new SumAggregation(),
+            {
+              aggregation: { type: AggregationType.SUM },
               instrumentName: '*',
-            }),
+            },
           ],
           readers: [reader],
         });
@@ -106,10 +106,14 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(metric.dataPointType, DataPointType.SUM);
         const pointData = metric.dataPoints as DataPoint<number>[];
         assert.strictEqual(pointData.length, 1);
+        const resourceAttributes = resourceMetrics.resource.attributes;
+        serializer['_additionalAttributes'] = serializer[
+          '_filterResourceConstantLabels'
+        ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
         const result = serializer['_serializeSingularDataPoint'](
           metric.descriptor.name,
-          metric.descriptor.type,
+          metric,
           pointData[0]
         );
         return result;
@@ -136,10 +140,15 @@ describe('PrometheusSerializer', () => {
         const reader = new TestMetricReader();
         const meterProvider = new MeterProvider({
           views: [
-            new View({
-              aggregation: new ExplicitBucketHistogramAggregation([1, 10, 100]),
+            {
+              aggregation: {
+                type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+                options: {
+                  boundaries: [1, 10, 100],
+                },
+              },
               instrumentName: '*',
-            }),
+            },
           ],
           readers: [reader],
         });
@@ -156,10 +165,14 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(metric.dataPointType, DataPointType.HISTOGRAM);
         const pointData = metric.dataPoints as DataPoint<Histogram>[];
         assert.strictEqual(pointData.length, 1);
+        const resourceAttributes = resourceMetrics.resource.attributes;
+        serializer['_additionalAttributes'] = serializer[
+          '_filterResourceConstantLabels'
+        ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
         const result = serializer['_serializeHistogramDataPoint'](
           metric.descriptor.name,
-          metric.descriptor.type,
+          metric,
           pointData[0]
         );
         return result;
@@ -192,6 +205,20 @@ describe('PrometheusSerializer', () => {
             `test_bucket{foo1="bar1",foo2="bar2",le="+Inf"} 1 ${mockedHrTimeMs}\n`
         );
       });
+
+      it('serialize metric record with sum aggregator with timestamp and all resource attributes', async () => {
+        const serializer = new PrometheusSerializer(undefined, true, /.*/);
+        const result = await testSerializer(serializer);
+        assert.strictEqual(
+          result,
+          `test_count{foo1="bar1",foo2="bar2",${resourceAttributes}} 1 ${mockedHrTimeMs}\n` +
+            `test_sum{foo1="bar1",foo2="bar2",${resourceAttributes}} 5 ${mockedHrTimeMs}\n` +
+            `test_bucket{foo1="bar1",foo2="bar2",${resourceAttributes},le="1"} 0 ${mockedHrTimeMs}\n` +
+            `test_bucket{foo1="bar1",foo2="bar2",${resourceAttributes},le="10"} 1 ${mockedHrTimeMs}\n` +
+            `test_bucket{foo1="bar1",foo2="bar2",${resourceAttributes},le="100"} 1 ${mockedHrTimeMs}\n` +
+            `test_bucket{foo1="bar1",foo2="bar2",${resourceAttributes},le="+Inf"} 1 ${mockedHrTimeMs}\n`
+        );
+      });
     });
   });
 
@@ -201,10 +228,10 @@ describe('PrometheusSerializer', () => {
         const reader = new TestMetricReader();
         const meterProvider = new MeterProvider({
           views: [
-            new View({
-              aggregation: new SumAggregation(),
+            {
+              aggregation: { type: AggregationType.SUM },
               instrumentName: '*',
-            }),
+            },
           ],
           readers: [reader],
         });
@@ -221,6 +248,10 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
         const scopeMetrics = resourceMetrics.scopeMetrics[0];
+        const resourceAttributes = resourceMetrics.resource.attributes;
+        serializer['_additionalAttributes'] = serializer[
+          '_filterResourceConstantLabels'
+        ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
         const result = serializer['_serializeScopeMetrics'](scopeMetrics);
         return result;
@@ -249,6 +280,18 @@ describe('PrometheusSerializer', () => {
             `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
         );
       });
+
+      it('should serialize metric record with timestamp and all resource attributes', async () => {
+        const serializer = new PrometheusSerializer(undefined, true, /.*/);
+        const result = await testSerializer(serializer);
+        assert.strictEqual(
+          result,
+          '# HELP test_total foobar\n' +
+            '# TYPE test_total counter\n' +
+            `test_total{val="1",${resourceAttributes}} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2",${resourceAttributes}} 1 ${mockedHrTimeMs}\n`
+        );
+      });
     });
 
     describe('non-monotonic Sum', () => {
@@ -256,10 +299,10 @@ describe('PrometheusSerializer', () => {
         const reader = new TestMetricReader();
         const meterProvider = new MeterProvider({
           views: [
-            new View({
-              aggregation: new SumAggregation(),
+            {
+              aggregation: { type: AggregationType.SUM },
               instrumentName: '*',
-            }),
+            },
           ],
           readers: [reader],
         });
@@ -276,6 +319,10 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
         const scopeMetrics = resourceMetrics.scopeMetrics[0];
+        const resourceAttributes = resourceMetrics.resource.attributes;
+        serializer['_additionalAttributes'] = serializer[
+          '_filterResourceConstantLabels'
+        ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
         return serializer['_serializeScopeMetrics'](scopeMetrics);
       }
@@ -301,6 +348,19 @@ describe('PrometheusSerializer', () => {
             '# TYPE test_total gauge\n' +
             `test_total{val="1"} 1 ${mockedHrTimeMs}\n` +
             `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
+        );
+      });
+
+      it('serialize metric record with timestamp and all resource attributes', async () => {
+        const serializer = new PrometheusSerializer(undefined, true, /.*/);
+
+        const result = await testSerializer(serializer);
+        assert.strictEqual(
+          result,
+          '# HELP test_total foobar\n' +
+            '# TYPE test_total gauge\n' +
+            `test_total{val="1",${resourceAttributes}} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2",${resourceAttributes}} 1 ${mockedHrTimeMs}\n`
         );
       });
     });
@@ -310,10 +370,12 @@ describe('PrometheusSerializer', () => {
         const reader = new TestMetricReader();
         const meterProvider = new MeterProvider({
           views: [
-            new View({
-              aggregation: new LastValueAggregation(),
+            {
+              aggregation: {
+                type: AggregationType.LAST_VALUE,
+              },
               instrumentName: '*',
-            }),
+            },
           ],
           readers: [reader],
         });
@@ -330,6 +392,10 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
         const scopeMetrics = resourceMetrics.scopeMetrics[0];
+        const resourceAttributes = resourceMetrics.resource.attributes;
+        serializer['_additionalAttributes'] = serializer[
+          '_filterResourceConstantLabels'
+        ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
         return serializer['_serializeScopeMetrics'](scopeMetrics);
       }
@@ -357,6 +423,18 @@ describe('PrometheusSerializer', () => {
             `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
         );
       });
+
+      it('serialize metric record with timestamp and all resource attributes', async () => {
+        const serializer = new PrometheusSerializer(undefined, true, /.*/);
+        const result = await testSerializer(serializer);
+        assert.strictEqual(
+          result,
+          '# HELP test_total foobar\n' +
+            '# TYPE test_total gauge\n' +
+            `test_total{val="1",${resourceAttributes}} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2",${resourceAttributes}} 1 ${mockedHrTimeMs}\n`
+        );
+      });
     });
 
     describe('with ExplicitBucketHistogramAggregation', () => {
@@ -364,10 +442,13 @@ describe('PrometheusSerializer', () => {
         const reader = new TestMetricReader();
         const meterProvider = new MeterProvider({
           views: [
-            new View({
-              aggregation: new ExplicitBucketHistogramAggregation([1, 10, 100]),
+            {
+              aggregation: {
+                type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+                options: { boundaries: [1, 10, 100] },
+              },
               instrumentName: '*',
-            }),
+            },
           ],
           readers: [reader],
         });
@@ -387,6 +468,10 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
         const scopeMetrics = resourceMetrics.scopeMetrics[0];
+        const resourceAttributes = resourceMetrics.resource.attributes;
+        serializer['_additionalAttributes'] = serializer[
+          '_filterResourceConstantLabels'
+        ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
         const result = serializer['_serializeScopeMetrics'](scopeMetrics);
         return result;
@@ -414,15 +499,40 @@ describe('PrometheusSerializer', () => {
         );
       });
 
+      it('serialize cumulative metric record with all resource attributes', async () => {
+        const serializer = new PrometheusSerializer('', false, /.*/);
+        const result = await testSerializer(serializer);
+        assert.strictEqual(
+          result,
+          '# HELP test foobar\n' +
+            '# TYPE test histogram\n' +
+            `test_count{val="1",${resourceAttributes}} 3\n` +
+            `test_sum{val="1",${resourceAttributes}} 175\n` +
+            `test_bucket{val="1",${resourceAttributes},le="1"} 0\n` +
+            `test_bucket{val="1",${resourceAttributes},le="10"} 1\n` +
+            `test_bucket{val="1",${resourceAttributes},le="100"} 2\n` +
+            `test_bucket{val="1",${resourceAttributes},le="+Inf"} 3\n` +
+            `test_count{val="2",${resourceAttributes}} 1\n` +
+            `test_sum{val="2",${resourceAttributes}} 5\n` +
+            `test_bucket{val="2",${resourceAttributes},le="1"} 0\n` +
+            `test_bucket{val="2",${resourceAttributes},le="10"} 1\n` +
+            `test_bucket{val="2",${resourceAttributes},le="100"} 1\n` +
+            `test_bucket{val="2",${resourceAttributes},le="+Inf"} 1\n`
+        );
+      });
+
       it('serialize cumulative metric record on instrument that allows negative values', async () => {
         const serializer = new PrometheusSerializer();
         const reader = new TestMetricReader();
         const meterProvider = new MeterProvider({
           views: [
-            new View({
-              aggregation: new ExplicitBucketHistogramAggregation([1, 10, 100]),
+            {
+              aggregation: {
+                type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+                options: { boundaries: [1, 10, 100] },
+              },
               instrumentName: '*',
-            }),
+            },
           ],
           readers: [reader],
         });
@@ -442,6 +552,10 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
         const scopeMetrics = resourceMetrics.scopeMetrics[0];
+        const resourceAttributes = resourceMetrics.resource.attributes;
+        serializer['_additionalAttributes'] = serializer[
+          '_filterResourceConstantLabels'
+        ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
         const result = serializer['_serializeScopeMetrics'](scopeMetrics);
         assert.strictEqual(
@@ -472,7 +586,10 @@ describe('PrometheusSerializer', () => {
       const reader = new TestMetricReader();
       const meterProvider = new MeterProvider({
         views: [
-          new View({ aggregation: new SumAggregation(), instrumentName: '*' }),
+          {
+            aggregation: { type: AggregationType.SUM },
+            instrumentName: '*',
+          },
         ],
         readers: [reader],
       });
@@ -490,6 +607,10 @@ describe('PrometheusSerializer', () => {
       assert.strictEqual(metric.dataPointType, DataPointType.SUM);
       const pointData = metric.dataPoints as DataPoint<number>[];
       assert.strictEqual(pointData.length, 1);
+      const resourceAttributes = resourceMetrics.resource.attributes;
+      serializer['_additionalAttributes'] = serializer[
+        '_filterResourceConstantLabels'
+      ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
       if (exportAll) {
         const result = serializer.serialize(resourceMetrics);
@@ -497,7 +618,7 @@ describe('PrometheusSerializer', () => {
       } else {
         const result = serializer['_serializeSingularDataPoint'](
           metric.descriptor.name,
-          metric.descriptor.type,
+          metric,
           pointData[0]
         );
         return result;
@@ -561,7 +682,10 @@ describe('PrometheusSerializer', () => {
       const reader = new TestMetricReader();
       const meterProvider = new MeterProvider({
         views: [
-          new View({ aggregation: new SumAggregation(), instrumentName: '*' }),
+          {
+            aggregation: { type: AggregationType.SUM },
+            instrumentName: '*',
+          },
         ],
         readers: [reader],
       });
@@ -578,10 +702,14 @@ describe('PrometheusSerializer', () => {
       assert.strictEqual(metric.dataPointType, DataPointType.SUM);
       const pointData = metric.dataPoints as DataPoint<number>[];
       assert.strictEqual(pointData.length, 1);
+      const resourceAttributes = resourceMetrics.resource.attributes;
+      serializer['_additionalAttributes'] = serializer[
+        '_filterResourceConstantLabels'
+      ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
       const result = serializer['_serializeSingularDataPoint'](
         metric.descriptor.name,
-        metric.descriptor.type,
+        metric,
         pointData[0]
       );
       return result;
@@ -610,7 +738,7 @@ describe('PrometheusSerializer', () => {
           NaN: NaN,
           null: null,
           undefined: undefined,
-        } as unknown as MetricAttributes);
+        } as unknown as Attributes);
       });
 
       assert.strictEqual(
@@ -622,6 +750,7 @@ describe('PrometheusSerializer', () => {
     it('should serialize non-finite values', async () => {
       const serializer = new PrometheusSerializer();
       const cases = [
+        [NaN, 'NaN'],
         [-Infinity, '-Inf'],
         [+Infinity, '+Inf'],
       ] as [number, string][];
@@ -649,7 +778,7 @@ describe('PrometheusSerializer', () => {
           backslashN: '\u005c\u006e', // \n => \\n (\u005c\u005c\u006e)
           backslashDoubleQuote: '\u005c\u0022', // \" => \\\" (\u005c\u005c\u005c\u0022)
           backslashLineFeed: '\u005c\u000a', // \↵ => \\\n (\u005c\u005c\u005c\u006e)
-        } as unknown as MetricAttributes);
+        } as unknown as Attributes);
       });
 
       assert.strictEqual(
@@ -674,7 +803,7 @@ describe('PrometheusSerializer', () => {
         // error while linting: text format parsing error in line 282: expected '=' after label name, found '-'
         counter.add(1, {
           'account-id': '123456',
-        } as unknown as MetricAttributes);
+        } as unknown as Attributes);
       });
 
       assert.strictEqual(result, 'test_total{account_id="123456"} 1\n');
@@ -685,7 +814,7 @@ describe('PrometheusSerializer', () => {
     it('should serialize resource', () => {
       const serializer = new PrometheusSerializer(undefined, true);
       const result = serializer['_serializeResource'](
-        new Resource({
+        resourceFromAttributes({
           env: 'prod',
           hostname: 'myhost',
           datacenter: 'sdc',

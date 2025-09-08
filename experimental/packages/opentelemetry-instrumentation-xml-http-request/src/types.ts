@@ -39,7 +39,7 @@ export type SendBody =
   | ArrayBufferView
   | ArrayBuffer
   | FormData
-  // eslint-disable-next-line node/no-unsupported-features/node-builtins
+  // eslint-disable-next-line n/no-unsupported-features/node-builtins
   | URLSearchParams
   | ReadableStream<Uint8Array>
   | null;
@@ -63,7 +63,7 @@ export interface XhrMem {
     entries: PerformanceResourceTiming[];
   };
   // callback to remove events from xhr once the span ends
-  callbackToRemoveEvents?: Function;
+  callbackToRemoveEvents?: () => void;
 }
 
 export type PropagateTraceHeaderCorsUrl = string | RegExp;

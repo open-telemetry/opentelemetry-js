@@ -16,14 +16,10 @@
 
 const assert = require('assert');
 
-// TypeScript v4.4.4 doesn't support `node16` or `nodenext` in
-// [Module Resolution](https://www.typescriptlang.org/tsconfig#moduleResolution)
-// which is required for typescript to resolve the `package.json#exports`
-// entries.
-// Additionally, using `node16` or `nodenext` in `tsconfig.json#moduleResolution`
+// Using `node16` or `nodenext` in `tsconfig.json#moduleResolution`
 // requires the TypeScript to generate ESModule outputs. This is a breaking
 // change for CJS users.
-// So we have to use plain JavaScript to verity the `package.json#exports` here.
+// So we have to use plain JavaScript to verify the `package.json#exports` here.
 
 describe('@opentelemetry/api entries', () => {
   it('should import root entry', async () => {

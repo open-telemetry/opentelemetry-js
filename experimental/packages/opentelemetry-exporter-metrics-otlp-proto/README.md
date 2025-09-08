@@ -5,7 +5,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides a metrics-exporter for OTLP (http/protobuf) using protocol version `v0.20.0`.
+This module provides a metrics-exporter for OTLP (http/protobuf) using protocol version `v1.7.0`.
 
 ## Installation
 
@@ -28,12 +28,14 @@ const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
 };
 const metricExporter = new OTLPMetricExporter(collectorOptions);
-const meterProvider = new MeterProvider({});
-
-meterProvider.addMetricReader(new PeriodicExportingMetricReader({
-  exporter: metricExporter,
-  exportIntervalMillis: 1000,
-}));
+const meterProvider = new MeterProvider({
+  readers: [
+    new PeriodicExportingMetricReader({
+      exporter: metricExporter,
+      exportIntervalMillis: 1000,
+    }),
+  ],
+});
 
 // Now, start recording data
 const meter = meterProvider.getMeter('example-meter');

@@ -7,19 +7,22 @@ on:
   pull_request:
   merge_group:
 
+permissions:
+  contents: read
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: '16'
+          node-version: 18
 
       - name: Install and Bootstrap 🔧
         run: npm ci

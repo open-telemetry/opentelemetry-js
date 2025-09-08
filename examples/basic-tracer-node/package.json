@@ -16,7 +16,7 @@
     "tracing"
   ],
   "engines": {
-    "node": ">=14"
+    "node": "^18.19.0 || >=20.6.0"
   },
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
@@ -24,11 +24,12 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/api": "^1.0.2",
-    "@opentelemetry/exporter-jaeger": "0.25.0",
-    "@opentelemetry/resources": "0.25.0",
-    "@opentelemetry/semantic-conventions": "^1.22.0",
-    "@opentelemetry/sdk-trace-base": "0.25.0"
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/context-async-hooks": "^2.0.1",
+    "@opentelemetry/exporter-jaeger": "^2.0.1",
+    "@opentelemetry/resources": "^2.0.1",
+    "@opentelemetry/sdk-trace-base": "^2.0.1",
+    "@opentelemetry/semantic-conventions": "^1.36.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/basic-tracer-node"
 }

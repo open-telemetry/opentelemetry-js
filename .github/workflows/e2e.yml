@@ -1,0 +1,76 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  e2e-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        node_version:
+          - "18.19.0"
+          - "18"
+          - "20.6.0"
+          - "20"
+          - "22"
+          - "24"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+          node-version: ${{ matrix.node_version }}
+
+      # npm@11.0.0 drops support for Node.js v18
+      # Install the latest npm compatible with this version of Node.js
+      # - npm@11.1.0 supports: {"node":"^20.17.0 || >=22.9.0"}
+      - run: npm install -g npm@"<11.0.0"
+        if: ${{
+          matrix.node_version == '18.19.0' ||
+          matrix.node_version == '18' ||
+          matrix.node_version == '20.6.0'
+          }}
+      - run: npm install -g npm@latest
+        if: ${{
+          matrix.node_version == '20' ||
+          matrix.node_version == '22' ||
+          matrix.node_version == '24'
+          }}
+
+      - name: Bootstrap
+        run: npm ci
+
+      - name: Build 🔧
+        run: npm run compile
+
+      - name: Install collector
+        run: |
+          curl -sSL -o otelcol-contrib.tar.gz https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.126.0/otelcol-contrib_0.126.0_linux_amd64.tar.gz
+          tar -xzf otelcol-contrib.tar.gz
+        working-directory: e2e-tests
+      - name: run collector in background
+        run: |
+          ./otelcol-contrib --config collector-config.yaml &
+        working-directory: e2e-tests
+      - name: Export telemetry to collector
+        run: npm run export-telemetry
+        working-directory: e2e-tests
+      - name: stop collector
+        run: pkill -f otelcol-contrib
+        working-directory: e2e-tests
+      - name: Print output
+        run: cat collector-output.json
+        working-directory: e2e-tests
+      - name: verify exported telemetry
+        run: npm run verify
+        working-directory: e2e-tests

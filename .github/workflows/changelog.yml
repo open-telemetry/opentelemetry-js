@@ -1,4 +1,4 @@
-# This action requires that any PR targeting the main branch should touch at
+# This action requires that any PR targeting the main and next branch should touch at
 # least one CHANGELOG file. If a CHANGELOG entry is not required, add the "Skip
 # Changelog" label to disable this action.
 
@@ -9,13 +9,16 @@ on:
     types: [opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - main
+      - next
+permissions:
+  contents: read
 jobs:
   changelog:
     runs-on: ubuntu-latest
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'dependencies') && !contains(github.event.pull_request.labels.*.name, 'Skip Changelog')}}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Check for CHANGELOG changes
         run: |

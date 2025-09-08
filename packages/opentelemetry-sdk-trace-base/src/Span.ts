@@ -21,8 +21,8 @@ import {
   HrTime,
   Link,
   Span as APISpan,
-  SpanAttributes,
-  SpanAttributeValue,
+  Attributes,
+  AttributeValue,
   SpanContext,
   SpanKind,
   SpanStatus,
@@ -35,41 +35,61 @@ import {
   getTimeOrigin,
   hrTime,
   hrTimeDuration,
-  InstrumentationLibrary,
+  InstrumentationScope,
   isAttributeValue,
   isTimeInput,
   isTimeInputHrTime,
   otperformance,
   sanitizeAttributes,
 } from '@opentelemetry/core';
-import { IResource } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 import {
-  SEMATTRS_EXCEPTION_MESSAGE,
-  SEMATTRS_EXCEPTION_STACKTRACE,
-  SEMATTRS_EXCEPTION_TYPE,
+  ATTR_EXCEPTION_MESSAGE,
+  ATTR_EXCEPTION_STACKTRACE,
+  ATTR_EXCEPTION_TYPE,
 } from '@opentelemetry/semantic-conventions';
-import { ExceptionEventName } from './enums';
 import { ReadableSpan } from './export/ReadableSpan';
+import { ExceptionEventName } from './enums';
 import { SpanProcessor } from './SpanProcessor';
 import { TimedEvent } from './TimedEvent';
-import { Tracer } from './Tracer';
 import { SpanLimits } from './types';
+
+/**
+ * This type provides the properties of @link{ReadableSpan} at the same time
+ * of the Span API
+ */
+export type Span = APISpan & ReadableSpan;
+
+interface SpanOptions {
+  resource: Resource;
+  scope: InstrumentationScope;
+  context: Context;
+  spanContext: SpanContext;
+  name: string;
+  kind: SpanKind;
+  parentSpanContext?: SpanContext;
+  links?: Link[];
+  startTime?: TimeInput;
+  attributes?: Attributes;
+  spanLimits: SpanLimits;
+  spanProcessor: SpanProcessor;
+}
 
 /**
  * This class represents a span.
  */
-export class Span implements APISpan, ReadableSpan {
+export class SpanImpl implements Span {
   // Below properties are included to implement ReadableSpan for export
   // purposes but are not intended to be written-to directly.
   private readonly _spanContext: SpanContext;
   readonly kind: SpanKind;
-  readonly parentSpanId?: string;
-  readonly attributes: SpanAttributes = {};
+  readonly parentSpanContext?: SpanContext;
+  readonly attributes: Attributes = {};
   readonly links: Link[] = [];
   readonly events: TimedEvent[] = [];
   readonly startTime: HrTime;
-  readonly resource: IResource;
-  readonly instrumentationLibrary: InstrumentationLibrary;
+  readonly resource: Resource;
+  readonly instrumentationScope: InstrumentationScope;
 
   private _droppedAttributesCount = 0;
   private _droppedEventsCount: number = 0;
@@ -91,55 +111,41 @@ export class Span implements APISpan, ReadableSpan {
   private readonly _startTimeProvided: boolean;
 
   /**
-   * Constructs a new Span instance.
-   *
-   * @deprecated calling Span constructor directly is not supported. Please use tracer.startSpan.
-   * */
-  constructor(
-    parentTracer: Tracer,
-    context: Context,
-    spanName: string,
-    spanContext: SpanContext,
-    kind: SpanKind,
-    parentSpanId?: string,
-    links: Link[] = [],
-    startTime?: TimeInput,
-    _deprecatedClock?: unknown, // keeping this argument even though it is unused to ensure backwards compatibility
-    attributes?: SpanAttributes
-  ) {
-    this.name = spanName;
-    this._spanContext = spanContext;
-    this.parentSpanId = parentSpanId;
-    this.kind = kind;
-    this.links = links;
-
+   * Constructs a new SpanImpl instance.
+   */
+  constructor(opts: SpanOptions) {
     const now = Date.now();
+
+    this._spanContext = opts.spanContext;
     this._performanceStartTime = otperformance.now();
     this._performanceOffset =
       now - (this._performanceStartTime + getTimeOrigin());
-    this._startTimeProvided = startTime != null;
-
-    this.startTime = this._getTime(startTime ?? now);
-
-    this.resource = parentTracer.resource;
-    this.instrumentationLibrary = parentTracer.instrumentationLibrary;
-    this._spanLimits = parentTracer.getSpanLimits();
+    this._startTimeProvided = opts.startTime != null;
+    this._spanLimits = opts.spanLimits;
     this._attributeValueLengthLimit =
       this._spanLimits.attributeValueLengthLimit || 0;
+    this._spanProcessor = opts.spanProcessor;
 
-    if (attributes != null) {
-      this.setAttributes(attributes);
+    this.name = opts.name;
+    this.parentSpanContext = opts.parentSpanContext;
+    this.kind = opts.kind;
+    this.links = opts.links || [];
+    this.startTime = this._getTime(opts.startTime ?? now);
+    this.resource = opts.resource;
+    this.instrumentationScope = opts.scope;
+
+    if (opts.attributes != null) {
+      this.setAttributes(opts.attributes);
     }
 
-    this._spanProcessor = parentTracer.getActiveSpanProcessor();
-    this._spanProcessor.onStart(this, context);
+    this._spanProcessor.onStart(this, opts.context);
   }
 
   spanContext(): SpanContext {
     return this._spanContext;
   }
 
-  setAttribute(key: string, value?: SpanAttributeValue): this;
+  setAttribute(key: string, value?: AttributeValue): this;
   setAttribute(key: string, value: unknown): this {
     if (value == null || this._isSpanEnded()) return this;
     if (key.length === 0) {
@@ -151,9 +157,11 @@ export class Span implements APISpan, ReadableSpan {
       return this;
     }
 
+    const { attributeCountLimit } = this._spanLimits;
+
     if (
-      Object.keys(this.attributes).length >=
-        this._spanLimits.attributeCountLimit! &&
+      attributeCountLimit !== undefined &&
+      Object.keys(this.attributes).length >= attributeCountLimit &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
       this._droppedAttributesCount++;
@@ -163,7 +171,7 @@ export class Span implements APISpan, ReadableSpan {
     return this;
   }
 
-  setAttributes(attributes: SpanAttributes): this {
+  setAttributes(attributes: Attributes): this {
     for (const [k, v] of Object.entries(attributes)) {
       this.setAttribute(k, v);
     }
@@ -179,16 +187,23 @@ export class Span implements APISpan, ReadableSpan {
    */
   addEvent(
     name: string,
-    attributesOrStartTime?: SpanAttributes | TimeInput,
+    attributesOrStartTime?: Attributes | TimeInput,
     timeStamp?: TimeInput
   ): this {
     if (this._isSpanEnded()) return this;
-    if (this._spanLimits.eventCountLimit === 0) {
+
+    const { eventCountLimit } = this._spanLimits;
+
+    if (eventCountLimit === 0) {
       diag.warn('No events allowed.');
       this._droppedEventsCount++;
       return this;
     }
-    if (this.events.length >= this._spanLimits.eventCountLimit!) {
+
+    if (
+      eventCountLimit !== undefined &&
+      this.events.length >= eventCountLimit
+    ) {
       if (this._droppedEventsCount === 0) {
         diag.debug('Dropping extra events.');
       }
@@ -226,7 +241,19 @@ export class Span implements APISpan, ReadableSpan {
 
   setStatus(status: SpanStatus): this {
     if (this._isSpanEnded()) return this;
-    this.status = status;
+    this.status = { ...status };
+
+    // When using try-catch, the caught "error" is of type `any`. When then assigning `any` to `status.message`,
+    // TypeScript will not error. While this can happen during use of any API, it is more common on Span#setStatus()
+    // as it's likely used in a catch-block. Therefore, we validate if `status.message` is actually a string, null, or
+    // undefined to avoid an incorrect type causing issues downstream.
+    if (this.status.message != null && typeof status.message !== 'string') {
+      diag.warn(
+        `Dropping invalid status.message of type '${typeof status.message}', expected 'string'`
+      );
+      delete this.status.message;
+    }
+
     return this;
   }
 
@@ -268,7 +295,7 @@ export class Span implements APISpan, ReadableSpan {
   }
 
   private _getTime(inp?: TimeInput): HrTime {
-    if (typeof inp === 'number' && inp < otperformance.now()) {
+    if (typeof inp === 'number' && inp <= otperformance.now()) {
       // must be a performance timestamp
       // apply correction and convert to hrtime
       return hrTime(inp + this._performanceOffset);
@@ -301,28 +328,25 @@ export class Span implements APISpan, ReadableSpan {
   }
 
   recordException(exception: Exception, time?: TimeInput): void {
-    const attributes: SpanAttributes = {};
+    const attributes: Attributes = {};
     if (typeof exception === 'string') {
-      attributes[SEMATTRS_EXCEPTION_MESSAGE] = exception;
+      attributes[ATTR_EXCEPTION_MESSAGE] = exception;
     } else if (exception) {
       if (exception.code) {
-        attributes[SEMATTRS_EXCEPTION_TYPE] = exception.code.toString();
+        attributes[ATTR_EXCEPTION_TYPE] = exception.code.toString();
       } else if (exception.name) {
-        attributes[SEMATTRS_EXCEPTION_TYPE] = exception.name;
+        attributes[ATTR_EXCEPTION_TYPE] = exception.name;
       }
       if (exception.message) {
-        attributes[SEMATTRS_EXCEPTION_MESSAGE] = exception.message;
+        attributes[ATTR_EXCEPTION_MESSAGE] = exception.message;
       }
       if (exception.stack) {
-        attributes[SEMATTRS_EXCEPTION_STACKTRACE] = exception.stack;
+        attributes[ATTR_EXCEPTION_STACKTRACE] = exception.stack;
       }
     }
 
     // these are minimum requirements from spec
-    if (
-      attributes[SEMATTRS_EXCEPTION_TYPE] ||
-      attributes[SEMATTRS_EXCEPTION_MESSAGE]
-    ) {
+    if (attributes[ATTR_EXCEPTION_TYPE] || attributes[ATTR_EXCEPTION_MESSAGE]) {
       this.addEvent(ExceptionEventName, attributes, time);
     } else {
       diag.warn(`Failed to record an exception ${exception}`);
@@ -351,8 +375,13 @@ export class Span implements APISpan, ReadableSpan {
 
   private _isSpanEnded(): boolean {
     if (this._ended) {
+      const error = new Error(
+        `Operation attempted on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`
+      );
+
       diag.warn(
-        `Can not execute the operation on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`
+        `Cannot execute the operation on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`,
+        error
       );
     }
     return this._ended;
@@ -365,7 +394,7 @@ export class Span implements APISpan, ReadableSpan {
     if (value.length <= limit) {
       return value;
     }
-    return value.substr(0, limit);
+    return value.substring(0, limit);
   }
 
   /**
@@ -380,7 +409,7 @@ export class Span implements APISpan, ReadableSpan {
    * @param value Attribute value
    * @returns truncated attribute value if required, otherwise same value
    */
-  private _truncateToSize(value: SpanAttributeValue): SpanAttributeValue {
+  private _truncateToSize(value: AttributeValue): AttributeValue {
     const limit = this._attributeValueLengthLimit;
     // Check limit
     if (limit <= 0) {

@@ -16,57 +16,62 @@
 
 import { SDK_INFO } from '@opentelemetry/core';
 import {
-  SEMRESATTRS_CLOUD_ACCOUNT_ID,
-  SEMRESATTRS_CLOUD_AVAILABILITY_ZONE,
-  SEMRESATTRS_CLOUD_PROVIDER,
-  SEMRESATTRS_CLOUD_REGION,
-  SEMRESATTRS_CONTAINER_ID,
-  SEMRESATTRS_CONTAINER_IMAGE_NAME,
-  SEMRESATTRS_CONTAINER_IMAGE_TAG,
-  SEMRESATTRS_CONTAINER_NAME,
-  SEMRESATTRS_HOST_ID,
-  SEMRESATTRS_HOST_IMAGE_ID,
-  SEMRESATTRS_HOST_IMAGE_NAME,
-  SEMRESATTRS_HOST_IMAGE_VERSION,
-  SEMRESATTRS_HOST_NAME,
-  SEMRESATTRS_HOST_TYPE,
-  SEMRESATTRS_K8S_CLUSTER_NAME,
-  SEMRESATTRS_K8S_DEPLOYMENT_NAME,
-  SEMRESATTRS_K8S_NAMESPACE_NAME,
-  SEMRESATTRS_K8S_POD_NAME,
-  SEMRESATTRS_SERVICE_INSTANCE_ID,
-  SEMRESATTRS_SERVICE_NAME,
-  SEMRESATTRS_SERVICE_NAMESPACE,
-  SEMRESATTRS_SERVICE_VERSION,
-  SEMRESATTRS_TELEMETRY_SDK_LANGUAGE,
-  SEMRESATTRS_TELEMETRY_SDK_NAME,
-  SEMRESATTRS_TELEMETRY_SDK_VERSION,
+  ATTR_SERVICE_NAME,
+  ATTR_SERVICE_VERSION,
+  ATTR_TELEMETRY_SDK_LANGUAGE,
+  ATTR_TELEMETRY_SDK_NAME,
+  ATTR_TELEMETRY_SDK_VERSION,
 } from '@opentelemetry/semantic-conventions';
-import { Resource } from '../src/Resource';
+import {
+  ATTR_CLOUD_ACCOUNT_ID,
+  ATTR_CLOUD_AVAILABILITY_ZONE,
+  ATTR_CLOUD_PROVIDER,
+  ATTR_CLOUD_REGION,
+  ATTR_CONTAINER_ID,
+  ATTR_CONTAINER_IMAGE_NAME,
+  ATTR_CONTAINER_IMAGE_TAGS,
+  ATTR_CONTAINER_NAME,
+  ATTR_HOST_ID,
+  ATTR_HOST_IMAGE_ID,
+  ATTR_HOST_IMAGE_NAME,
+  ATTR_HOST_IMAGE_VERSION,
+  ATTR_HOST_NAME,
+  ATTR_HOST_TYPE,
+  ATTR_K8S_CLUSTER_NAME,
+  ATTR_K8S_DEPLOYMENT_NAME,
+  ATTR_K8S_NAMESPACE_NAME,
+  ATTR_K8S_POD_NAME,
+  ATTR_SERVICE_INSTANCE_ID,
+  ATTR_SERVICE_NAMESPACE,
+} from '../src/semconv';
 import {
   assertCloudResource,
   assertContainerResource,
   assertHostResource,
   assertK8sResource,
-  assertTelemetrySDKResource,
   assertServiceResource,
+  assertTelemetrySDKResource,
 } from './util/resource-assertions';
 
 describe('assertCloudResource', () => {
   it('requires one cloud label', () => {
-    const resource = new Resource({
-      [SEMRESATTRS_CLOUD_PROVIDER]: 'gcp',
-    });
+    const resource = {
+      attributes: {
+        [ATTR_CLOUD_PROVIDER]: 'gcp',
+      },
+    };
     assertCloudResource(resource, {});
   });
 
   it('validates optional attributes', () => {
-    const resource = new Resource({
-      [SEMRESATTRS_CLOUD_PROVIDER]: 'gcp',
-      [SEMRESATTRS_CLOUD_ACCOUNT_ID]: 'opentelemetry',
-      [SEMRESATTRS_CLOUD_REGION]: 'us-central1',
-      [SEMRESATTRS_CLOUD_AVAILABILITY_ZONE]: 'us-central1-a',
-    });
+    const resource = {
+      attributes: {
+        [ATTR_CLOUD_PROVIDER]: 'gcp',
+        [ATTR_CLOUD_ACCOUNT_ID]: 'opentelemetry',
+        [ATTR_CLOUD_REGION]: 'us-central1',
+        [ATTR_CLOUD_AVAILABILITY_ZONE]: 'us-central1-a',
+      },
+    };
     assertCloudResource(resource, {
       provider: 'gcp',
       accountId: 'opentelemetry',
@@ -78,46 +83,54 @@ describe('assertCloudResource', () => {
 
 describe('assertContainerResource', () => {
   it('requires one container label', () => {
-    const resource = new Resource({
-      [SEMRESATTRS_CONTAINER_NAME]: 'opentelemetry-autoconf',
-    });
+    const resource = {
+      attributes: {
+        [ATTR_CONTAINER_NAME]: 'opentelemetry-autoconf',
+      },
+    };
     assertContainerResource(resource, {});
   });
 
   it('validates optional attributes', () => {
-    const resource = new Resource({
-      [SEMRESATTRS_CONTAINER_NAME]: 'opentelemetry-autoconf',
-      [SEMRESATTRS_CONTAINER_ID]: 'abc',
-      [SEMRESATTRS_CONTAINER_IMAGE_NAME]: 'gcr.io/opentelemetry/operator',
-      [SEMRESATTRS_CONTAINER_IMAGE_TAG]: '0.1',
-    });
+    const resource = {
+      attributes: {
+        [ATTR_CONTAINER_NAME]: 'opentelemetry-autoconf',
+        [ATTR_CONTAINER_ID]: 'abc',
+        [ATTR_CONTAINER_IMAGE_NAME]: 'gcr.io/opentelemetry/operator',
+        [ATTR_CONTAINER_IMAGE_TAGS]: ['0.1'],
+      },
+    };
     assertContainerResource(resource, {
       name: 'opentelemetry-autoconf',
       id: 'abc',
       imageName: 'gcr.io/opentelemetry/operator',
-      imageTag: '0.1',
+      imageTags: ['0.1'],
     });
   });
 });
 
 describe('assertHostResource', () => {
   it('requires one host label', () => {
-    const resource = new Resource({
-      [SEMRESATTRS_HOST_ID]: 'opentelemetry-test-id',
-    });
+    const resource = {
+      attributes: {
+        [ATTR_HOST_ID]: 'opentelemetry-test-id',
+      },
+    };
     assertHostResource(resource, {});
   });
 
   it('validates optional attributes', () => {
-    const resource = new Resource({
-      [SEMRESATTRS_HOST_ID]: 'opentelemetry-test-id',
-      [SEMRESATTRS_HOST_NAME]: 'opentelemetry-test-name',
-      [SEMRESATTRS_HOST_TYPE]: 'n1-standard-1',
-      [SEMRESATTRS_HOST_IMAGE_NAME]:
-        'infra-ami-eks-worker-node-7d4ec78312, CentOS-8-x86_64-1905',
-      [SEMRESATTRS_HOST_IMAGE_ID]: 'ami-07b06b442921831e5',
-      [SEMRESATTRS_HOST_IMAGE_VERSION]: '0.1',
-    });
+    const resource = {
+      attributes: {
+        [ATTR_HOST_ID]: 'opentelemetry-test-id',
+        [ATTR_HOST_NAME]: 'opentelemetry-test-name',
+        [ATTR_HOST_TYPE]: 'n1-standard-1',
+        [ATTR_HOST_IMAGE_NAME]:
+          'infra-ami-eks-worker-node-7d4ec78312, CentOS-8-x86_64-1905',
+        [ATTR_HOST_IMAGE_ID]: 'ami-07b06b442921831e5',
+        [ATTR_HOST_IMAGE_VERSION]: '0.1',
+      },
+    };
     assertHostResource(resource, {
       hostName: 'opentelemetry-test-hostname',
       id: 'opentelemetry-test-id',
@@ -132,19 +145,23 @@ describe('assertHostResource', () => {
 
 describe('assertK8sResource', () => {
   it('requires one k8s label', () => {
-    const resource = new Resource({
-      [SEMRESATTRS_K8S_CLUSTER_NAME]: 'opentelemetry-cluster',
-    });
+    const resource = {
+      attributes: {
+        [ATTR_K8S_CLUSTER_NAME]: 'opentelemetry-cluster',
+      },
+    };
     assertK8sResource(resource, {});
   });
 
   it('validates optional attributes', () => {
-    const resource = new Resource({
-      [SEMRESATTRS_K8S_CLUSTER_NAME]: 'opentelemetry-cluster',
-      [SEMRESATTRS_K8S_NAMESPACE_NAME]: 'default',
-      [SEMRESATTRS_K8S_POD_NAME]: 'opentelemetry-pod-autoconf',
-      [SEMRESATTRS_K8S_DEPLOYMENT_NAME]: 'opentelemetry',
-    });
+    const resource = {
+      attributes: {
+        [ATTR_K8S_CLUSTER_NAME]: 'opentelemetry-cluster',
+        [ATTR_K8S_NAMESPACE_NAME]: 'default',
+        [ATTR_K8S_POD_NAME]: 'opentelemetry-pod-autoconf',
+        [ATTR_K8S_DEPLOYMENT_NAME]: 'opentelemetry',
+      },
+    };
     assertK8sResource(resource, {
       clusterName: 'opentelemetry-cluster',
       namespaceName: 'default',
@@ -156,23 +173,24 @@ describe('assertK8sResource', () => {
 
 describe('assertTelemetrySDKResource', () => {
   it('uses default validations', () => {
-    const resource = new Resource({
-      [SEMRESATTRS_TELEMETRY_SDK_NAME]:
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_NAME],
-      [SEMRESATTRS_TELEMETRY_SDK_LANGUAGE]:
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
-      [SEMRESATTRS_TELEMETRY_SDK_VERSION]:
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_VERSION],
-    });
+    const resource = {
+      attributes: {
+        [ATTR_TELEMETRY_SDK_NAME]: SDK_INFO[ATTR_TELEMETRY_SDK_NAME],
+        [ATTR_TELEMETRY_SDK_LANGUAGE]: SDK_INFO[ATTR_TELEMETRY_SDK_LANGUAGE],
+        [ATTR_TELEMETRY_SDK_VERSION]: SDK_INFO[ATTR_TELEMETRY_SDK_VERSION],
+      },
+    };
     assertTelemetrySDKResource(resource, {});
   });
 
   it('validates optional attributes', () => {
-    const resource = new Resource({
-      [SEMRESATTRS_TELEMETRY_SDK_NAME]: 'opentelemetry',
-      [SEMRESATTRS_TELEMETRY_SDK_LANGUAGE]: 'nodejs',
-      [SEMRESATTRS_TELEMETRY_SDK_VERSION]: '0.1.0',
-    });
+    const resource = {
+      attributes: {
+        [ATTR_TELEMETRY_SDK_NAME]: 'opentelemetry',
+        [ATTR_TELEMETRY_SDK_LANGUAGE]: 'nodejs',
+        [ATTR_TELEMETRY_SDK_VERSION]: '0.1.0',
+      },
+    };
     assertTelemetrySDKResource(resource, {
       name: 'opentelemetry',
       language: 'nodejs',
@@ -183,10 +201,12 @@ describe('assertTelemetrySDKResource', () => {
 
 describe('assertServiceResource', () => {
   it('validates required attributes', () => {
-    const resource = new Resource({
-      [SEMRESATTRS_SERVICE_NAME]: 'shoppingcart',
-      [SEMRESATTRS_SERVICE_INSTANCE_ID]: '627cc493-f310-47de-96bd-71410b7dec09',
-    });
+    const resource = {
+      attributes: {
+        [ATTR_SERVICE_NAME]: 'shoppingcart',
+        [ATTR_SERVICE_INSTANCE_ID]: '627cc493-f310-47de-96bd-71410b7dec09',
+      },
+    };
     assertServiceResource(resource, {
       name: 'shoppingcart',
       instanceId: '627cc493-f310-47de-96bd-71410b7dec09',
@@ -194,12 +214,14 @@ describe('assertServiceResource', () => {
   });
 
   it('validates optional attributes', () => {
-    const resource = new Resource({
-      [SEMRESATTRS_SERVICE_NAME]: 'shoppingcart',
-      [SEMRESATTRS_SERVICE_INSTANCE_ID]: '627cc493-f310-47de-96bd-71410b7dec09',
-      [SEMRESATTRS_SERVICE_NAMESPACE]: 'shop',
-      [SEMRESATTRS_SERVICE_VERSION]: '0.1.0',
-    });
+    const resource = {
+      attributes: {
+        [ATTR_SERVICE_NAME]: 'shoppingcart',
+        [ATTR_SERVICE_INSTANCE_ID]: '627cc493-f310-47de-96bd-71410b7dec09',
+        [ATTR_SERVICE_NAMESPACE]: 'shop',
+        [ATTR_SERVICE_VERSION]: '0.1.0',
+      },
+    };
     assertServiceResource(resource, {
       name: 'shoppingcart',
       instanceId: '627cc493-f310-47de-96bd-71410b7dec09',

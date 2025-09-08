@@ -18,68 +18,26 @@ import {
   OTLPMetricExporterBase,
   OTLPMetricExporterOptions,
 } from '@opentelemetry/exporter-metrics-otlp-http';
-import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import {
+  convertLegacyOtlpGrpcOptions,
+  createOtlpGrpcExportDelegate,
   OTLPGRPCExporterConfigNode,
-  OTLPGRPCExporterNodeBase,
-  validateAndNormalizeUrl,
-  DEFAULT_COLLECTOR_URL,
 } from '@opentelemetry/otlp-grpc-exporter-base';
-import { baggageUtils, getEnv } from '@opentelemetry/core';
-import {
-  IExportMetricsServiceResponse,
-  ProtobufMetricsSerializer,
-} from '@opentelemetry/otlp-transformer';
-import { VERSION } from './version';
-import { parseHeaders } from '@opentelemetry/otlp-exporter-base';
-
-const USER_AGENT = {
-  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
-};
-
-class OTLPMetricExporterProxy extends OTLPGRPCExporterNodeBase<
-  ResourceMetrics,
-  IExportMetricsServiceResponse
-> {
-  constructor(config?: OTLPGRPCExporterConfigNode & OTLPMetricExporterOptions) {
-    const signalSpecificMetadata = {
-      ...USER_AGENT,
-      ...baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
-      ),
-      ...parseHeaders(config?.headers),
-    };
-    super(
-      config,
-      signalSpecificMetadata,
-      'MetricsExportService',
-      '/opentelemetry.proto.collector.metrics.v1.MetricsService/Export',
-      ProtobufMetricsSerializer
-    );
-  }
-
-  getDefaultUrl(config: OTLPGRPCExporterConfigNode): string {
-    return validateAndNormalizeUrl(this.getUrlFromConfig(config));
-  }
-
-  getUrlFromConfig(config: OTLPGRPCExporterConfigNode): string {
-    if (typeof config.url === 'string') {
-      return config.url;
-    }
-
-    return (
-      getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT ||
-      getEnv().OTEL_EXPORTER_OTLP_ENDPOINT ||
-      DEFAULT_COLLECTOR_URL
-    );
-  }
-}
+import { ProtobufMetricsSerializer } from '@opentelemetry/otlp-transformer';
 
 /**
  * OTLP-gRPC metric exporter
  */
-export class OTLPMetricExporter extends OTLPMetricExporterBase<OTLPMetricExporterProxy> {
+export class OTLPMetricExporter extends OTLPMetricExporterBase {
   constructor(config?: OTLPGRPCExporterConfigNode & OTLPMetricExporterOptions) {
-    super(new OTLPMetricExporterProxy(config), config);
+    super(
+      createOtlpGrpcExportDelegate(
+        convertLegacyOtlpGrpcOptions(config ?? {}, 'METRICS'),
+        ProtobufMetricsSerializer,
+        'MetricsExportService',
+        '/opentelemetry.proto.collector.metrics.v1.MetricsService/Export'
+      ),
+      config
+    );
   }
 }

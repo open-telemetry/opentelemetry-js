@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { OtlpEncodingOptions } from '../common/types';
+import type { OtlpEncodingOptions } from '../common/internal-types';
 import { ValueType } from '@opentelemetry/api';
 import {
   AggregationTemporality,
@@ -28,24 +28,29 @@ import {
 import {
   EAggregationTemporality,
   IExponentialHistogramDataPoint,
+  IExportMetricsServiceRequest,
   IHistogramDataPoint,
   IMetric,
   INumberDataPoint,
   IResourceMetrics,
   IScopeMetrics,
-} from './types';
-import { Encoder, getOtlpEncoder } from '../common';
-import { createInstrumentationScope, toAttributes } from '../common/internal';
-import { createResource } from '../resource/internal';
+} from './internal-types';
+import { Encoder, getOtlpEncoder } from '../common/utils';
+import {
+  createInstrumentationScope,
+  createResource,
+  toAttributes,
+} from '../common/internal';
 
 export function toResourceMetrics(
   resourceMetrics: ResourceMetrics,
   options?: OtlpEncodingOptions
 ): IResourceMetrics {
   const encoder = getOtlpEncoder(options);
+  const processedResource = createResource(resourceMetrics.resource);
   return {
-    resource: createResource(resourceMetrics.resource),
-    schemaUrl: undefined,
+    resource: processedResource,
+    schemaUrl: processedResource.schemaUrl,
     scopeMetrics: toScopeMetrics(resourceMetrics.scopeMetrics, encoder),
   };
 }
@@ -200,4 +205,15 @@ function toAggregationTemporality(
     case AggregationTemporality.CUMULATIVE:
       return EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE;
   }
+}
+
+export function createExportMetricsServiceRequest(
+  resourceMetrics: ResourceMetrics[],
+  options?: OtlpEncodingOptions
+): IExportMetricsServiceRequest {
+  return {
+    resourceMetrics: resourceMetrics.map(metrics =>
+      toResourceMetrics(metrics, options)
+    ),
+  };
 }

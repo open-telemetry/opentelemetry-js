@@ -5,7 +5,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides a trace-exporter for OTLP (gRPC) traces using protocol version `v0.20.0`.
+This module provides a trace-exporter for OTLP (gRPC) traces using protocol version `v1.7.0`.
 
 ## Installation
 
@@ -24,7 +24,7 @@ To see documentation and sample code for the metric exporter, see the [exporter-
 The OTLPTraceExporter in Node expects the URL to only be the hostname. It will not work with `/v1/traces`.
 
 ```js
-const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
+const { NodeTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-node');
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
 
 const collectorOptions = {
@@ -33,9 +33,10 @@ const collectorOptions = {
   url: 'http://<collector-hostname>:<port>',
 };
 
-const provider = new BasicTracerProvider();
 const exporter = new OTLPTraceExporter(collectorOptions);
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+const provider = new NodeTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(exporter)]
+});
 
 provider.register();
 ['SIGINT', 'SIGTERM'].forEach(signal => {
@@ -49,7 +50,7 @@ By default, plaintext connection is used. In order to use TLS in Node.js, provid
 const fs = require('fs');
 const grpc = require('@grpc/grpc-js');
 
-const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
+const { NodeTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-node');
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
 
 const collectorOptions = {
@@ -59,9 +60,10 @@ const collectorOptions = {
   credentials: grpc.credentials.createSsl(),
 };
 
-const provider = new BasicTracerProvider();
 const exporter = new OTLPTraceExporter(collectorOptions);
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+const provider = new NodeTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(exporter)]
+});
 
 provider.register();
 ['SIGINT', 'SIGTERM'].forEach(signal => {
@@ -79,14 +81,14 @@ To use mutual authentication, pass to the `createSsl()` constructor:
   ),
 ```
 
-To generate credentials for mutual authentication, you can refer to the script used to generate certificates for tests [here](./test/certs/regenerate.sh)
+To generate credentials for mutual authentication, you can refer to [the script used to generate certificates for tests here](./test/certs/regenerate.sh).
 
 The exporter can be configured to send custom metadata with each request as in the example below:
 
 ```js
 const grpc = require('@grpc/grpc-js');
 
-const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
+const { NodeTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-node');
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
 
 const metadata = new grpc.Metadata();
@@ -100,9 +102,10 @@ const collectorOptions = {
   metadata, // // an optional grpc.Metadata object to be sent with each request
 };
 
-const provider = new BasicTracerProvider();
 const exporter = new OTLPTraceExporter(collectorOptions);
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+const provider = new NodeTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(exporter)]
+});
 
 provider.register();
 ['SIGINT', 'SIGTERM'].forEach(signal => {

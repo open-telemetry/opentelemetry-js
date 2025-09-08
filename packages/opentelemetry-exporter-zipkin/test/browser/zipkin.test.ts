@@ -115,7 +115,7 @@ describe('Zipkin Exporter - web', () => {
 
         setTimeout(() => {
           const request = server.requests[0];
-          assert(request.url, endpointUrl);
+          assert.ok(request.url, endpointUrl);
           const body = request.requestBody;
           const json = JSON.parse(body) as any;
           ensureSpanIsCorrect(json[0]);

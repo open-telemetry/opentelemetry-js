@@ -40,7 +40,7 @@ describe('LastValueAggregator', () => {
     it('no exceptions on createAccumulation', () => {
       const aggregator = new LastValueAggregator();
       const accumulation = aggregator.createAccumulation([0, 0]);
-      assert(accumulation instanceof LastValueAccumulation);
+      assert.ok(accumulation instanceof LastValueAccumulation);
     });
   });
 

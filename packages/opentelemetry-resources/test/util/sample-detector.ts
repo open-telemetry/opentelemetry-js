@@ -15,25 +15,28 @@
  */
 
 import {
-  SEMRESATTRS_CLOUD_ACCOUNT_ID,
-  SEMRESATTRS_CLOUD_AVAILABILITY_ZONE,
-  SEMRESATTRS_CLOUD_PROVIDER,
-  SEMRESATTRS_CLOUD_REGION,
-  SEMRESATTRS_HOST_ID,
-  SEMRESATTRS_HOST_TYPE,
-} from '@opentelemetry/semantic-conventions';
-import { Detector, Resource } from '../../src';
+  ATTR_CLOUD_ACCOUNT_ID,
+  ATTR_CLOUD_AVAILABILITY_ZONE,
+  ATTR_CLOUD_PROVIDER,
+  ATTR_CLOUD_REGION,
+  ATTR_HOST_ID,
+  ATTR_HOST_TYPE,
+} from '../../src/semconv';
+import { ResourceDetector } from '../../src';
+import { DetectedResource } from '../../src/types';
 
-class SampleDetector implements Detector {
-  async detect(): Promise<Resource> {
-    return new Resource({
-      [SEMRESATTRS_CLOUD_PROVIDER]: 'provider',
-      [SEMRESATTRS_CLOUD_ACCOUNT_ID]: 'accountId',
-      [SEMRESATTRS_CLOUD_REGION]: 'region',
-      [SEMRESATTRS_CLOUD_AVAILABILITY_ZONE]: 'zone',
-      [SEMRESATTRS_HOST_ID]: 'instanceId',
-      [SEMRESATTRS_HOST_TYPE]: 'instanceType',
-    });
+class SampleDetector implements ResourceDetector {
+  detect(): DetectedResource {
+    return {
+      attributes: {
+        [ATTR_CLOUD_PROVIDER]: 'provider',
+        [ATTR_CLOUD_ACCOUNT_ID]: 'accountId',
+        [ATTR_CLOUD_REGION]: 'region',
+        [ATTR_CLOUD_AVAILABILITY_ZONE]: 'zone',
+        [ATTR_HOST_ID]: 'instanceId',
+        [ATTR_HOST_TYPE]: 'instanceType',
+      },
+    };
   }
 }
 

@@ -1,0 +1,65 @@
+name: Create or Update Release PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        type: choice
+        description: Release type
+        options:
+          - patch
+          - minor
+      release_scope:
+        type: choice
+        description: Release Scope
+        options:
+          - experimental # all packages in experimental/packages
+          - sdk # all SDK packages, experimental and stable, excluding semantic conventions
+          - all # all release packages, including API, excluding semconv
+          - semconv # only semantic convention package
+
+permissions:
+  contents: read
+
+jobs:
+  create-or-update-release-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fork
+        run: gh repo fork open-telemetry/opentelemetry-js
+        env:
+          GITHUB_TOKEN: ${{ secrets.OPENTELEMETRYBOT_GITHUB_TOKEN }}
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          repository: opentelemetrybot/opentelemetry-js
+          ref: main
+          token: ${{ secrets.OPENTELEMETRYBOT_GITHUB_TOKEN }}
+      - name: Sync with upstream
+        run: |
+          git remote show origin
+          git remote add upstream https://github.com/open-telemetry/opentelemetry-js.git
+          git fetch upstream
+          git reset --hard upstream/main
+          git push origin main --force
+
+      - uses: actions/setup-node@v5
+        with:
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+          node-version: 22
+      - run: npm install -g npm@latest
+
+      - run: npm ci
+
+      - name: Create/Update Release PR
+        run: |
+          git config user.name opentelemetrybot
+          git config user.email 107717825+opentelemetrybot@users.noreply.github.com
+          npm run github:create_or_update_release_pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.OPENTELEMETRYBOT_GITHUB_TOKEN }}
+          RELEASE_SCOPE: ${{ github.event.inputs.release_scope }}
+          RELEASE_KIND: ${{ github.event.inputs.release_scope }}:${{ github.event.inputs.release_type }}
+          RELEASE_PR_REMOTE: origin
+          RELEASE_PR_OWNER: opentelemetrybot

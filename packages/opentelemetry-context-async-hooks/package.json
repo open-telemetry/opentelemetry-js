@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-async-hooks",
-  "version": "1.25.1",
+  "version": "2.1.0",
   "description": "OpenTelemetry AsyncHooks-based Context Manager",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -9,13 +9,12 @@
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
-    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
+    "test": "nyc mocha 'test/**/*.test.ts'",
     "tdd": "npm run test -- --watch-extensions ts --watch",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
+    "precompile": "lerna run version --scope @opentelemetry/context-async-hooks --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../scripts/align-api-deps.js"
@@ -31,7 +30,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=14"
+    "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
     "build/src/**/*.js",
@@ -46,15 +45,12 @@
   },
   "devDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0",
-    "@types/mocha": "10.0.6",
+    "@types/mocha": "10.0.10",
     "@types/node": "18.6.5",
-    "codecov": "3.8.3",
-    "cross-var": "1.1.0",
     "lerna": "6.6.2",
-    "mocha": "10.2.0",
-    "nyc": "15.1.0",
-    "ts-mocha": "10.0.0",
-    "typescript": "4.4.4"
+    "mocha": "11.7.2",
+    "nyc": "17.1.0",
+    "typescript": "5.0.4"
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0"

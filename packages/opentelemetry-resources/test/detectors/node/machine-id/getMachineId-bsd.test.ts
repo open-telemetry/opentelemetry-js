@@ -73,7 +73,7 @@ describe('getMachineId on BSD', () => {
 
     const machineId = await getMachineId();
 
-    assert.equal(machineId, '');
+    assert.strictEqual(machineId, undefined);
     assert.equal(fsStub.callCount, 1);
     assert.equal(execStub.callCount, 1);
   });

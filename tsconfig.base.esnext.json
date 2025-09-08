@@ -3,7 +3,7 @@
   "compilerOptions": {
     "module": "esnext",
     // target should be aligned with tsconfig.base.json
-    "target": "es2017",
-    "moduleResolution": "node"
+    "target": "es2022",
+    "moduleResolution": "node16"
   },
 }

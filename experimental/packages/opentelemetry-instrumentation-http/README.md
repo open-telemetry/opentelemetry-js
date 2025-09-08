@@ -22,7 +22,7 @@ npm install --save @opentelemetry/instrumentation-http
 
 ## Usage
 
-OpenTelemetry HTTP Instrumentation allows the user to automatically collect trace data and export them to their backend of choice, to give observability to distributed systems.
+OpenTelemetry HTTP Instrumentation allows the user to automatically collect telemetry and export it to their backend of choice, to give observability to distributed systems.
 
 To load a specific instrumentation (HTTP in this case), specify it in the Node Tracer's configuration.
 
@@ -35,9 +35,10 @@ const {
 } = require('@opentelemetry/sdk-trace-node');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 
-const provider = new NodeTracerProvider();
+const provider = new NodeTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
+});
 
-provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.register();
 
 registerInstrumentations({
@@ -50,60 +51,82 @@ See [examples/http](https://github.com/open-telemetry/opentelemetry-js/tree/main
 
 ### Http instrumentation Options
 
-Http instrumentation has few options available to choose from. You can set the following:
+Http instrumentation has a few [configuration options](https://github.com/open-telemetry/opentelemetry-js/blob/e1ec4026edae53a2dea3a9a604d6d21bb5e8d99f/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L60-L93) available to choose from.
+You can set the following:
 
-| Options | Type | Description |
-| ------- | ---- | ----------- |
-| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L91) | `HttpCustomAttributeFunction` | Function for adding custom attributes |
-| [`requestHook`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#93) | `HttpRequestCustomAttributeFunction` | Function for adding custom attributes before request is handled |
-| [`responseHook`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L95) | `HttpResponseCustomAttributeFunction` | Function for adding custom attributes before response is handled |
-| [`startIncomingSpanHook`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L97) | `StartIncomingSpanCustomAttributeFunction` | Function for adding custom attributes before a span is started in incomingRequest |
-| [`startOutgoingSpanHook`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L99) | `StartOutgoingSpanCustomAttributeFunction` | Function for adding custom attributes before a span is started in outgoingRequest |
-| `ignoreIncomingRequestHook` | `IgnoreIncomingRequestFunction` | Http instrumentation will not trace all incoming requests that matched with custom function |
-| `ignoreOutgoingRequestHook` | `IgnoreOutgoingRequestFunction` | Http instrumentation will not trace all outgoing requests that matched with custom function |
-| [`serverName`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L101) | `string` | The primary server name of the matched virtual host. |
-| [`requireParentforOutgoingSpans`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L103) | Boolean | Require that is a parent span to create new span for outgoing requests. |
-| [`requireParentforIncomingSpans`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L105) | Boolean | Require that is a parent span to create new span for incoming requests. |
-| [`headersToSpanAttributes`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L107) | `object` | List of case insensitive HTTP headers to convert to span attributes. Client (outgoing requests, incoming responses) and server (incoming requests, outgoing responses) headers will be converted to span attributes in the form of `http.{request\|response}.header.header_name`, e.g. `http.response.header.content_length` |
-
-The following options are deprecated:
-
-| Options | Type | Description |
-| ------- | ---- | ----------- |
-| `ignoreIncomingPaths` | `IgnoreMatcher[]` | Http instrumentation will not trace all incoming requests that match paths |
+| Options                                 | Type                                       | Description                                                                                                                                                                                                                                                                                                                  |
+| --------------------------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `applyCustomAttributesOnSpan`           | `HttpCustomAttributeFunction`              | Function for adding custom attributes                                                                                                                                                                                                                                                                                        |
+| `requestHook`                           | `HttpRequestCustomAttributeFunction`       | Function for adding custom attributes before request is handled                                                                                                                                                                                                                                                              |
+| `responseHook`                          | `HttpResponseCustomAttributeFunction`      | Function for adding custom attributes before response is handled                                                                                                                                                                                                                                                             |
+| `startIncomingSpanHook`                 | `StartIncomingSpanCustomAttributeFunction` | Function for adding custom attributes before a span is started in incomingRequest                                                                                                                                                                                                                                            |
+| `startOutgoingSpanHook`                 | `StartOutgoingSpanCustomAttributeFunction` | Function for adding custom attributes before a span is started in outgoingRequest                                                                                                                                                                                                                                            |
+| `ignoreIncomingRequestHook`             | `IgnoreIncomingRequestFunction`            | Http instrumentation will not trace all incoming requests that matched with custom function                                                                                                                                                                                                                                  |
+| `ignoreOutgoingRequestHook`             | `IgnoreOutgoingRequestFunction`            | Http instrumentation will not trace all outgoing requests that matched with custom function                                                                                                                                                                                                                                  |
+| `disableOutgoingRequestInstrumentation` | `boolean`                                  | Set to true to avoid instrumenting outgoing requests at all. This can be helpful when another instrumentation handles outgoing requests.                                                                                                                                                                                     |
+| `disableIncomingRequestInstrumentation` | `boolean`                                  | Set to true to avoid instrumenting incoming requests at all. This can be helpful when another instrumentation handles incoming requests.                                                                                                                                                                                     |
+| `serverName`                            | `string`                                   | The primary server name of the matched virtual host.                                                                                                                                                                                                                                                                         |
+| `requireParentforOutgoingSpans`         | Boolean                                    | Require that is a parent span to create new span for outgoing requests.                                                                                                                                                                                                                                                      |
+| `requireParentforIncomingSpans`         | Boolean                                    | Require that is a parent span to create new span for incoming requests.                                                                                                                                                                                                                                                      |
+| `headersToSpanAttributes`               | `object`                                   | List of case insensitive HTTP headers to convert to span attributes. Client (outgoing requests, incoming responses) and server (incoming requests, outgoing responses) headers will be converted to span attributes in the form of `http.{request\|response}.header.header_name`, e.g. `http.response.header.content_length` |
 
 ## Semantic Conventions
 
-This package uses `@opentelemetry/semantic-conventions` version `1.22+`, which implements Semantic Convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md)
+Prior to version `0.54.0`, this instrumentation created spans targeting an experimental semantic convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md).
 
-Attributes collected:
+HTTP semantic conventions (semconv) were stabilized in v1.23.0, and a [migration process](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md#http-semantic-convention-stability-migration) was defined.
+`instrumentation-http` versions 0.54.0 and later include support for migrating to stable HTTP semantic conventions, as described below.
+The intent is to provide an approximate 6 month time window for users of this instrumentation to migrate to the new HTTP semconv, after which a new minor version will use the *new* semconv by default and drop support for the old semconv.
+See the [HTTP semconv migration plan for OpenTelemetry JS instrumentations](https://github.com/open-telemetry/opentelemetry-js/issues/5646).
 
-| Attribute                                   | Short Description                                                              |
-| ------------------------------------------- | ------------------------------------------------------------------------------ |
-| `ip_tcp`                                    | Transport protocol used                                                        |
-| `ip_udp`                                    | Transport protocol used                                                        |
-| `http.client_ip`                            | The IP address of the original client behind all proxies, if known             |
-| `http.flavor`                               | Kind of HTTP protocol used                                                     |
-| `http.host`                                 | The value of the HTTP host header                                              |
-| `http.method`                               | HTTP request method                                                            |
-| `http.request_content_length`               | The size of the request payload body in bytes                                  |
-| `http.request_content_length_uncompressed`  | The size of the uncompressed request payload body after transport decoding     |
-| `http.response_content_length`              | The size of the response payload body in bytes                                 |
-| `http.response_content_length_uncompressed` | The size of the uncompressed response payload body after transport decoding    |
-| `http.route`                                | The matched route (path template).                                             |
-| `http.scheme`                               | The URI scheme identifying the used protocol                                   |
-| `http.server_name`                          | The primary server name of the matched virtual host                            |
-| `http.status_code`                          | HTTP response status code                                                      |
-| `http.target`                               | The full request target as passed in a HTTP request line or equivalent         |
-| `http.url`                                  | Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]` |
-| `http.user_agent`                           | Value of the HTTP User-Agent header sent by the client                         |
-| `net.host.ip`                               | Like net.peer.ip but for the host IP. Useful in case of a multi-IP host        |
-| `net.host.name`                             | Local hostname or similar                                                      |
-| `net.host.port`                             | Like net.peer.port but for the host port                                       |
-| `net.peer.ip.`                              | Remote address of the peer (dotted decimal for IPv4 or RFC5952 for IPv6)       |
-| `net.peer.name`                             | Remote hostname or similar                                                     |
-| `net.peer.port`                             | Remote port number                                                             |
-| `net.transport`                             | Transport protocol used                                                        |
+To select which semconv version(s) is emitted from this instrumentation, use the `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable.
+
+- `http`: emit the new (stable) v1.23.0+ semantics
+- `http/dup`: emit **both** the old v1.7.0 and the new (stable) v1.23.0+ semantics
+- By default, if `OTEL_SEMCONV_STABILITY_OPT_IN` includes neither of the above tokens, the old v1.7.0 semconv is used.
+
+### Attributes collected
+
+| v1.7.0 semconv                              | v1.23.0 semconv                     | Short Description                                                                                                                                                                 |
+| ------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `http.client_ip`                            | `client.address`                    | The IP address of the original client behind all proxies, if known                                                                                                                |
+| `http.flavor`                               | `network.protocol.version`          | Kind of HTTP protocol used                                                                                                                                                        |
+| `http.host`                                 | `server.address`                    | The value of the HTTP host header                                                                                                                                                 |
+| `http.method`                               | `http.request.method`               | HTTP request method                                                                                                                                                               |
+| `http.request_content_length`               | (opt-in, `headersToSpanAttributes`) | The size of the request payload body in bytes. For newer semconv, use the `headersToSpanAttributes:` option to capture this as `http.request.header.content_length`.              |
+| `http.request_content_length_uncompressed`  | (not included)                      | The size of the uncompressed request payload body after transport decoding. (In semconv v1.23.0 this is defined by `http.request.body.size`, which is experimental and opt-in.)   |
+| `http.response_content_length`              | (opt-in, `headersToSpanAttributes`) | The size of the response payload body in bytes. For newer semconv, use the `headersToSpanAttributes:` option to capture this as `http.response.header.content_length`.            |
+| `http.response_content_length_uncompressed` | (not included)                      | The size of the uncompressed response payload body after transport decoding. (In semconv v1.23.0 this is defined by `http.response.body.size`, which is experimental and opt-in.) |
+| `http.route`                                | no change                           | The matched route (path template).                                                                                                                                                |
+| `http.scheme`                               | `url.scheme`                        | The URI scheme identifying the used protocol                                                                                                                                      |
+| `http.server_name`                          | `server.address`                    | The primary server name of the matched virtual host                                                                                                                               |
+| `http.status_code`                          | `http.response.status_code`         | HTTP response status code                                                                                                                                                         |
+| `http.target`                               | `url.path` and `url.query`          | The URI path and query component                                                                                                                                                  |
+| `http.url`                                  | `url.full`                          | Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]`                                                                                                    |
+| `http.user_agent`                           | `user_agent.original`               | Value of the HTTP User-Agent header sent by the client                                                                                                                            |
+| `net.host.ip`                               | `network.local.address`             | Like net.peer.ip but for the host IP. Useful in case of a multi-IP host                                                                                                           |
+| `net.host.name`                             | `server.address`                    | Local hostname or similar                                                                                                                                                         |
+| `net.host.port`                             | `server.port`                       | Like net.peer.port but for the host port                                                                                                                                          |
+| `net.peer.ip.`                              | `network.peer.address`              | Remote address of the peer (dotted decimal for IPv4 or RFC5952 for IPv6)                                                                                                          |
+| `net.peer.name`                             | `server.address`                    | Server domain name if available without reverse DNS lookup                                                                                                                        |
+| `net.peer.port`                             | `server.port`                       | Server port number                                                                                                                                                                |
+| `net.transport`                             | `network.transport`                 | Transport protocol used                                                                                                                                                           |
+
+Metrics Exported:
+
+- [`http.server.request.duration`](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-metrics.md#metric-httpserverrequestduration)
+- [`http.client.request.duration`](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-metrics.md#metric-httpclientrequestduration)
+
+### Upgrading Semantic Conventions
+
+When upgrading to the new semantic conventions, it is recommended to do so in the following order:
+
+1. Upgrade `@opentelemetry/instrumentation-http` to the latest version
+2. Set `OTEL_SEMCONV_STABILITY_OPT_IN=http/dup` to emit both old and new semantic conventions
+3. Modify alerts, dashboards, metrics, and other processes to expect the new semantic conventions
+4. Set `OTEL_SEMCONV_STABILITY_OPT_IN=http` to emit only the new semantic conventions
+
+This will cause both the old and new semantic conventions to be emitted during the transition period.
 
 ## Useful links
 

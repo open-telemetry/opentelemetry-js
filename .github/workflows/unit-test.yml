@@ -6,37 +6,48 @@ on:
   pull_request:
   merge_group:
 
+permissions:
+  contents: read
+
 jobs:
   node-tests:
     strategy:
       fail-fast: false
       matrix:
         node_version:
-          - "14"
-          - "16"
+          - "18.19.0"
           - "18"
+          - "20.6.0"
           - "20"
           - "22"
+          - "24"
     runs-on: ubuntu-latest
-    env:
-      NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
           node-version: ${{ matrix.node_version }}
 
+      # npm@11.0.0 drops support for Node.js v18
+      # Install the latest npm compatible with this version of Node.js
+      # - npm@11.1.0 supports: {"node":"^20.17.0 || >=22.9.0"}
+      - run: npm install -g npm@"<11.0.0"
+        if: ${{
+          matrix.node_version == '18.19.0' ||
+          matrix.node_version == '18' ||
+          matrix.node_version == '20.6.0'
+          }}
       - run: npm install -g npm@latest
-        if: ${{ matrix.node_version == '18' || matrix.node_version == '20' || matrix.node_version == '22' }}
-
-      # npm@10.0.0 drops support for Node.js v14 and v16
-      - run: npm install -g npm@"<10.0.0"
-        if: ${{ matrix.node_version == '14' || matrix.node_version == '16' }}
+        if: ${{
+          matrix.node_version == '20' ||
+          matrix.node_version == '22' ||
+          matrix.node_version == '24'
+          }}
 
       - name: Bootstrap
         run: npm ci
@@ -44,30 +55,33 @@ jobs:
       - name: Build 🔧
         run: npm run compile
 
-      - name: Unit tests
-        run: |
-          # TODO(legendecas): webpack https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesunsupported
-          if [ "${{ matrix.node_version }}" = "18" ] || [ "${{ matrix.node_version }}" == "20" ] || [ "${{ matrix.node_version }}" == "22" ]; then
-            export NODE_OPTIONS=--openssl-legacy-provider
-          fi
-          npm run test
+      - run: npm test
+        if: ${{ matrix.node_version != '22' && matrix.node_version != '24' }}
+      # Node.js type stripping conflicts with mocha usage of ts-node.
+      # See https://github.com/open-telemetry/opentelemetry-js/issues/5415
+      - run: npm test
+        env:
+          NODE_OPTIONS: '--no-experimental-strip-types'
+        if: ${{ matrix.node_version == '22' || matrix.node_version == '24' }}
+
       - name: Report Coverage
-        run: npm run codecov
-        if: ${{ matrix.node_version == '14' }}
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          verbose: true
   node-windows-tests:
     runs-on: windows-latest
-    env:
-      NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: '18'
+          node-version: '22'
 
       - run: npm install -g npm@latest
 
@@ -80,23 +94,21 @@ jobs:
           npm run compile
 
       - name: Unit tests
-        env:
-         NODE_OPTIONS: --openssl-legacy-provider
         run: npm run test
+        env:
+          NODE_OPTIONS: '--no-experimental-strip-types'
   browser-tests:
     runs-on: ubuntu-latest
-    env:
-      NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: 16
+          node-version: 22
 
       - name: Bootstrap
         run: npm ci
@@ -107,20 +119,22 @@ jobs:
       - name: Unit tests
         run: npm run test:browser
       - name: Report Coverage
-        run: npm run codecov:browser
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          verbose: true
   webworker-tests:
     runs-on: ubuntu-latest
-    env:
-      NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+        uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: 16
+          node-version: 22
 
       - name: Bootstrap
         run: npm ci
@@ -131,40 +145,8 @@ jobs:
       - name: Unit tests
         run: npm run test:webworker
       - name: Report Coverage
-        run: npm run codecov:webworker
-  api-eol-node-test:
-    strategy:
-      fail-fast: false
-      matrix:
-        node_version:
-          - "8"
-          - "10"
-          - "12"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
-          cache: 'npm'
-          cache-dependency-path: |
-            package-lock.json
-          node-version: ${{ matrix.node_version }}
-
-      - name: Build
-        working-directory: ./api
-        run: |
-          npm install --ignore-scripts
-          npm install @types/mocha@^7 mocha@^7 ts-loader@^8 ts-mocha@^8
-          node ../scripts/version-update.js
-          npx tsc --build tsconfig.json tsconfig.esm.json
-
-      - name: Test
-        working-directory: ./api
-        # running test:eol as node 8 is not supported anymore by the version of nyc we use, as we don't report coverage
-        # for this step we leave it out.
-        # Details: nyc requires istanbul-lib-report, which silently dropped support for Node.js v8 when going from
-        # 3.0.0 to 3.0.1 by requiring make-dir@^4.0.0 to fix https://github.com/advisories/GHSA-c2qf-rxjj-qqgw.
-        # make-dir does not support Node.js v8 anymore.
-        run: npm run test:eol
+          verbose: true

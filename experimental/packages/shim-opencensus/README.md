@@ -79,16 +79,18 @@ OpenCensus metrics can be collected and sent to an OpenTelemetry exporter by pro
 through the OpenTelemetry Prometheus exporter:
 
 ```js
-meterProvider.addMetricReader(
-  new PrometheusExporter({
-    metricProducers: [
-      new OpenCensusMetricProducer({
-        openCensusMetricProducerManager:
-          oc.Metrics.getMetricProducerManager(),
-      }),
-    ],
-  })
-);
+new MeterProvider({
+  readers: [
+    new PrometheusExporter({
+      metricProducers: [
+        new OpenCensusMetricProducer({
+          openCensusMetricProducerManager:
+            oc.Metrics.getMetricProducerManager(),
+        }),
+      ],
+    }),
+  ],
+});
 ```
 
 ## Example

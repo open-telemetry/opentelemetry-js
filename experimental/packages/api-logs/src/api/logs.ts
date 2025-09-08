@@ -24,9 +24,12 @@ import { LoggerProvider } from '../types/LoggerProvider';
 import { NOOP_LOGGER_PROVIDER } from '../NoopLoggerProvider';
 import { Logger } from '../types/Logger';
 import { LoggerOptions } from '../types/LoggerOptions';
+import { ProxyLoggerProvider } from '../ProxyLoggerProvider';
 
 export class LogsAPI {
   private static _instance?: LogsAPI;
+
+  private _proxyLoggerProvider = new ProxyLoggerProvider();
 
   private constructor() {}
 
@@ -48,6 +51,7 @@ export class LogsAPI {
       provider,
       NOOP_LOGGER_PROVIDER
     );
+    this._proxyLoggerProvider._setDelegate(provider);
 
     return provider;
   }
@@ -60,7 +64,7 @@ export class LogsAPI {
   public getLoggerProvider(): LoggerProvider {
     return (
       _global[GLOBAL_LOGS_API_KEY]?.(API_BACKWARDS_COMPATIBILITY_VERSION) ??
-      NOOP_LOGGER_PROVIDER
+      this._proxyLoggerProvider
     );
   }
 
@@ -80,5 +84,6 @@ export class LogsAPI {
   /** Remove the global logger provider */
   public disable(): void {
     delete _global[GLOBAL_LOGS_API_KEY];
+    this._proxyLoggerProvider = new ProxyLoggerProvider();
   }
 }

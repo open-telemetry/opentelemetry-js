@@ -14,13 +14,13 @@
       "path": "../../api"
     },
     {
+      "path": "../../semantic-conventions"
+    },
+    {
       "path": "../opentelemetry-core"
     },
     {
       "path": "../opentelemetry-resources"
-    },
-    {
-      "path": "../opentelemetry-semantic-conventions"
     }
   ]
 }

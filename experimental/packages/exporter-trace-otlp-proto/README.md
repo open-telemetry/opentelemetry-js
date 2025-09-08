@@ -5,7 +5,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides a trace-exporter for OTLP (http/protobuf) using protocol version `v0.20.0`.
+This module provides a trace-exporter for OTLP (http/protobuf) using protocol version `v1.7.0`.
 
 ## Installation
 
@@ -22,7 +22,7 @@ To see documentation and sample code for the metric exporter, see the [exporter-
 ## Traces in Node - PROTO over http
 
 ```js
-const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
+const { NodeTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-node');
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-proto');
 
 const collectorOptions = {
@@ -32,9 +32,10 @@ const collectorOptions = {
   }, //an optional object containing custom headers to be sent with each request will only work with http
 };
 
-const provider = new BasicTracerProvider();
 const exporter = new OTLPTraceExporter(collectorOptions);
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+const provider = new NodeTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(exporter)]
+});
 
 provider.register();
 

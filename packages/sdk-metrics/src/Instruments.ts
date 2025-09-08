@@ -18,10 +18,11 @@ import {
   context as contextApi,
   diag,
   Context,
-  MetricAttributes,
+  Attributes,
   ValueType,
   UpDownCounter,
   Counter,
+  Gauge,
   Histogram,
   Observable,
   ObservableCallback,
@@ -36,7 +37,6 @@ import {
   AsyncWritableMetricStorage,
   WritableMetricStorage,
 } from './state/WritableMetricStorage';
-import { Gauge } from './types';
 
 export class SyncInstrument {
   constructor(
@@ -46,7 +46,7 @@ export class SyncInstrument {
 
   protected _record(
     value: number,
-    attributes: MetricAttributes = {},
+    attributes: Attributes = {},
     context: Context = contextApi.active()
   ) {
     if (typeof value !== 'number') {
@@ -87,7 +87,7 @@ export class UpDownCounterInstrument
   /**
    * Increment value of counter by the input. Inputs may be negative.
    */
-  add(value: number, attributes?: MetricAttributes, ctx?: Context): void {
+  add(value: number, attributes?: Attributes, ctx?: Context): void {
     this._record(value, attributes, ctx);
   }
 }
@@ -99,7 +99,7 @@ export class CounterInstrument extends SyncInstrument implements Counter {
   /**
    * Increment value of counter by the input. Inputs may not be negative.
    */
-  add(value: number, attributes?: MetricAttributes, ctx?: Context): void {
+  add(value: number, attributes?: Attributes, ctx?: Context): void {
     if (value < 0) {
       diag.warn(
         `negative value provided to counter ${this._descriptor.name}: ${value}`
@@ -118,7 +118,7 @@ export class GaugeInstrument extends SyncInstrument implements Gauge {
   /**
    * Records a measurement.
    */
-  record(value: number, attributes?: MetricAttributes, ctx?: Context): void {
+  record(value: number, attributes?: Attributes, ctx?: Context): void {
     this._record(value, attributes, ctx);
   }
 }
@@ -130,7 +130,7 @@ export class HistogramInstrument extends SyncInstrument implements Histogram {
   /**
    * Records a measurement. Value of the measurement must not be negative.
    */
-  record(value: number, attributes?: MetricAttributes, ctx?: Context): void {
+  record(value: number, attributes?: Attributes, ctx?: Context): void {
     if (value < 0) {
       diag.warn(
         `negative value provided to histogram ${this._descriptor.name}: ${value}`

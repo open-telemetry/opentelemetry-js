@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 
-export * from './http';
-export * from './types';
-export * from './utils';
+export { HttpInstrumentation } from './http';
+export type {
+  HttpCustomAttributeFunction,
+  HttpInstrumentationConfig,
+  HttpRequestCustomAttributeFunction,
+  HttpResponseCustomAttributeFunction,
+  IgnoreIncomingRequestFunction,
+  IgnoreOutgoingRequestFunction,
+  StartIncomingSpanCustomAttributeFunction,
+  StartOutgoingSpanCustomAttributeFunction,
+} from './types';

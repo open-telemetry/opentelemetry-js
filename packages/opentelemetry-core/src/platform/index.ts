@@ -13,4 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './node';
+export {
+  SDK_INFO,
+  _globalThis,
+  otperformance,
+  unrefTimer,
+  getBooleanFromEnv,
+  getStringFromEnv,
+  getNumberFromEnv,
+  getStringListFromEnv,
+} from './node';

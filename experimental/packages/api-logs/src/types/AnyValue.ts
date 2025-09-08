@@ -14,16 +14,29 @@
  * limitations under the License.
  */
 
-import { AttributeValue } from '@opentelemetry/api';
+export type AnyValueScalar = string | number | boolean;
+
+export type AnyValueArray = Array<AnyValue>;
 
 /**
  * AnyValueMap is a map from string to AnyValue (attribute value or a nested map)
  */
 export interface AnyValueMap {
-  [attributeKey: string]: AnyValue | undefined;
+  [attributeKey: string]: AnyValue;
 }
 
 /**
- * AnyValue is a either an attribute value or a map of AnyValue(s)
+ * AnyValue can be one of the following:
+ * - a scalar value
+ * - a byte array
+ * - array of any value
+ * - map from string to any value
+ * - empty value
  */
-export type AnyValue = AttributeValue | AnyValueMap;
+export type AnyValue =
+  | AnyValueScalar
+  | Uint8Array
+  | AnyValueArray
+  | AnyValueMap
+  | null
+  | undefined;

@@ -16,14 +16,28 @@
 
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import { Aggregation, InstrumentType, PushMetricExporter } from '../../src';
-import { ResourceMetrics } from '../../src/export/MetricData';
+import {
+  AggregationOption,
+  AggregationType,
+  CollectionResult,
+  InstrumentType,
+  MetricProducer,
+  PushMetricExporter,
+} from '../../src';
+import {
+  DataPointType,
+  ResourceMetrics,
+  ScopeMetrics,
+} from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { TimeoutError } from '../../src/utils';
-import { ExportResult, ExportResultCode } from '@opentelemetry/core';
-import { assertRejects } from '../test-utils';
-import { emptyResourceMetrics, TestMetricProducer } from './TestMetricProducer';
+import {
+  ExportResult,
+  ExportResultCode,
+  setGlobalErrorHandler,
+} from '@opentelemetry/core';
+import { TestMetricProducer } from './TestMetricProducer';
 import {
   assertAggregationSelector,
   assertAggregationTemporalitySelector,
@@ -32,6 +46,7 @@ import {
   DEFAULT_AGGREGATION_SELECTOR,
   DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
 } from '../../src/export/AggregationSelector';
+import { ValueType } from '@opentelemetry/api';
 
 const MAX_32_BIT_INT = 2 ** 31 - 1;
 
@@ -67,9 +82,7 @@ class TestMetricExporter implements PushMetricExporter {
 
   async shutdown(): Promise<void> {
     if (this._shutdown) return;
-    const flushPromise = this.forceFlush();
     this._shutdown = true;
-    await flushPromise;
   }
 
   async forceFlush(): Promise<void> {
@@ -107,8 +120,8 @@ class TestDeltaMetricExporter extends TestMetricExporter {
 }
 
 class TestDropMetricExporter extends TestMetricExporter {
-  selectAggregation(_instrumentType: InstrumentType): Aggregation {
-    return Aggregation.Drop();
+  selectAggregation(_instrumentType: InstrumentType): AggregationOption {
+    return { type: AggregationType.DROP };
   }
 }
 
@@ -116,6 +129,52 @@ describe('PeriodicExportingMetricReader', () => {
   afterEach(() => {
     sinon.restore();
   });
+
+  const waitForAsyncAttributesStub = sinon.stub().returns(
+    new Promise<void>(resolve =>
+      setTimeout(() => {
+        resolve();
+      }, 10)
+    )
+  );
+  const scopeMetrics: ScopeMetrics[] = [
+    {
+      scope: {
+        name: 'test',
+      },
+      metrics: [
+        {
+          dataPointType: DataPointType.GAUGE,
+          dataPoints: [
+            {
+              // Sample hr time datapoints.
+              startTime: [12345, 678901234],
+              endTime: [12345, 678901234],
+              attributes: {},
+              value: 1,
+            },
+          ],
+          descriptor: {
+            name: '',
+            description: '',
+            unit: '',
+            valueType: ValueType.INT,
+          },
+          aggregationTemporality: AggregationTemporality.CUMULATIVE,
+        },
+      ],
+    },
+  ];
+  const resourceMetrics: ResourceMetrics = {
+    resource: {
+      attributes: {},
+      merge: sinon.stub(),
+      asyncAttributesPending: true, // ensure we try to await async attributes
+      waitForAsyncAttributes: waitForAsyncAttributesStub, // resolve when awaited
+      getRawAttributes: () => [],
+    },
+    scopeMetrics: scopeMetrics,
+  };
 
   describe('constructor', () => {
     it('should construct PeriodicExportingMetricReader without exceptions', () => {
@@ -194,15 +253,29 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 20,
       });
 
-      reader.setMetricProducer(new TestMetricProducer());
+      reader.setMetricProducer(
+        new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+      );
       const result = await exporter.waitForNumberOfExports(2);
 
-      assert.deepStrictEqual(result, [
-        emptyResourceMetrics,
-        emptyResourceMetrics,
-      ]);
+      assert.deepStrictEqual(result, [resourceMetrics, resourceMetrics]);
       await reader.shutdown();
     });
+  });
+
+  it('should not export without populated scope metrics', async () => {
+    const exporter = new TestMetricExporter();
+    const reader = new PeriodicExportingMetricReader({
+      exporter: exporter,
+      exportIntervalMillis: 30,
+      exportTimeoutMillis: 20,
+    });
+
+    reader.setMetricProducer(new TestMetricProducer());
+    const result = await exporter.forceFlush();
+
+    assert.deepStrictEqual(result, undefined);
+    await reader.shutdown();
   });
 
   describe('periodic export', () => {
@@ -215,13 +288,12 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 20,
       });
 
-      reader.setMetricProducer(new TestMetricProducer());
+      reader.setMetricProducer(
+        new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+      );
 
       const result = await exporter.waitForNumberOfExports(2);
-      assert.deepStrictEqual(result, [
-        emptyResourceMetrics,
-        emptyResourceMetrics,
-      ]);
+      assert.deepStrictEqual(result, [resourceMetrics, resourceMetrics]);
 
       exporter.throwExport = false;
       await reader.shutdown();
@@ -236,13 +308,12 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 20,
       });
 
-      reader.setMetricProducer(new TestMetricProducer());
+      reader.setMetricProducer(
+        new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+      );
 
       const result = await exporter.waitForNumberOfExports(2);
-      assert.deepStrictEqual(result, [
-        emptyResourceMetrics,
-        emptyResourceMetrics,
-      ]);
+      assert.deepStrictEqual(result, [resourceMetrics, resourceMetrics]);
 
       exporter.rejectExport = false;
       await reader.shutdown();
@@ -258,13 +329,12 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 20,
       });
 
-      reader.setMetricProducer(new TestMetricProducer());
+      reader.setMetricProducer(
+        new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+      );
 
       const result = await exporter.waitForNumberOfExports(2);
-      assert.deepStrictEqual(result, [
-        emptyResourceMetrics,
-        emptyResourceMetrics,
-      ]);
+      assert.deepStrictEqual(result, [resourceMetrics, resourceMetrics]);
 
       exporter.throwExport = false;
       await reader.shutdown();
@@ -286,7 +356,9 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 80,
       });
 
-      reader.setMetricProducer(new TestMetricProducer());
+      reader.setMetricProducer(
+        new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+      );
       await reader.forceFlush();
       exporterMock.verify();
 
@@ -294,6 +366,100 @@ describe('PeriodicExportingMetricReader', () => {
       assert.strictEqual(exports.length, 1);
 
       await reader.shutdown();
+    });
+
+    it('should complete actions before promise resolves when async resource attributes are pending', async () => {
+      // arrange
+      const waitForAsyncAttributesStub = sinon.stub().returns(
+        new Promise<void>(resolve =>
+          setTimeout(() => {
+            resolve();
+          }, 10)
+        )
+      );
+      const resourceMetrics: ResourceMetrics = {
+        resource: {
+          attributes: {},
+          merge: sinon.stub(),
+          asyncAttributesPending: true, // ensure we try to await async attributes
+          waitForAsyncAttributes: waitForAsyncAttributesStub, // resolve when awaited
+          getRawAttributes: () => [],
+        },
+        scopeMetrics: scopeMetrics,
+      };
+
+      const mockCollectionResult: CollectionResult = {
+        errors: [],
+        resourceMetrics,
+      };
+      const producerStubs: MetricProducer = {
+        collect: sinon.stub().resolves(mockCollectionResult),
+      };
+
+      const exporter = new TestMetricExporter();
+
+      const reader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: MAX_32_BIT_INT,
+        exportTimeoutMillis: 80,
+      });
+
+      reader.setMetricProducer(producerStubs);
+
+      // act
+      await reader.forceFlush();
+
+      // assert
+      sinon.assert.calledOnce(waitForAsyncAttributesStub);
+      assert.strictEqual(
+        exporter.getExports().length,
+        1,
+        'Expected exactly 1 export to happen when awaiting forceFlush'
+      );
+    });
+
+    it('should call global error handler when resolving async attributes fails', async () => {
+      // arrange
+      const expectedError = new Error('resolving async attributes failed');
+      const waitForAsyncAttributesStub = sinon.stub().rejects(expectedError);
+
+      const resourceMetrics: ResourceMetrics = {
+        resource: {
+          attributes: {},
+          merge: sinon.stub(),
+          asyncAttributesPending: true, // ensure we try to await async attributes
+          waitForAsyncAttributes: waitForAsyncAttributesStub, // reject when awaited
+          getRawAttributes: () => [],
+        },
+        scopeMetrics: [],
+      };
+
+      const mockCollectionResult: CollectionResult = {
+        errors: [],
+        resourceMetrics,
+      };
+      const producerStubs: MetricProducer = {
+        collect: sinon.stub().resolves(mockCollectionResult),
+      };
+
+      const exporter = new TestMetricExporter();
+
+      const reader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: MAX_32_BIT_INT,
+        exportTimeoutMillis: 80,
+      });
+
+      reader.setMetricProducer(producerStubs);
+      const errorHandlerStub = sinon.stub();
+      setGlobalErrorHandler(errorHandlerStub);
+
+      // act
+      await reader.forceFlush();
+
+      // assert
+      sinon.assert.calledOnce(waitForAsyncAttributesStub);
+      sinon.assert.calledOnceWithExactly(errorHandlerStub, expectedError);
     });
 
     it('should throw TimeoutError when forceFlush takes too long', async () => {
@@ -307,7 +473,7 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-      await assertRejects(
+      await assert.rejects(
         () => reader.forceFlush({ timeoutMillis: 20 }),
         TimeoutError
       );
@@ -324,7 +490,10 @@ describe('PeriodicExportingMetricReader', () => {
       });
       reader.setMetricProducer(new TestMetricProducer());
 
-      await assertRejects(() => reader.forceFlush(), /Error during forceFlush/);
+      await assert.rejects(
+        () => reader.forceFlush(),
+        /Error during forceFlush/
+      );
     });
 
     it('should not forceFlush exporter after shutdown', async () => {
@@ -437,7 +606,7 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-      await assertRejects(
+      await assert.rejects(
         () => reader.shutdown({ timeoutMillis: 20 }),
         TimeoutError
       );
@@ -471,7 +640,7 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 80,
       });
 
-      await assertRejects(() => reader.shutdown(), /Error during forceFlush/);
+      await assert.rejects(() => reader.shutdown(), /Error during forceFlush/);
     });
   });
 });

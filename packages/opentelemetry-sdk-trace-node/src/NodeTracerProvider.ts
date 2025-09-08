@@ -13,19 +13,66 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  AsyncHooksContextManager,
-  AsyncLocalStorageContextManager,
-} from '@opentelemetry/context-async-hooks';
-import { B3Propagator, B3InjectEncoding } from '@opentelemetry/propagator-b3';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import {
   BasicTracerProvider,
-  PROPAGATOR_FACTORY,
   SDKRegistrationConfig,
 } from '@opentelemetry/sdk-trace-base';
-import * as semver from 'semver';
 import { NodeTracerConfig } from './config';
-import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
+import {
+  context,
+  ContextManager,
+  propagation,
+  TextMapPropagator,
+  trace,
+} from '@opentelemetry/api';
+import {
+  CompositePropagator,
+  W3CBaggagePropagator,
+  W3CTraceContextPropagator,
+} from '@opentelemetry/core';
+
+function setupContextManager(
+  contextManager: ContextManager | null | undefined
+) {
+  // null means 'do not register'
+  if (contextManager === null) {
+    return;
+  }
+
+  // undefined means 'register default'
+  if (contextManager === undefined) {
+    const defaultContextManager = new AsyncLocalStorageContextManager();
+    defaultContextManager.enable();
+    context.setGlobalContextManager(defaultContextManager);
+    return;
+  }
+
+  contextManager.enable();
+  context.setGlobalContextManager(contextManager);
+}
+
+function setupPropagator(propagator: TextMapPropagator | null | undefined) {
+  // null means 'do not register'
+  if (propagator === null) {
+    return;
+  }
+
+  // undefined means 'register default'
+  if (propagator === undefined) {
+    propagation.setGlobalPropagator(
+      new CompositePropagator({
+        propagators: [
+          new W3CTraceContextPropagator(),
+          new W3CBaggagePropagator(),
+        ],
+      })
+    );
+    return;
+  }
+
+  propagation.setGlobalPropagator(propagator);
+}
 
 /**
  * Register this TracerProvider for use with the OpenTelemetry API.
@@ -35,36 +82,20 @@ import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
  * @param config Configuration object for SDK registration
  */
 export class NodeTracerProvider extends BasicTracerProvider {
-  protected static override readonly _registeredPropagators = new Map<
-    string,
-    PROPAGATOR_FACTORY
-  >([
-    ...BasicTracerProvider._registeredPropagators,
-    [
-      'b3',
-      () =>
-        new B3Propagator({ injectEncoding: B3InjectEncoding.SINGLE_HEADER }),
-    ],
-    [
-      'b3multi',
-      () => new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
-    ],
-    ['jaeger', () => new JaegerPropagator()],
-  ]);
-
   constructor(config: NodeTracerConfig = {}) {
     super(config);
   }
 
-  override register(config: SDKRegistrationConfig = {}): void {
-    if (config.contextManager === undefined) {
-      const ContextManager = semver.gte(process.version, '14.8.0')
-        ? AsyncLocalStorageContextManager
-        : AsyncHooksContextManager;
-      config.contextManager = new ContextManager();
-      config.contextManager.enable();
-    }
-
-    super.register(config);
+  /**
+   * Register this TracerProvider for use with the OpenTelemetry API.
+   * Undefined values may be replaced with defaults, and
+   * null values will be skipped.
+   *
+   * @param config Configuration object for SDK registration
+   */
+  register(config: SDKRegistrationConfig = {}): void {
+    trace.setGlobalTracerProvider(this);
+    setupContextManager(config.contextManager);
+    setupPropagator(config.propagator);
   }
 }

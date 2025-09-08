@@ -16,16 +16,14 @@
 
 import { context, ContextManager, trace } from '@opentelemetry/api';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-import { B3Propagator } from '@opentelemetry/propagator-b3';
-import { Resource } from '@opentelemetry/resources';
-import { SEMRESATTRS_TELEMETRY_SDK_LANGUAGE } from '@opentelemetry/semantic-conventions';
-import { Span, Tracer } from '@opentelemetry/sdk-trace-base';
+import { ATTR_TELEMETRY_SDK_LANGUAGE } from '@opentelemetry/semantic-conventions';
+import { Span } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { WebTracerConfig } from '../src';
 import { WebTracerProvider } from '../src/WebTracerProvider';
 
-describe('WebTracerProvider', () => {
-  describe('constructor', () => {
+describe('WebTracerProvider', function () {
+  describe('constructor', function () {
     let defaultOptions: WebTracerConfig;
     let contextManager: ContextManager;
 
@@ -40,52 +38,20 @@ describe('WebTracerProvider', () => {
       context.disable();
     });
 
-    it('should construct an instance with required only options', () => {
+    it('should construct an instance with required only options', function () {
       const tracer = new WebTracerProvider(
         Object.assign({}, defaultOptions)
       ).getTracer('default');
-      assert.ok(tracer instanceof Tracer);
+      assert.ok(tracer);
     });
 
-    it('should work without default context manager', () => {
+    it('should work without default context manager', function () {
       assert.doesNotThrow(() => {
         new WebTracerProvider({});
       });
     });
 
-    it('should throw error when context manager is passed in constructor', () => {
-      let error = '';
-      try {
-        new WebTracerProvider({
-          contextManager: new ZoneContextManager(),
-        } as any);
-      } catch (e) {
-        error = e;
-      }
-      assert.strictEqual(
-        error,
-        'contextManager should be defined in' +
-          ' register method not in constructor'
-      );
-    });
-
-    it('should throw error when propagator is passed in constructor', () => {
-      let error = '';
-      try {
-        new WebTracerProvider({
-          propagator: new B3Propagator(),
-        } as any);
-      } catch (e) {
-        error = e;
-      }
-      assert.strictEqual(
-        error,
-        'propagator should be defined in register' +
-          ' method not in constructor'
-      );
-    });
-
-    describe('when contextManager is "ZoneContextManager"', () => {
+    describe('when contextManager is "ZoneContextManager"', function () {
       it('should correctly return the contexts for 2 parallel actions', done => {
         const webTracerWithZone = new WebTracerProvider().getTracer('default');
 
@@ -123,14 +89,14 @@ describe('WebTracerProvider', () => {
       });
     });
 
-    describe('.startSpan()', () => {
-      it('should assign resource to span', () => {
+    describe('.startSpan()', function () {
+      it('should assign resource to span', function () {
         const provider = new WebTracerProvider();
         const span = provider.getTracer('default').startSpan('my-span') as Span;
         assert.ok(span);
-        assert.ok(span.resource instanceof Resource);
+        assert.ok(span.resource);
         assert.equal(
-          span.resource.attributes[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
+          span.resource.attributes[ATTR_TELEMETRY_SDK_LANGUAGE],
           'webjs'
         );
       });

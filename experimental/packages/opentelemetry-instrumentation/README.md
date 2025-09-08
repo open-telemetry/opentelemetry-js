@@ -7,6 +7,9 @@
 
 ## Installation
 
+**Note: Much of OpenTelemetry JS documentation is written assuming the compiled application is run as CommonJS.**
+For more details on ECMAScript Modules vs CommonJS, refer to [esm-support](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-support.md).
+
 ```bash
 npm install --save @opentelemetry/instrumentation
 ```
@@ -108,7 +111,7 @@ export class MyInstrumentation extends InstrumentationBase {
 
 // Later, but before the module to instrument is required
 
-const myInstrumentationn = new MyInstrumentation();
+const myInstrumentation = new MyInstrumentation();
 myInstrumentation.setTracerProvider(provider); // this is optional, only if global TracerProvider shouldn't be used
 myInstrumentation.setMeterProvider(meterProvider); // this is optional
 myInstrumentation.enable();
@@ -219,12 +222,17 @@ If nothing is specified the global registered provider is used. Usually this is 
 There might be use case where someone has the need for more providers within an application. Please note that special care must be takes in such setups
 to avoid leaking information from one provider to the other because there are a lot places where e.g. the global `ContextManager` or `Propagator` is used.
 
-## Instrumentation for ES Modules In Node.js (experimental)
+## Instrumentation for ECMAScript Modules (ESM) in Node.js (experimental)
 
-As the module loading mechanism for ESM is different than CJS, you need to select a custom loader so instrumentation can load hook on the ESM module it want to patch. To do so, you must provide the `--experimental-loader=@opentelemetry/instrumentation/hook.mjs` flag to the `node` binary. Alternatively you can set the `NODE_OPTIONS` environment variable to `NODE_OPTIONS="--experimental-loader=@opentelemetry/instrumentation/hook.mjs"`.
-As the ESM module loader from Node.js is experimental, so is our support for it. Feel free to provide feedback or report issues about it.
+Node.js uses a different module loader for ECMAScript Modules (ESM) vs. CommonJS (CJS).
+A `require()` call will cause Node.js to use the CommonJS module loader.
+An `import ...` statement or `import()` call will cause Node.js to use the ECMAScript module loader.
 
-**Note**: ESM Instrumentation is not yet supported for Node 20.
+If your application is written in JavaScript as ESM, or it must compile to ESM from TypeScript, then a loader hook is required to properly patch instrumentation.
+The custom hook for ESM instrumentation is `--experimental-loader=@opentelemetry/instrumentation/hook.mjs`.
+This flag must be passed to the `node` binary, which is often done as a startup command and/or in the `NODE_OPTIONS` environment variable.
+
+For more details on ECMAScript Modules vs CommonJS, refer to [esm-support](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-support.md).
 
 ## Limitations
 
@@ -236,6 +244,8 @@ Instrumentations for external modules (e.g. express, mongodb,...) hooks the `req
 ## License
 
 Apache 2.0 - See [LICENSE][license-url] for more information.
+
+Third-party licenses and copyright notices can be found in the [LICENSES directory](./LICENSES).
 
 ## Useful links
 

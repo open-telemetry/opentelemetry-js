@@ -19,7 +19,7 @@ import { ConsoleMetricExporter } from '../../src/export/ConsoleMetricExporter';
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { ResourceMetrics } from '../../src/export/MetricData';
 import { MeterProvider } from '../../src/MeterProvider';
-import { defaultResource } from '../util';
+import { testResource } from '../util';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { assertAggregationTemporalitySelector } from './utils';
@@ -64,7 +64,7 @@ describe('ConsoleMetricExporter', () => {
         exportTimeoutMillis: 100,
       });
       meterProvider = new MeterProvider({
-        resource: defaultResource,
+        resource: testResource,
         readers: [metricReader],
       });
       meter = meterProvider.getMeter('ConsoleMetricExporter', '1.0.0');

@@ -2,20 +2,450 @@
 # CHANGELOG
 
 All notable changes to experimental packages in this project will be documented in this file.
+For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2.x.md).
 
 ## Unreleased
 
-### :boom: Breaking Change
+### :boom: Breaking Changes
 
-### :rocket: (Enhancement)
+### :rocket: Features
 
-### :bug: (Bug Fix)
+### :bug: Bug Fixes
 
 * fix(instrumentation-http): respect requireParent flag when INVALID_SPAN_CONTEXT is used [#4788](https://github.com/open-telemetry/opentelemetry-js/pull/4788) @reberhardt7
 
-### :books: (Refine Doc)
+### :books: Documentation
+
+### :house: Internal
+
+## 0.204.0
+
+### :boom: Breaking Changes
+
+* feat(api-logs)!: Marked private methods as "conventionally private". [#5789](https://github.com/open-telemetry/opentelemetry-js/pull/5789)
+* feat(exporter-otlp-\*): support custom HTTP agents [#5719](https://github.com/open-telemetry/opentelemetry-js/pull/5719) @raphael-theriault-swi
+  * `OtlpHttpConfiguration.agentOptions` has been removed and functionality has been rolled into `OtlpHttpConfiguration.agentFactory`
+    * (old) `{ agentOptions: myOptions }`
+    * (new) `{ agentFactory: httpAgentFactoryFromOptions(myOptions) }`
+
+### :rocket: Features
+
+* feat(otlp-exporter-base): Add fetch transport for fetch-only environments like service workers. [#5807](https://github.com/open-telemetry/opentelemetry-js/pull/5807)
+  * when using headers, the Browser exporter now prefers `fetch` over `XMLHttpRequest` if present. Sending via `XMLHttpRequest` will be removed in a future release.
+* feat(opentelemetry-configuration): creation of basic ConfigProvider [#5809](https://github.com/open-telemetry/opentelemetry-js/pull/5809) @maryliag
+* feat(opentelemetry-configuration): creation of basic FileConfigProvider [#5863](https://github.com/open-telemetry/opentelemetry-js/pull/5863) @maryliag
+* feat(sdk-node): Add support for multiple metric readers via the new `metricReaders` option in NodeSDK configuration. Users can now register multiple metric readers (e.g., Console, Prometheus) directly through the NodeSDK constructor. The old `metricReader` (singular) option is now deprecated and will show a warning if used, but remains supported for backward compatibility. Comprehensive tests and documentation have been added. [#5760](https://github.com/open-telemetry/opentelemetry-js/issues/5760)
+  * **Migration:**
+    - Before:
+
+      ```js
+      const sdk = new NodeSDK({ metricReader: myMetricReader });
+      ```
+
+    - After:
+
+      ```js
+      const sdk = new NodeSDK({ metricReaders: [myMetricReader] });
+      ```
+
+  * Users should migrate to the new `metricReaders` array option for future compatibility. The old option will be removed in an upcoming experimental version.
+* feat(instrumentation-http): Added support for redacting specific url query string values and url credentials [#5743](https://github.com/open-telemetry/opentelemetry-js/pull/5743) @rads-1996
+
+### :bug: Bug Fixes
+
+* fix(otlp-exporter-base): prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
+* fix(otlp-exporter-base): consider relative urls as valid in browser environments [#5807](https://github.com/open-telemetry/opentelemetry-js/pull/5807)
+* fix(instrumentation-fetch): Use ESM version of semconv instead of CJS. Users expecting mixed ESM and CJS modules will now only get ESM modules. [#5878](https://github.com/open-telemetry/opentelemetry-js/pull/5878) @overbalance
+
+### :house: Internal
+
+* refactor(otlp-exporter-base): use getStringFromEnv instead of process.env [#5594](https://github.com/open-telemetry/opentelemetry-js/pull/5594) @weyert
+* chore(sdk-logs): refactored imports [#5801](https://github.com/open-telemetry/opentelemetry-js/pull/5801) @svetlanabrennan
+* refactor(instrumentation-grpc): updated path to semconv [#5884](https://github.com/open-telemetry/opentelemetry-js/pull/5884) @overbalance
+
+## 0.203.0
+
+### :boom: Breaking Changes
+
+* feat(sdk-logs)!: Removed deprecated LoggerProvider#addLogRecordProcessor() [#5764](https://github.com/open-telemetry/opentelemetry-js/pull/5764) @svetlanabrennan
+* feat(sdk-logs)!: Changed `LogRecord` class to be an interface [#5749](https://github.com/open-telemetry/opentelemetry-js/pull/5749) @svetlanabrennan
+  * user-facing: `LogRecord` class is now not exported anymore. A newly exported interface `SdkLogRecord` is used in its place.
+* feat!: Removed `api-events` and `sdk-events` [#5737](https://github.com/open-telemetry/opentelemetry-js/pull/5737) @svetlanabrennan
+
+### :house: Internal
+
+* chore: Regenerated certs [#5752](https://github.com/open-telemetry/opentelemetry-js/pull/5752) @svetlanabrennan
+* refactor(otlp-exporter-base): remove compatibility code that was intended for now unsupported runtime Node.js v14 @pichlermarc
+
+## 0.202.0
+
+### :rocket: Features
+
+* feat(exporter-otlp-\*): update proto to `v1.7.0`
+* feat(exporter-metrics-otlp-proto): Support to protobuf in browser metrics. [#5710](https://github.com/open-telemetry/opentelemetry-js/pull/5710) @YangJonghun
+* feat(logs): add eventName to emit [#5707](https://github.com/open-telemetry/opentelemetry-js/pull/5707)
+
+### :bug: Bug Fixes
+
+* fix(instrumentation): remove dependency on the shimmer module [#5652](https://github.com/open-telemetry/opentelemetry-js/pull/5652) @cjihrig
+
+## 0.201.1
+
+### :bug: Bug Fixes
+
+* fix(instrumentation): Change `SemconvStability` export from `const enum` to `enum` to allow single-file transpilation tooling to work with code that uses `SemconvStability`. [#5691](https://github.com/open-telemetry/opentelemetry-js/issues/5691) @trentm
+
+## 0.201.0
+
+### :rocket: Features
+
+* feat(instrumentation-xml-http-request): support migration to stable HTTP semconv, v1.23.1  [#5662](https://github.com/open-telemetry/opentelemetry-js/pull/5662) @trentm
+  * Configure the instrumentation with `semconvStabilityOptIn: 'http'` to use the new, stable semconv v1.23.1 semantics or `'http/dup'` for both old (v1.7.0) and stable semantics. When `semconvStabilityOptIn` is not specified (or does not contain these values), it uses the old semconv v1.7.0. I.e. the default behavior is unchanged.
+* feat(instrumentation-fetch): support migration to stable HTTP semconv, v1.23.1  [#5651](https://github.com/open-telemetry/opentelemetry-js/pull/5651) @trentm
+  * Configure the instrumentation with `semconvStabilityOptIn: 'http'` to use the new, stable semconv v1.23.1 semantics or `'http/dup'` for both old (v1.7.0) and stable semantics. When `semconvStabilityOptIn` is not specified (or does not contain these values), it uses the old semconv v1.7.0. I.e. the default behavior is unchanged.
+* feat(instrumentation): New `semconvStabilityFromStr()` utility for semconv stability migration in instrumentations. [#5684](https://github.com/open-telemetry/opentelemetry-js/pull/5684) @trentm
+  * See [the utility comment](https://github.com/trentm/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation/src/semconvStability.ts).
+* feat(instrumentation-grpc): support migration to stable HTTP semconv [#5653](https://github.com/open-telemetry/opentelemetry-js/pull/5653) @JamieDanielson
+* feat(instrumentation-http): capture synthetic source type on requests [#5488](https://github.com/open-telemetry/opentelemetry-js/pull/5488) @JacksonWeber
+
+### :bug: Bug Fixes
+
+* fix(otlp-transformer): do not throw when deserializing empty JSON response [#5551](https://github.com/open-telemetry/opentelemetry-js/pull/5551) @pichlermarc
+* fix(instrumentation-http): report stable client metrics response code [#9586](https://github.com/open-telemetry/opentelemetry-js/pull/9586) @jtescher
+* fix(sdk-node): instantiate baggage processor when env var is set [#5634](https://github.com/open-telemetry/opentelemetry-js/pull/5634) @pichlermarc
+* fix(instrumentation-http): report `error.type` metrics attribute [#5647](https://github.com/open-telemetry/opentelemetry-js/pull/5647)
+
+### :house: Internal
+
+* refactor(instrumentation-http): Remove legacy http span attributes and metrics [#5552](https://github.com/open-telemetry/opentelemetry-js/pull/5552) @svetlanabrennan
+* refactor(instrumentation-http): Add back support for http semconv [#5665](https://github.com/open-telemetry/opentelemetry-js/pull/5665) @JamieDanielson
+  * Note: We initially removed support for legacy http attributes and metrics, but then added back for an additional 6 months to ensure all instrumentations could be updated and kept consistent. There should be no net new change in this instrumentation related to these semantic conventions. See [#5646](https://github.com/open-telemetry/opentelemetry-js/issues/5646) for details.
+* refactor(sdk-node): update semconv usage to `ATTR_` exports [#5668](https://github.com/open-telemetry/opentelemetry-js/pull/5668) @trentm
+* chore(sdk-node): Refactored using `get*FromEnv` utility function instead of `process.env` for NodeSDK's resource detector setup. [#5582](https://github.com/open-telemetry/opentelemetry-js/pull/5582) @beeme1mr
+* chore(sdk-node): Refactored using `get*FromEnv` utility function instead of `process.env` for NodeSDK's logging setup. [#5563](https://github.com/open-telemetry/opentelemetry-js/issues/5563) @weyert
+* test: test Node.js 24 in CI [#5661](https://github.com/open-telemetry/opentelemetry-js/pull/5661) @cjihrig
+
+## 0.200.0
+
+### Summary
+
+- The **minimum supported Node.js has been raised to `^18.19.0 || >=20.6.0`**. This means that support for Node.js 14 and 16 has been dropped.
+- The **minimum supported TypeScript version has been raised to 5.0.4**.
+- The **compilation target for transpiled TypeScript has been raised to ES2022** (from ES2017).
+- The **public interface has changed**
+  - for notes on migrating to 2.x / 0.200.x see [the upgrade guide](https://github.com/open-telemetry/opentelemetry-js/tree/main/doc/upgrade-to-2.x.md)
+- Only stable versions `2.0.0` are compatible with this release
+
+### :boom: Breaking Change
+
+* feat(exporter-prometheus)!: stop the using `type` field to enforce naming conventions [#5291](https://github.com/open-telemetry/opentelemetry-js/pull/5291) @chancancode
+  * Any non-monotonic sums will now be treated as counters and will therefore include the `_total` suffix.
+* feat(shim-opencenus)!: stop mapping removed Instrument `type` to OpenTelemetry metrics [#5291](https://github.com/open-telemetry/opentelemetry-js/pull/5291) @chancancode
+  * The internal OpenTelemetry data model dropped the concept of instrument type on exported metrics, therefore mapping it is not necessary anymore.
+* feat(instrumentation-fetch)!: passthrough original response to `applyCustomAttributes` hook [#5281](https://github.com/open-telemetry/opentelemetry-js/pull/5281) @chancancode
+  * Previously, the fetch instrumentation code unconditionally clones every `fetch()` response in order to preserve the ability for the `applyCustomAttributes` hook to consume the response body. This is fundamentally unsound, as it forces the browser to buffer and retain the response body until it is fully received and read, which crates unnecessary memory pressure on large or long-running response streams. In extreme cases, this is effectively a memory leak and can cause the browser tab to crash. If your use case for `applyCustomAttributes` requires access to the response body, please chime in on [#5293](https://github.com/open-telemetry/opentelemetry-js/issues/5293).
+* chore!: Raise the minimum supported Node.js version to `^18.19.0 || >=20.6.0`. Support for Node.js 14, 16, and early minor versions of 18 and 20 have been dropped. This applies to all packages except the 'api' and 'semantic-conventions' packages. [#5395](https://github.com/open-telemetry/opentelemetry-js/issues/5395) @trentm
+* feat(sdk-node)!: use `IMetricReader` over `MetricReader` [#5311](https://github.com/open-telemetry/opentelemetry-js/pull/5311)
+  * (user-facing): `NodeSDKConfiguration` now provides the more general `IMetricReader` type over `MetricReader`
+* feat(exporter-metrics-otlp-http)!: do not read environment variables from window in browsers [#5473](https://github.com/open-telemetry/opentelemetry-js/pull/5473) @pichlermarc
+  * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore, please pass configuration options to constructors instead.
+  * Note: Node.js environment variable configuration continues to work as-is.
+* feat(sdk-logs)!: do not read environment variables from window in browsers [#5472](https://github.com/open-telemetry/opentelemetry-js/pull/5472) @pichlermarc
+  * (user-facing): all configuration previously possible via `window.OTEL_*` is now not supported anymore, please pass configuration options to constructors instead.
+    * Note: Node.js environment variable configuration continues to work as-is.
+
+### :rocket: (Enhancement)
+
+* feat(instrumentation-fetch): add a `requestHook` option [#5380](https://github.com/open-telemetry/opentelemetry-js/pull/5380)
+* feat(instrumentation): re-export initialize function from import-in-the-middle [#5123](https://github.com/open-telemetry/opentelemetry-js/pull/5123)
+* feat(sdk-node): lower diagnostic level [#5360](https://github.com/open-telemetry/opentelemetry-js/pull/5360) @cjihrig
+* feat(exporter-prometheus): add additional attributes option [#5317](https://github.com/open-telemetry/opentelemetry-js/pull/5317) @marius-a-mueller
+  * Add `withResourceConstantLabels` option to `ExporterConfig`. It can be used to define a regex pattern to choose which resource attributes will be used as static labels on the metrics. The default is to not set any static labels.
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation-grpc): monitor error events with events.errorMonitor [#5369](https://github.com/open-telemetry/opentelemetry-js/pull/5369) @cjihrig
+* fix(exporter-metrics-otlp-http): browser OTLPMetricExporter was not passing config to OTLPMetricExporterBase super class [#5331](https://github.com/open-telemetry/opentelemetry-js/pull/5331) @trentm
+* fix(instrumentation-fetch, instrumentation-xhr): Ignore network events with zero-timings [#5332](https://github.com/open-telemetry/opentelemetry-js/pull/5332) @chancancode
+* fix(exporter-logs/trace-otlp-grpc): fix error for missing dependency otlp-exporter-base [#5412](https://github.com/open-telemetry/opentelemetry-js/pull/5412) @JamieDanielson
 
 ### :house: (Internal)
+
+* refactor(instrumentation-grpc): remove unused findIndex() function [#5372](https://github.com/open-telemetry/opentelemetry-js/pull/5372) @cjihrig
+* refactor(otlp-exporter-base): remove unnecessary isNaN() checks [#5374](https://github.com/open-telemetry/opentelemetry-js/pull/5374) @cjihrig
+* refactor(exporter-prometheus): remove unnecessary isNaN() check [#5377](https://github.com/open-telemetry/opentelemetry-js/pull/5377) @cjihrig
+* refactor(sdk-node): move code to auto-instantiate propagators into utils [#5355](https://github.com/open-telemetry/opentelemetry-js/pull/5355) @pichlermarc
+* chore: unpin `@opentelemetry/semantic-conventions` dep to allow better de-duplication in installs [#5439](https://github.com/open-telemetry/opentelemetry-js/pull/5439) @trentm
+* refactor(instrumentation-http): migrate away from getEnv() [#5469](https://github.com/open-telemetry/opentelemetry-js/pull/5469) @pichlermarc
+* refactor(sdk-node): migrate away from getEnv() [#5475](https://github.com/open-telemetry/opentelemetry-js/pull/5475) @pichlermarc
+
+## 0.57.0
+
+### :rocket: (Enhancement)
+
+* feat(opentelemetry-sdk-node): automatically configure metrics exporter based on environment variables [#5168](https://github.com/open-telemetry/opentelemetry-js/pull/5168) @bhaskarbanerjee
+
+### :house: (Internal)
+
+* refactor(otlp-transformer): re-structure package to prepare for separate entrypoints [#5264](https://github.com/open-telemetry/opentelemetry-js/pull/5264) @pichlermarc
+
+## 0.56.0
+
+### :boom: Breaking Change
+
+* feat(otlp-exporter-base)!: collapse base classes into one [#5031](https://github.com/open-telemetry/opentelemetry-js/pull/5031) @pichlermarc
+  * `OTLPExporterNodeBase` has been removed in favor of a platform-agnostic implementation (`OTLPExporterBase`)
+  * `OTLPExporterBrowserBase` has been removed in favor of a platform-agnostic implementation (`OTLPExporterBase`)
+  * `ExportServiceError` was intended for internal use and has been dropped from exports
+  * `validateAndNormalizeHeaders` was intended for internal use and has been dropped from exports
+  * `OTLPExporterBase` all properties are now private, the constructor now takes an `IOTLPExportDelegate`, the type parameter for config type has been dropped.
+    * This type is scheduled for removal in a future version of this package, please treat all exporters as `SpanExporter`, `PushMetricExporter` or `LogRecordExporter`, based on their respective type.
+* feat(otlp-grpc-exporter-base)!: collapse base classes into one [#5031](https://github.com/open-telemetry/opentelemetry-js/pull/5031) @pichlermarc
+  * `OTLPGRPCExporterNodeBase` has been removed in favor of a platform-agnostic implementation (`OTLPExporterBase` from `@opentelemetry/otlp-exporter-base`)
+* feat(otlp-transformer)!: accept `ResourceMetrics` in serializers instead of `ResourceMetrics[]`
+  * (user-facing): `ProtobufMetricsSerializer` now only accepts `ResourceMetrics` instead of `ResourceMetrics[]` to align with `PushMetricExporter` requirements
+  * (user-facing): `JsonMetricsSerializer` now only accepts `ResourceMetrics` instead of `ResourceMetrics[]` to align with `PushMetricExporter` requirements
+* feat(otlp-transformer)!: remove internal types and functions from public API @pichlermarc
+  * (user-facing): the following types and functions were intended for internal use and have been removed from exports
+    * `OtlpEncodingOptions`
+    * `IKeyValueList`
+    * `IKeyValue`
+    * `IInstrumentationScope`
+    * `IArrayValue`
+    * `LongBits`
+    * `IAnyValue`
+    * `Fixed64`
+    * `SpanContextEncodeFunction`
+    * `toLongBits`
+    * `OptionalSpanContextEncodeFunction`
+    * `getOtlpEncoder`
+    * `Encoder`
+    * `HrTimeEncodeFunction`
+    * `encodeAsLongBits`
+    * `encodeAsString`
+    * `hrTimeToNanos`
+    * `IValueAtQuantile`
+    * `ISummaryDataPoint`
+    * `ISummary`
+    * `ISum`
+    * `IScopeMetrics`
+    * `IResourceMetrics`
+    * `INumberDataPoint`
+    * `IHistogramDataPoint`
+    * `IHistogram`
+    * `IExponentialHistogramDataPoint`
+    * `IExponentialHistogram`
+    * `IMetric`
+    * `IGauge`
+    * `IExemplar`
+    * `EAggregationTemporality`
+    * `IExportMetricsServiceRequest`
+    * `IBuckets`
+    * `IResource`
+    * `IStatus`
+    * `EStatusCode`
+    * `ILink`
+    * `IEvent`
+    * `IScopeSpans`
+    * `ISpan`
+    * `IResourceSpans`
+    * `ESpanKind`
+    * `IExportTraceServiceRequest`
+    * `IScopeLogs`
+    * `IExportLogsServiceRequest`
+    * `IResourceLogs`
+    * `ILogRecord`
+    * `ESeverityNumber`
+    * `createExportTraceServiceRequest`
+    * `createExportMetricsServiceRequest`
+    * `createExportLogsServiceRequest`
+
+### :rocket: (Enhancement)
+
+* feat(otlp-exporter-base): handle OTLP partial success [#5183](https://github.com/open-telemetry/opentelemetry-js/pull/5183) @pichlermarc
+* feat(otlp-exporter-base): internally accept a http header provider function only [#5179](https://github.com/open-telemetry/opentelemetry-js/pull/5179) @pichlermarc
+* refactor(otlp-exporter-base): don't create blob before sending xhr [#5193](https://github.com/open-telemetry/opentelemetry-js/pull/5193) @pichlermarc
+  * improves compatibility with some unsupported runtimes
+* feat(otlp-exporter-base): add http response body to exporter error [#5204](https://github.com/open-telemetry/opentelemetry-js/pull/5204) @pichlermarc
+
+### :bug: (Bug Fix)
+
+* fix(otlp-exporter-\*): de-confuse Nuxt build tooling by not using 'export *' in comments [#5227](https://github.com/open-telemetry/opentelemetry-js/pull/5227) @pichlermarc
+
+### :house: (Internal)
+
+* chore(otlp-exporter-\*-grpc): clean up tests [#5196](https://github.com/open-telemetry/opentelemetry-js/pull/5196) @pichlermarc
+* chore(otlp-exporter-\*-http): clean up tests [#5196](https://github.com/open-telemetry/opentelemetry-js/pull/5198) @pichlermarc
+* chore(otlp-exporter-\*-proto): clean up tests [#5196](https://github.com/open-telemetry/opentelemetry-js/pull/5199) @pichlermarc
+
+## 0.55.0
+
+### :boom: Breaking Change
+
+* feat(instrumentation-http)!: reduce public API surface by removing exports and making protected methods private [#5124](https://github.com/open-telemetry/opentelemetry-js/pull/5124) @pichlermarc
+  * (user-facing) the following exports were intended for internal use only and have been removed without replacement
+    * extractHostnameAndPort
+    * getAbsoluteUrl
+    * getIncomingRequestAttributes
+    * getIncomingRequestAttributesOnResponse
+    * getIncomingRequestMetricAttributes
+    * getIncomingRequestMetricAttributesOnResponse
+    * getOutgoingRequestAttributes
+    * getOutgoingRequestAttributesOnResponse
+    * getOutgoingRequestMetricAttributes
+    * getOutgoingRequestMetricAttributesOnResponse
+    * getRequestInfo
+    * headerCapture
+    * isCompressed
+    * isValidOptionsType
+    * parseResponseStatus
+    * satisfiesPattern
+    * setAttributesFromHttpKind
+    * setRequestContentLengthAttribute
+    * setResponseContentLengthAttribute
+    * setSpanWithError
+    * RequestSignature
+    * RequestFunction
+    * ParsedRequestOptions
+    * IgnoreMatcher
+    * Https
+    * HttpRequestArgs
+    * HttpCallbackOptional
+    * HttpCallback
+    * Http
+    * GetFunction
+    * Func
+    * Err
+
+### :rocket: (Enhancement)
+
+* feat(sdk-node, sdk-logs): add `mergeResourceWithDefaults` flag, which allows opting-out of resources getting merged with the default resource [#4617](https://github.com/open-telemetry/opentelemetry-js/pull/4617)
+  * default: `true`
+  * note: `false` will become the default behavior in a future iteration in order to comply with [specification requirements](https://github.com/open-telemetry/opentelemetry-specification/blob/f3511a5ccda376dfd1de76dfa086fc9b35b54757/specification/resource/sdk.md?plain=1#L31-L36)
+* feat(instrumentation): Track request body size in XHR and Fetch instrumentations [#4706](https://github.com/open-telemetry/opentelemetry-js/pull/4706) @mustafahaddara
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation-http): Fix the `OTEL_SEMCONV_STABILITY_OPT_IN` variable check. Using `of` instead of `in` [#5137](https://github.com/open-telemetry/opentelemetry-js/pull/5137)
+* fix(instrumentation-http): drop url.parse in favor of URL constructor [#5091](https://github.com/open-telemetry/opentelemetry-js/pull/5091) @pichlermarc
+  * fixes a bug where using cyrillic characters in a client request string URL would throw an exception, whereas an un-instrumented client would accept the same input without throwing an exception
+* fix(otlp-exporter-base): fix unhandled error when writing to destroyed http request [#5163](https://github.com/open-telemetry/opentelemetry-js/pull/5163) @pichlermarc
+
+## 0.54.2
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation): Fix wrapping ESM files with absolute path [#5094](https://github.com/open-telemetry/opentelemetry-js/pull/5094) @serkan-ozal
+
+## 0.54.1
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation-http): skip malformed forwarded headers. [#5095](https://github.com/open-telemetry/opentelemetry-js/issues/5095) @pmlanger
+
+## 0.54.0
+
+### :boom: Breaking Change
+
+* feat(exporter-*-otlp-*)!: rewrite exporter config logic for testability [#4971](https://github.com/open-telemetry/opentelemetry-js/pull/4971) @pichlermarc
+  * (user-facing) `getDefaultUrl` was intended for internal use has been removed from all exporters
+  * (user-facing) `getUrlFromConfig` was intended for internal use and has been removed from all exporters
+  * (user-facing) `hostname` was intended for internal use and has been removed from all exporters
+  * (user-facing) `url` was intended for internal use and has been removed from all exporters
+  * (user-facing) `timeoutMillis` was intended for internal use and has been removed from all exporters
+  * (user-facing) `onInit` was intended for internal use and has been removed from all exporters
+  * (user-facing) OTLP exporter config `headers` type changed from `Partial<Record<string, unknown>>` to `Record<string, string>`
+* feat(otlp-exporter-base)!: do not export functions that are intended for internal use [#4971](https://github.com/open-telemetry/opentelemetry-js/pull/4971) @pichlermarc
+  * Drops the following functions and types that were intended for internal use from the package exports:
+    * `parseHeaders`
+    * `appendResourcePathToUrl`
+    * `appendResourcePathToUrlIfNeeded`
+    * `configureExporterTimeout`
+    * `invalidTimeout`
+* feat(instrumentation-http)!: remove long deprecated options [#5085](https://github.com/open-telemetry/opentelemetry-js/pull/5085) @pichlermarc
+  * `ignoreIncomingPaths` has been removed, use the more versatile `ignoreIncomingRequestHook` instead.
+  * `ignoreOutgoingUrls` has been removed, use the more versatile `ignoreOutgoingRequestHook` instead.
+  * `isIgnored` utility function was intended for internal use and has been removed without replacement.
+
+### :rocket: (Enhancement)
+
+* feat(api-logs): Add delegating no-op logger provider [#4861](https://github.com/open-telemetry/opentelemetry-js/pull/4861) @hectorhdzg
+* feat(instrumentation-http): Add support for [Semantic Conventions 1.27+](https://github.com/open-telemetry/semantic-conventions/releases/tag/v1.27.0) [#4940](https://github.com/open-telemetry/opentelemetry-js/pull/4940) [#4978](https://github.com/open-telemetry/opentelemetry-js/pull/4978) [#5026](https://github.com/open-telemetry/opentelemetry-js/pull/5026) @dyladan
+  * Applies to client and server spans and metrics
+  * Generate spans and metrics compliant with Semantic Conventions 1.27+ when `OTEL_SEMCONV_STABILITY_OPT_IN` contains `http` or `http/dup`
+  * Generate spans and metrics backwards compatible with previous attributes when `OTEL_SEMCONV_STABILITY_OPT_IN` contains `http/dup` or DOES NOT contain `http`
+
+### :bug: (Bug Fix)
+
+* fix(sampler-jaeger-remote): fixes an issue where package could emit unhandled promise rejections @Just-Sieb
+* fix(otlp-grpc-exporter-base): default compression to `'none'` if env vars `OTEL_EXPORTER_OTLP_TRACES_COMPRESSION` and `OTEL_EXPORTER_OTLP_COMPRESSION` are falsy @sjvans
+* fix(sdk-events): remove devDependencies to old `@opentelemetry/api-logs@0.52.0`, `@opentelemetry/api-events@0.52.0` packages [#5013](https://github.com/open-telemetry/opentelemetry-js/pull/5013) @pichlermarc
+* fix(sdk-logs): remove devDependencies to old `@opentelemetry/api-logs@0.52.0` [#5013](https://github.com/open-telemetry/opentelemetry-js/pull/5013) @pichlermarc
+* fix(sdk-logs): align LogRecord#setAttribute type with types from `@opentelemetry/api-logs@0.53.0` [#5013](https://github.com/open-telemetry/opentelemetry-js/pull/5013) @pichlermarc
+* fix(exporter-*-otlp-*): fixes a bug where signal-specific environment variables would not be applied and the trace-specific one was used instead [#4971](https://github.com/open-telemetry/opentelemetry-js/pull/4971) @pichlermarc
+  * Fixes:
+    * `OTEL_EXPORTER_OTLP_METRICS_COMPRESSION`
+    * `OTEL_EXPORTER_OTLP_LOGS_COMPRESSION`
+    * `OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE`
+    * `OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE`
+    * `OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY`
+    * `OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY`
+    * `OTEL_EXPORTER_OTLP_METRICS_INSECURE`
+    * `OTEL_EXPORTER_OTLP_LOGS_INSECURE`
+* fix(sdk-node): use warn instead of error on unknown OTEL_NODE_RESOURCE_DETECTORS values [#5034](https://github.com/open-telemetry/opentelemetry-js/pull/5034)
+* fix(exporter-logs-otlp-proto): Use correct config type in Node constructor
+* fix(instrumentation-http): Fix instrumentation of `http.get`, `http.request`, `https.get`, and `https.request` when used from ESM code and imported via the `import defaultExport from 'http'` style. [#5024](https://github.com/open-telemetry/opentelemetry-js/issues/5024) @trentm
+
+### :house: (Internal)
+
+* refactor(exporter-prometheus): replace `MetricAttributes` and `MetricAttributeValues` with `Attributes` and `AttributeValues` [#4993](https://github.com/open-telemetry/opentelemetry-js/pull/4993)
+
+* refactor(browser-detector): replace `ResourceAttributes` with `Attributes` [#5004](https://github.com/open-telemetry/opentelemetry-js/pull/5004)
+* refactor(sdk-logs): replace `ResourceAttributes` with `Attributes` [#5005](https://github.com/open-telemetry/opentelemetry-js/pull/5005) @david-luna
+
+## 0.53.0
+
+### :boom: Breaking Change
+
+* fix(instrumentation)!:remove unused description property from interface [#4847](https://github.com/open-telemetry/opentelemetry-js/pull/4847) @blumamir
+* feat(exporter-*-otlp-*)!: use transport interface in node.js exporters [#4743](https://github.com/open-telemetry/opentelemetry-js/pull/4743) @pichlermarc
+  * (user-facing) `headers` was intended for internal use has been removed from all exporters
+  * (user-facing) `compression` was intended for internal use and has been removed from all exporters
+  * (user-facing) `hostname` was intended for use in tests and is not used by any exporters, it will be removed in a future release
+* fix(exporter-*-otlp-*)!: ensure `User-Agent` header cannot be overwritten by the user [#4743](https://github.com/open-telemetry/opentelemetry-js/pull/4743) @pichlermarc
+  * allowing overrides of the `User-Agent` header was not specification compliant.
+* feat(exporter-*-otlp*)!: remove environment-variable specific code from browser exporters
+  * (user-facing) removes the ability to configure browser exporters by using `process.env` polyfills
+* feat(sdk-node)!: Automatically configure logs exporter [#4740](https://github.com/open-telemetry/opentelemetry-js/pull/4740)
+* feat(exporter-*-otlp-*)!: use transport interface in browser exporters [#4895](https://github.com/open-telemetry/opentelemetry-js/pull/4895) @pichlermarc
+  * (user-facing) protected `headers` property was intended for internal use has been removed from all exporters
+
+### :rocket: (Enhancement)
+
+* feat(otlp-transformer): Do not limit @opentelemetry/api upper range peerDependency [#4816](https://github.com/open-telemetry/opentelemetry-js/pull/4816) @mydea
+* feat(instrumentation-http): Allow to opt-out of instrumenting incoming/outgoing requests [#4643](https://github.com/open-telemetry/opentelemetry-js/pull/4643) @mydea
+* feat(sampler-jaeger-remote): added support of jaeger-remote-sampler according to this [spec](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk.md#jaegerremotesampler) [#4534](https://github.com/open-telemetry/opentelemetry-js/pull/4589) @legalimpurity
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation): ensure .setConfig() results in config.enabled defaulting to true [#4941](https://github.com/open-telemetry/opentelemetry-js/pull/4941) @trentm
+* fix(instrumentation-http): Ensure instrumentation of `http.get` and `https.get` work when used in ESM code [#4857](https://github.com/open-telemetry/opentelemetry-js/issues/4857) @trentm
+* fix(api-logs): align AnyValue to spec [#4893](https://github.com/open-telemetry/opentelemetry-js/pull/4893) @blumamir
+* fix(instrumentation): remove diag.debug() message for instrumentations that do not patch modules [#4925](https://github.com/open-telemetry/opentelemetry-js/pull/4925) @trentm
+
+### :house: (Internal)
+
+* refactor: Simplify the code for the `getEnv` function [#4799](https://github.com/open-telemetry/opentelemetry-js/pull/4799) @danstarns
+* refactor: remove "export *" in favor of explicit named exports [#4880](https://github.com/open-telemetry/opentelemetry-js/pull/4880) @robbkidd
+  * Packages updated:
+    * api-events
+    * api-logs
+    * opentelemetry-browser-detector
+    * opentelemetry-exporter-prometheus
+    * opentelemetry-instrumentation-fetch
+    * opentelemetry-instrumentation-http
+    * opentelemetry-instrumentation-xml-http-request
+    * opentelemetry-instrumentation
 
 ## 0.52.1
 
@@ -73,7 +503,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
-* fix(instrumentation): Update `import-in-the-middle` to fix [numerous bugs](https://github.com/DataDog/import-in-the-middle/releases/tag/v1.8.0) [#4745](https://github.com/open-telemetry/opentelemetry-js/pull/4745) @timfish
+* fix(instrumentation): Update `import-in-the-middle` to fix [numerous bugs](https://github.com/DataDog/import-in-the-middle/pull/91) [#4745](https://github.com/open-telemetry/opentelemetry-js/pull/4745) @timfish
 
 ### :books: (Refine Doc)
 
@@ -270,7 +700,7 @@ All notable changes to experimental packages in this project will be documented 
 
 * fix(sdk-node)!: remove the explicit dependency on @opentelemetry/exporter-jaeger that was kept on the previous release
   * '@opentelemetry/exporter-jaeger' is no longer be a dependency of this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.
-    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to one of the alternatives described [here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
+    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to [one of the alternatives described here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
 * fix(otlp-transformer)!: OTLP json encoding [#4220](https://github.com/open-telemetry/opentelemetry-js/pull/4220) @seemk
   * Fixes a bug in the OTLP (http/json) exporters where timestamps were not encoded as strings, causing the export to
     be rejected by OTLP endpoints
@@ -282,7 +712,7 @@ All notable changes to experimental packages in this project will be documented 
 * fix(exporter-logs-otlp-proto): change OTLPLogExporter to OTLPLogExporter [#4140](https://github.com/open-telemetry/opentelemetry-js/pull/4140) @Vunovati
 * fix(sdk-node): remove explicit dependency on @opentelemetry/exporter-jaeger
   * '@opentelemetry/exporter-jaeger' is no longer be a dependency of this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.
-    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to one of the alternatives described [here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
+    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to [one of the alternatives described here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
 * fix(sdk-logs): hide internal methods with internal shared state [#3865](https://github.com/open-telemetry/opentelemetry-js/pull/3865) @legendecas
 
 ### :rocket: (Enhancement)
@@ -316,7 +746,7 @@ All notable changes to experimental packages in this project will be documented 
     * `NodeSDK.detectResources()`, this is not necessary anymore, resources are now auto-detected on startup.
 * chore(sdk-node): add notice that '@opentelemetry/exporter-jaeger' has to be installed manually in the next version [#4068](https://github.com/open-telemetry/opentelemetry-js/pull/4068) @pichlermarc
   * Starting with 0.43.0 '@opentelemetry/exporter-jaeger' will no longer be a dependency of this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.
-    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to one of the alternatives described [here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
+    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to [one of the alternatives described here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
 
 ### :rocket: (Enhancement)
 

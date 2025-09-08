@@ -13,6 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * @since 1.0.0
+ */
 export interface SpanStatus {
   /** The status code of this message. */
   code: SpanStatusCode;
@@ -22,6 +26,8 @@ export interface SpanStatus {
 
 /**
  * An enumeration of status codes.
+ *
+ * @since 1.0.0
  */
 export enum SpanStatusCode {
   /**

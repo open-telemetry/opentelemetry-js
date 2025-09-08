@@ -21,18 +21,41 @@ npm install @opentelemetry/api
 
 ### Serialize Traces/Metrics/Logs
 
-This module exports functions to serialize traces, metrics and logs from the OpenTelemetry SDK into protocol buffers which can be sent over HTTP to the OpenTelemetry collector or a compatible receiver.
+This module exports serializers to serialize traces, metrics and logs from the OpenTelemetry SDK into protocol buffers
+or JSON which can be sent over HTTP or gRPC (protobuf-only) to the OpenTelemetry collector or a compatible receiver.
 
 ```typescript
 import {
-  createExportTraceServiceRequest,
-  createExportMetricsServiceRequest,
-  createExportLogsServiceRequest,
+  JsonLogsSerializer,
+  JsonMetricsSerializer,
+  JsonTraceSerializer,
+  ProtobufLogsSerializer,
+  ProtobufMetricsSerializer,
+  ProtobufTraceSerializer,
+  IExportLogsServiceResponse,
+  IExportMetricsServiceResponse,
+  IExportTraceServiceResponse,
 } from '@opentelemetry/otlp-transformer';
 
-const serializedSpans = createExportTraceServiceRequest(readableSpans);
-const serializedMetrics = createExportMetricsServiceRequest(readableMetrics);
-const serializedLogs = createExportLogsServiceRequest(readableLogRecords);
+// serialize to JSON export requests
+const serializedJsonLogs: Uint8Array = JsonLogsSerializer.serializeRequest(readableLogRecords);
+const serializedJsonMetrics: Uint8Array = JsonMetricsSerializer.serializeRequest(resourceMetrics);
+const serializedJsonTraces: Uint8Array = JsonTraceSerializer.serializeRequest(readableSpans);
+
+// serialize to Protobuf export requests
+const serializedProtobufLogs: Uint8Array = ProtobufLogsSerializer.serializeRequest(readableLogRecords);
+const serializedProtobufMetrics: Uint8Array = ProtobufMetricsSerializer.serializeRequest(resourceMetrics);
+const serializedProtobufTraces: Uint8Array = ProtobufTraceSerializer.serializeRequest(readableSpans);
+
+// deserialize JSON export responses
+const deserializedJsonLogResponse: IExportLogsServiceResponse = JsonLogsSerializer.deserializeResponse(jsonLogResponse);
+const deserializedJsonMetricsResponse: IExportMetricsServiceResponse = JsonMetricsSerializer.deserializeResponse(jsonMetricsResponse);
+const deserializedJsonTraceResponse: IExportTraceServiceResponse = JsonTraceSerializer.deserializeResponse(jsonTraceResponse);
+
+// deserialize Protobuf export responses
+const deserializedProtobufLogResponse: IExportLogsServiceResponse = ProtobufLogsSerializer.deserializeResponse(protobufLogResponse);
+const deserializedProtobufMetricsResponse: IExportMetricsServiceResponse = ProtobufMetricsSerializer.deserializeResponse(protobufMetricsResponse);
+const deserializedProtobufTraceResponse: IExportTraceServiceResponse = ProtobufTraceSerializer.deserializeResponse(protobufTraceResponse);
 ```
 
 ## Useful links

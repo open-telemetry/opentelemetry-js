@@ -111,7 +111,7 @@ export function hrTimeDuration(
 export function hrTimeToTimeStamp(time: api.HrTime): string {
   const precision = NANOSECOND_DIGITS;
   const tmp = `${'0'.repeat(precision)}${time[1]}Z`;
-  const nanoString = tmp.substr(tmp.length - precision - 1);
+  const nanoString = tmp.substring(tmp.length - precision - 1);
   const date = new Date(time[0] * 1000).toISOString();
   return date.replace('000Z', nanoString);
 }

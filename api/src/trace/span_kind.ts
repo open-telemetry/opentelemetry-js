@@ -13,6 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * @since 1.0.0
+ */
 export enum SpanKind {
   /** Default value. Indicates that the span is used internally. */
   INTERNAL = 0,

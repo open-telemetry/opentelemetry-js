@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-import {
-  DEFAULT_ENVIRONMENT,
-  ENVIRONMENT,
-  RAW_ENVIRONMENT,
-  parseEnvironment,
-} from '../../utils/environment';
-import { _globalThis } from './globalThis';
-
-/**
- * Gets the environment variables
- */
-export function getEnv(): Required<ENVIRONMENT> {
-  const globalEnv = parseEnvironment(
-    _globalThis as typeof globalThis & RAW_ENVIRONMENT
-  );
-  return Object.assign({}, DEFAULT_ENVIRONMENT, globalEnv);
+export function getStringFromEnv(_: string): string | undefined {
+  return undefined;
 }
 
-export function getEnvWithoutDefaults(): ENVIRONMENT {
-  return parseEnvironment(_globalThis as typeof globalThis & RAW_ENVIRONMENT);
+export function getBooleanFromEnv(_: string): boolean | undefined {
+  return undefined;
+}
+
+export function getNumberFromEnv(_: string): number | undefined {
+  return undefined;
+}
+
+export function getStringListFromEnv(_: string): string[] | undefined {
+  return undefined;
 }

@@ -37,7 +37,7 @@ import { TestRecordOnlySampler } from './TestRecordOnlySampler';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestStackContextManager } from './TestStackContextManager';
 import { BatchSpanProcessorBase } from '../../../src/export/BatchSpanProcessorBase';
-import { Resource, ResourceAttributes } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracerProvider({
@@ -96,32 +96,6 @@ describe('BatchSpanProcessorBase', () => {
       const processor = new BatchSpanProcessor(exporter, {});
       assert.ok(processor instanceof BatchSpanProcessor);
       processor.shutdown();
-    });
-
-    it('should read defaults from environment', () => {
-      const bspConfig = {
-        OTEL_BSP_MAX_EXPORT_BATCH_SIZE: 256,
-        OTEL_BSP_SCHEDULE_DELAY: 2500,
-      };
-
-      let env: Record<string, any>;
-      if (global.process?.versions?.node === undefined) {
-        env = globalThis as unknown as Record<string, any>;
-      } else {
-        env = process.env as Record<string, any>;
-      }
-
-      Object.entries(bspConfig).forEach(([k, v]) => {
-        env[k] = v;
-      });
-
-      const processor = new BatchSpanProcessor(exporter);
-      assert.ok(processor instanceof BatchSpanProcessor);
-      assert.strictEqual(processor['_maxExportBatchSize'], 256);
-      assert.strictEqual(processor['_scheduledDelayMillis'], 2500);
-      processor.shutdown();
-
-      Object.keys(bspConfig).forEach(k => delete env[k]);
     });
   });
 
@@ -440,12 +414,11 @@ describe('BatchSpanProcessorBase', () => {
 
       it('should wait for pending resource on flush', async () => {
         const tracer = new BasicTracerProvider({
-          resource: new Resource(
-            {},
-            new Promise<ResourceAttributes>(resolve => {
-              setTimeout(() => resolve({ async: 'fromasync' }), 1);
-            })
-          ),
+          resource: resourceFromAttributes({
+            async: new Promise<string>(resolve =>
+              setTimeout(() => resolve('fromasync'), 1)
+            ),
+          }),
         }).getTracer('default');
 
         const span = tracer.startSpan('test') as Span;

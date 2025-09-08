@@ -120,6 +120,35 @@ describe('DeltaMetricProcessor', () => {
       const accumulation = accumulations.get({});
       assert.strictEqual(accumulation?.toPointValue(), 20);
     });
+
+    it('should respect the cardinality limit', () => {
+      const cardinalityLimit = 2;
+      const metricProcessor = new DeltaMetricProcessor(
+        new SumAggregator(true),
+        cardinalityLimit
+      );
+
+      {
+        const measurements = new AttributeHashMap<number>();
+        measurements.set({ attribute: '1' }, 10);
+        measurements.set({ attribute: '2' }, 20);
+        measurements.set({ attribute: '3' }, 30);
+        metricProcessor.batchCumulate(measurements, [0, 0]);
+      }
+
+      const accumulations = metricProcessor.collect();
+      assert.strictEqual(accumulations.size, 2);
+      {
+        const accumulation = accumulations.get({ attribute: '1' });
+        assert.strictEqual(accumulation?.toPointValue(), 10);
+      }
+      {
+        const overflowAccumulation = accumulations.get({
+          'otel.metric.overflow': true,
+        });
+        assert.strictEqual(overflowAccumulation?.toPointValue(), 30);
+      }
+    });
   });
 
   describe('collect', () => {

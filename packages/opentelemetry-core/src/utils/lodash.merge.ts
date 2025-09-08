@@ -27,25 +27,11 @@ const undefinedTag = '[object Undefined]';
 const funcProto = Function.prototype;
 const funcToString = funcProto.toString;
 const objectCtorString = funcToString.call(Object);
-const getPrototype = overArg(Object.getPrototypeOf, Object);
+const getPrototypeOf = Object.getPrototypeOf;
 const objectProto = Object.prototype;
 const hasOwnProperty = objectProto.hasOwnProperty;
 const symToStringTag = Symbol ? Symbol.toStringTag : undefined;
 const nativeObjectToString = objectProto.toString;
-
-/**
- * Creates a unary function that invokes `func` with its argument transformed.
- *
- * @private
- * @param {Function} func The function to wrap.
- * @param {Function} transform The argument transform.
- * @returns {Function} Returns the new function.
- */
-function overArg(func: Function, transform: any): any {
-  return function (arg: any) {
-    return func(transform(arg));
-  };
-}
 
 /**
  * Checks if `value` is a plain object, that is, an object created by the
@@ -79,7 +65,7 @@ export function isPlainObject(value: any) {
   if (!isObjectLike(value) || baseGetTag(value) !== objectTag) {
     return false;
   }
-  const proto = getPrototype(value);
+  const proto = getPrototypeOf(value);
   if (proto === null) {
     return true;
   }
@@ -150,7 +136,7 @@ function getRawTag(value: any) {
   try {
     value[symToStringTag as any] = undefined;
     unmasked = true;
-  } catch (e) {
+  } catch {
     // silence
   }
 

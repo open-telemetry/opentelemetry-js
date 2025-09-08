@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, MetricAttributes } from '@opentelemetry/api';
+import { Context, HrTime, Attributes } from '@opentelemetry/api';
 import { WritableMetricStorage } from './WritableMetricStorage';
 
 /**
@@ -25,7 +25,7 @@ export class MultiMetricStorage implements WritableMetricStorage {
 
   record(
     value: number,
-    attributes: MetricAttributes,
+    attributes: Attributes,
     context: Context,
     recordTime: HrTime
   ) {

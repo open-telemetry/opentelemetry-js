@@ -15,15 +15,22 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { getEnv, TracesSamplerValues, ENVIRONMENT } from '@opentelemetry/core';
+import { getNumberFromEnv, getStringFromEnv } from '@opentelemetry/core';
 import { Sampler } from './Sampler';
 import { AlwaysOffSampler } from './sampler/AlwaysOffSampler';
 import { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
 import { ParentBasedSampler } from './sampler/ParentBasedSampler';
 import { TraceIdRatioBasedSampler } from './sampler/TraceIdRatioBasedSampler';
 
-const env = getEnv();
-const FALLBACK_OTEL_TRACES_SAMPLER = TracesSamplerValues.AlwaysOn;
+const enum TracesSamplerValues {
+  AlwaysOff = 'always_off',
+  AlwaysOn = 'always_on',
+  ParentBasedAlwaysOff = 'parentbased_always_off',
+  ParentBasedAlwaysOn = 'parentbased_always_on',
+  ParentBasedTraceIdRatio = 'parentbased_traceidratio',
+  TraceIdRatio = 'traceidratio',
+}
+
 const DEFAULT_RATIO = 1;
 
 /**
@@ -37,34 +44,37 @@ const DEFAULT_RATIO = 1;
 // envs are parsed before tests are ran - causes tests using these envs to fail
 export function loadDefaultConfig() {
   return {
-    sampler: buildSamplerFromEnv(env),
+    sampler: buildSamplerFromEnv(),
     forceFlushTimeoutMillis: 30000,
     generalLimits: {
-      attributeValueLengthLimit: getEnv().OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT,
-      attributeCountLimit: getEnv().OTEL_ATTRIBUTE_COUNT_LIMIT,
+      attributeValueLengthLimit:
+        getNumberFromEnv('OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT') ?? Infinity,
+      attributeCountLimit:
+        getNumberFromEnv('OTEL_ATTRIBUTE_COUNT_LIMIT') ?? 128,
     },
     spanLimits: {
       attributeValueLengthLimit:
-        getEnv().OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT,
-      attributeCountLimit: getEnv().OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT,
-      linkCountLimit: getEnv().OTEL_SPAN_LINK_COUNT_LIMIT,
-      eventCountLimit: getEnv().OTEL_SPAN_EVENT_COUNT_LIMIT,
+        getNumberFromEnv('OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT') ?? Infinity,
+      attributeCountLimit:
+        getNumberFromEnv('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT') ?? 128,
+      linkCountLimit: getNumberFromEnv('OTEL_SPAN_LINK_COUNT_LIMIT') ?? 128,
+      eventCountLimit: getNumberFromEnv('OTEL_SPAN_EVENT_COUNT_LIMIT') ?? 128,
       attributePerEventCountLimit:
-        getEnv().OTEL_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT,
+        getNumberFromEnv('OTEL_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT') ?? 128,
       attributePerLinkCountLimit:
-        getEnv().OTEL_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT,
+        getNumberFromEnv('OTEL_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT') ?? 128,
     },
   };
 }
 
 /**
  * Based on environment, builds a sampler, complies with specification.
- * @param environment optional, by default uses getEnv(), but allows passing a value to reuse parsed environment
  */
-export function buildSamplerFromEnv(
-  environment: Required<ENVIRONMENT> = getEnv()
-): Sampler {
-  switch (environment.OTEL_TRACES_SAMPLER) {
+export function buildSamplerFromEnv(): Sampler {
+  const sampler =
+    getStringFromEnv('OTEL_TRACES_SAMPLER') ??
+    TracesSamplerValues.ParentBasedAlwaysOn;
+  switch (sampler) {
     case TracesSamplerValues.AlwaysOn:
       return new AlwaysOnSampler();
     case TracesSamplerValues.AlwaysOff:
@@ -78,48 +88,33 @@ export function buildSamplerFromEnv(
         root: new AlwaysOffSampler(),
       });
     case TracesSamplerValues.TraceIdRatio:
-      return new TraceIdRatioBasedSampler(
-        getSamplerProbabilityFromEnv(environment)
-      );
+      return new TraceIdRatioBasedSampler(getSamplerProbabilityFromEnv());
     case TracesSamplerValues.ParentBasedTraceIdRatio:
       return new ParentBasedSampler({
-        root: new TraceIdRatioBasedSampler(
-          getSamplerProbabilityFromEnv(environment)
-        ),
+        root: new TraceIdRatioBasedSampler(getSamplerProbabilityFromEnv()),
       });
     default:
       diag.error(
-        `OTEL_TRACES_SAMPLER value "${environment.OTEL_TRACES_SAMPLER} invalid, defaulting to ${FALLBACK_OTEL_TRACES_SAMPLER}".`
+        `OTEL_TRACES_SAMPLER value "${sampler}" invalid, defaulting to "${TracesSamplerValues.ParentBasedAlwaysOn}".`
       );
-      return new AlwaysOnSampler();
+      return new ParentBasedSampler({
+        root: new AlwaysOnSampler(),
+      });
   }
 }
 
-function getSamplerProbabilityFromEnv(
-  environment: Required<ENVIRONMENT>
-): number | undefined {
-  if (
-    environment.OTEL_TRACES_SAMPLER_ARG === undefined ||
-    environment.OTEL_TRACES_SAMPLER_ARG === ''
-  ) {
+function getSamplerProbabilityFromEnv(): number | undefined {
+  const probability = getNumberFromEnv('OTEL_TRACES_SAMPLER_ARG');
+  if (probability == null) {
     diag.error(
       `OTEL_TRACES_SAMPLER_ARG is blank, defaulting to ${DEFAULT_RATIO}.`
     );
     return DEFAULT_RATIO;
   }
 
-  const probability = Number(environment.OTEL_TRACES_SAMPLER_ARG);
-
-  if (isNaN(probability)) {
-    diag.error(
-      `OTEL_TRACES_SAMPLER_ARG=${environment.OTEL_TRACES_SAMPLER_ARG} was given, but it is invalid, defaulting to ${DEFAULT_RATIO}.`
-    );
-    return DEFAULT_RATIO;
-  }
-
   if (probability < 0 || probability > 1) {
     diag.error(
-      `OTEL_TRACES_SAMPLER_ARG=${environment.OTEL_TRACES_SAMPLER_ARG} was given, but it is out of range ([0..1]), defaulting to ${DEFAULT_RATIO}.`
+      `OTEL_TRACES_SAMPLER_ARG=${probability} was given, but it is out of range ([0..1]), defaulting to ${DEFAULT_RATIO}.`
     );
     return DEFAULT_RATIO;
   }
