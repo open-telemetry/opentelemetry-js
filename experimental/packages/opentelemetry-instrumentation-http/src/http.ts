@@ -357,7 +357,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     return (original: Func<http.ClientRequest>): Func<http.ClientRequest> => {
       const instrumentation = this;
       return function httpsOutgoingRequest(
-        // eslint-disable-next-line node/no-unsupported-features/node-builtins
+        // eslint-disable-next-line n/no-unsupported-features/node-builtins
         options: https.RequestOptions | string | URL,
         ...args: HttpRequestArgs
       ): http.ClientRequest {
@@ -385,7 +385,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   /** Patches HTTPS outgoing get requests */
   private _getPatchHttpsOutgoingGetFunction(
     clientRequest: (
-      // eslint-disable-next-line node/no-unsupported-features/node-builtins
+      // eslint-disable-next-line n/no-unsupported-features/node-builtins
       options: http.RequestOptions | string | URL,
       ...args: HttpRequestArgs
     ) => http.ClientRequest
@@ -393,7 +393,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     return (original: Func<http.ClientRequest>): Func<http.ClientRequest> => {
       const instrumentation = this;
       return function httpsOutgoingRequest(
-        // eslint-disable-next-line node/no-unsupported-features/node-builtins
+        // eslint-disable-next-line n/no-unsupported-features/node-builtins
         options: https.RequestOptions | string | URL,
         ...args: HttpRequestArgs
       ): http.ClientRequest {

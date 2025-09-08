@@ -19,6 +19,15 @@
 //-----------------------------------------------------------------------------------------------------------------
 
 /**
+ * This event indicates that the application has detected substandard UI rendering performance.
+ *
+ * @note Jank happens when the UI is rendered slowly enough for the user to experience some disruption or sluggishness.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_APP_JANK = 'app.jank' as const;
+
+/**
  * This event represents an instantaneous click on the screen of an application.
  *
  * @note The `app.screen.click` event can be used to indicate that a user has clicked or tapped on the screen portion of an application. Clicks outside of an application's active area **SHOULD NOT** generate this event. This event does not differentiate between touch/mouse down and touch/mouse up. Implementations **SHOULD** give preference to generating this event at the time the click is complete, typically on touch release or mouse up. The location of the click event **MUST** be provided in absolute screen pixels.
@@ -83,6 +92,8 @@ export const EVENT_FEATURE_FLAG_EVALUATION = 'feature_flag.evaluation' as const;
  * This event describes the assistant message passed to GenAI system.
  *
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Chat history is reported on `gen_ai.input.messages` attribute on spans or `gen_ai.client.inference.operation.details` event.
  */
 export const EVENT_GEN_AI_ASSISTANT_MESSAGE = 'gen_ai.assistant.message' as const;
 
@@ -90,13 +101,26 @@ export const EVENT_GEN_AI_ASSISTANT_MESSAGE = 'gen_ai.assistant.message' as cons
  * This event describes the Gen AI response message.
  *
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Chat history is reported on `gen_ai.output.messages` attribute on spans or `gen_ai.client.inference.operation.details` event.
  */
 export const EVENT_GEN_AI_CHOICE = 'gen_ai.choice' as const;
+
+/**
+ * Describes the details of a GenAI completion request including chat history and parameters.
+ *
+ * @note This event is opt-in and could be used to store input and output details independently from traces.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS = 'gen_ai.client.inference.operation.details' as const;
 
 /**
  * This event describes the system instructions passed to the GenAI model.
  *
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Chat history is reported on `gen_ai.system_instructions` attribute on spans or `gen_ai.client.inference.operation.details` event.
  */
 export const EVENT_GEN_AI_SYSTEM_MESSAGE = 'gen_ai.system.message' as const;
 
@@ -104,6 +128,8 @@ export const EVENT_GEN_AI_SYSTEM_MESSAGE = 'gen_ai.system.message' as const;
  * This event describes the response from a tool or function call passed to the GenAI model.
  *
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Chat history is reported on `gen_ai.input.messages` attribute on spans or `gen_ai.client.inference.operation.details` event.
  */
 export const EVENT_GEN_AI_TOOL_MESSAGE = 'gen_ai.tool.message' as const;
 
@@ -111,6 +137,8 @@ export const EVENT_GEN_AI_TOOL_MESSAGE = 'gen_ai.tool.message' as const;
  * This event describes the user message passed to the GenAI model.
  *
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Chat history is reported on `gen_ai.input.messages` attribute on spans or `gen_ai.client.inference.operation.details` event.
  */
 export const EVENT_GEN_AI_USER_MESSAGE = 'gen_ai.user.message' as const;
 

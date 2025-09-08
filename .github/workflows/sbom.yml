@@ -2,14 +2,12 @@ name: SBOM
 on:
   release:
     types: [published]
-          
+
 permissions: read-all
 
 jobs:
   generate-sboms:
     runs-on: ubuntu-latest
-    env:
-      NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -32,13 +30,13 @@ jobs:
             echo "Generating SBOM for $dir_name"
             npm sbom --sbom-format=spdx --legacy-peer-deps --workspace ${dir} > "opentelemetry-js_${dir_name}.spdx.json"
           done
-        
+
       - name: Generate SBOM for the API package
         if: startsWith(github.ref, 'refs/tags/api/')
         run: |
           npm sbom --sbom-format=spdx --legacy-peer-deps --workspace api > opentelemetry-js_api.spdx.json
 
-      - name: Generate SBOMs for experimental packages 
+      - name: Generate SBOMs for experimental packages
         if: startsWith(github.ref, 'refs/tags/experimental/')
         run: |
           for dir in $(find experimental/packages -mindepth 1 -maxdepth 1 -type d)
