@@ -88,7 +88,7 @@ export function testSharedConfigurationFromEnvironment(
     });
     it('should not define timeoutMillis when specific and non-specific timeout values are infinite', function () {
       const spyLoggerWarn = sinon.stub(diag, 'warn');
-      process.env.OTEL_EXPORTER_OTLP_METRICS_TIMEOUT = '-Infinitiy';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_TIMEOUT = '-Infinity';
       process.env.OTEL_EXPORTER_OTLP_TIMEOUT = 'Infinity';
 
       const config = sut('METRICS');
@@ -96,7 +96,7 @@ export function testSharedConfigurationFromEnvironment(
       sinon.assert.calledTwice(spyLoggerWarn);
       sinon.assert.calledWithExactly(
         spyLoggerWarn,
-        `Unknown value '-Infinitiy' for OTEL_EXPORTER_OTLP_METRICS_TIMEOUT, expected a number, using defaults`
+        `Configuration: OTEL_EXPORTER_OTLP_TIMEOUT is invalid, expected number greater than 0 (actual: Infinity)`
       );
       sinon.assert.calledWithExactly(
         spyLoggerWarn,

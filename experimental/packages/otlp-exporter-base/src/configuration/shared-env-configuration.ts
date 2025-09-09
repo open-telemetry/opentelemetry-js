@@ -21,7 +21,7 @@ function parseAndValidateTimeoutFromEnv(
   timeoutEnvVar: string
 ): number | undefined {
   const envTimeout = getNumberFromEnv(timeoutEnvVar);
-  if (envTimeout) {
+  if (envTimeout != null) {
     if (Number.isFinite(envTimeout) && envTimeout > 0) {
       return envTimeout;
     }
@@ -48,9 +48,6 @@ function parseAndValidateCompressionFromEnv(
   compressionEnvVar: string
 ): 'none' | 'gzip' | undefined {
   const compression = getStringFromEnv(compressionEnvVar)?.trim();
-  if (compression === '') {
-    return undefined;
-  }
 
   if (compression == null || compression === 'none' || compression === 'gzip') {
     return compression;
