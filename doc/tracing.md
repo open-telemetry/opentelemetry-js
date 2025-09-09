@@ -79,20 +79,31 @@ server.on("GET", "/user/:id", onGet);
 Using span relationships, attributes, kind, and the related [semantic conventions](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/trace.md), we can more accurately describe the span in a way our tracing backend will more easily understand. The following example uses these mechanisms, which are described below.
 
 ```typescript
-import { NetTransportValues, SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { trace, context, SpanKind, SpanStatusCode } from '@opentelemetry/api';
+import {
+  ATTR_HTTP_REQUEST_METHOD,
+  ATTR_URL_PATH,
+  ATTR_URL_SCHEME,
+  ATTR_HTTP_RESPONSE_STATUS_CODE,
+  ATTR_NETWORK_PEER_ADDRESS,
+  ATTR_DB_SYSTEM_NAME,
+  ATTR_DB_NAMESPACE,
+  ATTR_DB_OPERATION_NAME,
+  ATTR_DB_QUERY_TEXT,
+} from '@opentelemetry/semantic-conventions';
 
 async function onGet(request, response) {
   // HTTP semantic conventions determine the span name and attributes for this span
-  const span = tracer.startSpan(`GET /user/:id`, {
+  const span = tracer.startSpan('GET /user/:id', {
     // attributes can be added when the span is started
     attributes: {
       // Attributes from the HTTP trace semantic conventions
-      // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
-      [SemanticAttributes.HTTP_METHOD]: "GET",
-      [SemanticAttributes.HTTP_FLAVOR]: "1.1",
-      [SemanticAttributes.HTTP_URL]: request.url,
-      [SemanticAttributes.NET_PEER_IP]: "192.0.2.5",
+      // https://opentelemetry.io/docs/specs/semconv/http/http-spans/#http-server-span
+      [ATTR_HTTP_REQUEST_METHOD]: 'POST',
+      [ATTR_URL_PATH]: request.url,
+      [ATTR_URL_SCHEME]: 'https',
+      [ATTR_HTTP_RESPONSE_STATUS_CODE]: '200',
+      [ATTR_NETWORK_PEER_ADDRESS]: '192.0.2.5',
     },
     // This span represents a remote incoming synchronous request
     kind: SpanKind.SERVER
@@ -142,26 +153,16 @@ async function getUser(userId) {
   const span = tracer.startSpan("SELECT ShopDb.Users", {
     attributes: {
       // Attributes from the database trace semantic conventions
-      // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/database.md
-      [SemanticAttributes.DB_SYSTEM]: "mysql",
-      [SemanticAttributes.DB_CONNECTION_STRING]: "Server=shopdb.example.com;Database=ShopDb;Uid=billing_user;TableCache=true;UseCompression=True;MinimumPoolSize=10;MaximumPoolSize=50;",
-      [SemanticAttributes.DB_USER]: "app_user",
-      [SemanticAttributes.NET_PEER_NAME]: "shopdb.example.com",
-      [SemanticAttributes.NET_PEER_IP]: "192.0.2.12",
-      [SemanticAttributes.NET_PEER_PORT]: 3306,
-      [SemanticAttributes.NET_TRANSPORT]: NetTransportValues.IP_TCP,
-      [SemanticAttributes.DB_NAME]: "ShopDb",
-      [SemanticAttributes.DB_STATEMENT]: `Select * from Users WHERE user_id = ${userId}`,
-      [SemanticAttributes.DB_OPERATION]: "SELECT",
-      [SemanticAttributes.DB_SQL_TABLE]: "Users",
+      // https://opentelemetry.io/docs/specs/semconv/database/database-spans/#span-definition
+      [ATTR_DB_SYSTEM_NAME]: "mysql",
+      [ATTR_DB_NAMESPACE]: "ShopDb",
+      [ATTR_DB_OPERATION_NAME]: "SELECT",
+      [ATTR_DB_QUERY_TEXT]: `SELECT * from Users WHERE id = ?`,
     },
     kind: SpanKind.CLIENT,
   });
   const user = await db.select("Users", { id: userId });
 
-  span.setStatus({
-      code: SpanStatusCode.OK,
-  });
   span.end();
   return user;
 }

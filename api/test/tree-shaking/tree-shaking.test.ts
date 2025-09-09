@@ -85,6 +85,11 @@ describe('tree-shaking', function () {
         },
       });
 
+      if (compiler == null) {
+        this.fail('Compiler was null');
+        return;
+      }
+
       const fs = new Union();
       fs.use(mfs as any).use(realFs as unknown as IFS);
 

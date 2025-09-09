@@ -26,9 +26,11 @@ import type {
 } from './internal-types';
 
 import { propagation, context } from '@opentelemetry/api';
-import { SEMATTRS_RPC_GRPC_STATUS_CODE } from '@opentelemetry/semantic-conventions';
 import { AttributeNames } from './enums/AttributeNames';
-import { GRPC_STATUS_CODE_OK } from './status-code';
+import {
+  ATTR_RPC_GRPC_STATUS_CODE,
+  RPC_GRPC_STATUS_CODE_VALUE_OK,
+} from './semconv';
 import {
   _grpcStatusCodeToSpanStatus,
   _grpcStatusCodeToOpenTelemetryStatusCode,
@@ -81,14 +83,17 @@ export function patchedCallback(
     if (err) {
       if (err.code) {
         span.setStatus(_grpcStatusCodeToSpanStatus(err.code));
-        span.setAttribute(SEMATTRS_RPC_GRPC_STATUS_CODE, err.code);
+        span.setAttribute(ATTR_RPC_GRPC_STATUS_CODE, err.code);
       }
       span.setAttributes({
         [AttributeNames.GRPC_ERROR_NAME]: err.name,
         [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
       });
     } else {
-      span.setAttribute(SEMATTRS_RPC_GRPC_STATUS_CODE, GRPC_STATUS_CODE_OK);
+      span.setAttribute(
+        ATTR_RPC_GRPC_STATUS_CODE,
+        RPC_GRPC_STATUS_CODE_VALUE_OK
+      );
     }
 
     span.end();
@@ -130,7 +135,7 @@ export function patchResponseStreamEvents(span: Span, call: EventEmitter) {
     span.setAttributes({
       [AttributeNames.GRPC_ERROR_NAME]: err.name,
       [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
-      [SEMATTRS_RPC_GRPC_STATUS_CODE]: err.code,
+      [ATTR_RPC_GRPC_STATUS_CODE]: err.code,
     });
 
     endSpan();
@@ -142,7 +147,7 @@ export function patchResponseStreamEvents(span: Span, call: EventEmitter) {
     }
 
     span.setStatus(_grpcStatusCodeToSpanStatus(status.code));
-    span.setAttribute(SEMATTRS_RPC_GRPC_STATUS_CODE, status.code);
+    span.setAttribute(ATTR_RPC_GRPC_STATUS_CODE, status.code);
 
     endSpan();
   });

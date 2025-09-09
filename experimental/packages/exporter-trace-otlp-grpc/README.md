@@ -5,7 +5,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides a trace-exporter for OTLP (gRPC) traces using protocol version `v0.20.0`.
+This module provides a trace-exporter for OTLP (gRPC) traces using protocol version `v1.7.0`.
 
 ## Installation
 
@@ -81,7 +81,7 @@ To use mutual authentication, pass to the `createSsl()` constructor:
   ),
 ```
 
-To generate credentials for mutual authentication, you can refer to the script used to generate certificates for tests [here](./test/certs/regenerate.sh)
+To generate credentials for mutual authentication, you can refer to [the script used to generate certificates for tests here](./test/certs/regenerate.sh).
 
 The exporter can be configured to send custom metadata with each request as in the example below:
 

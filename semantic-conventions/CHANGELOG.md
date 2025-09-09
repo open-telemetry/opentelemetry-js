@@ -15,6 +15,733 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :house: Internal
 
+## 1.37.0
+
+### :rocket: Features
+
+* feat: add `EVENT_*` exports for event names in Semantic Conventions [#5832](https://github.com/open-telemetry/opentelemetry-js/pull/5832) @trentm
+
+* feat: update semantic conventions to v1.37.0 [#5879](https://github.com/open-telemetry/opentelemetry-js/pull/5879) @trentm
+  * Semantic Conventions v1.37.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1370) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *2 added exports*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *1 exported value changed, 6 newly deprecated exports, 1 newly undeprecated export, 246 added exports*
+
+#### Stable changes in v1.37.0
+
+<details open>
+<summary>2 added exports</summary>
+
+```js
+EVENT_EXCEPTION                       // exception
+
+ATTR_ASPNETCORE_USER_IS_AUTHENTICATED // aspnetcore.user.is_authenticated
+```
+
+</details>
+
+#### Unstable changes in v1.37.0
+
+<details>
+<summary>1 exported value changed</summary>
+
+```js
+GEN_AI_SYSTEM_VALUE_AZ_AI_OPENAI // "azure.ai.openai" -> "az.ai.openai"
+```
+
+</details>
+
+<details>
+<summary>6 newly deprecated exports</summary>
+
+```js
+ATTR_CONTAINER_RUNTIME                         // container.runtime: Replaced by `container.runtime.name`.
+ATTR_GEN_AI_OPENAI_REQUEST_SERVICE_TIER        // gen_ai.openai.request.service_tier: Replaced by `openai.request.service_tier`.
+ATTR_GEN_AI_OPENAI_RESPONSE_SERVICE_TIER       // gen_ai.openai.response.service_tier: Replaced by `openai.response.service_tier`.
+ATTR_GEN_AI_OPENAI_RESPONSE_SYSTEM_FINGERPRINT // gen_ai.openai.response.system_fingerprint: Replaced by `openai.response.system_fingerprint`.
+ATTR_GEN_AI_SYSTEM                             // gen_ai.system: Replaced by `gen_ai.provider.name`.
+GEN_AI_SYSTEM_VALUE_XAI                        // xai: Replaced by `x_ai`.
+```
+
+</details>
+
+<details>
+<summary>1 newly undeprecated export</summary>
+
+```js
+GEN_AI_SYSTEM_VALUE_AZ_AI_INFERENCE // az.ai.inference
+```
+
+</details>
+
+<details>
+<summary>246 added exports</summary>
+
+```js
+METRIC_ASPNETCORE_AUTHENTICATION_AUTHENTICATE_DURATION                            // aspnetcore.authentication.authenticate.duration
+METRIC_ASPNETCORE_AUTHENTICATION_CHALLENGES                                       // aspnetcore.authentication.challenges
+METRIC_ASPNETCORE_AUTHENTICATION_FORBIDS                                          // aspnetcore.authentication.forbids
+METRIC_ASPNETCORE_AUTHENTICATION_SIGN_INS                                         // aspnetcore.authentication.sign_ins
+METRIC_ASPNETCORE_AUTHENTICATION_SIGN_OUTS                                        // aspnetcore.authentication.sign_outs
+METRIC_ASPNETCORE_AUTHORIZATION_ATTEMPTS                                          // aspnetcore.authorization.attempts
+METRIC_ASPNETCORE_IDENTITY_SIGN_IN_AUTHENTICATE_DURATION                          // aspnetcore.identity.sign_in.authenticate.duration
+METRIC_ASPNETCORE_IDENTITY_SIGN_IN_CHECK_PASSWORD_ATTEMPTS                        // aspnetcore.identity.sign_in.check_password_attempts
+METRIC_ASPNETCORE_IDENTITY_SIGN_IN_SIGN_INS                                       // aspnetcore.identity.sign_in.sign_ins
+METRIC_ASPNETCORE_IDENTITY_SIGN_IN_SIGN_OUTS                                      // aspnetcore.identity.sign_in.sign_outs
+METRIC_ASPNETCORE_IDENTITY_SIGN_IN_TWO_FACTOR_CLIENTS_FORGOTTEN                   // aspnetcore.identity.sign_in.two_factor_clients_forgotten
+METRIC_ASPNETCORE_IDENTITY_SIGN_IN_TWO_FACTOR_CLIENTS_REMEMBERED                  // aspnetcore.identity.sign_in.two_factor_clients_remembered
+METRIC_ASPNETCORE_IDENTITY_USER_CHECK_PASSWORD_ATTEMPTS                           // aspnetcore.identity.user.check_password_attempts
+METRIC_ASPNETCORE_IDENTITY_USER_CREATE_DURATION                                   // aspnetcore.identity.user.create.duration
+METRIC_ASPNETCORE_IDENTITY_USER_DELETE_DURATION                                   // aspnetcore.identity.user.delete.duration
+METRIC_ASPNETCORE_IDENTITY_USER_GENERATED_TOKENS                                  // aspnetcore.identity.user.generated_tokens
+METRIC_ASPNETCORE_IDENTITY_USER_UPDATE_DURATION                                   // aspnetcore.identity.user.update.duration
+METRIC_ASPNETCORE_IDENTITY_USER_VERIFY_TOKEN_ATTEMPTS                             // aspnetcore.identity.user.verify_token_attempts
+METRIC_ASPNETCORE_MEMORY_POOL_ALLOCATED                                           // aspnetcore.memory_pool.allocated
+METRIC_ASPNETCORE_MEMORY_POOL_EVICTED                                             // aspnetcore.memory_pool.evicted
+METRIC_ASPNETCORE_MEMORY_POOL_POOLED                                              // aspnetcore.memory_pool.pooled
+METRIC_ASPNETCORE_MEMORY_POOL_RENTED                                              // aspnetcore.memory_pool.rented
+
+METRIC_CONTAINER_FILESYSTEM_AVAILABLE                                             // container.filesystem.available
+METRIC_CONTAINER_FILESYSTEM_CAPACITY                                              // container.filesystem.capacity
+METRIC_CONTAINER_FILESYSTEM_USAGE                                                 // container.filesystem.usage
+
+METRIC_HW_BATTERY_CHARGE                                                          // hw.battery.charge
+METRIC_HW_BATTERY_CHARGE_LIMIT                                                    // hw.battery.charge.limit
+METRIC_HW_BATTERY_TIME_LEFT                                                       // hw.battery.time_left
+METRIC_HW_CPU_SPEED                                                               // hw.cpu.speed
+METRIC_HW_CPU_SPEED_LIMIT                                                         // hw.cpu.speed.limit
+METRIC_HW_FAN_SPEED                                                               // hw.fan.speed
+METRIC_HW_FAN_SPEED_LIMIT                                                         // hw.fan.speed.limit
+METRIC_HW_FAN_SPEED_RATIO                                                         // hw.fan.speed_ratio
+METRIC_HW_GPU_IO                                                                  // hw.gpu.io
+METRIC_HW_GPU_MEMORY_LIMIT                                                        // hw.gpu.memory.limit
+METRIC_HW_GPU_MEMORY_USAGE                                                        // hw.gpu.memory.usage
+METRIC_HW_GPU_MEMORY_UTILIZATION                                                  // hw.gpu.memory.utilization
+METRIC_HW_GPU_UTILIZATION                                                         // hw.gpu.utilization
+METRIC_HW_LOGICAL_DISK_LIMIT                                                      // hw.logical_disk.limit
+METRIC_HW_LOGICAL_DISK_USAGE                                                      // hw.logical_disk.usage
+METRIC_HW_LOGICAL_DISK_UTILIZATION                                                // hw.logical_disk.utilization
+METRIC_HW_MEMORY_SIZE                                                             // hw.memory.size
+METRIC_HW_NETWORK_BANDWIDTH_LIMIT                                                 // hw.network.bandwidth.limit
+METRIC_HW_NETWORK_BANDWIDTH_UTILIZATION                                           // hw.network.bandwidth.utilization
+METRIC_HW_NETWORK_IO                                                              // hw.network.io
+METRIC_HW_NETWORK_PACKETS                                                         // hw.network.packets
+METRIC_HW_NETWORK_UP                                                              // hw.network.up
+METRIC_HW_PHYSICAL_DISK_ENDURANCE_UTILIZATION                                     // hw.physical_disk.endurance_utilization
+METRIC_HW_PHYSICAL_DISK_SIZE                                                      // hw.physical_disk.size
+METRIC_HW_PHYSICAL_DISK_SMART                                                     // hw.physical_disk.smart
+METRIC_HW_POWER_SUPPLY_LIMIT                                                      // hw.power_supply.limit
+METRIC_HW_POWER_SUPPLY_USAGE                                                      // hw.power_supply.usage
+METRIC_HW_POWER_SUPPLY_UTILIZATION                                                // hw.power_supply.utilization
+METRIC_HW_TAPE_DRIVE_OPERATIONS                                                   // hw.tape_drive.operations
+METRIC_HW_TEMPERATURE                                                             // hw.temperature
+METRIC_HW_TEMPERATURE_LIMIT                                                       // hw.temperature.limit
+METRIC_HW_VOLTAGE                                                                 // hw.voltage
+METRIC_HW_VOLTAGE_LIMIT                                                           // hw.voltage.limit
+METRIC_HW_VOLTAGE_NOMINAL                                                         // hw.voltage.nominal
+
+METRIC_K8S_NODE_FILESYSTEM_AVAILABLE                                              // k8s.node.filesystem.available
+METRIC_K8S_NODE_FILESYSTEM_CAPACITY                                               // k8s.node.filesystem.capacity
+METRIC_K8S_NODE_FILESYSTEM_USAGE                                                  // k8s.node.filesystem.usage
+METRIC_K8S_POD_FILESYSTEM_AVAILABLE                                               // k8s.pod.filesystem.available
+METRIC_K8S_POD_FILESYSTEM_CAPACITY                                                // k8s.pod.filesystem.capacity
+METRIC_K8S_POD_FILESYSTEM_USAGE                                                   // k8s.pod.filesystem.usage
+METRIC_K8S_POD_VOLUME_AVAILABLE                                                   // k8s.pod.volume.available
+METRIC_K8S_POD_VOLUME_CAPACITY                                                    // k8s.pod.volume.capacity
+METRIC_K8S_POD_VOLUME_INODE_COUNT                                                 // k8s.pod.volume.inode.count
+METRIC_K8S_POD_VOLUME_INODE_FREE                                                  // k8s.pod.volume.inode.free
+METRIC_K8S_POD_VOLUME_INODE_USED                                                  // k8s.pod.volume.inode.used
+METRIC_K8S_POD_VOLUME_USAGE                                                       // k8s.pod.volume.usage
+
+METRIC_SYSTEM_NETWORK_PACKET_COUNT                                                // system.network.packet.count
+METRIC_SYSTEM_NETWORK_PACKET_DROPPED                                              // system.network.packet.dropped
+
+EVENT_APP_JANK                                                                    // app.jank
+EVENT_APP_SCREEN_CLICK                                                            // app.screen.click
+EVENT_APP_WIDGET_CLICK                                                            // app.widget.click
+EVENT_AZ_RESOURCE_LOG                                                             // az.resource.log
+EVENT_AZURE_RESOURCE_LOG                                                          // azure.resource.log
+EVENT_BROWSER_WEB_VITAL                                                           // browser.web_vital
+EVENT_DEVICE_APP_LIFECYCLE                                                        // device.app.lifecycle
+EVENT_FEATURE_FLAG_EVALUATION                                                     // feature_flag.evaluation
+EVENT_GEN_AI_ASSISTANT_MESSAGE                                                    // gen_ai.assistant.message
+EVENT_GEN_AI_CHOICE                                                               // gen_ai.choice
+EVENT_GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS                                   // gen_ai.client.inference.operation.details
+EVENT_GEN_AI_SYSTEM_MESSAGE                                                       // gen_ai.system.message
+EVENT_GEN_AI_TOOL_MESSAGE                                                         // gen_ai.tool.message
+EVENT_GEN_AI_USER_MESSAGE                                                         // gen_ai.user.message
+EVENT_RPC_MESSAGE                                                                 // rpc.message
+EVENT_SESSION_END                                                                 // session.end
+EVENT_SESSION_START                                                               // session.start
+
+ATTR_APP_BUILD_ID                                                                 // app.build_id
+ATTR_APP_JANK_FRAME_COUNT                                                         // app.jank.frame_count
+ATTR_APP_JANK_PERIOD                                                              // app.jank.period
+ATTR_APP_JANK_THRESHOLD                                                           // app.jank.threshold
+
+ATTR_ASPNETCORE_AUTHENTICATION_RESULT                                             // aspnetcore.authentication.result
+  ASPNETCORE_AUTHENTICATION_RESULT_VALUE_FAILURE                                    // "failure"
+  ASPNETCORE_AUTHENTICATION_RESULT_VALUE_NONE                                       // "none"
+  ASPNETCORE_AUTHENTICATION_RESULT_VALUE_SUCCESS                                    // "success"
+ATTR_ASPNETCORE_AUTHENTICATION_SCHEME                                             // aspnetcore.authentication.scheme
+ATTR_ASPNETCORE_AUTHORIZATION_POLICY                                              // aspnetcore.authorization.policy
+ATTR_ASPNETCORE_AUTHORIZATION_RESULT                                              // aspnetcore.authorization.result
+  ASPNETCORE_AUTHORIZATION_RESULT_VALUE_FAILURE                                     // "failure"
+  ASPNETCORE_AUTHORIZATION_RESULT_VALUE_SUCCESS                                     // "success"
+ATTR_ASPNETCORE_IDENTITY_ERROR_CODE                                               // aspnetcore.identity.error_code
+ATTR_ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT                                    // aspnetcore.identity.password_check_result
+  ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_FAILURE                           // "failure"
+  ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_PASSWORD_MISSING                  // "password_missing"
+  ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_SUCCESS                           // "success"
+  ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_SUCCESS_REHASH_NEEDED             // "success_rehash_needed"
+  ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_USER_MISSING                      // "user_missing"
+ATTR_ASPNETCORE_IDENTITY_RESULT                                                   // aspnetcore.identity.result
+  ASPNETCORE_IDENTITY_RESULT_VALUE_FAILURE                                          // "failure"
+  ASPNETCORE_IDENTITY_RESULT_VALUE_SUCCESS                                          // "success"
+ATTR_ASPNETCORE_IDENTITY_SIGN_IN_RESULT                                           // aspnetcore.identity.sign_in.result
+  ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_FAILURE                                  // "failure"
+  ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_LOCKED_OUT                               // "locked_out"
+  ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_NOT_ALLOWED                              // "not_allowed"
+  ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_REQUIRES_TWO_FACTOR                      // "requires_two_factor"
+  ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_SUCCESS                                  // "success"
+ATTR_ASPNETCORE_IDENTITY_SIGN_IN_TYPE                                             // aspnetcore.identity.sign_in.type
+  ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_EXTERNAL                                   // "external"
+  ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_PASSKEY                                    // "passkey"
+  ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_PASSWORD                                   // "password"
+  ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_TWO_FACTOR                                 // "two_factor"
+  ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_TWO_FACTOR_AUTHENTICATOR                   // "two_factor_authenticator"
+  ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_TWO_FACTOR_RECOVERY_CODE                   // "two_factor_recovery_code"
+ATTR_ASPNETCORE_IDENTITY_TOKEN_PURPOSE                                            // aspnetcore.identity.token_purpose
+  ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_OTHER                                     // "_OTHER"
+  ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_CHANGE_EMAIL                              // "change_email"
+  ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_CHANGE_PHONE_NUMBER                       // "change_phone_number"
+  ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_EMAIL_CONFIRMATION                        // "email_confirmation"
+  ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_RESET_PASSWORD                            // "reset_password"
+  ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_TWO_FACTOR                                // "two_factor"
+ATTR_ASPNETCORE_IDENTITY_TOKEN_VERIFIED                                           // aspnetcore.identity.token_verified
+  ASPNETCORE_IDENTITY_TOKEN_VERIFIED_VALUE_FAILURE                                  // "failure"
+  ASPNETCORE_IDENTITY_TOKEN_VERIFIED_VALUE_SUCCESS                                  // "success"
+ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE                                         // aspnetcore.identity.user.update_type
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_OTHER                                  // "_OTHER"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ACCESS_FAILED                          // "access_failed"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ADD_CLAIMS                             // "add_claims"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ADD_LOGIN                              // "add_login"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ADD_PASSWORD                           // "add_password"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ADD_TO_ROLES                           // "add_to_roles"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_CHANGE_EMAIL                           // "change_email"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_CHANGE_PASSWORD                        // "change_password"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_CHANGE_PHONE_NUMBER                    // "change_phone_number"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_CONFIRM_EMAIL                          // "confirm_email"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_GENERATE_NEW_TWO_FACTOR_RECOVERY_CODES // "generate_new_two_factor_recovery_codes"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_PASSWORD_REHASH                        // "password_rehash"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REDEEM_TWO_FACTOR_RECOVERY_CODE        // "redeem_two_factor_recovery_code"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_AUTHENTICATION_TOKEN            // "remove_authentication_token"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_CLAIMS                          // "remove_claims"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_FROM_ROLES                      // "remove_from_roles"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_LOGIN                           // "remove_login"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_PASSKEY                         // "remove_passkey"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_PASSWORD                        // "remove_password"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REPLACE_CLAIM                          // "replace_claim"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_RESET_ACCESS_FAILED_COUNT              // "reset_access_failed_count"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_RESET_AUTHENTICATOR_KEY                // "reset_authenticator_key"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_RESET_PASSWORD                         // "reset_password"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SECURITY_STAMP                         // "security_stamp"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_AUTHENTICATION_TOKEN               // "set_authentication_token"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_EMAIL                              // "set_email"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_LOCKOUT_ENABLED                    // "set_lockout_enabled"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_LOCKOUT_END_DATE                   // "set_lockout_end_date"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_PASSKEY                            // "set_passkey"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_PHONE_NUMBER                       // "set_phone_number"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_TWO_FACTOR_ENABLED                 // "set_two_factor_enabled"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_UPDATE                                 // "update"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_USER_NAME                              // "user_name"
+ATTR_ASPNETCORE_IDENTITY_USER_TYPE                                                // aspnetcore.identity.user_type
+ATTR_ASPNETCORE_MEMORY_POOL_OWNER                                                 // aspnetcore.memory_pool.owner
+ATTR_ASPNETCORE_SIGN_IN_IS_PERSISTENT                                             // aspnetcore.sign_in.is_persistent
+
+ATTR_CONTAINER_RUNTIME_DESCRIPTION                                                // container.runtime.description
+ATTR_CONTAINER_RUNTIME_NAME                                                       // container.runtime.name
+ATTR_CONTAINER_RUNTIME_VERSION                                                    // container.runtime.version
+
+ATTR_GEN_AI_INPUT_MESSAGES                                                        // gen_ai.input.messages
+ATTR_GEN_AI_OUTPUT_MESSAGES                                                       // gen_ai.output.messages
+ATTR_GEN_AI_PROVIDER_NAME                                                         // gen_ai.provider.name
+  GEN_AI_PROVIDER_NAME_VALUE_ANTHROPIC                                              // "anthropic"
+  GEN_AI_PROVIDER_NAME_VALUE_AWS_BEDROCK                                            // "aws.bedrock"
+  GEN_AI_PROVIDER_NAME_VALUE_AZURE_AI_INFERENCE                                     // "azure.ai.inference"
+  GEN_AI_PROVIDER_NAME_VALUE_AZURE_AI_OPENAI                                        // "azure.ai.openai"
+  GEN_AI_PROVIDER_NAME_VALUE_COHERE                                                 // "cohere"
+  GEN_AI_PROVIDER_NAME_VALUE_DEEPSEEK                                               // "deepseek"
+  GEN_AI_PROVIDER_NAME_VALUE_GCP_GEMINI                                             // "gcp.gemini"
+  GEN_AI_PROVIDER_NAME_VALUE_GCP_GEN_AI                                             // "gcp.gen_ai"
+  GEN_AI_PROVIDER_NAME_VALUE_GCP_VERTEX_AI                                          // "gcp.vertex_ai"
+  GEN_AI_PROVIDER_NAME_VALUE_GROQ                                                   // "groq"
+  GEN_AI_PROVIDER_NAME_VALUE_IBM_WATSONX_AI                                         // "ibm.watsonx.ai"
+  GEN_AI_PROVIDER_NAME_VALUE_MISTRAL_AI                                             // "mistral_ai"
+  GEN_AI_PROVIDER_NAME_VALUE_OPENAI                                                 // "openai"
+  GEN_AI_PROVIDER_NAME_VALUE_PERPLEXITY                                             // "perplexity"
+  GEN_AI_PROVIDER_NAME_VALUE_X_AI                                                   // "x_ai"
+ATTR_GEN_AI_SYSTEM_INSTRUCTIONS                                                   // gen_ai.system_instructions
+
+ATTR_HW_BATTERY_CAPACITY                                                          // hw.battery.capacity
+ATTR_HW_BATTERY_CHEMISTRY                                                         // hw.battery.chemistry
+ATTR_HW_BATTERY_STATE                                                             // hw.battery.state
+  HW_BATTERY_STATE_VALUE_CHARGING                                                   // "charging"
+  HW_BATTERY_STATE_VALUE_DISCHARGING                                                // "discharging"
+ATTR_HW_BIOS_VERSION                                                              // hw.bios_version
+ATTR_HW_DRIVER_VERSION                                                            // hw.driver_version
+ATTR_HW_ENCLOSURE_TYPE                                                            // hw.enclosure.type
+ATTR_HW_FIRMWARE_VERSION                                                          // hw.firmware_version
+ATTR_HW_GPU_TASK                                                                  // hw.gpu.task
+  HW_GPU_TASK_VALUE_DECODER                                                         // "decoder"
+  HW_GPU_TASK_VALUE_ENCODER                                                         // "encoder"
+  HW_GPU_TASK_VALUE_GENERAL                                                         // "general"
+ATTR_HW_LIMIT_TYPE                                                                // hw.limit_type
+  HW_LIMIT_TYPE_VALUE_CRITICAL                                                      // "critical"
+  HW_LIMIT_TYPE_VALUE_DEGRADED                                                      // "degraded"
+  HW_LIMIT_TYPE_VALUE_HIGH_CRITICAL                                                 // "high.critical"
+  HW_LIMIT_TYPE_VALUE_HIGH_DEGRADED                                                 // "high.degraded"
+  HW_LIMIT_TYPE_VALUE_LOW_CRITICAL                                                  // "low.critical"
+  HW_LIMIT_TYPE_VALUE_LOW_DEGRADED                                                  // "low.degraded"
+  HW_LIMIT_TYPE_VALUE_MAX                                                           // "max"
+  HW_LIMIT_TYPE_VALUE_THROTTLED                                                     // "throttled"
+  HW_LIMIT_TYPE_VALUE_TURBO                                                         // "turbo"
+ATTR_HW_LOGICAL_DISK_RAID_LEVEL                                                   // hw.logical_disk.raid_level
+ATTR_HW_LOGICAL_DISK_STATE                                                        // hw.logical_disk.state
+  HW_LOGICAL_DISK_STATE_VALUE_FREE                                                  // "free"
+  HW_LOGICAL_DISK_STATE_VALUE_USED                                                  // "used"
+ATTR_HW_MEMORY_TYPE                                                               // hw.memory.type
+ATTR_HW_MODEL                                                                     // hw.model
+ATTR_HW_NETWORK_LOGICAL_ADDRESSES                                                 // hw.network.logical_addresses
+ATTR_HW_NETWORK_PHYSICAL_ADDRESS                                                  // hw.network.physical_address
+ATTR_HW_PHYSICAL_DISK_SMART_ATTRIBUTE                                             // hw.physical_disk.smart_attribute
+ATTR_HW_PHYSICAL_DISK_STATE                                                       // hw.physical_disk.state
+  HW_PHYSICAL_DISK_STATE_VALUE_REMAINING                                            // "remaining"
+ATTR_HW_PHYSICAL_DISK_TYPE                                                        // hw.physical_disk.type
+ATTR_HW_SENSOR_LOCATION                                                           // hw.sensor_location
+ATTR_HW_SERIAL_NUMBER                                                             // hw.serial_number
+HW_STATE_VALUE_NEEDS_CLEANING                                                     // "needs_cleaning"
+HW_STATE_VALUE_PREDICTED_FAILURE                                                  // "predicted_failure"
+ATTR_HW_TAPE_DRIVE_OPERATION_TYPE                                                 // hw.tape_drive.operation_type
+  HW_TAPE_DRIVE_OPERATION_TYPE_VALUE_CLEAN                                          // "clean"
+  HW_TAPE_DRIVE_OPERATION_TYPE_VALUE_MOUNT                                          // "mount"
+  HW_TAPE_DRIVE_OPERATION_TYPE_VALUE_UNMOUNT                                        // "unmount"
+ATTR_HW_VENDOR                                                                    // hw.vendor
+
+MESSAGING_SYSTEM_VALUE_AWS_SNS                                                    // "aws.sns"
+
+ATTR_OPENAI_REQUEST_SERVICE_TIER                                                  // openai.request.service_tier
+  OPENAI_REQUEST_SERVICE_TIER_VALUE_AUTO                                            // "auto"
+  OPENAI_REQUEST_SERVICE_TIER_VALUE_DEFAULT                                         // "default"
+ATTR_OPENAI_RESPONSE_SERVICE_TIER                                                 // openai.response.service_tier
+ATTR_OPENAI_RESPONSE_SYSTEM_FINGERPRINT                                           // openai.response.system_fingerprint
+
+ATTR_OTEL_SCOPE_SCHEMA_URL                                                        // otel.scope.schema_url
+```
+
+</details>
+
+### :bug: Bug Fixes
+
+* fix: prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
+
+## 1.36.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.36.0 [#5779](https://github.com/open-telemetry/opentelemetry-js/pull/5779) @trentm
+  * Semantic Conventions v1.36.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1360) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *none*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *8 exported values changed, 7 newly deprecated exports, 3 newly undeprecated exports, 88 added exports*
+
+#### Unstable changes in v1.36.0
+
+<details>
+<summary>8 exported values changed</summary>
+
+```js
+CLOUD_PLATFORM_VALUE_AZURE_AKS                 // "azure_aks" -> "azure.aks"
+CLOUD_PLATFORM_VALUE_AZURE_APP_SERVICE         // "azure_app_service" -> "azure.app_service"
+CLOUD_PLATFORM_VALUE_AZURE_CONTAINER_APPS      // "azure_container_apps" -> "azure.container_apps"
+CLOUD_PLATFORM_VALUE_AZURE_CONTAINER_INSTANCES // "azure_container_instances" -> "azure.container_instances"
+CLOUD_PLATFORM_VALUE_AZURE_FUNCTIONS           // "azure_functions" -> "azure.functions"
+CLOUD_PLATFORM_VALUE_AZURE_OPENSHIFT           // "azure_openshift" -> "azure.openshift"
+CLOUD_PLATFORM_VALUE_AZURE_VM                  // "azure_vm" -> "azure.vm"
+GEN_AI_SYSTEM_VALUE_AZ_AI_OPENAI               // "az.ai.openai" -> "azure.ai.openai"
+```
+
+</details>
+
+<details>
+<summary>7 newly deprecated exports</summary>
+
+```js
+METRIC_CPU_FREQUENCY              // cpu.frequency: Replaced by `system.cpu.frequency`.
+METRIC_CPU_TIME                   // cpu.time: Replaced by `system.cpu.time`.
+METRIC_CPU_UTILIZATION            // cpu.utilization: Replaced by `system.cpu.utilization`.
+METRIC_OTEL_SDK_SPAN_ENDED        // otel.sdk.span.ended: Obsoleted.
+METRIC_SYSTEM_NETWORK_CONNECTIONS // system.network.connections: Replaced by `system.network.connection.count`.
+ATTR_AZ_NAMESPACE                 // az.namespace: Replaced by `azure.resource_provider.namespace`.
+ATTR_AZ_SERVICE_REQUEST_ID        // az.service_request_id: Replaced by `azure.service.request.id`.
+```
+
+</details>
+
+<details>
+<summary>3 newly undeprecated exports</summary>
+
+```js
+METRIC_SYSTEM_CPU_FREQUENCY   // system.cpu.frequency
+METRIC_SYSTEM_CPU_TIME        // system.cpu.time
+METRIC_SYSTEM_CPU_UTILIZATION // system.cpu.utilization
+```
+
+</details>
+
+<details>
+<summary>88 added exports</summary>
+
+```js
+METRIC_K8S_CONTAINER_CPU_LIMIT                                  // k8s.container.cpu.limit
+METRIC_K8S_CONTAINER_CPU_REQUEST                                // k8s.container.cpu.request
+METRIC_K8S_CONTAINER_EPHEMERAL_STORAGE_LIMIT                    // k8s.container.ephemeral_storage.limit
+METRIC_K8S_CONTAINER_EPHEMERAL_STORAGE_REQUEST                  // k8s.container.ephemeral_storage.request
+METRIC_K8S_CONTAINER_MEMORY_LIMIT                               // k8s.container.memory.limit
+METRIC_K8S_CONTAINER_MEMORY_REQUEST                             // k8s.container.memory.request
+METRIC_K8S_CONTAINER_READY                                      // k8s.container.ready
+METRIC_K8S_CONTAINER_RESTART_COUNT                              // k8s.container.restart.count
+METRIC_K8S_CONTAINER_STATUS_REASON                              // k8s.container.status.reason
+METRIC_K8S_CONTAINER_STATUS_STATE                               // k8s.container.status.state
+METRIC_K8S_CONTAINER_STORAGE_LIMIT                              // k8s.container.storage.limit
+METRIC_K8S_CONTAINER_STORAGE_REQUEST                            // k8s.container.storage.request
+METRIC_K8S_HPA_METRIC_TARGET_CPU_AVERAGE_UTILIZATION            // k8s.hpa.metric.target.cpu.average_utilization
+METRIC_K8S_HPA_METRIC_TARGET_CPU_AVERAGE_VALUE                  // k8s.hpa.metric.target.cpu.average_value
+METRIC_K8S_HPA_METRIC_TARGET_CPU_VALUE                          // k8s.hpa.metric.target.cpu.value
+METRIC_K8S_NODE_ALLOCATABLE_CPU                                 // k8s.node.allocatable.cpu
+METRIC_K8S_NODE_ALLOCATABLE_EPHEMERAL_STORAGE                   // k8s.node.allocatable.ephemeral_storage
+METRIC_K8S_NODE_ALLOCATABLE_MEMORY                              // k8s.node.allocatable.memory
+METRIC_K8S_NODE_ALLOCATABLE_PODS                                // k8s.node.allocatable.pods
+METRIC_K8S_NODE_CONDITION_STATUS                                // k8s.node.condition.status
+METRIC_K8S_RESOURCEQUOTA_CPU_LIMIT_HARD                         // k8s.resourcequota.cpu.limit.hard
+METRIC_K8S_RESOURCEQUOTA_CPU_LIMIT_USED                         // k8s.resourcequota.cpu.limit.used
+METRIC_K8S_RESOURCEQUOTA_CPU_REQUEST_HARD                       // k8s.resourcequota.cpu.request.hard
+METRIC_K8S_RESOURCEQUOTA_CPU_REQUEST_USED                       // k8s.resourcequota.cpu.request.used
+METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_LIMIT_HARD           // k8s.resourcequota.ephemeral_storage.limit.hard
+METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_LIMIT_USED           // k8s.resourcequota.ephemeral_storage.limit.used
+METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_REQUEST_HARD         // k8s.resourcequota.ephemeral_storage.request.hard
+METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_REQUEST_USED         // k8s.resourcequota.ephemeral_storage.request.used
+METRIC_K8S_RESOURCEQUOTA_HUGEPAGE_COUNT_REQUEST_HARD            // k8s.resourcequota.hugepage_count.request.hard
+METRIC_K8S_RESOURCEQUOTA_HUGEPAGE_COUNT_REQUEST_USED            // k8s.resourcequota.hugepage_count.request.used
+METRIC_K8S_RESOURCEQUOTA_MEMORY_LIMIT_HARD                      // k8s.resourcequota.memory.limit.hard
+METRIC_K8S_RESOURCEQUOTA_MEMORY_LIMIT_USED                      // k8s.resourcequota.memory.limit.used
+METRIC_K8S_RESOURCEQUOTA_MEMORY_REQUEST_HARD                    // k8s.resourcequota.memory.request.hard
+METRIC_K8S_RESOURCEQUOTA_MEMORY_REQUEST_USED                    // k8s.resourcequota.memory.request.used
+METRIC_K8S_RESOURCEQUOTA_OBJECT_COUNT_HARD                      // k8s.resourcequota.object_count.hard
+METRIC_K8S_RESOURCEQUOTA_OBJECT_COUNT_USED                      // k8s.resourcequota.object_count.used
+METRIC_K8S_RESOURCEQUOTA_PERSISTENTVOLUMECLAIM_COUNT_HARD       // k8s.resourcequota.persistentvolumeclaim_count.hard
+METRIC_K8S_RESOURCEQUOTA_PERSISTENTVOLUMECLAIM_COUNT_USED       // k8s.resourcequota.persistentvolumeclaim_count.used
+METRIC_K8S_RESOURCEQUOTA_STORAGE_REQUEST_HARD                   // k8s.resourcequota.storage.request.hard
+METRIC_K8S_RESOURCEQUOTA_STORAGE_REQUEST_USED                   // k8s.resourcequota.storage.request.used
+
+METRIC_OTEL_SDK_SPAN_STARTED                                    // otel.sdk.span.started
+
+METRIC_SYSTEM_NETWORK_CONNECTION_COUNT                          // system.network.connection.count
+
+ATTR_AZURE_RESOURCE_PROVIDER_NAMESPACE                          // azure.resource_provider.namespace
+ATTR_AZURE_SERVICE_REQUEST_ID                                   // azure.service.request.id
+
+ATTR_DNS_ANSWERS                                                // dns.answers
+
+GEN_AI_SYSTEM_VALUE_AZURE_AI_INFERENCE                          // "azure.ai.inference"
+GEN_AI_SYSTEM_VALUE_AZURE_AI_OPENAI                             // "azure.ai.openai"
+
+ATTR_K8S_CONTAINER_STATUS_REASON                                // k8s.container.status.reason
+  K8S_CONTAINER_STATUS_REASON_VALUE_COMPLETED                     // "Completed"
+  K8S_CONTAINER_STATUS_REASON_VALUE_CONTAINER_CANNOT_RUN          // "ContainerCannotRun"
+  K8S_CONTAINER_STATUS_REASON_VALUE_CONTAINER_CREATING            // "ContainerCreating"
+  K8S_CONTAINER_STATUS_REASON_VALUE_CRASH_LOOP_BACK_OFF           // "CrashLoopBackOff"
+  K8S_CONTAINER_STATUS_REASON_VALUE_CREATE_CONTAINER_CONFIG_ERROR // "CreateContainerConfigError"
+  K8S_CONTAINER_STATUS_REASON_VALUE_ERR_IMAGE_PULL                // "ErrImagePull"
+  K8S_CONTAINER_STATUS_REASON_VALUE_ERROR                         // "Error"
+  K8S_CONTAINER_STATUS_REASON_VALUE_IMAGE_PULL_BACK_OFF           // "ImagePullBackOff"
+  K8S_CONTAINER_STATUS_REASON_VALUE_OOM_KILLED                    // "OOMKilled"
+ATTR_K8S_CONTAINER_STATUS_STATE                                 // k8s.container.status.state
+  K8S_CONTAINER_STATUS_STATE_VALUE_RUNNING                        // "running"
+  K8S_CONTAINER_STATUS_STATE_VALUE_TERMINATED                     // "terminated"
+  K8S_CONTAINER_STATUS_STATE_VALUE_WAITING                        // "waiting"
+ATTR_K8S_HPA_METRIC_TYPE                                        // k8s.hpa.metric.type
+ATTR_K8S_HPA_SCALETARGETREF_API_VERSION                         // k8s.hpa.scaletargetref.api_version
+ATTR_K8S_HPA_SCALETARGETREF_KIND                                // k8s.hpa.scaletargetref.kind
+ATTR_K8S_HPA_SCALETARGETREF_NAME                                // k8s.hpa.scaletargetref.name
+ATTR_K8S_HUGEPAGE_SIZE                                          // k8s.hugepage.size
+ATTR_K8S_NODE_CONDITION_STATUS                                  // k8s.node.condition.status
+  K8S_NODE_CONDITION_STATUS_VALUE_CONDITION_FALSE                 // "false"
+  K8S_NODE_CONDITION_STATUS_VALUE_CONDITION_TRUE                  // "true"
+  K8S_NODE_CONDITION_STATUS_VALUE_CONDITION_UNKNOWN               // "unknown"
+ATTR_K8S_NODE_CONDITION_TYPE                                    // k8s.node.condition.type
+  K8S_NODE_CONDITION_TYPE_VALUE_DISK_PRESSURE                     // "DiskPressure"
+  K8S_NODE_CONDITION_TYPE_VALUE_MEMORY_PRESSURE                   // "MemoryPressure"
+  K8S_NODE_CONDITION_TYPE_VALUE_NETWORK_UNAVAILABLE               // "NetworkUnavailable"
+  K8S_NODE_CONDITION_TYPE_VALUE_PID_PRESSURE                      // "PIDPressure"
+  K8S_NODE_CONDITION_TYPE_VALUE_READY                             // "Ready"
+ATTR_K8S_RESOURCEQUOTA_RESOURCE_NAME                            // k8s.resourcequota.resource_name
+ATTR_K8S_STORAGECLASS_NAME                                      // k8s.storageclass.name
+
+ATTR_MAINFRAME_LPAR_NAME                                        // mainframe.lpar.name
+
+OS_TYPE_VALUE_ZOS                                               // "zos"
+
+OTEL_COMPONENT_TYPE_VALUE_PROMETHEUS_HTTP_TEXT_METRIC_EXPORTER  // "prometheus_http_text_metric_exporter"
+OTEL_COMPONENT_TYPE_VALUE_ZIPKIN_HTTP_SPAN_EXPORTER             // "zipkin_http_span_exporter"
+ATTR_OTEL_SPAN_PARENT_ORIGIN                                    // otel.span.parent.origin
+  OTEL_SPAN_PARENT_ORIGIN_VALUE_LOCAL                             // "local"
+  OTEL_SPAN_PARENT_ORIGIN_VALUE_NONE                              // "none"
+  OTEL_SPAN_PARENT_ORIGIN_VALUE_REMOTE                            // "remote"
+
+ATTR_ZOS_SMF_ID                                                 // zos.smf.id
+ATTR_ZOS_SYSPLEX_NAME                                           // zos.sysplex.name
+```
+
+</details>
+
+## 1.35.0
+
+**Known issue:** Changes from semantic conventions **v1.36.0** where accidentally released in this JS package with version **1.35.0**. Please use `@opentelemetry/semantic-conventions@1.36.0`.
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.36.0 [#5779](https://github.com/open-telemetry/opentelemetry-js/pull/5779) @trentm
+  * Changes from semantic conventions **v1.36.0** were incorrectly included in this release. See note above.
+
+* feat: improve the jsdoc comment on exported constants for enum values [#5784](https://github.com/open-telemetry/opentelemetry-js/pull/5784) @trentm
+  * The jsdoc comment for enum values now includes the 'brief', an
+    `@experimental` tag, and a `@deprecated` tag if the corresponding fields
+    exist on the semconv definition.
+
+## 1.34.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.34.0 [#5703](https://github.com/open-telemetry/opentelemetry-js/pull/5703) @trentm
+  * Semantic Conventions v1.34.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1340) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *none*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *12 added exports*
+
+#### Unstable changes in v1.34.0
+
+<details>
+<summary>12 added exports</summary>
+
+```js
+ATTR_AWS_BEDROCK_GUARDRAIL_ID             // aws.bedrock.guardrail.id
+ATTR_AWS_BEDROCK_KNOWLEDGE_BASE_ID        // aws.bedrock.knowledge_base.id
+ATTR_AWS_KINESIS_STREAM_NAME              // aws.kinesis.stream_name
+ATTR_AWS_LAMBDA_RESOURCE_MAPPING_ID       // aws.lambda.resource_mapping.id
+ATTR_AWS_SECRETSMANAGER_SECRET_ARN        // aws.secretsmanager.secret.arn
+ATTR_AWS_SNS_TOPIC_ARN                    // aws.sns.topic.arn
+ATTR_AWS_SQS_QUEUE_URL                    // aws.sqs.queue.url
+ATTR_AWS_STEP_FUNCTIONS_ACTIVITY_ARN      // aws.step_functions.activity.arn
+ATTR_AWS_STEP_FUNCTIONS_STATE_MACHINE_ARN // aws.step_functions.state_machine.arn
+
+ATTR_FEATURE_FLAG_RESULT_VALUE            // feature_flag.result.value
+
+ATTR_GEN_AI_CONVERSATION_ID               // gen_ai.conversation.id
+ATTR_GEN_AI_DATA_SOURCE_ID                // gen_ai.data_source.id
+```
+
+</details>
+
+## 1.33.1
+
+### :boom: Breaking Changes
+
+* fix: Remove the subset of `DB_SYSTEM_NAME_VALUE_*` exports that are unstable from the `@opentelemetry/semantic-conventions` entry point. [#5690](https://github.com/open-telemetry/opentelemetry-js/pull/5690)
+  * Version 1.33.0 erroneously included all `DB_SYSTEM_NAME_VALUE_*` constants in the stable entry point. Some of those enum values are not yet stable. They have been moved back to the unstable `@opentelemetry/semantic-conventions/incubating` entry point. See the PR description for a full list.
+
+## 1.33.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.33.0 [#5654](https://github.com/open-telemetry/opentelemetry-js/pull/5654) @trentm
+  * Semantic Conventions v1.33.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1330) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *56 added exports*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *1 exported value changed, 6 newly deprecated exports, 1 newly undeprecated export, 57 added exports*
+
+#### Stable changes in v1.33.0
+
+<details open>
+<summary>56 added exports</summary>
+
+```js
+METRIC_DB_CLIENT_OPERATION_DURATION       // db.client.operation.duration
+
+ATTR_CODE_COLUMN_NUMBER                   // code.column.number
+ATTR_CODE_FILE_PATH                       // code.file.path
+ATTR_CODE_FUNCTION_NAME                   // code.function.name
+ATTR_CODE_LINE_NUMBER                     // code.line.number
+ATTR_CODE_STACKTRACE                      // code.stacktrace
+
+ATTR_DB_COLLECTION_NAME                   // db.collection.name
+ATTR_DB_NAMESPACE                         // db.namespace
+ATTR_DB_OPERATION_BATCH_SIZE              // db.operation.batch.size
+ATTR_DB_OPERATION_NAME                    // db.operation.name
+ATTR_DB_QUERY_SUMMARY                     // db.query.summary
+ATTR_DB_QUERY_TEXT                        // db.query.text
+ATTR_DB_RESPONSE_STATUS_CODE              // db.response.status_code
+ATTR_DB_STORED_PROCEDURE_NAME             // db.stored_procedure.name
+ATTR_DB_SYSTEM_NAME                       // db.system.name
+  DB_SYSTEM_NAME_VALUE_ACTIAN_INGRES        // "actian.ingres"
+  DB_SYSTEM_NAME_VALUE_AWS_DYNAMODB         // "aws.dynamodb"
+  DB_SYSTEM_NAME_VALUE_AWS_REDSHIFT         // "aws.redshift"
+  DB_SYSTEM_NAME_VALUE_AZURE_COSMOSDB       // "azure.cosmosdb"
+  DB_SYSTEM_NAME_VALUE_CASSANDRA            // "cassandra"
+  DB_SYSTEM_NAME_VALUE_CLICKHOUSE           // "clickhouse"
+  DB_SYSTEM_NAME_VALUE_COCKROACHDB          // "cockroachdb"
+  DB_SYSTEM_NAME_VALUE_COUCHBASE            // "couchbase"
+  DB_SYSTEM_NAME_VALUE_COUCHDB              // "couchdb"
+  DB_SYSTEM_NAME_VALUE_DERBY                // "derby"
+  DB_SYSTEM_NAME_VALUE_ELASTICSEARCH        // "elasticsearch"
+  DB_SYSTEM_NAME_VALUE_FIREBIRDSQL          // "firebirdsql"
+  DB_SYSTEM_NAME_VALUE_GCP_SPANNER          // "gcp.spanner"
+  DB_SYSTEM_NAME_VALUE_GEODE                // "geode"
+  DB_SYSTEM_NAME_VALUE_H2DATABASE           // "h2database"
+  DB_SYSTEM_NAME_VALUE_HBASE                // "hbase"
+  DB_SYSTEM_NAME_VALUE_HIVE                 // "hive"
+  DB_SYSTEM_NAME_VALUE_HSQLDB               // "hsqldb"
+  DB_SYSTEM_NAME_VALUE_IBM_DB2              // "ibm.db2"
+  DB_SYSTEM_NAME_VALUE_IBM_INFORMIX         // "ibm.informix"
+  DB_SYSTEM_NAME_VALUE_IBM_NETEZZA          // "ibm.netezza"
+  DB_SYSTEM_NAME_VALUE_INFLUXDB             // "influxdb"
+  DB_SYSTEM_NAME_VALUE_INSTANTDB            // "instantdb"
+  DB_SYSTEM_NAME_VALUE_INTERSYSTEMS_CACHE   // "intersystems.cache"
+  DB_SYSTEM_NAME_VALUE_MARIADB              // "mariadb"
+  DB_SYSTEM_NAME_VALUE_MEMCACHED            // "memcached"
+  DB_SYSTEM_NAME_VALUE_MICROSOFT_SQL_SERVER // "microsoft.sql_server"
+  DB_SYSTEM_NAME_VALUE_MONGODB              // "mongodb"
+  DB_SYSTEM_NAME_VALUE_MYSQL                // "mysql"
+  DB_SYSTEM_NAME_VALUE_NEO4J                // "neo4j"
+  DB_SYSTEM_NAME_VALUE_OPENSEARCH           // "opensearch"
+  DB_SYSTEM_NAME_VALUE_ORACLE_DB            // "oracle.db"
+  DB_SYSTEM_NAME_VALUE_OTHER_SQL            // "other_sql"
+  DB_SYSTEM_NAME_VALUE_POSTGRESQL           // "postgresql"
+  DB_SYSTEM_NAME_VALUE_REDIS                // "redis"
+  DB_SYSTEM_NAME_VALUE_SAP_HANA             // "sap.hana"
+  DB_SYSTEM_NAME_VALUE_SAP_MAXDB            // "sap.maxdb"
+  DB_SYSTEM_NAME_VALUE_SOFTWAREAG_ADABAS    // "softwareag.adabas"
+  DB_SYSTEM_NAME_VALUE_SQLITE               // "sqlite"
+  DB_SYSTEM_NAME_VALUE_TERADATA             // "teradata"
+  DB_SYSTEM_NAME_VALUE_TRINO                // "trino"
+```
+
+</details>
+
+#### Unstable changes in v1.33.0
+
+<details>
+<summary>1 exported value changed</summary>
+
+```js
+ATTR_FEATURE_FLAG_PROVIDER_NAME // feature_flag.provider_name -> feature_flag.provider.name
+```
+
+</details>
+
+<details>
+<summary>6 newly deprecated exports</summary>
+
+```js
+METRIC_OTEL_SDK_EXPORTER_SPAN_EXPORTED_COUNT   // otel.sdk.exporter.span.exported.count: Renamed to `otel.sdk.exporter.span.exported`.
+METRIC_OTEL_SDK_EXPORTER_SPAN_INFLIGHT_COUNT   // otel.sdk.exporter.span.inflight.count: Renamed to `otel.sdk.exporter.span.inflight`.
+METRIC_OTEL_SDK_PROCESSOR_SPAN_PROCESSED_COUNT // otel.sdk.processor.span.processed.count: Renamed to `otel.sdk.processor.span.processed`.
+METRIC_OTEL_SDK_SPAN_ENDED_COUNT               // otel.sdk.span.ended.count: Renamed to `otel.sdk.span.ended`.
+METRIC_OTEL_SDK_SPAN_LIVE_COUNT                // otel.sdk.span.live.count: Renamed to `otel.sdk.span.live`.
+ATTR_FEATURE_FLAG_EVALUATION_ERROR_MESSAGE     // feature_flag.evaluation.error.message: Replaced by `error.message`.
+```
+
+</details>
+
+<details>
+<summary>1 newly undeprecated export</summary>
+
+```js
+ATTR_DB_QUERY_PARAMETER // (key) => `db.query.parameter.${key}`
+```
+
+</details>
+
+<details>
+<summary>57 added exports</summary>
+
+```js
+METRIC_JVM_FILE_DESCRIPTOR_COUNT                         // jvm.file_descriptor.count
+
+METRIC_OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED      // otel.sdk.exporter.metric_data_point.exported
+METRIC_OTEL_SDK_EXPORTER_METRIC_DATA_POINT_INFLIGHT      // otel.sdk.exporter.metric_data_point.inflight
+METRIC_OTEL_SDK_EXPORTER_OPERATION_DURATION              // otel.sdk.exporter.operation.duration
+METRIC_OTEL_SDK_EXPORTER_SPAN_EXPORTED                   // otel.sdk.exporter.span.exported
+METRIC_OTEL_SDK_EXPORTER_SPAN_INFLIGHT                   // otel.sdk.exporter.span.inflight
+METRIC_OTEL_SDK_METRIC_READER_COLLECTION_DURATION        // otel.sdk.metric_reader.collection.duration
+METRIC_OTEL_SDK_PROCESSOR_SPAN_PROCESSED                 // otel.sdk.processor.span.processed
+METRIC_OTEL_SDK_SPAN_ENDED                               // otel.sdk.span.ended
+METRIC_OTEL_SDK_SPAN_LIVE                                // otel.sdk.span.live
+
+ATTR_APP_SCREEN_COORDINATE_X                             // app.screen.coordinate.x
+ATTR_APP_SCREEN_COORDINATE_Y                             // app.screen.coordinate.y
+ATTR_APP_WIDGET_ID                                       // app.widget.id
+ATTR_APP_WIDGET_NAME                                     // app.widget.name
+
+ATTR_CICD_PIPELINE_ACTION_NAME                           // cicd.pipeline.action.name
+  CICD_PIPELINE_ACTION_NAME_VALUE_BUILD                    // "BUILD"
+  CICD_PIPELINE_ACTION_NAME_VALUE_RUN                      // "RUN"
+  CICD_PIPELINE_ACTION_NAME_VALUE_SYNC                     // "SYNC"
+ATTR_CICD_PIPELINE_TASK_RUN_RESULT                       // cicd.pipeline.task.run.result
+  CICD_PIPELINE_TASK_RUN_RESULT_VALUE_CANCELLATION         // "cancellation"
+  CICD_PIPELINE_TASK_RUN_RESULT_VALUE_ERROR                // "error"
+  CICD_PIPELINE_TASK_RUN_RESULT_VALUE_FAILURE              // "failure"
+  CICD_PIPELINE_TASK_RUN_RESULT_VALUE_SKIP                 // "skip"
+  CICD_PIPELINE_TASK_RUN_RESULT_VALUE_SUCCESS              // "success"
+  CICD_PIPELINE_TASK_RUN_RESULT_VALUE_TIMEOUT              // "timeout"
+ATTR_CICD_WORKER_ID                                      // cicd.worker.id
+ATTR_CICD_WORKER_NAME                                    // cicd.worker.name
+ATTR_CICD_WORKER_URL_FULL                                // cicd.worker.url.full
+
+GEN_AI_OPERATION_NAME_VALUE_GENERATE_CONTENT             // "generate_content"
+GEN_AI_OPERATION_NAME_VALUE_INVOKE_AGENT                 // "invoke_agent"
+GEN_AI_SYSTEM_VALUE_GCP_GEMINI                           // "gcp.gemini"
+GEN_AI_SYSTEM_VALUE_GCP_GEN_AI                           // "gcp.gen_ai"
+GEN_AI_SYSTEM_VALUE_GCP_VERTEX_AI                        // "gcp.vertex_ai"
+ATTR_GEN_AI_TOOL_DESCRIPTION                             // gen_ai.tool.description
+
+ATTR_JVM_GC_CAUSE                                        // jvm.gc.cause
+
+ATTR_K8S_CRONJOB_ANNOTATION                              // (key) => `k8s.cronjob.annotation.${key}`
+ATTR_K8S_CRONJOB_LABEL                                   // (key) => `k8s.cronjob.label.${key}`
+ATTR_K8S_DAEMONSET_ANNOTATION                            // (key) => `k8s.daemonset.annotation.${key}`
+ATTR_K8S_DAEMONSET_LABEL                                 // (key) => `k8s.daemonset.label.${key}`
+ATTR_K8S_DEPLOYMENT_ANNOTATION                           // (key) => `k8s.deployment.annotation.${key}`
+ATTR_K8S_DEPLOYMENT_LABEL                                // (key) => `k8s.deployment.label.${key}`
+ATTR_K8S_JOB_ANNOTATION                                  // (key) => `k8s.job.annotation.${key}`
+ATTR_K8S_JOB_LABEL                                       // (key) => `k8s.job.label.${key}`
+ATTR_K8S_NAMESPACE_ANNOTATION                            // (key) => `k8s.namespace.annotation.${key}`
+ATTR_K8S_NAMESPACE_LABEL                                 // (key) => `k8s.namespace.label.${key}`
+ATTR_K8S_NODE_ANNOTATION                                 // (key) => `k8s.node.annotation.${key}`
+ATTR_K8S_NODE_LABEL                                      // (key) => `k8s.node.label.${key}`
+ATTR_K8S_REPLICASET_ANNOTATION                           // (key) => `k8s.replicaset.annotation.${key}`
+ATTR_K8S_REPLICASET_LABEL                                // (key) => `k8s.replicaset.label.${key}`
+ATTR_K8S_STATEFULSET_ANNOTATION                          // (key) => `k8s.statefulset.annotation.${key}`
+ATTR_K8S_STATEFULSET_LABEL                               // (key) => `k8s.statefulset.label.${key}`
+
+OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_METRIC_EXPORTER      // "otlp_grpc_metric_exporter"
+OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_METRIC_EXPORTER // "otlp_http_json_metric_exporter"
+OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER      // "otlp_http_metric_exporter"
+OTEL_COMPONENT_TYPE_VALUE_PERIODIC_METRIC_READER         // "periodic_metric_reader"
+
+ATTR_PROCESS_ENVIRONMENT_VARIABLE                        // (key) => `process.environment_variable.${key}`
+
+VCS_PROVIDER_NAME_VALUE_GITEA                            // "gitea"
+```
+
+</details>
+
 ## 1.32.0
 
 ### :rocket: Features

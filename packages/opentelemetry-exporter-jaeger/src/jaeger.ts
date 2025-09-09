@@ -24,7 +24,7 @@ import {
 } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { Socket } from 'dgram';
-import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { spanToThrift } from './transform';
 import * as jaegerTypes from './types';
 
@@ -174,9 +174,7 @@ export class JaegerExporter implements SpanExporter {
       sender._client.unref();
     }
 
-    const serviceNameTag = span.tags.find(
-      t => t.key === SEMRESATTRS_SERVICE_NAME
-    );
+    const serviceNameTag = span.tags.find(t => t.key === ATTR_SERVICE_NAME);
     const serviceName = serviceNameTag?.vStr || 'unknown_service';
 
     sender.setProcess({

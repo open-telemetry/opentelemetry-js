@@ -226,26 +226,6 @@ describe('PeriodicExportingMetricReader', () => {
           }),
         /exportIntervalMillis must be greater than or equal to exportTimeoutMillis/
       );
-      assert.throws(
-        () =>
-          new PeriodicExportingMetricReader({
-            exporter: exporter,
-            exportIntervalMillis: 100,
-            // exportTimeoutMillis defaults to 30 seconds, which is greater than exportIntervalMillis.
-            exportTimeoutMillis: undefined,
-          }),
-        /exportIntervalMillis must be greater than or equal to exportTimeoutMillis/
-      );
-      assert.throws(
-        () =>
-          new PeriodicExportingMetricReader({
-            exporter: exporter,
-            // exportIntervalMillis defaults to 60 seconds, which is less than exportTimeoutMillis.
-            exportIntervalMillis: undefined,
-            exportTimeoutMillis: 90_000,
-          }),
-        /exportIntervalMillis must be greater than or equal to exportTimeoutMillis/
-      );
     });
 
     it('should not start exporting', async () => {

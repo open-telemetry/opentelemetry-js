@@ -60,37 +60,42 @@ export class PeriodicExportingMetricReader extends MetricReader {
   private readonly _exportTimeout: number;
 
   constructor(options: PeriodicExportingMetricReaderOptions) {
-    const {
-      exporter,
-      exportIntervalMillis = 60000,
-      exportTimeoutMillis = 30000,
-      metricProducers,
-    } = options;
-
     super({
-      aggregationSelector: exporter.selectAggregation?.bind(exporter),
+      aggregationSelector: options.exporter.selectAggregation?.bind(
+        options.exporter
+      ),
       aggregationTemporalitySelector:
-        exporter.selectAggregationTemporality?.bind(exporter),
-      metricProducers,
+        options.exporter.selectAggregationTemporality?.bind(options.exporter),
+      metricProducers: options.metricProducers,
     });
 
-    if (exportIntervalMillis <= 0) {
+    if (
+      options.exportIntervalMillis !== undefined &&
+      options.exportIntervalMillis <= 0
+    ) {
       throw Error('exportIntervalMillis must be greater than 0');
     }
 
-    if (exportTimeoutMillis <= 0) {
+    if (
+      options.exportTimeoutMillis !== undefined &&
+      options.exportTimeoutMillis <= 0
+    ) {
       throw Error('exportTimeoutMillis must be greater than 0');
     }
 
-    if (exportIntervalMillis < exportTimeoutMillis) {
+    if (
+      options.exportTimeoutMillis !== undefined &&
+      options.exportIntervalMillis !== undefined &&
+      options.exportIntervalMillis < options.exportTimeoutMillis
+    ) {
       throw Error(
         'exportIntervalMillis must be greater than or equal to exportTimeoutMillis'
       );
     }
 
-    this._exportInterval = exportIntervalMillis;
-    this._exportTimeout = exportTimeoutMillis;
-    this._exporter = exporter;
+    this._exportInterval = options.exportIntervalMillis ?? 60000;
+    this._exportTimeout = options.exportTimeoutMillis ?? 30000;
+    this._exporter = options.exporter;
   }
 
   private async _runOnce(): Promise<void> {

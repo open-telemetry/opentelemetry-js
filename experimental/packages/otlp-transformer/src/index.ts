@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-export {
+export type {
   IExportMetricsPartialSuccess,
   IExportMetricsServiceResponse,
 } from './metrics';
-export {
+export type {
   IExportTracePartialSuccess,
   IExportTraceServiceResponse,
 } from './trace';
-export { IExportLogsServiceResponse, IExportLogsPartialSuccess } from './logs';
+export type {
+  IExportLogsServiceResponse,
+  IExportLogsPartialSuccess,
+} from './logs';
 
 export { ProtobufLogsSerializer } from './logs/protobuf';
 export { ProtobufMetricsSerializer } from './metrics/protobuf';
@@ -32,4 +35,4 @@ export { JsonLogsSerializer } from './logs/json';
 export { JsonMetricsSerializer } from './metrics/json';
 export { JsonTraceSerializer } from './trace/json';
 
-export { ISerializer } from './i-serializer';
+export type { ISerializer } from './i-serializer';

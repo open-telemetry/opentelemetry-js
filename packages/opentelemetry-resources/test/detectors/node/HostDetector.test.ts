@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import {
-  SEMRESATTRS_HOST_ARCH,
-  SEMRESATTRS_HOST_ID,
-  SEMRESATTRS_HOST_NAME,
-} from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { hostDetector } from '../../../src';
 import { resourceFromDetectedResource } from '../../../src/ResourceImpl';
 import { describeNode } from '../../util';
+import {
+  ATTR_HOST_ARCH,
+  ATTR_HOST_ID,
+  ATTR_HOST_NAME,
+} from '../../../src/semconv';
 
 describeNode('hostDetector() on Node.js', () => {
   afterEach(() => {
@@ -44,14 +44,11 @@ describeNode('hostDetector() on Node.js', () => {
     await resource.waitForAsyncAttributes?.();
 
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_HOST_NAME],
+      resource.attributes[ATTR_HOST_NAME],
       'opentelemetry-test'
     );
-    assert.strictEqual(resource.attributes[SEMRESATTRS_HOST_ARCH], 'amd64');
-    assert.strictEqual(
-      resource.attributes[SEMRESATTRS_HOST_ID],
-      expectedHostId
-    );
+    assert.strictEqual(resource.attributes[ATTR_HOST_ARCH], 'amd64');
+    assert.strictEqual(resource.attributes[ATTR_HOST_ID], expectedHostId);
   });
 
   it('should pass through arch string if unknown', async () => {
@@ -62,7 +59,7 @@ describeNode('hostDetector() on Node.js', () => {
     const resource = resourceFromDetectedResource(hostDetector.detect());
 
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_HOST_ARCH],
+      resource.attributes[ATTR_HOST_ARCH],
       'some-unknown-arch'
     );
   });
@@ -79,10 +76,10 @@ describeNode('hostDetector() on Node.js', () => {
     await resource.waitForAsyncAttributes?.();
 
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_HOST_NAME],
+      resource.attributes[ATTR_HOST_NAME],
       'opentelemetry-test'
     );
-    assert.strictEqual(resource.attributes[SEMRESATTRS_HOST_ARCH], 'amd64');
-    assert.strictEqual(false, SEMRESATTRS_HOST_ID in resource.attributes);
+    assert.strictEqual(resource.attributes[ATTR_HOST_ARCH], 'amd64');
+    assert.strictEqual(false, ATTR_HOST_ID in resource.attributes);
   });
 });

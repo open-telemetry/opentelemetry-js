@@ -293,10 +293,10 @@ can be used to information about the record measurement itself.
 
 ```typescript
 async function myTask() {
-  const httpServerDuration = meter.createHistogram("http.server.duration", {
-    description: 'A http server duration',
-    unit: 'milliseconds',
-    valueType: ValueType.INT
+  const httpServerDuration = meter.createHistogram("my.http.server.request.duration", {
+    description: 'HTTP server request duration',
+    unit: 's',
+    valueType: ValueType.DOUBLE
   });
   const startTime = new Date().getTime()
   try {
@@ -305,12 +305,12 @@ async function myTask() {
   } catch (err) {
   } finally {
     const endTime = new Date().getTime()
-    const executionTime = endTime - startTime
+    const executionTime = (endTime - startTime) / 1000
 
     httpServerDuration.record(executionTime, {
-      [SemanticAttributes.HTTP_METHOD]: 'POST',
-      [SemanticAttributes.HTTP_STATUS_CODE]: '200',
-      [SemanticAttributes.HTTP_SCHEME]: 'https',
+      [ATTR_HTTP_REQUEST_METHOD]: 'POST',
+      [ATTR_HTTP_RESPONSE_STATUS_CODE]: '200',
+      [ATTR_URL_SCHEME]: 'https',
     })
   }
 }
@@ -416,17 +416,17 @@ const meterProvider = new MeterProvider({
 });
 
 // Create histogram metric
-const httpServerDuration = meter.createHistogram("http.server.duration", {
-  description: 'A http server duration',
-  unit: 'milliseconds',
-  valueType: ValueType.INT
+const httpServerDuration = meter.createHistogram('my.http.server.request.duration', {
+  description: 'HTTP server request duration',
+  unit: 's',
+  valueType: ValueType.DOUBLE
 });
 
 // Record measurement for histogram
 httpServerDuration.record(50, {
-  [SemanticAttributes.HTTP_METHOD]: 'POST',
-  [SemanticAttributes.HTTP_STATUS_CODE]: '200',
-  [SemanticAttributes.HTTP_SCHEME]: 'https',
+  [ATTR_HTTP_REQUEST_METHOD]: 'POST',
+  [ATTR_HTTP_RESPONSE_STATUS_CODE]: '200',
+  [ATTR_URL_SCHEME]: 'https',
 });
 ```
 

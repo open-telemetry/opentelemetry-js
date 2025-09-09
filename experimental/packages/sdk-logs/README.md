@@ -31,11 +31,10 @@ const {
 } = require('@opentelemetry/sdk-logs');
 
 // To start a logger, you first need to initialize the Logger provider.
-const loggerProvider = new LoggerProvider();
-// Add a processor to export log record
-loggerProvider.addLogRecordProcessor(
-  new SimpleLogRecordProcessor(new ConsoleLogRecordExporter())
-);
+// and add a processor to export log record
+const loggerProvider = new LoggerProvider({
+  processors: [new SimpleLogRecordProcessor(new ConsoleLogRecordExporter())]
+});
 
 //  To create a log record, you first need to get a Logger instance
 const logger = loggerProvider.getLogger('default');

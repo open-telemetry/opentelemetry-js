@@ -29,7 +29,7 @@ import {
   AlwaysOnSampler,
   Span,
 } from '@opentelemetry/sdk-trace-base';
-import { SEMRESATTRS_TELEMETRY_SDK_LANGUAGE } from '@opentelemetry/semantic-conventions';
+import { ATTR_TELEMETRY_SDK_LANGUAGE } from '@opentelemetry/semantic-conventions';
 
 import { NodeTracerProvider } from '../src/NodeTracerProvider';
 
@@ -139,7 +139,7 @@ describe('NodeTracerProvider', function () {
       assert.ok(span);
       assert.ok(span.resource);
       assert.equal(
-        span.resource.attributes[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
+        span.resource.attributes[ATTR_TELEMETRY_SDK_LANGUAGE],
         'nodejs'
       );
     });

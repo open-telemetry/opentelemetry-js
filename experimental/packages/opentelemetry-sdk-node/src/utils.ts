@@ -118,7 +118,7 @@ function getJaegerExporter() {
   // environments. By delaying the require statement to here, we only crash when
   // the exporter is actually used in such an environment.
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
     return new JaegerExporter();
   } catch (e) {

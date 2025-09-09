@@ -3,6 +3,9 @@ name: Publish packages to NPM
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   release-to-npm:
     runs-on: ubuntu-latest
@@ -11,12 +14,12 @@ jobs:
       id-token: write
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 18
           registry-url: 'https://registry.npmjs.org'

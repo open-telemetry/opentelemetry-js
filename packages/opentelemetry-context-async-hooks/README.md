@@ -5,7 +5,7 @@
 
 This package provides two [`ContextManager`](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api.ContextManager.html) implementations built on APIs from Node.js's [`async_hooks`][async-hooks-doc] module. If you're looking for a `ContextManager` to use in browser environments, consider [opentelemetry-context-zone](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone) or [opentelemetry-context-zone-peer-dep](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone-peer-dep).
 
-The definition of the `ContextManager` interface and the problem it solves can be found [here][def-context-manager].
+See [the definition of the `ContextManager` interface][def-context-manager] and the problem it solves.
 
 ## API
 
@@ -22,7 +22,7 @@ The former should be preferred over the latter as its implementation is substant
 
 ## Limitations
 
-It's possible that this package won't track context perfectly when used with certain packages. In particular, it inherits any bugs present in async_hooks. See [here][pkgs-that-break-ah] for known issues.
+It's possible that this package won't track context perfectly when used with certain packages. In particular, it inherits any bugs present in async_hooks. See [the known issues][pkgs-that-break-ah].
 
 async_hooks is still seeing significant correctness and performance fixes, it's recommended to run the latest Node.js LTS release to benefit from said fixes.
 
@@ -31,9 +31,9 @@ async_hooks is still seeing significant correctness and performance fixes, it's 
 Context propagation is a big subject when talking about tracing in Node.js. If you want more information about it here are some resources:
 
 - <https://www.npmjs.com/package/continuation-local-storage> (which was the old way of doing context propagation)
-- Datadog's own implementation for their JavaScript tracer: [here][dd-js-tracer-scope]
-- OpenTracing implementation: [here][opentracing-scope]
-- Discussion about context propagation by the Node.js Diagnostics Working Group: [here][diag-team-scope-discussion]
+- [Datadog's own implementation][dd-js-tracer-scope] for their JavaScript tracer
+- [OpenTracing implementation][opentracing-scope]
+- [Discussion about context propagation][diag-team-scope-discussion] by the Node.js Diagnostics Working Group
 
 ## Useful links
 

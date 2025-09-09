@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-export {
+export type {
   LoggerProviderConfig,
   LogRecordLimits,
   BufferConfig,
   BatchLogRecordProcessorBrowserConfig,
 } from './types';
 export { LoggerProvider } from './LoggerProvider';
-export { LogRecord } from './LogRecord';
-export { LogRecordProcessor } from './LogRecordProcessor';
-export { ReadableLogRecord } from './export/ReadableLogRecord';
+export type { SdkLogRecord } from './export/SdkLogRecord';
+export type { LogRecordProcessor } from './LogRecordProcessor';
+export type { ReadableLogRecord } from './export/ReadableLogRecord';
 export { NoopLogRecordProcessor } from './export/NoopLogRecordProcessor';
 export { ConsoleLogRecordExporter } from './export/ConsoleLogRecordExporter';
-export { LogRecordExporter } from './export/LogRecordExporter';
+export type { LogRecordExporter } from './export/LogRecordExporter';
 export { SimpleLogRecordProcessor } from './export/SimpleLogRecordProcessor';
 export { InMemoryLogRecordExporter } from './export/InMemoryLogRecordExporter';
 export { BatchLogRecordProcessor } from './platform';
