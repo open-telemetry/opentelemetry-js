@@ -19,7 +19,9 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :books: Documentation
 
 ### :house: Internal
+
 * chore(opentelemetry-instrumentation): export shimmer [#5865](https://github.com/open-telemetry/opentelemetry-js/pull/5865)
+
 ## 2.1.0
 
 ### :rocket: Features
