@@ -53,6 +53,7 @@ const ignoredLernaProjects = [
   'examples/http',
   'examples/https',
   'examples/esm-http-ts',
+  'bundler-tests/browser/*'
 ];
 
 let dryRun = false;
