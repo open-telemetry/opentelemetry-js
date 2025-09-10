@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { getNumberFromEnv, getStringFromEnv } from '@opentelemetry/core';
 import { OtlpSharedConfiguration } from './shared-configuration';
 import { diag } from '@opentelemetry/api';
 
 function parseAndValidateTimeoutFromEnv(
   timeoutEnvVar: string
 ): number | undefined {
-  const envTimeout = process.env[timeoutEnvVar]?.trim();
-  if (envTimeout != null && envTimeout !== '') {
-    const definedTimeout = Number(envTimeout);
-    if (Number.isFinite(definedTimeout) && definedTimeout > 0) {
-      return definedTimeout;
+  const envTimeout = getNumberFromEnv(timeoutEnvVar);
+  if (envTimeout != null) {
+    if (Number.isFinite(envTimeout) && envTimeout > 0) {
+      return envTimeout;
     }
     diag.warn(
       `Configuration: ${timeoutEnvVar} is invalid, expected number greater than 0 (actual: ${envTimeout})`
     );
   }
+
   return undefined;
 }
 
@@ -46,10 +47,7 @@ function getTimeoutFromEnv(signalIdentifier: string) {
 function parseAndValidateCompressionFromEnv(
   compressionEnvVar: string
 ): 'none' | 'gzip' | undefined {
-  const compression = process.env[compressionEnvVar]?.trim();
-  if (compression === '') {
-    return undefined;
-  }
+  const compression = getStringFromEnv(compressionEnvVar)?.trim();
 
   if (compression == null || compression === 'none' || compression === 'gzip') {
     return compression;
