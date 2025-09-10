@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-export interface HttpRequestParameters {
-  url: string;
-  headers: () => Record<string, string>;
-  compression: 'gzip' | 'none';
+import { HttpAgentFactory } from '../configuration/otlp-node-http-configuration';
+import { HttpRequestParameters } from './http-transport-types';
+
+export interface NodeHttpRequestParameters extends HttpRequestParameters {
+  agentFactory: HttpAgentFactory;
 }
