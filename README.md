@@ -227,7 +227,6 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 ### Maintainers
 
-- [Amir Blum](https://github.com/blumamir), Odigos
 - [Chengzhong Wu](https://github.com/legendecas), Bloomberg
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
 - [Jamie Danielson](https://github.com/JamieDanielson), Honeycomb
@@ -238,6 +237,7 @@ For more information about the maintainer role, see the [community repository](h
 
 ### Approvers
 
+- [Amir Blum](https://github.com/blumamir), Odigos
 - [David Luna](https://github.com/david-luna), Elastic
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
 - [Martin Kuba](https://github.com/martinkuba), Lightstep
