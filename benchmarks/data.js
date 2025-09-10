@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1757504085329,
+  "lastUpdate": 1757504213132,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -38172,6 +38172,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.71%",
             "unit": "ops/sec",
             "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "2197129a1d73fb3c465527ac98156f7de2ecfc0c",
+          "message": "ci: add workflow to move inactive approvers/maintainers to emeritus (#5898)",
+          "timestamp": "2025-09-10T11:27:26Z",
+          "tree_id": "0a5b20c963e639ec7fc8db20c94556d90c018320",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/2197129a1d73fb3c465527ac98156f7de2ecfc0c"
+        },
+        "date": 1757504212037,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 705182,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8742,
+            "range": "±0.80%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 297617,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 283438,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
