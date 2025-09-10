@@ -20,6 +20,24 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
     * `@opentelemetry/otlp-transformer/experimental/logs`: logs export service return types
     * `@opentelemetry/otlp-transformer/experimental/logs/trace`: logs export service return types
     * `@opentelemetry/otlp-transformer/experimental/logs/protobuf`: logs export service return types
+* fix(otlp-exporter-base)!: split node and browser config types in two [#5917](https://github.com/open-telemetry/opentelemetry-js/pull/5917) @pichlermarc
+  * Fixes a bug where Node.js modules would be incorrectly used in the instantiation of a web-targeted exporter
+  * Breaking changes:
+    * (user-facing) `createOtlpHttpExportDelegate(OtlpHttpConfiguration)` has been changed to take a different, but identical type `OtlpNodeHttpConfiguration` to differentiate it from the web-targeted exporters
+    * (user-facing) `convertLegacyHttpOptions(...)` now returns `OtlpNodeHttpConfiguration`, the returned object's contents remain identical.
+    * (user-facing) `agentFactory` has been dropped from `OtlpHttpConfiguration` as it is node-specific and is now part of `OtlpNodeHttpConfiguration` instead
+
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 0.204.0
+
+### :boom: Breaking Changes
 
 * feat(api-logs)!: Marked private methods as "conventionally private". [#5789](https://github.com/open-telemetry/opentelemetry-js/pull/5789)
 * feat(exporter-otlp-\*): support custom HTTP agents [#5719](https://github.com/open-telemetry/opentelemetry-js/pull/5719) @raphael-theriault-swi
@@ -48,14 +66,13 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
       ```
 
   * Users should migrate to the new `metricReaders` array option for future compatibility. The old option will be removed in an upcoming experimental version.
+* feat(instrumentation-http): Added support for redacting specific url query string values and url credentials [#5743](https://github.com/open-telemetry/opentelemetry-js/pull/5743) @rads-1996
 
 ### :bug: Bug Fixes
 
 * fix(otlp-exporter-base): prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
 * fix(otlp-exporter-base): consider relative urls as valid in browser environments [#5807](https://github.com/open-telemetry/opentelemetry-js/pull/5807)
 * fix(instrumentation-fetch): Use ESM version of semconv instead of CJS. Users expecting mixed ESM and CJS modules will now only get ESM modules. [#5878](https://github.com/open-telemetry/opentelemetry-js/pull/5878) @overbalance
-
-### :books: Documentation
 
 ### :house: Internal
 
@@ -700,7 +717,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * fix(sdk-node)!: remove the explicit dependency on @opentelemetry/exporter-jaeger that was kept on the previous release
   * '@opentelemetry/exporter-jaeger' is no longer be a dependency of this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.
-    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to one of the alternatives described [here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
+    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to [one of the alternatives described here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
 * fix(otlp-transformer)!: OTLP json encoding [#4220](https://github.com/open-telemetry/opentelemetry-js/pull/4220) @seemk
   * Fixes a bug in the OTLP (http/json) exporters where timestamps were not encoded as strings, causing the export to
     be rejected by OTLP endpoints
@@ -712,7 +729,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(exporter-logs-otlp-proto): change OTLPLogExporter to OTLPLogExporter [#4140](https://github.com/open-telemetry/opentelemetry-js/pull/4140) @Vunovati
 * fix(sdk-node): remove explicit dependency on @opentelemetry/exporter-jaeger
   * '@opentelemetry/exporter-jaeger' is no longer be a dependency of this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.
-    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to one of the alternatives described [here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
+    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to [one of the alternatives described here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
 * fix(sdk-logs): hide internal methods with internal shared state [#3865](https://github.com/open-telemetry/opentelemetry-js/pull/3865) @legendecas
 
 ### :rocket: (Enhancement)
@@ -746,7 +763,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
     * `NodeSDK.detectResources()`, this is not necessary anymore, resources are now auto-detected on startup.
 * chore(sdk-node): add notice that '@opentelemetry/exporter-jaeger' has to be installed manually in the next version [#4068](https://github.com/open-telemetry/opentelemetry-js/pull/4068) @pichlermarc
   * Starting with 0.43.0 '@opentelemetry/exporter-jaeger' will no longer be a dependency of this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.
-    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to one of the alternatives described [here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
+    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to [one of the alternatives described here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
 
 ### :rocket: (Enhancement)
 
