@@ -12,6 +12,7 @@
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "version:update": "lerna run version",
     "test": "lerna run test",
+    "test:bundle": "lerna run test:bundle",
     "test:browser": "lerna run test:browser",
     "test:webworker": "lerna run test:webworker",
     "test:backcompat": "lerna run test:backcompat",
@@ -127,6 +128,7 @@
     "examples/opentelemetry-web",
     "examples/http",
     "examples/https",
-    "examples/esm-http-ts"
+    "examples/esm-http-ts",
+    "bundler-tests/browser/*"
   ]
 }
