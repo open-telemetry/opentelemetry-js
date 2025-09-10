@@ -979,7 +979,10 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     let span: Span;
     const currentSpan = trace.getSpan(ctx);
 
-    if (requireParent === true && currentSpan === undefined) {
+    if (
+      requireParent === true &&
+      (!currentSpan || !trace.isSpanContextValid(currentSpan.spanContext()))
+    ) {
       span = trace.wrapSpanContext(INVALID_SPAN_CONTEXT);
     } else if (requireParent === true && currentSpan?.spanContext().isRemote) {
       span = currentSpan;
