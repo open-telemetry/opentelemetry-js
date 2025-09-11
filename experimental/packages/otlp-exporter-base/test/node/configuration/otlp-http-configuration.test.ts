@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 import * as assert from 'assert';
-import {
-  mergeOtlpHttpConfigurationWithDefaults,
-  OtlpHttpConfiguration,
-} from '../../../src/configuration/otlp-http-configuration';
+import { mergeOtlpNodeHttpConfigurationWithDefaults } from '../../../src/configuration/otlp-node-http-configuration';
+import { OtlpNodeHttpConfiguration } from '../../../src/configuration/otlp-node-http-configuration';
 
-describe('mergeOtlpHttpConfigurationWithDefaults (node)', function () {
-  const testDefaults: OtlpHttpConfiguration = {
+describe('mergeOtlpNodeHttpConfigurationWithDefaults', function () {
+  const testDefaults: OtlpNodeHttpConfiguration = {
     url: 'http://default.example.test',
     timeoutMillis: 1,
     compression: 'none',
@@ -31,7 +29,7 @@ describe('mergeOtlpHttpConfigurationWithDefaults (node)', function () {
 
   it('throws error when the user-provided url is not parseable', function () {
     assert.throws(() => {
-      mergeOtlpHttpConfigurationWithDefaults(
+      mergeOtlpNodeHttpConfigurationWithDefaults(
         { url: 'this is not a URL' },
         {},
         testDefaults

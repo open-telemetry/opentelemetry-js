@@ -8,7 +8,7 @@
 This package provides implementations of composite samplers that propagate sampling information across a trace.
 This implements the [experimental specification][probability-sampling].
 
-Currently `ComposableRuleBased` an `ComposableAnnotating` are not implemented.
+Currently `ComposableRuleBased` and `ComposableAnnotating` are not implemented.
 
 ## Quick Start
 

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-logs",
-  "version": "0.203.0",
+  "version": "0.205.0",
   "publishConfig": {
     "access": "public"
   },
@@ -78,7 +78,7 @@
     "@types/mocha": "10.0.10",
     "@types/node": "18.6.5",
     "@types/sinon": "17.0.4",
-    "babel-plugin-istanbul": "7.0.0",
+    "babel-plugin-istanbul": "7.0.1",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",
@@ -95,8 +95,8 @@
     "webpack-cli": "6.0.1"
   },
   "dependencies": {
-    "@opentelemetry/api-logs": "0.203.0",
-    "@opentelemetry/core": "2.0.1",
-    "@opentelemetry/resources": "2.0.1"
+    "@opentelemetry/api-logs": "0.205.0",
+    "@opentelemetry/core": "2.1.0",
+    "@opentelemetry/resources": "2.1.0"
   }
 }

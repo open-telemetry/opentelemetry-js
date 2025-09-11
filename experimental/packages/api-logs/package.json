@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/api-logs",
-  "version": "0.203.0",
+  "version": "0.205.0",
   "description": "Public logs API for OpenTelemetry",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -66,7 +66,7 @@
     "@types/mocha": "10.0.10",
     "@types/node": "^8.10.66",
     "@types/webpack-env": "1.16.3",
-    "babel-plugin-istanbul": "7.0.0",
+    "babel-plugin-istanbul": "7.0.1",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",
