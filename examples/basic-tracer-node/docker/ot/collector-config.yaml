@@ -13,6 +13,8 @@ exporters:
     endpoint: jaeger-all-in-one:14250
     tls:
       insecure: true
+    sending_queue:
+      batch:
 
 service:
   telemetry:
