@@ -21,7 +21,7 @@ exporters:
 service:
   telemetry:
     logs:
-      level: 'debug'
+      level: "debug"
   pipelines:
     traces:
       receivers: [otlp]

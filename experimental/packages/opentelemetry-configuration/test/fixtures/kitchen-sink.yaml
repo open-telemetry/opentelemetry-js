@@ -8,7 +8,7 @@
 # The file format version.
 # The yaml format is documented at
 # https://github.com/open-telemetry/opentelemetry-configuration/tree/main/schema
-file_format: '1.0-rc.1'
+file_format: "1.0-rc.1"
 # Configure if the SDK is disabled or not.
 # If omitted or null, false is used.
 disabled: false
@@ -51,7 +51,7 @@ logger_provider:
           # Configure exporter to be OTLP with HTTP transport.
           otlp_http:
             endpoint: http://localhost:4318/v1/logs
-            # Configure certificate used to verify a server's TLS credentials.
+            # Configure certificate used to verify a server"s TLS credentials.
             # Absolute path to certificate file in PEM format.
             # If omitted or null, system default certificate verification is used for secure connections.
             certificate_file: /app/cert.pem
@@ -64,14 +64,14 @@ logger_provider:
             # If omitted or null, mTLS is not used.
             client_certificate_file: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
-            # If an entry's .value is null, the entry is ignored.
+            # If an entry"s .value is null, the entry is ignored.
             headers:
               - name: api-key
-                value: '1234'
+                value: "1234"
             # Configure headers. Entries have lower priority than entries from .headers.
             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
             # If omitted or null, no headers are added.
-            headers_list: 'api-key=1234'
+            headers_list: "api-key=1234"
             # Configure compression.
             # Values include: gzip, none. Implementations may support other compression algorithms.
             # If omitted or null, none is used.
@@ -93,7 +93,7 @@ logger_provider:
             # Configure endpoint.
             # If omitted or null, http://localhost:4317 is used.
             endpoint: http://localhost:4317
-            # Configure certificate used to verify a server's TLS credentials.
+            # Configure certificate used to verify a server"s TLS credentials.
             # Absolute path to certificate file in PEM format.
             # If omitted or null, system default certificate verification is used for secure connections.
             certificate_file: /app/cert.pem
@@ -106,14 +106,14 @@ logger_provider:
             # If omitted or null, mTLS is not used.
             client_certificate_file: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
-            # If an entry's .value is null, the entry is ignored.
+            # If an entry"s .value is null, the entry is ignored.
             headers:
               - name: api-key
-                value: '1234'
+                value: "1234"
             # Configure headers. Entries have lower priority than entries from .headers.
             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
             # If omitted or null, no headers are added.
-            headers_list: 'api-key=1234'
+            headers_list: "api-key=1234"
             # Configure compression.
             # Values include: gzip, none. Implementations may support other compression algorithms.
             # If omitted or null, none is used.
@@ -122,7 +122,7 @@ logger_provider:
             # Value must be non-negative. A value of 0 indicates no limit (infinity).
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure client transport security for the exporter's connection.
+            # Configure client transport security for the exporter"s connection.
             # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
             # If omitted or null, false is used.
             insecure: false
@@ -176,7 +176,7 @@ logger_provider:
       - # Configure logger names to match, evaluated as follows:
         #
         #  * If the logger name exactly matches.
-        #  * If the logger name matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+        #  * If the logger name matches the wildcard pattern, where "?" matches any single character and "*" matches any number of characters including none.
         name: io.opentelemetry.contrib.*
         # The logger config.
         config:
@@ -214,17 +214,17 @@ meter_provider:
               # Configure resource attributes to be included.
               # Attribute keys from resources are evaluated to match as follows:
               #  * If the value of the attribute key exactly matches.
-              #  * If the value of the attribute key matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+              #  * If the value of the attribute key matches the wildcard pattern, where "?" matches any single character and "*" matches any number of characters including none.
               # If omitted, no resource attributes are included.
               included:
-                - 'service*'
+                - "service*"
               # Configure resource attributes to be excluded. Applies after .with_resource_constant_labels.included (i.e. excluded has higher priority than included).
               # Attribute keys from resources are evaluated to match as follows:
               #  * If the value of the attribute key exactly matches.
-              #  * If the value of the attribute key matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+              #  * If the value of the attribute key matches the wildcard pattern, where "?" matches any single character and "*" matches any number of characters including none.
               # If omitted, .included resource attributes are included.
               excluded:
-                - 'service.attr1'
+                - "service.attr1"
         # Configure metric producers.
         producers:
           - # Configure metric producer to be opencensus.
@@ -273,7 +273,7 @@ meter_provider:
             # Configure endpoint, including the metric specific path.
             # If omitted or null, http://localhost:4318/v1/metrics is used.
             endpoint: http://localhost:4318/v1/metrics
-            # Configure certificate used to verify a server's TLS credentials.
+            # Configure certificate used to verify a server"s TLS credentials.
             # Absolute path to certificate file in PEM format.
             # If omitted or null, system default certificate verification is used for secure connections.
             certificate_file: /app/cert.pem
@@ -286,14 +286,14 @@ meter_provider:
             # If omitted or null, mTLS is not used.
             client_certificate_file: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
-            # If an entry's .value is null, the entry is ignored.
+            # If an entry"s .value is null, the entry is ignored.
             headers:
               - name: api-key
-                value: '1234'
+                value: "1234"
             # Configure headers. Entries have lower priority than entries from .headers.
             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
             # If omitted or null, no headers are added.
-            headers_list: 'api-key=1234'
+            headers_list: "api-key=1234"
             # Configure compression.
             # Values include: gzip, none. Implementations may support other compression algorithms.
             # If omitted or null, none is used.
@@ -354,7 +354,7 @@ meter_provider:
             # Configure endpoint.
             # If omitted or null, http://localhost:4317 is used.
             endpoint: http://localhost:4317
-            # Configure certificate used to verify a server's TLS credentials.
+            # Configure certificate used to verify a server"s TLS credentials.
             # Absolute path to certificate file in PEM format.
             # If omitted or null, system default certificate verification is used for secure connections.
             certificate_file: /app/cert.pem
@@ -367,14 +367,14 @@ meter_provider:
             # If omitted or null, mTLS is not used.
             client_certificate_file: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
-            # If an entry's .value is null, the entry is ignored.
+            # If an entry"s .value is null, the entry is ignored.
             headers:
               - name: api-key
-                value: '1234'
+                value: "1234"
             # Configure headers. Entries have lower priority than entries from .headers.
             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
             # If omitted or null, no headers are added.
-            headers_list: 'api-key=1234'
+            headers_list: "api-key=1234"
             # Configure compression.
             # Values include: gzip, none. Implementations may support other compression algorithms.
             # If omitted or null, none is used.
@@ -383,7 +383,7 @@ meter_provider:
             # Value must be non-negative. A value of 0 indicates no limit (infinity).
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure client transport security for the exporter's connection.
+            # Configure client transport security for the exporter"s connection.
             # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
             # If omitted or null, false is used.
             insecure: false
@@ -463,10 +463,10 @@ meter_provider:
       # Configure view stream.
       stream:
         # Configure metric name of the resulting stream(s).
-        # If omitted or null, the instrument's original name is used.
+        # If omitted or null, the instrument"s original name is used.
         name: new_instrument_name
         # Configure metric description of the resulting stream(s).
-        # If omitted or null, the instrument's origin description is used.
+        # If omitted or null, the instrument"s origin description is used.
         description: new_description
         # Configure aggregation of the resulting stream(s).
         # Values include: default, drop, explicit_bucket_histogram, base2_exponential_bucket_histogram, last_value, sum. For behavior of values see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#aggregation.
@@ -498,7 +498,7 @@ meter_provider:
             # If omitted or null, true is used.
             record_min_max: true
         # Configure the aggregation cardinality limit.
-        # If omitted or null, the metric reader's default cardinality limit is used.
+        # If omitted or null, the metric reader"s default cardinality limit is used.
         aggregation_cardinality_limit: 2000
         # Configure attribute keys retained in the resulting stream(s).
         attribute_keys:
@@ -527,7 +527,7 @@ meter_provider:
       - # Configure meter names to match, evaluated as follows:
         #
         #  * If the meter name exactly matches.
-        #  * If the meter name matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+        #  * If the meter name matches the wildcard pattern, where "?" matches any single character and "*" matches any number of characters including none.
         name: io.opentelemetry.contrib.*
         # The meter config.
         config:
@@ -556,7 +556,7 @@ propagator:
   # The value is a comma separated list of propagator identifiers matching the format of OTEL_PROPAGATORS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration for details.
   # Built-in propagator identifiers include: tracecontext, baggage, b3, b3multi, jaeger, ottrace. Known third party identifiers include: xray.
   # If the resolved list of propagators (from .composite and .composite_list) is empty, a noop propagator is used.
-  composite_list: 'tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray'
+  composite_list: "tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray"
 # Configure tracer provider.
 # If omitted, a noop tracer provider is used.
 tracer_provider:
@@ -585,7 +585,7 @@ tracer_provider:
             # Configure endpoint, including the trace specific path.
             # If omitted or null, http://localhost:4318/v1/traces is used.
             endpoint: http://localhost:4318/v1/traces
-            # Configure certificate used to verify a server's TLS credentials.
+            # Configure certificate used to verify a server"s TLS credentials.
             # Absolute path to certificate file in PEM format.
             # If omitted or null, system default certificate verification is used for secure connections.
             certificate_file: /app/cert.pem
@@ -598,14 +598,14 @@ tracer_provider:
             # If omitted or null, mTLS is not used.
             client_certificate_file: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
-            # If an entry's .value is null, the entry is ignored.
+            # If an entry"s .value is null, the entry is ignored.
             headers:
               - name: api-key
-                value: '1234'
+                value: "1234"
             # Configure headers. Entries have lower priority than entries from .headers.
             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
             # If omitted or null, no headers are added.
-            headers_list: 'api-key=1234'
+            headers_list: "api-key=1234"
             # Configure compression.
             # Values include: gzip, none. Implementations may support other compression algorithms.
             # If omitted or null, none is used.
@@ -627,7 +627,7 @@ tracer_provider:
             # Configure endpoint.
             # If omitted or null, http://localhost:4317 is used.
             endpoint: http://localhost:4317
-            # Configure certificate used to verify a server's TLS credentials.
+            # Configure certificate used to verify a server"s TLS credentials.
             # Absolute path to certificate file in PEM format.
             # If omitted or null, system default certificate verification is used for secure connections.
             certificate_file: /app/cert.pem
@@ -640,14 +640,14 @@ tracer_provider:
             # If omitted or null, mTLS is not used.
             client_certificate_file: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
-            # If an entry's .value is null, the entry is ignored.
+            # If an entry"s .value is null, the entry is ignored.
             headers:
               - name: api-key
-                value: '1234'
+                value: "1234"
             # Configure headers. Entries have lower priority than entries from .headers.
             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
             # If omitted or null, no headers are added.
-            headers_list: 'api-key=1234'
+            headers_list: "api-key=1234"
             # Configure compression.
             # Values include: gzip, none. Implementations may support other compression algorithms.
             # If omitted or null, none is used.
@@ -656,7 +656,7 @@ tracer_provider:
             # Value must be non-negative. A value of 0 indicates no limit (infinity).
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure client transport security for the exporter's connection.
+            # Configure client transport security for the exporter"s connection.
             # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
             # If omitted or null, false is used.
             insecure: false
@@ -772,7 +772,7 @@ tracer_provider:
       - # Configure tracer names to match, evaluated as follows:
         #
         #  * If the tracer name exactly matches.
-        #  * If the tracer name matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+        #  * If the tracer name matches the wildcard pattern, where "?" matches any single character and "*" matches any number of characters including none.
         name: io.opentelemetry.contrib.*
         # The tracer config.
         config:
@@ -782,8 +782,8 @@ tracer_provider:
 # If omitted, the default resource is used.
 resource:
   # Configure resource attributes. Entries have higher priority than entries from .resource.attributes_list.
-  # Entries must contain .name and .value, and may optionally include .type. If an entry's .type omitted or null, string is used.
-  # The .value's type must match the .type. Values for .type include: string, bool, int, double, string_array, bool_array, int_array, double_array.
+  # Entries must contain .name and .value, and may optionally include .type. If an entry"s .type omitted or null, string is used.
+  # The .value"s type must match the .type. Values for .type include: string, bool, int, double, string_array, bool_array, int_array, double_array.
   attributes:
     - name: service.name
       value: unknown_service
@@ -800,7 +800,7 @@ resource:
       value: 1.1
       type: double
     - name: string_array_key
-      value: ['value1', 'value2']
+      value: ["value1", "value2"]
       type: string_array
     - name: bool_array_key
       value: [true, false]
@@ -814,7 +814,7 @@ resource:
   # Configure resource attributes. Entries have lower priority than entries from .resource.attributes.
   # The value is a list of comma separated key-value pairs matching the format of OTEL_RESOURCE_ATTRIBUTES. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration for details.
   # If omitted or null, no resource attributes are added.
-  attributes_list: 'service.namespace=my-namespace,service.version=1.0.0'
+  attributes_list: "service.namespace=my-namespace,service.version=1.0.0"
   # Configure resource detection.
   # This type is in development and subject to breaking changes in minor versions.
   # If omitted or null, resource detection is disabled.
@@ -824,14 +824,14 @@ resource:
       # Configure list of attribute key patterns to include from resource detectors.
       # Attribute keys from resource detectors are evaluated to match as follows:
       #  * If the value of the attribute key exactly matches.
-      #  * If the value of the attribute key matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+      #  * If the value of the attribute key matches the wildcard pattern, where "?" matches any single character and "*" matches any number of characters including none.
       # If omitted, all attributes are included.
       included:
         - process.*
       # Configure list of attribute key patterns to exclude from resource detectors. Applies after .resource.detectors.attributes.included (i.e. excluded has higher priority than included).
       # Attribute keys from resource detectors are evaluated to match as follows:
       #  * If the value of the attribute key exactly matches.
-      #  * If the value of the attribute key matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+      #  * If the value of the attribute key matches the wildcard pattern, where "?" matches any single character and "*" matches any number of characters including none.
       # If omitted, .included attributes are included.
       excluded:
         - process.command_args
@@ -894,54 +894,54 @@ instrumentation/development:
   cpp:
     # Configure the instrumentation corresponding to key "example".
     example:
-      property: 'value'
+      property: "value"
   # Configure .NET language-specific instrumentation libraries.
   dotnet:
     # Configure the instrumentation corresponding to key "example".
     example:
-      property: 'value'
+      property: "value"
   # Configure Erlang language-specific instrumentation libraries.
   erlang:
     # Configure the instrumentation corresponding to key "example".
     example:
-      property: 'value'
+      property: "value"
   # Configure Go language-specific instrumentation libraries.
   go:
     # Configure the instrumentation corresponding to key "example".
     example:
-      property: 'value'
+      property: "value"
   # Configure Java language-specific instrumentation libraries.
   java:
     # Configure the instrumentation corresponding to key "example".
     example:
-      property: 'value'
+      property: "value"
   # Configure JavaScript language-specific instrumentation libraries.
   js:
     # Configure the instrumentation corresponding to key "example".
     example:
-      property: 'value'
+      property: "value"
   # Configure PHP language-specific instrumentation libraries.
   php:
     # Configure the instrumentation corresponding to key "example".
     example:
-      property: 'value'
+      property: "value"
   # Configure Python language-specific instrumentation libraries.
   python:
     # Configure the instrumentation corresponding to key "example".
     example:
-      property: 'value'
+      property: "value"
   # Configure Ruby language-specific instrumentation libraries.
   ruby:
     # Configure the instrumentation corresponding to key "example".
     example:
-      property: 'value'
+      property: "value"
   # Configure Rust language-specific instrumentation libraries.
   rust:
     # Configure the instrumentation corresponding to key "example".
     example:
-      property: 'value'
+      property: "value"
   # Configure Swift language-specific instrumentation libraries.
   swift:
     # Configure the instrumentation corresponding to key "example".
     example:
-      property: 'value'
+      property: "value"
