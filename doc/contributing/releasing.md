@@ -20,7 +20,7 @@ We aim to eventually automate this process as much as possible.
 
 ## 2. Review and merge the release PR
 
-1. Review the PR generated via the workflow (it will be titled `chore: prepare next release` and opened by the @opentelemetrybot user)
+1. Review the PR generated via the workflow (it will be titled `chore: prepare next release` and opened by [otelbot[bot]](https://github.com/apps/otelbot))
 2. Once approved, merge the PR
 
 ## 3. Publish to NPM
