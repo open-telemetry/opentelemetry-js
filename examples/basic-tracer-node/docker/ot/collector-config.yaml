@@ -5,8 +5,8 @@ receivers:
       http:
         cors:
           allowed_origins:
-          - http://*
-          - https://*
+            - http://*
+            - https://*
 
 exporters:
   jaeger:
@@ -14,13 +14,10 @@ exporters:
     tls:
       insecure: true
 
-processors:
-  batch:
-
 service:
   telemetry:
     logs:
-      level: "debug"
+      level: 'debug'
   pipelines:
     traces:
       receivers: [otlp]
