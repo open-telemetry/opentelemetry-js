@@ -24,4 +24,3 @@ service:
     traces:
       receivers: [otlp]
       exporters: [jaeger]
-      processors: [batch]

@@ -26,7 +26,6 @@ service:
     traces:
       receivers: [otlp]
       exporters: [zipkin]
-      processors: [batch]
     metrics:
       receivers: [otlp]
       exporters: [prometheus]
