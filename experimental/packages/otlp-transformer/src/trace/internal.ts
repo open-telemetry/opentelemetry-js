@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { Link } from '@opentelemetry/api';
+import type { Link, SpanContext } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import type { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace-base';
 import type { Encoder } from '../common/utils';
@@ -33,6 +33,22 @@ import {
 } from './internal-types';
 import { OtlpEncodingOptions } from '../common/internal-types';
 import { getOtlpEncoder } from '../common/utils';
+
+// Span flags constants matching the OTLP specification
+const SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK = 0x100;
+const SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK = 0x200;
+
+/**
+ * Builds span flags based on the parent span context's isRemote property.
+ * This follows the OTLP specification for span flags.
+ */
+function buildSpanFlags(parentSpanContext?: SpanContext): number {
+  let flags = SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK;
+  if (parentSpanContext?.isRemote) {
+    flags |= SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK;
+  }
+  return flags;
+}
 
 export function sdkSpanToOtlpSpan(span: ReadableSpan, encoder: Encoder): ISpan {
   const ctx = span.spanContext();
@@ -61,6 +77,7 @@ export function sdkSpanToOtlpSpan(span: ReadableSpan, encoder: Encoder): ISpan {
     },
     links: span.links.map(link => toOtlpLink(link, encoder)),
     droppedLinksCount: span.droppedLinksCount,
+    flags: buildSpanFlags(span.parentSpanContext),
   };
 }
 
@@ -71,6 +88,7 @@ export function toOtlpLink(link: Link, encoder: Encoder): ILink {
     traceId: encoder.encodeSpanContext(link.context.traceId),
     traceState: link.context.traceState?.serialize(),
     droppedAttributesCount: link.droppedAttributesCount || 0,
+    flags: buildSpanFlags(link.context),
   };
 }
 
