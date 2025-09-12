@@ -44,12 +44,12 @@ function pbts(pbjsOutFile) {
   return exec(path.resolve(rootBinDir, 'pbts'), [...pbtsOptions, pbjsOutFile]);
 }
 
-async function pbjs(files) {
-  const outFile = path.join(generatedPath, 'root.js');
+async function pbjs(files, format, generatedFilename) {
+  const outFile = path.join(generatedPath, generatedFilename);
   const pbjsOptions = [
     '-t', 'static-module',
     '-p', protosPath,
-    '-w', 'commonjs',
+    '-w', format,
     '--null-defaults',
     '-o', outFile,
   ];
@@ -58,6 +58,7 @@ async function pbjs(files) {
 }
 
 (async function main() {
-  const pbjsOut = await pbjs(protos);
+  const pbjsOut = await pbjs(protos, 'commonjs', 'root.js');
+  await pbjs(protos, 'es6', 'root.mjs');
   await pbts(pbjsOut);
 })();
