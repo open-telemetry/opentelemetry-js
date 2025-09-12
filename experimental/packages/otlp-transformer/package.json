@@ -14,7 +14,8 @@
   "scripts": {
     "prepublishOnly": "npm run compile",
     "precompile": "lerna run version --scope @opentelemetry/otlp-transformer --include-dependencies",
-    "compile": "npm run protos && tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "compile": "npm run protos && tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json && npm run copy-esm-protos-to-build",
+    "copy-esm-protos-to-build": "cp src/generated/root.mjs build/esm/generated/root.js && cp src/generated/root.mjs build/esnext/generated/root.js",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "protos": "npm run submodule && npm run protos:generate",
     "protos:generate": "node ../../../scripts/generate-protos.js",
