@@ -203,10 +203,22 @@ function configureMetricProviderFromEnv(): IMetricReader[] {
 }
 
 /**
- * Core distribution of the OpenTelemetry JS SDK.
- * @example
- * <caption> Register SDK via using environment variables </caption>
+ * A setup helper for the OpenTelemetry SDKs (logs, metrics, traces).
+ * <p> After successful setup using {@link NodeSDK#start()}, use `@opentelemetry/api` to obtain the registered components.
+ * <p> Use the shutdown handler {@link NodeSDK#shutdown()} to ensure your telemetry is exported before the process exits.
  *
+ * @example <caption> Register SDK by using environment variables </caption>
+ *    const nodeSdk = new NodeSDK(); // providing no options uses OTEL_* environment variables for SDK setup.
+ *    nodeSdk.start(); // registers all configured SDK components
+ * @example <caption> Override environment variable config with your own components </caption>
+ *    const nodeSdk = new NodeSDK({
+ *      // override the list of metric reader with your own options and ignore environment variable config
+ *      // explore the docs of other options to learn more!
+ *      metricReaders: [ new PeriodicExportingMetricReader({
+ *        exporter: new OTLPMetricsExporter()
+ *        })]
+ *    });
+ *    nodeSdk.start(); // registers all configured SDK components
  */
 export class NodeSDK {
   private _tracerProviderConfig?: TracerProviderConfig;
