@@ -11,11 +11,12 @@ receivers:
 exporters:
   zipkin:
     endpoint: "http://zipkin-all-in-one:9411/api/v2/spans"
+    sending_queue:
+      batch:
   prometheus:
     endpoint: "0.0.0.0:9464"
-
-processors:
-  batch:
+    sending_queue:
+      batch:
 
 service:
   telemetry:
