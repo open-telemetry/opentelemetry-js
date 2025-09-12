@@ -333,16 +333,9 @@ describe('Node SDK', () => {
 
       sdk.start();
 
-      assert.strictEqual(
-        context['_getContextManager'](),
-        ctxManager,
-        'context manager should not change'
-      );
-      assert.strictEqual(
-        propagation['_getGlobalPropagator'](),
-        propagator,
-        'propagator should not change'
-      );
+      assertDefaultContextManagerRegistered();
+      assertDefaultPropagatorRegistered();
+
       assert.strictEqual(
         (trace.getTracerProvider() as ProxyTracerProvider).getDelegate(),
         delegate,
