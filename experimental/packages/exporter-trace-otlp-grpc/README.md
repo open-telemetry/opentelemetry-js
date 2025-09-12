@@ -81,7 +81,7 @@ To use mutual authentication, pass to the `createSsl()` constructor:
   ),
 ```
 
-To generate credentials for mutual authentication, you can refer to the script used to generate certificates for tests [here](./test/certs/regenerate.sh)
+To generate credentials for mutual authentication, you can refer to [the script used to generate certificates for tests here](./test/certs/regenerate.sh).
 
 The exporter can be configured to send custom metadata with each request as in the example below:
 

@@ -19,7 +19,7 @@ import type * as http from 'http';
 import type * as https from 'https';
 
 import type { OTLPExporterConfigBase } from './legacy-base-configuration';
-import type { HttpAgentFactory } from './otlp-http-configuration';
+import type { HttpAgentFactory } from './otlp-node-http-configuration';
 
 /**
  * Collector Exporter node base config

@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 import { OTLPExporterNodeConfigBase } from './legacy-node-configuration';
-import {
-  getHttpConfigurationDefaults,
-  HttpAgentFactory,
-  httpAgentFactoryFromOptions,
-  mergeOtlpHttpConfigurationWithDefaults,
-  OtlpHttpConfiguration,
-} from './otlp-http-configuration';
-import { getHttpConfigurationFromEnvironment } from './otlp-http-env-configuration';
 import { diag } from '@opentelemetry/api';
 import { wrapStaticHeadersInFunction } from './shared-configuration';
+import {
+  getNodeHttpConfigurationDefaults,
+  HttpAgentFactory,
+  mergeOtlpNodeHttpConfigurationWithDefaults,
+  OtlpNodeHttpConfiguration,
+} from './otlp-node-http-configuration';
+import { httpAgentFactoryFromOptions } from '../index-node-http';
+import { getNodeHttpConfigurationFromEnvironment } from './otlp-node-http-env-configuration';
 
 function convertLegacyAgentOptions(
   config: OTLPExporterNodeConfigBase
@@ -56,13 +56,13 @@ export function convertLegacyHttpOptions(
   signalIdentifier: string,
   signalResourcePath: string,
   requiredHeaders: Record<string, string>
-): OtlpHttpConfiguration {
+): OtlpNodeHttpConfiguration {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if ((config as any).metadata) {
     diag.warn('Metadata cannot be set when using http');
   }
 
-  return mergeOtlpHttpConfigurationWithDefaults(
+  return mergeOtlpNodeHttpConfigurationWithDefaults(
     {
       url: config.url,
       headers: wrapStaticHeadersInFunction(config.headers),
@@ -71,7 +71,10 @@ export function convertLegacyHttpOptions(
       compression: config.compression,
       agentFactory: convertLegacyAgentOptions(config),
     },
-    getHttpConfigurationFromEnvironment(signalIdentifier, signalResourcePath),
-    getHttpConfigurationDefaults(requiredHeaders, signalResourcePath)
+    getNodeHttpConfigurationFromEnvironment(
+      signalIdentifier,
+      signalResourcePath
+    ),
+    getNodeHttpConfigurationDefaults(requiredHeaders, signalResourcePath)
   );
 }

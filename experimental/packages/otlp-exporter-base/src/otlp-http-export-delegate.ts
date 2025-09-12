@@ -17,14 +17,14 @@ import {
   createOtlpExportDelegate,
   IOtlpExportDelegate,
 } from './otlp-export-delegate';
-import { OtlpHttpConfiguration } from './configuration/otlp-http-configuration';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
 import { createHttpExporterTransport } from './transport/http-exporter-transport';
 import { createBoundedQueueExportPromiseHandler } from './bounded-queue-export-promise-handler';
 import { createRetryingTransport } from './retrying-transport';
+import { OtlpNodeHttpConfiguration } from './configuration/otlp-node-http-configuration';
 
 export function createOtlpHttpExportDelegate<Internal, Response>(
-  options: OtlpHttpConfiguration,
+  options: OtlpNodeHttpConfiguration,
   serializer: ISerializer<Internal, Response>
 ): IOtlpExportDelegate<Internal> {
   return createOtlpExportDelegate(

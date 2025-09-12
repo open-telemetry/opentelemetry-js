@@ -84,9 +84,9 @@ type TracerProviderConfig = {
 
 export type MeterProviderConfig = {
   /**
-   * Reference to the MetricReader instance by the NodeSDK
+   * Reference to the MetricReader instances by the NodeSDK
    */
-  reader?: IMetricReader;
+  readers?: IMetricReader[];
   /**
    * List of {@link ViewOptions}s that should be passed to the MeterProvider
    */
@@ -312,10 +312,20 @@ export class NodeSDK {
       this.configureLoggerProviderFromEnv();
     }
 
-    if (configuration.metricReader || configuration.views) {
+    if (
+      configuration.metricReaders ||
+      configuration.metricReader ||
+      configuration.views
+    ) {
       const meterProviderConfig: MeterProviderConfig = {};
-      if (configuration.metricReader) {
-        meterProviderConfig.reader = configuration.metricReader;
+
+      if (configuration.metricReaders) {
+        meterProviderConfig.readers = configuration.metricReaders;
+      } else if (configuration.metricReader) {
+        meterProviderConfig.readers = [configuration.metricReader];
+        diag.warn(
+          "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
+        );
       }
 
       if (configuration.views) {
@@ -386,8 +396,8 @@ export class NodeSDK {
       configureMetricProviderFromEnv();
     if (this._meterProviderConfig || metricReadersFromEnv.length > 0) {
       const readers: IMetricReader[] = [];
-      if (this._meterProviderConfig?.reader) {
-        readers.push(this._meterProviderConfig.reader);
+      if (this._meterProviderConfig?.readers) {
+        readers.push(...this._meterProviderConfig.readers);
       }
 
       if (readers.length === 0) {
