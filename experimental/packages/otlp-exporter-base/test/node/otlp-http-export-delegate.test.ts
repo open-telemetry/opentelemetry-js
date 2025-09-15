@@ -30,8 +30,10 @@ import * as assert from 'assert';
 
 describe('createOtlpHttpExportDelegate', function () {
   let server: http.Server;
+  let headers: http.IncomingHttpHeaders | undefined;
   beforeEach(function (done) {
     server = http.createServer((request, response) => {
+      headers = request.headers;
       response.statusCode = 200;
       response.end('Test Server Response');
     });
@@ -42,6 +44,7 @@ describe('createOtlpHttpExportDelegate', function () {
   });
 
   afterEach(function (done) {
+    headers = undefined;
     server.close(() => {
       done();
     });
@@ -67,6 +70,66 @@ describe('createOtlpHttpExportDelegate', function () {
     delegate.export('foo', result => {
       try {
         assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('creates delegate with a user-agent in headers function', function (done) {
+    const serializer: ISerializer<string, string> = {
+      serializeRequest: sinon.stub().returns(Buffer.from([1, 2, 3])),
+      deserializeResponse: sinon.stub().returns('response'),
+    };
+    const delegate = createOtlpHttpExportDelegate(
+      {
+        url: 'http://localhost:8083',
+        agentFactory: () => new http.Agent(),
+        compression: 'none',
+        concurrencyLimit: 30,
+        headers: () => ({ 'User-Agent': 'OTLP-Http-Exporter/1.2.3' }),
+        timeoutMillis: 1000,
+      },
+      serializer
+    );
+
+    delegate.export('foo', result => {
+      try {
+        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+        assert.strictEqual(headers?.['user-agent'], 'OTLP-Http-Exporter/1.2.3');
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('creates delegate with a user-agent in headers function and in options', function (done) {
+    const serializer: ISerializer<string, string> = {
+      serializeRequest: sinon.stub().returns(Buffer.from([1, 2, 3])),
+      deserializeResponse: sinon.stub().returns('response'),
+    };
+    const delegate = createOtlpHttpExportDelegate(
+      {
+        url: 'http://localhost:8083',
+        agentFactory: () => new http.Agent(),
+        compression: 'none',
+        concurrencyLimit: 30,
+        headers: () => ({ 'User-Agent': 'OTLP-Http-Exporter/1.2.3' }),
+        timeoutMillis: 1000,
+        userAgent: 'Custom-User-Agent/1.2.3',
+      },
+      serializer
+    );
+
+    delegate.export('foo', result => {
+      try {
+        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+        assert.strictEqual(
+          headers?.['user-agent'],
+          'Custom-User-Agent/1.2.3 OTLP-Http-Exporter/1.2.3'
+        );
         done();
       } catch (e) {
         done(e);
