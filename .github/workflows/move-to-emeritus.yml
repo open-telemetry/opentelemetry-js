@@ -10,42 +10,32 @@ jobs:
   create-or-update-emeritus-pr:
     runs-on: ubuntu-latest
     steps:
-      - name: Fork
-        run: gh repo fork open-telemetry/opentelemetry-js
-        env:
-          GITHUB_TOKEN: ${{ secrets.OPENTELEMETRYBOT_GITHUB_TOKEN }}
       - name: Checkout
         uses: actions/checkout@v5
-        with:
-          repository: opentelemetrybot/opentelemetry-js
-          ref: main
-          token: ${{ secrets.OPENTELEMETRYBOT_GITHUB_TOKEN }}
-      - name: Sync with upstream
-        run: |
-          git remote show origin
-          git remote add upstream https://github.com/open-telemetry/opentelemetry-js.git
-          git fetch upstream
-          git reset --hard upstream/main
-          git push origin main --force
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           cache: 'npm'
           cache-dependency-path: package-lock.json
           node-version: 22
 
       - run: node scripts/move-to-emeritus.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2.0.6
+        id: otelbot-token
+        with:
+          app-id: ${{ vars.OTELBOT_APP_ID }}
+          private-key: ${{ secrets.OTELBOT_PRIVATE_KEY }}
 
       - name: Create/Update Move to Emeritus PR
         run: |
-          git config user.name opentelemetrybot
-          git config user.email 107717825+opentelemetrybot@users.noreply.github.com
+          git config user.name otelbot
+          git config user.email 197425009+otelbot@users.noreply.github.com
           git checkout -b chore/move-inactive-to-emeritus
           git add README.md
           git commit -m "chore: move inactive members to emeritus"
-          git push --set-upstream $PR_REMOTE chore/move-inactive-to-emeritus --force
-          gh pr create --repo open-telemetry/opentelemetry-js --title 'chore: move inactive members to emeritus' --body-file ./.tmp/emeritus-pr-body.md || gh pr edit --repo open-telemetry/opentelemetry-js $PR_OWNER:chore/move-inactive-to-emeritus --body-file ./.tmp/emeritus-pr-body.md
+          git push --set-upstream origin otelbot/move-inactive-to-emeritus --force
+          gh pr create --title 'chore: move inactive members to emeritus' --body-file ./.tmp/emeritus-pr-body.md || gh pr edit otelbot/move-inactive-to-emeritus --body-file ./.tmp/emeritus-pr-body.md
         env:
-          GITHUB_TOKEN: ${{ secrets.OPENTELEMETRYBOT_GITHUB_TOKEN }}
-          PR_REMOTE: origin
-          PR_OWNER: opentelemetrybot
+          GITHUB_TOKEN: ${{ steps.otelbot-token.outputs.token }}
