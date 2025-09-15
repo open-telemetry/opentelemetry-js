@@ -10,6 +10,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(otlp-exporter-base): add `userAgent` option to let user prepend their own user-agent string in HTTP exporters [#5928](https://github.com/open-telemetry/opentelemetry-js/pull/5928) @david-luna
+
 ### :bug: Bug Fixes
 
 * fix(instrumentation-http): respect requireParent flag when INVALID_SPAN_CONTEXT is used [#4788](https://github.com/open-telemetry/opentelemetry-js/pull/4788) @reberhardt7
