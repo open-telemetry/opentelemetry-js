@@ -15,8 +15,6 @@ exporters:
       batch:
   prometheus:
     endpoint: "0.0.0.0:9464"
-    sending_queue:
-      batch:
 
 service:
   telemetry:
