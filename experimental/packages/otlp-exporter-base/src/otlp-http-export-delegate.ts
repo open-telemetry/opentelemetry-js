@@ -39,7 +39,7 @@ export function createOtlpHttpExportDelegate<Internal, Response>(
         headers['User-Agent'] = `${options.userAgent}`;
       }
       return headers;
-    }
+    };
   }
   return createOtlpExportDelegate(
     {
