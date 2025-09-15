@@ -48,7 +48,7 @@ describe('OTLPTraceExporter', () => {
         value: function (_timeout: number) {},
       });
 
-      const stub = sinon.stub(http, 'request').returns(fakeRequest as any);
+      const reqStub = sinon.stub(http, 'request').returns(fakeRequest as any);
       let buff = Buffer.from('');
       fakeRequest.on('finish', () => {
         try {
@@ -59,11 +59,15 @@ describe('OTLPTraceExporter', () => {
           }, 'expected requestBody to be in JSON format, but parsing failed');
 
           // Check we can append a user agent string to the exporter one.
-          const httpRequestOptions = stub.args[0][0] as http.RequestOptions;
-          const headers = httpRequestOptions.headers as http.OutgoingHttpHeaders;
+          const httpRequestOptions = reqStub.args[0][0] as http.RequestOptions;
+          const headers =
+            httpRequestOptions.headers as http.OutgoingHttpHeaders;
           const userAgents = `${headers['User-Agent']}`.split(' ');
-          assert.equal(userAgents[0], 'Custom-Exporter/1.2.3');
-          assert.equal(userAgents[1], `OTel-OTLP-Exporter-JavaScript/${VERSION}`);
+          assert.equal(userAgents[0], 'Custom-User-Agent/1.2.3');
+          assert.equal(
+            userAgents[1],
+            `OTel-OTLP-Exporter-JavaScript/${VERSION}`
+          );
           done();
         } catch (e) {
           done(e);
@@ -75,7 +79,11 @@ describe('OTLPTraceExporter', () => {
       });
 
       new BasicTracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(new OTLPTraceExporter({ userAgent: 'Custom-Exporter/1.2.3' }))],
+        spanProcessors: [
+          new SimpleSpanProcessor(
+            new OTLPTraceExporter({ userAgent: 'Custom-User-Agent/1.2.3' })
+          ),
+        ],
       })
         .getTracer('test-tracer')
         .startSpan('test-span')

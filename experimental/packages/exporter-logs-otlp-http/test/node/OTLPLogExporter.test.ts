@@ -24,6 +24,7 @@ import {
   SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
 import { Stream } from 'stream';
+import { VERSION } from '../../src/version';
 
 /*
  * NOTE: Tests here are not intended to test the underlying components directly. They are intended as a quick
@@ -35,6 +36,9 @@ import { Stream } from 'stream';
 describe('OTLPLogExporter', () => {
   describe('export', () => {
     afterEach(() => {
+      // Note: this does seem to have an issue so if we add another test
+      // `http.request` is not properly stubbed and fails
+      // ref: https://github.com/sinonjs/sinon/issues/2384
       sinon.restore();
     });
 
@@ -44,7 +48,7 @@ describe('OTLPLogExporter', () => {
         value: function (_timeout: number) {},
       });
 
-      sinon.stub(http, 'request').returns(fakeRequest as any);
+      const reqStub = sinon.stub(http, 'request').returns(fakeRequest as any);
       let buff = Buffer.from('');
       fakeRequest.on('finish', () => {
         try {
@@ -52,6 +56,17 @@ describe('OTLPLogExporter', () => {
           assert.doesNotThrow(() => {
             JSON.parse(requestBody);
           }, 'expected requestBody to be in JSON format, but parsing failed');
+
+          // Check we can append a user agent string to the exporter one.
+          const httpRequestOptions = reqStub.args[0][0] as http.RequestOptions;
+          const headers =
+            httpRequestOptions.headers as http.OutgoingHttpHeaders;
+          const userAgents = `${headers['User-Agent']}`.split(' ');
+          assert.equal(userAgents[0], 'Custom-User-Agent/1.2.3');
+          assert.equal(
+            userAgents[1],
+            `OTel-OTLP-Exporter-JavaScript/${VERSION}`
+          );
           done();
         } catch (e) {
           done(e);
@@ -63,7 +78,11 @@ describe('OTLPLogExporter', () => {
       });
 
       const loggerProvider = new LoggerProvider({
-        processors: [new SimpleLogRecordProcessor(new OTLPLogExporter())],
+        processors: [
+          new SimpleLogRecordProcessor(
+            new OTLPLogExporter({ userAgent: 'Custom-User-Agent/1.2.3' })
+          ),
+        ],
       });
 
       loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });

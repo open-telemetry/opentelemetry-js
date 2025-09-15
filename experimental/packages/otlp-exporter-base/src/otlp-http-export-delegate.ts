@@ -27,6 +27,20 @@ export function createOtlpHttpExportDelegate<Internal, Response>(
   options: OtlpNodeHttpConfiguration,
   serializer: ISerializer<Internal, Response>
 ): IOtlpExportDelegate<Internal> {
+  // User Agent provided by the user will be prefixed to the corresponding
+  // header if exists.
+  if (options.userAgent) {
+    const headersFn = options.headers ?? (() => ({}));
+    options.headers = () => {
+      const headers = headersFn();
+      if (headers['User-Agent']) {
+        headers['User-Agent'] = `${options.userAgent} ${headers['User-Agent']}`;
+      } else {
+        headers['User-Agent'] = `${options.userAgent}`;
+      }
+      return headers;
+    }
+  }
   return createOtlpExportDelegate(
     {
       transport: createRetryingTransport({

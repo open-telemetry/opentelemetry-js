@@ -26,8 +26,6 @@ import {
   createOtlpHttpExportDelegate,
 } from '@opentelemetry/otlp-exporter-base/node-http';
 
-const exporterUseAgent = `OTel-OTLP-Exporter-JavaScript/${VERSION}`;
-
 /**
  * Collector Trace Exporter for Node
  */
@@ -39,7 +37,7 @@ export class OTLPTraceExporter
     super(
       createOtlpHttpExportDelegate(
         convertLegacyHttpOptions(config, 'TRACES', 'v1/traces', {
-          'User-Agent': config.userAgent? `${config.userAgent} ${exporterUseAgent}`: exporterUseAgent,
+          'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
           'Content-Type': 'application/json',
         }),
         JsonTraceSerializer
