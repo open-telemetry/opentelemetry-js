@@ -19,13 +19,14 @@ jobs:
           cache-dependency-path: package-lock.json
           node-version: 22
 
+      - run: node scripts/move-to-emeritus.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2.0.6
         id: otelbot-token
         with:
           app-id: ${{ vars.OTELBOT_APP_ID }}
           private-key: ${{ secrets.OTELBOT_PRIVATE_KEY }}
-
-      - run: node scripts/move-to-emeritus.js
 
       - name: Create/Update Move to Emeritus PR
         run: |
