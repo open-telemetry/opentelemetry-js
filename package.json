@@ -71,7 +71,7 @@
     "_github:update_release_pr_body:semconv": "node scripts/extract-latest-release-notes.js semantic-conventions/CHANGELOG.md && npm run _github:update_release_pr_body_from_file",
     "_verify_release_kind": "echo $RELEASE_KIND | grep -oE '^(all|sdk|experimental|semconv):(minor|patch)$'",
     "_verify_release_remote": "git remote get-url $RELEASE_PR_REMOTE",
-    "_github:update_release_branch": "npm run _verify_release_kind && npm run _verify_release_remote && (git checkout main && git pull upstream main && git branch -D otelbot/prepare-next-version; git checkout -b otelbot/prepare-next-version && npm run prepare_release:$RELEASE_KIND && git commit -am \"chore: prepare release\" && git push --set-upstream $RELEASE_PR_REMOTE --force otelbot/prepare-next-version)",
+    "_github:update_release_branch": "npm run _verify_release_kind && npm run _verify_release_remote && (git checkout main && git pull $RELEASE_PR_REMOTE main && git branch -D otelbot/prepare-next-version; git checkout -b otelbot/prepare-next-version && npm run prepare_release:$RELEASE_KIND && git commit -am \"chore: prepare release\" && git push --set-upstream $RELEASE_PR_REMOTE --force otelbot/prepare-next-version)",
     "github:create_or_update_release_pr": "npm run _github:update_release_branch && (gh pr create --repo open-telemetry/opentelemetry-js --title 'chore: prepare next release' --body ''; npm run _github:update_release_pr_body:$RELEASE_SCOPE)"
   },
   "repository": "open-telemetry/opentelemetry-js",
