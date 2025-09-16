@@ -56,7 +56,7 @@ export function hasValidConfigFile(): boolean {
   return false;
 }
 
-function ParseConfigFile(config: ConfigurationModel) {
+function parseConfigFile(config: ConfigurationModel) {
   const supportedFileVersions = ['1.0-rc.1'];
   const configFile = getStringFromEnv('OTEL_EXPERIMENTAL_CONFIG_FILE') || '';
   const file = fs.readFileSync(configFile, 'utf8');
