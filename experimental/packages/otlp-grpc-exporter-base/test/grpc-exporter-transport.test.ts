@@ -63,6 +63,7 @@ const simpleClientConfig: GrpcExporterTransportParameters = {
   credentials: createInsecureCredentials,
   compression: 'none',
   address: 'localhost:1234',
+  userAgent: 'OTel-OTLP-Exporter-JavaScript/1.2.3',
 };
 
 const timeoutMillis = 100;
