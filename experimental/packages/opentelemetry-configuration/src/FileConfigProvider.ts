@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  diagLogLevelFromString,
-  getStringFromEnv,
-} from '@opentelemetry/core';
+import { diagLogLevelFromString, getStringFromEnv } from '@opentelemetry/core';
 import {
   ConfigurationModel,
   initializeDefaultConfiguration,
@@ -25,6 +22,11 @@ import {
 import { ConfigProvider } from './IConfigProvider';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
+import {
+  getBooleanFromConfigFile,
+  getNumberFromConfigFile,
+  getStringFromConfigFile,
+} from './utils';
 
 export class FileConfigProvider implements ConfigProvider {
   private _config: ConfigurationModel;
@@ -65,29 +67,26 @@ function parseConfigFile(config: ConfigurationModel) {
     parsedContent['file_format'] &&
     supportedFileVersions.includes(parsedContent['file_format'])
   ) {
-    const disabled = getValue(config.disabled, parsedContent['disabled']);
+    const disabled = getBooleanFromConfigFile(parsedContent['disabled']);
     if (disabled || disabled === false) {
       config.disabled = disabled;
     }
 
-    const logLevel = getValue(
-      config.log_level,
+    const logLevel = getNumberFromConfigFile(
       diagLogLevelFromString(parsedContent['log_level'])
     );
     if (logLevel) {
       config.log_level = logLevel;
     }
 
-    const attrList = getValue(
-      config.resource.attributes_list,
+    const attrList = getStringFromConfigFile(
       parsedContent['resource']?.['attributes_list']
     );
     if (attrList) {
       config.resource.attributes_list = attrList;
     }
 
-    const schemaUrl = getValue(
-      config.resource.schema_url,
+    const schemaUrl = getStringFromConfigFile(
       parsedContent['resource']?.['schema_url']
     );
     if (schemaUrl) {
@@ -100,17 +99,6 @@ function parseConfigFile(config: ConfigurationModel) {
       `Unsupported File Format: ${parsedContent['file_format']}. It must be one of the following: ${supportedFileVersions}`
     );
   }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getValue(obj: unknown, value: unknown): any {
-  if (typeof obj === 'boolean') {
-    const raw = String(value)?.trim().toLowerCase();
-    if (raw === 'false') {
-      return false;
-    }
-  }
-  return value;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
