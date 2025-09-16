@@ -44,7 +44,7 @@ export interface ConfigurationModel {
 
 export function initializeDefaultConfiguration(): ConfigurationModel {
   const config: ConfigurationModel = {
-    disabled: true,
+    disabled: false,
     log_level: DiagLogLevel.INFO,
     node_resource_detectors: ['all'],
     resource: {},
