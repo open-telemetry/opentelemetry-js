@@ -1,4 +1,4 @@
-const { readFile, writeFile } = require('fs/promises');
+const { readFile, writeFile, mkdir } = require('fs/promises');
 
 const repoOwner = 'open-telemetry';
 const token = process.env.GITHUB_TOKEN;
@@ -168,6 +168,7 @@ async function moveMembersToEmeritus(inactiveUsers, sectionRegex, role) {
 }
 
 async function writePrSummary(inactiveUsers, cutoffDate) {
+  await mkdir('.tmp');
   await writeFile('.tmp/emeritus-pr-body.md', `Moving the following members to Emeritus as no reviews were posted since ${cutoffDate.toString()}:\n - ${inactiveUsers.map(user => '@' + user).join('\n - ')}`, 'utf-8');
 }
 
