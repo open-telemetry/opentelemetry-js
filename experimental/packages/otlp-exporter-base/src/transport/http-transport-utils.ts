@@ -43,16 +43,16 @@ export function sendWithHttp(
   timeoutMillis: number
 ): void {
   const parsedUrl = new URL(params.url);
+  const headers = {...params.headers()};
+  headers['User-Agent'] = params.userAgent;
 
   const options: http.RequestOptions | https.RequestOptions = {
     hostname: parsedUrl.hostname,
     port: parsedUrl.port,
     path: parsedUrl.pathname,
     method: 'POST',
-    headers: {
-      ...params.headers(),
-    },
-    agent: agent,
+    headers,
+    agent,
   };
 
   const req = request(options, (res: http.IncomingMessage) => {

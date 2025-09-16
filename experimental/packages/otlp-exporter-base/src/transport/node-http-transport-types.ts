@@ -19,4 +19,5 @@ import { HttpRequestParameters } from './http-transport-types';
 
 export interface NodeHttpRequestParameters extends HttpRequestParameters {
   agentFactory: HttpAgentFactory;
+  userAgent: string;
 }

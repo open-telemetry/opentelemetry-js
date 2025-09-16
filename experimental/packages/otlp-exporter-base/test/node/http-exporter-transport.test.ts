@@ -59,6 +59,7 @@ describe('HttpExporterTransport', function () {
         headers: () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
+        userAgent: 'OTel-OTLP-Exporter-JavaScript/1.2.3',
       });
 
       // act
@@ -99,6 +100,7 @@ describe('HttpExporterTransport', function () {
           assert.strictEqual(protocol, 'http:');
           return new SedAgent();
         },
+        userAgent: 'OTel-OTLP-Exporter-JavaScript/1.2.3',
       });
 
       // act
@@ -125,6 +127,7 @@ describe('HttpExporterTransport', function () {
         headers: () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
+        userAgent: 'OTel-OTLP-Exporter-JavaScript/1.2.3',
       });
 
       // act
@@ -149,6 +152,7 @@ describe('HttpExporterTransport', function () {
         headers: () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
+        userAgent: 'OTel-OTLP-Exporter-JavaScript/1.2.3',
       });
 
       const result = await transport.send(sampleRequestData, 1000);
@@ -174,6 +178,7 @@ describe('HttpExporterTransport', function () {
         headers: () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
+        userAgent: 'OTel-OTLP-Exporter-JavaScript/1.2.3',
       });
 
       // act
@@ -211,6 +216,7 @@ describe('HttpExporterTransport', function () {
         headers: () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
+        userAgent: 'OTel-OTLP-Exporter-JavaScript/1.2.3',
       });
 
       // act
@@ -244,6 +250,7 @@ describe('HttpExporterTransport', function () {
         headers: () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
+        userAgent: 'OTel-OTLP-Exporter-JavaScript/1.2.3',
       });
 
       // act
@@ -265,6 +272,7 @@ describe('HttpExporterTransport', function () {
         headers: () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
+        userAgent: 'OTel-OTLP-Exporter-JavaScript/1.2.3',
       });
 
       // act
@@ -315,6 +323,7 @@ describe('HttpExporterTransport', function () {
         headers: () => ({ foo: 'foo-value', bar: 'bar-value' }),
         compression: 'none',
         agentFactory: () => new http.Agent(),
+        userAgent: 'OTel-OTLP-Exporter-JavaScript/1.2.3',
       });
 
       // assert
@@ -364,6 +373,7 @@ describe('HttpExporterTransport', function () {
         headers: () => ({ foo: 'foo-value', bar: 'bar-value' }),
         compression: 'gzip',
         agentFactory: () => new http.Agent(),
+        userAgent: 'OTel-OTLP-Exporter-JavaScript/1.2.3',
       });
 
       // act
