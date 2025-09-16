@@ -65,26 +65,22 @@ describe('OTLPTraceExporter', () => {
         (window.navigator as any).sendBeacon = false;
       });
 
-      it('should successfully send data using XMLHttpRequest', async function () {
+      it('should successfully send data using fetch', async function () {
         // arrange
-        const server = sinon.fakeServer.create();
+        const stubFetch = sinon.stub(window, 'fetch');
         const tracerProvider = new BasicTracerProvider({
           spanProcessors: [new SimpleSpanProcessor(new OTLPTraceExporter())],
         });
 
         // act
         tracerProvider.getTracer('test-tracer').startSpan('test-span').end();
-        queueMicrotask(() => {
-          // simulate success response
-          server.requests[0].respond(200, {}, '');
-        });
         await tracerProvider.shutdown();
 
         // assert
-        const request = server.requests[0];
-        const body = request.requestBody as unknown as Uint8Array;
+        const request = new Request(...stubFetch.args[0]);
+        const body = await request.text();
         assert.doesNotThrow(
-          () => JSON.parse(new TextDecoder().decode(body)),
+          () => JSON.parse(body),
           'expected requestBody to be in JSON format, but parsing failed'
         );
       });

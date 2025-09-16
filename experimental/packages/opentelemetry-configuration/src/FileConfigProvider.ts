@@ -32,7 +32,7 @@ export class FileConfigProvider implements ConfigProvider {
 
   constructor() {
     this._config = initializeDefaultConfiguration();
-    ParseConfigFile(this._config);
+    parseConfigFile(this._config);
   }
 
   getInstrumentationConfig(): ConfigurationModel {
@@ -96,8 +96,6 @@ function parseConfigFile(config: ConfigurationModel) {
     }
 
     setResourceAttributes(config, parsedContent['resource']?.['attributes']);
-
-    setValuesFromEnvVariables(config);
   } else {
     throw new Error(
       `Unsupported File Format: ${parsedContent['file_format']}. It must be one of the following: ${supportedFileVersions}`
@@ -114,20 +112,6 @@ function getValue(obj: unknown, value: unknown): any {
     }
   }
   return value;
-}
-
-/**
- * Some values can only be set by Environment Variables and
- * not declarative configuration. This function set those values.
- * @param config
- */
-function setValuesFromEnvVariables(config: ConfigurationModel) {
-  const nodeResourceDetectors = getStringListFromEnv(
-    'OTEL_NODE_RESOURCE_DETECTORS'
-  );
-  if (nodeResourceDetectors) {
-    config.node_resource_detectors = nodeResourceDetectors;
-  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

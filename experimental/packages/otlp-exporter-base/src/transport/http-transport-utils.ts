@@ -27,7 +27,7 @@ import { OTLPExporterError } from '../types';
 
 /**
  * Sends data using http
- * @param requestFunction
+ * @param request
  * @param params
  * @param agent
  * @param data
