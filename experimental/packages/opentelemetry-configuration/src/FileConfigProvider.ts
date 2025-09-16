@@ -17,7 +17,6 @@
 import {
   diagLogLevelFromString,
   getStringFromEnv,
-  getStringListFromEnv,
 } from '@opentelemetry/core';
 import {
   ConfigurationModel,

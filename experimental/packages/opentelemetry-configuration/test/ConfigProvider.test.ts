@@ -214,20 +214,5 @@ describe('ConfigProvider', function () {
         defaultConfig
       );
     });
-
-    it('should initialize config with default values from valid config file and node resources', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/short-config.yml';
-      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,host, serviceinstance';
-      const expectedConfig = {
-        ...defaultConfig,
-        node_resource_detectors: ['env', 'host', 'serviceinstance'],
-      };
-      const configProvider = createConfigProvider();
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        expectedConfig
-      );
-    });
   });
 });
