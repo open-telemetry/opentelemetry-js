@@ -48,7 +48,6 @@ describe('OTLPTraceExporter', () => {
       let buff = Buffer.from('');
       fakeRequest.on('finish', () => {
         try {
-          // Check dats has the right format
           const requestBody = buff.toString();
           assert.doesNotThrow(() => {
             JSON.parse(requestBody);
