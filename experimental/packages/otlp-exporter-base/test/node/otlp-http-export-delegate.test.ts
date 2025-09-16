@@ -71,7 +71,10 @@ describe('createOtlpHttpExportDelegate', function () {
     delegate.export('foo', result => {
       try {
         assert.strictEqual(result.code, ExportResultCode.SUCCESS);
-        assert.strictEqual(headers?.['user-agent'], 'OTel-OTLP-Exporter-JavaScript/1.2.3');
+        assert.strictEqual(
+          headers?.['user-agent'],
+          'OTel-OTLP-Exporter-JavaScript/1.2.3'
+        );
         done();
       } catch (e) {
         done(e);
@@ -90,7 +93,7 @@ describe('createOtlpHttpExportDelegate', function () {
         agentFactory: () => new http.Agent(),
         compression: 'none',
         concurrencyLimit: 30,
-        headers: () => ({'User-Agent': 'Custom-User-Agent/1.2.3'}),
+        headers: () => ({ 'User-Agent': 'Custom-User-Agent/1.2.3' }),
         timeoutMillis: 1000,
         userAgent: 'OTel-OTLP-Exporter-JavaScript/1.2.3',
       },
@@ -100,7 +103,10 @@ describe('createOtlpHttpExportDelegate', function () {
     delegate.export('foo', result => {
       try {
         assert.strictEqual(result.code, ExportResultCode.SUCCESS);
-        assert.strictEqual(headers?.['user-agent'], 'OTel-OTLP-Exporter-JavaScript/1.2.3');
+        assert.strictEqual(
+          headers?.['user-agent'],
+          'OTel-OTLP-Exporter-JavaScript/1.2.3'
+        );
         done();
       } catch (e) {
         done(e);

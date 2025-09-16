@@ -45,6 +45,9 @@ describe('mergeOtlpNodeHttpConfigurationWithDefaults', function () {
       testDefaults
     );
 
-    assert.strictEqual(config.userAgent, 'Custom-User-Agent/1.2.3 OTel-OTLP-Exporter-JavaScript/1.2.3')
+    assert.strictEqual(
+      config.userAgent,
+      'Custom-User-Agent/1.2.3 OTel-OTLP-Exporter-JavaScript/1.2.3'
+    );
   });
 });

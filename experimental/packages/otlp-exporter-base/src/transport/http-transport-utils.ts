@@ -43,7 +43,7 @@ export function sendWithHttp(
   timeoutMillis: number
 ): void {
   const parsedUrl = new URL(params.url);
-  const headers = {...params.headers()};
+  const headers = { ...params.headers() };
   headers['User-Agent'] = params.userAgent;
 
   const options: http.RequestOptions | https.RequestOptions = {
