@@ -25,7 +25,12 @@ import * as assert from 'assert';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import { Metadata, Server, ServerCredentials } from '@grpc/grpc-js';
+import {
+  Metadata,
+  Server,
+  ServerCredentials,
+  ServerInterceptingCall,
+} from '@grpc/grpc-js';
 import { types } from 'util';
 import {
   ExportResponseFailure,
@@ -75,6 +80,7 @@ interface ExportedData {
 
 interface ServerTestContext {
   requests: ExportedData[];
+  metadata: Metadata[];
   serverResponseProvider: () => { error: Error | null; buffer?: Buffer };
 }
 
@@ -86,7 +92,22 @@ interface ServerTestContext {
  * @param context context for storing responses and to define server behavior.
  */
 function startServer(context: ServerTestContext): Promise<() => void> {
-  const server = new Server();
+  const server = new Server({
+    interceptors: [
+      (descriptor, call) => {
+        return new ServerInterceptingCall(call, {
+          start: next => {
+            next({
+              onReceiveMetadata: (metadata, mdNext) => {
+                context.metadata.push(metadata);
+                mdNext(metadata);
+              },
+            });
+          },
+        });
+      },
+    ],
+  });
   server.addService(testServiceDefinition, {
     export: (data: ExportedData, callback: any) => {
       context.requests.push(data);
@@ -191,6 +212,7 @@ describe('GrpcExporterTransport', function () {
     let shutdownHandle: () => void | undefined;
     const serverTestContext: ServerTestContext = {
       requests: [],
+      metadata: [],
       serverResponseProvider: () => {
         return { error: null, buffer: Buffer.from([]) };
       },
@@ -205,6 +227,7 @@ describe('GrpcExporterTransport', function () {
 
       // clear context
       serverTestContext.requests = [];
+      serverTestContext.metadata = [];
       serverTestContext.serverResponseProvider = () => {
         return { error: null, buffer: Buffer.from([]) };
       };
@@ -238,6 +261,7 @@ describe('GrpcExporterTransport', function () {
       let shutdownHandle: () => void | undefined;
       const serverTestContext: ServerTestContext = {
         requests: [],
+        metadata: [],
         serverResponseProvider: () => {
           return { error: null, buffer: Buffer.from([]) };
         },
@@ -252,9 +276,29 @@ describe('GrpcExporterTransport', function () {
 
         // clear context
         serverTestContext.requests = [];
+        serverTestContext.metadata = [];
         serverTestContext.serverResponseProvider = () => {
           return { error: null, buffer: Buffer.from([]) };
         };
+      });
+
+      it('sends user-agent as metadata', async function () {
+        const transport = createOtlpGrpcExporterTransport(simpleClientConfig);
+
+        (await transport.send(
+          Buffer.from([1, 2, 3]),
+          timeoutMillis
+        )) as ExportResponseSuccess;
+
+        assert.strictEqual(serverTestContext.requests.length, 1);
+        assert.deepEqual(
+          serverTestContext.requests[0].request,
+          Buffer.from([1, 2, 3])
+        );
+        assert.match(
+          serverTestContext.metadata[0].get('user-agent')[0] as string,
+          /^OTel-OTLP-Exporter-JavaScript\/1\.2\.3 grpc-node-js\/\d+.\d+.\d+$/
+        );
       });
 
       it('sends data', async function () {
@@ -384,6 +428,7 @@ describe('GrpcExporterTransport', function () {
       let shutdownHandle: (() => void) | undefined;
       const serverTestContext: ServerTestContext = {
         requests: [],
+        metadata: [],
         serverResponseProvider: () => {
           return { error: null, buffer: Buffer.from([]) };
         },
@@ -402,6 +447,7 @@ describe('GrpcExporterTransport', function () {
 
         // clear context
         serverTestContext.requests = [];
+        serverTestContext.metadata = [];
         serverTestContext.serverResponseProvider = () => {
           return { error: null, buffer: Buffer.from([]) };
         };

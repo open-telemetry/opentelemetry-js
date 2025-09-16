@@ -15,7 +15,10 @@
  */
 import * as http from 'http';
 import * as assert from 'assert';
-import { compressAndSend, sendWithHttp } from '../../src/transport/http-transport-utils';
+import {
+  compressAndSend,
+  sendWithHttp,
+} from '../../src/transport/http-transport-utils';
 
 describe('compressAndSend', function () {
   it('compressAndSend on destroyed request should handle error', function (done) {
@@ -33,7 +36,10 @@ describe('compressAndSend', function () {
 });
 
 describe('sendWithHttp', function () {
-  const requestFn: typeof http.request = (opts: any, cb: any): http.ClientRequest => {
+  const requestFn: typeof http.request = (
+    opts: any,
+    cb: any
+  ): http.ClientRequest => {
     sendUserAgent = opts.headers['User-Agent'];
     // const request = http.request(opts, cb);
     // return request.destroy();
@@ -44,7 +50,7 @@ describe('sendWithHttp', function () {
   beforeEach(() => {
     sendUserAgent = '';
   });
-  
+
   it('sends a request setting the provided user agent', function (done) {
     let firstCallback = true;
     sendWithHttp(
@@ -67,7 +73,7 @@ describe('sendWithHttp', function () {
           done();
         }
       },
-      100,
-    )
+      100
+    );
   });
 });
