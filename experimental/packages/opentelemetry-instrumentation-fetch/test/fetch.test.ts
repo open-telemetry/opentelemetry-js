@@ -2398,7 +2398,6 @@ describe('fetch', () => {
         const encoder = new TextEncoder();
 
         return msw.http.get('/api/stream', () => {
-
           const stream = new ReadableStream<Uint8Array>({
             start(controller) {
               // Continuously push data to simulate a long connection
@@ -2465,7 +2464,7 @@ describe('fetch', () => {
       };
 
       beforeEach(() => {
-        if(timer) {
+        if (timer) {
           clearInterval(timer);
           timer = undefined;
         }
@@ -2475,7 +2474,7 @@ describe('fetch', () => {
       });
 
       afterEach(() => {
-        if(timer) {
+        if (timer) {
           clearInterval(timer);
           timer = undefined;
         }
