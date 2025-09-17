@@ -47,9 +47,10 @@ export function toResourceMetrics(
   options?: OtlpEncodingOptions
 ): IResourceMetrics {
   const encoder = getOtlpEncoder(options);
+  const processedResource = createResource(resourceMetrics.resource);
   return {
-    resource: createResource(resourceMetrics.resource),
-    schemaUrl: undefined,
+    resource: processedResource,
+    schemaUrl: processedResource.schemaUrl,
     scopeMetrics: toScopeMetrics(resourceMetrics.scopeMetrics, encoder),
   };
 }

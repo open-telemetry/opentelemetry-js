@@ -30,7 +30,7 @@ import { AttributeNames } from './enums/AttributeNames';
 import {
   ATTR_RPC_GRPC_STATUS_CODE,
   RPC_GRPC_STATUS_CODE_VALUE_OK,
-} from '../src/semconv';
+} from './semconv';
 import {
   _grpcStatusCodeToSpanStatus,
   _grpcStatusCodeToOpenTelemetryStatusCode,

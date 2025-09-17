@@ -21,14 +21,9 @@ import {
 } from './shared-configuration';
 import { validateAndNormalizeHeaders } from '../util';
 
-// NOTE: do not change these imports to be actual imports, otherwise they WILL break `@opentelemetry/instrumentation-http`
-import type * as http from 'http';
-import type * as https from 'https';
-
 export interface OtlpHttpConfiguration extends OtlpSharedConfiguration {
   url: string;
   headers: () => Record<string, string>;
-  agentOptions: http.AgentOptions | https.AgentOptions;
 }
 
 function mergeHeaders(
@@ -62,8 +57,9 @@ function validateUserProvidedUrl(url: string | undefined): string | undefined {
     return undefined;
   }
   try {
-    new URL(url);
-    return url;
+    // NOTE: In non-browser environments, `globalThis.location` will be `undefined`.
+    const base = globalThis.location?.href;
+    return new URL(url, base).href;
   } catch {
     throw new Error(
       `Configuration: Could not parse user-provided export URL: '${url}'`
@@ -96,10 +92,6 @@ export function mergeOtlpHttpConfigurationWithDefaults(
       validateUserProvidedUrl(userProvidedConfiguration.url) ??
       fallbackConfiguration.url ??
       defaultConfiguration.url,
-    agentOptions:
-      userProvidedConfiguration.agentOptions ??
-      fallbackConfiguration.agentOptions ??
-      defaultConfiguration.agentOptions,
   };
 }
 
@@ -111,6 +103,5 @@ export function getHttpConfigurationDefaults(
     ...getSharedConfigurationDefaults(),
     headers: () => requiredHeaders,
     url: 'http://localhost:4318/' + signalResourcePath,
-    agentOptions: { keepAlive: true },
   };
 }

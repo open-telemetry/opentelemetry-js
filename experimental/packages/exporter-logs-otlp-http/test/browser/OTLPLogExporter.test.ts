@@ -64,26 +64,22 @@ describe('OTLPLogExporter', function () {
         (window.navigator as any).sendBeacon = false;
       });
 
-      it('should successfully send data using XMLHttpRequest', async function () {
+      it('should successfully send data using fetch', async function () {
         // arrange
-        const server = sinon.fakeServer.create();
+        const stubFetch = sinon.stub(window, 'fetch');
         const loggerProvider = new LoggerProvider({
           processors: [new SimpleLogRecordProcessor(new OTLPLogExporter())],
         });
 
         // act
         loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });
-        queueMicrotask(() => {
-          // simulate success response
-          server.requests[0].respond(200, {}, '');
-        });
         await loggerProvider.shutdown();
 
         // assert
-        const request = server.requests[0];
-        const body = request.requestBody as unknown as Uint8Array;
+        const request = new Request(...stubFetch.args[0]);
+        const body = await request.text();
         assert.doesNotThrow(
-          () => JSON.parse(new TextDecoder().decode(body)),
+          () => JSON.parse(body),
           'expected requestBody to be in JSON format, but parsing failed'
         );
       });
