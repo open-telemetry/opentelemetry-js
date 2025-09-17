@@ -12,10 +12,16 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+### :books: Documentation
+
+### :house: Internal
+
+## 0.205.1
+
+### :bug: Bug Fixes
+
 * fix(instrumentation-http): respect requireParent flag when INVALID_SPAN_CONTEXT is used [#4788](https://github.com/open-telemetry/opentelemetry-js/pull/4788) @reberhardt7
 * fix(otlp-transformer): trunc hrTime to int for nanos converting [#5924](https://github.com/open-telemetry/opentelemetry-js/pull/5924) @blumamir
-
-### :books: Documentation
 
 ### :house: Internal
 

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation-http",
-  "version": "0.205.0",
+  "version": "0.205.1",
   "description": "OpenTelemetry instrumentation for `node:http` and `node:https` http client and server modules",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -72,7 +72,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "2.1.0",
-    "@opentelemetry/instrumentation": "0.205.0",
+    "@opentelemetry/instrumentation": "0.205.1",
     "@opentelemetry/semantic-conventions": "^1.29.0",
     "forwarded-parse": "2.1.2"
   },
