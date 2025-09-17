@@ -500,6 +500,9 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           let proxiedResponse: Response | null = null;
 
           try {
+            // TODO: Switch to a consumer-driven model and drop `resClone`.
+            // Keeping eager consumption here to preserve current behavior and avoid breaking existing tests.
+            // Context: discussion in PR #5894 → https://github.com/open-telemetry/opentelemetry-js/pull/5894
             const resClone = response.clone();
             const body = resClone.body;
             if (body) {
