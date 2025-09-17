@@ -21,6 +21,7 @@ import {
   GrpcExporterTransport,
   GrpcExporterTransportParameters,
 } from '../src/grpc-exporter-transport';
+import { VERSION } from '../src/version';
 import * as assert from 'assert';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
@@ -68,7 +69,7 @@ const simpleClientConfig: GrpcExporterTransportParameters = {
   credentials: createInsecureCredentials,
   compression: 'none',
   address: 'localhost:1234',
-  userAgent: 'OTel-OTLP-Exporter-JavaScript/1.2.3',
+  userAgent: `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
 };
 
 const timeoutMillis = 100;
@@ -290,15 +291,18 @@ describe('GrpcExporterTransport', function () {
           timeoutMillis
         )) as ExportResponseSuccess;
 
+        const userAgent = serverTestContext.metadata[0].get(
+          'user-agent'
+        )[0] as string;
         assert.strictEqual(serverTestContext.requests.length, 1);
         assert.deepEqual(
           serverTestContext.requests[0].request,
           Buffer.from([1, 2, 3])
         );
-        assert.match(
-          serverTestContext.metadata[0].get('user-agent')[0] as string,
-          /^OTel-OTLP-Exporter-JavaScript\/1\.2\.3 grpc-node-js\/\d+.\d+.\d+$/
+        assert.ok(
+          userAgent.startsWith(`OTel-OTLP-Exporter-JavaScript/${VERSION}`)
         );
+        assert.match(userAgent, /grpc-node-js\/\d+\.\d+\.\d+$/);
       });
 
       it('sends data', async function () {

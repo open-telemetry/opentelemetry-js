@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { createOtlpHttpExportDelegate } from '../../src/otlp-http-export-delegate';
+import { VERSION } from '../../src/version';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
 import { ExportResultCode } from '@opentelemetry/core';
 
@@ -63,7 +64,7 @@ describe('createOtlpHttpExportDelegate', function () {
         concurrencyLimit: 30,
         headers: () => ({}),
         timeoutMillis: 1000,
-        userAgent: 'OTel-OTLP-Exporter-JavaScript/1.2.3',
+        userAgent: `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
       },
       serializer
     );
@@ -73,7 +74,7 @@ describe('createOtlpHttpExportDelegate', function () {
         assert.strictEqual(result.code, ExportResultCode.SUCCESS);
         assert.strictEqual(
           headers?.['user-agent'],
-          'OTel-OTLP-Exporter-JavaScript/1.2.3'
+          `OTel-OTLP-Exporter-JavaScript/${VERSION}`
         );
         done();
       } catch (e) {
@@ -95,7 +96,7 @@ describe('createOtlpHttpExportDelegate', function () {
         concurrencyLimit: 30,
         headers: () => ({ 'User-Agent': 'Custom-User-Agent/1.2.3' }),
         timeoutMillis: 1000,
-        userAgent: 'OTel-OTLP-Exporter-JavaScript/1.2.3',
+        userAgent: `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
       },
       serializer
     );
@@ -105,7 +106,7 @@ describe('createOtlpHttpExportDelegate', function () {
         assert.strictEqual(result.code, ExportResultCode.SUCCESS);
         assert.strictEqual(
           headers?.['user-agent'],
-          'OTel-OTLP-Exporter-JavaScript/1.2.3'
+          `OTel-OTLP-Exporter-JavaScript/${VERSION}`
         );
         done();
       } catch (e) {

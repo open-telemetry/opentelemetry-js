@@ -41,9 +41,7 @@ describe('sendWithHttp', function () {
     cb: any
   ): http.ClientRequest => {
     sendUserAgent = opts.headers['User-Agent'];
-    // const request = http.request(opts, cb);
-    // return request.destroy();
-    return http.request(opts, cb);
+    return http.request(opts, cb).destroy();
   };
   let sendUserAgent: string;
 
