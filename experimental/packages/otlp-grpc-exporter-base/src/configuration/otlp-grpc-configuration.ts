@@ -35,7 +35,7 @@ export interface OtlpGrpcConfiguration extends OtlpSharedConfiguration {
   url: string;
   metadata: () => Metadata;
   credentials: () => ChannelCredentials;
-  userAgent: string;
+  userAgent?: string;
 }
 
 /**
@@ -90,7 +90,7 @@ export function mergeOtlpGrpcConfigurationWithDefaults(
   userProvidedConfiguration: Partial<OtlpGrpcConfiguration>,
   fallbackConfiguration: Partial<UnresolvedOtlpGrpcConfiguration>,
   defaultConfiguration: UnresolvedOtlpGrpcConfiguration
-): OtlpGrpcConfiguration {
+): Required<OtlpGrpcConfiguration> {
   const rawUrl =
     userProvidedConfiguration.url ??
     fallbackConfiguration.url ??
