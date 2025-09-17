@@ -46,7 +46,7 @@ export interface OtlpNodeHttpConfiguration extends OtlpHttpConfiguration {
    * Ref: https://github.com/open-telemetry/opentelemetry-specification/pull/4654
    * Ref: https://opentelemetry.io/docs/specs/otel/protocol/exporter/#user-agent
    */
-  userAgent: string;
+  userAgent?: string;
 }
 
 export function httpAgentFactoryFromOptions(
@@ -67,8 +67,8 @@ export function httpAgentFactoryFromOptions(
 export function mergeOtlpNodeHttpConfigurationWithDefaults(
   userProvidedConfiguration: Partial<OtlpNodeHttpConfiguration>,
   fallbackConfiguration: Partial<OtlpNodeHttpConfiguration>,
-  defaultConfiguration: OtlpNodeHttpConfiguration
-): OtlpNodeHttpConfiguration {
+  defaultConfiguration: Required<OtlpNodeHttpConfiguration>
+): Required<OtlpNodeHttpConfiguration> {
   let userAgent = defaultConfiguration.userAgent;
   if (userProvidedConfiguration.userAgent) {
     userAgent = `${userProvidedConfiguration.userAgent} ${userAgent}`;
@@ -90,7 +90,7 @@ export function mergeOtlpNodeHttpConfigurationWithDefaults(
 export function getNodeHttpConfigurationDefaults(
   requiredHeaders: Record<string, string>,
   signalResourcePath: string
-): OtlpNodeHttpConfiguration {
+): Required<OtlpNodeHttpConfiguration> {
   return {
     ...getHttpConfigurationDefaults(requiredHeaders, signalResourcePath),
     agentFactory: httpAgentFactoryFromOptions({ keepAlive: true }),

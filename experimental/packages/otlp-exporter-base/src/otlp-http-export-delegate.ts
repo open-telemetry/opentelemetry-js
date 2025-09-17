@@ -24,7 +24,7 @@ import { createRetryingTransport } from './retrying-transport';
 import { OtlpNodeHttpConfiguration } from './configuration/otlp-node-http-configuration';
 
 export function createOtlpHttpExportDelegate<Internal, Response>(
-  options: OtlpNodeHttpConfiguration,
+  options: Required<OtlpNodeHttpConfiguration>,
   serializer: ISerializer<Internal, Response>
 ): IOtlpExportDelegate<Internal> {
   return createOtlpExportDelegate(

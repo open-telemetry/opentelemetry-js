@@ -18,7 +18,7 @@ import { mergeOtlpNodeHttpConfigurationWithDefaults } from '../../../src/configu
 import { OtlpNodeHttpConfiguration } from '../../../src/configuration/otlp-node-http-configuration';
 
 describe('mergeOtlpNodeHttpConfigurationWithDefaults', function () {
-  const testDefaults: OtlpNodeHttpConfiguration = {
+  const testDefaults: Required<OtlpNodeHttpConfiguration> = {
     url: 'http://default.example.test',
     timeoutMillis: 1,
     compression: 'none',
