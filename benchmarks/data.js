@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758118437716,
+  "lastUpdate": 1758219803543,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -38432,6 +38432,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.58%",
             "unit": "ops/sec",
             "extra": "91 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a382f06c074bcf14639f2077dbbdafdcc4ff15c1",
+          "message": "ci: harden npm publish workflow by switching to OIDC (#5946)\n\nCo-authored-by: Chengzhong Wu <legendecas@gmail.com>",
+          "timestamp": "2025-09-18T18:13:48Z",
+          "tree_id": "55d34342599016c33de67ec147b717ba9ebdfbd8",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/a382f06c074bcf14639f2077dbbdafdcc4ff15c1"
+        },
+        "date": 1758219802473,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 681215,
+            "range": "±0.72%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8507,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 298210,
+            "range": "±0.45%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 276950,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
