@@ -68,6 +68,8 @@ export function createComposableTraceIDRatioBasedSampler(
 
 const probabilityThresholdScale = Math.pow(2, 56);
 
+// TODO: Reduce threshold precision following spec recommendation of 4
+// to reduce size of serialized tracestate.
 function calculateThreshold(samplingProbability: number): bigint {
   return (
     MAX_THRESHOLD -
