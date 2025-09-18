@@ -23,6 +23,7 @@ import {
   trace,
   Attributes,
   DiagConsoleLogger,
+  INVALID_SPAN_CONTEXT,
 } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
@@ -1438,6 +1439,24 @@ describe('HttpInstrumentation', () => {
           spans.every(span => span.kind === SpanKind.CLIENT),
           true
         );
+      });
+
+      it('should not trace with INVALID_SPAN_CONTEXT parent with requireParent options enabled', async () => {
+        instrumentation.disable();
+        instrumentation.setConfig({
+          requireParentforIncomingSpans: true,
+          requireParentforOutgoingSpans: true,
+        });
+        instrumentation.enable();
+        const root = trace.wrapSpanContext(INVALID_SPAN_CONTEXT);
+        await context.with(trace.setSpan(context.active(), root), async () => {
+          const testPath = '/test/test';
+          await httpRequest.get(
+            `${protocol}://${hostname}:${serverPort}${testPath}`
+          );
+        });
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 0);
       });
 
       it('should trace with parent with both requireParent options enabled', done => {

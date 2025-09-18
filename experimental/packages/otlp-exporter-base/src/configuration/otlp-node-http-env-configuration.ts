@@ -16,8 +16,8 @@
 import { getStringFromEnv, parseKeyPairsIntoRecord } from '@opentelemetry/core';
 import { diag } from '@opentelemetry/api';
 import { getSharedConfigurationFromEnvironment } from './shared-env-configuration';
-import { OtlpHttpConfiguration } from './otlp-http-configuration';
 import { wrapStaticHeadersInFunction } from './shared-configuration';
+import { OtlpNodeHttpConfiguration } from './otlp-node-http-configuration';
 
 function getStaticHeadersFromEnv(
   signalIdentifier: string
@@ -123,10 +123,10 @@ function getSpecificUrlFromEnv(signalIdentifier: string): string | undefined {
  * @param signalIdentifier all caps part in environment variables that identifies the signal (e.g.: METRICS, TRACES, LOGS)
  * @param signalResourcePath signal resource path to append if necessary (e.g.: v1/metrics, v1/traces, v1/logs)
  */
-export function getHttpConfigurationFromEnvironment(
+export function getNodeHttpConfigurationFromEnvironment(
   signalIdentifier: string,
   signalResourcePath: string
-): Partial<OtlpHttpConfiguration> {
+): Partial<OtlpNodeHttpConfiguration> {
   return {
     ...getSharedConfigurationFromEnvironment(signalIdentifier),
     url:
