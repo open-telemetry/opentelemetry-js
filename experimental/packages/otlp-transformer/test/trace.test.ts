@@ -97,7 +97,7 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
                         },
                       },
                     ],
-                    flags: 0x100, // SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK
+                    flags: 0x101, // TraceFlags (0x01) | HAS_IS_REMOTE
                   },
                 ],
                 startTimeUnixNano: startTime,
@@ -130,7 +130,7 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
                   code: EStatusCode.STATUS_CODE_OK,
                   message: undefined,
                 },
-                flags: 0x100, // SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK
+                flags: 0x101, // TraceFlags (0x01) | HAS_IS_REMOTE
               },
             ],
             schemaUrl: 'http://url.to.schema',
@@ -189,7 +189,7 @@ function createExpectedSpanProtobuf() {
                         },
                       },
                     ],
-                    flags: 0x100, // SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK
+                    flags: 0x101, // TraceFlags (0x01) | HAS_IS_REMOTE
                   },
                 ],
                 startTimeUnixNano: startTime,
@@ -221,7 +221,7 @@ function createExpectedSpanProtobuf() {
                 status: {
                   code: EStatusCode.STATUS_CODE_OK,
                 },
-                flags: 0x100, // SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK
+                flags: 0x101, // TraceFlags (0x01) | HAS_IS_REMOTE
               },
             ],
             schemaUrl: 'http://url.to.schema',
@@ -580,16 +580,16 @@ describe('Trace', () => {
   });
 
   describe('span flags', () => {
-    it('sets flags to 0x100 for local parent span context', () => {
+    it('sets flags to 0x101 for local parent span context', () => {
       const exportRequest = createExportTraceServiceRequest([span], {
         useHex: true,
       });
       assert.ok(exportRequest);
       const spanFlags = exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].flags;
-      assert.strictEqual(spanFlags, 0x100); // SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK
+      assert.strictEqual(spanFlags, 0x101); // TraceFlags (0x01) | HAS_IS_REMOTE
     });
 
-    it('sets flags to 0x300 for remote parent span context', () => {
+    it('sets flags to 0x301 for remote parent span context', () => {
       // Create a span with a remote parent context
       const remoteParentSpanContext = {
         spanId: '0000000000000001',
@@ -608,19 +608,19 @@ describe('Trace', () => {
       });
       assert.ok(exportRequest);
       const spanFlags = exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].flags;
-      assert.strictEqual(spanFlags, 0x300); // SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK | SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK
+      assert.strictEqual(spanFlags, 0x301); // TraceFlags (0x01) | HAS_IS_REMOTE | IS_REMOTE
     });
 
-    it('sets flags to 0x100 for links with local context', () => {
+    it('sets flags to 0x101 for links with local context', () => {
       const exportRequest = createExportTraceServiceRequest([span], {
         useHex: true,
       });
       assert.ok(exportRequest);
       const linkFlags = exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].links?.[0].flags;
-      assert.strictEqual(linkFlags, 0x100); // SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK
+      assert.strictEqual(linkFlags, 0x101); // TraceFlags (0x01) | HAS_IS_REMOTE
     });
 
-    it('sets flags to 0x300 for links with remote context', () => {
+    it('sets flags to 0x301 for links with remote context', () => {
       // Create a span with a remote link context
       const remoteLinkContext = {
         spanId: '0000000000000003',
@@ -645,7 +645,7 @@ describe('Trace', () => {
       });
       assert.ok(exportRequest);
       const linkFlags = exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].links?.[0].flags;
-      assert.strictEqual(linkFlags, 0x300); // SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK | SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK
+      assert.strictEqual(linkFlags, 0x301); // TraceFlags (0x01) | HAS_IS_REMOTE | IS_REMOTE
     });
   });
 });

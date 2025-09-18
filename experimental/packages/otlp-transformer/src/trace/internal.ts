@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { Link, SpanContext } from '@opentelemetry/api';
+import type { Link } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import type { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace-base';
 import type { Encoder } from '../common/utils';
@@ -39,12 +39,13 @@ const SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK = 0x100;
 const SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK = 0x200;
 
 /**
- * Builds span flags based on the parent span context's isRemote property.
- * This follows the OTLP specification for span flags.
+ * Builds the 32-bit span flags value combining the low 8-bit W3C TraceFlags
+ * with the HAS_IS_REMOTE and IS_REMOTE bits according to the OTLP spec.
  */
-function buildSpanFlags(parentSpanContext?: SpanContext): number {
-  let flags = SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK;
-  if (parentSpanContext?.isRemote) {
+function buildSpanFlagsFrom(traceFlags: number, isRemote?: boolean): number {
+  // low 8 bits are W3C TraceFlags (e.g., sampled)
+  let flags = (traceFlags & 0xff) | SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK;
+  if (isRemote) {
     flags |= SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK;
   }
   return flags;
@@ -77,7 +78,7 @@ export function sdkSpanToOtlpSpan(span: ReadableSpan, encoder: Encoder): ISpan {
     },
     links: span.links.map(link => toOtlpLink(link, encoder)),
     droppedLinksCount: span.droppedLinksCount,
-    flags: buildSpanFlags(span.parentSpanContext),
+    flags: buildSpanFlagsFrom(ctx.traceFlags, span.parentSpanContext?.isRemote),
   };
 }
 
@@ -88,7 +89,7 @@ export function toOtlpLink(link: Link, encoder: Encoder): ILink {
     traceId: encoder.encodeSpanContext(link.context.traceId),
     traceState: link.context.traceState?.serialize(),
     droppedAttributesCount: link.droppedAttributesCount || 0,
-    flags: buildSpanFlags(link.context),
+    flags: buildSpanFlagsFrom(link.context.traceFlags, link.context.isRemote),
   };
 }
 
