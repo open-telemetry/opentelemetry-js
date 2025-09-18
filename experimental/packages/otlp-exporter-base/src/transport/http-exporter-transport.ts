@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import type { HttpRequestParameters } from './http-transport-types';
-
 // NOTE: do not change these type imports to actual imports. Doing so WILL break `@opentelemetry/instrumentation-http`,
 // as they'd be imported before the http/https modules can be wrapped.
 import type * as https from 'https';
@@ -23,6 +21,7 @@ import type * as http from 'http';
 import { ExportResponse } from '../export-response';
 import { IExporterTransport } from '../exporter-transport';
 import { sendWithHttp } from './http-transport-utils';
+import { NodeHttpRequestParameters } from './node-http-transport-types';
 
 interface Utils {
   agent: http.Agent | https.Agent;
@@ -32,7 +31,7 @@ interface Utils {
 class HttpExporterTransport implements IExporterTransport {
   private _utils: Utils | null = null;
 
-  constructor(private _parameters: HttpRequestParameters) {}
+  constructor(private _parameters: NodeHttpRequestParameters) {}
 
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
     const { agent, request } = await this._loadUtils();
@@ -80,7 +79,7 @@ async function requestFunctionFactory(
 }
 
 export function createHttpExporterTransport(
-  parameters: HttpRequestParameters
+  parameters: NodeHttpRequestParameters
 ): IExporterTransport {
   return new HttpExporterTransport(parameters);
 }

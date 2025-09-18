@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-trace-otlp-http",
-  "version": "0.204.0",
+  "version": "0.205.0",
   "description": "OpenTelemetry Collector Trace Exporter allows user to send collected traces to the OpenTelemetry Collector",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -70,7 +70,7 @@
     "@types/sinon": "17.0.4",
     "@types/webpack-env": "1.16.3",
     "babel-loader": "10.0.0",
-    "babel-plugin-istanbul": "7.0.0",
+    "babel-plugin-istanbul": "7.0.1",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",
@@ -91,8 +91,8 @@
   },
   "dependencies": {
     "@opentelemetry/core": "2.1.0",
-    "@opentelemetry/otlp-exporter-base": "0.204.0",
-    "@opentelemetry/otlp-transformer": "0.204.0",
+    "@opentelemetry/otlp-exporter-base": "0.205.0",
+    "@opentelemetry/otlp-transformer": "0.205.0",
     "@opentelemetry/resources": "2.1.0",
     "@opentelemetry/sdk-trace-base": "2.1.0"
   },

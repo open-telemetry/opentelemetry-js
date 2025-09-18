@@ -548,6 +548,12 @@ describe('Trace', () => {
       assert.deepStrictEqual(JSON.parse(decoder.decode(serialized)), expected);
     });
 
+    it('hrtime contains float value', () => {
+      const span = createSpanWithResource(resource);
+      (span as any).startTime = [1640715557.5, 342725388.5];
+      JsonTraceSerializer.serializeRequest([span]);
+    });
+
     it('deserializes a response', () => {
       const expectedResponse = {
         partialSuccess: {
