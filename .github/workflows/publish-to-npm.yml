@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write # to generate npm provenance statements
+      id-token: write # to generate npm OIDC and provenance statements
     environment: npm-publish-environment
     steps:
       - name: Setup Node
