@@ -531,7 +531,7 @@ at: <https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/e
 ## Exporting measurements to OpenTelemetry Protocol
 
 OpenTelemetry JavaScript comes with three different kinds of exporters that export
-the OTLP protocol, a) [over HTTP](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-http), b) [over GRPC](https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-grpc), c) [over Protobuf](https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-proto).
+the OTLP protocol, a) [over HTTP](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-http), b) [over GRPC](https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-grpc), c) [over Protobuf](https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-proto). (XXX Trent wuz here.)
 
 The example below shows how you can configure OpenTelemetry JavaScript to use
 the OTLP exporter using http/protobuf.
