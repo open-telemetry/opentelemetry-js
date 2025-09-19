@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758308830192,
+  "lastUpdate": 1758314074146,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -38536,6 +38536,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.66%",
             "unit": "ops/sec",
             "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "anuraaga@gmail.com",
+            "name": "Anuraag (Rag) Agrawal",
+            "username": "anuraaga"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4fcf8035c4344c3b44cfc6f15716f5ec7cd1bc8d",
+          "message": "feat(sampler-composite): add experimental implementation of composite sampling spec (#5839)\n\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2025-09-19T20:25:12Z",
+          "tree_id": "6f2ffdb0e3f0f9368b5e8a27fe038e591e2ef44d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/4fcf8035c4344c3b44cfc6f15716f5ec7cd1bc8d"
+        },
+        "date": 1758314073163,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 673419,
+            "range": "±0.90%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8290,
+            "range": "±0.37%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 298078,
+            "range": "±0.46%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 282549,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
