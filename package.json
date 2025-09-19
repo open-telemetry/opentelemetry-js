@@ -89,7 +89,7 @@
     "@typescript-eslint/parser": "8.41.0",
     "assert": "2.1.0",
     "benchmark": "2.1.4",
-    "eslint": "8.57.1",
+    "eslint": "9.36.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-n": "14.0.0",
