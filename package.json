@@ -20,7 +20,7 @@
     "predocs-test": "npm run docs",
     "docs": "typedoc --readme none && touch docs/.nojekyll",
     "docs-deploy": "gh-pages --dotfiles --dist docs",
-    "docs:test": "linkinator docs --silent --retry && linkinator doc/*.md --skip http://localhost:3000 --skip http://localhost:9464 --skip https://github.com/ --silent --retry --directory-listing",
+    "docs:test": "linkinator docs --silent --retry && linkinator doc/*.md --skip http://localhost:3000 --skip http://localhost:9464 --skip https://github.com/ --skip https://www.npmjs.com/ --silent --retry --directory-listing",
     "lint": "lerna run lint && npm run lint:markdown && npm run lint:semconv-deps",
     "lint:changed": "lerna run --concurrency 1 --stream lint --since HEAD --exclude-dependents",
     "lint:fix": "lerna run lint:fix && npm run lint:markdown:fix",
