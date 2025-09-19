@@ -21,6 +21,7 @@ import type {
   ServiceError,
   ChannelCredentials,
   Client,
+  ServiceClientConstructor,
 } from '@grpc/grpc-js';
 import {
   ExportResponse,
@@ -88,6 +89,7 @@ export interface GrpcExporterTransportParameters {
    */
   metadata: () => Metadata;
   compression: 'gzip' | 'none';
+  userAgent: string;
 }
 
 export class GrpcExporterTransport implements IExporterTransport {
@@ -120,10 +122,11 @@ export class GrpcExporterTransport implements IExporterTransport {
         });
       }
 
-      const clientConstructor = createServiceClientConstructor(
-        this._parameters.grpcPath,
-        this._parameters.grpcName
-      );
+      const clientConstructor: ServiceClientConstructor =
+        createServiceClientConstructor(
+          this._parameters.grpcPath,
+          this._parameters.grpcName
+        );
 
       try {
         this._client = new clientConstructor(
@@ -133,6 +136,7 @@ export class GrpcExporterTransport implements IExporterTransport {
             'grpc.default_compression_algorithm': toGrpcCompression(
               this._parameters.compression
             ),
+            'grpc.primary_user_agent': this._parameters.userAgent,
           }
         );
       } catch (error) {

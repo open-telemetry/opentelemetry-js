@@ -35,6 +35,7 @@ export interface OtlpGrpcConfiguration extends OtlpSharedConfiguration {
   url: string;
   metadata: () => Metadata;
   credentials: () => ChannelCredentials;
+  userAgent?: string;
 }
 
 /**
@@ -48,6 +49,7 @@ export interface UnresolvedOtlpGrpcConfiguration
    * Credentials are based on the final resolved URL
    */
   credentials: (url: string) => () => ChannelCredentials;
+  userAgent: string;
 }
 
 export function validateAndNormalizeUrl(url: string): string {
@@ -88,11 +90,16 @@ export function mergeOtlpGrpcConfigurationWithDefaults(
   userProvidedConfiguration: Partial<OtlpGrpcConfiguration>,
   fallbackConfiguration: Partial<UnresolvedOtlpGrpcConfiguration>,
   defaultConfiguration: UnresolvedOtlpGrpcConfiguration
-): OtlpGrpcConfiguration {
+): Required<OtlpGrpcConfiguration> {
   const rawUrl =
     userProvidedConfiguration.url ??
     fallbackConfiguration.url ??
     defaultConfiguration.url;
+
+  let userAgent = defaultConfiguration.userAgent;
+  if (userProvidedConfiguration.userAgent) {
+    userAgent = `${userProvidedConfiguration.userAgent} ${userAgent}`;
+  }
 
   return {
     ...mergeOtlpSharedConfigurationWithDefaults(
@@ -118,17 +125,14 @@ export function mergeOtlpGrpcConfigurationWithDefaults(
       userProvidedConfiguration.credentials ??
       fallbackConfiguration.credentials?.(rawUrl) ??
       defaultConfiguration.credentials(rawUrl),
+    userAgent,
   };
 }
 
 export function getOtlpGrpcDefaultConfiguration(): UnresolvedOtlpGrpcConfiguration {
   return {
     ...getSharedConfigurationDefaults(),
-    metadata: () => {
-      const metadata = createEmptyMetadata();
-      metadata.set('User-Agent', `OTel-OTLP-Exporter-JavaScript/${VERSION}`);
-      return metadata;
-    },
+    metadata: () => createEmptyMetadata(),
     url: 'http://localhost:4317',
     credentials: (url: string) => {
       if (url.startsWith('http://')) {
@@ -137,5 +141,6 @@ export function getOtlpGrpcDefaultConfiguration(): UnresolvedOtlpGrpcConfigurati
         return () => createSslCredentials();
       }
     },
+    userAgent: `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
   };
 }

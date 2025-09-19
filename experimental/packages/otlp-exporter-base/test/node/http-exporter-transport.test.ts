@@ -24,10 +24,12 @@ import {
   ExportResponseSuccess,
   OTLPExporterError,
 } from '../../src';
+import { VERSION } from '../../src/version';
 import * as zlib from 'zlib';
 import { createConnection, TcpNetConnectOpts } from 'net';
 
 const sampleRequestData = new Uint8Array([1, 2, 3]);
+const userAgent = `OTel-OTLP-Exporter-JavaScript/${VERSION}`;
 
 describe('HttpExporterTransport', function () {
   describe('send', function () {
@@ -59,6 +61,7 @@ describe('HttpExporterTransport', function () {
         headers: () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
+        userAgent,
       });
 
       // act
@@ -99,6 +102,7 @@ describe('HttpExporterTransport', function () {
           assert.strictEqual(protocol, 'http:');
           return new SedAgent();
         },
+        userAgent,
       });
 
       // act
@@ -125,6 +129,7 @@ describe('HttpExporterTransport', function () {
         headers: () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
+        userAgent,
       });
 
       // act
@@ -149,6 +154,7 @@ describe('HttpExporterTransport', function () {
         headers: () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
+        userAgent,
       });
 
       const result = await transport.send(sampleRequestData, 1000);
@@ -174,6 +180,7 @@ describe('HttpExporterTransport', function () {
         headers: () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
+        userAgent,
       });
 
       // act
@@ -211,6 +218,7 @@ describe('HttpExporterTransport', function () {
         headers: () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
+        userAgent,
       });
 
       // act
@@ -244,6 +252,7 @@ describe('HttpExporterTransport', function () {
         headers: () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
+        userAgent,
       });
 
       // act
@@ -265,6 +274,7 @@ describe('HttpExporterTransport', function () {
         headers: () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
+        userAgent,
       });
 
       // act
@@ -315,6 +325,7 @@ describe('HttpExporterTransport', function () {
         headers: () => ({ foo: 'foo-value', bar: 'bar-value' }),
         compression: 'none',
         agentFactory: () => new http.Agent(),
+        userAgent,
       });
 
       // assert
@@ -364,6 +375,7 @@ describe('HttpExporterTransport', function () {
         headers: () => ({ foo: 'foo-value', bar: 'bar-value' }),
         compression: 'gzip',
         agentFactory: () => new http.Agent(),
+        userAgent,
       });
 
       // act

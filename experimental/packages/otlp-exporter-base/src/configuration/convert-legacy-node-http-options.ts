@@ -56,7 +56,7 @@ export function convertLegacyHttpOptions(
   signalIdentifier: string,
   signalResourcePath: string,
   requiredHeaders: Record<string, string>
-): OtlpNodeHttpConfiguration {
+): Required<OtlpNodeHttpConfiguration> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if ((config as any).metadata) {
     diag.warn('Metadata cannot be set when using http');
@@ -70,6 +70,7 @@ export function convertLegacyHttpOptions(
       timeoutMillis: config.timeoutMillis,
       compression: config.compression,
       agentFactory: convertLegacyAgentOptions(config),
+      userAgent: config.userAgent,
     },
     getNodeHttpConfigurationFromEnvironment(
       signalIdentifier,

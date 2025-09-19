@@ -18,6 +18,7 @@ import {
   mergeOtlpHttpConfigurationWithDefaults,
   OtlpHttpConfiguration,
 } from './otlp-http-configuration';
+import { VERSION } from '../version';
 
 // NOTE: do not change these imports to be actual imports, otherwise they WILL break `@opentelemetry/instrumentation-http`
 import type * as http from 'http';
@@ -39,6 +40,13 @@ export interface OtlpNodeHttpConfiguration extends OtlpHttpConfiguration {
    * module is not loaded before `@opentelemetry/instrumentation-http` can instrument it.
    */
   agentFactory: HttpAgentFactory;
+  /**
+   * User agent header string to be appended to the exporter's value as a prefix.
+   * Availablie since v1.49.0 of the spec.
+   * Ref: https://github.com/open-telemetry/opentelemetry-specification/pull/4654
+   * Ref: https://opentelemetry.io/docs/specs/otel/protocol/exporter/#user-agent
+   */
+  userAgent?: string;
 }
 
 export function httpAgentFactoryFromOptions(
@@ -59,8 +67,12 @@ export function httpAgentFactoryFromOptions(
 export function mergeOtlpNodeHttpConfigurationWithDefaults(
   userProvidedConfiguration: Partial<OtlpNodeHttpConfiguration>,
   fallbackConfiguration: Partial<OtlpNodeHttpConfiguration>,
-  defaultConfiguration: OtlpNodeHttpConfiguration
-): OtlpNodeHttpConfiguration {
+  defaultConfiguration: Required<OtlpNodeHttpConfiguration>
+): Required<OtlpNodeHttpConfiguration> {
+  let userAgent = defaultConfiguration.userAgent;
+  if (userProvidedConfiguration.userAgent) {
+    userAgent = `${userProvidedConfiguration.userAgent} ${userAgent}`;
+  }
   return {
     ...mergeOtlpHttpConfigurationWithDefaults(
       userProvidedConfiguration,
@@ -71,15 +83,17 @@ export function mergeOtlpNodeHttpConfigurationWithDefaults(
       userProvidedConfiguration.agentFactory ??
       fallbackConfiguration.agentFactory ??
       defaultConfiguration.agentFactory,
+    userAgent,
   };
 }
 
 export function getNodeHttpConfigurationDefaults(
   requiredHeaders: Record<string, string>,
   signalResourcePath: string
-): OtlpNodeHttpConfiguration {
+): Required<OtlpNodeHttpConfiguration> {
   return {
     ...getHttpConfigurationDefaults(requiredHeaders, signalResourcePath),
     agentFactory: httpAgentFactoryFromOptions({ keepAlive: true }),
+    userAgent: `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
   };
 }
