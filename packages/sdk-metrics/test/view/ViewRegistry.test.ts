@@ -186,5 +186,136 @@ describe('ViewRegistry', () => {
         }
       });
     });
+
+    describe('Advisory attributes parameter', () => {
+      it('should create default view with allow-list when no registered views match and instrument has advisory attributes', () => {
+        const registry = new ViewRegistry();
+        
+        const instrumentWithAdvisoryAttributes = {
+          ...defaultInstrumentDescriptor,
+          name: 'test_instrument',
+          advice: {
+            attributes: ['key1', 'key2']
+          }
+        };
+
+        const views = registry.findViews(
+          instrumentWithAdvisoryAttributes,
+          defaultInstrumentationScope
+        );
+
+        assert.strictEqual(views.length, 1);
+        assert.strictEqual(views[0].name, undefined); // Default view has no custom name
+        
+        // Test that the attributesProcessor is configured correctly
+        const processor = views[0].attributesProcessor;
+        const result = processor.process({
+          key1: 'value1',
+          key2: 'value2',
+          key3: 'value3' // This should be filtered out
+        });
+        
+        assert.deepStrictEqual(result, {
+          key1: 'value1',
+          key2: 'value2'
+        });
+      });
+
+      it('should create default view without attribute filtering when instrument has no advisory attributes', () => {
+        const registry = new ViewRegistry();
+        
+        const instrumentWithoutAdvisoryAttributes = {
+          ...defaultInstrumentDescriptor,
+          name: 'test_instrument_no_attributes',
+          advice: {}
+        };
+
+        const views = registry.findViews(
+          instrumentWithoutAdvisoryAttributes,
+          defaultInstrumentationScope
+        );
+
+        assert.strictEqual(views.length, 1);
+        
+        // Test that the attributesProcessor allows all attributes
+        const processor = views[0].attributesProcessor;
+        const inputAttrs = {
+          key1: 'value1',
+          key2: 'value2',
+          key3: 'value3'
+        };
+        const result = processor.process(inputAttrs);
+        
+        assert.deepStrictEqual(result, inputAttrs);
+      });
+
+      it('should create default view without attribute filtering when instrument has empty advisory attributes', () => {
+        const registry = new ViewRegistry();
+        
+        const instrumentWithEmptyAdvisoryAttributes = {
+          ...defaultInstrumentDescriptor,
+          name: 'test_instrument_empty_attributes',
+          advice: {
+            attributes: []
+          }
+        };
+
+        const views = registry.findViews(
+          instrumentWithEmptyAdvisoryAttributes,
+          defaultInstrumentationScope
+        );
+
+        assert.strictEqual(views.length, 1);
+        
+        // Test that the attributesProcessor allows all attributes
+        const processor = views[0].attributesProcessor;
+        const inputAttrs = {
+          key1: 'value1',
+          key2: 'value2',
+          key3: 'value3'
+        };
+        const result = processor.process(inputAttrs);
+        
+        assert.deepStrictEqual(result, inputAttrs);
+      });
+
+      it('should use registered views instead of advisory attributes when available', () => {
+        const registry = new ViewRegistry();
+        
+        // Add a registered view
+        registry.addView(new View({ 
+          name: 'custom_view',
+          instrumentName: 'test_instrument'
+        }));
+        
+        const instrumentWithAdvisoryAttributes = {
+          ...defaultInstrumentDescriptor,
+          name: 'test_instrument',
+          advice: {
+            attributes: ['key1', 'key2']
+          }
+        };
+
+        const views = registry.findViews(
+          instrumentWithAdvisoryAttributes,
+          defaultInstrumentationScope
+        );
+
+        assert.strictEqual(views.length, 1);
+        assert.strictEqual(views[0].name, 'custom_view');
+        
+        // The registered view should be used instead of advisory attributes
+        const processor = views[0].attributesProcessor;
+        const inputAttrs = {
+          key1: 'value1',
+          key2: 'value2',
+          key3: 'value3'
+        };
+        const result = processor.process(inputAttrs);
+        
+        // Should allow all attributes since registered view doesn't have attribute filtering
+        assert.deepStrictEqual(result, inputAttrs);
+      });
+    });
   });
 });
