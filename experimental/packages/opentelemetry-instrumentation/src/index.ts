@@ -33,3 +33,4 @@ export {
   safeExecuteInTheMiddleAsync,
 } from './utils';
 export { SemconvStability, semconvStabilityFromStr } from './semconvStability';
+export { default as shimmer } from './shimmer';
