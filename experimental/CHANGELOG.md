@@ -10,7 +10,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
-* feat(sampler-composite): Added experimental implementations of draft composite sampling spec [#5839](https://github.com/open-telemetry/opentelemetry-js/pull/5839) @anuraaga
 * feat(opentelemetry-configuration): Parse of Configuration File [#5875](https://github.com/open-telemetry/opentelemetry-js/pull/5875) @maryliag
 
 ### :bug: Bug Fixes
