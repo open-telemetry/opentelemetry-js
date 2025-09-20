@@ -58,7 +58,7 @@
     "@types/request-promise-native": "1.0.21",
     "@types/sinon": "17.0.4",
     "@types/superagent": "8.1.9",
-    "axios": "1.12.0",
+    "axios": "1.12.2",
     "lerna": "6.6.2",
     "mocha": "11.7.2",
     "nock": "13.5.6",
