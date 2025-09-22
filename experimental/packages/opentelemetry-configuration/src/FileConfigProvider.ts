@@ -16,6 +16,7 @@
 
 import { diagLogLevelFromString, getStringFromEnv } from '@opentelemetry/core';
 import {
+  ConfigAttributes,
   ConfigurationModel,
   initializeDefaultConfiguration,
 } from './configModel';
@@ -104,8 +105,10 @@ function parseConfigFile(config: ConfigurationModel) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function setResourceAttributes(config: ConfigurationModel, attributes: any[]) {
+function setResourceAttributes(
+  config: ConfigurationModel,
+  attributes: ConfigAttributes[]
+) {
   if (attributes) {
     config.resource.attributes = [];
     for (let i = 0; i < attributes.length; i++) {
@@ -135,7 +138,7 @@ function setResourceAttributes(config: ConfigurationModel, attributes: any[]) {
       }
 
       config.resource.attributes.push({
-        name: att['name'],
+        name: getStringFromConfigFile(att['name']) ?? '',
         value: value,
         type: att['type'] ?? 'string',
       });

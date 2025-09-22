@@ -162,6 +162,87 @@ const configFromFile: Configuration = {
       },
     ],
   },
+  attribute_limits: {
+    attribute_count_limit: 128,
+  },
+  propagator: {
+    composite: ['tracecontext', 'baggage'],
+    composite_list: 'tracecontext,baggage',
+  },
+  tracer_provider: {
+    processors: [
+      {
+        batch: {
+          schedule_delay: 5000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            otlp_http: {
+              endpoint: 'http://localhost:4318/v1/traces',
+              timeout: 10000,
+            },
+          },
+        },
+      },
+    ],
+    limits: {
+      attribute_count_limit: 128,
+      event_count_limit: 128,
+      link_count_limit: 128,
+      event_attribute_count_limit: 128,
+      link_attribute_count_limit: 128,
+    },
+    sampler: {
+      parent_based: {
+        root: 'always_on',
+        remote_parent_sampled: 'always_on',
+        remote_parent_not_sampled: 'always_off',
+        local_parent_sampled: 'always_on',
+        local_parent_not_sampled: 'always_off',
+      },
+    },
+  },
+  meter_provider: {
+    readers: [
+      {
+        periodic: {
+          interval: 60000,
+          timeout: 30000,
+          exporter: {
+            otlp_http: {
+              endpoint: 'http://localhost:4318/v1/metrics',
+              timeout: 10000,
+              temporality_preference: 'cumulative',
+              default_histogram_aggregation: 'explicit_bucket_histogram',
+            },
+          },
+        },
+      },
+    ],
+    exemplar_filter: 'trace_based',
+  },
+  logger_provider: {
+    processors: [
+      {
+        batch: {
+          schedule_delay: 1000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            otlp_http: {
+              endpoint: 'http://localhost:4318/v1/logs',
+              timeout: 10000,
+            },
+          },
+        },
+      },
+    ],
+    limits: {
+      attribute_count_limit: 128,
+    },
+  },
 };
 
 const defaultConfigFromFileWithEnvVariables: Configuration = {
