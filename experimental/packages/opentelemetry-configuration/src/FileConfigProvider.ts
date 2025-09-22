@@ -135,13 +135,8 @@ function setResourceAttributes(config: ConfigurationModel, attributes: ConfigAtt
       }
 
       config.resource.attributes.push({
-<<<<<<< HEAD
-        name: att['name'],
-        value: value,
-=======
         name: getStringFromConfigFile(att['name']) ?? '',
-        value: att['value'],
->>>>>>> 36051e88440a9f78d07bdc0a605e4e79a4ce1cde
+        value: value,
         type: att['type'] ?? 'string',
       });
     }

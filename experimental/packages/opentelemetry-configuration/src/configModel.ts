@@ -162,7 +162,7 @@ export function initializeDefaultConfiguration(): ConfigurationModel {
 
 export interface ConfigAttributes {
   name: string;
-  value: string | boolean | number | string[] | boolean[] | number[];
+  value: string | boolean | number | string[] | boolean[] | number[] | undefined;
   type:
     | 'string'
     | 'bool'
