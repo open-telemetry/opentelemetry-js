@@ -102,7 +102,10 @@ function parseConfigFile(config: ConfigurationModel) {
   }
 }
 
-function setResourceAttributes(config: ConfigurationModel, attributes: ConfigAttributes[]) {
+function setResourceAttributes(
+  config: ConfigurationModel,
+  attributes: ConfigAttributes[]
+) {
   if (attributes) {
     config.resource.attributes = [];
     for (let i = 0; i < attributes.length; i++) {
