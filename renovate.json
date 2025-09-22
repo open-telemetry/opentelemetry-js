@@ -44,7 +44,7 @@
   "constraints": {
     "npm": ">10.8.0"
   },
-  "assignees": ["@dyladan", "@legendecas", "@pichlermarc"],
+  "assignees": ["@dyladan", "@legendecas", "@pichlermarc", "@trentm"],
   "labels": ["dependencies"],
   "postUpdateOptions": ["npmDedupe"]
 }
