@@ -18,7 +18,6 @@ import {
   mergeOtlpHttpConfigurationWithDefaults,
   OtlpHttpConfiguration,
 } from './otlp-http-configuration';
-import { VERSION } from '../version';
 
 // NOTE: do not change these imports to be actual imports, otherwise they WILL break `@opentelemetry/instrumentation-http`
 import type * as http from 'http';
@@ -66,12 +65,8 @@ export function httpAgentFactoryFromOptions(
 export function mergeOtlpNodeHttpConfigurationWithDefaults(
   userProvidedConfiguration: Partial<OtlpNodeHttpConfiguration>,
   fallbackConfiguration: Partial<OtlpNodeHttpConfiguration>,
-  defaultConfiguration: Required<OtlpNodeHttpConfiguration>
-): Required<OtlpNodeHttpConfiguration> {
-  let userAgent = defaultConfiguration.userAgent;
-  if (userProvidedConfiguration.userAgent) {
-    userAgent = `${userProvidedConfiguration.userAgent} ${userAgent}`;
-  }
+  defaultConfiguration: OtlpNodeHttpConfiguration
+): OtlpNodeHttpConfiguration {
   return {
     ...mergeOtlpHttpConfigurationWithDefaults(
       userProvidedConfiguration,
@@ -82,17 +77,15 @@ export function mergeOtlpNodeHttpConfigurationWithDefaults(
       userProvidedConfiguration.agentFactory ??
       fallbackConfiguration.agentFactory ??
       defaultConfiguration.agentFactory,
-    userAgent,
   };
 }
 
 export function getNodeHttpConfigurationDefaults(
   requiredHeaders: Record<string, string>,
   signalResourcePath: string
-): Required<OtlpNodeHttpConfiguration> {
+): OtlpNodeHttpConfiguration {
   return {
     ...getHttpConfigurationDefaults(requiredHeaders, signalResourcePath),
     agentFactory: httpAgentFactoryFromOptions({ keepAlive: true }),
-    userAgent: `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
   };
 }

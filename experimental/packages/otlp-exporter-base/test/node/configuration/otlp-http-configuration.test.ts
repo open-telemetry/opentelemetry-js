@@ -16,16 +16,17 @@
 import * as assert from 'assert';
 import { mergeOtlpNodeHttpConfigurationWithDefaults } from '../../../src/configuration/otlp-node-http-configuration';
 import { OtlpNodeHttpConfiguration } from '../../../src/configuration/otlp-node-http-configuration';
+import { VERSION } from '../../../src/version';
 
 describe('mergeOtlpNodeHttpConfigurationWithDefaults', function () {
-  const testDefaults: Required<OtlpNodeHttpConfiguration> = {
+  const testDefaults: OtlpNodeHttpConfiguration = {
     url: 'http://default.example.test',
     timeoutMillis: 1,
     compression: 'none',
     concurrencyLimit: 2,
     headers: () => ({}),
     agentFactory: () => null!,
-    userAgent: 'OTel-OTLP-Exporter-JavaScript/1.2.3',
+    userAgent: `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
   };
 
   it('throws error when the user-provided url is not parseable', function () {
@@ -38,16 +39,13 @@ describe('mergeOtlpNodeHttpConfigurationWithDefaults', function () {
     }, new Error("Configuration: Could not parse user-provided export URL: 'this is not a URL'"));
   });
 
-  it('merges user-agent from the provided config and defaults', function () {
+  it('takes user-agent from the user provided config over the defaults', function () {
     const config = mergeOtlpNodeHttpConfigurationWithDefaults(
       { userAgent: 'Custom-User-Agent/1.2.3' },
       {},
       testDefaults
     );
 
-    assert.strictEqual(
-      config.userAgent,
-      'Custom-User-Agent/1.2.3 OTel-OTLP-Exporter-JavaScript/1.2.3'
-    );
+    assert.strictEqual(config.userAgent, 'Custom-User-Agent/1.2.3');
   });
 });

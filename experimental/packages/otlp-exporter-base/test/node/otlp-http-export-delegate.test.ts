@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import { createOtlpHttpExportDelegate } from '../../src/otlp-http-export-delegate';
-import { VERSION } from '../../src/version';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
 import { ExportResultCode } from '@opentelemetry/core';
 
@@ -31,10 +30,8 @@ import * as assert from 'assert';
 
 describe('createOtlpHttpExportDelegate', function () {
   let server: http.Server;
-  let headers: http.IncomingHttpHeaders | undefined;
   beforeEach(function (done) {
     server = http.createServer((request, response) => {
-      headers = request.headers;
       response.statusCode = 200;
       response.end('Test Server Response');
     });
@@ -45,7 +42,6 @@ describe('createOtlpHttpExportDelegate', function () {
   });
 
   afterEach(function (done) {
-    headers = undefined;
     server.close(() => {
       done();
     });
@@ -64,7 +60,6 @@ describe('createOtlpHttpExportDelegate', function () {
         concurrencyLimit: 30,
         headers: () => ({}),
         timeoutMillis: 1000,
-        userAgent: `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
       },
       serializer
     );
@@ -72,42 +67,6 @@ describe('createOtlpHttpExportDelegate', function () {
     delegate.export('foo', result => {
       try {
         assert.strictEqual(result.code, ExportResultCode.SUCCESS);
-        assert.strictEqual(
-          headers?.['user-agent'],
-          `OTel-OTLP-Exporter-JavaScript/${VERSION}`
-        );
-        done();
-      } catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('ignores user-agent value in headers function', function (done) {
-    const serializer: ISerializer<string, string> = {
-      serializeRequest: sinon.stub().returns(Buffer.from([1, 2, 3])),
-      deserializeResponse: sinon.stub().returns('response'),
-    };
-    const delegate = createOtlpHttpExportDelegate(
-      {
-        url: 'http://localhost:8083',
-        agentFactory: () => new http.Agent(),
-        compression: 'none',
-        concurrencyLimit: 30,
-        headers: () => ({ 'User-Agent': 'Custom-User-Agent/1.2.3' }),
-        timeoutMillis: 1000,
-        userAgent: `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
-      },
-      serializer
-    );
-
-    delegate.export('foo', result => {
-      try {
-        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
-        assert.strictEqual(
-          headers?.['user-agent'],
-          `OTel-OTLP-Exporter-JavaScript/${VERSION}`
-        );
         done();
       } catch (e) {
         done(e);

@@ -24,6 +24,9 @@ import {
   parseRetryAfterToMills,
 } from '../is-export-retryable';
 import { OTLPExporterError } from '../types';
+import { VERSION } from '../version';
+
+const DEFAULT_USER_AGENT = `OTel-OTLP-Exporter-JavaScript/${VERSION}`;
 
 /**
  * Sends data using http
@@ -43,8 +46,13 @@ export function sendWithHttp(
   timeoutMillis: number
 ): void {
   const parsedUrl = new URL(params.url);
+
   const headers = { ...params.headers() };
-  headers['User-Agent'] = params.userAgent;
+  if (params.userAgent) {
+    headers['User-Agent'] = `${params.userAgent} ${DEFAULT_USER_AGENT}`;
+  } else {
+    headers['User-Agent'] = DEFAULT_USER_AGENT;
+  }
 
   const options: http.RequestOptions | https.RequestOptions = {
     hostname: parsedUrl.hostname,
