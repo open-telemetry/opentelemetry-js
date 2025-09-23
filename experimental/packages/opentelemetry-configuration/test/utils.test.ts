@@ -19,8 +19,11 @@ import * as sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
 import {
   getBooleanFromConfigFile,
+  getBooleanListFromConfigFile,
   getNumberFromConfigFile,
+  getNumberListFromConfigFile,
   getStringFromConfigFile,
+  getStringListFromConfigFile,
 } from '../src/utils';
 
 describe('config utils', function () {
@@ -44,6 +47,34 @@ describe('config utils', function () {
     );
   });
 
+  it('should return correct values for getBooleanListFromConfigFile', function () {
+    assert.deepStrictEqual(getBooleanListFromConfigFile(null), undefined);
+    assert.deepStrictEqual(getBooleanListFromConfigFile('  '), undefined);
+    assert.deepStrictEqual(getBooleanListFromConfigFile(' , '), []);
+    assert.deepStrictEqual(getBooleanListFromConfigFile(true), [true]);
+    assert.deepStrictEqual(getBooleanListFromConfigFile('true'), [true]);
+    assert.deepStrictEqual(getBooleanListFromConfigFile(false), [false]);
+    assert.deepStrictEqual(getBooleanListFromConfigFile('false'), [false]);
+    assert.deepStrictEqual(
+      getBooleanListFromConfigFile('true,false,false,true'),
+      [true, false, false, true]
+    );
+    assert.deepStrictEqual(
+      getBooleanListFromConfigFile('true,false,,,true,false'),
+      [true, false, true, false]
+    );
+
+    const warnStub = sinon.stub(diag, 'warn');
+    assert.deepStrictEqual(getBooleanListFromConfigFile('non-boolean'), []);
+    sinon.assert.calledOnceWithMatch(
+      warnStub,
+      `Unknown value 'non-boolean', expected 'true' or 'false'`
+    );
+    assert.deepStrictEqual(getBooleanListFromConfigFile('non-boolean,false'), [
+      false,
+    ]);
+  });
+
   it('should return correct values for getNumberFromConfigFile', function () {
     assert.strictEqual(getNumberFromConfigFile(null), undefined);
     assert.strictEqual(getNumberFromConfigFile(' '), undefined);
@@ -59,11 +90,57 @@ describe('config utils', function () {
     );
   });
 
+  it('should return correct values for getNumberListFromConfigFile', function () {
+    assert.deepStrictEqual(getNumberListFromConfigFile(null), undefined);
+    assert.deepStrictEqual(getNumberListFromConfigFile('  '), undefined);
+    assert.deepStrictEqual(getNumberListFromConfigFile(' , '), []);
+    assert.deepStrictEqual(getNumberListFromConfigFile(5), [5]);
+    assert.deepStrictEqual(getNumberListFromConfigFile('7'), [7]);
+    assert.deepStrictEqual(
+      getNumberListFromConfigFile('1,2,3,4'),
+      [1, 2, 3, 4]
+    );
+    assert.deepStrictEqual(
+      getNumberListFromConfigFile('5,6,,,7,8'),
+      [5, 6, 7, 8]
+    );
+
+    const warnStub = sinon.stub(diag, 'warn');
+    assert.deepStrictEqual(getNumberListFromConfigFile('non-number'), []);
+    sinon.assert.calledOnceWithMatch(
+      warnStub,
+      `Unknown value 'non-number', expected a number`
+    );
+    assert.deepStrictEqual(getNumberListFromConfigFile('non-number,10'), [10]);
+  });
+
   it('should return correct values for getStringFromConfigFile', function () {
     assert.strictEqual(getStringFromConfigFile(null), undefined);
     assert.strictEqual(getStringFromConfigFile(' '), undefined);
     assert.strictEqual(getStringFromConfigFile(undefined), undefined);
     assert.strictEqual(getStringFromConfigFile(1), '1');
     assert.strictEqual(getStringFromConfigFile('string-value'), 'string-value');
+  });
+
+  it('should return correct values for getStringListFromConfigFile', function () {
+    assert.deepStrictEqual(getStringListFromConfigFile(null), undefined);
+    assert.deepStrictEqual(getStringListFromConfigFile('  '), undefined);
+    assert.deepStrictEqual(getStringListFromConfigFile(' , '), []);
+    assert.deepStrictEqual(getStringListFromConfigFile(1), ['1']);
+    assert.deepStrictEqual(getStringListFromConfigFile('string-value'), [
+      'string-value',
+    ]);
+    assert.deepStrictEqual(getStringListFromConfigFile('v1,v2,v3,v4'), [
+      'v1',
+      'v2',
+      'v3',
+      'v4',
+    ]);
+    assert.deepStrictEqual(getStringListFromConfigFile('v5,v6,,,v7,v8'), [
+      'v5',
+      'v6',
+      'v7',
+      'v8',
+    ]);
   });
 });

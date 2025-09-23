@@ -40,6 +40,34 @@ export function getBooleanFromConfigFile(value: unknown): boolean | undefined {
 }
 
 /**
+ * Retrieves a list of booleans from a configuration file parameter.
+ * - Uses ',' as the delimiter.
+ * - Trims leading and trailing whitespace from each entry.
+ * - Excludes empty entries.
+ * - Returns `undefined` if the variable is empty or contains only whitespace.
+ * - Returns an empty array if all entries are empty or whitespace.
+ *
+ * @param {unknown} value - The value from the config file.
+ * @returns {boolean[] | undefined} - The list of strings or `undefined`.
+ */
+export function getBooleanListFromConfigFile(
+  value: unknown
+): boolean[] | undefined {
+  const list = getStringFromConfigFile(value)?.split(',');
+  if (list) {
+    const filteredList = [];
+    for (let i = 0; i < list.length; i++) {
+      const element = getBooleanFromConfigFile(list[i]);
+      if (element != null) {
+        filteredList.push(element);
+      }
+    }
+    return filteredList;
+  }
+  return list;
+}
+
+/**
  * Retrieves a number from a configuration file parameter.
  * - Returns `undefined` if the environment variable is empty, unset, or contains only whitespace.
  * - Returns `undefined` and a warning if is not a number.
@@ -64,8 +92,36 @@ export function getNumberFromConfigFile(value: unknown): number | undefined {
 }
 
 /**
+ * Retrieves a list of numbers from a configuration file parameter.
+ * - Uses ',' as the delimiter.
+ * - Trims leading and trailing whitespace from each entry.
+ * - Excludes empty entries.
+ * - Returns `undefined` if the variable is empty or contains only whitespace.
+ * - Returns an empty array if all entries are empty or whitespace.
+ *
+ * @param {unknown} value - The value from the config file.
+ * @returns {number[] | undefined} - The list of numbers or `undefined`.
+ */
+export function getNumberListFromConfigFile(
+  value: unknown
+): number[] | undefined {
+  const list = getStringFromConfigFile(value)?.split(',');
+  if (list) {
+    const filteredList = [];
+    for (let i = 0; i < list.length; i++) {
+      const element = getNumberFromConfigFile(list[i]);
+      if (element) {
+        filteredList.push(element);
+      }
+    }
+    return filteredList;
+  }
+  return list;
+}
+
+/**
  * Retrieves a string from a configuration file parameter.
- * - Returns `undefined` if the environment variable is empty, unset, or contains only whitespace.
+ * - Returns `undefined` if the variable is empty, unset, or contains only whitespace.
  *
  * @param {unknown} value - The value from the config file.
  * @returns {string | undefined} - The string value or `undefined`.
@@ -76,4 +132,24 @@ export function getStringFromConfigFile(value: unknown): string | undefined {
     return undefined;
   }
   return raw;
+}
+
+/**
+ * Retrieves a list of strings from a configuration file parameter.
+ * - Uses ',' as the delimiter.
+ * - Trims leading and trailing whitespace from each entry.
+ * - Excludes empty entries.
+ * - Returns `undefined` if the variable is empty or contains only whitespace.
+ * - Returns an empty array if all entries are empty or whitespace.
+ *
+ * @param {unknown} value - The value from the config file.
+ * @returns {string[] | undefined} - The list of strings or `undefined`.
+ */
+export function getStringListFromConfigFile(
+  value: unknown
+): string[] | undefined {
+  return getStringFromConfigFile(value)
+    ?.split(',')
+    .map(v => v.trim())
+    .filter(s => s !== '');
 }
