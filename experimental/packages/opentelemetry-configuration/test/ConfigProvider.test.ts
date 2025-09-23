@@ -890,14 +890,5 @@ describe('ConfigProvider', function () {
         defaultConfigFromFileWithEnvVariables
       );
     });
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/sdk-migration-config.yaml';
-
-      const configProvider = createConfigProvider();
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        defaultConfigFromFileWithEnvVariables
-      );
-    });
   });
 });
