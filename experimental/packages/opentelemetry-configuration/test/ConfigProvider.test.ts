@@ -20,10 +20,148 @@ import { DiagLogLevel } from '@opentelemetry/api';
 import { createConfigProvider } from '../src/ConfigProvider';
 
 const defaultConfig: Configuration = {
-  disable: false,
+  disabled: false,
   log_level: DiagLogLevel.INFO,
   node_resource_detectors: ['all'],
   resource: {},
+  attribute_limits: {
+    attribute_count_limit: 128,
+  },
+  propagator: {
+    composite: ['tracecontext', 'baggage'],
+    composite_list: 'tracecontext,baggage',
+  },
+  tracer_provider: {
+    processors: [
+      {
+        batch: {
+          schedule_delay: 5000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            otlp_http: {
+              endpoint: 'http://localhost:4318/v1/traces',
+              timeout: 10000,
+            },
+          },
+        },
+      },
+    ],
+    limits: {
+      attribute_count_limit: 128,
+      event_count_limit: 128,
+      link_count_limit: 128,
+      event_attribute_count_limit: 128,
+      link_attribute_count_limit: 128,
+    },
+    sampler: {
+      parent_based: {
+        root: 'always_on',
+        remote_parent_sampled: 'always_on',
+        remote_parent_not_sampled: 'always_off',
+        local_parent_sampled: 'always_on',
+        local_parent_not_sampled: 'always_off',
+      },
+    },
+  },
+  meter_provider: {
+    readers: [
+      {
+        periodic: {
+          interval: 60000,
+          timeout: 30000,
+          exporter: {
+            otlp_http: {
+              endpoint: 'http://localhost:4318/v1/metrics',
+              timeout: 10000,
+              temporality_preference: 'cumulative',
+              default_histogram_aggregation: 'explicit_bucket_histogram',
+            },
+          },
+        },
+      },
+    ],
+    exemplar_filter: 'trace_based',
+  },
+  logger_provider: {
+    processors: [
+      {
+        batch: {
+          schedule_delay: 1000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            otlp_http: {
+              endpoint: 'http://localhost:4318/v1/logs',
+              timeout: 10000,
+            },
+          },
+        },
+      },
+    ],
+    limits: {
+      attribute_count_limit: 128,
+    },
+  },
+};
+
+const configFromFile: Configuration = {
+  disabled: false,
+  log_level: DiagLogLevel.DEBUG,
+  node_resource_detectors: ['all'],
+  resource: {
+    schema_url: 'https://opentelemetry.io/schemas/1.16.0',
+    attributes_list: 'service.namespace=my-namespace,service.version=1.0.0',
+    attributes: [
+      {
+        name: 'service.name',
+        value: 'unknown_service',
+        type: 'string',
+      },
+      {
+        name: 'string_key',
+        value: 'value',
+        type: 'string',
+      },
+      {
+        name: 'bool_key',
+        value: true,
+        type: 'bool',
+      },
+      {
+        name: 'int_key',
+        value: 1,
+        type: 'int',
+      },
+      {
+        name: 'double_key',
+        value: 1.1,
+        type: 'double',
+      },
+      {
+        name: 'string_array_key',
+        value: ['value1', 'value2'],
+        type: 'string_array',
+      },
+      {
+        name: 'bool_array_key',
+        value: [true, false],
+        type: 'bool_array',
+      },
+      {
+        name: 'int_array_key',
+        value: [1, 2],
+        type: 'int_array',
+      },
+      {
+        name: 'double_array_key',
+        value: [1.1, 2.2],
+        type: 'double_array',
+      },
+    ],
+  },
   attribute_limits: {
     attribute_count_limit: 128,
   },
@@ -175,7 +313,7 @@ describe('ConfigProvider', function () {
       process.env.OTEL_SDK_DISABLED = 'true';
       const expectedConfig: Configuration = {
         ...defaultConfig,
-        disable: true,
+        disabled: true,
       };
       const configProvider = createConfigProvider();
       assert.deepStrictEqual(
@@ -463,6 +601,7 @@ describe('ConfigProvider', function () {
   describe('get values from config file', function () {
     afterEach(function () {
       delete process.env.OTEL_EXPERIMENTAL_CONFIG_FILE;
+      delete process.env.OTEL_NODE_RESOURCE_DETECTORS;
     });
 
     it('should initialize config with default values from valid config file', function () {
@@ -471,12 +610,19 @@ describe('ConfigProvider', function () {
       const configProvider = createConfigProvider();
       assert.deepStrictEqual(
         configProvider.getInstrumentationConfig(),
-        defaultConfig
+        configFromFile
       );
     });
 
     it('should return error from invalid config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = './fixtures/kitchen-sink.txt';
+      assert.throws(() => {
+        createConfigProvider();
+      });
+    });
+
+    it('should return error from invalid config file format', function () {
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
       assert.throws(() => {
         createConfigProvider();
       });
@@ -493,6 +639,16 @@ describe('ConfigProvider', function () {
 
     it('should initialize config with default values with all whitespace for config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = '  ';
+      const configProvider = createConfigProvider();
+      assert.deepStrictEqual(
+        configProvider.getInstrumentationConfig(),
+        defaultConfig
+      );
+    });
+
+    it('should initialize config with default values from valid short config file', function () {
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
+        'test/fixtures/short-config.yml';
       const configProvider = createConfigProvider();
       assert.deepStrictEqual(
         configProvider.getInstrumentationConfig(),

@@ -13,6 +13,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(otlp-transformer): add span flags support for isRemote property [#5910](https://github.com/open-telemetry/opentelemetry-js/pull/5910) @nikhilmantri0902
 * feat(sampler-composite): Added experimental implementations of draft composite sampling spec [#5839](https://github.com/open-telemetry/opentelemetry-js/pull/5839) @anuraaga
 * feat(opentelemetry-configuration): add more attributes to config model [#5826](https://github.com/open-telemetry/opentelemetry-js/pull/5826) @maryliag
+* feat(opentelemetry-configuration): Parse of Configuration File [#5875](https://github.com/open-telemetry/opentelemetry-js/pull/5875) @maryliag
 
 ### :bug: Bug Fixes
 
