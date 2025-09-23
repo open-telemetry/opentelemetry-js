@@ -12,6 +12,9 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * feat(otlp-exporter-base, otlp-grpc-exporter-base): add an option to let user prepend their own user-agent string in HTTP & GRPC exporters [#5928](https://github.com/open-telemetry/opentelemetry-js/pull/5928) @david-luna
   * Fixes a bug where GRPC exporter was not sending the user-agent header [#5687](https://github.com/open-telemetry/opentelemetry-js/issues/5867)
+* feat(otlp-transformer): add span flags support for isRemote property [#5910](https://github.com/open-telemetry/opentelemetry-js/pull/5910) @nikhilmantri0902
+* feat(sampler-composite): Added experimental implementations of draft composite sampling spec [#5839](https://github.com/open-telemetry/opentelemetry-js/pull/5839) @anuraaga
+* feat(opentelemetry-configuration): add more attributes to config model [#5826](https://github.com/open-telemetry/opentelemetry-js/pull/5826) @maryliag
 
 ### :bug: Bug Fixes
 
@@ -73,6 +76,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(otlp-exporter-base): prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
 * fix(otlp-exporter-base): consider relative urls as valid in browser environments [#5807](https://github.com/open-telemetry/opentelemetry-js/pull/5807)
 * fix(instrumentation-fetch): Use ESM version of semconv instead of CJS. Users expecting mixed ESM and CJS modules will now only get ESM modules. [#5878](https://github.com/open-telemetry/opentelemetry-js/pull/5878) @overbalance
+* fix(instrumentation-fetch): release HTTP connection when response body is cancelled [#5894](https://github.com/open-telemetry/opentelemetry-js/pull/5894) @Lei-k
 
 ### :house: Internal
 
