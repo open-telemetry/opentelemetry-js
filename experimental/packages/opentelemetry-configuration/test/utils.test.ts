@@ -18,6 +18,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
 import {
+  envVariableSubstitution,
   getBooleanFromConfigFile,
   getBooleanListFromConfigFile,
   getNumberFromConfigFile,
@@ -142,5 +143,28 @@ describe('config utils', function () {
       'v7',
       'v8',
     ]);
+  });
+
+  it('should return correct values for envVariableSubstitution', function () {
+    process.env.TEST1 = 't1';
+    process.env.TEST2 = 't2';
+    process.env.TEST_LONG_NAME = '100';
+    assert.deepStrictEqual(envVariableSubstitution(null), undefined);
+    assert.deepStrictEqual(envVariableSubstitution(' '), ' ');
+    assert.deepStrictEqual(envVariableSubstitution('${TEST1}'), 't1');
+    assert.deepStrictEqual(
+      envVariableSubstitution('${TEST1},${TEST2}'),
+      't1,t2'
+    );
+    assert.deepStrictEqual(envVariableSubstitution('${TEST_LONG_NAME}'), '100');
+    assert.deepStrictEqual(envVariableSubstitution('${TEST3}'), '');
+    assert.deepStrictEqual(
+      envVariableSubstitution('${TEST3:-backup}'),
+      'backup'
+    );
+
+    delete process.env.TEST1;
+    delete process.env.TEST2;
+    delete process.env.TEST_LONG_NAME;
   });
 });

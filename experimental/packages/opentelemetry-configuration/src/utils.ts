@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { diag } from '@opentelemetry/api';
+import { getStringFromEnv } from '@opentelemetry/core';
 import { inspect } from 'util';
 
 /**
@@ -26,7 +27,7 @@ import { inspect } from 'util';
  * @returns {boolean} - The boolean value or `false` if the environment variable is unset empty, unset, or contains only whitespace.
  */
 export function getBooleanFromConfigFile(value: unknown): boolean | undefined {
-  const raw = String(value)?.trim().toLowerCase();
+  const raw = envVariableSubstitution(value)?.trim().toLowerCase();
   if (raw === 'true') {
     return true;
   } else if (raw === 'false') {
@@ -77,7 +78,7 @@ export function getBooleanListFromConfigFile(
  * @returns {number | undefined} - The number value or `undefined`.
  */
 export function getNumberFromConfigFile(value: unknown): number | undefined {
-  const raw = String(value)?.trim();
+  const raw = envVariableSubstitution(value)?.trim();
   if (raw == null || raw.trim() === '') {
     return undefined;
   }
@@ -127,7 +128,7 @@ export function getNumberListFromConfigFile(
  * @returns {string | undefined} - The string value or `undefined`.
  */
 export function getStringFromConfigFile(value: unknown): string | undefined {
-  const raw = String(value)?.trim();
+  const raw = envVariableSubstitution(value)?.trim();
   if (value == null || raw === '') {
     return undefined;
   }
@@ -148,8 +149,28 @@ export function getStringFromConfigFile(value: unknown): string | undefined {
 export function getStringListFromConfigFile(
   value: unknown
 ): string[] | undefined {
+  value = envVariableSubstitution(value);
   return getStringFromConfigFile(value)
     ?.split(',')
     .map(v => v.trim())
     .filter(s => s !== '');
+}
+
+export function envVariableSubstitution(value: unknown): string | undefined {
+  if (value == null) {
+    return undefined;
+  }
+
+  const matches = String(value).match(/\$\{[a-zA-Z0-9_:.-]*\}/g);
+  if (matches) {
+    let stringValue = String(value);
+    for (const match of matches) {
+      const v = match.substring(2, match.length - 1).split(':-');
+      const defaultValue = v.length === 2 ? v[1] : '';
+      const replacement = getStringFromEnv(v[0]) || defaultValue;
+      stringValue = stringValue.replace(match, replacement);
+    }
+    return stringValue;
+  }
+  return String(value);
 }
