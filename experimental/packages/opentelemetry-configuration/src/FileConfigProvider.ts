@@ -16,6 +16,7 @@
 
 import { diagLogLevelFromString, getStringFromEnv } from '@opentelemetry/core';
 import {
+  AttributeLimits,
   ConfigAttributes,
   ConfigurationModel,
   initializeDefaultConfiguration,
@@ -98,6 +99,7 @@ function parseConfigFile(config: ConfigurationModel) {
     }
 
     setResourceAttributes(config, parsedContent['resource']?.['attributes']);
+    setAttributeLimits(config, parsedContent['attribute_limits']);
   } else {
     throw new Error(
       `Unsupported File Format: ${parsedContent['file_format']}. It must be one of the following: ${supportedFileVersions}`
@@ -142,6 +144,19 @@ function setResourceAttributes(
         value: value,
         type: att['type'] ?? 'string',
       });
+    }
+  }
+}
+
+function setAttributeLimits(config: ConfigurationModel, attrLimits: AttributeLimits) {
+  if (attrLimits) {
+    const lengthLimit = getNumberFromConfigFile(attrLimits['attribute_value_length_limit']);
+    if (lengthLimit) {
+      config.attribute_limits.attribute_value_length_limit = lengthLimit;
+    }
+    const countLimit = getNumberFromConfigFile(attrLimits['attribute_count_limit']);
+    if (countLimit) {
+      config.attribute_limits.attribute_count_limit = countLimit;
     }
   }
 }

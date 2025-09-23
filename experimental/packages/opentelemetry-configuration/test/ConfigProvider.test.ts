@@ -164,6 +164,7 @@ const configFromFile: Configuration = {
   },
   attribute_limits: {
     attribute_count_limit: 128,
+    attribute_value_length_limit: 4096,
   },
   propagator: {
     composite: ['tracecontext', 'baggage'],
