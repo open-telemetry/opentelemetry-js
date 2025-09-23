@@ -24,7 +24,6 @@ import {
   createInsecureCredentials,
   createSslCredentials,
 } from '../grpc-exporter-transport';
-import { VERSION } from '../version';
 import { URL } from 'url';
 import { diag } from '@opentelemetry/api';
 
@@ -49,7 +48,6 @@ export interface UnresolvedOtlpGrpcConfiguration
    * Credentials are based on the final resolved URL
    */
   credentials: (url: string) => () => ChannelCredentials;
-  userAgent: string;
 }
 
 export function validateAndNormalizeUrl(url: string): string {
@@ -90,16 +88,11 @@ export function mergeOtlpGrpcConfigurationWithDefaults(
   userProvidedConfiguration: Partial<OtlpGrpcConfiguration>,
   fallbackConfiguration: Partial<UnresolvedOtlpGrpcConfiguration>,
   defaultConfiguration: UnresolvedOtlpGrpcConfiguration
-): Required<OtlpGrpcConfiguration> {
+): OtlpGrpcConfiguration {
   const rawUrl =
     userProvidedConfiguration.url ??
     fallbackConfiguration.url ??
     defaultConfiguration.url;
-
-  let userAgent = defaultConfiguration.userAgent;
-  if (userProvidedConfiguration.userAgent) {
-    userAgent = `${userProvidedConfiguration.userAgent} ${userAgent}`;
-  }
 
   return {
     ...mergeOtlpSharedConfigurationWithDefaults(
@@ -125,7 +118,7 @@ export function mergeOtlpGrpcConfigurationWithDefaults(
       userProvidedConfiguration.credentials ??
       fallbackConfiguration.credentials?.(rawUrl) ??
       defaultConfiguration.credentials(rawUrl),
-    userAgent,
+    userAgent: userProvidedConfiguration.userAgent,
   };
 }
 
@@ -141,6 +134,5 @@ export function getOtlpGrpcDefaultConfiguration(): UnresolvedOtlpGrpcConfigurati
         return () => createSslCredentials();
       }
     },
-    userAgent: `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
   };
 }

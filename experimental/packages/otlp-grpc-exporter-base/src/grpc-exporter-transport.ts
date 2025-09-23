@@ -27,6 +27,16 @@ import {
   ExportResponse,
   IExporterTransport,
 } from '@opentelemetry/otlp-exporter-base';
+import { VERSION } from './version';
+
+const DEFAULT_USER_AGENT = `OTel-OTLP-Exporter-JavaScript/${VERSION}`;
+
+function createUserAgent(userAgent: string | undefined) {
+  if (userAgent) {
+    return `${userAgent} ${DEFAULT_USER_AGENT}`;
+  }
+  return DEFAULT_USER_AGENT;
+}
 
 // values taken from '@grpc/grpc-js` so that we don't need to require/import it.
 const GRPC_COMPRESSION_NONE = 0;
@@ -89,7 +99,7 @@ export interface GrpcExporterTransportParameters {
    */
   metadata: () => Metadata;
   compression: 'gzip' | 'none';
-  userAgent: string;
+  userAgent?: string;
 }
 
 export class GrpcExporterTransport implements IExporterTransport {
@@ -136,7 +146,9 @@ export class GrpcExporterTransport implements IExporterTransport {
             'grpc.default_compression_algorithm': toGrpcCompression(
               this._parameters.compression
             ),
-            'grpc.primary_user_agent': this._parameters.userAgent,
+            'grpc.primary_user_agent': createUserAgent(
+              this._parameters.userAgent
+            ),
           }
         );
       } catch (error) {

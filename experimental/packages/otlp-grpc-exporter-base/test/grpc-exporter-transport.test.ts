@@ -69,7 +69,6 @@ const simpleClientConfig: GrpcExporterTransportParameters = {
   credentials: createInsecureCredentials,
   compression: 'none',
   address: 'localhost:1234',
-  userAgent: `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
 };
 
 const timeoutMillis = 100;
@@ -283,7 +282,11 @@ describe('GrpcExporterTransport', function () {
         };
       });
 
-      it('sends user-agent as metadata', async function () {
+      const getUserAgent = () => {
+        return serverTestContext.metadata[0].get('user-agent')[0] as string;
+      };
+
+      it('sends default user-agent in metadata', async function () {
         const transport = createOtlpGrpcExporterTransport(simpleClientConfig);
 
         (await transport.send(
@@ -291,18 +294,42 @@ describe('GrpcExporterTransport', function () {
           timeoutMillis
         )) as ExportResponseSuccess;
 
-        const userAgent = serverTestContext.metadata[0].get(
-          'user-agent'
-        )[0] as string;
+        const userAgents = getUserAgent().split(' ');
         assert.strictEqual(serverTestContext.requests.length, 1);
         assert.deepEqual(
           serverTestContext.requests[0].request,
           Buffer.from([1, 2, 3])
         );
-        assert.ok(
-          userAgent.startsWith(`OTel-OTLP-Exporter-JavaScript/${VERSION}`)
+        assert.strictEqual(
+          userAgents[0],
+          `OTel-OTLP-Exporter-JavaScript/${VERSION}`
         );
-        assert.match(userAgent, /grpc-node-js\/\d+\.\d+\.\d+$/);
+        assert.match(userAgents[1], /^grpc-node-js\/\d+\.\d+\.\d+$/);
+      });
+
+      it('prepends provided user-agent to the default one in metadata', async function () {
+        const transport = createOtlpGrpcExporterTransport({
+          ...simpleClientConfig,
+          userAgent: 'Custom-User-Agent/1.2.3',
+        });
+
+        (await transport.send(
+          Buffer.from([1, 2, 3]),
+          timeoutMillis
+        )) as ExportResponseSuccess;
+
+        const userAgents = getUserAgent().split(' ');
+        assert.strictEqual(serverTestContext.requests.length, 1);
+        assert.deepEqual(
+          serverTestContext.requests[0].request,
+          Buffer.from([1, 2, 3])
+        );
+        assert.strictEqual(userAgents[0], 'Custom-User-Agent/1.2.3');
+        assert.strictEqual(
+          userAgents[1],
+          `OTel-OTLP-Exporter-JavaScript/${VERSION}`
+        );
+        assert.match(userAgents[2], /^grpc-node-js\/\d+\.\d+\.\d+$/);
       });
 
       it('sends data', async function () {

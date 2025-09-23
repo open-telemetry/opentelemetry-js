@@ -23,7 +23,7 @@ import { OtlpGrpcConfiguration } from './configuration/otlp-grpc-configuration';
 import { createOtlpGrpcExporterTransport } from './grpc-exporter-transport';
 
 export function createOtlpGrpcExportDelegate<Internal, Response>(
-  options: Required<OtlpGrpcConfiguration>,
+  options: OtlpGrpcConfiguration,
   serializer: ISerializer<Internal, Response>,
   grpcName: string,
   grpcPath: string

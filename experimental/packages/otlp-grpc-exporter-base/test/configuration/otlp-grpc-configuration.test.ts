@@ -26,7 +26,6 @@ import {
   createSslCredentials,
 } from '../../src/grpc-exporter-transport';
 import * as fs from 'fs';
-import { VERSION } from '../../src/version';
 
 describe('mergeOtlpGrpcConfigurationWithDefaults', function () {
   describe('metadata', function () {
@@ -58,13 +57,10 @@ describe('mergeOtlpGrpcConfigurationWithDefaults', function () {
         bar: 'bar-fallback', // uses fallback if there is no value set
         baz: 'baz-user', // does not drop user-set metadata if there is no fallback for it
       });
-      assert.equal(
-        config.userAgent,
-        'OTel-OTLP-Exporter-JavaScript/' + VERSION
-      );
+      assert.equal(config.userAgent, undefined);
     });
 
-    it('does not override default userAgent (does prepend)', function () {
+    it('sets userAgent options if user provided it', function () {
       // act
       const config = mergeOtlpGrpcConfigurationWithDefaults(
         {
@@ -74,25 +70,7 @@ describe('mergeOtlpGrpcConfigurationWithDefaults', function () {
         getOtlpGrpcDefaultConfiguration()
       );
 
-      assert.equal(
-        config.userAgent,
-        'user-provided-user-agent/1.2.3 OTel-OTLP-Exporter-JavaScript/' +
-          VERSION
-      );
-    });
-
-    it('does use default userAgent if nothing is provided', function () {
-      // act
-      const config = mergeOtlpGrpcConfigurationWithDefaults(
-        {},
-        {},
-        getOtlpGrpcDefaultConfiguration()
-      );
-
-      assert.equal(
-        config.userAgent,
-        'OTel-OTLP-Exporter-JavaScript/' + VERSION
-      );
+      assert.equal(config.userAgent, 'user-provided-user-agent/1.2.3');
     });
   });
 

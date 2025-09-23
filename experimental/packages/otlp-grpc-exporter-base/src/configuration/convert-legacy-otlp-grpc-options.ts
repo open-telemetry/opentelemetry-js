@@ -31,7 +31,7 @@ import { getOtlpGrpcConfigurationFromEnv } from './otlp-grpc-env-configuration';
 export function convertLegacyOtlpGrpcOptions(
   config: OTLPGRPCExporterConfigNode,
   signalIdentifier: string
-): Required<OtlpGrpcConfiguration> {
+): OtlpGrpcConfiguration {
   if (config.headers) {
     diag.warn('Headers cannot be set when using grpc');
   }
