@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758623792319,
+  "lastUpdate": 1758637317103,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -38952,6 +38952,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.58%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marylia.gutierrez@grafana.com",
+            "name": "Marylia Gutierrez",
+            "username": "maryliag"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b11baa153849c95ee25cc6e407cb8f07126f0d52",
+          "message": "feat(opentelemetry-configuration): Parse of Configuration File (#5875)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2025-09-23T13:14:05Z",
+          "tree_id": "3142a016f52b639b919e596531ac406945587939",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/b11baa153849c95ee25cc6e407cb8f07126f0d52"
+        },
+        "date": 1758637316090,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 641845,
+            "range": "±0.68%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8356,
+            "range": "±0.76%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 294572,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 276254,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
