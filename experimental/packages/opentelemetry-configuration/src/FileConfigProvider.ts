@@ -18,6 +18,8 @@ import { diagLogLevelFromString, getStringFromEnv } from '@opentelemetry/core';
 import {
   AttributeLimits,
   ConfigAttributes,
+  ConfigLoggerProvider,
+  ConfigMeterProvider,
   ConfigTracerProvider,
   ConfigurationModel,
   initializeDefaultConfiguration,
@@ -104,6 +106,8 @@ function parseConfigFile(config: ConfigurationModel) {
     setAttributeLimits(config, parsedContent['attribute_limits']);
     setPropagator(config, parsedContent['propagator']);
     setTracerProvider(config, parsedContent['tracer_provider']);
+    setMeterProvider(config, parsedContent['meter_provider']);
+    setLoggerProvider(config, parsedContent['logger_provider']);
   } else {
     throw new Error(
       `Unsupported File Format: ${parsedContent['file_format']}. It must be one of the following: ${supportedFileVersions}`
@@ -255,6 +259,45 @@ function setTracerProvider(
         config.tracer_provider.limits.link_attribute_count_limit =
           linkAttributeCountLimit;
       }
+    }
+  }
+}
+
+function setMeterProvider(
+  config: ConfigurationModel,
+  meterProvider: ConfigMeterProvider
+): void {
+  if (meterProvider) {
+    const exemplarFilter = getStringFromConfigFile(meterProvider['exemplar_filter']);
+  if (
+    exemplarFilter &&
+    (exemplarFilter === 'trace_based' ||
+      exemplarFilter === 'always_on' ||
+      exemplarFilter === 'always_off')
+  ) {
+    config.meter_provider.exemplar_filter = exemplarFilter;
+  }
+  }
+}
+
+function setLoggerProvider(
+  config: ConfigurationModel,
+  loggerProvider: ConfigLoggerProvider
+): void {
+  if (loggerProvider) {
+    const attributeValueLengthLimit = getNumberFromConfigFile(
+      loggerProvider['limits']['attribute_value_length_limit']
+    );
+    if (attributeValueLengthLimit) {
+      config.logger_provider.limits.attribute_value_length_limit =
+        attributeValueLengthLimit;
+    }
+    
+    const attributeCountLimit = getNumberFromConfigFile(
+      loggerProvider['limits']['attribute_count_limit']
+    );
+    if (attributeCountLimit) {
+      config.logger_provider.limits.attribute_count_limit = attributeCountLimit;
     }
   }
 }
