@@ -27,6 +27,7 @@ import * as yaml from 'yaml';
 import {
   getBooleanFromConfigFile,
   getBooleanListFromConfigFile,
+  getListFromObjectsFromConfigFile,
   getNumberFromConfigFile,
   getNumberListFromConfigFile,
   getStringFromConfigFile,
@@ -100,6 +101,7 @@ function parseConfigFile(config: ConfigurationModel) {
 
     setResourceAttributes(config, parsedContent['resource']?.['attributes']);
     setAttributeLimits(config, parsedContent['attribute_limits']);
+    setPropagator(config, parsedContent['propagator']);
   } else {
     throw new Error(
       `Unsupported File Format: ${parsedContent['file_format']}. It must be one of the following: ${supportedFileVersions}`
@@ -148,15 +150,52 @@ function setResourceAttributes(
   }
 }
 
-function setAttributeLimits(config: ConfigurationModel, attrLimits: AttributeLimits) {
+function setAttributeLimits(
+  config: ConfigurationModel,
+  attrLimits: AttributeLimits
+) {
   if (attrLimits) {
-    const lengthLimit = getNumberFromConfigFile(attrLimits['attribute_value_length_limit']);
+    const lengthLimit = getNumberFromConfigFile(
+      attrLimits['attribute_value_length_limit']
+    );
     if (lengthLimit) {
       config.attribute_limits.attribute_value_length_limit = lengthLimit;
     }
-    const countLimit = getNumberFromConfigFile(attrLimits['attribute_count_limit']);
+    const countLimit = getNumberFromConfigFile(
+      attrLimits['attribute_count_limit']
+    );
     if (countLimit) {
       config.attribute_limits.attribute_count_limit = countLimit;
+    }
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function setPropagator(config: ConfigurationModel, propagator: any): void {
+  if (propagator) {
+    let composite = getListFromObjectsFromConfigFile(propagator['composite']);
+    const compositeList = getStringListFromConfigFile(
+      propagator['composite_list']
+    );
+    if (composite === undefined) {
+      composite = [];
+    }
+    if (compositeList) {
+      for (let i = 0; i < compositeList.length; i++) {
+        if (!composite.includes(compositeList[i])) {
+          composite.push(compositeList[i]);
+        }
+      }
+    }
+
+    if (composite.length > 0) {
+      config.propagator.composite = composite;
+    }
+    const compositeListString = getStringFromConfigFile(
+      propagator['composite_list']
+    );
+    if (compositeListString) {
+      config.propagator.composite_list = compositeListString;
     }
   }
 }

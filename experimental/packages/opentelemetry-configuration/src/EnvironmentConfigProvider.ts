@@ -96,13 +96,13 @@ function setAttributeLimits(config: ConfigurationModel): void {
 }
 
 function setPropagators(config: ConfigurationModel): void {
-  const propagators = getStringListFromEnv('OTEL_PROPAGATORS');
-  if (propagators) {
-    config.propagator = {
-      composite: propagators,
-      composite_list:
-        getStringFromEnv('OTEL_PROPAGATORS') || 'tracecontext,baggage',
-    };
+  const composite = getStringListFromEnv('OTEL_PROPAGATORS');
+  if (composite) {
+    config.propagator.composite = composite;
+  }
+  const compositeList = getStringFromEnv('OTEL_PROPAGATORS');
+  if (compositeList) {
+    config.propagator.composite_list = compositeList;
   }
 }
 

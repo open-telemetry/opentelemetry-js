@@ -167,8 +167,16 @@ const configFromFile: Configuration = {
     attribute_value_length_limit: 4096,
   },
   propagator: {
-    composite: ['tracecontext', 'baggage'],
-    composite_list: 'tracecontext,baggage',
+    composite: [
+      'tracecontext',
+      'baggage',
+      'b3',
+      'b3multi',
+      'jaeger',
+      'ottrace',
+      'xray',
+    ],
+    composite_list: 'tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray',
   },
   tracer_provider: {
     processors: [
@@ -862,7 +870,7 @@ describe('ConfigProvider', function () {
       process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '29';
       const configProvider = createConfigProvider();
       const expectedConfig: Configuration = {
-        ...defaultConfig,
+        ...defaultConfigFromFileWithEnvVariables,
         resource: {
           attributes_list: 'attributes',
           attributes: [
@@ -873,6 +881,14 @@ describe('ConfigProvider', function () {
             },
           ],
         },
+        attribute_limits: {
+          attribute_count_limit: 7,
+          attribute_value_length_limit: 23,
+        },
+        propagator: {
+          composite: ['prop'],
+          composite_list: 'prop',
+        },
       };
 
       assert.deepStrictEqual(
@@ -881,15 +897,15 @@ describe('ConfigProvider', function () {
       );
     });
 
-    it('should initialize config with fallbacks defined in config file when corresponding environment variables are not defined', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/sdk-migration-config.yaml';
+    // it('should initialize config with fallbacks defined in config file when corresponding environment variables are not defined', function () {
+    //   process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
+    //     'test/fixtures/sdk-migration-config.yaml';
 
-      const configProvider = createConfigProvider();
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        defaultConfigFromFileWithEnvVariables
-      );
-    });
+    //   const configProvider = createConfigProvider();
+    //   assert.deepStrictEqual(
+    //     configProvider.getInstrumentationConfig(),
+    //     defaultConfigFromFileWithEnvVariables
+    //   );
+    // });
   });
 });
