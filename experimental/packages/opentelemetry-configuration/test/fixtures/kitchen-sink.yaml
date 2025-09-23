@@ -14,7 +14,7 @@ file_format: "1.0-rc.1"
 disabled: false
 # Configure the log level of the internal logger used by the SDK.
 # If omitted, info is used.
-log_level: info
+log_level: debug
 # Configure general attribute limits. See also tracer_provider.limits, logger_provider.limits.
 attribute_limits:
   # Configure max attribute value size. 
