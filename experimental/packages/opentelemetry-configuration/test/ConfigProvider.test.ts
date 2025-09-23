@@ -880,7 +880,16 @@ describe('ConfigProvider', function () {
       );
     });
 
-    it('should initialize config with config file that contains non existing environment variables', function () {
+    it('should initialize config with fallbacks defined in config file when corresponding environment variables are not defined', function () {
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
+        'test/fixtures/sdk-migration-config.yaml';
+
+      const configProvider = createConfigProvider();
+      assert.deepStrictEqual(
+        configProvider.getInstrumentationConfig(),
+        defaultConfigFromFileWithEnvVariables
+      );
+    });
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
         'test/fixtures/sdk-migration-config.yaml';
 
