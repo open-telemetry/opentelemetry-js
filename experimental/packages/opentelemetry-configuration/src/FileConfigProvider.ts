@@ -18,6 +18,7 @@ import { diagLogLevelFromString, getStringFromEnv } from '@opentelemetry/core';
 import {
   AttributeLimits,
   ConfigAttributes,
+  ConfigTracerProvider,
   ConfigurationModel,
   initializeDefaultConfiguration,
 } from './configModel';
@@ -102,6 +103,7 @@ function parseConfigFile(config: ConfigurationModel) {
     setResourceAttributes(config, parsedContent['resource']?.['attributes']);
     setAttributeLimits(config, parsedContent['attribute_limits']);
     setPropagator(config, parsedContent['propagator']);
+    setTracerProvider(config, parsedContent['tracer_provider']);
   } else {
     throw new Error(
       `Unsupported File Format: ${parsedContent['file_format']}. It must be one of the following: ${supportedFileVersions}`
@@ -196,6 +198,63 @@ function setPropagator(config: ConfigurationModel, propagator: any): void {
     );
     if (compositeListString) {
       config.propagator.composite_list = compositeListString;
+    }
+  }
+}
+
+function setTracerProvider(
+  config: ConfigurationModel,
+  tracerProvider: ConfigTracerProvider
+): void {
+  if (tracerProvider) {
+    // Limits
+    if (tracerProvider['limits']) {
+      const attributeValueLengthLimit = getNumberFromConfigFile(
+        tracerProvider['limits']['attribute_value_length_limit']
+      );
+
+      if (attributeValueLengthLimit) {
+        config.tracer_provider.limits.attribute_value_length_limit =
+          attributeValueLengthLimit;
+      }
+
+      const attributeCountLimit = getNumberFromConfigFile(
+        tracerProvider['limits']['attribute_count_limit']
+      );
+      if (attributeCountLimit) {
+        config.tracer_provider.limits.attribute_count_limit =
+          attributeCountLimit;
+      }
+
+      const eventCountLimit = getNumberFromConfigFile(
+        tracerProvider['limits']['event_count_limit']
+      );
+      if (eventCountLimit) {
+        config.tracer_provider.limits.event_count_limit = eventCountLimit;
+      }
+
+      const linkCountLimit = getNumberFromConfigFile(
+        tracerProvider['limits']['link_count_limit']
+      );
+      if (linkCountLimit) {
+        config.tracer_provider.limits.link_count_limit = linkCountLimit;
+      }
+
+      const eventAttributeCountLimit = getNumberFromConfigFile(
+        tracerProvider['limits']['event_attribute_count_limit']
+      );
+      if (eventAttributeCountLimit) {
+        config.tracer_provider.limits.event_attribute_count_limit =
+          eventAttributeCountLimit;
+      }
+
+      const linkAttributeCountLimit = getNumberFromConfigFile(
+        tracerProvider['limits']['link_attribute_count_limit']
+      );
+      if (linkAttributeCountLimit) {
+        config.tracer_provider.limits.link_attribute_count_limit =
+          linkAttributeCountLimit;
+      }
     }
   }
 }

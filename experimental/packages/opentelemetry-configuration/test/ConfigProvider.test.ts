@@ -197,6 +197,7 @@ const configFromFile: Configuration = {
     ],
     limits: {
       attribute_count_limit: 128,
+      attribute_value_length_limit: 4096,
       event_count_limit: 128,
       link_count_limit: 128,
       event_attribute_count_limit: 128,
@@ -889,6 +890,18 @@ describe('ConfigProvider', function () {
           composite: ['prop'],
           composite_list: 'prop',
         },
+        tracer_provider: {
+          ...defaultConfigFromFileWithEnvVariables.tracer_provider,
+          limits: {
+            ...defaultConfigFromFileWithEnvVariables.tracer_provider.limits,
+            attribute_value_length_limit: 14,
+            attribute_count_limit: 15,
+            event_count_limit: 16,
+            link_count_limit: 17,
+            event_attribute_count_limit: 18,
+            link_attribute_count_limit: 19,
+          },
+        },
       };
 
       assert.deepStrictEqual(
@@ -897,15 +910,15 @@ describe('ConfigProvider', function () {
       );
     });
 
-    // it('should initialize config with fallbacks defined in config file when corresponding environment variables are not defined', function () {
-    //   process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-    //     'test/fixtures/sdk-migration-config.yaml';
+    it('should initialize config with fallbacks defined in config file when corresponding environment variables are not defined', function () {
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
+        'test/fixtures/sdk-migration-config.yaml';
 
-    //   const configProvider = createConfigProvider();
-    //   assert.deepStrictEqual(
-    //     configProvider.getInstrumentationConfig(),
-    //     defaultConfigFromFileWithEnvVariables
-    //   );
-    // });
+      const configProvider = createConfigProvider();
+      assert.deepStrictEqual(
+        configProvider.getInstrumentationConfig(),
+        defaultConfigFromFileWithEnvVariables
+      );
+    });
   });
 });
