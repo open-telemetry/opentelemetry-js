@@ -911,7 +911,7 @@ describe('ConfigProvider', function () {
           limits: {
             attribute_value_length_limit: 28,
             attribute_count_limit: 29,
-          }
+          },
         },
       };
 

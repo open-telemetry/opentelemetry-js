@@ -268,15 +268,17 @@ function setMeterProvider(
   meterProvider: ConfigMeterProvider
 ): void {
   if (meterProvider) {
-    const exemplarFilter = getStringFromConfigFile(meterProvider['exemplar_filter']);
-  if (
-    exemplarFilter &&
-    (exemplarFilter === 'trace_based' ||
-      exemplarFilter === 'always_on' ||
-      exemplarFilter === 'always_off')
-  ) {
-    config.meter_provider.exemplar_filter = exemplarFilter;
-  }
+    const exemplarFilter = getStringFromConfigFile(
+      meterProvider['exemplar_filter']
+    );
+    if (
+      exemplarFilter &&
+      (exemplarFilter === 'trace_based' ||
+        exemplarFilter === 'always_on' ||
+        exemplarFilter === 'always_off')
+    ) {
+      config.meter_provider.exemplar_filter = exemplarFilter;
+    }
   }
 }
 
@@ -292,7 +294,7 @@ function setLoggerProvider(
       config.logger_provider.limits.attribute_value_length_limit =
         attributeValueLengthLimit;
     }
-    
+
     const attributeCountLimit = getNumberFromConfigFile(
       loggerProvider['limits']['attribute_count_limit']
     );
