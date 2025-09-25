@@ -164,10 +164,19 @@ const configFromFile: Configuration = {
   },
   attribute_limits: {
     attribute_count_limit: 128,
+    attribute_value_length_limit: 4096,
   },
   propagator: {
-    composite: ['tracecontext', 'baggage'],
-    composite_list: 'tracecontext,baggage',
+    composite: [
+      'tracecontext',
+      'baggage',
+      'b3',
+      'b3multi',
+      'jaeger',
+      'ottrace',
+      'xray',
+    ],
+    composite_list: 'tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray',
   },
   tracer_provider: {
     processors: [
@@ -188,6 +197,7 @@ const configFromFile: Configuration = {
     ],
     limits: {
       attribute_count_limit: 128,
+      attribute_value_length_limit: 4096,
       event_count_limit: 128,
       link_count_limit: 128,
       event_attribute_count_limit: 128,
@@ -241,6 +251,7 @@ const configFromFile: Configuration = {
     ],
     limits: {
       attribute_count_limit: 128,
+      attribute_value_length_limit: 4096,
     },
   },
 };
@@ -844,7 +855,7 @@ describe('ConfigProvider', function () {
         'metric-temporality';
       process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
         'metric-hist-agg';
-      process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'metric-exemplar-filter';
+      process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'always_off';
       process.env.OTEL_BLRP_SCHEDULE_DELAY = '23';
       process.env.OTEL_BLRP_EXPORT_TIMEOUT = '24';
       process.env.OTEL_BLRP_MAX_QUEUE_SIZE = '25';
@@ -861,7 +872,7 @@ describe('ConfigProvider', function () {
       process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '29';
       const configProvider = createConfigProvider();
       const expectedConfig: Configuration = {
-        ...defaultConfig,
+        ...defaultConfigFromFileWithEnvVariables,
         resource: {
           attributes_list: 'attributes',
           attributes: [
@@ -871,6 +882,36 @@ describe('ConfigProvider', function () {
               type: 'string',
             },
           ],
+        },
+        attribute_limits: {
+          attribute_count_limit: 7,
+          attribute_value_length_limit: 23,
+        },
+        propagator: {
+          composite: ['prop'],
+          composite_list: 'prop',
+        },
+        tracer_provider: {
+          ...defaultConfigFromFileWithEnvVariables.tracer_provider,
+          limits: {
+            attribute_value_length_limit: 14,
+            attribute_count_limit: 15,
+            event_count_limit: 16,
+            link_count_limit: 17,
+            event_attribute_count_limit: 18,
+            link_attribute_count_limit: 19,
+          },
+        },
+        meter_provider: {
+          ...defaultConfigFromFileWithEnvVariables.meter_provider,
+          exemplar_filter: 'always_off',
+        },
+        logger_provider: {
+          ...defaultConfigFromFileWithEnvVariables.logger_provider,
+          limits: {
+            attribute_value_length_limit: 28,
+            attribute_count_limit: 29,
+          },
         },
       };
 
