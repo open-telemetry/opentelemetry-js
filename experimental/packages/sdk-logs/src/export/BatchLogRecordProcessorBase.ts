@@ -147,10 +147,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   }
 
   private _maybeStartTimer() {
-    if (this._timer !== undefined) {
-      return;
-    }
-    this._timer = setTimeout(() => {
+    const flush = () => {
       this._flushOneBatch()
         .then(() => {
           if (this._finishedLogRecords.length > 0) {
@@ -161,7 +158,15 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
         .catch(e => {
           globalErrorHandler(e);
         });
-    }, this._scheduledDelayMillis);
+    };
+    // we only wait if the queue doesn't have enough elements yet
+    if (this._finishedLogRecords.length >= this._maxExportBatchSize) {
+      return flush();
+    }
+    if (this._timer !== undefined) {
+      return;
+    }
+    this._timer = setTimeout(() => flush(), this._scheduledDelayMillis);
     unrefTimer(this._timer);
   }
 
