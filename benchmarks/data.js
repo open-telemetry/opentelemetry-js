@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758643543606,
+  "lastUpdate": 1758807599476,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -39108,6 +39108,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.72%",
             "unit": "ops/sec",
             "extra": "91 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "tim@timfish.uk",
+            "name": "Tim Fish",
+            "username": "timfish"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "1c1dd011044bd5b134950e47fa339fc09b7016dd",
+          "message": "chore(deps): Update `require-in-the-middle` to v8.0.0 (#5959)",
+          "timestamp": "2025-09-25T13:14:09Z",
+          "tree_id": "22898a9b87fcc5efd23f14391f7fca4f93ac05cf",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/1c1dd011044bd5b134950e47fa339fc09b7016dd"
+        },
+        "date": 1758807598450,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 663431,
+            "range": "±0.77%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8577,
+            "range": "±0.73%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 284993,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 275826,
+            "range": "±0.62%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
