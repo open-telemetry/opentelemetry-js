@@ -25,8 +25,11 @@ import * as fs from 'fs';
 import * as yaml from 'yaml';
 import {
   getBooleanFromConfigFile,
+  getBooleanListFromConfigFile,
   getNumberFromConfigFile,
+  getNumberListFromConfigFile,
   getStringFromConfigFile,
+  getStringListFromConfigFile,
 } from './utils';
 
 export class FileConfigProvider implements ConfigProvider {
@@ -110,9 +113,33 @@ function setResourceAttributes(
     config.resource.attributes = [];
     for (let i = 0; i < attributes.length; i++) {
       const att = attributes[i];
+      let value = att['value'];
+      switch (att['type']) {
+        case 'bool':
+          value = getBooleanFromConfigFile(value);
+          break;
+        case 'bool_array':
+          value = getBooleanListFromConfigFile(value);
+          break;
+        case 'int':
+        case 'double':
+          value = getNumberFromConfigFile(value);
+          break;
+        case 'int_array':
+        case 'double_array':
+          value = getNumberListFromConfigFile(value);
+          break;
+        case 'string_array':
+          value = getStringListFromConfigFile(value);
+          break;
+        default:
+          value = getStringFromConfigFile(value);
+          break;
+      }
+
       config.resource.attributes.push({
         name: getStringFromConfigFile(att['name']) ?? '',
-        value: att['value'],
+        value: value,
         type: att['type'] ?? 'string',
       });
     }
