@@ -24,6 +24,16 @@ export interface Resource {
 
   /** Resource schemaUrl */
   schemaUrl?: string;
+
+  /** Resource entity references */
+  entityRefs?: EntityRef[];
+}
+
+export interface EntityRef {
+  schemaUrl?: string;
+  type: string;
+  idKeys: string[];
+  descriptionKeys: string[];
 }
 
 /** Properties of an InstrumentationScope. */
