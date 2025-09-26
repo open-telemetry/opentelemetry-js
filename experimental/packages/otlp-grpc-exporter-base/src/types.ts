@@ -28,4 +28,5 @@ export interface OTLPGRPCExporterConfigNode extends OTLPExporterConfigBase {
   credentials?: ChannelCredentials;
   metadata?: Metadata;
   compression?: CompressionAlgorithm;
+  userAgent?: string;
 }
