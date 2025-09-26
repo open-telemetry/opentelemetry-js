@@ -20,8 +20,6 @@ jobs:
     container:
       image: ubuntu:24.04
     timeout-minutes: 10
-    env:
-      NPM_CONFIG_UNSAFE_PERM: true
     steps:
       # Apt packages:
       # - git: Needed for 'npm run submodule'
@@ -36,7 +34,7 @@ jobs:
       # `npm run submodule`.
       - run: git config --global --add safe.directory $GITHUB_WORKSPACE
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           cache: 'npm'
           cache-dependency-path: |

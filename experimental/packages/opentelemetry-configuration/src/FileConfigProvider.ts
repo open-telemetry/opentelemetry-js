@@ -14,19 +14,30 @@
  * limitations under the License.
  */
 
-import { getStringFromEnv } from '@opentelemetry/core';
+import { diagLogLevelFromString, getStringFromEnv } from '@opentelemetry/core';
 import {
+  ConfigAttributes,
   ConfigurationModel,
   initializeDefaultConfiguration,
 } from './configModel';
 import { ConfigProvider } from './IConfigProvider';
 import * as fs from 'fs';
+import * as yaml from 'yaml';
+import {
+  getBooleanFromConfigFile,
+  getBooleanListFromConfigFile,
+  getNumberFromConfigFile,
+  getNumberListFromConfigFile,
+  getStringFromConfigFile,
+  getStringListFromConfigFile,
+} from './utils';
 
 export class FileConfigProvider implements ConfigProvider {
   private _config: ConfigurationModel;
 
   constructor() {
     this._config = initializeDefaultConfiguration();
+    parseConfigFile(this._config);
   }
 
   getInstrumentationConfig(): ConfigurationModel {
@@ -37,7 +48,10 @@ export class FileConfigProvider implements ConfigProvider {
 export function hasValidConfigFile(): boolean {
   const configFile = getStringFromEnv('OTEL_EXPERIMENTAL_CONFIG_FILE');
   if (configFile) {
-    if (!configFile.endsWith('.yaml') || !fs.existsSync(configFile)) {
+    if (
+      !(configFile.endsWith('.yaml') || configFile.endsWith('.yml')) ||
+      !fs.existsSync(configFile)
+    ) {
       throw new Error(
         `Config file ${configFile} set on OTEL_EXPERIMENTAL_CONFIG_FILE is not valid`
       );
@@ -45,4 +59,89 @@ export function hasValidConfigFile(): boolean {
     return true;
   }
   return false;
+}
+
+function parseConfigFile(config: ConfigurationModel) {
+  const supportedFileVersions = ['1.0-rc.1'];
+  const configFile = getStringFromEnv('OTEL_EXPERIMENTAL_CONFIG_FILE') || '';
+  const file = fs.readFileSync(configFile, 'utf8');
+  const parsedContent = yaml.parse(file);
+
+  if (
+    parsedContent['file_format'] &&
+    supportedFileVersions.includes(parsedContent['file_format'])
+  ) {
+    const disabled = getBooleanFromConfigFile(parsedContent['disabled']);
+    if (disabled || disabled === false) {
+      config.disabled = disabled;
+    }
+
+    const logLevel = getNumberFromConfigFile(
+      diagLogLevelFromString(parsedContent['log_level'])
+    );
+    if (logLevel) {
+      config.log_level = logLevel;
+    }
+
+    const attrList = getStringFromConfigFile(
+      parsedContent['resource']?.['attributes_list']
+    );
+    if (attrList) {
+      config.resource.attributes_list = attrList;
+    }
+
+    const schemaUrl = getStringFromConfigFile(
+      parsedContent['resource']?.['schema_url']
+    );
+    if (schemaUrl) {
+      config.resource.schema_url = schemaUrl;
+    }
+
+    setResourceAttributes(config, parsedContent['resource']?.['attributes']);
+  } else {
+    throw new Error(
+      `Unsupported File Format: ${parsedContent['file_format']}. It must be one of the following: ${supportedFileVersions}`
+    );
+  }
+}
+
+function setResourceAttributes(
+  config: ConfigurationModel,
+  attributes: ConfigAttributes[]
+) {
+  if (attributes) {
+    config.resource.attributes = [];
+    for (let i = 0; i < attributes.length; i++) {
+      const att = attributes[i];
+      let value = att['value'];
+      switch (att['type']) {
+        case 'bool':
+          value = getBooleanFromConfigFile(value);
+          break;
+        case 'bool_array':
+          value = getBooleanListFromConfigFile(value);
+          break;
+        case 'int':
+        case 'double':
+          value = getNumberFromConfigFile(value);
+          break;
+        case 'int_array':
+        case 'double_array':
+          value = getNumberListFromConfigFile(value);
+          break;
+        case 'string_array':
+          value = getStringListFromConfigFile(value);
+          break;
+        default:
+          value = getStringFromConfigFile(value);
+          break;
+      }
+
+      config.resource.attributes.push({
+        name: getStringFromConfigFile(att['name']) ?? '',
+        value: value,
+        type: att['type'] ?? 'string',
+      });
+    }
+  }
 }

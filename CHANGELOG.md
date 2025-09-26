@@ -10,9 +10,17 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ## Unreleased
 
-* feat(instrumentation-http): Added support for redacting specific url query string values and url credentials in instrumentations [#5743](https://github.com/open-telemetry/opentelemetry-js/pull/5743) @rads-1996
-
 ### :boom: Breaking Changes
+
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 2.1.0
 
 ### :rocket: Features
 
@@ -21,8 +29,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :bug: Bug Fixes
 
 * fix(sdk-metrics): Remove invalid default value for `startTime` param to ExponentialHistogramAccumulation. This only impacted the closurescript compiler. [#5763](https://github.com/open-telemetry/opentelemetry-js/pull/5763) @trentm
-
-### :books: Documentation
 
 ### :house: Internal
 
@@ -171,10 +177,10 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(core)!: drop `getEnv()`, `getEnvWithoutDefaults()` [#5481](https://github.com/open-telemetry/opentelemetry-js/pull/5481) @pichlermarc
   * (user-facing): `getEnv()` has been replaced by `getStringFromEnv()`, `getNumberFromEnv()`, `getBooleanFromEnv()`, `getStringListFromEnv()`
     * these new functions do not include defaults, please inline any defaults if necessary (example: `getStringFromEnv("OTEL_FOO") ?? "my-default"`)
-    * to find the previously used defaults, please see [here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239)
+    * see [the previously used defaults here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239)
   * (user-facing): `getEnvWithoutDefaults()` has been replaced by `getStringFromEnv()`, `getNumberFromEnv()`, `getBooleanFromEnv()`, `getStringListFromEnv()`
   * (user-facing): `DEFAULT_ENVIRONMENT` has been removed, please inline any defaults from now on
-    * to find the previously used defaults, please see [here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239)
+    * see [the previously used defaults here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239)
   * (user-facing): `ENVIRONMENT` has been removed without replacement
   * (user-facing): `RAW_ENVIRONMENT` has been removed without replacement
   * (user-facing): `parseEnvironment` has been removed without replacement
