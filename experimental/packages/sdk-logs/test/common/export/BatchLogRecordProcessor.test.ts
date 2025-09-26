@@ -213,8 +213,8 @@ describe('BatchLogRecordProcessorBase', () => {
       }
 
       // Allow async operations to complete
-      await new Promise(resolve => setImmediate(resolve));
-      
+      await new Promise(resolve => setTimeout(resolve, 0));
+
       // Verify export happened without waiting for the timer
       sinon.assert.calledOnce(exportSpy);
       assert.strictEqual(
@@ -244,10 +244,7 @@ describe('BatchLogRecordProcessorBase', () => {
 
       // Should have called export twice (once per filled batch)
       sinon.assert.calledTwice(exportSpy);
-      assert.strictEqual(
-        exporter.getFinishedLogRecords().length,
-        totalLogs
-      );
+      assert.strictEqual(exporter.getFinishedLogRecords().length, totalLogs);
 
       await processor.shutdown();
     });
@@ -266,7 +263,7 @@ describe('BatchLogRecordProcessorBase', () => {
       }
 
       // Allow immediate export to complete
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise(resolve => setTimeout(resolve, 0));
 
       // Verify first batch was exported immediately
       sinon.assert.calledOnce(exportSpy);
@@ -300,7 +297,9 @@ describe('BatchLogRecordProcessorBase', () => {
         defaultBufferConfig
       );
       // Add only a partial batch (less than maxExportBatchSize)
-      const partialBatchSize = Math.floor(defaultBufferConfig.maxExportBatchSize / 2);
+      const partialBatchSize = Math.floor(
+        defaultBufferConfig.maxExportBatchSize / 2
+      );
       for (let i = 0; i < partialBatchSize; i++) {
         const logRecord = createLogRecord();
         processor.onEmit(logRecord);
@@ -398,28 +397,31 @@ describe('BatchLogRecordProcessorBase', () => {
       // Use a large batch size to prevent automatic exports during this test
       const maxQueueSize = 6;
       const maxExportBatchSize = 20; // Will be clamped to maxQueueSize (6) by constructor
-      const processor = new BatchLogRecordProcessor(exporter, { maxQueueSize, maxExportBatchSize });
-      
+      const processor = new BatchLogRecordProcessor(exporter, {
+        maxQueueSize,
+        maxExportBatchSize,
+      });
+
       // Verify that maxExportBatchSize was adjusted to maxQueueSize
       assert.strictEqual(processor['_maxExportBatchSize'], maxQueueSize);
-      
+
       // Disable the processor temporarily to prevent exports during testing
       const originalMaybeStartTimer = processor['_maybeStartTimer'];
       processor['_maybeStartTimer'] = () => {}; // Do nothing
-      
+
       const logRecord = createLogRecord();
-      
+
       // Add more logs than the queue can hold
       for (let i = 0; i < maxQueueSize + 5; i++) {
         processor.onEmit(logRecord);
       }
-      
+
       // Should only have maxQueueSize logs in the buffer, others should be dropped
       assert.strictEqual(processor['_finishedLogRecords'].length, maxQueueSize);
-      
+
       // Restore original method
       processor['_maybeStartTimer'] = originalMaybeStartTimer;
-      
+
       processor.shutdown();
     });
   });
@@ -431,7 +433,9 @@ describe('BatchLogRecordProcessorBase', () => {
         defaultBufferConfig
       );
       // Add partial batch (less than maxExportBatchSize) so it doesn't export automatically
-      const partialBatchSize = Math.floor(defaultBufferConfig.maxExportBatchSize / 2);
+      const partialBatchSize = Math.floor(
+        defaultBufferConfig.maxExportBatchSize / 2
+      );
       for (let i = 0; i < partialBatchSize; i++) {
         const logRecord = createLogRecord();
         processor.onEmit(logRecord);
