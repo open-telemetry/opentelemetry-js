@@ -27,7 +27,6 @@
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "version": "node ../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "lerna run version --scope @opentelemetry/semantic-conventions --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../scripts/peer-api-check.js",
     "size-check": "npm run compile && mocha 'test/**/*.test.ts'",

@@ -15,7 +15,6 @@
     "test": "nyc mocha 'test/**/*.test.ts'",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc -w",
-    "precompile": "lerna run version --scope @opentelemetry/otlp-grpc-exporter-base --include-dependencies",
     "prewatch": "npm run precompile",
     "align-api-deps": "node ../../../scripts/align-api-deps.js",
     "maint:regenerate-test-certs": "cd test/certs && ./regenerate.sh"

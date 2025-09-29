@@ -13,7 +13,7 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "precompile": "lerna run version --scope @opentelemetry/otlp-transformer --include-dependencies",
+    "precompile": "npm run protos",
     "compile": "npm run protos && tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "protos": "npm run submodule && npm run protos:generate",

@@ -39,7 +39,6 @@
     "test:browser": "karma start --single-run",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "lerna run version --scope @opentelemetry/otlp-exporter-base --include-dependencies",
     "prewatch": "npm run precompile",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },

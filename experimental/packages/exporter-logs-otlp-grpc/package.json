@@ -15,7 +15,6 @@
     "test": "nyc mocha 'test/**/*.test.ts'",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --watch --build",
-    "precompile": "lerna run version --scope @opentelemetry/exporter-logs-otlp-grpc --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"

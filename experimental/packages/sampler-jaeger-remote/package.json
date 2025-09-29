@@ -15,7 +15,6 @@
     "test": "nyc mocha 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc -w",
-    "precompile": "lerna run version --scope @opentelemetry/sampler-jaeger-remote --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
