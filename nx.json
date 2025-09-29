@@ -1,0 +1,48 @@
+{
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "cacheableOperations": [
+          "compile",
+          "lint",
+          "version"
+        ]
+      }
+    }
+  },
+  "targetDefaults": {
+    "compile": {
+      "dependsOn": [
+        "version",
+        "^compile"
+      ],
+      "inputs": [
+        "{projectRoot}/src/**/*.ts",
+        "{projectRoot}/test/**/*.ts"
+      ],
+      "outputs": [
+        "{projectRoot}/build"
+      ]
+    },
+    "watch": {
+      "dependsOn": [
+        "compile"
+      ]
+    },
+    "lint": {
+      "inputs": [
+        "{projectRoot}/src/**/*.ts",
+        "{projectRoot}/test/**/*.ts"
+      ]
+    },
+    "version:update": {
+      "inputs": [
+        "{projectRoot}/package.json"
+      ],
+      "outputs": [
+        "{projectRoot}/src/version.ts"
+      ]
+    }
+  }
+}
