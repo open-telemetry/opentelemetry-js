@@ -23,5 +23,4 @@ jobs:
         run: npm ci --ignore-scripts
 
       - name: Check API dependency semantics
-        working-directory: packages
-        run: nx run-many -t peer-api-check
+        run: npx nx run-many -t peer-api-check
