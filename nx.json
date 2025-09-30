@@ -19,7 +19,8 @@
       ],
       "inputs": [
         "{projectRoot}/src/**/*.ts",
-        "{projectRoot}/test/**/*.ts"
+        "{projectRoot}/test/**/*.ts",
+        "{projectRoot}/**/*.proto"
       ],
       "outputs": [
         "{projectRoot}/build"
