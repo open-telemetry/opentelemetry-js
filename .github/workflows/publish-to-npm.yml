@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: 24
           registry-url: 'https://registry.npmjs.org'
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       # NOTE: in the past, we've had situations where the compiled files were missing as the `prepublishOnly` script was
       # missing in some packages. `npx lerna publish` *should* also run compile, but this is intended as a safeguard
       # when that does not happen for whatever reason.
