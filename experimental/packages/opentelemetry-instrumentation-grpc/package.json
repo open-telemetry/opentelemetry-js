@@ -7,7 +7,8 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "npm run protos:generate && tsc --build",
+    "precompile": "npm run protos:generate",
+    "compile": "tsc --build",
     "clean": "tsc --build --clean",
     "test": "npm run protos:generate && nyc mocha test/**/*.test.ts",
     "tdd": "npm run test -- --watch-extensions ts --watch",
