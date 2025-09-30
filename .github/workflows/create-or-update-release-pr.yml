@@ -53,5 +53,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.otelbot-token.outputs.token }}
           RELEASE_SCOPE: ${{ github.event.inputs.release_scope }}
-          RELEASE_BUMP: ${{ github.event.inputs.release_type }}
+          RELEASE_TYPE: ${{ github.event.inputs.release_type }}
           RELEASE_PR_REMOTE: origin

@@ -1,11 +1,24 @@
+/**
+ * This bumps all package versions based on the environment variable RELEASE_TYPE (allowed values 'minor' and 'patch'),
+ * then aligns all packages in the workspace to depend on that version IFF the dependency version is pinned. Packages
+ * like `@opentelemetry/semantic-conventions` which are unpinned on purpose will not be bumped.
+ *
+ * All packages versions are bumped in unison to satisfy this specification requirement:
+ * https://github.com/open-telemetry/opentelemetry-specification/blob/v1.49.0/specification/versioning-and-stability.md?plain=1#L353-L355
+ *
+ * Usage (from package directory):
+ * - RELEASE_TYPE=minor node <repo-root>/scripts/bump-versions.js # bumps minor version in all packages
+ * - RELEASE_TYPE=patch node <repo-root>/scripts/bump-versions.js # bumps patch version in all packages
+ */
+
 import * as fs from 'fs';
 import * as path from 'path';
 import * as glob from 'glob';
 
-const RELEASE_BUMP = process.env.RELEASE_BUMP;
+const RELEASE_TYPE = process.env.RELEASE_TYPE;
 
-if (!['minor', 'patch'].includes(RELEASE_BUMP)) {
-  console.error('RELEASE_BUMP must be either "minor" or "patch"');
+if (!['minor', 'patch'].includes(RELEASE_TYPE)) {
+  console.error('RELEASE_TYPE must be either "minor" or "patch"');
   process.exit(1);
 }
 
@@ -58,11 +71,11 @@ packagePaths.forEach(pkgPath => {
   const pkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
 
   const oldVersion = pkgJson.version;
-  const newVersion = bumpVersion(oldVersion, RELEASE_BUMP);
+  const newVersion = bumpVersion(oldVersion, RELEASE_TYPE);
   pkgJson.version = newVersion;
   updatedVersions[pkgJson.name] = newVersion;
 
-  fs.writeFileSync(pkgJsonPath, JSON.stringify(pkgJson, null, 2));
+  fs.writeFileSync(pkgJsonPath, JSON.stringify(pkgJson, null, 2) + '\n');
   console.info(`Bumped ${pkgJson.name} from ${oldVersion} to ${newVersion}`);
 });
 
@@ -73,6 +86,6 @@ packagePaths.forEach(pkgPath => {
 
   updatePinnedDependencies(pkgJson, updatedVersions);
 
-  fs.writeFileSync(pkgJsonPath, JSON.stringify(pkgJson, null, 2));
+  fs.writeFileSync(pkgJsonPath, JSON.stringify(pkgJson, null, 2) + '\n');
   console.info(`Updated dependencies for ${pkgJson.name}`);
 });
