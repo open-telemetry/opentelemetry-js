@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1759219647567,
+  "lastUpdate": 1759306271944,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -39212,6 +39212,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.56%",
             "unit": "ops/sec",
             "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "2b99d1aa736558890273fab59faab6b5ded772dc",
+          "message": "ci(publish-to-npm): align publish workflow with contrib repo (#5970)",
+          "timestamp": "2025-10-01T08:01:59Z",
+          "tree_id": "fccead8e3d4f1b851f7454edc932482962df12c8",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/2b99d1aa736558890273fab59faab6b5ded772dc"
+        },
+        "date": 1759306270850,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 652453,
+            "range": "±0.98%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8092,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 295603,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 282149,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
           }
         ]
       }
