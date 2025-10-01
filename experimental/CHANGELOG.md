@@ -27,6 +27,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :house: Internal
 
 * refactor(otlp-exporter-base): use get*FromEnv() for otlp exporter config. [#5583](https://github.com/open-telemetry/opentelemetry-js/issues/5583) @weyert
+* refactor(otlp-transformer): generate and export esm protos [#5925](https://github.com/open-telemetry/opentelemetry-js/pull/5925) @overbalance
 
 ## 0.205.0
 
