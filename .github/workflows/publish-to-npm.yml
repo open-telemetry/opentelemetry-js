@@ -7,48 +7,24 @@ permissions:
   contents: read
 
 jobs:
-  setup-and-compile:
+  npm-publish:
+    permissions:
+      contents: read
+      id-token: write # needed for OIDC and provenance
     runs-on: ubuntu-latest
+    environment: npm-publish-environment
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          fetch-depth: 0
-      - name: Setup Node
-        uses: actions/setup-node@v5
-        with:
+          # Require npm 11.5.1 or later for https://docs.npmjs.com/trusted-publishers.
           node-version: 24
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci --ignore-scripts
-      # NOTE: in the past, we've had situations where the compiled files were missing as the `prepublishOnly` script was
-      # missing in some packages. `npx lerna publish` *should* also run compile, but this is intended as a safeguard
-      # when that does not happen for whatever reason.
       - run: npm run compile
-      - name: Upload contents for publish
-        uses: actions/upload-artifact@v4
-        with:
-          name: publish-cache-${{ github.run_number }}
-          path: .
-          include-hidden-files: true
-          if-no-files-found: error
-          retention-days: 10
-  npm-publish:
-    needs: setup-and-compile
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write # to generate npm OIDC and provenance statements
-    environment: npm-publish-environment
-    steps:
-      - name: Setup Node
-        uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          registry-url: 'https://registry.npmjs.org'
-      - name: Download contents for publish
-        uses: actions/download-artifact@v5
-        with:
-          name: publish-cache-${{ github.run_number }}
+      # Release Please has already incremented versions and published tags, so we just
+      # need to publish all unpublished versions to npm here
+      # See: https://github.com/lerna/lerna/tree/main/libs/commands/publish#bump-from-package
       - name: Publish to npm
         env:
           NPM_CONFIG_PROVENANCE: true
@@ -58,4 +34,4 @@ jobs:
         # (packages are in-fact published in the correct order), but the race on the registry still applies.
         # If this happens, run the workflow again - there should be enough time for everything to settle until this workflow
         # attempts to publish again.
-        run: npx lerna publish --concurrency 1 from-package --no-push --no-private --no-git-tag-version --no-verify-access --dist-tag=latest --yes
+        run: npx lerna publish --concurrency 1 from-package --no-push --no-private --no-git-tag-version --dist-tag=latest --yes
