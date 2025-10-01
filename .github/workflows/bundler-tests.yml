@@ -22,7 +22,7 @@ jobs:
           node-version: 24
       - run: npm install -g npm@latest
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
       - name: Build TypeScript packages
         run: npm run compile
       - name: Run bundler tests
