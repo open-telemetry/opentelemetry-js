@@ -24,7 +24,6 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "lerna run version --scope @opentelemetry/api-logs --include-dependencies",
     "prewatch": "node ../../../scripts/version-update.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },
@@ -73,7 +72,6 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "5.0.1",
-    "lerna": "6.6.2",
     "mocha": "11.7.2",
     "nyc": "17.1.0",
     "ts-loader": "9.5.4",
