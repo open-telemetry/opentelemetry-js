@@ -17,6 +17,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :bug: Bug Fixes
 
 * fix(sdk-logs): Fix the `batchLogProcessor` exporting only upon `_scheduledDelayMillis` and ignoring `maxExportBatchSize` [#5961](https://github.com/open-telemetry/opentelemetry-js/pull/5961) @jacksonweber
+* test(shim-opentracing): add comparison thresholds in flaky assertions [#5974](https://github.com/open-telemetry/opentelemetry-js/pull/5974) @cjihrig
 
 ### :books: Documentation
 

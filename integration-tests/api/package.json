@@ -20,8 +20,6 @@
     "node": "^18.19.0 || >=20.6.0"
   },
   "scripts": {
-    "compile": "lerna run version --scope @opentelemetry/integration-tests-api --include-dependencies",
-    "pretest": "npm run compile",
     "test": "nyc mocha test/**/*.test.js",
     "lint": "eslint . --ext .js",
     "lint:fix": "eslint . --ext .js --fix"
@@ -31,7 +29,6 @@
     "@opentelemetry/core": "2.1.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.6.5",
-    "lerna": "6.6.2",
     "mocha": "11.7.2",
     "nyc": "17.1.0"
   }
