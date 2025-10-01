@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1759323380680,
+  "lastUpdate": 1759330991376,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -39420,6 +39420,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.71%",
             "unit": "ops/sec",
             "extra": "91 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "875cbcac06c349e2f1b62501af1243792b183d09",
+          "message": "chore: prefer nx over lerna where possible (#5965)\n\nCo-authored-by: David Luna <david.luna@elastic.co>",
+          "timestamp": "2025-10-01T14:54:11Z",
+          "tree_id": "00750efe2112af137da8fe37a4146634aa4cdc94",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/875cbcac06c349e2f1b62501af1243792b183d09"
+        },
+        "date": 1759330990312,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 682569,
+            "range": "±0.82%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8566,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 288377,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 282458,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
