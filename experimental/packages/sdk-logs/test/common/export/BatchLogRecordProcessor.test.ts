@@ -17,6 +17,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
+  ExportResult,
   ExportResultCode,
   loggingErrorHandler,
   setGlobalErrorHandler,
@@ -27,6 +28,7 @@ import {
   LogRecordLimits,
   SdkLogRecord,
   InMemoryLogRecordExporter,
+  LogRecordExporter,
 } from '../../../src';
 import { BatchLogRecordProcessorBase } from '../../../src/export/BatchLogRecordProcessorBase';
 import { reconfigureLimits } from '../../../src/config';
@@ -498,6 +500,46 @@ describe('BatchLogRecordProcessorBase', () => {
       await processor.shutdown();
       assert.strictEqual(exporter.getFinishedLogRecords().length, 0);
       assert.strictEqual(exportedLogRecords, 1);
+    });
+  });
+
+  describe('Concurrency', () => {
+    it('should only send a single batch at a time', async () => {
+      const callbacks: ((result: ExportResult) => void)[] = [];
+      const logRecords: SdkLogRecord[] = [];
+      const exporter: LogRecordExporter = {
+        export: async (
+          exportedLogRecords: SdkLogRecord[],
+          resultCallback: (result: ExportResult) => void
+        ) => {
+          callbacks.push(resultCallback);
+          logRecords.push(...exportedLogRecords);
+        },
+        shutdown: async () => {},
+      };
+      const processor = new BatchLogRecordProcessor(exporter, {
+        maxExportBatchSize: 5,
+        maxQueueSize: 6,
+      });
+      const totalLogRecords = 50;
+      for (let i = 0; i < totalLogRecords; i++) {
+        const logRecord = createLogRecord();
+        processor.onEmit(logRecord);
+      }
+      assert.equal(callbacks.length, 1);
+      assert.equal(logRecords.length, 5);
+      callbacks[0]({ code: ExportResultCode.SUCCESS });
+      await new Promise(resolve => setTimeout(resolve, 0));
+      // After the first batch completes we will have dropped a number
+      // of log records and the next batch will be smaller
+      assert.equal(callbacks.length, 2);
+      assert.equal(logRecords.length, 10);
+      callbacks[1]({ code: ExportResultCode.SUCCESS });
+
+      // We expect that all the other log records have been dropped
+      await new Promise(resolve => setTimeout(resolve, 0));
+      assert.equal(callbacks.length, 2);
+      assert.equal(logRecords.length, 10);
     });
   });
 });
