@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1759306271944,
+  "lastUpdate": 1759306402153,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -39264,6 +39264,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.58%",
             "unit": "ops/sec",
             "extra": "89 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "977c8a4e70d7ba78376bd11544bfbb34d8d3c2e8",
+          "message": "ci(move-to-emeritus): check out using otelbot-js token (#5973)",
+          "timestamp": "2025-10-01T08:02:16Z",
+          "tree_id": "2cf18f5e9afe2376c3bdd5f0d3086535ee9cb081",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/977c8a4e70d7ba78376bd11544bfbb34d8d3c2e8"
+        },
+        "date": 1759306401100,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 682431,
+            "range": "±1.42%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8541,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 289839,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 277565,
+            "range": "±0.97%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
