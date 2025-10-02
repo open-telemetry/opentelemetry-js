@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD029 -->
+
 # Migrating to stable HTTP and database semantic conventions
 
 This document describes how users of **OTel JS** instrumentations can migrate to stable **HTTP** and **database**-related semantic conventions (semconv).
