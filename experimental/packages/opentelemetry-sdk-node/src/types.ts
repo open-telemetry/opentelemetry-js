@@ -31,7 +31,7 @@ import {
 export interface NodeSDKConfiguration {
   autoDetectResources: boolean;
   contextManager: ContextManager;
-  textMapPropagator: TextMapPropagator;
+  textMapPropagator: TextMapPropagator | null;
   /** @deprecated use logRecordProcessors instead*/
   logRecordProcessor: LogRecordProcessor;
   logRecordProcessors?: LogRecordProcessor[];
