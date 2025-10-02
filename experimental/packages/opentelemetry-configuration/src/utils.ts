@@ -16,6 +16,7 @@
 import { diag } from '@opentelemetry/api';
 import { getStringFromEnv } from '@opentelemetry/core';
 import { inspect } from 'util';
+import { ConfigPropagator } from './configModel';
 
 /**
  * Retrieves a boolean value from a configuration file parameter.
@@ -169,7 +170,7 @@ export function getStringListFromConfigFile(
  * @returns {string[] | undefined} - The list of strings or `undefined`.
  */
 export function getListFromObjectsFromConfigFile(
-  value: object[]
+  value: object[] | undefined
 ): string[] | undefined {
   if (value) {
     const list: string[] = [];
@@ -200,4 +201,33 @@ export function envVariableSubstitution(value: unknown): string | undefined {
     return stringValue;
   }
   return String(value);
+}
+
+export function isPropagator(
+  propagator: unknown
+): propagator is Partial<ConfigPropagator> {
+  if (propagator == null) {
+    return false;
+  }
+  if (typeof propagator === 'object') {
+    if ('composite' in propagator) {
+      if (Array.isArray(propagator.composite)) {
+        for (let i = 0; i < propagator.composite.length; i++) {
+          const element = propagator.composite[i];
+          if (typeof element !== 'object') {
+            return false;
+          }
+        }
+      } else {
+        return false;
+      }
+    }
+    if ('composite_list' in propagator) {
+      if (typeof propagator.composite_list !== 'string') {
+        return false;
+      }
+    }
+    return true;
+  }
+  return false;
 }

@@ -35,6 +35,7 @@ import {
   getNumberListFromConfigFile,
   getStringFromConfigFile,
   getStringListFromConfigFile,
+  isPropagator,
 } from './utils';
 
 export class FileConfigProvider implements ConfigProvider {
@@ -176,10 +177,11 @@ function setAttributeLimits(
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function setPropagator(config: ConfigurationModel, propagator: any): void {
-  if (propagator) {
-    let composite = getListFromObjectsFromConfigFile(propagator['composite']);
+function setPropagator(config: ConfigurationModel, propagator: unknown): void {
+  if (propagator && isPropagator(propagator)) {
+    let composite = getListFromObjectsFromConfigFile(
+      propagator['composite'] as unknown as object[]
+    );
     const compositeList = getStringListFromConfigFile(
       propagator['composite_list']
     );
