@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation",
-  "version": "0.205.0",
+  "version": "0.206.0",
   "description": "Base class for node which OpenTelemetry instrumentation modules extend",
   "author": "OpenTelemetry Authors",
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation",
@@ -70,7 +70,7 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/api-logs": "0.205.0",
+    "@opentelemetry/api-logs": "0.206.0",
     "import-in-the-middle": "^1.8.1",
     "require-in-the-middle": "^8.0.0"
   },
