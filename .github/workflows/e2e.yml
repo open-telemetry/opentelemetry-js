@@ -48,7 +48,7 @@ jobs:
           }}
 
       - name: Bootstrap
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Build 🔧
         run: npm run compile

@@ -25,7 +25,7 @@ jobs:
           node-version: 22
 
       - name: Install and Bootstrap 🔧
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Generate version.ts files
         run: npm run version:update
