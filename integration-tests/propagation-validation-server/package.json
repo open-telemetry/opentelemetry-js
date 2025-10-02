@@ -1,6 +1,6 @@
 {
   "name": "propagation-validation-server",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "server for w3c tests",
   "main": "validation_server.js",
   "private": true,

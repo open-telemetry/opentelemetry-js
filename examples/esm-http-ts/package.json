@@ -1,7 +1,7 @@
 {
   "name": "esm-http-ts",
   "private": true,
-  "version": "0.205.0",
+  "version": "0.206.0",
   "description": "Example of HTTP integration with OpenTelemetry using ESM and TypeScript",
   "main": "build/index.js",
   "type": "module",
@@ -32,9 +32,9 @@
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/",
   "dependencies": {
     "@opentelemetry/api": "1.9.0",
-    "@opentelemetry/exporter-trace-otlp-proto": "0.205.0",
-    "@opentelemetry/instrumentation": "0.205.0",
-    "@opentelemetry/instrumentation-http": "0.205.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "0.206.0",
+    "@opentelemetry/instrumentation": "0.206.0",
+    "@opentelemetry/instrumentation-http": "0.206.0",
     "@opentelemetry/resources": "2.1.0",
     "@opentelemetry/sdk-trace-base": "2.1.0",
     "@opentelemetry/sdk-trace-node": "2.1.0",
