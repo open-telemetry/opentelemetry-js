@@ -7,10 +7,9 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "precompile": "npm run protos:generate",
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
-    "test": "npm run protos:generate && nyc mocha test/**/*.test.ts",
+    "test": "nyc mocha test/**/*.test.ts",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
@@ -18,7 +17,7 @@
     "watch": "tsc --build --watch",
     "prewatch": "node ../../../scripts/version-update.js",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
-    "protos:generate": "cd test/fixtures && buf generate",
+    "re-generate-protos": "npx -y @bufbuild/buf@1.53.0 generate",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },
   "keywords": [
@@ -46,7 +45,6 @@
     "access": "public"
   },
   "devDependencies": {
-    "@bufbuild/buf": "1.53.0",
     "@grpc/grpc-js": "^1.7.1",
     "@grpc/proto-loader": "^0.7.10",
     "@opentelemetry/api": "1.9.0",

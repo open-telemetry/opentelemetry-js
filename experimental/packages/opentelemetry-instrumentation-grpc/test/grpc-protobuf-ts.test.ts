@@ -21,7 +21,7 @@ instrumentation.disable();
 
 import { GrpcTransport } from '@protobuf-ts/grpc-transport';
 import * as grpc from '@grpc/grpc-js';
-import { GrpcTesterClient } from './proto/ts/fixtures/grpc-test.client';
+import { GrpcTesterClient } from './generated/test/fixtures/grpc-test.client';
 import {
   InMemorySpanExporter,
   NodeTracerProvider,
