@@ -41,7 +41,7 @@ jobs:
             package-lock.json
           node-version: ${{ matrix.node_version }}
 
-      - run: npm install -g npm@latest
+      - run: npm install -g npm@11.6.0
 
       - name: Bootstrap
         run: npm ci --ignore-scripts
