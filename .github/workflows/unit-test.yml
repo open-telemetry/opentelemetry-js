@@ -90,7 +90,6 @@ jobs:
 
       - name: Build 🔧
         run: |
-          npm config set script-shell "C:\\Program Files\\git\\bin\\bash.exe"
           npm run compile
 
       - name: Unit tests
