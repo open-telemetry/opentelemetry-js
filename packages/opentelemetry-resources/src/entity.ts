@@ -13,19 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as sinon from 'sinon';
-import { processDetector } from '../../../src';
-import { describeBrowser } from '../../util';
-import { assertEmptyResource } from '../../util/resource-assertions';
-import { resourceFromDetectedResource } from '../../../src/resource-impl';
 
-describeBrowser('processDetector() on web browser', () => {
-  afterEach(() => {
-    sinon.restore();
-  });
+import { Attributes } from '@opentelemetry/api';
 
-  it('should return empty resource', async () => {
-    const resource = resourceFromDetectedResource(processDetector.detect());
-    assertEmptyResource(resource);
-  });
-});
+export interface Entity {
+  type: string;
+  identifier: Attributes;
+  attributes: Attributes;
+  schemaUrl?: string;
+  asyncAttributesPending: boolean;
+  waitForAsyncAttributes(): Promise<void>;
+}
