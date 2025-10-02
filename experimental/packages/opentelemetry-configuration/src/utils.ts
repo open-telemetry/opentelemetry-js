@@ -170,6 +170,9 @@ export function envVariableSubstitution(value: unknown): string | undefined {
       const replacement = getStringFromEnv(v[0]) || defaultValue;
       stringValue = stringValue.replace(match, replacement);
     }
+    if (String(stringValue).match(/\$\{[a-zA-Z0-9_:.-]*\}/g)) {
+      stringValue = envVariableSubstitution(stringValue) ?? '';
+    }
     return stringValue;
   }
   return String(value);
