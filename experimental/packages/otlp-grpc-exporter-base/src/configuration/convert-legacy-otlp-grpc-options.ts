@@ -52,6 +52,7 @@ export function convertLegacyOtlpGrpcOptions(
         userProvidedCredentials != null
           ? () => userProvidedCredentials
           : undefined,
+      userAgent: config.userAgent,
     },
     getOtlpGrpcConfigurationFromEnv(signalIdentifier),
     getOtlpGrpcDefaultConfiguration()

@@ -36,6 +36,7 @@ export function createOtlpGrpcExportDelegate<Internal, Response>(
       compression: options.compression,
       credentials: options.credentials,
       metadata: options.metadata,
+      userAgent: options.userAgent,
       grpcName,
       grpcPath,
     })

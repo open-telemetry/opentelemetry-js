@@ -23,9 +23,7 @@ import {
   convertLegacyHttpOptions,
   createOtlpHttpExportDelegate,
 } from '@opentelemetry/otlp-exporter-base/node-http';
-
 import { ReadableLogRecord, LogRecordExporter } from '@opentelemetry/sdk-logs';
-import { VERSION } from '../../version';
 
 /**
  * OTLP Log Protobuf Exporter for Node.js
@@ -38,7 +36,6 @@ export class OTLPLogExporter
     super(
       createOtlpHttpExportDelegate(
         convertLegacyHttpOptions(config, 'LOGS', 'v1/logs', {
-          'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
           'Content-Type': 'application/x-protobuf',
         }),
         ProtobufLogsSerializer
