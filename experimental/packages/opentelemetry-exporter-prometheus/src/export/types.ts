@@ -74,4 +74,10 @@ export interface ExporterConfig {
    * @default undefined (no resource attributes are applied)
    */
   withResourceConstantLabels?: RegExp;
+
+  /**
+   * If true, the target_info metric is not included in scraped metrics.
+   * @default false (target_info metric is included)
+   */
+  withoutTargetInfo?: boolean;
 }

@@ -173,17 +173,20 @@ export class PrometheusSerializer {
   private _appendTimestamp: boolean;
   private _additionalAttributes: Attributes | undefined;
   private _withResourceConstantLabels: RegExp | undefined;
+  private _withoutTargetInfo: boolean | undefined;
 
   constructor(
     prefix?: string,
     appendTimestamp = false,
-    withResourceConstantLabels?: RegExp
+    withResourceConstantLabels?: RegExp,
+    withoutTargetInfo?: boolean
   ) {
     if (prefix) {
       this._prefix = prefix + '_';
     }
     this._appendTimestamp = appendTimestamp;
     this._withResourceConstantLabels = withResourceConstantLabels;
+    this._withoutTargetInfo = !!withoutTargetInfo;
   }
 
   serialize(resourceMetrics: ResourceMetrics): string {
@@ -353,6 +356,10 @@ export class PrometheusSerializer {
   }
 
   protected _serializeResource(resource: Resource): string {
+    if (this._withoutTargetInfo === true) {
+      return '';
+    }
+
     const name = 'target_info';
     const help = `# HELP ${name} Target metadata`;
     const type = `# TYPE ${name} gauge`;

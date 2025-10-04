@@ -587,6 +587,14 @@ describe('PrometheusExporter', () => {
         '',
       ]);
     });
+
+    it('should omit target_info if withoutTargetInfo is true', async () => {
+      exporter = new PrometheusExporter({ withoutTargetInfo: true });
+      setup(exporter);
+      const body = await request('http://localhost:9464/metrics');
+
+      assert.deepStrictEqual(body.includes('target_info'), false);
+    });
   });
 });
 
