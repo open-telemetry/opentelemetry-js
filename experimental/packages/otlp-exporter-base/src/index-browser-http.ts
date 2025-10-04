@@ -17,6 +17,7 @@
 export {
   createOtlpXhrExportDelegate,
   createOtlpSendBeaconExportDelegate,
+  createOtlpFetchExportDelegate,
 } from './otlp-browser-http-export-delegate';
 
 export { convertLegacyBrowserHttpOptions } from './configuration/convert-legacy-browser-http-options';
