@@ -681,4 +681,100 @@ describe('Utility', () => {
       assert.strictEqual(port, '80');
     });
   });
+
+  describe('getRemoteClientAddress()', () => {
+    it('returns IP address from x-forwarded-for header', () => {
+      const request = {
+        headers: {
+          'x-forwarded-for': '127.0.0.1, <proxy1>, <proxy2>',
+        },
+      } as unknown as IncomingMessage;
+      assert.strictEqual(utils.getRemoteClientAddress(request), '127.0.0.1');
+    });
+
+    it('returns IP address from x-forwarded-for header array', () => {
+      const request = {
+        headers: {
+          'x-forwarded-for': ['127.0.0.1'],
+        },
+      } as unknown as IncomingMessage;
+      assert.strictEqual(utils.getRemoteClientAddress(request), '127.0.0.1');
+    });
+
+    it('returns IP address without port from x-forwarded-for header', () => {
+      const request = {
+        headers: {
+          'x-forwarded-for': '127.0.0.1:54321',
+        },
+      } as unknown as IncomingMessage;
+      assert.strictEqual(utils.getRemoteClientAddress(request), '127.0.0.1');
+    });
+
+    it('returns IP address without port from x-forwarded-for header array', () => {
+      const request = {
+        headers: {
+          'x-forwarded-for': ['127.0.0.1:54321'],
+        },
+      } as unknown as IncomingMessage;
+      assert.strictEqual(utils.getRemoteClientAddress(request), '127.0.0.1');
+    });
+
+    it('handles IPv6 addresses containing brackets in x-forwarded-for header', () => {
+      const request = {
+        headers: {
+          'x-forwarded-for': '[::1]',
+        },
+      } as unknown as IncomingMessage;
+      assert.strictEqual(utils.getRemoteClientAddress(request), '::1');
+    });
+
+    it('forwarded header takes precedence over x-forwarded-for', () => {
+      const request = {
+        headers: {
+          forwarded: 'for=192.0.2.60;proto=http;by=203.0.113.43',
+          'x-forwarded-for': '127.0.0.1',
+        },
+      } as unknown as IncomingMessage;
+      assert.strictEqual(utils.getRemoteClientAddress(request), '192.0.2.60');
+    });
+
+    it('handles forwarded header with chain of proxies', () => {
+      const request = {
+        headers: {
+          forwarded: 'for=192.0.2.43, for=198.51.100.17',
+        },
+      } as unknown as IncomingMessage;
+      assert.strictEqual(utils.getRemoteClientAddress(request), '192.0.2.43');
+    });
+
+    it('handles IPv6 addresses containing brackets in forwarded header', () => {
+      const request = {
+        headers: {
+          forwarded: 'for="[2001:db8:cafe::17]:4711"',
+        },
+      } as unknown as IncomingMessage;
+      assert.strictEqual(
+        utils.getRemoteClientAddress(request),
+        '2001:db8:cafe::17'
+      );
+    });
+
+    it('returns address from socket as fallback', () => {
+      const request = {
+        headers: {},
+        socket: {
+          remoteAddress: '192.168.0.1',
+        },
+      } as unknown as IncomingMessage;
+      assert.strictEqual(utils.getRemoteClientAddress(request), '192.168.0.1');
+    });
+
+    it('returns null if client address cannot be determined', () => {
+      const request = {
+        headers: {},
+        socket: {},
+      } as unknown as IncomingMessage;
+      assert.strictEqual(utils.getRemoteClientAddress(request), null);
+    });
+  });
 });
