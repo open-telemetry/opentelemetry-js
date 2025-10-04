@@ -42,7 +42,7 @@ jobs:
           matrix.node_version == '18' ||
           matrix.node_version == '20.6.0'
           }}
-      - run: npm install -g npm@latest
+      - run: npm install -g npm@11.6.0
         if: ${{
           matrix.node_version == '20' ||
           matrix.node_version == '22' ||
@@ -83,7 +83,7 @@ jobs:
             package-lock.json
           node-version: '22'
 
-      - run: npm install -g npm@latest
+      - run: npm install -g npm@11.6.0
 
       - name: Bootstrap
         run: npm ci --ignore-scripts
