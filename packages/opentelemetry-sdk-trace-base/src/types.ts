@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-import { ContextManager, TextMapPropagator } from '@opentelemetry/api';
+import { ContextManager, TextMapPropagator, Tracer } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import { IdGenerator } from './IdGenerator';
 import { Sampler } from './Sampler';
 import { SpanProcessor } from './SpanProcessor';
+import { InstrumentationScope } from '@opentelemetry/core';
 
 /**
  * TracerConfig provides an interface for configuring a Basic Tracer.
@@ -54,7 +55,19 @@ export interface TracerConfig {
    * List of SpanProcessor for the tracer
    */
   spanProcessors?: SpanProcessor[];
+
+  /**
+   * Factory function for creating a tracer instance
+   */
+  tracerFactory?: TracerFactory;
 }
+
+export type TracerFactory = (
+  instrumentationScope: InstrumentationScope,
+  config: TracerConfig,
+  resource: Resource,
+  spanProcessor: SpanProcessor
+) => Tracer;
 
 /**
  * Configuration options for registering the API with the SDK.
