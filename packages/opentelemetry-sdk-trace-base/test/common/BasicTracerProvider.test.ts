@@ -104,6 +104,38 @@ describe('BasicTracerProvider', () => {
       });
     });
 
+    describe('when "tracerFactory" option defined', () => {
+      it('should use custom tracer factory when provided', () => {
+        const customTracerFactory = sinon
+          .stub()
+          .returns(
+            new Tracer(
+              { name: 'test', version: '1.0.0' },
+              {},
+              defaultResource(),
+              new NoopSpanProcessor()
+            )
+          );
+
+        const tracerProvider = new BasicTracerProvider({
+          tracerFactory: customTracerFactory,
+        });
+
+        const tracer = tracerProvider.getTracer('test-tracer');
+
+        sinon.assert.calledOnce(customTracerFactory);
+
+        assert.ok(tracer instanceof Tracer);
+      });
+
+      it('should use default factory when tracerFactory is undefined', () => {
+        const tracerProvider = new BasicTracerProvider({});
+        const tracer = tracerProvider.getTracer('default-tracer');
+
+        assert.ok(tracer instanceof Tracer);
+      });
+    });
+
     describe('generalLimits', () => {
       describe('when not defined default values', () => {
         it('should have tracer with default values', () => {
