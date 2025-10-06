@@ -10,7 +10,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * feat(sdk-node)!: drop lazy-loading of jaeger exporter [#5989](https://github.com/open-telemetry/opentelemetry-js/pull/5989)
   * (user-facing): setting `OTEL_TRACE_EXPORTER=jaeger` not instantiate a Jaeger exporter anymore, please use `OTEL_TRACE_EXPORTER=otlp` instead.
-    * Jaeger now has [native support for OTLP](https://www.jaegertracing.io/docs/1.73/architecture/apis/#opentelemetry-protocol-stable) and [Jaeger's Thrift endpoints have been deprecated](https://www.jaegertracing.io/docs/1.73/architecture/apis/#thrift-over-http-stable)
+    * Jaeger now has [native API support for OTLP](https://www.jaegertracing.io/docs/1.73/architecture/apis/#opentelemetry-protocol-stable) and [Jaeger's Thrift API endpoints have been deprecated](https://www.jaegertracing.io/docs/1.73/architecture/apis/#thrift-over-http-stable)
 
 ### :rocket: Features
 
