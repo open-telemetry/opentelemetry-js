@@ -42,7 +42,7 @@
     "@types/node"
   ],
   "constraints": {
-    "npm": ">10.8.0"
+    "npm": "11.6.0"
   },
   "assignees": ["@dyladan", "@legendecas", "@pichlermarc", "@trentm"],
   "labels": ["dependencies"],
