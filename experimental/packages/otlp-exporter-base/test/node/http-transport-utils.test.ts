@@ -41,13 +41,13 @@ describe('sendWithHttp', function () {
     opts: any,
     cb: any
   ): http.ClientRequest => {
-    sendUserAgent = opts.headers['User-Agent'];
+    sentUserAgent = opts.headers['User-Agent'];
     return http.request(opts, cb).destroy();
   };
-  let sendUserAgent: string;
+  let sentUserAgent: string;
 
   beforeEach(() => {
-    sendUserAgent = '';
+    sentUserAgent = '';
   });
 
   it('sends a request setting the default user-agent header', function (done) {
@@ -68,7 +68,7 @@ describe('sendWithHttp', function () {
         if (firstCallback) {
           firstCallback = false;
           assert.strictEqual(
-            sendUserAgent,
+            sentUserAgent,
             `OTel-OTLP-Exporter-JavaScript/${VERSION}`
           );
           done();
@@ -97,7 +97,7 @@ describe('sendWithHttp', function () {
         if (firstCallback) {
           firstCallback = false;
           assert.strictEqual(
-            sendUserAgent,
+            sentUserAgent,
             `Transport-User-Agent/1.2.3 OTel-OTLP-Exporter-JavaScript/${VERSION}`
           );
           done();
