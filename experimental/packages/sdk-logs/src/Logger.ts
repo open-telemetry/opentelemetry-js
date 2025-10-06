@@ -15,8 +15,9 @@
  */
 
 import type * as logsAPI from '@opentelemetry/api-logs';
+import { SeverityNumber } from '@opentelemetry/api-logs';
 import type { InstrumentationScope } from '@opentelemetry/core';
-import { context } from '@opentelemetry/api';
+import { context, trace, TraceFlags, isSpanContextValid } from '@opentelemetry/api';
 
 import { LogRecordImpl } from './LogRecordImpl';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
@@ -28,7 +29,44 @@ export class Logger implements logsAPI.Logger {
   ) {}
 
   public emit(logRecord: logsAPI.LogRecord): void {
+    // Get logger configuration
+    const loggerConfig = this._sharedState.getLoggerConfig(
+      this.instrumentationScope
+    );
+
     const currentContext = logRecord.context || context.active();
+
+    // Apply minimum severity filtering
+    const recordSeverity =
+      logRecord.severityNumber ?? SeverityNumber.UNSPECIFIED;
+
+    // 1. Minimum severity: If the log record's SeverityNumber is specified
+    //    (i.e. not 0) and is less than the configured minimum_severity,
+    //    the log record MUST be dropped.
+    if (
+      recordSeverity !== SeverityNumber.UNSPECIFIED &&
+      recordSeverity < loggerConfig.minimumSeverity
+    ) {
+      // Log record is dropped due to minimum severity filter
+      return;
+    }
+
+    // 2. Trace-based: If trace_based is true, and if the log record has a
+    //    SpanId and the TraceFlags SAMPLED flag is unset, the log record MUST be dropped.
+    if (loggerConfig.traceBased) {
+      const spanContext = trace.getSpanContext(currentContext);
+      if (spanContext && isSpanContextValid(spanContext)) {
+        // Check if the trace is unsampled (SAMPLED flag is unset)
+        const isSampled = (spanContext.traceFlags & TraceFlags.SAMPLED) === TraceFlags.SAMPLED;
+        if (!isSampled) {
+          // Log record is dropped due to trace-based filter
+          return;
+        }
+      }
+      // If there's no valid span context, the log record is not associated with a trace
+      // and therefore bypasses trace-based filtering (as per spec)
+    }
+
     /**
      * If a Logger was obtained with include_trace_context=true,
      * the LogRecords it emits MUST automatically include the Trace Context from the active Context,
