@@ -11,9 +11,10 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :rocket: Features
 
 * feat(otlp-exporter-base, otlp-grpc-exporter-base): add an option to let an SDK distribution prepend their own user-agent string in HTTP & GRPC exporters [#5928](https://github.com/open-telemetry/opentelemetry-js/pull/5928) @david-luna
-  * Fixes a bug where GRPC exporter was not sending the user-agent header [#5687](https://github.com/open-telemetry/opentelemetry-js/issues/5867)
 
 ### :bug: Bug Fixes
+
+* fix(otlp-grpc-exporter-base): fix GRPC exporter not sending the user-agent header [#5687](https://github.com/open-telemetry/opentelemetry-js/issues/5867) @david-luna
 
 ### :books: Documentation
 
