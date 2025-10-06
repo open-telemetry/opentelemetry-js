@@ -13,6 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export function unrefTimer(timer: NodeJS.Timer): void {
-  timer.unref();
+
+/**
+ * @deprecated please copy this code to your implementation instead, this function will be removed in the next major version of this package.
+ * @param timer
+ */
+export function unrefTimer(timer: { unref(): unknown } | number): void {
+  if (typeof timer !== 'number') {
+    timer.unref();
+  }
 }
