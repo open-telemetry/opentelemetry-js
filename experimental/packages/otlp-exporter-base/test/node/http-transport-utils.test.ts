@@ -50,7 +50,7 @@ describe('sendWithHttp', function () {
     sendUserAgent = '';
   });
 
-  it('sends a request setting the defaul user-agent header', function (done) {
+  it('sends a request setting the default user-agent header', function (done) {
     let firstCallback = true;
     sendWithHttp(
       requestFn,
