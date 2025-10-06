@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1759423234602,
+  "lastUpdate": 1759739583886,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -39626,6 +39626,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 277597,
             "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "232415664+otelbot-js[bot]@users.noreply.github.com",
+            "name": "otelbot-js[bot]",
+            "username": "otelbot-js[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "bfede5741ce2744b2653cdbff633a6dec03f22f7",
+          "message": "chore: prepare next release (#5976)\n\nCo-authored-by: otelbot <197425009+otelbot@users.noreply.github.com>",
+          "timestamp": "2025-10-06T08:25:06Z",
+          "tree_id": "83eea5a34eefa8666b9a269fd4dfbf119acb0ad0",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/bfede5741ce2744b2653cdbff633a6dec03f22f7"
+        },
+        "date": 1759739582851,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 686132,
+            "range": "±1.37%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8832,
+            "range": "±0.72%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 292494,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 280629,
+            "range": "±0.58%",
             "unit": "ops/sec",
             "extra": "95 samples"
           }
