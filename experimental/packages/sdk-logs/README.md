@@ -87,6 +87,7 @@ const loggerProvider = new LoggerProvider({
 ```
 
 **Behavior:**
+
 - Logs with `severityNumber >= minimumSeverity` are exported
 - Logs with `severityNumber = UNSPECIFIED` (0) or undefined always bypass the filter
 - Default minimum severity is `UNSPECIFIED` (no filtering)
@@ -110,6 +111,7 @@ const loggerProvider = new LoggerProvider({
 ```
 
 **Behavior:**
+
 - Logs associated with **sampled traces** (TraceFlags.SAMPLED set) are exported
 - Logs associated with **unsampled traces** (TraceFlags.SAMPLED not set) are dropped
 - Logs **without trace context** bypass the filter and are exported
