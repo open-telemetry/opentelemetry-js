@@ -35,6 +35,8 @@ export interface LoggerConfig {
    * If not explicitly set, defaults to 0 (UNSPECIFIED).
    * Log records with a specified severity (i.e. not 0) that is less than this value will be dropped.
    * Log records with unspecified severity (0) bypass this filter.
+   *
+   * @experimental This feature is in development as per the OpenTelemetry specification.
    */
   minimumSeverity?: SeverityNumber;
 
@@ -43,6 +45,8 @@ export interface LoggerConfig {
    * associated with sampled traces.
    * If not explicitly set, defaults to false.
    * If true, log records associated with unsampled traces will be dropped.
+   *
+   * @experimental This feature is in development as per the OpenTelemetry specification.
    */
   traceBased?: boolean;
 }
@@ -57,6 +61,7 @@ export interface LoggerConfig {
  *
  * @param loggerScope - The InstrumentationScope of the Logger
  * @returns The computed LoggerConfig with all properties set
+ * @experimental This feature is in development as per the OpenTelemetry specification.
  */
 export type LoggerConfigurator = (
   loggerScope: InstrumentationScope
@@ -81,6 +86,8 @@ export interface LoggerProviderConfig {
   /**
    * A function that computes the LoggerConfig for a given logger.
    * This is called when a Logger is first created.
+   *
+   * @experimental This feature is in development as per the OpenTelemetry specification.
    */
   loggerConfigurator?: LoggerConfigurator;
 }

@@ -17,7 +17,12 @@
 import type * as logsAPI from '@opentelemetry/api-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import type { InstrumentationScope } from '@opentelemetry/core';
-import { context, trace, TraceFlags, isSpanContextValid } from '@opentelemetry/api';
+import {
+  context,
+  trace,
+  TraceFlags,
+  isSpanContextValid,
+} from '@opentelemetry/api';
 
 import { LogRecordImpl } from './LogRecordImpl';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
@@ -57,7 +62,8 @@ export class Logger implements logsAPI.Logger {
       const spanContext = trace.getSpanContext(currentContext);
       if (spanContext && isSpanContextValid(spanContext)) {
         // Check if the trace is unsampled (SAMPLED flag is unset)
-        const isSampled = (spanContext.traceFlags & TraceFlags.SAMPLED) === TraceFlags.SAMPLED;
+        const isSampled =
+          (spanContext.traceFlags & TraceFlags.SAMPLED) === TraceFlags.SAMPLED;
         if (!isSampled) {
           // Log record is dropped due to trace-based filter
           return;

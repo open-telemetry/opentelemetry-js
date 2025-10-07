@@ -68,6 +68,8 @@ export class LoggerProviderSharedState {
    * Get the LoggerConfig for a given instrumentation scope.
    * Uses the LoggerConfigurator function to compute the config on first access
    * and caches the result.
+   *
+   * @experimental This feature is in development as per the OpenTelemetry specification.
    */
   getLoggerConfig(
     instrumentationScope: InstrumentationScope

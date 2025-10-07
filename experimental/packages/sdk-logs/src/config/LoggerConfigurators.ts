@@ -40,6 +40,8 @@ export interface LoggerPattern {
   /**
    * The configuration to apply to matching loggers.
    * Partial config is allowed; unspecified properties will use defaults.
+   *
+   * @experimental This feature is in development as per the OpenTelemetry specification.
    */
   config: LoggerConfig;
 }
@@ -54,6 +56,7 @@ export interface LoggerPattern {
  *
  * @param patterns - Array of logger patterns with their configurations
  * @returns A LoggerConfigurator function that computes complete LoggerConfig
+ * @experimental This feature is in development as per the OpenTelemetry specification.
  *
  * @example
  * ```typescript
