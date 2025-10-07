@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-metrics-otlp-http",
-  "version": "0.205.0",
+  "version": "0.206.0",
   "description": "OpenTelemetry Collector Metrics Exporter allows user to send collected metrics to the OpenTelemetry Collector",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -76,7 +76,7 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "5.0.1",
-    "mocha": "11.7.2",
+    "mocha": "11.7.4",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
     "ts-loader": "9.5.4",
@@ -89,8 +89,8 @@
   },
   "dependencies": {
     "@opentelemetry/core": "2.1.0",
-    "@opentelemetry/otlp-exporter-base": "0.205.0",
-    "@opentelemetry/otlp-transformer": "0.205.0",
+    "@opentelemetry/otlp-exporter-base": "0.206.0",
+    "@opentelemetry/otlp-transformer": "0.206.0",
     "@opentelemetry/resources": "2.1.0",
     "@opentelemetry/sdk-metrics": "2.1.0"
   },

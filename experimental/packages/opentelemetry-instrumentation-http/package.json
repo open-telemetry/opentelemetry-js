@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation-http",
-  "version": "0.205.0",
+  "version": "0.206.0",
   "description": "OpenTelemetry instrumentation for `node:http` and `node:https` http client and server modules",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -58,7 +58,7 @@
     "@types/sinon": "17.0.4",
     "@types/superagent": "8.1.9",
     "axios": "1.12.2",
-    "mocha": "11.7.2",
+    "mocha": "11.7.4",
     "nock": "13.5.6",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
@@ -70,7 +70,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "2.1.0",
-    "@opentelemetry/instrumentation": "0.205.0",
+    "@opentelemetry/instrumentation": "0.206.0",
     "@opentelemetry/semantic-conventions": "^1.29.0",
     "forwarded-parse": "2.1.2"
   },

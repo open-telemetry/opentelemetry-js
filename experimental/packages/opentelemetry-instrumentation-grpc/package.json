@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation-grpc",
-  "version": "0.205.0",
+  "version": "0.206.0",
   "description": "OpenTelemetry instrumentation for `@grpc/grpc-js` rpc client and server for gRPC framework",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -60,7 +60,7 @@
     "@types/mocha": "10.0.10",
     "@types/node": "18.6.5",
     "@types/sinon": "17.0.4",
-    "mocha": "11.7.2",
+    "mocha": "11.7.4",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
     "typescript": "5.0.4"
@@ -69,7 +69,7 @@
     "@opentelemetry/api": "^1.3.0"
   },
   "dependencies": {
-    "@opentelemetry/instrumentation": "0.205.0",
+    "@opentelemetry/instrumentation": "0.206.0",
     "@opentelemetry/semantic-conventions": "^1.29.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-grpc",
