@@ -150,6 +150,7 @@ describe('config utils', function () {
     process.env.TEST1 = 't1';
     process.env.TEST2 = 't2';
     process.env.TEST_LONG_NAME = '100';
+    process.env.TEST_ENDPOINT = 'http://test.com:4318/v1/traces';
     assert.deepStrictEqual(envVariableSubstitution(null), undefined);
     assert.deepStrictEqual(envVariableSubstitution(' '), ' ');
     assert.deepStrictEqual(envVariableSubstitution('${TEST1}'), 't1');
@@ -163,10 +164,23 @@ describe('config utils', function () {
       envVariableSubstitution('${TEST3:-backup}'),
       'backup'
     );
+    assert.deepStrictEqual(
+      envVariableSubstitution(
+        '${TEST_ENDPOINT:-http://localhost:4318/v1/traces}'
+      ),
+      'http://test.com:4318/v1/traces'
+    );
+    assert.deepStrictEqual(
+      envVariableSubstitution(
+        '${TEST_NON_EXISTING:-http://localhost:4318/v1/traces}'
+      ),
+      'http://localhost:4318/v1/traces'
+    );
 
     delete process.env.TEST1;
     delete process.env.TEST2;
     delete process.env.TEST_LONG_NAME;
+    delete process.env.TEST_ENDPOINT;
   });
 
   it('should return correct values for isPropagator', function () {

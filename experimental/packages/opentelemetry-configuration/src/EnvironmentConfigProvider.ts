@@ -173,45 +173,45 @@ function setTracerProvider(config: ConfigurationModel): void {
     }
 
     const endpoint = getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_ENDPOINT');
-    if (endpoint) {
+    if (endpoint && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.endpoint = endpoint;
     }
 
     const certificateFile = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE'
     );
-    if (certificateFile) {
+    if (certificateFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.certificate_file = certificateFile;
     }
 
     const clientKeyFile = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY'
     );
-    if (clientKeyFile) {
+    if (clientKeyFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.client_key_file = clientKeyFile;
     }
 
     const clientCertificateFile = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE'
     );
-    if (clientCertificateFile) {
+    if (clientCertificateFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.client_certificate_file = clientCertificateFile;
     }
 
     const compression = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_TRACES_COMPRESSION'
     );
-    if (compression) {
+    if (compression && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.compression = compression;
     }
 
     const timeout = getNumberFromEnv('OTEL_EXPORTER_OTLP_TRACES_TIMEOUT');
-    if (timeout) {
+    if (timeout && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.timeout = timeout;
     }
 
     const headersList = getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_HEADERS');
-    if (headersList) {
+    if (headersList && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.headers_list = headersList;
     }
 
@@ -355,43 +355,43 @@ function setLoggerProvider(config: ConfigurationModel): void {
     }
 
     const endpoint = getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_ENDPOINT');
-    if (endpoint) {
+    if (endpoint && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.endpoint = endpoint;
     }
 
     const certificateFile = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE'
     );
-    if (certificateFile) {
+    if (certificateFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.certificate_file = certificateFile;
     }
 
     const clientKeyFile = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY'
     );
-    if (clientKeyFile) {
+    if (clientKeyFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.client_key_file = clientKeyFile;
     }
 
     const clientCertificateFile = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE'
     );
-    if (clientCertificateFile) {
+    if (clientCertificateFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.client_certificate_file = clientCertificateFile;
     }
 
     const compression = getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_COMPRESSION');
-    if (compression) {
+    if (compression && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.compression = compression;
     }
 
     const timeout = getNumberFromEnv('OTEL_EXPORTER_OTLP_LOGS_TIMEOUT');
-    if (timeout) {
+    if (timeout && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.timeout = timeout;
     }
 
     const headersList = getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_HEADERS');
-    if (headersList) {
+    if (headersList && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.headers_list = headersList;
     }
 
