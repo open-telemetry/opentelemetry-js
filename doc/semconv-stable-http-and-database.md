@@ -36,7 +36,7 @@ Some HTTP-related instrumentations are for use in the browser:
 - 2024-09-10 to 2025-09-19: All OTel JS instrumentations producing `http.*` were updated to support stable semconv and `OTEL_SEMCONV_STABILITY_OPT_IN`.
 - Ongoing: [OTel JS instrumentations producing **`net.*` semconv** are being updated](https://github.com/open-telemetry/opentelemetry-js/issues/5663) to support stable semconv and `OTEL_SEMCONV_STABILITY_OPT_IN`
 - Ongoing: [OTel JS instrumentations producing **`db.*` semconv** are being updated](https://github.com/open-telemetry/opentelemetry-js-contrib/issues/2953) to support stable semconv and `OTEL_SEMCONV_STABILITY_OPT_IN`
-- Projected 2025-06: As part of OTel JS SDK 3.0, instrumentations will emit *stable* HTTP and database semantic conventions by default, and drop support for old names.
+- Projected 2026-06: As part of OTel JS SDK 3.0, instrumentations will emit *stable* HTTP and database semantic conventions by default, and drop support for old names.
 
 ## Q&A
 
