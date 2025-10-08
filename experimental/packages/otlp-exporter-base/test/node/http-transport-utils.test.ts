@@ -46,7 +46,7 @@ describe('sendWithHttp', function () {
   };
   let sentUserAgent: string;
 
-  beforeEach(() => {
+  beforeEach(function () {
     sentUserAgent = '';
   });
 
