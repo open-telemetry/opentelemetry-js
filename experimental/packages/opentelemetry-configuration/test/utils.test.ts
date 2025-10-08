@@ -25,7 +25,6 @@ import {
   getNumberListFromConfigFile,
   getStringFromConfigFile,
   getStringListFromConfigFile,
-  isPropagator,
 } from '../src/utils';
 
 describe('config utils', function () {
@@ -167,21 +166,5 @@ describe('config utils', function () {
     delete process.env.TEST1;
     delete process.env.TEST2;
     delete process.env.TEST_LONG_NAME;
-  });
-
-  it('should return correct values for isPropagator', function () {
-    assert.strictEqual(isPropagator(null), false);
-    assert.strictEqual(isPropagator('value'), false);
-    assert.strictEqual(isPropagator({}), true);
-    assert.strictEqual(isPropagator({ composite: 'value' }), false);
-    assert.strictEqual(isPropagator({ composite_list: true }), false);
-    assert.strictEqual(isPropagator({ composite: ['v1', 'v2'] }), false);
-    assert.strictEqual(
-      isPropagator({
-        composite: [{ tracecontext: null }, { baggage: null }],
-        composite_list: 'tracecontext,baggage',
-      }),
-      true
-    );
   });
 });

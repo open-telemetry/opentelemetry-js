@@ -20,6 +20,7 @@ import {
   ConfigAttributes,
   ConfigLoggerProvider,
   ConfigMeterProvider,
+  ConfigPropagator,
   ConfigTracerProvider,
   ConfigurationModel,
   initializeDefaultConfiguration,
@@ -30,12 +31,10 @@ import * as yaml from 'yaml';
 import {
   getBooleanFromConfigFile,
   getBooleanListFromConfigFile,
-  getListFromObjectsFromConfigFile,
   getNumberFromConfigFile,
   getNumberListFromConfigFile,
   getStringFromConfigFile,
   getStringListFromConfigFile,
-  isPropagator,
 } from './utils';
 
 export class FileConfigProvider implements ConfigProvider {
@@ -177,28 +176,32 @@ function setAttributeLimits(
   }
 }
 
-function setPropagator(config: ConfigurationModel, propagator: unknown): void {
-  if (propagator && isPropagator(propagator)) {
-    let composite = getListFromObjectsFromConfigFile(
-      propagator['composite'] as unknown as object[]
-    );
+function setPropagator(
+  config: ConfigurationModel,
+  propagator: ConfigPropagator
+): void {
+  if (propagator) {
+    const auxList = [];
+    const composite = [];
+    for (let i = 0; i < propagator.composite.length; i++) {
+      const key = Object.keys(propagator.composite[i])[0];
+      auxList.push(key);
+      composite.push({ [key]: null });
+    }
     const compositeList = getStringListFromConfigFile(
       propagator['composite_list']
     );
-    if (composite === undefined) {
-      composite = [];
-    }
     if (compositeList) {
       for (let i = 0; i < compositeList.length; i++) {
-        if (!composite.includes(compositeList[i])) {
-          composite.push(compositeList[i]);
+        if (!auxList.includes(compositeList[i])) {
+          composite.push({ [compositeList[i]]: null });
         }
       }
     }
-
     if (composite.length > 0) {
       config.propagator.composite = composite;
     }
+
     const compositeListString = getStringFromConfigFile(
       propagator['composite_list']
     );
