@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1759936505182,
+  "lastUpdate": 1759936964191,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -40042,6 +40042,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 277677,
             "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marylia.gutierrez@grafana.com",
+            "name": "Marylia Gutierrez",
+            "username": "maryliag"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "77c48d23dda3bc464958e44c21510a8258170eb4",
+          "message": "feat(opentelemetry-configuration): parse more parameters from config file (#5955)",
+          "timestamp": "2025-10-08T15:14:12Z",
+          "tree_id": "c7ca6c0ef832e34a85bbc068d93e9b649dc48a1a",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/77c48d23dda3bc464958e44c21510a8258170eb4"
+        },
+        "date": 1759936963133,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 694394,
+            "range": "±1.05%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8351,
+            "range": "±0.61%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 296946,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 273413,
+            "range": "±0.61%",
             "unit": "ops/sec",
             "extra": "92 samples"
           }
