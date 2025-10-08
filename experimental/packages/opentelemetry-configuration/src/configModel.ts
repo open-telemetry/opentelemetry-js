@@ -703,4 +703,44 @@ export interface ConfigLoggerProvider {
    * Configure log record limits. See also attribute_limits.
    */
   limits: AttributeLimits;
+
+  /**
+   * Configure loggers.
+   * This type is in development and subject to breaking changes in minor versions.
+   */
+  'logger_configurator/development'?: LoggerConfigurator;
+}
+
+export interface LoggerConfigurator {
+  /**
+   * Configure the default logger config used there is no matching entry in .logger_configurator/development.loggers.
+   */
+  default_config?: DisabledConfig;
+
+  /**
+   * Configure loggers.
+   */
+  loggers?: LoggerMatcherAndConfig[];
+}
+
+export interface DisabledConfig {
+  /**
+   * Configure if the logger is enabled or not.
+   */
+  disabled: boolean;
+}
+
+export interface LoggerMatcherAndConfig {
+  /**
+   * Configure logger names to match, evaluated as follows:
+   *  * If the logger name exactly matches.
+   *  * If the logger name matches the wildcard pattern, where '?' matches any single character 
+   * and '*' matches any number of characters including none.
+   */
+  name: string;
+
+  /**
+   * The logger config.
+   */
+  config: DisabledConfig;
 }

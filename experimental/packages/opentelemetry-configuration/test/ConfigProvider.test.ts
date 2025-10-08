@@ -314,7 +314,7 @@ const configFromFile: Configuration = {
     processors: [
       {
         batch: {
-          schedule_delay: 1000,
+          schedule_delay: 5000,
           export_timeout: 30000,
           max_queue_size: 2048,
           max_export_batch_size: 512,
@@ -323,7 +323,67 @@ const configFromFile: Configuration = {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
               encoding: 'protobuf',
+              certificate_file: '/app/cert.pem',
+              client_key_file: '/app/cert.pem',
+              client_certificate_file: '/app/cert.pem',
+              headers: [{ name: 'api-key', value: '1234' }],
+              headers_list: 'api-key=1234',
+              compression: 'gzip',
             },
+          },
+        },
+      },
+      {
+        batch: {
+          schedule_delay: 1000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            otlp_grpc: {
+              endpoint: 'http://localhost:4317',
+              timeout: 10000,
+              certificate_file: '/app/cert.pem',
+              client_key_file: '/app/cert.pem',
+              client_certificate_file: '/app/cert.pem',
+              headers: [{ name: 'api-key', value: '1234' }],
+              headers_list: 'api-key=1234',
+              compression: 'gzip',
+              insecure: false,
+            },
+          },
+        },
+      },
+      {
+        batch: {
+          schedule_delay: 1000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            'otlp_file/development': {
+              output_stream: 'file:///var/log/logs.jsonl',
+            },
+          },
+        },
+      },
+      {
+        batch: {
+          schedule_delay: 1000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            'otlp_file/development': {
+              output_stream: 'stdout',
+            },
+          },
+        },
+      },
+      {
+        simple: {
+          exporter: {
+            console: {},
           },
         },
       },
@@ -331,6 +391,19 @@ const configFromFile: Configuration = {
     limits: {
       attribute_count_limit: 128,
       attribute_value_length_limit: 4096,
+    },
+    'logger_configurator/development': {
+      default_config: {
+        disabled: true,
+      },
+      loggers: [
+        {
+          name: 'io.opentelemetry.contrib.*',
+          config: {
+            disabled: false,
+          },
+        },
+      ],
     },
   },
 };
@@ -423,6 +496,7 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
               encoding: 'protobuf',
+              compression: 'gzip',
             },
           },
         },
@@ -945,7 +1019,8 @@ describe('ConfigProvider', function () {
       process.env.OTEL_BLRP_EXPORT_TIMEOUT = '24';
       process.env.OTEL_BLRP_MAX_QUEUE_SIZE = '25';
       process.env.OTEL_BLRP_MAX_EXPORT_BATCH_SIZE = '26';
-      process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'logs-endpoint';
+      process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT =
+        'http://test.com:4318/v1/logs';
       process.env.OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE = 'logs-certificate';
       process.env.OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY = 'logs-client-key';
       process.env.OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE =
@@ -1019,6 +1094,28 @@ describe('ConfigProvider', function () {
             attribute_value_length_limit: 28,
             attribute_count_limit: 29,
           },
+          processors: [
+            {
+              batch: {
+                export_timeout: 24,
+                max_export_batch_size: 26,
+                max_queue_size: 25,
+                schedule_delay: 23,
+                exporter: {
+                  otlp_http: {
+                    certificate_file: 'logs-certificate',
+                    client_certificate_file: 'logs-client-certificate',
+                    client_key_file: 'logs-client-key',
+                    compression: 'logs-compression',
+                    encoding: 'protobuf',
+                    endpoint: 'http://test.com:4318/v1/logs',
+                    headers_list: 'logs-header',
+                    timeout: 27,
+                  },
+                },
+              },
+            },
+          ],
         },
       };
 
