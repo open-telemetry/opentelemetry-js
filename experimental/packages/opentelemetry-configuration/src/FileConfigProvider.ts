@@ -27,6 +27,10 @@ import {
   ConfigTracerProvider,
   ConfigurationModel,
   initializeDefaultConfiguration,
+  ConfigReader,
+  CardinalityLimits,
+  MetricProducer,
+  PullMetricExporter,
 } from './configModel';
 import { ConfigProvider } from './IConfigProvider';
 import * as fs from 'fs';
@@ -507,6 +511,108 @@ function setMeterProvider(
         exemplarFilter === 'always_off')
     ) {
       config.meter_provider.exemplar_filter = exemplarFilter;
+    }
+
+    if (meterProvider['readers']?.length > 0) {
+      config.meter_provider.readers = [];
+
+      for (let i = 0; i < meterProvider['readers'].length; i++) {
+        const readerType = Object.keys(meterProvider['readers'][i])[0];
+        if (readerType === 'pull') {
+          const element = meterProvider['readers'][i]['pull'];
+          if (element) {
+            const exporter: PullMetricExporter = {
+              'prometheus/development': {
+                host:
+                  getStringFromConfigFile(
+                    element['exporter']['prometheus/development']['host']
+                  ) ?? 'localhost',
+                port:
+                  getNumberFromConfigFile(
+                    element['exporter']['prometheus/development']['port']
+                  ) ?? 9464,
+                without_units:
+                  getBooleanFromConfigFile(
+                    element['exporter']['prometheus/development'][
+                      'without_units'
+                    ]
+                  ) ?? false,
+                without_scope_info:
+                  getBooleanFromConfigFile(
+                    element['exporter']['prometheus/development'][
+                      'without_scope_info'
+                    ]
+                  ) ?? false,
+                without_type_suffix:
+                  getBooleanFromConfigFile(
+                    element['exporter']['prometheus/development'][
+                      'without_type_suffix'
+                    ]
+                  ) ?? false,
+                with_resource_constant_labels: {
+                  included:
+                    getStringListFromConfigFile(
+                      element['exporter']['prometheus/development'][
+                        'with_resource_constant_labels'
+                      ]['included']
+                    ) ?? [],
+                  excluded:
+                    getStringListFromConfigFile(
+                      element['exporter']['prometheus/development'][
+                        'with_resource_constant_labels'
+                      ]['excluded']
+                    ) ?? [],
+                },
+              },
+            };
+            const producers: MetricProducer[] = [{ opencensus: null }];
+            const defaultLimit =
+              getNumberFromConfigFile(
+                element['cardinality_limits']['default']
+              ) ?? 2000;
+            const cardinalityLimits: CardinalityLimits = {
+              default: defaultLimit,
+              counter:
+                getNumberFromConfigFile(
+                  element['cardinality_limits']['counter']
+                ) ?? defaultLimit,
+              gauge:
+                getNumberFromConfigFile(
+                  element['cardinality_limits']['gauge']
+                ) ?? defaultLimit,
+              histogram:
+                getNumberFromConfigFile(
+                  element['cardinality_limits']['histogram']
+                ) ?? defaultLimit,
+              observable_counter:
+                getNumberFromConfigFile(
+                  element['cardinality_limits']['observable_counter']
+                ) ?? defaultLimit,
+              observable_gauge:
+                getNumberFromConfigFile(
+                  element['cardinality_limits']['observable_gauge']
+                ) ?? defaultLimit,
+              observable_up_down_counter:
+                getNumberFromConfigFile(
+                  element['cardinality_limits']['observable_up_down_counter']
+                ) ?? defaultLimit,
+              up_down_counter:
+                getNumberFromConfigFile(
+                  element['cardinality_limits']['up_down_counter']
+                ) ?? defaultLimit,
+            };
+
+            const pullReader: ConfigReader = {
+              pull: {
+                exporter: exporter,
+                producers: producers,
+                cardinality_limits: cardinalityLimits,
+              },
+            };
+            config.meter_provider.readers.push(pullReader);
+          }
+        }
+      }
     }
   }
 }

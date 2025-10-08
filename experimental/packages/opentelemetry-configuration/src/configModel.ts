@@ -673,11 +673,160 @@ export interface ConfigPeriodicReader {
    */
   exporter: ConfigMeterExporter;
 }
+
+export interface PullMetricReader {
+  /**
+   * Configure exporter.
+   */
+  exporter: PullMetricExporter;
+
+  /**
+   * Configure metric producers.
+   */
+  producers: MetricProducer[];
+
+  /**
+   * Configure cardinality limits.
+   */
+  cardinality_limits: CardinalityLimits;
+}
+
+export interface MetricProducer {
+  /**
+   * Configure metric producer to be opencensus.
+   */
+  opencensus: object | null;
+}
+
+export interface PullMetricExporter {
+  /**
+   * Configure exporter to be prometheus.
+   * This type is in development and subject to breaking changes in minor versions.
+   */
+  'prometheus/development': PrometheusExporter;
+}
+
+export interface PrometheusExporter {
+  /**
+   * Configure host.
+   * If omitted or null, localhost is used.
+   */
+  host: string;
+
+  /**
+   * Configure port.
+   * If omitted or null, 9464 is used.
+   */
+  port: number;
+
+  /**
+   * Configure Prometheus Exporter to produce metrics without a unit suffix or UNIT metadata.
+   * If omitted or null, false is used.
+   */
+  without_units: boolean;
+
+  /**
+   * Configure Prometheus Exporter to produce metrics without a type suffix.
+   * If omitted or null, false is used.
+   */
+  without_type_suffix: boolean;
+
+  /**
+   * Configure Prometheus Exporter to produce metrics without a scope info metric.
+   * If omitted or null, false is used.
+   */
+  without_scope_info: boolean;
+
+  /**
+   * Configure Prometheus Exporter to add resource attributes as metrics attributes.
+   */
+  with_resource_constant_labels: IncludeExclude;
+}
+
+export interface IncludeExclude {
+  /**
+   * Configure resource attributes to be included.
+   * Attribute keys from resources are evaluated to match as follows:
+   *  * If the value of the attribute key exactly matches.
+   *  * If the value of the attribute key matches the wildcard pattern, where '?' matches any
+   * single character and '*' matches any number of characters including none.
+   * If omitted, no resource attributes are included.
+   */
+  included: string[];
+
+  /**
+   * Configure resource attributes to be excluded. Applies after .with_resource_constant_labels.included
+   * (i.e. excluded has higher priority than included).
+   * Attribute keys from resources are evaluated to match as follows:
+   *   * If the value of the attribute key exactly matches.
+   *   * If the value of the attribute key matches the wildcard pattern, where '?' matches any
+   * single character and '*' matches any number of characters including none.
+   * If omitted, .included resource attributes are included.
+   */
+  excluded: string[];
+}
+
+export interface CardinalityLimits {
+  /**
+   * Configure default cardinality limit for all instrument types.
+   * Instrument-specific cardinality limits take priority.
+   * If omitted or null, 2000 is used.
+   */
+  default: number;
+
+  /**
+   * Configure default cardinality limit for counter instruments.
+   * If omitted or null, the value from .default is used.
+   */
+  counter: number;
+
+  /**
+   * Configure default cardinality limit for gauge instruments.
+   * If omitted or null, the value from .default is used.
+   */
+  gauge: number;
+
+  /**
+   * Configure default cardinality limit for histogram instruments.
+   * If omitted or null, the value from .default is used.
+   */
+  histogram: number;
+
+  /**
+   * Configure default cardinality limit for observable_counter instruments.
+   * If omitted or null, the value from .default is used.
+   */
+  observable_counter: number;
+
+  /**
+   * Configure default cardinality limit for observable_gauge instruments.
+   * If omitted or null, the value from .default is used.
+   */
+  observable_gauge: number;
+
+  /**
+   * Configure default cardinality limit for observable_up_down_counter instruments.
+   * If omitted or null, the value from .default is used.
+   */
+  observable_up_down_counter: number;
+
+  /**
+   * Configure default cardinality limit for up_down_counter instruments.
+   * If omitted or null, the value from .default is used.
+   */
+  up_down_counter: number;
+}
+
 export interface ConfigReader {
   /**
    * Configure a periodic metric reader.
    */
-  periodic: ConfigPeriodicReader;
+  periodic?: ConfigPeriodicReader;
+
+  /**
+   * Configure a pull based metric reader.
+   */
+  pull?: PullMetricReader;
 }
 export interface ConfigMeterProvider {
   /**
@@ -692,6 +841,285 @@ export interface ConfigMeterProvider {
    */
   exemplar_filter: 'trace_based' | 'always_on' | 'always_off';
 }
+
+//   readers:
+//     - # Configure a periodic metric reader.
+//       periodic:
+//         # Configure delay interval (in milliseconds) between start of two consecutive exports. 
+//         # Value must be non-negative.
+//         # If omitted or null, 60000 is used.
+//         interval: 60000
+//         # Configure maximum allowed time (in milliseconds) to export data. 
+//         # Value must be non-negative. A value of 0 indicates no limit (infinity).
+//         # If omitted or null, 30000 is used.
+//         timeout: 30000
+//         # Configure exporter.
+//         exporter:
+//           # Configure exporter to be OTLP with HTTP transport.
+//           otlp_http:
+//             # Configure endpoint, including the metric specific path.
+//             # If omitted or null, http://localhost:4318/v1/metrics is used.
+//             endpoint: http://localhost:4318/v1/metrics
+//             # Configure certificate used to verify a server's TLS credentials. 
+//             # Absolute path to certificate file in PEM format.
+//             # If omitted or null, system default certificate verification is used for secure connections.
+//             certificate_file: /app/cert.pem
+//             # Configure mTLS private client key. 
+//             # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
+//             # If omitted or null, mTLS is not used.
+//             client_key_file: /app/cert.pem
+//             # Configure mTLS client certificate. 
+//             # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
+//             # If omitted or null, mTLS is not used.
+//             client_certificate_file: /app/cert.pem
+//             # Configure headers. Entries have higher priority than entries from .headers_list.
+//             # If an entry's .value is null, the entry is ignored.
+//             headers:
+//               - name: api-key
+//                 value: "1234"
+//             # Configure headers. Entries have lower priority than entries from .headers.
+//             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
+//             # If omitted or null, no headers are added.
+//             headers_list: "api-key=1234"
+//             # Configure compression.
+//             # Values include: gzip, none. Implementations may support other compression algorithms.
+//             # If omitted or null, none is used.
+//             compression: gzip
+//             # Configure max time (in milliseconds) to wait for each export. 
+//             # Value must be non-negative. A value of 0 indicates no limit (infinity).
+//             # If omitted or null, 10000 is used.
+//             timeout: 10000
+//             # Configure the encoding used for messages. 
+//             # Values include: protobuf, json. Implementations may not support json.
+//             # If omitted or null, protobuf is used.
+//             encoding: protobuf
+//             # Configure temporality preference. 
+//             # Values include: cumulative, delta, low_memory. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+//             # If omitted or null, cumulative is used.
+//             temporality_preference: delta
+//             # Configure default histogram aggregation. 
+//             # Values include: explicit_bucket_histogram, base2_exponential_bucket_histogram. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+//             # If omitted or null, explicit_bucket_histogram is used.
+//             default_histogram_aggregation: base2_exponential_bucket_histogram
+//         # Configure metric producers.
+//         producers:
+//           - # Configure metric producer to be prometheus.
+//             prometheus:
+//         # Configure cardinality limits.
+//         cardinality_limits:
+//           # Configure default cardinality limit for all instrument types.
+//           # Instrument-specific cardinality limits take priority. 
+//           # If omitted or null, 2000 is used.
+//           default: 2000
+//           # Configure default cardinality limit for counter instruments.
+//           # If omitted or null, the value from .default is used.
+//           counter: 2000
+//           # Configure default cardinality limit for gauge instruments.
+//           # If omitted or null, the value from .default is used.
+//           gauge: 2000
+//           # Configure default cardinality limit for histogram instruments.
+//           # If omitted or null, the value from .default is used.
+//           histogram: 2000
+//           # Configure default cardinality limit for observable_counter instruments.
+//           # If omitted or null, the value from .default is used.
+//           observable_counter: 2000
+//           # Configure default cardinality limit for observable_gauge instruments.
+//           # If omitted or null, the value from .default is used.
+//           observable_gauge: 2000
+//           # Configure default cardinality limit for observable_up_down_counter instruments.
+//           # If omitted or null, the value from .default is used.
+//           observable_up_down_counter: 2000
+//           # Configure default cardinality limit for up_down_counter instruments.
+//           # If omitted or null, the value from .default is used.
+//           up_down_counter: 2000
+//     - # Configure a periodic metric reader.
+//       periodic:
+//         # Configure exporter.
+//         exporter:
+//           # Configure exporter to be OTLP with gRPC transport.
+//           otlp_grpc:
+//             # Configure endpoint.
+//             # If omitted or null, http://localhost:4317 is used.
+//             endpoint: http://localhost:4317
+//             # Configure certificate used to verify a server's TLS credentials. 
+//             # Absolute path to certificate file in PEM format.
+//             # If omitted or null, system default certificate verification is used for secure connections.
+//             certificate_file: /app/cert.pem
+//             # Configure mTLS private client key. 
+//             # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
+//             # If omitted or null, mTLS is not used.
+//             client_key_file: /app/cert.pem
+//             # Configure mTLS client certificate. 
+//             # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
+//             # If omitted or null, mTLS is not used.
+//             client_certificate_file: /app/cert.pem
+//             # Configure headers. Entries have higher priority than entries from .headers_list.
+//             # If an entry's .value is null, the entry is ignored.
+//             headers:
+//               - name: api-key
+//                 value: "1234"
+//             # Configure headers. Entries have lower priority than entries from .headers.
+//             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
+//             # If omitted or null, no headers are added.
+//             headers_list: "api-key=1234"
+//             # Configure compression.
+//             # Values include: gzip, none. Implementations may support other compression algorithms.
+//             # If omitted or null, none is used.
+//             compression: gzip
+//             # Configure max time (in milliseconds) to wait for each export. 
+//             # Value must be non-negative. A value of 0 indicates no limit (infinity).
+//             # If omitted or null, 10000 is used.
+//             timeout: 10000
+//             # Configure client transport security for the exporter's connection. 
+//             # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
+//             # If omitted or null, false is used.
+//             insecure: false
+//             # Configure temporality preference. 
+//             # Values include: cumulative, delta, low_memory. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+//             # If omitted or null, cumulative is used.
+//             temporality_preference: delta
+//             # Configure default histogram aggregation. 
+//             # Values include: explicit_bucket_histogram, base2_exponential_bucket_histogram. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+//             # If omitted or null, explicit_bucket_histogram is used.
+//             default_histogram_aggregation: base2_exponential_bucket_histogram
+//     - # Configure a periodic metric reader.
+//       periodic:
+//         # Configure exporter.
+//         exporter:
+//           # Configure exporter to be OTLP with file transport.
+//           # This type is in development and subject to breaking changes in minor versions.
+//           otlp_file/development:
+//             # Configure output stream. 
+//             # Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
+//             # If omitted or null, stdout is used.
+//             output_stream: file:///var/log/metrics.jsonl
+//             # Configure temporality preference. Values include: cumulative, delta, low_memory. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+//             # If omitted or null, cumulative is used.
+//             temporality_preference: delta
+//             # Configure default histogram aggregation. Values include: explicit_bucket_histogram, base2_exponential_bucket_histogram. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+//             # If omitted or null, explicit_bucket_histogram is used.
+//             default_histogram_aggregation: base2_exponential_bucket_histogram
+//     - # Configure a periodic metric reader.
+//       periodic:
+//         # Configure exporter.
+//         exporter:
+//           # Configure exporter to be OTLP with file transport.
+//           # This type is in development and subject to breaking changes in minor versions.
+//           otlp_file/development:
+//             # Configure output stream. 
+//             # Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
+//             # If omitted or null, stdout is used.
+//             output_stream: stdout
+//             # Configure temporality preference. Values include: cumulative, delta, low_memory. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+//             # If omitted or null, cumulative is used.
+//             temporality_preference: delta
+//             # Configure default histogram aggregation. Values include: explicit_bucket_histogram, base2_exponential_bucket_histogram. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+//             # If omitted or null, explicit_bucket_histogram is used.
+//             default_histogram_aggregation: base2_exponential_bucket_histogram
+//     - # Configure a periodic metric reader.
+//       periodic:
+//         # Configure exporter.
+//         exporter:
+//           # Configure exporter to be console.
+//           console:
+//   # Configure views. 
+//   # Each view has a selector which determines the instrument(s) it applies to, and a configuration for the resulting stream(s).
+//   views:
+//     - # Configure view selector. 
+//       # Selection criteria is additive as described in https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#instrument-selection-criteria.
+//       selector:
+//         # Configure instrument name selection criteria.
+//         # If omitted or null, all instrument names match.
+//         instrument_name: my-instrument
+//         # Configure instrument type selection criteria.
+//         # Values include: counter, gauge, histogram, observable_counter, observable_gauge, observable_up_down_counter, up_down_counter.
+//         # If omitted or null, all instrument types match.
+//         instrument_type: histogram
+//         # Configure the instrument unit selection criteria.
+//         # If omitted or null, all instrument units match.
+//         unit: ms
+//         # Configure meter name selection criteria.
+//         # If omitted or null, all meter names match.
+//         meter_name: my-meter
+//         # Configure meter version selection criteria.
+//         # If omitted or null, all meter versions match.
+//         meter_version: 1.0.0
+//         # Configure meter schema url selection criteria.
+//         # If omitted or null, all meter schema URLs match.
+//         meter_schema_url: https://opentelemetry.io/schemas/1.16.0
+//       # Configure view stream.
+//       stream:
+//         # Configure metric name of the resulting stream(s).
+//         # If omitted or null, the instrument's original name is used.
+//         name: new_instrument_name
+//         # Configure metric description of the resulting stream(s).
+//         # If omitted or null, the instrument's origin description is used.
+//         description: new_description
+//         # Configure aggregation of the resulting stream(s). 
+//         # Values include: default, drop, explicit_bucket_histogram, base2_exponential_bucket_histogram, last_value, sum. For behavior of values see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#aggregation.
+//         # If omitted, default is used.
+//         aggregation:
+//           # Configure aggregation to be explicit_bucket_histogram.
+//           explicit_bucket_histogram:
+//             # Configure bucket boundaries.
+//             # If omitted, [0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000] is used.
+//             boundaries:
+//               [
+//                 0.0,
+//                 5.0,
+//                 10.0,
+//                 25.0,
+//                 50.0,
+//                 75.0,
+//                 100.0,
+//                 250.0,
+//                 500.0,
+//                 750.0,
+//                 1000.0,
+//                 2500.0,
+//                 5000.0,
+//                 7500.0,
+//                 10000.0
+//               ]
+//             # Configure record min and max.
+//             # If omitted or null, true is used.
+//             record_min_max: true
+//         # Configure the aggregation cardinality limit.
+//         # If omitted or null, the metric reader's default cardinality limit is used.
+//         aggregation_cardinality_limit: 2000
+//         # Configure attribute keys retained in the resulting stream(s).
+//         attribute_keys:
+//           # Configure list of attribute keys to include in the resulting stream(s). All other attributes are dropped. 
+//           # If omitted, all attributes are included.
+//           included:
+//             - key1
+//             - key2
+//           # Configure list of attribute keys to exclude from the resulting stream(s). Applies after .attribute_keys.included (i.e. excluded has higher priority than included).
+//           # If omitted, .attribute_keys.included are included.
+//           excluded:
+//             - key3
+//   # Configure the exemplar filter. 
+//   # Values include: trace_based, always_on, always_off. For behavior of values see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#metrics-sdk-configuration.
+//   # If omitted or null, trace_based is used.
+//   exemplar_filter: trace_based
+//   # Configure meters.
+//   # This type is in development and subject to breaking changes in minor versions.
+//   meter_configurator/development:
+//     # Configure the default meter config used there is no matching entry in .meter_configurator/development.meters.
+//     default_config:
+//       # Configure if the meter is enabled or not.
+//       disabled: true
+//     # Configure meters.
+//     meters:
+//       - # Configure meter names to match, evaluated as follows:
+//         #
+//         #  * If the meter name exactly matches.
+//         #  * If the meter name matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+//         name: io.opentelemetry.contrib.*
+//         # The meter config.
+//         config:
+//           # Configure if the meter is enabled or not.
+//           disabled: false
 
 export interface ConfigLoggerProvider {
   /**
