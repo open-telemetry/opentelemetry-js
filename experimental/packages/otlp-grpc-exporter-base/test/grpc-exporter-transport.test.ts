@@ -294,7 +294,7 @@ describe('GrpcExporterTransport', function () {
           timeoutMillis
         )) as ExportResponseSuccess;
 
-        const userAgents = getUserAgent().split(' ');
+        const userAgents = getUserAgent(serverTestContext).split(' ');
         assert.strictEqual(serverTestContext.requests.length, 1);
         assert.deepEqual(
           serverTestContext.requests[0].request,
@@ -318,7 +318,7 @@ describe('GrpcExporterTransport', function () {
           timeoutMillis
         )) as ExportResponseSuccess;
 
-        const userAgents = getUserAgent().split(' ');
+        const userAgents = getUserAgent(serverTestContext).split(' ');
         assert.strictEqual(serverTestContext.requests.length, 1);
         assert.deepEqual(
           serverTestContext.requests[0].request,
