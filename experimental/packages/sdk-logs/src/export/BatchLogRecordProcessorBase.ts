@@ -20,7 +20,6 @@ import {
   ExportResultCode,
   getNumberFromEnv,
   globalErrorHandler,
-  unrefTimer,
   BindOnceFuture,
   internal,
   callWithTimeout,
@@ -40,7 +39,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   private readonly _exportTimeoutMillis: number;
 
   private _finishedLogRecords: SdkLogRecord[] = [];
-  private _timer: NodeJS.Timeout | undefined;
+  private _timer: NodeJS.Timeout | number | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
 
   constructor(
@@ -162,7 +161,11 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
           globalErrorHandler(e);
         });
     }, this._scheduledDelayMillis);
-    unrefTimer(this._timer);
+
+    // depending on runtime, this may be a 'number' or NodeJS.Timeout
+    if (typeof this._timer !== 'number') {
+      this._timer.unref();
+    }
   }
 
   private _clearTimer() {

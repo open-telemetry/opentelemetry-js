@@ -13,6 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export function unrefTimer(timer: NodeJS.Timer): void {
-  timer.unref();
-}
+
+import { unrefTimer } from '../../../src';
+import * as sinon from 'sinon';
+
+describe('timer-util', function () {
+  it('does not throw on number', function () {
+    unrefTimer(1);
+  });
+
+  it('does call unref', function () {
+    const unrefStub = sinon.stub();
+    unrefTimer({ unref: unrefStub });
+    sinon.assert.calledOnce(unrefStub);
+  });
+});
