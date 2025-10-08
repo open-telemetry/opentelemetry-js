@@ -282,9 +282,9 @@ describe('GrpcExporterTransport', function () {
         };
       });
 
-      function getUserAgent (serverTestContext: ServerTestContext) {
+      function getUserAgent(serverTestContext: ServerTestContext) {
         return serverTestContext.metadata[0].get('user-agent')[0] as string;
-      };
+      }
 
       it('sends default user-agent in metadata', async function () {
         const transport = createOtlpGrpcExporterTransport(simpleClientConfig);
