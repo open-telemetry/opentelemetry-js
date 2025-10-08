@@ -19,7 +19,7 @@ import * as sinon from 'sinon';
 
 import { diag } from '@opentelemetry/api';
 
-import { getHttpConfigurationFromEnvironment } from '../../../src/configuration/otlp-http-env-configuration';
+import { getNodeHttpConfigurationFromEnvironment } from '../../../src/configuration/otlp-node-http-env-configuration';
 import { testSharedConfigurationFromEnvironment } from './shared-env-configuration.test';
 
 describe('getHttpConfigurationFromEnvironment', function () {
@@ -34,7 +34,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
       delete process.env.OTEL_EXPORTER_OTLP_HEADERS;
       delete process.env.OTEL_EXPORTER_OTLP_METRICS_HEADERS;
 
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -45,7 +45,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
       process.env.OTEL_EXPORTER_OTLP_HEADERS = 'key1=value1,key2=value2';
       process.env.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'key1=metrics';
 
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -58,7 +58,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
     it('allows non-specific only headers', function () {
       process.env.OTEL_EXPORTER_OTLP_HEADERS = 'key1=value1,key2=value2';
 
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -72,7 +72,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_HEADERS =
         'key1=value1,key2=value2';
 
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -85,7 +85,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
     it('remains unset if specific headers are lists of empty strings', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_HEADERS = ' , , ,';
 
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -102,7 +102,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
 
     it('should use url defined in env that ends with root path and append version and signal path', function () {
       process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -114,7 +114,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
 
     it('should use url defined in env without checking if path is already present', function () {
       process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -126,7 +126,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
 
     it('should use url defined in env and append version and signal', function () {
       process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -139,7 +139,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
     it('should override global exporter url with signal url defined in env', function () {
       process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
       process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics/';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -151,7 +151,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
 
     it('should add root path when signal url defined in env contains no path and no root path', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -163,7 +163,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
 
     it('should not add root path when signal url defined in env contains root path but no path', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar/';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -176,7 +176,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
     it('should not add root path when signal url defined in env contains path', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT =
         'http://foo.bar/v1/metrics';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -189,7 +189,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
     it('should not add root path when signal url defined in env contains path and ends in /', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT =
         'http://foo.bar/v1/metrics/';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -202,7 +202,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
     it('should warn on invalid specific url', function () {
       const spyLoggerWarn = sinon.stub(diag, 'warn');
       process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'not a url';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -216,7 +216,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
     it('should warn on invalid non-specific url', function () {
       const spyLoggerWarn = sinon.stub(diag, 'warn');
       process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'not a url';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -230,7 +230,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
     it('should treat empty urls as not set', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
       process.env.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -239,6 +239,6 @@ describe('getHttpConfigurationFromEnvironment', function () {
   });
 
   testSharedConfigurationFromEnvironment(signalIdentifier =>
-    getHttpConfigurationFromEnvironment(signalIdentifier, 'v1/metrics')
+    getNodeHttpConfigurationFromEnvironment(signalIdentifier, 'v1/metrics')
   );
 });

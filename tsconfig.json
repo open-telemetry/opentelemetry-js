@@ -26,6 +26,7 @@
       "experimental/packages/otlp-exporter-base",
       "experimental/packages/otlp-grpc-exporter-base",
       "experimental/packages/otlp-transformer",
+      "experimental/packages/sampler-composite",
       "experimental/packages/sampler-jaeger-remote",
       "experimental/packages/sdk-logs",
       "experimental/packages/shim-opencensus",
@@ -85,6 +86,9 @@
       "path": "experimental/packages/opentelemetry-browser-detector"
     },
     {
+      "path": "experimental/packages/opentelemetry-configuration"
+    },
+    {
       "path": "experimental/packages/opentelemetry-exporter-metrics-otlp-grpc"
     },
     {
@@ -122,6 +126,9 @@
     },
     {
       "path": "experimental/packages/otlp-transformer"
+    },
+    {
+      "path": "experimental/packages/sampler-composite"
     },
     {
       "path": "experimental/packages/sampler-jaeger-remote"

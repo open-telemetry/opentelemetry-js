@@ -97,6 +97,7 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
                         },
                       },
                     ],
+                    flags: 0x101, // TraceFlags (0x01) | HAS_IS_REMOTE
                   },
                 ],
                 startTimeUnixNano: startTime,
@@ -129,6 +130,7 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
                   code: EStatusCode.STATUS_CODE_OK,
                   message: undefined,
                 },
+                flags: 0x101, // TraceFlags (0x01) | HAS_IS_REMOTE
               },
             ],
             schemaUrl: 'http://url.to.schema',
@@ -187,6 +189,7 @@ function createExpectedSpanProtobuf() {
                         },
                       },
                     ],
+                    flags: 0x101, // TraceFlags (0x01) | HAS_IS_REMOTE
                   },
                 ],
                 startTimeUnixNano: startTime,
@@ -218,6 +221,7 @@ function createExpectedSpanProtobuf() {
                 status: {
                   code: EStatusCode.STATUS_CODE_OK,
                 },
+                flags: 0x101, // TraceFlags (0x01) | HAS_IS_REMOTE
               },
             ],
             schemaUrl: 'http://url.to.schema',
@@ -232,11 +236,8 @@ describe('Trace', () => {
   let resource: Resource;
   let span: ReadableSpan;
 
-  beforeEach(() => {
-    resource = resourceFromAttributes({
-      'resource-attribute': 'resource attribute value',
-    });
-    span = {
+  function createSpanWithResource(spanResource: Resource): ReadableSpan {
+    return {
       spanContext: () => ({
         spanId: '0000000000000002',
         traceFlags: TraceFlags.SAMPLED,
@@ -283,7 +284,7 @@ describe('Trace', () => {
         },
       ],
       name: 'span-name',
-      resource,
+      resource: spanResource,
       startTime: [1640715557, 342725388],
       status: {
         code: SpanStatusCode.OK,
@@ -292,6 +293,13 @@ describe('Trace', () => {
       droppedEventsCount: 0,
       droppedLinksCount: 0,
     };
+  }
+
+  beforeEach(() => {
+    resource = resourceFromAttributes({
+      'resource-attribute': 'resource attribute value',
+    });
+    span = createSpanWithResource(resource);
   });
 
   describe('createExportTraceServiceRequest', () => {
@@ -443,6 +451,26 @@ describe('Trace', () => {
         );
       });
     });
+
+    it('supports schema URL on resource', () => {
+      const resourceWithSchema = resourceFromAttributes(
+        { 'resource-attribute': 'resource attribute value' },
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
+      );
+
+      const spanFromSDK = createSpanWithResource(resourceWithSchema);
+
+      const exportRequest = createExportTraceServiceRequest([spanFromSDK], {
+        useHex: true,
+      });
+
+      assert.ok(exportRequest);
+      assert.strictEqual(exportRequest.resourceSpans?.length, 1);
+      assert.strictEqual(
+        exportRequest.resourceSpans?.[0].schemaUrl,
+        'https://opentelemetry.test/schemas/1.2.3'
+      );
+    });
   });
 
   describe('ProtobufTracesSerializer', function () {
@@ -520,6 +548,12 @@ describe('Trace', () => {
       assert.deepStrictEqual(JSON.parse(decoder.decode(serialized)), expected);
     });
 
+    it('hrtime contains float value', () => {
+      const span = createSpanWithResource(resource);
+      (span as any).startTime = [1640715557.5, 342725388.5];
+      JsonTraceSerializer.serializeRequest([span]);
+    });
+
     it('deserializes a response', () => {
       const expectedResponse = {
         partialSuccess: {
@@ -548,6 +582,204 @@ describe('Trace', () => {
       assert.doesNotThrow(() =>
         JsonTraceSerializer.deserializeResponse(new Uint8Array([]))
       );
+    });
+  });
+
+  describe('span flags', () => {
+    it('sets flags to 0x101 for local parent span context', () => {
+      const exportRequest = createExportTraceServiceRequest([span], {
+        useHex: true,
+      });
+      assert.ok(exportRequest);
+      const spanFlags =
+        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].flags;
+      assert.strictEqual(spanFlags, 0x101); // TraceFlags (0x01) | HAS_IS_REMOTE
+    });
+
+    it('sets flags to 0x301 for remote parent span context', () => {
+      // Create a span with a remote parent context
+      const remoteParentSpanContext = {
+        spanId: '0000000000000001',
+        traceId: '00000000000000000000000000000001',
+        traceFlags: TraceFlags.SAMPLED,
+        isRemote: true, // This is the key difference
+      };
+
+      const spanWithRemoteParent = {
+        ...span,
+        parentSpanContext: remoteParentSpanContext,
+      };
+
+      const exportRequest = createExportTraceServiceRequest(
+        [spanWithRemoteParent],
+        {
+          useHex: true,
+        }
+      );
+      assert.ok(exportRequest);
+      const spanFlags =
+        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].flags;
+      assert.strictEqual(spanFlags, 0x301); // TraceFlags (0x01) | HAS_IS_REMOTE | IS_REMOTE
+    });
+
+    it('sets flags to 0x101 for links with local context', () => {
+      const exportRequest = createExportTraceServiceRequest([span], {
+        useHex: true,
+      });
+      assert.ok(exportRequest);
+      const linkFlags =
+        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].links?.[0]
+          .flags;
+      assert.strictEqual(linkFlags, 0x101); // TraceFlags (0x01) | HAS_IS_REMOTE
+    });
+
+    it('sets flags to 0x301 for links with remote context', () => {
+      // Create a span with a remote link context
+      const remoteLinkContext = {
+        spanId: '0000000000000003',
+        traceId: '00000000000000000000000000000002',
+        traceFlags: TraceFlags.SAMPLED,
+        isRemote: true, // This is the key difference
+      };
+
+      const remoteLink = {
+        context: remoteLinkContext,
+        attributes: { 'link-attribute': 'string value' },
+        droppedAttributesCount: 0,
+      };
+
+      const spanWithRemoteLink = {
+        ...span,
+        links: [remoteLink],
+      };
+
+      const exportRequest = createExportTraceServiceRequest(
+        [spanWithRemoteLink],
+        {
+          useHex: true,
+        }
+      );
+      assert.ok(exportRequest);
+      const linkFlags =
+        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].links?.[0]
+          .flags;
+      assert.strictEqual(linkFlags, 0x301); // TraceFlags (0x01) | HAS_IS_REMOTE | IS_REMOTE
+    });
+  });
+
+  describe('span/link flags matrix', () => {
+    const cases = [
+      { tf: 0x00, local: 0x100, remote: 0x300 },
+      { tf: 0x01, local: 0x101, remote: 0x301 },
+      { tf: 0x05, local: 0x105, remote: 0x305 },
+      { tf: 0xff, local: 0x1ff, remote: 0x3ff },
+    ];
+
+    it('composes span flags with local and remote parent across traceFlags', () => {
+      const baseCtx = span.spanContext();
+      for (const c of cases) {
+        // Local parent
+        const spanLocal = {
+          ...span,
+          spanContext: () => ({
+            spanId: baseCtx.spanId,
+            traceId: baseCtx.traceId,
+            traceFlags: c.tf,
+            isRemote: false,
+            traceState: baseCtx.traceState,
+          }),
+          parentSpanContext: {
+            ...span.parentSpanContext,
+            isRemote: false,
+          },
+        } as unknown as ReadableSpan;
+        const reqLocal = createExportTraceServiceRequest([spanLocal], {
+          useHex: true,
+        });
+        const spanFlagsLocal =
+          reqLocal.resourceSpans?.[0].scopeSpans[0].spans?.[0].flags;
+        assert.strictEqual(spanFlagsLocal, c.local);
+
+        // Remote parent
+        const spanRemote = {
+          ...spanLocal,
+          parentSpanContext: {
+            ...span.parentSpanContext,
+            isRemote: true,
+          },
+        } as unknown as ReadableSpan;
+        const reqRemote = createExportTraceServiceRequest([spanRemote], {
+          useHex: true,
+        });
+        const spanFlagsRemote =
+          reqRemote.resourceSpans?.[0].scopeSpans[0].spans?.[0].flags;
+        assert.strictEqual(spanFlagsRemote, c.remote);
+      }
+    });
+
+    it('composes link flags with local and remote context across traceFlags', () => {
+      for (const c of cases) {
+        const linkLocal = {
+          context: {
+            spanId: '0000000000000003',
+            traceId: '00000000000000000000000000000002',
+            traceFlags: c.tf,
+            isRemote: false,
+            traceState: new TraceState('link=foo'),
+          },
+          attributes: { 'link-attribute': 'string value' },
+          droppedAttributesCount: 0,
+        };
+        const spanWithLocalLink = {
+          ...span,
+          links: [linkLocal],
+        } as unknown as ReadableSpan;
+        const reqLocal = createExportTraceServiceRequest([spanWithLocalLink], {
+          useHex: true,
+        });
+        const linkFlagsLocal =
+          reqLocal.resourceSpans?.[0].scopeSpans[0].spans?.[0].links?.[0].flags;
+        assert.strictEqual(linkFlagsLocal, c.local);
+
+        const linkRemote = {
+          ...linkLocal,
+          context: { ...linkLocal.context, isRemote: true },
+        };
+        const spanWithRemoteLink = {
+          ...span,
+          links: [linkRemote],
+        } as unknown as ReadableSpan;
+        const reqRemote = createExportTraceServiceRequest(
+          [spanWithRemoteLink],
+          { useHex: true }
+        );
+        const linkFlagsRemote =
+          reqRemote.resourceSpans?.[0].scopeSpans[0].spans?.[0].links?.[0]
+            .flags;
+        assert.strictEqual(linkFlagsRemote, c.remote);
+      }
+    });
+
+    it('composes root span flags across traceFlags (no parent)', () => {
+      const baseCtx = span.spanContext();
+      for (const c of cases) {
+        const rootSpan = {
+          ...span,
+          spanContext: () => ({
+            spanId: baseCtx.spanId,
+            traceId: baseCtx.traceId,
+            traceFlags: c.tf,
+            isRemote: false,
+            traceState: baseCtx.traceState,
+          }),
+          parentSpanContext: undefined,
+        } as unknown as ReadableSpan;
+        const req = createExportTraceServiceRequest([rootSpan], {
+          useHex: true,
+        });
+        const flags = req.resourceSpans?.[0].scopeSpans[0].spans?.[0].flags;
+        assert.strictEqual(flags, c.local);
+      }
     });
   });
 });

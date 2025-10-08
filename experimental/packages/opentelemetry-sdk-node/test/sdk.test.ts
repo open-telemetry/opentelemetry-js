@@ -105,7 +105,7 @@ describe('Node SDK', () => {
     delegate = (trace.getTracerProvider() as ProxyTracerProvider).getDelegate();
     logsDelegate = (
       logs.getLoggerProvider() as ProxyLoggerProvider
-    ).getDelegate();
+    )._getDelegate();
   });
 
   afterEach(() => {
@@ -142,7 +142,7 @@ describe('Node SDK', () => {
       );
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
       assert.strictEqual(
-        (logs.getLoggerProvider() as ProxyLoggerProvider).getDelegate(),
+        (logs.getLoggerProvider() as ProxyLoggerProvider)._getDelegate(),
         logsDelegate,
         'logger provider should not have changed'
       );
@@ -314,6 +314,123 @@ describe('Node SDK', () => {
         (trace.getTracerProvider() as ProxyTracerProvider).getDelegate(),
         delegate,
         'tracer provider should not have changed'
+      );
+
+      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+
+      await sdk.shutdown();
+      delete env.OTEL_TRACES_EXPORTER;
+    });
+
+    it('should register a meter provider if multiple readers are provided', async () => {
+      // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
+      // which sets up an exporter and affects the context manager
+      env.OTEL_TRACES_EXPORTER = 'none';
+      const consoleExporter = new ConsoleMetricExporter();
+      const inMemoryExporter = new InMemoryMetricExporter(
+        AggregationTemporality.CUMULATIVE
+      );
+      const metricReader1 = new PeriodicExportingMetricReader({
+        exporter: consoleExporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+      const metricReader2 = new PeriodicExportingMetricReader({
+        exporter: inMemoryExporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+
+      const sdk = new NodeSDK({
+        metricReaders: [metricReader1, metricReader2],
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assert.strictEqual(
+        context['_getContextManager'](),
+        ctxManager,
+        'context manager should not change'
+      );
+      assert.strictEqual(
+        propagation['_getGlobalPropagator'](),
+        propagator,
+        'propagator should not change'
+      );
+      assert.strictEqual(
+        (trace.getTracerProvider() as ProxyTracerProvider).getDelegate(),
+        delegate,
+        'tracer provider should not have changed'
+      );
+
+      const meterProvider = metrics.getMeterProvider() as MeterProvider;
+      assert.ok(meterProvider instanceof MeterProvider);
+
+      // Verify that both metric readers are registered
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert.strictEqual(sharedState.metricCollectors.length, 2);
+
+      await sdk.shutdown();
+      delete env.OTEL_TRACES_EXPORTER;
+    });
+
+    it('should show deprecation warning when using metricReader option', async () => {
+      // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
+      // which sets up an exporter and affects the context manager
+      env.OTEL_TRACES_EXPORTER = 'none';
+      const exporter = new ConsoleMetricExporter();
+      const metricReader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+
+      const warnSpy = Sinon.spy(diag, 'warn');
+
+      const sdk = new NodeSDK({
+        metricReader: metricReader,
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      // Verify deprecation warning was shown
+      Sinon.assert.calledWith(
+        warnSpy,
+        "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
+      );
+
+      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+
+      await sdk.shutdown();
+      delete env.OTEL_TRACES_EXPORTER;
+    });
+
+    it('should not show deprecation warning when using metricReaders option', async () => {
+      // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
+      // which sets up an exporter and affects the context manager
+      env.OTEL_TRACES_EXPORTER = 'none';
+      const exporter = new ConsoleMetricExporter();
+      const metricReader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+
+      const warnSpy = Sinon.spy(diag, 'warn');
+
+      const sdk = new NodeSDK({
+        metricReaders: [metricReader],
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      // Verify no metricReader deprecation warning was shown
+      Sinon.assert.neverCalledWith(
+        warnSpy,
+        "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
       );
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
@@ -617,7 +734,7 @@ describe('Node SDK', () => {
       // Local functions to test if a mocked method is ever called with a specific argument or regex matching for an argument.
       // Needed because of race condition with parallel detectors.
       const callArgsContains = (
-        mockedFunction: sinon.SinonSpy,
+        mockedFunction: Sinon.SinonSpy,
         arg: any
       ): boolean => {
         return mockedFunction.getCalls().some(call => {
@@ -625,7 +742,7 @@ describe('Node SDK', () => {
         });
       };
       const callArgsMatches = (
-        mockedFunction: sinon.SinonSpy,
+        mockedFunction: Sinon.SinonSpy,
         regex: RegExp
       ): boolean => {
         return mockedFunction.getCalls().some(call => {

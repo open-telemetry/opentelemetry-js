@@ -20,16 +20,13 @@ jobs:
           - "20.6.0"
           - "20"
           - "22"
-          - "23"
           - "24"
     runs-on: ubuntu-latest
-    env:
-      NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           cache: 'npm'
           cache-dependency-path: |
@@ -45,28 +42,27 @@ jobs:
           matrix.node_version == '18' ||
           matrix.node_version == '20.6.0'
           }}
-      - run: npm install -g npm@latest
+      - run: npm install -g npm@11.6.0
         if: ${{
           matrix.node_version == '20' ||
           matrix.node_version == '22' ||
-          matrix.node_version == '23' ||
           matrix.node_version == '24'
           }}
 
       - name: Bootstrap
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Build 🔧
         run: npm run compile
 
       - run: npm test
-        if: ${{ matrix.node_version != '23' && matrix.node_version != '24' }}
-      # Node.js >= 23 type stripping conflicts with mocha usage of ts-node.
+        if: ${{ matrix.node_version != '22' && matrix.node_version != '24' }}
+      # Node.js type stripping conflicts with mocha usage of ts-node.
       # See https://github.com/open-telemetry/opentelemetry-js/issues/5415
       - run: npm test
         env:
           NODE_OPTIONS: '--no-experimental-strip-types'
-        if: ${{ matrix.node_version == '23' || matrix.node_version == '24' }}
+        if: ${{ matrix.node_version == '22' || matrix.node_version == '24' }}
 
       - name: Report Coverage
         uses: codecov/codecov-action@v5
@@ -76,23 +72,21 @@ jobs:
           verbose: true
   node-windows-tests:
     runs-on: windows-latest
-    env:
-      NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
           node-version: '22'
 
-      - run: npm install -g npm@latest
+      - run: npm install -g npm@11.6.0
 
       - name: Bootstrap
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Build 🔧
         run: |
@@ -101,15 +95,15 @@ jobs:
 
       - name: Unit tests
         run: npm run test
+        env:
+          NODE_OPTIONS: '--no-experimental-strip-types'
   browser-tests:
     runs-on: ubuntu-latest
-    env:
-      NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           cache: 'npm'
           cache-dependency-path: |
@@ -117,7 +111,7 @@ jobs:
           node-version: 22
 
       - name: Bootstrap
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Build 🔧
         run: npm run compile
@@ -132,12 +126,10 @@ jobs:
           verbose: true
   webworker-tests:
     runs-on: ubuntu-latest
-    env:
-      NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+        uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           cache: 'npm'
           cache-dependency-path: |
@@ -145,7 +137,7 @@ jobs:
           node-version: 22
 
       - name: Bootstrap
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Build 🔧
         run: npm run compile

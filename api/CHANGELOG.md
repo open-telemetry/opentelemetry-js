@@ -14,6 +14,8 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
+fix(api): prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)

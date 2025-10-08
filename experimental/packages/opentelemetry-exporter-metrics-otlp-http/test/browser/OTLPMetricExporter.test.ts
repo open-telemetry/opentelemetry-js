@@ -76,12 +76,9 @@ describe('OTLPMetricExporter', function () {
         (window.navigator as any).sendBeacon = false;
       });
 
-      it('should successfully send data using XMLHttpRequest', async function () {
+      it('should successfully send data using fetch', async function () {
         // arrange
-        const server = sinon.fakeServer.create();
-        server.respondWith('OK');
-        server.respondImmediately = true;
-        server.autoRespond = true;
+        const stubFetch = sinon.stub(window, 'fetch');
         const meterProvider = new MeterProvider({
           readers: [
             new PeriodicExportingMetricReader({
@@ -95,15 +92,14 @@ describe('OTLPMetricExporter', function () {
           .getMeter('test-meter')
           .createCounter('test-counter')
           .add(1);
-
         await meterProvider.shutdown();
 
         // assert
-        const request = server.requests[0];
-        const body = request.requestBody as unknown as Uint8Array;
+        const request = new Request(...stubFetch.args[0]);
+        const body = await request.text();
         assert.doesNotThrow(
-          () => JSON.parse(new TextDecoder().decode(body)),
-          'expected requestBody to be in JSON format, but parsing failed'
+          () => JSON.parse(body),
+          'expected request body to be in JSON format, but parsing failed'
         );
       });
     });
