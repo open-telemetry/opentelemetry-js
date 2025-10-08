@@ -830,5 +830,25 @@ describe('PrometheusSerializer', () => {
           'target_info{env="prod",hostname="myhost",datacenter="sdc",region="europe",owner="frontend"} 1\n'
       );
     });
+
+    it('omits target_info if withoutTargetInfo is true', () => {
+      const serializer = new PrometheusSerializer(
+        undefined,
+        true,
+        undefined,
+        true
+      );
+      const result = serializer['_serializeResource'](
+        resourceFromAttributes({
+          env: 'prod',
+          hostname: 'myhost',
+          datacenter: 'sdc',
+          region: 'europe',
+          owner: 'frontend',
+        })
+      );
+
+      assert.strictEqual(result.includes('target_info'), false);
+    });
   });
 });
