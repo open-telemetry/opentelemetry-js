@@ -362,6 +362,13 @@ export class NodeSDK {
       instrumentations: this._instrumentations,
     });
 
+    setupContextManager(this._configuration?.contextManager);
+    setupPropagator(
+      this._configuration?.textMapPropagator === null
+        ? null // null means don't set, so we cannot fall back to env config.
+        : (this._configuration?.textMapPropagator ?? getPropagatorFromEnv())
+    );
+
     if (this._autoDetectResources) {
       const internalConfig: ResourceDetectionConfig = {
         detectors: this._resourceDetectors,
@@ -432,13 +439,6 @@ export class NodeSDK {
         instrumentation.setMeterProvider(metrics.getMeterProvider());
       }
     }
-
-    setupContextManager(this._configuration?.contextManager);
-    setupPropagator(
-      this._configuration?.textMapPropagator === null
-        ? null // null means don't set, so we cannot fall back to env config.
-        : (this._configuration?.textMapPropagator ?? getPropagatorFromEnv())
-    );
   }
 
   public shutdown(): Promise<void> {
