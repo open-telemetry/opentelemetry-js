@@ -16,4 +16,5 @@
 
 import { performance } from 'perf_hooks';
 
-export const otperformance = performance;
+export const otperformance: { now(): number; readonly timeOrigin: number } =
+  performance;
