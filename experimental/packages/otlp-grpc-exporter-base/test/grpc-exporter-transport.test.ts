@@ -282,7 +282,7 @@ describe('GrpcExporterTransport', function () {
         };
       });
 
-      const getUserAgent = () => {
+      function getUserAgent (serverTestContext: ServerTestContext) {
         return serverTestContext.metadata[0].get('user-agent')[0] as string;
       };
 
