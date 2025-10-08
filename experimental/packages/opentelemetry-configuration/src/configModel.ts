@@ -734,7 +734,7 @@ export interface LoggerMatcherAndConfig {
   /**
    * Configure logger names to match, evaluated as follows:
    *  * If the logger name exactly matches.
-   *  * If the logger name matches the wildcard pattern, where '?' matches any single character 
+   *  * If the logger name matches the wildcard pattern, where '?' matches any single character
    * and '*' matches any number of characters including none.
    */
   name: string;
