@@ -309,11 +309,27 @@ export interface ConfigExporter {
   zipkin?: ConfigZipkin;
 }
 
-export interface ConfigMeterExporter {
+export interface PushMetricExporter {
   /**
    * Configure exporter to be OTLP with HTTP transport.
    */
-  otlp_http: ConfigMeterOTLPHttp;
+  otlp_http?: OtlpHttpMetricExporter;
+
+  /**
+   * Configure exporter to be OTLP with gRPC transport.
+   */
+  otlp_grpc?: OtlpGrpcMetricExporter;
+
+  /**
+   * Configure exporter to be OTLP with file transport.
+   * This type is in development and subject to breaking changes in minor versions.
+   */
+  'otlp_file/development': OtlpFileMetricExporter;
+
+  /**
+   * Configure exporter to be console.
+   */
+  console: object;
 }
 
 export interface ConfigOTLPHttp {
@@ -582,7 +598,7 @@ export interface ConfigTracerProvider {
   sampler: ConfigSampler;
 }
 
-export interface ConfigMeterOTLPHttp {
+export interface OtlpHttpMetricExporter {
   /**
    * Configure endpoint, including the metric specific path.
    * If omitted or null, http://localhost:4318/v1/metrics is used.
@@ -652,8 +668,15 @@ export interface ConfigMeterOTLPHttp {
   default_histogram_aggregation:
     | 'explicit_bucket_histogram'
     | 'base2_exponential_bucket_histogram';
+
+  /**
+   * Configure the encoding used for messages.
+   * Values include: protobuf, json. Implementations may not support json.
+   * If omitted or null, protobuf is used.
+   */
+  encoding: 'json' | 'protobuf';
 }
-export interface ConfigPeriodicReader {
+export interface PeriodicMetricReader {
   /**
    * Configure delay interval (in milliseconds) between start of two consecutive exports.
    * Value must be non-negative.
@@ -671,7 +694,17 @@ export interface ConfigPeriodicReader {
   /**
    * Configure exporter.
    */
-  exporter: ConfigMeterExporter;
+  exporter: PushMetricExporter;
+
+  /**
+   * Configure metric producers.
+   */
+  producers: MetricProducer[];
+
+  /**
+   * Configure cardinality limits.
+   */
+  cardinality_limits: CardinalityLimits; ///
 }
 
 export interface PullMetricReader {
@@ -695,7 +728,12 @@ export interface MetricProducer {
   /**
    * Configure metric producer to be opencensus.
    */
-  opencensus: object | null;
+  opencensus?: object;
+
+  /**
+   * Configure metric producer to be prometheus.
+   */
+  prometheus?: object;
 }
 
 export interface PullMetricExporter {
@@ -821,7 +859,7 @@ export interface ConfigReader {
   /**
    * Configure a periodic metric reader.
    */
-  periodic?: ConfigPeriodicReader;
+  periodic?: PeriodicMetricReader;
 
   /**
    * Configure a pull based metric reader.
@@ -843,96 +881,6 @@ export interface ConfigMeterProvider {
 }
 
 //   readers:
-//     - # Configure a periodic metric reader.
-//       periodic:
-//         # Configure delay interval (in milliseconds) between start of two consecutive exports. 
-//         # Value must be non-negative.
-//         # If omitted or null, 60000 is used.
-//         interval: 60000
-//         # Configure maximum allowed time (in milliseconds) to export data. 
-//         # Value must be non-negative. A value of 0 indicates no limit (infinity).
-//         # If omitted or null, 30000 is used.
-//         timeout: 30000
-//         # Configure exporter.
-//         exporter:
-//           # Configure exporter to be OTLP with HTTP transport.
-//           otlp_http:
-//             # Configure endpoint, including the metric specific path.
-//             # If omitted or null, http://localhost:4318/v1/metrics is used.
-//             endpoint: http://localhost:4318/v1/metrics
-//             # Configure certificate used to verify a server's TLS credentials. 
-//             # Absolute path to certificate file in PEM format.
-//             # If omitted or null, system default certificate verification is used for secure connections.
-//             certificate_file: /app/cert.pem
-//             # Configure mTLS private client key. 
-//             # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-//             # If omitted or null, mTLS is not used.
-//             client_key_file: /app/cert.pem
-//             # Configure mTLS client certificate. 
-//             # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-//             # If omitted or null, mTLS is not used.
-//             client_certificate_file: /app/cert.pem
-//             # Configure headers. Entries have higher priority than entries from .headers_list.
-//             # If an entry's .value is null, the entry is ignored.
-//             headers:
-//               - name: api-key
-//                 value: "1234"
-//             # Configure headers. Entries have lower priority than entries from .headers.
-//             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
-//             # If omitted or null, no headers are added.
-//             headers_list: "api-key=1234"
-//             # Configure compression.
-//             # Values include: gzip, none. Implementations may support other compression algorithms.
-//             # If omitted or null, none is used.
-//             compression: gzip
-//             # Configure max time (in milliseconds) to wait for each export. 
-//             # Value must be non-negative. A value of 0 indicates no limit (infinity).
-//             # If omitted or null, 10000 is used.
-//             timeout: 10000
-//             # Configure the encoding used for messages. 
-//             # Values include: protobuf, json. Implementations may not support json.
-//             # If omitted or null, protobuf is used.
-//             encoding: protobuf
-//             # Configure temporality preference. 
-//             # Values include: cumulative, delta, low_memory. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
-//             # If omitted or null, cumulative is used.
-//             temporality_preference: delta
-//             # Configure default histogram aggregation. 
-//             # Values include: explicit_bucket_histogram, base2_exponential_bucket_histogram. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
-//             # If omitted or null, explicit_bucket_histogram is used.
-//             default_histogram_aggregation: base2_exponential_bucket_histogram
-//         # Configure metric producers.
-//         producers:
-//           - # Configure metric producer to be prometheus.
-//             prometheus:
-//         # Configure cardinality limits.
-//         cardinality_limits:
-//           # Configure default cardinality limit for all instrument types.
-//           # Instrument-specific cardinality limits take priority. 
-//           # If omitted or null, 2000 is used.
-//           default: 2000
-//           # Configure default cardinality limit for counter instruments.
-//           # If omitted or null, the value from .default is used.
-//           counter: 2000
-//           # Configure default cardinality limit for gauge instruments.
-//           # If omitted or null, the value from .default is used.
-//           gauge: 2000
-//           # Configure default cardinality limit for histogram instruments.
-//           # If omitted or null, the value from .default is used.
-//           histogram: 2000
-//           # Configure default cardinality limit for observable_counter instruments.
-//           # If omitted or null, the value from .default is used.
-//           observable_counter: 2000
-//           # Configure default cardinality limit for observable_gauge instruments.
-//           # If omitted or null, the value from .default is used.
-//           observable_gauge: 2000
-//           # Configure default cardinality limit for observable_up_down_counter instruments.
-//           # If omitted or null, the value from .default is used.
-//           observable_up_down_counter: 2000
-//           # Configure default cardinality limit for up_down_counter instruments.
-//           # If omitted or null, the value from .default is used.
-//           up_down_counter: 2000
-//     - # Configure a periodic metric reader.
 //       periodic:
 //         # Configure exporter.
 //         exporter:
