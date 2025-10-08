@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1759827886415,
+  "lastUpdate": 1759910484052,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -39940,6 +39940,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.50%",
             "unit": "ops/sec",
             "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "33d35990654901a215a72a92f6541fc56d069724",
+          "message": "doc: add a doc for OTel JS users migrating to stable HTTP and database semconv (#5982)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2025-10-08T07:52:33Z",
+          "tree_id": "f45d25b6a1f3db45e3c2276d45e6fd5deb308bb6",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/33d35990654901a215a72a92f6541fc56d069724"
+        },
+        "date": 1759910483017,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 675502,
+            "range": "±0.61%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8431,
+            "range": "±0.80%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 288012,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 280326,
+            "range": "±0.64%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
