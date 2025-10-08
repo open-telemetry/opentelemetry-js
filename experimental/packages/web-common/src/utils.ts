@@ -22,6 +22,8 @@ import { SessionLogRecordProcessor } from './SessionLogRecordProcessor';
 import { SessionManager, SessionManagerConfig } from './SessionManager';
 import { SessionIdGenerator } from './types/SessionIdGenerator';
 import { DefaultIdGenerator } from './DefaultIdGenerator';
+import { SessionStore } from './types/SessionStore';
+import { LocalStorageSessionStore } from './LocalStorageSessionStore';
 
 export function createSessionSpanProcessor(
   sessionProvider: SessionProvider
@@ -44,4 +46,8 @@ export function createSessionManager(
 
 export function createDefaultSessionIdGenerator(): SessionIdGenerator {
   return new DefaultIdGenerator();
+}
+
+export function createLocalStorageSessionStore(): SessionStore {
+  return new LocalStorageSessionStore();
 }
