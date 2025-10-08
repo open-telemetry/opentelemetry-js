@@ -793,16 +793,24 @@ export function getRemoteClientAddress(
   if (forwardedHeader) {
     for (const entry of parseForwardedHeader(forwardedHeader)) {
       if (entry.for) {
-        return entry.for;
+        return removePortFromAddress(entry.for);
       }
     }
   }
 
   const xForwardedFor = request.headers['x-forwarded-for'];
-  if (typeof xForwardedFor === 'string') {
-    return xForwardedFor;
-  } else if (Array.isArray(xForwardedFor)) {
-    return xForwardedFor[0];
+  if (xForwardedFor) {
+    let xForwardedForVal;
+    if (typeof xForwardedFor === 'string') {
+      xForwardedForVal = xForwardedFor;
+    } else if (Array.isArray(xForwardedFor)) {
+      xForwardedForVal = xForwardedFor[0];
+    }
+
+    if (typeof xForwardedForVal === 'string') {
+      xForwardedForVal = xForwardedForVal.split(',')[0].trim();
+      return removePortFromAddress(xForwardedForVal);
+    }
   }
 
   const remote = request.socket.remoteAddress;
@@ -811,6 +819,22 @@ export function getRemoteClientAddress(
   }
 
   return null;
+}
+
+function removePortFromAddress(input: string): string {
+  // This function can be replaced with SocketAddress.parse() once the minimum
+  // supported Node.js version allows it.
+  try {
+    const { hostname: address } = new URL(`http://${input}`);
+
+    if (address.startsWith('[') && address.endsWith(']')) {
+      return address.slice(1, -1);
+    }
+
+    return address;
+  } catch {
+    return input;
+  }
 }
 
 function getInfoFromIncomingMessage(
@@ -906,7 +930,7 @@ export const getIncomingRequestAttributes = (
   }
 
   if (remoteClientAddress != null) {
-    newAttributes[ATTR_CLIENT_ADDRESS] = remoteClientAddress.split(',')[0];
+    newAttributes[ATTR_CLIENT_ADDRESS] = remoteClientAddress;
   }
 
   if (serverAddress?.port != null) {

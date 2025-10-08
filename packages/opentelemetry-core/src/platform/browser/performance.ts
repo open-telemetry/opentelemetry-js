@@ -14,4 +14,5 @@
  * limitations under the License.
  */
 
-export const otperformance = performance;
+export const otperformance: { now(): number; readonly timeOrigin: number } =
+  performance;

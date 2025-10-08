@@ -23,4 +23,3 @@ export {
 export { _globalThis } from './globalThis';
 export { otperformance } from './performance';
 export { SDK_INFO } from './sdk-info';
-export { unrefTimer } from './timer-util';
