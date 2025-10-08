@@ -28,7 +28,7 @@ const defaultConfig: Configuration = {
     attribute_count_limit: 128,
   },
   propagator: {
-    composite: ['tracecontext', 'baggage'],
+    composite: [{ tracecontext: null }, { baggage: null }],
     composite_list: 'tracecontext,baggage',
   },
   tracer_provider: {
@@ -170,13 +170,13 @@ const configFromFile: Configuration = {
   },
   propagator: {
     composite: [
-      'tracecontext',
-      'baggage',
-      'b3',
-      'b3multi',
-      'jaeger',
-      'ottrace',
-      'xray',
+      { tracecontext: null },
+      { baggage: null },
+      { b3: null },
+      { b3multi: null },
+      { jaeger: null },
+      { ottrace: null },
+      { xray: null },
     ],
     composite_list: 'tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray',
   },
@@ -352,7 +352,7 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
     attribute_count_limit: 128,
   },
   propagator: {
-    composite: ['tracecontext', 'baggage'],
+    composite: [{ tracecontext: null }, { baggage: null }],
     composite_list: 'tracecontext,baggage',
   },
   tracer_provider: {
@@ -597,7 +597,7 @@ describe('ConfigProvider', function () {
       const expectedConfig: Configuration = {
         ...defaultConfig,
         propagator: {
-          composite: ['tracecontext', 'jaeger'],
+          composite: [{ tracecontext: null }, { jaeger: null }],
           composite_list: 'tracecontext,jaeger',
         },
       };
@@ -973,7 +973,7 @@ describe('ConfigProvider', function () {
           attribute_value_length_limit: 23,
         },
         propagator: {
-          composite: ['prop'],
+          composite: [{ prop: null }],
           composite_list: 'prop',
         },
         tracer_provider: {

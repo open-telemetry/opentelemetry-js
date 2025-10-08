@@ -78,7 +78,7 @@ export function initializeDefaultConfiguration(): ConfigurationModel {
       attribute_count_limit: 128,
     },
     propagator: {
-      composite: ['tracecontext', 'baggage'],
+      composite: [{ tracecontext: null }, { baggage: null }],
       composite_list: 'tracecontext,baggage',
     },
     tracer_provider: {
@@ -229,7 +229,7 @@ export interface ConfigPropagator {
    * Known third party keys include: xray.
    * If the resolved list of propagators (from .composite and .composite_list) is empty, a noop propagator is used.
    */
-  composite: string[];
+  composite: object[];
 
   /**
    * Configure the propagators in the composite text map propagator.

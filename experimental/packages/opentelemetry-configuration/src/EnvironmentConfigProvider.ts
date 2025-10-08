@@ -97,8 +97,11 @@ function setAttributeLimits(config: ConfigurationModel): void {
 
 function setPropagators(config: ConfigurationModel): void {
   const composite = getStringListFromEnv('OTEL_PROPAGATORS');
-  if (composite) {
-    config.propagator.composite = composite;
+  if (composite && composite.length > 0) {
+    config.propagator.composite = [];
+    for (let i = 0; i < composite.length; i++) {
+      config.propagator.composite.push({ [composite[i]]: null });
+    }
   }
   const compositeList = getStringFromEnv('OTEL_PROPAGATORS');
   if (compositeList) {
