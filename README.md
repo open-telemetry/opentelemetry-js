@@ -108,7 +108,7 @@ The above example will emit auto-instrumented telemetry about your Node.js appli
 
 #### Debugging The Setup
 
-It's possible that an application instrumented as outline above may not be behaving in an expected manger.
+It's possible that an application instrumented as outlined above may not be behaving in an expected manner.
 For example, if the application is meant to be sending data to an Open Telemetry collector, that collector
 may not be receiving any data. Insight into such issues can be gained by enabling a diagnostics logger:
 
