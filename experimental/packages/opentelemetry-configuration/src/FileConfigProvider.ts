@@ -18,16 +18,12 @@ import { diagLogLevelFromString, getStringFromEnv } from '@opentelemetry/core';
 import {
   AttributeLimits,
   ConfigAttributes,
-  ConfigExporter,
-  ConfigHeader,
-  ConfigProcessor,
-  ConfigLoggerProvider,
-  ConfigMeterProvider,
-  ConfigPropagator,
-  ConfigTracerProvider,
+  LoggerProvider,
+  MeterProvider,
+  Propagator,
   ConfigurationModel,
   initializeDefaultConfiguration,
-} from './configModel';
+} from './models/configModel';
 import { ConfigProvider } from './IConfigProvider';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
@@ -39,6 +35,12 @@ import {
   getStringFromConfigFile,
   getStringListFromConfigFile,
 } from './utils';
+import { NameStringValuePair, OtlpHttpEncoding } from './models/commonModel';
+import {
+  SpanExporter,
+  SpanProcessor,
+  TracerProvider,
+} from './models/tracerProviderModel';
 
 export class FileConfigProvider implements ConfigProvider {
   private _config: ConfigurationModel;
@@ -91,18 +93,23 @@ function parseConfigFile(config: ConfigurationModel) {
       config.log_level = logLevel;
     }
 
-    const attrList = getStringFromConfigFile(
-      parsedContent['resource']?.['attributes_list']
-    );
-    if (attrList) {
-      config.resource.attributes_list = attrList;
-    }
+    if (parsedContent['resource']) {
+      if (config.resource == null) {
+        config.resource = {};
+      }
+      const attrList = getStringFromConfigFile(
+        parsedContent['resource']?.['attributes_list']
+      );
+      if (attrList) {
+        config.resource.attributes_list = attrList;
+      }
 
-    const schemaUrl = getStringFromConfigFile(
-      parsedContent['resource']?.['schema_url']
-    );
-    if (schemaUrl) {
-      config.resource.schema_url = schemaUrl;
+      const schemaUrl = getStringFromConfigFile(
+        parsedContent['resource']?.['schema_url']
+      );
+      if (schemaUrl) {
+        config.resource.schema_url = schemaUrl;
+      }
     }
 
     setResourceAttributes(config, parsedContent['resource']?.['attributes']);
@@ -123,6 +130,9 @@ function setResourceAttributes(
   attributes: ConfigAttributes[]
 ) {
   if (attributes) {
+    if (config.resource == null) {
+      config.resource = {};
+    }
     config.resource.attributes = [];
     for (let i = 0; i < attributes.length; i++) {
       const att = attributes[i];
@@ -164,6 +174,11 @@ function setAttributeLimits(
   attrLimits: AttributeLimits
 ) {
   if (attrLimits) {
+    if (config.attribute_limits == null) {
+      config.attribute_limits = {
+        attribute_count_limit: 128,
+      };
+    }
     const lengthLimit = getNumberFromConfigFile(
       attrLimits['attribute_value_length_limit']
     );
@@ -181,9 +196,9 @@ function setAttributeLimits(
 
 function setPropagator(
   config: ConfigurationModel,
-  propagator: ConfigPropagator
+  propagator: Propagator
 ): void {
-  if (propagator) {
+  if (propagator && propagator.composite) {
     const auxList = [];
     const composite = [];
     for (let i = 0; i < propagator.composite.length; i++) {
@@ -202,6 +217,9 @@ function setPropagator(
       }
     }
     if (composite.length > 0) {
+      if (config.propagator == null) {
+        config.propagator = {};
+      }
       config.propagator.composite = composite;
     }
 
@@ -209,14 +227,19 @@ function setPropagator(
       propagator['composite_list']
     );
     if (compositeListString) {
+      if (config.propagator == null) {
+        config.propagator = {};
+      }
       config.propagator.composite_list = compositeListString;
     }
   }
 }
 
-function getConfigHeaders(h?: ConfigHeader[]): ConfigHeader[] | null {
+function getConfigHeaders(
+  h?: NameStringValuePair[]
+): NameStringValuePair[] | null {
   if (h) {
-    const headers: ConfigHeader[] = [];
+    const headers: NameStringValuePair[] = [];
     for (let i = 0; i < h.length; i++) {
       const element = h[i];
       headers.push({
@@ -231,9 +254,9 @@ function getConfigHeaders(h?: ConfigHeader[]): ConfigHeader[] | null {
   return null;
 }
 
-function parseConfigExporter(exporter: ConfigExporter): ConfigExporter {
+function parseConfigExporter(exporter: SpanExporter): SpanExporter {
   const exporterType = Object.keys(exporter)[0];
-  let parsedExporter: ConfigExporter = {};
+  let parsedExporter: SpanExporter = {};
   let e;
   let certFile;
   let clientCertFile;
@@ -254,8 +277,8 @@ function parseConfigExporter(exporter: ConfigExporter): ConfigExporter {
             timeout: getNumberFromConfigFile(e['timeout']) ?? 10000,
             encoding:
               getStringFromConfigFile(e['encoding']) === 'json'
-                ? 'json'
-                : 'protobuf',
+                ? OtlpHttpEncoding.json
+                : OtlpHttpEncoding.protobuf,
           },
         };
 
@@ -367,11 +390,19 @@ function parseConfigExporter(exporter: ConfigExporter): ConfigExporter {
 
 function setTracerProvider(
   config: ConfigurationModel,
-  tracerProvider: ConfigTracerProvider
+  tracerProvider: TracerProvider
 ): void {
   if (tracerProvider) {
+    if (config.tracer_provider == null) {
+      config.tracer_provider = {
+        processors: [],
+      };
+    }
     // Limits
     if (tracerProvider['limits']) {
+      if (config.tracer_provider.limits == null) {
+        config.tracer_provider.limits = {};
+      }
       const attributeValueLengthLimit = getNumberFromConfigFile(
         tracerProvider['limits']['attribute_value_length_limit']
       );
@@ -431,7 +462,7 @@ function setTracerProvider(
           const element = tracerProvider['processors'][i]['batch'];
           if (element) {
             const parsedExporter = parseConfigExporter(element['exporter']);
-            const batchConfig: ConfigProcessor = {
+            const batchConfig: SpanProcessor = {
               batch: {
                 schedule_delay:
                   getNumberFromConfigFile(element['schedule_delay']) ?? 5000,
@@ -452,7 +483,7 @@ function setTracerProvider(
           const element = tracerProvider['processors'][i]['simple'];
           if (element) {
             const parsedExporter = parseConfigExporter(element['exporter']);
-            const simpleConfig: ConfigProcessor = {
+            const simpleConfig: SpanProcessor = {
               simple: {
                 exporter: parsedExporter,
               },
@@ -468,9 +499,12 @@ function setTracerProvider(
 
 function setMeterProvider(
   config: ConfigurationModel,
-  meterProvider: ConfigMeterProvider
+  meterProvider: MeterProvider
 ): void {
   if (meterProvider) {
+    if (config.meter_provider == null) {
+      config.meter_provider = {};
+    }
     const exemplarFilter = getStringFromConfigFile(
       meterProvider['exemplar_filter']
     );
@@ -487,22 +521,34 @@ function setMeterProvider(
 
 function setLoggerProvider(
   config: ConfigurationModel,
-  loggerProvider: ConfigLoggerProvider
+  loggerProvider: LoggerProvider
 ): void {
   if (loggerProvider) {
-    const attributeValueLengthLimit = getNumberFromConfigFile(
-      loggerProvider['limits']['attribute_value_length_limit']
-    );
-    if (attributeValueLengthLimit) {
-      config.logger_provider.limits.attribute_value_length_limit =
-        attributeValueLengthLimit;
+    if (config.logger_provider == null) {
+      config.logger_provider = {};
     }
+    if (loggerProvider['limits']) {
+      const attributeValueLengthLimit = getNumberFromConfigFile(
+        loggerProvider['limits']['attribute_value_length_limit']
+      );
+      const attributeCountLimit = getNumberFromConfigFile(
+        loggerProvider['limits']['attribute_count_limit']
+      );
+      if (attributeValueLengthLimit || attributeCountLimit) {
+        if (config.logger_provider.limits == null) {
+          config.logger_provider.limits = { attribute_count_limit: 128 };
+        }
 
-    const attributeCountLimit = getNumberFromConfigFile(
-      loggerProvider['limits']['attribute_count_limit']
-    );
-    if (attributeCountLimit) {
-      config.logger_provider.limits.attribute_count_limit = attributeCountLimit;
+        if (attributeValueLengthLimit) {
+          config.logger_provider.limits.attribute_value_length_limit =
+            attributeValueLengthLimit;
+        }
+
+        if (attributeCountLimit) {
+          config.logger_provider.limits.attribute_count_limit =
+            attributeCountLimit;
+        }
+      }
     }
   }
 }
