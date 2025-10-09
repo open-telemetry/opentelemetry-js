@@ -17,8 +17,6 @@
 import { diagLogLevelFromString, getStringFromEnv } from '@opentelemetry/core';
 import {
   AttributeLimits,
-  ConfigAttributes,
-  LoggerProvider,
   MeterProvider,
   Propagator,
   ConfigurationModel,
@@ -41,6 +39,8 @@ import {
   SpanProcessor,
   TracerProvider,
 } from './models/tracerProviderModel';
+import { LoggerProvider } from './models/loggerProviderModel';
+import { AttributeNameValue } from './models/resourceModel';
 
 export class FileConfigProvider implements ConfigProvider {
   private _config: ConfigurationModel;
@@ -98,14 +98,14 @@ function parseConfigFile(config: ConfigurationModel) {
         config.resource = {};
       }
       const attrList = getStringFromConfigFile(
-        parsedContent['resource']?.['attributes_list']
+        parsedContent['resource']['attributes_list']
       );
       if (attrList) {
         config.resource.attributes_list = attrList;
       }
 
       const schemaUrl = getStringFromConfigFile(
-        parsedContent['resource']?.['schema_url']
+        parsedContent['resource']['schema_url']
       );
       if (schemaUrl) {
         config.resource.schema_url = schemaUrl;
@@ -127,7 +127,7 @@ function parseConfigFile(config: ConfigurationModel) {
 
 function setResourceAttributes(
   config: ConfigurationModel,
-  attributes: ConfigAttributes[]
+  attributes: AttributeNameValue[]
 ) {
   if (attributes) {
     if (config.resource == null) {
@@ -551,7 +551,7 @@ function setLoggerProvider(
 ): void {
   if (loggerProvider) {
     if (config.logger_provider == null) {
-      config.logger_provider = {};
+      config.logger_provider = { processors: [] };
     }
     // Limits
     if (loggerProvider['limits']) {
@@ -562,6 +562,9 @@ function setLoggerProvider(
         loggerProvider['limits']['attribute_count_limit']
       );
       if (attributeValueLengthLimit || attributeCountLimit) {
+        if (config.logger_provider == null) {
+          config.logger_provider = { processors: [] };
+        }
         if (config.logger_provider.limits == null) {
           config.logger_provider.limits = { attribute_count_limit: 128 };
         }
@@ -579,6 +582,9 @@ function setLoggerProvider(
     // Processors
     if (loggerProvider['processors']) {
       if (loggerProvider['processors'].length > 0) {
+        if (config.logger_provider == null) {
+          config.logger_provider = { processors: [] };
+        }
         config.logger_provider.processors = [];
         for (let i = 0; i < loggerProvider['processors'].length; i++) {
           const processorType = Object.keys(loggerProvider['processors'][i])[0];
@@ -634,6 +640,9 @@ function setLoggerProvider(
         ]
       );
       if (defaultConfigDisabled || defaultConfigDisabled === false) {
+        if (config.logger_provider == null) {
+          config.logger_provider = { processors: [] };
+        }
         config.logger_provider['logger_configurator/development'] = {
           default_config: {
             disabled: defaultConfigDisabled,
@@ -653,8 +662,11 @@ function setLoggerProvider(
         ) {
           const logger =
             loggerProvider['logger_configurator/development'].loggers[i];
-          const disabled =
-            getBooleanFromConfigFile(logger['config']['disabled']) ?? false;
+          let disabled = false;
+          if (logger['config']) {
+            disabled =
+              getBooleanFromConfigFile(logger['config']['disabled']) ?? false;
+          }
           const name = getStringFromConfigFile(logger['name']);
           if (name) {
             loggers.push({
@@ -664,6 +676,9 @@ function setLoggerProvider(
               },
             });
           }
+        }
+        if (config.logger_provider == null) {
+          config.logger_provider = { processors: [] };
         }
         if (config.logger_provider['logger_configurator/development'] == null) {
           config.logger_provider['logger_configurator/development'] = {};

@@ -363,7 +363,7 @@ function setLoggerProvider(config: ConfigurationModel): void {
   );
   if (attributeValueLengthLimit || attributeCountLimit) {
     if (config.logger_provider == null) {
-      config.logger_provider = {};
+      config.logger_provider = { processors: [] };
     }
     if (config.logger_provider.limits == null) {
       config.logger_provider.limits = { attribute_count_limit: 128 };
