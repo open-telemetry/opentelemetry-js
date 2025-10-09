@@ -26,7 +26,10 @@ import {
   LoggerProvider,
 } from './loggerProviderModel';
 import { Resource } from './resourceModel';
-import { ExemplarFilter, MeterProvider } from './meterProviderModel';
+import {
+  initializeDefaultMeterProviderConfiguration,
+  MeterProvider,
+} from './meterProviderModel';
 
 export interface ConfigurationModel {
   /**
@@ -94,25 +97,7 @@ export function initializeDefaultConfiguration(): ConfigurationModel {
       composite_list: 'tracecontext,baggage',
     },
     tracer_provider: initializeDefaultTracerProviderConfiguration(),
-    meter_provider: {
-      readers: [
-        {
-          periodic: {
-            interval: 60000,
-            timeout: 30000,
-            exporter: {
-              otlp_http: {
-                endpoint: 'http://localhost:4318/v1/metrics',
-                timeout: 10000,
-                temporality_preference: 'cumulative',
-                default_histogram_aggregation: 'explicit_bucket_histogram',
-              },
-            },
-          },
-        },
-      ],
-      exemplar_filter: ExemplarFilter.trace_based,
-    },
+    meter_provider: initializeDefaultMeterProviderConfiguration(),
     logger_provider: initializeDefaultLoggerProviderConfiguration(),
   };
 

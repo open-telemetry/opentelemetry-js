@@ -17,11 +17,9 @@
 import { diagLogLevelFromString, getStringFromEnv } from '@opentelemetry/core';
 import {
   AttributeLimits,
-  MeterProvider,
   Propagator,
   ConfigurationModel,
   initializeDefaultConfiguration,
-  ConfigReader,
 } from './models/configModel';
 import { ConfigProvider } from './IConfigProvider';
 import * as fs from 'fs';
@@ -42,7 +40,22 @@ import {
 } from './models/tracerProviderModel';
 import { LoggerProvider } from './models/loggerProviderModel';
 import { AttributeNameValue } from './models/resourceModel';
-import { CardinalityLimits, MetricProducer, PullMetricExporter } from './configModel';
+import {
+  Aggregation,
+  CardinalityLimits,
+  ExemplarFilter,
+  ExporterDefaultHistogramAggregation,
+  ExporterTemporalityPreference,
+  InstrumentType,
+  MeterProvider,
+  MetricProducer,
+  MetricReader,
+  PullMetricExporter,
+  PushMetricExporter,
+  View,
+  ViewSelector,
+  ViewStream,
+} from './models/meterProviderModel';
 
 export class FileConfigProvider implements ConfigProvider {
   private _config: ConfigurationModel;
@@ -262,7 +275,7 @@ enum ProviderType {
   LOGGER = 2,
 }
 
-function parseConfigExporter(
+function parseConfigSpanExporter(
   exporter: SpanExporter,
   providerType: ProviderType
 ): SpanExporter {
@@ -281,9 +294,6 @@ function parseConfigExporter(
   switch (providerType) {
     case ProviderType.TRACER:
       endpoint = 'http://localhost:4318/v1/traces';
-      break;
-    case ProviderType.METER:
-      endpoint = 'http://localhost:4318/v1/metrics';
       break;
     case ProviderType.LOGGER:
       endpoint = 'http://localhost:4318/v1/logs';
@@ -388,7 +398,7 @@ function parseConfigExporter(
 
     case 'console':
       parsedExporter = {
-        console: {},
+        console: undefined,
       };
       break;
 
@@ -483,7 +493,7 @@ function setTracerProvider(
         if (processorType === 'batch') {
           const element = tracerProvider['processors'][i]['batch'];
           if (element) {
-            const parsedExporter = parseConfigExporter(
+            const parsedExporter = parseConfigSpanExporter(
               element['exporter'],
               ProviderType.TRACER
             );
@@ -507,7 +517,7 @@ function setTracerProvider(
         } else if (processorType === 'simple') {
           const element = tracerProvider['processors'][i]['simple'];
           if (element) {
-            const parsedExporter = parseConfigExporter(
+            const parsedExporter = parseConfigSpanExporter(
               element['exporter'],
               ProviderType.TRACER
             );
@@ -525,27 +535,247 @@ function setTracerProvider(
   }
 }
 
+function getCardinalityLimits(limits?: CardinalityLimits): CardinalityLimits {
+  if (limits == null) {
+    limits = {};
+  }
+  const defaultLimit = getNumberFromConfigFile(limits['default']) ?? 2000;
+
+  return {
+    default: defaultLimit,
+    counter: getNumberFromConfigFile(limits['counter']) ?? defaultLimit,
+    gauge: getNumberFromConfigFile(limits['gauge']) ?? defaultLimit,
+    histogram: getNumberFromConfigFile(limits['histogram']) ?? defaultLimit,
+    observable_counter:
+      getNumberFromConfigFile(limits['observable_counter']) ?? defaultLimit,
+    observable_gauge:
+      getNumberFromConfigFile(limits['observable_gauge']) ?? defaultLimit,
+    observable_up_down_counter:
+      getNumberFromConfigFile(limits['observable_up_down_counter']) ??
+      defaultLimit,
+    up_down_counter:
+      getNumberFromConfigFile(limits['up_down_counter']) ?? defaultLimit,
+  };
+}
+
+function getProducers(producers?: MetricProducer[]): MetricProducer[] {
+  const parsedProducers: MetricProducer[] = [];
+  if (producers) {
+    for (let j = 0; j < producers.length; j++) {
+      const producer = producers[j];
+      if (Object.keys(producer)[0] === 'opencensus') {
+        parsedProducers.push({ opencensus: undefined });
+      }
+      if (Object.keys(producer)[0] === 'prometheus') {
+        parsedProducers.push({ prometheus: undefined });
+      }
+    }
+  }
+
+  return parsedProducers;
+}
+
+function getTemporalityPreference(
+  temporalityPreference?: ExporterTemporalityPreference
+): ExporterTemporalityPreference {
+  const temporalityPreferenceType = getStringFromConfigFile(
+    temporalityPreference
+  );
+  switch (temporalityPreferenceType) {
+    case 'cumulative':
+      return ExporterTemporalityPreference.cumulative;
+    case 'delta':
+      return ExporterTemporalityPreference.delta;
+    case 'low_memory':
+      return ExporterTemporalityPreference.low_memory;
+    default:
+      return ExporterTemporalityPreference.cumulative;
+  }
+}
+
+function getDefaultHistogramAggregation(
+  defaultHistogramAggregation?: ExporterDefaultHistogramAggregation
+): ExporterDefaultHistogramAggregation {
+  const defaultHistogramAggregationType = getStringFromConfigFile(
+    defaultHistogramAggregation
+  );
+  switch (defaultHistogramAggregationType) {
+    case 'explicit_bucket_histogram':
+      return ExporterDefaultHistogramAggregation.explicit_bucket_histogram;
+    case 'base2_exponential_bucket_histogram':
+      return ExporterDefaultHistogramAggregation.base2_exponential_bucket_histogram;
+    default:
+      return ExporterDefaultHistogramAggregation.explicit_bucket_histogram;
+  }
+}
+
+function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
+  const exporterType = Object.keys(exporter)[0];
+  let parsedExporter: PushMetricExporter = {};
+  let e;
+  let certFile;
+  let clientCertFile;
+  let clientKeyFile;
+  let compression;
+  let headers;
+  let headersList;
+  let insecure;
+
+  switch (exporterType) {
+    case 'otlp_http':
+      e = exporter['otlp_http'];
+      if (e) {
+        parsedExporter = {
+          otlp_http: {
+            endpoint:
+              getStringFromConfigFile(e['endpoint']) ??
+              'http://localhost:4318/v1/metrics',
+            timeout: getNumberFromConfigFile(e['timeout']) ?? 10000,
+            encoding:
+              getStringFromConfigFile(e['encoding']) === 'json'
+                ? OtlpHttpEncoding.json
+                : OtlpHttpEncoding.protobuf,
+            temporality_preference: getTemporalityPreference(
+              e['temporality_preference']
+            ),
+            default_histogram_aggregation: getDefaultHistogramAggregation(
+              e['default_histogram_aggregation']
+            ),
+          },
+        };
+
+        certFile = getStringFromConfigFile(e['certificate_file']);
+        if (certFile && parsedExporter.otlp_http) {
+          parsedExporter.otlp_http.certificate_file = certFile;
+        }
+        clientCertFile = getStringFromConfigFile(e['client_certificate_file']);
+        if (clientCertFile && parsedExporter.otlp_http) {
+          parsedExporter.otlp_http.client_certificate_file = clientCertFile;
+        }
+        clientKeyFile = getStringFromConfigFile(e['client_key_file']);
+        if (clientKeyFile && parsedExporter.otlp_http) {
+          parsedExporter.otlp_http.client_key_file = clientKeyFile;
+        }
+        compression = getStringFromConfigFile(e['compression']);
+        if (compression && parsedExporter.otlp_http) {
+          parsedExporter.otlp_http.compression = compression;
+        }
+        headersList = getStringFromConfigFile(e['headers_list']);
+        if (headersList && parsedExporter.otlp_http) {
+          parsedExporter.otlp_http.headers_list = headersList;
+        }
+        headers = getConfigHeaders(e['headers']);
+        if (headers && parsedExporter.otlp_http) {
+          parsedExporter.otlp_http.headers = headers;
+        }
+      }
+      break;
+
+    case 'otlp_grpc':
+      e = exporter['otlp_grpc'];
+      if (e) {
+        parsedExporter = {
+          otlp_grpc: {
+            endpoint:
+              getStringFromConfigFile(e['endpoint']) ?? 'http://localhost:4317',
+            timeout: getNumberFromConfigFile(e['timeout']) ?? 10000,
+            temporality_preference: getTemporalityPreference(
+              e['temporality_preference']
+            ),
+            default_histogram_aggregation: getDefaultHistogramAggregation(
+              e['default_histogram_aggregation']
+            ),
+          },
+        };
+
+        certFile = getStringFromConfigFile(e['certificate_file']);
+        if (certFile && parsedExporter.otlp_grpc) {
+          parsedExporter.otlp_grpc.certificate_file = certFile;
+        }
+        clientCertFile = getStringFromConfigFile(e['client_certificate_file']);
+        if (clientCertFile && parsedExporter.otlp_grpc) {
+          parsedExporter.otlp_grpc.client_certificate_file = clientCertFile;
+        }
+        clientKeyFile = getStringFromConfigFile(e['client_key_file']);
+        if (clientKeyFile && parsedExporter.otlp_grpc) {
+          parsedExporter.otlp_grpc.client_key_file = clientKeyFile;
+        }
+        compression = getStringFromConfigFile(e['compression']);
+        if (compression && parsedExporter.otlp_grpc) {
+          parsedExporter.otlp_grpc.compression = compression;
+        }
+        headersList = getStringFromConfigFile(e['headers_list']);
+        if (headersList && parsedExporter.otlp_grpc) {
+          parsedExporter.otlp_grpc.headers_list = headersList;
+        }
+        headers = getConfigHeaders(e['headers']);
+        if (headers && parsedExporter.otlp_grpc) {
+          parsedExporter.otlp_grpc.headers = headers;
+        }
+        insecure = getBooleanFromConfigFile(e['insecure']);
+        if ((insecure || insecure === false) && parsedExporter.otlp_grpc) {
+          parsedExporter.otlp_grpc.insecure = insecure;
+        }
+      }
+      break;
+
+    case 'otlp_file/development':
+      e = exporter['otlp_file/development'];
+      if (e) {
+        parsedExporter = {
+          'otlp_file/development': {
+            output_stream:
+              getStringFromConfigFile(e['output_stream']) ?? 'stdout',
+            temporality_preference: getTemporalityPreference(
+              e['temporality_preference']
+            ),
+            default_histogram_aggregation: getDefaultHistogramAggregation(
+              e['default_histogram_aggregation']
+            ),
+          },
+        };
+      }
+      break;
+
+    case 'console':
+      parsedExporter = {
+        console: undefined,
+      };
+      break;
+  }
+
+  return parsedExporter;
+}
+
 function setMeterProvider(
   config: ConfigurationModel,
   meterProvider: MeterProvider
 ): void {
   if (meterProvider) {
     if (config.meter_provider == null) {
-      config.meter_provider = {};
+      config.meter_provider = { readers: [] };
     }
     const exemplarFilter = getStringFromConfigFile(
       meterProvider['exemplar_filter']
     );
-    if (
-      exemplarFilter &&
-      (exemplarFilter === 'trace_based' ||
-        exemplarFilter === 'always_on' ||
-        exemplarFilter === 'always_off')
-    ) {
-      config.meter_provider.exemplar_filter = exemplarFilter;
+    if (exemplarFilter) {
+      switch (exemplarFilter) {
+        case 'trace_based':
+          config.meter_provider.exemplar_filter = ExemplarFilter.trace_based;
+          break;
+        case 'always_on':
+          config.meter_provider.exemplar_filter = ExemplarFilter.always_on;
+          break;
+        case 'always_off':
+          config.meter_provider.exemplar_filter = ExemplarFilter.always_off;
+          break;
+        default:
+          config.meter_provider.exemplar_filter = ExemplarFilter.trace_based;
+          break;
+      }
     }
 
-    if (meterProvider['readers'] && meterProvider['readers']?.length > 0) {
+    if (meterProvider['readers'] && meterProvider['readers'].length > 0) {
       config.meter_provider.readers = [];
 
       for (let i = 0; i < meterProvider['readers'].length; i++) {
@@ -563,22 +793,10 @@ function setMeterProvider(
                   getNumberFromConfigFile(
                     element['exporter']['prometheus/development']['port']
                   ) ?? 9464,
-                without_units:
-                  getBooleanFromConfigFile(
-                    element['exporter']['prometheus/development'][
-                      'without_units'
-                    ]
-                  ) ?? false,
                 without_scope_info:
                   getBooleanFromConfigFile(
                     element['exporter']['prometheus/development'][
                       'without_scope_info'
-                    ]
-                  ) ?? false,
-                without_type_suffix:
-                  getBooleanFromConfigFile(
-                    element['exporter']['prometheus/development'][
-                      'without_type_suffix'
                     ]
                   ) ?? false,
                 with_resource_constant_labels: {
@@ -597,53 +815,218 @@ function setMeterProvider(
                 },
               },
             };
-            const producers: MetricProducer[] = [{ opencensus: undefined }];
-            const defaultLimit =
-              getNumberFromConfigFile(
-                element['cardinality_limits']['default']
-              ) ?? 2000;
-            const cardinalityLimits: CardinalityLimits = {
-              default: defaultLimit,
-              counter:
-                getNumberFromConfigFile(
-                  element['cardinality_limits']['counter']
-                ) ?? defaultLimit,
-              gauge:
-                getNumberFromConfigFile(
-                  element['cardinality_limits']['gauge']
-                ) ?? defaultLimit,
-              histogram:
-                getNumberFromConfigFile(
-                  element['cardinality_limits']['histogram']
-                ) ?? defaultLimit,
-              observable_counter:
-                getNumberFromConfigFile(
-                  element['cardinality_limits']['observable_counter']
-                ) ?? defaultLimit,
-              observable_gauge:
-                getNumberFromConfigFile(
-                  element['cardinality_limits']['observable_gauge']
-                ) ?? defaultLimit,
-              observable_up_down_counter:
-                getNumberFromConfigFile(
-                  element['cardinality_limits']['observable_up_down_counter']
-                ) ?? defaultLimit,
-              up_down_counter:
-                getNumberFromConfigFile(
-                  element['cardinality_limits']['up_down_counter']
-                ) ?? defaultLimit,
-            };
 
-            const pullReader: ConfigReader = {
+            const pullReader: MetricReader = {
               pull: {
                 exporter: exporter,
-                producers: producers,
-                cardinality_limits: cardinalityLimits,
+                cardinality_limits: getCardinalityLimits(
+                  element['cardinality_limits']
+                ),
               },
             };
+            const p = getProducers(element['producers']);
+            if (p.length > 0 && pullReader.pull) {
+              pullReader.pull.producers = p;
+            }
             config.meter_provider.readers.push(pullReader);
           }
+        } else if (readerType === 'periodic') {
+          const element = meterProvider['readers'][i]['periodic'];
+          if (element) {
+            const parsedExporter = parseMetricExporter(element['exporter']);
+
+            const periodicReader: MetricReader = {
+              periodic: {
+                exporter: parsedExporter,
+                cardinality_limits: getCardinalityLimits(
+                  element['cardinality_limits']
+                ),
+                interval: getNumberFromConfigFile(element['interval']) ?? 60000,
+                timeout: getNumberFromConfigFile(element['timeout']) ?? 30000,
+              },
+            };
+            const p = getProducers(element['producers']);
+            if (p.length > 0 && periodicReader.periodic) {
+              periodicReader.periodic.producers = p;
+            }
+            config.meter_provider.readers.push(periodicReader);
+          }
         }
+      }
+    }
+
+    if (meterProvider['views'] && meterProvider['views'].length > 0) {
+      config.meter_provider.views = [];
+      for (let j = 0; j < meterProvider['views'].length; j++) {
+        const element = meterProvider['views'][j];
+        const view: View = {};
+        if (element['selector']) {
+          const selector: ViewSelector = {};
+          const instrumentName = getStringFromConfigFile(
+            element['selector']['instrument_name']
+          );
+          if (instrumentName) {
+            selector.instrument_name = instrumentName;
+          }
+
+          const unit = getStringFromConfigFile(element['selector']['unit']);
+          if (unit) {
+            selector.unit = unit;
+          }
+
+          const meterName = getStringFromConfigFile(
+            element['selector']['meter_name']
+          );
+          if (meterName) {
+            selector.meter_name = meterName;
+          }
+
+          const meterVersion = getStringFromConfigFile(
+            element['selector']['meter_version']
+          );
+          if (meterVersion) {
+            selector.meter_version = meterVersion;
+          }
+
+          const meterSchemaUrl = getStringFromConfigFile(
+            element['selector']['meter_schema_url']
+          );
+          if (meterSchemaUrl) {
+            selector.meter_schema_url = meterSchemaUrl;
+          }
+
+          const instrumentType = getStringFromConfigFile(
+            element['selector']['instrument_type']
+          );
+          if (instrumentType) {
+            switch (instrumentType) {
+              case 'counter':
+                selector.instrument_type = InstrumentType.counter;
+                break;
+              case 'gauge':
+                selector.instrument_type = InstrumentType.gauge;
+                break;
+              case 'histogram':
+                selector.instrument_type = InstrumentType.histogram;
+                break;
+              case 'observable_counter':
+                selector.instrument_type = InstrumentType.observable_counter;
+                break;
+              case 'observable_gauge':
+                selector.instrument_type = InstrumentType.observable_gauge;
+                break;
+              case 'observable_up_down_counter':
+                selector.instrument_type =
+                  InstrumentType.observable_up_down_counter;
+                break;
+              case 'up_down_counter':
+                selector.instrument_type = InstrumentType.up_down_counter;
+                break;
+            }
+          }
+
+          if (Object.keys(selector).length > 0) {
+            view.selector = selector;
+          }
+        }
+        if (element['stream']) {
+          const stream: ViewStream = {};
+          const name = getStringFromConfigFile(element['stream']['name']);
+          if (name) {
+            stream.name = name;
+          }
+
+          const description = getStringFromConfigFile(
+            element['stream']['description']
+          );
+          if (description) {
+            stream.description = description;
+          }
+
+          const aggregationCardinalityLimit = getNumberFromConfigFile(
+            element['stream']['aggregation_cardinality_limit']
+          );
+          if (aggregationCardinalityLimit) {
+            stream.aggregation_cardinality_limit = aggregationCardinalityLimit;
+          }
+
+          if (element['stream']['attribute_keys']) {
+            stream.attribute_keys = {
+              included:
+                getStringListFromConfigFile(
+                  element['stream']['attribute_keys']['included']
+                ) ?? [],
+              excluded:
+                getStringListFromConfigFile(
+                  element['stream']['attribute_keys']['excluded']
+                ) ?? [],
+            };
+          }
+          const rawAgg = element['stream']['aggregation'];
+          if (rawAgg) {
+            const aggregation: Aggregation = {};
+            if (rawAgg['default']) {
+              aggregation.default = {};
+            }
+            if (rawAgg['drop']) {
+              aggregation.drop = {};
+            }
+            if (rawAgg['last_value']) {
+              aggregation.last_value = {};
+            }
+            if (rawAgg['sum']) {
+              aggregation.sum = {};
+            }
+            if (rawAgg['explicit_bucket_histogram']) {
+              aggregation.explicit_bucket_histogram = {
+                boundaries: getNumberListFromConfigFile(
+                  rawAgg['explicit_bucket_histogram']['boundaries']
+                ) ?? [
+                  0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000,
+                  7500, 10000,
+                ],
+                record_min_max:
+                  getBooleanFromConfigFile(
+                    rawAgg['explicit_bucket_histogram']['record_min_max']
+                  ) === false
+                    ? false
+                    : true,
+              };
+            }
+            if (rawAgg['base2_exponential_bucket_histogram']) {
+              aggregation.base2_exponential_bucket_histogram = {
+                record_min_max:
+                  getBooleanFromConfigFile(
+                    rawAgg['base2_exponential_bucket_histogram'][
+                      'record_min_max'
+                    ]
+                  ) === false
+                    ? false
+                    : true,
+              };
+              const maxScale = getNumberFromConfigFile(
+                rawAgg['base2_exponential_bucket_histogram']['max_scale']
+              );
+              if (maxScale) {
+                aggregation.base2_exponential_bucket_histogram.max_scale =
+                  maxScale;
+              }
+
+              const maxSize = getNumberFromConfigFile(
+                rawAgg['base2_exponential_bucket_histogram']['max_size']
+              );
+              if (maxSize) {
+                aggregation.base2_exponential_bucket_histogram.max_size =
+                  maxSize;
+              }
+            }
+            stream.aggregation = aggregation;
+          }
+          if (Object.keys(stream).length > 0) {
+            view.stream = stream;
+          }
+        }
+        config.meter_provider.views.push(view);
       }
     }
   }
@@ -695,7 +1078,7 @@ function setLoggerProvider(
           if (processorType === 'batch') {
             const element = loggerProvider['processors'][i]['batch'];
             if (element) {
-              const parsedExporter = parseConfigExporter(
+              const parsedExporter = parseConfigSpanExporter(
                 element['exporter'],
                 ProviderType.LOGGER
               );
@@ -719,7 +1102,7 @@ function setLoggerProvider(
           } else if (processorType === 'simple') {
             const element = loggerProvider['processors'][i]['simple'];
             if (element) {
-              const parsedExporter = parseConfigExporter(
+              const parsedExporter = parseConfigSpanExporter(
                 element['exporter'],
                 ProviderType.LOGGER
               );

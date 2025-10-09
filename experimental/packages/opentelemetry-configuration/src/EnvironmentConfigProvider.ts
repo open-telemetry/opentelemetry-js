@@ -26,6 +26,11 @@ import {
   getNumberFromEnv,
 } from '@opentelemetry/core';
 import { ConfigProvider } from './IConfigProvider';
+import {
+  ExemplarFilter,
+  ExporterDefaultHistogramAggregation,
+  ExporterTemporalityPreference,
+} from './models/meterProviderModel';
 
 /**
  * EnvironmentConfigProvider provides a configuration based on environment variables.
@@ -262,6 +267,9 @@ function setMeterProvider(config: ConfigurationModel): void {
     if (timeout) {
       readerPeriodic.timeout = timeout;
     }
+    if (readerPeriodic.exporter.otlp_http == null) {
+      readerPeriodic.exporter.otlp_http = {};
+    }
 
     const endpoint = getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_ENDPOINT');
     if (endpoint) {
@@ -310,26 +318,45 @@ function setMeterProvider(config: ConfigurationModel): void {
     const temporalityPreference = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE'
     );
-    if (
-      temporalityPreference &&
-      (temporalityPreference === 'cumulative' ||
-        temporalityPreference === 'delta' ||
-        temporalityPreference === 'low_memory')
-    ) {
-      readerPeriodic.exporter.otlp_http.temporality_preference =
-        temporalityPreference;
+    if (temporalityPreference) {
+      switch (temporalityPreference) {
+        case 'cumulative':
+          readerPeriodic.exporter.otlp_http.temporality_preference =
+            ExporterTemporalityPreference.cumulative;
+          break;
+        case 'delta':
+          readerPeriodic.exporter.otlp_http.temporality_preference =
+            ExporterTemporalityPreference.delta;
+          break;
+        case 'low_memory':
+          readerPeriodic.exporter.otlp_http.temporality_preference =
+            ExporterTemporalityPreference.low_memory;
+          break;
+        default:
+          readerPeriodic.exporter.otlp_http.temporality_preference =
+            ExporterTemporalityPreference.cumulative;
+          break;
+      }
     }
 
     const defaultHistogramAggregation = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION'
     );
-    if (
-      defaultHistogramAggregation &&
-      (defaultHistogramAggregation === 'explicit_bucket_histogram' ||
-        defaultHistogramAggregation === 'base2_exponential_bucket_histogram')
-    ) {
-      readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
-        defaultHistogramAggregation;
+    if (defaultHistogramAggregation) {
+      switch (defaultHistogramAggregation) {
+        case 'explicit_bucket_histogram':
+          readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
+            ExporterDefaultHistogramAggregation.explicit_bucket_histogram;
+          break;
+        case 'base2_exponential_bucket_histogram':
+          readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
+            ExporterDefaultHistogramAggregation.base2_exponential_bucket_histogram;
+          break;
+        default:
+          readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
+            ExporterDefaultHistogramAggregation.explicit_bucket_histogram;
+          break;
+      }
     }
     if (config.meter_provider == null) {
       config.meter_provider = { readers: [{}] };
@@ -341,16 +368,24 @@ function setMeterProvider(config: ConfigurationModel): void {
     config.meter_provider.readers[0].periodic = readerPeriodic;
   }
   const exemplarFilter = getStringFromEnv('OTEL_METRICS_EXEMPLAR_FILTER');
-  if (
-    exemplarFilter &&
-    (exemplarFilter === 'trace_based' ||
-      exemplarFilter === 'always_on' ||
-      exemplarFilter === 'always_off')
-  ) {
+  if (exemplarFilter) {
     if (config.meter_provider == null) {
-      config.meter_provider = {};
+      config.meter_provider = { readers: [] };
     }
-    config.meter_provider.exemplar_filter = exemplarFilter;
+    switch (exemplarFilter) {
+      case 'trace_based':
+        config.meter_provider.exemplar_filter = ExemplarFilter.trace_based;
+        break;
+      case 'always_on':
+        config.meter_provider.exemplar_filter = ExemplarFilter.always_on;
+        break;
+      case 'always_off':
+        config.meter_provider.exemplar_filter = ExemplarFilter.always_off;
+        break;
+      default:
+        config.meter_provider.exemplar_filter = ExemplarFilter.trace_based;
+        break;
+    }
   }
 }
 
