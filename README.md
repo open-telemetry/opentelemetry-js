@@ -235,7 +235,7 @@ For a more detailed breakdown of feature support see the [specification complian
 
 ## Contributing
 
-We'd love your help!. Use tags [up-for-grabs][up-for-grabs-issues] and
+We'd love your help! Use tags [up-for-grabs][up-for-grabs-issues] and
 [good first issue][good-first-issues] to get started with the project. For
 instructions to build and make changes to this project, see the
 [CONTRIBUTING][CONTRIBUTING] guide.
