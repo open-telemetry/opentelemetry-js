@@ -21,31 +21,36 @@ import {
 } from './shared-configuration';
 import { validateAndNormalizeHeaders } from '../util';
 
+export type HeadersFactory = () => Promise<Record<string, string>>;
+
 export interface OtlpHttpConfiguration extends OtlpSharedConfiguration {
   url: string;
-  headers: () => Record<string, string>;
+  headers: HeadersFactory;
   userAgent?: string;
 }
 
 function mergeHeaders(
-  userProvidedHeaders: (() => Record<string, string>) | undefined | null,
-  fallbackHeaders: (() => Record<string, string>) | undefined | null,
-  defaultHeaders: () => Record<string, string>
-): () => Record<string, string> {
-  const requiredHeaders = {
-    ...defaultHeaders(),
-  };
-  const headers = {};
+  userProvidedHeaders: HeadersFactory | undefined | null,
+  fallbackHeaders: HeadersFactory | undefined | null,
+  defaultHeaders: HeadersFactory
+): HeadersFactory {
+  return async () => {
+    const requiredHeaders = {
+      ...(await defaultHeaders()),
+    };
+    const headers = {};
 
-  return () => {
     // add fallback ones first
     if (fallbackHeaders != null) {
-      Object.assign(headers, fallbackHeaders());
+      Object.assign(headers, await fallbackHeaders());
     }
 
     // override with user-provided ones
     if (userProvidedHeaders != null) {
-      Object.assign(headers, userProvidedHeaders());
+      Object.assign(
+        headers,
+        validateAndNormalizeHeaders(await userProvidedHeaders())
+      );
     }
 
     // override required ones.
@@ -85,7 +90,7 @@ export function mergeOtlpHttpConfigurationWithDefaults(
       defaultConfiguration
     ),
     headers: mergeHeaders(
-      validateAndNormalizeHeaders(userProvidedConfiguration.headers),
+      userProvidedConfiguration.headers,
       fallbackConfiguration.headers,
       defaultConfiguration.headers
     ),
@@ -103,7 +108,7 @@ export function getHttpConfigurationDefaults(
 ): OtlpHttpConfiguration {
   return {
     ...getSharedConfigurationDefaults(),
-    headers: () => requiredHeaders,
+    headers: async () => requiredHeaders,
     url: 'http://localhost:4318/' + signalResourcePath,
   };
 }

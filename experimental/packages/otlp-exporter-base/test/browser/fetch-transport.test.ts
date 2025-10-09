@@ -25,7 +25,7 @@ import {
 
 const testTransportParameters = {
   url: 'http://example.test',
-  headers: () => ({
+  headers: async () => ({
     foo: 'foo-value',
     bar: 'bar-value',
     'Content-Type': 'application/json',

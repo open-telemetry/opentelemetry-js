@@ -8,9 +8,16 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* feat(otlp-exporter-base)!: allow passing an async function to headers option [#5994](https://github.com/open-telemetry/opentelemetry-js/pull/5994/files) @pichlermarc
+  * In addition to static headers, OTLP exporters now allow passing an async function that returns headers which will be called before each export. See TSDoc for `headers` in `OTLPExporterConfigBase` for details.
+  * Breaking changes:
+    * (user-facing): `headers` option in all OTLP exporters now accepts a function that returns a `Promise<Record<string, string>>` in addition to the existing `Record<string, string>` type.
+    * (user-facing): `headers` in `HttpNodeRequestParameters`, `FetchTransportParameters`, and `XhrRequestParameters` now only accept async functions.
+    * (user-facing): `headers` in `OtlpHttpConfiguration` now only accepts async functions.
+
 ### :rocket: Features
 
-* feat(sdk-node): always set up propagtion and context manager [#5930](https://github.com/open-telemetry/opentelemetry-js/pull/5930)
+* feat(sdk-node): always set up propagtion and context manager [#5930](https://github.com/open-telemetry/opentelemetry-js/pull/5930) @pichlermarc
   * using `(new NodeSDK).start()` will now automatically set up a context management and propagation, even if no Trace SDK
     is initialized.
 * feat(otlp-exporter-base, otlp-grpc-exporter-base): add an option to let an SDK distribution prepend their own user-agent string in HTTP & GRPC exporters [#5928](https://github.com/open-telemetry/opentelemetry-js/pull/5928) @david-luna

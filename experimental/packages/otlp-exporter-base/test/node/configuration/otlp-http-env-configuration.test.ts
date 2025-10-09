@@ -41,7 +41,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
       assert.strictEqual(config.headers, undefined);
     });
 
-    it('merges headers instead of overriding', function () {
+    it('merges headers instead of overriding', async function () {
       process.env.OTEL_EXPORTER_OTLP_HEADERS = 'key1=value1,key2=value2';
       process.env.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'key1=metrics';
 
@@ -49,26 +49,26 @@ describe('getHttpConfigurationFromEnvironment', function () {
         'METRICS',
         'v1/metrics'
       );
-      assert.deepEqual(config.headers?.(), {
+      assert.deepEqual(await config.headers?.(), {
         key1: 'metrics',
         key2: 'value2',
       });
     });
 
-    it('allows non-specific only headers', function () {
+    it('allows non-specific only headers', async function () {
       process.env.OTEL_EXPORTER_OTLP_HEADERS = 'key1=value1,key2=value2';
 
       const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
-      assert.deepEqual(config.headers?.(), {
+      assert.deepEqual(await config.headers?.(), {
         key1: 'value1',
         key2: 'value2',
       });
     });
 
-    it('allows specific only headers', function () {
+    it('allows specific only headers', async function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_HEADERS =
         'key1=value1,key2=value2';
 
@@ -76,7 +76,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
         'METRICS',
         'v1/metrics'
       );
-      assert.deepEqual(config.headers?.(), {
+      assert.deepEqual(await config.headers?.(), {
         key1: 'value1',
         key2: 'value2',
       });
