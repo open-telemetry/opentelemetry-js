@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1759950853575,
+  "lastUpdate": 1759995017827,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -40200,6 +40200,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.64%",
             "unit": "ops/sec",
             "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "martin@martinkuba.com",
+            "name": "Martin Kuba",
+            "username": "martinkuba"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9145fd6675b3dea9903fe41ee1399dec88a15bc3",
+          "message": "feat(web): Add session handling implementation (#5173)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2025-10-09T07:22:10Z",
+          "tree_id": "054a4fc704e04c10820288cab4bcf69c2a498582",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/9145fd6675b3dea9903fe41ee1399dec88a15bc3"
+        },
+        "date": 1759995016805,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 674536,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8373,
+            "range": "±0.83%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 295139,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 277383,
+            "range": "±0.63%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
