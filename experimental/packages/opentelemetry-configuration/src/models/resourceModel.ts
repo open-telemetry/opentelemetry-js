@@ -13,20 +13,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import type { ChannelCredentials, Metadata } from '@grpc/grpc-js';
-
-import {
-  CompressionAlgorithm,
-  OTLPExporterConfigBase,
-} from '@opentelemetry/otlp-exporter-base';
-
-/**
- * OTLP Exporter Config for Node
- */
-export interface OTLPGRPCExporterConfigNode extends OTLPExporterConfigBase {
-  credentials?: ChannelCredentials;
-  metadata?: Metadata;
-  compression?: CompressionAlgorithm;
-  userAgent?: string;
-}
+'use strict';

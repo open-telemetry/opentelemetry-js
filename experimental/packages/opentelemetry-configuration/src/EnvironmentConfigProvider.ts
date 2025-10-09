@@ -17,7 +17,7 @@
 import {
   ConfigurationModel,
   initializeDefaultConfiguration,
-} from './configModel';
+} from './models/configModel';
 import {
   getBooleanFromEnv,
   getStringFromEnv,
@@ -65,11 +65,17 @@ export class EnvironmentConfigProvider implements ConfigProvider {
 function setResources(config: ConfigurationModel): void {
   const resourceAttrList = getStringFromEnv('OTEL_RESOURCE_ATTRIBUTES');
   if (resourceAttrList) {
+    if (config.resource == null) {
+      config.resource = {};
+    }
     config.resource.attributes_list = resourceAttrList;
   }
 
   const serviceName = getStringFromEnv('OTEL_SERVICE_NAME');
   if (serviceName) {
+    if (config.resource == null) {
+      config.resource = {};
+    }
     config.resource.attributes = [
       {
         name: 'service.name',
@@ -85,19 +91,29 @@ function setAttributeLimits(config: ConfigurationModel): void {
     'OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT'
   );
   if (attributeValueLengthLimit) {
+    if (config.attribute_limits == null) {
+      config.attribute_limits = { attribute_count_limit: 128 };
+    }
     config.attribute_limits.attribute_value_length_limit =
       attributeValueLengthLimit;
   }
 
   const attributeCountLimit = getNumberFromEnv('OTEL_ATTRIBUTE_COUNT_LIMIT');
   if (attributeCountLimit) {
-    config.attribute_limits.attribute_count_limit = attributeCountLimit;
+    if (config.attribute_limits == null) {
+      config.attribute_limits = { attribute_count_limit: attributeCountLimit };
+    } else {
+      config.attribute_limits.attribute_count_limit = attributeCountLimit;
+    }
   }
 }
 
 function setPropagators(config: ConfigurationModel): void {
   const composite = getStringListFromEnv('OTEL_PROPAGATORS');
   if (composite && composite.length > 0) {
+    if (config.propagator == null) {
+      config.propagator = {};
+    }
     config.propagator.composite = [];
     for (let i = 0; i < composite.length; i++) {
       config.propagator.composite.push({ [composite[i]]: null });
@@ -105,11 +121,20 @@ function setPropagators(config: ConfigurationModel): void {
   }
   const compositeList = getStringFromEnv('OTEL_PROPAGATORS');
   if (compositeList) {
+    if (config.propagator == null) {
+      config.propagator = {};
+    }
     config.propagator.composite_list = compositeList;
   }
 }
 
 function setTracerProvider(config: ConfigurationModel): void {
+  if (config.tracer_provider == null) {
+    config.tracer_provider = { processors: [] };
+  }
+  if (config.tracer_provider.limits == null) {
+    config.tracer_provider.limits = {};
+  }
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT'
   );
@@ -223,7 +248,10 @@ function setTracerProvider(config: ConfigurationModel): void {
 }
 
 function setMeterProvider(config: ConfigurationModel): void {
-  const readerPeriodic = config.meter_provider.readers[0]?.periodic;
+  const readerPeriodic =
+    config.meter_provider?.readers && config.meter_provider?.readers.length > 0
+      ? config.meter_provider?.readers[0].periodic
+      : undefined;
   if (readerPeriodic) {
     const interval = getNumberFromEnv('OTEL_METRIC_EXPORT_INTERVAL');
     if (interval) {
@@ -303,6 +331,12 @@ function setMeterProvider(config: ConfigurationModel): void {
       readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
         defaultHistogramAggregation;
     }
+    if (config.meter_provider == null) {
+      config.meter_provider = { readers: [{}] };
+    }
+    if (config.meter_provider?.readers == null) {
+      config.meter_provider.readers = [{}];
+    }
 
     config.meter_provider.readers[0].periodic = readerPeriodic;
   }
@@ -313,6 +347,9 @@ function setMeterProvider(config: ConfigurationModel): void {
       exemplarFilter === 'always_on' ||
       exemplarFilter === 'always_off')
   ) {
+    if (config.meter_provider == null) {
+      config.meter_provider = {};
+    }
     config.meter_provider.exemplar_filter = exemplarFilter;
   }
 }
@@ -321,19 +358,31 @@ function setLoggerProvider(config: ConfigurationModel): void {
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT'
   );
-  if (attributeValueLengthLimit) {
-    config.logger_provider.limits.attribute_value_length_limit =
-      attributeValueLengthLimit;
-  }
-
   const attributeCountLimit = getNumberFromEnv(
     'OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT'
   );
-  if (attributeCountLimit) {
-    config.logger_provider.limits.attribute_count_limit = attributeCountLimit;
+  if (attributeValueLengthLimit || attributeCountLimit) {
+    if (config.logger_provider == null) {
+      config.logger_provider = {};
+    }
+    if (config.logger_provider.limits == null) {
+      config.logger_provider.limits = { attribute_count_limit: 128 };
+    }
+    if (attributeValueLengthLimit) {
+      config.logger_provider.limits.attribute_value_length_limit =
+        attributeValueLengthLimit;
+    }
+
+    if (attributeCountLimit) {
+      config.logger_provider.limits.attribute_count_limit = attributeCountLimit;
+    }
   }
 
-  const batch = config.logger_provider.processors[0]?.batch;
+  const batch =
+    config.logger_provider?.processors &&
+    config.logger_provider?.processors.length > 0
+      ? config.logger_provider?.processors[0].batch
+      : undefined;
   if (batch) {
     const scheduleDelay = getNumberFromEnv('OTEL_BLRP_SCHEDULE_DELAY');
     if (scheduleDelay) {
@@ -398,6 +447,12 @@ function setLoggerProvider(config: ConfigurationModel): void {
       batch.exporter.otlp_http.headers_list = headersList;
     }
 
+    if (config.logger_provider == null) {
+      config.logger_provider = { processors: [{}] };
+    }
+    if (config.logger_provider?.processors == null) {
+      config.logger_provider.processors = [{}];
+    }
     config.logger_provider.processors[0].batch = batch;
   }
 }

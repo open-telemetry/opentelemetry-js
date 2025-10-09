@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ConfigurationModel } from './configModel';
+import { ConfigurationModel } from './models/configModel';
 
 export interface ConfigProvider {
   /**

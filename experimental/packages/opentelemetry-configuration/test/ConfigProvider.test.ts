@@ -18,6 +18,7 @@ import * as assert from 'assert';
 import { Configuration } from '../src';
 import { DiagLogLevel } from '@opentelemetry/api';
 import { createConfigProvider } from '../src/ConfigProvider';
+import { OtlpHttpEncoding } from '../src/models/commonModel';
 
 const defaultConfig: Configuration = {
   disabled: false,
@@ -43,7 +44,7 @@ const defaultConfig: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/traces',
               timeout: 10000,
-              encoding: 'protobuf',
+              encoding: OtlpHttpEncoding.protobuf,
             },
           },
         },
@@ -58,11 +59,11 @@ const defaultConfig: Configuration = {
     },
     sampler: {
       parent_based: {
-        root: 'always_on',
-        remote_parent_sampled: 'always_on',
-        remote_parent_not_sampled: 'always_off',
-        local_parent_sampled: 'always_on',
-        local_parent_not_sampled: 'always_off',
+        root: { always_on: undefined },
+        remote_parent_sampled: { always_on: undefined },
+        remote_parent_not_sampled: { always_off: undefined },
+        local_parent_sampled: { always_on: undefined },
+        local_parent_not_sampled: { always_off: undefined },
       },
     },
   },
@@ -97,7 +98,7 @@ const defaultConfig: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
-              encoding: 'protobuf',
+              encoding: OtlpHttpEncoding.protobuf,
             },
           },
         },
@@ -198,7 +199,7 @@ const configFromFile: Configuration = {
               headers: [{ name: 'api-key', value: '1234' }],
               headers_list: 'api-key=1234',
               compression: 'gzip',
-              encoding: 'protobuf',
+              encoding: OtlpHttpEncoding.protobuf,
             },
           },
         },
@@ -283,11 +284,11 @@ const configFromFile: Configuration = {
     },
     sampler: {
       parent_based: {
-        root: 'always_on',
-        remote_parent_sampled: 'always_on',
-        remote_parent_not_sampled: 'always_off',
-        local_parent_sampled: 'always_on',
-        local_parent_not_sampled: 'always_off',
+        root: { always_on: undefined },
+        remote_parent_sampled: { always_on: undefined },
+        remote_parent_not_sampled: { always_off: undefined },
+        local_parent_sampled: { always_on: undefined },
+        local_parent_not_sampled: { always_off: undefined },
       },
     },
   },
@@ -322,7 +323,7 @@ const configFromFile: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
-              encoding: 'protobuf',
+              encoding: OtlpHttpEncoding.protobuf,
               certificate_file: '/app/cert.pem',
               client_key_file: '/app/cert.pem',
               client_certificate_file: '/app/cert.pem',
@@ -440,7 +441,7 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/traces',
               timeout: 10000,
-              encoding: 'protobuf',
+              encoding: OtlpHttpEncoding.protobuf,
               compression: 'gzip',
             },
           },
@@ -456,11 +457,11 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
     },
     sampler: {
       parent_based: {
-        root: 'always_on',
-        remote_parent_sampled: 'always_on',
-        remote_parent_not_sampled: 'always_off',
-        local_parent_sampled: 'always_on',
-        local_parent_not_sampled: 'always_off',
+        root: { always_on: undefined },
+        remote_parent_sampled: { always_on: undefined },
+        remote_parent_not_sampled: { always_off: undefined },
+        local_parent_sampled: { always_on: undefined },
+        local_parent_not_sampled: { always_off: undefined },
       },
     },
   },
@@ -495,7 +496,7 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
-              encoding: 'protobuf',
+              encoding: OtlpHttpEncoding.protobuf,
               compression: 'gzip',
             },
           },
@@ -731,7 +732,7 @@ describe('ConfigProvider', function () {
                     compression: 'gzip',
                     timeout: 2000,
                     headers_list: 'host=localhost',
-                    encoding: 'protobuf',
+                    encoding: OtlpHttpEncoding.protobuf,
                   },
                 },
               },
@@ -739,11 +740,11 @@ describe('ConfigProvider', function () {
           ],
           sampler: {
             parent_based: {
-              root: 'always_on',
-              remote_parent_sampled: 'always_on',
-              remote_parent_not_sampled: 'always_off',
-              local_parent_sampled: 'always_on',
-              local_parent_not_sampled: 'always_off',
+              root: { always_on: undefined },
+              remote_parent_sampled: { always_on: undefined },
+              remote_parent_not_sampled: { always_off: undefined },
+              local_parent_sampled: { always_on: undefined },
+              local_parent_not_sampled: { always_off: undefined },
             },
           },
         },
@@ -847,7 +848,7 @@ describe('ConfigProvider', function () {
                     compression: 'gzip',
                     timeout: 700,
                     headers_list: 'host=localhost',
-                    encoding: 'protobuf',
+                    encoding: OtlpHttpEncoding.protobuf,
                   },
                 },
               },
@@ -1074,7 +1075,7 @@ describe('ConfigProvider', function () {
                     client_certificate_file: 'trace-client-certificate',
                     client_key_file: 'trace-client-key',
                     compression: 'trace-compression',
-                    encoding: 'protobuf',
+                    encoding: OtlpHttpEncoding.protobuf,
                     endpoint: 'http://test.com:4318/v1/traces',
                     headers_list: 'trace-headers',
                     timeout: 1213,
@@ -1107,7 +1108,7 @@ describe('ConfigProvider', function () {
                     client_certificate_file: 'logs-client-certificate',
                     client_key_file: 'logs-client-key',
                     compression: 'logs-compression',
-                    encoding: 'protobuf',
+                    encoding: OtlpHttpEncoding.protobuf,
                     endpoint: 'http://test.com:4318/v1/logs',
                     headers_list: 'logs-header',
                     timeout: 27,

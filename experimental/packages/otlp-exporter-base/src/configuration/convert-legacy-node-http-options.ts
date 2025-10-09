@@ -70,6 +70,7 @@ export function convertLegacyHttpOptions(
       timeoutMillis: config.timeoutMillis,
       compression: config.compression,
       agentFactory: convertLegacyAgentOptions(config),
+      userAgent: config.userAgent,
     },
     getNodeHttpConfigurationFromEnvironment(
       signalIdentifier,
