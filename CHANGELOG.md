@@ -14,6 +14,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(web): add session handling implementation [5173](https://github.com/open-telemetry/opentelemetry-js/pull/5173) @martinkuba
+
 ### :bug: Bug Fixes
 
 * fix(core): avoid leaking Node.js types via `unrefTimer()` util [#5986](https://github.com/open-telemetry/opentelemetry-js/pull/5986)
