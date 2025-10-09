@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1760025681678,
+  "lastUpdate": 1760040092134,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -40356,6 +40356,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.64%",
             "unit": "ops/sec",
             "extra": "93 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "47067795+JacksonWeber@users.noreply.github.com",
+            "name": "Jackson Weber",
+            "username": "JacksonWeber"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "46b7d155a4777de53bfc1e79b2e68f1cfa18d34f",
+          "message": "fix(sdk-logs): Fix Not Exporting Upon `_maxExportBatchSize` (#5961)\n\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2025-10-09T19:48:16Z",
+          "tree_id": "05d978d31474c4fb23efd8c2f29216f24b93f93e",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/46b7d155a4777de53bfc1e79b2e68f1cfa18d34f"
+        },
+        "date": 1760040091075,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 673292,
+            "range": "±0.86%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8347,
+            "range": "±0.91%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 294092,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 278061,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
