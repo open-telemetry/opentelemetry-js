@@ -17,21 +17,12 @@
 import { diagLogLevelFromString, getStringFromEnv } from '@opentelemetry/core';
 import {
   AttributeLimits,
-  ConfigAttributes,
-  ConfigExporter,
-  ConfigHeader,
-  ConfigProcessor,
-  ConfigLoggerProvider,
-  ConfigMeterProvider,
-  ConfigPropagator,
-  ConfigTracerProvider,
+  MeterProvider,
+  Propagator,
   ConfigurationModel,
   initializeDefaultConfiguration,
   ConfigReader,
-  CardinalityLimits,
-  MetricProducer,
-  PullMetricExporter,
-} from './configModel';
+} from './models/configModel';
 import { ConfigProvider } from './IConfigProvider';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
@@ -43,6 +34,15 @@ import {
   getStringFromConfigFile,
   getStringListFromConfigFile,
 } from './utils';
+import { NameStringValuePair, OtlpHttpEncoding } from './models/commonModel';
+import {
+  SpanExporter,
+  SpanProcessor,
+  TracerProvider,
+} from './models/tracerProviderModel';
+import { LoggerProvider } from './models/loggerProviderModel';
+import { AttributeNameValue } from './models/resourceModel';
+import { CardinalityLimits, MetricProducer, PullMetricExporter } from './configModel';
 
 export class FileConfigProvider implements ConfigProvider {
   private _config: ConfigurationModel;
@@ -95,18 +95,23 @@ function parseConfigFile(config: ConfigurationModel) {
       config.log_level = logLevel;
     }
 
-    const attrList = getStringFromConfigFile(
-      parsedContent['resource']?.['attributes_list']
-    );
-    if (attrList) {
-      config.resource.attributes_list = attrList;
-    }
+    if (parsedContent['resource']) {
+      if (config.resource == null) {
+        config.resource = {};
+      }
+      const attrList = getStringFromConfigFile(
+        parsedContent['resource']['attributes_list']
+      );
+      if (attrList) {
+        config.resource.attributes_list = attrList;
+      }
 
-    const schemaUrl = getStringFromConfigFile(
-      parsedContent['resource']?.['schema_url']
-    );
-    if (schemaUrl) {
-      config.resource.schema_url = schemaUrl;
+      const schemaUrl = getStringFromConfigFile(
+        parsedContent['resource']['schema_url']
+      );
+      if (schemaUrl) {
+        config.resource.schema_url = schemaUrl;
+      }
     }
 
     setResourceAttributes(config, parsedContent['resource']?.['attributes']);
@@ -124,9 +129,12 @@ function parseConfigFile(config: ConfigurationModel) {
 
 function setResourceAttributes(
   config: ConfigurationModel,
-  attributes: ConfigAttributes[]
+  attributes: AttributeNameValue[]
 ) {
   if (attributes) {
+    if (config.resource == null) {
+      config.resource = {};
+    }
     config.resource.attributes = [];
     for (let i = 0; i < attributes.length; i++) {
       const att = attributes[i];
@@ -168,6 +176,11 @@ function setAttributeLimits(
   attrLimits: AttributeLimits
 ) {
   if (attrLimits) {
+    if (config.attribute_limits == null) {
+      config.attribute_limits = {
+        attribute_count_limit: 128,
+      };
+    }
     const lengthLimit = getNumberFromConfigFile(
       attrLimits['attribute_value_length_limit']
     );
@@ -185,9 +198,9 @@ function setAttributeLimits(
 
 function setPropagator(
   config: ConfigurationModel,
-  propagator: ConfigPropagator
+  propagator: Propagator
 ): void {
-  if (propagator) {
+  if (propagator && propagator.composite) {
     const auxList = [];
     const composite = [];
     for (let i = 0; i < propagator.composite.length; i++) {
@@ -206,6 +219,9 @@ function setPropagator(
       }
     }
     if (composite.length > 0) {
+      if (config.propagator == null) {
+        config.propagator = {};
+      }
       config.propagator.composite = composite;
     }
 
@@ -213,14 +229,19 @@ function setPropagator(
       propagator['composite_list']
     );
     if (compositeListString) {
+      if (config.propagator == null) {
+        config.propagator = {};
+      }
       config.propagator.composite_list = compositeListString;
     }
   }
 }
 
-function getConfigHeaders(h?: ConfigHeader[]): ConfigHeader[] | null {
+function getConfigHeaders(
+  h?: NameStringValuePair[]
+): NameStringValuePair[] | null {
   if (h) {
-    const headers: ConfigHeader[] = [];
+    const headers: NameStringValuePair[] = [];
     for (let i = 0; i < h.length; i++) {
       const element = h[i];
       headers.push({
@@ -242,11 +263,11 @@ enum ProviderType {
 }
 
 function parseConfigExporter(
-  exporter: ConfigExporter,
+  exporter: SpanExporter,
   providerType: ProviderType
-): ConfigExporter {
+): SpanExporter {
   const exporterType = Object.keys(exporter)[0];
-  let parsedExporter: ConfigExporter = {};
+  let parsedExporter: SpanExporter = {};
   let e;
   let certFile;
   let clientCertFile;
@@ -279,8 +300,8 @@ function parseConfigExporter(
             timeout: getNumberFromConfigFile(e['timeout']) ?? 10000,
             encoding:
               getStringFromConfigFile(e['encoding']) === 'json'
-                ? 'json'
-                : 'protobuf',
+                ? OtlpHttpEncoding.json
+                : OtlpHttpEncoding.protobuf,
           },
         };
 
@@ -391,11 +412,19 @@ function parseConfigExporter(
 
 function setTracerProvider(
   config: ConfigurationModel,
-  tracerProvider: ConfigTracerProvider
+  tracerProvider: TracerProvider
 ): void {
   if (tracerProvider) {
+    if (config.tracer_provider == null) {
+      config.tracer_provider = {
+        processors: [],
+      };
+    }
     // Limits
     if (tracerProvider['limits']) {
+      if (config.tracer_provider.limits == null) {
+        config.tracer_provider.limits = {};
+      }
       const attributeValueLengthLimit = getNumberFromConfigFile(
         tracerProvider['limits']['attribute_value_length_limit']
       );
@@ -458,7 +487,7 @@ function setTracerProvider(
               element['exporter'],
               ProviderType.TRACER
             );
-            const batchConfig: ConfigProcessor = {
+            const batchConfig: SpanProcessor = {
               batch: {
                 schedule_delay:
                   getNumberFromConfigFile(element['schedule_delay']) ?? 5000,
@@ -482,7 +511,7 @@ function setTracerProvider(
               element['exporter'],
               ProviderType.TRACER
             );
-            const simpleConfig: ConfigProcessor = {
+            const simpleConfig: SpanProcessor = {
               simple: {
                 exporter: parsedExporter,
               },
@@ -498,9 +527,12 @@ function setTracerProvider(
 
 function setMeterProvider(
   config: ConfigurationModel,
-  meterProvider: ConfigMeterProvider
+  meterProvider: MeterProvider
 ): void {
   if (meterProvider) {
+    if (config.meter_provider == null) {
+      config.meter_provider = {};
+    }
     const exemplarFilter = getStringFromConfigFile(
       meterProvider['exemplar_filter']
     );
@@ -513,7 +545,7 @@ function setMeterProvider(
       config.meter_provider.exemplar_filter = exemplarFilter;
     }
 
-    if (meterProvider['readers']?.length > 0) {
+    if (meterProvider['readers'] && meterProvider['readers']?.length > 0) {
       config.meter_provider.readers = [];
 
       for (let i = 0; i < meterProvider['readers'].length; i++) {
@@ -565,7 +597,7 @@ function setMeterProvider(
                 },
               },
             };
-            const producers: MetricProducer[] = [{ opencensus: null }];
+            const producers: MetricProducer[] = [{ opencensus: undefined }];
             const defaultLimit =
               getNumberFromConfigFile(
                 element['cardinality_limits']['default']
@@ -619,73 +651,86 @@ function setMeterProvider(
 
 function setLoggerProvider(
   config: ConfigurationModel,
-  loggerProvider: ConfigLoggerProvider
+  loggerProvider: LoggerProvider
 ): void {
   if (loggerProvider) {
+    if (config.logger_provider == null) {
+      config.logger_provider = { processors: [] };
+    }
     // Limits
     if (loggerProvider['limits']) {
       const attributeValueLengthLimit = getNumberFromConfigFile(
         loggerProvider['limits']['attribute_value_length_limit']
       );
-      if (attributeValueLengthLimit) {
-        config.logger_provider.limits.attribute_value_length_limit =
-          attributeValueLengthLimit;
-      }
-
       const attributeCountLimit = getNumberFromConfigFile(
         loggerProvider['limits']['attribute_count_limit']
       );
-      if (attributeCountLimit) {
-        config.logger_provider.limits.attribute_count_limit =
-          attributeCountLimit;
+      if (attributeValueLengthLimit || attributeCountLimit) {
+        if (config.logger_provider == null) {
+          config.logger_provider = { processors: [] };
+        }
+        if (config.logger_provider.limits == null) {
+          config.logger_provider.limits = { attribute_count_limit: 128 };
+        }
+        if (attributeValueLengthLimit) {
+          config.logger_provider.limits.attribute_value_length_limit =
+            attributeValueLengthLimit;
+        }
+        if (attributeCountLimit) {
+          config.logger_provider.limits.attribute_count_limit =
+            attributeCountLimit;
+        }
       }
     }
 
     // Processors
     if (loggerProvider['processors']) {
       if (loggerProvider['processors'].length > 0) {
+        if (config.logger_provider == null) {
+          config.logger_provider = { processors: [] };
+        }
         config.logger_provider.processors = [];
-      }
-      for (let i = 0; i < loggerProvider['processors'].length; i++) {
-        const processorType = Object.keys(loggerProvider['processors'][i])[0];
-        if (processorType === 'batch') {
-          const element = loggerProvider['processors'][i]['batch'];
-          if (element) {
-            const parsedExporter = parseConfigExporter(
-              element['exporter'],
-              ProviderType.LOGGER
-            );
-            const batchConfig: ConfigProcessor = {
-              batch: {
-                schedule_delay:
-                  getNumberFromConfigFile(element['schedule_delay']) ?? 1000,
-                export_timeout:
-                  getNumberFromConfigFile(element['export_timeout']) ?? 30000,
-                max_queue_size:
-                  getNumberFromConfigFile(element['max_queue_size']) ?? 2048,
-                max_export_batch_size:
-                  getNumberFromConfigFile(element['max_export_batch_size']) ??
-                  512,
-                exporter: parsedExporter,
-              },
-            };
+        for (let i = 0; i < loggerProvider['processors'].length; i++) {
+          const processorType = Object.keys(loggerProvider['processors'][i])[0];
+          if (processorType === 'batch') {
+            const element = loggerProvider['processors'][i]['batch'];
+            if (element) {
+              const parsedExporter = parseConfigExporter(
+                element['exporter'],
+                ProviderType.LOGGER
+              );
+              const batchConfig: SpanProcessor = {
+                batch: {
+                  schedule_delay:
+                    getNumberFromConfigFile(element['schedule_delay']) ?? 1000,
+                  export_timeout:
+                    getNumberFromConfigFile(element['export_timeout']) ?? 30000,
+                  max_queue_size:
+                    getNumberFromConfigFile(element['max_queue_size']) ?? 2048,
+                  max_export_batch_size:
+                    getNumberFromConfigFile(element['max_export_batch_size']) ??
+                    512,
+                  exporter: parsedExporter,
+                },
+              };
 
-            config.logger_provider.processors.push(batchConfig);
-          }
-        } else if (processorType === 'simple') {
-          const element = loggerProvider['processors'][i]['simple'];
-          if (element) {
-            const parsedExporter = parseConfigExporter(
-              element['exporter'],
-              ProviderType.LOGGER
-            );
-            const simpleConfig: ConfigProcessor = {
-              simple: {
-                exporter: parsedExporter,
-              },
-            };
+              config.logger_provider.processors.push(batchConfig);
+            }
+          } else if (processorType === 'simple') {
+            const element = loggerProvider['processors'][i]['simple'];
+            if (element) {
+              const parsedExporter = parseConfigExporter(
+                element['exporter'],
+                ProviderType.LOGGER
+              );
+              const simpleConfig: SpanProcessor = {
+                simple: {
+                  exporter: parsedExporter,
+                },
+              };
 
-            config.logger_provider.processors.push(simpleConfig);
+              config.logger_provider.processors.push(simpleConfig);
+            }
           }
         }
       }
@@ -699,6 +744,9 @@ function setLoggerProvider(
         ]
       );
       if (defaultConfigDisabled || defaultConfigDisabled === false) {
+        if (config.logger_provider == null) {
+          config.logger_provider = { processors: [] };
+        }
         config.logger_provider['logger_configurator/development'] = {
           default_config: {
             disabled: defaultConfigDisabled,
@@ -718,8 +766,11 @@ function setLoggerProvider(
         ) {
           const logger =
             loggerProvider['logger_configurator/development'].loggers[i];
-          const disabled =
-            getBooleanFromConfigFile(logger['config']['disabled']) ?? false;
+          let disabled = false;
+          if (logger['config']) {
+            disabled =
+              getBooleanFromConfigFile(logger['config']['disabled']) ?? false;
+          }
           const name = getStringFromConfigFile(logger['name']);
           if (name) {
             loggers.push({
@@ -729,6 +780,9 @@ function setLoggerProvider(
               },
             });
           }
+        }
+        if (config.logger_provider == null) {
+          config.logger_provider = { processors: [] };
         }
         if (config.logger_provider['logger_configurator/development'] == null) {
           config.logger_provider['logger_configurator/development'] = {};
