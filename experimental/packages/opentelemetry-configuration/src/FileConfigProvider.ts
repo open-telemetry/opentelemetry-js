@@ -315,8 +315,7 @@ function parseConfigExporter(exporter: SpanExporter): SpanExporter {
         parsedExporter = {
           otlp_grpc: {
             endpoint:
-              getStringFromConfigFile(e['endpoint']) ??
-              'http://localhost:4318/v1/traces',
+              getStringFromConfigFile(e['endpoint']) ?? 'http://localhost:4317',
             timeout: getNumberFromConfigFile(e['timeout']) ?? 10000,
           },
         };
