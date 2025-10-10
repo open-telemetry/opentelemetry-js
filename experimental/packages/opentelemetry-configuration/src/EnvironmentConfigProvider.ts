@@ -68,19 +68,17 @@ export class EnvironmentConfigProvider implements ConfigProvider {
 }
 
 function setResources(config: ConfigurationModel): void {
+  if (config.resource == null) {
+    config.resource = {};
+  }
+
   const resourceAttrList = getStringFromEnv('OTEL_RESOURCE_ATTRIBUTES');
   if (resourceAttrList) {
-    if (config.resource == null) {
-      config.resource = {};
-    }
     config.resource.attributes_list = resourceAttrList;
   }
 
   const serviceName = getStringFromEnv('OTEL_SERVICE_NAME');
   if (serviceName) {
-    if (config.resource == null) {
-      config.resource = {};
-    }
     config.resource.attributes = [
       {
         name: 'service.name',
@@ -95,7 +93,7 @@ function setAttributeLimits(config: ConfigurationModel): void {
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT'
   );
-  if (attributeValueLengthLimit) {
+  if (attributeValueLengthLimit && attributeValueLengthLimit > 0) {
     if (config.attribute_limits == null) {
       config.attribute_limits = { attribute_count_limit: 128 };
     }
@@ -114,11 +112,11 @@ function setAttributeLimits(config: ConfigurationModel): void {
 }
 
 function setPropagators(config: ConfigurationModel): void {
+  if (config.propagator == null) {
+    config.propagator = {};
+  }
   const composite = getStringListFromEnv('OTEL_PROPAGATORS');
   if (composite && composite.length > 0) {
-    if (config.propagator == null) {
-      config.propagator = {};
-    }
     config.propagator.composite = [];
     for (let i = 0; i < composite.length; i++) {
       config.propagator.composite.push({ [composite[i]]: null });
@@ -126,9 +124,6 @@ function setPropagators(config: ConfigurationModel): void {
   }
   const compositeList = getStringFromEnv('OTEL_PROPAGATORS');
   if (compositeList) {
-    if (config.propagator == null) {
-      config.propagator = {};
-    }
     config.propagator.composite_list = compositeList;
   }
 }
