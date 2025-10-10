@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1760117592599,
+  "lastUpdate": 1760122120114,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -40460,6 +40460,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.72%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jsumners@newrelic.com",
+            "name": "James Sumners",
+            "username": "jsumners-nr"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8959e3965182dcd92a57e56047dc874180c62b25",
+          "message": "chore: add debugging section to README (#5998)\n\nCo-authored-by: Marylia Gutierrez <maryliag@gmail.com>\nCo-authored-by: Marylia Gutierrez <marylia.gutierrez@grafana.com>",
+          "timestamp": "2025-10-10T18:39:22Z",
+          "tree_id": "ca937b7f97e0e1129d7a248579894c64cbd44ece",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/8959e3965182dcd92a57e56047dc874180c62b25"
+        },
+        "date": 1760122119035,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 669067,
+            "range": "±1.18%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8539,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 289897,
+            "range": "±0.60%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 277698,
+            "range": "±0.62%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
