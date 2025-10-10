@@ -106,8 +106,8 @@ export interface OtlpHttpExporter {
 }
 
 export enum OtlpHttpEncoding {
-  protobuf,
-  json,
+  JSON = 'json',
+  Protobuf = 'protobuf',
 }
 
 export interface OtlpGrpcExporter {

@@ -50,7 +50,7 @@ const defaultConfig: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/traces',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.protobuf,
+              encoding: OtlpHttpEncoding.Protobuf,
             },
           },
         },
@@ -83,15 +83,15 @@ const defaultConfig: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/metrics',
               timeout: 10000,
-              temporality_preference: ExporterTemporalityPreference.cumulative,
+              temporality_preference: ExporterTemporalityPreference.Cumulative,
               default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.explicit_bucket_histogram,
+                ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
             },
           },
         },
       },
     ],
-    exemplar_filter: ExemplarFilter.trace_based,
+    exemplar_filter: ExemplarFilter.TraceBased,
   },
   logger_provider: {
     processors: [
@@ -105,7 +105,7 @@ const defaultConfig: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.protobuf,
+              encoding: OtlpHttpEncoding.Protobuf,
             },
           },
         },
@@ -206,7 +206,7 @@ const configFromFile: Configuration = {
               headers: [{ name: 'api-key', value: '1234' }],
               headers_list: 'api-key=1234',
               compression: 'gzip',
-              encoding: OtlpHttpEncoding.protobuf,
+              encoding: OtlpHttpEncoding.Protobuf,
             },
           },
         },
@@ -350,10 +350,10 @@ const configFromFile: Configuration = {
               headers_list: 'api-key=1234',
               compression: 'gzip',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.protobuf,
-              temporality_preference: ExporterTemporalityPreference.delta,
+              encoding: OtlpHttpEncoding.Protobuf,
+              temporality_preference: ExporterTemporalityPreference.Delta,
               default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.base2_exponential_bucket_histogram,
+                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
             },
           },
           producers: [
@@ -393,9 +393,9 @@ const configFromFile: Configuration = {
               compression: 'gzip',
               timeout: 10000,
               insecure: false,
-              temporality_preference: ExporterTemporalityPreference.delta,
+              temporality_preference: ExporterTemporalityPreference.Delta,
               default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.base2_exponential_bucket_histogram,
+                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
             },
           },
           cardinality_limits: {
@@ -417,9 +417,9 @@ const configFromFile: Configuration = {
           exporter: {
             'otlp_file/development': {
               output_stream: 'file:///var/log/metrics.jsonl',
-              temporality_preference: ExporterTemporalityPreference.delta,
+              temporality_preference: ExporterTemporalityPreference.Delta,
               default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.base2_exponential_bucket_histogram,
+                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
             },
           },
           cardinality_limits: {
@@ -441,9 +441,9 @@ const configFromFile: Configuration = {
           exporter: {
             'otlp_file/development': {
               output_stream: 'stdout',
-              temporality_preference: ExporterTemporalityPreference.delta,
+              temporality_preference: ExporterTemporalityPreference.Delta,
               default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.base2_exponential_bucket_histogram,
+                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
             },
           },
           cardinality_limits: {
@@ -478,12 +478,12 @@ const configFromFile: Configuration = {
         },
       },
     ],
-    exemplar_filter: ExemplarFilter.trace_based,
+    exemplar_filter: ExemplarFilter.TraceBased,
     views: [
       {
         selector: {
           instrument_name: 'my-instrument',
-          instrument_type: InstrumentType.histogram,
+          instrument_type: InstrumentType.Histogram,
           unit: 'ms',
           meter_name: 'my-meter',
           meter_version: '1.0.0',
@@ -522,7 +522,7 @@ const configFromFile: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.protobuf,
+              encoding: OtlpHttpEncoding.Protobuf,
               certificate_file: '/app/cert.pem',
               client_key_file: '/app/cert.pem',
               client_certificate_file: '/app/cert.pem',
@@ -640,7 +640,7 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/traces',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.protobuf,
+              encoding: OtlpHttpEncoding.Protobuf,
               compression: 'gzip',
             },
           },
@@ -673,12 +673,12 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
           exporter: {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/metrics',
-              encoding: OtlpHttpEncoding.protobuf,
+              encoding: OtlpHttpEncoding.Protobuf,
               compression: 'gzip',
               timeout: 10000,
-              temporality_preference: ExporterTemporalityPreference.cumulative,
+              temporality_preference: ExporterTemporalityPreference.Cumulative,
               default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.explicit_bucket_histogram,
+                ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
             },
           },
           cardinality_limits: {
@@ -694,7 +694,7 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
         },
       },
     ],
-    exemplar_filter: ExemplarFilter.trace_based,
+    exemplar_filter: ExemplarFilter.TraceBased,
   },
   logger_provider: {
     processors: [
@@ -708,7 +708,7 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.protobuf,
+              encoding: OtlpHttpEncoding.Protobuf,
               compression: 'gzip',
             },
           },
@@ -944,7 +944,7 @@ describe('ConfigProvider', function () {
                     compression: 'gzip',
                     timeout: 2000,
                     headers_list: 'host=localhost',
-                    encoding: OtlpHttpEncoding.protobuf,
+                    encoding: OtlpHttpEncoding.Protobuf,
                   },
                 },
               },
@@ -1003,15 +1003,15 @@ describe('ConfigProvider', function () {
                     compression: 'gzip',
                     timeout: 300,
                     headers_list: 'host=localhost',
-                    temporality_preference: ExporterTemporalityPreference.delta,
+                    temporality_preference: ExporterTemporalityPreference.Delta,
                     default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.base2_exponential_bucket_histogram,
+                      ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
                   },
                 },
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.always_on,
+          exemplar_filter: ExemplarFilter.AlwaysOn,
         },
       };
       const configProvider = createConfigProvider();
@@ -1060,7 +1060,7 @@ describe('ConfigProvider', function () {
                     compression: 'gzip',
                     timeout: 700,
                     headers_list: 'host=localhost',
-                    encoding: OtlpHttpEncoding.protobuf,
+                    encoding: OtlpHttpEncoding.Protobuf,
                   },
                 },
               },
@@ -1288,7 +1288,7 @@ describe('ConfigProvider', function () {
                     client_certificate_file: 'trace-client-certificate',
                     client_key_file: 'trace-client-key',
                     compression: 'trace-compression',
-                    encoding: OtlpHttpEncoding.protobuf,
+                    encoding: OtlpHttpEncoding.Protobuf,
                     endpoint: 'http://test.com:4318/v1/traces',
                     headers_list: 'trace-headers',
                     timeout: 1213,
@@ -1299,7 +1299,7 @@ describe('ConfigProvider', function () {
           ],
         },
         meter_provider: {
-          exemplar_filter: ExemplarFilter.always_off,
+          exemplar_filter: ExemplarFilter.AlwaysOff,
           readers: [
             {
               periodic: {
@@ -1310,14 +1310,14 @@ describe('ConfigProvider', function () {
                     endpoint: 'http://test:4318/v1/metrics',
                     timeout: 22,
                     temporality_preference:
-                      ExporterTemporalityPreference.cumulative,
+                      ExporterTemporalityPreference.Cumulative,
                     default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.explicit_bucket_histogram,
+                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
                     certificate_file: 'metric-certificate',
                     client_certificate_file: 'metric-client-certificate',
                     client_key_file: 'metric-client-key',
                     compression: 'metric-compression',
-                    encoding: OtlpHttpEncoding.protobuf,
+                    encoding: OtlpHttpEncoding.Protobuf,
                     headers_list: 'metric-header',
                   },
                 },
@@ -1354,7 +1354,7 @@ describe('ConfigProvider', function () {
                     client_certificate_file: 'logs-client-certificate',
                     client_key_file: 'logs-client-key',
                     compression: 'logs-compression',
-                    encoding: OtlpHttpEncoding.protobuf,
+                    encoding: OtlpHttpEncoding.Protobuf,
                     endpoint: 'http://test.com:4318/v1/logs',
                     headers_list: 'logs-header',
                     timeout: 27,

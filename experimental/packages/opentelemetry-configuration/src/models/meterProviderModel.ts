@@ -32,15 +32,15 @@ export function initializeDefaultMeterProviderConfiguration(): MeterProvider {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/metrics',
               timeout: 10000,
-              temporality_preference: ExporterTemporalityPreference.cumulative,
+              temporality_preference: ExporterTemporalityPreference.Cumulative,
               default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.explicit_bucket_histogram,
+                ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
             },
           },
         },
       },
     ],
-    exemplar_filter: ExemplarFilter.trace_based,
+    exemplar_filter: ExemplarFilter.TraceBased,
   };
 }
 
@@ -66,9 +66,9 @@ export interface MeterProvider {
 }
 
 export enum ExemplarFilter {
-  always_on,
-  always_off,
-  trace_based,
+  AlwaysOff = 'always_off',
+  AlwaysOn = 'always_on',
+  TraceBased = 'trace_based',
 }
 
 export interface PeriodicMetricReader {
@@ -428,14 +428,14 @@ export interface OtlpFileMetricExporter {
 }
 
 export enum ExporterTemporalityPreference {
-  cumulative,
-  delta,
-  low_memory,
+  Cumulative = 'cumulative',
+  Delta = 'delta',
+  LowMemory = 'low_memory',
 }
 
 export enum ExporterDefaultHistogramAggregation {
-  explicit_bucket_histogram,
-  base2_exponential_bucket_histogram,
+  Base2ExponentialBucketHistogram = 'base2_exponential_bucket_histogram',
+  ExplicitBucketHistogram = 'explicit_bucket_histogram',
 }
 
 export interface View {
@@ -491,13 +491,13 @@ export interface ViewSelector {
 }
 
 export enum InstrumentType {
-  counter,
-  gauge,
-  histogram,
-  observable_counter,
-  observable_gauge,
-  observable_up_down_counter,
-  up_down_counter,
+  Counter = 'counter',
+  Gauge = 'gauge',
+  Histogram = 'histogram',
+  ObservableCounter = 'observable_counter',
+  ObservableGauge = 'observable_gauge',
+  ObservableUpDownCounter = 'observable_up_down_counter',
+  UpDownCounter = 'up_down_counter',
 }
 
 export interface ViewStream {

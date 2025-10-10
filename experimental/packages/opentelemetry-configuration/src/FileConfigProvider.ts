@@ -310,8 +310,8 @@ function parseConfigSpanExporter(
             timeout: getNumberFromConfigFile(e['timeout']) ?? 10000,
             encoding:
               getStringFromConfigFile(e['encoding']) === 'json'
-                ? OtlpHttpEncoding.json
-                : OtlpHttpEncoding.protobuf,
+                ? OtlpHttpEncoding.JSON
+                : OtlpHttpEncoding.Protobuf,
           },
         };
 
@@ -583,13 +583,13 @@ function getTemporalityPreference(
   );
   switch (temporalityPreferenceType) {
     case 'cumulative':
-      return ExporterTemporalityPreference.cumulative;
+      return ExporterTemporalityPreference.Cumulative;
     case 'delta':
-      return ExporterTemporalityPreference.delta;
+      return ExporterTemporalityPreference.Delta;
     case 'low_memory':
-      return ExporterTemporalityPreference.low_memory;
+      return ExporterTemporalityPreference.LowMemory;
     default:
-      return ExporterTemporalityPreference.cumulative;
+      return ExporterTemporalityPreference.Cumulative;
   }
 }
 
@@ -601,11 +601,11 @@ function getDefaultHistogramAggregation(
   );
   switch (defaultHistogramAggregationType) {
     case 'explicit_bucket_histogram':
-      return ExporterDefaultHistogramAggregation.explicit_bucket_histogram;
+      return ExporterDefaultHistogramAggregation.ExplicitBucketHistogram;
     case 'base2_exponential_bucket_histogram':
-      return ExporterDefaultHistogramAggregation.base2_exponential_bucket_histogram;
+      return ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram;
     default:
-      return ExporterDefaultHistogramAggregation.explicit_bucket_histogram;
+      return ExporterDefaultHistogramAggregation.ExplicitBucketHistogram;
   }
 }
 
@@ -633,8 +633,8 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
             timeout: getNumberFromConfigFile(e['timeout']) ?? 10000,
             encoding:
               getStringFromConfigFile(e['encoding']) === 'json'
-                ? OtlpHttpEncoding.json
-                : OtlpHttpEncoding.protobuf,
+                ? OtlpHttpEncoding.JSON
+                : OtlpHttpEncoding.Protobuf,
             temporality_preference: getTemporalityPreference(
               e['temporality_preference']
             ),
@@ -761,16 +761,16 @@ function setMeterProvider(
     if (exemplarFilter) {
       switch (exemplarFilter) {
         case 'trace_based':
-          config.meter_provider.exemplar_filter = ExemplarFilter.trace_based;
+          config.meter_provider.exemplar_filter = ExemplarFilter.TraceBased;
           break;
         case 'always_on':
-          config.meter_provider.exemplar_filter = ExemplarFilter.always_on;
+          config.meter_provider.exemplar_filter = ExemplarFilter.AlwaysOn;
           break;
         case 'always_off':
-          config.meter_provider.exemplar_filter = ExemplarFilter.always_off;
+          config.meter_provider.exemplar_filter = ExemplarFilter.AlwaysOff;
           break;
         default:
-          config.meter_provider.exemplar_filter = ExemplarFilter.trace_based;
+          config.meter_provider.exemplar_filter = ExemplarFilter.TraceBased;
           break;
       }
     }
@@ -901,26 +901,26 @@ function setMeterProvider(
           if (instrumentType) {
             switch (instrumentType) {
               case 'counter':
-                selector.instrument_type = InstrumentType.counter;
+                selector.instrument_type = InstrumentType.Counter;
                 break;
               case 'gauge':
-                selector.instrument_type = InstrumentType.gauge;
+                selector.instrument_type = InstrumentType.Gauge;
                 break;
               case 'histogram':
-                selector.instrument_type = InstrumentType.histogram;
+                selector.instrument_type = InstrumentType.Histogram;
                 break;
               case 'observable_counter':
-                selector.instrument_type = InstrumentType.observable_counter;
+                selector.instrument_type = InstrumentType.ObservableCounter;
                 break;
               case 'observable_gauge':
-                selector.instrument_type = InstrumentType.observable_gauge;
+                selector.instrument_type = InstrumentType.ObservableGauge;
                 break;
               case 'observable_up_down_counter':
                 selector.instrument_type =
-                  InstrumentType.observable_up_down_counter;
+                  InstrumentType.ObservableUpDownCounter;
                 break;
               case 'up_down_counter':
-                selector.instrument_type = InstrumentType.up_down_counter;
+                selector.instrument_type = InstrumentType.UpDownCounter;
                 break;
             }
           }

@@ -322,19 +322,19 @@ function setMeterProvider(config: ConfigurationModel): void {
       switch (temporalityPreference) {
         case 'cumulative':
           readerPeriodic.exporter.otlp_http.temporality_preference =
-            ExporterTemporalityPreference.cumulative;
+            ExporterTemporalityPreference.Cumulative;
           break;
         case 'delta':
           readerPeriodic.exporter.otlp_http.temporality_preference =
-            ExporterTemporalityPreference.delta;
+            ExporterTemporalityPreference.Delta;
           break;
         case 'low_memory':
           readerPeriodic.exporter.otlp_http.temporality_preference =
-            ExporterTemporalityPreference.low_memory;
+            ExporterTemporalityPreference.LowMemory;
           break;
         default:
           readerPeriodic.exporter.otlp_http.temporality_preference =
-            ExporterTemporalityPreference.cumulative;
+            ExporterTemporalityPreference.Cumulative;
           break;
       }
     }
@@ -346,15 +346,15 @@ function setMeterProvider(config: ConfigurationModel): void {
       switch (defaultHistogramAggregation) {
         case 'explicit_bucket_histogram':
           readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
-            ExporterDefaultHistogramAggregation.explicit_bucket_histogram;
+            ExporterDefaultHistogramAggregation.ExplicitBucketHistogram;
           break;
         case 'base2_exponential_bucket_histogram':
           readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
-            ExporterDefaultHistogramAggregation.base2_exponential_bucket_histogram;
+            ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram;
           break;
         default:
           readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
-            ExporterDefaultHistogramAggregation.explicit_bucket_histogram;
+            ExporterDefaultHistogramAggregation.ExplicitBucketHistogram;
           break;
       }
     }
@@ -374,16 +374,16 @@ function setMeterProvider(config: ConfigurationModel): void {
     }
     switch (exemplarFilter) {
       case 'trace_based':
-        config.meter_provider.exemplar_filter = ExemplarFilter.trace_based;
+        config.meter_provider.exemplar_filter = ExemplarFilter.TraceBased;
         break;
       case 'always_on':
-        config.meter_provider.exemplar_filter = ExemplarFilter.always_on;
+        config.meter_provider.exemplar_filter = ExemplarFilter.AlwaysOn;
         break;
       case 'always_off':
-        config.meter_provider.exemplar_filter = ExemplarFilter.always_off;
+        config.meter_provider.exemplar_filter = ExemplarFilter.AlwaysOff;
         break;
       default:
-        config.meter_provider.exemplar_filter = ExemplarFilter.trace_based;
+        config.meter_provider.exemplar_filter = ExemplarFilter.TraceBased;
         break;
     }
   }
