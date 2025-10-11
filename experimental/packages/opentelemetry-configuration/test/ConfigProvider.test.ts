@@ -18,6 +18,13 @@ import * as assert from 'assert';
 import { Configuration } from '../src';
 import { DiagLogLevel } from '@opentelemetry/api';
 import { createConfigProvider } from '../src/ConfigProvider';
+import { OtlpHttpEncoding } from '../src/models/commonModel';
+import {
+  ExemplarFilter,
+  ExporterDefaultHistogramAggregation,
+  ExporterTemporalityPreference,
+  InstrumentType,
+} from '../src/models/meterProviderModel';
 
 const defaultConfig: Configuration = {
   disabled: false,
@@ -43,6 +50,7 @@ const defaultConfig: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/traces',
               timeout: 10000,
+              encoding: OtlpHttpEncoding.Protobuf,
             },
           },
         },
@@ -57,11 +65,11 @@ const defaultConfig: Configuration = {
     },
     sampler: {
       parent_based: {
-        root: 'always_on',
-        remote_parent_sampled: 'always_on',
-        remote_parent_not_sampled: 'always_off',
-        local_parent_sampled: 'always_on',
-        local_parent_not_sampled: 'always_off',
+        root: { always_on: undefined },
+        remote_parent_sampled: { always_on: undefined },
+        remote_parent_not_sampled: { always_off: undefined },
+        local_parent_sampled: { always_on: undefined },
+        local_parent_not_sampled: { always_off: undefined },
       },
     },
   },
@@ -75,14 +83,15 @@ const defaultConfig: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/metrics',
               timeout: 10000,
-              temporality_preference: 'cumulative',
-              default_histogram_aggregation: 'explicit_bucket_histogram',
+              temporality_preference: ExporterTemporalityPreference.Cumulative,
+              default_histogram_aggregation:
+                ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
             },
           },
         },
       },
     ],
-    exemplar_filter: 'trace_based',
+    exemplar_filter: ExemplarFilter.TraceBased,
   },
   logger_provider: {
     processors: [
@@ -96,6 +105,7 @@ const defaultConfig: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
+              encoding: OtlpHttpEncoding.Protobuf,
             },
           },
         },
@@ -190,11 +200,87 @@ const configFromFile: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/traces',
               timeout: 10000,
+              certificate_file: '/app/cert.pem',
+              client_key_file: '/app/cert.pem',
+              client_certificate_file: '/app/cert.pem',
+              headers: [{ name: 'api-key', value: '1234' }],
+              headers_list: 'api-key=1234',
+              compression: 'gzip',
+              encoding: OtlpHttpEncoding.Protobuf,
             },
           },
         },
       },
+      {
+        batch: {
+          schedule_delay: 5000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            otlp_grpc: {
+              endpoint: 'http://localhost:4317',
+              timeout: 10000,
+              certificate_file: '/app/cert.pem',
+              client_key_file: '/app/cert.pem',
+              client_certificate_file: '/app/cert.pem',
+              headers: [{ name: 'api-key', value: '1234' }],
+              headers_list: 'api-key=1234',
+              compression: 'gzip',
+              insecure: false,
+            },
+          },
+        },
+      },
+      {
+        batch: {
+          schedule_delay: 5000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            'otlp_file/development': {
+              output_stream: 'file:///var/log/traces.jsonl',
+            },
+          },
+        },
+      },
+      {
+        batch: {
+          schedule_delay: 5000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            'otlp_file/development': {
+              output_stream: 'stdout',
+            },
+          },
+        },
+      },
+      {
+        batch: {
+          schedule_delay: 5000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            zipkin: {
+              endpoint: 'http://localhost:9411/api/v2/spans',
+              timeout: 10000,
+            },
+          },
+        },
+      },
+      {
+        simple: {
+          exporter: {
+            console: undefined,
+          },
+        },
+      },
     ],
+
     limits: {
       attribute_count_limit: 128,
       attribute_value_length_limit: 4096,
@@ -205,16 +291,46 @@ const configFromFile: Configuration = {
     },
     sampler: {
       parent_based: {
-        root: 'always_on',
-        remote_parent_sampled: 'always_on',
-        remote_parent_not_sampled: 'always_off',
-        local_parent_sampled: 'always_on',
-        local_parent_not_sampled: 'always_off',
+        root: { always_on: undefined },
+        remote_parent_sampled: { always_on: undefined },
+        remote_parent_not_sampled: { always_off: undefined },
+        local_parent_sampled: { always_on: undefined },
+        local_parent_not_sampled: { always_off: undefined },
       },
     },
   },
   meter_provider: {
     readers: [
+      {
+        pull: {
+          exporter: {
+            'prometheus/development': {
+              host: 'localhost',
+              port: 9464,
+              without_scope_info: false,
+              with_resource_constant_labels: {
+                included: ['service*'],
+                excluded: ['service.attr1'],
+              },
+            },
+          },
+          producers: [
+            {
+              opencensus: undefined,
+            },
+          ],
+          cardinality_limits: {
+            default: 2000,
+            counter: 2000,
+            gauge: 2000,
+            histogram: 2000,
+            observable_counter: 2000,
+            observable_gauge: 2000,
+            observable_up_down_counter: 2000,
+            up_down_counter: 2000,
+          },
+        },
+      },
       {
         periodic: {
           interval: 60000,
@@ -222,21 +338,183 @@ const configFromFile: Configuration = {
           exporter: {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/metrics',
+              certificate_file: '/app/cert.pem',
+              client_key_file: '/app/cert.pem',
+              client_certificate_file: '/app/cert.pem',
+              headers: [
+                {
+                  name: 'api-key',
+                  value: '1234',
+                },
+              ],
+              headers_list: 'api-key=1234',
+              compression: 'gzip',
               timeout: 10000,
-              temporality_preference: 'cumulative',
-              default_histogram_aggregation: 'explicit_bucket_histogram',
+              encoding: OtlpHttpEncoding.Protobuf,
+              temporality_preference: ExporterTemporalityPreference.Delta,
+              default_histogram_aggregation:
+                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
             },
+          },
+          producers: [
+            {
+              prometheus: undefined,
+            },
+          ],
+          cardinality_limits: {
+            default: 2000,
+            counter: 2000,
+            gauge: 2000,
+            histogram: 2000,
+            observable_counter: 2000,
+            observable_gauge: 2000,
+            observable_up_down_counter: 2000,
+            up_down_counter: 2000,
+          },
+        },
+      },
+      {
+        periodic: {
+          interval: 60000,
+          timeout: 30000,
+          exporter: {
+            otlp_grpc: {
+              endpoint: 'http://localhost:4317',
+              certificate_file: '/app/cert.pem',
+              client_key_file: '/app/cert.pem',
+              client_certificate_file: '/app/cert.pem',
+              headers: [
+                {
+                  name: 'api-key',
+                  value: '1234',
+                },
+              ],
+              headers_list: 'api-key=1234',
+              compression: 'gzip',
+              timeout: 10000,
+              insecure: false,
+              temporality_preference: ExporterTemporalityPreference.Delta,
+              default_histogram_aggregation:
+                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+            },
+          },
+          cardinality_limits: {
+            default: 2000,
+            counter: 2000,
+            gauge: 2000,
+            histogram: 2000,
+            observable_counter: 2000,
+            observable_gauge: 2000,
+            observable_up_down_counter: 2000,
+            up_down_counter: 2000,
+          },
+        },
+      },
+      {
+        periodic: {
+          timeout: 30000,
+          interval: 60000,
+          exporter: {
+            'otlp_file/development': {
+              output_stream: 'file:///var/log/metrics.jsonl',
+              temporality_preference: ExporterTemporalityPreference.Delta,
+              default_histogram_aggregation:
+                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+            },
+          },
+          cardinality_limits: {
+            default: 2000,
+            counter: 2000,
+            gauge: 2000,
+            histogram: 2000,
+            observable_counter: 2000,
+            observable_gauge: 2000,
+            observable_up_down_counter: 2000,
+            up_down_counter: 2000,
+          },
+        },
+      },
+      {
+        periodic: {
+          timeout: 30000,
+          interval: 60000,
+          exporter: {
+            'otlp_file/development': {
+              output_stream: 'stdout',
+              temporality_preference: ExporterTemporalityPreference.Delta,
+              default_histogram_aggregation:
+                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+            },
+          },
+          cardinality_limits: {
+            default: 2000,
+            counter: 2000,
+            gauge: 2000,
+            histogram: 2000,
+            observable_counter: 2000,
+            observable_gauge: 2000,
+            observable_up_down_counter: 2000,
+            up_down_counter: 2000,
+          },
+        },
+      },
+      {
+        periodic: {
+          timeout: 30000,
+          interval: 60000,
+          exporter: {
+            console: undefined,
+          },
+          cardinality_limits: {
+            default: 2000,
+            counter: 2000,
+            gauge: 2000,
+            histogram: 2000,
+            observable_counter: 2000,
+            observable_gauge: 2000,
+            observable_up_down_counter: 2000,
+            up_down_counter: 2000,
           },
         },
       },
     ],
-    exemplar_filter: 'trace_based',
+    exemplar_filter: ExemplarFilter.TraceBased,
+    views: [
+      {
+        selector: {
+          instrument_name: 'my-instrument',
+          instrument_type: InstrumentType.Histogram,
+          unit: 'ms',
+          meter_name: 'my-meter',
+          meter_version: '1.0.0',
+          meter_schema_url: 'https://opentelemetry.io/schemas/1.16.0',
+        },
+        stream: {
+          name: 'new_instrument_name',
+          description: 'new_description',
+          aggregation: {
+            explicit_bucket_histogram: {
+              boundaries: [
+                0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000,
+                7500, 10000,
+              ],
+              record_min_max: true,
+            },
+          },
+          aggregation_cardinality_limit: 2000,
+          attribute_keys: {
+            included: ['key1', 'key2'],
+            excluded: ['key3'],
+          },
+        },
+      },
+    ],
   },
   logger_provider: {
     processors: [
       {
         batch: {
-          schedule_delay: 1000,
+          schedule_delay: 5000,
           export_timeout: 30000,
           max_queue_size: 2048,
           max_export_batch_size: 512,
@@ -244,7 +522,68 @@ const configFromFile: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
+              encoding: OtlpHttpEncoding.Protobuf,
+              certificate_file: '/app/cert.pem',
+              client_key_file: '/app/cert.pem',
+              client_certificate_file: '/app/cert.pem',
+              headers: [{ name: 'api-key', value: '1234' }],
+              headers_list: 'api-key=1234',
+              compression: 'gzip',
             },
+          },
+        },
+      },
+      {
+        batch: {
+          schedule_delay: 1000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            otlp_grpc: {
+              endpoint: 'http://localhost:4317',
+              timeout: 10000,
+              certificate_file: '/app/cert.pem',
+              client_key_file: '/app/cert.pem',
+              client_certificate_file: '/app/cert.pem',
+              headers: [{ name: 'api-key', value: '1234' }],
+              headers_list: 'api-key=1234',
+              compression: 'gzip',
+              insecure: false,
+            },
+          },
+        },
+      },
+      {
+        batch: {
+          schedule_delay: 1000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            'otlp_file/development': {
+              output_stream: 'file:///var/log/logs.jsonl',
+            },
+          },
+        },
+      },
+      {
+        batch: {
+          schedule_delay: 1000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            'otlp_file/development': {
+              output_stream: 'stdout',
+            },
+          },
+        },
+      },
+      {
+        simple: {
+          exporter: {
+            console: undefined,
           },
         },
       },
@@ -252,6 +591,19 @@ const configFromFile: Configuration = {
     limits: {
       attribute_count_limit: 128,
       attribute_value_length_limit: 4096,
+    },
+    'logger_configurator/development': {
+      default_config: {
+        disabled: true,
+      },
+      loggers: [
+        {
+          name: 'io.opentelemetry.contrib.*',
+          config: {
+            disabled: false,
+          },
+        },
+      ],
     },
   },
 };
@@ -288,6 +640,8 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/traces',
               timeout: 10000,
+              encoding: OtlpHttpEncoding.Protobuf,
+              compression: 'gzip',
             },
           },
         },
@@ -302,11 +656,11 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
     },
     sampler: {
       parent_based: {
-        root: 'always_on',
-        remote_parent_sampled: 'always_on',
-        remote_parent_not_sampled: 'always_off',
-        local_parent_sampled: 'always_on',
-        local_parent_not_sampled: 'always_off',
+        root: { always_on: undefined },
+        remote_parent_sampled: { always_on: undefined },
+        remote_parent_not_sampled: { always_off: undefined },
+        local_parent_sampled: { always_on: undefined },
+        local_parent_not_sampled: { always_off: undefined },
       },
     },
   },
@@ -319,15 +673,28 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
           exporter: {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/metrics',
+              encoding: OtlpHttpEncoding.Protobuf,
+              compression: 'gzip',
               timeout: 10000,
-              temporality_preference: 'cumulative',
-              default_histogram_aggregation: 'explicit_bucket_histogram',
+              temporality_preference: ExporterTemporalityPreference.Cumulative,
+              default_histogram_aggregation:
+                ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
             },
+          },
+          cardinality_limits: {
+            default: 2000,
+            counter: 2000,
+            gauge: 2000,
+            histogram: 2000,
+            observable_counter: 2000,
+            observable_gauge: 2000,
+            observable_up_down_counter: 2000,
+            up_down_counter: 2000,
           },
         },
       },
     ],
-    exemplar_filter: 'trace_based',
+    exemplar_filter: ExemplarFilter.TraceBased,
   },
   logger_provider: {
     processors: [
@@ -341,6 +708,8 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
+              encoding: OtlpHttpEncoding.Protobuf,
+              compression: 'gzip',
             },
           },
         },
@@ -575,6 +944,7 @@ describe('ConfigProvider', function () {
                     compression: 'gzip',
                     timeout: 2000,
                     headers_list: 'host=localhost',
+                    encoding: OtlpHttpEncoding.Protobuf,
                   },
                 },
               },
@@ -582,11 +952,11 @@ describe('ConfigProvider', function () {
           ],
           sampler: {
             parent_based: {
-              root: 'always_on',
-              remote_parent_sampled: 'always_on',
-              remote_parent_not_sampled: 'always_off',
-              local_parent_sampled: 'always_on',
-              local_parent_not_sampled: 'always_off',
+              root: { always_on: undefined },
+              remote_parent_sampled: { always_on: undefined },
+              remote_parent_not_sampled: { always_off: undefined },
+              local_parent_sampled: { always_on: undefined },
+              local_parent_not_sampled: { always_off: undefined },
             },
           },
         },
@@ -633,15 +1003,15 @@ describe('ConfigProvider', function () {
                     compression: 'gzip',
                     timeout: 300,
                     headers_list: 'host=localhost',
-                    temporality_preference: 'delta',
+                    temporality_preference: ExporterTemporalityPreference.Delta,
                     default_histogram_aggregation:
-                      'base2_exponential_bucket_histogram',
+                      ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
                   },
                 },
               },
             },
           ],
-          exemplar_filter: 'always_on',
+          exemplar_filter: ExemplarFilter.AlwaysOn,
         },
       };
       const configProvider = createConfigProvider();
@@ -690,6 +1060,7 @@ describe('ConfigProvider', function () {
                     compression: 'gzip',
                     timeout: 700,
                     headers_list: 'host=localhost',
+                    encoding: OtlpHttpEncoding.Protobuf,
                   },
                 },
               },
@@ -827,7 +1198,8 @@ describe('ConfigProvider', function () {
       process.env.OTEL_BSP_EXPORT_TIMEOUT = '456';
       process.env.OTEL_BSP_MAX_QUEUE_SIZE = '789';
       process.env.OTEL_BSP_MAX_EXPORT_BATCH_SIZE = '1011';
-      process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'trace-endpoint';
+      process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT =
+        'http://test.com:4318/v1/traces';
       process.env.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE = 'trace-certificate';
       process.env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY = 'trace-client-key';
       process.env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE =
@@ -843,7 +1215,8 @@ describe('ConfigProvider', function () {
       process.env.OTEL_LINK_ATTRIBUTE_COUNT_LIMIT = '19';
       process.env.OTEL_METRIC_EXPORT_INTERVAL = '20';
       process.env.OTEL_METRIC_EXPORT_TIMEOUT = '21';
-      process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'metric-endpoint';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT =
+        'http://test:4318/v1/metrics';
       process.env.OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE = 'metric-certificate';
       process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY = 'metric-client-key';
       process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE =
@@ -860,7 +1233,8 @@ describe('ConfigProvider', function () {
       process.env.OTEL_BLRP_EXPORT_TIMEOUT = '24';
       process.env.OTEL_BLRP_MAX_QUEUE_SIZE = '25';
       process.env.OTEL_BLRP_MAX_EXPORT_BATCH_SIZE = '26';
-      process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'logs-endpoint';
+      process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT =
+        'http://test.com:4318/v1/logs';
       process.env.OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE = 'logs-certificate';
       process.env.OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY = 'logs-client-key';
       process.env.OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE =
@@ -901,10 +1275,65 @@ describe('ConfigProvider', function () {
             event_attribute_count_limit: 18,
             link_attribute_count_limit: 19,
           },
+          processors: [
+            {
+              batch: {
+                export_timeout: 456,
+                max_export_batch_size: 1011,
+                max_queue_size: 789,
+                schedule_delay: 123,
+                exporter: {
+                  otlp_http: {
+                    certificate_file: 'trace-certificate',
+                    client_certificate_file: 'trace-client-certificate',
+                    client_key_file: 'trace-client-key',
+                    compression: 'trace-compression',
+                    encoding: OtlpHttpEncoding.Protobuf,
+                    endpoint: 'http://test.com:4318/v1/traces',
+                    headers_list: 'trace-headers',
+                    timeout: 1213,
+                  },
+                },
+              },
+            },
+          ],
         },
         meter_provider: {
-          ...defaultConfigFromFileWithEnvVariables.meter_provider,
-          exemplar_filter: 'always_off',
+          exemplar_filter: ExemplarFilter.AlwaysOff,
+          readers: [
+            {
+              periodic: {
+                interval: 20,
+                timeout: 21,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://test:4318/v1/metrics',
+                    timeout: 22,
+                    temporality_preference:
+                      ExporterTemporalityPreference.Cumulative,
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                    certificate_file: 'metric-certificate',
+                    client_certificate_file: 'metric-client-certificate',
+                    client_key_file: 'metric-client-key',
+                    compression: 'metric-compression',
+                    encoding: OtlpHttpEncoding.Protobuf,
+                    headers_list: 'metric-header',
+                  },
+                },
+                cardinality_limits: {
+                  default: 2000,
+                  counter: 2000,
+                  gauge: 2000,
+                  histogram: 2000,
+                  observable_counter: 2000,
+                  observable_gauge: 2000,
+                  observable_up_down_counter: 2000,
+                  up_down_counter: 2000,
+                },
+              },
+            },
+          ],
         },
         logger_provider: {
           ...defaultConfigFromFileWithEnvVariables.logger_provider,
@@ -912,6 +1341,28 @@ describe('ConfigProvider', function () {
             attribute_value_length_limit: 28,
             attribute_count_limit: 29,
           },
+          processors: [
+            {
+              batch: {
+                export_timeout: 24,
+                max_export_batch_size: 26,
+                max_queue_size: 25,
+                schedule_delay: 23,
+                exporter: {
+                  otlp_http: {
+                    certificate_file: 'logs-certificate',
+                    client_certificate_file: 'logs-client-certificate',
+                    client_key_file: 'logs-client-key',
+                    compression: 'logs-compression',
+                    encoding: OtlpHttpEncoding.Protobuf,
+                    endpoint: 'http://test.com:4318/v1/logs',
+                    headers_list: 'logs-header',
+                    timeout: 27,
+                  },
+                },
+              },
+            },
+          ],
         },
       };
 
