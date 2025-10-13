@@ -24,10 +24,10 @@ export function sanitizeAttributes(attributes: unknown): Attributes {
   }
 
   for (const key in attributes) {
-    if (
-      !Object.prototype.hasOwnProperty.call(attributes, key) ||
-      !isAttributeKey(key)
-    ) {
+    if (!Object.prototype.hasOwnProperty.call(attributes, key)) {
+      continue;
+    }
+    if (!isAttributeKey(key)) {
       diag.warn(`Invalid attribute key: ${key}`);
       continue;
     }
