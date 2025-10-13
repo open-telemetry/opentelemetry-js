@@ -28,7 +28,7 @@ const defaultConfig: Configuration = {
     attribute_count_limit: 128,
   },
   propagator: {
-    composite: ['tracecontext', 'baggage'],
+    composite: [{ tracecontext: null }, { baggage: null }],
     composite_list: 'tracecontext,baggage',
   },
   tracer_provider: {
@@ -164,10 +164,19 @@ const configFromFile: Configuration = {
   },
   attribute_limits: {
     attribute_count_limit: 128,
+    attribute_value_length_limit: 4096,
   },
   propagator: {
-    composite: ['tracecontext', 'baggage'],
-    composite_list: 'tracecontext,baggage',
+    composite: [
+      { tracecontext: null },
+      { baggage: null },
+      { b3: null },
+      { b3multi: null },
+      { jaeger: null },
+      { ottrace: null },
+      { xray: null },
+    ],
+    composite_list: 'tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray',
   },
   tracer_provider: {
     processors: [
@@ -188,6 +197,7 @@ const configFromFile: Configuration = {
     ],
     limits: {
       attribute_count_limit: 128,
+      attribute_value_length_limit: 4096,
       event_count_limit: 128,
       link_count_limit: 128,
       event_attribute_count_limit: 128,
@@ -241,6 +251,7 @@ const configFromFile: Configuration = {
     ],
     limits: {
       attribute_count_limit: 128,
+      attribute_value_length_limit: 4096,
     },
   },
 };
@@ -262,7 +273,7 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
     attribute_count_limit: 128,
   },
   propagator: {
-    composite: ['tracecontext', 'baggage'],
+    composite: [{ tracecontext: null }, { baggage: null }],
     composite_list: 'tracecontext,baggage',
   },
   tracer_provider: {
@@ -342,61 +353,13 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
 };
 
 describe('ConfigProvider', function () {
-  describe('get values from environment variables', function () {
-    afterEach(function () {
-      delete process.env.OTEL_SDK_DISABLED;
-      delete process.env.OTEL_LOG_LEVEL;
-      delete process.env.OTEL_NODE_RESOURCE_DETECTORS;
-      delete process.env.OTEL_RESOURCE_ATTRIBUTES;
-      delete process.env.OTEL_SERVICE_NAME;
-      delete process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
-      delete process.env.OTEL_ATTRIBUTE_COUNT_LIMIT;
-      delete process.env.OTEL_PROPAGATORS;
-      delete process.env.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT;
-      delete process.env.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT;
-      delete process.env.OTEL_SPAN_EVENT_COUNT_LIMIT;
-      delete process.env.OTEL_SPAN_LINK_COUNT_LIMIT;
-      delete process.env.OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT;
-      delete process.env.OTEL_LINK_ATTRIBUTE_COUNT_LIMIT;
-      delete process.env.OTEL_BSP_SCHEDULE_DELAY;
-      delete process.env.OTEL_BSP_EXPORT_TIMEOUT;
-      delete process.env.OTEL_BSP_MAX_QUEUE_SIZE;
-      delete process.env.OTEL_BSP_MAX_EXPORT_BATCH_SIZE;
-      delete process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT;
-      delete process.env.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE;
-      delete process.env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY;
-      delete process.env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE;
-      delete process.env.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION;
-      delete process.env.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
-      delete process.env.OTEL_EXPORTER_OTLP_TRACES_HEADERS;
-      delete process.env.OTEL_METRIC_EXPORT_INTERVAL;
-      delete process.env.OTEL_METRIC_EXPORT_TIMEOUT;
-      delete process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT;
-      delete process.env.OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE;
-      delete process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY;
-      delete process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE;
-      delete process.env.OTEL_EXPORTER_OTLP_METRICS_COMPRESSION;
-      delete process.env.OTEL_EXPORTER_OTLP_METRICS_TIMEOUT;
-      delete process.env.OTEL_EXPORTER_OTLP_METRICS_HEADERS;
-      delete process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE;
-      delete process.env
-        .OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION;
-      delete process.env.OTEL_METRICS_EXEMPLAR_FILTER;
-      delete process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT;
-      delete process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT;
-      delete process.env.OTEL_BLRP_SCHEDULE_DELAY;
-      delete process.env.OTEL_BLRP_EXPORT_TIMEOUT;
-      delete process.env.OTEL_BLRP_MAX_QUEUE_SIZE;
-      delete process.env.OTEL_BLRP_MAX_EXPORT_BATCH_SIZE;
-      delete process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT;
-      delete process.env.OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE;
-      delete process.env.OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY;
-      delete process.env.OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE;
-      delete process.env.OTEL_EXPORTER_OTLP_LOGS_COMPRESSION;
-      delete process.env.OTEL_EXPORTER_OTLP_LOGS_TIMEOUT;
-      delete process.env.OTEL_EXPORTER_OTLP_LOGS_HEADERS;
-    });
+  const _origEnvVariables = { ...process.env };
 
+  afterEach(function () {
+    process.env = { ..._origEnvVariables };
+  });
+
+  describe('get values from environment variables', function () {
     it('should initialize config with default values', function () {
       const configProvider = createConfigProvider();
       assert.deepStrictEqual(
@@ -504,7 +467,7 @@ describe('ConfigProvider', function () {
       const expectedConfig: Configuration = {
         ...defaultConfig,
         propagator: {
-          composite: ['tracecontext', 'jaeger'],
+          composite: [{ tracecontext: null }, { jaeger: null }],
           composite_list: 'tracecontext,jaeger',
         },
       };
@@ -695,61 +658,6 @@ describe('ConfigProvider', function () {
   });
 
   describe('get values from config file', function () {
-    afterEach(function () {
-      delete process.env.OTEL_EXPERIMENTAL_CONFIG_FILE;
-      delete process.env.OTEL_NODE_RESOURCE_DETECTORS;
-      delete process.env.OTEL_SDK_DISABLED;
-      delete process.env.OTEL_LOG_LEVEL;
-      delete process.env.OTEL_SERVICE_NAME;
-      delete process.env.OTEL_RESOURCE_ATTRIBUTES;
-      delete process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
-      delete process.env.OTEL_ATTRIBUTE_COUNT_LIMIT;
-      delete process.env.OTEL_PROPAGATORS;
-      delete process.env.OTEL_BSP_SCHEDULE_DELAY;
-      delete process.env.OTEL_BSP_EXPORT_TIMEOUT;
-      delete process.env.OTEL_BSP_MAX_QUEUE_SIZE;
-      delete process.env.OTEL_BSP_MAX_EXPORT_BATCH_SIZE;
-      delete process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT;
-      delete process.env.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE;
-      delete process.env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY;
-      delete process.env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE;
-      delete process.env.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION;
-      delete process.env.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
-      delete process.env.OTEL_EXPORTER_OTLP_TRACES_HEADERS;
-      delete process.env.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT;
-      delete process.env.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT;
-      delete process.env.OTEL_SPAN_EVENT_COUNT_LIMIT;
-      delete process.env.OTEL_SPAN_LINK_COUNT_LIMIT;
-      delete process.env.OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT;
-      delete process.env.OTEL_LINK_ATTRIBUTE_COUNT_LIMIT;
-      delete process.env.OTEL_METRIC_EXPORT_INTERVAL;
-      delete process.env.OTEL_METRIC_EXPORT_TIMEOUT;
-      delete process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT;
-      delete process.env.OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE;
-      delete process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY;
-      delete process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE;
-      delete process.env.OTEL_EXPORTER_OTLP_METRICS_COMPRESSION;
-      delete process.env.OTEL_EXPORTER_OTLP_METRICS_TIMEOUT;
-      delete process.env.OTEL_EXPORTER_OTLP_METRICS_HEADERS;
-      delete process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE;
-      delete process.env
-        .OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION;
-      delete process.env.OTEL_METRICS_EXEMPLAR_FILTER;
-      delete process.env.OTEL_BLRP_SCHEDULE_DELAY;
-      delete process.env.OTEL_BLRP_EXPORT_TIMEOUT;
-      delete process.env.OTEL_BLRP_MAX_QUEUE_SIZE;
-      delete process.env.OTEL_BLRP_MAX_EXPORT_BATCH_SIZE;
-      delete process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT;
-      delete process.env.OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE;
-      delete process.env.OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY;
-      delete process.env.OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE;
-      delete process.env.OTEL_EXPORTER_OTLP_LOGS_COMPRESSION;
-      delete process.env.OTEL_EXPORTER_OTLP_LOGS_TIMEOUT;
-      delete process.env.OTEL_EXPORTER_OTLP_LOGS_HEADERS;
-      delete process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT;
-      delete process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT;
-    });
-
     it('should initialize config with default values from valid config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
         'test/fixtures/kitchen-sink.yaml';
@@ -844,7 +752,7 @@ describe('ConfigProvider', function () {
         'metric-temporality';
       process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
         'metric-hist-agg';
-      process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'metric-exemplar-filter';
+      process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'always_off';
       process.env.OTEL_BLRP_SCHEDULE_DELAY = '23';
       process.env.OTEL_BLRP_EXPORT_TIMEOUT = '24';
       process.env.OTEL_BLRP_MAX_QUEUE_SIZE = '25';
@@ -861,7 +769,7 @@ describe('ConfigProvider', function () {
       process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '29';
       const configProvider = createConfigProvider();
       const expectedConfig: Configuration = {
-        ...defaultConfig,
+        ...defaultConfigFromFileWithEnvVariables,
         resource: {
           attributes_list: 'attributes',
           attributes: [
@@ -871,6 +779,36 @@ describe('ConfigProvider', function () {
               type: 'string',
             },
           ],
+        },
+        attribute_limits: {
+          attribute_count_limit: 7,
+          attribute_value_length_limit: 23,
+        },
+        propagator: {
+          composite: [{ prop: null }],
+          composite_list: 'prop',
+        },
+        tracer_provider: {
+          ...defaultConfigFromFileWithEnvVariables.tracer_provider,
+          limits: {
+            attribute_value_length_limit: 14,
+            attribute_count_limit: 15,
+            event_count_limit: 16,
+            link_count_limit: 17,
+            event_attribute_count_limit: 18,
+            link_attribute_count_limit: 19,
+          },
+        },
+        meter_provider: {
+          ...defaultConfigFromFileWithEnvVariables.meter_provider,
+          exemplar_filter: 'always_off',
+        },
+        logger_provider: {
+          ...defaultConfigFromFileWithEnvVariables.logger_provider,
+          limits: {
+            attribute_value_length_limit: 28,
+            attribute_count_limit: 29,
+          },
         },
       };
 

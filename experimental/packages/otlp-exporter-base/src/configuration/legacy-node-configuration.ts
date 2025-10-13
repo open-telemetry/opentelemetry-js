@@ -50,6 +50,12 @@ export interface OTLPExporterNodeConfigBase extends OTLPExporterConfigBase {
    * }
    */
   httpAgentOptions?: http.AgentOptions | https.AgentOptions | HttpAgentFactory;
+  /**
+   * User agent header string to be prepended to the exporter's default value.
+   * Availablie since v1.49.0 of the spec.
+   * Ref: https://opentelemetry.io/docs/specs/otel/protocol/exporter/#user-agent
+   */
+  userAgent?: string;
 }
 
 export enum CompressionAlgorithm {
