@@ -240,7 +240,7 @@ For more information about the maintainer role, see the [community repository](h
 
 - [Amir Blum](https://github.com/blumamir), Odigos
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
-- [Martin Kuba](https://github.com/martinkuba), Lightstep
+- [Martin Kuba](https://github.com/martinkuba), Grafana Labs
 - [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Neville Wylie](https://github.com/MSNev), Microsoft
