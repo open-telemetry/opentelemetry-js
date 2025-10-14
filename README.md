@@ -246,6 +246,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 - [Chengzhong Wu](https://github.com/legendecas), Bloomberg
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
+- [David Luna](https://github.com/david-luna), Elastic
 - [Jamie Danielson](https://github.com/JamieDanielson), Honeycomb
 - [Marc Pichler](https://github.com/pichlermarc), Dynatrace
 - [Trent Mick](https://github.com/trentm), Elastic
@@ -255,9 +256,8 @@ For more information about the maintainer role, see the [community repository](h
 ### Approvers
 
 - [Amir Blum](https://github.com/blumamir), Odigos
-- [David Luna](https://github.com/david-luna), Elastic
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
-- [Martin Kuba](https://github.com/martinkuba), Lightstep
+- [Martin Kuba](https://github.com/martinkuba), Grafana Labs
 - [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Neville Wylie](https://github.com/MSNev), Microsoft
