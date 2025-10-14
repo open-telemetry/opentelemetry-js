@@ -14,13 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  ContextManager,
-  TextMapPropagator,
-  metrics,
-  diag,
-  DiagConsoleLogger,
-} from '@opentelemetry/api';
+import { metrics, trace, diag, DiagConsoleLogger } from '@opentelemetry/api';
 import { logs } from '@opentelemetry/api-logs';
 import {
   Instrumentation,
@@ -79,15 +73,20 @@ import {
   getResourceDetectorsFromEnv,
   getSpanProcessorsFromEnv,
   getPropagatorFromEnv,
+  setupPropagator,
+  setupContextManager,
 } from './utils';
 
-/** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
+type TracerProviderConfig = {
+  tracerConfig: NodeTracerConfig;
+  spanProcessors: SpanProcessor[];
+};
 
 export type MeterProviderConfig = {
   /**
-   * Reference to the MetricReader instance by the NodeSDK
+   * Reference to the MetricReader instances by the NodeSDK
    */
-  reader?: IMetricReader;
+  readers?: IMetricReader[];
   /**
    * List of {@link ViewOptions}s that should be passed to the MeterProvider
    */
@@ -129,6 +128,7 @@ function configureMetricProviderFromEnv(): IMetricReader[] {
     );
     return metricReaders;
   }
+
   enabledExporters.forEach(exporter => {
     if (exporter === 'otlp') {
       const protocol =
@@ -201,13 +201,27 @@ function configureMetricProviderFromEnv(): IMetricReader[] {
 
   return metricReaders;
 }
+
+/**
+ * A setup helper for the OpenTelemetry SDKs (logs, metrics, traces).
+ * <p> After successful setup using {@link NodeSDK#start()}, use `@opentelemetry/api` to obtain the registered components.
+ * <p> Use the shutdown handler {@link NodeSDK#shutdown()} to ensure your telemetry is exported before the process exits.
+ *
+ * @example <caption> Register SDK by using environment variables </caption>
+ *    const nodeSdk = new NodeSDK(); // providing no options uses OTEL_* environment variables for SDK setup.
+ *    nodeSdk.start(); // registers all configured SDK components
+ * @example <caption> Override environment variable config with your own components </caption>
+ *    const nodeSdk = new NodeSDK({
+ *      // override the list of metric reader with your own options and ignore environment variable config
+ *      // explore the docs of other options to learn more!
+ *      metricReaders: [ new PeriodicExportingMetricReader({
+ *        exporter: new OTLPMetricsExporter()
+ *        })]
+ *    });
+ *    nodeSdk.start(); // registers all configured SDK components
+ */
 export class NodeSDK {
-  private _tracerProviderConfig?: {
-    tracerConfig: NodeTracerConfig;
-    spanProcessors: SpanProcessor[];
-    contextManager?: ContextManager;
-    textMapPropagator?: TextMapPropagator;
-  };
+  private _tracerProviderConfig?: TracerProviderConfig;
   private _loggerProviderConfig?: LoggerProviderConfig;
   private _meterProviderConfig?: MeterProviderConfig;
   private _instrumentations: Instrumentation[];
@@ -292,8 +306,6 @@ export class NodeSDK {
       this._tracerProviderConfig = {
         tracerConfig: tracerProviderConfig,
         spanProcessors,
-        contextManager: configuration.contextManager,
-        textMapPropagator: configuration.textMapPropagator,
       };
     }
 
@@ -312,10 +324,20 @@ export class NodeSDK {
       this.configureLoggerProviderFromEnv();
     }
 
-    if (configuration.metricReader || configuration.views) {
+    if (
+      configuration.metricReaders ||
+      configuration.metricReader ||
+      configuration.views
+    ) {
       const meterProviderConfig: MeterProviderConfig = {};
-      if (configuration.metricReader) {
-        meterProviderConfig.reader = configuration.metricReader;
+
+      if (configuration.metricReaders) {
+        meterProviderConfig.readers = configuration.metricReaders;
+      } else if (configuration.metricReader) {
+        meterProviderConfig.readers = [configuration.metricReader];
+        diag.warn(
+          "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
+        );
       }
 
       if (configuration.views) {
@@ -340,6 +362,13 @@ export class NodeSDK {
       instrumentations: this._instrumentations,
     });
 
+    setupContextManager(this._configuration?.contextManager);
+    setupPropagator(
+      this._configuration?.textMapPropagator === null
+        ? null // null means don't set, so we cannot fall back to env config.
+        : (this._configuration?.textMapPropagator ?? getPropagatorFromEnv())
+    );
+
     if (this._autoDetectResources) {
       const internalConfig: ResourceDetectionConfig = {
         detectors: this._resourceDetectors,
@@ -361,23 +390,14 @@ export class NodeSDK {
       ? this._tracerProviderConfig.spanProcessors
       : getSpanProcessorsFromEnv();
 
-    this._tracerProvider = new NodeTracerProvider({
-      ...this._configuration,
-      resource: this._resource,
-      spanProcessors,
-    });
-
     // Only register if there is a span processor
     if (spanProcessors.length > 0) {
-      this._tracerProvider.register({
-        contextManager:
-          this._tracerProviderConfig?.contextManager ??
-          // _tracerProviderConfig may be undefined if trace-specific settings are not provided - fall back to raw config
-          this._configuration?.contextManager,
-        propagator:
-          this._tracerProviderConfig?.textMapPropagator ??
-          getPropagatorFromEnv(),
+      this._tracerProvider = new NodeTracerProvider({
+        ...this._configuration,
+        resource: this._resource,
+        spanProcessors,
       });
+      trace.setGlobalTracerProvider(this._tracerProvider);
     }
 
     if (this._loggerProviderConfig) {
@@ -395,8 +415,8 @@ export class NodeSDK {
       configureMetricProviderFromEnv();
     if (this._meterProviderConfig || metricReadersFromEnv.length > 0) {
       const readers: IMetricReader[] = [];
-      if (this._meterProviderConfig?.reader) {
-        readers.push(this._meterProviderConfig.reader);
+      if (this._meterProviderConfig?.readers) {
+        readers.push(...this._meterProviderConfig.readers);
       }
 
       if (readers.length === 0) {

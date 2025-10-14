@@ -58,7 +58,7 @@ npm install --save @opentelemetry/sdk-node
 npm install --save @opentelemetry/auto-instrumentations-node
 ```
 
-**Note:** `auto-instrumentations-node` is a meta package from [opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/metapackages/auto-instrumentations-node) that provides a simple way to initialize multiple Node.js instrumentations.
+**Note:** `auto-instrumentations-node` is a meta package from [opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/packages/auto-instrumentations-node) that provides a simple way to initialize multiple Node.js instrumentations.
 
 ### Set up Tracing
 
@@ -105,6 +105,23 @@ node -r ./tracing.js app.js
 ```
 
 The above example will emit auto-instrumented telemetry about your Node.js application to the console. For a more in-depth example, see the [Getting Started Guide](https://opentelemetry.io/docs/languages/js/getting-started/). For more information about automatic instrumentation see [@opentelemetry/sdk-trace-node][otel-node], which provides auto-instrumentation for Node.js applications. If the automatic instrumentation does not suit your needs, or you would like to create manual traces, see [@opentelemetry/sdk-trace-base][otel-tracing]
+
+#### Debugging The Setup
+
+It's possible that an application instrumented as outlined above may not be behaving in an expected manner.
+For example, if the application is meant to be sending data to an Open Telemetry collector, that collector
+may not be receiving any data. Insight into such issues can be gained by enabling a diagnostics logger:
+
+```js
+// Added as additional configuration to tracing.js
+
+const {
+  diag,
+  DiagConsoleLogger,
+  DiagLogLevel
+} = require('@opentelemetry/api');
+diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
+```
 
 ## Library Author
 
@@ -218,7 +235,7 @@ For a more detailed breakdown of feature support see the [specification complian
 
 ## Contributing
 
-We'd love your help!. Use tags [up-for-grabs][up-for-grabs-issues] and
+We'd love your help! Use tags [up-for-grabs][up-for-grabs-issues] and
 [good first issue][good-first-issues] to get started with the project. For
 instructions to build and make changes to this project, see the
 [CONTRIBUTING][CONTRIBUTING] guide.
@@ -227,9 +244,9 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 ### Maintainers
 
-- [Amir Blum](https://github.com/blumamir), Odigos
 - [Chengzhong Wu](https://github.com/legendecas), Bloomberg
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
+- [David Luna](https://github.com/david-luna), Elastic
 - [Jamie Danielson](https://github.com/JamieDanielson), Honeycomb
 - [Marc Pichler](https://github.com/pichlermarc), Dynatrace
 - [Trent Mick](https://github.com/trentm), Elastic
@@ -238,9 +255,9 @@ For more information about the maintainer role, see the [community repository](h
 
 ### Approvers
 
-- [David Luna](https://github.com/david-luna), Elastic
+- [Amir Blum](https://github.com/blumamir), Odigos
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
-- [Martin Kuba](https://github.com/martinkuba), Lightstep
+- [Martin Kuba](https://github.com/martinkuba), Grafana Labs
 - [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Neville Wylie](https://github.com/MSNev), Microsoft

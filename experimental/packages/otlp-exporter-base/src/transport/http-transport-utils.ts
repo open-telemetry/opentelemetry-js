@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as http from 'http';
-import * as https from 'https';
+import type * as http from 'http';
+import type * as https from 'https';
 import * as zlib from 'zlib';
 import { Readable } from 'stream';
 import { HttpRequestParameters } from './http-transport-types';
@@ -24,9 +24,13 @@ import {
   parseRetryAfterToMills,
 } from '../is-export-retryable';
 import { OTLPExporterError } from '../types';
+import { VERSION } from '../version';
+
+const DEFAULT_USER_AGENT = `OTel-OTLP-Exporter-JavaScript/${VERSION}`;
 
 /**
  * Sends data using http
+ * @param request
  * @param params
  * @param agent
  * @param data
@@ -34,6 +38,7 @@ import { OTLPExporterError } from '../types';
  * @param timeoutMillis
  */
 export function sendWithHttp(
+  request: typeof https.request | typeof http.request,
   params: HttpRequestParameters,
   agent: http.Agent | https.Agent,
   data: Uint8Array,
@@ -42,18 +47,21 @@ export function sendWithHttp(
 ): void {
   const parsedUrl = new URL(params.url);
 
+  const headers = { ...params.headers() };
+  if (params.userAgent) {
+    headers['User-Agent'] = `${params.userAgent} ${DEFAULT_USER_AGENT}`;
+  } else {
+    headers['User-Agent'] = DEFAULT_USER_AGENT;
+  }
+
   const options: http.RequestOptions | https.RequestOptions = {
     hostname: parsedUrl.hostname,
     port: parsedUrl.port,
     path: parsedUrl.pathname,
     method: 'POST',
-    headers: {
-      ...params.headers(),
-    },
-    agent: agent,
+    headers,
+    agent,
   };
-
-  const request = parsedUrl.protocol === 'http:' ? http.request : https.request;
 
   const req = request(options, (res: http.IncomingMessage) => {
     const responseData: Buffer[] = [];
@@ -132,13 +140,4 @@ function readableFromUint8Array(buff: string | Uint8Array): Readable {
   readable.push(null);
 
   return readable;
-}
-
-export function createHttpAgent(
-  rawUrl: string,
-  agentOptions: http.AgentOptions | https.AgentOptions
-) {
-  const parsedUrl = new URL(rawUrl);
-  const Agent = parsedUrl.protocol === 'http:' ? http.Agent : https.Agent;
-  return new Agent(agentOptions);
 }

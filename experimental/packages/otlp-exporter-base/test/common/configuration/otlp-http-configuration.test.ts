@@ -21,14 +21,13 @@ import {
 import * as assert from 'assert';
 import { testSharedConfigBehavior } from './shared-configuration.test';
 
-describe('mergeOtlpHttpConfigurationWithDefaults', function () {
+describe('mergeOtlpHttpConfigurationWithDefaults (common)', function () {
   const testDefaults: OtlpHttpConfiguration = {
     url: 'http://default.example.test',
     timeoutMillis: 1,
     compression: 'none',
     concurrencyLimit: 2,
     headers: () => ({ 'User-Agent': 'default-user-agent' }),
-    agentOptions: { keepAlive: true },
   };
 
   describe('headers', function () {
@@ -118,16 +117,6 @@ describe('mergeOtlpHttpConfigurationWithDefaults', function () {
         testDefaults
       );
       assert.strictEqual(config.url, testDefaults.url);
-    });
-
-    it('throws error when the user-provided url is not parseable', function () {
-      assert.throws(() => {
-        mergeOtlpHttpConfigurationWithDefaults(
-          { url: 'this is not a URL' },
-          {},
-          testDefaults
-        );
-      }, new Error("Configuration: Could not parse user-provided export URL: 'this is not a URL'"));
     });
   });
 

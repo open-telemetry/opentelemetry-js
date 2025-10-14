@@ -60,6 +60,7 @@ describe('JaegerExporter', () => {
   describe('constructor', () => {
     afterEach(() => {
       delete process.env.OTEL_EXPORTER_JAEGER_AGENT_HOST;
+      delete process.env.OTEL_EXPORTER_JAEGER_AGENT_PORT;
     });
 
     it('should construct an exporter', () => {

@@ -31,11 +31,13 @@ import {
 export interface NodeSDKConfiguration {
   autoDetectResources: boolean;
   contextManager: ContextManager;
-  textMapPropagator: TextMapPropagator;
+  textMapPropagator: TextMapPropagator | null;
   /** @deprecated use logRecordProcessors instead*/
   logRecordProcessor: LogRecordProcessor;
   logRecordProcessors?: LogRecordProcessor[];
+  /** @deprecated use metricReaders instead*/
   metricReader: IMetricReader;
+  metricReaders?: IMetricReader[];
   views: ViewOptions[];
   instrumentations: (Instrumentation | Instrumentation[])[];
   resource: Resource;

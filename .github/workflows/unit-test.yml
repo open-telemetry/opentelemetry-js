@@ -22,13 +22,11 @@ jobs:
           - "22"
           - "24"
     runs-on: ubuntu-latest
-    env:
-      NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           cache: 'npm'
           cache-dependency-path: |
@@ -44,7 +42,7 @@ jobs:
           matrix.node_version == '18' ||
           matrix.node_version == '20.6.0'
           }}
-      - run: npm install -g npm@latest
+      - run: npm install -g npm@11.6.0
         if: ${{
           matrix.node_version == '20' ||
           matrix.node_version == '22' ||
@@ -52,7 +50,7 @@ jobs:
           }}
 
       - name: Bootstrap
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Build 🔧
         run: npm run compile
@@ -74,23 +72,21 @@ jobs:
           verbose: true
   node-windows-tests:
     runs-on: windows-latest
-    env:
-      NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
           node-version: '22'
 
-      - run: npm install -g npm@latest
+      - run: npm install -g npm@11.6.0
 
       - name: Bootstrap
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Build 🔧
         run: |
@@ -103,13 +99,11 @@ jobs:
           NODE_OPTIONS: '--no-experimental-strip-types'
   browser-tests:
     runs-on: ubuntu-latest
-    env:
-      NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           cache: 'npm'
           cache-dependency-path: |
@@ -117,7 +111,7 @@ jobs:
           node-version: 22
 
       - name: Bootstrap
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Build 🔧
         run: npm run compile
@@ -132,12 +126,10 @@ jobs:
           verbose: true
   webworker-tests:
     runs-on: ubuntu-latest
-    env:
-      NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           cache: 'npm'
           cache-dependency-path: |
@@ -145,7 +137,7 @@ jobs:
           node-version: 22
 
       - name: Bootstrap
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Build 🔧
         run: npm run compile

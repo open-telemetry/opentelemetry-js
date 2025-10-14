@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/integration-tests-api",
-  "version": "2.2.0",
+  "version": "2.5.0",
   "private": true,
   "publishConfig": {
     "access": "restricted"
@@ -20,20 +20,16 @@
     "node": "^18.19.0 || >=20.6.0"
   },
   "scripts": {
-    "compile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
-    "pretest": "npm run compile",
     "test": "nyc mocha test/**/*.test.js",
     "lint": "eslint . --ext .js",
     "lint:fix": "eslint . --ext .js --fix"
   },
   "devDependencies": {
     "@opentelemetry/api": "^1.3.0",
-    "@opentelemetry/core": "2.0.1",
+    "@opentelemetry/core": "2.1.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.6.5",
-    "cross-var": "1.1.0",
-    "lerna": "6.6.2",
-    "mocha": "11.1.0",
+    "mocha": "11.7.4",
     "nyc": "17.1.0"
   }
 }

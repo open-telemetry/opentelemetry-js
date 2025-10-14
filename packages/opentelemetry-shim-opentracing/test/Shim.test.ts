@@ -42,6 +42,17 @@ import {
   ATTR_EXCEPTION_TYPE,
 } from '@opentelemetry/semantic-conventions';
 
+function assertWithinThreshold(
+  actual: number,
+  expected: number,
+  threshold: number
+) {
+  assert.ok(
+    Math.abs(actual - expected) <= threshold,
+    `actual (${actual}) and expected (${expected}) not within threshold of ${threshold}`
+  );
+}
+
 describe('OpenTracing Shim', () => {
   const compositePropagator = new CompositePropagator({
     propagators: [new W3CTraceContextPropagator(), new W3CBaggagePropagator()],
@@ -263,9 +274,10 @@ describe('OpenTracing Shim', () => {
         const adjustment = (otSpan as any)['_performanceOffset'];
 
         assert.strictEqual(otSpan.links.length, 1);
-        assert.deepStrictEqual(
+        assertWithinThreshold(
           hrTimeToMilliseconds(otSpan.startTime),
-          now + adjustment + performance.timeOrigin
+          now + adjustment + performance.timeOrigin,
+          0.001
         );
         assert.deepStrictEqual(otSpan.attributes, opentracingOptions.tags);
       });
@@ -497,9 +509,10 @@ describe('OpenTracing Shim', () => {
       const now = performance.now();
       span.finish(now);
       const adjustment = (otSpan as any)['_performanceOffset'];
-      assert.deepStrictEqual(
+      assertWithinThreshold(
         hrTimeToMilliseconds(otSpan.endTime),
-        now + adjustment + performance.timeOrigin
+        now + adjustment + performance.timeOrigin,
+        0.001
       );
     });
 

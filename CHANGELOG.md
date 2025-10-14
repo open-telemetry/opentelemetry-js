@@ -10,18 +10,39 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ## Unreleased
 
-* feat(instrumentation-http): Added support for redacting specific url query string values and url credentials in instrumentations [#5743](https://github.com/open-telemetry/opentelemetry-js/pull/5743) @rads-1996
 * perf(opentelemetry-core): optimize attribute serialization [#5866](https://github.com/open-telemetry/opentelemetry-js/pull/5866) @43081j
 
 ### :boom: Breaking Changes
 
 ### :rocket: Features
 
+* feat(web): add session handling implementation [5173](https://github.com/open-telemetry/opentelemetry-js/pull/5173) @martinkuba
+
+### :bug: Bug Fixes
+
+* fix(core): avoid leaking Node.js types via `unrefTimer()` util [#5986](https://github.com/open-telemetry/opentelemetry-js/pull/5986)
+* fix(core): avoid leaking Node.js types via otperformance [#5987](https://github.com/open-telemetry/opentelemetry-js/pull/5987) @pichlermarc
+  * **important:** this bug fix may be breaking for certain uses of `otperformnace`
+    * `otperformance.now()` and `otperformance.timeOrigin` are not affected.
+    * the previously used type was incorrect and overly broad, leading to unexpected run-time behavior runtimes that are not Node.js.
+    * these problems are now caught on compile-time: if you have been using this API and this change is breaking to you, please consider using your target platform's `performance` implementation instead.
+
+### :books: Documentation
+
+### :house: Internal
+
+* test(shim-opentracing): add comparison thresholds in flaky assertions [#5974](https://github.com/open-telemetry/opentelemetry-js/pull/5974) @cjihrig
+* test(exporter-jaeger): clean up OTEL_EXPORTER_JAEGER_AGENT_PORT between tests [#6003](https://github.com/open-telemetry/opentelemetry-js/pull/6003) @cjihrig
+
+## 2.1.0
+
+### :rocket: Features
+
+* feat(opentelemetry-resources): add schema url [#5070](https://github.com/open-telemetry/opentelemetry-js/pull/5753) @c-ehrlich
+
 ### :bug: Bug Fixes
 
 * fix(sdk-metrics): Remove invalid default value for `startTime` param to ExponentialHistogramAccumulation. This only impacted the closurescript compiler. [#5763](https://github.com/open-telemetry/opentelemetry-js/pull/5763) @trentm
-
-### :books: Documentation
 
 ### :house: Internal
 
@@ -35,6 +56,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(resource): do not trigger `Accessing resource attributes before async attributes settled` warning when detecting resources [#5546](https://github.com/open-telemetry/opentelemetry-js/pull/5546) @dyladan
   * verbose logging of detected resource removed
 * fix(resource): use dynamic import over require to improve ESM compliance [#5298](https://github.com/open-telemetry/opentelemetry-js/pull/5298) @xiaoxiangmoe
+* fix(core): `getNumberFromEnv` should return number | undefined [#5874](https://github.com/open-telemetry/opentelemetry-js/pull/5874) @shubham-vunet
 
 ### :books: Documentation
 
@@ -169,10 +191,10 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(core)!: drop `getEnv()`, `getEnvWithoutDefaults()` [#5481](https://github.com/open-telemetry/opentelemetry-js/pull/5481) @pichlermarc
   * (user-facing): `getEnv()` has been replaced by `getStringFromEnv()`, `getNumberFromEnv()`, `getBooleanFromEnv()`, `getStringListFromEnv()`
     * these new functions do not include defaults, please inline any defaults if necessary (example: `getStringFromEnv("OTEL_FOO") ?? "my-default"`)
-    * to find the previously used defaults, please see [here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239)
+    * see [the previously used defaults here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239)
   * (user-facing): `getEnvWithoutDefaults()` has been replaced by `getStringFromEnv()`, `getNumberFromEnv()`, `getBooleanFromEnv()`, `getStringListFromEnv()`
   * (user-facing): `DEFAULT_ENVIRONMENT` has been removed, please inline any defaults from now on
-    * to find the previously used defaults, please see [here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239)
+    * see [the previously used defaults here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239)
   * (user-facing): `ENVIRONMENT` has been removed without replacement
   * (user-facing): `RAW_ENVIRONMENT` has been removed without replacement
   * (user-facing): `parseEnvironment` has been removed without replacement
