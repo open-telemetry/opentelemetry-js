@@ -1049,16 +1049,15 @@ function setLoggerProvider(
         loggerProvider['limits']['attribute_count_limit']
       );
       if (attributeValueLengthLimit || attributeCountLimit) {
-        if (config.logger_provider == null) {
-          config.logger_provider = { processors: [] };
-        }
         if (config.logger_provider.limits == null) {
           config.logger_provider.limits = { attribute_count_limit: 128 };
         }
+
         if (attributeValueLengthLimit) {
           config.logger_provider.limits.attribute_value_length_limit =
             attributeValueLengthLimit;
         }
+
         if (attributeCountLimit) {
           config.logger_provider.limits.attribute_count_limit =
             attributeCountLimit;

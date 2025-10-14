@@ -102,7 +102,6 @@ export function initializeDefaultConfiguration(): ConfigurationModel {
 
   return config;
 }
-
 export interface AttributeLimits {
   /**
    * Configure max attribute value size.
