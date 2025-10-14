@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1760475090520,
+  "lastUpdate": 1760478455736,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -40824,6 +40824,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.57%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "cjihrig@gmail.com",
+            "name": "Colin Ihrig",
+            "username": "cjihrig"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "1dc69a64b5989eae590177e0fc6997011d2b857d",
+          "message": "test(opentelemetry-configuration): preserve special process.env behavior (#6010)",
+          "timestamp": "2025-10-14T21:39:20Z",
+          "tree_id": "632327bd7e4e6987716bbffcece3a4ad7139f02d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/1dc69a64b5989eae590177e0fc6997011d2b857d"
+        },
+        "date": 1760478454764,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 698275,
+            "range": "±0.62%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8406,
+            "range": "±0.69%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 294302,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 276965,
+            "range": "±0.63%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
