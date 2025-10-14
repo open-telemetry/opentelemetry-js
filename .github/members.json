@@ -1,0 +1,282 @@
+{
+  "maintainers": [
+    {
+      "login": "dyladan",
+      "name": "Daniel Dyla",
+      "affiliation": "Dynatrace"
+    },
+    {
+      "login": "pichlermarc",
+      "name": "Marc Pichler",
+      "affiliation": "Dynatrace"
+    },
+    {
+      "login": "trentm",
+      "name": "Trent Mick",
+      "affiliation": "Elastic"
+    },
+    {
+      "login": "david-luna",
+      "name": "David Luna",
+      "affiliation": "Elastic"
+    },
+    {
+      "login": "JamieDanielson",
+      "name": "Jamie Danielson",
+      "affiliation": "Honeycomb"
+    },
+    {
+      "login": "legendecas",
+      "name": "Chengzhong Wu",
+      "affiliation": "Bloomberg"
+    }
+  ],
+  "approvers": [
+    {
+      "login": "blumamir",
+      "name": "Amir Blum",
+      "affiliation": "Odigos"
+    },
+    {
+      "login": "david-luna",
+      "name": "David Luna",
+      "affiliation": "Elastic"
+    },
+    {
+      "login": "hectorhdzg",
+      "name": "Hector Hernandez",
+      "affiliation": "Microsoft"
+    },
+    {
+      "login": "martinkuba",
+      "name": "Martin Kuba",
+      "affiliation": "Lightstep"
+    },
+    {
+      "login": "maryliag",
+      "name": "Marylia Gutierrez",
+      "affiliation": "Grafana Labs"
+    },
+    {
+      "login": "mwear",
+      "name": "Matthew Wear",
+      "affiliation": "LightStep"
+    },
+    {
+      "login": "MSNev",
+      "name": "Neville Wylie",
+      "affiliation": "Microsoft"
+    },
+    {
+      "login": "pkanal",
+      "name": "Purvi Kanal",
+      "affiliation": "Honeycomb"
+    },
+    {
+      "login": "svetlanabrennan",
+      "name": "Svetlana Brennan",
+      "affiliation": "New Relic"
+    }
+  ],
+  "triagers": [
+    {
+      "login": "JacksonWeber",
+      "name": "Jackson Weber",
+      "affiliation": "Microsoft"
+    }
+  ],
+  "contrib-triagers": [
+    {
+      "login": "aabmass",
+      "name": "Aaron Abbott",
+      "affiliation": "Google"
+    },
+    {
+      "login": "abhee11",
+      "name": "Abhinav Mathur",
+      "affiliation": "AppDynamics"
+    },
+    {
+      "login": "obecny",
+      "name": "Bartlomiej Obecny"
+    },
+    {
+      "login": "d4nyll",
+      "name": "Daniel Li"
+    },
+    {
+      "login": "facostaembrace",
+      "name": "Florencia Acosta",
+      "affiliation": "Embrace"
+    },
+    {
+      "login": "JacksonWeber",
+      "name": "Jackson Weber",
+      "affiliation": "Microsoft"
+    },
+    {
+      "login": "Ugzuzg",
+      "name": "Jaryk",
+      "affiliation": "Volvo Cars"
+    },
+    {
+      "login": "jj22ee",
+      "name": "Jonathan Lee"
+    },
+    {
+      "login": "jpmunz",
+      "name": "Jonathan Munz",
+      "affiliation": "Embrace"
+    },
+    {
+      "login": "kirrg001",
+      "name": "kirrg001",
+      "affiliation": "Instana"
+    },
+    {
+      "login": "mhennoch",
+      "name": "MartenH",
+      "affiliation": "Splunk"
+    },
+    {
+      "login": "MikeGoldsmith",
+      "name": "Mike Goldsmith",
+      "affiliation": "Honeycomb"
+    },
+    {
+      "login": "mottibec",
+      "name": "Motti"
+    },
+    {
+      "login": "punya",
+      "name": "Punya Biswal",
+      "affiliation": "Google"
+    },
+    {
+      "login": "seemk",
+      "name": "Siim Kallas",
+      "affiliation": "Splunk"
+    },
+    {
+      "login": "t2t2",
+      "name": "t2t2",
+      "affiliation": "Splunk"
+    },
+    {
+      "login": "trivikr",
+      "name": "Trivikram Kamat",
+      "affiliation": "AWS"
+    },
+    {
+      "login": "psx95",
+      "name": "psx95"
+    },
+    {
+      "login": "dylanrussell",
+      "name": "dylanrussell"
+    },
+    {
+      "login": "dashpole",
+      "name": "dashpole"
+    },
+    {
+      "login": "yiyuan-he",
+      "name": "yiyuan-he"
+    },
+    {
+      "login": "henrinormak",
+      "name": "henrinormak"
+    },
+    {
+      "login": "weyert",
+      "name": "weyert"
+    },
+    {
+      "login": "raphael-theriault-swi",
+      "name": "raphael-theriault-swi"
+    },
+    {
+      "login": "naseemkullah",
+      "name": "naseemkullah"
+    },
+    {
+      "login": "onurtemizkan",
+      "name": "onurtemizkan"
+    },
+    {
+      "login": "sudarshan12s",
+      "name": "sudarshan12s"
+    },
+    {
+      "login": "sharadraju",
+      "name": "sharadraju"
+    }
+  ],
+  "emeriti": [
+    {
+      "login": "obecny",
+      "name": "Bartlomiej Obecny",
+      "role": "Maintainer"
+    },
+    {
+      "login": "bg451",
+      "name": "Brandon Gonzalez",
+      "role": "Approver"
+    },
+    {
+      "login": "dkhan",
+      "name": "Daniel Khan",
+      "role": "Maintainer"
+    },
+    {
+      "login": "Flarna",
+      "name": "Gerhard Stöbich",
+      "role": "Approver"
+    },
+    {
+      "login": "haddasbronfman",
+      "name": "Haddas Bronfman",
+      "role": "Approver"
+    },
+    {
+      "login": "johnbley",
+      "name": "John Bley",
+      "role": "Approver"
+    },
+    {
+      "login": "markwolff",
+      "name": "Mark Wolff",
+      "role": "Approver"
+    },
+    {
+      "login": "mayurkale22",
+      "name": "Mayur Kale",
+      "role": "Maintainer"
+    },
+    {
+      "login": "naseemkullah",
+      "name": "Naseem K. Ullah",
+      "role": "Approver"
+    },
+    {
+      "login": "OlivierAlbertini",
+      "name": "Olivier Albertini",
+      "role": "Approver"
+    },
+    {
+      "login": "rauno56",
+      "name": "Rauno Viskus",
+      "role": "Maintainer"
+    },
+    {
+      "login": "rochdev",
+      "name": "Roch Devost",
+      "role": "Approver"
+    },
+    {
+      "login": "vmarchaud",
+      "name": "Valentin Marchaud",
+      "role": "Maintainer"
+    }
+  ]
+}

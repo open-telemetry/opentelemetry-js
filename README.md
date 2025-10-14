@@ -246,11 +246,10 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 - [Chengzhong Wu](https://github.com/legendecas), Bloomberg
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
+- [David Luna](https://github.com/david-luna), Elastic
 - [Jamie Danielson](https://github.com/JamieDanielson), Honeycomb
 - [Marc Pichler](https://github.com/pichlermarc), Dynatrace
 - [Trent Mick](https://github.com/trentm), Elastic
-
-For more information about the maintainer role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#maintainer).
 
 ### Approvers
 
@@ -283,7 +282,10 @@ Typically, members of this are [component owners](https://github.com/open-teleme
 - [Abhinav Mathur](https://github.com/abhee11), AppDynamics
 - [Bartlomiej Obecny](https://github.com/obecny)
 - [Daniel Li](https://github.com/d4nyll)
+- [dashpole](https://github.com/dashpole)
+- [dylanrussell](https://github.com/dylanrussell)
 - [Florencia Acosta](https://github.com/facostaembrace), Embrace
+- [henrinormak](https://github.com/henrinormak)
 - [Jackson Weber](https://github.com/JacksonWeber), Microsoft
 - [Jaryk](https://github.com/Ugzuzg), Volvo Cars
 - [Jonathan Lee](https://github.com/jj22ee)
@@ -292,10 +294,18 @@ Typically, members of this are [component owners](https://github.com/open-teleme
 - [MartenH](https://github.com/mhennoch), Splunk
 - [Mike Goldsmith](https://github.com/MikeGoldsmith), Honeycomb
 - [Motti](https://github.com/mottibec)
+- [naseemkullah](https://github.com/naseemkullah)
+- [onurtemizkan](https://github.com/onurtemizkan)
+- [psx95](https://github.com/psx95)
 - [Punya Biswal](https://github.com/punya), Google
+- [raphael-theriault-swi](https://github.com/raphael-theriault-swi)
+- [sharadraju](https://github.com/sharadraju)
 - [Siim Kallas](https://github.com/seemk), Splunk
+- [sudarshan12s](https://github.com/sudarshan12s)
 - [t2t2](https://github.com/t2t2), Splunk
 - [Trivikram Kamat](https://github.com/trivikr), AWS
+- [weyert](https://github.com/weyert)
+- [yiyuan-he](https://github.com/yiyuan-he)
 
 For more information about the triager role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#triager).
 
