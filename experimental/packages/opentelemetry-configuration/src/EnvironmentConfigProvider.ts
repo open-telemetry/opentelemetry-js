@@ -17,7 +17,7 @@
 import {
   ConfigurationModel,
   initializeDefaultConfiguration,
-} from './configModel';
+} from './models/configModel';
 import {
   getBooleanFromEnv,
   getStringFromEnv,
@@ -63,6 +63,10 @@ export class EnvironmentConfigProvider implements ConfigProvider {
 }
 
 function setResources(config: ConfigurationModel): void {
+  if (config.resource == null) {
+    config.resource = {};
+  }
+
   const resourceAttrList = getStringFromEnv('OTEL_RESOURCE_ATTRIBUTES');
   if (resourceAttrList) {
     config.resource.attributes_list = resourceAttrList;
@@ -84,18 +88,28 @@ function setAttributeLimits(config: ConfigurationModel): void {
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT'
   );
-  if (attributeValueLengthLimit) {
+  if (attributeValueLengthLimit && attributeValueLengthLimit > 0) {
+    if (config.attribute_limits == null) {
+      config.attribute_limits = { attribute_count_limit: 128 };
+    }
     config.attribute_limits.attribute_value_length_limit =
       attributeValueLengthLimit;
   }
 
   const attributeCountLimit = getNumberFromEnv('OTEL_ATTRIBUTE_COUNT_LIMIT');
   if (attributeCountLimit) {
-    config.attribute_limits.attribute_count_limit = attributeCountLimit;
+    if (config.attribute_limits == null) {
+      config.attribute_limits = { attribute_count_limit: attributeCountLimit };
+    } else {
+      config.attribute_limits.attribute_count_limit = attributeCountLimit;
+    }
   }
 }
 
 function setPropagators(config: ConfigurationModel): void {
+  if (config.propagator == null) {
+    config.propagator = {};
+  }
   const composite = getStringListFromEnv('OTEL_PROPAGATORS');
   if (composite && composite.length > 0) {
     config.propagator.composite = [];
@@ -110,6 +124,12 @@ function setPropagators(config: ConfigurationModel): void {
 }
 
 function setTracerProvider(config: ConfigurationModel): void {
+  if (config.tracer_provider == null) {
+    config.tracer_provider = { processors: [] };
+  }
+  if (config.tracer_provider.limits == null) {
+    config.tracer_provider.limits = {};
+  }
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT'
   );
@@ -176,45 +196,45 @@ function setTracerProvider(config: ConfigurationModel): void {
     }
 
     const endpoint = getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_ENDPOINT');
-    if (endpoint) {
+    if (endpoint && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.endpoint = endpoint;
     }
 
     const certificateFile = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE'
     );
-    if (certificateFile) {
+    if (certificateFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.certificate_file = certificateFile;
     }
 
     const clientKeyFile = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY'
     );
-    if (clientKeyFile) {
+    if (clientKeyFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.client_key_file = clientKeyFile;
     }
 
     const clientCertificateFile = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE'
     );
-    if (clientCertificateFile) {
+    if (clientCertificateFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.client_certificate_file = clientCertificateFile;
     }
 
     const compression = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_TRACES_COMPRESSION'
     );
-    if (compression) {
+    if (compression && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.compression = compression;
     }
 
     const timeout = getNumberFromEnv('OTEL_EXPORTER_OTLP_TRACES_TIMEOUT');
-    if (timeout) {
+    if (timeout && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.timeout = timeout;
     }
 
     const headersList = getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_HEADERS');
-    if (headersList) {
+    if (headersList && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.headers_list = headersList;
     }
 
@@ -223,7 +243,10 @@ function setTracerProvider(config: ConfigurationModel): void {
 }
 
 function setMeterProvider(config: ConfigurationModel): void {
-  const readerPeriodic = config.meter_provider.readers[0]?.periodic;
+  const readerPeriodic =
+    config.meter_provider?.readers && config.meter_provider?.readers.length > 0
+      ? config.meter_provider?.readers[0].periodic
+      : undefined;
   if (readerPeriodic) {
     const interval = getNumberFromEnv('OTEL_METRIC_EXPORT_INTERVAL');
     if (interval) {
@@ -303,6 +326,12 @@ function setMeterProvider(config: ConfigurationModel): void {
       readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
         defaultHistogramAggregation;
     }
+    if (config.meter_provider == null) {
+      config.meter_provider = { readers: [{}] };
+    }
+    if (config.meter_provider?.readers == null) {
+      config.meter_provider.readers = [{}];
+    }
 
     config.meter_provider.readers[0].periodic = readerPeriodic;
   }
@@ -313,6 +342,9 @@ function setMeterProvider(config: ConfigurationModel): void {
       exemplarFilter === 'always_on' ||
       exemplarFilter === 'always_off')
   ) {
+    if (config.meter_provider == null) {
+      config.meter_provider = {};
+    }
     config.meter_provider.exemplar_filter = exemplarFilter;
   }
 }
@@ -321,19 +353,31 @@ function setLoggerProvider(config: ConfigurationModel): void {
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT'
   );
-  if (attributeValueLengthLimit) {
-    config.logger_provider.limits.attribute_value_length_limit =
-      attributeValueLengthLimit;
-  }
-
   const attributeCountLimit = getNumberFromEnv(
     'OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT'
   );
-  if (attributeCountLimit) {
-    config.logger_provider.limits.attribute_count_limit = attributeCountLimit;
+  if (attributeValueLengthLimit || attributeCountLimit) {
+    if (config.logger_provider == null) {
+      config.logger_provider = {};
+    }
+    if (config.logger_provider.limits == null) {
+      config.logger_provider.limits = { attribute_count_limit: 128 };
+    }
+    if (attributeValueLengthLimit) {
+      config.logger_provider.limits.attribute_value_length_limit =
+        attributeValueLengthLimit;
+    }
+
+    if (attributeCountLimit) {
+      config.logger_provider.limits.attribute_count_limit = attributeCountLimit;
+    }
   }
 
-  const batch = config.logger_provider.processors[0]?.batch;
+  const batch =
+    config.logger_provider?.processors &&
+    config.logger_provider?.processors.length > 0
+      ? config.logger_provider?.processors[0].batch
+      : undefined;
   if (batch) {
     const scheduleDelay = getNumberFromEnv('OTEL_BLRP_SCHEDULE_DELAY');
     if (scheduleDelay) {
@@ -358,46 +402,52 @@ function setLoggerProvider(config: ConfigurationModel): void {
     }
 
     const endpoint = getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_ENDPOINT');
-    if (endpoint) {
+    if (endpoint && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.endpoint = endpoint;
     }
 
     const certificateFile = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE'
     );
-    if (certificateFile) {
+    if (certificateFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.certificate_file = certificateFile;
     }
 
     const clientKeyFile = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY'
     );
-    if (clientKeyFile) {
+    if (clientKeyFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.client_key_file = clientKeyFile;
     }
 
     const clientCertificateFile = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE'
     );
-    if (clientCertificateFile) {
+    if (clientCertificateFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.client_certificate_file = clientCertificateFile;
     }
 
     const compression = getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_COMPRESSION');
-    if (compression) {
+    if (compression && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.compression = compression;
     }
 
     const timeout = getNumberFromEnv('OTEL_EXPORTER_OTLP_LOGS_TIMEOUT');
-    if (timeout) {
+    if (timeout && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.timeout = timeout;
     }
 
     const headersList = getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_HEADERS');
-    if (headersList) {
+    if (headersList && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.headers_list = headersList;
     }
 
+    if (config.logger_provider == null) {
+      config.logger_provider = { processors: [{}] };
+    }
+    if (config.logger_provider?.processors == null) {
+      config.logger_provider.processors = [{}];
+    }
     config.logger_provider.processors[0].batch = batch;
   }
 }
