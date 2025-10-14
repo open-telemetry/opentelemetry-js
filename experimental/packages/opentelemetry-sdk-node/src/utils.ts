@@ -120,27 +120,11 @@ function getOtlpExporterFromEnv(): SpanExporter {
   }
 }
 
-function getJaegerExporter() {
-  // The JaegerExporter does not support being required in bundled
-  // environments. By delaying the require statement to here, we only crash when
-  // the exporter is actually used in such an environment.
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
-    return new JaegerExporter();
-  } catch (e) {
-    throw new Error(
-      `Could not instantiate JaegerExporter. This could be due to the JaegerExporter's lack of support for bundling. If possible, use @opentelemetry/exporter-trace-otlp-proto instead. Original Error: ${e}`
-    );
-  }
-}
-
 export function getSpanProcessorsFromEnv(): SpanProcessor[] {
   const exportersMap = new Map<string, () => SpanExporter>([
     ['otlp', () => getOtlpExporterFromEnv()],
     ['zipkin', () => new ZipkinExporter()],
     ['console', () => new ConsoleSpanExporter()],
-    ['jaeger', () => getJaegerExporter()],
   ]);
   const exporters: SpanExporter[] = [];
   const processors: SpanProcessor[] = [];
