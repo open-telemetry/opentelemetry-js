@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1760523784337,
+  "lastUpdate": 1760526407180,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -41032,6 +41032,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.57%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "43081j@users.noreply.github.com",
+            "name": "James Garbutt",
+            "username": "43081j"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "56f326a32e0e8a8c185df1bd64f89d791d2ecf94",
+          "message": "perf(core): rework attribute serialisation (#5866)\n\nCo-authored-by: Chengzhong Wu <legendecas@gmail.com>",
+          "timestamp": "2025-10-15T10:56:14Z",
+          "tree_id": "adee48032355d4c6e5984954f76e6877ff4815b1",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/56f326a32e0e8a8c185df1bd64f89d791d2ecf94"
+        },
+        "date": 1760526406135,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 654382,
+            "range": "±0.79%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8416,
+            "range": "±0.66%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 296328,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 281617,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
           }
         ]
       }
