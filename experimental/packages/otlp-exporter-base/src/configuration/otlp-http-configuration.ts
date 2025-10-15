@@ -26,7 +26,6 @@ export type HeadersFactory = () => Promise<Record<string, string>>;
 export interface OtlpHttpConfiguration extends OtlpSharedConfiguration {
   url: string;
   headers: HeadersFactory;
-  userAgent?: string;
 }
 
 function mergeHeaders(
@@ -98,7 +97,6 @@ export function mergeOtlpHttpConfigurationWithDefaults(
       validateUserProvidedUrl(userProvidedConfiguration.url) ??
       fallbackConfiguration.url ??
       defaultConfiguration.url,
-    userAgent: userProvidedConfiguration.userAgent,
   };
 }
 
