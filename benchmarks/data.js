@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1760478455736,
+  "lastUpdate": 1760521495319,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -40876,6 +40876,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.63%",
             "unit": "ops/sec",
             "extra": "93 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "cjihrig@gmail.com",
+            "name": "Colin Ihrig",
+            "username": "cjihrig"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "5f51a37276472e44a7ad68e1a5095a63a6a5d763",
+          "message": "test(sdk-trace-base): ensure environment variables are cleaned up between tests (#6011)\n\nCo-authored-by: David Luna <david.luna@elastic.co>",
+          "timestamp": "2025-10-15T09:25:57Z",
+          "tree_id": "ea2a38f9816c1cd854927a71ce16b23f91213e81",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/5f51a37276472e44a7ad68e1a5095a63a6a5d763"
+        },
+        "date": 1760521494275,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 672704,
+            "range": "±0.72%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8440,
+            "range": "±0.66%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 295014,
+            "range": "±0.63%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 285696,
+            "range": "±0.62%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
