@@ -238,6 +238,14 @@ describe('getHttpConfigurationFromEnvironment', function () {
     });
   });
 
+  describe('certs', function () {
+    afterEach(function () {
+      delete process.env.OTEL_EXPORTER_OTLP_CERTIFICATE;
+      delete process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE;
+      delete process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY;
+    });
+  });
+
   testSharedConfigurationFromEnvironment(signalIdentifier =>
     getNodeHttpConfigurationFromEnvironment(signalIdentifier, 'v1/metrics')
   );

@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import * as fs from 'fs';
+import * as path from 'path';
 import { getStringFromEnv, parseKeyPairsIntoRecord } from '@opentelemetry/core';
 import { diag } from '@opentelemetry/api';
 import { getSharedConfigurationFromEnvironment } from './shared-env-configuration';
 import { wrapStaticHeadersInFunction } from './shared-configuration';
-import { OtlpNodeHttpConfiguration } from './otlp-node-http-configuration';
+import { OtlpNodeHttpConfiguration, httpAgentFactoryFromOptions } from './otlp-node-http-configuration';
 
 function getStaticHeadersFromEnv(
   signalIdentifier: string
@@ -117,6 +119,55 @@ function getSpecificUrlFromEnv(signalIdentifier: string): string | undefined {
   return appendRootPathToUrlIfNeeded(envUrl);
 }
 
+function readFileFromEnv(
+  signalSpecificEnvVar: string,
+  nonSignalSpecificEnvVar: string,
+  warningMessage: string
+): Buffer | undefined {
+  const signalSpecificPath = process.env[signalSpecificEnvVar]?.trim();
+  const nonSignalSpecificPath = process.env[nonSignalSpecificEnvVar]?.trim();
+  const filePath = signalSpecificPath ?? nonSignalSpecificPath;
+
+  if (filePath != null) {
+    try {
+      return fs.readFileSync(path.resolve(process.cwd(), filePath));
+    } catch {
+      diag.warn(warningMessage);
+      return undefined;
+    }
+  } else {
+    return undefined;
+  }
+}
+
+function getClientCertificateFromEnv(
+  signalIdentifier: string
+): Buffer | undefined {
+  return readFileFromEnv(
+    `OTEL_EXPORTER_OTLP_${signalIdentifier}_CLIENT_CERTIFICATE`,
+    'OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE',
+    'Failed to read client certificate chain file'
+  );
+}
+
+function getClientKeyFromEnv(signalIdentifier: string): Buffer | undefined {
+  return readFileFromEnv(
+    `OTEL_EXPORTER_OTLP_${signalIdentifier}_CLIENT_KEY`,
+    'OTEL_EXPORTER_OTLP_CLIENT_KEY',
+    'Failed to read client certificate private key file'
+  );
+}
+
+function getRootCertificateFromEnv(
+  signalIdentifier: string
+): Buffer | undefined {
+  return readFileFromEnv(
+    `OTEL_EXPORTER_OTLP_${signalIdentifier}_CERTIFICATE`,
+    'OTEL_EXPORTER_OTLP_CERTIFICATE',
+    'Failed to read root certificate file'
+  );
+}
+
 /**
  * Reads and returns configuration from the environment
  *
@@ -135,5 +186,11 @@ export function getNodeHttpConfigurationFromEnvironment(
     headers: wrapStaticHeadersInFunction(
       getStaticHeadersFromEnv(signalIdentifier)
     ),
+    agentFactory: httpAgentFactoryFromOptions({
+      keepAlive: true,
+      ca: getRootCertificateFromEnv(signalIdentifier),
+      cert: getClientCertificateFromEnv(signalIdentifier),
+      key: getClientKeyFromEnv(signalIdentifier),
+    }),
   };
 }
