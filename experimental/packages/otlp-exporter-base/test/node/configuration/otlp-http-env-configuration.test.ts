@@ -244,6 +244,8 @@ describe('getHttpConfigurationFromEnvironment', function () {
       delete process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE;
       delete process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY;
     });
+
+    // TODO: add tests here
   });
 
   testSharedConfigurationFromEnvironment(signalIdentifier =>
