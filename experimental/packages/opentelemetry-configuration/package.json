@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "2.1.0",
-    "yaml": "^1.10.2"
+    "yaml": "^2.0.0"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.9.0"

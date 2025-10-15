@@ -19,7 +19,6 @@ import {
   internal,
   ExportResultCode,
   globalErrorHandler,
-  unrefTimer,
 } from '@opentelemetry/core';
 import { MetricReader } from './MetricReader';
 import { PushMetricExporter } from './MetricExporter';
@@ -153,7 +152,11 @@ export class PeriodicExportingMetricReader extends MetricReader {
       // this._runOnce never rejects. Using void operator to suppress @typescript-eslint/no-floating-promises.
       void this._runOnce();
     }, this._exportInterval);
-    unrefTimer(this._interval);
+
+    // depending on runtime, this may be a 'number' or NodeJS.Timeout
+    if (typeof this._interval !== 'number') {
+      this._interval.unref();
+    }
   }
 
   protected async onForceFlush(): Promise<void> {

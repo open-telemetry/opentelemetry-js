@@ -17,7 +17,6 @@ export {
   SDK_INFO,
   _globalThis,
   otperformance,
-  unrefTimer,
   getBooleanFromEnv,
   getStringFromEnv,
   getNumberFromEnv,

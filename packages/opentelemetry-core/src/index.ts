@@ -37,6 +37,7 @@ export {
   millisToHrTime,
   timeInputToHrTime,
 } from './common/time';
+export { unrefTimer } from './common/timer-util';
 export type { ErrorHandler, InstrumentationScope } from './common/types';
 export { ExportResultCode } from './ExportResult';
 export type { ExportResult } from './ExportResult';
@@ -49,7 +50,6 @@ export {
   getNumberFromEnv,
   getStringListFromEnv,
   otperformance,
-  unrefTimer,
 } from './platform';
 export { CompositePropagator } from './propagation/composite';
 export type { CompositePropagatorConfig } from './propagation/composite';

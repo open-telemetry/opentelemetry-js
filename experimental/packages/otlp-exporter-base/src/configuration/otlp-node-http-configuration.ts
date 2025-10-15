@@ -39,6 +39,12 @@ export interface OtlpNodeHttpConfiguration extends OtlpHttpConfiguration {
    * module is not loaded before `@opentelemetry/instrumentation-http` can instrument it.
    */
   agentFactory: HttpAgentFactory;
+  /**
+   * User agent header string to be appended to the exporter's value as a prefix.
+   * Availablie since v1.49.0 of the spec.
+   * Ref: https://opentelemetry.io/docs/specs/otel/protocol/exporter/#user-agent
+   */
+  userAgent?: string;
 }
 
 export function httpAgentFactoryFromOptions(
@@ -71,6 +77,7 @@ export function mergeOtlpNodeHttpConfigurationWithDefaults(
       userProvidedConfiguration.agentFactory ??
       fallbackConfiguration.agentFactory ??
       defaultConfiguration.agentFactory,
+    userAgent: userProvidedConfiguration.userAgent,
   };
 }
 
