@@ -257,7 +257,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
       );
       assert.strictEqual(typeof agentFactory, 'function');
 
-      const agent = (await agentFactory!('https')) as any;
+      const agent = (await agentFactory!('https:')) as any;
       assert.strictEqual(agent.options.ca, undefined);
       assert.strictEqual(agent.options.cert, undefined);
       assert.strictEqual(agent.options.key, undefined);
@@ -273,13 +273,13 @@ describe('getHttpConfigurationFromEnvironment', function () {
       );
       assert.strictEqual(typeof agentFactory, 'function');
 
-      const agent = (await agentFactory!('https')) as any;
+      const agent = (await agentFactory!('https:')) as any;
       assert.strictEqual(agent.options.ca, undefined);
       assert.strictEqual(agent.options.cert, undefined);
       assert.strictEqual(agent.options.key, undefined);
     });
 
-    it('should set the certs in agent if defined in env vars', async function () {
+    it('should not set the certs in agent if protocol is http', async function () {
       process.env.OTEL_EXPORTER_OTLP_CERTIFICATE = `${certsDir}/ca.crt`;
       process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE = `${certsDir}/client.crt`;
       process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY = `${certsDir}/client.key`;
@@ -289,10 +289,10 @@ describe('getHttpConfigurationFromEnvironment', function () {
       );
       assert.strictEqual(typeof agentFactory, 'function');
 
-      const agent = (await agentFactory!('https')) as any;
-      assert.ok(agent.options.ca instanceof Buffer);
-      assert.ok(agent.options.cert instanceof Buffer);
-      assert.ok(agent.options.key instanceof Buffer);
+      const agent = (await agentFactory!('http:')) as any;
+      assert.strictEqual(agent.options.ca, undefined);
+      assert.strictEqual(agent.options.cert, undefined);
+      assert.strictEqual(agent.options.key, undefined);
     });
 
     it('should use the signal specific certs in agent if defined in env vars', async function () {
@@ -310,7 +310,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
       );
       assert.strictEqual(typeof agentFactory, 'function');
 
-      const agent = (await agentFactory!('https')) as any;
+      const agent = (await agentFactory!('https:')) as any;
       assert.ok(agent.options.ca instanceof Buffer);
       assert.ok(agent.options.cert instanceof Buffer);
       assert.ok(agent.options.key instanceof Buffer);
