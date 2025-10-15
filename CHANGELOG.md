@@ -31,6 +31,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * test(shim-opentracing): add comparison thresholds in flaky assertions [#5974](https://github.com/open-telemetry/opentelemetry-js/pull/5974) @cjihrig
 * test(exporter-jaeger): clean up OTEL_EXPORTER_JAEGER_AGENT_PORT between tests [#6003](https://github.com/open-telemetry/opentelemetry-js/pull/6003) @cjihrig
+* test(sdk-trace-base): ensure environment variables are cleaned up between tests [#6011](https://github.com/open-telemetry/opentelemetry-js/pull/6011) @cjihrig
+* perf(opentelemetry-core): optimize attribute serialization [#5866](https://github.com/open-telemetry/opentelemetry-js/pull/5866) @43081j
 
 ## 2.1.0
 
