@@ -513,7 +513,13 @@ describe('ConfigProvider', function () {
   const _origEnvVariables = { ...process.env };
 
   afterEach(function () {
-    process.env = { ..._origEnvVariables };
+    for (const key of Object.keys(process.env)) {
+      delete process.env[key];
+    }
+
+    for (const [key, value] of Object.entries(_origEnvVariables)) {
+      process.env[key] = value;
+    }
   });
 
   describe('get values from environment variables', function () {
