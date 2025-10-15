@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1760532419487,
+  "lastUpdate": 1760532903177,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -41188,6 +41188,58 @@ window.BENCHMARK_DATA = {
             "range": "±1.14%",
             "unit": "ops/sec",
             "extra": "89 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "29139614+renovate[bot]@users.noreply.github.com",
+            "name": "renovate[bot]",
+            "username": "renovate[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b1afb49027d3bda70751aead7788ea4d1b82f586",
+          "message": "chore(deps): update dependency linkinator to v7 (#5983)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+          "timestamp": "2025-10-15T12:38:39Z",
+          "tree_id": "f255a689dc772fd91b63e91f26fdaf53b49877ef",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/b1afb49027d3bda70751aead7788ea4d1b82f586"
+        },
+        "date": 1760532902135,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 698484,
+            "range": "±1.39%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8975,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 296214,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 280183,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
           }
         ]
       }
