@@ -127,8 +127,8 @@ function readFileFromEnv(
   nonSignalSpecificEnvVar: string,
   warningMessage: string
 ): Buffer | undefined {
-  const signalSpecificPath = process.env[signalSpecificEnvVar]?.trim();
-  const nonSignalSpecificPath = process.env[nonSignalSpecificEnvVar]?.trim();
+  const signalSpecificPath = getStringFromEnv(signalSpecificEnvVar);
+  const nonSignalSpecificPath = getStringFromEnv(nonSignalSpecificEnvVar);
   const filePath = signalSpecificPath ?? nonSignalSpecificPath;
 
   if (filePath != null) {
