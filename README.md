@@ -257,6 +257,7 @@ For more information about the maintainer role, see the [community repository](h
 
 - [Amir Blum](https://github.com/blumamir), Odigos
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
+- [Jackson Weber](https://github.com/JacksonWeber), Microsoft
 - [Martin Kuba](https://github.com/martinkuba), Grafana Labs
 - [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
 - [Matthew Wear](https://github.com/mwear), LightStep
@@ -270,7 +271,7 @@ For more information about the approver role, see the [community repository](htt
 
 Members of this team have triager permissions for opentelemetry-js.git and opentelemetry-js-contrib.git.
 
-- [Jackson Weber](https://github.com/JacksonWeber), Microsoft
+- N/A
 
 For more information about the triager role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#triager).
 

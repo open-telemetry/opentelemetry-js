@@ -77,6 +77,7 @@ export function mergeOtlpNodeHttpConfigurationWithDefaults(
       userProvidedConfiguration.agentFactory ??
       fallbackConfiguration.agentFactory ??
       defaultConfiguration.agentFactory,
+    userAgent: userProvidedConfiguration.userAgent,
   };
 }
 
