@@ -263,7 +263,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
       assert.strictEqual(agent.options.key, undefined);
     });
 
-    it('should not set the certs if env vars values have wrong values', async function () {
+    it('should not set the certs if env vars have wrong values', async function () {
       process.env.OTEL_EXPORTER_OTLP_CERTIFICATE = `${certsDir}/bogus-ca.crt`;
       process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE = `${certsDir}/bogus-client.crt`;
       process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY = `${certsDir}/bogus-client.key`;
@@ -295,12 +295,12 @@ describe('getHttpConfigurationFromEnvironment', function () {
       assert.ok(agent.options.key instanceof Buffer);
     });
 
-    it('should set the certs in agent if defined in env vars', async function () {
+    it('should use the signal specific certs in agent if defined in env vars', async function () {
       const certsDir = `${process.cwd()}/test/certs`;
       process.env.OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE = `${certsDir}/ca.crt`;
       process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE = `${certsDir}/client.crt`;
       process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY = `${certsDir}/client.key`;
-      // NOTE: if files do not exist the options are undefined
+      // NOTE: if files do not exist the options become undefined
       process.env.OTEL_EXPORTER_OTLP_CERTIFICATE = `${certsDir}/bogus-ca.crt`;
       process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE = `${certsDir}/bougus-client.crt`;
       process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY = `${certsDir}/bogus-client.key`;
