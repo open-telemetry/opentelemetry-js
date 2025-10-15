@@ -18,6 +18,7 @@ import * as assert from 'assert';
 import { Configuration } from '../src';
 import { DiagLogLevel } from '@opentelemetry/api';
 import { createConfigProvider } from '../src/ConfigProvider';
+import { OtlpHttpEncoding } from '../src/models/commonModel';
 
 const defaultConfig: Configuration = {
   disabled: false,
@@ -43,6 +44,7 @@ const defaultConfig: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/traces',
               timeout: 10000,
+              encoding: OtlpHttpEncoding.protobuf,
             },
           },
         },
@@ -57,11 +59,11 @@ const defaultConfig: Configuration = {
     },
     sampler: {
       parent_based: {
-        root: 'always_on',
-        remote_parent_sampled: 'always_on',
-        remote_parent_not_sampled: 'always_off',
-        local_parent_sampled: 'always_on',
-        local_parent_not_sampled: 'always_off',
+        root: { always_on: undefined },
+        remote_parent_sampled: { always_on: undefined },
+        remote_parent_not_sampled: { always_off: undefined },
+        local_parent_sampled: { always_on: undefined },
+        local_parent_not_sampled: { always_off: undefined },
       },
     },
   },
@@ -96,6 +98,7 @@ const defaultConfig: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
+              encoding: OtlpHttpEncoding.protobuf,
             },
           },
         },
@@ -190,11 +193,87 @@ const configFromFile: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/traces',
               timeout: 10000,
+              certificate_file: '/app/cert.pem',
+              client_key_file: '/app/cert.pem',
+              client_certificate_file: '/app/cert.pem',
+              headers: [{ name: 'api-key', value: '1234' }],
+              headers_list: 'api-key=1234',
+              compression: 'gzip',
+              encoding: OtlpHttpEncoding.protobuf,
             },
           },
         },
       },
+      {
+        batch: {
+          schedule_delay: 5000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            otlp_grpc: {
+              endpoint: 'http://localhost:4317',
+              timeout: 10000,
+              certificate_file: '/app/cert.pem',
+              client_key_file: '/app/cert.pem',
+              client_certificate_file: '/app/cert.pem',
+              headers: [{ name: 'api-key', value: '1234' }],
+              headers_list: 'api-key=1234',
+              compression: 'gzip',
+              insecure: false,
+            },
+          },
+        },
+      },
+      {
+        batch: {
+          schedule_delay: 5000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            'otlp_file/development': {
+              output_stream: 'file:///var/log/traces.jsonl',
+            },
+          },
+        },
+      },
+      {
+        batch: {
+          schedule_delay: 5000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            'otlp_file/development': {
+              output_stream: 'stdout',
+            },
+          },
+        },
+      },
+      {
+        batch: {
+          schedule_delay: 5000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            zipkin: {
+              endpoint: 'http://localhost:9411/api/v2/spans',
+              timeout: 10000,
+            },
+          },
+        },
+      },
+      {
+        simple: {
+          exporter: {
+            console: {},
+          },
+        },
+      },
     ],
+
     limits: {
       attribute_count_limit: 128,
       attribute_value_length_limit: 4096,
@@ -205,11 +284,11 @@ const configFromFile: Configuration = {
     },
     sampler: {
       parent_based: {
-        root: 'always_on',
-        remote_parent_sampled: 'always_on',
-        remote_parent_not_sampled: 'always_off',
-        local_parent_sampled: 'always_on',
-        local_parent_not_sampled: 'always_off',
+        root: { always_on: undefined },
+        remote_parent_sampled: { always_on: undefined },
+        remote_parent_not_sampled: { always_off: undefined },
+        local_parent_sampled: { always_on: undefined },
+        local_parent_not_sampled: { always_off: undefined },
       },
     },
   },
@@ -244,6 +323,7 @@ const configFromFile: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
+              encoding: OtlpHttpEncoding.protobuf,
             },
           },
         },
@@ -288,6 +368,8 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/traces',
               timeout: 10000,
+              encoding: OtlpHttpEncoding.protobuf,
+              compression: 'gzip',
             },
           },
         },
@@ -302,11 +384,11 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
     },
     sampler: {
       parent_based: {
-        root: 'always_on',
-        remote_parent_sampled: 'always_on',
-        remote_parent_not_sampled: 'always_off',
-        local_parent_sampled: 'always_on',
-        local_parent_not_sampled: 'always_off',
+        root: { always_on: undefined },
+        remote_parent_sampled: { always_on: undefined },
+        remote_parent_not_sampled: { always_off: undefined },
+        local_parent_sampled: { always_on: undefined },
+        local_parent_not_sampled: { always_off: undefined },
       },
     },
   },
@@ -341,6 +423,7 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
+              encoding: OtlpHttpEncoding.protobuf,
             },
           },
         },
@@ -356,7 +439,13 @@ describe('ConfigProvider', function () {
   const _origEnvVariables = { ...process.env };
 
   afterEach(function () {
-    process.env = { ..._origEnvVariables };
+    for (const key of Object.keys(process.env)) {
+      delete process.env[key];
+    }
+
+    for (const [key, value] of Object.entries(_origEnvVariables)) {
+      process.env[key] = value;
+    }
   });
 
   describe('get values from environment variables', function () {
@@ -527,6 +616,7 @@ describe('ConfigProvider', function () {
                     compression: 'gzip',
                     timeout: 2000,
                     headers_list: 'host=localhost',
+                    encoding: OtlpHttpEncoding.protobuf,
                   },
                 },
               },
@@ -534,11 +624,11 @@ describe('ConfigProvider', function () {
           ],
           sampler: {
             parent_based: {
-              root: 'always_on',
-              remote_parent_sampled: 'always_on',
-              remote_parent_not_sampled: 'always_off',
-              local_parent_sampled: 'always_on',
-              local_parent_not_sampled: 'always_off',
+              root: { always_on: undefined },
+              remote_parent_sampled: { always_on: undefined },
+              remote_parent_not_sampled: { always_off: undefined },
+              local_parent_sampled: { always_on: undefined },
+              local_parent_not_sampled: { always_off: undefined },
             },
           },
         },
@@ -642,6 +732,7 @@ describe('ConfigProvider', function () {
                     compression: 'gzip',
                     timeout: 700,
                     headers_list: 'host=localhost',
+                    encoding: OtlpHttpEncoding.protobuf,
                   },
                 },
               },
@@ -724,7 +815,8 @@ describe('ConfigProvider', function () {
       process.env.OTEL_BSP_EXPORT_TIMEOUT = '456';
       process.env.OTEL_BSP_MAX_QUEUE_SIZE = '789';
       process.env.OTEL_BSP_MAX_EXPORT_BATCH_SIZE = '1011';
-      process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'trace-endpoint';
+      process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT =
+        'http://test.com:4318/v1/traces';
       process.env.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE = 'trace-certificate';
       process.env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY = 'trace-client-key';
       process.env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE =
@@ -798,6 +890,28 @@ describe('ConfigProvider', function () {
             event_attribute_count_limit: 18,
             link_attribute_count_limit: 19,
           },
+          processors: [
+            {
+              batch: {
+                export_timeout: 456,
+                max_export_batch_size: 1011,
+                max_queue_size: 789,
+                schedule_delay: 123,
+                exporter: {
+                  otlp_http: {
+                    certificate_file: 'trace-certificate',
+                    client_certificate_file: 'trace-client-certificate',
+                    client_key_file: 'trace-client-key',
+                    compression: 'trace-compression',
+                    encoding: OtlpHttpEncoding.protobuf,
+                    endpoint: 'http://test.com:4318/v1/traces',
+                    headers_list: 'trace-headers',
+                    timeout: 1213,
+                  },
+                },
+              },
+            },
+          ],
         },
         meter_provider: {
           ...defaultConfigFromFileWithEnvVariables.meter_provider,
