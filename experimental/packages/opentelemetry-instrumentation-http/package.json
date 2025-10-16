@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation-http",
-  "version": "0.205.0",
+  "version": "0.206.0",
   "description": "OpenTelemetry instrumentation for `node:http` and `node:https` http client and server modules",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -17,7 +17,6 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch",
-    "precompile": "lerna run version --scope @opentelemetry/instrumentation-http --include-dependencies",
     "prewatch": "node ../../../scripts/version-update.js",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js",
@@ -58,9 +57,8 @@
     "@types/request-promise-native": "1.0.21",
     "@types/sinon": "17.0.4",
     "@types/superagent": "8.1.9",
-    "axios": "1.12.0",
-    "lerna": "6.6.2",
-    "mocha": "11.7.2",
+    "axios": "1.12.2",
+    "mocha": "11.7.4",
     "nock": "13.5.6",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
@@ -72,7 +70,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "2.1.0",
-    "@opentelemetry/instrumentation": "0.205.0",
+    "@opentelemetry/instrumentation": "0.206.0",
     "@opentelemetry/semantic-conventions": "^1.29.0",
     "forwarded-parse": "2.1.2"
   },

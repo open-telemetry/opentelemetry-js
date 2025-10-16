@@ -14,12 +14,12 @@ jobs:
 
       - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
 
-      - run: npm install -g npm@latest
+      - run: npm install -g npm@11.6.0
 
       - name: Bootstrap
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Generate SBOM for core packages
         if: ${{ ! startsWith(github.ref, 'refs/tags/experimental') && ! startsWith(github.ref, 'refs/tags/api') }}

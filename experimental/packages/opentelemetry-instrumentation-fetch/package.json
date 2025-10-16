@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation-fetch",
-  "version": "0.205.0",
+  "version": "0.206.0",
   "description": "OpenTelemetry instrumentation for fetch http client in web browsers",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -17,7 +17,6 @@
     "tdd": "karma start",
     "test:browser": "karma start --single-run",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "lerna run version --scope @opentelemetry/instrumentation-fetch --include-dependencies",
     "prewatch": "node ../../../scripts/version-update.js",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
@@ -72,8 +71,7 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "5.0.1",
-    "lerna": "6.6.2",
-    "mocha": "11.7.2",
+    "mocha": "11.7.4",
     "msw": "2.8.4",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
@@ -87,7 +85,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "2.1.0",
-    "@opentelemetry/instrumentation": "0.205.0",
+    "@opentelemetry/instrumentation": "0.206.0",
     "@opentelemetry/sdk-trace-web": "2.1.0",
     "@opentelemetry/semantic-conventions": "^1.29.0"
   },

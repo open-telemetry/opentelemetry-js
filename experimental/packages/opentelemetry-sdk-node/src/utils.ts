@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { diag, TextMapPropagator } from '@opentelemetry/api';
+import {
+  context,
+  ContextManager,
+  diag,
+  propagation,
+  TextMapPropagator,
+} from '@opentelemetry/api';
 import {
   CompositePropagator,
   getStringFromEnv,
@@ -43,6 +49,7 @@ import {
 } from '@opentelemetry/sdk-trace-base';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
@@ -113,27 +120,11 @@ function getOtlpExporterFromEnv(): SpanExporter {
   }
 }
 
-function getJaegerExporter() {
-  // The JaegerExporter does not support being required in bundled
-  // environments. By delaying the require statement to here, we only crash when
-  // the exporter is actually used in such an environment.
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
-    return new JaegerExporter();
-  } catch (e) {
-    throw new Error(
-      `Could not instantiate JaegerExporter. This could be due to the JaegerExporter's lack of support for bundling. If possible, use @opentelemetry/exporter-trace-otlp-proto instead. Original Error: ${e}`
-    );
-  }
-}
-
 export function getSpanProcessorsFromEnv(): SpanProcessor[] {
   const exportersMap = new Map<string, () => SpanExporter>([
     ['otlp', () => getOtlpExporterFromEnv()],
     ['zipkin', () => new ZipkinExporter()],
     ['console', () => new ConsoleSpanExporter()],
-    ['jaeger', () => getJaegerExporter()],
   ]);
   const exporters: SpanExporter[] = [];
   const processors: SpanProcessor[] = [];
@@ -198,6 +189,10 @@ export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
     return undefined;
   }
 
+  if (propagatorsEnvVarValue.includes('none')) {
+    return null;
+  }
+
   // Implementation note: this only contains specification required propagators that are actually hosted in this repo.
   // Any other propagators (like aws, aws-lambda, should go into `@opentelemetry/auto-configuration-propagators` instead).
   const propagatorsFactory = new Map<string, () => TextMapPropagator>([
@@ -246,4 +241,48 @@ export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
       propagators: validPropagators,
     });
   }
+}
+
+export function setupContextManager(
+  contextManager: ContextManager | null | undefined
+) {
+  // null means 'do not register'
+  if (contextManager === null) {
+    return;
+  }
+
+  // undefined means 'register default'
+  if (contextManager === undefined) {
+    const defaultContextManager = new AsyncLocalStorageContextManager();
+    defaultContextManager.enable();
+    context.setGlobalContextManager(defaultContextManager);
+    return;
+  }
+
+  contextManager.enable();
+  context.setGlobalContextManager(contextManager);
+}
+
+export function setupPropagator(
+  propagator: TextMapPropagator | null | undefined
+) {
+  // null means 'do not register'
+  if (propagator === null) {
+    return;
+  }
+
+  // undefined means 'register default'
+  if (propagator === undefined) {
+    propagation.setGlobalPropagator(
+      new CompositePropagator({
+        propagators: [
+          new W3CTraceContextPropagator(),
+          new W3CBaggagePropagator(),
+        ],
+      })
+    );
+    return;
+  }
+
+  propagation.setGlobalPropagator(propagator);
 }
