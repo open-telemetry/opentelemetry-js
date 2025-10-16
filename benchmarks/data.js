@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1760603683084,
+  "lastUpdate": 1760631601367,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -41344,6 +41344,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.65%",
             "unit": "ops/sec",
             "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "david.luna@elastic.co",
+            "name": "David Luna",
+            "username": "david-luna"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "3353b6f125d2718d2eee6cb013686d8586f9bd29",
+          "message": "feat(otlp-exporter-base): accept TLS config for node HTTP exporters from env vars (#6015)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2025-10-16T16:11:33Z",
+          "tree_id": "9e55c3dda82bf53b927dcafa4c174ad76360cc51",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/3353b6f125d2718d2eee6cb013686d8586f9bd29"
+        },
+        "date": 1760631600166,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 669136,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8336,
+            "range": "±0.70%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 293775,
+            "range": "±0.79%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 293115,
+            "range": "±0.79%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
