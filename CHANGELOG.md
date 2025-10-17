@@ -14,6 +14,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(sdk-trace-base): implement on ending in span processor [#6024](https://github.com/open-telemetry/opentelemetry-js/pull/6024) @majanjua-amzn
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
