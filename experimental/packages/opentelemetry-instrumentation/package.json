@@ -71,7 +71,7 @@
   },
   "dependencies": {
     "@opentelemetry/api-logs": "0.206.0",
-    "import-in-the-middle": "^1.8.1",
+    "import-in-the-middle": "^2.0.0",
     "require-in-the-middle": "^8.0.0"
   },
   "peerDependencies": {
