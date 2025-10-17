@@ -1346,6 +1346,29 @@ describe('Span', () => {
       const s = provider.getTracer('default').startSpan('test') as Span;
       assert.ok(s.attributes.attr);
     });
+
+    it('should call onEnding with a writeable span', () => {
+      const processor: SpanProcessor = {
+        onStart: span => {
+          span.setAttribute('attr', true);
+        },
+        forceFlush: () => Promise.resolve(),
+        onEnding: span => {
+          span.setAttribute('attr2', true);
+        },
+        onEnd() {},
+        shutdown: () => Promise.resolve(),
+      };
+
+      const provider = new BasicTracerProvider({
+        spanProcessors: [processor],
+      });
+
+      const s = provider.getTracer('default').startSpan('test') as Span;
+      s.end();
+      assert.ok(s.attributes.attr);
+      assert.ok(s.attributes.attr2);
+    });
   });
 
   describe('recordException', () => {
