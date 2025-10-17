@@ -28,7 +28,7 @@ describe('SendBeaconTransport', function () {
       const sendStub = sinon.stub(navigator, 'sendBeacon').returns(false);
       const transport = createSendBeaconTransport({
         url: 'http://example.test',
-        blobType: 'application/json',
+        headers: async () => ({ 'Content-Type': 'application/json' }),
       });
 
       // act
@@ -55,7 +55,7 @@ describe('SendBeaconTransport', function () {
       const sendStub = sinon.stub(navigator, 'sendBeacon').returns(true);
       const transport = createSendBeaconTransport({
         url: 'http://example.test',
-        blobType: 'application/json',
+        headers: async () => ({ 'Content-Type': 'application/json' }),
       });
 
       // act

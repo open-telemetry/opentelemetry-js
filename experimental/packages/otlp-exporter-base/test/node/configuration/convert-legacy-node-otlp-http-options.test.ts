@@ -91,4 +91,25 @@ describe('convertLegacyHttpOptions', function () {
     assert.ok(agent.options.keepAlive);
     assert.strictEqual(agent.options.port, 1234);
   });
+
+  it('should pass along header factory as-is', async function () {
+    const headers = { foo: 'bar' };
+    const options = convertLegacyHttpOptions(
+      {
+        headers: async () => headers,
+      },
+      'SIGNAL',
+      'v1/signal',
+      {}
+    );
+
+    // act
+    const initialHeaders = await options.headers();
+    headers.foo = 'baz';
+    const laterHeaders = await options.headers();
+
+    // assert
+    assert.deepStrictEqual(initialHeaders, { foo: 'bar' });
+    assert.deepStrictEqual(laterHeaders, { foo: 'baz' });
+  });
 });
