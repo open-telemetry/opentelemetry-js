@@ -17,11 +17,20 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-import { LoggerProvider, NoopLogRecordProcessor } from '../../src';
+import {
+  LoggerProvider,
+  NoopLogRecordProcessor,
+  createLoggerConfigurator,
+} from '../../src';
 import { LogRecordImpl } from '../../src/LogRecordImpl';
 import { ROOT_CONTEXT, TraceFlags, context, trace } from '@opentelemetry/api';
-import { LogRecord as ApiLogRecord } from '@opentelemetry/api-logs';
+import {
+  LogRecord as ApiLogRecord,
+  SeverityNumber,
+} from '@opentelemetry/api-logs';
 import { Logger } from '../../src/Logger';
+import { InMemoryLogRecordExporter } from '../../src/export/InMemoryLogRecordExporter';
+import { SimpleLogRecordProcessor } from '../../src/export/SimpleLogRecordProcessor';
 
 const setup = () => {
   const logProcessor = new NoopLogRecordProcessor();
@@ -83,6 +92,347 @@ describe('Logger', () => {
       const callSpy = sinon.spy(logProcessor, 'onEmit');
       logger.emit(logRecordData);
       assert.ok(callSpy.calledWith(sinon.match.any, activeContext));
+    });
+
+    describe('minimum severity filtering', () => {
+      it('should emit log records with severity above minimum', () => {
+        const exporter = new InMemoryLogRecordExporter();
+        const loggerProvider = new LoggerProvider({
+          processors: [new SimpleLogRecordProcessor(exporter)],
+          loggerConfigurator: createLoggerConfigurator([
+            {
+              pattern: 'test-logger',
+              config: { minimumSeverity: SeverityNumber.INFO },
+            },
+          ]),
+        });
+        const logger = loggerProvider.getLogger('test-logger') as Logger;
+
+        logger.emit({
+          body: 'info message',
+          severityNumber: SeverityNumber.INFO,
+        });
+
+        logger.emit({
+          body: 'warn message',
+          severityNumber: SeverityNumber.WARN,
+        });
+
+        const logRecords = exporter.getFinishedLogRecords();
+        assert.strictEqual(logRecords.length, 2);
+      });
+
+      it('should drop log records with severity below minimum', () => {
+        const exporter = new InMemoryLogRecordExporter();
+        const loggerProvider = new LoggerProvider({
+          processors: [new SimpleLogRecordProcessor(exporter)],
+          loggerConfigurator: createLoggerConfigurator([
+            {
+              pattern: 'test-logger',
+              config: { minimumSeverity: SeverityNumber.WARN },
+            },
+          ]),
+        });
+        const logger = loggerProvider.getLogger('test-logger') as Logger;
+
+        logger.emit({
+          body: 'debug message',
+          severityNumber: SeverityNumber.DEBUG,
+        });
+
+        logger.emit({
+          body: 'info message',
+          severityNumber: SeverityNumber.INFO,
+        });
+
+        const logRecords = exporter.getFinishedLogRecords();
+        assert.strictEqual(logRecords.length, 0);
+      });
+
+      it('should emit log records with severity equal to minimum', () => {
+        const exporter = new InMemoryLogRecordExporter();
+        const loggerProvider = new LoggerProvider({
+          processors: [new SimpleLogRecordProcessor(exporter)],
+          loggerConfigurator: createLoggerConfigurator([
+            {
+              pattern: 'test-logger',
+              config: { minimumSeverity: SeverityNumber.WARN },
+            },
+          ]),
+        });
+        const logger = loggerProvider.getLogger('test-logger') as Logger;
+
+        logger.emit({
+          body: 'warn message',
+          severityNumber: SeverityNumber.WARN,
+        });
+
+        const logRecords = exporter.getFinishedLogRecords();
+        assert.strictEqual(logRecords.length, 1);
+      });
+
+      it('should emit log records with unspecified severity (0) regardless of minimum', () => {
+        const exporter = new InMemoryLogRecordExporter();
+        const loggerProvider = new LoggerProvider({
+          processors: [new SimpleLogRecordProcessor(exporter)],
+          loggerConfigurator: createLoggerConfigurator([
+            {
+              pattern: 'test-logger',
+              config: { minimumSeverity: SeverityNumber.ERROR },
+            },
+          ]),
+        });
+        const logger = loggerProvider.getLogger('test-logger') as Logger;
+
+        logger.emit({
+          body: 'unspecified severity message',
+          severityNumber: SeverityNumber.UNSPECIFIED,
+        });
+
+        logger.emit({
+          body: 'no severity specified',
+          // severityNumber not specified at all
+        });
+
+        const logRecords = exporter.getFinishedLogRecords();
+        assert.strictEqual(logRecords.length, 2);
+      });
+
+      it('should use default minimum severity of 0 when not configured', () => {
+        const exporter = new InMemoryLogRecordExporter();
+        const loggerProvider = new LoggerProvider({
+          processors: [new SimpleLogRecordProcessor(exporter)],
+        });
+        const logger = loggerProvider.getLogger(
+          'unconfigured-logger'
+        ) as Logger;
+
+        logger.emit({
+          body: 'debug message',
+          severityNumber: SeverityNumber.DEBUG,
+        });
+
+        logger.emit({
+          body: 'trace message',
+          severityNumber: SeverityNumber.TRACE,
+        });
+
+        const logRecords = exporter.getFinishedLogRecords();
+        assert.strictEqual(logRecords.length, 2);
+      });
+
+      it('should only filter logs for configured logger, not other loggers', () => {
+        const exporter = new InMemoryLogRecordExporter();
+        const loggerProvider = new LoggerProvider({
+          processors: [new SimpleLogRecordProcessor(exporter)],
+          loggerConfigurator: createLoggerConfigurator([
+            {
+              pattern: 'filtered-logger',
+              config: { minimumSeverity: SeverityNumber.ERROR },
+            },
+            {
+              pattern: '*',
+              config: { minimumSeverity: SeverityNumber.UNSPECIFIED },
+            },
+          ]),
+        });
+        const filteredLogger = loggerProvider.getLogger(
+          'filtered-logger'
+        ) as Logger;
+        const unfilteredLogger = loggerProvider.getLogger(
+          'unfiltered-logger'
+        ) as Logger;
+
+        // Should be dropped (below minimum)
+        filteredLogger.emit({
+          body: 'filtered debug',
+          severityNumber: SeverityNumber.DEBUG,
+        });
+
+        // Should be emitted (no filter configured)
+        unfilteredLogger.emit({
+          body: 'unfiltered debug',
+          severityNumber: SeverityNumber.DEBUG,
+        });
+
+        const logRecords = exporter.getFinishedLogRecords();
+        assert.strictEqual(logRecords.length, 1);
+        assert.strictEqual(logRecords[0].body, 'unfiltered debug');
+      });
+    });
+
+    describe('trace-based filtering', () => {
+      it('should emit log records associated with sampled traces', () => {
+        const exporter = new InMemoryLogRecordExporter();
+        const loggerProvider = new LoggerProvider({
+          processors: [new SimpleLogRecordProcessor(exporter)],
+          loggerConfigurator: createLoggerConfigurator([
+            {
+              pattern: 'test-logger',
+              config: { traceBased: true },
+            },
+          ]),
+        });
+        const logger = loggerProvider.getLogger('test-logger') as Logger;
+
+        const spanContext = {
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.SAMPLED,
+        };
+        const activeContext = trace.setSpanContext(ROOT_CONTEXT, spanContext);
+
+        logger.emit({
+          body: 'sampled trace message',
+          context: activeContext,
+        });
+
+        const logRecords = exporter.getFinishedLogRecords();
+        assert.strictEqual(logRecords.length, 1);
+      });
+
+      it('should drop log records associated with unsampled traces', () => {
+        const exporter = new InMemoryLogRecordExporter();
+        const loggerProvider = new LoggerProvider({
+          processors: [new SimpleLogRecordProcessor(exporter)],
+          loggerConfigurator: createLoggerConfigurator([
+            {
+              pattern: 'test-logger',
+              config: { traceBased: true },
+            },
+          ]),
+        });
+        const logger = loggerProvider.getLogger('test-logger') as Logger;
+
+        const spanContext = {
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
+        };
+        const activeContext = trace.setSpanContext(ROOT_CONTEXT, spanContext);
+
+        logger.emit({
+          body: 'unsampled trace message',
+          context: activeContext,
+        });
+
+        const logRecords = exporter.getFinishedLogRecords();
+        assert.strictEqual(logRecords.length, 0);
+      });
+
+      it('should emit log records without trace context when trace-based filtering is enabled', () => {
+        const exporter = new InMemoryLogRecordExporter();
+        const loggerProvider = new LoggerProvider({
+          processors: [new SimpleLogRecordProcessor(exporter)],
+          loggerConfigurator: createLoggerConfigurator([
+            {
+              pattern: 'test-logger',
+              config: { traceBased: true },
+            },
+          ]),
+        });
+        const logger = loggerProvider.getLogger('test-logger') as Logger;
+
+        logger.emit({
+          body: 'message without trace context',
+          context: ROOT_CONTEXT,
+        });
+
+        const logRecords = exporter.getFinishedLogRecords();
+        assert.strictEqual(logRecords.length, 1);
+      });
+
+      it('should not filter when trace-based filtering is disabled (default)', () => {
+        const exporter = new InMemoryLogRecordExporter();
+        const loggerProvider = new LoggerProvider({
+          processors: [new SimpleLogRecordProcessor(exporter)],
+        });
+        const logger = loggerProvider.getLogger('test-logger') as Logger;
+
+        const spanContext = {
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
+        };
+        const activeContext = trace.setSpanContext(ROOT_CONTEXT, spanContext);
+
+        logger.emit({
+          body: 'unsampled trace message',
+          context: activeContext,
+        });
+
+        const logRecords = exporter.getFinishedLogRecords();
+        assert.strictEqual(logRecords.length, 1);
+      });
+
+      it('should combine trace-based and minimum severity filtering', () => {
+        const exporter = new InMemoryLogRecordExporter();
+        const loggerProvider = new LoggerProvider({
+          processors: [new SimpleLogRecordProcessor(exporter)],
+          loggerConfigurator: createLoggerConfigurator([
+            {
+              pattern: 'test-logger',
+              config: {
+                traceBased: true,
+                minimumSeverity: SeverityNumber.WARN,
+              },
+            },
+          ]),
+        });
+        const logger = loggerProvider.getLogger('test-logger') as Logger;
+
+        const sampledSpanContext = {
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.SAMPLED,
+        };
+        const sampledContext = trace.setSpanContext(
+          ROOT_CONTEXT,
+          sampledSpanContext
+        );
+
+        const unsampledSpanContext = {
+          traceId: 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4',
+          spanId: '7f8e9d0c1b2a3f4e',
+          traceFlags: TraceFlags.NONE,
+        };
+        const unsampledContext = trace.setSpanContext(
+          ROOT_CONTEXT,
+          unsampledSpanContext
+        );
+
+        // Should be emitted (sampled + severity >= minimum)
+        logger.emit({
+          body: 'sampled warn',
+          severityNumber: SeverityNumber.WARN,
+          context: sampledContext,
+        });
+
+        // Should be dropped (sampled but severity < minimum)
+        logger.emit({
+          body: 'sampled info',
+          severityNumber: SeverityNumber.INFO,
+          context: sampledContext,
+        });
+
+        // Should be dropped (severity >= minimum but unsampled)
+        logger.emit({
+          body: 'unsampled error',
+          severityNumber: SeverityNumber.ERROR,
+          context: unsampledContext,
+        });
+
+        // Should be dropped (unsampled + severity < minimum)
+        logger.emit({
+          body: 'unsampled debug',
+          severityNumber: SeverityNumber.DEBUG,
+          context: unsampledContext,
+        });
+
+        const logRecords = exporter.getFinishedLogRecords();
+        assert.strictEqual(logRecords.length, 1);
+        assert.strictEqual(logRecords[0].body, 'sampled warn');
+      });
     });
   });
 });
