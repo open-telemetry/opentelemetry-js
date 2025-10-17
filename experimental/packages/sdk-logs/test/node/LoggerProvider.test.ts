@@ -32,6 +32,10 @@ describe('LoggerProvider - node', () => {
   describe('constructor', () => {
     describe('logRecordLimits', () => {
       describe('when attribute value length limit is defined via env', () => {
+        afterEach(function () {
+          delete process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+        });
+
         it('should have attribute value length limit as default of Infinity', () => {
           process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = 'Infinity';
           const loggerProvider = new LoggerProvider();
@@ -41,18 +45,20 @@ describe('LoggerProvider - node', () => {
             logRecordLimits.attributeValueLengthLimit,
             Infinity
           );
-          delete process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT;
         });
       });
 
       describe('when attribute count limit is defined via env', () => {
+        afterEach(function () {
+          delete process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT;
+        });
+
         it('should have attribute count limits as defined in env', () => {
           process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '35';
           const loggerProvider = new LoggerProvider();
           const logRecordLimits =
             loggerProvider['_sharedState'].logRecordLimits;
           assert.strictEqual(logRecordLimits.attributeCountLimit, 35);
-          delete process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT;
         });
         it('should have attribute count limit as default of 128', () => {
           process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '128';
@@ -60,7 +66,6 @@ describe('LoggerProvider - node', () => {
           const logRecordLimits =
             loggerProvider['_sharedState'].logRecordLimits;
           assert.strictEqual(logRecordLimits.attributeCountLimit, 128);
-          delete process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT;
         });
       });
     });
