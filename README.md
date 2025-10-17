@@ -260,9 +260,6 @@ For more information about the maintainer role, see the [community repository](h
 - [Jackson Weber](https://github.com/JacksonWeber), Microsoft
 - [Martin Kuba](https://github.com/martinkuba), Grafana Labs
 - [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
-- [Matthew Wear](https://github.com/mwear), LightStep
-- [Neville Wylie](https://github.com/MSNev), Microsoft
-- [Purvi Kanal](https://github.com/pkanal), Honeycomb
 - [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
 
 For more information about the approver role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#approver).
@@ -315,6 +312,9 @@ For more information about the triager role, see the [community repository](http
 - [Rauno Viskus](https://github.com/rauno56), Maintainer
 - [Roch Devost](https://github.com/rochdev), Approver
 - [Valentin Marchaud](https://github.com/vmarchaud), Maintainer
+- [Matthew Wear](https://github.com/mwear), Approver
+- [Neville Wylie](https://github.com/MSNev), Approver
+- [Purvi Kanal](https://github.com/pkanal), Approver
 
 For more information about the emeritus role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#emeritus-maintainerapprovertriager).
 
