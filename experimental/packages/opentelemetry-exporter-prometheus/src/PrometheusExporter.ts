@@ -84,9 +84,12 @@ export class PrometheusExporter extends MetricReader {
       typeof config.appendTimestamp === 'boolean'
         ? config.appendTimestamp
         : PrometheusExporter.DEFAULT_OPTIONS.appendTimestamp;
+    const _resourceConstantLabelsFromEnv = process.env.OTEL_EXPORTER_PROMETHEUS_RESOURCE_CONSTANT_LABELS;
     const _withResourceConstantLabels =
       config.withResourceConstantLabels ||
-      PrometheusExporter.DEFAULT_OPTIONS.withResourceConstantLabels;
+      (_resourceConstantLabelsFromEnv
+        ? new RegExp(_resourceConstantLabelsFromEnv)
+        : PrometheusExporter.DEFAULT_OPTIONS.withResourceConstantLabels);
     const _withoutTargetInfo =
       config.withoutTargetInfo ||
       PrometheusExporter.DEFAULT_OPTIONS.withoutTargetInfo;
