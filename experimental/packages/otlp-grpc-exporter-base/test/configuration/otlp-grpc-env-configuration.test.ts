@@ -236,8 +236,6 @@ describe('getOtlpGrpcConfigurationFromEnvironment', function () {
       delete process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT;
       delete process.env.OTEL_EXPORTER_OTLP_INSECURE;
       delete process.env.OTEL_EXPORTER_OTLP_METRICS_INSECURE;
-      delete process.env.OTEL_EXPORTER_OTLP_INSECURE;
-      delete process.env.OTEL_EXPORTER_OTLP_METRICS_INSECURE;
       delete process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE;
       delete process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE;
       delete process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY;

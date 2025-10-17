@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import * as fs from 'fs';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
@@ -235,6 +235,103 @@ describe('getHttpConfigurationFromEnvironment', function () {
         'v1/metrics'
       );
       assert.strictEqual(config.url, undefined);
+    });
+  });
+
+  describe('certs', function () {
+    const certsDir = `${process.cwd()}/test/certs`;
+    const caCert = Buffer.from(fs.readFileSync(`${certsDir}/ca.crt`));
+    const clientCert = Buffer.from(fs.readFileSync(`${certsDir}/client.crt`));
+    const clientKey = Buffer.from(fs.readFileSync(`${certsDir}/client.key`));
+
+    afterEach(function () {
+      delete process.env.OTEL_EXPORTER_OTLP_CERTIFICATE;
+      delete process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE;
+      delete process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY;
+      delete process.env.OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE;
+      delete process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE;
+      delete process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY;
+    });
+
+    it('should not set the certs if not defined in env', async function () {
+      const { agentFactory } = getNodeHttpConfigurationFromEnvironment(
+        'METRICS',
+        'v1/metrics'
+      );
+      assert.strictEqual(typeof agentFactory, 'function');
+
+      const agent = (await agentFactory!('https:')) as any;
+      assert.strictEqual(agent.options.ca, undefined);
+      assert.strictEqual(agent.options.cert, undefined);
+      assert.strictEqual(agent.options.key, undefined);
+    });
+
+    it('should not set the certs if env vars have wrong values', async function () {
+      process.env.OTEL_EXPORTER_OTLP_CERTIFICATE = `${certsDir}/bogus-ca.crt`;
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE = `${certsDir}/bogus-client.crt`;
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY = `${certsDir}/bogus-client.key`;
+      const { agentFactory } = getNodeHttpConfigurationFromEnvironment(
+        'METRICS',
+        'v1/metrics'
+      );
+      assert.strictEqual(typeof agentFactory, 'function');
+
+      const agent = (await agentFactory!('https:')) as any;
+      assert.strictEqual(agent.options.ca, undefined);
+      assert.strictEqual(agent.options.cert, undefined);
+      assert.strictEqual(agent.options.key, undefined);
+    });
+
+    it('should not set the certs in agent if protocol is http', async function () {
+      process.env.OTEL_EXPORTER_OTLP_CERTIFICATE = `${certsDir}/ca.crt`;
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE = `${certsDir}/client.crt`;
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY = `${certsDir}/client.key`;
+      const { agentFactory } = getNodeHttpConfigurationFromEnvironment(
+        'METRICS',
+        'v1/metrics'
+      );
+      assert.strictEqual(typeof agentFactory, 'function');
+
+      const agent = (await agentFactory!('http:')) as any;
+      assert.strictEqual(agent.options.ca, undefined);
+      assert.strictEqual(agent.options.cert, undefined);
+      assert.strictEqual(agent.options.key, undefined);
+    });
+
+    it('should use the non signal specific certs in agent if defined in env vars', async function () {
+      process.env.OTEL_EXPORTER_OTLP_CERTIFICATE = `${certsDir}/ca.crt`;
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE = `${certsDir}/client.crt`;
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY = `${certsDir}/client.key`;
+      const { agentFactory } = getNodeHttpConfigurationFromEnvironment(
+        'METRICS',
+        'v1/metrics'
+      );
+      assert.strictEqual(typeof agentFactory, 'function');
+
+      const agent = (await agentFactory!('https:')) as any;
+      assert.strictEqual(caCert.compare(agent.options.ca), 0);
+      assert.strictEqual(clientCert.compare(agent.options.cert), 0);
+      assert.strictEqual(clientKey.compare(agent.options.key), 0);
+    });
+
+    it('should use the signal specific certs in agent if defined in env vars', async function () {
+      process.env.OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE = `${certsDir}/ca.crt`;
+      process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE = `${certsDir}/client.crt`;
+      process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY = `${certsDir}/client.key`;
+      // NOTE: if files do not exist the options become undefined
+      process.env.OTEL_EXPORTER_OTLP_CERTIFICATE = `${certsDir}/bogus-ca.crt`;
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE = `${certsDir}/bogus-client.crt`;
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY = `${certsDir}/bogus-client.key`;
+      const { agentFactory } = getNodeHttpConfigurationFromEnvironment(
+        'METRICS',
+        'v1/metrics'
+      );
+      assert.strictEqual(typeof agentFactory, 'function');
+
+      const agent = (await agentFactory!('https:')) as any;
+      assert.strictEqual(caCert.compare(agent.options.ca), 0);
+      assert.strictEqual(clientCert.compare(agent.options.cert), 0);
+      assert.strictEqual(clientKey.compare(agent.options.key), 0);
     });
   });
 

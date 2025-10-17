@@ -40,7 +40,8 @@
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "prewatch": "npm run precompile",
-    "align-api-deps": "node ../../../scripts/align-api-deps.js"
+    "align-api-deps": "node ../../../scripts/align-api-deps.js",
+    "maint:regenerate-test-certs": "cd test/certs && ./regenerate.sh"
   },
   "keywords": [
     "opentelemetry",
