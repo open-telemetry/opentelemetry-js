@@ -75,7 +75,7 @@ export function hasValidConfigFile(): boolean {
   return false;
 }
 
-function parseConfigFile(config: ConfigurationModel) {
+export function parseConfigFile(config: ConfigurationModel) {
   const supportedFileVersions = ['1.0-rc.1'];
   const configFile = getStringFromEnv('OTEL_EXPERIMENTAL_CONFIG_FILE') || '';
   const file = fs.readFileSync(configFile, 'utf8');
@@ -129,7 +129,7 @@ function parseConfigFile(config: ConfigurationModel) {
   }
 }
 
-function setResourceAttributes(
+export function setResourceAttributes(
   config: ConfigurationModel,
   attributes: AttributeNameValue[]
 ) {
@@ -173,7 +173,7 @@ function setResourceAttributes(
   }
 }
 
-function setAttributeLimits(
+export function setAttributeLimits(
   config: ConfigurationModel,
   attrLimits: AttributeLimits
 ) {
@@ -198,7 +198,7 @@ function setAttributeLimits(
   }
 }
 
-function setPropagator(
+export function setPropagator(
   config: ConfigurationModel,
   propagator: Propagator
 ): void {
@@ -411,7 +411,7 @@ function parseConfigExporter(
   return parsedExporter;
 }
 
-function setTracerProvider(
+export function setTracerProvider(
   config: ConfigurationModel,
   tracerProvider: TracerProvider
 ): void {
@@ -526,7 +526,7 @@ function setTracerProvider(
   }
 }
 
-function setMeterProvider(
+export function setMeterProvider(
   config: ConfigurationModel,
   meterProvider: MeterProvider
 ): void {
@@ -548,7 +548,7 @@ function setMeterProvider(
   }
 }
 
-function setLoggerProvider(
+export function setLoggerProvider(
   config: ConfigurationModel,
   loggerProvider: LoggerProvider
 ): void {

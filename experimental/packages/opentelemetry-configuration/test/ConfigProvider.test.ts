@@ -19,6 +19,22 @@ import { Configuration } from '../src';
 import { DiagLogLevel } from '@opentelemetry/api';
 import { createConfigProvider } from '../src/ConfigProvider';
 import { OtlpHttpEncoding } from '../src/models/commonModel';
+import {
+  setAttributeLimits,
+  setLoggerProvider,
+  setPropagators,
+  setResources,
+  setTracerProvider,
+} from '../src/EnvironmentConfigProvider';
+import { ConfigurationModel } from '../src/models/configModel';
+import {
+  parseConfigFile,
+  setResourceAttributes,
+  setAttributeLimits as setFileAttributeLimits,
+  setPropagator,
+  setTracerProvider as setFileTracerProvider,
+  setLoggerProvider as setFileLoggerProvider,
+} from '../src/FileConfigProvider';
 
 const defaultConfig: Configuration = {
   disabled: false,
@@ -820,6 +836,55 @@ describe('ConfigProvider', function () {
         expectedConfig
       );
     });
+
+    it('checks to keep good code coverage', function () {
+      let config: ConfigurationModel = {};
+      setResources(config);
+      assert.deepStrictEqual(config, { resource: {} });
+
+      config = {};
+      process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '5';
+      setAttributeLimits(config);
+      assert.deepStrictEqual(config, {
+        attribute_limits: {
+          attribute_count_limit: 128,
+          attribute_value_length_limit: 5,
+        },
+      });
+
+      config = {};
+      delete process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+      process.env.OTEL_ATTRIBUTE_COUNT_LIMIT = '7';
+      setAttributeLimits(config);
+      assert.deepStrictEqual(config, {
+        attribute_limits: {
+          attribute_count_limit: 7,
+        },
+      });
+
+      config = {};
+      setPropagators(config);
+      assert.deepStrictEqual(config, { propagator: {} });
+
+      config = {};
+      setTracerProvider(config);
+      assert.deepStrictEqual(config, {
+        tracer_provider: { limits: {}, processors: [] },
+      });
+
+      config = {};
+      process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = '3';
+      setLoggerProvider(config);
+      assert.deepStrictEqual(config, {
+        logger_provider: {
+          limits: {
+            attribute_count_limit: 128,
+            attribute_value_length_limit: 3,
+          },
+          processors: [],
+        },
+      });
+    });
   });
 
   describe('get values from config file', function () {
@@ -1038,6 +1103,43 @@ describe('ConfigProvider', function () {
         configProvider.getInstrumentationConfig(),
         defaultConfigFromFileWithEnvVariables
       );
+    });
+
+    it('checks to keep good code coverage', function () {
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
+        'test/fixtures/test-for-coverage.yaml';
+
+      let config = {};
+      parseConfigFile(config);
+      assert.deepStrictEqual(config, { resource: {} });
+
+      config = {};
+      setResourceAttributes(config, []);
+      assert.deepStrictEqual(config, { resource: { attributes: [] } });
+
+      config = {};
+      setFileAttributeLimits(config, { attribute_count_limit: 128 });
+      assert.deepStrictEqual(config, {
+        attribute_limits: { attribute_count_limit: 128 },
+      });
+
+      config = {};
+      setPropagator(config, { composite: [{ tracecontext: null }] });
+      assert.deepStrictEqual(config, {
+        propagator: { composite: [{ tracecontext: null }] },
+      });
+
+      config = {};
+      setFileTracerProvider(config, { processors: [] });
+      assert.deepStrictEqual(config, {
+        tracer_provider: { processors: [] },
+      });
+
+      config = {};
+      setFileLoggerProvider(config, { processors: [] });
+      assert.deepStrictEqual(config, {
+        logger_provider: { processors: [] },
+      });
     });
   });
 });
