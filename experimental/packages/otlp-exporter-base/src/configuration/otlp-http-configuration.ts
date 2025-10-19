@@ -24,7 +24,6 @@ import { validateAndNormalizeHeaders } from '../util';
 export interface OtlpHttpConfiguration extends OtlpSharedConfiguration {
   url: string;
   headers: () => Record<string, string>;
-  userAgent?: string;
 }
 
 function mergeHeaders(
@@ -93,7 +92,6 @@ export function mergeOtlpHttpConfigurationWithDefaults(
       validateUserProvidedUrl(userProvidedConfiguration.url) ??
       fallbackConfiguration.url ??
       defaultConfiguration.url,
-    userAgent: userProvidedConfiguration.userAgent,
   };
 }
 

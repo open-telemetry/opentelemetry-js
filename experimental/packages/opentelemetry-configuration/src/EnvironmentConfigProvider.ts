@@ -67,7 +67,7 @@ export class EnvironmentConfigProvider implements ConfigProvider {
   }
 }
 
-function setResources(config: ConfigurationModel): void {
+export function setResources(config: ConfigurationModel): void {
   if (config.resource == null) {
     config.resource = {};
   }
@@ -89,7 +89,7 @@ function setResources(config: ConfigurationModel): void {
   }
 }
 
-function setAttributeLimits(config: ConfigurationModel): void {
+export function setAttributeLimits(config: ConfigurationModel): void {
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT'
   );
@@ -111,7 +111,7 @@ function setAttributeLimits(config: ConfigurationModel): void {
   }
 }
 
-function setPropagators(config: ConfigurationModel): void {
+export function setPropagators(config: ConfigurationModel): void {
   if (config.propagator == null) {
     config.propagator = {};
   }
@@ -128,7 +128,7 @@ function setPropagators(config: ConfigurationModel): void {
   }
 }
 
-function setTracerProvider(config: ConfigurationModel): void {
+export function setTracerProvider(config: ConfigurationModel): void {
   if (config.tracer_provider == null) {
     config.tracer_provider = { processors: [] };
   }
@@ -384,7 +384,10 @@ function setMeterProvider(config: ConfigurationModel): void {
   }
 }
 
-function setLoggerProvider(config: ConfigurationModel): void {
+export function setLoggerProvider(config: ConfigurationModel): void {
+  if (config.logger_provider == null) {
+    config.logger_provider = { processors: [] };
+  }
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT'
   );
@@ -392,9 +395,6 @@ function setLoggerProvider(config: ConfigurationModel): void {
     'OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT'
   );
   if (attributeValueLengthLimit || attributeCountLimit) {
-    if (config.logger_provider == null) {
-      config.logger_provider = { processors: [] };
-    }
     if (config.logger_provider.limits == null) {
       config.logger_provider.limits = { attribute_count_limit: 128 };
     }
@@ -477,12 +477,6 @@ function setLoggerProvider(config: ConfigurationModel): void {
       batch.exporter.otlp_http.headers_list = headersList;
     }
 
-    if (config.logger_provider == null) {
-      config.logger_provider = { processors: [{}] };
-    }
-    if (config.logger_provider?.processors == null) {
-      config.logger_provider.processors = [{}];
-    }
     config.logger_provider.processors[0].batch = batch;
   }
 }
