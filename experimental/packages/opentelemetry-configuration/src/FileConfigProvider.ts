@@ -39,7 +39,11 @@ import {
   SpanProcessor,
   TracerProvider,
 } from './models/tracerProviderModel';
-import { LoggerProvider } from './models/loggerProviderModel';
+import {
+  LoggerProvider,
+  LogRecordExporter,
+  LogRecordProcessor,
+} from './models/loggerProviderModel';
 import { AttributeNameValue } from './models/resourceModel';
 
 export class FileConfigProvider implements ConfigProvider {
@@ -98,14 +102,14 @@ function parseConfigFile(config: ConfigurationModel) {
         config.resource = {};
       }
       const attrList = getStringFromConfigFile(
-        parsedContent['resource']['attributes_list']
+        parsedContent['resource']?.['attributes_list']
       );
       if (attrList) {
         config.resource.attributes_list = attrList;
       }
 
       const schemaUrl = getStringFromConfigFile(
-        parsedContent['resource']['schema_url']
+        parsedContent['resource']?.['schema_url']
       );
       if (schemaUrl) {
         config.resource.schema_url = schemaUrl;
@@ -261,11 +265,11 @@ enum ProviderType {
 }
 
 function parseConfigExporter(
-  exporter: SpanExporter,
+  exporter: SpanExporter | LogRecordExporter,
   providerType: ProviderType
-): SpanExporter {
+): SpanExporter | LogRecordExporter {
   const exporterType = Object.keys(exporter)[0];
-  let parsedExporter: SpanExporter = {};
+  let parsedExporter: SpanExporter | LogRecordExporter = {};
   let e;
   let certFile;
   let clientCertFile;
@@ -279,9 +283,11 @@ function parseConfigExporter(
   switch (providerType) {
     case ProviderType.TRACER:
       endpoint = 'http://localhost:4318/v1/traces';
+      parsedExporter = parsedExporter as SpanExporter;
       break;
     case ProviderType.LOGGER:
       endpoint = 'http://localhost:4318/v1/logs';
+      parsedExporter = parsedExporter as LogRecordExporter;
       break;
   }
 
@@ -388,7 +394,7 @@ function parseConfigExporter(
       break;
 
     case 'zipkin':
-      e = exporter['zipkin'];
+      e = (exporter as SpanExporter)['zipkin'];
       if (e) {
         parsedExporter = {
           zipkin: {
@@ -493,7 +499,7 @@ function setTracerProvider(
                 max_export_batch_size:
                   getNumberFromConfigFile(element['max_export_batch_size']) ??
                   512,
-                exporter: parsedExporter,
+                exporter: parsedExporter as SpanExporter,
               },
             };
 
@@ -508,7 +514,7 @@ function setTracerProvider(
             );
             const simpleConfig: SpanProcessor = {
               simple: {
-                exporter: parsedExporter,
+                exporter: parsedExporter as SpanExporter,
               },
             };
 
@@ -589,7 +595,7 @@ function setLoggerProvider(
                 element['exporter'],
                 ProviderType.LOGGER
               );
-              const batchConfig: SpanProcessor = {
+              const batchConfig: LogRecordProcessor = {
                 batch: {
                   schedule_delay:
                     getNumberFromConfigFile(element['schedule_delay']) ?? 1000,
@@ -600,7 +606,7 @@ function setLoggerProvider(
                   max_export_batch_size:
                     getNumberFromConfigFile(element['max_export_batch_size']) ??
                     512,
-                  exporter: parsedExporter,
+                  exporter: parsedExporter as LogRecordExporter,
                 },
               };
 
@@ -613,7 +619,7 @@ function setLoggerProvider(
                 element['exporter'],
                 ProviderType.LOGGER
               );
-              const simpleConfig: SpanProcessor = {
+              const simpleConfig: LogRecordProcessor = {
                 simple: {
                   exporter: parsedExporter,
                 },
