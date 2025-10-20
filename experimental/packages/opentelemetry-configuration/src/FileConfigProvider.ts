@@ -581,7 +581,7 @@ function getProducers(producers?: MetricProducer[]): MetricProducer[] {
   return parsedProducers;
 }
 
-function getTemporalityPreference(
+export function getTemporalityPreference(
   temporalityPreference?: ExporterTemporalityPreference
 ): ExporterTemporalityPreference {
   const temporalityPreferenceType = getStringFromConfigFile(

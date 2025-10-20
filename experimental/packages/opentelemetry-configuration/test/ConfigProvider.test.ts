@@ -41,6 +41,8 @@ import {
   setPropagator,
   setTracerProvider as setFileTracerProvider,
   setLoggerProvider as setFileLoggerProvider,
+  setMeterProvider as setFileMeterProvider,
+  getTemporalityPreference,
 } from '../src/FileConfigProvider';
 
 const defaultConfig: Configuration = {
@@ -1522,6 +1524,112 @@ describe('ConfigProvider', function () {
       setFileLoggerProvider(config, { processors: [] });
       assert.deepStrictEqual(config, {
         logger_provider: { processors: [] },
+      });
+
+      const res = getTemporalityPreference(
+        ExporterTemporalityPreference.LowMemory
+      );
+      assert.deepStrictEqual(res, 'low_memory');
+
+      config = {};
+      setFileMeterProvider(config, { readers: [] });
+      assert.deepStrictEqual(config, {
+        meter_provider: { readers: [] },
+      });
+
+      config = {};
+      setFileMeterProvider(config, {
+        readers: [],
+        exemplar_filter: ExemplarFilter.AlwaysOn,
+      });
+      assert.deepStrictEqual(config, {
+        meter_provider: { readers: [], exemplar_filter: 'always_on' },
+      });
+
+      config = {};
+      setFileMeterProvider(config, {
+        readers: [],
+        views: [{ selector: { instrument_type: InstrumentType.Counter } }],
+      });
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [],
+          views: [{ selector: { instrument_type: 'counter' } }],
+        },
+      });
+
+      config = {};
+      setFileMeterProvider(config, {
+        readers: [],
+        views: [{ selector: { instrument_type: InstrumentType.Gauge } }],
+      });
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [],
+          views: [{ selector: { instrument_type: 'gauge' } }],
+        },
+      });
+
+      config = {};
+      setFileMeterProvider(config, {
+        readers: [],
+        views: [
+          { selector: { instrument_type: InstrumentType.ObservableCounter } },
+        ],
+      });
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [],
+          views: [{ selector: { instrument_type: 'observable_counter' } }],
+        },
+      });
+
+      config = {};
+      setFileMeterProvider(config, {
+        readers: [],
+        views: [
+          { selector: { instrument_type: InstrumentType.ObservableGauge } },
+        ],
+      });
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [],
+          views: [{ selector: { instrument_type: 'observable_gauge' } }],
+        },
+      });
+
+      config = {};
+      setFileMeterProvider(config, {
+        readers: [],
+        views: [
+          {
+            selector: {
+              instrument_type: InstrumentType.ObservableUpDownCounter,
+            },
+          },
+        ],
+      });
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [],
+          views: [
+            { selector: { instrument_type: 'observable_up_down_counter' } },
+          ],
+        },
+      });
+
+      config = {};
+      setFileMeterProvider(config, {
+        readers: [],
+        views: [
+          { selector: { instrument_type: InstrumentType.UpDownCounter } },
+        ],
+      });
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [],
+          views: [{ selector: { instrument_type: 'up_down_counter' } }],
+        },
       });
     });
   });
