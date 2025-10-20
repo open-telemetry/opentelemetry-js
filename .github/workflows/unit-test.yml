@@ -21,6 +21,7 @@ jobs:
           - "20"
           - "22"
           - "24"
+          - "25"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -46,7 +47,8 @@ jobs:
         if: ${{
           matrix.node_version == '20' ||
           matrix.node_version == '22' ||
-          matrix.node_version == '24'
+          matrix.node_version == '24' ||
+          matrix.node_version == '25'
           }}
 
       - name: Bootstrap
@@ -56,13 +58,13 @@ jobs:
         run: npm run compile
 
       - run: npm test
-        if: ${{ matrix.node_version != '22' && matrix.node_version != '24' }}
+        if: ${{ matrix.node_version != '22' && matrix.node_version != '24' || matrix.node_version != '25' }}
       # Node.js type stripping conflicts with mocha usage of ts-node.
       # See https://github.com/open-telemetry/opentelemetry-js/issues/5415
       - run: npm test
         env:
           NODE_OPTIONS: '--no-experimental-strip-types'
-        if: ${{ matrix.node_version == '22' || matrix.node_version == '24' }}
+        if: ${{ matrix.node_version == '22' || matrix.node_version == '24' || matrix.node_version == '25' }}
 
       - name: Report Coverage
         uses: codecov/codecov-action@v5
