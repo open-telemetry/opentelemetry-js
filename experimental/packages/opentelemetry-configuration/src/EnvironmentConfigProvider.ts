@@ -247,11 +247,14 @@ export function setTracerProvider(config: ConfigurationModel): void {
   }
 }
 
-function setMeterProvider(config: ConfigurationModel): void {
+export function setMeterProvider(config: ConfigurationModel): void {
   const readerPeriodic =
     config.meter_provider?.readers && config.meter_provider?.readers.length > 0
       ? config.meter_provider?.readers[0].periodic
       : undefined;
+  if (config.meter_provider == null) {
+    config.meter_provider = { readers: [{}] };
+  }
   if (readerPeriodic) {
     const interval = getNumberFromEnv('OTEL_METRIC_EXPORT_INTERVAL');
     if (interval) {
@@ -353,20 +356,11 @@ function setMeterProvider(config: ConfigurationModel): void {
           break;
       }
     }
-    if (config.meter_provider == null) {
-      config.meter_provider = { readers: [{}] };
-    }
-    if (config.meter_provider?.readers == null) {
-      config.meter_provider.readers = [{}];
-    }
 
     config.meter_provider.readers[0].periodic = readerPeriodic;
   }
   const exemplarFilter = getStringFromEnv('OTEL_METRICS_EXEMPLAR_FILTER');
   if (exemplarFilter) {
-    if (config.meter_provider == null) {
-      config.meter_provider = { readers: [] };
-    }
     switch (exemplarFilter) {
       case 'trace_based':
         config.meter_provider.exemplar_filter = ExemplarFilter.TraceBased;

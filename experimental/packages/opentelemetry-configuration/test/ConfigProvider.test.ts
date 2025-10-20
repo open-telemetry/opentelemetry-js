@@ -28,6 +28,7 @@ import {
 import {
   setAttributeLimits,
   setLoggerProvider,
+  setMeterProvider,
   setPropagators,
   setResources,
   setTracerProvider,
@@ -1094,6 +1095,142 @@ describe('ConfigProvider', function () {
             attribute_value_length_limit: 3,
           },
           processors: [],
+        },
+      });
+
+      config = {
+        meter_provider: {
+          readers: [{ periodic: { exporter: { otlp_http: undefined } } }],
+        },
+      };
+      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE =
+        'cumulative';
+      setMeterProvider(config);
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                exporter: {
+                  otlp_http: { temporality_preference: 'cumulative' },
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE =
+        'low_memory';
+      setMeterProvider(config);
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                exporter: {
+                  otlp_http: { temporality_preference: 'low_memory' },
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'default';
+      setMeterProvider(config);
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                exporter: {
+                  otlp_http: { temporality_preference: 'cumulative' },
+                },
+              },
+            },
+          ],
+        },
+      });
+      delete process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE;
+
+      config = {
+        meter_provider: {
+          readers: [{ periodic: { exporter: { otlp_http: undefined } } }],
+        },
+      };
+      process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
+        'explicit_bucket_histogram';
+      setMeterProvider(config);
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                exporter: {
+                  otlp_http: {
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                  },
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
+        'default';
+      setMeterProvider(config);
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                exporter: {
+                  otlp_http: {
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                  },
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      config = {};
+      setMeterProvider(config);
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [{}],
+        },
+      });
+
+      process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'trace_based';
+      setMeterProvider(config);
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [{}],
+          exemplar_filter: 'trace_based',
+        },
+      });
+
+      config = {};
+      process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'always_off';
+      setMeterProvider(config);
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [{}],
+          exemplar_filter: 'always_off',
+        },
+      });
+
+      config = {};
+      process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'default';
+      setMeterProvider(config);
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [{}],
+          exemplar_filter: 'trace_based',
         },
       });
     });
