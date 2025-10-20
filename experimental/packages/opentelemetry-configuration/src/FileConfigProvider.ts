@@ -72,7 +72,7 @@ export function hasValidConfigFile(): boolean {
 }
 
 function parseConfigFile(config: ConfigurationModel) {
-  const supportedFileVersions = ['1.0-rc.1'];
+  const supportedFileVersions = ['1.0-rc.1', '1.0-rc.2'];
   const configFile = getStringFromEnv('OTEL_EXPERIMENTAL_CONFIG_FILE') || '';
   const file = fs.readFileSync(configFile, 'utf8');
   const parsedContent = yaml.parse(file);
