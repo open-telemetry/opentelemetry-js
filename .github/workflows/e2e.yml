@@ -20,11 +20,12 @@ jobs:
           - "20"
           - "22"
           - "24"
+          - "25"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           cache: 'npm'
           cache-dependency-path: |
@@ -44,7 +45,8 @@ jobs:
         if: ${{
           matrix.node_version == '20' ||
           matrix.node_version == '22' ||
-          matrix.node_version == '24'
+          matrix.node_version == '24' ||
+          matrix.node_version == '25'
           }}
 
       - name: Bootstrap
