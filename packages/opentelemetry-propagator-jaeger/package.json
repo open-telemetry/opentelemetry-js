@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/propagator-jaeger",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "OpenTelemetry Jaeger propagator provides HTTP header propagation for systems that are using Jaeger HTTP header format.",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -76,7 +76,7 @@
     "@opentelemetry/api": ">=1.0.0 <1.10.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "2.1.0"
+    "@opentelemetry/core": "2.2.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-propagator-jaeger",
   "sideEffects": false
