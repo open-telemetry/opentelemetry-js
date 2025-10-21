@@ -21,12 +21,13 @@ jobs:
           - "20"
           - "22"
           - "24"
+          - "25"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           cache: 'npm'
           cache-dependency-path: |
@@ -46,7 +47,8 @@ jobs:
         if: ${{
           matrix.node_version == '20' ||
           matrix.node_version == '22' ||
-          matrix.node_version == '24'
+          matrix.node_version == '24' ||
+          matrix.node_version == '25'
           }}
 
       - name: Bootstrap
@@ -56,13 +58,13 @@ jobs:
         run: npm run compile
 
       - run: npm test
-        if: ${{ matrix.node_version != '22' && matrix.node_version != '24' }}
+        if: ${{ matrix.node_version != '22' && matrix.node_version != '24' || matrix.node_version != '25' }}
       # Node.js type stripping conflicts with mocha usage of ts-node.
       # See https://github.com/open-telemetry/opentelemetry-js/issues/5415
       - run: npm test
         env:
           NODE_OPTIONS: '--no-experimental-strip-types'
-        if: ${{ matrix.node_version == '22' || matrix.node_version == '24' }}
+        if: ${{ matrix.node_version == '22' || matrix.node_version == '24' || matrix.node_version == '25' }}
 
       - name: Report Coverage
         uses: codecov/codecov-action@v5
@@ -76,7 +78,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           cache: 'npm'
           cache-dependency-path: |
@@ -103,7 +105,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           cache: 'npm'
           cache-dependency-path: |
@@ -129,7 +131,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           cache: 'npm'
           cache-dependency-path: |

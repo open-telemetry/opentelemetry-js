@@ -8,13 +8,13 @@
 # The file format version.
 # The yaml format is documented at
 # https://github.com/open-telemetry/opentelemetry-configuration/tree/main/schema
-file_format: "1.0-rc.1"
+file_format: "1.0-rc.2"
 # Configure if the SDK is disabled or not.
 # If omitted or null, false is used.
 disabled: false
 # Configure the log level of the internal logger used by the SDK.
 # If omitted, info is used.
-log_level: debug
+log_level: info
 # Configure general attribute limits. See also tracer_provider.limits, logger_provider.limits.
 attribute_limits:
   # Configure max attribute value size. 
@@ -200,12 +200,6 @@ meter_provider:
             # Configure port.
             # If omitted or null, 9464 is used.
             port: 9464
-            # Configure Prometheus Exporter to produce metrics without a unit suffix or UNIT metadata.
-            # If omitted or null, false is used.
-            without_units: false
-            # Configure Prometheus Exporter to produce metrics without a type suffix.
-            # If omitted or null, false is used.
-            without_type_suffix: false
             # Configure Prometheus Exporter to produce metrics without a scope info metric.
             # If omitted or null, false is used.
             without_scope_info: false
@@ -225,6 +219,15 @@ meter_provider:
               # If omitted, .included resource attributes are included.
               excluded:
                 - "service.attr1"
+            # Configure how Prometheus metrics are exposed. Values include:
+            #
+            #  * UnderscoreEscapingWithSuffixes, the default. This fully escapes metric names for classic Prometheus metric name compatibility, and includes appending type and unit suffixes.
+            #  * UnderscoreEscapingWithoutSuffixes, metric names will continue to escape special characters to _, but suffixes won't be attached.
+            #  * NoUTF8EscapingWithSuffixes will disable changing special characters to _. Special suffixes like units and _total for counters will be attached.
+            #  * NoTranslation. This strategy bypasses all metric and label name translation, passing them through unaltered.
+            #
+            # If omitted or null, UnderscoreEscapingWithSuffixes is used.
+            translation_strategy: UnderscoreEscapingWithSuffixes
         # Configure metric producers.
         producers:
           - # Configure metric producer to be opencensus.

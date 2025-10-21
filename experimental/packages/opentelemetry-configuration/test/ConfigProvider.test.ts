@@ -138,7 +138,7 @@ const defaultConfig: Configuration = {
 
 const configFromFile: Configuration = {
   disabled: false,
-  log_level: DiagLogLevel.DEBUG,
+  log_level: DiagLogLevel.INFO,
   node_resource_detectors: ['all'],
   resource: {
     schema_url: 'https://opentelemetry.io/schemas/1.16.0',
