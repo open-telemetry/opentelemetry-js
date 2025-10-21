@@ -16,12 +16,16 @@
 'use strict';
 
 import { DiagLogLevel } from '@opentelemetry/api';
-import { NameStringValuePair, OtlpHttpEncoding } from './commonModel';
+import { NameStringValuePair } from './commonModel';
 import {
   initializeDefaultTracerProviderConfiguration,
-  SpanProcessor,
   TracerProvider,
 } from './tracerProviderModel';
+import {
+  initializeDefaultLoggerProviderConfiguration,
+  LoggerProvider,
+} from './loggerProviderModel';
+import { Resource } from './resourceModel';
 
 export interface ConfigurationModel {
   /**
@@ -108,76 +112,11 @@ export function initializeDefaultConfiguration(): ConfigurationModel {
       ],
       exemplar_filter: 'trace_based',
     },
-    logger_provider: {
-      processors: [
-        {
-          batch: {
-            schedule_delay: 1000,
-            export_timeout: 30000,
-            max_queue_size: 2048,
-            max_export_batch_size: 512,
-            exporter: {
-              otlp_http: {
-                endpoint: 'http://localhost:4318/v1/logs',
-                timeout: 10000,
-                encoding: OtlpHttpEncoding.protobuf,
-              },
-            },
-          },
-        },
-      ],
-      limits: {
-        attribute_count_limit: 128,
-      },
-    },
+    logger_provider: initializeDefaultLoggerProviderConfiguration(),
   };
 
   return config;
 }
-
-export interface ConfigAttributes {
-  name: string;
-  value:
-    | string
-    | boolean
-    | number
-    | string[]
-    | boolean[]
-    | number[]
-    | undefined;
-  type:
-    | 'string'
-    | 'bool'
-    | 'int'
-    | 'double'
-    | 'string_array'
-    | 'bool_array'
-    | 'int_array'
-    | 'double_array';
-}
-
-export interface Resource {
-  /**
-   * Configure resource attributes. Entries have higher priority than entries from .resource.attributes_list.
-   * Entries must contain .name and .value, and may optionally include .type. If an entry's .type omitted or null, string is used.
-   * The .value's type must match the .type. Values for .type include: string, bool, int, double, string_array, bool_array, int_array, double_array.
-   */
-  attributes?: ConfigAttributes[];
-
-  /**
-   * Configure resource attributes. Entries have lower priority than entries from .resource.attributes.
-   * The value is a list of comma separated key-value pairs matching the format of OTEL_RESOURCE_ATTRIBUTES.
-   * If omitted or null, no resource attributes are added.
-   */
-  attributes_list?: string;
-
-  /**
-   * Configure resource schema URL.
-   * If omitted or null, no schema URL is used.
-   */
-  schema_url?: string;
-}
-
 export interface AttributeLimits {
   /**
    * Configure max attribute value size.
@@ -313,6 +252,7 @@ export interface ConfigPeriodicReader {
    */
   exporter: ConfigMeterExporter;
 }
+
 export interface ConfigReader {
   /**
    * Configure a periodic metric reader.
@@ -331,16 +271,4 @@ export interface MeterProvider {
    * If omitted or null, trace_based is used.
    */
   exemplar_filter?: 'trace_based' | 'always_on' | 'always_off';
-}
-
-export interface LoggerProvider {
-  /**
-   * Configure log record processors.
-   */
-  processors?: SpanProcessor[];
-
-  /**
-   * Configure log record limits. See also attribute_limits.
-   */
-  limits?: AttributeLimits;
 }
