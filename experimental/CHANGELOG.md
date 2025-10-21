@@ -32,6 +32,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
     is initialized.
 * feat(otlp-exporter-base, otlp-grpc-exporter-base): add an option to let an SDK distribution prepend their own user-agent string in HTTP & GRPC exporters [#5928](https://github.com/open-telemetry/opentelemetry-js/pull/5928) @david-luna
 * feat(web): add session handling implementation [5173](https://github.com/open-telemetry/opentelemetry-js/pull/5173) @martinkuba
+* feat(instrumentation): allow error of safeExecuteInTheMiddleAsync to be async [#6032](https://github.com/open-telemetry/opentelemetry-js/pull/6032) @JPeer264
 
 ### :bug: Bug Fixes
 
