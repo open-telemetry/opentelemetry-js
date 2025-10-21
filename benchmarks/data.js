@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1761055028666,
+  "lastUpdate": 1761078493084,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -41812,6 +41812,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.81%",
             "unit": "ops/sec",
             "extra": "93 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "8fa5242d248f26d961b11e27ec1f2b79485ea32e",
+          "message": "chore: update contrib-triagers section to include all component owners (#6034)",
+          "timestamp": "2025-10-21T20:19:51Z",
+          "tree_id": "4857a36fb2b1624b7f23ba8954606f7eae9f5e56",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/8fa5242d248f26d961b11e27ec1f2b79485ea32e"
+        },
+        "date": 1761078491971,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 686659,
+            "range": "±0.94%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8708,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 299491,
+            "range": "±0.71%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 290855,
+            "range": "±0.79%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
