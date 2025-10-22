@@ -35,7 +35,7 @@ export function initializeDefaultTracerProviderConfiguration(): TracerProvider {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/traces',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.protobuf,
+              encoding: OtlpHttpEncoding.Protobuf,
             },
           },
         },

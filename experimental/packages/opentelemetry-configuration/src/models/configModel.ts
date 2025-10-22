@@ -16,7 +16,6 @@
 'use strict';
 
 import { DiagLogLevel } from '@opentelemetry/api';
-import { NameStringValuePair } from './commonModel';
 import {
   initializeDefaultTracerProviderConfiguration,
   TracerProvider,
@@ -26,6 +25,10 @@ import {
   LoggerProvider,
 } from './loggerProviderModel';
 import { Resource } from './resourceModel';
+import {
+  initializeDefaultMeterProviderConfiguration,
+  MeterProvider,
+} from './meterProviderModel';
 
 export interface ConfigurationModel {
   /**
@@ -93,25 +96,7 @@ export function initializeDefaultConfiguration(): ConfigurationModel {
       composite_list: 'tracecontext,baggage',
     },
     tracer_provider: initializeDefaultTracerProviderConfiguration(),
-    meter_provider: {
-      readers: [
-        {
-          periodic: {
-            interval: 60000,
-            timeout: 30000,
-            exporter: {
-              otlp_http: {
-                endpoint: 'http://localhost:4318/v1/metrics',
-                timeout: 10000,
-                temporality_preference: 'cumulative',
-                default_histogram_aggregation: 'explicit_bucket_histogram',
-              },
-            },
-          },
-        },
-      ],
-      exemplar_filter: 'trace_based',
-    },
+    meter_provider: initializeDefaultMeterProviderConfiguration(),
     logger_provider: initializeDefaultLoggerProviderConfiguration(),
   };
 
@@ -152,123 +137,4 @@ export interface Propagator {
    * If the resolved list of propagators (from .composite and .composite_list) is empty, a noop propagator is used.
    */
   composite_list?: string;
-}
-
-export interface ConfigMeterExporter {
-  /**
-   * Configure exporter to be OTLP with HTTP transport.
-   */
-  otlp_http: ConfigMeterOTLPHttp;
-}
-
-export interface ConfigMeterOTLPHttp {
-  /**
-   * Configure endpoint, including the metric specific path.
-   * If omitted or null, http://localhost:4318/v1/metrics is used.
-   */
-  endpoint: string;
-
-  /**
-   * Configure certificate used to verify a server's TLS credentials.
-   * Absolute path to certificate file in PEM format.
-   * If omitted or null, system default certificate verification is used for secure connections.
-   */
-  certificate_file?: string;
-
-  /**
-   * Configure mTLS private client key.
-   * Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-   * If omitted or null, mTLS is not used.
-   */
-  client_key_file?: string;
-
-  /**
-   * Configure mTLS client certificate.
-   * Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-   * If omitted or null, mTLS is not used.
-   */
-  client_certificate_file?: string;
-
-  /**
-   * Configure compression.
-   * Values include: gzip, none. Implementations may support other compression algorithms.
-   * If omitted or null, none is used.
-   */
-  compression?: string;
-
-  /**
-   * Configure max time (in milliseconds) to wait for each export.
-   * Value must be non-negative. A value of 0 indicates no limit (infinity).
-   * If omitted or null, 10000 is used.
-   */
-  timeout: number;
-
-  /**
-   * Configure headers. Entries have higher priority than entries from .headers_list.
-   * If an entry's .value is null, the entry is ignored.
-   */
-  headers?: NameStringValuePair[];
-
-  /**
-   * Configure headers. Entries have lower priority than entries from .headers.
-   * The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS.
-   * If omitted or null, no headers are added.
-   */
-  headers_list?: string;
-
-  /**
-   * Configure temporality preference.
-   * Values include: cumulative, delta, low_memory.
-   * If omitted or null, cumulative is used.
-   */
-  temporality_preference: 'cumulative' | 'delta' | 'low_memory';
-
-  /**
-   * Configure default histogram aggregation.
-   * Values include: explicit_bucket_histogram, base2_exponential_bucket_histogram.
-   * If omitted or null, explicit_bucket_histogram is used.
-   */
-  default_histogram_aggregation:
-    | 'explicit_bucket_histogram'
-    | 'base2_exponential_bucket_histogram';
-}
-export interface ConfigPeriodicReader {
-  /**
-   * Configure delay interval (in milliseconds) between start of two consecutive exports.
-   * Value must be non-negative.
-   * If omitted or null, 60000 is used.
-   */
-  interval: number;
-
-  /**
-   * Configure maximum allowed time (in milliseconds) to export data.
-   * Value must be non-negative. A value of 0 indicates no limit (infinity).
-   * If omitted or null, 30000 is used.
-   */
-  timeout: number;
-
-  /**
-   * Configure exporter.
-   */
-  exporter: ConfigMeterExporter;
-}
-
-export interface ConfigReader {
-  /**
-   * Configure a periodic metric reader.
-   */
-  periodic?: ConfigPeriodicReader;
-}
-export interface MeterProvider {
-  /**
-   * Configure metric readers.
-   */
-  readers?: ConfigReader[];
-
-  /**
-   * Configure the exemplar filter.
-   * Values include: trace_based, always_on, always_off.
-   * If omitted or null, trace_based is used.
-   */
-  exemplar_filter?: 'trace_based' | 'always_on' | 'always_off';
 }
