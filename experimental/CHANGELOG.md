@@ -10,6 +10,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(instrumentation): allow error of safeExecuteInTheMiddleAsync to be async [#6032](https://github.com/open-telemetry/opentelemetry-js/pull/6032) @JPeer264
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
@@ -60,6 +62,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(exporter-prometheus): support withoutTargetInfo option [#5962](https://github.com/open-telemetry/opentelemetry-js/pull/5962) @cjihrig
 * feat(opentelemetry-configuration): parse trace provider from config file [#5992](https://github.com/open-telemetry/opentelemetry-js/pull/5992) @maryliag
 * feat(opentelemetry-configuration): parse logger provider from config file [#5995](https://github.com/open-telemetry/opentelemetry-js/pull/5995) @maryliag
+* feat(opentelemetry-configuration): parse meter provider from config file [#6000](https://github.com/open-telemetry/opentelemetry-js/pull/6000) @maryliag
 * feat(opentelemetry-configuration): parse config file with format 1.0-rc.2 [#6029](https://github.com/open-telemetry/opentelemetry-js/pull/6029) @maryliag
 
 ### :bug: Bug Fixes
