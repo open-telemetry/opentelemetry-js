@@ -95,6 +95,7 @@ describe('config utils', function () {
     assert.deepStrictEqual(getNumberListFromConfigFile(null), undefined);
     assert.deepStrictEqual(getNumberListFromConfigFile('  '), undefined);
     assert.deepStrictEqual(getNumberListFromConfigFile(' , '), []);
+    assert.deepStrictEqual(getNumberListFromConfigFile('0'), [0]);
     assert.deepStrictEqual(getNumberListFromConfigFile(5), [5]);
     assert.deepStrictEqual(getNumberListFromConfigFile('7'), [7]);
     assert.deepStrictEqual(

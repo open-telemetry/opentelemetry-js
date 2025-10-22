@@ -35,7 +35,7 @@ export function initializeDefaultLoggerProviderConfiguration(): LoggerProvider {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.protobuf,
+              encoding: OtlpHttpEncoding.Protobuf,
             },
           },
         },
