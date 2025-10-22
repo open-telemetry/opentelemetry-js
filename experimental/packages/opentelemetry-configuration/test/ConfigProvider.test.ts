@@ -19,6 +19,22 @@ import { Configuration } from '../src';
 import { DiagLogLevel } from '@opentelemetry/api';
 import { createConfigProvider } from '../src/ConfigProvider';
 import { OtlpHttpEncoding } from '../src/models/commonModel';
+import {
+  setAttributeLimits,
+  setLoggerProvider,
+  setPropagators,
+  setResources,
+  setTracerProvider,
+} from '../src/EnvironmentConfigProvider';
+import { ConfigurationModel } from '../src/models/configModel';
+import {
+  parseConfigFile,
+  setResourceAttributes,
+  setAttributeLimits as setFileAttributeLimits,
+  setPropagator,
+  setTracerProvider as setFileTracerProvider,
+  setLoggerProvider as setFileLoggerProvider,
+} from '../src/FileConfigProvider';
 
 const defaultConfig: Configuration = {
   disabled: false,
@@ -112,7 +128,7 @@ const defaultConfig: Configuration = {
 
 const configFromFile: Configuration = {
   disabled: false,
-  log_level: DiagLogLevel.DEBUG,
+  log_level: DiagLogLevel.INFO,
   node_resource_detectors: ['all'],
   resource: {
     schema_url: 'https://opentelemetry.io/schemas/1.16.0',
@@ -315,7 +331,7 @@ const configFromFile: Configuration = {
     processors: [
       {
         batch: {
-          schedule_delay: 1000,
+          schedule_delay: 5000,
           export_timeout: 30000,
           max_queue_size: 2048,
           max_export_batch_size: 512,
@@ -324,7 +340,67 @@ const configFromFile: Configuration = {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
               encoding: OtlpHttpEncoding.protobuf,
+              certificate_file: '/app/cert.pem',
+              client_key_file: '/app/cert.pem',
+              client_certificate_file: '/app/cert.pem',
+              headers: [{ name: 'api-key', value: '1234' }],
+              headers_list: 'api-key=1234',
+              compression: 'gzip',
             },
+          },
+        },
+      },
+      {
+        batch: {
+          schedule_delay: 1000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            otlp_grpc: {
+              endpoint: 'http://localhost:4317',
+              timeout: 10000,
+              certificate_file: '/app/cert.pem',
+              client_key_file: '/app/cert.pem',
+              client_certificate_file: '/app/cert.pem',
+              headers: [{ name: 'api-key', value: '1234' }],
+              headers_list: 'api-key=1234',
+              compression: 'gzip',
+              insecure: false,
+            },
+          },
+        },
+      },
+      {
+        batch: {
+          schedule_delay: 1000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            'otlp_file/development': {
+              output_stream: 'file:///var/log/logs.jsonl',
+            },
+          },
+        },
+      },
+      {
+        batch: {
+          schedule_delay: 1000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            'otlp_file/development': {
+              output_stream: 'stdout',
+            },
+          },
+        },
+      },
+      {
+        simple: {
+          exporter: {
+            console: {},
           },
         },
       },
@@ -332,6 +408,19 @@ const configFromFile: Configuration = {
     limits: {
       attribute_count_limit: 128,
       attribute_value_length_limit: 4096,
+    },
+    'logger_configurator/development': {
+      default_config: {
+        disabled: true,
+      },
+      loggers: [
+        {
+          name: 'io.opentelemetry.contrib.*',
+          config: {
+            disabled: false,
+          },
+        },
+      ],
     },
   },
 };
@@ -424,6 +513,7 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
               encoding: OtlpHttpEncoding.protobuf,
+              compression: 'gzip',
             },
           },
         },
@@ -746,6 +836,55 @@ describe('ConfigProvider', function () {
         expectedConfig
       );
     });
+
+    it('checks to keep good code coverage', function () {
+      let config: ConfigurationModel = {};
+      setResources(config);
+      assert.deepStrictEqual(config, { resource: {} });
+
+      config = {};
+      process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '5';
+      setAttributeLimits(config);
+      assert.deepStrictEqual(config, {
+        attribute_limits: {
+          attribute_count_limit: 128,
+          attribute_value_length_limit: 5,
+        },
+      });
+
+      config = {};
+      delete process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+      process.env.OTEL_ATTRIBUTE_COUNT_LIMIT = '7';
+      setAttributeLimits(config);
+      assert.deepStrictEqual(config, {
+        attribute_limits: {
+          attribute_count_limit: 7,
+        },
+      });
+
+      config = {};
+      setPropagators(config);
+      assert.deepStrictEqual(config, { propagator: {} });
+
+      config = {};
+      setTracerProvider(config);
+      assert.deepStrictEqual(config, {
+        tracer_provider: { limits: {}, processors: [] },
+      });
+
+      config = {};
+      process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = '3';
+      setLoggerProvider(config);
+      assert.deepStrictEqual(config, {
+        logger_provider: {
+          limits: {
+            attribute_count_limit: 128,
+            attribute_value_length_limit: 3,
+          },
+          processors: [],
+        },
+      });
+    });
   });
 
   describe('get values from config file', function () {
@@ -849,7 +988,8 @@ describe('ConfigProvider', function () {
       process.env.OTEL_BLRP_EXPORT_TIMEOUT = '24';
       process.env.OTEL_BLRP_MAX_QUEUE_SIZE = '25';
       process.env.OTEL_BLRP_MAX_EXPORT_BATCH_SIZE = '26';
-      process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'logs-endpoint';
+      process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT =
+        'http://test.com:4318/v1/logs';
       process.env.OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE = 'logs-certificate';
       process.env.OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY = 'logs-client-key';
       process.env.OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE =
@@ -923,6 +1063,28 @@ describe('ConfigProvider', function () {
             attribute_value_length_limit: 28,
             attribute_count_limit: 29,
           },
+          processors: [
+            {
+              batch: {
+                export_timeout: 24,
+                max_export_batch_size: 26,
+                max_queue_size: 25,
+                schedule_delay: 23,
+                exporter: {
+                  otlp_http: {
+                    certificate_file: 'logs-certificate',
+                    client_certificate_file: 'logs-client-certificate',
+                    client_key_file: 'logs-client-key',
+                    compression: 'logs-compression',
+                    encoding: OtlpHttpEncoding.protobuf,
+                    endpoint: 'http://test.com:4318/v1/logs',
+                    headers_list: 'logs-header',
+                    timeout: 27,
+                  },
+                },
+              },
+            },
+          ],
         },
       };
 
@@ -941,6 +1103,43 @@ describe('ConfigProvider', function () {
         configProvider.getInstrumentationConfig(),
         defaultConfigFromFileWithEnvVariables
       );
+    });
+
+    it('checks to keep good code coverage', function () {
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
+        'test/fixtures/test-for-coverage.yaml';
+
+      let config = {};
+      parseConfigFile(config);
+      assert.deepStrictEqual(config, { resource: {} });
+
+      config = {};
+      setResourceAttributes(config, []);
+      assert.deepStrictEqual(config, { resource: { attributes: [] } });
+
+      config = {};
+      setFileAttributeLimits(config, { attribute_count_limit: 128 });
+      assert.deepStrictEqual(config, {
+        attribute_limits: { attribute_count_limit: 128 },
+      });
+
+      config = {};
+      setPropagator(config, { composite: [{ tracecontext: null }] });
+      assert.deepStrictEqual(config, {
+        propagator: { composite: [{ tracecontext: null }] },
+      });
+
+      config = {};
+      setFileTracerProvider(config, { processors: [] });
+      assert.deepStrictEqual(config, {
+        tracer_provider: { processors: [] },
+      });
+
+      config = {};
+      setFileLoggerProvider(config, { processors: [] });
+      assert.deepStrictEqual(config, {
+        logger_provider: { processors: [] },
+      });
     });
   });
 });
