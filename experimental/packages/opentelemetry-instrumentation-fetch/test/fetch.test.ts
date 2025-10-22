@@ -369,6 +369,9 @@ describe('fetch', () => {
           msw.http.get('/boom', () => {
             return new msw.HttpResponse(null, { status: 500 });
           }),
+          msw.http.get('/null-body', () => {
+            return new msw.HttpResponse(null, { status: 204 });
+          }),
         ],
         callback = () => fetch('/api/status.json'),
         config = {},
@@ -390,6 +393,20 @@ describe('fetch', () => {
 
         return { rootSpan, response };
       };
+
+      describe('null-bodied response', () => {
+        // https://chromium.googlesource.com/chromium/src/+/ac85ca2a9cb8c76a37f9d7a6c611c24114f1f05d/third_party/WebKit/Source/core/fetch/Response.cpp#106
+        let response: Response | undefined;
+        beforeEach(async () => {
+          const result = await tracedFetch({
+            callback: () => fetch('/null-body'),
+          });
+          response = result.response;
+        });
+        it('should be handled correctly', async () => {
+          assert.strictEqual(response?.status, 204);
+        });
+      });
 
       describe('simple request', () => {
         let rootSpan: api.Span | undefined;
