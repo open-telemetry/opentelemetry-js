@@ -50,7 +50,10 @@ export function safeExecuteInTheMiddle<T>(
  */
 export async function safeExecuteInTheMiddleAsync<T>(
   execute: () => T,
-  onFinish: (e: Error | undefined, result: T | undefined) => void,
+  onFinish: (
+    e: Error | undefined,
+    result: T | undefined
+  ) => Promise<void> | void,
   preventThrowingError?: boolean
 ): Promise<T> {
   let error: Error | undefined;
@@ -60,7 +63,7 @@ export async function safeExecuteInTheMiddleAsync<T>(
   } catch (e) {
     error = e;
   } finally {
-    onFinish(error, result);
+    await onFinish(error, result);
     if (error && !preventThrowingError) {
       // eslint-disable-next-line no-unsafe-finally
       throw error;
