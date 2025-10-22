@@ -89,14 +89,15 @@ describe('safeExecuteInTheMiddle', function () {
 });
 
 describe('safeExecuteInTheMiddleAsync', function () {
-  it('should not throw error', function () {
+  it('should not throw error', function (done) {
     safeExecuteInTheMiddleAsync(
       async () => {
-        await setTimeout(() => {}, 1);
+        await new Promise(res => setTimeout(res, 1));
         return 'foo';
       },
       err => {
         assert.deepStrictEqual(err, undefined);
+        done();
       },
       true
     );
@@ -106,7 +107,7 @@ describe('safeExecuteInTheMiddleAsync', function () {
     try {
       await safeExecuteInTheMiddleAsync(
         async () => {
-          await setTimeout(() => {}, 1);
+          await new Promise(res => setTimeout(res, 1));
           throw error;
         },
         err => {
@@ -120,7 +121,7 @@ describe('safeExecuteInTheMiddleAsync', function () {
   it('should return result', async function () {
     const result = await safeExecuteInTheMiddleAsync(
       async () => {
-        await setTimeout(() => {}, 1);
+        await new Promise(res => setTimeout(res, 1));
         return 1;
       },
       (err, result) => {
@@ -129,5 +130,18 @@ describe('safeExecuteInTheMiddleAsync', function () {
       }
     );
     assert.deepStrictEqual(result, 1);
+  });
+  it('should wait for the error', async function () {
+    const result = await Promise.race([
+      safeExecuteInTheMiddleAsync(
+        () => 1,
+        async () => {
+          await new Promise(res => setTimeout(res, 100));
+        }
+      ),
+      new Promise(res => setTimeout(() => res('waited'), 10)),
+    ]);
+
+    assert.deepStrictEqual(result, 'waited');
   });
 });
