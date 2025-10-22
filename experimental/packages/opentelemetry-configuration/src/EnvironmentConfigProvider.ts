@@ -494,5 +494,3 @@ export function setLoggerProvider(config: ConfigurationModel): void {
     config.logger_provider.processors[0].batch = batch;
   }
 }
-
-// delete process.env.OTEL_EXPORTER_OTLP_CERTIFICATE;
