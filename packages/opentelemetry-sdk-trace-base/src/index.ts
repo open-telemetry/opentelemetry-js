@@ -16,6 +16,7 @@
 
 export { BasicTracerProvider } from './BasicTracerProvider';
 export { BatchSpanProcessor, RandomIdGenerator } from './platform';
+export { MultiSpanProcessor } from './MultiSpanProcessor'
 export { ConsoleSpanExporter } from './export/ConsoleSpanExporter';
 export { InMemorySpanExporter } from './export/InMemorySpanExporter';
 export type { ReadableSpan } from './export/ReadableSpan';
