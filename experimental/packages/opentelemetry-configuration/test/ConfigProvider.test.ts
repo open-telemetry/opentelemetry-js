@@ -1071,7 +1071,7 @@ describe('ConfigProvider', function () {
                   otlp_http: {
                     endpoint: 'http://backup.com:4318/v1/traces',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.protobuf,
+                    encoding: OtlpHttpEncoding.Protobuf,
                     certificate_file: 'backup_certificate_file.pem',
                     client_certificate_file: 'backup_client_certificate.pem',
                     client_key_file: 'backup_client_key.pem',
@@ -1094,8 +1094,10 @@ describe('ConfigProvider', function () {
                   otlp_http: {
                     endpoint: 'http://backup.com:4318/v1/metrics',
                     timeout: 10000,
-                    temporality_preference: 'cumulative',
-                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                    temporality_preference:
+                      ExporterTemporalityPreference.Cumulative,
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
                     certificate_file: 'backup_certificate_file.pem',
                     client_certificate_file: 'backup_client_certificate.pem',
                     client_key_file: 'backup_client_key.pem',
@@ -1118,7 +1120,7 @@ describe('ConfigProvider', function () {
                   otlp_http: {
                     endpoint: 'http://backup.com:4318/v1/logs',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.protobuf,
+                    encoding: OtlpHttpEncoding.Protobuf,
                     certificate_file: 'backup_certificate_file.pem',
                     client_certificate_file: 'backup_client_certificate.pem',
                     client_key_file: 'backup_client_key.pem',
