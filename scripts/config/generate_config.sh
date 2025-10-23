@@ -25,15 +25,3 @@ git fetch origin "${CONFIG_VERSION}" --depth=1
 git reset --hard FETCH_HEAD
 cd ${SCRIPT_DIR}
 
-# Create output directory if it doesn't exist
-mkdir -p ${ROOT_DIR}/experimental/packages/opentelemetry-configuration/src/generated
-
-# Generate TypeScript types using quicktype
-npx quicktype \
-  -s schema \
-  ${SCRIPT_DIR}/opentelemetry-configuration/schema/opentelemetry_configuration.json \
-  -o ${ROOT_DIR}/experimental/packages/opentelemetry-configuration/src/generated/opentelemetry_configuration.ts
-
-# Ensure config compiles
-cd "${ROOT_DIR}/experimental/packages/opentelemetry-configuration"
-npm run compile

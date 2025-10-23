@@ -17,12 +17,3 @@
 export { EnvironmentConfigProvider } from './EnvironmentConfigProvider';
 export type { ConfigProvider } from './IConfigProvider';
 export type { ConfigurationModel as Configuration } from './models/configModel';
-
-export type {
-  OpentelemetryConfiguration,
-  AttributeLimits,
-  PropagatorObject,
-  TracerProviderClass,
-  MeterProviderClass,
-  LoggerProviderClass,
-} from './generated/opentelemetry_configuration';
