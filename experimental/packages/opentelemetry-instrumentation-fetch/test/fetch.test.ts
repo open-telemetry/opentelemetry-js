@@ -403,8 +403,8 @@ describe('fetch', () => {
           });
           response = result.response;
         });
-        it('should be handled correctly', async () => {
-          assert.strictEqual(response?.status, 204);
+        it('204 (No Content) will correctly end the span', async () => {
+          assert.strictEqual(exportedSpans.length, 1);
         });
       });
 
