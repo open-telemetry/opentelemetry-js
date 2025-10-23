@@ -10,7 +10,7 @@ This directory contains scripts for generating TypeScript types from the OpenTel
 
 2. **`generate_config.sh`** - Bash script that:
    - Clones the [opentelemetry-configuration](https://github.com/open-telemetry/opentelemetry-configuration) repository
-   - Uses [quicktype](https://github.com/glideapps/quicktype) to generate TypeScript types from the JSON schema
+   - Uses [json-schema-to-typescript](https://www.npmjs.com/package/json-schema-to-typescript) to generate TypeScript types from the JSON schema
    - Outputs generated types to `experimental/packages/opentelemetry-configuration/src/generated/`
 
 ## Usage
