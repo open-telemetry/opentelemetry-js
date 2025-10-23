@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1761167811833,
+  "lastUpdate": 1761225967401,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -42072,6 +42072,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.59%",
             "unit": "ops/sec",
             "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0fa225fdc89905515f66b0a8982aea37e0106967",
+          "message": "chore(renovate): enable pinDigests for github actions (#6040)",
+          "timestamp": "2025-10-23T13:12:59Z",
+          "tree_id": "f417019a816509f770029fc4ecd5558df90dff58",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/0fa225fdc89905515f66b0a8982aea37e0106967"
+        },
+        "date": 1761225966327,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 669471,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8442,
+            "range": "±0.74%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 294400,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 278280,
+            "range": "±0.67%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
