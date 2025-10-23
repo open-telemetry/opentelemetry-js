@@ -23,7 +23,7 @@ export interface IncludeExclude {
    *   * If the value of the attribute key matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
    * If omitted, all attributes are included.
    */
-  include: string[];
+  included?: string[];
 
   /**
    * Configure list of attribute key patterns to exclude from resource detectors. Applies after .resource.detectors.attributes.included (i.e. excluded has higher priority than included).
@@ -32,7 +32,7 @@ export interface IncludeExclude {
    *   * If the value of the attribute key matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
    * If omitted, .included attributes are included.
    */
-  exclude: string[];
+  excluded?: string[];
 }
 
 export interface NameStringValuePair {
@@ -106,8 +106,8 @@ export interface OtlpHttpExporter {
 }
 
 export enum OtlpHttpEncoding {
-  protobuf,
-  json,
+  JSON = 'json',
+  Protobuf = 'protobuf',
 }
 
 export interface OtlpGrpcExporter {
