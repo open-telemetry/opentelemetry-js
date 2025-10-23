@@ -16,7 +16,7 @@
 
 export { EnvironmentConfigProvider } from './EnvironmentConfigProvider';
 export type { ConfigProvider } from './IConfigProvider';
-export type { ConfigurationModel as Configuration } from './configModel';
+export type { ConfigurationModel as Configuration } from './models/configModel';
 
 export type {
   OpentelemetryConfiguration,

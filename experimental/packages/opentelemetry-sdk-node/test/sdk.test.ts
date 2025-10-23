@@ -29,7 +29,6 @@ import {
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
-import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 import {
   AggregationTemporality,
   ConsoleMetricExporter,
@@ -1710,67 +1709,6 @@ describe('Node SDK', () => {
       assert.ok(
         listOfProcessors[1]['_exporter'] instanceof OTLPGrpcTraceExporter
       );
-
-      delete env.OTEL_TRACES_EXPORTER;
-      delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
-      await sdk.shutdown();
-    });
-
-    it('should be able to setup jaeger exporter', async () => {
-      env.OTEL_TRACES_EXPORTER = 'jaeger';
-      env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
-      const sdk = new NodeSDK();
-      sdk.start();
-
-      const listOfProcessors = getSdkSpanProcessors(sdk);
-
-      assert.ok(listOfProcessors.length === 1);
-      assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
-      assert.ok(listOfProcessors[0]['_exporter'] instanceof JaegerExporter);
-
-      delete env.OTEL_TRACES_EXPORTER;
-      delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
-      await sdk.shutdown();
-    });
-
-    it('should be able to setup jaeger and otlp exporters', async () => {
-      env.OTEL_TRACES_EXPORTER = 'otlp, jaeger';
-      env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
-      const sdk = new NodeSDK();
-      sdk.start();
-
-      const listOfProcessors = getSdkSpanProcessors(sdk);
-
-      assert.ok(listOfProcessors.length === 2);
-      assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
-      assert.ok(
-        listOfProcessors[0]['_exporter'] instanceof OTLPGrpcTraceExporter
-      );
-      assert.ok(listOfProcessors[1] instanceof BatchSpanProcessor);
-      assert.ok(listOfProcessors[1]['_exporter'] instanceof JaegerExporter);
-
-      delete env.OTEL_TRACES_EXPORTER;
-      delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
-      await sdk.shutdown();
-    });
-
-    it('should be able to setup zipkin, jaeger and otlp exporters', async () => {
-      env.OTEL_TRACES_EXPORTER = 'zipkin, otlp, jaeger';
-      env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
-      const sdk = new NodeSDK();
-      sdk.start();
-
-      const listOfProcessors = getSdkSpanProcessors(sdk);
-
-      assert.ok(listOfProcessors.length === 3);
-      assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
-      assert.ok(listOfProcessors[0]['_exporter'] instanceof ZipkinExporter);
-      assert.ok(listOfProcessors[1] instanceof BatchSpanProcessor);
-      assert.ok(
-        listOfProcessors[1]['_exporter'] instanceof OTLPGrpcTraceExporter
-      );
-      assert.ok(listOfProcessors[2] instanceof BatchSpanProcessor);
-      assert.ok(listOfProcessors[2]['_exporter'] instanceof JaegerExporter);
 
       delete env.OTEL_TRACES_EXPORTER;
       delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
