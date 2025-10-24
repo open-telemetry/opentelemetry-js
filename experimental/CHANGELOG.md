@@ -7,6 +7,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ## Unreleased
 
 * feat(opentelemetry-configuration): set attributes from attribute list from env variables [#6043](https://github.com/open-telemetry/opentelemetry-js/pull/6043) @maryliag
+* feat(opentelemetry-sdk-node): use declarative config for resource attributes [#6044](https://github.com/open-telemetry/opentelemetry-js/pull/6044) @maryliag
 
 ### :boom: Breaking Changes
 
