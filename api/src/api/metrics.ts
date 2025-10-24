@@ -16,13 +16,13 @@
 
 import { Meter, MeterOptions } from '../metrics/Meter';
 import { MeterProvider } from '../metrics/MeterProvider';
-import { NOOP_METER_PROVIDER } from '../metrics/NoopMeterProvider';
 import {
   getGlobal,
   registerGlobal,
   unregisterGlobal,
 } from '../internal/global-utils';
 import { DiagAPI } from './diag';
+import { ProxyMeterProvider } from '../metrics/ProxyMeterProvider';
 
 const API_NAME = 'metrics';
 
@@ -31,6 +31,8 @@ const API_NAME = 'metrics';
  */
 export class MetricsAPI {
   private static _instance?: MetricsAPI;
+
+  private _proxyMeterProvider = new ProxyMeterProvider();
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
@@ -49,14 +51,22 @@ export class MetricsAPI {
    * Returns true if the meter provider was successfully registered, else false.
    */
   public setGlobalMeterProvider(provider: MeterProvider): boolean {
-    return registerGlobal(API_NAME, provider, DiagAPI.instance());
+    const success = registerGlobal(
+      API_NAME,
+      this._proxyMeterProvider,
+      DiagAPI.instance()
+    );
+    if (success) {
+      this._proxyMeterProvider.setDelegate(provider);
+    }
+    return success;
   }
 
   /**
    * Returns the global meter provider.
    */
   public getMeterProvider(): MeterProvider {
-    return getGlobal(API_NAME) || NOOP_METER_PROVIDER;
+    return getGlobal(API_NAME) || this._proxyMeterProvider;
   }
 
   /**
@@ -73,5 +83,6 @@ export class MetricsAPI {
   /** Remove the global meter provider */
   public disable(): void {
     unregisterGlobal(API_NAME, DiagAPI.instance());
+    this._proxyMeterProvider = new ProxyMeterProvider();
   }
 }
