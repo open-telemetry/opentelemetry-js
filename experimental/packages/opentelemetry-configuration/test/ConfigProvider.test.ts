@@ -1297,7 +1297,7 @@ describe('ConfigProvider', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
         'test/fixtures/short-config.yml';
       const configProvider = createConfigProvider();
-       const expectedConfig: Configuration = {
+      const expectedConfig: Configuration = {
         ...defaultConfig,
         resource: {
           attributes_list: 'service.instance.id=123',
