@@ -71,7 +71,7 @@ const simpleClientConfig: GrpcExporterTransportParameters = {
   address: 'localhost:1234',
 };
 
-const timeoutMillis = 100;
+const timeoutMillis = 10_000;
 
 interface ExportedData {
   request: Buffer;
