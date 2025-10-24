@@ -19,6 +19,31 @@ import { Configuration } from '../src';
 import { DiagLogLevel } from '@opentelemetry/api';
 import { createConfigProvider } from '../src/ConfigProvider';
 import { OtlpHttpEncoding } from '../src/models/commonModel';
+import {
+  ExemplarFilter,
+  ExporterDefaultHistogramAggregation,
+  ExporterTemporalityPreference,
+  InstrumentType,
+} from '../src/models/meterProviderModel';
+import {
+  setAttributeLimits,
+  setLoggerProvider,
+  setMeterProvider,
+  setPropagators,
+  setResources,
+  setTracerProvider,
+} from '../src/EnvironmentConfigProvider';
+import { ConfigurationModel } from '../src/models/configModel';
+import {
+  parseConfigFile,
+  setResourceAttributes,
+  setAttributeLimits as setFileAttributeLimits,
+  setPropagator,
+  setTracerProvider as setFileTracerProvider,
+  setLoggerProvider as setFileLoggerProvider,
+  setMeterProvider as setFileMeterProvider,
+  getTemporalityPreference,
+} from '../src/FileConfigProvider';
 
 const defaultConfig: Configuration = {
   disabled: false,
@@ -44,7 +69,7 @@ const defaultConfig: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/traces',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.protobuf,
+              encoding: OtlpHttpEncoding.Protobuf,
             },
           },
         },
@@ -77,14 +102,15 @@ const defaultConfig: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/metrics',
               timeout: 10000,
-              temporality_preference: 'cumulative',
-              default_histogram_aggregation: 'explicit_bucket_histogram',
+              temporality_preference: ExporterTemporalityPreference.Cumulative,
+              default_histogram_aggregation:
+                ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
             },
           },
         },
       },
     ],
-    exemplar_filter: 'trace_based',
+    exemplar_filter: ExemplarFilter.TraceBased,
   },
   logger_provider: {
     processors: [
@@ -98,7 +124,7 @@ const defaultConfig: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.protobuf,
+              encoding: OtlpHttpEncoding.Protobuf,
             },
           },
         },
@@ -199,7 +225,7 @@ const configFromFile: Configuration = {
               headers: [{ name: 'api-key', value: '1234' }],
               headers_list: 'api-key=1234',
               compression: 'gzip',
-              encoding: OtlpHttpEncoding.protobuf,
+              encoding: OtlpHttpEncoding.Protobuf,
             },
           },
         },
@@ -268,7 +294,7 @@ const configFromFile: Configuration = {
       {
         simple: {
           exporter: {
-            console: {},
+            console: undefined,
           },
         },
       },
@@ -295,27 +321,219 @@ const configFromFile: Configuration = {
   meter_provider: {
     readers: [
       {
+        pull: {
+          exporter: {
+            'prometheus/development': {
+              host: 'localhost',
+              port: 9464,
+              without_scope_info: false,
+              with_resource_constant_labels: {
+                included: ['service*'],
+                excluded: ['service.attr1'],
+              },
+            },
+          },
+          producers: [
+            {
+              opencensus: undefined,
+            },
+          ],
+          cardinality_limits: {
+            default: 2000,
+            counter: 2000,
+            gauge: 2000,
+            histogram: 2000,
+            observable_counter: 2000,
+            observable_gauge: 2000,
+            observable_up_down_counter: 2000,
+            up_down_counter: 2000,
+          },
+        },
+      },
+      {
         periodic: {
           interval: 60000,
           timeout: 30000,
           exporter: {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/metrics',
+              certificate_file: '/app/cert.pem',
+              client_key_file: '/app/cert.pem',
+              client_certificate_file: '/app/cert.pem',
+              headers: [
+                {
+                  name: 'api-key',
+                  value: '1234',
+                },
+              ],
+              headers_list: 'api-key=1234',
+              compression: 'gzip',
               timeout: 10000,
-              temporality_preference: 'cumulative',
-              default_histogram_aggregation: 'explicit_bucket_histogram',
+              encoding: OtlpHttpEncoding.Protobuf,
+              temporality_preference: ExporterTemporalityPreference.Delta,
+              default_histogram_aggregation:
+                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
             },
+          },
+          producers: [
+            {
+              prometheus: undefined,
+            },
+          ],
+          cardinality_limits: {
+            default: 2000,
+            counter: 2000,
+            gauge: 2000,
+            histogram: 2000,
+            observable_counter: 2000,
+            observable_gauge: 2000,
+            observable_up_down_counter: 2000,
+            up_down_counter: 2000,
+          },
+        },
+      },
+      {
+        periodic: {
+          interval: 60000,
+          timeout: 30000,
+          exporter: {
+            otlp_grpc: {
+              endpoint: 'http://localhost:4317',
+              certificate_file: '/app/cert.pem',
+              client_key_file: '/app/cert.pem',
+              client_certificate_file: '/app/cert.pem',
+              headers: [
+                {
+                  name: 'api-key',
+                  value: '1234',
+                },
+              ],
+              headers_list: 'api-key=1234',
+              compression: 'gzip',
+              timeout: 10000,
+              insecure: false,
+              temporality_preference: ExporterTemporalityPreference.Delta,
+              default_histogram_aggregation:
+                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+            },
+          },
+          cardinality_limits: {
+            default: 2000,
+            counter: 2000,
+            gauge: 2000,
+            histogram: 2000,
+            observable_counter: 2000,
+            observable_gauge: 2000,
+            observable_up_down_counter: 2000,
+            up_down_counter: 2000,
+          },
+        },
+      },
+      {
+        periodic: {
+          timeout: 30000,
+          interval: 60000,
+          exporter: {
+            'otlp_file/development': {
+              output_stream: 'file:///var/log/metrics.jsonl',
+              temporality_preference: ExporterTemporalityPreference.Delta,
+              default_histogram_aggregation:
+                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+            },
+          },
+          cardinality_limits: {
+            default: 2000,
+            counter: 2000,
+            gauge: 2000,
+            histogram: 2000,
+            observable_counter: 2000,
+            observable_gauge: 2000,
+            observable_up_down_counter: 2000,
+            up_down_counter: 2000,
+          },
+        },
+      },
+      {
+        periodic: {
+          timeout: 30000,
+          interval: 60000,
+          exporter: {
+            'otlp_file/development': {
+              output_stream: 'stdout',
+              temporality_preference: ExporterTemporalityPreference.Delta,
+              default_histogram_aggregation:
+                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+            },
+          },
+          cardinality_limits: {
+            default: 2000,
+            counter: 2000,
+            gauge: 2000,
+            histogram: 2000,
+            observable_counter: 2000,
+            observable_gauge: 2000,
+            observable_up_down_counter: 2000,
+            up_down_counter: 2000,
+          },
+        },
+      },
+      {
+        periodic: {
+          timeout: 30000,
+          interval: 60000,
+          exporter: {
+            console: undefined,
+          },
+          cardinality_limits: {
+            default: 2000,
+            counter: 2000,
+            gauge: 2000,
+            histogram: 2000,
+            observable_counter: 2000,
+            observable_gauge: 2000,
+            observable_up_down_counter: 2000,
+            up_down_counter: 2000,
           },
         },
       },
     ],
-    exemplar_filter: 'trace_based',
+    exemplar_filter: ExemplarFilter.TraceBased,
+    views: [
+      {
+        selector: {
+          instrument_name: 'my-instrument',
+          instrument_type: InstrumentType.Histogram,
+          unit: 'ms',
+          meter_name: 'my-meter',
+          meter_version: '1.0.0',
+          meter_schema_url: 'https://opentelemetry.io/schemas/1.16.0',
+        },
+        stream: {
+          name: 'new_instrument_name',
+          description: 'new_description',
+          aggregation: {
+            explicit_bucket_histogram: {
+              boundaries: [
+                0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000,
+                7500, 10000,
+              ],
+              record_min_max: true,
+            },
+          },
+          aggregation_cardinality_limit: 2000,
+          attribute_keys: {
+            included: ['key1', 'key2'],
+            excluded: ['key3'],
+          },
+        },
+      },
+    ],
   },
   logger_provider: {
     processors: [
       {
         batch: {
-          schedule_delay: 1000,
+          schedule_delay: 5000,
           export_timeout: 30000,
           max_queue_size: 2048,
           max_export_batch_size: 512,
@@ -323,8 +541,68 @@ const configFromFile: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.protobuf,
+              encoding: OtlpHttpEncoding.Protobuf,
+              certificate_file: '/app/cert.pem',
+              client_key_file: '/app/cert.pem',
+              client_certificate_file: '/app/cert.pem',
+              headers: [{ name: 'api-key', value: '1234' }],
+              headers_list: 'api-key=1234',
+              compression: 'gzip',
             },
+          },
+        },
+      },
+      {
+        batch: {
+          schedule_delay: 1000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            otlp_grpc: {
+              endpoint: 'http://localhost:4317',
+              timeout: 10000,
+              certificate_file: '/app/cert.pem',
+              client_key_file: '/app/cert.pem',
+              client_certificate_file: '/app/cert.pem',
+              headers: [{ name: 'api-key', value: '1234' }],
+              headers_list: 'api-key=1234',
+              compression: 'gzip',
+              insecure: false,
+            },
+          },
+        },
+      },
+      {
+        batch: {
+          schedule_delay: 1000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            'otlp_file/development': {
+              output_stream: 'file:///var/log/logs.jsonl',
+            },
+          },
+        },
+      },
+      {
+        batch: {
+          schedule_delay: 1000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            'otlp_file/development': {
+              output_stream: 'stdout',
+            },
+          },
+        },
+      },
+      {
+        simple: {
+          exporter: {
+            console: undefined,
           },
         },
       },
@@ -332,6 +610,19 @@ const configFromFile: Configuration = {
     limits: {
       attribute_count_limit: 128,
       attribute_value_length_limit: 4096,
+    },
+    'logger_configurator/development': {
+      default_config: {
+        disabled: true,
+      },
+      loggers: [
+        {
+          name: 'io.opentelemetry.contrib.*',
+          config: {
+            disabled: false,
+          },
+        },
+      ],
     },
   },
 };
@@ -368,7 +659,7 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/traces',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.protobuf,
+              encoding: OtlpHttpEncoding.Protobuf,
               compression: 'gzip',
             },
           },
@@ -401,15 +692,28 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
           exporter: {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/metrics',
+              encoding: OtlpHttpEncoding.Protobuf,
+              compression: 'gzip',
               timeout: 10000,
-              temporality_preference: 'cumulative',
-              default_histogram_aggregation: 'explicit_bucket_histogram',
+              temporality_preference: ExporterTemporalityPreference.Cumulative,
+              default_histogram_aggregation:
+                ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
             },
+          },
+          cardinality_limits: {
+            default: 2000,
+            counter: 2000,
+            gauge: 2000,
+            histogram: 2000,
+            observable_counter: 2000,
+            observable_gauge: 2000,
+            observable_up_down_counter: 2000,
+            up_down_counter: 2000,
           },
         },
       },
     ],
-    exemplar_filter: 'trace_based',
+    exemplar_filter: ExemplarFilter.TraceBased,
   },
   logger_provider: {
     processors: [
@@ -423,7 +727,8 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.protobuf,
+              encoding: OtlpHttpEncoding.Protobuf,
+              compression: 'gzip',
             },
           },
         },
@@ -616,7 +921,7 @@ describe('ConfigProvider', function () {
                     compression: 'gzip',
                     timeout: 2000,
                     headers_list: 'host=localhost',
-                    encoding: OtlpHttpEncoding.protobuf,
+                    encoding: OtlpHttpEncoding.Protobuf,
                   },
                 },
               },
@@ -675,15 +980,15 @@ describe('ConfigProvider', function () {
                     compression: 'gzip',
                     timeout: 300,
                     headers_list: 'host=localhost',
-                    temporality_preference: 'delta',
+                    temporality_preference: ExporterTemporalityPreference.Delta,
                     default_histogram_aggregation:
-                      'base2_exponential_bucket_histogram',
+                      ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
                   },
                 },
               },
             },
           ],
-          exemplar_filter: 'always_on',
+          exemplar_filter: ExemplarFilter.AlwaysOn,
         },
       };
       const configProvider = createConfigProvider();
@@ -732,7 +1037,7 @@ describe('ConfigProvider', function () {
                     compression: 'gzip',
                     timeout: 700,
                     headers_list: 'host=localhost',
-                    encoding: OtlpHttpEncoding.protobuf,
+                    encoding: OtlpHttpEncoding.Protobuf,
                   },
                 },
               },
@@ -745,6 +1050,191 @@ describe('ConfigProvider', function () {
         configProvider.getInstrumentationConfig(),
         expectedConfig
       );
+    });
+
+    it('checks to keep good code coverage', function () {
+      let config: ConfigurationModel = {};
+      setResources(config);
+      assert.deepStrictEqual(config, { resource: {} });
+
+      config = {};
+      process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '5';
+      setAttributeLimits(config);
+      assert.deepStrictEqual(config, {
+        attribute_limits: {
+          attribute_count_limit: 128,
+          attribute_value_length_limit: 5,
+        },
+      });
+
+      config = {};
+      delete process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+      process.env.OTEL_ATTRIBUTE_COUNT_LIMIT = '7';
+      setAttributeLimits(config);
+      assert.deepStrictEqual(config, {
+        attribute_limits: {
+          attribute_count_limit: 7,
+        },
+      });
+
+      config = {};
+      setPropagators(config);
+      assert.deepStrictEqual(config, { propagator: {} });
+
+      config = {};
+      setTracerProvider(config);
+      assert.deepStrictEqual(config, {
+        tracer_provider: { limits: {}, processors: [] },
+      });
+
+      config = {};
+      process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = '3';
+      setLoggerProvider(config);
+      assert.deepStrictEqual(config, {
+        logger_provider: {
+          limits: {
+            attribute_count_limit: 128,
+            attribute_value_length_limit: 3,
+          },
+          processors: [],
+        },
+      });
+
+      config = {
+        meter_provider: {
+          readers: [{ periodic: { exporter: { otlp_http: undefined } } }],
+        },
+      };
+      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE =
+        'cumulative';
+      setMeterProvider(config);
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                exporter: {
+                  otlp_http: { temporality_preference: 'cumulative' },
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE =
+        'low_memory';
+      setMeterProvider(config);
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                exporter: {
+                  otlp_http: { temporality_preference: 'low_memory' },
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'default';
+      setMeterProvider(config);
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                exporter: {
+                  otlp_http: { temporality_preference: 'cumulative' },
+                },
+              },
+            },
+          ],
+        },
+      });
+      delete process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE;
+
+      config = {
+        meter_provider: {
+          readers: [{ periodic: { exporter: { otlp_http: undefined } } }],
+        },
+      };
+      process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
+        'explicit_bucket_histogram';
+      setMeterProvider(config);
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                exporter: {
+                  otlp_http: {
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                  },
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
+        'default';
+      setMeterProvider(config);
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                exporter: {
+                  otlp_http: {
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                  },
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      config = {};
+      setMeterProvider(config);
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [{}],
+        },
+      });
+
+      process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'trace_based';
+      setMeterProvider(config);
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [{}],
+          exemplar_filter: 'trace_based',
+        },
+      });
+
+      config = {};
+      process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'always_off';
+      setMeterProvider(config);
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [{}],
+          exemplar_filter: 'always_off',
+        },
+      });
+
+      config = {};
+      process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'default';
+      setMeterProvider(config);
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [{}],
+          exemplar_filter: 'trace_based',
+        },
+      });
     });
   });
 
@@ -832,7 +1322,8 @@ describe('ConfigProvider', function () {
       process.env.OTEL_LINK_ATTRIBUTE_COUNT_LIMIT = '19';
       process.env.OTEL_METRIC_EXPORT_INTERVAL = '20';
       process.env.OTEL_METRIC_EXPORT_TIMEOUT = '21';
-      process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'metric-endpoint';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT =
+        'http://test:4318/v1/metrics';
       process.env.OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE = 'metric-certificate';
       process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY = 'metric-client-key';
       process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE =
@@ -849,7 +1340,8 @@ describe('ConfigProvider', function () {
       process.env.OTEL_BLRP_EXPORT_TIMEOUT = '24';
       process.env.OTEL_BLRP_MAX_QUEUE_SIZE = '25';
       process.env.OTEL_BLRP_MAX_EXPORT_BATCH_SIZE = '26';
-      process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'logs-endpoint';
+      process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT =
+        'http://test.com:4318/v1/logs';
       process.env.OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE = 'logs-certificate';
       process.env.OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY = 'logs-client-key';
       process.env.OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE =
@@ -903,7 +1395,7 @@ describe('ConfigProvider', function () {
                     client_certificate_file: 'trace-client-certificate',
                     client_key_file: 'trace-client-key',
                     compression: 'trace-compression',
-                    encoding: OtlpHttpEncoding.protobuf,
+                    encoding: OtlpHttpEncoding.Protobuf,
                     endpoint: 'http://test.com:4318/v1/traces',
                     headers_list: 'trace-headers',
                     timeout: 1213,
@@ -914,8 +1406,41 @@ describe('ConfigProvider', function () {
           ],
         },
         meter_provider: {
-          ...defaultConfigFromFileWithEnvVariables.meter_provider,
-          exemplar_filter: 'always_off',
+          exemplar_filter: ExemplarFilter.AlwaysOff,
+          readers: [
+            {
+              periodic: {
+                interval: 20,
+                timeout: 21,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://test:4318/v1/metrics',
+                    timeout: 22,
+                    temporality_preference:
+                      ExporterTemporalityPreference.Cumulative,
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                    certificate_file: 'metric-certificate',
+                    client_certificate_file: 'metric-client-certificate',
+                    client_key_file: 'metric-client-key',
+                    compression: 'metric-compression',
+                    encoding: OtlpHttpEncoding.Protobuf,
+                    headers_list: 'metric-header',
+                  },
+                },
+                cardinality_limits: {
+                  default: 2000,
+                  counter: 2000,
+                  gauge: 2000,
+                  histogram: 2000,
+                  observable_counter: 2000,
+                  observable_gauge: 2000,
+                  observable_up_down_counter: 2000,
+                  up_down_counter: 2000,
+                },
+              },
+            },
+          ],
         },
         logger_provider: {
           ...defaultConfigFromFileWithEnvVariables.logger_provider,
@@ -923,6 +1448,28 @@ describe('ConfigProvider', function () {
             attribute_value_length_limit: 28,
             attribute_count_limit: 29,
           },
+          processors: [
+            {
+              batch: {
+                export_timeout: 24,
+                max_export_batch_size: 26,
+                max_queue_size: 25,
+                schedule_delay: 23,
+                exporter: {
+                  otlp_http: {
+                    certificate_file: 'logs-certificate',
+                    client_certificate_file: 'logs-client-certificate',
+                    client_key_file: 'logs-client-key',
+                    compression: 'logs-compression',
+                    encoding: OtlpHttpEncoding.Protobuf,
+                    endpoint: 'http://test.com:4318/v1/logs',
+                    headers_list: 'logs-header',
+                    timeout: 27,
+                  },
+                },
+              },
+            },
+          ],
         },
       };
 
@@ -941,6 +1488,149 @@ describe('ConfigProvider', function () {
         configProvider.getInstrumentationConfig(),
         defaultConfigFromFileWithEnvVariables
       );
+    });
+
+    it('checks to keep good code coverage', function () {
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
+        'test/fixtures/test-for-coverage.yaml';
+
+      let config = {};
+      parseConfigFile(config);
+      assert.deepStrictEqual(config, { resource: {} });
+
+      config = {};
+      setResourceAttributes(config, []);
+      assert.deepStrictEqual(config, { resource: { attributes: [] } });
+
+      config = {};
+      setFileAttributeLimits(config, { attribute_count_limit: 128 });
+      assert.deepStrictEqual(config, {
+        attribute_limits: { attribute_count_limit: 128 },
+      });
+
+      config = {};
+      setPropagator(config, { composite: [{ tracecontext: null }] });
+      assert.deepStrictEqual(config, {
+        propagator: { composite: [{ tracecontext: null }] },
+      });
+
+      config = {};
+      setFileTracerProvider(config, { processors: [] });
+      assert.deepStrictEqual(config, {
+        tracer_provider: { processors: [] },
+      });
+
+      config = {};
+      setFileLoggerProvider(config, { processors: [] });
+      assert.deepStrictEqual(config, {
+        logger_provider: { processors: [] },
+      });
+
+      const res = getTemporalityPreference(
+        ExporterTemporalityPreference.LowMemory
+      );
+      assert.deepStrictEqual(res, 'low_memory');
+
+      config = {};
+      setFileMeterProvider(config, { readers: [] });
+      assert.deepStrictEqual(config, {
+        meter_provider: { readers: [] },
+      });
+
+      config = {};
+      setFileMeterProvider(config, {
+        readers: [],
+        exemplar_filter: ExemplarFilter.AlwaysOn,
+      });
+      assert.deepStrictEqual(config, {
+        meter_provider: { readers: [], exemplar_filter: 'always_on' },
+      });
+
+      config = {};
+      setFileMeterProvider(config, {
+        readers: [],
+        views: [{ selector: { instrument_type: InstrumentType.Counter } }],
+      });
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [],
+          views: [{ selector: { instrument_type: 'counter' } }],
+        },
+      });
+
+      config = {};
+      setFileMeterProvider(config, {
+        readers: [],
+        views: [{ selector: { instrument_type: InstrumentType.Gauge } }],
+      });
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [],
+          views: [{ selector: { instrument_type: 'gauge' } }],
+        },
+      });
+
+      config = {};
+      setFileMeterProvider(config, {
+        readers: [],
+        views: [
+          { selector: { instrument_type: InstrumentType.ObservableCounter } },
+        ],
+      });
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [],
+          views: [{ selector: { instrument_type: 'observable_counter' } }],
+        },
+      });
+
+      config = {};
+      setFileMeterProvider(config, {
+        readers: [],
+        views: [
+          { selector: { instrument_type: InstrumentType.ObservableGauge } },
+        ],
+      });
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [],
+          views: [{ selector: { instrument_type: 'observable_gauge' } }],
+        },
+      });
+
+      config = {};
+      setFileMeterProvider(config, {
+        readers: [],
+        views: [
+          {
+            selector: {
+              instrument_type: InstrumentType.ObservableUpDownCounter,
+            },
+          },
+        ],
+      });
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [],
+          views: [
+            { selector: { instrument_type: 'observable_up_down_counter' } },
+          ],
+        },
+      });
+
+      config = {};
+      setFileMeterProvider(config, {
+        readers: [],
+        views: [
+          { selector: { instrument_type: InstrumentType.UpDownCounter } },
+        ],
+      });
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          readers: [],
+          views: [{ selector: { instrument_type: 'up_down_counter' } }],
+        },
+      });
     });
   });
 });

@@ -26,6 +26,11 @@ import {
   getNumberFromEnv,
 } from '@opentelemetry/core';
 import { ConfigProvider } from './IConfigProvider';
+import {
+  ExemplarFilter,
+  ExporterDefaultHistogramAggregation,
+  ExporterTemporalityPreference,
+} from './models/meterProviderModel';
 
 /**
  * EnvironmentConfigProvider provides a configuration based on environment variables.
@@ -62,7 +67,7 @@ export class EnvironmentConfigProvider implements ConfigProvider {
   }
 }
 
-function setResources(config: ConfigurationModel): void {
+export function setResources(config: ConfigurationModel): void {
   if (config.resource == null) {
     config.resource = {};
   }
@@ -84,7 +89,7 @@ function setResources(config: ConfigurationModel): void {
   }
 }
 
-function setAttributeLimits(config: ConfigurationModel): void {
+export function setAttributeLimits(config: ConfigurationModel): void {
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT'
   );
@@ -106,7 +111,7 @@ function setAttributeLimits(config: ConfigurationModel): void {
   }
 }
 
-function setPropagators(config: ConfigurationModel): void {
+export function setPropagators(config: ConfigurationModel): void {
   if (config.propagator == null) {
     config.propagator = {};
   }
@@ -123,7 +128,7 @@ function setPropagators(config: ConfigurationModel): void {
   }
 }
 
-function setTracerProvider(config: ConfigurationModel): void {
+export function setTracerProvider(config: ConfigurationModel): void {
   if (config.tracer_provider == null) {
     config.tracer_provider = { processors: [] };
   }
@@ -242,11 +247,14 @@ function setTracerProvider(config: ConfigurationModel): void {
   }
 }
 
-function setMeterProvider(config: ConfigurationModel): void {
+export function setMeterProvider(config: ConfigurationModel): void {
   const readerPeriodic =
     config.meter_provider?.readers && config.meter_provider?.readers.length > 0
       ? config.meter_provider?.readers[0].periodic
       : undefined;
+  if (config.meter_provider == null) {
+    config.meter_provider = { readers: [{}] };
+  }
   if (readerPeriodic) {
     const interval = getNumberFromEnv('OTEL_METRIC_EXPORT_INTERVAL');
     if (interval) {
@@ -256,6 +264,9 @@ function setMeterProvider(config: ConfigurationModel): void {
     const timeout = getNumberFromEnv('OTEL_METRIC_EXPORT_TIMEOUT');
     if (timeout) {
       readerPeriodic.timeout = timeout;
+    }
+    if (readerPeriodic.exporter.otlp_http == null) {
+      readerPeriodic.exporter.otlp_http = {};
     }
 
     const endpoint = getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_ENDPOINT');
@@ -305,51 +316,72 @@ function setMeterProvider(config: ConfigurationModel): void {
     const temporalityPreference = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE'
     );
-    if (
-      temporalityPreference &&
-      (temporalityPreference === 'cumulative' ||
-        temporalityPreference === 'delta' ||
-        temporalityPreference === 'low_memory')
-    ) {
-      readerPeriodic.exporter.otlp_http.temporality_preference =
-        temporalityPreference;
+    if (temporalityPreference) {
+      switch (temporalityPreference) {
+        case 'cumulative':
+          readerPeriodic.exporter.otlp_http.temporality_preference =
+            ExporterTemporalityPreference.Cumulative;
+          break;
+        case 'delta':
+          readerPeriodic.exporter.otlp_http.temporality_preference =
+            ExporterTemporalityPreference.Delta;
+          break;
+        case 'low_memory':
+          readerPeriodic.exporter.otlp_http.temporality_preference =
+            ExporterTemporalityPreference.LowMemory;
+          break;
+        default:
+          readerPeriodic.exporter.otlp_http.temporality_preference =
+            ExporterTemporalityPreference.Cumulative;
+          break;
+      }
     }
 
     const defaultHistogramAggregation = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION'
     );
-    if (
-      defaultHistogramAggregation &&
-      (defaultHistogramAggregation === 'explicit_bucket_histogram' ||
-        defaultHistogramAggregation === 'base2_exponential_bucket_histogram')
-    ) {
-      readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
-        defaultHistogramAggregation;
-    }
-    if (config.meter_provider == null) {
-      config.meter_provider = { readers: [{}] };
-    }
-    if (config.meter_provider?.readers == null) {
-      config.meter_provider.readers = [{}];
+    if (defaultHistogramAggregation) {
+      switch (defaultHistogramAggregation) {
+        case 'explicit_bucket_histogram':
+          readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
+            ExporterDefaultHistogramAggregation.ExplicitBucketHistogram;
+          break;
+        case 'base2_exponential_bucket_histogram':
+          readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
+            ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram;
+          break;
+        default:
+          readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
+            ExporterDefaultHistogramAggregation.ExplicitBucketHistogram;
+          break;
+      }
     }
 
     config.meter_provider.readers[0].periodic = readerPeriodic;
   }
   const exemplarFilter = getStringFromEnv('OTEL_METRICS_EXEMPLAR_FILTER');
-  if (
-    exemplarFilter &&
-    (exemplarFilter === 'trace_based' ||
-      exemplarFilter === 'always_on' ||
-      exemplarFilter === 'always_off')
-  ) {
-    if (config.meter_provider == null) {
-      config.meter_provider = {};
+  if (exemplarFilter) {
+    switch (exemplarFilter) {
+      case 'trace_based':
+        config.meter_provider.exemplar_filter = ExemplarFilter.TraceBased;
+        break;
+      case 'always_on':
+        config.meter_provider.exemplar_filter = ExemplarFilter.AlwaysOn;
+        break;
+      case 'always_off':
+        config.meter_provider.exemplar_filter = ExemplarFilter.AlwaysOff;
+        break;
+      default:
+        config.meter_provider.exemplar_filter = ExemplarFilter.TraceBased;
+        break;
     }
-    config.meter_provider.exemplar_filter = exemplarFilter;
   }
 }
 
-function setLoggerProvider(config: ConfigurationModel): void {
+export function setLoggerProvider(config: ConfigurationModel): void {
+  if (config.logger_provider == null) {
+    config.logger_provider = { processors: [] };
+  }
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT'
   );
@@ -357,9 +389,6 @@ function setLoggerProvider(config: ConfigurationModel): void {
     'OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT'
   );
   if (attributeValueLengthLimit || attributeCountLimit) {
-    if (config.logger_provider == null) {
-      config.logger_provider = {};
-    }
     if (config.logger_provider.limits == null) {
       config.logger_provider.limits = { attribute_count_limit: 128 };
     }
@@ -442,12 +471,6 @@ function setLoggerProvider(config: ConfigurationModel): void {
       batch.exporter.otlp_http.headers_list = headersList;
     }
 
-    if (config.logger_provider == null) {
-      config.logger_provider = { processors: [{}] };
-    }
-    if (config.logger_provider?.processors == null) {
-      config.logger_provider.processors = [{}];
-    }
     config.logger_provider.processors[0].batch = batch;
   }
 }

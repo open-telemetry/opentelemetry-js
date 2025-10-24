@@ -260,9 +260,6 @@ For more information about the maintainer role, see the [community repository](h
 - [Jackson Weber](https://github.com/JacksonWeber), Microsoft
 - [Martin Kuba](https://github.com/martinkuba), Grafana Labs
 - [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
-- [Matthew Wear](https://github.com/mwear), LightStep
-- [Neville Wylie](https://github.com/MSNev), Microsoft
-- [Purvi Kanal](https://github.com/pkanal), Honeycomb
 - [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
 
 For more information about the approver role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#approver).
@@ -284,7 +281,10 @@ Typically, members of this are [component owners](https://github.com/open-teleme
 - [Abhinav Mathur](https://github.com/abhee11), AppDynamics
 - [Bartlomiej Obecny](https://github.com/obecny)
 - [Daniel Li](https://github.com/d4nyll)
+- [dashpole](https://github.com/dashpole)
+- [dylanrussell](https://github.com/dylanrussell)
 - [Florencia Acosta](https://github.com/facostaembrace), Embrace
+- [henrinormak](https://github.com/henrinormak)
 - [Jackson Weber](https://github.com/JacksonWeber), Microsoft
 - [Jaryk](https://github.com/Ugzuzg), Volvo Cars
 - [Jonathan Lee](https://github.com/jj22ee)
@@ -293,10 +293,18 @@ Typically, members of this are [component owners](https://github.com/open-teleme
 - [MartenH](https://github.com/mhennoch), Splunk
 - [Mike Goldsmith](https://github.com/MikeGoldsmith), Honeycomb
 - [Motti](https://github.com/mottibec)
+- [naseemkullah](https://github.com/naseemkullah)
+- [onurtemizkan](https://github.com/onurtemizkan)
+- [psx95](https://github.com/psx95)
 - [Punya Biswal](https://github.com/punya), Google
+- [raphael-theriault-swi](https://github.com/raphael-theriault-swi)
+- [sharadraju](https://github.com/sharadraju)
 - [Siim Kallas](https://github.com/seemk), Splunk
+- [sudarshan12s](https://github.com/sudarshan12s)
 - [t2t2](https://github.com/t2t2), Splunk
 - [Trivikram Kamat](https://github.com/trivikr), AWS
+- [weyert](https://github.com/weyert)
+- [yiyuan-he](https://github.com/yiyuan-he)
 
 For more information about the triager role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#triager).
 
@@ -315,6 +323,9 @@ For more information about the triager role, see the [community repository](http
 - [Rauno Viskus](https://github.com/rauno56), Maintainer
 - [Roch Devost](https://github.com/rochdev), Approver
 - [Valentin Marchaud](https://github.com/vmarchaud), Maintainer
+- [Matthew Wear](https://github.com/mwear), Approver
+- [Neville Wylie](https://github.com/MSNev), Approver
+- [Purvi Kanal](https://github.com/pkanal), Approver
 
 For more information about the emeritus role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#emeritus-maintainerapprovertriager).
 
