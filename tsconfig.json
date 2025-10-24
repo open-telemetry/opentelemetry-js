@@ -13,6 +13,7 @@
       "experimental/packages/exporter-trace-otlp-http",
       "experimental/packages/exporter-trace-otlp-proto",
       "experimental/packages/opentelemetry-browser-detector",
+      "experimental/packages/opentelemetry-configuration",
       "experimental/packages/opentelemetry-exporter-metrics-otlp-grpc",
       "experimental/packages/opentelemetry-exporter-metrics-otlp-http",
       "experimental/packages/opentelemetry-exporter-metrics-otlp-proto",
