@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/otlp-exporter-base",
-  "version": "0.204.0",
+  "version": "0.207.0",
   "description": "OpenTelemetry OTLP Exporter base (for internal use only)",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -39,9 +39,9 @@
     "test:browser": "karma start --single-run",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "lerna run version --scope @opentelemetry/otlp-exporter-base --include-dependencies",
     "prewatch": "npm run precompile",
-    "align-api-deps": "node ../../../scripts/align-api-deps.js"
+    "align-api-deps": "node ../../../scripts/align-api-deps.js",
+    "maint:regenerate-test-certs": "cd test/certs && ./regenerate.sh"
   },
   "keywords": [
     "opentelemetry",
@@ -74,8 +74,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/core": "2.1.0",
-    "@opentelemetry/otlp-transformer": "0.204.0"
+    "@opentelemetry/core": "2.2.0",
+    "@opentelemetry/otlp-transformer": "0.207.0"
   },
   "devDependencies": {
     "@babel/core": "7.27.1",
@@ -91,8 +91,7 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "5.0.1",
-    "lerna": "6.6.2",
-    "mocha": "11.7.2",
+    "mocha": "11.7.4",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
     "ts-loader": "9.5.4",

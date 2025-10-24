@@ -20,6 +20,25 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+## 2.2.0
+
+### :bug: Bug Fixes
+
+* fix(core): avoid leaking Node.js types via `unrefTimer()` util [#5986](https://github.com/open-telemetry/opentelemetry-js/pull/5986) @pichlermarc
+* fix(core): avoid leaking Node.js types via otperformance [#5987](https://github.com/open-telemetry/opentelemetry-js/pull/5987) @pichlermarc
+  * **important:** this bug fix may be breaking for certain uses of `otperformance`
+    * `otperformance.now()` and `otperformance.timeOrigin` are not affected.
+    * the previously used type was incorrect and overly broad, leading to unexpected run-time behavior runtimes that are not Node.js.
+    * these problems are now caught on compile-time: if you have been using this API and this change is breaking to you, please consider using your target platform's `performance` implementation instead.
+
+### :house: Internal
+
+* test(shim-opentracing): add comparison thresholds in flaky assertions [#5974](https://github.com/open-telemetry/opentelemetry-js/pull/5974) @cjihrig
+* test(exporter-jaeger): clean up OTEL_EXPORTER_JAEGER_AGENT_PORT between tests [#6003](https://github.com/open-telemetry/opentelemetry-js/pull/6003) @cjihrig
+* test(sdk-trace-base): ensure environment variables are cleaned up between tests [#6011](https://github.com/open-telemetry/opentelemetry-js/pull/6011) @cjihrig
+* perf(opentelemetry-core): optimize attribute serialization [#5866](https://github.com/open-telemetry/opentelemetry-js/pull/5866) @43081j
+* test: test Node.js 25 in CI [#6019](https://github.com/open-telemetry/opentelemetry-js/pull/6019) @cjihrig
+
 ## 2.1.0
 
 ### :rocket: Features

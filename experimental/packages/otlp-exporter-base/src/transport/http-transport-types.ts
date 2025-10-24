@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
+import { HeadersFactory } from '../configuration/otlp-http-configuration';
+
 export interface HttpRequestParameters {
   url: string;
-  headers: () => Record<string, string>;
+  headers: HeadersFactory;
   compression: 'gzip' | 'none';
+  userAgent?: string;
 }

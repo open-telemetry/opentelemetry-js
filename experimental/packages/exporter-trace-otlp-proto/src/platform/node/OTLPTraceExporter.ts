@@ -20,7 +20,6 @@ import {
   OTLPExporterBase,
 } from '@opentelemetry/otlp-exporter-base';
 import { ProtobufTraceSerializer } from '@opentelemetry/otlp-transformer/trace/protobuf';
-import { VERSION } from '../../version';
 import {
   createOtlpHttpExportDelegate,
   convertLegacyHttpOptions,
@@ -37,7 +36,6 @@ export class OTLPTraceExporter
     super(
       createOtlpHttpExportDelegate(
         convertLegacyHttpOptions(config, 'TRACES', 'v1/traces', {
-          'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
           'Content-Type': 'application/x-protobuf',
         }),
         ProtobufTraceSerializer

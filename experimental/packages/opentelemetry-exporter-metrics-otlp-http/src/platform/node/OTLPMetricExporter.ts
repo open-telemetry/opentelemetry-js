@@ -18,15 +18,10 @@ import { OTLPMetricExporterOptions } from '../../OTLPMetricExporterOptions';
 import { OTLPMetricExporterBase } from '../../OTLPMetricExporterBase';
 import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { JsonMetricsSerializer } from '@opentelemetry/otlp-transformer/metrics/json';
-import { VERSION } from '../../version';
 import {
   convertLegacyHttpOptions,
   createOtlpHttpExportDelegate,
 } from '@opentelemetry/otlp-exporter-base/node-http';
-
-const USER_AGENT = {
-  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
-};
 
 /**
  * OTLP Metric Exporter for Node.js
@@ -36,7 +31,6 @@ export class OTLPMetricExporter extends OTLPMetricExporterBase {
     super(
       createOtlpHttpExportDelegate(
         convertLegacyHttpOptions(config ?? {}, 'METRICS', 'v1/metrics', {
-          ...USER_AGENT,
           'Content-Type': 'application/json',
         }),
         JsonMetricsSerializer

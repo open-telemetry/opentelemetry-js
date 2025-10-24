@@ -20,11 +20,12 @@ jobs:
           - "20"
           - "22"
           - "24"
+          - "25"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6
         with:
           cache: 'npm'
           cache-dependency-path: |
@@ -40,15 +41,16 @@ jobs:
           matrix.node_version == '18' ||
           matrix.node_version == '20.6.0'
           }}
-      - run: npm install -g npm@latest
+      - run: npm install -g npm@11.6.0
         if: ${{
           matrix.node_version == '20' ||
           matrix.node_version == '22' ||
-          matrix.node_version == '24'
+          matrix.node_version == '24' ||
+          matrix.node_version == '25'
           }}
 
       - name: Bootstrap
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Build 🔧
         run: npm run compile

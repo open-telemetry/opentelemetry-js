@@ -18,7 +18,6 @@ import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-
 import { OTLPMetricExporterBase } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { ProtobufMetricsSerializer } from '@opentelemetry/otlp-transformer/metrics/protobuf';
-import { VERSION } from '../../version';
 import {
   convertLegacyHttpOptions,
   createOtlpHttpExportDelegate,
@@ -29,7 +28,6 @@ export class OTLPMetricExporter extends OTLPMetricExporterBase {
     super(
       createOtlpHttpExportDelegate(
         convertLegacyHttpOptions(config ?? {}, 'METRICS', 'v1/metrics', {
-          'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
           'Content-Type': 'application/x-protobuf',
         }),
         ProtobufMetricsSerializer

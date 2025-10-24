@@ -21,7 +21,6 @@ import type {
 import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import { JsonLogsSerializer } from '@opentelemetry/otlp-transformer/experimental/logs/json';
-import { VERSION } from '../../version';
 import {
   convertLegacyHttpOptions,
   createOtlpHttpExportDelegate,
@@ -38,7 +37,6 @@ export class OTLPLogExporter
     super(
       createOtlpHttpExportDelegate(
         convertLegacyHttpOptions(config, 'LOGS', 'v1/logs', {
-          'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
           'Content-Type': 'application/json',
         }),
         JsonLogsSerializer
