@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-metrics-otlp-proto",
-  "version": "0.207.0",
+  "version": "0.208.0",
   "description": "OpenTelemetry Collector Metrics Exporter allows user to send collected metrics to the OpenTelemetry Collector using protobuf over HTTP",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -89,9 +89,9 @@
   },
   "dependencies": {
     "@opentelemetry/core": "2.2.0",
-    "@opentelemetry/exporter-metrics-otlp-http": "0.207.0",
-    "@opentelemetry/otlp-exporter-base": "0.207.0",
-    "@opentelemetry/otlp-transformer": "0.207.0",
+    "@opentelemetry/exporter-metrics-otlp-http": "0.208.0",
+    "@opentelemetry/otlp-exporter-base": "0.208.0",
+    "@opentelemetry/otlp-transformer": "0.208.0",
     "@opentelemetry/resources": "2.2.0",
     "@opentelemetry/sdk-metrics": "2.2.0"
   },
