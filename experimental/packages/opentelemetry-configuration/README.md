@@ -1,4 +1,4 @@
-# OpenTelemetry SDK for Node.js
+# OpenTelemetry Configuration for Node.js
 
 [![Apache License][license-image]][license-image]
 
@@ -18,6 +18,18 @@ To get started you need to install `@opentelemetry/configuration`.
 ```sh
 # Install the package
 npm install @opentelemetry/configuration
+```
+
+## Type Definitions
+
+This package includes TypeScript type definitions generated from the official [OpenTelemetry Configuration Schema](https://github.com/open-telemetry/opentelemetry-configuration).
+
+### Regenerating Types
+
+To regenerate the TypeScript types from the latest schema:
+
+```sh
+npm run generate:config
 ```
 
 ## Useful links
