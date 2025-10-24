@@ -223,7 +223,7 @@ function configureMetricProviderFromEnv(): IMetricReader[] {
  *    nodeSdk.start(); // registers all configured SDK components
  */
 export class NodeSDK {
-  config: Configuration;
+  private _config: Configuration;
   private _tracerProviderConfig?: TracerProviderConfig;
   private _loggerProviderConfig?: LoggerProviderConfig;
   private _meterProviderConfig?: MeterProviderConfig;
@@ -247,16 +247,16 @@ export class NodeSDK {
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
     const configProvider: ConfigProvider = createConfigProvider();
-    this.config = configProvider.getInstrumentationConfig();
-    if (this.config.disabled) {
+    this._config = configProvider.getInstrumentationConfig();
+    if (this._config.disabled) {
       this._disabled = true;
       // Functions with possible side-effects are set
       // to no-op via the _disabled flag
     }
 
-    if (this.config.log_level != null) {
+    if (this._config.log_level != null) {
       diag.setLogger(new DiagConsoleLogger(), {
-        logLevel: this.config.log_level,
+        logLevel: this._config.log_level,
       });
     }
 
@@ -268,8 +268,8 @@ export class NodeSDK {
       this._resourceDetectors = [];
     } else if (configuration.resourceDetectors != null) {
       this._resourceDetectors = configuration.resourceDetectors;
-    } else if (this.config.node_resource_detectors) {
-      this._resourceDetectors = getResourceDetectorsFromEnv(this.config);
+    } else if (this._config.node_resource_detectors) {
+      this._resourceDetectors = getResourceDetectorsFromEnv(this._config);
     } else {
       this._resourceDetectors = [envDetector, processDetector, hostDetector];
     }
@@ -390,7 +390,7 @@ export class NodeSDK {
             })
           );
 
-    const instanceId = getInstanceID(this.config);
+    const instanceId = getInstanceID(this._config);
     this._resource =
       instanceId === undefined
         ? this._resource
