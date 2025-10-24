@@ -24,7 +24,7 @@ describe('mergeOtlpNodeHttpConfigurationWithDefaults', function () {
     timeoutMillis: 1,
     compression: 'none',
     concurrencyLimit: 2,
-    headers: () => ({}),
+    headers: async () => ({}),
     agentFactory: () => null!,
     userAgent: `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
   };

@@ -15,7 +15,6 @@
  */
 import { OTLPExporterNodeConfigBase } from './legacy-node-configuration';
 import { diag } from '@opentelemetry/api';
-import { wrapStaticHeadersInFunction } from './shared-configuration';
 import {
   getNodeHttpConfigurationDefaults,
   HttpAgentFactory,
@@ -24,6 +23,7 @@ import {
 } from './otlp-node-http-configuration';
 import { httpAgentFactoryFromOptions } from '../index-node-http';
 import { getNodeHttpConfigurationFromEnvironment } from './otlp-node-http-env-configuration';
+import { convertLegacyHeaders } from './convert-legacy-http-options';
 
 function convertLegacyAgentOptions(
   config: OTLPExporterNodeConfigBase
@@ -65,7 +65,7 @@ export function convertLegacyHttpOptions(
   return mergeOtlpNodeHttpConfigurationWithDefaults(
     {
       url: config.url,
-      headers: wrapStaticHeadersInFunction(config.headers),
+      headers: convertLegacyHeaders(config),
       concurrencyLimit: config.concurrencyLimit,
       timeoutMillis: config.timeoutMillis,
       compression: config.compression,

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { HeadersFactory } from './otlp-http-configuration';
+
 /**
  * Configuration shared across all OTLP exporters
  *
@@ -39,12 +41,12 @@ export function validateTimeoutMillis(timeoutMillis: number) {
 
 export function wrapStaticHeadersInFunction(
   headers: Record<string, string> | undefined
-): (() => Record<string, string>) | undefined {
+): HeadersFactory | undefined {
   if (headers == null) {
     return undefined;
   }
 
-  return () => headers;
+  return async () => headers;
 }
 
 /**
