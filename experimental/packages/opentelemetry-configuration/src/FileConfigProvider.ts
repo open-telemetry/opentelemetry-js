@@ -124,7 +124,11 @@ export function parseConfigFile(config: ConfigurationModel) {
         const list = getStringListFromConfigFile(
           parsedContent['resource']?.['attributes_list']
         );
-        if (list && list.length > 0) {
+        if (
+          list &&
+          list.length > 0 &&
+          parsedContent['resource']?.['attributes'] == null
+        ) {
           config.resource.attributes = [];
           for (let i = 0; i < list.length; i++) {
             const element = list[i].split('=');
