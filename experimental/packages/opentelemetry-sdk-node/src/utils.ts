@@ -66,15 +66,9 @@ export function getResourceDetectorsFromEnv(
     [RESOURCE_DETECTOR_ENVIRONMENT, envDetector],
     [RESOURCE_DETECTOR_HOST, hostDetector],
     [RESOURCE_DETECTOR_OS, osDetector],
+    [RESOURCE_DETECTOR_SERVICE_INSTANCE_ID, serviceInstanceIdDetector],
     [RESOURCE_DETECTOR_PROCESS, processDetector],
   ]);
-
-  if (getInstanceID(config) == null) {
-    resourceDetectors.set(
-      RESOURCE_DETECTOR_SERVICE_INSTANCE_ID,
-      serviceInstanceIdDetector
-    );
-  }
 
   const resourceDetectorsFromEnv = config.node_resource_detectors ?? ['all'];
 
@@ -93,18 +87,6 @@ export function getResourceDetectorsFromEnv(
     }
     return resourceDetector || [];
   });
-}
-
-export function getServiceName(config: Configuration): string | undefined {
-  if (config.resource?.attributes) {
-    for (let i = 0; i < config.resource.attributes.length; i++) {
-      const element = config.resource.attributes[i];
-      if (element.name === 'service.name') {
-        return element.value?.toString();
-      }
-    }
-  }
-  return undefined;
 }
 
 export function getInstanceID(config: Configuration): string | undefined {

@@ -70,13 +70,14 @@ import {
   getPropagatorFromEnv,
   setupPropagator,
   setupContextManager,
-  getServiceName,
+  getInstanceID,
 } from './utils';
 import {
   ConfigProvider,
   Configuration,
   createConfigProvider,
 } from '../../opentelemetry-configuration/build/src';
+import { ATTR_SERVICE_INSTANCE_ID } from '@opentelemetry/resources/src/semconv';
 
 type TracerProviderConfig = {
   tracerConfig: NodeTracerConfig;
@@ -273,8 +274,7 @@ export class NodeSDK {
       this._resourceDetectors = [envDetector, processDetector, hostDetector];
     }
 
-    this._serviceName =
-      configuration.serviceName ?? getServiceName(this.config);
+    this._serviceName = configuration.serviceName;
 
     // If a tracer provider can be created from manual configuration, create it
     if (
@@ -387,6 +387,16 @@ export class NodeSDK {
         : this._resource.merge(
             resourceFromAttributes({
               [ATTR_SERVICE_NAME]: this._serviceName,
+            })
+          );
+
+    const instanceId = getInstanceID(this.config);
+    this._resource =
+      instanceId === undefined
+        ? this._resource
+        : this._resource.merge(
+            resourceFromAttributes({
+              [ATTR_SERVICE_INSTANCE_ID]: instanceId,
             })
           );
 
