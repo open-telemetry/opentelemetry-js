@@ -260,6 +260,7 @@ For more information about the maintainer role, see the [community repository](h
 - [Jackson Weber](https://github.com/JacksonWeber), Microsoft
 - [Martin Kuba](https://github.com/martinkuba), Grafana Labs
 - [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
+- [Raphaël Thériault](https://github.com/raphael-theriault-swi), SolarWinds
 - [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
 
 For more information about the approver role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#approver).
@@ -297,7 +298,6 @@ Typically, members of this are [component owners](https://github.com/open-teleme
 - [onurtemizkan](https://github.com/onurtemizkan)
 - [psx95](https://github.com/psx95)
 - [Punya Biswal](https://github.com/punya), Google
-- [raphael-theriault-swi](https://github.com/raphael-theriault-swi)
 - [sharadraju](https://github.com/sharadraju)
 - [Siim Kallas](https://github.com/seemk), Splunk
 - [sudarshan12s](https://github.com/sudarshan12s)
