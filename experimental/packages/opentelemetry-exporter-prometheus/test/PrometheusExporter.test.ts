@@ -50,6 +50,7 @@ describe('PrometheusExporter', () => {
     sinon.restore();
     delete process.env.OTEL_EXPORTER_PROMETHEUS_HOST;
     delete process.env.OTEL_EXPORTER_PROMETHEUS_PORT;
+    delete process.env.OTEL_EXPORTER_PROMETHEUS_RESOURCE_CONSTANT_LABELS;
   });
 
   describe('constructor', () => {
@@ -89,6 +90,12 @@ describe('PrometheusExporter', () => {
     it('should not start the server if preventServerStart is passed as an option', () => {
       const exporter = new PrometheusExporter({ preventServerStart: true });
       assert.ok(exporter['_server'].listening === false);
+    });
+
+    it('should config resource constant labels by env', () => {
+      process.env.OTEL_EXPORTER_PROMETHEUS_RESOURCE_CONSTANT_LABELS = 'test';
+      const exporter = new PrometheusExporter({ preventServerStart: true });
+      assert.ok(exporter['_serializer']['_withResourceConstantLabels']);
     });
   });
 
