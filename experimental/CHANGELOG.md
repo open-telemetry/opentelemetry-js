@@ -6,7 +6,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ## Unreleased
 
-* feat(opentelemetry-configuration): set attributes from attribute list from env variables [#6029](https://github.com/open-telemetry/opentelemetry-js/pull/6029) @maryliag
+* feat(opentelemetry-configuration): set attributes from attribute list from env variables [#6043](https://github.com/open-telemetry/opentelemetry-js/pull/6043) @maryliag
 
 ### :boom: Breaking Changes
 
