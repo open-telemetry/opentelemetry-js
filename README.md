@@ -251,8 +251,6 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Marc Pichler](https://github.com/pichlermarc), Dynatrace
 - [Trent Mick](https://github.com/trentm), Elastic
 
-For more information about the maintainer role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#maintainer).
-
 ### Approvers
 
 - [Amir Blum](https://github.com/blumamir), Odigos
