@@ -39,10 +39,19 @@ export const assertServiceResource = (
   }
 ) => {
   assert.strictEqual(resource.attributes[ATTR_SERVICE_NAME], validations.name);
-  assert.strictEqual(
-    resource.attributes[ATTR_SERVICE_INSTANCE_ID],
-    validations.instanceId
-  );
+  if (validations.instanceId) {
+    assert.strictEqual(
+      resource.attributes[ATTR_SERVICE_INSTANCE_ID],
+      validations.instanceId
+    );
+  } else {
+    assert.notEqual(
+      resource.attributes[ATTR_SERVICE_INSTANCE_ID],
+      null,
+      `${ATTR_SERVICE_INSTANCE_ID} must not be null`
+    );
+  }
+
   if (validations.namespace)
     assert.strictEqual(
       resource.attributes[ATTR_SERVICE_NAMESPACE],

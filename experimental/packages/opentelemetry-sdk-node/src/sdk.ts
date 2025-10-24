@@ -63,19 +63,20 @@ import {
 } from '@opentelemetry/sdk-trace-node';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
-import {
-  getBooleanFromEnv,
-  getStringFromEnv,
-  getStringListFromEnv,
-  diagLogLevelFromString,
-} from '@opentelemetry/core';
+import { getStringFromEnv, getStringListFromEnv } from '@opentelemetry/core';
 import {
   getResourceDetectorsFromEnv,
   getSpanProcessorsFromEnv,
   getPropagatorFromEnv,
   setupPropagator,
   setupContextManager,
+  getServiceName,
 } from './utils';
+import {
+  ConfigProvider,
+  Configuration,
+  createConfigProvider,
+} from '../../opentelemetry-configuration/build/src';
 
 type TracerProviderConfig = {
   tracerConfig: NodeTracerConfig;
@@ -221,6 +222,7 @@ function configureMetricProviderFromEnv(): IMetricReader[] {
  *    nodeSdk.start(); // registers all configured SDK components
  */
 export class NodeSDK {
+  config: Configuration;
   private _tracerProviderConfig?: TracerProviderConfig;
   private _loggerProviderConfig?: LoggerProviderConfig;
   private _meterProviderConfig?: MeterProviderConfig;
@@ -243,16 +245,17 @@ export class NodeSDK {
    * Create a new NodeJS SDK instance
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
-    if (getBooleanFromEnv('OTEL_SDK_DISABLED')) {
+    const configProvider: ConfigProvider = createConfigProvider();
+    this.config = configProvider.getInstrumentationConfig();
+    if (this.config.disabled) {
       this._disabled = true;
       // Functions with possible side-effects are set
       // to no-op via the _disabled flag
     }
 
-    const logLevel = getStringFromEnv('OTEL_LOG_LEVEL');
-    if (logLevel != null) {
+    if (this.config.log_level != null) {
       diag.setLogger(new DiagConsoleLogger(), {
-        logLevel: diagLogLevelFromString(logLevel),
+        logLevel: this.config.log_level,
       });
     }
 
@@ -264,13 +267,14 @@ export class NodeSDK {
       this._resourceDetectors = [];
     } else if (configuration.resourceDetectors != null) {
       this._resourceDetectors = configuration.resourceDetectors;
-    } else if (getStringFromEnv('OTEL_NODE_RESOURCE_DETECTORS')) {
-      this._resourceDetectors = getResourceDetectorsFromEnv();
+    } else if (this.config.node_resource_detectors) {
+      this._resourceDetectors = getResourceDetectorsFromEnv(this.config);
     } else {
       this._resourceDetectors = [envDetector, processDetector, hostDetector];
     }
 
-    this._serviceName = configuration.serviceName;
+    this._serviceName =
+      configuration.serviceName ?? getServiceName(this.config);
 
     // If a tracer provider can be created from manual configuration, create it
     if (

@@ -50,6 +50,7 @@ import {
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
+import { Configuration } from '../../opentelemetry-configuration/build/src';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
@@ -57,19 +58,25 @@ const RESOURCE_DETECTOR_OS = 'os';
 const RESOURCE_DETECTOR_PROCESS = 'process';
 const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
 
-export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
+export function getResourceDetectorsFromEnv(
+  config: Configuration
+): Array<ResourceDetector> {
   // When updating this list, make sure to also update the section `resourceDetectors` on README.
   const resourceDetectors = new Map<string, ResourceDetector>([
     [RESOURCE_DETECTOR_ENVIRONMENT, envDetector],
     [RESOURCE_DETECTOR_HOST, hostDetector],
     [RESOURCE_DETECTOR_OS, osDetector],
-    [RESOURCE_DETECTOR_SERVICE_INSTANCE_ID, serviceInstanceIdDetector],
     [RESOURCE_DETECTOR_PROCESS, processDetector],
   ]);
 
-  const resourceDetectorsFromEnv = getStringListFromEnv(
-    'OTEL_NODE_RESOURCE_DETECTORS'
-  ) ?? ['all'];
+  if (getInstanceID(config) == null) {
+    resourceDetectors.set(
+      RESOURCE_DETECTOR_SERVICE_INSTANCE_ID,
+      serviceInstanceIdDetector
+    );
+  }
+
+  const resourceDetectorsFromEnv = config.node_resource_detectors ?? ['all'];
 
   if (resourceDetectorsFromEnv.includes('all')) {
     return [...resourceDetectors.values()].flat();
@@ -82,12 +89,34 @@ export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   return resourceDetectorsFromEnv.flatMap(detector => {
     const resourceDetector = resourceDetectors.get(detector);
     if (!resourceDetector) {
-      diag.warn(
-        `Invalid resource detector "${detector}" specified in the environment variable OTEL_NODE_RESOURCE_DETECTORS`
-      );
+      diag.warn(`Invalid resource detector "${detector}" specified`);
     }
     return resourceDetector || [];
   });
+}
+
+export function getServiceName(config: Configuration): string | undefined {
+  if (config.resource?.attributes) {
+    for (let i = 0; i < config.resource.attributes.length; i++) {
+      const element = config.resource.attributes[i];
+      if (element.name === 'service.name') {
+        return element.value?.toString();
+      }
+    }
+  }
+  return undefined;
+}
+
+export function getInstanceID(config: Configuration): string | undefined {
+  if (config.resource?.attributes) {
+    for (let i = 0; i < config.resource.attributes.length; i++) {
+      const element = config.resource.attributes[i];
+      if (element.name === 'service.instance.id') {
+        return element.value?.toString();
+      }
+    }
+  }
+  return undefined;
 }
 
 export function filterBlanksAndNulls(list: string[]): string[] {
