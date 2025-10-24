@@ -63,19 +63,21 @@ import {
 } from '@opentelemetry/sdk-trace-node';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
-import {
-  getBooleanFromEnv,
-  getStringFromEnv,
-  getStringListFromEnv,
-  diagLogLevelFromString,
-} from '@opentelemetry/core';
+import { getStringFromEnv, getStringListFromEnv } from '@opentelemetry/core';
 import {
   getResourceDetectorsFromEnv,
   getSpanProcessorsFromEnv,
   getPropagatorFromEnv,
   setupPropagator,
   setupContextManager,
+  getInstanceID,
 } from './utils';
+import {
+  ConfigProvider,
+  Configuration,
+  createConfigProvider,
+} from '@opentelemetry/configuration';
+import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
 
 type TracerProviderConfig = {
   tracerConfig: NodeTracerConfig;
@@ -221,6 +223,7 @@ function configureMetricProviderFromEnv(): IMetricReader[] {
  *    nodeSdk.start(); // registers all configured SDK components
  */
 export class NodeSDK {
+  private _config: Configuration;
   private _tracerProviderConfig?: TracerProviderConfig;
   private _loggerProviderConfig?: LoggerProviderConfig;
   private _meterProviderConfig?: MeterProviderConfig;
@@ -243,16 +246,17 @@ export class NodeSDK {
    * Create a new NodeJS SDK instance
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
-    if (getBooleanFromEnv('OTEL_SDK_DISABLED')) {
+    const configProvider: ConfigProvider = createConfigProvider();
+    this._config = configProvider.getInstrumentationConfig();
+    if (this._config.disabled) {
       this._disabled = true;
       // Functions with possible side-effects are set
       // to no-op via the _disabled flag
     }
 
-    const logLevel = getStringFromEnv('OTEL_LOG_LEVEL');
-    if (logLevel != null) {
+    if (this._config.log_level != null) {
       diag.setLogger(new DiagConsoleLogger(), {
-        logLevel: diagLogLevelFromString(logLevel),
+        logLevel: this._config.log_level,
       });
     }
 
@@ -264,8 +268,8 @@ export class NodeSDK {
       this._resourceDetectors = [];
     } else if (configuration.resourceDetectors != null) {
       this._resourceDetectors = configuration.resourceDetectors;
-    } else if (getStringFromEnv('OTEL_NODE_RESOURCE_DETECTORS')) {
-      this._resourceDetectors = getResourceDetectorsFromEnv();
+    } else if (this._config.node_resource_detectors) {
+      this._resourceDetectors = getResourceDetectorsFromEnv(this._config);
     } else {
       this._resourceDetectors = [envDetector, processDetector, hostDetector];
     }
@@ -383,6 +387,16 @@ export class NodeSDK {
         : this._resource.merge(
             resourceFromAttributes({
               [ATTR_SERVICE_NAME]: this._serviceName,
+            })
+          );
+
+    const instanceId = getInstanceID(this._config);
+    this._resource =
+      instanceId === undefined
+        ? this._resource
+        : this._resource.merge(
+            resourceFromAttributes({
+              [ATTR_SERVICE_INSTANCE_ID]: instanceId,
             })
           );
 

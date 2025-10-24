@@ -21,7 +21,10 @@ import {
   ATTR_SERVICE_VERSION,
 } from '@opentelemetry/semantic-conventions';
 
-import { ATTR_SERVICE_INSTANCE_ID, ATTR_SERVICE_NAMESPACE } from '../semconv';
+import {
+  ATTR_SERVICE_INSTANCE_ID,
+  ATTR_SERVICE_NAMESPACE,
+} from '../../src/semconv';
 
 /**
  * Test utility method to validate a service resource
@@ -39,10 +42,19 @@ export const assertServiceResource = (
   }
 ) => {
   assert.strictEqual(resource.attributes[ATTR_SERVICE_NAME], validations.name);
-  assert.strictEqual(
-    resource.attributes[ATTR_SERVICE_INSTANCE_ID],
-    validations.instanceId
-  );
+  if (validations.instanceId) {
+    assert.strictEqual(
+      resource.attributes[ATTR_SERVICE_INSTANCE_ID],
+      validations.instanceId
+    );
+  } else {
+    assert.notEqual(
+      resource.attributes[ATTR_SERVICE_INSTANCE_ID],
+      null,
+      `${ATTR_SERVICE_INSTANCE_ID} must not be null`
+    );
+  }
+
   if (validations.namespace)
     assert.strictEqual(
       resource.attributes[ATTR_SERVICE_NAMESPACE],

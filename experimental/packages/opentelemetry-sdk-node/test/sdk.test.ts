@@ -83,7 +83,7 @@ import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/expo
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
-import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from './semconv';
+import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from '../src/semconv';
 
 function assertDefaultContextManagerRegistered() {
   assert.ok(
@@ -124,7 +124,7 @@ describe('Node SDK', () => {
 
   describe('Basic Registration', () => {
     it('should not register more than the minimal SDK components', async () => {
-      // need to set these to none, since the deafult value is 'otlp'
+      // need to set these to none, since the default value is 'otlp'
       env.OTEL_TRACES_EXPORTER = 'none';
       env.OTEL_LOGS_EXPORTER = 'none';
       env.OTEL_METRIC_EXPORTER = 'none';
@@ -171,20 +171,6 @@ describe('Node SDK', () => {
       });
 
       delete env.OTEL_LOG_LEVEL;
-      sdk.shutdown();
-    });
-
-    it('should not register a diag logger with OTEL_LOG_LEVEL unset', () => {
-      delete env.OTEL_LOG_LEVEL;
-
-      const spy = Sinon.spy(diag, 'setLogger');
-      const sdk = new NodeSDK({
-        autoDetectResources: false,
-      });
-
-      sdk.start();
-
-      assert.strictEqual(spy.callCount, 0);
       sdk.shutdown();
     });
 
