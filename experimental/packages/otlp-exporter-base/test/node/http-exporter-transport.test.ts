@@ -56,7 +56,7 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: () => ({}),
+        headers: async () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
       });
@@ -93,7 +93,7 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://jocajhost:8080',
-        headers: () => ({}),
+        headers: async () => ({}),
         compression: 'none',
         agentFactory: protocol => {
           assert.strictEqual(protocol, 'http:');
@@ -122,7 +122,7 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: () => ({}),
+        headers: async () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
       });
@@ -146,7 +146,7 @@ describe('HttpExporterTransport', function () {
       // act
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: () => ({}),
+        headers: async () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
       });
@@ -171,7 +171,7 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: () => ({}),
+        headers: async () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
       });
@@ -208,7 +208,7 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: () => ({}),
+        headers: async () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
       });
@@ -241,7 +241,7 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: () => ({}),
+        headers: async () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
       });
@@ -262,7 +262,7 @@ describe('HttpExporterTransport', function () {
       const transport = createHttpExporterTransport({
         // use wrong port
         url: 'http://example.test',
-        headers: () => ({}),
+        headers: async () => ({}),
         compression: 'none',
         agentFactory: () => new http.Agent(),
       });
@@ -312,7 +312,7 @@ describe('HttpExporterTransport', function () {
       // act
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: () => ({ foo: 'foo-value', bar: 'bar-value' }),
+        headers: async () => ({ foo: 'foo-value', bar: 'bar-value' }),
         compression: 'none',
         agentFactory: () => new http.Agent(),
       });
@@ -361,7 +361,7 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: () => ({ foo: 'foo-value', bar: 'bar-value' }),
+        headers: async () => ({ foo: 'foo-value', bar: 'bar-value' }),
         compression: 'gzip',
         agentFactory: () => new http.Agent(),
       });
