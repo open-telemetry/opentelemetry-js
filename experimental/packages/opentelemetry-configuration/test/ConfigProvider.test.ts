@@ -1297,9 +1297,22 @@ describe('ConfigProvider', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
         'test/fixtures/short-config.yml';
       const configProvider = createConfigProvider();
+       const expectedConfig: Configuration = {
+        ...defaultConfig,
+        resource: {
+          attributes_list: 'service.instance.id=123',
+          attributes: [
+            {
+              name: 'service.instance.id',
+              value: '123',
+              type: 'string',
+            },
+          ],
+        },
+      };
       assert.deepStrictEqual(
         configProvider.getInstrumentationConfig(),
-        defaultConfig
+        expectedConfig
       );
     });
 
