@@ -77,7 +77,7 @@ import {
   Configuration,
   createConfigProvider,
 } from '@opentelemetry/configuration';
-import { ATTR_SERVICE_INSTANCE_ID } from '@opentelemetry/resources/src/semconv';
+import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
 
 type TracerProviderConfig = {
   tracerConfig: NodeTracerConfig;
