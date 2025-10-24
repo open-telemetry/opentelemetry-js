@@ -402,28 +402,6 @@ describe('fetch', () => {
 
       describe('null-bodied response', () => {
         // https://chromium.googlesource.com/chromium/src/+/ac85ca2a9cb8c76a37f9d7a6c611c24114f1f05d/third_party/WebKit/Source/core/fetch/Response.cpp#106
-        it('101 (Switching Protocols) will correctly end the span', async () => {
-          await startWorker(
-            msw.http.get('/null-body-101', () => {
-              return new msw.HttpResponse(null, { status: 101 });
-            })
-          );
-          try {
-            await trace(
-              async () => {
-                await fetch('/null-body-101');
-              },
-              { ignoreNetworkEvents: false },
-              false
-            );
-          } catch (err) {)
-            // fetch throws `TypeError: Failed to fetch` on 101 response
-          }
-
-          // make sure we still have a span with the captured error
-          assert.strictEqual(exportedSpans.length, 1);
-          assert.match(exportedSpans[0].status.message ?? '', /TypeError/);
-        });
         it('204 (No Content) will correctly end the span', async () => {
           await tracedFetch({
             callback: () => fetch('/null-body-204'),
