@@ -21,19 +21,17 @@ import { diag } from '@opentelemetry/api';
  * @param partialHeaders
  */
 export function validateAndNormalizeHeaders(
-  partialHeaders: (() => Record<string, string>) | undefined
-): () => Record<string, string> {
-  return () => {
-    const headers: Record<string, string> = {};
-    Object.entries(partialHeaders?.() ?? {}).forEach(([key, value]) => {
-      if (typeof value !== 'undefined') {
-        headers[key] = String(value);
-      } else {
-        diag.warn(
-          `Header "${key}" has invalid value (${value}) and will be ignored`
-        );
-      }
-    });
-    return headers;
-  };
+  partialHeaders: Record<string, string> | undefined
+): Record<string, string> {
+  const headers: Record<string, string> = {};
+  Object.entries(partialHeaders ?? {}).forEach(([key, value]) => {
+    if (typeof value !== 'undefined') {
+      headers[key] = String(value);
+    } else {
+      diag.warn(
+        `Header "${key}" has invalid value (${value}) and will be ignored`
+      );
+    }
+  });
+  return headers;
 }
