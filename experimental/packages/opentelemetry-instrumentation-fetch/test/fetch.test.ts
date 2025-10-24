@@ -369,8 +369,14 @@ describe('fetch', () => {
           msw.http.get('/boom', () => {
             return new msw.HttpResponse(null, { status: 500 });
           }),
-          msw.http.get('/null-body', () => {
+          msw.http.get('/null-body-204', () => {
             return new msw.HttpResponse(null, { status: 204 });
+          }),
+          msw.http.get('/null-body-205', () => {
+            return new msw.HttpResponse(null, { status: 205 });
+          }),
+          msw.http.get('/null-body-304', () => {
+            return new msw.HttpResponse(null, { status: 304 });
           }),
         ],
         callback = () => fetch('/api/status.json'),
@@ -396,15 +402,57 @@ describe('fetch', () => {
 
       describe('null-bodied response', () => {
         // https://chromium.googlesource.com/chromium/src/+/ac85ca2a9cb8c76a37f9d7a6c611c24114f1f05d/third_party/WebKit/Source/core/fetch/Response.cpp#106
-        let response: Response | undefined;
-        beforeEach(async () => {
-          const result = await tracedFetch({
-            callback: () => fetch('/null-body'),
-          });
-          response = result.response;
+        it('101 (Switching Protocols) will correctly end the span', async () => {
+          await startWorker(
+            msw.http.get('/null-body-101', () => {
+              return new msw.HttpResponse(null, { status: 101 });
+            })
+          );
+          try {
+            await trace(
+              async () => {
+                await fetch('/null-body-101');
+              },
+              { ignoreNetworkEvents: false },
+              false
+            );
+          } catch (err) {)
+            // fetch throws `TypeError: Failed to fetch` on 101 response
+          }
+
+          // make sure we still have a span with the captured error
+          assert.strictEqual(exportedSpans.length, 1);
+          assert.match(exportedSpans[0].status.message ?? '', /TypeError/);
         });
         it('204 (No Content) will correctly end the span', async () => {
+          await tracedFetch({
+            callback: () => fetch('/null-body-204'),
+          });
           assert.strictEqual(exportedSpans.length, 1);
+          assert.strictEqual(
+            exportedSpans[0].attributes[ATTR_HTTP_STATUS_CODE],
+            204
+          );
+        });
+        it('205 (Reset Content) will correctly end the span', async () => {
+          await tracedFetch({
+            callback: () => fetch('/null-body-205'),
+          });
+          assert.strictEqual(exportedSpans.length, 1);
+          assert.strictEqual(
+            exportedSpans[0].attributes[ATTR_HTTP_STATUS_CODE],
+            205
+          );
+        });
+        it('304 (Not Modified) will correctly end the span', async () => {
+          await tracedFetch({
+            callback: () => fetch('/null-body-304'),
+          });
+          assert.strictEqual(exportedSpans.length, 1);
+          assert.strictEqual(
+            exportedSpans[0].attributes[ATTR_HTTP_STATUS_CODE],
+            304
+          );
         });
       });
 

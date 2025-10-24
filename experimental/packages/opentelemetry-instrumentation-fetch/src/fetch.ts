@@ -508,7 +508,8 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
             if (body) {
               const reader = body.getReader();
               const isNullBodyStatus =
-                response.status === 101 ||
+                // if the server returns 101, fetch throws TypeError: Failed to fetch
+                // response.status === 101 ||
                 response.status === 204 ||
                 response.status === 205 ||
                 response.status === 304;
