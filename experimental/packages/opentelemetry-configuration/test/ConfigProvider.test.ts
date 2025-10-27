@@ -1064,6 +1064,92 @@ describe('ConfigProvider', function () {
       );
     });
 
+    it('should use backup option for certificates', function () {
+      process.env.OTEL_EXPORTER_OTLP_CERTIFICATE =
+        'backup_certificate_file.pem';
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY = 'backup_client_key.pem';
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE =
+        'backup_client_certificate.pem';
+      process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://backup.com:4318';
+
+      const expectedConfig: Configuration = {
+        ...defaultConfig,
+        tracer_provider: {
+          processors: [
+            {
+              batch: {
+                ...defaultConfig.tracer_provider?.processors[0].batch,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://backup.com:4318/v1/traces',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                    certificate_file: 'backup_certificate_file.pem',
+                    client_certificate_file: 'backup_client_certificate.pem',
+                    client_key_file: 'backup_client_key.pem',
+                  },
+                },
+              },
+            },
+          ],
+          limits: defaultConfig.tracer_provider?.limits,
+          sampler: defaultConfig.tracer_provider?.sampler,
+        },
+        meter_provider: {
+          ...defaultConfig.meter_provider,
+          readers: [
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://backup.com:4318/v1/metrics',
+                    timeout: 10000,
+                    temporality_preference:
+                      ExporterTemporalityPreference.Cumulative,
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                    certificate_file: 'backup_certificate_file.pem',
+                    client_certificate_file: 'backup_client_certificate.pem',
+                    client_key_file: 'backup_client_key.pem',
+                  },
+                },
+              },
+            },
+          ],
+        },
+        logger_provider: {
+          ...defaultConfig.logger_provider,
+          processors: [
+            {
+              batch: {
+                schedule_delay: 1000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://backup.com:4318/v1/logs',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                    certificate_file: 'backup_certificate_file.pem',
+                    client_certificate_file: 'backup_client_certificate.pem',
+                    client_key_file: 'backup_client_key.pem',
+                  },
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configProvider = createConfigProvider();
+      assert.deepStrictEqual(
+        configProvider.getInstrumentationConfig(),
+        expectedConfig
+      );
+    });
+
     it('checks to keep good code coverage', function () {
       let config: ConfigurationModel = {};
       setResources(config);
