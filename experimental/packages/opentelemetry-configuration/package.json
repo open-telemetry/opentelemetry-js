@@ -10,6 +10,7 @@
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
+    "generate:config": "node ../../../scripts/config/generate-config.js",
     "test": "nyc mocha test/**/*.test.ts",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
