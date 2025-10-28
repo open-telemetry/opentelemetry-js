@@ -6,6 +6,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ## Unreleased
 
+* feat(opentelemetry-configuration): set attributes from attribute list from env variables [#6043](https://github.com/open-telemetry/opentelemetry-js/pull/6043) @maryliag
+
 ### :boom: Breaking Changes
 
 * feat(otlp-exporter-base)!: allow passing an async function to headers option [#5994](https://github.com/open-telemetry/opentelemetry-js/pull/5994/files) @pichlermarc
@@ -74,6 +76,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(opentelemetry-configuration): parse logger provider from config file [#5995](https://github.com/open-telemetry/opentelemetry-js/pull/5995) @maryliag
 * feat(opentelemetry-configuration): parse meter provider from config file [#6000](https://github.com/open-telemetry/opentelemetry-js/pull/6000) @maryliag
 * feat(opentelemetry-configuration): parse config file with format 1.0-rc.2 [#6029](https://github.com/open-telemetry/opentelemetry-js/pull/6029) @maryliag
+* feat(opentelemetry-configuration): add backup options for certificates and endpoints [#6038](https://github.com/open-telemetry/opentelemetry-js/pull/6038) @maryliag
 
 ### :bug: Bug Fixes
 
