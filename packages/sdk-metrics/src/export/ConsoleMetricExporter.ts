@@ -43,7 +43,7 @@ export class ConsoleMetricExporter implements PushMetricExporter {
   constructor(options?: ConsoleMetricExporterOptions) {
     this._temporalitySelector =
       options?.temporalitySelector ?? DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR;
-    this._depth = options?.depth ?? null;
+    this._depth = typeof options?.depth !== 'undefined' ? options?.depth : null;
   }
 
   export(
