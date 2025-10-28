@@ -358,6 +358,17 @@ function parseConfigSpanOrLogRecordExporter(
         headersList = getStringFromConfigFile(e['headers_list']);
         if (headersList && parsedExporter.otlp_http) {
           parsedExporter.otlp_http.headers_list = headersList;
+          const list = getStringListFromConfigFile(e['headers_list']);
+          if (list && list.length > 0 && e['headers'] == null) {
+            parsedExporter.otlp_http.headers = [];
+            for (let i = 0; i < list.length; i++) {
+              const element = list[i].split('=');
+              parsedExporter.otlp_http.headers.push({
+                name: element[0],
+                value: element[1],
+              });
+            }
+          }
         }
         headers = getConfigHeaders(e['headers']);
         if (headers && parsedExporter.otlp_http) {
@@ -396,6 +407,17 @@ function parseConfigSpanOrLogRecordExporter(
         headersList = getStringFromConfigFile(e['headers_list']);
         if (headersList && parsedExporter.otlp_grpc) {
           parsedExporter.otlp_grpc.headers_list = headersList;
+          const list = getStringListFromConfigFile(e['headers_list']);
+          if (list && list.length > 0 && e['headers'] == null) {
+            parsedExporter.otlp_grpc.headers = [];
+            for (let i = 0; i < list.length; i++) {
+              const element = list[i].split('=');
+              parsedExporter.otlp_grpc.headers.push({
+                name: element[0],
+                value: element[1],
+              });
+            }
+          }
         }
         headers = getConfigHeaders(e['headers']);
         if (headers && parsedExporter.otlp_grpc) {
@@ -687,6 +709,17 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
         headersList = getStringFromConfigFile(e['headers_list']);
         if (headersList && parsedExporter.otlp_http) {
           parsedExporter.otlp_http.headers_list = headersList;
+          const list = getStringListFromConfigFile(e['headers_list']);
+          if (list && list.length > 0 && e['headers'] == null) {
+            parsedExporter.otlp_http.headers = [];
+            for (let i = 0; i < list.length; i++) {
+              const element = list[i].split('=');
+              parsedExporter.otlp_http.headers.push({
+                name: element[0],
+                value: element[1],
+              });
+            }
+          }
         }
         headers = getConfigHeaders(e['headers']);
         if (headers && parsedExporter.otlp_http) {
@@ -731,6 +764,17 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
         headersList = getStringFromConfigFile(e['headers_list']);
         if (headersList && parsedExporter.otlp_grpc) {
           parsedExporter.otlp_grpc.headers_list = headersList;
+          const list = getStringListFromConfigFile(e['headers_list']);
+          if (list && list.length > 0 && e['headers'] == null) {
+            parsedExporter.otlp_grpc.headers = [];
+            for (let i = 0; i < list.length; i++) {
+              const element = list[i].split('=');
+              parsedExporter.otlp_grpc.headers.push({
+                name: element[0],
+                value: element[1],
+              });
+            }
+          }
         }
         headers = getConfigHeaders(e['headers']);
         if (headers && parsedExporter.otlp_grpc) {

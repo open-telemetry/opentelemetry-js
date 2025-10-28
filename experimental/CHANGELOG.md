@@ -20,6 +20,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :rocket: Features
 
 * feat(instrumentation): allow error of safeExecuteInTheMiddleAsync to be async [#6032](https://github.com/open-telemetry/opentelemetry-js/pull/6032) @JPeer264
+* feat(opentelemetry-config): set headers from headers_list [#6060](https://github.com/open-telemetry/opentelemetry-js/pull/6060) @JamieDanielson
 
 ### :bug: Bug Fixes
 

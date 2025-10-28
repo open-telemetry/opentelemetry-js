@@ -1395,6 +1395,48 @@ describe('ConfigProvider', function () {
             },
           ],
         },
+        tracer_provider: {
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/traces',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                    headers_list: 'api-key=1234',
+                    headers: [
+                      {
+                        name: 'api-key',
+                        value: '1234',
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          ],
+          limits: {
+            attribute_count_limit: 128,
+            event_count_limit: 128,
+            link_count_limit: 128,
+            event_attribute_count_limit: 128,
+            link_attribute_count_limit: 128,
+          },
+          sampler: {
+            parent_based: {
+              root: { always_on: undefined },
+              remote_parent_sampled: { always_on: undefined },
+              remote_parent_not_sampled: { always_off: undefined },
+              local_parent_sampled: { always_on: undefined },
+              local_parent_not_sampled: { always_off: undefined },
+            },
+          },
+        },
       };
       assert.deepStrictEqual(
         configProvider.getInstrumentationConfig(),
