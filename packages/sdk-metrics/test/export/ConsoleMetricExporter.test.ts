@@ -174,5 +174,67 @@ describe('ConsoleMetricExporter', () => {
       });
       assertAggregationTemporalitySelector(exporter, selector);
     });
+
+    it('should use default depth of null', async () => {
+      const previousConsoleDir = console.dir;
+      console.dir = () => {};
+
+      const exporter = new ConsoleMetricExporter();
+      const metricReader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+      const meterProvider = new MeterProvider({
+        resource: testResource,
+        readers: [metricReader],
+      });
+      const meter = meterProvider.getMeter('test', '1.0.0');
+      const counter = meter.createCounter('test_counter');
+      counter.add(1);
+
+      const spyConsole = sinon.spy(console, 'dir');
+      const spyExport = sinon.spy(exporter, 'export');
+
+      await waitForNumberOfExports(spyExport, 1);
+
+      const consoleArgs = spyConsole.args[0];
+      const options = consoleArgs[1];
+      assert.strictEqual(options.depth, null);
+
+      console.dir = previousConsoleDir;
+      await metricReader.shutdown();
+    });
+
+    it('should use custom depth when provided', async () => {
+      const previousConsoleDir = console.dir;
+      console.dir = () => {};
+
+      const exporter = new ConsoleMetricExporter({ depth: 5 });
+      const metricReader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+      const meterProvider = new MeterProvider({
+        resource: testResource,
+        readers: [metricReader],
+      });
+      const meter = meterProvider.getMeter('test', '1.0.0');
+      const counter = meter.createCounter('test_counter');
+      counter.add(1);
+
+      const spyConsole = sinon.spy(console, 'dir');
+      const spyExport = sinon.spy(exporter, 'export');
+
+      await waitForNumberOfExports(spyExport, 1);
+
+      const consoleArgs = spyConsole.args[0];
+      const options = consoleArgs[1];
+      assert.strictEqual(options.depth, 5);
+
+      console.dir = previousConsoleDir;
+      await metricReader.shutdown();
+    });
   });
 });

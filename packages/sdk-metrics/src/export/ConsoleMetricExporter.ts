@@ -24,6 +24,7 @@ import {
 
 interface ConsoleMetricExporterOptions {
   temporalitySelector?: AggregationTemporalitySelector;
+  depth?: number | null;
 }
 
 /**
@@ -37,10 +38,12 @@ interface ConsoleMetricExporterOptions {
 export class ConsoleMetricExporter implements PushMetricExporter {
   protected _shutdown = false;
   protected _temporalitySelector: AggregationTemporalitySelector;
+  protected _depth: number | null;
 
   constructor(options?: ConsoleMetricExporterOptions) {
     this._temporalitySelector =
       options?.temporalitySelector ?? DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR;
+    this._depth = options?.depth ?? null;
   }
 
   export(
@@ -53,7 +56,7 @@ export class ConsoleMetricExporter implements PushMetricExporter {
       return;
     }
 
-    return ConsoleMetricExporter._sendMetrics(metrics, resultCallback);
+    return this._sendMetrics(metrics, resultCallback);
   }
 
   forceFlush(): Promise<void> {
@@ -71,7 +74,7 @@ export class ConsoleMetricExporter implements PushMetricExporter {
     return Promise.resolve();
   }
 
-  private static _sendMetrics(
+  private _sendMetrics(
     metrics: ResourceMetrics,
     done: (result: ExportResult) => void
   ): void {
@@ -83,7 +86,7 @@ export class ConsoleMetricExporter implements PushMetricExporter {
             dataPointType: metric.dataPointType,
             dataPoints: metric.dataPoints,
           },
-          { depth: null }
+          { depth: this._depth }
         );
       }
     }
