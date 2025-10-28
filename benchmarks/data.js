@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1761689762274,
+  "lastUpdate": 1761695551346,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -42538,6 +42538,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 278879,
             "range": "±0.63%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jamiedanielson@honeycomb.io",
+            "name": "Jamie Danielson",
+            "username": "JamieDanielson"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6953aa5d3ebf889b1d37176f0ebd64f342dae200",
+          "message": "feat(opentelemetry-config): add backups for compression, timeout, headers (#6058)\n\nCo-authored-by: Marylia Gutierrez <marylia.gutierrez@grafana.com>",
+          "timestamp": "2025-10-28T23:44:07Z",
+          "tree_id": "d398d313c404813655226c80d689710eb7742a9d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/6953aa5d3ebf889b1d37176f0ebd64f342dae200"
+        },
+        "date": 1761695550321,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 694397,
+            "range": "±0.65%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8489,
+            "range": "±0.83%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 294026,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 285450,
+            "range": "±0.56%",
             "unit": "ops/sec",
             "extra": "92 samples"
           }
