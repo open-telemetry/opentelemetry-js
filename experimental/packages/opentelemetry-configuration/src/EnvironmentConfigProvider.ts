@@ -73,8 +73,18 @@ export function setResources(config: ConfigurationModel): void {
   }
 
   const resourceAttrList = getStringFromEnv('OTEL_RESOURCE_ATTRIBUTES');
-  if (resourceAttrList) {
+  const list = getStringListFromEnv('OTEL_RESOURCE_ATTRIBUTES');
+  if (list && list.length > 0) {
     config.resource.attributes_list = resourceAttrList;
+    config.resource.attributes = [];
+    for (let i = 0; i < list.length; i++) {
+      const element = list[i].split('=');
+      config.resource.attributes.push({
+        name: element[0],
+        value: element[1],
+        type: 'string',
+      });
+    }
   }
 
   const serviceName = getStringFromEnv('OTEL_SERVICE_NAME');
@@ -200,28 +210,32 @@ export function setTracerProvider(config: ConfigurationModel): void {
       batch.max_export_batch_size = maxExportBatchSize;
     }
 
-    const endpoint = getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_ENDPOINT');
+    const endpoint =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_ENDPOINT') ??
+      (getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')
+        ? `${getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')}/v1/traces`
+        : null);
     if (endpoint && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.endpoint = endpoint;
     }
 
-    const certificateFile = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE'
-    );
+    const certificateFile =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_CERTIFICATE');
     if (certificateFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.certificate_file = certificateFile;
     }
 
-    const clientKeyFile = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY'
-    );
+    const clientKeyFile =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_CLIENT_KEY');
     if (clientKeyFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.client_key_file = clientKeyFile;
     }
 
-    const clientCertificateFile = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE'
-    );
+    const clientCertificateFile =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE');
     if (clientCertificateFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.client_certificate_file = clientCertificateFile;
     }
@@ -269,28 +283,32 @@ export function setMeterProvider(config: ConfigurationModel): void {
       readerPeriodic.exporter.otlp_http = {};
     }
 
-    const endpoint = getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_ENDPOINT');
+    const endpoint =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_ENDPOINT') ??
+      (getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')
+        ? `${getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')}/v1/metrics`
+        : null);
     if (endpoint) {
       readerPeriodic.exporter.otlp_http.endpoint = endpoint;
     }
 
-    const certificateFile = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE'
-    );
+    const certificateFile =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_CERTIFICATE');
     if (certificateFile) {
       readerPeriodic.exporter.otlp_http.certificate_file = certificateFile;
     }
 
-    const clientKeyFile = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY'
-    );
+    const clientKeyFile =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_CLIENT_KEY');
     if (clientKeyFile) {
       readerPeriodic.exporter.otlp_http.client_key_file = clientKeyFile;
     }
 
-    const clientCertificateFile = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE'
-    );
+    const clientCertificateFile =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE');
     if (clientCertificateFile) {
       readerPeriodic.exporter.otlp_http.client_certificate_file =
         clientCertificateFile;
@@ -430,28 +448,32 @@ export function setLoggerProvider(config: ConfigurationModel): void {
       batch.max_export_batch_size = maxExportBatchSize;
     }
 
-    const endpoint = getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_ENDPOINT');
+    const endpoint =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_ENDPOINT') ??
+      (getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')
+        ? `${getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')}/v1/logs`
+        : null);
     if (endpoint && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.endpoint = endpoint;
     }
 
-    const certificateFile = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE'
-    );
+    const certificateFile =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_CERTIFICATE');
     if (certificateFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.certificate_file = certificateFile;
     }
 
-    const clientKeyFile = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY'
-    );
+    const clientKeyFile =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_CLIENT_KEY');
     if (clientKeyFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.client_key_file = clientKeyFile;
     }
 
-    const clientCertificateFile = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE'
-    );
+    const clientCertificateFile =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE');
     if (clientCertificateFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.client_certificate_file = clientCertificateFile;
     }
