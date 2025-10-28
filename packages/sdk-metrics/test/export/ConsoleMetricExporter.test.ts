@@ -200,7 +200,7 @@ describe('ConsoleMetricExporter', () => {
 
       const consoleArgs = spyConsole.args[0];
       const options = consoleArgs[1];
-      assert.strictEqual(options.depth, null);
+      assert.strictEqual(options?.depth, null);
 
       console.dir = previousConsoleDir;
       await metricReader.shutdown();
@@ -231,7 +231,7 @@ describe('ConsoleMetricExporter', () => {
 
       const consoleArgs = spyConsole.args[0];
       const options = consoleArgs[1];
-      assert.strictEqual(options.depth, 5);
+      assert.strictEqual(options?.depth, 5);
 
       console.dir = previousConsoleDir;
       await metricReader.shutdown();

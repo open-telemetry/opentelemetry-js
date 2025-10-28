@@ -103,7 +103,7 @@ describe('ConsoleLogRecordExporter', () => {
 
       const consoleArgs = spyConsole.args[0];
       const options = consoleArgs[1];
-      assert.strictEqual(options.depth, 3);
+      assert.strictEqual(options?.depth, 3);
     });
 
     it('should use custom depth when provided', () => {
@@ -117,7 +117,7 @@ describe('ConsoleLogRecordExporter', () => {
 
       const consoleArgs = spyConsole.args[0];
       const options = consoleArgs[1];
-      assert.strictEqual(options.depth, 5);
+      assert.strictEqual(options?.depth, 5);
     });
 
     it('should use null depth when explicitly provided', () => {
@@ -131,7 +131,7 @@ describe('ConsoleLogRecordExporter', () => {
 
       const consoleArgs = spyConsole.args[0];
       const options = consoleArgs[1];
-      assert.strictEqual(options.depth, null);
+      assert.strictEqual(options?.depth, null);
     });
   });
 });
