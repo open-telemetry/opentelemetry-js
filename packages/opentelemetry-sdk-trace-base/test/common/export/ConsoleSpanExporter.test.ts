@@ -116,4 +116,57 @@ describe('ConsoleSpanExporter', () => {
       await consoleExporter.forceFlush();
     });
   });
+
+  describe('constructor', () => {
+    it('should use default depth of 3', () => {
+      consoleExporter = new ConsoleSpanExporter();
+      const basicTracerProvider = new BasicTracerProvider({
+        sampler: new AlwaysOnSampler(),
+        spanProcessors: [new SimpleSpanProcessor(consoleExporter)],
+      });
+
+      const spyConsole = sinon.spy(console, 'dir');
+      const tracer = basicTracerProvider.getTracer('test');
+      const span = tracer.startSpan('test-span');
+      span.end();
+
+      const consoleArgs = spyConsole.args[0];
+      const options = consoleArgs[1];
+      assert.strictEqual(options.depth, 3);
+    });
+
+    it('should use custom depth when provided', () => {
+      consoleExporter = new ConsoleSpanExporter({ depth: 5 });
+      const basicTracerProvider = new BasicTracerProvider({
+        sampler: new AlwaysOnSampler(),
+        spanProcessors: [new SimpleSpanProcessor(consoleExporter)],
+      });
+
+      const spyConsole = sinon.spy(console, 'dir');
+      const tracer = basicTracerProvider.getTracer('test');
+      const span = tracer.startSpan('test-span');
+      span.end();
+
+      const consoleArgs = spyConsole.args[0];
+      const options = consoleArgs[1];
+      assert.strictEqual(options.depth, 5);
+    });
+
+    it('should use null depth when explicitly provided', () => {
+      consoleExporter = new ConsoleSpanExporter({ depth: null });
+      const basicTracerProvider = new BasicTracerProvider({
+        sampler: new AlwaysOnSampler(),
+        spanProcessors: [new SimpleSpanProcessor(consoleExporter)],
+      });
+
+      const spyConsole = sinon.spy(console, 'dir');
+      const tracer = basicTracerProvider.getTracer('test');
+      const span = tracer.startSpan('test-span');
+      span.end();
+
+      const consoleArgs = spyConsole.args[0];
+      const options = consoleArgs[1];
+      assert.strictEqual(options.depth, null);
+    });
+  });
 });

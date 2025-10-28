@@ -22,6 +22,10 @@ import {
   hrTimeToMicroseconds,
 } from '@opentelemetry/core';
 
+interface ConsoleSpanOptions {
+  depth?: number | null;
+}
+
 /**
  * This is implementation of {@link SpanExporter} that prints spans to the
  * console. This class can be used for diagnostic purposes.
@@ -31,6 +35,12 @@ import {
 
 /* eslint-disable no-console */
 export class ConsoleSpanExporter implements SpanExporter {
+  protected _depth: number | null;
+
+  constructor(options?: ConsoleSpanOptions) {
+    this._depth = options?.depth ?? 3;
+  }
+
   /**
    * Export spans.
    * @param spans
@@ -93,7 +103,7 @@ export class ConsoleSpanExporter implements SpanExporter {
     done?: (result: ExportResult) => void
   ): void {
     for (const span of spans) {
-      console.dir(this._exportInfo(span), { depth: 3 });
+      console.dir(this._exportInfo(span), { depth: this._depth });
     }
     if (done) {
       return done({ code: ExportResultCode.SUCCESS });
