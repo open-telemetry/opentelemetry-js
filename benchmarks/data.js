@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1761597630246,
+  "lastUpdate": 1761689762274,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -42488,6 +42488,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.63%",
             "unit": "ops/sec",
             "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "29139614+renovate[bot]@users.noreply.github.com",
+            "name": "renovate[bot]",
+            "username": "renovate[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "74f470e8eaa61d0893aa6e0f8d38212c100e33d5",
+          "message": "chore(deps): update github/codeql-action digest to 4e94bd1 (#6049)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+          "timestamp": "2025-10-28T22:06:45Z",
+          "tree_id": "27fd99a7e911c87f6f149ce4b213c84111e92b00",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/74f470e8eaa61d0893aa6e0f8d38212c100e33d5"
+        },
+        "date": 1761689761226,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 696982,
+            "range": "±1.00%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8636,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 295956,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 278879,
+            "range": "±0.63%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
