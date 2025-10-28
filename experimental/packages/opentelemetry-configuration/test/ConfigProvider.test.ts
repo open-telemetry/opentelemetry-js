@@ -1064,14 +1064,16 @@ describe('ConfigProvider', function () {
       );
     });
 
-    it('should use backup option for certificates', function () {
+    it('should use backup options for exporters', function () {
       process.env.OTEL_EXPORTER_OTLP_CERTIFICATE =
         'backup_certificate_file.pem';
       process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY = 'backup_client_key.pem';
       process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE =
         'backup_client_certificate.pem';
       process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://backup.com:4318';
-
+      process.env.OTEL_EXPORTER_OTLP_COMPRESSION = 'backup_compression';
+      process.env.OTEL_EXPORTER_OTLP_TIMEOUT = '12000';
+      process.env.OTEL_EXPORTER_OTLP_HEADERS = 'backup_headers=123';
       const expectedConfig: Configuration = {
         ...defaultConfig,
         tracer_provider: {
@@ -1082,11 +1084,13 @@ describe('ConfigProvider', function () {
                 exporter: {
                   otlp_http: {
                     endpoint: 'http://backup.com:4318/v1/traces',
-                    timeout: 10000,
+                    timeout: 12000,
+                    compression: 'backup_compression',
                     encoding: OtlpHttpEncoding.Protobuf,
                     certificate_file: 'backup_certificate_file.pem',
                     client_certificate_file: 'backup_client_certificate.pem',
                     client_key_file: 'backup_client_key.pem',
+                    headers_list: 'backup_headers=123',
                   },
                 },
               },
@@ -1105,7 +1109,8 @@ describe('ConfigProvider', function () {
                 exporter: {
                   otlp_http: {
                     endpoint: 'http://backup.com:4318/v1/metrics',
-                    timeout: 10000,
+                    timeout: 12000,
+                    compression: 'backup_compression',
                     temporality_preference:
                       ExporterTemporalityPreference.Cumulative,
                     default_histogram_aggregation:
@@ -1113,6 +1118,7 @@ describe('ConfigProvider', function () {
                     certificate_file: 'backup_certificate_file.pem',
                     client_certificate_file: 'backup_client_certificate.pem',
                     client_key_file: 'backup_client_key.pem',
+                    headers_list: 'backup_headers=123',
                   },
                 },
               },
@@ -1131,11 +1137,13 @@ describe('ConfigProvider', function () {
                 exporter: {
                   otlp_http: {
                     endpoint: 'http://backup.com:4318/v1/logs',
-                    timeout: 10000,
+                    timeout: 12000,
+                    compression: 'backup_compression',
                     encoding: OtlpHttpEncoding.Protobuf,
                     certificate_file: 'backup_certificate_file.pem',
                     client_certificate_file: 'backup_client_certificate.pem',
                     client_key_file: 'backup_client_key.pem',
+                    headers_list: 'backup_headers=123',
                   },
                 },
               },
