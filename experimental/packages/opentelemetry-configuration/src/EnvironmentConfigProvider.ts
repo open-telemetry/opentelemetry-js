@@ -240,19 +240,23 @@ export function setTracerProvider(config: ConfigurationModel): void {
       batch.exporter.otlp_http.client_certificate_file = clientCertificateFile;
     }
 
-    const compression = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_TRACES_COMPRESSION'
-    );
+    const compression =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_COMPRESSION') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_COMPRESSION');
     if (compression && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.compression = compression;
     }
 
-    const timeout = getNumberFromEnv('OTEL_EXPORTER_OTLP_TRACES_TIMEOUT');
+    const timeout =
+      getNumberFromEnv('OTEL_EXPORTER_OTLP_TRACES_TIMEOUT') ??
+      getNumberFromEnv('OTEL_EXPORTER_OTLP_TIMEOUT');
     if (timeout && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.timeout = timeout;
     }
 
-    const headersList = getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_HEADERS');
+    const headersList =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_HEADERS') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_HEADERS');
     if (headersList && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.headers_list = headersList;
     }
@@ -314,19 +318,23 @@ export function setMeterProvider(config: ConfigurationModel): void {
         clientCertificateFile;
     }
 
-    const compression = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_METRICS_COMPRESSION'
-    );
+    const compression =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_COMPRESSION') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_COMPRESSION');
     if (compression) {
       readerPeriodic.exporter.otlp_http.compression = compression;
     }
 
-    const timeoutEx = getNumberFromEnv('OTEL_EXPORTER_OTLP_METRICS_TIMEOUT');
+    const timeoutEx =
+      getNumberFromEnv('OTEL_EXPORTER_OTLP_METRICS_TIMEOUT') ??
+      getNumberFromEnv('OTEL_EXPORTER_OTLP_TIMEOUT');
     if (timeoutEx) {
       readerPeriodic.exporter.otlp_http.timeout = timeoutEx;
     }
 
-    const headersList = getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_HEADERS');
+    const headersList =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_HEADERS') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_HEADERS');
     if (headersList) {
       readerPeriodic.exporter.otlp_http.headers_list = headersList;
     }
@@ -478,17 +486,23 @@ export function setLoggerProvider(config: ConfigurationModel): void {
       batch.exporter.otlp_http.client_certificate_file = clientCertificateFile;
     }
 
-    const compression = getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_COMPRESSION');
+    const compression =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_COMPRESSION') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_COMPRESSION');
     if (compression && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.compression = compression;
     }
 
-    const timeout = getNumberFromEnv('OTEL_EXPORTER_OTLP_LOGS_TIMEOUT');
+    const timeout =
+      getNumberFromEnv('OTEL_EXPORTER_OTLP_LOGS_TIMEOUT') ??
+      getNumberFromEnv('OTEL_EXPORTER_OTLP_TIMEOUT');
     if (timeout && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.timeout = timeout;
     }
 
-    const headersList = getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_HEADERS');
+    const headersList =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_HEADERS') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_HEADERS');
     if (headersList && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.headers_list = headersList;
     }
