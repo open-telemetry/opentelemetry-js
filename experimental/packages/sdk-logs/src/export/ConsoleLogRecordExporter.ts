@@ -39,7 +39,7 @@ export class ConsoleLogRecordExporter implements LogRecordExporter {
   protected _depth: number | null;
 
   constructor(options?: ConsoleLogRecordOptions) {
-    this._depth = options?.depth ?? 3;
+    this._depth = typeof options?.depth !== 'undefined' ? options?.depth : 3;
   }
 
   /**
