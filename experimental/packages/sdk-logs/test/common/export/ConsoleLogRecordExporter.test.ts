@@ -91,5 +91,47 @@ describe('ConsoleLogRecordExporter', () => {
         assert.ok(spyExport.calledOnce);
       });
     });
+
+    it('should use default depth of 3', () => {
+      const consoleExporter = new ConsoleLogRecordExporter();
+      const spyConsole = sinon.spy(console, 'dir');
+      const provider = new LoggerProvider({
+        processors: [new SimpleLogRecordProcessor(consoleExporter)],
+      });
+
+      provider.getLogger('test').emit({ body: 'test' });
+
+      const consoleArgs = spyConsole.args[0];
+      const options = consoleArgs[1];
+      assert.strictEqual(options.depth, 3);
+    });
+
+    it('should use custom depth when provided', () => {
+      const consoleExporter = new ConsoleLogRecordExporter({ depth: 5 });
+      const spyConsole = sinon.spy(console, 'dir');
+      const provider = new LoggerProvider({
+        processors: [new SimpleLogRecordProcessor(consoleExporter)],
+      });
+
+      provider.getLogger('test').emit({ body: 'test' });
+
+      const consoleArgs = spyConsole.args[0];
+      const options = consoleArgs[1];
+      assert.strictEqual(options.depth, 5);
+    });
+
+    it('should use null depth when explicitly provided', () => {
+      const consoleExporter = new ConsoleLogRecordExporter({ depth: null });
+      const spyConsole = sinon.spy(console, 'dir');
+      const provider = new LoggerProvider({
+        processors: [new SimpleLogRecordProcessor(consoleExporter)],
+      });
+
+      provider.getLogger('test').emit({ body: 'test' });
+
+      const consoleArgs = spyConsole.args[0];
+      const options = consoleArgs[1];
+      assert.strictEqual(options.depth, null);
+    });
   });
 });

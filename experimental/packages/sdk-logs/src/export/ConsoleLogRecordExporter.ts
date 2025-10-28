@@ -23,6 +23,10 @@ import {
 import type { ReadableLogRecord } from './ReadableLogRecord';
 import type { LogRecordExporter } from './LogRecordExporter';
 
+interface ConsoleLogRecordOptions {
+  depth?: number | null;
+}
+
 /**
  * This is implementation of {@link LogRecordExporter} that prints LogRecords to the
  * console. This class can be used for diagnostic purposes.
@@ -32,6 +36,12 @@ import type { LogRecordExporter } from './LogRecordExporter';
 
 /* eslint-disable no-console */
 export class ConsoleLogRecordExporter implements LogRecordExporter {
+  protected _depth: number | null;
+
+  constructor(options?: ConsoleLogRecordOptions) {
+    this._depth = options?.depth ?? 3;
+  }
+
   /**
    * Export logs.
    * @param logs
@@ -82,7 +92,7 @@ export class ConsoleLogRecordExporter implements LogRecordExporter {
     done?: (result: ExportResult) => void
   ): void {
     for (const logRecord of logRecords) {
-      console.dir(this._exportInfo(logRecord), { depth: 3 });
+      console.dir(this._exportInfo(logRecord), { depth: this._depth });
     }
     done?.({ code: ExportResultCode.SUCCESS });
   }
