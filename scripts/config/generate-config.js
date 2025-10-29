@@ -26,7 +26,7 @@
 
 const { compileFromFile } = require('json-schema-to-typescript');
 const fs = require('fs');
-const { execSync } = require('child_process');
+const { execSync, spawnSync } = require('child_process');
 const path = require('path');
 const yaml = require('yaml');
 const ts = require('typescript');
@@ -385,10 +385,19 @@ compileFromFile(`${ROOT_DIR}/scripts/config/opentelemetry-configuration/schema/o
     fs.writeFileSync(outputPath, content);
 
     // format opentelemetry-configuration generated types
-    execSync(`npx prettier --write ${outputPath}`, { stdio: 'inherit' });
+    const prettierResult = spawnSync('npx', ['prettier', '--write', outputPath], { stdio: 'inherit' });
+    if (prettierResult.error) {
+      throw prettierResult.error;
+    }
 
     // compile opentelemetry-configuration package
-    execSync(`npm run compile`, { stdio: 'inherit', cwd: `${ROOT_DIR}/experimental/packages/opentelemetry-configuration` });
+    const compileResult = spawnSync('npm', ['run', 'compile'], {
+      stdio: 'inherit',
+      cwd: `${ROOT_DIR}/experimental/packages/opentelemetry-configuration`
+    });
+    if (compileResult.error) {
+      throw compileResult.error;
+    }
   });
 
 /* notes
