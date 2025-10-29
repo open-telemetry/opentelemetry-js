@@ -26,7 +26,7 @@
 
 const { compileFromFile } = require('json-schema-to-typescript');
 const fs = require('fs');
-const { execSync, spawnSync } = require('child_process');
+const { spawnSync } = require('child_process');
 const path = require('path');
 const yaml = require('yaml');
 const ts = require('typescript');
@@ -35,8 +35,13 @@ const SCRIPT_DIR = __dirname;
 const ROOT_DIR = path.join(SCRIPT_DIR, '..', '..');
 
 // Run the bash script to get the latest version of the schema
-const scriptPath = path.join(SCRIPT_DIR, 'generate-config.sh');
-execSync(`bash "${scriptPath}"`, { stdio: 'inherit', cwd: SCRIPT_DIR });
+const bashResult = spawnSync('bash', ['generate-config.sh'], {
+  stdio: 'inherit',
+  cwd: SCRIPT_DIR
+});
+if (bashResult.error) {
+  throw bashResult.error;
+}
 
 function addLicenseHeader(content) {
   const licenseHeader = `/*
@@ -355,23 +360,15 @@ const options = {
 const outputPath = `${ROOT_DIR}/experimental/packages/opentelemetry-configuration/src/generated/opentelemetry-configuration.ts`;
 compileFromFile(`${ROOT_DIR}/scripts/config/opentelemetry-configuration/schema/opentelemetry_configuration.json`, options)
   .then(ts => {
-    fs.writeFileSync(outputPath, ts);
+    let content = ts;
 
     // Add JSDoc descriptions from type_descriptions.yaml
-    let content = fs.readFileSync(outputPath, 'utf8');
     content = addDescriptionsToTypes(content);
-    fs.writeFileSync(outputPath, content);
 
     // Fix the HttpsOpentelemetryIoOtelconfigInstrumentationJson type
     // See notes below for details on why this is needed
-    content = fs.readFileSync(outputPath, 'utf8');
-
-    // Find and replace the index signature in HttpsOpentelemetryIoOtelconfigInstrumentationJson
-    // Pattern matches the interface and its index signature line
     const pattern = /(export interface HttpsOpentelemetryIoOtelconfigInstrumentationJson\s*\{[\s\S]*?)(\s+\[k: string\]: ExperimentalLanguageSpecificInstrumentation;)/;
-
     content = content.replace(pattern, (_match, interfaceStart, _indexSignature) => {
-      // Replace the index signature with the corrected multi-type version
       const replacement = `  [k: string]:\n    | ExperimentalLanguageSpecificInstrumentation\n    | ExperimentalGeneralInstrumentation\n    | undefined;`;
       return interfaceStart + replacement;
     });
@@ -381,7 +378,6 @@ compileFromFile(`${ROOT_DIR}/scripts/config/opentelemetry-configuration/schema/o
       content = addLicenseHeader(content);
     }
 
-    // Write back the processed content
     fs.writeFileSync(outputPath, content);
 
     // format opentelemetry-configuration generated types
