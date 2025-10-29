@@ -64,6 +64,9 @@
       "path": "../exporter-trace-otlp-proto"
     },
     {
+      "path": "../opentelemetry-configuration"
+    },
+    {
       "path": "../opentelemetry-exporter-metrics-otlp-grpc"
     },
     {
