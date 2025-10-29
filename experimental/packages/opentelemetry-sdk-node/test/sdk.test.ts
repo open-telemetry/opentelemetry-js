@@ -58,7 +58,6 @@ import {
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
 import { NodeSDK } from '../src';
-import * as process from 'process';
 import {
   envDetector,
   processDetector,
