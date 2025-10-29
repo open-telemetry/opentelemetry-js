@@ -21,7 +21,7 @@ cd opentelemetry-configuration
 
 git init
 # git remote add origin https://github.com/open-telemetry/opentelemetry-configuration.git
-# this branch has the fix that removes patternProperties
+# TEMP: this branch has the fix that removes patternProperties from the schema
 git remote add origin https://github.com/dol/opentelemetry-configuration
 git fetch origin fix/wildcard-pattern
 git checkout fix/wildcard-pattern
