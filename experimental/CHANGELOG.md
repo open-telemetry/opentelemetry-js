@@ -10,6 +10,18 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 0.208.0
+
+### :boom: Breaking Changes
+
 * feat(otlp-exporter-base)!: allow passing an async function to headers option [#5994](https://github.com/open-telemetry/opentelemetry-js/pull/5994/files) @pichlermarc
   * In addition to static headers, OTLP exporters now allow passing an async function that returns headers which will be called before each export. See TSDoc for `headers` in `OTLPExporterConfigBase` for details.
   * Breaking changes:
@@ -24,10 +36,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(opentelemetry-configuration): parse meter provider from config file [#6000](https://github.com/open-telemetry/opentelemetry-js/pull/6000) @maryliag
 * feat(opentelemetry-configuration): add backup options for certificates and endpoints [#6038](https://github.com/open-telemetry/opentelemetry-js/pull/6038) @maryliag
 * feat(opentelemetry-configuration): add backups for compression, timeout, headers [#6058](https://github.com/open-telemetry/opentelemetry-js/pull/6058) @JamieDanielson
-
-### :bug: Bug Fixes
-
-### :books: Documentation
 
 ### :house: Internal
 
