@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context, SpanKind, Link, SpanAttributes } from '@opentelemetry/api';
+import { Context, SpanKind, Link, SpanAttributes, diag } from '@opentelemetry/api';
 import {
   Sampler,
   SamplingResult,
@@ -40,13 +40,17 @@ export class PerOperationSampler implements Sampler {
       config.perOperationStrategies.map(perOperationStrategy => [
         perOperationStrategy.operation,
         new TraceIdRatioBasedSampler(
-          perOperationStrategy.probabilisticSampling.samplingRate
+          perOperationStrategy.probabilisticSampling.samplingRate,
         ),
       ])
     );
+    config.perOperationStrategies.forEach((e) => {
+      diag.info(`Operation: ${e.operation} sampling: ${JSON.stringify(e.probabilisticSampling)}`)
+    });
   }
 
   private getSamplerForOperation(spanName: string): Sampler {
+    diag.info(`SpanName: ${spanName}`);
     let resultantSampler = this._perOperationSampler.get(spanName);
     if (resultantSampler == null) {
       resultantSampler = this._defaultSampler;
@@ -62,6 +66,15 @@ export class PerOperationSampler implements Sampler {
     attributes: SpanAttributes,
     links: Link[]
   ): SamplingResult {
+    diag.info(`attributes: ${JSON.stringify(attributes)}`);
+    const host = attributes["http.host"];
+
+    if (typeof host === 'string' && host.includes('metronome.com')) {
+      if (attributes["http.method"] !== undefined && attributes["http.target"] !== undefined) {
+        diag.info("Resetting span name")
+        spanName = `${attributes["http.method"]} ${attributes["http.target"]}`;
+      }
+    }
     return this.getSamplerForOperation(spanName).shouldSample(
       context,
       traceId,
@@ -73,10 +86,9 @@ export class PerOperationSampler implements Sampler {
   }
 
   toString(): string {
-    return `PerOperationSampler{default=${
-      this._defaultSampler
-    }, perOperationSamplers={${Array.from(this._perOperationSampler).map(
-      ([key, value]) => `${key}=${value}`
-    )}}}`;
+    return `PerOperationSampler{default=${this._defaultSampler
+      }, perOperationSamplers={${Array.from(this._perOperationSampler).map(
+        ([key, value]) => `${key}=${value}`
+      )}}}`;
   }
 }

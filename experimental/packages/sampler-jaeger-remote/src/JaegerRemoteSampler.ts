@@ -99,6 +99,7 @@ export class JaegerRemoteSampler implements Sampler {
   ): Sampler {
     const perOperationStrategies =
       newConfig.operationSampling?.perOperationStrategies;
+    diag.info(JSON.stringify(newConfig));
     if (
       newConfig.operationSampling &&
       perOperationStrategies &&
