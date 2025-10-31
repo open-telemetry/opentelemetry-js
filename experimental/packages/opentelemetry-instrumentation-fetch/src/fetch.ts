@@ -507,8 +507,14 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
             const body = resClone.body;
             if (body) {
               const reader = body.getReader();
-
-              const wrappedBody = withCancelPropagation(response.body, reader);
+              const isNullBodyStatus =
+                // 101 responses and protocol upgrading is handled internally by the browser
+                response.status === 204 ||
+                response.status === 205 ||
+                response.status === 304;
+              const wrappedBody = isNullBodyStatus
+                ? null
+                : withCancelPropagation(response.body, reader);
 
               proxiedResponse = new Response(wrappedBody, {
                 status: response.status,
