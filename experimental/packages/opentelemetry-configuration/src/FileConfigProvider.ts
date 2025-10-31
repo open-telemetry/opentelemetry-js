@@ -121,6 +121,24 @@ export function parseConfigFile(config: ConfigurationModel) {
       );
       if (attrList) {
         config.resource.attributes_list = attrList;
+        const list = getStringListFromConfigFile(
+          parsedContent['resource']?.['attributes_list']
+        );
+        if (
+          list &&
+          list.length > 0 &&
+          parsedContent['resource']?.['attributes'] == null
+        ) {
+          config.resource.attributes = [];
+          for (let i = 0; i < list.length; i++) {
+            const element = list[i].split('=');
+            config.resource.attributes.push({
+              name: element[0],
+              value: element[1],
+              type: 'string',
+            });
+          }
+        }
       }
 
       const schemaUrl = getStringFromConfigFile(

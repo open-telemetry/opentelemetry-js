@@ -21,10 +21,11 @@ import {
   isExportRetryable,
   parseRetryAfterToMills,
 } from '../is-export-retryable';
+import { HeadersFactory } from '../configuration/otlp-http-configuration';
 
 export interface FetchTransportParameters {
   url: string;
-  headers: () => Record<string, string>;
+  headers: HeadersFactory;
 }
 
 class FetchTransport implements IExporterTransport {
@@ -38,7 +39,7 @@ class FetchTransport implements IExporterTransport {
       const url = new URL(this._parameters.url);
       const response = await fetch(url.href, {
         method: 'POST',
-        headers: this._parameters.headers(),
+        headers: await this._parameters.headers(),
         body: data,
         signal: abortController.signal,
         keepalive: isBrowserEnvironment,

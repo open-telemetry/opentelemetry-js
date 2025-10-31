@@ -61,7 +61,7 @@ export function createOtlpSendBeaconExportDelegate<Internal, Response>(
     createRetryingTransport({
       transport: createSendBeaconTransport({
         url: options.url,
-        blobType: options.headers()['Content-Type'],
+        headers: options.headers,
       }),
     })
   );
