@@ -30,3 +30,7 @@ export type { LogRecordExporter } from './export/LogRecordExporter';
 export { SimpleLogRecordProcessor } from './export/SimpleLogRecordProcessor';
 export { InMemoryLogRecordExporter } from './export/InMemoryLogRecordExporter';
 export { BatchLogRecordProcessor } from './platform';
+export {
+  FilteringLogRecordProcessor,
+  type FilteringLogRecordProcessorConfig,
+} from './export/FilteringLogRecordProcessor';

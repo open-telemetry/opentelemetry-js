@@ -57,6 +57,68 @@ logger.emit({
 Logs configuration is a merge of both the user supplied configuration and the default
 configuration as specified in [config.ts](./src/config.ts)
 
+## Filtering Log Records
+
+Use the `FilteringLogRecordProcessor` to drop log records by severity or trace sampling before they reach exporters. Wrap your existing processor so only logs that pass the filter are forwarded.
+
+### Minimum Severity Filtering
+
+```js
+const {
+  LoggerProvider,
+  SimpleLogRecordProcessor,
+  FilteringLogRecordProcessor,
+} = require('@opentelemetry/sdk-logs');
+const { SeverityNumber } = require('@opentelemetry/api-logs');
+
+const loggerProvider = new LoggerProvider({
+  processors: [
+    new FilteringLogRecordProcessor(
+      new SimpleLogRecordProcessor(exporter),
+      { minimumSeverity: SeverityNumber.WARN }
+    ),
+  ],
+});
+```
+
+- Logs with `severityNumber >= minimumSeverity` are exported.
+- Logs with `severityNumber = UNSPECIFIED` (0) or undefined always bypass the filter.
+- Default minimum severity is `UNSPECIFIED` (no filtering).
+
+### Trace-Based Filtering
+
+```js
+const loggerProvider = new LoggerProvider({
+  processors: [
+    new FilteringLogRecordProcessor(
+      new SimpleLogRecordProcessor(exporter),
+      { traceBased: true }
+    ),
+  ],
+});
+```
+
+- Logs associated with **sampled traces** (`TraceFlags.SAMPLED` set) are exported.
+- Logs associated with **unsampled traces** are dropped.
+- Logs **without trace context** bypass the filter and are exported.
+- Default is `false` (no trace-based filtering).
+
+### Combined Filtering
+
+```js
+const loggerProvider = new LoggerProvider({
+  processors: [
+    new FilteringLogRecordProcessor(
+      new SimpleLogRecordProcessor(exporter),
+      {
+        minimumSeverity: SeverityNumber.WARN,
+        traceBased: true,
+      }
+    ),
+  ],
+});
+```
+
 ## Example
 
 See [examples/logs](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/examples/logs)
