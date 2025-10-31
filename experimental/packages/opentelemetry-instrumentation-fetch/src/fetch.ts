@@ -124,7 +124,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     );
   }
 
-  init(): void {}
+  protected override init(): void {}
 
   /**
    * Add cors pre flight child span
