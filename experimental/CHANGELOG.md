@@ -24,7 +24,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(opentelemetry-configuration): parse meter provider from config file [#6000](https://github.com/open-telemetry/opentelemetry-js/pull/6000) @maryliag
 * feat(opentelemetry-configuration): add backup options for certificates and endpoints [#6038](https://github.com/open-telemetry/opentelemetry-js/pull/6038) @maryliag
 * feat(opentelemetry-configuration): add backups for compression, timeout, headers [#6058](https://github.com/open-telemetry/opentelemetry-js/pull/6058) @JamieDanielson
-* * feat(sdk-logs): add the `FilteringLogRecordProcessor` including the ability to filter by minimum severity and trace [#5991](https://github.com/open-telemetry/opentelemetry-js/pull/5991) @JacksonWeber
+* feat(sdk-logs): add the `FilteringLogRecordProcessor` including the ability to filter by minimum severity and trace [#5991](https://github.com/open-telemetry/opentelemetry-js/pull/5991) @JacksonWeber
 
 ### :bug: Bug Fixes
 
@@ -81,12 +81,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(opentelemetry-configuration): Parse of Configuration File [#5875](https://github.com/open-telemetry/opentelemetry-js/pull/5875) @maryliag
 * feat(opentelemetry-configuration): parse of array objects on configuration file [#5947](https://github.com/open-telemetry/opentelemetry-js/pull/5947) @maryliag
 * feat(opentelemetry-configuration): parse of environment variables on configuration file [#5947](https://github.com/open-telemetry/opentelemetry-js/pull/5947) @maryliag
-* feat(opentelemetry-configuration): parse more parameters from config file [#5955](https://github.com/open-telemetry/opentelemetry-js/pull/5955) @maryliag
-* feat(exporter-prometheus): support withoutTargetInfo option [#5962](https://github.com/open-telemetry/opentelemetry-js/pull/5962) @cjihrig
-* feat(opentelemetry-configuration): parse trace provider from config file [#5992](https://github.com/open-telemetry/opentelemetry-js/pull/5992) @maryliag
-* feat(opentelemetry-configuration): parse logger provider from config file [#5995](https://github.com/open-telemetry/opentelemetry-js/pull/5995) @maryliag
-* feat(opentelemetry-configuration): parse meter provider from config file [#6000](https://github.com/open-telemetry/opentelemetry-js/pull/6000) @maryliag
-* feat(opentelemetry-configuration): parse config file with format 1.0-rc.2 [#6029](https://github.com/open-telemetry/opentelemetry-js/pull/6029) @maryliag
 
 ### :bug: Bug Fixes
 
