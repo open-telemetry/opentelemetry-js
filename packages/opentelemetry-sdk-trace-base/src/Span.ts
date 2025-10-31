@@ -291,6 +291,9 @@ export class SpanImpl implements Span {
       );
     }
 
+    if (this._spanProcessor.onEnding) {
+      this._spanProcessor.onEnding(this);
+    }
     this._spanProcessor.onEnd(this);
   }
 
