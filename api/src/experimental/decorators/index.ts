@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-/**
- * Any exports here may change at any time and without warning
- * @module @opentelemetry/api/experimental
- */
+import { TraceDecoratorAPI } from './trace';
 
-export { wrapTracer, SugaredTracer } from './trace/SugaredTracer';
-export type { SugaredSpanOptions } from './trace/SugaredOptions';
-
-export { decorators } from './decorators/index';
+export const trace = TraceDecoratorAPI.getInstance();
+export const decorators = {
+  trace,
+};
