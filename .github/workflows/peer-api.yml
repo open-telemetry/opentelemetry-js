@@ -14,7 +14,7 @@ jobs:
   peer-api-check:
     runs-on: ubuntu-latest
     container:
-      image: node:22@sha256:23c24e85395992be118734a39903e08c8f7d1abc73978c46b6bda90060091a49
+      image: node:24@sha256:34af25027ee1b8bffd482ba995ec1e577fbd398db87beb4c60b80c2c9c025127
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
