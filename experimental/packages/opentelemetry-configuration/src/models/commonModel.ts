@@ -15,6 +15,26 @@
  */
 'use strict';
 
+export interface IncludeExclude {
+  /**
+   * Configure list of attribute key patterns to include from resource detectors.
+   * Attribute keys from resource detectors are evaluated to match as follows:
+   *   * If the value of the attribute key exactly matches.
+   *   * If the value of the attribute key matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+   * If omitted, all attributes are included.
+   */
+  included?: string[];
+
+  /**
+   * Configure list of attribute key patterns to exclude from resource detectors. Applies after .resource.detectors.attributes.included (i.e. excluded has higher priority than included).
+   * Attribute keys from resource detectors are evaluated to match as follows:
+   *   * If the value of the attribute key exactly matches.
+   *   * If the value of the attribute key matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+   * If omitted, .included attributes are included.
+   */
+  excluded?: string[];
+}
+
 export interface NameStringValuePair {
   name: string;
   value: string;
@@ -86,8 +106,8 @@ export interface OtlpHttpExporter {
 }
 
 export enum OtlpHttpEncoding {
-  protobuf,
-  json,
+  JSON = 'json',
+  Protobuf = 'protobuf',
 }
 
 export interface OtlpGrpcExporter {

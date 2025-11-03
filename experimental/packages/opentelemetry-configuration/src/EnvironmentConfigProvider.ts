@@ -26,6 +26,11 @@ import {
   getNumberFromEnv,
 } from '@opentelemetry/core';
 import { ConfigProvider } from './IConfigProvider';
+import {
+  ExemplarFilter,
+  ExporterDefaultHistogramAggregation,
+  ExporterTemporalityPreference,
+} from './models/meterProviderModel';
 
 /**
  * EnvironmentConfigProvider provides a configuration based on environment variables.
@@ -62,14 +67,24 @@ export class EnvironmentConfigProvider implements ConfigProvider {
   }
 }
 
-function setResources(config: ConfigurationModel): void {
+export function setResources(config: ConfigurationModel): void {
   if (config.resource == null) {
     config.resource = {};
   }
 
   const resourceAttrList = getStringFromEnv('OTEL_RESOURCE_ATTRIBUTES');
-  if (resourceAttrList) {
+  const list = getStringListFromEnv('OTEL_RESOURCE_ATTRIBUTES');
+  if (list && list.length > 0) {
     config.resource.attributes_list = resourceAttrList;
+    config.resource.attributes = [];
+    for (let i = 0; i < list.length; i++) {
+      const element = list[i].split('=');
+      config.resource.attributes.push({
+        name: element[0],
+        value: element[1],
+        type: 'string',
+      });
+    }
   }
 
   const serviceName = getStringFromEnv('OTEL_SERVICE_NAME');
@@ -84,7 +99,7 @@ function setResources(config: ConfigurationModel): void {
   }
 }
 
-function setAttributeLimits(config: ConfigurationModel): void {
+export function setAttributeLimits(config: ConfigurationModel): void {
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT'
   );
@@ -106,7 +121,7 @@ function setAttributeLimits(config: ConfigurationModel): void {
   }
 }
 
-function setPropagators(config: ConfigurationModel): void {
+export function setPropagators(config: ConfigurationModel): void {
   if (config.propagator == null) {
     config.propagator = {};
   }
@@ -123,7 +138,7 @@ function setPropagators(config: ConfigurationModel): void {
   }
 }
 
-function setTracerProvider(config: ConfigurationModel): void {
+export function setTracerProvider(config: ConfigurationModel): void {
   if (config.tracer_provider == null) {
     config.tracer_provider = { processors: [] };
   }
@@ -195,45 +210,53 @@ function setTracerProvider(config: ConfigurationModel): void {
       batch.max_export_batch_size = maxExportBatchSize;
     }
 
-    const endpoint = getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_ENDPOINT');
+    const endpoint =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_ENDPOINT') ??
+      (getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')
+        ? `${getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')}/v1/traces`
+        : null);
     if (endpoint && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.endpoint = endpoint;
     }
 
-    const certificateFile = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE'
-    );
+    const certificateFile =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_CERTIFICATE');
     if (certificateFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.certificate_file = certificateFile;
     }
 
-    const clientKeyFile = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY'
-    );
+    const clientKeyFile =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_CLIENT_KEY');
     if (clientKeyFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.client_key_file = clientKeyFile;
     }
 
-    const clientCertificateFile = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE'
-    );
+    const clientCertificateFile =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE');
     if (clientCertificateFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.client_certificate_file = clientCertificateFile;
     }
 
-    const compression = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_TRACES_COMPRESSION'
-    );
+    const compression =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_COMPRESSION') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_COMPRESSION');
     if (compression && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.compression = compression;
     }
 
-    const timeout = getNumberFromEnv('OTEL_EXPORTER_OTLP_TRACES_TIMEOUT');
+    const timeout =
+      getNumberFromEnv('OTEL_EXPORTER_OTLP_TRACES_TIMEOUT') ??
+      getNumberFromEnv('OTEL_EXPORTER_OTLP_TIMEOUT');
     if (timeout && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.timeout = timeout;
     }
 
-    const headersList = getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_HEADERS');
+    const headersList =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_HEADERS') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_HEADERS');
     if (headersList && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.headers_list = headersList;
     }
@@ -242,11 +265,14 @@ function setTracerProvider(config: ConfigurationModel): void {
   }
 }
 
-function setMeterProvider(config: ConfigurationModel): void {
+export function setMeterProvider(config: ConfigurationModel): void {
   const readerPeriodic =
     config.meter_provider?.readers && config.meter_provider?.readers.length > 0
       ? config.meter_provider?.readers[0].periodic
       : undefined;
+  if (config.meter_provider == null) {
+    config.meter_provider = { readers: [{}] };
+  }
   if (readerPeriodic) {
     const interval = getNumberFromEnv('OTEL_METRIC_EXPORT_INTERVAL');
     if (interval) {
@@ -257,47 +283,58 @@ function setMeterProvider(config: ConfigurationModel): void {
     if (timeout) {
       readerPeriodic.timeout = timeout;
     }
+    if (readerPeriodic.exporter.otlp_http == null) {
+      readerPeriodic.exporter.otlp_http = {};
+    }
 
-    const endpoint = getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_ENDPOINT');
+    const endpoint =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_ENDPOINT') ??
+      (getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')
+        ? `${getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')}/v1/metrics`
+        : null);
     if (endpoint) {
       readerPeriodic.exporter.otlp_http.endpoint = endpoint;
     }
 
-    const certificateFile = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE'
-    );
+    const certificateFile =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_CERTIFICATE');
     if (certificateFile) {
       readerPeriodic.exporter.otlp_http.certificate_file = certificateFile;
     }
 
-    const clientKeyFile = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY'
-    );
+    const clientKeyFile =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_CLIENT_KEY');
     if (clientKeyFile) {
       readerPeriodic.exporter.otlp_http.client_key_file = clientKeyFile;
     }
 
-    const clientCertificateFile = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE'
-    );
+    const clientCertificateFile =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE');
     if (clientCertificateFile) {
       readerPeriodic.exporter.otlp_http.client_certificate_file =
         clientCertificateFile;
     }
 
-    const compression = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_METRICS_COMPRESSION'
-    );
+    const compression =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_COMPRESSION') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_COMPRESSION');
     if (compression) {
       readerPeriodic.exporter.otlp_http.compression = compression;
     }
 
-    const timeoutEx = getNumberFromEnv('OTEL_EXPORTER_OTLP_METRICS_TIMEOUT');
+    const timeoutEx =
+      getNumberFromEnv('OTEL_EXPORTER_OTLP_METRICS_TIMEOUT') ??
+      getNumberFromEnv('OTEL_EXPORTER_OTLP_TIMEOUT');
     if (timeoutEx) {
       readerPeriodic.exporter.otlp_http.timeout = timeoutEx;
     }
 
-    const headersList = getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_HEADERS');
+    const headersList =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_HEADERS') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_HEADERS');
     if (headersList) {
       readerPeriodic.exporter.otlp_http.headers_list = headersList;
     }
@@ -305,51 +342,72 @@ function setMeterProvider(config: ConfigurationModel): void {
     const temporalityPreference = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE'
     );
-    if (
-      temporalityPreference &&
-      (temporalityPreference === 'cumulative' ||
-        temporalityPreference === 'delta' ||
-        temporalityPreference === 'low_memory')
-    ) {
-      readerPeriodic.exporter.otlp_http.temporality_preference =
-        temporalityPreference;
+    if (temporalityPreference) {
+      switch (temporalityPreference) {
+        case 'cumulative':
+          readerPeriodic.exporter.otlp_http.temporality_preference =
+            ExporterTemporalityPreference.Cumulative;
+          break;
+        case 'delta':
+          readerPeriodic.exporter.otlp_http.temporality_preference =
+            ExporterTemporalityPreference.Delta;
+          break;
+        case 'low_memory':
+          readerPeriodic.exporter.otlp_http.temporality_preference =
+            ExporterTemporalityPreference.LowMemory;
+          break;
+        default:
+          readerPeriodic.exporter.otlp_http.temporality_preference =
+            ExporterTemporalityPreference.Cumulative;
+          break;
+      }
     }
 
     const defaultHistogramAggregation = getStringFromEnv(
       'OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION'
     );
-    if (
-      defaultHistogramAggregation &&
-      (defaultHistogramAggregation === 'explicit_bucket_histogram' ||
-        defaultHistogramAggregation === 'base2_exponential_bucket_histogram')
-    ) {
-      readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
-        defaultHistogramAggregation;
-    }
-    if (config.meter_provider == null) {
-      config.meter_provider = { readers: [{}] };
-    }
-    if (config.meter_provider?.readers == null) {
-      config.meter_provider.readers = [{}];
+    if (defaultHistogramAggregation) {
+      switch (defaultHistogramAggregation) {
+        case 'explicit_bucket_histogram':
+          readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
+            ExporterDefaultHistogramAggregation.ExplicitBucketHistogram;
+          break;
+        case 'base2_exponential_bucket_histogram':
+          readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
+            ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram;
+          break;
+        default:
+          readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
+            ExporterDefaultHistogramAggregation.ExplicitBucketHistogram;
+          break;
+      }
     }
 
     config.meter_provider.readers[0].periodic = readerPeriodic;
   }
   const exemplarFilter = getStringFromEnv('OTEL_METRICS_EXEMPLAR_FILTER');
-  if (
-    exemplarFilter &&
-    (exemplarFilter === 'trace_based' ||
-      exemplarFilter === 'always_on' ||
-      exemplarFilter === 'always_off')
-  ) {
-    if (config.meter_provider == null) {
-      config.meter_provider = {};
+  if (exemplarFilter) {
+    switch (exemplarFilter) {
+      case 'trace_based':
+        config.meter_provider.exemplar_filter = ExemplarFilter.TraceBased;
+        break;
+      case 'always_on':
+        config.meter_provider.exemplar_filter = ExemplarFilter.AlwaysOn;
+        break;
+      case 'always_off':
+        config.meter_provider.exemplar_filter = ExemplarFilter.AlwaysOff;
+        break;
+      default:
+        config.meter_provider.exemplar_filter = ExemplarFilter.TraceBased;
+        break;
     }
-    config.meter_provider.exemplar_filter = exemplarFilter;
   }
 }
 
-function setLoggerProvider(config: ConfigurationModel): void {
+export function setLoggerProvider(config: ConfigurationModel): void {
+  if (config.logger_provider == null) {
+    config.logger_provider = { processors: [] };
+  }
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT'
   );
@@ -357,9 +415,6 @@ function setLoggerProvider(config: ConfigurationModel): void {
     'OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT'
   );
   if (attributeValueLengthLimit || attributeCountLimit) {
-    if (config.logger_provider == null) {
-      config.logger_provider = {};
-    }
     if (config.logger_provider.limits == null) {
       config.logger_provider.limits = { attribute_count_limit: 128 };
     }
@@ -401,53 +456,57 @@ function setLoggerProvider(config: ConfigurationModel): void {
       batch.max_export_batch_size = maxExportBatchSize;
     }
 
-    const endpoint = getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_ENDPOINT');
+    const endpoint =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_ENDPOINT') ??
+      (getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')
+        ? `${getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')}/v1/logs`
+        : null);
     if (endpoint && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.endpoint = endpoint;
     }
 
-    const certificateFile = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE'
-    );
+    const certificateFile =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_CERTIFICATE');
     if (certificateFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.certificate_file = certificateFile;
     }
 
-    const clientKeyFile = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY'
-    );
+    const clientKeyFile =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_CLIENT_KEY');
     if (clientKeyFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.client_key_file = clientKeyFile;
     }
 
-    const clientCertificateFile = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE'
-    );
+    const clientCertificateFile =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE');
     if (clientCertificateFile && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.client_certificate_file = clientCertificateFile;
     }
 
-    const compression = getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_COMPRESSION');
+    const compression =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_COMPRESSION') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_COMPRESSION');
     if (compression && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.compression = compression;
     }
 
-    const timeout = getNumberFromEnv('OTEL_EXPORTER_OTLP_LOGS_TIMEOUT');
+    const timeout =
+      getNumberFromEnv('OTEL_EXPORTER_OTLP_LOGS_TIMEOUT') ??
+      getNumberFromEnv('OTEL_EXPORTER_OTLP_TIMEOUT');
     if (timeout && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.timeout = timeout;
     }
 
-    const headersList = getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_HEADERS');
+    const headersList =
+      getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_HEADERS') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_HEADERS');
     if (headersList && batch.exporter.otlp_http) {
       batch.exporter.otlp_http.headers_list = headersList;
     }
 
-    if (config.logger_provider == null) {
-      config.logger_provider = { processors: [{}] };
-    }
-    if (config.logger_provider?.processors == null) {
-      config.logger_provider.processors = [{}];
-    }
     config.logger_provider.processors[0].batch = batch;
   }
 }

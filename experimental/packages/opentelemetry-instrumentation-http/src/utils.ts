@@ -116,7 +116,6 @@ export const getAbsoluteUrl = (
   }
   // Redact sensitive query parameters
   if (path.includes('?')) {
-    //const [pathname, query] = path.split('?', 2);
     const parsedUrl = url.parse(path);
     const pathname = parsedUrl.pathname || '';
     const query = parsedUrl.query || '';

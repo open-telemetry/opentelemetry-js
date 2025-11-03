@@ -111,7 +111,7 @@ export function getNumberListFromConfigFile(
     const filteredList = [];
     for (let i = 0; i < list.length; i++) {
       const element = getNumberFromConfigFile(list[i]);
-      if (element) {
+      if (element || element === 0) {
         filteredList.push(element);
       }
     }

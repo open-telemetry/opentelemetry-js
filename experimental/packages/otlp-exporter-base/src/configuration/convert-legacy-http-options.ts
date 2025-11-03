@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-import { HeadersFactory } from '../configuration/otlp-http-configuration';
+import { OTLPExporterConfigBase } from './legacy-base-configuration';
+import { wrapStaticHeadersInFunction } from './shared-configuration';
+import { HeadersFactory } from './otlp-http-configuration';
 
-export interface HttpRequestParameters {
-  url: string;
-  headers: HeadersFactory;
-  compression: 'gzip' | 'none';
-  userAgent?: string;
+export function convertLegacyHeaders(
+  config: OTLPExporterConfigBase
+): HeadersFactory | undefined {
+  if (typeof config.headers === 'function') {
+    return config.headers;
+  }
+  return wrapStaticHeadersInFunction(config.headers);
 }
