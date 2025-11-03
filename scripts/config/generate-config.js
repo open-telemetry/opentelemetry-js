@@ -69,73 +69,19 @@ function addLicenseHeader(content) {
  * This handles cases where json-schema-to-typescript generates different names
  */
 const TYPE_NAME_MAPPING = {
-  'OpenTelemetryConfiguration': 'OpenTelemetryConfiguration',
   'Resource': 'HttpsOpentelemetryIoOtelconfigResourceJson',
-  'ResourceDetection': 'ExperimentalResourceDetection',
-  'Detector': 'ExperimentalResourceDetector',
-  'DetectorAttributes': 'IncludeExclude',
-  'AttributeLimits': 'AttributeLimits',
   'Propagator': 'HttpsOpentelemetryIoOtelconfigPropagatorJson',
-  'CompositePropagator': 'TextMapPropagator',
   'LoggerProvider': 'HttpsOpentelemetryIoOtelconfigLoggerProviderJson',
-  'LogRecordProcessor': 'LogRecordProcessor',
-  'BatchLogRecordProcessor': 'BatchLogRecordProcessor',
-  'SimpleLogRecordProcessor': 'SimpleLogRecordProcessor',
-  'LogRecordExporter': 'LogRecordExporter',
-  'LogRecordLimits': 'LogRecordLimits',
-  'LoggerConfigurator': 'ExperimentalLoggerConfigurator',
-  'LoggerConfigAndMatcher': 'ExperimentalLoggerMatcherAndConfig',
-  'LoggerConfig': 'ExperimentalLoggerConfig',
   'TracerProvider': 'HttpsOpentelemetryIoOtelconfigTracerProviderJson',
-  'SpanProcessor': 'SpanProcessor',
-  'BatchSpanProcessor': 'BatchSpanProcessor',
-  'SimpleSpanProcessor': 'SimpleSpanProcessor',
-  'SpanExporter': 'SpanExporter',
-  'ZipkinSpanExporter': 'ZipkinSpanExporter',
-  'SpanLimits': 'SpanLimits',
-  'Sampler': 'Sampler',
-  'TracerConfigurator': 'ExperimentalTracerConfigurator',
-  'TracerConfigAndMatcher': 'ExperimentalTracerMatcherAndConfig',
-  'TracerConfig': 'ExperimentalTracerConfig',
   'MeterProvider': 'HttpsOpentelemetryIoOtelconfigMeterProviderJson',
-  'MetricReader': 'MetricReader',
-  'PullMetricReader': 'PullMetricReader',
-  'PeriodicMetricReader': 'PeriodicMetricReader',
-  'MetricProducer': 'MetricProducer',
-  'CardinalityLimits': 'CardinalityLimits',
-  'MetricExporter': ['PushMetricExporter', 'PullMetricExporter'],  // Handles both push and pull
-  'PrometheusMetricExporter': 'ExperimentalPrometheusMetricExporter',
-  'PrometheusIncludeExclude': 'IncludeExclude',
-  'View': 'View',
-  'Selector': 'ViewSelector',
-  'Stream': 'ViewStream',
-  'StreamIncludeExclude': 'IncludeExclude',
-  'StreamAggregation': 'Aggregation',
-  'StreamAggregationExplicitBucketHistogram': 'ExplicitBucketHistogramAggregation',
-  'MeterConfigurator': 'ExperimentalMeterConfigurator',
-  'MeterConfigAndMatcher': 'ExperimentalMeterMatcherAndConfig',
-  'MeterConfig': 'ExperimentalMeterConfig',
-  'OtlpExporterCommon': ['OtlpHttpExporter', 'OtlpGrpcExporter', 'OtlpHttpMetricExporter', 'OtlpGrpcMetricExporter'],
-  'OtlpHttpExporter': ['OtlpHttpExporter', 'OtlpHttpSpanExporter', 'OtlpHttpLogRecordExporter'],
-  'OtlpHttpSpanExporter': 'OtlpHttpExporter',
-  'OtlpHttpMetricExporter': 'OtlpHttpMetricExporter',
-  'OtlpHttpLogRecordExporter': 'OtlpHttpExporter',
-  'OtlpGrpcExporter': 'OtlpGrpcExporter',
-  'OtlpFileExporter': ['ExperimentalOtlpFileExporter', 'ExperimentalOtlpFileMetricExporter'],
   'Instrumentation': 'HttpsOpentelemetryIoOtelconfigInstrumentationJson',
-  'GeneralInstrumentation': 'ExperimentalGeneralInstrumentation',
-  'GeneralInstrumentationPeer': 'ExperimentalPeerInstrumentation',
-  'GeneralInstrumentationHttp': 'ExperimentalHttpInstrumentation',
-  'GeneralInstrumentationHttpClient': 'ExperimentalHttpInstrumentation',  // client property
-  'GeneralInstrumentationHttpServer': 'ExperimentalHttpInstrumentation',  // server property
-  'LanguageSpecificInstrumentation': 'ExperimentalLanguageSpecificInstrumentation',
 };
 
 /**
  * Load type descriptions from YAML file
  */
 function loadTypeDescriptions() {
-  const yamlPath = path.join(SCRIPT_DIR, 'opentelemetry-configuration/schema/type_descriptions.yaml');
+  const yamlPath = path.join(SCRIPT_DIR, 'opentelemetry-configuration/schema/meta_schema_types.yaml');
   const yamlContent = fs.readFileSync(yamlPath, 'utf8');
   const parsed = yaml.parse(yamlContent);
 
@@ -143,8 +89,15 @@ function loadTypeDescriptions() {
   const typeDescriptions = new Map();
 
   for (const entry of parsed) {
-    if (entry.type && entry.property_descriptions) {
-      typeDescriptions.set(entry.type, entry.property_descriptions);
+    if (entry.type && entry.properties) {
+      // Convert array of {property, description} objects to a map
+      const propertyMap = {};
+      for (const prop of entry.properties) {
+        if (prop.property && prop.description) {
+          propertyMap[prop.property] = prop.description;
+        }
+      }
+      typeDescriptions.set(entry.type, propertyMap);
     }
   }
 
@@ -309,6 +262,11 @@ function findYamlTypesForInterface(interfaceName) {
     }
   }
 
+  // If no mapping found, try direct name match as fallback
+  if (matches.length === 0) {
+    matches.push(interfaceName);
+  }
+
   return matches;
 }
 
@@ -350,6 +308,108 @@ function getIndentation(node, sourceText) {
   return indent;
 }
 
+/**
+ * Simplify redundant intersection types
+ * Converts patterns like: T & (T | null) & T & (T | null) -> T | null
+ */
+function simplifyRedundantIntersections(content) {
+  const sourceFile = ts.createSourceFile(
+    'temp.ts',
+    content,
+    ts.ScriptTarget.Latest,
+    true
+  );
+
+  const modifications = [];
+
+  function visitNode(node) {
+    // Look for type alias declarations with intersection types
+    if (ts.isTypeAliasDeclaration(node) && node.type && ts.isIntersectionTypeNode(node.type)) {
+      const intersectionTypes = node.type.types;
+
+      // Collect type literals and check if there are nullable unions
+      const typeLiterals = [];
+      let hasNull = false;
+
+      for (const type of intersectionTypes) {
+        if (ts.isTypeLiteralNode(type)) {
+          typeLiterals.push(type);
+        } else if (ts.isUnionTypeNode(type)) {
+          // Check if this is a union with null
+          for (const unionMember of type.types) {
+            if (unionMember.kind === ts.SyntaxKind.NullKeyword) {
+              hasNull = true;
+            } else if (ts.isTypeLiteralNode(unionMember)) {
+              typeLiterals.push(unionMember);
+            }
+          }
+        } else if (ts.isParenthesizedTypeNode(type) && ts.isUnionTypeNode(type.type)) {
+          // Handle parenthesized unions: (T | null)
+          for (const unionMember of type.type.types) {
+            if (unionMember.kind === ts.SyntaxKind.NullKeyword) {
+              hasNull = true;
+            } else if (ts.isTypeLiteralNode(unionMember)) {
+              typeLiterals.push(unionMember);
+            }
+          }
+        }
+      }
+
+      // If we have multiple type literals that appear to be duplicates, simplify
+      if (typeLiterals.length > 1) {
+        // Check if they have the same structure (same property names)
+        const firstLiteral = typeLiterals[0];
+        const firstProps = firstLiteral.members.map(m =>
+          ts.isPropertySignature(m) && m.name ? getPropertyName(m.name) : ''
+        ).filter(Boolean).sort().join(',');
+
+        const allSame = typeLiterals.every(literal => {
+          const props = literal.members.map(m =>
+            ts.isPropertySignature(m) && m.name ? getPropertyName(m.name) : ''
+          ).filter(Boolean).sort().join(',');
+          return props === firstProps;
+        });
+
+        if (allSame) {
+          // Replace the entire type with simplified version
+          const typeStart = node.type.pos;
+          const typeEnd = node.type.end;
+
+          // Extract just the first type literal text
+          const firstLiteralStart = firstLiteral.pos;
+          const firstLiteralEnd = firstLiteral.end;
+          let simplifiedType = content.substring(firstLiteralStart, firstLiteralEnd).trim();
+
+          // Add | null if any branch had it
+          if (hasNull) {
+            simplifiedType = simplifiedType + ' | null';
+          }
+
+          modifications.push({
+            start: typeStart,
+            end: typeEnd,
+            replacement: ' ' + simplifiedType
+          });
+        }
+      }
+    }
+
+    ts.forEachChild(node, visitNode);
+  }
+
+  visitNode(sourceFile);
+
+  // Apply modifications in reverse order to maintain positions
+  modifications.sort((a, b) => b.start - a.start);
+
+  let modifiedContent = content;
+  for (const mod of modifications) {
+    modifiedContent = modifiedContent.slice(0, mod.start) + mod.replacement + modifiedContent.slice(mod.end);
+  }
+
+  return modifiedContent;
+}
+
 const options = {
   cwd: `${ROOT_DIR}/scripts/config/opentelemetry-configuration/schema`,
   strictIndexSignatures: true, // adds undefined
@@ -362,8 +422,8 @@ compileFromFile(`${ROOT_DIR}/scripts/config/opentelemetry-configuration/schema/o
   .then(ts => {
     let content = ts;
 
-    // Add JSDoc descriptions from type_descriptions.yaml
-    content = addDescriptionsToTypes(content);
+    // Simplify redundant intersection types
+    content = simplifyRedundantIntersections(content);
 
     // Fix the HttpsOpentelemetryIoOtelconfigInstrumentationJson type
     // See notes below for details on why this is needed
@@ -372,6 +432,14 @@ compileFromFile(`${ROOT_DIR}/scripts/config/opentelemetry-configuration/schema/o
       const replacement = `  [k: string]:\n    | ExperimentalLanguageSpecificInstrumentation\n    | ExperimentalGeneralInstrumentation\n    | undefined;`;
       return interfaceStart + replacement;
     });
+
+    // Fix the OpenTelemetryConfiguration type to be OpentelemetryConfiguration
+    // TODO: this is temporary, see https://github.com/open-telemetry/opentelemetry-configuration/issues/371
+    const openTelemetryConfigurationPattern = "export interface OpenTelemetryConfiguration";
+    content = content.replace(openTelemetryConfigurationPattern, "export interface OpentelemetryConfiguration");
+
+    // Add JSDoc descriptions from type_descriptions.yaml
+    content = addDescriptionsToTypes(content);
 
     // Add license header if not present
     if (!content.includes('Copyright The OpenTelemetry Authors')) {
