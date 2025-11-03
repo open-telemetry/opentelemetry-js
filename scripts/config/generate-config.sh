@@ -20,11 +20,11 @@ mkdir opentelemetry-configuration
 cd opentelemetry-configuration
 
 git init
-# git remote add origin https://github.com/open-telemetry/opentelemetry-configuration.git
-# TEMP: this branch has the fix that removes patternProperties from the schema
-git remote add origin https://github.com/dol/opentelemetry-configuration
-git fetch origin fix/wildcard-pattern
-git checkout fix/wildcard-pattern
+git remote add origin https://github.com/open-telemetry/opentelemetry-configuration.git
 # git fetch origin "${CONFIG_VERSION}" --depth=1
+# TEMP: main branch has the fix that removes patternProperties from the schema
+# Replace once a new tag is released
+git fetch origin main
+git checkout main
 git reset --hard FETCH_HEAD
 cd ${SCRIPT_DIR}
