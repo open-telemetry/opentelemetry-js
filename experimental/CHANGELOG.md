@@ -16,6 +16,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
     * (user-facing): `headers` option in all OTLP exporters now accepts a function that returns a `Promise<Record<string, string>>` in addition to the existing `Record<string, string>` type.
     * (user-facing): `headers` in `HttpNodeRequestParameters`, `FetchTransportParameters`, and `XhrRequestParameters` now only accept async functions.
     * (user-facing): `headers` in `OtlpHttpConfiguration` now only accepts async functions.
+* feat(sdk-logs): remove NoopLogRecordProcessor from exports [#6079](https://github.com/open-telemetry/opentelemetry-js/pull/6079) @cjihrig
 
 ### :rocket: Features
 
