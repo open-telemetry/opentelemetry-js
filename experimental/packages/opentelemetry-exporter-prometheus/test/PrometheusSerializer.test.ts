@@ -266,8 +266,8 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total counter\n' +
-            'test_total{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 1\n' +
-            'test_total{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 1\n'
+            'test_total{val="1",otel_scope_name="test"} 1\n' +
+            'test_total{val="2",otel_scope_name="test"} 1\n'
         );
       });
 
@@ -278,8 +278,8 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total counter\n' +
-            `test_total{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 1 ${mockedHrTimeMs}\n` +
-            `test_total{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 1 ${mockedHrTimeMs}\n`
+            `test_total{val="1",otel_scope_name="test"} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2",otel_scope_name="test"} 1 ${mockedHrTimeMs}\n`
         );
       });
 
@@ -290,8 +290,8 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total counter\n' +
-            `test_total{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",${resourceAttributes}} 1 ${mockedHrTimeMs}\n` +
-            `test_total{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",${resourceAttributes}} 1 ${mockedHrTimeMs}\n`
+            `test_total{val="1",otel_scope_name="test",${resourceAttributes}} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2",otel_scope_name="test",${resourceAttributes}} 1 ${mockedHrTimeMs}\n`
         );
       });
     });
@@ -336,8 +336,8 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total gauge\n' +
-            'test_total{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 1\n' +
-            'test_total{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 1\n'
+            'test_total{val="1",otel_scope_name="test"} 1\n' +
+            'test_total{val="2",otel_scope_name="test"} 1\n'
         );
       });
 
@@ -348,8 +348,8 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total gauge\n' +
-            `test_total{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 1 ${mockedHrTimeMs}\n` +
-            `test_total{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 1 ${mockedHrTimeMs}\n`
+            `test_total{val="1",otel_scope_name="test"} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2",otel_scope_name="test"} 1 ${mockedHrTimeMs}\n`
         );
       });
 
@@ -361,8 +361,8 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total gauge\n' +
-            `test_total{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",${resourceAttributes}} 1 ${mockedHrTimeMs}\n` +
-            `test_total{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",${resourceAttributes}} 1 ${mockedHrTimeMs}\n`
+            `test_total{val="1",otel_scope_name="test",${resourceAttributes}} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2",otel_scope_name="test",${resourceAttributes}} 1 ${mockedHrTimeMs}\n`
         );
       });
     });
@@ -409,8 +409,8 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total gauge\n' +
-            'test_total{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 1\n' +
-            'test_total{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 1\n'
+            'test_total{val="1",otel_scope_name="test"} 1\n' +
+            'test_total{val="2",otel_scope_name="test"} 1\n'
         );
       });
 
@@ -421,8 +421,8 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total gauge\n' +
-            `test_total{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 1 ${mockedHrTimeMs}\n` +
-            `test_total{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 1 ${mockedHrTimeMs}\n`
+            `test_total{val="1",otel_scope_name="test"} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2",otel_scope_name="test"} 1 ${mockedHrTimeMs}\n`
         );
       });
 
@@ -433,8 +433,8 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total gauge\n' +
-            `test_total{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",${resourceAttributes}} 1 ${mockedHrTimeMs}\n` +
-            `test_total{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",${resourceAttributes}} 1 ${mockedHrTimeMs}\n`
+            `test_total{val="1",otel_scope_name="test",${resourceAttributes}} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2",otel_scope_name="test",${resourceAttributes}} 1 ${mockedHrTimeMs}\n`
         );
       });
     });
@@ -486,18 +486,18 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test foobar\n' +
             '# TYPE test histogram\n' +
-            'test_count{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 3\n' +
-            'test_sum{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 175\n' +
-            'test_bucket{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",le="1"} 0\n' +
-            'test_bucket{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",le="10"} 1\n' +
-            'test_bucket{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",le="100"} 2\n' +
-            'test_bucket{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",le="+Inf"} 3\n' +
-            'test_count{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 1\n' +
-            'test_sum{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 5\n' +
-            'test_bucket{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",le="1"} 0\n' +
-            'test_bucket{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",le="10"} 1\n' +
-            'test_bucket{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",le="100"} 1\n' +
-            'test_bucket{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",le="+Inf"} 1\n'
+            'test_count{val="1",otel_scope_name="test"} 3\n' +
+            'test_sum{val="1",otel_scope_name="test"} 175\n' +
+            'test_bucket{val="1",otel_scope_name="test",le="1"} 0\n' +
+            'test_bucket{val="1",otel_scope_name="test",le="10"} 1\n' +
+            'test_bucket{val="1",otel_scope_name="test",le="100"} 2\n' +
+            'test_bucket{val="1",otel_scope_name="test",le="+Inf"} 3\n' +
+            'test_count{val="2",otel_scope_name="test"} 1\n' +
+            'test_sum{val="2",otel_scope_name="test"} 5\n' +
+            'test_bucket{val="2",otel_scope_name="test",le="1"} 0\n' +
+            'test_bucket{val="2",otel_scope_name="test",le="10"} 1\n' +
+            'test_bucket{val="2",otel_scope_name="test",le="100"} 1\n' +
+            'test_bucket{val="2",otel_scope_name="test",le="+Inf"} 1\n'
         );
       });
 
@@ -508,18 +508,18 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test foobar\n' +
             '# TYPE test histogram\n' +
-            `test_count{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",${resourceAttributes}} 3\n` +
-            `test_sum{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",${resourceAttributes}} 175\n` +
-            `test_bucket{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",${resourceAttributes},le="1"} 0\n` +
-            `test_bucket{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",${resourceAttributes},le="10"} 1\n` +
-            `test_bucket{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",${resourceAttributes},le="100"} 2\n` +
-            `test_bucket{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",${resourceAttributes},le="+Inf"} 3\n` +
-            `test_count{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",${resourceAttributes}} 1\n` +
-            `test_sum{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",${resourceAttributes}} 5\n` +
-            `test_bucket{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",${resourceAttributes},le="1"} 0\n` +
-            `test_bucket{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",${resourceAttributes},le="10"} 1\n` +
-            `test_bucket{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",${resourceAttributes},le="100"} 1\n` +
-            `test_bucket{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",${resourceAttributes},le="+Inf"} 1\n`
+            `test_count{val="1",otel_scope_name="test",${resourceAttributes}} 3\n` +
+            `test_sum{val="1",otel_scope_name="test",${resourceAttributes}} 175\n` +
+            `test_bucket{val="1",otel_scope_name="test",${resourceAttributes},le="1"} 0\n` +
+            `test_bucket{val="1",otel_scope_name="test",${resourceAttributes},le="10"} 1\n` +
+            `test_bucket{val="1",otel_scope_name="test",${resourceAttributes},le="100"} 2\n` +
+            `test_bucket{val="1",otel_scope_name="test",${resourceAttributes},le="+Inf"} 3\n` +
+            `test_count{val="2",otel_scope_name="test",${resourceAttributes}} 1\n` +
+            `test_sum{val="2",otel_scope_name="test",${resourceAttributes}} 5\n` +
+            `test_bucket{val="2",otel_scope_name="test",${resourceAttributes},le="1"} 0\n` +
+            `test_bucket{val="2",otel_scope_name="test",${resourceAttributes},le="10"} 1\n` +
+            `test_bucket{val="2",otel_scope_name="test",${resourceAttributes},le="100"} 1\n` +
+            `test_bucket{val="2",otel_scope_name="test",${resourceAttributes},le="+Inf"} 1\n`
         );
       });
 
@@ -564,16 +564,16 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test foobar\n' +
             '# TYPE test histogram\n' +
-            'test_count{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 3\n' +
-            'test_bucket{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",le="1"} 0\n' +
-            'test_bucket{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",le="10"} 1\n' +
-            'test_bucket{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",le="100"} 2\n' +
-            'test_bucket{val="1",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",le="+Inf"} 3\n' +
-            'test_count{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 1\n' +
-            'test_bucket{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",le="1"} 0\n' +
-            'test_bucket{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",le="10"} 1\n' +
-            'test_bucket{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",le="100"} 1\n' +
-            'test_bucket{val="2",otel_scope_name="test",otel_scope_schema_url="",otel_scope_version="",le="+Inf"} 1\n'
+            'test_count{val="1",otel_scope_name="test"} 3\n' +
+            'test_bucket{val="1",otel_scope_name="test",le="1"} 0\n' +
+            'test_bucket{val="1",otel_scope_name="test",le="10"} 1\n' +
+            'test_bucket{val="1",otel_scope_name="test",le="100"} 2\n' +
+            'test_bucket{val="1",otel_scope_name="test",le="+Inf"} 3\n' +
+            'test_count{val="2",otel_scope_name="test"} 1\n' +
+            'test_bucket{val="2",otel_scope_name="test",le="1"} 0\n' +
+            'test_bucket{val="2",otel_scope_name="test",le="10"} 1\n' +
+            'test_bucket{val="2",otel_scope_name="test",le="100"} 1\n' +
+            'test_bucket{val="2",otel_scope_name="test",le="+Inf"} 1\n'
         );
       });
     });
@@ -642,7 +642,7 @@ describe('PrometheusSerializer', () => {
           '# HELP test_total description missing\n' +
           `# UNIT test_total ${unitOfMetric}\n` +
           '# TYPE test_total counter\n' +
-          'test_total{otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 1\n'
+          'test_total{otel_scope_name="test"} 1\n'
       );
     });
 
@@ -657,7 +657,7 @@ describe('PrometheusSerializer', () => {
         serializedDefaultResource +
           '# HELP test_total description missing\n' +
           '# TYPE test_total counter\n' +
-          'test_total{otel_scope_name="test",otel_scope_schema_url="",otel_scope_version=""} 1\n'
+          'test_total{otel_scope_name="test"} 1\n'
       );
     });
 

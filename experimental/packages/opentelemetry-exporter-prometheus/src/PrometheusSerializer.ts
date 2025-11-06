@@ -271,12 +271,18 @@ export class PrometheusSerializer {
     if (this._withoutScopeInfo) {
       additionalAttributes = this._additionalAttributes;
     } else {
+      const scopeInfo: Attributes = { [ATTR_OTEL_SCOPE_NAME]: scope.name };
+
+      if (scope.schemaUrl) {
+        scopeInfo[ATTR_OTEL_SCOPE_SCHEMA_URL] = scope.schemaUrl;
+      }
+
+      if (scope.version) {
+        scopeInfo[ATTR_OTEL_SCOPE_VERSION] = scope.version;
+      }
+
       additionalAttributes = Object.assign(
-        {
-          [ATTR_OTEL_SCOPE_NAME]: scope.name,
-          [ATTR_OTEL_SCOPE_SCHEMA_URL]: scope.schemaUrl ?? '',
-          [ATTR_OTEL_SCOPE_VERSION]: scope.version ?? '',
-        },
+        scopeInfo,
         this._additionalAttributes
       );
     }
