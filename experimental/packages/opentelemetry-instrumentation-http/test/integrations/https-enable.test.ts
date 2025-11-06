@@ -27,7 +27,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Socket } from 'net';
 import { assertSpan } from '../utils/assertSpan';
-import * as url from 'url';
+import { urlToHttpOptions } from 'url';
 import * as utils from '../utils/utils';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
@@ -182,7 +182,7 @@ describe('HttpsInstrumentation Integration tests', () => {
       assert.strictEqual(spans.length, 0);
 
       const result = await httpsRequest.get(
-        new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`)
+        new URL(`${protocol}://localhost:${mockServerPort}/?query=test`)
       );
 
       spans = memoryExporter.getFinishedSpans();
@@ -209,7 +209,7 @@ describe('HttpsInstrumentation Integration tests', () => {
       assert.strictEqual(spans.length, 0);
 
       const result = await httpsRequest.get(
-        new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
+        new URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
         {
           headers: { 'x-foo': 'foo' },
         }
@@ -271,7 +271,7 @@ describe('HttpsInstrumentation Integration tests', () => {
       assert.strictEqual(spans.length, 0);
       const options = Object.assign(
         { headers: { Expect: '100-continue' } },
-        url.parse(`${protocol}://localhost:${mockServerPort}/`)
+        urlToHttpOptions(new URL(`${protocol}://localhost:${mockServerPort}/`))
       );
 
       const result = await httpsRequest.get(options);
