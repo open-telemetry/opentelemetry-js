@@ -22,7 +22,8 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-import { LoggerProvider, NoopLogRecordProcessor } from '../../src';
+import { LoggerProvider } from '../../src';
+import { NoopLogRecordProcessor } from '../../src/export/NoopLogRecordProcessor';
 import { loadDefaultConfig } from '../../src/config';
 import { DEFAULT_LOGGER_NAME } from './../../src/LoggerProvider';
 import { MultiLogRecordProcessor } from '../../src/MultiLogRecordProcessor';

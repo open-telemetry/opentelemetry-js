@@ -17,7 +17,8 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-import { LoggerProvider, NoopLogRecordProcessor } from '../../src';
+import { LoggerProvider } from '../../src';
+import { NoopLogRecordProcessor } from '../../src/export/NoopLogRecordProcessor';
 import { LogRecordImpl } from '../../src/LogRecordImpl';
 import { ROOT_CONTEXT, TraceFlags, context, trace } from '@opentelemetry/api';
 import { LogRecord as ApiLogRecord } from '@opentelemetry/api-logs';
