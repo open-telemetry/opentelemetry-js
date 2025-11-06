@@ -131,10 +131,10 @@ describe('Node SDK', () => {
     });
 
     it('should not register more than the minimal SDK components', async () => {
-      // need to set these to none, since the deafult value is 'otlp'
+      // need to set these to none, since the default value is 'otlp'
       process.env.OTEL_TRACES_EXPORTER = 'none';
       process.env.OTEL_LOGS_EXPORTER = 'none';
-      process.env.OTEL_METRIC_EXPORTER = 'none';
+      process.env.OTEL_METRICS_EXPORTER = 'none';
       const sdk = new NodeSDK({
         autoDetectResources: false,
       });
@@ -156,6 +156,7 @@ describe('Node SDK', () => {
         logsDelegate,
         'logger provider should not have changed'
       );
+
       await sdk.shutdown();
     });
 
@@ -200,8 +201,6 @@ describe('Node SDK', () => {
 
       sdk.start();
 
-      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
-
       assertDefaultContextManagerRegistered();
       assertDefaultPropagatorRegistered();
 
@@ -218,8 +217,6 @@ describe('Node SDK', () => {
       });
 
       sdk.start();
-
-      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
 
       assertDefaultContextManagerRegistered();
       assertDefaultPropagatorRegistered();
@@ -243,8 +240,6 @@ describe('Node SDK', () => {
       });
 
       sdk.start();
-
-      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
 
       assertDefaultContextManagerRegistered();
       assertDefaultPropagatorRegistered();
@@ -1245,13 +1240,6 @@ describe('Node SDK', () => {
       delete process.env.OTEL_EXPORTER_METRICS_PROTOCOL;
     });
 
-    it('should not register the provider if OTEL_METRICS_EXPORTER is not set', async () => {
-      const sdk = new NodeSDK();
-      sdk.start();
-      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
-      await sdk.shutdown();
-    });
-
     it('should not register the provider if OTEL_METRICS_EXPORTER contains none', async () => {
       process.env.OTEL_METRICS_EXPORTER = 'console,none';
       const sdk = new NodeSDK();
@@ -1441,7 +1429,7 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
-    it('should use prometheus if that is set ', async () => {
+    it('should use prometheus if that is set', async () => {
       process.env.OTEL_METRICS_EXPORTER = 'prometheus';
       delete process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL;
       const sdk = new NodeSDK();
@@ -1454,6 +1442,20 @@ describe('Node SDK', () => {
       );
       await sdk.shutdown();
     });
+  });
+
+  it('should use default grpc otlp exporter when empty value is provided for exporter via env', async () => {
+    process.env.OTEL_METRICS_EXPORTER = '';
+    const sdk = new NodeSDK();
+    sdk.start();
+
+    const meterProvider = metrics.getMeterProvider();
+    const sharedState = (meterProvider as any)['_sharedState'];
+    assert.ok(
+      sharedState.metricCollectors[0]._metricReader._exporter instanceof
+        OTLPProtoMetricExporter
+    );
+    await sdk.shutdown();
   });
 
   describe('setup exporter from env', () => {
@@ -1474,6 +1476,7 @@ describe('Node SDK', () => {
     beforeEach(() => {
       stubLoggerError = Sinon.stub(diag, 'warn');
     });
+
     afterEach(() => {
       delete process.env.OTEL_EXPORTER_OTLP_PROTOCOL;
       delete process.env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
