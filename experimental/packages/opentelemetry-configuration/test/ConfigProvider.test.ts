@@ -45,7 +45,136 @@ import {
   getTemporalityPreference,
 } from '../src/FileConfigProvider';
 
+function createDefaultTracerProviderConfig(options?: {
+  includeCompression?: boolean;
+}): Partial<Configuration> {
+  const { includeCompression = false } = options || {};
+
+  return {
+    tracer_provider: {
+      processors: [
+        {
+          batch: {
+            schedule_delay: 5000,
+            export_timeout: 30000,
+            max_queue_size: 2048,
+            max_export_batch_size: 512,
+            exporter: {
+              otlp_http: {
+                endpoint: 'http://localhost:4318/v1/traces',
+                timeout: 10000,
+                encoding: OtlpHttpEncoding.Protobuf,
+                ...(includeCompression ? { compression: 'gzip' } : {}),
+              },
+            },
+          },
+        },
+      ],
+      limits: {
+        attribute_count_limit: 128,
+        event_count_limit: 128,
+        link_count_limit: 128,
+        event_attribute_count_limit: 128,
+        link_attribute_count_limit: 128,
+      },
+      sampler: {
+        parent_based: {
+          root: { always_on: undefined },
+          remote_parent_sampled: { always_on: undefined },
+          remote_parent_not_sampled: { always_off: undefined },
+          local_parent_sampled: { always_on: undefined },
+          local_parent_not_sampled: { always_off: undefined },
+        },
+      },
+    },
+  };
+}
+
+function createDefaultMeterProviderConfig(options?: {
+  includeCardinalityLimits?: boolean;
+  includeCompression?: boolean;
+}): Partial<Configuration> {
+  const { includeCardinalityLimits = false, includeCompression = false } =
+    options || {};
+
+  return {
+    meter_provider: {
+      readers: [
+        {
+          periodic: {
+            interval: 60000,
+            timeout: 30000,
+            exporter: {
+              otlp_http: {
+                endpoint: 'http://localhost:4318/v1/metrics',
+                timeout: 10000,
+                temporality_preference:
+                  ExporterTemporalityPreference.Cumulative,
+                default_histogram_aggregation:
+                  ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                ...(includeCompression
+                  ? { encoding: OtlpHttpEncoding.Protobuf, compression: 'gzip' }
+                  : {}),
+              },
+            },
+            ...(includeCardinalityLimits
+              ? {
+                  cardinality_limits: {
+                    default: 2000,
+                    counter: 2000,
+                    gauge: 2000,
+                    histogram: 2000,
+                    observable_counter: 2000,
+                    observable_gauge: 2000,
+                    observable_up_down_counter: 2000,
+                    up_down_counter: 2000,
+                  },
+                }
+              : {}),
+          },
+        },
+      ],
+      exemplar_filter: ExemplarFilter.TraceBased,
+    },
+  };
+}
+
+function createDefaultLoggerProviderConfig(options?: {
+  includeCompression?: boolean;
+}): Partial<Configuration> {
+  const { includeCompression = false } = options || {};
+
+  return {
+    logger_provider: {
+      processors: [
+        {
+          batch: {
+            schedule_delay: 1000,
+            export_timeout: 30000,
+            max_queue_size: 2048,
+            max_export_batch_size: 512,
+            exporter: {
+              otlp_http: {
+                endpoint: 'http://localhost:4318/v1/logs',
+                timeout: 10000,
+                encoding: OtlpHttpEncoding.Protobuf,
+                ...(includeCompression ? { compression: 'gzip' } : {}),
+              },
+            },
+          },
+        },
+      ],
+      limits: {
+        attribute_count_limit: 128,
+      },
+    },
+  };
+}
+
 const defaultConfig: Configuration = {
+  ...createDefaultTracerProviderConfig(),
+  ...createDefaultMeterProviderConfig(),
+  ...createDefaultLoggerProviderConfig(),
   disabled: false,
   log_level: DiagLogLevel.INFO,
   node_resource_detectors: ['all'],
@@ -56,83 +185,6 @@ const defaultConfig: Configuration = {
   propagator: {
     composite: [{ tracecontext: null }, { baggage: null }],
     composite_list: 'tracecontext,baggage',
-  },
-  tracer_provider: {
-    processors: [
-      {
-        batch: {
-          schedule_delay: 5000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
-          exporter: {
-            otlp_http: {
-              endpoint: 'http://localhost:4318/v1/traces',
-              timeout: 10000,
-              encoding: OtlpHttpEncoding.Protobuf,
-            },
-          },
-        },
-      },
-    ],
-    limits: {
-      attribute_count_limit: 128,
-      event_count_limit: 128,
-      link_count_limit: 128,
-      event_attribute_count_limit: 128,
-      link_attribute_count_limit: 128,
-    },
-    sampler: {
-      parent_based: {
-        root: { always_on: undefined },
-        remote_parent_sampled: { always_on: undefined },
-        remote_parent_not_sampled: { always_off: undefined },
-        local_parent_sampled: { always_on: undefined },
-        local_parent_not_sampled: { always_off: undefined },
-      },
-    },
-  },
-  meter_provider: {
-    readers: [
-      {
-        periodic: {
-          interval: 60000,
-          timeout: 30000,
-          exporter: {
-            otlp_http: {
-              endpoint: 'http://localhost:4318/v1/metrics',
-              timeout: 10000,
-              temporality_preference: ExporterTemporalityPreference.Cumulative,
-              default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
-            },
-          },
-        },
-      },
-    ],
-    exemplar_filter: ExemplarFilter.TraceBased,
-  },
-  logger_provider: {
-    processors: [
-      {
-        batch: {
-          schedule_delay: 1000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
-          exporter: {
-            otlp_http: {
-              endpoint: 'http://localhost:4318/v1/logs',
-              timeout: 10000,
-              encoding: OtlpHttpEncoding.Protobuf,
-            },
-          },
-        },
-      },
-    ],
-    limits: {
-      attribute_count_limit: 128,
-    },
   },
 };
 
@@ -628,6 +680,12 @@ const configFromFile: Configuration = {
 };
 
 const defaultConfigFromFileWithEnvVariables: Configuration = {
+  ...createDefaultTracerProviderConfig({ includeCompression: true }),
+  ...createDefaultMeterProviderConfig({
+    includeCardinalityLimits: true,
+    includeCompression: true,
+  }),
+  ...createDefaultLoggerProviderConfig({ includeCompression: true }),
   disabled: false,
   log_level: DiagLogLevel.INFO,
   node_resource_detectors: ['all'],
@@ -646,97 +704,6 @@ const defaultConfigFromFileWithEnvVariables: Configuration = {
   propagator: {
     composite: [{ tracecontext: null }, { baggage: null }],
     composite_list: 'tracecontext,baggage',
-  },
-  tracer_provider: {
-    processors: [
-      {
-        batch: {
-          schedule_delay: 5000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
-          exporter: {
-            otlp_http: {
-              endpoint: 'http://localhost:4318/v1/traces',
-              timeout: 10000,
-              encoding: OtlpHttpEncoding.Protobuf,
-              compression: 'gzip',
-            },
-          },
-        },
-      },
-    ],
-    limits: {
-      attribute_count_limit: 128,
-      event_count_limit: 128,
-      link_count_limit: 128,
-      event_attribute_count_limit: 128,
-      link_attribute_count_limit: 128,
-    },
-    sampler: {
-      parent_based: {
-        root: { always_on: undefined },
-        remote_parent_sampled: { always_on: undefined },
-        remote_parent_not_sampled: { always_off: undefined },
-        local_parent_sampled: { always_on: undefined },
-        local_parent_not_sampled: { always_off: undefined },
-      },
-    },
-  },
-  meter_provider: {
-    readers: [
-      {
-        periodic: {
-          interval: 60000,
-          timeout: 30000,
-          exporter: {
-            otlp_http: {
-              endpoint: 'http://localhost:4318/v1/metrics',
-              encoding: OtlpHttpEncoding.Protobuf,
-              compression: 'gzip',
-              timeout: 10000,
-              temporality_preference: ExporterTemporalityPreference.Cumulative,
-              default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
-            },
-          },
-          cardinality_limits: {
-            default: 2000,
-            counter: 2000,
-            gauge: 2000,
-            histogram: 2000,
-            observable_counter: 2000,
-            observable_gauge: 2000,
-            observable_up_down_counter: 2000,
-            up_down_counter: 2000,
-          },
-        },
-      },
-    ],
-    exemplar_filter: ExemplarFilter.TraceBased,
-  },
-  logger_provider: {
-    processors: [
-      {
-        batch: {
-          schedule_delay: 1000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
-          exporter: {
-            otlp_http: {
-              endpoint: 'http://localhost:4318/v1/logs',
-              timeout: 10000,
-              encoding: OtlpHttpEncoding.Protobuf,
-              compression: 'gzip',
-            },
-          },
-        },
-      },
-    ],
-    limits: {
-      attribute_count_limit: 128,
-    },
   },
 };
 
@@ -1356,14 +1323,15 @@ describe('ConfigProvider', function () {
     });
 
     it('should return error from invalid config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = './fixtures/kitchen-sink.txt';
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
       assert.throws(() => {
         createConfigProvider();
       });
     });
 
     it('should return error from invalid config file format', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
+        'test/fixtures/kitchen-sink.txt';
       assert.throws(() => {
         createConfigProvider();
       });
@@ -1443,6 +1411,74 @@ describe('ConfigProvider', function () {
               local_parent_sampled: { always_on: undefined },
               local_parent_not_sampled: { always_off: undefined },
             },
+          },
+        },
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/metrics',
+                    timeout: 10000,
+                    temporality_preference:
+                      ExporterTemporalityPreference.Cumulative,
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                    headers_list: 'api-key=1234',
+                    headers: [
+                      {
+                        name: 'api-key',
+                        value: '1234',
+                      },
+                    ],
+                  },
+                },
+                cardinality_limits: {
+                  default: 2000,
+                  counter: 2000,
+                  gauge: 2000,
+                  histogram: 2000,
+                  observable_counter: 2000,
+                  observable_gauge: 2000,
+                  observable_up_down_counter: 2000,
+                  up_down_counter: 2000,
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+        },
+        logger_provider: {
+          processors: [
+            {
+              batch: {
+                schedule_delay: 1000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/logs',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                    headers_list: 'api-key=1234',
+                    headers: [
+                      {
+                        name: 'api-key',
+                        value: '1234',
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          ],
+          limits: {
+            attribute_count_limit: 128,
           },
         },
       };

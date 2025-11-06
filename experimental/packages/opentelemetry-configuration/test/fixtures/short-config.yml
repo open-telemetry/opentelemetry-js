@@ -9,3 +9,17 @@ tracer_provider:
         exporter:
           otlp_http:
             headers_list: api-key=1234
+
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          otlp_http:
+            headers_list: api-key=1234
+
+logger_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp_http:
+            headers_list: api-key=1234
