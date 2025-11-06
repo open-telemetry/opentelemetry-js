@@ -9,6 +9,16 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 1.38.0
+
+### :rocket: Features
+
 * feat: update semantic conventions to v1.38.0 [#6090](https://github.com/open-telemetry/opentelemetry-js/pull/6090) @trentm
   * Semantic Conventions v1.38.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1380) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * `@opentelemetry/semantic-conventions` (stable) changes: *none*
@@ -264,12 +274,6 @@ ATTR_SYSTEM_PAGING_FAULT_TYPE                                           // syste
 ```
 
 </details>
-
-### :bug: Bug Fixes
-
-### :books: Documentation
-
-### :house: Internal
 
 ## 1.37.0
 
