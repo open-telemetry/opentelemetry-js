@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1762367129120,
+  "lastUpdate": 1762417789011,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -43216,6 +43216,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.54%",
             "unit": "ops/sec",
             "extra": "93 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "cjihrig@gmail.com",
+            "name": "Colin Ihrig",
+            "username": "cjihrig"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "52d82f0daf07f345ef32b6588913db6efed55875",
+          "message": "feat(api-logs): remove `NOOP_LOGGER_PROVIDER` and `NoopLoggerProvider` from exports (#6086)",
+          "timestamp": "2025-11-06T08:21:25Z",
+          "tree_id": "d18c029fe579b3abb5f2d7e2eee03d1a738c5ad9",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/52d82f0daf07f345ef32b6588913db6efed55875"
+        },
+        "date": 1762417788011,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 695013,
+            "range": "±0.93%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8486,
+            "range": "±0.75%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 296935,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 292902,
+            "range": "±0.68%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
