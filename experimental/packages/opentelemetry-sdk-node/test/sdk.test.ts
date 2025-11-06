@@ -156,6 +156,7 @@ describe('Node SDK', () => {
         logsDelegate,
         'logger provider should not have changed'
       );
+
       await sdk.shutdown();
     });
 
@@ -1441,7 +1442,7 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
-    it('should use prometheus if that is set ', async () => {
+    it('should use prometheus if that is set', async () => {
       process.env.OTEL_METRICS_EXPORTER = 'prometheus';
       delete process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL;
       const sdk = new NodeSDK();
@@ -1454,6 +1455,20 @@ describe('Node SDK', () => {
       );
       await sdk.shutdown();
     });
+  });
+
+  it('should use default grpc otlp exporter when empty value is provided for exporter via env', async () => {
+    process.env.OTEL_METRICS_EXPORTER = '';
+    const sdk = new NodeSDK();
+    sdk.start();
+
+    const meterProvider = metrics.getMeterProvider();
+    const sharedState = (meterProvider as any)['_sharedState'];
+    assert.ok(
+      sharedState.metricCollectors[0]._metricReader._exporter instanceof
+      OTLPGrpcMetricExporter
+    );
+    await sdk.shutdown();
   });
 
   describe('setup exporter from env', () => {
@@ -1474,6 +1489,7 @@ describe('Node SDK', () => {
     beforeEach(() => {
       stubLoggerError = Sinon.stub(diag, 'warn');
     });
+
     afterEach(() => {
       delete process.env.OTEL_EXPORTER_OTLP_PROTOCOL;
       delete process.env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;

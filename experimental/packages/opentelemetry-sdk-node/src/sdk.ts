@@ -120,6 +120,7 @@ function configureMetricProviderFromEnv(): IMetricReader[] {
 
   if (enabledExporters.length === 0) {
     diag.debug('OTEL_METRICS_EXPORTER is empty. Using default otlp exporter.');
+    enabledExporters.push('otlp');
   }
 
   if (enabledExporters.includes('none')) {
