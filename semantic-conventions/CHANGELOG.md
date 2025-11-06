@@ -9,6 +9,262 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
+* feat: update semantic conventions to v1.38.0 [#6090](https://github.com/open-telemetry/opentelemetry-js/pull/6090) @trentm
+  * Semantic Conventions v1.38.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1380) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *none*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *1 exported value changed, 40 newly deprecated exports, 1 newly undeprecated export, 157 added exports*
+
+#### Unstable changes in v1.38.0
+
+<details>
+<summary>1 exported value changed</summary>
+
+```js
+ATTR_PROCESS_CONTEXT_SWITCH_TYPE // process.context_switch_type -> process.context_switch.type
+```
+
+</details>
+
+<details>
+<summary>40 newly deprecated exports</summary>
+
+```js
+METRIC_K8S_CRONJOB_ACTIVE_JOBS                  // k8s.cronjob.active_jobs: Replaced by `k8s.cronjob.job.active`.
+METRIC_K8S_DAEMONSET_CURRENT_SCHEDULED_NODES    // k8s.daemonset.current_scheduled_nodes: Replaced by `k8s.daemonset.node.current_scheduled`.
+METRIC_K8S_DAEMONSET_DESIRED_SCHEDULED_NODES    // k8s.daemonset.desired_scheduled_nodes: Replaced by `k8s.daemonset.node.desired_scheduled`.
+METRIC_K8S_DAEMONSET_MISSCHEDULED_NODES         // k8s.daemonset.misscheduled_nodes: Replaced by `k8s.daemonset.node.misscheduled`.
+METRIC_K8S_DAEMONSET_READY_NODES                // k8s.daemonset.ready_nodes: Replaced by `k8s.daemonset.node.ready`.
+METRIC_K8S_DEPLOYMENT_AVAILABLE_PODS            // k8s.deployment.available_pods: Replaced by `k8s.deployment.pod.available`.
+METRIC_K8S_DEPLOYMENT_DESIRED_PODS              // k8s.deployment.desired_pods: Replaced by `k8s.deployment.pod.desired`.
+METRIC_K8S_HPA_CURRENT_PODS                     // k8s.hpa.current_pods: Replaced by `k8s.hpa.pod.current`.
+METRIC_K8S_HPA_DESIRED_PODS                     // k8s.hpa.desired_pods: Replaced by `k8s.hpa.pod.desired`.
+METRIC_K8S_HPA_MAX_PODS                         // k8s.hpa.max_pods: Replaced by `k8s.hpa.pod.max`.
+METRIC_K8S_HPA_MIN_PODS                         // k8s.hpa.min_pods: Replaced by `k8s.hpa.pod.min`.
+METRIC_K8S_JOB_ACTIVE_PODS                      // k8s.job.active_pods: Replaced by `k8s.job.pod.active`.
+METRIC_K8S_JOB_DESIRED_SUCCESSFUL_PODS          // k8s.job.desired_successful_pods: Replaced by `k8s.job.pod.desired_successful`.
+METRIC_K8S_JOB_FAILED_PODS                      // k8s.job.failed_pods: Replaced by `k8s.job.pod.failed`.
+METRIC_K8S_JOB_MAX_PARALLEL_PODS                // k8s.job.max_parallel_pods: Replaced by `k8s.job.pod.max_parallel`.
+METRIC_K8S_JOB_SUCCESSFUL_PODS                  // k8s.job.successful_pods: Replaced by `k8s.job.pod.successful`.
+METRIC_K8S_NODE_ALLOCATABLE_CPU                 // k8s.node.allocatable.cpu: Replaced by `k8s.node.cpu.allocatable`.
+METRIC_K8S_NODE_ALLOCATABLE_EPHEMERAL_STORAGE   // k8s.node.allocatable.ephemeral_storage: Replaced by `k8s.node.ephemeral_storage.allocatable`.
+METRIC_K8S_NODE_ALLOCATABLE_MEMORY              // k8s.node.allocatable.memory: Replaced by `k8s.node.memory.allocatable`.
+METRIC_K8S_NODE_ALLOCATABLE_PODS                // k8s.node.allocatable.pods: Replaced by `k8s.node.pod.allocatable`.
+METRIC_K8S_REPLICASET_AVAILABLE_PODS            // k8s.replicaset.available_pods: Replaced by `k8s.replicaset.pod.available`.
+METRIC_K8S_REPLICASET_DESIRED_PODS              // k8s.replicaset.desired_pods: Replaced by `k8s.replicaset.pod.desired`.
+METRIC_K8S_REPLICATIONCONTROLLER_AVAILABLE_PODS // k8s.replicationcontroller.available_pods: Replaced by `k8s.replicationcontroller.pod.available`.
+METRIC_K8S_REPLICATIONCONTROLLER_DESIRED_PODS   // k8s.replicationcontroller.desired_pods: Replaced by `k8s.replicationcontroller.pod.desired`.
+METRIC_K8S_STATEFULSET_CURRENT_PODS             // k8s.statefulset.current_pods: Replaced by `k8s.statefulset.pod.current`.
+METRIC_K8S_STATEFULSET_DESIRED_PODS             // k8s.statefulset.desired_pods: Replaced by `k8s.statefulset.pod.desired`.
+METRIC_K8S_STATEFULSET_READY_PODS               // k8s.statefulset.ready_pods: Replaced by `k8s.statefulset.pod.ready`.
+METRIC_K8S_STATEFULSET_UPDATED_PODS             // k8s.statefulset.updated_pods: Replaced by `k8s.statefulset.pod.updated`.
+METRIC_RPC_CLIENT_REQUESTS_PER_RPC              // rpc.client.requests_per_rpc: Removed, no replacement at this time.
+METRIC_RPC_CLIENT_RESPONSES_PER_RPC             // rpc.client.responses_per_rpc: Removed, no replacement at this time.
+METRIC_RPC_SERVER_REQUESTS_PER_RPC              // rpc.server.requests_per_rpc: Removed, no replacement at this time.
+METRIC_RPC_SERVER_RESPONSES_PER_RPC             // rpc.server.responses_per_rpc: Removed, no replacement at this time.
+METRIC_V8JS_HEAP_SPACE_AVAILABLE_SIZE           // v8js.heap.space.available_size: Replaced by `v8js.memory.heap.space.available_size`.
+METRIC_V8JS_HEAP_SPACE_PHYSICAL_SIZE            // v8js.heap.space.physical_size: Replaced by `v8js.memory.heap.space.physical_size`.
+GEN_AI_SYSTEM_VALUE_AZ_AI_INFERENCE             // az.ai.inference: Replaced by `azure.ai.inference`.
+GEN_AI_SYSTEM_VALUE_AZ_AI_OPENAI                // az.ai.openai: Replaced by `azure.ai.openai`.
+ATTR_PROCESS_PAGING_FAULT_TYPE                  // process.paging.fault_type: Replaced by `system.paging.fault.type`.
+ATTR_SYSTEM_CPU_LOGICAL_NUMBER                  // system.cpu.logical_number: Replaced by `cpu.logical_number`.
+ATTR_SYSTEM_PAGING_TYPE                         // system.paging.type: Replaced by `system.paging.fault.type`.
+ATTR_SYSTEM_PROCESS_STATUS                      // system.process.status: Replaced by `process.state`.
+```
+
+</details>
+
+<details>
+<summary>1 newly undeprecated export</summary>
+
+```js
+GEN_AI_SYSTEM_VALUE_XAI // xai
+```
+
+</details>
+
+<details>
+<summary>157 added exports</summary>
+
+```js
+METRIC_CONTAINER_MEMORY_AVAILABLE                                       // container.memory.available
+METRIC_CONTAINER_MEMORY_PAGING_FAULTS                                   // container.memory.paging.faults
+METRIC_CONTAINER_MEMORY_RSS                                             // container.memory.rss
+METRIC_CONTAINER_MEMORY_WORKING_SET                                     // container.memory.working_set
+
+METRIC_K8S_CONTAINER_CPU_LIMIT_UTILIZATION                              // k8s.container.cpu.limit_utilization
+METRIC_K8S_CONTAINER_CPU_REQUEST_UTILIZATION                            // k8s.container.cpu.request_utilization
+METRIC_K8S_CRONJOB_JOB_ACTIVE                                           // k8s.cronjob.job.active
+METRIC_K8S_DAEMONSET_NODE_CURRENT_SCHEDULED                             // k8s.daemonset.node.current_scheduled
+METRIC_K8S_DAEMONSET_NODE_DESIRED_SCHEDULED                             // k8s.daemonset.node.desired_scheduled
+METRIC_K8S_DAEMONSET_NODE_MISSCHEDULED                                  // k8s.daemonset.node.misscheduled
+METRIC_K8S_DAEMONSET_NODE_READY                                         // k8s.daemonset.node.ready
+METRIC_K8S_DEPLOYMENT_POD_AVAILABLE                                     // k8s.deployment.pod.available
+METRIC_K8S_DEPLOYMENT_POD_DESIRED                                       // k8s.deployment.pod.desired
+METRIC_K8S_HPA_POD_CURRENT                                              // k8s.hpa.pod.current
+METRIC_K8S_HPA_POD_DESIRED                                              // k8s.hpa.pod.desired
+METRIC_K8S_HPA_POD_MAX                                                  // k8s.hpa.pod.max
+METRIC_K8S_HPA_POD_MIN                                                  // k8s.hpa.pod.min
+METRIC_K8S_JOB_POD_ACTIVE                                               // k8s.job.pod.active
+METRIC_K8S_JOB_POD_DESIRED_SUCCESSFUL                                   // k8s.job.pod.desired_successful
+METRIC_K8S_JOB_POD_FAILED                                               // k8s.job.pod.failed
+METRIC_K8S_JOB_POD_MAX_PARALLEL                                         // k8s.job.pod.max_parallel
+METRIC_K8S_JOB_POD_SUCCESSFUL                                           // k8s.job.pod.successful
+METRIC_K8S_NODE_CPU_ALLOCATABLE                                         // k8s.node.cpu.allocatable
+METRIC_K8S_NODE_EPHEMERAL_STORAGE_ALLOCATABLE                           // k8s.node.ephemeral_storage.allocatable
+METRIC_K8S_NODE_MEMORY_ALLOCATABLE                                      // k8s.node.memory.allocatable
+METRIC_K8S_NODE_MEMORY_AVAILABLE                                        // k8s.node.memory.available
+METRIC_K8S_NODE_MEMORY_PAGING_FAULTS                                    // k8s.node.memory.paging.faults
+METRIC_K8S_NODE_MEMORY_RSS                                              // k8s.node.memory.rss
+METRIC_K8S_NODE_MEMORY_WORKING_SET                                      // k8s.node.memory.working_set
+METRIC_K8S_NODE_POD_ALLOCATABLE                                         // k8s.node.pod.allocatable
+METRIC_K8S_POD_MEMORY_AVAILABLE                                         // k8s.pod.memory.available
+METRIC_K8S_POD_MEMORY_PAGING_FAULTS                                     // k8s.pod.memory.paging.faults
+METRIC_K8S_POD_MEMORY_RSS                                               // k8s.pod.memory.rss
+METRIC_K8S_POD_MEMORY_WORKING_SET                                       // k8s.pod.memory.working_set
+METRIC_K8S_POD_STATUS_PHASE                                             // k8s.pod.status.phase
+METRIC_K8S_POD_STATUS_REASON                                            // k8s.pod.status.reason
+METRIC_K8S_REPLICASET_POD_AVAILABLE                                     // k8s.replicaset.pod.available
+METRIC_K8S_REPLICASET_POD_DESIRED                                       // k8s.replicaset.pod.desired
+METRIC_K8S_REPLICATIONCONTROLLER_POD_AVAILABLE                          // k8s.replicationcontroller.pod.available
+METRIC_K8S_REPLICATIONCONTROLLER_POD_DESIRED                            // k8s.replicationcontroller.pod.desired
+METRIC_K8S_STATEFULSET_POD_CURRENT                                      // k8s.statefulset.pod.current
+METRIC_K8S_STATEFULSET_POD_DESIRED                                      // k8s.statefulset.pod.desired
+METRIC_K8S_STATEFULSET_POD_READY                                        // k8s.statefulset.pod.ready
+METRIC_K8S_STATEFULSET_POD_UPDATED                                      // k8s.statefulset.pod.updated
+
+METRIC_NFS_CLIENT_NET_COUNT                                             // nfs.client.net.count
+METRIC_NFS_CLIENT_NET_TCP_CONNECTION_ACCEPTED                           // nfs.client.net.tcp.connection.accepted
+METRIC_NFS_CLIENT_OPERATION_COUNT                                       // nfs.client.operation.count
+METRIC_NFS_CLIENT_PROCEDURE_COUNT                                       // nfs.client.procedure.count
+METRIC_NFS_CLIENT_RPC_AUTHREFRESH_COUNT                                 // nfs.client.rpc.authrefresh.count
+METRIC_NFS_CLIENT_RPC_COUNT                                             // nfs.client.rpc.count
+METRIC_NFS_CLIENT_RPC_RETRANSMIT_COUNT                                  // nfs.client.rpc.retransmit.count
+METRIC_NFS_SERVER_FH_STALE_COUNT                                        // nfs.server.fh.stale.count
+METRIC_NFS_SERVER_IO                                                    // nfs.server.io
+METRIC_NFS_SERVER_NET_COUNT                                             // nfs.server.net.count
+METRIC_NFS_SERVER_NET_TCP_CONNECTION_ACCEPTED                           // nfs.server.net.tcp.connection.accepted
+METRIC_NFS_SERVER_OPERATION_COUNT                                       // nfs.server.operation.count
+METRIC_NFS_SERVER_PROCEDURE_COUNT                                       // nfs.server.procedure.count
+METRIC_NFS_SERVER_REPCACHE_REQUESTS                                     // nfs.server.repcache.requests
+METRIC_NFS_SERVER_RPC_COUNT                                             // nfs.server.rpc.count
+METRIC_NFS_SERVER_THREAD_COUNT                                          // nfs.server.thread.count
+
+METRIC_OPENSHIFT_CLUSTERQUOTA_CPU_LIMIT_HARD                            // openshift.clusterquota.cpu.limit.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_CPU_LIMIT_USED                            // openshift.clusterquota.cpu.limit.used
+METRIC_OPENSHIFT_CLUSTERQUOTA_CPU_REQUEST_HARD                          // openshift.clusterquota.cpu.request.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_CPU_REQUEST_USED                          // openshift.clusterquota.cpu.request.used
+METRIC_OPENSHIFT_CLUSTERQUOTA_EPHEMERAL_STORAGE_LIMIT_HARD              // openshift.clusterquota.ephemeral_storage.limit.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_EPHEMERAL_STORAGE_LIMIT_USED              // openshift.clusterquota.ephemeral_storage.limit.used
+METRIC_OPENSHIFT_CLUSTERQUOTA_EPHEMERAL_STORAGE_REQUEST_HARD            // openshift.clusterquota.ephemeral_storage.request.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_EPHEMERAL_STORAGE_REQUEST_USED            // openshift.clusterquota.ephemeral_storage.request.used
+METRIC_OPENSHIFT_CLUSTERQUOTA_HUGEPAGE_COUNT_REQUEST_HARD               // openshift.clusterquota.hugepage_count.request.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_HUGEPAGE_COUNT_REQUEST_USED               // openshift.clusterquota.hugepage_count.request.used
+METRIC_OPENSHIFT_CLUSTERQUOTA_MEMORY_LIMIT_HARD                         // openshift.clusterquota.memory.limit.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_MEMORY_LIMIT_USED                         // openshift.clusterquota.memory.limit.used
+METRIC_OPENSHIFT_CLUSTERQUOTA_MEMORY_REQUEST_HARD                       // openshift.clusterquota.memory.request.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_MEMORY_REQUEST_USED                       // openshift.clusterquota.memory.request.used
+METRIC_OPENSHIFT_CLUSTERQUOTA_OBJECT_COUNT_HARD                         // openshift.clusterquota.object_count.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_OBJECT_COUNT_USED                         // openshift.clusterquota.object_count.used
+METRIC_OPENSHIFT_CLUSTERQUOTA_PERSISTENTVOLUMECLAIM_COUNT_HARD          // openshift.clusterquota.persistentvolumeclaim_count.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_PERSISTENTVOLUMECLAIM_COUNT_USED          // openshift.clusterquota.persistentvolumeclaim_count.used
+METRIC_OPENSHIFT_CLUSTERQUOTA_STORAGE_REQUEST_HARD                      // openshift.clusterquota.storage.request.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_STORAGE_REQUEST_USED                      // openshift.clusterquota.storage.request.used
+
+METRIC_SYSTEM_NETWORK_DROPPED                                           // system.network.dropped
+METRIC_SYSTEM_NETWORK_PACKETS                                           // system.network.packets
+
+METRIC_V8JS_MEMORY_HEAP_SPACE_AVAILABLE_SIZE                            // v8js.memory.heap.space.available_size
+METRIC_V8JS_MEMORY_HEAP_SPACE_PHYSICAL_SIZE                             // v8js.memory.heap.space.physical_size
+
+EVENT_GEN_AI_EVALUATION_RESULT                                          // gen_ai.evaluation.result
+
+ATTR_APP_SCREEN_ID                                                      // app.screen.id
+ATTR_APP_SCREEN_NAME                                                    // app.screen.name
+
+ATTR_GCP_APPHUB_DESTINATION_APPLICATION_CONTAINER                       // gcp.apphub_destination.application.container
+ATTR_GCP_APPHUB_DESTINATION_APPLICATION_ID                              // gcp.apphub_destination.application.id
+ATTR_GCP_APPHUB_DESTINATION_APPLICATION_LOCATION                        // gcp.apphub_destination.application.location
+ATTR_GCP_APPHUB_DESTINATION_SERVICE_CRITICALITY_TYPE                    // gcp.apphub_destination.service.criticality_type
+  GCP_APPHUB_DESTINATION_SERVICE_CRITICALITY_TYPE_VALUE_HIGH              // "HIGH"
+  GCP_APPHUB_DESTINATION_SERVICE_CRITICALITY_TYPE_VALUE_LOW               // "LOW"
+  GCP_APPHUB_DESTINATION_SERVICE_CRITICALITY_TYPE_VALUE_MEDIUM            // "MEDIUM"
+  GCP_APPHUB_DESTINATION_SERVICE_CRITICALITY_TYPE_VALUE_MISSION_CRITICAL  // "MISSION_CRITICAL"
+ATTR_GCP_APPHUB_DESTINATION_SERVICE_ENVIRONMENT_TYPE                    // gcp.apphub_destination.service.environment_type
+  GCP_APPHUB_DESTINATION_SERVICE_ENVIRONMENT_TYPE_VALUE_DEVELOPMENT       // "DEVELOPMENT"
+  GCP_APPHUB_DESTINATION_SERVICE_ENVIRONMENT_TYPE_VALUE_PRODUCTION        // "PRODUCTION"
+  GCP_APPHUB_DESTINATION_SERVICE_ENVIRONMENT_TYPE_VALUE_STAGING           // "STAGING"
+  GCP_APPHUB_DESTINATION_SERVICE_ENVIRONMENT_TYPE_VALUE_TEST              // "TEST"
+ATTR_GCP_APPHUB_DESTINATION_SERVICE_ID                                  // gcp.apphub_destination.service.id
+ATTR_GCP_APPHUB_DESTINATION_WORKLOAD_CRITICALITY_TYPE                   // gcp.apphub_destination.workload.criticality_type
+  GCP_APPHUB_DESTINATION_WORKLOAD_CRITICALITY_TYPE_VALUE_HIGH             // "HIGH"
+  GCP_APPHUB_DESTINATION_WORKLOAD_CRITICALITY_TYPE_VALUE_LOW              // "LOW"
+  GCP_APPHUB_DESTINATION_WORKLOAD_CRITICALITY_TYPE_VALUE_MEDIUM           // "MEDIUM"
+  GCP_APPHUB_DESTINATION_WORKLOAD_CRITICALITY_TYPE_VALUE_MISSION_CRITICAL // "MISSION_CRITICAL"
+ATTR_GCP_APPHUB_DESTINATION_WORKLOAD_ENVIRONMENT_TYPE                   // gcp.apphub_destination.workload.environment_type
+  GCP_APPHUB_DESTINATION_WORKLOAD_ENVIRONMENT_TYPE_VALUE_DEVELOPMENT      // "DEVELOPMENT"
+  GCP_APPHUB_DESTINATION_WORKLOAD_ENVIRONMENT_TYPE_VALUE_PRODUCTION       // "PRODUCTION"
+  GCP_APPHUB_DESTINATION_WORKLOAD_ENVIRONMENT_TYPE_VALUE_STAGING          // "STAGING"
+  GCP_APPHUB_DESTINATION_WORKLOAD_ENVIRONMENT_TYPE_VALUE_TEST             // "TEST"
+ATTR_GCP_APPHUB_DESTINATION_WORKLOAD_ID                                 // gcp.apphub_destination.workload.id
+
+ATTR_GEN_AI_EMBEDDINGS_DIMENSION_COUNT                                  // gen_ai.embeddings.dimension.count
+ATTR_GEN_AI_EVALUATION_EXPLANATION                                      // gen_ai.evaluation.explanation
+ATTR_GEN_AI_EVALUATION_NAME                                             // gen_ai.evaluation.name
+ATTR_GEN_AI_EVALUATION_SCORE_LABEL                                      // gen_ai.evaluation.score.label
+ATTR_GEN_AI_EVALUATION_SCORE_VALUE                                      // gen_ai.evaluation.score.value
+ATTR_GEN_AI_TOOL_CALL_ARGUMENTS                                         // gen_ai.tool.call.arguments
+ATTR_GEN_AI_TOOL_CALL_RESULT                                            // gen_ai.tool.call.result
+ATTR_GEN_AI_TOOL_DEFINITIONS                                            // gen_ai.tool.definitions
+
+HTTP_REQUEST_METHOD_VALUE_QUERY                                         // "QUERY"
+
+ATTR_K8S_POD_STATUS_PHASE                                               // k8s.pod.status.phase
+  K8S_POD_STATUS_PHASE_VALUE_FAILED                                       // "Failed"
+  K8S_POD_STATUS_PHASE_VALUE_PENDING                                      // "Pending"
+  K8S_POD_STATUS_PHASE_VALUE_RUNNING                                      // "Running"
+  K8S_POD_STATUS_PHASE_VALUE_SUCCEEDED                                    // "Succeeded"
+  K8S_POD_STATUS_PHASE_VALUE_UNKNOWN                                      // "Unknown"
+ATTR_K8S_POD_STATUS_REASON                                              // k8s.pod.status.reason
+  K8S_POD_STATUS_REASON_VALUE_EVICTED                                     // "Evicted"
+  K8S_POD_STATUS_REASON_VALUE_NODE_AFFINITY                               // "NodeAffinity"
+  K8S_POD_STATUS_REASON_VALUE_NODE_LOST                                   // "NodeLost"
+  K8S_POD_STATUS_REASON_VALUE_SHUTDOWN                                    // "Shutdown"
+  K8S_POD_STATUS_REASON_VALUE_UNEXPECTED_ADMISSION_ERROR                  // "UnexpectedAdmissionError"
+
+ATTR_NFS_OPERATION_NAME                                                 // nfs.operation.name
+ATTR_NFS_SERVER_REPCACHE_STATUS                                         // nfs.server.repcache.status
+
+ATTR_ONC_RPC_PROCEDURE_NAME                                             // onc_rpc.procedure.name
+ATTR_ONC_RPC_PROCEDURE_NUMBER                                           // onc_rpc.procedure.number
+ATTR_ONC_RPC_PROGRAM_NAME                                               // onc_rpc.program.name
+ATTR_ONC_RPC_VERSION                                                    // onc_rpc.version
+
+ATTR_OPENSHIFT_CLUSTERQUOTA_NAME                                        // openshift.clusterquota.name
+ATTR_OPENSHIFT_CLUSTERQUOTA_UID                                         // openshift.clusterquota.uid
+
+ATTR_PPROF_LOCATION_IS_FOLDED                                           // pprof.location.is_folded
+ATTR_PPROF_MAPPING_HAS_FILENAMES                                        // pprof.mapping.has_filenames
+ATTR_PPROF_MAPPING_HAS_FUNCTIONS                                        // pprof.mapping.has_functions
+ATTR_PPROF_MAPPING_HAS_INLINE_FRAMES                                    // pprof.mapping.has_inline_frames
+ATTR_PPROF_MAPPING_HAS_LINE_NUMBERS                                     // pprof.mapping.has_line_numbers
+ATTR_PPROF_PROFILE_COMMENT                                              // pprof.profile.comment
+
+ATTR_PROCESS_STATE                                                      // process.state
+  PROCESS_STATE_VALUE_DEFUNCT                                             // "defunct"
+  PROCESS_STATE_VALUE_RUNNING                                             // "running"
+  PROCESS_STATE_VALUE_SLEEPING                                            // "sleeping"
+  PROCESS_STATE_VALUE_STOPPED                                             // "stopped"
+
+RPC_SYSTEM_VALUE_JSONRPC                                                // "jsonrpc"
+RPC_SYSTEM_VALUE_ONC_RPC                                                // "onc_rpc"
+
+ATTR_SYSTEM_PAGING_FAULT_TYPE                                           // system.paging.fault.type
+  SYSTEM_PAGING_FAULT_TYPE_VALUE_MAJOR                                    // "major"
+  SYSTEM_PAGING_FAULT_TYPE_VALUE_MINOR                                    // "minor"
+```
+
+</details>
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
