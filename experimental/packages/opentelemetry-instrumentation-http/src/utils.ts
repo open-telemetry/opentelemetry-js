@@ -116,16 +116,20 @@ export const getAbsoluteUrl = (
   }
   // Redact sensitive query parameters
   if (path.includes('?')) {
-    const parsedUrl = new URL(path, 'http://localhost');
-    const sensitiveParamsToRedact: string[] = redactedQueryParams || [];
+    try {
+      const parsedUrl = new URL(path, 'http://localhost');
+      const sensitiveParamsToRedact: string[] = redactedQueryParams || [];
 
-    for (const sensitiveParam of sensitiveParamsToRedact) {
-      if (parsedUrl.searchParams.get(sensitiveParam)) {
-        parsedUrl.searchParams.set(sensitiveParam, STR_REDACTED);
+      for (const sensitiveParam of sensitiveParamsToRedact) {
+        if (parsedUrl.searchParams.get(sensitiveParam)) {
+          parsedUrl.searchParams.set(sensitiveParam, STR_REDACTED);
+        }
       }
-    }
 
-    path = `${parsedUrl.pathname}${parsedUrl.search}`;
+      path = `${parsedUrl.pathname}${parsedUrl.search}`;
+    } catch {
+      // Ignore error, as the path was not a valid URL.
+    }
   }
   const authPart = reqUrlObject.auth ? `${STR_REDACTED}:${STR_REDACTED}@` : '';
   return `${protocol}//${authPart}${host}${path}`;
