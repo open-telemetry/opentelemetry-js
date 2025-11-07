@@ -148,7 +148,7 @@ export abstract class InstrumentationBase<
       const { name } = module;
       try {
         const resolvedModule = require.resolve(name);
-        if (require.cache[resolvedModule]) {
+        if (require.cache[resolvedModule]?.loaded) {
           // Module is already cached, which means the instrumentation hook might not work
           this._diag.warn(
             `Module ${name} has been loaded before ${this.instrumentationName} so it might not work, please initialize it before requiring ${name}`
