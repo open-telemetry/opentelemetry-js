@@ -2,3 +2,24 @@ file_format: "1.0-rc.1"
 disabled: false
 resource:
   attributes_list: service.instance.id=123
+
+tracer_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp_http:
+            headers_list: api-key=1234
+
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          otlp_http:
+            headers_list: api-key=1234
+
+logger_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp_http:
+            headers_list: api-key=1234
