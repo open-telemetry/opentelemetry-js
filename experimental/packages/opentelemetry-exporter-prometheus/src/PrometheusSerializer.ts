@@ -23,8 +23,18 @@ import {
   DataPoint,
   Histogram,
 } from '@opentelemetry/sdk-metrics';
-import { hrTimeToMilliseconds } from '@opentelemetry/core';
+import {
+  InstrumentationScope,
+  hrTimeToMilliseconds,
+} from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
+import {
+  ATTR_OTEL_SCOPE_NAME,
+  ATTR_OTEL_SCOPE_VERSION,
+} from '@opentelemetry/semantic-conventions';
+
+// This is currently listed as experimental.
+const ATTR_OTEL_SCOPE_SCHEMA_URL = 'otel.scope.schema_url';
 
 type PrometheusDataTypeLiteral =
   | 'counter'
@@ -173,19 +183,22 @@ export class PrometheusSerializer {
   private _appendTimestamp: boolean;
   private _additionalAttributes: Attributes | undefined;
   private _withResourceConstantLabels: RegExp | undefined;
+  private _withoutScopeInfo: boolean | undefined;
   private _withoutTargetInfo: boolean | undefined;
 
   constructor(
     prefix?: string,
     appendTimestamp = false,
     withResourceConstantLabels?: RegExp,
-    withoutTargetInfo?: boolean
+    withoutTargetInfo?: boolean,
+    withoutScopeInfo?: boolean
   ) {
     if (prefix) {
       this._prefix = prefix + '_';
     }
     this._appendTimestamp = appendTimestamp;
     this._withResourceConstantLabels = withResourceConstantLabels;
+    this._withoutScopeInfo = !!withoutScopeInfo;
     this._withoutTargetInfo = !!withoutTargetInfo;
   }
 
@@ -227,12 +240,15 @@ export class PrometheusSerializer {
   private _serializeScopeMetrics(scopeMetrics: ScopeMetrics) {
     let str = '';
     for (const metric of scopeMetrics.metrics) {
-      str += this._serializeMetricData(metric) + '\n';
+      str += this._serializeMetricData(metric, scopeMetrics.scope) + '\n';
     }
     return str;
   }
 
-  private _serializeMetricData(metricData: MetricData) {
+  private _serializeMetricData(
+    metricData: MetricData,
+    scope: InstrumentationScope
+  ) {
     let name = sanitizePrometheusMetricName(
       escapeString(metricData.descriptor.name)
     );
@@ -250,19 +266,53 @@ export class PrometheusSerializer {
       ? `\n# UNIT ${name} ${escapeString(metricData.descriptor.unit)}`
       : '';
     const type = `# TYPE ${name} ${toPrometheusType(metricData)}`;
+    let additionalAttributes: Attributes | undefined;
+
+    if (this._withoutScopeInfo) {
+      additionalAttributes = this._additionalAttributes;
+    } else {
+      const scopeInfo: Attributes = { [ATTR_OTEL_SCOPE_NAME]: scope.name };
+
+      if (scope.schemaUrl) {
+        scopeInfo[ATTR_OTEL_SCOPE_SCHEMA_URL] = scope.schemaUrl;
+      }
+
+      if (scope.version) {
+        scopeInfo[ATTR_OTEL_SCOPE_VERSION] = scope.version;
+      }
+
+      additionalAttributes = Object.assign(
+        scopeInfo,
+        this._additionalAttributes
+      );
+    }
 
     let results = '';
     switch (dataPointType) {
       case DataPointType.SUM:
       case DataPointType.GAUGE: {
         results = metricData.dataPoints
-          .map(it => this._serializeSingularDataPoint(name, metricData, it))
+          .map(it =>
+            this._serializeSingularDataPoint(
+              name,
+              metricData,
+              it,
+              additionalAttributes
+            )
+          )
           .join('');
         break;
       }
       case DataPointType.HISTOGRAM: {
         results = metricData.dataPoints
-          .map(it => this._serializeHistogramDataPoint(name, metricData, it))
+          .map(it =>
+            this._serializeHistogramDataPoint(
+              name,
+              metricData,
+              it,
+              additionalAttributes
+            )
+          )
           .join('');
         break;
       }
@@ -279,7 +329,8 @@ export class PrometheusSerializer {
   private _serializeSingularDataPoint(
     name: string,
     data: MetricData,
-    dataPoint: DataPoint<number>
+    dataPoint: DataPoint<number>,
+    additionalAttributes: Attributes | undefined
   ): string {
     let results = '';
 
@@ -291,7 +342,7 @@ export class PrometheusSerializer {
       attributes,
       value,
       this._appendTimestamp ? timestamp : undefined,
-      this._additionalAttributes
+      additionalAttributes
     );
     return results;
   }
@@ -299,7 +350,8 @@ export class PrometheusSerializer {
   private _serializeHistogramDataPoint(
     name: string,
     data: MetricData,
-    dataPoint: DataPoint<Histogram>
+    dataPoint: DataPoint<Histogram>,
+    additionalAttributes: Attributes | undefined
   ): string {
     let results = '';
 
@@ -316,7 +368,7 @@ export class PrometheusSerializer {
           attributes,
           value,
           this._appendTimestamp ? timestamp : undefined,
-          this._additionalAttributes
+          additionalAttributes
         );
     }
 
@@ -343,7 +395,7 @@ export class PrometheusSerializer {
         attributes,
         cumulativeSum,
         this._appendTimestamp ? timestamp : undefined,
-        Object.assign({}, this._additionalAttributes ?? {}, {
+        Object.assign({}, additionalAttributes, {
           le:
             upperBound === undefined || upperBound === Infinity
               ? '+Inf'
