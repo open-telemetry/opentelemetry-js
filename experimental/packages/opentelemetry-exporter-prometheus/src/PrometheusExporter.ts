@@ -35,6 +35,7 @@ export class PrometheusExporter extends MetricReader {
     prefix: '',
     appendTimestamp: false,
     withResourceConstantLabels: undefined,
+    withoutScopeInfo: false,
     withoutTargetInfo: false,
   };
 
@@ -87,6 +88,9 @@ export class PrometheusExporter extends MetricReader {
     const _withResourceConstantLabels =
       config.withResourceConstantLabels ||
       PrometheusExporter.DEFAULT_OPTIONS.withResourceConstantLabels;
+    const _withoutScopeInfo =
+      config.withoutScopeInfo ||
+      PrometheusExporter.DEFAULT_OPTIONS.withoutScopeInfo;
     const _withoutTargetInfo =
       config.withoutTargetInfo ||
       PrometheusExporter.DEFAULT_OPTIONS.withoutTargetInfo;
@@ -96,7 +100,8 @@ export class PrometheusExporter extends MetricReader {
       this._prefix,
       this._appendTimestamp,
       _withResourceConstantLabels,
-      _withoutTargetInfo
+      _withoutTargetInfo,
+      _withoutScopeInfo
     );
 
     this._baseUrl = `http://${this._host}:${this._port}/`;
