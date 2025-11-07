@@ -130,8 +130,10 @@ function configureMetricProviderFromEnv(): IMetricReader[] {
   enabledExporters.forEach(exporter => {
     if (exporter === 'otlp') {
       const protocol =
-        process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL?.trim() ||
-        process.env.OTEL_EXPORTER_OTLP_PROTOCOL?.trim();
+        (
+          getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_PROTOCOL') ??
+          getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL')
+        )?.trim() || 'http/protobuf'; // Using || to also fall back on empty string
 
       const exportIntervalMillis = getValueInMillis(
         'OTEL_METRIC_EXPORT_INTERVAL',
@@ -477,10 +479,11 @@ export class NodeSDK {
 
     enabledExporters.forEach(exporter => {
       if (exporter === 'otlp') {
-        const protocol = (
-          getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_PROTOCOL') ??
-          getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL')
-        )?.trim();
+        const protocol =
+          (
+            getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_PROTOCOL') ??
+            getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL')
+          )?.trim() || 'http/protobuf'; // Using || to also fall back on empty string
 
         switch (protocol) {
           case 'grpc':
@@ -490,10 +493,6 @@ export class NodeSDK {
             exporters.push(new OTLPHttpLogExporter());
             break;
           case 'http/protobuf':
-            exporters.push(new OTLPProtoLogExporter());
-            break;
-          case undefined:
-          case '':
             exporters.push(new OTLPProtoLogExporter());
             break;
           default:
