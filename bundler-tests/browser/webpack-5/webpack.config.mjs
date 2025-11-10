@@ -1,19 +1,26 @@
 import { fileURLToPath } from 'url';
 import path from 'path';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/** @type {import('./node_modules/@types/webpack').Configuration} */
 export default {
-  entry: './src/emit-event.js',
+  mode: 'development',
+  entry: './src/index.js',
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
-    clean: false
   },
   devServer: {
     static: {
       directory: path.resolve(__dirname, 'dist/'),
     },
   },
-  mode: 'development'
+  plugins: [
+    new HtmlWebpackPlugin({
+      title: 'Development',
+      template: 'index.html',
+    }),
+  ],
 };
