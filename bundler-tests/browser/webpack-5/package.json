@@ -1,8 +1,8 @@
 {
-  "name": "@opentelemetry/webpack-5-bundle-test",
+  "name": "webpack-5-bundle-test",
   "private": true,
   "version": "0.208.0",
-  "description": "Test app for logs in webpack",
+  "description": "Test app for logs in webpack 5",
   "type": "module",
   "scripts": {
     "test:bundle": "npm i && webpack --config webpack.config.mjs",
