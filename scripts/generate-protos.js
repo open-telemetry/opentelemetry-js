@@ -1,6 +1,6 @@
 'use strict';
 
-const cp = require('child_process');
+const spawn = require('cross-spawn');
 const path = require('path');
 
 const appRoot = process.cwd();
@@ -23,9 +23,10 @@ const protos = [
 
 function exec(command, argv) {
   return new Promise((resolve, reject) => {
-    const child = cp.spawn(command, argv, {
+    const child = spawn(command, argv, {
       stdio: ['ignore', 'inherit', 'inherit'],
     });
+    child.on('error', reject);
     child.on('exit', (code, signal) => {
       if (code !== 0) {
         reject(new Error(`${command} exited with non-zero code(${code}, ${signal})`));
