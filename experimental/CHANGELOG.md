@@ -55,6 +55,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * test(otlp-grpc-exporter-base): increase timeout in flaky test [#6042](https://github.com/open-telemetry/opentelemetry-js/pull/6042) @cjihrig
 * test(sdk-node): use process.env consistently in tests [#6052](https://github.com/open-telemetry/opentelemetry-js/pull/6052) @cjihrig
 * test(sdk-node): ensure process.env is cleaned up between tests [#6066](https://github.com/open-telemetry/opentelemetry-js/pull/6066) @cjihrig
+* refactor(instrumentation-http): avoid deprecated url.parse() in getAbsoluteUrl() [#6089](https://github.com/open-telemetry/opentelemetry-js/pull/6089) @cjihrig
 
 ## 0.207.0
 
