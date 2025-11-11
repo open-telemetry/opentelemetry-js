@@ -140,22 +140,38 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
           this._wrap(
             moduleExports.Client.prototype,
             'makeUnaryRequest',
-            this._patchClientRequestMethod(moduleExports, false)
+            this._patchClientRequestMethod(
+              moduleExports,
+              false,
+              'makeUnaryRequest'
+            )
           );
           this._wrap(
             moduleExports.Client.prototype,
             'makeClientStreamRequest',
-            this._patchClientRequestMethod(moduleExports, false)
+            this._patchClientRequestMethod(
+              moduleExports,
+              false,
+              'makeClientStreamRequest'
+            )
           );
           this._wrap(
             moduleExports.Client.prototype,
             'makeServerStreamRequest',
-            this._patchClientRequestMethod(moduleExports, true)
+            this._patchClientRequestMethod(
+              moduleExports,
+              true,
+              'makeServerStreamRequest'
+            )
           );
           this._wrap(
             moduleExports.Client.prototype,
             'makeBidiStreamRequest',
-            this._patchClientRequestMethod(moduleExports, true)
+            this._patchClientRequestMethod(
+              moduleExports,
+              true,
+              'makeBidiStreamRequest'
+            )
           );
           return moduleExports;
         },
@@ -304,15 +320,14 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
    */
   private _patchClientRequestMethod<ReturnType extends EventEmitter>(
     grpcLib: typeof grpcJs,
-    hasResponseStream: boolean
+    hasResponseStream: boolean,
+    name: string
   ): (
     original: ClientRequestFunction<ReturnType>
   ) => ClientRequestFunction<ReturnType> {
     const instrumentation = this;
     return (original: ClientRequestFunction<ReturnType>) => {
-      instrumentation._diag.debug(
-        'patched makeClientStreamRequest on grpc client'
-      );
+      instrumentation._diag.debug(`patched ${name} on grpc client`);
 
       return function makeClientStreamRequest(this: grpcJs.Client) {
         // method must always be at first position
