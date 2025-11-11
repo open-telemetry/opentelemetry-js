@@ -23,7 +23,7 @@ export default {
     rules: [
       {
         test: /\.(?:js|mjs|cjs)$/,
-        // Include OpenTelemetry packages for transpilation (they use modern JS syntax)
+        // Include OpenTelemetry ES2022 packages for transpilation
         exclude: /node_modules\/(?!@opentelemetry)/,
         use: {
           loader: 'babel-loader',
