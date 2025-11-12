@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1762816275321,
+  "lastUpdate": 1762939481436,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -43734,6 +43734,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 287992,
             "range": "±0.66%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "ded89b5cb36aeeffe2a0c925a7f647f28f3daac7",
+          "message": "ci: use setup-node for peer-api-check (#6099)",
+          "timestamp": "2025-11-12T08:52:32Z",
+          "tree_id": "950adefef69d27f58172c532cde709aec17dce78",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/ded89b5cb36aeeffe2a0c925a7f647f28f3daac7"
+        },
+        "date": 1762939480414,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 694168,
+            "range": "±1.04%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8427,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 297697,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 293431,
+            "range": "±0.63%",
             "unit": "ops/sec",
             "extra": "94 samples"
           }
