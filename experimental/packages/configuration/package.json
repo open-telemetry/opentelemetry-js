@@ -55,6 +55,6 @@
     "ts-loader": "9.5.4",
     "typescript": "5.0.4"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-configuration",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/configuration",
   "sideEffects": false
 }
