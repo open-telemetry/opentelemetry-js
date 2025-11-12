@@ -73,9 +73,9 @@ import {
   getInstanceID,
 } from './utils';
 import {
-  ConfigProvider,
-  Configuration,
-  createConfigProvider,
+  ConfigFactory,
+  ConfigurationModel,
+  createConfigFactory,
 } from '@opentelemetry/configuration';
 import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
 
@@ -223,7 +223,7 @@ function configureMetricProviderFromEnv(): IMetricReader[] {
  *    nodeSdk.start(); // registers all configured SDK components
  */
 export class NodeSDK {
-  private _config: Configuration;
+  private _config: ConfigurationModel;
   private _tracerProviderConfig?: TracerProviderConfig;
   private _loggerProviderConfig?: LoggerProviderConfig;
   private _meterProviderConfig?: MeterProviderConfig;
@@ -246,8 +246,8 @@ export class NodeSDK {
    * Create a new NodeJS SDK instance
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
-    const configProvider: ConfigProvider = createConfigProvider();
-    this._config = configProvider.getInstrumentationConfig();
+    const configFactory: ConfigFactory = createConfigFactory();
+    this._config = configFactory.getConfigModel();
     if (this._config.disabled) {
       this._disabled = true;
       // Functions with possible side-effects are set

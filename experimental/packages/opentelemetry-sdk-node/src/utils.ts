@@ -50,7 +50,7 @@ import {
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import { Configuration } from '@opentelemetry/configuration';
+import { ConfigurationModel } from '@opentelemetry/configuration';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
@@ -59,7 +59,7 @@ const RESOURCE_DETECTOR_PROCESS = 'process';
 const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
 
 export function getResourceDetectorsFromEnv(
-  config: Configuration
+  config: ConfigurationModel
 ): Array<ResourceDetector> {
   // When updating this list, make sure to also update the section `resourceDetectors` on README.
   const resourceDetectors = new Map<string, ResourceDetector>([
@@ -89,7 +89,7 @@ export function getResourceDetectorsFromEnv(
   });
 }
 
-export function getInstanceID(config: Configuration): string | undefined {
+export function getInstanceID(config: ConfigurationModel): string | undefined {
   if (config.resource?.attributes) {
     for (let i = 0; i < config.resource.attributes.length; i++) {
       const element = config.resource.attributes[i];
