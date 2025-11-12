@@ -16,11 +16,11 @@
 
 import { ConfigurationModel } from './models/configModel';
 
-export interface ConfigProvider {
+export interface ConfigFactory {
   /**
-   * Returns a ConfigurationModel, used for instrumentation configuration
+   * Returns a ConfigurationModel.
    *
    * @returns ConfigurationModel a Configuration Model with all configuration attributes
    */
-  getInstrumentationConfig(): ConfigurationModel;
+  getConfigModel(): ConfigurationModel;
 }
