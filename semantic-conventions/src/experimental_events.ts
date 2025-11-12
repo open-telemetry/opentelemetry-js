@@ -116,6 +116,13 @@ export const EVENT_GEN_AI_CHOICE = 'gen_ai.choice' as const;
 export const EVENT_GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS = 'gen_ai.client.inference.operation.details' as const;
 
 /**
+ * This event captures the result of evaluating GenAI output for quality, accuracy, or other characteristics. This event **SHOULD** be parented to GenAI operation span being evaluated when possible or set `gen_ai.response.id` when span id is not available.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_GEN_AI_EVALUATION_RESULT = 'gen_ai.evaluation.result' as const;
+
+/**
  * This event describes the system instructions passed to the GenAI model.
  *
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.

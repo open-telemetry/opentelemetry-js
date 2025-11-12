@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
-export type { ConfigProvider } from './IConfigProvider';
-export type { ConfigurationModel as Configuration } from './models/configModel';
-export { createConfigProvider } from './ConfigProvider';
+import { ConfigurationModel } from './models/configModel';
+
+export interface ConfigFactory {
+  /**
+   * Returns a ConfigurationModel.
+   *
+   * @returns ConfigurationModel a Configuration Model with all configuration attributes
+   */
+  getConfigModel(): ConfigurationModel;
+}

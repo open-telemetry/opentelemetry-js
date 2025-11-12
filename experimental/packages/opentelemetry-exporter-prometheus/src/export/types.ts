@@ -76,6 +76,12 @@ export interface ExporterConfig {
   withResourceConstantLabels?: RegExp;
 
   /**
+   * If true, scope labels are not included in scraped metrics.
+   * @default false (scope labels are included)
+   */
+  withoutScopeInfo?: boolean;
+
+  /**
    * If true, the target_info metric is not included in scraped metrics.
    * @default false (target_info metric is included)
    */

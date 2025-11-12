@@ -25,7 +25,7 @@ import {
   diagLogLevelFromString,
   getNumberFromEnv,
 } from '@opentelemetry/core';
-import { ConfigProvider } from './IConfigProvider';
+import { ConfigFactory } from './IConfigFactory';
 import {
   ExemplarFilter,
   ExporterDefaultHistogramAggregation,
@@ -35,7 +35,7 @@ import {
 /**
  * EnvironmentConfigProvider provides a configuration based on environment variables.
  */
-export class EnvironmentConfigProvider implements ConfigProvider {
+export class EnvironmentConfigFactory implements ConfigFactory {
   private _config: ConfigurationModel;
 
   constructor() {
@@ -62,7 +62,7 @@ export class EnvironmentConfigProvider implements ConfigProvider {
     setLoggerProvider(this._config);
   }
 
-  getInstrumentationConfig(): ConfigurationModel {
+  getConfigModel(): ConfigurationModel {
     return this._config;
   }
 }

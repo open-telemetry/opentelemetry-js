@@ -6,6 +6,7 @@
     "entryPoints": [
       "api",
       "experimental/packages/api-logs",
+      "experimental/packages/configuration",
       "experimental/packages/exporter-logs-otlp-grpc",
       "experimental/packages/exporter-logs-otlp-http",
       "experimental/packages/exporter-logs-otlp-proto",
@@ -13,7 +14,6 @@
       "experimental/packages/exporter-trace-otlp-http",
       "experimental/packages/exporter-trace-otlp-proto",
       "experimental/packages/opentelemetry-browser-detector",
-      "experimental/packages/opentelemetry-configuration",
       "experimental/packages/opentelemetry-exporter-metrics-otlp-grpc",
       "experimental/packages/opentelemetry-exporter-metrics-otlp-http",
       "experimental/packages/opentelemetry-exporter-metrics-otlp-proto",
@@ -66,6 +66,9 @@
       "path": "experimental/packages/api-logs"
     },
     {
+      "path": "experimental/packages/configuration"
+    },
+    {
       "path": "experimental/packages/exporter-logs-otlp-grpc"
     },
     {
@@ -85,9 +88,6 @@
     },
     {
       "path": "experimental/packages/opentelemetry-browser-detector"
-    },
-    {
-      "path": "experimental/packages/opentelemetry-configuration"
     },
     {
       "path": "experimental/packages/opentelemetry-exporter-metrics-otlp-grpc"

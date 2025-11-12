@@ -211,6 +211,16 @@ describe('Utility', () => {
         'http://localhost:8080/registers?AWSAccessKeyId=REDACTED'
       );
     });
+    it('does not perform redaction if the provided path cannot be parsed', () => {
+      const result = utils.getAbsoluteUrl(
+        { path: 'http://?AWSAccessKeyId=secret123' },
+        {}
+      );
+      assert.strictEqual(
+        result,
+        'http://localhosthttp://?AWSAccessKeyId=secret123'
+      );
+    });
   });
 
   describe('setSpanWithError()', () => {

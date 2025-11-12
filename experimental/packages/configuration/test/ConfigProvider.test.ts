@@ -15,9 +15,9 @@
  */
 
 import * as assert from 'assert';
-import { Configuration } from '../src';
+import { ConfigurationModel } from '../src';
 import { DiagLogLevel } from '@opentelemetry/api';
-import { createConfigProvider } from '../src/ConfigProvider';
+import { createConfigFactory } from '../src/ConfigFactory';
 import { OtlpHttpEncoding } from '../src/models/commonModel';
 import {
   ExemplarFilter,
@@ -32,8 +32,7 @@ import {
   setPropagators,
   setResources,
   setTracerProvider,
-} from '../src/EnvironmentConfigProvider';
-import { ConfigurationModel } from '../src/models/configModel';
+} from '../src/EnvironmentConfigFactory';
 import {
   parseConfigFile,
   setResourceAttributes,
@@ -43,9 +42,9 @@ import {
   setLoggerProvider as setFileLoggerProvider,
   setMeterProvider as setFileMeterProvider,
   getTemporalityPreference,
-} from '../src/FileConfigProvider';
+} from '../src/FileConfigFactory';
 
-const defaultConfig: Configuration = {
+const defaultConfig: ConfigurationModel = {
   disabled: false,
   log_level: DiagLogLevel.INFO,
   node_resource_detectors: ['all'],
@@ -136,7 +135,7 @@ const defaultConfig: Configuration = {
   },
 };
 
-const configFromFile: Configuration = {
+const configFromFile: ConfigurationModel = {
   disabled: false,
   log_level: DiagLogLevel.INFO,
   node_resource_detectors: ['all'],
@@ -627,7 +626,7 @@ const configFromFile: Configuration = {
   },
 };
 
-const defaultConfigFromFileWithEnvVariables: Configuration = {
+const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
   disabled: false,
   log_level: DiagLogLevel.INFO,
   node_resource_detectors: ['all'],
@@ -755,56 +754,44 @@ describe('ConfigProvider', function () {
 
   describe('get values from environment variables', function () {
     it('should initialize config with default values', function () {
-      const configProvider = createConfigProvider();
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        defaultConfig
-      );
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), defaultConfig);
     });
 
     it('should return config with disable true', function () {
       process.env.OTEL_SDK_DISABLED = 'true';
-      const expectedConfig: Configuration = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         disabled: true,
       };
-      const configProvider = createConfigProvider();
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        expectedConfig
-      );
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
 
     it('should return config with log level as debug', function () {
       process.env.OTEL_LOG_LEVEL = 'DEBUG';
-      const expectedConfig: Configuration = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         log_level: DiagLogLevel.DEBUG,
       };
-      const configProvider = createConfigProvider();
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        expectedConfig
-      );
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
 
     it('should return config with a list of options for node resource detectors', function () {
       process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,host, serviceinstance';
-      const expectedConfig: Configuration = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         node_resource_detectors: ['env', 'host', 'serviceinstance'],
       };
-      const configProvider = createConfigProvider();
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        expectedConfig
-      );
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
 
     it('should return config with a resource attribute list', function () {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.namespace=my-namespace,service.version=1.0.0';
-      const expectedConfig: Configuration = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         resource: {
           attributes_list:
@@ -823,16 +810,13 @@ describe('ConfigProvider', function () {
           ],
         },
       };
-      const configProvider = createConfigProvider();
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        expectedConfig
-      );
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
 
     it('should return config with custom service name', function () {
       process.env.OTEL_SERVICE_NAME = 'my service name';
-      const expectedConfig: Configuration = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         resource: {
           attributes: [
@@ -844,44 +828,35 @@ describe('ConfigProvider', function () {
           ],
         },
       };
-      const configProvider = createConfigProvider();
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        expectedConfig
-      );
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
 
     it('should return config with custom attribute_limits', function () {
       process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '100';
       process.env.OTEL_ATTRIBUTE_COUNT_LIMIT = '200';
-      const expectedConfig: Configuration = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         attribute_limits: {
           attribute_value_length_limit: 100,
           attribute_count_limit: 200,
         },
       };
-      const configProvider = createConfigProvider();
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        expectedConfig
-      );
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
 
     it('should return config with custom propagator', function () {
       process.env.OTEL_PROPAGATORS = 'tracecontext,jaeger';
-      const expectedConfig: Configuration = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         propagator: {
           composite: [{ tracecontext: null }, { jaeger: null }],
           composite_list: 'tracecontext,jaeger',
         },
       };
-      const configProvider = createConfigProvider();
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        expectedConfig
-      );
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
 
     it('should return config with custom tracer_provider', function () {
@@ -906,7 +881,7 @@ describe('ConfigProvider', function () {
       process.env.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = 'gzip';
       process.env.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT = '2000';
       process.env.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'host=localhost';
-      const expectedConfig: Configuration = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
           limits: {
@@ -950,11 +925,8 @@ describe('ConfigProvider', function () {
           },
         },
       };
-      const configProvider = createConfigProvider();
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        expectedConfig
-      );
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
 
     it('should return config with custom meter_provider', function () {
@@ -975,7 +947,7 @@ describe('ConfigProvider', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
         'base2_exponential_bucket_histogram';
       process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'always_on';
-      const expectedConfig: Configuration = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         meter_provider: {
           readers: [
@@ -1003,11 +975,8 @@ describe('ConfigProvider', function () {
           exemplar_filter: ExemplarFilter.AlwaysOn,
         },
       };
-      const configProvider = createConfigProvider();
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        expectedConfig
-      );
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
 
     it('should return config with custom logger_provider', function () {
@@ -1026,7 +995,7 @@ describe('ConfigProvider', function () {
       process.env.OTEL_EXPORTER_OTLP_LOGS_COMPRESSION = 'gzip';
       process.env.OTEL_EXPORTER_OTLP_LOGS_TIMEOUT = '700';
       process.env.OTEL_EXPORTER_OTLP_LOGS_HEADERS = 'host=localhost';
-      const expectedConfig: Configuration = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         logger_provider: {
           limits: {
@@ -1057,11 +1026,8 @@ describe('ConfigProvider', function () {
           ],
         },
       };
-      const configProvider = createConfigProvider();
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        expectedConfig
-      );
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
 
     it('should use backup options for exporters', function () {
@@ -1074,7 +1040,7 @@ describe('ConfigProvider', function () {
       process.env.OTEL_EXPORTER_OTLP_COMPRESSION = 'backup_compression';
       process.env.OTEL_EXPORTER_OTLP_TIMEOUT = '12000';
       process.env.OTEL_EXPORTER_OTLP_HEADERS = 'backup_headers=123';
-      const expectedConfig: Configuration = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
           processors: [
@@ -1151,11 +1117,8 @@ describe('ConfigProvider', function () {
           ],
         },
       };
-      const configProvider = createConfigProvider();
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        expectedConfig
-      );
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
 
     it('checks to keep good code coverage', function () {
@@ -1348,50 +1311,41 @@ describe('ConfigProvider', function () {
     it('should initialize config with default values from valid config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
         'test/fixtures/kitchen-sink.yaml';
-      const configProvider = createConfigProvider();
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        configFromFile
-      );
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), configFromFile);
     });
 
     it('should return error from invalid config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = './fixtures/kitchen-sink.txt';
       assert.throws(() => {
-        createConfigProvider();
+        createConfigFactory();
       });
     });
 
     it('should return error from invalid config file format', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
       assert.throws(() => {
-        createConfigProvider();
+        createConfigFactory();
       });
     });
 
     it('should initialize config with default values with empty string for config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = '';
-      const configProvider = createConfigProvider();
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        defaultConfig
-      );
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), defaultConfig);
     });
 
     it('should initialize config with default values with all whitespace for config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = '  ';
-      const configProvider = createConfigProvider();
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        defaultConfig
-      );
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), defaultConfig);
     });
 
     it('should initialize config with default values from valid short config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
         'test/fixtures/short-config.yml';
-      const configProvider = createConfigProvider();
-      const expectedConfig: Configuration = {
+      const configProvider = createConfigFactory();
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         resource: {
           attributes_list: 'service.instance.id=123',
@@ -1404,10 +1358,7 @@ describe('ConfigProvider', function () {
           ],
         },
       };
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        expectedConfig
-      );
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
 
     it('should initialize config with config file that contains environment variables', function () {
@@ -1470,8 +1421,8 @@ describe('ConfigProvider', function () {
       process.env.OTEL_EXPORTER_OTLP_LOGS_HEADERS = 'logs-header';
       process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = '28';
       process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '29';
-      const configProvider = createConfigProvider();
-      const expectedConfig: Configuration = {
+      const configProvider = createConfigFactory();
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfigFromFileWithEnvVariables,
         resource: {
           attributes_list: 'attributes',
@@ -1592,19 +1543,16 @@ describe('ConfigProvider', function () {
         },
       };
 
-      assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
-        expectedConfig
-      );
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
 
     it('should initialize config with fallbacks defined in config file when corresponding environment variables are not defined', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
         'test/fixtures/sdk-migration-config.yaml';
 
-      const configProvider = createConfigProvider();
+      const configProvider = createConfigFactory();
       assert.deepStrictEqual(
-        configProvider.getInstrumentationConfig(),
+        configProvider.getConfigModel(),
         defaultConfigFromFileWithEnvVariables
       );
     });
