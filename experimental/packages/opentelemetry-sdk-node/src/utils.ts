@@ -50,7 +50,7 @@ import {
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import { Configuration } from '../../opentelemetry-configuration/build/src';
+import { Configuration } from '@opentelemetry/configuration';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
