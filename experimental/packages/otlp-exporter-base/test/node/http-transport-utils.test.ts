@@ -54,11 +54,10 @@ describe('sendWithHttp', function () {
     let firstCallback = true;
     sendWithHttp(
       requestFn,
-      {
-        url: 'http://localhost:8080',
-        compression: 'gzip',
-        headers: () => ({}),
-      },
+      'http://localhost:8080',
+      {},
+      'gzip',
+      undefined,
       new http.Agent(),
       Buffer.from([1, 2, 3]),
       // TODO: the `onDone` callback is called twice because there are two error handlers
@@ -82,12 +81,10 @@ describe('sendWithHttp', function () {
     let firstCallback = true;
     sendWithHttp(
       requestFn,
-      {
-        url: 'http://localhost:8080',
-        compression: 'gzip',
-        headers: () => ({}),
-        userAgent: 'Transport-User-Agent/1.2.3',
-      },
+      'http://localhost:8080',
+      {},
+      'gzip',
+      'Transport-User-Agent/1.2.3',
       new http.Agent(),
       Buffer.from([1, 2, 3]),
       // TODO: the `onDone` callback is called twice because there are two error handlers

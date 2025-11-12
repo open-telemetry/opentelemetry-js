@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-export type { Logger } from './types/Logger';
-export type { LoggerProvider } from './types/LoggerProvider';
-export { SeverityNumber } from './types/LogRecord';
-export type { LogAttributes, LogBody, LogRecord } from './types/LogRecord';
-export type { LoggerOptions } from './types/LoggerOptions';
-export type { AnyValue, AnyValueMap } from './types/AnyValue';
-export { NOOP_LOGGER, NoopLogger } from './NoopLogger';
-export { ProxyLoggerProvider } from './ProxyLoggerProvider';
+import { OTLPExporterConfigBase } from './legacy-base-configuration';
+import { wrapStaticHeadersInFunction } from './shared-configuration';
+import { HeadersFactory } from './otlp-http-configuration';
 
-import { LogsAPI } from './api/logs';
-export const logs = LogsAPI.getInstance();
+export function convertLegacyHeaders(
+  config: OTLPExporterConfigBase
+): HeadersFactory | undefined {
+  if (typeof config.headers === 'function') {
+    return config.headers;
+  }
+  return wrapStaticHeadersInFunction(config.headers);
+}
