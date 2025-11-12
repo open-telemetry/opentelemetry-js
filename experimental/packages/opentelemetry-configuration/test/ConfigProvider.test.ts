@@ -809,6 +809,18 @@ describe('ConfigProvider', function () {
         resource: {
           attributes_list:
             'service.namespace=my-namespace,service.version=1.0.0',
+          attributes: [
+            {
+              name: 'service.namespace',
+              value: 'my-namespace',
+              type: 'string',
+            },
+            {
+              name: 'service.version',
+              value: '1.0.0',
+              type: 'string',
+            },
+          ],
         },
       };
       const configProvider = createConfigProvider();
@@ -1038,6 +1050,100 @@ describe('ConfigProvider', function () {
                     timeout: 700,
                     headers_list: 'host=localhost',
                     encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configProvider = createConfigProvider();
+      assert.deepStrictEqual(
+        configProvider.getInstrumentationConfig(),
+        expectedConfig
+      );
+    });
+
+    it('should use backup options for exporters', function () {
+      process.env.OTEL_EXPORTER_OTLP_CERTIFICATE =
+        'backup_certificate_file.pem';
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY = 'backup_client_key.pem';
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE =
+        'backup_client_certificate.pem';
+      process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://backup.com:4318';
+      process.env.OTEL_EXPORTER_OTLP_COMPRESSION = 'backup_compression';
+      process.env.OTEL_EXPORTER_OTLP_TIMEOUT = '12000';
+      process.env.OTEL_EXPORTER_OTLP_HEADERS = 'backup_headers=123';
+      const expectedConfig: Configuration = {
+        ...defaultConfig,
+        tracer_provider: {
+          processors: [
+            {
+              batch: {
+                ...defaultConfig.tracer_provider?.processors[0].batch,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://backup.com:4318/v1/traces',
+                    timeout: 12000,
+                    compression: 'backup_compression',
+                    encoding: OtlpHttpEncoding.Protobuf,
+                    certificate_file: 'backup_certificate_file.pem',
+                    client_certificate_file: 'backup_client_certificate.pem',
+                    client_key_file: 'backup_client_key.pem',
+                    headers_list: 'backup_headers=123',
+                  },
+                },
+              },
+            },
+          ],
+          limits: defaultConfig.tracer_provider?.limits,
+          sampler: defaultConfig.tracer_provider?.sampler,
+        },
+        meter_provider: {
+          ...defaultConfig.meter_provider,
+          readers: [
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://backup.com:4318/v1/metrics',
+                    timeout: 12000,
+                    compression: 'backup_compression',
+                    temporality_preference:
+                      ExporterTemporalityPreference.Cumulative,
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                    certificate_file: 'backup_certificate_file.pem',
+                    client_certificate_file: 'backup_client_certificate.pem',
+                    client_key_file: 'backup_client_key.pem',
+                    headers_list: 'backup_headers=123',
+                  },
+                },
+              },
+            },
+          ],
+        },
+        logger_provider: {
+          ...defaultConfig.logger_provider,
+          processors: [
+            {
+              batch: {
+                schedule_delay: 1000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://backup.com:4318/v1/logs',
+                    timeout: 12000,
+                    compression: 'backup_compression',
+                    encoding: OtlpHttpEncoding.Protobuf,
+                    certificate_file: 'backup_certificate_file.pem',
+                    client_certificate_file: 'backup_client_certificate.pem',
+                    client_key_file: 'backup_client_key.pem',
+                    headers_list: 'backup_headers=123',
                   },
                 },
               },
@@ -1285,9 +1391,22 @@ describe('ConfigProvider', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
         'test/fixtures/short-config.yml';
       const configProvider = createConfigProvider();
+      const expectedConfig: Configuration = {
+        ...defaultConfig,
+        resource: {
+          attributes_list: 'service.instance.id=123',
+          attributes: [
+            {
+              name: 'service.instance.id',
+              value: '123',
+              type: 'string',
+            },
+          ],
+        },
+      };
       assert.deepStrictEqual(
         configProvider.getInstrumentationConfig(),
-        defaultConfig
+        expectedConfig
       );
     });
 
