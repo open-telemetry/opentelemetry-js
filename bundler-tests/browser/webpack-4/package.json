@@ -35,10 +35,10 @@
     "webpack-dev-server": "^4"
   },
   "dependencies": {
-    "@opentelemetry/api": "^1.3.0",
-    "@opentelemetry/api-logs": "0.208.0",
-    "@opentelemetry/exporter-logs-otlp-http": "0.208.0",
-    "@opentelemetry/sdk-logs": "0.208.0"
+    "@opentelemetry/api": "file:../../../api",
+    "@opentelemetry/api-logs": "file:../../../experimental/packages/api-logs",
+    "@opentelemetry/exporter-logs-otlp-http": "file:../../../experimental/packages/exporter-logs-otlp-http",
+    "@opentelemetry/sdk-logs": "file:../../../experimental/packages/sdk-logs"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/bundler-tests/browser/webpack-4"
 }
