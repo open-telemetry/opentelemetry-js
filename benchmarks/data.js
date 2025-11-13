@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1762990672158,
+  "lastUpdate": 1763037792891,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -43840,6 +43840,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.65%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "overbalance@users.noreply.github.com",
+            "name": "Jared Freeze",
+            "username": "overbalance"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "823251fe7f3273214bd837ca37f05007cba5961f",
+          "message": "refactor(bundler-tests): split webpack tests into webpack-4 and webpack-5 (#6098)",
+          "timestamp": "2025-11-13T12:34:04Z",
+          "tree_id": "da3274e3cdd3e0ed3f603ebf3002d4ccb9d76b86",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/823251fe7f3273214bd837ca37f05007cba5961f"
+        },
+        "date": 1763037791889,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 691526,
+            "range": "±1.30%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8495,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 297115,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 286615,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
           }
         ]
       }
