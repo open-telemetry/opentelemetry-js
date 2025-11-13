@@ -32,7 +32,7 @@
     "html-webpack-plugin": "^4.5.2",
     "webpack": "^4",
     "webpack-cli": "^4",
-    "webpack-dev-server": "^4"
+    "webpack-dev-server": "^5.2.1"
   },
   "dependencies": {
     "@opentelemetry/api": "file:../../../api",
