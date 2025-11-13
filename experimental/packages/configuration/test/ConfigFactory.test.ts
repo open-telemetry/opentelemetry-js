@@ -929,6 +929,113 @@ describe('ConfigProvider', function () {
       assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
 
+    it('should return config with tracer_provider with console exporter', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'console';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          ...defaultConfig.tracer_provider,
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  console: {},
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with tracer_provider with default zipkin exporter', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'zipkin';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          ...defaultConfig.tracer_provider,
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  zipkin: {
+                    endpoint: 'http://localhost:9411/api/v2/spans',
+                    timeout: 10000,
+                  },
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with tracer_provider with default zipkin exporter', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'zipkin';
+      process.env.OTEL_EXPORTER_ZIPKIN_ENDPOINT =
+        'http://custom:9411/api/v2/spans';
+      process.env.OTEL_EXPORTER_ZIPKIN_TIMEOUT = '15000';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          ...defaultConfig.tracer_provider,
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  zipkin: {
+                    endpoint: 'http://custom:9411/api/v2/spans',
+                    timeout: 15000,
+                  },
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with tracer_provider with no exporter', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'none';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          ...defaultConfig.tracer_provider,
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {},
+              },
+            },
+          ],
+        },
+      };
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+    });
+
     it('should return config with custom meter_provider', function () {
       process.env.OTEL_METRIC_EXPORT_INTERVAL = '100';
       process.env.OTEL_METRIC_EXPORT_TIMEOUT = '200';

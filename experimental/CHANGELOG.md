@@ -12,6 +12,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * feat(exporter-prometheus): support withoutScopeInfo option [#5993](https://github.com/open-telemetry/opentelemetry-js/pull/5993) @cjihrig
 * feat(configuration): improvements on package [#6101](https://github.com/open-telemetry/opentelemetry-js/pull/6101) @maryliag
+* feat(configuration): set tracer provider exporter type from env variable [#6106](https://github.com/open-telemetry/opentelemetry-js/pull/6106) @maryliag
 
 ### :bug: Bug Fixes
 
