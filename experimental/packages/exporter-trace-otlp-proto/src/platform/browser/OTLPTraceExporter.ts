@@ -19,7 +19,7 @@ import {
   OTLPExporterConfigBase,
   OTLPExporterBase,
 } from '@opentelemetry/otlp-exporter-base';
-import { ProtobufTraceSerializer } from '@opentelemetry/otlp-transformer';
+import { ProtobufTraceSerializer } from '@opentelemetry/otlp-transformer/trace/protobuf';
 import { createLegacyOtlpBrowserExportDelegate } from '@opentelemetry/otlp-exporter-base/browser-http';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/traces';
