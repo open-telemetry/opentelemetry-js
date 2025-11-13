@@ -121,7 +121,6 @@
     "examples/opentelemetry-web",
     "examples/http",
     "examples/https",
-    "examples/esm-http-ts",
-    "bundler-tests/browser/*"
+    "examples/esm-http-ts"
   ]
 }
