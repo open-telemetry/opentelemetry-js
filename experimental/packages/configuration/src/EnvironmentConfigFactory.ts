@@ -296,7 +296,7 @@ export function setMeterProvider(config: ConfigurationModel): void {
       }
 
       const endpoint =
-      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_ENDPOINT') ??
+        getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_ENDPOINT') ??
         (getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')
           ? `${getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')}/v1/metrics`
           : null);
