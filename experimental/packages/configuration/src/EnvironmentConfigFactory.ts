@@ -279,12 +279,14 @@ export function setMeterProvider(config: ConfigurationModel): void {
       readerPeriodic.interval = interval;
     }
 
-    const exportersType = getStringListFromEnv('OTEL_METRICS_EXPORTER') ?? ['otlp'];
+    const exportersType = getStringListFromEnv('OTEL_METRICS_EXPORTER') ?? [
+      'otlp',
+    ];
     if (exportersType) {
       config.meter_provider.readers = [];
       for (let i = 0; i < exportersType.length; i++) {
         const exporterType = exportersType[i];
-        const readerPeriodicInfo = { ...readerPeriodic};
+        const readerPeriodicInfo = { ...readerPeriodic };
 
         // TODO: add prometheus exporter support
         if (exporterType === 'console') {
@@ -314,14 +316,16 @@ export function setMeterProvider(config: ConfigurationModel): void {
             getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE') ??
             getStringFromEnv('OTEL_EXPORTER_OTLP_CERTIFICATE');
           if (certificateFile) {
-            readerPeriodicInfo.exporter.otlp_http.certificate_file = certificateFile;
+            readerPeriodicInfo.exporter.otlp_http.certificate_file =
+              certificateFile;
           }
 
           const clientKeyFile =
             getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY') ??
             getStringFromEnv('OTEL_EXPORTER_OTLP_CLIENT_KEY');
           if (clientKeyFile) {
-            readerPeriodicInfo.exporter.otlp_http.client_key_file = clientKeyFile;
+            readerPeriodicInfo.exporter.otlp_http.client_key_file =
+              clientKeyFile;
           }
 
           const clientCertificateFile =
