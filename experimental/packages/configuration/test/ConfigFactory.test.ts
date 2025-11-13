@@ -1025,6 +1025,45 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
+    it('should return config with meter_provider with list of exporters', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'otlp,console';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  otlp_http: {
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                    temporality_preference:
+                      ExporterTemporalityPreference.Cumulative,
+                    endpoint: 'http://localhost:4318/v1/metrics',
+                    timeout: 10000,
+                  },
+                },
+              },
+            },
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  console: {},
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
     it('should return config with custom logger_provider', function () {
       process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = '100';
       process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '200';
