@@ -23,7 +23,7 @@ import {
   NET_TRANSPORT_VALUE_IP_TCP,
 } from '../../src/semconv';
 import * as assert from 'assert';
-import * as url from 'url';
+import { urlToHttpOptions } from 'url';
 import { HttpInstrumentation } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import * as utils from '../utils/utils';
@@ -180,7 +180,7 @@ describe('HttpInstrumentation Integration tests', () => {
       assert.strictEqual(spans.length, 0);
 
       const result = await httpRequest.get(
-        new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`)
+        new URL(`${protocol}://localhost:${mockServerPort}/?query=test`)
       );
 
       spans = memoryExporter.getFinishedSpans();
@@ -207,7 +207,7 @@ describe('HttpInstrumentation Integration tests', () => {
       assert.strictEqual(spans.length, 0);
 
       const result = await httpRequest.get(
-        new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
+        new URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
         {
           headers: { 'x-foo': 'foo' },
         }
@@ -270,7 +270,7 @@ describe('HttpInstrumentation Integration tests', () => {
 
       const headers = { 'x-foo': 'foo' };
       const result = await httpRequest.get(
-        new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
+        new URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
         { headers }
       );
       assert.deepStrictEqual(headers, { 'x-foo': 'foo' });
@@ -284,7 +284,7 @@ describe('HttpInstrumentation Integration tests', () => {
 
       const headers = { 'x-foo': 'foo', forwarded: 'malformed' };
       const result = await httpRequest.get(
-        new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
+        new URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
         { headers }
       );
 
@@ -297,7 +297,7 @@ describe('HttpInstrumentation Integration tests', () => {
       assert.strictEqual(spans.length, 0);
       const options = Object.assign(
         { headers: { Expect: '100-continue' } },
-        url.parse(`${protocol}://localhost:${mockServerPort}/`)
+        urlToHttpOptions(new URL(`${protocol}://localhost:${mockServerPort}/`))
       );
 
       const result = await httpRequest.get(options);
