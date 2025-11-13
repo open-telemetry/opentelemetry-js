@@ -1013,6 +1013,63 @@ describe('ConfigProvider', function () {
       assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
 
+    it('should return config with tracer_provider with exporter list', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'otlp,console,zipkin';
+      process.env.OTEL_EXPORTER_ZIPKIN_ENDPOINT =
+        'http://custom:9411/api/v2/spans';
+      process.env.OTEL_EXPORTER_ZIPKIN_TIMEOUT = '15000';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          ...defaultConfig.tracer_provider,
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/traces',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  console: {},
+                },
+              },
+            },
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  zipkin: {
+                    endpoint: 'http://custom:9411/api/v2/spans',
+                    timeout: 15000,
+                  },
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+    });
+
     it('should return config with tracer_provider with no exporter', function () {
       process.env.OTEL_TRACES_EXPORTER = 'none';
       const expectedConfig: ConfigurationModel = {
