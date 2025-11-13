@@ -1082,6 +1082,48 @@ describe('ConfigProvider', function () {
       assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
 
+    it('should return config with logger_provider with console exporter', function () {
+      process.env.OTEL_LOGS_EXPORTER = 'otlp,console';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        logger_provider: {
+          limits: {
+            attribute_count_limit: 128,
+          },
+          processors: [
+            {
+              batch: {
+                schedule_delay: 1000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/logs',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+            {
+              batch: {
+                schedule_delay: 1000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  console: {},
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+    });
+
     it('should use backup options for exporters', function () {
       process.env.OTEL_EXPORTER_OTLP_CERTIFICATE =
         'backup_certificate_file.pem';
