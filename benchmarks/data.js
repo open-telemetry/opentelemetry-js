@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1763040672884,
+  "lastUpdate": 1763048203089,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -43944,6 +43944,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.76%",
             "unit": "ops/sec",
             "extra": "89 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "134644284+majanjua-amzn@users.noreply.github.com",
+            "name": "Mahad Janjua",
+            "username": "majanjua-amzn"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "a05e5815518d6cc39bbf7da3c938a4b7f0a3da83",
+          "message": "feat: implement on ending in span processor (#6024)",
+          "timestamp": "2025-11-13T15:27:52Z",
+          "tree_id": "8d87956a7271b28c9e31a4e7acddc26a6df113a0",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/a05e5815518d6cc39bbf7da3c938a4b7f0a3da83"
+        },
+        "date": 1763048202103,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 664723,
+            "range": "±0.60%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8220,
+            "range": "±0.97%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 281349,
+            "range": "±0.64%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 276340,
+            "range": "±0.62%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
