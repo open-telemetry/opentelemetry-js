@@ -53,6 +53,14 @@ export class MultiSpanProcessor implements SpanProcessor {
     }
   }
 
+  onEnding(span: Span): void {
+    for (const spanProcessor of this._spanProcessors) {
+      if (spanProcessor.onEnding) {
+        spanProcessor.onEnding(span);
+      }
+    }
+  }
+
   onEnd(span: ReadableSpan): void {
     for (const spanProcessor of this._spanProcessors) {
       spanProcessor.onEnd(span);
