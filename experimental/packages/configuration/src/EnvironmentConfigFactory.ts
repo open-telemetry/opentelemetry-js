@@ -456,12 +456,14 @@ export function setLoggerProvider(config: ConfigurationModel): void {
       batch.max_export_batch_size = maxExportBatchSize;
     }
 
-    const exportersType = getStringListFromEnv('OTEL_LOGS_EXPORTER') ?? ['otlp'];
+    const exportersType = getStringListFromEnv('OTEL_LOGS_EXPORTER') ?? [
+      'otlp',
+    ];
     if (exportersType) {
       config.logger_provider.processors = [];
       for (let i = 0; i < exportersType.length; i++) {
         const exporterType = exportersType[i];
-        const batchInfo = { ...batch};
+        const batchInfo = { ...batch };
         if (exporterType === 'console') {
           batchInfo.exporter = { console: {} };
         } else if (exporterType === 'none') {
