@@ -21,7 +21,7 @@ import {
   ConfigurationModel,
   initializeDefaultConfiguration,
 } from './models/configModel';
-import { ConfigProvider } from './IConfigProvider';
+import { ConfigFactory } from './IConfigFactory';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
 import {
@@ -61,7 +61,7 @@ import {
   ViewStream,
 } from './models/meterProviderModel';
 
-export class FileConfigProvider implements ConfigProvider {
+export class FileConfigFactory implements ConfigFactory {
   private _config: ConfigurationModel;
 
   constructor() {
@@ -69,7 +69,7 @@ export class FileConfigProvider implements ConfigProvider {
     parseConfigFile(this._config);
   }
 
-  getInstrumentationConfig(): ConfigurationModel {
+  getConfigModel(): ConfigurationModel {
     return this._config;
   }
 }

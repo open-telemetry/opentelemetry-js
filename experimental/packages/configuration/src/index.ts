@@ -14,13 +14,6 @@
  * limitations under the License.
  */
 
-import { ConfigurationModel } from './models/configModel';
-
-export interface ConfigProvider {
-  /**
-   * Returns a ConfigurationModel, used for instrumentation configuration
-   *
-   * @returns ConfigurationModel a Configuration Model with all configuration attributes
-   */
-  getInstrumentationConfig(): ConfigurationModel;
-}
+export type { ConfigFactory } from './IConfigFactory';
+export type { ConfigurationModel } from './models/configModel';
+export { createConfigFactory } from './ConfigFactory';
