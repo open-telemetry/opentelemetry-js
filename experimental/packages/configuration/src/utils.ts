@@ -111,7 +111,7 @@ export function getNumberListFromConfigFile(
     const filteredList = [];
     for (let i = 0; i < list.length; i++) {
       const element = getNumberFromConfigFile(list[i]);
-      if (element) {
+      if (element || element === 0) {
         filteredList.push(element);
       }
     }
@@ -161,7 +161,7 @@ export function envVariableSubstitution(value: unknown): string | undefined {
     return undefined;
   }
 
-  const matches = String(value).match(/\$\{[a-zA-Z0-9_:.-]*\}/g);
+  const matches = String(value).match(/\$\{[a-zA-Z0-9,=/_:.-]*\}/g);
   if (matches) {
     let stringValue = String(value);
     for (const match of matches) {

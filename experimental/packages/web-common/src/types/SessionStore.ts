@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 
-import { ConfigProvider } from './IConfigProvider';
-import { EnvironmentConfigProvider } from './EnvironmentConfigProvider';
-import { FileConfigProvider, hasValidConfigFile } from './FileConfigProvider';
+import { Session } from './Session';
 
-export function createConfigProvider(): ConfigProvider {
-  if (hasValidConfigFile()) {
-    return new FileConfigProvider();
-  }
-  return new EnvironmentConfigProvider();
+export interface SessionStore {
+  save(session: Session): Promise<void>;
+  get(): Promise<Session | null>;
 }

@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
-export { EnvironmentConfigProvider } from './EnvironmentConfigProvider';
-export type { ConfigProvider } from './IConfigProvider';
-export type { ConfigurationModel as Configuration } from './configModel';
+import { Session } from './Session';
+
+export interface SessionObserver {
+  onSessionStarted(newSession: Session, previousSession?: Session): void;
+  onSessionEnded(session: Session): void;
+}

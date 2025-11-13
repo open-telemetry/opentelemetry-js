@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { ConfigurationModel } from './configModel';
+import { ConfigFactory } from './IConfigFactory';
+import { EnvironmentConfigFactory } from './EnvironmentConfigFactory';
+import { FileConfigFactory, hasValidConfigFile } from './FileConfigFactory';
 
-export interface ConfigProvider {
-  /**
-   * Returns a ConfigurationModel, used for instrumentation configuration
-   *
-   * @returns ConfigurationModel a Configuration Model with all configuration attributes
-   */
-  getInstrumentationConfig(): ConfigurationModel;
+export function createConfigFactory(): ConfigFactory {
+  if (hasValidConfigFile()) {
+    return new FileConfigFactory();
+  }
+  return new EnvironmentConfigFactory();
 }

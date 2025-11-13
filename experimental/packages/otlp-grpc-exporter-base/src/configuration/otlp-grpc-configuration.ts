@@ -24,7 +24,6 @@ import {
   createInsecureCredentials,
   createSslCredentials,
 } from '../grpc-exporter-transport';
-import { VERSION } from '../version';
 import { URL } from 'url';
 import { diag } from '@opentelemetry/api';
 
@@ -35,6 +34,7 @@ export interface OtlpGrpcConfiguration extends OtlpSharedConfiguration {
   url: string;
   metadata: () => Metadata;
   credentials: () => ChannelCredentials;
+  userAgent?: string;
 }
 
 /**
@@ -118,17 +118,14 @@ export function mergeOtlpGrpcConfigurationWithDefaults(
       userProvidedConfiguration.credentials ??
       fallbackConfiguration.credentials?.(rawUrl) ??
       defaultConfiguration.credentials(rawUrl),
+    userAgent: userProvidedConfiguration.userAgent,
   };
 }
 
 export function getOtlpGrpcDefaultConfiguration(): UnresolvedOtlpGrpcConfiguration {
   return {
     ...getSharedConfigurationDefaults(),
-    metadata: () => {
-      const metadata = createEmptyMetadata();
-      metadata.set('User-Agent', `OTel-OTLP-Exporter-JavaScript/${VERSION}`);
-      return metadata;
-    },
+    metadata: () => createEmptyMetadata(),
     url: 'http://localhost:4317',
     credentials: (url: string) => {
       if (url.startsWith('http://')) {
