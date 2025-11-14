@@ -104,6 +104,7 @@ const defaultConfig: ConfigurationModel = {
               temporality_preference: ExporterTemporalityPreference.Cumulative,
               default_histogram_aggregation:
                 ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+              encoding: OtlpHttpEncoding.Protobuf,
             },
           },
         },
@@ -739,7 +740,7 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
   },
 };
 
-describe('ConfigProvider', function () {
+describe('ConfigFactory', function () {
   const _origEnvVariables = { ...process.env };
 
   afterEach(function () {
@@ -754,8 +755,8 @@ describe('ConfigProvider', function () {
 
   describe('get values from environment variables', function () {
     it('should initialize config with default values', function () {
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), defaultConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
     });
 
     it('should return config with disable true', function () {
@@ -764,8 +765,8 @@ describe('ConfigProvider', function () {
         ...defaultConfig,
         disabled: true,
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with log level as debug', function () {
@@ -774,8 +775,8 @@ describe('ConfigProvider', function () {
         ...defaultConfig,
         log_level: DiagLogLevel.DEBUG,
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with a list of options for node resource detectors', function () {
@@ -784,8 +785,8 @@ describe('ConfigProvider', function () {
         ...defaultConfig,
         node_resource_detectors: ['env', 'host', 'serviceinstance'],
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with a resource attribute list', function () {
@@ -810,8 +811,8 @@ describe('ConfigProvider', function () {
           ],
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with custom service name', function () {
@@ -828,8 +829,8 @@ describe('ConfigProvider', function () {
           ],
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with custom attribute_limits', function () {
@@ -842,8 +843,8 @@ describe('ConfigProvider', function () {
           attribute_count_limit: 200,
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with custom propagator', function () {
@@ -855,8 +856,8 @@ describe('ConfigProvider', function () {
           composite_list: 'tracecontext,jaeger',
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with custom tracer_provider', function () {
@@ -925,8 +926,8 @@ describe('ConfigProvider', function () {
           },
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with custom meter_provider', function () {
@@ -967,6 +968,7 @@ describe('ConfigProvider', function () {
                     temporality_preference: ExporterTemporalityPreference.Delta,
                     default_histogram_aggregation:
                       ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+                    encoding: OtlpHttpEncoding.Protobuf,
                   },
                 },
               },
@@ -975,8 +977,260 @@ describe('ConfigProvider', function () {
           exemplar_filter: ExemplarFilter.AlwaysOn,
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with meter_provider with console exporter', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'console';
+
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  console: {},
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with meter_provider with no exporter', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'none,console';
+
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [],
+          exemplar_filter: ExemplarFilter.TraceBased,
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with meter_provider with list of exporters', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'otlp,console';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  otlp_http: {
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                    temporality_preference:
+                      ExporterTemporalityPreference.Cumulative,
+                    endpoint: 'http://localhost:4318/v1/metrics',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  console: {},
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with meter_provider with otlp grpc exporter', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'otlp';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'grpc';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE = 'metric-cert.pem';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY = 'metric-key.pem';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE =
+        'metric-client-cert.pem';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_COMPRESSION = 'gzip';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'host=localhost';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  otlp_grpc: {
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                    temporality_preference:
+                      ExporterTemporalityPreference.Cumulative,
+                    endpoint: 'http://localhost:4317',
+                    timeout: 10000,
+                    certificate_file: 'metric-cert.pem',
+                    client_key_file: 'metric-key.pem',
+                    client_certificate_file: 'metric-client-cert.pem',
+                    compression: 'gzip',
+                    headers_list: 'host=localhost',
+                  },
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with meter_provider with otlp grpc exporter, delta temporality and base2 aggr', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'otlp';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'grpc';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'delta';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
+        'base2_exponential_bucket_histogram';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  otlp_grpc: {
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+                    temporality_preference: ExporterTemporalityPreference.Delta,
+                    endpoint: 'http://localhost:4317',
+                    timeout: 10000,
+                  },
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with meter_provider with otlp grpc exporter and low memory temporality', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'otlp';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'grpc';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE =
+        'low_memory';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  otlp_grpc: {
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                    temporality_preference:
+                      ExporterTemporalityPreference.LowMemory,
+                    endpoint: 'http://localhost:4317',
+                    timeout: 10000,
+                  },
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with meter_provider with otlp grpc exporter, invalid temporality and invalid aggr', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'otlp';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'grpc';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'invalid';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
+        'invalid';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  otlp_grpc: {
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                    temporality_preference:
+                      ExporterTemporalityPreference.Cumulative,
+                    endpoint: 'http://localhost:4317',
+                    timeout: 10000,
+                  },
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with meter_provider with otlp http/json exporter', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'otlp';
+      process.env.OTEL_EXPORTER_OTLP_PROTOCOL = 'http/json';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  otlp_http: {
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                    temporality_preference:
+                      ExporterTemporalityPreference.Cumulative,
+                    endpoint: 'http://localhost:4318/v1/metrics',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.JSON,
+                  },
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with custom logger_provider', function () {
@@ -1026,8 +1280,8 @@ describe('ConfigProvider', function () {
           ],
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should use backup options for exporters', function () {
@@ -1085,6 +1339,7 @@ describe('ConfigProvider', function () {
                     client_certificate_file: 'backup_client_certificate.pem',
                     client_key_file: 'backup_client_key.pem',
                     headers_list: 'backup_headers=123',
+                    encoding: OtlpHttpEncoding.Protobuf,
                   },
                 },
               },
@@ -1117,8 +1372,8 @@ describe('ConfigProvider', function () {
           ],
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('checks to keep good code coverage', function () {
@@ -1183,8 +1438,14 @@ describe('ConfigProvider', function () {
             {
               periodic: {
                 exporter: {
-                  otlp_http: { temporality_preference: 'cumulative' },
+                  otlp_http: {
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                    encoding: 'protobuf',
+                    temporality_preference: 'cumulative',
+                    timeout: 10000,
+                  },
                 },
+                timeout: 30000,
               },
             },
           ],
@@ -1200,8 +1461,14 @@ describe('ConfigProvider', function () {
             {
               periodic: {
                 exporter: {
-                  otlp_http: { temporality_preference: 'low_memory' },
+                  otlp_http: {
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                    encoding: 'protobuf',
+                    temporality_preference: 'low_memory',
+                    timeout: 10000,
+                  },
                 },
+                timeout: 30000,
               },
             },
           ],
@@ -1216,8 +1483,14 @@ describe('ConfigProvider', function () {
             {
               periodic: {
                 exporter: {
-                  otlp_http: { temporality_preference: 'cumulative' },
+                  otlp_http: {
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                    encoding: 'protobuf',
+                    temporality_preference: 'cumulative',
+                    timeout: 10000,
+                  },
                 },
+                timeout: 30000,
               },
             },
           ],
@@ -1241,8 +1514,12 @@ describe('ConfigProvider', function () {
                 exporter: {
                   otlp_http: {
                     default_histogram_aggregation: 'explicit_bucket_histogram',
+                    encoding: 'protobuf',
+                    temporality_preference: 'cumulative',
+                    timeout: 10000,
                   },
                 },
+                timeout: 30000,
               },
             },
           ],
@@ -1260,8 +1537,12 @@ describe('ConfigProvider', function () {
                 exporter: {
                   otlp_http: {
                     default_histogram_aggregation: 'explicit_bucket_histogram',
+                    encoding: 'protobuf',
+                    temporality_preference: 'cumulative',
+                    timeout: 10000,
                   },
                 },
+                timeout: 30000,
               },
             },
           ],
@@ -1311,8 +1592,8 @@ describe('ConfigProvider', function () {
     it('should initialize config with default values from valid config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
         'test/fixtures/kitchen-sink.yaml';
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), configFromFile);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), configFromFile);
     });
 
     it('should return error from invalid config file', function () {
@@ -1331,20 +1612,20 @@ describe('ConfigProvider', function () {
 
     it('should initialize config with default values with empty string for config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = '';
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), defaultConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
     });
 
     it('should initialize config with default values with all whitespace for config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = '  ';
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), defaultConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
     });
 
     it('should initialize config with default values from valid short config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
         'test/fixtures/short-config.yml';
-      const configProvider = createConfigFactory();
+      const configFactory = createConfigFactory();
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         resource: {
@@ -1358,7 +1639,7 @@ describe('ConfigProvider', function () {
           ],
         },
       };
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should initialize config with config file that contains environment variables', function () {
@@ -1421,7 +1702,7 @@ describe('ConfigProvider', function () {
       process.env.OTEL_EXPORTER_OTLP_LOGS_HEADERS = 'logs-header';
       process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = '28';
       process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '29';
-      const configProvider = createConfigFactory();
+      const configFactory = createConfigFactory();
       const expectedConfig: ConfigurationModel = {
         ...defaultConfigFromFileWithEnvVariables,
         resource: {
@@ -1543,16 +1824,16 @@ describe('ConfigProvider', function () {
         },
       };
 
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should initialize config with fallbacks defined in config file when corresponding environment variables are not defined', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
         'test/fixtures/sdk-migration-config.yaml';
 
-      const configProvider = createConfigFactory();
+      const configFactory = createConfigFactory();
       assert.deepStrictEqual(
-        configProvider.getConfigModel(),
+        configFactory.getConfigModel(),
         defaultConfigFromFileWithEnvVariables
       );
     });
