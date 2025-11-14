@@ -511,7 +511,8 @@ export function setLoggerProvider(config: ConfigurationModel): void {
             batchInfo.exporter.otlp_grpc = {};
             const endpoint =
               getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_ENDPOINT') ??
-              getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT');
+              getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT') ??
+              'http://localhost:4317';
             if (endpoint) {
               batchInfo.exporter.otlp_grpc.endpoint = endpoint;
             }
