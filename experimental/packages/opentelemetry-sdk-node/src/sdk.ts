@@ -496,14 +496,18 @@ export class NodeSDK {
 
   private configureLoggerProviderFromConfigFactory(): void {
     const logRecordProcessors: LogRecordProcessor[] = [];
-    console.log(">>>> P: ", this._config.logger_provider);
-
     const enabledProcessors = this._config.logger_provider?.processors;
     enabledProcessors?.forEach(processor => {
       if (processor.batch) {
         logRecordProcessors.push(
           new BatchLogRecordProcessor(
-            this.getExporterType(processor.batch.exporter)
+            this.getExporterType(processor.batch.exporter),
+            {
+              maxQueueSize: processor.batch.max_queue_size,
+              maxExportBatchSize: processor.batch.max_export_batch_size,
+              scheduledDelayMillis: processor.batch.schedule_delay,
+              exportTimeoutMillis: processor.batch.export_timeout,
+            }
           )
         );
       }
@@ -515,8 +519,6 @@ export class NodeSDK {
         );
       }
     });
-
-    console.log(">>>> logRecordProcessors: ", logRecordProcessors);
     if (logRecordProcessors.length > 0) {
       this._loggerProviderConfig = {
         logRecordProcessors: logRecordProcessors,
