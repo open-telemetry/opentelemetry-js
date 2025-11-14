@@ -300,8 +300,10 @@ export function setMeterProvider(config: ConfigurationModel): void {
           readerPeriodicInfo.exporter = {};
         } else {
           // 'otlp' and default
-          const protocol = getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_PROTOCOL') ??
-            (getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL') ?? 'http/protobuf');
+          const protocol =
+            getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_PROTOCOL') ??
+            getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL') ??
+            'http/protobuf';
           const certificateFile =
             getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE') ??
             getStringFromEnv('OTEL_EXPORTER_OTLP_CERTIFICATE');
@@ -316,23 +318,27 @@ export function setMeterProvider(config: ConfigurationModel): void {
             getStringFromEnv('OTEL_EXPORTER_OTLP_COMPRESSION');
           const timeoutExporter =
             getNumberFromEnv('OTEL_EXPORTER_OTLP_METRICS_TIMEOUT') ??
-            (getNumberFromEnv('OTEL_EXPORTER_OTLP_TIMEOUT') ?? 10000);
+            getNumberFromEnv('OTEL_EXPORTER_OTLP_TIMEOUT') ??
+            10000;
           const headersList =
             getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_HEADERS') ??
             getStringFromEnv('OTEL_EXPORTER_OTLP_HEADERS');
-          const temporalityPreference = getStringFromEnv(
-            'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE'
-          ) ?? 'cumulative';
-          const defaultHistogramAggregation = getStringFromEnv(
-            'OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION'
-          ) ?? 'explicit_bucket_histogram';
+          const temporalityPreference =
+            getStringFromEnv(
+              'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE'
+            ) ?? 'cumulative';
+          const defaultHistogramAggregation =
+            getStringFromEnv(
+              'OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION'
+            ) ?? 'explicit_bucket_histogram';
 
           if (protocol === 'grpc') {
             delete readerPeriodicInfo.exporter.otlp_http;
             readerPeriodicInfo.exporter.otlp_grpc = {};
             const endpoint =
               getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_ENDPOINT') ??
-              (getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT') ?? 'http://localhost:4317');
+              getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT') ??
+              'http://localhost:4317';
             if (endpoint) {
               readerPeriodicInfo.exporter.otlp_grpc.endpoint = endpoint;
             }
@@ -463,9 +469,11 @@ export function setMeterProvider(config: ConfigurationModel): void {
               }
             }
             if (protocol === 'http/json') {
-              readerPeriodicInfo.exporter.otlp_http.encoding = OtlpHttpEncoding.JSON;
+              readerPeriodicInfo.exporter.otlp_http.encoding =
+                OtlpHttpEncoding.JSON;
             } else if (protocol === 'http/protobuf') {
-              readerPeriodicInfo.exporter.otlp_http.encoding = OtlpHttpEncoding.Protobuf;
+              readerPeriodicInfo.exporter.otlp_http.encoding =
+                OtlpHttpEncoding.Protobuf;
             }
           }
         }
