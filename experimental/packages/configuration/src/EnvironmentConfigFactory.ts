@@ -32,6 +32,7 @@ import {
   ExporterTemporalityPreference,
 } from './models/meterProviderModel';
 import { OtlpHttpEncoding } from './models/commonModel';
+import { diag } from '@opentelemetry/api';
 
 /**
  * EnvironmentConfigProvider provides a configuration based on environment variables.
@@ -280,11 +281,20 @@ export function setMeterProvider(config: ConfigurationModel): void {
       readerPeriodic.interval = interval;
     }
 
-    const exportersType = getStringListFromEnv('OTEL_METRICS_EXPORTER') ?? [
-      'otlp',
-    ];
-    if (exportersType) {
+    const exportersType = Array.from(
+      new Set(getStringListFromEnv('OTEL_METRICS_EXPORTER'))
+    );
+    if (exportersType.length === 0) {
+      exportersType.push('otlp');
+    }
+    if (exportersType.length > 0) {
       config.meter_provider.readers = [];
+      if (exportersType.includes('none')) {
+        diag.info(
+          `OTEL_METRICS_EXPORTER contains "none". Meter provider will not be initialized.`
+        );
+        return;
+      }
       for (let i = 0; i < exportersType.length; i++) {
         const exporterType = exportersType[i];
         const readerPeriodicInfo = { ...readerPeriodic };
@@ -296,8 +306,6 @@ export function setMeterProvider(config: ConfigurationModel): void {
         // TODO: add prometheus exporter support
         if (exporterType === 'console') {
           readerPeriodicInfo.exporter = { console: {} };
-        } else if (exporterType === 'none') {
-          readerPeriodicInfo.exporter = {};
         } else {
           // 'otlp' and default
           const protocol =

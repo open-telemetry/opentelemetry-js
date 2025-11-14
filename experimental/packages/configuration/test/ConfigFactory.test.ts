@@ -1006,20 +1006,12 @@ describe('ConfigFactory', function () {
     });
 
     it('should return config with meter_provider with no exporter', function () {
-      process.env.OTEL_METRICS_EXPORTER = 'none';
+      process.env.OTEL_METRICS_EXPORTER = 'none,console';
 
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         meter_provider: {
-          readers: [
-            {
-              periodic: {
-                interval: 60000,
-                timeout: 30000,
-                exporter: {},
-              },
-            },
-          ],
+          readers: [],
           exemplar_filter: ExemplarFilter.TraceBased,
         },
       };
