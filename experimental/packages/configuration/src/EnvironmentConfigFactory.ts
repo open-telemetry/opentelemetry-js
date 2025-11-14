@@ -460,7 +460,7 @@ export function setLoggerProvider(config: ConfigurationModel): void {
 
     const exportersType = Array.from(
       new Set(getStringListFromEnv('OTEL_LOGS_EXPORTER'))
-    ) ?? ['otlp'];
+    );
     if (exportersType.length === 0) {
       exportersType.push('otlp');
     }
