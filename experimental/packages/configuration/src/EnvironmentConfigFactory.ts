@@ -470,9 +470,11 @@ export function setLoggerProvider(config: ConfigurationModel): void {
         } else if (exporterType === 'none') {
           batchInfo.exporter = {};
         } else {
-          // 'otlp' and default   
-          const protocol = getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_PROTOCOL') ??
-            (getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL') ?? 'http/protobuf');
+          // 'otlp' and default
+          const protocol =
+            getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_PROTOCOL') ??
+            getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL') ??
+            'http/protobuf';
           const certificateFile =
             getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE') ??
             getStringFromEnv('OTEL_EXPORTER_OTLP_CERTIFICATE');
@@ -487,7 +489,8 @@ export function setLoggerProvider(config: ConfigurationModel): void {
             getStringFromEnv('OTEL_EXPORTER_OTLP_COMPRESSION');
           const timeout =
             getNumberFromEnv('OTEL_EXPORTER_OTLP_LOGS_TIMEOUT') ??
-            (getNumberFromEnv('OTEL_EXPORTER_OTLP_TIMEOUT') ?? 10000);
+            getNumberFromEnv('OTEL_EXPORTER_OTLP_TIMEOUT') ??
+            10000;
           const headersList =
             getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_HEADERS') ??
             getStringFromEnv('OTEL_EXPORTER_OTLP_HEADERS');
@@ -520,7 +523,6 @@ export function setLoggerProvider(config: ConfigurationModel): void {
             if (headersList) {
               batchInfo.exporter.otlp_grpc.headers_list = headersList;
             }
-
           } else {
             if (batchInfo.exporter.otlp_http == null) {
               batchInfo.exporter.otlp_http = {};
