@@ -1180,7 +1180,7 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
-    it('should fall back to OTEL_EXPORTER_OTLP_PROTOCOL', async () => {
+    it('should fall back to OTEL_EXPORTER_OTLP_PROTOCOL for logger', async () => {
       process.env.OTEL_LOGS_EXPORTER = 'otlp';
       process.env.OTEL_EXPORTER_OTLP_PROTOCOL = 'grpc';
       const sdk = new NodeSDK();
@@ -1337,7 +1337,7 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
-    it('should fall back to OTEL_EXPORTER_OTLP_PROTOCOL', async () => {
+    it('should fall back to OTEL_EXPORTER_OTLP_PROTOCOL for metrics', async () => {
       process.env.OTEL_METRICS_EXPORTER = 'otlp';
       process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'grpc';
       const sdk = new NodeSDK();

@@ -63,7 +63,7 @@ import {
 } from '@opentelemetry/sdk-trace-node';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
-import { getStringFromEnv, getStringListFromEnv } from '@opentelemetry/core';
+import { getStringListFromEnv } from '@opentelemetry/core';
 import {
   getResourceDetectorsFromEnv,
   getSpanProcessorsFromEnv,
@@ -76,6 +76,7 @@ import {
   ConfigFactory,
   ConfigurationModel,
   createConfigFactory,
+  LogRecordExporterModel,
 } from '@opentelemetry/configuration';
 import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
 
@@ -325,7 +326,7 @@ export class NodeSDK {
         "The 'logRecordProcessor' option is deprecated. Please use 'logRecordProcessors' instead."
       );
     } else {
-      this.configureLoggerProviderFromEnv();
+      this.configureLoggerProviderFromConfigFactory();
     }
 
     if (
@@ -474,68 +475,51 @@ export class NodeSDK {
     );
   }
 
-  private configureLoggerProviderFromEnv(): void {
-    const enabledExporters = getStringListFromEnv('OTEL_LOGS_EXPORTER') ?? [];
-
-    if (enabledExporters.length === 0) {
-      diag.debug('OTEL_LOGS_EXPORTER is empty. Using default otlp exporter.');
-      enabledExporters.push('otlp');
+  private getExporterType(exporter: LogRecordExporterModel): LogRecordExporter {
+    if (exporter.otlp_http) {
+      if (exporter.otlp_http.encoding === 'json') {
+        return new OTLPHttpLogExporter();
+      }
+      if (exporter.otlp_http.encoding === 'protobuf') {
+        return new OTLPProtoLogExporter();
+      }
+      diag.warn(`Unsupported OTLP logs protocol. Using http/protobuf.`);
+      return new OTLPProtoLogExporter();
+    } else if (exporter.otlp_grpc) {
+      return new OTLPGrpcLogExporter();
+    } else if (exporter.console) {
+      return new ConsoleLogRecordExporter();
     }
+    diag.warn(`Unsupported Exporter value. Using OTLP http/protobuf.`);
+    return new OTLPProtoLogExporter();
+  }
 
-    if (enabledExporters.includes('none')) {
-      diag.info(
-        `OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.`
-      );
-      return;
-    }
+  private configureLoggerProviderFromConfigFactory(): void {
+    const logRecordProcessors: LogRecordProcessor[] = [];
+    console.log(">>>> P: ", this._config.logger_provider);
 
-    const exporters: LogRecordExporter[] = [];
-
-    enabledExporters.forEach(exporter => {
-      if (exporter === 'otlp') {
-        const protocol = (
-          getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_PROTOCOL') ??
-          getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL')
-        )?.trim();
-
-        switch (protocol) {
-          case 'grpc':
-            exporters.push(new OTLPGrpcLogExporter());
-            break;
-          case 'http/json':
-            exporters.push(new OTLPHttpLogExporter());
-            break;
-          case 'http/protobuf':
-            exporters.push(new OTLPProtoLogExporter());
-            break;
-          case undefined:
-          case '':
-            exporters.push(new OTLPProtoLogExporter());
-            break;
-          default:
-            diag.warn(
-              `Unsupported OTLP logs protocol: "${protocol}". Using http/protobuf.`
-            );
-            exporters.push(new OTLPProtoLogExporter());
-        }
-      } else if (exporter === 'console') {
-        exporters.push(new ConsoleLogRecordExporter());
-      } else {
-        diag.warn(
-          `Unsupported OTEL_LOGS_EXPORTER value: "${exporter}". Supported values are: otlp, console, none.`
+    const enabledProcessors = this._config.logger_provider?.processors;
+    enabledProcessors?.forEach(processor => {
+      if (processor.batch) {
+        logRecordProcessors.push(
+          new BatchLogRecordProcessor(
+            this.getExporterType(processor.batch.exporter)
+          )
+        );
+      }
+      if (processor.simple) {
+        logRecordProcessors.push(
+          new SimpleLogRecordProcessor(
+            this.getExporterType(processor.simple.exporter)
+          )
         );
       }
     });
 
-    if (exporters.length > 0) {
+    console.log(">>>> logRecordProcessors: ", logRecordProcessors);
+    if (logRecordProcessors.length > 0) {
       this._loggerProviderConfig = {
-        logRecordProcessors: exporters.map(exporter => {
-          if (exporter instanceof ConsoleLogRecordExporter) {
-            return new SimpleLogRecordProcessor(exporter);
-          } else {
-            return new BatchLogRecordProcessor(exporter);
-          }
-        }),
+        logRecordProcessors: logRecordProcessors,
       };
     }
   }
