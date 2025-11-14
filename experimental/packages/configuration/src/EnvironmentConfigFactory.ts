@@ -32,6 +32,7 @@ import {
   ExporterTemporalityPreference,
 } from './models/meterProviderModel';
 import { OtlpHttpEncoding } from './models/commonModel';
+import { diag } from '@opentelemetry/api';
 
 /**
  * EnvironmentConfigProvider provides a configuration based on environment variables.
@@ -457,18 +458,28 @@ export function setLoggerProvider(config: ConfigurationModel): void {
       batch.max_export_batch_size = maxExportBatchSize;
     }
 
-    const exportersType = getStringListFromEnv('OTEL_LOGS_EXPORTER') ?? [
-      'otlp',
-    ];
-    if (exportersType) {
+    const exportersType = Array.from(
+      new Set(getStringListFromEnv('OTEL_LOGS_EXPORTER'))
+    ) ?? ['otlp'];
+    if (exportersType.length === 0) {
+      exportersType.push('otlp');
+    }
+    if (exportersType.length > 0) {
       config.logger_provider.processors = [];
+      if (exportersType.includes('none')) {
+        diag.info(
+          `OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.`
+        );
+        return;
+      }
+
       for (let i = 0; i < exportersType.length; i++) {
         const exporterType = exportersType[i];
         const batchInfo = { ...batch };
         if (exporterType === 'console') {
-          batchInfo.exporter = { console: {} };
-        } else if (exporterType === 'none') {
-          batchInfo.exporter = {};
+          config.logger_provider.processors.push({
+            simple: { exporter: { console: {} } },
+          });
         } else {
           // 'otlp' and default
           const protocol =
@@ -561,8 +572,8 @@ export function setLoggerProvider(config: ConfigurationModel): void {
               batchInfo.exporter.otlp_http.encoding = OtlpHttpEncoding.Protobuf;
             }
           }
+          config.logger_provider.processors.push({ batch: batchInfo });
         }
-        config.logger_provider.processors.push({ batch: batchInfo });
       }
     }
   }

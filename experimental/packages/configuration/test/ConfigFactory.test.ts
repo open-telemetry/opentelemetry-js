@@ -1040,11 +1040,7 @@ describe('ConfigProvider', function () {
           },
           processors: [
             {
-              batch: {
-                schedule_delay: 1000,
-                export_timeout: 30000,
-                max_queue_size: 2048,
-                max_export_batch_size: 512,
+              simple: {
                 exporter: {
                   console: {},
                 },
@@ -1058,31 +1054,21 @@ describe('ConfigProvider', function () {
     });
 
     it('should return config with logger_provider with no exporter', function () {
-      process.env.OTEL_LOGS_EXPORTER = 'none';
+      process.env.OTEL_LOGS_EXPORTER = 'none,console';
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         logger_provider: {
           limits: {
             attribute_count_limit: 128,
           },
-          processors: [
-            {
-              batch: {
-                schedule_delay: 1000,
-                export_timeout: 30000,
-                max_queue_size: 2048,
-                max_export_batch_size: 512,
-                exporter: {},
-              },
-            },
-          ],
+          processors: [],
         },
       };
       const configProvider = createConfigFactory();
       assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
 
-    it('should return config with logger_provider with console exporter', function () {
+    it('should return config with logger_provider with exporter list', function () {
       process.env.OTEL_LOGS_EXPORTER = 'otlp,console';
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
@@ -1107,11 +1093,7 @@ describe('ConfigProvider', function () {
               },
             },
             {
-              batch: {
-                schedule_delay: 1000,
-                export_timeout: 30000,
-                max_queue_size: 2048,
-                max_export_batch_size: 512,
+              simple: {
                 exporter: {
                   console: {},
                 },
