@@ -31,6 +31,7 @@ import {
   ExporterDefaultHistogramAggregation,
   ExporterTemporalityPreference,
 } from './models/meterProviderModel';
+import { diag } from '@opentelemetry/api';
 
 /**
  * EnvironmentConfigProvider provides a configuration based on environment variables.
@@ -210,16 +211,27 @@ export function setTracerProvider(config: ConfigurationModel): void {
       batch.max_export_batch_size = maxExportBatchSize;
     }
 
-    const exportersType = getStringListFromEnv('OTEL_TRACES_EXPORTER') ?? [
-      'otlp',
-    ];
-    if (exportersType) {
+    const exportersType = Array.from(
+      new Set(getStringListFromEnv('OTEL_TRACES_EXPORTER'))
+    );
+    if (exportersType.length === 0) {
+      exportersType.push('otlp');
+    }
+    if (exportersType.length > 0) {
       config.tracer_provider.processors = [];
+      if (exportersType.includes('none')) {
+        diag.info(
+          `OTEL_TRACES_EXPORTER contains "none". Tracer provider will not be initialized.`
+        );
+        return;
+      }
       for (let i = 0; i < exportersType.length; i++) {
         const exporterType = exportersType[i];
         const batchInfo = { ...batch };
         if (exporterType === 'console') {
-          batchInfo.exporter = { console: {} };
+          config.tracer_provider.processors.push({
+            simple: { exporter: { console: {} } },
+          });
         } else if (exporterType === 'zipkin') {
           batchInfo.exporter = {
             zipkin: {
@@ -230,8 +242,7 @@ export function setTracerProvider(config: ConfigurationModel): void {
                 getNumberFromEnv('OTEL_EXPORTER_ZIPKIN_TIMEOUT') ?? 10000,
             },
           };
-        } else if (exporterType === 'none') {
-          batchInfo.exporter = {};
+          config.tracer_provider.processors.push({ batch: batchInfo });
         } else {
           // 'otlp' and default
           const endpoint =
@@ -285,8 +296,8 @@ export function setTracerProvider(config: ConfigurationModel): void {
           if (headersList && batchInfo.exporter.otlp_http) {
             batchInfo.exporter.otlp_http.headers_list = headersList;
           }
+          config.tracer_provider.processors.push({ batch: batchInfo });
         }
-        config.tracer_provider.processors.push({ batch: batchInfo });
       }
     }
   }

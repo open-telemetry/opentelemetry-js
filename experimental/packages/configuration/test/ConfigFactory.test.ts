@@ -937,11 +937,7 @@ describe('ConfigProvider', function () {
           ...defaultConfig.tracer_provider,
           processors: [
             {
-              batch: {
-                schedule_delay: 5000,
-                export_timeout: 30000,
-                max_queue_size: 2048,
-                max_export_batch_size: 512,
+              simple: {
                 exporter: {
                   console: {},
                 },
@@ -1039,11 +1035,7 @@ describe('ConfigProvider', function () {
               },
             },
             {
-              batch: {
-                schedule_delay: 5000,
-                export_timeout: 30000,
-                max_queue_size: 2048,
-                max_export_batch_size: 512,
+              simple: {
                 exporter: {
                   console: {},
                 },
@@ -1071,22 +1063,12 @@ describe('ConfigProvider', function () {
     });
 
     it('should return config with tracer_provider with no exporter', function () {
-      process.env.OTEL_TRACES_EXPORTER = 'none';
+      process.env.OTEL_TRACES_EXPORTER = 'none,console';
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
           ...defaultConfig.tracer_provider,
-          processors: [
-            {
-              batch: {
-                schedule_delay: 5000,
-                export_timeout: 30000,
-                max_queue_size: 2048,
-                max_export_batch_size: 512,
-                exporter: {},
-              },
-            },
-          ],
+          processors: [],
         },
       };
       const configProvider = createConfigFactory();
