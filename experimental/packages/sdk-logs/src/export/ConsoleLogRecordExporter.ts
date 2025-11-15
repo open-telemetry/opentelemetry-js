@@ -23,6 +23,22 @@ import {
 import type { ReadableLogRecord } from './ReadableLogRecord';
 import type { LogRecordExporter } from './LogRecordExporter';
 
+function log(payload: unknown): void {
+  let serialized: string;
+  try {
+    serialized = JSON.stringify(
+      payload,
+      (_key, value) => (value === undefined ? null : value),
+      2
+    );
+  } catch {
+    serialized = String(payload);
+  }
+
+  /* eslint-disable-next-line no-console */
+  console.log(serialized);
+}
+
 /**
  * This is implementation of {@link LogRecordExporter} that prints LogRecords to the
  * console. This class can be used for diagnostic purposes.
@@ -82,7 +98,7 @@ export class ConsoleLogRecordExporter implements LogRecordExporter {
     done?: (result: ExportResult) => void
   ): void {
     for (const logRecord of logRecords) {
-      console.dir(this._exportInfo(logRecord), { depth: 3 });
+      log(this._exportInfo(logRecord));
     }
     done?.({ code: ExportResultCode.SUCCESS });
   }

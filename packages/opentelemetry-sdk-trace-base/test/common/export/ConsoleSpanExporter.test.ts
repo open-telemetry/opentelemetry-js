@@ -28,16 +28,13 @@ import {
 /* eslint-disable no-console */
 describe('ConsoleSpanExporter', () => {
   let consoleExporter: ConsoleSpanExporter;
-  let previousConsoleDir: any;
 
   beforeEach(() => {
-    previousConsoleDir = console.dir;
-    console.dir = () => {};
     consoleExporter = new ConsoleSpanExporter();
   });
 
   afterEach(() => {
-    console.dir = previousConsoleDir;
+    sinon.restore();
   });
 
   describe('.export()', () => {
@@ -49,7 +46,7 @@ describe('ConsoleSpanExporter', () => {
           spanProcessors: [new SimpleSpanProcessor(consoleExporter)],
         });
 
-        const spyConsole = sinon.spy(console, 'dir');
+        const stubConsole = sinon.stub(console, 'log');
         const spyExport = sinon.spy(consoleExporter, 'export');
 
         const instrumentationScopeName = '@opentelemetry/sdk-trace-base/test';
@@ -73,8 +70,8 @@ describe('ConsoleSpanExporter', () => {
         const spans = spyExport.args[0];
         const firstSpan = spans[0][0];
         const firstEvent = firstSpan.events[0];
-        const consoleArgs = spyConsole.args[0];
-        const consoleSpan = consoleArgs[0];
+        const loggedPayload = stubConsole.args[0][0];
+        const consoleSpan = JSON.parse(loggedPayload);
         const keys = Object.keys(consoleSpan).sort().join(',');
 
         const expectedKeys = [
@@ -106,7 +103,33 @@ describe('ConsoleSpanExporter', () => {
         );
 
         assert.ok(spyExport.calledOnce);
+        assert.ok(stubConsole.calledOnce);
       });
+    });
+
+    it('should serialize span information using String() when JSON fails', () => {
+      const basicTracerProvider = new BasicTracerProvider({
+        sampler: new AlwaysOnSampler(),
+        spanProcessors: [new SimpleSpanProcessor(consoleExporter)],
+      });
+
+      const stubConsole = sinon.stub(console, 'log');
+      const originalStringify = JSON.stringify;
+      let shouldThrow = true;
+      sinon.stub(JSON, 'stringify').callsFake((...args) => {
+        if (shouldThrow) {
+          shouldThrow = false;
+          throw new Error('boom');
+        }
+        return originalStringify(...args);
+      });
+
+      const tracer = basicTracerProvider.getTracer('fallback-string');
+      const span = tracer.startSpan('fallback-span');
+      span.end();
+
+      assert.ok(stubConsole.calledOnce);
+      assert.strictEqual(stubConsole.args[0][0], '[object Object]');
     });
   });
 

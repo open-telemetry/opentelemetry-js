@@ -26,15 +26,8 @@ import {
 
 /* eslint-disable no-console */
 describe('ConsoleLogRecordExporter', () => {
-  let previousConsoleDir: typeof console.dir;
-
-  beforeEach(() => {
-    previousConsoleDir = console.dir;
-    console.dir = () => {};
-  });
-
   afterEach(() => {
-    console.dir = previousConsoleDir;
+    sinon.restore();
   });
 
   describe('export', () => {
@@ -43,7 +36,7 @@ describe('ConsoleLogRecordExporter', () => {
         const instrumentationScopeName = '@opentelemetry/sdk-logs/test';
         const instrumentationScopeVersion = '1.2.3';
         const consoleExporter = new ConsoleLogRecordExporter();
-        const spyConsole = sinon.spy(console, 'dir');
+        const stubConsole = sinon.stub(console, 'log');
         const spyExport = sinon.spy(consoleExporter, 'export');
         const provider = new LoggerProvider({
           processors: [new SimpleLogRecordProcessor(consoleExporter)],
@@ -59,8 +52,8 @@ describe('ConsoleLogRecordExporter', () => {
 
         const logRecords = spyExport.args[0];
         const firstLogRecord = logRecords[0][0];
-        const consoleArgs = spyConsole.args[0];
-        const consoleLogRecord = consoleArgs[0];
+        const loggedPayload = stubConsole.args[0][0];
+        const consoleLogRecord = JSON.parse(loggedPayload);
         const keys = Object.keys(consoleLogRecord).sort().join(',');
 
         const expectedKeys = [
@@ -89,7 +82,30 @@ describe('ConsoleLogRecordExporter', () => {
         );
 
         assert.ok(spyExport.calledOnce);
+        assert.ok(stubConsole.calledOnce);
       });
+    });
+
+    it('should serialize log record using String() when JSON fails', () => {
+      const consoleExporter = new ConsoleLogRecordExporter();
+      const stubConsole = sinon.stub(console, 'log');
+      const originalStringify = JSON.stringify;
+      let shouldThrow = true;
+      sinon.stub(JSON, 'stringify').callsFake((...args) => {
+        if (shouldThrow) {
+          shouldThrow = false;
+          throw new Error('boom');
+        }
+        return originalStringify(...args);
+      });
+      const provider = new LoggerProvider({
+        processors: [new SimpleLogRecordProcessor(consoleExporter)],
+      });
+
+      provider.getLogger('test').emit({ body: 'trigger fallback' });
+
+      assert.ok(stubConsole.calledOnce);
+      assert.strictEqual(stubConsole.args[0][0], '[object Object]');
     });
   });
 });
