@@ -79,6 +79,79 @@ process.on("SIGTERM", () => {
 });
 ```
 
+## Configuration file
+
+The SDK configuration can be done through a configuration yaml file.
+
+To setup create the file and set the environment variable `OTEL_EXPERIMENTAL_CONFIG_FILE` to its path e.g. `test/fixtures/kitchen-sink.yaml`.
+
+If the environment variable is set, the configuration will only be used from the file and the correspondent environment
+variables will not be used, unless they're in the config file itself (e.g. `disabled: ${OTEL_SDK_DISABLED:-false}`)
+
+Example of all available configurations:
+
+```yml
+# The file format version.
+# The yaml format is documented at
+# https://github.com/open-telemetry/opentelemetry-configuration/tree/main/schema
+file_format: "1.0-rc.2"
+# Configure if the SDK is disabled or not.
+disabled: false
+# Configure the log level of the internal logger used by the SDK.
+# If omitted, info is used.
+log_level: info
+# Configure logger provider.
+# If omitted, a noop logger provider is used.
+logger_provider:
+  # Configure log record processors.
+  processors:
+    - # Configure a batch log record processor.
+      batch:
+        # Configure delay interval (in milliseconds) between two consecutive exports.
+        # Value must be non-negative.
+        # If omitted or null, 1000 is used.
+        schedule_delay: 5000
+        # Configure maximum allowed time (in milliseconds) to export data.
+        # Value must be non-negative. A value of 0 indicates no limit (infinity).
+        # If omitted or null, 30000 is used.
+        export_timeout: 30000
+        # Configure maximum queue size. Value must be positive.
+        # If omitted or null, 2048 is used.
+        max_queue_size: 2048
+        # Configure maximum batch size. Value must be positive.
+        # If omitted or null, 512 is used.
+        max_export_batch_size: 512
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be OTLP with HTTP transport.
+          otlp_http:
+            # Configure compression.
+            # Values include: gzip, none. Implementations may support other compression algorithms.
+            # If omitted or null, none is used.
+            compression: gzip
+            # Configure the encoding used for messages.
+            # Values include: protobuf, json. Implementations may not support json.
+            # If omitted or null, protobuf is used.
+            encoding: protobuf
+    - # Configure a batch log record processor.
+      batch:
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be OTLP with gRPC transport.
+          otlp_grpc:
+            # Configure compression.
+            # Values include: gzip, none. Implementations may support other compression algorithms.
+            # If omitted or null, none is used.
+            compression: gzip
+    - # Configure a simple log record processor.
+      simple:
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be console.
+          console:
+
+```
+
 ## Configuration
 
 Below is a full list of configuration options which may be passed into the `NodeSDK` constructor;

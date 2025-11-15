@@ -79,6 +79,7 @@ import {
   LogRecordExporterModel,
 } from '@opentelemetry/configuration';
 import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
+import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 
 type TracerProviderConfig = {
   tracerConfig: NodeTracerConfig;
@@ -478,7 +479,12 @@ export class NodeSDK {
   private getExporterType(exporter: LogRecordExporterModel): LogRecordExporter {
     if (exporter.otlp_http) {
       if (exporter.otlp_http.encoding === 'json') {
-        return new OTLPHttpLogExporter();
+        return new OTLPHttpLogExporter({
+          compression:
+            exporter.otlp_http.compression === 'gzip'
+              ? CompressionAlgorithm.GZIP
+              : CompressionAlgorithm.NONE,
+        });
       }
       if (exporter.otlp_http.encoding === 'protobuf') {
         return new OTLPProtoLogExporter();
@@ -496,8 +502,7 @@ export class NodeSDK {
 
   private configureLoggerProviderFromConfigFactory(): void {
     const logRecordProcessors: LogRecordProcessor[] = [];
-    const enabledProcessors = this._config.logger_provider?.processors;
-    enabledProcessors?.forEach(processor => {
+    this._config.logger_provider?.processors?.forEach(processor => {
       if (processor.batch) {
         logRecordProcessors.push(
           new BatchLogRecordProcessor(
