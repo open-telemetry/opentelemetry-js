@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/otlp-exporter-base",
-  "version": "0.207.0",
+  "version": "0.208.0",
   "description": "OpenTelemetry OTLP Exporter base (for internal use only)",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -75,7 +75,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "2.2.0",
-    "@opentelemetry/otlp-transformer": "0.207.0"
+    "@opentelemetry/otlp-transformer": "0.208.0"
   },
   "devDependencies": {
     "@babel/core": "7.27.1",
@@ -91,7 +91,7 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "5.0.1",
-    "mocha": "11.7.4",
+    "mocha": "11.7.5",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
     "ts-loader": "9.5.4",

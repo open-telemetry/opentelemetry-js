@@ -78,6 +78,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "8.41.0",
     "@typescript-eslint/parser": "8.41.0",
+    "@types/node": "18.6.5",
     "assert": "2.1.0",
     "benchmark": "2.1.4",
     "eslint": "8.57.1",
@@ -120,7 +121,6 @@
     "examples/opentelemetry-web",
     "examples/http",
     "examples/https",
-    "examples/esm-http-ts",
-    "bundler-tests/browser/*"
+    "examples/esm-http-ts"
   ]
 }

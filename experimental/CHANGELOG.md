@@ -6,6 +6,23 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ## Unreleased
 
+### :boom: Breaking Changes
+
+### :rocket: Features
+
+* feat(exporter-prometheus): support withoutScopeInfo option [#5993](https://github.com/open-telemetry/opentelemetry-js/pull/5993) @cjihrig
+* feat(configuration): improvements on package [#6101](https://github.com/open-telemetry/opentelemetry-js/pull/6101) @maryliag
+
+### :bug: Bug Fixes
+
+* fix(instrumentation-grpc): attach correct name to diag message [#6097](https://github.com/open-telemetry/opentelemetry-js/pull/6043) @pichlermarc
+
+### :books: Documentation
+
+### :house: Internal
+
+## 0.208.0
+
 * feat(opentelemetry-configuration): set attributes from attribute list from env variables [#6043](https://github.com/open-telemetry/opentelemetry-js/pull/6043) @maryliag
 
 ### :boom: Breaking Changes
@@ -16,6 +33,9 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
     * (user-facing): `headers` option in all OTLP exporters now accepts a function that returns a `Promise<Record<string, string>>` in addition to the existing `Record<string, string>` type.
     * (user-facing): `headers` in `HttpNodeRequestParameters`, `FetchTransportParameters`, and `XhrRequestParameters` now only accept async functions.
     * (user-facing): `headers` in `OtlpHttpConfiguration` now only accepts async functions.
+* feat(sdk-logs): remove NoopLogRecordProcessor from exports [#6079](https://github.com/open-telemetry/opentelemetry-js/pull/6079) @cjihrig
+* feat(api-logs): remove ProxyLogger from exports [#6082](https://github.com/open-telemetry/opentelemetry-js/pull/6082) @cjihrig
+* feat(api-logs): remove NOOP_LOGGER_PROVIDER and NoopLoggerProvider from exports [#6086](https://github.com/open-telemetry/opentelemetry-js/pull/6086) @cjihrig
 
 ### :rocket: Features
 
@@ -31,11 +51,15 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :books: Documentation
 
+* doc(sdk-logs): document that SimpleLogRecordProcessor is not for production use [#6080](https://github.com/open-telemetry/opentelemetry-js/pull/6080) @cjihrig
+
 ### :house: Internal
 
 * test(otlp-grpc-exporter-base): increase timeout in flaky test [#6042](https://github.com/open-telemetry/opentelemetry-js/pull/6042) @cjihrig
 * test(sdk-node): use process.env consistently in tests [#6052](https://github.com/open-telemetry/opentelemetry-js/pull/6052) @cjihrig
 * test(sdk-node): ensure process.env is cleaned up between tests [#6066](https://github.com/open-telemetry/opentelemetry-js/pull/6066) @cjihrig
+* refactor(instrumentation-http): avoid deprecated url.parse() in getAbsoluteUrl() [#6089](https://github.com/open-telemetry/opentelemetry-js/pull/6089) @cjihrig
+* test(instrumentation-http): avoid deprecated url.parse() [#6102](https://github.com/open-telemetry/opentelemetry-js/pull/6102) @cjihrig
 
 ## 0.207.0
 

@@ -23,7 +23,6 @@ import {
 } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as path from 'path';
-import * as url from 'url';
 import { HttpInstrumentation } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
@@ -83,10 +82,10 @@ describe('Packages', () => {
       it(`should create a span for GET requests and add propagation headers by using ${name} package`, async () => {
         nock.load(path.join(__dirname, '../', '/fixtures/google-https.json'));
 
-        const urlparsed = url.parse(
+        const urlparsed = new URL(
           'https://www.google.com/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8'
         );
-        const result = await httpPackage.get(urlparsed.href!);
+        const result = await httpPackage.get(urlparsed.href);
         if (!resHeaders) {
           const res = result as axios.AxiosResponse<unknown>;
           resHeaders = res.headers as any;
@@ -94,11 +93,11 @@ describe('Packages', () => {
         const spans = memoryExporter.getFinishedSpans();
         const span = spans[0];
         const validations = {
-          hostname: urlparsed.hostname!,
+          hostname: urlparsed.hostname,
           httpStatusCode: 200,
           httpMethod: 'GET',
-          pathname: urlparsed.pathname!,
-          path: urlparsed.path,
+          pathname: urlparsed.pathname,
+          path: urlparsed.pathname + urlparsed.search,
           resHeaders,
           component: 'https',
         };

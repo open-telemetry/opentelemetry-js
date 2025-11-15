@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { ConfigProvider } from './IConfigProvider';
-import { EnvironmentConfigProvider } from './EnvironmentConfigProvider';
-import { FileConfigProvider, hasValidConfigFile } from './FileConfigProvider';
+import { ConfigFactory } from './IConfigFactory';
+import { EnvironmentConfigFactory } from './EnvironmentConfigFactory';
+import { FileConfigFactory, hasValidConfigFile } from './FileConfigFactory';
 
-export function createConfigProvider(): ConfigProvider {
+export function createConfigFactory(): ConfigFactory {
   if (hasValidConfigFile()) {
-    return new FileConfigProvider();
+    return new FileConfigFactory();
   }
-  return new EnvironmentConfigProvider();
+  return new EnvironmentConfigFactory();
 }
