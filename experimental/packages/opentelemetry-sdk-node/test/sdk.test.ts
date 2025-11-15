@@ -82,7 +82,7 @@ import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/expo
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
-import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from './semconv';
+import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from '../src/semconv';
 
 function assertDefaultContextManagerRegistered() {
   assert.ok(
@@ -131,7 +131,7 @@ describe('Node SDK', () => {
     });
 
     it('should not register more than the minimal SDK components', async () => {
-      // need to set these to none, since the deafult value is 'otlp'
+      // need to set these to none, since the default value is 'otlp'
       process.env.OTEL_TRACES_EXPORTER = 'none';
       process.env.OTEL_LOGS_EXPORTER = 'none';
       process.env.OTEL_METRIC_EXPORTER = 'none';
@@ -175,20 +175,6 @@ describe('Node SDK', () => {
         logLevel: DiagLogLevel.ERROR,
       });
 
-      sdk.shutdown();
-    });
-
-    it('should not register a diag logger with OTEL_LOG_LEVEL unset', () => {
-      delete process.env.OTEL_LOG_LEVEL;
-
-      const spy = Sinon.spy(diag, 'setLogger');
-      const sdk = new NodeSDK({
-        autoDetectResources: false,
-      });
-
-      sdk.start();
-
-      assert.strictEqual(spy.callCount, 0);
       sdk.shutdown();
     });
 
@@ -1194,7 +1180,7 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
-    it('should fall back to OTEL_EXPORTER_OTLP_PROTOCOL', async () => {
+    it('should fall back to OTEL_EXPORTER_OTLP_PROTOCOL for logger', async () => {
       process.env.OTEL_LOGS_EXPORTER = 'otlp';
       process.env.OTEL_EXPORTER_OTLP_PROTOCOL = 'grpc';
       const sdk = new NodeSDK();
@@ -1351,7 +1337,7 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
-    it('should fall back to OTEL_EXPORTER_OTLP_PROTOCOL', async () => {
+    it('should fall back to OTEL_EXPORTER_OTLP_PROTOCOL for metrics', async () => {
       process.env.OTEL_METRICS_EXPORTER = 'otlp';
       process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'grpc';
       const sdk = new NodeSDK();

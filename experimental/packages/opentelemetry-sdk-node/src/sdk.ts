@@ -63,19 +63,23 @@ import {
 } from '@opentelemetry/sdk-trace-node';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
-import {
-  getBooleanFromEnv,
-  getStringFromEnv,
-  getStringListFromEnv,
-  diagLogLevelFromString,
-} from '@opentelemetry/core';
+import { getStringListFromEnv } from '@opentelemetry/core';
 import {
   getResourceDetectorsFromEnv,
   getSpanProcessorsFromEnv,
   getPropagatorFromEnv,
   setupPropagator,
   setupContextManager,
+  getInstanceID,
 } from './utils';
+import {
+  ConfigFactory,
+  ConfigurationModel,
+  createConfigFactory,
+  LogRecordExporterModel,
+} from '@opentelemetry/configuration';
+import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
+import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 
 type TracerProviderConfig = {
   tracerConfig: NodeTracerConfig;
@@ -221,6 +225,7 @@ function configureMetricProviderFromEnv(): IMetricReader[] {
  *    nodeSdk.start(); // registers all configured SDK components
  */
 export class NodeSDK {
+  private _config: ConfigurationModel;
   private _tracerProviderConfig?: TracerProviderConfig;
   private _loggerProviderConfig?: LoggerProviderConfig;
   private _meterProviderConfig?: MeterProviderConfig;
@@ -243,16 +248,17 @@ export class NodeSDK {
    * Create a new NodeJS SDK instance
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
-    if (getBooleanFromEnv('OTEL_SDK_DISABLED')) {
+    const configFactory: ConfigFactory = createConfigFactory();
+    this._config = configFactory.getConfigModel();
+    if (this._config.disabled) {
       this._disabled = true;
       // Functions with possible side-effects are set
       // to no-op via the _disabled flag
     }
 
-    const logLevel = getStringFromEnv('OTEL_LOG_LEVEL');
-    if (logLevel != null) {
+    if (this._config.log_level != null) {
       diag.setLogger(new DiagConsoleLogger(), {
-        logLevel: diagLogLevelFromString(logLevel),
+        logLevel: this._config.log_level,
       });
     }
 
@@ -264,8 +270,8 @@ export class NodeSDK {
       this._resourceDetectors = [];
     } else if (configuration.resourceDetectors != null) {
       this._resourceDetectors = configuration.resourceDetectors;
-    } else if (getStringFromEnv('OTEL_NODE_RESOURCE_DETECTORS')) {
-      this._resourceDetectors = getResourceDetectorsFromEnv();
+    } else if (this._config.node_resource_detectors) {
+      this._resourceDetectors = getResourceDetectorsFromEnv(this._config);
     } else {
       this._resourceDetectors = [envDetector, processDetector, hostDetector];
     }
@@ -321,7 +327,7 @@ export class NodeSDK {
         "The 'logRecordProcessor' option is deprecated. Please use 'logRecordProcessors' instead."
       );
     } else {
-      this.configureLoggerProviderFromEnv();
+      this.configureLoggerProviderFromConfigFactory();
     }
 
     if (
@@ -383,6 +389,16 @@ export class NodeSDK {
         : this._resource.merge(
             resourceFromAttributes({
               [ATTR_SERVICE_NAME]: this._serviceName,
+            })
+          );
+
+    const instanceId = getInstanceID(this._config);
+    this._resource =
+      instanceId === undefined
+        ? this._resource
+        : this._resource.merge(
+            resourceFromAttributes({
+              [ATTR_SERVICE_INSTANCE_ID]: instanceId,
             })
           );
 
@@ -460,68 +476,57 @@ export class NodeSDK {
     );
   }
 
-  private configureLoggerProviderFromEnv(): void {
-    const enabledExporters = getStringListFromEnv('OTEL_LOGS_EXPORTER') ?? [];
-
-    if (enabledExporters.length === 0) {
-      diag.debug('OTEL_LOGS_EXPORTER is empty. Using default otlp exporter.');
-      enabledExporters.push('otlp');
+  private getExporterType(exporter: LogRecordExporterModel): LogRecordExporter {
+    if (exporter.otlp_http) {
+      if (exporter.otlp_http.encoding === 'json') {
+        return new OTLPHttpLogExporter({
+          compression:
+            exporter.otlp_http.compression === 'gzip'
+              ? CompressionAlgorithm.GZIP
+              : CompressionAlgorithm.NONE,
+        });
+      }
+      if (exporter.otlp_http.encoding === 'protobuf') {
+        return new OTLPProtoLogExporter();
+      }
+      diag.warn(`Unsupported OTLP logs protocol. Using http/protobuf.`);
+      return new OTLPProtoLogExporter();
+    } else if (exporter.otlp_grpc) {
+      return new OTLPGrpcLogExporter();
+    } else if (exporter.console) {
+      return new ConsoleLogRecordExporter();
     }
+    diag.warn(`Unsupported Exporter value. Using OTLP http/protobuf.`);
+    return new OTLPProtoLogExporter();
+  }
 
-    if (enabledExporters.includes('none')) {
-      diag.info(
-        `OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.`
-      );
-      return;
-    }
-
-    const exporters: LogRecordExporter[] = [];
-
-    enabledExporters.forEach(exporter => {
-      if (exporter === 'otlp') {
-        const protocol = (
-          getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_PROTOCOL') ??
-          getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL')
-        )?.trim();
-
-        switch (protocol) {
-          case 'grpc':
-            exporters.push(new OTLPGrpcLogExporter());
-            break;
-          case 'http/json':
-            exporters.push(new OTLPHttpLogExporter());
-            break;
-          case 'http/protobuf':
-            exporters.push(new OTLPProtoLogExporter());
-            break;
-          case undefined:
-          case '':
-            exporters.push(new OTLPProtoLogExporter());
-            break;
-          default:
-            diag.warn(
-              `Unsupported OTLP logs protocol: "${protocol}". Using http/protobuf.`
-            );
-            exporters.push(new OTLPProtoLogExporter());
-        }
-      } else if (exporter === 'console') {
-        exporters.push(new ConsoleLogRecordExporter());
-      } else {
-        diag.warn(
-          `Unsupported OTEL_LOGS_EXPORTER value: "${exporter}". Supported values are: otlp, console, none.`
+  private configureLoggerProviderFromConfigFactory(): void {
+    const logRecordProcessors: LogRecordProcessor[] = [];
+    this._config.logger_provider?.processors?.forEach(processor => {
+      if (processor.batch) {
+        logRecordProcessors.push(
+          new BatchLogRecordProcessor(
+            this.getExporterType(processor.batch.exporter),
+            {
+              maxQueueSize: processor.batch.max_queue_size,
+              maxExportBatchSize: processor.batch.max_export_batch_size,
+              scheduledDelayMillis: processor.batch.schedule_delay,
+              exportTimeoutMillis: processor.batch.export_timeout,
+            }
+          )
+        );
+      }
+      if (processor.simple) {
+        logRecordProcessors.push(
+          new SimpleLogRecordProcessor(
+            this.getExporterType(processor.simple.exporter)
+          )
         );
       }
     });
-
-    if (exporters.length > 0) {
+    if (logRecordProcessors.length > 0) {
       this._loggerProviderConfig = {
-        logRecordProcessors: exporters.map(exporter => {
-          if (exporter instanceof ConsoleLogRecordExporter) {
-            return new SimpleLogRecordProcessor(exporter);
-          } else {
-            return new BatchLogRecordProcessor(exporter);
-          }
-        }),
+        logRecordProcessors: logRecordProcessors,
       };
     }
   }
