@@ -26,6 +26,35 @@ interface ConsoleMetricExporterOptions {
   temporalitySelector?: AggregationTemporalitySelector;
 }
 
+function log(payload: unknown): void {
+  /**
+   * String(payload) fallback path is currently redundant because
+   * hashAttributes invokes JSON.stringify during metric registration. Reinstate
+   * fallback logic below if hashAttributes logic is changed to standardise
+   * implementation with ConsoleSpanExporter and ConsoleLogRecordExporter, and
+   * unskip the test.
+   */
+  // let serialized: string;
+  // try {
+  //   serialized = JSON.stringify(
+  //     payload,
+  //     (_key, value) => (value === undefined ? null : value),
+  //     2
+  //   );
+  // } catch {
+  //   serialized = String(payload);
+  // }
+
+  const serialized = JSON.stringify(
+    payload,
+    (_key, value) => (value === undefined ? null : value),
+    2
+  );
+
+  /* eslint-disable-next-line no-console */
+  console.log(serialized);
+}
+
 /**
  * This is an implementation of {@link PushMetricExporter} that prints metrics to the
  * console. This class can be used for diagnostic purposes.
@@ -77,14 +106,11 @@ export class ConsoleMetricExporter implements PushMetricExporter {
   ): void {
     for (const scopeMetrics of metrics.scopeMetrics) {
       for (const metric of scopeMetrics.metrics) {
-        console.dir(
-          {
-            descriptor: metric.descriptor,
-            dataPointType: metric.dataPointType,
-            dataPoints: metric.dataPoints,
-          },
-          { depth: null }
-        );
+        log({
+          descriptor: metric.descriptor,
+          dataPointType: metric.dataPointType,
+          dataPoints: metric.dataPoints,
+        });
       }
     }
 
