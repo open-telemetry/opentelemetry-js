@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1763420025712,
+  "lastUpdate": 1763420979036,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -44566,6 +44566,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 275993,
             "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marylia.gutierrez@grafana.com",
+            "name": "Marylia Gutierrez",
+            "username": "maryliag"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "bc60b8dd925c6fdc3d405e6f626528a0ab2ff800",
+          "message": "feat(configuration): set tracer provider exporter type from env variable (#6106)",
+          "timestamp": "2025-11-17T23:01:38Z",
+          "tree_id": "94b1cd8d1b17a43d3bb5448ac90fd9e9509a951a",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/bc60b8dd925c6fdc3d405e6f626528a0ab2ff800"
+        },
+        "date": 1763420978072,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 665214,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8389,
+            "range": "±0.68%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 293717,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 291267,
+            "range": "±0.64%",
             "unit": "ops/sec",
             "extra": "93 samples"
           }
