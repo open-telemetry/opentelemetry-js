@@ -281,111 +281,212 @@ export function setMeterProvider(config: ConfigurationModel): void {
       readerPeriodic.interval = interval;
     }
 
-    const timeout = getNumberFromEnv('OTEL_METRIC_EXPORT_TIMEOUT');
-    if (timeout) {
-      readerPeriodic.timeout = timeout;
-    }
-    if (readerPeriodic.exporter.otlp_http == null) {
-      readerPeriodic.exporter.otlp_http = {};
-    }
-
-    const endpoint =
-      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_ENDPOINT') ??
-      (getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')
-        ? `${getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')}/v1/metrics`
-        : null);
-    if (endpoint) {
-      readerPeriodic.exporter.otlp_http.endpoint = endpoint;
-    }
-
-    const certificateFile =
-      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE') ??
-      getStringFromEnv('OTEL_EXPORTER_OTLP_CERTIFICATE');
-    if (certificateFile) {
-      readerPeriodic.exporter.otlp_http.certificate_file = certificateFile;
-    }
-
-    const clientKeyFile =
-      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY') ??
-      getStringFromEnv('OTEL_EXPORTER_OTLP_CLIENT_KEY');
-    if (clientKeyFile) {
-      readerPeriodic.exporter.otlp_http.client_key_file = clientKeyFile;
-    }
-
-    const clientCertificateFile =
-      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE') ??
-      getStringFromEnv('OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE');
-    if (clientCertificateFile) {
-      readerPeriodic.exporter.otlp_http.client_certificate_file =
-        clientCertificateFile;
-    }
-
-    const compression =
-      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_COMPRESSION') ??
-      getStringFromEnv('OTEL_EXPORTER_OTLP_COMPRESSION');
-    if (compression) {
-      readerPeriodic.exporter.otlp_http.compression = compression;
-    }
-
-    const timeoutEx =
-      getNumberFromEnv('OTEL_EXPORTER_OTLP_METRICS_TIMEOUT') ??
-      getNumberFromEnv('OTEL_EXPORTER_OTLP_TIMEOUT');
-    if (timeoutEx) {
-      readerPeriodic.exporter.otlp_http.timeout = timeoutEx;
-    }
-
-    const headersList =
-      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_HEADERS') ??
-      getStringFromEnv('OTEL_EXPORTER_OTLP_HEADERS');
-    if (headersList) {
-      readerPeriodic.exporter.otlp_http.headers_list = headersList;
-    }
-
-    const temporalityPreference = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE'
+    const exportersType = Array.from(
+      new Set(getStringListFromEnv('OTEL_METRICS_EXPORTER'))
     );
-    if (temporalityPreference) {
-      switch (temporalityPreference) {
-        case 'cumulative':
-          readerPeriodic.exporter.otlp_http.temporality_preference =
-            ExporterTemporalityPreference.Cumulative;
-          break;
-        case 'delta':
-          readerPeriodic.exporter.otlp_http.temporality_preference =
-            ExporterTemporalityPreference.Delta;
-          break;
-        case 'low_memory':
-          readerPeriodic.exporter.otlp_http.temporality_preference =
-            ExporterTemporalityPreference.LowMemory;
-          break;
-        default:
-          readerPeriodic.exporter.otlp_http.temporality_preference =
-            ExporterTemporalityPreference.Cumulative;
-          break;
-      }
+    if (exportersType.length === 0) {
+      exportersType.push('otlp');
     }
 
-    const defaultHistogramAggregation = getStringFromEnv(
-      'OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION'
-    );
-    if (defaultHistogramAggregation) {
-      switch (defaultHistogramAggregation) {
-        case 'explicit_bucket_histogram':
-          readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
-            ExporterDefaultHistogramAggregation.ExplicitBucketHistogram;
-          break;
-        case 'base2_exponential_bucket_histogram':
-          readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
-            ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram;
-          break;
-        default:
-          readerPeriodic.exporter.otlp_http.default_histogram_aggregation =
-            ExporterDefaultHistogramAggregation.ExplicitBucketHistogram;
-          break;
-      }
+    config.meter_provider.readers = [];
+    if (exportersType.includes('none')) {
+      diag.info(
+        `OTEL_METRICS_EXPORTER contains "none". Meter provider will not be initialized.`
+      );
+      return;
     }
+    for (let i = 0; i < exportersType.length; i++) {
+      const exporterType = exportersType[i];
+      const readerPeriodicInfo = { ...readerPeriodic };
+      const timeout = getNumberFromEnv('OTEL_METRIC_EXPORT_TIMEOUT') ?? 30000;
+      if (timeout) {
+        readerPeriodicInfo.timeout = timeout;
+      }
 
-    config.meter_provider.readers[0].periodic = readerPeriodic;
+      // TODO: add prometheus exporter support
+      if (exporterType === 'console') {
+        readerPeriodicInfo.exporter = { console: {} };
+      } else {
+        // 'otlp' and default
+        const protocol =
+          getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_PROTOCOL') ??
+          getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL') ??
+          'http/protobuf';
+        const certificateFile =
+          getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE') ??
+          getStringFromEnv('OTEL_EXPORTER_OTLP_CERTIFICATE');
+        const clientKeyFile =
+          getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY') ??
+          getStringFromEnv('OTEL_EXPORTER_OTLP_CLIENT_KEY');
+        const clientCertificateFile =
+          getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE') ??
+          getStringFromEnv('OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE');
+        const compression =
+          getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_COMPRESSION') ??
+          getStringFromEnv('OTEL_EXPORTER_OTLP_COMPRESSION');
+        const timeoutExporter =
+          getNumberFromEnv('OTEL_EXPORTER_OTLP_METRICS_TIMEOUT') ??
+          getNumberFromEnv('OTEL_EXPORTER_OTLP_TIMEOUT') ??
+          10000;
+        const headersList =
+          getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_HEADERS') ??
+          getStringFromEnv('OTEL_EXPORTER_OTLP_HEADERS');
+        const temporalityPreference =
+          getStringFromEnv(
+            'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE'
+          ) ?? 'cumulative';
+        const defaultHistogramAggregation =
+          getStringFromEnv(
+            'OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION'
+          ) ?? 'explicit_bucket_histogram';
+
+        if (protocol === 'grpc') {
+          delete readerPeriodicInfo.exporter.otlp_http;
+          readerPeriodicInfo.exporter.otlp_grpc = {};
+          const endpoint =
+            getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_ENDPOINT') ??
+            getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT') ??
+            'http://localhost:4317';
+          if (endpoint) {
+            readerPeriodicInfo.exporter.otlp_grpc.endpoint = endpoint;
+          }
+          if (certificateFile) {
+            readerPeriodicInfo.exporter.otlp_grpc.certificate_file =
+              certificateFile;
+          }
+          if (clientKeyFile) {
+            readerPeriodicInfo.exporter.otlp_grpc.client_key_file =
+              clientKeyFile;
+          }
+          if (clientCertificateFile) {
+            readerPeriodicInfo.exporter.otlp_grpc.client_certificate_file =
+              clientCertificateFile;
+          }
+          if (compression) {
+            readerPeriodicInfo.exporter.otlp_grpc.compression = compression;
+          }
+          if (timeoutExporter) {
+            readerPeriodicInfo.exporter.otlp_grpc.timeout = timeoutExporter;
+          }
+          if (headersList) {
+            readerPeriodicInfo.exporter.otlp_grpc.headers_list = headersList;
+          }
+          if (temporalityPreference) {
+            switch (temporalityPreference) {
+              case 'cumulative':
+                readerPeriodicInfo.exporter.otlp_grpc.temporality_preference =
+                  ExporterTemporalityPreference.Cumulative;
+                break;
+              case 'delta':
+                readerPeriodicInfo.exporter.otlp_grpc.temporality_preference =
+                  ExporterTemporalityPreference.Delta;
+                break;
+              case 'low_memory':
+                readerPeriodicInfo.exporter.otlp_grpc.temporality_preference =
+                  ExporterTemporalityPreference.LowMemory;
+                break;
+              default:
+                readerPeriodicInfo.exporter.otlp_grpc.temporality_preference =
+                  ExporterTemporalityPreference.Cumulative;
+                break;
+            }
+          }
+          if (defaultHistogramAggregation) {
+            switch (defaultHistogramAggregation) {
+              case 'explicit_bucket_histogram':
+                readerPeriodicInfo.exporter.otlp_grpc.default_histogram_aggregation =
+                  ExporterDefaultHistogramAggregation.ExplicitBucketHistogram;
+                break;
+              case 'base2_exponential_bucket_histogram':
+                readerPeriodicInfo.exporter.otlp_grpc.default_histogram_aggregation =
+                  ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram;
+                break;
+              default:
+                readerPeriodicInfo.exporter.otlp_grpc.default_histogram_aggregation =
+                  ExporterDefaultHistogramAggregation.ExplicitBucketHistogram;
+                break;
+            }
+          }
+        } else {
+          if (readerPeriodicInfo.exporter.otlp_http == null) {
+            readerPeriodicInfo.exporter.otlp_http = {};
+          }
+          const endpoint =
+            getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_ENDPOINT') ??
+            (getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')
+              ? `${getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')}/v1/metrics`
+              : null);
+          if (endpoint) {
+            readerPeriodicInfo.exporter.otlp_http.endpoint = endpoint;
+          }
+          if (certificateFile) {
+            readerPeriodicInfo.exporter.otlp_http.certificate_file =
+              certificateFile;
+          }
+          if (clientKeyFile) {
+            readerPeriodicInfo.exporter.otlp_http.client_key_file =
+              clientKeyFile;
+          }
+          if (clientCertificateFile) {
+            readerPeriodicInfo.exporter.otlp_http.client_certificate_file =
+              clientCertificateFile;
+          }
+          if (compression) {
+            readerPeriodicInfo.exporter.otlp_http.compression = compression;
+          }
+          if (timeoutExporter) {
+            readerPeriodicInfo.exporter.otlp_http.timeout = timeoutExporter;
+          }
+          if (headersList) {
+            readerPeriodicInfo.exporter.otlp_http.headers_list = headersList;
+          }
+          if (temporalityPreference) {
+            switch (temporalityPreference) {
+              case 'cumulative':
+                readerPeriodicInfo.exporter.otlp_http.temporality_preference =
+                  ExporterTemporalityPreference.Cumulative;
+                break;
+              case 'delta':
+                readerPeriodicInfo.exporter.otlp_http.temporality_preference =
+                  ExporterTemporalityPreference.Delta;
+                break;
+              case 'low_memory':
+                readerPeriodicInfo.exporter.otlp_http.temporality_preference =
+                  ExporterTemporalityPreference.LowMemory;
+                break;
+              default:
+                readerPeriodicInfo.exporter.otlp_http.temporality_preference =
+                  ExporterTemporalityPreference.Cumulative;
+                break;
+            }
+          }
+          if (defaultHistogramAggregation) {
+            switch (defaultHistogramAggregation) {
+              case 'explicit_bucket_histogram':
+                readerPeriodicInfo.exporter.otlp_http.default_histogram_aggregation =
+                  ExporterDefaultHistogramAggregation.ExplicitBucketHistogram;
+                break;
+              case 'base2_exponential_bucket_histogram':
+                readerPeriodicInfo.exporter.otlp_http.default_histogram_aggregation =
+                  ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram;
+                break;
+              default:
+                readerPeriodicInfo.exporter.otlp_http.default_histogram_aggregation =
+                  ExporterDefaultHistogramAggregation.ExplicitBucketHistogram;
+                break;
+            }
+          }
+          if (protocol === 'http/json') {
+            readerPeriodicInfo.exporter.otlp_http.encoding =
+              OtlpHttpEncoding.JSON;
+          } else if (protocol === 'http/protobuf') {
+            readerPeriodicInfo.exporter.otlp_http.encoding =
+              OtlpHttpEncoding.Protobuf;
+          }
+        }
+      }
+      config.meter_provider.readers.push({ periodic: readerPeriodicInfo });
+    }
   }
   const exemplarFilter = getStringFromEnv('OTEL_METRICS_EXEMPLAR_FILTER');
   if (exemplarFilter) {
