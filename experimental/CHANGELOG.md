@@ -12,11 +12,15 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * feat(exporter-prometheus): support withoutScopeInfo option [#5993](https://github.com/open-telemetry/opentelemetry-js/pull/5993) @cjihrig
 * refactor(configuration): improvements on package [#6101](https://github.com/open-telemetry/opentelemetry-js/pull/6101) @maryliag
+* feat(configuration): set logger provider exporter type from env variable [#6104](https://github.com/open-telemetry/opentelemetry-js/pull/6104) @maryliag
+* feat(configuration): set meter provider exporter type from env variable [#6105](https://github.com/open-telemetry/opentelemetry-js/pull/6105) @maryliag
+* feat(configuration): set tracer provider exporter type from env variables [#6106](https://github.com/open-telemetry/opentelemetry-js/pull/6106) @maryliag
 * feat(opentelemetry-sdk-node): use declarative config for resource attributes [#6044](https://github.com/open-telemetry/opentelemetry-js/pull/6044) @maryliag
 
 ### :bug: Bug Fixes
 
 * fix(instrumentation-grpc): attach correct name to diag message [#6097](https://github.com/open-telemetry/opentelemetry-js/pull/6043) @pichlermarc
+* fix(opentelemetry-sdk-node): default to otlp if OTEL_METRICS_EXPORTER is empty [#6092](https://github.com/open-telemetry/opentelemetry-js/pull/6092) @jeengbe
 
 ### :books: Documentation
 
