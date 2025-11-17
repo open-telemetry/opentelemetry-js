@@ -113,7 +113,9 @@ function getValueInMillis(envName: string, defaultValue: number): number {
  */
 function configureMetricProviderFromEnv(): IMetricReader[] {
   const metricReaders: IMetricReader[] = [];
-  const enabledExporters = getStringListFromEnv('OTEL_METRICS_EXPORTER') ?? [];
+  const enabledExporters = Array.from(
+    new Set(getStringListFromEnv('OTEL_METRICS_EXPORTER') ?? [])
+  );
 
   if (enabledExporters.length === 0) {
     diag.debug('OTEL_METRICS_EXPORTER is empty. Using default otlp exporter.');
@@ -461,7 +463,9 @@ export class NodeSDK {
   }
 
   private configureLoggerProviderFromEnv(): void {
-    const enabledExporters = getStringListFromEnv('OTEL_LOGS_EXPORTER') ?? [];
+    const enabledExporters = Array.from(
+      new Set(getStringListFromEnv('OTEL_LOGS_EXPORTER') ?? [])
+    );
 
     if (enabledExporters.length === 0) {
       diag.debug('OTEL_LOGS_EXPORTER is empty. Using default otlp exporter.');

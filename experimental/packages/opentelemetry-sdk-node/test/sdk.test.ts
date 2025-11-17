@@ -1442,23 +1442,44 @@ describe('Node SDK', () => {
       );
       await sdk.shutdown();
     });
+
+    it('should use default grpc otlp exporter when empty value is provided for exporter via env', async () => {
+      process.env.OTEL_METRICS_EXPORTER = '';
+      const sdk = new NodeSDK();
+      sdk.start();
+
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert.ok(
+        sharedState.metricCollectors[0]._metricReader._exporter instanceof
+          OTLPProtoMetricExporter
+      );
+      await sdk.shutdown();
+    });
+
+    it('should not register the same metric exporter twice', async () => {
+      process.env.OTEL_METRICS_EXPORTER = 'console,otlp,console';
+      const sdk = new NodeSDK();
+      sdk.start();
+
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+
+      assert.ok(sharedState.metricCollectors.length === 2);
+      assert.ok(
+        sharedState.metricCollectors[0]._metricReader._exporter instanceof
+          ConsoleMetricExporter
+      );
+      assert.ok(
+        sharedState.metricCollectors[1]._metricReader._exporter instanceof
+          OTLPProtoMetricExporter
+      );
+
+      await sdk.shutdown();
+    });
   });
 
-  it('should use default grpc otlp exporter when empty value is provided for exporter via env', async () => {
-    process.env.OTEL_METRICS_EXPORTER = '';
-    const sdk = new NodeSDK();
-    sdk.start();
-
-    const meterProvider = metrics.getMeterProvider();
-    const sharedState = (meterProvider as any)['_sharedState'];
-    assert.ok(
-      sharedState.metricCollectors[0]._metricReader._exporter instanceof
-        OTLPProtoMetricExporter
-    );
-    await sdk.shutdown();
-  });
-
-  describe('setup exporter from env', () => {
+  describe('setup trace exporter from env', () => {
     let stubLoggerError: Sinon.SinonStub;
 
     const getSdkSpanProcessors = (sdk: NodeSDK) => {
@@ -1751,6 +1772,25 @@ describe('Node SDK', () => {
       assert.ok(listOfProcessors[0] instanceof SimpleSpanProcessor);
       assert.ok(
         listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter
+      );
+      await sdk.shutdown();
+    });
+
+    it('should not register the same exporter twice', async () => {
+      process.env.OTEL_TRACES_EXPORTER = 'console,otlp,console';
+      const sdk = new NodeSDK();
+      sdk.start();
+
+      const listOfProcessors = getSdkSpanProcessors(sdk);
+
+      assert.ok(listOfProcessors.length === 2);
+      assert.ok(listOfProcessors[0] instanceof SimpleSpanProcessor);
+      assert.ok(
+        listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter
+      );
+      assert.ok(listOfProcessors[1] instanceof BatchSpanProcessor);
+      assert.ok(
+        listOfProcessors[1]['_exporter'] instanceof OTLPProtoTraceExporter
       );
       await sdk.shutdown();
     });
