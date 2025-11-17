@@ -49,10 +49,10 @@ To override the default timeout duration, use the following options:
 
 - Set with environment variables:
 
-  | Environment variable | Description |
-  |----------------------|-------------|
-  | OTEL_EXPORTER_OTLP_TRACES_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace batch. Default is 10000. |
-  | OTEL_EXPORTER_OTLP_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace and metric batch. Default is 10000. |
+  | Environment variable              | Description                                                                                                    |
+  |-----------------------------------|----------------------------------------------------------------------------------------------------------------|
+  | OTEL_EXPORTER_OTLP_TRACES_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace batch. Default is 10000.            |
+  | OTEL_EXPORTER_OTLP_TIMEOUT        | The maximum waiting time, in milliseconds, allowed to send each OTLP trace and metric batch. Default is 10000. |
 
   > `OTEL_EXPORTER_OTLP_TRACES_TIMEOUT` takes precedence and overrides `OTEL_EXPORTER_OTLP_TIMEOUT`.
 
