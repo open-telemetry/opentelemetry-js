@@ -5,8 +5,7 @@
   "description": "Test app for logs in webpack 4",
   "type": "module",
   "scripts": {
-    "test:bundle": "npm i && webpack --config webpack.config.mjs",
-    "start": "npm i && webpack serve --config webpack.config.mjs --open"
+    "test:bundle": "npm i && webpack --config webpack.config.mjs"
   },
   "repository": {
     "type": "git",
@@ -31,8 +30,7 @@
     "babel-loader": "^8.0.0",
     "html-webpack-plugin": "^4.5.2",
     "webpack": "^4",
-    "webpack-cli": "^4",
-    "webpack-dev-server": "^4"
+    "webpack-cli": "^4"
   },
   "dependencies": {
     "@opentelemetry/api": "file:../../../api",
