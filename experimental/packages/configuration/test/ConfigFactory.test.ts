@@ -930,6 +930,192 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
+    it('should return config with tracer_provider with console exporter', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'console';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          ...defaultConfig.tracer_provider,
+          processors: [
+            {
+              simple: {
+                exporter: {
+                  console: {},
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with tracer_provider with default zipkin exporter', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'zipkin';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          ...defaultConfig.tracer_provider,
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  zipkin: {
+                    endpoint: 'http://localhost:9411/api/v2/spans',
+                    timeout: 10000,
+                  },
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with tracer_provider with default zipkin exporter', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'zipkin';
+      process.env.OTEL_EXPORTER_ZIPKIN_ENDPOINT =
+        'http://custom:9411/api/v2/spans';
+      process.env.OTEL_EXPORTER_ZIPKIN_TIMEOUT = '15000';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          ...defaultConfig.tracer_provider,
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  zipkin: {
+                    endpoint: 'http://custom:9411/api/v2/spans',
+                    timeout: 15000,
+                  },
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with tracer_provider with exporter list', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'otlp,console,zipkin';
+      process.env.OTEL_EXPORTER_ZIPKIN_ENDPOINT =
+        'http://custom:9411/api/v2/spans';
+      process.env.OTEL_EXPORTER_ZIPKIN_TIMEOUT = '15000';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          ...defaultConfig.tracer_provider,
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/traces',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+            {
+              simple: {
+                exporter: {
+                  console: {},
+                },
+              },
+            },
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  zipkin: {
+                    endpoint: 'http://custom:9411/api/v2/spans',
+                    timeout: 15000,
+                  },
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with tracer_provider with no exporter', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'none,console';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          ...defaultConfig.tracer_provider,
+          processors: [],
+        },
+      };
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with tracer_provider with otlp grpc exporter', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
+      process.env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
+      process.env.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE = 'traces-cert.pem';
+      process.env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY = 'traces-key.pem';
+      process.env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE =
+        'traces-client-cert.pem';
+      process.env.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = 'gzip';
+      process.env.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'host=localhost';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          ...defaultConfig.tracer_provider,
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_grpc: {
+                    endpoint: 'http://localhost:4317',
+                    timeout: 10000,
+                    certificate_file: 'traces-cert.pem',
+                    client_key_file: 'traces-key.pem',
+                    client_certificate_file: 'traces-client-cert.pem',
+                    compression: 'gzip',
+                    headers_list: 'host=localhost',
+                  },
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+    });
+
     it('should return config with custom meter_provider', function () {
       process.env.OTEL_METRIC_EXPORT_INTERVAL = '100';
       process.env.OTEL_METRIC_EXPORT_TIMEOUT = '200';
