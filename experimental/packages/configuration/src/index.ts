@@ -16,4 +16,5 @@
 
 export type { ConfigFactory } from './IConfigFactory';
 export type { ConfigurationModel } from './models/configModel';
+export type { LogRecordExporter as LogRecordExporterModel } from './models/loggerProviderModel';
 export { createConfigFactory } from './ConfigFactory';
