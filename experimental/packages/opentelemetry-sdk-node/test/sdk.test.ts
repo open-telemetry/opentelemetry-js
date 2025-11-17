@@ -1457,7 +1457,7 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
-    it('should not register the same metric exporter twice', async () => {
+    it('should not register the same exporter twice', async () => {
       process.env.OTEL_METRICS_EXPORTER = 'console,otlp,console';
       const sdk = new NodeSDK();
       sdk.start();
