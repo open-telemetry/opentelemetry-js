@@ -5,7 +5,7 @@
   "description": "Test app for logs in webpack 4",
   "type": "module",
   "scripts": {
-    "test:bundle": "npm i && webpack --config webpack.config.mjs",
+    "test:bundle": "npm i && webpack --config webpack.config.mjs"
   },
   "repository": {
     "type": "git",
