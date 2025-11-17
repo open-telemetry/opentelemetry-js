@@ -1203,7 +1203,7 @@ describe('ConfigFactory', function () {
 
     it('should return config with meter_provider with otlp http/json exporter', function () {
       process.env.OTEL_METRICS_EXPORTER = 'otlp';
-      process.env.OTEL_EXPORTER_OTLP_PROTOCOL = 'http/json';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'http/json';
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         meter_provider: {
@@ -1303,8 +1303,8 @@ describe('ConfigFactory', function () {
           ],
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with logger_provider with no exporter', function () {
@@ -1318,8 +1318,8 @@ describe('ConfigFactory', function () {
           processors: [],
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with logger_provider with exporter list', function () {
@@ -1356,13 +1356,13 @@ describe('ConfigFactory', function () {
           ],
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with logger_provider with otlp grpc exporter', function () {
       process.env.OTEL_LOGS_EXPORTER = 'otlp';
-      process.env.OTEL_EXPORTER_OTLP_PROTOCOL = 'grpc';
+      process.env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL = 'grpc';
       process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'http://localhost:4317';
       process.env.OTEL_EXPORTER_OTLP_TIMEOUT = '10000';
       process.env.OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE = 'log-cert.pem';
@@ -1400,13 +1400,13 @@ describe('ConfigFactory', function () {
           ],
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with logger_provider with otlp http/json exporter', function () {
       process.env.OTEL_LOGS_EXPORTER = 'otlp';
-      process.env.OTEL_EXPORTER_OTLP_PROTOCOL = 'http/json';
+      process.env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL = 'http/json';
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         logger_provider: {
@@ -1432,8 +1432,8 @@ describe('ConfigFactory', function () {
           ],
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should use backup options for exporters', function () {
