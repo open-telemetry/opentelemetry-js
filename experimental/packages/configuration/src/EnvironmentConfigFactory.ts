@@ -361,7 +361,7 @@ export function setMeterProvider(config: ConfigurationModel): void {
     config.meter_provider.readers = [];
     if (exportersType.includes('none')) {
       diag.info(
-        `OTEL_METRICS_EXPORTER contains "none". Meter provider will not be initialized.`
+        `OTEL_METRICS_EXPORTER contains "none". Metric provider will not be initialized.`
       );
       return;
     }
