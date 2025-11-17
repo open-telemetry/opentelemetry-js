@@ -1078,7 +1078,7 @@ describe('ConfigFactory', function () {
 
     it('should return config with tracer_provider with otlp grpc exporter', function () {
       process.env.OTEL_TRACES_EXPORTER = 'otlp';
-      process.env.OTEL_EXPORTER_OTLP_PROTOCOL = 'grpc';
+      process.env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
       process.env.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE = 'traces-cert.pem';
       process.env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY = 'traces-key.pem';
       process.env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE =
