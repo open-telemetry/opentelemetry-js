@@ -14,7 +14,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * refactor(configuration): improvements on package [#6101](https://github.com/open-telemetry/opentelemetry-js/pull/6101) @maryliag
 * feat(opentelemetry-sdk-node): use declarative config for resource attributes [#6044](https://github.com/open-telemetry/opentelemetry-js/pull/6044) @maryliag
 * feat(configuration): set logger provider exporter type from env variable [#6104](https://github.com/open-telemetry/opentelemetry-js/pull/6104) @maryliag
-* feat(opentelemetry-sdk-node): use declarative config for logger provider [#xxx](https://github.com/open-telemetry/opentelemetry-js/pull/xxxx) @maryliag
+* feat(opentelemetry-sdk-node): use declarative config for logger provider [#6111](https://github.com/open-telemetry/opentelemetry-js/pull/6111) @maryliag
 
 ### :bug: Bug Fixes
 
