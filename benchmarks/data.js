@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1763400373110,
+  "lastUpdate": 1763403560532,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -44308,6 +44308,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.49%",
             "unit": "ops/sec",
             "extra": "93 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "77ca31e30a5c9afdf77117590168532db90df97f",
+          "message": "test(webpack-4): remove dev server dependency and start script (#6120)",
+          "timestamp": "2025-11-17T17:46:46Z",
+          "tree_id": "d7df5e2470c0639df6d79eb21f84cd1786c77904",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/77ca31e30a5c9afdf77117590168532db90df97f"
+        },
+        "date": 1763403559504,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 645580,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8207,
+            "range": "±0.91%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 301791,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 286065,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
