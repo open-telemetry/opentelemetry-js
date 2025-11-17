@@ -35,6 +35,7 @@ export function initializeDefaultMeterProviderConfiguration(): MeterProvider {
               temporality_preference: ExporterTemporalityPreference.Cumulative,
               default_histogram_aggregation:
                 ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+              encoding: OtlpHttpEncoding.Protobuf,
             },
           },
         },
