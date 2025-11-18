@@ -15,8 +15,9 @@
  */
 
 import * as assert from 'assert';
+import * as Sinon from 'sinon';
 import { ConfigurationModel } from '../src';
-import { DiagLogLevel } from '@opentelemetry/api';
+import { diag, DiagLogLevel } from '@opentelemetry/api';
 import { createConfigFactory } from '../src/ConfigFactory';
 import { OtlpHttpEncoding } from '../src/models/commonModel';
 import {
@@ -104,6 +105,7 @@ const defaultConfig: ConfigurationModel = {
               temporality_preference: ExporterTemporalityPreference.Cumulative,
               default_histogram_aggregation:
                 ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+              encoding: OtlpHttpEncoding.Protobuf,
             },
           },
         },
@@ -739,7 +741,7 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
   },
 };
 
-describe('ConfigProvider', function () {
+describe('ConfigFactory', function () {
   const _origEnvVariables = { ...process.env };
 
   afterEach(function () {
@@ -750,12 +752,13 @@ describe('ConfigProvider', function () {
     for (const [key, value] of Object.entries(_origEnvVariables)) {
       process.env[key] = value;
     }
+    Sinon.restore();
   });
 
   describe('get values from environment variables', function () {
     it('should initialize config with default values', function () {
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), defaultConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
     });
 
     it('should return config with disable true', function () {
@@ -764,8 +767,8 @@ describe('ConfigProvider', function () {
         ...defaultConfig,
         disabled: true,
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with log level as debug', function () {
@@ -774,8 +777,8 @@ describe('ConfigProvider', function () {
         ...defaultConfig,
         log_level: DiagLogLevel.DEBUG,
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with a list of options for node resource detectors', function () {
@@ -784,8 +787,8 @@ describe('ConfigProvider', function () {
         ...defaultConfig,
         node_resource_detectors: ['env', 'host', 'serviceinstance'],
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with a resource attribute list', function () {
@@ -810,8 +813,8 @@ describe('ConfigProvider', function () {
           ],
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with custom service name', function () {
@@ -828,8 +831,8 @@ describe('ConfigProvider', function () {
           ],
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with custom attribute_limits', function () {
@@ -842,8 +845,8 @@ describe('ConfigProvider', function () {
           attribute_count_limit: 200,
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with custom propagator', function () {
@@ -855,8 +858,8 @@ describe('ConfigProvider', function () {
           composite_list: 'tracecontext,jaeger',
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with custom tracer_provider', function () {
@@ -925,6 +928,192 @@ describe('ConfigProvider', function () {
           },
         },
       };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with tracer_provider with console exporter', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'console';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          ...defaultConfig.tracer_provider,
+          processors: [
+            {
+              simple: {
+                exporter: {
+                  console: {},
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with tracer_provider with default zipkin exporter', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'zipkin';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          ...defaultConfig.tracer_provider,
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  zipkin: {
+                    endpoint: 'http://localhost:9411/api/v2/spans',
+                    timeout: 10000,
+                  },
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with tracer_provider with default zipkin exporter', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'zipkin';
+      process.env.OTEL_EXPORTER_ZIPKIN_ENDPOINT =
+        'http://custom:9411/api/v2/spans';
+      process.env.OTEL_EXPORTER_ZIPKIN_TIMEOUT = '15000';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          ...defaultConfig.tracer_provider,
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  zipkin: {
+                    endpoint: 'http://custom:9411/api/v2/spans',
+                    timeout: 15000,
+                  },
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with tracer_provider with exporter list', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'otlp,console,zipkin';
+      process.env.OTEL_EXPORTER_ZIPKIN_ENDPOINT =
+        'http://custom:9411/api/v2/spans';
+      process.env.OTEL_EXPORTER_ZIPKIN_TIMEOUT = '15000';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          ...defaultConfig.tracer_provider,
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/traces',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+            {
+              simple: {
+                exporter: {
+                  console: {},
+                },
+              },
+            },
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  zipkin: {
+                    endpoint: 'http://custom:9411/api/v2/spans',
+                    timeout: 15000,
+                  },
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with tracer_provider with no exporter', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'none,console';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          ...defaultConfig.tracer_provider,
+          processors: [],
+        },
+      };
+      const configProvider = createConfigFactory();
+      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with tracer_provider with otlp grpc exporter', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
+      process.env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
+      process.env.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE = 'traces-cert.pem';
+      process.env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY = 'traces-key.pem';
+      process.env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE =
+        'traces-client-cert.pem';
+      process.env.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = 'gzip';
+      process.env.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'host=localhost';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          ...defaultConfig.tracer_provider,
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_grpc: {
+                    endpoint: 'http://localhost:4317',
+                    timeout: 10000,
+                    certificate_file: 'traces-cert.pem',
+                    client_key_file: 'traces-key.pem',
+                    client_certificate_file: 'traces-client-cert.pem',
+                    compression: 'gzip',
+                    headers_list: 'host=localhost',
+                  },
+                },
+              },
+            },
+          ],
+        },
+      };
       const configProvider = createConfigFactory();
       assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
@@ -967,6 +1156,7 @@ describe('ConfigProvider', function () {
                     temporality_preference: ExporterTemporalityPreference.Delta,
                     default_histogram_aggregation:
                       ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+                    encoding: OtlpHttpEncoding.Protobuf,
                   },
                 },
               },
@@ -975,8 +1165,260 @@ describe('ConfigProvider', function () {
           exemplar_filter: ExemplarFilter.AlwaysOn,
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with meter_provider with console exporter', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'console';
+
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  console: {},
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with meter_provider with no exporter', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'none,console';
+
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [],
+          exemplar_filter: ExemplarFilter.TraceBased,
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with meter_provider with list of exporters', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'otlp,console';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  otlp_http: {
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                    temporality_preference:
+                      ExporterTemporalityPreference.Cumulative,
+                    endpoint: 'http://localhost:4318/v1/metrics',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  console: {},
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with meter_provider with otlp grpc exporter', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'otlp';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'grpc';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE = 'metric-cert.pem';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY = 'metric-key.pem';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE =
+        'metric-client-cert.pem';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_COMPRESSION = 'gzip';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'host=localhost';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  otlp_grpc: {
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                    temporality_preference:
+                      ExporterTemporalityPreference.Cumulative,
+                    endpoint: 'http://localhost:4317',
+                    timeout: 10000,
+                    certificate_file: 'metric-cert.pem',
+                    client_key_file: 'metric-key.pem',
+                    client_certificate_file: 'metric-client-cert.pem',
+                    compression: 'gzip',
+                    headers_list: 'host=localhost',
+                  },
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with meter_provider with otlp grpc exporter, delta temporality and base2 aggr', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'otlp';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'grpc';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'delta';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
+        'base2_exponential_bucket_histogram';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  otlp_grpc: {
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+                    temporality_preference: ExporterTemporalityPreference.Delta,
+                    endpoint: 'http://localhost:4317',
+                    timeout: 10000,
+                  },
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with meter_provider with otlp grpc exporter and low memory temporality', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'otlp';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'grpc';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE =
+        'low_memory';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  otlp_grpc: {
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                    temporality_preference:
+                      ExporterTemporalityPreference.LowMemory,
+                    endpoint: 'http://localhost:4317',
+                    timeout: 10000,
+                  },
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with meter_provider with otlp grpc exporter, invalid temporality and invalid aggr', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'otlp';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'grpc';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'invalid';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
+        'invalid';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  otlp_grpc: {
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                    temporality_preference:
+                      ExporterTemporalityPreference.Cumulative,
+                    endpoint: 'http://localhost:4317',
+                    timeout: 10000,
+                  },
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with meter_provider with otlp http/json exporter', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'otlp';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'http/json';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  otlp_http: {
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                    temporality_preference:
+                      ExporterTemporalityPreference.Cumulative,
+                    endpoint: 'http://localhost:4318/v1/metrics',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.JSON,
+                  },
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should return config with custom logger_provider', function () {
@@ -1026,8 +1468,160 @@ describe('ConfigProvider', function () {
           ],
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with logger_provider with console exporter', function () {
+      process.env.OTEL_LOGS_EXPORTER = 'console';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        logger_provider: {
+          limits: {
+            attribute_count_limit: 128,
+          },
+          processors: [
+            {
+              simple: {
+                exporter: {
+                  console: {},
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with logger_provider with no exporter', function () {
+      process.env.OTEL_LOGS_EXPORTER = 'none,console';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        logger_provider: {
+          limits: {
+            attribute_count_limit: 128,
+          },
+          processors: [],
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with logger_provider with exporter list', function () {
+      process.env.OTEL_LOGS_EXPORTER = 'otlp,console';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        logger_provider: {
+          limits: {
+            attribute_count_limit: 128,
+          },
+          processors: [
+            {
+              batch: {
+                schedule_delay: 1000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/logs',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+            {
+              simple: {
+                exporter: {
+                  console: {},
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with logger_provider with otlp grpc exporter', function () {
+      process.env.OTEL_LOGS_EXPORTER = 'otlp';
+      process.env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL = 'grpc';
+      process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'http://localhost:4317';
+      process.env.OTEL_EXPORTER_OTLP_TIMEOUT = '10000';
+      process.env.OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE = 'log-cert.pem';
+      process.env.OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY = 'log-key.pem';
+      process.env.OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE =
+        'log-client-cert.pem';
+      process.env.OTEL_EXPORTER_OTLP_LOGS_HEADERS = 'host=localhost';
+      process.env.OTEL_EXPORTER_OTLP_LOGS_COMPRESSION = 'gzip';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        logger_provider: {
+          limits: {
+            attribute_count_limit: 128,
+          },
+          processors: [
+            {
+              batch: {
+                schedule_delay: 1000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_grpc: {
+                    endpoint: 'http://localhost:4317',
+                    timeout: 10000,
+                    certificate_file: 'log-cert.pem',
+                    client_key_file: 'log-key.pem',
+                    client_certificate_file: 'log-client-cert.pem',
+                    headers_list: 'host=localhost',
+                    compression: 'gzip',
+                  },
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with logger_provider with otlp http/json exporter', function () {
+      process.env.OTEL_LOGS_EXPORTER = 'otlp';
+      process.env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL = 'http/json';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        logger_provider: {
+          limits: {
+            attribute_count_limit: 128,
+          },
+          processors: [
+            {
+              batch: {
+                schedule_delay: 1000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/logs',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.JSON,
+                  },
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should use backup options for exporters', function () {
@@ -1085,6 +1679,7 @@ describe('ConfigProvider', function () {
                     client_certificate_file: 'backup_client_certificate.pem',
                     client_key_file: 'backup_client_key.pem',
                     headers_list: 'backup_headers=123',
+                    encoding: OtlpHttpEncoding.Protobuf,
                   },
                 },
               },
@@ -1117,8 +1712,8 @@ describe('ConfigProvider', function () {
           ],
         },
       };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('checks to keep good code coverage', function () {
@@ -1183,8 +1778,14 @@ describe('ConfigProvider', function () {
             {
               periodic: {
                 exporter: {
-                  otlp_http: { temporality_preference: 'cumulative' },
+                  otlp_http: {
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                    encoding: 'protobuf',
+                    temporality_preference: 'cumulative',
+                    timeout: 10000,
+                  },
                 },
+                timeout: 30000,
               },
             },
           ],
@@ -1200,8 +1801,14 @@ describe('ConfigProvider', function () {
             {
               periodic: {
                 exporter: {
-                  otlp_http: { temporality_preference: 'low_memory' },
+                  otlp_http: {
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                    encoding: 'protobuf',
+                    temporality_preference: 'low_memory',
+                    timeout: 10000,
+                  },
                 },
+                timeout: 30000,
               },
             },
           ],
@@ -1216,8 +1823,14 @@ describe('ConfigProvider', function () {
             {
               periodic: {
                 exporter: {
-                  otlp_http: { temporality_preference: 'cumulative' },
+                  otlp_http: {
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                    encoding: 'protobuf',
+                    temporality_preference: 'cumulative',
+                    timeout: 10000,
+                  },
                 },
+                timeout: 30000,
               },
             },
           ],
@@ -1241,8 +1854,12 @@ describe('ConfigProvider', function () {
                 exporter: {
                   otlp_http: {
                     default_histogram_aggregation: 'explicit_bucket_histogram',
+                    encoding: 'protobuf',
+                    temporality_preference: 'cumulative',
+                    timeout: 10000,
                   },
                 },
+                timeout: 30000,
               },
             },
           ],
@@ -1260,8 +1877,12 @@ describe('ConfigProvider', function () {
                 exporter: {
                   otlp_http: {
                     default_histogram_aggregation: 'explicit_bucket_histogram',
+                    encoding: 'protobuf',
+                    temporality_preference: 'cumulative',
+                    timeout: 10000,
                   },
                 },
+                timeout: 30000,
               },
             },
           ],
@@ -1311,40 +1932,46 @@ describe('ConfigProvider', function () {
     it('should initialize config with default values from valid config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
         'test/fixtures/kitchen-sink.yaml';
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), configFromFile);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), configFromFile);
     });
 
     it('should return error from invalid config file', function () {
+      const warnSpy = Sinon.spy(diag, 'warn');
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = './fixtures/kitchen-sink.txt';
-      assert.throws(() => {
-        createConfigFactory();
-      });
+      createConfigFactory();
+      Sinon.assert.calledWith(
+        warnSpy,
+        'Config file ./fixtures/kitchen-sink.txt set on OTEL_EXPERIMENTAL_CONFIG_FILE is not valid'
+      );
     });
 
     it('should return error from invalid config file format', function () {
+      const warnSpy = Sinon.spy(diag, 'warn');
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
-      assert.throws(() => {
-        createConfigFactory();
-      });
+      createConfigFactory();
+      Sinon.assert.calledWith(
+        warnSpy,
+        'Unsupported File Format: invalid. It must be one of the following: 1.0-rc.1,1.0-rc.2'
+      );
     });
 
     it('should initialize config with default values with empty string for config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = '';
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), defaultConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
     });
 
     it('should initialize config with default values with all whitespace for config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = '  ';
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), defaultConfig);
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
     });
 
     it('should initialize config with default values from valid short config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
         'test/fixtures/short-config.yml';
-      const configProvider = createConfigFactory();
+      const configFactory = createConfigFactory();
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         resource: {
@@ -1358,7 +1985,7 @@ describe('ConfigProvider', function () {
           ],
         },
       };
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should initialize config with config file that contains environment variables', function () {
@@ -1421,7 +2048,7 @@ describe('ConfigProvider', function () {
       process.env.OTEL_EXPORTER_OTLP_LOGS_HEADERS = 'logs-header';
       process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = '28';
       process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '29';
-      const configProvider = createConfigFactory();
+      const configFactory = createConfigFactory();
       const expectedConfig: ConfigurationModel = {
         ...defaultConfigFromFileWithEnvVariables,
         resource: {
@@ -1543,16 +2170,16 @@ describe('ConfigProvider', function () {
         },
       };
 
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
     it('should initialize config with fallbacks defined in config file when corresponding environment variables are not defined', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
         'test/fixtures/sdk-migration-config.yaml';
 
-      const configProvider = createConfigFactory();
+      const configFactory = createConfigFactory();
       assert.deepStrictEqual(
-        configProvider.getConfigModel(),
+        configFactory.getConfigModel(),
         defaultConfigFromFileWithEnvVariables
       );
     });
