@@ -1210,7 +1210,7 @@ describe('Node SDK', () => {
     });
   });
 
-  describe('configuring metric provider from env', () => {
+  describe('configuring meter provider from env', () => {
     let stubLogger: Sinon.SinonStub;
 
     beforeEach(() => {
@@ -1233,7 +1233,7 @@ describe('Node SDK', () => {
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
       assert.strictEqual(
         stubLogger.args[0][0],
-        'OTEL_METRICS_EXPORTER contains "none". Metric provider will not be initialized.'
+        'OTEL_METRICS_EXPORTER contains "none". Meter provider will not be initialized.'
       );
       await sdk.shutdown();
     });

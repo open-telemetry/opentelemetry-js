@@ -128,7 +128,7 @@ function configureMetricProviderFromEnv(): IMetricReader[] {
 
   if (enabledExporters.includes('none')) {
     diag.info(
-      `OTEL_METRICS_EXPORTER contains "none". Metric provider will not be initialized.`
+      `OTEL_METRICS_EXPORTER contains "none". Meter provider will not be initialized.`
     );
     return metricReaders;
   }
