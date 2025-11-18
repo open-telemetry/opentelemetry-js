@@ -63,7 +63,7 @@ import {
 } from '@opentelemetry/sdk-trace-node';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
-import { getStringListFromEnv } from '@opentelemetry/core';
+import { getStringFromEnv, getStringListFromEnv } from '@opentelemetry/core';
 import {
   getResourceDetectorsFromEnv,
   getSpanProcessorsFromEnv,
@@ -117,13 +117,13 @@ function getValueInMillis(envName: string, defaultValue: number): number {
  */
 function configureMetricProviderFromEnv(): IMetricReader[] {
   const metricReaders: IMetricReader[] = [];
-  const enabledExporters = getStringListFromEnv('OTEL_METRICS_EXPORTER');
-  if (!enabledExporters) {
-    return metricReaders;
-  }
+  const enabledExporters = Array.from(
+    new Set(getStringListFromEnv('OTEL_METRICS_EXPORTER') ?? [])
+  );
 
   if (enabledExporters.length === 0) {
     diag.debug('OTEL_METRICS_EXPORTER is empty. Using default otlp exporter.');
+    enabledExporters.push('otlp');
   }
 
   if (enabledExporters.includes('none')) {
@@ -136,8 +136,10 @@ function configureMetricProviderFromEnv(): IMetricReader[] {
   enabledExporters.forEach(exporter => {
     if (exporter === 'otlp') {
       const protocol =
-        process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL?.trim() ||
-        process.env.OTEL_EXPORTER_OTLP_PROTOCOL?.trim();
+        (
+          getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_PROTOCOL') ??
+          getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL')
+        )?.trim() || 'http/protobuf'; // Using || to also fall back on empty string
 
       const exportIntervalMillis = getValueInMillis(
         'OTEL_METRIC_EXPORT_INTERVAL',
