@@ -27,6 +27,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+* refactor(opentelemetry-sdk-node): simplify calculation of traceExportersList [#xxxx](https://github.com/open-telemetry/opentelemetry-js/pull/xxxx) @cjihrig
+
 ## 0.208.0
 
 * feat(opentelemetry-configuration): set attributes from attribute list from env variables [#6043](https://github.com/open-telemetry/opentelemetry-js/pull/6043) @maryliag

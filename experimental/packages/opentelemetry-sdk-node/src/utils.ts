@@ -128,9 +128,9 @@ export function getSpanProcessorsFromEnv(): SpanProcessor[] {
   ]);
   const exporters: SpanExporter[] = [];
   const processors: SpanProcessor[] = [];
-  let traceExportersList = filterBlanksAndNulls(
-    Array.from(new Set(getStringListFromEnv('OTEL_TRACES_EXPORTER')))
-  );
+  let traceExportersList = Array.from(
+    new Set(getStringListFromEnv('OTEL_TRACES_EXPORTER'))
+  ).filter(s => s !== 'null');
 
   if (traceExportersList[0] === 'none') {
     diag.warn(
