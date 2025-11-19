@@ -24,25 +24,23 @@ import {
   ExporterDefaultHistogramAggregation,
   ExporterTemporalityPreference,
   InstrumentType,
+  MeterProvider,
 } from '../src/models/meterProviderModel';
 import {
   setAttributeLimits,
-  setLoggerProvider,
   setMeterProvider,
   setPropagators,
   setResources,
-  setTracerProvider,
 } from '../src/EnvironmentConfigFactory';
 import {
   parseConfigFile,
   setResourceAttributes,
   setAttributeLimits as setFileAttributeLimits,
   setPropagator,
-  setTracerProvider as setFileTracerProvider,
-  setLoggerProvider as setFileLoggerProvider,
   setMeterProvider as setFileMeterProvider,
   getTemporalityPreference,
 } from '../src/FileConfigFactory';
+import { TracerProvider } from '../src/models/tracerProviderModel';
 
 const defaultConfig: ConfigurationModel = {
   disabled: false,
@@ -56,82 +54,24 @@ const defaultConfig: ConfigurationModel = {
     composite: [{ tracecontext: null }, { baggage: null }],
     composite_list: 'tracecontext,baggage',
   },
-  tracer_provider: {
-    processors: [
-      {
-        batch: {
-          schedule_delay: 5000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
-          exporter: {
-            otlp_http: {
-              endpoint: 'http://localhost:4318/v1/traces',
-              timeout: 10000,
-              encoding: OtlpHttpEncoding.Protobuf,
-            },
-          },
-        },
-      },
-    ],
-    limits: {
-      attribute_count_limit: 128,
-      event_count_limit: 128,
-      link_count_limit: 128,
-      event_attribute_count_limit: 128,
-      link_attribute_count_limit: 128,
-    },
-    sampler: {
-      parent_based: {
-        root: { always_on: undefined },
-        remote_parent_sampled: { always_on: undefined },
-        remote_parent_not_sampled: { always_off: undefined },
-        local_parent_sampled: { always_on: undefined },
-        local_parent_not_sampled: { always_off: undefined },
-      },
-    },
+};
+
+const defaultTracerProvider: TracerProvider = {
+  processors: [],
+  limits: {
+    attribute_count_limit: 128,
+    event_count_limit: 128,
+    link_count_limit: 128,
+    event_attribute_count_limit: 128,
+    link_attribute_count_limit: 128,
   },
-  meter_provider: {
-    readers: [
-      {
-        periodic: {
-          interval: 60000,
-          timeout: 30000,
-          exporter: {
-            otlp_http: {
-              endpoint: 'http://localhost:4318/v1/metrics',
-              timeout: 10000,
-              temporality_preference: ExporterTemporalityPreference.Cumulative,
-              default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
-              encoding: OtlpHttpEncoding.Protobuf,
-            },
-          },
-        },
-      },
-    ],
-    exemplar_filter: ExemplarFilter.TraceBased,
-  },
-  logger_provider: {
-    processors: [
-      {
-        batch: {
-          schedule_delay: 1000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
-          exporter: {
-            otlp_http: {
-              endpoint: 'http://localhost:4318/v1/logs',
-              timeout: 10000,
-              encoding: OtlpHttpEncoding.Protobuf,
-            },
-          },
-        },
-      },
-    ],
-    limits: {
-      attribute_count_limit: 128,
+  sampler: {
+    parent_based: {
+      root: { always_on: undefined },
+      remote_parent_sampled: { always_on: undefined },
+      remote_parent_not_sampled: { always_off: undefined },
+      local_parent_sampled: { always_on: undefined },
+      local_parent_not_sampled: { always_off: undefined },
     },
   },
 };
@@ -299,7 +239,6 @@ const configFromFile: ConfigurationModel = {
         },
       },
     ],
-
     limits: {
       attribute_count_limit: 128,
       attribute_value_length_limit: 4096,
@@ -861,6 +800,7 @@ describe('ConfigFactory', function () {
     });
 
     it('should return config with custom tracer_provider', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
       process.env.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT = '100';
       process.env.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT = '200';
       process.env.OTEL_SPAN_EVENT_COUNT_LIMIT = '300';
@@ -930,12 +870,43 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
+    it('should return config with tracer_provider otlp and json protocol', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
+      process.env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'http/json';
+
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          ...defaultTracerProvider,
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/traces',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.JSON,
+                  },
+                },
+              },
+            },
+          ],
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
     it('should return config with tracer_provider with console exporter', function () {
       process.env.OTEL_TRACES_EXPORTER = 'console';
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
-          ...defaultConfig.tracer_provider,
+          ...defaultTracerProvider,
           processors: [
             {
               simple: {
@@ -956,7 +927,7 @@ describe('ConfigFactory', function () {
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
-          ...defaultConfig.tracer_provider,
+          ...defaultTracerProvider,
           processors: [
             {
               batch: {
@@ -979,7 +950,7 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
 
-    it('should return config with tracer_provider with default zipkin exporter', function () {
+    it('should return config with tracer_provider with custom zipkin exporter', function () {
       process.env.OTEL_TRACES_EXPORTER = 'zipkin';
       process.env.OTEL_EXPORTER_ZIPKIN_ENDPOINT =
         'http://custom:9411/api/v2/spans';
@@ -987,7 +958,7 @@ describe('ConfigFactory', function () {
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
-          ...defaultConfig.tracer_provider,
+          ...defaultTracerProvider,
           processors: [
             {
               batch: {
@@ -1018,7 +989,7 @@ describe('ConfigFactory', function () {
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
-          ...defaultConfig.tracer_provider,
+          ...defaultTracerProvider,
           processors: [
             {
               batch: {
@@ -1065,15 +1036,8 @@ describe('ConfigFactory', function () {
 
     it('should return config with tracer_provider with no exporter', function () {
       process.env.OTEL_TRACES_EXPORTER = 'none,console';
-      const expectedConfig: ConfigurationModel = {
-        ...defaultConfig,
-        tracer_provider: {
-          ...defaultConfig.tracer_provider,
-          processors: [],
-        },
-      };
       const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
+      assert.deepStrictEqual(configProvider.getConfigModel(), defaultConfig);
     });
 
     it('should return config with tracer_provider with otlp grpc exporter', function () {
@@ -1088,7 +1052,7 @@ describe('ConfigFactory', function () {
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
-          ...defaultConfig.tracer_provider,
+          ...defaultTracerProvider,
           processors: [
             {
               batch: {
@@ -1119,6 +1083,7 @@ describe('ConfigFactory', function () {
     it('should return config with custom meter_provider', function () {
       process.env.OTEL_METRIC_EXPORT_INTERVAL = '100';
       process.env.OTEL_METRIC_EXPORT_TIMEOUT = '200';
+      process.env.OTEL_METRICS_EXPORTER = 'otlp';
       process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT =
         'http://test.com:4318/v1/metrics';
       process.env.OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE =
@@ -1193,16 +1158,8 @@ describe('ConfigFactory', function () {
 
     it('should return config with meter_provider with no exporter', function () {
       process.env.OTEL_METRICS_EXPORTER = 'none,console';
-
-      const expectedConfig: ConfigurationModel = {
-        ...defaultConfig,
-        meter_provider: {
-          readers: [],
-          exemplar_filter: ExemplarFilter.TraceBased,
-        },
-      };
       const configFactory = createConfigFactory();
-      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+      assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
     });
 
     it('should return config with meter_provider with list of exporters', function () {
@@ -1426,6 +1383,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_BLRP_EXPORT_TIMEOUT = '400';
       process.env.OTEL_BLRP_MAX_QUEUE_SIZE = '500';
       process.env.OTEL_BLRP_MAX_EXPORT_BATCH_SIZE = '600';
+      process.env.OTEL_LOGS_EXPORTER = 'otlp';
       process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT =
         'http://test.com:4318/v1/logs';
       process.env.OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE = 'certificate_file.txt';
@@ -1495,17 +1453,8 @@ describe('ConfigFactory', function () {
 
     it('should return config with logger_provider with no exporter', function () {
       process.env.OTEL_LOGS_EXPORTER = 'none,console';
-      const expectedConfig: ConfigurationModel = {
-        ...defaultConfig,
-        logger_provider: {
-          limits: {
-            attribute_count_limit: 128,
-          },
-          processors: [],
-        },
-      };
       const configFactory = createConfigFactory();
-      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+      assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
     });
 
     it('should return config with logger_provider with exporter list', function () {
@@ -1632,13 +1581,20 @@ describe('ConfigFactory', function () {
       process.env.OTEL_EXPORTER_OTLP_COMPRESSION = 'backup_compression';
       process.env.OTEL_EXPORTER_OTLP_TIMEOUT = '12000';
       process.env.OTEL_EXPORTER_OTLP_HEADERS = 'backup_headers=123';
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
+      process.env.OTEL_METRICS_EXPORTER = 'otlp';
+      process.env.OTEL_LOGS_EXPORTER = 'otlp';
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
+          ...defaultTracerProvider,
           processors: [
             {
               batch: {
-                ...defaultConfig.tracer_provider?.processors[0].batch,
+                export_timeout: 30000,
+                max_export_batch_size: 512,
+                max_queue_size: 2048,
+                schedule_delay: 5000,
                 exporter: {
                   otlp_http: {
                     endpoint: 'http://backup.com:4318/v1/traces',
@@ -1654,11 +1610,9 @@ describe('ConfigFactory', function () {
               },
             },
           ],
-          limits: defaultConfig.tracer_provider?.limits,
-          sampler: defaultConfig.tracer_provider?.sampler,
         },
         meter_provider: {
-          ...defaultConfig.meter_provider,
+          exemplar_filter: ExemplarFilter.TraceBased,
           readers: [
             {
               periodic: {
@@ -1685,7 +1639,9 @@ describe('ConfigFactory', function () {
           ],
         },
         logger_provider: {
-          ...defaultConfig.logger_provider,
+          limits: {
+            attribute_count_limit: 128,
+          },
           processors: [
             {
               batch: {
@@ -1744,185 +1700,65 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(config, { propagator: {} });
 
       config = {};
-      setTracerProvider(config);
-      assert.deepStrictEqual(config, {
-        tracer_provider: { limits: {}, processors: [] },
-      });
-
-      config = {};
-      process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = '3';
-      setLoggerProvider(config);
-      assert.deepStrictEqual(config, {
-        logger_provider: {
-          limits: {
-            attribute_count_limit: 128,
-            attribute_value_length_limit: 3,
-          },
-          processors: [],
-        },
-      });
-
-      config = {
-        meter_provider: {
-          readers: [{ periodic: { exporter: { otlp_http: undefined } } }],
-        },
-      };
-      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE =
-        'cumulative';
-      setMeterProvider(config);
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          readers: [
-            {
-              periodic: {
-                exporter: {
-                  otlp_http: {
-                    default_histogram_aggregation: 'explicit_bucket_histogram',
-                    encoding: 'protobuf',
-                    temporality_preference: 'cumulative',
-                    timeout: 10000,
-                  },
-                },
-                timeout: 30000,
-              },
-            },
-          ],
-        },
-      });
-
       process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE =
         'low_memory';
+      process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'always_off';
+      process.env.OTEL_METRICS_EXPORTER = 'otlp';
       setMeterProvider(config);
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          readers: [
-            {
-              periodic: {
-                exporter: {
-                  otlp_http: {
-                    default_histogram_aggregation: 'explicit_bucket_histogram',
-                    encoding: 'protobuf',
-                    temporality_preference: 'low_memory',
-                    timeout: 10000,
-                  },
-                },
-                timeout: 30000,
-              },
-            },
-          ],
-        },
-      });
 
-      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'default';
-      setMeterProvider(config);
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          readers: [
-            {
-              periodic: {
-                exporter: {
-                  otlp_http: {
-                    default_histogram_aggregation: 'explicit_bucket_histogram',
-                    encoding: 'protobuf',
-                    temporality_preference: 'cumulative',
-                    timeout: 10000,
-                  },
+      let expectedMeterProvider: MeterProvider = {
+        exemplar_filter: ExemplarFilter.AlwaysOff,
+        readers: [
+          {
+            periodic: {
+              exporter: {
+                otlp_http: {
+                  default_histogram_aggregation:
+                    ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                  encoding: OtlpHttpEncoding.Protobuf,
+                  endpoint: 'http://localhost:4318/v1/metrics',
+                  temporality_preference:
+                    ExporterTemporalityPreference.LowMemory,
+                  timeout: 10000,
                 },
-                timeout: 30000,
               },
+              interval: 60000,
+              timeout: 30000,
             },
-          ],
-        },
-      });
-      delete process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE;
-
-      config = {
-        meter_provider: {
-          readers: [{ periodic: { exporter: { otlp_http: undefined } } }],
-        },
+          },
+        ],
       };
-      process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
-        'explicit_bucket_histogram';
-      setMeterProvider(config);
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          readers: [
-            {
-              periodic: {
-                exporter: {
-                  otlp_http: {
-                    default_histogram_aggregation: 'explicit_bucket_histogram',
-                    encoding: 'protobuf',
-                    temporality_preference: 'cumulative',
-                    timeout: 10000,
-                  },
-                },
-                timeout: 30000,
-              },
-            },
-          ],
-        },
-      });
+      assert.deepStrictEqual(config.meter_provider, expectedMeterProvider);
 
+      config = {};
+      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'default';
       process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
         'default';
-      setMeterProvider(config);
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          readers: [
-            {
-              periodic: {
-                exporter: {
-                  otlp_http: {
-                    default_histogram_aggregation: 'explicit_bucket_histogram',
-                    encoding: 'protobuf',
-                    temporality_preference: 'cumulative',
-                    timeout: 10000,
-                  },
-                },
-                timeout: 30000,
-              },
-            },
-          ],
-        },
-      });
-
-      config = {};
-      setMeterProvider(config);
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          readers: [{}],
-        },
-      });
-
-      process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'trace_based';
-      setMeterProvider(config);
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          readers: [{}],
-          exemplar_filter: 'trace_based',
-        },
-      });
-
-      config = {};
-      process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'always_off';
-      setMeterProvider(config);
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          readers: [{}],
-          exemplar_filter: 'always_off',
-        },
-      });
-
-      config = {};
       process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'default';
       setMeterProvider(config);
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          readers: [{}],
-          exemplar_filter: 'trace_based',
-        },
-      });
+      expectedMeterProvider = {
+        exemplar_filter: ExemplarFilter.TraceBased,
+        readers: [
+          {
+            periodic: {
+              exporter: {
+                otlp_http: {
+                  default_histogram_aggregation:
+                    ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                  encoding: OtlpHttpEncoding.Protobuf,
+                  endpoint: 'http://localhost:4318/v1/metrics',
+                  temporality_preference:
+                    ExporterTemporalityPreference.Cumulative,
+                  timeout: 10000,
+                },
+              },
+              interval: 60000,
+              timeout: 30000,
+            },
+          },
+        ],
+      };
+      assert.deepStrictEqual(config.meter_provider, expectedMeterProvider);
     });
   });
 
@@ -2200,45 +2036,20 @@ describe('ConfigFactory', function () {
         propagator: { composite: [{ tracecontext: null }] },
       });
 
-      config = {};
-      setFileTracerProvider(config, { processors: [] });
-      assert.deepStrictEqual(config, {
-        tracer_provider: { processors: [] },
-      });
-
-      config = {};
-      setFileLoggerProvider(config, { processors: [] });
-      assert.deepStrictEqual(config, {
-        logger_provider: { processors: [] },
-      });
-
       const res = getTemporalityPreference(
         ExporterTemporalityPreference.LowMemory
       );
       assert.deepStrictEqual(res, 'low_memory');
 
       config = {};
-      setFileMeterProvider(config, { readers: [] });
-      assert.deepStrictEqual(config, {
-        meter_provider: { readers: [] },
-      });
-
-      config = {};
       setFileMeterProvider(config, {
         readers: [],
         exemplar_filter: ExemplarFilter.AlwaysOn,
-      });
-      assert.deepStrictEqual(config, {
-        meter_provider: { readers: [], exemplar_filter: 'always_on' },
-      });
-
-      config = {};
-      setFileMeterProvider(config, {
-        readers: [],
         views: [{ selector: { instrument_type: InstrumentType.Counter } }],
       });
       assert.deepStrictEqual(config, {
         meter_provider: {
+          exemplar_filter: 'always_on',
           readers: [],
           views: [{ selector: { instrument_type: 'counter' } }],
         },
@@ -2251,6 +2062,7 @@ describe('ConfigFactory', function () {
       });
       assert.deepStrictEqual(config, {
         meter_provider: {
+          exemplar_filter: 'trace_based',
           readers: [],
           views: [{ selector: { instrument_type: 'gauge' } }],
         },
@@ -2265,6 +2077,7 @@ describe('ConfigFactory', function () {
       });
       assert.deepStrictEqual(config, {
         meter_provider: {
+          exemplar_filter: 'trace_based',
           readers: [],
           views: [{ selector: { instrument_type: 'observable_counter' } }],
         },
@@ -2279,6 +2092,7 @@ describe('ConfigFactory', function () {
       });
       assert.deepStrictEqual(config, {
         meter_provider: {
+          exemplar_filter: 'trace_based',
           readers: [],
           views: [{ selector: { instrument_type: 'observable_gauge' } }],
         },
@@ -2297,6 +2111,7 @@ describe('ConfigFactory', function () {
       });
       assert.deepStrictEqual(config, {
         meter_provider: {
+          exemplar_filter: 'trace_based',
           readers: [],
           views: [
             { selector: { instrument_type: 'observable_up_down_counter' } },
@@ -2310,11 +2125,134 @@ describe('ConfigFactory', function () {
         views: [
           { selector: { instrument_type: InstrumentType.UpDownCounter } },
         ],
+        exemplar_filter: 'default' as ExemplarFilter,
       });
       assert.deepStrictEqual(config, {
         meter_provider: {
+          exemplar_filter: 'trace_based',
           readers: [],
           views: [{ selector: { instrument_type: 'up_down_counter' } }],
+        },
+      });
+
+      config = {};
+      setFileMeterProvider(config, {
+        views: [{ stream: { aggregation: { default: {} } } }],
+        readers: [],
+      });
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          exemplar_filter: 'trace_based',
+          readers: [],
+          views: [
+            {
+              stream: {
+                aggregation: {
+                  default: {},
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      config = {};
+      setFileMeterProvider(config, {
+        views: [{ stream: { aggregation: { drop: {} } } }],
+        readers: [],
+      });
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          exemplar_filter: 'trace_based',
+          readers: [],
+          views: [
+            {
+              stream: {
+                aggregation: {
+                  drop: {},
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      config = {};
+      setFileMeterProvider(config, {
+        views: [{ stream: { aggregation: { last_value: {} } } }],
+        readers: [],
+      });
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          exemplar_filter: 'trace_based',
+          readers: [],
+          views: [
+            {
+              stream: {
+                aggregation: {
+                  last_value: {},
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      config = {};
+      setFileMeterProvider(config, {
+        views: [{ stream: { aggregation: { sum: {} } } }],
+        readers: [],
+      });
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          exemplar_filter: 'trace_based',
+          readers: [],
+          views: [
+            {
+              stream: {
+                aggregation: {
+                  sum: {},
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      config = {};
+      setFileMeterProvider(config, {
+        views: [
+          {
+            stream: {
+              aggregation: {
+                base2_exponential_bucket_histogram: {
+                  record_min_max: false,
+                  max_scale: 20,
+                  max_size: 160,
+                },
+              },
+            },
+          },
+        ],
+        readers: [],
+      });
+      assert.deepStrictEqual(config, {
+        meter_provider: {
+          exemplar_filter: 'trace_based',
+          readers: [],
+          views: [
+            {
+              stream: {
+                aggregation: {
+                  base2_exponential_bucket_histogram: {
+                    record_min_max: false,
+                    max_scale: 20,
+                    max_size: 160,
+                  },
+                },
+              },
+            },
+          ],
         },
       });
     });
