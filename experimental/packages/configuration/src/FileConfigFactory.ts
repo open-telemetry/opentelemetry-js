@@ -34,11 +34,13 @@ import {
 } from './utils';
 import { NameStringValuePair, OtlpHttpEncoding } from './models/commonModel';
 import {
+  initializeDefaultTracerProviderConfiguration,
   SpanExporter,
   SpanProcessor,
   TracerProvider,
 } from './models/tracerProviderModel';
 import {
+  initializeDefaultLoggerProviderConfiguration,
   LoggerProvider,
   LogRecordExporter,
   LogRecordProcessor,
@@ -50,6 +52,7 @@ import {
   ExemplarFilter,
   ExporterDefaultHistogramAggregation,
   ExporterTemporalityPreference,
+  initializeDefaultMeterProviderConfiguration,
   InstrumentType,
   MeterProvider,
   MetricProducer,
@@ -450,12 +453,8 @@ export function setTracerProvider(
   config: ConfigurationModel,
   tracerProvider: TracerProvider
 ): void {
-  if (tracerProvider) {
-    if (config.tracer_provider == null) {
-      config.tracer_provider = {
-        processors: [],
-      };
-    }
+  if (tracerProvider?.processors?.length > 0) {
+    config.tracer_provider = initializeDefaultTracerProviderConfiguration();
     // Limits
     if (tracerProvider['limits']) {
       if (config.tracer_provider.limits == null) {
@@ -778,9 +777,7 @@ export function setMeterProvider(
   meterProvider: MeterProvider
 ): void {
   if (meterProvider) {
-    if (config.meter_provider == null) {
-      config.meter_provider = { readers: [] };
-    }
+    config.meter_provider = initializeDefaultMeterProviderConfiguration();
     const exemplarFilter = getStringFromConfigFile(
       meterProvider['exemplar_filter']
     );
@@ -1063,9 +1060,7 @@ export function setLoggerProvider(
   loggerProvider: LoggerProvider
 ): void {
   if (loggerProvider) {
-    if (config.logger_provider == null) {
-      config.logger_provider = { processors: [] };
-    }
+    config.logger_provider = initializeDefaultLoggerProviderConfiguration();
     // Limits
     if (loggerProvider['limits']) {
       const attributeValueLengthLimit = getNumberFromConfigFile(
@@ -1092,9 +1087,6 @@ export function setLoggerProvider(
     // Processors
     if (loggerProvider['processors']) {
       if (loggerProvider['processors'].length > 0) {
-        if (config.logger_provider == null) {
-          config.logger_provider = { processors: [] };
-        }
         config.logger_provider.processors = [];
         for (let i = 0; i < loggerProvider['processors'].length; i++) {
           const processorType = Object.keys(loggerProvider['processors'][i])[0];
@@ -1150,9 +1142,6 @@ export function setLoggerProvider(
         ]
       );
       if (defaultConfigDisabled || defaultConfigDisabled === false) {
-        if (config.logger_provider == null) {
-          config.logger_provider = { processors: [] };
-        }
         config.logger_provider['logger_configurator/development'] = {
           default_config: {
             disabled: defaultConfigDisabled,
@@ -1186,9 +1175,6 @@ export function setLoggerProvider(
               },
             });
           }
-        }
-        if (config.logger_provider == null) {
-          config.logger_provider = { processors: [] };
         }
         if (config.logger_provider['logger_configurator/development'] == null) {
           config.logger_provider['logger_configurator/development'] = {};
