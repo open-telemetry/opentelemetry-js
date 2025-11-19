@@ -19,6 +19,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(opentelemetry-sdk-node): use declarative config for resource attributes [#6044](https://github.com/open-telemetry/opentelemetry-js/pull/6044) @maryliag
 * feat(opentelemetry-sdk-node): use declarative config for logger provider [#6111](https://github.com/open-telemetry/opentelemetry-js/pull/6111) @maryliag
 * feat(configuration): doesnt set meter,tracer,logger provider by default [#6130](https://github.com/open-telemetry/opentelemetry-js/pull/6130) @maryliag
+* refactor(configuration): dont have a default value for node resource detectors [#x](https://github.com/open-telemetry/opentelemetry-js/pull/x) @maryliag
 
 ### :bug: Bug Fixes
 

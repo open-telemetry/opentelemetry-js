@@ -77,7 +77,6 @@ export function initializeDefaultConfiguration(): ConfigurationModel {
   const config: ConfigurationModel = {
     disabled: false,
     log_level: DiagLogLevel.INFO,
-    node_resource_detectors: ['all'],
     resource: {},
     attribute_limits: {
       attribute_count_limit: 128,

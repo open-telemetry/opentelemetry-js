@@ -46,7 +46,6 @@ import { TracerProvider } from '../src/models/tracerProviderModel';
 const defaultConfig: ConfigurationModel = {
   disabled: false,
   log_level: DiagLogLevel.INFO,
-  node_resource_detectors: ['all'],
   resource: {},
   attribute_limits: {
     attribute_count_limit: 128,
@@ -80,7 +79,6 @@ const defaultTracerProvider: TracerProvider = {
 const configFromFile: ConfigurationModel = {
   disabled: false,
   log_level: DiagLogLevel.INFO,
-  node_resource_detectors: ['all'],
   resource: {
     schema_url: 'https://opentelemetry.io/schemas/1.16.0',
     attributes_list: 'service.namespace=my-namespace,service.version=1.0.0',
@@ -570,7 +568,6 @@ const configFromFile: ConfigurationModel = {
 const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
   disabled: false,
   log_level: DiagLogLevel.INFO,
-  node_resource_detectors: ['all'],
   resource: {
     attributes: [
       {
