@@ -23,7 +23,13 @@ const protos = [
 
 function exec(command, argv) {
   return new Promise((resolve, reject) => {
-    const child = cp.spawn(command, argv, {
+    let spawnCmd = command;
+    let spawnArgs = argv;
+    if (process.platform === 'win32' && command.endsWith('.cmd')) {
+      spawnCmd = 'cmd.exe';
+      spawnArgs = ['/c', command, ...argv];
+    }
+    const child = cp.spawn(spawnCmd, spawnArgs, {
       stdio: ['ignore', 'inherit', 'inherit'],
     });
     child.on('exit', (code, signal) => {
