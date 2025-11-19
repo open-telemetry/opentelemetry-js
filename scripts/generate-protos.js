@@ -3,11 +3,11 @@
 const cp = require('child_process');
 const path = require('path');
 
-const appRoot = process.cwd();
+const transformerPackageRoot = path.resolve(__dirname, '..', 'experimental', 'packages', 'otlp-transformer');
 const rootBinDir = path.resolve(__dirname, '..', 'node_modules', '.bin');
 
-const generatedPath = path.resolve(appRoot, './src/generated');
-const protosPath = path.resolve(appRoot, './protos');
+const generatedPath = path.resolve(transformerPackageRoot, './src/generated');
+const protosPath = path.resolve(transformerPackageRoot, './protos');
 const protos = [
   'opentelemetry/proto/common/v1/common.proto',
   'opentelemetry/proto/resource/v1/resource.proto',
