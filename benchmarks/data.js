@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1763564690696,
+  "lastUpdate": 1763567153692,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -44984,6 +44984,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.59%",
             "unit": "ops/sec",
             "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "cjihrig@gmail.com",
+            "name": "Colin Ihrig",
+            "username": "cjihrig"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "77ab16551799d2d352c6d1baed6e3414791756c4",
+          "message": "refactor(opentelemetry-sdk-node): simplify calculation of `traceExportersList` (#6132)\n\nCo-authored-by: Marylia Gutierrez <marylia.gutierrez@grafana.com>",
+          "timestamp": "2025-11-19T15:34:56Z",
+          "tree_id": "ec9df4dcc4e0f9d92886b388d22a3462072ff0bb",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/77ab16551799d2d352c6d1baed6e3414791756c4"
+        },
+        "date": 1763567152675,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 676390,
+            "range": "±0.60%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8490,
+            "range": "±0.79%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 292224,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 287334,
+            "range": "±0.69%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
