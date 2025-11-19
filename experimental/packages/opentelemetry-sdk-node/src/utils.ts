@@ -90,10 +90,6 @@ export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   });
 }
 
-export function filterBlanksAndNulls(list: string[]): string[] {
-  return list.map(item => item.trim()).filter(s => s !== 'null' && s !== '');
-}
-
 export function getOtlpProtocolFromEnv(): string {
   return (
     getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL') ??
