@@ -6,7 +6,6 @@
     "entryPoints": [
       "api",
       "experimental/packages/api-logs",
-      "experimental/packages/configuration",
       "experimental/packages/exporter-logs-otlp-grpc",
       "experimental/packages/exporter-logs-otlp-http",
       "experimental/packages/exporter-logs-otlp-proto",
