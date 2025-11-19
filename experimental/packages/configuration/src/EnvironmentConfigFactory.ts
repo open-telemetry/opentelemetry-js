@@ -374,22 +374,6 @@ export function setMeterProvider(config: ConfigurationModel): void {
       readerPeriodicInfo.timeout = timeout;
     }
 
-<<<<<<< HEAD
-    config.meter_provider.readers = [];
-    if (exportersType.includes('none')) {
-      diag.info(
-        `OTEL_METRICS_EXPORTER contains "none". Metric provider will not be initialized.`
-      );
-      return;
-    }
-    for (let i = 0; i < exportersType.length; i++) {
-      const exporterType = exportersType[i];
-      const readerPeriodicInfo = { ...readerPeriodic };
-      const timeout = getNumberFromEnv('OTEL_METRIC_EXPORT_TIMEOUT') ?? 30000;
-      if (timeout) {
-        readerPeriodicInfo.timeout = timeout;
-      }
-=======
     // TODO: add prometheus exporter support
     if (exporterType === 'console') {
       readerPeriodicInfo.exporter = { console: {} };
@@ -425,7 +409,6 @@ export function setMeterProvider(config: ConfigurationModel): void {
         getStringFromEnv(
           'OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION'
         ) ?? 'explicit_bucket_histogram';
->>>>>>> default-providers
 
       if (protocol === 'grpc') {
         delete readerPeriodicInfo.exporter.otlp_http;

@@ -70,7 +70,6 @@ import {
   getPropagatorFromEnv,
   setupPropagator,
   setupContextManager,
-  getInstanceID,
 } from './utils';
 import {
   ConfigFactory,
@@ -78,7 +77,6 @@ import {
   createConfigFactory,
   LogRecordExporterModel,
 } from '@opentelemetry/configuration';
-import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 
 type TracerProviderConfig = {
@@ -391,16 +389,6 @@ export class NodeSDK {
         : this._resource.merge(
             resourceFromAttributes({
               [ATTR_SERVICE_NAME]: this._serviceName,
-            })
-          );
-
-    const instanceId = getInstanceID(this._config);
-    this._resource =
-      instanceId === undefined
-        ? this._resource
-        : this._resource.merge(
-            resourceFromAttributes({
-              [ATTR_SERVICE_INSTANCE_ID]: instanceId,
             })
           );
 
