@@ -63,6 +63,7 @@ import {
   ViewSelector,
   ViewStream,
 } from './models/meterProviderModel';
+import { diag } from '@opentelemetry/api';
 
 export class FileConfigFactory implements ConfigFactory {
   private _config: ConfigurationModel;
@@ -84,9 +85,10 @@ export function hasValidConfigFile(): boolean {
       !(configFile.endsWith('.yaml') || configFile.endsWith('.yml')) ||
       !fs.existsSync(configFile)
     ) {
-      throw new Error(
+      diag.warn(
         `Config file ${configFile} set on OTEL_EXPERIMENTAL_CONFIG_FILE is not valid`
       );
+      return false;
     }
     return true;
   }
@@ -159,7 +161,7 @@ export function parseConfigFile(config: ConfigurationModel) {
     setMeterProvider(config, parsedContent['meter_provider']);
     setLoggerProvider(config, parsedContent['logger_provider']);
   } else {
-    throw new Error(
+    diag.warn(
       `Unsupported File Format: ${parsedContent['file_format']}. It must be one of the following: ${supportedFileVersions}`
     );
   }

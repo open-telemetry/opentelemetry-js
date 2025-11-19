@@ -15,8 +15,9 @@
  */
 
 import * as assert from 'assert';
+import * as Sinon from 'sinon';
 import { ConfigurationModel } from '../src';
-import { DiagLogLevel } from '@opentelemetry/api';
+import { diag, DiagLogLevel } from '@opentelemetry/api';
 import { createConfigFactory } from '../src/ConfigFactory';
 import { OtlpHttpEncoding } from '../src/models/commonModel';
 import {
@@ -690,6 +691,7 @@ describe('ConfigFactory', function () {
     for (const [key, value] of Object.entries(_origEnvVariables)) {
       process.env[key] = value;
     }
+    Sinon.restore();
   });
 
   describe('get values from environment variables', function () {
@@ -1771,17 +1773,23 @@ describe('ConfigFactory', function () {
     });
 
     it('should return error from invalid config file', function () {
+      const warnSpy = Sinon.spy(diag, 'warn');
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = './fixtures/kitchen-sink.txt';
-      assert.throws(() => {
-        createConfigFactory();
-      });
+      createConfigFactory();
+      Sinon.assert.calledWith(
+        warnSpy,
+        'Config file ./fixtures/kitchen-sink.txt set on OTEL_EXPERIMENTAL_CONFIG_FILE is not valid'
+      );
     });
 
     it('should return error from invalid config file format', function () {
+      const warnSpy = Sinon.spy(diag, 'warn');
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
-      assert.throws(() => {
-        createConfigFactory();
-      });
+      createConfigFactory();
+      Sinon.assert.calledWith(
+        warnSpy,
+        'Unsupported File Format: invalid. It must be one of the following: 1.0-rc.1,1.0-rc.2'
+      );
     });
 
     it('should initialize config with default values with empty string for config file', function () {
