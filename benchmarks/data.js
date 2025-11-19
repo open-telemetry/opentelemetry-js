@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1763567153692,
+  "lastUpdate": 1763591200902,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -45036,6 +45036,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.69%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marylia.gutierrez@grafana.com",
+            "name": "Marylia Gutierrez",
+            "username": "maryliag"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "daa3fe2ff8c1fef289327f0f23f4050326c505db",
+          "message": "refactor(configuration): dont have a default value for node resource detectors (#6131)\n\nCo-authored-by: Jamie Danielson <jamiedanielson@honeycomb.io>",
+          "timestamp": "2025-11-19T22:17:32Z",
+          "tree_id": "c9d221c506665080f67d330ad35ceb392d90cecf",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/daa3fe2ff8c1fef289327f0f23f4050326c505db"
+        },
+        "date": 1763591199865,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 695889,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8588,
+            "range": "±0.72%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 299744,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 282651,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
           }
         ]
       }
