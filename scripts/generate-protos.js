@@ -24,7 +24,6 @@ const protos = [
 function exec(command, argv) {
   return new Promise((resolve, reject) => {
     const child = cp.spawn(command, argv, {
-      shell: true,
       stdio: ['ignore', 'inherit', 'inherit'],
     });
     child.on('exit', (code, signal) => {
@@ -41,7 +40,8 @@ function pbts(pbjsOutFile) {
   const pbtsOptions = [
     '-o', path.join(generatedPath, 'root.d.ts'),
   ];
-  return exec(path.resolve(rootBinDir, 'pbts'), [...pbtsOptions, pbjsOutFile]);
+  // on windows, scripts in node_modules/.bin/ are suffixed with .cmd
+  return exec(path.resolve(rootBinDir, process.platform !== 'win32' ? 'pbts': 'pbts.cmd'), [...pbtsOptions, pbjsOutFile]);
 }
 
 async function pbjs(files) {
@@ -53,7 +53,8 @@ async function pbjs(files) {
     '--null-defaults',
     '-o', outFile,
   ];
-  await exec(path.resolve(rootBinDir, 'pbjs'), [...pbjsOptions, ...files]);
+  // on windows, scripts in node_modules/.bin/ suffixed with .cmd
+  await exec(path.resolve(rootBinDir, process.platform !== 'win32' ? 'pbjs': 'pbjs.cmd'), [...pbjsOptions, ...files]);
   return outFile;
 }
 
