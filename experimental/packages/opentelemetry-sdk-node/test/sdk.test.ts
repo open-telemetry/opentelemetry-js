@@ -1100,7 +1100,17 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
-    it('should use otlp with http/protobuf by default', async () => {
+    it('should not set logger provider by default', async () => {
+      const sdk = new NodeSDK();
+      sdk.start();
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert.equal(sharedState, undefined);
+      await sdk.shutdown();
+    });
+
+    it('should use otlp with http/protobuf by default for otlp', async () => {
+      process.env.OTEL_LOGS_EXPORTER = 'otlp';
       const sdk = new NodeSDK();
       sdk.start();
       const loggerProvider = logs.getLoggerProvider();
