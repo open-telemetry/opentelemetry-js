@@ -35,8 +35,14 @@ import {
 } from './models/meterProviderModel';
 import { OtlpHttpEncoding } from './models/commonModel';
 import { diag } from '@opentelemetry/api';
-import { BatchSpanProcessor, initializeDefaultTracerProviderConfiguration } from './models/tracerProviderModel';
-import { BatchLogRecordProcessor, initializeDefaultLoggerProviderConfiguration } from './models/loggerProviderModel';
+import {
+  BatchSpanProcessor,
+  initializeDefaultTracerProviderConfiguration,
+} from './models/tracerProviderModel';
+import {
+  BatchLogRecordProcessor,
+  initializeDefaultLoggerProviderConfiguration,
+} from './models/loggerProviderModel';
 
 /**
  * EnvironmentConfigProvider provides a configuration based on environment variables.
@@ -203,7 +209,7 @@ export function setTracerProvider(config: ConfigurationModel): void {
       linkAttributeCountLimit;
   }
 
-  const batch : BatchSpanProcessor = { exporter: {} };
+  const batch: BatchSpanProcessor = { exporter: {} };
   const scheduleDelay = getNumberFromEnv('OTEL_BSP_SCHEDULE_DELAY') ?? 5000;
   if (scheduleDelay) {
     batch.schedule_delay = scheduleDelay;
@@ -219,9 +225,8 @@ export function setTracerProvider(config: ConfigurationModel): void {
     batch.max_queue_size = maxQueueSize;
   }
 
-  const maxExportBatchSize = getNumberFromEnv(
-    'OTEL_BSP_MAX_EXPORT_BATCH_SIZE'
-  ) ?? 512;
+  const maxExportBatchSize =
+    getNumberFromEnv('OTEL_BSP_MAX_EXPORT_BATCH_SIZE') ?? 512;
   if (maxExportBatchSize) {
     batch.max_export_batch_size = maxExportBatchSize;
   }
@@ -398,9 +403,8 @@ export function setMeterProvider(config: ConfigurationModel): void {
         getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_HEADERS') ??
         getStringFromEnv('OTEL_EXPORTER_OTLP_HEADERS');
       const temporalityPreference =
-        getStringFromEnv(
-          'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE'
-        ) ?? 'cumulative';
+        getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE') ??
+        'cumulative';
       const defaultHistogramAggregation =
         getStringFromEnv(
           'OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION'
@@ -421,8 +425,7 @@ export function setMeterProvider(config: ConfigurationModel): void {
             certificateFile;
         }
         if (clientKeyFile) {
-          readerPeriodicInfo.exporter.otlp_grpc.client_key_file =
-            clientKeyFile;
+          readerPeriodicInfo.exporter.otlp_grpc.client_key_file = clientKeyFile;
         }
         if (clientCertificateFile) {
           readerPeriodicInfo.exporter.otlp_grpc.client_certificate_file =
@@ -490,8 +493,7 @@ export function setMeterProvider(config: ConfigurationModel): void {
             certificateFile;
         }
         if (clientKeyFile) {
-          readerPeriodicInfo.exporter.otlp_http.client_key_file =
-            clientKeyFile;
+          readerPeriodicInfo.exporter.otlp_http.client_key_file = clientKeyFile;
         }
         if (clientCertificateFile) {
           readerPeriodicInfo.exporter.otlp_http.client_certificate_file =
@@ -553,8 +555,9 @@ export function setMeterProvider(config: ConfigurationModel): void {
     }
     config.meter_provider.readers.push({ periodic: readerPeriodicInfo });
   }
-  
-  const exemplarFilter = getStringFromEnv('OTEL_METRICS_EXEMPLAR_FILTER') ?? 'trace_based';
+
+  const exemplarFilter =
+    getStringFromEnv('OTEL_METRICS_EXEMPLAR_FILTER') ?? 'trace_based';
   if (exemplarFilter) {
     switch (exemplarFilter) {
       case 'trace_based':
@@ -608,7 +611,7 @@ export function setLoggerProvider(config: ConfigurationModel): void {
     }
   }
 
-  const batch : BatchLogRecordProcessor = { exporter: {} };
+  const batch: BatchLogRecordProcessor = { exporter: {} };
   const scheduleDelay = getNumberFromEnv('OTEL_BLRP_SCHEDULE_DELAY') ?? 1000;
   if (scheduleDelay) {
     batch.schedule_delay = scheduleDelay;
@@ -624,9 +627,8 @@ export function setLoggerProvider(config: ConfigurationModel): void {
     batch.max_queue_size = maxQueueSize;
   }
 
-  const maxExportBatchSize = getNumberFromEnv(
-    'OTEL_BLRP_MAX_EXPORT_BATCH_SIZE'
-  ) ?? 512;
+  const maxExportBatchSize =
+    getNumberFromEnv('OTEL_BLRP_MAX_EXPORT_BATCH_SIZE') ?? 512;
   if (maxExportBatchSize) {
     batch.max_export_batch_size = maxExportBatchSize;
   }
@@ -734,5 +736,4 @@ export function setLoggerProvider(config: ConfigurationModel): void {
       config.logger_provider.processors.push({ batch: batchInfo });
     }
   }
-
 }
