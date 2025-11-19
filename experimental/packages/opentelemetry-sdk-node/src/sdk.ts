@@ -70,14 +70,12 @@ import {
   getPropagatorFromEnv,
   setupPropagator,
   setupContextManager,
-  getInstanceID,
 } from './utils';
 import {
   ConfigFactory,
   ConfigurationModel,
   createConfigFactory,
 } from '@opentelemetry/configuration';
-import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
 
 type TracerProviderConfig = {
   tracerConfig: NodeTracerConfig;
@@ -389,16 +387,6 @@ export class NodeSDK {
         : this._resource.merge(
             resourceFromAttributes({
               [ATTR_SERVICE_NAME]: this._serviceName,
-            })
-          );
-
-    const instanceId = getInstanceID(this._config);
-    this._resource =
-      instanceId === undefined
-        ? this._resource
-        : this._resource.merge(
-            resourceFromAttributes({
-              [ATTR_SERVICE_INSTANCE_ID]: instanceId,
             })
           );
 

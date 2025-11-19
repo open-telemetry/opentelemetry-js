@@ -89,18 +89,6 @@ export function getResourceDetectorsFromEnv(
   });
 }
 
-export function getInstanceID(config: ConfigurationModel): string | undefined {
-  if (config.resource?.attributes) {
-    for (let i = 0; i < config.resource.attributes.length; i++) {
-      const element = config.resource.attributes[i];
-      if (element.name === 'service.instance.id') {
-        return element.value?.toString();
-      }
-    }
-  }
-  return undefined;
-}
-
 export function filterBlanksAndNulls(list: string[]): string[] {
   return list.map(item => item.trim()).filter(s => s !== 'null' && s !== '');
 }
