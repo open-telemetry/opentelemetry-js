@@ -17,7 +17,7 @@
     "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "protos": "npm run submodule && npm run protos:generate",
-    "protos:generate:js": "pbjs -t static-module -p ./protos -w commonjs --null-defaults -o ./src/generated/root.js ./protos/opentelemetry/proto/common/v1/common.proto ./protos/opentelemetry/proto/resource/v1/resource.proto ./protos/opentelemetry/proto/trace/v1/trace.proto protos/opentelemetry/proto/collector/trace/v1/trace_service.proto protos/opentelemetry/proto/metrics/v1/metrics.proto ./protos/opentelemetry/proto/collector/metrics/v1/metrics_service.proto ./protos/opentelemetry/proto/logs/v1/logs.proto ./protos/opentelemetry/proto/collector/logs/v1/logs_service.proto",
+    "protos:generate:js": "pbjs -t static-module -p ./protos -w commonjs --null-defaults -o ./src/generated/root.js ./protos/opentelemetry/proto/common/v1/common.proto ./protos/opentelemetry/proto/resource/v1/resource.proto ./protos/opentelemetry/proto/trace/v1/trace.proto ./protos/opentelemetry/proto/collector/trace/v1/trace_service.proto ./protos/opentelemetry/proto/metrics/v1/metrics.proto ./protos/opentelemetry/proto/collector/metrics/v1/metrics_service.proto ./protos/opentelemetry/proto/logs/v1/logs.proto ./protos/opentelemetry/proto/collector/logs/v1/logs_service.proto",
     "protos:generate:ts": "pbts -o ./src/generated/root.d.ts ./src/generated/root.js",
     "protos:generate": "npm run protos:generate:js && npm run protos:generate:ts",
     "lint": "eslint . --ext .ts",
