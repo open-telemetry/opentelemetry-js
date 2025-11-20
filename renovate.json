@@ -1,5 +1,8 @@
 {
-  "extends": ["config:recommended"],
+  "extends": [
+    "config:best-practices",
+    "helpers:pinGitHubActionDigestsToSemver"
+  ],
   "packageRules": [
     {
       "matchManagers": ["github-actions"],
