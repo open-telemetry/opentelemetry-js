@@ -135,7 +135,7 @@ Optional parameters:
 - `localParentNotSampled(Sampler)` (default: `AlwaysOff`)
 
 |Parent|parent.isRemote()|parent.isSampled()|Invoke sampler|
-|--|--|--|--|
+|---|---|---|---|
 |absent|n/a|n/a|`root()`|
 |present|true|true|`remoteParentSampled()`|
 |present|true|false|`remoteParentNotSampled()`|
