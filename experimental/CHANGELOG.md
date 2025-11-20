@@ -18,7 +18,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(configuration): set meter provider exporter type from env variable [#6105](https://github.com/open-telemetry/opentelemetry-js/pull/6105) @maryliag
 * refactor(configuration): throw warning and not error for invalid files [#6124](https://github.com/open-telemetry/opentelemetry-js/pull/6124) @maryliag
 * refactor(configuration): dont have a default value for node resource detectors [#x](https://github.com/open-telemetry/opentelemetry-js/pull/x) @maryliag
-* feat(opentelemetry-sdk-node): new function to start SDK [#6145](https://github.com/open-telemetry/opentelemetry-js/pull/6145) @maryliag
+* feat(opentelemetry-sdk-node): skeleton for experimental function to start SDK - not ready for usage [#6145](https://github.com/open-telemetry/opentelemetry-js/pull/6145) @maryliag
 
 ### :bug: Bug Fixes
 

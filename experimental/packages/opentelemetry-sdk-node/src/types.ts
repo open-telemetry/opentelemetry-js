@@ -52,6 +52,6 @@ export interface NodeSDKConfiguration {
   idGenerator: IdGenerator;
 }
 
-export interface SDKConfiguration {
-  contextManager: ContextManager;
+export interface SDKOptions {
+  contextManager: ContextManager | null;
 }

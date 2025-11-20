@@ -17,17 +17,15 @@ import {
   ConfigFactory,
   createConfigFactory,
 } from '@opentelemetry/configuration';
-import { SDKConfiguration } from './types';
+import { SDKOptions } from './types';
 import { diag, DiagConsoleLogger } from '@opentelemetry/api';
 import { setupContextManager } from './utils';
 
 /**
  * Experimental function to start the OpenTelemetry Node SDK
- * @param configurationSDK
+ * @param sdkOptions
  */
-export const startNodeSDK = (
-  configurationSDK: Partial<SDKConfiguration> = {}
-) => {
+export const startNodeSDK = (sdkOptions: Partial<SDKOptions> = {}) => {
   const configFactory: ConfigFactory = createConfigFactory();
   const config = configFactory.getConfigModel();
 
@@ -39,7 +37,7 @@ export const startNodeSDK = (
     diag.setLogger(new DiagConsoleLogger(), { logLevel: config.log_level });
   }
 
-  setupContextManager(configurationSDK?.contextManager);
+  setupContextManager(sdkOptions?.contextManager);
 
   const shutdownFn = async () => {
     const promises: Promise<unknown>[] = [];
