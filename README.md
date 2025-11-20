@@ -176,7 +176,7 @@ All stable packages are released with the same version, and all experimental pac
 The below table describes which versions of each set of packages are expected to work together.
 
 | Stable Packages | Experimental Packages |
-|-----------------|-----------------------|
+| --------------- | --------------------- |
 | 2.0.x           | 0.200.x               |
 | 1.30.x          | 0.57.x                |
 | 1.29.x          | 0.56.x                |
