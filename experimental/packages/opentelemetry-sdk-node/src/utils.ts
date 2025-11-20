@@ -90,10 +90,6 @@ export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   });
 }
 
-export function filterBlanksAndNulls(list: string[]): string[] {
-  return list.map(item => item.trim()).filter(s => s !== 'null' && s !== '');
-}
-
 export function getOtlpProtocolFromEnv(): string {
   return (
     getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL') ??
@@ -128,9 +124,9 @@ export function getSpanProcessorsFromEnv(): SpanProcessor[] {
   ]);
   const exporters: SpanExporter[] = [];
   const processors: SpanProcessor[] = [];
-  let traceExportersList = filterBlanksAndNulls(
-    Array.from(new Set(getStringListFromEnv('OTEL_TRACES_EXPORTER')))
-  );
+  let traceExportersList = Array.from(
+    new Set(getStringListFromEnv('OTEL_TRACES_EXPORTER'))
+  ).filter(s => s !== 'null');
 
   if (traceExportersList[0] === 'none') {
     diag.warn(

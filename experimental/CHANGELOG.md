@@ -17,6 +17,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(configuration): set tracer provider exporter type from env variables [#6106](https://github.com/open-telemetry/opentelemetry-js/pull/6106) @maryliag
 * feat(configuration): set meter provider exporter type from env variable [#6105](https://github.com/open-telemetry/opentelemetry-js/pull/6105) @maryliag
 * refactor(configuration): throw warning and not error for invalid files [#6124](https://github.com/open-telemetry/opentelemetry-js/pull/6124) @maryliag
+* refactor(configuration): dont have a default value for node resource detectors [#6131](https://github.com/open-telemetry/opentelemetry-js/pull/6131) @maryliag
 * feat(configuration): doesnt set meter,tracer,logger provider by default [#6130](https://github.com/open-telemetry/opentelemetry-js/pull/6130) @maryliag
 
 ### :bug: Bug Fixes
@@ -27,6 +28,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :books: Documentation
 
 ### :house: Internal
+
+* refactor(opentelemetry-sdk-node): simplify calculation of traceExportersList [#6132](https://github.com/open-telemetry/opentelemetry-js/pull/6132) @cjihrig
 
 ## 0.208.0
 
