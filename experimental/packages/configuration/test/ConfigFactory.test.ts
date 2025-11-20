@@ -26,6 +26,7 @@ import {
   ExporterTemporalityPreference,
   InstrumentType,
   MeterProvider,
+  MetricReader,
 } from '../src/models/meterProviderModel';
 import {
   setAttributeLimits,
@@ -676,6 +677,49 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
     ],
     limits: {
       attribute_count_limit: 128,
+    },
+  },
+};
+
+const readerExample: MetricReader = {
+  periodic: {
+    interval: 60000,
+    timeout: 30000,
+    exporter: {
+      otlp_http: {
+        endpoint: 'http://localhost:4318/v1/metrics',
+        certificate_file: '/app/cert.pem',
+        client_key_file: '/app/cert.pem',
+        client_certificate_file: '/app/cert.pem',
+        headers: [
+          {
+            name: 'api-key',
+            value: '1234',
+          },
+        ],
+        headers_list: 'api-key=1234',
+        compression: 'gzip',
+        timeout: 10000,
+        encoding: OtlpHttpEncoding.Protobuf,
+        temporality_preference: ExporterTemporalityPreference.Delta,
+        default_histogram_aggregation:
+          ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+      },
+    },
+    producers: [
+      {
+        prometheus: undefined,
+      },
+    ],
+    cardinality_limits: {
+      default: 2000,
+      counter: 2000,
+      gauge: 2000,
+      histogram: 2000,
+      observable_counter: 2000,
+      observable_gauge: 2000,
+      observable_up_down_counter: 2000,
+      up_down_counter: 2000,
     },
   },
 };
@@ -2020,6 +2064,25 @@ describe('ConfigFactory', function () {
       );
     });
 
+    it('checks for incomplete providers', function () {
+      const warnSpy = Sinon.spy(diag, 'warn');
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
+        'test/fixtures/invalid-providers.yaml';
+      createConfigFactory();
+      Sinon.assert.calledWith(
+        warnSpy.firstCall,
+        'TracerProvider must have at least one processor configured'
+      );
+      Sinon.assert.calledWith(
+        warnSpy.secondCall,
+        'MeterProvider must have at least one reader configured'
+      );
+      Sinon.assert.calledWith(
+        warnSpy.thirdCall,
+        'LoggerProvider must have at least one processor configured'
+      );
+    });
+
     it('checks to keep good code coverage', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
         'test/fixtures/test-for-coverage.yaml';
@@ -2051,34 +2114,34 @@ describe('ConfigFactory', function () {
 
       config = {};
       setFileMeterProvider(config, {
-        readers: [],
+        readers: [readerExample],
         exemplar_filter: ExemplarFilter.AlwaysOn,
         views: [{ selector: { instrument_type: InstrumentType.Counter } }],
       });
       assert.deepStrictEqual(config, {
         meter_provider: {
           exemplar_filter: 'always_on',
-          readers: [],
+          readers: [readerExample],
           views: [{ selector: { instrument_type: 'counter' } }],
         },
       });
 
       config = {};
       setFileMeterProvider(config, {
-        readers: [],
+        readers: [readerExample],
         views: [{ selector: { instrument_type: InstrumentType.Gauge } }],
       });
       assert.deepStrictEqual(config, {
         meter_provider: {
           exemplar_filter: 'trace_based',
-          readers: [],
+          readers: [readerExample],
           views: [{ selector: { instrument_type: 'gauge' } }],
         },
       });
 
       config = {};
       setFileMeterProvider(config, {
-        readers: [],
+        readers: [readerExample],
         views: [
           { selector: { instrument_type: InstrumentType.ObservableCounter } },
         ],
@@ -2086,14 +2149,14 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(config, {
         meter_provider: {
           exemplar_filter: 'trace_based',
-          readers: [],
+          readers: [readerExample],
           views: [{ selector: { instrument_type: 'observable_counter' } }],
         },
       });
 
       config = {};
       setFileMeterProvider(config, {
-        readers: [],
+        readers: [readerExample],
         views: [
           { selector: { instrument_type: InstrumentType.ObservableGauge } },
         ],
@@ -2101,14 +2164,14 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(config, {
         meter_provider: {
           exemplar_filter: 'trace_based',
-          readers: [],
+          readers: [readerExample],
           views: [{ selector: { instrument_type: 'observable_gauge' } }],
         },
       });
 
       config = {};
       setFileMeterProvider(config, {
-        readers: [],
+        readers: [readerExample],
         views: [
           {
             selector: {
@@ -2120,7 +2183,7 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(config, {
         meter_provider: {
           exemplar_filter: 'trace_based',
-          readers: [],
+          readers: [readerExample],
           views: [
             { selector: { instrument_type: 'observable_up_down_counter' } },
           ],
@@ -2129,7 +2192,7 @@ describe('ConfigFactory', function () {
 
       config = {};
       setFileMeterProvider(config, {
-        readers: [],
+        readers: [readerExample],
         views: [
           { selector: { instrument_type: InstrumentType.UpDownCounter } },
         ],
@@ -2138,7 +2201,7 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(config, {
         meter_provider: {
           exemplar_filter: 'trace_based',
-          readers: [],
+          readers: [readerExample],
           views: [{ selector: { instrument_type: 'up_down_counter' } }],
         },
       });
@@ -2146,12 +2209,12 @@ describe('ConfigFactory', function () {
       config = {};
       setFileMeterProvider(config, {
         views: [{ stream: { aggregation: { default: {} } } }],
-        readers: [],
+        readers: [readerExample],
       });
       assert.deepStrictEqual(config, {
         meter_provider: {
           exemplar_filter: 'trace_based',
-          readers: [],
+          readers: [readerExample],
           views: [
             {
               stream: {
@@ -2167,12 +2230,12 @@ describe('ConfigFactory', function () {
       config = {};
       setFileMeterProvider(config, {
         views: [{ stream: { aggregation: { drop: {} } } }],
-        readers: [],
+        readers: [readerExample],
       });
       assert.deepStrictEqual(config, {
         meter_provider: {
           exemplar_filter: 'trace_based',
-          readers: [],
+          readers: [readerExample],
           views: [
             {
               stream: {
@@ -2188,12 +2251,12 @@ describe('ConfigFactory', function () {
       config = {};
       setFileMeterProvider(config, {
         views: [{ stream: { aggregation: { last_value: {} } } }],
-        readers: [],
+        readers: [readerExample],
       });
       assert.deepStrictEqual(config, {
         meter_provider: {
           exemplar_filter: 'trace_based',
-          readers: [],
+          readers: [readerExample],
           views: [
             {
               stream: {
@@ -2209,12 +2272,12 @@ describe('ConfigFactory', function () {
       config = {};
       setFileMeterProvider(config, {
         views: [{ stream: { aggregation: { sum: {} } } }],
-        readers: [],
+        readers: [readerExample],
       });
       assert.deepStrictEqual(config, {
         meter_provider: {
           exemplar_filter: 'trace_based',
-          readers: [],
+          readers: [readerExample],
           views: [
             {
               stream: {
@@ -2242,12 +2305,12 @@ describe('ConfigFactory', function () {
             },
           },
         ],
-        readers: [],
+        readers: [readerExample],
       });
       assert.deepStrictEqual(config, {
         meter_provider: {
           exemplar_filter: 'trace_based',
-          readers: [],
+          readers: [readerExample],
           views: [
             {
               stream: {

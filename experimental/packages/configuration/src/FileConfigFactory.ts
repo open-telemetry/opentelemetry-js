@@ -453,7 +453,7 @@ export function setTracerProvider(
   config: ConfigurationModel,
   tracerProvider: TracerProvider
 ): void {
-  if (tracerProvider?.processors?.length > 0) {
+  if (tracerProvider && tracerProvider.processors?.length > 0) {
     config.tracer_provider = initializeDefaultTracerProviderConfiguration();
     // Limits
     if (tracerProvider['limits']) {
@@ -509,54 +509,51 @@ export function setTracerProvider(
     }
 
     // Processors
-    if (tracerProvider['processors']) {
-      if (tracerProvider['processors'].length > 0) {
-        config.tracer_provider.processors = [];
-      }
-      for (let i = 0; i < tracerProvider['processors'].length; i++) {
-        const processorType = Object.keys(tracerProvider['processors'][i])[0];
-        if (processorType === 'batch') {
-          const element = tracerProvider['processors'][i]['batch'];
-          if (element) {
-            const parsedExporter = parseConfigSpanOrLogRecordExporter(
-              element['exporter'],
-              ProviderType.TRACER
-            );
-            const batchConfig: SpanProcessor = {
-              batch: {
-                schedule_delay:
-                  getNumberFromConfigFile(element['schedule_delay']) ?? 5000,
-                export_timeout:
-                  getNumberFromConfigFile(element['export_timeout']) ?? 30000,
-                max_queue_size:
-                  getNumberFromConfigFile(element['max_queue_size']) ?? 2048,
-                max_export_batch_size:
-                  getNumberFromConfigFile(element['max_export_batch_size']) ??
-                  512,
-                exporter: parsedExporter as SpanExporter,
-              },
-            };
+    for (let i = 0; i < tracerProvider['processors'].length; i++) {
+      const processorType = Object.keys(tracerProvider['processors'][i])[0];
+      if (processorType === 'batch') {
+        const element = tracerProvider['processors'][i]['batch'];
+        if (element) {
+          const parsedExporter = parseConfigSpanOrLogRecordExporter(
+            element['exporter'],
+            ProviderType.TRACER
+          );
+          const batchConfig: SpanProcessor = {
+            batch: {
+              schedule_delay:
+                getNumberFromConfigFile(element['schedule_delay']) ?? 5000,
+              export_timeout:
+                getNumberFromConfigFile(element['export_timeout']) ?? 30000,
+              max_queue_size:
+                getNumberFromConfigFile(element['max_queue_size']) ?? 2048,
+              max_export_batch_size:
+                getNumberFromConfigFile(element['max_export_batch_size']) ??
+                512,
+              exporter: parsedExporter as SpanExporter,
+            },
+          };
 
-            config.tracer_provider.processors.push(batchConfig);
-          }
-        } else if (processorType === 'simple') {
-          const element = tracerProvider['processors'][i]['simple'];
-          if (element) {
-            const parsedExporter = parseConfigSpanOrLogRecordExporter(
-              element['exporter'],
-              ProviderType.TRACER
-            );
-            const simpleConfig: SpanProcessor = {
-              simple: {
-                exporter: parsedExporter as SpanExporter,
-              },
-            };
+          config.tracer_provider.processors.push(batchConfig);
+        }
+      } else if (processorType === 'simple') {
+        const element = tracerProvider['processors'][i]['simple'];
+        if (element) {
+          const parsedExporter = parseConfigSpanOrLogRecordExporter(
+            element['exporter'],
+            ProviderType.TRACER
+          );
+          const simpleConfig: SpanProcessor = {
+            simple: {
+              exporter: parsedExporter as SpanExporter,
+            },
+          };
 
-            config.tracer_provider.processors.push(simpleConfig);
-          }
+          config.tracer_provider.processors.push(simpleConfig);
         }
       }
     }
+  } else if (tracerProvider && tracerProvider.processors == null) {
+    diag.warn('TracerProvider must have at least one processor configured');
   }
 }
 
@@ -776,7 +773,7 @@ export function setMeterProvider(
   config: ConfigurationModel,
   meterProvider: MeterProvider
 ): void {
-  if (meterProvider) {
+  if (meterProvider && meterProvider.readers?.length > 0) {
     config.meter_provider = initializeDefaultMeterProviderConfiguration();
     const exemplarFilter = getStringFromConfigFile(
       meterProvider['exemplar_filter']
@@ -798,82 +795,78 @@ export function setMeterProvider(
       }
     }
 
-    if (meterProvider['readers'] && meterProvider['readers'].length > 0) {
-      config.meter_provider.readers = [];
-
-      for (let i = 0; i < meterProvider['readers'].length; i++) {
-        const readerType = Object.keys(meterProvider['readers'][i])[0];
-        if (readerType === 'pull') {
-          const element = meterProvider['readers'][i]['pull'];
-          if (element) {
-            const exporter: PullMetricExporter = {
-              'prometheus/development': {
-                host:
-                  getStringFromConfigFile(
-                    element['exporter']['prometheus/development']['host']
-                  ) ?? 'localhost',
-                port:
-                  getNumberFromConfigFile(
-                    element['exporter']['prometheus/development']['port']
-                  ) ?? 9464,
-                without_scope_info:
-                  getBooleanFromConfigFile(
+    for (let i = 0; i < meterProvider.readers.length; i++) {
+      const readerType = Object.keys(meterProvider['readers'][i])[0];
+      if (readerType === 'pull') {
+        const element = meterProvider['readers'][i]['pull'];
+        if (element) {
+          const exporter: PullMetricExporter = {
+            'prometheus/development': {
+              host:
+                getStringFromConfigFile(
+                  element['exporter']['prometheus/development']['host']
+                ) ?? 'localhost',
+              port:
+                getNumberFromConfigFile(
+                  element['exporter']['prometheus/development']['port']
+                ) ?? 9464,
+              without_scope_info:
+                getBooleanFromConfigFile(
+                  element['exporter']['prometheus/development'][
+                    'without_scope_info'
+                  ]
+                ) ?? false,
+              with_resource_constant_labels: {
+                included:
+                  getStringListFromConfigFile(
                     element['exporter']['prometheus/development'][
-                      'without_scope_info'
-                    ]
-                  ) ?? false,
-                with_resource_constant_labels: {
-                  included:
-                    getStringListFromConfigFile(
-                      element['exporter']['prometheus/development'][
-                        'with_resource_constant_labels'
-                      ]['included']
-                    ) ?? [],
-                  excluded:
-                    getStringListFromConfigFile(
-                      element['exporter']['prometheus/development'][
-                        'with_resource_constant_labels'
-                      ]['excluded']
-                    ) ?? [],
-                },
+                      'with_resource_constant_labels'
+                    ]['included']
+                  ) ?? [],
+                excluded:
+                  getStringListFromConfigFile(
+                    element['exporter']['prometheus/development'][
+                      'with_resource_constant_labels'
+                    ]['excluded']
+                  ) ?? [],
               },
-            };
+            },
+          };
 
-            const pullReader: MetricReader = {
-              pull: {
-                exporter: exporter,
-                cardinality_limits: getCardinalityLimits(
-                  element['cardinality_limits']
-                ),
-              },
-            };
-            const p = getProducers(element['producers']);
-            if (p.length > 0 && pullReader.pull) {
-              pullReader.pull.producers = p;
-            }
-            config.meter_provider.readers.push(pullReader);
+          const pullReader: MetricReader = {
+            pull: {
+              exporter: exporter,
+              cardinality_limits: getCardinalityLimits(
+                element['cardinality_limits']
+              ),
+            },
+          };
+          const p = getProducers(element['producers']);
+          if (p.length > 0 && pullReader.pull) {
+            pullReader.pull.producers = p;
           }
-        } else if (readerType === 'periodic') {
-          const element = meterProvider['readers'][i]['periodic'];
-          if (element) {
-            const parsedExporter = parseMetricExporter(element['exporter']);
+          config.meter_provider.readers.push(pullReader);
+        }
+      } else if (readerType === 'periodic') {
+        const element = meterProvider['readers'][i]['periodic'];
+        if (element) {
+          const parsedExporter = parseMetricExporter(element['exporter']);
 
-            const periodicReader: MetricReader = {
-              periodic: {
-                exporter: parsedExporter,
-                cardinality_limits: getCardinalityLimits(
-                  element['cardinality_limits']
-                ),
-                interval: getNumberFromConfigFile(element['interval']) ?? 60000,
-                timeout: getNumberFromConfigFile(element['timeout']) ?? 30000,
-              },
-            };
-            const p = getProducers(element['producers']);
-            if (p.length > 0 && periodicReader.periodic) {
-              periodicReader.periodic.producers = p;
-            }
-            config.meter_provider.readers.push(periodicReader);
+          const periodicReader: MetricReader = {
+            periodic: {
+              exporter: parsedExporter,
+              cardinality_limits: getCardinalityLimits(
+                element['cardinality_limits']
+              ),
+              interval: getNumberFromConfigFile(element['interval']) ?? 60000,
+              timeout: getNumberFromConfigFile(element['timeout']) ?? 30000,
+            },
+          };
+          const p = getProducers(element['producers']);
+          if (p.length > 0 && periodicReader.periodic) {
+            periodicReader.periodic.producers = p;
           }
+          config.meter_provider.readers.push(periodicReader);
         }
       }
     }
@@ -1052,6 +1045,8 @@ export function setMeterProvider(
         config.meter_provider.views.push(view);
       }
     }
+  } else if (meterProvider && meterProvider.readers == null) {
+    diag.warn('MeterProvider must have at least one reader configured');
   }
 }
 
@@ -1059,7 +1054,7 @@ export function setLoggerProvider(
   config: ConfigurationModel,
   loggerProvider: LoggerProvider
 ): void {
-  if (loggerProvider) {
+  if (loggerProvider && loggerProvider.processors?.length > 0) {
     config.logger_provider = initializeDefaultLoggerProviderConfiguration();
     // Limits
     if (loggerProvider['limits']) {
@@ -1085,51 +1080,46 @@ export function setLoggerProvider(
     }
 
     // Processors
-    if (loggerProvider['processors']) {
-      if (loggerProvider['processors'].length > 0) {
-        config.logger_provider.processors = [];
-        for (let i = 0; i < loggerProvider['processors'].length; i++) {
-          const processorType = Object.keys(loggerProvider['processors'][i])[0];
-          if (processorType === 'batch') {
-            const element = loggerProvider['processors'][i]['batch'];
-            if (element) {
-              const parsedExporter = parseConfigSpanOrLogRecordExporter(
-                element['exporter'],
-                ProviderType.LOGGER
-              );
-              const batchConfig: LogRecordProcessor = {
-                batch: {
-                  schedule_delay:
-                    getNumberFromConfigFile(element['schedule_delay']) ?? 1000,
-                  export_timeout:
-                    getNumberFromConfigFile(element['export_timeout']) ?? 30000,
-                  max_queue_size:
-                    getNumberFromConfigFile(element['max_queue_size']) ?? 2048,
-                  max_export_batch_size:
-                    getNumberFromConfigFile(element['max_export_batch_size']) ??
-                    512,
-                  exporter: parsedExporter as LogRecordExporter,
-                },
-              };
+    for (let i = 0; i < loggerProvider['processors'].length; i++) {
+      const processorType = Object.keys(loggerProvider['processors'][i])[0];
+      if (processorType === 'batch') {
+        const element = loggerProvider['processors'][i]['batch'];
+        if (element) {
+          const parsedExporter = parseConfigSpanOrLogRecordExporter(
+            element['exporter'],
+            ProviderType.LOGGER
+          );
+          const batchConfig: LogRecordProcessor = {
+            batch: {
+              schedule_delay:
+                getNumberFromConfigFile(element['schedule_delay']) ?? 1000,
+              export_timeout:
+                getNumberFromConfigFile(element['export_timeout']) ?? 30000,
+              max_queue_size:
+                getNumberFromConfigFile(element['max_queue_size']) ?? 2048,
+              max_export_batch_size:
+                getNumberFromConfigFile(element['max_export_batch_size']) ??
+                512,
+              exporter: parsedExporter as LogRecordExporter,
+            },
+          };
 
-              config.logger_provider.processors.push(batchConfig);
-            }
-          } else if (processorType === 'simple') {
-            const element = loggerProvider['processors'][i]['simple'];
-            if (element) {
-              const parsedExporter = parseConfigSpanOrLogRecordExporter(
-                element['exporter'],
-                ProviderType.LOGGER
-              );
-              const simpleConfig: LogRecordProcessor = {
-                simple: {
-                  exporter: parsedExporter,
-                },
-              };
+          config.logger_provider.processors.push(batchConfig);
+        }
+      } else if (processorType === 'simple') {
+        const element = loggerProvider['processors'][i]['simple'];
+        if (element) {
+          const parsedExporter = parseConfigSpanOrLogRecordExporter(
+            element['exporter'],
+            ProviderType.LOGGER
+          );
+          const simpleConfig: LogRecordProcessor = {
+            simple: {
+              exporter: parsedExporter,
+            },
+          };
 
-              config.logger_provider.processors.push(simpleConfig);
-            }
-          }
+          config.logger_provider.processors.push(simpleConfig);
         }
       }
     }
@@ -1183,5 +1173,7 @@ export function setLoggerProvider(
           loggers;
       }
     }
+  } else if (loggerProvider && loggerProvider.processors == null) {
+    diag.warn('LoggerProvider must have at least one processor configured');
   }
 }
