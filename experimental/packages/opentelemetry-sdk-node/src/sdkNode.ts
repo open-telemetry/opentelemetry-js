@@ -17,7 +17,7 @@ import {
   ConfigFactory,
   createConfigFactory,
 } from '@opentelemetry/configuration';
-import { NodeSDKConfiguration } from './types';
+import { SDKConfiguration } from './types';
 import { diag, DiagConsoleLogger } from '@opentelemetry/api';
 import { setupContextManager } from './utils';
 
@@ -26,7 +26,7 @@ import { setupContextManager } from './utils';
  * @param configurationSDK
  */
 export const startNodeSDK = (
-  configurationSDK: Partial<NodeSDKConfiguration> = {}
+  configurationSDK: Partial<SDKConfiguration> = {}
 ) => {
   const configFactory: ConfigFactory = createConfigFactory();
   const config = configFactory.getConfigModel();
