@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { startNodeSDK } from '../src/sdkNode';
+import { startNodeSDK } from '../src/start';
 import { context, diag } from '@opentelemetry/api';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import * as Sinon from 'sinon';
