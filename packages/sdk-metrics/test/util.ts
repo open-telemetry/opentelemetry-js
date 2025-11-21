@@ -35,7 +35,6 @@ import {
   DataPointType,
   ScopeMetrics,
 } from '../src/export/MetricData';
-import { isNotNullish } from '../src/utils';
 import { HrTime } from '@opentelemetry/api';
 import { Histogram } from '../src/aggregator/types';
 import { AggregationTemporality } from '../src/export/AggregationTemporality';
@@ -110,10 +109,10 @@ export function assertMetricData(
   if (metricDescriptor != null) {
     assertPartialDeepStrictEqual(it.descriptor, metricDescriptor);
   }
-  if (isNotNullish(dataPointType)) {
+  if (dataPointType != null) {
     assert.strictEqual(it.dataPointType, dataPointType);
   } else {
-    assert.ok(isNotNullish(DataPointType[it.dataPointType]));
+    assert.ok(DataPointType[it.dataPointType] != null);
   }
   if (aggregationTemporality != null) {
     assert.strictEqual(aggregationTemporality, it.aggregationTemporality);
