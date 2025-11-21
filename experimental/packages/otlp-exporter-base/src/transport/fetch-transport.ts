@@ -18,7 +18,8 @@ import { IExporterTransport } from '../exporter-transport';
 import { ExportResponse } from '../export-response';
 import { diag } from '@opentelemetry/api';
 import {
-  isExportRetryable,
+  isExportHTTPErrorRetryable,
+  isExportNetworkErrorRetryable,
   parseRetryAfterToMills,
 } from '../is-export-retryable';
 import { HeadersFactory } from '../configuration/otlp-http-configuration';
@@ -53,7 +54,7 @@ class FetchTransport implements IExporterTransport {
       if (response.status >= 200 && response.status <= 299) {
         diag.debug('response success');
         return { status: 'success' };
-      } else if (isExportRetryable(response.status)) {
+      } else if (isExportHTTPErrorRetryable(response.status)) {
         const retryAfter = response.headers.get('Retry-After');
         const retryInMillis = parseRetryAfterToMills(retryAfter);
         return { status: 'retryable', retryInMillis };
@@ -63,10 +64,10 @@ class FetchTransport implements IExporterTransport {
         error: new Error('Fetch request failed with non-retryable status'),
       };
     } catch (error) {
-      if (error?.name === 'AbortError') {
+      if (isExportNetworkErrorRetryable(error)) {
         return {
-          status: 'failure',
-          error: new Error('Fetch request timed out', { cause: error }),
+          status: 'retryable',
+          retryInMillis: 0,
         };
       }
       return {
