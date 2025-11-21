@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1763744656548,
+  "lastUpdate": 1763766987409,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -45452,6 +45452,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.60%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marylia.gutierrez@grafana.com",
+            "name": "Marylia Gutierrez",
+            "username": "maryliag"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "169223defd770942b9a47fcaa9c07c503a1fb6c3",
+          "message": "feat(opentelemetry-sdk-node): set instrumentation and propagators for experimental start (#6148)\n\nCo-authored-by: Jamie Danielson <jamiedanielson@honeycomb.io>",
+          "timestamp": "2025-11-21T23:05:48Z",
+          "tree_id": "a1e24fccc17e1aca2126b8fd897c810ba106b600",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/169223defd770942b9a47fcaa9c07c503a1fb6c3"
+        },
+        "date": 1763766986372,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 650469,
+            "range": "±0.70%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 7763,
+            "range": "±0.82%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 297019,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 291463,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
