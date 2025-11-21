@@ -264,28 +264,19 @@ export function getPropagatorFromConfiguration(
 
   // Values MUST be deduplicated in order to register a Propagator only once.
   const uniquePropagatorNames = Array.from(new Set(propagatorsValue));
+  const validPropagators: TextMapPropagator[] = [];
 
-  const propagators = uniquePropagatorNames.map(name => {
+  uniquePropagatorNames.forEach(name => {
     const propagator = propagatorsFactory.get(name)?.();
     if (!propagator) {
       diag.warn(
         `Propagator "${name}" requested through configuration is unavailable.`
       );
-      return undefined;
+      return;
     }
 
-    return propagator;
+    validPropagators.push(propagator);
   });
-
-  const validPropagators = propagators.reduce<TextMapPropagator[]>(
-    (list, item) => {
-      if (item) {
-        list.push(item);
-      }
-      return list;
-    },
-    []
-  );
 
   if (validPropagators.length === 0) {
     // null to signal that the default should **not** be used in its place.
