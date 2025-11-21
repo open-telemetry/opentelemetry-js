@@ -30,6 +30,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :house: Internal
 
 * refactor(opentelemetry-sdk-node): simplify calculation of traceExportersList [#6132](https://github.com/open-telemetry/opentelemetry-js/pull/6132) @cjihrig
+* refactor(instrumentation): combine filter() calls in \_onRequire [#6142](https://github.com/open-telemetry/opentelemetry-js/pull/6142) @cjihrig
 
 ## 0.208.0
 
