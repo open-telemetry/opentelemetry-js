@@ -259,6 +259,12 @@ export function setupContextManager(
   context.setGlobalContextManager(contextManager);
 }
 
+export function setupDefaultContextManager() {
+  const defaultContextManager = new AsyncLocalStorageContextManager();
+  defaultContextManager.enable();
+  context.setGlobalContextManager(defaultContextManager);
+}
+
 export function setupPropagator(
   propagator: TextMapPropagator | null | undefined
 ) {

@@ -51,7 +51,3 @@ export interface NodeSDKConfiguration {
   spanLimits: SpanLimits;
   idGenerator: IdGenerator;
 }
-
-export interface SDKOptions {
-  contextManager: ContextManager | null;
-}

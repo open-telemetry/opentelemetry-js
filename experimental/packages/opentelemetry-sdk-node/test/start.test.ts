@@ -20,7 +20,7 @@ import { context, diag } from '@opentelemetry/api';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import * as Sinon from 'sinon';
 
-describe('startNodeSDK', () => {
+describe('startNodeSDK', function () {
   const _origEnvVariables = { ...process.env };
 
   afterEach(function () {
