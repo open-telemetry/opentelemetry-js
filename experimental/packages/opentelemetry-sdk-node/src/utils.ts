@@ -246,9 +246,6 @@ export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
 export function getPropagatorFromConfigFactory(
   config: ConfigurationModel
 ): TextMapPropagator | null | undefined {
-  // Empty and undefined MUST be treated equal.
-  // const propagatorsEnvVarValue = getStringListFromEnv('OTEL_PROPAGATORS');
-
   const propagatorsValue = getKeyListFromObjectArray(
     config.propagator?.composite
   );
