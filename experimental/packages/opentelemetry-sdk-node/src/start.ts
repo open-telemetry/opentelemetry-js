@@ -17,20 +17,22 @@ import {
   ConfigFactory,
   createConfigFactory,
 } from '@opentelemetry/configuration';
-import { SDKOptions } from './types';
 import { diag, DiagConsoleLogger } from '@opentelemetry/api';
 import {
   getPropagatorFromConfigFactory,
-  setupContextManager,
+  setupDefaultContextManager,
   setupPropagator,
 } from './utils';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
+import type { SDKOptions } from './types';
 
 /**
- * Experimental function to start the OpenTelemetry Node SDK
+ * @experimental Function to start the OpenTelemetry Node SDK
  * @param sdkOptions
  */
-export const startNodeSDK = (sdkOptions: Partial<SDKOptions> = {}) => {
+export function startNodeSDK(sdkOptions: SDKOptions): {
+  shutdown: () => Promise<void>;
+} {
   const configFactory: ConfigFactory = createConfigFactory();
   const config = configFactory.getConfigModel();
 
@@ -45,7 +47,7 @@ export const startNodeSDK = (sdkOptions: Partial<SDKOptions> = {}) => {
   registerInstrumentations({
     instrumentations: sdkOptions?.instrumentations?.flat() ?? [],
   });
-  setupContextManager(sdkOptions?.contextManager);
+  setupDefaultContextManager();
   setupPropagator(
     sdkOptions?.textMapPropagator === null
       ? null // null means don't set.
@@ -58,8 +60,7 @@ export const startNodeSDK = (sdkOptions: Partial<SDKOptions> = {}) => {
     await Promise.all(promises);
   };
   return { shutdown: shutdownFn };
-};
-
+}
 const NOOP_SDK = {
-  shutdown: () => {},
+  shutdown: async () => {},
 };
