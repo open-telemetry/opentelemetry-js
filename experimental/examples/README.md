@@ -7,7 +7,7 @@ This directory contains examples of how to run real applications with OpenTeleme
 These examples are using work in progress metrics packages.
 
 | Name                      | Description                                                                      | Complexity Level |
-|---------------------------|----------------------------------------------------------------------------------|------------------|
+| ------------------------- | -------------------------------------------------------------------------------- | ---------------- |
 | [prometheus](prometheus/) | Basic Metric use with Prometheus (`@opentelemetry/exporter-prometheus`) Exporter | Beginner         |
 
 ## Contributing

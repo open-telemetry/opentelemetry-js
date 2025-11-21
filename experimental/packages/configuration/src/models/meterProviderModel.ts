@@ -23,24 +23,7 @@ import {
 
 export function initializeDefaultMeterProviderConfiguration(): MeterProvider {
   return {
-    readers: [
-      {
-        periodic: {
-          interval: 60000,
-          timeout: 30000,
-          exporter: {
-            otlp_http: {
-              endpoint: 'http://localhost:4318/v1/metrics',
-              timeout: 10000,
-              temporality_preference: ExporterTemporalityPreference.Cumulative,
-              default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
-              encoding: OtlpHttpEncoding.Protobuf,
-            },
-          },
-        },
-      },
-    ],
+    readers: [],
     exemplar_filter: ExemplarFilter.TraceBased,
   };
 }
