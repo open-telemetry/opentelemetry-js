@@ -18,29 +18,12 @@
 import {
   OtlpFileExporter,
   OtlpGrpcExporter,
-  OtlpHttpEncoding,
   OtlpHttpExporter,
 } from './commonModel';
 
 export function initializeDefaultTracerProviderConfiguration(): TracerProvider {
   return {
-    processors: [
-      {
-        batch: {
-          schedule_delay: 5000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
-          exporter: {
-            otlp_http: {
-              endpoint: 'http://localhost:4318/v1/traces',
-              timeout: 10000,
-              encoding: OtlpHttpEncoding.Protobuf,
-            },
-          },
-        },
-      },
-    ],
+    processors: [],
     limits: {
       attribute_count_limit: 128,
       event_count_limit: 128,
