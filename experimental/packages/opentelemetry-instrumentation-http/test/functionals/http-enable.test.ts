@@ -942,24 +942,29 @@ describe('HttpInstrumentation', () => {
 
       it('should have 2 ended span when client prematurely close', async () => {
         const promise = new Promise<void>(resolve => {
+          function waitForSpans() {
+            const numSpans = memoryExporter.getFinishedSpans().length;
+
+            if (numSpans < 2) {
+              setTimeout(waitForSpans, 1);
+            } else if (numSpans > 2) {
+              throw new Error(`too many spans: ${numSpans}`);
+            } else {
+              resolve();
+            }
+          }
+
           const req = http.get(
             `${protocol}://${hostname}:${serverPort}/hang`,
             res => {
-              res.on('close', () => {});
+              res.on('close', waitForSpans);
               res.on('error', () => {});
+              // Close the socket.
+              req.destroy();
             }
           );
-          // close the socket.
-          setTimeout(() => {
-            req.destroy();
-          }, 10);
 
           req.on('error', () => {});
-
-          req.on('close', () => {
-            // yield to server to end the span.
-            setTimeout(resolve, 10);
-          });
         });
 
         await promise;
