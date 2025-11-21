@@ -19,7 +19,12 @@ import {
 } from '@opentelemetry/configuration';
 import { SDKOptions } from './types';
 import { diag, DiagConsoleLogger } from '@opentelemetry/api';
-import { setupContextManager } from './utils';
+import {
+  getPropagatorFromConfigFactory,
+  setupContextManager,
+  setupPropagator,
+} from './utils';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
 /**
  * Experimental function to start the OpenTelemetry Node SDK
@@ -37,7 +42,16 @@ export const startNodeSDK = (sdkOptions: Partial<SDKOptions> = {}) => {
     diag.setLogger(new DiagConsoleLogger(), { logLevel: config.log_level });
   }
 
+  registerInstrumentations({
+    instrumentations: sdkOptions?.instrumentations?.flat() ?? [],
+  });
   setupContextManager(sdkOptions?.contextManager);
+  setupPropagator(
+    sdkOptions?.textMapPropagator === null
+      ? null // null means don't set.
+      : (sdkOptions?.textMapPropagator ??
+          getPropagatorFromConfigFactory(config))
+  );
 
   const shutdownFn = async () => {
     const promises: Promise<unknown>[] = [];

@@ -50,6 +50,7 @@ import {
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
+import { ConfigurationModel } from '@opentelemetry/configuration';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
@@ -239,6 +240,77 @@ export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
   }
 }
 
+/**
+ * Get a propagator as defined by configuration model from configuration factory
+ */
+export function getPropagatorFromConfigFactory(
+  config: ConfigurationModel
+): TextMapPropagator | null | undefined {
+  // Empty and undefined MUST be treated equal.
+  // const propagatorsEnvVarValue = getStringListFromEnv('OTEL_PROPAGATORS');
+
+  const propagatorsValue = getKeyListFromObjectArray(
+    config.propagator?.composite
+  );
+  if (propagatorsValue == null) {
+    // return undefined to fall back to default
+    return undefined;
+  }
+
+  if (propagatorsValue.includes('none')) {
+    return null;
+  }
+
+  // Implementation note: this only contains specification required propagators that are actually hosted in this repo.
+  // Any other propagators (like aws, aws-lambda, should go into `@opentelemetry/auto-configuration-propagators` instead).
+  const propagatorsFactory = new Map<string, () => TextMapPropagator>([
+    ['tracecontext', () => new W3CTraceContextPropagator()],
+    ['baggage', () => new W3CBaggagePropagator()],
+    ['b3', () => new B3Propagator()],
+    [
+      'b3multi',
+      () => new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
+    ],
+    ['jaeger', () => new JaegerPropagator()],
+  ]);
+
+  // Values MUST be deduplicated in order to register a Propagator only once.
+  const uniquePropagatorNames = Array.from(new Set(propagatorsValue));
+
+  const propagators = uniquePropagatorNames.map(name => {
+    const propagator = propagatorsFactory.get(name)?.();
+    if (!propagator) {
+      diag.warn(
+        `Propagator "${name}" requested through configuration is unavailable.`
+      );
+      return undefined;
+    }
+
+    return propagator;
+  });
+
+  const validPropagators = propagators.reduce<TextMapPropagator[]>(
+    (list, item) => {
+      if (item) {
+        list.push(item);
+      }
+      return list;
+    },
+    []
+  );
+
+  if (validPropagators.length === 0) {
+    // null to signal that the default should **not** be used in its place.
+    return null;
+  } else if (uniquePropagatorNames.length === 1) {
+    return validPropagators[0];
+  } else {
+    return new CompositePropagator({
+      propagators: validPropagators,
+    });
+  }
+}
+
 export function setupContextManager(
   contextManager: ContextManager | null | undefined
 ) {
@@ -281,4 +353,15 @@ export function setupPropagator(
   }
 
   propagation.setGlobalPropagator(propagator);
+}
+
+export function getKeyListFromObjectArray(
+  obj: object[] | undefined
+): string[] | undefined {
+  if (!obj || obj.length === 0) {
+    return undefined;
+  }
+  return obj
+    .map(item => Object.keys(item))
+    .reduce((prev, curr) => prev.concat(curr), []);
 }

@@ -54,4 +54,6 @@ export interface NodeSDKConfiguration {
 
 export interface SDKOptions {
   contextManager: ContextManager | null;
+  instrumentations: (Instrumentation | Instrumentation[])[];
+  textMapPropagator: TextMapPropagator | null;
 }
