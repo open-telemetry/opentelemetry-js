@@ -17,7 +17,7 @@
 import {
   getPropagatorFromEnv,
   getKeyListFromObjectArray,
-  getPropagatorFromConfigFactory,
+  getPropagatorFromConfiguration,
 } from '../src/utils';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -113,7 +113,7 @@ describe('getPropagatorFromConfigFactory', function () {
   });
 
   it('when not defined', function () {
-    const propagator = getPropagatorFromConfigFactory({});
+    const propagator = getPropagatorFromConfiguration({});
     assert.deepStrictEqual(propagator, undefined);
   });
 
@@ -121,7 +121,7 @@ describe('getPropagatorFromConfigFactory', function () {
     const config: ConfigurationModel = {
       propagator: { composite: [{ tracecontext: undefined }] },
     };
-    assert.deepStrictEqual(getPropagatorFromConfigFactory(config)?.fields(), [
+    assert.deepStrictEqual(getPropagatorFromConfiguration(config)?.fields(), [
       'traceparent',
       'tracestate',
     ]);
@@ -139,7 +139,7 @@ describe('getPropagatorFromConfigFactory', function () {
         ],
       },
     };
-    assert.deepStrictEqual(getPropagatorFromConfigFactory(config)?.fields(), [
+    assert.deepStrictEqual(getPropagatorFromConfiguration(config)?.fields(), [
       'traceparent',
       'tracestate',
       'baggage',
@@ -164,7 +164,7 @@ describe('getPropagatorFromConfigFactory', function () {
         ],
       },
     };
-    assert.deepStrictEqual(getPropagatorFromConfigFactory(config), null);
+    assert.deepStrictEqual(getPropagatorFromConfiguration(config), null);
     sinon.assert.calledWithExactly(
       warnStub,
       'Propagator "my" requested through configuration is unavailable.'
@@ -187,7 +187,7 @@ describe('getPropagatorFromConfigFactory', function () {
       },
     };
 
-    assert.deepStrictEqual(getPropagatorFromConfigFactory(config), null);
+    assert.deepStrictEqual(getPropagatorFromConfiguration(config), null);
   });
 });
 

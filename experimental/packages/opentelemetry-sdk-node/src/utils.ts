@@ -232,9 +232,9 @@ export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
 }
 
 /**
- * Get a propagator as defined by configuration model from configuration factory
+ * Get a propagator as defined by configuration model from configuration
  */
-export function getPropagatorFromConfigFactory(
+export function getPropagatorFromConfiguration(
   config: ConfigurationModel
 ): TextMapPropagator | null | undefined {
   const propagatorsValue = getKeyListFromObjectArray(

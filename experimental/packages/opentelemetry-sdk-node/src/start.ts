@@ -19,7 +19,7 @@ import {
 } from '@opentelemetry/configuration';
 import { diag, DiagConsoleLogger } from '@opentelemetry/api';
 import {
-  getPropagatorFromConfigFactory,
+  getPropagatorFromConfiguration,
   setupDefaultContextManager,
   setupPropagator,
 } from './utils';
@@ -52,7 +52,7 @@ export function startNodeSDK(sdkOptions: SDKOptions): {
     sdkOptions?.textMapPropagator === null
       ? null // null means don't set.
       : (sdkOptions?.textMapPropagator ??
-          getPropagatorFromConfigFactory(config))
+          getPropagatorFromConfiguration(config))
   );
 
   const shutdownFn = async () => {
