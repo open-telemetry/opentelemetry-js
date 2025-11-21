@@ -552,7 +552,11 @@ export function setTracerProvider(
         }
       }
     }
-  } else if (tracerProvider && (tracerProvider.processors == null || tracerProvider.processors.length === 0)) {
+  } else if (
+    tracerProvider &&
+    (tracerProvider.processors == null ||
+      tracerProvider.processors.length === 0)
+  ) {
     diag.warn('TracerProvider must have at least one processor configured');
   }
 }
@@ -1045,7 +1049,10 @@ export function setMeterProvider(
         config.meter_provider.views.push(view);
       }
     }
-  } else if (meterProvider && (meterProvider.readers == null || meterProvider.readers.length === 0)) {
+  } else if (
+    meterProvider &&
+    (meterProvider.readers == null || meterProvider.readers.length === 0)
+  ) {
     diag.warn('MeterProvider must have at least one reader configured');
   }
 }
@@ -1173,7 +1180,11 @@ export function setLoggerProvider(
           loggers;
       }
     }
-  } else if (loggerProvider && (loggerProvider.processors == null || loggerProvider.processors.length === 0)) {
+  } else if (
+    loggerProvider &&
+    (loggerProvider.processors == null ||
+      loggerProvider.processors.length === 0)
+  ) {
     diag.warn('LoggerProvider must have at least one processor configured');
   }
 }
