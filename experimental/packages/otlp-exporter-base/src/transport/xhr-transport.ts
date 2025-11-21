@@ -18,7 +18,7 @@ import { IExporterTransport } from '../exporter-transport';
 import { ExportResponse } from '../export-response';
 import { diag } from '@opentelemetry/api';
 import {
-  isExportRetryable,
+  isExportHTTPErrorRetryable,
   parseRetryAfterToMills,
 } from '../is-export-retryable';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -49,8 +49,8 @@ class XhrTransport implements IExporterTransport {
 
       xhr.ontimeout = _ => {
         resolve({
-          status: 'failure',
-          error: new Error('XHR request timed out'),
+          status: 'retryable',
+          retryInMillis: 0,
         });
       };
 
@@ -60,7 +60,7 @@ class XhrTransport implements IExporterTransport {
           resolve({
             status: 'success',
           });
-        } else if (xhr.status && isExportRetryable(xhr.status)) {
+        } else if (xhr.status && isExportHTTPErrorRetryable(xhr.status)) {
           resolve({
             status: 'retryable',
             retryInMillis: parseRetryAfterToMills(
@@ -82,9 +82,10 @@ class XhrTransport implements IExporterTransport {
         });
       };
       xhr.onerror = () => {
+        // XHR onerror typically indicates network failures which are retryable
         resolve({
-          status: 'failure',
-          error: new Error('XHR request errored'),
+          status: 'retryable',
+          retryInMillis: 0,
         });
       };
 

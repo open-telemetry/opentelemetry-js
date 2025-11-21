@@ -15,7 +15,11 @@
  */
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import { parseRetryAfterToMills } from '../../src/is-export-retryable';
+import {
+  isExportHTTPErrorRetryable,
+  isExportNetworkErrorRetryable,
+  parseRetryAfterToMills,
+} from '../../src/is-export-retryable';
 
 describe('parseRetryAfterToMills', function () {
   // now: 2023-01-20T00:00:00.000Z
@@ -42,4 +46,96 @@ describe('parseRetryAfterToMills', function () {
       assert.strictEqual(parseRetryAfterToMills(value), expect);
     });
   }
+});
+
+describe('isExportHTTPErrorRetryable', function () {
+  it('should return true for retryable status codes', function () {
+    assert.strictEqual(isExportHTTPErrorRetryable(429), true);
+    assert.strictEqual(isExportHTTPErrorRetryable(502), true);
+    assert.strictEqual(isExportHTTPErrorRetryable(503), true);
+    assert.strictEqual(isExportHTTPErrorRetryable(504), true);
+  });
+
+  it('should return false for non-retryable status codes', function () {
+    assert.strictEqual(isExportHTTPErrorRetryable(200), false);
+    assert.strictEqual(isExportHTTPErrorRetryable(201), false);
+    assert.strictEqual(isExportHTTPErrorRetryable(400), false);
+    assert.strictEqual(isExportHTTPErrorRetryable(401), false);
+    assert.strictEqual(isExportHTTPErrorRetryable(404), false);
+    assert.strictEqual(isExportHTTPErrorRetryable(500), false);
+  });
+});
+
+describe('isExportNetworkErrorRetryable', function () {
+  it('should return false for AbortError', function () {
+    const error = new Error('The operation was aborted');
+    error.name = 'AbortError';
+    assert.strictEqual(isExportNetworkErrorRetryable(error), false);
+  });
+
+  it('should return true for Node.js system errors with error.code', function () {
+    const retryableCodes = [
+      'ECONNRESET',
+      'ECONNREFUSED',
+      'EPIPE',
+      'ETIMEDOUT',
+      'EAI_AGAIN',
+      'ENOTFOUND',
+      'ENETUNREACH',
+      'EHOSTUNREACH',
+    ];
+
+    for (const code of retryableCodes) {
+      const error = new Error('Network error') as any;
+      error.code = code;
+      assert.strictEqual(
+        isExportNetworkErrorRetryable(error),
+        true,
+        `Expected ${code} to be retryable`
+      );
+    }
+  });
+
+  it('should return true for undici errors wrapped in TypeError', function () {
+    const undiciCodes = [
+      'UND_ERR_CONNECT_TIMEOUT',
+      'UND_ERR_HEADERS_TIMEOUT',
+      'UND_ERR_BODY_TIMEOUT',
+      'UND_ERR_SOCKET',
+    ];
+
+    for (const code of undiciCodes) {
+      const cause = new Error('Undici error') as any;
+      cause.code = code;
+      const error = new TypeError('fetch failed', { cause });
+      assert.strictEqual(
+        isExportNetworkErrorRetryable(error),
+        true,
+        `Expected ${code} to be retryable`
+      );
+    }
+  });
+
+  it('should return true for browser fetch TypeError without cause', function () {
+    // Browser fetch throws TypeError for network errors without cause
+    const error = new TypeError('Failed to fetch');
+    assert.strictEqual(isExportNetworkErrorRetryable(error), true);
+  });
+
+  it('should return false for TypeError with non-retryable cause', function () {
+    const cause = new Error('Invalid argument');
+    const error = new TypeError('fetch failed', { cause });
+    assert.strictEqual(isExportNetworkErrorRetryable(error), false);
+  });
+
+  it('should return false for non-network errors', function () {
+    const error = new Error('Some other error');
+    assert.strictEqual(isExportNetworkErrorRetryable(error), false);
+  });
+
+  it('should return false for errors with non-retryable codes', function () {
+    const error = new Error('Invalid argument') as NodeJS.ErrnoException;
+    error.code = 'ERR_INVALID_ARG';
+    assert.strictEqual(isExportNetworkErrorRetryable(error), false);
+  });
 });

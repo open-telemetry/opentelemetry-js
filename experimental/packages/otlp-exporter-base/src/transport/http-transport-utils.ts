@@ -19,7 +19,8 @@ import * as zlib from 'zlib';
 import { Readable } from 'stream';
 import { ExportResponse } from '../export-response';
 import {
-  isExportRetryable,
+  isExportHTTPErrorRetryable,
+  isExportNetworkErrorRetryable,
   parseRetryAfterToMills,
 } from '../is-export-retryable';
 import { OTLPExporterError } from '../types';
@@ -74,7 +75,7 @@ export function sendWithHttp(
           status: 'success',
           data: Buffer.concat(responseData),
         });
-      } else if (res.statusCode && isExportRetryable(res.statusCode)) {
+      } else if (res.statusCode && isExportHTTPErrorRetryable(res.statusCode)) {
         onDone({
           status: 'retryable',
           retryInMillis: parseRetryAfterToMills(res.headers['retry-after']),
@@ -96,16 +97,23 @@ export function sendWithHttp(
   req.setTimeout(timeoutMillis, () => {
     req.destroy();
     onDone({
-      status: 'failure',
-      error: new Error('Request Timeout'),
+      status: 'retryable',
+      retryInMillis: 0,
     });
   });
 
   req.on('error', (error: Error) => {
-    onDone({
-      status: 'failure',
-      error,
-    });
+    if (isExportNetworkErrorRetryable(error)) {
+      onDone({
+        status: 'retryable',
+        retryInMillis: 0,
+      });
+    } else {
+      onDone({
+        status: 'failure',
+        error,
+      });
+    }
   });
 
   compressAndSend(req, compression, data, (error: Error) => {

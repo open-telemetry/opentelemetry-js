@@ -195,7 +195,7 @@ describe('HttpExporterTransport', function () {
       );
     });
 
-    it('returns failure when request times out', function (done) {
+    it('returns retryable when request times out', function (done) {
       // arrange
       const timer = sinon.useFakeTimers();
       server = http.createServer((_, res) => {
@@ -218,10 +218,10 @@ describe('HttpExporterTransport', function () {
         .send(sampleRequestData, 100)
         .then(result => {
           // assert
-          assert.strictEqual(result.status, 'failure');
+          assert.strictEqual(result.status, 'retryable');
           assert.strictEqual(
-            (result as ExportResponseFailure).error.message,
-            'Request Timeout'
+            (result as ExportResponseRetryable).retryInMillis,
+            0
           );
           done();
         })
@@ -232,7 +232,7 @@ describe('HttpExporterTransport', function () {
       timer.tick(200);
     });
 
-    it('returns failure when socket hangs up', async function () {
+    it('returns retryable when socket hangs up', async function () {
       // arrange
       server = http.createServer((_, res) => {
         res.destroy();
@@ -250,14 +250,11 @@ describe('HttpExporterTransport', function () {
       const result = await transport.send(sampleRequestData, 100);
 
       // assert
-      assert.strictEqual(result.status, 'failure');
-      assert.strictEqual(
-        (result as ExportResponseFailure).error.message,
-        'socket hang up'
-      );
+      assert.strictEqual(result.status, 'retryable');
+      assert.strictEqual((result as ExportResponseRetryable).retryInMillis, 0);
     });
 
-    it('returns failure when server does not exist', async function () {
+    it('returns retryable when server does not exist', async function () {
       // arrange
       const transport = createHttpExporterTransport({
         // use wrong port
@@ -271,11 +268,8 @@ describe('HttpExporterTransport', function () {
       const result = await transport.send(sampleRequestData, 100);
 
       // assert
-      assert.strictEqual(result.status, 'failure');
-      assert.strictEqual(
-        (result as ExportResponseFailure).error.message,
-        'getaddrinfo ENOTFOUND example.test'
-      );
+      assert.strictEqual(result.status, 'retryable');
+      assert.strictEqual((result as ExportResponseRetryable).retryInMillis, 0);
     });
 
     it('passes uncompressed input to server', function (done) {
