@@ -165,7 +165,9 @@ function setupLoggerProvider(
   return undefined;
 }
 
-function getExporterType(exporter: LogRecordExporterModel): LogRecordExporter {
+function getLogRecordExporter(
+  exporter: LogRecordExporterModel
+): LogRecordExporter {
   if (exporter.otlp_http) {
     if (exporter.otlp_http.encoding === 'json') {
       return new OTLPHttpLogExporter({
@@ -196,17 +198,22 @@ function getLogRecordProcessorsFromConfiguration(
   config.logger_provider?.processors?.forEach(processor => {
     if (processor.batch) {
       logRecordProcessors.push(
-        new BatchLogRecordProcessor(getExporterType(processor.batch.exporter), {
-          maxQueueSize: processor.batch.max_queue_size,
-          maxExportBatchSize: processor.batch.max_export_batch_size,
-          scheduledDelayMillis: processor.batch.schedule_delay,
-          exportTimeoutMillis: processor.batch.export_timeout,
-        })
+        new BatchLogRecordProcessor(
+          getLogRecordExporter(processor.batch.exporter),
+          {
+            maxQueueSize: processor.batch.max_queue_size,
+            maxExportBatchSize: processor.batch.max_export_batch_size,
+            scheduledDelayMillis: processor.batch.schedule_delay,
+            exportTimeoutMillis: processor.batch.export_timeout,
+          }
+        )
       );
     }
     if (processor.simple) {
       logRecordProcessors.push(
-        new SimpleLogRecordProcessor(getExporterType(processor.simple.exporter))
+        new SimpleLogRecordProcessor(
+          getLogRecordExporter(processor.simple.exporter)
+        )
       );
     }
   });
