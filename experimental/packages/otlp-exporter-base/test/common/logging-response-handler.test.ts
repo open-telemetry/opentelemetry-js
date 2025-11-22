@@ -15,7 +15,7 @@
  */
 import { createLoggingPartialSuccessResponseHandler } from '../../src/logging-response-handler';
 import * as sinon from 'sinon';
-import { IExportTraceServiceResponse } from '@opentelemetry/otlp-transformer';
+import { IExportTraceServiceResponse } from '@opentelemetry/otlp-transformer/trace';
 import { registerMockDiagLogger } from './test-utils';
 
 describe('loggingResponseHandler', function () {
