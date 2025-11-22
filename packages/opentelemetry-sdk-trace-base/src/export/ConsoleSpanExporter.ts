@@ -22,6 +22,22 @@ import {
   hrTimeToMicroseconds,
 } from '@opentelemetry/core';
 
+function log(payload: unknown): void {
+  let serialized: string;
+  try {
+    serialized = JSON.stringify(
+      payload,
+      (_key, value) => (value === undefined ? null : value),
+      2
+    );
+  } catch {
+    serialized = String(payload);
+  }
+
+  /* eslint-disable-next-line no-console */
+  console.log(serialized);
+}
+
 /**
  * This is implementation of {@link SpanExporter} that prints spans to the
  * console. This class can be used for diagnostic purposes.
@@ -93,7 +109,7 @@ export class ConsoleSpanExporter implements SpanExporter {
     done?: (result: ExportResult) => void
   ): void {
     for (const span of spans) {
-      console.dir(this._exportInfo(span), { depth: 3 });
+      log(this._exportInfo(span));
     }
     if (done) {
       return done({ code: ExportResultCode.SUCCESS });
