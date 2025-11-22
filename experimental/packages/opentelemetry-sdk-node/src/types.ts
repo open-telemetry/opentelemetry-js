@@ -55,6 +55,11 @@ export interface NodeSDKConfiguration {
  * @experimental Options for new experimental SDK setup
  */
 export interface SDKOptions {
+  autoDetectResources?: boolean;
   instrumentations?: (Instrumentation | Instrumentation[])[];
+  logRecordProcessors?: LogRecordProcessor[];
+  resource?: Resource;
+  resourceDetectors?: ResourceDetector[];
+  serviceName?: string;
   textMapPropagator?: TextMapPropagator | null;
 }

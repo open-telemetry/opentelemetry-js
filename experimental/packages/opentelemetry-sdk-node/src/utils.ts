@@ -91,6 +91,37 @@ export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   });
 }
 
+export function getResourceDetectorsFromConfiguration(
+  config: ConfigurationModel
+): Array<ResourceDetector> {
+  // When updating this list, make sure to also update the section `resourceDetectors` on README.
+  const resourceDetectors = new Map<string, ResourceDetector>([
+    [RESOURCE_DETECTOR_ENVIRONMENT, envDetector],
+    [RESOURCE_DETECTOR_HOST, hostDetector],
+    [RESOURCE_DETECTOR_OS, osDetector],
+    [RESOURCE_DETECTOR_SERVICE_INSTANCE_ID, serviceInstanceIdDetector],
+    [RESOURCE_DETECTOR_PROCESS, processDetector],
+  ]);
+
+  const resourceDetectorsFromConfig = config.node_resource_detectors ?? ['all'];
+
+  if (resourceDetectorsFromConfig.includes('all')) {
+    return [...resourceDetectors.values()].flat();
+  }
+
+  if (resourceDetectorsFromConfig.includes('none')) {
+    return [];
+  }
+
+  return resourceDetectorsFromConfig.flatMap(detector => {
+    const resourceDetector = resourceDetectors.get(detector);
+    if (!resourceDetector) {
+      diag.warn(`Invalid resource detector "${detector}" specified`);
+    }
+    return resourceDetector || [];
+  });
+}
+
 export function getOtlpProtocolFromEnv(): string {
   return (
     getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL') ??
