@@ -36,7 +36,7 @@ describe('startNodeSDK', function () {
   it('should return NOOP_SDK when disabled is true', () => {
     const info = Sinon.spy(diag, 'info');
     process.env.OTEL_SDK_DISABLED = 'true';
-    const sdk = startNodeSDK();
+    const sdk = startNodeSDK({});
 
     Sinon.assert.calledWith(info, 'OpenTelemetry SDK is disabled');
 
@@ -46,7 +46,7 @@ describe('startNodeSDK', function () {
   it('should return NOOP_SDK when disabled is true', () => {
     process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
       'test/fixtures/kitchen-sink.yaml';
-    const sdk = startNodeSDK();
+    const sdk = startNodeSDK({});
 
     assertDefaultContextManagerRegistered();
 
