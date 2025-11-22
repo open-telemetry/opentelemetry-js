@@ -598,7 +598,7 @@ describe('HttpsInstrumentation', () => {
             }
           );
           req.setTimeout(10, () => {
-            req.abort();
+            req.destroy();
           });
           // Instrumentation should not swallow error event.
           assert.strictEqual(req.listeners('error').length, 0);
