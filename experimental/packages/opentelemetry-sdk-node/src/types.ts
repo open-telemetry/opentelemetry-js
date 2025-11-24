@@ -51,3 +51,10 @@ export interface NodeSDKConfiguration {
   spanLimits: SpanLimits;
   idGenerator: IdGenerator;
 }
+/**
+ * @experimental Options for new experimental SDK setup
+ */
+export interface SDKOptions {
+  instrumentations?: (Instrumentation | Instrumentation[])[];
+  textMapPropagator?: TextMapPropagator | null;
+}
