@@ -35,6 +35,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * test(instrumentation-http): make timing dependent test more robust [#6144](https://github.com/open-telemetry/opentelemetry-js/pull/6144) @cjihrig
 * refactor(opentelemetry-sdk-node): simplify calculation of validPropagators [#6143](https://github.com/open-telemetry/opentelemetry-js/pull/6143) @cjihrig
 * test(instrumentation-http): replace uses of deprecated abort() [#6149](https://github.com/open-telemetry/opentelemetry-js/pull/6149) @cjihrig
+* refactor(configuration): simplify boolean check [#xxxx](https://github.com/open-telemetry/opentelemetry-js/pull/xxxx) @cjihrig
 
 ## 0.208.0
 
