@@ -106,7 +106,7 @@ export function parseConfigFile(config: ConfigurationModel) {
     supportedFileVersions.includes(parsedContent['file_format'])
   ) {
     const disabled = getBooleanFromConfigFile(parsedContent['disabled']);
-    if (disabled || disabled === false) {
+    if (disabled !== undefined) {
       config.disabled = disabled;
     }
 
