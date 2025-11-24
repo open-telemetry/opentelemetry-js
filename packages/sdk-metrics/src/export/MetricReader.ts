@@ -18,7 +18,7 @@ import * as api from '@opentelemetry/api';
 import { AggregationTemporality } from './AggregationTemporality';
 import { MetricProducer } from './MetricProducer';
 import { CollectionResult, InstrumentType } from './MetricData';
-import { callWithTimeout, FlatMap } from '../utils';
+import { callWithTimeout } from '../utils';
 import {
   CollectionOptions,
   ForceFlushOptions,
@@ -230,13 +230,12 @@ export abstract class MetricReader implements IMetricReader {
 
     // Merge the results, keeping the SDK's Resource
     const errors = sdkCollectionResults.errors.concat(
-      FlatMap(additionalCollectionResults, result => result.errors)
+      additionalCollectionResults.flatMap(result => result.errors)
     );
     const resource = sdkCollectionResults.resourceMetrics.resource;
     const scopeMetrics =
       sdkCollectionResults.resourceMetrics.scopeMetrics.concat(
-        FlatMap(
-          additionalCollectionResults,
+        additionalCollectionResults.flatMap(
           result => result.resourceMetrics.scopeMetrics
         )
       );
