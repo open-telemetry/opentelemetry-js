@@ -54,14 +54,11 @@ class AllowListProcessor implements IAttributesProcessor {
 
   process(incoming: Attributes, _context?: Context): Attributes {
     const filteredAttributes: Attributes = {};
-    Object.keys(incoming)
-      .filter(attributeName =>
-        this._allowedAttributeNames.includes(attributeName)
-      )
-      .forEach(
-        attributeName =>
-          (filteredAttributes[attributeName] = incoming[attributeName])
-      );
+    Object.keys(incoming).forEach(attributeName => {
+      if (this._allowedAttributeNames.includes(attributeName)) {
+        filteredAttributes[attributeName] = incoming[attributeName];
+      }
+    });
     return filteredAttributes;
   }
 }
@@ -71,14 +68,11 @@ class DenyListProcessor implements IAttributesProcessor {
 
   process(incoming: Attributes, _context?: Context): Attributes {
     const filteredAttributes: Attributes = {};
-    Object.keys(incoming)
-      .filter(
-        attributeName => !this._deniedAttributeNames.includes(attributeName)
-      )
-      .forEach(
-        attributeName =>
-          (filteredAttributes[attributeName] = incoming[attributeName])
-      );
+    Object.keys(incoming).forEach(attributeName => {
+      if (!this._deniedAttributeNames.includes(attributeName)) {
+        filteredAttributes[attributeName] = incoming[attributeName];
+      }
+    });
     return filteredAttributes;
   }
 }
