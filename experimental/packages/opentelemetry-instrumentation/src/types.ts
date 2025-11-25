@@ -62,10 +62,10 @@ export interface InstrumentationDelegate<
   ConfigType extends InstrumentationConfig = InstrumentationConfig,
 > {
   /** Instrumentation Name  */
-  name: string;
+  readonly name: string;
 
   /** Instrumentation Version  */
-  version: string;
+  readonly version: string;
 
   /** Method to set instrumentation config  */
   setConfig(config: ConfigType): void;
@@ -73,10 +73,16 @@ export interface InstrumentationDelegate<
   /** Method to get instrumentation config  */
   getConfig(): ConfigType; // TODO: is it necessary?
 
+  /** method to set the internal logger */
   setDiag(diag: DiagLogger): void;
-  setTracer(tracer: Tracer): void;
-  setMeter(meter: Meter): void; // this should handle update instruments
-  setLogger(logger: Logger): void;
+
+  // TODO: should be optional? sometimes a instrumentation does not use a tracer, meter, logger
+  /** method to set the tracer that will be used by the instrumentation */
+  setTracer?: (tracer: Tracer) => void;
+  /** method to set the meter that will be used by the instrumentation (updateInstruments!!!) */
+  setMeter?: (meter: Meter) => void;
+  /** method to set the logger that will be used by the instrumentation */
+  setLogger?: (logger: Logger) => void;
 
   /** Method to initialize instrumentation config  */
   init(shimmer: Shimmer): InstrumentationModuleDefinition[] | undefined;

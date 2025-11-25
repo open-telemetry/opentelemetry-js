@@ -68,9 +68,9 @@ export function createInstrumentation<T extends InstrumentationConfig>(
   const diagLogger = diag.createComponentLogger({ namespace: delegate.name });
   delegate.setConfig(delegateConfig);
   delegate.setDiag(diagLogger);
-  delegate.setTracer(trace.getTracer(delegate.name, delegate.version));
-  delegate.setMeter(metrics.getMeter(delegate.name, delegate.version));
-  delegate.setLogger(logs.getLogger(delegate.name, delegate.version));
+  delegate.setTracer?.(trace.getTracer(delegate.name, delegate.version));
+  delegate.setMeter?.(metrics.getMeter(delegate.name, delegate.version));
+  delegate.setLogger?.(logs.getLogger(delegate.name, delegate.version));
 
   // Keep the diagLogger
   set(delegate, _kOtDiag, diagLogger);
@@ -105,13 +105,17 @@ export function createInstrumentation<T extends InstrumentationConfig>(
       delegate.disable?.();
     },
     setTracerProvider(traceProv) {
-      delegate.setTracer(traceProv.getTracer(delegate.name, delegate.version));
+      delegate.setTracer?.(
+        traceProv.getTracer(delegate.name, delegate.version)
+      );
     },
     setMeterProvider(meterProv) {
-      delegate.setMeter(meterProv.getMeter(delegate.name, delegate.version));
+      delegate.setMeter?.(meterProv.getMeter(delegate.name, delegate.version));
     },
     setLoggerProvider(loggerProv) {
-      delegate.setLogger(loggerProv.getLogger(delegate.name, delegate.version));
+      delegate.setLogger?.(
+        loggerProv.getLogger(delegate.name, delegate.version)
+      );
     },
   } as Instrumentation<T>;
 }

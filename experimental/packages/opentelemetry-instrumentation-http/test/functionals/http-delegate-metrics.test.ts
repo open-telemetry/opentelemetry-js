@@ -187,7 +187,8 @@ describe('HttpInstrumentationDelegate - metrics', () => {
   describe('with semconv stability set to stable', () => {
     before(() => {
       // @ts-expect-error - accesing internal property not available in the type
-      instrumentation['_delegate']['_semconvStability'] = SemconvStability.STABLE;
+      instrumentation['_delegate']['_semconvStability'] =
+        SemconvStability.STABLE;
     });
 
     it('should add server/client duration metrics', async () => {
@@ -292,7 +293,8 @@ describe('HttpInstrumentationDelegate - metrics', () => {
   describe('with semconv stability set to duplicate', () => {
     before(() => {
       // @ts-expect-error - accesing internal property not available in the type
-      instrumentation['_delegate']['_semconvStability'] = SemconvStability.DUPLICATE;
+      instrumentation['_delegate']['_semconvStability'] =
+        SemconvStability.DUPLICATE;
     });
 
     it('should add server/client duration metrics', async () => {

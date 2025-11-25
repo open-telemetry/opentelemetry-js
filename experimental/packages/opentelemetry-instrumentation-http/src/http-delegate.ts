@@ -91,7 +91,6 @@ import {
   InstrumentationDelegate,
   Shimmer,
 } from '@opentelemetry/instrumentation/src/types';
-import { Logger } from '@opentelemetry/api-logs';
 
 type HeaderCapture = {
   client: {
@@ -112,8 +111,6 @@ class HttpInstrumentationDelegate
   private _config!: HttpInstrumentationConfig;
   private _diag!: DiagLogger;
   private _tracer!: Tracer;
-  // @ts-expect-error - unused for now
-  private _logger!: Logger;
 
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
@@ -137,10 +134,6 @@ class HttpInstrumentationDelegate
 
   setTracer(tracer: Tracer): void {
     this._tracer = tracer;
-  }
-
-  setLogger(logger: Logger): void {
-    this._logger = logger;
   }
 
   setMeter(meter: Meter) {

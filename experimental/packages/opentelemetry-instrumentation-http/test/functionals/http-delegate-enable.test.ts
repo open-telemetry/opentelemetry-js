@@ -67,7 +67,10 @@ import {
 import * as assert from 'assert';
 import * as nock from 'nock';
 import * as path from 'path';
-import { createHttpInstrumentation, HttpInstrumentationConfig } from '../../src';
+import {
+  createHttpInstrumentation,
+  HttpInstrumentationConfig,
+} from '../../src';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
