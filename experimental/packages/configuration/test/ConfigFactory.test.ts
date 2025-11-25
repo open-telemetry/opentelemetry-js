@@ -815,6 +815,27 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
+    it('OTEL_SERVICE_NAME takes precedence over service name value in OTEL_RESOURCE_ATTRIBUTES', function () {
+      process.env.OTEL_SERVICE_NAME = 'name-from-service-name';
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.name=name-from-attributes';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        resource: {
+          attributes: [
+            {
+              name: 'service.name',
+              value: 'name-from-service-name',
+              type: 'string',
+            },
+          ],
+          attributes_list: 'service.name=name-from-attributes',
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
     it('should return config with custom attribute_limits', function () {
       process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '100';
       process.env.OTEL_ATTRIBUTE_COUNT_LIMIT = '200';
