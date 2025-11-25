@@ -33,11 +33,14 @@ import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/expor
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import {
+  DetectedResourceAttributes,
   envDetector,
   hostDetector,
   osDetector,
   processDetector,
+  Resource,
   ResourceDetector,
+  resourceFromAttributes,
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import {
@@ -71,6 +74,22 @@ const RESOURCE_DETECTOR_HOST = 'host';
 const RESOURCE_DETECTOR_OS = 'os';
 const RESOURCE_DETECTOR_PROCESS = 'process';
 const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
+
+export function getResourceFromConfiguration(
+  config: ConfigurationModel
+): Resource | undefined {
+  if (config.resource && config.resource.attributes) {
+    const attr: DetectedResourceAttributes = {};
+    for (let i = 0; i < config.resource.attributes.length; i++) {
+      const a = config.resource.attributes[i];
+      attr[a.name] = a.value;
+    }
+    return resourceFromAttributes(attr, {
+      schemaUrl: config.resource.schema_url,
+    });
+  }
+  return undefined;
+}
 
 export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   // When updating this list, make sure to also update the section `resourceDetectors` on README.
@@ -117,7 +136,7 @@ export function getResourceDetectorsFromConfiguration(
     [RESOURCE_DETECTOR_PROCESS, processDetector],
   ]);
 
-  const resourceDetectorsFromConfig = config.node_resource_detectors ?? ['all'];
+  const resourceDetectorsFromConfig = config.node_resource_detectors ?? [];
 
   if (resourceDetectorsFromConfig.includes('all')) {
     return [...resourceDetectors.values()].flat();

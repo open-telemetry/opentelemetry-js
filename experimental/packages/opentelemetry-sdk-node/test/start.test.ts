@@ -155,8 +155,7 @@ describe('startNodeSDK', function () {
   });
 
   it('should register a logger provider if multiple log record processors are provided', async () => {
-    process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-      'test/fixtures/logger-test.yaml';
+    process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = 'test/fixtures/logger.yaml';
     const sdk = startNodeSDK({});
 
     const loggerProvider = logs.getLoggerProvider();
@@ -227,7 +226,7 @@ describe('startNodeSDK', function () {
     await sdk.shutdown();
   });
 
-  describe('detectResources', async () => {
+  describe('setupResources', async () => {
     beforeEach(() => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.instance.id=627cc493,service.name=my-service,service.namespace=default,service.version=0.0.1';
@@ -289,8 +288,36 @@ describe('startNodeSDK', function () {
         version: '0.0.1',
       });
 
-      assert.notEqual(resource.attributes[ATTR_PROCESS_PID], undefined);
-      assert.notEqual(resource.attributes[ATTR_HOST_NAME], undefined);
+      assert.equal(resource.attributes[ATTR_PROCESS_PID], undefined);
+      assert.equal(resource.attributes[ATTR_HOST_NAME], undefined);
+    });
+
+    it('should configure resources from config file', async () => {
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
+        'test/fixtures/resources.yaml';
+      const configFactory: ConfigFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      const resource = setupResource(config, {});
+      await resource.waitForAsyncAttributes?.();
+
+      assert.deepStrictEqual(
+        resource.schemaUrl,
+        'https://opentelemetry.io/schemas/1.16.0'
+      );
+
+      assert.deepStrictEqual(resource.attributes, {
+        'service.name': 'config-name',
+        'service.namespace': 'config-namespace',
+        'service.version': '1.0.0',
+        bool_array_key: [true, false],
+        bool_key: true,
+        double_array_key: [1.1, 2.2],
+        double_key: 1.1,
+        int_array_key: [1, 2],
+        int_key: 1,
+        string_array_key: ['value1', 'value2'],
+        string_key: 'value',
+      });
     });
 
     it('returns a merged resource with a buggy detector', async () => {

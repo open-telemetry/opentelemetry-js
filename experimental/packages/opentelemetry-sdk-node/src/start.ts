@@ -24,6 +24,7 @@ import {
   getLogRecordProcessorsFromConfiguration,
   getPropagatorFromConfiguration,
   getResourceDetectorsFromConfiguration,
+  getResourceFromConfiguration,
   setupPropagator,
 } from './utils';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
@@ -33,15 +34,10 @@ import { logs } from '@opentelemetry/api-logs';
 import {
   defaultResource,
   detectResources,
-  envDetector,
-  hostDetector,
-  osDetector,
-  processDetector,
   Resource,
   ResourceDetectionConfig,
   ResourceDetector,
   resourceFromAttributes,
-  serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
@@ -94,27 +90,19 @@ export function setupResource(
   config: ConfigurationModel,
   sdkOptions: SDKOptions
 ): Resource {
-  let resource: Resource = sdkOptions.resource ?? defaultResource();
-  let autoDetectResources = false;
-  let resourceDetectors: ResourceDetector[];
+  let resource: Resource =
+    sdkOptions.resource ??
+    getResourceFromConfiguration(config) ??
+    defaultResource();
+  let resourceDetectors: ResourceDetector[] = [];
 
   if (sdkOptions.resourceDetectors != null) {
     resourceDetectors = sdkOptions.resourceDetectors;
-    autoDetectResources = true;
   } else if (config.node_resource_detectors) {
     resourceDetectors = getResourceDetectorsFromConfiguration(config);
-    autoDetectResources = true;
-  } else {
-    resourceDetectors = [
-      envDetector,
-      processDetector,
-      hostDetector,
-      osDetector,
-      serviceInstanceIdDetector,
-    ];
   }
 
-  if (autoDetectResources) {
+  if (resourceDetectors.length > 0) {
     const internalConfig: ResourceDetectionConfig = {
       detectors: resourceDetectors,
     };
