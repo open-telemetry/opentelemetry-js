@@ -96,5 +96,5 @@ export function isDescriptorCompatibleWith(
 // NB: the first character counted separately from the rest.
 const NAME_REGEXP = /^[a-z][a-z0-9_.\-/]{0,254}$/i;
 export function isValidName(name: string): boolean {
-  return name.match(NAME_REGEXP) != null;
+  return NAME_REGEXP.test(name);
 }
