@@ -846,6 +846,32 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
+    it('should configure service name via OTEL_SERVICE_NAME env var', function () {
+      process.env.OTEL_SERVICE_NAME = 'name-from-service-name';
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.instance.id=my-instance-id';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        resource: {
+          attributes: [
+            {
+              name: 'service.name',
+              value: 'name-from-service-name',
+              type: 'string',
+            },
+            {
+              name: 'service.instance.id',
+              value: 'my-instance-id',
+              type: 'string',
+            },
+          ],
+          attributes_list: 'service.instance.id=my-instance-id',
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
     it('should return config with custom attribute_limits', function () {
       process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '100';
       process.env.OTEL_ATTRIBUTE_COUNT_LIMIT = '200';
