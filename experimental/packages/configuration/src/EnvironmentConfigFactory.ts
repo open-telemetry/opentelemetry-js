@@ -86,6 +86,7 @@ export function setResources(config: ConfigurationModel): void {
 
   const resourceAttrList = getStringFromEnv('OTEL_RESOURCE_ATTRIBUTES');
   const list = getStringListFromEnv('OTEL_RESOURCE_ATTRIBUTES');
+  const serviceName = getStringFromEnv('OTEL_SERVICE_NAME');
   if (list && list.length > 0) {
     config.resource.attributes_list = resourceAttrList;
     config.resource.attributes = [];
@@ -93,14 +94,16 @@ export function setResources(config: ConfigurationModel): void {
       const element = list[i].split('=');
       config.resource.attributes.push({
         name: element[0],
-        value: element[1],
+        value:
+          serviceName && element[0] === 'service.name'
+            ? serviceName
+            : element[1],
         type: 'string',
       });
     }
   }
 
-  const serviceName = getStringFromEnv('OTEL_SERVICE_NAME');
-  if (serviceName) {
+  if (serviceName && config.resource.attributes == null) {
     config.resource.attributes = [
       {
         name: 'service.name',

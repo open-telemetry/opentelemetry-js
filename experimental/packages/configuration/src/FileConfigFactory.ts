@@ -106,7 +106,7 @@ export function parseConfigFile(config: ConfigurationModel) {
     supportedFileVersions.includes(parsedContent['file_format'])
   ) {
     const disabled = getBooleanFromConfigFile(parsedContent['disabled']);
-    if (disabled || disabled === false) {
+    if (disabled !== undefined) {
       config.disabled = disabled;
     }
 
@@ -427,7 +427,7 @@ function parseConfigSpanOrLogRecordExporter(
 
     case 'console':
       parsedExporter = {
-        console: undefined,
+        console: {},
       };
       break;
 
@@ -765,7 +765,7 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
 
     case 'console':
       parsedExporter = {
-        console: undefined,
+        console: {},
       };
       break;
   }
