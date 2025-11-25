@@ -44,7 +44,6 @@ import {
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
 
 /**
@@ -96,15 +95,15 @@ export function setupResource(
   sdkOptions: SDKOptions
 ): Resource {
   let resource: Resource = sdkOptions.resource ?? defaultResource();
-  const autoDetectResources = sdkOptions.autoDetectResources ?? true;
+  let autoDetectResources = false;
   let resourceDetectors: ResourceDetector[];
 
-  if (!autoDetectResources) {
-    resourceDetectors = [];
-  } else if (sdkOptions.resourceDetectors != null) {
+  if (sdkOptions.resourceDetectors != null) {
     resourceDetectors = sdkOptions.resourceDetectors;
+    autoDetectResources = true;
   } else if (config.node_resource_detectors) {
     resourceDetectors = getResourceDetectorsFromConfiguration(config);
+    autoDetectResources = true;
   } else {
     resourceDetectors = [
       envDetector,
@@ -119,18 +118,9 @@ export function setupResource(
     const internalConfig: ResourceDetectionConfig = {
       detectors: resourceDetectors,
     };
-
     resource = resource.merge(detectResources(internalConfig));
   }
 
-  resource =
-    sdkOptions.serviceName === undefined
-      ? resource
-      : resource.merge(
-          resourceFromAttributes({
-            [ATTR_SERVICE_NAME]: sdkOptions.serviceName,
-          })
-        );
   const instanceId = getInstanceID(config);
   resource =
     instanceId === undefined
@@ -155,9 +145,7 @@ function setupLoggerProvider(
   sdkOptions: SDKOptions,
   resource: Resource | undefined
 ): LoggerProvider | undefined {
-  const logProcessors =
-    sdkOptions.logRecordProcessors ??
-    getLogRecordProcessorsFromConfiguration(config);
+  const logProcessors = getLogRecordProcessorsFromConfiguration(config);
 
   if (logProcessors) {
     const loggerProvider = new LoggerProvider({

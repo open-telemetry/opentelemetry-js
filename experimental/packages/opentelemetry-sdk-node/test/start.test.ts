@@ -33,32 +33,12 @@ import {
 } from '@opentelemetry/context-async-hooks';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
 import {
-  // AggregationTemporality,
-  // ConsoleMetricExporter,
-  // InMemoryMetricExporter,
-  // InstrumentType,
   MeterProvider,
-  // PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
-// import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
-// import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
-// import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
-// import { PrometheusExporter as PrometheusMetricExporter } from '@opentelemetry/exporter-prometheus';
-// import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   assertServiceInstanceIdIsUUID,
-  // assertServiceInstanceIdIsUUID,
   assertServiceResource,
 } from './util/resource-assertions';
-// import {
-//   ConsoleSpanExporter,
-//   SimpleSpanProcessor,
-//   BatchSpanProcessor,
-//   NoopSpanProcessor,
-//   IdGenerator,
-//   AlwaysOffSampler,
-//   SpanProcessor,
-// } from '@opentelemetry/sdk-trace-base';
 import {
   envDetector,
   processDetector,
@@ -66,12 +46,9 @@ import {
   serviceInstanceIdDetector,
   DetectedResource,
 } from '@opentelemetry/resources';
-// import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { logs, ProxyLoggerProvider } from '@opentelemetry/api-logs';
 import {
   SimpleLogRecordProcessor,
-  InMemoryLogRecordExporter,
-  LoggerProvider,
   ConsoleLogRecordExporter,
   BatchLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
@@ -82,9 +59,6 @@ import {
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
-// import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
-// import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
-// import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
 import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from '../src/semconv';
 
@@ -124,16 +98,6 @@ describe('startNodeSDK', function () {
     const sdk = startNodeSDK({});
 
     Sinon.assert.calledWith(info, 'OpenTelemetry SDK is disabled');
-
-    sdk.shutdown();
-  });
-
-  it('should return NOOP_SDK when disabled is true', () => {
-    process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-      'test/fixtures/kitchen-sink.yaml';
-    const sdk = startNodeSDK({});
-
-    assertDefaultContextManagerRegistered();
 
     sdk.shutdown();
   });
@@ -192,51 +156,37 @@ describe('startNodeSDK', function () {
     sdk.shutdown();
   });
 
-  it('should register a logger provider if a log record processor is provided', async () => {
-    const logRecordExporter = new InMemoryLogRecordExporter();
-    const logRecordProcessor = new SimpleLogRecordProcessor(logRecordExporter);
-    const sdk = startNodeSDK({ logRecordProcessors: [logRecordProcessor] });
-
-    assertDefaultContextManagerRegistered();
-    assertDefaultPropagatorRegistered();
-
-    assert.ok(
-      (logs.getLoggerProvider() as ProxyLoggerProvider) instanceof
-        LoggerProvider
-    );
-    await sdk.shutdown();
-  });
-
   it('should register a logger provider if multiple log record processors are provided', async () => {
-    const logRecordExporter = new InMemoryLogRecordExporter();
-    const simpleLogRecordProcessor = new SimpleLogRecordProcessor(
-      logRecordExporter
-    );
-    const batchLogRecordProcessor = new BatchLogRecordProcessor(
-      logRecordExporter
-    );
-    const sdk = startNodeSDK({
-      logRecordProcessors: [simpleLogRecordProcessor, batchLogRecordProcessor],
-    });
+    process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
+      'test/fixtures/logger-test.yaml';
+    const sdk = startNodeSDK({});
 
     const loggerProvider = logs.getLoggerProvider();
     const sharedState = (loggerProvider as any)['_sharedState'];
-    assert.ok(sharedState.registeredLogRecordProcessors.length === 2);
+    assert.ok(sharedState.registeredLogRecordProcessors.length === 3);
     assert.ok(
       sharedState.registeredLogRecordProcessors[0]._exporter instanceof
-        InMemoryLogRecordExporter
+        OTLPProtoLogExporter
     );
     assert.ok(
       sharedState.registeredLogRecordProcessors[0] instanceof
-        SimpleLogRecordProcessor
+        BatchLogRecordProcessor
     );
     assert.ok(
       sharedState.registeredLogRecordProcessors[1]._exporter instanceof
-        InMemoryLogRecordExporter
+        OTLPGrpcLogExporter
     );
     assert.ok(
       sharedState.registeredLogRecordProcessors[1] instanceof
         BatchLogRecordProcessor
+    );
+    assert.ok(
+      sharedState.registeredLogRecordProcessors[2]._exporter instanceof
+        ConsoleLogRecordExporter
+    );
+    assert.ok(
+      sharedState.registeredLogRecordProcessors[2] instanceof
+        SimpleLogRecordProcessor
     );
     await sdk.shutdown();
   });
@@ -389,7 +339,7 @@ describe('startNodeSDK', function () {
         verbose: Sinon.fake(),
       };
       diag.setLogger(diagMocks, DiagLogLevel.DEBUG);
-      const sdk1 = startNodeSDK({ autoDetectResources: false });
+      const sdk1 = startNodeSDK({});
       await sdk1.shutdown();
 
       const sdk2 = startNodeSDK({ resourceDetectors: [envDetector] });
@@ -403,21 +353,6 @@ describe('startNodeSDK', function () {
   });
 
   describe('configureServiceName', async () => {
-    it('should configure service name via config', async () => {
-      process.env.OTEL_RESOURCE_ATTRIBUTES =
-        'service.instance.id=my-instance-id';
-      const configFactory: ConfigFactory = createConfigFactory();
-      const config = configFactory.getConfigModel();
-      const resource = setupResource(config, {
-        serviceName: 'config-set-name',
-      });
-
-      assertServiceResource(resource, {
-        name: 'config-set-name',
-        instanceId: 'my-instance-id',
-      });
-    });
-
     it('should configure service name via OTEL_SERVICE_NAME env var', async () => {
       process.env.OTEL_SERVICE_NAME = 'env-set-name';
       process.env.OTEL_RESOURCE_ATTRIBUTES =
@@ -433,23 +368,6 @@ describe('startNodeSDK', function () {
       });
     });
 
-    it('should favor config set service name over OTEL_SERVICE_NAME env set service name', async () => {
-      process.env.OTEL_SERVICE_NAME = 'env-set-name';
-      process.env.OTEL_RESOURCE_ATTRIBUTES =
-        'service.instance.id=my-instance-id';
-      const configFactory: ConfigFactory = createConfigFactory();
-      const config = configFactory.getConfigModel();
-      const resource = setupResource(config, {
-        serviceName: 'config-set-name',
-      });
-      await resource.waitForAsyncAttributes?.();
-
-      assertServiceResource(resource, {
-        name: 'config-set-name',
-        instanceId: 'my-instance-id',
-      });
-    });
-
     it('should configure service name via OTEL_RESOURCE_ATTRIBUTES env var', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.name=resource-env-set-name,service.instance.id=my-instance-id';
@@ -460,22 +378,6 @@ describe('startNodeSDK', function () {
 
       assertServiceResource(resource, {
         name: 'resource-env-set-name',
-        instanceId: 'my-instance-id',
-      });
-    });
-
-    it('should favor config set service name over OTEL_RESOURCE_ATTRIBUTES env set service name', async () => {
-      process.env.OTEL_RESOURCE_ATTRIBUTES =
-        'service.name=resource-env-set-name,service.instance.id=my-instance-id';
-      const configFactory: ConfigFactory = createConfigFactory();
-      const config = configFactory.getConfigModel();
-      const resource = setupResource(config, {
-        serviceName: 'config-set-name',
-      });
-      await resource.waitForAsyncAttributes?.();
-
-      assertServiceResource(resource, {
-        name: 'config-set-name',
         instanceId: 'my-instance-id',
       });
     });
@@ -510,7 +412,6 @@ describe('startNodeSDK', function () {
       const configFactory: ConfigFactory = createConfigFactory();
       const config = configFactory.getConfigModel();
       const resource = setupResource(config, {
-        autoDetectResources: true,
         resourceDetectors: [
           processDetector,
           envDetector,

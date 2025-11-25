@@ -393,6 +393,7 @@ export function getKeyListFromObjectArray(
 export function getLogRecordExporter(
   exporter: LogRecordExporterModel
 ): LogRecordExporter {
+  console.log("AAA ", exporter);
   if (exporter.otlp_http) {
     const encoding = exporter.otlp_http.encoding;
     if (encoding === 'json') {
