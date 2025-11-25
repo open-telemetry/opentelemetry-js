@@ -30,17 +30,36 @@ import {
 import { MultiSpanProcessor } from '../../src/MultiSpanProcessor';
 
 class TestProcessor implements SpanProcessor {
+  static events: string[] = [];
+  name: string;
   spans: Span[] = [];
-  onStart(span: Span): void {}
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  onStart(span: Span): void {
+    TestProcessor.events.push(this.name + ':start');
+  }
+
   onEnd(span: Span): void {
+    TestProcessor.events.push(this.name + ':end');
     this.spans.push(span);
   }
+
   shutdown(): Promise<void> {
-    this.spans = [];
+    TestProcessor.events = [];
     return Promise.resolve();
   }
+
   forceFlush(): Promise<void> {
     return Promise.resolve();
+  }
+}
+
+class ExtendedTestProcessor extends TestProcessor {
+  onEnding(span: Span): void {
+    TestProcessor.events.push(this.name + ':ending');
   }
 }
 
@@ -54,63 +73,71 @@ describe('MultiSpanProcessor', () => {
   });
 
   it('should handle one span processor', () => {
-    const processor1 = new TestProcessor();
+    const processor1 = new TestProcessor('sp1');
     const tracerProvider = new BasicTracerProvider({
       spanProcessors: [processor1],
     });
     const tracer = tracerProvider.getTracer('default');
     const span = tracer.startSpan('one');
-    assert.strictEqual(processor1.spans.length, 0);
+    assert.deepStrictEqual(TestProcessor.events, ['sp1:start']);
     span.end();
-    assert.strictEqual(processor1.spans.length, 1);
+    assert.deepStrictEqual(TestProcessor.events, ['sp1:start', 'sp1:end']);
+    tracerProvider['_activeSpanProcessor'].shutdown();
+  });
+
+  it('should handle one span processor with on ending', () => {
+    TestProcessor.events = [];
+    const processor1 = new ExtendedTestProcessor('sp1');
+    const tracerProvider = new BasicTracerProvider({
+      spanProcessors: [processor1],
+    });
+    const tracer = tracerProvider.getTracer('default');
+    const span = tracer.startSpan('one');
+    assert.deepStrictEqual(TestProcessor.events, ['sp1:start']);
+    span.end();
+    assert.deepStrictEqual(TestProcessor.events, [
+      'sp1:start',
+      'sp1:ending',
+      'sp1:end',
+    ]);
     tracerProvider['_activeSpanProcessor'].shutdown();
   });
 
   it('should handle two span processor', async () => {
-    const processor1 = new TestProcessor();
-    const processor2 = new TestProcessor();
+    TestProcessor.events = [];
+    const processor1 = new TestProcessor('p1');
+    const processor2 = new ExtendedTestProcessor('p2');
     const tracerProvider = new BasicTracerProvider({
       spanProcessors: [processor1, processor2],
     });
     const tracer = tracerProvider.getTracer('default');
     const span = tracer.startSpan('one');
     assert.strictEqual(processor1.spans.length, 0);
-    assert.strictEqual(processor1.spans.length, processor2.spans.length);
+    assert.strictEqual(processor2.spans.length, processor2.spans.length);
+    assert.deepStrictEqual(TestProcessor.events, ['p1:start', 'p2:start']);
 
     span.end();
     assert.strictEqual(processor1.spans.length, 1);
     assert.strictEqual(processor1.spans.length, processor2.spans.length);
+    assert.deepStrictEqual(TestProcessor.events, [
+      'p1:start',
+      'p2:start',
+      'p2:ending',
+      'p1:end',
+      'p2:end',
+    ]);
 
     tracerProvider.shutdown().then(() => {
       assert.strictEqual(processor1.spans.length, 0);
       assert.strictEqual(processor1.spans.length, processor2.spans.length);
+      assert.deepStrictEqual(TestProcessor.events.length, 0);
     });
   });
 
   it('should export spans on manual shutdown from two span processor', () => {
-    const processor1 = new TestProcessor();
-    const processor2 = new TestProcessor();
-    const tracerProvider = new BasicTracerProvider({
-      spanProcessors: [processor1, processor2],
-    });
-    const tracer = tracerProvider.getTracer('default');
-    const span = tracer.startSpan('one');
-    assert.strictEqual(processor1.spans.length, 0);
-    assert.strictEqual(processor1.spans.length, processor2.spans.length);
-
-    span.end();
-    assert.strictEqual(processor1.spans.length, 1);
-    assert.strictEqual(processor1.spans.length, processor2.spans.length);
-
-    tracerProvider.shutdown().then(() => {
-      assert.strictEqual(processor1.spans.length, 0);
-      assert.strictEqual(processor1.spans.length, processor2.spans.length);
-    });
-  });
-
-  it('should export spans on manual shutdown from two span processor', () => {
-    const processor1 = new TestProcessor();
-    const processor2 = new TestProcessor();
+    TestProcessor.events = [];
+    const processor1 = new TestProcessor('p1');
+    const processor2 = new ExtendedTestProcessor('p2');
     const tracerProvider = new BasicTracerProvider({
       spanProcessors: [processor1, processor2],
     });
@@ -172,7 +199,8 @@ describe('MultiSpanProcessor', () => {
 
   it('should call globalErrorHandler in forceFlush', async () => {
     const expectedError = new Error('whoops');
-    const testProcessor = new TestProcessor();
+    TestProcessor.events = [];
+    const testProcessor = new TestProcessor('p1');
     const forceFlush = Sinon.stub(testProcessor, 'forceFlush');
     forceFlush.rejects(expectedError);
 

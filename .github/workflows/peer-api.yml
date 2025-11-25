@@ -13,11 +13,16 @@ permissions:
 jobs:
   peer-api-check:
     runs-on: ubuntu-latest
-    container:
-      image: node:24@sha256:34af25027ee1b8bffd482ba995ec1e577fbd398db87beb4c60b80c2c9c025127
     steps:
       - name: Checkout
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6
+
+      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6
+        with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+          node-version: '24'
 
       - name: Install script dependencies
         run: npm ci --ignore-scripts

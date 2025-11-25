@@ -14,11 +14,19 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(sdk-trace-base): implement on ending in span processor [#6024](https://github.com/open-telemetry/opentelemetry-js/pull/6024) @majanjua-amzn
+  * note: this feature is experimental and subject to change
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
 
 ### :house: Internal
+
+* refactor(bundler-tests): split webpack tests into webpack-4 and webpack-5 [#6098](https://github.com/open-telemetry/opentelemetry-js/pull/6098) @overbalance
+* refactor(sdk-metrics): remove isNotNullish() utility function [#6151](https://github.com/open-telemetry/opentelemetry-js/pull/6151) @cjihrig
+* refactor(sdk-metrics): remove FlatMap() utility function [#6154](https://github.com/open-telemetry/opentelemetry-js/pull/6154) @cjihrig
+* refactor(sdk-metrics): simplify AllowList and DenyList processors [#6159](https://github.com/open-telemetry/opentelemetry-js/pull/6159) @cjihrig
 
 ## 2.2.0
 

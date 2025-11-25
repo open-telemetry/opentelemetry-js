@@ -32,7 +32,7 @@ jobs:
           private-key: ${{ secrets.OTELBOT_JS_PRIVATE_KEY }}
 
       - name: Checkout
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6
         with:
           token: ${{ steps.otelbot-token.outputs.token }}
 

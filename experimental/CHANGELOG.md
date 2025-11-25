@@ -10,11 +10,32 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(exporter-prometheus): support withoutScopeInfo option [#5993](https://github.com/open-telemetry/opentelemetry-js/pull/5993) @cjihrig
+* refactor(configuration): improvements on package [#6101](https://github.com/open-telemetry/opentelemetry-js/pull/6101) @maryliag
+* feat(configuration): set logger provider exporter type from env variable [#6104](https://github.com/open-telemetry/opentelemetry-js/pull/6104) @maryliag
+* feat(configuration): set meter provider exporter type from env variable [#6105](https://github.com/open-telemetry/opentelemetry-js/pull/6105) @maryliag
+* feat(configuration): set tracer provider exporter type from env variables [#6106](https://github.com/open-telemetry/opentelemetry-js/pull/6106) @maryliag
+* feat(configuration): set meter provider exporter type from env variable [#6105](https://github.com/open-telemetry/opentelemetry-js/pull/6105) @maryliag
+* refactor(configuration): throw warning and not error for invalid files [#6124](https://github.com/open-telemetry/opentelemetry-js/pull/6124) @maryliag
+* refactor(configuration): dont have a default value for node resource detectors [#6131](https://github.com/open-telemetry/opentelemetry-js/pull/6131) @maryliag
+* feat(configuration): doesnt set meter,tracer,logger provider by default [#6130](https://github.com/open-telemetry/opentelemetry-js/pull/6130) @maryliag
+* feat(opentelemetry-sdk-node): set instrumentation and propagators for experimental start [#6148](https://github.com/open-telemetry/opentelemetry-js/pull/6148) @maryliag
+
 ### :bug: Bug Fixes
+
+* fix(instrumentation-grpc): attach correct name to diag message [#6097](https://github.com/open-telemetry/opentelemetry-js/pull/6043) @pichlermarc
+* fix(opentelemetry-sdk-node): default to otlp if OTEL_METRICS_EXPORTER is empty [#6092](https://github.com/open-telemetry/opentelemetry-js/pull/6092) @jeengbe
 
 ### :books: Documentation
 
 ### :house: Internal
+
+* refactor(opentelemetry-sdk-node): simplify calculation of traceExportersList [#6132](https://github.com/open-telemetry/opentelemetry-js/pull/6132) @cjihrig
+* refactor(instrumentation): combine filter() calls in \_onRequire [#6142](https://github.com/open-telemetry/opentelemetry-js/pull/6142) @cjihrig
+* test(instrumentation-http): make timing dependent test more robust [#6144](https://github.com/open-telemetry/opentelemetry-js/pull/6144) @cjihrig
+* refactor(opentelemetry-sdk-node): simplify calculation of validPropagators [#6143](https://github.com/open-telemetry/opentelemetry-js/pull/6143) @cjihrig
+* test(instrumentation-http): replace uses of deprecated abort() [#6149](https://github.com/open-telemetry/opentelemetry-js/pull/6149) @cjihrig
+* refactor(configuration): simplify boolean check [#6158](https://github.com/open-telemetry/opentelemetry-js/pull/6158) @cjihrig
 
 ## 0.208.0
 
@@ -53,6 +74,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * test(otlp-grpc-exporter-base): increase timeout in flaky test [#6042](https://github.com/open-telemetry/opentelemetry-js/pull/6042) @cjihrig
 * test(sdk-node): use process.env consistently in tests [#6052](https://github.com/open-telemetry/opentelemetry-js/pull/6052) @cjihrig
 * test(sdk-node): ensure process.env is cleaned up between tests [#6066](https://github.com/open-telemetry/opentelemetry-js/pull/6066) @cjihrig
+* refactor(instrumentation-http): avoid deprecated url.parse() in getAbsoluteUrl() [#6089](https://github.com/open-telemetry/opentelemetry-js/pull/6089) @cjihrig
+* test(instrumentation-http): avoid deprecated url.parse() [#6102](https://github.com/open-telemetry/opentelemetry-js/pull/6102) @cjihrig
 
 ## 0.207.0
 

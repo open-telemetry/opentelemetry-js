@@ -201,19 +201,19 @@ This is an alternative to programmatically configuring an exporter or span proce
 ### Exporters
 
 | Environment variable | Description                                                                                                                                                              |
-|----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | OTEL_TRACES_EXPORTER | List of exporters to be used for tracing, separated by commas. Options include `otlp`, `zipkin`, and `none`. Default is `otlp`. `none` means no autoconfigured exporter. |
 | OTEL_LOGS_EXPORTER   | List of exporters to be used for logging, separated by commas. Options include `otlp`, `console` and `none`. Default is `otlp`. `none` means no autoconfigured exporter. |
 
 ### OTLP Exporter
 
 | Environment variable                | Description                                                                                                                                                  |
-|-------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | OTEL_EXPORTER_OTLP_PROTOCOL         | The transport protocol to use on OTLP trace, metric, and log requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`. |
 | OTEL_EXPORTER_OTLP_TRACES_PROTOCOL  | The transport protocol to use on OTLP trace requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`.                  |
 | OTEL_EXPORTER_OTLP_METRICS_PROTOCOL | The transport protocol to use on OTLP metric requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`.                 |
 | OTEL_EXPORTER_OTLP_LOGS_PROTOCOL    | The transport protocol to use on OTLP log requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`.                    |
-| OTEL_METRICS_EXPORTER               | Metrics exporter to be used. options are `otlp`, `prometheus`, `console` or `none`.                                                                          |
+| OTEL_METRICS_EXPORTER               | Metrics exporter to be used. options are `otlp`, `prometheus`, `console` or `none`. Default is `otlp`.                                                       |
 | OTEL_METRIC_EXPORT_INTERVAL         | The export interval when using a push Metric Reader. Default is `60000`.                                                                                     |
 | OTEL_METRIC_EXPORT_TIMEOUT          | The export timeout when using a push Metric Reader. Default is `30000`.                                                                                      |
 

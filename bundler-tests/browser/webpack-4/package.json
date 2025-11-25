@@ -1,0 +1,42 @@
+{
+  "name": "webpack-4-bundle-test",
+  "private": true,
+  "version": "0.208.0",
+  "description": "Test app for logs in webpack 4",
+  "type": "module",
+  "scripts": {
+    "test:bundle": "npm i && webpack --config webpack.config.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "keywords": [
+    "opentelemetry",
+    "web",
+    "events"
+  ],
+  "engines": {
+    "node": "^18.19.0 || >=20.6.0"
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "babel-loader": "^8.0.0",
+    "html-webpack-plugin": "^4.5.2",
+    "webpack": "^4",
+    "webpack-cli": "^4"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "file:../../../api",
+    "@opentelemetry/api-logs": "file:../../../experimental/packages/api-logs",
+    "@opentelemetry/exporter-logs-otlp-http": "file:../../../experimental/packages/exporter-logs-otlp-http",
+    "@opentelemetry/sdk-logs": "file:../../../experimental/packages/sdk-logs"
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/bundler-tests/browser/webpack-4"
+}

@@ -46,6 +46,7 @@ import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { SemconvStability } from '@opentelemetry/instrumentation';
 import { extractHostnameAndPort } from '../../src/utils';
 import { AttributeNames } from '../../src/enums/AttributeNames';
+import { ParsedUrlQuery } from 'node:querystring';
 
 describe('Utility', () => {
   describe('parseResponseStatus()', () => {
@@ -80,7 +81,20 @@ describe('Utility', () => {
   describe('getRequestInfo()', () => {
     it('should get options object', () => {
       const webUrl = 'http://u:p@google.fr/aPath?qu=ry';
-      const urlParsed = url.parse(webUrl);
+      const urlParsed = {
+        protocol: 'http:',
+        slashes: true,
+        auth: 'u:p',
+        host: 'google.fr',
+        port: null,
+        hostname: 'google.fr',
+        hash: null,
+        search: '?qu=ry',
+        query: 'qu=ry',
+        pathname: '/aPath',
+        path: '/aPath?qu=ry',
+        href: 'http://u:p@google.fr/aPath?qu=ry',
+      };
       const urlParsedWithoutPathname = {
         ...urlParsed,
         pathname: undefined,
@@ -95,7 +109,7 @@ describe('Utility', () => {
         host: undefined,
         port: null,
       };
-      const whatWgUrl = new url.URL(webUrl);
+      const whatWgUrl = new URL(webUrl);
       for (const param of [
         webUrl,
         urlParsed,
@@ -155,12 +169,44 @@ describe('Utility', () => {
   describe('getAbsoluteUrl()', () => {
     it('should return absolute url with localhost', () => {
       const path = '/test/1';
-      const result = utils.getAbsoluteUrl(url.parse(path), {});
+      const result = utils.getAbsoluteUrl(
+        {
+          protocol: null,
+          slashes: null,
+          auth: null,
+          host: null,
+          port: null,
+          hostname: null,
+          hash: null,
+          search: null,
+          query: null as unknown as undefined,
+          pathname: '/test/1',
+          path: '/test/1',
+          href: '/test/1',
+        },
+        {}
+      );
       assert.strictEqual(result, `http://localhost${path}`);
     });
     it('should return absolute url', () => {
       const absUrl = 'http://www.google/test/1?query=1';
-      const result = utils.getAbsoluteUrl(url.parse(absUrl), {});
+      const result = utils.getAbsoluteUrl(
+        {
+          protocol: 'http:',
+          slashes: true,
+          auth: null,
+          host: 'www.google',
+          port: null,
+          hostname: 'www.google',
+          hash: null,
+          search: '?query=1',
+          query: 'query=1' as unknown as ParsedUrlQuery,
+          pathname: '/test/1',
+          path: '/test/1?query=1',
+          href: 'http://www.google/test/1?query=1',
+        },
+        {}
+      );
       assert.strictEqual(result, absUrl);
     });
     it('should return default url', () => {
@@ -211,6 +257,16 @@ describe('Utility', () => {
         'http://localhost:8080/registers?AWSAccessKeyId=REDACTED'
       );
     });
+    it('does not perform redaction if the provided path cannot be parsed', () => {
+      const result = utils.getAbsoluteUrl(
+        { path: 'http://?AWSAccessKeyId=secret123' },
+        {}
+      );
+      assert.strictEqual(
+        result,
+        'http://localhosthttp://?AWSAccessKeyId=secret123'
+      );
+    });
   });
 
   describe('setSpanWithError()', () => {
@@ -248,7 +304,11 @@ describe('Utility', () => {
         assert.strictEqual(utils.isValidOptionsType(options), false);
       });
     });
-    for (const options of ['url', url.parse('http://url.com'), {}]) {
+    for (const options of [
+      'url',
+      url.urlToHttpOptions(new URL('http://url.com')),
+      {},
+    ]) {
       it(`should return true with the following value: ${JSON.stringify(
         options
       )}`, () => {

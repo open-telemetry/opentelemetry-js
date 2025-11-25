@@ -176,7 +176,7 @@ All stable packages are released with the same version, and all experimental pac
 The below table describes which versions of each set of packages are expected to work together.
 
 | Stable Packages | Experimental Packages |
-|-----------------|-----------------------|
+| --------------- | --------------------- |
 | 2.0.x           | 0.200.x               |
 | 1.30.x          | 0.57.x                |
 | 1.29.x          | 0.56.x                |
@@ -262,6 +262,9 @@ For more information about the maintainer role, see the [community repository](h
 - [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
 - [Raphaël Thériault](https://github.com/raphael-theriault-swi), SolarWinds
 - [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
+
+In addition, [Browser SIG Maintainers](https://github.com/orgs/open-telemetry/teams/browser-maintainers) are granted the
+Approver role for browser-targeted packages as defined in this repository's [CODEOWNERS](./.github/CODEOWNERS) file.
 
 For more information about the approver role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#approver).
 
