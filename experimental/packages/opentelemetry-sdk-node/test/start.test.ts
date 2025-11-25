@@ -32,9 +32,7 @@ import {
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
-import {
-  MeterProvider,
-} from '@opentelemetry/sdk-metrics';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import {
   assertServiceInstanceIdIsUUID,
   assertServiceResource,
