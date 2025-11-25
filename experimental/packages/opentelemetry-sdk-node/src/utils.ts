@@ -381,3 +381,15 @@ export function getKeyListFromObjectArray(
     .map(item => Object.keys(item))
     .reduce((prev, curr) => prev.concat(curr), []);
 }
+
+export function getInstanceID(config: ConfigurationModel): string | undefined {
+  if (config.resource?.attributes) {
+    for (let i = 0; i < config.resource.attributes.length; i++) {
+      const element = config.resource.attributes[i];
+      if (element.name === 'service.instance.id') {
+        return element.value?.toString();
+      }
+    }
+  }
+  return undefined;
+}

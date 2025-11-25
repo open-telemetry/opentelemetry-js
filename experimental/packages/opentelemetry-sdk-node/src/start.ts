@@ -21,6 +21,7 @@ import {
 } from '@opentelemetry/configuration';
 import { diag, DiagConsoleLogger } from '@opentelemetry/api';
 import {
+  getInstanceID,
   getPropagatorFromConfiguration,
   getResourceDetectorsFromConfiguration,
   setupDefaultContextManager,
@@ -55,6 +56,7 @@ import {
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
 
 /**
  * @experimental Function to start the OpenTelemetry Node SDK
@@ -100,7 +102,7 @@ const NOOP_SDK = {
   shutdown: async () => {},
 };
 
-function setupResource(
+export function setupResource(
   config: ConfigurationModel,
   sdkOptions: SDKOptions
 ): Resource {
@@ -138,6 +140,15 @@ function setupResource(
       : resource.merge(
           resourceFromAttributes({
             [ATTR_SERVICE_NAME]: sdkOptions.serviceName,
+          })
+        );
+  const instanceId = getInstanceID(config);
+  resource =
+    instanceId === undefined
+      ? resource
+      : resource.merge(
+          resourceFromAttributes({
+            [ATTR_SERVICE_INSTANCE_ID]: instanceId,
           })
         );
 

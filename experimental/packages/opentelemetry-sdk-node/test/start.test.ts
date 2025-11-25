@@ -15,12 +15,97 @@
  */
 
 import * as assert from 'assert';
-import { startNodeSDK } from '../src/start';
-import { context, diag } from '@opentelemetry/api';
-import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
+import { setupResource, startNodeSDK } from '../src/start';
 import * as Sinon from 'sinon';
+import {
+  context,
+  propagation,
+  ProxyTracerProvider,
+  trace,
+  diag,
+  DiagLogLevel,
+  metrics,
+  DiagConsoleLogger,
+} from '@opentelemetry/api';
+import {
+  // AsyncHooksContextManager,
+  AsyncLocalStorageContextManager,
+} from '@opentelemetry/context-async-hooks';
+import { W3CTraceContextPropagator } from '@opentelemetry/core';
+import {
+  // AggregationTemporality,
+  // ConsoleMetricExporter,
+  // InMemoryMetricExporter,
+  // InstrumentType,
+  MeterProvider,
+  // PeriodicExportingMetricReader,
+} from '@opentelemetry/sdk-metrics';
+// import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
+// import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
+// import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
+// import { PrometheusExporter as PrometheusMetricExporter } from '@opentelemetry/exporter-prometheus';
+// import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import {
+  assertServiceInstanceIdIsUUID,
+  // assertServiceInstanceIdIsUUID,
+  assertServiceResource,
+} from './util/resource-assertions';
+// import {
+//   ConsoleSpanExporter,
+//   SimpleSpanProcessor,
+//   BatchSpanProcessor,
+//   NoopSpanProcessor,
+//   IdGenerator,
+//   AlwaysOffSampler,
+//   SpanProcessor,
+// } from '@opentelemetry/sdk-trace-base';
+import {
+  envDetector,
+  processDetector,
+  hostDetector,
+  serviceInstanceIdDetector,
+  DetectedResource,
+} from '@opentelemetry/resources';
+// import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { logs, ProxyLoggerProvider } from '@opentelemetry/api-logs';
+import {
+  SimpleLogRecordProcessor,
+  InMemoryLogRecordExporter,
+  LoggerProvider,
+  ConsoleLogRecordExporter,
+  BatchLogRecordProcessor,
+} from '@opentelemetry/sdk-logs';
+import {
+  ConfigFactory,
+  createConfigFactory,
+} from '@opentelemetry/configuration';
+import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
+import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
+import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
+// import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
+// import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
+// import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
+
+import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from '../src/semconv';
 
 describe('startNodeSDK', function () {
+  let delegate: any;
+  let logsDelegate: any;
+
+  beforeEach(() => {
+    diag.disable();
+    context.disable();
+    trace.disable();
+    propagation.disable();
+    metrics.disable();
+    logs.disable();
+
+    delegate = (trace.getTracerProvider() as ProxyTracerProvider).getDelegate();
+    logsDelegate = (
+      logs.getLoggerProvider() as ProxyLoggerProvider
+    )._getDelegate();
+  });
+
   const _origEnvVariables = { ...process.env };
 
   afterEach(function () {
@@ -52,6 +137,529 @@ describe('startNodeSDK', function () {
 
     sdk.shutdown();
   });
+
+  it('should not register more than the minimal SDK components', async () => {
+    // need to set these to none, since the default value is 'otlp'
+    process.env.OTEL_TRACES_EXPORTER = 'none';
+    process.env.OTEL_LOGS_EXPORTER = 'none';
+    process.env.OTEL_METRICS_EXPORTER = 'none';
+    const sdk = startNodeSDK({});
+
+    // These are minimal OTel functionality and always registered.
+    assertDefaultContextManagerRegistered();
+    assertDefaultPropagatorRegistered();
+
+    assert.strictEqual(
+      (trace.getTracerProvider() as ProxyTracerProvider).getDelegate(),
+      delegate,
+      'tracer provider should not have changed'
+    );
+    assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
+    assert.strictEqual(
+      (logs.getLoggerProvider() as ProxyLoggerProvider)._getDelegate(),
+      logsDelegate,
+      'logger provider should not have changed'
+    );
+
+    await sdk.shutdown();
+  });
+
+  it('should register a diag logger with OTEL_LOG_LEVEL', () => {
+    process.env.OTEL_LOG_LEVEL = 'ERROR';
+
+    const spy = Sinon.spy(diag, 'setLogger');
+    const sdk = startNodeSDK({});
+
+    assert.strictEqual(spy.callCount, 1);
+    assert.ok(spy.args[0][0] instanceof DiagConsoleLogger);
+    assert.deepStrictEqual(spy.args[0][1], {
+      logLevel: DiagLogLevel.ERROR,
+    });
+
+    sdk.shutdown();
+  });
+
+  it('should register a diag logger as info as default', () => {
+    const spy = Sinon.spy(diag, 'setLogger');
+    const sdk = startNodeSDK({});
+
+    assert.strictEqual(spy.callCount, 1);
+    assert.ok(spy.args[0][0] instanceof DiagConsoleLogger);
+    assert.deepStrictEqual(spy.args[0][1], {
+      logLevel: DiagLogLevel.INFO,
+    });
+
+    sdk.shutdown();
+  });
+
+  it('should register a logger provider if a log record processor is provided', async () => {
+    const logRecordExporter = new InMemoryLogRecordExporter();
+    const logRecordProcessor = new SimpleLogRecordProcessor(logRecordExporter);
+    const sdk = startNodeSDK({ logRecordProcessors: [logRecordProcessor] });
+
+    assertDefaultContextManagerRegistered();
+    assertDefaultPropagatorRegistered();
+
+    assert.ok(
+      (logs.getLoggerProvider() as ProxyLoggerProvider) instanceof
+        LoggerProvider
+    );
+    await sdk.shutdown();
+  });
+
+  it('should register a logger provider if multiple log record processors are provided', async () => {
+    const logRecordExporter = new InMemoryLogRecordExporter();
+    const simpleLogRecordProcessor = new SimpleLogRecordProcessor(
+      logRecordExporter
+    );
+    const batchLogRecordProcessor = new BatchLogRecordProcessor(
+      logRecordExporter
+    );
+    const sdk = startNodeSDK({
+      logRecordProcessors: [simpleLogRecordProcessor, batchLogRecordProcessor],
+    });
+
+    const loggerProvider = logs.getLoggerProvider();
+    const sharedState = (loggerProvider as any)['_sharedState'];
+    assert.ok(sharedState.registeredLogRecordProcessors.length === 2);
+    assert.ok(
+      sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+        InMemoryLogRecordExporter
+    );
+    assert.ok(
+      sharedState.registeredLogRecordProcessors[0] instanceof
+        SimpleLogRecordProcessor
+    );
+    assert.ok(
+      sharedState.registeredLogRecordProcessors[1]._exporter instanceof
+        InMemoryLogRecordExporter
+    );
+    assert.ok(
+      sharedState.registeredLogRecordProcessors[1] instanceof
+        BatchLogRecordProcessor
+    );
+    await sdk.shutdown();
+  });
+
+  it('should register a propagator if only a propagator is provided', async () => {
+    const expectedPropagator = new W3CTraceContextPropagator();
+    const sdk = startNodeSDK({
+      textMapPropagator: expectedPropagator,
+    });
+
+    const actualPropagator = propagation['_getGlobalPropagator']();
+    assert.equal(actualPropagator, expectedPropagator);
+    await sdk.shutdown();
+  });
+
+  it('should not register propagators OTEL_PROPAGATORS contains "none"', async () => {
+    process.env.OTEL_PROPAGATORS = 'none';
+    const sdk = startNodeSDK({});
+
+    assert.deepStrictEqual(propagation.fields(), []);
+
+    await sdk.shutdown();
+  });
+
+  it('should not register propagators OTEL_PROPAGATORS contains "none" alongside valid propagator', async () => {
+    process.env.OTEL_PROPAGATORS = 'b3, none';
+    const sdk = startNodeSDK({});
+
+    assert.deepStrictEqual(propagation.fields(), []);
+
+    await sdk.shutdown();
+  });
+
+  it('should not register propagators OTEL_PROPAGATORS contains valid propagator but option is set to null', async () => {
+    process.env.OTEL_PROPAGATORS = 'b3';
+    const sdk = startNodeSDK({ textMapPropagator: null });
+
+    assert.deepStrictEqual(propagation.fields(), []);
+
+    await sdk.shutdown();
+  });
+
+  describe('detectResources', async () => {
+    beforeEach(() => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.instance.id=627cc493,service.name=my-service,service.namespace=default,service.version=0.0.1';
+    });
+
+    afterEach(() => {
+      delete process.env.OTEL_RESOURCE_ATTRIBUTES;
+    });
+
+    // Local function to test if a mocked method is ever called with a specific argument or regex matching for an argument.
+    // Needed because of race condition with parallel detectors.
+    const callArgsMatches = (
+      mockedFunction: Sinon.SinonSpy,
+      regex: RegExp
+    ): boolean => {
+      return mockedFunction.getCalls().some(call => {
+        return call.args.some(callArgs => regex.test(callArgs.toString()));
+      });
+    };
+
+    it('returns a merged resource with custom resource', async () => {
+      const configFactory: ConfigFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      const resource = setupResource(config, {
+        resourceDetectors: [
+          processDetector,
+          {
+            detect(): DetectedResource {
+              return {
+                attributes: { customAttr: 'someValue' },
+              };
+            },
+          },
+          envDetector,
+          hostDetector,
+        ],
+      });
+      await resource.waitForAsyncAttributes?.();
+
+      assert.strictEqual(resource.attributes['customAttr'], 'someValue');
+      assertServiceResource(resource, {
+        instanceId: '627cc493',
+        name: 'my-service',
+        namespace: 'default',
+        version: '0.0.1',
+      });
+    });
+
+    it('default detectors populate values properly', async () => {
+      const configFactory: ConfigFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      const resource = setupResource(config, {});
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceResource(resource, {
+        instanceId: '627cc493',
+        name: 'my-service',
+        namespace: 'default',
+        version: '0.0.1',
+      });
+
+      assert.notEqual(resource.attributes[ATTR_PROCESS_PID], undefined);
+      assert.notEqual(resource.attributes[ATTR_HOST_NAME], undefined);
+    });
+
+    it('returns a merged resource with a buggy detector', async () => {
+      const configFactory: ConfigFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      const resource = setupResource(config, {
+        resourceDetectors: [
+          processDetector,
+          {
+            detect() {
+              throw new Error('Buggy detector');
+            },
+          },
+          envDetector,
+          hostDetector,
+        ],
+      });
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceResource(resource, {
+        instanceId: '627cc493',
+        name: 'my-service',
+        namespace: 'default',
+        version: '0.0.1',
+      });
+    });
+
+    // 1. If not auto-detecting resources, then NodeSDK should not
+    //    complain about `OTEL_NODE_RESOURCE_DETECTORS` values.
+    // 2. If given resourceDetectors, then NodeSDK should not complain
+    //    about `OTEL_NODE_RESOURCE_DETECTORS` values.
+    //
+    // Practically, these tests help ensure that there is no spurious
+    // diag error message when using OTEL_NODE_RESOURCE_DETECTORS with
+    // @opentelemetry/auto-instrumentations-node, which supports more values
+    // than this package (e.g. 'gcp').
+    it('does not diag.warn when not using the envvar', async () => {
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,os,no-such-detector';
+      const diagMocks = {
+        error: Sinon.fake(),
+        warn: Sinon.fake(),
+        info: Sinon.fake(),
+        debug: Sinon.fake(),
+        verbose: Sinon.fake(),
+      };
+      diag.setLogger(diagMocks, DiagLogLevel.DEBUG);
+      const sdk1 = startNodeSDK({ autoDetectResources: false });
+      await sdk1.shutdown();
+
+      const sdk2 = startNodeSDK({ resourceDetectors: [envDetector] });
+      await sdk2.shutdown();
+
+      assert.ok(
+        !callArgsMatches(diagMocks.error, /no-such-detector/),
+        'diag.error() messages do not mention "no-such-detector"'
+      );
+    });
+  });
+
+  describe('configureServiceName', async () => {
+    it('should configure service name via config', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.instance.id=my-instance-id';
+      const configFactory: ConfigFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      const resource = setupResource(config, {
+        serviceName: 'config-set-name',
+      });
+
+      assertServiceResource(resource, {
+        name: 'config-set-name',
+        instanceId: 'my-instance-id',
+      });
+    });
+
+    it('should configure service name via OTEL_SERVICE_NAME env var', async () => {
+      process.env.OTEL_SERVICE_NAME = 'env-set-name';
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.instance.id=my-instance-id';
+      const configFactory: ConfigFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      const resource = setupResource(config, {});
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceResource(resource, {
+        name: 'env-set-name',
+        instanceId: 'my-instance-id',
+      });
+    });
+
+    it('should favor config set service name over OTEL_SERVICE_NAME env set service name', async () => {
+      process.env.OTEL_SERVICE_NAME = 'env-set-name';
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.instance.id=my-instance-id';
+      const configFactory: ConfigFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      const resource = setupResource(config, {
+        serviceName: 'config-set-name',
+      });
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceResource(resource, {
+        name: 'config-set-name',
+        instanceId: 'my-instance-id',
+      });
+    });
+
+    it('should configure service name via OTEL_RESOURCE_ATTRIBUTES env var', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.name=resource-env-set-name,service.instance.id=my-instance-id';
+      const configFactory: ConfigFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      const resource = setupResource(config, {});
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceResource(resource, {
+        name: 'resource-env-set-name',
+        instanceId: 'my-instance-id',
+      });
+    });
+
+    it('should favor config set service name over OTEL_RESOURCE_ATTRIBUTES env set service name', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.name=resource-env-set-name,service.instance.id=my-instance-id';
+      const configFactory: ConfigFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      const resource = setupResource(config, {
+        serviceName: 'config-set-name',
+      });
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceResource(resource, {
+        name: 'config-set-name',
+        instanceId: 'my-instance-id',
+      });
+    });
+  });
+
+  describe('configureServiceInstanceId', async () => {
+    it('should configure service instance id via OTEL_RESOURCE_ATTRIBUTES env var', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.instance.id=627cc493,service.name=my-service,service.namespace';
+      const configFactory: ConfigFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      const resource = setupResource(config, {});
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceResource(resource, {
+        name: 'my-service',
+        instanceId: '627cc493',
+      });
+    });
+
+    it('should configure service instance id via OTEL_NODE_RESOURCE_DETECTORS env var', async () => {
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,host,os,serviceinstance';
+      const configFactory: ConfigFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      const resource = setupResource(config, {});
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceInstanceIdIsUUID(resource);
+    });
+
+    it('should configure service instance id with random UUID', async () => {
+      const configFactory: ConfigFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      const resource = setupResource(config, {
+        autoDetectResources: true,
+        resourceDetectors: [
+          processDetector,
+          envDetector,
+          hostDetector,
+          serviceInstanceIdDetector,
+        ],
+      });
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceInstanceIdIsUUID(resource);
+    });
+  });
+
+  describe('A disabled SDK should be no-op', () => {
+    beforeEach(() => {
+      process.env.OTEL_SDK_DISABLED = 'true';
+    });
+
+    it('should not register a trace provider', async () => {
+      const sdk = startNodeSDK({});
+
+      assert.strictEqual(
+        (trace.getTracerProvider() as ProxyTracerProvider).getDelegate(),
+        delegate,
+        'sdk.start() should not change the global tracer provider'
+      );
+
+      await sdk.shutdown();
+    });
+  });
+
+  describe('configuring logger provider from env', () => {
+    let stubLogger: Sinon.SinonStub;
+
+    beforeEach(() => {
+      stubLogger = Sinon.stub(diag, 'info');
+    });
+
+    afterEach(() => {
+      stubLogger.reset();
+    });
+
+    it('should not register the provider if OTEL_LOGS_EXPORTER contains none', async () => {
+      const logsAPIStub = Sinon.spy(logs, 'setGlobalLoggerProvider');
+      process.env.OTEL_LOGS_EXPORTER = 'console,none';
+      const sdk = startNodeSDK({});
+      assert.strictEqual(
+        stubLogger.args[0][0],
+        'OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.'
+      );
+
+      Sinon.assert.notCalled(logsAPIStub);
+      await sdk.shutdown();
+    });
+
+    it('should not set logger provider by default', async () => {
+      const logsAPIStub = Sinon.spy(logs, 'setGlobalLoggerProvider');
+      const sdk = startNodeSDK({});
+      Sinon.assert.notCalled(logsAPIStub);
+      await sdk.shutdown();
+    });
+
+    it('should set up all allowed exporters', async () => {
+      process.env.OTEL_LOGS_EXPORTER = 'console,otlp';
+      const sdk = startNodeSDK({});
+
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert.ok(sharedState.registeredLogRecordProcessors.length === 2);
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+          ConsoleLogRecordExporter
+      );
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[0] instanceof
+          SimpleLogRecordProcessor
+      );
+      // defaults to http/protobuf
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[1]._exporter instanceof
+          OTLPProtoLogExporter
+      );
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[1] instanceof
+          BatchLogRecordProcessor
+      );
+      await sdk.shutdown();
+    });
+
+    it('should use OTEL_EXPORTER_OTLP_LOGS_PROTOCOL for otlp protocol', async () => {
+      process.env.OTEL_LOGS_EXPORTER = 'otlp';
+      process.env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL = 'grpc';
+      const sdk = startNodeSDK({});
+
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert.ok(sharedState.registeredLogRecordProcessors.length === 1);
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+          OTLPGrpcLogExporter
+      );
+      await sdk.shutdown();
+    });
+
+    it('should use OTLPHttpLogExporter when http/json is set', async () => {
+      process.env.OTEL_LOGS_EXPORTER = 'otlp';
+      process.env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL = 'http/json';
+      const sdk = startNodeSDK({});
+
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert.ok(sharedState.registeredLogRecordProcessors.length === 1);
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+          OTLPHttpLogExporter
+      );
+      await sdk.shutdown();
+    });
+
+    it('should fall back to OTEL_EXPORTER_OTLP_PROTOCOL', async () => {
+      process.env.OTEL_LOGS_EXPORTER = 'otlp';
+      process.env.OTEL_EXPORTER_OTLP_PROTOCOL = 'grpc';
+      const sdk = startNodeSDK({});
+
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert.ok(sharedState.registeredLogRecordProcessors.length === 1);
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+          OTLPGrpcLogExporter
+      );
+      await sdk.shutdown();
+    });
+
+    it('should fall back to http/protobuf if invalid protocol is set', async () => {
+      process.env.OTEL_LOGS_EXPORTER = 'otlp';
+      process.env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL = 'grpc2';
+      const sdk = startNodeSDK({});
+
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert.ok(sharedState.registeredLogRecordProcessors.length === 1);
+      assert.ok(
+        sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+          OTLPProtoLogExporter
+      );
+      await sdk.shutdown();
+    });
+  });
 });
 
 function assertDefaultContextManagerRegistered() {
@@ -59,4 +667,12 @@ function assertDefaultContextManagerRegistered() {
     context['_getContextManager']().constructor.name ===
       AsyncLocalStorageContextManager.name
   );
+}
+
+function assertDefaultPropagatorRegistered() {
+  assert.deepStrictEqual(propagation.fields(), [
+    'traceparent',
+    'tracestate',
+    'baggage',
+  ]);
 }
