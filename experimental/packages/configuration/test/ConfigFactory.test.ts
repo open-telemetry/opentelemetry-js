@@ -244,7 +244,7 @@ const configFromFile: ConfigurationModel = {
       {
         simple: {
           exporter: {
-            console: undefined,
+            console: {},
           },
         },
       },
@@ -431,7 +431,7 @@ const configFromFile: ConfigurationModel = {
           timeout: 30000,
           interval: 60000,
           exporter: {
-            console: undefined,
+            console: {},
           },
           cardinality_limits: {
             default: 2000,
@@ -551,7 +551,7 @@ const configFromFile: ConfigurationModel = {
       {
         simple: {
           exporter: {
-            console: undefined,
+            console: {},
           },
         },
       },
