@@ -16,19 +16,10 @@
 'use strict';
 
 import { DiagLogLevel } from '@opentelemetry/api';
-import {
-  initializeDefaultTracerProviderConfiguration,
-  TracerProvider,
-} from './tracerProviderModel';
-import {
-  initializeDefaultLoggerProviderConfiguration,
-  LoggerProvider,
-} from './loggerProviderModel';
+import { TracerProvider } from './tracerProviderModel';
+import { LoggerProvider } from './loggerProviderModel';
 import { Resource } from './resourceModel';
-import {
-  initializeDefaultMeterProviderConfiguration,
-  MeterProvider,
-} from './meterProviderModel';
+import { MeterProvider } from './meterProviderModel';
 
 export interface ConfigurationModel {
   /**
@@ -86,7 +77,6 @@ export function initializeDefaultConfiguration(): ConfigurationModel {
   const config: ConfigurationModel = {
     disabled: false,
     log_level: DiagLogLevel.INFO,
-    node_resource_detectors: ['all'],
     resource: {},
     attribute_limits: {
       attribute_count_limit: 128,
@@ -95,9 +85,6 @@ export function initializeDefaultConfiguration(): ConfigurationModel {
       composite: [{ tracecontext: null }, { baggage: null }],
       composite_list: 'tracecontext,baggage',
     },
-    tracer_provider: initializeDefaultTracerProviderConfiguration(),
-    meter_provider: initializeDefaultMeterProviderConfiguration(),
-    logger_provider: initializeDefaultLoggerProviderConfiguration(),
   };
 
   return config;

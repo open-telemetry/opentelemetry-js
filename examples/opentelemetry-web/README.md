@@ -24,7 +24,7 @@ Other options for running the application, this serves the same examples using d
 can review the different effects on the resulting bundle sizes that are loaded via the browser.
 
 | Command                | Description                                               |
-|------------------------|-----------------------------------------------------------|
+| ---------------------- | --------------------------------------------------------- |
 | `npm start` (Default)  | Serve the raw development bundles compressed via GZip     |
 | `npm run start-nc`     | Serve the raw development bundles uncompressed            |
 | `npm run start-prod`   | Serve the minified production bundles compressed via GZip |
