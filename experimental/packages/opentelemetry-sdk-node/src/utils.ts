@@ -50,7 +50,21 @@ import {
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import { ConfigurationModel } from '@opentelemetry/configuration';
+import {
+  BatchLogRecordProcessor,
+  ConsoleLogRecordExporter,
+  LogRecordExporter,
+  LogRecordProcessor,
+  SimpleLogRecordProcessor,
+} from '@opentelemetry/sdk-logs';
+import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
+import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
+import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
+import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
+import {
+  ConfigurationModel,
+  LogRecordExporterModel,
+} from '@opentelemetry/configuration';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
@@ -341,12 +355,6 @@ export function setupContextManager(
   context.setGlobalContextManager(contextManager);
 }
 
-export function setupDefaultContextManager() {
-  const defaultContextManager = new AsyncLocalStorageContextManager();
-  defaultContextManager.enable();
-  context.setGlobalContextManager(defaultContextManager);
-}
-
 export function setupPropagator(
   propagator: TextMapPropagator | null | undefined
 ) {
@@ -380,6 +388,67 @@ export function getKeyListFromObjectArray(
   return obj
     .map(item => Object.keys(item))
     .reduce((prev, curr) => prev.concat(curr), []);
+}
+
+export function getLogRecordExporter(
+  exporter: LogRecordExporterModel
+): LogRecordExporter {
+  if (exporter.otlp_http) {
+    const encoding = exporter.otlp_http.encoding;
+    if (encoding === 'json') {
+      return new OTLPHttpLogExporter({
+        compression:
+          exporter.otlp_http.compression === 'gzip'
+            ? CompressionAlgorithm.GZIP
+            : CompressionAlgorithm.NONE,
+      });
+    }
+    if (encoding === 'protobuf') {
+      return new OTLPProtoLogExporter();
+    }
+    diag.warn(
+      `Unsupported OTLP logs encoding: ${encoding}. Using http/protobuf.`
+    );
+    return new OTLPProtoLogExporter();
+  } else if (exporter.otlp_grpc) {
+    return new OTLPGrpcLogExporter();
+  } else if (exporter.console) {
+    return new ConsoleLogRecordExporter();
+  }
+  diag.warn(`Unsupported Exporter value. Using OTLP http/protobuf.`);
+  return new OTLPProtoLogExporter();
+}
+
+export function getLogRecordProcessorsFromConfiguration(
+  config: ConfigurationModel
+): LogRecordProcessor[] | undefined {
+  const logRecordProcessors: LogRecordProcessor[] = [];
+  config.logger_provider?.processors?.forEach(processor => {
+    if (processor.batch) {
+      logRecordProcessors.push(
+        new BatchLogRecordProcessor(
+          getLogRecordExporter(processor.batch.exporter),
+          {
+            maxQueueSize: processor.batch.max_queue_size,
+            maxExportBatchSize: processor.batch.max_export_batch_size,
+            scheduledDelayMillis: processor.batch.schedule_delay,
+            exportTimeoutMillis: processor.batch.export_timeout,
+          }
+        )
+      );
+    }
+    if (processor.simple) {
+      logRecordProcessors.push(
+        new SimpleLogRecordProcessor(
+          getLogRecordExporter(processor.simple.exporter)
+        )
+      );
+    }
+  });
+  if (logRecordProcessors.length > 0) {
+    return logRecordProcessors;
+  }
+  return undefined;
 }
 
 export function getInstanceID(config: ConfigurationModel): string | undefined {

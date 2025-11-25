@@ -17,30 +17,18 @@ import {
   ConfigFactory,
   ConfigurationModel,
   createConfigFactory,
-  LogRecordExporterModel,
 } from '@opentelemetry/configuration';
-import { diag, DiagConsoleLogger } from '@opentelemetry/api';
+import { context, diag, DiagConsoleLogger } from '@opentelemetry/api';
 import {
   getInstanceID,
+  getLogRecordProcessorsFromConfiguration,
   getPropagatorFromConfiguration,
   getResourceDetectorsFromConfiguration,
-  setupDefaultContextManager,
   setupPropagator,
 } from './utils';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import type { SDKOptions } from './types';
-import {
-  BatchLogRecordProcessor,
-  ConsoleLogRecordExporter,
-  LoggerProvider,
-  LogRecordExporter,
-  LogRecordProcessor,
-  SimpleLogRecordProcessor,
-} from '@opentelemetry/sdk-logs';
-import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
-import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
-import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
-import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
+import { LoggerProvider } from '@opentelemetry/sdk-logs';
 import { logs } from '@opentelemetry/api-logs';
 import {
   defaultResource,
@@ -55,6 +43,7 @@ import {
   resourceFromAttributes,
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
 
@@ -155,6 +144,12 @@ export function setupResource(
   return resource;
 }
 
+function setupDefaultContextManager() {
+  const defaultContextManager = new AsyncLocalStorageContextManager();
+  defaultContextManager.enable();
+  context.setGlobalContextManager(defaultContextManager);
+}
+
 function setupLoggerProvider(
   config: ConfigurationModel,
   sdkOptions: SDKOptions,
@@ -172,64 +167,6 @@ function setupLoggerProvider(
 
     logs.setGlobalLoggerProvider(loggerProvider);
     return loggerProvider;
-  }
-  return undefined;
-}
-
-function getLogRecordExporter(
-  exporter: LogRecordExporterModel
-): LogRecordExporter {
-  if (exporter.otlp_http) {
-    if (exporter.otlp_http.encoding === 'json') {
-      return new OTLPHttpLogExporter({
-        compression:
-          exporter.otlp_http.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
-      });
-    }
-    if (exporter.otlp_http.encoding === 'protobuf') {
-      return new OTLPProtoLogExporter();
-    }
-    diag.warn(`Unsupported OTLP logs protocol. Using http/protobuf.`);
-    return new OTLPProtoLogExporter();
-  } else if (exporter.otlp_grpc) {
-    return new OTLPGrpcLogExporter();
-  } else if (exporter.console) {
-    return new ConsoleLogRecordExporter();
-  }
-  diag.warn(`Unsupported Exporter value. Using OTLP http/protobuf.`);
-  return new OTLPProtoLogExporter();
-}
-
-function getLogRecordProcessorsFromConfiguration(
-  config: ConfigurationModel
-): LogRecordProcessor[] | undefined {
-  const logRecordProcessors: LogRecordProcessor[] = [];
-  config.logger_provider?.processors?.forEach(processor => {
-    if (processor.batch) {
-      logRecordProcessors.push(
-        new BatchLogRecordProcessor(
-          getLogRecordExporter(processor.batch.exporter),
-          {
-            maxQueueSize: processor.batch.max_queue_size,
-            maxExportBatchSize: processor.batch.max_export_batch_size,
-            scheduledDelayMillis: processor.batch.schedule_delay,
-            exportTimeoutMillis: processor.batch.export_timeout,
-          }
-        )
-      );
-    }
-    if (processor.simple) {
-      logRecordProcessors.push(
-        new SimpleLogRecordProcessor(
-          getLogRecordExporter(processor.simple.exporter)
-        )
-      );
-    }
-  });
-  if (logRecordProcessors.length > 0) {
-    return logRecordProcessors;
   }
   return undefined;
 }
