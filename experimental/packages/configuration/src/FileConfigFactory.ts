@@ -427,7 +427,7 @@ function parseConfigSpanOrLogRecordExporter(
 
     case 'console':
       parsedExporter = {
-        console: undefined,
+        console: {},
       };
       break;
 
@@ -765,7 +765,7 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
 
     case 'console':
       parsedExporter = {
-        console: undefined,
+        console: {},
       };
       break;
   }
