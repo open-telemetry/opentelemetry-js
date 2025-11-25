@@ -815,7 +815,7 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
-    it('OTEL_SERVICE_NAME take precedent over service name value in OTEL_RESOURCE_ATTRIBUTES', function () {
+    it('OTEL_SERVICE_NAME takes precedence over service name value in OTEL_RESOURCE_ATTRIBUTES', function () {
       process.env.OTEL_SERVICE_NAME = 'name-from-service-name';
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.name=name-from-attributes';
