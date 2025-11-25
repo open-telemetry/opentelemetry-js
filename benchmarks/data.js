@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1764065433663,
+  "lastUpdate": 1764096107216,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -45972,6 +45972,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.74%",
             "unit": "ops/sec",
             "extra": "90 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "maryliag@gmail.com",
+            "name": "Marylia Gutierrez",
+            "username": "maryliag"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9f81074997e29f597ebe8751c2fe84028a575f5d",
+          "message": "fix(configuration): merge service name from OTEL_SERVICE_NAME instead of replacing all resource attributes (#6162)\n\nCo-authored-by: Jackson Weber <47067795+JacksonWeber@users.noreply.github.com>",
+          "timestamp": "2025-11-25T18:32:45Z",
+          "tree_id": "d57c4a1085bb4bf64f10fd4e7f76783abbb5e7d6",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/9f81074997e29f597ebe8751c2fe84028a575f5d"
+        },
+        "date": 1764096106187,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 698860,
+            "range": "±1.26%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8430,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 284083,
+            "range": "±0.46%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 277443,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
           }
         ]
       }
