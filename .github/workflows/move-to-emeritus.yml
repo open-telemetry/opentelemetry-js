@@ -1,0 +1,41 @@
+name: Move inactive members to Emeritus
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  create-or-update-emeritus-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2.0.6
+        id: otelbot-token
+        with:
+          app-id: ${{ vars.OTELBOT_JS_APP_ID }}
+          private-key: ${{ secrets.OTELBOT_JS_PRIVATE_KEY }}
+      - name: Checkout
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6
+        with:
+          token: ${{ steps.otelbot-token.outputs.token }}
+      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6
+        with:
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+          node-version: 22
+      - run: node scripts/move-to-emeritus.js
+        env:
+          # don't use otelbot-js's token as it has more permissions than we need.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create/Update Move to Emeritus PR
+        run: |
+          git config user.name otelbot
+          git config user.email 197425009+otelbot@users.noreply.github.com
+          git checkout -b otelbot/move-inactive-to-emeritus
+          git add README.md
+          git commit -m "chore: move inactive members to emeritus"
+          git push --set-upstream origin otelbot/move-inactive-to-emeritus --force
+          gh pr create --title 'chore: move inactive members to emeritus' --body-file ./.tmp/emeritus-pr-body.md || gh pr edit otelbot/move-inactive-to-emeritus --body-file ./.tmp/emeritus-pr-body.md
+        env:
+          GITHUB_TOKEN: ${{ steps.otelbot-token.outputs.token }}

@@ -21,21 +21,28 @@ import {
   isExportRetryable,
   parseRetryAfterToMills,
 } from '../is-export-retryable';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { createFetchTransport } from './fetch-transport';
+import { HeadersFactory } from '../configuration/otlp-http-configuration';
 
+/**
+ * @deprecated favor the fetch transport
+ * @see {@link createFetchTransport}
+ */
 export interface XhrRequestParameters {
   url: string;
-  headers: () => Record<string, string>;
+  headers: HeadersFactory;
 }
 
 class XhrTransport implements IExporterTransport {
   constructor(private _parameters: XhrRequestParameters) {}
 
-  send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
-    return new Promise<ExportResponse>(resolve => {
+  async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
+    const headers = await this._parameters.headers();
+    const response = await new Promise<ExportResponse>(resolve => {
       const xhr = new XMLHttpRequest();
       xhr.timeout = timeoutMillis;
       xhr.open('POST', this._parameters.url);
-      const headers = this._parameters.headers();
       Object.entries(headers).forEach(([k, v]) => {
         xhr.setRequestHeader(k, v);
       });
@@ -83,6 +90,8 @@ class XhrTransport implements IExporterTransport {
 
       xhr.send(data);
     });
+
+    return response;
   }
 
   shutdown() {
@@ -91,6 +100,8 @@ class XhrTransport implements IExporterTransport {
 }
 
 /**
+ * @deprecated use {@link createFetchTransport} instead
+ *
  * Creates an exporter transport that uses XHR to send the data
  * @param parameters applied to each request made by transport
  */

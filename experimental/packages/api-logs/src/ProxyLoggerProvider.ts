@@ -29,23 +29,32 @@ export class ProxyLoggerProvider implements LoggerProvider {
     options?: LoggerOptions | undefined
   ): Logger {
     return (
-      this.getDelegateLogger(name, version, options) ??
+      this._getDelegateLogger(name, version, options) ??
       new ProxyLogger(this, name, version, options)
     );
   }
 
-  getDelegate(): LoggerProvider {
+  /**
+   * Get the delegate logger provider.
+   * Used by tests only.
+   * @internal
+   */
+  _getDelegate(): LoggerProvider {
     return this._delegate ?? NOOP_LOGGER_PROVIDER;
   }
 
   /**
    * Set the delegate logger provider
+   * @internal
    */
-  setDelegate(delegate: LoggerProvider) {
+  _setDelegate(delegate: LoggerProvider) {
     this._delegate = delegate;
   }
 
-  getDelegateLogger(
+  /**
+   * @internal
+   */
+  _getDelegateLogger(
     name: string,
     version?: string | undefined,
     options?: LoggerOptions | undefined

@@ -35,7 +35,7 @@ import {
   ATTR_HTTP_METHOD,
   ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
   ATTR_HTTP_REQUEST_BODY_SIZE,
-} from '../src/semconv';
+} from './semconv';
 import {
   ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
@@ -410,7 +410,6 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           getFetchBodyLength(...args)
             .then(bodyLength => {
               if (!bodyLength) return;
-
               if (plugin._semconvStability & SemconvStability.OLD) {
                 createdSpan.setAttribute(
                   ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
@@ -451,16 +450,78 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           }
         }
 
+        function withCancelPropagation(
+          body: ReadableStream<Uint8Array> | null,
+          readerClone: ReadableStreamDefaultReader<Uint8Array>
+        ): ReadableStream<Uint8Array> | null {
+          if (!body) return null;
+
+          const reader = body.getReader();
+
+          return new ReadableStream({
+            async pull(controller) {
+              try {
+                const { value, done } = await reader.read();
+                if (done) {
+                  reader.releaseLock();
+                  controller.close();
+                } else {
+                  controller.enqueue(value);
+                }
+              } catch (err) {
+                controller.error(err);
+                reader.cancel(err).catch(_ => {});
+
+                try {
+                  reader.releaseLock();
+                } catch {
+                  // Spec reference:
+                  // https://streams.spec.whatwg.org/#default-reader-release-lock
+                  //
+                  // releaseLock() only throws if called on an invalid reader
+                  // (i.e. reader.[[stream]] is undefined, meaning the lock is already released
+                  // or the reader was never associated). In normal use this cannot happen.
+                  // This catch is defensive only.
+                }
+              }
+            },
+            cancel(reason) {
+              readerClone.cancel(reason).catch(_ => {});
+              return reader.cancel(reason);
+            },
+          });
+        }
+
         function onSuccess(
           span: api.Span,
           resolve: (value: Response | PromiseLike<Response>) => void,
           response: Response
         ): void {
+          let proxiedResponse: Response | null = null;
+
           try {
+            // TODO: Switch to a consumer-driven model and drop `resClone`.
+            // Keeping eager consumption here to preserve current behavior and avoid breaking existing tests.
+            // Context: discussion in PR #5894 → https://github.com/open-telemetry/opentelemetry-js/pull/5894
             const resClone = response.clone();
             const body = resClone.body;
             if (body) {
               const reader = body.getReader();
+              const isNullBodyStatus =
+                // 101 responses and protocol upgrading is handled internally by the browser
+                response.status === 204 ||
+                response.status === 205 ||
+                response.status === 304;
+              const wrappedBody = isNullBodyStatus
+                ? null
+                : withCancelPropagation(response.body, reader);
+
+              proxiedResponse = new Response(wrappedBody, {
+                status: response.status,
+                statusText: response.statusText,
+                headers: response.headers,
+              });
+
               const read = (): void => {
                 reader.read().then(
                   ({ done }) => {
@@ -481,7 +542,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
               endSpanOnSuccess(span, response);
             }
           } finally {
-            resolve(response);
+            resolve(proxiedResponse ?? response);
           }
         }
 
@@ -502,11 +563,9 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
             api.trace.setSpan(api.context.active(), createdSpan),
             () => {
               plugin._addHeaders(options, url);
-              // Important to execute "_callRequestHook" after "_addHeaders", allowing the consumer code to override the request headers.
               plugin._callRequestHook(createdSpan, options);
               plugin._tasksCount++;
-              // TypeScript complains about arrow function captured a this typed as globalThis
-              // ts(7041)
+
               return original
                 .apply(
                   self,

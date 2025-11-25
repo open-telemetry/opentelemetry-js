@@ -13,19 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { parseKeyPairsIntoRecord } from '@opentelemetry/core';
+import * as fs from 'fs';
+import * as path from 'path';
+import { getStringFromEnv, parseKeyPairsIntoRecord } from '@opentelemetry/core';
 import { diag } from '@opentelemetry/api';
 import { getSharedConfigurationFromEnvironment } from './shared-env-configuration';
-import { OtlpHttpConfiguration } from './otlp-http-configuration';
 import { wrapStaticHeadersInFunction } from './shared-configuration';
+import {
+  OtlpNodeHttpConfiguration,
+  httpAgentFactoryFromOptions,
+} from './otlp-node-http-configuration';
 
 function getStaticHeadersFromEnv(
   signalIdentifier: string
 ): Record<string, string> | undefined {
-  const signalSpecificRawHeaders =
-    process.env[`OTEL_EXPORTER_OTLP_${signalIdentifier}_HEADERS`]?.trim();
-  const nonSignalSpecificRawHeaders =
-    process.env['OTEL_EXPORTER_OTLP_HEADERS']?.trim();
+  const signalSpecificRawHeaders = getStringFromEnv(
+    `OTEL_EXPORTER_OTLP_${signalIdentifier}_HEADERS`
+  );
+  const nonSignalSpecificRawHeaders = getStringFromEnv(
+    'OTEL_EXPORTER_OTLP_HEADERS'
+  );
 
   const signalSpecificHeaders = parseKeyPairsIntoRecord(
     signalSpecificRawHeaders
@@ -98,20 +105,70 @@ function appendResourcePathToUrl(
 function getNonSpecificUrlFromEnv(
   signalResourcePath: string
 ): string | undefined {
-  const envUrl = process.env.OTEL_EXPORTER_OTLP_ENDPOINT?.trim();
-  if (envUrl == null || envUrl === '') {
+  const envUrl = getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT');
+  if (envUrl === undefined) {
     return undefined;
   }
   return appendResourcePathToUrl(envUrl, signalResourcePath);
 }
 
 function getSpecificUrlFromEnv(signalIdentifier: string): string | undefined {
-  const envUrl =
-    process.env[`OTEL_EXPORTER_OTLP_${signalIdentifier}_ENDPOINT`]?.trim();
-  if (envUrl == null || envUrl === '') {
+  const envUrl = getStringFromEnv(
+    `OTEL_EXPORTER_OTLP_${signalIdentifier}_ENDPOINT`
+  );
+  if (envUrl === undefined) {
     return undefined;
   }
   return appendRootPathToUrlIfNeeded(envUrl);
+}
+
+function readFileFromEnv(
+  signalSpecificEnvVar: string,
+  nonSignalSpecificEnvVar: string,
+  warningMessage: string
+): Buffer | undefined {
+  const signalSpecificPath = getStringFromEnv(signalSpecificEnvVar);
+  const nonSignalSpecificPath = getStringFromEnv(nonSignalSpecificEnvVar);
+  const filePath = signalSpecificPath ?? nonSignalSpecificPath;
+
+  if (filePath != null) {
+    try {
+      return fs.readFileSync(path.resolve(process.cwd(), filePath));
+    } catch {
+      diag.warn(warningMessage);
+      return undefined;
+    }
+  } else {
+    return undefined;
+  }
+}
+
+function getClientCertificateFromEnv(
+  signalIdentifier: string
+): Buffer | undefined {
+  return readFileFromEnv(
+    `OTEL_EXPORTER_OTLP_${signalIdentifier}_CLIENT_CERTIFICATE`,
+    'OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE',
+    'Failed to read client certificate chain file'
+  );
+}
+
+function getClientKeyFromEnv(signalIdentifier: string): Buffer | undefined {
+  return readFileFromEnv(
+    `OTEL_EXPORTER_OTLP_${signalIdentifier}_CLIENT_KEY`,
+    'OTEL_EXPORTER_OTLP_CLIENT_KEY',
+    'Failed to read client certificate private key file'
+  );
+}
+
+function getRootCertificateFromEnv(
+  signalIdentifier: string
+): Buffer | undefined {
+  return readFileFromEnv(
+    `OTEL_EXPORTER_OTLP_${signalIdentifier}_CERTIFICATE`,
+    'OTEL_EXPORTER_OTLP_CERTIFICATE',
+    'Failed to read root certificate file'
+  );
 }
 
 /**
@@ -120,10 +177,10 @@ function getSpecificUrlFromEnv(signalIdentifier: string): string | undefined {
  * @param signalIdentifier all caps part in environment variables that identifies the signal (e.g.: METRICS, TRACES, LOGS)
  * @param signalResourcePath signal resource path to append if necessary (e.g.: v1/metrics, v1/traces, v1/logs)
  */
-export function getHttpConfigurationFromEnvironment(
+export function getNodeHttpConfigurationFromEnvironment(
   signalIdentifier: string,
   signalResourcePath: string
-): Partial<OtlpHttpConfiguration> {
+): Partial<OtlpNodeHttpConfiguration> {
   return {
     ...getSharedConfigurationFromEnvironment(signalIdentifier),
     url:
@@ -132,5 +189,11 @@ export function getHttpConfigurationFromEnvironment(
     headers: wrapStaticHeadersInFunction(
       getStaticHeadersFromEnv(signalIdentifier)
     ),
+    agentFactory: httpAgentFactoryFromOptions({
+      keepAlive: true,
+      ca: getRootCertificateFromEnv(signalIdentifier),
+      cert: getClientCertificateFromEnv(signalIdentifier),
+      key: getClientKeyFromEnv(signalIdentifier),
+    }),
   };
 }

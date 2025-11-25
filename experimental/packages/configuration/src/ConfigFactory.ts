@@ -13,4 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export function unrefTimer(_timer: number): void {}
+
+import { ConfigFactory } from './IConfigFactory';
+import { EnvironmentConfigFactory } from './EnvironmentConfigFactory';
+import { FileConfigFactory, hasValidConfigFile } from './FileConfigFactory';
+
+export function createConfigFactory(): ConfigFactory {
+  if (hasValidConfigFile()) {
+    return new FileConfigFactory();
+  }
+  return new EnvironmentConfigFactory();
+}

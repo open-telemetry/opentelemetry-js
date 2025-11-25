@@ -23,6 +23,7 @@ import {
   trace,
   Attributes,
   DiagConsoleLogger,
+  INVALID_SPAN_CONTEXT,
 } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
@@ -782,7 +783,7 @@ describe('HttpInstrumentation', () => {
             }
           );
           req.setTimeout(10, () => {
-            req.abort();
+            req.destroy();
           });
           // Instrumentation should not swallow error event.
           assert.strictEqual(req.listeners('error').length, 0);
@@ -941,24 +942,29 @@ describe('HttpInstrumentation', () => {
 
       it('should have 2 ended span when client prematurely close', async () => {
         const promise = new Promise<void>(resolve => {
+          function waitForSpans() {
+            const numSpans = memoryExporter.getFinishedSpans().length;
+
+            if (numSpans < 2) {
+              setTimeout(waitForSpans, 1);
+            } else if (numSpans > 2) {
+              throw new Error(`too many spans: ${numSpans}`);
+            } else {
+              resolve();
+            }
+          }
+
           const req = http.get(
             `${protocol}://${hostname}:${serverPort}/hang`,
             res => {
-              res.on('close', () => {});
+              res.on('close', waitForSpans);
               res.on('error', () => {});
+              // Close the socket.
+              req.destroy();
             }
           );
-          // close the socket.
-          setTimeout(() => {
-            req.destroy();
-          }, 10);
 
           req.on('error', () => {});
-
-          req.on('close', () => {
-            // yield to server to end the span.
-            setTimeout(resolve, 10);
-          });
         });
 
         await promise;
@@ -1438,6 +1444,24 @@ describe('HttpInstrumentation', () => {
           spans.every(span => span.kind === SpanKind.CLIENT),
           true
         );
+      });
+
+      it('should not trace with INVALID_SPAN_CONTEXT parent with requireParent options enabled', async () => {
+        instrumentation.disable();
+        instrumentation.setConfig({
+          requireParentforIncomingSpans: true,
+          requireParentforOutgoingSpans: true,
+        });
+        instrumentation.enable();
+        const root = trace.wrapSpanContext(INVALID_SPAN_CONTEXT);
+        await context.with(trace.setSpan(context.active(), root), async () => {
+          const testPath = '/test/test';
+          await httpRequest.get(
+            `${protocol}://${hostname}:${serverPort}${testPath}`
+          );
+        });
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 0);
       });
 
       it('should trace with parent with both requireParent options enabled', done => {

@@ -14,34 +14,36 @@
  * limitations under the License.
  */
 
-import type {
-  HttpRequestParameters,
-  sendWithHttp,
-} from './http-transport-types';
-
 // NOTE: do not change these type imports to actual imports. Doing so WILL break `@opentelemetry/instrumentation-http`,
 // as they'd be imported before the http/https modules can be wrapped.
 import type * as https from 'https';
 import type * as http from 'http';
 import { ExportResponse } from '../export-response';
 import { IExporterTransport } from '../exporter-transport';
+import { sendWithHttp } from './http-transport-utils';
+import { NodeHttpRequestParameters } from './node-http-transport-types';
 
 interface Utils {
   agent: http.Agent | https.Agent;
-  send: sendWithHttp;
+  request: typeof http.request | typeof https.request;
 }
 
 class HttpExporterTransport implements IExporterTransport {
   private _utils: Utils | null = null;
 
-  constructor(private _parameters: HttpRequestParameters) {}
+  constructor(private _parameters: NodeHttpRequestParameters) {}
 
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
-    const { agent, send } = this._loadUtils();
+    const { agent, request } = await this._loadUtils();
+    const headers = await this._parameters.headers();
 
     return new Promise<ExportResponse>(resolve => {
-      send(
-        this._parameters,
+      sendWithHttp(
+        request,
+        this._parameters.url,
+        headers,
+        this._parameters.compression,
+        this._parameters.userAgent,
         agent,
         data,
         result => {
@@ -56,32 +58,32 @@ class HttpExporterTransport implements IExporterTransport {
     // intentionally left empty, nothing to do.
   }
 
-  private _loadUtils(): Utils {
+  private async _loadUtils(): Promise<Utils> {
     let utils = this._utils;
 
     if (utils === null) {
-      // Lazy require to ensure that http/https is not required before instrumentations can wrap it.
-      const {
-        sendWithHttp,
-        createHttpAgent,
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-      } = require('./http-transport-utils');
-
-      utils = this._utils = {
-        agent: createHttpAgent(
-          this._parameters.url,
-          this._parameters.agentOptions
-        ),
-        send: sendWithHttp,
-      };
+      const protocol = new URL(this._parameters.url).protocol;
+      const [agent, request] = await Promise.all([
+        this._parameters.agentFactory(protocol),
+        requestFunctionFactory(protocol),
+      ]);
+      utils = this._utils = { agent, request };
     }
 
     return utils;
   }
 }
 
+async function requestFunctionFactory(
+  protocol: string
+): Promise<typeof http.request | typeof https.request> {
+  const module = protocol === 'http:' ? import('http') : import('https');
+  const { request } = await module;
+  return request;
+}
+
 export function createHttpExporterTransport(
-  parameters: HttpRequestParameters
+  parameters: NodeHttpRequestParameters
 ): IExporterTransport {
   return new HttpExporterTransport(parameters);
 }

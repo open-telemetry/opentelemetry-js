@@ -2,26 +2,24 @@ name: SBOM
 on:
   release:
     types: [published]
-          
+
 permissions: read-all
 
 jobs:
   generate-sboms:
     runs-on: ubuntu-latest
-    env:
-      NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6
         with:
-          node-version: 20
+          node-version: 22
 
-      - run: npm install -g npm@latest
+      - run: npm install -g npm@11.6.0
 
       - name: Bootstrap
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Generate SBOM for core packages
         if: ${{ ! startsWith(github.ref, 'refs/tags/experimental') && ! startsWith(github.ref, 'refs/tags/api') }}
@@ -32,13 +30,13 @@ jobs:
             echo "Generating SBOM for $dir_name"
             npm sbom --sbom-format=spdx --legacy-peer-deps --workspace ${dir} > "opentelemetry-js_${dir_name}.spdx.json"
           done
-        
+
       - name: Generate SBOM for the API package
         if: startsWith(github.ref, 'refs/tags/api/')
         run: |
           npm sbom --sbom-format=spdx --legacy-peer-deps --workspace api > opentelemetry-js_api.spdx.json
 
-      - name: Generate SBOMs for experimental packages 
+      - name: Generate SBOMs for experimental packages
         if: startsWith(github.ref, 'refs/tags/experimental/')
         run: |
           for dir in $(find experimental/packages -mindepth 1 -maxdepth 1 -type d)
@@ -53,7 +51,7 @@ jobs:
           zip sbom.zip *.spdx.json
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
         with:
           name: SBOM.zip
           path: ./sbom.zip
@@ -65,11 +63,11 @@ jobs:
       contents: write
     steps:
       - name: Download artifact from generate-sboms
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
         with:
           name: SBOM.zip
       - name: Upload release asset
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

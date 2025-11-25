@@ -21,7 +21,6 @@ import {
   getNumberFromEnv,
   globalErrorHandler,
   suppressTracing,
-  unrefTimer,
 } from '@opentelemetry/core';
 import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
@@ -43,7 +42,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
 
   private _isExporting = false;
   private _finishedSpans: ReadableSpan[] = [];
-  private _timer: NodeJS.Timeout | undefined;
+  private _timer: NodeJS.Timeout | number | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
   private _droppedSpansCount: number = 0;
 
@@ -249,7 +248,11 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
     }
     if (this._timer !== undefined) return;
     this._timer = setTimeout(() => flush(), this._scheduledDelayMillis);
-    unrefTimer(this._timer);
+
+    // depending on runtime, this may be a 'number' or NodeJS.Timeout
+    if (typeof this._timer !== 'number') {
+      this._timer.unref();
+    }
   }
 
   private _clearTimer() {

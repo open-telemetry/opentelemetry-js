@@ -369,6 +369,15 @@ describe('fetch', () => {
           msw.http.get('/boom', () => {
             return new msw.HttpResponse(null, { status: 500 });
           }),
+          msw.http.get('/null-body-204', () => {
+            return new msw.HttpResponse(null, { status: 204 });
+          }),
+          msw.http.get('/null-body-205', () => {
+            return new msw.HttpResponse(null, { status: 205 });
+          }),
+          msw.http.get('/null-body-304', () => {
+            return new msw.HttpResponse(null, { status: 304 });
+          }),
         ],
         callback = () => fetch('/api/status.json'),
         config = {},
@@ -390,6 +399,40 @@ describe('fetch', () => {
 
         return { rootSpan, response };
       };
+
+      describe('null-bodied response', () => {
+        // https://chromium.googlesource.com/chromium/src/+/ac85ca2a9cb8c76a37f9d7a6c611c24114f1f05d/third_party/WebKit/Source/core/fetch/Response.cpp#106
+        it('204 (No Content) will correctly end the span', async () => {
+          await tracedFetch({
+            callback: () => fetch('/null-body-204'),
+          });
+          assert.strictEqual(exportedSpans.length, 1);
+          assert.strictEqual(
+            exportedSpans[0].attributes[ATTR_HTTP_STATUS_CODE],
+            204
+          );
+        });
+        it('205 (Reset Content) will correctly end the span', async () => {
+          await tracedFetch({
+            callback: () => fetch('/null-body-205'),
+          });
+          assert.strictEqual(exportedSpans.length, 1);
+          assert.strictEqual(
+            exportedSpans[0].attributes[ATTR_HTTP_STATUS_CODE],
+            205
+          );
+        });
+        it('304 (Not Modified) will correctly end the span', async () => {
+          await tracedFetch({
+            callback: () => fetch('/null-body-304'),
+          });
+          assert.strictEqual(exportedSpans.length, 1);
+          assert.strictEqual(
+            exportedSpans[0].attributes[ATTR_HTTP_STATUS_CODE],
+            304
+          );
+        });
+      });
 
       describe('simple request', () => {
         let rootSpan: api.Span | undefined;
@@ -2385,6 +2428,126 @@ describe('fetch', () => {
           );
           // Using 'http/dup', but should *not* have `http.response.body.size`
           // attribute, because it is Opt-In.
+        });
+      });
+    });
+
+    describe('long-lived streaming requests', () => {
+      let tracePromise: Promise<api.Span> | undefined;
+      let pushes = 0;
+      let timer: any;
+
+      const streamHandler = () => {
+        const encoder = new TextEncoder();
+
+        return msw.http.get('/api/stream', () => {
+          const stream = new ReadableStream<Uint8Array>({
+            start(controller) {
+              // Continuously push data to simulate a long connection
+              timer = setInterval(() => {
+                if (pushes >= 50) {
+                  clearInterval(timer);
+                  controller.close();
+                  return;
+                }
+                pushes += 1;
+                controller.enqueue(encoder.encode(`data: ${pushes}\n`));
+              }, 50);
+            },
+          });
+
+          const response = new msw.HttpResponse(stream, {
+            status: 200,
+            headers: {
+              'Content-Type': 'text/plain; charset=utf-8',
+              'Cache-Control': 'no-cache',
+              Connection: 'keep-alive',
+            },
+          });
+
+          return response;
+        });
+      };
+
+      async function tracedFetch({
+        handlers = [streamHandler()],
+        callback = () => fetch('/api/stream', { method: 'GET' }),
+        config = {},
+      }: {
+        handlers?: msw.RequestHandler[];
+        callback?: () => Promise<Response>;
+        config?: FetchInstrumentationConfig;
+      } = {}): Promise<{ response: Response }> {
+        await startWorker(...handlers);
+
+        const response = await new Promise<Response>(resolve => {
+          tracePromise = trace(async () => {
+            resolve(await callback());
+          }, config);
+        });
+
+        return { response: response };
+      }
+
+      const assertFirstChunk = async (response: Response) => {
+        assert.ok(
+          response.body instanceof ReadableStream,
+          'response.body should be a ReadableStream'
+        );
+        const reader = response.body.getReader();
+        const first = await reader.read();
+        assert.strictEqual(first.done, false, 'first chunk should not be done');
+        const text = new TextDecoder().decode(first.value);
+        assert.match(
+          text,
+          /^data: \d+\n$/,
+          'first chunk should match "data: <n>\\n"'
+        );
+        return reader;
+      };
+
+      beforeEach(() => {
+        if (timer) {
+          clearInterval(timer);
+          timer = undefined;
+        }
+
+        pushes = 0;
+        tracePromise = undefined;
+      });
+
+      afterEach(() => {
+        if (timer) {
+          clearInterval(timer);
+          timer = undefined;
+        }
+      });
+
+      describe('when client cancels the reader', () => {
+        it('should cancel stream and release the connection', async () => {
+          const { response } = await tracedFetch();
+
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => {
+              reject(new Error('trace should finish before timeout'));
+            }, 1000);
+          });
+
+          // Read the first chunk to confirm the stream is live
+          const reader = await assertFirstChunk(response);
+
+          reader.cancel('test-cancel');
+
+          await Promise.race([tracePromise, timeoutPromise]);
+
+          assert.strictEqual(
+            exportedSpans.length,
+            1,
+            'should create a single span'
+          );
+
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          assert.ok(span.ended, 'span should be ended');
         });
       });
     });

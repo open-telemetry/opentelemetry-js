@@ -15,17 +15,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v4
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6
         with:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: 18
+          node-version: 22
 
       - name: Install and Bootstrap 🔧
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Generate version.ts files
         run: npm run version:update

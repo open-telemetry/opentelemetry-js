@@ -35,6 +35,8 @@ export class PrometheusExporter extends MetricReader {
     prefix: '',
     appendTimestamp: false,
     withResourceConstantLabels: undefined,
+    withoutScopeInfo: false,
+    withoutTargetInfo: false,
   };
 
   private readonly _host?: string;
@@ -86,12 +88,20 @@ export class PrometheusExporter extends MetricReader {
     const _withResourceConstantLabels =
       config.withResourceConstantLabels ||
       PrometheusExporter.DEFAULT_OPTIONS.withResourceConstantLabels;
+    const _withoutScopeInfo =
+      config.withoutScopeInfo ||
+      PrometheusExporter.DEFAULT_OPTIONS.withoutScopeInfo;
+    const _withoutTargetInfo =
+      config.withoutTargetInfo ||
+      PrometheusExporter.DEFAULT_OPTIONS.withoutTargetInfo;
     // unref to prevent prometheus exporter from holding the process open on exit
     this._server = createServer(this._requestHandler).unref();
     this._serializer = new PrometheusSerializer(
       this._prefix,
       this._appendTimestamp,
-      _withResourceConstantLabels
+      _withResourceConstantLabels,
+      _withoutTargetInfo,
+      _withoutScopeInfo
     );
 
     this._baseUrl = `http://${this._host}:${this._port}/`;
