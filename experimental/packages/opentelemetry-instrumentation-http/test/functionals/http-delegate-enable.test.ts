@@ -1072,8 +1072,9 @@ describe('HttpInstrumentationDelegate', () => {
 
       before(async () => {
         instrumentation.setConfig({});
-        // @ts-expect-error
-        instrumentation['_delegate']['_semconvStability'] = SemconvStability.STABLE;
+        // @ts-expect-error - accesing internal property not available in the type
+        instrumentation['_delegate']['_semconvStability'] =
+          SemconvStability.STABLE;
         instrumentation.enable();
         server = http.createServer((request, response) => {
           if (request.url?.includes('/premature-close')) {
@@ -1212,8 +1213,9 @@ describe('HttpInstrumentationDelegate', () => {
       });
 
       before(async () => {
-        // @ts-expect-error
-        instrumentation['_delegate']['_semconvStability'] = SemconvStability.DUPLICATE;
+        // @ts-expect-error - accesing internal property not available in the type
+        instrumentation['_delegate']['_semconvStability'] =
+          SemconvStability.DUPLICATE;
         instrumentation.enable();
         server = http.createServer((request, response) => {
           if (request.url?.includes('/setroute')) {

@@ -87,7 +87,10 @@ import {
   setSpanWithError,
 } from './utils';
 import { Err, Func, Http, HttpRequestArgs, Https } from './internal-types';
-import { InstrumentationDelegate, Shimmer } from '@opentelemetry/instrumentation/src/types';
+import {
+  InstrumentationDelegate,
+  Shimmer,
+} from '@opentelemetry/instrumentation/src/types';
 import { Logger } from '@opentelemetry/api-logs';
 
 type HeaderCapture = {
@@ -98,16 +101,19 @@ type HeaderCapture = {
   server: {
     captureRequestHeaders: ReturnType<typeof headerCapture>;
     captureResponseHeaders: ReturnType<typeof headerCapture>;
-  }
-}
+  };
+};
 
-class HttpInstrumentationDelegate implements InstrumentationDelegate<HttpInstrumentationConfig> {
+class HttpInstrumentationDelegate
+  implements InstrumentationDelegate<HttpInstrumentationConfig>
+{
   name = '@opentelemetry/instrumentation-http';
   version = VERSION;
   private _config!: HttpInstrumentationConfig;
   private _diag!: DiagLogger;
   private _tracer!: Tracer;
-  // private _logger!: Logger;
+  // @ts-expect-error - unused for now
+  private _logger!: Logger;
 
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
@@ -134,7 +140,7 @@ class HttpInstrumentationDelegate implements InstrumentationDelegate<HttpInstrum
   }
 
   setLogger(logger: Logger): void {
-    // this._logger = logger;
+    this._logger = logger;
   }
 
   setMeter(meter: Meter) {
@@ -231,11 +237,16 @@ class HttpInstrumentationDelegate implements InstrumentationDelegate<HttpInstrum
     return this._config;
   }
 
-  init(shimmer: Shimmer): [
+  init(
+    shimmer: Shimmer
+  ): [
     InstrumentationNodeModuleDefinition,
     InstrumentationNodeModuleDefinition,
   ] {
-    return [this._getHttpsInstrumentation(shimmer), this._getHttpInstrumentation(shimmer)];
+    return [
+      this._getHttpsInstrumentation(shimmer),
+      this._getHttpInstrumentation(shimmer),
+    ];
   }
 
   private _getHttpInstrumentation(shimmer: Shimmer) {
@@ -1121,6 +1132,8 @@ class HttpInstrumentationDelegate implements InstrumentationDelegate<HttpInstrum
   }
 }
 
-export function createHttpInstrumentation(config: HttpInstrumentationConfig = {}): Instrumentation<HttpInstrumentationConfig> {
+export function createHttpInstrumentation(
+  config: HttpInstrumentationConfig = {}
+): Instrumentation<HttpInstrumentationConfig> {
   return createInstrumentation(new HttpInstrumentationDelegate(), config);
 }
