@@ -1228,6 +1228,7 @@ describe('HttpInstrumentation', () => {
 
         const spans = memoryExporter.getFinishedSpans();
         const clientSpan = spans[0];
+        console.dir(spans); // XXX
         assert.strictEqual(clientSpan.kind, SpanKind.CLIENT);
         assert.strictEqual(
           clientSpan.attributes[ATTR_HTTP_REQUEST_METHOD],
