@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 
-import { TracerProvider, MeterProvider, Span } from '@opentelemetry/api';
-import { LoggerProvider } from '@opentelemetry/api-logs';
+import type {
+  TracerProvider,
+  Tracer,
+  MeterProvider,
+  Span,
+  Meter,
+  DiagLogger,
+} from '@opentelemetry/api';
+import type { Logger, LoggerProvider } from '@opentelemetry/api-logs';
+
+import type { wrap, unwrap, massWrap, massUnwrap } from './shimmer';
 
 /** Interface Instrumentation to apply patch. */
 export interface Instrumentation<
@@ -49,6 +58,34 @@ export interface Instrumentation<
   getConfig(): ConfigType;
 }
 
+export interface InstrumentationDelegate<
+  ConfigType extends InstrumentationConfig = InstrumentationConfig,
+> {
+  /** Instrumentation Name  */
+  name: string;
+
+  /** Instrumentation Version  */
+  version: string;
+
+  /** Method to set instrumentation config  */
+  setConfig(config: ConfigType): void;
+
+  /** Method to get instrumentation config  */
+  getConfig(): ConfigType; // TODO: is it necessary?
+
+  setDiag(diag: DiagLogger): void;
+  setTracer(tracer: Tracer): void;
+  setMeter(meter: Meter): void; // this should handle update instruments
+  setLogger(logger: Logger): void;
+
+  /** Method to initialize instrumentation config  */
+  init(shimmer: Shimmer): InstrumentationModuleDefinition[] | undefined;
+  /** Method to enable the instrumentation  */
+  enable?: () => void;
+  /** Method to disable the instrumentation  */
+  disable?: () => void;
+}
+
 /**
  * Base interface for configuration options common to all instrumentations.
  * This interface can be extended by individual instrumentations to include
@@ -73,6 +110,13 @@ export interface ShimWrapped extends Function {
   __unwrap: Function;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   __original: Function;
+}
+
+export interface Shimmer {
+  wrap: typeof wrap;
+  unwrap: typeof unwrap;
+  massWrap: typeof massWrap;
+  massUnwrap: typeof massUnwrap;
 }
 
 export interface InstrumentationModuleFile {

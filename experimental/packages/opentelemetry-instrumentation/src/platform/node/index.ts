@@ -14,4 +14,5 @@
  * limitations under the License.
  */
 export { InstrumentationBase } from './instrumentation';
+export { createInstrumentation } from './create-instrumentation';
 export { normalize } from './normalize';
