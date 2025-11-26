@@ -23,17 +23,19 @@ export {
   processDetector,
   serviceInstanceIdDetector,
 } from './detectors';
+export type { Entity } from './entity';
+export { defaultServiceName } from './platform';
 export type { Resource } from './Resource';
 export {
-  resourceFromAttributes,
   defaultResource,
   emptyResource,
-} from './ResourceImpl';
-export { defaultServiceName } from './platform';
+  resourceFromAttributes,
+  resourceFromDetectedResource,
+} from './resource-impl';
 export type {
-  ResourceDetector,
   DetectedResource,
   DetectedResourceAttributes,
-  RawResourceAttribute,
   MaybePromise,
+  RawResourceAttribute,
+  ResourceDetector,
 } from './types';
