@@ -91,9 +91,7 @@ export function setupResource(
   sdkOptions: SDKOptions
 ): Resource {
   let resource: Resource =
-    sdkOptions.resource ??
-    getResourceFromConfiguration(config) ??
-    defaultResource();
+    getResourceFromConfiguration(config) ?? defaultResource();
   let resourceDetectors: ResourceDetector[] = [];
 
   if (sdkOptions.resourceDetectors != null) {
