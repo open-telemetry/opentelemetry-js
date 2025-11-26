@@ -21,6 +21,8 @@ import type { InstrumentationScope } from '@opentelemetry/core';
  * @param scope - The instrumentation scope to convert
  * @returns A unique string identifier for the scope
  */
-export function getInstrumentationScopeKey(scope: InstrumentationScope): string {
+export function getInstrumentationScopeKey(
+  scope: InstrumentationScope
+): string {
   return `${scope.name}@${scope.version || ''}:${scope.schemaUrl || ''}`;
 }

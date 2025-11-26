@@ -20,7 +20,7 @@ import type { LoggerConfig, LoggerConfigurator } from '../types';
 
 /**
  * Default LoggerConfig used when no pattern matches
- * 
+ *
  * @experimental This feature is in development as per the OpenTelemetry specification.
  */
 const DEFAULT_LOGGER_CONFIG: Required<LoggerConfig> = {

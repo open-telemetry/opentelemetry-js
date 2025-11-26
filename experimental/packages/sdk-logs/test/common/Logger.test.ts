@@ -72,7 +72,10 @@ describe('Logger', () => {
         );
 
         // Emit multiple log records - getLoggerConfig should not be called again
-        logger.emit({ body: 'message 1', severityNumber: SeverityNumber.ERROR });
+        logger.emit({
+          body: 'message 1',
+          severityNumber: SeverityNumber.ERROR,
+        });
         logger.emit({ body: 'message 2', severityNumber: SeverityNumber.WARN });
         logger.emit({ body: 'message 3', severityNumber: SeverityNumber.INFO });
 
