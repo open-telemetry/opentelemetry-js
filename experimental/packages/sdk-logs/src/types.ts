@@ -21,12 +21,16 @@ import { LogRecordProcessor } from './LogRecordProcessor';
 
 /**
  * A LoggerConfig defines various configurable aspects of a Logger's behavior.
+ * 
+ * @experimental This feature is in development as per the OpenTelemetry specification.
  */
 export interface LoggerConfig {
   /**
    * A boolean indication of whether the logger is enabled.
    * If a Logger is disabled, it behaves equivalently to a No-op Logger.
    * Defaults to false (loggers are enabled by default).
+   * 
+   * @experimental This feature is in development as per the OpenTelemetry specification.
    */
   disabled?: boolean;
 
