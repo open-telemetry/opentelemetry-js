@@ -22,6 +22,7 @@ import { LogRecordProcessor } from '../LogRecordProcessor';
 import { LogRecordLimits, LoggerConfig, LoggerConfigurator } from '../types';
 import { NoopLogRecordProcessor } from '../export/NoopLogRecordProcessor';
 import { MultiLogRecordProcessor } from '../MultiLogRecordProcessor';
+import { getInstrumentationScopeKey } from './utils';
 
 const DEFAULT_LOGGER_CONFIG: Required<LoggerConfig> = {
   disabled: false,
@@ -74,7 +75,7 @@ export class LoggerProviderSharedState {
   getLoggerConfig(
     instrumentationScope: InstrumentationScope
   ): Required<LoggerConfig> {
-    const key = this._getScopeKey(instrumentationScope);
+    const key = getInstrumentationScopeKey(instrumentationScope);
 
     // Return cached config if available
     let config = this._loggerConfigs.get(key);
@@ -90,9 +91,5 @@ export class LoggerProviderSharedState {
     this._loggerConfigs.set(key, config);
 
     return config;
-  }
-
-  private _getScopeKey(scope: InstrumentationScope): string {
-    return `${scope.name}@${scope.version || ''}:${scope.schemaUrl || ''}`;
   }
 }
