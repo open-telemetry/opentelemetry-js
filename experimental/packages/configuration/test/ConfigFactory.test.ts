@@ -234,7 +234,7 @@ const configFromFile: ConfigurationModel = {
       {
         simple: {
           exporter: {
-            console: undefined,
+            console: {},
           },
         },
       },
@@ -421,7 +421,7 @@ const configFromFile: ConfigurationModel = {
           timeout: 30000,
           interval: 60000,
           exporter: {
-            console: undefined,
+            console: {},
           },
           cardinality_limits: {
             default: 2000,
@@ -541,7 +541,7 @@ const configFromFile: ConfigurationModel = {
       {
         simple: {
           exporter: {
-            console: undefined,
+            console: {},
           },
         },
       },
@@ -809,6 +809,27 @@ describe('ConfigFactory', function () {
               type: 'string',
             },
           ],
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('OTEL_SERVICE_NAME takes precedence over service name value in OTEL_RESOURCE_ATTRIBUTES', function () {
+      process.env.OTEL_SERVICE_NAME = 'name-from-service-name';
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.name=name-from-attributes';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        resource: {
+          attributes: [
+            {
+              name: 'service.name',
+              value: 'name-from-service-name',
+              type: 'string',
+            },
+          ],
+          attributes_list: 'service.name=name-from-attributes',
         },
       };
       const configFactory = createConfigFactory();
