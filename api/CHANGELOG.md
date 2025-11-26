@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 ### :boom: Breaking Change
 
 * feat(api) Add delegating no-op meter provider [#4858](https://github.com/open-telemetry/opentelemetry-js/pull/4858) @hectorhdzg
+  * Proxy meters now upgrade previously created instruments and batch callbacks once an SDK registers, mirroring the behavior of the tracing and logging APIs.
 
 ### :rocket: (Enhancement)
 

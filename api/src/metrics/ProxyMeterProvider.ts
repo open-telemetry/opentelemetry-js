@@ -31,15 +31,20 @@ const NOOP_METER_PROVIDER = new NoopMeterProvider();
  */
 export class ProxyMeterProvider implements MeterProvider {
   private _delegate?: MeterProvider;
+  private readonly _proxyMeters = new Set<ProxyMeter>();
 
   /**
    * Get a {@link ProxyMeter}
    */
   getMeter(name: string, version?: string, options?: MeterOptions): Meter {
-    return (
-      this.getDelegateMeter(name, version, options) ??
-      new ProxyMeter(this, name, version, options)
-    );
+    const delegate = this.getDelegateMeter(name, version, options);
+    if (delegate) {
+      return delegate;
+    }
+
+    const meter = new ProxyMeter(this, name, version, options);
+    this._proxyMeters.add(meter);
+    return meter;
   }
 
   getDelegate(): MeterProvider {
@@ -51,6 +56,10 @@ export class ProxyMeterProvider implements MeterProvider {
    */
   setDelegate(delegate: MeterProvider) {
     this._delegate = delegate;
+    for (const meter of this._proxyMeters) {
+      meter._bindDelegate();
+    }
+    this._proxyMeters.clear();
   }
 
   getDelegateMeter(
@@ -59,5 +68,10 @@ export class ProxyMeterProvider implements MeterProvider {
     options?: MeterOptions
   ): Meter | undefined {
     return this._delegate?.getMeter(name, version, options);
+  }
+
+  /** @internal */
+  _onProxyMeterDelegateBound(meter: ProxyMeter): void {
+    this._proxyMeters.delete(meter);
   }
 }

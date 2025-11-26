@@ -17,7 +17,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
-  ProxyMeter,
   ProxyMeterProvider,
   Meter,
   MeterProvider,
@@ -29,14 +28,8 @@ import {
   ObservableUpDownCounter,
   Gauge,
 } from '../../../src';
-import {
-  NoopHistogramMetric,
-  NoopMeter,
-  NoopObservableCounterMetric,
-  NoopObservableGaugeMetric,
-  NoopObservableUpDownCounterMetric,
-  NoopUpDownCounterMetric,
-} from '../../../src/metrics/NoopMeter';
+import { ProxyMeter } from '../../../src/metrics/ProxyMeter';
+import { NoopMeter } from '../../../src/metrics/NoopMeter';
 
 describe('ProxyMeter', () => {
   let provider: ProxyMeterProvider;
@@ -57,27 +50,16 @@ describe('ProxyMeter', () => {
       assert.ok(meter instanceof ProxyMeter);
     });
 
-    it('create instruments should return Noop metric instruments', () => {
+    it('creates proxy instruments that act as no-ops before delegation', () => {
       const meter = provider.getMeter('test');
-      assert.ok(
-        meter.createHistogram('histogram-name') instanceof NoopHistogramMetric
-      );
-      assert.ok(
-        meter.createObservableCounter('observablecounter-name') instanceof
-          NoopObservableCounterMetric
-      );
-      assert.ok(
-        meter.createObservableGauge('observableGauge-name') instanceof
-          NoopObservableGaugeMetric
-      );
-      assert.ok(
-        meter.createObservableUpDownCounter('observableCounter-name') instanceof
-          NoopObservableUpDownCounterMetric
-      );
-      assert.ok(
-        meter.createUpDownCounter('upDownCounter-name') instanceof
-          NoopUpDownCounterMetric
-      );
+
+      const counter = meter.createCounter('counter');
+      const histogram = meter.createHistogram('histogram');
+      const observable = meter.createObservableGauge('gauge');
+
+      assert.doesNotThrow(() => counter.add(1));
+      assert.doesNotThrow(() => histogram.record(1));
+      assert.doesNotThrow(() => observable.addCallback(() => {}));
     });
   });
 
@@ -123,6 +105,7 @@ describe('ProxyMeter', () => {
   describe('when delegate is set after getMeter', () => {
     let meter: Meter;
     let delegate: MeterProvider;
+    let delegateMeter: Meter;
     let delegateGauge: Gauge;
     let delegateHistogram: Histogram;
     let delegateCounter: Counter;
@@ -130,34 +113,43 @@ describe('ProxyMeter', () => {
     let delegateObservableGauge: ObservableGauge;
     let delegateObservableCounter: ObservableCounter;
     let delegateObservableUpDownCounter: ObservableUpDownCounter;
-    let delegateMeter: Meter;
+    let addBatchStub: sinon.SinonStub;
+    let removeBatchStub: sinon.SinonStub;
 
     beforeEach(() => {
-      delegateHistogram = new NoopHistogramMetric();
+      delegateGauge = { record: sandbox.stub() };
+      delegateHistogram = { record: sandbox.stub() };
+      delegateCounter = { add: sandbox.stub() };
+      delegateUpDownCounter = { add: sandbox.stub() };
+      delegateObservableGauge = {
+        addCallback: sandbox.stub(),
+        removeCallback: sandbox.stub(),
+      };
+      delegateObservableCounter = {
+        addCallback: sandbox.stub(),
+        removeCallback: sandbox.stub(),
+      };
+      delegateObservableUpDownCounter = {
+        addCallback: sandbox.stub(),
+        removeCallback: sandbox.stub(),
+      };
+      addBatchStub = sandbox.stub();
+      removeBatchStub = sandbox.stub();
+
       delegateMeter = {
-        createGauge() {
-          return delegateGauge;
-        },
-        createHistogram() {
-          return delegateHistogram;
-        },
-        createCounter() {
-          return delegateCounter;
-        },
-        createObservableCounter() {
-          return delegateObservableCounter;
-        },
-        createObservableGauge() {
-          return delegateObservableGauge;
-        },
-        createObservableUpDownCounter() {
-          return delegateObservableUpDownCounter;
-        },
-        createUpDownCounter() {
-          return delegateUpDownCounter;
-        },
-        addBatchObservableCallback() {},
-        removeBatchObservableCallback() {},
+        createGauge: sandbox.stub().returns(delegateGauge),
+        createHistogram: sandbox.stub().returns(delegateHistogram),
+        createCounter: sandbox.stub().returns(delegateCounter),
+        createObservableCounter: sandbox
+          .stub()
+          .returns(delegateObservableCounter),
+        createObservableGauge: sandbox.stub().returns(delegateObservableGauge),
+        createObservableUpDownCounter: sandbox
+          .stub()
+          .returns(delegateObservableUpDownCounter),
+        createUpDownCounter: sandbox.stub().returns(delegateUpDownCounter),
+        addBatchObservableCallback: addBatchStub,
+        removeBatchObservableCallback: removeBatchStub,
       };
 
       meter = provider.getMeter('test');
@@ -200,9 +192,88 @@ describe('ProxyMeter', () => {
       assert.strictEqual(instrument, delegateObservableUpDownCounter);
     });
 
-    it('should create observable up down counters using the delegate meter', () => {
-      const histogram = meter.createUpDownCounter('test');
-      assert.strictEqual(histogram, delegateUpDownCounter);
+    it('should create up down counters using the delegate meter', () => {
+      const instrument = meter.createUpDownCounter('test');
+      assert.strictEqual(instrument, delegateUpDownCounter);
+    });
+  });
+
+  describe('when instruments are created before delegate is set', () => {
+    it('hydrates synchronous instruments once the delegate registers', () => {
+      const meter = provider.getMeter('test');
+      const counter = meter.createCounter('pre-counter');
+      const addStub = sandbox.stub();
+      const delegateCounter: Counter = {
+        add: addStub,
+      };
+      const delegateMeter = new NoopMeter();
+      sandbox.stub(delegateMeter, 'createCounter').returns(delegateCounter);
+
+      provider.setDelegate({
+        getMeter() {
+          return delegateMeter;
+        },
+      });
+
+      counter.add(7);
+      sandbox.assert.calledOnceWithExactly(addStub, 7);
+    });
+
+    it('hydrates observable callbacks that were added before delegation', () => {
+      const meter = provider.getMeter('test');
+      const observable = meter.createObservableGauge('observable');
+      const callback = sandbox.stub();
+      observable.addCallback(callback);
+
+      const delegateObservable: ObservableGauge = {
+        addCallback: sandbox.stub(),
+        removeCallback: sandbox.stub(),
+      };
+      const delegateMeter = new NoopMeter();
+      sandbox
+        .stub(delegateMeter, 'createObservableGauge')
+        .returns(delegateObservable);
+
+      provider.setDelegate({
+        getMeter() {
+          return delegateMeter;
+        },
+      });
+
+      sandbox.assert.calledOnceWithExactly(
+        delegateObservable.addCallback as sinon.SinonStub,
+        callback
+      );
+    });
+
+    it('hydrates batch observable callbacks registered before delegation', () => {
+      const meter = provider.getMeter('test');
+      const observable = meter.createObservableGauge('batch');
+      const callback = sandbox.stub();
+      meter.addBatchObservableCallback(callback, [observable]);
+
+      const delegateObservable: ObservableGauge = {
+        addCallback: sandbox.stub(),
+        removeCallback: sandbox.stub(),
+      };
+      const delegateMeter = new NoopMeter();
+      sandbox
+        .stub(delegateMeter, 'createObservableGauge')
+        .returns(delegateObservable);
+      const addBatchStub = sandbox.stub(
+        delegateMeter,
+        'addBatchObservableCallback'
+      );
+
+      provider.setDelegate({
+        getMeter() {
+          return delegateMeter;
+        },
+      });
+
+      sandbox.assert.calledOnce(addBatchStub);
+      const [, registeredObservables] = addBatchStub.firstCall.args;
+      assert.strictEqual(registeredObservables[0], delegateObservable);
     });
   });
 });
