@@ -20,6 +20,8 @@ import type { LoggerConfig, LoggerConfigurator } from '../types';
 
 /**
  * Default LoggerConfig used when no pattern matches
+ * 
+ * @experimental This feature is in development as per the OpenTelemetry specification.
  */
 const DEFAULT_LOGGER_CONFIG: Required<LoggerConfig> = {
   disabled: false,
@@ -29,11 +31,15 @@ const DEFAULT_LOGGER_CONFIG: Required<LoggerConfig> = {
 
 /**
  * Configuration for a specific logger pattern
+ *
+ * @experimental This feature is in development as per the OpenTelemetry specification.
  */
 export interface LoggerPattern {
   /**
    * The logger name or pattern to match.
    * Use '*' for wildcard matching.
+   *
+   * @experimental This feature is in development as per the OpenTelemetry specification.
    */
   pattern: string;
 
