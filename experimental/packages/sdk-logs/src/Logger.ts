@@ -26,18 +26,25 @@ import {
 
 import { LogRecordImpl } from './LogRecordImpl';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
+import { LoggerConfig } from './types';
 
 export class Logger implements logsAPI.Logger {
+  private readonly _loggerConfig: Required<LoggerConfig>;
+
   constructor(
     public readonly instrumentationScope: InstrumentationScope,
     private _sharedState: LoggerProviderSharedState
-  ) {}
-
-  public emit(logRecord: logsAPI.LogRecord): void {
-    // Get logger configuration
-    const loggerConfig = this._sharedState.getLoggerConfig(
+  ) {
+    // Cache the logger configuration at construction time
+    // Since we don't support re-configuration, this avoids map lookups
+    // and string allocations on each emit() call
+    this._loggerConfig = this._sharedState.getLoggerConfig(
       this.instrumentationScope
     );
+  }
+
+  public emit(logRecord: logsAPI.LogRecord): void {
+    const loggerConfig = this._loggerConfig;
 
     const currentContext = logRecord.context || context.active();
 

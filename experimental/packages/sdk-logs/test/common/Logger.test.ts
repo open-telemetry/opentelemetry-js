@@ -27,6 +27,7 @@ import {
 import { Logger } from '../../src/Logger';
 import { InMemoryLogRecordExporter } from '../../src/export/InMemoryLogRecordExporter';
 import { SimpleLogRecordProcessor } from '../../src/export/SimpleLogRecordProcessor';
+import { LoggerProviderSharedState } from '../../src/internal/LoggerProviderSharedState';
 
 const setup = () => {
   const logProcessor = new NoopLogRecordProcessor();
@@ -42,6 +43,47 @@ describe('Logger', () => {
     it('should create an instance', () => {
       const { logger } = setup();
       assert.ok(logger instanceof Logger);
+    });
+
+    it('should cache the logger config at construction time', () => {
+      const logProcessor = new NoopLogRecordProcessor();
+      const loggerProvider = new LoggerProvider({
+        processors: [logProcessor],
+        loggerConfigurator: createLoggerConfigurator([
+          {
+            pattern: 'test-logger',
+            config: { minimumSeverity: SeverityNumber.WARN },
+          },
+        ]),
+      });
+
+      const getLoggerConfigSpy = sinon.spy(
+        LoggerProviderSharedState.prototype,
+        'getLoggerConfig'
+      );
+
+      try {
+        // Get the logger - this should call getLoggerConfig once
+        const logger = loggerProvider.getLogger('test-logger') as Logger;
+        assert.strictEqual(
+          getLoggerConfigSpy.callCount,
+          1,
+          'getLoggerConfig should be called once during logger construction'
+        );
+
+        // Emit multiple log records - getLoggerConfig should not be called again
+        logger.emit({ body: 'message 1', severityNumber: SeverityNumber.ERROR });
+        logger.emit({ body: 'message 2', severityNumber: SeverityNumber.WARN });
+        logger.emit({ body: 'message 3', severityNumber: SeverityNumber.INFO });
+
+        assert.strictEqual(
+          getLoggerConfigSpy.callCount,
+          1,
+          'getLoggerConfig should still be called only once after multiple emit() calls'
+        );
+      } finally {
+        getLoggerConfigSpy.restore();
+      }
     });
   });
 
