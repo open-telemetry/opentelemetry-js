@@ -19,7 +19,11 @@ import { TextMapPropagator } from '@opentelemetry/api';
 import { Instrumentation } from '@opentelemetry/instrumentation';
 import { Resource, ResourceDetector } from '@opentelemetry/resources';
 import { LoggerProvider, LogRecordProcessor } from '@opentelemetry/sdk-logs';
-import { IMetricReader, MeterProvider, ViewOptions } from '@opentelemetry/sdk-metrics';
+import {
+  IMetricReader,
+  MeterProvider,
+  ViewOptions,
+} from '@opentelemetry/sdk-metrics';
 import {
   Sampler,
   SpanExporter,
