@@ -18,8 +18,8 @@ import type { ContextManager } from '@opentelemetry/api';
 import { TextMapPropagator } from '@opentelemetry/api';
 import { Instrumentation } from '@opentelemetry/instrumentation';
 import { Resource, ResourceDetector } from '@opentelemetry/resources';
-import { LogRecordProcessor } from '@opentelemetry/sdk-logs';
-import { IMetricReader, ViewOptions } from '@opentelemetry/sdk-metrics';
+import { LoggerProvider, LogRecordProcessor } from '@opentelemetry/sdk-logs';
+import { IMetricReader, MeterProvider, ViewOptions } from '@opentelemetry/sdk-metrics';
 import {
   Sampler,
   SpanExporter,
@@ -27,6 +27,7 @@ import {
   SpanProcessor,
   IdGenerator,
 } from '@opentelemetry/sdk-trace-base';
+import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 
 export interface NodeSDKConfiguration {
   autoDetectResources: boolean;
@@ -58,4 +59,12 @@ export interface SDKOptions {
   instrumentations?: (Instrumentation | Instrumentation[])[];
   resourceDetectors?: ResourceDetector[];
   textMapPropagator?: TextMapPropagator | null;
+}
+
+export interface SDKComponents {
+  contextManager: ContextManager;
+  loggerProvider?: LoggerProvider;
+  meterProvider?: MeterProvider;
+  tracesProvider?: NodeTracerProvider;
+  propagator?: TextMapPropagator;
 }

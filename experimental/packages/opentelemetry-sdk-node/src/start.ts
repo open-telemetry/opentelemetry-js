@@ -18,17 +18,21 @@ import {
   ConfigurationModel,
   createConfigFactory,
 } from '@opentelemetry/configuration';
-import { context, diag, DiagConsoleLogger } from '@opentelemetry/api';
+import {
+  context,
+  diag,
+  DiagConsoleLogger,
+  propagation,
+} from '@opentelemetry/api';
 import {
   getInstanceID,
   getLogRecordProcessorsFromConfiguration,
   getPropagatorFromConfiguration,
   getResourceDetectorsFromConfiguration,
   getResourceFromConfiguration,
-  setupPropagator,
 } from './utils';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
-import type { SDKOptions } from './types';
+import type { SDKComponents, SDKOptions } from './types';
 import { LoggerProvider } from '@opentelemetry/sdk-logs';
 import { logs } from '@opentelemetry/api-logs';
 import {
@@ -41,6 +45,11 @@ import {
 } from '@opentelemetry/resources';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
+import {
+  CompositePropagator,
+  W3CBaggagePropagator,
+  W3CTraceContextPropagator,
+} from '@opentelemetry/core';
 
 /**
  * @experimental Function to start the OpenTelemetry Node SDK
@@ -59,24 +68,23 @@ export function startNodeSDK(sdkOptions: SDKOptions): {
   if (config.log_level != null) {
     diag.setLogger(new DiagConsoleLogger(), { logLevel: config.log_level });
   }
-
   registerInstrumentations({
     instrumentations: sdkOptions?.instrumentations?.flat() ?? [],
   });
-  setupDefaultContextManager();
-  setupPropagator(
-    sdkOptions?.textMapPropagator === null
-      ? null // null means don't set.
-      : (sdkOptions?.textMapPropagator ??
-          getPropagatorFromConfiguration(config))
-  );
-  const resource = setupResource(config, sdkOptions);
-  const loggerProvider = setupLoggerProvider(config, sdkOptions, resource);
+
+  const components = create(config, sdkOptions);
+  context.setGlobalContextManager(components.contextManager);
+  if (components.loggerProvider) {
+    logs.setGlobalLoggerProvider(components.loggerProvider);
+  }
+  if (components.propagator) {
+    propagation.setGlobalPropagator(components.propagator);
+  }
 
   const shutdownFn = async () => {
     const promises: Promise<unknown>[] = [];
-    if (loggerProvider) {
-      promises.push(loggerProvider.shutdown());
+    if (components.loggerProvider) {
+      promises.push(components.loggerProvider.shutdown());
     }
     await Promise.all(promises);
   };
@@ -85,6 +93,48 @@ export function startNodeSDK(sdkOptions: SDKOptions): {
 const NOOP_SDK = {
   shutdown: async () => {},
 };
+
+/**
+ * Interpret configuration model and return SDK components.
+ */
+function create(
+  config: ConfigurationModel,
+  sdkOptions: SDKOptions
+): SDKComponents {
+  const defaultContextManager = new AsyncLocalStorageContextManager();
+  defaultContextManager.enable();
+  const components: SDKComponents = {
+    contextManager: defaultContextManager,
+  };
+  const resource = setupResource(config, sdkOptions);
+
+  const propagator =
+    sdkOptions?.textMapPropagator === null
+      ? null // null means don't set.
+      : (sdkOptions?.textMapPropagator ??
+        getPropagatorFromConfiguration(config));
+  if (propagator) {
+    components.propagator = propagator;
+  } else if (propagator === undefined) {
+    components.propagator = new CompositePropagator({
+      propagators: [
+        new W3CTraceContextPropagator(),
+        new W3CBaggagePropagator(),
+      ],
+    });
+  }
+
+  const logProcessors = getLogRecordProcessorsFromConfiguration(config);
+  if (logProcessors) {
+    const loggerProvider = new LoggerProvider({
+      resource: resource,
+      processors: logProcessors,
+    });
+    components.loggerProvider = loggerProvider;
+  }
+
+  return components;
+}
 
 export function setupResource(
   config: ConfigurationModel,
@@ -118,29 +168,4 @@ export function setupResource(
         );
 
   return resource;
-}
-
-function setupDefaultContextManager() {
-  const defaultContextManager = new AsyncLocalStorageContextManager();
-  defaultContextManager.enable();
-  context.setGlobalContextManager(defaultContextManager);
-}
-
-function setupLoggerProvider(
-  config: ConfigurationModel,
-  sdkOptions: SDKOptions,
-  resource: Resource | undefined
-): LoggerProvider | undefined {
-  const logProcessors = getLogRecordProcessorsFromConfiguration(config);
-
-  if (logProcessors) {
-    const loggerProvider = new LoggerProvider({
-      resource: resource,
-      processors: logProcessors,
-    });
-
-    logs.setGlobalLoggerProvider(loggerProvider);
-    return loggerProvider;
-  }
-  return undefined;
 }
