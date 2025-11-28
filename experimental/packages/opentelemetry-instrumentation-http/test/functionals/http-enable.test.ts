@@ -1207,6 +1207,33 @@ describe('HttpInstrumentation', () => {
           [ATTR_URL_SCHEME]: protocol,
         });
       });
+
+      it('should accept QUERY as a known HTTP req method', async () => {
+        await new Promise<void>((resolve, reject) => {
+          const req = http.request(
+            `${protocol}://${hostname}:${serverPort}/hi`,
+            {
+              method: 'QUERY',
+            },
+            res => {
+              res.resume();
+              res.on('end', resolve);
+              res.on('error', reject);
+            }
+          );
+          req.on('error', reject);
+          req.write('{}');
+          req.end();
+        });
+
+        const spans = memoryExporter.getFinishedSpans();
+        const clientSpan = spans.slice(-1)[0];
+        assert.strictEqual(clientSpan.kind, SpanKind.CLIENT);
+        assert.strictEqual(
+          clientSpan.attributes[ATTR_HTTP_REQUEST_METHOD],
+          'QUERY'
+        );
+      });
     });
 
     describe('with semconv stability set to http/dup', () => {

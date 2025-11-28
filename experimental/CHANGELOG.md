@@ -21,6 +21,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(configuration): doesnt set meter,tracer,logger provider by default [#6130](https://github.com/open-telemetry/opentelemetry-js/pull/6130) @maryliag
 * feat(opentelemetry-sdk-node): set instrumentation and propagators for experimental start [#6148](https://github.com/open-telemetry/opentelemetry-js/pull/6148) @maryliag
 * refactor(configuration): set console exporter as empty object [#6164](https://github.com/open-telemetry/opentelemetry-js/pull/6164) @maryliag
+* feat(instrumentation-http, instrumentation-fetch, instrumentation-xml-http-request): support "QUERY" as a known HTTP method
 * feat(opentelemetry-sdk-node): set resources and log provider for experimental start [#6152](https://github.com/open-telemetry/opentelemetry-js/pull/6152) @maryliag
 
 ### :bug: Bug Fixes
