@@ -17,7 +17,7 @@ npm install
 
 ## Running Tests
 
-Test can be run completely or each step can be run separately.
+Tests can be run completely or each step can be run separately.
 
 ### `npm run test:e2e`
 

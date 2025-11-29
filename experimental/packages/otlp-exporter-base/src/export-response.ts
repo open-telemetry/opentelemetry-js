@@ -27,6 +27,7 @@ export interface ExportResponseFailure {
 export interface ExportResponseRetryable {
   status: 'retryable';
   retryInMillis?: number;
+  error?: Error;
 }
 
 export type ExportResponse =
