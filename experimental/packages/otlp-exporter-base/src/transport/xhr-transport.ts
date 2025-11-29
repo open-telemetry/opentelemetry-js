@@ -50,7 +50,7 @@ class XhrTransport implements IExporterTransport {
       xhr.ontimeout = _ => {
         resolve({
           status: 'retryable',
-          retryInMillis: 0,
+          error: new Error('XHR request timed out'),
         });
       };
 
@@ -82,10 +82,9 @@ class XhrTransport implements IExporterTransport {
         });
       };
       xhr.onerror = () => {
-        // XHR onerror typically indicates network failures which are retryable
         resolve({
           status: 'retryable',
-          retryInMillis: 0,
+          error: new Error('XHR request encountered a network error'),
         });
       };
 

@@ -67,7 +67,7 @@ class FetchTransport implements IExporterTransport {
       if (isExportNetworkErrorRetryable(error)) {
         return {
           status: 'retryable',
-          retryInMillis: 0,
+          error: new Error('Fetch request encountered a network error', { cause: error }),
         };
       }
       return {

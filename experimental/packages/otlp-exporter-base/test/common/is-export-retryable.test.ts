@@ -96,26 +96,6 @@ describe('isExportNetworkErrorRetryable', function () {
     }
   });
 
-  it('should return true for undici errors wrapped in TypeError', function () {
-    const undiciCodes = [
-      'UND_ERR_CONNECT_TIMEOUT',
-      'UND_ERR_HEADERS_TIMEOUT',
-      'UND_ERR_BODY_TIMEOUT',
-      'UND_ERR_SOCKET',
-    ];
-
-    for (const code of undiciCodes) {
-      const cause = new Error('Undici error') as any;
-      cause.code = code;
-      const error = new TypeError('fetch failed', { cause });
-      assert.strictEqual(
-        isExportNetworkErrorRetryable(error),
-        true,
-        `Expected ${code} to be retryable`
-      );
-    }
-  });
-
   it('should return true for browser fetch TypeError without cause', function () {
     // Browser fetch throws TypeError for network errors without cause
     const error = new TypeError('Failed to fetch');

@@ -182,32 +182,8 @@ describe('FetchTransport', function () {
         try {
           assert.strictEqual(response.status, 'retryable');
           assert.strictEqual(
-            (response as ExportResponseRetryable).retryInMillis,
-            0
-          );
-        } catch (e) {
-          done(e);
-        }
-        done();
-      }, done /* catch any rejections */);
-    });
-
-    it('returns retryable when fetch throws network error with code', function (done) {
-      // arrange
-      const cause = new Error('network error') as NodeJS.ErrnoException;
-      cause.code = 'ECONNRESET';
-      const networkError = new TypeError('fetch failed', { cause });
-      sinon.stub(globalThis, 'fetch').rejects(networkError);
-      const transport = createFetchTransport(testTransportParameters);
-
-      //act
-      transport.send(testPayload, requestTimeout).then(response => {
-        // assert
-        try {
-          assert.strictEqual(response.status, 'retryable');
-          assert.strictEqual(
-            (response as ExportResponseRetryable).retryInMillis,
-            0
+            response.error?.message,
+            'Fetch request encountered a network error'
           );
         } catch (e) {
           done(e);

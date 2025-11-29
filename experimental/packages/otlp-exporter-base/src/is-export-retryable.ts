@@ -49,10 +49,6 @@ export function isExportNetworkErrorRetryable(error: Error): boolean {
     'ENOTFOUND',
     'ENETUNREACH',
     'EHOSTUNREACH',
-    'UND_ERR_CONNECT_TIMEOUT',
-    'UND_ERR_HEADERS_TIMEOUT',
-    'UND_ERR_BODY_TIMEOUT',
-    'UND_ERR_SOCKET',
   ]);
 
   if (error.name === 'AbortError') {

@@ -98,7 +98,7 @@ export function sendWithHttp(
     req.destroy();
     onDone({
       status: 'retryable',
-      retryInMillis: 0,
+      error: new Error('Request timed out'),
     });
   });
 
@@ -106,7 +106,7 @@ export function sendWithHttp(
     if (isExportNetworkErrorRetryable(error)) {
       onDone({
         status: 'retryable',
-        retryInMillis: 0,
+        error,
       });
     } else {
       onDone({
