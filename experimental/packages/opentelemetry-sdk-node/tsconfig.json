@@ -46,6 +46,9 @@
       "path": "../api-logs"
     },
     {
+      "path": "../configuration"
+    },
+    {
       "path": "../exporter-logs-otlp-grpc"
     },
     {
