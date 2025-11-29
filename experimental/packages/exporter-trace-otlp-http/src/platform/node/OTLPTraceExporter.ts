@@ -19,7 +19,7 @@ import {
   OTLPExporterNodeConfigBase,
   OTLPExporterBase,
 } from '@opentelemetry/otlp-exporter-base';
-import { JsonTraceSerializer } from '@opentelemetry/otlp-transformer';
+import { JsonTraceSerializer } from '@opentelemetry/otlp-transformer/trace/json';
 import {
   convertLegacyHttpOptions,
   createOtlpHttpExportDelegate,
