@@ -24,23 +24,53 @@ let verifiedMetric = false;
 let verifiedLog = false;
 
 const lines = data.split('\n').filter(Boolean);
+
+// Extract all individual telemetry items
+const allSpans = [];
+const allMetrics = [];
+const allLogs = [];
+
 for (const line of lines) {
   const parsed = JSON.parse(line);
   if (parsed.resourceSpans) {
-    console.log('found span');
-    verifySpan(parsed.resourceSpans[0].scopeSpans[0].spans[0]);
-    verifiedSpan = true;
+    parsed.resourceSpans.forEach(rs => {
+      rs.scopeSpans?.forEach(ss => {
+        ss.spans?.forEach(span => allSpans.push(span));
+      });
+    });
   }
   if (parsed.resourceMetrics) {
-    console.log('found metric');
-    verifyMetric(parsed.resourceMetrics[0].scopeMetrics[0].metrics[0]);
-    verifiedMetric = true;
+    parsed.resourceMetrics.forEach(rm => {
+      rm.scopeMetrics?.forEach(sm => {
+        sm.metrics?.forEach(metric => allMetrics.push(metric));
+      });
+    });
   }
   if (parsed.resourceLogs) {
-    console.log('found log');
-    verifyLog(parsed.resourceLogs[0].scopeLogs[0].logRecords[0]);
-    verifiedLog = true;
+    parsed.resourceLogs.forEach(rl => {
+      rl.scopeLogs?.forEach(sl => {
+        sl.logRecords?.forEach(log => allLogs.push(log));
+      });
+    });
   }
+}
+
+if (allSpans.length > 0) {
+  console.log('found spans');
+  verifySpans(allSpans);
+  verifiedSpan = true;
+}
+
+if (allMetrics.length > 0) {
+  console.log('found metrics');
+  verifyMetrics(allMetrics);
+  verifiedMetric = true;
+}
+
+if (allLogs.length > 0) {
+  console.log('found logs');
+  verifyLogs(allLogs);
+  verifiedLog = true;
 }
 
 if (!verifiedSpan) {
@@ -56,49 +86,60 @@ if (!verifiedLog) {
   process.exit(1);
 }
 
-function verifySpan(span) {
-  const expectedName = 'example-span';
-  if (span.name !== expectedName) {
-    console.error(`Expected span name ${expectedName}, but got '${span.name}'`);
+function verifySpans(spans) {
+  const expectedSpanNames = [
+    'span-before-collector-start',
+    'span-after-collector-start',
+  ];
+
+  if (spans.length < 2) {
+    console.error(`Expected at least 2 spans, but got ${spans.length}`);
+    process.exit(1);
+  }
+
+  const foundSpanNames = spans.map(s => s.name);
+
+  expectedSpanNames.forEach(expectedName => {
+    if (!foundSpanNames.includes(expectedName)) {
+      console.error(`Expected span '${expectedName}' not found`);
+      process.exit(1);
+    }
+  });
+}
+
+function verifyMetrics(metrics) {
+  const testCounter = metrics.find(m => m.name === 'test_counter');
+  if (!testCounter) {
+    console.error("Expected metric 'test_counter' not found");
+    process.exit(1);
+  }
+
+  const dataPoints = testCounter.sum?.dataPoints || [];
+  if (dataPoints.length < 2) {
+    console.error(
+      `Expected at least 2 data points, but got ${dataPoints.length}`
+    );
     process.exit(1);
   }
 }
 
-function verifyMetric(metric) {
-  const expectedName = 'example_counter';
-  const expectedValue = 42;
+function verifyLogs(logs) {
+  const expectedLogBodies = [
+    'log-before-collector-start',
+    'log-after-collector-start',
+  ];
 
-  if (metric.name !== expectedName) {
-    console.error(
-      `Expected metric name ${expectedName}, but got '${metric.name}'`
-    );
-    process.exit(1);
-  }
-  if (
-    metric.sum &&
-    metric.sum.dataPoints &&
-    metric.sum.dataPoints[0].asDouble !== expectedValue
-  ) {
-    console.error(
-      `Expected metric value ${expectedValue}, but got '${metric.sum.dataPoints[0].asDouble}'`
-    );
-    process.exit(1);
-  }
-}
-
-function verifyLog(log) {
-  const expectedBody = 'test-log-body';
-  if (log.body && log.body.stringValue !== expectedBody) {
-    console.error(
-      `Expected log body '${expectedBody}', but got '${log.body.stringValue}'`
-    );
+  if (logs.length < 2) {
+    console.error(`Expected at least 2 logs, but got ${logs.length}`);
     process.exit(1);
   }
 
-  if (log.eventName !== 'test-log-event') {
-    console.error(
-      `Expected log event name 'test-log-event', but got '${log.eventName}'`
-    );
-    process.exit(1);
-  }
+  const foundLogBodies = logs.map(l => l.body?.stringValue);
+
+  expectedLogBodies.forEach(expectedBody => {
+    if (!foundLogBodies.includes(expectedBody)) {
+      console.error(`Expected log '${expectedBody}' not found`);
+      process.exit(1);
+    }
+  });
 }
