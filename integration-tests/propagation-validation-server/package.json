@@ -17,7 +17,7 @@
     "@opentelemetry/sdk-trace-base": "2.2.0",
     "axios": "1.12.2",
     "body-parser": "2.2.1",
-    "express": "5.1.0"
+    "express": "5.2.0"
   },
   "devDependencies": {
     "typescript": "5.0.4"
