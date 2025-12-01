@@ -742,6 +742,25 @@ describe('fetch', () => {
         });
       });
 
+      describe('QUERY method (semconvStabilityOptIn=http)', () => {
+        beforeEach(async () => {
+          await tracedFetch({
+            callback: () => fetch('/api/status.json', { method: 'QUERY' }),
+            config: {
+              semconvStabilityOptIn: 'http',
+            },
+          });
+        });
+
+        it('http.request.method attr should use QUERY', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          assert.strictEqual(
+            span.attributes[ATTR_HTTP_REQUEST_METHOD],
+            'QUERY'
+          );
+        });
+      });
+
       describe('trace propagation headers', () => {
         describe('with global propagator', () => {
           before(() => {
