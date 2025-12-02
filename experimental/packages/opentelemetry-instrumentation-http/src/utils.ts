@@ -1124,6 +1124,9 @@ const KNOWN_METHODS = new Set([
 
   // PATCH from https://www.rfc-editor.org/rfc/rfc5789.html
   'PATCH',
+
+  // QUERY from https://datatracker.ietf.org/doc/draft-ietf-httpbis-safe-method-w-body/
+  'QUERY',
 ]);
 
 function normalizeMethod(method?: string | null) {

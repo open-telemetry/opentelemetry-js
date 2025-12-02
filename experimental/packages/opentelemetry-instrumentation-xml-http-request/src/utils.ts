@@ -110,6 +110,8 @@ const DEFAULT_KNOWN_METHODS = {
   POST: true,
   PUT: true,
   TRACE: true,
+  // QUERY from https://datatracker.ietf.org/doc/draft-ietf-httpbis-safe-method-w-body/
+  QUERY: true,
 };
 let knownMethods: { [key: string]: boolean };
 function getKnownMethods() {
