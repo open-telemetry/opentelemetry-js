@@ -125,12 +125,16 @@ export function toOtlpSpanEvent(
 
 export function createExportTraceServiceRequest(
   spans: ReadableSpan[],
-  options?: OtlpEncodingOptions
+  options?: OtlpEncodingOptions | Encoder
 ): IExportTraceServiceRequest {
-  const encoder = getOtlpEncoder(options);
+  const encoder = isEncoder(options) ? options : getOtlpEncoder(options);
   return {
     resourceSpans: spanRecordsToResourceSpans(spans, encoder),
   };
+}
+
+function isEncoder(obj: OtlpEncodingOptions | Encoder | undefined): obj is Encoder {
+  return obj !== undefined && 'encodeHrTime' in obj;
 }
 
 function createResourceMap(readableSpans: ReadableSpan[]) {

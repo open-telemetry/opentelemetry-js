@@ -14,29 +14,44 @@
  * limitations under the License.
  */
 
-import * as root from '../../generated/root';
+import { toBinary, fromBinary, fromJson } from '@bufbuild/protobuf';
+import type { JsonValue } from '@bufbuild/protobuf';
 import { ISerializer } from '../../i-serializer';
-import { IExportMetricsServiceRequest } from '../internal-types';
-import { ExportType } from '../../common/protobuf/protobuf-export-type';
 import { createExportMetricsServiceRequest } from '../internal';
 import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import { IExportMetricsServiceResponse } from '../export-response';
-
-const metricsResponseType = root.opentelemetry.proto.collector.metrics.v1
-  .ExportMetricsServiceResponse as ExportType<IExportMetricsServiceResponse>;
-
-const metricsRequestType = root.opentelemetry.proto.collector.metrics.v1
-  .ExportMetricsServiceRequest as ExportType<IExportMetricsServiceRequest>;
+import {
+  ExportMetricsServiceRequestSchema,
+  ExportMetricsServiceResponseSchema,
+} from '../../generated/opentelemetry/proto/collector/metrics/v1/metrics_service_pb';
+import { PROTOBUF_JSON_ENCODER } from '../../common/utils';
 
 export const ProtobufMetricsSerializer: ISerializer<
   ResourceMetrics,
   IExportMetricsServiceResponse
 > = {
   serializeRequest: (arg: ResourceMetrics) => {
-    const request = createExportMetricsServiceRequest([arg]);
-    return metricsRequestType.encode(request).finish();
+    const request = createExportMetricsServiceRequest(
+      [arg],
+      PROTOBUF_JSON_ENCODER
+    );
+    const message = fromJson(
+      ExportMetricsServiceRequestSchema,
+      request as unknown as JsonValue
+    );
+    return toBinary(ExportMetricsServiceRequestSchema, message);
   },
   deserializeResponse: (arg: Uint8Array) => {
-    return metricsResponseType.decode(arg);
+    const response = fromBinary(ExportMetricsServiceResponseSchema, arg);
+    return {
+      partialSuccess: response.partialSuccess
+        ? {
+            rejectedDataPoints: Number(
+              response.partialSuccess.rejectedDataPoints
+            ),
+            errorMessage: response.partialSuccess.errorMessage,
+          }
+        : undefined,
+    };
   },
 };

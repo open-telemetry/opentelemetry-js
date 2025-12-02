@@ -14,29 +14,39 @@
  * limitations under the License.
  */
 
-import * as root from '../../generated/root';
+import { toBinary, fromBinary, fromJson } from '@bufbuild/protobuf';
+import type { JsonValue } from '@bufbuild/protobuf';
 import { ISerializer } from '../../i-serializer';
-import { ExportType } from '../../common/protobuf/protobuf-export-type';
-import { IExportTraceServiceRequest } from '../internal-types';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { createExportTraceServiceRequest } from '../internal';
 import { IExportTraceServiceResponse } from '../export-response';
-
-const traceResponseType = root.opentelemetry.proto.collector.trace.v1
-  .ExportTraceServiceResponse as ExportType<IExportTraceServiceResponse>;
-
-const traceRequestType = root.opentelemetry.proto.collector.trace.v1
-  .ExportTraceServiceRequest as ExportType<IExportTraceServiceRequest>;
+import {
+  ExportTraceServiceRequestSchema,
+  ExportTraceServiceResponseSchema,
+} from '../../generated/opentelemetry/proto/collector/trace/v1/trace_service_pb';
+import { PROTOBUF_JSON_ENCODER } from '../../common/utils';
 
 export const ProtobufTraceSerializer: ISerializer<
   ReadableSpan[],
   IExportTraceServiceResponse
 > = {
   serializeRequest: (arg: ReadableSpan[]) => {
-    const request = createExportTraceServiceRequest(arg);
-    return traceRequestType.encode(request).finish();
+    const request = createExportTraceServiceRequest(arg, PROTOBUF_JSON_ENCODER);
+    const message = fromJson(
+      ExportTraceServiceRequestSchema,
+      request as unknown as JsonValue
+    );
+    return toBinary(ExportTraceServiceRequestSchema, message);
   },
   deserializeResponse: (arg: Uint8Array) => {
-    return traceResponseType.decode(arg);
+    const response = fromBinary(ExportTraceServiceResponseSchema, arg);
+    return {
+      partialSuccess: response.partialSuccess
+        ? {
+            rejectedSpans: Number(response.partialSuccess.rejectedSpans),
+            errorMessage: response.partialSuccess.errorMessage,
+          }
+        : undefined,
+    };
   },
 };

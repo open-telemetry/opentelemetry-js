@@ -35,12 +35,16 @@ import { LogAttributes } from '@opentelemetry/api-logs';
 
 export function createExportLogsServiceRequest(
   logRecords: ReadableLogRecord[],
-  options?: OtlpEncodingOptions
+  options?: OtlpEncodingOptions | Encoder
 ): IExportLogsServiceRequest {
-  const encoder = getOtlpEncoder(options);
+  const encoder = isEncoder(options) ? options : getOtlpEncoder(options);
   return {
     resourceLogs: logRecordsToResourceLogs(logRecords, encoder),
   };
+}
+
+function isEncoder(obj: OtlpEncodingOptions | Encoder | undefined): obj is Encoder {
+  return obj !== undefined && 'encodeHrTime' in obj;
 }
 
 function createResourceMap(

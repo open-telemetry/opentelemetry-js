@@ -44,15 +44,19 @@ import {
 
 export function toResourceMetrics(
   resourceMetrics: ResourceMetrics,
-  options?: OtlpEncodingOptions
+  options?: OtlpEncodingOptions | Encoder
 ): IResourceMetrics {
-  const encoder = getOtlpEncoder(options);
+  const encoder = isEncoder(options) ? options : getOtlpEncoder(options);
   const processedResource = createResource(resourceMetrics.resource);
   return {
     resource: processedResource,
     schemaUrl: processedResource.schemaUrl,
     scopeMetrics: toScopeMetrics(resourceMetrics.scopeMetrics, encoder),
   };
+}
+
+function isEncoder(obj: OtlpEncodingOptions | Encoder | undefined): obj is Encoder {
+  return obj !== undefined && 'encodeHrTime' in obj;
 }
 
 export function toScopeMetrics(
@@ -209,7 +213,7 @@ function toAggregationTemporality(
 
 export function createExportMetricsServiceRequest(
   resourceMetrics: ResourceMetrics[],
-  options?: OtlpEncodingOptions
+  options?: OtlpEncodingOptions | Encoder
 ): IExportMetricsServiceRequest {
   return {
     resourceMetrics: resourceMetrics.map(metrics =>

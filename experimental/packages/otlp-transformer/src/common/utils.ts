@@ -68,10 +68,42 @@ function optionalHexToBinary(str: string | undefined): Uint8Array | undefined {
   return hexToBinary(str);
 }
 
+/**
+ * Convert hex string to base64 (for protobuf JSON format).
+ */
+export function hexToBase64(hex: string): string {
+  const bytes = hexToBinary(hex);
+  // Works in both Node.js and browser
+  if (typeof Buffer !== 'undefined') {
+    return Buffer.from(bytes).toString('base64');
+  }
+  // Browser fallback
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+function optionalHexToBase64(str: string | undefined): string | undefined {
+  if (str === undefined) return undefined;
+  return hexToBase64(str);
+}
+
 const DEFAULT_ENCODER: Encoder = {
   encodeHrTime: encodeAsLongBits,
   encodeSpanContext: hexToBinary,
   encodeOptionalSpanContext: optionalHexToBinary,
+};
+
+/**
+ * Encoder for protobuf JSON format (used with fromJson).
+ * Uses string timestamps and base64 for bytes.
+ */
+export const PROTOBUF_JSON_ENCODER: Encoder = {
+  encodeHrTime: encodeAsString,
+  encodeSpanContext: hexToBase64,
+  encodeOptionalSpanContext: optionalHexToBase64,
 };
 
 export function getOtlpEncoder(options?: OtlpEncodingOptions): Encoder {

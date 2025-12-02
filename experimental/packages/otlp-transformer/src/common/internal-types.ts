@@ -91,7 +91,7 @@ export interface LongBits {
   high: number;
 }
 
-export type Fixed64 = LongBits | string | number;
+export type Fixed64 = LongBits | string | number | bigint;
 
 export interface OtlpEncodingOptions {
   /** Convert trace and span IDs to hex strings. */
