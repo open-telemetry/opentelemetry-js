@@ -32,9 +32,10 @@ export const ProtobufTraceSerializer: ISerializer<
 > = {
   serializeRequest: (arg: ReadableSpan[]) => {
     const request = createExportTraceServiceRequest(arg, PROTOBUF_JSON_ENCODER);
+    // JSON.parse(JSON.stringify(...)) removes undefined values which fromJson doesn't accept
     const message = fromJson(
       ExportTraceServiceRequestSchema,
-      request as unknown as JsonValue
+      JSON.parse(JSON.stringify(request)) as JsonValue
     );
     return toBinary(ExportTraceServiceRequestSchema, message);
   },

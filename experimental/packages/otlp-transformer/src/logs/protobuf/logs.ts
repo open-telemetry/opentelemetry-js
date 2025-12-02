@@ -34,9 +34,10 @@ export const ProtobufLogsSerializer: ISerializer<
 > = {
   serializeRequest: (arg: ReadableLogRecord[]) => {
     const request = createExportLogsServiceRequest(arg, PROTOBUF_JSON_ENCODER);
+    // JSON.parse(JSON.stringify(...)) removes undefined values which fromJson doesn't accept
     const message = fromJson(
       ExportLogsServiceRequestSchema,
-      request as unknown as JsonValue
+      JSON.parse(JSON.stringify(request)) as JsonValue
     );
     return toBinary(ExportLogsServiceRequestSchema, message);
   },
