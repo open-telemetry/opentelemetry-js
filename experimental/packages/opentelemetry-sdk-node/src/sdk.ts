@@ -113,11 +113,19 @@ function getValueInMillis(envName: string, defaultValue: number): number {
  */
 function configureMetricProviderFromEnv(): IMetricReader[] {
   const metricReaders: IMetricReader[] = [];
+  const metricsExporterEnvDefined = Object.prototype.hasOwnProperty.call(
+    process.env,
+    'OTEL_METRICS_EXPORTER'
+  );
   const enabledExporters = Array.from(
     new Set(getStringListFromEnv('OTEL_METRICS_EXPORTER') ?? [])
   );
 
   if (enabledExporters.length === 0) {
+    if (!metricsExporterEnvDefined) {
+      return metricReaders;
+    }
+
     diag.debug('OTEL_METRICS_EXPORTER is empty. Using default otlp exporter.');
     enabledExporters.push('otlp');
   }
