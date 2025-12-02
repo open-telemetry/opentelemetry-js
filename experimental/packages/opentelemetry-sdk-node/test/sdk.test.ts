@@ -330,7 +330,11 @@ describe('Node SDK', () => {
         'tracer provider should not have changed'
       );
 
-      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+      assert.ok(
+        (
+          metrics.getMeterProvider() as ProxyMeterProvider
+        ).getDelegate() instanceof MeterProvider
+      );
 
       await sdk.shutdown();
     });
@@ -369,13 +373,9 @@ describe('Node SDK', () => {
         delegate,
         'tracer provider should not have changed'
       );
-      assert.ok(
-        (
-          metrics.getMeterProvider() as ProxyMeterProvider
-        ).getDelegate() instanceof MeterProvider
-      );
-
-      const meterProvider = metrics.getMeterProvider() as MeterProvider;
+      const meterProvider = (
+        metrics.getMeterProvider() as ProxyMeterProvider
+      ).getDelegate() as MeterProvider;
       assert.ok(meterProvider instanceof MeterProvider);
 
       // Verify that both metric readers are registered
@@ -411,7 +411,11 @@ describe('Node SDK', () => {
         "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
       );
 
-      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+      assert.ok(
+        (
+          metrics.getMeterProvider() as ProxyMeterProvider
+        ).getDelegate() instanceof MeterProvider
+      );
 
       await sdk.shutdown();
     });
@@ -442,7 +446,11 @@ describe('Node SDK', () => {
         "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
       );
 
-      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+      assert.ok(
+        (
+          metrics.getMeterProvider() as ProxyMeterProvider
+        ).getDelegate() instanceof MeterProvider
+      );
 
       await sdk.shutdown();
     });
@@ -1510,7 +1518,9 @@ describe('Node SDK', () => {
       sdk.start();
 
       const meterProvider = metrics.getMeterProvider();
-      const sharedState = (meterProvider as any)['_sharedState'];
+      const sharedState = (
+        (meterProvider as ProxyMeterProvider).getDelegate() as any
+      )['_sharedState'];
       assert.ok(
         sharedState.metricCollectors[0]._metricReader._exporter instanceof
           OTLPProtoMetricExporter
@@ -1524,7 +1534,9 @@ describe('Node SDK', () => {
       sdk.start();
 
       const meterProvider = metrics.getMeterProvider();
-      const sharedState = (meterProvider as any)['_sharedState'];
+      const sharedState = (
+        (meterProvider as ProxyMeterProvider).getDelegate() as any
+      )['_sharedState'];
 
       assert.ok(sharedState.metricCollectors.length === 2);
       assert.ok(
