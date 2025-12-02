@@ -1303,6 +1303,26 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
+    it('should not configure metrics when OTEL_METRICS_EXPORTER is unset', async () => {
+      delete process.env.OTEL_METRICS_EXPORTER;
+      process.env.OTEL_TRACES_EXPORTER = 'none';
+
+      const sdk = new NodeSDK();
+      sdk.start();
+
+      try {
+        const meterProvider = metrics.getMeterProvider() as ProxyMeterProvider;
+        assert.strictEqual((meterProvider as any)._delegate, undefined);
+
+        const meter = metrics.getMeter('proxy-meter-test');
+        const counter = meter.createCounter('proxy-counter-test');
+        counter.add(1);
+      } finally {
+        await sdk.shutdown();
+        delete process.env.OTEL_TRACES_EXPORTER;
+      }
+    });
+
     it('should use console with default interval and timeout', async () => {
       process.env.OTEL_METRICS_EXPORTER = 'console';
       const sdk = new NodeSDK();
