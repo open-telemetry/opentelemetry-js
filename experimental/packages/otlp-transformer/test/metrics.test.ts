@@ -320,8 +320,7 @@ describe('Metrics', () => {
       scopeMetrics: [
         {
           scope: {
-            name: 'mylib',
-            version: '0.1.0',
+            ...expectedScope,
             schemaUrl: expectedSchemaUrl,
           },
           metrics: metricData,
@@ -855,7 +854,7 @@ describe('Metrics', () => {
             },
             scopeMetrics: [
               {
-                scope: { name: 'mylib', version: '0.1.0' },
+                scope: expectedScope,
                 schemaUrl: expectedSchemaUrl,
                 metrics: [
                   {
