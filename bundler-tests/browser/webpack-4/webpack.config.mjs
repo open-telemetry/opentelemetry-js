@@ -18,6 +18,7 @@ export default {
       '@opentelemetry/otlp-exporter-base/browser-http':
         '@opentelemetry/otlp-exporter-base/build/esm/index-browser-http.js',
       // @bufbuild/protobuf subpath exports (used by @opentelemetry/otlp-transformer)
+      // These paths are compatible with @bufbuild/protobuf v2.x
       '@bufbuild/protobuf/codegenv1':
         '@bufbuild/protobuf/dist/esm/codegenv1/index.js',
       '@bufbuild/protobuf/wkt': '@bufbuild/protobuf/dist/esm/wkt/index.js',
