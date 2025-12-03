@@ -22,7 +22,7 @@ import {
   IResourceLogs,
 } from './internal-types';
 import { Resource } from '@opentelemetry/resources';
-import { Encoder, getOtlpEncoder, isEncoder } from '../common/utils';
+import { Encoder, getOtlpEncoder, isOtlpEncoder } from '../common/utils';
 import {
   createInstrumentationScope,
   createResource,
@@ -37,7 +37,7 @@ export function createExportLogsServiceRequest(
   logRecords: ReadableLogRecord[],
   options?: OtlpEncodingOptions | Encoder
 ): IExportLogsServiceRequest {
-  const encoder = isEncoder(options) ? options : getOtlpEncoder(options);
+  const encoder = isOtlpEncoder(options) ? options : getOtlpEncoder(options);
   return {
     resourceLogs: logRecordsToResourceLogs(logRecords, encoder),
   };

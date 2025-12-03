@@ -35,7 +35,7 @@ import {
   IResourceMetrics,
   IScopeMetrics,
 } from './internal-types';
-import { Encoder, getOtlpEncoder, isEncoder } from '../common/utils';
+import { Encoder, getOtlpEncoder, isOtlpEncoder } from '../common/utils';
 import {
   createInstrumentationScope,
   createResource,
@@ -46,7 +46,7 @@ export function toResourceMetrics(
   resourceMetrics: ResourceMetrics,
   options?: OtlpEncodingOptions | Encoder
 ): IResourceMetrics {
-  const encoder = isEncoder(options) ? options : getOtlpEncoder(options);
+  const encoder = isOtlpEncoder(options) ? options : getOtlpEncoder(options);
   const processedResource = createResource(resourceMetrics.resource);
   return {
     resource: processedResource,

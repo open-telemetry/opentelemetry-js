@@ -103,7 +103,7 @@ export const PROTOBUF_JSON_ENCODER: Encoder = {
 };
 
 /** @internal */
-export function isEncoder(
+export function isOtlpEncoder(
   obj: OtlpEncodingOptions | Encoder | undefined
 ): obj is Encoder {
   return obj !== undefined && 'encodeHrTime' in obj;
