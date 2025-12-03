@@ -886,6 +886,21 @@ describe('Metrics', () => {
       assert.deepStrictEqual(decodedJson, expected);
     });
 
+    it('serializes an empty request', () => {
+      const serialized = ProtobufMetricsSerializer.serializeRequest(
+        createResourceMetrics([])
+      );
+      assert.ok(serialized, 'serialized response is undefined');
+      const decoded = fromBinary(ExportMetricsServiceRequestSchema, serialized);
+      const decodedJson = toJson(ExportMetricsServiceRequestSchema, decoded);
+      // Empty metrics still has resource and scope, just no metric data
+      assert.ok(decodedJson, 'decoded response should exist');
+      assert.ok(
+        typeof decodedJson === 'object' && decodedJson !== null,
+        'decoded should be an object'
+      );
+    });
+
     it('deserializes a response', () => {
       const response = create(ExportMetricsServiceResponseSchema, {
         partialSuccess: {

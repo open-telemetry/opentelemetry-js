@@ -341,6 +341,13 @@ describe('Logs', () => {
       assert.deepStrictEqual(decodedJson, expected);
     });
 
+    it('serializes an empty request', () => {
+      const serialized = ProtobufLogsSerializer.serializeRequest([]);
+      assert.ok(serialized, 'serialized response is undefined');
+      const decoded = fromBinary(ExportLogsServiceRequestSchema, serialized);
+      assert.deepStrictEqual(toJson(ExportLogsServiceRequestSchema, decoded), {});
+    });
+
     it('deserializes a response', () => {
       const response = create(ExportLogsServiceResponseSchema, {
         partialSuccess: {
