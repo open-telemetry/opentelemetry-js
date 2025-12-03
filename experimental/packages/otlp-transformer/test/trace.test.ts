@@ -485,7 +485,10 @@ describe('Trace', () => {
       const serialized = ProtobufTraceSerializer.serializeRequest([]);
       assert.ok(serialized, 'serialized response is undefined');
       const decoded = fromBinary(ExportTraceServiceRequestSchema, serialized);
-      assert.deepStrictEqual(toJson(ExportTraceServiceRequestSchema, decoded), {});
+      assert.deepStrictEqual(
+        toJson(ExportTraceServiceRequestSchema, decoded),
+        {}
+      );
     });
 
     it('deserializes a response', () => {

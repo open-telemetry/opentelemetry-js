@@ -345,7 +345,10 @@ describe('Logs', () => {
       const serialized = ProtobufLogsSerializer.serializeRequest([]);
       assert.ok(serialized, 'serialized response is undefined');
       const decoded = fromBinary(ExportLogsServiceRequestSchema, serialized);
-      assert.deepStrictEqual(toJson(ExportLogsServiceRequestSchema, decoded), {});
+      assert.deepStrictEqual(
+        toJson(ExportLogsServiceRequestSchema, decoded),
+        {}
+      );
     });
 
     it('deserializes a response', () => {
