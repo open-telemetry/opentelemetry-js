@@ -77,12 +77,8 @@ export function hexToBase64(hex: string): string {
   if (typeof Buffer !== 'undefined') {
     return Buffer.from(bytes).toString('base64');
   }
-  // Browser fallback
-  let binary = '';
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
+  // Browser fallback using spread to avoid string concatenation in loop
+  return btoa(String.fromCharCode(...bytes));
 }
 
 function optionalHexToBase64(str: string | undefined): string | undefined {
