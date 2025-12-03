@@ -22,7 +22,7 @@ import {
   IResourceLogs,
 } from './internal-types';
 import { Resource } from '@opentelemetry/resources';
-import { Encoder, getOtlpEncoder } from '../common/utils';
+import { Encoder, getOtlpEncoder, isEncoder } from '../common/utils';
 import {
   createInstrumentationScope,
   createResource,
@@ -41,10 +41,6 @@ export function createExportLogsServiceRequest(
   return {
     resourceLogs: logRecordsToResourceLogs(logRecords, encoder),
   };
-}
-
-function isEncoder(obj: OtlpEncodingOptions | Encoder | undefined): obj is Encoder {
-  return obj !== undefined && 'encodeHrTime' in obj;
 }
 
 function createResourceMap(

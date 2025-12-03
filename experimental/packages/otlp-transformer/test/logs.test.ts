@@ -121,23 +121,15 @@ function createExpectedLogProtobuf(): unknown {
               value: { stringValue: 'some attribute value' },
             },
           ],
-          droppedAttributesCount: 0,
-          entityRefs: [],
         },
-        schemaUrl: '',
         scopeLogs: [
           {
-            scope: {
-              name: 'scope_name_1',
-              version: '0.1.0',
-              attributes: [],
-              droppedAttributesCount: 0,
-            },
+            scope: { name: 'scope_name_1', version: '0.1.0' },
             logRecords: [
               {
                 timeUnixNano: timeUnixNano,
                 observedTimeUnixNano: observedTimeUnixNano,
-                // protobuf-es toJson outputs some enums as strings
+                // protobuf-es toJson outputs enums as strings
                 severityNumber: 'SEVERITY_NUMBER_ERROR',
                 severityText: 'error',
                 body: { stringValue: 'some_log_body' },
@@ -148,7 +140,6 @@ function createExpectedLogProtobuf(): unknown {
                     value: { stringValue: 'some attribute value' },
                   },
                 ],
-                droppedAttributesCount: 0,
                 flags: 1,
                 traceId: traceId,
                 spanId: spanId,
@@ -346,10 +337,7 @@ describe('Logs', () => {
       const decoded = fromBinary(ExportLogsServiceRequestSchema, serialized);
       const expected = createExpectedLogProtobuf();
       // toJson converts to protobuf JSON format (strings for 64-bit ints, base64 for bytes)
-      // alwaysEmitImplicit includes default values like droppedAttributesCount: 0
-      const decodedJson = toJson(ExportLogsServiceRequestSchema, decoded, {
-        alwaysEmitImplicit: true,
-      });
+      const decodedJson = toJson(ExportLogsServiceRequestSchema, decoded);
       assert.deepStrictEqual(decodedJson, expected);
     });
 

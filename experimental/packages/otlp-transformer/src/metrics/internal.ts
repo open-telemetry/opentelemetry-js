@@ -35,7 +35,7 @@ import {
   IResourceMetrics,
   IScopeMetrics,
 } from './internal-types';
-import { Encoder, getOtlpEncoder } from '../common/utils';
+import { Encoder, getOtlpEncoder, isEncoder } from '../common/utils';
 import {
   createInstrumentationScope,
   createResource,
@@ -53,10 +53,6 @@ export function toResourceMetrics(
     schemaUrl: processedResource.schemaUrl,
     scopeMetrics: toScopeMetrics(resourceMetrics.scopeMetrics, encoder),
   };
-}
-
-function isEncoder(obj: OtlpEncodingOptions | Encoder | undefined): obj is Encoder {
-  return obj !== undefined && 'encodeHrTime' in obj;
 }
 
 export function toScopeMetrics(

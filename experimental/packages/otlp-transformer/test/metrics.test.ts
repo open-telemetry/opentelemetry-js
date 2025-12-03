@@ -818,49 +818,24 @@ describe('Metrics', () => {
       assert.ok(serialized, 'serialized response is undefined');
       const decoded = fromBinary(ExportMetricsServiceRequestSchema, serialized);
       // toJson converts to protobuf JSON format (strings for 64-bit ints)
-      // alwaysEmitImplicit includes default values like droppedAttributesCount: 0
-      const decodedJson = toJson(ExportMetricsServiceRequestSchema, decoded, {
-        alwaysEmitImplicit: true,
-      });
+      const decodedJson = toJson(ExportMetricsServiceRequestSchema, decoded);
 
       // protobuf JSON format uses string representation for 64-bit integers
-      // and string enums for aggregationTemporality
       const expectedProtobufAttributes = [
         {
           key: 'string-attribute',
-          value: {
-            stringValue: 'some attribute value',
-          },
+          value: { stringValue: 'some attribute value' },
         },
-        {
-          key: 'int-attribute',
-          value: {
-            intValue: '1', // 64-bit int as string in protobuf JSON
-          },
-        },
-        {
-          key: 'double-attribute',
-          value: {
-            doubleValue: 1.1,
-          },
-        },
-        {
-          key: 'boolean-attribute',
-          value: {
-            boolValue: true,
-          },
-        },
+        { key: 'int-attribute', value: { intValue: '1' } },
+        { key: 'double-attribute', value: { doubleValue: 1.1 } },
+        { key: 'boolean-attribute', value: { boolValue: true } },
         {
           key: 'array-attribute',
           value: {
             arrayValue: {
               values: [
-                {
-                  stringValue: 'attribute value 1',
-                },
-                {
-                  stringValue: 'attribute value 2',
-                },
+                { stringValue: 'attribute value 1' },
+                { stringValue: 'attribute value 2' },
               ],
             },
           },
@@ -874,40 +849,27 @@ describe('Metrics', () => {
               attributes: [
                 {
                   key: 'resource-attribute',
-                  value: {
-                    stringValue: 'resource attribute value',
-                  },
+                  value: { stringValue: 'resource attribute value' },
                 },
               ],
-              droppedAttributesCount: 0,
-              entityRefs: [],
             },
-            schemaUrl: '',
             scopeMetrics: [
               {
-                scope: {
-                  name: 'mylib',
-                  version: '0.1.0',
-                  attributes: [],
-                  droppedAttributesCount: 0,
-                },
+                scope: { name: 'mylib', version: '0.1.0' },
                 schemaUrl: expectedSchemaUrl,
                 metrics: [
                   {
                     name: 'counter',
                     description: 'this is a description',
                     unit: '1',
-                    metadata: [],
                     sum: {
                       dataPoints: [
                         {
                           attributes: expectedProtobufAttributes,
-                          // Use encodeAsString which preserves full precision via BigInt
+                          // encodeAsString preserves full precision via BigInt
                           startTimeUnixNano: encodeAsString(START_TIME),
                           timeUnixNano: encodeAsString(END_TIME),
                           asInt: '10',
-                          exemplars: [],
-                          flags: 0,
                         },
                       ],
                       // protobuf-es toJson outputs enums as strings

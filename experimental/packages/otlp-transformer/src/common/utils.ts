@@ -106,6 +106,12 @@ export const PROTOBUF_JSON_ENCODER: Encoder = {
   encodeOptionalSpanContext: optionalHexToBase64,
 };
 
+export function isEncoder(
+  obj: OtlpEncodingOptions | Encoder | undefined
+): obj is Encoder {
+  return obj !== undefined && 'encodeHrTime' in obj;
+}
+
 export function getOtlpEncoder(options?: OtlpEncodingOptions): Encoder {
   if (options === undefined) {
     return DEFAULT_ENCODER;

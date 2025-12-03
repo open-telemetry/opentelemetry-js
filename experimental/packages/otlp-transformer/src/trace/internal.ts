@@ -32,7 +32,7 @@ import {
   ISpan,
 } from './internal-types';
 import { OtlpEncodingOptions } from '../common/internal-types';
-import { getOtlpEncoder } from '../common/utils';
+import { getOtlpEncoder, isEncoder } from '../common/utils';
 
 // Span flags constants matching the OTLP specification
 const SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK = 0x100;
@@ -131,10 +131,6 @@ export function createExportTraceServiceRequest(
   return {
     resourceSpans: spanRecordsToResourceSpans(spans, encoder),
   };
-}
-
-function isEncoder(obj: OtlpEncodingOptions | Encoder | undefined): obj is Encoder {
-  return obj !== undefined && 'encodeHrTime' in obj;
 }
 
 function createResourceMap(readableSpans: ReadableSpan[]) {

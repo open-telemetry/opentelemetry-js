@@ -168,18 +168,10 @@ function createExpectedSpanProtobuf() {
               value: { stringValue: 'resource attribute value' },
             },
           ],
-          droppedAttributesCount: 0,
-          entityRefs: [],
         },
-        schemaUrl: '',
         scopeSpans: [
           {
-            scope: {
-              name: 'myLib',
-              version: '0.1.0',
-              attributes: [],
-              droppedAttributesCount: 0,
-            },
+            scope: { name: 'myLib', version: '0.1.0' },
             spans: [
               {
                 traceId: traceId,
@@ -187,55 +179,46 @@ function createExpectedSpanProtobuf() {
                 traceState: 'span=bar',
                 parentSpanId: parentSpanId,
                 name: 'span-name',
+                // protobuf-es toJson outputs enums as strings
                 kind: 'SPAN_KIND_CLIENT',
-                links: [
-                  {
-                    droppedAttributesCount: 0,
-                    spanId: linkSpanId,
-                    traceId: linkTraceId,
-                    traceState: 'link=foo',
-                    attributes: [
-                      {
-                        key: 'link-attribute',
-                        value: {
-                          stringValue: 'string value',
-                        },
-                      },
-                    ],
-                    flags: 0x101, // TraceFlags (0x01) | HAS_IS_REMOTE
-                  },
-                ],
                 startTimeUnixNano: startTime,
                 endTimeUnixNano: endTime,
-                events: [
-                  {
-                    droppedAttributesCount: 0,
-                    attributes: [
-                      {
-                        key: 'event-attribute',
-                        value: {
-                          stringValue: 'some string value',
-                        },
-                      },
-                    ],
-                    name: 'some event',
-                    timeUnixNano: eventTime,
-                  },
-                ],
                 attributes: [
                   {
                     key: 'string-attribute',
                     value: { stringValue: 'some attribute value' },
                   },
                 ],
-                droppedAttributesCount: 0,
-                droppedEventsCount: 0,
-                droppedLinksCount: 0,
-                status: {
-                  code: 'STATUS_CODE_OK',
-                  message: '',
-                },
-                flags: 0x101, // TraceFlags (0x01) | HAS_IS_REMOTE
+                events: [
+                  {
+                    name: 'some event',
+                    timeUnixNano: eventTime,
+                    attributes: [
+                      {
+                        key: 'event-attribute',
+                        value: { stringValue: 'some string value' },
+                      },
+                    ],
+                  },
+                ],
+                links: [
+                  {
+                    traceId: linkTraceId,
+                    spanId: linkSpanId,
+                    traceState: 'link=foo',
+                    attributes: [
+                      {
+                        key: 'link-attribute',
+                        value: { stringValue: 'string value' },
+                      },
+                    ],
+                    // TraceFlags (0x01) | HAS_IS_REMOTE
+                    flags: 0x101,
+                  },
+                ],
+                status: { code: 'STATUS_CODE_OK' },
+                // TraceFlags (0x01) | HAS_IS_REMOTE
+                flags: 0x101,
               },
             ],
             schemaUrl: 'http://url.to.schema',
@@ -494,10 +477,7 @@ describe('Trace', () => {
       const decoded = fromBinary(ExportTraceServiceRequestSchema, serialized);
       const expected = createExpectedSpanProtobuf();
       // toJson converts to protobuf JSON format (strings for 64-bit ints, base64 for bytes)
-      // alwaysEmitImplicit includes default values like droppedAttributesCount: 0
-      const decodedJson = toJson(ExportTraceServiceRequestSchema, decoded, {
-        alwaysEmitImplicit: true,
-      });
+      const decodedJson = toJson(ExportTraceServiceRequestSchema, decoded);
       assert.deepStrictEqual(decodedJson, expected);
     });
 
