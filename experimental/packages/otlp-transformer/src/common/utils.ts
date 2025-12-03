@@ -102,6 +102,7 @@ export const PROTOBUF_JSON_ENCODER: Encoder = {
   encodeOptionalSpanContext: optionalHexToBase64,
 };
 
+/** @internal */
 export function isEncoder(
   obj: OtlpEncodingOptions | Encoder | undefined
 ): obj is Encoder {
