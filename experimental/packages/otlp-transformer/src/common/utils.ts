@@ -16,7 +16,6 @@
 
 import type { OtlpEncodingOptions, Fixed64, LongBits } from './internal-types';
 import { HrTime } from '@opentelemetry/api';
-import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { hexToBinary } from './hex-to-binary';
 
 export function hrTimeToNanos(hrTime: HrTime): bigint {
@@ -41,9 +40,6 @@ export function encodeAsString(hrTime: HrTime): string {
   const nanos = hrTimeToNanos(hrTime);
   return nanos.toString();
 }
-
-const encodeTimestamp =
-  typeof BigInt !== 'undefined' ? encodeAsString : hrTimeToNanoseconds;
 
 export type HrTimeEncodeFunction = (hrTime: HrTime) => Fixed64;
 export type SpanContextEncodeFunction = (
@@ -117,7 +113,7 @@ export function getOtlpEncoder(options?: OtlpEncodingOptions): Encoder {
   const useLongBits = options.useLongBits ?? true;
   const useHex = options.useHex ?? false;
   return {
-    encodeHrTime: useLongBits ? encodeAsLongBits : encodeTimestamp,
+    encodeHrTime: useLongBits ? encodeAsLongBits : encodeAsString,
     encodeSpanContext: useHex ? identity : hexToBinary,
     encodeOptionalSpanContext: useHex ? identity : optionalHexToBinary,
   };
