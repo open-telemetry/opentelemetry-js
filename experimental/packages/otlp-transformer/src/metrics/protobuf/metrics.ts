@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { toBinary, fromBinary, fromJson } from '@bufbuild/protobuf';
-import type { JsonValue } from '@bufbuild/protobuf';
+import { toBinary, fromBinary, fromJsonString } from '@bufbuild/protobuf';
 import { ISerializer } from '../../i-serializer';
 import { createExportMetricsServiceRequest } from '../internal';
 import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
@@ -35,10 +34,9 @@ export const ProtobufMetricsSerializer: ISerializer<
       [arg],
       PROTOBUF_JSON_ENCODER
     );
-    // JSON.parse(JSON.stringify(...)) removes undefined values which fromJson doesn't accept
-    const message = fromJson(
+    const message = fromJsonString(
       ExportMetricsServiceRequestSchema,
-      JSON.parse(JSON.stringify(request)) as JsonValue
+      JSON.stringify(request)
     );
     return toBinary(ExportMetricsServiceRequestSchema, message);
   },

@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { toBinary, fromBinary, fromJson } from '@bufbuild/protobuf';
-import type { JsonValue } from '@bufbuild/protobuf';
+import { toBinary, fromBinary, fromJsonString } from '@bufbuild/protobuf';
 import { ISerializer } from '../../i-serializer';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { createExportTraceServiceRequest } from '../internal';
@@ -32,10 +31,9 @@ export const ProtobufTraceSerializer: ISerializer<
 > = {
   serializeRequest: (arg: ReadableSpan[]) => {
     const request = createExportTraceServiceRequest(arg, PROTOBUF_JSON_ENCODER);
-    // JSON.parse(JSON.stringify(...)) removes undefined values which fromJson doesn't accept
-    const message = fromJson(
+    const message = fromJsonString(
       ExportTraceServiceRequestSchema,
-      JSON.parse(JSON.stringify(request)) as JsonValue
+      JSON.stringify(request)
     );
     return toBinary(ExportTraceServiceRequestSchema, message);
   },

@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { toBinary, fromBinary, fromJson } from '@bufbuild/protobuf';
-import type { JsonValue } from '@bufbuild/protobuf';
+import { toBinary, fromBinary, fromJsonString } from '@bufbuild/protobuf';
 import { IExportLogsServiceResponse } from '../export-response';
 import { createExportLogsServiceRequest } from '../internal';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
@@ -34,10 +33,9 @@ export const ProtobufLogsSerializer: ISerializer<
 > = {
   serializeRequest: (arg: ReadableLogRecord[]) => {
     const request = createExportLogsServiceRequest(arg, PROTOBUF_JSON_ENCODER);
-    // JSON.parse(JSON.stringify(...)) removes undefined values which fromJson doesn't accept
-    const message = fromJson(
+    const message = fromJsonString(
       ExportLogsServiceRequestSchema,
-      JSON.parse(JSON.stringify(request)) as JsonValue
+      JSON.stringify(request)
     );
     return toBinary(ExportLogsServiceRequestSchema, message);
   },
