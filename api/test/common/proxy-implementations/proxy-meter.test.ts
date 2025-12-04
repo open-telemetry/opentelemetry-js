@@ -27,6 +27,7 @@ import {
   Counter,
   ObservableUpDownCounter,
   Gauge,
+  NoopMeterProvider,
 } from '../../../src';
 import { ProxyMeter } from '../../../src/metrics/ProxyMeter';
 import { NoopMeter } from '../../../src/metrics/NoopMeter';
@@ -41,6 +42,21 @@ describe('ProxyMeter', () => {
 
   afterEach(() => {
     sandbox.restore();
+  });
+
+  describe('getDelegate', () => {
+    it('returns NoopMeterProvider when delegate is unset', () => {
+      const delegate = provider.getDelegate();
+      assert.ok(delegate instanceof NoopMeterProvider);
+    });
+
+    it('returns the configured delegate when set', () => {
+      const noopDelegate = new NoopMeterProvider();
+      provider.setDelegate(noopDelegate);
+
+      const delegate = provider.getDelegate();
+      assert.strictEqual(delegate, noopDelegate);
+    });
   });
 
   describe('when no delegate is set', () => {
