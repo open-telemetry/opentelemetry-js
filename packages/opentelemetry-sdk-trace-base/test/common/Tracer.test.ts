@@ -52,7 +52,11 @@ describe('Tracer', () => {
   const tracerProvider = new BasicTracerProvider();
 
   class TestSampler implements Sampler {
-    constructor(private readonly traceState?: TraceState) {}
+    private readonly traceState?: TraceState;
+
+    constructor(traceState?: TraceState) {
+      this.traceState = traceState;
+    }
 
     shouldSample(
       _context: Context,
