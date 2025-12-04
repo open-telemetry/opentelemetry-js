@@ -92,7 +92,8 @@ describe('ProxyMeter', () => {
     it('creates observable counters that buffer callbacks before delegation', () => {
       const meter = provider.getMeter('test');
 
-      const observableCounter = meter.createObservableCounter('observable-counter');
+      const observableCounter =
+        meter.createObservableCounter('observable-counter');
       const observableUpDownCounter = meter.createObservableUpDownCounter(
         'observable-up-down-counter'
       );
@@ -100,7 +101,9 @@ describe('ProxyMeter', () => {
       const upDownCallback = sandbox.stub();
 
       assert.doesNotThrow(() => observableCounter.addCallback(counterCallback));
-      assert.doesNotThrow(() => observableCounter.removeCallback(counterCallback));
+      assert.doesNotThrow(() =>
+        observableCounter.removeCallback(counterCallback)
+      );
       assert.doesNotThrow(() =>
         observableUpDownCounter.addCallback(upDownCallback)
       );
@@ -333,7 +336,9 @@ describe('ProxyMeter', () => {
         add: addStub,
       } as UpDownCounter;
       const delegateMeter = new NoopMeter();
-      sandbox.stub(delegateMeter, 'createUpDownCounter').returns(delegateUpDownCounter);
+      sandbox
+        .stub(delegateMeter, 'createUpDownCounter')
+        .returns(delegateUpDownCounter);
 
       provider.setDelegate({
         getMeter() {
@@ -347,7 +352,9 @@ describe('ProxyMeter', () => {
 
     it('hydrates observable counters that were created before delegation', () => {
       const meter = provider.getMeter('test');
-      const observableCounter = meter.createObservableCounter('pre-observable-counter');
+      const observableCounter = meter.createObservableCounter(
+        'pre-observable-counter'
+      );
       const callback = sandbox.stub();
       observableCounter.addCallback(callback);
 
@@ -458,35 +465,35 @@ describe('ProxyMeter', () => {
       assert.strictEqual(registeredObservables[0], delegateObservable);
     });
 
-      it('remaps proxy observables when registering batch callbacks after delegation', () => {
-        const meter = provider.getMeter('test');
-        const proxyObservable = meter.createObservableGauge('proxy-batch');
-        const callback = sandbox.stub();
-        const delegateObservable: ObservableGauge = {
-          addCallback: sandbox.stub(),
-          removeCallback: sandbox.stub(),
-        };
-        const delegateMeter = new NoopMeter();
-        sandbox
-          .stub(delegateMeter, 'createObservableGauge')
-          .returns(delegateObservable);
-        const addBatchStub = sandbox.stub(
-          delegateMeter,
-          'addBatchObservableCallback'
-        );
+    it('remaps proxy observables when registering batch callbacks after delegation', () => {
+      const meter = provider.getMeter('test');
+      const proxyObservable = meter.createObservableGauge('proxy-batch');
+      const callback = sandbox.stub();
+      const delegateObservable: ObservableGauge = {
+        addCallback: sandbox.stub(),
+        removeCallback: sandbox.stub(),
+      };
+      const delegateMeter = new NoopMeter();
+      sandbox
+        .stub(delegateMeter, 'createObservableGauge')
+        .returns(delegateObservable);
+      const addBatchStub = sandbox.stub(
+        delegateMeter,
+        'addBatchObservableCallback'
+      );
 
-        provider.setDelegate({
-          getMeter() {
-            return delegateMeter;
-          },
-        });
-
-        meter.addBatchObservableCallback(callback, [proxyObservable]);
-
-        sandbox.assert.calledOnce(addBatchStub);
-        const [, registeredObservables] = addBatchStub.firstCall.args;
-        assert.strictEqual(registeredObservables[0], delegateObservable);
+      provider.setDelegate({
+        getMeter() {
+          return delegateMeter;
+        },
       });
+
+      meter.addBatchObservableCallback(callback, [proxyObservable]);
+
+      sandbox.assert.calledOnce(addBatchStub);
+      const [, registeredObservables] = addBatchStub.firstCall.args;
+      assert.strictEqual(registeredObservables[0], delegateObservable);
+    });
 
     it('removes batch callbacks via the current delegate before delegation', () => {
       const meter = provider.getMeter('test');
@@ -512,18 +519,18 @@ describe('ProxyMeter', () => {
       );
     });
 
-      it('removes batch callbacks by delegating to the noop meter when unset', () => {
-        const meter = provider.getMeter('test');
-        const observable = meter.createObservableGauge('noop-batch');
-        const callback = sandbox.stub();
-        meter.addBatchObservableCallback(callback, [observable]);
+    it('removes batch callbacks by delegating to the noop meter when unset', () => {
+      const meter = provider.getMeter('test');
+      const observable = meter.createObservableGauge('noop-batch');
+      const callback = sandbox.stub();
+      meter.addBatchObservableCallback(callback, [observable]);
 
-        const noopSpy = sandbox.spy(NOOP_METER, 'removeBatchObservableCallback');
+      const noopSpy = sandbox.spy(NOOP_METER, 'removeBatchObservableCallback');
 
-        meter.removeBatchObservableCallback(callback, [observable]);
+      meter.removeBatchObservableCallback(callback, [observable]);
 
-        sandbox.assert.calledOnce(noopSpy);
-      });
+      sandbox.assert.calledOnce(noopSpy);
+    });
   });
 
   describe('proxy instrument internals', () => {
@@ -631,7 +638,10 @@ describe('ProxyMeter', () => {
       } as Counter;
       const delegateMeter = new NoopMeter();
       sandbox.stub(delegateMeter, 'createCounter').returns(delegateCounter);
-      sandbox.stub(meter as unknown as { _flushPendingState: () => void }, '_flushPendingState');
+      sandbox.stub(
+        meter as unknown as { _flushPendingState: () => void },
+        '_flushPendingState'
+      );
 
       provider.setDelegate({
         getMeter() {
@@ -641,9 +651,7 @@ describe('ProxyMeter', () => {
 
       counter.add(3);
 
-      sandbox.assert.calledOnce(
-        delegateMeter.createCounter as sinon.SinonStub
-      );
+      sandbox.assert.calledOnce(delegateMeter.createCounter as sinon.SinonStub);
       sandbox.assert.calledOnce(delegateCounter.add as sinon.SinonStub);
     });
   });
