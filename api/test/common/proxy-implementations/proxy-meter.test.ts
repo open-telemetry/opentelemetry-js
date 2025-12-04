@@ -27,8 +27,8 @@ import {
   Counter,
   ObservableUpDownCounter,
   Gauge,
-  NoopMeterProvider,
 } from '../../../src';
+import { NoopMeterProvider } from '../../../src/metrics/NoopMeterProvider';
 import { ProxyMeter } from '../../../src/metrics/ProxyMeter';
 import { NoopMeter } from '../../../src/metrics/NoopMeter';
 
