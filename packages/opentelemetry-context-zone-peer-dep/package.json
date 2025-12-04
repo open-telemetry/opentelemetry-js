@@ -75,11 +75,11 @@
     "typescript": "5.0.4",
     "webpack": "5.101.3",
     "webpack-cli": "6.0.1",
-    "zone.js": "0.15.1"
+    "zone.js": "0.16.0"
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0",
-    "zone.js": "^0.10.2 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^0.14.0 || ^0.15.0"
+    "zone.js": "^0.10.2 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^0.14.0 || ^0.15.0 || ^0.16.0"
   },
   "sideEffects": false,
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone-peer-dep"
