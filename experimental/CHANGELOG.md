@@ -32,6 +32,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :books: Documentation
 
+* docs(exporter-prometheus): correct `@default` value for `appendTimestamp` option in JSDoc [#6191](https://github.com/open-telemetry/opentelemetry-js/pull/6191) @Slawaq
+
 ### :house: Internal
 
 * refactor(opentelemetry-sdk-node): simplify calculation of traceExportersList [#6132](https://github.com/open-telemetry/opentelemetry-js/pull/6132) @cjihrig
