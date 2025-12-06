@@ -121,31 +121,6 @@ export function parseConfigFile(config: ConfigurationModel) {
       if (config.resource == null) {
         config.resource = {};
       }
-      const attrList = getStringFromConfigFile(
-        parsedContent['resource']?.['attributes_list']
-      );
-      if (attrList) {
-        config.resource.attributes_list = attrList;
-        const list = getStringListFromConfigFile(
-          parsedContent['resource']?.['attributes_list']
-        );
-        if (
-          list &&
-          list.length > 0 &&
-          parsedContent['resource']?.['attributes'] == null
-        ) {
-          config.resource.attributes = [];
-          for (let i = 0; i < list.length; i++) {
-            const element = list[i].split('=');
-            config.resource.attributes.push({
-              name: element[0],
-              value: element[1],
-              type: 'string',
-            });
-          }
-        }
-      }
-
       const schemaUrl = getStringFromConfigFile(
         parsedContent['resource']?.['schema_url']
       );
@@ -154,7 +129,11 @@ export function parseConfigFile(config: ConfigurationModel) {
       }
     }
 
-    setResourceAttributes(config, parsedContent['resource']?.['attributes']);
+    setResourceAttributes(
+      config,
+      parsedContent['resource']?.['attributes'],
+      parsedContent['resource']?.['attributes_list']
+    );
     setAttributeLimits(config, parsedContent['attribute_limits']);
     setPropagator(config, parsedContent['propagator']);
     setTracerProvider(config, parsedContent['tracer_provider']);
@@ -169,44 +148,71 @@ export function parseConfigFile(config: ConfigurationModel) {
 
 export function setResourceAttributes(
   config: ConfigurationModel,
-  attributes: AttributeNameValue[]
+  attributes: AttributeNameValue[],
+  attributeList: string
 ) {
-  if (attributes) {
+  if (attributes || attributeList) {
+    const addedKeys = [];
     if (config.resource == null) {
       config.resource = {};
     }
-    config.resource.attributes = [];
-    for (let i = 0; i < attributes.length; i++) {
-      const att = attributes[i];
-      let value = att['value'];
-      switch (att['type']) {
-        case 'bool':
-          value = getBooleanFromConfigFile(value);
-          break;
-        case 'bool_array':
-          value = getBooleanListFromConfigFile(value);
-          break;
-        case 'int':
-        case 'double':
-          value = getNumberFromConfigFile(value);
-          break;
-        case 'int_array':
-        case 'double_array':
-          value = getNumberListFromConfigFile(value);
-          break;
-        case 'string_array':
-          value = getStringListFromConfigFile(value);
-          break;
-        default:
-          value = getStringFromConfigFile(value);
-          break;
+    if (getStringFromConfigFile(attributeList)) {
+      config.resource.attributes_list = getStringFromConfigFile(attributeList);
+    }
+
+    const list = getStringListFromConfigFile(attributeList);
+    if ((list && list.length > 0) || (attributes && attributes.length > 0)) {
+      config.resource.attributes = [];
+
+      if (attributes) {
+        for (let i = 0; i < attributes.length; i++) {
+          const att = attributes[i];
+          let value = att['value'];
+          switch (att['type']) {
+            case 'bool':
+              value = getBooleanFromConfigFile(value);
+              break;
+            case 'bool_array':
+              value = getBooleanListFromConfigFile(value);
+              break;
+            case 'int':
+            case 'double':
+              value = getNumberFromConfigFile(value);
+              break;
+            case 'int_array':
+            case 'double_array':
+              value = getNumberListFromConfigFile(value);
+              break;
+            case 'string_array':
+              value = getStringListFromConfigFile(value);
+              break;
+            default:
+              value = getStringFromConfigFile(value);
+              break;
+          }
+
+          const key = getStringFromConfigFile(att['name']) ?? '';
+          config.resource.attributes.push({
+            name: key,
+            value: value,
+            type: att['type'] ?? 'string',
+          });
+          addedKeys.push(key);
+        }
       }
 
-      config.resource.attributes.push({
-        name: getStringFromConfigFile(att['name']) ?? '',
-        value: value,
-        type: att['type'] ?? 'string',
-      });
+      if (list) {
+        for (let i = 0; i < list.length; i++) {
+          const element = list[i].split('=');
+          if (!addedKeys.includes(element[0])) {
+            config.resource.attributes.push({
+              name: element[0],
+              value: element[1],
+              type: 'string',
+            });
+          }
+        }
+      }
     }
   }
 }
@@ -427,7 +433,7 @@ function parseConfigSpanOrLogRecordExporter(
 
     case 'console':
       parsedExporter = {
-        console: undefined,
+        console: {},
       };
       break;
 
@@ -765,7 +771,7 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
 
     case 'console':
       parsedExporter = {
-        console: undefined,
+        console: {},
       };
       break;
   }

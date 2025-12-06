@@ -129,6 +129,16 @@ const configFromFile: ConfigurationModel = {
         value: [1.1, 2.2],
         type: 'double_array',
       },
+      {
+        name: 'service.namespace',
+        type: 'string',
+        value: 'my-namespace',
+      },
+      {
+        name: 'service.version',
+        type: 'string',
+        value: '1.0.0',
+      },
     ],
   },
   attribute_limits: {
@@ -234,7 +244,7 @@ const configFromFile: ConfigurationModel = {
       {
         simple: {
           exporter: {
-            console: undefined,
+            console: {},
           },
         },
       },
@@ -421,7 +431,7 @@ const configFromFile: ConfigurationModel = {
           timeout: 30000,
           interval: 60000,
           exporter: {
-            console: undefined,
+            console: {},
           },
           cardinality_limits: {
             default: 2000,
@@ -541,7 +551,7 @@ const configFromFile: ConfigurationModel = {
       {
         simple: {
           exporter: {
-            console: undefined,
+            console: {},
           },
         },
       },
@@ -809,6 +819,53 @@ describe('ConfigFactory', function () {
               type: 'string',
             },
           ],
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('OTEL_SERVICE_NAME takes precedence over service name value in OTEL_RESOURCE_ATTRIBUTES', function () {
+      process.env.OTEL_SERVICE_NAME = 'name-from-service-name';
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.name=name-from-attributes';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        resource: {
+          attributes: [
+            {
+              name: 'service.name',
+              value: 'name-from-service-name',
+              type: 'string',
+            },
+          ],
+          attributes_list: 'service.name=name-from-attributes',
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should configure service name via OTEL_SERVICE_NAME env var', function () {
+      process.env.OTEL_SERVICE_NAME = 'name-from-service-name';
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.instance.id=my-instance-id';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        resource: {
+          attributes: [
+            {
+              name: 'service.name',
+              value: 'name-from-service-name',
+              type: 'string',
+            },
+            {
+              name: 'service.instance.id',
+              value: 'my-instance-id',
+              type: 'string',
+            },
+          ],
+          attributes_list: 'service.instance.id=my-instance-id',
         },
       };
       const configFactory = createConfigFactory();
@@ -1871,7 +1928,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_SDK_DISABLED = 'false';
       process.env.OTEL_LOG_LEVEL = 'debug';
       process.env.OTEL_SERVICE_NAME = 'custom-name';
-      process.env.OTEL_RESOURCE_ATTRIBUTES = 'attributes';
+      process.env.OTEL_RESOURCE_ATTRIBUTES = 'att=1';
       process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '23';
       process.env.OTEL_ATTRIBUTE_COUNT_LIMIT = '7';
       process.env.OTEL_PROPAGATORS = 'prop';
@@ -1929,11 +1986,16 @@ describe('ConfigFactory', function () {
       const expectedConfig: ConfigurationModel = {
         ...defaultConfigFromFileWithEnvVariables,
         resource: {
-          attributes_list: 'attributes',
+          attributes_list: 'att=1',
           attributes: [
             {
               name: 'service.name',
               value: 'custom-name',
+              type: 'string',
+            },
+            {
+              name: 'att',
+              value: '1',
               type: 'string',
             },
           ],
@@ -2080,6 +2142,78 @@ describe('ConfigFactory', function () {
       );
     });
 
+    it('check resources priority', function () {
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
+        'test/fixtures/resources.yaml';
+      const configFactory = createConfigFactory();
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        resource: {
+          schema_url: 'https://opentelemetry.io/schemas/1.16.0',
+          attributes_list:
+            'service.namespace=config-namespace,service.version=1.0.0',
+          attributes: [
+            {
+              name: 'service.name',
+              value: 'config-name',
+              type: 'string',
+            },
+            {
+              name: 'service.namespace',
+              value: 'priority-config-namespace',
+              type: 'string',
+            },
+            {
+              name: 'string_key',
+              value: 'value',
+              type: 'string',
+            },
+            {
+              name: 'bool_key',
+              value: true,
+              type: 'bool',
+            },
+            {
+              name: 'int_key',
+              value: 1,
+              type: 'int',
+            },
+            {
+              name: 'double_key',
+              value: 1.1,
+              type: 'double',
+            },
+            {
+              name: 'string_array_key',
+              value: ['value1', 'value2'],
+              type: 'string_array',
+            },
+            {
+              name: 'bool_array_key',
+              value: [true, false],
+              type: 'bool_array',
+            },
+            {
+              name: 'int_array_key',
+              value: [1, 2],
+              type: 'int_array',
+            },
+            {
+              name: 'double_array_key',
+              value: [1.1, 2.2],
+              type: 'double_array',
+            },
+            {
+              name: 'service.version',
+              value: '1.0.0',
+              type: 'string',
+            },
+          ],
+        },
+      };
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
     it('checks to keep good code coverage', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
         'test/fixtures/test-for-coverage.yaml';
@@ -2089,8 +2223,8 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(config, { resource: {} });
 
       config = {};
-      setResourceAttributes(config, []);
-      assert.deepStrictEqual(config, { resource: { attributes: [] } });
+      setResourceAttributes(config, [], '');
+      assert.deepStrictEqual(config, { resource: {} });
 
       config = {};
       setFileAttributeLimits(config, { attribute_count_limit: 128 });
