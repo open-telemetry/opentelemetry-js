@@ -53,8 +53,11 @@ export class ShimTracer implements oc.Tracer {
   eventListeners: oc.SpanEventListener[] = [];
   // Uses the global OpenTelemetry propagator by default
   propagation: oc.Propagation = shimPropagation;
+  private otelTracer: Tracer;
 
-  constructor(private otelTracer: Tracer) {}
+  constructor(otelTracer: Tracer) {
+    this.otelTracer = otelTracer;
+  }
 
   start({ propagation }: oc.TracerConfig): this {
     this.active = true;

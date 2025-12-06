@@ -29,7 +29,11 @@ export interface SendBeaconParameters {
 }
 
 class SendBeaconTransport implements IExporterTransport {
-  constructor(private _params: SendBeaconParameters) {}
+  private _params: SendBeaconParameters;
+  constructor(params: SendBeaconParameters) {
+    this._params = params;
+  }
+
   async send(data: Uint8Array): Promise<ExportResponse> {
     const blobType = (await this._params.headers())['Content-Type'];
     return new Promise<ExportResponse>(resolve => {

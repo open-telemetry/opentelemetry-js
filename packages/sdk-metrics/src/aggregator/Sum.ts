@@ -28,12 +28,22 @@ import { AggregationTemporality } from '../export/AggregationTemporality';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 
 export class SumAccumulation implements Accumulation {
+  public startTime;
+  public monotonic;
+  private _current;
+  public reset;
+
   constructor(
-    public startTime: HrTime,
-    public monotonic: boolean,
-    private _current = 0,
-    public reset = false
-  ) {}
+    startTime: HrTime,
+    monotonic: boolean,
+    current = 0,
+    reset = false
+  ) {
+    this.startTime = startTime;
+    this.monotonic = monotonic;
+    this._current = current;
+    this.reset = reset;
+  }
 
   record(value: number): void {
     if (this.monotonic && value < 0) {
@@ -54,8 +64,11 @@ export class SumAccumulation implements Accumulation {
 /** Basic aggregator which calculates a Sum from individual measurements. */
 export class SumAggregator implements Aggregator<SumAccumulation> {
   public kind: AggregatorKind.SUM = AggregatorKind.SUM;
+  public monotonic: boolean;
 
-  constructor(public monotonic: boolean) {}
+  constructor(monotonic: boolean) {
+    this.monotonic = monotonic;
+  }
 
   createAccumulation(startTime: HrTime) {
     return new SumAccumulation(startTime, this.monotonic);

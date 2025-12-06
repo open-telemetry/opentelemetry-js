@@ -29,7 +29,11 @@ export interface FetchTransportParameters {
 }
 
 class FetchTransport implements IExporterTransport {
-  constructor(private _parameters: FetchTransportParameters) {}
+  private _parameters: FetchTransportParameters;
+
+  constructor(parameters: FetchTransportParameters) {
+    this._parameters = parameters;
+  }
 
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
     const abortController = new AbortController();

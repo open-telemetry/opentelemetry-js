@@ -35,7 +35,11 @@ export interface XhrRequestParameters {
 }
 
 class XhrTransport implements IExporterTransport {
-  constructor(private _parameters: XhrRequestParameters) {}
+  private _parameters: XhrRequestParameters;
+
+  constructor(parameters: XhrRequestParameters) {
+    this._parameters = parameters;
+  }
 
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
     const headers = await this._parameters.headers();

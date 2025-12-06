@@ -25,13 +25,21 @@ export class LoggerProviderSharedState {
   readonly loggers: Map<string, Logger> = new Map();
   activeProcessor: LogRecordProcessor;
   readonly registeredLogRecordProcessors: LogRecordProcessor[] = [];
+  readonly resource: Resource;
+  readonly forceFlushTimeoutMillis: number;
+  readonly logRecordLimits: Required<LogRecordLimits>;
+  readonly processors: LogRecordProcessor[];
 
   constructor(
-    readonly resource: Resource,
-    readonly forceFlushTimeoutMillis: number,
-    readonly logRecordLimits: Required<LogRecordLimits>,
-    readonly processors: LogRecordProcessor[]
+    resource: Resource,
+    forceFlushTimeoutMillis: number,
+    logRecordLimits: Required<LogRecordLimits>,
+    processors: LogRecordProcessor[]
   ) {
+    this.resource = resource;
+    this.forceFlushTimeoutMillis = forceFlushTimeoutMillis;
+    this.logRecordLimits = logRecordLimits;
+    this.processors = processors;
     if (processors.length > 0) {
       this.registeredLogRecordProcessors = processors;
       this.activeProcessor = new MultiLogRecordProcessor(

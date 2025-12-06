@@ -34,11 +34,10 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
   private _cardinalityLimit: number;
   private _overflowAttributes = { 'otel.metric.overflow': true };
   private _overflowHashCode: string;
+  private _aggregator: Aggregator<T>;
 
-  constructor(
-    private _aggregator: Aggregator<T>,
-    aggregationCardinalityLimit?: number
-  ) {
+  constructor(aggregator: Aggregator<T>, aggregationCardinalityLimit?: number) {
+    this._aggregator = aggregator;
     this._cardinalityLimit = (aggregationCardinalityLimit ?? 2000) - 1;
     this._overflowHashCode = hashAttributes(this._overflowAttributes);
   }

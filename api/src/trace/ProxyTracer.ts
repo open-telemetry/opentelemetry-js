@@ -31,13 +31,22 @@ const NOOP_TRACER = new NoopTracer();
 export class ProxyTracer implements Tracer {
   // When a real implementation is provided, this will be it
   private _delegate?: Tracer;
+  private _provider: TracerDelegator;
+  public readonly name: string;
+  public readonly version?: string;
+  public readonly options?: TracerOptions;
 
   constructor(
-    private _provider: TracerDelegator,
-    public readonly name: string,
-    public readonly version?: string,
-    public readonly options?: TracerOptions
-  ) {}
+    provider: TracerDelegator,
+    name: string,
+    version?: string,
+    options?: TracerOptions
+  ) {
+    this._provider = provider;
+    this.name = name;
+    this.version = version;
+    this.options = options;
+  }
 
   startSpan(name: string, options?: SpanOptions, context?: Context): Span {
     return this._getTracer().startSpan(name, options, context);

@@ -53,10 +53,13 @@ class HighLow {
   static combine(h1: HighLow, h2: HighLow): HighLow {
     return new HighLow(Math.min(h1.low, h2.low), Math.max(h1.high, h2.high));
   }
-  constructor(
-    public low: number,
-    public high: number
-  ) {}
+
+  public low: number;
+  public high: number;
+  constructor(low: number, high: number) {
+    this.low = low;
+    this.high = high;
+  }
 }
 
 const MAX_SCALE = 20;
@@ -64,19 +67,43 @@ const DEFAULT_MAX_SIZE = 160;
 const MIN_MAX_SIZE = 2;
 
 export class ExponentialHistogramAccumulation implements Accumulation {
+  public startTime;
+  private _maxSize;
+  private _recordMinMax;
+  private _sum;
+  private _count;
+  private _zeroCount;
+  private _min;
+  private _max;
+  private _positive;
+  private _negative;
+  private _mapping;
+
   constructor(
-    public startTime: HrTime,
-    private _maxSize = DEFAULT_MAX_SIZE,
-    private _recordMinMax = true,
-    private _sum = 0,
-    private _count = 0,
-    private _zeroCount = 0,
-    private _min = Number.POSITIVE_INFINITY,
-    private _max = Number.NEGATIVE_INFINITY,
-    private _positive = new Buckets(),
-    private _negative = new Buckets(),
-    private _mapping: Mapping = getMapping(MAX_SCALE)
+    startTime: HrTime,
+    maxSize = DEFAULT_MAX_SIZE,
+    recordMinMax = true,
+    sum = 0,
+    count = 0,
+    zeroCount = 0,
+    min = Number.POSITIVE_INFINITY,
+    max = Number.NEGATIVE_INFINITY,
+    positive = new Buckets(),
+    negative = new Buckets(),
+    mapping: Mapping = getMapping(MAX_SCALE)
   ) {
+    this.startTime = startTime;
+    this._maxSize = maxSize;
+    this._recordMinMax = recordMinMax;
+    this._sum = sum;
+    this._count = count;
+    this._zeroCount = zeroCount;
+    this._min = min;
+    this._max = max;
+    this._positive = positive;
+    this._negative = negative;
+    this._mapping = mapping;
+
     if (this._maxSize < MIN_MAX_SIZE) {
       diag.warn(`Exponential Histogram Max Size set to ${this._maxSize}, \
                 changing to the minimum size of: ${MIN_MAX_SIZE}`);
@@ -520,16 +547,18 @@ export class ExponentialHistogramAggregator
   public kind: AggregatorKind.EXPONENTIAL_HISTOGRAM =
     AggregatorKind.EXPONENTIAL_HISTOGRAM;
 
+  readonly _maxSize: number;
+  private readonly _recordMinMax: boolean;
   /**
    * @param _maxSize Maximum number of buckets for each of the positive
    *    and negative ranges, exclusive of the zero-bucket.
    * @param _recordMinMax If set to true, min and max will be recorded.
    *    Otherwise, min and max will not be recorded.
    */
-  constructor(
-    readonly _maxSize: number,
-    private readonly _recordMinMax: boolean
-  ) {}
+  constructor(maxSize: number, recordMinMax: boolean) {
+    this._maxSize = maxSize;
+    this._recordMinMax = recordMinMax;
+  }
 
   createAccumulation(startTime: HrTime) {
     return new ExponentialHistogramAccumulation(

@@ -44,7 +44,10 @@ import { InstrumentType } from './export/MetricData';
  * This class implements the {@link IMeter} interface.
  */
 export class Meter implements IMeter {
-  constructor(private _meterSharedState: MeterSharedState) {}
+  private _meterSharedState: MeterSharedState;
+  constructor(meterSharedState: MeterSharedState) {
+    this._meterSharedState = meterSharedState;
+  }
 
   /**
    * Create a {@link Gauge} instrument.

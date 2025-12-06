@@ -98,15 +98,13 @@ export class HistogramAggregation implements Aggregation {
  */
 export class ExplicitBucketHistogramAggregation implements Aggregation {
   private _boundaries: number[];
+  private readonly _recordMinMax: boolean;
 
   /**
    * @param boundaries the bucket boundaries of the histogram aggregation
    * @param _recordMinMax If set to true, min and max will be recorded. Otherwise, min and max will not be recorded.
    */
-  constructor(
-    boundaries: number[],
-    private readonly _recordMinMax = true
-  ) {
+  constructor(boundaries: number[], recordMinMax = true) {
     if (boundaries == null) {
       throw new Error(
         'ExplicitBucketHistogramAggregation should be created with explicit boundaries, if a single bucket histogram is required, please pass an empty array'
@@ -124,6 +122,7 @@ export class ExplicitBucketHistogramAggregation implements Aggregation {
       infinityIndex = undefined;
     }
     this._boundaries = boundaries.slice(minusInfinityIndex + 1, infinityIndex);
+    this._recordMinMax = recordMinMax;
   }
 
   createAggregator(_instrument: InstrumentDescriptor) {
@@ -132,10 +131,13 @@ export class ExplicitBucketHistogramAggregation implements Aggregation {
 }
 
 export class ExponentialHistogramAggregation implements Aggregation {
-  constructor(
-    private readonly _maxSize = 160,
-    private readonly _recordMinMax = true
-  ) {}
+  private readonly _maxSize: number;
+  private readonly _recordMinMax: boolean;
+
+  constructor(maxSize = 160, recordMinMax = true) {
+    this._maxSize = maxSize;
+    this._recordMinMax = recordMinMax;
+  }
   createAggregator(_instrument: InstrumentDescriptor) {
     return new ExponentialHistogramAggregator(
       this._maxSize,

@@ -264,7 +264,10 @@ tests.push({
 });
 
 class A {
-  constructor(private _name = 'foo') {}
+  private _name: string;
+  constructor(name = 'foo') {
+    this._name = name;
+  }
 
   getName() {
     return this._name;
@@ -272,11 +275,10 @@ class A {
 }
 
 class B extends A {
-  constructor(
-    name = 'foo',
-    private _ver = 1
-  ) {
+  private _ver: number;
+  constructor(name = 'foo', ver = 1) {
     super(name);
+    this._ver = ver;
   }
   getVer() {
     return this._ver;

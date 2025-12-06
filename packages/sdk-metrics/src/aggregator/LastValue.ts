@@ -29,11 +29,15 @@ import { AggregationTemporality } from '../export/AggregationTemporality';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 
 export class LastValueAccumulation implements Accumulation {
-  constructor(
-    public startTime: HrTime,
-    private _current = 0,
-    public sampleTime: HrTime = [0, 0]
-  ) {}
+  public startTime;
+  private _current;
+  public sampleTime;
+
+  constructor(startTime: HrTime, current = 0, sampleTime: HrTime = [0, 0]) {
+    this.startTime = startTime;
+    this._current = current;
+    this.sampleTime = sampleTime;
+  }
 
   record(value: number): void {
     this._current = value;

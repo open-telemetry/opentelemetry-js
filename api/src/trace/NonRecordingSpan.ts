@@ -29,9 +29,11 @@ import { Link } from './link';
  * propagation.
  */
 export class NonRecordingSpan implements Span {
-  constructor(
-    private readonly _spanContext: SpanContext = INVALID_SPAN_CONTEXT
-  ) {}
+  private readonly _spanContext: SpanContext;
+
+  constructor(spanContext: SpanContext = INVALID_SPAN_CONTEXT) {
+    this._spanContext = spanContext;
+  }
 
   // Returns a SpanContext.
   spanContext(): SpanContext {

@@ -52,6 +52,7 @@ interface LastReportedHistory<T extends Maybe<Accumulation>> {
  * of metrics and reports given temporality values.
  */
 export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
+  private _aggregator: Aggregator<T>;
   private _unreportedAccumulations = new Map<
     MetricCollectorHandle,
     AttributeHashMap<T>[]
@@ -62,9 +63,10 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
   >();
 
   constructor(
-    private _aggregator: Aggregator<T>,
+    aggregator: Aggregator<T>,
     collectorHandles: MetricCollectorHandle[]
   ) {
+    this._aggregator = aggregator;
     collectorHandles.forEach(handle => {
       this._unreportedAccumulations.set(handle, []);
     });

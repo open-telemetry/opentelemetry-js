@@ -21,7 +21,10 @@ import { WritableMetricStorage } from './WritableMetricStorage';
  * Internal interface.
  */
 export class MultiMetricStorage implements WritableMetricStorage {
-  constructor(private readonly _backingStorages: WritableMetricStorage[]) {}
+  private readonly _backingStorages: WritableMetricStorage[];
+  constructor(backingStorages: WritableMetricStorage[]) {
+    this._backingStorages = backingStorages;
+  }
 
   record(
     value: number,

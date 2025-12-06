@@ -24,10 +24,15 @@ import type { SdkLogRecord } from './export/SdkLogRecord';
  * received events to a list of {@link LogRecordProcessor}s.
  */
 export class MultiLogRecordProcessor implements LogRecordProcessor {
+  public readonly processors: LogRecordProcessor[];
+  public readonly forceFlushTimeoutMillis: number;
   constructor(
-    public readonly processors: LogRecordProcessor[],
-    public readonly forceFlushTimeoutMillis: number
-  ) {}
+    processors: LogRecordProcessor[],
+    forceFlushTimeoutMillis: number
+  ) {
+    this.processors = processors;
+    this.forceFlushTimeoutMillis = forceFlushTimeoutMillis;
+  }
 
   public async forceFlush(): Promise<void> {
     const timeout = this.forceFlushTimeoutMillis;

@@ -33,11 +33,13 @@ export class ObservableResultImpl implements ObservableResult {
    * @internal
    */
   _buffer = new AttributeHashMap<number>();
+  private _instrumentName: string;
+  private _valueType: ValueType;
 
-  constructor(
-    private _instrumentName: string,
-    private _valueType: ValueType
-  ) {}
+  constructor(instrumentName: string, valueType: ValueType) {
+    this._instrumentName = instrumentName;
+    this._valueType = valueType;
+  }
 
   /**
    * Observe a measurement of the value associated with the given attributes.

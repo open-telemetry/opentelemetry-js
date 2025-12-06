@@ -39,7 +39,10 @@ class NoopAttributesProcessor implements IAttributesProcessor {
 }
 
 class MultiAttributesProcessor implements IAttributesProcessor {
-  constructor(private readonly _processors: IAttributesProcessor[]) {}
+  private readonly _processors: IAttributesProcessor[];
+  constructor(processors: IAttributesProcessor[]) {
+    this._processors = processors;
+  }
   process(incoming: Attributes, context?: Context): Attributes {
     let filteredAttributes = incoming;
     for (const processor of this._processors) {
@@ -50,7 +53,10 @@ class MultiAttributesProcessor implements IAttributesProcessor {
 }
 
 class AllowListProcessor implements IAttributesProcessor {
-  constructor(private _allowedAttributeNames: string[]) {}
+  private _allowedAttributeNames: string[];
+  constructor(allowedAttributeNames: string[]) {
+    this._allowedAttributeNames = allowedAttributeNames;
+  }
 
   process(incoming: Attributes, _context?: Context): Attributes {
     const filteredAttributes: Attributes = {};
@@ -64,7 +70,10 @@ class AllowListProcessor implements IAttributesProcessor {
 }
 
 class DenyListProcessor implements IAttributesProcessor {
-  constructor(private _deniedAttributeNames: string[]) {}
+  private _deniedAttributeNames: string[];
+  constructor(deniedAttributeNames: string[]) {
+    this._deniedAttributeNames = deniedAttributeNames;
+  }
 
   process(incoming: Attributes, _context?: Context): Attributes {
     const filteredAttributes: Attributes = {};

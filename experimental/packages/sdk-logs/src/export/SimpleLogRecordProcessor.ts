@@ -35,10 +35,12 @@ import type { SdkLogRecord } from './SdkLogRecord';
  * using the {@link BatchLogRecordProcessor} instead.
  */
 export class SimpleLogRecordProcessor implements LogRecordProcessor {
+  private readonly _exporter: LogRecordExporter;
   private _shutdownOnce: BindOnceFuture<void>;
   private _unresolvedExports: Set<Promise<void>>;
 
-  constructor(private readonly _exporter: LogRecordExporter) {
+  constructor(exporter: LogRecordExporter) {
+    this._exporter = exporter;
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
     this._unresolvedExports = new Set<Promise<void>>();
   }
