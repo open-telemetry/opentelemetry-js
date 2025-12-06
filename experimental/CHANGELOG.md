@@ -41,6 +41,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * test(instrumentation-http): replace uses of deprecated abort() [#6149](https://github.com/open-telemetry/opentelemetry-js/pull/6149) @cjihrig
 * refactor(configuration): simplify boolean check [#6158](https://github.com/open-telemetry/opentelemetry-js/pull/6158) @cjihrig
 * refactor(otlp-transformer): migrate from protobufjs to protobuf-es [#6179](https://github.com/open-telemetry/opentelemetry-js/pull/6179) @overbalance
+* chore(otlp-transformer, sampler-composite): clean up tsconfig after protobuf-es migration [#6192](https://github.com/open-telemetry/opentelemetry-js/pull/6192) @overbalance
 
 ## 0.208.0
 
