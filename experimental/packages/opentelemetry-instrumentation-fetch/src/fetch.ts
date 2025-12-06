@@ -212,22 +212,23 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       return;
     }
 
+    const headersSetter = {
+      set: (h: Headers, k: string, v: string) =>
+        h.set(k, typeof v === 'string' ? v : String(v)),
+    };
+
     if (options instanceof Request) {
-      api.propagation.inject(api.context.active(), options.headers, {
-        set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
-      });
-    } else if (options.headers instanceof Headers) {
-      api.propagation.inject(api.context.active(), options.headers, {
-        set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
-      });
-    } else if (options.headers instanceof Map) {
-      api.propagation.inject(api.context.active(), options.headers, {
-        set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
-      });
+      // Request.headers is already a Headers object
+      api.propagation.inject(api.context.active(), options.headers, headersSetter);
     } else {
-      const headers: Partial<Record<string, unknown>> = {};
-      api.propagation.inject(api.context.active(), headers);
-      options.headers = Object.assign({}, headers, options.headers || {});
+      // The Headers constructor handles all valid HeadersInit types:
+      // - undefined/null
+      // - Headers object
+      // - Record<string, string>
+      // - Iterable<[string, string]> (including array of tuples)
+      const headers = new Headers(options.headers);
+      api.propagation.inject(api.context.active(), headers, headersSetter);
+      options.headers = headers;
     }
   }
 
