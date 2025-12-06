@@ -35,7 +35,7 @@ import {
   IResourceMetrics,
   IScopeMetrics,
 } from './internal-types';
-import { Encoder, getOtlpEncoder } from '../common/utils';
+import { Encoder, getOtlpEncoder, isOtlpEncoder } from '../common/utils';
 import {
   createInstrumentationScope,
   createResource,
@@ -44,9 +44,9 @@ import {
 
 export function toResourceMetrics(
   resourceMetrics: ResourceMetrics,
-  options?: OtlpEncodingOptions
+  options?: OtlpEncodingOptions | Encoder
 ): IResourceMetrics {
-  const encoder = getOtlpEncoder(options);
+  const encoder = isOtlpEncoder(options) ? options : getOtlpEncoder(options);
   const processedResource = createResource(resourceMetrics.resource);
   return {
     resource: processedResource,
@@ -209,7 +209,7 @@ function toAggregationTemporality(
 
 export function createExportMetricsServiceRequest(
   resourceMetrics: ResourceMetrics[],
-  options?: OtlpEncodingOptions
+  options?: OtlpEncodingOptions | Encoder
 ): IExportMetricsServiceRequest {
   return {
     resourceMetrics: resourceMetrics.map(metrics =>
