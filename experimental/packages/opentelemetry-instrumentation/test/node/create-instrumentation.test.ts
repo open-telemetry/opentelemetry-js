@@ -108,6 +108,12 @@ describe('createInstrumentation', function () {
 
     beforeEach(() => {
       modulePatchSpy = sinon.spy(patchFn);
+      // Make sure testd are not getting cached results
+      Object.keys(require.cache).forEach((k) => {
+        if (k.includes('test-version-not-available')) {
+          delete require.cache[k];
+        }
+      })
     });
 
     describe('and patching a module', function () {
@@ -168,7 +174,7 @@ describe('createInstrumentation', function () {
                 moduleUnpatchSpy,
                 [
                   new InstrumentationNodeModuleFile(
-                    'baz.js',
+                    'test-version-not-available/lib/baz.js',
                     [`^${MODULE_VERSION}`],
                     filePatchSpy,
                     fileUnpatchSpy
@@ -195,7 +201,7 @@ describe('createInstrumentation', function () {
                 moduleUnpatchSpy,
                 [
                   new InstrumentationNodeModuleFile(
-                    'baz.js',
+                    'test-version-not-available/lib/baz.js',
                     [`^${MODULE_VERSION}`, WILDCARD_VERSION],
                     filePatchSpy,
                     fileUnpatchSpy
