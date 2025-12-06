@@ -41,7 +41,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
           node-version: 22
-      - run: npm install -g npm@11.6.0
+      - run: npm install -g npm@latest
 
       - run: npm ci --ignore-scripts
 

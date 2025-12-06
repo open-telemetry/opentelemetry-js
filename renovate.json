@@ -46,7 +46,7 @@
     "@types/node"
   ],
   "constraints": {
-    "npm": "11.6.0"
+    "npm": ">=11.6.3"
   },
   "assignees": ["@dyladan", "@legendecas", "@pichlermarc", "@trentm"],
   "labels": ["dependencies"],
