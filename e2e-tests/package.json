@@ -4,12 +4,12 @@
   "description": "End-to-end tests for OpenTelemetry JS",
   "version": "0.7.0",
   "scripts": {
-    "test:e2e": "npm run stop-collector; npm run run-collector && npm run export-telemetry && npm run verify || npm run stop-collector",
+    "test:e2e": "npm run run-collector; npm run stop-collector; node test.mjs && npm run verify || npm run stop-collector",
     "lint": "eslint . --ext .mjs",
     "lint:fix": "eslint . --ext .mjs --fix",
     "run-collector": "docker run --pull=always -d --rm --name otelcol-e2e -v $(pwd)/collector-config.yaml:/etc/otelcol/config.yaml -v $(pwd)/collector-output.json:/tmp/collector-output.json -p 4317:4317 -p 4318:4318 -w /tmp otel/opentelemetry-collector-contrib:latest --config /etc/otelcol/config.yaml && sleep 5",
     "export-telemetry": "node test.mjs; sleep 5",
-    "prerun-collector": "node -e \"require('fs').writeFileSync('collector-output.json', '')\"",
+    "prerun-collector": "node -e \"const fs = require('fs'); fs.writeFileSync('collector-output.json', ''); fs.chmodSync('collector-output.json', 0o666);\"",
     "stop-collector": "docker stop otelcol-e2e",
     "verify": "node verify.mjs"
   },
