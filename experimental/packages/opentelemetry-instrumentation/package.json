@@ -47,7 +47,6 @@
     "tdd": "npm run tdd:node",
     "tdd:node": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
-    "test:instr": "nyc mocha 'test/node/create-instrumentation.test.ts'",
     "test:cjs": "nyc mocha 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:esm": "nyc node --experimental-loader=./hook.mjs ../../../node_modules/mocha/bin/mocha 'test/node/*.test.mjs'",
     "test": "npm run test:cjs && npm run test:esm",

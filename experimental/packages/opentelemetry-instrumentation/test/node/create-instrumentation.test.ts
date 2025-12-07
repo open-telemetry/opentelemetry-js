@@ -15,7 +15,7 @@
  */
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-// import * as path from 'path';
+import * as path from 'path';
 import {
   Instrumentation,
   InstrumentationNodeModuleDefinition,
@@ -159,8 +159,8 @@ describe('createInstrumentation', function () {
       let fileUnpatchSpy: sinon.SinonSpy;
 
       beforeEach(() => {
-        filePatchSpy = sinon.stub().callsFake(exports => exports);
-        fileUnpatchSpy = sinon.stub().callsFake(exports => exports);
+        filePatchSpy = sinon.stub().callsFake(patchFn);
+        fileUnpatchSpy = sinon.stub().callsFake(unpatchFn);
       });
 
       it('should not patch if the instrumentation has no wildcard version', function () {
@@ -216,6 +216,64 @@ describe('createInstrumentation', function () {
         sinon.assert.called(modulePatchSpy);
         sinon.assert.called(filePatchSpy);
       });
+    });
+  });
+
+  describe('enable/disable', function () {
+    it('should work with a normal module', function () {
+      modulePatchSpy = sinon.spy(patchFn);
+      moduleUnpatchSpy = sinon.spy(unpatchFn);
+      instrumentation = instrFromPartialDelegate({
+        init() {
+          return [
+            new InstrumentationNodeModuleDefinition(
+              'crypto',
+              [WILDCARD_VERSION],
+              modulePatchSpy,
+              moduleUnpatchSpy
+            ),
+          ];
+        },
+      });
+      const exportsPatched = require('crypto');
+      assert.equal(exportsPatched.__patched, true, 'after enable');
+      instrumentation.disable();
+      assert.equal(exportsPatched.__patched, false, 'after disable');
+      instrumentation.enable();
+      assert.equal(exportsPatched.__patched, true, 'after re-enable');
+    });
+
+    it('should work with a absolute path module', function () {
+      const moduleName = 'absolutePathTestFixture';
+      const fileName = path.join(__dirname, 'fixtures', `${moduleName}.js`);
+      modulePatchSpy = sinon.spy(patchFn);
+      moduleUnpatchSpy = sinon.spy(unpatchFn);
+      instrumentation = instrFromPartialDelegate({
+        init() {
+          return [
+            new InstrumentationNodeModuleDefinition(
+              fileName,
+              ['*'],
+              undefined,
+              undefined,
+              [
+                new InstrumentationNodeModuleFile(
+                  moduleName,
+                  ['*'],
+                  modulePatchSpy,
+                  moduleUnpatchSpy,
+                ),
+              ]
+            ),
+          ];
+        },
+      });
+      const exportsPatched = require(fileName);
+      assert.equal(exportsPatched.__patched, true, 'after enable');
+      instrumentation.disable();
+      assert.equal(exportsPatched.__patched, false, 'after disable');
+      instrumentation.enable();
+      assert.equal(exportsPatched.__patched, true, 'after re-enable');
     });
   });
 });
