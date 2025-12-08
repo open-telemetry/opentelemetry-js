@@ -11,6 +11,8 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :bug: Bug Fixes
 
+* fix(semantic-conventions): replace non-standard `module` export condition with `import` [#6201](https://github.com/open-telemetry/opentelemetry-js/pull/6201) @overbalance
+
 ### :books: Documentation
 
 ### :house: Internal

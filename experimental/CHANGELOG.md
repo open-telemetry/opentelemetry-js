@@ -31,6 +31,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(configuration): combine resource attributes and attributes list correctly [#6166](https://github.com/open-telemetry/opentelemetry-js/pull/6166) @maryliag
 * fix(sdk-node): add missing direct dependency to @opentelemetry/context-async-hooks [#6189](https://github.com/open-telemetry/opentelemetry-js/pull/6189) @pichlermarc
 * fix(instrumentation-fetch): use feature detection for browser environment [#6200](https://github.com/open-telemetry/opentelemetry-js/pull/6200) @overbalance
+* fix(otlp-exporter-base): replace non-standard `module` export condition with `import` [#6201](https://github.com/open-telemetry/opentelemetry-js/pull/6201) @overbalance
 
 ### :books: Documentation
 

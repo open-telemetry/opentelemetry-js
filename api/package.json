@@ -14,15 +14,15 @@
   },
   "exports": {
     ".": {
-      "esnext": "./build/esnext/index.js",
-      "module": "./build/esm/index.js",
       "types": "./build/src/index.d.ts",
+      "esnext": "./build/esnext/index.js",
+      "import": "./build/esm/index.js",
       "default": "./build/src/index.js"
     },
     "./experimental": {
-      "esnext": "./build/esnext/experimental/index.js",
-      "module": "./build/esm/experimental/index.js",
       "types": "./build/src/experimental/index.d.ts",
+      "esnext": "./build/esnext/experimental/index.js",
+      "import": "./build/esm/experimental/index.js",
       "default": "./build/src/experimental/index.js"
     }
   },
