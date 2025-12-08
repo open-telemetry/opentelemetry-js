@@ -2,19 +2,33 @@
   "name": "@opentelemetry/context-zone",
   "version": "2.2.0",
   "description": "OpenTelemetry Context Zone",
-  "main": "build/src/index.js",
-  "module": "build/esm/index.js",
-  "esnext": "build/esnext/index.js",
-  "types": "build/src/index.d.ts",
+  "author": "OpenTelemetry Authors",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./build/index.cjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "esnext": "./build/index.mjs",
+      "import": "./build/index.mjs",
+      "default": "./build/index.cjs"
+    }
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "compile": "tsdown && tsc -p tsconfig.dts.json",
+    "clean": "rm -rf build",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "watch": "tsdown --watch",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../scripts/align-api-deps.js"
@@ -27,28 +41,17 @@
     "metrics",
     "stats"
   ],
-  "author": "OpenTelemetry Authors",
-  "license": "Apache-2.0",
   "engines": {
     "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
-    "build/esm/**/*.js",
-    "build/esm/**/*.js.map",
-    "build/esm/**/*.d.ts",
-    "build/esnext/**/*.js",
-    "build/esnext/**/*.js.map",
-    "build/esnext/**/*.d.ts",
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
-    "doc",
+    "build/**/*.cjs",
+    "build/**/*.mjs",
+    "build/**/*.d.ts",
+    "build/**/*.map",
     "LICENSE",
     "README.md"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
   "devDependencies": {
     "typescript": "5.0.4"
   },
@@ -56,6 +59,5 @@
     "@opentelemetry/context-zone-peer-dep": "2.2.0",
     "zone.js": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^0.14.0 || ^0.15.0 || ^0.16.0"
   },
-  "sideEffects": true,
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone"
+  "sideEffects": true
 }

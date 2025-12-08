@@ -2,13 +2,29 @@
   "name": "@opentelemetry/instrumentation-http",
   "version": "0.208.0",
   "description": "OpenTelemetry instrumentation for `node:http` and `node:https` http client and server modules",
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
+  "author": "OpenTelemetry Authors",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-http",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./build/index.cjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "esnext": "./build/index.mjs",
+      "import": "./build/index.mjs",
+      "default": "./build/index.cjs"
+    }
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build",
-    "clean": "tsc --build --clean",
+    "compile": "tsdown && tsc -p tsconfig.dts.json",
+    "clean": "rm -rf build",
     "test:cjs": "nyc mocha test/**/*.test.ts",
     "test:esm": "nyc node --experimental-loader=@opentelemetry/instrumentation/hook.mjs ../../../node_modules/mocha/bin/mocha 'test/**/*.test.mjs'",
     "test": "npm run test:cjs && npm run test:esm",
@@ -16,7 +32,7 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../../scripts/version-update.js",
-    "watch": "tsc --build --watch",
+    "watch": "tsdown --watch",
     "prewatch": "node ../../../scripts/version-update.js",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js",
@@ -30,22 +46,17 @@
     "profiling",
     "instrumentation"
   ],
-  "author": "OpenTelemetry Authors",
-  "license": "Apache-2.0",
   "engines": {
     "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
-    "doc",
+    "build/**/*.cjs",
+    "build/**/*.mjs",
+    "build/**/*.d.ts",
+    "build/**/*.map",
     "LICENSE",
     "README.md"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
   "devDependencies": {
     "@opentelemetry/api": "1.9.0",
     "@opentelemetry/context-async-hooks": "2.2.0",
@@ -74,6 +85,5 @@
     "@opentelemetry/semantic-conventions": "^1.29.0",
     "forwarded-parse": "2.1.2"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-http",
   "sideEffects": false
 }

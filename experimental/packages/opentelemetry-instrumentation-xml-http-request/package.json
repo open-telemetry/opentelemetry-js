@@ -2,21 +2,35 @@
   "name": "@opentelemetry/instrumentation-xml-http-request",
   "version": "0.208.0",
   "description": "OpenTelemetry instrumentation for XMLHttpRequest http client in web browsers",
-  "main": "build/src/index.js",
-  "module": "build/esm/index.js",
-  "esnext": "build/esnext/index.js",
-  "types": "build/src/index.d.ts",
+  "author": "OpenTelemetry Authors",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-xml-http-request",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./build/index.cjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "esnext": "./build/index.mjs",
+      "import": "./build/index.mjs",
+      "default": "./build/index.cjs"
+    }
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "compile": "tsdown && tsc -p tsconfig.dts.json",
+    "clean": "rm -rf build",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../../scripts/version-update.js",
     "tdd": "karma start",
     "test:browser": "karma start --single-run",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "watch": "tsdown --watch",
     "prewatch": "node ../../../scripts/version-update.js",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
@@ -30,28 +44,17 @@
     "XMLHttpRequest",
     "stats"
   ],
-  "author": "OpenTelemetry Authors",
-  "license": "Apache-2.0",
   "engines": {
     "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
-    "build/esm/**/*.js",
-    "build/esm/**/*.js.map",
-    "build/esm/**/*.d.ts",
-    "build/esnext/**/*.js",
-    "build/esnext/**/*.js.map",
-    "build/esnext/**/*.d.ts",
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
-    "doc",
+    "build/**/*.cjs",
+    "build/**/*.mjs",
+    "build/**/*.d.ts",
+    "build/**/*.map",
     "LICENSE",
     "README.md"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
   "devDependencies": {
     "@babel/core": "7.27.1",
     "@babel/preset-env": "7.27.2",
@@ -88,6 +91,5 @@
     "@opentelemetry/sdk-trace-web": "2.2.0",
     "@opentelemetry/semantic-conventions": "^1.29.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-xml-http-request",
   "sideEffects": false
 }

@@ -2,13 +2,29 @@
   "name": "@opentelemetry/exporter-trace-otlp-grpc",
   "version": "0.208.0",
   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector",
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
+  "author": "OpenTelemetry Authors",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-grpc",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./build/index.cjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "esnext": "./build/index.mjs",
+      "import": "./build/index.mjs",
+      "default": "./build/index.cjs"
+    }
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build",
-    "clean": "tsc --build --clean",
+    "compile": "tsdown && tsc -p tsconfig.dts.json",
+    "clean": "rm -rf build",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "tdd": "npm run test -- --watch-extensions ts --watch",
@@ -28,23 +44,17 @@
     "metrics",
     "stats"
   ],
-  "author": "OpenTelemetry Authors",
-  "license": "Apache-2.0",
   "engines": {
     "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
-    "build/protos/**/*.proto",
-    "doc",
+    "build/**/*.cjs",
+    "build/**/*.mjs",
+    "build/**/*.d.ts",
+    "build/**/*.map",
     "LICENSE",
     "README.md"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
   "devDependencies": {
     "@grpc/proto-loader": "^0.7.10",
     "@opentelemetry/api": "1.9.0",
@@ -69,6 +79,5 @@
     "@opentelemetry/resources": "2.2.0",
     "@opentelemetry/sdk-trace-base": "2.2.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-grpc",
   "sideEffects": false
 }

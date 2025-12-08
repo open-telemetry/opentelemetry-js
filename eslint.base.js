@@ -1,4 +1,5 @@
 module.exports = {
+  ignorePatterns: ['tsdown.config.ts'],
   plugins: [
     "@typescript-eslint",
     "header",

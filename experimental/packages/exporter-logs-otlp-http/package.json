@@ -1,22 +1,25 @@
 {
   "name": "@opentelemetry/exporter-logs-otlp-http",
   "version": "0.208.0",
-  "publishConfig": {
-    "access": "public"
-  },
   "description": "OpenTelemetry Collector Logs Exporter allows user to send collected logs to the OpenTelemetry Collector",
   "author": "OpenTelemetry Authors",
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-logs-otlp-http",
   "license": "Apache-2.0",
-  "main": "build/src/index.js",
-  "module": "build/esm/index.js",
-  "esnext": "build/esnext/index.js",
-  "types": "build/src/index.d.ts",
-  "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts",
-    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
-    "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
-    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./build/index.cjs",
+  "module": "./build/index.mjs",
+  "browser": "./build/index.mjs",
+  "types": "./build/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "esnext": "./build/index.mjs",
+      "import": "./build/index.mjs",
+      "default": "./build/index.cjs"
+    }
   },
   "repository": {
     "type": "git",
@@ -30,8 +33,8 @@
   },
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "compile": "tsdown && tsc -p tsconfig.dts.json",
+    "clean": "rm -rf build",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "tdd": "npm run test -- --watch-extensions ts --watch",
@@ -39,7 +42,7 @@
     "test": "nyc mocha 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "karma start --single-run",
     "version": "node ../../../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "watch": "tsdown --watch",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
@@ -54,16 +57,10 @@
     "stats"
   ],
   "files": [
-    "build/esm/**/*.js",
-    "build/esm/**/*.js.map",
-    "build/esm/**/*.d.ts",
-    "build/esnext/**/*.js",
-    "build/esnext/**/*.js.map",
-    "build/esnext/**/*.d.ts",
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
-    "doc",
+    "build/**/*.cjs",
+    "build/**/*.mjs",
+    "build/**/*.d.ts",
+    "build/**/*.map",
     "LICENSE",
     "README.md"
   ],

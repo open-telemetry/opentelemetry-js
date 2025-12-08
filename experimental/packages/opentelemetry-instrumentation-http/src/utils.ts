@@ -86,8 +86,7 @@ import {
   DEFAULT_QUERY_STRINGS_TO_REDACT,
   STR_REDACTED,
 } from './internal-types';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-import forwardedParse = require('forwarded-parse');
+import forwardedParse from 'forwarded-parse';
 
 /**
  * Get an absolute url

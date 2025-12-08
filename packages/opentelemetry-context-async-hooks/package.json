@@ -2,13 +2,29 @@
   "name": "@opentelemetry/context-async-hooks",
   "version": "2.2.0",
   "description": "OpenTelemetry AsyncHooks-based Context Manager",
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
+  "author": "OpenTelemetry Authors",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-async-hooks",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./build/index.cjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "esnext": "./build/index.mjs",
+      "import": "./build/index.mjs",
+      "default": "./build/index.cjs"
+    }
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build",
-    "clean": "tsc --build --clean",
+    "compile": "tsdown && tsc -p tsconfig.dts.json",
+    "clean": "rm -rf build",
     "test": "nyc mocha 'test/**/*.test.ts'",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "lint": "eslint . --ext .ts",
@@ -26,22 +42,17 @@
     "metrics",
     "stats"
   ],
-  "author": "OpenTelemetry Authors",
-  "license": "Apache-2.0",
   "engines": {
     "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
-    "doc",
+    "build/**/*.cjs",
+    "build/**/*.mjs",
+    "build/**/*.d.ts",
+    "build/**/*.map",
     "LICENSE",
     "README.md"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
   "devDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0",
     "@types/mocha": "10.0.10",
@@ -53,6 +64,5 @@
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-async-hooks",
   "sideEffects": false
 }

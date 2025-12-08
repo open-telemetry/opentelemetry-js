@@ -2,21 +2,29 @@
   "name": "@opentelemetry/sdk-trace-base",
   "version": "2.2.0",
   "description": "OpenTelemetry Tracing",
-  "main": "build/src/index.js",
-  "module": "build/esm/index.js",
-  "esnext": "build/esnext/index.js",
-  "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts",
-    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
-    "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
-    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
+  "author": "OpenTelemetry Authors",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
   },
-  "types": "build/src/index.d.ts",
+  "type": "module",
+  "main": "./build/index.cjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "esnext": "./build/index.mjs",
+      "import": "./build/index.mjs",
+      "default": "./build/index.cjs"
+    }
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "compile": "tsdown && tsc -p tsconfig.dts.json",
+    "clean": "rm -rf build",
     "test": "nyc mocha 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "karma start --single-run",
     "test:webworker": "karma start karma.worker.js --single-run",
@@ -27,7 +35,7 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "watch": "tsdown --watch",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../scripts/align-api-deps.js"
@@ -40,28 +48,17 @@
     "metrics",
     "stats"
   ],
-  "author": "OpenTelemetry Authors",
-  "license": "Apache-2.0",
   "engines": {
     "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
-    "build/esm/**/*.js",
-    "build/esm/**/*.js.map",
-    "build/esm/**/*.d.ts",
-    "build/esnext/**/*.js",
-    "build/esnext/**/*.js.map",
-    "build/esnext/**/*.d.ts",
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
-    "doc",
+    "build/**/*.cjs",
+    "build/**/*.mjs",
+    "build/**/*.d.ts",
+    "build/**/*.map",
     "LICENSE",
     "README.md"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
   "devDependencies": {
     "@opentelemetry/api": ">=1.3.0 <1.10.0",
     "@types/mocha": "10.0.10",
@@ -91,6 +88,5 @@
     "@opentelemetry/resources": "2.2.0",
     "@opentelemetry/semantic-conventions": "^1.29.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base",
   "sideEffects": false
 }

@@ -1,17 +1,25 @@
 {
   "name": "@opentelemetry/web-common",
   "version": "0.208.0",
-  "publishConfig": {
-    "access": "public"
-  },
   "description": "Common utilities for web instrumentation",
   "author": "OpenTelemetry Authors",
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/web-common",
   "license": "Apache-2.0",
-  "main": "build/src/index.js",
-  "module": "build/esm/index.js",
-  "esnext": "build/esnext/index.js",
-  "types": "build/src/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./build/index.cjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "esnext": "./build/index.mjs",
+      "import": "./build/index.mjs",
+      "default": "./build/index.cjs"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/open-telemetry/opentelemetry-js.git"
@@ -23,8 +31,8 @@
     "node": "^18.19.0 || >=20.6.0"
   },
   "scripts": {
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "clean": "rm -rf build",
+    "compile": "tsdown && tsc -p tsconfig.dts.json",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
@@ -33,7 +41,7 @@
     "tdd": "karma start",
     "test:browser": "karma start --single-run",
     "version": "node ../../../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "watch": "tsdown --watch",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },
   "keywords": [
@@ -45,16 +53,10 @@
     "monitoring"
   ],
   "files": [
-    "build/esm/**/*.js",
-    "build/esm/**/*.js.map",
-    "build/esm/**/*.d.ts",
-    "build/esnext/**/*.js",
-    "build/esnext/**/*.js.map",
-    "build/esnext/**/*.d.ts",
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
-    "doc",
+    "build/**/*.cjs",
+    "build/**/*.mjs",
+    "build/**/*.d.ts",
+    "build/**/*.map",
     "LICENSE",
     "README.md"
   ],
