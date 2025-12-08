@@ -67,7 +67,7 @@ import { _globalThis } from '@opentelemetry/core';
 // safe enough
 const OBSERVER_WAIT_TIME_MS = 300;
 
-const isNode = typeof process === 'object' && process.release?.name === 'node';
+const hasBrowserPerformanceAPI = typeof PerformanceObserver !== 'undefined';
 
 export interface FetchCustomAttributeFunction {
   (
@@ -651,11 +651,9 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
    * implements enable function
    */
   override enable(): void {
-    if (isNode) {
-      // Node.js v18+ *does* have a global `fetch()`, but this package does not
-      // support instrumenting it.
+    if (!hasBrowserPerformanceAPI) {
       this._diag.warn(
-        "this instrumentation is intended for web usage only, it does not instrument Node.js's fetch()"
+        'this instrumentation is intended for web usage only, it does not instrument server-side fetch()'
       );
       return;
     }
@@ -670,7 +668,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
    * implements unpatch function
    */
   override disable(): void {
-    if (isNode) {
+    if (!hasBrowserPerformanceAPI) {
       return;
     }
     this._unwrap(_globalThis, 'fetch');
