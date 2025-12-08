@@ -19,3 +19,6 @@ export type {
   IExportTracePartialSuccess,
   IExportTraceServiceResponse,
 } from './export-response';
+
+export { JsonTraceSerializer } from './json';
+export { ProtobufTraceSerializer } from './protobuf';

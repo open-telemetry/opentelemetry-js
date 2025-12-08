@@ -19,3 +19,6 @@ export type {
   IExportLogsServiceResponse,
   IExportLogsPartialSuccess,
 } from './export-response';
+
+export { JsonLogsSerializer } from './json';
+export { ProtobufLogsSerializer } from './protobuf';
