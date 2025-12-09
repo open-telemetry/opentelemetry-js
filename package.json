@@ -3,6 +3,13 @@
   "version": "0.1.0",
   "description": "OpenTelemetry is a distributed tracing and stats collection framework.",
   "type": "commonjs",
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "esModuleInterop": true
+    }
+  },
   "scripts": {
     "precompile": "npm run submodule && nx run-many -t protos:generate && nx run-many -t version",
     "compile": "nx run-many -t compile",

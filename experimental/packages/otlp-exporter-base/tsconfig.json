@@ -4,6 +4,12 @@
     "outDir": "build",
     "rootDir": "."
   },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs",
+      "moduleResolution": "node"
+    }
+  },
   "files": [],
   "include": [
     "src/**/*.ts",

@@ -4,6 +4,13 @@
     "outDir": "build",
     "rootDir": "."
   },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "esModuleInterop": true
+    }
+  },
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
