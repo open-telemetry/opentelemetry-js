@@ -102,18 +102,14 @@ describe('createInstrumentation', function () {
     // For all of these cases, there is no indication of the actual module version,
     // so we require there to be a wildcard supported version.
 
-    // @ts-expect-error -- xxxx
-    let instrumentation: Instrumentation;
-    let modulePatchSpy: sinon.SinonSpy;
-
     beforeEach(() => {
       modulePatchSpy = sinon.spy(patchFn);
-      // Make sure testd are not getting cached results
-      Object.keys(require.cache).forEach((k) => {
+      // Make sure tests are not getting cached results
+      Object.keys(require.cache).forEach(k => {
         if (k.includes('test-version-not-available')) {
           delete require.cache[k];
         }
-      })
+      });
     });
 
     describe('and patching a module', function () {
@@ -261,7 +257,7 @@ describe('createInstrumentation', function () {
                   moduleName,
                   ['*'],
                   modulePatchSpy,
-                  moduleUnpatchSpy,
+                  moduleUnpatchSpy
                 ),
               ]
             ),
