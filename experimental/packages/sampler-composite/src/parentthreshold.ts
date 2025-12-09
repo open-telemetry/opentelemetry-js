@@ -29,8 +29,10 @@ import { INVALID_THRESHOLD, isValidThreshold, MIN_THRESHOLD } from './util';
 
 class ComposableParentThresholdSampler implements ComposableSampler {
   private readonly description: string;
+  private readonly rootSampler: ComposableSampler;
 
-  constructor(private readonly rootSampler: ComposableSampler) {
+  constructor(rootSampler: ComposableSampler) {
+    this.rootSampler = rootSampler;
     this.description = `ComposableParentThresholdSampler(rootSampler=${rootSampler})`;
   }
 

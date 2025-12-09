@@ -33,8 +33,11 @@ export class MeterProviderSharedState {
   metricCollectors: MetricCollector[] = [];
 
   meterSharedStates: Map<string, MeterSharedState> = new Map();
+  public resource: Resource;
 
-  constructor(public resource: Resource) {}
+  constructor(resource: Resource) {
+    this.resource = resource;
+  }
 
   getMeterSharedState(instrumentationScope: InstrumentationScope) {
     const id = instrumentationScopeId(instrumentationScope);

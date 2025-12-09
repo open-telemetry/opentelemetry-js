@@ -23,15 +23,23 @@ export class InstrumentationNodeModuleDefinition
   implements InstrumentationModuleDefinition
 {
   files: InstrumentationModuleFile[];
+  public name: string;
+  public supportedVersions: string[];
+  public patch;
+  public unpatch;
   constructor(
-    public name: string,
-    public supportedVersions: string[],
+    name: string,
+    supportedVersions: string[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public patch?: (exports: any, moduleVersion?: string) => any,
+    patch?: (exports: any, moduleVersion?: string) => any,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public unpatch?: (exports: any, moduleVersion?: string) => void,
+    unpatch?: (exports: any, moduleVersion?: string) => void,
     files?: InstrumentationModuleFile[]
   ) {
     this.files = files || [];
+    this.name = name;
+    this.supportedVersions = supportedVersions;
+    this.patch = patch;
+    this.unpatch = unpatch;
   }
 }
