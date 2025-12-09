@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1765215935209,
+  "lastUpdate": 1765272575531,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -47514,6 +47514,86 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 284590,
             "range": "±0.69%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "d7db1882dbabd61862ad17066e8ce0d224475ee0",
+          "message": "fix(sdk-node): add missing dependency to `@opentelemetry/context-async-hooks` (#6189)",
+          "timestamp": "2025-12-09T09:22:05Z",
+          "tree_id": "9efca191bf2b8c339970cf505ef6439a054ea4d4",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/d7db1882dbabd61862ad17066e8ce0d224475ee0"
+        },
+        "date": 1765272574501,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 611793,
+            "range": "±0.69%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 7584,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 1975011,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 1765623,
+            "range": "±0.63%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 1767278,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 1581163,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 297831,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 279437,
+            "range": "±0.71%",
             "unit": "ops/sec",
             "extra": "92 samples"
           }
