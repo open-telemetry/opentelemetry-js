@@ -26,10 +26,13 @@ export class BindOnceFuture<
 > {
   private _isCalled = false;
   private _deferred = new Deferred<R>();
-  constructor(
-    private _callback: T,
-    private _that: This
-  ) {}
+  private _callback: T;
+  private _that: This;
+
+  constructor(callback: T, that: This) {
+    this._callback = callback;
+    this._that = that;
+  }
 
   get isCalled() {
     return this._isCalled;

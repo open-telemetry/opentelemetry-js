@@ -29,7 +29,10 @@ import {
  * Represents a storage from which we can collect metrics.
  */
 export abstract class MetricStorage {
-  constructor(protected _instrumentDescriptor: InstrumentDescriptor) {}
+  protected _instrumentDescriptor: InstrumentDescriptor;
+  constructor(instrumentDescriptor: InstrumentDescriptor) {
+    this._instrumentDescriptor = instrumentDescriptor;
+  }
 
   /**
    * Collects the metrics from this storage.

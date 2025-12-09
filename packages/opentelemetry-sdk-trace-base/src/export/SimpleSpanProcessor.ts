@@ -35,10 +35,12 @@ import { SpanExporter } from './SpanExporter';
  * NOTE: This {@link SpanProcessor} exports every ended span individually instead of batching spans together, which causes significant performance overhead with most exporters. For production use, please consider using the {@link BatchSpanProcessor} instead.
  */
 export class SimpleSpanProcessor implements SpanProcessor {
+  private readonly _exporter: SpanExporter;
   private _shutdownOnce: BindOnceFuture<void>;
   private _pendingExports: Set<Promise<void>>;
 
-  constructor(private readonly _exporter: SpanExporter) {
+  constructor(exporter: SpanExporter) {
+    this._exporter = exporter;
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
     this._pendingExports = new Set<Promise<void>>();
   }

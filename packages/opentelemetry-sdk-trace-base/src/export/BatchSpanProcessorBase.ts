@@ -39,6 +39,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   private readonly _maxQueueSize: number;
   private readonly _scheduledDelayMillis: number;
   private readonly _exportTimeoutMillis: number;
+  private readonly _exporter: SpanExporter;
 
   private _isExporting = false;
   private _finishedSpans: ReadableSpan[] = [];
@@ -46,10 +47,8 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   private _shutdownOnce: BindOnceFuture<void>;
   private _droppedSpansCount: number = 0;
 
-  constructor(
-    private readonly _exporter: SpanExporter,
-    config?: T
-  ) {
+  constructor(exporter: SpanExporter, config?: T) {
+    this._exporter = exporter;
     this._maxExportBatchSize =
       typeof config?.maxExportBatchSize === 'number'
         ? config.maxExportBatchSize
