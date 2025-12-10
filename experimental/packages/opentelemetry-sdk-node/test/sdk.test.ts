@@ -18,6 +18,7 @@ import {
   context,
   propagation,
   ProxyTracerProvider,
+  ProxyMeterProvider,
   trace,
   diag,
   DiagLogLevel,
@@ -101,6 +102,7 @@ function assertDefaultPropagatorRegistered() {
 
 describe('Node SDK', () => {
   let delegate: any;
+  let metricsDelegate: any;
   let logsDelegate: any;
 
   beforeEach(() => {
@@ -112,6 +114,9 @@ describe('Node SDK', () => {
     logs.disable();
 
     delegate = (trace.getTracerProvider() as ProxyTracerProvider).getDelegate();
+    metricsDelegate = (
+      metrics.getMeterProvider() as ProxyMeterProvider
+    ).getDelegate();
     logsDelegate = (
       logs.getLoggerProvider() as ProxyLoggerProvider
     )._getDelegate();
@@ -150,6 +155,12 @@ describe('Node SDK', () => {
         delegate,
         'tracer provider should not have changed'
       );
+      assert.strictEqual(
+        (metrics.getMeterProvider() as ProxyMeterProvider).getDelegate(),
+        metricsDelegate,
+        'meter provider should not have changed'
+      );
+      assert.ok(!(logs.getLoggerProvider() instanceof LoggerProvider));
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
       assert.strictEqual(
         (logs.getLoggerProvider() as ProxyLoggerProvider)._getDelegate(),
@@ -201,6 +212,13 @@ describe('Node SDK', () => {
 
       sdk.start();
 
+      assert.ok(
+        !(
+          (
+            metrics.getMeterProvider() as ProxyMeterProvider
+          ).getDelegate() instanceof MeterProvider
+        )
+      );
       assertDefaultContextManagerRegistered();
       assertDefaultPropagatorRegistered();
 
@@ -218,6 +236,13 @@ describe('Node SDK', () => {
 
       sdk.start();
 
+      assert.ok(
+        !(
+          (
+            metrics.getMeterProvider() as ProxyMeterProvider
+          ).getDelegate() instanceof MeterProvider
+        )
+      );
       assertDefaultContextManagerRegistered();
       assertDefaultPropagatorRegistered();
 
@@ -241,6 +266,13 @@ describe('Node SDK', () => {
 
       sdk.start();
 
+      assert.ok(
+        !(
+          (
+            metrics.getMeterProvider() as ProxyMeterProvider
+          ).getDelegate() instanceof MeterProvider
+        )
+      );
       assertDefaultContextManagerRegistered();
       assertDefaultPropagatorRegistered();
 
@@ -298,7 +330,11 @@ describe('Node SDK', () => {
         'tracer provider should not have changed'
       );
 
-      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+      assert.ok(
+        (
+          metrics.getMeterProvider() as ProxyMeterProvider
+        ).getDelegate() instanceof MeterProvider
+      );
 
       await sdk.shutdown();
     });
@@ -337,8 +373,9 @@ describe('Node SDK', () => {
         delegate,
         'tracer provider should not have changed'
       );
-
-      const meterProvider = metrics.getMeterProvider() as MeterProvider;
+      const meterProvider = (
+        metrics.getMeterProvider() as ProxyMeterProvider
+      ).getDelegate() as MeterProvider;
       assert.ok(meterProvider instanceof MeterProvider);
 
       // Verify that both metric readers are registered
@@ -374,7 +411,11 @@ describe('Node SDK', () => {
         "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
       );
 
-      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+      assert.ok(
+        (
+          metrics.getMeterProvider() as ProxyMeterProvider
+        ).getDelegate() instanceof MeterProvider
+      );
 
       await sdk.shutdown();
     });
@@ -405,7 +446,11 @@ describe('Node SDK', () => {
         "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
       );
 
-      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+      assert.ok(
+        (
+          metrics.getMeterProvider() as ProxyMeterProvider
+        ).getDelegate() instanceof MeterProvider
+      );
 
       await sdk.shutdown();
     });
@@ -619,8 +664,8 @@ describe('Node SDK', () => {
       'tracer provider should not have changed'
     );
 
-    const meterProvider = metrics.getMeterProvider() as MeterProvider;
-    assert.ok(meterProvider);
+    const meterProvider = metrics.getMeterProvider() as ProxyMeterProvider;
+    assert.ok(meterProvider.getDelegate() instanceof MeterProvider);
 
     const meter = meterProvider.getMeter('NodeSDKViews', '1.0.0');
     const counter = meter.createCounter('test_counter', {
@@ -1017,7 +1062,13 @@ describe('Node SDK', () => {
       });
       sdk.start();
 
-      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
+      assert.ok(
+        !(
+          (
+            metrics.getMeterProvider() as ProxyMeterProvider
+          ).getDelegate() instanceof MeterProvider
+        )
+      );
 
       await sdk.shutdown();
     });
@@ -1252,12 +1303,34 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
+    it('should not configure metrics when OTEL_METRICS_EXPORTER is unset', async () => {
+      delete process.env.OTEL_METRICS_EXPORTER;
+      process.env.OTEL_TRACES_EXPORTER = 'none';
+
+      const sdk = new NodeSDK();
+      sdk.start();
+
+      try {
+        const meterProvider = metrics.getMeterProvider() as ProxyMeterProvider;
+        assert.strictEqual((meterProvider as any)._delegate, undefined);
+
+        const meter = metrics.getMeter('proxy-meter-test');
+        const counter = meter.createCounter('proxy-counter-test');
+        counter.add(1);
+      } finally {
+        await sdk.shutdown();
+        delete process.env.OTEL_TRACES_EXPORTER;
+      }
+    });
+
     it('should use console with default interval and timeout', async () => {
       process.env.OTEL_METRICS_EXPORTER = 'console';
       const sdk = new NodeSDK();
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
-      const sharedState = (meterProvider as any)['_sharedState'];
+      const sharedState = (
+        (meterProvider as ProxyMeterProvider).getDelegate() as any
+      )['_sharedState'];
       assert.ok(
         sharedState.metricCollectors[0]._metricReader._exporter instanceof
           ConsoleMetricExporter
@@ -1279,7 +1352,9 @@ describe('Node SDK', () => {
       const sdk = new NodeSDK();
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
-      const sharedState = (meterProvider as any)['_sharedState'];
+      const sharedState = (
+        (meterProvider as ProxyMeterProvider).getDelegate() as any
+      )['_sharedState'];
       assert.ok(
         sharedState.metricCollectors[0]._metricReader._exporter instanceof
           OTLPGrpcMetricExporter
@@ -1301,7 +1376,9 @@ describe('Node SDK', () => {
       const sdk = new NodeSDK();
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
-      const sharedState = (meterProvider as any)['_sharedState'];
+      const sharedState = (
+        (meterProvider as ProxyMeterProvider).getDelegate() as any
+      )['_sharedState'];
       assert.ok(
         sharedState.metricCollectors[0]._metricReader._exporter instanceof
           OTLPProtoMetricExporter
@@ -1323,7 +1400,9 @@ describe('Node SDK', () => {
       const sdk = new NodeSDK();
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
-      const sharedState = (meterProvider as any)['_sharedState'];
+      const sharedState = (
+        (meterProvider as ProxyMeterProvider).getDelegate() as any
+      )['_sharedState'];
       assert.ok(
         sharedState.metricCollectors[0]._metricReader._exporter instanceof
           OTLPHttpMetricExporter
@@ -1345,7 +1424,9 @@ describe('Node SDK', () => {
       const sdk = new NodeSDK();
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
-      const sharedState = (meterProvider as any)['_sharedState'];
+      const sharedState = (
+        (meterProvider as ProxyMeterProvider).getDelegate() as any
+      )['_sharedState'];
       assert.ok(
         sharedState.metricCollectors[0]._metricReader._exporter instanceof
           OTLPGrpcMetricExporter
@@ -1367,7 +1448,9 @@ describe('Node SDK', () => {
       const sdk = new NodeSDK();
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
-      const sharedState = (meterProvider as any)['_sharedState'];
+      const sharedState = (
+        (meterProvider as ProxyMeterProvider).getDelegate() as any
+      )['_sharedState'];
       assert.ok(
         sharedState.metricCollectors[0]._metricReader._exporter instanceof
           OTLPProtoMetricExporter
@@ -1389,7 +1472,9 @@ describe('Node SDK', () => {
       const sdk = new NodeSDK();
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
-      const sharedState = (meterProvider as any)['_sharedState'];
+      const sharedState = (
+        (meterProvider as ProxyMeterProvider).getDelegate() as any
+      )['_sharedState'];
       assert.ok(
         sharedState.metricCollectors[0]._metricReader._exporter instanceof
           OTLPProtoMetricExporter
@@ -1413,7 +1498,9 @@ describe('Node SDK', () => {
       const sdk = new NodeSDK();
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
-      const sharedState = (meterProvider as any)['_sharedState'];
+      const sharedState = (
+        (meterProvider as ProxyMeterProvider).getDelegate() as any
+      )['_sharedState'];
       assert.ok(
         sharedState.metricCollectors[0]._metricReader._exporter instanceof
           OTLPProtoMetricExporter
@@ -1435,7 +1522,9 @@ describe('Node SDK', () => {
       const sdk = new NodeSDK();
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
-      const sharedState = (meterProvider as any)['_sharedState'];
+      const sharedState = (
+        (meterProvider as ProxyMeterProvider).getDelegate() as any
+      )['_sharedState'];
       assert.ok(
         sharedState.metricCollectors[0]._metricReader instanceof
           PrometheusMetricExporter
@@ -1449,7 +1538,9 @@ describe('Node SDK', () => {
       sdk.start();
 
       const meterProvider = metrics.getMeterProvider();
-      const sharedState = (meterProvider as any)['_sharedState'];
+      const sharedState = (
+        (meterProvider as ProxyMeterProvider).getDelegate() as any
+      )['_sharedState'];
       assert.ok(
         sharedState.metricCollectors[0]._metricReader._exporter instanceof
           OTLPProtoMetricExporter
@@ -1463,7 +1554,9 @@ describe('Node SDK', () => {
       sdk.start();
 
       const meterProvider = metrics.getMeterProvider();
-      const sharedState = (meterProvider as any)['_sharedState'];
+      const sharedState = (
+        (meterProvider as ProxyMeterProvider).getDelegate() as any
+      )['_sharedState'];
 
       assert.ok(sharedState.metricCollectors.length === 2);
       assert.ok(
