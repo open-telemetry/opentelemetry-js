@@ -20,6 +20,9 @@ export {
   getNumberFromEnv,
   getStringListFromEnv,
 } from './environment';
-export { _globalThis } from './globalThis';
-export { otperformance } from './performance';
+export { _globalThis } from '../../common/globalThis';
 export { SDK_INFO } from './sdk-info';
+
+// Use global performance which is available in both Node.js (18+) and browsers
+export const otperformance: { now(): number; readonly timeOrigin: number } =
+  performance;
