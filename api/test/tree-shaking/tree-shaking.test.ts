@@ -64,7 +64,7 @@ describe('tree-shaking', function () {
         this.skip();
       }
       const sourceCode = `
-          import { ${testAPI.export} } from '../../build/index.mjs';
+          import { ${testAPI.export} } from '../../';
           console.log(${testAPI.export});
         `;
       mfs.mkdirpSync(path.dirname(sourceCodePath));

@@ -22,7 +22,7 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsdown && tsc -p tsconfig.dts.json",
+    "compile": "tsdown && tsc -p tsconfig.dts.json && tsc -p tsconfig.json",
     "clean": "rm -rf build",
     "test:cjs": "nyc mocha test/**/*.test.ts",
     "test:esm": "nyc node --experimental-loader=@opentelemetry/instrumentation/hook.mjs ../../../node_modules/mocha/bin/mocha 'test/**/*.test.mjs'",
