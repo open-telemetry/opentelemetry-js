@@ -21,35 +21,35 @@ import {
 } from './shared-configuration';
 import { validateAndNormalizeHeaders } from '../util';
 
-// NOTE: do not change these imports to be actual imports, otherwise they WILL break `@opentelemetry/instrumentation-http`
-import type * as http from 'http';
-import type * as https from 'https';
+export type HeadersFactory = () => Promise<Record<string, string>>;
 
 export interface OtlpHttpConfiguration extends OtlpSharedConfiguration {
   url: string;
-  headers: () => Record<string, string>;
-  agentOptions: http.AgentOptions | https.AgentOptions;
+  headers: HeadersFactory;
 }
 
 function mergeHeaders(
-  userProvidedHeaders: (() => Record<string, string>) | undefined | null,
-  fallbackHeaders: (() => Record<string, string>) | undefined | null,
-  defaultHeaders: () => Record<string, string>
-): () => Record<string, string> {
-  const requiredHeaders = {
-    ...defaultHeaders(),
-  };
-  const headers = {};
+  userProvidedHeaders: HeadersFactory | undefined | null,
+  fallbackHeaders: HeadersFactory | undefined | null,
+  defaultHeaders: HeadersFactory
+): HeadersFactory {
+  return async () => {
+    const requiredHeaders = {
+      ...(await defaultHeaders()),
+    };
+    const headers = {};
 
-  return () => {
     // add fallback ones first
     if (fallbackHeaders != null) {
-      Object.assign(headers, fallbackHeaders());
+      Object.assign(headers, await fallbackHeaders());
     }
 
     // override with user-provided ones
     if (userProvidedHeaders != null) {
-      Object.assign(headers, userProvidedHeaders());
+      Object.assign(
+        headers,
+        validateAndNormalizeHeaders(await userProvidedHeaders())
+      );
     }
 
     // override required ones.
@@ -62,8 +62,9 @@ function validateUserProvidedUrl(url: string | undefined): string | undefined {
     return undefined;
   }
   try {
-    new URL(url);
-    return url;
+    // NOTE: In non-browser environments, `globalThis.location` will be `undefined`.
+    const base = globalThis.location?.href;
+    return new URL(url, base).href;
   } catch {
     throw new Error(
       `Configuration: Could not parse user-provided export URL: '${url}'`
@@ -88,7 +89,7 @@ export function mergeOtlpHttpConfigurationWithDefaults(
       defaultConfiguration
     ),
     headers: mergeHeaders(
-      validateAndNormalizeHeaders(userProvidedConfiguration.headers),
+      userProvidedConfiguration.headers,
       fallbackConfiguration.headers,
       defaultConfiguration.headers
     ),
@@ -96,10 +97,6 @@ export function mergeOtlpHttpConfigurationWithDefaults(
       validateUserProvidedUrl(userProvidedConfiguration.url) ??
       fallbackConfiguration.url ??
       defaultConfiguration.url,
-    agentOptions:
-      userProvidedConfiguration.agentOptions ??
-      fallbackConfiguration.agentOptions ??
-      defaultConfiguration.agentOptions,
   };
 }
 
@@ -109,8 +106,7 @@ export function getHttpConfigurationDefaults(
 ): OtlpHttpConfiguration {
   return {
     ...getSharedConfigurationDefaults(),
-    headers: () => requiredHeaders,
+    headers: async () => requiredHeaders,
     url: 'http://localhost:4318/' + signalResourcePath,
-    agentOptions: { keepAlive: true },
   };
 }

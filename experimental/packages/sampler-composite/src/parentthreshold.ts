@@ -1,0 +1,91 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import {
+  Attributes,
+  Context,
+  isSpanContextValid,
+  Link,
+  SpanKind,
+  TraceFlags,
+  trace,
+} from '@opentelemetry/api';
+import { ComposableSampler, SamplingIntent } from './types';
+import { parseOtelTraceState } from './tracestate';
+import { INVALID_THRESHOLD, isValidThreshold, MIN_THRESHOLD } from './util';
+
+class ComposableParentThresholdSampler implements ComposableSampler {
+  private readonly description: string;
+  private readonly rootSampler: ComposableSampler;
+
+  constructor(rootSampler: ComposableSampler) {
+    this.rootSampler = rootSampler;
+    this.description = `ComposableParentThresholdSampler(rootSampler=${rootSampler})`;
+  }
+
+  getSamplingIntent(
+    context: Context,
+    traceId: string,
+    spanName: string,
+    spanKind: SpanKind,
+    attributes: Attributes,
+    links: Link[]
+  ): SamplingIntent {
+    const parentSpanContext = trace.getSpanContext(context);
+    if (!parentSpanContext || !isSpanContextValid(parentSpanContext)) {
+      return this.rootSampler.getSamplingIntent(
+        context,
+        traceId,
+        spanName,
+        spanKind,
+        attributes,
+        links
+      );
+    }
+
+    const otTraceState = parseOtelTraceState(parentSpanContext.traceState);
+
+    if (isValidThreshold(otTraceState.threshold)) {
+      return {
+        threshold: otTraceState.threshold,
+        thresholdReliable: true,
+      };
+    }
+
+    const threshold =
+      parentSpanContext.traceFlags & TraceFlags.SAMPLED
+        ? MIN_THRESHOLD
+        : INVALID_THRESHOLD;
+    return {
+      threshold,
+      thresholdReliable: false,
+    };
+  }
+
+  toString(): string {
+    return this.description;
+  }
+}
+
+/**
+ * Returns a composable sampler that respects the sampling decision of the
+ * parent span or falls back to the given sampler if it is a root span.
+ */
+export function createComposableParentThresholdSampler(
+  rootSampler: ComposableSampler
+): ComposableSampler {
+  return new ComposableParentThresholdSampler(rootSampler);
+}

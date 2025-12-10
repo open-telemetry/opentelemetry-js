@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { ExportResult, getNumberFromEnv } from '@opentelemetry/core';
 import { diag } from '@opentelemetry/api';
 import {
+  ExportResult,
   ExportResultCode,
+  getNumberFromEnv,
   globalErrorHandler,
-  unrefTimer,
   BindOnceFuture,
   internal,
   callWithTimeout,
@@ -37,15 +37,15 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   private readonly _maxQueueSize: number;
   private readonly _scheduledDelayMillis: number;
   private readonly _exportTimeoutMillis: number;
+  private readonly _exporter: LogRecordExporter;
 
+  private _isExporting = false;
   private _finishedLogRecords: SdkLogRecord[] = [];
-  private _timer: NodeJS.Timeout | undefined;
+  private _timer: NodeJS.Timeout | number | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
 
-  constructor(
-    private readonly _exporter: LogRecordExporter,
-    config?: T
-  ) {
+  constructor(exporter: LogRecordExporter, config?: T) {
+    this._exporter = exporter;
     this._maxExportBatchSize =
       config?.maxExportBatchSize ??
       getNumberFromEnv('OTEL_BLRP_MAX_EXPORT_BATCH_SIZE') ??
@@ -146,22 +146,32 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   }
 
   private _maybeStartTimer() {
-    if (this._timer !== undefined) {
-      return;
-    }
-    this._timer = setTimeout(() => {
+    if (this._isExporting) return;
+    const flush = () => {
+      this._isExporting = true;
       this._flushOneBatch()
         .then(() => {
+          this._isExporting = false;
           if (this._finishedLogRecords.length > 0) {
             this._clearTimer();
             this._maybeStartTimer();
           }
         })
         .catch(e => {
+          this._isExporting = false;
           globalErrorHandler(e);
         });
-    }, this._scheduledDelayMillis);
-    unrefTimer(this._timer);
+    };
+    // we only wait if the queue doesn't have enough elements yet
+    if (this._finishedLogRecords.length >= this._maxExportBatchSize) {
+      return flush();
+    }
+    if (this._timer !== undefined) return;
+    this._timer = setTimeout(() => flush(), this._scheduledDelayMillis);
+    // depending on runtime, this may be a 'number' or NodeJS.Timeout
+    if (typeof this._timer !== 'number') {
+      this._timer.unref();
+    }
   }
 
   private _clearTimer() {

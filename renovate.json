@@ -2,11 +2,25 @@
   "extends": ["config:recommended"],
   "packageRules": [
     {
+      "matchManagers": ["github-actions"],
+      "pinDigests": true
+    },
+    {
       "groupName": "all patch versions",
       "groupSlug": "all-patch",
       "matchUpdateTypes": ["patch"],
       "schedule": ["before 3am every weekday"],
       "matchPackageNames": ["!prettier"]
+    },
+    {
+      "groupName": "@protobuf-ts packages",
+      "matchUpdateTypes": ["minor", "major"],
+      "matchPackageNames": ["/^@protobuf-ts//"]
+    },
+    {
+      "groupName": "typedoc packages",
+      "matchUpdateTypes": ["minor", "major"],
+      "matchPackageNames": ["/^typedoc(-|$)/"]
     },
     {
       "matchUpdateTypes": ["minor"],
@@ -32,8 +46,9 @@
     "@types/node"
   ],
   "constraints": {
-    "npm": ">10.8.0"
+    "npm": ">=11.6.3"
   },
-  "assignees": ["@blumamir", "@dyladan", "@legendecas", "@pichlermarc"],
-  "labels": ["dependencies"]
+  "assignees": ["@dyladan", "@legendecas", "@pichlermarc", "@trentm"],
+  "labels": ["dependencies"],
+  "postUpdateOptions": ["npmDedupe"]
 }

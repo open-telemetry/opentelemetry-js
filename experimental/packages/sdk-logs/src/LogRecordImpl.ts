@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
 import type * as logsAPI from '@opentelemetry/api-logs';
 import * as api from '@opentelemetry/api';
 import {
@@ -25,7 +24,7 @@ import type { Resource } from '@opentelemetry/resources';
 
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
-import { AnyValue, LogAttributes, LogBody, isLogAttributeValue } from '@opentelemetry/api-logs';
+import { AnyValue, isLogAttributeValue } from '@opentelemetry/api-logs';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 
 export class LogRecordImpl implements ReadableLogRecord {
@@ -37,7 +36,7 @@ export class LogRecordImpl implements ReadableLogRecord {
   readonly attributes: logsAPI.LogAttributes = {};
   private _severityText?: string;
   private _severityNumber?: logsAPI.SeverityNumber;
-  private _body?: LogBody;
+  private _body?: logsAPI.LogBody;
   private _eventName?: string;
   private totalAttributesCount: number = 0;
 
@@ -64,13 +63,13 @@ export class LogRecordImpl implements ReadableLogRecord {
     return this._severityNumber;
   }
 
-  set body(body: LogBody | undefined) {
+  set body(body: logsAPI.LogBody | undefined) {
     if (this._isLogRecordReadonly()) {
       return;
     }
     this._body = body;
   }
-  get body(): LogBody | undefined {
+  get body(): logsAPI.LogBody | undefined {
     return this._body;
   }
 
@@ -124,7 +123,7 @@ export class LogRecordImpl implements ReadableLogRecord {
     this.setAttributes(attributes);
   }
 
-  public setAttribute(key: string, value?: AnyValue) {
+  public setAttribute(key: string, value?: logsAPI.AnyValue) {
     if (this._isLogRecordReadonly()) {
       return this;
     }
@@ -152,14 +151,14 @@ export class LogRecordImpl implements ReadableLogRecord {
     return this;
   }
 
-  public setAttributes(attributes: LogAttributes) {
+  public setAttributes(attributes: logsAPI.LogAttributes) {
     for (const [k, v] of Object.entries(attributes)) {
       this.setAttribute(k, v);
     }
     return this;
   }
 
-  public setBody(body: LogBody) {
+  public setBody(body: logsAPI.LogBody) {
     this.body = body;
     return this;
   }
@@ -239,7 +238,7 @@ export class LogRecordImpl implements ReadableLogRecord {
 
   private _isLogRecordReadonly(): boolean {
     if (this._isReadonly) {
-      diag.warn('Can not execute the operation on emitted log record');
+      api.diag.warn('Can not execute the operation on emitted log record');
     }
     return this._isReadonly;
   }

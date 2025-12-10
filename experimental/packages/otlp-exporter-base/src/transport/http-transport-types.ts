@@ -14,21 +14,11 @@
  * limitations under the License.
  */
 
-import type * as http from 'http';
-import type * as https from 'https';
-import { ExportResponse } from '../export-response';
-
-export type sendWithHttp = (
-  params: HttpRequestParameters,
-  agent: http.Agent | https.Agent,
-  data: Uint8Array,
-  onDone: (response: ExportResponse) => void,
-  timeoutMillis: number
-) => void;
+import { HeadersFactory } from '../configuration/otlp-http-configuration';
 
 export interface HttpRequestParameters {
   url: string;
-  headers: () => Record<string, string>;
+  headers: HeadersFactory;
   compression: 'gzip' | 'none';
-  agentOptions: http.AgentOptions | https.AgentOptions;
+  userAgent?: string;
 }

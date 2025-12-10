@@ -22,7 +22,8 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-import { LoggerProvider, NoopLogRecordProcessor } from '../../src';
+import { LoggerProvider } from '../../src';
+import { NoopLogRecordProcessor } from '../../src/export/NoopLogRecordProcessor';
 import { loadDefaultConfig } from '../../src/config';
 import { DEFAULT_LOGGER_NAME } from './../../src/LoggerProvider';
 import { MultiLogRecordProcessor } from '../../src/MultiLogRecordProcessor';
@@ -50,6 +51,22 @@ describe('LoggerProvider', () => {
         const sharedState = provider['_sharedState'];
         const processor = sharedState.activeProcessor;
         assert.ok(processor instanceof NoopLogRecordProcessor);
+      });
+
+      it('should add logRecord processor', () => {
+        const logRecordProcessor = new NoopLogRecordProcessor();
+        const provider = new LoggerProvider({
+          processors: [logRecordProcessor],
+        });
+        const sharedState = provider['_sharedState'];
+        assert.ok(
+          sharedState.activeProcessor instanceof MultiLogRecordProcessor
+        );
+        assert.strictEqual(sharedState.activeProcessor.processors.length, 1);
+        assert.strictEqual(
+          sharedState.activeProcessor.processors[0],
+          logRecordProcessor
+        );
       });
 
       it('should have default resource if not pass', () => {
@@ -198,21 +215,6 @@ describe('LoggerProvider', () => {
       assert.strictEqual(sharedState.loggers.size, 2);
       assert.ok(logger2 instanceof Logger);
       assert.strictEqual(logger1, logger2);
-    });
-  });
-
-  describe('addLogRecordProcessor', () => {
-    it('should add logRecord processor', () => {
-      const provider = new LoggerProvider();
-      const sharedState = provider['_sharedState'];
-      const logRecordProcessor = new NoopLogRecordProcessor();
-      provider.addLogRecordProcessor(logRecordProcessor);
-      assert.ok(sharedState.activeProcessor instanceof MultiLogRecordProcessor);
-      assert.strictEqual(sharedState.activeProcessor.processors.length, 1);
-      assert.strictEqual(
-        sharedState.activeProcessor.processors[0],
-        logRecordProcessor
-      );
     });
   });
 

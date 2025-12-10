@@ -25,7 +25,10 @@ import { SpanProcessor } from './SpanProcessor';
  * received events to a list of {@link SpanProcessor}s.
  */
 export class MultiSpanProcessor implements SpanProcessor {
-  constructor(private readonly _spanProcessors: SpanProcessor[]) {}
+  private readonly _spanProcessors: SpanProcessor[];
+  constructor(spanProcessors: SpanProcessor[]) {
+    this._spanProcessors = spanProcessors;
+  }
 
   forceFlush(): Promise<void> {
     const promises: Promise<void>[] = [];
@@ -50,6 +53,14 @@ export class MultiSpanProcessor implements SpanProcessor {
   onStart(span: Span, context: Context): void {
     for (const spanProcessor of this._spanProcessors) {
       spanProcessor.onStart(span, context);
+    }
+  }
+
+  onEnding(span: Span): void {
+    for (const spanProcessor of this._spanProcessors) {
+      if (spanProcessor.onEnding) {
+        spanProcessor.onEnding(span);
+      }
     }
   }
 

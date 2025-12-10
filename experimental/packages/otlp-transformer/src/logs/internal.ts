@@ -22,7 +22,7 @@ import {
   IResourceLogs,
 } from './internal-types';
 import { Resource } from '@opentelemetry/resources';
-import { Encoder, getOtlpEncoder } from '../common/utils';
+import { Encoder, getOtlpEncoder, isOtlpEncoder } from '../common/utils';
 import {
   createInstrumentationScope,
   createResource,
@@ -35,9 +35,9 @@ import { LogAttributes } from '@opentelemetry/api-logs';
 
 export function createExportLogsServiceRequest(
   logRecords: ReadableLogRecord[],
-  options?: OtlpEncodingOptions
+  options?: OtlpEncodingOptions | Encoder
 ): IExportLogsServiceRequest {
-  const encoder = getOtlpEncoder(options);
+  const encoder = isOtlpEncoder(options) ? options : getOtlpEncoder(options);
   return {
     resourceLogs: logRecordsToResourceLogs(logRecords, encoder),
   };
@@ -79,17 +79,20 @@ function logRecordsToResourceLogs(
   encoder: Encoder
 ): IResourceLogs[] {
   const resourceMap = createResourceMap(logRecords);
-  return Array.from(resourceMap, ([resource, ismMap]) => ({
-    resource: createResource(resource),
-    scopeLogs: Array.from(ismMap, ([, scopeLogs]) => {
-      return {
-        scope: createInstrumentationScope(scopeLogs[0].instrumentationScope),
-        logRecords: scopeLogs.map(log => toLogRecord(log, encoder)),
-        schemaUrl: scopeLogs[0].instrumentationScope.schemaUrl,
-      };
-    }),
-    schemaUrl: undefined,
-  }));
+  return Array.from(resourceMap, ([resource, ismMap]) => {
+    const processedResource = createResource(resource);
+    return {
+      resource: processedResource,
+      scopeLogs: Array.from(ismMap, ([, scopeLogs]) => {
+        return {
+          scope: createInstrumentationScope(scopeLogs[0].instrumentationScope),
+          logRecords: scopeLogs.map(log => toLogRecord(log, encoder)),
+          schemaUrl: scopeLogs[0].instrumentationScope.schemaUrl,
+        };
+      }),
+      schemaUrl: processedResource.schemaUrl,
+    };
+  });
 }
 
 function toLogRecord(log: ReadableLogRecord, encoder: Encoder): ILogRecord {

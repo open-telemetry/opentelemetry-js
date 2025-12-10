@@ -32,7 +32,24 @@ import {
   ISpan,
 } from './internal-types';
 import { OtlpEncodingOptions } from '../common/internal-types';
-import { getOtlpEncoder } from '../common/utils';
+import { getOtlpEncoder, isOtlpEncoder } from '../common/utils';
+
+// Span flags constants matching the OTLP specification
+const SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK = 0x100;
+const SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK = 0x200;
+
+/**
+ * Builds the 32-bit span flags value combining the low 8-bit W3C TraceFlags
+ * with the HAS_IS_REMOTE and IS_REMOTE bits according to the OTLP spec.
+ */
+function buildSpanFlagsFrom(traceFlags: number, isRemote?: boolean): number {
+  // low 8 bits are W3C TraceFlags (e.g., sampled)
+  let flags = (traceFlags & 0xff) | SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK;
+  if (isRemote) {
+    flags |= SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK;
+  }
+  return flags;
+}
 
 export function sdkSpanToOtlpSpan(span: ReadableSpan, encoder: Encoder): ISpan {
   const ctx = span.spanContext();
@@ -61,6 +78,7 @@ export function sdkSpanToOtlpSpan(span: ReadableSpan, encoder: Encoder): ISpan {
     },
     links: span.links.map(link => toOtlpLink(link, encoder)),
     droppedLinksCount: span.droppedLinksCount,
+    flags: buildSpanFlagsFrom(ctx.traceFlags, span.parentSpanContext?.isRemote),
   };
 }
 
@@ -71,6 +89,7 @@ export function toOtlpLink(link: Link, encoder: Encoder): ILink {
     traceId: encoder.encodeSpanContext(link.context.traceId),
     traceState: link.context.traceState?.serialize(),
     droppedAttributesCount: link.droppedAttributesCount || 0,
+    flags: buildSpanFlagsFrom(link.context.traceFlags, link.context.isRemote),
   };
 }
 
@@ -88,27 +107,11 @@ export function toOtlpSpanEvent(
   };
 }
 
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 export function createExportTraceServiceRequest(
   spans: ReadableSpan[],
-  options?: OtlpEncodingOptions
+  options?: OtlpEncodingOptions | Encoder
 ): IExportTraceServiceRequest {
-  const encoder = getOtlpEncoder(options);
+  const encoder = isOtlpEncoder(options) ? options : getOtlpEncoder(options);
   return {
     resourceSpans: spanRecordsToResourceSpans(spans, encoder),
   };
@@ -170,11 +173,11 @@ function spanRecordsToResourceSpans(
       }
       ilmEntry = ilmIterator.next();
     }
-    // TODO SDK types don't provide resource schema URL at this time
+    const processedResource = createResource(resource);
     const transformedSpans: IResourceSpans = {
-      resource: createResource(resource),
+      resource: processedResource,
       scopeSpans: scopeResourceSpans,
-      schemaUrl: undefined,
+      schemaUrl: processedResource.schemaUrl,
     };
 
     out.push(transformedSpans);

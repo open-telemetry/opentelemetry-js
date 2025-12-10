@@ -19,10 +19,6 @@ import { InstrumentationScope } from '@opentelemetry/core';
 
 export type Maybe<T> = T | undefined;
 
-export function isNotNullish<T>(item: Maybe<T>): item is T {
-  return item !== undefined && item !== null;
-}
-
 /**
  * Converting the unordered attributes into unique identifier string.
  * @param attributes user provided unordered Attributes.
@@ -139,17 +135,6 @@ export function isPromiseAllSettledRejectionResult(
   it: PromiseAllSettledResult<unknown>
 ): it is PromiseAllSettledRejectionResult {
   return it.status === 'rejected';
-}
-
-/**
- * Node.js v11.0 lower and browser compatible `Array.prototype.flatMap`.
- */
-export function FlatMap<T, R>(arr: T[], fn: (it: T) => R[]): R[] {
-  const result: R[] = [];
-  arr.forEach(it => {
-    result.push(...fn(it));
-  });
-  return result;
 }
 
 export function setEquals(lhs: Set<unknown>, rhs: Set<unknown>): boolean {

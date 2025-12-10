@@ -223,11 +223,11 @@ export abstract class InstrumentationBase<
     // internal file
     const files = module.files ?? [];
     const normalizedName = path.normalize(name);
-    const supportedFileInstrumentations = files
-      .filter(f => f.name === normalizedName)
-      .filter(f =>
+    const supportedFileInstrumentations = files.filter(
+      f =>
+        f.name === normalizedName &&
         isSupported(f.supportedVersions, version, module.includePrerelease)
-      );
+    );
     return supportedFileInstrumentations.reduce<T>((patchedExports, file) => {
       file.moduleExports = patchedExports;
       if (this._enabled) {

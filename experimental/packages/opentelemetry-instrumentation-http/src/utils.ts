@@ -82,6 +82,10 @@ import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
 import { Err, IgnoreMatcher, ParsedRequestOptions } from './internal-types';
 import { SYNTHETIC_BOT_NAMES, SYNTHETIC_TEST_NAMES } from './internal-types';
+import {
+  DEFAULT_QUERY_STRINGS_TO_REDACT,
+  STR_REDACTED,
+} from './internal-types';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import forwardedParse = require('forwarded-parse');
 
@@ -91,15 +95,15 @@ import forwardedParse = require('forwarded-parse');
 export const getAbsoluteUrl = (
   requestUrl: ParsedRequestOptions | null,
   headers: IncomingHttpHeaders | OutgoingHttpHeaders,
-  fallbackProtocol = 'http:'
+  fallbackProtocol = 'http:',
+  redactedQueryParams: string[] = Array.from(DEFAULT_QUERY_STRINGS_TO_REDACT)
 ): string => {
   const reqUrlObject = requestUrl || {};
   const protocol = reqUrlObject.protocol || fallbackProtocol;
   const port = (reqUrlObject.port || '').toString();
-  const path = reqUrlObject.path || '/';
+  let path = reqUrlObject.path || '/';
   let host =
     reqUrlObject.host || reqUrlObject.hostname || headers.host || 'localhost';
-
   // if there is no port in host and there is a port
   // it should be displayed if it's not 80 and 443 (default ports)
   if (
@@ -110,8 +114,25 @@ export const getAbsoluteUrl = (
   ) {
     host += `:${port}`;
   }
+  // Redact sensitive query parameters
+  if (path.includes('?')) {
+    try {
+      const parsedUrl = new URL(path, 'http://localhost');
+      const sensitiveParamsToRedact: string[] = redactedQueryParams || [];
 
-  return `${protocol}//${host}${path}`;
+      for (const sensitiveParam of sensitiveParamsToRedact) {
+        if (parsedUrl.searchParams.get(sensitiveParam)) {
+          parsedUrl.searchParams.set(sensitiveParam, STR_REDACTED);
+        }
+      }
+
+      path = `${parsedUrl.pathname}${parsedUrl.search}`;
+    } catch {
+      // Ignore error, as the path was not a valid URL.
+    }
+  }
+  const authPart = reqUrlObject.auth ? `${STR_REDACTED}:${STR_REDACTED}@` : '';
+  return `${protocol}//${authPart}${host}${path}`;
 };
 
 /**
@@ -442,6 +463,7 @@ export const getOutgoingRequestAttributes = (
     hostname: string;
     port: string | number;
     hookAttributes?: Attributes;
+    redactedQueryParams?: string[];
   },
   semconvStability: SemconvStability,
   enableSyntheticSourceDetection: boolean
@@ -455,7 +477,8 @@ export const getOutgoingRequestAttributes = (
   const urlFull = getAbsoluteUrl(
     requestOptions,
     headers,
-    `${options.component}:`
+    `${options.component}:`,
+    options.redactedQueryParams
   );
 
   const oldAttributes: Attributes = {
@@ -766,16 +789,24 @@ export function getRemoteClientAddress(
   if (forwardedHeader) {
     for (const entry of parseForwardedHeader(forwardedHeader)) {
       if (entry.for) {
-        return entry.for;
+        return removePortFromAddress(entry.for);
       }
     }
   }
 
   const xForwardedFor = request.headers['x-forwarded-for'];
-  if (typeof xForwardedFor === 'string') {
-    return xForwardedFor;
-  } else if (Array.isArray(xForwardedFor)) {
-    return xForwardedFor[0];
+  if (xForwardedFor) {
+    let xForwardedForVal;
+    if (typeof xForwardedFor === 'string') {
+      xForwardedForVal = xForwardedFor;
+    } else if (Array.isArray(xForwardedFor)) {
+      xForwardedForVal = xForwardedFor[0];
+    }
+
+    if (typeof xForwardedForVal === 'string') {
+      xForwardedForVal = xForwardedForVal.split(',')[0].trim();
+      return removePortFromAddress(xForwardedForVal);
+    }
   }
 
   const remote = request.socket.remoteAddress;
@@ -784,6 +815,22 @@ export function getRemoteClientAddress(
   }
 
   return null;
+}
+
+function removePortFromAddress(input: string): string {
+  // This function can be replaced with SocketAddress.parse() once the minimum
+  // supported Node.js version allows it.
+  try {
+    const { hostname: address } = new URL(`http://${input}`);
+
+    if (address.startsWith('[') && address.endsWith(']')) {
+      return address.slice(1, -1);
+    }
+
+    return address;
+  } catch {
+    return input;
+  }
 }
 
 function getInfoFromIncomingMessage(
@@ -879,7 +926,7 @@ export const getIncomingRequestAttributes = (
   }
 
   if (remoteClientAddress != null) {
-    newAttributes[ATTR_CLIENT_ADDRESS] = remoteClientAddress.split(',')[0];
+    newAttributes[ATTR_CLIENT_ADDRESS] = remoteClientAddress;
   }
 
   if (serverAddress?.port != null) {
@@ -1077,6 +1124,9 @@ const KNOWN_METHODS = new Set([
 
   // PATCH from https://www.rfc-editor.org/rfc/rfc5789.html
   'PATCH',
+
+  // QUERY from https://datatracker.ietf.org/doc/draft-ietf-httpbis-safe-method-w-body/
+  'QUERY',
 ]);
 
 function normalizeMethod(method?: string | null) {

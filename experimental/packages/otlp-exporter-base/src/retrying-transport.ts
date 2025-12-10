@@ -31,7 +31,11 @@ function getJitter() {
 }
 
 class RetryingTransport implements IExporterTransport {
-  constructor(private _transport: IExporterTransport) {}
+  private _transport: IExporterTransport;
+
+  constructor(transport: IExporterTransport) {
+    this._transport = transport;
+  }
 
   private retry(
     data: Uint8Array,

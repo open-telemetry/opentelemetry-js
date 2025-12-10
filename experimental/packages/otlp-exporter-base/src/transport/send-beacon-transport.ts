@@ -17,23 +17,30 @@
 import { IExporterTransport } from '../exporter-transport';
 import { ExportResponse } from '../export-response';
 import { diag } from '@opentelemetry/api';
+import { HeadersFactory } from '../configuration/otlp-http-configuration';
 
 export interface SendBeaconParameters {
   url: string;
   /**
-   * for instance 'application/x-protobuf'
+   * Only `Content-Type` will be used, sendBeacon does not support custom headers
+   * https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
    */
-  blobType: string;
+  headers: HeadersFactory;
 }
 
 class SendBeaconTransport implements IExporterTransport {
-  constructor(private _params: SendBeaconParameters) {}
-  send(data: Uint8Array): Promise<ExportResponse> {
+  private _params: SendBeaconParameters;
+  constructor(params: SendBeaconParameters) {
+    this._params = params;
+  }
+
+  async send(data: Uint8Array): Promise<ExportResponse> {
+    const blobType = (await this._params.headers())['Content-Type'];
     return new Promise<ExportResponse>(resolve => {
       if (
         navigator.sendBeacon(
           this._params.url,
-          new Blob([data], { type: this._params.blobType })
+          new Blob([data], { type: blobType })
         )
       ) {
         // no way to signal retry, treat everything as success

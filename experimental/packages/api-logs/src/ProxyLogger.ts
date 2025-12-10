@@ -22,13 +22,22 @@ import { LogRecord } from './types/LogRecord';
 export class ProxyLogger implements Logger {
   // When a real implementation is provided, this will be it
   private _delegate?: Logger;
+  private _provider: LoggerDelegator;
+  public readonly name: string;
+  public readonly version?: string | undefined;
+  public readonly options?: LoggerOptions | undefined;
 
   constructor(
-    private _provider: LoggerDelegator,
-    public readonly name: string,
-    public readonly version?: string | undefined,
-    public readonly options?: LoggerOptions | undefined
-  ) {}
+    provider: LoggerDelegator,
+    name: string,
+    version?: string | undefined,
+    options?: LoggerOptions | undefined
+  ) {
+    this._provider = provider;
+    this.name = name;
+    this.version = version;
+    this.options = options;
+  }
 
   /**
    * Emit a log record. This method should only be used by log appenders.
@@ -47,7 +56,7 @@ export class ProxyLogger implements Logger {
     if (this._delegate) {
       return this._delegate;
     }
-    const logger = this._provider.getDelegateLogger(
+    const logger = this._provider._getDelegateLogger(
       this.name,
       this.version,
       this.options
@@ -61,7 +70,7 @@ export class ProxyLogger implements Logger {
 }
 
 export interface LoggerDelegator {
-  getDelegateLogger(
+  _getDelegateLogger(
     name: string,
     version?: string,
     options?: LoggerOptions

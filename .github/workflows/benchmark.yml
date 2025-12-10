@@ -4,22 +4,37 @@ on:
   push:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 jobs:
   benchmark-tests:
+    permissions:
+      contents: write # required for pushing benchmark results to gh-pages
     strategy:
       fail-fast: false
       matrix:
         node_version:
           - "22"
-    runs-on: equinix-bare-metal
+    runs-on: oracle-bare-metal-64cpu-512gb-x86-64
+    container:
+      image: ubuntu:24.04@sha256:c35e29c9450151419d9448b0fd75374fec4fff364a27f176fb458d472dfc9e54
     timeout-minutes: 10
-    env:
-      NPM_CONFIG_UNSAFE_PERM: true
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      # Apt packages:
+      # - git: Needed for 'npm run submodule'
+      - name: Setup container environment
+        run: |
+          apt-get update && apt-get install --fix-missing -y git
 
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+
+      # Avoid "detected dubious ownership in repository" error when running
+      # `npm run submodule`.
+      - run: git config --global --add safe.directory $GITHUB_WORKSPACE
+
+      - uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6
         with:
           cache: 'npm'
           cache-dependency-path: |
@@ -29,7 +44,7 @@ jobs:
       - run: npm install -g npm@latest
 
       - name: Bootstrap
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Build 🔧
         run: npm run compile

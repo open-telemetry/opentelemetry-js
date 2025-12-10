@@ -19,8 +19,12 @@ import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
-import { toBase64 } from './utils';
-import * as root from '../src/generated/root';
+import { hexToBase64 } from '../src/common/utils';
+import { fromBinary, toBinary, create, toJson } from '@bufbuild/protobuf';
+import {
+  ExportLogsServiceRequestSchema,
+  ExportLogsServiceResponseSchema,
+} from '../src/generated/opentelemetry/proto/collector/logs/v1/logs_service_pb';
 import { OtlpEncodingOptions } from '../src/common/internal-types';
 import {
   ESeverityNumber,
@@ -97,9 +101,15 @@ function createExpectedLogJson(
   };
 }
 
-function createExpectedLogProtobuf(): IExportLogsServiceRequest {
-  const traceId = toBase64('00000000000000000000000000000001');
-  const spanId = toBase64('0000000000000002');
+// Returns untyped object for JSON comparison (toJson output differs from typed interface)
+function createExpectedLogProtobuf(): unknown {
+  // protobuf JSON format uses base64 for bytes
+  const traceId = hexToBase64('00000000000000000000000000000001');
+  const spanId = hexToBase64('0000000000000002');
+
+  // protobuf JSON format uses string representation for 64-bit integers
+  const timeUnixNano = '1680253513123241635';
+  const observedTimeUnixNano = '1683526948965142784';
 
   return {
     resourceLogs: [
@@ -111,16 +121,16 @@ function createExpectedLogProtobuf(): IExportLogsServiceRequest {
               value: { stringValue: 'some attribute value' },
             },
           ],
-          droppedAttributesCount: 0,
         },
         scopeLogs: [
           {
             scope: { name: 'scope_name_1', version: '0.1.0' },
             logRecords: [
               {
-                timeUnixNano: 1680253513123241700,
-                observedTimeUnixNano: 1683526948965142800,
-                severityNumber: ESeverityNumber.SEVERITY_NUMBER_ERROR,
+                timeUnixNano: timeUnixNano,
+                observedTimeUnixNano: observedTimeUnixNano,
+                // protobuf-es toJson outputs enums as strings
+                severityNumber: 'SEVERITY_NUMBER_ERROR',
                 severityText: 'error',
                 body: { stringValue: 'some_log_body' },
                 eventName: 'some.event.name',
@@ -130,7 +140,6 @@ function createExpectedLogProtobuf(): IExportLogsServiceRequest {
                     value: { stringValue: 'some attribute value' },
                   },
                 ],
-                droppedAttributesCount: 0,
                 flags: 1,
                 traceId: traceId,
                 spanId: spanId,
@@ -143,6 +152,27 @@ function createExpectedLogProtobuf(): IExportLogsServiceRequest {
     ],
   };
 }
+
+const DEFAULT_LOG_FRAGMENT: Omit<
+  ReadableLogRecord,
+  'resource' | 'instrumentationScope'
+> = {
+  hrTime: [1680253513, 123241635] as HrTime,
+  hrTimeObserved: [1683526948, 965142784] as HrTime,
+  attributes: {
+    'some-attribute': 'some attribute value',
+  },
+  droppedAttributesCount: 0,
+  severityNumber: SeverityNumber.ERROR,
+  severityText: 'error',
+  body: 'some_log_body',
+  eventName: 'some.event.name',
+  spanContext: {
+    spanId: '0000000000000002',
+    traceFlags: TraceFlags.SAMPLED,
+    traceId: '00000000000000000000000000000001',
+  },
+} as const;
 
 describe('Logs', () => {
   let resource_1: Resource;
@@ -166,6 +196,18 @@ describe('Logs', () => {
   // using `resource_2`, `scope_1`, `log_fragment_1`
   let log_2_1_1: ReadableLogRecord;
 
+  function createReadableLogRecord(
+    resource: Resource,
+    scope: InstrumentationScope,
+    logFragment: Omit<ReadableLogRecord, 'resource' | 'instrumentationScope'>
+  ): ReadableLogRecord {
+    return {
+      ...logFragment,
+      resource: resource,
+      instrumentationScope: scope,
+    } as ReadableLogRecord;
+  }
+
   beforeEach(() => {
     resource_1 = resourceFromAttributes({
       'resource-attribute': 'some attribute value',
@@ -181,23 +223,8 @@ describe('Logs', () => {
     scope_2 = {
       name: 'scope_name_2',
     };
-    const log_fragment_1 = {
-      hrTime: [1680253513, 123241635] as HrTime,
-      hrTimeObserved: [1683526948, 965142784] as HrTime,
-      attributes: {
-        'some-attribute': 'some attribute value',
-      },
-      droppedAttributesCount: 0,
-      severityNumber: SeverityNumber.ERROR,
-      severityText: 'error',
-      body: 'some_log_body',
-      eventName: 'some.event.name',
-      spanContext: {
-        spanId: '0000000000000002',
-        traceFlags: TraceFlags.SAMPLED,
-        traceId: '00000000000000000000000000000001',
-      },
-    };
+
+    const log_fragment_1 = DEFAULT_LOG_FRAGMENT;
     const log_fragment_2 = {
       hrTime: [1680253797, 687038506] as HrTime,
       hrTimeObserved: [1680253797, 687038506] as HrTime,
@@ -206,26 +233,11 @@ describe('Logs', () => {
       },
       droppedAttributesCount: 0,
     };
-    log_1_1_1 = {
-      ...log_fragment_1,
-      resource: resource_1,
-      instrumentationScope: scope_1,
-    };
-    log_1_1_2 = {
-      ...log_fragment_2,
-      resource: resource_1,
-      instrumentationScope: scope_1,
-    };
-    log_1_2_1 = {
-      ...log_fragment_1,
-      resource: resource_1,
-      instrumentationScope: scope_2,
-    };
-    log_2_1_1 = {
-      ...log_fragment_1,
-      resource: resource_2,
-      instrumentationScope: scope_1,
-    };
+
+    log_1_1_1 = createReadableLogRecord(resource_1, scope_1, log_fragment_1);
+    log_1_1_2 = createReadableLogRecord(resource_1, scope_1, log_fragment_2);
+    log_1_2_1 = createReadableLogRecord(resource_1, scope_2, log_fragment_1);
+    log_2_1_1 = createReadableLogRecord(resource_2, scope_1, log_fragment_1);
   });
 
   describe('createExportLogsServiceRequest', () => {
@@ -292,45 +304,64 @@ describe('Logs', () => {
       assert.ok(exportRequest);
       assert.strictEqual(exportRequest.resourceLogs?.length, 2);
     });
+
+    it('supports schema URL on resource', () => {
+      const resourceWithSchema = resourceFromAttributes(
+        {},
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
+      );
+
+      const logWithSchema = createReadableLogRecord(
+        resourceWithSchema,
+        scope_1,
+        DEFAULT_LOG_FRAGMENT
+      );
+
+      const exportRequest = createExportLogsServiceRequest([logWithSchema], {
+        useHex: true,
+      });
+
+      assert.ok(exportRequest);
+      assert.strictEqual(exportRequest.resourceLogs?.length, 1);
+      assert.strictEqual(
+        exportRequest.resourceLogs?.[0].schemaUrl,
+        'https://opentelemetry.test/schemas/1.2.3'
+      );
+    });
   });
 
   describe('ProtobufLogsSerializer', function () {
     it('serializes an export request', () => {
       const serialized = ProtobufLogsSerializer.serializeRequest([log_1_1_1]);
       assert.ok(serialized, 'serialized response is undefined');
-      const decoded =
-        root.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest.decode(
-          serialized
-        );
-
+      const decoded = fromBinary(ExportLogsServiceRequestSchema, serialized);
       const expected = createExpectedLogProtobuf();
-      const decodedObj =
-        root.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest.toObject(
-          decoded,
-          {
-            // This incurs some precision loss that's taken into account in createExpectedLogsProtobuf()
-            // Using String here will incur the same precision loss on browser only, using Number to prevent having to
-            // have different assertions for browser and Node.js
-            longs: Number,
-            // Convert to String (Base64) as otherwise the type will be different for Node.js (Buffer) and Browser (Uint8Array)
-            // and this fails assertions.
-            bytes: String,
-          }
-        );
+      // toJson converts to protobuf JSON format (strings for 64-bit ints, base64 for bytes)
+      const decodedJson = toJson(ExportLogsServiceRequestSchema, decoded);
+      assert.deepStrictEqual(decodedJson, expected);
+    });
 
-      assert.deepStrictEqual(decodedObj, expected);
+    it('serializes an empty request', () => {
+      const serialized = ProtobufLogsSerializer.serializeRequest([]);
+      assert.ok(serialized, 'serialized response is undefined');
+      const decoded = fromBinary(ExportLogsServiceRequestSchema, serialized);
+      assert.deepStrictEqual(
+        toJson(ExportLogsServiceRequestSchema, decoded),
+        {}
+      );
     });
 
     it('deserializes a response', () => {
-      const protobufSerializedResponse =
-        root.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse.encode(
-          {
-            partialSuccess: {
-              errorMessage: 'foo',
-              rejectedLogRecords: 1,
-            },
-          }
-        ).finish();
+      const response = create(ExportLogsServiceResponseSchema, {
+        partialSuccess: {
+          errorMessage: 'foo',
+          rejectedLogRecords: BigInt(1),
+        },
+      });
+      const protobufSerializedResponse = toBinary(
+        ExportLogsServiceResponseSchema,
+        response
+      );
 
       const deserializedResponse = ProtobufLogsSerializer.deserializeResponse(
         protobufSerializedResponse
@@ -341,10 +372,7 @@ describe('Logs', () => {
         'partialSuccess not present in the deserialized message'
       );
       assert.equal(deserializedResponse.partialSuccess.errorMessage, 'foo');
-      assert.equal(
-        Number(deserializedResponse.partialSuccess.rejectedLogRecords),
-        1
-      );
+      assert.equal(deserializedResponse.partialSuccess.rejectedLogRecords, 1);
     });
 
     it('does not throw when deserializing an empty response', () => {

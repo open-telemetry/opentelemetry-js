@@ -21,50 +21,49 @@ import {
 import * as assert from 'assert';
 import { testSharedConfigBehavior } from './shared-configuration.test';
 
-describe('mergeOtlpHttpConfigurationWithDefaults', function () {
+describe('mergeOtlpHttpConfigurationWithDefaults (common)', function () {
   const testDefaults: OtlpHttpConfiguration = {
     url: 'http://default.example.test',
     timeoutMillis: 1,
     compression: 'none',
     concurrencyLimit: 2,
-    headers: () => ({ 'User-Agent': 'default-user-agent' }),
-    agentOptions: { keepAlive: true },
+    headers: async () => ({ 'User-Agent': 'default-user-agent' }),
   };
 
   describe('headers', function () {
-    it('merges headers instead of overriding', function () {
+    it('merges headers instead of overriding', async function () {
       const config = mergeOtlpHttpConfigurationWithDefaults(
         {
-          headers: () => ({ foo: 'user' }),
+          headers: async () => ({ foo: 'user' }),
         },
         {
-          headers: () => ({ foo: 'fallback', bar: 'fallback' }),
+          headers: async () => ({ foo: 'fallback', bar: 'fallback' }),
         },
         testDefaults
       );
-      assert.deepStrictEqual(config.headers(), {
+      assert.deepStrictEqual(await config.headers(), {
         'User-Agent': 'default-user-agent',
         foo: 'user',
         bar: 'fallback',
       });
     });
 
-    it('does not override default (required) header', function () {
+    it('does not override default (required) header', async function () {
       const config = mergeOtlpHttpConfigurationWithDefaults(
         {
-          headers: () => ({ 'User-Agent': 'custom' }),
+          headers: async () => ({ 'User-Agent': 'custom' }),
         },
         {
-          headers: () => ({ 'User-Agent': 'custom-fallback' }),
+          headers: async () => ({ 'User-Agent': 'custom-fallback' }),
         },
         testDefaults
       );
-      assert.deepStrictEqual(config.headers(), {
+      assert.deepStrictEqual(await config.headers(), {
         'User-Agent': 'default-user-agent',
       });
     });
 
-    it('drops user-provided headers with undefined values', function () {
+    it('drops user-provided headers with undefined values', async function () {
       const config = mergeOtlpHttpConfigurationWithDefaults(
         {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -78,7 +77,7 @@ describe('mergeOtlpHttpConfigurationWithDefaults', function () {
         {},
         testDefaults
       );
-      assert.deepStrictEqual(config.headers(), {
+      assert.deepStrictEqual(await config.headers(), {
         foo: 'foo-user-provided',
         baz: 'null',
         'User-Agent': 'default-user-agent',
@@ -118,16 +117,6 @@ describe('mergeOtlpHttpConfigurationWithDefaults', function () {
         testDefaults
       );
       assert.strictEqual(config.url, testDefaults.url);
-    });
-
-    it('throws error when the user-provided url is not parseable', function () {
-      assert.throws(() => {
-        mergeOtlpHttpConfigurationWithDefaults(
-          { url: 'this is not a URL' },
-          {},
-          testDefaults
-        );
-      }, new Error("Configuration: Could not parse user-provided export URL: 'this is not a URL'"));
     });
   });
 

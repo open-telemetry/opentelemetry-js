@@ -16,12 +16,13 @@
 
 import type { OtlpEncodingOptions, Fixed64, LongBits } from './internal-types';
 import { HrTime } from '@opentelemetry/api';
-import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { hexToBinary } from './hex-to-binary';
 
 export function hrTimeToNanos(hrTime: HrTime): bigint {
   const NANOSECONDS = BigInt(1_000_000_000);
-  return BigInt(hrTime[0]) * NANOSECONDS + BigInt(hrTime[1]);
+  return (
+    BigInt(Math.trunc(hrTime[0])) * NANOSECONDS + BigInt(Math.trunc(hrTime[1]))
+  );
 }
 
 export function toLongBits(value: bigint): LongBits {
@@ -39,9 +40,6 @@ export function encodeAsString(hrTime: HrTime): string {
   const nanos = hrTimeToNanos(hrTime);
   return nanos.toString();
 }
-
-const encodeTimestamp =
-  typeof BigInt !== 'undefined' ? encodeAsString : hrTimeToNanoseconds;
 
 export type HrTimeEncodeFunction = (hrTime: HrTime) => Fixed64;
 export type SpanContextEncodeFunction = (
@@ -66,11 +64,46 @@ function optionalHexToBinary(str: string | undefined): Uint8Array | undefined {
   return hexToBinary(str);
 }
 
+/**
+ * Convert hex string to base64 (for protobuf JSON format).
+ */
+export function hexToBase64(hex: string): string {
+  const bytes = hexToBinary(hex);
+  // Works in both Node.js and browser
+  if (typeof Buffer !== 'undefined') {
+    return Buffer.from(bytes).toString('base64');
+  }
+  // Browser fallback using spread to avoid string concatenation in loop
+  return btoa(String.fromCharCode(...bytes));
+}
+
+function optionalHexToBase64(str: string | undefined): string | undefined {
+  if (str === undefined) return undefined;
+  return hexToBase64(str);
+}
+
 const DEFAULT_ENCODER: Encoder = {
   encodeHrTime: encodeAsLongBits,
   encodeSpanContext: hexToBinary,
   encodeOptionalSpanContext: optionalHexToBinary,
 };
+
+/**
+ * Encoder for protobuf JSON format (used with fromJson).
+ * Uses string timestamps and base64 for bytes.
+ */
+export const PROTOBUF_JSON_ENCODER: Encoder = {
+  encodeHrTime: encodeAsString,
+  encodeSpanContext: hexToBase64,
+  encodeOptionalSpanContext: optionalHexToBase64,
+};
+
+/** @internal */
+export function isOtlpEncoder(
+  obj: OtlpEncodingOptions | Encoder | undefined
+): obj is Encoder {
+  return obj !== undefined && 'encodeHrTime' in obj;
+}
 
 export function getOtlpEncoder(options?: OtlpEncodingOptions): Encoder {
   if (options === undefined) {
@@ -80,7 +113,7 @@ export function getOtlpEncoder(options?: OtlpEncodingOptions): Encoder {
   const useLongBits = options.useLongBits ?? true;
   const useHex = options.useHex ?? false;
   return {
-    encodeHrTime: useLongBits ? encodeAsLongBits : encodeTimestamp,
+    encodeHrTime: useLongBits ? encodeAsLongBits : encodeAsString,
     encodeSpanContext: useHex ? identity : hexToBinary,
     encodeOptionalSpanContext: useHex ? identity : optionalHexToBinary,
   };

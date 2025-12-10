@@ -13,20 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as http from 'http';
-import * as https from 'https';
+import type * as http from 'http';
+import type * as https from 'https';
 import * as zlib from 'zlib';
 import { Readable } from 'stream';
-import { HttpRequestParameters } from './http-transport-types';
 import { ExportResponse } from '../export-response';
 import {
   isExportRetryable,
   parseRetryAfterToMills,
 } from '../is-export-retryable';
 import { OTLPExporterError } from '../types';
+import { VERSION } from '../version';
+
+const DEFAULT_USER_AGENT = `OTel-OTLP-Exporter-JavaScript/${VERSION}`;
 
 /**
  * Sends data using http
+ * @param request
  * @param params
  * @param agent
  * @param data
@@ -34,27 +37,32 @@ import { OTLPExporterError } from '../types';
  * @param timeoutMillis
  */
 export function sendWithHttp(
-  params: HttpRequestParameters,
+  request: typeof https.request | typeof http.request,
+  url: string,
+  headers: Record<string, string>,
+  compression: 'gzip' | 'none',
+  userAgent: string | undefined,
   agent: http.Agent | https.Agent,
   data: Uint8Array,
   onDone: (response: ExportResponse) => void,
   timeoutMillis: number
 ): void {
-  const parsedUrl = new URL(params.url);
-  const nodeVersion = Number(process.versions.node.split('.')[0]);
+  const parsedUrl = new URL(url);
+
+  if (userAgent) {
+    headers['User-Agent'] = `${userAgent} ${DEFAULT_USER_AGENT}`;
+  } else {
+    headers['User-Agent'] = DEFAULT_USER_AGENT;
+  }
 
   const options: http.RequestOptions | https.RequestOptions = {
     hostname: parsedUrl.hostname,
     port: parsedUrl.port,
     path: parsedUrl.pathname,
     method: 'POST',
-    headers: {
-      ...params.headers(),
-    },
-    agent: agent,
+    headers,
+    agent,
   };
-
-  const request = parsedUrl.protocol === 'http:' ? http.request : https.request;
 
   const req = request(options, (res: http.IncomingMessage) => {
     const responseData: Buffer[] = [];
@@ -92,6 +100,7 @@ export function sendWithHttp(
       error: new Error('Request Timeout'),
     });
   });
+
   req.on('error', (error: Error) => {
     onDone({
       status: 'failure',
@@ -99,15 +108,7 @@ export function sendWithHttp(
     });
   });
 
-  const reportTimeoutErrorEvent = nodeVersion >= 14 ? 'close' : 'abort';
-  req.on(reportTimeoutErrorEvent, () => {
-    onDone({
-      status: 'failure',
-      error: new Error('Request timed out'),
-    });
-  });
-
-  compressAndSend(req, params.compression, data, (error: Error) => {
+  compressAndSend(req, compression, data, (error: Error) => {
     onDone({
       status: 'failure',
       error,
@@ -140,13 +141,4 @@ function readableFromUint8Array(buff: string | Uint8Array): Readable {
   readable.push(null);
 
   return readable;
-}
-
-export function createHttpAgent(
-  rawUrl: string,
-  agentOptions: http.AgentOptions | https.AgentOptions
-) {
-  const parsedUrl = new URL(rawUrl);
-  const Agent = parsedUrl.protocol === 'http:' ? http.Agent : https.Agent;
-  return new Agent(agentOptions);
 }

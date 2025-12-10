@@ -22,7 +22,7 @@ export function getBooleanFromEnv(_: string): boolean | undefined {
   return undefined;
 }
 
-export function getNumberFromEnv(_: string): boolean | undefined {
+export function getNumberFromEnv(_: string): number | undefined {
   return undefined;
 }
 

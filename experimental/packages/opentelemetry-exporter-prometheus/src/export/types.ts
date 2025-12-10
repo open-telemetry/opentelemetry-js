@@ -29,7 +29,7 @@ export interface ExporterConfig {
 
   /**
    * Append timestamp to metrics
-   * @default true
+   * @default false
    */
   appendTimestamp?: boolean;
 
@@ -74,4 +74,16 @@ export interface ExporterConfig {
    * @default undefined (no resource attributes are applied)
    */
   withResourceConstantLabels?: RegExp;
+
+  /**
+   * If true, scope labels are not included in scraped metrics.
+   * @default false (scope labels are included)
+   */
+  withoutScopeInfo?: boolean;
+
+  /**
+   * If true, the target_info metric is not included in scraped metrics.
+   * @default false (target_info metric is included)
+   */
+  withoutTargetInfo?: boolean;
 }

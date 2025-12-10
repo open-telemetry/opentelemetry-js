@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/api-logs",
-  "version": "0.202.0",
+  "version": "0.208.0",
   "description": "Public logs API for OpenTelemetry",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -24,7 +24,6 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "node ../../../scripts/version-update.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },
@@ -66,20 +65,18 @@
     "@types/mocha": "10.0.10",
     "@types/node": "^8.10.66",
     "@types/webpack-env": "1.16.3",
-    "babel-plugin-istanbul": "7.0.0",
-    "cross-var": "1.1.0",
+    "babel-plugin-istanbul": "7.0.1",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "5.0.1",
-    "lerna": "6.6.2",
-    "mocha": "11.1.0",
+    "mocha": "11.7.5",
     "nyc": "17.1.0",
-    "ts-loader": "9.5.2",
+    "ts-loader": "9.5.4",
     "typescript": "5.0.4",
-    "webpack": "5.99.9"
+    "webpack": "5.101.3"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/api-logs",
   "sideEffects": false

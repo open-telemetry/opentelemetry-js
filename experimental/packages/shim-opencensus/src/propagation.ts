@@ -26,7 +26,11 @@ import {
 import { mapSpanContext, reverseMapSpanContext } from './trace-transform';
 
 class Getter implements TextMapGetter<void> {
-  constructor(private ocGetter: oc.HeaderGetter) {}
+  private ocGetter: oc.HeaderGetter;
+
+  constructor(ocGetter: oc.HeaderGetter) {
+    this.ocGetter = ocGetter;
+  }
   keys(): string[] {
     return [];
   }
@@ -36,7 +40,12 @@ class Getter implements TextMapGetter<void> {
 }
 
 class Setter implements TextMapSetter<void> {
-  constructor(private ocSetter: oc.HeaderSetter) {}
+  private ocSetter: oc.HeaderSetter;
+
+  constructor(ocSetter: oc.HeaderSetter) {
+    this.ocSetter = ocSetter;
+  }
+
   set(carrier: void, key: string, value: string): void {
     this.ocSetter.setHeader(key, value);
   }

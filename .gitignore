@@ -38,7 +38,10 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+
+# Output directories
 build/
+dist/
 
 # TypeScript v1 declaration files
 typings/
@@ -75,6 +78,7 @@ docs
 #lerna
 .changelog
 package.json.lerna_backup
+.nx
 
 # OS generated files
 .DS_Store

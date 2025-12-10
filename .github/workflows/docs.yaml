@@ -4,14 +4,19 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: read
+
 jobs:
   build-and-deploy:
+    permissions:
+      contents: write # required for deploying documentation to gh-pages
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6
         with:
           cache: 'npm'
           cache-dependency-path: |
@@ -20,7 +25,7 @@ jobs:
 
       - name: Install and Build 🔧
         run: |
-          npm ci
+          npm ci --ignore-scripts
           npm run compile
 
       - name: Build Docs

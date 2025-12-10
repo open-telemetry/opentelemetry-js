@@ -18,45 +18,40 @@ on:
           - all # all release packages, including API, excluding semconv
           - semconv # only semantic convention package
 
+permissions:
+  contents: read
+
 jobs:
   create-or-update-release-pr:
     runs-on: ubuntu-latest
     steps:
-      - name: Fork
-        run: gh repo fork open-telemetry/opentelemetry-js
-        env:
-          GITHUB_TOKEN: ${{ secrets.OPENTELEMETRYBOT_GITHUB_TOKEN }}
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        id: otelbot-token
         with:
-          repository: opentelemetrybot/opentelemetry-js
-          ref: main
-          token: ${{ secrets.OPENTELEMETRYBOT_GITHUB_TOKEN }}
-      - name: Sync with upstream
-        run: |
-          git remote show origin
-          git remote add upstream https://github.com/open-telemetry/opentelemetry-js.git
-          git fetch upstream
-          git reset --hard upstream/main
-          git push origin main --force
+          app-id: ${{ vars.OTELBOT_JS_APP_ID }}
+          private-key: ${{ secrets.OTELBOT_JS_PRIVATE_KEY }}
 
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        with:
+          token: ${{ steps.otelbot-token.outputs.token }}
+
+      - uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6
         with:
           cache: 'npm'
           cache-dependency-path: package-lock.json
           node-version: 22
       - run: npm install -g npm@latest
 
-      - run: npm ci
+      - run: npm ci --ignore-scripts
 
       - name: Create/Update Release PR
         run: |
-          git config user.name opentelemetrybot
-          git config user.email 107717825+opentelemetrybot@users.noreply.github.com
+          git config user.name otelbot
+          git config user.email 197425009+otelbot@users.noreply.github.com
           npm run github:create_or_update_release_pr
         env:
-          GITHUB_TOKEN: ${{ secrets.OPENTELEMETRYBOT_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.otelbot-token.outputs.token }}
           RELEASE_SCOPE: ${{ github.event.inputs.release_scope }}
-          RELEASE_KIND: ${{ github.event.inputs.release_scope }}:${{ github.event.inputs.release_type }}
+          RELEASE_TYPE: ${{ github.event.inputs.release_type }}
           RELEASE_PR_REMOTE: origin
-          RELEASE_PR_OWNER: opentelemetrybot

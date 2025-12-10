@@ -22,8 +22,6 @@ export type { LoggerOptions } from './types/LoggerOptions';
 export type { AnyValue, AnyValueMap } from './types/AnyValue';
 export { isLogAttributeValue } from './utils/validation';
 export { NOOP_LOGGER, NoopLogger } from './NoopLogger';
-export { NOOP_LOGGER_PROVIDER, NoopLoggerProvider } from './NoopLoggerProvider';
-export { ProxyLogger } from './ProxyLogger';
 export { ProxyLoggerProvider } from './ProxyLoggerProvider';
 
 import { LogsAPI } from './api/logs';

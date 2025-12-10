@@ -21,11 +21,22 @@ import type {
   ServiceError,
   ChannelCredentials,
   Client,
+  ServiceClientConstructor,
 } from '@grpc/grpc-js';
 import {
   ExportResponse,
   IExporterTransport,
 } from '@opentelemetry/otlp-exporter-base';
+import { VERSION } from './version';
+
+const DEFAULT_USER_AGENT = `OTel-OTLP-Exporter-JavaScript/${VERSION}`;
+
+function createUserAgent(userAgent: string | undefined) {
+  if (userAgent) {
+    return `${userAgent} ${DEFAULT_USER_AGENT}`;
+  }
+  return DEFAULT_USER_AGENT;
+}
 
 // values taken from '@grpc/grpc-js` so that we don't need to require/import it.
 const GRPC_COMPRESSION_NONE = 0;
@@ -88,13 +99,17 @@ export interface GrpcExporterTransportParameters {
    */
   metadata: () => Metadata;
   compression: 'gzip' | 'none';
+  userAgent?: string;
 }
 
 export class GrpcExporterTransport implements IExporterTransport {
   private _client?: Client;
   private _metadata?: Metadata;
+  private _parameters: GrpcExporterTransportParameters;
 
-  constructor(private _parameters: GrpcExporterTransportParameters) {}
+  constructor(parameters: GrpcExporterTransportParameters) {
+    this._parameters = parameters;
+  }
 
   shutdown() {
     this._client?.close();
@@ -120,10 +135,11 @@ export class GrpcExporterTransport implements IExporterTransport {
         });
       }
 
-      const clientConstructor = createServiceClientConstructor(
-        this._parameters.grpcPath,
-        this._parameters.grpcName
-      );
+      const clientConstructor: ServiceClientConstructor =
+        createServiceClientConstructor(
+          this._parameters.grpcPath,
+          this._parameters.grpcName
+        );
 
       try {
         this._client = new clientConstructor(
@@ -132,6 +148,9 @@ export class GrpcExporterTransport implements IExporterTransport {
           {
             'grpc.default_compression_algorithm': toGrpcCompression(
               this._parameters.compression
+            ),
+            'grpc.primary_user_agent': createUserAgent(
+              this._parameters.userAgent
             ),
           }
         );

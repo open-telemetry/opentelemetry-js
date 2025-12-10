@@ -26,7 +26,7 @@ import { ensureHeadersContain } from '../testHelper';
 
 const testTransportParameters = {
   url: 'http://example.test',
-  headers: () => ({
+  headers: async () => ({
     foo: 'foo-value',
     bar: 'bar-value',
     'Content-Type': 'application/json',
@@ -36,8 +36,30 @@ const testTransportParameters = {
 const requestTimeout = 1000;
 const testPayload = Uint8Array.from([1, 2, 3]);
 
+function respondWhenRequestExists(
+  server: sinon.SinonFakeServer,
+  responder: (request: sinon.SinonFakeXMLHttpRequest) => void
+) {
+  function tryRespond() {
+    if (server.requests.length > 0) {
+      responder(server.requests[0]);
+    } else {
+      setTimeout(tryRespond, 0);
+    }
+  }
+  setTimeout(tryRespond, 0);
+}
+
+function hasOnTimeout(request: unknown): request is { ontimeout: () => void } {
+  if (request == null || typeof request != 'object') {
+    return false;
+  }
+
+  return 'ontimeout' in request && typeof request['ontimeout'] === 'function';
+}
+
 describe('XhrTransport', function () {
-  afterEach(() => {
+  afterEach(function () {
     sinon.restore();
   });
 
@@ -48,7 +70,7 @@ describe('XhrTransport', function () {
       const transport = createXhrTransport(testTransportParameters);
 
       let request: sinon.SinonFakeXMLHttpRequest;
-      queueMicrotask(() => {
+      respondWhenRequestExists(server, () => {
         // this executes after the act block
         request = server.requests[0];
         request.respond(200, {}, 'test response');
@@ -84,7 +106,7 @@ describe('XhrTransport', function () {
       const server = sinon.fakeServer.create();
       const transport = createXhrTransport(testTransportParameters);
 
-      queueMicrotask(() => {
+      respondWhenRequestExists(server, () => {
         // this executes after the act block
         const request = server.requests[0];
         request.respond(404, {}, '');
@@ -107,7 +129,7 @@ describe('XhrTransport', function () {
       const server = sinon.fakeServer.create();
       const transport = createXhrTransport(testTransportParameters);
 
-      queueMicrotask(() => {
+      respondWhenRequestExists(server, () => {
         // this executes after the act block
         const request = server.requests[0];
         request.respond(503, { 'Retry-After': 5 }, '');
@@ -132,9 +154,17 @@ describe('XhrTransport', function () {
     it('returns failure when request times out', function (done) {
       // arrange
       // A fake server needed, otherwise the message will not be a timeout but a failure to connect.
-      sinon.useFakeServer();
-      const clock = sinon.useFakeTimers();
+      const server = sinon.useFakeServer();
       const transport = createXhrTransport(testTransportParameters);
+
+      respondWhenRequestExists(server, () => {
+        // this executes after the act block
+        const request = server.requests[0];
+        // Manually trigger the ontimeout event, but don't respond.
+        if (hasOnTimeout(request)) {
+          request.ontimeout();
+        }
+      });
 
       //act
       transport.send(testPayload, requestTimeout).then(response => {
@@ -150,7 +180,6 @@ describe('XhrTransport', function () {
         }
         done();
       }, done /* catch any rejections */);
-      clock.tick(requestTimeout + 100);
     });
 
     it('returns failure when no server exists', function (done) {

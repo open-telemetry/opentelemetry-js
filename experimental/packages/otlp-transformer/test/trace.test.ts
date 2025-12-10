@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as root from '../src/generated/root';
+import { fromBinary, toBinary, create, toJson } from '@bufbuild/protobuf';
+import {
+  ExportTraceServiceRequestSchema,
+  ExportTraceServiceResponseSchema,
+} from '../src/generated/opentelemetry/proto/collector/trace/v1/trace_service_pb';
 import { SpanKind, SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import { TraceState } from '@opentelemetry/core';
 import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import { toBase64 } from './utils';
+import { hexToBase64 } from '../src/common/utils';
 import { OtlpEncodingOptions } from '../src/common/internal-types';
 import { ESpanKind, EStatusCode } from '../src/trace/internal-types';
 import { createExportTraceServiceRequest } from '../src/trace/internal';
@@ -97,6 +101,7 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
                         },
                       },
                     ],
+                    flags: 0x101, // TraceFlags (0x01) | HAS_IS_REMOTE
                   },
                 ],
                 startTimeUnixNano: startTime,
@@ -129,6 +134,7 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
                   code: EStatusCode.STATUS_CODE_OK,
                   message: undefined,
                 },
+                flags: 0x101, // TraceFlags (0x01) | HAS_IS_REMOTE
               },
             ],
             schemaUrl: 'http://url.to.schema',
@@ -140,15 +146,17 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
 }
 
 function createExpectedSpanProtobuf() {
-  const startTime = 1640715557342725400;
-  const endTime = 1640715558642725400;
-  const eventTime = 1640715558542725400;
+  // protobuf JSON format uses string representation for 64-bit integers
+  const startTime = '1640715557342725388';
+  const endTime = '1640715558642725388';
+  const eventTime = '1640715558542725388';
 
-  const traceId = toBase64('00000000000000000000000000000001');
-  const spanId = toBase64('0000000000000002');
-  const parentSpanId = toBase64('0000000000000001');
-  const linkSpanId = toBase64('0000000000000003');
-  const linkTraceId = toBase64('00000000000000000000000000000002');
+  // protobuf JSON format uses base64 for bytes
+  const traceId = hexToBase64('00000000000000000000000000000001');
+  const spanId = hexToBase64('0000000000000002');
+  const parentSpanId = hexToBase64('0000000000000001');
+  const linkSpanId = hexToBase64('0000000000000003');
+  const linkTraceId = hexToBase64('00000000000000000000000000000002');
 
   return {
     resourceSpans: [
@@ -160,7 +168,6 @@ function createExpectedSpanProtobuf() {
               value: { stringValue: 'resource attribute value' },
             },
           ],
-          droppedAttributesCount: 0,
         },
         scopeSpans: [
           {
@@ -172,52 +179,46 @@ function createExpectedSpanProtobuf() {
                 traceState: 'span=bar',
                 parentSpanId: parentSpanId,
                 name: 'span-name',
-                kind: ESpanKind.SPAN_KIND_CLIENT,
-                links: [
-                  {
-                    droppedAttributesCount: 0,
-                    spanId: linkSpanId,
-                    traceId: linkTraceId,
-                    traceState: 'link=foo',
-                    attributes: [
-                      {
-                        key: 'link-attribute',
-                        value: {
-                          stringValue: 'string value',
-                        },
-                      },
-                    ],
-                  },
-                ],
+                // protobuf-es toJson outputs enums as strings
+                kind: 'SPAN_KIND_CLIENT',
                 startTimeUnixNano: startTime,
                 endTimeUnixNano: endTime,
-                events: [
-                  {
-                    droppedAttributesCount: 0,
-                    attributes: [
-                      {
-                        key: 'event-attribute',
-                        value: {
-                          stringValue: 'some string value',
-                        },
-                      },
-                    ],
-                    name: 'some event',
-                    timeUnixNano: eventTime,
-                  },
-                ],
                 attributes: [
                   {
                     key: 'string-attribute',
                     value: { stringValue: 'some attribute value' },
                   },
                 ],
-                droppedAttributesCount: 0,
-                droppedEventsCount: 0,
-                droppedLinksCount: 0,
-                status: {
-                  code: EStatusCode.STATUS_CODE_OK,
-                },
+                events: [
+                  {
+                    name: 'some event',
+                    timeUnixNano: eventTime,
+                    attributes: [
+                      {
+                        key: 'event-attribute',
+                        value: { stringValue: 'some string value' },
+                      },
+                    ],
+                  },
+                ],
+                links: [
+                  {
+                    traceId: linkTraceId,
+                    spanId: linkSpanId,
+                    traceState: 'link=foo',
+                    attributes: [
+                      {
+                        key: 'link-attribute',
+                        value: { stringValue: 'string value' },
+                      },
+                    ],
+                    // TraceFlags (0x01) | HAS_IS_REMOTE
+                    flags: 0x101,
+                  },
+                ],
+                status: { code: 'STATUS_CODE_OK' },
+                // TraceFlags (0x01) | HAS_IS_REMOTE
+                flags: 0x101,
               },
             ],
             schemaUrl: 'http://url.to.schema',
@@ -232,11 +233,8 @@ describe('Trace', () => {
   let resource: Resource;
   let span: ReadableSpan;
 
-  beforeEach(() => {
-    resource = resourceFromAttributes({
-      'resource-attribute': 'resource attribute value',
-    });
-    span = {
+  function createSpanWithResource(spanResource: Resource): ReadableSpan {
+    return {
       spanContext: () => ({
         spanId: '0000000000000002',
         traceFlags: TraceFlags.SAMPLED,
@@ -283,7 +281,7 @@ describe('Trace', () => {
         },
       ],
       name: 'span-name',
-      resource,
+      resource: spanResource,
       startTime: [1640715557, 342725388],
       status: {
         code: SpanStatusCode.OK,
@@ -292,6 +290,13 @@ describe('Trace', () => {
       droppedEventsCount: 0,
       droppedLinksCount: 0,
     };
+  }
+
+  beforeEach(() => {
+    resource = resourceFromAttributes({
+      'resource-attribute': 'resource attribute value',
+    });
+    span = createSpanWithResource(resource);
   });
 
   describe('createExportTraceServiceRequest', () => {
@@ -443,43 +448,60 @@ describe('Trace', () => {
         );
       });
     });
+
+    it('supports schema URL on resource', () => {
+      const resourceWithSchema = resourceFromAttributes(
+        { 'resource-attribute': 'resource attribute value' },
+        { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
+      );
+
+      const spanFromSDK = createSpanWithResource(resourceWithSchema);
+
+      const exportRequest = createExportTraceServiceRequest([spanFromSDK], {
+        useHex: true,
+      });
+
+      assert.ok(exportRequest);
+      assert.strictEqual(exportRequest.resourceSpans?.length, 1);
+      assert.strictEqual(
+        exportRequest.resourceSpans?.[0].schemaUrl,
+        'https://opentelemetry.test/schemas/1.2.3'
+      );
+    });
   });
 
   describe('ProtobufTracesSerializer', function () {
     it('serializes an export request', () => {
       const serialized = ProtobufTraceSerializer.serializeRequest([span]);
       assert.ok(serialized, 'serialized response is undefined');
-      const decoded =
-        root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest.decode(
-          serialized
-        );
+      const decoded = fromBinary(ExportTraceServiceRequestSchema, serialized);
       const expected = createExpectedSpanProtobuf();
-      const decodedObj =
-        root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest.toObject(
-          decoded,
-          {
-            // This incurs some precision loss that's taken into account in createExpectedSpanProtobuf()
-            // Using String here will incur the same precision loss on browser only, using Number to prevent having to
-            // have different assertions for browser and Node.js
-            longs: Number,
-            // Convert to String (Base64) as otherwise the type will be different for Node.js (Buffer) and Browser (Uint8Array)
-            // and this fails assertions.
-            bytes: String,
-          }
-        );
-      assert.deepStrictEqual(decodedObj, expected);
+      // toJson converts to protobuf JSON format (strings for 64-bit ints, base64 for bytes)
+      const decodedJson = toJson(ExportTraceServiceRequestSchema, decoded);
+      assert.deepStrictEqual(decodedJson, expected);
+    });
+
+    it('serializes an empty request', () => {
+      const serialized = ProtobufTraceSerializer.serializeRequest([]);
+      assert.ok(serialized, 'serialized response is undefined');
+      const decoded = fromBinary(ExportTraceServiceRequestSchema, serialized);
+      assert.deepStrictEqual(
+        toJson(ExportTraceServiceRequestSchema, decoded),
+        {}
+      );
     });
 
     it('deserializes a response', () => {
-      const protobufSerializedResponse =
-        root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceResponse.encode(
-          {
-            partialSuccess: {
-              errorMessage: 'foo',
-              rejectedSpans: 1,
-            },
-          }
-        ).finish();
+      const response = create(ExportTraceServiceResponseSchema, {
+        partialSuccess: {
+          errorMessage: 'foo',
+          rejectedSpans: BigInt(1),
+        },
+      });
+      const protobufSerializedResponse = toBinary(
+        ExportTraceServiceResponseSchema,
+        response
+      );
 
       const deserializedResponse = ProtobufTraceSerializer.deserializeResponse(
         protobufSerializedResponse
@@ -490,10 +512,7 @@ describe('Trace', () => {
         'partialSuccess not present in the deserialized message'
       );
       assert.equal(deserializedResponse.partialSuccess.errorMessage, 'foo');
-      assert.equal(
-        Number(deserializedResponse.partialSuccess.rejectedSpans),
-        1
-      );
+      assert.equal(deserializedResponse.partialSuccess.rejectedSpans, 1);
     });
 
     it('does not throw when deserializing an empty response', () => {
@@ -518,6 +537,12 @@ describe('Trace', () => {
 
       const decoder = new TextDecoder();
       assert.deepStrictEqual(JSON.parse(decoder.decode(serialized)), expected);
+    });
+
+    it('hrtime contains float value', () => {
+      const span = createSpanWithResource(resource);
+      (span as any).startTime = [1640715557.5, 342725388.5];
+      JsonTraceSerializer.serializeRequest([span]);
     });
 
     it('deserializes a response', () => {
@@ -548,6 +573,204 @@ describe('Trace', () => {
       assert.doesNotThrow(() =>
         JsonTraceSerializer.deserializeResponse(new Uint8Array([]))
       );
+    });
+  });
+
+  describe('span flags', () => {
+    it('sets flags to 0x101 for local parent span context', () => {
+      const exportRequest = createExportTraceServiceRequest([span], {
+        useHex: true,
+      });
+      assert.ok(exportRequest);
+      const spanFlags =
+        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].flags;
+      assert.strictEqual(spanFlags, 0x101); // TraceFlags (0x01) | HAS_IS_REMOTE
+    });
+
+    it('sets flags to 0x301 for remote parent span context', () => {
+      // Create a span with a remote parent context
+      const remoteParentSpanContext = {
+        spanId: '0000000000000001',
+        traceId: '00000000000000000000000000000001',
+        traceFlags: TraceFlags.SAMPLED,
+        isRemote: true, // This is the key difference
+      };
+
+      const spanWithRemoteParent = {
+        ...span,
+        parentSpanContext: remoteParentSpanContext,
+      };
+
+      const exportRequest = createExportTraceServiceRequest(
+        [spanWithRemoteParent],
+        {
+          useHex: true,
+        }
+      );
+      assert.ok(exportRequest);
+      const spanFlags =
+        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].flags;
+      assert.strictEqual(spanFlags, 0x301); // TraceFlags (0x01) | HAS_IS_REMOTE | IS_REMOTE
+    });
+
+    it('sets flags to 0x101 for links with local context', () => {
+      const exportRequest = createExportTraceServiceRequest([span], {
+        useHex: true,
+      });
+      assert.ok(exportRequest);
+      const linkFlags =
+        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].links?.[0]
+          .flags;
+      assert.strictEqual(linkFlags, 0x101); // TraceFlags (0x01) | HAS_IS_REMOTE
+    });
+
+    it('sets flags to 0x301 for links with remote context', () => {
+      // Create a span with a remote link context
+      const remoteLinkContext = {
+        spanId: '0000000000000003',
+        traceId: '00000000000000000000000000000002',
+        traceFlags: TraceFlags.SAMPLED,
+        isRemote: true, // This is the key difference
+      };
+
+      const remoteLink = {
+        context: remoteLinkContext,
+        attributes: { 'link-attribute': 'string value' },
+        droppedAttributesCount: 0,
+      };
+
+      const spanWithRemoteLink = {
+        ...span,
+        links: [remoteLink],
+      };
+
+      const exportRequest = createExportTraceServiceRequest(
+        [spanWithRemoteLink],
+        {
+          useHex: true,
+        }
+      );
+      assert.ok(exportRequest);
+      const linkFlags =
+        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].links?.[0]
+          .flags;
+      assert.strictEqual(linkFlags, 0x301); // TraceFlags (0x01) | HAS_IS_REMOTE | IS_REMOTE
+    });
+  });
+
+  describe('span/link flags matrix', () => {
+    const cases = [
+      { tf: 0x00, local: 0x100, remote: 0x300 },
+      { tf: 0x01, local: 0x101, remote: 0x301 },
+      { tf: 0x05, local: 0x105, remote: 0x305 },
+      { tf: 0xff, local: 0x1ff, remote: 0x3ff },
+    ];
+
+    it('composes span flags with local and remote parent across traceFlags', () => {
+      const baseCtx = span.spanContext();
+      for (const c of cases) {
+        // Local parent
+        const spanLocal = {
+          ...span,
+          spanContext: () => ({
+            spanId: baseCtx.spanId,
+            traceId: baseCtx.traceId,
+            traceFlags: c.tf,
+            isRemote: false,
+            traceState: baseCtx.traceState,
+          }),
+          parentSpanContext: {
+            ...span.parentSpanContext,
+            isRemote: false,
+          },
+        } as unknown as ReadableSpan;
+        const reqLocal = createExportTraceServiceRequest([spanLocal], {
+          useHex: true,
+        });
+        const spanFlagsLocal =
+          reqLocal.resourceSpans?.[0].scopeSpans[0].spans?.[0].flags;
+        assert.strictEqual(spanFlagsLocal, c.local);
+
+        // Remote parent
+        const spanRemote = {
+          ...spanLocal,
+          parentSpanContext: {
+            ...span.parentSpanContext,
+            isRemote: true,
+          },
+        } as unknown as ReadableSpan;
+        const reqRemote = createExportTraceServiceRequest([spanRemote], {
+          useHex: true,
+        });
+        const spanFlagsRemote =
+          reqRemote.resourceSpans?.[0].scopeSpans[0].spans?.[0].flags;
+        assert.strictEqual(spanFlagsRemote, c.remote);
+      }
+    });
+
+    it('composes link flags with local and remote context across traceFlags', () => {
+      for (const c of cases) {
+        const linkLocal = {
+          context: {
+            spanId: '0000000000000003',
+            traceId: '00000000000000000000000000000002',
+            traceFlags: c.tf,
+            isRemote: false,
+            traceState: new TraceState('link=foo'),
+          },
+          attributes: { 'link-attribute': 'string value' },
+          droppedAttributesCount: 0,
+        };
+        const spanWithLocalLink = {
+          ...span,
+          links: [linkLocal],
+        } as unknown as ReadableSpan;
+        const reqLocal = createExportTraceServiceRequest([spanWithLocalLink], {
+          useHex: true,
+        });
+        const linkFlagsLocal =
+          reqLocal.resourceSpans?.[0].scopeSpans[0].spans?.[0].links?.[0].flags;
+        assert.strictEqual(linkFlagsLocal, c.local);
+
+        const linkRemote = {
+          ...linkLocal,
+          context: { ...linkLocal.context, isRemote: true },
+        };
+        const spanWithRemoteLink = {
+          ...span,
+          links: [linkRemote],
+        } as unknown as ReadableSpan;
+        const reqRemote = createExportTraceServiceRequest(
+          [spanWithRemoteLink],
+          { useHex: true }
+        );
+        const linkFlagsRemote =
+          reqRemote.resourceSpans?.[0].scopeSpans[0].spans?.[0].links?.[0]
+            .flags;
+        assert.strictEqual(linkFlagsRemote, c.remote);
+      }
+    });
+
+    it('composes root span flags across traceFlags (no parent)', () => {
+      const baseCtx = span.spanContext();
+      for (const c of cases) {
+        const rootSpan = {
+          ...span,
+          spanContext: () => ({
+            spanId: baseCtx.spanId,
+            traceId: baseCtx.traceId,
+            traceFlags: c.tf,
+            isRemote: false,
+            traceState: baseCtx.traceState,
+          }),
+          parentSpanContext: undefined,
+        } as unknown as ReadableSpan;
+        const req = createExportTraceServiceRequest([rootSpan], {
+          useHex: true,
+        });
+        const flags = req.resourceSpans?.[0].scopeSpans[0].spans?.[0].flags;
+        assert.strictEqual(flags, c.local);
+      }
     });
   });
 });

@@ -46,6 +46,7 @@ import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { SemconvStability } from '@opentelemetry/instrumentation';
 import { extractHostnameAndPort } from '../../src/utils';
 import { AttributeNames } from '../../src/enums/AttributeNames';
+import { ParsedUrlQuery } from 'node:querystring';
 
 describe('Utility', () => {
   describe('parseResponseStatus()', () => {
@@ -80,7 +81,20 @@ describe('Utility', () => {
   describe('getRequestInfo()', () => {
     it('should get options object', () => {
       const webUrl = 'http://u:p@google.fr/aPath?qu=ry';
-      const urlParsed = url.parse(webUrl);
+      const urlParsed = {
+        protocol: 'http:',
+        slashes: true,
+        auth: 'u:p',
+        host: 'google.fr',
+        port: null,
+        hostname: 'google.fr',
+        hash: null,
+        search: '?qu=ry',
+        query: 'qu=ry',
+        pathname: '/aPath',
+        path: '/aPath?qu=ry',
+        href: 'http://u:p@google.fr/aPath?qu=ry',
+      };
       const urlParsedWithoutPathname = {
         ...urlParsed,
         pathname: undefined,
@@ -95,7 +109,7 @@ describe('Utility', () => {
         host: undefined,
         port: null,
       };
-      const whatWgUrl = new url.URL(webUrl);
+      const whatWgUrl = new URL(webUrl);
       for (const param of [
         webUrl,
         urlParsed,
@@ -155,12 +169,44 @@ describe('Utility', () => {
   describe('getAbsoluteUrl()', () => {
     it('should return absolute url with localhost', () => {
       const path = '/test/1';
-      const result = utils.getAbsoluteUrl(url.parse(path), {});
+      const result = utils.getAbsoluteUrl(
+        {
+          protocol: null,
+          slashes: null,
+          auth: null,
+          host: null,
+          port: null,
+          hostname: null,
+          hash: null,
+          search: null,
+          query: null as unknown as undefined,
+          pathname: '/test/1',
+          path: '/test/1',
+          href: '/test/1',
+        },
+        {}
+      );
       assert.strictEqual(result, `http://localhost${path}`);
     });
     it('should return absolute url', () => {
       const absUrl = 'http://www.google/test/1?query=1';
-      const result = utils.getAbsoluteUrl(url.parse(absUrl), {});
+      const result = utils.getAbsoluteUrl(
+        {
+          protocol: 'http:',
+          slashes: true,
+          auth: null,
+          host: 'www.google',
+          port: null,
+          hostname: 'www.google',
+          hash: null,
+          search: '?query=1',
+          query: 'query=1' as unknown as ParsedUrlQuery,
+          pathname: '/test/1',
+          path: '/test/1?query=1',
+          href: 'http://www.google/test/1?query=1',
+        },
+        {}
+      );
       assert.strictEqual(result, absUrl);
     });
     it('should return default url', () => {
@@ -173,6 +219,53 @@ describe('Utility', () => {
         {}
       );
       assert.strictEqual(result, 'http://localhost:8080/helloworld');
+    });
+    it('should return auth credentials as REDACTED to avoid leaking sensitive information', () => {
+      const result = utils.getAbsoluteUrl(
+        { path: '/helloworld', port: 8080, auth: 'user:password' },
+        {}
+      );
+      assert.strictEqual(
+        result,
+        'http://REDACTED:REDACTED@localhost:8080/helloworld'
+      );
+    });
+    it('should return auth credentials and particular query strings as REDACTED', () => {
+      const result = utils.getAbsoluteUrl(
+        {
+          path: '/registers?X-Goog-Signature=secret123',
+          port: 8080,
+          auth: 'user:pass',
+        },
+        {}
+      );
+      assert.strictEqual(
+        result,
+        'http://REDACTED:REDACTED@localhost:8080/registers?X-Goog-Signature=REDACTED'
+      );
+    });
+    it('should return particular query strings as REDACTED', () => {
+      const result = utils.getAbsoluteUrl(
+        {
+          path: '/registers?AWSAccessKeyId=secret123',
+          port: 8080,
+        },
+        {}
+      );
+      assert.strictEqual(
+        result,
+        'http://localhost:8080/registers?AWSAccessKeyId=REDACTED'
+      );
+    });
+    it('does not perform redaction if the provided path cannot be parsed', () => {
+      const result = utils.getAbsoluteUrl(
+        { path: 'http://?AWSAccessKeyId=secret123' },
+        {}
+      );
+      assert.strictEqual(
+        result,
+        'http://localhosthttp://?AWSAccessKeyId=secret123'
+      );
     });
   });
 
@@ -211,7 +304,11 @@ describe('Utility', () => {
         assert.strictEqual(utils.isValidOptionsType(options), false);
       });
     });
-    for (const options of ['url', url.parse('http://url.com'), {}]) {
+    for (const options of [
+      'url',
+      url.urlToHttpOptions(new URL('http://url.com')),
+      {},
+    ]) {
       it(`should return true with the following value: ${JSON.stringify(
         options
       )}`, () => {
@@ -642,6 +739,102 @@ describe('Utility', () => {
       const { hostname, port } = extractHostnameAndPort(parsedOption);
       assert.strictEqual(hostname, 'www.google.com');
       assert.strictEqual(port, '80');
+    });
+  });
+
+  describe('getRemoteClientAddress()', () => {
+    it('returns IP address from x-forwarded-for header', () => {
+      const request = {
+        headers: {
+          'x-forwarded-for': '127.0.0.1, <proxy1>, <proxy2>',
+        },
+      } as unknown as IncomingMessage;
+      assert.strictEqual(utils.getRemoteClientAddress(request), '127.0.0.1');
+    });
+
+    it('returns IP address from x-forwarded-for header array', () => {
+      const request = {
+        headers: {
+          'x-forwarded-for': ['127.0.0.1'],
+        },
+      } as unknown as IncomingMessage;
+      assert.strictEqual(utils.getRemoteClientAddress(request), '127.0.0.1');
+    });
+
+    it('returns IP address without port from x-forwarded-for header', () => {
+      const request = {
+        headers: {
+          'x-forwarded-for': '127.0.0.1:54321',
+        },
+      } as unknown as IncomingMessage;
+      assert.strictEqual(utils.getRemoteClientAddress(request), '127.0.0.1');
+    });
+
+    it('returns IP address without port from x-forwarded-for header array', () => {
+      const request = {
+        headers: {
+          'x-forwarded-for': ['127.0.0.1:54321'],
+        },
+      } as unknown as IncomingMessage;
+      assert.strictEqual(utils.getRemoteClientAddress(request), '127.0.0.1');
+    });
+
+    it('handles IPv6 addresses containing brackets in x-forwarded-for header', () => {
+      const request = {
+        headers: {
+          'x-forwarded-for': '[::1]',
+        },
+      } as unknown as IncomingMessage;
+      assert.strictEqual(utils.getRemoteClientAddress(request), '::1');
+    });
+
+    it('forwarded header takes precedence over x-forwarded-for', () => {
+      const request = {
+        headers: {
+          forwarded: 'for=192.0.2.60;proto=http;by=203.0.113.43',
+          'x-forwarded-for': '127.0.0.1',
+        },
+      } as unknown as IncomingMessage;
+      assert.strictEqual(utils.getRemoteClientAddress(request), '192.0.2.60');
+    });
+
+    it('handles forwarded header with chain of proxies', () => {
+      const request = {
+        headers: {
+          forwarded: 'for=192.0.2.43, for=198.51.100.17',
+        },
+      } as unknown as IncomingMessage;
+      assert.strictEqual(utils.getRemoteClientAddress(request), '192.0.2.43');
+    });
+
+    it('handles IPv6 addresses containing brackets in forwarded header', () => {
+      const request = {
+        headers: {
+          forwarded: 'for="[2001:db8:cafe::17]:4711"',
+        },
+      } as unknown as IncomingMessage;
+      assert.strictEqual(
+        utils.getRemoteClientAddress(request),
+        '2001:db8:cafe::17'
+      );
+    });
+
+    it('returns address from socket as fallback', () => {
+      const request = {
+        headers: {},
+        socket: {
+          remoteAddress: '192.168.0.1',
+        },
+      } as unknown as IncomingMessage;
+      assert.strictEqual(utils.getRemoteClientAddress(request), '192.168.0.1');
+    });
+
+    it('returns null if client address cannot be determined', () => {
+      const request = {
+        headers: {},
+        socket: {},
+      } as unknown as IncomingMessage;
+      assert.strictEqual(utils.getRemoteClientAddress(request), null);
     });
   });
 });

@@ -36,6 +36,15 @@ export interface SpanProcessor {
   onStart(span: Span, parentContext: Context): void;
 
   /**
+   * Called when a {@link Span} is ending, if the `span.isRecording()`
+   * returns true.
+   * @param span the Span that is ending.
+   *
+   * @experimental This method is experimental and may break in minor versions of this package
+   */
+  onEnding?(span: Span): void;
+
+  /**
    * Called when a {@link ReadableSpan} is ended, if the `span.isRecording()`
    * returns true.
    * @param span the Span that just ended.
