@@ -10,15 +10,24 @@
   },
   "main": "./build/index.cjs",
   "module": "./build/index.mjs",
-  "browser": "./build/index.mjs",
+  "browser": {
+    "./build/platform/index.mjs": "./build/platform/browser/index.mjs"
+  },
   "types": "./build/index.d.ts",
   "exports": {
     ".": {
-      "types": "./build/index.d.ts",
-      "esnext": "./build/index.mjs",
-      "import": "./build/index.mjs",
-      "default": "./build/index.cjs"
-    }
+      "require": "./build/index.cjs",
+      "import": "./build/index.mjs"
+    },
+    "./platform": {
+      "require": "./build/platform/index.cjs",
+      "import": "./build/platform/index.mjs"
+    },
+    "./platform/browser": {
+      "require": "./build/platform/browser/index.cjs",
+      "import": "./build/platform/browser/index.mjs"
+    },
+    "./package.json": "./package.json"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {

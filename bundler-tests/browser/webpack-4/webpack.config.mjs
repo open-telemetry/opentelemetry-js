@@ -13,22 +13,40 @@ export default {
     path: path.resolve(__dirname, 'dist'),
   },
   resolve: {
+    // Prefer browser and ESM builds
+    mainFields: ['browser', 'module', 'main'],
+    extensions: ['.mjs', '.js', '.cjs', '.json'],
     alias: {
-      // Webpack 4 doesn't support package.json exports field, so we need to manually map subpath exports
+      // Webpack 4 doesn't support package.json exports field - subpath exports need aliases
       '@opentelemetry/otlp-exporter-base/browser-http':
-        '@opentelemetry/otlp-exporter-base/build/esm/index-browser-http.js',
-      // @bufbuild/protobuf subpath exports (used by @opentelemetry/otlp-transformer)
-      // These paths are compatible with @bufbuild/protobuf v2.x
+        '@opentelemetry/otlp-exporter-base/build/browser-http/index.mjs',
       '@bufbuild/protobuf/codegenv1':
         '@bufbuild/protobuf/dist/esm/codegenv1/index.js',
       '@bufbuild/protobuf/wkt': '@bufbuild/protobuf/dist/esm/wkt/index.js',
       '@bufbuild/protobuf/wire': '@bufbuild/protobuf/dist/esm/wire/index.js',
       '@bufbuild/protobuf/reflect':
         '@bufbuild/protobuf/dist/esm/reflect/index.js',
+      // Force ESM entry points (mainFields alone is insufficient for these packages)
+      '@opentelemetry/api-logs$': '@opentelemetry/api-logs/build/index.mjs',
+      '@opentelemetry/core$': '@opentelemetry/core/build/index.mjs',
+      '@opentelemetry/otlp-exporter-base$':
+        '@opentelemetry/otlp-exporter-base/build/index.mjs',
+      '@opentelemetry/otlp-transformer$':
+        '@opentelemetry/otlp-transformer/build/index.mjs',
+      '@opentelemetry/resources$': '@opentelemetry/resources/build/index.mjs',
+      '@opentelemetry/sdk-logs$': '@opentelemetry/sdk-logs/build/index.mjs',
+      '@opentelemetry/sdk-metrics$':
+        '@opentelemetry/sdk-metrics/build/index.mjs',
+      '@opentelemetry/semantic-conventions$':
+        '@opentelemetry/semantic-conventions/build/index.mjs',
     },
   },
   module: {
     rules: [
+      {
+        test: /\.mjs$/,
+        type: 'javascript/auto',
+      },
       {
         test: /\.(?:js|mjs|cjs)$/,
         // Include OpenTelemetry ES2022 packages for transpilation

@@ -10,7 +10,10 @@
   },
   "main": "./build/index.cjs",
   "module": "./build/index.mjs",
-  "browser": "./build/index.mjs",
+  "browser": {
+    "./build/platform/index.mjs": "./build/platform/browser/index.mjs",
+    "./build/platform/node/OTLPLogExporter.mjs": "./build/platform/browser/OTLPLogExporter.mjs"
+  },
   "types": "./build/index.d.ts",
   "exports": {
     ".": {

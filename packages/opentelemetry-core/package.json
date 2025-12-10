@@ -10,15 +10,27 @@
   },
   "main": "./build/index.cjs",
   "module": "./build/index.mjs",
-  "browser": "./build/index.mjs",
+  "browser": {
+    "./build/platform/node/environment.mjs": "./build/platform/browser/environment.mjs",
+    "./build/platform/node/globalThis.mjs": "./build/platform/browser/globalThis.mjs",
+    "./build/platform/node/performance.mjs": "./build/platform/browser/performance.mjs",
+    "./build/platform/node/sdk-info.mjs": "./build/platform/browser/sdk-info.mjs"
+  },
   "types": "./build/index.d.ts",
   "exports": {
     ".": {
-      "types": "./build/index.d.ts",
-      "esnext": "./build/index.mjs",
-      "import": "./build/index.mjs",
-      "default": "./build/index.cjs"
-    }
+      "require": "./build/index.cjs",
+      "import": "./build/index.mjs"
+    },
+    "./platform": {
+      "require": "./build/platform/index.cjs",
+      "import": "./build/platform/index.mjs"
+    },
+    "./platform/browser": {
+      "require": "./build/platform/browser/index.cjs",
+      "import": "./build/platform/browser/index.mjs"
+    },
+    "./package.json": "./package.json"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {

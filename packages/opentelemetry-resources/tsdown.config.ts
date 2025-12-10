@@ -5,7 +5,9 @@ export default defineConfig({
   ...baseConfig,
   entry: [
     "src/index.ts",
+    "src/platform/index.ts",
     "src/platform/browser/index.ts",
+    "src/detectors/platform/index.ts",
     "src/detectors/platform/browser/index.ts",
   ],
 });

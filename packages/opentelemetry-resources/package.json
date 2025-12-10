@@ -10,6 +10,13 @@
   },
   "main": "./build/index.cjs",
   "module": "./build/index.mjs",
+  "browser": {
+    "./build/platform/node/default-service-name.mjs": "./build/platform/browser/default-service-name.mjs",
+    "./build/detectors/platform/node/HostDetector.mjs": "./build/detectors/platform/browser/HostDetector.mjs",
+    "./build/detectors/platform/node/OSDetector.mjs": "./build/detectors/platform/browser/OSDetector.mjs",
+    "./build/detectors/platform/node/ProcessDetector.mjs": "./build/detectors/platform/browser/ProcessDetector.mjs",
+    "./build/detectors/platform/node/ServiceInstanceIdDetector.mjs": "./build/detectors/platform/browser/ServiceInstanceIdDetector.mjs"
+  },
   "types": "./build/index.d.ts",
   "exports": {
     ".": {

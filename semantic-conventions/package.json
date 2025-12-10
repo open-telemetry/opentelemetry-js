@@ -13,17 +13,14 @@
   "types": "./build/index.d.ts",
   "exports": {
     ".": {
-      "types": "./build/index.d.ts",
-      "esnext": "./build/index.mjs",
-      "import": "./build/index.mjs",
-      "default": "./build/index.cjs"
+      "require": "./build/index.cjs",
+      "import": "./build/index.mjs"
     },
     "./incubating": {
-      "types": "./build/incubating/index.d.ts",
-      "esnext": "./build/incubating/index.mjs",
-      "import": "./build/incubating/index.mjs",
-      "default": "./build/incubating/index.cjs"
-    }
+      "require": "./build/incubating/index.cjs",
+      "import": "./build/incubating/index.mjs"
+    },
+    "./package.json": "./package.json"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {

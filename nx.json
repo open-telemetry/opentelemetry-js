@@ -50,6 +50,11 @@
       "outputs": [
         "{projectRoot}/src/version.ts"
       ]
+    },
+    "test:bundle": {
+      "dependsOn": [
+        "^compile"
+      ]
     }
   },
   "plugins": [

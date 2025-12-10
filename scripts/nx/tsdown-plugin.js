@@ -28,8 +28,8 @@ exports.createNodesV2 = [
                   executor: 'nx:run-commands',
                   options: {
                     commands: [
-                      'npx tsdown',
                       'npx tsc -p tsconfig.dts.json',
+                      'npx tsdown',
                     ],
                     cwd: projectRoot,
                     parallel: false,
