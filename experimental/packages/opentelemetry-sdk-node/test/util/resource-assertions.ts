@@ -21,7 +21,10 @@ import {
   ATTR_SERVICE_VERSION,
 } from '@opentelemetry/semantic-conventions';
 
-import { ATTR_SERVICE_INSTANCE_ID, ATTR_SERVICE_NAMESPACE } from '../semconv';
+import {
+  ATTR_SERVICE_INSTANCE_ID,
+  ATTR_SERVICE_NAMESPACE,
+} from '../../src/semconv';
 
 /**
  * Test utility method to validate a service resource
