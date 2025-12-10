@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1765359172076,
+  "lastUpdate": 1765375734785,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -48076,6 +48076,86 @@ window.BENCHMARK_DATA = {
             "range": "±0.57%",
             "unit": "ops/sec",
             "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "29139614+renovate[bot]@users.noreply.github.com",
+            "name": "renovate[bot]",
+            "username": "renovate[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "578c79fa3e8723b3d14cb27021843b66710d0b0f",
+          "message": "chore(deps): update all patch versions (#6197)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+          "timestamp": "2025-12-10T13:55:25Z",
+          "tree_id": "5f97400c192e687e1946405d05ebfcc83a8a23f6",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/578c79fa3e8723b3d14cb27021843b66710d0b0f"
+        },
+        "date": 1765375733749,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 697576,
+            "range": "±0.97%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8590,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 1947581,
+            "range": "±0.77%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 1731283,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 1755853,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 1574222,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 297069,
+            "range": "±0.66%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 282325,
+            "range": "±0.62%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
           }
         ]
       }
