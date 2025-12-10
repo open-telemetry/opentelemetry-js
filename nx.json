@@ -22,6 +22,7 @@
         "{projectRoot}/test/**/*.ts",
         "{projectRoot}/**/*.proto",
         "{projectRoot}/package.json",
+        "{projectRoot}/tsdown.config.ts",
         "{workspaceRoot}/tsdown.*",
         "{workspaceRoot}/tsconfig.*",
         "{workspaceRoot}/package.json"
