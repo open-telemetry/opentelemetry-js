@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { AnyValue } from '../types/AnyValue';
+import { AnyValue } from '@opentelemetry/api-logs';
 
 /**
  * Validates if a value is a valid AnyValue for Log Attributes according to OpenTelemetry spec.
@@ -24,7 +24,7 @@ import { AnyValue } from '../types/AnyValue';
  * - Arrays of any values (heterogeneous arrays allowed)
  * - Maps from string to any value (nested objects)
  * - Empty values (null/undefined)
- * 
+ *
  * @param val - The value to validate
  * @returns true if the value is a valid AnyValue, false otherwise
  */
@@ -32,14 +32,21 @@ export function isLogAttributeValue(val: unknown): val is AnyValue {
   return isLogAttributeValueInternal(val, new WeakSet());
 }
 
-function isLogAttributeValueInternal(val: unknown, visited: WeakSet<object>): val is AnyValue {
+function isLogAttributeValueInternal(
+  val: unknown,
+  visited: WeakSet<object>
+): val is AnyValue {
   // null and undefined are explicitly allowed
   if (val == null) {
     return true;
   }
 
   // Scalar values
-  if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') {
+  if (
+    typeof val === 'string' ||
+    typeof val === 'number' ||
+    typeof val === 'boolean'
+  ) {
     return true;
   }
 
@@ -70,8 +77,10 @@ function isLogAttributeValueInternal(val: unknown, visited: WeakSet<object>): va
 
     // Objects/Maps (including empty objects)
     // All object properties must be valid AnyValues
-    return Object.values(obj).every(item => isLogAttributeValueInternal(item, visited));
+    return Object.values(obj).every(item =>
+      isLogAttributeValueInternal(item, visited)
+    );
   }
 
   return false;
-} 
+}

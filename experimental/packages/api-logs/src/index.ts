@@ -20,7 +20,6 @@ export { SeverityNumber } from './types/LogRecord';
 export type { LogAttributes, LogBody, LogRecord } from './types/LogRecord';
 export type { LoggerOptions } from './types/LoggerOptions';
 export type { AnyValue, AnyValueMap } from './types/AnyValue';
-export { isLogAttributeValue } from './utils/validation';
 export { NOOP_LOGGER, NoopLogger } from './NoopLogger';
 export { ProxyLoggerProvider } from './ProxyLoggerProvider';
 

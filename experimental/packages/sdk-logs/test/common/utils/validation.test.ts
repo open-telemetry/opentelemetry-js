@@ -58,7 +58,10 @@ describe('isLogAttributeValue', () => {
     it('should accept Uint8Array', () => {
       assert.strictEqual(isLogAttributeValue(new Uint8Array([1, 2, 3])), true);
       assert.strictEqual(isLogAttributeValue(new Uint8Array(0)), true);
-      assert.strictEqual(isLogAttributeValue(new Uint8Array([255, 0, 128])), true);
+      assert.strictEqual(
+        isLogAttributeValue(new Uint8Array([255, 0, 128])),
+        true
+      );
     });
   });
 
@@ -72,12 +75,27 @@ describe('isLogAttributeValue', () => {
     it('should accept heterogeneous arrays', () => {
       assert.strictEqual(isLogAttributeValue(['string', 42, true]), true);
       assert.strictEqual(isLogAttributeValue([null, undefined, 'test']), true);
-      assert.strictEqual(isLogAttributeValue(['test', new Uint8Array([1, 2])]), true);
+      assert.strictEqual(
+        isLogAttributeValue(['test', new Uint8Array([1, 2])]),
+        true
+      );
     });
 
     it('should accept nested arrays', () => {
-      assert.strictEqual(isLogAttributeValue([['a', 'b'], [1, 2]]), true);
-      assert.strictEqual(isLogAttributeValue([[1, 2, 3], ['nested', 'array']]), true);
+      assert.strictEqual(
+        isLogAttributeValue([
+          ['a', 'b'],
+          [1, 2],
+        ]),
+        true
+      );
+      assert.strictEqual(
+        isLogAttributeValue([
+          [1, 2, 3],
+          ['nested', 'array'],
+        ]),
+        true
+      );
     });
 
     it('should accept arrays with null/undefined', () => {
@@ -86,7 +104,10 @@ describe('isLogAttributeValue', () => {
     });
 
     it('should accept arrays with objects', () => {
-      assert.strictEqual(isLogAttributeValue([{ key: 'value' }, 'string']), true);
+      assert.strictEqual(
+        isLogAttributeValue([{ key: 'value' }, 'string']),
+        true
+      );
     });
   });
 
@@ -105,9 +126,9 @@ describe('isLogAttributeValue', () => {
         level1: {
           level2: {
             deep: 'value',
-            number: 123
-          }
-        }
+            number: 123,
+          },
+        },
       };
       assert.strictEqual(isLogAttributeValue(nested), true);
     });
@@ -116,17 +137,23 @@ describe('isLogAttributeValue', () => {
       const obj = {
         strings: ['a', 'b'],
         numbers: [1, 2, 3],
-        mixed: ['str', 42, true]
+        mixed: ['str', 42, true],
       };
       assert.strictEqual(isLogAttributeValue(obj), true);
     });
 
     it('should accept objects with null/undefined values', () => {
-      assert.strictEqual(isLogAttributeValue({ nullVal: null, undefVal: undefined }), true);
+      assert.strictEqual(
+        isLogAttributeValue({ nullVal: null, undefVal: undefined }),
+        true
+      );
     });
 
     it('should accept objects with byte arrays', () => {
-      assert.strictEqual(isLogAttributeValue({ bytes: new Uint8Array([1, 2, 3]) }), true);
+      assert.strictEqual(
+        isLogAttributeValue({ bytes: new Uint8Array([1, 2, 3]) }),
+        true
+      );
     });
 
     it('should accept plain objects without prototypes', () => {
@@ -160,19 +187,22 @@ describe('isLogAttributeValue', () => {
         scalars: {
           str: 'test',
           num: 42,
-          bool: true
+          bool: true,
         },
         arrays: {
           homogeneous: ['a', 'b', 'c'],
           heterogeneous: [1, 'two', true, null],
-          nested: [[1, 2], ['a', 'b']]
+          nested: [
+            [1, 2],
+            ['a', 'b'],
+          ],
         },
         bytes: new Uint8Array([255, 254, 253]),
         nullish: {
           nullValue: null,
-          undefinedValue: undefined
+          undefinedValue: undefined,
         },
-        empty: {}
+        empty: {},
       };
       assert.strictEqual(isLogAttributeValue(complex), true);
     });
@@ -181,7 +211,7 @@ describe('isLogAttributeValue', () => {
       const arrayOfObjects = [
         { name: 'obj1', value: 123 },
         { name: 'obj2', nested: { deep: 'value' } },
-        { bytes: new Uint8Array([1, 2, 3]) }
+        { bytes: new Uint8Array([1, 2, 3]) },
       ];
       assert.strictEqual(isLogAttributeValue(arrayOfObjects), true);
     });
@@ -189,8 +219,14 @@ describe('isLogAttributeValue', () => {
 
   describe('should reject invalid values', () => {
     it('should reject functions', () => {
-      assert.strictEqual(isLogAttributeValue(() => {}), false);
-      assert.strictEqual(isLogAttributeValue(function() {}), false);
+      assert.strictEqual(
+        isLogAttributeValue(() => {}),
+        false
+      );
+      assert.strictEqual(
+        isLogAttributeValue(function () {}),
+        false
+      );
     });
 
     it('should reject symbols', () => {
@@ -219,8 +255,11 @@ describe('isLogAttributeValue', () => {
 
     it('should reject Map objects', () => {
       assert.strictEqual(isLogAttributeValue(new Map()), false);
-      assert.strictEqual(isLogAttributeValue(new Map([['key', 'value']])), false);
-      
+      assert.strictEqual(
+        isLogAttributeValue(new Map([['key', 'value']])),
+        false
+      );
+
       const nestedMap = new Map();
       nestedMap.set('nested', new Map([['inner', 'value']]));
       assert.strictEqual(isLogAttributeValue(nestedMap), false);
@@ -242,15 +281,30 @@ describe('isLogAttributeValue', () => {
       assert.strictEqual(isLogAttributeValue([Symbol('test'), 'valid']), false);
       assert.strictEqual(isLogAttributeValue([new Date()]), false);
       assert.strictEqual(isLogAttributeValue([new Map()]), false);
-      assert.strictEqual(isLogAttributeValue(['valid', new Set([1, 2, 3])]), false);
+      assert.strictEqual(
+        isLogAttributeValue(['valid', new Set([1, 2, 3])]),
+        false
+      );
     });
 
     it('should reject objects containing invalid values', () => {
-      assert.strictEqual(isLogAttributeValue({ valid: 'test', invalid: () => {} }), false);
-      assert.strictEqual(isLogAttributeValue({ symbol: Symbol('test') }), false);
+      assert.strictEqual(
+        isLogAttributeValue({ valid: 'test', invalid: () => {} }),
+        false
+      );
+      assert.strictEqual(
+        isLogAttributeValue({ symbol: Symbol('test') }),
+        false
+      );
       assert.strictEqual(isLogAttributeValue({ date: new Date() }), false);
-      assert.strictEqual(isLogAttributeValue({ map: new Map([['key', 'value']]) }), false);
-      assert.strictEqual(isLogAttributeValue({ set: new Set([1, 2, 3]) }), false);
+      assert.strictEqual(
+        isLogAttributeValue({ map: new Map([['key', 'value']]) }),
+        false
+      );
+      assert.strictEqual(
+        isLogAttributeValue({ set: new Set([1, 2, 3]) }),
+        false
+      );
     });
 
     it('should reject deeply nested invalid values', () => {
@@ -258,9 +312,9 @@ describe('isLogAttributeValue', () => {
         level1: {
           level2: {
             valid: 'value',
-            invalid: Symbol('test')
-          }
-        }
+            invalid: Symbol('test'),
+          },
+        },
       };
       assert.strictEqual(isLogAttributeValue(nested), false);
     });
@@ -268,7 +322,7 @@ describe('isLogAttributeValue', () => {
     it('should reject arrays with nested invalid values', () => {
       const nestedArray = [
         ['valid', 'array'],
-        ['has', Symbol('invalid')]
+        ['has', Symbol('invalid')],
       ];
       assert.strictEqual(isLogAttributeValue(nestedArray), false);
     });
@@ -278,7 +332,7 @@ describe('isLogAttributeValue', () => {
     it('should handle circular references gracefully', () => {
       const circular: any = { a: 'test' };
       circular.self = circular;
-      
+
       // This should not throw an error, though it might return false
       // The exact behavior isn't specified in the OpenTelemetry spec
       const result = isLogAttributeValue(circular);
@@ -290,7 +344,7 @@ describe('isLogAttributeValue', () => {
       for (let i = 0; i < 100; i++) {
         deep = { level: i, nested: deep };
       }
-      
+
       const result = isLogAttributeValue(deep);
       assert.strictEqual(typeof result, 'boolean');
     });
@@ -300,4 +354,4 @@ describe('isLogAttributeValue', () => {
       assert.strictEqual(isLogAttributeValue(largeArray), true);
     });
   });
-}); 
+});

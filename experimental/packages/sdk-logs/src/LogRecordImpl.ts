@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-import type * as logsAPI from '@opentelemetry/api-logs';
+import type {
+  AnyValue,
+  LogAttributes,
+  LogBody,
+  LogRecord,
+  SeverityNumber,
+} from '@opentelemetry/api-logs';
 import * as api from '@opentelemetry/api';
-import {
-  timeInputToHrTime,
-  InstrumentationScope,
-} from '@opentelemetry/core';
+import { timeInputToHrTime, InstrumentationScope } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
-
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
-import { AnyValue, isLogAttributeValue } from '@opentelemetry/api-logs';
+import { isLogAttributeValue } from './utils/validation';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 
 export class LogRecordImpl implements ReadableLogRecord {
@@ -33,10 +35,10 @@ export class LogRecordImpl implements ReadableLogRecord {
   readonly spanContext?: api.SpanContext;
   readonly resource: Resource;
   readonly instrumentationScope: InstrumentationScope;
-  readonly attributes: logsAPI.LogAttributes = {};
+  readonly attributes: LogAttributes = {};
   private _severityText?: string;
-  private _severityNumber?: logsAPI.SeverityNumber;
-  private _body?: logsAPI.LogBody;
+  private _severityNumber?: SeverityNumber;
+  private _body?: LogBody;
   private _eventName?: string;
   private totalAttributesCount: number = 0;
 
@@ -53,23 +55,23 @@ export class LogRecordImpl implements ReadableLogRecord {
     return this._severityText;
   }
 
-  set severityNumber(severityNumber: logsAPI.SeverityNumber | undefined) {
+  set severityNumber(severityNumber: SeverityNumber | undefined) {
     if (this._isLogRecordReadonly()) {
       return;
     }
     this._severityNumber = severityNumber;
   }
-  get severityNumber(): logsAPI.SeverityNumber | undefined {
+  get severityNumber(): SeverityNumber | undefined {
     return this._severityNumber;
   }
 
-  set body(body: logsAPI.LogBody | undefined) {
+  set body(body: LogBody | undefined) {
     if (this._isLogRecordReadonly()) {
       return;
     }
     this._body = body;
   }
-  get body(): logsAPI.LogBody | undefined {
+  get body(): LogBody | undefined {
     return this._body;
   }
 
@@ -90,7 +92,7 @@ export class LogRecordImpl implements ReadableLogRecord {
   constructor(
     _sharedState: LoggerProviderSharedState,
     instrumentationScope: InstrumentationScope,
-    logRecord: logsAPI.LogRecord
+    logRecord: LogRecord
   ) {
     const {
       timestamp,
@@ -123,7 +125,7 @@ export class LogRecordImpl implements ReadableLogRecord {
     this.setAttributes(attributes);
   }
 
-  public setAttribute(key: string, value?: logsAPI.AnyValue) {
+  public setAttribute(key: string, value?: AnyValue) {
     if (this._isLogRecordReadonly()) {
       return this;
     }
@@ -151,14 +153,14 @@ export class LogRecordImpl implements ReadableLogRecord {
     return this;
   }
 
-  public setAttributes(attributes: logsAPI.LogAttributes) {
+  public setAttributes(attributes: LogAttributes) {
     for (const [k, v] of Object.entries(attributes)) {
       this.setAttribute(k, v);
     }
     return this;
   }
 
-  public setBody(body: logsAPI.LogBody) {
+  public setBody(body: LogBody) {
     this.body = body;
     return this;
   }
@@ -168,7 +170,7 @@ export class LogRecordImpl implements ReadableLogRecord {
     return this;
   }
 
-  public setSeverityNumber(severityNumber: logsAPI.SeverityNumber) {
+  public setSeverityNumber(severityNumber: SeverityNumber) {
     this.severityNumber = severityNumber;
     return this;
   }
