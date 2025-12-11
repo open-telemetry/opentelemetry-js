@@ -73,6 +73,7 @@ interface SpanOptions {
   attributes?: Attributes;
   spanLimits: SpanLimits;
   spanProcessor: SpanProcessor;
+  recordEndMetrics: () => void;
 }
 
 /**
@@ -105,6 +106,7 @@ export class SpanImpl implements Span {
   private readonly _spanProcessor: SpanProcessor;
   private readonly _spanLimits: SpanLimits;
   private readonly _attributeValueLengthLimit: number;
+  private readonly _record_end_metrics: () => void;
 
   private readonly _performanceStartTime: number;
   private readonly _performanceOffset: number;
@@ -133,6 +135,7 @@ export class SpanImpl implements Span {
     this.startTime = this._getTime(opts.startTime ?? now);
     this.resource = opts.resource;
     this.instrumentationScope = opts.scope;
+    this._record_end_metrics = opts.recordEndMetrics;
 
     if (opts.attributes != null) {
       this.setAttributes(opts.attributes);

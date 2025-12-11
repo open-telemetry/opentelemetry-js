@@ -27,6 +27,12 @@ import {
   defaultResource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
+import {
+  AggregationTemporality,
+  InMemoryMetricExporter,
+  MeterProvider,
+  PeriodicExportingMetricReader,
+} from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
@@ -562,6 +568,47 @@ describe('BasicTracerProvider', () => {
       );
       tracerProvider.shutdown();
       sinon.assert.calledOnce(shutdownStub);
+    });
+  });
+
+  describe('TracerMetrics', () => {
+    const metricExporter = new InMemoryMetricExporter(
+      AggregationTemporality.CUMULATIVE
+    );
+    const metricReader = new PeriodicExportingMetricReader({
+      exporter: metricExporter,
+    });
+    const meterProvider = new MeterProvider({
+      readers: [metricReader],
+    });
+
+    afterEach(() => {
+      metricExporter.reset();
+    });
+
+    after(async () => {
+      await meterProvider.shutdown();
+    });
+
+    it('should record metrics for sampled spans', async () => {
+      const tracerProvider = new BasicTracerProvider({
+        meterProvider,
+        sampler: new AlwaysOnSampler(),
+      });
+      const tracer = tracerProvider.getTracer('test');
+      const span = tracer.startSpan('span');
+      await meterProvider.forceFlush();
+      const exportedMetrics = metricExporter.getMetrics();
+      assert.strictEqual(exportedMetrics.length, 1);
+      const resourceMetrics = exportedMetrics[0];
+      assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
+      const scopeMetrics = resourceMetrics.scopeMetrics[0];
+      assert.strictEqual(scopeMetrics.metrics.length, 2);
+      const spansStartedMetric = scopeMetrics.metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.started'
+      );
+      assert.ok(spansStartedMetric);
+      span.end();
     });
   });
 });

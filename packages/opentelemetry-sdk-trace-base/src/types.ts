@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { ContextManager, TextMapPropagator } from '@opentelemetry/api';
+import {
+  ContextManager,
+  MeterProvider,
+  TextMapPropagator,
+} from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import { IdGenerator } from './IdGenerator';
 import { Sampler } from './Sampler';
@@ -54,6 +58,9 @@ export interface TracerConfig {
    * List of SpanProcessor for the tracer
    */
   spanProcessors?: SpanProcessor[];
+
+  /** A meter provider to record trace SDK metrics to. */
+  meterProvider?: MeterProvider;
 }
 
 /**
