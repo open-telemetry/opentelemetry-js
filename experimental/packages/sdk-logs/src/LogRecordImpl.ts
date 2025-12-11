@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-import type * as logsAPI from '@opentelemetry/api-logs';
+import type {
+  AnyValue,
+  LogAttributes,
+  LogBody,
+  LogRecord,
+  SeverityNumber,
+} from '@opentelemetry/api-logs';
 import * as api from '@opentelemetry/api';
-import {
-  timeInputToHrTime,
-  isAttributeValue,
-  InstrumentationScope,
-} from '@opentelemetry/core';
+import { timeInputToHrTime, InstrumentationScope } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
-
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
+import { isLogAttributeValue } from './utils/validation';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 
 export class LogRecordImpl implements ReadableLogRecord {
@@ -33,10 +35,10 @@ export class LogRecordImpl implements ReadableLogRecord {
   readonly spanContext?: api.SpanContext;
   readonly resource: Resource;
   readonly instrumentationScope: InstrumentationScope;
-  readonly attributes: logsAPI.LogAttributes = {};
+  readonly attributes: LogAttributes = {};
   private _severityText?: string;
-  private _severityNumber?: logsAPI.SeverityNumber;
-  private _body?: logsAPI.LogBody;
+  private _severityNumber?: SeverityNumber;
+  private _body?: LogBody;
   private _eventName?: string;
   private totalAttributesCount: number = 0;
 
@@ -53,23 +55,23 @@ export class LogRecordImpl implements ReadableLogRecord {
     return this._severityText;
   }
 
-  set severityNumber(severityNumber: logsAPI.SeverityNumber | undefined) {
+  set severityNumber(severityNumber: SeverityNumber | undefined) {
     if (this._isLogRecordReadonly()) {
       return;
     }
     this._severityNumber = severityNumber;
   }
-  get severityNumber(): logsAPI.SeverityNumber | undefined {
+  get severityNumber(): SeverityNumber | undefined {
     return this._severityNumber;
   }
 
-  set body(body: logsAPI.LogBody | undefined) {
+  set body(body: LogBody | undefined) {
     if (this._isLogRecordReadonly()) {
       return;
     }
     this._body = body;
   }
-  get body(): logsAPI.LogBody | undefined {
+  get body(): LogBody | undefined {
     return this._body;
   }
 
@@ -90,7 +92,7 @@ export class LogRecordImpl implements ReadableLogRecord {
   constructor(
     _sharedState: LoggerProviderSharedState,
     instrumentationScope: InstrumentationScope,
-    logRecord: logsAPI.LogRecord
+    logRecord: LogRecord
   ) {
     const {
       timestamp,
@@ -123,25 +125,15 @@ export class LogRecordImpl implements ReadableLogRecord {
     this.setAttributes(attributes);
   }
 
-  public setAttribute(key: string, value?: logsAPI.AnyValue) {
+  public setAttribute(key: string, value?: AnyValue) {
     if (this._isLogRecordReadonly()) {
-      return this;
-    }
-    if (value === null) {
       return this;
     }
     if (key.length === 0) {
       api.diag.warn(`Invalid attribute key: ${key}`);
       return this;
     }
-    if (
-      !isAttributeValue(value) &&
-      !(
-        typeof value === 'object' &&
-        !Array.isArray(value) &&
-        Object.keys(value).length > 0
-      )
-    ) {
+    if (!isLogAttributeValue(value)) {
       api.diag.warn(`Invalid attribute value set for key: ${key}`);
       return this;
     }
@@ -157,22 +149,18 @@ export class LogRecordImpl implements ReadableLogRecord {
       }
       return this;
     }
-    if (isAttributeValue(value)) {
-      this.attributes[key] = this._truncateToSize(value);
-    } else {
-      this.attributes[key] = value;
-    }
+    this.attributes[key] = this._truncateToSize(value);
     return this;
   }
 
-  public setAttributes(attributes: logsAPI.LogAttributes) {
+  public setAttributes(attributes: LogAttributes) {
     for (const [k, v] of Object.entries(attributes)) {
       this.setAttribute(k, v);
     }
     return this;
   }
 
-  public setBody(body: logsAPI.LogBody) {
+  public setBody(body: LogBody) {
     this.body = body;
     return this;
   }
@@ -182,7 +170,7 @@ export class LogRecordImpl implements ReadableLogRecord {
     return this;
   }
 
-  public setSeverityNumber(severityNumber: logsAPI.SeverityNumber) {
+  public setSeverityNumber(severityNumber: SeverityNumber) {
     this.severityNumber = severityNumber;
     return this;
   }
@@ -201,7 +189,7 @@ export class LogRecordImpl implements ReadableLogRecord {
     this._isReadonly = true;
   }
 
-  private _truncateToSize(value: api.AttributeValue): api.AttributeValue {
+  private _truncateToSize(value: AnyValue): AnyValue {
     const limit = this._logRecordLimits.attributeValueLengthLimit;
     // Check limit
     if (limit <= 0) {
@@ -210,19 +198,36 @@ export class LogRecordImpl implements ReadableLogRecord {
       return value;
     }
 
+    // null/undefined - no truncation needed
+    if (value == null) {
+      return value;
+    }
+
     // String
     if (typeof value === 'string') {
       return this._truncateToLimitUtil(value, limit);
     }
 
-    // Array of strings
-    if (Array.isArray(value)) {
-      return (value as []).map(val =>
-        typeof val === 'string' ? this._truncateToLimitUtil(val, limit) : val
-      );
+    // Byte arrays - no truncation needed
+    if (value instanceof Uint8Array) {
+      return value;
     }
 
-    // Other types, no need to apply value length limit
+    // Arrays (can contain any AnyValue types)
+    if (Array.isArray(value)) {
+      return value.map(val => this._truncateToSize(val));
+    }
+
+    // Objects/Maps - recursively truncate nested values
+    if (typeof value === 'object') {
+      const truncatedObj: Record<string, AnyValue> = {};
+      for (const [k, v] of Object.entries(value as Record<string, AnyValue>)) {
+        truncatedObj[k] = this._truncateToSize(v);
+      }
+      return truncatedObj;
+    }
+
+    // Other types (number, boolean), no need to apply value length limit
     return value;
   }
 
