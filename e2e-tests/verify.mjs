@@ -32,12 +32,12 @@ for (const line of lines) {
     verifiedSpan = true;
   }
   if (parsed.resourceMetrics) {
-    const metric = parsed.resourceMetrics[0].scopeMetrics[0].metrics.find(
-      m => m.name === 'example_counter'
+    const scopeMetrics = parsed.resourceMetrics[0].scopeMetrics.find(
+      sm => sm.scope.name === 'example-meter'
     );
-    if (metric) {
+    if (scopeMetrics) {
       console.log('found metric');
-      verifyMetric(metric);
+      verifyMetric(scopeMetrics.metrics[0]);
       verifiedMetric = true;
     }
   }
