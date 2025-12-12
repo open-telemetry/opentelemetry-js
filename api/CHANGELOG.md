@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 
 * feat(api): improve isValidSpanId, isValidTraceId performance [#5714](https://github.com/open-telemetry/opentelemetry-js/pull/5714) @seemk
 * feat(diag): change types in `DiagComponentLogger` from `any` to `unknown`[#5478](https://github.com/open-telemetry/opentelemetry-js/pull/5478) @loganrosen
+* feat(sdk-trace): implement span start/end metrics  [#1851](https://github.com/open-telemetry/opentelemetry-js/pull/6213) @anuraaga
 
 ### :bug: (Bug Fix)
 
