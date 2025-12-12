@@ -33,7 +33,11 @@ for (const line of lines) {
   }
   if (parsed.resourceMetrics) {
     console.log('found metric');
-    verifyMetric(parsed.resourceMetrics[0].scopeMetrics[0].metrics[0]);
+    verifyMetric(
+      parsed.resourceMetrics[0].scopeMetrics[0].metrics.find(
+        m => m.name === 'example_counter'
+      )
+    );
     verifiedMetric = true;
   }
   if (parsed.resourceLogs) {
