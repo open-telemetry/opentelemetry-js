@@ -20,6 +20,9 @@
     },
     {
       "path": "../opentelemetry-resources"
+    },
+    {
+      "path": "../sdk-metrics"
     }
   ]
 }
