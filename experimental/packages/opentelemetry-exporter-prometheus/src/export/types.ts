@@ -29,7 +29,7 @@ export interface ExporterConfig {
 
   /**
    * Append timestamp to metrics
-   * @default true
+   * @default false
    */
   appendTimestamp?: boolean;
 

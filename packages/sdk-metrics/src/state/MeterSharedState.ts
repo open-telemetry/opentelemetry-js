@@ -45,12 +45,16 @@ export class MeterSharedState {
   metricStorageRegistry = new MetricStorageRegistry();
   observableRegistry = new ObservableRegistry();
   meter: Meter;
+  private _meterProviderSharedState: MeterProviderSharedState;
+  private _instrumentationScope: InstrumentationScope;
 
   constructor(
-    private _meterProviderSharedState: MeterProviderSharedState,
-    private _instrumentationScope: InstrumentationScope
+    meterProviderSharedState: MeterProviderSharedState,
+    instrumentationScope: InstrumentationScope
   ) {
     this.meter = new Meter(this);
+    this._meterProviderSharedState = meterProviderSharedState;
+    this._instrumentationScope = instrumentationScope;
   }
 
   registerMetricStorage(descriptor: InstrumentDescriptor) {

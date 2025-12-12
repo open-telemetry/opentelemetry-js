@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as root from '../src/generated/root';
+import { fromBinary, toBinary, create, toJson } from '@bufbuild/protobuf';
+import {
+  ExportTraceServiceRequestSchema,
+  ExportTraceServiceResponseSchema,
+} from '../src/generated/opentelemetry/proto/collector/trace/v1/trace_service_pb';
 import { SpanKind, SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import { TraceState } from '@opentelemetry/core';
 import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import { toBase64 } from './utils';
+import { hexToBase64 } from '../src/common/utils';
 import { OtlpEncodingOptions } from '../src/common/internal-types';
 import { ESpanKind, EStatusCode } from '../src/trace/internal-types';
 import { createExportTraceServiceRequest } from '../src/trace/internal';
@@ -142,15 +146,17 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
 }
 
 function createExpectedSpanProtobuf() {
-  const startTime = 1640715557342725400;
-  const endTime = 1640715558642725400;
-  const eventTime = 1640715558542725400;
+  // protobuf JSON format uses string representation for 64-bit integers
+  const startTime = '1640715557342725388';
+  const endTime = '1640715558642725388';
+  const eventTime = '1640715558542725388';
 
-  const traceId = toBase64('00000000000000000000000000000001');
-  const spanId = toBase64('0000000000000002');
-  const parentSpanId = toBase64('0000000000000001');
-  const linkSpanId = toBase64('0000000000000003');
-  const linkTraceId = toBase64('00000000000000000000000000000002');
+  // protobuf JSON format uses base64 for bytes
+  const traceId = hexToBase64('00000000000000000000000000000001');
+  const spanId = hexToBase64('0000000000000002');
+  const parentSpanId = hexToBase64('0000000000000001');
+  const linkSpanId = hexToBase64('0000000000000003');
+  const linkTraceId = hexToBase64('00000000000000000000000000000002');
 
   return {
     resourceSpans: [
@@ -162,7 +168,6 @@ function createExpectedSpanProtobuf() {
               value: { stringValue: 'resource attribute value' },
             },
           ],
-          droppedAttributesCount: 0,
         },
         scopeSpans: [
           {
@@ -174,54 +179,46 @@ function createExpectedSpanProtobuf() {
                 traceState: 'span=bar',
                 parentSpanId: parentSpanId,
                 name: 'span-name',
-                kind: ESpanKind.SPAN_KIND_CLIENT,
-                links: [
-                  {
-                    droppedAttributesCount: 0,
-                    spanId: linkSpanId,
-                    traceId: linkTraceId,
-                    traceState: 'link=foo',
-                    attributes: [
-                      {
-                        key: 'link-attribute',
-                        value: {
-                          stringValue: 'string value',
-                        },
-                      },
-                    ],
-                    flags: 0x101, // TraceFlags (0x01) | HAS_IS_REMOTE
-                  },
-                ],
+                // protobuf-es toJson outputs enums as strings
+                kind: 'SPAN_KIND_CLIENT',
                 startTimeUnixNano: startTime,
                 endTimeUnixNano: endTime,
-                events: [
-                  {
-                    droppedAttributesCount: 0,
-                    attributes: [
-                      {
-                        key: 'event-attribute',
-                        value: {
-                          stringValue: 'some string value',
-                        },
-                      },
-                    ],
-                    name: 'some event',
-                    timeUnixNano: eventTime,
-                  },
-                ],
                 attributes: [
                   {
                     key: 'string-attribute',
                     value: { stringValue: 'some attribute value' },
                   },
                 ],
-                droppedAttributesCount: 0,
-                droppedEventsCount: 0,
-                droppedLinksCount: 0,
-                status: {
-                  code: EStatusCode.STATUS_CODE_OK,
-                },
-                flags: 0x101, // TraceFlags (0x01) | HAS_IS_REMOTE
+                events: [
+                  {
+                    name: 'some event',
+                    timeUnixNano: eventTime,
+                    attributes: [
+                      {
+                        key: 'event-attribute',
+                        value: { stringValue: 'some string value' },
+                      },
+                    ],
+                  },
+                ],
+                links: [
+                  {
+                    traceId: linkTraceId,
+                    spanId: linkSpanId,
+                    traceState: 'link=foo',
+                    attributes: [
+                      {
+                        key: 'link-attribute',
+                        value: { stringValue: 'string value' },
+                      },
+                    ],
+                    // TraceFlags (0x01) | HAS_IS_REMOTE
+                    flags: 0x101,
+                  },
+                ],
+                status: { code: 'STATUS_CODE_OK' },
+                // TraceFlags (0x01) | HAS_IS_REMOTE
+                flags: 0x101,
               },
             ],
             schemaUrl: 'http://url.to.schema',
@@ -477,37 +474,34 @@ describe('Trace', () => {
     it('serializes an export request', () => {
       const serialized = ProtobufTraceSerializer.serializeRequest([span]);
       assert.ok(serialized, 'serialized response is undefined');
-      const decoded =
-        root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest.decode(
-          serialized
-        );
+      const decoded = fromBinary(ExportTraceServiceRequestSchema, serialized);
       const expected = createExpectedSpanProtobuf();
-      const decodedObj =
-        root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest.toObject(
-          decoded,
-          {
-            // This incurs some precision loss that's taken into account in createExpectedSpanProtobuf()
-            // Using String here will incur the same precision loss on browser only, using Number to prevent having to
-            // have different assertions for browser and Node.js
-            longs: Number,
-            // Convert to String (Base64) as otherwise the type will be different for Node.js (Buffer) and Browser (Uint8Array)
-            // and this fails assertions.
-            bytes: String,
-          }
-        );
-      assert.deepStrictEqual(decodedObj, expected);
+      // toJson converts to protobuf JSON format (strings for 64-bit ints, base64 for bytes)
+      const decodedJson = toJson(ExportTraceServiceRequestSchema, decoded);
+      assert.deepStrictEqual(decodedJson, expected);
+    });
+
+    it('serializes an empty request', () => {
+      const serialized = ProtobufTraceSerializer.serializeRequest([]);
+      assert.ok(serialized, 'serialized response is undefined');
+      const decoded = fromBinary(ExportTraceServiceRequestSchema, serialized);
+      assert.deepStrictEqual(
+        toJson(ExportTraceServiceRequestSchema, decoded),
+        {}
+      );
     });
 
     it('deserializes a response', () => {
-      const protobufSerializedResponse =
-        root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceResponse.encode(
-          {
-            partialSuccess: {
-              errorMessage: 'foo',
-              rejectedSpans: 1,
-            },
-          }
-        ).finish();
+      const response = create(ExportTraceServiceResponseSchema, {
+        partialSuccess: {
+          errorMessage: 'foo',
+          rejectedSpans: BigInt(1),
+        },
+      });
+      const protobufSerializedResponse = toBinary(
+        ExportTraceServiceResponseSchema,
+        response
+      );
 
       const deserializedResponse = ProtobufTraceSerializer.deserializeResponse(
         protobufSerializedResponse
@@ -518,10 +512,7 @@ describe('Trace', () => {
         'partialSuccess not present in the deserialized message'
       );
       assert.equal(deserializedResponse.partialSuccess.errorMessage, 'foo');
-      assert.equal(
-        Number(deserializedResponse.partialSuccess.rejectedSpans),
-        1
-      );
+      assert.equal(deserializedResponse.partialSuccess.rejectedSpans, 1);
     });
 
     it('does not throw when deserializing an empty response', () => {

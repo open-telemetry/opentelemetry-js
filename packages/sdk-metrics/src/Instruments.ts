@@ -39,10 +39,16 @@ import {
 } from './state/WritableMetricStorage';
 
 export class SyncInstrument {
+  private _writableMetricStorage: WritableMetricStorage;
+  protected _descriptor: InstrumentDescriptor;
+
   constructor(
-    private _writableMetricStorage: WritableMetricStorage,
-    protected _descriptor: InstrumentDescriptor
-  ) {}
+    writableMetricStorage: WritableMetricStorage,
+    descriptor: InstrumentDescriptor
+  ) {
+    this._writableMetricStorage = writableMetricStorage;
+    this._descriptor = descriptor;
+  }
 
   protected _record(
     value: number,
@@ -146,14 +152,16 @@ export class ObservableInstrument implements Observable {
   _metricStorages: AsyncWritableMetricStorage[];
   /** @internal */
   _descriptor: InstrumentDescriptor;
+  private _observableRegistry: ObservableRegistry;
 
   constructor(
     descriptor: InstrumentDescriptor,
     metricStorages: AsyncWritableMetricStorage[],
-    private _observableRegistry: ObservableRegistry
+    observableRegistry: ObservableRegistry
   ) {
     this._descriptor = descriptor;
     this._metricStorages = metricStorages;
+    this._observableRegistry = observableRegistry;
   }
 
   /**

@@ -24,8 +24,11 @@ export interface Hash<ValueType, HashCodeType> {
 export class HashMap<KeyType, ValueType, HashCodeType> {
   private _valueMap = new Map<HashCodeType, ValueType>();
   private _keyMap = new Map<HashCodeType, KeyType>();
+  private _hash;
 
-  constructor(private _hash: Hash<KeyType, HashCodeType>) {}
+  constructor(hash: Hash<KeyType, HashCodeType>) {
+    this._hash = hash;
+  }
 
   get(key: KeyType, hashCode?: HashCodeType) {
     hashCode ??= this._hash(key);

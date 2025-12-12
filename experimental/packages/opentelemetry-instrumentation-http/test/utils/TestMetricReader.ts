@@ -17,11 +17,13 @@
 import { MetricReader, PushMetricExporter } from '@opentelemetry/sdk-metrics';
 
 export class TestMetricReader extends MetricReader {
-  constructor(private _exporter: PushMetricExporter) {
+  private _exporter: PushMetricExporter;
+  constructor(exporter: PushMetricExporter) {
     super({
       aggregationTemporalitySelector:
-        _exporter.selectAggregationTemporality?.bind(_exporter),
+        exporter.selectAggregationTemporality?.bind(exporter),
     });
+    this._exporter = exporter;
   }
 
   protected onForceFlush(): Promise<void> {

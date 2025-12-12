@@ -105,8 +105,11 @@ export interface GrpcExporterTransportParameters {
 export class GrpcExporterTransport implements IExporterTransport {
   private _client?: Client;
   private _metadata?: Metadata;
+  private _parameters: GrpcExporterTransportParameters;
 
-  constructor(private _parameters: GrpcExporterTransportParameters) {}
+  constructor(parameters: GrpcExporterTransportParameters) {
+    this._parameters = parameters;
+  }
 
   shutdown() {
     this._client?.close();

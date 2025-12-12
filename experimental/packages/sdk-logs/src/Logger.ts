@@ -29,12 +29,16 @@ import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState'
 import { LoggerConfig } from './types';
 
 export class Logger implements logsAPI.Logger {
+  public readonly instrumentationScope: InstrumentationScope;
+  private _sharedState: LoggerProviderSharedState;
   private readonly _loggerConfig: Required<LoggerConfig>;
 
   constructor(
-    public readonly instrumentationScope: InstrumentationScope,
-    private _sharedState: LoggerProviderSharedState
+    instrumentationScope: InstrumentationScope,
+    sharedState: LoggerProviderSharedState
   ) {
+    this.instrumentationScope = instrumentationScope;
+    this._sharedState = sharedState;
     // Cache the logger configuration at construction time
     // Since we don't support re-configuration, this avoids map lookups
     // and string allocations on each emit() call

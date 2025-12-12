@@ -36,17 +36,20 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>>
   extends MetricStorage
   implements AsyncWritableMetricStorage
 {
+  private _aggregationCardinalityLimit?: number;
   private _deltaMetricStorage: DeltaMetricProcessor<T>;
   private _temporalMetricStorage: TemporalMetricProcessor<T>;
+  private _attributesProcessor: IAttributesProcessor;
 
   constructor(
     _instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<T>,
-    private _attributesProcessor: IAttributesProcessor,
+    attributesProcessor: IAttributesProcessor,
     collectorHandles: MetricCollectorHandle[],
-    private _aggregationCardinalityLimit?: number
+    aggregationCardinalityLimit?: number
   ) {
     super(_instrumentDescriptor);
+    this._aggregationCardinalityLimit = aggregationCardinalityLimit;
     this._deltaMetricStorage = new DeltaMetricProcessor(
       aggregator,
       this._aggregationCardinalityLimit
@@ -55,6 +58,7 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>>
       aggregator,
       collectorHandles
     );
+    this._attributesProcessor = attributesProcessor;
   }
 
   record(measurements: AttributeHashMap<number>, observationTime: HrTime) {

@@ -55,6 +55,7 @@
     "@opentelemetry/sdk-trace-base": "2.2.0",
     "@opentelemetry/sdk-trace-node": "2.2.0",
     "@protobuf-ts/grpc-transport": "2.11.1",
+    "@protobuf-ts/plugin": "2.11.1",
     "@protobuf-ts/runtime": "2.11.1",
     "@protobuf-ts/runtime-rpc": "2.11.1",
     "@types/mocha": "10.0.10",
