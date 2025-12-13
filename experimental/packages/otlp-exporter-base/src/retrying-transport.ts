@@ -55,9 +55,12 @@ class RetryingTransport implements IExporterTransport {
 
     while (result.status === 'retryable' && attempts > 0) {
       attempts--;
-      
+
       // use maximum of computed backoff and 0 to avoid negative timeouts
-      const backoff = Math.max(Math.min(nextBackoff * (1 + getJitter()), MAX_BACKOFF), 0);
+      const backoff = Math.max(
+        Math.min(nextBackoff * (1 + getJitter()), MAX_BACKOFF),
+        0
+      );
       nextBackoff = nextBackoff * BACKOFF_MULTIPLIER;
       const retryInMillis = result.retryInMillis ?? backoff;
 
@@ -71,15 +74,19 @@ class RetryingTransport implements IExporterTransport {
         );
         return result;
       }
-      
+
       diag.verbose(`Scheduling export retry in ${Math.round(retryInMillis)}ms`);
       result = await this.retry(data, remainingTimeoutMillis, retryInMillis);
     }
-    
+
     if (result.status === 'success') {
-      diag.verbose(`Export succeded after ${MAX_ATTEMPTS - attempts} retry attempts.`);
+      diag.verbose(
+        `Export succeded after ${MAX_ATTEMPTS - attempts} retry attempts.`
+      );
     } else if (result.status === 'retryable') {
-      diag.info(`Export failed after maximum retry attempts (${MAX_ATTEMPTS}).`);
+      diag.info(
+        `Export failed after maximum retry attempts (${MAX_ATTEMPTS}).`
+      );
     } else {
       diag.info(`Export failed with non-retryable error: ${result.error}`);
     }

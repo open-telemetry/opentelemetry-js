@@ -109,9 +109,9 @@ class OTLPExportDelegate<Internal, Response>
           } else if (response.status === 'retryable') {
             resultCallback({
               code: ExportResultCode.FAILED,
-              error: new OTLPExporterError(
-                'Export failed with retryable status'
-              ),
+              error:
+                response.error ??
+                new OTLPExporterError('Export failed with retryable status'),
             });
           } else {
             resultCallback({

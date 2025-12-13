@@ -19,54 +19,6 @@ export function isExportHTTPErrorRetryable(statusCode: number): boolean {
   return retryCodes.includes(statusCode);
 }
 
-function getErrorCode(error: unknown): string | undefined {
-  if (!error || typeof error !== 'object') {
-    return undefined;
-  }
-
-  if ('code' in error && typeof error.code === 'string') {
-    return error.code;
-  }
-
-  const err = error as Error;
-  if (err.cause && typeof err.cause === 'object' && 'code' in err.cause) {
-    const code = (err.cause as { code: unknown }).code;
-    if (typeof code === 'string') {
-      return code;
-    }
-  }
-
-  return undefined;
-}
-
-export function isExportNetworkErrorRetryable(error: Error): boolean {
-  const RETRYABLE_ERROR_CODES = new Set([
-    'ECONNRESET',
-    'ECONNREFUSED',
-    'EPIPE',
-    'ETIMEDOUT',
-    'EAI_AGAIN',
-    'ENOTFOUND',
-    'ENETUNREACH',
-    'EHOSTUNREACH',
-  ]);
-
-  if (error.name === 'AbortError') {
-    return false;
-  }
-
-  const code = getErrorCode(error);
-  if (code && RETRYABLE_ERROR_CODES.has(code)) {
-    return true;
-  }
-
-  if (error instanceof TypeError && !error.cause) {
-    return true;
-  }
-
-  return false;
-}
-
 export function parseRetryAfterToMills(
   retryAfter?: string | undefined | null
 ): number | undefined {

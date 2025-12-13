@@ -17,7 +17,6 @@ import * as sinon from 'sinon';
 import * as assert from 'assert';
 import {
   isExportHTTPErrorRetryable,
-  isExportNetworkErrorRetryable,
   parseRetryAfterToMills,
 } from '../../src/is-export-retryable';
 
@@ -63,59 +62,5 @@ describe('isExportHTTPErrorRetryable', function () {
     assert.strictEqual(isExportHTTPErrorRetryable(401), false);
     assert.strictEqual(isExportHTTPErrorRetryable(404), false);
     assert.strictEqual(isExportHTTPErrorRetryable(500), false);
-  });
-});
-
-describe('isExportNetworkErrorRetryable', function () {
-  it('should return false for AbortError', function () {
-    const error = new Error('The operation was aborted');
-    error.name = 'AbortError';
-    assert.strictEqual(isExportNetworkErrorRetryable(error), false);
-  });
-
-  it('should return true for Node.js system errors with error.code', function () {
-    const retryableCodes = [
-      'ECONNRESET',
-      'ECONNREFUSED',
-      'EPIPE',
-      'ETIMEDOUT',
-      'EAI_AGAIN',
-      'ENOTFOUND',
-      'ENETUNREACH',
-      'EHOSTUNREACH',
-    ];
-
-    for (const code of retryableCodes) {
-      const error = new Error('Network error') as any;
-      error.code = code;
-      assert.strictEqual(
-        isExportNetworkErrorRetryable(error),
-        true,
-        `Expected ${code} to be retryable`
-      );
-    }
-  });
-
-  it('should return true for browser fetch TypeError without cause', function () {
-    // Browser fetch throws TypeError for network errors without cause
-    const error = new TypeError('Failed to fetch');
-    assert.strictEqual(isExportNetworkErrorRetryable(error), true);
-  });
-
-  it('should return false for TypeError with non-retryable cause', function () {
-    const cause = new Error('Invalid argument');
-    const error = new TypeError('fetch failed', { cause });
-    assert.strictEqual(isExportNetworkErrorRetryable(error), false);
-  });
-
-  it('should return false for non-network errors', function () {
-    const error = new Error('Some other error');
-    assert.strictEqual(isExportNetworkErrorRetryable(error), false);
-  });
-
-  it('should return false for errors with non-retryable codes', function () {
-    const error = new Error('Invalid argument') as NodeJS.ErrnoException;
-    error.code = 'ERR_INVALID_ARG';
-    assert.strictEqual(isExportNetworkErrorRetryable(error), false);
   });
 });

@@ -20,7 +20,6 @@ import { Readable } from 'stream';
 import { ExportResponse } from '../export-response';
 import {
   isExportHTTPErrorRetryable,
-  isExportNetworkErrorRetryable,
   parseRetryAfterToMills,
 } from '../is-export-retryable';
 import { OTLPExporterError } from '../types';
@@ -103,7 +102,7 @@ export function sendWithHttp(
   });
 
   req.on('error', (error: Error) => {
-    if (isExportNetworkErrorRetryable(error)) {
+    if (isHttpTransportNetworkErrorRetryable(error)) {
       onDone({
         status: 'retryable',
         error,
@@ -149,4 +148,23 @@ function readableFromUint8Array(buff: string | Uint8Array): Readable {
   readable.push(null);
 
   return readable;
+}
+
+function isHttpTransportNetworkErrorRetryable(error: Error): boolean {
+  const RETRYABLE_NETWORK_ERROR_CODES = new Set([
+    'ECONNRESET',
+    'ECONNREFUSED',
+    'EPIPE',
+    'ETIMEDOUT',
+    'EAI_AGAIN',
+    'ENOTFOUND',
+    'ENETUNREACH',
+    'EHOSTUNREACH',
+  ]);
+
+  if ('code' in error && typeof error.code === 'string') {
+    return RETRYABLE_NETWORK_ERROR_CODES.has(error.code);
+  }
+
+  return false;
 }
