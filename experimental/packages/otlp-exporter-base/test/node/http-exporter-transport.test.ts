@@ -195,7 +195,7 @@ describe('HttpExporterTransport', function () {
       );
     });
 
-    it('returns failure when request times out', function (done) {
+    it('returns retryable when request times out', function (done) {
       // arrange
       const timer = sinon.useFakeTimers();
       server = http.createServer((_, res) => {
@@ -218,11 +218,9 @@ describe('HttpExporterTransport', function () {
         .send(sampleRequestData, 100)
         .then(result => {
           // assert
-          assert.strictEqual(result.status, 'failure');
-          assert.strictEqual(
-            (result as ExportResponseFailure).error.message,
-            'Request Timeout'
-          );
+          assert.strictEqual(result.status, 'retryable');
+          assert.ok(result.error, 'Expected error object to be present');
+          assert.strictEqual(result.error.message, 'Request timed out');
           done();
         })
         .catch(error => {
@@ -232,7 +230,7 @@ describe('HttpExporterTransport', function () {
       timer.tick(200);
     });
 
-    it('returns failure when socket hangs up', async function () {
+    it('returns retryable when socket hangs up (ECONNRESET)', async function () {
       // arrange
       server = http.createServer((_, res) => {
         res.destroy();
@@ -250,14 +248,47 @@ describe('HttpExporterTransport', function () {
       const result = await transport.send(sampleRequestData, 100);
 
       // assert
-      assert.strictEqual(result.status, 'failure');
+      assert.strictEqual(result.status, 'retryable');
+      assert.ok(result.error, 'Expected error object to be present');
       assert.strictEqual(
-        (result as ExportResponseFailure).error.message,
-        'socket hang up'
+        (result.error as NodeJS.ErrnoException).code,
+        'ECONNRESET'
+      );
+      assert.strictEqual(result.error?.message, 'socket hang up');
+    });
+
+    it('returns retryable on connection refused (ECONNREFUSED)', async function () {
+      // arrange
+      server = http.createServer();
+      await new Promise<void>(resolve => server!.listen(0, resolve));
+      const port = (server!.address() as any).port;
+      await new Promise<void>(resolve => server!.close(resolve as any));
+      server = undefined;
+
+      const transport = createHttpExporterTransport({
+        url: `http://localhost:${port}`,
+        headers: async () => ({}),
+        compression: 'none',
+        agentFactory: () => new http.Agent(),
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 50);
+
+      // assert
+      assert.strictEqual(result.status, 'retryable');
+      assert.ok(result.error, 'Expected error object to be present');
+      assert.strictEqual(
+        (result.error as NodeJS.ErrnoException).code,
+        'ECONNREFUSED'
+      );
+      assert.strictEqual(
+        result.error?.message.includes('connect ECONNREFUSED'),
+        true
       );
     });
 
-    it('returns failure when server does not exist', async function () {
+    it('returns retryable when server does not exist (ENOTFOUND)', async function () {
       // arrange
       const transport = createHttpExporterTransport({
         // use wrong port
@@ -271,10 +302,15 @@ describe('HttpExporterTransport', function () {
       const result = await transport.send(sampleRequestData, 100);
 
       // assert
-      assert.strictEqual(result.status, 'failure');
+      assert.strictEqual(result.status, 'retryable');
+      assert.ok(result.error, 'Expected error object to be present');
       assert.strictEqual(
-        (result as ExportResponseFailure).error.message,
-        'getaddrinfo ENOTFOUND example.test'
+        (result.error as NodeJS.ErrnoException).code,
+        'ENOTFOUND'
+      );
+      assert.strictEqual(
+        result.error?.message.includes('getaddrinfo ENOTFOUND'),
+        true
       );
     });
 

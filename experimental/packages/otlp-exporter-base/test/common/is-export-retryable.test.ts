@@ -15,7 +15,10 @@
  */
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import { parseRetryAfterToMills } from '../../src/is-export-retryable';
+import {
+  isExportHTTPErrorRetryable,
+  parseRetryAfterToMills,
+} from '../../src/is-export-retryable';
 
 describe('parseRetryAfterToMills', function () {
   // now: 2023-01-20T00:00:00.000Z
@@ -42,4 +45,22 @@ describe('parseRetryAfterToMills', function () {
       assert.strictEqual(parseRetryAfterToMills(value), expect);
     });
   }
+});
+
+describe('isExportHTTPErrorRetryable', function () {
+  it('should return true for retryable status codes', function () {
+    assert.strictEqual(isExportHTTPErrorRetryable(429), true);
+    assert.strictEqual(isExportHTTPErrorRetryable(502), true);
+    assert.strictEqual(isExportHTTPErrorRetryable(503), true);
+    assert.strictEqual(isExportHTTPErrorRetryable(504), true);
+  });
+
+  it('should return false for non-retryable status codes', function () {
+    assert.strictEqual(isExportHTTPErrorRetryable(200), false);
+    assert.strictEqual(isExportHTTPErrorRetryable(201), false);
+    assert.strictEqual(isExportHTTPErrorRetryable(400), false);
+    assert.strictEqual(isExportHTTPErrorRetryable(401), false);
+    assert.strictEqual(isExportHTTPErrorRetryable(404), false);
+    assert.strictEqual(isExportHTTPErrorRetryable(500), false);
+  });
 });
