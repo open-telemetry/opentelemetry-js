@@ -81,7 +81,8 @@ class FetchLaterTransport implements IExporterTransport {
       diag.debug('FetchLater request queued successfully');
       return { status: 'success' };
     } catch (error) {
-      // Handle QuotaExceededError specifically - this occurs when the 640KB quota is exceeded
+      // Handle QuotaExceededError specifically - this occurs when quota is exceeded
+      // See: https://fetch.spec.whatwg.org/#deferred-fetch-quota
       if (error instanceof DOMException && error.name === 'QuotaExceededError') {
         diag.warn('FetchLater quota exceeded, request not queued');
       }
