@@ -18,36 +18,60 @@ import * as assert from 'assert';
 import { inferExportDelegateToUse } from '../../src/configuration/create-legacy-browser-delegate';
 import {
   createOtlpFetchExportDelegate,
+  createOtlpFetchLaterExportDelegate,
   createOtlpSendBeaconExportDelegate,
 } from '../../src/otlp-browser-http-export-delegate';
 
 describe('createLegacyBrowserDelegate', function () {
-  describe('when beacon and fetch are available', function () {
-    it('uses the beacon delegate when no headers are provided', function () {
+  describe('when fetchLater is available', function () {
+    it('uses the fetchLater delegate regardless of headers', function () {
       const delegate = inferExportDelegateToUse(undefined);
-      assert.equal(delegate, createOtlpSendBeaconExportDelegate);
+      assert.equal(delegate, createOtlpFetchLaterExportDelegate);
     });
 
-    it('uses the fetch delegate when headers are provided', function () {
+    it('uses the fetchLater delegate when headers are provided', function () {
       const delegate = inferExportDelegateToUse({ foo: 'bar' });
-      assert.equal(delegate, createOtlpFetchExportDelegate);
+      assert.equal(delegate, createOtlpFetchLaterExportDelegate);
     });
   });
 
-  describe('when beacon is unavailable', function () {
-    const sendBeacon = window.navigator.sendBeacon;
+  describe('when fetchLater is unavailable', function () {
+    const fetchLater = (window as any).fetchLater;
     beforeEach(function () {
-      // fake sendBeacon being unavailable
-      (window.navigator as any).sendBeacon = undefined;
+      // fake fetchLater being unavailable
+      (window as any).fetchLater = undefined;
     });
-    afterEach(() => {
-      (window.navigator as any).sendBeacon = sendBeacon;
+    afterEach(function () {
+      (window as any).fetchLater = fetchLater;
     });
 
-    describe('when fetch is available', function () {
-      it('uses the fetch delegate', function () {
+    describe('when beacon and fetch are available', function () {
+      it('uses the beacon delegate when no headers are provided', function () {
         const delegate = inferExportDelegateToUse(undefined);
+        assert.equal(delegate, createOtlpSendBeaconExportDelegate);
+      });
+
+      it('uses the fetch delegate when headers are provided', function () {
+        const delegate = inferExportDelegateToUse({ foo: 'bar' });
         assert.equal(delegate, createOtlpFetchExportDelegate);
+      });
+    });
+
+    describe('when beacon is unavailable', function () {
+      const sendBeacon = window.navigator.sendBeacon;
+      beforeEach(function () {
+        // fake sendBeacon being unavailable
+        (window.navigator as any).sendBeacon = undefined;
+      });
+      afterEach(() => {
+        (window.navigator as any).sendBeacon = sendBeacon;
+      });
+
+      describe('when fetch is available', function () {
+        it('uses the fetch delegate', function () {
+          const delegate = inferExportDelegateToUse(undefined);
+          assert.equal(delegate, createOtlpFetchExportDelegate);
+        });
       });
     });
   });
