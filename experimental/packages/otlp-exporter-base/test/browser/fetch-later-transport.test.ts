@@ -40,9 +40,7 @@ describe('FetchLaterTransport', function () {
   describe('send', function () {
     it('returns success when fetchLater queues successfully (activated: true)', async function () {
       // arrange
-      const fetchLaterStub = sinon
-        .stub()
-        .returns({ activated: true });
+      const fetchLaterStub = sinon.stub().returns({ activated: true });
       (globalThis as Record<string, unknown>).fetchLater = fetchLaterStub;
 
       const transport = createFetchLaterTransport(testTransportParameters);
@@ -53,16 +51,20 @@ describe('FetchLaterTransport', function () {
       // assert
       assert.strictEqual(result.status, 'success');
       sinon.assert.calledOnce(fetchLaterStub);
-      sinon.assert.calledWithMatch(fetchLaterStub, testTransportParameters.url, {
-        method: 'POST',
-        headers: {
-          foo: 'foo-value',
-          bar: 'bar-value',
-          'Content-Type': 'application/json',
-        },
-        body: testPayload,
-        activateAfter: 0,
-      });
+      sinon.assert.calledWithMatch(
+        fetchLaterStub,
+        testTransportParameters.url,
+        {
+          method: 'POST',
+          headers: {
+            foo: 'foo-value',
+            bar: 'bar-value',
+            'Content-Type': 'application/json',
+          },
+          body: testPayload,
+          activateAfter: 0,
+        }
+      );
     });
 
     it('returns success when fetchLater queues successfully (activated: false)', async function () {
@@ -82,7 +84,9 @@ describe('FetchLaterTransport', function () {
 
     it('returns failure when fetchLater throws', async function () {
       // arrange
-      const fetchLaterStub = sinon.stub().throws(new Error('fetchLater failed'));
+      const fetchLaterStub = sinon
+        .stub()
+        .throws(new Error('fetchLater failed'));
       (globalThis as Record<string, unknown>).fetchLater = fetchLaterStub;
 
       const transport = createFetchLaterTransport(testTransportParameters);
@@ -100,7 +104,10 @@ describe('FetchLaterTransport', function () {
 
     it('returns failure when QuotaExceededError is thrown', async function () {
       // arrange
-      const quotaError = new DOMException('Quota exceeded', 'QuotaExceededError');
+      const quotaError = new DOMException(
+        'Quota exceeded',
+        'QuotaExceededError'
+      );
       const fetchLaterStub = sinon.stub().throws(quotaError);
       (globalThis as Record<string, unknown>).fetchLater = fetchLaterStub;
 

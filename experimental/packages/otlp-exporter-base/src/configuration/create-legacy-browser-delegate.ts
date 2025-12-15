@@ -50,7 +50,11 @@ export function createLegacyOtlpBrowserExportDelegate<Internal, Response>(
 export function inferExportDelegateToUse(
   configHeaders: OTLPExporterConfigBase['headers']
 ) {
-  if ('fetchLater' in globalThis && typeof (globalThis as any).fetchLater !== 'undefined') {
+  if (
+    'fetchLater' in globalThis &&
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
+    typeof (globalThis as any).fetchLater !== 'undefined'
+  ) {
     return createOtlpFetchLaterExportDelegate;
   } else if (!configHeaders && typeof navigator.sendBeacon === 'function') {
     return createOtlpSendBeaconExportDelegate;
