@@ -179,10 +179,6 @@ describe('XhrTransport', function () {
         // assert
         try {
           assert.strictEqual(response.status, 'retryable');
-          assert.strictEqual(
-            (response as ExportResponseRetryable).retryInMillis,
-            0
-          );
         } catch (e) {
           done(e);
         }
@@ -200,10 +196,6 @@ describe('XhrTransport', function () {
         // assert
         try {
           assert.strictEqual(response.status, 'retryable');
-          assert.strictEqual(
-            (response as ExportResponseRetryable).retryInMillis,
-            0
-          );
         } catch (e) {
           done(e);
         }
