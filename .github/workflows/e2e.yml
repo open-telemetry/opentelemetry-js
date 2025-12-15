@@ -41,7 +41,7 @@ jobs:
           matrix.node_version == '18' ||
           matrix.node_version == '20.6.0'
           }}
-      - run: npm install -g npm@11.6.0
+      - run: npm install -g npm@latest
         if: ${{
           matrix.node_version == '20' ||
           matrix.node_version == '22' ||

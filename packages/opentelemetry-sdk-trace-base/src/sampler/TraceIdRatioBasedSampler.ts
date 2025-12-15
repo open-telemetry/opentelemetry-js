@@ -19,10 +19,11 @@ import { Sampler, SamplingDecision, SamplingResult } from '../Sampler';
 
 /** Sampler that samples a given fraction of traces based of trace id deterministically. */
 export class TraceIdRatioBasedSampler implements Sampler {
+  private readonly _ratio;
   private _upperBound: number;
 
-  constructor(private readonly _ratio = 0) {
-    this._ratio = this._normalize(_ratio);
+  constructor(ratio = 0) {
+    this._ratio = this._normalize(ratio);
     this._upperBound = Math.floor(this._ratio * 0xffffffff);
   }
 
