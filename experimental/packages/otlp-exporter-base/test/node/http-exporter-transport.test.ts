@@ -282,10 +282,13 @@ describe('HttpExporterTransport', function () {
         (result.error as NodeJS.ErrnoException).code,
         'ECONNREFUSED'
       );
-      assert.strictEqual(
-        result.error?.message.includes('connect ECONNREFUSED'),
-        true
-      );
+      // Node.js 20+ can try multiple requests (IPv4 & IPv6) at once
+      // and return AggregateError
+      const errorMessage =
+        result.error instanceof AggregateError
+          ? result.error?.errors.map(e => (e as Error).message).join(' ')
+          : result.error?.message;
+      assert.strictEqual(errorMessage.includes('connect ECONNREFUSED'), true);
     });
 
     it('returns retryable when server does not exist (ENOTFOUND)', async function () {
