@@ -13,21 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as root from '../../generated/root';
-
-import { IExportLogsServiceRequest } from '../internal-types';
+import { toBinary, fromBinary, fromJsonString } from '@bufbuild/protobuf';
 import { IExportLogsServiceResponse } from '../export-response';
-
 import { createExportLogsServiceRequest } from '../internal';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
-import { ExportType } from '../../common/protobuf/protobuf-export-type';
 import { ISerializer } from '../../i-serializer';
-
-const logsResponseType = root.opentelemetry.proto.collector.logs.v1
-  .ExportLogsServiceResponse as ExportType<IExportLogsServiceResponse>;
-
-const logsRequestType = root.opentelemetry.proto.collector.logs.v1
-  .ExportLogsServiceRequest as ExportType<IExportLogsServiceRequest>;
+import {
+  ExportLogsServiceRequestSchema,
+  ExportLogsServiceResponseSchema,
+} from '../../generated/opentelemetry/proto/collector/logs/v1/logs_service_pb';
+import { PROTOBUF_JSON_ENCODER } from '../../common/utils';
 
 /*
  * @experimental this serializer may receive breaking changes in minor versions, pin this package's version when using this constant
@@ -37,10 +32,24 @@ export const ProtobufLogsSerializer: ISerializer<
   IExportLogsServiceResponse
 > = {
   serializeRequest: (arg: ReadableLogRecord[]) => {
-    const request = createExportLogsServiceRequest(arg);
-    return logsRequestType.encode(request).finish();
+    const request = createExportLogsServiceRequest(arg, PROTOBUF_JSON_ENCODER);
+    const message = fromJsonString(
+      ExportLogsServiceRequestSchema,
+      JSON.stringify(request)
+    );
+    return toBinary(ExportLogsServiceRequestSchema, message);
   },
   deserializeResponse: (arg: Uint8Array) => {
-    return logsResponseType.decode(arg);
+    const response = fromBinary(ExportLogsServiceResponseSchema, arg);
+    return {
+      partialSuccess: response.partialSuccess
+        ? {
+            rejectedLogRecords: Number(
+              response.partialSuccess.rejectedLogRecords
+            ),
+            errorMessage: response.partialSuccess.errorMessage,
+          }
+        : undefined,
+    };
   },
 };

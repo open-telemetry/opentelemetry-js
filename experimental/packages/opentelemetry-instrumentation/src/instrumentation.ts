@@ -47,12 +47,17 @@ export abstract class InstrumentationAbstract<
   private _meter: Meter;
   private _logger: Logger;
   protected _diag: DiagLogger;
+  public readonly instrumentationName: string;
+  public readonly instrumentationVersion: string;
 
   constructor(
-    public readonly instrumentationName: string,
-    public readonly instrumentationVersion: string,
+    instrumentationName: string,
+    instrumentationVersion: string,
     config: ConfigType
   ) {
+    this.instrumentationName = instrumentationName;
+    this.instrumentationVersion = instrumentationVersion;
+
     this.setConfig(config);
 
     this._diag = diag.createComponentLogger({

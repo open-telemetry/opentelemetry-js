@@ -24,8 +24,12 @@ import {
 import * as assert from 'assert';
 import { createExportMetricsServiceRequest } from '../src/metrics/internal';
 import { EAggregationTemporality } from '../src/metrics/internal-types';
-import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
-import * as root from '../src/generated/root';
+import { hrTime } from '@opentelemetry/core';
+import { fromBinary, toBinary, create, toJson } from '@bufbuild/protobuf';
+import {
+  ExportMetricsServiceRequestSchema,
+  ExportMetricsServiceResponseSchema,
+} from '../src/generated/opentelemetry/proto/collector/metrics/v1/metrics_service_pb';
 import { encodeAsLongBits, encodeAsString } from '../src/common/utils';
 import { ProtobufMetricsSerializer } from '../src/metrics/protobuf';
 import { JsonMetricsSerializer } from '../src/metrics/json';
@@ -316,8 +320,7 @@ describe('Metrics', () => {
       scopeMetrics: [
         {
           scope: {
-            name: 'mylib',
-            version: '0.1.0',
+            ...expectedScope,
             schemaUrl: expectedSchemaUrl,
           },
           metrics: metricData,
@@ -812,23 +815,43 @@ describe('Metrics', () => {
         ])
       );
       assert.ok(serialized, 'serialized response is undefined');
-      const decoded =
-        root.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.decode(
-          serialized
-        );
+      const decoded = fromBinary(ExportMetricsServiceRequestSchema, serialized);
+      // toJson converts to protobuf JSON format (strings for 64-bit ints)
+      const decodedJson = toJson(ExportMetricsServiceRequestSchema, decoded);
 
-      const decodedObj =
-        root.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.toObject(
-          decoded,
-          {
-            longs: Number,
-          }
-        );
+      // protobuf JSON format uses string representation for 64-bit integers
+      const expectedProtobufAttributes = [
+        {
+          key: 'string-attribute',
+          value: { stringValue: 'some attribute value' },
+        },
+        { key: 'int-attribute', value: { intValue: '1' } },
+        { key: 'double-attribute', value: { doubleValue: 1.1 } },
+        { key: 'boolean-attribute', value: { boolValue: true } },
+        {
+          key: 'array-attribute',
+          value: {
+            arrayValue: {
+              values: [
+                { stringValue: 'attribute value 1' },
+                { stringValue: 'attribute value 2' },
+              ],
+            },
+          },
+        },
+      ];
 
       const expected = {
         resourceMetrics: [
           {
-            resource: expectedResource,
+            resource: {
+              attributes: [
+                {
+                  key: 'resource-attribute',
+                  value: { stringValue: 'resource attribute value' },
+                },
+              ],
+            },
             scopeMetrics: [
               {
                 scope: expectedScope,
@@ -841,14 +864,15 @@ describe('Metrics', () => {
                     sum: {
                       dataPoints: [
                         {
-                          attributes: expectedAttributes,
-                          startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
-                          timeUnixNano: hrTimeToNanoseconds(END_TIME),
-                          asInt: 10,
+                          attributes: expectedProtobufAttributes,
+                          // encodeAsString preserves full precision via BigInt
+                          startTimeUnixNano: encodeAsString(START_TIME),
+                          timeUnixNano: encodeAsString(END_TIME),
+                          asInt: '10',
                         },
                       ],
-                      aggregationTemporality:
-                        EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA,
+                      // protobuf-es toJson outputs enums as strings
+                      aggregationTemporality: 'AGGREGATION_TEMPORALITY_DELTA',
                       isMonotonic: true,
                     },
                   },
@@ -858,19 +882,35 @@ describe('Metrics', () => {
           },
         ],
       };
-      assert.deepStrictEqual(decodedObj, expected);
+      assert.deepStrictEqual(decodedJson, expected);
+    });
+
+    it('serializes an empty request', () => {
+      const serialized = ProtobufMetricsSerializer.serializeRequest(
+        createResourceMetrics([])
+      );
+      assert.ok(serialized, 'serialized response is undefined');
+      const decoded = fromBinary(ExportMetricsServiceRequestSchema, serialized);
+      const decodedJson = toJson(ExportMetricsServiceRequestSchema, decoded);
+      // Empty metrics still has resource and scope, just no metric data
+      assert.ok(decodedJson, 'decoded response should exist');
+      assert.ok(
+        typeof decodedJson === 'object' && decodedJson !== null,
+        'decoded should be an object'
+      );
     });
 
     it('deserializes a response', () => {
-      const protobufSerializedResponse =
-        root.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceResponse.encode(
-          {
-            partialSuccess: {
-              errorMessage: 'foo',
-              rejectedDataPoints: 1,
-            },
-          }
-        ).finish();
+      const response = create(ExportMetricsServiceResponseSchema, {
+        partialSuccess: {
+          errorMessage: 'foo',
+          rejectedDataPoints: BigInt(1),
+        },
+      });
+      const protobufSerializedResponse = toBinary(
+        ExportMetricsServiceResponseSchema,
+        response
+      );
 
       const deserializedResponse =
         ProtobufMetricsSerializer.deserializeResponse(
@@ -882,10 +922,7 @@ describe('Metrics', () => {
         'partialSuccess not present in the deserialized message'
       );
       assert.equal(deserializedResponse.partialSuccess.errorMessage, 'foo');
-      assert.equal(
-        Number(deserializedResponse.partialSuccess.rejectedDataPoints),
-        1
-      );
+      assert.equal(deserializedResponse.partialSuccess.rejectedDataPoints, 1);
     });
 
     it('does not throw when deserializing an empty response', () => {

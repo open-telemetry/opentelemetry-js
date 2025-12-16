@@ -21,7 +21,3 @@ export const isPromiseLike = <R>(val: unknown): val is PromiseLike<R> => {
     typeof (val as Partial<PromiseLike<R>>).then === 'function'
   );
 };
-
-export function identity<T>(_: T): T {
-  return _;
-}

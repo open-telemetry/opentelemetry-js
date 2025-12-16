@@ -22,10 +22,16 @@ import { LogRecordImpl } from './LogRecordImpl';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 
 export class Logger implements logsAPI.Logger {
+  public readonly instrumentationScope: InstrumentationScope;
+  private _sharedState: LoggerProviderSharedState;
+
   constructor(
-    public readonly instrumentationScope: InstrumentationScope,
-    private _sharedState: LoggerProviderSharedState
-  ) {}
+    instrumentationScope: InstrumentationScope,
+    sharedState: LoggerProviderSharedState
+  ) {
+    this.instrumentationScope = instrumentationScope;
+    this._sharedState = sharedState;
+  }
 
   public emit(logRecord: logsAPI.LogRecord): void {
     const currentContext = logRecord.context || context.active();

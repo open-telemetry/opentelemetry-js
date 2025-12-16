@@ -14,9 +14,17 @@ export default {
   },
   resolve: {
     alias: {
-      // Webpack 4 doesn't support package.json exports field, so we need to manually map the browser-http subpath
+      // Webpack 4 doesn't support package.json exports field, so we need to manually map subpath exports
       '@opentelemetry/otlp-exporter-base/browser-http':
         '@opentelemetry/otlp-exporter-base/build/esm/index-browser-http.js',
+      // @bufbuild/protobuf subpath exports (used by @opentelemetry/otlp-transformer)
+      // These paths are compatible with @bufbuild/protobuf v2.x
+      '@bufbuild/protobuf/codegenv1':
+        '@bufbuild/protobuf/dist/esm/codegenv1/index.js',
+      '@bufbuild/protobuf/wkt': '@bufbuild/protobuf/dist/esm/wkt/index.js',
+      '@bufbuild/protobuf/wire': '@bufbuild/protobuf/dist/esm/wire/index.js',
+      '@bufbuild/protobuf/reflect':
+        '@bufbuild/protobuf/dist/esm/reflect/index.js',
     },
   },
   module: {
