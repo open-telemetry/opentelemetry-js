@@ -48,6 +48,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * refactor(otlp-transformer): migrate from protobufjs to protobuf-es [#6179](https://github.com/open-telemetry/opentelemetry-js/pull/6179) @overbalance
 * chore(otlp-transformer, sampler-composite): clean up tsconfig after protobuf-es migration [#6192](https://github.com/open-telemetry/opentelemetry-js/pull/6192) @overbalance
 * chore(instrumentation-grpc): use local protobuf-ts plugin instead of buf.build remote [#6202](https://github.com/open-telemetry/opentelemetry-js/pull/6202) @overbalance
+* fix(api-logs,sdk-logs): allow AnyValue attributes for logs and handle circular references [#XXXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXXX) @david-luna
+  * based on [#5765](https://github.com/open-telemetry/opentelemetry-js/pull/5765) from @alec2435
 
 ## 0.208.0
 
