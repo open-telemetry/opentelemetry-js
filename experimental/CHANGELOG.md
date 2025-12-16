@@ -46,6 +46,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * refactor(configuration): simplify boolean check [#6158](https://github.com/open-telemetry/opentelemetry-js/pull/6158) @cjihrig
 * chore: disallow constructor parameter property syntax [#6187](https://github.com/open-telemetry/opentelemetry-js/pull/6187) @legendecas
 * chore(instrumentation-grpc): use local protobuf-ts plugin instead of buf.build remote [#6202](https://github.com/open-telemetry/opentelemetry-js/pull/6202) @overbalance
+* test(otlp-transformer): add benchmark for ProtobufTraceSerializer [#6226](https://github.com/open-telemetry/opentelemetry-js/pull/6226) @overbalance
 
 ## 0.208.0
 
