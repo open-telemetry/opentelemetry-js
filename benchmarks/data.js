@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1765881240903,
+  "lastUpdate": 1765910574206,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -48556,6 +48556,93 @@ window.BENCHMARK_DATA = {
             "range": "±0.59%",
             "unit": "ops/sec",
             "extra": "93 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "overbalance@users.noreply.github.com",
+            "name": "Jared Freeze",
+            "username": "overbalance"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "4342ec9563df55e73c846d3dd95dd00fc10e67d9",
+          "message": "test(otlp-transformer): add benchmark for ProtobufTraceSerializer (#6226)",
+          "timestamp": "2025-12-16T18:35:14Z",
+          "tree_id": "828192b3833307f42b6cdd7cfc95f7756f795133",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/4342ec9563df55e73c846d3dd95dd00fc10e67d9"
+        },
+        "date": 1765910573099,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 696200,
+            "range": "±0.88%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8904,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "transform 100 spans to protobuf",
+            "value": 80.01,
+            "range": "±0.91%",
+            "unit": "ops/sec",
+            "extra": "68 samples"
+          },
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 1953819,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 1780296,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 1783471,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 1595678,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 290772,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 276089,
+            "range": "±0.70%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
