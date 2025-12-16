@@ -21,6 +21,11 @@ export enum SemconvStability {
   OLD = 0x2,
   /** Emit both stable and old semantic conventions. */
   DUPLICATE = 0x1 | 0x2,
+  /**
+   * Emit both stable and latest in-development semantic conventions.
+   * @experimental this flag is not yet supported by any semconv specification, and thus may change or be removed in the future.
+   */
+  LATEST_EXPERIMENTAL = 0x4 | 0x1,
 }
 
 // Common namespaces mentioned in semantic-conventions docs, but allow
@@ -90,12 +95,21 @@ export function semconvStabilityFromStr(
     .map(v => v.trim())
     .filter(s => s !== '');
   for (const entry of entries ?? []) {
-    if (entry.toLowerCase() === namespace + '/dup') {
-      // DUPLICATE takes highest precedence.
-      semconvStability = SemconvStability.DUPLICATE;
+    const normalizedEntry = entry.toLowerCase();
+    if (normalizedEntry === namespace + '_latest_exerimental') {
+      // LATEST_EXPERIMENTAL takes highest precedence, always set it.
+      semconvStability = SemconvStability.LATEST_EXPERIMENTAL;
+      // Highest precedence, no need to read the others.
       break;
-    } else if (entry.toLowerCase() === namespace) {
-      semconvStability = SemconvStability.STABLE;
+    } else if (normalizedEntry === namespace + '/dup') {
+      // DUPLICATE takes precedence over STABLE and OLD.
+      // Don't break here in case LATEST_EXPERIMENTAL appears later.
+      semconvStability = SemconvStability.DUPLICATE;
+    } else if (normalizedEntry === namespace) {
+      // Only set STABLE if we haven't already found DUPLICATE.
+      if (semconvStability === SemconvStability.OLD) {
+        semconvStability = SemconvStability.STABLE;
+      }
     }
   }
 

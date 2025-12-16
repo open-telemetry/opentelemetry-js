@@ -18,6 +18,38 @@ import { inspect } from 'util';
 import * as assert from 'assert';
 import { SemconvStability, semconvStabilityFromStr } from '../../src';
 
+describe('SemconvStability', function () {
+  it('should have correct bitwise flag values', function () {
+    // STABLE is 0x1
+    assert.strictEqual(SemconvStability.STABLE, 0x1);
+
+    // OLD is 0x2
+    assert.strictEqual(SemconvStability.OLD, 0x2);
+
+    // DUPLICATE is 0x3 (STABLE | OLD)
+    assert.strictEqual(SemconvStability.DUPLICATE, 0x3);
+    assert.strictEqual(
+      SemconvStability.DUPLICATE & SemconvStability.STABLE,
+      SemconvStability.STABLE
+    );
+    assert.strictEqual(
+      SemconvStability.DUPLICATE & SemconvStability.OLD,
+      SemconvStability.OLD
+    );
+
+    // LATEST_EXPERIMENTAL is 0x5 (0x4 | STABLE)
+    assert.strictEqual(SemconvStability.LATEST_EXPERIMENTAL, 0x5);
+    assert.strictEqual(
+      SemconvStability.LATEST_EXPERIMENTAL & SemconvStability.STABLE,
+      SemconvStability.STABLE
+    );
+    assert.strictEqual(
+      SemconvStability.LATEST_EXPERIMENTAL & SemconvStability.OLD,
+      0
+    );
+  });
+});
+
 describe('semconvStabilityFromStr', function () {
   const table = [
     { namespace: 'http', str: undefined, expected: SemconvStability.OLD },
@@ -72,6 +104,117 @@ describe('semconvStabilityFromStr', function () {
       namespace: 'database',
       str: 'just,bogus,values',
       expected: SemconvStability.OLD,
+    },
+
+    // LATEST_EXPERIMENTAL tests for http namespace
+    {
+      namespace: 'http',
+      str: 'http_latest_exerimental',
+      expected: SemconvStability.LATEST_EXPERIMENTAL,
+    },
+    {
+      namespace: 'http',
+      str: 'HTTP_latest_exerimental',
+      expected: SemconvStability.LATEST_EXPERIMENTAL,
+    },
+    {
+      namespace: 'http',
+      str: ', http_latest_exerimental,bar',
+      expected: SemconvStability.LATEST_EXPERIMENTAL,
+    },
+    {
+      namespace: 'http',
+      str: ', http_latest_exerimental\t ,blah',
+      expected: SemconvStability.LATEST_EXPERIMENTAL,
+    },
+    // LATEST_EXPERIMENTAL takes precedence over DUPLICATE
+    {
+      namespace: 'http',
+      str: 'http/dup,http_latest_exerimental',
+      expected: SemconvStability.LATEST_EXPERIMENTAL,
+    },
+    {
+      namespace: 'http',
+      str: 'http_latest_exerimental,http/dup',
+      expected: SemconvStability.LATEST_EXPERIMENTAL,
+    },
+    // LATEST_EXPERIMENTAL takes precedence over STABLE
+    {
+      namespace: 'http',
+      str: 'http,http_latest_exerimental',
+      expected: SemconvStability.LATEST_EXPERIMENTAL,
+    },
+    {
+      namespace: 'http',
+      str: 'http_latest_exerimental,http',
+      expected: SemconvStability.LATEST_EXPERIMENTAL,
+    },
+
+    // LATEST_EXPERIMENTAL tests for database namespace
+    {
+      namespace: 'database',
+      str: 'database_latest_exerimental',
+      expected: SemconvStability.LATEST_EXPERIMENTAL,
+    },
+    {
+      namespace: 'database',
+      str: 'DATABASE_latest_exerimental',
+      expected: SemconvStability.LATEST_EXPERIMENTAL,
+    },
+    {
+      namespace: 'database',
+      str: ', database_latest_exerimental,bar',
+      expected: SemconvStability.LATEST_EXPERIMENTAL,
+    },
+    {
+      namespace: 'database',
+      str: ', database_latest_exerimental\t ,blah',
+      expected: SemconvStability.LATEST_EXPERIMENTAL,
+    },
+    // LATEST_EXPERIMENTAL takes precedence over DUPLICATE
+    {
+      namespace: 'database',
+      str: 'database/dup,database_latest_exerimental',
+      expected: SemconvStability.LATEST_EXPERIMENTAL,
+    },
+    {
+      namespace: 'database',
+      str: 'database_latest_exerimental,database/dup',
+      expected: SemconvStability.LATEST_EXPERIMENTAL,
+    },
+    // LATEST_EXPERIMENTAL takes precedence over STABLE
+    {
+      namespace: 'database',
+      str: 'database,database_latest_exerimental',
+      expected: SemconvStability.LATEST_EXPERIMENTAL,
+    },
+    {
+      namespace: 'database',
+      str: 'database_latest_exerimental,database',
+      expected: SemconvStability.LATEST_EXPERIMENTAL,
+    },
+
+    // Namespace isolation: http_latest_exerimental doesn't affect database namespace
+    {
+      namespace: 'database',
+      str: 'http_latest_exerimental',
+      expected: SemconvStability.OLD,
+    },
+    {
+      namespace: 'http',
+      str: 'database_latest_exerimental',
+      expected: SemconvStability.OLD,
+    },
+    // Mixed namespaces: only the matching namespace applies
+    {
+      namespace: 'http',
+      str: 'database,http_latest_exerimental',
+      expected: SemconvStability.LATEST_EXPERIMENTAL,
+    },
+    {
+      namespace: 'database',
+      str: 'http_latest_exerimental,database/dup',
+      expected: SemconvStability.DUPLICATE,
     },
   ];
   for (const { namespace, str, expected } of table) {
