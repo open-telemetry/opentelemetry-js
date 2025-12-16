@@ -49,7 +49,7 @@ export class ConsoleMetricExporter implements PushMetricExporter {
   ): void {
     if (this._shutdown) {
       // If the exporter is shutting down, by spec, we need to return FAILED as export result
-      setImmediate(resultCallback, { code: ExportResultCode.FAILED });
+      resultCallback({ code: ExportResultCode.FAILED });
       return;
     }
 
