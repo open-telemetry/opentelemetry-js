@@ -10,28 +10,6 @@
   "esnext": "build/esnext/index.js",
   "types": "build/src/index.d.ts",
   "main": "build/src/index.js",
-  "exports": {
-    ".": {
-      "types": "./build/src/index.d.ts",
-      "import": "./build/esm/index.js",
-      "require": "./build/src/index.js"
-    },
-    "./trace": {
-      "types": "./build/src/trace/index.d.ts",
-      "import": "./build/esm/trace/index.js",
-      "require": "./build/src/trace/index.js"
-    },
-    "./logs": {
-      "types": "./build/src/logs/index.d.ts",
-      "import": "./build/esm/logs/index.js",
-      "require": "./build/src/logs/index.js"
-    },
-    "./metrics": {
-      "types": "./build/src/metrics/index.d.ts",
-      "import": "./build/esm/metrics/index.js",
-      "require": "./build/src/metrics/index.js"
-    }
-  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",

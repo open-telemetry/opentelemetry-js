@@ -19,6 +19,3 @@ export type {
   IExportMetricsPartialSuccess,
   IExportMetricsServiceResponse,
 } from './export-response';
-
-export { JsonMetricsSerializer } from './json';
-export { ProtobufMetricsSerializer } from './protobuf';
