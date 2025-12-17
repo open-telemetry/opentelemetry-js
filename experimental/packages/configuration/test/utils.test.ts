@@ -26,6 +26,8 @@ import {
   getStringFromConfigFile,
   getStringListFromConfigFile,
 } from '../src/utils';
+import { initializeDefaultConfiguration } from '../src/models/configModel';
+import { EnvironmentConfigFactory } from '../src/EnvironmentConfigFactory';
 
 describe('config utils', function () {
   afterEach(function () {
@@ -188,5 +190,19 @@ describe('config utils', function () {
         'http://localhost:4318/v1/traces'
       );
     });
+  });
+
+  it('should set propagators from OTEL_PROPAGATORS when defined', () => {
+
+    const factory = new EnvironmentConfigFactory();
+    const config = factory.getConfigModel();
+
+    assert.strictEqual(config.propagator, 'propagator should be defined');
+    assert.strictEqual(
+      config.propagator.composite_list,
+      'tracecontext,baggage'
+    );
+
+    delete process.env.OTEL_PROPAGATORS;
   });
 });
