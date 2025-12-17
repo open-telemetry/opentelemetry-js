@@ -31,6 +31,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * refactor(sdk-metrics): simplify AllowList and DenyList processors [#6159](https://github.com/open-telemetry/opentelemetry-js/pull/6159) @cjihrig
 * chore: disallow constructor parameter property syntax [#6187](https://github.com/open-telemetry/opentelemetry-js/pull/6187) @legendecas
 * refactor(sdk-metrics): use test() instead of match() in isValidName() [#6205](https://github.com/open-telemetry/opentelemetry-js/pull/6205) @cjihrig
+* chore(deps): update nx to 22.3.0 [#6233](https://github.com/open-telemetry/opentelemetry-js/pull/6233) @overbalance
 
 ## 2.2.0
 
