@@ -66,7 +66,9 @@ describe('OTLPLogExporter', function () {
 
       it('should successfully send data using fetch', async function () {
         // arrange
-        const stubFetch = sinon.stub(window, 'fetch');
+        const stubFetch = sinon
+          .stub(window, 'fetch')
+          .resolves(new Response('', { status: 200 }));
         const loggerProvider = new LoggerProvider({
           processors: [new SimpleLogRecordProcessor(new OTLPLogExporter())],
         });
