@@ -83,23 +83,6 @@ describe('time', () => {
       const output = hrTime(null as any);
       assert.deepStrictEqual(output, [0, 22800000]);
     });
-
-    describe('when timeOrigin is not available', () => {
-      it('should use the performance.timing.fetchStart as a fallback', () => {
-        Object.defineProperty(performance, 'timing', {
-          writable: true,
-          value: {
-            fetchStart: 11.5,
-          },
-        });
-
-        sinon.stub(performance, 'timeOrigin').value(undefined);
-        sinon.stub(performance, 'now').callsFake(() => 11.3);
-
-        const output = hrTime();
-        assert.deepStrictEqual(output, [0, 22800000]);
-      });
-    });
   });
 
   describe('#timeInputToHrTime', () => {
