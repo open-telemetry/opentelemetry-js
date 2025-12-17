@@ -14,6 +14,25 @@
  * limitations under the License.
  */
 
-require('./span');
-require('./BatchSpanProcessor');
-require('./RandomIdGenerator');
+const Benchmark = require('benchmark');
+const {
+  RandomIdGenerator,
+} = require('../../../build/src/platform/browser/RandomIdGenerator');
+
+const idGenerator = new RandomIdGenerator();
+
+const suite = new Benchmark.Suite();
+
+suite.on('cycle', event => {
+  console.log(String(event.target));
+});
+
+suite.add('generateTraceId', function () {
+  idGenerator.generateTraceId();
+});
+
+suite.add('generateSpanId', function () {
+  idGenerator.generateSpanId();
+});
+
+suite.run();
