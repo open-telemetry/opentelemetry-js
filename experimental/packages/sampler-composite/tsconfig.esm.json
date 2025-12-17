@@ -1,6 +1,7 @@
 {
   "extends": "../../../tsconfig.base.esm.json",
   "compilerOptions": {
+    "allowJs": true,
     "outDir": "build/esm",
     "rootDir": "src",
     "tsBuildInfoFile": "build/esm/tsconfig.esm.tsbuildinfo"
