@@ -193,6 +193,7 @@ describe('config utils', function () {
   });
 
   it('should set propagators from OTEL_PROPAGATORS when defined', () => {
+    process.env.OTEL_PROPAGATORS = 'tracecontext,baggage';
 
     const factory = new EnvironmentConfigFactory();
     const config = factory.getConfigModel();
