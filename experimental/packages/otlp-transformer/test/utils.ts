@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-export interface ExportResponseSuccess {
-  status: 'success';
-  data?: Uint8Array;
-}
+import { hexToBinary } from '../src/common/hex-to-binary';
 
-export interface ExportResponseFailure {
-  status: 'failure';
-  error: Error;
-}
+/**
+ * utility function to convert a string representing a hex value to a base64 string
+ * that represents the bytes of that hex value. This is needed as we need to support Node.js 14
+ * where btoa() does not exist, and the Browser, where Buffer does not exist.
+ * @param hexStr
+ */
+export function toBase64(hexStr: string) {
+  if (typeof btoa !== 'undefined') {
+    const decoder = new TextDecoder('utf8');
+    return btoa(decoder.decode(hexToBinary(hexStr)));
+  }
 
-export interface ExportResponseRetryable {
-  status: 'retryable';
-  retryInMillis?: number;
-  error?: Error;
+  return Buffer.from(hexToBinary(hexStr)).toString('base64');
 }
-
-export type ExportResponse =
-  | ExportResponseSuccess
-  | ExportResponseFailure
-  | ExportResponseRetryable;

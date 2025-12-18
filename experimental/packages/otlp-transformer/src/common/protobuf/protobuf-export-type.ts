@@ -14,23 +14,9 @@
  * limitations under the License.
  */
 
-export interface ExportResponseSuccess {
-  status: 'success';
-  data?: Uint8Array;
-}
+import * as protobuf from 'protobufjs';
 
-export interface ExportResponseFailure {
-  status: 'failure';
-  error: Error;
+export interface ExportType<T, R = T & { toJSON: () => unknown }> {
+  encode(message: T, writer?: protobuf.Writer): protobuf.Writer;
+  decode(reader: protobuf.Reader | Uint8Array, length?: number): R;
 }
-
-export interface ExportResponseRetryable {
-  status: 'retryable';
-  retryInMillis?: number;
-  error?: Error;
-}
-
-export type ExportResponse =
-  | ExportResponseSuccess
-  | ExportResponseFailure
-  | ExportResponseRetryable;

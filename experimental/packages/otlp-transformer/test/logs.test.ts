@@ -19,12 +19,8 @@ import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
-import { hexToBase64 } from '../src/common/utils';
-import { fromBinary, toBinary, create, toJson } from '@bufbuild/protobuf';
-import {
-  ExportLogsServiceRequestSchema,
-  ExportLogsServiceResponseSchema,
-} from '../src/generated/opentelemetry/proto/collector/logs/v1/logs_service_pb';
+import { toBase64 } from './utils';
+import * as root from '../src/generated/root';
 import { OtlpEncodingOptions } from '../src/common/internal-types';
 import {
   ESeverityNumber,
@@ -101,15 +97,9 @@ function createExpectedLogJson(
   };
 }
 
-// Returns untyped object for JSON comparison (toJson output differs from typed interface)
-function createExpectedLogProtobuf(): unknown {
-  // protobuf JSON format uses base64 for bytes
-  const traceId = hexToBase64('00000000000000000000000000000001');
-  const spanId = hexToBase64('0000000000000002');
-
-  // protobuf JSON format uses string representation for 64-bit integers
-  const timeUnixNano = '1680253513123241635';
-  const observedTimeUnixNano = '1683526948965142784';
+function createExpectedLogProtobuf(): IExportLogsServiceRequest {
+  const traceId = toBase64('00000000000000000000000000000001');
+  const spanId = toBase64('0000000000000002');
 
   return {
     resourceLogs: [
@@ -121,16 +111,16 @@ function createExpectedLogProtobuf(): unknown {
               value: { stringValue: 'some attribute value' },
             },
           ],
+          droppedAttributesCount: 0,
         },
         scopeLogs: [
           {
             scope: { name: 'scope_name_1', version: '0.1.0' },
             logRecords: [
               {
-                timeUnixNano: timeUnixNano,
-                observedTimeUnixNano: observedTimeUnixNano,
-                // protobuf-es toJson outputs enums as strings
-                severityNumber: 'SEVERITY_NUMBER_ERROR',
+                timeUnixNano: 1680253513123241700,
+                observedTimeUnixNano: 1683526948965142800,
+                severityNumber: ESeverityNumber.SEVERITY_NUMBER_ERROR,
                 severityText: 'error',
                 body: { stringValue: 'some_log_body' },
                 eventName: 'some.event.name',
@@ -140,6 +130,7 @@ function createExpectedLogProtobuf(): unknown {
                     value: { stringValue: 'some attribute value' },
                   },
                 ],
+                droppedAttributesCount: 0,
                 flags: 1,
                 traceId: traceId,
                 spanId: spanId,
@@ -334,34 +325,39 @@ describe('Logs', () => {
     it('serializes an export request', () => {
       const serialized = ProtobufLogsSerializer.serializeRequest([log_1_1_1]);
       assert.ok(serialized, 'serialized response is undefined');
-      const decoded = fromBinary(ExportLogsServiceRequestSchema, serialized);
-      const expected = createExpectedLogProtobuf();
-      // toJson converts to protobuf JSON format (strings for 64-bit ints, base64 for bytes)
-      const decodedJson = toJson(ExportLogsServiceRequestSchema, decoded);
-      assert.deepStrictEqual(decodedJson, expected);
-    });
+      const decoded =
+        root.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest.decode(
+          serialized
+        );
 
-    it('serializes an empty request', () => {
-      const serialized = ProtobufLogsSerializer.serializeRequest([]);
-      assert.ok(serialized, 'serialized response is undefined');
-      const decoded = fromBinary(ExportLogsServiceRequestSchema, serialized);
-      assert.deepStrictEqual(
-        toJson(ExportLogsServiceRequestSchema, decoded),
-        {}
-      );
+      const expected = createExpectedLogProtobuf();
+      const decodedObj =
+        root.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest.toObject(
+          decoded,
+          {
+            // This incurs some precision loss that's taken into account in createExpectedLogsProtobuf()
+            // Using String here will incur the same precision loss on browser only, using Number to prevent having to
+            // have different assertions for browser and Node.js
+            longs: Number,
+            // Convert to String (Base64) as otherwise the type will be different for Node.js (Buffer) and Browser (Uint8Array)
+            // and this fails assertions.
+            bytes: String,
+          }
+        );
+
+      assert.deepStrictEqual(decodedObj, expected);
     });
 
     it('deserializes a response', () => {
-      const response = create(ExportLogsServiceResponseSchema, {
-        partialSuccess: {
-          errorMessage: 'foo',
-          rejectedLogRecords: BigInt(1),
-        },
-      });
-      const protobufSerializedResponse = toBinary(
-        ExportLogsServiceResponseSchema,
-        response
-      );
+      const protobufSerializedResponse =
+        root.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse.encode(
+          {
+            partialSuccess: {
+              errorMessage: 'foo',
+              rejectedLogRecords: 1,
+            },
+          }
+        ).finish();
 
       const deserializedResponse = ProtobufLogsSerializer.deserializeResponse(
         protobufSerializedResponse
@@ -372,7 +368,10 @@ describe('Logs', () => {
         'partialSuccess not present in the deserialized message'
       );
       assert.equal(deserializedResponse.partialSuccess.errorMessage, 'foo');
-      assert.equal(deserializedResponse.partialSuccess.rejectedLogRecords, 1);
+      assert.equal(
+        Number(deserializedResponse.partialSuccess.rejectedLogRecords),
+        1
+      );
     });
 
     it('does not throw when deserializing an empty response', () => {

@@ -1,8 +1,9 @@
 {
-  "extends": "../../../tsconfig.base.es5.json",
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": ".",
-    "outDir": "build"
+    "outDir": "build",
+    "typeRoots": ["./node_modules/@types"]
   },
   "include": [
     "index.ts"

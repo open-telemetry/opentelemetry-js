@@ -5,7 +5,7 @@
   "description": "Backwards compatibility app for node 16 types and the OpenTelemetry Node.js SDK",
   "main": "index.js",
   "scripts": {
-    "test:backcompat": "tsc --noEmit index.ts && tsc --noEmit --esModuleInterop index.ts",
+    "test:backcompat": "tsc -p . --noEmit && tsc -p . --noEmit --esModuleInterop",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },

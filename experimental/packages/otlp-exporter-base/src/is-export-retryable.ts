@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export function isExportRetryable(statusCode: number): boolean {
+export function isExportHTTPErrorRetryable(statusCode: number): boolean {
   const retryCodes = [429, 502, 503, 504];
   return retryCodes.includes(statusCode);
 }
