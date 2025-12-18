@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1766066931494,
+  "lastUpdate": 1766067055603,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -48991,6 +48991,93 @@ window.BENCHMARK_DATA = {
             "range": "±0.61%",
             "unit": "ops/sec",
             "extra": "93 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "overbalance@users.noreply.github.com",
+            "name": "Jared Freeze",
+            "username": "overbalance"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "f9c995d424148cb5afdd37eadbeb04e68ae3cabb",
+          "message": "chore(backcompat): fix backcompat tests and tsconfig cleanup (#6232)",
+          "timestamp": "2025-12-18T13:52:41Z",
+          "tree_id": "f9d92e7f1e3c0ec8b180a7a94f1e749afd3e04f9",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/f9c995d424148cb5afdd37eadbeb04e68ae3cabb"
+        },
+        "date": 1766067054563,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 672983,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8454,
+            "range": "±0.74%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans to protobuf",
+            "value": 1147,
+            "range": "±0.46%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 1971190,
+            "range": "±0.66%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 1783430,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 1739464,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 1580079,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 296544,
+            "range": "±0.81%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 284129,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
