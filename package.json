@@ -15,7 +15,6 @@
     "test:bundle": "nx run-many -t test:bundle",
     "test:browser": "nx run-many -t test:browser",
     "test:webworker": "nx run-many -t test:webworker",
-    "test:backcompat": "nx run-many -t test:backcompat",
     "test:bench": "nx run-many -t test:bench",
     "predocs-test": "npm run docs",
     "docs": "typedoc --readme none && touch docs/.nojekyll",
