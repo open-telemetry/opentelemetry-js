@@ -16,7 +16,6 @@
 
 import * as api from '@opentelemetry/api';
 import { otperformance as performance } from '../platform';
-import { TimeOriginLegacy } from './types';
 
 const NANOSECOND_DIGITS = 9;
 const NANOSECOND_DIGITS_IN_MILLIS = 6;
@@ -36,13 +35,11 @@ export function millisToHrTime(epochMillis: number): api.HrTime {
   return [seconds, nanos];
 }
 
+/**
+ * @deprecated Use `performance.timeOrigin` directly.
+ */
 export function getTimeOrigin(): number {
-  let timeOrigin = performance.timeOrigin;
-  if (typeof timeOrigin !== 'number') {
-    const perf: TimeOriginLegacy = performance as unknown as TimeOriginLegacy;
-    timeOrigin = perf.timing && perf.timing.fetchStart;
-  }
-  return timeOrigin;
+  return performance.timeOrigin;
 }
 
 /**
@@ -50,7 +47,7 @@ export function getTimeOrigin(): number {
  * @param performanceNow
  */
 export function hrTime(performanceNow?: number): api.HrTime {
-  const timeOrigin = millisToHrTime(getTimeOrigin());
+  const timeOrigin = millisToHrTime(performance.timeOrigin);
   const now = millisToHrTime(
     typeof performanceNow === 'number' ? performanceNow : performance.now()
   );
@@ -69,7 +66,7 @@ export function timeInputToHrTime(time: api.TimeInput): api.HrTime {
     return time as api.HrTime;
   } else if (typeof time === 'number') {
     // Must be a performance.now() if it's smaller than process start time.
-    if (time < getTimeOrigin()) {
+    if (time < performance.timeOrigin) {
       return hrTime(time);
     } else {
       // epoch milliseconds or performance.timeOrigin
