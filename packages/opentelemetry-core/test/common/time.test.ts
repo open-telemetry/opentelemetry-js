@@ -19,6 +19,7 @@ import { otperformance as performance } from '../../src/platform';
 import * as sinon from 'sinon';
 import * as api from '@opentelemetry/api';
 import {
+  getTimeOrigin,
   hrTime,
   timeInputToHrTime,
   hrTimeDuration,
@@ -33,6 +34,13 @@ import {
 describe('time', () => {
   afterEach(() => {
     sinon.restore();
+  });
+
+  describe('#getTimeOrigin', () => {
+    it('should return performance.timeOrigin', () => {
+      sinon.stub(performance, 'timeOrigin').value(1234567890.123);
+      assert.strictEqual(getTimeOrigin(), 1234567890.123);
+    });
   });
 
   describe('#hrTime', () => {
