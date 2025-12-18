@@ -32,7 +32,7 @@ import {
   ISpan,
 } from './internal-types';
 import { OtlpEncodingOptions } from '../common/internal-types';
-import { getOtlpEncoder, isOtlpEncoder } from '../common/utils';
+import { getOtlpEncoder } from '../common/utils';
 
 // Span flags constants matching the OTLP specification
 const SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK = 0x100;
@@ -109,9 +109,9 @@ export function toOtlpSpanEvent(
 
 export function createExportTraceServiceRequest(
   spans: ReadableSpan[],
-  options?: OtlpEncodingOptions | Encoder
+  options?: OtlpEncodingOptions
 ): IExportTraceServiceRequest {
-  const encoder = isOtlpEncoder(options) ? options : getOtlpEncoder(options);
+  const encoder = getOtlpEncoder(options);
   return {
     resourceSpans: spanRecordsToResourceSpans(spans, encoder),
   };
