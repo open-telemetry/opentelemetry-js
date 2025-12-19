@@ -51,6 +51,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * chore(backcompat): fix backcompat tests and tsconfig cleanup [#6232](https://github.com/open-telemetry/opentelemetry-js/pull/6232) @overbalance
 * refactor(instrumentation-http): refactor getIncomingRequestAttributes() to reduce work [#6207](https://github.com/open-telemetry/opentelemetry-js/pull/6207) @cjihrig
 * refactor(api-logs,instrumentation-fetch): remove platform-specific globalThis, use globalThis directly [#6208](https://github.com/open-telemetry/opentelemetry-js/pull/6208) @overbalance
+* test(otlp-transformer): remove obsolete compat code from toBase64() [#xxxx](https://github.com/open-telemetry/opentelemetry-js/pull/xxxx) @cjihrig
 
 ## 0.208.0
 
