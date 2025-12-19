@@ -114,7 +114,6 @@
     "e2e-tests",
     "experimental/packages/*",
     "experimental/examples/*",
-    "experimental/backwards-compatibility/*",
     "integration-tests/*",
     "examples/otlp-exporter-node",
     "examples/opentelemetry-web",
