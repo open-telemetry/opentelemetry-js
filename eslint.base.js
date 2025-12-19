@@ -64,6 +64,7 @@ module.exports = {
         "projectService": true
       },
       rules: {
+        "no-console": "warn",
         "no-empty": "off",
         "@typescript-eslint/ban-ts-ignore": "off",
         "@typescript-eslint/no-unsafe-function-type": ["warn"],
