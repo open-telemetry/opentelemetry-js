@@ -27,7 +27,7 @@ const GLOBAL_OPENTELEMETRY_API_KEY = Symbol.for(
   `opentelemetry.js.api.${major}`
 );
 
-export const _global = globalThis as OTelGlobal;
+const _global = globalThis as OTelGlobal;
 
 export function registerGlobal<Type extends keyof OTelGlobalAPI>(
   type: Type,
