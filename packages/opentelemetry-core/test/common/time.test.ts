@@ -19,6 +19,7 @@ import { otperformance as performance } from '../../src/platform';
 import * as sinon from 'sinon';
 import * as api from '@opentelemetry/api';
 import {
+  getTimeOrigin,
   hrTime,
   timeInputToHrTime,
   hrTimeDuration,
@@ -33,6 +34,13 @@ import {
 describe('time', () => {
   afterEach(() => {
     sinon.restore();
+  });
+
+  describe('#getTimeOrigin', () => {
+    it('should return performance.timeOrigin', () => {
+      sinon.stub(performance, 'timeOrigin').value(1234567890.123);
+      assert.strictEqual(getTimeOrigin(), 1234567890.123);
+    });
   });
 
   describe('#hrTime', () => {
@@ -82,23 +90,6 @@ describe('time', () => {
 
       const output = hrTime(null as any);
       assert.deepStrictEqual(output, [0, 22800000]);
-    });
-
-    describe('when timeOrigin is not available', () => {
-      it('should use the performance.timing.fetchStart as a fallback', () => {
-        Object.defineProperty(performance, 'timing', {
-          writable: true,
-          value: {
-            fetchStart: 11.5,
-          },
-        });
-
-        sinon.stub(performance, 'timeOrigin').value(undefined);
-        sinon.stub(performance, 'now').callsFake(() => 11.3);
-
-        const output = hrTime();
-        assert.deepStrictEqual(output, [0, 22800000]);
-      });
     });
   });
 
