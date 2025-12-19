@@ -17,7 +17,6 @@
 import { MeterProvider } from '../metrics/MeterProvider';
 import { ContextManager } from '../context/types';
 import { DiagLogger } from '../diag/types';
-import { _globalThis } from '../platform';
 import { TextMapPropagator } from '../propagation/TextMapPropagator';
 import type { TracerProvider } from '../trace/tracer_provider';
 import { VERSION } from '../version';
@@ -28,7 +27,7 @@ const GLOBAL_OPENTELEMETRY_API_KEY = Symbol.for(
   `opentelemetry.js.api.${major}`
 );
 
-const _global = _globalThis as OTelGlobal;
+export const _global = globalThis as OTelGlobal;
 
 export function registerGlobal<Type extends keyof OTelGlobalAPI>(
   type: Type,

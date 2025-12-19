@@ -59,7 +59,6 @@ import {
   serverPortFromUrl,
 } from './utils';
 import { VERSION } from './version';
-import { _globalThis } from '@opentelemetry/core';
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
@@ -658,10 +657,10 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       return;
     }
     if (isWrapped(fetch)) {
-      this._unwrap(_globalThis, 'fetch');
+      this._unwrap(globalThis, 'fetch');
       this._diag.debug('removing previous patch for constructor');
     }
-    this._wrap(_globalThis, 'fetch', this._patchConstructor());
+    this._wrap(globalThis, 'fetch', this._patchConstructor());
   }
 
   /**
@@ -671,7 +670,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     if (!hasBrowserPerformanceAPI) {
       return;
     }
-    this._unwrap(_globalThis, 'fetch');
+    this._unwrap(globalThis, 'fetch');
     this._usedResources = new WeakSet<PerformanceResourceTiming>();
   }
 }
