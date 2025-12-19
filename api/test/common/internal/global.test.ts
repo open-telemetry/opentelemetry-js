@@ -17,7 +17,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { getGlobal } from '../../../src/internal/global-utils';
-import { _globalThis } from '../../../src/platform';
 import { NoopContextManager } from '../../../src/context/NoopContextManager';
 import { DiagLogLevel } from '../../../src/diag/types';
 
@@ -56,7 +55,7 @@ describe('Global Utils', function () {
     api1.trace.disable();
     api1.diag.disable();
     // @ts-expect-error we are modifying internals for testing purposes here
-    delete _globalThis[Symbol.for(GLOBAL_API_SYMBOL_KEY)];
+    delete globalThis[Symbol.for(GLOBAL_API_SYMBOL_KEY)];
   });
 
   it('should change the global context manager', function () {
@@ -92,7 +91,7 @@ describe('Global Utils', function () {
     const globalInstance = getGlobal('diag');
     assert.ok(globalInstance);
     // @ts-expect-error we are modifying internals for testing purposes here
-    _globalThis[Symbol.for(GLOBAL_API_SYMBOL_KEY)].version = '0.0.1';
+    globalThis[Symbol.for(GLOBAL_API_SYMBOL_KEY)].version = '0.0.1';
 
     assert.equal(false, api1.diag.setLogger(logger2)); // won't happen
 
