@@ -39,9 +39,9 @@ module.exports = {
       process: 'process/browser.js'
     }),
     // Benchmark.js checks for AMD's define function which doesn't exist in webpack.
-    // NOTE: This pollutes tests with a defined 'window.define' global.
+    // NOTE: This pollutes tests with a defined 'self.define' global.
     new webpack.BannerPlugin({
-      banner: 'window.define = window.define || Object.assign(function(){}, {amd: false});',
+      banner: 'self.define = self.define || Object.assign(function(){}, {amd: false});',
       raw: true
     })
   ],
