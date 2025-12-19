@@ -29,16 +29,19 @@ for (const line of lines) {
   if (parsed.resourceSpans) {
     console.log('found span');
     verifySpan(parsed.resourceSpans[0].scopeSpans[0].spans[0]);
+    verifyResource(parsed.resourceSpans[0].resource);
     verifiedSpan = true;
   }
   if (parsed.resourceMetrics) {
     console.log('found metric');
     verifyMetric(parsed.resourceMetrics[0].scopeMetrics[0].metrics[0]);
+    verifyResource(parsed.resourceMetrics[0].resource);
     verifiedMetric = true;
   }
   if (parsed.resourceLogs) {
     console.log('found log');
     verifyLog(parsed.resourceLogs[0].scopeLogs[0].logRecords[0]);
+    verifyResource(parsed.resourceLogs[0].resource);
     verifiedLog = true;
   }
 }
@@ -54,6 +57,29 @@ if (!verifiedMetric) {
 if (!verifiedLog) {
   console.error('No logs found in the output');
   process.exit(1);
+}
+
+function verifyResource(resource) {
+  if (!resource || !resource.attributes) {
+    console.error('Resource attributes are missing');
+    process.exit(1);
+  }
+  const name = resource.attributes.find(attr => attr.key === 'service.name');
+  if (!name || name.value.stringValue !== 'example-service') {
+    console.error(
+      `Expected service.name to be 'example-service', but got '${name?.value.stringValue}'`
+    );
+    process.exit(1);
+  }
+  const version = resource.attributes.find(
+    attr => attr.key === 'service.version'
+  );
+  if (!version || version.value.stringValue !== '1.0.0') {
+    console.error(
+      `Expected service.version to be '1.0.0', but got '${version?.value.stringValue}'`
+    );
+    process.exit(1);
+  }
 }
 
 function verifySpan(span) {
