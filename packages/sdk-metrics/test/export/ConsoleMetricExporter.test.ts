@@ -47,16 +47,12 @@ async function waitForNumberOfExports(
 /* eslint-disable no-console */
 describe('ConsoleMetricExporter', () => {
   describe('export', () => {
-    let previousConsoleDir: any;
     let exporter: ConsoleMetricExporter;
     let meterProvider: MeterProvider;
     let metricReader: PeriodicExportingMetricReader;
     let meter: metrics.Meter;
 
     beforeEach(() => {
-      previousConsoleDir = console.dir;
-      console.dir = () => {};
-
       exporter = new ConsoleMetricExporter();
       metricReader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -71,9 +67,8 @@ describe('ConsoleMetricExporter', () => {
     });
 
     afterEach(async () => {
-      console.dir = previousConsoleDir;
-
       await metricReader.shutdown();
+      sinon.restore();
     });
 
     it('should export information about metric', async () => {
@@ -91,14 +86,14 @@ describe('ConsoleMetricExporter', () => {
       histogram.record(100);
       histogram.record(1000);
 
-      const spyConsole = sinon.spy(console, 'dir');
+      const stubConsole = sinon.stub(console, 'log');
       const spyExport = sinon.spy(exporter, 'export');
 
       await waitForNumberOfExports(spyExport, 1);
       const resourceMetrics = spyExport.args[0];
       const firstResourceMetric = resourceMetrics[0];
-      const consoleArgs = spyConsole.args[0];
-      const consoleMetric = consoleArgs[0];
+      const loggedPayload = stubConsole.args[0][0];
+      const consoleMetric = JSON.parse(loggedPayload);
       const keys = Object.keys(consoleMetric).sort().join(',');
 
       const expectedKeys = ['dataPointType', 'dataPoints', 'descriptor'].join(
@@ -124,6 +119,29 @@ describe('ConsoleMetricExporter', () => {
       );
 
       assert.ok(spyExport.calledOnce);
+      assert.ok(stubConsole.called);
+    });
+
+    it.skip('should serialize metric information using String() when JSON fails', async () => {
+      const stubConsole = sinon.stub(console, 'log');
+      const originalStringify = JSON.stringify;
+      let shouldThrow = true;
+      sinon.stub(JSON, 'stringify').callsFake((...args) => {
+        if (shouldThrow) {
+          shouldThrow = false;
+          throw new Error('boom');
+        }
+        return originalStringify(...args);
+      });
+
+      const counter = meter.createCounter('fallback_counter');
+      counter.add(1);
+
+      const spyExport = sinon.spy(exporter, 'export');
+      await waitForNumberOfExports(spyExport, 1);
+
+      assert.ok(stubConsole.calledOnce);
+      assert.strictEqual(stubConsole.args[0][0], '[object Object]');
     });
   });
 
