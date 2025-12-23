@@ -52,7 +52,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * refactor(instrumentation-http): refactor getIncomingRequestAttributes() to reduce work [#6207](https://github.com/open-telemetry/opentelemetry-js/pull/6207) @cjihrig
 * refactor(api-logs,instrumentation-fetch): remove platform-specific globalThis, use globalThis directly [#6208](https://github.com/open-telemetry/opentelemetry-js/pull/6208) @overbalance
 * test(otlp-transformer): remove obsolete compat code from toBase64() [#6242](https://github.com/open-telemetry/opentelemetry-js/pull/6242) @cjihrig
-* refactor(otlp-exporter-base): simplify isExportHTTPErrorRetryable() [#xxxx](https://github.com/open-telemetry/opentelemetry-js/pull/xxxx) @cjihrig
+* refactor(otlp-exporter-base): simplify isExportHTTPErrorRetryable() [#6249](https://github.com/open-telemetry/opentelemetry-js/pull/6249) @cjihrig
 
 ## 0.208.0
 
