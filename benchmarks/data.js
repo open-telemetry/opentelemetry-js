@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1766495379609,
+  "lastUpdate": 1766696399540,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -49861,6 +49861,93 @@ window.BENCHMARK_DATA = {
             "range": "±0.71%",
             "unit": "ops/sec",
             "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "47067795+JacksonWeber@users.noreply.github.com",
+            "name": "Jackson Weber",
+            "username": "JacksonWeber"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f9a5c3608c79f7579104c110e38b6932e6d13de5",
+          "message": "feat(sdk-logs): Add Logger Configurator API & Trace-based + Min-Severity Filtering (#5991)",
+          "timestamp": "2025-12-25T20:52:13Z",
+          "tree_id": "d045be713d61aa8caf3408b683b9efba684fc2b9",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/f9a5c3608c79f7579104c110e38b6932e6d13de5"
+        },
+        "date": 1766696398504,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 693219,
+            "range": "±0.91%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8444,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans to protobuf",
+            "value": 1115,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 1955261,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 1755841,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 1742592,
+            "range": "±0.46%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 1576809,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 309065,
+            "range": "±0.68%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 302592,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
           }
         ]
       }
