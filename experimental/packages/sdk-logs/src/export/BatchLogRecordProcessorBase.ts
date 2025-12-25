@@ -133,16 +133,12 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
     if (this._finishedLogRecords.length === 0) {
       return Promise.resolve();
     }
-    return new Promise((resolve, reject) => {
-      callWithTimeout(
-        this._export(
-          this._finishedLogRecords.splice(0, this._maxExportBatchSize)
-        ),
-        this._exportTimeoutMillis
-      )
-        .then(() => resolve())
-        .catch(reject);
-    });
+    return callWithTimeout(
+      this._export(
+        this._finishedLogRecords.splice(0, this._maxExportBatchSize)
+      ),
+      this._exportTimeoutMillis
+    );
   }
 
   private _maybeStartTimer() {
