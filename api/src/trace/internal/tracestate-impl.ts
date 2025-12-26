@@ -60,20 +60,23 @@ export class TraceStateImpl implements TraceState {
   }
 
   serialize(): string {
-    return this._keys()
-      .reduce((agg: string[], key) => {
-        agg.push(key + LIST_MEMBER_KEY_VALUE_SPLITTER + this.get(key));
-        return agg;
-      }, [])
-      .join(LIST_MEMBERS_SEPARATOR);
+    return (
+      Array.from(this._internalState.keys())
+        // Use reduceRight() because keys are stored in reverse insertion order.
+        .reduceRight((agg: string[], key) => {
+          agg.push(key + LIST_MEMBER_KEY_VALUE_SPLITTER + this.get(key));
+          return agg;
+        }, [])
+        .join(LIST_MEMBERS_SEPARATOR)
+    );
   }
 
   private _parse(rawTraceState: string) {
     if (rawTraceState.length > MAX_TRACE_STATE_LEN) return;
     this._internalState = rawTraceState
       .split(LIST_MEMBERS_SEPARATOR)
-      .reverse() // Store in reverse so new keys (.set(...)) will be placed at the beginning
-      .reduce((agg: Map<string, string>, part: string) => {
+      // Use reduceRight() so new keys (.set(...)) will be placed at the beginning
+      .reduceRight((agg: Map<string, string>, part: string) => {
         const listMember = part.trim(); // Optional Whitespace (OWS) handling
         const i = listMember.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
         if (i !== -1) {
@@ -98,6 +101,7 @@ export class TraceStateImpl implements TraceState {
     }
   }
 
+  // @ts-expect-error TS6133 Accessed in tests only.
   private _keys(): string[] {
     return Array.from(this._internalState.keys()).reverse();
   }
