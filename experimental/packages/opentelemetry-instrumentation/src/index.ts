@@ -15,7 +15,7 @@
  */
 
 export { registerInstrumentations } from './autoLoader';
-export { InstrumentationBase } from './platform/index';
+export { InstrumentationBase, createInstrumentation } from './platform/index';
 export { InstrumentationNodeModuleDefinition } from './instrumentationNodeModuleDefinition';
 export { InstrumentationNodeModuleFile } from './instrumentationNodeModuleFile';
 export type {
