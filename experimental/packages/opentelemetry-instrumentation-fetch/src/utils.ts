@@ -25,6 +25,33 @@ const DIAG_LOGGER = diag.createComponentLogger({
   namespace: '@opentelemetry/opentelemetry-instrumentation-fetch/utils',
 });
 
+export function isRequest(value: unknown): value is Request {
+  if (value === null || typeof value !== 'object') {
+    return false;
+  }
+
+  const candidate = value as {
+    url?: unknown;
+    method?: unknown;
+    headers?: unknown;
+    clone?: unknown;
+  };
+
+  const headers = candidate.headers as
+    | { get?: unknown; set?: unknown }
+    | undefined;
+
+  return (
+    typeof candidate.url === 'string' &&
+    typeof candidate.method === 'string' &&
+    typeof candidate.clone === 'function' &&
+    typeof headers === 'object' &&
+    headers !== null &&
+    typeof headers.get === 'function' &&
+    typeof headers.set === 'function'
+  );
+}
+
 /**
  * Helper function to determine payload content length for fetch requests
  *
@@ -67,9 +94,9 @@ export function getFetchBodyLength(...args: Parameters<typeof fetch>) {
     } else {
       return Promise.resolve(getXHRBodyLength(requestInit.body));
     }
-  } else {
+  } else if (isRequest(args[0])) {
     const info = args[0];
-    if (!info?.body) {
+    if (!info.body) {
       return Promise.resolve();
     }
 
@@ -77,6 +104,8 @@ export function getFetchBodyLength(...args: Parameters<typeof fetch>) {
       .clone()
       .text()
       .then(t => getByteLength(t));
+  } else {
+    return Promise.resolve();
   }
 }
 
@@ -214,7 +243,7 @@ function getKnownMethods() {
     );
     if (cfgMethods && cfgMethods.length > 0) {
       knownMethods = {};
-      cfgMethods.forEach(m => {
+      cfgMethods.forEach((m: string) => {
         knownMethods[m] = true;
       });
     } else {
