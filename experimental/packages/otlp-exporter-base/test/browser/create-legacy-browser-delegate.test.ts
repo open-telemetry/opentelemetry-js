@@ -29,6 +29,11 @@ describe('createLegacyBrowserDelegate', function () {
       assert.equal(delegate, createOtlpSendBeaconExportDelegate);
     });
 
+    it('uses the beacon delegate when headers is empty object', function () {
+      const delegate = inferExportDelegateToUse({});
+      assert.equal(delegate, createOtlpSendBeaconExportDelegate);
+    });
+
     it('uses the fetch delegate when headers are provided', function () {
       const delegate = inferExportDelegateToUse({ foo: 'bar' });
       assert.equal(delegate, createOtlpFetchExportDelegate);
