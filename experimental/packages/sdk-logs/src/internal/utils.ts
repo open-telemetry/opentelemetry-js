@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-import { hexToBinary } from '../src/common/hex-to-binary';
+import type { InstrumentationScope } from '@opentelemetry/core';
 
 /**
- * utility function to convert a string representing a hex value to a base64 string
- * that represents the bytes of that hex value.
- * @param hexStr
+ * Converting the instrumentation scope object to a unique identifier string.
+ * @param scope - The instrumentation scope to convert
+ * @returns A unique string identifier for the scope
  */
-export function toBase64(hexStr: string) {
-  const decoder = new TextDecoder('utf8');
-  return btoa(decoder.decode(hexToBinary(hexStr)));
+export function getInstrumentationScopeKey(
+  scope: InstrumentationScope
+): string {
+  return `${scope.name}@${scope.version || ''}:${scope.schemaUrl || ''}`;
 }

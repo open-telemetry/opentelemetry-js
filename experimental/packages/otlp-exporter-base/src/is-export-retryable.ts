@@ -15,8 +15,12 @@
  */
 
 export function isExportHTTPErrorRetryable(statusCode: number): boolean {
-  const retryCodes = [429, 502, 503, 504];
-  return retryCodes.includes(statusCode);
+  return (
+    statusCode === 429 ||
+    statusCode === 502 ||
+    statusCode === 503 ||
+    statusCode === 504
+  );
 }
 
 export function parseRetryAfterToMills(
