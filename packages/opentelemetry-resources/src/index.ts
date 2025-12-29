@@ -29,7 +29,7 @@ export {
   defaultResource,
   emptyResource,
 } from './ResourceImpl';
-export { defaultServiceName } from './platform';
+export { defaultServiceName } from './default-service-name';
 export type {
   ResourceDetector,
   DetectedResource,

@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
-export function defaultServiceName(): string {
-  return 'unknown_service';
+import type { InstrumentationScope } from '@opentelemetry/core';
+
+/**
+ * Converting the instrumentation scope object to a unique identifier string.
+ * @param scope - The instrumentation scope to convert
+ * @returns A unique string identifier for the scope
+ */
+export function getInstrumentationScopeKey(
+  scope: InstrumentationScope
+): string {
+  return `${scope.name}@${scope.version || ''}:${scope.schemaUrl || ''}`;
 }

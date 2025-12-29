@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
-/** only globals that common to node and browsers are allowed */
-// eslint-disable-next-line n/no-unsupported-features/es-builtins
-export const _globalThis = typeof globalThis === 'object' ? globalThis : global;
+// Check if we are in a Node.js environment and if so, use the process.argv0 property
+// to determine the default service name
+const DEFAULT_SERVICE_NAME =
+  typeof process === 'object' &&
+  typeof process.argv0 === 'string' &&
+  process.argv0.length > 0
+    ? `unknown_service:${process.argv0}`
+    : 'unknown_service';
+
+export function defaultServiceName(): string {
+  return DEFAULT_SERVICE_NAME;
+}
