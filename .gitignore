@@ -83,13 +83,10 @@ package.json.lerna_backup
 # OS generated files
 .DS_Store
 
-# VsCode configs
-.vscode/
-
-#Visual Studio
+# Editor configs
+.vscode
+.zed
 .vs/
-
-#IDEA
 .idea
 *.iml
 
