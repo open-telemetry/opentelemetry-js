@@ -173,10 +173,11 @@ describeNode('envDetector() on Node.js', () => {
       delete process.env.OTEL_RESOURCE_ATTRIBUTES;
       delete process.env.OTEL_SERVICE_NAME;
       // restore if stubbed
-      if ((envDetector as any)._parseResourceAttributesBackup) {
-        (envDetector as any)._parseResourceAttributes =
-          (envDetector as any)._parseResourceAttributesBackup;
-        delete (envDetector as any)._parseResourceAttributesBackup;
+      const detectorWithAny = envDetector as any;
+      if (detectorWithAny._parseResourceAttributesBackup) {
+        detectorWithAny._parseResourceAttributes =
+          detectorWithAny._parseResourceAttributesBackup;
+        delete detectorWithAny._parseResourceAttributesBackup;
       }
     });
 
@@ -189,9 +190,10 @@ describeNode('envDetector() on Node.js', () => {
     it('logs and continues when attribute parsing throws', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES = 'k=v';
       process.env.OTEL_SERVICE_NAME = 'svc';
-      (envDetector as any)._parseResourceAttributesBackup =
-        (envDetector as any)._parseResourceAttributes;
-      (envDetector as any)._parseResourceAttributes = () => {
+      const detectorWithAny = envDetector as any;
+      detectorWithAny._parseResourceAttributesBackup =
+        detectorWithAny._parseResourceAttributes;
+      detectorWithAny._parseResourceAttributes = () => {
         throw new Error('parse boom');
       };
 
