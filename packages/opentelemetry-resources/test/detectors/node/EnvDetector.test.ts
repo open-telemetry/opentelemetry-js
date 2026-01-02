@@ -131,4 +131,72 @@ describeNode('envDetector() on Node.js', () => {
       assert.strictEqual(resource.attributes?.['k8s.cluster.name'], 'c1');
     });
   });
+
+  describe('edge cases for invalid input handling', () => {
+    afterEach(() => {
+      delete process.env.OTEL_RESOURCE_ATTRIBUTES;
+    });
+
+    it('drops attributes with invalid keys', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES = 'bad key=value';
+      const resource = resourceFromDetectedResource(envDetector.detect());
+      assertEmptyResource(resource);
+    });
+
+    it('drops malformed pairs without a key/value separator', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES = 'novalue';
+      const resource = resourceFromDetectedResource(envDetector.detect());
+      assertEmptyResource(resource);
+    });
+
+    it('drops attributes with overlong values even after sanitization', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES = `k=${'a'.repeat(300)}`;
+      const resource = resourceFromDetectedResource(envDetector.detect());
+      assertEmptyResource(resource);
+    });
+
+    it('drops attributes with invalid percent-encoding', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES = 'k=%E0%A4%';
+      const resource = resourceFromDetectedResource(envDetector.detect());
+      assertEmptyResource(resource);
+    });
+
+    it('drops attributes that decode to non-printable ASCII', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES = 'k=%00';
+      const resource = resourceFromDetectedResource(envDetector.detect());
+      assertEmptyResource(resource);
+    });
+  });
+
+  describe('service name and error handling', () => {
+    afterEach(() => {
+      delete process.env.OTEL_RESOURCE_ATTRIBUTES;
+      delete process.env.OTEL_SERVICE_NAME;
+      // restore if stubbed
+      if ((envDetector as any)._parseResourceAttributesBackup) {
+        (envDetector as any)._parseResourceAttributes =
+          (envDetector as any)._parseResourceAttributesBackup;
+        delete (envDetector as any)._parseResourceAttributesBackup;
+      }
+    });
+
+    it('includes OTEL_SERVICE_NAME even when no attributes are set', async () => {
+      process.env.OTEL_SERVICE_NAME = 'svc-from-env';
+      const resource = resourceFromDetectedResource(envDetector.detect());
+      assert.strictEqual(resource.attributes?.['service.name'], 'svc-from-env');
+    });
+
+    it('logs and continues when attribute parsing throws', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES = 'k=v';
+      process.env.OTEL_SERVICE_NAME = 'svc';
+      (envDetector as any)._parseResourceAttributesBackup =
+        (envDetector as any)._parseResourceAttributes;
+      (envDetector as any)._parseResourceAttributes = () => {
+        throw new Error('parse boom');
+      };
+
+      const resource = resourceFromDetectedResource(envDetector.detect());
+      assert.strictEqual(resource.attributes?.['service.name'], 'svc');
+    });
+  });
 });
