@@ -123,7 +123,10 @@ describeNode('envDetector() on Node.js', () => {
 
     it('should drop invalid attributes but keep the rest', async () => {
       const resource = resourceFromDetectedResource(envDetector.detect());
-      assert.strictEqual(resource.attributes?.['k8s.deployment.name'], undefined);
+      assert.strictEqual(
+        resource.attributes?.['k8s.deployment.name'],
+        undefined
+      );
       assert.strictEqual(resource.attributes?.['k8s.pod.name'], 'pod-xyz-123');
       assert.strictEqual(resource.attributes?.['k8s.cluster.name'], 'c1');
     });

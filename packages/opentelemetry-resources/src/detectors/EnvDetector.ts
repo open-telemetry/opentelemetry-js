@@ -113,13 +113,18 @@ class EnvDetector implements ResourceDetector {
       key = key.trim();
       value = value.trim().split(/^"|"$/).join('');
       if (!this._isValidAndNotEmpty(key)) {
-        diag.debug(`Invalid attribute key: ${key} ${this._ERROR_MESSAGE_INVALID_CHARS}`);
+        diag.debug(
+          `Invalid attribute key: ${key} ${this._ERROR_MESSAGE_INVALID_CHARS}`
+        );
         continue;
       }
 
       let sanitizedValue = value;
       // Be tolerant of unencoded baggage-invalid characters by percent-encoding them before validation/decoding.
       if (!this._isValid(sanitizedValue)) {
+        diag.debug(
+          `EnvDetector failed: Attribute value ${this._ERROR_MESSAGE_INVALID_VALUE}`
+        );
         sanitizedValue = percentEncodeBaggageValue(sanitizedValue);
       }
 
@@ -132,7 +137,7 @@ class EnvDetector implements ResourceDetector {
       let decodedValue: string;
       try {
         decodedValue = decodeURIComponent(sanitizedValue);
-      } catch (e) {
+      } catch {
         diag.debug(
           `Attribute value for key ${key} is not valid percent-encoding: ${value}`
         );
