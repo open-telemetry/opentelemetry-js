@@ -19,6 +19,11 @@ import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { ResourceDetectionConfig } from '../config';
 import { DetectedResource, ResourceDetector } from '../types';
 import { getStringFromEnv } from '@opentelemetry/core';
+import {
+  isBaggageOctetString,
+  isPrintableAscii,
+  percentEncodeBaggageValue,
+} from '../utils';
 
 /**
  * EnvDetector can be used to detect the presence of and create a Resource
@@ -108,12 +113,40 @@ class EnvDetector implements ResourceDetector {
       key = key.trim();
       value = value.trim().split(/^"|"$/).join('');
       if (!this._isValidAndNotEmpty(key)) {
-        throw new Error(`Attribute key ${this._ERROR_MESSAGE_INVALID_CHARS}`);
+        diag.debug(`Invalid attribute key: ${key} ${this._ERROR_MESSAGE_INVALID_CHARS}`);
+        continue;
       }
-      if (!this._isValid(value)) {
-        throw new Error(`Attribute value ${this._ERROR_MESSAGE_INVALID_VALUE}`);
+
+      let sanitizedValue = value;
+      // Be tolerant of unencoded baggage-invalid characters by percent-encoding them before validation/decoding.
+      if (!this._isValid(sanitizedValue)) {
+        sanitizedValue = percentEncodeBaggageValue(sanitizedValue);
       }
-      attributes[key] = decodeURIComponent(value);
+
+      if (!this._isValid(sanitizedValue)) {
+        diag.debug(
+          `Invalid attribute value for key ${key}: ${value} ${this._ERROR_MESSAGE_INVALID_VALUE}`
+        );
+        continue;
+      }
+      let decodedValue: string;
+      try {
+        decodedValue = decodeURIComponent(sanitizedValue);
+      } catch (e) {
+        diag.debug(
+          `Attribute value for key ${key} is not valid percent-encoding: ${value}`
+        );
+        continue;
+      }
+
+      if (!isPrintableAscii(decodedValue, this._MAX_LENGTH)) {
+        diag.debug(
+          `Decoded attribute value for key ${key} ${this._ERROR_MESSAGE_INVALID_VALUE}`
+        );
+        continue;
+      }
+
+      attributes[key] = decodedValue;
     }
     return attributes;
   }
@@ -126,18 +159,7 @@ class EnvDetector implements ResourceDetector {
    * @returns Whether the String is valid.
    */
   private _isValid(name: string): boolean {
-    return name.length <= this._MAX_LENGTH && this._isBaggageOctetString(name);
-  }
-
-  // https://www.w3.org/TR/baggage/#definition
-  private _isBaggageOctetString(str: string): boolean {
-    for (let i = 0; i < str.length; i++) {
-      const ch = str.charCodeAt(i);
-      if (ch < 0x21 || ch === 0x2c || ch === 0x3b || ch === 0x5c || ch > 0x7e) {
-        return false;
-      }
-    }
-    return true;
+    return name.length <= this._MAX_LENGTH && isBaggageOctetString(name);
   }
 
   /**

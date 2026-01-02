@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import * as assert from 'assert';
 import { envDetector } from '../../../src';
 import { resourceFromDetectedResource } from '../../../src/ResourceImpl';
 import { describeNode } from '../../util';
@@ -44,8 +45,46 @@ describeNode('envDetector() on Node.js', () => {
     });
   });
 
+  describe('with unencoded spaces in values', () => {
+    before(() => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'k8s.deployment.name="deployment name with spaces"';
+    });
+
+    after(() => {
+      delete process.env.OTEL_RESOURCE_ATTRIBUTES;
+    });
+
+    it('should treat spaces as spaces and keep the attribute', async () => {
+      const resource = resourceFromDetectedResource(envDetector.detect());
+      assert.strictEqual(
+        resource.attributes?.['k8s.deployment.name'],
+        'deployment name with spaces'
+      );
+    });
+  });
+
+  describe('with other unencoded baggage-invalid characters', () => {
+    before(() => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'k8s.deployment.name="deployment;name\\with\\delims"';
+    });
+
+    after(() => {
+      delete process.env.OTEL_RESOURCE_ATTRIBUTES;
+    });
+
+    it('should percent-encode invalid chars and preserve the value', async () => {
+      const resource = resourceFromDetectedResource(envDetector.detect());
+      assert.strictEqual(
+        resource.attributes?.['k8s.deployment.name'],
+        'deployment;name\\with\\delims'
+      );
+    });
+  });
+
   describe('with invalid env', () => {
-    const values = ['k8s.deployment.name="with spaces"'];
+    const values = ['k8s.deployment.name="bad\tvalue"'];
 
     for (const value of values) {
       describe(`value: '${value}'`, () => {
@@ -69,6 +108,24 @@ describeNode('envDetector() on Node.js', () => {
     it('should return empty resource', async () => {
       const resource = resourceFromDetectedResource(envDetector.detect());
       assertEmptyResource(resource);
+    });
+  });
+
+  describe('with partially invalid env', () => {
+    before(() => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'k8s.pod.name="pod-xyz-123",k8s.deployment.name="bad\tvalue",k8s.cluster.name="c1"';
+    });
+
+    after(() => {
+      delete process.env.OTEL_RESOURCE_ATTRIBUTES;
+    });
+
+    it('should drop invalid attributes but keep the rest', async () => {
+      const resource = resourceFromDetectedResource(envDetector.detect());
+      assert.strictEqual(resource.attributes?.['k8s.deployment.name'], undefined);
+      assert.strictEqual(resource.attributes?.['k8s.pod.name'], 'pod-xyz-123');
+      assert.strictEqual(resource.attributes?.['k8s.cluster.name'], 'c1');
     });
   });
 });
