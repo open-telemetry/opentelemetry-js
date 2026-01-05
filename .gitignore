@@ -84,11 +84,11 @@ package.json.lerna_backup
 .DS_Store
 
 # Editor configs
-.vscode
-.zed
-.vs/
-.idea
 *.iml
+.idea/
+.vs/
+.vscode/
+.zed/
 
 # non-aggregated benchmark results
 .benchmark-results.txt
