@@ -30,7 +30,7 @@
     "babel-loader": "^8.0.0",
     "html-webpack-plugin": "^4.5.2",
     "webpack": "^4",
-    "webpack-cli": "^4"
+    "webpack-cli": "^6.0.0"
   },
   "dependencies": {
     "@opentelemetry/api": "file:../../../api",
