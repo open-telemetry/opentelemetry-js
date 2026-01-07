@@ -36,6 +36,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * refactor(core,resources): consolidate platform-specific code [#6208](https://github.com/open-telemetry/opentelemetry-js/pull/6208) @overbalance
 * test(api): remove unnecessary conditional [#6241](https://github.com/open-telemetry/opentelemetry-js/pull/6241) @cjihrig
 * refactor(api): remove several reverse() calls [#6252](https://github.com/open-telemetry/opentelemetry-js/pull/6252) @cjihrig
+* chore: add zed to gitignore [#6258](https://github.com/open-telemetry/opentelemetry-js/pull/6258) @overbalance
 * perf(sdk-trace-base): use Uint8Array for browser RandomIdGenerator [#6209](https://github.com/open-telemetry/opentelemetry-js/pull/6209) @overbalance
 
 ## 2.2.0
