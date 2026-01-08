@@ -78,11 +78,11 @@ describeBrowser('browserDetector()', () => {
   });
 });
 
-describe('browserDetector() in Node.js', () => {
-  it('should return empty resource in Node.js environment even if navigator is present', () => {
-    // We don't need to stub navigator because I am are on Node 24
-    const resource = browserDetector.detect();
-
-    assertEmptyResource(resource);
+if (typeof process !== 'undefined' && process.versions?.node) {
+  describe('browserDetector() in Node.js', () => {
+    it('should return empty resource in Node.js environment even if navigator is present', () => {
+      const resource = browserDetector.detect();
+      assertEmptyResource(resource);
+    });
   });
-});
+}
