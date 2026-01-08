@@ -14,14 +14,22 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 2.3.0
+
+### :rocket: Features
+
 * feat(sdk-trace-base): implement on ending in span processor [#6024](https://github.com/open-telemetry/opentelemetry-js/pull/6024) @majanjua-amzn
   * note: this feature is experimental and subject to change
 
 ### :bug: Bug Fixes
 
 * fix(sdk-metrics): remove setImmediate usage in ConsoleMetricExporter [#6199](https://github.com/open-telemetry/opentelemetry-js/pull/6199) @overbalance
-
-### :books: Documentation
 
 ### :house: Internal
 
