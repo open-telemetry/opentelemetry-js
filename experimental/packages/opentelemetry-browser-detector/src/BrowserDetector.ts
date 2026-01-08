@@ -28,7 +28,13 @@ import { BROWSER_ATTRIBUTES, UserAgentData } from './types';
  */
 class BrowserDetector implements ResourceDetector {
   detect(config?: ResourceDetectionConfig): DetectedResource {
-    const isBrowser = typeof navigator !== 'undefined';
+    const isBrowser =
+      typeof navigator !== 'undefined' &&
+      // @ts-ignore
+      globalThis.process?.versions?.node === undefined &&
+      // @ts-ignore
+      globalThis.Bun?.version === undefined;
+
     if (!isBrowser) {
       return emptyResource();
     }
