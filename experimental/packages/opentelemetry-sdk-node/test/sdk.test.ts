@@ -410,6 +410,30 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
+    it('should not register meter provider when metricReaders is empty array', async () => {
+      // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
+      process.env.OTEL_TRACES_EXPORTER = 'none';
+      const sdk = new NodeSDK({
+        metricReaders: [],
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assertDefaultContextManagerRegistered();
+      assertDefaultPropagatorRegistered();
+
+      assert.strictEqual(
+        (trace.getTracerProvider() as ProxyTracerProvider).getDelegate(),
+        delegate,
+        'tracer provider should not have changed'
+      );
+
+      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
+
+      await sdk.shutdown();
+    });
+
     it('should register a logger provider if a log record processor is provided', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'none';
       const logRecordExporter = new InMemoryLogRecordExporter();
