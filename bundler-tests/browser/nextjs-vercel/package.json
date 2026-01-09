@@ -36,8 +36,8 @@
     "@opentelemetry/sdk-trace-base": "file:../../../packages/opentelemetry-sdk-trace-base",
     "@opentelemetry/sdk-trace-web": "file:../../../packages/opentelemetry-sdk-trace-web",
     "@opentelemetry/semantic-conventions": "file:../../../semantic-conventions",
-    "next": "^15.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "next": "^16",
+    "react": "^19",
+    "react-dom": "^19"
   }
 }
