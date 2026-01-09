@@ -15,7 +15,12 @@
  */
 import * as sinon from 'sinon';
 import { browserDetector } from '../src/BrowserDetector';
-import { assertEmptyResource, assertResource, describeBrowser } from './util';
+import {
+  assertEmptyResource,
+  assertResource,
+  describeBrowser,
+  describeNode,
+} from './util';
 
 describeBrowser('browserDetector()', () => {
   afterEach(() => {
@@ -69,7 +74,7 @@ describeBrowser('browserDetector()', () => {
     });
   });
 
-  it('should return empty resources if user agent is missing', async () => {
+  it('should return empty resource if userAgent is missing', async () => {
     sinon.stub(globalThis, 'navigator').value({
       userAgent: '',
     });
@@ -78,11 +83,15 @@ describeBrowser('browserDetector()', () => {
   });
 });
 
-if (typeof process !== 'undefined' && process.versions?.node) {
-  describe('browserDetector() in Node.js', () => {
-    it('should return empty resource in Node.js environment even if navigator is present', () => {
-      const resource = browserDetector.detect();
-      assertEmptyResource(resource);
+describeNode('browserDetector()', () => {
+  it('should return empty resource even if navigator is present', () => {
+    sinon.stub(globalThis, 'navigator').value({
+      userAgent: 'dddd',
+      language: 'en-US',
+      userAgentData: undefined,
     });
+
+    const resource = browserDetector.detect();
+    assertEmptyResource(resource);
   });
-}
+});
