@@ -20,7 +20,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
-* chore(browser): fix CODEOWNERS paths for browser-related packages
+* chore(browser): fix CODEOWNERS paths for browser-related packages [#6273](https://github.com/open-telemetry/opentelemetry-js/pull/6273) @overbalance
+* perf(sdk-trace-base): use Uint8Array for browser RandomIdGenerator [#6209](https://github.com/open-telemetry/opentelemetry-js/pull/6209) @overbalance
 
 ## 2.3.0
 
@@ -48,7 +49,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * refactor(api): remove several reverse() calls [#6252](https://github.com/open-telemetry/opentelemetry-js/pull/6252) @cjihrig
 * refactor(api): remove unnecessary map() call [#6251](https://github.com/open-telemetry/opentelemetry-js/pull/6251) @cjihrig
 * chore: add zed to gitignore [#6258](https://github.com/open-telemetry/opentelemetry-js/pull/6258) @overbalance
-* perf(sdk-trace-base): use Uint8Array for browser RandomIdGenerator [#6209](https://github.com/open-telemetry/opentelemetry-js/pull/6209) @overbalance
 
 ## 2.2.0
 
