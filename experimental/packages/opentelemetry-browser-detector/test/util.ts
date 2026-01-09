@@ -19,8 +19,7 @@ import { BROWSER_ATTRIBUTES } from '../src/types';
 import { DetectedResource } from '@opentelemetry/resources';
 
 const isBrowser =
-  globalThis.window !== undefined &&
-  globalThis.document?.defaultView === globalThis.window;
+  typeof window !== 'undefined' && typeof document !== 'undefined';
 
 export function describeBrowser(title: string, fn: (this: Suite) => void) {
   title = `Browser: ${title}`;
