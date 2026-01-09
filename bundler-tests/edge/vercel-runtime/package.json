@@ -5,7 +5,7 @@
   "description": "Test Vercel Edge Runtime",
   "type": "module",
   "scripts": {
-    "test:bundle": "npm i && node edge-runtime.test.js"
+    "test:bundle": "npm i && node --test edge-runtime.test.js"
   },
   "repository": {
     "type": "git",
@@ -30,6 +30,12 @@
     "esbuild": "^0.27.2"
   },
   "dependencies": {
-    "@opentelemetry/resources": "^2.3.0"
+    "@opentelemetry/api": "file:../../../api",
+    "@opentelemetry/core": "file:../../../packages/opentelemetry-core",
+    "@opentelemetry/resources": "file:../../../packages/opentelemetry-resources",
+    "@opentelemetry/sdk-trace-base": "file:../../../packages/opentelemetry-sdk-trace-base",
+    "@opentelemetry/sdk-trace-web": "file:../../../packages/opentelemetry-sdk-trace-web",
+    "@opentelemetry/semantic-conventions": "file:../../../semantic-conventions",
+    "@opentelemetry/propagator-b3": "file:../../../packages/opentelemetry-propagator-b3"
   }
 }

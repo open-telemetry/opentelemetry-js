@@ -125,4 +125,47 @@ describe('Vercel Edge Runtime', () => {
     assert.strictEqual(result.success, true);
   });
 
+  it('should handle defaultServiceName without process global', async () => {
+    const result = await bundleAndRun(`
+      import { defaultServiceName } from '@opentelemetry/resources';
+      const name = defaultServiceName();
+      globalThis.__TEST_RESULT__ = {
+        success: true,
+        serviceName: name,
+        // In edge runtime, process is undefined so should fallback
+        isUnknownService: name === 'unknown_service'
+      };
+    `);
+    assert.strictEqual(result.success, true);
+    assert.strictEqual(
+      result.isUnknownService,
+      true,
+      'Should fallback to unknown_service in edge runtime'
+    );
+  });
+
+  it('should work with globalThis.process pattern', async () => {
+    // Test the proposed fix: using globalThis.process instead of process
+    const result = await bundleAndRun(`
+      // Simulating the proposed fix
+      const DEFAULT_SERVICE_NAME =
+        typeof globalThis.process === 'object' &&
+        typeof globalThis.process.argv0 === 'string' &&
+        globalThis.process.argv0.length > 0
+          ? 'unknown_service:' + globalThis.process.argv0
+          : 'unknown_service';
+
+      globalThis.__TEST_RESULT__ = {
+        success: true,
+        serviceName: DEFAULT_SERVICE_NAME,
+        isUnknownService: DEFAULT_SERVICE_NAME === 'unknown_service'
+      };
+    `);
+    assert.strictEqual(result.success, true);
+    assert.strictEqual(
+      result.isUnknownService,
+      true,
+      'globalThis.process should be undefined in edge runtime'
+    );
+  });
 });
