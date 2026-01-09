@@ -23,12 +23,12 @@ let serviceName: string | undefined;
  */
 export function defaultServiceName(): string {
   if (serviceName === undefined) {
-    serviceName =
-      typeof globalThis.process === 'object' &&
-      typeof globalThis.process.argv0 === 'string' &&
-      globalThis.process.argv0.length > 0
-        ? `unknown_service:${globalThis.process.argv0}`
-        : 'unknown_service';
+    try {
+      const argv0 = globalThis.process.argv0;
+      serviceName = argv0 ? `unknown_service:${argv0}` : 'unknown_service';
+    } catch {
+      serviceName = 'unknown_service';
+    }
   }
   return serviceName;
 }
