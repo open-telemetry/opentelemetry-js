@@ -29,9 +29,8 @@ import { BROWSER_ATTRIBUTES, UserAgentData } from './types';
 class BrowserDetector implements ResourceDetector {
   detect(config?: ResourceDetectionConfig): DetectedResource {
     const isBrowser =
-      typeof globalThis !== 'undefined' &&
-      typeof globalThis.window !== 'undefined' &&
-      typeof globalThis.window.document !== 'undefined';
+      globalThis.window !== undefined &&
+      globalThis.document?.defaultView === globalThis.window;
 
     if (!isBrowser) {
       return emptyResource();
