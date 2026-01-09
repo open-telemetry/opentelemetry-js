@@ -84,14 +84,8 @@ describeBrowser('browserDetector()', () => {
 });
 
 describeNode('browserDetector()', () => {
-  afterEach(() => {
-    // Clean up manually set navigator property
-    delete (globalThis as { navigator?: unknown }).navigator;
-  });
-
   it('should return empty resource even if navigator is present', () => {
-    // Cannot use sinon.stub for non-existent properties in Node.js
-    // Define the property directly instead
+    // Cannot use sinon.stub for non-existent properties (Node.js <=20)
     Object.defineProperty(globalThis, 'navigator', {
       value: {
         userAgent: 'dddd',
