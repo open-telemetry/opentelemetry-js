@@ -1,0 +1,43 @@
+{
+  "name": "nextjs-vercel-bundle-test",
+    "private": true,
+    "version": "0.208.0",
+    "description": "Test Vercel Edge Runtime",
+    "type": "module",
+
+    "repository": {
+      "type": "git",
+      "url": "git+ssh://git@github.com/open-telemetry/opentelemetry-js.git"
+    },
+    "keywords": [
+      "opentelemetry",
+      "web",
+      "edge",
+      "vercel",
+      "nextjs",
+      "browser"
+    ],
+    "engines": {
+      "node": "^18.19.0 || >=20.6.0"
+    },
+    "author": "OpenTelemetry Authors",
+    "license": "Apache-2.0",
+    "bugs": {
+      "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+    },
+  "scripts": {
+    "build": "next build",
+    "test:bundle": "npm i && next build"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "file:../../../api",
+    "@opentelemetry/core": "file:../../../packages/opentelemetry-core",
+    "@opentelemetry/resources": "file:../../../packages/opentelemetry-resources",
+    "@opentelemetry/sdk-trace-base": "file:../../../packages/opentelemetry-sdk-trace-base",
+    "@opentelemetry/sdk-trace-web": "file:../../../packages/opentelemetry-sdk-trace-web",
+    "@opentelemetry/semantic-conventions": "file:../../../semantic-conventions",
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}
