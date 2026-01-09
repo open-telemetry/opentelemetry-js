@@ -32,6 +32,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(sdk-node): add missing direct dependency to @opentelemetry/context-async-hooks [#6189](https://github.com/open-telemetry/opentelemetry-js/pull/6189) @pichlermarc
 * fix(instrumentation-fetch): use feature detection for browser environment [#6200](https://github.com/open-telemetry/opentelemetry-js/pull/6200) @overbalance
 * fix(otlp-exporter-base): ensure retry on network errors during HTTP export [#6147](https://github.com/open-telemetry/opentelemetry-js/pull/6147) @jsokol805
+* fix(browser-detector): use window feature detection to avoid false positives in Node.js 21+ and Bun [#6271](https://github.com/open-telemetry/opentelemetry-js/pull/6271) @fiyinfoluwa001 @overbalance
 
 ### :books: Documentation
 
