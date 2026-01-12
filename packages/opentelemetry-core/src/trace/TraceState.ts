@@ -39,8 +39,6 @@ export class TraceState implements api.TraceState {
   }
 
   set(key: string, value: string): TraceState {
-    // TODO: Benchmark the different approaches(map vs list) and
-    // use the faster one.
     const traceState = this._clone();
     if (traceState._internalState.has(key)) {
       traceState._internalState.delete(key);
@@ -78,37 +76,49 @@ export class TraceState implements api.TraceState {
   }
 
   private _parse(rawTraceState: string) {
-    if (rawTraceState.length > MAX_TRACE_STATE_LEN) return;
-    this._internalState = rawTraceState
-      .split(LIST_MEMBERS_SEPARATOR)
-      .reverse() // Store in reverse so new keys (.set(...)) will be placed at the beginning
-      .reduce((agg: Map<string, string>, part: string) => {
-        const listMember = part.trim(); // Optional Whitespace (OWS) handling
-        const i = listMember.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
-        if (i !== -1) {
-          const key = listMember.slice(0, i);
-          const value = listMember.slice(i + 1, part.length);
-          if (validateKey(key) && validateValue(value)) {
-            agg.set(key, value);
-          } else {
-            // TODO: Consider to add warning log
-          }
-        }
-        return agg;
-      }, new Map());
-
-    // Because of the reverse() requirement, trunc must be done after map is created
-    if (this._internalState.size > MAX_TRACE_STATE_ITEMS) {
-      this._internalState = new Map(
-        Array.from(this._internalState.entries())
-          .reverse() // Use reverse same as original tracestate parse chain
-          .slice(0, MAX_TRACE_STATE_ITEMS)
-      );
+    if (rawTraceState.length > MAX_TRACE_STATE_LEN) {
+      return;
     }
+
+    const parts = rawTraceState.split(LIST_MEMBERS_SEPARATOR);
+    const n = parts.length;
+    if (n === 0) {
+      return;
+    }
+
+    // Iterate in reverse order so Map insertion order is reversed
+    // This ensures serialize() outputs entries in the original order
+    const map = new Map<string, string>();
+    for (let i = n - 1; i >= 0; i--) {
+      const listMember = parts[i].trim(); // Optional Whitespace (OWS) handling
+      const eqIdx = listMember.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
+      if (eqIdx !== -1) {
+        const key = listMember.slice(0, eqIdx);
+        const value = listMember.slice(eqIdx + 1);
+        if (validateKey(key) && validateValue(value)) {
+          map.set(key, value);
+        }
+      }
+    }
+
+    // Truncate if needed - keep first MAX_TRACE_STATE_ITEMS from original order
+    // Since we iterated in reverse, those are the last items in Map order
+    if (map.size > MAX_TRACE_STATE_ITEMS) {
+      const entries = Array.from(map.entries());
+      map.clear();
+      for (
+        let i = entries.length - MAX_TRACE_STATE_ITEMS;
+        i < entries.length;
+        i++
+      ) {
+        map.set(entries[i][0], entries[i][1]);
+      }
+    }
+    this._internalState = map;
   }
 
   private _clone(): TraceState {
-    const traceState = new TraceState();
+    const traceState = Object.create(TraceState.prototype) as TraceState;
     traceState._internalState = new Map(this._internalState);
     return traceState;
   }
