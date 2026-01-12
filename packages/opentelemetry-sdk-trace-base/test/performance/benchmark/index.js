@@ -16,3 +16,4 @@
 
 require('./span');
 require('./BatchSpanProcessor');
+require('./sampler');
