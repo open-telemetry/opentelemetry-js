@@ -60,12 +60,21 @@ export class TraceState implements api.TraceState {
   }
 
   serialize(): string {
-    return this._keys()
-      .reduce((agg: string[], key) => {
-        agg.push(key + LIST_MEMBER_KEY_VALUE_SPLITTER + this.get(key));
-        return agg;
-      }, [])
-      .join(LIST_MEMBERS_SEPARATOR);
+    const size = this._internalState.size;
+    if (size === 0) {
+      return '';
+    }
+
+    const keys = Array.from(this._internalState.keys());
+    // Pre-allocate array and fill in reverse order to avoid creating
+    // an intermediate reversed array
+    const parts = new Array<string>(size);
+    for (let i = size - 1, j = 0; i >= 0; i--, j++) {
+      const key = keys[i];
+      parts[j] =
+        key + LIST_MEMBER_KEY_VALUE_SPLITTER + this._internalState.get(key);
+    }
+    return parts.join(LIST_MEMBERS_SEPARATOR);
   }
 
   private _parse(rawTraceState: string) {
@@ -96,10 +105,6 @@ export class TraceState implements api.TraceState {
           .slice(0, MAX_TRACE_STATE_ITEMS)
       );
     }
-  }
-
-  private _keys(): string[] {
-    return Array.from(this._internalState.keys()).reverse();
   }
 
   private _clone(): TraceState {
