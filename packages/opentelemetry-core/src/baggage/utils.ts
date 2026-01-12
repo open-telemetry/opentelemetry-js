@@ -32,12 +32,23 @@ type ParsedBaggageKeyValue = {
 };
 
 export function serializeKeyPairs(keyPairs: string[]): string {
-  return keyPairs.reduce((hValue: string, current: string) => {
-    const value = `${hValue}${
-      hValue !== '' ? BAGGAGE_ITEMS_SEPARATOR : ''
-    }${current}`;
-    return value.length > BAGGAGE_MAX_TOTAL_LENGTH ? hValue : value;
-  }, '');
+  const len = keyPairs.length;
+  if (len === 0) {
+    return '';
+  }
+
+  // Build result incrementally, checking length before concatenation
+  let result = keyPairs[0];
+  for (let i = 1; i < len; i++) {
+    const pair = keyPairs[i];
+    // Check if adding this pair would exceed max length (separator + pair)
+    const newLength = result.length + 1 + pair.length;
+    if (newLength > BAGGAGE_MAX_TOTAL_LENGTH) {
+      break;
+    }
+    result += BAGGAGE_ITEMS_SEPARATOR + pair;
+  }
+  return result;
 }
 
 export function getKeyPairs(baggage: Baggage): string[] {
