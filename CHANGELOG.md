@@ -50,6 +50,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * chore(browser): fix CODEOWNERS paths for browser-related packages
 * refactor(sdk-metrics): remove Promise.allSettled() ponyfill [#6277](https://github.com/open-telemetry/opentelemetry-js/pull/6277) @cjihrig
+* perf(sdk-trace-base): optimize setAttribute performance [#6283](https://github.com/open-telemetry/opentelemetry-js/pull/6283) @AbhiPrasad
 
 ## 2.3.0
 
