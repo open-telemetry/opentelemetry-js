@@ -16,7 +16,7 @@
 'use strict';
 
 import {
-  OtlpFileExporter,
+  ExperimentalOtlpFileExporter,
   OtlpGrpcExporter,
   OtlpHttpExporter,
 } from './commonModel';
@@ -132,6 +132,11 @@ export interface Sampler {
    * Configure sampler to be always_on.
    */
   always_on?: object;
+
+  /***
+   * Configure sampler to be trace_id_ratio_based.
+   */
+  trace_id_ratio_based?: TraceIdRatioBasedSampler;
 }
 
 export interface ParentBasedSampler {
@@ -164,6 +169,13 @@ export interface ParentBasedSampler {
    * If omitted or null, always_off is used.
    */
   local_parent_not_sampled: Sampler;
+}
+
+export interface TraceIdRatioBasedSampler {
+  /**
+   * Configure trace_id_ratio.
+   */
+  ratio: number;
 }
 
 export interface BatchSpanProcessor {
@@ -214,17 +226,12 @@ export interface SpanExporter {
    * Configure exporter to be OTLP with file transport.
    * This type is in development and subject to breaking changes in minor versions.
    */
-  'otlp_file/development'?: OtlpFileExporter;
+  'otlp_file/development'?: ExperimentalOtlpFileExporter;
 
   /**
    * Configure exporter to be console.
    */
   console?: object;
-
-  /**
-   * Configure exporter to be zipkin.
-   */
-  zipkin?: ZipkinSpanExporter;
 }
 
 export interface ZipkinSpanExporter {

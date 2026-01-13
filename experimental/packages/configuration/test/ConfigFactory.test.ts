@@ -19,9 +19,10 @@ import * as Sinon from 'sinon';
 import { ConfigurationModel } from '../src';
 import { diag, DiagLogLevel } from '@opentelemetry/api';
 import { createConfigFactory } from '../src/ConfigFactory';
-import { OtlpHttpEncoding } from '../src/models/commonModel';
+import { OtlpHttpEncoding, SeverityNumber } from '../src/models/commonModel';
 import {
   ExemplarFilter,
+  ExperimentalPrometheusTranslationStrategy,
   ExporterDefaultHistogramAggregation,
   ExporterTemporalityPreference,
   InstrumentType,
@@ -169,9 +170,11 @@ const configFromFile: ConfigurationModel = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/traces',
               timeout: 10000,
-              certificate_file: '/app/cert.pem',
-              client_key_file: '/app/cert.pem',
-              client_certificate_file: '/app/cert.pem',
+              tls: {
+                ca_file: '/app/cert.pem',
+                key_file: '/app/cert.pem',
+                cert_file: '/app/cert.pem',
+              },
               headers: [{ name: 'api-key', value: '1234' }],
               headers_list: 'api-key=1234',
               compression: 'gzip',
@@ -190,13 +193,15 @@ const configFromFile: ConfigurationModel = {
             otlp_grpc: {
               endpoint: 'http://localhost:4317',
               timeout: 10000,
-              certificate_file: '/app/cert.pem',
-              client_key_file: '/app/cert.pem',
-              client_certificate_file: '/app/cert.pem',
+              tls: {
+                ca_file: '/app/cert.pem',
+                key_file: '/app/cert.pem',
+                cert_file: '/app/cert.pem',
+                insecure: false,
+              },
               headers: [{ name: 'api-key', value: '1234' }],
               headers_list: 'api-key=1234',
               compression: 'gzip',
-              insecure: false,
             },
           },
         },
@@ -228,20 +233,6 @@ const configFromFile: ConfigurationModel = {
         },
       },
       {
-        batch: {
-          schedule_delay: 5000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
-          exporter: {
-            zipkin: {
-              endpoint: 'http://localhost:9411/api/v2/spans',
-              timeout: 10000,
-            },
-          },
-        },
-      },
-      {
         simple: {
           exporter: {
             console: {},
@@ -259,7 +250,7 @@ const configFromFile: ConfigurationModel = {
     },
     sampler: {
       parent_based: {
-        root: { always_on: undefined },
+        root: { trace_id_ratio_based: { ratio: 0.0001 } },
         remote_parent_sampled: { always_on: undefined },
         remote_parent_not_sampled: { always_off: undefined },
         local_parent_sampled: { always_on: undefined },
@@ -276,15 +267,18 @@ const configFromFile: ConfigurationModel = {
               host: 'localhost',
               port: 9464,
               without_scope_info: false,
+              without_target_info: false,
               with_resource_constant_labels: {
                 included: ['service*'],
                 excluded: ['service.attr1'],
               },
+              translation_strategy:
+                ExperimentalPrometheusTranslationStrategy.UnderscoreEscapingWithSuffixes,
             },
           },
           producers: [
             {
-              opencensus: undefined,
+              opencensus: {},
             },
           ],
           cardinality_limits: {
@@ -306,9 +300,11 @@ const configFromFile: ConfigurationModel = {
           exporter: {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/metrics',
-              certificate_file: '/app/cert.pem',
-              client_key_file: '/app/cert.pem',
-              client_certificate_file: '/app/cert.pem',
+              tls: {
+                ca_file: '/app/cert.pem',
+                key_file: '/app/cert.pem',
+                cert_file: '/app/cert.pem',
+              },
               headers: [
                 {
                   name: 'api-key',
@@ -326,7 +322,7 @@ const configFromFile: ConfigurationModel = {
           },
           producers: [
             {
-              prometheus: undefined,
+              opencensus: {},
             },
           ],
           cardinality_limits: {
@@ -348,9 +344,12 @@ const configFromFile: ConfigurationModel = {
           exporter: {
             otlp_grpc: {
               endpoint: 'http://localhost:4317',
-              certificate_file: '/app/cert.pem',
-              client_key_file: '/app/cert.pem',
-              client_certificate_file: '/app/cert.pem',
+              tls: {
+                ca_file: '/app/cert.pem',
+                key_file: '/app/cert.pem',
+                cert_file: '/app/cert.pem',
+                insecure: false,
+              },
               headers: [
                 {
                   name: 'api-key',
@@ -360,7 +359,6 @@ const configFromFile: ConfigurationModel = {
               headers_list: 'api-key=1234',
               compression: 'gzip',
               timeout: 10000,
-              insecure: false,
               temporality_preference: ExporterTemporalityPreference.Delta,
               default_histogram_aggregation:
                 ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
@@ -431,7 +429,11 @@ const configFromFile: ConfigurationModel = {
           timeout: 30000,
           interval: 60000,
           exporter: {
-            console: {},
+            console: {
+              temporality_preference: ExporterTemporalityPreference.Delta,
+              default_histogram_aggregation:
+                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+            },
           },
           cardinality_limits: {
             default: 2000,
@@ -491,9 +493,11 @@ const configFromFile: ConfigurationModel = {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
               encoding: OtlpHttpEncoding.Protobuf,
-              certificate_file: '/app/cert.pem',
-              client_key_file: '/app/cert.pem',
-              client_certificate_file: '/app/cert.pem',
+              tls: {
+                ca_file: '/app/cert.pem',
+                key_file: '/app/cert.pem',
+                cert_file: '/app/cert.pem',
+              },
               headers: [{ name: 'api-key', value: '1234' }],
               headers_list: 'api-key=1234',
               compression: 'gzip',
@@ -511,13 +515,15 @@ const configFromFile: ConfigurationModel = {
             otlp_grpc: {
               endpoint: 'http://localhost:4317',
               timeout: 10000,
-              certificate_file: '/app/cert.pem',
-              client_key_file: '/app/cert.pem',
-              client_certificate_file: '/app/cert.pem',
+              tls: {
+                ca_file: '/app/cert.pem',
+                key_file: '/app/cert.pem',
+                cert_file: '/app/cert.pem',
+                insecure: false,
+              },
               headers: [{ name: 'api-key', value: '1234' }],
               headers_list: 'api-key=1234',
               compression: 'gzip',
-              insecure: false,
             },
           },
         },
@@ -569,6 +575,8 @@ const configFromFile: ConfigurationModel = {
           name: 'io.opentelemetry.contrib.*',
           config: {
             disabled: false,
+            minimum_severity: SeverityNumber.INFO,
+            trace_based: true,
           },
         },
       ],
@@ -695,9 +703,11 @@ const readerExample: MetricReader = {
     exporter: {
       otlp_http: {
         endpoint: 'http://localhost:4318/v1/metrics',
-        certificate_file: '/app/cert.pem',
-        client_key_file: '/app/cert.pem',
-        client_certificate_file: '/app/cert.pem',
+        tls: {
+          ca_file: '/app/cert.pem',
+          key_file: '/app/cert.pem',
+          cert_file: '/app/cert.pem',
+        },
         headers: [
           {
             name: 'api-key',
@@ -715,7 +725,7 @@ const readerExample: MetricReader = {
     },
     producers: [
       {
-        prometheus: undefined,
+        opencensus: undefined,
       },
     ],
     cardinality_limits: {
@@ -943,9 +953,11 @@ describe('ConfigFactory', function () {
                 exporter: {
                   otlp_http: {
                     endpoint: 'http://test.com:4318/v1/traces',
-                    certificate_file: 'certificate_file.txt',
-                    client_key_file: 'certificate_key_value',
-                    client_certificate_file: 'client_certificate_file.txt',
+                    tls: {
+                      ca_file: 'certificate_file.txt',
+                      key_file: 'certificate_key_value',
+                      cert_file: 'client_certificate_file.txt',
+                    },
                     compression: 'gzip',
                     timeout: 2000,
                     headers_list: 'host=localhost',
@@ -1022,65 +1034,6 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
     });
 
-    it('should return config with tracer_provider with default zipkin exporter', function () {
-      process.env.OTEL_TRACES_EXPORTER = 'zipkin';
-      const expectedConfig: ConfigurationModel = {
-        ...defaultConfig,
-        tracer_provider: {
-          ...defaultTracerProvider,
-          processors: [
-            {
-              batch: {
-                schedule_delay: 5000,
-                export_timeout: 30000,
-                max_queue_size: 2048,
-                max_export_batch_size: 512,
-                exporter: {
-                  zipkin: {
-                    endpoint: 'http://localhost:9411/api/v2/spans',
-                    timeout: 10000,
-                  },
-                },
-              },
-            },
-          ],
-        },
-      };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
-    });
-
-    it('should return config with tracer_provider with custom zipkin exporter', function () {
-      process.env.OTEL_TRACES_EXPORTER = 'zipkin';
-      process.env.OTEL_EXPORTER_ZIPKIN_ENDPOINT =
-        'http://custom:9411/api/v2/spans';
-      process.env.OTEL_EXPORTER_ZIPKIN_TIMEOUT = '15000';
-      const expectedConfig: ConfigurationModel = {
-        ...defaultConfig,
-        tracer_provider: {
-          ...defaultTracerProvider,
-          processors: [
-            {
-              batch: {
-                schedule_delay: 5000,
-                export_timeout: 30000,
-                max_queue_size: 2048,
-                max_export_batch_size: 512,
-                exporter: {
-                  zipkin: {
-                    endpoint: 'http://custom:9411/api/v2/spans',
-                    timeout: 15000,
-                  },
-                },
-              },
-            },
-          ],
-        },
-      };
-      const configProvider = createConfigFactory();
-      assert.deepStrictEqual(configProvider.getConfigModel(), expectedConfig);
-    });
-
     it('should return config with tracer_provider with exporter list', function () {
       process.env.OTEL_TRACES_EXPORTER = 'otlp,console,zipkin';
       process.env.OTEL_EXPORTER_ZIPKIN_ENDPOINT =
@@ -1110,20 +1063,6 @@ describe('ConfigFactory', function () {
               simple: {
                 exporter: {
                   console: {},
-                },
-              },
-            },
-            {
-              batch: {
-                schedule_delay: 5000,
-                export_timeout: 30000,
-                max_queue_size: 2048,
-                max_export_batch_size: 512,
-                exporter: {
-                  zipkin: {
-                    endpoint: 'http://custom:9411/api/v2/spans',
-                    timeout: 15000,
-                  },
                 },
               },
             },
@@ -1164,9 +1103,11 @@ describe('ConfigFactory', function () {
                   otlp_grpc: {
                     endpoint: 'http://localhost:4317',
                     timeout: 10000,
-                    certificate_file: 'traces-cert.pem',
-                    client_key_file: 'traces-key.pem',
-                    client_certificate_file: 'traces-client-cert.pem',
+                    tls: {
+                      ca_file: 'traces-cert.pem',
+                      key_file: 'traces-key.pem',
+                      cert_file: 'traces-client-cert.pem',
+                    },
                     compression: 'gzip',
                     headers_list: 'host=localhost',
                   },
@@ -1210,9 +1151,11 @@ describe('ConfigFactory', function () {
                 exporter: {
                   otlp_http: {
                     endpoint: 'http://test.com:4318/v1/metrics',
-                    certificate_file: 'certificate_file.txt',
-                    client_key_file: 'certificate_key_value',
-                    client_certificate_file: 'client_certificate_file.txt',
+                    tls: {
+                      ca_file: 'certificate_file.txt',
+                      key_file: 'certificate_key_value',
+                      cert_file: 'client_certificate_file.txt',
+                    },
                     compression: 'gzip',
                     timeout: 300,
                     headers_list: 'host=localhost',
@@ -1327,9 +1270,11 @@ describe('ConfigFactory', function () {
                       ExporterTemporalityPreference.Cumulative,
                     endpoint: 'http://localhost:4317',
                     timeout: 10000,
-                    certificate_file: 'metric-cert.pem',
-                    client_key_file: 'metric-key.pem',
-                    client_certificate_file: 'metric-client-cert.pem',
+                    tls: {
+                      ca_file: 'metric-cert.pem',
+                      key_file: 'metric-key.pem',
+                      cert_file: 'metric-client-cert.pem',
+                    },
                     compression: 'gzip',
                     headers_list: 'host=localhost',
                   },
@@ -1510,9 +1455,11 @@ describe('ConfigFactory', function () {
                 exporter: {
                   otlp_http: {
                     endpoint: 'http://test.com:4318/v1/logs',
-                    certificate_file: 'certificate_file.txt',
-                    client_key_file: 'certificate_key_value',
-                    client_certificate_file: 'client_certificate_file.txt',
+                    tls: {
+                      ca_file: 'certificate_file.txt',
+                      key_file: 'certificate_key_value',
+                      cert_file: 'client_certificate_file.txt',
+                    },
                     compression: 'gzip',
                     timeout: 700,
                     headers_list: 'host=localhost',
@@ -1623,9 +1570,11 @@ describe('ConfigFactory', function () {
                   otlp_grpc: {
                     endpoint: 'http://localhost:4317',
                     timeout: 10000,
-                    certificate_file: 'log-cert.pem',
-                    client_key_file: 'log-key.pem',
-                    client_certificate_file: 'log-client-cert.pem',
+                    tls: {
+                      ca_file: 'log-cert.pem',
+                      key_file: 'log-key.pem',
+                      cert_file: 'log-client-cert.pem',
+                    },
                     headers_list: 'host=localhost',
                     compression: 'gzip',
                   },
@@ -1701,9 +1650,11 @@ describe('ConfigFactory', function () {
                     timeout: 12000,
                     compression: 'backup_compression',
                     encoding: OtlpHttpEncoding.Protobuf,
-                    certificate_file: 'backup_certificate_file.pem',
-                    client_certificate_file: 'backup_client_certificate.pem',
-                    client_key_file: 'backup_client_key.pem',
+                    tls: {
+                      ca_file: 'backup_certificate_file.pem',
+                      key_file: 'backup_client_key.pem',
+                      cert_file: 'backup_client_certificate.pem',
+                    },
                     headers_list: 'backup_headers=123',
                   },
                 },
@@ -1727,9 +1678,11 @@ describe('ConfigFactory', function () {
                       ExporterTemporalityPreference.Cumulative,
                     default_histogram_aggregation:
                       ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
-                    certificate_file: 'backup_certificate_file.pem',
-                    client_certificate_file: 'backup_client_certificate.pem',
-                    client_key_file: 'backup_client_key.pem',
+                    tls: {
+                      ca_file: 'backup_certificate_file.pem',
+                      key_file: 'backup_client_key.pem',
+                      cert_file: 'backup_client_certificate.pem',
+                    },
                     headers_list: 'backup_headers=123',
                     encoding: OtlpHttpEncoding.Protobuf,
                   },
@@ -1755,9 +1708,11 @@ describe('ConfigFactory', function () {
                     timeout: 12000,
                     compression: 'backup_compression',
                     encoding: OtlpHttpEncoding.Protobuf,
-                    certificate_file: 'backup_certificate_file.pem',
-                    client_certificate_file: 'backup_client_certificate.pem',
-                    client_key_file: 'backup_client_key.pem',
+                    tls: {
+                      ca_file: 'backup_certificate_file.pem',
+                      key_file: 'backup_client_key.pem',
+                      cert_file: 'backup_client_certificate.pem',
+                    },
                     headers_list: 'backup_headers=123',
                   },
                 },
@@ -1925,6 +1880,7 @@ describe('ConfigFactory', function () {
     it('should initialize config with config file that contains environment variables', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
         'test/fixtures/sdk-migration-config.yaml';
+      process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://test.com:4318';
       process.env.OTEL_SDK_DISABLED = 'false';
       process.env.OTEL_LOG_LEVEL = 'debug';
       process.env.OTEL_SERVICE_NAME = 'custom-name';
@@ -2027,9 +1983,11 @@ describe('ConfigFactory', function () {
                 schedule_delay: 123,
                 exporter: {
                   otlp_http: {
-                    certificate_file: 'trace-certificate',
-                    client_certificate_file: 'trace-client-certificate',
-                    client_key_file: 'trace-client-key',
+                    tls: {
+                      ca_file: 'trace-certificate',
+                      key_file: 'trace-client-key',
+                      cert_file: 'trace-client-certificate',
+                    },
                     compression: 'trace-compression',
                     encoding: OtlpHttpEncoding.Protobuf,
                     endpoint: 'http://test.com:4318/v1/traces',
@@ -2056,9 +2014,11 @@ describe('ConfigFactory', function () {
                       ExporterTemporalityPreference.Cumulative,
                     default_histogram_aggregation:
                       ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
-                    certificate_file: 'metric-certificate',
-                    client_certificate_file: 'metric-client-certificate',
-                    client_key_file: 'metric-client-key',
+                    tls: {
+                      ca_file: 'metric-certificate',
+                      key_file: 'metric-client-key',
+                      cert_file: 'metric-client-certificate',
+                    },
                     compression: 'metric-compression',
                     encoding: OtlpHttpEncoding.Protobuf,
                     headers_list: 'metric-header',
@@ -2093,9 +2053,11 @@ describe('ConfigFactory', function () {
                 schedule_delay: 23,
                 exporter: {
                   otlp_http: {
-                    certificate_file: 'logs-certificate',
-                    client_certificate_file: 'logs-client-certificate',
-                    client_key_file: 'logs-client-key',
+                    tls: {
+                      ca_file: 'logs-certificate',
+                      key_file: 'logs-client-key',
+                      cert_file: 'logs-client-certificate',
+                    },
                     compression: 'logs-compression',
                     encoding: OtlpHttpEncoding.Protobuf,
                     endpoint: 'http://test.com:4318/v1/logs',

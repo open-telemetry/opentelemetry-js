@@ -96,7 +96,7 @@ export function hasValidConfigFile(): boolean {
 }
 
 export function parseConfigFile(config: ConfigurationModel) {
-  const supportedFileVersions = ['1.0-rc.1', '1.0-rc.2'];
+  const supportedFileVersions = ['1.0-rc.3'];
   const configFile = getStringFromEnv('OTEL_EXPERIMENTAL_CONFIG_FILE') || '';
   const file = fs.readFileSync(configFile, 'utf8');
   const parsedContent = yaml.parse(file);
@@ -349,19 +349,6 @@ function parseConfigSpanOrLogRecordExporter(
                 : OtlpHttpEncoding.Protobuf,
           },
         };
-
-        certFile = getStringFromConfigFile(e['certificate_file']);
-        if (certFile && parsedExporter.otlp_http) {
-          parsedExporter.otlp_http.certificate_file = certFile;
-        }
-        clientCertFile = getStringFromConfigFile(e['client_certificate_file']);
-        if (clientCertFile && parsedExporter.otlp_http) {
-          parsedExporter.otlp_http.client_certificate_file = clientCertFile;
-        }
-        clientKeyFile = getStringFromConfigFile(e['client_key_file']);
-        if (clientKeyFile && parsedExporter.otlp_http) {
-          parsedExporter.otlp_http.client_key_file = clientKeyFile;
-        }
         compression = getStringFromConfigFile(e['compression']);
         if (compression && parsedExporter.otlp_http) {
           parsedExporter.otlp_http.compression = compression;
@@ -373,6 +360,25 @@ function parseConfigSpanOrLogRecordExporter(
         headers = getConfigHeaders(e['headers']);
         if (headers && parsedExporter.otlp_http) {
           parsedExporter.otlp_http.headers = headers;
+        }
+
+        if (e['tls']) {
+          certFile = getStringFromConfigFile(e['tls']['ca_file']);
+          clientCertFile = getStringFromConfigFile(e['tls']['cert_file']);
+          clientKeyFile = getStringFromConfigFile(e['tls']['key_file']);
+
+          if (certFile || clientCertFile || clientKeyFile) {
+            parsedExporter.otlp_http!.tls = {};
+            if (certFile) {
+              parsedExporter.otlp_http!.tls.ca_file = certFile;
+            }
+            if (clientCertFile) {
+              parsedExporter.otlp_http!.tls.cert_file = clientCertFile;
+            }
+            if (clientKeyFile) {
+              parsedExporter.otlp_http!.tls.key_file = clientKeyFile;
+            }
+          }
         }
       }
       break;
@@ -388,18 +394,6 @@ function parseConfigSpanOrLogRecordExporter(
           },
         };
 
-        certFile = getStringFromConfigFile(e['certificate_file']);
-        if (certFile && parsedExporter.otlp_grpc) {
-          parsedExporter.otlp_grpc.certificate_file = certFile;
-        }
-        clientCertFile = getStringFromConfigFile(e['client_certificate_file']);
-        if (clientCertFile && parsedExporter.otlp_grpc) {
-          parsedExporter.otlp_grpc.client_certificate_file = clientCertFile;
-        }
-        clientKeyFile = getStringFromConfigFile(e['client_key_file']);
-        if (clientKeyFile && parsedExporter.otlp_grpc) {
-          parsedExporter.otlp_grpc.client_key_file = clientKeyFile;
-        }
         compression = getStringFromConfigFile(e['compression']);
         if (compression && parsedExporter.otlp_grpc) {
           parsedExporter.otlp_grpc.compression = compression;
@@ -412,9 +406,28 @@ function parseConfigSpanOrLogRecordExporter(
         if (headers && parsedExporter.otlp_grpc) {
           parsedExporter.otlp_grpc.headers = headers;
         }
-        insecure = getBooleanFromConfigFile(e['insecure']);
-        if ((insecure || insecure === false) && parsedExporter.otlp_grpc) {
-          parsedExporter.otlp_grpc.insecure = insecure;
+
+        if (e['tls']) {
+          certFile = getStringFromConfigFile(e['tls']['ca_file']);
+          clientCertFile = getStringFromConfigFile(e['tls']['cert_file']);
+          clientKeyFile = getStringFromConfigFile(e['tls']['key_file']);
+
+          if (certFile || clientCertFile || clientKeyFile) {
+            parsedExporter.otlp_grpc!.tls = {};
+            if (certFile) {
+              parsedExporter.otlp_grpc!.tls.ca_file = certFile;
+            }
+            if (clientCertFile) {
+              parsedExporter.otlp_grpc!.tls.cert_file = clientCertFile;
+            }
+            if (clientKeyFile) {
+              parsedExporter.otlp_grpc!.tls.key_file = clientKeyFile;
+            }
+            insecure = getBooleanFromConfigFile(e['tls']['insecure']);
+            if (insecure || insecure === false) {
+              parsedExporter.otlp_grpc!.tls.insecure = insecure;
+            }
+          }
         }
       }
       break;
@@ -435,20 +448,6 @@ function parseConfigSpanOrLogRecordExporter(
       parsedExporter = {
         console: {},
       };
-      break;
-
-    case 'zipkin':
-      e = (exporter as SpanExporter)['zipkin'];
-      if (e) {
-        parsedExporter = {
-          zipkin: {
-            endpoint:
-              getStringFromConfigFile(e['endpoint']) ??
-              'http://localhost:9411/api/v2/spans',
-            timeout: getNumberFromConfigFile(e['timeout']) ?? 10000,
-          },
-        };
-      }
       break;
   }
 
@@ -598,9 +597,6 @@ function getProducers(producers?: MetricProducer[]): MetricProducer[] {
       if (Object.keys(producer)[0] === 'opencensus') {
         parsedProducers.push({ opencensus: undefined });
       }
-      if (Object.keys(producer)[0] === 'prometheus') {
-        parsedProducers.push({ prometheus: undefined });
-      }
     }
   }
 
@@ -676,18 +672,6 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
           },
         };
 
-        certFile = getStringFromConfigFile(e['certificate_file']);
-        if (certFile && parsedExporter.otlp_http) {
-          parsedExporter.otlp_http.certificate_file = certFile;
-        }
-        clientCertFile = getStringFromConfigFile(e['client_certificate_file']);
-        if (clientCertFile && parsedExporter.otlp_http) {
-          parsedExporter.otlp_http.client_certificate_file = clientCertFile;
-        }
-        clientKeyFile = getStringFromConfigFile(e['client_key_file']);
-        if (clientKeyFile && parsedExporter.otlp_http) {
-          parsedExporter.otlp_http.client_key_file = clientKeyFile;
-        }
         compression = getStringFromConfigFile(e['compression']);
         if (compression && parsedExporter.otlp_http) {
           parsedExporter.otlp_http.compression = compression;
@@ -699,6 +683,25 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
         headers = getConfigHeaders(e['headers']);
         if (headers && parsedExporter.otlp_http) {
           parsedExporter.otlp_http.headers = headers;
+        }
+
+        if (e['tls']) {
+          certFile = getStringFromConfigFile(e['tls']['ca_file']);
+          clientCertFile = getStringFromConfigFile(e['tls']['cert_file']);
+          clientKeyFile = getStringFromConfigFile(e['tls']['key_file']);
+
+          if (certFile || clientCertFile || clientKeyFile) {
+            parsedExporter.otlp_http!.tls = {};
+            if (certFile) {
+              parsedExporter.otlp_http!.tls.ca_file = certFile;
+            }
+            if (clientCertFile) {
+              parsedExporter.otlp_http!.tls.cert_file = clientCertFile;
+            }
+            if (clientKeyFile) {
+              parsedExporter.otlp_http!.tls.key_file = clientKeyFile;
+            }
+          }
         }
       }
       break;
@@ -720,18 +723,6 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
           },
         };
 
-        certFile = getStringFromConfigFile(e['certificate_file']);
-        if (certFile && parsedExporter.otlp_grpc) {
-          parsedExporter.otlp_grpc.certificate_file = certFile;
-        }
-        clientCertFile = getStringFromConfigFile(e['client_certificate_file']);
-        if (clientCertFile && parsedExporter.otlp_grpc) {
-          parsedExporter.otlp_grpc.client_certificate_file = clientCertFile;
-        }
-        clientKeyFile = getStringFromConfigFile(e['client_key_file']);
-        if (clientKeyFile && parsedExporter.otlp_grpc) {
-          parsedExporter.otlp_grpc.client_key_file = clientKeyFile;
-        }
         compression = getStringFromConfigFile(e['compression']);
         if (compression && parsedExporter.otlp_grpc) {
           parsedExporter.otlp_grpc.compression = compression;
@@ -744,9 +735,28 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
         if (headers && parsedExporter.otlp_grpc) {
           parsedExporter.otlp_grpc.headers = headers;
         }
-        insecure = getBooleanFromConfigFile(e['insecure']);
-        if ((insecure || insecure === false) && parsedExporter.otlp_grpc) {
-          parsedExporter.otlp_grpc.insecure = insecure;
+
+        if (e['tls']) {
+          certFile = getStringFromConfigFile(e['tls']['ca_file']);
+          clientCertFile = getStringFromConfigFile(e['tls']['cert_file']);
+          clientKeyFile = getStringFromConfigFile(e['tls']['key_file']);
+
+          if (certFile || clientCertFile || clientKeyFile) {
+            parsedExporter.otlp_grpc!.tls = {};
+            if (certFile) {
+              parsedExporter.otlp_grpc!.tls.ca_file = certFile;
+            }
+            if (clientCertFile) {
+              parsedExporter.otlp_grpc!.tls.cert_file = clientCertFile;
+            }
+            if (clientKeyFile) {
+              parsedExporter.otlp_grpc!.tls.key_file = clientKeyFile;
+            }
+            insecure = getBooleanFromConfigFile(e['tls']['insecure']);
+            if (insecure || insecure === false) {
+              parsedExporter.otlp_grpc!.tls.insecure = insecure;
+            }
+          }
         }
       }
       break;
