@@ -222,7 +222,7 @@ export interface ExperimentalPrometheusMetricExporter {
   /**
    * Configure Prometheus Exporter to add resource attributes as metrics attributes.
    */
-  with_resource_constant_labels: IncludeExclude;
+  with_resource_constant_labels?: IncludeExclude;
 
   /**
    * Configure how metric names are translated to Prometheus metric names.
@@ -416,12 +416,12 @@ export interface View {
   /**
    * Configure view selector.
    */
-  selector?: ViewSelector;
+  selector: ViewSelector;
 
   /**
    * Configure view stream.
    */
-  stream?: ViewStream;
+  stream: ViewStream;
 }
 
 export interface ViewSelector {

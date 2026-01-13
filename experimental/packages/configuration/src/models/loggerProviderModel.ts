@@ -152,11 +152,26 @@ export interface ExperimentalLoggerConfigurator {
   loggers?: ExperimentalLoggerMatcherAndConfig[];
 }
 
+export interface ExperimentalLoggerMatcherAndConfig {
+  /**
+   * Configure logger names to match, evaluated as follows:
+   *  * If the logger name exactly matches.
+   *  * If the logger name matches the wildcard pattern, where '?' matches any single character
+   * and '*' matches any number of characters including none.
+   */
+  name: string;
+
+  /**
+   * The logger config.
+   */
+  config: ExperimentalLoggerConfig;
+}
+
 export interface ExperimentalLoggerConfig {
   /**
    * Configure if the logger is enabled or not.
    */
-  disabled: boolean;
+  enable?: boolean;
 
   /**
    * Configure severity filtering.
@@ -169,19 +184,4 @@ export interface ExperimentalLoggerConfig {
    * If true, log records associated with unsampled trace contexts traces are not processed. If false, or if a log record is not associated with a trace context, trace based filtering is not applied.
    */
   trace_based?: boolean;
-}
-
-export interface ExperimentalLoggerMatcherAndConfig {
-  /**
-   * Configure logger names to match, evaluated as follows:
-   *  * If the logger name exactly matches.
-   *  * If the logger name matches the wildcard pattern, where '?' matches any single character
-   * and '*' matches any number of characters including none.
-   */
-  name?: string;
-
-  /**
-   * The logger config.
-   */
-  config?: ExperimentalLoggerConfig;
 }
