@@ -568,13 +568,13 @@ const configFromFile: ConfigurationModel = {
     },
     'logger_configurator/development': {
       default_config: {
-        disabled: true,
+        enabled: true,
       },
       loggers: [
         {
           name: 'io.opentelemetry.contrib.*',
           config: {
-            disabled: false,
+            enabled: false,
             minimum_severity: SeverityNumber.INFO,
             trace_based: true,
           },

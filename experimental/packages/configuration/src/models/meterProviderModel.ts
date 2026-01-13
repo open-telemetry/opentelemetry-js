@@ -416,12 +416,12 @@ export interface View {
   /**
    * Configure view selector.
    */
-  selector: ViewSelector;
+  selector?: ViewSelector;
 
   /**
    * Configure view stream.
    */
-  stream: ViewStream;
+  stream?: ViewStream;
 }
 
 export interface ViewSelector {

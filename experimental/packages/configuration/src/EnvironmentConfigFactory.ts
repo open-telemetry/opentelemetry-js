@@ -432,7 +432,8 @@ export function setMeterProvider(config: ConfigurationModel): void {
             readerPeriodicInfo.exporter.otlp_grpc.tls.key_file = clientKeyFile;
           }
           if (clientCertificateFile) {
-            readerPeriodicInfo.exporter.otlp_grpc.tls.cert_file = clientCertificateFile;
+            readerPeriodicInfo.exporter.otlp_grpc.tls.cert_file =
+              clientCertificateFile;
           }
         }
         if (compression) {
@@ -501,7 +502,8 @@ export function setMeterProvider(config: ConfigurationModel): void {
             readerPeriodicInfo.exporter.otlp_http.tls.key_file = clientKeyFile;
           }
           if (clientCertificateFile) {
-            readerPeriodicInfo.exporter.otlp_http.tls.cert_file = clientCertificateFile;
+            readerPeriodicInfo.exporter.otlp_http.tls.cert_file =
+              clientCertificateFile;
           }
         }
         if (compression) {

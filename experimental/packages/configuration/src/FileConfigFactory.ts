@@ -841,13 +841,13 @@ export function setMeterProvider(
                   getStringListFromConfigFile(
                     element['exporter']['prometheus/development'][
                       'with_resource_constant_labels'
-                    ]['included']
+                    ]?.['included']
                   ) ?? [],
                 excluded:
                   getStringListFromConfigFile(
                     element['exporter']['prometheus/development'][
                       'with_resource_constant_labels'
-                    ]['excluded']
+                    ]?.['excluded']
                   ) ?? [],
               },
             },
@@ -1151,13 +1151,13 @@ export function setLoggerProvider(
     if (loggerProvider['logger_configurator/development']) {
       const defaultConfigDisabled = getBooleanFromConfigFile(
         loggerProvider['logger_configurator/development']['default_config']?.[
-          'disabled'
+          'enabled'
         ]
       );
       if (defaultConfigDisabled || defaultConfigDisabled === false) {
         config.logger_provider['logger_configurator/development'] = {
           default_config: {
-            disabled: defaultConfigDisabled,
+            enabled: defaultConfigDisabled,
           },
         };
       }
@@ -1174,17 +1174,17 @@ export function setLoggerProvider(
         ) {
           const logger =
             loggerProvider['logger_configurator/development'].loggers[i];
-          let disabled = false;
+          let enabled = false;
           if (logger['config']) {
-            disabled =
-              getBooleanFromConfigFile(logger['config']['disabled']) ?? false;
+            enabled =
+              getBooleanFromConfigFile(logger['config']['enabled']) ?? false;
           }
           const name = getStringFromConfigFile(logger['name']);
           if (name) {
             loggers.push({
               name: name,
               config: {
-                disabled: disabled,
+                enabled: enabled,
               },
             });
           }

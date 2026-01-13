@@ -171,7 +171,7 @@ export interface ExperimentalLoggerConfig {
   /**
    * Configure if the logger is enabled or not.
    */
-  enable?: boolean;
+  enabled?: boolean;
 
   /**
    * Configure severity filtering.
