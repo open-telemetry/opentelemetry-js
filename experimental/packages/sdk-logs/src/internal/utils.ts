@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
-/** only globals that common to node and browsers are allowed */
-// eslint-disable-next-line n/no-unsupported-features/es-builtins
-export const _globalThis = typeof globalThis === 'object' ? globalThis : global;
+import type { InstrumentationScope } from '@opentelemetry/core';
+
+/**
+ * Converting the instrumentation scope object to a unique identifier string.
+ * @param scope - The instrumentation scope to convert
+ * @returns A unique string identifier for the scope
+ */
+export function getInstrumentationScopeKey(
+  scope: InstrumentationScope
+): string {
+  return `${scope.name}@${scope.version || ''}:${scope.schemaUrl || ''}`;
+}

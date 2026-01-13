@@ -14,12 +14,24 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+* chore(browser): fix CODEOWNERS paths for browser-related packages
+
+## 2.3.0
+
+### :rocket: Features
+
 * feat(sdk-trace-base): implement on ending in span processor [#6024](https://github.com/open-telemetry/opentelemetry-js/pull/6024) @majanjua-amzn
   * note: this feature is experimental and subject to change
 
 ### :bug: Bug Fixes
 
-### :books: Documentation
+* fix(sdk-metrics): remove setImmediate usage in ConsoleMetricExporter [#6199](https://github.com/open-telemetry/opentelemetry-js/pull/6199) @overbalance
 
 ### :house: Internal
 
@@ -29,6 +41,14 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * refactor(sdk-metrics): simplify AllowList and DenyList processors [#6159](https://github.com/open-telemetry/opentelemetry-js/pull/6159) @cjihrig
 * chore: disallow constructor parameter property syntax [#6187](https://github.com/open-telemetry/opentelemetry-js/pull/6187) @legendecas
 * refactor(sdk-metrics): use test() instead of match() in isValidName() [#6205](https://github.com/open-telemetry/opentelemetry-js/pull/6205) @cjihrig
+* refactor(core): remove TimeOriginLegacy Safari <15 fallback [#6235](https://github.com/open-telemetry/opentelemetry-js/pull/6235) @overbalance
+* chore: remove backcompat workspace [#6238](https://github.com/open-telemetry/opentelemetry-js/pull/6238) @overbalance
+* refactor(core,resources): consolidate platform-specific code [#6208](https://github.com/open-telemetry/opentelemetry-js/pull/6208) @overbalance
+* test(api): remove unnecessary conditional [#6241](https://github.com/open-telemetry/opentelemetry-js/pull/6241) @cjihrig
+* refactor(api): remove several reverse() calls [#6252](https://github.com/open-telemetry/opentelemetry-js/pull/6252) @cjihrig
+* refactor(api): remove unnecessary map() call [#6251](https://github.com/open-telemetry/opentelemetry-js/pull/6251) @cjihrig
+* chore: add zed to gitignore [#6258](https://github.com/open-telemetry/opentelemetry-js/pull/6258) @overbalance
+* chore(deps): update nx to 22.3.0 [#6233](https://github.com/open-telemetry/opentelemetry-js/pull/6233) @overbalance
 
 ## 2.2.0
 
