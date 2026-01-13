@@ -93,6 +93,7 @@ export class SpanImpl implements Span {
   private _droppedAttributesCount = 0;
   private _droppedEventsCount: number = 0;
   private _droppedLinksCount: number = 0;
+  private _attributesCount: number = 0;
 
   name: string;
   status: SpanStatus = {
@@ -157,16 +158,24 @@ export class SpanImpl implements Span {
     }
 
     const { attributeCountLimit } = this._spanLimits;
+    const isNewKey = !Object.prototype.hasOwnProperty.call(
+      this.attributes,
+      key
+    );
 
     if (
       attributeCountLimit !== undefined &&
-      Object.keys(this.attributes).length >= attributeCountLimit &&
-      !Object.prototype.hasOwnProperty.call(this.attributes, key)
+      this._attributesCount >= attributeCountLimit &&
+      isNewKey
     ) {
       this._droppedAttributesCount++;
       return this;
     }
+
     this.attributes[key] = this._truncateToSize(value);
+    if (isNewKey) {
+      this._attributesCount++;
+    }
     return this;
   }
 
