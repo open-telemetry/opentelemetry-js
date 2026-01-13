@@ -65,11 +65,11 @@ logger_provider:
     attribute_count_limit: 128
   logger_configurator/development:
     default_config:
-      disabled: true
+      enabled: true
     loggers:
       - name: io.opentelemetry.contrib.*
         config:
-          disabled: false
+          enabled: false
           minimum_severity: info
           trace_based: true
 meter_provider:
@@ -202,13 +202,6 @@ meter_provider:
           excluded:
             - key3
   exemplar_filter: trace_based
-  meter_configurator/development:
-    default_config:
-      disabled: true
-    meters:
-      - name: io.opentelemetry.contrib.*
-        config:
-          disabled: false
 propagator:
   composite:
     - tracecontext:
@@ -327,13 +320,6 @@ tracer_provider:
       # If omitted or null, always_off is used.
       local_parent_not_sampled:
         always_off:
-  tracer_configurator/development:
-    default_config:
-      disabled: true
-    tracers:
-      - name: io.opentelemetry.contrib.*
-        config:
-          disabled: false
 resource:
   attributes:
     - name: service.name
@@ -375,62 +361,3 @@ resource:
       - process:
       - service:
   schema_url: https://opentelemetry.io/schemas/1.16.0
-instrumentation/development:
-  general:
-    peer:
-      service_mapping:
-        - peer: 1.2.3.4
-          service: FooService
-        - peer: 2.3.4.5
-          service: BarService
-    http:
-      client:
-        request_captured_headers:
-          - Content-Type
-          - Accept
-        response_captured_headers:
-          - Content-Type
-          - Content-Encoding
-      server:
-        request_captured_headers:
-          - Content-Type
-          - Accept
-        response_captured_headers:
-          - Content-Type
-          - Content-Encoding
-  cpp:
-    example:
-      property: "value"
-  dotnet:
-    example:
-      property: "value"
-  erlang:
-    example:
-      property: "value"
-  go:
-    example:
-      property: "value"
-  java:
-    example:
-      property: "value"
-  js:
-    example:
-      property: "value"
-  php:
-    example:
-      property: "value"
-  python:
-    example:
-      property: "value"
-  ruby:
-    example:
-      property: "value"
-  rust:
-    example:
-      property: "value"
-  swift:
-    example:
-      property: "value"
-distribution:
-  example:
-    property: "value"

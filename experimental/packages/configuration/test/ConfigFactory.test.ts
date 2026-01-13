@@ -82,6 +82,118 @@ const configFromFile: ConfigurationModel = {
   disabled: false,
   log_level: DiagLogLevel.INFO,
   resource: {
+    attributes: [
+      {
+        name: 'service.name',
+        value: 'unknown_service',
+        type: 'string',
+      },
+    ],
+  },
+  attribute_limits: {
+    attribute_count_limit: 128,
+  },
+  propagator: {
+    composite: [{ tracecontext: null }, { baggage: null }],
+    composite_list: 'tracecontext,baggage',
+  },
+  tracer_provider: {
+    processors: [
+      {
+        batch: {
+          schedule_delay: 5000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            otlp_http: {
+              endpoint: 'http://localhost:4318/v1/traces',
+              timeout: 10000,
+              compression: 'gzip',
+              encoding: OtlpHttpEncoding.Protobuf,
+            },
+          },
+        },
+      },
+    ],
+    limits: {
+      attribute_count_limit: 128,
+      event_count_limit: 128,
+      link_count_limit: 128,
+      event_attribute_count_limit: 128,
+      link_attribute_count_limit: 128,
+    },
+    sampler: {
+      parent_based: {
+        root: { always_on: undefined },
+        remote_parent_sampled: { always_on: undefined },
+        remote_parent_not_sampled: { always_off: undefined },
+        local_parent_sampled: { always_on: undefined },
+        local_parent_not_sampled: { always_off: undefined },
+      },
+    },
+  },
+  meter_provider: {
+    readers: [
+      {
+        periodic: {
+          interval: 60000,
+          timeout: 30000,
+          exporter: {
+            otlp_http: {
+              endpoint: 'http://localhost:4318/v1/metrics',
+              compression: 'gzip',
+              timeout: 10000,
+              encoding: OtlpHttpEncoding.Protobuf,
+              temporality_preference: ExporterTemporalityPreference.Cumulative,
+              default_histogram_aggregation:
+                ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+            },
+          },
+          cardinality_limits: {
+            default: 2000,
+            counter: 2000,
+            gauge: 2000,
+            histogram: 2000,
+            observable_counter: 2000,
+            observable_gauge: 2000,
+            observable_up_down_counter: 2000,
+            up_down_counter: 2000,
+          },
+        },
+      },
+    ],
+    exemplar_filter: ExemplarFilter.TraceBased,
+  },
+  logger_provider: {
+    processors: [
+      {
+        batch: {
+          schedule_delay: 1000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
+          exporter: {
+            otlp_http: {
+              endpoint: 'http://localhost:4318/v1/logs',
+              timeout: 10000,
+              encoding: OtlpHttpEncoding.Protobuf,
+              compression: 'gzip',
+            },
+          },
+        },
+      },
+    ],
+    limits: {
+      attribute_count_limit: 128,
+    },
+  },
+};
+
+const configFromKitchenSinkFile: ConfigurationModel = {
+  disabled: false,
+  log_level: DiagLogLevel.INFO,
+  resource: {
     schema_url: 'https://opentelemetry.io/schemas/1.16.0',
     attributes_list: 'service.namespace=my-namespace,service.version=1.0.0',
     attributes: [
@@ -725,7 +837,7 @@ const readerExample: MetricReader = {
     },
     producers: [
       {
-        opencensus: undefined,
+        opencensus: {},
       },
     ],
     cardinality_limits: {
@@ -1035,10 +1147,7 @@ describe('ConfigFactory', function () {
     });
 
     it('should return config with tracer_provider with exporter list', function () {
-      process.env.OTEL_TRACES_EXPORTER = 'otlp,console,zipkin';
-      process.env.OTEL_EXPORTER_ZIPKIN_ENDPOINT =
-        'http://custom:9411/api/v2/spans';
-      process.env.OTEL_EXPORTER_ZIPKIN_TIMEOUT = '15000';
+      process.env.OTEL_TRACES_EXPORTER = 'otlp,console';
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
@@ -1820,18 +1929,28 @@ describe('ConfigFactory', function () {
   describe('get values from config file', function () {
     it('should initialize config with default values from valid config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/kitchen-sink.yaml';
+        'test/fixtures/sdk-config.yaml';
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), configFromFile);
     });
 
+    it('should initialize config with default values from longer valid config file', function () {
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
+        'test/fixtures/kitchen-sink.yaml';
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(
+        configFactory.getConfigModel(),
+        configFromKitchenSinkFile
+      );
+    });
+
     it('should return error from invalid config file', function () {
       const warnSpy = Sinon.spy(diag, 'warn');
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = './fixtures/kitchen-sink.txt';
+      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = './fixtures/invalid.txt';
       createConfigFactory();
       Sinon.assert.calledWith(
         warnSpy,
-        'Config file ./fixtures/kitchen-sink.txt set on OTEL_EXPERIMENTAL_CONFIG_FILE is not valid'
+        'Config file ./fixtures/invalid.txt set on OTEL_EXPERIMENTAL_CONFIG_FILE is not valid'
       );
     });
 
@@ -1841,7 +1960,7 @@ describe('ConfigFactory', function () {
       createConfigFactory();
       Sinon.assert.calledWith(
         warnSpy,
-        'Unsupported File Format: invalid. It must be one of the following: 1.0-rc.1,1.0-rc.2'
+        'Unsupported File Format: invalid. It must be one of the following: 1.0-rc.3'
       );
     });
 
@@ -1887,7 +2006,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_RESOURCE_ATTRIBUTES = 'att=1';
       process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '23';
       process.env.OTEL_ATTRIBUTE_COUNT_LIMIT = '7';
-      process.env.OTEL_PROPAGATORS = 'prop';
+      process.env.OTEL_PROPAGATORS = 'b3multi';
       process.env.OTEL_BSP_SCHEDULE_DELAY = '123';
       process.env.OTEL_BSP_EXPORT_TIMEOUT = '456';
       process.env.OTEL_BSP_MAX_QUEUE_SIZE = '789';
@@ -1910,7 +2029,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_METRIC_EXPORT_INTERVAL = '20';
       process.env.OTEL_METRIC_EXPORT_TIMEOUT = '21';
       process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT =
-        'http://test:4318/v1/metrics';
+        'http://test.com:4318/v1/metrics';
       process.env.OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE = 'metric-certificate';
       process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY = 'metric-client-key';
       process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE =
@@ -1961,8 +2080,8 @@ describe('ConfigFactory', function () {
           attribute_value_length_limit: 23,
         },
         propagator: {
-          composite: [{ prop: null }],
-          composite_list: 'prop',
+          composite: [{ b3multi: null }],
+          composite_list: 'b3multi',
         },
         tracer_provider: {
           ...defaultConfigFromFileWithEnvVariables.tracer_provider,
@@ -2008,7 +2127,7 @@ describe('ConfigFactory', function () {
                 timeout: 21,
                 exporter: {
                   otlp_http: {
-                    endpoint: 'http://test:4318/v1/metrics',
+                    endpoint: 'http://test.com:4318/v1/metrics',
                     timeout: 22,
                     temporality_preference:
                       ExporterTemporalityPreference.Cumulative,
@@ -2182,7 +2301,13 @@ describe('ConfigFactory', function () {
 
       let config = {};
       parseConfigFile(config);
-      assert.deepStrictEqual(config, { resource: {} });
+      assert.deepStrictEqual(config, {
+        resource: {},
+        propagator: {
+          composite: [{ tracecontext: null }],
+          composite_list: 'tracecontext',
+        },
+      });
 
       config = {};
       setResourceAttributes(config, [], '');

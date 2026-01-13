@@ -32,7 +32,11 @@ import {
   getStringFromConfigFile,
   getStringListFromConfigFile,
 } from './utils';
-import { NameStringValuePair, OtlpHttpEncoding } from './models/commonModel';
+import {
+  NameStringValuePair,
+  OtlpHttpEncoding,
+  SeverityNumber,
+} from './models/commonModel';
 import {
   initializeDefaultTracerProviderConfiguration,
   SpanExporter,
@@ -40,6 +44,7 @@ import {
   TracerProvider,
 } from './models/tracerProviderModel';
 import {
+  ExperimentalLoggerMatcherAndConfig,
   initializeDefaultLoggerProviderConfiguration,
   LoggerProvider,
   LogRecordExporter,
@@ -50,6 +55,7 @@ import {
   Aggregation,
   CardinalityLimits,
   ExemplarFilter,
+  ExperimentalPrometheusTranslationStrategy,
   ExporterDefaultHistogramAggregation,
   ExporterTemporalityPreference,
   initializeDefaultMeterProviderConfiguration,
@@ -246,14 +252,17 @@ export function setPropagator(
   config: ConfigurationModel,
   propagator: Propagator
 ): void {
-  if (propagator && propagator.composite) {
+  if (propagator && (propagator.composite || propagator.composite_list)) {
     const auxList = [];
     const composite = [];
-    for (let i = 0; i < propagator.composite.length; i++) {
-      const key = Object.keys(propagator.composite[i])[0];
-      auxList.push(key);
-      composite.push({ [key]: null });
+    if (propagator.composite) {
+      for (let i = 0; i < propagator.composite.length; i++) {
+        const key = Object.keys(propagator.composite[i])[0];
+        auxList.push(key);
+        composite.push({ [key]: null });
+      }
     }
+
     const compositeList = getStringListFromConfigFile(
       propagator['composite_list']
     );
@@ -595,7 +604,7 @@ function getProducers(producers?: MetricProducer[]): MetricProducer[] {
     for (let j = 0; j < producers.length; j++) {
       const producer = producers[j];
       if (Object.keys(producer)[0] === 'opencensus') {
-        parsedProducers.push({ opencensus: undefined });
+        parsedProducers.push({ opencensus: {} });
       }
     }
   }
@@ -836,7 +845,21 @@ export function setMeterProvider(
                     'without_scope_info'
                   ]
                 ) ?? false,
-              with_resource_constant_labels: {
+              without_target_info:
+                getBooleanFromConfigFile(
+                  element['exporter']['prometheus/development'][
+                    'without_target_info'
+                  ]
+                ) ?? false,
+            },
+          };
+          if (
+            element['exporter']['prometheus/development'][
+              'with_resource_constant_labels'
+            ]
+          ) {
+            exporter['prometheus/development']!.with_resource_constant_labels =
+              {
                 included:
                   getStringListFromConfigFile(
                     element['exporter']['prometheus/development'][
@@ -849,10 +872,38 @@ export function setMeterProvider(
                       'with_resource_constant_labels'
                     ]?.['excluded']
                   ) ?? [],
-              },
-            },
-          };
+              };
+          }
 
+          if (
+            element['exporter']['prometheus/development'][
+              'translation_strategy'
+            ]
+          ) {
+            const ts = getStringFromConfigFile(
+              element['exporter']['prometheus/development'][
+                'translation_strategy'
+              ]
+            );
+            switch (ts) {
+              case 'underscore_escaping_with_suffixes':
+                exporter['prometheus/development']!.translation_strategy =
+                  ExperimentalPrometheusTranslationStrategy.UnderscoreEscapingWithSuffixes;
+                break;
+              case 'underscore_escaping_without_suffixes':
+                exporter['prometheus/development']!.translation_strategy =
+                  ExperimentalPrometheusTranslationStrategy.UnderscoreEscapingWithoutSuffixes;
+                break;
+              case 'no_utf8_escaping_with_suffixes':
+                exporter['prometheus/development']!.translation_strategy =
+                  ExperimentalPrometheusTranslationStrategy.NoUtf8EscapingWithSuffixes;
+                break;
+              case 'no_translation':
+                exporter['prometheus/development']!.translation_strategy =
+                  ExperimentalPrometheusTranslationStrategy.NoTranslation;
+                break;
+            }
+          }
           const pullReader: MetricReader = {
             pull: {
               exporter: exporter,
@@ -1073,6 +1124,64 @@ export function setMeterProvider(
   }
 }
 
+export function getSeverity(
+  severity?: SeverityNumber
+): SeverityNumber | undefined {
+  const severityType = getStringFromConfigFile(severity);
+  switch (severityType) {
+    case 'debug':
+      return SeverityNumber.DEBUG;
+    case 'debug2':
+      return SeverityNumber.DEBUG2;
+    case 'debug3':
+      return SeverityNumber.DEBUG3;
+    case 'debug4':
+      return SeverityNumber.DEBUG4;
+    case 'info':
+      return SeverityNumber.INFO;
+    case 'info2':
+      return SeverityNumber.INFO2;
+    case 'info3':
+      return SeverityNumber.INFO3;
+    case 'info4':
+      return SeverityNumber.INFO4;
+    case 'warn':
+      return SeverityNumber.WARN;
+    case 'warn2':
+      return SeverityNumber.WARN2;
+    case 'warn3':
+      return SeverityNumber.WARN3;
+    case 'warn4':
+      return SeverityNumber.WARN4;
+    case 'error':
+      return SeverityNumber.ERROR;
+    case 'error2':
+      return SeverityNumber.ERROR2;
+    case 'error3':
+      return SeverityNumber.ERROR3;
+    case 'error4':
+      return SeverityNumber.ERROR4;
+    case 'fatal':
+      return SeverityNumber.FATAL;
+    case 'fatal2':
+      return SeverityNumber.FATAL2;
+    case 'fatal3':
+      return SeverityNumber.FATAL3;
+    case 'fatal4':
+      return SeverityNumber.FATAL4;
+    case 'trace':
+      return SeverityNumber.TRACE;
+    case 'trace2':
+      return SeverityNumber.TRACE2;
+    case 'trace3':
+      return SeverityNumber.TRACE3;
+    case 'trace4':
+      return SeverityNumber.TRACE4;
+    default:
+      return undefined;
+  }
+}
+
 export function setLoggerProvider(
   config: ConfigurationModel,
   loggerProvider: LoggerProvider
@@ -1175,18 +1284,34 @@ export function setLoggerProvider(
           const logger =
             loggerProvider['logger_configurator/development'].loggers[i];
           let enabled = false;
+          let traceBased;
+          let minSeverity;
           if (logger['config']) {
             enabled =
               getBooleanFromConfigFile(logger['config']['enabled']) ?? false;
+            traceBased = getBooleanFromConfigFile(
+              logger['config']['trace_based']
+            );
+            if (logger['config']['minimum_severity']) {
+              minSeverity = getSeverity(logger['config']['minimum_severity']);
+            }
           }
           const name = getStringFromConfigFile(logger['name']);
           if (name) {
-            loggers.push({
+            const loggerNew: ExperimentalLoggerMatcherAndConfig = {
               name: name,
               config: {
                 enabled: enabled,
               },
-            });
+            };
+            if (traceBased !== undefined) {
+              loggerNew.config!.trace_based = traceBased;
+            }
+            if (minSeverity !== undefined) {
+              loggerNew.config!.minimum_severity = minSeverity;
+            }
+
+            loggers.push(loggerNew);
           }
         }
         if (config.logger_provider['logger_configurator/development'] == null) {
