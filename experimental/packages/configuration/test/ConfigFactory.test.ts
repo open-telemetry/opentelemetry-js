@@ -362,7 +362,7 @@ const configFromKitchenSinkFile: ConfigurationModel = {
     },
     sampler: {
       parent_based: {
-        root: { trace_id_ratio_based: { ratio: 0.0001 } },
+        root: { always_on: undefined },
         remote_parent_sampled: { always_on: undefined },
         remote_parent_not_sampled: { always_off: undefined },
         local_parent_sampled: { always_on: undefined },

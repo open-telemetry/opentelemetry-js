@@ -268,8 +268,7 @@ tracer_provider:
   sampler:
     parent_based:
       root:
-        trace_id_ratio_based:
-          ratio: 0.0001
+        always_on:
       remote_parent_sampled:
         always_on:
       remote_parent_not_sampled:

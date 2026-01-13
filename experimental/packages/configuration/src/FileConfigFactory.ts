@@ -789,9 +789,19 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
       break;
 
     case 'console':
-      parsedExporter = {
-        console: {},
-      };
+      e = exporter['console'];
+      if (e) {
+        parsedExporter = {
+          console: {
+            temporality_preference: getTemporalityPreference(
+              e['temporality_preference']
+            ),
+            default_histogram_aggregation: getDefaultHistogramAggregation(
+              e['default_histogram_aggregation']
+            ),
+          },
+        };
+      }
       break;
   }
 
