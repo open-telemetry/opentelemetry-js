@@ -11,6 +11,7 @@
   "main": "./build/index.cjs",
   "module": "./build/index.mjs",
   "browser": {
+    "./build/detectors/platform/index.mjs": "./build/detectors/platform/browser/index.mjs",
     "./build/detectors/platform/node/HostDetector.mjs": "./build/detectors/platform/browser/HostDetector.mjs",
     "./build/detectors/platform/node/OSDetector.mjs": "./build/detectors/platform/browser/OSDetector.mjs",
     "./build/detectors/platform/node/ProcessDetector.mjs": "./build/detectors/platform/browser/ProcessDetector.mjs",
