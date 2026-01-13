@@ -1,21 +1,39 @@
 {
   "name": "@opentelemetry/otlp-transformer",
-  "private": false,
+  "version": "0.211.0",
+  "description": "Transform OpenTelemetry SDK data into OTLP",
+  "author": "OpenTelemetry Authors",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-transformer",
+  "license": "Apache-2.0",
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.211.0",
-  "description": "Transform OpenTelemetry SDK data into OTLP",
-  "module": "build/esm/index.js",
-  "esnext": "build/esnext/index.js",
-  "types": "build/src/index.d.ts",
-  "main": "build/src/index.js",
+  "main": "./build/index.cjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.cts",
+  "exports": {
+    ".": {
+      "esnext": {
+        "types": "./build/index.d.mts",
+        "default": "./build/index.mjs"
+      },
+      "require": {
+        "types": "./build/index.d.cts",
+        "default": "./build/index.cjs"
+      },
+      "import": {
+        "types": "./build/index.d.mts",
+        "default": "./build/index.mjs"
+      }
+    }
+  },
+  "private": false,
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
     "precompile": "npm run protos",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "compile": "tsdown",
+    "clean": "rm -rf build",
     "protos": "npm run submodule && npm run protos:generate",
     "protos:generate:js": "pbjs -t static-module -p ./protos -w commonjs --null-defaults -o ./src/generated/root.js ./protos/opentelemetry/proto/common/v1/common.proto ./protos/opentelemetry/proto/resource/v1/resource.proto ./protos/opentelemetry/proto/trace/v1/trace.proto ./protos/opentelemetry/proto/collector/trace/v1/trace_service.proto ./protos/opentelemetry/proto/metrics/v1/metrics.proto ./protos/opentelemetry/proto/collector/metrics/v1/metrics_service.proto ./protos/opentelemetry/proto/logs/v1/logs.proto ./protos/opentelemetry/proto/collector/logs/v1/logs_service.proto",
     "protos:generate:ts": "pbts -o ./src/generated/root.d.ts ./src/generated/root.js",
@@ -28,7 +46,7 @@
     "test:browser": "karma start --single-run",
     "test:bench": "node test/performance/benchmark/index.js | tee .benchmark-results.txt",
     "prewatch": "node ../../../scripts/version-update.js",
-    "watch": "npm run protos && tsc -w tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "watch": "npm run protos && tsdown --watch",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },
@@ -41,23 +59,15 @@
     "tracing",
     "metrics"
   ],
-  "author": "OpenTelemetry Authors",
-  "license": "Apache-2.0",
   "engines": {
     "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
-    "build/esm/**/*.js",
-    "build/esm/**/*.js.map",
-    "build/esm/**/*.d.ts",
-    "build/esnext/**/*.js",
-    "build/esnext/**/*.js.map",
-    "build/esnext/**/*.d.ts",
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
-    "LICENSE",
-    "README.md"
+    "build/**/*.cjs",
+    "build/**/*.mjs",
+    "build/**/*.d.cts",
+    "build/**/*.d.mts",
+    "build/**/*.map"
   ],
   "peerDependencies": {
     "@opentelemetry/api": "^1.3.0"
@@ -89,6 +99,5 @@
     "@opentelemetry/sdk-trace-base": "2.5.0",
     "protobufjs": "8.0.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-transformer",
   "sideEffects": false
 }

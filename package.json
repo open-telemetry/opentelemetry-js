@@ -2,13 +2,20 @@
   "name": "opentelemetry",
   "version": "0.1.0",
   "description": "OpenTelemetry is a distributed tracing and stats collection framework.",
+  "type": "commonjs",
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "esModuleInterop": true
+    }
+  },
   "scripts": {
     "precompile": "npm run submodule && nx run-many -t protos:generate && nx run-many -t version",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "compile": "nx run-many -t compile",
     "prewatch": "npm run precompile",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "postinstall": "npm run update-ts-configs",
+    "watch": "nx run-many -t watch",
+    "clean": "nx run-many -t clean",
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "version:update": "nx run-many -t version",
     "test": "nx run-many -t test",
@@ -28,7 +35,6 @@
     "lint:markdown": "markdownlint-cli2 $(git ls-files '*.md')  # requires Node.js >=20",
     "lint:markdown:fix": "markdownlint-cli2 --fix $(git ls-files '*.md')  # requires Node.js >=20",
     "lint:semconv-deps": "./scripts/lint-semconv-deps.mjs",
-    "update-ts-configs": "node scripts/update-ts-configs.js",
     "maint:regenerate-test-certs": "npm run --if-present --workspaces maint:regenerate-test-certs",
     "comment_prepare_1": "echo scripts in this section automatically prepare releases. Intended for use by maintainers only.",
     "prepare_release:experimental": "npm run _check:no_changes && npm run _backup:package-json && npm run _workspace:remove_api && npm run _workspace:remove_semconv && npm run _workspace:remove_stable && npm run _workspace:bump_version && npm run _restore:package-json && npm run _changelog:prepare_experimental",
@@ -101,8 +107,10 @@
     "nx": "22.3.3",
     "prettier": "3.6.2",
     "process": "0.11.10",
+    "publint": "0.3.16",
     "semver": "7.7.3",
     "ts-node": "10.9.2",
+    "tsdown": "0.20.0-beta.1",
     "typedoc": "0.27.9",
     "typedoc-plugin-missing-exports": "3.1.0",
     "typescript": "5.0.4",

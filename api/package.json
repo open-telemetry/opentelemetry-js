@@ -2,28 +2,43 @@
   "name": "@opentelemetry/api",
   "version": "1.9.0",
   "description": "Public API for OpenTelemetry",
-  "main": "build/src/index.js",
-  "module": "build/esm/index.js",
-  "esnext": "build/esnext/index.js",
-  "types": "build/src/index.d.ts",
+  "author": "OpenTelemetry Authors",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/api",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./build/index.cjs",
+  "module": "./build/index.mjs",
+  "browser": "./build/index.mjs",
+  "types": "./build/index.d.cts",
   "exports": {
     ".": {
-      "esnext": "./build/esnext/index.js",
-      "module": "./build/esm/index.js",
-      "types": "./build/src/index.d.ts",
-      "default": "./build/src/index.js"
+      "require": {
+        "types": "./build/index.d.cts",
+        "default": "./build/index.cjs"
+      },
+      "import": {
+        "types": "./build/index.d.mts",
+        "default": "./build/index.mjs"
+      }
     },
     "./experimental": {
-      "esnext": "./build/esnext/experimental/index.js",
-      "module": "./build/esm/experimental/index.js",
-      "types": "./build/src/experimental/index.d.ts",
-      "default": "./build/src/experimental/index.js"
-    }
+      "require": {
+        "types": "./build/experimental/index.d.cts",
+        "default": "./build/experimental/index.cjs"
+      },
+      "import": {
+        "types": "./build/experimental/index.d.mts",
+        "default": "./build/experimental/index.mjs"
+      }
+    },
+    "./package.json": "./package.json"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "clean": "rm -rf build",
+    "compile": "tsdown",
     "lint:fix": "eslint . --ext .ts --fix",
     "lint": "eslint . --ext .ts",
     "test:browser": "karma start --single-run",
@@ -32,7 +47,7 @@
     "cycle-check": "dpdm --exit-code circular:1 src/index.ts",
     "version": "node ../scripts/version-update.js",
     "prewatch": "npm run precompile",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "watch": "tsdown --watch",
     "peer-api-check": "node ../scripts/peer-api-check.js"
   },
   "keywords": [
@@ -44,27 +59,18 @@
     "stats",
     "monitoring"
   ],
-  "author": "OpenTelemetry Authors",
-  "license": "Apache-2.0",
   "engines": {
     "node": ">=8.0.0"
   },
   "files": [
-    "build/esm/**/*.js",
-    "build/esm/**/*.js.map",
-    "build/esm/**/*.d.ts",
-    "build/esnext/**/*.js",
-    "build/esnext/**/*.js.map",
-    "build/esnext/**/*.d.ts",
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
+    "build/**/*.cjs",
+    "build/**/*.mjs",
+    "build/**/*.d.cts",
+    "build/**/*.d.mts",
+    "build/**/*.map",
     "LICENSE",
     "README.md"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
   "devDependencies": {
     "@types/mocha": "10.0.10",
     "@types/node": "^8.10.66",
@@ -89,6 +95,5 @@
     "unionfs": "4.5.4",
     "webpack": "5.101.3"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/api",
   "sideEffects": false
 }

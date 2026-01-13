@@ -13,6 +13,9 @@ export default {
     path: path.resolve(__dirname, 'dist'),
   },
   resolve: {
+    // Prefer browser and ESM builds
+    mainFields: ['browser', 'module', 'main'],
+    extensions: ['.mjs', '.js', '.cjs', '.json'],
     alias: {
       // Webpack 4 doesn't support package.json exports field, so we need to manually map the browser-http subpath
       '@opentelemetry/otlp-exporter-base/browser-http':
@@ -21,6 +24,10 @@ export default {
   },
   module: {
     rules: [
+      {
+        test: /\.mjs$/,
+        type: 'javascript/auto',
+      },
       {
         test: /\.(?:js|mjs|cjs)$/,
         // Include OpenTelemetry ES2022 packages for transpilation
