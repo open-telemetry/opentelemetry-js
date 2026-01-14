@@ -16,10 +16,16 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+### :books: Documentation
+
+### :house: Internal
+
+## 2.4.0
+
+### :bug: Bug Fixes
+
 * fix(sdk-metrics): improve PeriodicExportingMetricReader() constructor input validation [#6286](https://github.com/open-telemetry/opentelemetry-js/pull/6286) @cjihrig
 * fix(core): Avoid using DOM types for otperformance export [#6278](https://github.com/open-telemetry/opentelemetry-js/pull/6278) @samchungy
-
-### :books: Documentation
 
 ### :house: Internal
 
