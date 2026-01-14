@@ -8,18 +8,24 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
-* feat(sdk-node)!: do not add default MetricReader when an empty `metricReaders` array is provided to NodeSDK constructor [#6272](https://github.com/open-telemetry/opentelemetry-js/pull/6272) @pichlermarc
-  * (user-facing): setting `metricsReaders: []` now prevents the `NodeSDK` from instantiating a Metrics SDK, regardless of settings in `OTEL_METRICS_EXPORTER` env var.
-
 ### :rocket: Features
 
 ### :bug: Bug Fixes
 
-* fix(sdk-node): ensure invalid metric reader config does not throw on startup [#6295](https://github.com/open-telemetry/opentelemetry-js/pull/6295) @pichlermarc
-
 ### :books: Documentation
 
 ### :house: Internal
+
+## 0.210.0
+
+### :boom: Breaking Changes
+
+* feat(sdk-node)!: do not add default MetricReader when an empty `metricReaders` array is provided to NodeSDK constructor [#6272](https://github.com/open-telemetry/opentelemetry-js/pull/6272) @pichlermarc
+  * (user-facing): setting `metricsReaders: []` now prevents the `NodeSDK` from instantiating a Metrics SDK, regardless of settings in `OTEL_METRICS_EXPORTER` env var.
+
+### :bug: Bug Fixes
+
+* fix(sdk-node): ensure invalid metric reader config does not throw on startup [#6295](https://github.com/open-telemetry/opentelemetry-js/pull/6295) @pichlermarc
 
 ## 0.209.0
 
