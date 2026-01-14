@@ -762,7 +762,7 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
               parsedExporter.otlp_grpc!.tls.key_file = clientKeyFile;
             }
             insecure = getBooleanFromConfigFile(e['tls']['insecure']);
-            if (insecure || insecure === false) {
+            if (insecure !== undefined) {
               parsedExporter.otlp_grpc!.tls.insecure = insecure;
             }
           }
