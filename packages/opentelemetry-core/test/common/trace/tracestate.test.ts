@@ -105,7 +105,7 @@ describe('TraceState', () => {
           .map((_: null, num: number) => `a${num}=${num}`)
           .join(',')
       );
-      assert.deepStrictEqual(state['_keys']().length, 32);
+      assert.deepStrictEqual(state['_internalState'].size, 32);
       assert.deepStrictEqual(state.get('a0'), '0');
       assert.deepStrictEqual(state.get('a31'), '31');
       assert.deepStrictEqual(
@@ -127,7 +127,7 @@ describe('TraceState', () => {
 
       const state = new TraceState(tracestate.join(','));
 
-      assert.deepStrictEqual(state['_keys']().length, 32);
+      assert.deepStrictEqual(state['_internalState'].size, 32);
       assert.deepStrictEqual(state.get('a0'), '0');
       assert.deepStrictEqual(state.get('a31'), '31');
       assert.deepStrictEqual(state.get('invalid.middle.key.a'), undefined);
