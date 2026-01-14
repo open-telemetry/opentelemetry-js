@@ -23,6 +23,7 @@ import type {
   Client,
   ServiceClientConstructor,
 } from '@grpc/grpc-js';
+import { status } from '@grpc/grpc-js';
 import {
   ExportResponse,
   IExporterTransport,
@@ -41,6 +42,11 @@ function createUserAgent(userAgent: string | undefined) {
 // values taken from '@grpc/grpc-js` so that we don't need to require/import it.
 const GRPC_COMPRESSION_NONE = 0;
 const GRPC_COMPRESSION_GZIP = 2;
+
+/**
+ * The maximum number of deadline exceeded errors that will be tolerated before the client is closed.
+ */
+const MAX_DEADLINE_EXCEEDED_COUNT = 5;
 
 function toGrpcCompression(compression: 'gzip' | 'none'): number {
   return compression === 'gzip' ? GRPC_COMPRESSION_GZIP : GRPC_COMPRESSION_NONE;
@@ -106,9 +112,11 @@ export class GrpcExporterTransport implements IExporterTransport {
   private _client?: Client;
   private _metadata?: Metadata;
   private _parameters: GrpcExporterTransportParameters;
+  private _deadlineExceededCount: number;
 
   constructor(parameters: GrpcExporterTransportParameters) {
     this._parameters = parameters;
+    this._deadlineExceededCount = 0;
   }
 
   shutdown() {
@@ -154,6 +162,7 @@ export class GrpcExporterTransport implements IExporterTransport {
             ),
           }
         );
+        this._deadlineExceededCount = 0;
       } catch (error) {
         return Promise.resolve({
           status: 'failure',
@@ -185,11 +194,21 @@ export class GrpcExporterTransport implements IExporterTransport {
               status: 'failure',
               error: err,
             });
+
+            if (err.code === status.DEADLINE_EXCEEDED) {
+              this._deadlineExceededCount++;
+              if (this._deadlineExceededCount > MAX_DEADLINE_EXCEEDED_COUNT) {
+                this._client?.close();
+                this._client = undefined;
+              }
+            }
           } else {
             resolve({
               data: response,
               status: 'success',
             });
+            // Reset the deadline exceeded count when we get a successful response.
+            this._deadlineExceededCount = 0;
           }
         }
       );
