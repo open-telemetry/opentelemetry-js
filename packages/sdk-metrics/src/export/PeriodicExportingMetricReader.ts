@@ -88,7 +88,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
         );
       } else {
         // An invalid combination of value was implicitly provided.
-        api.diag.warn(
+        api.diag.info(
           `Timeout of ${exportTimeoutMillis} exceeds the interval of ${exportIntervalMillis}. Clamping timeout to interval duration.`
         );
         exportTimeoutMillis = exportIntervalMillis;
