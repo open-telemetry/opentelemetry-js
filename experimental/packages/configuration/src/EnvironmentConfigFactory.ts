@@ -608,7 +608,8 @@ export function setLoggerProvider(config: ConfigurationModel): void {
     }
 
     if (attributeCountLimit) {
-      config.logger_provider.limits!.attribute_count_limit = attributeCountLimit;
+      config.logger_provider.limits!.attribute_count_limit =
+        attributeCountLimit;
     }
   }
 
