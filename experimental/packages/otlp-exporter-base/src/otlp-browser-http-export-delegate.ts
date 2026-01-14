@@ -21,6 +21,7 @@ import { createXhrTransport } from './transport/xhr-transport';
 import { createSendBeaconTransport } from './transport/send-beacon-transport';
 import { createOtlpNetworkExportDelegate } from './otlp-network-export-delegate';
 import { createFetchTransport } from './transport/fetch-transport';
+import { createFetchLaterTransport } from './transport/fetch-later-transport';
 
 /**
  * @deprecated use {@link createOtlpFetchExportDelegate}
@@ -63,6 +64,19 @@ export function createOtlpSendBeaconExportDelegate<Internal, Response>(
         url: options.url,
         headers: options.headers,
       }),
+    })
+  );
+}
+
+export function createOtlpFetchLaterExportDelegate<Internal, Response>(
+  options: OtlpHttpConfiguration,
+  serializer: ISerializer<Internal, Response>
+): IOtlpExportDelegate<Internal> {
+  return createOtlpNetworkExportDelegate(
+    options,
+    serializer,
+    createRetryingTransport({
+      transport: createFetchLaterTransport(options),
     })
   );
 }

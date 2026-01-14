@@ -16,6 +16,7 @@
 import { ISerializer } from '@opentelemetry/otlp-transformer';
 import {
   createOtlpFetchExportDelegate,
+  createOtlpFetchLaterExportDelegate,
   createOtlpSendBeaconExportDelegate,
   createOtlpXhrExportDelegate,
 } from '../otlp-browser-http-export-delegate';
@@ -50,7 +51,13 @@ export function createLegacyOtlpBrowserExportDelegate<Internal, Response>(
 export function inferExportDelegateToUse(
   configHeaders: OTLPExporterConfigBase['headers']
 ) {
-  if (!configHeaders && typeof navigator.sendBeacon === 'function') {
+  if (
+    'fetchLater' in globalThis &&
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
+    typeof (globalThis as any).fetchLater !== 'undefined'
+  ) {
+    return createOtlpFetchLaterExportDelegate;
+  } else if (!configHeaders && typeof navigator.sendBeacon === 'function') {
     return createOtlpSendBeaconExportDelegate;
   } else if (typeof globalThis.fetch !== 'undefined') {
     return createOtlpFetchExportDelegate;
