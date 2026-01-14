@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/configuration",
-  "version": "0.209.0",
+  "version": "0.210.0",
   "description": "OpenTelemetry Configuration",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -38,7 +38,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/core": "2.3.0",
+    "@opentelemetry/core": "2.4.0",
     "yaml": "^2.0.0"
   },
   "peerDependencies": {
