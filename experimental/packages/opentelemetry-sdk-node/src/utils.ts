@@ -360,16 +360,31 @@ export function getKeyListFromObjectArray(
     .reduce((prev, curr) => prev.concat(curr), []);
 }
 
+export function getAndValidateMillisFromEnv(
+  envVarName: string
+): number | undefined {
+  const value = getNumberFromEnv(envVarName);
+  if (value != null && value <= 0) {
+    diag.warn(
+      `${envVarName} (${value}) is invalid, expected number greater than 0, using default.`
+    );
+    return undefined;
+  }
+  return value;
+}
+
 export function getPeriodicExportingMetricReaderFromEnv(
   exporter: PushMetricExporter
 ): IMetricReader {
   const defaultTimeoutMillis = 30_000;
   const defaultIntervalMillis = 60_000;
 
-  const rawExportIntervalMillis = getNumberFromEnv(
+  const rawExportIntervalMillis = getAndValidateMillisFromEnv(
     'OTEL_METRIC_EXPORT_INTERVAL'
   );
-  const rawExportTimeoutMillis = getNumberFromEnv('OTEL_METRIC_EXPORT_TIMEOUT');
+  const rawExportTimeoutMillis = getAndValidateMillisFromEnv(
+    'OTEL_METRIC_EXPORT_TIMEOUT'
+  );
 
   // Apply defaults
   const exportIntervalMillis = rawExportIntervalMillis ?? defaultIntervalMillis;

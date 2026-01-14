@@ -1487,6 +1487,36 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
+    it('should warn when OTEL_METRIC_EXPORT_INTERVAL is set to invalid value', async function () {
+      process.env.OTEL_METRICS_EXPORTER = 'otlp';
+      process.env.OTEL_METRIC_EXPORT_INTERVAL = '-1';
+      const sdk = new NodeSDK();
+
+      assert.doesNotThrow(() => sdk.start());
+
+      // expect a info log since timeout was not explicitly set
+      Sinon.assert.calledWithMatch(
+        warnStub,
+        Sinon.match(/OTEL_METRIC_EXPORT_INTERVAL.*invalid/)
+      );
+      await sdk.shutdown();
+    });
+
+    it('should warn when OTEL_METRIC_EXPORT_TIMEOUT is set to invalid value', async function () {
+      process.env.OTEL_METRICS_EXPORTER = 'otlp';
+      process.env.OTEL_METRIC_EXPORT_TIMEOUT = '-1';
+      const sdk = new NodeSDK();
+
+      assert.doesNotThrow(() => sdk.start());
+
+      // expect a info log since timeout was not explicitly set
+      Sinon.assert.calledWithMatch(
+        warnStub,
+        Sinon.match(/OTEL_METRIC_EXPORT_TIMEOUT.*invalid/)
+      );
+      await sdk.shutdown();
+    });
+
     it('should use prometheus if that is set', async () => {
       process.env.OTEL_METRICS_EXPORTER = 'prometheus';
       delete process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL;
