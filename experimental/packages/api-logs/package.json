@@ -30,7 +30,7 @@
     "compile": "tsdown",
     "clean": "rm -rf build",
     "test": "nyc mocha test/**/*.test.ts",
-    "test:browser": "karma start --single-run",
+    "test:browser": "vitest run --config vitest.config.browser.mts",
     "build": "npm run compile",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",

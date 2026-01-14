@@ -36,7 +36,7 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
     "tdd": "karma start",
-    "test:browser": "karma start --single-run",
+    "test:browser": "vitest run --config vitest.config.browser.mts",
     "test:webworker": "karma start karma.worker.js --single-run",
     "watch": "tsdown --watch",
     "prewatch": "npm run precompile",

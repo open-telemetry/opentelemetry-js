@@ -10,6 +10,10 @@
   },
   "main": "./build/index.cjs",
   "module": "./build/index.mjs",
+  "browser": {
+    "./build/platform/index.mjs": "./build/platform/browser/index.mjs",
+    "./build/platform/node/OTLPTraceExporter.mjs": "./build/platform/browser/OTLPTraceExporter.mjs"
+  },
   "types": "./build/index.d.cts",
   "exports": {
     ".": {
@@ -36,7 +40,7 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc mocha 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
-    "test:browser": "karma start --single-run",
+    "test:browser": "vitest run --config vitest.config.browser.mts",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsdown --watch",
     "prewatch": "npm run precompile",

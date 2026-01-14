@@ -46,7 +46,7 @@
     "prepublishOnly": "npm run compile",
     "prewatch": "npm run precompile",
     "tdd": "karma start",
-    "test:browser": "karma start --single-run",
+    "test:browser": "vitest run --config vitest.config.browser.mts",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsdown --watch",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
