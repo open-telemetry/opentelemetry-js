@@ -228,6 +228,26 @@ describe('PeriodicExportingMetricReader', () => {
       );
     });
 
+    it('should clamp when timeout implicitly exceeds interval', () => {
+      const exporter = new TestDeltaMetricExporter();
+
+      const p1 = new PeriodicExportingMetricReader({
+        exporter,
+        // exportTimeoutMillis defaults to 30 seconds, which is greater than exportIntervalMillis.
+        exportIntervalMillis: 100,
+      }) as any;
+      assert.strictEqual(p1._exportInterval, 100);
+      assert.strictEqual(p1._exportTimeout, 100);
+
+      const p2 = new PeriodicExportingMetricReader({
+        exporter,
+        // exportIntervalMillis defaults to 60 seconds, which is less than exportTimeoutMillis.
+        exportTimeoutMillis: 90_000,
+      }) as any;
+      assert.strictEqual(p2._exportInterval, 60_000);
+      assert.strictEqual(p2._exportTimeout, 60_000);
+    });
+
     it('should not start exporting', async () => {
       const exporter = new TestDeltaMetricExporter();
       const exporterMock = sinon.mock(exporter);

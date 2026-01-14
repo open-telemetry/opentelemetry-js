@@ -297,28 +297,4 @@ After adding the package, run `npm install` from the root of the project. This w
 
 Universal packages are packages that can be used in both web browsers and
 Node.js environment. These packages may be implemented on top of different
-platform APIs to achieve the same goal. Like accessing the _global_ reference,
-we have different preferred ways to do it:
-
-- In Node.js, we access the _global_ reference with `globalThis` or `global`:
-
-```js
-/// packages/opentelemetry-core/src/platform/node/globalThis.ts
-export const _globalThis = typeof globalThis === 'object' ? globalThis : global;
-```
-
-- In web browser, we access the _global_ reference with the following definition:
-
-```js
-/// packages/opentelemetry-core/src/platform/browser/globalThis.ts
-export const _globalThis: typeof globalThis =
-  typeof globalThis === 'object' ? globalThis :
-    typeof self === 'object' ? self :
-      typeof window === 'object' ? window :
-        typeof global === 'object' ? global :
-          {} as typeof globalThis;
-```
-
-Even though the implementation may differ, the exported names must be aligned.
-It can be confusing if exported names present in one environment but not in the
-others.
+platform APIs to achieve the same goal.

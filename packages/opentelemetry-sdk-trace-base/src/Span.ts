@@ -32,7 +32,6 @@ import {
 import {
   addHrTimes,
   millisToHrTime,
-  getTimeOrigin,
   hrTime,
   hrTimeDuration,
   InstrumentationScope,
@@ -119,7 +118,7 @@ export class SpanImpl implements Span {
     this._spanContext = opts.spanContext;
     this._performanceStartTime = otperformance.now();
     this._performanceOffset =
-      now - (this._performanceStartTime + getTimeOrigin());
+      now - (this._performanceStartTime + otperformance.timeOrigin);
     this._startTimeProvided = opts.startTime != null;
     this._spanLimits = opts.spanLimits;
     this._attributeValueLengthLimit =

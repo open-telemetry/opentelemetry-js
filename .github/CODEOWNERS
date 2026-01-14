@@ -17,14 +17,16 @@
 
 # Maintainers own the API packages: strict stability guarantees require extensive review
 api/ @open-telemetry/javascript-maintainers
-packages/experimental/api-logs/ @open-telemetry/javascript-maintainers
+experimental/packages/api-logs/ @open-telemetry/javascript-maintainers
 
 # Any browser-specific code is co-owned by Browser SIG and JS SIG (list more packages here as needed):
+bundler-tests/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
+examples/opentelemetry-web/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
+experimental/packages/opentelemetry-browser-detector/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
+experimental/packages/opentelemetry-instrumentation-fetch/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
+experimental/packages/opentelemetry-instrumentation-xml-http-request/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
+experimental/packages/opentelemetry-web-common/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
 packages/opentelemetry-sdk-trace-web/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
-packages/experimental/opentelemetry-browser-detector/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
-packages/experimental/opentelemetry-instrumentation-fetch/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
-packages/experimental/opentelemetry-instrumentation-xml-http-request/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
-packages/experimental/opentelemetry-web-common/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
 
 # All other files
 * @open-telemetry/javascript-approvers
