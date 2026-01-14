@@ -23,6 +23,7 @@ import {
 } from '@opentelemetry/api';
 import {
   CompositePropagator,
+  getNumberFromEnv,
   getStringFromEnv,
   getStringListFromEnv,
   W3CBaggagePropagator,
@@ -51,6 +52,14 @@ import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { ConfigurationModel } from '@opentelemetry/configuration';
+import {
+  IMetricReader,
+  PeriodicExportingMetricReader,
+  PushMetricExporter,
+} from '@opentelemetry/sdk-metrics';
+import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
+import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
+import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
@@ -349,4 +358,74 @@ export function getKeyListFromObjectArray(
   return obj
     .map(item => Object.keys(item))
     .reduce((prev, curr) => prev.concat(curr), []);
+}
+
+export function getPeriodicExportingMetricReaderFromEnv(
+  exporter: PushMetricExporter
+): IMetricReader {
+  const defaultTimeoutMillis = 30_000;
+  const defaultIntervalMillis = 60_000;
+
+  const rawExportIntervalMillis = getNumberFromEnv(
+    'OTEL_METRIC_EXPORT_INTERVAL'
+  );
+  const rawExportTimeoutMillis = getNumberFromEnv('OTEL_METRIC_EXPORT_TIMEOUT');
+
+  // Apply defaults
+  const exportIntervalMillis = rawExportIntervalMillis ?? defaultIntervalMillis;
+  let exportTimeoutMillis = rawExportTimeoutMillis ?? defaultTimeoutMillis;
+
+  // Ensure timeout doesn't exceed interval
+  if (exportTimeoutMillis > exportIntervalMillis) {
+    // determine which env vars were set and which ones defaulted for logging purposes
+    const timeoutSource =
+      rawExportTimeoutMillis != null
+        ? rawExportTimeoutMillis.toString()
+        : `${defaultTimeoutMillis}, default`;
+    const intervalSource =
+      rawExportIntervalMillis != null
+        ? rawExportIntervalMillis.toString()
+        : `${defaultIntervalMillis}, default`;
+
+    const bothSetByUser =
+      rawExportTimeoutMillis != null && rawExportIntervalMillis != null;
+    const logMessage = `OTEL_METRIC_EXPORT_TIMEOUT (${timeoutSource}) is greater than OTEL_METRIC_EXPORT_INTERVAL (${intervalSource}). Clamping timeout to interval value.`;
+
+    // only bother users if they explicitly set both values.
+    if (bothSetByUser) {
+      diag.warn(logMessage);
+    } else {
+      diag.info(logMessage);
+    }
+
+    exportTimeoutMillis = exportIntervalMillis;
+  }
+
+  return new PeriodicExportingMetricReader({
+    exportTimeoutMillis,
+    exportIntervalMillis,
+    exporter,
+  });
+}
+
+export function getOtlpMetricExporterFromEnv(): PushMetricExporter {
+  const protocol =
+    (
+      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_PROTOCOL') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL')
+    )?.trim() || 'http/protobuf'; // Using || to also fall back on empty string
+
+  switch (protocol) {
+    case 'grpc':
+      return new OTLPGrpcMetricExporter();
+    case 'http/json':
+      return new OTLPHttpMetricExporter();
+    case 'http/protobuf':
+      return new OTLPProtoMetricExporter();
+  }
+
+  diag.warn(
+    `Unsupported OTLP metrics protocol: "${protocol}". Using http/protobuf.`
+  );
+  return new OTLPProtoMetricExporter();
 }
