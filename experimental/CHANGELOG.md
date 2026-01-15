@@ -10,6 +10,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(sampler-composite): add ComposableAnnotatingSampler and ComposableRuleBasedSampler [#6305](https://github.com/open-telemetry/opentelemetry-js/pull/6305) @trentm
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
