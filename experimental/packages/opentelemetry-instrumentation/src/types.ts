@@ -85,7 +85,8 @@ export interface InstrumentationDelegate<
   setLogger?: (logger: Logger) => void;
 
   /** Method to initialize instrumentation config  */
-  init(shimmer: Shimmer): InstrumentationModuleDefinition[] | undefined;
+  /** web instrumentations use it to get the shimmer functions */
+  init: (shimmer: Shimmer) => InstrumentationModuleDefinition[] | undefined;
   /** Method to enable the instrumentation  */
   enable?: () => void;
   /** Method to disable the instrumentation  */

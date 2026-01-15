@@ -76,7 +76,7 @@ export function createInstrumentation<T extends InstrumentationConfig>(
   set(delegate, _kOtDiag, diagLogger);
   set(delegate, _kOtHooks, []);
   // Set the modules
-  let modules = delegate.init(nodeShimmer);
+  let modules = delegate.init?.(nodeShimmer);
   if (modules && !Array.isArray(modules)) {
     modules = [modules];
   }

@@ -20,7 +20,6 @@ import {
   semconvStabilityFromStr,
   isWrapped,
   InstrumentationBase,
-  InstrumentationConfig,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import * as core from '@opentelemetry/core';
@@ -45,7 +44,7 @@ import {
   ATTR_SERVER_PORT,
   ATTR_URL_FULL,
 } from '@opentelemetry/semantic-conventions';
-import { FetchError, FetchResponse, SpanData } from './types';
+import { FetchError, FetchResponse, SpanData, FetchInstrumentationConfig } from './types';
 import {
   getFetchBodyLength,
   normalizeHttpRequestMethod,
@@ -54,6 +53,7 @@ import {
 import { VERSION } from './version';
 import { _globalThis } from '@opentelemetry/core';
 
+
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
 // hard to say how long it should really wait, seems like 300ms is
@@ -61,48 +61,6 @@ import { _globalThis } from '@opentelemetry/core';
 const OBSERVER_WAIT_TIME_MS = 300;
 
 const isNode = typeof process === 'object' && process.release?.name === 'node';
-
-export interface FetchCustomAttributeFunction {
-  (
-    span: api.Span,
-    request: Request | RequestInit,
-    result: Response | FetchError
-  ): void;
-}
-
-export interface FetchRequestHookFunction {
-  (span: api.Span, request: Request | RequestInit): void;
-}
-
-/**
- * FetchPlugin Config
- */
-export interface FetchInstrumentationConfig extends InstrumentationConfig {
-  // the number of timing resources is limited, after the limit
-  // (chrome 250, safari 150) the information is not collected anymore
-  // the only way to prevent that is to regularly clean the resources
-  // whenever it is possible, this is needed only when PerformanceObserver
-  // is not available
-  clearTimingResources?: boolean;
-  // urls which should include trace headers when origin doesn't match
-  propagateTraceHeaderCorsUrls?: web.PropagateTraceHeaderCorsUrls;
-  /**
-   * URLs that partially match any regex in ignoreUrls will not be traced.
-   * In addition, URLs that are _exact matches_ of strings in ignoreUrls will
-   * also not be traced.
-   */
-  ignoreUrls?: Array<string | RegExp>;
-  /** Function for adding custom attributes on the span */
-  applyCustomAttributesOnSpan?: FetchCustomAttributeFunction;
-  /** Function for adding custom attributes or headers before the request is handled */
-  requestHook?: FetchRequestHookFunction;
-  // Ignore adding network events as span events
-  ignoreNetworkEvents?: boolean;
-  /** Measure outgoing request size */
-  measureRequestSize?: boolean;
-  /** Select the HTTP semantic conventions version(s) used. */
-  semconvStabilityOptIn?: string;
-}
 
 /**
  * This class represents a fetch plugin for auto instrumentation

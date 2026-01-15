@@ -90,7 +90,7 @@ import { Err, Func, Http, HttpRequestArgs, Https } from './internal-types';
 import {
   InstrumentationDelegate,
   Shimmer,
-} from '@opentelemetry/instrumentation/src/types';
+} from '@opentelemetry/instrumentation';
 
 type HeaderCapture = {
   client: {
