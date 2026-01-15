@@ -18,6 +18,9 @@ import { Context, ROOT_CONTEXT } from '@opentelemetry/api';
 import * as asyncHooks from 'async_hooks';
 import { AbstractAsyncHooksContextManager } from './AbstractAsyncHooksContextManager';
 
+/**
+ * @deprecated Use AsyncLocalStorageContextManager instead.
+ */
 export class AsyncHooksContextManager extends AbstractAsyncHooksContextManager {
   private _asyncHook: asyncHooks.AsyncHook;
   private _contexts: Map<number, Context> = new Map();

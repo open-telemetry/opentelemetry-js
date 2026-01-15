@@ -52,10 +52,7 @@ describe('Baggage', function () {
 
       const entry = bag.getEntry('key');
       assert.ok(entry);
-      if (entry) {
-        entry.value = 'mutated';
-      }
-
+      entry!.value = 'mutated';
       assert.strictEqual(bag.getEntry('key')?.value, 'value');
     });
   });

@@ -19,6 +19,7 @@ const {
   createExportTraceServiceRequest,
 } = require('../../../build/src/trace/internal');
 const { BasicTracerProvider } = require('@opentelemetry/sdk-trace-base');
+const { ProtobufTraceSerializer } = require('../../../build/src');
 
 const tracerProvider = new BasicTracerProvider();
 const tracer = tracerProvider.getTracer('test');
@@ -41,6 +42,10 @@ suite.add('transform 1 span', function () {
 
 suite.add('transform 100 spans', function () {
   createExportTraceServiceRequest(spans);
+});
+
+suite.add('transform 100 spans to protobuf', function () {
+  ProtobufTraceSerializer.serializeRequest(spans);
 });
 
 suite.run();

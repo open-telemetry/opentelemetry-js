@@ -19,8 +19,8 @@ import * as assert from 'assert';
 import { createXhrTransport } from '../../src/transport/xhr-transport';
 import {
   ExportResponseRetryable,
-  ExportResponseFailure,
   ExportResponseSuccess,
+  ExportResponseFailure,
 } from '../../src';
 import { ensureHeadersContain } from '../testHelper';
 
@@ -56,6 +56,14 @@ function hasOnTimeout(request: unknown): request is { ontimeout: () => void } {
   }
 
   return 'ontimeout' in request && typeof request['ontimeout'] === 'function';
+}
+
+function hasOnAbort(request: unknown): request is { onabort: () => void } {
+  if (request == null || typeof request != 'object') {
+    return false;
+  }
+
+  return 'onabort' in request && typeof request['onabort'] === 'function';
 }
 
 describe('XhrTransport', function () {
@@ -151,7 +159,7 @@ describe('XhrTransport', function () {
       }, done /* catch any rejections */);
     });
 
-    it('returns failure when request times out', function (done) {
+    it('returns retryable when request times out', function (done) {
       // arrange
       // A fake server needed, otherwise the message will not be a timeout but a failure to connect.
       const server = sinon.useFakeServer();
@@ -170,11 +178,7 @@ describe('XhrTransport', function () {
       transport.send(testPayload, requestTimeout).then(response => {
         // assert
         try {
-          assert.strictEqual(response.status, 'failure');
-          assert.strictEqual(
-            (response as ExportResponseFailure).error.message,
-            'XHR request timed out'
-          );
+          assert.strictEqual(response.status, 'retryable');
         } catch (e) {
           done(e);
         }
@@ -182,7 +186,7 @@ describe('XhrTransport', function () {
       }, done /* catch any rejections */);
     });
 
-    it('returns failure when no server exists', function (done) {
+    it('returns retryable when network error occurs', function (done) {
       // arrange
       const clock = sinon.useFakeTimers();
       const transport = createXhrTransport(testTransportParameters);
@@ -191,17 +195,43 @@ describe('XhrTransport', function () {
       transport.send(testPayload, requestTimeout).then(response => {
         // assert
         try {
-          assert.strictEqual(response.status, 'failure');
-          assert.strictEqual(
-            (response as ExportResponseFailure).error.message,
-            'XHR request errored'
-          );
+          assert.strictEqual(response.status, 'retryable');
         } catch (e) {
           done(e);
         }
         done();
       }, done /* catch any rejections */);
       clock.tick(requestTimeout + 100);
+    });
+
+    it('returns failure when request is aborted', function (done) {
+      // arrange
+      const server = sinon.useFakeServer();
+      const transport = createXhrTransport(testTransportParameters);
+
+      respondWhenRequestExists(server, () => {
+        // this executes after the act block
+        const request = server.requests[0];
+        // Manually trigger the onabort event
+        if (hasOnAbort(request)) {
+          request.onabort();
+        }
+      });
+
+      //act
+      transport.send(testPayload, requestTimeout).then(response => {
+        // assert
+        try {
+          assert.strictEqual(response.status, 'failure');
+          assert.strictEqual(
+            (response as ExportResponseFailure).error.message,
+            'XHR request aborted'
+          );
+        } catch (e) {
+          done(e);
+        }
+        done();
+      }, done /* catch any rejections */);
     });
   });
 });

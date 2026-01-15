@@ -39,13 +39,24 @@ class OTLPExportDelegate<Internal, Response>
   implements IOtlpExportDelegate<Internal>
 {
   private _diagLogger: DiagLogger;
+  private _transport: IExporterTransport;
+  private _serializer: ISerializer<Internal, Response>;
+  private _responseHandler: IOtlpResponseHandler<Response>;
+  private _promiseQueue: IExportPromiseHandler;
+  private _timeout: number;
+
   constructor(
-    private _transport: IExporterTransport,
-    private _serializer: ISerializer<Internal, Response>,
-    private _responseHandler: IOtlpResponseHandler<Response>,
-    private _promiseQueue: IExportPromiseHandler,
-    private _timeout: number
+    transport: IExporterTransport,
+    serializer: ISerializer<Internal, Response>,
+    responseHandler: IOtlpResponseHandler<Response>,
+    promiseQueue: IExportPromiseHandler,
+    timeout: number
   ) {
+    this._transport = transport;
+    this._serializer = serializer;
+    this._responseHandler = responseHandler;
+    this._promiseQueue = promiseQueue;
+    this._timeout = timeout;
     this._diagLogger = diag.createComponentLogger({
       namespace: 'OTLPExportDelegate',
     });
@@ -109,9 +120,9 @@ class OTLPExportDelegate<Internal, Response>
           } else if (response.status === 'retryable') {
             resultCallback({
               code: ExportResultCode.FAILED,
-              error: new OTLPExporterError(
-                'Export failed with retryable status'
-              ),
+              error:
+                response.error ??
+                new OTLPExporterError('Export failed with retryable status'),
             });
           } else {
             resultCallback({

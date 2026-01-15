@@ -1,17 +1,11 @@
 {
   "name": "@opentelemetry/api-logs",
-  "version": "0.208.0",
+  "version": "0.210.0",
   "description": "Public logs API for OpenTelemetry",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
   "types": "build/src/index.d.ts",
-  "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts",
-    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
-    "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
-    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
-  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",

@@ -16,6 +16,7 @@
 
 import { IExporterTransport } from './exporter-transport';
 import { ExportResponse } from './export-response';
+import { diag } from '@opentelemetry/api';
 
 const MAX_ATTEMPTS = 5;
 const INITIAL_BACKOFF = 1000;
@@ -31,7 +32,11 @@ function getJitter() {
 }
 
 class RetryingTransport implements IExporterTransport {
-  constructor(private _transport: IExporterTransport) {}
+  private _transport: IExporterTransport;
+
+  constructor(transport: IExporterTransport) {
+    this._transport = transport;
+  }
 
   private retry(
     data: Uint8Array,
@@ -46,17 +51,18 @@ class RetryingTransport implements IExporterTransport {
   }
 
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
-    const deadline = Date.now() + timeoutMillis;
-    let result = await this._transport.send(data, timeoutMillis);
     let attempts = MAX_ATTEMPTS;
     let nextBackoff = INITIAL_BACKOFF;
+
+    const deadline = Date.now() + timeoutMillis;
+    let result = await this._transport.send(data, timeoutMillis);
 
     while (result.status === 'retryable' && attempts > 0) {
       attempts--;
 
       // use maximum of computed backoff and 0 to avoid negative timeouts
       const backoff = Math.max(
-        Math.min(nextBackoff, MAX_BACKOFF) + getJitter(),
+        Math.min(nextBackoff * (1 + getJitter()), MAX_BACKOFF),
         0
       );
       nextBackoff = nextBackoff * BACKOFF_MULTIPLIER;
@@ -65,10 +71,28 @@ class RetryingTransport implements IExporterTransport {
       // return when expected retry time is after the export deadline.
       const remainingTimeoutMillis = deadline - Date.now();
       if (retryInMillis > remainingTimeoutMillis) {
+        diag.info(
+          `Export retry time ${Math.round(retryInMillis)}ms exceeds remaining timeout ${Math.round(
+            remainingTimeoutMillis
+          )}ms, not retrying further.`
+        );
         return result;
       }
 
+      diag.verbose(`Scheduling export retry in ${Math.round(retryInMillis)}ms`);
       result = await this.retry(data, remainingTimeoutMillis, retryInMillis);
+    }
+
+    if (result.status === 'success') {
+      diag.verbose(
+        `Export succeded after ${MAX_ATTEMPTS - attempts} retry attempts.`
+      );
+    } else if (result.status === 'retryable') {
+      diag.info(
+        `Export failed after maximum retry attempts (${MAX_ATTEMPTS}).`
+      );
+    } else {
+      diag.info(`Export failed with non-retryable error: ${result.error}`);
     }
 
     return result;

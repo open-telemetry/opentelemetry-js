@@ -17,11 +17,11 @@
 // Much of the logic here overlaps with the same utils file in opentelemetry-instrumentation-xml-http-request
 // These may be unified in the future.
 
-import * as api from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import { getStringListFromEnv } from '@opentelemetry/core';
 import { URLLike } from '@opentelemetry/sdk-trace-web';
 
-const DIAG_LOGGER = api.diag.createComponentLogger({
+const DIAG_LOGGER = diag.createComponentLogger({
   namespace: '@opentelemetry/opentelemetry-instrumentation-fetch/utils',
 });
 

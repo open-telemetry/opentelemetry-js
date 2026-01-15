@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/shim-opentracing",
-  "version": "2.2.0",
+  "version": "2.4.0",
   "description": "OpenTracing to OpenTelemetry shim",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -42,9 +42,9 @@
   },
   "devDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0",
-    "@opentelemetry/propagator-b3": "2.2.0",
-    "@opentelemetry/propagator-jaeger": "2.2.0",
-    "@opentelemetry/sdk-trace-base": "2.2.0",
+    "@opentelemetry/propagator-b3": "2.4.0",
+    "@opentelemetry/propagator-jaeger": "2.4.0",
+    "@opentelemetry/sdk-trace-base": "2.4.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.6.5",
     "mocha": "11.7.5",
@@ -55,7 +55,7 @@
     "@opentelemetry/api": ">=1.0.0 <1.10.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "2.2.0",
+    "@opentelemetry/core": "2.4.0",
     "@opentelemetry/semantic-conventions": "^1.29.0",
     "opentracing": "^0.14.4"
   },

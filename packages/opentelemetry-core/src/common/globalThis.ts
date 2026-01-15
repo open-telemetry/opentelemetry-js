@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
-/** only globals that common to node and browsers are allowed */
-// eslint-disable-next-line n/no-unsupported-features/es-builtins
-export const _globalThis = typeof globalThis === 'object' ? globalThis : global;
+/**
+ * @deprecated Use globalThis directly instead.
+ */
+export const _globalThis = globalThis;

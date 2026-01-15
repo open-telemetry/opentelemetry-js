@@ -614,8 +614,10 @@ describe('PrometheusExporter', () => {
 });
 
 class RequestStatusError extends Error {
-  constructor(public statusCode: number | undefined) {
+  public statusCode: number | undefined;
+  constructor(statusCode: number | undefined) {
     super('request failed with non-200 code');
+    this.statusCode = statusCode;
   }
 }
 

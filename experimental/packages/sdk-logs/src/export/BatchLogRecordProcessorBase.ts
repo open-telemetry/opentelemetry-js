@@ -37,16 +37,15 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   private readonly _maxQueueSize: number;
   private readonly _scheduledDelayMillis: number;
   private readonly _exportTimeoutMillis: number;
+  private readonly _exporter: LogRecordExporter;
 
   private _isExporting = false;
   private _finishedLogRecords: SdkLogRecord[] = [];
   private _timer: NodeJS.Timeout | number | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
 
-  constructor(
-    private readonly _exporter: LogRecordExporter,
-    config?: T
-  ) {
+  constructor(exporter: LogRecordExporter, config?: T) {
+    this._exporter = exporter;
     this._maxExportBatchSize =
       config?.maxExportBatchSize ??
       getNumberFromEnv('OTEL_BLRP_MAX_EXPORT_BATCH_SIZE') ??
@@ -134,16 +133,12 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
     if (this._finishedLogRecords.length === 0) {
       return Promise.resolve();
     }
-    return new Promise((resolve, reject) => {
-      callWithTimeout(
-        this._export(
-          this._finishedLogRecords.splice(0, this._maxExportBatchSize)
-        ),
-        this._exportTimeoutMillis
-      )
-        .then(() => resolve())
-        .catch(reject);
-    });
+    return callWithTimeout(
+      this._export(
+        this._finishedLogRecords.splice(0, this._maxExportBatchSize)
+      ),
+      this._exportTimeoutMillis
+    );
   }
 
   private _maybeStartTimer() {

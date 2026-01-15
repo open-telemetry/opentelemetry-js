@@ -410,6 +410,30 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
+    it('should not register meter provider when metricReaders is empty array', async () => {
+      // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
+      process.env.OTEL_TRACES_EXPORTER = 'none';
+      const sdk = new NodeSDK({
+        metricReaders: [],
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assertDefaultContextManagerRegistered();
+      assertDefaultPropagatorRegistered();
+
+      assert.strictEqual(
+        (trace.getTracerProvider() as ProxyTracerProvider).getDelegate(),
+        delegate,
+        'tracer provider should not have changed'
+      );
+
+      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
+
+      await sdk.shutdown();
+    });
+
     it('should register a logger provider if a log record processor is provided', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'none';
       const logRecordExporter = new InMemoryLogRecordExporter();
@@ -1225,14 +1249,16 @@ describe('Node SDK', () => {
   });
 
   describe('configuring metric provider from env', () => {
-    let stubLogger: Sinon.SinonStub;
+    let infoStub: Sinon.SinonStub;
+    let warnStub: Sinon.SinonStub;
 
     beforeEach(() => {
-      stubLogger = Sinon.stub(diag, 'info');
+      infoStub = Sinon.stub(diag, 'info');
+      warnStub = Sinon.stub(diag, 'warn');
     });
 
     afterEach(() => {
-      stubLogger.reset();
+      Sinon.restore();
       delete process.env.OTEL_METRIC_EXPORT_INTERVAL;
       delete process.env.OTEL_METRIC_EXPORT_TIMEOUT;
       delete process.env.OTEL_METRICS_EXPORTER;
@@ -1246,7 +1272,7 @@ describe('Node SDK', () => {
       sdk.start();
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
       assert.strictEqual(
-        stubLogger.args[0][0],
+        infoStub.args[0][0],
         'OTEL_METRICS_EXPORTER contains "none". Metric provider will not be initialized.'
       );
       await sdk.shutdown();
@@ -1425,6 +1451,68 @@ describe('Node SDK', () => {
       assert.strictEqual(
         sharedState.metricCollectors[0]._metricReader._exportTimeout,
         150
+      );
+      await sdk.shutdown();
+    });
+
+    it('should clamp OTEL_METRIC_EXPORT_TIMEOUT to OTEL_METRIC_EXPORT_INTERVAL when timeout exceeds interval and log warning', async function () {
+      process.env.OTEL_METRICS_EXPORTER = 'otlp';
+      process.env.OTEL_METRIC_EXPORT_INTERVAL = '100';
+      process.env.OTEL_METRIC_EXPORT_TIMEOUT = '200';
+      const sdk = new NodeSDK();
+
+      assert.doesNotThrow(() => sdk.start());
+
+      // expect a warning since timeout was explicitly set
+      Sinon.assert.calledWithMatch(
+        warnStub,
+        Sinon.match(/OTEL_METRIC_EXPORT_TIMEOUT.*Clamping/)
+      );
+
+      await sdk.shutdown();
+    });
+
+    it('should clamp default OTEL_METRIC_EXPORT_TIMEOUT to OTEL_METRIC_EXPORT_INTERVAL when interval is low and log info', async function () {
+      process.env.OTEL_METRICS_EXPORTER = 'otlp';
+      process.env.OTEL_METRIC_EXPORT_INTERVAL = '100';
+      const sdk = new NodeSDK();
+
+      assert.doesNotThrow(() => sdk.start());
+
+      // expect a info log since timeout was not explicitly set
+      Sinon.assert.calledWithMatch(
+        infoStub,
+        Sinon.match(/OTEL_METRIC_EXPORT_TIMEOUT.*Clamping/)
+      );
+      await sdk.shutdown();
+    });
+
+    it('should warn when OTEL_METRIC_EXPORT_INTERVAL is set to invalid value', async function () {
+      process.env.OTEL_METRICS_EXPORTER = 'otlp';
+      process.env.OTEL_METRIC_EXPORT_INTERVAL = '-1';
+      const sdk = new NodeSDK();
+
+      assert.doesNotThrow(() => sdk.start());
+
+      // expect a info log since timeout was not explicitly set
+      Sinon.assert.calledWithMatch(
+        warnStub,
+        Sinon.match(/OTEL_METRIC_EXPORT_INTERVAL.*invalid/)
+      );
+      await sdk.shutdown();
+    });
+
+    it('should warn when OTEL_METRIC_EXPORT_TIMEOUT is set to invalid value', async function () {
+      process.env.OTEL_METRICS_EXPORTER = 'otlp';
+      process.env.OTEL_METRIC_EXPORT_TIMEOUT = '-1';
+      const sdk = new NodeSDK();
+
+      assert.doesNotThrow(() => sdk.start());
+
+      // expect a info log since timeout was not explicitly set
+      Sinon.assert.calledWithMatch(
+        warnStub,
+        Sinon.match(/OTEL_METRIC_EXPORT_TIMEOUT.*invalid/)
       );
       await sdk.shutdown();
     });

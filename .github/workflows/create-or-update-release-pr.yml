@@ -25,7 +25,7 @@ jobs:
   create-or-update-release-pr:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/create-github-app-token@7e473efe3cb98aa54f8d4bac15400b15fad77d94 # v2.2.0
+      - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         id: otelbot-token
         with:
           app-id: ${{ vars.OTELBOT_JS_APP_ID }}
@@ -36,12 +36,12 @@ jobs:
         with:
           token: ${{ steps.otelbot-token.outputs.token }}
 
-      - uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
         with:
           cache: 'npm'
           cache-dependency-path: package-lock.json
           node-version: 22
-      - run: npm install -g npm@11.6.0
+      - run: npm install -g npm@latest
 
       - run: npm ci --ignore-scripts
 

@@ -42,9 +42,6 @@ import {
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
-import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
-import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
-import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { PrometheusExporter as PrometheusMetricExporter } from '@opentelemetry/exporter-prometheus';
 import {
   MeterProvider,
@@ -75,6 +72,8 @@ import {
   getPropagatorFromEnv,
   setupPropagator,
   setupContextManager,
+  getPeriodicExportingMetricReaderFromEnv,
+  getOtlpMetricExporterFromEnv,
 } from './utils';
 
 type TracerProviderConfig = {
@@ -101,17 +100,10 @@ export type LoggerProviderConfig = {
 };
 
 /**
- * @Returns param value, if set else returns the default value
- */
-function getValueInMillis(envName: string, defaultValue: number): number {
-  return parseInt(process.env[envName] || '') || defaultValue;
-}
-
-/**
  *
  * @returns MetricReader[] if appropriate environment variables are configured
  */
-function configureMetricProviderFromEnv(): IMetricReader[] {
+function getMetricReadersFromEnv(): IMetricReader[] {
   const metricReaders: IMetricReader[] = [];
   const enabledExporters = Array.from(
     new Set(getStringListFromEnv('OTEL_METRICS_EXPORTER') ?? [])
@@ -131,61 +123,9 @@ function configureMetricProviderFromEnv(): IMetricReader[] {
 
   enabledExporters.forEach(exporter => {
     if (exporter === 'otlp') {
-      const protocol =
-        (
-          getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_PROTOCOL') ??
-          getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL')
-        )?.trim() || 'http/protobuf'; // Using || to also fall back on empty string
-
-      const exportIntervalMillis = getValueInMillis(
-        'OTEL_METRIC_EXPORT_INTERVAL',
-        60000
+      metricReaders.push(
+        getPeriodicExportingMetricReaderFromEnv(getOtlpMetricExporterFromEnv())
       );
-      const exportTimeoutMillis = getValueInMillis(
-        'OTEL_METRIC_EXPORT_TIMEOUT',
-        30000
-      );
-
-      switch (protocol) {
-        case 'grpc':
-          metricReaders.push(
-            new PeriodicExportingMetricReader({
-              exporter: new OTLPGrpcMetricExporter(),
-              exportIntervalMillis: exportIntervalMillis,
-              exportTimeoutMillis: exportTimeoutMillis,
-            })
-          );
-          break;
-        case 'http/json':
-          metricReaders.push(
-            new PeriodicExportingMetricReader({
-              exporter: new OTLPHttpMetricExporter(),
-              exportIntervalMillis: exportIntervalMillis,
-              exportTimeoutMillis: exportTimeoutMillis,
-            })
-          );
-          break;
-        case 'http/protobuf':
-          metricReaders.push(
-            new PeriodicExportingMetricReader({
-              exporter: new OTLPProtoMetricExporter(),
-              exportIntervalMillis: exportIntervalMillis,
-              exportTimeoutMillis: exportTimeoutMillis,
-            })
-          );
-          break;
-        default:
-          diag.warn(
-            `Unsupported OTLP metrics protocol: "${protocol}". Using http/protobuf.`
-          );
-          metricReaders.push(
-            new PeriodicExportingMetricReader({
-              exporter: new OTLPProtoMetricExporter(),
-              exportIntervalMillis: exportIntervalMillis,
-              exportTimeoutMillis: exportTimeoutMillis,
-            })
-          );
-      }
     } else if (exporter === 'console') {
       metricReaders.push(
         new PeriodicExportingMetricReader({
@@ -326,27 +266,24 @@ export class NodeSDK {
       this.configureLoggerProviderFromEnv();
     }
 
-    if (
-      configuration.metricReaders ||
-      configuration.metricReader ||
-      configuration.views
-    ) {
-      const meterProviderConfig: MeterProviderConfig = {};
-
-      if (configuration.metricReaders) {
-        meterProviderConfig.readers = configuration.metricReaders;
-      } else if (configuration.metricReader) {
-        meterProviderConfig.readers = [configuration.metricReader];
-        diag.warn(
-          "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
-        );
-      }
-
-      if (configuration.views) {
-        meterProviderConfig.views = configuration.views;
-      }
-
-      this._meterProviderConfig = meterProviderConfig;
+    if (configuration.metricReaders) {
+      this._meterProviderConfig = {
+        readers: configuration.metricReaders,
+        views: configuration.views,
+      };
+    } else if (configuration.metricReader) {
+      this._meterProviderConfig = {
+        readers: [configuration.metricReader],
+        views: configuration.views,
+      };
+      diag.warn(
+        "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
+      );
+    } else {
+      this._meterProviderConfig = {
+        readers: getMetricReadersFromEnv(),
+        views: configuration.views,
+      };
     }
 
     this._instrumentations = configuration.instrumentations?.flat() ?? [];
@@ -413,22 +350,15 @@ export class NodeSDK {
       logs.setGlobalLoggerProvider(loggerProvider);
     }
 
-    const metricReadersFromEnv: IMetricReader[] =
-      configureMetricProviderFromEnv();
-    if (this._meterProviderConfig || metricReadersFromEnv.length > 0) {
-      const readers: IMetricReader[] = [];
-      if (this._meterProviderConfig?.readers) {
-        readers.push(...this._meterProviderConfig.readers);
-      }
-
-      if (readers.length === 0) {
-        metricReadersFromEnv.forEach((r: IMetricReader) => readers.push(r));
-      }
-
+    if (
+      this._meterProviderConfig?.readers &&
+      // only register if there is a reader, otherwise we waste compute/memory.
+      this._meterProviderConfig.readers.length > 0
+    ) {
       const meterProvider = new MeterProvider({
         resource: this._resource,
         views: this._meterProviderConfig?.views ?? [],
-        readers: readers,
+        readers: this._meterProviderConfig.readers,
       });
 
       this._meterProvider = meterProvider;
