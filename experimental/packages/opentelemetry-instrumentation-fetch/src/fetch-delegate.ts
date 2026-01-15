@@ -14,7 +14,18 @@
  * limitations under the License.
  */
 
-import { context, DiagLogger, propagation, Span, Tracer, trace, Attributes, SpanKind, HrTime, SpanStatusCode } from '@opentelemetry/api';
+import {
+  context,
+  DiagLogger,
+  propagation,
+  Span,
+  Tracer,
+  trace,
+  Attributes,
+  SpanKind,
+  HrTime,
+  SpanStatusCode,
+} from '@opentelemetry/api';
 import {
   Shimmer,
   SemconvStability,
@@ -47,7 +58,12 @@ import {
   ATTR_SERVER_PORT,
   ATTR_URL_FULL,
 } from '@opentelemetry/semantic-conventions';
-import { FetchError, FetchResponse, SpanData, FetchInstrumentationConfig } from './types';
+import {
+  FetchError,
+  FetchResponse,
+  SpanData,
+  FetchInstrumentationConfig,
+} from './types';
 import {
   getFetchBodyLength,
   normalizeHttpRequestMethod,
@@ -55,7 +71,6 @@ import {
 } from './utils';
 import { VERSION } from './version';
 import { _globalThis } from '@opentelemetry/core';
-
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
@@ -76,7 +91,10 @@ const fetchDelegate: InstrumentationDelegate<FetchInstrumentationConfig> = {
   name: '@opentelemetry/instrumentation-fetch',
   version: VERSION,
   setConfig: function (config: FetchInstrumentationConfig): void {
-    _semconvStability = semconvStabilityFromStr('http', config.semconvStabilityOptIn);
+    _semconvStability = semconvStabilityFromStr(
+      'http',
+      config.semconvStabilityOptIn
+    );
     _config = config;
   },
   getConfig: function (): FetchInstrumentationConfig {
@@ -113,7 +131,7 @@ const fetchDelegate: InstrumentationDelegate<FetchInstrumentationConfig> = {
     }
     _shimmer.unwrap(_globalThis, 'fetch');
     _usedResources = new WeakSet<PerformanceResourceTiming>();
-  }
+  },
 };
 
 /**
@@ -121,7 +139,7 @@ const fetchDelegate: InstrumentationDelegate<FetchInstrumentationConfig> = {
  */
 function patchConstructor(): (original: typeof fetch) => typeof fetch {
   return original => {
-    return function patchConstructor(
+    return function _patchConstructor(
       this: typeof globalThis,
       ...args: Parameters<typeof fetch>
     ): Promise<Response> {
@@ -148,10 +166,7 @@ function patchConstructor(): (original: typeof fetch) => typeof fetch {
               );
             }
             if (_semconvStability & SemconvStability.STABLE) {
-              createdSpan.setAttribute(
-                ATTR_HTTP_REQUEST_BODY_SIZE,
-                bodyLength
-              );
+              createdSpan.setAttribute(ATTR_HTTP_REQUEST_BODY_SIZE, bodyLength);
             }
           })
           .catch(error => {
@@ -338,18 +353,13 @@ function addChildSpan(
     undefined,
     skipOldSemconvContentLengthAttrs
   );
-  childSpan.end(
-    corsPreFlightRequest[web.PerformanceTimingNames.RESPONSE_END]
-  );
+  childSpan.end(corsPreFlightRequest[web.PerformanceTimingNames.RESPONSE_END]);
 }
 
 /**
  * Adds more attributes to span just before ending it
  */
-function addFinalSpanAttributes(
-  span: Span,
-  response: FetchResponse
-): void {
+function addFinalSpanAttributes(span: Span, response: FetchResponse): void {
   const parsedUrl = web.parseUrl(response.url);
 
   if (_semconvStability & SemconvStability.OLD) {
@@ -557,8 +567,7 @@ function applyAttributesAfterFetch(
   request: Request | RequestInit,
   result: Response | FetchError
 ) {
-  const applyCustomAttributesOnSpan =
-    _config.applyCustomAttributesOnSpan;
+  const applyCustomAttributesOnSpan = _config.applyCustomAttributesOnSpan;
   if (applyCustomAttributesOnSpan) {
     safeExecuteInTheMiddle(
       () => applyCustomAttributesOnSpan(span, request, result),
@@ -614,7 +623,8 @@ function prepareSpanData(spanUrl: string): SpanData {
   return { entries, observer, startTime, spanUrl };
 }
 
-
-export function createFetchInstrumentation(config: FetchInstrumentationConfig = {}): Instrumentation<FetchInstrumentationConfig> {
+export function createFetchInstrumentation(
+  config: FetchInstrumentationConfig = {}
+): Instrumentation<FetchInstrumentationConfig> {
   return createInstrumentation(fetchDelegate, config);
 }

@@ -44,7 +44,12 @@ import {
   ATTR_SERVER_PORT,
   ATTR_URL_FULL,
 } from '@opentelemetry/semantic-conventions';
-import { FetchError, FetchResponse, SpanData, FetchInstrumentationConfig } from './types';
+import {
+  FetchError,
+  FetchResponse,
+  SpanData,
+  FetchInstrumentationConfig,
+} from './types';
 import {
   getFetchBodyLength,
   normalizeHttpRequestMethod,
@@ -52,7 +57,6 @@ import {
 } from './utils';
 import { VERSION } from './version';
 import { _globalThis } from '@opentelemetry/core';
-
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer

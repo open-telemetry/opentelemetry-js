@@ -87,4 +87,3 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
   /** Select the HTTP semantic conventions version(s) used. */
   semconvStabilityOptIn?: string;
 }
-

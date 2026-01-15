@@ -20,6 +20,7 @@ import {
   semconvStabilityFromStr,
   isWrapped,
   registerInstrumentations,
+  Instrumentation,
 } from '@opentelemetry/instrumentation';
 
 import {
@@ -217,7 +218,7 @@ describe('fetch', () => {
   });
 
   describe('enabling/disabling', () => {
-    let fetchInstrumentation: FetchInstrumentation | undefined;
+    let fetchInstrumentation: Instrumentation | undefined;
 
     afterEach(() => {
       fetchInstrumentation?.disable();
