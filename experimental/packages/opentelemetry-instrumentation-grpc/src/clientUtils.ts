@@ -72,13 +72,13 @@ export function getMethodsToWrap(
  * Patches a callback so that the current span for this trace is also ended
  * when the callback is invoked.
  */
-export function patchedCallback(
+export function patchedCallback<T>(
   span: Span,
-  callback: SendUnaryDataCallback<ResponseType>
+  callback: SendUnaryDataCallback<T>
 ) {
-  const wrappedFn: SendUnaryDataCallback<ResponseType> = (
+  const wrappedFn: SendUnaryDataCallback<T> = (
     err: grpcJs.ServiceError | null,
-    res?: ResponseType
+    res?: T
   ) => {
     if (err) {
       if (err.code) {
@@ -173,7 +173,7 @@ export function makeGrpcClientRemoteCall(
       if (callbackFuncIndex !== -1) {
         args[callbackFuncIndex] = patchedCallback(
           span,
-          args[callbackFuncIndex] as SendUnaryDataCallback<ResponseType>
+          args[callbackFuncIndex] as SendUnaryDataCallback<unknown>
         );
       }
     }

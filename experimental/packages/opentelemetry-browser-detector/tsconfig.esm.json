@@ -1,6 +1,11 @@
 {
   "extends": "../../../tsconfig.base.esm.json",
   "compilerOptions": {
+    "lib": [
+      "es2022",
+      "dom",
+      "dom.iterable"
+    ],
     "outDir": "build/esm",
     "rootDir": "src",
     "tsBuildInfoFile": "build/esm/tsconfig.esm.tsbuildinfo"
