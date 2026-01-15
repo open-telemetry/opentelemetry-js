@@ -16,9 +16,10 @@
 'use strict';
 
 import {
-  OtlpFileExporter,
+  ExperimentalOtlpFileExporter,
   OtlpGrpcExporter,
   OtlpHttpExporter,
+  SeverityNumber,
 } from './commonModel';
 
 export function initializeDefaultLoggerProviderConfiguration(): LoggerProvider {
@@ -45,7 +46,7 @@ export interface LoggerProvider {
    * Configure loggers.
    * This type is in development and subject to breaking changes in minor versions.
    */
-  'logger_configurator/development'?: LoggerConfigurator;
+  'logger_configurator/development'?: ExperimentalLoggerConfigurator;
 }
 
 export interface SimpleLogRecordProcessor {
@@ -103,7 +104,7 @@ export interface LogRecordExporter {
    * Configure exporter to be OTLP with file transport.
    * This type is in development and subject to breaking changes in minor versions.
    */
-  'otlp_file/development'?: OtlpFileExporter;
+  'otlp_file/development'?: ExperimentalOtlpFileExporter;
 
   /**
    * Configure exporter to be console.
@@ -139,36 +140,48 @@ export interface LogRecordProcessor {
   simple?: SimpleLogRecordProcessor;
 }
 
-export interface LoggerConfigurator {
+export interface ExperimentalLoggerConfigurator {
   /**
    * Configure the default logger config used there is no matching entry in .logger_configurator/development.loggers.
    */
-  default_config?: LoggerConfig;
+  default_config?: ExperimentalLoggerConfig;
 
   /**
    * Configure loggers.
    */
-  loggers?: LoggerMatcherAndConfig[];
+  loggers?: ExperimentalLoggerMatcherAndConfig[];
 }
 
-export interface LoggerConfig {
-  /**
-   * Configure if the logger is enabled or not.
-   */
-  disabled: boolean;
-}
-
-export interface LoggerMatcherAndConfig {
+export interface ExperimentalLoggerMatcherAndConfig {
   /**
    * Configure logger names to match, evaluated as follows:
    *  * If the logger name exactly matches.
    *  * If the logger name matches the wildcard pattern, where '?' matches any single character
    * and '*' matches any number of characters including none.
    */
-  name?: string;
+  name: string;
 
   /**
    * The logger config.
    */
-  config?: LoggerConfig;
+  config: ExperimentalLoggerConfig;
+}
+
+export interface ExperimentalLoggerConfig {
+  /**
+   * Configure if the logger is enabled or not.
+   */
+  enabled?: boolean;
+
+  /**
+   * Configure severity filtering.
+   * Log records with an non-zero (i.e. unspecified) severity number which is less than minimum_severity are not processed.
+   */
+  minimum_severity?: SeverityNumber;
+
+  /**
+   * Configure trace based filtering.
+   * If true, log records associated with unsampled trace contexts traces are not processed. If false, or if a log record is not associated with a trace context, trace based filtering is not applied.
+   */
+  trace_based?: boolean;
 }
