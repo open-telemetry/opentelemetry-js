@@ -17,17 +17,17 @@ import { Attributes, Context, Link, SpanKind } from '@opentelemetry/api';
 import type { ComposableSampler, SamplingIntent } from './types';
 
 class ComposableAnnotatingSampler implements ComposableSampler {
-  private readonly attributes: Attributes;
   private readonly delegate: ComposableSampler;
+  private readonly attributes: Attributes;
   private readonly description: string;
 
-  constructor(attributes: Attributes, delegate: ComposableSampler) {
+  constructor(delegate: ComposableSampler, attributes: Attributes) {
     // Shallow copy `attributes` to avoid changes to the original object (at
     // least top-level fields) impacting the sampler. Freeze the object so
     // we can return it in `getSamplingIntent` without copying there.
     this.attributes = Object.freeze({ ...attributes });
     this.delegate = delegate;
-    this.description = `ComposableAnnotatingSampler(attributes, delegate=${delegate})`;
+    this.description = `ComposableAnnotatingSampler(delegate=${delegate}, attributes)`;
   }
 
   getSamplingIntent(
@@ -46,12 +46,14 @@ class ComposableAnnotatingSampler implements ComposableSampler {
       attributes,
       links
     );
-    if (!intent.attributes) {
-      intent.attributes = this.attributes;
-    } else {
-      intent.attributes = { ...intent.attributes, ...this.attributes };
-    }
-    return intent;
+    return {
+      threshold: intent.threshold,
+      thresholdReliable: intent.thresholdReliable,
+      attributes: intent.attributes
+        ? { ...intent.attributes, ...this.attributes }
+        : this.attributes,
+      updateTraceState: intent.updateTraceState,
+    };
   }
 
   toString(): string {
@@ -60,8 +62,8 @@ class ComposableAnnotatingSampler implements ComposableSampler {
 }
 
 export function createComposableAnnotatingSampler(
-  attributes: Attributes,
-  delegate: ComposableSampler
+  delegate: ComposableSampler,
+  attributes: Attributes
 ): ComposableSampler {
-  return new ComposableAnnotatingSampler(attributes, delegate);
+  return new ComposableAnnotatingSampler(delegate, attributes);
 }

@@ -27,10 +27,10 @@ describe('ComposableAnnotatingSampler', () => {
   const alwaysOnSampler = createComposableAlwaysOnSampler();
 
   it('should have a description', () => {
-    const sampler = createComposableAnnotatingSampler({}, alwaysOnSampler);
+    const sampler = createComposableAnnotatingSampler(alwaysOnSampler, {});
     assert.strictEqual(
       sampler.toString(),
-      'ComposableAnnotatingSampler(attributes, delegate=ComposableAlwaysOnSampler)'
+      'ComposableAnnotatingSampler(delegate=ComposableAlwaysOnSampler, attributes)'
     );
   });
 
@@ -44,8 +44,8 @@ describe('ComposableAnnotatingSampler', () => {
       []
     );
     const sampler = createComposableAnnotatingSampler(
-      { foo: 'bar' },
-      alwaysOnSampler
+      alwaysOnSampler,
+      { foo: 'bar' }
     );
     const intent = sampler.getSamplingIntent(
       context.active(),
@@ -65,11 +65,11 @@ describe('ComposableAnnotatingSampler', () => {
 
   it('should merge attributes', () => {
     const sampler = createComposableAnnotatingSampler(
-      { foo: 'bar', spam: 'eggs' },
       createComposableAnnotatingSampler(
-        { foo: 'baz', wuz: 'here' },
-        alwaysOnSampler
-      )
+        alwaysOnSampler,
+        { foo: 'baz', wuz: 'here' }
+      ),
+      { foo: 'bar', spam: 'eggs' },
     );
     const intent = sampler.getSamplingIntent(
       context.active(),
