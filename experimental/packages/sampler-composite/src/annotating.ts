@@ -27,7 +27,7 @@ class ComposableAnnotatingSampler implements ComposableSampler {
     // we can return it in `getSamplingIntent` without copying there.
     this.attributes = Object.freeze({ ...attributes });
     this.delegate = delegate;
-    this.description = `ComposableAnnotatingSampler(delegate=${delegate}, attributes)`;
+    this.description = `ComposableAnnotatingSampler(${delegate}, attributes)`;
   }
 
   getSamplingIntent(

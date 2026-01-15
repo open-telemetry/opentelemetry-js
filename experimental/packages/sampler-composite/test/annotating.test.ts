@@ -30,7 +30,7 @@ describe('ComposableAnnotatingSampler', () => {
     const sampler = createComposableAnnotatingSampler(alwaysOnSampler, {});
     assert.strictEqual(
       sampler.toString(),
-      'ComposableAnnotatingSampler(delegate=ComposableAlwaysOnSampler, attributes)'
+      'ComposableAnnotatingSampler(ComposableAlwaysOnSampler, attributes)'
     );
   });
 
@@ -43,10 +43,9 @@ describe('ComposableAnnotatingSampler', () => {
       {},
       []
     );
-    const sampler = createComposableAnnotatingSampler(
-      alwaysOnSampler,
-      { foo: 'bar' }
-    );
+    const sampler = createComposableAnnotatingSampler(alwaysOnSampler, {
+      foo: 'bar',
+    });
     const intent = sampler.getSamplingIntent(
       context.active(),
       'unused',
@@ -65,11 +64,11 @@ describe('ComposableAnnotatingSampler', () => {
 
   it('should merge attributes', () => {
     const sampler = createComposableAnnotatingSampler(
-      createComposableAnnotatingSampler(
-        alwaysOnSampler,
-        { foo: 'baz', wuz: 'here' }
-      ),
-      { foo: 'bar', spam: 'eggs' },
+      createComposableAnnotatingSampler(alwaysOnSampler, {
+        foo: 'baz',
+        wuz: 'here',
+      }),
+      { foo: 'bar', spam: 'eggs' }
     );
     const intent = sampler.getSamplingIntent(
       context.active(),
@@ -80,9 +79,9 @@ describe('ComposableAnnotatingSampler', () => {
       []
     );
     assert.deepStrictEqual(intent.attributes, {
-      foo: 'bar',  // outer annotating sampler wins
+      foo: 'bar', // outer annotating sampler wins
       spam: 'eggs',
-      wuz: 'here'
+      wuz: 'here',
     });
   });
 });
