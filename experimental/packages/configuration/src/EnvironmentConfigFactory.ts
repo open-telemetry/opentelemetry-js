@@ -173,14 +173,11 @@ export function setTracerProvider(config: ConfigurationModel): void {
   }
   config.tracer_provider = initializeDefaultTracerProviderConfiguration();
 
-  if (config.tracer_provider.limits == null) {
-    config.tracer_provider.limits = {};
-  }
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT'
   );
   if (attributeValueLengthLimit) {
-    config.tracer_provider.limits.attribute_value_length_limit =
+    config.tracer_provider.limits!.attribute_value_length_limit =
       attributeValueLengthLimit;
   }
 
@@ -188,24 +185,24 @@ export function setTracerProvider(config: ConfigurationModel): void {
     'OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT'
   );
   if (attributeCountLimit) {
-    config.tracer_provider.limits.attribute_count_limit = attributeCountLimit;
+    config.tracer_provider.limits!.attribute_count_limit = attributeCountLimit;
   }
 
   const eventCountLimit = getNumberFromEnv('OTEL_SPAN_EVENT_COUNT_LIMIT');
   if (eventCountLimit) {
-    config.tracer_provider.limits.event_count_limit = eventCountLimit;
+    config.tracer_provider.limits!.event_count_limit = eventCountLimit;
   }
 
   const linkCountLimit = getNumberFromEnv('OTEL_SPAN_LINK_COUNT_LIMIT');
   if (linkCountLimit) {
-    config.tracer_provider.limits.link_count_limit = linkCountLimit;
+    config.tracer_provider.limits!.link_count_limit = linkCountLimit;
   }
 
   const eventAttributeCountLimit = getNumberFromEnv(
     'OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT'
   );
   if (eventAttributeCountLimit) {
-    config.tracer_provider.limits.event_attribute_count_limit =
+    config.tracer_provider.limits!.event_attribute_count_limit =
       eventAttributeCountLimit;
   }
 
@@ -213,7 +210,7 @@ export function setTracerProvider(config: ConfigurationModel): void {
     'OTEL_LINK_ATTRIBUTE_COUNT_LIMIT'
   );
   if (linkAttributeCountLimit) {
-    config.tracer_provider.limits.link_attribute_count_limit =
+    config.tracer_provider.limits!.link_attribute_count_limit =
       linkAttributeCountLimit;
   }
 
@@ -246,16 +243,6 @@ export function setTracerProvider(config: ConfigurationModel): void {
       config.tracer_provider.processors.push({
         simple: { exporter: { console: {} } },
       });
-    } else if (exporterType === 'zipkin') {
-      batchInfo.exporter = {
-        zipkin: {
-          endpoint:
-            getStringFromEnv('OTEL_EXPORTER_ZIPKIN_ENDPOINT') ??
-            'http://localhost:9411/api/v2/spans',
-          timeout: getNumberFromEnv('OTEL_EXPORTER_ZIPKIN_TIMEOUT') ?? 10000,
-        },
-      };
-      config.tracer_provider.processors.push({ batch: batchInfo });
     } else {
       // 'otlp' and default
       const protocol =
@@ -292,16 +279,19 @@ export function setTracerProvider(config: ConfigurationModel): void {
         if (endpoint) {
           batchInfo.exporter.otlp_grpc.endpoint = endpoint;
         }
-        if (certificateFile) {
-          batchInfo.exporter.otlp_grpc.certificate_file = certificateFile;
+        if (certificateFile || clientKeyFile || clientCertificateFile) {
+          batchInfo.exporter.otlp_grpc.tls = {};
+          if (certificateFile) {
+            batchInfo.exporter.otlp_grpc.tls.ca_file = certificateFile;
+          }
+          if (clientKeyFile) {
+            batchInfo.exporter.otlp_grpc.tls.key_file = clientKeyFile;
+          }
+          if (clientCertificateFile) {
+            batchInfo.exporter.otlp_grpc.tls.cert_file = clientCertificateFile;
+          }
         }
-        if (clientKeyFile) {
-          batchInfo.exporter.otlp_grpc.client_key_file = clientKeyFile;
-        }
-        if (clientCertificateFile) {
-          batchInfo.exporter.otlp_grpc.client_certificate_file =
-            clientCertificateFile;
-        }
+
         if (compression) {
           batchInfo.exporter.otlp_grpc.compression = compression;
         }
@@ -323,15 +313,17 @@ export function setTracerProvider(config: ConfigurationModel): void {
         if (endpoint) {
           batchInfo.exporter.otlp_http.endpoint = endpoint;
         }
-        if (certificateFile) {
-          batchInfo.exporter.otlp_http.certificate_file = certificateFile;
-        }
-        if (clientKeyFile) {
-          batchInfo.exporter.otlp_http.client_key_file = clientKeyFile;
-        }
-        if (clientCertificateFile) {
-          batchInfo.exporter.otlp_http.client_certificate_file =
-            clientCertificateFile;
+        if (certificateFile || clientKeyFile || clientCertificateFile) {
+          batchInfo.exporter.otlp_http.tls = {};
+          if (certificateFile) {
+            batchInfo.exporter.otlp_http.tls.ca_file = certificateFile;
+          }
+          if (clientKeyFile) {
+            batchInfo.exporter.otlp_http.tls.key_file = clientKeyFile;
+          }
+          if (clientCertificateFile) {
+            batchInfo.exporter.otlp_http.tls.cert_file = clientCertificateFile;
+          }
         }
         if (compression) {
           batchInfo.exporter.otlp_http.compression = compression;
@@ -428,16 +420,18 @@ export function setMeterProvider(config: ConfigurationModel): void {
         if (endpoint) {
           readerPeriodicInfo.exporter.otlp_grpc.endpoint = endpoint;
         }
-        if (certificateFile) {
-          readerPeriodicInfo.exporter.otlp_grpc.certificate_file =
-            certificateFile;
-        }
-        if (clientKeyFile) {
-          readerPeriodicInfo.exporter.otlp_grpc.client_key_file = clientKeyFile;
-        }
-        if (clientCertificateFile) {
-          readerPeriodicInfo.exporter.otlp_grpc.client_certificate_file =
-            clientCertificateFile;
+        if (certificateFile || clientKeyFile || clientCertificateFile) {
+          readerPeriodicInfo.exporter.otlp_grpc.tls = {};
+          if (certificateFile) {
+            readerPeriodicInfo.exporter.otlp_grpc.tls.ca_file = certificateFile;
+          }
+          if (clientKeyFile) {
+            readerPeriodicInfo.exporter.otlp_grpc.tls.key_file = clientKeyFile;
+          }
+          if (clientCertificateFile) {
+            readerPeriodicInfo.exporter.otlp_grpc.tls.cert_file =
+              clientCertificateFile;
+          }
         }
         if (compression) {
           readerPeriodicInfo.exporter.otlp_grpc.compression = compression;
@@ -496,16 +490,18 @@ export function setMeterProvider(config: ConfigurationModel): void {
         if (endpoint) {
           readerPeriodicInfo.exporter.otlp_http.endpoint = endpoint;
         }
-        if (certificateFile) {
-          readerPeriodicInfo.exporter.otlp_http.certificate_file =
-            certificateFile;
-        }
-        if (clientKeyFile) {
-          readerPeriodicInfo.exporter.otlp_http.client_key_file = clientKeyFile;
-        }
-        if (clientCertificateFile) {
-          readerPeriodicInfo.exporter.otlp_http.client_certificate_file =
-            clientCertificateFile;
+        if (certificateFile || clientKeyFile || clientCertificateFile) {
+          readerPeriodicInfo.exporter.otlp_http.tls = {};
+          if (certificateFile) {
+            readerPeriodicInfo.exporter.otlp_http.tls.ca_file = certificateFile;
+          }
+          if (clientKeyFile) {
+            readerPeriodicInfo.exporter.otlp_http.tls.key_file = clientKeyFile;
+          }
+          if (clientCertificateFile) {
+            readerPeriodicInfo.exporter.otlp_http.tls.cert_file =
+              clientCertificateFile;
+          }
         }
         if (compression) {
           readerPeriodicInfo.exporter.otlp_http.compression = compression;
@@ -606,16 +602,14 @@ export function setLoggerProvider(config: ConfigurationModel): void {
     'OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT'
   );
   if (attributeValueLengthLimit || attributeCountLimit) {
-    if (config.logger_provider.limits == null) {
-      config.logger_provider.limits = { attribute_count_limit: 128 };
-    }
     if (attributeValueLengthLimit) {
-      config.logger_provider.limits.attribute_value_length_limit =
+      config.logger_provider.limits!.attribute_value_length_limit =
         attributeValueLengthLimit;
     }
 
     if (attributeCountLimit) {
-      config.logger_provider.limits.attribute_count_limit = attributeCountLimit;
+      config.logger_provider.limits!.attribute_count_limit =
+        attributeCountLimit;
     }
   }
 
@@ -684,15 +678,17 @@ export function setLoggerProvider(config: ConfigurationModel): void {
         if (endpoint) {
           batchInfo.exporter.otlp_grpc.endpoint = endpoint;
         }
-        if (certificateFile) {
-          batchInfo.exporter.otlp_grpc.certificate_file = certificateFile;
-        }
-        if (clientKeyFile) {
-          batchInfo.exporter.otlp_grpc.client_key_file = clientKeyFile;
-        }
-        if (clientCertificateFile) {
-          batchInfo.exporter.otlp_grpc.client_certificate_file =
-            clientCertificateFile;
+        if (certificateFile || clientKeyFile || clientCertificateFile) {
+          batchInfo.exporter.otlp_grpc.tls = {};
+          if (certificateFile) {
+            batchInfo.exporter.otlp_grpc.tls.ca_file = certificateFile;
+          }
+          if (clientKeyFile) {
+            batchInfo.exporter.otlp_grpc.tls.key_file = clientKeyFile;
+          }
+          if (clientCertificateFile) {
+            batchInfo.exporter.otlp_grpc.tls.cert_file = clientCertificateFile;
+          }
         }
         if (compression) {
           batchInfo.exporter.otlp_grpc.compression = compression;
@@ -715,15 +711,17 @@ export function setLoggerProvider(config: ConfigurationModel): void {
         if (endpoint) {
           batchInfo.exporter.otlp_http.endpoint = endpoint;
         }
-        if (certificateFile) {
-          batchInfo.exporter.otlp_http.certificate_file = certificateFile;
-        }
-        if (clientKeyFile) {
-          batchInfo.exporter.otlp_http.client_key_file = clientKeyFile;
-        }
-        if (clientCertificateFile) {
-          batchInfo.exporter.otlp_http.client_certificate_file =
-            clientCertificateFile;
+        if (certificateFile || clientKeyFile || clientCertificateFile) {
+          batchInfo.exporter.otlp_http.tls = {};
+          if (certificateFile) {
+            batchInfo.exporter.otlp_http.tls.ca_file = certificateFile;
+          }
+          if (clientKeyFile) {
+            batchInfo.exporter.otlp_http.tls.key_file = clientKeyFile;
+          }
+          if (clientCertificateFile) {
+            batchInfo.exporter.otlp_http.tls.cert_file = clientCertificateFile;
+          }
         }
         if (compression) {
           batchInfo.exporter.otlp_http.compression = compression;
