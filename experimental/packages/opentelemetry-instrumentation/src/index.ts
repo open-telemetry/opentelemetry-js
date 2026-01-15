@@ -21,8 +21,10 @@ export { InstrumentationNodeModuleFile } from './instrumentationNodeModuleFile';
 export type {
   Instrumentation,
   InstrumentationConfig,
+  InstrumentationDelegate,
   InstrumentationModuleDefinition,
   InstrumentationModuleFile,
+  Shimmer,
   ShimWrapped,
   SpanCustomizationHook,
 } from './types';
