@@ -16,6 +16,8 @@
 'use strict';
 
 import {
+  GrpcTls,
+  HttpTls,
   IncludeExclude,
   NameStringValuePair,
   OtlpHttpEncoding,
@@ -169,12 +171,12 @@ export interface PushMetricExporter {
    * Configure exporter to be OTLP with file transport.
    * This type is in development and subject to breaking changes in minor versions.
    */
-  'otlp_file/development'?: OtlpFileMetricExporter;
+  'otlp_file/development'?: ExperimentalOtlpFileMetricExporter;
 
   /**
    * Configure exporter to be console.
    */
-  console?: object;
+  console?: ConsoleMetricExporter;
 }
 
 export interface PullMetricExporter {
@@ -182,7 +184,7 @@ export interface PullMetricExporter {
    * Configure exporter to be prometheus.
    * This type is in development and subject to breaking changes in minor versions.
    */
-  'prometheus/development': PrometheusMetricExporter;
+  'prometheus/development': ExperimentalPrometheusMetricExporter;
 }
 
 export interface MetricProducer {
@@ -190,14 +192,9 @@ export interface MetricProducer {
    * Configure metric producer to be opencensus.
    */
   opencensus?: object;
-
-  /**
-   * Configure metric producer to be prometheus.
-   */
-  prometheus?: object;
 }
 
-export interface PrometheusMetricExporter {
+export interface ExperimentalPrometheusMetricExporter {
   /**
    * Configure host.
    * If omitted or null, localhost is used.
@@ -217,9 +214,27 @@ export interface PrometheusMetricExporter {
   without_scope_info?: boolean;
 
   /**
+   * Configure Prometheus Exporter to produce metrics without a target info metric for the resource.
+   * If omitted or null, false is used.
+   */
+  without_target_info?: boolean;
+
+  /**
    * Configure Prometheus Exporter to add resource attributes as metrics attributes.
    */
-  with_resource_constant_labels: IncludeExclude;
+  with_resource_constant_labels?: IncludeExclude;
+
+  /**
+   * Configure how metric names are translated to Prometheus metric names.
+   */
+  translation_strategy?: ExperimentalPrometheusTranslationStrategy;
+}
+
+export enum ExperimentalPrometheusTranslationStrategy {
+  UnderscoreEscapingWithSuffixes = 'underscore_escaping_with_suffixes',
+  UnderscoreEscapingWithoutSuffixes = 'underscore_escaping_without_suffixes',
+  NoUtf8EscapingWithSuffixes = 'no_utf8_escaping_with_suffixes',
+  NoTranslation = 'no_translation',
 }
 
 export interface MetricReader {
@@ -242,25 +257,9 @@ export interface OtlpHttpMetricExporter {
   endpoint?: string;
 
   /**
-   * Configure certificate used to verify a server's TLS credentials.
-   * Absolute path to certificate file in PEM format.
-   * If omitted or null, system default certificate verification is used for secure connections.
+   * Configure TLS settings for the exporter.
    */
-  certificate_file?: string;
-
-  /**
-   * Configure mTLS private client key.
-   * Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-   * If omitted or null, mTLS is not used.
-   */
-  client_key_file?: string;
-
-  /**
-   * Configure mTLS client certificate.
-   * Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-   * If omitted or null, mTLS is not used.
-   */
-  client_certificate_file?: string;
+  tls?: HttpTls;
 
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
@@ -319,25 +318,9 @@ export interface OtlpGrpcMetricExporter {
   endpoint?: string;
 
   /**
-   * Configure certificate used to verify a server's TLS credentials.
-   * Absolute path to certificate file in PEM format.
-   * If omitted or null, system default certificate verification is used for secure connections.
+   * Configure TLS settings for the exporter.
    */
-  certificate_file?: string;
-
-  /**
-   * Configure mTLS private client key.
-   * Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-   * If omitted or null, mTLS is not used.
-   */
-  client_key_file?: string;
-
-  /**
-   * Configure mTLS client certificate.
-   * Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-   * If omitted or null, mTLS is not used.
-   */
-  client_certificate_file?: string;
+  tls?: GrpcTls;
 
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
@@ -367,13 +350,6 @@ export interface OtlpGrpcMetricExporter {
   timeout?: number;
 
   /**
-   * Configure client transport security for the exporter's connection.
-   * Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
-   * If omitted or null, false is used.
-   */
-  insecure?: boolean;
-
-  /**
    * Configure temporality preference.
    * Values include: cumulative, delta, low_memory.
    * If omitted or null, cumulative is used.
@@ -388,7 +364,7 @@ export interface OtlpGrpcMetricExporter {
   default_histogram_aggregation?: ExporterDefaultHistogramAggregation;
 }
 
-export interface OtlpFileMetricExporter {
+export interface ExperimentalOtlpFileMetricExporter {
   /**
    * Configure output stream.
    * Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
@@ -420,6 +396,20 @@ export enum ExporterTemporalityPreference {
 export enum ExporterDefaultHistogramAggregation {
   Base2ExponentialBucketHistogram = 'base2_exponential_bucket_histogram',
   ExplicitBucketHistogram = 'explicit_bucket_histogram',
+}
+
+export interface ConsoleMetricExporter {
+  /**
+   * Configure temporality preference.
+   * If omitted or null, cumulative is used.
+   */
+  temporality_preference?: ExporterTemporalityPreference;
+
+  /**
+   * Configure default histogram aggregation.
+   * If omitted or null, explicit_bucket_histogram is used.
+   */
+  default_histogram_aggregation?: ExporterDefaultHistogramAggregation;
 }
 
 export interface View {
