@@ -301,7 +301,7 @@ export const ATTR_DB_OPERATION_NAME = 'db.operation.name' as const;
  * Summary may be available to the instrumentation through
  * instrumentation hooks or other means. If it is not available, instrumentations
  * that support query parsing **SHOULD** generate a summary following
- * [Generating query summary](/docs/database/database-spans.md#generating-a-summary-of-the-query)
+ * [Generating query summary](/docs/db/database-spans.md#generating-a-summary-of-the-query)
  * section.
  */
 export const ATTR_DB_QUERY_SUMMARY = 'db.query.summary' as const;
@@ -312,7 +312,7 @@ export const ATTR_DB_QUERY_SUMMARY = 'db.query.summary' as const;
  * @example SELECT * FROM wuser_table where username = ?
  * @example SET mykey ?
  *
- * @note For sanitization see [Sanitization of `db.query.text`](/docs/database/database-spans.md#sanitization-of-dbquerytext).
+ * @note For sanitization see [Sanitization of `db.query.text`](/docs/db/database-spans.md#sanitization-of-dbquerytext).
  * For batch operations, if the individual operations are known to have the same query text then that query text **SHOULD** be used, otherwise all of the individual query texts **SHOULD** be concatenated with separator `; ` or some other database system specific separator if more applicable.
  * Parameterized query text **SHOULD NOT** be sanitized. Even though parameterized query text can potentially have sensitive data, by using a parameterized query the user is giving a strong signal that any sensitive data will be passed as parameter values, and the benefit to observability of capturing the static part of the query text by default outweighs the risk.
  */
@@ -445,7 +445,7 @@ export const DOTNET_GC_HEAP_GENERATION_VALUE_POH = "poh" as const;
  *
  * If the operation has completed successfully, instrumentations **SHOULD NOT** set `error.type`.
  *
- * If a specific domain defines its own set of error identifiers (such as HTTP or gRPC status codes),
+ * If a specific domain defines its own set of error identifiers (such as HTTP or RPC status codes),
  * it's **RECOMMENDED** to:
  *
  *   - Use a domain-specific attribute
@@ -982,7 +982,7 @@ export const ATTR_SERVER_PORT = 'server.port' as const;
 export const ATTR_SERVICE_NAME = 'service.name' as const;
 
 /**
- * The version string of the service API or implementation. The format is not defined by these conventions.
+ * The version string of the service component. The format is not defined by these conventions.
  *
  * @example 2.0.0
  * @example a01dbef8a
