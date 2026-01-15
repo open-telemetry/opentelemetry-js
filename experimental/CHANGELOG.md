@@ -13,7 +13,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
-* feat(configuration): parse config for rc 3 [#6101](https://github.com/open-telemetry/opentelemetry-js/pull/6101) @maryliag
+* feat(configuration): parse config for rc 3 [#6291](https://github.com/open-telemetry/opentelemetry-js/pull/6291) @maryliag
 
 ### :bug: Bug Fixes
 
