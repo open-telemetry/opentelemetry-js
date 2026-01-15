@@ -98,6 +98,78 @@ meter_provider:
           observable_gauge: 2000
           observable_up_down_counter: 2000
           up_down_counter: 2000
+    - pull:
+        exporter:
+          prometheus/development:
+            host: localhost
+            port: 9464
+            without_scope_info: false
+            without_target_info: false
+            with_resource_constant_labels:
+              included:
+                - "service*"
+              excluded:
+                - "service.attr1"
+            translation_strategy: underscore_escaping_without_suffixes
+        producers:
+          - opencensus:
+        cardinality_limits:
+          default: 2000
+          counter: 2000
+          gauge: 2000
+          histogram: 2000
+          observable_counter: 2000
+          observable_gauge: 2000
+          observable_up_down_counter: 2000
+          up_down_counter: 2000
+    - pull:
+        exporter:
+          prometheus/development:
+            host: localhost
+            port: 9464
+            without_scope_info: false
+            without_target_info: false
+            with_resource_constant_labels:
+              included:
+                - "service*"
+              excluded:
+                - "service.attr1"
+            translation_strategy: no_utf8_escaping_with_suffixes
+        producers:
+          - opencensus:
+        cardinality_limits:
+          default: 2000
+          counter: 2000
+          gauge: 2000
+          histogram: 2000
+          observable_counter: 2000
+          observable_gauge: 2000
+          observable_up_down_counter: 2000
+          up_down_counter: 2000
+    - pull:
+        exporter:
+          prometheus/development:
+            host: localhost
+            port: 9464
+            without_scope_info: false
+            without_target_info: false
+            with_resource_constant_labels:
+              included:
+                - "service*"
+              excluded:
+                - "service.attr1"
+            translation_strategy: no_translation
+        producers:
+          - opencensus:
+        cardinality_limits:
+          default: 2000
+          counter: 2000
+          gauge: 2000
+          histogram: 2000
+          observable_counter: 2000
+          observable_gauge: 2000
+          observable_up_down_counter: 2000
+          up_down_counter: 2000
     - periodic:
         interval: 60000
         timeout: 30000

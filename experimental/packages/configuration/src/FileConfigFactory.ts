@@ -284,10 +284,7 @@ export function setPropagator(
       propagator['composite_list']
     );
     if (compositeListString) {
-      if (config.propagator == null) {
-        config.propagator = {};
-      }
-      config.propagator.composite_list = compositeListString;
+      config.propagator!.composite_list = compositeListString;
     }
   }
 }
@@ -471,15 +468,12 @@ export function setTracerProvider(
     config.tracer_provider = initializeDefaultTracerProviderConfiguration();
     // Limits
     if (tracerProvider['limits']) {
-      if (config.tracer_provider.limits == null) {
-        config.tracer_provider.limits = {};
-      }
       const attributeValueLengthLimit = getNumberFromConfigFile(
         tracerProvider['limits']['attribute_value_length_limit']
       );
 
       if (attributeValueLengthLimit) {
-        config.tracer_provider.limits.attribute_value_length_limit =
+        config.tracer_provider.limits!.attribute_value_length_limit =
           attributeValueLengthLimit;
       }
 
@@ -487,7 +481,7 @@ export function setTracerProvider(
         tracerProvider['limits']['attribute_count_limit']
       );
       if (attributeCountLimit) {
-        config.tracer_provider.limits.attribute_count_limit =
+        config.tracer_provider.limits!.attribute_count_limit =
           attributeCountLimit;
       }
 
@@ -495,21 +489,21 @@ export function setTracerProvider(
         tracerProvider['limits']['event_count_limit']
       );
       if (eventCountLimit) {
-        config.tracer_provider.limits.event_count_limit = eventCountLimit;
+        config.tracer_provider.limits!.event_count_limit = eventCountLimit;
       }
 
       const linkCountLimit = getNumberFromConfigFile(
         tracerProvider['limits']['link_count_limit']
       );
       if (linkCountLimit) {
-        config.tracer_provider.limits.link_count_limit = linkCountLimit;
+        config.tracer_provider.limits!.link_count_limit = linkCountLimit;
       }
 
       const eventAttributeCountLimit = getNumberFromConfigFile(
         tracerProvider['limits']['event_attribute_count_limit']
       );
       if (eventAttributeCountLimit) {
-        config.tracer_provider.limits.event_attribute_count_limit =
+        config.tracer_provider.limits!.event_attribute_count_limit =
           eventAttributeCountLimit;
       }
 
@@ -517,7 +511,7 @@ export function setTracerProvider(
         tracerProvider['limits']['link_attribute_count_limit']
       );
       if (linkAttributeCountLimit) {
-        config.tracer_provider.limits.link_attribute_count_limit =
+        config.tracer_provider.limits!.link_attribute_count_limit =
           linkAttributeCountLimit;
       }
     }
@@ -1207,15 +1201,12 @@ export function setLoggerProvider(
         loggerProvider['limits']['attribute_count_limit']
       );
       if (attributeValueLengthLimit || attributeCountLimit) {
-        if (config.logger_provider.limits == null) {
-          config.logger_provider.limits = { attribute_count_limit: 128 };
-        }
         if (attributeValueLengthLimit) {
-          config.logger_provider.limits.attribute_value_length_limit =
+          config.logger_provider.limits!.attribute_value_length_limit =
             attributeValueLengthLimit;
         }
         if (attributeCountLimit) {
-          config.logger_provider.limits.attribute_count_limit =
+          config.logger_provider.limits!.attribute_count_limit =
             attributeCountLimit;
         }
       }

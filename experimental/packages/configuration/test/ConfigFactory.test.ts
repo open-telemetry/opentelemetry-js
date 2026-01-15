@@ -42,6 +42,7 @@ import {
   setPropagator,
   setMeterProvider as setFileMeterProvider,
   getTemporalityPreference,
+  getSeverity,
 } from '../src/FileConfigFactory';
 import { TracerProvider } from '../src/models/tracerProviderModel';
 
@@ -386,6 +387,105 @@ const configFromKitchenSinkFile: ConfigurationModel = {
               },
               translation_strategy:
                 ExperimentalPrometheusTranslationStrategy.UnderscoreEscapingWithSuffixes,
+            },
+          },
+          producers: [
+            {
+              opencensus: {},
+            },
+          ],
+          cardinality_limits: {
+            default: 2000,
+            counter: 2000,
+            gauge: 2000,
+            histogram: 2000,
+            observable_counter: 2000,
+            observable_gauge: 2000,
+            observable_up_down_counter: 2000,
+            up_down_counter: 2000,
+          },
+        },
+      },
+      {
+        pull: {
+          exporter: {
+            'prometheus/development': {
+              host: 'localhost',
+              port: 9464,
+              without_scope_info: false,
+              without_target_info: false,
+              with_resource_constant_labels: {
+                included: ['service*'],
+                excluded: ['service.attr1'],
+              },
+              translation_strategy:
+                ExperimentalPrometheusTranslationStrategy.UnderscoreEscapingWithoutSuffixes,
+            },
+          },
+          producers: [
+            {
+              opencensus: {},
+            },
+          ],
+          cardinality_limits: {
+            default: 2000,
+            counter: 2000,
+            gauge: 2000,
+            histogram: 2000,
+            observable_counter: 2000,
+            observable_gauge: 2000,
+            observable_up_down_counter: 2000,
+            up_down_counter: 2000,
+          },
+        },
+      },
+      {
+        pull: {
+          exporter: {
+            'prometheus/development': {
+              host: 'localhost',
+              port: 9464,
+              without_scope_info: false,
+              without_target_info: false,
+              with_resource_constant_labels: {
+                included: ['service*'],
+                excluded: ['service.attr1'],
+              },
+              translation_strategy:
+                ExperimentalPrometheusTranslationStrategy.NoUtf8EscapingWithSuffixes,
+            },
+          },
+          producers: [
+            {
+              opencensus: {},
+            },
+          ],
+          cardinality_limits: {
+            default: 2000,
+            counter: 2000,
+            gauge: 2000,
+            histogram: 2000,
+            observable_counter: 2000,
+            observable_gauge: 2000,
+            observable_up_down_counter: 2000,
+            up_down_counter: 2000,
+          },
+        },
+      },
+      {
+        pull: {
+          exporter: {
+            'prometheus/development': {
+              host: 'localhost',
+              port: 9464,
+              without_scope_info: false,
+              without_target_info: false,
+              with_resource_constant_labels: {
+                included: ['service*'],
+                excluded: ['service.attr1'],
+              },
+              translation_strategy:
+                ExperimentalPrometheusTranslationStrategy.NoTranslation,
             },
           },
           producers: [
@@ -2307,6 +2407,32 @@ describe('ConfigFactory', function () {
           composite: [{ tracecontext: null }],
           composite_list: 'tracecontext',
         },
+        logger_provider: {
+          limits: {
+            attribute_count_limit: 128,
+          },
+          processors: [
+            {
+              simple: {
+                exporter: {
+                  console: {},
+                },
+              },
+            },
+          ],
+          'logger_configurator/development': {
+            loggers: [
+              {
+                config: {
+                  enabled: false,
+                  minimum_severity: 'info',
+                  trace_based: true,
+                },
+                name: 'io.opentelemetry.contrib.*',
+              },
+            ],
+          },
+        },
       });
 
       config = {};
@@ -2544,6 +2670,104 @@ describe('ConfigFactory', function () {
           ],
         },
       });
+
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.DEBUG),
+        SeverityNumber.DEBUG
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.DEBUG2),
+        SeverityNumber.DEBUG2
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.DEBUG3),
+        SeverityNumber.DEBUG3
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.DEBUG4),
+        SeverityNumber.DEBUG4
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.INFO),
+        SeverityNumber.INFO
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.INFO2),
+        SeverityNumber.INFO2
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.INFO3),
+        SeverityNumber.INFO3
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.INFO4),
+        SeverityNumber.INFO4
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.WARN),
+        SeverityNumber.WARN
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.WARN2),
+        SeverityNumber.WARN2
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.WARN3),
+        SeverityNumber.WARN3
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.WARN4),
+        SeverityNumber.WARN4
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.ERROR),
+        SeverityNumber.ERROR
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.ERROR2),
+        SeverityNumber.ERROR2
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.ERROR3),
+        SeverityNumber.ERROR3
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.ERROR4),
+        SeverityNumber.ERROR4
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.FATAL),
+        SeverityNumber.FATAL
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.FATAL2),
+        SeverityNumber.FATAL2
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.FATAL3),
+        SeverityNumber.FATAL3
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.FATAL4),
+        SeverityNumber.FATAL4
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.TRACE),
+        SeverityNumber.TRACE
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.TRACE2),
+        SeverityNumber.TRACE2
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.TRACE3),
+        SeverityNumber.TRACE3
+      );
+      assert.deepStrictEqual(
+        getSeverity(SeverityNumber.TRACE4),
+        SeverityNumber.TRACE4
+      );
+      assert.deepStrictEqual(getSeverity(undefined), undefined);
     });
   });
 });
