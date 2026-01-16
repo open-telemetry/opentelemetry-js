@@ -14,6 +14,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * fix(sdk-logs): allow AnyValue attributes for logs and handle circular references [#6210](https://github.com/open-telemetry/opentelemetry-js/pull/6210) @david-luna
   * based on [#5765](https://github.com/open-telemetry/opentelemetry-js/pull/5765) from @alec2435
+* fix(browser-detector): use window feature detection to avoid false positives in Node.js 21+ and Bun [#6271](https://github.com/open-telemetry/opentelemetry-js/pull/6271) @fiyinfoluwa001 @overbalance
 
 ### :books: Documentation
 
