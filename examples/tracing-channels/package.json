@@ -1,0 +1,16 @@
+{
+  "name": "tracing-channels",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --import ./opentelemetry.ts ./index.ts"
+  },
+  "dependencies": {
+    "@types/node": "24"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

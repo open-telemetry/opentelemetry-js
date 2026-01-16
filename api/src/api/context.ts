@@ -15,7 +15,7 @@
  */
 
 import { NoopContextManager } from '../context/NoopContextManager';
-import { Context, ContextManager } from '../context/types';
+import { Context, ContextManager, Token } from '../context/types';
 import {
   getGlobal,
   registerGlobal,
@@ -87,6 +87,30 @@ export class ContextAPI {
    */
   public bind<T>(context: Context, target: T): T {
     return this._getContextManager().bind(context, target);
+  }
+
+  /**
+   * Associates a Context with the caller's current execution unit.
+   * This is an optional global operation that allows context to be set
+   * imperatively rather than using with().
+   *
+   * @param context The Context to attach
+   * @returns A Token that can be used to restore the previous Context
+   * @since 1.10.0
+   */
+  attach?(context: Context): Token {
+    return this._getContextManager().attach?.(context)!;
+  }
+
+  /**
+   * Restores the Context associated with the caller's current execution unit
+   * to the value it had before the corresponding attach() call.
+   *
+   * @param token A Token returned by a previous call to attach()
+   * @since 1.10.0
+   */
+  detach?(token: Token): void {
+    return this._getContextManager().detach?.(token);
   }
 
   private _getContextManager(): ContextManager {
