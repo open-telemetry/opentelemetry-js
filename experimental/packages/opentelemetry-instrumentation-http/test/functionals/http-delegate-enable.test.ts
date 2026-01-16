@@ -324,18 +324,17 @@ describe('HttpInstrumentationDelegate', () => {
       before(async () => {
         instrumentation.setConfig({
           ignoreIncomingRequestHook: (request: RequestOptions) => {
-            const headers = request.headers as http.OutgoingHttpHeaders | undefined;
-            return (
-              headers?.['user-agent']?.match('ignored-string') != null
-            );
+            const headers = request.headers as
+              | http.OutgoingHttpHeaders
+              | undefined;
+            return headers?.['user-agent']?.match('ignored-string') != null;
           },
           ignoreOutgoingRequestHook: (request: RequestOptions) => {
-            const headers = request.headers as http.OutgoingHttpHeaders | undefined;
+            const headers = request.headers as
+              | http.OutgoingHttpHeaders
+              | undefined;
             if (headers?.['user-agent'] != null) {
-              return (
-                `${headers['user-agent']}`.match('ignored-string') !=
-                null
-              );
+              return `${headers['user-agent']}`.match('ignored-string') != null;
             }
             return false;
           },

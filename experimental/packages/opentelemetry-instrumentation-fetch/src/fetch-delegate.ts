@@ -34,7 +34,7 @@ import {
   safeExecuteInTheMiddle,
   Instrumentation,
   InstrumentationDelegate,
-  createInstrumentation
+  createInstrumentation,
 } from '@opentelemetry/instrumentation';
 import * as core from '@opentelemetry/core';
 import * as web from '@opentelemetry/sdk-trace-web';

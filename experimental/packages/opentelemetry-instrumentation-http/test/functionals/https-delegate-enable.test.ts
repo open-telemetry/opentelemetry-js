@@ -189,12 +189,11 @@ describe('HttpsInstrumentationDelegate', () => {
             );
           },
           ignoreOutgoingRequestHook: (request: http.RequestOptions) => {
-            const headers = request.headers as http.OutgoingHttpHeaders | undefined;
+            const headers = request.headers as
+              | http.OutgoingHttpHeaders
+              | undefined;
             if (headers?.['user-agent'] != null) {
-              return (
-                `${headers['user-agent']}`.match('ignored-string') !=
-                null
-              );
+              return `${headers['user-agent']}`.match('ignored-string') != null;
             }
             return false;
           },
