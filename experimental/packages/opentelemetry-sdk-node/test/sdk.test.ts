@@ -1431,7 +1431,7 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
-    it('should use otlp with http/protobuf and and use user defined flushing settings', async () => {
+    it('should use otlp with http/protobuf and use user defined flushing settings', async () => {
       process.env.OTEL_METRICS_EXPORTER = 'otlp';
       process.env.OTEL_METRIC_EXPORT_INTERVAL = '200';
       process.env.OTEL_METRIC_EXPORT_TIMEOUT = '150';

@@ -106,7 +106,7 @@ describe('utils', function () {
     );
 
     it(
-      'should return correct path for element with id and and surrounded by' +
+      'should return correct path for element with id and surrounded by' +
         ' text nodes mixed with cnode',
       function () {
         const element = getElementXPath($fixture.find('#btn23')[0]);
