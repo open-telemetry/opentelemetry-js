@@ -26,6 +26,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { describeBrowser, describeNode } from './util';
 import { defaultResource, emptyResource, resourceFromAttributes } from '../src';
+import { _clearDefaultServiceNameCache } from '../src/default-service-name';
 import * as EventEmitter from 'events';
 
 describe('Resource', () => {
@@ -42,6 +43,8 @@ describe('Resource', () => {
     'k8s.io/container/name': 'c2',
     'k8s.io/location': 'location1',
   });
+
+  beforeEach(() => _clearDefaultServiceNameCache());
 
   it('should return merged resource', () => {
     const expectedResource = resourceFromAttributes({
