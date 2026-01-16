@@ -183,15 +183,16 @@ describe('HttpsInstrumentationDelegate', () => {
 
       before(() => {
         instrumentation.setConfig({
-          ignoreIncomingRequestHook: request => {
+          ignoreIncomingRequestHook: (request: http.IncomingMessage) => {
             return (
               request.headers['user-agent']?.match('ignored-string') != null
             );
           },
-          ignoreOutgoingRequestHook: request => {
-            if (request.headers?.['user-agent'] != null) {
+          ignoreOutgoingRequestHook: (request: http.RequestOptions) => {
+            const headers = request.headers as http.OutgoingHttpHeaders | undefined;
+            if (headers?.['user-agent'] != null) {
               return (
-                `${request.headers['user-agent']}`.match('ignored-string') !=
+                `${headers['user-agent']}`.match('ignored-string') !=
                 null
               );
             }

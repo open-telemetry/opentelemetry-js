@@ -157,7 +157,8 @@ export const startIncomingSpanHookFunction = (
 export const startOutgoingSpanHookFunction = (
   request: RequestOptions
 ): Attributes => {
-  return { guid: request.headers?.guid };
+  const headers = request.headers as http.OutgoingHttpHeaders | undefined;
+  return { guid: headers?.guid };
 };
 
 describe('HttpInstrumentationDelegate', () => {
@@ -322,15 +323,17 @@ describe('HttpInstrumentationDelegate', () => {
 
       before(async () => {
         instrumentation.setConfig({
-          ignoreIncomingRequestHook: request => {
+          ignoreIncomingRequestHook: (request: RequestOptions) => {
+            const headers = request.headers as http.OutgoingHttpHeaders | undefined;
             return (
-              request.headers['user-agent']?.match('ignored-string') != null
+              headers?.['user-agent']?.match('ignored-string') != null
             );
           },
-          ignoreOutgoingRequestHook: request => {
-            if (request.headers?.['user-agent'] != null) {
+          ignoreOutgoingRequestHook: (request: RequestOptions) => {
+            const headers = request.headers as http.OutgoingHttpHeaders | undefined;
+            if (headers?.['user-agent'] != null) {
               return (
-                `${request.headers['user-agent']}`.match('ignored-string') !=
+                `${headers['user-agent']}`.match('ignored-string') !=
                 null
               );
             }
