@@ -34,7 +34,7 @@ import {
   safeExecuteInTheMiddle,
   Instrumentation,
   InstrumentationDelegate,
-  createInstrumentation,
+  createInstrumentation
 } from '@opentelemetry/instrumentation';
 import * as core from '@opentelemetry/core';
 import * as web from '@opentelemetry/sdk-trace-web';
@@ -70,7 +70,6 @@ import {
   serverPortFromUrl,
 } from './utils';
 import { VERSION } from './version';
-import { _globalThis } from '@opentelemetry/core';
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
@@ -120,16 +119,16 @@ const fetchDelegate: InstrumentationDelegate<FetchInstrumentationConfig> = {
       return;
     }
     if (isWrapped(fetch)) {
-      _shimmer.unwrap(_globalThis, 'fetch');
+      _shimmer.unwrap(globalThis, 'fetch');
       _diag.debug('removing previous patch for constructor');
     }
-    _shimmer.wrap(_globalThis, 'fetch', patchConstructor());
+    _shimmer.wrap(globalThis, 'fetch', patchConstructor());
   },
   disable: function () {
     if (isNode) {
       return;
     }
-    _shimmer.unwrap(_globalThis, 'fetch');
+    _shimmer.unwrap(globalThis, 'fetch');
     _usedResources = new WeakSet<PerformanceResourceTiming>();
   },
 };

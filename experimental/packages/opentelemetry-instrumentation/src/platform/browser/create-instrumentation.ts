@@ -61,7 +61,7 @@ export function createInstrumentation<T extends InstrumentationConfig>(
   set(delegate, _kOtDiag, diagLogger);
   set(delegate, _kOtHooks, []);
   // Set the modules
-  // TODO: for now we're not doing auto patch/unpatch bu I think it could be done
+  // TODO: for now we're not doing auto patch/unpatch but I think it could be done
   let modules = delegate.init?.(shimmer);
   if (modules && !Array.isArray(modules)) {
     modules = [modules];
