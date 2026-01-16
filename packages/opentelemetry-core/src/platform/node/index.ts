@@ -26,4 +26,5 @@ export { SDK_INFO } from './sdk-info';
 /**
  * @deprecated Use performance directly.
  */
-export const otperformance = performance;
+export const otperformance: { now(): number; readonly timeOrigin: number } =
+  performance;

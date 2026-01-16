@@ -20,7 +20,21 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+* chore(context-async-hooks): Deprecate `AsyncHooksContextManager` [#6298](https://github.com/open-telemetry/opentelemetry-js/pull/6298) @trentm
+* chore: fix CODEOWNERS rule ordering [#6297](https://github.com/open-telemetry/opentelemetry-js/pull/6297) @overbalance
+* fix(github): fix CODEOWNERS browser package paths [#6303](https://github.com/open-telemetry/opentelemetry-js/pull/6303) @overbalance
+
+## 2.4.0
+
+### :bug: Bug Fixes
+
+* fix(sdk-metrics): improve PeriodicExportingMetricReader() constructor input validation [#6286](https://github.com/open-telemetry/opentelemetry-js/pull/6286) @cjihrig
+* fix(core): Avoid using DOM types for otperformance export [#6278](https://github.com/open-telemetry/opentelemetry-js/pull/6278) @samchungy
+
+### :house: Internal
+
 * chore(browser): fix CODEOWNERS paths for browser-related packages
+* refactor(sdk-metrics): remove Promise.allSettled() ponyfill [#6277](https://github.com/open-telemetry/opentelemetry-js/pull/6277) @cjihrig
 
 ## 2.3.0
 
@@ -48,6 +62,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * refactor(api): remove several reverse() calls [#6252](https://github.com/open-telemetry/opentelemetry-js/pull/6252) @cjihrig
 * refactor(api): remove unnecessary map() call [#6251](https://github.com/open-telemetry/opentelemetry-js/pull/6251) @cjihrig
 * chore: add zed to gitignore [#6258](https://github.com/open-telemetry/opentelemetry-js/pull/6258) @overbalance
+* chore(deps): update nx to 22.3.0 [#6233](https://github.com/open-telemetry/opentelemetry-js/pull/6233) @overbalance
 
 ## 2.2.0
 

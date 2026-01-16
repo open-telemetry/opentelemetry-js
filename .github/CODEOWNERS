@@ -12,6 +12,9 @@
 #  https://help.github.com/en/articles/about-code-owners
 #
 
+# All files
+* @open-telemetry/javascript-approvers
+
 # Only maintainers can approve changes in .github/ - including this file here, workflows and issue templates
 .github/ @open-telemetry/javascript-maintainers
 
@@ -25,8 +28,7 @@ examples/opentelemetry-web/ @open-telemetry/browser-maintainers @open-telemetry/
 experimental/packages/opentelemetry-browser-detector/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
 experimental/packages/opentelemetry-instrumentation-fetch/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
 experimental/packages/opentelemetry-instrumentation-xml-http-request/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
-experimental/packages/opentelemetry-web-common/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
+experimental/packages/web-common/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
+packages/opentelemetry-context-zone/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
+packages/opentelemetry-context-zone-peer-dep/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
 packages/opentelemetry-sdk-trace-web/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
-
-# All other files
-* @open-telemetry/javascript-approvers
