@@ -12,9 +12,15 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(sdk-logs): allow AnyValue attributes for logs and handle circular references [#6210](https://github.com/open-telemetry/opentelemetry-js/pull/6210) @david-luna
+  * based on [#5765](https://github.com/open-telemetry/opentelemetry-js/pull/5765) from @alec2435
+* fix(browser-detector): use window feature detection to avoid false positives in Node.js 21+ and Bun [#6271](https://github.com/open-telemetry/opentelemetry-js/pull/6271) @fiyinfoluwa001 @overbalance
+
 ### :books: Documentation
 
 ### :house: Internal
+
+* fix(build): update @types/node to 18.19.130, remove DOM types from base tsconfig [#6280](https://github.com/open-telemetry/opentelemetry-js/pull/6280) @overbalance
 
 ## 0.210.0
 
@@ -76,8 +82,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * test(otlp-transformer): remove obsolete compat code from toBase64() [#6242](https://github.com/open-telemetry/opentelemetry-js/pull/6242) @cjihrig
 * refactor(otlp-exporter-base): simplify isExportHTTPErrorRetryable() [#6249](https://github.com/open-telemetry/opentelemetry-js/pull/6249) @cjihrig
 * refactor(sdk-logs): remove wrapper Promise in \_flushOneBatch() [#6253](https://github.com/open-telemetry/opentelemetry-js/pull/6253) @cjihrig
-* fix(sdk-logs): allow AnyValue attributes for logs and handle circular references [#6210](https://github.com/open-telemetry/opentelemetry-js/pull/6210) @david-luna
-  * based on [#5765](https://github.com/open-telemetry/opentelemetry-js/pull/5765) from @alec2435
 
 ## 0.208.0
 

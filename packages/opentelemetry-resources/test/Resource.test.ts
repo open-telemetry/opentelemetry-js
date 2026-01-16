@@ -107,7 +107,7 @@ describe('Resource', () => {
     const debugStub = sinon.spy(diag, 'error');
     const resource = resourceFromAttributes({
       async: new Promise(resolve => {
-        setTimeout(resolve, 1);
+        setTimeout(() => resolve(undefined), 1);
       }),
     });
 
@@ -134,7 +134,7 @@ describe('Resource', () => {
     it('should return false for asyncAttributesPending once promise settles', async () => {
       const resourceResolve = resourceFromAttributes({
         async: new Promise(resolve => {
-          setTimeout(resolve, 1);
+          setTimeout(() => resolve(undefined), 1);
         }),
       });
       const resourceReject = resourceFromAttributes({
