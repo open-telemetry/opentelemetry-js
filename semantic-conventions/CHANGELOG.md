@@ -9,6 +9,16 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 1.39.0
+
+### :rocket: Features
+
 * feat: update semantic conventions to v1.39.0 [#NNNN]
   * Semantic Conventions v1.39.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1390) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * `@opentelemetry/semantic-conventions` (stable) changes: *none*
@@ -133,12 +143,6 @@ ATTR_SYSTEM_MEMORY_LINUX_SLAB_STATE                        // system.memory.linu
 ```
 
 </details>
-
-### :bug: Bug Fixes
-
-### :books: Documentation
-
-### :house: Internal
 
 ## 1.38.0
 
