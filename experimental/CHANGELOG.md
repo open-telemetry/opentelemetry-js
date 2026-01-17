@@ -10,6 +10,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(sdk-logs): export event name from ConsoleLogRecordExporter
+
 ### :bug: Bug Fixes
 
 * fix(sdk-logs): allow AnyValue attributes for logs and handle circular references [#6210](https://github.com/open-telemetry/opentelemetry-js/pull/6210) @david-luna
