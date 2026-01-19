@@ -8,6 +8,10 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* fix(otlp-exporter-base): remove xhr transport [#6317](https://github.com/open-telemetry/opentelemetry-js/pull/6317) @cjihrig
+  * Breaking changes:
+    * (user-facing) The XHR transport was previously deprecated and has now been removed. Users should use a `fetch()` polyfill if they want to keep the functionality of sending headers with their requests.
+
 ### :rocket: Features
 
 * feat(sdk-logs): export event name from ConsoleLogRecordExporter [#6310](https://github.com/open-telemetry/opentelemetry-js/pull/6310) @aicest
