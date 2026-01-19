@@ -49,7 +49,7 @@ describe('API registration', function () {
 
   afterEach(() => {
     sinon.restore();
-  })
+  });
 
   it('should register default implementations', function () {
     const tracerProvider = new NodeTracerProvider();
