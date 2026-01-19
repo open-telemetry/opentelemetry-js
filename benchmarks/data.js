@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1768648345502,
+  "lastUpdate": 1768814202469,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -52993,6 +52993,93 @@ window.BENCHMARK_DATA = {
             "range": "±0.56%",
             "unit": "ops/sec",
             "extra": "93 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "4016742+aicest@users.noreply.github.com",
+            "name": "Fai",
+            "username": "aicest"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "ae9b9337bfa315c6e8b9d2cb3cc3210c6b7a43ee",
+          "message": "feat(sdk-logs): export event name from ConsoleLogRecordExporter (#6310)\n\nCo-authored-by: Colin Ihrig <cjihrig@gmail.com>",
+          "timestamp": "2026-01-19T08:56:37Z",
+          "tree_id": "3cdf7e1f12cbc447790182319ae8759764dc7953",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/ae9b9337bfa315c6e8b9d2cb3cc3210c6b7a43ee"
+        },
+        "date": 1768814201457,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 670279,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8500,
+            "range": "±0.74%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "transform 100 spans to protobuf",
+            "value": 1142,
+            "range": "±0.89%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 1992878,
+            "range": "±0.83%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 1810365,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 1773890,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 1600553,
+            "range": "±0.61%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 295418,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 281564,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
           }
         ]
       }
