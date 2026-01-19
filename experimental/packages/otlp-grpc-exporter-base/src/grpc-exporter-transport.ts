@@ -23,7 +23,6 @@ import type {
   Client,
   ServiceClientConstructor,
 } from '@grpc/grpc-js';
-import { status } from '@grpc/grpc-js';
 import {
   ExportResponse,
   IExporterTransport,
@@ -42,6 +41,7 @@ function createUserAgent(userAgent: string | undefined) {
 // values taken from '@grpc/grpc-js` so that we don't need to require/import it.
 const GRPC_COMPRESSION_NONE = 0;
 const GRPC_COMPRESSION_GZIP = 2;
+const GRPC_DEADLINE_EXCEEDED = 4;
 
 /**
  * The maximum number of deadline exceeded errors that will be tolerated before the client is closed.
@@ -195,7 +195,7 @@ export class GrpcExporterTransport implements IExporterTransport {
               error: err,
             });
 
-            if (err.code === status.DEADLINE_EXCEEDED) {
+            if (err.code === GRPC_DEADLINE_EXCEEDED) {
               this._deadlineExceededCount++;
               if (this._deadlineExceededCount > MAX_DEADLINE_EXCEEDED_COUNT) {
                 this._client?.close();
