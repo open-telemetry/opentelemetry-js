@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  context,
-  propagation,
-  trace,
-} from '@opentelemetry/api';
+import { context, propagation, trace } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { StackContextManager, WebTracerProvider } from '../src';

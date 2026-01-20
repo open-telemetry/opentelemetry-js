@@ -199,7 +199,10 @@ describe('Node SDK', () => {
       assertDefaultPropagatorRegistered();
 
       assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
-      assert.ok(setGlobalTracerProviderSpy.lastCall.args[0] instanceof NodeTracerProvider)
+      assert.ok(
+        setGlobalTracerProviderSpy.lastCall.args[0] instanceof
+          NodeTracerProvider
+      );
       await sdk.shutdown();
     });
 
@@ -219,7 +222,10 @@ describe('Node SDK', () => {
         1,
         'tracer provider should have changed once'
       );
-      assert.ok(setGlobalTracerProviderSpy.lastCall.args[0] instanceof NodeTracerProvider)
+      assert.ok(
+        setGlobalTracerProviderSpy.lastCall.args[0] instanceof
+          NodeTracerProvider
+      );
       await sdk.shutdown();
     });
 
@@ -242,7 +248,7 @@ describe('Node SDK', () => {
 
       const nodeTracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
       assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
-      assert.ok(nodeTracerProvider instanceof NodeTracerProvider)
+      assert.ok(nodeTracerProvider instanceof NodeTracerProvider);
 
       const spanProcessor = nodeTracerProvider['_activeSpanProcessor'] as any;
 
@@ -1124,7 +1130,7 @@ describe('Node SDK', () => {
       assert.ok(
         setGlobalLoggerProviderSpy.callCount === 0,
         'logger provider should not have changed'
-      )
+      );
       await sdk.shutdown();
     });
 

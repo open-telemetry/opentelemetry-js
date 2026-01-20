@@ -18,11 +18,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { inspect } from 'util';
 
-import {
-  context,
-  propagation,
-  trace,
-} from '@opentelemetry/api';
+import { context, propagation, trace } from '@opentelemetry/api';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { CompositePropagator } from '@opentelemetry/core';
 import { NodeTracerProvider } from '../src';
@@ -39,7 +35,7 @@ const assertInstanceOf = (actual: object, ExpectedConstructor: Function) => {
 
 describe('API registration', function () {
   let setGlobalTracerProviderSpy: sinon.SinonSpy;
-  
+
   beforeEach(() => {
     context.disable();
     trace.disable();
