@@ -42,9 +42,6 @@ import {
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
-import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
-import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
-import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { PrometheusExporter as PrometheusMetricExporter } from '@opentelemetry/exporter-prometheus';
 import {
   MeterProvider,
@@ -75,6 +72,8 @@ import {
   getPropagatorFromEnv,
   setupPropagator,
   setupContextManager,
+  getPeriodicExportingMetricReaderFromEnv,
+  getOtlpMetricExporterFromEnv,
 } from './utils';
 
 type TracerProviderConfig = {
@@ -101,13 +100,6 @@ export type LoggerProviderConfig = {
 };
 
 /**
- * @Returns param value, if set else returns the default value
- */
-function getValueInMillis(envName: string, defaultValue: number): number {
-  return parseInt(process.env[envName] || '') || defaultValue;
-}
-
-/**
  *
  * @returns MetricReader[] if appropriate environment variables are configured
  */
@@ -131,61 +123,9 @@ function getMetricReadersFromEnv(): IMetricReader[] {
 
   enabledExporters.forEach(exporter => {
     if (exporter === 'otlp') {
-      const protocol =
-        (
-          getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_PROTOCOL') ??
-          getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL')
-        )?.trim() || 'http/protobuf'; // Using || to also fall back on empty string
-
-      const exportIntervalMillis = getValueInMillis(
-        'OTEL_METRIC_EXPORT_INTERVAL',
-        60000
+      metricReaders.push(
+        getPeriodicExportingMetricReaderFromEnv(getOtlpMetricExporterFromEnv())
       );
-      const exportTimeoutMillis = getValueInMillis(
-        'OTEL_METRIC_EXPORT_TIMEOUT',
-        30000
-      );
-
-      switch (protocol) {
-        case 'grpc':
-          metricReaders.push(
-            new PeriodicExportingMetricReader({
-              exporter: new OTLPGrpcMetricExporter(),
-              exportIntervalMillis: exportIntervalMillis,
-              exportTimeoutMillis: exportTimeoutMillis,
-            })
-          );
-          break;
-        case 'http/json':
-          metricReaders.push(
-            new PeriodicExportingMetricReader({
-              exporter: new OTLPHttpMetricExporter(),
-              exportIntervalMillis: exportIntervalMillis,
-              exportTimeoutMillis: exportTimeoutMillis,
-            })
-          );
-          break;
-        case 'http/protobuf':
-          metricReaders.push(
-            new PeriodicExportingMetricReader({
-              exporter: new OTLPProtoMetricExporter(),
-              exportIntervalMillis: exportIntervalMillis,
-              exportTimeoutMillis: exportTimeoutMillis,
-            })
-          );
-          break;
-        default:
-          diag.warn(
-            `Unsupported OTLP metrics protocol: "${protocol}". Using http/protobuf.`
-          );
-          metricReaders.push(
-            new PeriodicExportingMetricReader({
-              exporter: new OTLPProtoMetricExporter(),
-              exportIntervalMillis: exportIntervalMillis,
-              exportTimeoutMillis: exportTimeoutMillis,
-            })
-          );
-      }
     } else if (exporter === 'console') {
       metricReaders.push(
         new PeriodicExportingMetricReader({

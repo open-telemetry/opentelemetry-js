@@ -193,17 +193,23 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
         })
         .catch(globalErrorHandler);
 
-    const pendingResources = logRecords
-      .map(logRecord => logRecord.resource)
-      .filter(resource => resource.asyncAttributesPending);
+    const pendingResources = [];
+
+    for (let i = 0; i < logRecords.length; i++) {
+      const resource = logRecords[i].resource;
+      if (
+        resource.asyncAttributesPending &&
+        typeof resource.waitForAsyncAttributes === 'function'
+      ) {
+        pendingResources.push(resource.waitForAsyncAttributes());
+      }
+    }
 
     // Avoid scheduling a promise to make the behavior more predictable and easier to test
     if (pendingResources.length === 0) {
       return doExport();
     } else {
-      return Promise.all(
-        pendingResources.map(resource => resource.waitForAsyncAttributes?.())
-      ).then(doExport, globalErrorHandler);
+      return Promise.all(pendingResources).then(doExport, globalErrorHandler);
     }
   }
 

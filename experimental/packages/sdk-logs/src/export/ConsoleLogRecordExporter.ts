@@ -67,6 +67,7 @@ export class ConsoleLogRecordExporter implements LogRecordExporter {
       traceFlags: logRecord.spanContext?.traceFlags,
       severityText: logRecord.severityText,
       severityNumber: logRecord.severityNumber,
+      eventName: logRecord.eventName,
       body: logRecord.body,
       attributes: logRecord.attributes,
     };

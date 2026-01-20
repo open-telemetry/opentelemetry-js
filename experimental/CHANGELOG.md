@@ -8,16 +8,36 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
-* feat(sdk-node)!: do not add default MetricReader when an empty `metricReaders` array is provided to NodeSDK constructor [#6272](https://github.com/open-telemetry/opentelemetry-js/pull/6272) @pichlermarc
-  * (user-facing): setting `metricsReaders: []` now prevents the `NodeSDK` from instantiating a Metrics SDK, regardless of settings in `OTEL_METRICS_EXPORTER` env var.
+* fix(otlp-exporter-base)!: remove xhr transport [#6317](https://github.com/open-telemetry/opentelemetry-js/pull/6317) @cjihrig
+  * (user-facing) The deprecated XHR-based transport has been removed and replaced with `fetch()`. This change affects users who relied on `XmlHttpRequest` instead of `fetch()` for sending headers with OTLP exports. To maintain compatibility on browsers without a `fetch()` implementation, include a `fetch()` polyfill.
 
 ### :rocket: Features
 
+* feat(sdk-logs): export event name from ConsoleLogRecordExporter [#6310](https://github.com/open-telemetry/opentelemetry-js/pull/6310) @aicest
+
 ### :bug: Bug Fixes
+
+* fix(sdk-logs): allow AnyValue attributes for logs and handle circular references [#6210](https://github.com/open-telemetry/opentelemetry-js/pull/6210) @david-luna
+  * based on [#5765](https://github.com/open-telemetry/opentelemetry-js/pull/5765) from @alec2435
+* fix(browser-detector): use window feature detection to avoid false positives in Node.js 21+ and Bun [#6271](https://github.com/open-telemetry/opentelemetry-js/pull/6271) @fiyinfoluwa001 @overbalance
 
 ### :books: Documentation
 
 ### :house: Internal
+
+* fix(build): update @types/node to 18.19.130, remove DOM types from base tsconfig [#6280](https://github.com/open-telemetry/opentelemetry-js/pull/6280) @overbalance
+* refactor(sdk-logs): simplify \_export() [#6318](https://github.com/open-telemetry/opentelemetry-js/pull/6318) @cjihrig
+
+## 0.210.0
+
+### :boom: Breaking Changes
+
+* feat(sdk-node)!: do not add default MetricReader when an empty `metricReaders` array is provided to NodeSDK constructor [#6272](https://github.com/open-telemetry/opentelemetry-js/pull/6272) @pichlermarc
+  * (user-facing): setting `metricsReaders: []` now prevents the `NodeSDK` from instantiating a Metrics SDK, regardless of settings in `OTEL_METRICS_EXPORTER` env var.
+
+### :bug: Bug Fixes
+
+* fix(sdk-node): ensure invalid metric reader config does not throw on startup [#6295](https://github.com/open-telemetry/opentelemetry-js/pull/6295) @pichlermarc
 
 ## 0.209.0
 
