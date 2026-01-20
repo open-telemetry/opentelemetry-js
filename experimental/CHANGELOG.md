@@ -9,8 +9,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :boom: Breaking Changes
 
 * fix(otlp-exporter-base): remove xhr transport [#6317](https://github.com/open-telemetry/opentelemetry-js/pull/6317) @cjihrig
-  * Breaking changes:
-    * (user-facing) The XHR transport was previously deprecated and has now been removed. Users should use a `fetch()` polyfill if they want to keep the functionality of sending headers with their requests.
+  * (user-facing) The deprecated XHR-based transport has been removed and replaced with `fetch()`. This change affects users who relied on `XmlHttpRequest` instead of `fetch()` for sending headers with OTLP exports. To maintain compatibility on browsers without a `fetch()` implementation, include a `fetch()` polyfill.
 
 ### :rocket: Features
 
