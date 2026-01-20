@@ -22,7 +22,7 @@
     "test:webworker": "karma start karma.worker.js --single-run",
     "test:bench": "npm run test:bench:node && npm run test:bench:browser",
     "test:bench:node": "mocha 'test/**/*.bench.ts' --exclude 'test/browser/**/*.bench.ts' | grep 'ops/sec' | tee .benchmark-results.txt",
-    "test:bench:browser": "karma start karma.bench.js --single-run | grep 'ops/sec' | tee -a .benchmark-results.txt",
+    "test:bench:browser": "karma start karma.bench.js --single-run",
     "tdd": "npm run tdd:node",
     "tdd:node": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
