@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-import {
-  context,
-  propagation,
-  trace,
-  ProxyTracerProvider,
-} from '@opentelemetry/api';
+import { context, propagation, trace } from '@opentelemetry/api';
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { StackContextManager, WebTracerProvider } from '../src';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 
 describe('Node Globals Foolproofing', function () {
   const originalProcess = globalThis?.process;
+  let setGlobalTracerProviderSpy: sinon.SinonSpy;
+
   before(() => {
     Object.assign(globalThis, { process: false });
   });
@@ -38,6 +36,11 @@ describe('Node Globals Foolproofing', function () {
     context.disable();
     trace.disable();
     propagation.disable();
+    setGlobalTracerProviderSpy = sinon.spy(trace, 'setGlobalTracerProvider');
+  });
+
+  afterEach(() => {
+    sinon.restore();
   });
 
   it('Can get TraceProvider without node globals such as process', function () {
@@ -54,8 +57,8 @@ describe('Node Globals Foolproofing', function () {
     );
 
     assert.ok(context['_getContextManager']() instanceof StackContextManager);
-    const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
-    assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
+    assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
+    assert.ok(setGlobalTracerProviderSpy.lastCall.args[0] === tracerProvider);
   });
 
   it('Can get TraceProvider with custom id generator and without node globals such as process', function () {
