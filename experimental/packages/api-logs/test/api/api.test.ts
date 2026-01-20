@@ -15,7 +15,8 @@
  */
 
 import * as assert from 'assert';
-import { Logger, ProxyLoggerProvider, logs } from '../../src';
+import { Logger, logs } from '../../src';
+import { ProxyLoggerProvider } from '../../src/ProxyLoggerProvider';
 import { NoopLogger } from '../../src/NoopLogger';
 import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
 
