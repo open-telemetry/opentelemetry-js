@@ -20,6 +20,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+* perf(sdk-trace-base): use Uint8Array for browser RandomIdGenerator [#6209](https://github.com/open-telemetry/opentelemetry-js/pull/6209) @overbalance
+
 ## 2.5.0
 
 ### :bug: Bug Fixes
@@ -32,7 +34,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * chore: fix CODEOWNERS rule ordering [#6297](https://github.com/open-telemetry/opentelemetry-js/pull/6297) @overbalance
 * fix(github): fix CODEOWNERS browser package paths [#6303](https://github.com/open-telemetry/opentelemetry-js/pull/6303) @overbalance
 * fix(build): update @types/node to 18.19.130, remove DOM types from base tsconfig [#6280](https://github.com/open-telemetry/opentelemetry-js/pull/6280) @overbalance
-* perf(sdk-trace-base): use Uint8Array for browser RandomIdGenerator [#6209](https://github.com/open-telemetry/opentelemetry-js/pull/6209) @overbalance
 
 ## 2.4.0
 
