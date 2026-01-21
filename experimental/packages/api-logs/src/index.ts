@@ -21,7 +21,6 @@ export type { LogAttributes, LogBody, LogRecord } from './types/LogRecord';
 export type { LoggerOptions } from './types/LoggerOptions';
 export type { AnyValue, AnyValueMap } from './types/AnyValue';
 export { NOOP_LOGGER, NoopLogger } from './NoopLogger';
-export { ProxyLoggerProvider } from './ProxyLoggerProvider';
 
 import { LogsAPI } from './api/logs';
 export const logs = LogsAPI.getInstance();
