@@ -42,8 +42,10 @@ describe('API registration', function () {
     assert.ok(
       propagation['_getGlobalPropagator']() instanceof CompositePropagator
     );
-    assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
-    assert.ok(setGlobalTracerProviderSpy.lastCall.args[0] === tracerProvider);
+    sinon.assert.calledOnceWithMatch(
+      setGlobalTracerProviderSpy,
+      (provider: any) => provider === tracerProvider
+    );
   });
 
   it('should register configured implementations', function () {
@@ -60,8 +62,10 @@ describe('API registration', function () {
     assert.ok(context['_getContextManager']() === contextManager);
     assert.ok(propagation['_getGlobalPropagator']() === propagator);
 
-    assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
-    assert.ok(setGlobalTracerProviderSpy.lastCall.args[0] === tracerProvider);
+    sinon.assert.calledOnceWithMatch(
+      setGlobalTracerProviderSpy,
+      (provider: any) => provider === tracerProvider
+    );
   });
 
   it('should skip null context manager', function () {
@@ -80,8 +84,10 @@ describe('API registration', function () {
     assert.ok(
       propagation['_getGlobalPropagator']() instanceof CompositePropagator
     );
-    assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
-    assert.ok(setGlobalTracerProviderSpy.lastCall.args[0] === tracerProvider);
+    sinon.assert.calledOnceWithMatch(
+      setGlobalTracerProviderSpy,
+      (provider: any) => provider === tracerProvider
+    );
   });
 
   it('should skip null propagator', function () {
@@ -98,7 +104,9 @@ describe('API registration', function () {
     );
 
     assert.ok(context['_getContextManager']() instanceof StackContextManager);
-    assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
-    assert.ok(setGlobalTracerProviderSpy.lastCall.args[0] === tracerProvider);
+    sinon.assert.calledOnceWithMatch(
+      setGlobalTracerProviderSpy,
+      (provider: any) => provider === tracerProvider
+    );
   });
 });
