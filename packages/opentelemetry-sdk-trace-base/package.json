@@ -20,7 +20,8 @@
     "test": "nyc mocha 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "karma start --single-run",
     "test:webworker": "karma start karma.worker.js --single-run",
-    "test:bench": "node test/performance/benchmark/index.js | tee .benchmark-results.txt",
+    "test:bench": "mocha 'test/node/**/*.bench.ts' | grep 'ops/sec' | tee test/node/.benchmark-results.txt",
+    "test:bench:browser": "karma start karma.bench.js --single-run",
     "tdd": "npm run tdd:node",
     "tdd:node": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
@@ -64,6 +65,7 @@
   },
   "devDependencies": {
     "@opentelemetry/api": ">=1.3.0 <1.10.0",
+    "@types/benchmark": "2.1.5",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",

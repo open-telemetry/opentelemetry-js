@@ -20,6 +20,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+* perf(sdk-trace-base): use Uint8Array for browser RandomIdGenerator [#6209](https://github.com/open-telemetry/opentelemetry-js/pull/6209) @overbalance
+
 ## 2.5.0
 
 ### :bug: Bug Fixes

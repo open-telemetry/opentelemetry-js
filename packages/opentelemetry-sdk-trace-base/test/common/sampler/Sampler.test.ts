@@ -23,8 +23,8 @@ import {
   SamplingDecision,
   SamplingResult,
   TraceIdRatioBasedSampler,
-} from '../../src';
-import { assertAssignable } from './util';
+} from '../../../src';
+import { assertAssignable } from '../util';
 
 describe('Sampler', () => {
   const samplers = [
