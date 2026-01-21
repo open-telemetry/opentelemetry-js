@@ -15,6 +15,7 @@
  */
 
 import * as assert from 'assert';
+import { Suite } from 'mocha';
 import * as sinon from 'sinon';
 import { SpanExporter } from '../../../src';
 import { BatchSpanProcessor } from '../../../src/platform/browser/export/BatchSpanProcessor';
@@ -24,18 +25,19 @@ import {
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
 
-/**
- * VisibilityState has been removed from TypeScript 4.6.0+
- * So just defining a simple replacement
- */
-type WebVisibilityState = 'visible' | 'hidden';
+const isBrowser =
+  typeof window !== 'undefined' && typeof document !== 'undefined';
 
-const describeDocument =
-  typeof document === 'object' ? describe : describe.skip;
+export function describeBrowser(title: string, fn: (this: Suite) => void) {
+  title = `Browser: ${title}`;
+  if (isBrowser) {
+    return describe(title, fn);
+  }
+  return describe.skip(title, fn);
+}
 
-describeDocument('BatchSpanProcessor - web main context', () => {
-  // TODO: change to DocumentVisibilityState when TypeScript is upgraded to 4.6+
-  let visibilityState: WebVisibilityState = 'visible';
+describeBrowser('BatchSpanProcessor', () => {
+  let visibilityState: DocumentVisibilityState = 'visible';
   let exporter: SpanExporter;
   let processor: BatchSpanProcessor;
   let forceFlushSpy: sinon.SinonStub;
