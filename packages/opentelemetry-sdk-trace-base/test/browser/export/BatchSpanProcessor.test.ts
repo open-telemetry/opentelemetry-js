@@ -28,7 +28,7 @@ import {
 const isBrowser =
   typeof window !== 'undefined' && typeof document !== 'undefined';
 
-export function describeBrowser(title: string, fn: (this: Suite) => void) {
+function describeBrowser(title: string, fn: (this: Suite) => void) {
   title = `Browser: ${title}`;
   if (isBrowser) {
     return describe(title, fn);
