@@ -16,9 +16,15 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
-* refactor(resources): use runtime check for default service name [#6257](https://github.com/open-telemetry/opentelemetry-js/pull/6257) @overbalance
-
 ### :books: Documentation
+
+### :house: Internal
+
+## 2.5.0
+
+### :bug: Bug Fixes
+
+* refactor(resources): use runtime check for default service name [#6257](https://github.com/open-telemetry/opentelemetry-js/pull/6257) @overbalance
 
 ### :house: Internal
 
