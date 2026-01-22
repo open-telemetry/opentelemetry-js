@@ -14,25 +14,38 @@
  * limitations under the License.
  */
 
-const Benchmark = require('benchmark');
-const { BasicTracerProvider, BatchSpanProcessor } = require('../../../build/src');
-const { ExportResultCode } = require('@opentelemetry/core');
+import * as Benchmark from 'benchmark';
+import {
+  BasicTracerProvider,
+  BatchSpanProcessor,
+  SpanExporter,
+  ReadableSpan,
+} from '../../../src';
+import { ExportResultCode, ExportResult } from '@opentelemetry/core';
 
-class NoopExporter  {
-  export(spans, resultCallback) {
+class NoopExporter implements SpanExporter {
+  export(
+    spans: ReadableSpan[],
+    resultCallback: (result: ExportResult) => void
+  ): void {
     setTimeout(() => resultCallback({ code: ExportResultCode.SUCCESS }), 0);
   }
 
-  shutdown() {
+  shutdown(): Promise<void> {
     return this.forceFlush();
   }
 
-  forceFlush() {
+  forceFlush(): Promise<void> {
     return Promise.resolve();
   }
 }
 
-function createSpan() {
+const tracerProvider = new BasicTracerProvider({
+  spanProcessors: [new BatchSpanProcessor(new NoopExporter())],
+});
+const tracer = tracerProvider.getTracer('test');
+
+function createSpan(): void {
   const span = tracer.startSpan('span');
   span.setAttribute('aaaaaaaaaaaaaaaaaaaa', 'aaaaaaaaaaaaaaaaaaaa');
   span.setAttribute('bbbbbbbbbbbbbbbbbbbb', 'aaaaaaaaaaaaaaaaaaaa');
@@ -47,19 +60,19 @@ function createSpan() {
   span.end();
 }
 
-const tracerProvider = new BasicTracerProvider({
-  spanProcessors: [new BatchSpanProcessor(new NoopExporter())]
+describe('BatchSpanProcessor benchmark (browser)', function () {
+  this.timeout(60000);
+
+  it('process span (browser)', done => {
+    const suite = new Benchmark.Suite();
+    suite
+      .add('BatchSpanProcessor process span (browser)', () => {
+        createSpan();
+      })
+      .on('cycle', (event: Benchmark.Event) =>
+        console.log(String(event.target))
+      )
+      .on('complete', () => done())
+      .run({ async: true });
+  });
 });
-const tracer = tracerProvider.getTracer('test')
-
-const suite = new Benchmark.Suite('BatchSpanProcessor');
-
-suite.on('cycle', event => {
-  console.log(String(event.target));
-});
-
-suite.add('BatchSpanProcessor process span', function() {
-  createSpan();
-});
-
-suite.run();

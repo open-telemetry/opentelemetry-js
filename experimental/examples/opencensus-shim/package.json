@@ -1,7 +1,7 @@
 {
   "name": "opencensus-shim",
   "private": true,
-  "version": "0.210.0",
+  "version": "0.211.0",
   "description": "Example of using @opentelemetry/shim-opencensus in Node.js",
   "main": "index.js",
   "scripts": {
@@ -32,13 +32,13 @@
     "@opencensus/instrumentation-http": "0.1.0",
     "@opencensus/nodejs-base": "0.1.0",
     "@opentelemetry/api": "1.9.0",
-    "@opentelemetry/exporter-prometheus": "0.210.0",
-    "@opentelemetry/exporter-trace-otlp-grpc": "0.210.0",
-    "@opentelemetry/resources": "2.4.0",
-    "@opentelemetry/sdk-metrics": "2.4.0",
-    "@opentelemetry/sdk-trace-node": "2.4.0",
+    "@opentelemetry/exporter-prometheus": "0.211.0",
+    "@opentelemetry/exporter-trace-otlp-grpc": "0.211.0",
+    "@opentelemetry/resources": "2.5.0",
+    "@opentelemetry/sdk-metrics": "2.5.0",
+    "@opentelemetry/sdk-trace-node": "2.5.0",
     "@opentelemetry/semantic-conventions": "^1.29.0",
-    "@opentelemetry/shim-opencensus": "0.210.0"
+    "@opentelemetry/shim-opencensus": "0.211.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/examples/opencensus-shim"
 }

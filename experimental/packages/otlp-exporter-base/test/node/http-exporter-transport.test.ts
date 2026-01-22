@@ -83,7 +83,10 @@ describe('HttpExporterTransport', function () {
       server.listen(8080);
 
       class SedAgent extends http.Agent {
-        createConnection(options: TcpNetConnectOpts, listener: () => void) {
+        override createConnection(
+          options: TcpNetConnectOpts,
+          listener: () => void
+        ) {
           return createConnection(
             { ...options, host: options.host?.replaceAll('j', 'l') },
             listener
