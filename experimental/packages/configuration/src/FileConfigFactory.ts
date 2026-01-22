@@ -413,7 +413,12 @@ function parseConfigSpanOrLogRecordExporter(
           clientKeyFile = getStringFromConfigFile(e['tls']['key_file']);
           insecure = getBooleanFromConfigFile(e['tls']['insecure']);
 
-          const tls = getGrpcTlsConfig(certFile, clientKeyFile, clientCertFile, insecure);
+          const tls = getGrpcTlsConfig(
+            certFile,
+            clientKeyFile,
+            clientCertFile,
+            insecure
+          );
           if (tls) {
             parsedExporter.otlp_grpc!.tls = tls;
           }
@@ -718,9 +723,14 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
           certFile = getStringFromConfigFile(e['tls']['ca_file']);
           clientCertFile = getStringFromConfigFile(e['tls']['cert_file']);
           clientKeyFile = getStringFromConfigFile(e['tls']['key_file']);
-            insecure = getBooleanFromConfigFile(e['tls']['insecure']);
+          insecure = getBooleanFromConfigFile(e['tls']['insecure']);
 
-          const tls = getGrpcTlsConfig(certFile, clientKeyFile, clientCertFile, insecure);
+          const tls = getGrpcTlsConfig(
+            certFile,
+            clientKeyFile,
+            clientCertFile,
+            insecure
+          );
           if (tls) {
             parsedExporter.otlp_grpc!.tls = tls;
           }

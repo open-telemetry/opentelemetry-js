@@ -280,7 +280,11 @@ export function setTracerProvider(config: ConfigurationModel): void {
         if (endpoint) {
           batchInfo.exporter.otlp_grpc.endpoint = endpoint;
         }
-        const tls = getGrpcTlsConfig(certificateFile, clientKeyFile, clientCertificateFile);
+        const tls = getGrpcTlsConfig(
+          certificateFile,
+          clientKeyFile,
+          clientCertificateFile
+        );
         if (tls) {
           batchInfo.exporter.otlp_grpc.tls = tls;
         }
@@ -305,7 +309,11 @@ export function setTracerProvider(config: ConfigurationModel): void {
         if (endpoint) {
           batchInfo.exporter.otlp_http.endpoint = endpoint;
         }
-        const tls = getHttpTlsConfig(certificateFile, clientKeyFile, clientCertificateFile);
+        const tls = getHttpTlsConfig(
+          certificateFile,
+          clientKeyFile,
+          clientCertificateFile
+        );
         if (tls) {
           batchInfo.exporter.otlp_http.tls = tls;
         }
@@ -404,7 +412,11 @@ export function setMeterProvider(config: ConfigurationModel): void {
         if (endpoint) {
           readerPeriodicInfo.exporter.otlp_grpc.endpoint = endpoint;
         }
-        const tls = getGrpcTlsConfig(certificateFile, clientKeyFile, clientCertificateFile);
+        const tls = getGrpcTlsConfig(
+          certificateFile,
+          clientKeyFile,
+          clientCertificateFile
+        );
         if (tls) {
           readerPeriodicInfo.exporter.otlp_grpc.tls = tls;
         }
@@ -465,7 +477,11 @@ export function setMeterProvider(config: ConfigurationModel): void {
         if (endpoint) {
           readerPeriodicInfo.exporter.otlp_http.endpoint = endpoint;
         }
-        const tls = getHttpTlsConfig(certificateFile, clientKeyFile, clientCertificateFile);
+        const tls = getHttpTlsConfig(
+          certificateFile,
+          clientKeyFile,
+          clientCertificateFile
+        );
         if (tls) {
           readerPeriodicInfo.exporter.otlp_http.tls = tls;
         }
@@ -644,7 +660,11 @@ export function setLoggerProvider(config: ConfigurationModel): void {
         if (endpoint) {
           batchInfo.exporter.otlp_grpc.endpoint = endpoint;
         }
-        const tls = getGrpcTlsConfig(certificateFile, clientKeyFile, clientCertificateFile);
+        const tls = getGrpcTlsConfig(
+          certificateFile,
+          clientKeyFile,
+          clientCertificateFile
+        );
         if (tls) {
           batchInfo.exporter.otlp_grpc.tls = tls;
         }
@@ -669,7 +689,11 @@ export function setLoggerProvider(config: ConfigurationModel): void {
         if (endpoint) {
           batchInfo.exporter.otlp_http.endpoint = endpoint;
         }
-        const tls = getHttpTlsConfig(certificateFile, clientKeyFile, clientCertificateFile);
+        const tls = getHttpTlsConfig(
+          certificateFile,
+          clientKeyFile,
+          clientCertificateFile
+        );
         if (tls) {
           batchInfo.exporter.otlp_http.tls = tls;
         }
