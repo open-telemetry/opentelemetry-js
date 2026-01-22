@@ -25,30 +25,21 @@ class BatchSpanProcessor extends BatchSpanProcessorBase<BufferConfig> {
 describe('BatchSpanProcessorBase', () => {
   describe('constructor', () => {
     it('should read defaults from environment', () => {
-      const exporter = new InMemorySpanExporter();
       const bspConfig = {
         OTEL_BSP_MAX_EXPORT_BATCH_SIZE: 256,
         OTEL_BSP_SCHEDULE_DELAY: 2500,
       };
 
-      let env: Record<string, any>;
-      if (global.process?.versions?.node === undefined) {
-        env = globalThis as unknown as Record<string, any>;
-      } else {
-        env = process.env as Record<string, any>;
-      }
+      Object.assign(process.env, bspConfig);
 
-      Object.entries(bspConfig).forEach(([k, v]) => {
-        env[k] = v;
-      });
+      const processor = new BatchSpanProcessor(new InMemorySpanExporter());
 
-      const processor = new BatchSpanProcessor(exporter);
       assert.ok(processor instanceof BatchSpanProcessor);
       assert.strictEqual(processor['_maxExportBatchSize'], 256);
       assert.strictEqual(processor['_scheduledDelayMillis'], 2500);
       processor.shutdown();
 
-      Object.keys(bspConfig).forEach(k => delete env[k]);
+      Object.keys(bspConfig).forEach(k => delete process.env[k]);
     });
   });
 });
