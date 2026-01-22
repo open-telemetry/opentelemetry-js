@@ -472,7 +472,7 @@ export const getOutgoingRequestAttributes = (
   const port = options.port;
   const method = requestOptions.method ?? 'GET';
   const normalizedMethod = normalizeMethod(method);
-  const headers = requestOptions.headers || {};
+  const headers = (requestOptions.headers || {}) as OutgoingHttpHeaders;
   const userAgent = headers['user-agent'];
   const urlFull = getAbsoluteUrl(
     requestOptions,

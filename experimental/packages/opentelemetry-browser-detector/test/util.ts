@@ -18,9 +18,20 @@ import * as assert from 'assert';
 import { BROWSER_ATTRIBUTES } from '../src/types';
 import { DetectedResource } from '@opentelemetry/resources';
 
+const isBrowser =
+  typeof window !== 'undefined' && typeof document !== 'undefined';
+
 export function describeBrowser(title: string, fn: (this: Suite) => void) {
   title = `Browser: ${title}`;
-  if (typeof process === 'object' && process.release?.name === 'node') {
+  if (isBrowser) {
+    return describe(title, fn);
+  }
+  return describe.skip(title, fn);
+}
+
+export function describeNode(title: string, fn: (this: Suite) => void) {
+  title = `Node.js: ${title}`;
+  if (isBrowser) {
     return describe.skip(title, fn);
   }
   return describe(title, fn);

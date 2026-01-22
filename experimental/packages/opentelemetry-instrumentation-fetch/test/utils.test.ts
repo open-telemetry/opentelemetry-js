@@ -221,7 +221,7 @@ describe('getFetchBodyLength', () => {
     assert.strictEqual(decoder.decode(value), jsonString);
   });
 
-  it('should read the body of the first param when recieving a request', async () => {
+  it('should read the body of the first param when receiving a request', async () => {
     const bodyContent = JSON.stringify({
       key1: 'true',
       key2: 'hello world',
@@ -246,7 +246,7 @@ describe('getFetchBodyLength', () => {
     assert.strictEqual(body, bodyContent);
   });
 
-  it('should read the body of the first param when recieving a request with urlparams body', async () => {
+  it('should read the body of the first param when receiving a request with urlparams body', async () => {
     const body = new URLSearchParams();
     body.append('hello', 'world');
 

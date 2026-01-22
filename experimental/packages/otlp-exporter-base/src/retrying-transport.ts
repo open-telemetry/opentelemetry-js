@@ -85,7 +85,7 @@ class RetryingTransport implements IExporterTransport {
 
     if (result.status === 'success') {
       diag.verbose(
-        `Export succeded after ${MAX_ATTEMPTS - attempts} retry attempts.`
+        `Export succeeded after ${MAX_ATTEMPTS - attempts} retry attempts.`
       );
     } else if (result.status === 'retryable') {
       diag.info(

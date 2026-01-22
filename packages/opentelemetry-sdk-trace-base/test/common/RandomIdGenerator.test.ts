@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import * as assert from 'assert';
-import { RandomIdGenerator } from '../../../src/platform';
+import { RandomIdGenerator } from '../../src/platform';
 
 const idGenerator = new RandomIdGenerator();
 

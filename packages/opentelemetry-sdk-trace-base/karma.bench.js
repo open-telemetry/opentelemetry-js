@@ -14,5 +14,18 @@
  * limitations under the License.
  */
 
-require('./span');
-require('./BatchSpanProcessor');
+const karmaWebpackConfig = require('../../karma.webpack');
+const karmaBaseConfig = require('../../karma.base');
+
+module.exports = config => {
+  config.set(
+    Object.assign({}, karmaBaseConfig, {
+      webpack: karmaWebpackConfig,
+      files: ['test/browser/**/*.bench.ts'],
+      preprocessors: {
+        'test/browser/**/*.bench.ts': ['webpack'],
+      },
+      browserNoActivityTimeout: 120000,
+    })
+  );
+};
