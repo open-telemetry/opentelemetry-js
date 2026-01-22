@@ -165,6 +165,7 @@ const configFromFile: ConfigurationModel = {
       },
     ],
     exemplar_filter: ExemplarFilter.TraceBased,
+    views: [],
   },
   logger_provider: {
     processors: [
@@ -188,6 +189,7 @@ const configFromFile: ConfigurationModel = {
     limits: {
       attribute_count_limit: 128,
     },
+    'logger_configurator/development': {},
   },
 };
 
@@ -882,6 +884,7 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
       },
     ],
     exemplar_filter: ExemplarFilter.TraceBased,
+    views: [],
   },
   logger_provider: {
     processors: [
@@ -905,6 +908,7 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
     limits: {
       attribute_count_limit: 128,
     },
+    'logger_configurator/development': {},
   },
 };
 
@@ -1378,6 +1382,7 @@ describe('ConfigFactory', function () {
             },
           ],
           exemplar_filter: ExemplarFilter.AlwaysOn,
+          views: [],
         },
       };
       const configFactory = createConfigFactory();
@@ -1402,6 +1407,7 @@ describe('ConfigFactory', function () {
             },
           ],
           exemplar_filter: ExemplarFilter.TraceBased,
+          views: [],
         },
       };
       const configFactory = createConfigFactory();
@@ -1448,6 +1454,7 @@ describe('ConfigFactory', function () {
             },
           ],
           exemplar_filter: ExemplarFilter.TraceBased,
+          views: [],
         },
       };
       const configFactory = createConfigFactory();
@@ -1492,6 +1499,7 @@ describe('ConfigFactory', function () {
             },
           ],
           exemplar_filter: ExemplarFilter.TraceBased,
+          views: [],
         },
       };
       const configFactory = createConfigFactory();
@@ -1525,6 +1533,7 @@ describe('ConfigFactory', function () {
             },
           ],
           exemplar_filter: ExemplarFilter.TraceBased,
+          views: [],
         },
       };
       const configFactory = createConfigFactory();
@@ -1558,6 +1567,7 @@ describe('ConfigFactory', function () {
             },
           ],
           exemplar_filter: ExemplarFilter.TraceBased,
+          views: [],
         },
       };
       const configFactory = createConfigFactory();
@@ -1592,6 +1602,7 @@ describe('ConfigFactory', function () {
             },
           ],
           exemplar_filter: ExemplarFilter.TraceBased,
+          views: [],
         },
       };
       const configFactory = createConfigFactory();
@@ -1624,6 +1635,7 @@ describe('ConfigFactory', function () {
             },
           ],
           exemplar_filter: ExemplarFilter.TraceBased,
+          views: [],
         },
       };
       const configFactory = createConfigFactory();
@@ -1678,6 +1690,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
+          'logger_configurator/development': {},
         },
       };
       const configFactory = createConfigFactory();
@@ -1701,6 +1714,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
+          'logger_configurator/development': {},
         },
       };
       const configFactory = createConfigFactory();
@@ -1745,6 +1759,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
+          'logger_configurator/development': {},
         },
       };
       const configFactory = createConfigFactory();
@@ -1791,6 +1806,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
+          'logger_configurator/development': {},
         },
       };
       const configFactory = createConfigFactory();
@@ -1823,6 +1839,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
+          'logger_configurator/development': {},
         },
       };
       const configFactory = createConfigFactory();
@@ -1899,6 +1916,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
+          views: [],
         },
         logger_provider: {
           limits: {
@@ -1928,6 +1946,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
+          'logger_configurator/development': {},
         },
       };
       const configFactory = createConfigFactory();
@@ -1991,6 +2010,7 @@ describe('ConfigFactory', function () {
             },
           },
         ],
+        views: [],
       };
       assert.deepStrictEqual(config.meter_provider, expectedMeterProvider);
 
@@ -2021,6 +2041,7 @@ describe('ConfigFactory', function () {
             },
           },
         ],
+        views: [],
       };
       assert.deepStrictEqual(config.meter_provider, expectedMeterProvider);
     });
@@ -2256,6 +2277,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
+          views: [],
         },
         logger_provider: {
           ...defaultConfigFromFileWithEnvVariables.logger_provider,

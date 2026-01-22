@@ -43,6 +43,7 @@ import {
   BatchLogRecordProcessor,
   initializeDefaultLoggerProviderConfiguration,
 } from './models/loggerProviderModel';
+import { getGrpcTlsConfig, getHttpTlsConfig } from './utils';
 
 /**
  * EnvironmentConfigProvider provides a configuration based on environment variables.
@@ -279,19 +280,10 @@ export function setTracerProvider(config: ConfigurationModel): void {
         if (endpoint) {
           batchInfo.exporter.otlp_grpc.endpoint = endpoint;
         }
-        if (certificateFile || clientKeyFile || clientCertificateFile) {
-          batchInfo.exporter.otlp_grpc.tls = {};
-          if (certificateFile) {
-            batchInfo.exporter.otlp_grpc.tls.ca_file = certificateFile;
-          }
-          if (clientKeyFile) {
-            batchInfo.exporter.otlp_grpc.tls.key_file = clientKeyFile;
-          }
-          if (clientCertificateFile) {
-            batchInfo.exporter.otlp_grpc.tls.cert_file = clientCertificateFile;
-          }
+        const tls = getGrpcTlsConfig(certificateFile, clientKeyFile, clientCertificateFile);
+        if (tls) {
+          batchInfo.exporter.otlp_grpc.tls = tls;
         }
-
         if (compression) {
           batchInfo.exporter.otlp_grpc.compression = compression;
         }
@@ -313,17 +305,9 @@ export function setTracerProvider(config: ConfigurationModel): void {
         if (endpoint) {
           batchInfo.exporter.otlp_http.endpoint = endpoint;
         }
-        if (certificateFile || clientKeyFile || clientCertificateFile) {
-          batchInfo.exporter.otlp_http.tls = {};
-          if (certificateFile) {
-            batchInfo.exporter.otlp_http.tls.ca_file = certificateFile;
-          }
-          if (clientKeyFile) {
-            batchInfo.exporter.otlp_http.tls.key_file = clientKeyFile;
-          }
-          if (clientCertificateFile) {
-            batchInfo.exporter.otlp_http.tls.cert_file = clientCertificateFile;
-          }
+        const tls = getHttpTlsConfig(certificateFile, clientKeyFile, clientCertificateFile);
+        if (tls) {
+          batchInfo.exporter.otlp_http.tls = tls;
         }
         if (compression) {
           batchInfo.exporter.otlp_http.compression = compression;
@@ -420,18 +404,9 @@ export function setMeterProvider(config: ConfigurationModel): void {
         if (endpoint) {
           readerPeriodicInfo.exporter.otlp_grpc.endpoint = endpoint;
         }
-        if (certificateFile || clientKeyFile || clientCertificateFile) {
-          readerPeriodicInfo.exporter.otlp_grpc.tls = {};
-          if (certificateFile) {
-            readerPeriodicInfo.exporter.otlp_grpc.tls.ca_file = certificateFile;
-          }
-          if (clientKeyFile) {
-            readerPeriodicInfo.exporter.otlp_grpc.tls.key_file = clientKeyFile;
-          }
-          if (clientCertificateFile) {
-            readerPeriodicInfo.exporter.otlp_grpc.tls.cert_file =
-              clientCertificateFile;
-          }
+        const tls = getGrpcTlsConfig(certificateFile, clientKeyFile, clientCertificateFile);
+        if (tls) {
+          readerPeriodicInfo.exporter.otlp_grpc.tls = tls;
         }
         if (compression) {
           readerPeriodicInfo.exporter.otlp_grpc.compression = compression;
@@ -490,18 +465,9 @@ export function setMeterProvider(config: ConfigurationModel): void {
         if (endpoint) {
           readerPeriodicInfo.exporter.otlp_http.endpoint = endpoint;
         }
-        if (certificateFile || clientKeyFile || clientCertificateFile) {
-          readerPeriodicInfo.exporter.otlp_http.tls = {};
-          if (certificateFile) {
-            readerPeriodicInfo.exporter.otlp_http.tls.ca_file = certificateFile;
-          }
-          if (clientKeyFile) {
-            readerPeriodicInfo.exporter.otlp_http.tls.key_file = clientKeyFile;
-          }
-          if (clientCertificateFile) {
-            readerPeriodicInfo.exporter.otlp_http.tls.cert_file =
-              clientCertificateFile;
-          }
+        const tls = getHttpTlsConfig(certificateFile, clientKeyFile, clientCertificateFile);
+        if (tls) {
+          readerPeriodicInfo.exporter.otlp_http.tls = tls;
         }
         if (compression) {
           readerPeriodicInfo.exporter.otlp_http.compression = compression;
@@ -678,17 +644,9 @@ export function setLoggerProvider(config: ConfigurationModel): void {
         if (endpoint) {
           batchInfo.exporter.otlp_grpc.endpoint = endpoint;
         }
-        if (certificateFile || clientKeyFile || clientCertificateFile) {
-          batchInfo.exporter.otlp_grpc.tls = {};
-          if (certificateFile) {
-            batchInfo.exporter.otlp_grpc.tls.ca_file = certificateFile;
-          }
-          if (clientKeyFile) {
-            batchInfo.exporter.otlp_grpc.tls.key_file = clientKeyFile;
-          }
-          if (clientCertificateFile) {
-            batchInfo.exporter.otlp_grpc.tls.cert_file = clientCertificateFile;
-          }
+        const tls = getGrpcTlsConfig(certificateFile, clientKeyFile, clientCertificateFile);
+        if (tls) {
+          batchInfo.exporter.otlp_grpc.tls = tls;
         }
         if (compression) {
           batchInfo.exporter.otlp_grpc.compression = compression;
@@ -711,17 +669,9 @@ export function setLoggerProvider(config: ConfigurationModel): void {
         if (endpoint) {
           batchInfo.exporter.otlp_http.endpoint = endpoint;
         }
-        if (certificateFile || clientKeyFile || clientCertificateFile) {
-          batchInfo.exporter.otlp_http.tls = {};
-          if (certificateFile) {
-            batchInfo.exporter.otlp_http.tls.ca_file = certificateFile;
-          }
-          if (clientKeyFile) {
-            batchInfo.exporter.otlp_http.tls.key_file = clientKeyFile;
-          }
-          if (clientCertificateFile) {
-            batchInfo.exporter.otlp_http.tls.cert_file = clientCertificateFile;
-          }
+        const tls = getHttpTlsConfig(certificateFile, clientKeyFile, clientCertificateFile);
+        if (tls) {
+          batchInfo.exporter.otlp_http.tls = tls;
         }
         if (compression) {
           batchInfo.exporter.otlp_http.compression = compression;

@@ -21,7 +21,7 @@ import {
   OtlpHttpExporter,
 } from './commonModel';
 
-export function initializeDefaultTracerProviderConfiguration(): TracerProvider {
+export function initializeDefaultTracerProviderConfiguration(): Required<TracerProvider> {
   return {
     processors: [],
     limits: {

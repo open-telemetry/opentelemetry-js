@@ -27,6 +27,8 @@ import * as yaml from 'yaml';
 import {
   getBooleanFromConfigFile,
   getBooleanListFromConfigFile,
+  getGrpcTlsConfig,
+  getHttpTlsConfig,
   getNumberFromConfigFile,
   getNumberListFromConfigFile,
   getStringFromConfigFile,
@@ -373,17 +375,9 @@ function parseConfigSpanOrLogRecordExporter(
           clientCertFile = getStringFromConfigFile(e['tls']['cert_file']);
           clientKeyFile = getStringFromConfigFile(e['tls']['key_file']);
 
-          if (certFile || clientCertFile || clientKeyFile) {
-            parsedExporter.otlp_http!.tls = {};
-            if (certFile) {
-              parsedExporter.otlp_http!.tls.ca_file = certFile;
-            }
-            if (clientCertFile) {
-              parsedExporter.otlp_http!.tls.cert_file = clientCertFile;
-            }
-            if (clientKeyFile) {
-              parsedExporter.otlp_http!.tls.key_file = clientKeyFile;
-            }
+          const tls = getHttpTlsConfig(certFile, clientKeyFile, clientCertFile);
+          if (tls) {
+            parsedExporter.otlp_http!.tls = tls;
           }
         }
       }
@@ -417,22 +411,11 @@ function parseConfigSpanOrLogRecordExporter(
           certFile = getStringFromConfigFile(e['tls']['ca_file']);
           clientCertFile = getStringFromConfigFile(e['tls']['cert_file']);
           clientKeyFile = getStringFromConfigFile(e['tls']['key_file']);
+          insecure = getBooleanFromConfigFile(e['tls']['insecure']);
 
-          if (certFile || clientCertFile || clientKeyFile) {
-            parsedExporter.otlp_grpc!.tls = {};
-            if (certFile) {
-              parsedExporter.otlp_grpc!.tls.ca_file = certFile;
-            }
-            if (clientCertFile) {
-              parsedExporter.otlp_grpc!.tls.cert_file = clientCertFile;
-            }
-            if (clientKeyFile) {
-              parsedExporter.otlp_grpc!.tls.key_file = clientKeyFile;
-            }
-            insecure = getBooleanFromConfigFile(e['tls']['insecure']);
-            if (insecure !== undefined) {
-              parsedExporter.otlp_grpc!.tls.insecure = insecure;
-            }
+          const tls = getGrpcTlsConfig(certFile, clientKeyFile, clientCertFile, insecure);
+          if (tls) {
+            parsedExporter.otlp_grpc!.tls = tls;
           }
         }
       }
@@ -693,17 +676,9 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
           clientCertFile = getStringFromConfigFile(e['tls']['cert_file']);
           clientKeyFile = getStringFromConfigFile(e['tls']['key_file']);
 
-          if (certFile || clientCertFile || clientKeyFile) {
-            parsedExporter.otlp_http!.tls = {};
-            if (certFile) {
-              parsedExporter.otlp_http!.tls.ca_file = certFile;
-            }
-            if (clientCertFile) {
-              parsedExporter.otlp_http!.tls.cert_file = clientCertFile;
-            }
-            if (clientKeyFile) {
-              parsedExporter.otlp_http!.tls.key_file = clientKeyFile;
-            }
+          const tls = getHttpTlsConfig(certFile, clientKeyFile, clientCertFile);
+          if (tls) {
+            parsedExporter.otlp_http!.tls = tls;
           }
         }
       }
@@ -743,22 +718,11 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
           certFile = getStringFromConfigFile(e['tls']['ca_file']);
           clientCertFile = getStringFromConfigFile(e['tls']['cert_file']);
           clientKeyFile = getStringFromConfigFile(e['tls']['key_file']);
-
-          if (certFile || clientCertFile || clientKeyFile) {
-            parsedExporter.otlp_grpc!.tls = {};
-            if (certFile) {
-              parsedExporter.otlp_grpc!.tls.ca_file = certFile;
-            }
-            if (clientCertFile) {
-              parsedExporter.otlp_grpc!.tls.cert_file = clientCertFile;
-            }
-            if (clientKeyFile) {
-              parsedExporter.otlp_grpc!.tls.key_file = clientKeyFile;
-            }
             insecure = getBooleanFromConfigFile(e['tls']['insecure']);
-            if (insecure !== undefined) {
-              parsedExporter.otlp_grpc!.tls.insecure = insecure;
-            }
+
+          const tls = getGrpcTlsConfig(certFile, clientKeyFile, clientCertFile, insecure);
+          if (tls) {
+            parsedExporter.otlp_grpc!.tls = tls;
           }
         }
       }

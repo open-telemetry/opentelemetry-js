@@ -23,9 +23,10 @@ import {
   OtlpHttpEncoding,
 } from './commonModel';
 
-export function initializeDefaultMeterProviderConfiguration(): MeterProvider {
+export function initializeDefaultMeterProviderConfiguration(): Required<MeterProvider> {
   return {
     readers: [],
+    views: [],
     exemplar_filter: ExemplarFilter.TraceBased,
   };
 }

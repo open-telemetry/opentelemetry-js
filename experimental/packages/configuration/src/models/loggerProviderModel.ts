@@ -22,12 +22,13 @@ import {
   SeverityNumber,
 } from './commonModel';
 
-export function initializeDefaultLoggerProviderConfiguration(): LoggerProvider {
+export function initializeDefaultLoggerProviderConfiguration(): Required<LoggerProvider> {
   return {
     processors: [],
     limits: {
       attribute_count_limit: 128,
     },
+    'logger_configurator/development': {},
   };
 }
 
