@@ -26,7 +26,7 @@
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "test": "nyc mocha 'test/**/*.test.ts'",
     "test:browser": "karma start --single-run",
-    "test:bench": "node test/performance/benchmark/index.js | tee .benchmark-results.txt",
+    "test:bench": "node test/performance/benchmark/micro-benchmarks.js && node test/performance/benchmark/index.js | tee .benchmark-results.txt",
     "prewatch": "node ../../../scripts/version-update.js",
     "watch": "npm run protos && tsc -w tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
