@@ -34,7 +34,6 @@ import {
 import {
   LogRecordProcessor,
   LoggerProvider,
-  BatchLogRecordProcessor,
   ConsoleLogRecordExporter,
   LogRecordExporter,
   SimpleLogRecordProcessor,
@@ -74,6 +73,8 @@ import {
   setupContextManager,
   getPeriodicExportingMetricReaderFromEnv,
   getOtlpMetricExporterFromEnv,
+  getBatchLogRecordProcessorFromEnv,
+  getLoggerProviderConfigFromEnv,
 } from './utils';
 
 type TracerProviderConfig = {
@@ -341,6 +342,7 @@ export class NodeSDK {
 
     if (this._loggerProviderConfig) {
       const loggerProvider = new LoggerProvider({
+        ...getLoggerProviderConfigFromEnv(),
         resource: this._resource,
         processors: this._loggerProviderConfig.logRecordProcessors,
       });
@@ -450,7 +452,7 @@ export class NodeSDK {
           if (exporter instanceof ConsoleLogRecordExporter) {
             return new SimpleLogRecordProcessor(exporter);
           } else {
-            return new BatchLogRecordProcessor(exporter);
+            return getBatchLogRecordProcessorFromEnv(exporter);
           }
         }),
       };

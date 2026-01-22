@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import { startNodeSDK } from '../src/start';
-import { context, diag } from '@opentelemetry/api';
+import { context, diag, propagation } from '@opentelemetry/api';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import * as Sinon from 'sinon';
 
@@ -30,6 +30,11 @@ describe('startNodeSDK', function () {
     for (const [key, value] of Object.entries(_origEnvVariables)) {
       process.env[key] = value;
     }
+
+    // disable all registered SDK components
+    context.disable();
+    propagation.disable();
+
     Sinon.restore();
   });
 
