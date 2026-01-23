@@ -9,7 +9,7 @@
   "dependencies": {
     "@opentelemetry/resources": "file:../../../packages/opentelemetry-resources",
     "next": "^15",
-    "react": "^18",
-    "react-dom": "^18"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   }
 }
