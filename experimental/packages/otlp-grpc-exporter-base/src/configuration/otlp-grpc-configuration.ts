@@ -28,7 +28,11 @@ import { URL } from 'url';
 import { diag } from '@opentelemetry/api';
 
 // NOTE: do not change this to be an actual import, doing so will break `@opentelemetry/instrumentation-grpc`
-import type { ChannelCredentials, ChannelOptions, Metadata } from '@grpc/grpc-js';
+import type {
+  ChannelCredentials,
+  ChannelOptions,
+  Metadata,
+} from '@grpc/grpc-js';
 
 export interface OtlpGrpcConfiguration extends OtlpSharedConfiguration {
   url: string;
