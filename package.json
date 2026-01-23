@@ -11,7 +11,7 @@
     }
   },
   "scripts": {
-    "precompile": "npm run submodule && nx run-many -t protos:generate && nx run-many -t version",
+    "precompile": "npm run submodule && nx run-many -t protos:generate",
     "compile": "nx run-many -t compile",
     "prewatch": "npm run precompile",
     "watch": "nx run-many -t watch",
