@@ -26,15 +26,11 @@ const rValues =
 const entryPoints = [
   {
     name: 'cjs',
-    entry: './build/src/index.js',
+    entry: './build/index.cjs',
   },
   {
     name: 'esm',
-    entry: './build/esm/index.js',
-  },
-  {
-    name: 'esnext',
-    entry: './build/esnext/index.js',
+    entry: './build/index.mjs',
   },
 ];
 

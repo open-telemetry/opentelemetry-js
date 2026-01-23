@@ -12,6 +12,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(otlp-exporter-base): replace non-standard `module` export condition with `import` [#6201](https://github.com/open-telemetry/opentelemetry-js/pull/6201) @overbalance
+
 ### :books: Documentation
 
 ### :house: Internal

@@ -2,31 +2,45 @@
   "name": "@opentelemetry/semantic-conventions",
   "version": "1.39.0",
   "description": "OpenTelemetry semantic conventions",
-  "main": "build/src/index.js",
-  "module": "build/esm/index.js",
-  "esnext": "build/esnext/index.js",
-  "types": "build/src/index.d.ts",
+  "author": "OpenTelemetry Authors",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/semantic-conventions",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./build/index.cjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.cts",
   "exports": {
     ".": {
-      "esnext": "./build/esnext/index.js",
-      "module": "./build/esm/index.js",
-      "types": "./build/src/index.d.ts",
-      "default": "./build/src/index.js"
+      "require": {
+        "types": "./build/index.d.cts",
+        "default": "./build/index.cjs"
+      },
+      "import": {
+        "types": "./build/index.d.mts",
+        "default": "./build/index.mjs"
+      }
     },
     "./incubating": {
-      "esnext": "./build/esnext/index-incubating.js",
-      "module": "./build/esm/index-incubating.js",
-      "types": "./build/src/index-incubating.d.ts",
-      "default": "./build/src/index-incubating.js"
-    }
+      "require": {
+        "types": "./build/incubating/index.d.cts",
+        "default": "./build/incubating/index.cjs"
+      },
+      "import": {
+        "types": "./build/incubating/index.d.mts",
+        "default": "./build/incubating/index.mjs"
+      }
+    },
+    "./package.json": "./package.json"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "compile": "tsdown",
+    "clean": "rm -rf build",
     "version": "node ../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "watch": "tsdown --watch",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../scripts/peer-api-check.js",
     "size-check": "npm run compile && mocha 'test/**/*.test.ts'",
@@ -39,28 +53,18 @@
     "attributes",
     "semantic conventions"
   ],
-  "author": "OpenTelemetry Authors",
-  "license": "Apache-2.0",
   "engines": {
     "node": ">=14"
   },
   "files": [
-    "build/esm/**/*.js",
-    "build/esm/**/*.js.map",
-    "build/esm/**/*.d.ts",
-    "build/esnext/**/*.js",
-    "build/esnext/**/*.js.map",
-    "build/esnext/**/*.d.ts",
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
-    "doc",
+    "build/**/*.cjs",
+    "build/**/*.mjs",
+    "build/**/*.d.cts",
+    "build/**/*.d.mts",
+    "build/**/*.map",
     "LICENSE",
     "README.md"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
   "devDependencies": {
     "@size-limit/file": "^12.0.0",
     "@size-limit/time": "^12.0.0",
@@ -76,6 +80,5 @@
     "ts-node": "10.9.2",
     "typescript": "5.0.4"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/semantic-conventions",
   "sideEffects": false
 }
