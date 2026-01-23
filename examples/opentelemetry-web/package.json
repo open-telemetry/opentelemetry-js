@@ -35,7 +35,7 @@
   "devDependencies": {
     "@babel/core": "^7.23.6",
     "@babel/preset-env": "^7.22.20",
-    "babel-loader": "^8.0.6",
+    "babel-loader": "^10.0.0",
     "ts-loader": "^9.2.6",
     "typescript": "5.0.4",
     "webpack": "^5.89.0",
