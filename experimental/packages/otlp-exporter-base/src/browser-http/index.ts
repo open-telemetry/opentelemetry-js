@@ -15,7 +15,7 @@
  */
 
 export {
-  createOtlpXhrExportDelegate,
+  createOtlpFetchExportDelegate,
   createOtlpSendBeaconExportDelegate,
 } from '../otlp-browser-http-export-delegate';
 
