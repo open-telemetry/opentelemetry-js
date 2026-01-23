@@ -24,6 +24,7 @@ fix(api): prioritize `esnext` export condition as it is more specific [#5458](ht
 * chore: enable tsconfig isolatedModules [#5697](https://github.com/open-telemetry/opentelemetry-js/pull/5697) @legendecas
 * chore: disallow constructor parameter property syntax [#6187](https://github.com/open-telemetry/opentelemetry-js/pull/6187) @legendecas
 * refactor(api): remove platform-specific globalThis, use globalThis directly [#6208](https://github.com/open-telemetry/opentelemetry-js/pull/6208) @overbalance
+* chore(api): mark ProxyTracerProvider as deprecated [#6328](https://github.com/open-telemetry/opentelemetry-js/pull/6328) @cjihrig
 
 ## 1.9.0
 
