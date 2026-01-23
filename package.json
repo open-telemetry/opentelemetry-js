@@ -82,7 +82,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@types/node": "18.19.130",
+    "@types/node": "^20.19.30",
     "@typescript-eslint/eslint-plugin": "8.41.0",
     "@typescript-eslint/parser": "8.41.0",
     "@vitest/browser": "^4.0.17",
@@ -112,7 +112,7 @@
     "typescript": "5.0.4",
     "util": "0.12.5",
     "vite-plugin-node-polyfills": "^0.24.0",
-    "vitest": "^4.0.17"
+    "vitest": "4.0.18"
   },
   "workspaces": [
     "api",
