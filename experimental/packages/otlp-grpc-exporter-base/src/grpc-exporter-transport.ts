@@ -22,6 +22,7 @@ import type {
   ChannelCredentials,
   Client,
   ServiceClientConstructor,
+  ChannelOptions,
 } from '@grpc/grpc-js';
 import {
   ExportResponse,
@@ -100,6 +101,7 @@ export interface GrpcExporterTransportParameters {
   metadata: () => Metadata;
   compression: 'gzip' | 'none';
   userAgent?: string;
+  channelOptions?: ChannelOptions;
 }
 
 export class GrpcExporterTransport implements IExporterTransport {
@@ -152,6 +154,7 @@ export class GrpcExporterTransport implements IExporterTransport {
             'grpc.primary_user_agent': createUserAgent(
               this._parameters.userAgent
             ),
+            ...this._parameters.channelOptions,
           }
         );
       } catch (error) {

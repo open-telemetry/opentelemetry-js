@@ -28,13 +28,14 @@ import { URL } from 'url';
 import { diag } from '@opentelemetry/api';
 
 // NOTE: do not change this to be an actual import, doing so will break `@opentelemetry/instrumentation-grpc`
-import type { ChannelCredentials, Metadata } from '@grpc/grpc-js';
+import type { ChannelCredentials, ChannelOptions, Metadata } from '@grpc/grpc-js';
 
 export interface OtlpGrpcConfiguration extends OtlpSharedConfiguration {
   url: string;
   metadata: () => Metadata;
   credentials: () => ChannelCredentials;
   userAgent?: string;
+  channelOptions?: ChannelOptions;
 }
 
 /**
@@ -48,6 +49,7 @@ export interface UnresolvedOtlpGrpcConfiguration
    * Credentials are based on the final resolved URL
    */
   credentials: (url: string) => () => ChannelCredentials;
+  channelOptions?: ChannelOptions;
 }
 
 export function validateAndNormalizeUrl(url: string): string {
@@ -119,6 +121,10 @@ export function mergeOtlpGrpcConfigurationWithDefaults(
       fallbackConfiguration.credentials?.(rawUrl) ??
       defaultConfiguration.credentials(rawUrl),
     userAgent: userProvidedConfiguration.userAgent,
+    channelOptions:
+      userProvidedConfiguration.channelOptions ??
+      fallbackConfiguration.channelOptions ??
+      defaultConfiguration.channelOptions,
   };
 }
 
