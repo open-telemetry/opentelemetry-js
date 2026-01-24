@@ -15,6 +15,7 @@
  */
 
 export { HttpInstrumentation } from './http';
+export { createHttpInstrumentation } from './http-delegate';
 export type {
   HttpCustomAttributeFunction,
   HttpInstrumentationConfig,

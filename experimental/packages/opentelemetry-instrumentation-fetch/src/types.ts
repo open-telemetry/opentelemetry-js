@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-import type { HrTime } from '@opentelemetry/api';
+import type { HrTime, Span } from '@opentelemetry/api';
+import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
+import type { PropagateTraceHeaderCorsUrls } from '@opentelemetry/sdk-trace-web';
 
 /**
  * Interface used to provide information to finish span on fetch response
@@ -42,4 +44,46 @@ export interface SpanData {
   observer?: PerformanceObserver;
   spanUrl: string;
   startTime: HrTime;
+}
+
+export interface FetchCustomAttributeFunction {
+  (
+    span: Span,
+    request: Request | RequestInit,
+    result: Response | FetchError
+  ): void;
+}
+
+export interface FetchRequestHookFunction {
+  (span: Span, request: Request | RequestInit): void;
+}
+
+/**
+ * FetchPlugin Config
+ */
+export interface FetchInstrumentationConfig extends InstrumentationConfig {
+  // the number of timing resources is limited, after the limit
+  // (chrome 250, safari 150) the information is not collected anymore
+  // the only way to prevent that is to regularly clean the resources
+  // whenever it is possible, this is needed only when PerformanceObserver
+  // is not available
+  clearTimingResources?: boolean;
+  // urls which should include trace headers when origin doesn't match
+  propagateTraceHeaderCorsUrls?: PropagateTraceHeaderCorsUrls;
+  /**
+   * URLs that partially match any regex in ignoreUrls will not be traced.
+   * In addition, URLs that are _exact matches_ of strings in ignoreUrls will
+   * also not be traced.
+   */
+  ignoreUrls?: Array<string | RegExp>;
+  /** Function for adding custom attributes on the span */
+  applyCustomAttributesOnSpan?: FetchCustomAttributeFunction;
+  /** Function for adding custom attributes or headers before the request is handled */
+  requestHook?: FetchRequestHookFunction;
+  // Ignore adding network events as span events
+  ignoreNetworkEvents?: boolean;
+  /** Measure outgoing request size */
+  measureRequestSize?: boolean;
+  /** Select the HTTP semantic conventions version(s) used. */
+  semconvStabilityOptIn?: string;
 }
