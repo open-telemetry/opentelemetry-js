@@ -93,24 +93,20 @@ describe('utils', function () {
     });
 
     it('should use ancestor id when optimised recursively', function () {
-      const body = document.querySelector('body');
-      if (!body) {
-        throw new Error('Missing document body');
-      }
+      const body = document.body;
+      assert.ok(body, 'Missing document body');
 
       const container = document.createElement('div');
       container.id = 'body-id';
       const inner = document.createElement('div');
       container.appendChild(inner);
-      body.appendChild(container);
+      document.body.appendChild(container);
 
-      try {
-        const element = getElementXPath(inner, true);
-        assert.strictEqual(element, '//*[@id="body-id"]/div');
-        assert.strictEqual(inner, getElementByXpath(element));
-      } finally {
-        body.removeChild(container);
-      }
+      const element = getElementXPath(inner, true);
+      assert.strictEqual(element, '//*[@id="body-id"]/div');
+      assert.strictEqual(inner, getElementByXpath(element));
+
+      document.body.removeChild(container);
     });
 
     it(
