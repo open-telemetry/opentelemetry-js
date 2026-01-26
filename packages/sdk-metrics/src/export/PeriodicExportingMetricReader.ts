@@ -116,7 +116,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
     }
   }
 
-  private async _doRun(): Promise<void> {
+  private async _collectAndPrepareMetrics() {
     const { resourceMetrics, errors } = await this.collect({
       timeoutMillis: this._exportTimeout,
     });
@@ -136,6 +136,12 @@ export class PeriodicExportingMetricReader extends MetricReader {
         globalErrorHandler(e);
       }
     }
+
+    return resourceMetrics;
+  }
+
+  private async _doRun(): Promise<void> {
+    const resourceMetrics = await this._collectAndPrepareMetrics();
 
     if (resourceMetrics.scopeMetrics.length === 0) {
       return;
@@ -171,7 +177,31 @@ export class PeriodicExportingMetricReader extends MetricReader {
     if (this._interval) {
       clearInterval(this._interval);
     }
-    await this.onForceFlush();
+
+    // Include the "effects" of forceFlush on shutdown, but do not call this.forceFlush directly, as it would wait for
+    // the export to finish before flushing which may include long retries.
+    const resourceMetrics = await this._collectAndPrepareMetrics();
+
+    if (resourceMetrics.scopeMetrics.length > 0) {
+      // Schedule the export but don't wait for it
+      internal._export(this._exporter, resourceMetrics).then(
+        result => {
+          if (result.code !== ExportResultCode.SUCCESS) {
+            globalErrorHandler(
+              new Error(
+                `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
+              )
+            );
+          }
+        },
+        err => {
+          globalErrorHandler(err);
+        }
+      );
+    }
+
+    // tell exporter to hurry-up, we're going home.
+    await this._exporter.forceFlush();
     await this._exporter.shutdown();
   }
 }

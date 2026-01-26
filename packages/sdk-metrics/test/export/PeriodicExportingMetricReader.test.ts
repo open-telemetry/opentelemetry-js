@@ -653,14 +653,16 @@ describe('PeriodicExportingMetricReader', () => {
 
     it('should throw on non-initialized instance.', async () => {
       const exporter = new TestMetricExporter();
-      exporter.throwFlush = true;
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
         exportTimeoutMillis: 80,
       });
 
-      await assert.rejects(() => reader.shutdown(), /Error during forceFlush/);
+      await assert.rejects(
+        () => reader.shutdown(),
+        /Error: MetricReader is not bound to a MetricProducer/
+      );
     });
   });
 });
