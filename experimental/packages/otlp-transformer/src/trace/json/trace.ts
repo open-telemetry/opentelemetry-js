@@ -17,16 +17,14 @@ import { ISerializer } from '../../i-serializer';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { IExportTraceServiceResponse } from '../export-response';
 import { createExportTraceServiceRequest } from '../internal';
+import { JSON_ENCODER } from '../../common/utils';
 
 export const JsonTraceSerializer: ISerializer<
   ReadableSpan[],
   IExportTraceServiceResponse
 > = {
   serializeRequest: (arg: ReadableSpan[]) => {
-    const request = createExportTraceServiceRequest(arg, {
-      useHex: true,
-      useLongBits: false,
-    });
+    const request = createExportTraceServiceRequest(arg, JSON_ENCODER);
     const encoder = new TextEncoder();
     return encoder.encode(JSON.stringify(request));
   },
