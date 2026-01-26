@@ -1883,4 +1883,36 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
   });
+
+  describe('shutdown', function () {
+    it('should shutdown within reasonable time when collector is not reachable', async function () {
+      // arrange
+      // force all exporters on
+      process.env.OTEL_EXPORTER_METRICS = 'otlp';
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
+      process.env.OTEL_LOGS_EXPORTER = 'otlp';
+
+      // set invalid endpoint to avoid hitting local collector endpoints
+      process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://example.invalid/';
+
+      const sdk = new NodeSDK();
+      sdk.start();
+
+      // simulate exporting some data so that shutdown has something to flush
+      metrics.getMeter('my-meter').createCounter('my-counter').add(1);
+      trace.getTracer('my-tracer').startSpan('my-span').end();
+      logs.getLogger('my-logger').emit({ body: 'my-log' });
+
+      // act
+      const shutdownStarted = Date.now();
+      await sdk.shutdown();
+      const shutdownDuration = Date.now() - shutdownStarted;
+
+      // assert
+      assert.ok(
+        shutdownDuration < 1000,
+        `shutdown took too long: ${shutdownDuration}ms`
+      );
+    });
+  });
 });
