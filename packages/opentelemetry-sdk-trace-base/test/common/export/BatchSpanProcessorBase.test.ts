@@ -58,7 +58,6 @@ function createUnsampledSpan(spanName: string): Span {
 }
 
 class BatchSpanProcessor extends BatchSpanProcessorBase<BufferConfig> {
-  onInit() {}
   onShutdown() {}
 }
 
@@ -164,32 +163,31 @@ describe('BatchSpanProcessorBase', () => {
       }
       processor.onStart(span, ROOT_CONTEXT);
       processor.onEnd(span);
+      await Promise.resolve(); // yield to allow export to schedule
       assert.strictEqual(exporter.getFinishedSpans().length, 5);
       await processor.shutdown();
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
     });
 
-    it('should force flush when timeout exceeded', done => {
+    it('should export when scheduledDelayMillis is exceeded', async function () {
+      // arrange
       const clock = sinon.useFakeTimers();
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
       const span = createSampledSpan(name);
+
+      // act
       for (let i = 1; i < defaultBufferConfig.maxExportBatchSize; i++) {
         processor.onStart(span, ROOT_CONTEXT);
         processor.onEnd(span);
         assert.strictEqual(exporter.getFinishedSpans().length, 0);
       }
+      await clock.tickAsync(defaultBufferConfig.scheduledDelayMillis + 1000);
 
-      setTimeout(() => {
-        assert.strictEqual(exporter.getFinishedSpans().length, 4);
-        done();
-      }, defaultBufferConfig.scheduledDelayMillis + 1000);
-
-      clock.tick(defaultBufferConfig.scheduledDelayMillis + 1000);
-
-      clock.restore();
+      // assert
+      assert.strictEqual(exporter.getFinishedSpans().length, 4);
     });
 
-    it('should force flush on demand', () => {
+    it('should force flush on demand', async function () {
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
       const span = createSampledSpan(name);
       for (let i = 1; i < defaultBufferConfig.maxExportBatchSize; i++) {
@@ -197,7 +195,7 @@ describe('BatchSpanProcessorBase', () => {
         processor.onEnd(span);
       }
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
-      processor.forceFlush();
+      await processor.forceFlush();
       assert.strictEqual(exporter.getFinishedSpans().length, 4);
     });
 
@@ -231,48 +229,28 @@ describe('BatchSpanProcessorBase', () => {
       clock.restore();
     });
 
-    it(
-      'should export each sampled span exactly once with buffer size' +
-        ' reached multiple times',
-      done => {
-        const originalTimeout = setTimeout;
-        const clock = sinon.useFakeTimers();
-        const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
-        const totalSpans = defaultBufferConfig.maxExportBatchSize * 2;
-        for (let i = 0; i < totalSpans; i++) {
-          const span = createSampledSpan(`${name}_${i}`);
-          processor.onStart(span, ROOT_CONTEXT);
-          processor.onEnd(span);
-        }
-        const span = createSampledSpan(`${name}_last`);
+    it('should export each sampled span exactly once with buffer size reached multiple times', async function () {
+      const clock = sinon.useFakeTimers();
+      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
+      const totalSpans = defaultBufferConfig.maxExportBatchSize * 2;
+      for (let i = 0; i < totalSpans; i++) {
+        const span = createSampledSpan(`${name}_${i}`);
         processor.onStart(span, ROOT_CONTEXT);
         processor.onEnd(span);
-        clock.tick(defaultBufferConfig.scheduledDelayMillis + 10);
-
-        // because there is an async promise that will be trigger original
-        // timeout is needed to simulate a real tick to the next
-        originalTimeout(() => {
-          clock.tick(defaultBufferConfig.scheduledDelayMillis + 10);
-          originalTimeout(async () => {
-            clock.tick(defaultBufferConfig.scheduledDelayMillis + 10);
-            clock.restore();
-
-            diag.info(
-              'finished spans count',
-              exporter.getFinishedSpans().length
-            );
-            assert.strictEqual(
-              exporter.getFinishedSpans().length,
-              totalSpans + 1
-            );
-
-            await processor.shutdown();
-            assert.strictEqual(exporter.getFinishedSpans().length, 0);
-            done();
-          });
-        });
       }
-    );
+      const span = createSampledSpan(`${name}_last`);
+      processor.onStart(span, ROOT_CONTEXT);
+      processor.onEnd(span);
+      await clock.tickAsync(defaultBufferConfig.scheduledDelayMillis + 10);
+      await clock.tickAsync(defaultBufferConfig.scheduledDelayMillis + 10);
+      await clock.tickAsync(defaultBufferConfig.scheduledDelayMillis + 10);
+
+      diag.info('finished spans count', exporter.getFinishedSpans().length);
+      assert.strictEqual(exporter.getFinishedSpans().length, totalSpans + 1);
+
+      await processor.shutdown();
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
+    });
   });
 
   describe('force flush', () => {
@@ -327,7 +305,8 @@ describe('BatchSpanProcessorBase', () => {
         });
       });
 
-      it('should call globalErrorHandler when exporting fails', done => {
+      it('should call globalErrorHandler when exporting fails', async function () {
+        // arrange
         const clock = sinon.useFakeTimers();
         const expectedError = new Error('Exporter failed');
         sinon.stub(exporter, 'export').callsFake((_, callback) => {
@@ -335,30 +314,22 @@ describe('BatchSpanProcessorBase', () => {
             callback({ code: ExportResultCode.FAILED, error: expectedError });
           }, 0);
         });
-
         const errorHandlerSpy = sinon.spy();
-
         setGlobalErrorHandler(errorHandlerSpy);
 
+        // act
         for (let i = 0; i < defaultBufferConfig.maxExportBatchSize; i++) {
           const span = createSampledSpan('test');
           processor.onStart(span, ROOT_CONTEXT);
           processor.onEnd(span);
         }
+        await clock.tickAsync(defaultBufferConfig.scheduledDelayMillis + 1000);
 
-        clock.tick(defaultBufferConfig.scheduledDelayMillis + 1000);
-        clock.restore();
-        setTimeout(async () => {
-          assert.strictEqual(errorHandlerSpy.callCount, 1);
-
-          const [[error]] = errorHandlerSpy.args;
-
-          assert.deepStrictEqual(error, expectedError);
-
-          //reset global error handler
-          setGlobalErrorHandler(loggingErrorHandler());
-          done();
-        });
+        // assert
+        sinon.assert.calledOnce(errorHandlerSpy);
+        sinon.assert.calledOnceWithExactly(errorHandlerSpy, expectedError);
+        // reset global error handler
+        setGlobalErrorHandler(loggingErrorHandler());
       });
 
       it('should still export when previously failed', async () => {
@@ -554,6 +525,7 @@ describe('BatchSpanProcessorBase', () => {
         processor.onStart(span, ROOT_CONTEXT);
         processor.onEnd(span);
       }
+      await new Promise(resolve => setTimeout(resolve, 0));
       assert.equal(callbacks.length, 1);
       assert.equal(spans.length, 5);
       callbacks[0]({ code: ExportResultCode.SUCCESS });

@@ -21,7 +21,7 @@ import { ReadableSpan } from './ReadableSpan';
  * An interface that allows different tracing services to export recorded data
  * for sampled spans in their own format.
  *
- * To export data this MUST be register to the Tracer SDK using a optional
+ * To export data this MUST be registered to the Tracer SDK using an optional
  * config.
  */
 export interface SpanExporter {
