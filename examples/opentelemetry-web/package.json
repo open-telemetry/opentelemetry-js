@@ -1,11 +1,10 @@
 {
-  "name": "web-opentelemetry-example",
+  "name": "opentelemetry-web-example",
   "private": true,
   "version": "0.211.0",
   "description": "Example of using @opentelemetry/sdk-trace-web and @opentelemetry/sdk-metrics in browser",
-  "main": "index.js",
   "scripts": {
-    "start": "webpack serve --progress --color --port 8090 --config webpack.dev.config.js --hot --host 0.0.0.0 --compress",
+    "start": "webpack serve --progress --color --port 8090 --config webpack.dev.config.js --hot --host 0.0.0.0 --compress --open",
     "start-nc": "webpack serve --progress --color --port 8090 --config webpack.dev.config.js --hot --host 0.0.0.0 --no-compress",
     "start-prod": "webpack serve --progress --color --port 8090 --config webpack.prod.config.js --hot --host 0.0.0.0 --compress",
     "start-prodnc": "webpack serve --progress --color --port 8090 --config webpack.prod.config.js --hot --host 0.0.0.0 --no-compress",
@@ -35,7 +34,7 @@
   "devDependencies": {
     "@babel/core": "^7.23.6",
     "@babel/preset-env": "^7.22.20",
-    "babel-loader": "^8.0.6",
+    "babel-loader": "^10.0.0",
     "ts-loader": "^9.2.6",
     "typescript": "5.0.4",
     "webpack": "^5.89.0",
