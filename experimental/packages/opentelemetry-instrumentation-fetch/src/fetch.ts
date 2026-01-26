@@ -230,7 +230,16 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     } else {
       const headers: Partial<Record<string, unknown>> = {};
       propagation.inject(context.active(), headers);
-      options.headers = Object.assign({}, headers, options.headers || {});
+      const originalHeaders = options.headers;
+      if (
+        originalHeaders &&
+        typeof originalHeaders[Symbol.iterator] === 'function'
+      ) {
+        const iterableHeaders = Object.fromEntries(originalHeaders);
+        options.headers = Object.assign({}, iterableHeaders, headers);
+      } else {
+        options.headers = Object.assign({}, headers, originalHeaders || {});
+      }
     }
   }
 
