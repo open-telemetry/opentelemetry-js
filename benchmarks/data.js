@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1769190501399,
+  "lastUpdate": 1769435597542,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -54107,6 +54107,107 @@ window.BENCHMARK_DATA = {
             "range": "±0.52%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "29139614+renovate[bot]@users.noreply.github.com",
+            "name": "renovate[bot]",
+            "username": "renovate[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f21d39b19e309a176324f5ad0c77b9671117795c",
+          "message": "chore(deps): update github/codeql-action action to v4.31.11 (#6336)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+          "timestamp": "2026-01-26T13:19:06Z",
+          "tree_id": "c97d8980531d1988bc3bc08cbb9bceb8ddb8819c",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/f21d39b19e309a176324f5ad0c77b9671117795c"
+        },
+        "date": 1769435596514,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 698665,
+            "range": "±0.67%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8830,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "transform 100 spans to protobuf",
+            "value": 1173,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 1995607,
+            "range": "±0.78%",
+            "unit": "ops/sec",
+            "extra": "86 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 1821746,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 1769097,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 1602894,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 271135,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "generateTraceId",
+            "value": 3401766,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "generateSpanId",
+            "value": 4361238,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 283510,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
