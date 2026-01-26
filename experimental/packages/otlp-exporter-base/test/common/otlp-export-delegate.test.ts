@@ -104,7 +104,6 @@ describe('OTLPExportDelegate', function () {
       };
       const mockSerializer = <FakeSerializer>serializerStubs;
 
-      // promise queue has not reached capacity yet
       const promiseQueueStubs = {
         pushPromise: sinon.stub(),
         hasReachedLimit: sinon.stub(),

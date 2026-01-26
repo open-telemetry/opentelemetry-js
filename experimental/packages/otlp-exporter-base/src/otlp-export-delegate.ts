@@ -141,6 +141,8 @@ class OTLPExportDelegate<Internal, Response>
   }
 
   forceFlush(): Promise<void> {
+    // note: it is the responsibility of the caller to ensure not new exports are scheduled after this call.
+    this._transport.forceFlush?.();
     return this._promiseQueue.awaitAll();
   }
 

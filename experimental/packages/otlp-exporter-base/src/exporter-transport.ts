@@ -18,5 +18,10 @@ import { ExportResponse } from './export-response';
 
 export interface IExporterTransport {
   send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse>;
+
+  /**
+   * Finish pending requests as soon as possible, foregoing retries if possible.
+   */
+  forceFlush?(): void;
   shutdown(): void;
 }

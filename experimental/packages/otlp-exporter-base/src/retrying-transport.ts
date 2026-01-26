@@ -31,11 +31,17 @@ function getJitter() {
   return Math.random() * (2 * JITTER) - JITTER;
 }
 
+interface CancellableOperation {
+  cancelRetry(): void;
+}
+
 class RetryingTransport implements IExporterTransport {
-  private _transport: IExporterTransport;
+  private readonly _transport: IExporterTransport;
+  private readonly _cancellableOperations;
 
   constructor(transport: IExporterTransport) {
     this._transport = transport;
+    this._cancellableOperations = new Set<CancellableOperation>();
   }
 
   private retry(
@@ -44,9 +50,22 @@ class RetryingTransport implements IExporterTransport {
     inMillis: number
   ): Promise<ExportResponse> {
     return new Promise((resolve, reject) => {
-      setTimeout(() => {
+      const timeoutHandle = setTimeout(() => {
+        // Remove from cancellable operations once executing
+        this._cancellableOperations.delete(operation);
         this._transport.send(data, timeoutMillis).then(resolve, reject);
       }, inMillis);
+
+      const operation: CancellableOperation = {
+        cancelRetry: () => {
+          clearTimeout(timeoutHandle);
+          resolve({
+            status: 'retryable',
+            error: new Error('Retry cancelled due to forceFlush()'),
+          });
+        },
+      };
+      this._cancellableOperations.add(operation);
     });
   }
 
@@ -54,48 +73,81 @@ class RetryingTransport implements IExporterTransport {
     let attempts = MAX_ATTEMPTS;
     let nextBackoff = INITIAL_BACKOFF;
 
-    const deadline = Date.now() + timeoutMillis;
-    let result = await this._transport.send(data, timeoutMillis);
+    // Create an operation to track this request and allow cancellation of retries
+    let shouldRetry = true;
+    const operation: CancellableOperation = {
+      cancelRetry: () => {
+        shouldRetry = false;
+      },
+    };
+    this._cancellableOperations.add(operation);
 
-    while (result.status === 'retryable' && attempts > 0) {
-      attempts--;
+    try {
+      const deadline = Date.now() + timeoutMillis;
+      let result = await this._transport.send(data, timeoutMillis);
 
-      // use maximum of computed backoff and 0 to avoid negative timeouts
-      const backoff = Math.max(
-        Math.min(nextBackoff * (1 + getJitter()), MAX_BACKOFF),
-        0
-      );
-      nextBackoff = nextBackoff * BACKOFF_MULTIPLIER;
-      const retryInMillis = result.retryInMillis ?? backoff;
+      while (result.status === 'retryable' && attempts > 0) {
+        attempts--;
 
-      // return when expected retry time is after the export deadline.
-      const remainingTimeoutMillis = deadline - Date.now();
-      if (retryInMillis > remainingTimeoutMillis) {
-        diag.info(
-          `Export retry time ${Math.round(retryInMillis)}ms exceeds remaining timeout ${Math.round(
-            remainingTimeoutMillis
-          )}ms, not retrying further.`
+        // Don't retry if forceFlush has been called for this request
+        if (!shouldRetry) {
+          diag.info('Foregoing retry as operation was forceFlushed');
+          return result;
+        }
+
+        // use maximum of computed backoff and 0 to avoid negative timeouts
+        const backoff = Math.max(
+          Math.min(nextBackoff * (1 + getJitter()), MAX_BACKOFF),
+          0
         );
-        return result;
+        nextBackoff = nextBackoff * BACKOFF_MULTIPLIER;
+        const retryInMillis = result.retryInMillis ?? backoff;
+
+        // return when expected retry time is after the export deadline.
+        const remainingTimeoutMillis = deadline - Date.now();
+        if (retryInMillis > remainingTimeoutMillis) {
+          diag.info(
+            `Export retry time ${Math.round(retryInMillis)}ms exceeds remaining timeout ${Math.round(
+              remainingTimeoutMillis
+            )}ms, not retrying further.`
+          );
+          return result;
+        }
+
+        diag.verbose(
+          `Scheduling export retry in ${Math.round(retryInMillis)}ms`
+        );
+        result = await this.retry(data, remainingTimeoutMillis, retryInMillis);
       }
 
-      diag.verbose(`Scheduling export retry in ${Math.round(retryInMillis)}ms`);
-      result = await this.retry(data, remainingTimeoutMillis, retryInMillis);
-    }
+      if (result.status === 'success') {
+        diag.verbose(
+          `Export succeeded after ${MAX_ATTEMPTS - attempts} retry attempts.`
+        );
+      } else if (result.status === 'retryable') {
+        diag.info(
+          `Export failed after maximum retry attempts (${MAX_ATTEMPTS}).`
+        );
+      } else {
+        diag.info(`Export failed with non-retryable error: ${result.error}`);
+      }
 
-    if (result.status === 'success') {
-      diag.verbose(
-        `Export succeeded after ${MAX_ATTEMPTS - attempts} retry attempts.`
-      );
-    } else if (result.status === 'retryable') {
-      diag.info(
-        `Export failed after maximum retry attempts (${MAX_ATTEMPTS}).`
-      );
-    } else {
-      diag.info(`Export failed with non-retryable error: ${result.error}`);
+      return result;
+    } finally {
+      // Always remove the operation from the set when done to avoid memory leaks
+      this._cancellableOperations.delete(operation);
     }
+  }
 
-    return result;
+  forceFlush() {
+    this._transport.forceFlush?.();
+
+    diag.debug('cancelling pending retries');
+    // Cancel all pending retries and mark active requests to not retry
+    for (const operation of this._cancellableOperations) {
+      operation.cancelRetry();
+    }
+    this._cancellableOperations.clear();
   }
 
   shutdown() {
