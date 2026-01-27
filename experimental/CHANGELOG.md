@@ -12,11 +12,14 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(exporter-prometheus): add missing `@opentelemetry/semantic-conventions` dependency [#6330](https://github.com/open-telemetry/opentelemetry-js/pull/6330) @omizha
 * fix(instrumentation-fetch): handle HeadersInit tuple arrays in _addHeaders [#6341](https://github.com/open-telemetry/opentelemetry-js/pull/6341) @overbalance
 
 ### :books: Documentation
 
 ### :house: Internal
+
+* perf(otlp-transformer): optimize toAnyValue performance [#6287](https://github.com/open-telemetry/opentelemetry-js/pull/6287) @AbhiPrasad
 
 ## 0.211.0
 
