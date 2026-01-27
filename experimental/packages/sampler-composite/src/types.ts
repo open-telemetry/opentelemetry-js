@@ -42,3 +42,8 @@ export interface ComposableSampler {
   /** Returns the sampler name or short description with the configuration. */
   toString(): string;
 }
+
+export type SamplingPredicate = (
+  ...args: Parameters<Sampler['shouldSample']>
+) => boolean;
+export type SamplingRule = [SamplingPredicate, ComposableSampler];

@@ -16,10 +16,10 @@
 import type { ComposableSampler, SamplingIntent } from './types';
 import { INVALID_THRESHOLD } from './util';
 
-const intent: SamplingIntent = {
+const intent: SamplingIntent = Object.freeze({
   threshold: INVALID_THRESHOLD,
   thresholdReliable: false,
-};
+});
 
 class ComposableAlwaysOffSampler implements ComposableSampler {
   getSamplingIntent(): SamplingIntent {
