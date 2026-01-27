@@ -515,11 +515,23 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
                 ? null
                 : withCancelPropagation(response.body, reader);
 
-              proxiedResponse = new Response(wrappedBody, {
+              const newResponse = new Response(wrappedBody, {
                 status: response.status,
                 statusText: response.statusText,
                 headers: response.headers,
               });
+
+              
+              
+              proxiedResponse = new Proxy(newResponse, {
+                get(target, prop) {
+                  
+                  if (prop === 'url' || prop === 'type') {
+                    return (response as any)[prop];
+                  }
+                  return (target as any)[prop];
+                },
+              }) as Response;
 
               const read = (): void => {
                 reader.read().then(
