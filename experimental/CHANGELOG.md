@@ -20,6 +20,7 @@ feat(configuration): parse config for rc 3 [#6304](https://github.com/open-telem
 ### :bug: Bug Fixes
 
 * fix(exporter-prometheus): add missing `@opentelemetry/semantic-conventions` dependency [#6330](https://github.com/open-telemetry/opentelemetry-js/pull/6330) @omizha
+* fix(instrumentation-fetch): handle HeadersInit tuple arrays in _addHeaders [#6341](https://github.com/open-telemetry/opentelemetry-js/pull/6341) @overbalance
 
 ### :books: Documentation
 
