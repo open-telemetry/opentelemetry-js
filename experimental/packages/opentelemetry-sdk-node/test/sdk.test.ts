@@ -1002,14 +1002,9 @@ describe('Node SDK', () => {
     it('should configure service instance id with service instance id from env variable taking priority over random UUID', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.instance.id=custom-service,service.name=my-service';
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'all';
       const sdk = new NodeSDK({
         autoDetectResources: true,
-        resourceDetectors: [
-          processDetector,
-          envDetector,
-          hostDetector,
-          serviceInstanceIdDetector,
-        ],
       });
 
       sdk.start();

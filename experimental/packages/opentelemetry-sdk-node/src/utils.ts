@@ -76,11 +76,11 @@ const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
 export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   // When updating this list, make sure to also update the section `resourceDetectors` on README.
   const resourceDetectors = new Map<string, ResourceDetector>([
-    [RESOURCE_DETECTOR_ENVIRONMENT, envDetector],
     [RESOURCE_DETECTOR_HOST, hostDetector],
     [RESOURCE_DETECTOR_OS, osDetector],
     [RESOURCE_DETECTOR_SERVICE_INSTANCE_ID, serviceInstanceIdDetector],
     [RESOURCE_DETECTOR_PROCESS, processDetector],
+    [RESOURCE_DETECTOR_ENVIRONMENT, envDetector],
   ]);
 
   const resourceDetectorsFromEnv = getStringListFromEnv(
