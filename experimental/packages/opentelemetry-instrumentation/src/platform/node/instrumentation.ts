@@ -288,6 +288,9 @@ export abstract class InstrumentationBase<
     for (const module of this._modules) {
       const hookFn: HookFn = (exports, name, baseDir) => {
         if (!baseDir && path.isAbsolute(name)) {
+          // Change IITM `name` and `baseDir` values to match what RITM returns.
+          // See "Comparing to RITM" on https://github.com/nodejs/import-in-the-middle/pull/241
+          // for an example of the differences.
           const parsedPath = path.parse(name);
           name = parsedPath.name;
           baseDir = parsedPath.dir;
@@ -308,7 +311,7 @@ export abstract class InstrumentationBase<
       this._hooks.push(hook);
       const esmHook = new HookImport(
         [module.name],
-        { internals: false },
+        { internals: true },
         <HookFn>hookFn
       );
       this._hooks.push(esmHook);
