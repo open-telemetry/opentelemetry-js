@@ -37,12 +37,11 @@ import {
 } from './../../src';
 import { invalidAttributes, validAttributes } from './utils';
 import { LoggerProviderSharedState } from '../../src/internal/LoggerProviderSharedState';
-import { reconfigureLimits } from '../../src/config';
 import { LogRecordImpl } from '../../src/LogRecordImpl';
 
 const performanceTimeOrigin: HrTime = [1, 1];
 
-const setup = (logRecordLimits?: LogRecordLimits, data?: logsAPI.LogRecord) => {
+const setup = (limits?: LogRecordLimits, data?: logsAPI.LogRecord) => {
   const instrumentationScope = {
     name: 'test name',
     version: 'test version',
@@ -52,7 +51,10 @@ const setup = (logRecordLimits?: LogRecordLimits, data?: logsAPI.LogRecord) => {
   const sharedState = new LoggerProviderSharedState(
     resource,
     Infinity,
-    reconfigureLimits(logRecordLimits ?? {}),
+    {
+      attributeCountLimit: limits?.attributeCountLimit ?? 128,
+      attributeValueLengthLimit: limits?.attributeValueLengthLimit ?? Infinity,
+    },
     []
   );
   const logRecord = new LogRecordImpl(

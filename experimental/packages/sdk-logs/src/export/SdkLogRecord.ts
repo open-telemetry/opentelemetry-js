@@ -25,7 +25,7 @@ import type {
 import type { Resource } from '@opentelemetry/resources';
 
 /**
- * A recording of a event. Typically the record includes a timestamp indicating when the
+ * A recording of an event. Typically, the record includes a timestamp indicating when the
  * event happened as well as other data that describes what happened, where it happened, etc.
  *
  * @remarks

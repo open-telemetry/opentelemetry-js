@@ -33,7 +33,7 @@ const DEFAULT_LOGGER_CONFIG: Required<LoggerConfig> = {
 /**
  * Default LoggerConfigurator that returns the default config for all loggers
  */
-const DEFAULT_LOGGER_CONFIGURATOR: LoggerConfigurator = () => ({
+export const DEFAULT_LOGGER_CONFIGURATOR: LoggerConfigurator = () => ({
   ...DEFAULT_LOGGER_CONFIG,
 });
 
