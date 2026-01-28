@@ -148,6 +148,25 @@ describe('utils', function () {
       assert.strictEqual(element, '//html/body/div/div[4]/div[8]/comment()');
       assert.strictEqual(node, getElementByXpath(element));
     });
+
+    it('should pass optimised parameter recursively to parent nodes', function () {
+      // Test the specific bug from issue #6323
+      // Create a structure: div#test-parent-id > div (no id)
+      const testContainer = document.createElement('div');
+      testContainer.id = 'test-parent-id';
+      const childDiv = document.createElement('div');
+      testContainer.appendChild(childDiv);
+      document.body.appendChild(testContainer);
+
+      try {
+        const xpath = getElementXPath(childDiv, true);
+        // With optimised=true, should use parent's id instead of full path
+        assert.strictEqual(xpath, '//*[@id="test-parent-id"]/div');
+        assert.strictEqual(childDiv, getElementByXpath(xpath));
+      } finally {
+        document.body.removeChild(testContainer);
+      }
+    });
   });
 
   describe('parseUrl', function () {
