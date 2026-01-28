@@ -374,7 +374,7 @@ export function getElementXPath(target: any, optimised?: boolean): string {
   }
   let xpath = '';
   if (target.parentNode) {
-    xpath += getElementXPath(target.parentNode, false);
+    xpath += getElementXPath(target.parentNode, optimised);
   }
   xpath += targetValue;
 

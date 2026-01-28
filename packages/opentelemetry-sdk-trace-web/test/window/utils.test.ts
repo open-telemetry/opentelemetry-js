@@ -92,6 +92,23 @@ describe('utils', function () {
       );
     });
 
+    it('should use ancestor id when optimised recursively', function () {
+      const body = document.body;
+      assert.ok(body, 'Missing document body');
+
+      const container = document.createElement('div');
+      container.id = 'body-id';
+      const inner = document.createElement('div');
+      container.appendChild(inner);
+      document.body.appendChild(container);
+
+      const element = getElementXPath(inner, true);
+      assert.strictEqual(element, '//*[@id="body-id"]/div');
+      assert.strictEqual(inner, getElementByXpath(element));
+
+      document.body.removeChild(container);
+    });
+
     it(
       'should return correct path for element with id and surrounded by the' +
         ' same type',
