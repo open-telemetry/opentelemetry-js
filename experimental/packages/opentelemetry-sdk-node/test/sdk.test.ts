@@ -998,6 +998,30 @@ describe('Node SDK', () => {
       assertServiceInstanceIdIsUUID(resource);
       await sdk.shutdown();
     });
+
+    it('should configure service instance id with service instance id from env variable taking priority over random UUID', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.instance.id=custom-service,service.name=my-service';
+      const sdk = new NodeSDK({
+        autoDetectResources: true,
+        resourceDetectors: [
+          processDetector,
+          envDetector,
+          hostDetector,
+          serviceInstanceIdDetector,
+        ],
+      });
+
+      sdk.start();
+      const resource = sdk['_resource'];
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceResource(resource, {
+        name: 'my-service',
+        instanceId: 'custom-service',
+      });
+      await sdk.shutdown();
+    });
   });
 
   describe('A disabled SDK should be no-op', () => {
