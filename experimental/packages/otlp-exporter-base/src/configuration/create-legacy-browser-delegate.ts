@@ -49,7 +49,12 @@ export function createLegacyOtlpBrowserExportDelegate<Internal, Response>(
 export function inferExportDelegateToUse(
   configHeaders: OTLPExporterConfigBase['headers']
 ) {
-  if (!configHeaders && typeof navigator.sendBeacon === 'function') {
+  const isEmptyHeaders =
+    configHeaders == null ||
+    (typeof configHeaders === 'object' &&
+      Object.keys(configHeaders).length === 0);
+
+  if (isEmptyHeaders && typeof navigator.sendBeacon === 'function') {
     return createOtlpSendBeaconExportDelegate;
   }
 
