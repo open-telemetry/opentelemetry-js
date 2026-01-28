@@ -57,8 +57,10 @@ describe('Node Globals Foolproofing', function () {
     );
 
     assert.ok(context['_getContextManager']() instanceof StackContextManager);
-    assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
-    assert.ok(setGlobalTracerProviderSpy.lastCall.args[0] === tracerProvider);
+    sinon.assert.calledOnceWithMatch(
+      setGlobalTracerProviderSpy,
+      (provider: any) => provider === tracerProvider
+    );
   });
 
   it('Can get TraceProvider with custom id generator and without node globals such as process', function () {

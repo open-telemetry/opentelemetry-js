@@ -8,8 +8,25 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+* fix(exporter-prometheus): add missing `@opentelemetry/semantic-conventions` dependency [#6330](https://github.com/open-telemetry/opentelemetry-js/pull/6330) @omizha
+
+### :books: Documentation
+
+### :house: Internal
+
+* perf(otlp-transformer): optimize toAnyValue performance [#6287](https://github.com/open-telemetry/opentelemetry-js/pull/6287) @AbhiPrasad
+
+## 0.211.0
+
+### :boom: Breaking Changes
+
 * fix(otlp-exporter-base)!: remove xhr transport [#6317](https://github.com/open-telemetry/opentelemetry-js/pull/6317) @cjihrig
   * (user-facing) The deprecated XHR-based transport has been removed and replaced with `fetch()`. This change affects users who relied on `XmlHttpRequest` instead of `fetch()` for sending headers with OTLP exports. To maintain compatibility on browsers without a `fetch()` implementation, include a `fetch()` polyfill.
+* chore(api-logs)!: remove `ProxyLoggerProvider` export [#6322](https://github.com/open-telemetry/opentelemetry-js/pull/6322) @david-luna
 
 ### :rocket: Features
 
@@ -21,8 +38,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(sdk-logs): allow AnyValue attributes for logs and handle circular references [#6210](https://github.com/open-telemetry/opentelemetry-js/pull/6210) @david-luna
   * based on [#5765](https://github.com/open-telemetry/opentelemetry-js/pull/5765) from @alec2435
 * fix(browser-detector): use window feature detection to avoid false positives in Node.js 21+ and Bun [#6271](https://github.com/open-telemetry/opentelemetry-js/pull/6271) @fiyinfoluwa001 @overbalance
-
-### :books: Documentation
 
 ### :house: Internal
 

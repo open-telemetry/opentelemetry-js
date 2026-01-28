@@ -16,6 +16,7 @@
     "test:browser": "nx run-many -t test:browser",
     "test:webworker": "nx run-many -t test:webworker",
     "test:bench": "nx run-many -t test:bench",
+    "test:bench:browser": "nx run-many -t test:bench:browser -- --verbose",
     "predocs-test": "npm run docs",
     "docs": "typedoc --readme none && touch docs/.nojekyll",
     "docs-deploy": "gh-pages --dotfiles --dist docs",
