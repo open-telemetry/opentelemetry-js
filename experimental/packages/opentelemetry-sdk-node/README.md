@@ -151,10 +151,12 @@ For example, to enable only the `env`, `host` detectors:
 ```shell
 export OTEL_NODE_RESOURCE_DETECTORS="host,env"
 ```
-NOTE: The order set on `OTEL_NODE_RESOURCE_DETECTORS` will be respected and executed in order.
-For example, if you have `OTEL_RESOURCE_ATTRIBUTES="service.instance.id='custom-name'"` and `serviceinstance` on `OTEL_NODE_RESOURCE_DETECTORS`, it can have 2 scenarios:
-- `OTEL_NODE_RESOURCE_DETECTORS="serviceinstance,env"` will have the `service.instance.id` as `custom-name`
-- `OTEL_NODE_RESOURCE_DETECTORS="env,serviceinstance"` will have the `service.instance.id` as a random UUID
+
+NOTE: The order set on `OTEL_NODE_RESOURCE_DETECTORS` will be respected and the detectors will be executed in order.
+For example, if you have `OTEL_RESOURCE_ATTRIBUTES="service.instance.id='custom-name'"`, but also `serviceinstance` and `env` on `OTEL_NODE_RESOURCE_DETECTORS`, it can have 2 scenarios:
+
+  - `OTEL_NODE_RESOURCE_DETECTORS="serviceinstance,env"` will have the `service.instance.id` as `custom-name`
+  - `OTEL_NODE_RESOURCE_DETECTORS="env,serviceinstance"` will have the `service.instance.id` as a random UUID
 
 ### sampler
 
