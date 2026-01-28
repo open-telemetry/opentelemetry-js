@@ -521,27 +521,37 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
                 headers: response.headers,
               });
 
-// Response url, type, and redirected are read-only properties that can't be set via constructor
-// Use a Proxy to forward them from the original response and maintain the wrapped body
-const readOnlyProps = new Set(['url', 'type', 'redirected']);
-function createResponseProxy(target: Response, original: Response): Response {
-  return new Proxy(target, {
-    get(t, prop, receiver) {
-      if (typeof prop === 'string' && readOnlyProps.has(prop)) {
-        return Reflect.get(original, prop);
-      }
-      if (prop === 'clone') {
-        return function clone() {
-          return createResponseProxy(t.clone(), original);
-        };
-      }
-      const value = Reflect.get(t, prop, receiver);
-      return typeof value === 'function' ? value.bind(t) : value;
-    },
-  }) as Response;
-}
-
-proxiedResponse = createResponseProxy(newResponse, response);
+              // Response url, type, and redirected are read-only properties that can't be set via constructor
+              // Use a Proxy to forward them from the original response and maintain the wrapped body
+              const readOnlyProps = new Set(['url', 'type', 'redirected']);
+              function createResponseProxy(
+                target: Response,
+                original: Response
+              ): Response {
+                return new Proxy(target, {
+                  get(t, prop, receiver) {
+                    if (
+                      typeof prop === 'string' &&
+                      readOnlyProps.has(prop)
+                    ) {
+                      return Reflect.get(original, prop);
+                    }
+                    if (prop === 'clone') {
+                      return function clone() {
+                        return createResponseProxy(
+                          t.clone(),
+                          original
+                        );
+                      };
+                    }
+                    const value = Reflect.get(t, prop, receiver);
+                    return typeof value === 'function'
+                      ? value.bind(t)
+                      : value;
+                  },
+                }) as Response;
+              }
+              proxiedResponse = createResponseProxy(newResponse, response);
 
               const read = (): void => {
                 reader.read().then(
