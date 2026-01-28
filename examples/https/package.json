@@ -45,6 +45,6 @@
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/https",
   "devDependencies": {
-    "cross-env": "^6.0.0"
+    "cross-env": "^10.0.0"
   }
 }
