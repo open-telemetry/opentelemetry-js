@@ -18,32 +18,15 @@ import { ATTR_SERVICE_INSTANCE_ID } from '../../../semconv';
 import { randomUUID } from 'crypto';
 import { ResourceDetectionConfig } from '../../../config';
 import { DetectedResource, ResourceDetector } from '../../../types';
-import { getStringFromEnv, getStringListFromEnv } from '@opentelemetry/core';
 
 /**
  * ServiceInstanceIdDetector detects the resources related to the service instance ID.
  */
 class ServiceInstanceIdDetector implements ResourceDetector {
   detect(_config?: ResourceDetectionConfig): DetectedResource {
-    let serviceInstanceID;
-    if (
-      getStringFromEnv('OTEL_RESOURCE_ATTRIBUTES')?.includes(
-        'service.instance.id'
-      )
-    ) {
-      const resources = getStringListFromEnv('OTEL_RESOURCE_ATTRIBUTES') || [];
-      for (const resource of resources) {
-        const [key, value] = resource.split('=');
-        if (key === 'service.instance.id') {
-          serviceInstanceID = value;
-          break;
-        }
-      }
-    }
-
     return {
       attributes: {
-        [ATTR_SERVICE_INSTANCE_ID]: serviceInstanceID ?? randomUUID(),
+        [ATTR_SERVICE_INSTANCE_ID]: randomUUID(),
       },
     };
   }
