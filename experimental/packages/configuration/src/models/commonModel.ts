@@ -50,25 +50,9 @@ export interface OtlpHttpExporter {
   endpoint?: string;
 
   /**
-   * Configure certificate used to verify a server's TLS credentials.
-   * Absolute path to certificate file in PEM format.
-   * If omitted or null, system default certificate verification is used for secure connections.
+   * Configure TLS settings for the exporter.
    */
-  certificate_file?: string;
-
-  /**
-   * Configure mTLS private client key.
-   * Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-   * If omitted or null, mTLS is not used.
-   */
-  client_key_file?: string;
-
-  /**
-   * Configure mTLS client certificate.
-   * Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-   * If omitted or null, mTLS is not used.
-   */
-  client_certificate_file?: string;
+  tls?: HttpTls;
 
   /**
    * Configure compression.
@@ -118,25 +102,9 @@ export interface OtlpGrpcExporter {
   endpoint?: string;
 
   /**
-   * Configure certificate used to verify a server's TLS credentials.
-   * Absolute path to certificate file in PEM format.
-   * If omitted or null, system default certificate verification is used for secure connections.
+   * Configure TLS settings for the exporter.
    */
-  certificate_file?: string;
-
-  /**
-   * Configure mTLS private client key.
-   * Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-   * If omitted or null, mTLS is not used.
-   */
-  client_key_file?: string;
-
-  /**
-   * Configure mTLS client certificate.
-   * Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-   * If omitted or null, mTLS is not used.
-   */
-  client_certificate_file?: string;
+  tls?: GrpcTls;
 
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
@@ -164,6 +132,61 @@ export interface OtlpGrpcExporter {
    * If omitted or null, 10000 is used.
    */
   timeout?: number;
+}
+
+export interface ExperimentalOtlpFileExporter {
+  /**
+   * Configure output stream.
+   * Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
+   * If omitted or null, stdout is used.
+   */
+  output_stream?: string;
+}
+
+export interface HttpTls {
+  /**
+   * Configure certificate used to verify a server's TLS credentials.
+   * Absolute path to certificate file in PEM format.
+   * If omitted or null, system default certificate verification is used for secure connections.
+   */
+  ca_file?: string;
+
+  /**
+   * Configure mTLS private client key.
+   * Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
+   * If omitted or null, mTLS is not used.
+   */
+  key_file?: string;
+
+  /**
+   * Configure mTLS client certificate.
+   * Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
+   * If omitted or null, mTLS is not used.
+   */
+  cert_file?: string;
+}
+
+export interface GrpcTls {
+  /**
+   * Configure certificate used to verify a server's TLS credentials.
+   * Absolute path to certificate file in PEM format.
+   * If omitted or null, system default certificate verification is used for secure connections.
+   */
+  ca_file?: string;
+
+  /**
+   * Configure mTLS private client key.
+   * Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
+   * If omitted or null, mTLS is not used.
+   */
+  key_file?: string;
+
+  /**
+   * Configure mTLS client certificate.
+   * Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
+   * If omitted or null, mTLS is not used.
+   */
+  cert_file?: string;
 
   /**
    * Configure client transport security for the exporter's connection.
@@ -173,11 +196,29 @@ export interface OtlpGrpcExporter {
   insecure?: boolean;
 }
 
-export interface OtlpFileExporter {
-  /**
-   * Configure output stream.
-   * Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
-   * If omitted or null, stdout is used.
-   */
-  output_stream?: string;
+export enum SeverityNumber {
+  DEBUG = 'debug',
+  DEBUG2 = 'debug2',
+  DEBUG3 = 'debug3',
+  DEBUG4 = 'debug4',
+  ERROR = 'error',
+  ERROR2 = 'error2',
+  ERROR3 = 'error3',
+  ERROR4 = 'error4',
+  FATAL = 'fatal',
+  FATAL2 = 'fatal2',
+  FATAL3 = 'fatal3',
+  FATAL4 = 'fatal4',
+  INFO = 'info',
+  INFO2 = 'info2',
+  INFO3 = 'info3',
+  INFO4 = 'info4',
+  TRACE = 'trace',
+  TRACE2 = 'trace2',
+  TRACE3 = 'trace3',
+  TRACE4 = 'trace4',
+  WARN = 'warn',
+  WARN2 = 'warn2',
+  WARN3 = 'warn3',
+  WARN4 = 'warn4',
 }
