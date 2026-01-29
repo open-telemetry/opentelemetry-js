@@ -25,6 +25,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * perf(sdk-trace-base): use Uint8Array for browser RandomIdGenerator [#6209](https://github.com/open-telemetry/opentelemetry-js/pull/6209) @overbalance
 * test(sdk-trace-base): remove obsolete TypeScript and platform workarounds [#6327](https://github.com/open-telemetry/opentelemetry-js/pull/6327) @overbalance
 * fix(example-web): update Docker config and deps for collector [#6342](https://github.com/open-telemetry/opentelemetry-js/pull/6342) @overbalance
+* perf(sdk-trace-base): optimize TraceIdRatioBasedSampler performance [#6284](https://github.com/open-telemetry/opentelemetry-js/pull/6284) @AbhiPrasad
 
 ## 2.5.0
 
