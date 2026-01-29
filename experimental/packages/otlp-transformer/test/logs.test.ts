@@ -98,7 +98,10 @@ function createExpectedLogProtobuf(): IExportLogsServiceRequest {
   const spanId = toBase64('0000000000000002');
 
   // Base64 encoding of Uint8Array([1, 2, 3, 4, 5])
-  const testBytesBase64 = 'AQIDBAU=';
+  // Note: protobuf serializer encodes as binary. However, when decoding, with protobuf.js
+  // we use `bytes: String`, as otherwise the type will be different for Node.js (Buffer) and Browser (Uint8Array)
+  // which makes assertions overly complex.
+  const bytesValue = 'AQIDBAU=';
 
   return {
     resourceLogs: [
@@ -130,7 +133,7 @@ function createExpectedLogProtobuf(): IExportLogsServiceRequest {
                   },
                   {
                     key: 'bytes-attribute',
-                    value: { bytesValue: testBytesBase64 },
+                    value: { bytesValue: bytesValue },
                   },
                 ],
                 droppedAttributesCount: 0,
@@ -411,13 +414,6 @@ describe('Logs', () => {
 
       const decoder = new TextDecoder();
       const actual = JSON.parse(decoder.decode(serialized));
-
-      // Verify Uint8Array is base64 encoded in bytesValue in JSON output
-      const bytesAttr =
-        actual.resourceLogs[0].scopeLogs[0].logRecords[0].attributes.find(
-          (attr: { key: string }) => attr.key === 'bytes-attribute'
-        );
-      assert.strictEqual(bytesAttr.value.bytesValue, 'AQIDBAU=');
 
       assert.deepStrictEqual(actual, expected);
     });
