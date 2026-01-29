@@ -37,11 +37,9 @@ export function serializeKeyPairs(keyPairs: string[]): string {
     return '';
   }
 
-  // Build result incrementally, checking length before concatenation
   let result = keyPairs[0];
   for (let i = 1; i < len; i++) {
     const pair = keyPairs[i];
-    // Check if adding this pair would exceed max length (separator + pair)
     const newLength = result.length + 1 + pair.length;
     if (newLength > BAGGAGE_MAX_TOTAL_LENGTH) {
       break;
