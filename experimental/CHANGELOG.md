@@ -19,6 +19,8 @@ feat(configuration): parse config for rc 3 [#6304](https://github.com/open-telem
 
 ### :bug: Bug Fixes
 
+* fix(api-logs): use LogAttributes for LoggerOptions#scopeAttributes [#????](https://github.com/open-telemetry/opentelemetry-js/pull/????) @author
+  * `LoggerOptions#scopeAttributes` type changed from `Attributes` (trace API) to `LogAttributes` (logs API) for consistency and to avoid a future breaking change for implementers.
 * fix(exporter-prometheus): add missing `@opentelemetry/semantic-conventions` dependency [#6330](https://github.com/open-telemetry/opentelemetry-js/pull/6330) @omizha
 
 ### :books: Documentation
