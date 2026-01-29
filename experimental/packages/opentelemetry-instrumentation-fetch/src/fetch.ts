@@ -219,18 +219,26 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       propagation.inject(context.active(), options.headers, {
         set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
       });
-    } else if (options.headers instanceof Headers) {
-      propagation.inject(context.active(), options.headers, {
-        set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
-      });
-    } else if (options.headers instanceof Map) {
-      propagation.inject(context.active(), options.headers, {
-        set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
-      });
     } else {
-      const headers: Partial<Record<string, unknown>> = {};
-      propagation.inject(context.active(), headers);
-      options.headers = Object.assign({}, headers, options.headers || {});
+      // Use Headers to correctly handle all HeadersInit types:
+      // - undefined/null
+      // - Headers object
+      // - Record<string, string>
+      // - Iterable<[string, string]> (including array of tuples)
+      const headers = new Headers();
+      propagation.inject(context.active(), headers, {
+        set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
+      });
+      // Merge user headers second so they take precedence on conflicts
+      new Headers(options.headers).forEach((value, key) => {
+        headers.set(key, value);
+      });
+      // Convert back to plain object to maintain backward compatibility
+      const headersObject: Record<string, string> = {};
+      headers.forEach((value, key) => {
+        headersObject[key] = value;
+      });
+      options.headers = headersObject;
     }
   }
 
