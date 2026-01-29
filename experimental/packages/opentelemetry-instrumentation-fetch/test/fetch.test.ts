@@ -2451,6 +2451,163 @@ describe('fetch', () => {
       });
     });
 
+    describe('Response properties preservation', () => {
+      beforeEach(async () => {
+        await startWorker(
+          msw.http.get('/api/status.json', () => {
+            return msw.HttpResponse.json({ ok: true });
+          })
+        );
+      });
+
+      it('should preserve response.url property', async () => {
+        const testUrl = `${ORIGIN}/api/status.json`;
+        let response: Response | undefined;
+
+        await trace(async () => {
+          response = await fetch('/api/status.json');
+        });
+
+        assert.ok(response);
+        assert.strictEqual(
+          response.url,
+          testUrl,
+          'response.url should match the original request URL'
+        );
+      });
+
+      it('should preserve response.type property for same-origin requests', async () => {
+        let response: Response | undefined;
+
+        await trace(async () => {
+          response = await fetch('/api/status.json');
+        });
+
+        assert.ok(response);
+        assert.strictEqual(
+          response.type,
+          'basic',
+          'response.type should be "basic" for same-origin requests'
+        );
+      });
+
+      it('should preserve response.type property for CORS requests', async () => {
+        await startWorker(
+          msw.http.get('http://example.com/api/status.json', () => {
+            return msw.HttpResponse.json({ ok: true });
+          })
+        );
+
+        let response: Response | undefined;
+
+        await trace(async () => {
+          response = await fetch('http://example.com/api/status.json', {
+            mode: 'cors',
+          });
+        });
+
+        assert.ok(response);
+        // response.type is preserved from the original; in real CORS it is "cors", but
+        // when MSW intercepts the request the browser may report "basic" or "cors"
+        assert.ok(
+          ['basic', 'cors', 'opaque'].includes(response.type),
+          'response.type should be a valid ResponseType'
+        );
+        assert.strictEqual(
+          response.clone().type,
+          response.type,
+          'cloned response.type should match original (preservation)'
+        );
+      });
+
+      it('should preserve response.redirected property', async () => {
+        let response: Response | undefined;
+
+        await trace(async () => {
+          response = await fetch('/api/status.json');
+        });
+
+        assert.ok(response);
+        assert.strictEqual(
+          typeof response.redirected,
+          'boolean',
+          'response.redirected should be a boolean'
+        );
+        // redirected will be false for this test, but we're verifying it's preserved
+        assert.strictEqual(
+          response.redirected,
+          false,
+          'response.redirected should be preserved from original response'
+        );
+      });
+
+      it('should preserve response.redirected and response.url when response followed a redirect', async () => {
+        const finalUrl = `${ORIGIN}/api/status.json`;
+        await startWorker(
+          msw.http.get('/redirect-to-status', () => {
+            return new msw.HttpResponse(null, {
+              status: 302,
+              headers: { Location: '/api/status.json' },
+            });
+          }),
+          msw.http.get('/api/status.json', () => {
+            return msw.HttpResponse.json({ ok: true });
+          })
+        );
+
+        let response: Response | undefined;
+
+        await trace(async () => {
+          response = await fetch('/redirect-to-status');
+        });
+
+        assert.ok(response);
+        assert.strictEqual(
+          response.redirected,
+          true,
+          'response.redirected should be true when request followed a redirect'
+        );
+        assert.strictEqual(
+          response.url,
+          finalUrl,
+          'response.url should be the final URL after redirect'
+        );
+      });
+
+      it('should preserve response properties when clone() is called', async () => {
+        const testUrl = `${ORIGIN}/api/status.json`;
+        let response: Response | undefined;
+
+        await trace(async () => {
+          response = await fetch('/api/status.json');
+        });
+
+        assert.ok(response);
+        const cloned = response.clone();
+
+        assert.strictEqual(
+          cloned.url,
+          testUrl,
+          'cloned response.url should match the original request URL'
+        );
+        assert.strictEqual(
+          cloned.type,
+          'basic',
+          'cloned response.type should match the original response type'
+        );
+        assert.strictEqual(
+          typeof cloned.redirected,
+          'boolean',
+          'cloned response.redirected should be a boolean'
+        );
+        assert.strictEqual(
+          cloned.redirected,
+          false,
+          'cloned response.redirected should match the original'
+        );
+      });
+    });
+
     describe('long-lived streaming requests', () => {
       let tracePromise: Promise<api.Span> | undefined;
       let pushes = 0;
