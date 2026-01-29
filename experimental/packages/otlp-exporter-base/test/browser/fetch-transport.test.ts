@@ -41,7 +41,7 @@ describe('FetchTransport', function () {
   });
 
   describe('send', function () {
-    it.only('it uses global fetch API and is not affected by patching', function (done) {
+    it('it uses global fetch API and is not affected by patching', function (done) {
       // arrange
       const transport = createFetchTransport(testTransportParameters);
       // We patch after the transport is created simulating what an

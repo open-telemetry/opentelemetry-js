@@ -28,12 +28,12 @@ export interface FetchTransportParameters {
   headers: HeadersFactory;
 }
 
-// Keep a ref of the fetch API on top so this transport is not
-// affected by instrumentations wrapping. This API is in globalThis
-// so we do not affect any (X)ITM hook if used in Node.js
-const fetchApi = globalThis.fetch;
-
 class FetchTransport implements IExporterTransport {
+  // Keep a ref of the fetch API on top so this transport is not
+  // affected by instrumentations wrapping. It's important the transport
+  // is created before any instrumentation that wraps `fetch`.
+  // This API is in globalThis so we do not affect any (X)ITM hook if used in Node.js
+  private _fetchApi = globalThis.fetch;
   private _parameters: FetchTransportParameters;
 
   constructor(parameters: FetchTransportParameters) {
@@ -46,7 +46,7 @@ class FetchTransport implements IExporterTransport {
     try {
       const isBrowserEnvironment = !!globalThis.location;
       const url = new URL(this._parameters.url);
-      const response = await fetchApi(url.href, {
+      const response = await this._fetchApi(url.href, {
         method: 'POST',
         headers: await this._parameters.headers(),
         body: data,
