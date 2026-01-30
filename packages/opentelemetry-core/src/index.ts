@@ -71,6 +71,12 @@ export {
   suppressTracing,
   unsuppressTracing,
 } from './trace/suppress-tracing';
+export {
+  isLoggingSuppressed,
+  suppressLogging,
+  unsuppressLogging,
+} from './diag/suppress-logging';
+export { createSuppressedDiagLogger } from './diag/SuppressedDiagLogger';
 export { TraceState } from './trace/TraceState';
 export { merge } from './utils/merge';
 export { TimeoutError, callWithTimeout } from './utils/timeout';
