@@ -79,6 +79,7 @@ import type {
   IncomingMessage,
   ServerResponse,
   RequestOptions,
+  OutgoingHttpHeaders,
 } from 'http';
 import { isWrapped, SemconvStability } from '@opentelemetry/instrumentation';
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
@@ -155,7 +156,8 @@ export const startIncomingSpanHookFunction = (
 export const startOutgoingSpanHookFunction = (
   request: RequestOptions
 ): Attributes => {
-  return { guid: request.headers?.guid };
+  const headers = request.headers as OutgoingHttpHeaders | undefined;
+  return { guid: headers?.guid };
 };
 
 describe('HttpInstrumentation', () => {
@@ -326,11 +328,9 @@ describe('HttpInstrumentation', () => {
             );
           },
           ignoreOutgoingRequestHook: request => {
-            if (request.headers?.['user-agent'] != null) {
-              return (
-                `${request.headers['user-agent']}`.match('ignored-string') !=
-                null
-              );
+            const headers = request.headers as OutgoingHttpHeaders | undefined;
+            if (headers?.['user-agent'] != null) {
+              return `${headers['user-agent']}`.match('ignored-string') != null;
             }
             return false;
           },
@@ -783,7 +783,7 @@ describe('HttpInstrumentation', () => {
             }
           );
           req.setTimeout(10, () => {
-            req.abort();
+            req.destroy();
           });
           // Instrumentation should not swallow error event.
           assert.strictEqual(req.listeners('error').length, 0);
@@ -942,24 +942,29 @@ describe('HttpInstrumentation', () => {
 
       it('should have 2 ended span when client prematurely close', async () => {
         const promise = new Promise<void>(resolve => {
+          function waitForSpans() {
+            const numSpans = memoryExporter.getFinishedSpans().length;
+
+            if (numSpans < 2) {
+              setTimeout(waitForSpans, 1);
+            } else if (numSpans > 2) {
+              throw new Error(`too many spans: ${numSpans}`);
+            } else {
+              resolve();
+            }
+          }
+
           const req = http.get(
             `${protocol}://${hostname}:${serverPort}/hang`,
             res => {
-              res.on('close', () => {});
+              res.on('close', waitForSpans);
               res.on('error', () => {});
+              // Close the socket.
+              req.destroy();
             }
           );
-          // close the socket.
-          setTimeout(() => {
-            req.destroy();
-          }, 10);
 
           req.on('error', () => {});
-
-          req.on('close', () => {
-            // yield to server to end the span.
-            setTimeout(resolve, 10);
-          });
         });
 
         await promise;
@@ -1201,6 +1206,33 @@ describe('HttpInstrumentation', () => {
           [ATTR_URL_PATH]: `${pathname}/setroute`,
           [ATTR_URL_SCHEME]: protocol,
         });
+      });
+
+      it('should accept QUERY as a known HTTP req method', async () => {
+        await new Promise<void>((resolve, reject) => {
+          const req = http.request(
+            `${protocol}://${hostname}:${serverPort}/hi`,
+            {
+              method: 'QUERY',
+            },
+            res => {
+              res.resume();
+              res.on('end', resolve);
+              res.on('error', reject);
+            }
+          );
+          req.on('error', reject);
+          req.write('{}');
+          req.end();
+        });
+
+        const spans = memoryExporter.getFinishedSpans();
+        const clientSpan = spans.slice(-1)[0];
+        assert.strictEqual(clientSpan.kind, SpanKind.CLIENT);
+        assert.strictEqual(
+          clientSpan.attributes[ATTR_HTTP_REQUEST_METHOD],
+          'QUERY'
+        );
       });
     });
 

@@ -81,7 +81,7 @@ export interface IAnyValue {
   kvlistValue?: IKeyValueList;
 
   /** AnyValue bytesValue */
-  bytesValue?: Uint8Array;
+  bytesValue?: Uint8Array | string;
 }
 
 /** Properties of an ArrayValue. */

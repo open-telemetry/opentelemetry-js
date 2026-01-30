@@ -38,7 +38,10 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+
+# Output directories
 build/
+dist/
 
 # TypeScript v1 declaration files
 typings/
@@ -75,19 +78,17 @@ docs
 #lerna
 .changelog
 package.json.lerna_backup
+.nx
 
 # OS generated files
 .DS_Store
 
-# VsCode configs
-.vscode/
-
-#Visual Studio
-.vs/
-
-#IDEA
-.idea
+# Editor configs
 *.iml
+.idea/
+.vs/
+.vscode/
+.zed/
 
 # non-aggregated benchmark results
 .benchmark-results.txt

@@ -1,0 +1,434 @@
+# kitchen-sink.yaml demonstrates all configurable surface area.
+#
+# It DOES NOT represent expected real world configuration, as it makes strange configuration
+# choices in an effort to exercise the full surface area.
+#
+# Configuration values are set to their defaults when default values are defined.
+#
+# For schema documentation, including required properties, semantics, default behavior, etc,
+# see: https://github.com/open-telemetry/opentelemetry-configuration/blob/main/schema-docs.md
+file_format: "1.0-rc.3"
+disabled: false
+log_level: info
+attribute_limits:
+  attribute_value_length_limit: 4096
+  attribute_count_limit: 128
+logger_provider:
+  processors:
+    - batch:
+        schedule_delay: 5000
+        export_timeout: 30000
+        max_queue_size: 2048
+        max_export_batch_size: 512
+        exporter:
+          otlp_http:
+            endpoint: http://localhost:4318/v1/logs
+            tls:
+              ca_file: /app/cert.pem
+              key_file: /app/cert.pem
+              cert_file: /app/cert.pem
+            headers:
+              - name: api-key
+                value: "1234"
+            headers_list: "api-key=1234"
+            compression: gzip
+            timeout: 10000
+            encoding: protobuf
+    - batch:
+        exporter:
+          otlp_grpc:
+            endpoint: http://localhost:4317
+            tls:
+              ca_file: /app/cert.pem
+              key_file: /app/cert.pem
+              cert_file: /app/cert.pem
+              insecure: false
+            headers:
+              - name: api-key
+                value: "1234"
+            headers_list: "api-key=1234"
+            compression: gzip
+            timeout: 10000
+    - batch:
+        exporter:
+          otlp_file/development:
+            output_stream: file:///var/log/logs.jsonl
+    - batch:
+        exporter:
+          otlp_file/development:
+            output_stream: stdout
+    - simple:
+        exporter:
+          console:
+  limits:
+    attribute_value_length_limit: 4096
+    attribute_count_limit: 128
+  logger_configurator/development:
+    default_config:
+      enabled: true
+    loggers:
+      - name: io.opentelemetry.contrib.*
+        config:
+          enabled: false
+          minimum_severity: info
+          trace_based: true
+meter_provider:
+  readers:
+    - pull:
+        exporter:
+          prometheus/development:
+            host: localhost
+            port: 9464
+            without_scope_info: false
+            without_target_info: false
+            with_resource_constant_labels:
+              included:
+                - "service*"
+              excluded:
+                - "service.attr1"
+            translation_strategy: underscore_escaping_with_suffixes
+        producers:
+          - opencensus:
+        cardinality_limits:
+          default: 2000
+          counter: 2000
+          gauge: 2000
+          histogram: 2000
+          observable_counter: 2000
+          observable_gauge: 2000
+          observable_up_down_counter: 2000
+          up_down_counter: 2000
+    - pull:
+        exporter:
+          prometheus/development:
+            host: localhost
+            port: 9464
+            without_scope_info: false
+            without_target_info: false
+            with_resource_constant_labels:
+              included:
+                - "service*"
+              excluded:
+                - "service.attr1"
+            translation_strategy: underscore_escaping_without_suffixes
+        producers:
+          - opencensus:
+        cardinality_limits:
+          default: 2000
+          counter: 2000
+          gauge: 2000
+          histogram: 2000
+          observable_counter: 2000
+          observable_gauge: 2000
+          observable_up_down_counter: 2000
+          up_down_counter: 2000
+    - pull:
+        exporter:
+          prometheus/development:
+            host: localhost
+            port: 9464
+            without_scope_info: false
+            without_target_info: false
+            with_resource_constant_labels:
+              included:
+                - "service*"
+              excluded:
+                - "service.attr1"
+            translation_strategy: no_utf8_escaping_with_suffixes
+        producers:
+          - opencensus:
+        cardinality_limits:
+          default: 2000
+          counter: 2000
+          gauge: 2000
+          histogram: 2000
+          observable_counter: 2000
+          observable_gauge: 2000
+          observable_up_down_counter: 2000
+          up_down_counter: 2000
+    - pull:
+        exporter:
+          prometheus/development:
+            host: localhost
+            port: 9464
+            without_scope_info: false
+            without_target_info: false
+            with_resource_constant_labels:
+              included:
+                - "service*"
+              excluded:
+                - "service.attr1"
+            translation_strategy: no_translation
+        producers:
+          - opencensus:
+        cardinality_limits:
+          default: 2000
+          counter: 2000
+          gauge: 2000
+          histogram: 2000
+          observable_counter: 2000
+          observable_gauge: 2000
+          observable_up_down_counter: 2000
+          up_down_counter: 2000
+    - periodic:
+        interval: 60000
+        timeout: 30000
+        exporter:
+          otlp_http:
+            endpoint: http://localhost:4318/v1/metrics
+            tls:
+              ca_file: /app/cert.pem
+              key_file: /app/cert.pem
+              cert_file: /app/cert.pem
+            headers:
+              - name: api-key
+                value: "1234"
+            headers_list: "api-key=1234"
+            compression: gzip
+            timeout: 10000
+            encoding: protobuf
+            temporality_preference: delta
+            default_histogram_aggregation: base2_exponential_bucket_histogram
+        producers:
+          - opencensus:
+        cardinality_limits:
+          default: 2000
+          counter: 2000
+          gauge: 2000
+          histogram: 2000
+          observable_counter: 2000
+          observable_gauge: 2000
+          observable_up_down_counter: 2000
+          up_down_counter: 2000
+    - periodic:
+        exporter:
+          otlp_grpc:
+            endpoint: http://localhost:4317
+            tls:
+              ca_file: /app/cert.pem
+              key_file: /app/cert.pem
+              cert_file: /app/cert.pem
+              insecure: false
+            headers:
+              - name: api-key
+                value: "1234"
+            headers_list: "api-key=1234"
+            compression: gzip
+            timeout: 10000
+            temporality_preference: delta
+            default_histogram_aggregation: base2_exponential_bucket_histogram
+    - periodic:
+        exporter:
+          otlp_file/development:
+            output_stream: file:///var/log/metrics.jsonl
+            temporality_preference: delta
+            default_histogram_aggregation: base2_exponential_bucket_histogram
+    - periodic:
+        exporter:
+          otlp_file/development:
+            output_stream: stdout
+            temporality_preference: delta
+            default_histogram_aggregation: base2_exponential_bucket_histogram
+    - periodic:
+        exporter:
+          console:
+            temporality_preference: delta
+            default_histogram_aggregation: base2_exponential_bucket_histogram
+  views:
+    - selector:
+        instrument_name: my-instrument
+        instrument_type: histogram
+        unit: ms
+        meter_name: my-meter
+        meter_version: 1.0.0
+        meter_schema_url: https://opentelemetry.io/schemas/1.16.0
+      stream:
+        name: new_instrument_name
+        description: new_description
+        aggregation:
+          explicit_bucket_histogram:
+            boundaries:
+              [
+                0.0,
+                5.0,
+                10.0,
+                25.0,
+                50.0,
+                75.0,
+                100.0,
+                250.0,
+                500.0,
+                750.0,
+                1000.0,
+                2500.0,
+                5000.0,
+                7500.0,
+                10000.0
+              ]
+            record_min_max: true
+        aggregation_cardinality_limit: 2000
+        attribute_keys:
+          included:
+            - key1
+            - key2
+          excluded:
+            - key3
+  exemplar_filter: trace_based
+propagator:
+  composite:
+    - tracecontext:
+    - baggage:
+    - b3:
+    - b3multi:
+    - jaeger:
+    - ottrace:
+  composite_list: "tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray"
+tracer_provider:
+  processors:
+    - batch:
+        schedule_delay: 5000
+        export_timeout: 30000
+        max_queue_size: 2048
+        max_export_batch_size: 512
+        exporter:
+          otlp_http:
+            endpoint: http://localhost:4318/v1/traces
+            tls:
+              ca_file: /app/cert.pem
+              key_file: /app/cert.pem
+              cert_file: /app/cert.pem
+            headers:
+              - name: api-key
+                value: "1234"
+            headers_list: "api-key=1234"
+            compression: gzip
+            timeout: 10000
+            encoding: protobuf
+    - batch:
+        exporter:
+          otlp_grpc:
+            endpoint: http://localhost:4317
+            tls:
+              ca_file: /app/cert.pem
+              key_file: /app/cert.pem
+              cert_file: /app/cert.pem
+              insecure: false
+            headers:
+              - name: api-key
+                value: "1234"
+            headers_list: "api-key=1234"
+            compression: gzip
+            timeout: 10000
+    - batch:
+        exporter:
+          otlp_file/development:
+            output_stream: file:///var/log/traces.jsonl
+    - batch:
+        exporter:
+          otlp_file/development:
+            output_stream: stdout
+    - simple:
+        exporter:
+          console:
+  limits:
+    attribute_value_length_limit: 4096
+    attribute_count_limit: 128
+    event_count_limit: 128
+    link_count_limit: 128
+    event_attribute_count_limit: 128
+    link_attribute_count_limit: 128
+  sampler:
+    parent_based:
+      root:
+        always_on:
+      remote_parent_sampled:
+        always_on:
+      remote_parent_not_sampled:
+        probability/development:
+          ratio: 0.01
+      local_parent_sampled:
+        composite/development:
+          # Configure sampler to be rule_based.
+          rule_based:
+            # The rules for the sampler, matched in order. Each rule can have multiple match conditions - the sampler will be applied if all match. 
+            # If no conditions are specified, the rule matches all spans that reach it. If no rules match, the span is not sampled.
+            rules:
+              - attribute_values:
+                  key: http.route
+                  values:
+                    - /healthz
+                    - /livez
+                # Configure sampler when matched.
+                sampler:
+                  # Configure sampler to be always_off if matched.
+                  always_off:
+              # Configure a sampling rule matching http.path attribute patterns.
+              - attribute_patterns:
+                  key: http.path
+                  included:
+                    - /internal/*
+                  excluded:
+                    - /internal/special/*
+                # Configure sampler when matched.
+                sampler:
+                  # Configure sampler to be always_on if matched.
+                  always_on:
+              # Configure a sampling rule matching root spans with CLIENT span kind.
+              - parent:
+                  - none
+                span_kinds:
+                  - client
+                sampler:
+                  # Configure sampler to be probability if matched.
+                  probability:
+                    ratio: 0.05
+              - sampler:
+                  probability:
+                    # Configure ratio.
+                    # If omitted or null, 1.0 is used.
+                    ratio: 0.001
+      # Configure local_parent_not_sampled sampler.
+      # If omitted or null, always_off is used.
+      local_parent_not_sampled:
+        always_off:
+resource:
+  attributes:
+    - name: service.name
+      value: unknown_service
+    - name: string_key
+      value: value
+      type: string
+    - name: bool_key
+      value: true
+      type: bool
+    - name: int_key
+      value: 1
+      type: int
+    - name: double_key
+      value: 1.1
+      type: double
+    - name: string_array_key
+      value: [ "value1", "value2" ]
+      type: string_array
+    - name: bool_array_key
+      value: [ true, false ]
+      type: bool_array
+    - name: int_array_key
+      value: [ 1, 2 ]
+      type: int_array
+    - name: double_array_key
+      value: [ 1.1, 2.2 ]
+      type: double_array
+  attributes_list: "service.namespace=my-namespace,service.version=1.0.0"
+  detection/development:
+    attributes:
+      included:
+        - process.*
+      excluded:
+        - process.command_args
+    detectors:
+      - container:
+      - host:
+      - process:
+      - service:
+  schema_url: https://opentelemetry.io/schemas/1.16.0

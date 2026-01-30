@@ -15,14 +15,10 @@
  */
 
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { inspect } from 'util';
 
-import {
-  context,
-  propagation,
-  trace,
-  ProxyTracerProvider,
-} from '@opentelemetry/api';
+import { context, propagation, trace } from '@opentelemetry/api';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { CompositePropagator } from '@opentelemetry/core';
 import { NodeTracerProvider } from '../src';
@@ -38,10 +34,17 @@ const assertInstanceOf = (actual: object, ExpectedConstructor: Function) => {
 };
 
 describe('API registration', function () {
+  let setGlobalTracerProviderSpy: sinon.SinonSpy;
+
   beforeEach(() => {
     context.disable();
     trace.disable();
     propagation.disable();
+    setGlobalTracerProviderSpy = sinon.spy(trace, 'setGlobalTracerProvider');
+  });
+
+  afterEach(() => {
+    sinon.restore();
   });
 
   it('should register default implementations', function () {
@@ -56,9 +59,10 @@ describe('API registration', function () {
       propagation['_getGlobalPropagator'](),
       CompositePropagator
     );
-    const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
-
-    assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
+    sinon.assert.calledOnceWithMatch(
+      setGlobalTracerProviderSpy,
+      (provider: any) => provider === tracerProvider
+    );
   });
 
   it('should register configured implementations', function () {
@@ -78,8 +82,10 @@ describe('API registration', function () {
     assert.strictEqual(context['_getContextManager'](), mockContextManager);
     assert.strictEqual(propagation['_getGlobalPropagator'](), mockPropagator);
 
-    const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
-    assert.strictEqual(apiTracerProvider.getDelegate(), tracerProvider);
+    sinon.assert.calledOnceWithMatch(
+      setGlobalTracerProviderSpy,
+      (provider: any) => provider === tracerProvider
+    );
   });
 
   it('should skip null context manager', function () {
@@ -100,8 +106,10 @@ describe('API registration', function () {
       CompositePropagator
     );
 
-    const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
-    assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
+    sinon.assert.calledOnceWithMatch(
+      setGlobalTracerProviderSpy,
+      (provider: any) => provider === tracerProvider
+    );
   });
 
   it('should skip null propagator', function () {
@@ -119,7 +127,9 @@ describe('API registration', function () {
       AsyncLocalStorageContextManager
     );
 
-    const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
-    assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
+    sinon.assert.calledOnceWithMatch(
+      setGlobalTracerProviderSpy,
+      (provider: any) => provider === tracerProvider
+    );
   });
 });

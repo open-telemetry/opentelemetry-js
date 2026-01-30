@@ -24,7 +24,6 @@ export {
   serviceInstanceIdDetector,
 } from './detectors';
 export type { Entity } from '@opentelemetry/api';
-export { defaultServiceName } from './platform';
 export type { Resource } from './Resource';
 export {
   defaultResource,
@@ -32,6 +31,7 @@ export {
   resourceFromAttributes,
   resourceFromDetectedResource,
 } from './resource-impl';
+export { defaultServiceName } from './default-service-name';
 export type {
   DetectedResource,
   DetectedResourceAttributes,

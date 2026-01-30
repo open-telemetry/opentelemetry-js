@@ -31,6 +31,7 @@ const NOOP_TRACER_PROVIDER = new NoopTracerProvider();
  *   When a delegate is set after tracers have already been provided,
  *   all tracers already provided will use the provided delegate implementation.
  *
+ * @deprecated This will be removed in the next major version.
  * @since 1.0.0
  */
 export class ProxyTracerProvider implements TracerProvider {

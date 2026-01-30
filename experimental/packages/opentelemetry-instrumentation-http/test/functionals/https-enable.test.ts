@@ -52,6 +52,7 @@ instrumentation.enable();
 instrumentation.disable();
 
 import * as http from 'http';
+import type { OutgoingHttpHeaders } from 'http';
 import * as https from 'https';
 import { httpsRequest } from '../utils/httpsRequest';
 
@@ -189,11 +190,9 @@ describe('HttpsInstrumentation', () => {
             );
           },
           ignoreOutgoingRequestHook: request => {
-            if (request.headers?.['user-agent'] != null) {
-              return (
-                `${request.headers['user-agent']}`.match('ignored-string') !=
-                null
-              );
+            const headers = request.headers as OutgoingHttpHeaders | undefined;
+            if (headers?.['user-agent'] != null) {
+              return `${headers['user-agent']}`.match('ignored-string') != null;
             }
             return false;
           },
@@ -598,7 +597,7 @@ describe('HttpsInstrumentation', () => {
             }
           );
           req.setTimeout(10, () => {
-            req.abort();
+            req.destroy();
           });
           // Instrumentation should not swallow error event.
           assert.strictEqual(req.listeners('error').length, 0);

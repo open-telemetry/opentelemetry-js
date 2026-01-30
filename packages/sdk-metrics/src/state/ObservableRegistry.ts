@@ -26,12 +26,7 @@ import {
   BatchObservableResultImpl,
   ObservableResultImpl,
 } from '../ObservableResult';
-import {
-  callWithTimeout,
-  PromiseAllSettled,
-  isPromiseAllSettledRejectionResult,
-  setEquals,
-} from '../utils';
+import { callWithTimeout, setEquals } from '../utils';
 
 /**
  * Records for single instrument observable callback.
@@ -131,14 +126,14 @@ export class ObservableRegistry {
       timeoutMillis
     );
 
-    const results = await PromiseAllSettled([
+    const results = await Promise.allSettled([
       ...callbackFutures,
       ...batchCallbackFutures,
     ]);
 
     const rejections = results
-      .filter(isPromiseAllSettledRejectionResult)
-      .map(it => it.reason);
+      .filter(result => result.status === 'rejected')
+      .map(result => (result as PromiseRejectedResult).reason);
     return rejections;
   }
 

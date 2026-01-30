@@ -369,6 +369,15 @@ describe('fetch', () => {
           msw.http.get('/boom', () => {
             return new msw.HttpResponse(null, { status: 500 });
           }),
+          msw.http.get('/null-body-204', () => {
+            return new msw.HttpResponse(null, { status: 204 });
+          }),
+          msw.http.get('/null-body-205', () => {
+            return new msw.HttpResponse(null, { status: 205 });
+          }),
+          msw.http.get('/null-body-304', () => {
+            return new msw.HttpResponse(null, { status: 304 });
+          }),
         ],
         callback = () => fetch('/api/status.json'),
         config = {},
@@ -390,6 +399,40 @@ describe('fetch', () => {
 
         return { rootSpan, response };
       };
+
+      describe('null-bodied response', () => {
+        // https://chromium.googlesource.com/chromium/src/+/ac85ca2a9cb8c76a37f9d7a6c611c24114f1f05d/third_party/WebKit/Source/core/fetch/Response.cpp#106
+        it('204 (No Content) will correctly end the span', async () => {
+          await tracedFetch({
+            callback: () => fetch('/null-body-204'),
+          });
+          assert.strictEqual(exportedSpans.length, 1);
+          assert.strictEqual(
+            exportedSpans[0].attributes[ATTR_HTTP_STATUS_CODE],
+            204
+          );
+        });
+        it('205 (Reset Content) will correctly end the span', async () => {
+          await tracedFetch({
+            callback: () => fetch('/null-body-205'),
+          });
+          assert.strictEqual(exportedSpans.length, 1);
+          assert.strictEqual(
+            exportedSpans[0].attributes[ATTR_HTTP_STATUS_CODE],
+            205
+          );
+        });
+        it('304 (Not Modified) will correctly end the span', async () => {
+          await tracedFetch({
+            callback: () => fetch('/null-body-304'),
+          });
+          assert.strictEqual(exportedSpans.length, 1);
+          assert.strictEqual(
+            exportedSpans[0].attributes[ATTR_HTTP_STATUS_CODE],
+            304
+          );
+        });
+      });
 
       describe('simple request', () => {
         let rootSpan: api.Span | undefined;
@@ -696,6 +739,25 @@ describe('fetch', () => {
 
           const keys = Object.keys(attributes);
           assert.strictEqual(keys.length, 6);
+        });
+      });
+
+      describe('QUERY method (semconvStabilityOptIn=http)', () => {
+        beforeEach(async () => {
+          await tracedFetch({
+            callback: () => fetch('/api/status.json', { method: 'QUERY' }),
+            config: {
+              semconvStabilityOptIn: 'http',
+            },
+          });
+        });
+
+        it('http.request.method attr should use QUERY', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          assert.strictEqual(
+            span.attributes[ATTR_HTTP_REQUEST_METHOD],
+            'QUERY'
+          );
         });
       });
 

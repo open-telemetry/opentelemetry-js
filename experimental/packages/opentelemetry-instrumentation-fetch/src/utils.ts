@@ -17,11 +17,11 @@
 // Much of the logic here overlaps with the same utils file in opentelemetry-instrumentation-xml-http-request
 // These may be unified in the future.
 
-import * as api from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import { getStringListFromEnv } from '@opentelemetry/core';
 import { URLLike } from '@opentelemetry/sdk-trace-web';
 
-const DIAG_LOGGER = api.diag.createComponentLogger({
+const DIAG_LOGGER = diag.createComponentLogger({
   namespace: '@opentelemetry/opentelemetry-instrumentation-fetch/utils',
 });
 
@@ -203,6 +203,8 @@ const DEFAULT_KNOWN_METHODS = {
   POST: true,
   PUT: true,
   TRACE: true,
+  // QUERY from https://datatracker.ietf.org/doc/draft-ietf-httpbis-safe-method-w-body/
+  QUERY: true,
 };
 let knownMethods: { [key: string]: boolean };
 function getKnownMethods() {

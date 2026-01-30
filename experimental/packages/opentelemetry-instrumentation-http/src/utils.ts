@@ -116,24 +116,20 @@ export const getAbsoluteUrl = (
   }
   // Redact sensitive query parameters
   if (path.includes('?')) {
-    //const [pathname, query] = path.split('?', 2);
-    const parsedUrl = url.parse(path);
-    const pathname = parsedUrl.pathname || '';
-    const query = parsedUrl.query || '';
-    const searchParams = new URLSearchParams(query);
-    const sensitiveParamsToRedact: string[] = redactedQueryParams || [];
+    try {
+      const parsedUrl = new URL(path, 'http://localhost');
+      const sensitiveParamsToRedact: string[] = redactedQueryParams || [];
 
-    for (const sensitiveParam of sensitiveParamsToRedact) {
-      if (
-        searchParams.has(sensitiveParam) &&
-        searchParams.get(sensitiveParam) !== ''
-      ) {
-        searchParams.set(sensitiveParam, STR_REDACTED);
+      for (const sensitiveParam of sensitiveParamsToRedact) {
+        if (parsedUrl.searchParams.get(sensitiveParam)) {
+          parsedUrl.searchParams.set(sensitiveParam, STR_REDACTED);
+        }
       }
-    }
 
-    const redactedQuery = searchParams.toString();
-    path = `${pathname}?${redactedQuery}`;
+      path = `${parsedUrl.pathname}${parsedUrl.search}`;
+    } catch {
+      // Ignore error, as the path was not a valid URL.
+    }
   }
   const authPart = reqUrlObject.auth ? `${STR_REDACTED}:${STR_REDACTED}@` : '';
   return `${protocol}//${authPart}${host}${path}`;
@@ -476,7 +472,7 @@ export const getOutgoingRequestAttributes = (
   const port = options.port;
   const method = requestOptions.method ?? 'GET';
   const normalizedMethod = normalizeMethod(method);
-  const headers = requestOptions.headers || {};
+  const headers = (requestOptions.headers || {}) as OutgoingHttpHeaders;
   const userAgent = headers['user-agent'];
   const urlFull = getAbsoluteUrl(
     requestOptions,
@@ -793,16 +789,24 @@ export function getRemoteClientAddress(
   if (forwardedHeader) {
     for (const entry of parseForwardedHeader(forwardedHeader)) {
       if (entry.for) {
-        return entry.for;
+        return removePortFromAddress(entry.for);
       }
     }
   }
 
   const xForwardedFor = request.headers['x-forwarded-for'];
-  if (typeof xForwardedFor === 'string') {
-    return xForwardedFor;
-  } else if (Array.isArray(xForwardedFor)) {
-    return xForwardedFor[0];
+  if (xForwardedFor) {
+    let xForwardedForVal;
+    if (typeof xForwardedFor === 'string') {
+      xForwardedForVal = xForwardedFor;
+    } else if (Array.isArray(xForwardedFor)) {
+      xForwardedForVal = xForwardedFor[0];
+    }
+
+    if (typeof xForwardedForVal === 'string') {
+      xForwardedForVal = xForwardedForVal.split(',')[0].trim();
+      return removePortFromAddress(xForwardedForVal);
+    }
   }
 
   const remote = request.socket.remoteAddress;
@@ -811,6 +815,22 @@ export function getRemoteClientAddress(
   }
 
   return null;
+}
+
+function removePortFromAddress(input: string): string {
+  // This function can be replaced with SocketAddress.parse() once the minimum
+  // supported Node.js version allows it.
+  try {
+    const { hostname: address } = new URL(`http://${input}`);
+
+    if (address.startsWith('[') && address.endsWith(']')) {
+      return address.slice(1, -1);
+    }
+
+    return address;
+  } catch {
+    return input;
+  }
 }
 
 function getInfoFromIncomingMessage(
@@ -866,96 +886,104 @@ export const getIncomingRequestAttributes = (
   },
   logger: DiagLogger
 ): Attributes => {
-  const headers = request.headers;
-  const userAgent = headers['user-agent'];
-  const ips = headers['x-forwarded-for'];
-  const httpVersion = request.httpVersion;
-  const host = headers.host;
-  const hostname = host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') || 'localhost';
+  const {
+    component,
+    enableSyntheticSourceDetection,
+    hookAttributes,
+    semconvStability,
+    serverName,
+  } = options;
+  const { headers, httpVersion, method } = request;
+  const { host, 'user-agent': userAgent, 'x-forwarded-for': ips } = headers;
+  const parsedUrl = getInfoFromIncomingMessage(component, request, logger);
+  let newAttributes: Attributes;
+  let oldAttributes: Attributes;
 
-  const method = request.method;
-  const normalizedMethod = normalizeMethod(method);
+  if (semconvStability !== SemconvStability.OLD) {
+    // Stable attributes are used.
+    const normalizedMethod = normalizeMethod(method);
+    const serverAddress = getServerAddress(request, component);
+    const remoteClientAddress = getRemoteClientAddress(request);
 
-  const serverAddress = getServerAddress(request, options.component);
-  const serverName = options.serverName;
-  const remoteClientAddress = getRemoteClientAddress(request);
+    newAttributes = {
+      [ATTR_HTTP_REQUEST_METHOD]: normalizedMethod,
+      [ATTR_URL_SCHEME]: component,
+      [ATTR_SERVER_ADDRESS]: serverAddress?.host,
+      [ATTR_NETWORK_PEER_ADDRESS]: request.socket.remoteAddress,
+      [ATTR_NETWORK_PEER_PORT]: request.socket.remotePort,
+      [ATTR_NETWORK_PROTOCOL_VERSION]: request.httpVersion,
+      [ATTR_USER_AGENT_ORIGINAL]: userAgent,
+    };
 
-  const newAttributes: Attributes = {
-    [ATTR_HTTP_REQUEST_METHOD]: normalizedMethod,
-    [ATTR_URL_SCHEME]: options.component,
-    [ATTR_SERVER_ADDRESS]: serverAddress?.host,
-    [ATTR_NETWORK_PEER_ADDRESS]: request.socket.remoteAddress,
-    [ATTR_NETWORK_PEER_PORT]: request.socket.remotePort,
-    [ATTR_NETWORK_PROTOCOL_VERSION]: request.httpVersion,
-    [ATTR_USER_AGENT_ORIGINAL]: userAgent,
-  };
+    if (parsedUrl.pathname != null) {
+      newAttributes[ATTR_URL_PATH] = parsedUrl.pathname;
+    }
 
-  const parsedUrl = getInfoFromIncomingMessage(
-    options.component,
-    request,
-    logger
-  );
+    if (parsedUrl.search) {
+      // Remove leading '?' from URL search (https://developer.mozilla.org/en-US/docs/Web/API/URL/search).
+      newAttributes[ATTR_URL_QUERY] = parsedUrl.search.slice(1);
+    }
 
-  if (parsedUrl?.pathname != null) {
-    newAttributes[ATTR_URL_PATH] = parsedUrl.pathname;
+    if (remoteClientAddress != null) {
+      newAttributes[ATTR_CLIENT_ADDRESS] = remoteClientAddress;
+    }
+
+    if (serverAddress?.port != null) {
+      newAttributes[ATTR_SERVER_PORT] = Number(serverAddress.port);
+    }
+
+    // Conditionally required if request method required case normalization.
+    if (method !== normalizedMethod) {
+      newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
+    }
+
+    if (enableSyntheticSourceDetection && userAgent) {
+      newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
+        getSyntheticType(userAgent);
+    }
   }
 
-  if (parsedUrl.search) {
-    // Remove leading '?' from URL search (https://developer.mozilla.org/en-US/docs/Web/API/URL/search).
-    newAttributes[ATTR_URL_QUERY] = parsedUrl.search.slice(1);
+  if (semconvStability !== SemconvStability.STABLE) {
+    // Old attributes are used.
+    const hostname = host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') || 'localhost';
+
+    oldAttributes = {
+      [ATTR_HTTP_URL]: parsedUrl.toString(),
+      [ATTR_HTTP_HOST]: host,
+      [ATTR_NET_HOST_NAME]: hostname,
+      [ATTR_HTTP_METHOD]: method,
+      [ATTR_HTTP_SCHEME]: component,
+    };
+
+    if (typeof ips === 'string') {
+      oldAttributes[ATTR_HTTP_CLIENT_IP] = ips.split(',')[0];
+    }
+
+    if (typeof serverName === 'string') {
+      oldAttributes[ATTR_HTTP_SERVER_NAME] = serverName;
+    }
+
+    if (parsedUrl.pathname) {
+      oldAttributes[ATTR_HTTP_TARGET] =
+        parsedUrl.pathname + parsedUrl.search || '/';
+    }
+
+    if (userAgent !== undefined) {
+      oldAttributes[ATTR_HTTP_USER_AGENT] = userAgent;
+    }
+
+    setRequestContentLengthAttribute(request, oldAttributes);
+    setAttributesFromHttpKind(httpVersion, oldAttributes);
   }
 
-  if (remoteClientAddress != null) {
-    newAttributes[ATTR_CLIENT_ADDRESS] = remoteClientAddress.split(',')[0];
-  }
-
-  if (serverAddress?.port != null) {
-    newAttributes[ATTR_SERVER_PORT] = Number(serverAddress.port);
-  }
-
-  // conditionally required if request method required case normalization
-  if (method !== normalizedMethod) {
-    newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
-  }
-
-  if (options.enableSyntheticSourceDetection && userAgent) {
-    newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] = getSyntheticType(userAgent);
-  }
-  const oldAttributes: Attributes = {
-    [ATTR_HTTP_URL]: parsedUrl.toString(),
-    [ATTR_HTTP_HOST]: host,
-    [ATTR_NET_HOST_NAME]: hostname,
-    [ATTR_HTTP_METHOD]: method,
-    [ATTR_HTTP_SCHEME]: options.component,
-  };
-
-  if (typeof ips === 'string') {
-    oldAttributes[ATTR_HTTP_CLIENT_IP] = ips.split(',')[0];
-  }
-
-  if (typeof serverName === 'string') {
-    oldAttributes[ATTR_HTTP_SERVER_NAME] = serverName;
-  }
-
-  if (parsedUrl?.pathname) {
-    oldAttributes[ATTR_HTTP_TARGET] =
-      parsedUrl?.pathname + parsedUrl?.search || '/';
-  }
-
-  if (userAgent !== undefined) {
-    oldAttributes[ATTR_HTTP_USER_AGENT] = userAgent;
-  }
-  setRequestContentLengthAttribute(request, oldAttributes);
-  setAttributesFromHttpKind(httpVersion, oldAttributes);
-
-  switch (options.semconvStability) {
+  switch (semconvStability) {
     case SemconvStability.STABLE:
-      return Object.assign(newAttributes, options.hookAttributes);
+      return Object.assign(newAttributes!, hookAttributes);
     case SemconvStability.OLD:
-      return Object.assign(oldAttributes, options.hookAttributes);
+      return Object.assign(oldAttributes!, hookAttributes);
+    default:
+      return Object.assign(oldAttributes!, newAttributes!, hookAttributes);
   }
-
-  return Object.assign(oldAttributes, newAttributes, options.hookAttributes);
 };
 
 /**
@@ -1104,6 +1132,9 @@ const KNOWN_METHODS = new Set([
 
   // PATCH from https://www.rfc-editor.org/rfc/rfc5789.html
   'PATCH',
+
+  // QUERY from https://datatracker.ietf.org/doc/draft-ietf-httpbis-safe-method-w-body/
+  'QUERY',
 ]);
 
 function normalizeMethod(method?: string | null) {

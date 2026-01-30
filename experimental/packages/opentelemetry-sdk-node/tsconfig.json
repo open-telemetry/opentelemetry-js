@@ -19,9 +19,6 @@
       "path": "../../../packages/opentelemetry-core"
     },
     {
-      "path": "../../../packages/opentelemetry-exporter-jaeger"
-    },
-    {
       "path": "../../../packages/opentelemetry-exporter-zipkin"
     },
     {
@@ -47,6 +44,9 @@
     },
     {
       "path": "../api-logs"
+    },
+    {
+      "path": "../configuration"
     },
     {
       "path": "../exporter-logs-otlp-grpc"

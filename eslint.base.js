@@ -51,6 +51,7 @@ module.exports = {
         "@typescript-eslint/no-empty-function": ["off"],
         "@typescript-eslint/no-unsafe-function-type": ["warn"],
         "@typescript-eslint/no-shadow": ["warn"],
+        "@typescript-eslint/parameter-properties": "error",
         "no-restricted-syntax": ["error", "ExportAllDeclaration"],
         "prefer-rest-params": "off",
       }
@@ -63,6 +64,7 @@ module.exports = {
         "projectService": true
       },
       rules: {
+        "no-console": "warn",
         "no-empty": "off",
         "@typescript-eslint/ban-ts-ignore": "off",
         "@typescript-eslint/no-unsafe-function-type": ["warn"],

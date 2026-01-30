@@ -74,7 +74,9 @@ describe('OTLPTraceExporter', () => {
 
       it('should successfully send data using fetch', async function () {
         // arrange
-        const stubFetch = sinon.stub(window, 'fetch');
+        const stubFetch = sinon
+          .stub(window, 'fetch')
+          .resolves(new Response('', { status: 200 }));
         const meterProvider = new MeterProvider({
           readers: [
             new PeriodicExportingMetricReader({

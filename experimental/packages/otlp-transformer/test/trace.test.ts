@@ -22,8 +22,10 @@ import {
 } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
+import { TextDecoder, TextEncoder } from 'util';
 import { hexToBinary } from '../src/common/hex-to-binary';
 import { OtlpEncodingOptions } from '../src/common/internal-types';
+import { JSON_ENCODER, PROTOBUF_ENCODER } from '../src/common/utils';
 import * as root from '../src/generated/root';
 import { createExportTraceServiceRequest } from '../src/trace/internal';
 import { ESpanKind, EStatusCode, ISpan } from '../src/trace/internal-types';
@@ -366,28 +368,30 @@ describe('Trace', () => {
   describe('createExportTraceServiceRequest', () => {
     it('returns null on an empty list', () => {
       assert.deepStrictEqual(
-        createExportTraceServiceRequest([], { useHex: true }),
+        createExportTraceServiceRequest([], JSON_ENCODER),
         {
           resourceSpans: [],
         }
       );
     });
 
-    it('serializes a span with useHex = true', () => {
-      const exportRequest = createExportTraceServiceRequest([span], {
-        useHex: true,
-      });
+    it('serializes a span with json encoder', () => {
+      const exportRequest = createExportTraceServiceRequest(
+        [span],
+        JSON_ENCODER
+      );
       assert.ok(exportRequest);
       assert.deepStrictEqual(
         exportRequest,
-        createExpectedSpanJson({ useHex: true })
+        createExpectedSpanJson({ useHex: true, useLongBits: false })
       );
     });
 
-    it('serializes a span with useHex = false', () => {
-      const exportRequest = createExportTraceServiceRequest([span], {
-        useHex: false,
-      });
+    it('serializes a span with protobuf encoder', () => {
+      const exportRequest = createExportTraceServiceRequest(
+        [span],
+        PROTOBUF_ENCODER
+      );
       assert.ok(exportRequest);
       assert.deepStrictEqual(
         exportRequest,
@@ -396,17 +400,23 @@ describe('Trace', () => {
     });
 
     it('serializes a span with string timestamps', () => {
-      const options: OtlpEncodingOptions = { useLongBits: false };
-      const exportRequest = createExportTraceServiceRequest([span], options);
+      const exportRequest = createExportTraceServiceRequest(
+        [span],
+        JSON_ENCODER
+      );
       assert.ok(exportRequest);
-      assert.deepStrictEqual(exportRequest, createExpectedSpanJson(options));
+      assert.deepStrictEqual(
+        exportRequest,
+        createExpectedSpanJson({ useLongBits: false, useHex: true })
+      );
     });
 
     it('serializes a span without a parent with useHex = true', () => {
       (span as any).parentSpanContext.spanId = undefined;
-      const exportRequest = createExportTraceServiceRequest([span], {
-        useHex: true,
-      });
+      const exportRequest = createExportTraceServiceRequest(
+        [span],
+        JSON_ENCODER
+      );
       assert.ok(exportRequest);
       assert.strictEqual(
         (exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0] as ISpan)
@@ -417,9 +427,10 @@ describe('Trace', () => {
 
     it('serializes a span without a parent with useHex = false', () => {
       (span as any).parentSpanContext.spanId = undefined;
-      const exportRequest = createExportTraceServiceRequest([span], {
-        useHex: false,
-      });
+      const exportRequest = createExportTraceServiceRequest(
+        [span],
+        PROTOBUF_ENCODER
+      );
       assert.ok(exportRequest);
       assert.strictEqual(
         (exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0] as ISpan)
@@ -432,9 +443,10 @@ describe('Trace', () => {
       it('error', () => {
         span.status.code = SpanStatusCode.ERROR;
         span.status.message = 'error message';
-        const exportRequest = createExportTraceServiceRequest([span], {
-          useHex: true,
-        });
+        const exportRequest = createExportTraceServiceRequest(
+          [span],
+          JSON_ENCODER
+        );
         assert.ok(exportRequest);
         const spanStatus =
           exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].status;
@@ -444,9 +456,10 @@ describe('Trace', () => {
 
       it('unset', () => {
         span.status.code = SpanStatusCode.UNSET;
-        const exportRequest = createExportTraceServiceRequest([span], {
-          useHex: true,
-        });
+        const exportRequest = createExportTraceServiceRequest(
+          [span],
+          JSON_ENCODER
+        );
         assert.ok(exportRequest);
         assert.strictEqual(
           exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].status.code,
@@ -458,9 +471,10 @@ describe('Trace', () => {
     describe('span kind', () => {
       it('consumer', () => {
         (span as any).kind = SpanKind.CONSUMER;
-        const exportRequest = createExportTraceServiceRequest([span], {
-          useHex: true,
-        });
+        const exportRequest = createExportTraceServiceRequest(
+          [span],
+          JSON_ENCODER
+        );
         assert.ok(exportRequest);
         assert.strictEqual(
           exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].kind,
@@ -469,9 +483,10 @@ describe('Trace', () => {
       });
       it('internal', () => {
         (span as any).kind = SpanKind.INTERNAL;
-        const exportRequest = createExportTraceServiceRequest([span], {
-          useHex: true,
-        });
+        const exportRequest = createExportTraceServiceRequest(
+          [span],
+          JSON_ENCODER
+        );
         assert.ok(exportRequest);
         assert.strictEqual(
           exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].kind,
@@ -480,9 +495,10 @@ describe('Trace', () => {
       });
       it('producer', () => {
         (span as any).kind = SpanKind.PRODUCER;
-        const exportRequest = createExportTraceServiceRequest([span], {
-          useHex: true,
-        });
+        const exportRequest = createExportTraceServiceRequest(
+          [span],
+          JSON_ENCODER
+        );
         assert.ok(exportRequest);
         assert.strictEqual(
           exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].kind,
@@ -491,9 +507,10 @@ describe('Trace', () => {
       });
       it('server', () => {
         (span as any).kind = SpanKind.SERVER;
-        const exportRequest = createExportTraceServiceRequest([span], {
-          useHex: true,
-        });
+        const exportRequest = createExportTraceServiceRequest(
+          [span],
+          JSON_ENCODER
+        );
         assert.ok(exportRequest);
         assert.strictEqual(
           exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].kind,
@@ -502,9 +519,10 @@ describe('Trace', () => {
       });
       it('unspecified', () => {
         (span as any).kind = undefined;
-        const exportRequest = createExportTraceServiceRequest([span], {
-          useHex: true,
-        });
+        const exportRequest = createExportTraceServiceRequest(
+          [span],
+          JSON_ENCODER
+        );
         assert.ok(exportRequest);
         assert.strictEqual(
           exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].kind,
@@ -521,9 +539,10 @@ describe('Trace', () => {
 
       const spanFromSDK = createSpanWithResource(resourceWithSchema);
 
-      const exportRequest = createExportTraceServiceRequest([spanFromSDK], {
-        useHex: true,
-      });
+      const exportRequest = createExportTraceServiceRequest(
+        [spanFromSDK],
+        JSON_ENCODER
+      );
 
       assert.ok(exportRequest);
       assert.strictEqual(exportRequest.resourceSpans?.length, 1);
@@ -648,9 +667,10 @@ describe('Trace', () => {
 
   describe('span flags', () => {
     it('sets flags to 0x101 for local parent span context', () => {
-      const exportRequest = createExportTraceServiceRequest([span], {
-        useHex: true,
-      });
+      const exportRequest = createExportTraceServiceRequest(
+        [span],
+        JSON_ENCODER
+      );
       assert.ok(exportRequest);
       const spanFlags =
         exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].flags;
@@ -673,9 +693,7 @@ describe('Trace', () => {
 
       const exportRequest = createExportTraceServiceRequest(
         [spanWithRemoteParent],
-        {
-          useHex: true,
-        }
+        JSON_ENCODER
       );
       assert.ok(exportRequest);
       const spanFlags =
@@ -684,9 +702,10 @@ describe('Trace', () => {
     });
 
     it('sets flags to 0x101 for links with local context', () => {
-      const exportRequest = createExportTraceServiceRequest([span], {
-        useHex: true,
-      });
+      const exportRequest = createExportTraceServiceRequest(
+        [span],
+        JSON_ENCODER
+      );
       assert.ok(exportRequest);
       const linkFlags =
         exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].links?.[0]
@@ -716,9 +735,7 @@ describe('Trace', () => {
 
       const exportRequest = createExportTraceServiceRequest(
         [spanWithRemoteLink],
-        {
-          useHex: true,
-        }
+        JSON_ENCODER
       );
       assert.ok(exportRequest);
       const linkFlags =
@@ -754,9 +771,10 @@ describe('Trace', () => {
             isRemote: false,
           },
         } as unknown as ReadableSpan;
-        const reqLocal = createExportTraceServiceRequest([spanLocal], {
-          useHex: true,
-        });
+        const reqLocal = createExportTraceServiceRequest(
+          [spanLocal],
+          JSON_ENCODER
+        );
         const spanFlagsLocal =
           reqLocal.resourceSpans?.[0].scopeSpans[0].spans?.[0].flags;
         assert.strictEqual(spanFlagsLocal, c.local);
@@ -769,9 +787,10 @@ describe('Trace', () => {
             isRemote: true,
           },
         } as unknown as ReadableSpan;
-        const reqRemote = createExportTraceServiceRequest([spanRemote], {
-          useHex: true,
-        });
+        const reqRemote = createExportTraceServiceRequest(
+          [spanRemote],
+          JSON_ENCODER
+        );
         const spanFlagsRemote =
           reqRemote.resourceSpans?.[0].scopeSpans[0].spans?.[0].flags;
         assert.strictEqual(spanFlagsRemote, c.remote);
@@ -795,9 +814,10 @@ describe('Trace', () => {
           ...span,
           links: [linkLocal],
         } as unknown as ReadableSpan;
-        const reqLocal = createExportTraceServiceRequest([spanWithLocalLink], {
-          useHex: true,
-        });
+        const reqLocal = createExportTraceServiceRequest(
+          [spanWithLocalLink],
+          JSON_ENCODER
+        );
         const linkFlagsLocal =
           reqLocal.resourceSpans?.[0].scopeSpans[0].spans?.[0].links?.[0].flags;
         assert.strictEqual(linkFlagsLocal, c.local);
@@ -812,7 +832,7 @@ describe('Trace', () => {
         } as unknown as ReadableSpan;
         const reqRemote = createExportTraceServiceRequest(
           [spanWithRemoteLink],
-          { useHex: true }
+          JSON_ENCODER
         );
         const linkFlagsRemote =
           reqRemote.resourceSpans?.[0].scopeSpans[0].spans?.[0].links?.[0]
@@ -835,9 +855,7 @@ describe('Trace', () => {
           }),
           parentSpanContext: undefined,
         } as unknown as ReadableSpan;
-        const req = createExportTraceServiceRequest([rootSpan], {
-          useHex: true,
-        });
+        const req = createExportTraceServiceRequest([rootSpan], JSON_ENCODER);
         const flags = req.resourceSpans?.[0].scopeSpans[0].spans?.[0].flags;
         assert.strictEqual(flags, c.local);
       }

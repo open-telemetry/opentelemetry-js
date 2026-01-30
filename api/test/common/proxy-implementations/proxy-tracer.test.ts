@@ -19,7 +19,6 @@ import * as sinon from 'sinon';
 import {
   context,
   ProxyTracer,
-  ProxyTracerProvider,
   ROOT_CONTEXT,
   Span,
   SpanKind,
@@ -29,6 +28,7 @@ import {
 } from '../../../src';
 import { NonRecordingSpan } from '../../../src/trace/NonRecordingSpan';
 import { NoopTracer } from '../../../src/trace/NoopTracer';
+import { ProxyTracerProvider } from '../../../src/trace/ProxyTracerProvider';
 
 describe('ProxyTracer', function () {
   let provider: ProxyTracerProvider;

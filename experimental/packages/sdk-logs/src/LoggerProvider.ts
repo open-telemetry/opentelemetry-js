@@ -16,14 +16,16 @@
 import { diag } from '@opentelemetry/api';
 import type * as logsAPI from '@opentelemetry/api-logs';
 import { NOOP_LOGGER } from '@opentelemetry/api-logs';
+import { BindOnceFuture } from '@opentelemetry/core';
 import { defaultResource } from '@opentelemetry/resources';
-import { BindOnceFuture, merge } from '@opentelemetry/core';
 
-import type { LoggerProviderConfig } from './types';
-import { Logger } from './Logger';
-import { loadDefaultConfig, reconfigureLimits } from './config';
-import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 import { Entity } from '@opentelemetry/api';
+import {
+  DEFAULT_LOGGER_CONFIGURATOR,
+  LoggerProviderSharedState,
+} from './internal/LoggerProviderSharedState';
+import { Logger } from './Logger';
+import type { LoggerProviderConfig } from './types';
 
 export const DEFAULT_LOGGER_NAME = 'unknown';
 
@@ -33,14 +35,25 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
   private readonly _config: LoggerProviderConfig;
 
   constructor(config: LoggerProviderConfig = {}) {
-    const mergedConfig = merge({}, loadDefaultConfig(), config);
-    const resource = config.resource ?? defaultResource();
+    const mergedConfig = {
+      resource: config.resource ?? defaultResource(),
+      forceFlushTimeoutMillis: config.forceFlushTimeoutMillis ?? 30000,
+      logRecordLimits: {
+        attributeCountLimit: config.logRecordLimits?.attributeCountLimit ?? 128,
+        attributeValueLengthLimit:
+          config.logRecordLimits?.attributeValueLengthLimit ?? Infinity,
+      },
+      loggerConfigurator:
+        config.loggerConfigurator ?? DEFAULT_LOGGER_CONFIGURATOR,
+      processors: config.processors ?? [],
+    };
     this._config = config;
     this._sharedState = new LoggerProviderSharedState(
-      resource,
+      mergedConfig.resource,
       mergedConfig.forceFlushTimeoutMillis,
-      reconfigureLimits(mergedConfig.logRecordLimits),
-      config?.processors ?? []
+      mergedConfig.logRecordLimits,
+      mergedConfig.processors,
+      mergedConfig.loggerConfigurator
     );
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
   }

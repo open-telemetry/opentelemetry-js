@@ -32,7 +32,6 @@ import {
 import {
   addHrTimes,
   millisToHrTime,
-  getTimeOrigin,
   hrTime,
   hrTimeDuration,
   InstrumentationScope,
@@ -94,6 +93,7 @@ export class SpanImpl implements Span {
   private _droppedAttributesCount = 0;
   private _droppedEventsCount: number = 0;
   private _droppedLinksCount: number = 0;
+  private _attributesCount: number = 0;
 
   name: string;
   status: SpanStatus = {
@@ -119,7 +119,7 @@ export class SpanImpl implements Span {
     this._spanContext = opts.spanContext;
     this._performanceStartTime = otperformance.now();
     this._performanceOffset =
-      now - (this._performanceStartTime + getTimeOrigin());
+      now - (this._performanceStartTime + otperformance.timeOrigin);
     this._startTimeProvided = opts.startTime != null;
     this._spanLimits = opts.spanLimits;
     this._attributeValueLengthLimit =
@@ -158,16 +158,24 @@ export class SpanImpl implements Span {
     }
 
     const { attributeCountLimit } = this._spanLimits;
+    const isNewKey = !Object.prototype.hasOwnProperty.call(
+      this.attributes,
+      key
+    );
 
     if (
       attributeCountLimit !== undefined &&
-      Object.keys(this.attributes).length >= attributeCountLimit &&
-      !Object.prototype.hasOwnProperty.call(this.attributes, key)
+      this._attributesCount >= attributeCountLimit &&
+      isNewKey
     ) {
       this._droppedAttributesCount++;
       return this;
     }
+
     this.attributes[key] = this._truncateToSize(value);
+    if (isNewKey) {
+      this._attributesCount++;
+    }
     return this;
   }
 
@@ -270,8 +278,6 @@ export class SpanImpl implements Span {
       );
       return;
     }
-    this._ended = true;
-
     this.endTime = this._getTime(endTime);
     this._duration = hrTimeDuration(this.startTime, this.endTime);
 
@@ -290,7 +296,11 @@ export class SpanImpl implements Span {
         `Dropped ${this._droppedEventsCount} events because eventCountLimit reached`
       );
     }
+    if (this._spanProcessor.onEnding) {
+      this._spanProcessor.onEnding(this);
+    }
 
+    this._ended = true;
     this._spanProcessor.onEnd(this);
   }
 

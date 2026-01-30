@@ -10,24 +10,24 @@ jobs:
   create-or-update-emeritus-pr:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        id: otelbot-token
+        with:
+          app-id: ${{ vars.OTELBOT_JS_APP_ID }}
+          private-key: ${{ secrets.OTELBOT_JS_PRIVATE_KEY }}
       - name: Checkout
-        uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v5
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        with:
+          token: ${{ steps.otelbot-token.outputs.token }}
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
         with:
           cache: 'npm'
           cache-dependency-path: package-lock.json
           node-version: 22
-
       - run: node scripts/move-to-emeritus.js
         env:
+          # don't use otelbot-js's token as it has more permissions than we need.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2.0.6
-        id: otelbot-token
-        with:
-          app-id: ${{ vars.OTELBOT_APP_ID }}
-          private-key: ${{ secrets.OTELBOT_PRIVATE_KEY }}
-
       - name: Create/Update Move to Emeritus PR
         run: |
           git config user.name otelbot

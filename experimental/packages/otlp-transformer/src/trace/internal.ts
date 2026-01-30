@@ -31,8 +31,6 @@ import {
   IScopeSpans,
   ISpan,
 } from './internal-types';
-import { OtlpEncodingOptions } from '../common/internal-types';
-import { getOtlpEncoder } from '../common/utils';
 
 // Span flags constants matching the OTLP specification
 const SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK = 0x100;
@@ -67,7 +65,7 @@ export function sdkSpanToOtlpSpan(span: ReadableSpan, encoder: Encoder): ISpan {
     kind: span.kind == null ? 0 : span.kind + 1,
     startTimeUnixNano: encoder.encodeHrTime(span.startTime),
     endTimeUnixNano: encoder.encodeHrTime(span.endTime),
-    attributes: toAttributes(span.attributes),
+    attributes: toAttributes(span.attributes, encoder),
     droppedAttributesCount: span.droppedAttributesCount,
     events: span.events.map(event => toOtlpSpanEvent(event, encoder)),
     droppedEventsCount: span.droppedEventsCount,
@@ -84,7 +82,7 @@ export function sdkSpanToOtlpSpan(span: ReadableSpan, encoder: Encoder): ISpan {
 
 export function toOtlpLink(link: Link, encoder: Encoder): ILink {
   return {
-    attributes: link.attributes ? toAttributes(link.attributes) : [],
+    attributes: link.attributes ? toAttributes(link.attributes, encoder) : [],
     spanId: encoder.encodeSpanContext(link.context.spanId),
     traceId: encoder.encodeSpanContext(link.context.traceId),
     traceState: link.context.traceState?.serialize(),
@@ -99,7 +97,7 @@ export function toOtlpSpanEvent(
 ): IEvent {
   return {
     attributes: timedEvent.attributes
-      ? toAttributes(timedEvent.attributes)
+      ? toAttributes(timedEvent.attributes, encoder)
       : [],
     name: timedEvent.name,
     timeUnixNano: encoder.encodeHrTime(timedEvent.time),
@@ -107,27 +105,10 @@ export function toOtlpSpanEvent(
   };
 }
 
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 export function createExportTraceServiceRequest(
   spans: ReadableSpan[],
-  options?: OtlpEncodingOptions
+  encoder: Encoder
 ): IExportTraceServiceRequest {
-  const encoder = getOtlpEncoder(options);
   return {
     resourceSpans: spanRecordsToResourceSpans(spans, encoder),
   };
@@ -189,7 +170,7 @@ function spanRecordsToResourceSpans(
       }
       ilmEntry = ilmIterator.next();
     }
-    const processedResource = createResource(resource);
+    const processedResource = createResource(resource, encoder);
     const transformedSpans: IResourceSpans = {
       resource: processedResource,
       scopeSpans: scopeResourceSpans,

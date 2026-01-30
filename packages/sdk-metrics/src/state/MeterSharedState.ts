@@ -17,13 +17,13 @@
 import { HrTime } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { MetricCollectOptions } from '../export/MetricProducer';
-import { ScopeMetrics } from '../export/MetricData';
+import { MetricData, ScopeMetrics } from '../export/MetricData';
 import {
   createInstrumentDescriptorWithView,
   InstrumentDescriptor,
 } from '../InstrumentDescriptor';
 import { Meter } from '../Meter';
-import { isNotNullish, Maybe } from '../utils';
+import { Maybe } from '../utils';
 import { AsyncMetricStorage } from './AsyncMetricStorage';
 import { MeterProviderSharedState } from './MeterProviderSharedState';
 import { MetricCollectorHandle } from './MetricCollector';
@@ -45,12 +45,16 @@ export class MeterSharedState {
   metricStorageRegistry = new MetricStorageRegistry();
   observableRegistry = new ObservableRegistry();
   meter: Meter;
+  private _meterProviderSharedState: MeterProviderSharedState;
+  private _instrumentationScope: InstrumentationScope;
 
   constructor(
-    private _meterProviderSharedState: MeterProviderSharedState,
-    private _instrumentationScope: InstrumentationScope
+    meterProviderSharedState: MeterProviderSharedState,
+    instrumentationScope: InstrumentationScope
   ) {
     this.meter = new Meter(this);
+    this._meterProviderSharedState = meterProviderSharedState;
+    this._instrumentationScope = instrumentationScope;
   }
 
   registerMetricStorage(descriptor: InstrumentDescriptor) {
@@ -97,11 +101,14 @@ export class MeterSharedState {
       return null;
     }
 
-    const metricDataList = storages
-      .map(metricStorage => {
-        return metricStorage.collect(collector, collectionTime);
-      })
-      .filter(isNotNullish);
+    const metricDataList: MetricData[] = [];
+    storages.forEach(metricStorage => {
+      const metricData = metricStorage.collect(collector, collectionTime);
+
+      if (metricData != null) {
+        metricDataList.push(metricData);
+      }
+    });
 
     // skip this scope if no data was collected (storage created, but no data observed)
     if (metricDataList.length === 0) {

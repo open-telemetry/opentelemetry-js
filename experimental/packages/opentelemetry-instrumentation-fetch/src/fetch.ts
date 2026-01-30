@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import {
+  context,
+  propagation,
+  SpanKind,
+  SpanStatusCode,
+  trace,
+} from '@opentelemetry/api';
+import type { Attributes, HrTime, Span } from '@opentelemetry/api';
 import {
   SemconvStability,
   semconvStabilityFromStr,
@@ -52,7 +59,6 @@ import {
   serverPortFromUrl,
 } from './utils';
 import { VERSION } from './version';
-import { _globalThis } from '@opentelemetry/core';
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
@@ -60,18 +66,18 @@ import { _globalThis } from '@opentelemetry/core';
 // safe enough
 const OBSERVER_WAIT_TIME_MS = 300;
 
-const isNode = typeof process === 'object' && process.release?.name === 'node';
+const hasBrowserPerformanceAPI = typeof PerformanceObserver !== 'undefined';
 
 export interface FetchCustomAttributeFunction {
   (
-    span: api.Span,
+    span: Span,
     request: Request | RequestInit,
     result: Response | FetchError
   ): void;
 }
 
 export interface FetchRequestHookFunction {
-  (span: api.Span, request: Request | RequestInit): void;
+  (span: Span, request: Request | RequestInit): void;
 }
 
 /**
@@ -132,7 +138,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
    * @param corsPreFlightRequest
    */
   private _addChildSpan(
-    span: api.Span,
+    span: Span,
     corsPreFlightRequest: PerformanceResourceTiming
   ): void {
     const childSpan = this.tracer.startSpan(
@@ -140,7 +146,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       {
         startTime: corsPreFlightRequest[web.PerformanceTimingNames.FETCH_START],
       },
-      api.trace.setSpan(api.context.active(), span)
+      trace.setSpan(context.active(), span)
     );
     const skipOldSemconvContentLengthAttrs = !(
       this._semconvStability & SemconvStability.OLD
@@ -162,10 +168,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
    * @param span
    * @param response
    */
-  private _addFinalSpanAttributes(
-    span: api.Span,
-    response: FetchResponse
-  ): void {
+  private _addFinalSpanAttributes(span: Span, response: FetchResponse): void {
     const parsedUrl = web.parseUrl(response.url);
 
     if (this._semconvStability & SemconvStability.OLD) {
@@ -205,7 +208,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       )
     ) {
       const headers: Partial<Record<string, unknown>> = {};
-      api.propagation.inject(api.context.active(), headers);
+      propagation.inject(context.active(), headers);
       if (Object.keys(headers).length > 0) {
         this._diag.debug('headers inject skipped due to CORS policy');
       }
@@ -213,20 +216,20 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     }
 
     if (options instanceof Request) {
-      api.propagation.inject(api.context.active(), options.headers, {
+      propagation.inject(context.active(), options.headers, {
         set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
       });
     } else if (options.headers instanceof Headers) {
-      api.propagation.inject(api.context.active(), options.headers, {
+      propagation.inject(context.active(), options.headers, {
         set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
       });
     } else if (options.headers instanceof Map) {
-      api.propagation.inject(api.context.active(), options.headers, {
+      propagation.inject(context.active(), options.headers, {
         set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
       });
     } else {
       const headers: Partial<Record<string, unknown>> = {};
-      api.propagation.inject(api.context.active(), headers);
+      propagation.inject(context.active(), headers);
       options.headers = Object.assign({}, headers, options.headers || {});
     }
   }
@@ -252,14 +255,14 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   private _createSpan(
     url: string,
     options: Partial<Request | RequestInit> = {}
-  ): api.Span | undefined {
+  ): Span | undefined {
     if (core.isUrlIgnored(url, this.getConfig().ignoreUrls)) {
       this._diag.debug('ignoring span as url matches ignored url');
       return;
     }
 
     let name = '';
-    const attributes = {} as api.Attributes;
+    const attributes = {} as Attributes;
     if (this._semconvStability & SemconvStability.OLD) {
       const method = (options.method || 'GET').toUpperCase();
       name = `HTTP ${method}`;
@@ -283,7 +286,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     }
 
     return this.tracer.startSpan(name, {
-      kind: api.SpanKind.CLIENT,
+      kind: SpanKind.CLIENT,
       attributes,
     });
   }
@@ -295,9 +298,9 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
    * @param endTime
    */
   private _findResourceAndAddNetworkEvents(
-    span: api.Span,
+    span: Span,
     resourcesObserver: SpanData,
-    endTime: api.HrTime
+    endTime: HrTime
   ): void {
     let resources: PerformanceResourceTiming[] = resourcesObserver.entries;
     if (!resources.length) {
@@ -358,11 +361,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
    * @param spanData
    * @param response
    */
-  private _endSpan(
-    span: api.Span,
-    spanData: SpanData,
-    response: FetchResponse
-  ) {
+  private _endSpan(span: Span, spanData: SpanData, response: FetchResponse) {
     const endTime = core.millisToHrTime(Date.now());
     const performanceEndTime = core.hrTime();
     this._addFinalSpanAttributes(span, response);
@@ -370,7 +369,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     if (this._semconvStability & SemconvStability.STABLE) {
       // https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#status
       if (response.status >= 400) {
-        span.setStatus({ code: api.SpanStatusCode.ERROR });
+        span.setStatus({ code: SpanStatusCode.ERROR });
         span.setAttribute(ATTR_ERROR_TYPE, String(response.status));
       }
     }
@@ -428,7 +427,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
             });
         }
 
-        function endSpanOnError(span: api.Span, error: FetchError) {
+        function endSpanOnError(span: Span, error: FetchError) {
           plugin._applyAttributesAfterFetch(span, options, error);
           plugin._endSpan(span, spanData, {
             status: error.status || 0,
@@ -437,7 +436,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           });
         }
 
-        function endSpanOnSuccess(span: api.Span, response: Response) {
+        function endSpanOnSuccess(span: Span, response: Response) {
           plugin._applyAttributesAfterFetch(span, options, response);
           if (response.status >= 200 && response.status < 400) {
             plugin._endSpan(span, spanData, response);
@@ -493,7 +492,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         }
 
         function onSuccess(
-          span: api.Span,
+          span: Span,
           resolve: (value: Response | PromiseLike<Response>) => void,
           response: Response
         ): void {
@@ -507,8 +506,14 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
             const body = resClone.body;
             if (body) {
               const reader = body.getReader();
-
-              const wrappedBody = withCancelPropagation(response.body, reader);
+              const isNullBodyStatus =
+                // 101 responses and protocol upgrading is handled internally by the browser
+                response.status === 204 ||
+                response.status === 205 ||
+                response.status === 304;
+              const wrappedBody = isNullBodyStatus
+                ? null
+                : withCancelPropagation(response.body, reader);
 
               proxiedResponse = new Response(wrappedBody, {
                 status: response.status,
@@ -541,7 +546,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         }
 
         function onError(
-          span: api.Span,
+          span: Span,
           reject: (reason?: unknown) => void,
           error: FetchError
         ) {
@@ -553,8 +558,8 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         }
 
         return new Promise((resolve, reject) => {
-          return api.context.with(
-            api.trace.setSpan(api.context.active(), createdSpan),
+          return context.with(
+            trace.setSpan(context.active(), createdSpan),
             () => {
               plugin._addHeaders(options, url);
               plugin._callRequestHook(createdSpan, options);
@@ -577,7 +582,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   }
 
   private _applyAttributesAfterFetch(
-    span: api.Span,
+    span: Span,
     request: Request | RequestInit,
     result: Response | FetchError
   ) {
@@ -598,7 +603,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     }
   }
 
-  private _callRequestHook(span: api.Span, request: Request | RequestInit) {
+  private _callRequestHook(span: Span, request: Request | RequestInit) {
     const requestHook = this.getConfig().requestHook;
     if (requestHook) {
       safeExecuteInTheMiddle(
@@ -645,29 +650,27 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
    * implements enable function
    */
   override enable(): void {
-    if (isNode) {
-      // Node.js v18+ *does* have a global `fetch()`, but this package does not
-      // support instrumenting it.
+    if (!hasBrowserPerformanceAPI) {
       this._diag.warn(
-        "this instrumentation is intended for web usage only, it does not instrument Node.js's fetch()"
+        'this instrumentation is intended for web usage only, it does not instrument server-side fetch()'
       );
       return;
     }
     if (isWrapped(fetch)) {
-      this._unwrap(_globalThis, 'fetch');
+      this._unwrap(globalThis, 'fetch');
       this._diag.debug('removing previous patch for constructor');
     }
-    this._wrap(_globalThis, 'fetch', this._patchConstructor());
+    this._wrap(globalThis, 'fetch', this._patchConstructor());
   }
 
   /**
    * implements unpatch function
    */
   override disable(): void {
-    if (isNode) {
+    if (!hasBrowserPerformanceAPI) {
       return;
     }
-    this._unwrap(_globalThis, 'fetch');
+    this._unwrap(globalThis, 'fetch');
     this._usedResources = new WeakSet<PerformanceResourceTiming>();
   }
 }

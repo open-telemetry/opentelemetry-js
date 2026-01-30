@@ -17,13 +17,15 @@ import type * as http from 'http';
 import type * as https from 'https';
 import * as zlib from 'zlib';
 import { Readable } from 'stream';
-import { HttpRequestParameters } from './http-transport-types';
 import { ExportResponse } from '../export-response';
 import {
-  isExportRetryable,
+  isExportHTTPErrorRetryable,
   parseRetryAfterToMills,
 } from '../is-export-retryable';
 import { OTLPExporterError } from '../types';
+import { VERSION } from '../version';
+
+const DEFAULT_USER_AGENT = `OTel-OTLP-Exporter-JavaScript/${VERSION}`;
 
 /**
  * Sends data using http
@@ -36,23 +38,30 @@ import { OTLPExporterError } from '../types';
  */
 export function sendWithHttp(
   request: typeof https.request | typeof http.request,
-  params: HttpRequestParameters,
+  url: string,
+  headers: Record<string, string>,
+  compression: 'gzip' | 'none',
+  userAgent: string | undefined,
   agent: http.Agent | https.Agent,
   data: Uint8Array,
   onDone: (response: ExportResponse) => void,
   timeoutMillis: number
 ): void {
-  const parsedUrl = new URL(params.url);
+  const parsedUrl = new URL(url);
+
+  if (userAgent) {
+    headers['User-Agent'] = `${userAgent} ${DEFAULT_USER_AGENT}`;
+  } else {
+    headers['User-Agent'] = DEFAULT_USER_AGENT;
+  }
 
   const options: http.RequestOptions | https.RequestOptions = {
     hostname: parsedUrl.hostname,
     port: parsedUrl.port,
     path: parsedUrl.pathname,
     method: 'POST',
-    headers: {
-      ...params.headers(),
-    },
-    agent: agent,
+    headers,
+    agent,
   };
 
   const req = request(options, (res: http.IncomingMessage) => {
@@ -65,7 +74,7 @@ export function sendWithHttp(
           status: 'success',
           data: Buffer.concat(responseData),
         });
-      } else if (res.statusCode && isExportRetryable(res.statusCode)) {
+      } else if (res.statusCode && isExportHTTPErrorRetryable(res.statusCode)) {
         onDone({
           status: 'retryable',
           retryInMillis: parseRetryAfterToMills(res.headers['retry-after']),
@@ -87,19 +96,26 @@ export function sendWithHttp(
   req.setTimeout(timeoutMillis, () => {
     req.destroy();
     onDone({
-      status: 'failure',
-      error: new Error('Request Timeout'),
+      status: 'retryable',
+      error: new Error('Request timed out'),
     });
   });
 
   req.on('error', (error: Error) => {
-    onDone({
-      status: 'failure',
-      error,
-    });
+    if (isHttpTransportNetworkErrorRetryable(error)) {
+      onDone({
+        status: 'retryable',
+        error,
+      });
+    } else {
+      onDone({
+        status: 'failure',
+        error,
+      });
+    }
   });
 
-  compressAndSend(req, params.compression, data, (error: Error) => {
+  compressAndSend(req, compression, data, (error: Error) => {
     onDone({
       status: 'failure',
       error,
@@ -132,4 +148,23 @@ function readableFromUint8Array(buff: string | Uint8Array): Readable {
   readable.push(null);
 
   return readable;
+}
+
+function isHttpTransportNetworkErrorRetryable(error: Error): boolean {
+  const RETRYABLE_NETWORK_ERROR_CODES = new Set([
+    'ECONNRESET',
+    'ECONNREFUSED',
+    'EPIPE',
+    'ETIMEDOUT',
+    'EAI_AGAIN',
+    'ENOTFOUND',
+    'ENETUNREACH',
+    'EHOSTUNREACH',
+  ]);
+
+  if ('code' in error && typeof error.code === 'string') {
+    return RETRYABLE_NETWORK_ERROR_CODES.has(error.code);
+  }
+
+  return false;
 }

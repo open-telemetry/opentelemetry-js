@@ -25,25 +25,25 @@ jobs:
   create-or-update-release-pr:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2.0.6
+      - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         id: otelbot-token
         with:
           app-id: ${{ vars.OTELBOT_JS_APP_ID }}
           private-key: ${{ secrets.OTELBOT_JS_PRIVATE_KEY }}
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           token: ${{ steps.otelbot-token.outputs.token }}
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
         with:
           cache: 'npm'
           cache-dependency-path: package-lock.json
           node-version: 22
       - run: npm install -g npm@latest
 
-      - run: npm ci
+      - run: npm ci --ignore-scripts
 
       - name: Create/Update Release PR
         run: |
@@ -53,5 +53,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.otelbot-token.outputs.token }}
           RELEASE_SCOPE: ${{ github.event.inputs.release_scope }}
-          RELEASE_KIND: ${{ github.event.inputs.release_scope }}:${{ github.event.inputs.release_type }}
+          RELEASE_TYPE: ${{ github.event.inputs.release_type }}
           RELEASE_PR_REMOTE: origin

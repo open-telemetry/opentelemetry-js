@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 export class Buckets {
+  public backing;
+  public indexBase;
+  public indexStart;
+  public indexEnd;
   /**
    * The term index refers to the number of the exponential histogram bucket
    * used to determine its boundaries. The lower boundary of a bucket is
@@ -32,11 +36,16 @@ export class Buckets {
    * the backing array.
    */
   constructor(
-    public backing = new BucketsBacking(),
-    public indexBase = 0,
-    public indexStart = 0,
-    public indexEnd = 0
-  ) {}
+    backing = new BucketsBacking(),
+    indexBase = 0,
+    indexStart = 0,
+    indexEnd = 0
+  ) {
+    this.backing = backing;
+    this.indexBase = indexBase;
+    this.indexStart = indexStart;
+    this.indexEnd = indexEnd;
+  }
 
   /**
    * Offset is the bucket index of the smallest entry in the counts array
@@ -216,7 +225,11 @@ export class Buckets {
  * manage them.
  */
 class BucketsBacking {
-  constructor(private _counts = [0]) {}
+  private _counts;
+
+  constructor(counts = [0]) {
+    this._counts = counts;
+  }
 
   /**
    * length returns the physical size of the backing array, which

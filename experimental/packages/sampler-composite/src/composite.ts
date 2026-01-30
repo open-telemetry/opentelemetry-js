@@ -36,7 +36,11 @@ import {
 } from './util';
 
 class CompositeSampler implements Sampler {
-  constructor(private readonly delegate: ComposableSampler) {}
+  private readonly delegate: ComposableSampler;
+
+  constructor(delegate: ComposableSampler) {
+    this.delegate = delegate;
+  }
 
   shouldSample(
     context: Context,

@@ -198,7 +198,10 @@ function createMainResource(resource = {}): PerformanceResourceTiming {
 
 function createFakePerformanceObs(url: string) {
   class FakePerfObs implements PerformanceObserver {
-    constructor(private readonly cb: PerformanceObserverCallback) {}
+    private readonly cb: PerformanceObserverCallback;
+    constructor(cb: PerformanceObserverCallback) {
+      this.cb = cb;
+    }
 
     observe() {
       const absoluteUrl = url.startsWith('http') ? url : location.origin + url;

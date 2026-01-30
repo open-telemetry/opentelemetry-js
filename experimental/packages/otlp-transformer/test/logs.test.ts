@@ -23,9 +23,9 @@ import {
 import * as assert from 'assert';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
+import { JSON_ENCODER, PROTOBUF_ENCODER, Encoder } from '../src/common/utils';
 import { toBase64 } from './utils';
 import * as root from '../src/generated/root';
-import { OtlpEncodingOptions } from '../src/common/internal-types';
 import {
   ESeverityNumber,
   IExportLogsServiceRequest,
@@ -33,25 +33,17 @@ import {
 import { createExportLogsServiceRequest } from '../src/logs/internal';
 import { ProtobufLogsSerializer } from '../src/logs/protobuf';
 import { JsonLogsSerializer } from '../src/logs/json';
-import { hexToBinary } from '../src/common/hex-to-binary';
 
-function createExpectedLogJson(
-  options: OtlpEncodingOptions
-): IExportLogsServiceRequest {
-  const useHex = options.useHex ?? false;
-  const useLongBits = options.useLongBits ?? true;
+function createExpectedLogJson(encoder: Encoder): IExportLogsServiceRequest {
+  const timeUnixNano = encoder.encodeHrTime([1680253513, 123241635]);
+  const observedTimeUnixNano = encoder.encodeHrTime([1683526948, 965142784]);
 
-  const timeUnixNano = useLongBits
-    ? { low: 4132445859, high: 391214506 }
-    : '1680253513123241635';
-  const observedTimeUnixNano = useLongBits
-    ? { low: 584929536, high: 391976663 }
-    : '1683526948965142784';
+  const traceId = encoder.encodeSpanContext('00000000000000000000000000000001');
+  const spanId = encoder.encodeSpanContext('0000000000000002');
 
-  const traceId = useHex
-    ? '00000000000000000000000000000001'
-    : hexToBinary('00000000000000000000000000000001');
-  const spanId = useHex ? '0000000000000002' : hexToBinary('0000000000000002');
+  // Encode Uint8Array test bytes
+  const testBytes = new Uint8Array([1, 2, 3, 4, 5]);
+  const bytesValue = encoder.encodeUint8Array(testBytes);
 
   return {
     resourceLogs: [
@@ -87,6 +79,10 @@ function createExpectedLogJson(
                     key: 'some-attribute',
                     value: { stringValue: 'some attribute value' },
                   },
+                  {
+                    key: 'bytes-attribute',
+                    value: { bytesValue: bytesValue },
+                  },
                 ],
                 droppedAttributesCount: 0,
                 flags: 1,
@@ -105,6 +101,12 @@ function createExpectedLogJson(
 function createExpectedLogProtobuf(): IExportLogsServiceRequest {
   const traceId = toBase64('00000000000000000000000000000001');
   const spanId = toBase64('0000000000000002');
+
+  // Base64 encoding of Uint8Array([1, 2, 3, 4, 5])
+  // Note: protobuf serializer encodes as binary. However, when decoding, with protobuf.js
+  // we use `bytes: String`, as otherwise the type will be different for Node.js (Buffer) and Browser (Uint8Array)
+  // which makes assertions overly complex.
+  const bytesValue = 'AQIDBAU=';
 
   return {
     resourceLogs: [
@@ -146,6 +148,10 @@ function createExpectedLogProtobuf(): IExportLogsServiceRequest {
                     key: 'some-attribute',
                     value: { stringValue: 'some attribute value' },
                   },
+                  {
+                    key: 'bytes-attribute',
+                    value: { bytesValue: bytesValue },
+                  },
                 ],
                 droppedAttributesCount: 0,
                 flags: 1,
@@ -169,6 +175,7 @@ const DEFAULT_LOG_FRAGMENT: Omit<
   hrTimeObserved: [1683526948, 965142784] as HrTime,
   attributes: {
     'some-attribute': 'some attribute value',
+    'bytes-attribute': new Uint8Array([1, 2, 3, 4, 5]),
   },
   droppedAttributesCount: 0,
   severityNumber: SeverityNumber.ERROR,
@@ -264,40 +271,39 @@ describe('Logs', () => {
 
   describe('createExportLogsServiceRequest', () => {
     it('returns null on an empty list', () => {
-      assert.deepStrictEqual(
-        createExportLogsServiceRequest([], { useHex: true }),
-        {
-          resourceLogs: [],
-        }
-      );
+      assert.deepStrictEqual(createExportLogsServiceRequest([], JSON_ENCODER), {
+        resourceLogs: [],
+      });
     });
 
     it('serializes a log record with useHex = true', () => {
-      const exportRequest = createExportLogsServiceRequest([log_1_1_1], {
-        useHex: true,
-      });
+      const exportRequest = createExportLogsServiceRequest(
+        [log_1_1_1],
+        JSON_ENCODER
+      );
       assert.ok(exportRequest);
       assert.deepStrictEqual(
         exportRequest,
-        createExpectedLogJson({ useHex: true })
+        createExpectedLogJson(JSON_ENCODER)
       );
     });
 
     it('serializes a log record with useHex = false', () => {
-      const exportRequest = createExportLogsServiceRequest([log_1_1_1], {
-        useHex: false,
-      });
+      const exportRequest = createExportLogsServiceRequest(
+        [log_1_1_1],
+        PROTOBUF_ENCODER
+      );
       assert.ok(exportRequest);
       assert.deepStrictEqual(
         exportRequest,
-        createExpectedLogJson({ useHex: false })
+        createExpectedLogJson(PROTOBUF_ENCODER)
       );
     });
 
     it('aggregates multiple logs with same resource and same scope', () => {
       const exportRequest = createExportLogsServiceRequest(
         [log_1_1_1, log_1_1_2],
-        { useHex: false }
+        PROTOBUF_ENCODER
       );
       assert.ok(exportRequest);
       assert.strictEqual(exportRequest.resourceLogs?.length, 1);
@@ -311,7 +317,7 @@ describe('Logs', () => {
     it('aggregates multiple logs with same resource and different scopes', () => {
       const exportRequest = createExportLogsServiceRequest(
         [log_1_1_1, log_1_2_1],
-        { useHex: false }
+        PROTOBUF_ENCODER
       );
       assert.ok(exportRequest);
       assert.strictEqual(exportRequest.resourceLogs?.length, 1);
@@ -321,7 +327,7 @@ describe('Logs', () => {
     it('aggregates multiple logs with different resources', () => {
       const exportRequest = createExportLogsServiceRequest(
         [log_1_1_1, log_2_1_1],
-        { useHex: false }
+        PROTOBUF_ENCODER
       );
       assert.ok(exportRequest);
       assert.strictEqual(exportRequest.resourceLogs?.length, 2);
@@ -339,9 +345,10 @@ describe('Logs', () => {
         DEFAULT_LOG_FRAGMENT
       );
 
-      const exportRequest = createExportLogsServiceRequest([logWithSchema], {
-        useHex: true,
-      });
+      const exportRequest = createExportLogsServiceRequest(
+        [logWithSchema],
+        JSON_ENCODER
+      );
 
       assert.ok(exportRequest);
       assert.strictEqual(exportRequest.resourceLogs?.length, 1);
@@ -349,6 +356,22 @@ describe('Logs', () => {
         exportRequest.resourceLogs?.[0].schemaUrl,
         'https://opentelemetry.test/schemas/1.2.3'
       );
+    });
+
+    it('encodes Uint8Array to base64 when used with JSON_ENCODER', () => {
+      const exportRequest = createExportLogsServiceRequest(
+        [log_1_1_1],
+        JSON_ENCODER
+      );
+      assert.ok(exportRequest);
+      const bytesAttr =
+        exportRequest.resourceLogs?.[0].scopeLogs[0].logRecords?.[0].attributes?.find(
+          attr => attr.key === 'bytes-attribute'
+        );
+      assert.ok(bytesAttr, 'bytes-attribute not found');
+      // JSON_ENCODER should encode Uint8Array as base64 string in bytesValue
+      assert.strictEqual(bytesAttr.value.bytesValue, 'AQIDBAU=');
+      assert.strictEqual(bytesAttr.value.stringValue, undefined);
     });
   });
 
@@ -416,14 +439,14 @@ describe('Logs', () => {
     it('serializes an export request', () => {
       // stringify, then parse to remove undefined keys in the expected JSON
       const expected = JSON.parse(
-        JSON.stringify(
-          createExpectedLogJson({ useHex: true, useLongBits: false })
-        )
+        JSON.stringify(createExpectedLogJson(JSON_ENCODER))
       );
       const serialized = JsonLogsSerializer.serializeRequest([log_1_1_1]);
 
       const decoder = new TextDecoder();
-      assert.deepStrictEqual(JSON.parse(decoder.decode(serialized)), expected);
+      const actual = JSON.parse(decoder.decode(serialized));
+
+      assert.deepStrictEqual(actual, expected);
     });
 
     it('deserializes a response', () => {

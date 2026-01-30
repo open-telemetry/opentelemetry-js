@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-jaeger",
-  "version": "2.1.0",
+  "version": "2.5.0",
   "description": "OpenTelemetry Exporter Jaeger allows user to send collected traces to Jaeger",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -15,7 +15,6 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
     "watch": "tsc --build --watch",
-    "precompile": "lerna run version --scope @opentelemetry/exporter-jaeger --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../scripts/align-api-deps.js"
@@ -45,12 +44,11 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "^1.0.0",
-    "@opentelemetry/resources": "2.1.0",
+    "@opentelemetry/resources": "2.5.0",
     "@types/mocha": "10.0.10",
-    "@types/node": "18.6.5",
+    "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
-    "lerna": "6.6.2",
-    "mocha": "11.7.2",
+    "mocha": "11.7.5",
     "nock": "13.5.6",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
@@ -60,8 +58,8 @@
     "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "2.1.0",
-    "@opentelemetry/sdk-trace-base": "2.1.0",
+    "@opentelemetry/core": "2.5.0",
+    "@opentelemetry/sdk-trace-base": "2.5.0",
     "@opentelemetry/semantic-conventions": "^1.29.0",
     "jaeger-client": "^3.15.0"
   },

@@ -30,16 +30,23 @@ interface Utils {
 
 class HttpExporterTransport implements IExporterTransport {
   private _utils: Utils | null = null;
+  private _parameters: NodeHttpRequestParameters;
 
-  constructor(private _parameters: NodeHttpRequestParameters) {}
+  constructor(parameters: NodeHttpRequestParameters) {
+    this._parameters = parameters;
+  }
 
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
     const { agent, request } = await this._loadUtils();
+    const headers = await this._parameters.headers();
 
     return new Promise<ExportResponse>(resolve => {
       sendWithHttp(
         request,
-        this._parameters,
+        this._parameters.url,
+        headers,
+        this._parameters.compression,
+        this._parameters.userAgent,
         agent,
         data,
         result => {

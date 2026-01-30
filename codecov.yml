@@ -1,6 +1,12 @@
 codecov:
   notify:
     require_ci_to_pass: no
+ignore:
+  - "*.js"
+  - "**/karma.*.js"
+  - "**/.eslintrc.js"
+  - "**/*.config.*"
+  - "scripts/"
 comment:
   layout: "header, changes, diff, files"
   behavior: default

@@ -14,9 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
         with:
           cache: 'npm'
           cache-dependency-path: |
@@ -25,7 +25,7 @@ jobs:
 
       - name: Install and Build 🔧
         run: |
-          npm ci
+          npm ci --ignore-scripts
           npm run compile
 
       - name: Build Docs

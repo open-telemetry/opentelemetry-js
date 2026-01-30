@@ -58,7 +58,7 @@ describe('createOtlpHttpExportDelegate', function () {
         agentFactory: () => new http.Agent(),
         compression: 'none',
         concurrencyLimit: 30,
-        headers: () => ({}),
+        headers: async () => ({}),
         timeoutMillis: 1000,
       },
       serializer

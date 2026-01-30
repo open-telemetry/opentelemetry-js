@@ -23,7 +23,7 @@ import {
   ATTR_TELEMETRY_SDK_VERSION,
 } from '@opentelemetry/semantic-conventions';
 import { Resource } from './Resource';
-import { defaultServiceName } from './platform';
+import { defaultServiceName } from './default-service-name';
 import {
   DetectedResource,
   DetectedResourceAttributes,

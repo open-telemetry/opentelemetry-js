@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/template",
-  "version": "2.1.0",
+  "version": "2.5.0",
   "private": true,
   "publishConfig": {
     "access": "restricted"
@@ -30,7 +30,6 @@
     "compile": "tsc --build",
     "version": "node ../../scripts/version-update.js",
     "clean": "tsc --build --clean",
-    "precompile": "lerna run version --scope @opentelemetry/template --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../scripts/align-api-deps.js"
@@ -77,8 +76,7 @@
     "build/esnext/**/*.d.ts"
   ],
   "devDependencies": {
-    "@types/node": "18.6.5",
-    "lerna": "6.6.2",
+    "@types/node": "18.19.130",
     "typescript": "5.0.4"
   },
   "Add these to devDependencies for testing": {

@@ -25,7 +25,7 @@ import {
 
 const testTransportParameters = {
   url: 'http://example.test',
-  headers: () => ({
+  headers: async () => ({
     foo: 'foo-value',
     bar: 'bar-value',
     'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ describe('FetchTransport', function () {
       }, done /* catch any rejections */);
     });
 
-    it('returns failure when request times out', function (done) {
+    it('returns failure when request is aborted', function (done) {
       // arrange
       const abortError = new Error('aborted request');
       abortError.name = 'AbortError';
@@ -137,7 +137,7 @@ describe('FetchTransport', function () {
           assert.strictEqual(response.status, 'failure');
           assert.strictEqual(
             (response as ExportResponseFailure).error.message,
-            'Fetch request timed out'
+            'Fetch request errored'
           );
         } catch (e) {
           done(e);
@@ -147,7 +147,7 @@ describe('FetchTransport', function () {
       clock.tick(requestTimeout + 100);
     });
 
-    it('returns failure when no server exists', function (done) {
+    it('returns failure when fetch throws non-network error', function (done) {
       // arrange
       sinon.stub(globalThis, 'fetch').throws(new Error('fetch failed'));
       const clock = sinon.useFakeTimers();
@@ -168,6 +168,28 @@ describe('FetchTransport', function () {
         done();
       }, done /* catch any rejections */);
       clock.tick(requestTimeout + 100);
+    });
+
+    it('returns retryable when browser fetch throws network error', function (done) {
+      // arrange
+      // Browser fetch throws TypeError for network errors
+      sinon.stub(globalThis, 'fetch').rejects(new TypeError('Failed to fetch'));
+      const transport = createFetchTransport(testTransportParameters);
+
+      //act
+      transport.send(testPayload, requestTimeout).then(response => {
+        // assert
+        try {
+          assert.strictEqual(response.status, 'retryable');
+          assert.strictEqual(
+            response.error?.message,
+            'Fetch request encountered a network error'
+          );
+        } catch (e) {
+          done(e);
+        }
+        done();
+      }, done /* catch any rejections */);
     });
   });
 });
