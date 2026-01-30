@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { BindableProvider } from '../common/Entity';
 import { Meter, MeterOptions } from './Meter';
 
 /**
@@ -21,7 +22,7 @@ import { Meter, MeterOptions } from './Meter';
  *
  * @since 1.3.0
  */
-export interface MeterProvider {
+export interface MeterProvider extends BindableProvider<MeterProvider> {
   /**
    * Returns a Meter, creating one if one with the given name, version, and
    * schemaUrl pair is not already created.

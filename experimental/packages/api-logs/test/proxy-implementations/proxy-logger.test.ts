@@ -51,6 +51,9 @@ describe('ProxyLogger', () => {
       getLoggerStub = sandbox.stub().returns(new NoopLogger());
       delegate = {
         getLogger: getLoggerStub,
+        forEntity(entity) {
+          return this;
+        },
       };
       provider._setDelegate(delegate);
     });
@@ -102,6 +105,9 @@ describe('ProxyLogger', () => {
       delegateProvider = {
         getLogger() {
           return delegateLogger;
+        },
+        forEntity() {
+          return this;
         },
       };
       provider._setDelegate(delegateProvider);

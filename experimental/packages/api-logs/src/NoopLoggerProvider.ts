@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import { LoggerProvider } from './types/LoggerProvider';
+import { Entity } from '@opentelemetry/api';
+import { NoopLogger } from './NoopLogger';
 import { Logger } from './types/Logger';
 import { LoggerOptions } from './types/LoggerOptions';
-import { NoopLogger } from './NoopLogger';
+import { LoggerProvider } from './types/LoggerProvider';
 
 export class NoopLoggerProvider implements LoggerProvider {
   getLogger(
@@ -26,6 +27,10 @@ export class NoopLoggerProvider implements LoggerProvider {
     _options?: LoggerOptions | undefined
   ): Logger {
     return new NoopLogger();
+  }
+
+  forEntity(_entity: Entity): LoggerProvider {
+    return this;
   }
 }
 

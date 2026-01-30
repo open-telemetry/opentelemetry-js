@@ -93,6 +93,13 @@ class ResourceImpl implements Resource {
     this._schemaUrl = validateSchemaUrl(options?.schemaUrl);
   }
 
+  addEntity(entity: Entity): Resource {
+    const newEntities = [...this._entities, entity];
+    return new ResourceImpl(this._rawAttributes, newEntities, {
+      schemaUrl: this._schemaUrl,
+    });
+  }
+
   public get asyncAttributesPending(): boolean {
     return (
       this._asyncAttributesPending ||

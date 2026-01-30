@@ -70,4 +70,6 @@ export interface Resource {
   merge(other: Resource | null): Resource;
 
   getRawAttributes(): RawResourceAttribute[];
+
+  addEntity(entity: Entity): Resource;
 }
