@@ -49,35 +49,15 @@ export interface MeterProviderOptions {
 export class MeterProvider implements IMeterProvider {
   private _sharedState: MeterProviderSharedState;
   private _shutdown = false;
+  private _config: MeterProviderOptions;
 
-  forEntity(_entity: Entity): IMeterProvider {
-    throw new Error('Method not implemented.');
-    // // No-op implementation for compatibility with BindableProvider interface
-    // return new MeterProvider({
-    //   resource: this._sharedState.resource.merge(
-    //     resourceFromDetectedResource({
-    //       entities: [entity],
-    //     })
-    //   ),
-    //   readers: this._sharedState.metricCollectors.map(
-    //     collector => collector['_metricReader']
-    //   ),
-    //   views: this._sharedState.viewRegistry['_registeredViews'].map(
-    //     viewRecord => ({
-    //       instrumentName: viewRecord['name'],
-    //       instrumentVersion: viewRecord['version'],
-    //       instrumentType: viewRecord['type'],
-    //       attributeKeys: viewRecord['attributeKeys'],
-    //       aggregation: viewRecord['aggregation'],
-    //       meterSelector: viewRecord['meterSelector'],
-    //       entitySelector: viewRecord['entitySelector'],
-    //       schemaUrl: viewRecord['schemaUrl'],
-    //     })
-    //   ),
-    // });
+  forEntity(entity: Entity): IMeterProvider {
+    const newResource = this._sharedState.resource.addEntity(entity);
+    return new MeterProvider({ ...this._config, resource: newResource });
   }
 
   constructor(options?: MeterProviderOptions) {
+    this._config = options ?? {};
     this._sharedState = new MeterProviderSharedState(
       options?.resource ?? defaultResource()
     );
