@@ -29,11 +29,6 @@ export interface FetchTransportParameters {
 }
 
 class FetchTransport implements IExporterTransport {
-  // Keep a ref of the fetch API on top so this transport is not
-  // affected by instrumentations wrapping. It's important the transport
-  // is created before any instrumentation that wraps `fetch`.
-  // This API is in globalThis so we do not affect any (X)ITM hook if used in Node.js
-  private _fetchApi = globalThis.fetch;
   private _parameters: FetchTransportParameters;
 
   constructor(parameters: FetchTransportParameters) {
@@ -43,10 +38,23 @@ class FetchTransport implements IExporterTransport {
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
     const abortController = new AbortController();
     const timeout = setTimeout(() => abortController.abort(), timeoutMillis);
+    // Fetch API may be wrapped by an instrumentation lile `@opentelemetry/instrumentation-fetch`.
+    // In that case the instrumentation would create a new Span for this request
+    // because the context manager cannot keep the context after `await` calls.
+    // This creates an indirect endless loop Export -> Span -> Export
+    // By using the `__original` function the instrumentation can't intercept the call
+    // and no Span will be created breaking the vicious cycle
+    let fetchApi = globalThis.fetch;
+    // @ts-expect-error -- fetch could be wrapped
+    if (typeof fetchApi.__original === 'function') {
+      // @ts-expect-error -- fetch could be wrapped
+      fetchApi = fetchApi.__original;
+    }
+
     try {
       const isBrowserEnvironment = !!globalThis.location;
       const url = new URL(this._parameters.url);
-      const response = await this._fetchApi(url.href, {
+      const response = await fetchApi(url.href, {
         method: 'POST',
         headers: await this._parameters.headers(),
         body: data,
