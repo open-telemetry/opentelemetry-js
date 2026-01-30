@@ -17,6 +17,7 @@ import { ISerializer } from '../../i-serializer';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { createExportLogsServiceRequest } from '../internal';
 import { IExportLogsServiceResponse } from '../export-response';
+import { JSON_ENCODER } from '../../common/utils';
 
 /*
  * @experimental this serializer may receive breaking changes in minor versions, pin this package's version when using this constant
@@ -26,10 +27,7 @@ export const JsonLogsSerializer: ISerializer<
   IExportLogsServiceResponse
 > = {
   serializeRequest: (arg: ReadableLogRecord[]) => {
-    const request = createExportLogsServiceRequest(arg, {
-      useHex: true,
-      useLongBits: false,
-    });
+    const request = createExportLogsServiceRequest(arg, JSON_ENCODER);
     const encoder = new TextEncoder();
     return encoder.encode(JSON.stringify(request));
   },
