@@ -12,6 +12,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
   * (user-facing): environment variable configuration is no longer applied automatically when instantiating SDK components
     (`LoggerProvider`, `BatchLogRecordProcessor`) directly from `@opentelemetry/sdk-logs`. Please migrate to using
     `NodeSDK` from `@opentelemetry/sdk-node` to get automatic environment variable configuration.
+* feat(sdk-logs)!: add required `forceFlush()` to `LogRecordExporter` interface [#????](https://github.com/open-telemetry/opentelemetry-js/pull/????) @pichlermarc
+  * (user-facing): `LogRecordExporter` interface now requires a `forceFlush()` method to be implemented. Custom exporters will need to implement this method to continue working with the Logs SDK.
 
 ### :rocket: Features
 
@@ -21,6 +23,7 @@ feat(configuration): parse config for rc 3 [#6304](https://github.com/open-telem
 
 * fix(exporter-prometheus): add missing `@opentelemetry/semantic-conventions` dependency [#6330](https://github.com/open-telemetry/opentelemetry-js/pull/6330) @omizha
 * fix(otlp-transformer): correctly handle Uint8Array attribute values when serializing to JSON [#6348](https://github.com/open-telemetry/opentelemetry-js/pull/6348) @pichlermarc
+* fix(sdk-logs): invoke exporter forceFlush without first awaiting export [#????](https://github.com/open-telemetry/opentelemetry-js/pull/????) @pichlermarc
 
 ### :books: Documentation
 
