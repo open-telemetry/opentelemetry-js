@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { Entity } from '../common/Entity';
 import { NoopTracer } from './NoopTracer';
 import { Tracer } from './tracer';
 import { TracerOptions } from './tracer_options';
@@ -32,5 +33,9 @@ export class NoopTracerProvider implements TracerProvider {
     _options?: TracerOptions
   ): Tracer {
     return new NoopTracer();
+  }
+
+  forEntity(_entity: Entity): TracerProvider {
+    return this;
   }
 }

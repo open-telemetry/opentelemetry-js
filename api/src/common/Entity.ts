@@ -25,4 +25,6 @@ export type Entity = {
   identifier: Attributes;
   attributes: Attributes;
   schemaUrl?: string;
+  asyncAttributesPending: boolean;
+  waitForAsyncAttributes(): Promise<void>;
 };

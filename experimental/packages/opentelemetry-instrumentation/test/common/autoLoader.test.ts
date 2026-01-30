@@ -31,6 +31,9 @@ class DummyTracerProvider implements TracerProvider {
   getTracer(name: string, version?: string): Tracer {
     throw new Error('not implemented');
   }
+  forEntity(entity: Entity): TracerProvider {
+    throw new Error('Method not implemented.');
+  }
 }
 
 class DummyMeterProvider implements MeterProvider {
