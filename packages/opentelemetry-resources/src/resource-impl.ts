@@ -33,7 +33,7 @@ import {
 } from './types';
 import { isPromiseLike } from './utils';
 import { EntityImpl, mergeEntities } from './entity-impl';
-import { Entity } from './entity';
+import { Entity } from '@opentelemetry/api';
 
 class ResourceImpl implements Resource {
   private _rawAttributes: RawResourceAttribute[];

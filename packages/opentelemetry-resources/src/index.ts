@@ -23,7 +23,7 @@ export {
   processDetector,
   serviceInstanceIdDetector,
 } from './detectors';
-export type { Entity } from './entity';
+export type { Entity } from '@opentelemetry/api';
 export { defaultServiceName } from './platform';
 export type { Resource } from './Resource';
 export {

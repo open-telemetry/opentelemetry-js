@@ -17,7 +17,7 @@
 import { Attributes, AttributeValue, diag } from '@opentelemetry/api';
 import { DetectedEntity, DetectedResourceAttributeValue } from './types';
 import { identity, isPromiseLike } from './utils';
-import { Entity } from './entity';
+import { Entity } from '@opentelemetry/api';
 
 export class EntityImpl implements Entity {
   private _type: string;
