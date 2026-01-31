@@ -53,7 +53,8 @@ class FetchTransport implements IExporterTransport {
         headers: await this._parameters.headers(),
         body: data,
         signal: abortController.signal,
-        keepalive: isBrowserEnvironment && data.byteLength < KEEPALIVE_BODY_SIZE_LIMIT,
+        keepalive:
+          isBrowserEnvironment && data.byteLength < KEEPALIVE_BODY_SIZE_LIMIT,
         mode: isBrowserEnvironment
           ? globalThis.location?.origin === url.origin
             ? 'same-origin'
