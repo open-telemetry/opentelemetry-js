@@ -33,10 +33,41 @@ import { OTLPTraceExporter } from '../../src/platform/browser/index';
 describe('OTLPTraceExporter', () => {
   afterEach(() => {
     sinon.restore();
+    delete (globalThis as any).fetchLater;
   });
 
   describe('export', function () {
+    describe('when fetchLater is available', function () {
+      it('should successfully send data using fetchLater', async function () {
+        // arrange
+        const fetchLaterStub = sinon.stub().returns({ activated: false });
+        (globalThis as any).fetchLater = fetchLaterStub;
+        const tracerProvider = new BasicTracerProvider({
+          spanProcessors: [new SimpleSpanProcessor(new OTLPTraceExporter())],
+        });
+
+        // act
+        tracerProvider.getTracer('test-tracer').startSpan('test-span').end();
+        await tracerProvider.shutdown();
+
+        // assert
+        assert.ok(fetchLaterStub.called, 'fetchLater should be called');
+        const [url, options] = fetchLaterStub.args[0];
+        assert.ok(url.endsWith('/v1/traces'), 'URL should end with /v1/traces');
+        assert.strictEqual(options.method, 'POST');
+        assert.doesNotThrow(
+          () => JSON.parse(new TextDecoder().decode(options.body)),
+          'expected requestBody to be in JSON format, but parsing failed'
+        );
+      });
+    });
+
     describe('when sendBeacon is available', function () {
+      beforeEach(function () {
+        // disable fetchLater so sendBeacon is used
+        (globalThis as any).fetchLater = undefined;
+      });
+
       it('should successfully send data using sendBeacon', async function () {
         // arrange
         const stubBeacon = sinon.stub(navigator, 'sendBeacon');
@@ -61,6 +92,8 @@ describe('OTLPTraceExporter', () => {
 
     describe('when sendBeacon is not available', function () {
       beforeEach(function () {
+        // disable fetchLater so fetch is used
+        (globalThis as any).fetchLater = undefined;
         // fake sendBeacon not being available
         (window.navigator as any).sendBeacon = false;
       });
