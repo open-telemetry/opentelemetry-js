@@ -23,6 +23,13 @@ import {
 } from '../is-export-retryable';
 import { HeadersFactory } from '../configuration/otlp-http-configuration';
 
+/**
+ * Maximum body size for using keepalive flag.
+ * Browsers limit keepalive requests to 64KiB total. We use 60KiB for body
+ * to leave room for headers.
+ */
+const KEEPALIVE_BODY_SIZE_LIMIT = 60 * 1024;
+
 export interface FetchTransportParameters {
   url: string;
   headers: HeadersFactory;
@@ -46,7 +53,7 @@ class FetchTransport implements IExporterTransport {
         headers: await this._parameters.headers(),
         body: data,
         signal: abortController.signal,
-        keepalive: isBrowserEnvironment,
+        keepalive: isBrowserEnvironment && data.byteLength < KEEPALIVE_BODY_SIZE_LIMIT,
         mode: isBrowserEnvironment
           ? globalThis.location?.origin === url.origin
             ? 'same-origin'
