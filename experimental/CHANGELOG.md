@@ -38,6 +38,7 @@ feat(configuration): parse config for rc 3 [#6304](https://github.com/open-telem
 
 ### :rocket: Features
 
+* feat(instrumentation): use the `internals: true` option with import-in-the-middle hook, allowing instrumentations to hook internal files in ES modules [#6344](https://github.com/open-telemetry/opentelemetry-js/pull/6344) @trentm
 * feat(sdk-logs): export event name from ConsoleLogRecordExporter [#6310](https://github.com/open-telemetry/opentelemetry-js/pull/6310) @aicest
 
 ### :bug: Bug Fixes
