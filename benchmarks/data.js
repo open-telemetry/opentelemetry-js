@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1769793090410,
+  "lastUpdate": 1769824512019,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -55375,6 +55375,114 @@ window.BENCHMARK_DATA = {
             "range": "±0.45%",
             "unit": "ops/sec",
             "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f15aa7e67c1ae48bad3ca0628c38a2e1b3450b5b",
+          "message": "feat(instrumentation): use the `internals: true` option with import-in-the-middle hook, allowing instrumentations to hook internal files in ES modules (#6344)",
+          "timestamp": "2026-01-31T01:02:40Z",
+          "tree_id": "fa657f87a91f8381489412a8b4767c1458f326ee",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/f15aa7e67c1ae48bad3ca0628c38a2e1b3450b5b"
+        },
+        "date": 1769824510949,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 512 spans (protobuf)",
+            "value": 166,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "80 samples"
+          },
+          {
+            "name": "transform 512 spans (json)",
+            "value": 278,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "86 samples"
+          },
+          {
+            "name": "transform 512 logs (protobuf)",
+            "value": 146,
+            "range": "±1.00%",
+            "unit": "ops/sec",
+            "extra": "81 samples"
+          },
+          {
+            "name": "transform 512 logs (json)",
+            "value": 250,
+            "range": "±1.75%",
+            "unit": "ops/sec",
+            "extra": "76 samples"
+          },
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 1981023,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 1763116,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 1749588,
+            "range": "±0.41%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 1580264,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 272643,
+            "range": "±1.75%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
+          },
+          {
+            "name": "generateTraceId",
+            "value": 3650344,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "generateSpanId",
+            "value": 4562014,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 298715,
+            "range": "±0.14%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
           }
         ]
       }
