@@ -191,5 +191,49 @@ describe('FetchTransport', function () {
         done();
       }, done /* catch any rejections */);
     });
+
+    it('uses keepalive when body size is less than 60KiB', function (done) {
+      // arrange
+      const smallPayload = new Uint8Array(61439);
+      const fetchStub = sinon
+        .stub(globalThis, 'fetch')
+        .resolves(new Response('', { status: 200 }));
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act
+      transport.send(smallPayload, requestTimeout).then(() => {
+        // assert
+        try {
+          sinon.assert.calledOnce(fetchStub);
+          const callArgs = fetchStub.firstCall.args[1];
+          assert.strictEqual(callArgs?.keepalive, true);
+        } catch (e) {
+          done(e);
+        }
+        done();
+      }, done);
+    });
+
+    it('does not use keepalive when body size is 60KiB or larger', function (done) {
+      // arrange
+      const largePayload = new Uint8Array(61440);
+      const fetchStub = sinon
+        .stub(globalThis, 'fetch')
+        .resolves(new Response('', { status: 200 }));
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act
+      transport.send(largePayload, requestTimeout).then(() => {
+        // assert
+        try {
+          sinon.assert.calledOnce(fetchStub);
+          const callArgs = fetchStub.firstCall.args[1];
+          assert.strictEqual(callArgs?.keepalive, false);
+        } catch (e) {
+          done(e);
+        }
+        done();
+      }, done);
+    });
   });
 });
