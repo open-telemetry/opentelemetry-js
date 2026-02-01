@@ -8,7 +8,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
-* feat(sdk-logs)!: move environment variable configuration to `@opentelemetry/sdk-node` [#????](https://github.com/open-telemetry/opentelemetry-js/pull/????) @pichlermarc
+* feat(sdk-logs)!: move environment variable configuration to `@opentelemetry/sdk-node` [#6325](https://github.com/open-telemetry/opentelemetry-js/pull/6325) @pichlermarc
   * (user-facing): environment variable configuration is no longer applied automatically when instantiating SDK components
     (`LoggerProvider`, `BatchLogRecordProcessor`) directly from `@opentelemetry/sdk-logs`. Please migrate to using
     `NodeSDK` from `@opentelemetry/sdk-node` to get automatic environment variable configuration.
