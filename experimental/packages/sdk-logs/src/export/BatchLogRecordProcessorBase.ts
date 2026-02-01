@@ -150,7 +150,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
       return flush();
     }
     if (this._timer !== undefined) return;
-    this._timer = setTimeout(() => flush(), this._scheduledDelayMillis);
+    this._timer = setTimeout(flush, this._scheduledDelayMillis);
     // depending on runtime, this may be a 'number' or NodeJS.Timeout
     if (typeof this._timer !== 'number') {
       this._timer.unref();
