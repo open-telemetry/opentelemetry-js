@@ -27,7 +27,7 @@ feat(configuration): parse config for rc 3 [#6304](https://github.com/open-telem
 ### :house: Internal
 
 * perf(otlp-transformer): optimize toAnyValue performance [#6287](https://github.com/open-telemetry/opentelemetry-js/pull/6287) @AbhiPrasad
-* refactor(sdk-logs): remove unnecessary closure in \_maybeStartTimer() [#xxxx](https://github.com/open-telemetry/opentelemetry-js/pull/xxxx) @cjihrig
+* refactor(sdk-logs): remove unnecessary closure in \_maybeStartTimer() [#6361](https://github.com/open-telemetry/opentelemetry-js/pull/6361) @cjihrig
 
 ## 0.211.0
 
