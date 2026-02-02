@@ -38,10 +38,6 @@ export class ProxyTracerProvider implements TracerProvider {
   private _delegate?: TracerProvider;
   private _entity?: Entity;
 
-  constructor(entity?: Entity) {
-    this._entity = entity;
-  }
-
   /**
    * Get a {@link ProxyTracer}
    */
@@ -80,6 +76,8 @@ export class ProxyTracerProvider implements TracerProvider {
       return this._delegate.forEntity(entity);
     }
     // Return a new proxy that will apply the entity when a delegate is set
-    return new ProxyTracerProvider(entity);
+    const boundProxy = new ProxyTracerProvider();
+    boundProxy._entity = entity;
+    return boundProxy;
   }
 }
