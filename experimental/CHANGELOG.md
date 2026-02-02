@@ -20,6 +20,7 @@ feat(configuration): parse config for rc 3 [#6304](https://github.com/open-telem
 ### :bug: Bug Fixes
 
 * fix(exporter-prometheus): add missing `@opentelemetry/semantic-conventions` dependency [#6330](https://github.com/open-telemetry/opentelemetry-js/pull/6330) @omizha
+* fix(otlp-transformer): correctly handle Uint8Array attribute values when serializing to JSON [#6348](https://github.com/open-telemetry/opentelemetry-js/pull/6348) @pichlermarc
 * fix(otlp-exporter-base): fix unwanted instrumentation of the fetch exports when context is not propagated [#6353](https://github.com/open-telemetry/opentelemetry-js/pull/6353) @david-luna
 
 ### :books: Documentation
@@ -38,6 +39,7 @@ feat(configuration): parse config for rc 3 [#6304](https://github.com/open-telem
 
 ### :rocket: Features
 
+* feat(instrumentation): use the `internals: true` option with import-in-the-middle hook, allowing instrumentations to hook internal files in ES modules [#6344](https://github.com/open-telemetry/opentelemetry-js/pull/6344) @trentm
 * feat(sdk-logs): export event name from ConsoleLogRecordExporter [#6310](https://github.com/open-telemetry/opentelemetry-js/pull/6310) @aicest
 
 ### :bug: Bug Fixes
