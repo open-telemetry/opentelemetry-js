@@ -82,6 +82,7 @@ feat(configuration): parse config for rc 3 [#6304](https://github.com/open-telem
 
 ### :bug: Bug Fixes
 
+* fix(otlp-exporter-base): use sendBeacon with empty headers [#6216](https://github.com/open-telemetry/opentelemetry-js/pull/6216) @YangJonghun
 * fix(instrumentation-grpc): attach correct name to diag message [#6097](https://github.com/open-telemetry/opentelemetry-js/pull/6043) @pichlermarc
 * fix(opentelemetry-sdk-node): default to otlp if OTEL_METRICS_EXPORTER is empty [#6092](https://github.com/open-telemetry/opentelemetry-js/pull/6092) @jeengbe
 * fix(configuration): merge service name from OTEL_SERVICE_NAME instead of replacing all resource attributes [#6162](https://github.com/open-telemetry/opentelemetry-js/pull/6162) @maryliag
