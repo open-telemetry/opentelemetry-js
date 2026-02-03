@@ -475,10 +475,10 @@ export function getBatchLogRecordProcessorConfigFromEnv(): BufferConfig {
   return {
     maxQueueSize: getNonNegativeNumberFromEnv('OTEL_BLRP_MAX_QUEUE_SIZE'),
     scheduledDelayMillis: getNonNegativeNumberFromEnv(
-      'OTEL_BLRP_SCHEDULED_DELAY_MILLIS'
+      'OTEL_BLRP_SCHEDULE_DELAY'
     ),
     exportTimeoutMillis: getNonNegativeNumberFromEnv(
-      'OTEL_BLRP_EXPORT_TIMEOUT_MILLIS'
+      'OTEL_BLRP_EXPORT_TIMEOUT'
     ),
     maxExportBatchSize: getNonNegativeNumberFromEnv(
       'OTEL_BLRP_MAX_EXPORT_BATCH_SIZE'
