@@ -27,7 +27,7 @@ describeNode('envDetector() on Node.js', () => {
   describe('with valid env', () => {
     before(() => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
-        'k8s.pod.name="pod-xyz-123",k8s.cluster.name="c1",k8s.namespace.name="default",k8s.deployment.name="deployment%20name"';
+        'k8s.pod.name=pod-xyz-123,k8s.cluster.name=c1,k8s.namespace.name=default,k8s.deployment.name=deployment%20name';
     });
 
     after(() => {
@@ -48,7 +48,7 @@ describeNode('envDetector() on Node.js', () => {
   describe('with unencoded spaces in values', () => {
     before(() => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
-        'k8s.deployment.name="deployment name with spaces"';
+        'k8s.deployment.name=deployment name with spaces';
     });
 
     after(() => {
@@ -64,17 +64,36 @@ describeNode('envDetector() on Node.js', () => {
     });
   });
 
-  describe('with other unencoded baggage-invalid characters', () => {
+  describe('with quoted values (backward compatibility)', () => {
     before(() => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
-        'k8s.deployment.name="deployment;name\\with\\delims"';
+        'k8s.deployment.name="deployment name"';
     });
 
     after(() => {
       delete process.env.OTEL_RESOURCE_ATTRIBUTES;
     });
 
-    it('should percent-encode invalid chars and preserve the value', async () => {
+    it('should strip leading and trailing quotes from values', async () => {
+      const resource = resourceFromDetectedResource(envDetector.detect());
+      assert.strictEqual(
+        resource.attributes?.['k8s.deployment.name'],
+        'deployment name'
+      );
+    });
+  });
+
+  describe('with other special characters in values', () => {
+    before(() => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'k8s.deployment.name=deployment%3Bname%5Cwith%5Cdelims';
+    });
+
+    after(() => {
+      delete process.env.OTEL_RESOURCE_ATTRIBUTES;
+    });
+
+    it('should decode percent-encoded chars and preserve the value', async () => {
       const resource = resourceFromDetectedResource(envDetector.detect());
       assert.strictEqual(
         resource.attributes?.['k8s.deployment.name'],
@@ -83,8 +102,8 @@ describeNode('envDetector() on Node.js', () => {
     });
   });
 
-  describe('with invalid env', () => {
-    const values = ['k8s.deployment.name="bad\tvalue"'];
+  describe('with invalid env (invalid percent-encoding)', () => {
+    const values = ['k8s.deployment.name=%E0%A4%'];
 
     for (const value of values) {
       describe(`value: '${value}'`, () => {
@@ -96,7 +115,7 @@ describeNode('envDetector() on Node.js', () => {
           delete process.env.OTEL_RESOURCE_ATTRIBUTES;
         });
 
-        it('should return empty resource', async () => {
+        it('should discard entire env var and return empty resource', async () => {
           const resource = resourceFromDetectedResource(envDetector.detect());
           assertEmptyResource(resource);
         });
@@ -111,60 +130,71 @@ describeNode('envDetector() on Node.js', () => {
     });
   });
 
-  describe('with partially invalid env', () => {
+  describe('with partially invalid env (unencoded = in value)', () => {
     before(() => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
-        'k8s.pod.name="pod-xyz-123",k8s.deployment.name="bad\tvalue",k8s.cluster.name="c1"';
+        'k8s.pod.name=pod-xyz-123,k8s.deployment.name=bad=value,k8s.cluster.name=c1';
     });
 
     after(() => {
       delete process.env.OTEL_RESOURCE_ATTRIBUTES;
     });
 
-    it('should drop invalid attributes but keep the rest', async () => {
+    it('should discard entire env var on any error per spec', async () => {
       const resource = resourceFromDetectedResource(envDetector.detect());
-      assert.strictEqual(
-        resource.attributes?.['k8s.deployment.name'],
-        undefined
-      );
-      assert.strictEqual(resource.attributes?.['k8s.pod.name'], 'pod-xyz-123');
-      assert.strictEqual(resource.attributes?.['k8s.cluster.name'], 'c1');
+      // Per spec: on any error, the entire value SHOULD be discarded
+      assertEmptyResource(resource);
     });
   });
 
-  describe('edge cases for invalid input handling', () => {
+  describe('edge cases for input handling', () => {
     afterEach(() => {
       delete process.env.OTEL_RESOURCE_ATTRIBUTES;
     });
 
-    it('drops attributes with invalid keys', async () => {
-      process.env.OTEL_RESOURCE_ATTRIBUTES = 'bad key=value';
+    it('allows spaces in keys (spec does not forbid)', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES = 'key with spaces=value';
       const resource = resourceFromDetectedResource(envDetector.detect());
-      assertEmptyResource(resource);
+      assert.strictEqual(
+        resource.attributes?.['key with spaces'],
+        'value'
+      );
     });
 
-    it('drops malformed pairs without a key/value separator', async () => {
+    it('discards entire env var when missing key/value separator', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES = 'novalue';
       const resource = resourceFromDetectedResource(envDetector.detect());
       assertEmptyResource(resource);
     });
 
-    it('drops attributes with overlong values even after sanitization', async () => {
+    it('rejects values exceeding 255 characters', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES = `k=${'a'.repeat(300)}`;
       const resource = resourceFromDetectedResource(envDetector.detect());
       assertEmptyResource(resource);
     });
 
-    it('drops attributes with invalid percent-encoding', async () => {
+    it('discards entire env var with invalid percent-encoding', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES = 'k=%E0%A4%';
       const resource = resourceFromDetectedResource(envDetector.detect());
       assertEmptyResource(resource);
     });
 
-    it('drops attributes that decode to non-printable ASCII', async () => {
+    it('allows non-printable ASCII after decoding (spec allows)', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES = 'k=%00';
       const resource = resourceFromDetectedResource(envDetector.detect());
-      assertEmptyResource(resource);
+      assert.strictEqual(
+        resource.attributes?.['k'],
+        '\0'
+      );
+    });
+
+    it('properly decodes percent-encoded comma and equals', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES = 'key%3Dwith%3Dequals=value%2Cwith%2Ccommas';
+      const resource = resourceFromDetectedResource(envDetector.detect());
+      assert.strictEqual(
+        resource.attributes?.['key=with=equals'],
+        'value,with,commas'
+      );
     });
   });
 

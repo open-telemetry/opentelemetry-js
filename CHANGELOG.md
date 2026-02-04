@@ -12,6 +12,11 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* fix(resources)!: update OTEL_RESOURCE_ATTRIBUTES parsing to match spec changes (open-telemetry/opentelemetry-specification#4856) [#6261](https://github.com/open-telemetry/opentelemetry-js/pull/6261) @jacksonweber
+  * On any parsing error, the entire environment variable value is now discarded (per spec)
+  * Removed W3C Baggage octet validation (spec removed this reference)
+  * Retained backward compatibility: quote stripping and 255 character limit
+
 ### :rocket: Features
 
 ### :bug: Bug Fixes
@@ -59,7 +64,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * feat(sdk-trace-base): implement on ending in span processor [#6024](https://github.com/open-telemetry/opentelemetry-js/pull/6024) @majanjua-amzn
   * note: this feature is experimental and subject to change
-* feat(resources): align OTEL_RESOURCE_ATTRIBUTES parsing with W3C baggage encoding (tolerate and percent-encode invalid characters) [#6261](https://github.com/open-telemetry/opentelemetry-js/pull/6261) @jacksonweber
 
 ### :bug: Bug Fixes
 
