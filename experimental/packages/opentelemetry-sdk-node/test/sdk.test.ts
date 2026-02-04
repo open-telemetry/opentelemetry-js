@@ -764,16 +764,8 @@ describe('Node SDK', () => {
     });
 
     describe('with a diag logger', () => {
-      // Local functions to test if a mocked method is ever called with a specific argument or regex matching for an argument.
+      // Local function to test if a mocked method is ever called with regex matching for an argument.
       // Needed because of race condition with parallel detectors.
-      const callArgsContains = (
-        mockedFunction: Sinon.SinonSpy,
-        arg: any
-      ): boolean => {
-        return mockedFunction.getCalls().some(call => {
-          return call.args.some(callarg => arg === callarg);
-        });
-      };
       const callArgsMatches = (
         mockedFunction: Sinon.SinonSpy,
         regex: RegExp
@@ -832,7 +824,8 @@ describe('Node SDK', () => {
 
       describe('with a faulty environment variable', () => {
         beforeEach(() => {
-          process.env.OTEL_RESOURCE_ATTRIBUTES = 'bad=\\attribute';
+          process.env.OTEL_RESOURCE_ATTRIBUTES =
+            'bad=' + 'x'.repeat(300);
         });
 
         it('prints correct error messages when EnvDetector has an invalid variable', async () => {
@@ -850,9 +843,9 @@ describe('Node SDK', () => {
           sdk.start();
 
           assert.ok(
-            callArgsContains(
+            callArgsMatches(
               mockedLoggerMethod,
-              'EnvDetector failed: Attribute value should be a ASCII string with a length not exceed 255 characters.'
+              /EnvDetector failed: Attribute value exceeds the maximum length of 255 characters/
             )
           );
           await sdk.shutdown();
@@ -954,7 +947,7 @@ describe('Node SDK', () => {
 
     it('should configure service instance id via OTEL_RESOURCE_ATTRIBUTES env var', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
-        'service.instance.id=627cc493,service.name=my-service,service.namespace';
+        'service.instance.id=627cc493,service.name=my-service,service.namespace=default';
       const sdk = new NodeSDK();
 
       sdk.start();
