@@ -155,10 +155,7 @@ describeNode('envDetector() on Node.js', () => {
     it('allows spaces in keys (spec does not forbid)', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES = 'key with spaces=value';
       const resource = resourceFromDetectedResource(envDetector.detect());
-      assert.strictEqual(
-        resource.attributes?.['key with spaces'],
-        'value'
-      );
+      assert.strictEqual(resource.attributes?.['key with spaces'], 'value');
     });
 
     it('discards entire env var when missing key/value separator', async () => {
@@ -182,14 +179,12 @@ describeNode('envDetector() on Node.js', () => {
     it('allows non-printable ASCII after decoding (spec allows)', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES = 'k=%00';
       const resource = resourceFromDetectedResource(envDetector.detect());
-      assert.strictEqual(
-        resource.attributes?.['k'],
-        '\0'
-      );
+      assert.strictEqual(resource.attributes?.['k'], '\0');
     });
 
     it('properly decodes percent-encoded comma and equals', async () => {
-      process.env.OTEL_RESOURCE_ATTRIBUTES = 'key%3Dwith%3Dequals=value%2Cwith%2Ccommas';
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'key%3Dwith%3Dequals=value%2Cwith%2Ccommas';
       const resource = resourceFromDetectedResource(envDetector.detect());
       assert.strictEqual(
         resource.attributes?.['key=with=equals'],
