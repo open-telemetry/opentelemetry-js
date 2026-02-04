@@ -87,6 +87,7 @@ export type { PropagationAPI } from './api/propagation';
 export type { SpanAttributes, SpanAttributeValue } from './trace/attributes';
 export type { Link } from './trace/link';
 export { ProxyTracer, type TracerDelegator } from './trace/ProxyTracer';
+// TODO: Remove ProxyTracerProvider export in the next major version.
 export { ProxyTracerProvider } from './trace/ProxyTracerProvider';
 export type { Sampler } from './trace/Sampler';
 export { SamplingDecision, type SamplingResult } from './trace/SamplingResult';

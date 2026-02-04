@@ -1,5 +1,17 @@
-file_format: "1.0-rc.1"
+file_format: "1.0-rc.3"
 resource:
   attributes_list:
 propagator:
   composite_list: tracecontext
+logger_provider:
+  processors:
+    - simple:
+          exporter:
+            console:
+  logger_configurator/development:
+    loggers:
+      - name: io.opentelemetry.contrib.*
+        config:
+          enabled: false
+          minimum_severity: info
+          trace_based: true

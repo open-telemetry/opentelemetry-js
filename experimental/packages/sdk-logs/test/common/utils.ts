@@ -22,13 +22,11 @@ export const validAttributes = {
   'array<number>': [1, 2],
   'array<bool>': [true, false],
   object: { bar: 'foo' },
+  'empty-object': {},
+  'non-homogeneous-array': [0, ''],
 };
 
 export const invalidAttributes = {
-  // invalid attribute empty object
-  object: {},
-  // invalid attribute inhomogeneous array
-  'non-homogeneous-array': [0, ''],
   // This empty length attribute should not be set
   '': 'empty-key',
 };

@@ -31,7 +31,6 @@ import {
   LogRecordExporter,
 } from '../../../src';
 import { BatchLogRecordProcessorBase } from '../../../src/export/BatchLogRecordProcessorBase';
-import { reconfigureLimits } from '../../../src/config';
 import { LoggerProviderSharedState } from '../../../src/internal/LoggerProviderSharedState';
 import {
   defaultResource,
@@ -52,10 +51,13 @@ const createLogRecord = (
   const sharedState = new LoggerProviderSharedState(
     resource || defaultResource(),
     Infinity,
-    reconfigureLimits(limits ?? {}),
+    {
+      attributeCountLimit: limits?.attributeCountLimit ?? 128,
+      attributeValueLengthLimit: limits?.attributeValueLengthLimit ?? Infinity,
+    },
     []
   );
-  const logRecord = new LogRecordImpl(
+  return new LogRecordImpl(
     sharedState,
     {
       name: 'test name',
@@ -66,7 +68,6 @@ const createLogRecord = (
       body: 'body',
     }
   );
-  return logRecord;
 };
 
 describe('BatchLogRecordProcessorBase', () => {

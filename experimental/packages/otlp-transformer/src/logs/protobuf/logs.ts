@@ -22,6 +22,7 @@ import { createExportLogsServiceRequest } from '../internal';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { ExportType } from '../../common/protobuf/protobuf-export-type';
 import { ISerializer } from '../../i-serializer';
+import { PROTOBUF_ENCODER } from '../../common/utils';
 
 const logsResponseType = root.opentelemetry.proto.collector.logs.v1
   .ExportLogsServiceResponse as ExportType<IExportLogsServiceResponse>;
@@ -37,7 +38,7 @@ export const ProtobufLogsSerializer: ISerializer<
   IExportLogsServiceResponse
 > = {
   serializeRequest: (arg: ReadableLogRecord[]) => {
-    const request = createExportLogsServiceRequest(arg);
+    const request = createExportLogsServiceRequest(arg, PROTOBUF_ENCODER);
     return logsRequestType.encode(request).finish();
   },
   deserializeResponse: (arg: Uint8Array) => {

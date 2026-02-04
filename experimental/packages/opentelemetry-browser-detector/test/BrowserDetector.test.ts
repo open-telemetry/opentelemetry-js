@@ -15,7 +15,12 @@
  */
 import * as sinon from 'sinon';
 import { browserDetector } from '../src/BrowserDetector';
-import { assertEmptyResource, assertResource, describeBrowser } from './util';
+import {
+  assertEmptyResource,
+  assertResource,
+  describeBrowser,
+  describeNode,
+} from './util';
 
 describeBrowser('browserDetector()', () => {
   afterEach(() => {
@@ -69,10 +74,27 @@ describeBrowser('browserDetector()', () => {
     });
   });
 
-  it('should return empty resources if user agent is missing', async () => {
+  it('should return empty resource if userAgent is missing', async () => {
     sinon.stub(globalThis, 'navigator').value({
       userAgent: '',
     });
+    const resource = browserDetector.detect();
+    assertEmptyResource(resource);
+  });
+});
+
+describeNode('browserDetector()', () => {
+  it('should return empty resource even if navigator is present', () => {
+    // Cannot use sinon.stub for non-existent properties (Node.js <=20)
+    Object.defineProperty(globalThis, 'navigator', {
+      value: {
+        userAgent: 'dddd',
+        language: 'en-US',
+        userAgentData: undefined,
+      },
+      configurable: true,
+    });
+
     const resource = browserDetector.detect();
     assertEmptyResource(resource);
   });

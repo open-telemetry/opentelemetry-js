@@ -24,6 +24,7 @@ fix(api): prioritize `esnext` export condition as it is more specific [#5458](ht
 * chore: enable tsconfig isolatedModules [#5697](https://github.com/open-telemetry/opentelemetry-js/pull/5697) @legendecas
 * chore: disallow constructor parameter property syntax [#6187](https://github.com/open-telemetry/opentelemetry-js/pull/6187) @legendecas
 * refactor(api): remove platform-specific globalThis, use globalThis directly [#6208](https://github.com/open-telemetry/opentelemetry-js/pull/6208) @overbalance
+* chore(api): mark ProxyTracerProvider as deprecated [#6328](https://github.com/open-telemetry/opentelemetry-js/pull/6328) @cjihrig
 
 ## 1.9.0
 
@@ -31,7 +32,7 @@ fix(api): prioritize `esnext` export condition as it is more specific [#5458](ht
 
 * feat(metrics): added synchronous gauge [#4528](https://github.com/open-telemetry/opentelemetry-js/pull/4528) @clintonb
 * feat(api): allow adding span links after span creation [#4536](https://github.com/open-telemetry/opentelemetry-js/pull/4536) @seemk
-  * This change is non-breaking for end-users, but breaking for Trace SDK implmentations in accordance with the [specification](https://github.com/open-telemetry/opentelemetry-specification/blob/a03382ada8afa9415266a84dafac0510ec8c160f/specification/upgrading.md?plain=1#L97-L122) as new features need to be implemented.
+  * This change is non-breaking for end-users, but breaking for Trace SDK implementations in accordance with the [specification](https://github.com/open-telemetry/opentelemetry-specification/blob/a03382ada8afa9415266a84dafac0510ec8c160f/specification/upgrading.md?plain=1#L97-L122) as new features need to be implemented.
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
 
 ## 1.8.0

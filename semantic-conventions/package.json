@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/semantic-conventions",
-  "version": "1.38.0",
+  "version": "1.39.0",
   "description": "OpenTelemetry semantic conventions",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -62,9 +62,9 @@
     "access": "public"
   },
   "devDependencies": {
-    "@size-limit/file": "^11.0.1",
-    "@size-limit/time": "^11.0.1",
-    "@size-limit/webpack": "^11.0.1",
+    "@size-limit/file": "^12.0.0",
+    "@size-limit/time": "^12.0.0",
+    "@size-limit/webpack": "^12.0.0",
     "@types/mocha": "10.0.10",
     "@types/node": "^14.18.63",
     "@types/sinon": "17.0.4",
@@ -72,7 +72,7 @@
     "nock": "13.5.6",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
-    "size-limit": "^11.0.1",
+    "size-limit": "^12.0.0",
     "ts-node": "10.9.2",
     "typescript": "5.0.4"
   },

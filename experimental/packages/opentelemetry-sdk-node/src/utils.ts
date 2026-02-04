@@ -23,6 +23,7 @@ import {
 } from '@opentelemetry/api';
 import {
   CompositePropagator,
+  getNumberFromEnv,
   getStringFromEnv,
   getStringListFromEnv,
   W3CBaggagePropagator,
@@ -51,6 +52,20 @@ import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { ConfigurationModel } from '@opentelemetry/configuration';
+import {
+  IMetricReader,
+  PeriodicExportingMetricReader,
+  PushMetricExporter,
+} from '@opentelemetry/sdk-metrics';
+import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
+import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
+import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
+import {
+  BatchLogRecordProcessor,
+  BufferConfig,
+  LogRecordExporter,
+  LoggerProviderConfig,
+} from '@opentelemetry/sdk-logs';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
@@ -61,11 +76,11 @@ const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
 export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   // When updating this list, make sure to also update the section `resourceDetectors` on README.
   const resourceDetectors = new Map<string, ResourceDetector>([
-    [RESOURCE_DETECTOR_ENVIRONMENT, envDetector],
     [RESOURCE_DETECTOR_HOST, hostDetector],
     [RESOURCE_DETECTOR_OS, osDetector],
     [RESOURCE_DETECTOR_SERVICE_INSTANCE_ID, serviceInstanceIdDetector],
     [RESOURCE_DETECTOR_PROCESS, processDetector],
+    [RESOURCE_DETECTOR_ENVIRONMENT, envDetector],
   ]);
 
   const resourceDetectorsFromEnv = getStringListFromEnv(
@@ -349,4 +364,133 @@ export function getKeyListFromObjectArray(
   return obj
     .map(item => Object.keys(item))
     .reduce((prev, curr) => prev.concat(curr), []);
+}
+
+export function getNonNegativeNumberFromEnv(
+  envVarName: string
+): number | undefined {
+  const value = getNumberFromEnv(envVarName);
+  if (value != null && value <= 0) {
+    diag.warn(
+      `${envVarName} (${value}) is invalid, expected number greater than 0, using default.`
+    );
+    return undefined;
+  }
+  return value;
+}
+
+export function getPeriodicExportingMetricReaderFromEnv(
+  exporter: PushMetricExporter
+): IMetricReader {
+  const defaultTimeoutMillis = 30_000;
+  const defaultIntervalMillis = 60_000;
+
+  const rawExportIntervalMillis = getNonNegativeNumberFromEnv(
+    'OTEL_METRIC_EXPORT_INTERVAL'
+  );
+  const rawExportTimeoutMillis = getNonNegativeNumberFromEnv(
+    'OTEL_METRIC_EXPORT_TIMEOUT'
+  );
+
+  // Apply defaults
+  const exportIntervalMillis = rawExportIntervalMillis ?? defaultIntervalMillis;
+  let exportTimeoutMillis = rawExportTimeoutMillis ?? defaultTimeoutMillis;
+
+  // Ensure timeout doesn't exceed interval
+  if (exportTimeoutMillis > exportIntervalMillis) {
+    // determine which env vars were set and which ones defaulted for logging purposes
+    const timeoutSource =
+      rawExportTimeoutMillis != null
+        ? rawExportTimeoutMillis.toString()
+        : `${defaultTimeoutMillis}, default`;
+    const intervalSource =
+      rawExportIntervalMillis != null
+        ? rawExportIntervalMillis.toString()
+        : `${defaultIntervalMillis}, default`;
+
+    const bothSetByUser =
+      rawExportTimeoutMillis != null && rawExportIntervalMillis != null;
+    const logMessage = `OTEL_METRIC_EXPORT_TIMEOUT (${timeoutSource}) is greater than OTEL_METRIC_EXPORT_INTERVAL (${intervalSource}). Clamping timeout to interval value.`;
+
+    // only bother users if they explicitly set both values.
+    if (bothSetByUser) {
+      diag.warn(logMessage);
+    } else {
+      diag.info(logMessage);
+    }
+
+    exportTimeoutMillis = exportIntervalMillis;
+  }
+
+  return new PeriodicExportingMetricReader({
+    exportTimeoutMillis,
+    exportIntervalMillis,
+    exporter,
+  });
+}
+
+export function getOtlpMetricExporterFromEnv(): PushMetricExporter {
+  const protocol =
+    (
+      getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_PROTOCOL') ??
+      getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL')
+    )?.trim() || 'http/protobuf'; // Using || to also fall back on empty string
+
+  switch (protocol) {
+    case 'grpc':
+      return new OTLPGrpcMetricExporter();
+    case 'http/json':
+      return new OTLPHttpMetricExporter();
+    case 'http/protobuf':
+      return new OTLPProtoMetricExporter();
+  }
+
+  diag.warn(
+    `Unsupported OTLP metrics protocol: "${protocol}". Using http/protobuf.`
+  );
+  return new OTLPProtoMetricExporter();
+}
+
+/**
+ * Get LoggerProviderConfig from environment variables.
+ */
+export function getLoggerProviderConfigFromEnv(): LoggerProviderConfig {
+  return {
+    logRecordLimits: {
+      attributeCountLimit:
+        getNonNegativeNumberFromEnv('OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT') ??
+        getNonNegativeNumberFromEnv('OTEL_ATTRIBUTE_COUNT_LIMIT'),
+      attributeValueLengthLimit:
+        getNonNegativeNumberFromEnv(
+          'OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT'
+        ) ?? getNonNegativeNumberFromEnv('OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT'),
+    },
+  };
+}
+
+/**
+ * Get configuration for BatchLogRecordProcessor from environment variables.
+ */
+export function getBatchLogRecordProcessorConfigFromEnv(): BufferConfig {
+  return {
+    maxQueueSize: getNonNegativeNumberFromEnv('OTEL_BLRP_MAX_QUEUE_SIZE'),
+    scheduledDelayMillis: getNonNegativeNumberFromEnv(
+      'OTEL_BLRP_SCHEDULED_DELAY_MILLIS'
+    ),
+    exportTimeoutMillis: getNonNegativeNumberFromEnv(
+      'OTEL_BLRP_EXPORT_TIMEOUT_MILLIS'
+    ),
+    maxExportBatchSize: getNonNegativeNumberFromEnv(
+      'OTEL_BLRP_MAX_EXPORT_BATCH_SIZE'
+    ),
+  };
+}
+
+export function getBatchLogRecordProcessorFromEnv(
+  exporter: LogRecordExporter
+): BatchLogRecordProcessor {
+  return new BatchLogRecordProcessor(
+    exporter,
+    getBatchLogRecordProcessorConfigFromEnv()
+  );
 }

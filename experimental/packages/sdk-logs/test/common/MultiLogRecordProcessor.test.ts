@@ -23,7 +23,6 @@ import {
   InMemoryLogRecordExporter,
   SimpleLogRecordProcessor,
 } from './../../src';
-import { loadDefaultConfig } from '../../src/config';
 import { MultiLogRecordProcessor } from './../../src/MultiLogRecordProcessor';
 
 class TestProcessor implements LogRecordProcessor {
@@ -41,7 +40,7 @@ class TestProcessor implements LogRecordProcessor {
 }
 
 const setup = (processors: LogRecordProcessor[] = []) => {
-  const { forceFlushTimeoutMillis } = loadDefaultConfig();
+  const forceFlushTimeoutMillis = 30_000;
   const multiProcessor = new MultiLogRecordProcessor(
     processors,
     forceFlushTimeoutMillis

@@ -19,7 +19,6 @@ import { inferExportDelegateToUse } from '../../src/configuration/create-legacy-
 import {
   createOtlpFetchExportDelegate,
   createOtlpSendBeaconExportDelegate,
-  createOtlpXhrExportDelegate,
 } from '../../src/otlp-browser-http-export-delegate';
 
 describe('createLegacyBrowserDelegate', function () {
@@ -50,44 +49,6 @@ describe('createLegacyBrowserDelegate', function () {
         const delegate = inferExportDelegateToUse(undefined);
         assert.equal(delegate, createOtlpFetchExportDelegate);
       });
-    });
-
-    describe('when fetch is unavailable', function () {
-      const fetch = window.fetch;
-      beforeEach(function () {
-        // fake fetch being unavailable
-        (window as any).fetch = undefined;
-      });
-      afterEach(() => {
-        window.fetch = fetch;
-      });
-
-      it('uses xhr delegate', function () {
-        const delegate = inferExportDelegateToUse(undefined);
-        assert.equal(delegate, createOtlpXhrExportDelegate);
-      });
-    });
-  });
-
-  describe('when fetch is unavailable but beacon and xhr are', function () {
-    const fetch = window.fetch;
-    beforeEach(function () {
-      // fake fetch being unavailable
-      (window as any).fetch = undefined;
-    });
-    afterEach(function () {
-      window.fetch = fetch;
-    });
-
-    it('uses xhr when beacon is available but headers are provided', function () {
-      const fetch = window.fetch;
-      // @ts-expect-error one should not be able to mutate the window but this is a test.
-      window.fetch = undefined;
-
-      const delegate = inferExportDelegateToUse({ foo: 'bar' });
-      assert.equal(delegate, createOtlpXhrExportDelegate);
-
-      window.fetch = fetch;
     });
   });
 });

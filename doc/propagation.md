@@ -1,6 +1,6 @@
 # Propagation
 
-Span context fields like trace id, span id, trace flags, and baggages need to be send to the downstream services
+Span context fields like trace id, span id, trace flags, and baggages need to be sent to the downstream services
 in order to properly associate downstream created spans with the current span.
 
 This is commonly achieved with HTTP headers, RPC metadata, with well-known formats like:
