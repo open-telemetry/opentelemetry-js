@@ -158,8 +158,20 @@ describeNode('envDetector() on Node.js', () => {
       assert.strictEqual(resource.attributes?.['key with spaces'], 'value');
     });
 
+    it('discards entire env var when key is empty', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES = '=value';
+      const resource = resourceFromDetectedResource(envDetector.detect());
+      assertEmptyResource(resource);
+    });
+
     it('discards entire env var when missing key/value separator', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES = 'novalue';
+      const resource = resourceFromDetectedResource(envDetector.detect());
+      assertEmptyResource(resource);
+    });
+
+    it('rejects keys exceeding 255 characters', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES = `${'k'.repeat(300)}=value`;
       const resource = resourceFromDetectedResource(envDetector.detect());
       assertEmptyResource(resource);
     });
