@@ -33,9 +33,7 @@ export function _export<T>(
   return new Promise(resolve => {
     // prevent downstream exporter calls from generating spans
     context.with(suppressTracing(context.active()), () => {
-      exporter.export(arg, (result: ExportResult) => {
-        resolve(result);
-      });
+      exporter.export(arg, resolve);
     });
   });
 }
