@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Attributes } from '@opentelemetry/api';
+import type { LogAttributes } from './LogRecord';
+
 export interface LoggerOptions {
   /**
    * The schemaUrl of the tracer or instrumentation library
@@ -24,7 +25,7 @@ export interface LoggerOptions {
   /**
    * The instrumentation scope attributes to associate with emitted telemetry
    */
-  scopeAttributes?: Attributes;
+  scopeAttributes?: LogAttributes;
 
   /**
    * Specifies whether the Trace Context should automatically be passed on to the LogRecords emitted by the Logger.
