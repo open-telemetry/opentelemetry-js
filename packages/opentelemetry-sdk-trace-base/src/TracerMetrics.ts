@@ -15,6 +15,12 @@
  */
 import { Counter, Meter, SpanContext, UpDownCounter } from '@opentelemetry/api';
 import { SamplingDecision } from './Sampler';
+import {
+  ATTR_OTEL_SPAN_PARENT_ORIGIN,
+  ATTR_OTEL_SPAN_SAMPLING_RESULT,
+  METRIC_OTEL_SDK_SPAN_LIVE,
+  METRIC_OTEL_SDK_SPAN_STARTED,
+} from './semconv';
 
 /**
  * Generates `otel.sdk.span.*` metrics.
@@ -25,12 +31,12 @@ export class TracerMetrics {
   private readonly liveSpans: UpDownCounter;
 
   constructor(meter: Meter) {
-    this.startedSpans = meter.createCounter('otel.sdk.span.started', {
+    this.startedSpans = meter.createCounter(METRIC_OTEL_SDK_SPAN_STARTED, {
       unit: '{span}',
       description: 'The number of created spans.',
     });
 
-    this.liveSpans = meter.createUpDownCounter('otel.sdk.span.live', {
+    this.liveSpans = meter.createUpDownCounter(METRIC_OTEL_SDK_SPAN_LIVE, {
       unit: '{span}',
       description: 'The number of currently live spans.',
     });
@@ -42,8 +48,8 @@ export class TracerMetrics {
   ): () => void {
     const samplingDecisionStr = samplingDecisionToString(samplingDecision);
     this.startedSpans.add(1, {
-      'otel.span.parent.origin': parentOrigin(parentSpanCtx),
-      'otel.span.sampling_result': samplingDecisionStr,
+      [ATTR_OTEL_SPAN_PARENT_ORIGIN]: parentOrigin(parentSpanCtx),
+      [ATTR_OTEL_SPAN_SAMPLING_RESULT]: samplingDecisionStr,
     });
 
     if (samplingDecision === SamplingDecision.NOT_RECORD) {
@@ -51,7 +57,7 @@ export class TracerMetrics {
     }
 
     const liveSpanAttributes = {
-      'otel.span.sampling_result': samplingDecisionStr,
+      [ATTR_OTEL_SPAN_SAMPLING_RESULT]: samplingDecisionStr,
     };
     this.liveSpans.add(1, liveSpanAttributes);
     return () => {
