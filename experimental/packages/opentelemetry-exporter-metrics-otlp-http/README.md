@@ -26,10 +26,14 @@ the [Collector Trace Exporter for web and node][trace-exporter-url].
 The OTLPMetricExporter in Web expects the endpoint to end in `/v1/metrics`.
 
 ```js
-import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
+import {
+  MeterProvider,
+  PeriodicExportingMetricReader,
+} from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 
 const collectorOptions = {
+  fetch: customFetch, // an optional custom fetch implementation - default is globalThis.fetch
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
   headers: {}, // an optional object containing custom headers to be sent with each request
   concurrencyLimit: 1, // an optional limit on pending requests
@@ -47,15 +51,21 @@ const meterProvider = new MeterProvider({
 // Now, start recording data
 const meter = meterProvider.getMeter('example-meter');
 const counter = meter.createCounter('metric_name');
-counter.add(10, { 'key': 'value' });
+counter.add(10, { key: 'value' });
 ```
 
 ## Metrics in Node
 
 ```js
-const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
-const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-http');
+const {
+  MeterProvider,
+  PeriodicExportingMetricReader,
+} = require('@opentelemetry/sdk-metrics');
+const {
+  OTLPMetricExporter,
+} = require('@opentelemetry/exporter-metrics-otlp-http');
 const collectorOptions = {
+  fetch: customFetch, // an optional custom fetch implementation - default is globalThis.fetch
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
   concurrencyLimit: 1, // an optional limit on pending requests
 };
@@ -72,8 +82,7 @@ const meterProvider = new MeterProvider({
 // Now, start recording data
 const meter = meterProvider.getMeter('example-meter');
 const counter = meter.createCounter('metric_name');
-counter.add(10, { 'key': 'value' });
-
+counter.add(10, { key: 'value' });
 ```
 
 ## Environment Variable Configuration
