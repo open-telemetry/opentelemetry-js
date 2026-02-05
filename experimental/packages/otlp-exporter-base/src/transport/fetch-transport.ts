@@ -24,6 +24,7 @@ import {
 import { HeadersFactory } from '../configuration/otlp-http-configuration';
 
 export interface FetchTransportParameters {
+  fetch: typeof globalThis.fetch;
   url: string;
   headers: HeadersFactory;
 }
@@ -44,7 +45,7 @@ class FetchTransport implements IExporterTransport {
     // This creates an indirect endless loop Export -> Span -> Export
     // By using the `__original` function the instrumentation can't intercept the call
     // and no Span will be created breaking the vicious cycle
-    let fetchApi = globalThis.fetch;
+    let fetchApi = this._parameters.fetch;
     // @ts-expect-error -- fetch could be wrapped
     if (typeof fetchApi.__original === 'function') {
       // @ts-expect-error -- fetch could be wrapped

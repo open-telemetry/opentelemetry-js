@@ -27,6 +27,7 @@ describe('mergeOtlpNodeHttpConfigurationWithDefaults', function () {
     headers: async () => ({}),
     agentFactory: () => null!,
     userAgent: `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+    fetch: fetch,
   };
 
   it('throws error when the user-provided url is not parseable', function () {

@@ -60,6 +60,7 @@ describe('createOtlpHttpExportDelegate', function () {
         concurrencyLimit: 30,
         headers: async () => ({}),
         timeoutMillis: 1000,
+        fetch: globalThis.fetch,
       },
       serializer
     );
