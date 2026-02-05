@@ -431,6 +431,37 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
+    it('should register a meter provider to the tracer provider if both initialized', async () => {
+      const exporter = new ConsoleMetricExporter();
+      const metricReader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+
+      const sdk = new NodeSDK({
+        metricReader: metricReader,
+        traceExporter: new ConsoleSpanExporter(),
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assertDefaultContextManagerRegistered();
+      assertDefaultPropagatorRegistered();
+
+      assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
+      const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
+      assert.ok(tracerProvider instanceof NodeTracerProvider);
+      assert.ok(
+        (tracerProvider as any)._config.meterProvider instanceof MeterProvider
+      );
+
+      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+
+      await sdk.shutdown();
+    });
+
     it('should register a logger provider if a log record processor is provided', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'none';
       const logRecordExporter = new InMemoryLogRecordExporter();
