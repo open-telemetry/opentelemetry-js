@@ -32,10 +32,41 @@ import {
 describe('OTLPLogExporter', function () {
   afterEach(() => {
     sinon.restore();
+    delete (globalThis as any).fetchLater;
   });
 
   describe('export', function () {
+    describe('when fetchLater is available', function () {
+      it('should successfully send data using fetchLater', async function () {
+        // arrange
+        const fetchLaterStub = sinon.stub().returns({ activated: false });
+        (globalThis as any).fetchLater = fetchLaterStub;
+        const loggerProvider = new LoggerProvider({
+          processors: [new SimpleLogRecordProcessor(new OTLPLogExporter())],
+        });
+
+        // act
+        loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });
+        await loggerProvider.shutdown();
+
+        // assert
+        assert.ok(fetchLaterStub.called, 'fetchLater should be called');
+        const [url, options] = fetchLaterStub.args[0];
+        assert.ok(url.endsWith('/v1/logs'), 'URL should end with /v1/logs');
+        assert.strictEqual(options.method, 'POST');
+        assert.throws(
+          () => JSON.parse(new TextDecoder().decode(options.body)),
+          'expected requestBody to be in protobuf format, but parsing as JSON succeeded'
+        );
+      });
+    });
+
     describe('when sendBeacon is available', function () {
+      beforeEach(function () {
+        // disable fetchLater so sendBeacon is used
+        (globalThis as any).fetchLater = undefined;
+      });
+
       it('should successfully send data using sendBeacon', async function () {
         // arrange
         const stubBeacon = sinon.stub(navigator, 'sendBeacon');
@@ -60,6 +91,8 @@ describe('OTLPLogExporter', function () {
 
     describe('when sendBeacon is not available', function () {
       beforeEach(function () {
+        // disable fetchLater so fetch is used
+        (globalThis as any).fetchLater = undefined;
         // fake sendBeacon not being available
         (window.navigator as any).sendBeacon = false;
       });

@@ -33,10 +33,51 @@ import { OTLPMetricExporter } from '../../src/platform/browser';
 describe('OTLPTraceExporter', () => {
   afterEach(() => {
     sinon.restore();
+    delete (globalThis as any).fetchLater;
   });
 
   describe('export', function () {
+    describe('when fetchLater is available', function () {
+      it('should successfully send data using fetchLater', async function () {
+        // arrange
+        const fetchLaterStub = sinon.stub().returns({ activated: false });
+        (globalThis as any).fetchLater = fetchLaterStub;
+        const meterProvider = new MeterProvider({
+          readers: [
+            new PeriodicExportingMetricReader({
+              exporter: new OTLPMetricExporter(),
+            }),
+          ],
+        });
+
+        // act
+        meterProvider
+          .getMeter('test-meter')
+          .createCounter('test-counter')
+          .add(1);
+        await meterProvider.shutdown();
+
+        // assert
+        assert.ok(fetchLaterStub.called, 'fetchLater should be called');
+        const [url, options] = fetchLaterStub.args[0];
+        assert.ok(
+          url.endsWith('/v1/metrics'),
+          'URL should end with /v1/metrics'
+        );
+        assert.strictEqual(options.method, 'POST');
+        assert.throws(
+          () => JSON.parse(new TextDecoder().decode(options.body)),
+          'expected requestBody to be in protobuf format, but parsing as JSON succeeded'
+        );
+      });
+    });
+
     describe('when sendBeacon is available', function () {
+      beforeEach(function () {
+        // disable fetchLater so sendBeacon is used
+        (globalThis as any).fetchLater = undefined;
+      });
+
       it('should successfully send data using sendBeacon', async function () {
         // arrange
         const stubBeacon = sinon.stub(navigator, 'sendBeacon');
@@ -68,6 +109,8 @@ describe('OTLPTraceExporter', () => {
 
     describe('when sendBeacon is not available', function () {
       beforeEach(function () {
+        // disable fetchLater so fetch is used
+        (globalThis as any).fetchLater = undefined;
         // fake sendBeacon not being available
         (window.navigator as any).sendBeacon = false;
       });
