@@ -291,8 +291,8 @@ describe('getLoggerProviderConfigFromEnv', function () {
 describe('getBatchLogRecordProcessorConfigFromEnv', function () {
   afterEach(function () {
     delete process.env.OTEL_BLRP_MAX_QUEUE_SIZE;
-    delete process.env.OTEL_BLRP_SCHEDULED_DELAY_MILLIS;
-    delete process.env.OTEL_BLRP_EXPORT_TIMEOUT_MILLIS;
+    delete process.env.OTEL_BLRP_SCHEDULE_DELAY;
+    delete process.env.OTEL_BLRP_EXPORT_TIMEOUT;
     delete process.env.OTEL_BLRP_MAX_EXPORT_BATCH_SIZE;
 
     sinon.restore();
@@ -322,7 +322,7 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
   });
 
   it('should configure scheduled delay based on env var', function () {
-    process.env.OTEL_BLRP_SCHEDULED_DELAY_MILLIS = '10000';
+    process.env.OTEL_BLRP_SCHEDULE_DELAY = '10000';
     const config = getBatchLogRecordProcessorConfigFromEnv();
 
     assert.deepStrictEqual(config, {
@@ -334,7 +334,7 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
   });
 
   it('should configure export timeout based on env var', function () {
-    process.env.OTEL_BLRP_EXPORT_TIMEOUT_MILLIS = '60000';
+    process.env.OTEL_BLRP_EXPORT_TIMEOUT = '60000';
     const config = getBatchLogRecordProcessorConfigFromEnv();
 
     assert.deepStrictEqual(config, {
@@ -359,8 +359,8 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
 
   it('should configure all values based on env vars', function () {
     process.env.OTEL_BLRP_MAX_QUEUE_SIZE = '8192';
-    process.env.OTEL_BLRP_SCHEDULED_DELAY_MILLIS = '15000';
-    process.env.OTEL_BLRP_EXPORT_TIMEOUT_MILLIS = '45000';
+    process.env.OTEL_BLRP_SCHEDULE_DELAY = '15000';
+    process.env.OTEL_BLRP_EXPORT_TIMEOUT = '45000';
     process.env.OTEL_BLRP_MAX_EXPORT_BATCH_SIZE = '2048';
     const config = getBatchLogRecordProcessorConfigFromEnv();
 
@@ -375,8 +375,8 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
   it('should warn and return undefined for negative values from env vars', function () {
     const warnStub = sinon.stub(diag, 'warn');
     process.env.OTEL_BLRP_MAX_QUEUE_SIZE = '-1';
-    process.env.OTEL_BLRP_SCHEDULED_DELAY_MILLIS = '-1';
-    process.env.OTEL_BLRP_EXPORT_TIMEOUT_MILLIS = '-1';
+    process.env.OTEL_BLRP_SCHEDULE_DELAY = '-1';
+    process.env.OTEL_BLRP_EXPORT_TIMEOUT = '-1';
     process.env.OTEL_BLRP_MAX_EXPORT_BATCH_SIZE = '-1';
 
     const config = getBatchLogRecordProcessorConfigFromEnv();
@@ -397,8 +397,8 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
   it('should return undefined for string values in env vars', function () {
     const warnStub = sinon.stub(diag, 'warn');
     process.env.OTEL_BLRP_MAX_QUEUE_SIZE = 'not a number';
-    process.env.OTEL_BLRP_SCHEDULED_DELAY_MILLIS = 'also not a number';
-    process.env.OTEL_BLRP_EXPORT_TIMEOUT_MILLIS = 'still not a number';
+    process.env.OTEL_BLRP_SCHEDULE_DELAY = 'also not a number';
+    process.env.OTEL_BLRP_EXPORT_TIMEOUT = 'still not a number';
     process.env.OTEL_BLRP_MAX_EXPORT_BATCH_SIZE = 'definitely not a number';
 
     const config = getBatchLogRecordProcessorConfigFromEnv();
