@@ -476,4 +476,11 @@ describe('Logger', () => {
       });
     });
   });
+
+  describe('enabled', () => {
+    it('should return true', () => {
+      const { logger } = setup();
+      assert.ok(logger.enabled());
+    });
+  });
 });
