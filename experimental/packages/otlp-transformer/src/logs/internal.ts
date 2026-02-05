@@ -22,7 +22,7 @@ import {
   IResourceLogs,
 } from './internal-types';
 import { Resource } from '@opentelemetry/resources';
-import { Encoder, getOtlpEncoder } from '../common/utils';
+import { Encoder } from '../common/utils';
 import {
   createInstrumentationScope,
   createResource,
@@ -30,14 +30,13 @@ import {
   toKeyValue,
 } from '../common/internal';
 import { SeverityNumber } from '@opentelemetry/api-logs';
-import { OtlpEncodingOptions, IKeyValue } from '../common/internal-types';
+import { IKeyValue } from '../common/internal-types';
 import { LogAttributes } from '@opentelemetry/api-logs';
 
 export function createExportLogsServiceRequest(
   logRecords: ReadableLogRecord[],
-  options?: OtlpEncodingOptions
+  encoder: Encoder
 ): IExportLogsServiceRequest {
-  const encoder = getOtlpEncoder(options);
   return {
     resourceLogs: logRecordsToResourceLogs(logRecords, encoder),
   };
@@ -80,7 +79,7 @@ function logRecordsToResourceLogs(
 ): IResourceLogs[] {
   const resourceMap = createResourceMap(logRecords);
   return Array.from(resourceMap, ([resource, ismMap]) => {
-    const processedResource = createResource(resource);
+    const processedResource = createResource(resource, encoder);
     return {
       resource: processedResource,
       scopeLogs: Array.from(ismMap, ([, scopeLogs]) => {
@@ -101,9 +100,9 @@ function toLogRecord(log: ReadableLogRecord, encoder: Encoder): ILogRecord {
     observedTimeUnixNano: encoder.encodeHrTime(log.hrTimeObserved),
     severityNumber: toSeverityNumber(log.severityNumber),
     severityText: log.severityText,
-    body: toAnyValue(log.body),
+    body: toAnyValue(log.body, encoder),
     eventName: log.eventName,
-    attributes: toLogAttributes(log.attributes),
+    attributes: toLogAttributes(log.attributes, encoder),
     droppedAttributesCount: log.droppedAttributesCount,
     flags: log.spanContext?.traceFlags,
     traceId: encoder.encodeOptionalSpanContext(log.spanContext?.traceId),
@@ -117,6 +116,11 @@ function toSeverityNumber(
   return severityNumber as number | undefined as ESeverityNumber | undefined;
 }
 
-export function toLogAttributes(attributes: LogAttributes): IKeyValue[] {
-  return Object.keys(attributes).map(key => toKeyValue(key, attributes[key]));
+export function toLogAttributes(
+  attributes: LogAttributes,
+  encoder: Encoder
+): IKeyValue[] {
+  return Object.keys(attributes).map(key =>
+    toKeyValue(key, attributes[key], encoder)
+  );
 }

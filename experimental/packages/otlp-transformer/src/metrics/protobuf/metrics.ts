@@ -21,6 +21,7 @@ import { ExportType } from '../../common/protobuf/protobuf-export-type';
 import { createExportMetricsServiceRequest } from '../internal';
 import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import { IExportMetricsServiceResponse } from '../export-response';
+import { PROTOBUF_ENCODER } from '../../common/utils';
 
 const metricsResponseType = root.opentelemetry.proto.collector.metrics.v1
   .ExportMetricsServiceResponse as ExportType<IExportMetricsServiceResponse>;
@@ -33,7 +34,7 @@ export const ProtobufMetricsSerializer: ISerializer<
   IExportMetricsServiceResponse
 > = {
   serializeRequest: (arg: ResourceMetrics) => {
-    const request = createExportMetricsServiceRequest([arg]);
+    const request = createExportMetricsServiceRequest([arg], PROTOBUF_ENCODER);
     return metricsRequestType.encode(request).finish();
   },
   deserializeResponse: (arg: Uint8Array) => {

@@ -8,12 +8,21 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* feat(sdk-logs)!: move environment variable configuration to `@opentelemetry/sdk-node` [#6325](https://github.com/open-telemetry/opentelemetry-js/pull/6325) @pichlermarc
+  * (user-facing): environment variable configuration is no longer applied automatically when instantiating SDK components
+    (`LoggerProvider`, `BatchLogRecordProcessor`) directly from `@opentelemetry/sdk-logs`. Please migrate to using
+    `NodeSDK` from `@opentelemetry/sdk-node` to get automatic environment variable configuration.
+
 ### :rocket: Features
+
+feat(configuration): parse config for rc 3 [#6304](https://github.com/open-telemetry/opentelemetry-js/pull/6304) @maryliag
 
 ### :bug: Bug Fixes
 
 * fix(instrumentation-fetch): preserve Response.url, type, and redirected properties [#6243](https://github.com/open-telemetry/opentelemetry-js/issues/6243) @AnubhavPurohit691
-  * The fetch instrumentation now preserves the read-only `url`, `type`, and `redirected` properties from the original Response object when wrapping it with a Proxy. This fixes issues where code relying on these properties (e.g., CORS type detection) would fail with instrumented fetch.
+* The fetch instrumentation now preserves the read-only `url`, `type`, and `redirected` properties from the original Response object when wrapping it with a Proxy. This fixes issues where code relying on these properties (e.g., CORS type detection) would fail with instrumented fetch.
+* fix(exporter-prometheus): add missing `@opentelemetry/semantic-conventions` dependency [#6330](https://github.com/open-telemetry/opentelemetry-js/pull/6330) @omizha
+* fix(otlp-transformer): correctly handle Uint8Array attribute values when serializing to JSON [#6348](https://github.com/open-telemetry/opentelemetry-js/pull/6348) @pichlermarc
 
 ### :books: Documentation
 
@@ -31,6 +40,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(instrumentation): use the `internals: true` option with import-in-the-middle hook, allowing instrumentations to hook internal files in ES modules [#6344](https://github.com/open-telemetry/opentelemetry-js/pull/6344) @trentm
 * feat(sdk-logs): export event name from ConsoleLogRecordExporter [#6310](https://github.com/open-telemetry/opentelemetry-js/pull/6310) @aicest
 
 ### :bug: Bug Fixes

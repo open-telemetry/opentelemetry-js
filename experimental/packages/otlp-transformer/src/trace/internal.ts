@@ -31,8 +31,6 @@ import {
   IScopeSpans,
   ISpan,
 } from './internal-types';
-import { OtlpEncodingOptions } from '../common/internal-types';
-import { getOtlpEncoder } from '../common/utils';
 
 // Span flags constants matching the OTLP specification
 const SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK = 0x100;
@@ -67,7 +65,7 @@ export function sdkSpanToOtlpSpan(span: ReadableSpan, encoder: Encoder): ISpan {
     kind: span.kind == null ? 0 : span.kind + 1,
     startTimeUnixNano: encoder.encodeHrTime(span.startTime),
     endTimeUnixNano: encoder.encodeHrTime(span.endTime),
-    attributes: toAttributes(span.attributes),
+    attributes: toAttributes(span.attributes, encoder),
     droppedAttributesCount: span.droppedAttributesCount,
     events: span.events.map(event => toOtlpSpanEvent(event, encoder)),
     droppedEventsCount: span.droppedEventsCount,
@@ -84,7 +82,7 @@ export function sdkSpanToOtlpSpan(span: ReadableSpan, encoder: Encoder): ISpan {
 
 export function toOtlpLink(link: Link, encoder: Encoder): ILink {
   return {
-    attributes: link.attributes ? toAttributes(link.attributes) : [],
+    attributes: link.attributes ? toAttributes(link.attributes, encoder) : [],
     spanId: encoder.encodeSpanContext(link.context.spanId),
     traceId: encoder.encodeSpanContext(link.context.traceId),
     traceState: link.context.traceState?.serialize(),
@@ -99,7 +97,7 @@ export function toOtlpSpanEvent(
 ): IEvent {
   return {
     attributes: timedEvent.attributes
-      ? toAttributes(timedEvent.attributes)
+      ? toAttributes(timedEvent.attributes, encoder)
       : [],
     name: timedEvent.name,
     timeUnixNano: encoder.encodeHrTime(timedEvent.time),
@@ -109,9 +107,8 @@ export function toOtlpSpanEvent(
 
 export function createExportTraceServiceRequest(
   spans: ReadableSpan[],
-  options?: OtlpEncodingOptions
+  encoder: Encoder
 ): IExportTraceServiceRequest {
-  const encoder = getOtlpEncoder(options);
   return {
     resourceSpans: spanRecordsToResourceSpans(spans, encoder),
   };
@@ -173,7 +170,7 @@ function spanRecordsToResourceSpans(
       }
       ilmEntry = ilmIterator.next();
     }
-    const processedResource = createResource(resource);
+    const processedResource = createResource(resource, encoder);
     const transformedSpans: IResourceSpans = {
       resource: processedResource,
       scopeSpans: scopeResourceSpans,
