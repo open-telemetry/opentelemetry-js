@@ -33,7 +33,7 @@ export class BaggageImpl implements Baggage {
   }
 
   getAllEntries(): [string, BaggageEntry][] {
-    return Array.from(this._entries.entries()).map(([k, v]) => [k, v]);
+    return Array.from(this._entries.entries());
   }
 
   setEntry(key: string, entry: BaggageEntry): BaggageImpl {

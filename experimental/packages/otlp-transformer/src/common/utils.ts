@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-import type { OtlpEncodingOptions, Fixed64, LongBits } from './internal-types';
+import type { Fixed64, LongBits } from './internal-types';
 import { HrTime } from '@opentelemetry/api';
+import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { hexToBinary } from './hex-to-binary';
 
 export function hrTimeToNanos(hrTime: HrTime): bigint {
@@ -41,6 +42,9 @@ export function encodeAsString(hrTime: HrTime): string {
   return nanos.toString();
 }
 
+const encodeTimestamp =
+  typeof BigInt !== 'undefined' ? encodeAsString : hrTimeToNanoseconds;
+
 export type HrTimeEncodeFunction = (hrTime: HrTime) => Fixed64;
 export type SpanContextEncodeFunction = (
   spanContext: string
@@ -48,11 +52,15 @@ export type SpanContextEncodeFunction = (
 export type OptionalSpanContextEncodeFunction = (
   spanContext: string | undefined
 ) => string | Uint8Array | undefined;
+export type Uint8ArrayEncodeFunction = (
+  value: Uint8Array
+) => string | Uint8Array;
 
 export interface Encoder {
   encodeHrTime: HrTimeEncodeFunction;
   encodeSpanContext: SpanContextEncodeFunction;
   encodeOptionalSpanContext: OptionalSpanContextEncodeFunction;
+  encodeUint8Array: Uint8ArrayEncodeFunction;
 }
 
 function identity<T>(value: T): T {
@@ -65,56 +73,35 @@ function optionalHexToBinary(str: string | undefined): Uint8Array | undefined {
 }
 
 /**
- * Convert hex string to base64 (for protobuf JSON format).
+ * Encoder for protobuf format.
+ * Uses { high, low } timestamps and binary for span/trace IDs, leaves Uint8Array attributes as-is.
  */
-export function hexToBase64(hex: string): string {
-  const bytes = hexToBinary(hex);
-  // Works in both Node.js and browser
-  if (typeof Buffer !== 'undefined') {
-    return Buffer.from(bytes).toString('base64');
-  }
-  // Browser fallback using spread to avoid string concatenation in loop
-  return btoa(String.fromCharCode(...bytes));
-}
-
-function optionalHexToBase64(str: string | undefined): string | undefined {
-  if (str === undefined) return undefined;
-  return hexToBase64(str);
-}
-
-const DEFAULT_ENCODER: Encoder = {
+export const PROTOBUF_ENCODER: Encoder = {
   encodeHrTime: encodeAsLongBits,
   encodeSpanContext: hexToBinary,
   encodeOptionalSpanContext: optionalHexToBinary,
+  encodeUint8Array: identity,
 };
 
 /**
- * Encoder for protobuf JSON format (used with fromJson).
- * Uses string timestamps and base64 for bytes.
+ * Encoder for JSON format.
+ * Uses string timestamps, hex for span/trace IDs, and base64 for Uint8Array.
  */
-export const PROTOBUF_JSON_ENCODER: Encoder = {
-  encodeHrTime: encodeAsString,
-  encodeSpanContext: hexToBase64,
-  encodeOptionalSpanContext: optionalHexToBase64,
+export const JSON_ENCODER: Encoder = {
+  encodeHrTime: encodeTimestamp,
+  encodeSpanContext: identity,
+  encodeOptionalSpanContext: identity,
+  encodeUint8Array: (bytes: Uint8Array): string => {
+    if (typeof Buffer !== 'undefined') {
+      return Buffer.from(bytes).toString('base64');
+    }
+
+    // implementation note: not using spread operator and passing to
+    // btoa to avoid stack overflow on large Uint8Arrays
+    const chars = new Array(bytes.length);
+    for (let i = 0; i < bytes.length; i++) {
+      chars[i] = String.fromCharCode(bytes[i]);
+    }
+    return btoa(chars.join(''));
+  },
 };
-
-/** @internal */
-export function isOtlpEncoder(
-  obj: OtlpEncodingOptions | Encoder | undefined
-): obj is Encoder {
-  return obj !== undefined && 'encodeHrTime' in obj;
-}
-
-export function getOtlpEncoder(options?: OtlpEncodingOptions): Encoder {
-  if (options === undefined) {
-    return DEFAULT_ENCODER;
-  }
-
-  const useLongBits = options.useLongBits ?? true;
-  const useHex = options.useHex ?? false;
-  return {
-    encodeHrTime: useLongBits ? encodeAsLongBits : encodeAsString,
-    encodeSpanContext: useHex ? identity : hexToBinary,
-    encodeOptionalSpanContext: useHex ? identity : optionalHexToBinary,
-  };
-}

@@ -14,43 +14,30 @@
  * limitations under the License.
  */
 
-import { toBinary, fromBinary, fromJsonString } from '@bufbuild/protobuf';
+import * as root from '../../generated/root';
 import { ISerializer } from '../../i-serializer';
+import { IExportMetricsServiceRequest } from '../internal-types';
+import { ExportType } from '../../common/protobuf/protobuf-export-type';
 import { createExportMetricsServiceRequest } from '../internal';
 import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import { IExportMetricsServiceResponse } from '../export-response';
-import {
-  ExportMetricsServiceRequestSchema,
-  ExportMetricsServiceResponseSchema,
-} from '../../generated/opentelemetry/proto/collector/metrics/v1/metrics_service_pb';
-import { PROTOBUF_JSON_ENCODER } from '../../common/utils';
+import { PROTOBUF_ENCODER } from '../../common/utils';
+
+const metricsResponseType = root.opentelemetry.proto.collector.metrics.v1
+  .ExportMetricsServiceResponse as ExportType<IExportMetricsServiceResponse>;
+
+const metricsRequestType = root.opentelemetry.proto.collector.metrics.v1
+  .ExportMetricsServiceRequest as ExportType<IExportMetricsServiceRequest>;
 
 export const ProtobufMetricsSerializer: ISerializer<
   ResourceMetrics,
   IExportMetricsServiceResponse
 > = {
   serializeRequest: (arg: ResourceMetrics) => {
-    const request = createExportMetricsServiceRequest(
-      [arg],
-      PROTOBUF_JSON_ENCODER
-    );
-    const message = fromJsonString(
-      ExportMetricsServiceRequestSchema,
-      JSON.stringify(request)
-    );
-    return toBinary(ExportMetricsServiceRequestSchema, message);
+    const request = createExportMetricsServiceRequest([arg], PROTOBUF_ENCODER);
+    return metricsRequestType.encode(request).finish();
   },
   deserializeResponse: (arg: Uint8Array) => {
-    const response = fromBinary(ExportMetricsServiceResponseSchema, arg);
-    return {
-      partialSuccess: response.partialSuccess
-        ? {
-            rejectedDataPoints: Number(
-              response.partialSuccess.rejectedDataPoints
-            ),
-            errorMessage: response.partialSuccess.errorMessage,
-          }
-        : undefined,
-    };
+    return metricsResponseType.decode(arg);
   },
 };

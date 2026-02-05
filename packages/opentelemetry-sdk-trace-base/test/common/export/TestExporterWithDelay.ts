@@ -31,7 +31,7 @@ export class TestExporterWithDelay extends InMemorySpanExporter {
     spans: ReadableSpan[],
     resultCallback: (result: ExportResult) => void
   ): void {
-    super.export(spans, () => setTimeout(resultCallback, 1));
+    super.export(spans, result => setTimeout(() => resultCallback(result), 1));
   }
 
   override shutdown(): Promise<void> {

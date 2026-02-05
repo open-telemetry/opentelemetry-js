@@ -16,6 +16,7 @@
 import { diag } from '@opentelemetry/api';
 import { getStringFromEnv } from '@opentelemetry/core';
 import { inspect } from 'util';
+import { GrpcTls, HttpTls } from './models/commonModel';
 
 /**
  * Retrieves a boolean value from a configuration file parameter.
@@ -173,4 +174,50 @@ export function envVariableSubstitution(value: unknown): string | undefined {
     return stringValue;
   }
   return String(value);
+}
+
+export function getGrpcTlsConfig(
+  certificateFile?: string,
+  clientKeyFile?: string,
+  clientCertificateFile?: string,
+  insecure?: boolean
+): GrpcTls | undefined {
+  if (certificateFile || clientKeyFile || clientCertificateFile) {
+    const tls: GrpcTls = {};
+    if (certificateFile) {
+      tls.ca_file = certificateFile;
+    }
+    if (clientKeyFile) {
+      tls.key_file = clientKeyFile;
+    }
+    if (clientCertificateFile) {
+      tls.cert_file = clientCertificateFile;
+    }
+    if (insecure !== undefined) {
+      tls.insecure = insecure;
+    }
+    return tls;
+  }
+  return undefined;
+}
+
+export function getHttpTlsConfig(
+  certificateFile?: string,
+  clientKeyFile?: string,
+  clientCertificateFile?: string
+): HttpTls | undefined {
+  if (certificateFile || clientKeyFile || clientCertificateFile) {
+    const tls: HttpTls = {};
+    if (certificateFile) {
+      tls.ca_file = certificateFile;
+    }
+    if (clientKeyFile) {
+      tls.key_file = clientKeyFile;
+    }
+    if (clientCertificateFile) {
+      tls.cert_file = clientCertificateFile;
+    }
+    return tls;
+  }
+  return undefined;
 }

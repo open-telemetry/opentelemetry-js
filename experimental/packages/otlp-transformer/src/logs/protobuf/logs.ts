@@ -13,16 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { toBinary, fromBinary, fromJsonString } from '@bufbuild/protobuf';
+import * as root from '../../generated/root';
+
+import { IExportLogsServiceRequest } from '../internal-types';
 import { IExportLogsServiceResponse } from '../export-response';
+
 import { createExportLogsServiceRequest } from '../internal';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
+import { ExportType } from '../../common/protobuf/protobuf-export-type';
 import { ISerializer } from '../../i-serializer';
-import {
-  ExportLogsServiceRequestSchema,
-  ExportLogsServiceResponseSchema,
-} from '../../generated/opentelemetry/proto/collector/logs/v1/logs_service_pb';
-import { PROTOBUF_JSON_ENCODER } from '../../common/utils';
+import { PROTOBUF_ENCODER } from '../../common/utils';
+
+const logsResponseType = root.opentelemetry.proto.collector.logs.v1
+  .ExportLogsServiceResponse as ExportType<IExportLogsServiceResponse>;
+
+const logsRequestType = root.opentelemetry.proto.collector.logs.v1
+  .ExportLogsServiceRequest as ExportType<IExportLogsServiceRequest>;
 
 /*
  * @experimental this serializer may receive breaking changes in minor versions, pin this package's version when using this constant
@@ -32,24 +38,10 @@ export const ProtobufLogsSerializer: ISerializer<
   IExportLogsServiceResponse
 > = {
   serializeRequest: (arg: ReadableLogRecord[]) => {
-    const request = createExportLogsServiceRequest(arg, PROTOBUF_JSON_ENCODER);
-    const message = fromJsonString(
-      ExportLogsServiceRequestSchema,
-      JSON.stringify(request)
-    );
-    return toBinary(ExportLogsServiceRequestSchema, message);
+    const request = createExportLogsServiceRequest(arg, PROTOBUF_ENCODER);
+    return logsRequestType.encode(request).finish();
   },
   deserializeResponse: (arg: Uint8Array) => {
-    const response = fromBinary(ExportLogsServiceResponseSchema, arg);
-    return {
-      partialSuccess: response.partialSuccess
-        ? {
-            rejectedLogRecords: Number(
-              response.partialSuccess.rejectedLogRecords
-            ),
-            errorMessage: response.partialSuccess.errorMessage,
-          }
-        : undefined,
-    };
+    return logsResponseType.decode(arg);
   },
 };

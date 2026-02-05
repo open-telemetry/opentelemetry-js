@@ -52,6 +52,7 @@ describe('ConsoleLogRecordExporter', () => {
         provider
           .getLogger(instrumentationScopeName, instrumentationScopeVersion)
           .emit({
+            eventName: 'event1',
             body: 'body1',
             severityNumber: SeverityNumber.DEBUG,
             severityText: 'DEBUG',
@@ -66,6 +67,7 @@ describe('ConsoleLogRecordExporter', () => {
         const expectedKeys = [
           'attributes',
           'body',
+          'eventName',
           'instrumentationScope',
           'resource',
           'severityNumber',
@@ -76,6 +78,7 @@ describe('ConsoleLogRecordExporter', () => {
           'traceId',
         ].join(',');
 
+        assert.ok(firstLogRecord.eventName === 'event1');
         assert.ok(firstLogRecord.body === 'body1');
         assert.ok(firstLogRecord.severityNumber === SeverityNumber.DEBUG);
         assert.ok(firstLogRecord.severityText === 'DEBUG');

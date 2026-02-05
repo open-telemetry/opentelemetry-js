@@ -152,7 +152,7 @@ export const EVENT_GEN_AI_USER_MESSAGE = 'gen_ai.user.message' as const;
 /**
  * Describes a message sent or received within the context of an RPC call.
  *
- * @note In the lifetime of an RPC stream, an event for each message sent/received on client and server spans **SHOULD** be created. In case of unary calls only one sent and one received message will be recorded for both client and server spans.
+ * @note In the lifetime of an RPC stream, an event for each message sent/received on client and server spans **SHOULD** be created. In case of unary calls message events **SHOULD NOT** be recorded.
  *
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */

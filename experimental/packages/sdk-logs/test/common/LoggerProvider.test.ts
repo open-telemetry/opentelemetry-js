@@ -24,7 +24,6 @@ import * as sinon from 'sinon';
 
 import { LoggerProvider } from '../../src';
 import { NoopLogRecordProcessor } from '../../src/export/NoopLogRecordProcessor';
-import { loadDefaultConfig } from '../../src/config';
 import { DEFAULT_LOGGER_NAME } from './../../src/LoggerProvider';
 import { MultiLogRecordProcessor } from '../../src/MultiLogRecordProcessor';
 import { Logger } from '../../src/Logger';
@@ -87,10 +86,7 @@ describe('LoggerProvider', () => {
       it('should have default forceFlushTimeoutMillis if not pass', () => {
         const provider = new LoggerProvider();
         const sharedState = provider['_sharedState'];
-        assert.ok(
-          sharedState.forceFlushTimeoutMillis ===
-            loadDefaultConfig().forceFlushTimeoutMillis
-        );
+        assert.ok(sharedState.forceFlushTimeoutMillis === 30_000);
       });
     });
 

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { OtlpEncodingOptions } from '../common/internal-types';
 import { ValueType } from '@opentelemetry/api';
 import {
   AggregationTemporality,
@@ -35,7 +34,7 @@ import {
   IResourceMetrics,
   IScopeMetrics,
 } from './internal-types';
-import { Encoder, getOtlpEncoder, isOtlpEncoder } from '../common/utils';
+import { Encoder } from '../common/utils';
 import {
   createInstrumentationScope,
   createResource,
@@ -44,10 +43,9 @@ import {
 
 export function toResourceMetrics(
   resourceMetrics: ResourceMetrics,
-  options?: OtlpEncodingOptions | Encoder
+  encoder: Encoder
 ): IResourceMetrics {
-  const encoder = isOtlpEncoder(options) ? options : getOtlpEncoder(options);
-  const processedResource = createResource(resourceMetrics.resource);
+  const processedResource = createResource(resourceMetrics.resource, encoder);
   return {
     resource: processedResource,
     schemaUrl: processedResource.schemaUrl,
@@ -118,7 +116,7 @@ function toSingularDataPoint(
   encoder: Encoder
 ) {
   const out: INumberDataPoint = {
-    attributes: toAttributes(dataPoint.attributes),
+    attributes: toAttributes(dataPoint.attributes, encoder),
     startTimeUnixNano: encoder.encodeHrTime(dataPoint.startTime),
     timeUnixNano: encoder.encodeHrTime(dataPoint.endTime),
   };
@@ -155,7 +153,7 @@ function toHistogramDataPoints(
   return metricData.dataPoints.map(dataPoint => {
     const histogram = dataPoint.value as Histogram;
     return {
-      attributes: toAttributes(dataPoint.attributes),
+      attributes: toAttributes(dataPoint.attributes, encoder),
       bucketCounts: histogram.buckets.counts,
       explicitBounds: histogram.buckets.boundaries,
       count: histogram.count,
@@ -175,7 +173,7 @@ function toExponentialHistogramDataPoints(
   return metricData.dataPoints.map(dataPoint => {
     const histogram = dataPoint.value as ExponentialHistogram;
     return {
-      attributes: toAttributes(dataPoint.attributes),
+      attributes: toAttributes(dataPoint.attributes, encoder),
       count: histogram.count,
       min: histogram.min,
       max: histogram.max,
@@ -209,11 +207,11 @@ function toAggregationTemporality(
 
 export function createExportMetricsServiceRequest(
   resourceMetrics: ResourceMetrics[],
-  options?: OtlpEncodingOptions | Encoder
+  encoder: Encoder
 ): IExportMetricsServiceRequest {
   return {
     resourceMetrics: resourceMetrics.map(metrics =>
-      toResourceMetrics(metrics, options)
+      toResourceMetrics(metrics, encoder)
     ),
   };
 }

@@ -18,7 +18,6 @@ import { diag } from '@opentelemetry/api';
 import {
   ExportResult,
   ExportResultCode,
-  getNumberFromEnv,
   globalErrorHandler,
   BindOnceFuture,
   internal,
@@ -46,22 +45,10 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
 
   constructor(exporter: LogRecordExporter, config?: T) {
     this._exporter = exporter;
-    this._maxExportBatchSize =
-      config?.maxExportBatchSize ??
-      getNumberFromEnv('OTEL_BLRP_MAX_EXPORT_BATCH_SIZE') ??
-      512;
-    this._maxQueueSize =
-      config?.maxQueueSize ??
-      getNumberFromEnv('OTEL_BLRP_MAX_QUEUE_SIZE') ??
-      2048;
-    this._scheduledDelayMillis =
-      config?.scheduledDelayMillis ??
-      getNumberFromEnv('OTEL_BLRP_SCHEDULE_DELAY') ??
-      5000;
-    this._exportTimeoutMillis =
-      config?.exportTimeoutMillis ??
-      getNumberFromEnv('OTEL_BLRP_EXPORT_TIMEOUT') ??
-      30000;
+    this._maxExportBatchSize = config?.maxExportBatchSize ?? 512;
+    this._maxQueueSize = config?.maxQueueSize ?? 2048;
+    this._scheduledDelayMillis = config?.scheduledDelayMillis ?? 5000;
+    this._exportTimeoutMillis = config?.exportTimeoutMillis ?? 30000;
 
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
 
@@ -133,16 +120,12 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
     if (this._finishedLogRecords.length === 0) {
       return Promise.resolve();
     }
-    return new Promise((resolve, reject) => {
-      callWithTimeout(
-        this._export(
-          this._finishedLogRecords.splice(0, this._maxExportBatchSize)
-        ),
-        this._exportTimeoutMillis
-      )
-        .then(() => resolve())
-        .catch(reject);
-    });
+    return callWithTimeout(
+      this._export(
+        this._finishedLogRecords.splice(0, this._maxExportBatchSize)
+      ),
+      this._exportTimeoutMillis
+    );
   }
 
   private _maybeStartTimer() {
@@ -197,17 +180,23 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
         })
         .catch(globalErrorHandler);
 
-    const pendingResources = logRecords
-      .map(logRecord => logRecord.resource)
-      .filter(resource => resource.asyncAttributesPending);
+    const pendingResources = [];
+
+    for (let i = 0; i < logRecords.length; i++) {
+      const resource = logRecords[i].resource;
+      if (
+        resource.asyncAttributesPending &&
+        typeof resource.waitForAsyncAttributes === 'function'
+      ) {
+        pendingResources.push(resource.waitForAsyncAttributes());
+      }
+    }
 
     // Avoid scheduling a promise to make the behavior more predictable and easier to test
     if (pendingResources.length === 0) {
       return doExport();
     } else {
-      return Promise.all(
-        pendingResources.map(resource => resource.waitForAsyncAttributes?.())
-      ).then(doExport, globalErrorHandler);
+      return Promise.all(pendingResources).then(doExport, globalErrorHandler);
     }
   }
 

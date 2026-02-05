@@ -15,6 +15,135 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :house: Internal
 
+## 1.39.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.39.0 [#6301](https://github.com/open-telemetry/opentelemetry-js/pull/6301) @trentm
+  * Semantic Conventions v1.39.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1390) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *none*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *19 newly deprecated exports, 70 added exports*
+
+#### Unstable changes in v1.39.0
+
+<details>
+<summary>19 newly deprecated exports</summary>
+
+```js
+METRIC_PROCESS_OPEN_FILE_DESCRIPTOR_COUNT // process.open_file_descriptor.count: Replaced by `process.unix.file_descriptor.count`.
+METRIC_RPC_CLIENT_DURATION                // rpc.client.duration: Replaced by `rpc.client.call.duration` with unit `s`.
+METRIC_RPC_SERVER_DURATION                // rpc.server.duration: Replaced by `rpc.server.call.duration` with unit `s`.
+METRIC_SYSTEM_LINUX_MEMORY_AVAILABLE      // system.linux.memory.available: Replaced by `system.memory.linux.available`.
+METRIC_SYSTEM_LINUX_MEMORY_SLAB_USAGE     // system.linux.memory.slab.usage: Replaced by `system.memory.linux.slab.usage`.
+ATTR_LINUX_MEMORY_SLAB_STATE              // linux.memory.slab.state: Replaced by `system.memory.linux.slab.state`.
+ATTR_PEER_SERVICE                         // peer.service: Replaced by `service.peer.name`.
+ATTR_RPC_CONNECT_RPC_ERROR_CODE           // rpc.connect_rpc.error_code: Replaced by `rpc.response.status_code`.
+ATTR_RPC_CONNECT_RPC_REQUEST_METADATA     // (key) => `rpc.connect_rpc.request.metadata.${key}`: Replaced by `rpc.request.metadata`.
+ATTR_RPC_CONNECT_RPC_RESPONSE_METADATA    // (key) => `rpc.connect_rpc.response.metadata.${key}`: Replaced by `rpc.response.metadata`.
+ATTR_RPC_GRPC_REQUEST_METADATA            // (key) => `rpc.grpc.request.metadata.${key}`: Replaced by `rpc.request.metadata`.
+ATTR_RPC_GRPC_RESPONSE_METADATA           // (key) => `rpc.grpc.response.metadata.${key}`: Replaced by `rpc.response.metadata`.
+ATTR_RPC_GRPC_STATUS_CODE                 // rpc.grpc.status_code: Use string representation of the gRPC status code on the `rpc.response.status_code` attribute.
+ATTR_RPC_JSONRPC_ERROR_CODE               // rpc.jsonrpc.error_code: Use string representation of the error code on the `rpc.response.status_code` attribute.
+ATTR_RPC_JSONRPC_ERROR_MESSAGE            // rpc.jsonrpc.error_message: Use the span status description or `error.message` attribute on other signals.
+ATTR_RPC_JSONRPC_REQUEST_ID               // rpc.jsonrpc.request_id: Replaced by `jsonrpc.request.id`.
+ATTR_RPC_JSONRPC_VERSION                  // rpc.jsonrpc.version: Replaced by `jsonrpc.protocol.version`.
+ATTR_RPC_SERVICE                          // rpc.service: Value should be included in `rpc.method` which is expected to be a fully-qualified name.
+ATTR_RPC_SYSTEM                           // rpc.system: Replaced by `rpc.system.name`.
+```
+
+</details>
+
+<details>
+<summary>70 added exports</summary>
+
+```js
+METRIC_MCP_CLIENT_OPERATION_DURATION                       // mcp.client.operation.duration
+METRIC_MCP_CLIENT_SESSION_DURATION                         // mcp.client.session.duration
+METRIC_MCP_SERVER_OPERATION_DURATION                       // mcp.server.operation.duration
+METRIC_MCP_SERVER_SESSION_DURATION                         // mcp.server.session.duration
+
+METRIC_PROCESS_UNIX_FILE_DESCRIPTOR_COUNT                  // process.unix.file_descriptor.count
+METRIC_PROCESS_WINDOWS_HANDLE_COUNT                        // process.windows.handle.count
+
+METRIC_RPC_CLIENT_CALL_DURATION                            // rpc.client.call.duration
+METRIC_RPC_SERVER_CALL_DURATION                            // rpc.server.call.duration
+
+METRIC_SYSTEM_MEMORY_LINUX_AVAILABLE                       // system.memory.linux.available
+METRIC_SYSTEM_MEMORY_LINUX_SLAB_USAGE                      // system.memory.linux.slab.usage
+
+CLOUD_PLATFORM_VALUE_AKAMAI_CLOUD_COMPUTE                  // "akamai_cloud.compute"
+CLOUD_PLATFORM_VALUE_GCP_AGENT_ENGINE                      // "gcp.agent_engine"
+CLOUD_PLATFORM_VALUE_HETZNER_CLOUD_SERVER                  // "hetzner.cloud_server"
+CLOUD_PLATFORM_VALUE_VULTR_CLOUD_COMPUTE                   // "vultr.cloud_compute"
+CLOUD_PROVIDER_VALUE_AKAMAI_CLOUD                          // "akamai_cloud"
+CLOUD_PROVIDER_VALUE_HETZNER                               // "hetzner"
+CLOUD_PROVIDER_VALUE_VULTR                                 // "vultr"
+
+ATTR_GEN_AI_PROMPT_NAME                                    // gen_ai.prompt.name
+
+ATTR_JSONRPC_PROTOCOL_VERSION                              // jsonrpc.protocol.version
+ATTR_JSONRPC_REQUEST_ID                                    // jsonrpc.request.id
+
+ATTR_K8S_POD_HOSTNAME                                      // k8s.pod.hostname
+ATTR_K8S_POD_IP                                            // k8s.pod.ip
+ATTR_K8S_POD_START_TIME                                    // k8s.pod.start_time
+
+ATTR_MCP_METHOD_NAME                                       // mcp.method.name
+  MCP_METHOD_NAME_VALUE_COMPLETION_COMPLETE                  // "completion/complete"
+  MCP_METHOD_NAME_VALUE_ELICITATION_CREATE                   // "elicitation/create"
+  MCP_METHOD_NAME_VALUE_INITIALIZE                           // "initialize"
+  MCP_METHOD_NAME_VALUE_LOGGING_SET_LEVEL                    // "logging/setLevel"
+  MCP_METHOD_NAME_VALUE_NOTIFICATIONS_CANCELLED              // "notifications/cancelled"
+  MCP_METHOD_NAME_VALUE_NOTIFICATIONS_INITIALIZED            // "notifications/initialized"
+  MCP_METHOD_NAME_VALUE_NOTIFICATIONS_MESSAGE                // "notifications/message"
+  MCP_METHOD_NAME_VALUE_NOTIFICATIONS_PROGRESS               // "notifications/progress"
+  MCP_METHOD_NAME_VALUE_NOTIFICATIONS_PROMPTS_LIST_CHANGED   // "notifications/prompts/list_changed"
+  MCP_METHOD_NAME_VALUE_NOTIFICATIONS_RESOURCES_LIST_CHANGED // "notifications/resources/list_changed"
+  MCP_METHOD_NAME_VALUE_NOTIFICATIONS_RESOURCES_UPDATED      // "notifications/resources/updated"
+  MCP_METHOD_NAME_VALUE_NOTIFICATIONS_ROOTS_LIST_CHANGED     // "notifications/roots/list_changed"
+  MCP_METHOD_NAME_VALUE_NOTIFICATIONS_TOOLS_LIST_CHANGED     // "notifications/tools/list_changed"
+  MCP_METHOD_NAME_VALUE_PING                                 // "ping"
+  MCP_METHOD_NAME_VALUE_PROMPTS_GET                          // "prompts/get"
+  MCP_METHOD_NAME_VALUE_PROMPTS_LIST                         // "prompts/list"
+  MCP_METHOD_NAME_VALUE_RESOURCES_LIST                       // "resources/list"
+  MCP_METHOD_NAME_VALUE_RESOURCES_READ                       // "resources/read"
+  MCP_METHOD_NAME_VALUE_RESOURCES_SUBSCRIBE                  // "resources/subscribe"
+  MCP_METHOD_NAME_VALUE_RESOURCES_TEMPLATES_LIST             // "resources/templates/list"
+  MCP_METHOD_NAME_VALUE_RESOURCES_UNSUBSCRIBE                // "resources/unsubscribe"
+  MCP_METHOD_NAME_VALUE_ROOTS_LIST                           // "roots/list"
+  MCP_METHOD_NAME_VALUE_SAMPLING_CREATE_MESSAGE              // "sampling/createMessage"
+  MCP_METHOD_NAME_VALUE_TOOLS_CALL                           // "tools/call"
+  MCP_METHOD_NAME_VALUE_TOOLS_LIST                           // "tools/list"
+ATTR_MCP_PROTOCOL_VERSION                                  // mcp.protocol.version
+ATTR_MCP_RESOURCE_URI                                      // mcp.resource.uri
+ATTR_MCP_SESSION_ID                                        // mcp.session.id
+
+ATTR_OTEL_EVENT_NAME                                       // otel.event.name
+
+ATTR_PPROF_PROFILE_DOC_URL                                 // pprof.profile.doc_url
+ATTR_PPROF_PROFILE_DROP_FRAMES                             // pprof.profile.drop_frames
+ATTR_PPROF_PROFILE_KEEP_FRAMES                             // pprof.profile.keep_frames
+
+ATTR_RPC_METHOD_ORIGINAL                                   // rpc.method_original
+ATTR_RPC_REQUEST_METADATA                                  // (key) => `rpc.request.metadata.${key}`
+ATTR_RPC_RESPONSE_METADATA                                 // (key) => `rpc.response.metadata.${key}`
+ATTR_RPC_RESPONSE_STATUS_CODE                              // rpc.response.status_code
+ATTR_RPC_SYSTEM_NAME                                       // rpc.system.name
+  RPC_SYSTEM_NAME_VALUE_CONNECTRPC                           // "connectrpc"
+  RPC_SYSTEM_NAME_VALUE_DUBBO                                // "dubbo"
+  RPC_SYSTEM_NAME_VALUE_GRPC                                 // "grpc"
+  RPC_SYSTEM_NAME_VALUE_JSONRPC                              // "jsonrpc"
+
+ATTR_SERVICE_PEER_NAME                                     // service.peer.name
+ATTR_SERVICE_PEER_NAMESPACE                                // service.peer.namespace
+
+ATTR_SYSTEM_MEMORY_LINUX_SLAB_STATE                        // system.memory.linux.slab.state
+  SYSTEM_MEMORY_LINUX_SLAB_STATE_VALUE_RECLAIMABLE           // "reclaimable"
+  SYSTEM_MEMORY_LINUX_SLAB_STATE_VALUE_UNRECLAIMABLE         // "unreclaimable"
+```
+
+</details>
+
 ## 1.38.0
 
 ### :rocket: Features

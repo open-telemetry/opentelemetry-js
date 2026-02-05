@@ -24,13 +24,13 @@ import {
 import * as assert from 'assert';
 import { createExportMetricsServiceRequest } from '../src/metrics/internal';
 import { EAggregationTemporality } from '../src/metrics/internal-types';
-import { hrTime } from '@opentelemetry/core';
-import { fromBinary, toBinary, create, toJson } from '@bufbuild/protobuf';
 import {
-  ExportMetricsServiceRequestSchema,
-  ExportMetricsServiceResponseSchema,
-} from '../src/generated/opentelemetry/proto/collector/metrics/v1/metrics_service_pb';
-import { encodeAsLongBits, encodeAsString } from '../src/common/utils';
+  PROTOBUF_ENCODER,
+  encodeAsLongBits,
+  encodeAsString,
+} from '../src/common/utils';
+import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
+import * as root from '../src/generated/root';
 import { ProtobufMetricsSerializer } from '../src/metrics/protobuf';
 import { JsonMetricsSerializer } from '../src/metrics/json';
 
@@ -320,7 +320,8 @@ describe('Metrics', () => {
       scopeMetrics: [
         {
           scope: {
-            ...expectedScope,
+            name: 'mylib',
+            version: '0.1.0',
             schemaUrl: expectedSchemaUrl,
           },
           metrics: metricData,
@@ -334,7 +335,10 @@ describe('Metrics', () => {
       const metrics = createResourceMetrics([
         createCounterData(10, AggregationTemporality.DELTA),
       ]);
-      const exportRequest = createExportMetricsServiceRequest([metrics]);
+      const exportRequest = createExportMetricsServiceRequest(
+        [metrics],
+        PROTOBUF_ENCODER
+      );
       assert.ok(exportRequest);
 
       assert.deepStrictEqual(exportRequest, {
@@ -377,7 +381,10 @@ describe('Metrics', () => {
       const metrics = createResourceMetrics([
         createUpDownCounterData(10, AggregationTemporality.DELTA),
       ]);
-      const exportRequest = createExportMetricsServiceRequest([metrics]);
+      const exportRequest = createExportMetricsServiceRequest(
+        [metrics],
+        PROTOBUF_ENCODER
+      );
       assert.ok(exportRequest);
 
       assert.deepStrictEqual(exportRequest, {
@@ -417,11 +424,14 @@ describe('Metrics', () => {
     });
 
     it('serializes an observable monotonic sum metric record', () => {
-      const exportRequest = createExportMetricsServiceRequest([
-        createResourceMetrics([
-          createObservableCounterData(10, AggregationTemporality.DELTA),
-        ]),
-      ]);
+      const exportRequest = createExportMetricsServiceRequest(
+        [
+          createResourceMetrics([
+            createObservableCounterData(10, AggregationTemporality.DELTA),
+          ]),
+        ],
+        PROTOBUF_ENCODER
+      );
       assert.ok(exportRequest);
 
       assert.deepStrictEqual(exportRequest, {
@@ -461,11 +471,14 @@ describe('Metrics', () => {
     });
 
     it('serializes an observable non-monotonic sum metric record', () => {
-      const exportRequest = createExportMetricsServiceRequest([
-        createResourceMetrics([
-          createObservableUpDownCounterData(10, AggregationTemporality.DELTA),
-        ]),
-      ]);
+      const exportRequest = createExportMetricsServiceRequest(
+        [
+          createResourceMetrics([
+            createObservableUpDownCounterData(10, AggregationTemporality.DELTA),
+          ]),
+        ],
+        PROTOBUF_ENCODER
+      );
       assert.ok(exportRequest);
 
       assert.deepStrictEqual(exportRequest, {
@@ -505,9 +518,10 @@ describe('Metrics', () => {
     });
 
     it('serializes a gauge metric record', () => {
-      const exportRequest = createExportMetricsServiceRequest([
-        createResourceMetrics([createObservableGaugeData(10.5)]),
-      ]);
+      const exportRequest = createExportMetricsServiceRequest(
+        [createResourceMetrics([createObservableGaugeData(10.5)])],
+        PROTOBUF_ENCODER
+      );
       assert.ok(exportRequest);
 
       assert.deepStrictEqual(exportRequest, {
@@ -545,19 +559,22 @@ describe('Metrics', () => {
 
     describe('serializes a histogram metric record', () => {
       it('with min/max', () => {
-        const exportRequest = createExportMetricsServiceRequest([
-          createResourceMetrics([
-            createHistogramMetrics(
-              2,
-              9,
-              [5],
-              [1, 1],
-              AggregationTemporality.CUMULATIVE,
-              1,
-              8
-            ),
-          ]),
-        ]);
+        const exportRequest = createExportMetricsServiceRequest(
+          [
+            createResourceMetrics([
+              createHistogramMetrics(
+                2,
+                9,
+                [5],
+                [1, 1],
+                AggregationTemporality.CUMULATIVE,
+                1,
+                8
+              ),
+            ]),
+          ],
+          PROTOBUF_ENCODER
+        );
         assert.ok(exportRequest);
 
         assert.deepStrictEqual(exportRequest, {
@@ -601,17 +618,20 @@ describe('Metrics', () => {
       });
 
       it('without min/max', () => {
-        const exportRequest = createExportMetricsServiceRequest([
-          createResourceMetrics([
-            createHistogramMetrics(
-              2,
-              9,
-              [5],
-              [1, 1],
-              AggregationTemporality.CUMULATIVE
-            ),
-          ]),
-        ]);
+        const exportRequest = createExportMetricsServiceRequest(
+          [
+            createResourceMetrics([
+              createHistogramMetrics(
+                2,
+                9,
+                [5],
+                [1, 1],
+                AggregationTemporality.CUMULATIVE
+              ),
+            ]),
+          ],
+          PROTOBUF_ENCODER
+        );
         assert.ok(exportRequest);
 
         assert.deepStrictEqual(exportRequest, {
@@ -657,21 +677,24 @@ describe('Metrics', () => {
 
     describe('serializes an exponential histogram metric record', () => {
       it('with min/max', () => {
-        const exportRequest = createExportMetricsServiceRequest([
-          createResourceMetrics([
-            createExponentialHistogramMetrics(
-              3,
-              10,
-              1,
-              0,
-              { offset: 0, bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0] },
-              { offset: 0, bucketCounts: [0] },
-              AggregationTemporality.CUMULATIVE,
-              1,
-              8
-            ),
-          ]),
-        ]);
+        const exportRequest = createExportMetricsServiceRequest(
+          [
+            createResourceMetrics([
+              createExponentialHistogramMetrics(
+                3,
+                10,
+                1,
+                0,
+                { offset: 0, bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0] },
+                { offset: 0, bucketCounts: [0] },
+                AggregationTemporality.CUMULATIVE,
+                1,
+                8
+              ),
+            ]),
+          ],
+          PROTOBUF_ENCODER
+        );
 
         assert.ok(exportRequest);
 
@@ -721,19 +744,22 @@ describe('Metrics', () => {
       });
 
       it('without min/max', () => {
-        const exportRequest = createExportMetricsServiceRequest([
-          createResourceMetrics([
-            createExponentialHistogramMetrics(
-              3,
-              10,
-              1,
-              0,
-              { offset: 0, bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0] },
-              { offset: 0, bucketCounts: [0] },
-              AggregationTemporality.CUMULATIVE
-            ),
-          ]),
-        ]);
+        const exportRequest = createExportMetricsServiceRequest(
+          [
+            createResourceMetrics([
+              createExponentialHistogramMetrics(
+                3,
+                10,
+                1,
+                0,
+                { offset: 0, bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0] },
+                { offset: 0, bucketCounts: [0] },
+                AggregationTemporality.CUMULATIVE
+              ),
+            ]),
+          ],
+          PROTOBUF_ENCODER
+        );
 
         assert.ok(exportRequest);
 
@@ -794,9 +820,10 @@ describe('Metrics', () => {
         resourceWithSchema
       );
 
-      const exportRequest = createExportMetricsServiceRequest([
-        resourceMetrics,
-      ]);
+      const exportRequest = createExportMetricsServiceRequest(
+        [resourceMetrics],
+        PROTOBUF_ENCODER
+      );
 
       assert.ok(exportRequest);
       assert.strictEqual(exportRequest.resourceMetrics?.length, 1);
@@ -815,43 +842,23 @@ describe('Metrics', () => {
         ])
       );
       assert.ok(serialized, 'serialized response is undefined');
-      const decoded = fromBinary(ExportMetricsServiceRequestSchema, serialized);
-      // toJson converts to protobuf JSON format (strings for 64-bit ints)
-      const decodedJson = toJson(ExportMetricsServiceRequestSchema, decoded);
+      const decoded =
+        root.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.decode(
+          serialized
+        );
 
-      // protobuf JSON format uses string representation for 64-bit integers
-      const expectedProtobufAttributes = [
-        {
-          key: 'string-attribute',
-          value: { stringValue: 'some attribute value' },
-        },
-        { key: 'int-attribute', value: { intValue: '1' } },
-        { key: 'double-attribute', value: { doubleValue: 1.1 } },
-        { key: 'boolean-attribute', value: { boolValue: true } },
-        {
-          key: 'array-attribute',
-          value: {
-            arrayValue: {
-              values: [
-                { stringValue: 'attribute value 1' },
-                { stringValue: 'attribute value 2' },
-              ],
-            },
-          },
-        },
-      ];
+      const decodedObj =
+        root.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.toObject(
+          decoded,
+          {
+            longs: Number,
+          }
+        );
 
       const expected = {
         resourceMetrics: [
           {
-            resource: {
-              attributes: [
-                {
-                  key: 'resource-attribute',
-                  value: { stringValue: 'resource attribute value' },
-                },
-              ],
-            },
+            resource: expectedResource,
             scopeMetrics: [
               {
                 scope: expectedScope,
@@ -864,15 +871,14 @@ describe('Metrics', () => {
                     sum: {
                       dataPoints: [
                         {
-                          attributes: expectedProtobufAttributes,
-                          // encodeAsString preserves full precision via BigInt
-                          startTimeUnixNano: encodeAsString(START_TIME),
-                          timeUnixNano: encodeAsString(END_TIME),
-                          asInt: '10',
+                          attributes: expectedAttributes,
+                          startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
+                          timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                          asInt: 10,
                         },
                       ],
-                      // protobuf-es toJson outputs enums as strings
-                      aggregationTemporality: 'AGGREGATION_TEMPORALITY_DELTA',
+                      aggregationTemporality:
+                        EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA,
                       isMonotonic: true,
                     },
                   },
@@ -882,35 +888,19 @@ describe('Metrics', () => {
           },
         ],
       };
-      assert.deepStrictEqual(decodedJson, expected);
-    });
-
-    it('serializes an empty request', () => {
-      const serialized = ProtobufMetricsSerializer.serializeRequest(
-        createResourceMetrics([])
-      );
-      assert.ok(serialized, 'serialized response is undefined');
-      const decoded = fromBinary(ExportMetricsServiceRequestSchema, serialized);
-      const decodedJson = toJson(ExportMetricsServiceRequestSchema, decoded);
-      // Empty metrics still has resource and scope, just no metric data
-      assert.ok(decodedJson, 'decoded response should exist');
-      assert.ok(
-        typeof decodedJson === 'object' && decodedJson !== null,
-        'decoded should be an object'
-      );
+      assert.deepStrictEqual(decodedObj, expected);
     });
 
     it('deserializes a response', () => {
-      const response = create(ExportMetricsServiceResponseSchema, {
-        partialSuccess: {
-          errorMessage: 'foo',
-          rejectedDataPoints: BigInt(1),
-        },
-      });
-      const protobufSerializedResponse = toBinary(
-        ExportMetricsServiceResponseSchema,
-        response
-      );
+      const protobufSerializedResponse =
+        root.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceResponse.encode(
+          {
+            partialSuccess: {
+              errorMessage: 'foo',
+              rejectedDataPoints: 1,
+            },
+          }
+        ).finish();
 
       const deserializedResponse =
         ProtobufMetricsSerializer.deserializeResponse(
@@ -922,7 +912,10 @@ describe('Metrics', () => {
         'partialSuccess not present in the deserialized message'
       );
       assert.equal(deserializedResponse.partialSuccess.errorMessage, 'foo');
-      assert.equal(deserializedResponse.partialSuccess.rejectedDataPoints, 1);
+      assert.equal(
+        Number(deserializedResponse.partialSuccess.rejectedDataPoints),
+        1
+      );
     });
 
     it('does not throw when deserializing an empty response', () => {
