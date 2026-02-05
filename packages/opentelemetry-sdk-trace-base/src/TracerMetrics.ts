@@ -13,21 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  Counter,
-  MeterProvider,
-  SpanContext,
-  UpDownCounter,
-} from '@opentelemetry/api';
+import { Counter, Meter, SpanContext, UpDownCounter } from '@opentelemetry/api';
 import { SamplingDecision } from './Sampler';
 
+/**
+ * Generates `otel.sdk.span.*` metrics.
+ * https://opentelemetry.io/docs/specs/semconv/otel/sdk-metrics/#span-metrics
+ */
 export class TracerMetrics {
   private readonly startedSpans: Counter;
   private readonly liveSpans: UpDownCounter;
 
-  constructor(meterProvider: MeterProvider) {
-    const meter = meterProvider.getMeter('@opentelemetry/sdk-trace');
-
+  constructor(meter: Meter) {
     this.startedSpans = meter.createCounter('otel.sdk.span.started', {
       unit: '{span}',
       description: 'The number of created spans.',
@@ -81,7 +78,5 @@ function samplingDecisionToString(decision: SamplingDecision): string {
       return 'RECORD_ONLY';
     case SamplingDecision.NOT_RECORD:
       return 'DROP';
-    default:
-      return 'unknown';
   }
 }

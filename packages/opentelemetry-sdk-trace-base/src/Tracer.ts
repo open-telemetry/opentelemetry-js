@@ -60,10 +60,12 @@ export class Tracer implements api.Tracer {
     this._idGenerator = config.idGenerator || new RandomIdGenerator();
     this._resource = resource;
     this._spanProcessor = spanProcessor;
-    this._tracerMetrics = new TracerMetrics(
-      localConfig.meterProvider || api.metrics.getMeterProvider()
-    );
     this.instrumentationScope = instrumentationScope;
+
+    const meter = localConfig.meterProvider
+      ? localConfig.meterProvider.getMeter('@opentelemetry/sdk-trace')
+      : api.createNoopMeter();
+    this._tracerMetrics = new TracerMetrics(meter);
   }
 
   /**
