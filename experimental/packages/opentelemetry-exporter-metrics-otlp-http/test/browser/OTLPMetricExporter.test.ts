@@ -43,7 +43,7 @@ describe('OTLPMetricExporter', function () {
     describe('when sendBeacon is available', function () {
       it('should successfully send data using sendBeacon', async function () {
         // arrange
-        const stubBeacon = sinon.stub(navigator, 'sendBeacon');
+        const stubBeacon = sinon.stub(navigator, 'sendBeacon').returns(true);
         const meterProvider = new MeterProvider({
           readers: [
             new PeriodicExportingMetricReader({

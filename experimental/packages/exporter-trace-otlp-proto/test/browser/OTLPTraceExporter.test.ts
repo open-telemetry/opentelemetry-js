@@ -39,7 +39,7 @@ describe('OTLPTraceExporter', () => {
     describe('when sendBeacon is available', function () {
       it('should successfully send data using sendBeacon', async function () {
         // arrange
-        const stubBeacon = sinon.stub(navigator, 'sendBeacon');
+        const stubBeacon = sinon.stub(navigator, 'sendBeacon').returns(true);
         const tracerProvider = new BasicTracerProvider({
           spanProcessors: [new SimpleSpanProcessor(new OTLPTraceExporter())],
         });
