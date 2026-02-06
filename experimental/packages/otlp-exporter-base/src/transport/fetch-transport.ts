@@ -24,6 +24,7 @@ import {
 import { HeadersFactory } from '../configuration/otlp-http-configuration';
 
 export interface FetchTransportParameters {
+  fetch: typeof globalThis.fetch;
   url: string;
   headers: HeadersFactory;
 }
@@ -41,7 +42,7 @@ class FetchTransport implements IExporterTransport {
     try {
       const isBrowserEnvironment = !!globalThis.location;
       const url = new URL(this._parameters.url);
-      const response = await fetch(url.href, {
+      const response = await this._parameters.fetch(url.href, {
         method: 'POST',
         headers: await this._parameters.headers(),
         body: data,

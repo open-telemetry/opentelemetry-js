@@ -71,6 +71,7 @@ export function convertLegacyHttpOptions(
       compression: config.compression,
       agentFactory: convertLegacyAgentOptions(config),
       userAgent: config.userAgent,
+      fetch: config.fetch,
     },
     getNodeHttpConfigurationFromEnvironment(
       signalIdentifier,

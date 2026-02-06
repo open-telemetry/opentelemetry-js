@@ -44,9 +44,12 @@ describe('FetchTransport', function () {
     it('returns success when request succeeds', function (done) {
       // arrange
       const fetchStub = sinon
-        .stub(globalThis, 'fetch')
+        .stub()
         .resolves(new Response('test response', { status: 200 }));
-      const transport = createFetchTransport(testTransportParameters);
+      const transport = createFetchTransport({
+        ...testTransportParameters,
+        fetch: fetchStub,
+      });
 
       //act
       transport.send(testPayload, requestTimeout).then(response => {
@@ -80,10 +83,13 @@ describe('FetchTransport', function () {
 
     it('returns failure when request fails', function (done) {
       // arrange
-      sinon
-        .stub(globalThis, 'fetch')
+      const fetchStub = sinon
+        .stub()
         .resolves(new Response('', { status: 404 }));
-      const transport = createFetchTransport(testTransportParameters);
+      const transport = createFetchTransport({
+        ...testTransportParameters,
+        fetch: fetchStub,
+      });
 
       //act
       transport.send(testPayload, requestTimeout).then(response => {
@@ -99,12 +105,15 @@ describe('FetchTransport', function () {
 
     it('returns retryable when request is retryable', function (done) {
       // arrange
-      sinon
-        .stub(globalThis, 'fetch')
+      const fetchStub = sinon
+        .stub()
         .resolves(
           new Response('', { status: 503, headers: { 'Retry-After': '5' } })
         );
-      const transport = createFetchTransport(testTransportParameters);
+      const transport = createFetchTransport({
+        ...testTransportParameters,
+        fetch: fetchStub,
+      });
 
       //act
       transport.send(testPayload, requestTimeout).then(response => {
@@ -126,9 +135,12 @@ describe('FetchTransport', function () {
       // arrange
       const abortError = new Error('aborted request');
       abortError.name = 'AbortError';
-      sinon.stub(globalThis, 'fetch').rejects(abortError);
+      const fetchStub = sinon.stub().rejects(abortError);
       const clock = sinon.useFakeTimers();
-      const transport = createFetchTransport(testTransportParameters);
+      const transport = createFetchTransport({
+        ...testTransportParameters,
+        fetch: fetchStub,
+      });
 
       //act
       transport.send(testPayload, requestTimeout).then(response => {
@@ -149,9 +161,12 @@ describe('FetchTransport', function () {
 
     it('returns failure when fetch throws non-network error', function (done) {
       // arrange
-      sinon.stub(globalThis, 'fetch').throws(new Error('fetch failed'));
+      const fetchStub = sinon.stub().throws(new Error('fetch failed'));
       const clock = sinon.useFakeTimers();
-      const transport = createFetchTransport(testTransportParameters);
+      const transport = createFetchTransport({
+        ...testTransportParameters,
+        fetch: fetchStub,
+      });
 
       //act
       transport.send(testPayload, requestTimeout).then(response => {
@@ -173,8 +188,11 @@ describe('FetchTransport', function () {
     it('returns retryable when browser fetch throws network error', function (done) {
       // arrange
       // Browser fetch throws TypeError for network errors
-      sinon.stub(globalThis, 'fetch').rejects(new TypeError('Failed to fetch'));
-      const transport = createFetchTransport(testTransportParameters);
+      const fetchStub = sinon.stub().rejects(new TypeError('Failed to fetch'));
+      const transport = createFetchTransport({
+        ...testTransportParameters,
+        fetch: fetchStub,
+      });
 
       //act
       transport.send(testPayload, requestTimeout).then(response => {
@@ -184,6 +202,41 @@ describe('FetchTransport', function () {
           assert.strictEqual(
             response.error?.message,
             'Fetch request encountered a network error'
+          );
+        } catch (e) {
+          done(e);
+        }
+        done();
+      }, done /* catch any rejections */);
+    });
+
+    it('uses custom fetch function when provided', function (done) {
+      // arrange
+      const customFetchStub = sinon
+        .stub()
+        .resolves(new Response('custom fetch response', { status: 200 }));
+      const globalFetchStub = sinon
+        .stub(globalThis, 'fetch')
+        .resolves(new Response('global fetch response', { status: 200 }));
+      const transport = createFetchTransport({
+        ...testTransportParameters,
+        fetch: customFetchStub,
+      });
+
+      //act
+      transport.send(testPayload, requestTimeout).then(response => {
+        // assert
+        try {
+          assert.strictEqual(response.status, 'success');
+          sinon.assert.calledOnce(customFetchStub);
+          sinon.assert.notCalled(globalFetchStub);
+          sinon.assert.calledWithMatch(
+            customFetchStub,
+            testTransportParameters.url,
+            {
+              method: 'POST',
+              body: testPayload,
+            }
           );
         } catch (e) {
           done(e);
