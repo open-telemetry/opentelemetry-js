@@ -395,7 +395,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         originalResponse: Response
       ): Response {
         return new Proxy(target, {
-          get(t, prop, receiver) {
+          get(t, prop, _receiver) {
             if (typeof prop === 'string' && readOnlyProps.has(prop)) {
               return Reflect.get(originalResponse, prop);
             }
