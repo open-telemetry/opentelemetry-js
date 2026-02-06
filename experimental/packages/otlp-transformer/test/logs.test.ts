@@ -15,7 +15,11 @@
  */
 import { HrTime, TraceFlags } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
-import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
+import {
+  Resource,
+  resourceFromAttributes,
+  resourceFromDetectedResource,
+} from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
@@ -52,6 +56,7 @@ function createExpectedLogJson(encoder: Encoder): IExportLogsServiceRequest {
             },
           ],
           droppedAttributesCount: 0,
+          entityRefs: [],
         },
         schemaUrl: undefined,
         scopeLogs: [
@@ -109,11 +114,23 @@ function createExpectedLogProtobuf(): IExportLogsServiceRequest {
         resource: {
           attributes: [
             {
-              key: 'resource-attribute',
-              value: { stringValue: 'some attribute value' },
+              key: 'id_key_1',
+              value: { stringValue: 'id_value_1' },
+            },
+            {
+              key: 'attr_key_1',
+              value: { stringValue: 'attr_value_1' },
             },
           ],
           droppedAttributesCount: 0,
+          entityRefs: [
+            {
+              descriptionKeys: ['attr_key_1'],
+              idKeys: ['id_key_1'],
+              schemaUrl: 'http://url.to.schema',
+              type: 'entity_type_1',
+            },
+          ],
         },
         scopeLogs: [
           {
@@ -175,6 +192,7 @@ const DEFAULT_LOG_FRAGMENT: Omit<
 describe('Logs', () => {
   let resource_1: Resource;
   let resource_2: Resource;
+  let resource_3: Resource;
   let scope_1: InstrumentationScope;
   let scope_2: InstrumentationScope;
 
@@ -193,6 +211,8 @@ describe('Logs', () => {
   let log_1_2_1: ReadableLogRecord;
   // using `resource_2`, `scope_1`, `log_fragment_1`
   let log_2_1_1: ReadableLogRecord;
+  // using `resource_3`, `scope_1`, `log_fragment_1`
+  let log_3_1_1: ReadableLogRecord;
 
   function createReadableLogRecord(
     resource: Resource,
@@ -212,6 +232,16 @@ describe('Logs', () => {
     });
     resource_2 = resourceFromAttributes({
       'resource-attribute': 'another attribute value',
+    });
+    resource_3 = resourceFromDetectedResource({
+      entities: [
+        {
+          type: 'entity_type_1',
+          identifier: { id_key_1: 'id_value_1' },
+          attributes: { attr_key_1: 'attr_value_1' },
+          schemaUrl: 'http://url.to.schema',
+        },
+      ],
     });
     scope_1 = {
       name: 'scope_name_1',
@@ -236,6 +266,7 @@ describe('Logs', () => {
     log_1_1_2 = createReadableLogRecord(resource_1, scope_1, log_fragment_2);
     log_1_2_1 = createReadableLogRecord(resource_1, scope_2, log_fragment_1);
     log_2_1_1 = createReadableLogRecord(resource_2, scope_1, log_fragment_1);
+    log_3_1_1 = createReadableLogRecord(resource_3, scope_1, log_fragment_1);
   });
 
   describe('createExportLogsServiceRequest', () => {
@@ -346,7 +377,7 @@ describe('Logs', () => {
 
   describe('ProtobufLogsSerializer', function () {
     it('serializes an export request', () => {
-      const serialized = ProtobufLogsSerializer.serializeRequest([log_1_1_1]);
+      const serialized = ProtobufLogsSerializer.serializeRequest([log_3_1_1]);
       assert.ok(serialized, 'serialized response is undefined');
       const decoded =
         root.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest.decode(

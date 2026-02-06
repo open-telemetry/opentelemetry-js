@@ -19,9 +19,11 @@ import { Logger } from './types/Logger';
 import { LoggerOptions } from './types/LoggerOptions';
 import { NOOP_LOGGER_PROVIDER } from './NoopLoggerProvider';
 import { ProxyLogger } from './ProxyLogger';
+import { Entity } from '@opentelemetry/api';
 
 export class ProxyLoggerProvider implements LoggerProvider {
   private _delegate?: LoggerProvider;
+  private _boundEntity?: Entity;
 
   getLogger(
     name: string,
@@ -32,6 +34,16 @@ export class ProxyLoggerProvider implements LoggerProvider {
       this._getDelegateLogger(name, version, options) ??
       new ProxyLogger(this, name, version, options)
     );
+  }
+
+  forEntity(entity: Entity): LoggerProvider {
+    const boundProvider = this._delegate?.forEntity(entity);
+    if (boundProvider) {
+      return boundProvider;
+    }
+    const proxyLoggerProvider = new ProxyLoggerProvider();
+    proxyLoggerProvider._boundEntity = entity;
+    return proxyLoggerProvider;
   }
 
   /**
@@ -59,6 +71,10 @@ export class ProxyLoggerProvider implements LoggerProvider {
     version?: string | undefined,
     options?: LoggerOptions | undefined
   ): Logger | undefined {
+    if (this._boundEntity) {
+      const boundProvider = this._delegate?.forEntity(this._boundEntity);
+      return boundProvider?.getLogger(name, version, options);
+    }
     return this._delegate?.getLogger(name, version, options);
   }
 }

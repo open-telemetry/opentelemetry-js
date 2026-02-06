@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-import { Entity } from '../common/Entity';
-import { Meter, MeterOptions } from './Meter';
-import { MeterProvider } from './MeterProvider';
-import { NOOP_METER } from './NoopMeter';
+import { Attributes } from './Attributes';
 
-/**
- * An implementation of the {@link MeterProvider} which returns an impotent Meter
- * for all calls to `getMeter`
- */
-export class NoopMeterProvider implements MeterProvider {
-  forEntity(_entity: Entity): this {
-    return this;
-  }
-
-  getMeter(_name: string, _version?: string, _options?: MeterOptions): Meter {
-    return NOOP_METER;
-  }
+export interface BindableProvider<T> {
+  forEntity(entity: Entity): T;
 }
 
-export const NOOP_METER_PROVIDER = new NoopMeterProvider();
+export type Entity = {
+  type: string;
+  identifier: Attributes;
+  attributes: Attributes;
+  schemaUrl?: string;
+  asyncAttributesPending: boolean;
+  waitForAsyncAttributes(): Promise<void>;
+};

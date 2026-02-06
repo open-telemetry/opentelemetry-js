@@ -15,7 +15,7 @@
  */
 
 import { envDetector } from '../../../src';
-import { resourceFromDetectedResource } from '../../../src/ResourceImpl';
+import { resourceFromDetectedResource } from '../../../src/resource-impl';
 import { describeNode } from '../../util';
 import {
   assertEmptyResource,

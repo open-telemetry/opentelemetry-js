@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { Entity } from '../common/Entity';
 import { Tracer } from './tracer';
 import { TracerOptions } from './tracer_options';
 
@@ -36,4 +37,13 @@ export interface TracerProvider {
    * @returns Tracer A Tracer with the given name and version
    */
   getTracer(name: string, version?: string, options?: TracerOptions): Tracer;
+
+  /**
+   * Creates a new TracerProvider with the same configuration but with the
+   * provided entity merged into the resource.
+   *
+   * @param entity The entity to merge into the resource
+   * @returns A new TracerProvider with the merged entity
+   */
+  forEntity(entity: Entity): TracerProvider;
 }

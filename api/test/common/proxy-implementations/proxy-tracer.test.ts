@@ -72,6 +72,7 @@ describe('ProxyTracer', function () {
       getTracerStub = sandbox.stub().returns(new NoopTracer());
       delegate = {
         getTracer: getTracerStub,
+        forEntity: sandbox.stub().returnsThis(),
       };
       provider.setDelegate(delegate);
     });
@@ -127,6 +128,7 @@ describe('ProxyTracer', function () {
         getTracer() {
           return delegateTracer;
         },
+        forEntity: sandbox.stub().returnsThis(),
       };
       provider.setDelegate(delegate);
     });

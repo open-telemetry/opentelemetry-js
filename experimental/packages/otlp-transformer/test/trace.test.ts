@@ -13,21 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as root from '../src/generated/root';
 import { SpanKind, SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import { TraceState } from '@opentelemetry/core';
-import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
+import {
+  Resource,
+  resourceFromAttributes,
+  resourceFromDetectedResource,
+} from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import { toBase64 } from './utils';
-import { OtlpEncodingOptions } from '../src/common/internal-types';
-import { ESpanKind, EStatusCode } from '../src/trace/internal-types';
-import { createExportTraceServiceRequest } from '../src/trace/internal';
-import { ProtobufTraceSerializer } from '../src/trace/protobuf';
-import { JsonTraceSerializer } from '../src/trace/json';
+import { TextDecoder, TextEncoder } from 'util';
 import { hexToBinary } from '../src/common/hex-to-binary';
-import { ISpan } from '../src/trace/internal-types';
+import { OtlpEncodingOptions } from '../src/common/internal-types';
 import { JSON_ENCODER, PROTOBUF_ENCODER } from '../src/common/utils';
+import * as root from '../src/generated/root';
+import { createExportTraceServiceRequest } from '../src/trace/internal';
+import { ESpanKind, EStatusCode, ISpan } from '../src/trace/internal-types';
+import { JsonTraceSerializer } from '../src/trace/json';
+import { ProtobufTraceSerializer } from '../src/trace/protobuf';
+import { toBase64 } from './utils';
 
 function createExpectedSpanJson(options: OtlpEncodingOptions) {
   const useHex = options.useHex ?? false;
@@ -63,8 +67,30 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
         resource: {
           attributes: [
             {
+              key: 'resource-entity-id',
+              value: {
+                stringValue: 'resource entity value',
+              },
+            },
+            {
+              key: 'resource-entity-attribute',
+              value: {
+                stringValue: 'resource entity attribute value',
+              },
+            },
+            {
               key: 'resource-attribute',
-              value: { stringValue: 'resource attribute value' },
+              value: {
+                stringValue: 'resource attribute value',
+              },
+            },
+          ],
+          entityRefs: [
+            {
+              descriptionKeys: ['resource-entity-attribute'],
+              idKeys: ['resource-entity-id'],
+              schemaUrl: 'http://url.to.resource.schema',
+              type: 'resource-entity-type',
             },
           ],
           droppedAttributesCount: 0,
@@ -159,8 +185,30 @@ function createExpectedSpanProtobuf() {
         resource: {
           attributes: [
             {
+              key: 'resource-entity-id',
+              value: {
+                stringValue: 'resource entity value',
+              },
+            },
+            {
+              key: 'resource-entity-attribute',
+              value: {
+                stringValue: 'resource entity attribute value',
+              },
+            },
+            {
               key: 'resource-attribute',
-              value: { stringValue: 'resource attribute value' },
+              value: {
+                stringValue: 'resource attribute value',
+              },
+            },
+          ],
+          entityRefs: [
+            {
+              descriptionKeys: ['resource-entity-attribute'],
+              idKeys: ['resource-entity-id'],
+              schemaUrl: 'http://url.to.resource.schema',
+              type: 'resource-entity-type',
             },
           ],
           droppedAttributesCount: 0,
@@ -297,8 +345,22 @@ describe('Trace', () => {
   }
 
   beforeEach(() => {
-    resource = resourceFromAttributes({
-      'resource-attribute': 'resource attribute value',
+    resource = resourceFromDetectedResource({
+      attributes: {
+        'resource-attribute': 'resource attribute value',
+      },
+      entities: [
+        {
+          identifier: {
+            'resource-entity-id': 'resource entity value',
+          },
+          type: 'resource-entity-type',
+          attributes: {
+            'resource-entity-attribute': 'resource entity attribute value',
+          },
+          schemaUrl: 'http://url.to.resource.schema',
+        },
+      ],
     });
     span = createSpanWithResource(resource);
   });

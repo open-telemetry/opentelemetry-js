@@ -16,6 +16,7 @@
 
 import { Attributes } from '@opentelemetry/api';
 import { RawResourceAttribute } from './types';
+import { Entity } from '@opentelemetry/api';
 
 /**
  * An interface that represents a resource. A Resource describes the entity for which signals (metrics or trace) are
@@ -47,6 +48,11 @@ export interface Resource {
   readonly schemaUrl?: string;
 
   /**
+   * @returns a list of Entities associated with the resource
+   */
+  readonly entities: Entity[];
+
+  /**
    * Returns a promise that will never be rejected. Resolves when all async attributes have finished being added to
    * this Resource's attributes. This is useful in exporters to block until resource detection
    * has finished.
@@ -64,4 +70,6 @@ export interface Resource {
   merge(other: Resource | null): Resource;
 
   getRawAttributes(): RawResourceAttribute[];
+
+  addEntity(entity: Entity): Resource;
 }

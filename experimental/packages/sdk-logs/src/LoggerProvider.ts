@@ -16,21 +16,23 @@
 import { diag } from '@opentelemetry/api';
 import type * as logsAPI from '@opentelemetry/api-logs';
 import { NOOP_LOGGER } from '@opentelemetry/api-logs';
-import { defaultResource } from '@opentelemetry/resources';
 import { BindOnceFuture } from '@opentelemetry/core';
+import { defaultResource } from '@opentelemetry/resources';
 
-import type { LoggerProviderConfig } from './types';
-import { Logger } from './Logger';
+import { Entity } from '@opentelemetry/api';
 import {
   DEFAULT_LOGGER_CONFIGURATOR,
   LoggerProviderSharedState,
 } from './internal/LoggerProviderSharedState';
+import { Logger } from './Logger';
+import type { LoggerProviderConfig } from './types';
 
 export const DEFAULT_LOGGER_NAME = 'unknown';
 
 export class LoggerProvider implements logsAPI.LoggerProvider {
   private _shutdownOnce: BindOnceFuture<void>;
   private readonly _sharedState: LoggerProviderSharedState;
+  private readonly _config: LoggerProviderConfig;
 
   constructor(config: LoggerProviderConfig = {}) {
     const mergedConfig = {
@@ -45,6 +47,7 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
         config.loggerConfigurator ?? DEFAULT_LOGGER_CONFIGURATOR,
       processors: config.processors ?? [],
     };
+    this._config = config;
     this._sharedState = new LoggerProviderSharedState(
       mergedConfig.resource,
       mergedConfig.forceFlushTimeoutMillis,
@@ -112,6 +115,21 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
       return this._shutdownOnce.promise;
     }
     return this._shutdownOnce.call();
+  }
+
+  /**
+   * Creates a new LoggerProvider with the same export pipeline but a new resource
+   * that includes the provided entity merged into it.
+   *
+   * @param entity - The entity to merge into the resource
+   * @returns A new LoggerProvider with the merged entity
+   */
+  public forEntity(entity: Entity): LoggerProvider {
+    const newResource = this._sharedState.resource.addEntity(entity);
+    return new LoggerProvider({
+      ...this._config,
+      resource: newResource,
+    });
   }
 
   private _shutdown(): Promise<void> {

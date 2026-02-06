@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { Entity } from '@opentelemetry/api';
 import { Logger } from './Logger';
 import { LoggerOptions } from './LoggerOptions';
 
@@ -31,4 +32,6 @@ export interface LoggerProvider {
    * @returns Logger A Logger with the given name and version
    */
   getLogger(name: string, version?: string, options?: LoggerOptions): Logger;
+
+  forEntity(entity: Entity): LoggerProvider;
 }

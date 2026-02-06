@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { Entity } from '../common/Entity';
 import { Tracer } from './tracer';
 import { TracerProvider } from './tracer_provider';
 import { ProxyTracer } from './ProxyTracer';
@@ -35,6 +36,7 @@ const NOOP_TRACER_PROVIDER = new NoopTracerProvider();
  */
 export class ProxyTracerProvider implements TracerProvider {
   private _delegate?: TracerProvider;
+  private _entity?: Entity;
 
   /**
    * Get a {@link ProxyTracer}
@@ -47,7 +49,11 @@ export class ProxyTracerProvider implements TracerProvider {
   }
 
   getDelegate(): TracerProvider {
-    return this._delegate ?? NOOP_TRACER_PROVIDER;
+    const delegate = this._delegate ?? NOOP_TRACER_PROVIDER;
+    if (this._entity && delegate !== NOOP_TRACER_PROVIDER) {
+      return delegate.forEntity(this._entity);
+    }
+    return delegate;
   }
 
   /**
@@ -63,5 +69,15 @@ export class ProxyTracerProvider implements TracerProvider {
     options?: TracerOptions
   ): Tracer | undefined {
     return this._delegate?.getTracer(name, version, options);
+  }
+
+  forEntity(entity: Entity): TracerProvider {
+    if (this._delegate) {
+      return this._delegate.forEntity(entity);
+    }
+    // Return a new proxy that will apply the entity when a delegate is set
+    const boundProxy = new ProxyTracerProvider();
+    boundProxy._entity = entity;
+    return boundProxy;
   }
 }
