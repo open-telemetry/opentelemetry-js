@@ -28,6 +28,7 @@ import { Sampler } from './Sampler';
 import { IdGenerator } from './IdGenerator';
 import { RandomIdGenerator } from './platform';
 import { Resource } from '@opentelemetry/resources';
+import { TracerMetrics } from './TracerMetrics';
 
 /**
  * This class represents a basic tracer.
@@ -41,6 +42,7 @@ export class Tracer implements api.Tracer {
 
   private readonly _resource: Resource;
   private readonly _spanProcessor: SpanProcessor;
+  private readonly _tracerMetrics: TracerMetrics;
 
   /**
    * Constructs a new Tracer instance.
@@ -59,6 +61,11 @@ export class Tracer implements api.Tracer {
     this._resource = resource;
     this._spanProcessor = spanProcessor;
     this.instrumentationScope = instrumentationScope;
+
+    const meter = localConfig.meterProvider
+      ? localConfig.meterProvider.getMeter('@opentelemetry/sdk-trace')
+      : api.createNoopMeter();
+    this._tracerMetrics = new TracerMetrics(meter);
   }
 
   /**
@@ -120,6 +127,11 @@ export class Tracer implements api.Tracer {
       links
     );
 
+    const recordEndMetrics = this._tracerMetrics.startSpan(
+      parentSpanContext,
+      samplingResult.decision
+    );
+
     traceState = samplingResult.traceState ?? traceState;
 
     const traceFlags =
@@ -154,6 +166,7 @@ export class Tracer implements api.Tracer {
       startTime: options.startTime,
       spanProcessor: this._spanProcessor,
       spanLimits: this._spanLimits,
+      recordEndMetrics,
     });
     return span;
   }
