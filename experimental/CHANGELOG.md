@@ -21,6 +21,7 @@ feat(configuration): parse config for rc 3 [#6304](https://github.com/open-telem
 
 * fix(exporter-prometheus): add missing `@opentelemetry/semantic-conventions` dependency [#6330](https://github.com/open-telemetry/opentelemetry-js/pull/6330) @omizha
 * fix(otlp-transformer): correctly handle Uint8Array attribute values when serializing to JSON [#6348](https://github.com/open-telemetry/opentelemetry-js/pull/6348) @pichlermarc
+* fix(otlp-exporter-base): fix unwanted instrumentation of the fetch exports when context is not propagated [#6353](https://github.com/open-telemetry/opentelemetry-js/pull/6353) @david-luna
 
 ### :books: Documentation
 
