@@ -60,6 +60,12 @@ import {
 import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
 import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
+import {
+  BatchLogRecordProcessor,
+  BufferConfig,
+  LogRecordExporter,
+  LoggerProviderConfig,
+} from '@opentelemetry/sdk-logs';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
@@ -70,11 +76,11 @@ const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
 export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   // When updating this list, make sure to also update the section `resourceDetectors` on README.
   const resourceDetectors = new Map<string, ResourceDetector>([
-    [RESOURCE_DETECTOR_ENVIRONMENT, envDetector],
     [RESOURCE_DETECTOR_HOST, hostDetector],
     [RESOURCE_DETECTOR_OS, osDetector],
     [RESOURCE_DETECTOR_SERVICE_INSTANCE_ID, serviceInstanceIdDetector],
     [RESOURCE_DETECTOR_PROCESS, processDetector],
+    [RESOURCE_DETECTOR_ENVIRONMENT, envDetector],
   ]);
 
   const resourceDetectorsFromEnv = getStringListFromEnv(
@@ -360,7 +366,7 @@ export function getKeyListFromObjectArray(
     .reduce((prev, curr) => prev.concat(curr), []);
 }
 
-export function getAndValidateMillisFromEnv(
+export function getNonNegativeNumberFromEnv(
   envVarName: string
 ): number | undefined {
   const value = getNumberFromEnv(envVarName);
@@ -379,10 +385,10 @@ export function getPeriodicExportingMetricReaderFromEnv(
   const defaultTimeoutMillis = 30_000;
   const defaultIntervalMillis = 60_000;
 
-  const rawExportIntervalMillis = getAndValidateMillisFromEnv(
+  const rawExportIntervalMillis = getNonNegativeNumberFromEnv(
     'OTEL_METRIC_EXPORT_INTERVAL'
   );
-  const rawExportTimeoutMillis = getAndValidateMillisFromEnv(
+  const rawExportTimeoutMillis = getNonNegativeNumberFromEnv(
     'OTEL_METRIC_EXPORT_TIMEOUT'
   );
 
@@ -443,4 +449,48 @@ export function getOtlpMetricExporterFromEnv(): PushMetricExporter {
     `Unsupported OTLP metrics protocol: "${protocol}". Using http/protobuf.`
   );
   return new OTLPProtoMetricExporter();
+}
+
+/**
+ * Get LoggerProviderConfig from environment variables.
+ */
+export function getLoggerProviderConfigFromEnv(): LoggerProviderConfig {
+  return {
+    logRecordLimits: {
+      attributeCountLimit:
+        getNonNegativeNumberFromEnv('OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT') ??
+        getNonNegativeNumberFromEnv('OTEL_ATTRIBUTE_COUNT_LIMIT'),
+      attributeValueLengthLimit:
+        getNonNegativeNumberFromEnv(
+          'OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT'
+        ) ?? getNonNegativeNumberFromEnv('OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT'),
+    },
+  };
+}
+
+/**
+ * Get configuration for BatchLogRecordProcessor from environment variables.
+ */
+export function getBatchLogRecordProcessorConfigFromEnv(): BufferConfig {
+  return {
+    maxQueueSize: getNonNegativeNumberFromEnv('OTEL_BLRP_MAX_QUEUE_SIZE'),
+    scheduledDelayMillis: getNonNegativeNumberFromEnv(
+      'OTEL_BLRP_SCHEDULE_DELAY'
+    ),
+    exportTimeoutMillis: getNonNegativeNumberFromEnv(
+      'OTEL_BLRP_EXPORT_TIMEOUT'
+    ),
+    maxExportBatchSize: getNonNegativeNumberFromEnv(
+      'OTEL_BLRP_MAX_EXPORT_BATCH_SIZE'
+    ),
+  };
+}
+
+export function getBatchLogRecordProcessorFromEnv(
+  exporter: LogRecordExporter
+): BatchLogRecordProcessor {
+  return new BatchLogRecordProcessor(
+    exporter,
+    getBatchLogRecordProcessorConfigFromEnv()
+  );
 }

@@ -79,6 +79,7 @@ import type {
   IncomingMessage,
   ServerResponse,
   RequestOptions,
+  OutgoingHttpHeaders,
 } from 'http';
 import { isWrapped, SemconvStability } from '@opentelemetry/instrumentation';
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
@@ -155,7 +156,8 @@ export const startIncomingSpanHookFunction = (
 export const startOutgoingSpanHookFunction = (
   request: RequestOptions
 ): Attributes => {
-  return { guid: request.headers?.guid };
+  const headers = request.headers as OutgoingHttpHeaders | undefined;
+  return { guid: headers?.guid };
 };
 
 describe('HttpInstrumentation', () => {
@@ -326,11 +328,9 @@ describe('HttpInstrumentation', () => {
             );
           },
           ignoreOutgoingRequestHook: request => {
-            if (request.headers?.['user-agent'] != null) {
-              return (
-                `${request.headers['user-agent']}`.match('ignored-string') !=
-                null
-              );
+            const headers = request.headers as OutgoingHttpHeaders | undefined;
+            if (headers?.['user-agent'] != null) {
+              return `${headers['user-agent']}`.match('ignored-string') != null;
             }
             return false;
           },

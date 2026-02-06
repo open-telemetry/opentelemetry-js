@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation-grpc",
-  "version": "0.210.0",
+  "version": "0.211.0",
   "description": "OpenTelemetry instrumentation for `@grpc/grpc-js` rpc client and server for gRPC framework",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -50,16 +50,16 @@
     "@grpc/grpc-js": "^1.7.1",
     "@grpc/proto-loader": "^0.7.10",
     "@opentelemetry/api": "1.9.0",
-    "@opentelemetry/context-async-hooks": "2.4.0",
-    "@opentelemetry/core": "2.4.0",
-    "@opentelemetry/sdk-trace-base": "2.4.0",
-    "@opentelemetry/sdk-trace-node": "2.4.0",
+    "@opentelemetry/context-async-hooks": "2.5.0",
+    "@opentelemetry/core": "2.5.0",
+    "@opentelemetry/sdk-trace-base": "2.5.0",
+    "@opentelemetry/sdk-trace-node": "2.5.0",
     "@protobuf-ts/grpc-transport": "2.11.1",
     "@protobuf-ts/plugin": "2.11.1",
     "@protobuf-ts/runtime": "2.11.1",
     "@protobuf-ts/runtime-rpc": "2.11.1",
     "@types/mocha": "10.0.10",
-    "@types/node": "18.6.5",
+    "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
     "@typescript/vfs": "1.6.2",
     "mocha": "11.7.5",
@@ -71,7 +71,7 @@
     "@opentelemetry/api": "^1.3.0"
   },
   "dependencies": {
-    "@opentelemetry/instrumentation": "0.210.0",
+    "@opentelemetry/instrumentation": "0.211.0",
     "@opentelemetry/semantic-conventions": "^1.29.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-grpc",

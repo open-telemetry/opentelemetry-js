@@ -151,7 +151,7 @@ Previous versions of node *may* work, but they are not tested by OpenTelemetry a
 Rather than define versions of specific browsers / runtimes, OpenTelemetry sets the minimum supported version based on the
 underlying language features used.
 
-The current minumum language feature support is set as [ECMAScript 2022](https://262.ecma-international.org/13.0/) that are available
+The current minimum language feature support is set as [ECMAScript 2022](https://262.ecma-international.org/13.0/) that are available
 in all modern browsers / runtimes.
 
 This means that if you are targeting or your end-users are using a browser / runtime that does not support ES2022, you will need
@@ -165,7 +165,7 @@ This minimum support level is subject to change as the project evolves and as th
 OpenTelemetry JavaScript is built with TypeScript `v5.0.4`. If you have a TypeScript project (app, library, instrumentation, etc.)
 that depends on it, we recommend using same or higher version to compile the project.
 
-OpenTelemetry JavaScript will follows DefinitelyType's [support policy for TypeScript](https://github.com/DefinitelyTyped/DefinitelyTyped#support-window) which sets a support window of 2 years. Support for TypeScript versions older than 2 years will be dropped in minor releases of OpenTelemetry JavaScript.
+OpenTelemetry JavaScript will follow DefinitelyType's [support policy for TypeScript](https://github.com/DefinitelyTyped/DefinitelyTyped#support-window) which sets a support window of 2 years. Support for TypeScript versions older than 2 years will be dropped in minor releases of OpenTelemetry JavaScript.
 
 ## Package Version Compatibility
 
