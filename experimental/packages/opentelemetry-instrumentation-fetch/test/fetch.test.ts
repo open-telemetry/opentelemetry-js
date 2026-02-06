@@ -2606,6 +2606,47 @@ describe('fetch', () => {
           'cloned response.redirected should match the original'
         );
       });
+
+      it('should not cause "Illegal invocation" when accessing response.headers getter', async () => {
+        let response: Response | undefined;
+
+        await trace(async () => {
+          response = await fetch('/api/status.json');
+        });
+
+        assert.ok(response);
+        // Proxy uses target as receiver so Response getters (e.g. headers) run with correct this
+        assert.doesNotThrow(() => {
+          const contentType = response!.headers.get('content-type');
+          assert.ok(
+            contentType !== null && contentType.includes('application/json'),
+            'response.headers getter should work without Illegal invocation'
+          );
+        });
+      });
+
+      it('should allow response.json() to work on the wrapped response', async () => {
+        const payload = { ok: true, message: 'hello' };
+        await startWorker(
+          msw.http.get('/api/payload.json', () => {
+            return msw.HttpResponse.json(payload);
+          })
+        );
+
+        let response: Response | undefined;
+
+        await trace(async () => {
+          response = await fetch('/api/payload.json');
+        });
+
+        assert.ok(response);
+        const data = await response.json();
+        assert.deepStrictEqual(
+          data,
+          payload,
+          'response.json() should return the response body'
+        );
+      });
     });
 
     describe('long-lived streaming requests', () => {
