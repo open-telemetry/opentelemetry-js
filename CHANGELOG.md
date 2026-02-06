@@ -16,6 +16,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(sdk-trace-web): pass `optimised` parameter recursively in `getElementXPath` [#6323](https://github.com/open-telemetry/opentelemetry-js/issues/6323) @ritesh
 * fix(opentelemetry-sdk-node): the custom value from env variable for service.instance.id should take priority over random uuid as backup [#6345](https://github.com/open-telemetry/opentelemetry-js/pull/6345) @maryliag
 
 ### :books: Documentation
