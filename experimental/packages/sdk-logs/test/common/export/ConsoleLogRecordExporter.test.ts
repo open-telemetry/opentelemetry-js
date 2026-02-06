@@ -95,4 +95,11 @@ describe('ConsoleLogRecordExporter', () => {
       });
     });
   });
+
+  describe('forceFlush', function () {
+    it('should forceFlush without error', async function () {
+      const consoleExporter = new ConsoleLogRecordExporter();
+      await consoleExporter.forceFlush();
+    });
+  });
 });

@@ -30,4 +30,10 @@ export interface LogRecordExporter {
 
   /** Stops the exporter. */
   shutdown(): Promise<void>;
+
+  /**
+   * Finish all pending exports as soon as possible, preferably before
+   * resolving the promise returned.
+   */
+  forceFlush(): Promise<void>;
 }
