@@ -225,20 +225,12 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       // - Headers object
       // - Record<string, string>
       // - Iterable<[string, string]> (including array of tuples)
-      const headers = new Headers();
+      const headers = new Headers(options.headers);
+      // Inject propagation headers last so they take precedence on conflicts
       propagation.inject(context.active(), headers, {
         set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
       });
-      // Merge user headers second so they take precedence on conflicts
-      new Headers(options.headers).forEach((value, key) => {
-        headers.set(key, value);
-      });
-      // Convert back to plain object to maintain backward compatibility
-      const headersObject: Record<string, string> = {};
-      headers.forEach((value, key) => {
-        headersObject[key] = value;
-      });
-      options.headers = headersObject;
+      options.headers = headers;
     }
   }
 
@@ -595,8 +587,9 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           return context.with(
             trace.setSpan(context.active(), createdSpan),
             () => {
-              plugin._addHeaders(options, url);
+              // Call request hook before injection so hooks cannot tamper with propagation headers
               plugin._callRequestHook(createdSpan, options);
+              plugin._addHeaders(options, url);
               plugin._tasksCount++;
 
               return original
