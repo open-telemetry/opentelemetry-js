@@ -20,6 +20,7 @@ import {
   Attributes,
   AttributeValue,
   diag,
+  Exception,
   ROOT_CONTEXT,
   trace,
   TraceFlags,
@@ -173,10 +174,7 @@ describe('LogRecord', () => {
         logRecord.attributes[ATTR_EXCEPTION_MESSAGE],
         error.message
       );
-      assert.strictEqual(
-        logRecord.attributes[ATTR_EXCEPTION_TYPE],
-        error.name
-      );
+      assert.strictEqual(logRecord.attributes[ATTR_EXCEPTION_TYPE], error.name);
       if (error.stack) {
         assert.strictEqual(
           logRecord.attributes[ATTR_EXCEPTION_STACKTRACE],
@@ -204,6 +202,27 @@ describe('LogRecord', () => {
         logRecord.attributes[ATTR_EXCEPTION_TYPE],
         'CustomError'
       );
+    });
+
+    it('should set exception.message for string exceptions', () => {
+      const logRecordData: logsAPI.LogRecord = {
+        exception: 'boom',
+      };
+      const { logRecord } = setup(undefined, logRecordData);
+
+      assert.strictEqual(logRecord.attributes[ATTR_EXCEPTION_MESSAGE], 'boom');
+    });
+
+    it('should warn when exception has no useful fields', () => {
+      const warnSpy = sinon.stub(diag, 'warn');
+      const logRecordData: logsAPI.LogRecord = {
+        exception: {} as Exception,
+      };
+
+      setup(undefined, logRecordData);
+
+      assert.ok(warnSpy.calledOnce);
+      warnSpy.restore();
     });
   });
 
@@ -347,30 +366,6 @@ describe('LogRecord', () => {
           ]);
         });
       });
-    });
-  });
-
-  describe('setException', () => {
-    it('should set exception attributes on the log record', () => {
-      const { logRecord } = setup();
-      const error = new Error('kaboom');
-
-      logRecord.setException(error);
-
-      assert.strictEqual(
-        logRecord.attributes[ATTR_EXCEPTION_MESSAGE],
-        error.message
-      );
-      assert.strictEqual(
-        logRecord.attributes[ATTR_EXCEPTION_TYPE],
-        error.name
-      );
-      if (error.stack) {
-        assert.strictEqual(
-          logRecord.attributes[ATTR_EXCEPTION_STACKTRACE],
-          error.stack
-        );
-      }
     });
   });
 

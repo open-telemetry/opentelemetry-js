@@ -86,6 +86,8 @@ export interface LogRecord {
 
   /**
    * An exception (or error) associated with the log record.
+   *
+   * @experimental
    */
   exception?: Exception;
 

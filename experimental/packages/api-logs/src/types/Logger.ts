@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import type { Exception } from '@opentelemetry/api';
 import { LogRecord } from './LogRecord';
-import { RecordExceptionOptions } from './RecordExceptionOptions';
 
 export interface Logger {
   /**
@@ -25,12 +23,4 @@ export interface Logger {
    * @param logRecord
    */
   emit(logRecord: LogRecord): void;
-
-  /**
-   * Record an exception as a log record.
-   *
-   * @param exception
-   * @param options
-   */
-  recordException(exception: Exception, options?: RecordExceptionOptions): void;
 }

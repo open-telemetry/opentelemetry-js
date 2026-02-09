@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-import type { Exception } from '@opentelemetry/api';
 import { Logger } from './types/Logger';
 import { LogRecord } from './types/LogRecord';
-import type { RecordExceptionOptions } from './types/RecordExceptionOptions';
 
 export class NoopLogger implements Logger {
   emit(_logRecord: LogRecord): void {}
-  recordException(_exception: Exception, _options?: RecordExceptionOptions): void {}
 }
 
 export const NOOP_LOGGER = new NoopLogger();

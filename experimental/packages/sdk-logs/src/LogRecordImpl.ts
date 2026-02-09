@@ -190,14 +190,6 @@ export class LogRecordImpl implements ReadableLogRecord {
     return this;
   }
 
-  public setException(exception: Exception) {
-    if (this._isLogRecordReadonly()) {
-      return this;
-    }
-    this._setException(exception);
-    return this;
-  }
-
   /**
    * @internal
    * A LogRecordProcessor may freely modify logRecord for the duration of the OnEmit call.

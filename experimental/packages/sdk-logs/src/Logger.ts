@@ -22,7 +22,6 @@ import {
   trace,
   TraceFlags,
   isSpanContextValid,
-  Exception,
 } from '@opentelemetry/api';
 
 import { LogRecordImpl } from './LogRecordImpl';
@@ -108,15 +107,5 @@ export class Logger implements logsAPI.Logger {
      * If logRecord is needed after OnEmit returns (i.e. for asynchronous processing) only reads are permitted.
      */
     logRecordInstance._makeReadonly();
-  }
-
-  public recordException(
-    exception: Exception,
-    options?: logsAPI.RecordExceptionOptions
-  ): void {
-    this.emit({
-      exception,
-      ...options,
-    });
   }
 }
