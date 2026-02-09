@@ -14,5 +14,4 @@
  * limitations under the License.
  */
 
-export { AsyncHooksContextManager } from './AsyncHooksContextManager';
 export { AsyncLocalStorageContextManager } from './AsyncLocalStorageContextManager';
