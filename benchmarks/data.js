@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1770633794889,
+  "lastUpdate": 1770661211492,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -57101,6 +57101,114 @@ window.BENCHMARK_DATA = {
             "name": "create spans (10 attributes)",
             "value": 262862,
             "range": "±1.62%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "david.luna@elastic.co",
+            "name": "David Luna",
+            "username": "david-luna"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a0d5c141a1aa13c56b75e3332e3ced4396a2c037",
+          "message": "fix(otlp-exporter-base): avoid use of a wrapped fetch (#6353)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2026-02-09T18:06:57Z",
+          "tree_id": "963f6e5eff328dc639b14a42c46920c690fe5395",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/a0d5c141a1aa13c56b75e3332e3ced4396a2c037"
+        },
+        "date": 1770661210334,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 512 spans (protobuf)",
+            "value": 164,
+            "range": "±0.70%",
+            "unit": "ops/sec",
+            "extra": "79 samples"
+          },
+          {
+            "name": "transform 512 spans (json)",
+            "value": 281,
+            "range": "±0.72%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "transform 512 logs (protobuf)",
+            "value": 141,
+            "range": "±1.19%",
+            "unit": "ops/sec",
+            "extra": "79 samples"
+          },
+          {
+            "name": "transform 512 logs (json)",
+            "value": 240,
+            "range": "±1.56%",
+            "unit": "ops/sec",
+            "extra": "76 samples"
+          },
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 1995604,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 1806028,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 1750850,
+            "range": "±0.46%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 1590882,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 272570,
+            "range": "±0.83%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "generateTraceId",
+            "value": 3529147,
+            "range": "±0.62%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "generateSpanId",
+            "value": 4307717,
+            "range": "±0.86%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 280458,
+            "range": "±0.34%",
             "unit": "ops/sec",
             "extra": "94 samples"
           }
