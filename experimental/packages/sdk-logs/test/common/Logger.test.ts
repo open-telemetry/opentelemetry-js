@@ -24,6 +24,11 @@ import {
   LogRecord as ApiLogRecord,
   SeverityNumber,
 } from '@opentelemetry/api-logs';
+import {
+  ATTR_EXCEPTION_MESSAGE,
+  ATTR_EXCEPTION_STACKTRACE,
+  ATTR_EXCEPTION_TYPE,
+} from '@opentelemetry/semantic-conventions';
 import { Logger } from '../../src/Logger';
 import { InMemoryLogRecordExporter } from '../../src/export/InMemoryLogRecordExporter';
 import { SimpleLogRecordProcessor } from '../../src/export/SimpleLogRecordProcessor';
@@ -474,6 +479,37 @@ describe('Logger', () => {
         assert.strictEqual(logRecords.length, 1);
         assert.strictEqual(logRecords[0].body, 'sampled warn');
       });
+    });
+  });
+
+  describe('recordException', () => {
+    it('should emit a log record with exception attributes', () => {
+      const exporter = new InMemoryLogRecordExporter();
+      const loggerProvider = new LoggerProvider({
+        processors: [new SimpleLogRecordProcessor(exporter)],
+      });
+      const logger = loggerProvider.getLogger('test-logger') as Logger;
+      const error = new Error('boom');
+
+      logger.recordException(error);
+
+      const logRecords = exporter.getFinishedLogRecords();
+      assert.strictEqual(logRecords.length, 1);
+      const logRecord = logRecords[0];
+      assert.strictEqual(
+        logRecord.attributes[ATTR_EXCEPTION_MESSAGE],
+        error.message
+      );
+      assert.strictEqual(
+        logRecord.attributes[ATTR_EXCEPTION_TYPE],
+        error.name
+      );
+      if (error.stack) {
+        assert.strictEqual(
+          logRecord.attributes[ATTR_EXCEPTION_STACKTRACE],
+          error.stack
+        );
+      }
     });
   });
 });

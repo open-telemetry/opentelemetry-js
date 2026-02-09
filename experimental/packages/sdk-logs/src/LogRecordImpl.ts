@@ -22,8 +22,14 @@ import type {
   SeverityNumber,
 } from '@opentelemetry/api-logs';
 import * as api from '@opentelemetry/api';
+import type { Exception } from '@opentelemetry/api';
 import { timeInputToHrTime, InstrumentationScope } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
+import {
+  ATTR_EXCEPTION_MESSAGE,
+  ATTR_EXCEPTION_STACKTRACE,
+  ATTR_EXCEPTION_TYPE,
+} from '@opentelemetry/semantic-conventions';
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
 import { isLogAttributeValue } from './utils/validation';
@@ -102,6 +108,7 @@ export class LogRecordImpl implements ReadableLogRecord {
       severityText,
       body,
       attributes = {},
+      exception,
       context,
     } = logRecord;
 
@@ -123,6 +130,9 @@ export class LogRecordImpl implements ReadableLogRecord {
     this._logRecordLimits = _sharedState.logRecordLimits;
     this._eventName = eventName;
     this.setAttributes(attributes);
+    if (exception != null) {
+      this._setException(exception);
+    }
   }
 
   public setAttribute(key: string, value?: AnyValue) {
@@ -180,6 +190,14 @@ export class LogRecordImpl implements ReadableLogRecord {
     return this;
   }
 
+  public setException(exception: Exception) {
+    if (this._isLogRecordReadonly()) {
+      return this;
+    }
+    this._setException(exception);
+    return this;
+  }
+
   /**
    * @internal
    * A LogRecordProcessor may freely modify logRecord for the duration of the OnEmit call.
@@ -229,6 +247,35 @@ export class LogRecordImpl implements ReadableLogRecord {
 
     // Other types (number, boolean), no need to apply value length limit
     return value;
+  }
+
+  private _setException(exception: Exception): void {
+    const attributes: LogAttributes = {};
+    if (typeof exception === 'string') {
+      attributes[ATTR_EXCEPTION_MESSAGE] = exception;
+    } else if (exception) {
+      if (exception.code) {
+        attributes[ATTR_EXCEPTION_TYPE] = exception.code.toString();
+      } else if (exception.name) {
+        attributes[ATTR_EXCEPTION_TYPE] = exception.name;
+      }
+      if (exception.message) {
+        attributes[ATTR_EXCEPTION_MESSAGE] = exception.message;
+      }
+      if (exception.stack) {
+        attributes[ATTR_EXCEPTION_STACKTRACE] = exception.stack;
+      }
+    }
+
+    if (attributes[ATTR_EXCEPTION_TYPE] || attributes[ATTR_EXCEPTION_MESSAGE]) {
+      for (const [key, value] of Object.entries(attributes)) {
+        if (!Object.prototype.hasOwnProperty.call(this.attributes, key)) {
+          this.setAttribute(key, value);
+        }
+      }
+    } else {
+      api.diag.warn(`Failed to record an exception ${exception}`);
+    }
   }
 
   private _truncateToLimitUtil(value: string, limit: number): string {

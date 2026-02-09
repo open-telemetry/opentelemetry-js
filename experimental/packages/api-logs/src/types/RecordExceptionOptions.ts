@@ -14,46 +14,10 @@
  * limitations under the License.
  */
 
-import { Context, Exception, TimeInput } from '@opentelemetry/api';
-import { AnyValue, AnyValueMap } from './AnyValue';
+import { Context, TimeInput } from '@opentelemetry/api';
+import { LogAttributes, LogBody, SeverityNumber } from './LogRecord';
 
-export type LogBody = AnyValue;
-export type LogAttributes = AnyValueMap;
-
-export enum SeverityNumber {
-  UNSPECIFIED = 0,
-  TRACE = 1,
-  TRACE2 = 2,
-  TRACE3 = 3,
-  TRACE4 = 4,
-  DEBUG = 5,
-  DEBUG2 = 6,
-  DEBUG3 = 7,
-  DEBUG4 = 8,
-  INFO = 9,
-  INFO2 = 10,
-  INFO3 = 11,
-  INFO4 = 12,
-  WARN = 13,
-  WARN2 = 14,
-  WARN3 = 15,
-  WARN4 = 16,
-  ERROR = 17,
-  ERROR2 = 18,
-  ERROR3 = 19,
-  ERROR4 = 20,
-  FATAL = 21,
-  FATAL2 = 22,
-  FATAL3 = 23,
-  FATAL4 = 24,
-}
-
-export interface LogRecord {
-  /**
-   * The unique identifier for the log record.
-   */
-  eventName?: string;
-
+export interface RecordExceptionOptions {
   /**
    * The time when the log record occurred as UNIX Epoch time in nanoseconds.
    */
@@ -80,14 +44,14 @@ export interface LogRecord {
   body?: LogBody;
 
   /**
+   * The event name of the log record.
+   */
+  eventName?: string;
+
+  /**
    * Attributes that define the log record.
    */
   attributes?: LogAttributes;
-
-  /**
-   * An exception (or error) associated with the log record.
-   */
-  exception?: Exception;
 
   /**
    * The Context associated with the LogRecord.

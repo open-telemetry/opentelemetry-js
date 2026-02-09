@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { HrTime, SpanContext } from '@opentelemetry/api';
+import type { HrTime, SpanContext, Exception } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
 import type {
   AnyValue,
@@ -88,4 +88,11 @@ export interface SdkLogRecord {
    * @returns The updated SdkLogRecord.
    */
   setSeverityText(severityText: string): SdkLogRecord;
+
+  /**
+   * Sets exception attributes based on the provided exception.
+   * @param exception The exception to record.
+   * @returns The updated SdkLogRecord.
+   */
+  setException(exception: Exception): SdkLogRecord;
 }

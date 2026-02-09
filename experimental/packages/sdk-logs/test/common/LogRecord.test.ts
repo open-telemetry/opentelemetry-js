@@ -29,6 +29,11 @@ import { AnyValue } from '@opentelemetry/api-logs';
 import type { HrTime } from '@opentelemetry/api';
 import { hrTimeToMilliseconds, timeInputToHrTime } from '@opentelemetry/core';
 import { defaultResource } from '@opentelemetry/resources';
+import {
+  ATTR_EXCEPTION_MESSAGE,
+  ATTR_EXCEPTION_STACKTRACE,
+  ATTR_EXCEPTION_TYPE,
+} from '@opentelemetry/semantic-conventions';
 
 import {
   LogRecordLimits,
@@ -155,6 +160,50 @@ describe('LogRecord', () => {
         attr1: false,
         attr2: 123,
       });
+    });
+
+    it('should set exception attributes from exception', () => {
+      const error = new Error('boom');
+      const logRecordData: logsAPI.LogRecord = {
+        exception: error,
+      };
+      const { logRecord } = setup(undefined, logRecordData);
+
+      assert.strictEqual(
+        logRecord.attributes[ATTR_EXCEPTION_MESSAGE],
+        error.message
+      );
+      assert.strictEqual(
+        logRecord.attributes[ATTR_EXCEPTION_TYPE],
+        error.name
+      );
+      if (error.stack) {
+        assert.strictEqual(
+          logRecord.attributes[ATTR_EXCEPTION_STACKTRACE],
+          error.stack
+        );
+      }
+    });
+
+    it('should not overwrite user-provided exception attributes', () => {
+      const error = new Error('boom');
+      const logRecordData: logsAPI.LogRecord = {
+        exception: error,
+        attributes: {
+          [ATTR_EXCEPTION_MESSAGE]: 'user message',
+          [ATTR_EXCEPTION_TYPE]: 'CustomError',
+        },
+      };
+      const { logRecord } = setup(undefined, logRecordData);
+
+      assert.strictEqual(
+        logRecord.attributes[ATTR_EXCEPTION_MESSAGE],
+        'user message'
+      );
+      assert.strictEqual(
+        logRecord.attributes[ATTR_EXCEPTION_TYPE],
+        'CustomError'
+      );
     });
   });
 
@@ -298,6 +347,30 @@ describe('LogRecord', () => {
           ]);
         });
       });
+    });
+  });
+
+  describe('setException', () => {
+    it('should set exception attributes on the log record', () => {
+      const { logRecord } = setup();
+      const error = new Error('kaboom');
+
+      logRecord.setException(error);
+
+      assert.strictEqual(
+        logRecord.attributes[ATTR_EXCEPTION_MESSAGE],
+        error.message
+      );
+      assert.strictEqual(
+        logRecord.attributes[ATTR_EXCEPTION_TYPE],
+        error.name
+      );
+      if (error.stack) {
+        assert.strictEqual(
+          logRecord.attributes[ATTR_EXCEPTION_STACKTRACE],
+          error.stack
+        );
+      }
     });
   });
 
