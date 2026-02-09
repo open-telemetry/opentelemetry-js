@@ -1,4 +1,4 @@
-file_format: "1.0-rc.2"
+file_format: "1.0-rc.3"
 disabled: false
 resource:
   # Configure resource attributes. Entries have higher priority than entries from .resource.attributes_list.

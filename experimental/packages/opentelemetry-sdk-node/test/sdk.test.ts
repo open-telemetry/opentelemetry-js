@@ -998,6 +998,60 @@ describe('Node SDK', () => {
       assertServiceInstanceIdIsUUID(resource);
       await sdk.shutdown();
     });
+
+    it('should configure service instance id with service instance id from env variable taking priority over random UUID', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.instance.id=custom-service,service.name=my-service';
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'all';
+      const sdk = new NodeSDK({
+        autoDetectResources: true,
+      });
+
+      sdk.start();
+      const resource = sdk['_resource'];
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceResource(resource, {
+        name: 'my-service',
+        instanceId: 'custom-service',
+      });
+      await sdk.shutdown();
+    });
+
+    it('should configure service instance id with service instance id from env variable taking priority over random UUID, based on order', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.instance.id=custom-service,service.name=my-service';
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'serviceinstance,env';
+      const sdk = new NodeSDK({
+        autoDetectResources: true,
+      });
+
+      sdk.start();
+      const resource = sdk['_resource'];
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceResource(resource, {
+        name: 'my-service',
+        instanceId: 'custom-service',
+      });
+      await sdk.shutdown();
+    });
+
+    it('should configure service instance id with service instance id from env variable taking priority over random UUID, based on order', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.instance.id=custom-service,service.name=my-service';
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,serviceinstance';
+      const sdk = new NodeSDK({
+        autoDetectResources: true,
+      });
+
+      sdk.start();
+      const resource = sdk['_resource'];
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceInstanceIdIsUUID(resource);
+      await sdk.shutdown();
+    });
   });
 
   describe('A disabled SDK should be no-op', () => {
@@ -1116,6 +1170,10 @@ describe('Node SDK', () => {
       delete process.env.OTEL_LOGS_EXPORTER;
       delete process.env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL;
       delete process.env.OTEL_EXPORTER_OTLP_PROTOCOL;
+      delete process.env.OTEL_TRACES_EXPORTER;
+      delete process.env.OTEL_METRICS_EXPORTER;
+      delete process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT;
+      delete process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT;
     });
 
     it('should not register the provider if OTEL_LOGS_EXPORTER contains none', async () => {
@@ -1240,6 +1298,52 @@ describe('Node SDK', () => {
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof
           OTLPProtoLogExporter
       );
+      await sdk.shutdown();
+    });
+
+    it('should apply OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT and OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT', async () => {
+      // arrange
+      process.env.OTEL_TRACES_EXPORTER = 'none';
+      process.env.OTEL_METRICS_EXPORTER = 'none';
+      process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '2';
+      process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = '10';
+
+      const logRecordExporter = new InMemoryLogRecordExporter();
+      const logRecordProcessor = new SimpleLogRecordProcessor(
+        logRecordExporter
+      );
+      const sdk = new NodeSDK({
+        logRecordProcessors: [logRecordProcessor],
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+      const logger = logs.getLogger('test-logger', '1.0.0');
+
+      // act
+      logger.emit({
+        attributes: {
+          shortAttr: 'short',
+          longAttr: 'abcdefghijklmnopqrstuvwxyz', // Should be truncated to 10 chars
+          droppedAttr: 'dropped', // should be dropped
+        },
+      });
+
+      const logRecords = logRecordExporter.getFinishedLogRecords();
+      assert.strictEqual(logRecords.length, 1);
+
+      // Verify attribute count limit was applied
+      const record = logRecords[0];
+      const attributeCount = Object.keys(record.attributes).length;
+      assert.strictEqual(attributeCount, 2);
+      assert.strictEqual(record.droppedAttributesCount, 1);
+      assert.strictEqual(record.attributes.shortAttr, 'short');
+      assert.strictEqual(
+        record.attributes.longAttr,
+        'abcdefghij',
+        'Long attribute should be truncated to 10 characters'
+      );
+
       await sdk.shutdown();
     });
   });

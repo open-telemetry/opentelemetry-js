@@ -43,7 +43,7 @@ export interface Resource {
    * This type is in development and subject to breaking changes in minor versions.
    * If omitted or null, resource detection is disabled.
    */
-  'detection/development'?: ResourceDetection;
+  'detection/development'?: ExperimentalResourceDetection;
 }
 
 export interface AttributeNameValue {
@@ -67,7 +67,7 @@ export interface AttributeNameValue {
     | 'double_array';
 }
 
-export interface ResourceDetection {
+export interface ExperimentalResourceDetection {
   /**
    * Configure attributes provided by resource detectors.
    */
@@ -78,10 +78,10 @@ export interface ResourceDetection {
    * Resource detector names are dependent on the SDK language ecosystem. Please consult documentation for each respective language.
    * If omitted or null, no resource detectors are enabled.
    */
-  detectors?: ResourceDetector;
+  detectors?: ExperimentalResourceDetector;
 }
 
-export interface ResourceDetector {
+export interface ExperimentalResourceDetector {
   /**
    * Enable the container resource detector, which populates container.* attributes.
    */

@@ -27,12 +27,18 @@ import * as yaml from 'yaml';
 import {
   getBooleanFromConfigFile,
   getBooleanListFromConfigFile,
+  getGrpcTlsConfig,
+  getHttpTlsConfig,
   getNumberFromConfigFile,
   getNumberListFromConfigFile,
   getStringFromConfigFile,
   getStringListFromConfigFile,
 } from './utils';
-import { NameStringValuePair, OtlpHttpEncoding } from './models/commonModel';
+import {
+  NameStringValuePair,
+  OtlpHttpEncoding,
+  SeverityNumber,
+} from './models/commonModel';
 import {
   initializeDefaultTracerProviderConfiguration,
   SpanExporter,
@@ -40,6 +46,7 @@ import {
   TracerProvider,
 } from './models/tracerProviderModel';
 import {
+  ExperimentalLoggerMatcherAndConfig,
   initializeDefaultLoggerProviderConfiguration,
   LoggerProvider,
   LogRecordExporter,
@@ -50,6 +57,7 @@ import {
   Aggregation,
   CardinalityLimits,
   ExemplarFilter,
+  ExperimentalPrometheusTranslationStrategy,
   ExporterDefaultHistogramAggregation,
   ExporterTemporalityPreference,
   initializeDefaultMeterProviderConfiguration,
@@ -96,7 +104,7 @@ export function hasValidConfigFile(): boolean {
 }
 
 export function parseConfigFile(config: ConfigurationModel) {
-  const supportedFileVersions = ['1.0-rc.1', '1.0-rc.2'];
+  const supportedFileVersions = ['1.0-rc.3'];
   const configFile = getStringFromEnv('OTEL_EXPERIMENTAL_CONFIG_FILE') || '';
   const file = fs.readFileSync(configFile, 'utf8');
   const parsedContent = yaml.parse(file);
@@ -246,14 +254,17 @@ export function setPropagator(
   config: ConfigurationModel,
   propagator: Propagator
 ): void {
-  if (propagator && propagator.composite) {
+  if (propagator && (propagator.composite || propagator.composite_list)) {
     const auxList = [];
     const composite = [];
-    for (let i = 0; i < propagator.composite.length; i++) {
-      const key = Object.keys(propagator.composite[i])[0];
-      auxList.push(key);
-      composite.push({ [key]: null });
+    if (propagator.composite) {
+      for (let i = 0; i < propagator.composite.length; i++) {
+        const key = Object.keys(propagator.composite[i])[0];
+        auxList.push(key);
+        composite.push({ [key]: null });
+      }
     }
+
     const compositeList = getStringListFromConfigFile(
       propagator['composite_list']
     );
@@ -275,10 +286,7 @@ export function setPropagator(
       propagator['composite_list']
     );
     if (compositeListString) {
-      if (config.propagator == null) {
-        config.propagator = {};
-      }
-      config.propagator.composite_list = compositeListString;
+      config.propagator!.composite_list = compositeListString;
     }
   }
 }
@@ -349,19 +357,6 @@ function parseConfigSpanOrLogRecordExporter(
                 : OtlpHttpEncoding.Protobuf,
           },
         };
-
-        certFile = getStringFromConfigFile(e['certificate_file']);
-        if (certFile && parsedExporter.otlp_http) {
-          parsedExporter.otlp_http.certificate_file = certFile;
-        }
-        clientCertFile = getStringFromConfigFile(e['client_certificate_file']);
-        if (clientCertFile && parsedExporter.otlp_http) {
-          parsedExporter.otlp_http.client_certificate_file = clientCertFile;
-        }
-        clientKeyFile = getStringFromConfigFile(e['client_key_file']);
-        if (clientKeyFile && parsedExporter.otlp_http) {
-          parsedExporter.otlp_http.client_key_file = clientKeyFile;
-        }
         compression = getStringFromConfigFile(e['compression']);
         if (compression && parsedExporter.otlp_http) {
           parsedExporter.otlp_http.compression = compression;
@@ -373,6 +368,17 @@ function parseConfigSpanOrLogRecordExporter(
         headers = getConfigHeaders(e['headers']);
         if (headers && parsedExporter.otlp_http) {
           parsedExporter.otlp_http.headers = headers;
+        }
+
+        if (e['tls']) {
+          certFile = getStringFromConfigFile(e['tls']['ca_file']);
+          clientCertFile = getStringFromConfigFile(e['tls']['cert_file']);
+          clientKeyFile = getStringFromConfigFile(e['tls']['key_file']);
+
+          const tls = getHttpTlsConfig(certFile, clientKeyFile, clientCertFile);
+          if (tls) {
+            parsedExporter.otlp_http!.tls = tls;
+          }
         }
       }
       break;
@@ -388,18 +394,6 @@ function parseConfigSpanOrLogRecordExporter(
           },
         };
 
-        certFile = getStringFromConfigFile(e['certificate_file']);
-        if (certFile && parsedExporter.otlp_grpc) {
-          parsedExporter.otlp_grpc.certificate_file = certFile;
-        }
-        clientCertFile = getStringFromConfigFile(e['client_certificate_file']);
-        if (clientCertFile && parsedExporter.otlp_grpc) {
-          parsedExporter.otlp_grpc.client_certificate_file = clientCertFile;
-        }
-        clientKeyFile = getStringFromConfigFile(e['client_key_file']);
-        if (clientKeyFile && parsedExporter.otlp_grpc) {
-          parsedExporter.otlp_grpc.client_key_file = clientKeyFile;
-        }
         compression = getStringFromConfigFile(e['compression']);
         if (compression && parsedExporter.otlp_grpc) {
           parsedExporter.otlp_grpc.compression = compression;
@@ -412,9 +406,22 @@ function parseConfigSpanOrLogRecordExporter(
         if (headers && parsedExporter.otlp_grpc) {
           parsedExporter.otlp_grpc.headers = headers;
         }
-        insecure = getBooleanFromConfigFile(e['insecure']);
-        if ((insecure || insecure === false) && parsedExporter.otlp_grpc) {
-          parsedExporter.otlp_grpc.insecure = insecure;
+
+        if (e['tls']) {
+          certFile = getStringFromConfigFile(e['tls']['ca_file']);
+          clientCertFile = getStringFromConfigFile(e['tls']['cert_file']);
+          clientKeyFile = getStringFromConfigFile(e['tls']['key_file']);
+          insecure = getBooleanFromConfigFile(e['tls']['insecure']);
+
+          const tls = getGrpcTlsConfig(
+            certFile,
+            clientKeyFile,
+            clientCertFile,
+            insecure
+          );
+          if (tls) {
+            parsedExporter.otlp_grpc!.tls = tls;
+          }
         }
       }
       break;
@@ -436,20 +443,6 @@ function parseConfigSpanOrLogRecordExporter(
         console: {},
       };
       break;
-
-    case 'zipkin':
-      e = (exporter as SpanExporter)['zipkin'];
-      if (e) {
-        parsedExporter = {
-          zipkin: {
-            endpoint:
-              getStringFromConfigFile(e['endpoint']) ??
-              'http://localhost:9411/api/v2/spans',
-            timeout: getNumberFromConfigFile(e['timeout']) ?? 10000,
-          },
-        };
-      }
-      break;
   }
 
   return parsedExporter;
@@ -463,15 +456,12 @@ export function setTracerProvider(
     config.tracer_provider = initializeDefaultTracerProviderConfiguration();
     // Limits
     if (tracerProvider['limits']) {
-      if (config.tracer_provider.limits == null) {
-        config.tracer_provider.limits = {};
-      }
       const attributeValueLengthLimit = getNumberFromConfigFile(
         tracerProvider['limits']['attribute_value_length_limit']
       );
 
       if (attributeValueLengthLimit) {
-        config.tracer_provider.limits.attribute_value_length_limit =
+        config.tracer_provider.limits!.attribute_value_length_limit =
           attributeValueLengthLimit;
       }
 
@@ -479,7 +469,7 @@ export function setTracerProvider(
         tracerProvider['limits']['attribute_count_limit']
       );
       if (attributeCountLimit) {
-        config.tracer_provider.limits.attribute_count_limit =
+        config.tracer_provider.limits!.attribute_count_limit =
           attributeCountLimit;
       }
 
@@ -487,21 +477,21 @@ export function setTracerProvider(
         tracerProvider['limits']['event_count_limit']
       );
       if (eventCountLimit) {
-        config.tracer_provider.limits.event_count_limit = eventCountLimit;
+        config.tracer_provider.limits!.event_count_limit = eventCountLimit;
       }
 
       const linkCountLimit = getNumberFromConfigFile(
         tracerProvider['limits']['link_count_limit']
       );
       if (linkCountLimit) {
-        config.tracer_provider.limits.link_count_limit = linkCountLimit;
+        config.tracer_provider.limits!.link_count_limit = linkCountLimit;
       }
 
       const eventAttributeCountLimit = getNumberFromConfigFile(
         tracerProvider['limits']['event_attribute_count_limit']
       );
       if (eventAttributeCountLimit) {
-        config.tracer_provider.limits.event_attribute_count_limit =
+        config.tracer_provider.limits!.event_attribute_count_limit =
           eventAttributeCountLimit;
       }
 
@@ -509,7 +499,7 @@ export function setTracerProvider(
         tracerProvider['limits']['link_attribute_count_limit']
       );
       if (linkAttributeCountLimit) {
-        config.tracer_provider.limits.link_attribute_count_limit =
+        config.tracer_provider.limits!.link_attribute_count_limit =
           linkAttributeCountLimit;
       }
     }
@@ -596,10 +586,7 @@ function getProducers(producers?: MetricProducer[]): MetricProducer[] {
     for (let j = 0; j < producers.length; j++) {
       const producer = producers[j];
       if (Object.keys(producer)[0] === 'opencensus') {
-        parsedProducers.push({ opencensus: undefined });
-      }
-      if (Object.keys(producer)[0] === 'prometheus') {
-        parsedProducers.push({ prometheus: undefined });
+        parsedProducers.push({ opencensus: {} });
       }
     }
   }
@@ -676,18 +663,6 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
           },
         };
 
-        certFile = getStringFromConfigFile(e['certificate_file']);
-        if (certFile && parsedExporter.otlp_http) {
-          parsedExporter.otlp_http.certificate_file = certFile;
-        }
-        clientCertFile = getStringFromConfigFile(e['client_certificate_file']);
-        if (clientCertFile && parsedExporter.otlp_http) {
-          parsedExporter.otlp_http.client_certificate_file = clientCertFile;
-        }
-        clientKeyFile = getStringFromConfigFile(e['client_key_file']);
-        if (clientKeyFile && parsedExporter.otlp_http) {
-          parsedExporter.otlp_http.client_key_file = clientKeyFile;
-        }
         compression = getStringFromConfigFile(e['compression']);
         if (compression && parsedExporter.otlp_http) {
           parsedExporter.otlp_http.compression = compression;
@@ -699,6 +674,17 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
         headers = getConfigHeaders(e['headers']);
         if (headers && parsedExporter.otlp_http) {
           parsedExporter.otlp_http.headers = headers;
+        }
+
+        if (e['tls']) {
+          certFile = getStringFromConfigFile(e['tls']['ca_file']);
+          clientCertFile = getStringFromConfigFile(e['tls']['cert_file']);
+          clientKeyFile = getStringFromConfigFile(e['tls']['key_file']);
+
+          const tls = getHttpTlsConfig(certFile, clientKeyFile, clientCertFile);
+          if (tls) {
+            parsedExporter.otlp_http!.tls = tls;
+          }
         }
       }
       break;
@@ -720,18 +706,6 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
           },
         };
 
-        certFile = getStringFromConfigFile(e['certificate_file']);
-        if (certFile && parsedExporter.otlp_grpc) {
-          parsedExporter.otlp_grpc.certificate_file = certFile;
-        }
-        clientCertFile = getStringFromConfigFile(e['client_certificate_file']);
-        if (clientCertFile && parsedExporter.otlp_grpc) {
-          parsedExporter.otlp_grpc.client_certificate_file = clientCertFile;
-        }
-        clientKeyFile = getStringFromConfigFile(e['client_key_file']);
-        if (clientKeyFile && parsedExporter.otlp_grpc) {
-          parsedExporter.otlp_grpc.client_key_file = clientKeyFile;
-        }
         compression = getStringFromConfigFile(e['compression']);
         if (compression && parsedExporter.otlp_grpc) {
           parsedExporter.otlp_grpc.compression = compression;
@@ -744,9 +718,22 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
         if (headers && parsedExporter.otlp_grpc) {
           parsedExporter.otlp_grpc.headers = headers;
         }
-        insecure = getBooleanFromConfigFile(e['insecure']);
-        if ((insecure || insecure === false) && parsedExporter.otlp_grpc) {
-          parsedExporter.otlp_grpc.insecure = insecure;
+
+        if (e['tls']) {
+          certFile = getStringFromConfigFile(e['tls']['ca_file']);
+          clientCertFile = getStringFromConfigFile(e['tls']['cert_file']);
+          clientKeyFile = getStringFromConfigFile(e['tls']['key_file']);
+          insecure = getBooleanFromConfigFile(e['tls']['insecure']);
+
+          const tls = getGrpcTlsConfig(
+            certFile,
+            clientKeyFile,
+            clientCertFile,
+            insecure
+          );
+          if (tls) {
+            parsedExporter.otlp_grpc!.tls = tls;
+          }
         }
       }
       break;
@@ -770,9 +757,19 @@ function parseMetricExporter(exporter: PushMetricExporter): PushMetricExporter {
       break;
 
     case 'console':
-      parsedExporter = {
-        console: {},
-      };
+      e = exporter['console'];
+      if (e) {
+        parsedExporter = {
+          console: {
+            temporality_preference: getTemporalityPreference(
+              e['temporality_preference']
+            ),
+            default_histogram_aggregation: getDefaultHistogramAggregation(
+              e['default_histogram_aggregation']
+            ),
+          },
+        };
+      }
       break;
   }
 
@@ -826,23 +823,65 @@ export function setMeterProvider(
                     'without_scope_info'
                   ]
                 ) ?? false,
-              with_resource_constant_labels: {
+              without_target_info:
+                getBooleanFromConfigFile(
+                  element['exporter']['prometheus/development'][
+                    'without_target_info'
+                  ]
+                ) ?? false,
+            },
+          };
+          if (
+            element['exporter']['prometheus/development'][
+              'with_resource_constant_labels'
+            ]
+          ) {
+            exporter['prometheus/development']!.with_resource_constant_labels =
+              {
                 included:
                   getStringListFromConfigFile(
                     element['exporter']['prometheus/development'][
                       'with_resource_constant_labels'
-                    ]['included']
+                    ]?.['included']
                   ) ?? [],
                 excluded:
                   getStringListFromConfigFile(
                     element['exporter']['prometheus/development'][
                       'with_resource_constant_labels'
-                    ]['excluded']
+                    ]?.['excluded']
                   ) ?? [],
-              },
-            },
-          };
+              };
+          }
 
+          if (
+            element['exporter']['prometheus/development'][
+              'translation_strategy'
+            ]
+          ) {
+            const ts = getStringFromConfigFile(
+              element['exporter']['prometheus/development'][
+                'translation_strategy'
+              ]
+            );
+            switch (ts) {
+              case 'underscore_escaping_with_suffixes':
+                exporter['prometheus/development']!.translation_strategy =
+                  ExperimentalPrometheusTranslationStrategy.UnderscoreEscapingWithSuffixes;
+                break;
+              case 'underscore_escaping_without_suffixes':
+                exporter['prometheus/development']!.translation_strategy =
+                  ExperimentalPrometheusTranslationStrategy.UnderscoreEscapingWithoutSuffixes;
+                break;
+              case 'no_utf8_escaping_with_suffixes':
+                exporter['prometheus/development']!.translation_strategy =
+                  ExperimentalPrometheusTranslationStrategy.NoUtf8EscapingWithSuffixes;
+                break;
+              case 'no_translation':
+                exporter['prometheus/development']!.translation_strategy =
+                  ExperimentalPrometheusTranslationStrategy.NoTranslation;
+                break;
+            }
+          }
           const pullReader: MetricReader = {
             pull: {
               exporter: exporter,
@@ -1063,6 +1102,64 @@ export function setMeterProvider(
   }
 }
 
+export function getSeverity(
+  severity?: SeverityNumber
+): SeverityNumber | undefined {
+  const severityType = getStringFromConfigFile(severity);
+  switch (severityType) {
+    case 'debug':
+      return SeverityNumber.DEBUG;
+    case 'debug2':
+      return SeverityNumber.DEBUG2;
+    case 'debug3':
+      return SeverityNumber.DEBUG3;
+    case 'debug4':
+      return SeverityNumber.DEBUG4;
+    case 'info':
+      return SeverityNumber.INFO;
+    case 'info2':
+      return SeverityNumber.INFO2;
+    case 'info3':
+      return SeverityNumber.INFO3;
+    case 'info4':
+      return SeverityNumber.INFO4;
+    case 'warn':
+      return SeverityNumber.WARN;
+    case 'warn2':
+      return SeverityNumber.WARN2;
+    case 'warn3':
+      return SeverityNumber.WARN3;
+    case 'warn4':
+      return SeverityNumber.WARN4;
+    case 'error':
+      return SeverityNumber.ERROR;
+    case 'error2':
+      return SeverityNumber.ERROR2;
+    case 'error3':
+      return SeverityNumber.ERROR3;
+    case 'error4':
+      return SeverityNumber.ERROR4;
+    case 'fatal':
+      return SeverityNumber.FATAL;
+    case 'fatal2':
+      return SeverityNumber.FATAL2;
+    case 'fatal3':
+      return SeverityNumber.FATAL3;
+    case 'fatal4':
+      return SeverityNumber.FATAL4;
+    case 'trace':
+      return SeverityNumber.TRACE;
+    case 'trace2':
+      return SeverityNumber.TRACE2;
+    case 'trace3':
+      return SeverityNumber.TRACE3;
+    case 'trace4':
+      return SeverityNumber.TRACE4;
+    default:
+      return undefined;
+  }
+}
+
 export function setLoggerProvider(
   config: ConfigurationModel,
   loggerProvider: LoggerProvider
@@ -1078,15 +1175,12 @@ export function setLoggerProvider(
         loggerProvider['limits']['attribute_count_limit']
       );
       if (attributeValueLengthLimit || attributeCountLimit) {
-        if (config.logger_provider.limits == null) {
-          config.logger_provider.limits = { attribute_count_limit: 128 };
-        }
         if (attributeValueLengthLimit) {
-          config.logger_provider.limits.attribute_value_length_limit =
+          config.logger_provider.limits!.attribute_value_length_limit =
             attributeValueLengthLimit;
         }
         if (attributeCountLimit) {
-          config.logger_provider.limits.attribute_count_limit =
+          config.logger_provider.limits!.attribute_count_limit =
             attributeCountLimit;
         }
       }
@@ -1141,13 +1235,13 @@ export function setLoggerProvider(
     if (loggerProvider['logger_configurator/development']) {
       const defaultConfigDisabled = getBooleanFromConfigFile(
         loggerProvider['logger_configurator/development']['default_config']?.[
-          'disabled'
+          'enabled'
         ]
       );
       if (defaultConfigDisabled || defaultConfigDisabled === false) {
         config.logger_provider['logger_configurator/development'] = {
           default_config: {
-            disabled: defaultConfigDisabled,
+            enabled: defaultConfigDisabled,
           },
         };
       }
@@ -1164,19 +1258,35 @@ export function setLoggerProvider(
         ) {
           const logger =
             loggerProvider['logger_configurator/development'].loggers[i];
-          let disabled = false;
+          let enabled = false;
+          let traceBased;
+          let minSeverity;
           if (logger['config']) {
-            disabled =
-              getBooleanFromConfigFile(logger['config']['disabled']) ?? false;
+            enabled =
+              getBooleanFromConfigFile(logger['config']['enabled']) ?? false;
+            traceBased = getBooleanFromConfigFile(
+              logger['config']['trace_based']
+            );
+            if (logger['config']['minimum_severity']) {
+              minSeverity = getSeverity(logger['config']['minimum_severity']);
+            }
           }
           const name = getStringFromConfigFile(logger['name']);
           if (name) {
-            loggers.push({
+            const loggerNew: ExperimentalLoggerMatcherAndConfig = {
               name: name,
               config: {
-                disabled: disabled,
+                enabled: enabled,
               },
-            });
+            };
+            if (traceBased !== undefined) {
+              loggerNew.config!.trace_based = traceBased;
+            }
+            if (minSeverity !== undefined) {
+              loggerNew.config!.minimum_severity = minSeverity;
+            }
+
+            loggers.push(loggerNew);
           }
         }
         if (config.logger_provider['logger_configurator/development'] == null) {

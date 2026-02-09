@@ -23,24 +23,20 @@ describe('NoopContextManager', function () {
 
   describe('.enable()', function () {
     it('should work', function () {
-      assert.doesNotThrow(() => {
-        contextManager = new NoopContextManager();
-        assert.ok(
-          contextManager.enable() === contextManager,
-          'should return this'
-        );
-      });
+      contextManager = new NoopContextManager();
+      assert.ok(
+        contextManager.enable() === contextManager,
+        'should return this'
+      );
     });
   });
 
   describe('.disable()', function () {
     it('should work', function () {
-      assert.doesNotThrow(() => {
-        assert.ok(
-          contextManager.disable() === contextManager,
-          'should return this'
-        );
-      });
+      assert.ok(
+        contextManager.disable() === contextManager,
+        'should return this'
+      );
       contextManager.enable();
     });
   });
