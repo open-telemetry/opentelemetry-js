@@ -78,7 +78,7 @@
     "protobufjs-cli": "2.0.0",
     "ts-loader": "9.5.4",
     "typescript": "5.0.4",
-    "webpack": "5.101.3"
+    "webpack": "5.104.1"
   },
   "dependencies": {
     "@opentelemetry/api-logs": "0.211.0",
