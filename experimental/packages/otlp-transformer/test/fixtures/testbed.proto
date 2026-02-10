@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+message TestMessage {
+  int32 field1 = 1;
+  string field2 = 2;
+
+  message Nested {
+    int32 field1 = 1;
+    string field2 = 2;
+  }
+
+  Nested field3 = 3;
+
+  // Repeated fields to exercise different wire types and repeated code-paths
+  repeated int32 field4 = 4;
+  repeated string field5 = 5;
+  repeated bytes field6 = 6;
+  repeated Nested field7 = 7;
+  repeated fixed32 field8 = 8;
+  repeated fixed64 field9 = 9;
+  repeated double field10 = 10;
+}
