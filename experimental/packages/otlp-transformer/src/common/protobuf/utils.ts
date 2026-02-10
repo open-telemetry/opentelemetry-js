@@ -44,7 +44,8 @@ export function sizeAsVarint(value: number): number {
       }
     }
 
-    // high will always be > 0 in this branch, so encoding will always be 5-10 bytes
+    // high will always be > 0 in this branch, otherwise we would not need 64-bit handling;
+    // encoding will always be 5-10 bytes
     if (high <= 0x7) return 5; // up to 35 bits (2^35-1: high=7, low=0xFFFFFFFF)
     if (high <= 0x3ff) return 6; // up to 42 bits (2^42-1: high=1023, low=0xFFFFFFFF)
     if (high <= 0x1ffff) return 7; // up to 49 bits
