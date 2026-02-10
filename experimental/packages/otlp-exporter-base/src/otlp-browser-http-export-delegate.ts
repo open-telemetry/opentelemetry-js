@@ -17,7 +17,6 @@ import { OtlpHttpConfiguration } from './configuration/otlp-http-configuration';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
 import { IOtlpExportDelegate } from './otlp-export-delegate';
 import { createRetryingTransport } from './retrying-transport';
-import { createSendBeaconTransport } from './transport/send-beacon-transport';
 import { createOtlpNetworkExportDelegate } from './otlp-network-export-delegate';
 import { createFetchTransport } from './transport/fetch-transport';
 
@@ -34,18 +33,12 @@ export function createOtlpFetchExportDelegate<Internal, Response>(
   );
 }
 
+/**
+ * @deprecated Use {@link createOtlpFetchExportDelegate} instead.
+ */
 export function createOtlpSendBeaconExportDelegate<Internal, Response>(
   options: OtlpHttpConfiguration,
   serializer: ISerializer<Internal, Response>
 ): IOtlpExportDelegate<Internal> {
-  return createOtlpNetworkExportDelegate(
-    options,
-    serializer,
-    createRetryingTransport({
-      transport: createSendBeaconTransport({
-        url: options.url,
-        headers: options.headers,
-      }),
-    })
-  );
+  return createOtlpFetchExportDelegate(options, serializer);
 }

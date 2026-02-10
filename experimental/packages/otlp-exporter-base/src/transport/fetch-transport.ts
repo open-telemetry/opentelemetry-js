@@ -23,6 +23,34 @@ import {
 } from '../is-export-retryable';
 import { HeadersFactory } from '../configuration/otlp-http-configuration';
 
+/**
+ * Maximum total body size for concurrent keepalive requests.
+ * Browsers enforce a 64KiB cumulative limit across all pending keepalive requests.
+ * We use 60KB to leave headroom for headers.
+ * @see https://github.com/whatwg/fetch/issues/679
+ * @see https://blog.huli.tw/2025/01/06/en/navigator-sendbeacon-64kib-and-source-code/
+ */
+const MAX_KEEPALIVE_BODY_SIZE = 60 * 1024;
+
+/**
+ * Maximum concurrent keepalive requests.
+ * Chrome enforces 9 concurrent keepalive fetch requests per renderer process.
+ * @see https://github.com/whatwg/fetch/issues/679
+ * Quote: "If the renderer process is processing more than 9 requests with keepalive set, we reject a new request"
+ */
+const MAX_KEEPALIVE_REQUESTS = 9;
+
+/**
+ * Track cumulative pending body size across all in-flight keepalive requests.
+ * This is necessary because the 64KiB limit is cumulative, not per-request.
+ */
+let pendingBodySize = 0;
+
+/**
+ * Track number of pending keepalive requests.
+ */
+let pendingKeepaliveCount = 0;
+
 export interface FetchTransportParameters {
   url: string;
   headers: HeadersFactory;
@@ -51,36 +79,60 @@ class FetchTransport implements IExporterTransport {
       fetchApi = fetchApi.__original;
     }
 
+    const requestSize = data.byteLength;
+
+    // Determine if we can use keepalive based on cumulative browser limits.
+    // We must check BEFORE adding to pending totals to avoid exceeding limits.
+    // In non-browser environments, these limits don't apply but tracking is harmless.
+    const wouldExceedSize =
+      pendingBodySize + requestSize > MAX_KEEPALIVE_BODY_SIZE;
+    const wouldExceedCount = pendingKeepaliveCount >= MAX_KEEPALIVE_REQUESTS;
+    const useKeepalive = !wouldExceedSize && !wouldExceedCount;
+
+    if (useKeepalive) {
+      pendingBodySize += requestSize;
+      pendingKeepaliveCount++;
+    } else {
+      const reason = wouldExceedSize ? 'size limit' : 'count limit';
+      diag.debug(
+        `keepalive disabled: ${(requestSize / 1024).toFixed(1)}KB payload, ${pendingKeepaliveCount} pending (${reason})`
+      );
+    }
+
     try {
-      const isBrowserEnvironment = !!globalThis.location;
       const url = new URL(this._parameters.url);
       const response = await fetchApi(url.href, {
         method: 'POST',
         headers: await this._parameters.headers(),
         body: data,
         signal: abortController.signal,
-        keepalive: isBrowserEnvironment,
-        mode: isBrowserEnvironment
-          ? globalThis.location?.origin === url.origin
+        keepalive: useKeepalive,
+        mode: globalThis.location
+          ? globalThis.location.origin === url.origin
             ? 'same-origin'
             : 'cors'
           : 'no-cors',
       });
 
       if (response.status >= 200 && response.status <= 299) {
-        diag.debug('response success');
+        diag.debug(`export response success (status: ${response.status})`);
         return { status: 'success' };
       } else if (isExportHTTPErrorRetryable(response.status)) {
+        diag.warn(`export response retryable (status: ${response.status})`);
         const retryAfter = response.headers.get('Retry-After');
         const retryInMillis = parseRetryAfterToMills(retryAfter);
         return { status: 'retryable', retryInMillis };
       }
+      diag.error(`export response failure (status: ${response.status})`);
       return {
         status: 'failure',
-        error: new Error('Fetch request failed with non-retryable status'),
+        error: new Error(
+          `Fetch request failed with non-retryable status ${response.status}`
+        ),
       };
     } catch (error) {
       if (isFetchNetworkErrorRetryable(error)) {
+        diag.warn(`export request retryable (network error: ${error})`);
         return {
           status: 'retryable',
           error: new Error('Fetch request encountered a network error', {
@@ -88,12 +140,17 @@ class FetchTransport implements IExporterTransport {
           }),
         };
       }
+      diag.error(`export request failure (error: ${error})`);
       return {
         status: 'failure',
         error: new Error('Fetch request errored', { cause: error }),
       };
     } finally {
       clearTimeout(timeout);
+      if (useKeepalive) {
+        pendingBodySize -= requestSize;
+        pendingKeepaliveCount--;
+      }
     }
   }
 
