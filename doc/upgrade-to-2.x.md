@@ -9,7 +9,7 @@ In late February 2025, the OpenTelemetry JavaScript project released the first v
 
 Per [OpenTelemetry guidelines](https://opentelemetry.io/docs/specs/otel/versioning-and-stability/#sdk-support), the 1.x versions of stable SDK packages will be supported for one year from the 2.0.0 release.
 
-If you have any questions about the 2.x changes, please ask! You can reach the OTel JS community on the [#otel-js](https://cloud-native.slack.com/archives/C01NL1GRPQR) channel of the [CNCF Slack](https://slack.cncf.io/), [open a Discussion issue](https://github.com/open-telemetry/opentelemetry-js/issues/new?template=discussion.md) on the repository, or join the weekly [OTel JS SIG zoom call](https://docs.google.com/document/d/1tCyoQK49WVcE-x8oryZOTTToFm7sIeUhxFPm9g-qL1k/edit).
+If you have any questions about the 2.x changes, please ask! You can reach the OTel JS community on the [#otel-js](https://cloud-native.slack.com/archives/C01NL1GRPQR) channel of the [CNCF Slack](https://cloud-native.slack.com), [open a Discussion issue](https://github.com/open-telemetry/opentelemetry-js/issues/new?template=discussion.md) on the repository, or join the weekly [OTel JS SIG zoom call](https://docs.google.com/document/d/1tCyoQK49WVcE-x8oryZOTTToFm7sIeUhxFPm9g-qL1k/edit).
 
 ## What is JS SDK 2.x?
 
