@@ -55,6 +55,11 @@ export class InMemoryLogRecordExporter implements LogRecordExporter {
     return Promise.resolve();
   }
 
+  public forceFlush(): Promise<void> {
+    // nothing to flush
+    return Promise.resolve();
+  }
+
   public getFinishedLogRecords(): ReadableLogRecord[] {
     return this._finishedLogRecords;
   }
