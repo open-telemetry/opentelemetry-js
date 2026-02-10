@@ -220,13 +220,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
       });
     } else {
-      // Use Headers to correctly handle all HeadersInit types:
-      // - undefined/null
-      // - Headers object
-      // - Record<string, string>
-      // - Iterable<[string, string]> (including array of tuples)
       const headers = new Headers(options.headers);
-      // Inject propagation headers last so they take precedence on conflicts
       propagation.inject(context.active(), headers, {
         set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
       });
