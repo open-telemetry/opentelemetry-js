@@ -248,4 +248,100 @@ describe('ProtobufWriter', function () {
       sinon.assert.calledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
     });
   });
+
+  describe('large sub-messages', function () {
+    it('should not shift message on 1-byte varint length prefix', function () {
+      const writer = new ProtobufWriter(4);
+      const messageStart = writer.startLengthDelimited(); // reserve space
+      writer.writeVarint(1);
+      writer.writeVarint(2);
+      writer.writeVarint(3);
+      writer.finishLengthDelimited(messageStart, 3); // accurate length that fits in 1 byte, so no shifting needed
+      const result = writer.finish();
+
+      assert.deepStrictEqual(
+        result,
+        new Uint8Array([
+          ...[3] /* varint encoding of 3 */,
+          ...[1, 2, 3] /* message contents remain in-place */,
+        ])
+      );
+    });
+
+    // Note: the following tests pretend that the message is larger than it actually is
+    // to avoid actually having to use such large messages. This keeps memory use acceptable
+    // as otherwise we'd be using ~2GiB of memory for the largest test, which is not practical.
+
+    it('should shift message on 2-byte varint length prefix', function () {
+      const writer = new ProtobufWriter(4);
+      const messageStart = writer.startLengthDelimited(); // reserve space
+      writer.writeVarint(1);
+      writer.writeVarint(2);
+      writer.writeVarint(3);
+      writer.finishLengthDelimited(messageStart, 128); // pretend message is 128 bytes to force 2-byte varint length
+      const result = writer.finish();
+
+      assert.deepStrictEqual(
+        result,
+        new Uint8Array([
+          ...[128, 1] /* varint encoding of 128 */,
+          ...[1, 2, 3] /* message contents properly shifted */,
+        ])
+      );
+    });
+
+    it('should shift message on 3-byte varint length prefix', function () {
+      const writer = new ProtobufWriter(4);
+      const messageStart = writer.startLengthDelimited(); // reserve space
+      writer.writeVarint(1);
+      writer.writeVarint(2);
+      writer.writeVarint(3);
+      writer.finishLengthDelimited(messageStart, Math.pow(2, 21) - 1); // pretend message is 2^21-1 bytes to force 3-byte varint length
+      const result = writer.finish();
+
+      assert.deepStrictEqual(
+        result,
+        new Uint8Array([
+          ...[255, 255, 127] /* varint encoding of 2^21-1 */,
+          ...[1, 2, 3] /* message contents properly shifted */,
+        ])
+      );
+    });
+
+    it('should shift message on 4-byte varint length prefix', function () {
+      const writer = new ProtobufWriter(4);
+      const messageStart = writer.startLengthDelimited(); // reserve space
+      writer.writeVarint(1);
+      writer.writeVarint(2);
+      writer.writeVarint(3);
+      writer.finishLengthDelimited(messageStart, Math.pow(2, 28) - 1); // pretend message is 2^28-1 bytes to force 4-byte varint length
+      const result = writer.finish();
+
+      assert.deepStrictEqual(
+        result,
+        new Uint8Array([
+          ...[255, 255, 255, 127] /* varint encoding of 2^28-1 */,
+          ...[1, 2, 3] /* message contents properly shifted */,
+        ])
+      );
+    });
+
+    it('should shift message on 5-byte varint length prefix', function () {
+      const writer = new ProtobufWriter(4);
+      const messageStart = writer.startLengthDelimited(); // reserve space
+      writer.writeVarint(1);
+      writer.writeVarint(2);
+      writer.writeVarint(3);
+      writer.finishLengthDelimited(messageStart, Math.pow(2, 31) - 1); // pretend message is 2^31-1 bytes to force 5-byte varint length
+      const result = writer.finish();
+
+      assert.deepStrictEqual(
+        result,
+        new Uint8Array([
+          ...[255, 255, 255, 255, 7] /* varint encoding of 2^31-1 */,
+          ...[1, 2, 3] /* message contents properly shifted */,
+        ])
+      );
+    });
+  });
 });
