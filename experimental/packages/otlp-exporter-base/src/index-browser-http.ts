@@ -15,7 +15,7 @@
  */
 
 /**
- * @deprecated Use {@link createOtlpFetchExportDelegate} instead.
+ * @deprecated Use `createOtlpFetchExportDelegate` instead.
  */
 export { createOtlpSendBeaconExportDelegate } from './otlp-browser-http-export-delegate';
 
