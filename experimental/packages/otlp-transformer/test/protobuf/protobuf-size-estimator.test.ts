@@ -22,18 +22,29 @@ describe('ProtobufSizeEstimator', function () {
   describe('size estimation accuracy', function () {
     it('should match ProtobufWriter size for writeVarint', function () {
       const testValues = [
-        0,
-        1,
+        0, // min 1-byte varint
+        1, // 1-byte varint
         127, // max 1-byte varint
         128, // min 2-byte varint
-        300,
+        300, // 2-byte varint
         16383, // max 2-byte varint
         16384, // min 3-byte varint
         2097151, // max 3-byte varint
         2097152, // min 4-byte varint
         268435455, // max 4-byte varint
         268435456, // min 5-byte varint
-        0xffffffff, // max 32-bit varint
+        4294967295, // max 5-byte varint (32-bit unsigned)
+        -1, // 10-byte varint (negative)
+        -100, // 10-byte varint (negative)
+        -2147483648, // 10-byte varint (min 32-bit signed)
+        4294967296, // min 6-byte varint (2^32)
+        8589934591, // 6-byte varint
+        34359738367, // 7-byte varint
+        4398046511103, // 8-byte varint
+        562949953421311, // 9-byte varint
+        // we're just testing if size estimation works here, precision loss does not matter in this case.
+        // eslint-disable-next-line no-loss-of-precision
+        72057594037927935, // 10-byte varint
       ];
 
       for (const value of testValues) {
@@ -43,7 +54,11 @@ describe('ProtobufSizeEstimator', function () {
         writer.writeVarint(value);
         estimator.writeVarint(value);
 
-        assert.strictEqual(estimator.pos, writer.pos);
+        assert.strictEqual(
+          estimator.pos,
+          writer.pos,
+          `Unexpected size mismatch for value ${value}: expected ${writer.pos} but got ${estimator.pos}`
+        );
       }
     });
 

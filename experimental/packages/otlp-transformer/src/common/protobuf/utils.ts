@@ -27,16 +27,14 @@ export function sizeAsVarint(value: number): number {
     if (v < 0x10000000) return 4;
     return 5;
   } else {
-    // 64-bit handling - use explicit size calculation instead of loop
-    let low: number;
+    // 64-bit handling
     let high: number;
 
     if (value >= 0) {
-      low = value >>> 0;
       high = (value / 0x100000000) >>> 0;
     } else {
       const abs = Math.abs(value);
-      low = abs >>> 0;
+      let low = abs >>> 0;
       high = (abs / 0x100000000) >>> 0;
       low = ~low >>> 0;
       high = ~high >>> 0;
@@ -46,22 +44,12 @@ export function sizeAsVarint(value: number): number {
       }
     }
 
-    // Calculate size based on the magnitude
-    // Each byte can hold 7 bits of data
-    if (high === 0) {
-      // Only low part has data
-      if (low < 0x80) return 1;
-      if (low < 0x4000) return 2;
-      if (low < 0x200000) return 3;
-      if (low < 0x10000000) return 4;
-      return 5;
-    } else {
-      // High part has data - need 6-10 bytes
-      if (high < 0x8) return 6; // 35 bits
-      if (high < 0x400) return 7; // 42 bits
-      if (high < 0x20000) return 8; // 49 bits
-      if (high < 0x1000000) return 9; // 56 bits
-      return 10; // 57-64 bits
-    }
+    // high will always be > 0 in this branch, so encoding will always be 5-10 bytes
+    if (high <= 0x7) return 5; // up to 35 bits (2^35-1: high=7, low=0xFFFFFFFF)
+    if (high <= 0x3ff) return 6; // up to 42 bits (2^42-1: high=1023, low=0xFFFFFFFF)
+    if (high <= 0x1ffff) return 7; // up to 49 bits
+    if (high <= 0xffffff) return 8; // up to 56 bits
+    if (high <= 0x7fffffff) return 9; // up to 63 bits
+    return 10; // 64 bits
   }
 }
