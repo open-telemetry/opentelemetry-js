@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context, Exception, TimeInput } from '@opentelemetry/api';
+import { Context, TimeInput } from '@opentelemetry/api';
 import { AnyValue, AnyValueMap } from './AnyValue';
 
 export type LogBody = AnyValue;
@@ -89,7 +89,7 @@ export interface LogRecord {
    *
    * @experimental
    */
-  exception?: Exception;
+  exception?: unknown;
 
   /**
    * The Context associated with the LogRecord.

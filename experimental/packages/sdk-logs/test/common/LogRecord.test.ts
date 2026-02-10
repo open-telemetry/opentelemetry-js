@@ -20,7 +20,6 @@ import {
   Attributes,
   AttributeValue,
   diag,
-  Exception,
   ROOT_CONTEXT,
   trace,
   TraceFlags,
@@ -216,7 +215,7 @@ describe('LogRecord', () => {
     it('should warn when exception has no useful fields', () => {
       const warnSpy = sinon.stub(diag, 'warn');
       const logRecordData: logsAPI.LogRecord = {
-        exception: {} as Exception,
+        exception: {} as unknown,
       };
 
       setup(undefined, logRecordData);

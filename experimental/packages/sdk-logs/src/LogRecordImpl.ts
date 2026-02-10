@@ -22,7 +22,6 @@ import type {
   SeverityNumber,
 } from '@opentelemetry/api-logs';
 import * as api from '@opentelemetry/api';
-import type { Exception } from '@opentelemetry/api';
 import { timeInputToHrTime, InstrumentationScope } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import {
@@ -241,31 +240,74 @@ export class LogRecordImpl implements ReadableLogRecord {
     return value;
   }
 
-  private _setException(exception: Exception): void {
-    const attributes: LogAttributes = {};
+  private _setException(exception: unknown): void {
+    let hasMinimumAttributes = false;
+
     if (typeof exception === 'string') {
-      attributes[ATTR_EXCEPTION_MESSAGE] = exception;
-    } else if (exception) {
-      if (exception.code) {
-        attributes[ATTR_EXCEPTION_TYPE] = exception.code.toString();
-      } else if (exception.name) {
-        attributes[ATTR_EXCEPTION_TYPE] = exception.name;
+      if (
+        !Object.prototype.hasOwnProperty.call(
+          this.attributes,
+          ATTR_EXCEPTION_MESSAGE
+        )
+      ) {
+        this.setAttribute(ATTR_EXCEPTION_MESSAGE, exception);
       }
-      if (exception.message) {
-        attributes[ATTR_EXCEPTION_MESSAGE] = exception.message;
+      hasMinimumAttributes = true;
+    } else if (exception && typeof exception === 'object') {
+      const exceptionObj = exception as {
+        code?: string | number;
+        name?: string;
+        message?: string;
+        stack?: string;
+      };
+
+      if (exceptionObj.code) {
+        if (
+          !Object.prototype.hasOwnProperty.call(
+            this.attributes,
+            ATTR_EXCEPTION_TYPE
+          )
+        ) {
+          this.setAttribute(ATTR_EXCEPTION_TYPE, exceptionObj.code.toString());
+        }
+        hasMinimumAttributes = true;
+      } else if (exceptionObj.name) {
+        if (
+          !Object.prototype.hasOwnProperty.call(
+            this.attributes,
+            ATTR_EXCEPTION_TYPE
+          )
+        ) {
+          this.setAttribute(ATTR_EXCEPTION_TYPE, exceptionObj.name);
+        }
+        hasMinimumAttributes = true;
       }
-      if (exception.stack) {
-        attributes[ATTR_EXCEPTION_STACKTRACE] = exception.stack;
+
+      if (exceptionObj.message) {
+        if (
+          !Object.prototype.hasOwnProperty.call(
+            this.attributes,
+            ATTR_EXCEPTION_MESSAGE
+          )
+        ) {
+          this.setAttribute(ATTR_EXCEPTION_MESSAGE, exceptionObj.message);
+        }
+        hasMinimumAttributes = true;
+      }
+
+      if (exceptionObj.stack) {
+        if (
+          !Object.prototype.hasOwnProperty.call(
+            this.attributes,
+            ATTR_EXCEPTION_STACKTRACE
+          )
+        ) {
+          this.setAttribute(ATTR_EXCEPTION_STACKTRACE, exceptionObj.stack);
+        }
       }
     }
 
-    if (attributes[ATTR_EXCEPTION_TYPE] || attributes[ATTR_EXCEPTION_MESSAGE]) {
-      for (const [key, value] of Object.entries(attributes)) {
-        if (!Object.prototype.hasOwnProperty.call(this.attributes, key)) {
-          this.setAttribute(key, value);
-        }
-      }
-    } else {
+    if (!hasMinimumAttributes) {
       api.diag.warn(`Failed to record an exception ${exception}`);
     }
   }
