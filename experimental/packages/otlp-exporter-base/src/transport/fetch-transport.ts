@@ -83,7 +83,6 @@ class FetchTransport implements IExporterTransport {
 
     // Determine if we can use keepalive based on cumulative browser limits.
     // We must check BEFORE adding to pending totals to avoid exceeding limits.
-    // In non-browser environments, these limits don't apply but tracking is harmless.
     const wouldExceedSize =
       pendingBodySize + requestSize > MAX_KEEPALIVE_BODY_SIZE;
     const wouldExceedCount = pendingKeepaliveCount >= MAX_KEEPALIVE_REQUESTS;
