@@ -644,21 +644,23 @@ describe('Utility', () => {
       );
 
       assert.deepStrictEqual(attrs, {
-        'http.request.header.x_forwarded_for': ['foo']
+        'http.request.header.x_forwarded_for': ['foo'],
       });
     });
 
     it('ignores non-existent headers', () => {
-      const attrs = utils.headerCapture('request', ['Origin', 'Accept'])(header => {
-        if (header === 'origin') {
-          return 'localhost';
-        }
+      const attrs = utils.headerCapture('request', ['Origin', 'Accept'])(
+        header => {
+          if (header === 'origin') {
+            return 'localhost';
+          }
 
-        return undefined;
-      });
+          return undefined;
+        }
+      );
 
       assert.deepStrictEqual(attrs, {
-        'http.request.header.origin': ['localhost']
+        'http.request.header.origin': ['localhost'],
       });
     });
   });
