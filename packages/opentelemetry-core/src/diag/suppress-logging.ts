@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-import { Context, createContextKey } from '@opentelemetry/api';
+let _loggingSuppressed = false;
 
-const SUPPRESS_LOGGING_KEY = createContextKey(
-  'OpenTelemetry SDK Context Key SUPPRESS_LOGGING'
-);
-
-export function suppressLogging(context: Context): Context {
-  return context.setValue(SUPPRESS_LOGGING_KEY, true);
+export function suppressLogging(): void {
+  _loggingSuppressed = true;
 }
 
-export function unsuppressLogging(context: Context): Context {
-  return context.deleteValue(SUPPRESS_LOGGING_KEY);
+export function unsuppressLogging(): void {
+  _loggingSuppressed = false;
 }
 
-export function isLoggingSuppressed(context: Context): boolean {
-  return context.getValue(SUPPRESS_LOGGING_KEY) === true;
+export function isLoggingSuppressed(): boolean {
+  return _loggingSuppressed;
 }

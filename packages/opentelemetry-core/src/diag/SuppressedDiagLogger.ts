@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { context, DiagLogger, DiagLogFunction } from '@opentelemetry/api';
-import { suppressLogging } from './suppress-logging';
+import { DiagLogger, DiagLogFunction } from '@opentelemetry/api';
+import { isLoggingSuppressed, suppressLogging, unsuppressLogging } from './suppress-logging';
 
 // Internal class - not exported
 class SuppressedDiagLogger implements DiagLogger {
@@ -47,9 +47,15 @@ class SuppressedDiagLogger implements DiagLogger {
 
   private _proxy(method: keyof DiagLogger): DiagLogFunction {
     return (...args) => {
-      context.with(suppressLogging(context.active()), () => {
+      const wasSuppressed = isLoggingSuppressed();
+      suppressLogging();
+      try {
         this._logger[method](...args);
-      });
+      } finally {
+        if (!wasSuppressed) {
+          unsuppressLogging();
+        }
+      }
     };
   }
 }
