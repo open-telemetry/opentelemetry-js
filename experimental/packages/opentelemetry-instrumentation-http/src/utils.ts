@@ -1095,9 +1095,9 @@ export function headerCapture(type: 'request' | 'response', headers: string[]) {
   }
 
   return (
-    span: Span,
     getHeader: (key: string) => undefined | string | string[] | number
-  ) => {
+  ): Attributes => {
+    const attributes: Attributes = {};
     for (const capturedHeader of normalizedHeaders.keys()) {
       const value = getHeader(capturedHeader);
 
@@ -1109,13 +1109,14 @@ export function headerCapture(type: 'request' | 'response', headers: string[]) {
       const key = `http.${type}.header.${normalizedHeader}`;
 
       if (typeof value === 'string') {
-        span.setAttribute(key, [value]);
+        attributes[key] = [value];
       } else if (Array.isArray(value)) {
-        span.setAttribute(key, value);
+        attributes[key] = value;
       } else {
-        span.setAttribute(key, [value]);
+        attributes[key] = [value];
       }
     }
+    return attributes;
   };
 }
 

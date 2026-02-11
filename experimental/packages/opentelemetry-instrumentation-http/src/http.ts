@@ -459,12 +459,15 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           this._callResponseHook(span, response);
         }
 
-        this._headerCapture.client.captureRequestHeaders(span, header =>
-          request.getHeader(header)
+        span.setAttributes(
+          this._headerCapture.client.captureRequestHeaders(header =>
+            request.getHeader(header)
+          )
         );
-        this._headerCapture.client.captureResponseHeaders(
-          span,
-          header => response.headers[header]
+        span.setAttributes(
+          this._headerCapture.client.captureResponseHeaders(
+            header => response.headers[header]
+          )
         );
 
         context.bind(context.active(), response);
@@ -623,6 +626,13 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         instrumentation._diag
       );
 
+      Object.assign(
+        spanAttributes,
+        instrumentation._headerCapture.server.captureRequestHeaders(
+          header => request.headers[header]
+        )
+      );
+
       const spanOptions: SpanOptions = {
         kind: SpanKind.SERVER,
         attributes: spanAttributes,
@@ -663,11 +673,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           if (instrumentation.getConfig().responseHook) {
             instrumentation._callResponseHook(span, response);
           }
-
-          instrumentation._headerCapture.server.captureRequestHeaders(
-            span,
-            header => request.headers[header]
-          );
 
           // After 'error', no further events other than 'close' should be emitted.
           let hasError = false;
@@ -889,8 +894,10 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       getIncomingStableRequestMetricAttributesOnResponse(attributes)
     );
 
-    this._headerCapture.server.captureResponseHeaders(span, header =>
-      response.getHeader(header)
+    span.setAttributes(
+      this._headerCapture.server.captureResponseHeaders(header =>
+        response.getHeader(header)
+      )
     );
 
     span.setAttributes(attributes).setStatus({
