@@ -81,10 +81,6 @@ export function initializeDefaultConfiguration(): ConfigurationModel {
     attribute_limits: {
       attribute_count_limit: 128,
     },
-    propagator: {
-      composite: [{ tracecontext: null }, { baggage: null }],
-      composite_list: 'tracecontext,baggage',
-    },
   };
 
   return config;

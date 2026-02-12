@@ -287,6 +287,9 @@ export function setPropagator(
     );
     if (compositeListString) {
       config.propagator!.composite_list = compositeListString;
+    } else if (auxList.length > 0) {
+      // Generate composite_list from the composite entries
+      config.propagator!.composite_list = auxList.join(',');
     }
   }
 }
