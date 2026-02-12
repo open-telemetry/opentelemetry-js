@@ -54,9 +54,15 @@ NOTE: In order to enable the detection, the parameter <code>autoDetectResources<
 <li><code>none</code> - disable resource detection</li>
 </ul>
 <p>For example, to enable only the <code>env</code>, <code>host</code> detectors:</p>
-<pre><code class="shell"><span class="hl-3">export</span><span class="hl-1"> </span><span class="hl-6">OTEL_NODE_RESOURCE_DETECTORS</span><span class="hl-1">=</span><span class="hl-2">&quot;env,host&quot;</span>
+<pre><code class="shell"><span class="hl-3">export</span><span class="hl-1"> </span><span class="hl-6">OTEL_NODE_RESOURCE_DETECTORS</span><span class="hl-1">=</span><span class="hl-2">&quot;host,env&quot;</span>
 </code><button type="button">Copy</button></pre>
 
+<p>NOTE: The order set on <code>OTEL_NODE_RESOURCE_DETECTORS</code> will be respected and the detectors will be executed in order.
+For example, if you have <code>OTEL_RESOURCE_ATTRIBUTES=&quot;service.instance.id=custom-name&quot;</code>, but also <code>serviceinstance</code> and <code>env</code> on <code>OTEL_NODE_RESOURCE_DETECTORS</code>, it can have 2 scenarios:</p>
+<ul>
+<li><code>OTEL_NODE_RESOURCE_DETECTORS=&quot;serviceinstance,env&quot;</code> will have the <code>service.instance.id</code> as <code>custom-name</code></li>
+<li><code>OTEL_NODE_RESOURCE_DETECTORS=&quot;env,serviceinstance&quot;</code> will have the <code>service.instance.id</code> as a random UUID</li>
+</ul>
 <a id="sampler" class="tsd-anchor"></a><h3 class="tsd-anchor-link">sampler<a href="#sampler" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Configure a custom sampler. By default, all traces will be sampled.</p>
 <a id="spanprocessor" class="tsd-anchor"></a><h3 class="tsd-anchor-link">spanProcessor<a href="#spanprocessor" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Deprecated, please use <a href="#spanprocessors">spanProcessors</a> instead.</p>
 <a id="spanprocessors" class="tsd-anchor"></a><h3 class="tsd-anchor-link">spanProcessors<a href="#spanprocessors" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>An array of span processors to register to the tracer provider.</p>
