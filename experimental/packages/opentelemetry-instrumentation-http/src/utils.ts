@@ -1100,7 +1100,10 @@ export function headerCapture(
     } else {
       // In old semconv, the header name converted hypen to underscore, e.g.:
       // `http.request.header.content_length`.
-      normalizedHeaders.set(capturedHeader, capturedHeader.replace(/-/g, '_'));
+      normalizedHeaders.set(
+        capturedHeader,
+        capturedHeader.replaceAll('-', '_')
+      );
     }
   }
 
