@@ -28,6 +28,7 @@ describe('mergeOtlpHttpConfigurationWithDefaults (common)', function () {
     compression: 'none',
     concurrencyLimit: 2,
     headers: async () => ({ 'User-Agent': 'default-user-agent' }),
+    fetch: async () => new Response(),
   };
 
   describe('headers', function () {
@@ -117,6 +118,44 @@ describe('mergeOtlpHttpConfigurationWithDefaults (common)', function () {
         testDefaults
       );
       assert.strictEqual(config.url, testDefaults.url);
+    });
+  });
+
+  describe('fetch', function () {
+    it('uses user provided fetch over fallback', function () {
+      const userFetch = async () => new Response('user');
+      const fallbackFetch = async () => new Response('fallback');
+      const config = mergeOtlpHttpConfigurationWithDefaults(
+        {
+          fetch: userFetch,
+        },
+        {
+          fetch: fallbackFetch,
+        },
+        testDefaults
+      );
+      assert.strictEqual(config.fetch, userFetch);
+    });
+
+    it('uses fallback fetch over default', function () {
+      const fallbackFetch = async () => new Response('fallback');
+      const config = mergeOtlpHttpConfigurationWithDefaults(
+        {},
+        {
+          fetch: fallbackFetch,
+        },
+        testDefaults
+      );
+      assert.strictEqual(config.fetch, fallbackFetch);
+    });
+
+    it('uses default if none other are specified', function () {
+      const config = mergeOtlpHttpConfigurationWithDefaults(
+        {},
+        {},
+        testDefaults
+      );
+      assert.strictEqual(config.fetch, testDefaults.fetch);
     });
   });
 

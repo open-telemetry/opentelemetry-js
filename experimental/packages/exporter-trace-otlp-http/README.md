@@ -31,6 +31,7 @@ import {
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 
 const collectorOptions = {
+  fetch: customFetch, // an optional custom fetch implementation - default is globalThis.fetch
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/traces
   headers: {}, // an optional object containing custom headers to be sent with each request
   concurrencyLimit: 10, // an optional limit on pending requests
@@ -48,24 +49,29 @@ const provider = new WebTracerProvider({
       scheduledDelayMillis: 500,
       // How long the export can run before it is cancelled
       exportTimeoutMillis: 30000,
-    })
-  ]
+    }),
+  ],
 });
 
 provider.register();
-
 ```
 
 ## Traces in Node - JSON over http
 
 ```js
-const { NodeTracerProvider, BatchSpanProcessor } = require('@opentelemetry/sdk-trace-node');
-const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-http');
+const {
+  NodeTracerProvider,
+  BatchSpanProcessor,
+} = require('@opentelemetry/sdk-trace-node');
+const {
+  OTLPTraceExporter,
+} = require('@opentelemetry/exporter-trace-otlp-http');
 
 const collectorOptions = {
+  fetch: customFetch, // an optional custom fetch implementation - default is globalThis.fetch
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/traces
   headers: {
-    foo: 'bar'
+    foo: 'bar',
   }, // an optional object containing custom headers to be sent with each request will only work with http
   concurrencyLimit: 10, // an optional limit on pending requests
 };
@@ -78,12 +84,11 @@ const provider = new NodeTracerProvider({
       maxQueueSize: 1000,
       // The interval between two consecutive exports
       scheduledDelayMillis: 30000,
-    })
-  ]
+    }),
+  ],
 });
 
 provider.register();
-
 ```
 
 ## GRPC
@@ -138,7 +143,7 @@ To override the default timeout duration, use the following options:
     timeoutMillis: 15000,
     url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/traces
     headers: {
-      foo: 'bar'
+      foo: 'bar',
     }, // an optional object containing custom headers to be sent with each request will only work with http
     concurrencyLimit: 10, // an optional limit on pending requests
   };
@@ -161,7 +166,7 @@ This retry policy has the following configuration, which there is currently no w
 
 This retry policy first checks if the response has a `'Retry-After'` header. If there is a `'Retry-After'` header, the exporter will wait the amount specified in the `'Retry-After'` header before retrying. If there is no `'Retry-After'` header, the exporter will use an exponential backoff with jitter retry strategy.
 
-  > The exporter will retry exporting within the [exporter timeout configuration](#exporter-timeout-configuration) time.
+> The exporter will retry exporting within the [exporter timeout configuration](#exporter-timeout-configuration) time.
 
 ## Running opentelemetry-collector locally to see the traces
 

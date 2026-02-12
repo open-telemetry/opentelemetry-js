@@ -112,4 +112,24 @@ describe('convertLegacyHttpOptions', function () {
     assert.deepStrictEqual(initialHeaders, { foo: 'bar' });
     assert.deepStrictEqual(laterHeaders, { foo: 'baz' });
   });
+
+  it('should pass along custom fetch function', function () {
+    const customFetch = async () => new Response();
+    const options = convertLegacyHttpOptions(
+      {
+        fetch: customFetch,
+      },
+      'SIGNAL',
+      'v1/signal',
+      {}
+    );
+
+    assert.strictEqual(options.fetch, customFetch);
+  });
+
+  it('should use default fetch when not provided', function () {
+    const options = convertLegacyHttpOptions({}, 'SIGNAL', 'v1/signal', {});
+
+    assert.strictEqual(options.fetch, globalThis.fetch);
+  });
 });

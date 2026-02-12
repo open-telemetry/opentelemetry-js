@@ -42,6 +42,24 @@ export interface OTLPExporterConfigBase {
    */
   headers?: Record<string, string> | HeadersFactory;
   url?: string;
+  /**
+   * Custom fetch implementation to use for HTTP requests.
+   *
+   * @remarks
+   * This option allows you to provide a custom fetch function that will be used
+   * instead of the global `fetch`.
+   *
+   * The function must have the same signature as the global `fetch` function.
+   *
+   * @example <caption>Using a custom fetch with request logging:</caption>
+   * fetch: async (input, init) => {
+   *   console.log('Making request to:', input);
+   *   return globalThis.fetch(input, init);
+   * }
+   *
+   * @default globalThis.fetch
+   */
+  fetch?: typeof globalThis.fetch;
   concurrencyLimit?: number;
   /** Maximum time the OTLP exporter will wait for each batch export.
    * The default value is 10000ms. */

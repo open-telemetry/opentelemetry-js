@@ -39,6 +39,7 @@ export function convertLegacyBrowserHttpOptions(
       timeoutMillis: config.timeoutMillis,
       headers: convertLegacyHeaders(config),
       concurrencyLimit: config.concurrencyLimit,
+      fetch: config.fetch,
     },
     {}, // no fallback for browser case
     getHttpConfigurationDefaults(requiredHeaders, signalResourcePath)

@@ -26,6 +26,7 @@ describe('mergeOtlpHttpConfigurationWithDefaults (browser)', function () {
     compression: 'none',
     concurrencyLimit: 2,
     headers: async () => ({ 'User-Agent': 'default-user-agent' }),
+    fetch: globalThis.fetch,
   };
 
   it('resolves user-provided relative url to document', function () {

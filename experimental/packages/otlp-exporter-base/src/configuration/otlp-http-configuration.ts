@@ -24,6 +24,7 @@ import { validateAndNormalizeHeaders } from '../util';
 export type HeadersFactory = () => Promise<Record<string, string>>;
 
 export interface OtlpHttpConfiguration extends OtlpSharedConfiguration {
+  fetch: typeof globalThis.fetch;
   url: string;
   headers: HeadersFactory;
 }
@@ -97,6 +98,10 @@ export function mergeOtlpHttpConfigurationWithDefaults(
       validateUserProvidedUrl(userProvidedConfiguration.url) ??
       fallbackConfiguration.url ??
       defaultConfiguration.url,
+    fetch:
+      userProvidedConfiguration.fetch ??
+      fallbackConfiguration.fetch ??
+      defaultConfiguration.fetch,
   };
 }
 
@@ -108,5 +113,6 @@ export function getHttpConfigurationDefaults(
     ...getSharedConfigurationDefaults(),
     headers: async () => requiredHeaders,
     url: 'http://localhost:4318/' + signalResourcePath,
+    fetch: globalThis.fetch,
   };
 }
