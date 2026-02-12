@@ -45,11 +45,6 @@ import {
 } from '@opentelemetry/resources';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
-import {
-  CompositePropagator,
-  W3CBaggagePropagator,
-  W3CTraceContextPropagator,
-} from '@opentelemetry/core';
 
 /**
  * @experimental Function to start the OpenTelemetry Node SDK
@@ -111,18 +106,11 @@ function create(
 
   const propagator =
     sdkOptions?.textMapPropagator === null
-      ? null // null means don't set.
+      ? null
       : (sdkOptions?.textMapPropagator ??
         getPropagatorFromConfiguration(config));
   if (propagator) {
     components.propagator = propagator;
-  } else if (propagator === undefined) {
-    components.propagator = new CompositePropagator({
-      propagators: [
-        new W3CTraceContextPropagator(),
-        new W3CBaggagePropagator(),
-      ],
-    });
   }
 
   const logProcessors = getLogRecordProcessorsFromConfiguration(config);

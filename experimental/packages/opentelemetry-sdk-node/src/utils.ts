@@ -103,7 +103,6 @@ export function getResourceFromConfiguration(
 }
 
 export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
-  console.log("AAAAAAAAA");
   // When updating this list, make sure to also update the section `resourceDetectors` on README.
   const resourceDetectors = new Map<string, ResourceDetector>([
     [RESOURCE_DETECTOR_HOST, hostDetector],
