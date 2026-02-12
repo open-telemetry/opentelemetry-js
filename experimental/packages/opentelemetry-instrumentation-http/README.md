@@ -107,7 +107,7 @@ v1.7.0 semconv                              | v1.23.0 semconv                   
 `net.host.ip`                               | `network.local.address`             | Like net.peer.ip but for the host IP. Useful in case of a multi-IP host
 `net.host.name`                             | `server.address`                    | Local hostname or similar
 `net.host.port`                             | `server.port`                       | Like net.peer.port but for the host port
-`net.peer.ip`                              | `network.peer.address`              | Remote address of the peer (dotted decimal for IPv4 or RFC5952 for IPv6)
+`net.peer.ip`                               | `network.peer.address`              | Remote address of the peer (dotted decimal for IPv4 or RFC5952 for IPv6)
 `net.peer.name`                             | `server.address`                    | Server domain name if available without reverse DNS lookup
 `net.peer.port`                             | `server.port`                       | Server port number
 `net.transport`                             | `network.transport`                 | Transport protocol used
