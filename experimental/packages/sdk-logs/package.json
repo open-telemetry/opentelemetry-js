@@ -95,6 +95,6 @@
     "@opentelemetry/api-logs": "0.211.0",
     "@opentelemetry/core": "2.5.0",
     "@opentelemetry/resources": "2.5.0",
-    "@opentelemetry/semantic-conventions": "^1.39.0"
+    "@opentelemetry/semantic-conventions": "^1.29.0"
   }
 }

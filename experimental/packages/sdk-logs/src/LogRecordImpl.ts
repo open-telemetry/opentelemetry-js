@@ -243,14 +243,9 @@ export class LogRecordImpl implements ReadableLogRecord {
   private _setException(exception: unknown): void {
     let hasMinimumAttributes = false;
 
-    if (typeof exception === 'string') {
-      if (
-        !Object.prototype.hasOwnProperty.call(
-          this.attributes,
-          ATTR_EXCEPTION_MESSAGE
-        )
-      ) {
-        this.setAttribute(ATTR_EXCEPTION_MESSAGE, exception);
+    if (typeof exception === 'string' || typeof exception === 'number') {
+      if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_MESSAGE)) {
+        this.setAttribute(ATTR_EXCEPTION_MESSAGE, String(exception));
       }
       hasMinimumAttributes = true;
     } else if (exception && typeof exception === 'object') {
@@ -262,48 +257,29 @@ export class LogRecordImpl implements ReadableLogRecord {
       };
 
       if (exceptionObj.code) {
-        if (
-          !Object.prototype.hasOwnProperty.call(
-            this.attributes,
-            ATTR_EXCEPTION_TYPE
-          )
-        ) {
+        if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_TYPE)) {
           this.setAttribute(ATTR_EXCEPTION_TYPE, exceptionObj.code.toString());
         }
         hasMinimumAttributes = true;
       } else if (exceptionObj.name) {
-        if (
-          !Object.prototype.hasOwnProperty.call(
-            this.attributes,
-            ATTR_EXCEPTION_TYPE
-          )
-        ) {
+        if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_TYPE)) {
           this.setAttribute(ATTR_EXCEPTION_TYPE, exceptionObj.name);
         }
         hasMinimumAttributes = true;
       }
 
       if (exceptionObj.message) {
-        if (
-          !Object.prototype.hasOwnProperty.call(
-            this.attributes,
-            ATTR_EXCEPTION_MESSAGE
-          )
-        ) {
+        if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_MESSAGE)) {
           this.setAttribute(ATTR_EXCEPTION_MESSAGE, exceptionObj.message);
         }
         hasMinimumAttributes = true;
       }
 
       if (exceptionObj.stack) {
-        if (
-          !Object.prototype.hasOwnProperty.call(
-            this.attributes,
-            ATTR_EXCEPTION_STACKTRACE
-          )
-        ) {
+        if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_STACKTRACE)) {
           this.setAttribute(ATTR_EXCEPTION_STACKTRACE, exceptionObj.stack);
         }
+        hasMinimumAttributes = true;
       }
     }
 

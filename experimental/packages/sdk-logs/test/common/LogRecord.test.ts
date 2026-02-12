@@ -212,6 +212,15 @@ describe('LogRecord', () => {
       assert.strictEqual(logRecord.attributes[ATTR_EXCEPTION_MESSAGE], 'boom');
     });
 
+    it('should set exception.message for numeric exceptions', () => {
+      const logRecordData: logsAPI.LogRecord = {
+        exception: 42,
+      };
+      const { logRecord } = setup(undefined, logRecordData);
+
+      assert.strictEqual(logRecord.attributes[ATTR_EXCEPTION_MESSAGE], '42');
+    });
+
     it('should warn when exception has no useful fields', () => {
       const warnSpy = sinon.stub(diag, 'warn');
       const logRecordData: logsAPI.LogRecord = {
