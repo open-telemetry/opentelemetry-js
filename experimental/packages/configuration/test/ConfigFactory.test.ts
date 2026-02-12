@@ -53,10 +53,7 @@ const defaultConfig: ConfigurationModel = {
   attribute_limits: {
     attribute_count_limit: 128,
   },
-  propagator: {
-    composite: [{ tracecontext: null }, { baggage: null }],
-    composite_list: 'tracecontext,baggage',
-  },
+  propagator: {},
 };
 
 const defaultTracerProvider: TracerProvider = {
@@ -1112,6 +1109,14 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
+    it('should not set propagators by default', function () {
+      const configFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      assert.deepStrictEqual(config, defaultConfig);
+      assert.strictEqual(config.propagator?.composite, undefined);
+      assert.strictEqual(config.propagator?.composite_list, undefined);
+    });
+
     it('should return config with custom propagator', function () {
       process.env.OTEL_PROPAGATORS = 'tracecontext,jaeger';
       const expectedConfig: ConfigurationModel = {
@@ -2102,7 +2107,11 @@ describe('ConfigFactory', function () {
         'test/fixtures/short-config.yml';
       const configFactory = createConfigFactory();
       const expectedConfig: ConfigurationModel = {
-        ...defaultConfig,
+        disabled: false,
+        log_level: DiagLogLevel.INFO,
+        attribute_limits: {
+          attribute_count_limit: 128,
+        },
         resource: {
           attributes_list: 'service.instance.id=123',
           attributes: [
@@ -2350,7 +2359,11 @@ describe('ConfigFactory', function () {
         'test/fixtures/resources.yaml';
       const configFactory = createConfigFactory();
       const expectedConfig: ConfigurationModel = {
-        ...defaultConfig,
+        disabled: false,
+        log_level: DiagLogLevel.INFO,
+        attribute_limits: {
+          attribute_count_limit: 128,
+        },
         resource: {
           schema_url: 'https://opentelemetry.io/schemas/1.16.0',
           attributes_list:
@@ -2470,7 +2483,10 @@ describe('ConfigFactory', function () {
       config = {};
       setPropagator(config, { composite: [{ tracecontext: null }] });
       assert.deepStrictEqual(config, {
-        propagator: { composite: [{ tracecontext: null }] },
+        propagator: {
+          composite: [{ tracecontext: null }],
+          composite_list: 'tracecontext',
+        },
       });
 
       const res = getTemporalityPreference(
