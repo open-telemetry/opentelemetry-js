@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1770885588886,
+  "lastUpdate": 1770892984208,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -57641,6 +57641,114 @@ window.BENCHMARK_DATA = {
             "name": "create spans (10 attributes)",
             "value": 282435,
             "range": "±0.60%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "29139614+renovate[bot]@users.noreply.github.com",
+            "name": "renovate[bot]",
+            "username": "renovate[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "48e2fb499ee476b18c08679b056adc2c1ef6f36b",
+          "message": "chore(deps): update fossas/fossa-action action to v1.8.0 (#6405)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+          "timestamp": "2026-02-12T10:33:22Z",
+          "tree_id": "de77f3503096fec6810a2655afe4cdff0b2442be",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/48e2fb499ee476b18c08679b056adc2c1ef6f36b"
+        },
+        "date": 1770892983112,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 512 spans (protobuf)",
+            "value": 156,
+            "range": "±0.98%",
+            "unit": "ops/sec",
+            "extra": "79 samples"
+          },
+          {
+            "name": "transform 512 spans (json)",
+            "value": 283,
+            "range": "±0.94%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "transform 512 logs (protobuf)",
+            "value": 163,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "79 samples"
+          },
+          {
+            "name": "transform 512 logs (json)",
+            "value": 292,
+            "range": "±0.40%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 1985754,
+            "range": "±0.45%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 1791616,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 1752354,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 1588023,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 258932,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "generateTraceId",
+            "value": 3555209,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "generateSpanId",
+            "value": 4573468,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 261874,
+            "range": "±1.63%",
             "unit": "ops/sec",
             "extra": "94 samples"
           }
