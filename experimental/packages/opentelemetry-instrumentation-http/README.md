@@ -62,7 +62,7 @@ Options                                 | Type                                  
 `startIncomingSpanHook`                 | `StartIncomingSpanCustomAttributeFunction` | Function for adding custom attributes before a span is started in incomingRequest
 `startOutgoingSpanHook`                 | `StartOutgoingSpanCustomAttributeFunction` | Function for adding custom attributes before a span is started in outgoingRequest
 `ignoreIncomingRequestHook`             | `IgnoreIncomingRequestFunction`            | HTTP instrumentation will not trace all incoming requests that matched with custom function.
-`ignoreOutgoingRequestHook`             | `IgnoreOutgoingRequestFunction`            | Http instrumentation will not trace all outgoing requests that matched with custom function.
+`ignoreOutgoingRequestHook`             | `IgnoreOutgoingRequestFunction`            | HTTP instrumentation will not trace all outgoing requests that matched with custom function.
 `disableOutgoingRequestInstrumentation` | `boolean`                                  | Set to true to avoid instrumenting outgoing requests at all. This can be helpful when another instrumentation handles outgoing requests.
 `disableIncomingRequestInstrumentation` | `boolean`                                  | Set to true to avoid instrumenting incoming requests at all. This can be helpful when another instrumentation handles incoming requests.
 `serverName`                            | `string`                                   | The primary server name of the matched virtual host.
