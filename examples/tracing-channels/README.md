@@ -11,7 +11,7 @@ This example demonstrates how to instrument a library that uses Node.js tracing 
   - `opentelemetry.ts` - OpenTelemetry SDK setup with OTLP and console exporters, also registers the tracing channel instrumentation
 
 To run the example:
-- `npm run compile` (from top-level, important as context operations are not available otherwise, they are not available on `main` yet)
+- `npm run compile` (from top-level of the repo, important as context operations are not available otherwise, they are not available on `main` yet)
 - `npm run start` (you can set OTLP exporter env vars to point it to your backend of choice)
 
 You should see properly parented spans for both tracing channel operations and nested traditionally-instrumented operations.

@@ -86,6 +86,16 @@ export interface TracingChannelSubscriberConfig<TMessage> {
 }
 
 /**
+ * Helper function to determine if a message indicates the end of an operation,
+ * based on the presence of 'result' or 'error' properties - they may be undefined,
+ * the presence of the property is the indicator to look for.
+ * @param message
+ */
+export function isEnding(message) {
+  return Object.prototype.hasOwnProperty.call(message, 'result') || Object.prototype.hasOwnProperty.call(message, 'error');
+}
+
+/**
  * Wraps tracing channel subscriber callbacks to automatically handle OpenTelemetry context management.
  * This simplifies instrumentation by removing the need for manual context attach/detach operations.
  *
@@ -140,8 +150,6 @@ export function subscriberWithContextManagement<TMessage extends object>(
 
   return {
     start(message: MessageWithState) {
-      if (!config.onStart) return;
-
       const state = getSubscriberState(message);
 
       // Capture the current context before calling the user's callback
@@ -151,7 +159,7 @@ export function subscriberWithContextManagement<TMessage extends object>(
       }
 
       // Call user's callback to get or create a span
-      const span = config.onStart(message as TMessage, state.span);
+      const span = config.onStart?.(message as TMessage, state.span);
 
       // If a span is returned, update our stored span and context
       if (span) {
@@ -164,8 +172,6 @@ export function subscriberWithContextManagement<TMessage extends object>(
     },
 
     asyncStart(message: MessageWithState) {
-      if (!config.onAsyncStart) return;
-
       const state = getSubscriberState(message);
 
       // Capture the current context if we don't have one yet
@@ -175,7 +181,7 @@ export function subscriberWithContextManagement<TMessage extends object>(
       }
 
       // Call user's callback to get or create a span
-      const span = config.onAsyncStart(message as TMessage, state.span);
+      const span = config.onAsyncStart?.(message as TMessage, state.span);
 
       // If a span is returned, update our stored span and context
       if (span) {
@@ -192,9 +198,7 @@ export function subscriberWithContextManagement<TMessage extends object>(
       const state = getSubscriberState(message);
 
       // Call user's callback if provided
-      if (config.onEnd) {
-        config.onEnd(message as TMessage, state.span);
-      }
+      config.onEnd?.(message as TMessage, state.span);
 
       // Restore previous context
       if (state.contextToken) {
@@ -206,9 +210,7 @@ export function subscriberWithContextManagement<TMessage extends object>(
       const state = getSubscriberState(message);
 
       // Call user's callback if provided
-      if (config.onAsyncEnd) {
-        config.onAsyncEnd(message as TMessage, state.span);
-      }
+      config.onAsyncEnd?.(message as TMessage, state.span);
 
       // Restore previous context
       if (state.asyncContextToken) {
@@ -217,10 +219,8 @@ export function subscriberWithContextManagement<TMessage extends object>(
     },
 
     error(message: MessageWithState & { error: unknown }) {
-      if (!config.onError) return;
-
       const state = getSubscriberState(message);
-      config.onError(message as TMessage & { error: unknown }, state.span);
+      config.onError?.(message as TMessage & { error: unknown }, state.span);
     }
   };
 }

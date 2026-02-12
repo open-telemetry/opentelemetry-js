@@ -2,7 +2,9 @@ import { diag } from '@opentelemetry/api';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
-import { setupTracingChannelInstrumentation } from './tracing-channel-instrumentation.ts';
+import {
+  libraryOperationInstrumentation,
+} from './tracing-channel-instrumentation.ts';
 
 const sdk = new NodeSDK({
   spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter()),
@@ -25,7 +27,7 @@ async function shutdown(): Promise<void> {
 
 // custom instrumentation for the tracing channel;
 // this is where the magic happens to create spans based on tracing channel messages
-setupTracingChannelInstrumentation();
+libraryOperationInstrumentation();
 
 // Gracefully shutdown SDK if a SIGTERM is received
 process.on('SIGTERM', shutdown);
