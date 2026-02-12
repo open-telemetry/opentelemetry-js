@@ -53,7 +53,11 @@ import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 
-import { ATTR_HOST_NAME, ATTR_PROCESS_PID, ATTR_SERVICE_INSTANCE_ID } from '../src/semconv';
+import {
+  ATTR_HOST_NAME,
+  ATTR_PROCESS_PID,
+  ATTR_SERVICE_INSTANCE_ID,
+} from '../src/semconv';
 import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
 
 describe('startNodeSDK', function () {
