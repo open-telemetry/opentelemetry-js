@@ -1419,6 +1419,64 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
+    it('should return config with meter_provider with prometheus exporter', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'prometheus';
+
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [
+            {
+              pull: {
+                exporter: {
+                  'prometheus/development': {
+                    host: 'localhost',
+                    port: 9464,
+                    without_scope_info: false,
+                    without_target_info: false,
+                  },
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+          views: [],
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with meter_provider with prometheus exporter and custom port', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'prometheus';
+      process.env.OTEL_EXPORTER_PROMETHEUS_HOST = '0.0.0.0';
+      process.env.OTEL_EXPORTER_PROMETHEUS_PORT = '8080';
+
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [
+            {
+              pull: {
+                exporter: {
+                  'prometheus/development': {
+                    host: '0.0.0.0',
+                    port: 8080,
+                    without_scope_info: false,
+                    without_target_info: false,
+                  },
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+          views: [],
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
     it('should return config with meter_provider with no exporter', function () {
       process.env.OTEL_METRICS_EXPORTER = 'none,console';
       const configFactory = createConfigFactory();
