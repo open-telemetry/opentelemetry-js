@@ -1,5 +1,6 @@
 import { context, trace } from '@opentelemetry/api';
 import type { Span, Context, Token } from '@opentelemetry/api';
+import type { TracingChannelSubscribers } from 'node:diagnostics_channel';
 
 /**
  * Utility type to hold instrumentation state for a given operation,
@@ -39,7 +40,7 @@ export interface TracingChannelSubscriberConfig<TMessage> {
    *
    * @param message - The tracing channel message
    * @param span - The existing span if one was already created, undefined otherwise
-   * @returns A span to be made active, or undefined to skip context management
+   * @returns A span to be made active, or undefined to manage context without a span
    */
   onStart?: (message: TMessage, span?: Span) => Span | undefined;
 
@@ -47,10 +48,11 @@ export interface TracingChannelSubscriberConfig<TMessage> {
    * Called when the asynchronous part of the operation starts.
    * Should return a span to be made active during the async operation.
    * If a span was already created in onStart, it will be reused automatically.
+   * The context captured in onStart will be preserved and used as the parent context.
    *
    * @param message - The tracing channel message
    * @param span - The existing span if one was already created, undefined otherwise
-   * @returns A span to be made active, or undefined to skip context management
+   * @returns A span to be made active, or undefined to manage context without a span
    */
   onAsyncStart?: (message: TMessage, span?: Span) => Span | undefined;
 
@@ -89,8 +91,10 @@ export interface TracingChannelSubscriberConfig<TMessage> {
  *
  * The wrapper will:
  * - Automatically attach and detach context tokens for sync and async operations
+ * - Capture context in onStart to ensure it is available in onAsyncStart, even if no span is created
  * - Reuse spans between start and asyncStart if the same span is returned
  * - Preserve the correct context for proper span parenting, even across async boundaries
+ * - Allow context management without creating a span (return undefined from callbacks)
  * - Store state on the message object using a unique symbol per subscriber to avoid collisions
  *
  * @template TMessage - The type of the message received from the tracing channel
@@ -118,9 +122,9 @@ export interface TracingChannelSubscriberConfig<TMessage> {
  * }));
  * ```
  */
-export function subscriberWithContextManagement<TMessage>(
+export function subscriberWithContextManagement<TMessage extends object>(
   config: TracingChannelSubscriberConfig<TMessage>
-) {
+): TracingChannelSubscribers<TMessage> {
   // Create a unique symbol for this subscriber to avoid cross-pollution between different instrumentations
   const subscriberStateSymbol = Symbol('otel-tracing-channel-subscriber-state');
 
@@ -140,13 +144,22 @@ export function subscriberWithContextManagement<TMessage>(
 
       const state = getSubscriberState(message);
 
+      // Capture the current context before calling the user's callback
+      // This ensures we have the correct parent context even if onStart returns undefined
+      if (!state.context) {
+        state.context = context.active();
+      }
+
       // Call user's callback to get or create a span
       const span = config.onStart(message as TMessage, state.span);
-      if (!span) return;
 
-      // Store span and create context with span active
-      state.span = span;
-      state.context = trace.setSpan(state.context ?? context.active(), span);
+      // If a span is returned, update our stored span and context
+      if (span) {
+        state.span = span;
+        state.context = trace.setSpan(state.context, span);
+      }
+
+      // Always attach context to ensure proper context flow, even if no span was created
       state.contextToken = context.attach?.(state.context);
     },
 
@@ -155,13 +168,22 @@ export function subscriberWithContextManagement<TMessage>(
 
       const state = getSubscriberState(message);
 
+      // Capture the current context if we don't have one yet
+      // This handles the case where asyncStart is called without a prior start
+      if (!state.context) {
+        state.context = context.active();
+      }
+
       // Call user's callback to get or create a span
       const span = config.onAsyncStart(message as TMessage, state.span);
-      if (!span) return;
 
-      // Store span and create context with span active
-      state.span = span;
-      state.context = trace.setSpan(state.context ?? context.active(), span);
+      // If a span is returned, update our stored span and context
+      if (span) {
+        state.span = span;
+        state.context = trace.setSpan(state.context, span);
+      }
+
+      // Always attach context to ensure proper context flow, even if no span was created
       // Use a different token for async context, as sync ends before async end is called
       state.asyncContextToken = context.attach?.(state.context);
     },
