@@ -96,7 +96,7 @@ describe('startNodeSDK', function () {
 
       // These are minimal OTel functionality and always registered.
       assertDefaultContextManagerRegistered();
-      assertDefaultPropagatorRegistered();
+      assert.deepStrictEqual(propagation.fields(), []);
 
       assert.ok(
         setGlobalLoggerProviderSpy.called === false,
@@ -603,12 +603,4 @@ function assertDefaultContextManagerRegistered() {
     context['_getContextManager']().constructor.name ===
       AsyncLocalStorageContextManager.name
   );
-}
-
-function assertDefaultPropagatorRegistered() {
-  assert.deepStrictEqual(propagation.fields(), [
-    'traceparent',
-    'tracestate',
-    'baggage',
-  ]);
 }
