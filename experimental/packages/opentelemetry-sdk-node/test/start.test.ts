@@ -53,7 +53,8 @@ import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 
-import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from '../src/semconv';
+import { ATTR_HOST_NAME, ATTR_PROCESS_PID, ATTR_SERVICE_INSTANCE_ID } from '../src/semconv';
+import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
 
 describe('startNodeSDK', function () {
   let setGlobalLoggerProviderSpy: Sinon.SinonSpy;
@@ -323,6 +324,19 @@ describe('startNodeSDK', function () {
 
       assert.equal(resource.attributes[ATTR_PROCESS_PID], undefined);
       assert.equal(resource.attributes[ATTR_HOST_NAME], undefined);
+    });
+
+    it('have node resource detectors with OTEL_NODE_RESOURCE_DETECTORS as all', async () => {
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'all';
+      const configFactory: ConfigFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      const resource = setupResource(config, {});
+      await resource.waitForAsyncAttributes?.();
+
+      assert.notEqual(resource.attributes[ATTR_PROCESS_PID], undefined);
+      assert.notEqual(resource.attributes[ATTR_HOST_NAME], undefined);
+      assert.notEqual(resource.attributes[ATTR_OS_TYPE], undefined);
+      assert.notEqual(resource.attributes[ATTR_SERVICE_INSTANCE_ID], undefined);
     });
 
     it('should configure resources from config file', async () => {
