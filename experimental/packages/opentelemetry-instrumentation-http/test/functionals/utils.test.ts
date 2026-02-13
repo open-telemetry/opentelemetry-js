@@ -590,89 +590,78 @@ describe('Utility', () => {
   });
 
   describe('headers to span attributes capture', () => {
-    let span: Span;
-    let mock: sinon.SinonMock;
+    it('should capture attributes for request and response keys', () => {
+      const reqAttrs = utils.headerCapture('request', ['Origin'])(
+        () => 'localhost'
+      );
+      const resAttrs = utils.headerCapture('response', ['Cookie'])(
+        () => 'token=123'
+      );
 
-    beforeEach(() => {
-      span = {
-        setAttribute: () => undefined,
-      } as unknown as Span;
-      mock = sinon.mock(span);
+      assert.deepStrictEqual(reqAttrs, {
+        'http.request.header.origin': ['localhost'],
+      });
+      assert.deepStrictEqual(resAttrs, {
+        'http.response.header.cookie': ['token=123'],
+      });
     });
 
-    it('should set attributes for request and response keys', () => {
-      mock
-        .expects('setAttribute')
-        .calledWithExactly('http.request.header.origin', ['localhost']);
-      mock
-        .expects('setAttribute')
-        .calledWithExactly('http.response.header.cookie', ['token=123']);
-
-      utils.headerCapture('request', ['Origin'])(span, () => 'localhost');
-      utils.headerCapture('response', ['Cookie'])(span, () => 'token=123');
-      mock.verify();
-    });
-
-    it('should set attributes for multiple values', () => {
-      mock
-        .expects('setAttribute')
-        .calledWithExactly('http.request.header.origin', [
-          'localhost',
-          'www.example.com',
-        ]);
-
-      utils.headerCapture('request', ['Origin'])(span, () => [
+    it('should capture attributes for multiple values', () => {
+      const attrs = utils.headerCapture('request', ['Origin'])(() => [
         'localhost',
         'www.example.com',
       ]);
-      mock.verify();
+
+      assert.deepStrictEqual(attrs, {
+        'http.request.header.origin': ['localhost', 'www.example.com'],
+      });
     });
 
-    it('sets attributes for multiple headers', () => {
-      mock
-        .expects('setAttribute')
-        .calledWithExactly('http.request.header.origin', ['localhost']);
-      mock
-        .expects('setAttribute')
-        .calledWithExactly('http.request.header.foo', [42]);
+    it('should capture attributes for multiple headers', () => {
+      const attrs = utils.headerCapture('request', ['Origin', 'Foo'])(
+        header => {
+          if (header === 'origin') {
+            return 'localhost';
+          }
 
-      utils.headerCapture('request', ['Origin', 'Foo'])(span, header => {
-        if (header === 'origin') {
-          return 'localhost';
+          if (header === 'foo') {
+            return 42;
+          }
+
+          return undefined;
         }
+      );
 
-        if (header === 'foo') {
-          return 42;
-        }
-
-        return undefined;
+      assert.deepStrictEqual(attrs, {
+        'http.request.header.origin': ['localhost'],
+        'http.request.header.foo': [42],
       });
-      mock.verify();
     });
 
     it('should normalize header names', () => {
-      mock
-        .expects('setAttribute')
-        .calledWithExactly('http.request.header.x_forwarded_for', ['foo']);
+      const attrs = utils.headerCapture('request', ['X-Forwarded-For'])(
+        () => 'foo'
+      );
 
-      utils.headerCapture('request', ['X-Forwarded-For'])(span, () => 'foo');
-      mock.verify();
+      assert.deepStrictEqual(attrs, {
+        'http.request.header.x_forwarded_for': ['foo'],
+      });
     });
 
     it('ignores non-existent headers', () => {
-      mock
-        .expects('setAttribute')
-        .once()
-        .calledWithExactly('http.request.header.origin', ['localhost']);
+      const attrs = utils.headerCapture('request', ['Origin', 'Accept'])(
+        header => {
+          if (header === 'origin') {
+            return 'localhost';
+          }
 
-      utils.headerCapture('request', ['Origin', 'Accept'])(span, header => {
-        if (header === 'origin') {
-          return 'localhost';
+          return undefined;
         }
+      );
 
-        return undefined;
+      assert.deepStrictEqual(attrs, {
+        'http.request.header.origin': ['localhost'],
       });
-      mock.verify();
     });
   });
 
