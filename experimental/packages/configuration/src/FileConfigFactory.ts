@@ -301,11 +301,11 @@ function parseSampler(sampler: Sampler): Sampler {
 
   switch (samplerType) {
     case 'always_on':
-      parsedSampler = { always_on: sampler['always_on'] };
+      parsedSampler = { always_on: sampler['always_on'] ?? undefined };
       break;
 
     case 'always_off':
-      parsedSampler = { always_off: sampler['always_off'] };
+      parsedSampler = { always_off: sampler['always_off'] ?? undefined };
       break;
 
     case 'trace_id_ratio_based': {
