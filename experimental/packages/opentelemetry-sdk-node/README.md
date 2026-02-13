@@ -234,7 +234,7 @@ OpenTelemetry defines [metrics for monitoring SDK components](https://openteleme
 Until this spec is stabilized, the following environment variable must be used
 to enable these metrics:
 
-```
+```bash
 OTEL_NODE_EXPERIMENTAL_SDK_METRICS=true
 ```
 
