@@ -228,6 +228,21 @@ Additionally, you can specify other applicable environment variables that apply 
 - [OTLP exporter environment configuration](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options)
 - [Zipkin exporter environment configuration](https://github.com/open-telemetry/opentelemetry-specification/blob/6ce62202e5407518e19c56c445c13682ef51a51d/specification/sdk-environment-variables.md#zipkin-exporter)
 
+## Enable OpenTelemetry SDK internal metrics from environment
+
+OpenTelemetry defines [metrics for monitoring SDK components](https://opentelemetry.io/docs/specs/semconv/otel/sdk-metrics/).
+Until this spec is stabilized, the following environment variable must be used
+to enable these metrics:
+
+```
+OTEL_NODE_EXPERIMENTAL_SDK_METRICS=true
+```
+
+Currently a subset of the specified metrics are implemented. See the following
+linkes for details:
+
+- Span metrics: [TracerMetrics.ts](../../../packages/opentelemetry-sdk-trace-base/src/TracerMetrics.ts)
+
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

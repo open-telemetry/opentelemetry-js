@@ -130,6 +130,7 @@ describe('Node SDK', () => {
       delete process.env.OTEL_METRICS_EXPORTER;
       delete process.env.OTEL_PROPAGATORS;
       delete process.env.OTEL_TRACES_EXPORTER;
+      delete process.env.OTEL_NODE_EXPERIMENTAL_SDK_METRICS;
     });
 
     it('should not register more than the minimal SDK components', async () => {
@@ -419,7 +420,8 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
-    it('should register a meter provider to the tracer provider if both initialized', async () => {
+    it('should register a meter provider to the tracer provider if both initialized and metrics enabled', async () => {
+      process.env.OTEL_NODE_EXPERIMENTAL_SDK_METRICS = 'true';
       const exporter = new ConsoleMetricExporter();
       const metricReader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -444,6 +446,35 @@ describe('Node SDK', () => {
       assert.ok(
         (tracerProvider as any)._config.meterProvider instanceof MeterProvider
       );
+
+      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+
+      await sdk.shutdown();
+    });
+
+    it('should not register a meter provider to the tracer provider if both initialized but metrics disabled', async () => {
+      const exporter = new ConsoleMetricExporter();
+      const metricReader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+
+      const sdk = new NodeSDK({
+        metricReader: metricReader,
+        traceExporter: new ConsoleSpanExporter(),
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assertDefaultContextManagerRegistered();
+      assertDefaultPropagatorRegistered();
+
+      assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
+      const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
+      assert.ok(tracerProvider instanceof NodeTracerProvider);
+      assert.equal((tracerProvider as any)._config.meterProvider, undefined);
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
 

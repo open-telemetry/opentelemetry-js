@@ -29,6 +29,7 @@ import { IdGenerator } from './IdGenerator';
 import { RandomIdGenerator } from './platform';
 import { Resource } from '@opentelemetry/resources';
 import { TracerMetrics } from './TracerMetrics';
+import { VERSION } from './version';
 
 /**
  * This class represents a basic tracer.
@@ -63,7 +64,7 @@ export class Tracer implements api.Tracer {
     this.instrumentationScope = instrumentationScope;
 
     const meter = localConfig.meterProvider
-      ? localConfig.meterProvider.getMeter('@opentelemetry/sdk-trace')
+      ? localConfig.meterProvider.getMeter('@opentelemetry/sdk-trace', VERSION)
       : api.createNoopMeter();
     this._tracerMetrics = new TracerMetrics(meter);
   }

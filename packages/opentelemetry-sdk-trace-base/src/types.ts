@@ -59,7 +59,10 @@ export interface TracerConfig {
    */
   spanProcessors?: SpanProcessor[];
 
-  /** A meter provider to record trace SDK metrics to. */
+  /**
+   * A meter provider to record trace SDK metrics to.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
   meterProvider?: MeterProvider;
 }
 
