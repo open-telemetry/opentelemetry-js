@@ -114,6 +114,16 @@ export interface Sampler {
    * Configure sampler to be trace_id_ratio_based.
    */
   trace_id_ratio_based?: TraceIdRatioBasedSampler;
+
+  /**
+   * Configure sampler to be probability/development.
+   */
+  'probability/development'?: ProbabilitySampler;
+
+  /**
+   * Configure sampler to be composite/development.
+   */
+  'composite/development'?: CompositeSampler;
 }
 
 export interface ParentBasedSampler {
@@ -153,6 +163,58 @@ export interface TraceIdRatioBasedSampler {
    * Configure trace_id_ratio.
    */
   ratio?: number;
+}
+
+export interface ProbabilitySampler {
+  /**
+   * Configure probability ratio.
+   */
+  ratio?: number;
+}
+
+export interface RuleBasedSamplerRule {
+  /**
+   * Configure rule action.
+   */
+  action: 'record_and_sample' | 'drop';
+  /**
+   * Configure rule attribute.
+   */
+  attribute?: string;
+  /**
+   * Configure rule pattern.
+   */
+  pattern?: string;
+}
+
+export interface RuleBasedSampler {
+  /**
+   * Configure fallback sampler.
+   */
+  fallback_sampler?: Sampler;
+  /**
+   * Configure rules.
+   */
+  rules?: RuleBasedSamplerRule[];
+  /**
+   * Configure span kind.
+   */
+  span_kind?: string;
+}
+
+export interface CompositeSampler {
+  /**
+   * Configure list of samplers.
+   */
+  samplers: Sampler[];
+  /**
+   * Configure composite type.
+   */
+  composite?: 'rule_based';
+  /**
+   * Configure rule_based sampler.
+   */
+  rule_based?: RuleBasedSampler;
 }
 
 export interface SimpleSpanProcessor {

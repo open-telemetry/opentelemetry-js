@@ -41,6 +41,7 @@ import {
 } from './models/commonModel';
 import {
   initializeDefaultTracerProviderConfiguration,
+  Sampler,
   SpanExporter,
   SpanProcessor,
   TracerProvider,
@@ -294,6 +295,107 @@ export function setPropagator(
   }
 }
 
+function parseSampler(sampler: Sampler): Sampler {
+  const samplerType = Object.keys(sampler)[0];
+  let parsedSampler: Sampler = {};
+
+  switch (samplerType) {
+    case 'always_on':
+      parsedSampler = { always_on: sampler['always_on'] };
+      break;
+
+    case 'always_off':
+      parsedSampler = { always_off: sampler['always_off'] };
+      break;
+
+    case 'trace_id_ratio_based': {
+      const s = sampler['trace_id_ratio_based'];
+      parsedSampler = {
+        trace_id_ratio_based: {
+          ratio: getNumberFromConfigFile(s?.ratio) ?? 1.0,
+        },
+      };
+      break;
+    }
+
+    case 'parent_based': {
+      const s = sampler['parent_based'];
+      if (s) {
+        parsedSampler = { parent_based: {} };
+        if (s.root) {
+          parsedSampler.parent_based!.root = parseSampler(s.root);
+        }
+        if (s.remote_parent_sampled) {
+          parsedSampler.parent_based!.remote_parent_sampled = parseSampler(
+            s.remote_parent_sampled
+          );
+        }
+        if (s.remote_parent_not_sampled) {
+          parsedSampler.parent_based!.remote_parent_not_sampled = parseSampler(
+            s.remote_parent_not_sampled
+          );
+        }
+        if (s.local_parent_sampled) {
+          parsedSampler.parent_based!.local_parent_sampled = parseSampler(
+            s.local_parent_sampled
+          );
+        }
+        if (s.local_parent_not_sampled) {
+          parsedSampler.parent_based!.local_parent_not_sampled = parseSampler(
+            s.local_parent_not_sampled
+          );
+        }
+      }
+      break;
+    }
+
+    case 'probability/development': {
+      const s = sampler['probability/development'];
+      parsedSampler = {
+        'probability/development': {
+          ratio: getNumberFromConfigFile(s?.ratio) ?? 1.0,
+        },
+      };
+      break;
+    }
+
+    case 'composite/development': {
+      const s = sampler['composite/development'];
+      if (s) {
+        parsedSampler = { 'composite/development': { samplers: [] } };
+        if (s.samplers && s.samplers.length > 0) {
+          parsedSampler['composite/development']!.samplers = s.samplers.map(
+            (childSampler: Sampler) => parseSampler(childSampler)
+          );
+        }
+        if (s.composite) {
+          parsedSampler['composite/development']!.composite = s.composite;
+        }
+        if (s.rule_based) {
+          const rb = s.rule_based;
+          parsedSampler['composite/development']!.rule_based = {};
+          if (rb.fallback_sampler) {
+            parsedSampler[
+              'composite/development'
+            ]!.rule_based!.fallback_sampler = parseSampler(rb.fallback_sampler);
+          }
+          if (rb.rules) {
+            parsedSampler['composite/development']!.rule_based!.rules =
+              rb.rules;
+          }
+          if (rb.span_kind) {
+            parsedSampler['composite/development']!.rule_based!.span_kind =
+              getStringFromConfigFile(rb.span_kind);
+          }
+        }
+      }
+      break;
+    }
+  }
+
+  return parsedSampler;
+}
+
 function getConfigHeaders(
   h?: NameStringValuePair[]
 ): NameStringValuePair[] | null {
@@ -505,6 +607,11 @@ export function setTracerProvider(
         config.tracer_provider.limits!.link_attribute_count_limit =
           linkAttributeCountLimit;
       }
+    }
+
+    // Sampler
+    if (tracerProvider['sampler']) {
+      config.tracer_provider.sampler = parseSampler(tracerProvider['sampler']);
     }
 
     // Processors
