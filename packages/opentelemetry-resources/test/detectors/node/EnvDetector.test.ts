@@ -64,7 +64,7 @@ describeNode('envDetector() on Node.js', () => {
     });
   });
 
-  describe('with quoted values (backward compatibility)', () => {
+  describe('with quoted values (no special handling)', () => {
     before(() => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'k8s.deployment.name="deployment name"';
@@ -74,11 +74,11 @@ describeNode('envDetector() on Node.js', () => {
       delete process.env.OTEL_RESOURCE_ATTRIBUTES;
     });
 
-    it('should strip leading and trailing quotes from values', async () => {
+    it('should preserve quotes as literal characters in values', async () => {
       const resource = resourceFromDetectedResource(envDetector.detect());
       assert.strictEqual(
         resource.attributes?.['k8s.deployment.name'],
-        'deployment name'
+        '"deployment name"'
       );
     });
   });

@@ -103,8 +103,7 @@ class EnvDetector implements ResourceDetector {
 
       const [rawKey, rawValue] = keyValuePair;
       const key = rawKey.trim();
-      // Strip leading and trailing quotes for backward compatibility
-      const value = rawValue.trim().split(/^"|"$/).join('');
+      const value = rawValue.trim();
 
       if (key.length === 0) {
         throw new Error(
