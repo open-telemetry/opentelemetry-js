@@ -12,6 +12,9 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(otlp-exporter-base): remove sendBeacon in favor of fetch with keepalive [#6391](https://github.com/open-telemetry/opentelemetry-js/pull/6391) @overbalance
+  * (user-facing) createOtlpSendBeaconExportDelegate will be removed in a future version
+
 ### :books: Documentation
 
 ### :house: Internal
@@ -43,8 +46,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(exporter-prometheus): add missing `@opentelemetry/semantic-conventions` dependency [#6330](https://github.com/open-telemetry/opentelemetry-js/pull/6330) @omizha
 * fix(otlp-transformer): correctly handle Uint8Array attribute values when serializing to JSON [#6348](https://github.com/open-telemetry/opentelemetry-js/pull/6348) @pichlermarc
 * fix(otlp-exporter-base): fix unwanted instrumentation of the fetch exports when context is not propagated [#6353](https://github.com/open-telemetry/opentelemetry-js/pull/6353) @david-luna
-* fix(otlp-exporter-base): remove sendBeacon in favor of fetch with keepalive [#6391](https://github.com/open-telemetry/opentelemetry-js/pull/6391) @overbalance
-  * (user-facing) createOtlpSendBeaconExportDelegate will be removed in a future version
 
 ### :house: Internal
 
