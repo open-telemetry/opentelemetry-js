@@ -14,7 +14,7 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
-fix(api): prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
+* fix(api): prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
 
 ### :books: (Refine Doc)
 
@@ -25,6 +25,7 @@ fix(api): prioritize `esnext` export condition as it is more specific [#5458](ht
 * chore: disallow constructor parameter property syntax [#6187](https://github.com/open-telemetry/opentelemetry-js/pull/6187) @legendecas
 * refactor(api): remove platform-specific globalThis, use globalThis directly [#6208](https://github.com/open-telemetry/opentelemetry-js/pull/6208) @overbalance
 * chore(api): mark ProxyTracerProvider as deprecated [#6328](https://github.com/open-telemetry/opentelemetry-js/pull/6328) @cjihrig
+* refactor: migrate build from tsc to tsdown with dual CJS/ESM output [#6201](https://github.com/open-telemetry/opentelemetry-js/pull/6201) @overbalance
 
 ## 1.9.0
 

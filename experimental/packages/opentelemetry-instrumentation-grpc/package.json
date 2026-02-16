@@ -2,20 +2,43 @@
   "name": "@opentelemetry/instrumentation-grpc",
   "version": "0.212.0",
   "description": "OpenTelemetry instrumentation for `@grpc/grpc-js` rpc client and server for gRPC framework",
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
+  "author": "OpenTelemetry Authors",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-grpc",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./build/index.cjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.cts",
+  "exports": {
+    ".": {
+      "esnext": {
+        "types": "./build/index.d.mts",
+        "default": "./build/index.mjs"
+      },
+      "require": {
+        "types": "./build/index.d.cts",
+        "default": "./build/index.cjs"
+      },
+      "import": {
+        "types": "./build/index.d.mts",
+        "default": "./build/index.mjs"
+      }
+    }
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
     "precompile": "npm run protos:generate",
-    "compile": "tsc --build",
-    "clean": "tsc --build --clean",
+    "compile": "tsdown",
+    "clean": "rimraf build",
     "test": "npm run protos:generate && nyc mocha test/**/*.test.ts",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../../scripts/version-update.js",
-    "watch": "tsc --build --watch",
+    "watch": "tsdown --watch",
     "prewatch": "node ../../../scripts/version-update.js",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "protos:generate": "cd test/fixtures && buf generate",
@@ -29,22 +52,18 @@
     "profiling",
     "instrumentation"
   ],
-  "author": "OpenTelemetry Authors",
-  "license": "Apache-2.0",
   "engines": {
     "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
-    "doc",
+    "build/**/*.cjs",
+    "build/**/*.mjs",
+    "build/**/*.d.cts",
+    "build/**/*.d.mts",
+    "build/**/*.map",
     "LICENSE",
     "README.md"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
   "devDependencies": {
     "@bufbuild/buf": "1.53.0",
     "@grpc/grpc-js": "^1.14.3",
@@ -74,6 +93,5 @@
     "@opentelemetry/instrumentation": "0.212.0",
     "@opentelemetry/semantic-conventions": "^1.29.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-grpc",
   "sideEffects": false
 }

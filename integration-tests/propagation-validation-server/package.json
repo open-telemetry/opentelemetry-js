@@ -7,9 +7,7 @@
   "repository": "open-telemetry/opentelemetry-js",
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
-  "scripts": {
-    "compile": "tsc --build"
-  },
+  "scripts": {},
   "dependencies": {
     "@opentelemetry/api": "^1.3.0",
     "@opentelemetry/context-async-hooks": "2.5.1",
@@ -18,9 +16,6 @@
     "axios": "1.13.5",
     "body-parser": "2.2.2",
     "express": "5.1.0"
-  },
-  "devDependencies": {
-    "typescript": "5.0.4"
   },
   "engines": {
     "node": "^18.19.0 || >=20.6.0"

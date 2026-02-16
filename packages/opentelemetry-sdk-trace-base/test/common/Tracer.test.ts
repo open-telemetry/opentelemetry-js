@@ -192,9 +192,9 @@ describe('Tracer', () => {
   });
 
   describe('when suppressTracing true', () => {
-    const context = suppressTracing(ROOT_CONTEXT);
+    const ctx = suppressTracing(ROOT_CONTEXT);
 
-    it('should return cached no-op span ', done => {
+    it('should return cached no-op span ', () => {
       const tracer = new Tracer(
         { name: 'default', version: '0.0.1' },
         { sampler: new TestSampler() },
@@ -202,12 +202,10 @@ describe('Tracer', () => {
         tracerProvider['_activeSpanProcessor']
       );
 
-      const span = tracer.startSpan('span3', undefined, context);
+      const span = tracer.startSpan('span3', undefined, ctx);
 
       assert.ok(!span.isRecording());
       span.end();
-
-      done();
     });
   });
 
