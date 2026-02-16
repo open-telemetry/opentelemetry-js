@@ -608,8 +608,16 @@ describe('Utility', () => {
         .expects('setAttribute')
         .calledWithExactly('http.response.header.cookie', ['token=123']);
 
-      utils.headerCapture('request', ['Origin'])(span, () => 'localhost');
-      utils.headerCapture('response', ['Cookie'])(span, () => 'token=123');
+      utils.headerCapture(
+        'request',
+        ['Origin'],
+        SemconvStability.OLD
+      )(span, () => 'localhost');
+      utils.headerCapture(
+        'response',
+        ['Cookie'],
+        SemconvStability.OLD
+      )(span, () => 'token=123');
       mock.verify();
     });
 
@@ -621,10 +629,11 @@ describe('Utility', () => {
           'www.example.com',
         ]);
 
-      utils.headerCapture('request', ['Origin'])(span, () => [
-        'localhost',
-        'www.example.com',
-      ]);
+      utils.headerCapture(
+        'request',
+        ['Origin'],
+        SemconvStability.OLD
+      )(span, () => ['localhost', 'www.example.com']);
       mock.verify();
     });
 
@@ -636,7 +645,11 @@ describe('Utility', () => {
         .expects('setAttribute')
         .calledWithExactly('http.request.header.foo', [42]);
 
-      utils.headerCapture('request', ['Origin', 'Foo'])(span, header => {
+      utils.headerCapture(
+        'request',
+        ['Origin', 'Foo'],
+        SemconvStability.OLD
+      )(span, header => {
         if (header === 'origin') {
           return 'localhost';
         }
@@ -650,12 +663,43 @@ describe('Utility', () => {
       mock.verify();
     });
 
-    it('should normalize header names', () => {
+    it('should normalize header names (SemconvStability.OLD)', () => {
       mock
         .expects('setAttribute')
         .calledWithExactly('http.request.header.x_forwarded_for', ['foo']);
 
-      utils.headerCapture('request', ['X-Forwarded-For'])(span, () => 'foo');
+      utils.headerCapture(
+        'request',
+        ['X-Forwarded-For'],
+        SemconvStability.OLD
+      )(span, () => 'foo');
+      mock.verify();
+    });
+
+    it('should normalize header names (SemconvStability.STABLE)', () => {
+      mock
+        .expects('setAttribute')
+        .calledWithExactly('http.request.header.x-forwarded-for', ['foo']);
+
+      utils.headerCapture(
+        'request',
+        ['X-Forwarded-For'],
+        SemconvStability.STABLE
+      )(span, () => 'foo');
+      mock.verify();
+    });
+
+    it('should normalize header names (SemconvStability.DUPLICATE)', () => {
+      // STABLE semconv wins over OLD when "DUPLICATE" is selected.
+      mock
+        .expects('setAttribute')
+        .calledWithExactly('http.request.header.x-forwarded-for', ['foo']);
+
+      utils.headerCapture(
+        'request',
+        ['X-Forwarded-For'],
+        SemconvStability.DUPLICATE
+      )(span, () => 'foo');
       mock.verify();
     });
 
@@ -665,7 +709,11 @@ describe('Utility', () => {
         .once()
         .calledWithExactly('http.request.header.origin', ['localhost']);
 
-      utils.headerCapture('request', ['Origin', 'Accept'])(span, header => {
+      utils.headerCapture(
+        'request',
+        ['Origin', 'Accept'],
+        SemconvStability.OLD
+      )(span, header => {
         if (header === 'origin') {
           return 'localhost';
         }

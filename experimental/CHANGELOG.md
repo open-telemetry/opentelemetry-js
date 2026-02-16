@@ -8,12 +8,28 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 0.212.0
+
+### :boom: Breaking Changes
+
 * feat(sdk-logs)!: move environment variable configuration to `@opentelemetry/sdk-node` [#6325](https://github.com/open-telemetry/opentelemetry-js/pull/6325) @pichlermarc
   * (user-facing): environment variable configuration is no longer applied automatically when instantiating SDK components
     (`LoggerProvider`, `BatchLogRecordProcessor`) directly from `@opentelemetry/sdk-logs`. Please migrate to using
     `NodeSDK` from `@opentelemetry/sdk-node` to get automatic environment variable configuration.
+* fix(instrumentation-http)!: do not normalize hyphens to underscores in captured header attribute names if using stable semconv [#6381](https://github.com/open-telemetry/opentelemetry-js/issues/6381) @trentm
+  * With the `headersToSpanAttributes` option, one can specify that HTTP headers should be captured as span attributes named `http.{request,response}.header.HEADERNAME`. With old Semantic Conventions, the `HEADERNAME` normalizes hyphens to underscores, e.g. `http.response.header.content_length`. When stable HTTP semconv is enabled (via `OTEL_SEMCONV_STABILITY_OPT_IN`), hyphens are no longer changed, e.g. `http.response.header.content-length`.
 
 ### :rocket: Features
+
+* feat(configuration): add Prometheus exporter support [#6400](https://github.com/open-telemetry/opentelemetry-js/pull/6400) @MikeGoldsmith
 
 * feat(sampler-composite): add ComposableAnnotatingSampler and ComposableRuleBasedSampler [#6305](https://github.com/open-telemetry/opentelemetry-js/pull/6305) @trentm
 * feat(configuration): parse config for rc 3 [#6304](https://github.com/open-telemetry/opentelemetry-js/pull/6304) @maryliag
@@ -21,6 +37,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(configuration): remove default propagator initialization  [#6399](https://github.com/open-telemetry/opentelemetry-js/pull/6399) @MikeGoldsmith
 * fix(instrumentation-fetch): preserve Response.url, type, and redirected properties [#6243](https://github.com/open-telemetry/opentelemetry-js/issues/6243) @AnubhavPurohit691
   * The fetch instrumentation now preserves the read-only `url`, `type`, and `redirected` properties from the original Response object when wrapping it with a Proxy. This fixes issues where code relying on these properties (e.g., CORS type detection) would fail with instrumented fetch.
 * fix(exporter-prometheus): add missing `@opentelemetry/semantic-conventions` dependency [#6330](https://github.com/open-telemetry/opentelemetry-js/pull/6330) @omizha
@@ -28,8 +45,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(otlp-exporter-base): fix unwanted instrumentation of the fetch exports when context is not propagated [#6353](https://github.com/open-telemetry/opentelemetry-js/pull/6353) @david-luna
 * fix(otlp-exporter-base): remove sendBeacon in favor of fetch with keepalive [#6391](https://github.com/open-telemetry/opentelemetry-js/pull/6391) @overbalance
   * (user-facing) createOtlpSendBeaconExportDelegate will be removed in a future version
-
-### :books: Documentation
 
 ### :house: Internal
 
