@@ -116,6 +116,11 @@ export interface Sampler {
   trace_id_ratio_based?: TraceIdRatioBasedSampler;
 
   /**
+   * Configure sampler to be probability (experimental).
+   */
+  probability?: ProbabilitySampler;
+
+  /**
    * Configure sampler to be probability/development.
    */
   'probability/development'?: ProbabilitySampler;
@@ -174,17 +179,32 @@ export interface ProbabilitySampler {
 
 export interface RuleBasedSamplerRule {
   /**
-   * Configure rule action.
+   * Configure attribute values matching condition.
    */
-  action: 'record_and_sample' | 'drop';
+  attribute_values?: {
+    key?: string;
+    values?: string[];
+  };
   /**
-   * Configure rule attribute.
+   * Configure attribute patterns matching condition.
    */
-  attribute?: string;
+  attribute_patterns?: {
+    key?: string;
+    included?: string[];
+    excluded?: string[];
+  };
   /**
-   * Configure rule pattern.
+   * Configure parent matching condition.
    */
-  pattern?: string;
+  parent?: string[];
+  /**
+   * Configure span kinds matching condition.
+   */
+  span_kinds?: string[];
+  /**
+   * Configure sampler to use when rule matches.
+   */
+  sampler?: Sampler;
 }
 
 export interface RuleBasedSampler {
@@ -206,7 +226,7 @@ export interface CompositeSampler {
   /**
    * Configure list of samplers.
    */
-  samplers: Sampler[];
+  samplers?: Sampler[];
   /**
    * Configure composite type.
    */

@@ -349,6 +349,16 @@ function parseSampler(sampler: Sampler): Sampler {
       break;
     }
 
+    case 'probability': {
+      const s = sampler['probability'];
+      parsedSampler = {
+        probability: {
+          ratio: getNumberFromConfigFile(s?.ratio) ?? 1.0,
+        },
+      };
+      break;
+    }
+
     case 'probability/development': {
       const s = sampler['probability/development'];
       parsedSampler = {
@@ -362,7 +372,7 @@ function parseSampler(sampler: Sampler): Sampler {
     case 'composite/development': {
       const s = sampler['composite/development'];
       if (s) {
-        parsedSampler = { 'composite/development': { samplers: [] } };
+        parsedSampler = { 'composite/development': {} };
         if (s.samplers && s.samplers.length > 0) {
           parsedSampler['composite/development']!.samplers = s.samplers.map(
             (childSampler: Sampler) => parseSampler(childSampler)
@@ -381,7 +391,10 @@ function parseSampler(sampler: Sampler): Sampler {
           }
           if (rb.rules) {
             parsedSampler['composite/development']!.rule_based!.rules =
-              rb.rules;
+              rb.rules.map(rule => ({
+                ...rule,
+                sampler: rule.sampler ? parseSampler(rule.sampler) : undefined,
+              }));
           }
           if (rb.span_kind) {
             parsedSampler['composite/development']!.rule_based!.span_kind =

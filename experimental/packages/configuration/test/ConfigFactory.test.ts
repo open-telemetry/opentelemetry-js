@@ -364,8 +364,40 @@ const configFromKitchenSinkFile: ConfigurationModel = {
       parent_based: {
         root: { always_on: undefined },
         remote_parent_sampled: { always_on: undefined },
-        remote_parent_not_sampled: { always_off: undefined },
-        local_parent_sampled: { always_on: undefined },
+        remote_parent_not_sampled: {
+          'probability/development': { ratio: 0.01 },
+        },
+        local_parent_sampled: {
+          'composite/development': {
+            rule_based: {
+              rules: [
+                {
+                  attribute_values: {
+                    key: 'http.route',
+                    values: ['/healthz', '/livez'],
+                  },
+                  sampler: { always_off: undefined },
+                },
+                {
+                  attribute_patterns: {
+                    key: 'http.path',
+                    included: ['/internal/*'],
+                    excluded: ['/internal/special/*'],
+                  },
+                  sampler: { always_on: undefined },
+                },
+                {
+                  parent: ['none'],
+                  span_kinds: ['client'],
+                  sampler: { probability: { ratio: 0.05 } },
+                },
+                {
+                  sampler: { probability: { ratio: 0.001 } },
+                },
+              ],
+            },
+          },
+        },
         local_parent_not_sampled: { always_off: undefined },
       },
     },
