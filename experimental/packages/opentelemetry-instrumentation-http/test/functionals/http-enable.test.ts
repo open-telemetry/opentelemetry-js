@@ -1076,8 +1076,8 @@ describe('HttpInstrumentation', () => {
       });
 
       before(async () => {
-        instrumentation.setConfig({});
         instrumentation['_semconvStability'] = SemconvStability.STABLE;
+        instrumentation.setConfig({});
         instrumentation.enable();
         server = http.createServer((request, response) => {
           if (request.url?.includes('/premature-close')) {
@@ -1119,6 +1119,8 @@ describe('HttpInstrumentation', () => {
 
       after(() => {
         server.close();
+        instrumentation['_semconvStability'] = SemconvStability.OLD;
+        instrumentation.setConfig({});
         instrumentation.disable();
       });
 
@@ -1244,6 +1246,7 @@ describe('HttpInstrumentation', () => {
 
       before(async () => {
         instrumentation['_semconvStability'] = SemconvStability.DUPLICATE;
+        instrumentation.setConfig({});
         instrumentation.enable();
         server = http.createServer((request, response) => {
           if (request.url?.includes('/setroute')) {
@@ -1264,6 +1267,8 @@ describe('HttpInstrumentation', () => {
 
       after(() => {
         server.close();
+        instrumentation['_semconvStability'] = SemconvStability.OLD;
+        instrumentation.setConfig({});
         instrumentation.disable();
       });
 

@@ -32,6 +32,7 @@ import {
   ExporterTemporalityPreference,
   initializeDefaultMeterProviderConfiguration,
   PeriodicMetricReader,
+  PullMetricReader,
 } from './models/meterProviderModel';
 import { OtlpHttpEncoding } from './models/commonModel';
 import { diag } from '@opentelemetry/api';
@@ -360,13 +361,29 @@ export function setMeterProvider(config: ConfigurationModel): void {
   }
   for (let i = 0; i < exportersType.length; i++) {
     const exporterType = exportersType[i];
+    if (exporterType === 'prometheus') {
+      // Prometheus uses a pull reader
+      const pullReader: PullMetricReader = {
+        exporter: {
+          'prometheus/development': {
+            host:
+              getStringFromEnv('OTEL_EXPORTER_PROMETHEUS_HOST') ?? 'localhost',
+            port: getNumberFromEnv('OTEL_EXPORTER_PROMETHEUS_PORT') ?? 9464,
+            without_scope_info: false,
+            without_target_info: false,
+          },
+        },
+      };
+      config.meter_provider.readers.push({ pull: pullReader });
+      continue;
+    }
+
     const readerPeriodicInfo = { ...readerPeriodic };
     const timeout = getNumberFromEnv('OTEL_METRIC_EXPORT_TIMEOUT') ?? 30000;
     if (timeout) {
       readerPeriodicInfo.timeout = timeout;
     }
 
-    // TODO: add prometheus exporter support
     if (exporterType === 'console') {
       readerPeriodicInfo.exporter = { console: {} };
     } else {

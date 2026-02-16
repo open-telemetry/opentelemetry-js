@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-logs",
-  "version": "0.211.0",
+  "version": "0.212.0",
   "publishConfig": {
     "access": "public"
   },
@@ -92,9 +92,9 @@
     "webpack-cli": "6.0.1"
   },
   "dependencies": {
-    "@opentelemetry/api-logs": "0.211.0",
-    "@opentelemetry/core": "2.5.0",
-    "@opentelemetry/resources": "2.5.0",
+    "@opentelemetry/api-logs": "0.212.0",
+    "@opentelemetry/core": "2.5.1",
+    "@opentelemetry/resources": "2.5.1",
     "@opentelemetry/semantic-conventions": "^1.29.0"
   }
 }
