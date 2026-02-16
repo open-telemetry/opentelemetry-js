@@ -30,7 +30,10 @@ const DEFAULT_USER_AGENT = `OTel-OTLP-Exporter-JavaScript/${VERSION}`;
 /**
  * Sends data using http
  * @param request
- * @param params
+ * @param url
+ * @param headers
+ * @param compression
+ * @param userAgent
  * @param agent
  * @param data
  * @param onDone
