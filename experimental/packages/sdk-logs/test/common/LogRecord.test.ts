@@ -232,6 +232,15 @@ describe('LogRecord', () => {
       assert.ok(warnSpy.calledOnce);
       warnSpy.restore();
     });
+
+    it('should set exception.type from code', () => {
+      const logRecordData: logsAPI.LogRecord = {
+        exception: { code: 12 },
+      };
+      const { logRecord } = setup(undefined, logRecordData);
+
+      assert.strictEqual(logRecord.attributes[ATTR_EXCEPTION_TYPE], '12');
+    });
   });
 
   describe('setAttribute', () => {
