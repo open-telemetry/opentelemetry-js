@@ -267,9 +267,9 @@ describe('HttpExporterTransport', function () {
         res.writeHead(403);
         res.write('');
         // Destroy the socket to simulate something going wrong
-        setTimeout(() => {
+        queueMicrotask(() => {
           res.socket?.destroy();
-        }, 10);
+        });
       });
       server.listen(8080);
 
@@ -299,9 +299,9 @@ describe('HttpExporterTransport', function () {
         res.writeHead(429, 'Too many requests', { 'retry-after': '1' });
         res.write('');
         // Destroy the socket to simulate something going wrong
-        setTimeout(() => {
+        queueMicrotask(() => {
           res.socket?.destroy();
-        }, 10);
+        });
       });
       server.listen(8080);
 
@@ -332,9 +332,9 @@ describe('HttpExporterTransport', function () {
         res.writeHead(200);
         res.write('');
         // Destroy the socket to simulate connection reset after headers
-        setTimeout(() => {
+        queueMicrotask(() => {
           res.socket?.destroy();
-        }, 10);
+        });
       });
       server.listen(8080);
 
