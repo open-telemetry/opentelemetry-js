@@ -94,6 +94,28 @@ export function sendWithHttp(
         });
       }
     });
+
+    res.on('error', (error: Error) => {
+      if (res.statusCode && res.statusCode < 299) {
+        // If the response is successful but an error occurs while reading the response,
+        // we consider it a success since the data has been sent successfully.
+        onDone({
+          status: 'success',
+        });
+      }
+      if (res.statusCode && isExportHTTPErrorRetryable(res.statusCode)) {
+        onDone({
+          status: 'retryable',
+          error: error,
+          retryInMillis: parseRetryAfterToMills(res.headers['retry-after']),
+        });
+      } else {
+        onDone({
+          status: 'failure',
+          error,
+        });
+      }
+    });
   });
 
   req.setTimeout(timeoutMillis, () => {
