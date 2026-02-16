@@ -95,3 +95,4 @@ package.json.lerna_backup
 
 # release notes for release creation
 .tmp/
+__screenshots__/

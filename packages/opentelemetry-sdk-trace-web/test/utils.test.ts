@@ -87,6 +87,23 @@ function createResource(
 }
 
 describe('utils', function () {
+  const needsLocationMock = typeof globalThis.location === 'undefined';
+  beforeAll(() => {
+    if (needsLocationMock) {
+      Object.defineProperty(globalThis, 'location', {
+        value: { origin: 'http://localhost', href: 'http://localhost/' },
+        writable: true,
+        configurable: true,
+      });
+    }
+  });
+  afterAll(() => {
+    if (needsLocationMock) {
+      // @ts-expect-error cleaning up mock
+      delete globalThis.location;
+    }
+  });
+
   afterEach(() => {
     sinon.restore();
   });
