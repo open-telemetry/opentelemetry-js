@@ -35,56 +35,26 @@ describe('OTLPLogExporter', function () {
   });
 
   describe('export', function () {
-    describe('when sendBeacon is available', function () {
-      it('should successfully send data using sendBeacon', async function () {
-        // arrange
-        const stubBeacon = sinon.stub(navigator, 'sendBeacon');
-        const loggerProvider = new LoggerProvider({
-          processors: [new SimpleLogRecordProcessor(new OTLPLogExporter())],
-        });
-
-        // act
-        loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });
-        await loggerProvider.shutdown();
-
-        // assert
-        const args = stubBeacon.args[0];
-        const blob: Blob = args[1] as unknown as Blob;
-        const body = await blob.text();
-        assert.doesNotThrow(
-          () => JSON.parse(body),
-          'expected requestBody to be in JSON format, but parsing failed'
-        );
-      });
-    });
-
-    describe('when sendBeacon is not available', function () {
-      beforeEach(function () {
-        // fake sendBeacon not being available
-        (window.navigator as any).sendBeacon = false;
+    it('should successfully send data using fetch', async function () {
+      // arrange
+      const stubFetch = sinon
+        .stub(window, 'fetch')
+        .resolves(new Response('', { status: 200 }));
+      const loggerProvider = new LoggerProvider({
+        processors: [new SimpleLogRecordProcessor(new OTLPLogExporter())],
       });
 
-      it('should successfully send data using fetch', async function () {
-        // arrange
-        const stubFetch = sinon
-          .stub(window, 'fetch')
-          .resolves(new Response('', { status: 200 }));
-        const loggerProvider = new LoggerProvider({
-          processors: [new SimpleLogRecordProcessor(new OTLPLogExporter())],
-        });
+      // act
+      loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });
+      await loggerProvider.shutdown();
 
-        // act
-        loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });
-        await loggerProvider.shutdown();
-
-        // assert
-        const request = new Request(...stubFetch.args[0]);
-        const body = await request.text();
-        assert.doesNotThrow(
-          () => JSON.parse(body),
-          'expected requestBody to be in JSON format, but parsing failed'
-        );
-      });
+      // assert
+      const request = new Request(...stubFetch.args[0]);
+      const body = await request.text();
+      assert.doesNotThrow(
+        () => JSON.parse(body),
+        'expected requestBody to be in JSON format, but parsing failed'
+      );
     });
   });
 });

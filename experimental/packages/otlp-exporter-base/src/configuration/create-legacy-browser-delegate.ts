@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 import { ISerializer } from '@opentelemetry/otlp-transformer';
-import {
-  createOtlpFetchExportDelegate,
-  createOtlpSendBeaconExportDelegate,
-} from '../otlp-browser-http-export-delegate';
+import { createOtlpFetchExportDelegate } from '../otlp-browser-http-export-delegate';
 import { convertLegacyBrowserHttpOptions } from './convert-legacy-browser-http-options';
 import { IOtlpExportDelegate } from '../otlp-export-delegate';
 import { OTLPExporterConfigBase } from './legacy-base-configuration';
@@ -35,23 +32,11 @@ export function createLegacyOtlpBrowserExportDelegate<Internal, Response>(
   signalResourcePath: string,
   requiredHeaders: Record<string, string>
 ): IOtlpExportDelegate<Internal> {
-  const createOtlpExportDelegate = inferExportDelegateToUse(config.headers);
-
   const options = convertLegacyBrowserHttpOptions(
     config,
     signalResourcePath,
     requiredHeaders
   );
 
-  return createOtlpExportDelegate(options, serializer);
-}
-
-export function inferExportDelegateToUse(
-  configHeaders: OTLPExporterConfigBase['headers']
-) {
-  if (!configHeaders && typeof navigator.sendBeacon === 'function') {
-    return createOtlpSendBeaconExportDelegate;
-  }
-
-  return createOtlpFetchExportDelegate;
+  return createOtlpFetchExportDelegate(options, serializer);
 }
