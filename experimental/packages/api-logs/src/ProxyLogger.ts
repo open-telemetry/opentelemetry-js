@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
+import { Context } from '@opentelemetry/api';
 import { NOOP_LOGGER } from './NoopLogger';
 import { Logger } from './types/Logger';
 import { LoggerOptions } from './types/LoggerOptions';
-import { LogRecord } from './types/LogRecord';
+import { LogRecord, SeverityNumber } from './types/LogRecord';
 
 export class ProxyLogger implements Logger {
   // When a real implementation is provided, this will be it
@@ -46,6 +47,19 @@ export class ProxyLogger implements Logger {
    */
   emit(logRecord: LogRecord): void {
     this._getLogger().emit(logRecord);
+  }
+
+  /**
+   * Returns `true` if the logger is enabled for the given options.
+   *
+   * @param options
+   */
+  enabled(options?: {
+    context?: Context;
+    severityNumber?: SeverityNumber;
+    eventName?: string;
+  }): boolean {
+    return this._getLogger().enabled(options);
   }
 
   /**

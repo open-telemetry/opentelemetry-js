@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { LogRecord } from './LogRecord';
+import type { Context } from '@opentelemetry/api';
+import { LogRecord, SeverityNumber } from './LogRecord';
 
 export interface Logger {
   /**
@@ -23,4 +24,17 @@ export interface Logger {
    * @param logRecord
    */
   emit(logRecord: LogRecord): void;
+
+  /**
+   * Tells if the logger is enabled for the given context, severity number and event
+   * name if provided. The context details to the active one
+   * TODO: check in the spec what means implicit/explicit context support
+   * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/api.md#enabled
+   * @param options
+   */
+  enabled(options?: {
+    context?: Context;
+    severityNumber?: SeverityNumber;
+    eventName?: string;
+  }): boolean;
 }
