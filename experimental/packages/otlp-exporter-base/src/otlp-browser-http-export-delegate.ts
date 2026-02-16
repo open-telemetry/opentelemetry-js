@@ -34,7 +34,7 @@ export function createOtlpFetchExportDelegate<Internal, Response>(
 }
 
 /**
- * @deprecated Use {@link createOtlpFetchExportDelegate} instead.
+ * @deprecated Use {@link createOtlpFetchExportDelegate} instead. Modern browsers use `fetch` with `keepAlive: true` when `sendBeacon` is used. Use a `fetch` polyfill that mimics this behavior to keep using `sendBeacon`.
  */
 export function createOtlpSendBeaconExportDelegate<Internal, Response>(
   options: OtlpHttpConfiguration,
