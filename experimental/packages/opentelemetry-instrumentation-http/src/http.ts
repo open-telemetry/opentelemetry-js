@@ -100,11 +100,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
   constructor(config: HttpInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-http', VERSION, config);
-    this._headerCapture = this._createHeaderCapture();
     this._semconvStability = semconvStabilityFromStr(
       'http',
       process.env.OTEL_SEMCONV_STABILITY_OPT_IN
     );
+    this._headerCapture = this._createHeaderCapture(this._semconvStability);
   }
 
   protected override _updateMetricInstruments() {
@@ -194,7 +194,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
   override setConfig(config: HttpInstrumentationConfig = {}): void {
     super.setConfig(config);
-    this._headerCapture = this._createHeaderCapture();
+    this._headerCapture = this._createHeaderCapture(this._semconvStability);
   }
 
   init(): [
@@ -1059,28 +1059,32 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     }
   }
 
-  private _createHeaderCapture() {
+  private _createHeaderCapture(semconvStability: SemconvStability) {
     const config = this.getConfig();
 
     return {
       client: {
         captureRequestHeaders: headerCapture(
           'request',
-          config.headersToSpanAttributes?.client?.requestHeaders ?? []
+          config.headersToSpanAttributes?.client?.requestHeaders ?? [],
+          semconvStability
         ),
         captureResponseHeaders: headerCapture(
           'response',
-          config.headersToSpanAttributes?.client?.responseHeaders ?? []
+          config.headersToSpanAttributes?.client?.responseHeaders ?? [],
+          semconvStability
         ),
       },
       server: {
         captureRequestHeaders: headerCapture(
           'request',
-          config.headersToSpanAttributes?.server?.requestHeaders ?? []
+          config.headersToSpanAttributes?.server?.requestHeaders ?? [],
+          semconvStability
         ),
         captureResponseHeaders: headerCapture(
           'response',
-          config.headersToSpanAttributes?.server?.responseHeaders ?? []
+          config.headersToSpanAttributes?.server?.responseHeaders ?? [],
+          semconvStability
         ),
       },
     };
