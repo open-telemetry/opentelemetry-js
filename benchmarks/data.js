@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1771248163020,
+  "lastUpdate": 1771268073164,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -58399,6 +58399,114 @@ window.BENCHMARK_DATA = {
             "range": "±0.45%",
             "unit": "ops/sec",
             "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "overbalance@users.noreply.github.com",
+            "name": "Jared Freeze",
+            "username": "overbalance"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "34e7d9170ac429f436f1b26e7dc692c2f531a3a0",
+          "message": "fix(otlp-exporter-base): remove sendBeacon in favor of fetch with keepalive (#6391)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2026-02-16T17:35:33Z",
+          "tree_id": "73c5444e3e5ec05031f40ed46caa128d53ac4728",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/34e7d9170ac429f436f1b26e7dc692c2f531a3a0"
+        },
+        "date": 1771268072126,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 512 spans (protobuf)",
+            "value": 164,
+            "range": "±1.34%",
+            "unit": "ops/sec",
+            "extra": "79 samples"
+          },
+          {
+            "name": "transform 512 spans (json)",
+            "value": 279,
+            "range": "±0.98%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "transform 512 logs (protobuf)",
+            "value": 145,
+            "range": "±1.11%",
+            "unit": "ops/sec",
+            "extra": "81 samples"
+          },
+          {
+            "name": "transform 512 logs (json)",
+            "value": 245,
+            "range": "±1.68%",
+            "unit": "ops/sec",
+            "extra": "75 samples"
+          },
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 1973206,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 1793085,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 1759979,
+            "range": "±0.45%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 1590312,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 247595,
+            "range": "±0.72%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
+          },
+          {
+            "name": "generateTraceId",
+            "value": 2944488,
+            "range": "±1.04%",
+            "unit": "ops/sec",
+            "extra": "87 samples"
+          },
+          {
+            "name": "generateSpanId",
+            "value": 3933181,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 253382,
+            "range": "±1.62%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
