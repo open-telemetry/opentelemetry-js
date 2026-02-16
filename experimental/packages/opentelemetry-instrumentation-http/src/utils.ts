@@ -1087,11 +1087,24 @@ export const getIncomingStableRequestMetricAttributesOnResponse = (
   return metricAttributes;
 };
 
-export function headerCapture(type: 'request' | 'response', headers: string[]) {
+export function headerCapture(
+  type: 'request' | 'response',
+  headers: string[],
+  semconvStability: SemconvStability
+) {
   const normalizedHeaders = new Map<string, string>();
   for (let i = 0, len = headers.length; i < len; i++) {
     const capturedHeader = headers[i].toLowerCase();
-    normalizedHeaders.set(capturedHeader, capturedHeader.replace(/-/g, '_'));
+    if (semconvStability & SemconvStability.STABLE) {
+      normalizedHeaders.set(capturedHeader, capturedHeader);
+    } else {
+      // In old semconv, the header name converted hypen to underscore, e.g.:
+      // `http.request.header.content_length`.
+      normalizedHeaders.set(
+        capturedHeader,
+        capturedHeader.replaceAll('-', '_')
+      );
+    }
   }
 
   return (
