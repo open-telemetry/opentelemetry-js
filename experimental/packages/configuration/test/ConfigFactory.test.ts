@@ -2417,7 +2417,10 @@ describe('ConfigFactory', function () {
       const config = configFactory.getConfigModel();
       assert.deepStrictEqual(config.tracer_provider?.sampler, {
         'composite/development': {
-          samplers: [{ always_on: undefined }, { trace_id_ratio_based: { ratio: 0.5 } }],
+          samplers: [
+            { always_on: undefined },
+            { trace_id_ratio_based: { ratio: 0.5 } },
+          ],
         },
       });
     });
