@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import * as sinon from 'sinon';
-import { diag } from '@opentelemetry/api';
+import { diag, DiagLogLevel } from '@opentelemetry/api';
 
 export function registerMockDiagLogger() {
   // arrange
@@ -25,7 +25,7 @@ export function registerMockDiagLogger() {
     warn: sinon.stub(),
     error: sinon.stub(),
   };
-  diag.setLogger(stubs);
+  diag.setLogger(stubs, DiagLogLevel.ALL);
   stubs.warn.resetHistory(); // reset history setLogger will warn if another has already been set
 
   return stubs;

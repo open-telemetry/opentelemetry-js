@@ -12,6 +12,9 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(otlp-exporter-base): remove sendBeacon in favor of fetch with keepalive [#6391](https://github.com/open-telemetry/opentelemetry-js/pull/6391) @overbalance
+  * (user-facing) createOtlpSendBeaconExportDelegate will be removed in a future version
+
 ### :books: Documentation
 
 ### :house: Internal
