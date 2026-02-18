@@ -219,18 +219,12 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       propagation.inject(context.active(), options.headers, {
         set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
       });
-    } else if (options.headers instanceof Headers) {
-      propagation.inject(context.active(), options.headers, {
-        set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
-      });
-    } else if (options.headers instanceof Map) {
-      propagation.inject(context.active(), options.headers, {
-        set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
-      });
     } else {
-      const headers: Partial<Record<string, unknown>> = {};
-      propagation.inject(context.active(), headers);
-      options.headers = Object.assign({}, headers, options.headers || {});
+      const headers = new Headers(options.headers);
+      propagation.inject(context.active(), headers, {
+        set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
+      });
+      options.headers = headers;
     }
   }
 
@@ -587,8 +581,9 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           return context.with(
             trace.setSpan(context.active(), createdSpan),
             () => {
-              plugin._addHeaders(options, url);
+              // Call request hook before injection so hooks cannot tamper with propagation headers
               plugin._callRequestHook(createdSpan, options);
+              plugin._addHeaders(options, url);
               plugin._tasksCount++;
 
               return original

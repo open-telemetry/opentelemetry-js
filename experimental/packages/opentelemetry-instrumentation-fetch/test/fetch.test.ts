@@ -845,6 +845,23 @@ describe('fetch', () => {
 
             assert.strictEqual(headers['foo'], 'bar');
           });
+
+          it('should keep custom headers with url, untyped request object and tuple array headers', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch('/api/echo-headers.json', {
+                  headers: [
+                    ['foo', 'bar'],
+                    ['content-type', 'application/json'],
+                  ],
+                }),
+            });
+
+            const headers = await assertPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+            assert.strictEqual(headers['content-type'], 'application/json');
+          });
         });
 
         describe('without global propagator', () => {
@@ -917,6 +934,23 @@ describe('fetch', () => {
             const headers = await assertNoPropagationHeaders(response);
 
             assert.strictEqual(headers['foo'], 'bar');
+          });
+
+          it('should keep custom headers with url, untyped request object and tuple array headers', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch('/api/echo-headers.json', {
+                  headers: [
+                    ['foo', 'bar'],
+                    ['content-type', 'application/json'],
+                  ],
+                }),
+            });
+
+            const headers = await assertNoPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+            assert.strictEqual(headers['content-type'], 'application/json');
           });
         });
       });
