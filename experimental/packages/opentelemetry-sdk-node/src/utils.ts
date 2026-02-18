@@ -551,7 +551,7 @@ export function getBatchLogRecordProcessorFromEnv(
 
 export function getLogRecordExporter(
   exporter: LogRecordExporterModel
-): LogRecordExporter {
+): LogRecordExporter | undefined {
   if (exporter.otlp_http) {
     const encoding = exporter.otlp_http.encoding;
     if (encoding === 'json') {
@@ -563,19 +563,34 @@ export function getLogRecordExporter(
       });
     }
     if (encoding === 'protobuf') {
-      return new OTLPProtoLogExporter();
+      return new OTLPProtoLogExporter({
+        compression:
+          exporter.otlp_http.compression === 'gzip'
+            ? CompressionAlgorithm.GZIP
+            : CompressionAlgorithm.NONE,
+      });
     }
     diag.warn(
       `Unsupported OTLP logs encoding: ${encoding}. Using http/protobuf.`
     );
-    return new OTLPProtoLogExporter();
+    return new OTLPProtoLogExporter({
+      compression:
+        exporter.otlp_http.compression === 'gzip'
+          ? CompressionAlgorithm.GZIP
+          : CompressionAlgorithm.NONE,
+    });
   } else if (exporter.otlp_grpc) {
-    return new OTLPGrpcLogExporter();
+    return new OTLPGrpcLogExporter({
+      compression:
+        exporter.otlp_grpc.compression === 'gzip'
+          ? CompressionAlgorithm.GZIP
+          : CompressionAlgorithm.NONE,
+    });
   } else if (exporter.console) {
     return new ConsoleLogRecordExporter();
   }
-  diag.warn(`Unsupported Exporter value. Using OTLP http/protobuf.`);
-  return new OTLPProtoLogExporter();
+  diag.warn(`Unsupported Exporter value. No Log Record Exporter registered`);
+  return undefined;
 }
 
 export function getLogRecordProcessorsFromConfiguration(
@@ -584,24 +599,23 @@ export function getLogRecordProcessorsFromConfiguration(
   const logRecordProcessors: LogRecordProcessor[] = [];
   config.logger_provider?.processors?.forEach(processor => {
     if (processor.batch) {
-      logRecordProcessors.push(
-        new BatchLogRecordProcessor(
-          getLogRecordExporter(processor.batch.exporter),
-          {
+      const exporter = getLogRecordExporter(processor.batch.exporter);
+      if (exporter) {
+        logRecordProcessors.push(
+          new BatchLogRecordProcessor(exporter, {
             maxQueueSize: processor.batch.max_queue_size,
             maxExportBatchSize: processor.batch.max_export_batch_size,
             scheduledDelayMillis: processor.batch.schedule_delay,
             exportTimeoutMillis: processor.batch.export_timeout,
-          }
-        )
-      );
+          })
+        );
+      }
     }
     if (processor.simple) {
-      logRecordProcessors.push(
-        new SimpleLogRecordProcessor(
-          getLogRecordExporter(processor.simple.exporter)
-        )
-      );
+      const exporter = getLogRecordExporter(processor.simple.exporter);
+      if (exporter) {
+        logRecordProcessors.push(new SimpleLogRecordProcessor(exporter));
+      }
     }
   });
   if (logRecordProcessors.length > 0) {

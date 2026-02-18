@@ -48,6 +48,7 @@ import {
 import {
   ConfigFactory,
   createConfigFactory,
+  LogRecordExporterModel,
 } from '@opentelemetry/configuration';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
@@ -59,6 +60,7 @@ import {
   ATTR_SERVICE_INSTANCE_ID,
 } from '../src/semconv';
 import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
+import { getLogRecordExporter, setupContextManager } from '../src/utils';
 
 describe('startNodeSDK', function () {
   let setGlobalLoggerProviderSpy: Sinon.SinonSpy;
@@ -91,7 +93,7 @@ describe('startNodeSDK', function () {
     Sinon.restore();
   });
 
-  describe('Basic Registration', () => {
+  describe('Basic Registration', function () {
     it('should not register more than the minimal SDK components', async () => {
       // need to set these to none, since the default value is 'otlp'
       process.env.OTEL_TRACES_EXPORTER = 'none';
@@ -111,7 +113,7 @@ describe('startNodeSDK', function () {
       await sdk.shutdown();
     });
 
-    it('should register a diag logger with OTEL_LOG_LEVEL', () => {
+    it('should register a diag logger with OTEL_LOG_LEVEL', async () => {
       process.env.OTEL_LOG_LEVEL = 'ERROR';
 
       const spy = Sinon.spy(diag, 'setLogger');
@@ -123,10 +125,10 @@ describe('startNodeSDK', function () {
         logLevel: DiagLogLevel.ERROR,
       });
 
-      sdk.shutdown();
+      await sdk.shutdown();
     });
 
-    it('should register a diag logger with INFO with OTEL_LOG_LEVEL unset', () => {
+    it('should register a diag logger with INFO with OTEL_LOG_LEVEL unset', async () => {
       delete process.env.OTEL_LOG_LEVEL;
 
       const spy = Sinon.spy(diag, 'setLogger');
@@ -137,7 +139,7 @@ describe('startNodeSDK', function () {
       assert.deepStrictEqual(spy.args[0][1], {
         logLevel: DiagLogLevel.INFO,
       });
-      sdk.shutdown();
+      await sdk.shutdown();
     });
 
     it('should register a propagator if only a propagator is provided', async () => {
@@ -186,27 +188,27 @@ describe('startNodeSDK', function () {
     });
   });
 
-  it('should return NOOP_SDK when disabled is true', () => {
+  it('should return NOOP_SDK when disabled is true', async () => {
     const info = Sinon.spy(diag, 'info');
     process.env.OTEL_SDK_DISABLED = 'true';
     const sdk = startNodeSDK({});
 
     Sinon.assert.calledWith(info, 'OpenTelemetry SDK is disabled');
 
-    sdk.shutdown();
+    await sdk.shutdown();
   });
 
-  it('should return NOOP_SDK when disabled is true', () => {
+  it('should return NOOP_SDK when disabled is true', async () => {
     process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
       'test/fixtures/kitchen-sink.yaml';
     const sdk = startNodeSDK({});
 
     assertDefaultContextManagerRegistered();
 
-    sdk.shutdown();
+    await sdk.shutdown();
   });
 
-  it('should register a diag logger as info as default', () => {
+  it('should register a diag logger as info as default', async () => {
     const spy = Sinon.spy(diag, 'setLogger');
     const sdk = startNodeSDK({});
 
@@ -216,7 +218,7 @@ describe('startNodeSDK', function () {
       logLevel: DiagLogLevel.INFO,
     });
 
-    sdk.shutdown();
+    await sdk.shutdown();
   });
 
   it('should register a logger provider if multiple log record processors are provided', async () => {
@@ -253,7 +255,7 @@ describe('startNodeSDK', function () {
     await sdk.shutdown();
   });
 
-  describe('setupResources', async () => {
+  describe('setupResources', async function () {
     beforeEach(() => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.instance.id=627cc493,service.name=my-service,service.namespace=default,service.version=0.0.1';
@@ -428,7 +430,7 @@ describe('startNodeSDK', function () {
     });
   });
 
-  describe('configureServiceName', async () => {
+  describe('configureServiceName', async function () {
     it('should configure service name via OTEL_SERVICE_NAME env var', async () => {
       process.env.OTEL_SERVICE_NAME = 'env-set-name';
       process.env.OTEL_RESOURCE_ATTRIBUTES =
@@ -459,7 +461,7 @@ describe('startNodeSDK', function () {
     });
   });
 
-  describe('configureServiceInstanceId', async () => {
+  describe('configureServiceInstanceId', async function () {
     it('should configure service instance id via OTEL_RESOURCE_ATTRIBUTES env var', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.instance.id=627cc493,service.name=my-service,service.namespace';
@@ -501,7 +503,7 @@ describe('startNodeSDK', function () {
     });
   });
 
-  describe('configuring logger provider from env', () => {
+  describe('configuring logger provider from env', function () {
     let stubLogger: Sinon.SinonStub;
 
     beforeEach(() => {
@@ -612,6 +614,21 @@ describe('startNodeSDK', function () {
           OTLPProtoLogExporter
       );
       await sdk.shutdown();
+    });
+  });
+
+  describe('tests to increase code coverage', function () {
+    it('should return undefined for invalid log record exporter model', async () => {
+      const exporter: LogRecordExporterModel = {};
+      assert.equal(getLogRecordExporter(exporter), undefined);
+    });
+
+    it('', async () => {
+      setupContextManager(null);
+      assert.equal(
+        context['_getContextManager']().constructor.name,
+        'NoopContextManager'
+      );
     });
   });
 });
