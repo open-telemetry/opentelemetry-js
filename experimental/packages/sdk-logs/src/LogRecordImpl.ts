@@ -24,6 +24,11 @@ import type {
 import * as api from '@opentelemetry/api';
 import { timeInputToHrTime, InstrumentationScope } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
+import {
+  ATTR_EXCEPTION_MESSAGE,
+  ATTR_EXCEPTION_STACKTRACE,
+  ATTR_EXCEPTION_TYPE,
+} from '@opentelemetry/semantic-conventions';
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
 import { isLogAttributeValue } from './utils/validation';
@@ -102,6 +107,7 @@ export class LogRecordImpl implements ReadableLogRecord {
       severityText,
       body,
       attributes = {},
+      exception,
       context,
     } = logRecord;
 
@@ -123,6 +129,9 @@ export class LogRecordImpl implements ReadableLogRecord {
     this._logRecordLimits = _sharedState.logRecordLimits;
     this._eventName = eventName;
     this.setAttributes(attributes);
+    if (exception != null) {
+      this._setException(exception);
+    }
   }
 
   public setAttribute(key: string, value?: AnyValue) {
@@ -229,6 +238,54 @@ export class LogRecordImpl implements ReadableLogRecord {
 
     // Other types (number, boolean), no need to apply value length limit
     return value;
+  }
+
+  private _setException(exception: unknown): void {
+    let hasMinimumAttributes = false;
+
+    if (typeof exception === 'string' || typeof exception === 'number') {
+      if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_MESSAGE)) {
+        this.setAttribute(ATTR_EXCEPTION_MESSAGE, String(exception));
+      }
+      hasMinimumAttributes = true;
+    } else if (exception && typeof exception === 'object') {
+      const exceptionObj = exception as {
+        code?: string | number;
+        name?: string;
+        message?: string;
+        stack?: string;
+      };
+
+      if (exceptionObj.code) {
+        if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_TYPE)) {
+          this.setAttribute(ATTR_EXCEPTION_TYPE, exceptionObj.code.toString());
+        }
+        hasMinimumAttributes = true;
+      } else if (exceptionObj.name) {
+        if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_TYPE)) {
+          this.setAttribute(ATTR_EXCEPTION_TYPE, exceptionObj.name);
+        }
+        hasMinimumAttributes = true;
+      }
+
+      if (exceptionObj.message) {
+        if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_MESSAGE)) {
+          this.setAttribute(ATTR_EXCEPTION_MESSAGE, exceptionObj.message);
+        }
+        hasMinimumAttributes = true;
+      }
+
+      if (exceptionObj.stack) {
+        if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_STACKTRACE)) {
+          this.setAttribute(ATTR_EXCEPTION_STACKTRACE, exceptionObj.stack);
+        }
+        hasMinimumAttributes = true;
+      }
+    }
+
+    if (!hasMinimumAttributes) {
+      api.diag.warn(`Failed to record an exception ${exception}`);
+    }
   }
 
   private _truncateToLimitUtil(value: string, limit: number): string {

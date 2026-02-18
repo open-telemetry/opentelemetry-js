@@ -85,6 +85,13 @@ export interface LogRecord {
   attributes?: LogAttributes;
 
   /**
+   * An exception (or error) associated with the log record.
+   *
+   * @experimental
+   */
+  exception?: unknown;
+
+  /**
    * The Context associated with the LogRecord.
    */
   context?: Context;
