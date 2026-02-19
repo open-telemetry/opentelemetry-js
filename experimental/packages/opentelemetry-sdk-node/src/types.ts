@@ -19,6 +19,7 @@ import { TextMapPropagator } from '@opentelemetry/api';
 import { Instrumentation } from '@opentelemetry/instrumentation';
 import { Resource, ResourceDetector } from '@opentelemetry/resources';
 import { LoggerProvider, LogRecordProcessor } from '@opentelemetry/sdk-logs';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { IMetricReader, ViewOptions } from '@opentelemetry/sdk-metrics';
 import {
   Sampler,
@@ -63,5 +64,6 @@ export interface SDKOptions {
 export interface SDKComponents {
   contextManager: ContextManager;
   loggerProvider?: LoggerProvider;
+  meterProvider?: MeterProvider;
   propagator?: TextMapPropagator;
 }
