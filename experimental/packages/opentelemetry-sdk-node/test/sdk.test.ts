@@ -80,7 +80,7 @@ import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/expo
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
-import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from './semconv';
+import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from '../src/semconv';
 
 function assertDefaultContextManagerRegistered() {
   assert.ok(
