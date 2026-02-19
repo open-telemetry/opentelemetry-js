@@ -135,4 +135,19 @@ export class BasicTracerProvider implements TracerProvider {
   shutdown(): Promise<void> {
     return this._activeSpanProcessor.shutdown();
   }
+
+  /**
+   * Creates a new TracerProvider with the same configuration but a new resource
+   * that includes the provided entity merged into it.
+   *
+   * @param entity - The entity to merge into the resource
+   * @returns A new TracerProvider with the merged entity
+   */
+  forEntity(entity: import('@opentelemetry/api').Entity): TracerProvider {
+    const newResource = this._resource.addEntity(entity);
+    return new BasicTracerProvider({
+      ...this._config,
+      resource: newResource,
+    });
+  }
 }

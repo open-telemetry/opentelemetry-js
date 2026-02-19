@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { hostDetector } from '../../../src';
-import { resourceFromDetectedResource } from '../../../src/ResourceImpl';
+import { resourceFromDetectedResource } from '../../../src/resource-impl';
 import { describeNode } from '../../util';
 import {
   ATTR_HOST_ARCH,

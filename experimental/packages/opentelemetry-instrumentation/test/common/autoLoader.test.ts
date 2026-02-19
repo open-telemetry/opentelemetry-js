@@ -20,6 +20,7 @@ import {
   Meter,
   MeterOptions,
   MeterProvider,
+  Entity,
 } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -30,15 +31,24 @@ class DummyTracerProvider implements TracerProvider {
   getTracer(name: string, version?: string): Tracer {
     throw new Error('not implemented');
   }
+  forEntity(entity: Entity): TracerProvider {
+    throw new Error('Method not implemented.');
+  }
 }
 
 class DummyMeterProvider implements MeterProvider {
+  forEntity(entity: Entity): MeterProvider {
+    throw new Error('Method not implemented.');
+  }
   getMeter(name: string, version?: string, options?: MeterOptions): Meter {
     throw new Error('not implemented');
   }
 }
 
 class DummyLoggerProvider implements LoggerProvider {
+  forEntity(entity: Entity): LoggerProvider {
+    throw new Error('Method not implemented.');
+  }
   getLogger(name: string, version?: string, options?: LoggerOptions): Logger {
     throw new Error('not implemented');
   }

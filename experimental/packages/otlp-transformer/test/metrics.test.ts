@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 import { ValueType } from '@opentelemetry/api';
-import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
+import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
+import {
+  Resource,
+  resourceFromAttributes,
+  resourceFromDetectedResource,
+} from '@opentelemetry/resources';
 import {
   AggregationTemporality,
   DataPointType,
@@ -22,17 +27,17 @@ import {
   ResourceMetrics,
 } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
-import { createExportMetricsServiceRequest } from '../src/metrics/internal';
-import { EAggregationTemporality } from '../src/metrics/internal-types';
+import { TextDecoder, TextEncoder } from 'util';
 import {
   PROTOBUF_ENCODER,
   encodeAsLongBits,
   encodeAsString,
 } from '../src/common/utils';
-import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
 import * as root from '../src/generated/root';
-import { ProtobufMetricsSerializer } from '../src/metrics/protobuf';
+import { createExportMetricsServiceRequest } from '../src/metrics/internal';
+import { EAggregationTemporality } from '../src/metrics/internal-types';
 import { JsonMetricsSerializer } from '../src/metrics/json';
+import { ProtobufMetricsSerializer } from '../src/metrics/protobuf';
 
 const START_TIME = hrTime();
 const END_TIME = hrTime();
@@ -48,10 +53,30 @@ describe('Metrics', () => {
   const expectedResource = {
     attributes: [
       {
+        key: 'resource-entity-id',
+        value: {
+          stringValue: 'resource entity value',
+        },
+      },
+      {
+        key: 'resource-entity-attribute',
+        value: {
+          stringValue: 'resource entity attribute value',
+        },
+      },
+      {
         key: 'resource-attribute',
         value: {
           stringValue: 'resource attribute value',
         },
+      },
+    ],
+    entityRefs: [
+      {
+        descriptionKeys: ['resource-entity-attribute'],
+        idKeys: ['resource-entity-id'],
+        schemaUrl: 'http://url.to.resource.schema',
+        type: 'resource-entity-type',
       },
     ],
     droppedAttributesCount: 0,
@@ -311,8 +336,22 @@ describe('Metrics', () => {
   ): ResourceMetrics {
     const resource =
       customResource ||
-      resourceFromAttributes({
-        'resource-attribute': 'resource attribute value',
+      resourceFromDetectedResource({
+        attributes: {
+          'resource-attribute': 'resource attribute value',
+        },
+        entities: [
+          {
+            identifier: {
+              'resource-entity-id': 'resource entity value',
+            },
+            type: 'resource-entity-type',
+            attributes: {
+              'resource-entity-attribute': 'resource entity attribute value',
+            },
+            schemaUrl: 'http://url.to.resource.schema',
+          },
+        ],
       });
 
     return {

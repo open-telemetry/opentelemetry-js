@@ -168,10 +168,14 @@ describe('PeriodicExportingMetricReader', () => {
   const resourceMetrics: ResourceMetrics = {
     resource: {
       attributes: {},
+      entities: [],
       merge: sinon.stub(),
       asyncAttributesPending: true, // ensure we try to await async attributes
       waitForAsyncAttributes: waitForAsyncAttributesStub, // resolve when awaited
       getRawAttributes: () => [],
+      addEntity: () => {
+        return resourceMetrics.resource;
+      },
     },
     scopeMetrics: scopeMetrics,
   };
@@ -400,10 +404,14 @@ describe('PeriodicExportingMetricReader', () => {
       const resourceMetrics: ResourceMetrics = {
         resource: {
           attributes: {},
+          entities: [],
           merge: sinon.stub(),
           asyncAttributesPending: true, // ensure we try to await async attributes
           waitForAsyncAttributes: waitForAsyncAttributesStub, // resolve when awaited
           getRawAttributes: () => [],
+          addEntity: () => {
+            return resourceMetrics.resource;
+          },
         },
         scopeMetrics: scopeMetrics,
       };
@@ -446,10 +454,14 @@ describe('PeriodicExportingMetricReader', () => {
       const resourceMetrics: ResourceMetrics = {
         resource: {
           attributes: {},
+          entities: [],
           merge: sinon.stub(),
           asyncAttributesPending: true, // ensure we try to await async attributes
           waitForAsyncAttributes: waitForAsyncAttributesStub, // reject when awaited
           getRawAttributes: () => [],
+          addEntity: () => {
+            return resourceMetrics.resource;
+          },
         },
         scopeMetrics: [],
       };

@@ -23,17 +23,19 @@ export {
   processDetector,
   serviceInstanceIdDetector,
 } from './detectors';
+export type { Entity } from '@opentelemetry/api';
 export type { Resource } from './Resource';
 export {
-  resourceFromAttributes,
   defaultResource,
   emptyResource,
-} from './ResourceImpl';
+  resourceFromAttributes,
+  resourceFromDetectedResource,
+} from './resource-impl';
 export { defaultServiceName } from './default-service-name';
 export type {
-  ResourceDetector,
   DetectedResource,
   DetectedResourceAttributes,
-  RawResourceAttribute,
   MaybePromise,
+  RawResourceAttribute,
+  ResourceDetector,
 } from './types';

@@ -48,6 +48,7 @@ describe('HttpInstrumentation', () => {
             .returns(trace.wrapSpanContext(INVALID_SPAN_CONTEXT));
           return { startSpan: startSpanStub } as any;
         },
+        forEntity: () => provider,
       };
       nock.cleanAll();
       nock.enableNetConnect();

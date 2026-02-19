@@ -21,12 +21,17 @@ import {
   MeterOptions,
   createNoopMeter,
 } from '@opentelemetry/api';
-import { defaultResource, Resource } from '@opentelemetry/resources';
 import { IMetricReader } from './export/MetricReader';
+import {
+  defaultResource,
+  Resource,
+  // resourceFromDetectedResource,
+} from '@opentelemetry/resources';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { MetricCollector } from './state/MetricCollector';
 import { ForceFlushOptions, ShutdownOptions } from './types';
 import { View, ViewOptions } from './view/View';
+import { Entity } from '../../../api/src/common/Entity';
 
 /**
  * MeterProviderOptions provides an interface for configuring a MeterProvider.
@@ -44,8 +49,15 @@ export interface MeterProviderOptions {
 export class MeterProvider implements IMeterProvider {
   private _sharedState: MeterProviderSharedState;
   private _shutdown = false;
+  private _config: MeterProviderOptions;
+
+  forEntity(entity: Entity): IMeterProvider {
+    const newResource = this._sharedState.resource.addEntity(entity);
+    return new MeterProvider({ ...this._config, resource: newResource });
+  }
 
   constructor(options?: MeterProviderOptions) {
+    this._config = options ?? {};
     this._sharedState = new MeterProviderSharedState(
       options?.resource ?? defaultResource()
     );
