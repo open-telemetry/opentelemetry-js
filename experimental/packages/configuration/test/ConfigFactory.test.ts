@@ -53,10 +53,7 @@ const defaultConfig: ConfigurationModel = {
   attribute_limits: {
     attribute_count_limit: 128,
   },
-  propagator: {
-    composite: [{ tracecontext: null }, { baggage: null }],
-    composite_list: 'tracecontext,baggage',
-  },
+  propagator: {},
 };
 
 const defaultTracerProvider: TracerProvider = {
@@ -1112,6 +1109,14 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
+    it('should not set propagators by default', function () {
+      const configFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      assert.deepStrictEqual(config, defaultConfig);
+      assert.strictEqual(config.propagator?.composite, undefined);
+      assert.strictEqual(config.propagator?.composite_list, undefined);
+    });
+
     it('should return config with custom propagator', function () {
       process.env.OTEL_PROPAGATORS = 'tracecontext,jaeger';
       const expectedConfig: ConfigurationModel = {
@@ -1402,6 +1407,64 @@ describe('ConfigFactory', function () {
                 timeout: 30000,
                 exporter: {
                   console: {},
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+          views: [],
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with meter_provider with prometheus exporter', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'prometheus';
+
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [
+            {
+              pull: {
+                exporter: {
+                  'prometheus/development': {
+                    host: 'localhost',
+                    port: 9464,
+                    without_scope_info: false,
+                    without_target_info: false,
+                  },
+                },
+              },
+            },
+          ],
+          exemplar_filter: ExemplarFilter.TraceBased,
+          views: [],
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with meter_provider with prometheus exporter and custom port', function () {
+      process.env.OTEL_METRICS_EXPORTER = 'prometheus';
+      process.env.OTEL_EXPORTER_PROMETHEUS_HOST = '0.0.0.0';
+      process.env.OTEL_EXPORTER_PROMETHEUS_PORT = '8080';
+
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        meter_provider: {
+          readers: [
+            {
+              pull: {
+                exporter: {
+                  'prometheus/development': {
+                    host: '0.0.0.0',
+                    port: 8080,
+                    without_scope_info: false,
+                    without_target_info: false,
+                  },
                 },
               },
             },
@@ -2102,7 +2165,11 @@ describe('ConfigFactory', function () {
         'test/fixtures/short-config.yml';
       const configFactory = createConfigFactory();
       const expectedConfig: ConfigurationModel = {
-        ...defaultConfig,
+        disabled: false,
+        log_level: DiagLogLevel.INFO,
+        attribute_limits: {
+          attribute_count_limit: 128,
+        },
         resource: {
           attributes_list: 'service.instance.id=123',
           attributes: [
@@ -2350,7 +2417,11 @@ describe('ConfigFactory', function () {
         'test/fixtures/resources.yaml';
       const configFactory = createConfigFactory();
       const expectedConfig: ConfigurationModel = {
-        ...defaultConfig,
+        disabled: false,
+        log_level: DiagLogLevel.INFO,
+        attribute_limits: {
+          attribute_count_limit: 128,
+        },
         resource: {
           schema_url: 'https://opentelemetry.io/schemas/1.16.0',
           attributes_list:
@@ -2470,7 +2541,10 @@ describe('ConfigFactory', function () {
       config = {};
       setPropagator(config, { composite: [{ tracecontext: null }] });
       assert.deepStrictEqual(config, {
-        propagator: { composite: [{ tracecontext: null }] },
+        propagator: {
+          composite: [{ tracecontext: null }],
+          composite_list: 'tracecontext',
+        },
       });
 
       const res = getTemporalityPreference(

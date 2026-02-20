@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-import { ContextManager, TextMapPropagator } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
-import { IdGenerator } from './IdGenerator';
-import { Sampler } from './Sampler';
-import { SpanProcessor } from './SpanProcessor';
+import type {
+  ContextManager,
+  MeterProvider,
+  TextMapPropagator,
+} from '@opentelemetry/api';
+import type { Resource } from '@opentelemetry/resources';
+import type { IdGenerator } from './IdGenerator';
+import type { Sampler } from './Sampler';
+import type { SpanProcessor } from './SpanProcessor';
 
 /**
  * TracerConfig provides an interface for configuring a Basic Tracer.
@@ -54,6 +58,12 @@ export interface TracerConfig {
    * List of SpanProcessor for the tracer
    */
   spanProcessors?: SpanProcessor[];
+
+  /**
+   * A meter provider to record trace SDK metrics to.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  meterProvider?: MeterProvider;
 }
 
 /**

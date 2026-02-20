@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+/**
+ * @deprecated Use `createOtlpFetchExportDelegate` instead.
+ */
 export { createOtlpSendBeaconExportDelegate } from './otlp-browser-http-export-delegate';
 
 export { convertLegacyBrowserHttpOptions } from './configuration/convert-legacy-browser-http-options';
