@@ -72,7 +72,7 @@ export function sendWithHttp(
     res.on('data', chunk => responseData.push(chunk));
 
     res.on('end', () => {
-      if (res.statusCode && res.statusCode < 299) {
+      if (res.statusCode && res.statusCode <= 299) {
         onDone({
           status: 'success',
           data: Buffer.concat(responseData),
@@ -96,14 +96,16 @@ export function sendWithHttp(
     });
 
     res.on('error', (error: Error) => {
-      if (res.statusCode && res.statusCode < 299) {
+      // Note: 'end' may still be emitted after 'error' on the same response object.
+      // However, since onDone maps to a Promise resolve/reject, only the first call takes effect.
+      // This will be addressed in https://github.com/open-telemetry/opentelemetry-js/issues/5990
+      if (res.statusCode && res.statusCode <= 299) {
         // If the response is successful but an error occurs while reading the response,
         // we consider it a success since the data has been sent successfully.
         onDone({
           status: 'success',
         });
-      }
-      if (res.statusCode && isExportHTTPErrorRetryable(res.statusCode)) {
+      } else if (res.statusCode && isExportHTTPErrorRetryable(res.statusCode)) {
         onDone({
           status: 'retryable',
           error: error,
