@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import {
   context,
   HrTime,
@@ -91,6 +92,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
   private _headerCapture;
+  private _httpPatched: boolean = false;
+  private _httpsPatched: boolean = false;
   declare private _oldHttpServerDurationHistogram: Histogram;
   declare private _stableHttpServerDurationHistogram: Histogram;
   declare private _oldHttpClientDurationHistogram: Histogram;
@@ -209,8 +212,16 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'http',
       ['*'],
       (moduleExports: Http): Http => {
+        // Guard against double-instrumentation, if loaded by both `require`
+        // and `import`.
+        if (this._httpPatched) {
+          return moduleExports;
+        }
+        this._httpPatched = true;
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const isESM = (moduleExports as any)[Symbol.toStringTag] === 'Module';
+
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           const patchedRequest = this._wrap(
             moduleExports,
@@ -241,6 +252,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         return moduleExports;
       },
       (moduleExports: Http) => {
+        this._httpPatched = false;
         if (moduleExports === undefined) return;
 
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
@@ -259,8 +271,16 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'https',
       ['*'],
       (moduleExports: Https): Https => {
+        // Guard against double-instrumentation, if loaded by both `require`
+        // and `import`.
+        if (this._httpsPatched) {
+          return moduleExports;
+        }
+        this._httpsPatched = true;
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const isESM = (moduleExports as any)[Symbol.toStringTag] === 'Module';
+
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           const patchedRequest = this._wrap(
             moduleExports,
@@ -291,6 +311,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         return moduleExports;
       },
       (moduleExports: Https) => {
+        this._httpsPatched = false;
         if (moduleExports === undefined) return;
 
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
