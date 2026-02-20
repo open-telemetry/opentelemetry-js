@@ -75,7 +75,7 @@
     "typescript": "5.0.4",
     "webpack": "5.104.1",
     "webpack-cli": "6.0.1",
-    "zone.js": "0.16.0"
+    "zone.js": "0.16.1"
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0",

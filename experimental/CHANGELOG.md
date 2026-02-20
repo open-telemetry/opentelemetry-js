@@ -36,11 +36,11 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :rocket: Features
 
 * feat(configuration): add Prometheus exporter support [#6400](https://github.com/open-telemetry/opentelemetry-js/pull/6400) @MikeGoldsmith
-
 * feat(sampler-composite): add ComposableAnnotatingSampler and ComposableRuleBasedSampler [#6305](https://github.com/open-telemetry/opentelemetry-js/pull/6305) @trentm
 * feat(configuration): parse config for rc 3 [#6304](https://github.com/open-telemetry/opentelemetry-js/pull/6304) @maryliag
 * feat(instrumentation): use the `internals: true` option with import-in-the-middle hook, allowing instrumentations to hook internal files in ES modules [#6344](https://github.com/open-telemetry/opentelemetry-js/pull/6344) @trentm
 * feat(api-logs,sdk-logs): add log exception support and mapping [#6379](https://github.com/open-telemetry/opentelemetry-js/issues/6379) @iblancasa
+* feat(opentelemetry-sdk-node): set log provider for experimental start [#6407](https://github.com/open-telemetry/opentelemetry-js/pull/6407) @maryliag
 
 ### :bug: Bug Fixes
 
