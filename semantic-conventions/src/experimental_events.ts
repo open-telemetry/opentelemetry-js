@@ -69,6 +69,17 @@ export const EVENT_AZURE_RESOURCE_LOG = 'azure.resource.log' as const;
 export const EVENT_BROWSER_WEB_VITAL = 'browser.web_vital' as const;
 
 /**
+ * This event represents an exception that occurred during a database client operation, such as connection failures, query errors, timeouts, or other errors that prevent the operation from completing successfully.
+ *
+ * @note This event **SHOULD** be recorded when an exception occurs during database client operations.
+ * Instrumentations **SHOULD** set the severity to WARN (severity number 13) when recording this event.
+ * Instrumentations **MAY** provide a configuration option to populate exception events with the attributes captured on the corresponding database client span.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_DB_CLIENT_OPERATION_EXCEPTION = 'db.client.operation.exception' as const;
+
+/**
  * This event represents an occurrence of a lifecycle transition on Android or iOS platform.
  *
  * @note The event body fields **MUST** be used to describe the state of the application at the time of the event.
@@ -150,13 +161,60 @@ export const EVENT_GEN_AI_TOOL_MESSAGE = 'gen_ai.tool.message' as const;
 export const EVENT_GEN_AI_USER_MESSAGE = 'gen_ai.user.message' as const;
 
 /**
+ * This event represents an exception that occurred during an HTTP client request, such as network failures, timeouts, or other errors that prevent the request from completing successfully.
+ *
+ * @note This event **SHOULD** be recorded when an exception occurs during HTTP client operations.
+ * Instrumentations **SHOULD** set the severity to WARN (severity number 13) when recording this event.
+ * Some HTTP client frameworks generate artificial exceptions for non-successful HTTP status codes (e.g., 404 Not Found). When possible, instrumentations **SHOULD NOT** record these artificial exceptions, or **SHOULD** set the severity to DEBUG (severity number 5).
+ * Instrumentations **MAY** provide a configuration option to populate exception events with the attributes captured on the corresponding HTTP client span.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_HTTP_CLIENT_REQUEST_EXCEPTION = 'http.client.request.exception' as const;
+
+/**
+ * This event represents an exception that occurred during HTTP server request processing, such as application errors, internal failures, or other exceptions that prevent the server from successfully handling the request.
+ *
+ * @note This event **SHOULD** be recorded when an exception occurs during HTTP server request processing.
+ * Instrumentations **SHOULD** set the severity to ERROR (severity number 17) when recording this event.
+ * Instrumentations **MAY** provide a configuration option to populate exception events with the attributes captured on the corresponding HTTP server span.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_HTTP_SERVER_REQUEST_EXCEPTION = 'http.server.request.exception' as const;
+
+/**
+ * This event represents an exception that occurred during an outgoing RPC call, such as network failures, timeouts, serialization errors, or other errors that prevent the call from completing successfully.
+ *
+ * @note This event **SHOULD** be recorded when an exception occurs during RPC client call operations.
+ * Instrumentations **SHOULD** set the severity to WARN (severity number 13) when recording this event.
+ * Instrumentations **MAY** provide a configuration option to populate exception events with the attributes captured on the corresponding RPC client span.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_RPC_CLIENT_CALL_EXCEPTION = 'rpc.client.call.exception' as const;
+
+/**
  * Describes a message sent or received within the context of an RPC call.
  *
  * @note In the lifetime of an RPC stream, an event for each message sent/received on client and server spans **SHOULD** be created. In case of unary calls message events **SHOULD NOT** be recorded.
  *
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Deprecated, no replacement at this time.
  */
 export const EVENT_RPC_MESSAGE = 'rpc.message' as const;
+
+/**
+ * This event represents an exception that occurred during incoming RPC call processing, such as application errors, internal failures, or other exceptions that prevent the server from successfully handling the call.
+ *
+ * @note This event **SHOULD** be recorded when an exception occurs during RPC server call processing.
+ * Instrumentations **SHOULD** set the severity to ERROR (severity number 17) when recording this event.
+ * Instrumentations **MAY** provide a configuration option to populate exception events with the attributes captured on the corresponding RPC server span.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_RPC_SERVER_CALL_EXCEPTION = 'rpc.server.call.exception' as const;
 
 /**
  * Indicates that a session has ended.
