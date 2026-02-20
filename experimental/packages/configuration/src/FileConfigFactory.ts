@@ -150,10 +150,7 @@ export function parseConfigFile(config: ConfigurationModel) {
     const detectionConfig =
       parsedContent['resource']?.['detection/development'];
     if (detectionConfig) {
-      if (config.resource == null) {
-        config.resource = {};
-      }
-      config.resource['detection/development'] =
+      config.resource!['detection/development'] =
         parseDetectionDevelopment(detectionConfig);
     }
     setAttributeLimits(config, parsedContent['attribute_limits']);
