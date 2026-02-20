@@ -1,0 +1,20 @@
+file_format: "1.0-rc.3"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    composite/development:
+      composite: rule_based
+      rule_based:
+        span_kind: client
+        fallback_sampler:
+          always_off:
+        rules:
+          - attribute_values:
+              key: http.method
+              values:
+                - GET
+            sampler:
+              always_on:
