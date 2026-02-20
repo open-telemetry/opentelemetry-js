@@ -19,6 +19,7 @@ import {
   defaultResource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
@@ -27,6 +28,7 @@ import { NoopLogRecordProcessor } from '../../src/export/NoopLogRecordProcessor'
 import { DEFAULT_LOGGER_NAME } from './../../src/LoggerProvider';
 import { MultiLogRecordProcessor } from '../../src/MultiLogRecordProcessor';
 import { Logger } from '../../src/Logger';
+import { TestMetricReader } from './utils';
 
 describe('LoggerProvider', () => {
   beforeEach(() => {
@@ -312,6 +314,41 @@ describe('LoggerProvider', () => {
       provider.shutdown();
       sinon.assert.calledOnce(shutdownStub);
       sinon.assert.calledOnce(warnStub);
+    });
+  });
+
+  describe('LoggerMetrics', () => {
+    it('should record metrics for created logs', async () => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+
+      const logRecordProcessor = new NoopLogRecordProcessor();
+      const provider = new LoggerProvider({
+        processors: [logRecordProcessor],
+        meterProvider,
+      });
+      const logger = provider.getLogger('test');
+      logger.emit({ body: 'log 1' });
+      let { resourceMetrics } = await metricReader.collect();
+      let metrics = resourceMetrics.scopeMetrics[0].metrics;
+      let logsCreatedMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.log.created'
+      );
+      assert.ok(logsCreatedMetric);
+      assert.strictEqual(logsCreatedMetric.dataPoints[0].value, 1);
+      assert.deepStrictEqual(logsCreatedMetric.dataPoints[0].attributes, {});
+
+      logger.emit({ body: 'log 1' });
+      ({ resourceMetrics } = await metricReader.collect());
+      metrics = resourceMetrics.scopeMetrics[0].metrics;
+      logsCreatedMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.log.created'
+      );
+      assert.ok(logsCreatedMetric);
+      assert.strictEqual(logsCreatedMetric.dataPoints[0].value, 2);
+      assert.deepStrictEqual(logsCreatedMetric.dataPoints[0].attributes, {});
     });
   });
 });

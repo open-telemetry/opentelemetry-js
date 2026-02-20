@@ -97,6 +97,7 @@ export class Logger implements logsAPI.Logger {
         ...logRecord,
       }
     );
+    this._sharedState.loggerMetrics.emitLog();
     /**
      * the explicitly passed Context,
      * the current Context, or an empty Context if the Logger was obtained with include_trace_context=false
