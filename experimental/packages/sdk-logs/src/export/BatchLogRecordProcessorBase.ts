@@ -91,7 +91,7 @@ class ExportOperation {
 
       // Export with timeout, wrapped in suppressTracing context
       await context.with(suppressTracing(context.active()), async () => {
-        await this._exportWithTimeout(
+        return this._exportWithTimeout(
           exporter,
           logRecords,
           exportTimeoutMillis
@@ -147,7 +147,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   private _finishedLogRecords: SdkLogRecord[] = [];
   private _timer: NodeJS.Timeout | number | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
-  private _droppedLogRecordsCount: number = 0;
+  private _flushing: boolean = false;
 
   constructor(exporter: LogRecordExporter, config?: T) {
     this._exporter = exporter;
@@ -170,25 +170,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
     if (this._shutdownOnce.isCalled) {
       return;
     }
-
-    if (this._finishedLogRecords.length >= this._maxQueueSize) {
-      if (this._droppedLogRecordsCount === 0) {
-        diag.debug('maxQueueSize reached, dropping log records');
-      }
-      this._droppedLogRecordsCount++;
-      return;
-    }
-
-    if (this._droppedLogRecordsCount > 0) {
-      // some log records were dropped, log once with count of log records dropped
-      diag.warn(
-        `Dropped ${this._droppedLogRecordsCount} log records because maxQueueSize reached`
-      );
-      this._droppedLogRecordsCount = 0;
-    }
-
-    this._finishedLogRecords.push(logRecord);
-    this._maybeStartTimer();
+    this._addToBuffer(logRecord);
   }
 
   public forceFlush(): Promise<void> {
@@ -196,6 +178,15 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
       return this._shutdownOnce.promise;
     }
     return this._flushAll();
+  }
+
+  /** Add a LogRecord in the buffer. */
+  private _addToBuffer(logRecord: SdkLogRecord) {
+    if (this._finishedLogRecords.length >= this._maxQueueSize) {
+      return;
+    }
+    this._finishedLogRecords.push(logRecord);
+    this._maybeStartTimer();
   }
 
   public shutdown(): Promise<void> {
@@ -214,6 +205,18 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
    * for all other cases _exportOneBatch should be used
    * */
   private async _flushAll(): Promise<void> {
+    // Guard against concurrent flushes. Concurrent .forceFlush() calls will
+    // return without waiting for the in-progress flush to finish.
+    if (this._flushing) {
+      return;
+    }
+    this._flushing = true;
+
+    // Grab the current set of finished log records, because the spec says:
+    // > ... for which the LogRecordProcessor had already received events prior to the call to ForceFlush ...
+    let toFlush = this._finishedLogRecords;
+    this._finishedLogRecords = [];
+
     // Clear timer to prevent concurrent exports
     this._clearTimer();
 
@@ -226,15 +229,18 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
     }
 
     // Now flush all batches sequentially to avoid race conditions
-    while (this._finishedLogRecords.length > 0) {
-      const logRecords = this._extractBatch();
-      if (logRecords === null) {
-        break;
+    while (toFlush.length > 0) {
+      let batch;
+      if (toFlush.length <= this._maxExportBatchSize) {
+        batch = toFlush;
+        toFlush = [];
+      } else {
+        batch = toFlush.splice(0, this._maxExportBatchSize);
       }
 
       const exportOp = new ExportOperation(
         this._exporter,
-        logRecords,
+        batch,
         this._exportTimeoutMillis
       );
       this._currentExport = exportOp;
@@ -250,6 +256,9 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
         this._currentExport = null;
       }
     }
+
+    this._flushing = false;
+    this._maybeStartTimer();
   }
 
   /**
@@ -300,6 +309,10 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
 
   private _maybeStartTimer() {
     if (this._shutdownOnce.isCalled) {
+      return;
+    }
+
+    if (this._flushing) {
       return;
     }
 
