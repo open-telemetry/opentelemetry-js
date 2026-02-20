@@ -111,6 +111,12 @@ describe('Node SDK', () => {
 
     setGlobalTracerProviderSpy = Sinon.spy(trace, 'setGlobalTracerProvider');
     setGlobalLoggerProviderSpy = Sinon.spy(logs, 'setGlobalLoggerProvider');
+
+    // need to set these to none, since the default value is 'otlp'. Tests either
+    // provide exporters programatically or reset to an appropriate value.
+    process.env.OTEL_TRACES_EXPORTER = 'none';
+    process.env.OTEL_LOGS_EXPORTER = 'none';
+    process.env.OTEL_METRICS_EXPORTER = 'none';
   });
 
   afterEach(() => {
@@ -124,13 +130,10 @@ describe('Node SDK', () => {
       delete process.env.OTEL_METRICS_EXPORTER;
       delete process.env.OTEL_PROPAGATORS;
       delete process.env.OTEL_TRACES_EXPORTER;
+      delete process.env.OTEL_NODE_EXPERIMENTAL_SDK_METRICS;
     });
 
     it('should not register more than the minimal SDK components', async () => {
-      // need to set these to none, since the default value is 'otlp'
-      process.env.OTEL_TRACES_EXPORTER = 'none';
-      process.env.OTEL_LOGS_EXPORTER = 'none';
-      process.env.OTEL_METRICS_EXPORTER = 'none';
       const sdk = new NodeSDK({
         autoDetectResources: false,
       });
@@ -272,9 +275,6 @@ describe('Node SDK', () => {
     });
 
     it('should register a meter provider if a reader is provided', async () => {
-      // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
-      // which sets up an exporter and affects the context manager
-      process.env.OTEL_TRACES_EXPORTER = 'none';
       const exporter = new ConsoleMetricExporter();
       const metricReader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -303,9 +303,6 @@ describe('Node SDK', () => {
     });
 
     it('should register a meter provider if multiple readers are provided', async () => {
-      // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
-      // which sets up an exporter and affects the context manager
-      process.env.OTEL_TRACES_EXPORTER = 'none';
       const consoleExporter = new ConsoleMetricExporter();
       const inMemoryExporter = new InMemoryMetricExporter(
         AggregationTemporality.CUMULATIVE
@@ -347,9 +344,6 @@ describe('Node SDK', () => {
     });
 
     it('should show deprecation warning when using metricReader option', async () => {
-      // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
-      // which sets up an exporter and affects the context manager
-      process.env.OTEL_TRACES_EXPORTER = 'none';
       const exporter = new ConsoleMetricExporter();
       const metricReader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -378,9 +372,6 @@ describe('Node SDK', () => {
     });
 
     it('should not show deprecation warning when using metricReaders option', async () => {
-      // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
-      // which sets up an exporter and affects the context manager
-      process.env.OTEL_TRACES_EXPORTER = 'none';
       const exporter = new ConsoleMetricExporter();
       const metricReader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -409,8 +400,6 @@ describe('Node SDK', () => {
     });
 
     it('should not register meter provider when metricReaders is empty array', async () => {
-      // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
-      process.env.OTEL_TRACES_EXPORTER = 'none';
       const sdk = new NodeSDK({
         metricReaders: [],
         autoDetectResources: false,
@@ -431,8 +420,68 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
+    it('should register a meter provider to the tracer provider if both initialized and metrics enabled', async () => {
+      process.env.OTEL_NODE_EXPERIMENTAL_SDK_METRICS = 'true';
+      const exporter = new ConsoleMetricExporter();
+      const metricReader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+
+      const sdk = new NodeSDK({
+        metricReader: metricReader,
+        traceExporter: new ConsoleSpanExporter(),
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assertDefaultContextManagerRegistered();
+      assertDefaultPropagatorRegistered();
+
+      assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
+      const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
+      assert.ok(tracerProvider instanceof NodeTracerProvider);
+      assert.ok(
+        (tracerProvider as any)._config.meterProvider instanceof MeterProvider
+      );
+
+      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+
+      await sdk.shutdown();
+    });
+
+    it('should not register a meter provider to the tracer provider if both initialized but metrics disabled', async () => {
+      const exporter = new ConsoleMetricExporter();
+      const metricReader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+
+      const sdk = new NodeSDK({
+        metricReader: metricReader,
+        traceExporter: new ConsoleSpanExporter(),
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assertDefaultContextManagerRegistered();
+      assertDefaultPropagatorRegistered();
+
+      assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
+      const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
+      assert.ok(tracerProvider instanceof NodeTracerProvider);
+      assert.equal((tracerProvider as any)._config.meterProvider, undefined);
+
+      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+
+      await sdk.shutdown();
+    });
+
     it('should register a logger provider if a log record processor is provided', async () => {
-      process.env.OTEL_TRACES_EXPORTER = 'none';
       const logRecordExporter = new InMemoryLogRecordExporter();
       const logRecordProcessor = new SimpleLogRecordProcessor(
         logRecordExporter
@@ -604,9 +653,6 @@ describe('Node SDK', () => {
   }
 
   it('should register meter views when provided', async () => {
-    // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
-    // which sets up an exporter and affects the context manager
-    process.env.OTEL_TRACES_EXPORTER = 'none';
     const exporter = new InMemoryMetricExporter(
       AggregationTemporality.CUMULATIVE
     );
@@ -1163,6 +1209,9 @@ describe('Node SDK', () => {
 
     beforeEach(() => {
       stubLogger = Sinon.stub(diag, 'info');
+      delete process.env.OTEL_LOGS_EXPORTER;
+      delete process.env.OTEL_METRICS_EXPORTER;
+      delete process.env.OTEL_TRACES_EXPORTER;
     });
 
     afterEach(() => {
@@ -1303,8 +1352,6 @@ describe('Node SDK', () => {
 
     it('should apply OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT and OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT', async () => {
       // arrange
-      process.env.OTEL_TRACES_EXPORTER = 'none';
-      process.env.OTEL_METRICS_EXPORTER = 'none';
       process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '2';
       process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = '10';
 
@@ -1355,6 +1402,9 @@ describe('Node SDK', () => {
     beforeEach(() => {
       infoStub = Sinon.stub(diag, 'info');
       warnStub = Sinon.stub(diag, 'warn');
+      delete process.env.OTEL_LOGS_EXPORTER;
+      delete process.env.OTEL_METRICS_EXPORTER;
+      delete process.env.OTEL_TRACES_EXPORTER;
     });
 
     afterEach(() => {
@@ -1684,6 +1734,9 @@ describe('Node SDK', () => {
 
     beforeEach(() => {
       stubLoggerError = Sinon.stub(diag, 'warn');
+      delete process.env.OTEL_LOGS_EXPORTER;
+      delete process.env.OTEL_METRICS_EXPORTER;
+      delete process.env.OTEL_TRACES_EXPORTER;
     });
 
     afterEach(() => {
