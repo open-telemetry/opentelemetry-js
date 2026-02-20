@@ -39,9 +39,8 @@ describe('sendWithHttp', function () {
     sentUserAgent = '';
   });
 
-  it('sends a request setting the default user-agent header', function (done) {
-    let firstCallback = true;
-    sendWithHttp(
+  it('sends a request setting the default user-agent header', async function () {
+    await sendWithHttp(
       requestFn,
       'http://localhost:8080',
       {},
@@ -49,26 +48,16 @@ describe('sendWithHttp', function () {
       undefined,
       new http.Agent(),
       Buffer.from([1, 2, 3]),
-      // TODO: the `onDone` callback is called twice because there are two error handlers
-      // - first is attached on the request created in `sendWithHttp`
-      // - second is attached on the pipe within `compressAndSend`
-      () => {
-        if (firstCallback) {
-          firstCallback = false;
-          assert.strictEqual(
-            sentUserAgent,
-            `OTel-OTLP-Exporter-JavaScript/${VERSION}`
-          );
-          done();
-        }
-      },
       100
+    );
+    assert.strictEqual(
+      sentUserAgent,
+      `OTel-OTLP-Exporter-JavaScript/${VERSION}`
     );
   });
 
-  it('sends a request prepending the provided user-agent to the default one', function (done) {
-    let firstCallback = true;
-    sendWithHttp(
+  it('sends a request prepending the provided user-agent to the default one', async function () {
+    await sendWithHttp(
       requestFn,
       'http://localhost:8080',
       {},
@@ -76,20 +65,11 @@ describe('sendWithHttp', function () {
       'Transport-User-Agent/1.2.3',
       new http.Agent(),
       Buffer.from([1, 2, 3]),
-      // TODO: the `onDone` callback is called twice because there are two error handlers
-      // - first is attached on the request created in `sendWithHttp`
-      // - second is attached on the pipe within `compressAndSend`
-      () => {
-        if (firstCallback) {
-          firstCallback = false;
-          assert.strictEqual(
-            sentUserAgent,
-            `Transport-User-Agent/1.2.3 OTel-OTLP-Exporter-JavaScript/${VERSION}`
-          );
-          done();
-        }
-      },
       100
+    );
+    assert.strictEqual(
+      sentUserAgent,
+      `Transport-User-Agent/1.2.3 OTel-OTLP-Exporter-JavaScript/${VERSION}`
     );
   });
 });
