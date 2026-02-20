@@ -147,7 +147,8 @@ export function parseConfigFile(config: ConfigurationModel) {
       parsedContent['resource']?.['attributes_list']
     );
 
-    const detectionConfig = parsedContent['resource']?.['detection/development'];
+    const detectionConfig =
+      parsedContent['resource']?.['detection/development'];
     if (detectionConfig) {
       if (config.resource == null) {
         config.resource = {};
