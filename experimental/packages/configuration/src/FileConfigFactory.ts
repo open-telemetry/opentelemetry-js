@@ -52,7 +52,11 @@ import {
   LogRecordExporter,
   LogRecordProcessor,
 } from './models/loggerProviderModel';
-import { AttributeNameValue } from './models/resourceModel';
+import {
+  AttributeNameValue,
+  ExperimentalResourceDetection,
+  ExperimentalResourceDetector,
+} from './models/resourceModel';
 import {
   Aggregation,
   CardinalityLimits,
@@ -142,6 +146,15 @@ export function parseConfigFile(config: ConfigurationModel) {
       parsedContent['resource']?.['attributes'],
       parsedContent['resource']?.['attributes_list']
     );
+
+    const detectionConfig = parsedContent['resource']?.['detection/development'];
+    if (detectionConfig) {
+      if (config.resource == null) {
+        config.resource = {};
+      }
+      config.resource['detection/development'] =
+        parseDetectionDevelopment(detectionConfig);
+    }
     setAttributeLimits(config, parsedContent['attribute_limits']);
     setPropagator(config, parsedContent['propagator']);
     setTracerProvider(config, parsedContent['tracer_provider']);
@@ -223,6 +236,48 @@ export function setResourceAttributes(
       }
     }
   }
+}
+
+function parseDetectionDevelopment(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  detection: any
+): ExperimentalResourceDetection {
+  const result: ExperimentalResourceDetection = {};
+
+  if (detection['attributes']) {
+    result.attributes = {};
+    const included = detection['attributes']['included'];
+    if (Array.isArray(included)) {
+      result.attributes.included = included.filter(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (v: any) => typeof v === 'string'
+      );
+    }
+    const excluded = detection['attributes']['excluded'];
+    if (Array.isArray(excluded)) {
+      result.attributes.excluded = excluded.filter(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (v: any) => typeof v === 'string'
+      );
+    }
+  }
+
+  if (Array.isArray(detection['detectors'])) {
+    result.detectors = detection['detectors']
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .filter((d: any) => typeof d === 'object' && d !== null)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((d: any) => {
+        const detector: ExperimentalResourceDetector = {};
+        if ('container' in d) detector.container = d.container ?? {};
+        if ('host' in d) detector.host = d.host ?? {};
+        if ('process' in d) detector.process = d.process ?? {};
+        if ('service' in d) detector.service = d.service ?? {};
+        return detector;
+      });
+  }
+
+  return result;
 }
 
 export function setAttributeLimits(
