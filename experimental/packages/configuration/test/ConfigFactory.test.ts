@@ -253,6 +253,18 @@ const configFromKitchenSinkFile: ConfigurationModel = {
         value: '1.0.0',
       },
     ],
+    'detection/development': {
+      attributes: {
+        included: ['process.*'],
+        excluded: ['process.command_args'],
+      },
+      detectors: [
+        { container: {} },
+        { host: {} },
+        { process: {} },
+        { service: {} },
+      ],
+    },
   },
   attribute_limits: {
     attribute_count_limit: 128,
@@ -999,6 +1011,51 @@ describe('ConfigFactory', function () {
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         node_resource_detectors: ['env', 'host', 'serviceinstance'],
+        resource: {
+          'detection/development': {
+            detectors: [{ host: {} }, { service: {} }],
+          },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should map OTEL_NODE_RESOURCE_DETECTORS=all to all spec detectors', function () {
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'all';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        node_resource_detectors: ['all'],
+        resource: {
+          'detection/development': {
+            detectors: [
+              { container: {} },
+              { host: {} },
+              { process: {} },
+              { service: {} },
+            ],
+          },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should not set detection/development for OTEL_NODE_RESOURCE_DETECTORS=none', function () {
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'none';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        node_resource_detectors: ['none'],
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should not set detection/development for JS-only detectors (env, os)', function () {
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,os';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        node_resource_detectors: ['env', 'os'],
       };
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);

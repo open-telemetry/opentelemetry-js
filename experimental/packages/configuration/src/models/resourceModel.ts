@@ -78,7 +78,7 @@ export interface ExperimentalResourceDetection {
    * Resource detector names are dependent on the SDK language ecosystem. Please consult documentation for each respective language.
    * If omitted or null, no resource detectors are enabled.
    */
-  detectors?: ExperimentalResourceDetector;
+  detectors?: ExperimentalResourceDetector[];
 }
 
 export interface ExperimentalResourceDetector {
