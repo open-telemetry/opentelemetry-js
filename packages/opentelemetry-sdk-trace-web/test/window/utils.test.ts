@@ -140,6 +140,17 @@ describe('utils', function () {
       assert.strictEqual(textNode, getElementByXpath(element));
     });
 
+    it('should return optimised path for child of element with id when optimised = true', function () {
+      const element = getElementXPath(
+        $fixture.find('#btn22')[0].parentNode.children[0],
+        true
+      );
+      assert.ok(
+        element.indexOf('@id') > 0,
+        'expected optimised xpath to use @id shortcut for ancestor'
+      );
+    });
+
     it('should return correct path when element is comment node', function () {
       const comment = $fixture.find('#comment')[0];
       const node = document.createComment('foobar');
