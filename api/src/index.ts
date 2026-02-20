@@ -30,7 +30,7 @@ export type { Attributes, AttributeValue } from './common/Attributes';
 
 // Context APIs
 export { createContextKey, ROOT_CONTEXT } from './context/context';
-export type { Context, ContextManager } from './context/types';
+export type { Context, ContextManager, Token } from './context/types';
 export type { ContextAPI } from './api/context';
 
 // Diag APIs

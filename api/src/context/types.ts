@@ -44,6 +44,14 @@ export interface Context {
 }
 
 /**
+ * An opaque token returned by attach() that can be used to restore the previous Context.
+ * This is an opaque type to prevent misuse and ensure type safety.
+ *
+ * @since 1.10.0
+ */
+export type Token = { readonly __brand: 'Token' };
+
+/**
  * @since 1.0.0
  */
 export interface ContextManager {
@@ -82,4 +90,24 @@ export interface ContextManager {
    * Disable context management
    */
   disable(): this;
+
+  /**
+   * Associates a Context with the caller's current execution unit.
+   * This is an optional global operation that allows context to be set
+   * imperatively rather than using with().
+   *
+   * @param context The Context to attach
+   * @returns A Token that can be used to restore the previous Context
+   * @since 1.10.0
+   */
+  attach?(context: Context): Token;
+
+  /**
+   * Restores the Context associated with the caller's current execution unit
+   * to the value it had before the corresponding attach() call.
+   *
+   * @param token A Token returned by a previous call to attach()
+   * @since 1.10.0
+   */
+  detach?(token: Token): void;
 }
