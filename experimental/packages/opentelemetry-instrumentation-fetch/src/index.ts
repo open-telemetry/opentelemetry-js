@@ -15,8 +15,9 @@
  */
 
 export { FetchInstrumentation } from './fetch';
+export { createFetchInstrumentation } from './fetch-delegate';
 export type {
   FetchCustomAttributeFunction,
   FetchRequestHookFunction,
   FetchInstrumentationConfig,
-} from './fetch';
+} from './types';

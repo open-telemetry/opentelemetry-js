@@ -15,4 +15,5 @@
  */
 
 export { InstrumentationBase } from './instrumentation';
+export { createInstrumentation } from './create-instrumentation';
 export { normalize } from './noop-normalize';
