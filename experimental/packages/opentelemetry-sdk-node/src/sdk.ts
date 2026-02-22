@@ -326,32 +326,6 @@ export class NodeSDK {
             })
           );
 
-    const spanProcessors = this._tracerProviderConfig
-      ? this._tracerProviderConfig.spanProcessors
-      : getSpanProcessorsFromEnv();
-
-    // Only register if there is a span processor
-    if (spanProcessors.length > 0) {
-      this._tracerProvider = new NodeTracerProvider({
-        ...this._configuration,
-        resource: this._resource,
-        spanProcessors,
-      });
-      trace.setGlobalTracerProvider(this._tracerProvider);
-    }
-
-    if (this._loggerProviderConfig) {
-      const loggerProvider = new LoggerProvider({
-        ...getLoggerProviderConfigFromEnv(),
-        resource: this._resource,
-        processors: this._loggerProviderConfig.logRecordProcessors,
-      });
-
-      this._loggerProvider = loggerProvider;
-
-      logs.setGlobalLoggerProvider(loggerProvider);
-    }
-
     if (
       this._meterProviderConfig?.readers &&
       // only register if there is a reader, otherwise we waste compute/memory.
@@ -372,6 +346,38 @@ export class NodeSDK {
       for (const instrumentation of this._instrumentations) {
         instrumentation.setMeterProvider(metrics.getMeterProvider());
       }
+    }
+
+    const spanProcessors = this._tracerProviderConfig
+      ? this._tracerProviderConfig.spanProcessors
+      : getSpanProcessorsFromEnv();
+
+    // Only register if there is a span processor
+    if (spanProcessors.length > 0) {
+      // While SDK metrics are unstable, we require an opt-in.
+      // https://opentelemetry.io/docs/specs/semconv/otel/sdk-metrics/
+      const sdkMetricsEnabled = getBooleanFromEnv(
+        'OTEL_NODE_EXPERIMENTAL_SDK_METRICS'
+      );
+      this._tracerProvider = new NodeTracerProvider({
+        ...this._configuration,
+        resource: this._resource,
+        meterProvider: sdkMetricsEnabled ? this._meterProvider : undefined,
+        spanProcessors,
+      });
+      trace.setGlobalTracerProvider(this._tracerProvider);
+    }
+
+    if (this._loggerProviderConfig) {
+      const loggerProvider = new LoggerProvider({
+        ...getLoggerProviderConfigFromEnv(),
+        resource: this._resource,
+        processors: this._loggerProviderConfig.logRecordProcessors,
+      });
+
+      this._loggerProvider = loggerProvider;
+
+      logs.setGlobalLoggerProvider(loggerProvider);
     }
   }
 

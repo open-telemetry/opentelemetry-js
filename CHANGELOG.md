@@ -12,7 +12,14 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* fix(resources): update `OTEL_RESOURCE_ATTRIBUTES` parsing to match spec changes (open-telemetry/opentelemetry-specification#4856) [#6261](https://github.com/open-telemetry/opentelemetry-js/pull/6261) @jacksonweber
+  * **Important:** This fix is included in the "breaking changes" section because it can be breaking for some edge case usage of `OTEL_RESOURCE_ATTRIBUTES`:
+    * `export OTEL_RESOURCE_ATTRIBUTES=foo=bar,spam` will now be fully ignored, because the `spam` entry is invalid (missing `=`). Per spec, any parsing error results in ignoring the entire environment variable.
+    * `export OTEL_RESOURCE_ATTRIBUTES='wat=" spaces  "'` will now result in `{"wat": "\" spaces  \""}` *with* the double-quotes included in the value. Before this change the implementation included brittle double-quoting to allow leading and trailing whitespace in the value. To support leading or trailing whitespace now, you must percent-encode the whitespace. Internal whitespace still works without encoding, e.g. `export OTEL_RESOURCE_ATTRIBUTES='green=eggs and ham'`.
+
 ### :rocket: Features
+
+* feat(sdk-trace): implement span start/end metrics  [#1851](https://github.com/open-telemetry/opentelemetry-js/pull/6213) @anuraaga
 
 ### :bug: Bug Fixes
 
