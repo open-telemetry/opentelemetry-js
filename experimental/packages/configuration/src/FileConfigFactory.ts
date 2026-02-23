@@ -261,18 +261,20 @@ function parseDetectionDevelopment(
   }
 
   if (Array.isArray(detection['detectors'])) {
-    result.detectors = detection['detectors']
+    result.detectors = [];
+    for (let i = 0; i < detection['detectors'].length; i++) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .filter((d: any) => typeof d === 'object' && d !== null)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .map((d: any) => {
-        const detector: ExperimentalResourceDetector = {};
-        if ('container' in d) detector.container = d.container ?? {};
-        if ('host' in d) detector.host = d.host ?? {};
-        if ('process' in d) detector.process = d.process ?? {};
-        if ('service' in d) detector.service = d.service ?? {};
-        return detector;
-      });
+      const d: any = detection['detectors'][i];
+      if (typeof d !== 'object' || d === null) {
+        continue;
+      }
+      const detector: ExperimentalResourceDetector = {};
+      if ('container' in d) detector.container = d.container ?? {};
+      if ('host' in d) detector.host = d.host ?? {};
+      if ('process' in d) detector.process = d.process ?? {};
+      if ('service' in d) detector.service = d.service ?? {};
+      result.detectors.push(detector);
+    }
   }
 
   return result;
