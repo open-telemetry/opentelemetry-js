@@ -478,9 +478,42 @@ describe('Logger', () => {
   });
 
   describe('enabled', () => {
-    it('should return true', () => {
-      const { logger } = setup();
-      assert.ok(logger.enabled());
+    describe('with default configuration', () => {
+      it('should return "true" when called with no options', () => {
+        const { logger } = setup();
+        assert.ok(logger.enabled());
+      });
+      it('should return "true" when called with a severity number', () => {
+        const { logger } = setup();
+        assert.ok(logger.enabled({ severityNumber: SeverityNumber.WARN }));
+      });
+    });
+    describe('with custom configuration', () => {
+      const logProcessor = new NoopLogRecordProcessor();
+      const loggerProvider = new LoggerProvider({
+        processors: [logProcessor],
+        loggerConfigurator: createLoggerConfigurator([
+          {
+            pattern: 'disabled-logger',
+            config: { disabled: true },
+          },
+          {
+            pattern: 'warn-logger',
+            config: { minimumSeverity: SeverityNumber.WARN },
+          },
+        ]),
+      });
+
+      it('should return "false" if the logger is configured to be disabled', () => {
+        const logger = loggerProvider.getLogger('disabled-logger');
+        assert.ok(!logger.enabled());
+      });
+      it('should return "true" when if severity is greater or equal than the configured', () => {
+        const logger = loggerProvider.getLogger('warn-logger');
+        assert.ok(!logger.enabled({ severityNumber: SeverityNumber.INFO }));
+        assert.ok(logger.enabled({ severityNumber: SeverityNumber.WARN }));
+        assert.ok(logger.enabled({ severityNumber: SeverityNumber.ERROR }));
+      });
     });
   });
 });

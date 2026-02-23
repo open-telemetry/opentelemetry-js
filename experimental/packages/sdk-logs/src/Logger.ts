@@ -110,11 +110,20 @@ export class Logger implements logsAPI.Logger {
     logRecordInstance._makeReadonly();
   }
 
-  public enabled(_options?: {
+  public enabled(options?: {
     context?: Context;
     severityNumber?: SeverityNumber;
     eventName?: string;
   }): boolean {
-    return true;
+    if (this._loggerConfig.disabled) {
+      return false;
+    }
+
+    // If severity is not provided or NaN we treat it as UNSPECIFIED
+    let severityNumber = options?.severityNumber;
+    if (typeof severityNumber !== 'number' || isNaN(severityNumber)) {
+      severityNumber = SeverityNumber.UNSPECIFIED;
+    }
+    return severityNumber >= this._loggerConfig.minimumSeverity;
   }
 }
