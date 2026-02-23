@@ -32,18 +32,18 @@ class ComposableTraceIDRatioBasedSampler implements ComposableSampler {
     const thresholdStr =
       threshold === MAX_THRESHOLD ? 'max' : serializeTh(threshold);
     if (threshold !== MAX_THRESHOLD) {
-      this.intent = {
+      this.intent = Object.freeze({
         threshold: threshold,
         thresholdReliable: true,
-      };
+      });
     } else {
       // Same as AlwaysOff, notably the threshold is not considered reliable. The spec mentions
       // returning an instance of ComposableAlwaysOffSampler in this case but it seems clearer
       // if the description of the sampler matches the user's request.
-      this.intent = {
+      this.intent = Object.freeze({
         threshold: INVALID_THRESHOLD,
         thresholdReliable: false,
-      };
+      });
     }
     this.description = `ComposableTraceIDRatioBasedSampler(threshold=${thresholdStr}, ratio=${ratio})`;
   }

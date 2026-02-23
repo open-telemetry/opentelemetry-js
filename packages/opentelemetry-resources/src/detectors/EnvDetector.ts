@@ -34,16 +34,6 @@ class EnvDetector implements ResourceDetector {
   // OTEL_RESOURCE_ATTRIBUTES contains key value pair separated by '='.
   private readonly _LABEL_KEY_VALUE_SPLITTER = '=';
 
-  private readonly _ERROR_MESSAGE_INVALID_CHARS =
-    'should be a ASCII string with a length greater than 0 and not exceed ' +
-    this._MAX_LENGTH +
-    ' characters.';
-
-  private readonly _ERROR_MESSAGE_INVALID_VALUE =
-    'should be a ASCII string with a length not exceed ' +
-    this._MAX_LENGTH +
-    ' characters.';
-
   /**
    * Returns a {@link Resource} populated with attributes from the
    * OTEL_RESOURCE_ATTRIBUTES environment variable. Note this is an async
@@ -62,7 +52,7 @@ class EnvDetector implements ResourceDetector {
         const parsedAttributes = this._parseResourceAttributes(rawAttributes);
         Object.assign(attributes, parsedAttributes);
       } catch (e) {
-        diag.debug(`EnvDetector failed: ${e.message}`);
+        diag.debug(`EnvDetector failed: ${e instanceof Error ? e.message : e}`);
       }
     }
 
@@ -77,78 +67,77 @@ class EnvDetector implements ResourceDetector {
    * Creates an attribute map from the OTEL_RESOURCE_ATTRIBUTES environment
    * variable.
    *
-   * OTEL_RESOURCE_ATTRIBUTES: A comma-separated list of attributes describing
-   * the source in more detail, e.g. “key1=val1,key2=val2”. Domain names and
-   * paths are accepted as attribute keys. Values may be quoted or unquoted in
-   * general. If a value contains whitespace, =, or " characters, it must
-   * always be quoted.
+   * OTEL_RESOURCE_ATTRIBUTES: A comma-separated list of attributes in the
+   * format "key1=value1,key2=value2". The ',' and '=' characters in keys
+   * and values MUST be percent-encoded. Other characters MAY be percent-encoded.
+   *
+   * Per the spec, on any error (e.g., decoding failure), the entire environment
+   * variable value is discarded.
    *
    * @param rawEnvAttributes The resource attributes as a comma-separated list
    * of key/value pairs.
-   * @returns The sanitized resource attributes.
+   * @returns The parsed resource attributes.
+   * @throws Error if parsing fails (caller handles by discarding all attributes)
    */
   private _parseResourceAttributes(rawEnvAttributes?: string): Attributes {
     if (!rawEnvAttributes) return {};
 
     const attributes: Attributes = {};
     const rawAttributes: string[] = rawEnvAttributes.split(
-      this._COMMA_SEPARATOR,
-      -1
+      this._COMMA_SEPARATOR
     );
+
     for (const rawAttribute of rawAttributes) {
       const keyValuePair: string[] = rawAttribute.split(
-        this._LABEL_KEY_VALUE_SPLITTER,
-        -1
+        this._LABEL_KEY_VALUE_SPLITTER
       );
+
+      // Per spec: ',' and '=' MUST be percent-encoded in keys and values.
+      // If we get != 2 parts, there's an unencoded '=' which is an error.
       if (keyValuePair.length !== 2) {
-        continue;
+        throw new Error(
+          `Invalid format for OTEL_RESOURCE_ATTRIBUTES: "${rawAttribute}". ` +
+            `Expected format: key=value. The ',' and '=' characters must be percent-encoded in keys and values.`
+        );
       }
-      let [key, value] = keyValuePair;
-      // Leading and trailing whitespaces are trimmed.
-      key = key.trim();
-      value = value.trim().split(/^"|"$/).join('');
-      if (!this._isValidAndNotEmpty(key)) {
-        throw new Error(`Attribute key ${this._ERROR_MESSAGE_INVALID_CHARS}`);
+
+      const [rawKey, rawValue] = keyValuePair;
+      const key = rawKey.trim();
+      const value = rawValue.trim();
+
+      if (key.length === 0) {
+        throw new Error(
+          `Invalid OTEL_RESOURCE_ATTRIBUTES: empty attribute key in "${rawAttribute}".`
+        );
       }
-      if (!this._isValid(value)) {
-        throw new Error(`Attribute value ${this._ERROR_MESSAGE_INVALID_VALUE}`);
+
+      let decodedKey: string;
+      let decodedValue: string;
+      try {
+        decodedKey = decodeURIComponent(key);
+        decodedValue = decodeURIComponent(value);
+      } catch (e) {
+        throw new Error(
+          `Failed to percent-decode OTEL_RESOURCE_ATTRIBUTES entry "${rawAttribute}": ${e instanceof Error ? e.message : e}`
+        );
       }
-      attributes[key] = decodeURIComponent(value);
+
+      if (decodedKey.length > this._MAX_LENGTH) {
+        throw new Error(
+          `Attribute key exceeds the maximum length of ${this._MAX_LENGTH} characters: "${decodedKey}".`
+        );
+      }
+
+      if (decodedValue.length > this._MAX_LENGTH) {
+        throw new Error(
+          `Attribute value exceeds the maximum length of ${this._MAX_LENGTH} characters for key "${decodedKey}".`
+        );
+      }
+
+      attributes[decodedKey] = decodedValue;
     }
+
     return attributes;
-  }
-
-  /**
-   * Determines whether the given String is a valid printable ASCII string with
-   * a length not exceed _MAX_LENGTH characters.
-   *
-   * @param str The String to be validated.
-   * @returns Whether the String is valid.
-   */
-  private _isValid(name: string): boolean {
-    return name.length <= this._MAX_LENGTH && this._isBaggageOctetString(name);
-  }
-
-  // https://www.w3.org/TR/baggage/#definition
-  private _isBaggageOctetString(str: string): boolean {
-    for (let i = 0; i < str.length; i++) {
-      const ch = str.charCodeAt(i);
-      if (ch < 0x21 || ch === 0x2c || ch === 0x3b || ch === 0x5c || ch > 0x7e) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
-   * Determines whether the given String is a valid printable ASCII string with
-   * a length greater than 0 and not exceed _MAX_LENGTH characters.
-   *
-   * @param str The String to be validated.
-   * @returns Whether the String is valid and not empty.
-   */
-  private _isValidAndNotEmpty(str: string): boolean {
-    return str.length > 0 && this._isValid(str);
   }
 }
 

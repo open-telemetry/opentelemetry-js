@@ -221,38 +221,29 @@ describe('API', function () {
   describe('Global diag', function () {
     it('initialization', function () {
       const inst = DiagAPI.instance();
-
       assert.deepStrictEqual(diag, inst);
     });
 
     diagLoggerFunctions.forEach(fName => {
       it(`no argument logger ${fName} message doesn't throw`, function () {
-        //@ts-expect-error an undefined logger is not allowed
+        // @ts-expect-error an undefined logger is not allowed
         diag.setLogger();
-        assert.doesNotThrow(() => {
-          diag[fName](`${fName} message`);
-        });
+        diag[fName](`${fName} message`);
       });
 
       it(`null logger ${fName} message doesn't throw`, function () {
         diag.setLogger(null as any);
-        assert.doesNotThrow(() => {
-          diag[fName](`${fName} message`);
-        });
+        diag[fName](`${fName} message`);
       });
 
       it(`undefined logger ${fName} message doesn't throw`, function () {
         diag.setLogger(undefined as any);
-        assert.doesNotThrow(() => {
-          diag[fName](`${fName} message`);
-        });
+        diag[fName](`${fName} message`);
       });
 
       it(`empty logger ${fName} message doesn't throw`, function () {
         diag.setLogger({} as any);
-        assert.doesNotThrow(() => {
-          diag[fName](`${fName} message`);
-        });
+        diag[fName](`${fName} message`);
       });
     });
   });

@@ -18,7 +18,7 @@ jobs:
           - "22"
     runs-on: oracle-bare-metal-64cpu-512gb-x86-64
     container:
-      image: ubuntu:24.04@sha256:cd1dba651b3080c3686ecf4e3c4220f026b521fb76978881737d24f200828b2b
+      image: ubuntu:24.04@sha256:d1e2e92c075e5ca139d51a140fff46f84315c0fdce203eab2807c7e495eff4f9
     timeout-minutes: 10
     steps:
       # Apt packages:
@@ -28,7 +28,7 @@ jobs:
           apt-get update && apt-get install --fix-missing -y git
 
       - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       # Avoid "detected dubious ownership in repository" error when running
       # `npm run submodule`.

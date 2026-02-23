@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-metrics",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "description": "OpenTelemetry metrics SDK",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -71,15 +71,15 @@
     "sinon": "18.0.1",
     "ts-loader": "9.5.4",
     "typescript": "5.0.4",
-    "webpack": "5.101.3",
+    "webpack": "5.104.1",
     "webpack-cli": "6.0.1"
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.9.0 <1.10.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "2.5.0",
-    "@opentelemetry/resources": "2.5.0"
+    "@opentelemetry/core": "2.5.1",
+    "@opentelemetry/resources": "2.5.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-metrics",
   "sideEffects": false

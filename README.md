@@ -131,9 +131,10 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 | Platform Version    | Supported                                     |
 | ------------------- | --------------------------------------------- |
-| Node.JS `v22`       | :heavy_check_mark:                            |
-| Node.JS `v20`       | :heavy_check_mark:                            |
-| Node.JS `v18`       | :heavy_check_mark:                            |
+| Node.js `v24`       | :heavy_check_mark:                            |
+| Node.js `v22`       | :heavy_check_mark:                            |
+| Node.js `v20`       | :heavy_check_mark:                            |
+| Node.js `v18`       | :heavy_check_mark:                            |
 | Older Node Versions | See [Node Support](#node-support)             |
 | Web Browsers        | See [Browser Support](#browser-support) below |
 

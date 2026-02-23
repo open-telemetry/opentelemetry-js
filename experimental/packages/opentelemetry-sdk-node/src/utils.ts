@@ -34,11 +34,14 @@ import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/expor
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import {
+  DetectedResourceAttributes,
   envDetector,
   hostDetector,
   osDetector,
   processDetector,
+  Resource,
   ResourceDetector,
+  resourceFromAttributes,
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import {
@@ -51,7 +54,14 @@ import {
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import { ConfigurationModel } from '@opentelemetry/configuration';
+import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
+import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
+import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
+import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
+import {
+  ConfigurationModel,
+  LogRecordExporterModel,
+} from '@opentelemetry/configuration';
 import {
   IMetricReader,
   PeriodicExportingMetricReader,
@@ -63,8 +73,11 @@ import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/ex
 import {
   BatchLogRecordProcessor,
   BufferConfig,
+  ConsoleLogRecordExporter,
   LogRecordExporter,
   LoggerProviderConfig,
+  LogRecordProcessor,
+  SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
@@ -72,6 +85,22 @@ const RESOURCE_DETECTOR_HOST = 'host';
 const RESOURCE_DETECTOR_OS = 'os';
 const RESOURCE_DETECTOR_PROCESS = 'process';
 const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
+
+export function getResourceFromConfiguration(
+  config: ConfigurationModel
+): Resource | undefined {
+  if (config.resource && config.resource.attributes) {
+    const attr: DetectedResourceAttributes = {};
+    for (let i = 0; i < config.resource.attributes.length; i++) {
+      const a = config.resource.attributes[i];
+      attr[a.name] = a.value;
+    }
+    return resourceFromAttributes(attr, {
+      schemaUrl: config.resource.schema_url,
+    });
+  }
+  return undefined;
+}
 
 export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   // When updating this list, make sure to also update the section `resourceDetectors` on README.
@@ -101,6 +130,37 @@ export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
       diag.warn(
         `Invalid resource detector "${detector}" specified in the environment variable OTEL_NODE_RESOURCE_DETECTORS`
       );
+    }
+    return resourceDetector || [];
+  });
+}
+
+export function getResourceDetectorsFromConfiguration(
+  config: ConfigurationModel
+): Array<ResourceDetector> {
+  // When updating this list, make sure to also update the section `resourceDetectors` on README.
+  const resourceDetectors = new Map<string, ResourceDetector>([
+    [RESOURCE_DETECTOR_HOST, hostDetector],
+    [RESOURCE_DETECTOR_OS, osDetector],
+    [RESOURCE_DETECTOR_SERVICE_INSTANCE_ID, serviceInstanceIdDetector],
+    [RESOURCE_DETECTOR_PROCESS, processDetector],
+    [RESOURCE_DETECTOR_ENVIRONMENT, envDetector],
+  ]);
+
+  const resourceDetectorsFromConfig = config.node_resource_detectors ?? [];
+
+  if (resourceDetectorsFromConfig.includes('all')) {
+    return [...resourceDetectors.values()].flat();
+  }
+
+  if (resourceDetectorsFromConfig.includes('none')) {
+    return [];
+  }
+
+  return resourceDetectorsFromConfig.flatMap(detector => {
+    const resourceDetector = resourceDetectors.get(detector);
+    if (!resourceDetector) {
+      diag.warn(`Invalid resource detector "${detector}" specified`);
     }
     return resourceDetector || [];
   });
@@ -325,12 +385,6 @@ export function setupContextManager(
   context.setGlobalContextManager(contextManager);
 }
 
-export function setupDefaultContextManager() {
-  const defaultContextManager = new AsyncLocalStorageContextManager();
-  defaultContextManager.enable();
-  context.setGlobalContextManager(defaultContextManager);
-}
-
 export function setupPropagator(
   propagator: TextMapPropagator | null | undefined
 ) {
@@ -475,10 +529,10 @@ export function getBatchLogRecordProcessorConfigFromEnv(): BufferConfig {
   return {
     maxQueueSize: getNonNegativeNumberFromEnv('OTEL_BLRP_MAX_QUEUE_SIZE'),
     scheduledDelayMillis: getNonNegativeNumberFromEnv(
-      'OTEL_BLRP_SCHEDULED_DELAY_MILLIS'
+      'OTEL_BLRP_SCHEDULE_DELAY'
     ),
     exportTimeoutMillis: getNonNegativeNumberFromEnv(
-      'OTEL_BLRP_EXPORT_TIMEOUT_MILLIS'
+      'OTEL_BLRP_EXPORT_TIMEOUT'
     ),
     maxExportBatchSize: getNonNegativeNumberFromEnv(
       'OTEL_BLRP_MAX_EXPORT_BATCH_SIZE'
@@ -493,4 +547,91 @@ export function getBatchLogRecordProcessorFromEnv(
     exporter,
     getBatchLogRecordProcessorConfigFromEnv()
   );
+}
+
+export function getLogRecordExporter(
+  exporter: LogRecordExporterModel
+): LogRecordExporter | undefined {
+  if (exporter.otlp_http) {
+    const encoding = exporter.otlp_http.encoding;
+    if (encoding === 'json') {
+      return new OTLPHttpLogExporter({
+        compression:
+          exporter.otlp_http.compression === 'gzip'
+            ? CompressionAlgorithm.GZIP
+            : CompressionAlgorithm.NONE,
+      });
+    }
+    if (encoding === 'protobuf') {
+      return new OTLPProtoLogExporter({
+        compression:
+          exporter.otlp_http.compression === 'gzip'
+            ? CompressionAlgorithm.GZIP
+            : CompressionAlgorithm.NONE,
+      });
+    }
+    diag.warn(
+      `Unsupported OTLP logs encoding: ${encoding}. Using http/protobuf.`
+    );
+    return new OTLPProtoLogExporter({
+      compression:
+        exporter.otlp_http.compression === 'gzip'
+          ? CompressionAlgorithm.GZIP
+          : CompressionAlgorithm.NONE,
+    });
+  } else if (exporter.otlp_grpc) {
+    return new OTLPGrpcLogExporter({
+      compression:
+        exporter.otlp_grpc.compression === 'gzip'
+          ? CompressionAlgorithm.GZIP
+          : CompressionAlgorithm.NONE,
+    });
+  } else if (exporter.console) {
+    return new ConsoleLogRecordExporter();
+  }
+  diag.warn(`Unsupported Exporter value. No Log Record Exporter registered`);
+  return undefined;
+}
+
+export function getLogRecordProcessorsFromConfiguration(
+  config: ConfigurationModel
+): LogRecordProcessor[] | undefined {
+  const logRecordProcessors: LogRecordProcessor[] = [];
+  config.logger_provider?.processors?.forEach(processor => {
+    if (processor.batch) {
+      const exporter = getLogRecordExporter(processor.batch.exporter);
+      if (exporter) {
+        logRecordProcessors.push(
+          new BatchLogRecordProcessor(exporter, {
+            maxQueueSize: processor.batch.max_queue_size,
+            maxExportBatchSize: processor.batch.max_export_batch_size,
+            scheduledDelayMillis: processor.batch.schedule_delay,
+            exportTimeoutMillis: processor.batch.export_timeout,
+          })
+        );
+      }
+    }
+    if (processor.simple) {
+      const exporter = getLogRecordExporter(processor.simple.exporter);
+      if (exporter) {
+        logRecordProcessors.push(new SimpleLogRecordProcessor(exporter));
+      }
+    }
+  });
+  if (logRecordProcessors.length > 0) {
+    return logRecordProcessors;
+  }
+  return undefined;
+}
+
+export function getInstanceID(config: ConfigurationModel): string | undefined {
+  if (config.resource?.attributes) {
+    for (let i = 0; i < config.resource.attributes.length; i++) {
+      const element = config.resource.attributes[i];
+      if (element.name === 'service.instance.id') {
+        return element.value?.toString();
+      }
+    }
+  }
+  return undefined;
 }

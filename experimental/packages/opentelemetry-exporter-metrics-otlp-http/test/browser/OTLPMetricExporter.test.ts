@@ -40,70 +40,30 @@ describe('OTLPMetricExporter', function () {
   });
 
   describe('export', function () {
-    describe('when sendBeacon is available', function () {
-      it('should successfully send data using sendBeacon', async function () {
-        // arrange
-        const stubBeacon = sinon.stub(navigator, 'sendBeacon');
-        const meterProvider = new MeterProvider({
-          readers: [
-            new PeriodicExportingMetricReader({
-              exporter: new OTLPMetricExporter(),
-            }),
-          ],
-        });
-
-        // act
-        meterProvider
-          .getMeter('test-meter')
-          .createCounter('test-counter')
-          .add(1);
-        await meterProvider.shutdown();
-
-        // assert
-        const args = stubBeacon.args[0];
-        const blob: Blob = args[1] as unknown as Blob;
-        const body = await blob.text();
-        assert.doesNotThrow(
-          () => JSON.parse(body),
-          'expected requestBody to be in JSON format, but parsing failed'
-        );
-      });
-    });
-
-    describe('when sendBeacon is not available', function () {
-      beforeEach(function () {
-        // fake sendBeacon not being available
-        (window.navigator as any).sendBeacon = false;
+    it('should successfully send data using fetch', async function () {
+      // arrange
+      const stubFetch = sinon
+        .stub(window, 'fetch')
+        .resolves(new Response('', { status: 200 }));
+      const meterProvider = new MeterProvider({
+        readers: [
+          new PeriodicExportingMetricReader({
+            exporter: new OTLPMetricExporter(),
+          }),
+        ],
       });
 
-      it('should successfully send data using fetch', async function () {
-        // arrange
-        const stubFetch = sinon
-          .stub(window, 'fetch')
-          .resolves(new Response('', { status: 200 }));
-        const meterProvider = new MeterProvider({
-          readers: [
-            new PeriodicExportingMetricReader({
-              exporter: new OTLPMetricExporter(),
-            }),
-          ],
-        });
+      // act
+      meterProvider.getMeter('test-meter').createCounter('test-counter').add(1);
+      await meterProvider.shutdown();
 
-        // act
-        meterProvider
-          .getMeter('test-meter')
-          .createCounter('test-counter')
-          .add(1);
-        await meterProvider.shutdown();
-
-        // assert
-        const request = new Request(...stubFetch.args[0]);
-        const body = await request.text();
-        assert.doesNotThrow(
-          () => JSON.parse(body),
-          'expected request body to be in JSON format, but parsing failed'
-        );
-      });
+      // assert
+      const request = new Request(...stubFetch.args[0]);
+      const body = await request.text();
+      assert.doesNotThrow(
+        () => JSON.parse(body),
+        'expected request body to be in JSON format, but parsing failed'
+      );
     });
   });
 
