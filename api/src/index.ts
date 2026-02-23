@@ -54,21 +54,21 @@ export type {
   Gauge,
   Histogram,
   MetricOptions,
+  UpDownCounter,
+  MetricAdvice,
+  MetricAttributes,
+  MetricAttributeValue,
+} from './metrics/Metric';
+export type {
   Observable,
   ObservableCounter,
   ObservableGauge,
   ObservableUpDownCounter,
-  UpDownCounter,
   BatchObservableCallback,
-  MetricAdvice,
-  MetricAttributes,
-  MetricAttributeValue,
   ObservableCallback,
-} from './metrics/Metric';
-export type {
   BatchObservableResult,
   ObservableResult,
-} from './metrics/ObservableResult';
+} from './metrics/Metric';
 export type { MetricsAPI } from './api/metrics';
 
 // Propagation APIs
