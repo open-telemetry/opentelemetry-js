@@ -59,7 +59,7 @@
     "@opentelemetry/context-zone": "2.5.1",
     "@opentelemetry/resources": "2.5.1",
     "@opentelemetry/semantic-conventions": "^1.29.0",
-    "@types/jquery": "3.5.33",
+    "@types/jquery": "3.5.34",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
