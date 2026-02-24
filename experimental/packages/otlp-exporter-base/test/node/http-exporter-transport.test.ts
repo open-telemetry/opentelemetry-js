@@ -260,6 +260,98 @@ describe('HttpExporterTransport', function () {
       assert.strictEqual(result.error?.message, 'socket hang up');
     });
 
+    it('returns failure when socket is destroyed after headers with non-retryable error code are received', async function () {
+      // arrange
+      server = http.createServer((_, res) => {
+        // Force flush http response headers to trigger client response callback
+        res.writeHead(403);
+        res.write('');
+        // Destroy the socket to simulate something going wrong
+        queueMicrotask(() => {
+          res.socket?.destroy();
+        });
+      });
+      server.listen(8080);
+
+      const transport = createHttpExporterTransport({
+        url: 'http://localhost:8080',
+        headers: async () => ({}),
+        compression: 'none',
+        agentFactory: () => new http.Agent(),
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 1000);
+
+      // assert
+      assert.strictEqual(result.status, 'failure');
+      assert.strictEqual(
+        (result.error as NodeJS.ErrnoException).code,
+        'ECONNRESET'
+      );
+      assert.strictEqual(result.error?.message, 'aborted');
+    });
+
+    it('returns failure when socket is destroyed after headers with retryable code are received', async function () {
+      // arrange
+      server = http.createServer((_, res) => {
+        // Force flush http response headers to trigger client response callback
+        res.writeHead(429, 'Too many requests', { 'retry-after': '1' });
+        res.write('');
+        // Destroy the socket to simulate something going wrong
+        queueMicrotask(() => {
+          res.socket?.destroy();
+        });
+      });
+      server.listen(8080);
+
+      const transport = createHttpExporterTransport({
+        url: 'http://localhost:8080',
+        headers: async () => ({}),
+        compression: 'none',
+        agentFactory: () => new http.Agent(),
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 1000);
+
+      // assert
+      assert.strictEqual(result.status, 'retryable');
+      assert.strictEqual(
+        (result.error as NodeJS.ErrnoException).code,
+        'ECONNRESET'
+      );
+      assert.strictEqual(result.retryInMillis, 1000);
+      assert.strictEqual(result.error?.message, 'aborted');
+    });
+
+    it('returns success when socket is destroyed after headers with success code are received', async function () {
+      // arrange
+      server = http.createServer((_, res) => {
+        // Force flush http response headers to trigger client response callback
+        res.writeHead(200);
+        res.write('');
+        // Destroy the socket to simulate connection reset after headers
+        queueMicrotask(() => {
+          res.socket?.destroy();
+        });
+      });
+      server.listen(8080);
+
+      const transport = createHttpExporterTransport({
+        url: 'http://localhost:8080',
+        headers: async () => ({}),
+        compression: 'none',
+        agentFactory: () => new http.Agent(),
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 1000);
+
+      // assert
+      assert.strictEqual(result.status, 'success');
+    });
+
     it('returns retryable on connection refused (ECONNREFUSED)', async function () {
       // arrange
       server = http.createServer();

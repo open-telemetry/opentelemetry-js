@@ -14,12 +14,14 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
-fix(api): prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
+* fix(api): prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
+* fix(api): update diag `consoleLogger` to use original console methods to prevent infinite loop when a console instrumentation is present [#6395](https://github.com/open-telemetry/opentelemetry-js/pull/6395)
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
 
+* refactor(api): refactor to avoid circular deps by merging observable types into `Metric.ts` [#6441](https://github.com/open-telemetry/opentelemetry-js/pull/6441) @pichlermarc
 * refactor(api): remove "export *" in favor of explicit named exports [#4880](https://github.com/open-telemetry/opentelemetry-js/pull/4880) @robbkidd
 * chore: enable tsconfig isolatedModules [#5697](https://github.com/open-telemetry/opentelemetry-js/pull/5697) @legendecas
 * chore: disallow constructor parameter property syntax [#6187](https://github.com/open-telemetry/opentelemetry-js/pull/6187) @legendecas
