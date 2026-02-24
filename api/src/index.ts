@@ -58,8 +58,6 @@ export type {
   MetricAdvice,
   MetricAttributes,
   MetricAttributeValue,
-} from './metrics/Metric';
-export type {
   Observable,
   ObservableCounter,
   ObservableGauge,
