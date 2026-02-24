@@ -60,6 +60,7 @@ const fixture = `
     <div></div>
   </div>
   <div></div>
+  <div id="body-id"><div></div></div>
 </div>
 `;
 
@@ -90,6 +91,13 @@ describe('utils', function () {
         $fixture.find('#btn22')[0],
         getElementByXpath(element)
       );
+    });
+
+    it('should use ancestor id when optimised recursively', function () {
+      const inner = $fixture.find('#body-id div')[0];
+      const element = getElementXPath(inner, true);
+      assert.strictEqual(element, '//*[@id="body-id"]/div');
+      assert.strictEqual(inner, getElementByXpath(element));
     });
 
     it(
