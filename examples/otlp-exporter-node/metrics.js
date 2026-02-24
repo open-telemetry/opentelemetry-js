@@ -5,11 +5,12 @@ const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-htt
 // const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-grpc');
 // const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-proto');
 // const { ConsoleMetricExporter } = require('@opentelemetry/sdk-metrics');
+const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 const {
   MeterProvider,
   PeriodicExportingMetricReader,
   View,
-  AggregationType,
+  AggregationType, ConsoleMetricExporter,
 } = require('@opentelemetry/sdk-metrics');
 const { resourceFromAttributes } = require('@opentelemetry/resources');
 const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
@@ -17,10 +18,15 @@ const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 // Optional and only needed to see the internal diagnostic logging (during development)
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 
-const metricExporter = new OTLPMetricExporter({
+const otlpExporter = new OTLPMetricExporter({
   // headers: {
   //   foo: 'bar'
   // },
+});
+
+const { endpoint, port } = PrometheusExporter.DEFAULT_OPTIONS;
+const prometheusExporter = new PrometheusExporter({}, () => {
+  console.log(`prometheus scrape endpoint: http://localhost:${port}${endpoint}`);
 });
 
 // Create an instance of the metric provider
@@ -37,10 +43,11 @@ const meterProvider = new MeterProvider({
   }],
   readers: [
     new PeriodicExportingMetricReader({
-      exporter: metricExporter,
+      exporter: new ConsoleMetricExporter(),
       // exporter: new ConsoleMetricExporter(),
-      exportIntervalMillis: 1000,
+      exportIntervalMillis: 10,
     }),
+    prometheusExporter,
   ],
 });
 
@@ -69,4 +76,4 @@ setInterval(() => {
   upDownCounter.add(Math.random() > 0.5 ? 1 : -1, attributes);
   histogram.record(Math.random(), attributes);
   exponentialHistogram.record(Math.random(), attributes);
-}, 1000);
+}, 2);

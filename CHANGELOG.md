@@ -23,6 +23,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(sdk-metrics): fix memory leak in `TemporalMetricProcessor` where unreported accumulations grew unboundedly for slow or absent collectors
+
 ### :books: Documentation
 
 ### :house: Internal

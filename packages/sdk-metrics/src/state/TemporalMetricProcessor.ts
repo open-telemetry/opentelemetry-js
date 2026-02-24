@@ -55,7 +55,7 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
   private _aggregator: Aggregator<T>;
   private _unreportedAccumulations = new Map<
     MetricCollectorHandle,
-    AttributeHashMap<T>[]
+    AttributeHashMap<T>
   >();
   private _reportHistory = new Map<
     MetricCollectorHandle,
@@ -68,14 +68,13 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
   ) {
     this._aggregator = aggregator;
     collectorHandles.forEach(handle => {
-      this._unreportedAccumulations.set(handle, []);
+      this._unreportedAccumulations.set(handle, new AttributeHashMap<T>());
     });
   }
 
   /**
    * Builds the {@link MetricData} streams to report against a specific MetricCollector.
    * @param collector The information of the MetricCollector.
-   * @param collectors The registered collectors.
    * @param instrumentDescriptor The instrumentation descriptor that these metrics generated with.
    * @param currentAccumulations The current accumulation of metric data from instruments.
    * @param collectionTime The current collection timestamp.
@@ -89,7 +88,7 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
   ): Maybe<MetricData> {
     this._stashAccumulations(currentAccumulations);
     const unreportedAccumulations =
-      this._getMergedUnreportedAccumulations(collector);
+      this._getAndResetUnreportedAccumulations(collector);
 
     let result = unreportedAccumulations;
     let aggregationTemporality: AggregationTemporality;
@@ -159,25 +158,26 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
   private _stashAccumulations(currentAccumulation: AttributeHashMap<T>) {
     const registeredCollectors = this._unreportedAccumulations.keys();
     for (const collector of registeredCollectors) {
-      let stash = this._unreportedAccumulations.get(collector);
-      if (stash === undefined) {
-        stash = [];
-        this._unreportedAccumulations.set(collector, stash);
-      }
-      stash.push(currentAccumulation);
+      const stash =
+        this._unreportedAccumulations.get(collector) ??
+        new AttributeHashMap<T>();
+      this._unreportedAccumulations.set(
+        collector,
+        TemporalMetricProcessor.merge(
+          stash,
+          currentAccumulation,
+          this._aggregator
+        )
+      );
     }
   }
 
-  private _getMergedUnreportedAccumulations(collector: MetricCollectorHandle) {
-    let result = new AttributeHashMap<T>();
-    const unreportedList = this._unreportedAccumulations.get(collector);
-    this._unreportedAccumulations.set(collector, []);
-    if (unreportedList === undefined) {
-      return result;
-    }
-    for (const it of unreportedList) {
-      result = TemporalMetricProcessor.merge(result, it, this._aggregator);
-    }
+  private _getAndResetUnreportedAccumulations(
+    collector: MetricCollectorHandle
+  ) {
+    const result =
+      this._unreportedAccumulations.get(collector) ?? new AttributeHashMap<T>();
+    this._unreportedAccumulations.set(collector, new AttributeHashMap<T>());
     return result;
   }
 
