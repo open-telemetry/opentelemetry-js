@@ -106,6 +106,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(opentelemetry-sdk-node): set instrumentation and propagators for experimental start [#6148](https://github.com/open-telemetry/opentelemetry-js/pull/6148) @maryliag
 * refactor(configuration): set console exporter as empty object [#6164](https://github.com/open-telemetry/opentelemetry-js/pull/6164) @maryliag
 * feat(instrumentation-http, instrumentation-fetch, instrumentation-xml-http-request): support "QUERY" as a known HTTP method
+* feat(opentelemetry-instrumentation): add `createInstrumentation` factory function [#6163](https://github.com/open-telemetry/opentelemetry-js/pull/6163) @david-luna
 
 ### :bug: Bug Fixes
 

@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 
-import { TracerProvider, MeterProvider, Span } from '@opentelemetry/api';
-import { LoggerProvider } from '@opentelemetry/api-logs';
+import type {
+  TracerProvider,
+  Tracer,
+  MeterProvider,
+  Span,
+  Meter,
+  DiagLogger,
+} from '@opentelemetry/api';
+import type { Logger, LoggerProvider } from '@opentelemetry/api-logs';
+
+import type { wrap, unwrap, massWrap, massUnwrap } from './shimmer';
 
 /** Interface Instrumentation to apply patch. */
 export interface Instrumentation<
@@ -49,6 +58,41 @@ export interface Instrumentation<
   getConfig(): ConfigType;
 }
 
+export interface InstrumentationDelegate<
+  ConfigType extends InstrumentationConfig = InstrumentationConfig,
+> {
+  /** Instrumentation Name  */
+  readonly name: string;
+
+  /** Instrumentation Version  */
+  readonly version: string;
+
+  /** Method to set instrumentation config  */
+  setConfig(config: ConfigType): void;
+
+  /** Method to get instrumentation config  */
+  getConfig(): ConfigType; // TODO: is it necessary?
+
+  /** method to set the internal logger */
+  setDiag(diag: DiagLogger): void;
+
+  // TODO: should be optional? sometimes a instrumentation does not use a tracer, meter, logger
+  /** method to set the tracer that will be used by the instrumentation */
+  setTracer?: (tracer: Tracer) => void;
+  /** method to set the meter that will be used by the instrumentation (updateInstruments!!!) */
+  setMeter?: (meter: Meter) => void;
+  /** method to set the logger that will be used by the instrumentation */
+  setLogger?: (logger: Logger) => void;
+
+  /** Method to initialize instrumentation config  */
+  /** web instrumentations use it to get the shimmer functions */
+  init: (shimmer: Shimmer) => InstrumentationModuleDefinition[] | undefined;
+  /** Method to enable the instrumentation  */
+  enable?: () => void;
+  /** Method to disable the instrumentation  */
+  disable?: () => void;
+}
+
 /**
  * Base interface for configuration options common to all instrumentations.
  * This interface can be extended by individual instrumentations to include
@@ -73,6 +117,13 @@ export interface ShimWrapped extends Function {
   __unwrap: Function;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   __original: Function;
+}
+
+export interface Shimmer {
+  wrap: typeof wrap;
+  unwrap: typeof unwrap;
+  massWrap: typeof massWrap;
+  massUnwrap: typeof massUnwrap;
 }
 
 export interface InstrumentationModuleFile {
