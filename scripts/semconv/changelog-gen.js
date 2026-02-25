@@ -385,7 +385,7 @@ ${summary.join('\n')}
 function main() {
   const [aVer, bVer] = process.argv.slice(2);
   const s = semconvChangelogGen(aVer, bVer);
-  console.log('The following could be added to the top "Enhancement" section of "semantic-conventions/CHANGELOG.md":');
+  console.log('The following could be added to the top "Features" section of "semantic-conventions/CHANGELOG.md":');
   console.log('\n- - -');
   console.log(s)
   console.log('- - -');

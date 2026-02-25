@@ -9,6 +9,119 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
+* feat: update semantic conventions to v1.40.0 [#NNNN]
+  * Semantic Conventions v1.40.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1400) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *2 added exports*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *11 newly deprecated exports, 56 added exports*
+
+#### Stable changes in v1.40.0
+
+<details open>
+<summary>2 added exports</summary>
+
+```js
+ATTR_SERVICE_INSTANCE_ID // service.instance.id
+ATTR_SERVICE_NAMESPACE   // service.namespace
+```
+
+</details>
+
+#### Unstable changes in v1.40.0
+
+<details>
+<summary>11 newly deprecated exports</summary>
+
+```js
+METRIC_RPC_CLIENT_REQUEST_SIZE     // rpc.client.request.size: Removed, no replacement at this time.
+METRIC_RPC_CLIENT_RESPONSE_SIZE    // rpc.client.response.size: Removed, no replacement at this time.
+METRIC_RPC_SERVER_REQUEST_SIZE     // rpc.server.request.size: Removed, no replacement at this time.
+METRIC_RPC_SERVER_RESPONSE_SIZE    // rpc.server.response.size: Removed, no replacement at this time.
+METRIC_SYSTEM_MEMORY_SHARED        // system.memory.shared: Replaced by `system.memory.linux.shared`.
+EVENT_RPC_MESSAGE                  // rpc.message: Deprecated, no replacement at this time.
+ATTR_ERROR_MESSAGE                 // error.message: Use domain-specific error message attribute. For example, use `feature_flag.error.message` for feature flag errors.
+ATTR_RPC_MESSAGE_COMPRESSED_SIZE   // rpc.message.compressed_size: Deprecated, no replacement at this time.
+ATTR_RPC_MESSAGE_ID                // rpc.message.id: Deprecated, no replacement at this time.
+ATTR_RPC_MESSAGE_TYPE              // rpc.message.type: Deprecated, no replacement at this time.
+ATTR_RPC_MESSAGE_UNCOMPRESSED_SIZE // rpc.message.uncompressed_size: Deprecated, no replacement at this time.
+```
+
+</details>
+
+<details>
+<summary>56 added exports</summary>
+
+```js
+METRIC_JVM_FILE_DESCRIPTOR_LIMIT                 // jvm.file_descriptor.limit
+
+METRIC_K8S_SERVICE_ENDPOINT_COUNT                // k8s.service.endpoint.count
+METRIC_K8S_SERVICE_LOAD_BALANCER_INGRESS_COUNT   // k8s.service.load_balancer.ingress.count
+
+METRIC_SYSTEM_MEMORY_LINUX_SHARED                // system.memory.linux.shared
+
+EVENT_DB_CLIENT_OPERATION_EXCEPTION              // db.client.operation.exception
+EVENT_HTTP_CLIENT_REQUEST_EXCEPTION              // http.client.request.exception
+EVENT_HTTP_SERVER_REQUEST_EXCEPTION              // http.server.request.exception
+EVENT_RPC_CLIENT_CALL_EXCEPTION                  // rpc.client.call.exception
+EVENT_RPC_SERVER_CALL_EXCEPTION                  // rpc.server.call.exception
+
+ATTR_FEATURE_FLAG_ERROR_MESSAGE                  // feature_flag.error.message
+
+ATTR_GCP_GCE_INSTANCE_GROUP_MANAGER_NAME         // gcp.gce.instance_group_manager.name
+ATTR_GCP_GCE_INSTANCE_GROUP_MANAGER_REGION       // gcp.gce.instance_group_manager.region
+ATTR_GCP_GCE_INSTANCE_GROUP_MANAGER_ZONE         // gcp.gce.instance_group_manager.zone
+
+ATTR_GEN_AI_AGENT_VERSION                        // gen_ai.agent.version
+GEN_AI_OPERATION_NAME_VALUE_RETRIEVAL            // "retrieval"
+ATTR_GEN_AI_RETRIEVAL_DOCUMENTS                  // gen_ai.retrieval.documents
+ATTR_GEN_AI_RETRIEVAL_QUERY_TEXT                 // gen_ai.retrieval.query.text
+ATTR_GEN_AI_USAGE_CACHE_CREATION_INPUT_TOKENS    // gen_ai.usage.cache_creation.input_tokens
+ATTR_GEN_AI_USAGE_CACHE_READ_INPUT_TOKENS        // gen_ai.usage.cache_read.input_tokens
+
+ATTR_K8S_SERVICE_ANNOTATION                      // (key) => `k8s.service.annotation.${key}`
+ATTR_K8S_SERVICE_ENDPOINT_ADDRESS_TYPE           // k8s.service.endpoint.address_type
+  K8S_SERVICE_ENDPOINT_ADDRESS_TYPE_VALUE_FQDN     // "FQDN"
+  K8S_SERVICE_ENDPOINT_ADDRESS_TYPE_VALUE_IPV4     // "IPv4"
+  K8S_SERVICE_ENDPOINT_ADDRESS_TYPE_VALUE_IPV6     // "IPv6"
+ATTR_K8S_SERVICE_ENDPOINT_CONDITION              // k8s.service.endpoint.condition
+  K8S_SERVICE_ENDPOINT_CONDITION_VALUE_READY       // "ready"
+  K8S_SERVICE_ENDPOINT_CONDITION_VALUE_SERVING     // "serving"
+  K8S_SERVICE_ENDPOINT_CONDITION_VALUE_TERMINATING // "terminating"
+ATTR_K8S_SERVICE_ENDPOINT_ZONE                   // k8s.service.endpoint.zone
+ATTR_K8S_SERVICE_LABEL                           // (key) => `k8s.service.label.${key}`
+ATTR_K8S_SERVICE_NAME                            // k8s.service.name
+ATTR_K8S_SERVICE_PUBLISH_NOT_READY_ADDRESSES     // k8s.service.publish_not_ready_addresses
+ATTR_K8S_SERVICE_SELECTOR                        // (key) => `k8s.service.selector.${key}`
+ATTR_K8S_SERVICE_TRAFFIC_DISTRIBUTION            // k8s.service.traffic_distribution
+ATTR_K8S_SERVICE_TYPE                            // k8s.service.type
+  K8S_SERVICE_TYPE_VALUE_CLUSTER_IP                // "ClusterIP"
+  K8S_SERVICE_TYPE_VALUE_EXTERNAL_NAME             // "ExternalName"
+  K8S_SERVICE_TYPE_VALUE_LOAD_BALANCER             // "LoadBalancer"
+  K8S_SERVICE_TYPE_VALUE_NODE_PORT                 // "NodePort"
+ATTR_K8S_SERVICE_UID                             // k8s.service.uid
+
+ATTR_OPENAI_API_TYPE                             // openai.api.type
+  OPENAI_API_TYPE_VALUE_CHAT_COMPLETIONS           // "chat_completions"
+  OPENAI_API_TYPE_VALUE_RESPONSES                  // "responses"
+
+ATTR_ORACLE_DB_DOMAIN                            // oracle.db.domain
+ATTR_ORACLE_DB_INSTANCE_NAME                     // oracle.db.instance.name
+ATTR_ORACLE_DB_NAME                              // oracle.db.name
+ATTR_ORACLE_DB_PDB                               // oracle.db.pdb
+ATTR_ORACLE_DB_SERVICE                           // oracle.db.service
+ATTR_ORACLE_CLOUD_REALM                          // oracle_cloud.realm
+
+ATTR_PPROF_SCOPE_DEFAULT_SAMPLE_TYPE             // pprof.scope.default_sample_type
+ATTR_PPROF_SCOPE_SAMPLE_TYPE_ORDER               // pprof.scope.sample_type_order
+
+ATTR_SERVICE_CRITICALITY                         // service.criticality
+  SERVICE_CRITICALITY_VALUE_CRITICAL               // "critical"
+  SERVICE_CRITICALITY_VALUE_HIGH                   // "high"
+  SERVICE_CRITICALITY_VALUE_LOW                    // "low"
+  SERVICE_CRITICALITY_VALUE_MEDIUM                 // "medium"
+```
+
+</details>
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
