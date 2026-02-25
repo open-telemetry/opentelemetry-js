@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import { callWithTimeout } from '@opentelemetry/core';
+import { callWithTimeout, InstrumentationScope } from '@opentelemetry/core';
 import type { Context } from '@opentelemetry/api';
 import type { LogRecordProcessor } from './LogRecordProcessor';
 import type { SdkLogRecord } from './export/SdkLogRecord';
+import { SeverityNumber } from '@opentelemetry/api-logs';
 
 /**
  * Implementation of the {@link LogRecordProcessor} that simply forwards all
@@ -51,5 +52,14 @@ export class MultiLogRecordProcessor implements LogRecordProcessor {
 
   public async shutdown(): Promise<void> {
     await Promise.all(this.processors.map(processor => processor.shutdown()));
+  }
+
+  public enabled(options: {
+    context: Context;
+    instrumentationScope: InstrumentationScope;
+    severityNumber?: SeverityNumber;
+    eventName?: string;
+  }): boolean {
+    return this.processors.some(processor => processor.enabled(options));
   }
 }

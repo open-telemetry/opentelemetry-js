@@ -798,6 +798,7 @@ describe('LogRecord', () => {
         },
         forceFlush: () => Promise.resolve(),
         shutdown: () => Promise.resolve(),
+        enabled: () => true,
       };
       const provider = new LoggerProvider({ processors: [processor] });
       provider.getLogger('default').emit({ body: 'test' });

@@ -115,15 +115,41 @@ export class Logger implements logsAPI.Logger {
     severityNumber?: SeverityNumber;
     eventName?: string;
   }): boolean {
+    // This logger is disabled
     if (this._loggerConfig.disabled) {
       return false;
     }
 
-    // If severity is not provided or NaN we treat it as UNSPECIFIED
-    let severityNumber = options?.severityNumber;
-    if (typeof severityNumber !== 'number' || isNaN(severityNumber)) {
-      severityNumber = SeverityNumber.UNSPECIFIED;
+    // Severity number given and lower than the min configured
+    const severityNumber = options?.severityNumber;
+    if (
+      typeof severityNumber === 'number' &&
+      !isNaN(severityNumber) &&
+      severityNumber < this._loggerConfig.minimumSeverity
+    ) {
+      return false;
     }
-    return severityNumber >= this._loggerConfig.minimumSeverity;
+
+    // Trace based: the context (given or the active) has a unsampled Span
+    if (this._loggerConfig.traceBased) {
+      const span = trace.getSpan(options?.context || context.active());
+      if (span && span.spanContext().traceFlags === TraceFlags.NONE) {
+        return false;
+      }
+    }
+
+    // Lastly check if there is any enabled processor
+    const enabledOpts = {
+      context: options?.context || context.active(),
+      instrumentationScope: this.instrumentationScope,
+      severityNumber: options?.severityNumber,
+      eventName: options?.eventName,
+    };
+    for (const processor of this._sharedState.processors) {
+      if (processor.enabled(enabledOpts)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

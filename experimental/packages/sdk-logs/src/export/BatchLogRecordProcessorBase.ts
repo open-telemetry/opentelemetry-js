@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
+import { Context, diag } from '@opentelemetry/api';
 import {
   ExportResult,
   ExportResultCode,
@@ -22,12 +22,14 @@ import {
   BindOnceFuture,
   internal,
   callWithTimeout,
+  InstrumentationScope,
 } from '@opentelemetry/core';
 
 import type { BufferConfig } from '../types';
 import type { SdkLogRecord } from './SdkLogRecord';
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
+import { SeverityNumber } from '@opentelemetry/api-logs';
 
 export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   implements LogRecordProcessor
@@ -76,6 +78,23 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
 
   public shutdown(): Promise<void> {
     return this._shutdownOnce.call();
+  }
+
+  public enabled(_options: {
+    context: Context;
+    instrumentationScope: InstrumentationScope;
+    severityNumber?: SeverityNumber;
+    eventName?: string;
+  }): boolean {
+    // XXX: what we should interpret from https://github.com/open-telemetry/opentelemetry-specification/blob/fc2e1a9ef6472ea8ccbc71d9bff748211a3f5001/specification/logs/sdk.md#enabled-1
+    // ```
+    // An implementation should return false if a LogRecord (if ever created) is supposed to be filtered out for the given parameters.
+    // It should default to returning true for any indeterminate state, for example, when awaiting configuration.
+    // ```
+    if (this._shutdownOnce.isCalled) {
+      return false;
+    }
+    return true;
   }
 
   private async _shutdown(): Promise<void> {

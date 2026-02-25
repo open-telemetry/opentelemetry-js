@@ -37,6 +37,9 @@ class TestProcessor implements LogRecordProcessor {
   forceFlush(): Promise<void> {
     return Promise.resolve();
   }
+  enabled(): boolean {
+    return true;
+  }
 }
 
 const setup = (processors: LogRecordProcessor[] = []) => {
@@ -117,6 +120,7 @@ describe('MultiLogRecordProcessor', () => {
         shutdown: () => {
           return Promise.resolve();
         },
+        enabled: () => true,
       };
       const { multiProcessor } = setup([processor]);
       multiProcessor.forceFlush();
@@ -162,6 +166,7 @@ describe('MultiLogRecordProcessor', () => {
         shutdown: () => {
           return Promise.resolve();
         },
+        enabled: () => true,
       };
 
       const clock = sinon.useFakeTimers();

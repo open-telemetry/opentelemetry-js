@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { ExportResult } from '@opentelemetry/core';
+import type { ExportResult, InstrumentationScope } from '@opentelemetry/core';
 import {
   BindOnceFuture,
   ExportResultCode,
@@ -24,6 +24,8 @@ import {
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
 import type { SdkLogRecord } from './SdkLogRecord';
+import { Context } from '@opentelemetry/api';
+import { SeverityNumber } from '@opentelemetry/api-logs';
 
 /**
  * An implementation of the {@link LogRecordProcessor} interface that exports
@@ -93,6 +95,18 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
 
   public shutdown(): Promise<void> {
     return this._shutdownOnce.call();
+  }
+
+  public enabled(_options: {
+    context: Context;
+    instrumentationScope: InstrumentationScope;
+    severityNumber?: SeverityNumber;
+    eventName?: string;
+  }): boolean {
+    if (this._shutdownOnce.isCalled) {
+      return false;
+    }
+    return true;
   }
 
   private _shutdown(): Promise<void> {

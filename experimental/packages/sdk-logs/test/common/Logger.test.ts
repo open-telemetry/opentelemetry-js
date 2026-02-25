@@ -478,20 +478,57 @@ describe('Logger', () => {
   });
 
   describe('enabled', () => {
-    describe('with default configuration', () => {
-      it('should return "true" when called with no options', () => {
-        const { logger } = setup();
-        assert.ok(logger.enabled());
+    describe('with default configuration and disabled log processors', () => {
+      const { logger } = setup();
+
+      it('should return "false" when called with no options', () => {
+        assert.ok(!logger.enabled());
       });
-      it('should return "true" when called with a severity number', () => {
-        const { logger } = setup();
-        assert.ok(logger.enabled({ severityNumber: SeverityNumber.WARN }));
+
+      it('should return "false" when called with a severity number', () => {
+        assert.ok(!logger.enabled({ severityNumber: SeverityNumber.WARN }));
+      });
+
+      it('should return "false" when called with a context with a recording span', () => {
+        const spanContext = {
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
+        };
+        const activeContext = trace.setSpanContext(ROOT_CONTEXT, spanContext);
+        assert.ok(!logger.enabled({ context: activeContext }));
       });
     });
-    describe('with custom configuration', () => {
-      const logProcessor = new NoopLogRecordProcessor();
+
+    describe('with default configuration and enabled log processors', () => {
+      const exporter = new InMemoryLogRecordExporter();
       const loggerProvider = new LoggerProvider({
-        processors: [logProcessor],
+        processors: [new SimpleLogRecordProcessor(exporter)],
+      });
+      const logger = loggerProvider.getLogger('test-logger');
+
+      it('should return "true" when called with no options', () => {
+        assert.ok(logger.enabled());
+      });
+
+      it('should return "true" when called with a severity number', () => {
+        assert.ok(logger.enabled({ severityNumber: SeverityNumber.WARN }));
+      });
+
+      it('should return "true" when called with a context with an unsampled span', () => {
+        const spanContext = {
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
+        };
+        const activeContext = trace.setSpanContext(ROOT_CONTEXT, spanContext);
+        assert.ok(logger.enabled({ context: activeContext }));
+      });
+    });
+
+    describe('with custom configuration and disabled log processors', () => {
+      const loggerProvider = new LoggerProvider({
+        processors: [new NoopLogRecordProcessor()],
         loggerConfigurator: createLoggerConfigurator([
           {
             pattern: 'disabled-logger',
@@ -501,6 +538,57 @@ describe('Logger', () => {
             pattern: 'warn-logger',
             config: { minimumSeverity: SeverityNumber.WARN },
           },
+          {
+            pattern: 'trace-logger',
+            config: { traceBased: true },
+          },
+        ]),
+      });
+
+      it('should return "false" no matter the combinations', () => {
+        const disabledLogger = loggerProvider.getLogger('disabled-logger');
+        assert.ok(!disabledLogger.enabled());
+
+        const warnLogger = loggerProvider.getLogger('warn-logger');
+        assert.ok(!warnLogger.enabled({ severityNumber: SeverityNumber.INFO }));
+        assert.ok(
+          !warnLogger.enabled({ severityNumber: SeverityNumber.ERROR })
+        );
+
+        const sampledSpanContext = {
+          traceId: 'e4cda95b652f4a1592b449d5929fda1b',
+          spanId: '9e0c63257de34c92',
+          traceFlags: TraceFlags.SAMPLED,
+        };
+        const traceLogger = loggerProvider.getLogger('trace-logger');
+        assert.ok(
+          !traceLogger.enabled({
+            context: trace.setSpanContext(ROOT_CONTEXT, sampledSpanContext),
+          })
+        );
+
+        const customLogger = loggerProvider.getLogger('custom-logger');
+        assert.ok(!customLogger.enabled());
+      });
+    });
+
+    describe('with custom configuration and enabled log processors', () => {
+      const exporter = new InMemoryLogRecordExporter();
+      const loggerProvider = new LoggerProvider({
+        processors: [new SimpleLogRecordProcessor(exporter)],
+        loggerConfigurator: createLoggerConfigurator([
+          {
+            pattern: 'disabled-logger',
+            config: { disabled: true },
+          },
+          {
+            pattern: 'warn-logger',
+            config: { minimumSeverity: SeverityNumber.WARN },
+          },
+          {
+            pattern: 'trace-logger',
+            config: { traceBased: true },
+          },
         ]),
       });
 
@@ -508,11 +596,42 @@ describe('Logger', () => {
         const logger = loggerProvider.getLogger('disabled-logger');
         assert.ok(!logger.enabled());
       });
-      it('should return "true" when if severity is greater or equal than the configured', () => {
+
+      it('should return "true" when severity is greater or equal than the configured', () => {
         const logger = loggerProvider.getLogger('warn-logger');
         assert.ok(!logger.enabled({ severityNumber: SeverityNumber.INFO }));
         assert.ok(logger.enabled({ severityNumber: SeverityNumber.WARN }));
         assert.ok(logger.enabled({ severityNumber: SeverityNumber.ERROR }));
+      });
+
+      it('should return "true" when trace based and context has a sampled span', () => {
+        const logger = loggerProvider.getLogger('trace-logger');
+        const unsampledSpanContext = {
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
+        };
+        const sampledSpanContext = {
+          traceId: 'e4cda95b652f4a1592b449d5929fda1b',
+          spanId: '9e0c63257de34c92',
+          traceFlags: TraceFlags.SAMPLED,
+        };
+
+        assert.ok(
+          !logger.enabled({
+            context: trace.setSpanContext(ROOT_CONTEXT, unsampledSpanContext),
+          })
+        );
+        assert.ok(
+          logger.enabled({
+            context: trace.setSpanContext(ROOT_CONTEXT, sampledSpanContext),
+          })
+        );
+      });
+
+      it('should return "true" when a log processor is enabled', () => {
+        const logger = loggerProvider.getLogger('my-logger');
+        assert.ok(logger.enabled());
       });
     });
   });

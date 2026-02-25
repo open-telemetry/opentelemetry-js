@@ -30,7 +30,7 @@ export interface Logger {
    * name if provided. The context details to the active one
    * TODO: check in the spec what means implicit/explicit context support
    * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/api.md#enabled
-   * @param options
+   * @param options the context, severity number and event name
    */
   enabled(options?: {
     context?: Context;
