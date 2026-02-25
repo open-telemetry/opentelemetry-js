@@ -845,6 +845,19 @@ describe('fetch', () => {
 
             assert.strictEqual(headers['foo'], 'bar');
           });
+
+          it('should keep custom headers with url, untyped request object and array headers', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch('/api/echo-headers.json', {
+                  headers: [['foo', 'bar']],
+                }),
+            });
+
+            const headers = await assertPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+          });
         });
 
         describe('without global propagator', () => {
@@ -911,6 +924,19 @@ describe('fetch', () => {
                 fetch('/api/echo-headers.json', {
                   // @ts-expect-error relies on implicit coercion
                   headers: new Map().set('foo', 'bar'),
+                }),
+            });
+
+            const headers = await assertNoPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+          });
+
+          it('should keep custom headers with url, untyped request object and array headers', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch('/api/echo-headers.json', {
+                  headers: [['foo', 'bar']],
                 }),
             });
 

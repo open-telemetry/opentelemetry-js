@@ -227,6 +227,13 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       propagation.inject(context.active(), options.headers, {
         set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
       });
+    } else if (Array.isArray(options.headers)) {
+      const headers: Partial<Record<string, unknown>> = {};
+      propagation.inject(context.active(), headers);
+      const propagationEntries: [string, string][] = Object.entries(headers).map(
+        ([k, v]) => [k, typeof v === 'string' ? v : String(v)] as [string, string]
+      );
+      options.headers = [...options.headers, ...propagationEntries];
     } else {
       const headers: Partial<Record<string, unknown>> = {};
       propagation.inject(context.active(), headers);
