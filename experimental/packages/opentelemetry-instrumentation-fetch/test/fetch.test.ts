@@ -845,6 +845,23 @@ describe('fetch', () => {
 
             assert.strictEqual(headers['foo'], 'bar');
           });
+
+          it('should keep custom headers with url, untyped request object and tuple array headers', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch('/api/echo-headers.json', {
+                  headers: [
+                    ['foo', 'bar'],
+                    ['baz', 'qux'],
+                  ],
+                }),
+            });
+
+            const headers = await assertPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+            assert.strictEqual(headers['baz'], 'qux');
+          });
         });
 
         describe('without global propagator', () => {
@@ -917,6 +934,23 @@ describe('fetch', () => {
             const headers = await assertNoPropagationHeaders(response);
 
             assert.strictEqual(headers['foo'], 'bar');
+          });
+
+          it('should keep custom headers with url, untyped request object and tuple array headers', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch('/api/echo-headers.json', {
+                  headers: [
+                    ['foo', 'bar'],
+                    ['baz', 'qux'],
+                  ],
+                }),
+            });
+
+            const headers = await assertNoPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+            assert.strictEqual(headers['baz'], 'qux');
           });
         });
       });
@@ -1787,15 +1821,15 @@ describe('fetch', () => {
                 request !== null &&
                   typeof request === 'object' &&
                   !(request instanceof Request),
-                '`requestHook` should get the `RequestInit` object passed to `fetch()`'
+                '`requestHook` should get a `RequestInit` object'
               );
 
               assert.ok(
-                request.headers !== null && typeof request.headers === 'object',
-                '`requestHook` should get the `headers` object passed to `fetch()`'
+                request.headers instanceof Headers,
+                '`requestHook` should get headers as a `Headers` object'
               );
 
-              (request.headers as Record<string, string>)['custom-foo'] = 'foo';
+              (request.headers as Headers).set('custom-foo', 'foo');
             },
           },
           callback: () =>
