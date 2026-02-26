@@ -9,6 +9,16 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 1.40.0
+
+### :rocket: Features
+
 * feat: update semantic conventions to v1.40.0 [#NNNN]
   * Semantic Conventions v1.40.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1400) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * `@opentelemetry/semantic-conventions` (stable) changes: *2 added exports*
@@ -121,12 +131,6 @@ ATTR_SERVICE_CRITICALITY                         // service.criticality
 ```
 
 </details>
-
-### :bug: Bug Fixes
-
-### :books: Documentation
-
-### :house: Internal
 
 ## 1.39.0
 
