@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 //----------------------------------------------------------------------------------------------------------
@@ -1214,6 +1203,13 @@ export const METRIC_JVM_BUFFER_MEMORY_USED = 'jvm.buffer.memory.used' as const;
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_JVM_FILE_DESCRIPTOR_COUNT = 'jvm.file_descriptor.count' as const;
+
+/**
+ * Measure of max open file descriptors as reported by the JVM.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_JVM_FILE_DESCRIPTOR_LIMIT = 'jvm.file_descriptor.limit' as const;
 
 /**
  * Measure of initial memory requested.
@@ -2526,6 +2522,53 @@ export const METRIC_K8S_RESOURCEQUOTA_STORAGE_REQUEST_HARD = 'k8s.resourcequota.
 export const METRIC_K8S_RESOURCEQUOTA_STORAGE_REQUEST_USED = 'k8s.resourcequota.storage.request.used' as const;
 
 /**
+ * Number of endpoints for a service by condition and address type.
+ *
+ * @note This metric is derived from the Kubernetes [EndpointSlice API](https://kubernetes.io/docs/reference/kubernetes-api/service-resources/endpoint-slice-v1/).
+ * It reports the number of network endpoints backing a Service, broken down by their condition and address type.
+ *
+ * In dual-stack or multi-protocol clusters, separate counts are reported for each address family (`IPv4`, `IPv6`, `FQDN`).
+ *
+ * When the optional `zone` attribute is enabled, counts are further broken down by availability zone for zone-aware monitoring.
+ *
+ * An endpoint may be reported under multiple conditions simultaneously (e.g., both `serving` and `terminating` during a graceful shutdown).
+ * See [K8s EndpointConditions](https://kubernetes.io/docs/reference/kubernetes-api/service-resources/endpoint-slice-v1/) for more details.
+ *
+ * The conditions represent:
+ *
+ *   - `ready`: Endpoints capable of receiving new connections.
+ *   - `serving`: Endpoints currently handling traffic.
+ *   - `terminating`: Endpoints that are being phased out but may still be handling existing connections.
+ *
+ * For Services with `publishNotReadyAddresses` enabled (common for headless StatefulSets),
+ * this metric will include endpoints that are published despite not being ready.
+ * The `k8s.service.publish_not_ready_addresses` resource attribute indicates this setting.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_SERVICE_ENDPOINT_COUNT = 'k8s.service.endpoint.count' as const;
+
+/**
+ * Number of load balancer ingress points (external IPs/hostnames) assigned to the service.
+ *
+ * @note This metric reports the number of external ingress points (IP addresses or hostnames)
+ * assigned to a LoadBalancer Service.
+ *
+ * It is only emitted for Services of type `LoadBalancer` and reflects the assignments
+ * made by the underlying infrastructure's load balancer controller in the
+ * [.status.loadBalancer.ingress](https://kubernetes.io/docs/reference/kubernetes-api/service-resources/service-v1/#ServiceStatus) field.
+ *
+ * A value of `0` indicates that no ingress points have been assigned yet (e.g., during provisioning).
+ * A value greater than `1` may occur when multiple IPs or hostnames are assigned (e.g., dual-stack configurations).
+ *
+ * This metric signals that external endpoints have been assigned by the load balancer controller, but it does not
+ * guarantee that the load balancer is healthy.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_SERVICE_LOAD_BALANCER_INGRESS_COUNT = 'k8s.service.load_balancer.ingress.count' as const;
+
+/**
  * Deprecated, use `k8s.statefulset.pod.current` instead.
  *
  * @note This metric aligns with the `currentReplicas` field of the
@@ -3512,7 +3555,7 @@ export const METRIC_PROCESS_UPTIME = 'process.uptime' as const;
 export const METRIC_PROCESS_WINDOWS_HANDLE_COUNT = 'process.windows.handle.count' as const;
 
 /**
- * Measures the duration of outbound remote procedure calls (RPC).
+ * Measures the duration of an outgoing Remote Procedure Call (RPC).
  *
  * @note When this metric is reported alongside an RPC client span, the metric value
  * **SHOULD** be the same as the RPC client span duration.
@@ -3541,6 +3584,8 @@ export const METRIC_RPC_CLIENT_DURATION = 'rpc.client.duration' as const;
  * @note **Streaming**: Recorded per message in a streaming batch
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Removed, no replacement at this time.
  */
 export const METRIC_RPC_CLIENT_REQUEST_SIZE = 'rpc.client.request.size' as const;
 
@@ -3563,6 +3608,8 @@ export const METRIC_RPC_CLIENT_REQUESTS_PER_RPC = 'rpc.client.requests_per_rpc' 
  * @note **Streaming**: Recorded per response in a streaming batch
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Removed, no replacement at this time.
  */
 export const METRIC_RPC_CLIENT_RESPONSE_SIZE = 'rpc.client.response.size' as const;
 
@@ -3580,7 +3627,7 @@ export const METRIC_RPC_CLIENT_RESPONSE_SIZE = 'rpc.client.response.size' as con
 export const METRIC_RPC_CLIENT_RESPONSES_PER_RPC = 'rpc.client.responses_per_rpc' as const;
 
 /**
- * Measures the duration of inbound remote procedure calls (RPC).
+ * Measures the duration of an incoming Remote Procedure Call (RPC).
  *
  * @note When this metric is reported alongside an RPC server span, the metric value
  * **SHOULD** be the same as the RPC server span duration.
@@ -3609,6 +3656,8 @@ export const METRIC_RPC_SERVER_DURATION = 'rpc.server.duration' as const;
  * @note **Streaming**: Recorded per message in a streaming batch
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Removed, no replacement at this time.
  */
 export const METRIC_RPC_SERVER_REQUEST_SIZE = 'rpc.server.request.size' as const;
 
@@ -3631,6 +3680,8 @@ export const METRIC_RPC_SERVER_REQUESTS_PER_RPC = 'rpc.server.requests_per_rpc' 
  * @note **Streaming**: Recorded per response in a streaming batch
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Removed, no replacement at this time.
  */
 export const METRIC_RPC_SERVER_RESPONSE_SIZE = 'rpc.server.response.size' as const;
 
@@ -3801,6 +3852,16 @@ export const METRIC_SYSTEM_MEMORY_LIMIT = 'system.memory.limit' as const;
 export const METRIC_SYSTEM_MEMORY_LINUX_AVAILABLE = 'system.memory.linux.available' as const;
 
 /**
+ * Shared memory used (mostly by tmpfs).
+ *
+ * @note Equivalent of `shared` from [`free` command](https://man7.org/linux/man-pages/man1/free.1.html) or
+ * `Shmem` from [`/proc/meminfo`](https://man7.org/linux/man-pages/man5/proc.5.html)"
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_SYSTEM_MEMORY_LINUX_SHARED = 'system.memory.linux.shared' as const;
+
+/**
  * Reports the memory used by the Linux kernel for managing caches of frequently used objects.
  *
  * @note The sum over the `reclaimable` and `unreclaimable` state values in `memory.linux.slab.usage` **SHOULD** be equal to the total slab memory available on the system.
@@ -3812,12 +3873,11 @@ export const METRIC_SYSTEM_MEMORY_LINUX_AVAILABLE = 'system.memory.linux.availab
 export const METRIC_SYSTEM_MEMORY_LINUX_SLAB_USAGE = 'system.memory.linux.slab.usage' as const;
 
 /**
- * Shared memory used (mostly by tmpfs).
- *
- * @note Equivalent of `shared` from [`free` command](https://man7.org/linux/man-pages/man1/free.1.html) or
- * `Shmem` from [`/proc/meminfo`](https://man7.org/linux/man-pages/man5/proc.5.html)"
+ * Deprecated, use `system.memory.linux.shared` instead.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `system.memory.linux.shared`.
  */
 export const METRIC_SYSTEM_MEMORY_SHARED = 'system.memory.shared' as const;
 

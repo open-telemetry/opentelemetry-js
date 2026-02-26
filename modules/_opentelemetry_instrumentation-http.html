@@ -55,12 +55,12 @@ You can set the following:</p>
 <tr>
 <td><code>ignoreIncomingRequestHook</code></td>
 <td><code>IgnoreIncomingRequestFunction</code></td>
-<td>Http instrumentation will not trace all incoming requests that matched with custom function</td>
+<td>HTTP instrumentation will not trace all incoming requests that matched with custom function.</td>
 </tr>
 <tr>
 <td><code>ignoreOutgoingRequestHook</code></td>
 <td><code>IgnoreOutgoingRequestFunction</code></td>
-<td>Http instrumentation will not trace all outgoing requests that matched with custom function</td>
+<td>HTTP instrumentation will not trace all outgoing requests that matched with custom function.</td>
 </tr>
 <tr>
 <td><code>disableOutgoingRequestInstrumentation</code></td>
@@ -90,7 +90,7 @@ You can set the following:</p>
 <tr>
 <td><code>headersToSpanAttributes</code></td>
 <td><code>object</code></td>
-<td>List of case insensitive HTTP headers to convert to span attributes. Client (outgoing requests, incoming responses) and server (incoming requests, outgoing responses) headers will be converted to span attributes in the form of <code>http.{request|response}.header.header_name</code>, e.g. <code>http.response.header.content_length</code></td>
+<td>Specify which HTTP headers should be captured as span attributes. This is an object of the form <code>{client: {requestHeaders: [...], responseHeaders: [...]}, server: {requestHeaders: [...], responseHeaders: [...]}}</code>, where each <code>[...]</code> is an array of HTTP header names (case-insensitive) to capture. Client (outgoing requests, incoming responses) and server (incoming requests, outgoing responses) headers will be converted to span attributes in the form of <code>http.{request,response}.header.$header_name</code>, e.g. <code>http.response.header.content_length</code>. By default hyphens in header names are converted to underscore. However, if stable semantic conventions are selected (see next section), then, hyphens in header names are not changed, e.g. <code>http.response.header.content-length</code>.</td>
 </tr>
 </tbody>
 </table>
@@ -137,7 +137,7 @@ See the <a href="https://github.com/open-telemetry/opentelemetry-js/issues/5646"
 <tr>
 <td><code>http.request_content_length</code></td>
 <td>(opt-in, <code>headersToSpanAttributes</code>)</td>
-<td>The size of the request payload body in bytes. For newer semconv, use the <code>headersToSpanAttributes:</code> option to capture this as <code>http.request.header.content_length</code>.</td>
+<td>The size of the request payload body in bytes. For newer semconv, use the <code>headersToSpanAttributes</code> option to capture this as <code>http.request.header.content-length</code>.</td>
 </tr>
 <tr>
 <td><code>http.request_content_length_uncompressed</code></td>
@@ -147,7 +147,7 @@ See the <a href="https://github.com/open-telemetry/opentelemetry-js/issues/5646"
 <tr>
 <td><code>http.response_content_length</code></td>
 <td>(opt-in, <code>headersToSpanAttributes</code>)</td>
-<td>The size of the response payload body in bytes. For newer semconv, use the <code>headersToSpanAttributes:</code> option to capture this as <code>http.response.header.content_length</code>.</td>
+<td>The size of the response payload body in bytes. For newer semconv, use the <code>headersToSpanAttributes</code> option to capture this as <code>http.response.header.content-length</code>.</td>
 </tr>
 <tr>
 <td><code>http.response_content_length_uncompressed</code></td>
@@ -205,7 +205,7 @@ See the <a href="https://github.com/open-telemetry/opentelemetry-js/issues/5646"
 <td>Like net.peer.port but for the host port</td>
 </tr>
 <tr>
-<td><code>net.peer.ip.</code></td>
+<td><code>net.peer.ip</code></td>
 <td><code>network.peer.address</code></td>
 <td>Remote address of the peer (dotted decimal for IPv4 or RFC5952 for IPv6)</td>
 </tr>

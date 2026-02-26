@@ -1,24 +1,17 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ContextManager, TextMapPropagator } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
-import { IdGenerator } from './IdGenerator';
-import { Sampler } from './Sampler';
-import { SpanProcessor } from './SpanProcessor';
+import type {
+  ContextManager,
+  MeterProvider,
+  TextMapPropagator,
+} from '@opentelemetry/api';
+import type { Resource } from '@opentelemetry/resources';
+import type { IdGenerator } from './IdGenerator';
+import type { Sampler } from './Sampler';
+import type { SpanProcessor } from './SpanProcessor';
 
 /**
  * TracerConfig provides an interface for configuring a Basic Tracer.
@@ -54,6 +47,12 @@ export interface TracerConfig {
    * List of SpanProcessor for the tracer
    */
   spanProcessors?: SpanProcessor[];
+
+  /**
+   * A meter provider to record trace SDK metrics to.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  meterProvider?: MeterProvider;
 }
 
 /**
