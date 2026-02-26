@@ -27,6 +27,7 @@
       "experimental/packages/otlp-exporter-base",
       "experimental/packages/otlp-grpc-exporter-base",
       "experimental/packages/otlp-transformer",
+      "experimental/packages/sampler-always-record",
       "experimental/packages/sampler-composite",
       "experimental/packages/sampler-jaeger-remote",
       "experimental/packages/sdk-logs",
@@ -127,6 +128,9 @@
     },
     {
       "path": "experimental/packages/otlp-transformer"
+    },
+    {
+      "path": "experimental/packages/sampler-always-record"
     },
     {
       "path": "experimental/packages/sampler-composite"
