@@ -20,7 +20,9 @@ import {
   AggregationOption,
   AggregationType,
   CollectionResult,
+  Histogram,
   InstrumentType,
+  MeterProvider,
   MetricProducer,
   PushMetricExporter,
 } from '../../src';
@@ -661,6 +663,107 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       await assert.rejects(() => reader.shutdown(), /Error during forceFlush/);
+    });
+  });
+
+  describe('sdk metrics', () => {
+    it('should record collection duration when meter provider set', async () => {
+      const exporter = new TestMetricExporter();
+      const reader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 30,
+        exportTimeoutMillis: 20,
+      });
+      const meterProvider = new MeterProvider({
+        readers: [reader],
+        sdkMetricsEnabled: true,
+      });
+
+      const counter = meterProvider
+        .getMeter('test')
+        .createCounter('test_counter');
+      counter.add(1);
+
+      // First export will not have the collection metric, so wait for two.
+      const result = await exporter.waitForNumberOfExports(2);
+      assert.strictEqual(result.length, 2);
+      const scopeMetrics = result[1].scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/sdk-metrics'
+      );
+      assert.ok(scopeMetrics);
+      const collectionDurationMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.metric_reader.collection.duration'
+      );
+      assert.ok(collectionDurationMetric);
+      const histogram = collectionDurationMetric.dataPoints[0]
+        .value as Histogram;
+      assert.strictEqual(histogram.count, 1);
+      const attrs = collectionDurationMetric.dataPoints[0].attributes;
+      assert.strictEqual(
+        attrs['otel.component.type'],
+        'periodic_metric_reader'
+      );
+      assert.ok(
+        attrs['otel.component.name']
+          ?.toString()
+          .startsWith('periodic_metric_reader/')
+      );
+      assert.strictEqual(attrs['error.type'], undefined);
+
+      await meterProvider.shutdown();
+    });
+
+    it('should record collection error', async () => {
+      const exporter = new TestMetricExporter();
+      const reader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 30,
+        exportTimeoutMillis: 20,
+      });
+      const meterProvider = new MeterProvider({
+        readers: [reader],
+        sdkMetricsEnabled: true,
+      });
+
+      meterProvider
+        .getMeter('test')
+        .createObservableCounter('bad_counter')
+        .addCallback(() => {
+          throw new Error('bad metric');
+        });
+
+      const counter = meterProvider
+        .getMeter('test')
+        .createCounter('test_counter');
+      counter.add(1);
+
+      // First export will not have the collection metric, so wait for two.
+      const result = await exporter.waitForNumberOfExports(2);
+      assert.strictEqual(result.length, 2);
+      const scopeMetrics = result[1].scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/sdk-metrics'
+      );
+      assert.ok(scopeMetrics);
+      const collectionDurationMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.metric_reader.collection.duration'
+      );
+      assert.ok(collectionDurationMetric);
+      const histogram = collectionDurationMetric.dataPoints[0]
+        .value as Histogram;
+      assert.strictEqual(histogram.count, 1);
+      const attrs = collectionDurationMetric.dataPoints[0].attributes;
+      assert.strictEqual(
+        attrs['otel.component.type'],
+        'periodic_metric_reader'
+      );
+      assert.ok(
+        attrs['otel.component.name']
+          ?.toString()
+          .startsWith('periodic_metric_reader/')
+      );
+      assert.strictEqual(attrs['error.type'], 'Error');
+
+      await meterProvider.shutdown();
     });
   });
 });
