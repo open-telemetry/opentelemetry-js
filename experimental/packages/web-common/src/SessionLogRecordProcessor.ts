@@ -24,6 +24,7 @@ import { SessionProvider } from './types/SessionProvider';
  */
 export class SessionLogRecordProcessor implements LogRecordProcessor {
   private _sessionIdProvider: SessionProvider;
+
   constructor(sessionIdProvider: SessionProvider) {
     this._sessionIdProvider = sessionIdProvider;
   }
