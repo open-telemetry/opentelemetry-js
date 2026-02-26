@@ -34,10 +34,18 @@ export class ConsoleLogRecordExporter implements LogRecordExporter {
   }
 
   /**
+   * ForceFlush the exporter.
+   * No-op for {@link ConsoleLogRecordExporter}
+   */
+  public async forceFlush(): Promise<void> {
+    // nothing to flush
+  }
+
+  /**
    * Shutdown the exporter.
    */
-  public shutdown(): Promise<void> {
-    return Promise.resolve();
+  public async shutdown(): Promise<void> {
+    // nothing to do
   }
 
   /**

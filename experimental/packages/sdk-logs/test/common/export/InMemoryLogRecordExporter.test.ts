@@ -84,4 +84,11 @@ describe('InMemoryLogRecordExporter', () => {
       assert.strictEqual(memoryExporter.getFinishedLogRecords().length, 0);
     });
   });
+
+  describe('forceFlush', function () {
+    it('should forceFlush without error', async function () {
+      const exporter = new InMemoryLogRecordExporter();
+      await exporter.forceFlush();
+    });
+  });
 });
