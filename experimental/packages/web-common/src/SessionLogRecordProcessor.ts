@@ -18,16 +18,12 @@ import { Context } from '@opentelemetry/api';
 import { SdkLogRecord, LogRecordProcessor } from '@opentelemetry/sdk-logs';
 import { ATTR_SESSION_ID } from './semconv';
 import { SessionProvider } from './types/SessionProvider';
-import { SeverityNumber } from '@opentelemetry/api-logs';
-import { InstrumentationScope } from '@opentelemetry/core';
 
 /**
  * SessionLogRecordProcessor is a {@link SpanProcessor} adds the session.id attribute
  */
 export class SessionLogRecordProcessor implements LogRecordProcessor {
   private _sessionIdProvider: SessionProvider;
-  private _shutdowCalled = false;
-
   constructor(sessionIdProvider: SessionProvider) {
     this._sessionIdProvider = sessionIdProvider;
   }
@@ -39,15 +35,6 @@ export class SessionLogRecordProcessor implements LogRecordProcessor {
     }
   }
 
-  enabled(_options: {
-    context: Context;
-    instrumentationScope: InstrumentationScope;
-    severityNumber?: SeverityNumber;
-    eventName?: string;
-  }): boolean {
-    return !this._shutdowCalled;
-  }
-
   /**
    * Forces to export all finished spans
    */
@@ -57,7 +44,5 @@ export class SessionLogRecordProcessor implements LogRecordProcessor {
    * Shuts down the processor. Called when SDK is shut down. This is an
    * opportunity for processor to do any cleanup required.
    */
-  async shutdown(): Promise<void> {
-    this._shutdowCalled = true;
-  }
+  async shutdown(): Promise<void> {}
 }

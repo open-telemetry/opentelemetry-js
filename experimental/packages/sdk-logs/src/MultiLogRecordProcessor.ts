@@ -61,7 +61,7 @@ export class MultiLogRecordProcessor implements LogRecordProcessor {
     eventName?: string;
   }): boolean {
     for (const processor of this.processors) {
-      if (processor.enabled(options)) {
+      if (!processor.enabled || processor.enabled(options)) {
         return true;
       }
     }

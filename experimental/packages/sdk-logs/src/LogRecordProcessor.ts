@@ -44,7 +44,7 @@ export interface LogRecordProcessor {
    * name if provided.
    * @param options
    */
-  enabled(options: {
+  enabled?(options: {
     context: Context;
     instrumentationScope: InstrumentationScope;
     severityNumber?: SeverityNumber;

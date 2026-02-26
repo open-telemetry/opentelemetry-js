@@ -121,12 +121,11 @@ export class Logger implements logsAPI.Logger {
     }
 
     // Severity number given and lower than the min configured
-    const severityNumber = options?.severityNumber;
-    if (
-      typeof severityNumber === 'number' &&
-      !isNaN(severityNumber) &&
-      severityNumber < this._loggerConfig.minimumSeverity
-    ) {
+    let severityNumber = options?.severityNumber;
+    if (typeof severityNumber !== 'number' || isNaN(severityNumber)) {
+      severityNumber = SeverityNumber.UNSPECIFIED;
+    }
+    if (severityNumber < this._loggerConfig.minimumSeverity) {
       return false;
     }
 
@@ -146,7 +145,7 @@ export class Logger implements logsAPI.Logger {
       eventName: options?.eventName,
     };
     for (const processor of this._sharedState.processors) {
-      if (processor.enabled(enabledOpts)) {
+      if (!processor.enabled || processor.enabled(enabledOpts)) {
         return true;
       }
     }
