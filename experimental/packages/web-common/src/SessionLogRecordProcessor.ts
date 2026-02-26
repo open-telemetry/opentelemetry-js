@@ -18,6 +18,8 @@ import { Context } from '@opentelemetry/api';
 import { SdkLogRecord, LogRecordProcessor } from '@opentelemetry/sdk-logs';
 import { ATTR_SESSION_ID } from './semconv';
 import { SessionProvider } from './types/SessionProvider';
+import { SeverityNumber } from '@opentelemetry/api-logs';
+import { InstrumentationScope } from '@opentelemetry/core';
 
 /**
  * SessionLogRecordProcessor is a {@link SpanProcessor} adds the session.id attribute
@@ -34,6 +36,15 @@ export class SessionLogRecordProcessor implements LogRecordProcessor {
     if (sessionId) {
       logRecord.setAttribute(ATTR_SESSION_ID, sessionId);
     }
+  }
+
+  enabled(_options: {
+    context: Context;
+    instrumentationScope: InstrumentationScope;
+    severityNumber?: SeverityNumber;
+    eventName?: string;
+  }): boolean {
+    return true;
   }
 
   /**

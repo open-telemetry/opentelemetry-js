@@ -16,6 +16,7 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import { ROOT_CONTEXT } from '@opentelemetry/api';
 import {
   ExportResultCode,
   loggingErrorHandler,
@@ -106,6 +107,24 @@ describe('SimpleLogRecordProcessor', () => {
       assert.deepStrictEqual(error, expectedError);
       // reset global error handler
       setGlobalErrorHandler(loggingErrorHandler());
+    });
+  });
+
+  describe('enabled', () => {
+    const context = ROOT_CONTEXT;
+    const instrumentationScope = { name: 'test', version: '0.0.0' };
+
+    it('should return "true" if not shut down', async () => {
+      const exporter = new InMemoryLogRecordExporter();
+      const { processor } = setup(exporter);
+      assert.ok(processor.enabled({ context, instrumentationScope }));
+    });
+
+    it('should return "false" if already shut down', async () => {
+      const exporter = new InMemoryLogRecordExporter();
+      const { processor } = setup(exporter);
+      await processor.shutdown();
+      assert.ok(!processor.enabled({ context, instrumentationScope }));
     });
   });
 
