@@ -42,6 +42,7 @@ import {
   FetchInstrumentation,
   FetchInstrumentationConfig,
 } from '../src';
+import { isRequest as isRequestLike } from '../src/utils';
 import { AttributeNames } from '../src/enums/AttributeNames';
 import {
   ATTR_HTTP_HOST,
@@ -1750,7 +1751,7 @@ describe('fetch', () => {
           config: {
             requestHook: (span, request) => {
               assert.ok(
-                request instanceof Request,
+                isRequestLike(request),
                 '`requestHook` should get the `Request` object passed to `fetch()`'
               );
 
@@ -1777,6 +1778,53 @@ describe('fetch', () => {
           'bar',
           'header set from fetch() should be sent'
         );
+      });
+
+      it('treats a `Request` argument as a request even if global Request is overwritten', async () => {
+        const OriginalRequest = globalThis.Request;
+
+        try {
+          (globalThis as any).Request = function Request() {};
+
+          const { response } = await tracedFetch({
+            config: {
+              requestHook: (span, request) => {
+                assert.ok(
+                  isRequestLike(request),
+                  '`requestHook` should get the `Request` object passed to `fetch()`'
+                );
+
+                assert.ok(
+                  !((request as any) instanceof Request),
+                  'sanity check: `instanceof Request` should fail when global Request is overwritten'
+                );
+
+                (request as Request).headers.set('custom-foo', 'foo');
+              },
+            },
+            callback: () =>
+              fetch(
+                new OriginalRequest('/api/echo-headers.json', {
+                  headers: new Headers({ 'custom-bar': 'bar' }),
+                })
+              ),
+          });
+
+          const { request } = await response.json();
+
+          assert.strictEqual(
+            request.headers['custom-foo'],
+            'foo',
+            'header set from requestHook should be sent'
+          );
+          assert.strictEqual(
+            request.headers['custom-bar'],
+            'bar',
+            'header set from fetch() should be sent'
+          );
+        } finally {
+          globalThis.Request = OriginalRequest;
+        }
       });
 
       it('can modify headers when called with a `RequestInit` object', async () => {
