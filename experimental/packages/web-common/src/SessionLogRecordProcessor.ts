@@ -26,6 +26,7 @@ import { InstrumentationScope } from '@opentelemetry/core';
  */
 export class SessionLogRecordProcessor implements LogRecordProcessor {
   private _sessionIdProvider: SessionProvider;
+  private _shutdowCalled = false;
 
   constructor(sessionIdProvider: SessionProvider) {
     this._sessionIdProvider = sessionIdProvider;
@@ -44,7 +45,7 @@ export class SessionLogRecordProcessor implements LogRecordProcessor {
     severityNumber?: SeverityNumber;
     eventName?: string;
   }): boolean {
-    return true;
+    return !this._shutdowCalled;
   }
 
   /**
@@ -56,5 +57,7 @@ export class SessionLogRecordProcessor implements LogRecordProcessor {
    * Shuts down the processor. Called when SDK is shut down. This is an
    * opportunity for processor to do any cleanup required.
    */
-  async shutdown(): Promise<void> {}
+  async shutdown(): Promise<void> {
+    this._shutdowCalled = true;
+  }
 }

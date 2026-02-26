@@ -21,6 +21,7 @@ import {
   LoggerProvider,
   SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
+import { ROOT_CONTEXT } from '@opentelemetry/api';
 
 describe('SessionLogRecordProcessor', function () {
   it('adds session.id attribute', function () {
@@ -97,5 +98,19 @@ describe('SessionLogRecordProcessor', function () {
       },
     });
     await processor.shutdown();
+  });
+
+  it('is enabled until showtdown is called', async function () {
+    const context = ROOT_CONTEXT;
+    const instrumentationScope = { name: 'test', version: '0.0.0' };
+    const processor = new SessionLogRecordProcessor({
+      getSessionId: () => {
+        return null;
+      },
+    });
+
+    assert.ok(processor.enabled({ context, instrumentationScope }));
+    await processor.shutdown();
+    assert.ok(!processor.enabled({ context, instrumentationScope }));
   });
 });
