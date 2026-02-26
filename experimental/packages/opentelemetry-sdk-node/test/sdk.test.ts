@@ -421,7 +421,7 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
-    it('should register a meter provider to the tracer and logger provider if all initialized and metrics enabled', async () => {
+    it('should configure components for metrics if enabled', async () => {
       process.env.OTEL_NODE_EXPERIMENTAL_SDK_METRICS = 'true';
       const exporter = new ConsoleMetricExporter();
       const metricReader = new PeriodicExportingMetricReader({
@@ -462,7 +462,7 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
-    it('should not register a meter provider to the tracer and logger provider if all initialized but metrics disabled', async () => {
+    it('should not configure components for metrics if disabled', async () => {
       const exporter = new ConsoleMetricExporter();
       const metricReader = new PeriodicExportingMetricReader({
         exporter: exporter,
