@@ -5,7 +5,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-import { OTLPLogExporter } from '../../src/platform/browser';
+import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import {
   LoggerProvider,
   SimpleLogRecordProcessor,

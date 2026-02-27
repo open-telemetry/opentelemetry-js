@@ -6,11 +6,11 @@ import { OTLPExporterNodeConfigBase } from './legacy-node-configuration';
 import { diag } from '@opentelemetry/api';
 import {
   getNodeHttpConfigurationDefaults,
+  httpAgentFactoryFromOptions,
   HttpAgentFactory,
   mergeOtlpNodeHttpConfigurationWithDefaults,
   OtlpNodeHttpConfiguration,
 } from './otlp-node-http-configuration';
-import { httpAgentFactoryFromOptions } from '../index-node-http';
 import { getNodeHttpConfigurationFromEnvironment } from './otlp-node-http-env-configuration';
 import { convertLegacyHeaders } from './convert-legacy-http-options';
 

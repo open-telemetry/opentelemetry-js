@@ -41,40 +41,56 @@ describe('WebTracerProvider', function () {
     });
 
     describe('when contextManager is "ZoneContextManager"', function () {
-      it('should correctly return the contexts for 2 parallel actions', done => {
+      it('should correctly return the contexts for 2 parallel actions', async () => {
         const webTracerWithZone = new WebTracerProvider().getTracer('default');
 
         const rootSpan = webTracerWithZone.startSpan('rootSpan');
 
-        context.with(trace.setSpan(context.active(), rootSpan), () => {
-          assert.ok(
-            trace.getSpan(context.active()) === rootSpan,
-            'Current span is rootSpan'
-          );
-          const concurrentSpan1 =
-            webTracerWithZone.startSpan('concurrentSpan1');
-          const concurrentSpan2 =
-            webTracerWithZone.startSpan('concurrentSpan2');
+        await context.with(
+          trace.setSpan(context.active(), rootSpan),
+          async () => {
+            assert.ok(
+              trace.getSpan(context.active()) === rootSpan,
+              'Current span is rootSpan'
+            );
+            const concurrentSpan1 =
+              webTracerWithZone.startSpan('concurrentSpan1');
+            const concurrentSpan2 =
+              webTracerWithZone.startSpan('concurrentSpan2');
 
-          context.with(trace.setSpan(context.active(), concurrentSpan1), () => {
-            setTimeout(() => {
-              assert.ok(
-                trace.getSpan(context.active()) === concurrentSpan1,
-                'Current span is concurrentSpan1'
-              );
-            }, 10);
-          });
+            const p1 = context.with(
+              trace.setSpan(context.active(), concurrentSpan1),
+              () => {
+                return new Promise<void>(resolve => {
+                  setTimeout(() => {
+                    assert.ok(
+                      trace.getSpan(context.active()) === concurrentSpan1,
+                      'Current span is concurrentSpan1'
+                    );
+                    resolve();
+                  }, 10);
+                });
+              }
+            );
 
-          context.with(trace.setSpan(context.active(), concurrentSpan2), () => {
-            setTimeout(() => {
-              assert.ok(
-                trace.getSpan(context.active()) === concurrentSpan2,
-                'Current span is concurrentSpan2'
-              );
-              done();
-            }, 20);
-          });
-        });
+            const p2 = context.with(
+              trace.setSpan(context.active(), concurrentSpan2),
+              () => {
+                return new Promise<void>(resolve => {
+                  setTimeout(() => {
+                    assert.ok(
+                      trace.getSpan(context.active()) === concurrentSpan2,
+                      'Current span is concurrentSpan2'
+                    );
+                    resolve();
+                  }, 20);
+                });
+              }
+            );
+
+            await Promise.all([p1, p2]);
+          }
+        );
       });
     });
 

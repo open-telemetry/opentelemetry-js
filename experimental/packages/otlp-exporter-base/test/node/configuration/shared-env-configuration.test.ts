@@ -8,7 +8,7 @@ import * as sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
 import * as process from 'process';
 import { OtlpSharedConfiguration } from '../../../src';
-import { getSharedConfigurationFromEnvironment } from '../../../src/index-node-http';
+import { getSharedConfigurationFromEnvironment } from '../../../src/node-http';
 
 export function testSharedConfigurationFromEnvironment(
   sut: (signalIdentifier: string) => Partial<OtlpSharedConfiguration>

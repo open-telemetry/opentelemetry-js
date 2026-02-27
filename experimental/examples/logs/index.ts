@@ -15,11 +15,7 @@ import {
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 
 const loggerProvider = new LoggerProvider({
-  processors: [
-    new SimpleLogRecordProcessor(
-      new ConsoleLogRecordExporter()
-    )
-  ],
+  processors: [new SimpleLogRecordProcessor(new ConsoleLogRecordExporter())],
 });
 
 logs.setGlobalLoggerProvider(loggerProvider);

@@ -2,23 +2,56 @@
   "name": "@opentelemetry/shim-opencensus",
   "version": "0.212.0",
   "description": "OpenCensus to OpenTelemetry shim",
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
+  "author": "OpenTelemetry Authors",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/shim-opencensus",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./build/index.cjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.cts",
   "exports": {
-    ".": "./build/src/index.js",
-    "./register": "./build/src/register.js"
+    ".": {
+      "esnext": {
+        "types": "./build/index.d.mts",
+        "default": "./build/index.mjs"
+      },
+      "require": {
+        "types": "./build/index.d.cts",
+        "default": "./build/index.cjs"
+      },
+      "import": {
+        "types": "./build/index.d.mts",
+        "default": "./build/index.mjs"
+      }
+    },
+    "./register": {
+      "esnext": {
+        "types": "./build/register/index.d.mts",
+        "default": "./build/register/index.mjs"
+      },
+      "require": {
+        "types": "./build/register/index.d.cts",
+        "default": "./build/register/index.cjs"
+      },
+      "import": {
+        "types": "./build/register/index.d.mts",
+        "default": "./build/register/index.mjs"
+      }
+    }
   },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build",
-    "clean": "tsc --build --clean",
+    "compile": "tsdown",
+    "clean": "rimraf build",
     "tdd": "npm run test -- --extension ts --watch",
     "test": "nyc mocha test/**/*.test.ts",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../../scripts/version-update.js",
-    "watch": "tsc --build --watch",
+    "watch": "tsdown --watch",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
@@ -30,22 +63,18 @@
     "tracing",
     "profiling"
   ],
-  "author": "OpenTelemetry Authors",
-  "license": "Apache-2.0",
   "engines": {
     "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
-    "doc",
+    "build/**/*.cjs",
+    "build/**/*.mjs",
+    "build/**/*.d.cts",
+    "build/**/*.d.mts",
+    "build/**/*.map",
     "LICENSE",
     "README.md"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
   "devDependencies": {
     "@opencensus/core": "0.1.0",
     "@opentelemetry/api": "1.9.0",
@@ -69,6 +98,5 @@
     "@opentelemetry/sdk-metrics": "2.5.1",
     "require-in-the-middle": "^8.0.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/shim-opencensus",
   "sideEffects": false
 }

@@ -279,20 +279,16 @@ describe('SimpleSpanProcessor', () => {
     });
 
     describe('when flushing complete', () => {
-      it('should call an async callback', done => {
+      it('should call an async callback', async () => {
         const processor = new SimpleSpanProcessor(exporter);
-        processor.forceFlush().then(() => {
-          done();
-        });
+        await processor.forceFlush();
       });
     });
 
     describe('when shutdown is complete', () => {
-      it('should call an async callback', done => {
+      it('should call an async callback', async () => {
         const processor = new SimpleSpanProcessor(exporter);
-        processor.shutdown().then(() => {
-          done();
-        });
+        await processor.shutdown();
       });
     });
   });

@@ -21,7 +21,7 @@ const {
   JsonTraceSerializer,
   ProtobufLogsSerializer,
   JsonLogsSerializer,
-} = require('../../../build/src');
+} = require('../../../build/index.cjs');
 const { resourceFromAttributes } = require('@opentelemetry/resources');
 const { TraceFlags } = require('@opentelemetry/api');
 const { SeverityNumber } = require('@opentelemetry/api-logs');

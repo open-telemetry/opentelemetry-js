@@ -37,7 +37,7 @@ describe('FetchTransport', function () {
   });
 
   describe('send', function () {
-    it('it uses global fetch API and is not affected by patching', function (done) {
+    it('it uses global fetch API and is not affected by patching', async function () {
       // arrange
       const fetchStub = sinon
         .stub(globalThis, 'fetch')
@@ -49,19 +49,15 @@ describe('FetchTransport', function () {
       (globalThis.fetch as any).__original = fetchStub;
 
       //act
-      transport.send(testPayload, requestTimeout).then(response => {
-        // assert
-        try {
-          assert.strictEqual(response.status, 'success');
-          sinon.assert.notCalled(patchedStub);
-          sinon.assert.called(fetchStub);
-        } catch (e) {
-          done(e);
-        }
-        done();
-      }, done /* catch any rejections */);
+      const response = await transport.send(testPayload, requestTimeout);
+
+      // assert
+      assert.strictEqual(response.status, 'success');
+      sinon.assert.notCalled(patchedStub);
+      sinon.assert.called(fetchStub);
     });
-    it('returns success when request succeeds', function (done) {
+
+    it('returns success when request succeeds', async function () {
       // arrange
       const fetchStub = sinon
         .stub(globalThis, 'fetch')
@@ -69,36 +65,24 @@ describe('FetchTransport', function () {
       const transport = createFetchTransport(testTransportParameters);
 
       //act
-      transport.send(testPayload, requestTimeout).then(response => {
-        // assert
-        try {
-          assert.strictEqual(response.status, 'success');
-          // currently we don't do anything with the response yet, so it's dropped by the transport.
-          assert.strictEqual(
-            (response as ExportResponseSuccess).data,
-            undefined
-          );
-          sinon.assert.calledOnceWithMatch(
-            fetchStub,
-            testTransportParameters.url,
-            {
-              method: 'POST',
-              headers: {
-                foo: 'foo-value',
-                bar: 'bar-value',
-                'Content-Type': 'application/json',
-              },
-              body: testPayload,
-            }
-          );
-        } catch (e) {
-          done(e);
-        }
-        done();
-      }, done /* catch any rejections */);
+      const response = await transport.send(testPayload, requestTimeout);
+
+      // assert
+      assert.strictEqual(response.status, 'success');
+      // currently we don't do anything with the response yet, so it's dropped by the transport.
+      assert.strictEqual((response as ExportResponseSuccess).data, undefined);
+      sinon.assert.calledOnceWithMatch(fetchStub, testTransportParameters.url, {
+        method: 'POST',
+        headers: {
+          foo: 'foo-value',
+          bar: 'bar-value',
+          'Content-Type': 'application/json',
+        },
+        body: testPayload,
+      });
     });
 
-    it('returns failure when request fails', function (done) {
+    it('returns failure when request fails', async function () {
       // arrange
       sinon
         .stub(globalThis, 'fetch')
@@ -106,18 +90,13 @@ describe('FetchTransport', function () {
       const transport = createFetchTransport(testTransportParameters);
 
       //act
-      transport.send(testPayload, requestTimeout).then(response => {
-        // assert
-        try {
-          assert.strictEqual(response.status, 'failure');
-        } catch (e) {
-          done(e);
-        }
-        done();
-      }, done /* catch any rejections */);
+      const response = await transport.send(testPayload, requestTimeout);
+
+      // assert
+      assert.strictEqual(response.status, 'failure');
     });
 
-    it('returns retryable when request is retryable', function (done) {
+    it('returns retryable when request is retryable', async function () {
       // arrange
       sinon
         .stub(globalThis, 'fetch')
@@ -127,22 +106,17 @@ describe('FetchTransport', function () {
       const transport = createFetchTransport(testTransportParameters);
 
       //act
-      transport.send(testPayload, requestTimeout).then(response => {
-        // assert
-        try {
-          assert.strictEqual(response.status, 'retryable');
-          assert.strictEqual(
-            (response as ExportResponseRetryable).retryInMillis,
-            5000
-          );
-        } catch (e) {
-          done(e);
-        }
-        done();
-      }, done /* catch any rejections */);
+      const response = await transport.send(testPayload, requestTimeout);
+
+      // assert
+      assert.strictEqual(response.status, 'retryable');
+      assert.strictEqual(
+        (response as ExportResponseRetryable).retryInMillis,
+        5000
+      );
     });
 
-    it('returns failure when request is aborted', function (done) {
+    it('returns failure when request is aborted', async function () {
       // arrange
       const abortError = new Error('aborted request');
       abortError.name = 'AbortError';
@@ -151,65 +125,52 @@ describe('FetchTransport', function () {
       const transport = createFetchTransport(testTransportParameters);
 
       //act
-      transport.send(testPayload, requestTimeout).then(response => {
-        // assert
-        try {
-          assert.strictEqual(response.status, 'failure');
-          assert.strictEqual(
-            (response as ExportResponseFailure).error.message,
-            'Fetch request errored'
-          );
-        } catch (e) {
-          done(e);
-        }
-        done();
-      }, done /* catch any rejections */);
+      const responsePromise = transport.send(testPayload, requestTimeout);
       clock.tick(requestTimeout + 100);
+      const response = await responsePromise;
+
+      // assert
+      assert.strictEqual(response.status, 'failure');
+      assert.strictEqual(
+        (response as ExportResponseFailure).error.message,
+        'Fetch request errored'
+      );
     });
 
-    it('returns failure when fetch throws non-network error', function (done) {
+    it('returns failure when fetch throws non-network error', async function () {
       // arrange
       sinon.stub(globalThis, 'fetch').throws(new Error('fetch failed'));
       const clock = sinon.useFakeTimers();
       const transport = createFetchTransport(testTransportParameters);
 
       //act
-      transport.send(testPayload, requestTimeout).then(response => {
-        // assert
-        try {
-          assert.strictEqual(response.status, 'failure');
-          assert.strictEqual(
-            (response as ExportResponseFailure).error.message,
-            'Fetch request errored'
-          );
-        } catch (e) {
-          done(e);
-        }
-        done();
-      }, done /* catch any rejections */);
+      const responsePromise = transport.send(testPayload, requestTimeout);
       clock.tick(requestTimeout + 100);
+      const response = await responsePromise;
+
+      // assert
+      assert.strictEqual(response.status, 'failure');
+      assert.strictEqual(
+        (response as ExportResponseFailure).error.message,
+        'Fetch request errored'
+      );
     });
 
-    it('returns retryable when browser fetch throws network error', function (done) {
+    it('returns retryable when browser fetch throws network error', async function () {
       // arrange
       // Browser fetch throws TypeError for network errors
       sinon.stub(globalThis, 'fetch').rejects(new TypeError('Failed to fetch'));
       const transport = createFetchTransport(testTransportParameters);
 
       //act
-      transport.send(testPayload, requestTimeout).then(response => {
-        // assert
-        try {
-          assert.strictEqual(response.status, 'retryable');
-          assert.strictEqual(
-            response.error?.message,
-            'Fetch request encountered a network error'
-          );
-        } catch (e) {
-          done(e);
-        }
-        done();
-      }, done /* catch any rejections */);
+      const response = await transport.send(testPayload, requestTimeout);
+
+      // assert
+      assert.strictEqual(response.status, 'retryable');
+      assert.strictEqual(
+        response.error?.message,
+        'Fetch request encountered a network error'
+      );
     });
 
     it('returns failure when fetch throws TypeError with cause', async function () {

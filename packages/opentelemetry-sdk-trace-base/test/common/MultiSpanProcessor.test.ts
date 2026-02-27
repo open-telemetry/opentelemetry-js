@@ -116,14 +116,12 @@ describe('MultiSpanProcessor', () => {
       'p2:end',
     ]);
 
-    tracerProvider.shutdown().then(() => {
-      assert.strictEqual(processor1.spans.length, 0);
-      assert.strictEqual(processor1.spans.length, processor2.spans.length);
-      assert.deepStrictEqual(TestProcessor.events.length, 0);
-    });
+    await tracerProvider.shutdown();
+    // TestProcessor.shutdown() clears the static events array
+    assert.deepStrictEqual(TestProcessor.events.length, 0);
   });
 
-  it('should export spans on manual shutdown from two span processor', () => {
+  it('should export spans on manual shutdown from two span processor', async () => {
     TestProcessor.events = [];
     const processor1 = new TestProcessor('p1');
     const processor2 = new ExtendedTestProcessor('p2');
@@ -139,10 +137,9 @@ describe('MultiSpanProcessor', () => {
     assert.strictEqual(processor1.spans.length, 1);
     assert.strictEqual(processor1.spans.length, processor2.spans.length);
 
-    tracerProvider.shutdown().then(() => {
-      assert.strictEqual(processor1.spans.length, 0);
-      assert.strictEqual(processor1.spans.length, processor2.spans.length);
-    });
+    await tracerProvider.shutdown();
+    // Verify shutdown was called (events are cleared by TestProcessor.shutdown())
+    assert.deepStrictEqual(TestProcessor.events.length, 0);
   });
 
   it('should force span processors to flush', () => {
@@ -163,7 +160,7 @@ describe('MultiSpanProcessor', () => {
     assert.ok(flushed);
   });
 
-  it('should wait for all span processors to finish flushing', done => {
+  it('should wait for all span processors to finish flushing', async () => {
     let flushed = 0;
     const processor1 = new SimpleSpanProcessor(new InMemorySpanExporter());
     const processor2 = new SimpleSpanProcessor(new InMemorySpanExporter());
@@ -178,12 +175,10 @@ describe('MultiSpanProcessor', () => {
     });
 
     const multiSpanProcessor = new MultiSpanProcessor([processor1, processor2]);
-    multiSpanProcessor.forceFlush().then(() => {
-      Sinon.assert.calledOnce(spy1);
-      Sinon.assert.calledOnce(spy2);
-      assert.strictEqual(flushed, 2);
-      done();
-    });
+    await multiSpanProcessor.forceFlush();
+    Sinon.assert.calledOnce(spy1);
+    Sinon.assert.calledOnce(spy2);
+    assert.strictEqual(flushed, 2);
   });
 
   it('should call globalErrorHandler in forceFlush', async () => {

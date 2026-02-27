@@ -11,7 +11,7 @@ import { ThriftProcess } from '../src/types';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { TraceFlags } from '@opentelemetry/api';
 import { resourceFromAttributes } from '@opentelemetry/resources';
-import * as nock from 'nock';
+import nock from 'nock';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 
 describe('JaegerExporter', () => {

@@ -450,18 +450,17 @@ describe('BasicTracerProvider', () => {
   });
 
   describe('.withSpan()', () => {
-    it('should run context with NoopContextManager context manager', done => {
+    it('should run context with NoopContextManager context manager', () => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       context.with(trace.setSpan(context.active(), span), () => {
         assert.deepStrictEqual(trace.getSpan(context.active()), undefined);
-        return done();
       });
     });
   });
 
   describe('.forceFlush()', () => {
-    it('should call forceFlush on all registered span processors', done => {
+    it('should call forceFlush on all registered span processors', async () => {
       sinon.restore();
       const forceFlushStub = sinon.stub(
         NoopSpanProcessor.prototype,
@@ -475,20 +474,12 @@ describe('BasicTracerProvider', () => {
         spanProcessors: [spanProcessorOne, spanProcessorTwo],
       });
 
-      tracerProvider
-        .forceFlush()
-        .then(() => {
-          sinon.restore();
-          assert.ok(forceFlushStub.calledTwice);
-          done();
-        })
-        .catch(error => {
-          sinon.restore();
-          done(error);
-        });
+      await tracerProvider.forceFlush();
+      sinon.restore();
+      assert.ok(forceFlushStub.calledTwice);
     });
 
-    it('should throw error when calling forceFlush on all registered span processors fails', done => {
+    it('should throw error when calling forceFlush on all registered span processors fails', async () => {
       sinon.restore();
 
       const forceFlushStub = sinon.stub(
@@ -503,30 +494,23 @@ describe('BasicTracerProvider', () => {
         spanProcessors: [spanProcessorOne, spanProcessorTwo],
       });
 
-      tracerProvider
-        .forceFlush()
-        .then(() => {
-          sinon.restore();
-          done(new Error('Successful forceFlush not expected'));
-        })
-        .catch(_error => {
-          sinon.restore();
-          sinon.assert.calledTwice(forceFlushStub);
-          done();
-        });
+      await assert.rejects(async () => {
+        await tracerProvider.forceFlush();
+      });
+      sinon.restore();
+      sinon.assert.calledTwice(forceFlushStub);
     });
   });
 
   describe('.bind()', () => {
-    it('should bind context with NoopContextManager context manager', done => {
+    it('should bind context with NoopContextManager context manager', () => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       const fn = () => {
         assert.deepStrictEqual(trace.getSpan(context.active()), undefined);
-        return done();
       };
       const patchedFn = context.bind(trace.setSpan(context.active(), span), fn);
-      return patchedFn();
+      patchedFn();
     });
   });
 

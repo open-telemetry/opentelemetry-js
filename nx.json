@@ -20,7 +20,12 @@
       "inputs": [
         "{projectRoot}/src/**/*.ts",
         "{projectRoot}/test/**/*.ts",
-        "{projectRoot}/**/*.proto"
+        "{projectRoot}/**/*.proto",
+        "{projectRoot}/package.json",
+        "{projectRoot}/tsdown.config.ts",
+        "{workspaceRoot}/tsdown.*",
+        "{workspaceRoot}/tsconfig.*",
+        "{workspaceRoot}/package.json"
       ],
       "outputs": [
         "{projectRoot}/build"
@@ -34,7 +39,8 @@
     "lint": {
       "inputs": [
         "{projectRoot}/src/**/*.ts",
-        "{projectRoot}/test/**/*.ts"
+        "{projectRoot}/test/**/*.ts",
+        "{workspaceRoot}/eslint*"
       ]
     },
     "version:update": {
@@ -43,6 +49,11 @@
       ],
       "outputs": [
         "{projectRoot}/src/version.ts"
+      ]
+    },
+    "test:bundle": {
+      "dependsOn": [
+        "^compile"
       ]
     }
   }

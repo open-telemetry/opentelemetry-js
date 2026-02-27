@@ -15,7 +15,7 @@
  */
 
 const Benchmark = require('benchmark');
-const { parsePairKeyValue } = require('../../../build/src/baggage/utils');
+const { parsePairKeyValue } = require('../../../build/baggage/utils.cjs');
 
 const suite = new Benchmark.Suite();
 
