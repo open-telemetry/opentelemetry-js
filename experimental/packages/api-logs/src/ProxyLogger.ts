@@ -49,11 +49,6 @@ export class ProxyLogger implements Logger {
     this._getLogger().emit(logRecord);
   }
 
-  /**
-   * Returns `true` if the logger is enabled for the given options.
-   *
-   * @param options
-   */
   enabled(options?: {
     context?: Context;
     severityNumber?: SeverityNumber;
