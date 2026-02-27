@@ -205,21 +205,20 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     }
 
     if (options instanceof Request) {
-      propagation.inject(context.active(), options.headers, {
-        set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
-      });
-    } else if (options.headers instanceof Headers) {
-      propagation.inject(context.active(), options.headers, {
-        set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
-      });
-    } else if (options.headers instanceof Map) {
+      // This mutates `Request.headers` in-place, because it is read-only
+      // (per https://developer.mozilla.org/en-US/docs/Web/API/Request/headers),
+      // so we cannot (easily) replace it.
       propagation.inject(context.active(), options.headers, {
         set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
       });
     } else {
-      const headers: Partial<Record<string, unknown>> = {};
-      propagation.inject(context.active(), headers);
-      options.headers = Object.assign({}, headers, options.headers || {});
+      // Otherwise, create a new Headers to avoid mutating the caller's
+      // possibly re-used headers.
+      const headers = new Headers(options.headers);
+      propagation.inject(context.active(), headers, {
+        set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
+      });
+      options.headers = headers;
     }
   }
 
@@ -576,8 +575,11 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           return context.with(
             trace.setSpan(context.active(), createdSpan),
             () => {
-              plugin._addHeaders(options, url);
+              // Call request hook before injection so hooks cannot tamper with propagation headers.
+              // Also, this means the hook will see `options.headers` in the same type as passed in,
+              // rather than as a `Headers` instance set by `_addHeaders()`.
               plugin._callRequestHook(createdSpan, options);
+              plugin._addHeaders(options, url);
               plugin._tasksCount++;
 
               return original
