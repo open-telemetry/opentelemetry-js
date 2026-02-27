@@ -3,7 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ChannelCredentials, Metadata } from '@grpc/grpc-js';
+import type {
+  ChannelCredentials,
+  ChannelOptions,
+  Metadata,
+} from '@grpc/grpc-js';
 
 import {
   CompressionAlgorithm,
@@ -18,4 +22,5 @@ export interface OTLPGRPCExporterConfigNode extends OTLPExporterConfigBase {
   metadata?: Metadata;
   compression?: CompressionAlgorithm;
   userAgent?: string;
+  channelOptions?: ChannelOptions;
 }

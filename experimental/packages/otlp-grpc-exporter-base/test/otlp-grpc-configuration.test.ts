@@ -5,7 +5,11 @@
 import { diag } from '@opentelemetry/api';
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import { validateAndNormalizeUrl } from '../src/configuration/otlp-grpc-configuration';
+import {
+  getOtlpGrpcDefaultConfiguration,
+  mergeOtlpGrpcConfigurationWithDefaults,
+  validateAndNormalizeUrl,
+} from '../src/configuration/otlp-grpc-configuration';
 
 describe('validateAndNormalizeUrl()', function () {
   const tests = [
@@ -68,5 +72,49 @@ describe('validateAndNormalizeUrl()', function () {
         diagWarn.restore();
       }
     });
+  });
+});
+
+describe('channelOptions', function () {
+  it('uses user-provided channelOptions over fallback', function () {
+    const userChannelOptions = {
+      'grpc.keepalive_time_ms': 10000,
+      'grpc.keepalive_timeout_ms': 5000,
+    };
+    const fallBackChannelOptions = {
+      'grpc.keepalive_time_ms': 20000,
+    };
+
+    const config = mergeOtlpGrpcConfigurationWithDefaults(
+      { channelOptions: userChannelOptions },
+      { channelOptions: fallBackChannelOptions },
+      getOtlpGrpcDefaultConfiguration()
+    );
+
+    assert.deepStrictEqual(config.channelOptions, userChannelOptions);
+  });
+
+  it('uses fallback channelOptions over default', function () {
+    const fallbackChannelOptions = {
+      'grpc.initial_reconnect_backoff_ms': 1000,
+    };
+
+    const config = mergeOtlpGrpcConfigurationWithDefaults(
+      {},
+      { channelOptions: fallbackChannelOptions },
+      getOtlpGrpcDefaultConfiguration()
+    );
+
+    assert.deepStrictEqual(config.channelOptions, fallbackChannelOptions);
+  });
+
+  it('should use default if nothing is provided', function () {
+    const config = mergeOtlpGrpcConfigurationWithDefaults(
+      {},
+      {},
+      getOtlpGrpcDefaultConfiguration()
+    );
+
+    assert.strictEqual(config.channelOptions, undefined);
   });
 });

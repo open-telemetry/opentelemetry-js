@@ -443,6 +443,25 @@ describe('GrpcExporterTransport', function () {
         assert.strictEqual(result.status, 'failure');
         assert.strictEqual(result.error, expectedError);
       });
+
+      it('accepts channelOptions in config', async function () {
+        const transport = createOtlpGrpcExporterTransport({
+          ...simpleClientConfig,
+          channelOptions: {
+            'grpc.keepalive_time_ms': 10000,
+            'grpc.keepalive_timeout_ms': 5000,
+            'grpc.keepalive_permit_without_calls': 1,
+          },
+        });
+
+        const result = (await transport.send(
+          Buffer.from([1, 2, 3]),
+          timeoutMillis
+        )) as ExportResponseSuccess;
+
+        assert.strictEqual(result.status, 'success');
+        assert.strictEqual(serverTestContext.requests.length, 1);
+      });
     });
     describe('uds', function () {
       let shutdownHandle: (() => void) | undefined;
