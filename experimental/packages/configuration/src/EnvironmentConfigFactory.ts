@@ -61,6 +61,7 @@ export class EnvironmentConfigFactory implements ConfigFactory {
     setAttributeLimits(this._config);
     setPropagators(this._config);
     setTracerProvider(this._config);
+    setSampler(this._config);
     setMeterProvider(this._config);
     setLoggerProvider(this._config);
   }
@@ -146,6 +147,55 @@ export function setPropagators(config: ConfigurationModel): void {
   const compositeList = getStringFromEnv('OTEL_PROPAGATORS');
   if (compositeList) {
     config.propagator.composite_list = compositeList;
+  }
+}
+
+export function setSampler(config: ConfigurationModel): void {
+  const sampler = getStringFromEnv('OTEL_TRACES_SAMPLER');
+  const arg = getStringFromEnv('OTEL_TRACES_SAMPLER_ARG');
+
+  if (!sampler || !config.tracer_provider) {
+    return;
+  }
+
+  const ratio = arg ? parseFloat(arg) : 1.0;
+
+  switch (sampler) {
+    case 'always_on':
+      config.tracer_provider.sampler = { always_on: {} };
+      break;
+
+    case 'always_off':
+      config.tracer_provider.sampler = { always_off: {} };
+      break;
+
+    case 'traceidratio':
+      config.tracer_provider.sampler = {
+        trace_id_ratio_based: { ratio },
+      };
+      break;
+
+    case 'parentbased_always_on':
+      config.tracer_provider.sampler = {
+        parent_based: { root: { always_on: {} } },
+      };
+      break;
+
+    case 'parentbased_always_off':
+      config.tracer_provider.sampler = {
+        parent_based: { root: { always_off: {} } },
+      };
+      break;
+
+    case 'parentbased_traceidratio':
+      config.tracer_provider.sampler = {
+        parent_based: { root: { trace_id_ratio_based: { ratio } } },
+      };
+      break;
+
+    default:
+      diag.warn(`Unknown sampler type: ${sampler}`);
+      break;
   }
 }
 

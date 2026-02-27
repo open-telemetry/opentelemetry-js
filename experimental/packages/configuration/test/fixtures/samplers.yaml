@@ -1,0 +1,14 @@
+file_format: "1.0-rc.3"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    parent_based:
+      root:
+        trace_id_ratio_based:
+          ratio: 0.5
+      remote_parent_not_sampled:
+        probability/development:
+          ratio: 0.1

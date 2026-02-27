@@ -1,0 +1,12 @@
+file_format: "1.0-rc.3"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    composite/development:
+      samplers:
+        - always_on:
+        - trace_id_ratio_based:
+            ratio: 0.5
