@@ -125,7 +125,10 @@ export class Logger implements logsAPI.Logger {
     if (typeof severityNumber !== 'number' || isNaN(severityNumber)) {
       severityNumber = SeverityNumber.UNSPECIFIED;
     }
-    if (severityNumber < this._loggerConfig.minimumSeverity) {
+    if (
+      severityNumber !== SeverityNumber.UNSPECIFIED &&
+      severityNumber < this._loggerConfig.minimumSeverity
+    ) {
       return false;
     }
 

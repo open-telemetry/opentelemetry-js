@@ -604,6 +604,14 @@ describe('Logger', () => {
         assert.ok(logger.enabled({ severityNumber: SeverityNumber.ERROR }));
       });
 
+      it('should return "true" when severity is not passed or UNSPECIFIED', () => {
+        const logger = loggerProvider.getLogger('warn-logger');
+        assert.ok(logger.enabled());
+        assert.ok(
+          logger.enabled({ severityNumber: SeverityNumber.UNSPECIFIED })
+        );
+      });
+
       it('should return "true" when trace based and context has a sampled span', () => {
         const logger = loggerProvider.getLogger('trace-logger');
         const unsampledSpanContext = {
