@@ -26,9 +26,8 @@ export interface Logger {
   emit(logRecord: LogRecord): void;
 
   /**
-   * Tells if the logger is enabled for the given context, severity number and event
-   * name if provided.
-   * @param options the context, severity number and event name
+   * Will a log record with the given details get emitted?
+   * This can be used to avoid expensive calculation of log record data.   
    */
   enabled(options?: {
     context?: Context;
