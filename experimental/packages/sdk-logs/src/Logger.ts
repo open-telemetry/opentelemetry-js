@@ -11,6 +11,7 @@ import {
   trace,
   TraceFlags,
   isSpanContextValid,
+  Context,
 } from '@opentelemetry/api';
 
 import { LogRecordImpl } from './LogRecordImpl';
@@ -96,5 +97,50 @@ export class Logger implements logsAPI.Logger {
      * If logRecord is needed after OnEmit returns (i.e. for asynchronous processing) only reads are permitted.
      */
     logRecordInstance._makeReadonly();
+  }
+
+  public enabled(options?: {
+    context?: Context;
+    severityNumber?: SeverityNumber;
+    eventName?: string;
+  }): boolean {
+    // This logger is disabled
+    if (this._loggerConfig.disabled) {
+      return false;
+    }
+
+    // Severity number given and lower than the min configured
+    let severityNumber = options?.severityNumber;
+    if (typeof severityNumber !== 'number' || isNaN(severityNumber)) {
+      severityNumber = SeverityNumber.UNSPECIFIED;
+    }
+    if (
+      severityNumber !== SeverityNumber.UNSPECIFIED &&
+      severityNumber < this._loggerConfig.minimumSeverity
+    ) {
+      return false;
+    }
+
+    // Trace based: the context (given or the active) has a unsampled Span
+    if (this._loggerConfig.traceBased) {
+      const span = trace.getSpan(options?.context || context.active());
+      if (span && span.spanContext().traceFlags === TraceFlags.NONE) {
+        return false;
+      }
+    }
+
+    // Lastly check if there is any enabled processor
+    const enabledOpts = {
+      context: options?.context || context.active(),
+      instrumentationScope: this.instrumentationScope,
+      severityNumber: options?.severityNumber,
+      eventName: options?.eventName,
+    };
+    for (const processor of this._sharedState.processors) {
+      if (!processor.enabled || processor.enabled(enabledOpts)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

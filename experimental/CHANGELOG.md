@@ -35,6 +35,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
     `NodeSDK` from `@opentelemetry/sdk-node` to get automatic environment variable configuration.
 * fix(instrumentation-http)!: do not normalize hyphens to underscores in captured header attribute names if using stable semconv [#6381](https://github.com/open-telemetry/opentelemetry-js/issues/6381) @trentm
   * With the `headersToSpanAttributes` option, one can specify that HTTP headers should be captured as span attributes named `http.{request,response}.header.HEADERNAME`. With old Semantic Conventions, the `HEADERNAME` normalizes hyphens to underscores, e.g. `http.response.header.content_length`. When stable HTTP semconv is enabled (via `OTEL_SEMCONV_STABILITY_OPT_IN`), hyphens are no longer changed, e.g. `http.response.header.content-length`.
+* feat(api-logs, sdk-logs)!: add `enabled` method to Logger interface and implementi it in logs API and SDK [#6371](https://github.com/open-telemetry/opentelemetry-js/pull/6371) @david-luna
 
 ### :rocket: Features
 
