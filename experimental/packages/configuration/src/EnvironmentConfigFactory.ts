@@ -34,6 +34,7 @@ import {
   initializeDefaultLoggerProviderConfiguration,
 } from './models/loggerProviderModel';
 import { getGrpcTlsConfig, getHttpTlsConfig } from './utils';
+import { ExperimentalResourceDetector } from './models/resourceModel';
 
 /**
  * EnvironmentConfigProvider provides a configuration based on environment variables.
@@ -106,6 +107,29 @@ export function setResources(config: ConfigurationModel): void {
           type: 'string',
         });
       }
+    }
+  }
+
+  const nodeDetectors = getStringListFromEnv('OTEL_NODE_RESOURCE_DETECTORS');
+  if (
+    nodeDetectors &&
+    nodeDetectors.length > 0 &&
+    !nodeDetectors.includes('none')
+  ) {
+    const all = nodeDetectors.includes('all');
+    const detectors: ExperimentalResourceDetector[] = [];
+    if (all || nodeDetectors.includes('container'))
+      detectors.push({ container: {} });
+    if (all || nodeDetectors.includes('host')) detectors.push({ host: {} });
+    if (all || nodeDetectors.includes('process'))
+      detectors.push({ process: {} });
+    if (all || nodeDetectors.includes('serviceinstance'))
+      detectors.push({ service: {} });
+    if (detectors.length > 0) {
+      if (config.resource['detection/development'] == null) {
+        config.resource['detection/development'] = {};
+      }
+      config.resource['detection/development'].detectors = detectors;
     }
   }
 }
