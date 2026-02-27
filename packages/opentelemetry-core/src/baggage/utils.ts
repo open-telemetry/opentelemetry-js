@@ -59,7 +59,7 @@ export function parsePairKeyValue(
   const rawKey = keyPairPart.substring(0, separatorIndex).trim();
   const rawValue = keyPairPart.substring(separatorIndex + 1).trim();
 
-  if (!rawKey || !rawValue) return;
+  if (!rawKey) return;
   let key: string;
   let value: string;
   try {
@@ -94,7 +94,7 @@ export function parseKeyPairsIntoRecord(
     value.split(BAGGAGE_ITEMS_SEPARATOR).forEach(entry => {
       const keyPair = parsePairKeyValue(entry);
 
-      if (keyPair !== undefined && keyPair.value.length > 0) {
+      if (keyPair !== undefined && keyPair.value !== undefined) {
         result[keyPair.key] = keyPair.value;
       }
     });

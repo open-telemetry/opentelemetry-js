@@ -43,9 +43,10 @@ describe('parseKeyPairsIntoRecord()', () => {
     });
   });
 
-  it('filters out empty values', () => {
-    assert.deepStrictEqual(parseKeyPairsIntoRecord('key1=,key2=value2'), {
-      key2: 'value2',
+  it('prevents empty baggage values', () => {
+    assert.deepStrictEqual(parseKeyPairsIntoRecord('key1=value1,key2='), {
+      key1: 'value1',
+      key2: '',
     });
   });
 });
