@@ -70,6 +70,7 @@ import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/expor
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
 import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from '../src/semconv';
+import { NOOP_HISTOGRAM_METRIC } from '../../../../api/src/metrics/NoopMeter';
 
 function assertDefaultContextManagerRegistered() {
   assert.ok(
@@ -409,7 +410,7 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
-    it('should register a meter provider to the tracer provider if both initialized and metrics enabled', async () => {
+    it('should configure components for metrics if enabled', async () => {
       process.env.OTEL_NODE_EXPERIMENTAL_SDK_METRICS = 'true';
       const exporter = new ConsoleMetricExporter();
       const metricReader = new PeriodicExportingMetricReader({
@@ -437,11 +438,15 @@ describe('Node SDK', () => {
       );
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+      assert.notDeepEqual(
+        (metricReader as any)._metrics.collectionDuration,
+        NOOP_HISTOGRAM_METRIC
+      );
 
       await sdk.shutdown();
     });
 
-    it('should not register a meter provider to the tracer provider if both initialized but metrics disabled', async () => {
+    it('should not configure components for metrics if disabled', async () => {
       const exporter = new ConsoleMetricExporter();
       const metricReader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -466,6 +471,10 @@ describe('Node SDK', () => {
       assert.equal((tracerProvider as any)._config.meterProvider, undefined);
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+      assert.deepEqual(
+        (metricReader as any)._metrics.collectionDuration,
+        NOOP_HISTOGRAM_METRIC
+      );
 
       await sdk.shutdown();
     });

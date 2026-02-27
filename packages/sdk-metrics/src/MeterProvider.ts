@@ -16,6 +16,7 @@ import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { MetricCollector } from './state/MetricCollector';
 import { ForceFlushOptions, ShutdownOptions } from './types';
 import { View, ViewOptions } from './view/View';
+import { PeriodicExportingMetricReader } from './export/PeriodicExportingMetricReader';
 
 /**
  * MeterProviderOptions provides an interface for configuring a MeterProvider.
@@ -25,6 +26,12 @@ export interface MeterProviderOptions {
   resource?: Resource;
   views?: ViewOptions[];
   readers?: IMetricReader[];
+
+  /**
+   * Whether to enable SDK metrics for this meter provider.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  sdkMetricsEnabled?: boolean;
 }
 
 /**
@@ -49,6 +56,12 @@ export class MeterProvider implements IMeterProvider {
         const collector = new MetricCollector(this._sharedState, metricReader);
         metricReader.setMetricProducer(collector);
         this._sharedState.metricCollectors.push(collector);
+        if (
+          options.sdkMetricsEnabled &&
+          metricReader instanceof PeriodicExportingMetricReader
+        ) {
+          metricReader.setMeterProvider(this);
+        }
       }
     }
   }
