@@ -59,6 +59,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :house: Internal
 
 * perf(otlp-transformer): optimize toAnyValue performance [#6287](https://github.com/open-telemetry/opentelemetry-js/pull/6287) @AbhiPrasad
+* refactor: migrate build from tsc to tsdown with dual CJS/ESM output [#6201](https://github.com/open-telemetry/opentelemetry-js/pull/6201) @overbalance
 
 ## 0.211.0
 

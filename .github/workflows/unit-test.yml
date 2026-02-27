@@ -27,11 +27,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
+      # Build requires Node 22+ (rolldown dependency)
+      # First set up Node 22 to build, then switch to test version
       - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
         with:
-          cache: 'npm'
+          cache: npm
           cache-dependency-path: |
             package-lock.json
+          node-version: 22
+
+      - run: npm install -g npm@latest
+
+      - name: Bootstrap
+        run: npm ci --ignore-scripts
+
+      - name: Build 🔧
+        run: npm run compile
+
+      # Now switch to the test Node version
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
+        with:
           node-version: ${{ matrix.node_version }}
 
       # npm@11.0.0 drops support for Node.js v18
@@ -51,12 +66,6 @@ jobs:
           matrix.node_version == '25'
           }}
 
-      - name: Bootstrap
-        run: npm ci --ignore-scripts
-
-      - name: Build 🔧
-        run: npm run compile
-
       - run: npm test
 
       - name: Report Coverage
@@ -73,10 +82,10 @@ jobs:
 
       - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
         with:
-          cache: 'npm'
+          cache: npm
           cache-dependency-path: |
             package-lock.json
-          node-version: '22'
+          node-version: 22
 
       - run: npm install -g npm@latest
 
@@ -98,13 +107,16 @@ jobs:
 
       - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
         with:
-          cache: 'npm'
+          cache: npm
           cache-dependency-path: |
             package-lock.json
           node-version: 22
 
       - name: Bootstrap
         run: npm ci --ignore-scripts
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps chromium
 
       - name: Build 🔧
         run: npm run compile
@@ -124,13 +136,16 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
         with:
-          cache: 'npm'
+          cache: npm
           cache-dependency-path: |
             package-lock.json
           node-version: 22
 
       - name: Bootstrap
         run: npm ci --ignore-scripts
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps chromium
 
       - name: Build 🔧
         run: npm run compile

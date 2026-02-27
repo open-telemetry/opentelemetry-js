@@ -3,7 +3,7 @@
   "version": "0.211.0",
   "private": true,
   "scripts": {
-    "start": "ts-node index.ts",
+    "start": "tsx index.ts",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },
   "dependencies": {
@@ -13,6 +13,6 @@
   },
   "devDependencies": {
     "@types/node": "18.19.130",
-    "ts-node": "^10.9.1"
+    "tsx": "^4.21.0"
   }
 }

@@ -8,11 +8,7 @@ import { VERSION } from '../../../src/version';
 
 describe('version', function () {
   it('should have generated VERSION.ts', function () {
-    // Skip in case we're not running in Node.js
-    if (global.process?.versions?.node === undefined) {
-      this.skip();
-    }
-
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const pjson = require('../../../package.json');
     assert.strictEqual(pjson.version, VERSION);
   });

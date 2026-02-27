@@ -19,7 +19,7 @@ jobs:
 
       - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
         with:
-          cache: 'npm'
+          cache: npm
           cache-dependency-path: |
             package-lock.json
           node-version: 22
@@ -27,12 +27,8 @@ jobs:
       - name: Install and Bootstrap 🔧
         run: npm ci --ignore-scripts
 
-      - name: Generate version.ts files
-        run: npm run version:update
-
       - name: Build 🔧
         run: npm run compile
-        working-directory: ./integration-tests/propagation-validation-server
 
       - name: Run W3C Test harness
         run: ./integration-tests/tracecontext-integration-test.sh

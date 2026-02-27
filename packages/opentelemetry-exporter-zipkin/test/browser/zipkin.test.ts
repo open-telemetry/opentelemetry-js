@@ -10,8 +10,7 @@ import {
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { ZipkinExporter } from '../../src';
-import * as zipkinTypes from '../../src/types';
+import { ZipkinExporter, ExporterConfig } from '@opentelemetry/exporter-zipkin';
 import {
   ensureHeadersContain,
   ensureSpanIsCorrect,
@@ -22,7 +21,7 @@ const sendBeacon = navigator.sendBeacon;
 
 describe('Zipkin Exporter - web', () => {
   let zipkinExporter: ZipkinExporter;
-  let zipkinConfig: zipkinTypes.ExporterConfig = {};
+  let zipkinConfig: ExporterConfig = {};
   let spySend: sinon.SinonSpy;
   let spyBeacon: sinon.SinonSpy;
   let spans: ReadableSpan[];

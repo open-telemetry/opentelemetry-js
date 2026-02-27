@@ -1,14 +1,37 @@
 {
   "name": "@opentelemetry/context-async-hooks",
   "version": "2.5.1",
-  "description": "OpenTelemetry AsyncLocalStorage-based Context Manager",
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
+  "description": "OpenTelemetry AsyncHooks-based Context Manager",
+  "author": "OpenTelemetry Authors",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-async-hooks",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./build/index.cjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.cts",
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./build/index.d.cts",
+        "default": "./build/index.cjs"
+      },
+      "esnext": {
+        "types": "./build/index.d.mts",
+        "default": "./build/index.mjs"
+      },
+      "import": {
+        "types": "./build/index.d.mts",
+        "default": "./build/index.mjs"
+      }
+    }
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build",
-    "clean": "tsc --build --clean",
+    "compile": "tsdown",
+    "clean": "rimraf build",
     "test": "nyc mocha 'test/**/*.test.ts'",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "lint": "eslint . --ext .ts",
@@ -26,22 +49,18 @@
     "metrics",
     "stats"
   ],
-  "author": "OpenTelemetry Authors",
-  "license": "Apache-2.0",
   "engines": {
     "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
-    "doc",
+    "build/**/*.cjs",
+    "build/**/*.mjs",
+    "build/**/*.d.cts",
+    "build/**/*.d.mts",
+    "build/**/*.map",
     "LICENSE",
     "README.md"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
   "devDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0",
     "@types/mocha": "10.0.10",
@@ -53,6 +72,5 @@
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-async-hooks",
   "sideEffects": false
 }

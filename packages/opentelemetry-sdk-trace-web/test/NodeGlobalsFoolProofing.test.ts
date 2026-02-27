@@ -13,11 +13,11 @@ describe('Node Globals Foolproofing', function () {
   const originalProcess = globalThis?.process;
   let setGlobalTracerProviderSpy: sinon.SinonSpy;
 
-  before(() => {
+  beforeAll(() => {
     Object.assign(globalThis, { process: false });
   });
 
-  after(() => {
+  afterAll(() => {
     Object.assign(globalThis, { process: originalProcess });
   });
 

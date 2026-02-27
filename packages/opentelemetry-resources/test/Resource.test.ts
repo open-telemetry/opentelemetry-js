@@ -16,7 +16,7 @@ import * as sinon from 'sinon';
 import { describeBrowser, describeNode } from './util';
 import { defaultResource, emptyResource, resourceFromAttributes } from '../src';
 import { _clearDefaultServiceNameCache } from '../src/default-service-name';
-import * as EventEmitter from 'events';
+import { EventEmitter } from 'events';
 
 describe('Resource', () => {
   const resource1 = resourceFromAttributes({
