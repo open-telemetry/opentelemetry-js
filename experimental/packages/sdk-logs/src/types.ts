@@ -7,6 +7,7 @@ import type { Resource } from '@opentelemetry/resources';
 import type { SeverityNumber } from '@opentelemetry/api-logs';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import { LogRecordProcessor } from './LogRecordProcessor';
+import { MeterProvider } from '@opentelemetry/api';
 
 /**
  * A LoggerConfig defines various configurable aspects of a Logger's behavior.
@@ -83,6 +84,12 @@ export interface LoggerProviderConfig {
    * @experimental This feature is in development as per the OpenTelemetry specification.
    */
   loggerConfigurator?: LoggerConfigurator;
+
+  /**
+   * A meter provider to record logs SDK metrics to.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  meterProvider?: MeterProvider;
 }
 
 export interface LogRecordLimits {

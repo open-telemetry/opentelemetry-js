@@ -33,13 +33,15 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
       loggerConfigurator:
         config.loggerConfigurator ?? DEFAULT_LOGGER_CONFIGURATOR,
       processors: config.processors ?? [],
+      meterProvider: config.meterProvider,
     };
     this._sharedState = new LoggerProviderSharedState(
       mergedConfig.resource,
       mergedConfig.forceFlushTimeoutMillis,
       mergedConfig.logRecordLimits,
       mergedConfig.processors,
-      mergedConfig.loggerConfigurator
+      mergedConfig.loggerConfigurator,
+      mergedConfig.meterProvider
     );
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
   }

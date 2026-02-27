@@ -315,6 +315,12 @@ export class NodeSDK {
             })
           );
 
+    // While SDK metrics are unstable, we require an opt-in.
+    // https://opentelemetry.io/docs/specs/semconv/otel/sdk-metrics/
+    const sdkMetricsEnabled = getBooleanFromEnv(
+      'OTEL_NODE_EXPERIMENTAL_SDK_METRICS'
+    );
+
     if (
       this._meterProviderConfig?.readers &&
       // only register if there is a reader, otherwise we waste compute/memory.
@@ -343,11 +349,6 @@ export class NodeSDK {
 
     // Only register if there is a span processor
     if (spanProcessors.length > 0) {
-      // While SDK metrics are unstable, we require an opt-in.
-      // https://opentelemetry.io/docs/specs/semconv/otel/sdk-metrics/
-      const sdkMetricsEnabled = getBooleanFromEnv(
-        'OTEL_NODE_EXPERIMENTAL_SDK_METRICS'
-      );
       this._tracerProvider = new NodeTracerProvider({
         ...this._configuration,
         resource: this._resource,
@@ -362,6 +363,7 @@ export class NodeSDK {
         ...getLoggerProviderConfigFromEnv(),
         resource: this._resource,
         processors: this._loggerProviderConfig.logRecordProcessors,
+        meterProvider: sdkMetricsEnabled ? this._meterProvider : undefined,
       });
 
       this._loggerProvider = loggerProvider;
