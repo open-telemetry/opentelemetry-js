@@ -14,6 +14,8 @@ export type {
 } from './export-response';
 
 export type { IExporterTransport } from './exporter-transport';
+export { createRetryingTransport } from './retrying-transport';
+export { createFetchTransport } from './transport/fetch-transport';
 
 export {
   mergeOtlpSharedConfigurationWithDefaults,

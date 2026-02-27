@@ -10,6 +10,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(otlp-exporter-base): accept `fetch` parameter in `createFetchTransport`, and export `createFetchTransport` and `createRetryingTransport` [#6377](https://github.com/open-telemetry/opentelemetry-js/pull/6377) @zakcutner
+
 ### :bug: Bug Fixes
 
 * fix(instrumentation-http): guard against double-instrumentation if loaded with `require('http')` and `import 'http'` [#6428](https://github.com/open-telemetry/opentelemetry-js/issues/6428) @trentm
