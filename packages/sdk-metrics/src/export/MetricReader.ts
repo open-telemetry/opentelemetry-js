@@ -147,7 +147,7 @@ export abstract class MetricReader implements IMetricReader {
   setMetricProducer(metricProducer: MetricProducer) {
     if (this._sdkMetricProducer) {
       throw new Error(
-        'MetricReader can not be bound to a MeterProvider again.'
+        'MetricReader can not be bound to a MeterProducer again.'
       );
     }
     this._sdkMetricProducer = metricProducer;
