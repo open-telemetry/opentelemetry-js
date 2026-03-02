@@ -36,7 +36,6 @@ export class TraceState implements TraceStateApi {
     }
 
     // Validate the `ot` entry as per spec
-    // TODO: add a test for it
     const newEntryLength = key.length + value.length + 1;
     if (key === 'ot' && newEntryLength > MAX_OTEL_ENTRY_LEN) {
       return this;
