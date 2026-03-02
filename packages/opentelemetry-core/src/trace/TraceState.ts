@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as api from '@opentelemetry/api';
+import type { TraceState as TraceStateApi } from '@opentelemetry/api';
 import { validateKey, validateValue } from '../internal/validators';
 
 const MAX_TRACE_STATE_ITEMS = 32;
@@ -20,80 +20,106 @@ const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
  * - The value of any key can be updated. Modified keys MUST be moved to the
  * beginning of the list.
  */
-export class TraceState implements api.TraceState {
-  private _internalState: Map<string, string> = new Map();
+export class TraceState implements TraceStateApi {
+  private _raw: string;
+  private _length: number;
+  private _entries: Array<{ key: string; value: string }> | undefined;
 
   constructor(rawTraceState?: string) {
-    if (rawTraceState) this._parse(rawTraceState);
+    this._raw = rawTraceState || '';
+    this._length = this._raw.length;
   }
 
   set(key: string, value: string): TraceState {
-    // TODO: Benchmark the different approaches(map vs list) and
-    // use the faster one.
-    const traceState = this._clone();
-    if (traceState._internalState.has(key)) {
-      traceState._internalState.delete(key);
+    // Invalid entries results in skipping
+    if (!validateKey(key) || !validateValue(value)) {
+      return this;
     }
-    traceState._internalState.set(key, value);
-    return traceState;
+
+    // Get a new entries so keep this TraceState inmutable
+    const entries = this._entries
+      ? this._entries.map(e => e)
+      : this._parse(this._raw);
+
+    const newEntryLength = key.length + value.length + 1;
+    const index = entries.findIndex(entry => entry.key === key);
+
+    if (index === -1) {
+      // New entry. Check if the new TraceState is too long
+      if (this._length + newEntryLength > MAX_TRACE_STATE_LEN) {
+        return this;
+      }
+    } else {
+      // Update entry. Also check if too long with the updated length
+      const currentEntry = entries[index];
+      const currentEntryLength =
+        currentEntry.key.length + currentEntry.value.length + 1;
+      if (
+        this._length - currentEntryLength + newEntryLength >
+        MAX_TRACE_STATE_LEN
+      ) {
+        return this;
+      }
+      entries.splice(index, 1);
+    }
+    entries.unshift({ key, value });
+
+    const state = this._serializeEntries(entries);
+    return new TraceState(state.length > MAX_TRACE_STATE_LEN ? '' : state);
   }
 
   unset(key: string): TraceState {
-    const traceState = this._clone();
-    traceState._internalState.delete(key);
-    return traceState;
+    this._entries = this._entries || this._parse(this._raw);
+    const index = this._entries.findIndex(entry => entry.key === key);
+
+    if (index === -1) {
+      return this;
+    }
+    return new TraceState(
+      this._serializeEntries(this._entries.filter((_, idx) => idx !== index))
+    );
   }
 
   get(key: string): string | undefined {
-    return this._internalState.get(key);
+    this._entries = this._entries || this._parse(this._raw);
+    const entry = this._entries.find(e => e.key === key);
+
+    return entry && entry.value;
   }
 
   serialize(): string {
-    return this._keys()
-      .reduce((agg: string[], key) => {
-        agg.push(key + LIST_MEMBER_KEY_VALUE_SPLITTER + this.get(key));
-        return agg;
-      }, [])
-      .join(LIST_MEMBERS_SEPARATOR);
-  }
-
-  private _parse(rawTraceState: string) {
-    if (rawTraceState.length > MAX_TRACE_STATE_LEN) return;
-    this._internalState = rawTraceState
-      .split(LIST_MEMBERS_SEPARATOR)
-      .reverse() // Store in reverse so new keys (.set(...)) will be placed at the beginning
-      .reduce((agg: Map<string, string>, part: string) => {
-        const listMember = part.trim(); // Optional Whitespace (OWS) handling
-        const i = listMember.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
-        if (i !== -1) {
-          const key = listMember.slice(0, i);
-          const value = listMember.slice(i + 1, part.length);
-          if (validateKey(key) && validateValue(value)) {
-            agg.set(key, value);
-          } else {
-            // TODO: Consider to add warning log
-          }
-        }
-        return agg;
-      }, new Map());
-
-    // Because of the reverse() requirement, trunc must be done after map is created
-    if (this._internalState.size > MAX_TRACE_STATE_ITEMS) {
-      this._internalState = new Map(
-        Array.from(this._internalState.entries())
-          .reverse() // Use reverse same as original tracestate parse chain
-          .slice(0, MAX_TRACE_STATE_ITEMS)
-      );
+    if (this._entries) {
+      return this._serializeEntries(this._entries);
     }
+    return this._raw;
   }
 
-  private _keys(): string[] {
-    return Array.from(this._internalState.keys()).reverse();
+  private _parse(raw: string) {
+    const members = raw.split(LIST_MEMBERS_SEPARATOR);
+    const entries = [];
+
+    for (const member of members) {
+      const m = member.trim();
+      const idx = m.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
+      if (idx === -1) {
+        continue;
+      }
+      const key = m.slice(0, idx);
+      const value = m.slice(idx + 1);
+      const isValid = validateKey(key) && validateValue(value);
+      const hasSpace = entries.length < MAX_TRACE_STATE_ITEMS;
+      if (isValid && hasSpace) {
+        entries.push({ key, value });
+      }
+    }
+    return entries;
   }
 
-  private _clone(): TraceState {
-    const traceState = new TraceState();
-    traceState._internalState = new Map(this._internalState);
-    return traceState;
+  private _serializeEntries(
+    entries: Array<{ key: string; value: string }>
+  ): string {
+    return entries
+      .map(e => `${e.key}${LIST_MEMBER_KEY_VALUE_SPLITTER}${e.value}`)
+      .join(LIST_MEMBERS_SEPARATOR);
   }
 }
