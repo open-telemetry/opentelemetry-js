@@ -62,13 +62,6 @@ export class EnvironmentConfigFactory implements ConfigFactory {
       this._config.log_level = logLevel;
     }
 
-    const nodeResourceDetectors = getStringListFromEnv(
-      'OTEL_NODE_RESOURCE_DETECTORS'
-    );
-    if (nodeResourceDetectors) {
-      this._config.node_resource_detectors = nodeResourceDetectors;
-    }
-
     setResources(this._config);
     setAttributeLimits(this._config);
     setPropagators(this._config);

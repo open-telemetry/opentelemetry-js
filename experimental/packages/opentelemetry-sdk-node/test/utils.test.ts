@@ -20,11 +20,17 @@ import {
   getPropagatorFromConfiguration,
   getLoggerProviderConfigFromEnv,
   getBatchLogRecordProcessorConfigFromEnv,
+  getResourceDetectorsFromConfiguration,
 } from '../src/utils';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
 import { ConfigurationModel } from '@opentelemetry/configuration';
+import {
+  hostDetector,
+  processDetector,
+  serviceInstanceIdDetector,
+} from '@opentelemetry/resources';
 import { LoggerProviderConfig } from '@opentelemetry/sdk-logs';
 
 describe('getPropagatorFromEnv', function () {
@@ -410,5 +416,70 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
       maxExportBatchSize: undefined,
     });
     sinon.assert.callCount(warnStub, 4);
+  });
+});
+
+describe('getResourceDetectorsFromConfiguration', function () {
+  it('returns empty array when detection/development is not set', function () {
+    const config: ConfigurationModel = {};
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), []);
+  });
+
+  it('returns empty array when detectors array is empty', function () {
+    const config: ConfigurationModel = {
+      resource: { 'detection/development': { detectors: [] } },
+    };
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), []);
+  });
+
+  it('maps host detector object to hostDetector', function () {
+    const config: ConfigurationModel = {
+      resource: { 'detection/development': { detectors: [{ host: {} }] } },
+    };
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
+      hostDetector,
+    ]);
+  });
+
+  it('maps process detector object to processDetector', function () {
+    const config: ConfigurationModel = {
+      resource: { 'detection/development': { detectors: [{ process: {} }] } },
+    };
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
+      processDetector,
+    ]);
+  });
+
+  it('maps service detector object to serviceInstanceIdDetector', function () {
+    const config: ConfigurationModel = {
+      resource: { 'detection/development': { detectors: [{ service: {} }] } },
+    };
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
+      serviceInstanceIdDetector,
+    ]);
+  });
+
+  it('silently skips container detector (no JS implementation)', function () {
+    const config: ConfigurationModel = {
+      resource: {
+        'detection/development': { detectors: [{ container: {} }] },
+      },
+    };
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), []);
+  });
+
+  it('maps multiple detector objects in order', function () {
+    const config: ConfigurationModel = {
+      resource: {
+        'detection/development': {
+          detectors: [{ host: {} }, { process: {} }, { service: {} }],
+        },
+      },
+    };
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
+      hostDetector,
+      processDetector,
+      serviceInstanceIdDetector,
+    ]);
   });
 });

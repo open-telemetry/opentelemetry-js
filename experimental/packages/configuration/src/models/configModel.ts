@@ -35,12 +35,6 @@ export interface ConfigurationModel {
   log_level?: number;
 
   /**
-   * Node resource detectors
-   * If omitted, all is used.
-   */
-  node_resource_detectors?: string[];
-
-  /**
    * Configure resource for all signals.
    * If omitted, the default resource is used.
    */

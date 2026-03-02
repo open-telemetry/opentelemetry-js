@@ -1010,7 +1010,6 @@ describe('ConfigFactory', function () {
       process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,host, serviceinstance';
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
-        node_resource_detectors: ['env', 'host', 'serviceinstance'],
         resource: {
           'detection/development': {
             detectors: [{ host: {} }, { service: {} }],
@@ -1025,7 +1024,6 @@ describe('ConfigFactory', function () {
       process.env.OTEL_NODE_RESOURCE_DETECTORS = 'all';
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
-        node_resource_detectors: ['all'],
         resource: {
           'detection/development': {
             detectors: [
@@ -1045,7 +1043,6 @@ describe('ConfigFactory', function () {
       process.env.OTEL_NODE_RESOURCE_DETECTORS = 'none';
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
-        node_resource_detectors: ['none'],
       };
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
@@ -1055,7 +1052,6 @@ describe('ConfigFactory', function () {
       process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,os';
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
-        node_resource_detectors: ['env', 'os'],
       };
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
