@@ -71,8 +71,7 @@ export class TraceState implements TraceStateApi {
     }
     entries.unshift({ key, value });
 
-    const state = this._serializeEntries(entries);
-    return new TraceState(state.length > MAX_TRACE_STATE_LEN ? '' : state);
+    return new TraceState(this._serializeEntries(entries));
   }
 
   unset(key: string): TraceState {
