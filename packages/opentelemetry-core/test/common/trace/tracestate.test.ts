@@ -136,12 +136,29 @@ describe('TraceState', () => {
 
       const state = new TraceState(tracestate.join(','));
 
-      // assert.deepStrictEqual(state['_keys']().length, 32);
       assert.deepStrictEqual(state.get('a0'), '0');
       assert.deepStrictEqual(state.get('a31'), '31');
       assert.deepStrictEqual(state.get('invalid.middle.key.a'), undefined);
       assert.deepStrictEqual(state.get('invalid.middle.key.b'), undefined);
       assert.deepStrictEqual(state.get('invalid.middle.key.c'), undefined);
+    });
+  });
+
+  describe('"ot" entry validation', () => {
+    it('sohuld accept "ot" entry shorter the allowed length', () => {
+      const state = new TraceState('a=1,b=2');
+      const otState = state.set('ot', 'p:8;k1:7;r:62');
+
+      assert.deepStrictEqual(otState.get('ot'), 'p:8;k1:7;r:62');
+      assert.ok(state !== otState);
+    });
+
+    it('sohuld not accept "ot" entry longer than the allowed length', () => {
+      const state = new TraceState('a=1,b=2');
+      const otState = state.set('ot', 'p:' + '9'.repeat(255));
+
+      assert.deepStrictEqual(otState.get('ot'), undefined);
+      assert.ok(state === otState);
     });
   });
 });

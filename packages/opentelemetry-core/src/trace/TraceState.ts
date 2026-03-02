@@ -8,6 +8,7 @@ import { validateKey, validateValue } from '../internal/validators';
 
 const MAX_TRACE_STATE_ITEMS = 32;
 const MAX_TRACE_STATE_LEN = 512;
+const MAX_OTEL_ENTRY_LEN = 256;
 const LIST_MEMBERS_SEPARATOR = ',';
 const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
 
@@ -25,7 +26,7 @@ export class TraceState implements TraceStateApi {
   private _entries: Array<{ key: string; value: string }> | undefined;
 
   constructor(rawTraceState?: string) {
-    this._raw = rawTraceState || '';
+    this._raw = typeof rawTraceState === 'string' ? rawTraceState : '';
   }
 
   set(key: string, value: string): TraceState {
@@ -34,12 +35,16 @@ export class TraceState implements TraceStateApi {
       return this;
     }
 
-    // Get a new entries so keep this TraceState inmutable
-    const entries = this._entries
-      ? this._entries.map(e => e)
-      : this._parse(this._raw);
-
+    // Validate the `ot` entry as per spec
+    // TODO: add a test for it
     const newEntryLength = key.length + value.length + 1;
+    if (key === 'ot' && newEntryLength > MAX_OTEL_ENTRY_LEN) {
+      return this;
+    }
+
+    // Get a new entries so keep this TraceState inmutable
+    this._entries = this._entries || this._parse(this._raw);
+    const entries = this._entries.map(e => e);
     const index = entries.findIndex(entry => entry.key === key);
 
     if (index === -1) {
