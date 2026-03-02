@@ -94,6 +94,7 @@
   "dependencies": {
     "@opentelemetry/api-logs": "0.212.0",
     "@opentelemetry/core": "2.5.1",
-    "@opentelemetry/resources": "2.5.1"
+    "@opentelemetry/resources": "2.5.1",
+    "@opentelemetry/semantic-conventions": "^1.29.0"
   }
 }

@@ -8,12 +8,20 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* fix(api-logs)!: drop lingering includeTraceContext from LoggerOptions type [#6451](https://github.com/open-telemetry/opentelemetry-js/pull/6451) @trentm
+
 ### :rocket: Features
 
 ### :bug: Bug Fixes
 
+* fix(instrumentation-http): guard against double-instrumentation if loaded with `require('http')` and `import 'http'` [#6428](https://github.com/open-telemetry/opentelemetry-js/issues/6428) @trentm
+* fix(otlp-exporter-base): handle response error [#6412](https://github.com/open-telemetry/opentelemetry-js/pull/6412) @pichlermarc
+  * Fixes a bug where when the response header was received, but the connection was reset by the server,
+    an unhandled error would be thrown.
 * fix(otlp-exporter-base): remove sendBeacon in favor of fetch with keepalive [#6391](https://github.com/open-telemetry/opentelemetry-js/pull/6391) @overbalance
   * (user-facing) createOtlpSendBeaconExportDelegate will be removed in a future version
+* fix(otlp-transformer): downgrade `protobufjs` to version `^7.0.0` [#6418](https://github.com/open-telemetry/opentelemetry-js/pull/6418) @vitorvasc
+* fix(instrumentation-fetch): handle HeadersInit tuple arrays in _addHeaders [#6341](https://github.com/open-telemetry/opentelemetry-js/pull/6341) @overbalance @imadha
 
 ### :books: Documentation
 
@@ -33,11 +41,12 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :rocket: Features
 
 * feat(configuration): add Prometheus exporter support [#6400](https://github.com/open-telemetry/opentelemetry-js/pull/6400) @MikeGoldsmith
-
 * feat(sampler-composite): add ComposableAnnotatingSampler and ComposableRuleBasedSampler [#6305](https://github.com/open-telemetry/opentelemetry-js/pull/6305) @trentm
 * feat(configuration): parse config for rc 3 [#6304](https://github.com/open-telemetry/opentelemetry-js/pull/6304) @maryliag
 * feat(configuration): add sampler configuration parsing support [#6409](https://github.com/open-telemetry/opentelemetry-js/pull/6409) @MikeGoldsmith
 * feat(instrumentation): use the `internals: true` option with import-in-the-middle hook, allowing instrumentations to hook internal files in ES modules [#6344](https://github.com/open-telemetry/opentelemetry-js/pull/6344) @trentm
+* feat(api-logs,sdk-logs): add log exception support and mapping [#6379](https://github.com/open-telemetry/opentelemetry-js/issues/6379) @iblancasa
+* feat(opentelemetry-sdk-node): set log provider for experimental start [#6407](https://github.com/open-telemetry/opentelemetry-js/pull/6407) @maryliag
 
 ### :bug: Bug Fixes
 

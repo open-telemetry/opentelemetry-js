@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import {
@@ -27,6 +16,7 @@ import {
   defaultResource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
@@ -41,6 +31,8 @@ import {
 import { SpanImpl } from '../../src/Span';
 import { MultiSpanProcessor } from '../../src/MultiSpanProcessor';
 import { Tracer } from '../../src/Tracer';
+import { TestRecordOnlySampler } from './export/TestRecordOnlySampler';
+import { TestMetricReader } from './util';
 
 describe('BasicTracerProvider', () => {
   beforeEach(() => {
@@ -562,6 +554,256 @@ describe('BasicTracerProvider', () => {
       );
       tracerProvider.shutdown();
       sinon.assert.calledOnce(shutdownStub);
+    });
+  });
+
+  describe('TracerMetrics', () => {
+    it('should record metrics for sampled spans', async () => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+      const tracerProvider = new BasicTracerProvider({
+        meterProvider,
+        sampler: new AlwaysOnSampler(),
+      });
+      const tracer = tracerProvider.getTracer('test');
+      const span = tracer.startSpan('span');
+      let { resourceMetrics } = await metricReader.collect();
+      let metrics = resourceMetrics.scopeMetrics[0].metrics;
+      let spansStartedMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.started'
+      );
+      let spansLiveMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.live'
+      );
+      assert.ok(spansStartedMetric);
+      assert.strictEqual(spansStartedMetric.dataPoints[0].value, 1);
+      assert.deepStrictEqual(spansStartedMetric.dataPoints[0].attributes, {
+        'otel.span.parent.origin': 'none',
+        'otel.span.sampling_result': 'RECORD_AND_SAMPLE',
+      });
+      assert.ok(spansLiveMetric);
+      assert.strictEqual(spansLiveMetric.dataPoints[0].value, 1);
+      assert.deepStrictEqual(spansLiveMetric.dataPoints[0].attributes, {
+        'otel.span.sampling_result': 'RECORD_AND_SAMPLE',
+      });
+      span.end();
+      ({ resourceMetrics } = await metricReader.collect());
+      metrics = resourceMetrics.scopeMetrics[0].metrics;
+      spansStartedMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.started'
+      );
+      spansLiveMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.live'
+      );
+      assert.ok(spansStartedMetric);
+      assert.strictEqual(spansStartedMetric.dataPoints[0].value, 1);
+      assert.deepStrictEqual(spansStartedMetric.dataPoints[0].attributes, {
+        'otel.span.parent.origin': 'none',
+        'otel.span.sampling_result': 'RECORD_AND_SAMPLE',
+      });
+      assert.ok(spansLiveMetric);
+      assert.strictEqual(spansLiveMetric.dataPoints[0].value, 0);
+      assert.deepStrictEqual(spansLiveMetric.dataPoints[0].attributes, {
+        'otel.span.sampling_result': 'RECORD_AND_SAMPLE',
+      });
+    });
+
+    it('should record metrics for record-only spans', async () => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+      const tracerProvider = new BasicTracerProvider({
+        meterProvider,
+        sampler: new TestRecordOnlySampler(),
+      });
+      const tracer = tracerProvider.getTracer('test');
+      const span = tracer.startSpan('span');
+      let { resourceMetrics } = await metricReader.collect();
+      let metrics = resourceMetrics.scopeMetrics[0].metrics;
+      let spansStartedMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.started'
+      );
+      let spansLiveMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.live'
+      );
+      assert.ok(spansStartedMetric);
+      assert.strictEqual(spansStartedMetric.dataPoints[0].value, 1);
+      assert.deepStrictEqual(spansStartedMetric.dataPoints[0].attributes, {
+        'otel.span.parent.origin': 'none',
+        'otel.span.sampling_result': 'RECORD_ONLY',
+      });
+      assert.ok(spansLiveMetric);
+      assert.strictEqual(spansLiveMetric.dataPoints[0].value, 1);
+      assert.deepStrictEqual(spansLiveMetric.dataPoints[0].attributes, {
+        'otel.span.sampling_result': 'RECORD_ONLY',
+      });
+      span.end();
+      ({ resourceMetrics } = await metricReader.collect());
+      metrics = resourceMetrics.scopeMetrics[0].metrics;
+      spansStartedMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.started'
+      );
+      spansLiveMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.live'
+      );
+      assert.ok(spansStartedMetric);
+      assert.strictEqual(spansStartedMetric.dataPoints[0].value, 1);
+      assert.deepStrictEqual(spansStartedMetric.dataPoints[0].attributes, {
+        'otel.span.parent.origin': 'none',
+        'otel.span.sampling_result': 'RECORD_ONLY',
+      });
+      assert.ok(spansLiveMetric);
+      assert.strictEqual(spansLiveMetric.dataPoints[0].value, 0);
+      assert.deepStrictEqual(spansLiveMetric.dataPoints[0].attributes, {
+        'otel.span.sampling_result': 'RECORD_ONLY',
+      });
+    });
+
+    it('should record metrics for dropped spans', async () => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+      const tracerProvider = new BasicTracerProvider({
+        meterProvider,
+        sampler: new AlwaysOffSampler(),
+      });
+      const tracer = tracerProvider.getTracer('test');
+      const span = tracer.startSpan('span');
+      let { resourceMetrics } = await metricReader.collect();
+      let metrics = resourceMetrics.scopeMetrics[0].metrics;
+      let spansStartedMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.started'
+      );
+      let spansLiveMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.live'
+      );
+      assert.ok(spansStartedMetric);
+      assert.strictEqual(spansStartedMetric.dataPoints[0].value, 1);
+      assert.deepStrictEqual(spansStartedMetric.dataPoints[0].attributes, {
+        'otel.span.parent.origin': 'none',
+        'otel.span.sampling_result': 'DROP',
+      });
+      assert.strictEqual(spansLiveMetric, undefined);
+      span.end();
+      ({ resourceMetrics } = await metricReader.collect());
+      metrics = resourceMetrics.scopeMetrics[0].metrics;
+      spansStartedMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.started'
+      );
+      spansLiveMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.live'
+      );
+      assert.ok(spansStartedMetric);
+      assert.strictEqual(spansStartedMetric.dataPoints[0].value, 1);
+      assert.deepStrictEqual(spansStartedMetric.dataPoints[0].attributes, {
+        'otel.span.parent.origin': 'none',
+        'otel.span.sampling_result': 'DROP',
+      });
+      assert.strictEqual(spansLiveMetric, undefined);
+    });
+
+    it('should record metrics for dropped spans with remote parent', async () => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+      const tracerProvider = new BasicTracerProvider({
+        meterProvider,
+        sampler: new AlwaysOffSampler(),
+      });
+      const tracer = tracerProvider.getTracer('test');
+      const parentContext = trace.setSpanContext(context.active(), {
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: TraceFlags.SAMPLED,
+        isRemote: true,
+      });
+      const span = tracer.startSpan('span', undefined, parentContext);
+      let { resourceMetrics } = await metricReader.collect();
+      let metrics = resourceMetrics.scopeMetrics[0].metrics;
+      let spansStartedMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.started'
+      );
+      let spansLiveMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.live'
+      );
+      assert.ok(spansStartedMetric);
+      assert.strictEqual(spansStartedMetric.dataPoints[0].value, 1);
+      assert.deepStrictEqual(spansStartedMetric.dataPoints[0].attributes, {
+        'otel.span.parent.origin': 'remote',
+        'otel.span.sampling_result': 'DROP',
+      });
+      assert.strictEqual(spansLiveMetric, undefined);
+      span.end();
+      ({ resourceMetrics } = await metricReader.collect());
+      metrics = resourceMetrics.scopeMetrics[0].metrics;
+      spansStartedMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.started'
+      );
+      spansLiveMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.live'
+      );
+      assert.ok(spansStartedMetric);
+      assert.strictEqual(spansStartedMetric.dataPoints[0].value, 1);
+      assert.deepStrictEqual(spansStartedMetric.dataPoints[0].attributes, {
+        'otel.span.parent.origin': 'remote',
+        'otel.span.sampling_result': 'DROP',
+      });
+      assert.strictEqual(spansLiveMetric, undefined);
+    });
+
+    it('should record metrics for dropped spans with local parent', async () => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+      const tracerProvider = new BasicTracerProvider({
+        meterProvider,
+        sampler: new AlwaysOffSampler(),
+      });
+      const tracer = tracerProvider.getTracer('test');
+      const parentContext = trace.setSpanContext(context.active(), {
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: TraceFlags.SAMPLED,
+        isRemote: false,
+      });
+      const span = tracer.startSpan('span', undefined, parentContext);
+      let { resourceMetrics } = await metricReader.collect();
+      let metrics = resourceMetrics.scopeMetrics[0].metrics;
+      let spansStartedMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.started'
+      );
+      let spansLiveMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.live'
+      );
+      assert.ok(spansStartedMetric);
+      assert.strictEqual(spansStartedMetric.dataPoints[0].value, 1);
+      assert.deepStrictEqual(spansStartedMetric.dataPoints[0].attributes, {
+        'otel.span.parent.origin': 'local',
+        'otel.span.sampling_result': 'DROP',
+      });
+      assert.strictEqual(spansLiveMetric, undefined);
+      span.end();
+      ({ resourceMetrics } = await metricReader.collect());
+      metrics = resourceMetrics.scopeMetrics[0].metrics;
+      spansStartedMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.started'
+      );
+      spansLiveMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.span.live'
+      );
+      assert.ok(spansStartedMetric);
+      assert.strictEqual(spansStartedMetric.dataPoints[0].value, 1);
+      assert.deepStrictEqual(spansStartedMetric.dataPoints[0].attributes, {
+        'otel.span.parent.origin': 'local',
+        'otel.span.sampling_result': 'DROP',
+      });
+      assert.strictEqual(spansLiveMetric, undefined);
     });
   });
 });

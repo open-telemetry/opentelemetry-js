@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as sinon from 'sinon';
@@ -29,6 +18,11 @@ import { AnyValue } from '@opentelemetry/api-logs';
 import type { HrTime } from '@opentelemetry/api';
 import { hrTimeToMilliseconds, timeInputToHrTime } from '@opentelemetry/core';
 import { defaultResource } from '@opentelemetry/resources';
+import {
+  ATTR_EXCEPTION_MESSAGE,
+  ATTR_EXCEPTION_STACKTRACE,
+  ATTR_EXCEPTION_TYPE,
+} from '@opentelemetry/semantic-conventions';
 
 import {
   LogRecordLimits,
@@ -155,6 +149,86 @@ describe('LogRecord', () => {
         attr1: false,
         attr2: 123,
       });
+    });
+
+    it('should set exception attributes from exception', () => {
+      const error = new Error('boom');
+      const logRecordData: logsAPI.LogRecord = {
+        exception: error,
+      };
+      const { logRecord } = setup(undefined, logRecordData);
+
+      assert.strictEqual(
+        logRecord.attributes[ATTR_EXCEPTION_MESSAGE],
+        error.message
+      );
+      assert.strictEqual(logRecord.attributes[ATTR_EXCEPTION_TYPE], error.name);
+      if (error.stack) {
+        assert.strictEqual(
+          logRecord.attributes[ATTR_EXCEPTION_STACKTRACE],
+          error.stack
+        );
+      }
+    });
+
+    it('should not overwrite user-provided exception attributes', () => {
+      const error = new Error('boom');
+      const logRecordData: logsAPI.LogRecord = {
+        exception: error,
+        attributes: {
+          [ATTR_EXCEPTION_MESSAGE]: 'user message',
+          [ATTR_EXCEPTION_TYPE]: 'CustomError',
+        },
+      };
+      const { logRecord } = setup(undefined, logRecordData);
+
+      assert.strictEqual(
+        logRecord.attributes[ATTR_EXCEPTION_MESSAGE],
+        'user message'
+      );
+      assert.strictEqual(
+        logRecord.attributes[ATTR_EXCEPTION_TYPE],
+        'CustomError'
+      );
+    });
+
+    it('should set exception.message for string exceptions', () => {
+      const logRecordData: logsAPI.LogRecord = {
+        exception: 'boom',
+      };
+      const { logRecord } = setup(undefined, logRecordData);
+
+      assert.strictEqual(logRecord.attributes[ATTR_EXCEPTION_MESSAGE], 'boom');
+    });
+
+    it('should set exception.message for numeric exceptions', () => {
+      const logRecordData: logsAPI.LogRecord = {
+        exception: 42,
+      };
+      const { logRecord } = setup(undefined, logRecordData);
+
+      assert.strictEqual(logRecord.attributes[ATTR_EXCEPTION_MESSAGE], '42');
+    });
+
+    it('should warn when exception has no useful fields', () => {
+      const warnSpy = sinon.stub(diag, 'warn');
+      const logRecordData: logsAPI.LogRecord = {
+        exception: {} as unknown,
+      };
+
+      setup(undefined, logRecordData);
+
+      assert.ok(warnSpy.calledOnce);
+      warnSpy.restore();
+    });
+
+    it('should set exception.type from code', () => {
+      const logRecordData: logsAPI.LogRecord = {
+        exception: { code: 12 },
+      };
+      const { logRecord } = setup(undefined, logRecordData);
+
+      assert.strictEqual(logRecord.attributes[ATTR_EXCEPTION_TYPE], '12');
     });
   });
 
