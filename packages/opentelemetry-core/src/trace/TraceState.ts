@@ -22,12 +22,10 @@ const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
  */
 export class TraceState implements TraceStateApi {
   private _raw: string;
-  private _length: number;
   private _entries: Array<{ key: string; value: string }> | undefined;
 
   constructor(rawTraceState?: string) {
     this._raw = rawTraceState || '';
-    this._length = this._raw.length;
   }
 
   set(key: string, value: string): TraceState {
@@ -46,7 +44,7 @@ export class TraceState implements TraceStateApi {
 
     if (index === -1) {
       // New entry. Check if the new TraceState is too long
-      if (this._length + newEntryLength > MAX_TRACE_STATE_LEN) {
+      if (this._raw.length + newEntryLength > MAX_TRACE_STATE_LEN) {
         return this;
       }
     } else {
@@ -55,7 +53,7 @@ export class TraceState implements TraceStateApi {
       const currentEntryLength =
         currentEntry.key.length + currentEntry.value.length + 1;
       if (
-        this._length - currentEntryLength + newEntryLength >
+        this._raw.length - currentEntryLength + newEntryLength >
         MAX_TRACE_STATE_LEN
       ) {
         return this;
