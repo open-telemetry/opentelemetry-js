@@ -72,7 +72,6 @@ export class EnvironmentConfigFactory implements ConfigFactory {
     setAttributeLimits(this._config);
     setPropagators(this._config);
     setTracerProvider(this._config);
-    setSampler(this._config);
     setMeterProvider(this._config);
     setLoggerProvider(this._config);
   }
@@ -224,6 +223,7 @@ export function setTracerProvider(config: ConfigurationModel): void {
     return;
   }
   config.tracer_provider = initializeDefaultTracerProviderConfiguration();
+  setSampler(config);
 
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT'

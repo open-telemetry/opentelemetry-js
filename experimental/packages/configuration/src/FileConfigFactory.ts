@@ -40,6 +40,7 @@ import {
   SeverityNumber,
 } from './models/commonModel';
 import {
+  ExperimentalComposableSampler,
   initializeDefaultTracerProviderConfiguration,
   Sampler,
   SpanExporter,
@@ -295,6 +296,59 @@ export function setPropagator(
   }
 }
 
+function parseComposableSampler(
+  sampler: ExperimentalComposableSampler
+): ExperimentalComposableSampler {
+  const samplerType = Object.keys(sampler)[0];
+  let parsedSampler: ExperimentalComposableSampler = {};
+
+  switch (samplerType) {
+    case 'always_on':
+      parsedSampler = { always_on: sampler['always_on'] ?? undefined };
+      break;
+
+    case 'always_off':
+      parsedSampler = { always_off: sampler['always_off'] ?? undefined };
+      break;
+
+    case 'parent_threshold': {
+      const s = sampler['parent_threshold'];
+      if (s?.root) {
+        parsedSampler = {
+          parent_threshold: { root: parseComposableSampler(s.root) },
+        };
+      }
+      break;
+    }
+
+    case 'probability': {
+      const s = sampler['probability'];
+      parsedSampler = {
+        probability: {
+          ratio: getNumberFromConfigFile(s?.ratio) ?? 1.0,
+        },
+      };
+      break;
+    }
+
+    case 'rule_based': {
+      const rb = sampler['rule_based'];
+      if (rb) {
+        parsedSampler = { rule_based: {} };
+        if (rb.rules) {
+          parsedSampler.rule_based!.rules = rb.rules.map(rule => ({
+            ...rule,
+            sampler: rule.sampler ? parseComposableSampler(rule.sampler) : {},
+          }));
+        }
+      }
+      break;
+    }
+  }
+
+  return parsedSampler;
+}
+
 function parseSampler(sampler: Sampler): Sampler {
   const samplerType = Object.keys(sampler)[0];
   let parsedSampler: Sampler = {};
@@ -349,16 +403,6 @@ function parseSampler(sampler: Sampler): Sampler {
       break;
     }
 
-    case 'probability': {
-      const s = sampler['probability'];
-      parsedSampler = {
-        probability: {
-          ratio: getNumberFromConfigFile(s?.ratio) ?? 1.0,
-        },
-      };
-      break;
-    }
-
     case 'probability/development': {
       const s = sampler['probability/development'];
       parsedSampler = {
@@ -372,35 +416,9 @@ function parseSampler(sampler: Sampler): Sampler {
     case 'composite/development': {
       const s = sampler['composite/development'];
       if (s) {
-        parsedSampler = { 'composite/development': {} };
-        if (s.samplers && s.samplers.length > 0) {
-          parsedSampler['composite/development']!.samplers = s.samplers.map(
-            (childSampler: Sampler) => parseSampler(childSampler)
-          );
-        }
-        if (s.composite) {
-          parsedSampler['composite/development']!.composite = s.composite;
-        }
-        if (s.rule_based) {
-          const rb = s.rule_based;
-          parsedSampler['composite/development']!.rule_based = {};
-          if (rb.fallback_sampler) {
-            parsedSampler[
-              'composite/development'
-            ]!.rule_based!.fallback_sampler = parseSampler(rb.fallback_sampler);
-          }
-          if (rb.rules) {
-            parsedSampler['composite/development']!.rule_based!.rules =
-              rb.rules.map(rule => ({
-                ...rule,
-                sampler: rule.sampler ? parseSampler(rule.sampler) : undefined,
-              }));
-          }
-          if (rb.span_kind) {
-            parsedSampler['composite/development']!.rule_based!.span_kind =
-              getStringFromConfigFile(rb.span_kind);
-          }
-        }
+        parsedSampler = {
+          'composite/development': parseComposableSampler(s),
+        };
       }
       break;
     }

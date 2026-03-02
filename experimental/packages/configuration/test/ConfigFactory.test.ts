@@ -2410,32 +2410,31 @@ describe('ConfigFactory', function () {
       });
     });
 
-    it('should parse composite sampler with samplers array from config file', function () {
+    it('should parse composite sampler with rule_based rules from config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
         'test/fixtures/composite-sampler-array.yaml';
       const configFactory = createConfigFactory();
       const config = configFactory.getConfigModel();
       assert.deepStrictEqual(config.tracer_provider?.sampler, {
         'composite/development': {
-          samplers: [
-            { always_on: undefined },
-            { trace_id_ratio_based: { ratio: 0.5 } },
-          ],
+          rule_based: {
+            rules: [
+              { sampler: { always_on: undefined } },
+              { sampler: { probability: { ratio: 0.5 } } },
+            ],
+          },
         },
       });
     });
 
-    it('should parse composite sampler with rule_based fallback and span_kind from config file', function () {
+    it('should parse composite sampler with rule_based attribute matching from config file', function () {
       process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
         'test/fixtures/composite-sampler-rulebased-full.yaml';
       const configFactory = createConfigFactory();
       const config = configFactory.getConfigModel();
       assert.deepStrictEqual(config.tracer_provider?.sampler, {
         'composite/development': {
-          composite: 'rule_based',
           rule_based: {
-            span_kind: 'client',
-            fallback_sampler: { always_off: undefined },
             rules: [
               {
                 attribute_values: {

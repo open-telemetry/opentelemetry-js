@@ -116,19 +116,14 @@ export interface Sampler {
   trace_id_ratio_based?: TraceIdRatioBasedSampler;
 
   /**
-   * Configure sampler to be probability (experimental).
-   */
-  probability?: ProbabilitySampler;
-
-  /**
    * Configure sampler to be probability/development.
    */
-  'probability/development'?: ProbabilitySampler;
+  'probability/development'?: ExperimentalProbabilitySampler;
 
   /**
    * Configure sampler to be composite/development.
    */
-  'composite/development'?: CompositeSampler;
+  'composite/development'?: ExperimentalComposableSampler;
 }
 
 export interface ParentBasedSampler {
@@ -166,75 +161,96 @@ export interface ParentBasedSampler {
 export interface TraceIdRatioBasedSampler {
   /**
    * Configure trace_id_ratio.
+   * If omitted or null, 1.0 is used.
    */
   ratio?: number;
 }
 
-export interface ProbabilitySampler {
+export interface ExperimentalProbabilitySampler {
   /**
    * Configure probability ratio.
+   * If omitted or null, 1.0 is used.
    */
   ratio?: number;
 }
 
-export interface RuleBasedSamplerRule {
+export interface ExperimentalComposableSampler {
   /**
-   * Configure attribute values matching condition.
+   * Configure composable sampler to be always_off.
+   */
+  always_off?: object;
+
+  /**
+   * Configure composable sampler to be always_on.
+   */
+  always_on?: object;
+
+  /**
+   * Configure composable sampler to be parent_threshold.
+   */
+  parent_threshold?: ExperimentalComposableParentThresholdSampler;
+
+  /**
+   * Configure composable sampler to be probability.
+   */
+  probability?: ExperimentalComposableProbabilitySampler;
+
+  /**
+   * Configure composable sampler to be rule_based.
+   */
+  rule_based?: ExperimentalComposableRuleBasedSampler;
+}
+
+export interface ExperimentalComposableParentThresholdSampler {
+  /**
+   * Sampler to use when there is no parent.
+   */
+  root: ExperimentalComposableSampler;
+}
+
+export interface ExperimentalComposableProbabilitySampler {
+  /**
+   * Configure probability ratio.
+   * If omitted or null, 1.0 is used.
+   */
+  ratio?: number;
+}
+
+export interface ExperimentalComposableRuleBasedSampler {
+  /**
+   * The rules for the sampler, matched in order.
+   */
+  rules?: ExperimentalComposableRuleBasedSamplerRule[];
+}
+
+export interface ExperimentalComposableRuleBasedSamplerRule {
+  /**
+   * Values to match against a single attribute.
    */
   attribute_values?: {
-    key?: string;
-    values?: string[];
+    key: string;
+    values: string[];
   };
   /**
-   * Configure attribute patterns matching condition.
+   * Patterns to match against a single attribute.
    */
   attribute_patterns?: {
-    key?: string;
+    key: string;
     included?: string[];
     excluded?: string[];
   };
   /**
-   * Configure parent matching condition.
-   */
-  parent?: string[];
-  /**
-   * Configure span kinds matching condition.
+   * The span kinds to match.
    */
   span_kinds?: string[];
   /**
-   * Configure sampler to use when rule matches.
+   * The parent span types to match.
    */
-  sampler?: Sampler;
-}
-
-export interface RuleBasedSampler {
+  parent?: string[];
   /**
-   * Configure fallback sampler.
+   * The sampler to use for matching spans.
    */
-  fallback_sampler?: Sampler;
-  /**
-   * Configure rules.
-   */
-  rules?: RuleBasedSamplerRule[];
-  /**
-   * Configure span kind.
-   */
-  span_kind?: string;
-}
-
-export interface CompositeSampler {
-  /**
-   * Configure list of samplers.
-   */
-  samplers?: Sampler[];
-  /**
-   * Configure composite type.
-   */
-  composite?: 'rule_based';
-  /**
-   * Configure rule_based sampler.
-   */
-  rule_based?: RuleBasedSampler;
+  sampler: ExperimentalComposableSampler;
 }
 
 export interface SimpleSpanProcessor {

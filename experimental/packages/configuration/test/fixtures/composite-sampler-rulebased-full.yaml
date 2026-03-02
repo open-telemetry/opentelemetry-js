@@ -6,11 +6,7 @@ tracer_provider:
           console:
   sampler:
     composite/development:
-      composite: rule_based
       rule_based:
-        span_kind: client
-        fallback_sampler:
-          always_off:
         rules:
           - attribute_values:
               key: http.method
