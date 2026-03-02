@@ -47,12 +47,17 @@ export class TraceState implements TraceStateApi {
     const index = entries.findIndex(entry => entry.key === key);
 
     if (index === -1) {
-      // New entry. Check if the new TraceState is too long
-      if (this._raw.length + newEntryLength > MAX_TRACE_STATE_LEN) {
+      // New entry. Invalid if the resulting TraceState is
+      // - exceeds the length limit
+      // - exceeds the items limit
+      if (
+        this._raw.length + newEntryLength > MAX_TRACE_STATE_LEN ||
+        this._entries.length + 1 > MAX_TRACE_STATE_ITEMS
+      ) {
         return this;
       }
     } else {
-      // Update entry. Also check if too long with the updated length
+      // Update entry. Invalid if the resulting TraceState is too long
       const currentEntry = entries[index];
       const currentEntryLength =
         currentEntry.key.length + currentEntry.value.length + 1;
