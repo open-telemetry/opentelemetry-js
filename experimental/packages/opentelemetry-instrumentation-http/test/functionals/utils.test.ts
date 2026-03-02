@@ -579,66 +579,44 @@ describe('Utility', () => {
   });
 
   describe('headers to span attributes capture', () => {
-    let span: Span;
-    let mock: sinon.SinonMock;
-
-    beforeEach(() => {
-      span = {
-        setAttribute: () => undefined,
-      } as unknown as Span;
-      mock = sinon.mock(span);
-    });
-
-    it('should set attributes for request and response keys', () => {
-      mock
-        .expects('setAttribute')
-        .calledWithExactly('http.request.header.origin', ['localhost']);
-      mock
-        .expects('setAttribute')
-        .calledWithExactly('http.response.header.cookie', ['token=123']);
-
-      utils.headerCapture(
+    it('should capture attributes for request and response keys', () => {
+      const reqAttrs = utils.headerCapture(
         'request',
         ['Origin'],
         SemconvStability.OLD
-      )(span, () => 'localhost');
-      utils.headerCapture(
+      )(() => 'localhost');
+      const resAttrs = utils.headerCapture(
         'response',
         ['Cookie'],
         SemconvStability.OLD
-      )(span, () => 'token=123');
-      mock.verify();
+      )(() => 'token=123');
+
+      assert.deepStrictEqual(reqAttrs, {
+        'http.request.header.origin': ['localhost'],
+      });
+      assert.deepStrictEqual(resAttrs, {
+        'http.response.header.cookie': ['token=123'],
+      });
     });
 
-    it('should set attributes for multiple values', () => {
-      mock
-        .expects('setAttribute')
-        .calledWithExactly('http.request.header.origin', [
-          'localhost',
-          'www.example.com',
-        ]);
-
-      utils.headerCapture(
+    it('should capture attributes for multiple values', () => {
+      const attrs = utils.headerCapture(
         'request',
         ['Origin'],
         SemconvStability.OLD
-      )(span, () => ['localhost', 'www.example.com']);
-      mock.verify();
+      )(() => ['localhost', 'www.example.com']);
+
+      assert.deepStrictEqual(attrs, {
+        'http.request.header.origin': ['localhost', 'www.example.com'],
+      });
     });
 
-    it('sets attributes for multiple headers', () => {
-      mock
-        .expects('setAttribute')
-        .calledWithExactly('http.request.header.origin', ['localhost']);
-      mock
-        .expects('setAttribute')
-        .calledWithExactly('http.request.header.foo', [42]);
-
-      utils.headerCapture(
+    it('should capture attributes for multiple headers', () => {
+      const attrs = utils.headerCapture(
         'request',
         ['Origin', 'Foo'],
         SemconvStability.OLD
-      )(span, header => {
+      )(header => {
         if (header === 'origin') {
           return 'localhost';
         }
@@ -649,67 +627,63 @@ describe('Utility', () => {
 
         return undefined;
       });
-      mock.verify();
+
+      assert.deepStrictEqual(attrs, {
+        'http.request.header.origin': ['localhost'],
+        'http.request.header.foo': [42],
+      });
     });
 
     it('should normalize header names (SemconvStability.OLD)', () => {
-      mock
-        .expects('setAttribute')
-        .calledWithExactly('http.request.header.x_forwarded_for', ['foo']);
-
-      utils.headerCapture(
+      const attrs = utils.headerCapture(
         'request',
         ['X-Forwarded-For'],
         SemconvStability.OLD
-      )(span, () => 'foo');
-      mock.verify();
+      )(() => 'foo');
+      assert.deepStrictEqual(attrs, {
+        'http.request.header.x_forwarded_for': ['foo'],
+      });
     });
 
     it('should normalize header names (SemconvStability.STABLE)', () => {
-      mock
-        .expects('setAttribute')
-        .calledWithExactly('http.request.header.x-forwarded-for', ['foo']);
-
-      utils.headerCapture(
+      const attrs = utils.headerCapture(
         'request',
         ['X-Forwarded-For'],
         SemconvStability.STABLE
-      )(span, () => 'foo');
-      mock.verify();
+      )(() => 'foo');
+      assert.deepStrictEqual(attrs, {
+        'http.request.header.x-forwarded-for': ['foo'],
+      });
     });
 
     it('should normalize header names (SemconvStability.DUPLICATE)', () => {
       // STABLE semconv wins over OLD when "DUPLICATE" is selected.
-      mock
-        .expects('setAttribute')
-        .calledWithExactly('http.request.header.x-forwarded-for', ['foo']);
-
-      utils.headerCapture(
+      const attrs = utils.headerCapture(
         'request',
         ['X-Forwarded-For'],
         SemconvStability.DUPLICATE
-      )(span, () => 'foo');
-      mock.verify();
+      )(() => 'foo');
+      assert.deepStrictEqual(attrs, {
+        'http.request.header.x-forwarded-for': ['foo'],
+      });
     });
 
     it('ignores non-existent headers', () => {
-      mock
-        .expects('setAttribute')
-        .once()
-        .calledWithExactly('http.request.header.origin', ['localhost']);
-
-      utils.headerCapture(
+      const attrs = utils.headerCapture(
         'request',
         ['Origin', 'Accept'],
         SemconvStability.OLD
-      )(span, header => {
+      )(header => {
         if (header === 'origin') {
           return 'localhost';
         }
 
         return undefined;
       });
-      mock.verify();
+
+      assert.deepStrictEqual(attrs, {
+        'http.request.header.origin': ['localhost'],
+      });
     });
   });
 
