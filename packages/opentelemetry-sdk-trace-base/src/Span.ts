@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import {
@@ -72,6 +61,7 @@ interface SpanOptions {
   attributes?: Attributes;
   spanLimits: SpanLimits;
   spanProcessor: SpanProcessor;
+  recordEndMetrics?: () => void;
 }
 
 /**
@@ -105,6 +95,7 @@ export class SpanImpl implements Span {
   private readonly _spanProcessor: SpanProcessor;
   private readonly _spanLimits: SpanLimits;
   private readonly _attributeValueLengthLimit: number;
+  private readonly _recordEndMetrics?: () => void;
 
   private readonly _performanceStartTime: number;
   private readonly _performanceOffset: number;
@@ -133,6 +124,7 @@ export class SpanImpl implements Span {
     this.startTime = this._getTime(opts.startTime ?? now);
     this.resource = opts.resource;
     this.instrumentationScope = opts.scope;
+    this._recordEndMetrics = opts.recordEndMetrics;
 
     if (opts.attributes != null) {
       this.setAttributes(opts.attributes);
@@ -300,6 +292,7 @@ export class SpanImpl implements Span {
       this._spanProcessor.onEnding(this);
     }
 
+    this._recordEndMetrics?.();
     this._ended = true;
     this._spanProcessor.onEnd(this);
   }

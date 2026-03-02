@@ -4,7 +4,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.211.0",
+  "version": "0.212.0",
   "description": "Composite samplers for OpenTelemetry tracing",
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
@@ -60,8 +60,8 @@
     "nyc": "17.1.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "2.5.0",
-    "@opentelemetry/sdk-trace-base": "2.5.0"
+    "@opentelemetry/core": "2.5.1",
+    "@opentelemetry/sdk-trace-base": "2.5.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sampler-composite",
   "sideEffects": false

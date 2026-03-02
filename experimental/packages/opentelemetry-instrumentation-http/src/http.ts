@@ -1,18 +1,8 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
+
 import {
   context,
   HrTime,
@@ -91,6 +81,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
   private _headerCapture;
+  private _httpPatched: boolean = false;
+  private _httpsPatched: boolean = false;
   declare private _oldHttpServerDurationHistogram: Histogram;
   declare private _stableHttpServerDurationHistogram: Histogram;
   declare private _oldHttpClientDurationHistogram: Histogram;
@@ -100,11 +92,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
   constructor(config: HttpInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-http', VERSION, config);
-    this._headerCapture = this._createHeaderCapture();
     this._semconvStability = semconvStabilityFromStr(
       'http',
       process.env.OTEL_SEMCONV_STABILITY_OPT_IN
     );
+    this._headerCapture = this._createHeaderCapture(this._semconvStability);
   }
 
   protected override _updateMetricInstruments() {
@@ -194,7 +186,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
   override setConfig(config: HttpInstrumentationConfig = {}): void {
     super.setConfig(config);
-    this._headerCapture = this._createHeaderCapture();
+    this._headerCapture = this._createHeaderCapture(this._semconvStability);
   }
 
   init(): [
@@ -209,8 +201,16 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'http',
       ['*'],
       (moduleExports: Http): Http => {
+        // Guard against double-instrumentation, if loaded by both `require`
+        // and `import`.
+        if (this._httpPatched) {
+          return moduleExports;
+        }
+        this._httpPatched = true;
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const isESM = (moduleExports as any)[Symbol.toStringTag] === 'Module';
+
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           const patchedRequest = this._wrap(
             moduleExports,
@@ -241,6 +241,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         return moduleExports;
       },
       (moduleExports: Http) => {
+        this._httpPatched = false;
         if (moduleExports === undefined) return;
 
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
@@ -259,8 +260,16 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'https',
       ['*'],
       (moduleExports: Https): Https => {
+        // Guard against double-instrumentation, if loaded by both `require`
+        // and `import`.
+        if (this._httpsPatched) {
+          return moduleExports;
+        }
+        this._httpsPatched = true;
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const isESM = (moduleExports as any)[Symbol.toStringTag] === 'Module';
+
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           const patchedRequest = this._wrap(
             moduleExports,
@@ -291,6 +300,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         return moduleExports;
       },
       (moduleExports: Https) => {
+        this._httpsPatched = false;
         if (moduleExports === undefined) return;
 
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
@@ -1066,28 +1076,32 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     }
   }
 
-  private _createHeaderCapture() {
+  private _createHeaderCapture(semconvStability: SemconvStability) {
     const config = this.getConfig();
 
     return {
       client: {
         captureRequestHeaders: headerCapture(
           'request',
-          config.headersToSpanAttributes?.client?.requestHeaders ?? []
+          config.headersToSpanAttributes?.client?.requestHeaders ?? [],
+          semconvStability
         ),
         captureResponseHeaders: headerCapture(
           'response',
-          config.headersToSpanAttributes?.client?.responseHeaders ?? []
+          config.headersToSpanAttributes?.client?.responseHeaders ?? [],
+          semconvStability
         ),
       },
       server: {
         captureRequestHeaders: headerCapture(
           'request',
-          config.headersToSpanAttributes?.server?.requestHeaders ?? []
+          config.headersToSpanAttributes?.server?.requestHeaders ?? [],
+          semconvStability
         ),
         captureResponseHeaders: headerCapture(
           'response',
-          config.headersToSpanAttributes?.server?.responseHeaders ?? []
+          config.headersToSpanAttributes?.server?.responseHeaders ?? [],
+          semconvStability
         ),
       },
     };

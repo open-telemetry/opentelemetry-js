@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import {
@@ -32,6 +21,7 @@ import {
   ExporterTemporalityPreference,
   initializeDefaultMeterProviderConfiguration,
   PeriodicMetricReader,
+  PullMetricReader,
 } from './models/meterProviderModel';
 import { OtlpHttpEncoding } from './models/commonModel';
 import { diag } from '@opentelemetry/api';
@@ -360,13 +350,29 @@ export function setMeterProvider(config: ConfigurationModel): void {
   }
   for (let i = 0; i < exportersType.length; i++) {
     const exporterType = exportersType[i];
+    if (exporterType === 'prometheus') {
+      // Prometheus uses a pull reader
+      const pullReader: PullMetricReader = {
+        exporter: {
+          'prometheus/development': {
+            host:
+              getStringFromEnv('OTEL_EXPORTER_PROMETHEUS_HOST') ?? 'localhost',
+            port: getNumberFromEnv('OTEL_EXPORTER_PROMETHEUS_PORT') ?? 9464,
+            without_scope_info: false,
+            without_target_info: false,
+          },
+        },
+      };
+      config.meter_provider.readers.push({ pull: pullReader });
+      continue;
+    }
+
     const readerPeriodicInfo = { ...readerPeriodic };
     const timeout = getNumberFromEnv('OTEL_METRIC_EXPORT_TIMEOUT') ?? 30000;
     if (timeout) {
       readerPeriodicInfo.timeout = timeout;
     }
 
-    // TODO: add prometheus exporter support
     if (exporterType === 'console') {
       readerPeriodicInfo.exporter = { console: {} };
     } else {

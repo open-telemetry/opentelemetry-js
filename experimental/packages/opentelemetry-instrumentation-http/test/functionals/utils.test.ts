@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 import {
   Attributes,
@@ -591,12 +580,16 @@ describe('Utility', () => {
 
   describe('headers to span attributes capture', () => {
     it('should capture attributes for request and response keys', () => {
-      const reqAttrs = utils.headerCapture('request', ['Origin'])(
-        () => 'localhost'
-      );
-      const resAttrs = utils.headerCapture('response', ['Cookie'])(
-        () => 'token=123'
-      );
+      const reqAttrs = utils.headerCapture(
+        'request',
+        ['Origin'],
+        SemconvStability.OLD
+      )(() => 'localhost');
+      const resAttrs = utils.headerCapture(
+        'response',
+        ['Cookie'],
+        SemconvStability.OLD
+      )(() => 'token=123');
 
       assert.deepStrictEqual(reqAttrs, {
         'http.request.header.origin': ['localhost'],
@@ -607,10 +600,11 @@ describe('Utility', () => {
     });
 
     it('should capture attributes for multiple values', () => {
-      const attrs = utils.headerCapture('request', ['Origin'])(() => [
-        'localhost',
-        'www.example.com',
-      ]);
+      const attrs = utils.headerCapture(
+        'request',
+        ['Origin'],
+        SemconvStability.OLD
+      )(() => ['localhost', 'www.example.com']);
 
       assert.deepStrictEqual(attrs, {
         'http.request.header.origin': ['localhost', 'www.example.com'],
@@ -618,19 +612,21 @@ describe('Utility', () => {
     });
 
     it('should capture attributes for multiple headers', () => {
-      const attrs = utils.headerCapture('request', ['Origin', 'Foo'])(
-        header => {
-          if (header === 'origin') {
-            return 'localhost';
-          }
-
-          if (header === 'foo') {
-            return 42;
-          }
-
-          return undefined;
+      const attrs = utils.headerCapture(
+        'request',
+        ['Origin', 'Foo'],
+        SemconvStability.OLD
+      )(header => {
+        if (header === 'origin') {
+          return 'localhost';
         }
-      );
+
+        if (header === 'foo') {
+          return 42;
+        }
+
+        return undefined;
+      });
 
       assert.deepStrictEqual(attrs, {
         'http.request.header.origin': ['localhost'],
@@ -638,26 +634,52 @@ describe('Utility', () => {
       });
     });
 
-    it('should normalize header names', () => {
-      const attrs = utils.headerCapture('request', ['X-Forwarded-For'])(
-        () => 'foo'
-      );
-
+    it('should normalize header names (SemconvStability.OLD)', () => {
+      const attrs = utils.headerCapture(
+        'request',
+        ['X-Forwarded-For'],
+        SemconvStability.OLD
+      )(() => 'foo');
       assert.deepStrictEqual(attrs, {
         'http.request.header.x_forwarded_for': ['foo'],
       });
     });
 
-    it('ignores non-existent headers', () => {
-      const attrs = utils.headerCapture('request', ['Origin', 'Accept'])(
-        header => {
-          if (header === 'origin') {
-            return 'localhost';
-          }
+    it('should normalize header names (SemconvStability.STABLE)', () => {
+      const attrs = utils.headerCapture(
+        'request',
+        ['X-Forwarded-For'],
+        SemconvStability.STABLE
+      )(() => 'foo');
+      assert.deepStrictEqual(attrs, {
+        'http.request.header.x-forwarded-for': ['foo'],
+      });
+    });
 
-          return undefined;
+    it('should normalize header names (SemconvStability.DUPLICATE)', () => {
+      // STABLE semconv wins over OLD when "DUPLICATE" is selected.
+      const attrs = utils.headerCapture(
+        'request',
+        ['X-Forwarded-For'],
+        SemconvStability.DUPLICATE
+      )(() => 'foo');
+      assert.deepStrictEqual(attrs, {
+        'http.request.header.x-forwarded-for': ['foo'],
+      });
+    });
+
+    it('ignores non-existent headers', () => {
+      const attrs = utils.headerCapture(
+        'request',
+        ['Origin', 'Accept'],
+        SemconvStability.OLD
+      )(header => {
+        if (header === 'origin') {
+          return 'localhost';
         }
-      );
+
+        return undefined;
+      });
 
       assert.deepStrictEqual(attrs, {
         'http.request.header.origin': ['localhost'],

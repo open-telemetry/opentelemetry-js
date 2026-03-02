@@ -3,20 +3,38 @@ name: Create or Update Release PR
 on:
   workflow_dispatch:
     inputs:
-      release_type:
+      stable_sdk_release:
         type: choice
-        description: Release type
+        description: 'Stable SDK packages (./packages/*)'
+        default: 'inherit'
         options:
+          - inherit # no release unless required by other settings
           - patch
           - minor
-      release_scope:
+      experimental_release:
         type: choice
-        description: Release Scope
+        description: 'Experimental packages (./experimental/packages/*)'
+        default: 'inherit'
         options:
-          - experimental # all packages in experimental/packages
-          - sdk # all SDK packages, experimental and stable, excluding semantic conventions
-          - all # all release packages, including API, excluding semconv
-          - semconv # only semantic convention package
+          - inherit # matches stable SDK if released, otherwise no release
+          - patch
+          - minor
+      api_release:
+        type: choice
+        description: 'API package (./api) - makes stable SDK and experimental inherit the bump'
+        default: 'inherit'
+        options:
+          - inherit # no release
+          - patch
+          - minor
+      semconv_release:
+        type: choice
+        description: 'Semantic Conventions package (./semantic-conventions)'
+        default: 'inherit'
+        options:
+          - inherit # no release
+          - patch
+          - minor
 
 permissions:
   contents: read
@@ -52,6 +70,8 @@ jobs:
           npm run github:create_or_update_release_pr
         env:
           GITHUB_TOKEN: ${{ steps.otelbot-token.outputs.token }}
-          RELEASE_SCOPE: ${{ github.event.inputs.release_scope }}
-          RELEASE_TYPE: ${{ github.event.inputs.release_type }}
+          STABLE_SDK_RELEASE: ${{ github.event.inputs.stable_sdk_release }}
+          EXPERIMENTAL_RELEASE: ${{ github.event.inputs.experimental_release }}
+          API_RELEASE: ${{ github.event.inputs.api_release }}
+          SEMCONV_RELEASE: ${{ github.event.inputs.semconv_release }}
           RELEASE_PR_REMOTE: origin
