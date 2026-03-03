@@ -77,9 +77,21 @@ export interface ExperimentalResourceDetector {
   container?: object;
 
   /**
-   * Enable the host resource detector, which populates host.* and os.* attributes.
+   * Enable the environment variable resource detector (Node.js only, no spec equivalent).
+   * Reads OTEL_RESOURCE_ATTRIBUTES and OTEL_SERVICE_NAME environment variables.
+   */
+  env?: object;
+
+  /**
+   * Enable the host resource detector, which populates host.* attributes.
    */
   host?: object;
+
+  /**
+   * Enable the OS resource detector (Node.js only, no spec equivalent).
+   * Populates os.type and os.version attributes.
+   */
+  os?: object;
 
   /**
    * Enable the process resource detector, which populates process.* attributes.

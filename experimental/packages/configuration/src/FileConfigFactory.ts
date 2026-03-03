@@ -259,7 +259,9 @@ function parseDetectionDevelopment(
       }
       const detector: ExperimentalResourceDetector = {};
       if ('container' in d) detector.container = d.container ?? {};
+      if ('env' in d) detector.env = d.env ?? {};
       if ('host' in d) detector.host = d.host ?? {};
+      if ('os' in d) detector.os = d.os ?? {};
       if ('process' in d) detector.process = d.process ?? {};
       if ('service' in d) detector.service = d.service ?? {};
       result.detectors.push(detector);

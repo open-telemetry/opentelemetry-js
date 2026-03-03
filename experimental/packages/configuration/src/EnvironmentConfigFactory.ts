@@ -113,7 +113,9 @@ export function setResources(config: ConfigurationModel): void {
     const detectors: ExperimentalResourceDetector[] = [];
     if (all || nodeDetectors.includes('container'))
       detectors.push({ container: {} });
+    if (all || nodeDetectors.includes('env')) detectors.push({ env: {} });
     if (all || nodeDetectors.includes('host')) detectors.push({ host: {} });
+    if (all || nodeDetectors.includes('os')) detectors.push({ os: {} });
     if (all || nodeDetectors.includes('process'))
       detectors.push({ process: {} });
     if (all || nodeDetectors.includes('serviceinstance'))

@@ -249,7 +249,9 @@ const configFromKitchenSinkFile: ConfigurationModel = {
       },
       detectors: [
         { container: {} },
+        { env: {} },
         { host: {} },
+        { os: {} },
         { process: {} },
         { service: {} },
       ],
@@ -1001,7 +1003,7 @@ describe('ConfigFactory', function () {
         ...defaultConfig,
         resource: {
           'detection/development': {
-            detectors: [{ host: {} }, { service: {} }],
+            detectors: [{ env: {} }, { host: {} }, { service: {} }],
           },
         },
       };
@@ -1009,7 +1011,7 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
-    it('should map OTEL_NODE_RESOURCE_DETECTORS=all to all spec detectors', function () {
+    it('should map OTEL_NODE_RESOURCE_DETECTORS=all to all detectors', function () {
       process.env.OTEL_NODE_RESOURCE_DETECTORS = 'all';
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
@@ -1017,7 +1019,9 @@ describe('ConfigFactory', function () {
           'detection/development': {
             detectors: [
               { container: {} },
+              { env: {} },
               { host: {} },
+              { os: {} },
               { process: {} },
               { service: {} },
             ],
@@ -1037,10 +1041,29 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
-    it('should not set detection/development for JS-only detectors (env, os)', function () {
-      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,os';
+    it('should map OTEL_NODE_RESOURCE_DETECTORS=os to os detector', function () {
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'os';
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
+        resource: {
+          'detection/development': {
+            detectors: [{ os: {} }],
+          },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should map OTEL_NODE_RESOURCE_DETECTORS=env to env detector', function () {
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        resource: {
+          'detection/development': {
+            detectors: [{ env: {} }],
+          },
+        },
       };
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);

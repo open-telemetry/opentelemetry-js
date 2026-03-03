@@ -16,7 +16,9 @@ import * as sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
 import { ConfigurationModel } from '@opentelemetry/configuration';
 import {
+  envDetector,
   hostDetector,
+  osDetector,
   processDetector,
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
@@ -421,12 +423,30 @@ describe('getResourceDetectorsFromConfiguration', function () {
     assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), []);
   });
 
+  it('maps env detector object to envDetector', function () {
+    const config: ConfigurationModel = {
+      resource: { 'detection/development': { detectors: [{ env: {} }] } },
+    };
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
+      envDetector,
+    ]);
+  });
+
   it('maps host detector object to hostDetector', function () {
     const config: ConfigurationModel = {
       resource: { 'detection/development': { detectors: [{ host: {} }] } },
     };
     assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
       hostDetector,
+    ]);
+  });
+
+  it('maps os detector object to osDetector', function () {
+    const config: ConfigurationModel = {
+      resource: { 'detection/development': { detectors: [{ os: {} }] } },
+    };
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
+      osDetector,
     ]);
   });
 
