@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context, createContextKey } from '@opentelemetry/api';
+import type { Context } from '@opentelemetry/api';
+import { createContextKey } from '@opentelemetry/api';
 
 const SUPPRESS_TRACING_KEY = createContextKey(
   'OpenTelemetry SDK Context Key SUPPRESS_TRACING'

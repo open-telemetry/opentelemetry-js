@@ -4,9 +4,9 @@
  */
 
 import { NoopTracer } from './NoopTracer';
-import { Tracer } from './tracer';
-import { TracerOptions } from './tracer_options';
-import { TracerProvider } from './tracer_provider';
+import type { Tracer } from './tracer';
+import type { TracerOptions } from './tracer_options';
+import type { TracerProvider } from './tracer_provider';
 
 /**
  * An implementation of the {@link TracerProvider} which returns an impotent

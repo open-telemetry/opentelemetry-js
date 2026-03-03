@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { SpanContext } from '@opentelemetry/api';
 import {
   defaultTextMapGetter,
   defaultTextMapSetter,
   INVALID_SPANID,
   INVALID_TRACEID,
   ROOT_CONTEXT,
-  SpanContext,
   trace,
   TraceFlags,
 } from '@opentelemetry/api';

@@ -4,8 +4,9 @@
  */
 
 import { AggregationTemporality } from './AggregationTemporality';
-import { InstrumentType } from './MetricData';
-import { AggregationOption, AggregationType } from '../view/AggregationOption';
+import type { InstrumentType } from './MetricData';
+import type { AggregationOption } from '../view/AggregationOption';
+import { AggregationType } from '../view/AggregationOption';
 
 /**
  * Aggregation selector based on metric instrument types.

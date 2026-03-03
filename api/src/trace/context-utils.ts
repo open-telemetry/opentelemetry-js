@@ -4,9 +4,9 @@
  */
 
 import { createContextKey } from '../context/context';
-import { Context } from '../context/types';
-import { Span } from './span';
-import { SpanContext } from './span_context';
+import type { Context } from '../context/types';
+import type { Span } from './span';
+import type { SpanContext } from './span_context';
 import { NonRecordingSpan } from './NonRecordingSpan';
 import { ContextAPI } from '../api/context';
 

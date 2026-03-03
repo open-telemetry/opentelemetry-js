@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Logger } from '@opentelemetry/api-logs';
+import type { Logger } from '@opentelemetry/api-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
-import { Resource } from '@opentelemetry/resources';
+import type { Resource } from '@opentelemetry/resources';
 import type { InstrumentationScope } from '@opentelemetry/core';
-import { LogRecordProcessor } from '../LogRecordProcessor';
-import { LogRecordLimits, LoggerConfig, LoggerConfigurator } from '../types';
+import type { LogRecordProcessor } from '../LogRecordProcessor';
+import type {
+  LogRecordLimits,
+  LoggerConfig,
+  LoggerConfigurator,
+} from '../types';
 import { NoopLogRecordProcessor } from '../export/NoopLogRecordProcessor';
 import { MultiLogRecordProcessor } from '../MultiLogRecordProcessor';
 import { getInstrumentationScopeKey } from './utils';

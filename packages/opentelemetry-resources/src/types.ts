@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { AttributeValue } from '@opentelemetry/api';
-import { ResourceDetectionConfig } from './config';
+import type { AttributeValue } from '@opentelemetry/api';
+import type { ResourceDetectionConfig } from './config';
 
 /**
  * Interface for a Resource Detector.

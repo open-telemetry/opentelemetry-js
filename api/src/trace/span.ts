@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Exception } from '../common/Exception';
-import { TimeInput } from '../common/Time';
-import { SpanAttributes, SpanAttributeValue } from './attributes';
-import { SpanContext } from './span_context';
-import { SpanStatus } from './status';
-import { Link } from './link';
+import type { Exception } from '../common/Exception';
+import type { TimeInput } from '../common/Time';
+import type { SpanAttributes, SpanAttributeValue } from './attributes';
+import type { SpanContext } from './span_context';
+import type { SpanStatus } from './status';
+import type { Link } from './link';
 
 /**
  * An interface that represents a span. A span represents a single operation

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   SpanKind,
   SpanStatus,
   Attributes,
@@ -11,9 +11,9 @@ import {
   Link,
   SpanContext,
 } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
-import { InstrumentationScope } from '@opentelemetry/core';
-import { TimedEvent } from '../TimedEvent';
+import type { Resource } from '@opentelemetry/resources';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import type { TimedEvent } from '../TimedEvent';
 
 export interface ReadableSpan {
   readonly name: string;

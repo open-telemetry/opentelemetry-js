@@ -5,7 +5,7 @@
 import { diag } from '@opentelemetry/api';
 import { getStringFromEnv } from '@opentelemetry/core';
 import { inspect } from 'util';
-import { GrpcTls, HttpTls } from './models/commonModel';
+import type { GrpcTls, HttpTls } from './models/commonModel';
 
 /**
  * Retrieves a boolean value from a configuration file parameter.

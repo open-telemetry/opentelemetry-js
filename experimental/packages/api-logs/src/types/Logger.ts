@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { LogRecord } from './LogRecord';
+import type { LogRecord } from './LogRecord';
 
 export interface Logger {
   /**

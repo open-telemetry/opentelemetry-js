@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { ExportResultCode } from '@opentelemetry/core';
-import * as metrics from '@opentelemetry/api';
+import type * as metrics from '@opentelemetry/api';
 import * as assert from 'assert';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { InMemoryMetricExporter } from '../../src/export/InMemoryMetricExporter';
-import { ResourceMetrics } from '../../src/export/MetricData';
+import type { ResourceMetrics } from '../../src/export/MetricData';
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { MeterProvider } from '../../src/MeterProvider';
 import { testResource } from '../util';

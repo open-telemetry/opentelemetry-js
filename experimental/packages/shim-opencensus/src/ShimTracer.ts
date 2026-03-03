@@ -5,14 +5,13 @@
 
 import * as oc from '@opencensus/core';
 
+import type { Context, Tracer } from '@opentelemetry/api';
 import {
-  Context,
   context,
   createContextKey,
   diag,
   INVALID_SPAN_CONTEXT,
   trace,
-  Tracer,
 } from '@opentelemetry/api';
 import { DEFAULT_SPAN_NAME, ShimSpan } from './ShimSpan';
 import { mapSpanContext, mapSpanKind } from './trace-transform';

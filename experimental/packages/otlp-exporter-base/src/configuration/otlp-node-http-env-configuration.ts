@@ -8,10 +8,8 @@ import { getStringFromEnv, parseKeyPairsIntoRecord } from '@opentelemetry/core';
 import { diag } from '@opentelemetry/api';
 import { getSharedConfigurationFromEnvironment } from './shared-env-configuration';
 import { wrapStaticHeadersInFunction } from './shared-configuration';
-import {
-  OtlpNodeHttpConfiguration,
-  httpAgentFactoryFromOptions,
-} from './otlp-node-http-configuration';
+import type { OtlpNodeHttpConfiguration } from './otlp-node-http-configuration';
+import { httpAgentFactoryFromOptions } from './otlp-node-http-configuration';
 
 function getStaticHeadersFromEnv(
   signalIdentifier: string

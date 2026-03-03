@@ -30,14 +30,13 @@ import type {
 } from './internal-types';
 import { type GrpcInstrumentationConfig } from './types';
 
+import type { SpanOptions, Span } from '@opentelemetry/api';
 import {
   context,
   propagation,
   ROOT_CONTEXT,
-  SpanOptions,
   SpanKind,
   trace,
-  Span,
   type Attributes,
 } from '@opentelemetry/api';
 import {

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { HeadersFactory } from './otlp-http-configuration';
+import type { HeadersFactory } from './otlp-http-configuration';
 
 /**
  * Configuration shared across all OTLP exporters

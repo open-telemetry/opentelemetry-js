@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { TracerProvider, MeterProvider } from '@opentelemetry/api';
-import { Instrumentation } from './types';
-import { LoggerProvider } from '@opentelemetry/api-logs';
+import type { TracerProvider, MeterProvider } from '@opentelemetry/api';
+import type { Instrumentation } from './types';
+import type { LoggerProvider } from '@opentelemetry/api-logs';
 
 export interface AutoLoaderResult {
   instrumentations: Instrumentation[];

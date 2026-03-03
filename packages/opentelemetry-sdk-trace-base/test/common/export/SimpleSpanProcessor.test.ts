@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { SpanContext } from '@opentelemetry/api';
 import {
   context,
   ROOT_CONTEXT,
-  SpanContext,
   SpanKind,
   TraceFlags,
 } from '@opentelemetry/api';
@@ -26,7 +26,7 @@ import { SpanImpl } from '../../../src/Span';
 import { TestStackContextManager } from './TestStackContextManager';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestExporterWithDelay } from './TestExporterWithDelay';
-import { Tracer } from '../../../src/Tracer';
+import type { Tracer } from '../../../src/Tracer';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 
 describe('SimpleSpanProcessor', () => {

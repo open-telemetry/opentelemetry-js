@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { SessionIdGenerator } from './types/SessionIdGenerator';
-import { Session } from './types/Session';
-import { SessionProvider } from './types/SessionProvider';
-import { SessionObserver } from './types/SessionObserver';
-import { SessionStore } from './types/SessionStore';
-import { SessionPublisher } from './types/SessionPublisher';
+import type { SessionIdGenerator } from './types/SessionIdGenerator';
+import type { Session } from './types/Session';
+import type { SessionProvider } from './types/SessionProvider';
+import type { SessionObserver } from './types/SessionObserver';
+import type { SessionStore } from './types/SessionStore';
+import type { SessionPublisher } from './types/SessionPublisher';
 
 export interface SessionManagerConfig {
   /** Class responsible for generating a session ID */

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context } from '../context/types';
-import { TextMapPropagator } from './TextMapPropagator';
+import type { Context } from '../context/types';
+import type { TextMapPropagator } from './TextMapPropagator';
 
 /**
  * No-op implementations of {@link TextMapPropagator}.

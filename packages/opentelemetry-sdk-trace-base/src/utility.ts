@@ -4,8 +4,8 @@
  */
 
 import { buildSamplerFromEnv, loadDefaultConfig } from './config';
-import { Sampler } from './Sampler';
-import { SpanLimits, TracerConfig, GeneralLimits } from './types';
+import type { Sampler } from './Sampler';
+import type { SpanLimits, TracerConfig, GeneralLimits } from './types';
 import { getNumberFromEnv } from '@opentelemetry/core';
 
 export const DEFAULT_ATTRIBUTE_COUNT_LIMIT = 128;

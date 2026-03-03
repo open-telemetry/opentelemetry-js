@@ -8,7 +8,8 @@ import {
   SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
 import { OTLPLogExporter } from '../src';
-import { ServerTestContext, startServer } from './utils';
+import type { ServerTestContext } from './utils';
+import { startServer } from './utils';
 import * as assert from 'assert';
 
 const testServiceDefinition = {

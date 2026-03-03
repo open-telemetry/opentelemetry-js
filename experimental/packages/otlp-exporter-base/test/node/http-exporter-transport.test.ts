@@ -7,14 +7,15 @@ import { createHttpExporterTransport } from '../../src/transport/http-exporter-t
 import * as http from 'http';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
+import type {
   ExportResponseRetryable,
   ExportResponseFailure,
   ExportResponseSuccess,
   OTLPExporterError,
 } from '../../src';
 import * as zlib from 'zlib';
-import { createConnection, TcpNetConnectOpts } from 'net';
+import type { TcpNetConnectOpts } from 'net';
+import { createConnection } from 'net';
 
 const sampleRequestData = new Uint8Array([1, 2, 3]);
 

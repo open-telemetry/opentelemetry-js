@@ -2,10 +2,10 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { ISerializer } from '../../i-serializer';
-import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
+import type { ISerializer } from '../../i-serializer';
+import type { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import { createExportMetricsServiceRequest } from '../internal';
-import { IExportMetricsServiceResponse } from '../export-response';
+import type { IExportMetricsServiceResponse } from '../export-response';
 import { JSON_ENCODER } from '../../common/utils';
 
 export const JsonMetricsSerializer: ISerializer<

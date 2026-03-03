@@ -3,36 +3,38 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type {
+  HrTime,
+  Span,
+  SpanOptions,
+  SpanStatus,
+  Histogram,
+  Attributes,
+} from '@opentelemetry/api';
 import {
   context,
-  HrTime,
   INVALID_SPAN_CONTEXT,
   propagation,
   ROOT_CONTEXT,
-  Span,
   SpanKind,
-  SpanOptions,
-  SpanStatus,
   SpanStatusCode,
   trace,
-  Histogram,
-  Attributes,
   ValueType,
 } from '@opentelemetry/api';
+import type { RPCMetadata } from '@opentelemetry/core';
 import {
   hrTime,
   hrTimeDuration,
   hrTimeToMilliseconds,
   suppressTracing,
-  RPCMetadata,
   RPCType,
   setRPCMetadata,
 } from '@opentelemetry/core';
 import type * as http from 'http';
 import type * as https from 'https';
-import { Socket } from 'net';
+import type { Socket } from 'net';
 import * as url from 'url';
-import { HttpInstrumentationConfig } from './types';
+import type { HttpInstrumentationConfig } from './types';
 import { VERSION } from './version';
 import {
   InstrumentationBase,
@@ -72,7 +74,7 @@ import {
   parseResponseStatus,
   setSpanWithError,
 } from './utils';
-import { Err, Func, Http, HttpRequestArgs, Https } from './internal-types';
+import type { Err, Func, Http, HttpRequestArgs, Https } from './internal-types';
 
 /**
  * `node:http` and `node:https` instrumentation for OpenTelemetry

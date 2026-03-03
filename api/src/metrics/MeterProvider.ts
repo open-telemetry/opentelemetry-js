@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Meter, MeterOptions } from './Meter';
+import type { Meter, MeterOptions } from './Meter';
 
 /**
  * A registry for creating named {@link Meter}s.

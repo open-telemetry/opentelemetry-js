@@ -2,19 +2,20 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { HrTime, TraceFlags } from '@opentelemetry/api';
-import { InstrumentationScope } from '@opentelemetry/core';
-import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
+import type { HrTime } from '@opentelemetry/api';
+import { TraceFlags } from '@opentelemetry/api';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import type { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 import * as assert from 'assert';
-import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
+import type { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
-import { JSON_ENCODER, PROTOBUF_ENCODER, Encoder } from '../src/common/utils';
+import type { Encoder } from '../src/common/utils';
+import { JSON_ENCODER, PROTOBUF_ENCODER } from '../src/common/utils';
 import { toBase64 } from './utils';
 import * as root from '../src/generated/root';
-import {
-  ESeverityNumber,
-  IExportLogsServiceRequest,
-} from '../src/logs/internal-types';
+import type { IExportLogsServiceRequest } from '../src/logs/internal-types';
+import { ESeverityNumber } from '../src/logs/internal-types';
 import { createExportLogsServiceRequest } from '../src/logs/internal';
 import { ProtobufLogsSerializer } from '../src/logs/protobuf';
 import { JsonLogsSerializer } from '../src/logs/json';

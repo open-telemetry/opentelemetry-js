@@ -3,20 +3,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   Attributes,
   Context,
   ContextManager,
   Link,
   SpanKind,
-  context,
 } from '@opentelemetry/api';
+import { context } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import type { Sampler, SamplingResult } from '@opentelemetry/sdk-trace-base';
 import {
   InMemorySpanExporter,
-  Sampler,
   SamplingDecision,
-  SamplingResult,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';

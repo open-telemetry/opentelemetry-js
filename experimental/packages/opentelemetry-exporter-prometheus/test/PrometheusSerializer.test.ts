@@ -4,12 +4,11 @@
  */
 
 import * as assert from 'assert';
-import { Attributes, UpDownCounter } from '@opentelemetry/api';
+import type { Attributes, UpDownCounter } from '@opentelemetry/api';
+import type { DataPoint, Histogram } from '@opentelemetry/sdk-metrics';
 import {
   AggregationTemporality,
-  DataPoint,
   DataPointType,
-  Histogram,
   MeterProvider,
   MetricReader,
 } from '@opentelemetry/sdk-metrics';

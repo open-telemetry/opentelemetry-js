@@ -3,19 +3,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as types from '../../types';
+import type * as types from '../../types';
 import * as path from 'path';
 import { types as utilTypes } from 'util';
 import { satisfies } from '../../semver';
-import { wrap, unwrap, massWrap, massUnwrap } from '../../shimmer';
+import type { massWrap, massUnwrap } from '../../shimmer';
+import { wrap, unwrap } from '../../shimmer';
 import { InstrumentationAbstract } from '../../instrumentation';
-import {
-  RequireInTheMiddleSingleton,
-  Hooked,
-} from './RequireInTheMiddleSingleton';
+import type { Hooked } from './RequireInTheMiddleSingleton';
+import { RequireInTheMiddleSingleton } from './RequireInTheMiddleSingleton';
 import type { HookFn } from 'import-in-the-middle';
 import { Hook as HookImport } from 'import-in-the-middle';
-import {
+import type {
   InstrumentationConfig,
   InstrumentationModuleDefinition,
 } from '../../types';

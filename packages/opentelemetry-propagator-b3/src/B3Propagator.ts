@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   Context,
   TextMapGetter,
   TextMapPropagator,
@@ -13,7 +13,8 @@ import { isTracingSuppressed } from '@opentelemetry/core';
 import { B3MultiPropagator } from './B3MultiPropagator';
 import { B3SinglePropagator } from './B3SinglePropagator';
 import { B3_CONTEXT_HEADER } from './constants';
-import { B3InjectEncoding, B3PropagatorConfig } from './types';
+import type { B3PropagatorConfig } from './types';
+import { B3InjectEncoding } from './types';
 
 /**
  * Propagator that extracts B3 context in both single and multi-header variants,

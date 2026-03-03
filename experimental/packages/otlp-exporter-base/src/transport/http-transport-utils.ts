@@ -6,7 +6,7 @@ import type * as http from 'http';
 import type * as https from 'https';
 import * as zlib from 'zlib';
 import { Readable } from 'stream';
-import { ExportResponse } from '../export-response';
+import type { ExportResponse } from '../export-response';
 import {
   isExportHTTPErrorRetryable,
   parseRetryAfterToMills,

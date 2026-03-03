@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Tracer } from './tracer';
-import { TracerOptions } from './tracer_options';
+import type { Tracer } from './tracer';
+import type { TracerOptions } from './tracer_options';
 
 /**
  * A registry for creating named {@link Tracer}s.

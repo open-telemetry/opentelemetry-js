@@ -5,12 +5,11 @@
 
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
+import type { Span, SpanProcessor } from '../../src';
 import {
   BasicTracerProvider,
   InMemorySpanExporter,
   SimpleSpanProcessor,
-  Span,
-  SpanProcessor,
 } from '../../src';
 import {
   setGlobalErrorHandler,

@@ -4,12 +4,12 @@
  */
 
 import * as api from '@opentelemetry/api';
+import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import {
   SemconvStability,
   semconvStabilityFromStr,
   isWrapped,
   InstrumentationBase,
-  InstrumentationConfig,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import { hrTime, isUrlIgnored, otperformance } from '@opentelemetry/core';
@@ -40,7 +40,7 @@ import {
   ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
 } from './semconv';
 import { EventNames } from './enums/EventNames';
-import {
+import type {
   OpenFunction,
   PropagateTraceHeaderCorsUrls,
   SendFunction,
