@@ -5,10 +5,8 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This package provides implementations of composite samplers that propagate sampling information across a trace.
-This implements the [experimental specification][probability-sampling].
-
-Currently `ComposableRuleBased` and `ComposableAnnotating` are not implemented.
+This package provides implementations of [composite samplers][https://opentelemetry.io/docs/specs/otel/trace/sdk/#compositesampler] that propagate sampling information across a trace.
+These samplers provide the implementation for (the experimental) [Consistent Probability Sampling specification][probability-sampling].
 
 ## Quick Start
 
