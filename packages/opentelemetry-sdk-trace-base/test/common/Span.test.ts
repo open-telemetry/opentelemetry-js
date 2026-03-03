@@ -1014,7 +1014,6 @@ describe('Span', () => {
         code: SpanStatusCode.ERROR,
         message: new Error('this is not a string') as any,
       });
-      span.end();
 
       assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
       assert.strictEqual(span.status.message, undefined);
@@ -1022,6 +1021,45 @@ describe('Span', () => {
         warnStub,
         "Dropping invalid status.message of type 'object', expected 'string'"
       );
+    });
+
+    it('should ignore message for OK status', () => {
+      const span = new SpanImpl({
+        scope: tracer.instrumentationScope,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
+        spanContext,
+        name,
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
+
+      span.setStatus({ code: SpanStatusCode.OK, message: 'should be ignored' });
+
+      assert.strictEqual(span.status.code, SpanStatusCode.OK);
+      assert.strictEqual(span.status.message, undefined);
+    });
+
+    it('should ignore message for UNSET status', () => {
+      const span = new SpanImpl({
+        scope: tracer.instrumentationScope,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
+        spanContext,
+        name,
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
+
+      span.setStatus({
+        code: SpanStatusCode.UNSET,
+        message: 'should be ignored',
+      });
+
+      assert.strictEqual(span.status.code, SpanStatusCode.UNSET);
+      assert.strictEqual(span.status.message, undefined);
     });
 
     it('should ignore attempts to set UNSET status', () => {
@@ -1096,45 +1134,6 @@ describe('Span', () => {
       span.setStatus({ code: SpanStatusCode.OK });
 
       assert.strictEqual(span.status.code, SpanStatusCode.OK);
-      assert.strictEqual(span.status.message, undefined);
-    });
-
-    it('should ignore message for OK status', () => {
-      const span = new SpanImpl({
-        scope: tracer.instrumentationScope,
-        resource: tracer['_resource'],
-        context: ROOT_CONTEXT,
-        spanContext,
-        name,
-        kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
-        spanProcessor: tracer['_spanProcessor'],
-      });
-
-      span.setStatus({ code: SpanStatusCode.OK, message: 'should be ignored' });
-
-      assert.strictEqual(span.status.code, SpanStatusCode.OK);
-      assert.strictEqual(span.status.message, undefined);
-    });
-
-    it('should ignore message for UNSET status', () => {
-      const span = new SpanImpl({
-        scope: tracer.instrumentationScope,
-        resource: tracer['_resource'],
-        context: ROOT_CONTEXT,
-        spanContext,
-        name,
-        kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
-        spanProcessor: tracer['_spanProcessor'],
-      });
-
-      span.setStatus({
-        code: SpanStatusCode.UNSET,
-        message: 'should be ignored',
-      });
-
-      assert.strictEqual(span.status.code, SpanStatusCode.UNSET);
       assert.strictEqual(span.status.message, undefined);
     });
 
