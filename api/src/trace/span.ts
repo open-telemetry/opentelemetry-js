@@ -89,18 +89,21 @@ export interface Span {
   addLinks(links: Link[]): this;
 
   /**
-   * Sets a status to the span. If used, this will override the default Span
-   * status. Default is {@link SpanStatusCode.UNSET}.
+   * Sets the status of the span.
    *
-   * These values form a total order: Ok > Error > Unset. Setting
-   * {@link SpanStatusCode.OK} is final and any further attempts to change
-   * the status will be ignored. An attempt to set {@link SpanStatusCode.UNSET}
-   * is always ignored.
+   * By default, a span has status {@link SpanStatusCode.UNSET}.
+   * Calling this method overrides that default.
    *
-   * `message` is only used with {@link SpanStatusCode.ERROR} and is ignored
-   * for other status codes.
+   * The status codes have a total order: `OK > ERROR > UNSET`.
    *
-   * @param status the SpanStatus to set.
+   * - Once {@link SpanStatusCode.OK} is set, any further attempts to change
+   *   the status are ignored.
+   * - Any attempt to set {@link SpanStatusCode.UNSET} is always ignored.
+   *
+   * The `message` field is only used when {@link SpanStatusCode.ERROR} is set.
+   * For all other status codes, `message` is ignored.
+   *
+   * @param status The {@link SpanStatus} to set.
    */
   setStatus(status: SpanStatus): this;
 
