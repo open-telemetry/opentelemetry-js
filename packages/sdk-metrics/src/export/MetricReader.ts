@@ -146,8 +146,15 @@ export abstract class MetricReader implements IMetricReader {
 
   setMetricProducer(metricProducer: MetricProducer) {
     if (this._sdkMetricProducer) {
+      // This check ensures the following requirement from the spec
+      // (https://opentelemetry.io/docs/specs/otel/metrics/sdk/#metricreader):
+      // > The SDK MUST NOT allow a `MetricReader` instance to be registered
+      // > on more than one `MeterProvider` instance.
+      //
+      // So while the argument is a `MetricProducer`, the relevant user-level
+      // error message is about the **MeterProvider**.
       throw new Error(
-        'MetricReader can not be bound to a MeterProducer again.'
+        'MetricReader can not be bound to a MeterProvider again.'
       );
     }
     this._sdkMetricProducer = metricProducer;
