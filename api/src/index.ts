@@ -87,6 +87,7 @@ export { TraceFlags } from './trace/trace_flags';
 export type { TraceState } from './trace/trace_state';
 export { createTraceState } from './trace/internal/utils';
 export type { TracerProvider } from './trace/tracer_provider';
+export type { TracerProviderFactory } from './trace/TracerProviderFactory';
 export type { Tracer } from './trace/tracer';
 export type { TracerOptions } from './trace/tracer_options';
 export {

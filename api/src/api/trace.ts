@@ -15,6 +15,7 @@ import {
 } from '../trace/spancontext-utils';
 import { Tracer } from '../trace/tracer';
 import { TracerProvider } from '../trace/tracer_provider';
+import { TracerProviderFactory } from '../trace/TracerProviderFactory';
 import {
   deleteSpan,
   getActiveSpan,
@@ -36,6 +37,7 @@ export class TraceAPI {
   private static _instance?: TraceAPI;
 
   private _proxyTracerProvider = new ProxyTracerProvider();
+  private _tracerProviderFactory?: TracerProviderFactory;
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
@@ -50,7 +52,44 @@ export class TraceAPI {
   }
 
   /**
+   * Register a vendor {@link TracerProviderFactory}.
+   *
+   * The factory is called during {@link setGlobalTracerProvider} with the
+   * provider the application supplies, and its return value becomes the
+   * actual global delegate. This allows APM vendors to wrap, augment, or
+   * replace the TracerProvider without monkey-patching.
+   *
+   * Only one factory may be registered. Subsequent calls return `false`
+   * and are no-ops (consistent with `setGlobalTracerProvider` semantics).
+   * Call {@link disable} to clear the factory and allow re-registration.
+   *
+   * The factory must be registered **before** `setGlobalTracerProvider` is
+   * called; registering a factory after the provider is already set has no
+   * retroactive effect.
+   *
+   * @returns true if the factory was successfully registered, else false
+   * @since 1.10.0
+   */
+  public setTracerProviderFactory(factory: TracerProviderFactory): boolean {
+    if (this._tracerProviderFactory) {
+      DiagAPI.instance().error(
+        '@opentelemetry/api: Attempted duplicate registration of TracerProviderFactory'
+      );
+      return false;
+    }
+    this._tracerProviderFactory = factory;
+    DiagAPI.instance().debug(
+      '@opentelemetry/api: Registered a TracerProviderFactory.'
+    );
+    return true;
+  }
+
+  /**
    * Set the current global tracer.
+   *
+   * If a {@link TracerProviderFactory} has been registered via
+   * {@link setTracerProviderFactory}, the provider is passed through the
+   * factory before being installed as the delegate.
    *
    * @returns true if the tracer provider was successfully registered, else false
    */
@@ -61,7 +100,10 @@ export class TraceAPI {
       DiagAPI.instance()
     );
     if (success) {
-      this._proxyTracerProvider.setDelegate(provider);
+      const delegate = this._tracerProviderFactory
+        ? this._tracerProviderFactory.createTracerProvider(provider)
+        : provider;
+      this._proxyTracerProvider.setDelegate(delegate);
     }
     return success;
   }
@@ -84,6 +126,7 @@ export class TraceAPI {
   public disable() {
     unregisterGlobal(API_NAME, DiagAPI.instance());
     this._proxyTracerProvider = new ProxyTracerProvider();
+    this._tracerProviderFactory = undefined;
   }
 
   public wrapSpanContext = wrapSpanContext;

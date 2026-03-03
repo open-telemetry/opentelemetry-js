@@ -20,6 +20,8 @@ import api, {
   TextMapSetter,
   trace,
   TraceFlags,
+  TracerProvider,
+  TracerProviderFactory,
 } from '../../../src';
 import { DiagAPI } from '../../../src/api/diag';
 import { NoopMeter } from '../../../src/metrics/NoopMeter';
@@ -204,6 +206,152 @@ describe('API', function () {
         const fields = api.propagation.fields();
         assert.deepStrictEqual(fields, ['TestField']);
       });
+    });
+  });
+
+  describe('TracerProviderFactory', function () {
+    const spanContext = {
+      traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+      spanId: '6e0c63257de34c92',
+      traceFlags: TraceFlags.NONE,
+    };
+    const vendorSpan = new NonRecordingSpan(spanContext);
+
+    beforeEach(() => {
+      context.disable();
+      trace.disable();
+      propagation.disable();
+    });
+
+    class VendorTracer extends NoopTracer {
+      override startSpan(_name: string, _options?: SpanOptions): Span {
+        return vendorSpan;
+      }
+    }
+
+    class VendorTracerProvider extends NoopTracerProvider {
+      public readonly original: TracerProvider;
+      constructor(original: TracerProvider) {
+        super();
+        this.original = original;
+      }
+      override getTracer(_name: string, _version?: string) {
+        return new VendorTracer();
+      }
+    }
+
+    it('should apply factory when setGlobalTracerProvider is called', function () {
+      const factory: TracerProviderFactory = {
+        createTracerProvider(provider) {
+          return new VendorTracerProvider(provider);
+        },
+      };
+
+      assert.strictEqual(trace.setTracerProviderFactory(factory), true);
+      const original = new NoopTracerProvider();
+      assert.strictEqual(trace.setGlobalTracerProvider(original), true);
+
+      const span = trace.getTracer('test').startSpan('test');
+      assert.strictEqual(span, vendorSpan);
+    });
+
+    it('should pass the original provider to the factory', function () {
+      const original = new NoopTracerProvider();
+      let receivedProvider: TracerProvider | undefined;
+
+      const factory: TracerProviderFactory = {
+        createTracerProvider(provider) {
+          receivedProvider = provider;
+          return new VendorTracerProvider(provider);
+        },
+      };
+
+      trace.setTracerProviderFactory(factory);
+      trace.setGlobalTracerProvider(original);
+
+      assert.strictEqual(receivedProvider, original);
+    });
+
+    it('should reject duplicate factory registration', function () {
+      const factory: TracerProviderFactory = {
+        createTracerProvider(p) {
+          return p;
+        },
+      };
+
+      assert.strictEqual(trace.setTracerProviderFactory(factory), true);
+      assert.strictEqual(trace.setTracerProviderFactory(factory), false);
+    });
+
+    it('should allow re-registration after disable()', function () {
+      const factory: TracerProviderFactory = {
+        createTracerProvider(provider) {
+          return new VendorTracerProvider(provider);
+        },
+      };
+
+      assert.strictEqual(trace.setTracerProviderFactory(factory), true);
+      trace.disable();
+      assert.strictEqual(trace.setTracerProviderFactory(factory), true);
+    });
+
+    it('should use provider directly when no factory is registered', function () {
+      class DirectTracer extends NoopTracer {
+        override startSpan(_name: string, _options?: SpanOptions): Span {
+          return vendorSpan;
+        }
+      }
+
+      class DirectProvider extends NoopTracerProvider {
+        override getTracer(_name: string, _version?: string) {
+          return new DirectTracer();
+        }
+      }
+
+      trace.setGlobalTracerProvider(new DirectProvider());
+      const span = trace.getTracer('test').startSpan('test');
+      assert.strictEqual(span, vendorSpan);
+    });
+
+    it('factory can return the original provider unchanged', function () {
+      const factory: TracerProviderFactory = {
+        createTracerProvider(provider) {
+          return provider;
+        },
+      };
+
+      class OriginalTracer extends NoopTracer {
+        override startSpan(_name: string, _options?: SpanOptions): Span {
+          return vendorSpan;
+        }
+      }
+
+      class OriginalProvider extends NoopTracerProvider {
+        override getTracer(_name: string, _version?: string) {
+          return new OriginalTracer();
+        }
+      }
+
+      trace.setTracerProviderFactory(factory);
+      trace.setGlobalTracerProvider(new OriginalProvider());
+
+      const span = trace.getTracer('test').startSpan('test');
+      assert.strictEqual(span, vendorSpan);
+    });
+
+    it('factory wrapping preserves proxy late-binding behavior', function () {
+      const tracer = trace.getTracer('early');
+
+      const factory: TracerProviderFactory = {
+        createTracerProvider(provider) {
+          return new VendorTracerProvider(provider);
+        },
+      };
+      trace.setTracerProviderFactory(factory);
+      trace.setGlobalTracerProvider(new NoopTracerProvider());
+
+      const span = tracer.startSpan('test');
+      assert.strictEqual(span, vendorSpan);
     });
   });
 
