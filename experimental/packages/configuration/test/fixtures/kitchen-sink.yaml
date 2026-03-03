@@ -428,9 +428,9 @@ resource:
         - process.command_args
     detectors:
       - container:
-      - env:
       - host:
       - os:
       - process:
       - service:
+      - env:
   schema_url: https://opentelemetry.io/schemas/1.16.0

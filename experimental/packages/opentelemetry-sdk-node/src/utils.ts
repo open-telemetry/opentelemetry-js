@@ -131,11 +131,11 @@ export function getResourceDetectorsFromConfiguration(
 
   return detectors.flatMap(detector => {
     const result: ResourceDetector[] = [];
-    if (detector.env != null) result.push(envDetector);
     if (detector.host != null) result.push(hostDetector);
     if (detector.os != null) result.push(osDetector);
     if (detector.process != null) result.push(processDetector);
     if (detector.service != null) result.push(serviceInstanceIdDetector);
+    if (detector.env != null) result.push(envDetector);
     return result;
   });
 }

@@ -249,11 +249,11 @@ const configFromKitchenSinkFile: ConfigurationModel = {
       },
       detectors: [
         { container: {} },
-        { env: {} },
         { host: {} },
         { os: {} },
         { process: {} },
         { service: {} },
+        { env: {} },
       ],
     },
   },
@@ -1003,7 +1003,7 @@ describe('ConfigFactory', function () {
         ...defaultConfig,
         resource: {
           'detection/development': {
-            detectors: [{ env: {} }, { host: {} }, { service: {} }],
+            detectors: [{ host: {} }, { service: {} }, { env: {} }],
           },
         },
       };
@@ -1019,11 +1019,11 @@ describe('ConfigFactory', function () {
           'detection/development': {
             detectors: [
               { container: {} },
-              { env: {} },
               { host: {} },
               { os: {} },
               { process: {} },
               { service: {} },
+              { env: {} },
             ],
           },
         },
