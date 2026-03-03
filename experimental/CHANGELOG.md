@@ -13,7 +13,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :rocket: Features
 
 * feat(instrumentation-http): provide `http.request.header.<key>` at server span creation time [#6396](https://github.com/open-telemetry/opentelemetry-js/pull/6396) @vitorvasc
-* feat(configuration): export interfaces required in other packages [#x](https://github.com/open-telemetry/opentelemetry-js/pull/x) @maryliag
+* feat(configuration): export interfaces required in other packages [#6462](https://github.com/open-telemetry/opentelemetry-js/pull/6462) @maryliag
 
 ### :bug: Bug Fixes
 
