@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import { DiagLogger, DiagLogFunction } from './types';
@@ -25,6 +14,30 @@ const consoleMap: { n: keyof DiagLogger; c: ConsoleMapKeys }[] = [
   { n: 'verbose', c: 'trace' },
 ];
 
+// Save original console methods at module load time, before any instrumentation
+// can wrap them. This ensures DiagConsoleLogger calls the unwrapped originals.
+// Exported for testing only — not part of the public API.
+export const _originalConsoleMethods: Partial<
+  Record<ConsoleMapKeys | 'log', typeof console.log>
+> = {};
+if (typeof console !== 'undefined') {
+  const keys: (ConsoleMapKeys | 'log')[] = [
+    'error',
+    'warn',
+    'info',
+    'debug',
+    'trace',
+    'log',
+  ];
+  for (const key of keys) {
+    // eslint-disable-next-line no-console
+    if (typeof console[key] === 'function') {
+      // eslint-disable-next-line no-console
+      _originalConsoleMethods[key] = console[key];
+    }
+  }
+}
+
 /**
  * A simple Immutable Console based diagnostic logger which will output any messages to the Console.
  * If you want to limit the amount of logging to a specific level or lower use the
@@ -36,20 +49,23 @@ export class DiagConsoleLogger implements DiagLogger {
   constructor() {
     function _consoleFunc(funcName: ConsoleMapKeys): DiagLogFunction {
       return function (...args) {
-        if (console) {
-          // Some environments only expose the console when the F12 developer console is open
+        // Prefer original (pre-instrumentation) methods saved at module load time.
+        let theFunc = _originalConsoleMethods[funcName];
+        // Some environments only expose the console when the F12 developer console is open
+        if (typeof theFunc !== 'function') {
+          theFunc = _originalConsoleMethods['log'];
+        }
+        // Fall back in case console was not available at module load time but became available later.
+        if (typeof theFunc !== 'function' && console) {
           // eslint-disable-next-line no-console
-          let theFunc = console[funcName];
+          theFunc = console[funcName];
           if (typeof theFunc !== 'function') {
-            // Not all environments support all functions
             // eslint-disable-next-line no-console
             theFunc = console.log;
           }
-
-          // One last final check
-          if (typeof theFunc === 'function') {
-            return theFunc.apply(console, args);
-          }
+        }
+        if (typeof theFunc === 'function') {
+          return theFunc.apply(console, args);
         }
       };
     }

@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as api from '@opentelemetry/api';
@@ -28,6 +17,8 @@ import { Sampler } from './Sampler';
 import { IdGenerator } from './IdGenerator';
 import { RandomIdGenerator } from './platform';
 import { Resource } from '@opentelemetry/resources';
+import { TracerMetrics } from './TracerMetrics';
+import { VERSION } from './version';
 
 /**
  * This class represents a basic tracer.
@@ -41,6 +32,7 @@ export class Tracer implements api.Tracer {
 
   private readonly _resource: Resource;
   private readonly _spanProcessor: SpanProcessor;
+  private readonly _tracerMetrics: TracerMetrics;
 
   /**
    * Constructs a new Tracer instance.
@@ -59,6 +51,11 @@ export class Tracer implements api.Tracer {
     this._resource = resource;
     this._spanProcessor = spanProcessor;
     this.instrumentationScope = instrumentationScope;
+
+    const meter = localConfig.meterProvider
+      ? localConfig.meterProvider.getMeter('@opentelemetry/sdk-trace', VERSION)
+      : api.createNoopMeter();
+    this._tracerMetrics = new TracerMetrics(meter);
   }
 
   /**
@@ -120,6 +117,11 @@ export class Tracer implements api.Tracer {
       links
     );
 
+    const recordEndMetrics = this._tracerMetrics.startSpan(
+      parentSpanContext,
+      samplingResult.decision
+    );
+
     traceState = samplingResult.traceState ?? traceState;
 
     const traceFlags =
@@ -154,6 +156,7 @@ export class Tracer implements api.Tracer {
       startTime: options.startTime,
       spanProcessor: this._spanProcessor,
       spanLimits: this._spanLimits,
+      recordEndMetrics,
     });
     return span;
   }
