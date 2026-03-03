@@ -327,7 +327,9 @@ describe('OpenTracing Shim', () => {
 
         span.setTag('error', false);
         assert.strictEqual(otSpan.status.code, SpanStatusCode.OK);
+      });
 
+      it('maps string error tag to status code', () => {
         span.setTag('error', 'true');
         assert.strictEqual(otSpan.status.code, SpanStatusCode.ERROR);
 
@@ -350,7 +352,9 @@ describe('OpenTracing Shim', () => {
 
         span.addTags({ hello: 'stars', error: false });
         assert.strictEqual(otSpan.status.code, SpanStatusCode.OK);
+      });
 
+      it('maps string error tag to status code when adding multiple tags', () => {
         span.addTags({ hello: 'stars', error: 'true' });
         assert.strictEqual(otSpan.status.code, SpanStatusCode.ERROR);
 
