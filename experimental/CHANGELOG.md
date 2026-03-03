@@ -8,6 +8,18 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 0.213.0
+
+### :boom: Breaking Changes
+
 * fix(api-logs)!: drop lingering includeTraceContext from LoggerOptions type [#6451](https://github.com/open-telemetry/opentelemetry-js/pull/6451) @trentm
 
 ### :rocket: Features
@@ -24,10 +36,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
   * (user-facing) createOtlpSendBeaconExportDelegate will be removed in a future version
 * fix(otlp-transformer): downgrade `protobufjs` to version `^7.0.0` [#6418](https://github.com/open-telemetry/opentelemetry-js/pull/6418) @vitorvasc
 * fix(instrumentation-fetch): handle HeadersInit tuple arrays in _addHeaders [#6341](https://github.com/open-telemetry/opentelemetry-js/pull/6341) @overbalance @imadha
-
-### :books: Documentation
-
-### :house: Internal
 
 ## 0.212.0
 
