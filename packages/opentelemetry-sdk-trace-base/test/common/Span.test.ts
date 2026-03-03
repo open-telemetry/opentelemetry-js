@@ -962,6 +962,41 @@ describe('Span', () => {
       assert.strictEqual(span.status.message, 'This is an error');
     });
 
+    it('should set an OK status', () => {
+      const span = new SpanImpl({
+        scope: tracer.instrumentationScope,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
+        spanContext,
+        name,
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
+
+      span.setStatus({ code: SpanStatusCode.OK });
+
+      assert.strictEqual(span.status.code, SpanStatusCode.OK);
+      assert.strictEqual(span.status.message, undefined);
+    });
+
+    it('should ignore attempts to set UNSET from initial state', () => {
+      const span = new SpanImpl({
+        scope: tracer.instrumentationScope,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
+        spanContext,
+        name,
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
+
+      span.setStatus({ code: SpanStatusCode.UNSET });
+
+      assert.strictEqual(span.status.code, SpanStatusCode.UNSET);
+    });
+
     it('should drop non-string status message', function () {
       const warnStub = sinon.spy(diag, 'warn');
       const span = new SpanImpl({
@@ -1079,6 +1114,27 @@ describe('Span', () => {
       span.setStatus({ code: SpanStatusCode.OK, message: 'should be ignored' });
 
       assert.strictEqual(span.status.code, SpanStatusCode.OK);
+      assert.strictEqual(span.status.message, undefined);
+    });
+
+    it('should ignore message for UNSET status', () => {
+      const span = new SpanImpl({
+        scope: tracer.instrumentationScope,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
+        spanContext,
+        name,
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
+
+      span.setStatus({
+        code: SpanStatusCode.UNSET,
+        message: 'should be ignored',
+      });
+
+      assert.strictEqual(span.status.code, SpanStatusCode.UNSET);
       assert.strictEqual(span.status.message, undefined);
     });
 
