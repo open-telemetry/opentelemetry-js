@@ -23,7 +23,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
-* fix(sdk-trace): enforce StatusCode precedence rules in `setStatus` per specification @newbee1939
+* fix(sdk-trace-base): enforce StatusCode precedence rules in `setStatus` per specification [#6461](https://github.com/open-telemetry/opentelemetry-js/pull/6461) @newbee1939
 * fix(sdk-trace-web): propagate `optimised` flag in `getElementXPath` recursion [#6335](https://github.com/open-telemetry/opentelemetry-js/pull/6335) @akkupratap323
 
 ### :books: Documentation
