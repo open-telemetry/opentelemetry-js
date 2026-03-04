@@ -42,6 +42,23 @@ describe('TraceState', () => {
   });
 
   describe('.parse()', () => {
+    it('must skip parsing if keys are not accessed', () => {
+      let tracestate = 'a=1';
+      let state = new TraceState(tracestate);
+      assert.deepStrictEqual(state.serialize(), tracestate);
+
+      tracestate = 'a=' + 'b'.repeat(512);
+      state = new TraceState(tracestate);
+      assert.deepStrictEqual(state.serialize(), tracestate);
+
+      tracestate = new Array(33)
+        .fill(0)
+        .map((_: null, num: number) => `a${num}=${num}`)
+        .join(',');
+      state = new TraceState(tracestate);
+      assert.deepStrictEqual(state.serialize(), tracestate);
+    });
+
     it('must successfully parse valid state value', () => {
       const state = new TraceState(
         'vendorname2=opaqueValue2,vendorname1=opaqueValue1'
@@ -88,20 +105,23 @@ describe('TraceState', () => {
     });
 
     it('must truncate states with too many items', () => {
-      const state = new TraceState(
-        new Array(33)
-          .fill(0)
-          .map((_: null, num: number) => `a${num}=${num}`)
-          .join(',')
-      );
-      assert.deepStrictEqual(state['_keys']().length, 32);
-      assert.deepStrictEqual(state.get('a0'), '0');
-      assert.deepStrictEqual(state.get('a31'), '31');
-      assert.deepStrictEqual(
-        state.get('a32'),
-        undefined,
-        'should truncate from the tail'
-      );
+      const tracestate = new Array(33)
+        .fill(0)
+        .map((_: null, num: number) => `a${num}=${num}`);
+      const state = new TraceState(tracestate.join(','));
+
+      tracestate.forEach((entry, index) => {
+        const [key, value] = entry.split('=');
+        if (index < 32) {
+          assert.deepStrictEqual(state.get(key), value);
+        } else {
+          assert.deepStrictEqual(
+            state.get(key),
+            undefined,
+            'should truncate from the tail'
+          );
+        }
+      });
     });
 
     it('should not count invalid items towards max limit', () => {
@@ -116,12 +136,29 @@ describe('TraceState', () => {
 
       const state = new TraceState(tracestate.join(','));
 
-      assert.deepStrictEqual(state['_keys']().length, 32);
       assert.deepStrictEqual(state.get('a0'), '0');
       assert.deepStrictEqual(state.get('a31'), '31');
       assert.deepStrictEqual(state.get('invalid.middle.key.a'), undefined);
       assert.deepStrictEqual(state.get('invalid.middle.key.b'), undefined);
       assert.deepStrictEqual(state.get('invalid.middle.key.c'), undefined);
+    });
+  });
+
+  describe('"ot" entry validation', () => {
+    it('sohuld accept "ot" entry shorter the allowed length', () => {
+      const state = new TraceState('a=1,b=2');
+      const otState = state.set('ot', 'p:8;k1:7;r:62');
+
+      assert.deepStrictEqual(otState.get('ot'), 'p:8;k1:7;r:62');
+      assert.ok(state !== otState);
+    });
+
+    it('sohuld not accept "ot" entry longer than the allowed length', () => {
+      const state = new TraceState('a=1,b=2');
+      const otState = state.set('ot', 'p:' + '9'.repeat(255));
+
+      assert.deepStrictEqual(otState.get('ot'), undefined);
+      assert.ok(state === otState);
     });
   });
 });

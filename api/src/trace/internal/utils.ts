@@ -7,6 +7,7 @@ import { TraceState } from '../trace_state';
 import { TraceStateImpl } from './tracestate-impl';
 
 /**
+ * @deprecated This will be removed in the next major version.
  * @since 1.1.0
  */
 export function createTraceState(rawTraceState?: string): TraceState {
