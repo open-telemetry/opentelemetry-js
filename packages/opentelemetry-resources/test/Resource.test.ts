@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import { diag } from '@opentelemetry/api';
@@ -26,6 +15,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { describeBrowser, describeNode } from './util';
 import { defaultResource, emptyResource, resourceFromAttributes } from '../src';
+import { _clearDefaultServiceNameCache } from '../src/default-service-name';
 import * as EventEmitter from 'events';
 
 describe('Resource', () => {
@@ -42,6 +32,8 @@ describe('Resource', () => {
     'k8s.io/container/name': 'c2',
     'k8s.io/location': 'location1',
   });
+
+  beforeEach(() => _clearDefaultServiceNameCache());
 
   it('should return merged resource', () => {
     const expectedResource = resourceFromAttributes({
@@ -107,7 +99,7 @@ describe('Resource', () => {
     const debugStub = sinon.spy(diag, 'error');
     const resource = resourceFromAttributes({
       async: new Promise(resolve => {
-        setTimeout(resolve, 1);
+        setTimeout(() => resolve(undefined), 1);
       }),
     });
 
@@ -134,7 +126,7 @@ describe('Resource', () => {
     it('should return false for asyncAttributesPending once promise settles', async () => {
       const resourceResolve = resourceFromAttributes({
         async: new Promise(resolve => {
-          setTimeout(resolve, 1);
+          setTimeout(() => resolve(undefined), 1);
         }),
       });
       const resourceReject = resourceFromAttributes({

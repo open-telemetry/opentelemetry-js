@@ -1,25 +1,14 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context } from '../context/types';
+import type { Context } from '../context/types';
 import { NoopTracer } from './NoopTracer';
-import { Span } from './span';
-import { SpanOptions } from './SpanOptions';
-import { Tracer } from './tracer';
-import { TracerOptions } from './tracer_options';
+import type { Span } from './span';
+import type { SpanOptions } from './SpanOptions';
+import type { Tracer } from './tracer';
+import type { TracerOptions } from './tracer_options';
 
 const NOOP_TRACER = new NoopTracer();
 
@@ -31,13 +20,22 @@ const NOOP_TRACER = new NoopTracer();
 export class ProxyTracer implements Tracer {
   // When a real implementation is provided, this will be it
   private _delegate?: Tracer;
+  private _provider: TracerDelegator;
+  public readonly name: string;
+  public readonly version?: string;
+  public readonly options?: TracerOptions;
 
   constructor(
-    private _provider: TracerDelegator,
-    public readonly name: string,
-    public readonly version?: string,
-    public readonly options?: TracerOptions
-  ) {}
+    provider: TracerDelegator,
+    name: string,
+    version?: string,
+    options?: TracerOptions
+  ) {
+    this._provider = provider;
+    this.name = name;
+    this.version = version;
+    this.options = options;
+  }
 
   startSpan(name: string, options?: SpanOptions, context?: Context): Span {
     return this._getTracer().startSpan(name, options, context);

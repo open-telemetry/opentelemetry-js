@@ -83,15 +83,12 @@ package.json.lerna_backup
 # OS generated files
 .DS_Store
 
-# VsCode configs
-.vscode/
-
-#Visual Studio
-.vs/
-
-#IDEA
-.idea
+# Editor configs
 *.iml
+.idea/
+.vs/
+.vscode/
+.zed/
 
 # non-aggregated benchmark results
 .benchmark-results.txt

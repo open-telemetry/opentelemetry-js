@@ -1,46 +1,18 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 'use strict';
 
-import {
-  OtlpFileExporter,
+import type {
+  ExperimentalOtlpFileExporter,
   OtlpGrpcExporter,
-  OtlpHttpEncoding,
   OtlpHttpExporter,
 } from './commonModel';
 
-export function initializeDefaultTracerProviderConfiguration(): TracerProvider {
+export function initializeDefaultTracerProviderConfiguration(): Required<TracerProvider> {
   return {
-    processors: [
-      {
-        batch: {
-          schedule_delay: 5000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
-          exporter: {
-            otlp_http: {
-              endpoint: 'http://localhost:4318/v1/traces',
-              timeout: 10000,
-              encoding: OtlpHttpEncoding.Protobuf,
-            },
-          },
-        },
-      },
-    ],
+    processors: [],
     limits: {
       attribute_count_limit: 128,
       event_count_limit: 128,
@@ -78,16 +50,128 @@ export interface TracerProvider {
   sampler?: Sampler;
 }
 
-export interface SpanProcessor {
+export interface BatchSpanProcessor {
   /**
-   * Configure a batch span processor.
+   * Configure delay interval (in milliseconds) between two consecutive exports.
+   * Value must be non-negative.
+   * If omitted or null, 5000 is used for traces and 1000 for logs.
    */
-  batch?: BatchSpanProcessor;
+  schedule_delay?: number;
 
   /**
-   * Configure a simple span processor.
+   * Configure maximum allowed time (in milliseconds) to export data.
+   * Value must be non-negative. A value of 0 indicates no limit (infinity).
+   * If omitted or null, 30000 is used.
    */
-  simple?: SimpleSpanProcessor;
+  export_timeout?: number;
+
+  /**
+   * Configure maximum queue size. Value must be positive.
+   * If omitted or null, 2048 is used.
+   */
+  max_queue_size?: number;
+
+  /**
+   * Configure maximum batch size. Value must be positive.
+   * If omitted or null, 512 is used.
+   */
+  max_export_batch_size?: number;
+
+  /**
+   * Configure exporter.
+   */
+  exporter: SpanExporter;
+}
+
+export interface Sampler {
+  /**
+   * Configure sampler to be parent_based.
+   */
+  parent_based?: ParentBasedSampler;
+
+  /**
+   * Configure sampler to be always_off.
+   */
+  always_off?: object;
+
+  /**
+   * Configure sampler to be always_on.
+   */
+  always_on?: object;
+
+  /***
+   * Configure sampler to be trace_id_ratio_based.
+   */
+  trace_id_ratio_based?: TraceIdRatioBasedSampler;
+}
+
+export interface ParentBasedSampler {
+  /**
+   * Configure root sampler.
+   * If omitted or null, always_on is used.
+   */
+  root?: Sampler;
+
+  /**
+   * Configure remote_parent_sampled sampler.
+   * If omitted or null, always_on is used.
+   */
+  remote_parent_sampled?: Sampler;
+
+  /**
+   * Configure remote_parent_not_sampled sampler.
+   * If omitted or null, always_off is used.
+   */
+  remote_parent_not_sampled?: Sampler;
+
+  /**
+   * Configure local_parent_sampled sampler.
+   * If omitted or null, always_on is used.
+   */
+  local_parent_sampled?: Sampler;
+
+  /**
+   * Configure local_parent_not_sampled sampler.
+   * If omitted or null, always_off is used.
+   */
+  local_parent_not_sampled?: Sampler;
+}
+
+export interface TraceIdRatioBasedSampler {
+  /**
+   * Configure trace_id_ratio.
+   */
+  ratio?: number;
+}
+
+export interface SimpleSpanProcessor {
+  /**
+   * Configure exporter.
+   */
+  exporter: SpanExporter;
+}
+
+export interface SpanExporter {
+  /**
+   * Configure exporter to be OTLP with HTTP transport.
+   */
+  otlp_http?: OtlpHttpExporter;
+
+  /**
+   * Configure exporter to be OTLP with gRPC transport.
+   */
+  otlp_grpc?: OtlpGrpcExporter;
+
+  /**
+   * Configure exporter to be OTLP with file transport.
+   * This type is in development and subject to breaking changes in minor versions.
+   */
+  'otlp_file/development'?: ExperimentalOtlpFileExporter;
+
+  /**
+   * Configure exporter to be console.
+   */
+  console?: object;
 }
 
 export interface SpanLimits {
@@ -134,134 +218,14 @@ export interface SpanLimits {
   link_attribute_count_limit?: number;
 }
 
-export interface Sampler {
+export interface SpanProcessor {
   /**
-   * Configure sampler to be parent_based.
+   * Configure a batch span processor.
    */
-  parent_based?: ParentBasedSampler;
+  batch?: BatchSpanProcessor;
 
   /**
-   * Configure sampler to be always_off.
+   * Configure a simple span processor.
    */
-  always_off?: object;
-
-  /**
-   * Configure sampler to be always_on.
-   */
-  always_on?: object;
-}
-
-export interface ParentBasedSampler {
-  /**
-   * Configure root sampler.
-   * If omitted or null, always_on is used.
-   */
-  root: Sampler;
-
-  /**
-   * Configure remote_parent_sampled sampler.
-   * If omitted or null, always_on is used.
-   */
-  remote_parent_sampled: Sampler;
-
-  /**
-   * Configure remote_parent_not_sampled sampler.
-   * If omitted or null, always_off is used.
-   */
-  remote_parent_not_sampled: Sampler;
-
-  /**
-   * Configure local_parent_sampled sampler.
-   * If omitted or null, always_on is used.
-   */
-  local_parent_sampled: Sampler;
-
-  /**
-   * Configure local_parent_not_sampled sampler.
-   * If omitted or null, always_off is used.
-   */
-  local_parent_not_sampled: Sampler;
-}
-
-export interface BatchSpanProcessor {
-  /**
-   * Configure delay interval (in milliseconds) between two consecutive exports.
-   * Value must be non-negative.
-   * If omitted or null, 5000 is used for traces and 1000 for logs.
-   */
-  schedule_delay?: number;
-
-  /**
-   * Configure maximum allowed time (in milliseconds) to export data.
-   * Value must be non-negative. A value of 0 indicates no limit (infinity).
-   * If omitted or null, 30000 is used.
-   */
-  export_timeout?: number;
-
-  /**
-   * Configure maximum queue size. Value must be positive.
-   * If omitted or null, 2048 is used.
-   */
-  max_queue_size?: number;
-
-  /**
-   * Configure maximum batch size. Value must be positive.
-   * If omitted or null, 512 is used.
-   */
-  max_export_batch_size?: number;
-
-  /**
-   * Configure exporter.
-   */
-  exporter: SpanExporter;
-}
-
-export interface SpanExporter {
-  /**
-   * Configure exporter to be OTLP with HTTP transport.
-   */
-  otlp_http?: OtlpHttpExporter;
-
-  /**
-   * Configure exporter to be OTLP with gRPC transport.
-   */
-  otlp_grpc?: OtlpGrpcExporter;
-
-  /**
-   * Configure exporter to be OTLP with file transport.
-   * This type is in development and subject to breaking changes in minor versions.
-   */
-  'otlp_file/development'?: OtlpFileExporter;
-
-  /**
-   * Configure exporter to be console.
-   */
-  console?: object;
-
-  /**
-   * Configure exporter to be zipkin.
-   */
-  zipkin?: ZipkinSpanExporter;
-}
-
-export interface ZipkinSpanExporter {
-  /**
-   * Configure endpoint.
-   * If omitted or null, http://localhost:9411/api/v2/spans is used.
-   */
-  endpoint?: string;
-
-  /**
-   * Configure max time (in milliseconds) to wait for each export.
-   * Value must be non-negative. A value of 0 indicates indefinite.
-   * If omitted or null, 10000 is used.
-   */
-  timeout?: number;
-}
-
-export interface SimpleSpanProcessor {
-  /**
-   * Configure exporter.
-   */
-  exporter: SpanExporter;
+  simple?: SimpleSpanProcessor;
 }

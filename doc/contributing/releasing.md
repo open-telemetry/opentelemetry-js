@@ -11,12 +11,18 @@ We aim to eventually automate this process as much as possible.
 
 1. Go to the [Release PR Workflow](https://github.com/open-telemetry/opentelemetry-js/actions/workflows/create-or-update-release-pr.yml)
 2. Click "Run workflow"
-3. For `Release Type`, select if you want to create a release PR for a new `minor` or `patch` version.
-4. For `Release Scope`, select if you want to release
-   - `experimental` (all packages under `./experimental/packages`)
-   - `sdk` (all packages under `./packages/` and `./experimental/packages`)
-   - `all` (all packages under `./api/`, `./packages/` and `./experimental/packages`; excludes `./semantic-conventions/`)
-   - `semconv` (the single semconv package at `./semantic-conventions/`)
+3. Configure which packages to release and their version bump type:
+   - **Stable SDK packages** (`./packages/*`): Select `minor`, `patch`, or `inherit` (no release unless required)
+   - **Experimental packages** (`./experimental/packages/*`): Select `minor`, `patch`, or `inherit` (automatically inherits from Stable SDK if Stable SDK is released)
+   - **API package** (`./api`): Select `minor`, `patch`, or `inherit` (no release). When set, makes Stable SDK and Experimental packages inherit the same version bump.
+   - **Semantic Conventions** (`./semantic-conventions`): Select `minor`, `patch`, or `inherit` (no release)
+
+**Release Rules:**
+
+- If you release Stable SDK packages, Experimental packages will automatically inherit the same version bump type (unless you explicitly set Experimental to a different value)
+- If you use "API package", it will make both Stable SDK and Experimental packages inherit the same version bump
+- You cannot set "API package" to a specific version while also setting Stable SDK or Experimental to different bumps (the workflow will fail)
+- Semantic Conventions can be released independently or alongside other packages
 
 > [!TIP]
 > If there was a commit to `main`, after PR creation simply run the workflow again before merging it.
@@ -52,10 +58,10 @@ We aim to eventually automate this process as much as possible.
 
 1. Check out the commit created by merging the release PR
 2. Run
-   - `npm run _github:draft_release:experimental`, if you published an `all`, `sdk` or `experimental` release
-   - `npm run _github:draft_release:stable`, if you published an `all` or `sdk` release
+   - `npm run _github:draft_release:experimental`, if you published an `api`, `sdk` or `experimental` release
+   - `npm run _github:draft_release:stable`, if you published an `api` or `sdk` release
    - `npm run _github:draft_release:semconv`, if you published a `semconv` release
-   - `npm run _github:draft_release:api` if you published an `all` release
+   - `npm run _github:draft_release:api` if you published an `api` release
 3. Verify that the contents of the created draft releases (title, changelog, selected commit)
 4. Publish the releases
    - uncheck `Set as a pre-release` for all releases

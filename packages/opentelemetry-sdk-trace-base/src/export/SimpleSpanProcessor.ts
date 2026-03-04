@@ -1,30 +1,20 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context, TraceFlags } from '@opentelemetry/api';
+import type { Context } from '@opentelemetry/api';
+import { TraceFlags } from '@opentelemetry/api';
 import {
   internal,
   ExportResultCode,
   globalErrorHandler,
   BindOnceFuture,
 } from '@opentelemetry/core';
-import { Span } from '../Span';
-import { SpanProcessor } from '../SpanProcessor';
-import { ReadableSpan } from './ReadableSpan';
-import { SpanExporter } from './SpanExporter';
+import type { Span } from '../Span';
+import type { SpanProcessor } from '../SpanProcessor';
+import type { ReadableSpan } from './ReadableSpan';
+import type { SpanExporter } from './SpanExporter';
 
 /**
  * An implementation of the {@link SpanProcessor} that converts the {@link Span}
@@ -35,10 +25,12 @@ import { SpanExporter } from './SpanExporter';
  * NOTE: This {@link SpanProcessor} exports every ended span individually instead of batching spans together, which causes significant performance overhead with most exporters. For production use, please consider using the {@link BatchSpanProcessor} instead.
  */
 export class SimpleSpanProcessor implements SpanProcessor {
+  private readonly _exporter: SpanExporter;
   private _shutdownOnce: BindOnceFuture<void>;
   private _pendingExports: Set<Promise<void>>;
 
-  constructor(private readonly _exporter: SpanExporter) {
+  constructor(exporter: SpanExporter) {
+    this._exporter = exporter;
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
     this._pendingExports = new Set<Promise<void>>();
   }

@@ -1,27 +1,12 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Attributes } from '@opentelemetry/api';
-import { InstrumentationScope } from '@opentelemetry/core';
+import type { Attributes } from '@opentelemetry/api';
+import type { InstrumentationScope } from '@opentelemetry/core';
 
 export type Maybe<T> = T | undefined;
-
-export function isNotNullish<T>(item: Maybe<T>): item is T {
-  return item !== undefined && item !== null;
-}
 
 /**
  * Converting the unordered attributes into unique identifier string.
@@ -95,61 +80,6 @@ export function callWithTimeout<T>(
       throw reason;
     }
   );
-}
-
-export interface PromiseAllSettledFulfillResult<T> {
-  status: 'fulfilled';
-  value: T;
-}
-
-export interface PromiseAllSettledRejectionResult {
-  status: 'rejected';
-  reason: unknown;
-}
-
-export type PromiseAllSettledResult<T> =
-  | PromiseAllSettledFulfillResult<T>
-  | PromiseAllSettledRejectionResult;
-
-/**
- * Node.js v12.9 lower and browser compatible `Promise.allSettled`.
- */
-export async function PromiseAllSettled<T>(
-  promises: Promise<T>[]
-): Promise<PromiseAllSettledResult<T>[]> {
-  return Promise.all(
-    promises.map<Promise<PromiseAllSettledResult<T>>>(async p => {
-      try {
-        const ret = await p;
-        return {
-          status: 'fulfilled',
-          value: ret,
-        };
-      } catch (e) {
-        return {
-          status: 'rejected',
-          reason: e,
-        };
-      }
-    })
-  );
-}
-
-export function isPromiseAllSettledRejectionResult(
-  it: PromiseAllSettledResult<unknown>
-): it is PromiseAllSettledRejectionResult {
-  return it.status === 'rejected';
-}
-
-/**
- * Node.js v11.0 lower and browser compatible `Array.prototype.flatMap`.
- */
-export function FlatMap<T, R>(arr: T[], fn: (it: T) => R[]): R[] {
-  const result: R[] = [];
-  arr.forEach(it => {
-    result.push(...fn(it));
-  });
-  return result;
 }
 
 export function setEquals(lhs: Set<unknown>, rhs: Set<unknown>): boolean {

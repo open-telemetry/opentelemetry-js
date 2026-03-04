@@ -1,22 +1,10 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   Context,
-  diag,
   Exception,
   HrTime,
   Link,
@@ -26,33 +14,32 @@ import {
   SpanContext,
   SpanKind,
   SpanStatus,
-  SpanStatusCode,
   TimeInput,
 } from '@opentelemetry/api';
+import { diag, SpanStatusCode } from '@opentelemetry/api';
+import type { InstrumentationScope } from '@opentelemetry/core';
 import {
   addHrTimes,
   millisToHrTime,
-  getTimeOrigin,
   hrTime,
   hrTimeDuration,
-  InstrumentationScope,
   isAttributeValue,
   isTimeInput,
   isTimeInputHrTime,
   otperformance,
   sanitizeAttributes,
 } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import type { Resource } from '@opentelemetry/resources';
 import {
   ATTR_EXCEPTION_MESSAGE,
   ATTR_EXCEPTION_STACKTRACE,
   ATTR_EXCEPTION_TYPE,
 } from '@opentelemetry/semantic-conventions';
-import { ReadableSpan } from './export/ReadableSpan';
+import type { ReadableSpan } from './export/ReadableSpan';
 import { ExceptionEventName } from './enums';
-import { SpanProcessor } from './SpanProcessor';
-import { TimedEvent } from './TimedEvent';
-import { SpanLimits } from './types';
+import type { SpanProcessor } from './SpanProcessor';
+import type { TimedEvent } from './TimedEvent';
+import type { SpanLimits } from './types';
 
 /**
  * This type provides the properties of @link{ReadableSpan} at the same time
@@ -73,6 +60,7 @@ interface SpanOptions {
   attributes?: Attributes;
   spanLimits: SpanLimits;
   spanProcessor: SpanProcessor;
+  recordEndMetrics?: () => void;
 }
 
 /**
@@ -94,6 +82,7 @@ export class SpanImpl implements Span {
   private _droppedAttributesCount = 0;
   private _droppedEventsCount: number = 0;
   private _droppedLinksCount: number = 0;
+  private _attributesCount: number = 0;
 
   name: string;
   status: SpanStatus = {
@@ -105,6 +94,7 @@ export class SpanImpl implements Span {
   private readonly _spanProcessor: SpanProcessor;
   private readonly _spanLimits: SpanLimits;
   private readonly _attributeValueLengthLimit: number;
+  private readonly _recordEndMetrics?: () => void;
 
   private readonly _performanceStartTime: number;
   private readonly _performanceOffset: number;
@@ -119,7 +109,7 @@ export class SpanImpl implements Span {
     this._spanContext = opts.spanContext;
     this._performanceStartTime = otperformance.now();
     this._performanceOffset =
-      now - (this._performanceStartTime + getTimeOrigin());
+      now - (this._performanceStartTime + otperformance.timeOrigin);
     this._startTimeProvided = opts.startTime != null;
     this._spanLimits = opts.spanLimits;
     this._attributeValueLengthLimit =
@@ -133,6 +123,7 @@ export class SpanImpl implements Span {
     this.startTime = this._getTime(opts.startTime ?? now);
     this.resource = opts.resource;
     this.instrumentationScope = opts.scope;
+    this._recordEndMetrics = opts.recordEndMetrics;
 
     if (opts.attributes != null) {
       this.setAttributes(opts.attributes);
@@ -158,16 +149,24 @@ export class SpanImpl implements Span {
     }
 
     const { attributeCountLimit } = this._spanLimits;
+    const isNewKey = !Object.prototype.hasOwnProperty.call(
+      this.attributes,
+      key
+    );
 
     if (
       attributeCountLimit !== undefined &&
-      Object.keys(this.attributes).length >= attributeCountLimit &&
-      !Object.prototype.hasOwnProperty.call(this.attributes, key)
+      this._attributesCount >= attributeCountLimit &&
+      isNewKey
     ) {
       this._droppedAttributesCount++;
       return this;
     }
+
     this.attributes[key] = this._truncateToSize(value);
+    if (isNewKey) {
+      this._attributesCount++;
+    }
     return this;
   }
 
@@ -292,6 +291,7 @@ export class SpanImpl implements Span {
       this._spanProcessor.onEnding(this);
     }
 
+    this._recordEndMetrics?.();
     this._ended = true;
     this._spanProcessor.onEnd(this);
   }

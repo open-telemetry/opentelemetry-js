@@ -22,7 +22,7 @@ module.exports = {
   coverageReporter: {
     type : 'json',
     subdir: '.',
-    dir : '.nyc_output/'
+    dir : 'coverage/'
   },
   reporters: ['spec', 'coverage'],
   files: ['test/index-webpack.ts'],

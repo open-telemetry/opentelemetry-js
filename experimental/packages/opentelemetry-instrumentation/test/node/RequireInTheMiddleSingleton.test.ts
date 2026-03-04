@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
@@ -37,39 +26,42 @@ describe('RequireInTheMiddleSingleton', function () {
   describe('register', function () {
     const onRequireFsStub = makeOnRequiresStub('fs');
     const onRequireFsPromisesStub = makeOnRequiresStub('fs-promises');
-    const onRequireCodecovStub = makeOnRequiresStub('codecov');
-    const onRequireCodecovLibStub = makeOnRequiresStub('codecov-lib');
-    const onRequireCpxStub = makeOnRequiresStub('test-non-core-module');
-    const onRequireCpxLibStub = makeOnRequiresStub('test-non-core-module-lib');
+    const onRequireNonCoreModuleStub = makeOnRequiresStub(
+      'test-non-core-module'
+    );
+    const onRequireNonCoreModuleLibStub = makeOnRequiresStub(
+      'test-non-core-module-lib'
+    );
 
-    before(() => {
+    before(function () {
       requireInTheMiddleSingleton.register('fs', onRequireFsStub);
       requireInTheMiddleSingleton.register(
         'fs/promises',
         onRequireFsPromisesStub
       );
-      requireInTheMiddleSingleton.register('codecov', onRequireCodecovStub);
-      requireInTheMiddleSingleton.register(
-        'codecov/lib/codecov.js',
-        onRequireCodecovLibStub
-      );
       requireInTheMiddleSingleton.register(
         'test-non-core-module',
-        onRequireCpxStub
+        onRequireNonCoreModuleStub
       );
       requireInTheMiddleSingleton.register(
         'test-non-core-module/lib/copy-sync.js',
-        onRequireCpxLibStub
+        onRequireNonCoreModuleLibStub
       );
     });
 
-    beforeEach(() => {
+    afterEach(function () {
+      // delete cached modules to allow re-require
+      delete require.cache[require.resolve('fs/promises')];
+      delete require.cache[require.resolve('test-non-core-module')];
+      delete require.cache[
+        require.resolve('test-non-core-module/lib/copy-sync')
+      ];
+
+      // reset stubs
       onRequireFsStub.resetHistory();
       onRequireFsPromisesStub.resetHistory();
-      onRequireCodecovStub.resetHistory();
-      onRequireCodecovLibStub.resetHistory();
-      onRequireCpxStub.resetHistory();
-      onRequireCpxLibStub.resetHistory();
+      onRequireNonCoreModuleStub.resetHistory();
+      onRequireNonCoreModuleLibStub.resetHistory();
     });
 
     it('should return a hooked object', function () {
@@ -124,29 +116,44 @@ describe('RequireInTheMiddleSingleton', function () {
     describe('non-core module', function () {
       describe('AND module name matches', function () {
         const baseDir = path.normalize(
-          path.dirname(require.resolve('codecov'))
+          path.resolve(
+            path.dirname(require.resolve('test-non-core-module')),
+            '..'
+          )
         );
         const modulePath = path.normalize(
-          path.join('codecov', 'lib', 'codecov.js')
+          path.join('test-non-core-module', 'lib', 'copy-sync.js')
         );
         it('should call `onRequire`', function () {
-          const exports = require('codecov');
-          assert.deepStrictEqual(exports.__ritmOnRequires, ['codecov']);
+          const exports = require('test-non-core-module');
+          assert.deepStrictEqual(exports.__ritmOnRequires, [
+            'test-non-core-module',
+          ]);
           sinon.assert.calledWithExactly(
-            onRequireCodecovStub,
+            onRequireNonCoreModuleStub,
             exports,
-            'codecov',
+            'test-non-core-module',
             baseDir
           );
           sinon.assert.calledWithMatch(
-            onRequireCodecovStub,
-            { __ritmOnRequires: ['codecov', 'codecov-lib'] },
+            onRequireNonCoreModuleStub,
+            {
+              __ritmOnRequires: [
+                'test-non-core-module',
+                'test-non-core-module-lib',
+              ],
+            },
             modulePath,
             baseDir
           );
           sinon.assert.calledWithMatch(
-            onRequireCodecovLibStub,
-            { __ritmOnRequires: ['codecov', 'codecov-lib'] },
+            onRequireNonCoreModuleLibStub,
+            {
+              __ritmOnRequires: [
+                'test-non-core-module',
+                'test-non-core-module-lib',
+              ],
+            },
             modulePath,
             baseDir
           );
@@ -154,7 +161,7 @@ describe('RequireInTheMiddleSingleton', function () {
       });
     });
 
-    describe('non-core module with sub-path', function () {
+    describe('non-core module with sub-path (deep require)', function () {
       describe('AND module name matches', function () {
         const baseDir = path.normalize(
           path.resolve(
@@ -172,7 +179,7 @@ describe('RequireInTheMiddleSingleton', function () {
             'test-non-core-module-lib',
           ]);
           sinon.assert.calledWithMatch(
-            onRequireCpxStub,
+            onRequireNonCoreModuleStub,
             {
               __ritmOnRequires: [
                 'test-non-core-module',
@@ -183,13 +190,13 @@ describe('RequireInTheMiddleSingleton', function () {
             baseDir
           );
           sinon.assert.calledWithExactly(
-            onRequireCpxStub,
+            onRequireNonCoreModuleStub,
             exports,
             modulePath,
             baseDir
           );
           sinon.assert.calledWithExactly(
-            onRequireCpxLibStub,
+            onRequireNonCoreModuleLibStub,
             exports,
             modulePath,
             baseDir

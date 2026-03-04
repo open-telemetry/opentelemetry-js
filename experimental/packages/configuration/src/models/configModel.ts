@@ -1,34 +1,14 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 'use strict';
 
 import { DiagLogLevel } from '@opentelemetry/api';
-import {
-  initializeDefaultTracerProviderConfiguration,
-  TracerProvider,
-} from './tracerProviderModel';
-import {
-  initializeDefaultLoggerProviderConfiguration,
-  LoggerProvider,
-} from './loggerProviderModel';
-import { Resource } from './resourceModel';
-import {
-  initializeDefaultMeterProviderConfiguration,
-  MeterProvider,
-} from './meterProviderModel';
+import type { TracerProvider } from './tracerProviderModel';
+import type { LoggerProvider } from './loggerProviderModel';
+import type { Resource } from './resourceModel';
+import type { MeterProvider } from './meterProviderModel';
 
 export interface ConfigurationModel {
   /**
@@ -86,18 +66,10 @@ export function initializeDefaultConfiguration(): ConfigurationModel {
   const config: ConfigurationModel = {
     disabled: false,
     log_level: DiagLogLevel.INFO,
-    node_resource_detectors: ['all'],
     resource: {},
     attribute_limits: {
       attribute_count_limit: 128,
     },
-    propagator: {
-      composite: [{ tracecontext: null }, { baggage: null }],
-      composite_list: 'tracecontext,baggage',
-    },
-    tracer_provider: initializeDefaultTracerProviderConfiguration(),
-    meter_provider: initializeDefaultMeterProviderConfiguration(),
-    logger_provider: initializeDefaultLoggerProviderConfiguration(),
   };
 
   return config;

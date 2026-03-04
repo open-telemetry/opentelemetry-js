@@ -1,42 +1,27 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { HrTime } from '@opentelemetry/api';
-import { InstrumentationScope } from '@opentelemetry/core';
-import { MetricCollectOptions } from '../export/MetricProducer';
-import { ScopeMetrics } from '../export/MetricData';
-import {
-  createInstrumentDescriptorWithView,
-  InstrumentDescriptor,
-} from '../InstrumentDescriptor';
+import type { HrTime } from '@opentelemetry/api';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import type { MetricCollectOptions } from '../export/MetricProducer';
+import type { MetricData, ScopeMetrics } from '../export/MetricData';
+import type { InstrumentDescriptor } from '../InstrumentDescriptor';
+import { createInstrumentDescriptorWithView } from '../InstrumentDescriptor';
 import { Meter } from '../Meter';
-import { isNotNullish, Maybe } from '../utils';
+import type { Maybe } from '../utils';
 import { AsyncMetricStorage } from './AsyncMetricStorage';
-import { MeterProviderSharedState } from './MeterProviderSharedState';
-import { MetricCollectorHandle } from './MetricCollector';
+import type { MeterProviderSharedState } from './MeterProviderSharedState';
+import type { MetricCollectorHandle } from './MetricCollector';
 import { MetricStorageRegistry } from './MetricStorageRegistry';
 import { MultiMetricStorage } from './MultiWritableMetricStorage';
 import { ObservableRegistry } from './ObservableRegistry';
 import { SyncMetricStorage } from './SyncMetricStorage';
-import { Accumulation, Aggregator } from '../aggregator/types';
-import {
-  createNoopAttributesProcessor,
-  IAttributesProcessor,
-} from '../view/AttributesProcessor';
-import { MetricStorage } from './MetricStorage';
+import type { Accumulation, Aggregator } from '../aggregator/types';
+import type { IAttributesProcessor } from '../view/AttributesProcessor';
+import { createNoopAttributesProcessor } from '../view/AttributesProcessor';
+import type { MetricStorage } from './MetricStorage';
 
 /**
  * An internal record for shared meter provider states.
@@ -45,12 +30,16 @@ export class MeterSharedState {
   metricStorageRegistry = new MetricStorageRegistry();
   observableRegistry = new ObservableRegistry();
   meter: Meter;
+  private _meterProviderSharedState: MeterProviderSharedState;
+  private _instrumentationScope: InstrumentationScope;
 
   constructor(
-    private _meterProviderSharedState: MeterProviderSharedState,
-    private _instrumentationScope: InstrumentationScope
+    meterProviderSharedState: MeterProviderSharedState,
+    instrumentationScope: InstrumentationScope
   ) {
     this.meter = new Meter(this);
+    this._meterProviderSharedState = meterProviderSharedState;
+    this._instrumentationScope = instrumentationScope;
   }
 
   registerMetricStorage(descriptor: InstrumentDescriptor) {
@@ -97,11 +86,14 @@ export class MeterSharedState {
       return null;
     }
 
-    const metricDataList = storages
-      .map(metricStorage => {
-        return metricStorage.collect(collector, collectionTime);
-      })
-      .filter(isNotNullish);
+    const metricDataList: MetricData[] = [];
+    storages.forEach(metricStorage => {
+      const metricData = metricStorage.collect(collector, collectionTime);
+
+      if (metricData != null) {
+        metricDataList.push(metricData);
+      }
+    });
 
     // skip this scope if no data was collected (storage created, but no data observed)
     if (metricDataList.length === 0) {

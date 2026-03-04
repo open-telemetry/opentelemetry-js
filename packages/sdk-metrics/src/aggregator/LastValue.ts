@@ -1,39 +1,33 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   Accumulation,
   AccumulationRecord,
   Aggregator,
-  AggregatorKind,
   LastValue,
 } from './types';
-import { HrTime } from '@opentelemetry/api';
+import { AggregatorKind } from './types';
+import type { HrTime } from '@opentelemetry/api';
 import { millisToHrTime, hrTimeToMicroseconds } from '@opentelemetry/core';
-import { DataPointType, GaugeMetricData } from '../export/MetricData';
-import { Maybe } from '../utils';
-import { AggregationTemporality } from '../export/AggregationTemporality';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
+import type { GaugeMetricData } from '../export/MetricData';
+import { DataPointType } from '../export/MetricData';
+import type { Maybe } from '../utils';
+import type { AggregationTemporality } from '../export/AggregationTemporality';
+import type { InstrumentDescriptor } from '../InstrumentDescriptor';
 
 export class LastValueAccumulation implements Accumulation {
-  constructor(
-    public startTime: HrTime,
-    private _current = 0,
-    public sampleTime: HrTime = [0, 0]
-  ) {}
+  public startTime;
+  private _current;
+  public sampleTime;
+
+  constructor(startTime: HrTime, current = 0, sampleTime: HrTime = [0, 0]) {
+    this.startTime = startTime;
+    this._current = current;
+    this.sampleTime = sampleTime;
+  }
 
   record(value: number): void {
     this._current = value;

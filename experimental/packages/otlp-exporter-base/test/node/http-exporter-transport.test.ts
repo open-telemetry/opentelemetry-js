@@ -1,31 +1,21 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import { createHttpExporterTransport } from '../../src/transport/http-exporter-transport';
 import * as http from 'http';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
+import type {
   ExportResponseRetryable,
   ExportResponseFailure,
   ExportResponseSuccess,
   OTLPExporterError,
 } from '../../src';
 import * as zlib from 'zlib';
-import { createConnection, TcpNetConnectOpts } from 'net';
+import type { TcpNetConnectOpts } from 'net';
+import { createConnection } from 'net';
 
 const sampleRequestData = new Uint8Array([1, 2, 3]);
 
@@ -83,7 +73,10 @@ describe('HttpExporterTransport', function () {
       server.listen(8080);
 
       class SedAgent extends http.Agent {
-        createConnection(options: TcpNetConnectOpts, listener: () => void) {
+        override createConnection(
+          options: TcpNetConnectOpts,
+          listener: () => void
+        ) {
           return createConnection(
             { ...options, host: options.host?.replaceAll('j', 'l') },
             listener
@@ -195,7 +188,7 @@ describe('HttpExporterTransport', function () {
       );
     });
 
-    it('returns failure when request times out', function (done) {
+    it('returns retryable when request times out', function (done) {
       // arrange
       const timer = sinon.useFakeTimers();
       server = http.createServer((_, res) => {
@@ -218,11 +211,9 @@ describe('HttpExporterTransport', function () {
         .send(sampleRequestData, 100)
         .then(result => {
           // assert
-          assert.strictEqual(result.status, 'failure');
-          assert.strictEqual(
-            (result as ExportResponseFailure).error.message,
-            'Request Timeout'
-          );
+          assert.strictEqual(result.status, 'retryable');
+          assert.ok(result.error, 'Expected error object to be present');
+          assert.strictEqual(result.error.message, 'Request timed out');
           done();
         })
         .catch(error => {
@@ -232,7 +223,7 @@ describe('HttpExporterTransport', function () {
       timer.tick(200);
     });
 
-    it('returns failure when socket hangs up', async function () {
+    it('returns retryable when socket hangs up (ECONNRESET)', async function () {
       // arrange
       server = http.createServer((_, res) => {
         res.destroy();
@@ -250,14 +241,142 @@ describe('HttpExporterTransport', function () {
       const result = await transport.send(sampleRequestData, 100);
 
       // assert
-      assert.strictEqual(result.status, 'failure');
+      assert.strictEqual(result.status, 'retryable');
+      assert.ok(result.error, 'Expected error object to be present');
       assert.strictEqual(
-        (result as ExportResponseFailure).error.message,
-        'socket hang up'
+        (result.error as NodeJS.ErrnoException).code,
+        'ECONNRESET'
       );
+      assert.strictEqual(result.error?.message, 'socket hang up');
     });
 
-    it('returns failure when server does not exist', async function () {
+    it('returns failure when socket is destroyed after headers with non-retryable error code are received', async function () {
+      // arrange
+      server = http.createServer((_, res) => {
+        // Force flush http response headers to trigger client response callback
+        res.writeHead(403);
+        res.write('');
+        // Destroy the socket to simulate something going wrong
+        queueMicrotask(() => {
+          res.socket?.destroy();
+        });
+      });
+      server.listen(8080);
+
+      const transport = createHttpExporterTransport({
+        url: 'http://localhost:8080',
+        headers: async () => ({}),
+        compression: 'none',
+        agentFactory: () => new http.Agent(),
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 1000);
+
+      // assert
+      assert.strictEqual(result.status, 'failure');
+      assert.strictEqual(
+        (result.error as NodeJS.ErrnoException).code,
+        'ECONNRESET'
+      );
+      assert.strictEqual(result.error?.message, 'aborted');
+    });
+
+    it('returns failure when socket is destroyed after headers with retryable code are received', async function () {
+      // arrange
+      server = http.createServer((_, res) => {
+        // Force flush http response headers to trigger client response callback
+        res.writeHead(429, 'Too many requests', { 'retry-after': '1' });
+        res.write('');
+        // Destroy the socket to simulate something going wrong
+        queueMicrotask(() => {
+          res.socket?.destroy();
+        });
+      });
+      server.listen(8080);
+
+      const transport = createHttpExporterTransport({
+        url: 'http://localhost:8080',
+        headers: async () => ({}),
+        compression: 'none',
+        agentFactory: () => new http.Agent(),
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 1000);
+
+      // assert
+      assert.strictEqual(result.status, 'retryable');
+      assert.strictEqual(
+        (result.error as NodeJS.ErrnoException).code,
+        'ECONNRESET'
+      );
+      assert.strictEqual(result.retryInMillis, 1000);
+      assert.strictEqual(result.error?.message, 'aborted');
+    });
+
+    it('returns success when socket is destroyed after headers with success code are received', async function () {
+      // arrange
+      server = http.createServer((_, res) => {
+        // Force flush http response headers to trigger client response callback
+        res.writeHead(200);
+        res.write('');
+        // Destroy the socket to simulate connection reset after headers
+        queueMicrotask(() => {
+          res.socket?.destroy();
+        });
+      });
+      server.listen(8080);
+
+      const transport = createHttpExporterTransport({
+        url: 'http://localhost:8080',
+        headers: async () => ({}),
+        compression: 'none',
+        agentFactory: () => new http.Agent(),
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 1000);
+
+      // assert
+      assert.strictEqual(result.status, 'success');
+    });
+
+    it('returns retryable on connection refused (ECONNREFUSED)', async function () {
+      // arrange
+      server = http.createServer();
+      await new Promise<void>(resolve => server!.listen(0, resolve));
+      const port = (server!.address() as any).port;
+      await new Promise<void>(resolve => server!.close(resolve as any));
+      server = undefined;
+
+      const transport = createHttpExporterTransport({
+        url: `http://localhost:${port}`,
+        headers: async () => ({}),
+        compression: 'none',
+        agentFactory: () => new http.Agent(),
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 50);
+
+      // assert
+      assert.strictEqual(result.status, 'retryable');
+      assert.ok(result.error, 'Expected error object to be present');
+      assert.strictEqual(
+        (result.error as NodeJS.ErrnoException).code,
+        'ECONNREFUSED'
+      );
+      // Node.js 20+ can try multiple requests (IPv4 & IPv6) at once
+      // and return AggregateError
+      const errorMessage =
+        result.error instanceof AggregateError
+          ? result.error?.errors.map(e => (e as Error).message).join(' ')
+          : result.error?.message;
+      assert.strictEqual(errorMessage.includes('connect ECONNREFUSED'), true);
+    });
+
+    it('returns retryable when server does not exist (ENOTFOUND)', async function () {
       // arrange
       const transport = createHttpExporterTransport({
         // use wrong port
@@ -271,10 +390,15 @@ describe('HttpExporterTransport', function () {
       const result = await transport.send(sampleRequestData, 100);
 
       // assert
-      assert.strictEqual(result.status, 'failure');
+      assert.strictEqual(result.status, 'retryable');
+      assert.ok(result.error, 'Expected error object to be present');
       assert.strictEqual(
-        (result as ExportResponseFailure).error.message,
-        'getaddrinfo ENOTFOUND example.test'
+        (result.error as NodeJS.ErrnoException).code,
+        'ENOTFOUND'
+      );
+      assert.strictEqual(
+        result.error?.message.includes('getaddrinfo ENOTFOUND'),
+        true
       );
     });
 

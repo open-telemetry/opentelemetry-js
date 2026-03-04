@@ -1,21 +1,10 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 'use strict';
 
-import { IncludeExclude } from './commonModel';
+import type { IncludeExclude } from './commonModel';
 
 export interface Resource {
   /**
@@ -43,7 +32,7 @@ export interface Resource {
    * This type is in development and subject to breaking changes in minor versions.
    * If omitted or null, resource detection is disabled.
    */
-  'detection/development'?: ResourceDetection;
+  'detection/development'?: ExperimentalResourceDetection;
 }
 
 export interface AttributeNameValue {
@@ -67,7 +56,7 @@ export interface AttributeNameValue {
     | 'double_array';
 }
 
-export interface ResourceDetection {
+export interface ExperimentalResourceDetection {
   /**
    * Configure attributes provided by resource detectors.
    */
@@ -78,10 +67,10 @@ export interface ResourceDetection {
    * Resource detector names are dependent on the SDK language ecosystem. Please consult documentation for each respective language.
    * If omitted or null, no resource detectors are enabled.
    */
-  detectors?: ResourceDetector;
+  detectors?: ExperimentalResourceDetector;
 }
 
-export interface ResourceDetector {
+export interface ExperimentalResourceDetector {
   /**
    * Enable the container resource detector, which populates container.* attributes.
    */

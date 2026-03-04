@@ -1,0 +1,15 @@
+{
+  "name": "nextjs-15-edge-bundle-test",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "rm -rf .next && next build",
+    "test:bundle": "npm i && npm run build"
+  },
+  "dependencies": {
+    "@opentelemetry/resources": "file:../../../packages/opentelemetry-resources",
+    "next": "^15",
+    "react": "^18",
+    "react-dom": "^18"
+  }
+}

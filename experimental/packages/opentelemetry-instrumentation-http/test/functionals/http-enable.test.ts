@@ -1,27 +1,15 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
+import type { Span as ISpan, Attributes } from '@opentelemetry/api';
 import {
   SpanStatusCode,
   context,
   diag,
   propagation,
-  Span as ISpan,
   SpanKind,
   trace,
-  Attributes,
   DiagConsoleLogger,
   INVALID_SPAN_CONTEXT,
 } from '@opentelemetry/api';
@@ -68,17 +56,18 @@ import * as assert from 'assert';
 import * as nock from 'nock';
 import * as path from 'path';
 import { HttpInstrumentation } from '../../src/http';
-import { HttpInstrumentationConfig } from '../../src/types';
+import type { HttpInstrumentationConfig } from '../../src/types';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
-import { ContextManager } from '@opentelemetry/api';
+import type { ContextManager } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import type {
   ClientRequest,
   IncomingMessage,
   ServerResponse,
   RequestOptions,
+  OutgoingHttpHeaders,
 } from 'http';
 import { isWrapped, SemconvStability } from '@opentelemetry/instrumentation';
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
@@ -155,7 +144,8 @@ export const startIncomingSpanHookFunction = (
 export const startOutgoingSpanHookFunction = (
   request: RequestOptions
 ): Attributes => {
-  return { guid: request.headers?.guid };
+  const headers = request.headers as OutgoingHttpHeaders | undefined;
+  return { guid: headers?.guid };
 };
 
 describe('HttpInstrumentation', () => {
@@ -326,11 +316,9 @@ describe('HttpInstrumentation', () => {
             );
           },
           ignoreOutgoingRequestHook: request => {
-            if (request.headers?.['user-agent'] != null) {
-              return (
-                `${request.headers['user-agent']}`.match('ignored-string') !=
-                null
-              );
+            const headers = request.headers as OutgoingHttpHeaders | undefined;
+            if (headers?.['user-agent'] != null) {
+              return `${headers['user-agent']}`.match('ignored-string') != null;
             }
             return false;
           },
@@ -783,7 +771,7 @@ describe('HttpInstrumentation', () => {
             }
           );
           req.setTimeout(10, () => {
-            req.abort();
+            req.destroy();
           });
           // Instrumentation should not swallow error event.
           assert.strictEqual(req.listeners('error').length, 0);
@@ -942,24 +930,29 @@ describe('HttpInstrumentation', () => {
 
       it('should have 2 ended span when client prematurely close', async () => {
         const promise = new Promise<void>(resolve => {
+          function waitForSpans() {
+            const numSpans = memoryExporter.getFinishedSpans().length;
+
+            if (numSpans < 2) {
+              setTimeout(waitForSpans, 1);
+            } else if (numSpans > 2) {
+              throw new Error(`too many spans: ${numSpans}`);
+            } else {
+              resolve();
+            }
+          }
+
           const req = http.get(
             `${protocol}://${hostname}:${serverPort}/hang`,
             res => {
-              res.on('close', () => {});
+              res.on('close', waitForSpans);
               res.on('error', () => {});
+              // Close the socket.
+              req.destroy();
             }
           );
-          // close the socket.
-          setTimeout(() => {
-            req.destroy();
-          }, 10);
 
           req.on('error', () => {});
-
-          req.on('close', () => {
-            // yield to server to end the span.
-            setTimeout(resolve, 10);
-          });
         });
 
         await promise;
@@ -1071,8 +1064,8 @@ describe('HttpInstrumentation', () => {
       });
 
       before(async () => {
-        instrumentation.setConfig({});
         instrumentation['_semconvStability'] = SemconvStability.STABLE;
+        instrumentation.setConfig({});
         instrumentation.enable();
         server = http.createServer((request, response) => {
           if (request.url?.includes('/premature-close')) {
@@ -1114,6 +1107,8 @@ describe('HttpInstrumentation', () => {
 
       after(() => {
         server.close();
+        instrumentation['_semconvStability'] = SemconvStability.OLD;
+        instrumentation.setConfig({});
         instrumentation.disable();
       });
 
@@ -1202,6 +1197,33 @@ describe('HttpInstrumentation', () => {
           [ATTR_URL_SCHEME]: protocol,
         });
       });
+
+      it('should accept QUERY as a known HTTP req method', async () => {
+        await new Promise<void>((resolve, reject) => {
+          const req = http.request(
+            `${protocol}://${hostname}:${serverPort}/hi`,
+            {
+              method: 'QUERY',
+            },
+            res => {
+              res.resume();
+              res.on('end', resolve);
+              res.on('error', reject);
+            }
+          );
+          req.on('error', reject);
+          req.write('{}');
+          req.end();
+        });
+
+        const spans = memoryExporter.getFinishedSpans();
+        const clientSpan = spans.slice(-1)[0];
+        assert.strictEqual(clientSpan.kind, SpanKind.CLIENT);
+        assert.strictEqual(
+          clientSpan.attributes[ATTR_HTTP_REQUEST_METHOD],
+          'QUERY'
+        );
+      });
     });
 
     describe('with semconv stability set to http/dup', () => {
@@ -1212,6 +1234,7 @@ describe('HttpInstrumentation', () => {
 
       before(async () => {
         instrumentation['_semconvStability'] = SemconvStability.DUPLICATE;
+        instrumentation.setConfig({});
         instrumentation.enable();
         server = http.createServer((request, response) => {
           if (request.url?.includes('/setroute')) {
@@ -1232,6 +1255,8 @@ describe('HttpInstrumentation', () => {
 
       after(() => {
         server.close();
+        instrumentation['_semconvStability'] = SemconvStability.OLD;
+        instrumentation.setConfig({});
         instrumentation.disable();
       });
 

@@ -46,7 +46,6 @@ const tsConfigPriorityKeys = ['extends'];
 const ignoredLernaProjects = [
   'e2e-tests',
   'experimental/examples/*',
-  'experimental/backwards-compatibility/*',
   'integration-tests/*',
   'examples/otlp-exporter-node',
   'examples/opentelemetry-web',

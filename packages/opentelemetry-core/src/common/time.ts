@@ -1,22 +1,10 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as api from '@opentelemetry/api';
+import type * as api from '@opentelemetry/api';
 import { otperformance as performance } from '../platform';
-import { TimeOriginLegacy } from './types';
 
 const NANOSECOND_DIGITS = 9;
 const NANOSECOND_DIGITS_IN_MILLIS = 6;
@@ -36,13 +24,11 @@ export function millisToHrTime(epochMillis: number): api.HrTime {
   return [seconds, nanos];
 }
 
+/**
+ * @deprecated Use `performance.timeOrigin` directly.
+ */
 export function getTimeOrigin(): number {
-  let timeOrigin = performance.timeOrigin;
-  if (typeof timeOrigin !== 'number') {
-    const perf: TimeOriginLegacy = performance as unknown as TimeOriginLegacy;
-    timeOrigin = perf.timing && perf.timing.fetchStart;
-  }
-  return timeOrigin;
+  return performance.timeOrigin;
 }
 
 /**
@@ -50,7 +36,7 @@ export function getTimeOrigin(): number {
  * @param performanceNow
  */
 export function hrTime(performanceNow?: number): api.HrTime {
-  const timeOrigin = millisToHrTime(getTimeOrigin());
+  const timeOrigin = millisToHrTime(performance.timeOrigin);
   const now = millisToHrTime(
     typeof performanceNow === 'number' ? performanceNow : performance.now()
   );
@@ -69,7 +55,7 @@ export function timeInputToHrTime(time: api.TimeInput): api.HrTime {
     return time as api.HrTime;
   } else if (typeof time === 'number') {
     // Must be a performance.now() if it's smaller than process start time.
-    if (time < getTimeOrigin()) {
+    if (time < performance.timeOrigin) {
       return hrTime(time);
     } else {
       // epoch milliseconds or performance.timeOrigin

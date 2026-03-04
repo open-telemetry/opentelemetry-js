@@ -1,23 +1,9 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
-import {
-  Baggage,
-  BaggageEntryMetadata,
-  baggageEntryMetadataFromString,
-} from '@opentelemetry/api';
+import type { Baggage, BaggageEntryMetadata } from '@opentelemetry/api';
+import { baggageEntryMetadataFromString } from '@opentelemetry/api';
 import {
   BAGGAGE_ITEMS_SEPARATOR,
   BAGGAGE_PROPERTIES_SEPARATOR,
@@ -57,24 +43,38 @@ export function getKeyPairs(baggage: Baggage): string[] {
 export function parsePairKeyValue(
   entry: string
 ): ParsedBaggageKeyValue | undefined {
-  const valueProps = entry.split(BAGGAGE_PROPERTIES_SEPARATOR);
-  if (valueProps.length <= 0) return;
-  const keyPairPart = valueProps.shift();
-  if (!keyPairPart) return;
+  if (!entry) return;
+  const metadataSeparatorIndex = entry.indexOf(BAGGAGE_PROPERTIES_SEPARATOR);
+  const keyPairPart =
+    metadataSeparatorIndex === -1
+      ? entry
+      : entry.substring(0, metadataSeparatorIndex);
+
   const separatorIndex = keyPairPart.indexOf(BAGGAGE_KEY_PAIR_SEPARATOR);
   if (separatorIndex <= 0) return;
-  const key = decodeURIComponent(
-    keyPairPart.substring(0, separatorIndex).trim()
-  );
-  const value = decodeURIComponent(
-    keyPairPart.substring(separatorIndex + 1).trim()
-  );
-  let metadata;
-  if (valueProps.length > 0) {
-    metadata = baggageEntryMetadataFromString(
-      valueProps.join(BAGGAGE_PROPERTIES_SEPARATOR)
-    );
+
+  const rawKey = keyPairPart.substring(0, separatorIndex).trim();
+  const rawValue = keyPairPart.substring(separatorIndex + 1).trim();
+
+  if (!rawKey || !rawValue) return;
+  let key: string;
+  let value: string;
+  try {
+    key = decodeURIComponent(rawKey);
+    value = decodeURIComponent(rawValue);
+  } catch {
+    return;
   }
+
+  let metadata;
+  if (
+    metadataSeparatorIndex !== -1 &&
+    metadataSeparatorIndex < entry.length - 1
+  ) {
+    const metadataString = entry.substring(metadataSeparatorIndex + 1);
+    metadata = baggageEntryMetadataFromString(metadataString);
+  }
+
   return { key, value, metadata };
 }
 

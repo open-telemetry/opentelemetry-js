@@ -1,0 +1,7 @@
+file_format: "1.0-rc.3"
+tracer_provider:
+  processors: []
+meter_provider:
+  readers:
+logger_provider:
+  processors:

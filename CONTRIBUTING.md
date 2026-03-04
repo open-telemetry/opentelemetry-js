@@ -198,7 +198,7 @@ npm run watch
 
 #### TypeScript version & update policy
 
-TypeScript version used to compile the pacakges is `v5.0.4`. If you plan to use any of the packages from this
+TypeScript version used to compile the packages is `v5.0.4`. If you plan to use any of the packages from this
 repository to make your own application or package instrumentation make sure to use same version or higher.
 
 <!-- Ref: https://github.com/open-telemetry/opentelemetry-js/pull/5145#issuecomment-2518263890 -->
@@ -289,7 +289,7 @@ The document will be available under `docs` path.
 
 ### Adding a package
 
-To add a new package, copy `packages/template` to your new package directory and modify the `package.json` file to reflect your desired package settings. If the package will not support browser, the `karma.conf` and `tsconifg.esm.json` files may be deleted. If the package will support es5 targets, the reference to `tsconfig.base.json` in `tsconfig.json` should be changed to `tsconfig.es5.json`.
+To add a new package, copy `packages/template` to your new package directory and modify the `package.json` file to reflect your desired package settings. If the package will not support browser, the `karma.conf` and `tsconfig.esm.json` files may be deleted. If the package will support es5 targets, the reference to `tsconfig.base.json` in `tsconfig.json` should be changed to `tsconfig.es5.json`.
 
 After adding the package, run `npm install` from the root of the project. This will update the `tsconfig.json` project references automatically and install all dependencies in your new package. For packages supporting browser, file `tsconfig.esm.json` needs to be manually updated to include reference to ES modules build.
 
@@ -297,28 +297,4 @@ After adding the package, run `npm install` from the root of the project. This w
 
 Universal packages are packages that can be used in both web browsers and
 Node.js environment. These packages may be implemented on top of different
-platform APIs to achieve the same goal. Like accessing the _global_ reference,
-we have different preferred ways to do it:
-
-- In Node.js, we access the _global_ reference with `globalThis` or `global`:
-
-```js
-/// packages/opentelemetry-core/src/platform/node/globalThis.ts
-export const _globalThis = typeof globalThis === 'object' ? globalThis : global;
-```
-
-- In web browser, we access the _global_ reference with the following definition:
-
-```js
-/// packages/opentelemetry-core/src/platform/browser/globalThis.ts
-export const _globalThis: typeof globalThis =
-  typeof globalThis === 'object' ? globalThis :
-    typeof self === 'object' ? self :
-      typeof window === 'object' ? window :
-        typeof global === 'object' ? global :
-          {} as typeof globalThis;
-```
-
-Even though the implementation may differ, the exported names must be aligned.
-It can be confusing if exported names present in one environment but not in the
-others.
+platform APIs to achieve the same goal.

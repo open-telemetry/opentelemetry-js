@@ -1,32 +1,20 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as types from '../../types';
+import type * as types from '../../types';
 import * as path from 'path';
 import { types as utilTypes } from 'util';
 import { satisfies } from '../../semver';
-import { wrap, unwrap, massWrap, massUnwrap } from '../../shimmer';
+import type { massWrap, massUnwrap } from '../../shimmer';
+import { wrap, unwrap } from '../../shimmer';
 import { InstrumentationAbstract } from '../../instrumentation';
-import {
-  RequireInTheMiddleSingleton,
-  Hooked,
-} from './RequireInTheMiddleSingleton';
+import type { Hooked } from './RequireInTheMiddleSingleton';
+import { RequireInTheMiddleSingleton } from './RequireInTheMiddleSingleton';
 import type { HookFn } from 'import-in-the-middle';
 import { Hook as HookImport } from 'import-in-the-middle';
-import {
+import type {
   InstrumentationConfig,
   InstrumentationModuleDefinition,
 } from '../../types';
@@ -223,11 +211,11 @@ export abstract class InstrumentationBase<
     // internal file
     const files = module.files ?? [];
     const normalizedName = path.normalize(name);
-    const supportedFileInstrumentations = files
-      .filter(f => f.name === normalizedName)
-      .filter(f =>
+    const supportedFileInstrumentations = files.filter(
+      f =>
+        f.name === normalizedName &&
         isSupported(f.supportedVersions, version, module.includePrerelease)
-      );
+    );
     return supportedFileInstrumentations.reduce<T>((patchedExports, file) => {
       file.moduleExports = patchedExports;
       if (this._enabled) {
@@ -288,6 +276,9 @@ export abstract class InstrumentationBase<
     for (const module of this._modules) {
       const hookFn: HookFn = (exports, name, baseDir) => {
         if (!baseDir && path.isAbsolute(name)) {
+          // Change IITM `name` and `baseDir` values to match what RITM returns.
+          // See "Comparing to RITM" on https://github.com/nodejs/import-in-the-middle/pull/241
+          // for an example of the differences.
           const parsedPath = path.parse(name);
           name = parsedPath.name;
           baseDir = parsedPath.dir;
@@ -308,7 +299,7 @@ export abstract class InstrumentationBase<
       this._hooks.push(hook);
       const esmHook = new HookImport(
         [module.name],
-        { internals: false },
+        { internals: true },
         <HookFn>hookFn
       );
       this._hooks.push(esmHook);

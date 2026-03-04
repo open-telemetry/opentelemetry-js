@@ -1,34 +1,32 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import { NOOP_LOGGER } from './NoopLogger';
-import { Logger } from './types/Logger';
-import { LoggerOptions } from './types/LoggerOptions';
-import { LogRecord } from './types/LogRecord';
+import type { Logger } from './types/Logger';
+import type { LoggerOptions } from './types/LoggerOptions';
+import type { LogRecord } from './types/LogRecord';
 
 export class ProxyLogger implements Logger {
   // When a real implementation is provided, this will be it
   private _delegate?: Logger;
+  private _provider: LoggerDelegator;
+  public readonly name: string;
+  public readonly version?: string | undefined;
+  public readonly options?: LoggerOptions | undefined;
 
   constructor(
-    private _provider: LoggerDelegator,
-    public readonly name: string,
-    public readonly version?: string | undefined,
-    public readonly options?: LoggerOptions | undefined
-  ) {}
+    provider: LoggerDelegator,
+    name: string,
+    version?: string | undefined,
+    options?: LoggerOptions | undefined
+  ) {
+    this._provider = provider;
+    this.name = name;
+    this.version = version;
+    this.options = options;
+  }
 
   /**
    * Emit a log record. This method should only be used by log appenders.

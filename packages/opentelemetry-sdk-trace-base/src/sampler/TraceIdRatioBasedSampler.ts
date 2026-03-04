@@ -1,28 +1,19 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import { isValidTraceId } from '@opentelemetry/api';
-import { Sampler, SamplingDecision, SamplingResult } from '../Sampler';
+import type { Sampler, SamplingResult } from '../Sampler';
+import { SamplingDecision } from '../Sampler';
 
 /** Sampler that samples a given fraction of traces based of trace id deterministically. */
 export class TraceIdRatioBasedSampler implements Sampler {
+  private readonly _ratio;
   private _upperBound: number;
 
-  constructor(private readonly _ratio = 0) {
-    this._ratio = this._normalize(_ratio);
+  constructor(ratio = 0) {
+    this._ratio = this._normalize(ratio);
     this._upperBound = Math.floor(this._ratio * 0xffffffff);
   }
 
