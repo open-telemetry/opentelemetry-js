@@ -29,21 +29,16 @@ class HttpExporterTransport implements IExporterTransport {
     const { agent, request } = await this._loadUtils();
     const headers = await this._parameters.headers();
 
-    return new Promise<ExportResponse>(resolve => {
-      sendWithHttp(
-        request,
-        this._parameters.url,
-        headers,
-        this._parameters.compression,
-        this._parameters.userAgent,
-        agent,
-        data,
-        result => {
-          resolve(result);
-        },
-        timeoutMillis
-      );
-    });
+    return sendWithHttp(
+      request,
+      this._parameters.url,
+      headers,
+      this._parameters.compression,
+      this._parameters.userAgent,
+      agent,
+      data,
+      timeoutMillis
+    );
   }
 
   shutdown() {
