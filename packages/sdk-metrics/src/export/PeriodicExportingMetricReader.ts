@@ -13,6 +13,7 @@ import { MetricReader } from './MetricReader';
 import { PushMetricExporter } from './MetricExporter';
 import { callWithTimeout, TimeoutError } from '../utils';
 import { MetricProducer } from './MetricProducer';
+import { CardinalitySelector } from './CardinalitySelector';
 
 export type PeriodicExportingMetricReaderOptions = {
   /**
@@ -35,6 +36,13 @@ export type PeriodicExportingMetricReaderOptions = {
    * @experimental
    */
   metricProducers?: MetricProducer[];
+  /**
+   * Cardinality selector based on metric instrument types. If not configured,
+   * a default value is used.
+   *
+   * <p> NOTE: the provided function MUST be pure
+   */
+  cardinalitySelector?: CardinalitySelector;
 };
 
 /**
@@ -48,7 +56,12 @@ export class PeriodicExportingMetricReader extends MetricReader {
   private readonly _exportTimeout: number;
 
   constructor(options: PeriodicExportingMetricReaderOptions) {
-    const { exporter, exportIntervalMillis = 60000, metricProducers } = options;
+    const {
+      exporter,
+      exportIntervalMillis = 60000,
+      metricProducers,
+      cardinalitySelector,
+    } = options;
     let { exportTimeoutMillis = 30000 } = options;
 
     super({
@@ -56,6 +69,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
       aggregationTemporalitySelector:
         exporter.selectAggregationTemporality?.bind(exporter),
       metricProducers,
+      cardinalitySelector: cardinalitySelector,
     });
 
     if (exportIntervalMillis <= 0) {

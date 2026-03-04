@@ -253,6 +253,39 @@ describe('PeriodicExportingMetricReader', () => {
     });
   });
 
+  describe('selectCardinalityLimit', () => {
+    it('should use default cardinality limit with no exporter preference', () => {
+      const exporter = new TestDeltaMetricExporter();
+
+      const p = new PeriodicExportingMetricReader({
+        exporter,
+        exportIntervalMillis: 1,
+        exportTimeoutMillis: 1,
+      });
+
+      assert.strictEqual(
+        p.selectCardinalityLimit(InstrumentType.COUNTER),
+        2000
+      );
+    });
+
+    it('should use exporter preference for cardinality limit', () => {
+      const exporter = new TestDeltaMetricExporter();
+
+      const p = new PeriodicExportingMetricReader({
+        exporter,
+        exportIntervalMillis: 1,
+        exportTimeoutMillis: 1,
+        cardinalitySelector: (_instrumentType: InstrumentType) => 5000,
+      });
+
+      assert.strictEqual(
+        p.selectCardinalityLimit(InstrumentType.COUNTER),
+        5000
+      );
+    });
+  });
+
   describe('setMetricProducer', () => {
     it('should start exporting periodically', async () => {
       const exporter = new TestMetricExporter();
