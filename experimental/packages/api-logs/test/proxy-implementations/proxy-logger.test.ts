@@ -74,12 +74,17 @@ describe('ProxyLogger', () => {
 
     let delegateLogger: Logger;
     let emitCalled: boolean;
+    let enabledCalled: boolean;
 
     beforeEach(() => {
       emitCalled = false;
       delegateLogger = {
         emit() {
           emitCalled = true;
+        },
+        enabled() {
+          enabledCalled = true;
+          return true;
         },
       };
 
@@ -98,6 +103,11 @@ describe('ProxyLogger', () => {
         body: 'Test',
       });
       assert.ok(emitCalled);
+    });
+
+    it('should call enabled from the delegate logger', () => {
+      logger.enabled();
+      assert.ok(enabledCalled);
     });
   });
 });
