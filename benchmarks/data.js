@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1772660287649,
+  "lastUpdate": 1772664947109,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -61099,6 +61099,114 @@ window.BENCHMARK_DATA = {
             "range": "±0.51%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "rlj1202@gmail.com",
+            "name": "Jisu Sim",
+            "username": "rlj1202"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "30c8bf330b69fcafdaf9e26c1cba62fcd0e4bfdd",
+          "message": "fix(opentelemetry-instrumentation): improve `_warnOnPreloadedModules` function not to show warning logs when the module is not marked as loaded (#6095)\n\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2026-03-04T22:46:17Z",
+          "tree_id": "032695bbbdb223bb83af27135323552bb71dc6af",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/30c8bf330b69fcafdaf9e26c1cba62fcd0e4bfdd"
+        },
+        "date": 1772664945903,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 512 spans (protobuf)",
+            "value": 139,
+            "range": "±1.03%",
+            "unit": "ops/sec",
+            "extra": "78 samples"
+          },
+          {
+            "name": "transform 512 spans (json)",
+            "value": 276,
+            "range": "±0.70%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "transform 512 logs (protobuf)",
+            "value": 138,
+            "range": "±0.71%",
+            "unit": "ops/sec",
+            "extra": "77 samples"
+          },
+          {
+            "name": "transform 512 logs (json)",
+            "value": 281,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "87 samples"
+          },
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 1936266,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 1755190,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 1738341,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 1570345,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 258192,
+            "range": "±0.95%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "generateTraceId",
+            "value": 3542145,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
+          },
+          {
+            "name": "generateSpanId",
+            "value": 4409942,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 274260,
+            "range": "±0.37%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
