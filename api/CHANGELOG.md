@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 
 * feat(api): improve isValidSpanId, isValidTraceId performance [#5714](https://github.com/open-telemetry/opentelemetry-js/pull/5714) @seemk
 * feat(diag): change types in `DiagComponentLogger` from `any` to `unknown`[#5478](https://github.com/open-telemetry/opentelemetry-js/pull/5478) @loganrosen
+* feat(api): factory hook for TracerProvider [#6466](https://github.com/open-telemetry/opentelemetry-js/pull/6466) @ida613
 
 ### :bug: (Bug Fix)
 
