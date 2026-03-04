@@ -37,6 +37,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(otlp-transformer): downgrade `protobufjs` to version `^7.0.0` [#6418](https://github.com/open-telemetry/opentelemetry-js/pull/6418) @vitorvasc
 * fix(instrumentation-fetch): handle HeadersInit tuple arrays in _addHeaders [#6341](https://github.com/open-telemetry/opentelemetry-js/pull/6341) @overbalance @imadha
 
+* refactor(otlp-exporter-base): promisify sendWithHttp() [#????](https://github.com/open-telemetry/opentelemetry-js/pull/6412) @pichlermarc
+
 ## 0.212.0
 
 ### :boom: Breaking Changes
