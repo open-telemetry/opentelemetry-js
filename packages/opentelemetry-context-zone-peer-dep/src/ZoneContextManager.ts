@@ -4,8 +4,9 @@
  */
 
 /// <reference types="zone.js" />
-import { Context, ContextManager, ROOT_CONTEXT } from '@opentelemetry/api';
-import { TargetWithEvents } from './types';
+import type { Context, ContextManager } from '@opentelemetry/api';
+import { ROOT_CONTEXT } from '@opentelemetry/api';
+import type { TargetWithEvents } from './types';
 import { isListenerObject } from './util';
 
 /* Key name to be used to save a context reference in Zone */

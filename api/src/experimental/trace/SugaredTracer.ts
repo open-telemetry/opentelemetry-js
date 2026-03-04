@@ -2,14 +2,9 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { SugaredSpanOptions } from './SugaredOptions';
-import {
-  context as contextApi,
-  Context,
-  Span,
-  SpanStatusCode,
-  Tracer,
-} from '../../';
+import type { SugaredSpanOptions } from './SugaredOptions';
+import type { Context, Span, Tracer } from '../../';
+import { context as contextApi, SpanStatusCode } from '../../';
 
 const defaultOnException = (e: Error, span: Span) => {
   span.recordException(e);

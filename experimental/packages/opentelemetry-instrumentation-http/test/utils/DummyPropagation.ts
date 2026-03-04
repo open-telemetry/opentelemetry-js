@@ -2,12 +2,8 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import {
-  Context,
-  TextMapPropagator,
-  trace,
-  TraceFlags,
-} from '@opentelemetry/api';
+import type { Context, TextMapPropagator } from '@opentelemetry/api';
+import { trace, TraceFlags } from '@opentelemetry/api';
 import type * as http from 'http';
 
 export class DummyPropagation implements TextMapPropagator {

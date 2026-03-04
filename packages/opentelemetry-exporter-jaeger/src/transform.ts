@@ -3,24 +3,23 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Link, SpanStatusCode, SpanKind } from '@opentelemetry/api';
-import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { Link } from '@opentelemetry/api';
+import { SpanStatusCode, SpanKind } from '@opentelemetry/api';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import {
   hrTimeToMilliseconds,
   hrTimeToMicroseconds,
 } from '@opentelemetry/core';
-import {
+import type {
   ThriftSpan,
   Tag,
   Log,
   ThriftTag,
   ThriftLog,
-  ThriftUtils,
-  Utils,
   ThriftReference,
   TagValue,
-  ThriftReferenceType,
 } from './types';
+import { ThriftUtils, Utils, ThriftReferenceType } from './types';
 
 const DEFAULT_FLAGS = 0x1;
 

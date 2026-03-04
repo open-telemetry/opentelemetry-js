@@ -5,8 +5,10 @@
 
 import * as assert from 'assert';
 import * as opentracing from 'opentracing';
-import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
-import { SpanContextShim, SpanShim, TracerShim } from '../src/shim';
+import type { Span } from '@opentelemetry/sdk-trace-base';
+import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
+import type { SpanShim } from '../src/shim';
+import { SpanContextShim, TracerShim } from '../src/shim';
 import {
   CompositePropagator,
   W3CBaggagePropagator,

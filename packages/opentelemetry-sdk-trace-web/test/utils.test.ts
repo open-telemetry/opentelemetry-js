@@ -8,20 +8,19 @@ import {
   otperformance as performance,
 } from '@opentelemetry/core';
 import * as core from '@opentelemetry/core';
-import * as tracing from '@opentelemetry/sdk-trace-base';
-import { HrTime } from '@opentelemetry/api';
+import type * as tracing from '@opentelemetry/sdk-trace-base';
+import type { HrTime } from '@opentelemetry/api';
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import type { PerformanceEntries, URLLike } from '../src';
 import {
   addSpanNetworkEvent,
   addSpanNetworkEvents,
   getResource,
   normalizeUrl,
   parseUrl,
-  PerformanceEntries,
   shouldPropagateTraceHeaders,
-  URLLike,
 } from '../src';
 import { PerformanceTimingNames as PTN } from '../src/enums/PerformanceTimingNames';
 

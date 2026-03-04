@@ -3,17 +3,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  diag,
-  SpanStatusCode,
+import type {
   Exception,
-  ROOT_CONTEXT,
   SpanContext,
-  SpanKind,
-  TraceFlags,
   HrTime,
   Attributes,
   AttributeValue,
+} from '@opentelemetry/api';
+import {
+  diag,
+  SpanStatusCode,
+  ROOT_CONTEXT,
+  SpanKind,
+  TraceFlags,
 } from '@opentelemetry/api';
 import {
   hrTimeDuration,
@@ -28,10 +30,11 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { BasicTracerProvider, Span, SpanProcessor } from '../../src';
+import type { Span, SpanProcessor } from '../../src';
+import { BasicTracerProvider } from '../../src';
 import { SpanImpl } from '../../src/Span';
 import { invalidAttributes, validAttributes } from './util';
-import { Tracer } from '../../src/Tracer';
+import type { Tracer } from '../../src/Tracer';
 import {
   DEFAULT_ATTRIBUTE_COUNT_LIMIT,
   DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,

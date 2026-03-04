@@ -5,13 +5,13 @@
 
 import { DiagComponentLogger } from '../diag/ComponentLogger';
 import { createLogLevelDiagLogger } from '../diag/internal/logLevelLogger';
-import {
+import type {
   ComponentLoggerOptions,
   DiagLogFunction,
   DiagLogger,
   DiagLoggerApi,
-  DiagLogLevel,
 } from '../diag/types';
+import { DiagLogLevel } from '../diag/types';
 import {
   getGlobal,
   registerGlobal,

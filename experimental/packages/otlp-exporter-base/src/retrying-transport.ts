@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { IExporterTransport } from './exporter-transport';
-import { ExportResponse } from './export-response';
+import type { IExporterTransport } from './exporter-transport';
+import type { ExportResponse } from './export-response';
 import { diag } from '@opentelemetry/api';
 
 const MAX_ATTEMPTS = 5;

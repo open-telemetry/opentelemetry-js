@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ExportResult } from '@opentelemetry/core';
-import { AggregationTemporality } from './AggregationTemporality';
-import { InstrumentType, ResourceMetrics } from './MetricData';
-import { AggregationOption } from '../view/AggregationOption';
+import type { ExportResult } from '@opentelemetry/core';
+import type { AggregationTemporality } from './AggregationTemporality';
+import type { InstrumentType, ResourceMetrics } from './MetricData';
+import type { AggregationOption } from '../view/AggregationOption';
 
 /**
  * An interface that allows different metric services to export recorded data

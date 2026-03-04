@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context } from '@opentelemetry/api';
+import type { Context } from '@opentelemetry/api';
 import { globalErrorHandler } from '@opentelemetry/core';
-import { ReadableSpan } from './export/ReadableSpan';
-import { Span } from './Span';
-import { SpanProcessor } from './SpanProcessor';
+import type { ReadableSpan } from './export/ReadableSpan';
+import type { Span } from './Span';
+import type { SpanProcessor } from './SpanProcessor';
 
 /**
  * Implementation of the {@link SpanProcessor} that simply forwards all

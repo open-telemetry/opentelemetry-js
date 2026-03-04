@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context } from '@opentelemetry/api';
-import { ReadableSpan } from './ReadableSpan';
-import { Span } from '../Span';
-import { SpanProcessor } from '../SpanProcessor';
+import type { Context } from '@opentelemetry/api';
+import type { ReadableSpan } from './ReadableSpan';
+import type { Span } from '../Span';
+import type { SpanProcessor } from '../SpanProcessor';
 
 /** No-op implementation of SpanProcessor */
 export class NoopSpanProcessor implements SpanProcessor {

@@ -2,15 +2,14 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
+import type { Span as ISpan, Attributes } from '@opentelemetry/api';
 import {
   SpanStatusCode,
   context,
   diag,
   propagation,
-  Span as ISpan,
   SpanKind,
   trace,
-  Attributes,
   DiagConsoleLogger,
   INVALID_SPAN_CONTEXT,
 } from '@opentelemetry/api';
@@ -57,11 +56,11 @@ import * as assert from 'assert';
 import * as nock from 'nock';
 import * as path from 'path';
 import { HttpInstrumentation } from '../../src/http';
-import { HttpInstrumentationConfig } from '../../src/types';
+import type { HttpInstrumentationConfig } from '../../src/types';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
-import { ContextManager } from '@opentelemetry/api';
+import type { ContextManager } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import type {
   ClientRequest,

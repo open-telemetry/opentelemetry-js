@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Attributes } from '@opentelemetry/api';
+import type { Attributes } from '@opentelemetry/api';
 import { ATTR_OS_TYPE, ATTR_OS_VERSION } from '../../../semconv';
 import { platform, release } from 'os';
-import { ResourceDetectionConfig } from '../../../config';
-import { DetectedResource, ResourceDetector } from '../../../types';
+import type { ResourceDetectionConfig } from '../../../config';
+import type { DetectedResource, ResourceDetector } from '../../../types';
 import { normalizeType } from './utils';
 
 /**

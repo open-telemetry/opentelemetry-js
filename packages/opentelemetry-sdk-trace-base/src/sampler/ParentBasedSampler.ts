@@ -3,19 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  Context,
-  isSpanContextValid,
-  Link,
-  Attributes,
-  SpanKind,
-  TraceFlags,
-  trace,
-} from '@opentelemetry/api';
+import type { Context, Link, Attributes, SpanKind } from '@opentelemetry/api';
+import { isSpanContextValid, TraceFlags, trace } from '@opentelemetry/api';
 import { globalErrorHandler } from '@opentelemetry/core';
 import { AlwaysOffSampler } from './AlwaysOffSampler';
 import { AlwaysOnSampler } from './AlwaysOnSampler';
-import { Sampler, SamplingResult } from '../Sampler';
+import type { Sampler, SamplingResult } from '../Sampler';
 
 /**
  * A composite sampler that either respects the parent span's sampling decision

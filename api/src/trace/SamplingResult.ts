@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { SpanAttributes } from './attributes';
-import { TraceState } from './trace_state';
+import type { SpanAttributes } from './attributes';
+import type { TraceState } from './trace_state';
 
 /**
  * @deprecated use the one declared in @opentelemetry/sdk-trace-base instead.

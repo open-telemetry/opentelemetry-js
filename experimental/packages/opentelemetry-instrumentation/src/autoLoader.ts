@@ -9,7 +9,7 @@ import {
   disableInstrumentations,
   enableInstrumentations,
 } from './autoLoaderUtils';
-import { AutoLoaderOptions } from './types_internal';
+import type { AutoLoaderOptions } from './types_internal';
 
 /**
  * It will register instrumentations and plugins

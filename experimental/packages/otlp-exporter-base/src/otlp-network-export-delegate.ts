@@ -4,13 +4,11 @@
  */
 
 import { createBoundedQueueExportPromiseHandler } from './bounded-queue-export-promise-handler';
-import { OtlpSharedConfiguration } from './configuration/shared-configuration';
-import { ISerializer } from '@opentelemetry/otlp-transformer';
-import { IExporterTransport } from './exporter-transport';
-import {
-  createOtlpExportDelegate,
-  IOtlpExportDelegate,
-} from './otlp-export-delegate';
+import type { OtlpSharedConfiguration } from './configuration/shared-configuration';
+import type { ISerializer } from '@opentelemetry/otlp-transformer';
+import type { IExporterTransport } from './exporter-transport';
+import type { IOtlpExportDelegate } from './otlp-export-delegate';
+import { createOtlpExportDelegate } from './otlp-export-delegate';
 
 export function createOtlpNetworkExportDelegate<Internal, Response>(
   options: OtlpSharedConfiguration,

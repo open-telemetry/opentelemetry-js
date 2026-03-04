@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context, createContextKey, Span } from '@opentelemetry/api';
+import type { Context, Span } from '@opentelemetry/api';
+import { createContextKey } from '@opentelemetry/api';
 
 const RPC_METADATA_KEY = createContextKey(
   'OpenTelemetry SDK Context Key RPC_METADATA'

@@ -7,12 +7,14 @@ import { mapOcMetric } from '../src/metric-transform';
 
 import * as oc from '@opencensus/core';
 import { ValueType } from '@opentelemetry/api';
-import {
-  AggregationTemporality,
-  DataPointType,
+import type {
   GaugeMetricData,
   HistogramMetricData,
   SumMetricData,
+} from '@opentelemetry/sdk-metrics';
+import {
+  AggregationTemporality,
+  DataPointType,
 } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Span, SpanOptions } from '../../';
+import type { Span, SpanOptions } from '../../';
 
 /**
  * Options needed for span creation

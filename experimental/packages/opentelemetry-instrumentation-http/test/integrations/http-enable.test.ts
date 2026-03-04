@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { SpanKind, Span, context, propagation } from '@opentelemetry/api';
+import type { Span } from '@opentelemetry/api';
+import { SpanKind, context, propagation } from '@opentelemetry/api';
 import {
   ATTR_HTTP_FLAVOR,
   ATTR_HTTP_HOST,
@@ -30,7 +31,7 @@ instrumentation.disable();
 import * as http from 'http';
 import { httpRequest } from '../utils/httpRequest';
 import { DummyPropagation } from '../utils/DummyPropagation';
-import { Socket } from 'net';
+import type { Socket } from 'net';
 import { sendRequestTwice } from '../utils/rawRequest';
 
 const protocol = 'http';

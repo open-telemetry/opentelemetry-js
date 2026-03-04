@@ -3,14 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { HrTime } from '@opentelemetry/api';
-import { MetricData } from '../export/MetricData';
-import { Maybe } from '../utils';
-import { MetricCollectorHandle } from './MetricCollector';
-import {
-  createInstrumentDescriptor,
-  InstrumentDescriptor,
-} from '../InstrumentDescriptor';
+import type { HrTime } from '@opentelemetry/api';
+import type { MetricData } from '../export/MetricData';
+import type { Maybe } from '../utils';
+import type { MetricCollectorHandle } from './MetricCollector';
+import type { InstrumentDescriptor } from '../InstrumentDescriptor';
+import { createInstrumentDescriptor } from '../InstrumentDescriptor';
 
 /**
  * Internal interface.

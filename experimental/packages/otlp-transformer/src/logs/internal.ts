@@ -4,23 +4,23 @@
  */
 
 import type { ReadableLogRecord } from '@opentelemetry/sdk-logs';
-import {
+import type {
   ESeverityNumber,
   IExportLogsServiceRequest,
   ILogRecord,
   IResourceLogs,
 } from './internal-types';
-import { Resource } from '@opentelemetry/resources';
-import { Encoder } from '../common/utils';
+import type { Resource } from '@opentelemetry/resources';
+import type { Encoder } from '../common/utils';
 import {
   createInstrumentationScope,
   createResource,
   toAnyValue,
   toKeyValue,
 } from '../common/internal';
-import { SeverityNumber } from '@opentelemetry/api-logs';
-import { IKeyValue } from '../common/internal-types';
-import { LogAttributes } from '@opentelemetry/api-logs';
+import type { SeverityNumber } from '@opentelemetry/api-logs';
+import type { IKeyValue } from '../common/internal-types';
+import type { LogAttributes } from '@opentelemetry/api-logs';
 
 export function createExportLogsServiceRequest(
   logRecords: ReadableLogRecord[],

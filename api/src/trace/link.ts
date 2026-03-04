@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { SpanAttributes } from './attributes';
-import { SpanContext } from './span_context';
+import type { SpanAttributes } from './attributes';
+import type { SpanContext } from './span_context';
 
 /**
  * A pointer from the current {@link Span} to another span in the same trace or

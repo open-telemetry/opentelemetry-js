@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   Context,
-  diag,
   Exception,
   HrTime,
   Link,
@@ -15,32 +14,32 @@ import {
   SpanContext,
   SpanKind,
   SpanStatus,
-  SpanStatusCode,
   TimeInput,
 } from '@opentelemetry/api';
+import { diag, SpanStatusCode } from '@opentelemetry/api';
+import type { InstrumentationScope } from '@opentelemetry/core';
 import {
   addHrTimes,
   millisToHrTime,
   hrTime,
   hrTimeDuration,
-  InstrumentationScope,
   isAttributeValue,
   isTimeInput,
   isTimeInputHrTime,
   otperformance,
   sanitizeAttributes,
 } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import type { Resource } from '@opentelemetry/resources';
 import {
   ATTR_EXCEPTION_MESSAGE,
   ATTR_EXCEPTION_STACKTRACE,
   ATTR_EXCEPTION_TYPE,
 } from '@opentelemetry/semantic-conventions';
-import { ReadableSpan } from './export/ReadableSpan';
+import type { ReadableSpan } from './export/ReadableSpan';
 import { ExceptionEventName } from './enums';
-import { SpanProcessor } from './SpanProcessor';
-import { TimedEvent } from './TimedEvent';
-import { SpanLimits } from './types';
+import type { SpanProcessor } from './SpanProcessor';
+import type { TimedEvent } from './TimedEvent';
+import type { SpanLimits } from './types';
 
 /**
  * This type provides the properties of @link{ReadableSpan} at the same time

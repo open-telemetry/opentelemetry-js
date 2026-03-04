@@ -5,25 +5,25 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import type { ExportResult } from '@opentelemetry/core';
 import {
-  ExportResult,
   ExportResultCode,
   loggingErrorHandler,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
 
-import {
+import type {
   BufferConfig,
   LogRecordLimits,
   SdkLogRecord,
-  InMemoryLogRecordExporter,
   LogRecordExporter,
 } from '../../../src';
+import { InMemoryLogRecordExporter } from '../../../src';
 import { BatchLogRecordProcessorBase } from '../../../src/export/BatchLogRecordProcessorBase';
 import { LoggerProviderSharedState } from '../../../src/internal/LoggerProviderSharedState';
+import type { Resource } from '@opentelemetry/resources';
 import {
   defaultResource,
-  Resource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
 import { LogRecordImpl } from '../../../src/LogRecordImpl';

@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ExactPredicate, PatternPredicate, Predicate } from './Predicate';
-import { InstrumentType } from '../export/MetricData';
+import type { Predicate } from './Predicate';
+import { ExactPredicate, PatternPredicate } from './Predicate';
+import type { InstrumentType } from '../export/MetricData';
 
 export interface InstrumentSelectorCriteria {
   name?: string;

@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { InstrumentationScope } from '@opentelemetry/core';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
-import { InstrumentSelector } from './InstrumentSelector';
-import { MeterSelector } from './MeterSelector';
-import { View } from './View';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import type { InstrumentDescriptor } from '../InstrumentDescriptor';
+import type { InstrumentSelector } from './InstrumentSelector';
+import type { MeterSelector } from './MeterSelector';
+import type { View } from './View';
 
 export class ViewRegistry {
   private _registeredViews: View[] = [];

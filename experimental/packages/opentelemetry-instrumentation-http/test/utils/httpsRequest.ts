@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as http from 'http';
+import type * as http from 'http';
 import * as https from 'https';
-import { URL } from 'url';
+import type { URL } from 'url';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 

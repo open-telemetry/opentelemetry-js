@@ -2,7 +2,7 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { HrTime } from '@opentelemetry/api';
+import type { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
 
 export interface SimpleTestObject {

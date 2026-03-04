@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ExportResult } from '@opentelemetry/core';
-import { IOtlpExportDelegate } from './otlp-export-delegate';
+import type { ExportResult } from '@opentelemetry/core';
+import type { IOtlpExportDelegate } from './otlp-export-delegate';
 
 export class OTLPExporterBase<Internal> {
   private _delegate: IOtlpExportDelegate<Internal>;

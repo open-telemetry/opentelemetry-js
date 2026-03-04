@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Counter, UpDownCounter, Histogram } from '../../../src';
+import type { Counter, UpDownCounter, Histogram } from '../../../src';
 
 describe('Metric', function () {
   describe('Counter', function () {

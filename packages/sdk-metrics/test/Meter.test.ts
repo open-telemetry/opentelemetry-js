@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Observable, diag } from '@opentelemetry/api';
+import type { Observable } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
