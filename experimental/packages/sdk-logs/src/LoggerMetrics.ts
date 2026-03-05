@@ -2,7 +2,7 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { Counter, Meter } from '@opentelemetry/api';
+import type { Counter, Meter } from '@opentelemetry/api';
 import { METRIC_OTEL_SDK_LOG_CREATED } from './semconv';
 
 /**
