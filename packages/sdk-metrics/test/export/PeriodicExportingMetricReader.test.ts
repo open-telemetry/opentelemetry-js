@@ -10,11 +10,10 @@ import type {
   CollectionResult,
   Histogram,
   InstrumentType,
-  MeterProvider,
   MetricProducer,
   PushMetricExporter,
 } from '../../src';
-import { AggregationType } from '../../src';
+import { AggregationType, MeterProvider } from '../../src';
 import type {
   ResourceMetrics,
   ScopeMetrics,

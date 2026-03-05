@@ -23,6 +23,13 @@ import {
 } from './AggregationSelector';
 import type { AggregationOption } from '../view/AggregationOption';
 import type { CardinalitySelector } from './CardinalitySelector';
+import { MetricReaderMetrics } from './MetricReaderMetrics';
+import { VERSION } from '../version';
+import { hrTime } from '@opentelemetry/core';
+import {
+  hrTimeDuration,
+  hrTimeToSeconds,
+} from '@opentelemetry/core/src/common/time';
 
 export interface MetricReaderOptions {
   /**
@@ -54,6 +61,11 @@ export interface MetricReaderOptions {
    * @experimental
    */
   metricProducers?: MetricProducer[];
+  /**
+   * The component type used for reporting SDK metrics.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  otelComponentType?: string;
 }
 
 /**
@@ -118,6 +130,12 @@ export interface IMetricReader {
    * @param options options with timeout.
    */
   forceFlush(options?: ForceFlushOptions): Promise<void>;
+
+  /**
+   * Sets the MeterProvider to use for reporting metrics for this reader.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  setMeterProvider?(meterProvider: api.MeterProvider): void;
 }
 
 /**
@@ -132,9 +150,12 @@ export abstract class MetricReader implements IMetricReader {
   private _metricProducers: MetricProducer[];
   // MetricProducer used by this instance which produces metrics from the SDK
   private _sdkMetricProducer?: MetricProducer;
+  // Metrics about the MetricReader itself
+  private _metrics: MetricReaderMetrics;
   private readonly _aggregationTemporalitySelector: AggregationTemporalitySelector;
   private readonly _aggregationSelector: AggregationSelector;
   private readonly _cardinalitySelector?: CardinalitySelector;
+  private readonly _otelComponentType: string;
 
   constructor(options?: MetricReaderOptions) {
     this._aggregationSelector =
@@ -144,6 +165,12 @@ export abstract class MetricReader implements IMetricReader {
       DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR;
     this._metricProducers = options?.metricProducers ?? [];
     this._cardinalitySelector = options?.cardinalitySelector;
+    this._otelComponentType =
+      options?.otelComponentType ?? this.constructor.name;
+    this._metrics = new MetricReaderMetrics(
+      this._otelComponentType,
+      api.createNoopMeter()
+    );
   }
 
   setMetricProducer(metricProducer: MetricProducer) {
@@ -154,6 +181,11 @@ export abstract class MetricReader implements IMetricReader {
     }
     this._sdkMetricProducer = metricProducer;
     this.onInitialized();
+  }
+
+  setMeterProvider(meterProvider: api.MeterProvider): void {
+    const meter = meterProvider.getMeter('@opentelemetry/sdk-metrics', VERSION);
+    this._metrics = new MetricReaderMetrics(this._otelComponentType, meter);
   }
 
   selectAggregation(instrumentType: InstrumentType): AggregationOption {
@@ -207,6 +239,7 @@ export abstract class MetricReader implements IMetricReader {
       throw new Error('MetricReader is shutdown');
     }
 
+    const startTime = hrTime();
     const [sdkCollectionResults, ...additionalCollectionResults] =
       await Promise.all([
         this._sdkMetricProducer.collect({
@@ -218,11 +251,21 @@ export abstract class MetricReader implements IMetricReader {
           })
         ),
       ]);
+    const endTime = hrTime();
 
     // Merge the results, keeping the SDK's Resource
     const errors = sdkCollectionResults.errors.concat(
       additionalCollectionResults.flatMap(result => result.errors)
     );
+
+    const collectDuration = hrTimeToSeconds(hrTimeDuration(startTime, endTime));
+    this._metrics.recordCollection(
+      collectDuration,
+      errors.length > 0
+        ? ((errors[0] as Error).name ?? 'collect_error')
+        : undefined
+    );
+
     const resource = sdkCollectionResults.resourceMetrics.resource;
     const scopeMetrics =
       sdkCollectionResults.resourceMetrics.scopeMetrics.concat(

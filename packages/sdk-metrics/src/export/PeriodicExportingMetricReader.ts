@@ -8,16 +8,12 @@ import {
   internal,
   ExportResultCode,
   globalErrorHandler,
-  hrTime,
-  hrTimeDuration,
 } from '@opentelemetry/core';
 import { MetricReader } from './MetricReader';
 import type { PushMetricExporter } from './MetricExporter';
 import { callWithTimeout, TimeoutError } from '../utils';
 import type { MetricProducer } from './MetricProducer';
-import { MetricReaderMetrics } from './MetricReaderMetrics';
 import { OTEL_COMPONENT_TYPE_VALUE_PERIODIC_METRIC_READER } from '../semconv';
-import { VERSION } from '../version';
 
 export type PeriodicExportingMetricReaderOptions = {
   /**
@@ -49,7 +45,6 @@ export type PeriodicExportingMetricReaderOptions = {
 export class PeriodicExportingMetricReader extends MetricReader {
   private _interval?: ReturnType<typeof setInterval>;
   private _exporter: PushMetricExporter;
-  private _metrics: MetricReaderMetrics;
   private readonly _exportInterval: number;
   private readonly _exportTimeout: number;
 
@@ -61,6 +56,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
       aggregationSelector: exporter.selectAggregation?.bind(exporter),
       aggregationTemporalitySelector:
         exporter.selectAggregationTemporality?.bind(exporter),
+      otelComponentType: OTEL_COMPONENT_TYPE_VALUE_PERIODIC_METRIC_READER,
       metricProducers,
     });
 
@@ -93,18 +89,6 @@ export class PeriodicExportingMetricReader extends MetricReader {
     this._exportInterval = exportIntervalMillis;
     this._exportTimeout = exportTimeoutMillis;
     this._exporter = exporter;
-    this._metrics = new MetricReaderMetrics(
-      OTEL_COMPONENT_TYPE_VALUE_PERIODIC_METRIC_READER,
-      api.createNoopMeter()
-    );
-  }
-
-  setMeterProvider(meterProvider: api.MeterProvider) {
-    const meter = meterProvider.getMeter('@opentelemetry/sdk-metrics', VERSION);
-    this._metrics = new MetricReaderMetrics(
-      OTEL_COMPONENT_TYPE_VALUE_PERIODIC_METRIC_READER,
-      meter
-    );
   }
 
   private async _runOnce(): Promise<void> {
@@ -124,24 +108,16 @@ export class PeriodicExportingMetricReader extends MetricReader {
   }
 
   private async _doRun(): Promise<void> {
-    const startTime = hrTime();
     const { resourceMetrics, errors } = await this.collect({
       timeoutMillis: this._exportTimeout,
     });
-    const endTime = hrTime();
-    let collectError: string | undefined = undefined;
 
     if (errors.length > 0) {
       api.diag.error(
         'PeriodicExportingMetricReader: metrics collection errors',
         ...errors
       );
-      collectError = (errors[0] as Error).name ?? 'collect_error';
     }
-
-    const collectDuration = hrTimeDuration(startTime, endTime);
-    const collectDurationSecs = collectDuration[0] + collectDuration[1] / 1e9;
-    this._metrics.recordCollection(collectDurationSecs, collectError);
 
     if (resourceMetrics.resource.asyncAttributesPending) {
       try {
