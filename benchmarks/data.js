@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1772664947109,
+  "lastUpdate": 1772739644994,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -61207,6 +61207,114 @@ window.BENCHMARK_DATA = {
             "range": "±0.37%",
             "unit": "ops/sec",
             "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "48004352+newbee1939@users.noreply.github.com",
+            "name": "h6o",
+            "username": "newbee1939"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "356ddeefb599493837596cb710f2f93e3b279e29",
+          "message": "fix(span): enforce StatusCode precedence rules in setStatus per specification (#6461)\n\nSigned-off-by: h6o <48004352+newbee1939@users.noreply.github.com>",
+          "timestamp": "2026-03-05T19:25:05Z",
+          "tree_id": "f6d11ee43777f5fbe288c1bca6e9fbb1683d1766",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/356ddeefb599493837596cb710f2f93e3b279e29"
+        },
+        "date": 1772739643876,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 512 spans (protobuf)",
+            "value": 165,
+            "range": "±0.87%",
+            "unit": "ops/sec",
+            "extra": "80 samples"
+          },
+          {
+            "name": "transform 512 spans (json)",
+            "value": 282,
+            "range": "±0.99%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "transform 512 logs (protobuf)",
+            "value": 163,
+            "range": "±0.63%",
+            "unit": "ops/sec",
+            "extra": "79 samples"
+          },
+          {
+            "name": "transform 512 logs (json)",
+            "value": 295,
+            "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 1894796,
+            "range": "±1.20%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 1707841,
+            "range": "±1.14%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 1634609,
+            "range": "±1.65%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 1460323,
+            "range": "±2.28%",
+            "unit": "ops/sec",
+            "extra": "85 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 248640,
+            "range": "±0.93%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
+          },
+          {
+            "name": "generateTraceId",
+            "value": 3425145,
+            "range": "±0.86%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "generateSpanId",
+            "value": 4312174,
+            "range": "±0.97%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 275792,
+            "range": "±0.69%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
