@@ -17,7 +17,6 @@ import { MetricCollector } from './state/MetricCollector';
 import type { ForceFlushOptions, ShutdownOptions } from './types';
 import type { ViewOptions } from './view/View';
 import { View } from './view/View';
-import { PeriodicExportingMetricReader } from './export/PeriodicExportingMetricReader';
 
 /**
  * MeterProviderOptions provides an interface for configuring a MeterProvider.
@@ -57,11 +56,8 @@ export class MeterProvider implements IMeterProvider {
         const collector = new MetricCollector(this._sharedState, metricReader);
         metricReader.setMetricProducer(collector);
         this._sharedState.metricCollectors.push(collector);
-        if (
-          options.sdkMetricsEnabled &&
-          metricReader instanceof PeriodicExportingMetricReader
-        ) {
-          metricReader.setMeterProvider(this);
+        if (options.sdkMetricsEnabled) {
+          metricReader.setMeterProvider?.(this);
         }
       }
     }
