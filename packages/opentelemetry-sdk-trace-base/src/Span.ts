@@ -240,19 +240,26 @@ export class SpanImpl implements Span {
 
   setStatus(status: SpanStatus): this {
     if (this._isSpanEnded()) return this;
-    this.status = { ...status };
+    if (status.code === SpanStatusCode.UNSET) return this;
+    if (this.status.code === SpanStatusCode.OK) return this;
+
+    const newStatus: SpanStatus = { code: status.code };
 
     // When using try-catch, the caught "error" is of type `any`. When then assigning `any` to `status.message`,
     // TypeScript will not error. While this can happen during use of any API, it is more common on Span#setStatus()
     // as it's likely used in a catch-block. Therefore, we validate if `status.message` is actually a string, null, or
     // undefined to avoid an incorrect type causing issues downstream.
-    if (this.status.message != null && typeof status.message !== 'string') {
-      diag.warn(
-        `Dropping invalid status.message of type '${typeof status.message}', expected 'string'`
-      );
-      delete this.status.message;
+    if (status.code === SpanStatusCode.ERROR) {
+      if (typeof status.message === 'string') {
+        newStatus.message = status.message;
+      } else if (status.message != null) {
+        diag.warn(
+          `Dropping invalid status.message of type '${typeof status.message}', expected 'string'`
+        );
+      }
     }
 
+    this.status = newStatus;
     return this;
   }
 
