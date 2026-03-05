@@ -25,11 +25,7 @@ import type { AggregationOption } from '../view/AggregationOption';
 import type { CardinalitySelector } from './CardinalitySelector';
 import { MetricReaderMetrics } from './MetricReaderMetrics';
 import { VERSION } from '../version';
-import { hrTime } from '@opentelemetry/core';
-import {
-  hrTimeDuration,
-  hrTimeToSeconds,
-} from '@opentelemetry/core/src/common/time';
+import { hrTime, hrTimeDuration, hrTimeToSeconds } from '@opentelemetry/core';
 
 export interface MetricReaderOptions {
   /**
