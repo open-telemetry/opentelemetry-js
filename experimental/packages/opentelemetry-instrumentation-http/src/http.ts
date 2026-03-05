@@ -1,49 +1,40 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
+import type {
+  HrTime,
+  Span,
+  SpanOptions,
+  SpanStatus,
+  Histogram,
+  Attributes,
+} from '@opentelemetry/api';
 import {
   context,
-  HrTime,
   INVALID_SPAN_CONTEXT,
   propagation,
   ROOT_CONTEXT,
-  Span,
   SpanKind,
-  SpanOptions,
-  SpanStatus,
   SpanStatusCode,
   trace,
-  Histogram,
-  Attributes,
   ValueType,
 } from '@opentelemetry/api';
+import type { RPCMetadata } from '@opentelemetry/core';
 import {
   hrTime,
   hrTimeDuration,
   hrTimeToMilliseconds,
   suppressTracing,
-  RPCMetadata,
   RPCType,
   setRPCMetadata,
 } from '@opentelemetry/core';
 import type * as http from 'http';
 import type * as https from 'https';
-import { Socket } from 'net';
+import type { Socket } from 'net';
 import * as url from 'url';
-import { HttpInstrumentationConfig } from './types';
+import type { HttpInstrumentationConfig } from './types';
 import { VERSION } from './version';
 import {
   InstrumentationBase,
@@ -83,7 +74,7 @@ import {
   parseResponseStatus,
   setSpanWithError,
 } from './utils';
-import { Err, Func, Http, HttpRequestArgs, Https } from './internal-types';
+import type { Err, Func, Http, HttpRequestArgs, Https } from './internal-types';
 
 /**
  * `node:http` and `node:https` instrumentation for OpenTelemetry
@@ -480,12 +471,15 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           this._callResponseHook(span, response);
         }
 
-        this._headerCapture.client.captureRequestHeaders(span, header =>
-          request.getHeader(header)
+        span.setAttributes(
+          this._headerCapture.client.captureRequestHeaders(header =>
+            request.getHeader(header)
+          )
         );
-        this._headerCapture.client.captureResponseHeaders(
-          span,
-          header => response.headers[header]
+        span.setAttributes(
+          this._headerCapture.client.captureResponseHeaders(
+            header => response.headers[header]
+          )
         );
 
         context.bind(context.active(), response);
@@ -644,6 +638,13 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         instrumentation._diag
       );
 
+      Object.assign(
+        spanAttributes,
+        instrumentation._headerCapture.server.captureRequestHeaders(
+          header => request.headers[header]
+        )
+      );
+
       const spanOptions: SpanOptions = {
         kind: SpanKind.SERVER,
         attributes: spanAttributes,
@@ -684,11 +685,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           if (instrumentation.getConfig().responseHook) {
             instrumentation._callResponseHook(span, response);
           }
-
-          instrumentation._headerCapture.server.captureRequestHeaders(
-            span,
-            header => request.headers[header]
-          );
 
           // After 'error', no further events other than 'close' should be emitted.
           let hasError = false;
@@ -910,8 +906,10 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       getIncomingStableRequestMetricAttributesOnResponse(attributes)
     );
 
-    this._headerCapture.server.captureResponseHeaders(span, header =>
-      response.getHeader(header)
+    span.setAttributes(
+      this._headerCapture.server.captureResponseHeaders(header =>
+        response.getHeader(header)
+      )
     );
 
     span.setAttributes(attributes).setStatus({
