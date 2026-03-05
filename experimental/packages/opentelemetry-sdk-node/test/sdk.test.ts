@@ -409,7 +409,7 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
-    it('should configure components for metrics if enabled', async () => {
+    it('should configure components for SDK metrics if enabled', async () => {
       process.env.OTEL_NODE_EXPERIMENTAL_SDK_METRICS = 'true';
       const exporter = new ConsoleMetricExporter();
       const metricReader = new PeriodicExportingMetricReader({
@@ -419,7 +419,7 @@ describe('Node SDK', () => {
       });
 
       const sdk = new NodeSDK({
-        metricReader: metricReader,
+        metricReaders: [metricReader],
         traceExporter: new ConsoleSpanExporter(),
         autoDetectResources: false,
       });
@@ -445,7 +445,7 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
-    it('should not configure components for metrics if disabled', async () => {
+    it('should not configure components for SDK metrics if disabled', async () => {
       const exporter = new ConsoleMetricExporter();
       const metricReader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -454,7 +454,7 @@ describe('Node SDK', () => {
       });
 
       const sdk = new NodeSDK({
-        metricReader: metricReader,
+        metricReaders: [metricReader],
         traceExporter: new ConsoleSpanExporter(),
         autoDetectResources: false,
       });
