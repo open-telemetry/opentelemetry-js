@@ -1,26 +1,10 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  context,
-  ContextManager,
-  diag,
-  propagation,
-  TextMapPropagator,
-} from '@opentelemetry/api';
+import type { ContextManager, TextMapPropagator } from '@opentelemetry/api';
+import { context, diag, propagation } from '@opentelemetry/api';
 import {
   CompositePropagator,
   getNumberFromEnv,
@@ -33,23 +17,27 @@ import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/expo
 import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
-import {
+import type {
   DetectedResourceAttributes,
+  Resource,
+  ResourceDetector,
+} from '@opentelemetry/resources';
+import {
   envDetector,
   hostDetector,
   osDetector,
   processDetector,
-  Resource,
-  ResourceDetector,
   resourceFromAttributes,
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
+import type {
+  SpanExporter,
+  SpanProcessor,
+} from '@opentelemetry/sdk-trace-base';
 import {
   BatchSpanProcessor,
   ConsoleSpanExporter,
   SimpleSpanProcessor,
-  SpanExporter,
-  SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
@@ -58,25 +46,27 @@ import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
-import {
+import type {
   ConfigurationModel,
   LogRecordExporterModel,
 } from '@opentelemetry/configuration';
-import {
+import type {
   IMetricReader,
-  PeriodicExportingMetricReader,
   PushMetricExporter,
 } from '@opentelemetry/sdk-metrics';
+import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
 import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
-import {
-  BatchLogRecordProcessor,
+import type {
   BufferConfig,
-  ConsoleLogRecordExporter,
   LogRecordExporter,
   LoggerProviderConfig,
   LogRecordProcessor,
+} from '@opentelemetry/sdk-logs';
+import {
+  BatchLogRecordProcessor,
+  ConsoleLogRecordExporter,
   SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
 

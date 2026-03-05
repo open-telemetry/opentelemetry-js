@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as api from '@opentelemetry/api';
@@ -37,11 +26,11 @@ import {
 } from '@opentelemetry/sdk-trace-web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
+import type {
   FetchCustomAttributeFunction,
-  FetchInstrumentation,
   FetchInstrumentationConfig,
 } from '../src';
+import { FetchInstrumentation } from '../src';
 import { AttributeNames } from '../src/enums/AttributeNames';
 import {
   ATTR_HTTP_HOST,
@@ -845,6 +834,23 @@ describe('fetch', () => {
 
             assert.strictEqual(headers['foo'], 'bar');
           });
+
+          it('should keep custom headers with url, untyped request object and tuple array headers', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch('/api/echo-headers.json', {
+                  headers: [
+                    ['foo', 'bar'],
+                    ['content-type', 'application/json'],
+                  ],
+                }),
+            });
+
+            const headers = await assertPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+            assert.strictEqual(headers['content-type'], 'application/json');
+          });
         });
 
         describe('without global propagator', () => {
@@ -917,6 +923,23 @@ describe('fetch', () => {
             const headers = await assertNoPropagationHeaders(response);
 
             assert.strictEqual(headers['foo'], 'bar');
+          });
+
+          it('should keep custom headers with url, untyped request object and tuple array headers', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch('/api/echo-headers.json', {
+                  headers: [
+                    ['foo', 'bar'],
+                    ['content-type', 'application/json'],
+                  ],
+                }),
+            });
+
+            const headers = await assertNoPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+            assert.strictEqual(headers['content-type'], 'application/json');
           });
         });
       });

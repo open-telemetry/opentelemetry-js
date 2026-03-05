@@ -1,27 +1,16 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import { diagLogLevelFromString, getStringFromEnv } from '@opentelemetry/core';
-import {
+import type {
   AttributeLimits,
   Propagator,
   ConfigurationModel,
-  initializeDefaultConfiguration,
 } from './models/configModel';
-import { ConfigFactory } from './IConfigFactory';
+import { initializeDefaultConfiguration } from './models/configModel';
+import type { ConfigFactory } from './IConfigFactory';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
 import {
@@ -34,34 +23,25 @@ import {
   getStringFromConfigFile,
   getStringListFromConfigFile,
 } from './utils';
-import {
-  NameStringValuePair,
-  OtlpHttpEncoding,
-  SeverityNumber,
-} from './models/commonModel';
-import {
-  initializeDefaultTracerProviderConfiguration,
+import type { NameStringValuePair } from './models/commonModel';
+import { OtlpHttpEncoding, SeverityNumber } from './models/commonModel';
+import type {
   SpanExporter,
   SpanProcessor,
   TracerProvider,
 } from './models/tracerProviderModel';
-import {
+import { initializeDefaultTracerProviderConfiguration } from './models/tracerProviderModel';
+import type {
   ExperimentalLoggerMatcherAndConfig,
-  initializeDefaultLoggerProviderConfiguration,
   LoggerProvider,
   LogRecordExporter,
   LogRecordProcessor,
 } from './models/loggerProviderModel';
-import { AttributeNameValue } from './models/resourceModel';
-import {
+import { initializeDefaultLoggerProviderConfiguration } from './models/loggerProviderModel';
+import type { AttributeNameValue } from './models/resourceModel';
+import type {
   Aggregation,
   CardinalityLimits,
-  ExemplarFilter,
-  ExperimentalPrometheusTranslationStrategy,
-  ExporterDefaultHistogramAggregation,
-  ExporterTemporalityPreference,
-  initializeDefaultMeterProviderConfiguration,
-  InstrumentType,
   MeterProvider,
   MetricProducer,
   MetricReader,
@@ -70,6 +50,14 @@ import {
   View,
   ViewSelector,
   ViewStream,
+} from './models/meterProviderModel';
+import {
+  ExemplarFilter,
+  ExperimentalPrometheusTranslationStrategy,
+  ExporterDefaultHistogramAggregation,
+  ExporterTemporalityPreference,
+  initializeDefaultMeterProviderConfiguration,
+  InstrumentType,
 } from './models/meterProviderModel';
 import { diag } from '@opentelemetry/api';
 

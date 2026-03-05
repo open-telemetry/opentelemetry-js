@@ -1,31 +1,21 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import { createHttpExporterTransport } from '../../src/transport/http-exporter-transport';
 import * as http from 'http';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
+import type {
   ExportResponseRetryable,
   ExportResponseFailure,
   ExportResponseSuccess,
   OTLPExporterError,
 } from '../../src';
 import * as zlib from 'zlib';
-import { createConnection, TcpNetConnectOpts } from 'net';
+import type { TcpNetConnectOpts } from 'net';
+import { createConnection } from 'net';
 
 const sampleRequestData = new Uint8Array([1, 2, 3]);
 
@@ -258,6 +248,98 @@ describe('HttpExporterTransport', function () {
         'ECONNRESET'
       );
       assert.strictEqual(result.error?.message, 'socket hang up');
+    });
+
+    it('returns failure when socket is destroyed after headers with non-retryable error code are received', async function () {
+      // arrange
+      server = http.createServer((_, res) => {
+        // Force flush http response headers to trigger client response callback
+        res.writeHead(403);
+        res.write('');
+        // Destroy the socket to simulate something going wrong
+        queueMicrotask(() => {
+          res.socket?.destroy();
+        });
+      });
+      server.listen(8080);
+
+      const transport = createHttpExporterTransport({
+        url: 'http://localhost:8080',
+        headers: async () => ({}),
+        compression: 'none',
+        agentFactory: () => new http.Agent(),
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 1000);
+
+      // assert
+      assert.strictEqual(result.status, 'failure');
+      assert.strictEqual(
+        (result.error as NodeJS.ErrnoException).code,
+        'ECONNRESET'
+      );
+      assert.strictEqual(result.error?.message, 'aborted');
+    });
+
+    it('returns failure when socket is destroyed after headers with retryable code are received', async function () {
+      // arrange
+      server = http.createServer((_, res) => {
+        // Force flush http response headers to trigger client response callback
+        res.writeHead(429, 'Too many requests', { 'retry-after': '1' });
+        res.write('');
+        // Destroy the socket to simulate something going wrong
+        queueMicrotask(() => {
+          res.socket?.destroy();
+        });
+      });
+      server.listen(8080);
+
+      const transport = createHttpExporterTransport({
+        url: 'http://localhost:8080',
+        headers: async () => ({}),
+        compression: 'none',
+        agentFactory: () => new http.Agent(),
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 1000);
+
+      // assert
+      assert.strictEqual(result.status, 'retryable');
+      assert.strictEqual(
+        (result.error as NodeJS.ErrnoException).code,
+        'ECONNRESET'
+      );
+      assert.strictEqual(result.retryInMillis, 1000);
+      assert.strictEqual(result.error?.message, 'aborted');
+    });
+
+    it('returns success when socket is destroyed after headers with success code are received', async function () {
+      // arrange
+      server = http.createServer((_, res) => {
+        // Force flush http response headers to trigger client response callback
+        res.writeHead(200);
+        res.write('');
+        // Destroy the socket to simulate connection reset after headers
+        queueMicrotask(() => {
+          res.socket?.destroy();
+        });
+      });
+      server.listen(8080);
+
+      const transport = createHttpExporterTransport({
+        url: 'http://localhost:8080',
+        headers: async () => ({}),
+        compression: 'none',
+        agentFactory: () => new http.Agent(),
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 1000);
+
+      // assert
+      assert.strictEqual(result.status, 'success');
     });
 
     it('returns retryable on connection refused (ECONNREFUSED)', async function () {
