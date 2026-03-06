@@ -51,11 +51,15 @@ describe('StackContextManager', function () {
   });
 
   describe('.with()', function () {
-    it('should run the callback (null as target)', done => {
-      contextManager.with(null, done);
+    it('should run the callback (null as target)', () => {
+      let called = false;
+      contextManager.with(null, () => {
+        called = true;
+      });
+      assert.strictEqual(called, true);
     });
 
-    it('should run the callback (object as target)', done => {
+    it('should run the callback (object as target)', () => {
       const test = ROOT_CONTEXT.setValue(key1, 1);
       contextManager.with(test, () => {
         assert.strictEqual(
@@ -63,28 +67,28 @@ describe('StackContextManager', function () {
           test,
           'should have context'
         );
-        return done();
       });
     });
 
-    it('should run the callback (when disabled)', done => {
+    it('should run the callback (when disabled)', () => {
       contextManager.disable();
+      let called = false;
       contextManager.with(null, () => {
+        called = true;
         contextManager.enable();
-        return done();
       });
+      assert.strictEqual(called, true);
     });
 
-    it('should rethrow errors', done => {
+    it('should rethrow errors', () => {
       assert.throws(() => {
         contextManager.with(null, () => {
           throw new Error('This should be rethrown');
         });
       });
-      return done();
     });
 
-    it('should finally restore an old context', done => {
+    it('should finally restore an old context', () => {
       const ctx1 = ROOT_CONTEXT.setValue(key1, 'ctx1');
       const ctx2 = ROOT_CONTEXT.setValue(key1, 'ctx2');
       const ctx3 = ROOT_CONTEXT.setValue(key1, 'ctx3');
@@ -98,12 +102,11 @@ describe('StackContextManager', function () {
           assert.strictEqual(contextManager.active(), ctx2);
         });
         assert.strictEqual(contextManager.active(), ctx1);
-        return done();
       });
       assert.strictEqual(contextManager.active(), globalThis);
     });
 
-    it('should finally restore an old context when context is an object', done => {
+    it('should finally restore an old context when context is an object', () => {
       const ctx1 = ROOT_CONTEXT.setValue(key1, 1);
       const ctx2 = ROOT_CONTEXT.setValue(key1, 2);
       const ctx3 = ROOT_CONTEXT.setValue(key1, 3);
@@ -117,7 +120,6 @@ describe('StackContextManager', function () {
           assert.strictEqual(contextManager.active(), ctx2);
         });
         assert.strictEqual(contextManager.active(), ctx1);
-        return done();
       });
       assert.strictEqual(contextManager.active(), globalThis);
     });
@@ -187,7 +189,7 @@ describe('StackContextManager', function () {
       contextManager.enable();
     });
 
-    it('should return current context (when enabled)', done => {
+    it('should return current context (when enabled)', () => {
       const context = ROOT_CONTEXT.setValue(key1, 1);
       const fn: any = contextManager.bind(context, () => {
         assert.strictEqual(
@@ -195,12 +197,11 @@ describe('StackContextManager', function () {
           context,
           'should have context'
         );
-        return done();
       });
       fn();
     });
 
-    it('should return current context (when disabled)', done => {
+    it('should return current context (when disabled)', () => {
       contextManager.disable();
       const context = ROOT_CONTEXT.setValue(key1, 1);
       const fn: any = contextManager.bind(context, () => {
@@ -209,7 +210,6 @@ describe('StackContextManager', function () {
           context,
           'should have context'
         );
-        return done();
       });
       fn();
     });

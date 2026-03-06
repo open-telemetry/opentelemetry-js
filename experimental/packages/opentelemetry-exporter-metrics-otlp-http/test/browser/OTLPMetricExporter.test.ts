@@ -14,7 +14,6 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { OTLPMetricExporter } from '../../src/platform/browser';
 
 /*
  * NOTE: Tests here are not intended to test the underlying components directly. They are intended as a quick

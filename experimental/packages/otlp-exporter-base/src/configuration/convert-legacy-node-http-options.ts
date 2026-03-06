@@ -8,11 +8,11 @@ import type {
   HttpAgentFactory,
   OtlpNodeHttpConfiguration,
 } from './otlp-node-http-configuration';
+import { httpAgentFactoryFromOptions } from './otlp-node-http-configuration';
 import {
   getNodeHttpConfigurationDefaults,
   mergeOtlpNodeHttpConfigurationWithDefaults,
 } from './otlp-node-http-configuration';
-import { httpAgentFactoryFromOptions } from '../index-node-http';
 import { getNodeHttpConfigurationFromEnvironment } from './otlp-node-http-env-configuration';
 import { convertLegacyHeaders } from './convert-legacy-http-options';
 
