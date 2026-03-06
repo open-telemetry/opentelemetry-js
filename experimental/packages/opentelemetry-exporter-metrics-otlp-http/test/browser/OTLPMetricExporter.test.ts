@@ -3,7 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { AggregationTemporalityPreference } from '../../src';
+import {
+  AggregationTemporalityPreference,
+  OTLPMetricExporter,
+} from '@opentelemetry/exporter-metrics-otlp-http';
 import type { AggregationOption } from '@opentelemetry/sdk-metrics';
 import {
   AggregationTemporality,
