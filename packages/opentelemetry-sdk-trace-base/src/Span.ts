@@ -113,13 +113,17 @@ export class SpanImpl implements Span {
     this._startTimeProvided = opts.startTime != null;
     this._spanLimits = opts.spanLimits;
     this._attributeValueLengthLimit =
-      this._spanLimits.attributeValueLengthLimit || 0;
+      this._spanLimits.attributeValueLengthLimit ?? 0;
     this._spanProcessor = opts.spanProcessor;
 
     this.name = opts.name;
     this.parentSpanContext = opts.parentSpanContext;
     this.kind = opts.kind;
-    this.links = opts.links || [];
+    if (opts.links) {
+      for (const link of opts.links) {
+        this.addLink(link);
+      }
+    }
     this.startTime = this._getTime(opts.startTime ?? now);
     this.resource = opts.resource;
     this.instrumentationScope = opts.scope;
@@ -217,24 +221,83 @@ export class SpanImpl implements Span {
       attributesOrStartTime = undefined;
     }
 
-    const attributes = sanitizeAttributes(attributesOrStartTime);
+    const sanitized = sanitizeAttributes(attributesOrStartTime);
+    const { attributePerEventCountLimit } = this._spanLimits;
+    const entries = Object.entries(sanitized);
+    const attributes: Attributes = {};
+    let droppedAttributesCount = 0;
+
+    for (const [attr, attrVal] of entries) {
+      if (
+        attributePerEventCountLimit !== undefined &&
+        Object.keys(attributes).length >= attributePerEventCountLimit
+      ) {
+        droppedAttributesCount++;
+        continue;
+      }
+      attributes[attr] = this._truncateToSize(attrVal!);
+    }
 
     this.events.push({
       name,
       attributes,
       time: this._getTime(timeStamp),
-      droppedAttributesCount: 0,
+      droppedAttributesCount,
     });
     return this;
   }
 
   addLink(link: Link): this {
-    this.links.push(link);
+    if (this._isSpanEnded()) return this;
+
+    const { linkCountLimit } = this._spanLimits;
+
+    if (linkCountLimit === 0) {
+      this._droppedLinksCount++;
+      return this;
+    }
+
+    if (linkCountLimit !== undefined && this.links.length >= linkCountLimit) {
+      if (this._droppedLinksCount === 0) {
+        diag.debug('Dropping extra links.');
+      }
+      this.links.shift();
+      this._droppedLinksCount++;
+    }
+
+    const { attributePerLinkCountLimit } = this._spanLimits;
+    const sanitized = sanitizeAttributes(link.attributes);
+    const entries = Object.entries(sanitized);
+    const attributes: Attributes = {};
+    let droppedAttributesCount = 0;
+
+    for (const [attr, attrVal] of entries) {
+      if (
+        attributePerLinkCountLimit !== undefined &&
+        Object.keys(attributes).length >= attributePerLinkCountLimit
+      ) {
+        droppedAttributesCount++;
+        continue;
+      }
+      attributes[attr] = this._truncateToSize(attrVal!);
+    }
+
+    const processedLink: Link = { context: link.context };
+    if (Object.keys(attributes).length > 0) {
+      processedLink.attributes = attributes;
+    }
+    if (droppedAttributesCount > 0) {
+      processedLink.droppedAttributesCount = droppedAttributesCount;
+    }
+
+    this.links.push(processedLink);
     return this;
   }
 
   addLinks(links: Link[]): this {
-    this.links.push(...links);
+    for (const link of links) {
+      this.addLink(link);
+    }
     return this;
   }
 
@@ -292,6 +355,11 @@ export class SpanImpl implements Span {
     if (this._droppedEventsCount > 0) {
       diag.warn(
         `Dropped ${this._droppedEventsCount} events because eventCountLimit reached`
+      );
+    }
+    if (this._droppedLinksCount > 0) {
+      diag.warn(
+        `Dropped ${this._droppedLinksCount} links because linkCountLimit reached`
       );
     }
     if (this._spanProcessor.onEnding) {
