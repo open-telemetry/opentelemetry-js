@@ -10,7 +10,11 @@ import {
   convertLegacyOtlpGrpcOptions,
   createOtlpGrpcExportDelegate,
 } from '@opentelemetry/otlp-grpc-exporter-base';
-import { ProtobufMetricsSerializer } from '@opentelemetry/otlp-transformer';
+import {
+  MetricsSignal,
+  ProtobufMetricsSerializer,
+} from '@opentelemetry/otlp-transformer';
+import { OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_METRIC_EXPORTER } from './semconv';
 
 /**
  * OTLP-gRPC metric exporter
@@ -21,6 +25,9 @@ export class OTLPMetricExporter extends OTLPMetricExporterBase {
       createOtlpGrpcExportDelegate(
         convertLegacyOtlpGrpcOptions(config ?? {}, 'METRICS'),
         ProtobufMetricsSerializer,
+        OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_METRIC_EXPORTER,
+        MetricsSignal,
+        config?.meterProvider,
         'MetricsExportService',
         '/opentelemetry.proto.collector.metrics.v1.MetricsService/Export'
       ),

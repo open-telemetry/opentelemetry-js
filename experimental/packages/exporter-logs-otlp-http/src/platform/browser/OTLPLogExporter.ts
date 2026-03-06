@@ -9,8 +9,13 @@ import type {
 } from '@opentelemetry/sdk-logs';
 import type { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
-import { JsonLogsSerializer } from '@opentelemetry/otlp-transformer';
+import {
+  JsonLogsSerializer,
+  LogsSignal,
+} from '@opentelemetry/otlp-transformer';
 import { createLegacyOtlpBrowserExportDelegate } from '@opentelemetry/otlp-exporter-base/browser-http';
+
+import { OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_LOG_EXPORTER } from '../../semconv';
 
 /**
  * Collector Logs Exporter for Web
@@ -24,6 +29,9 @@ export class OTLPLogExporter
       createLegacyOtlpBrowserExportDelegate(
         config,
         JsonLogsSerializer,
+        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_LOG_EXPORTER,
+        LogsSignal,
+        config.meterProvider,
         'v1/logs',
         { 'Content-Type': 'application/json' }
       )

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { MeterProvider } from '@opentelemetry/api';
 import type { ExportResult } from '@opentelemetry/core';
 
 /**
@@ -16,6 +17,12 @@ export interface ExporterConfig {
   statusCodeTagName?: string;
   statusDescriptionTagName?: string;
   getExportRequestHeaders?: () => Record<string, string> | undefined;
+
+  /**
+   * MeterProvider to record exporter metrics.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  meterProvider?: MeterProvider;
 }
 
 /**

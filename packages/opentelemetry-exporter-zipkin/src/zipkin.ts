@@ -4,7 +4,7 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import type { ExportResult } from '@opentelemetry/core';
+import { type ExportResult, internal } from '@opentelemetry/core';
 import { ExportResultCode, getStringFromEnv } from '@opentelemetry/core';
 import type { SpanExporter, ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { prepareSend } from './platform/index';
@@ -15,6 +15,10 @@ import {
   defaultStatusErrorTagName,
 } from './transform';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import {
+  ATTR_HTTP_RESPONSE_STATUS_CODE,
+  OTEL_COMPONENT_TYPE_VALUE_ZIPKIN_HTTP_SPAN_EXPORTER,
+} from './semconv';
 import { prepareGetHeaders } from './utils';
 
 /**
@@ -24,6 +28,9 @@ export class ZipkinExporter implements SpanExporter {
   private readonly DEFAULT_SERVICE_NAME = 'OpenTelemetry Service';
   private readonly _statusCodeTagName: string;
   private readonly _statusDescriptionTagName: string;
+  private readonly _metrics: InstanceType<
+    typeof internal.ExporterMetrics<ReadableSpan[]>
+  >;
   private _urlStr: string;
   private _send: zipkinTypes.SendFunction;
   private _getHeaders: zipkinTypes.GetHeaders | undefined;
@@ -49,6 +56,31 @@ export class ZipkinExporter implements SpanExporter {
       // noop
       this._beforeSend = function () {};
     }
+    this._metrics = new internal.ExporterMetrics({
+      componentType: OTEL_COMPONENT_TYPE_VALUE_ZIPKIN_HTTP_SPAN_EXPORTER,
+      signal: {
+        name: 'span',
+        countItems: (spans: ReadableSpan[]) => spans.length,
+      },
+      url: this._urlStr,
+      meterProvider: config.meterProvider,
+      errorAttributes: (error: unknown) => {
+        if (!(error instanceof Error)) {
+          return {};
+        }
+        if (
+          error.message.startsWith('`Got unexpected status code from zipkin: ')
+        ) {
+          const statusStr = error.message.substring(
+            '`Got unexpected status code from zipkin: '.length
+          );
+          return {
+            [ATTR_HTTP_RESPONSE_STATUS_CODE]: Number(statusStr),
+          };
+        }
+        return {};
+      },
+    });
   }
 
   /**
@@ -142,7 +174,9 @@ export class ZipkinExporter implements SpanExporter {
       )
     );
     this._beforeSend();
+    const finishExport = this._metrics.startExport(spans);
     return this._send(zipkinSpans, (result: ExportResult) => {
+      finishExport(result.error?.name);
       if (done) {
         return done(result);
       }

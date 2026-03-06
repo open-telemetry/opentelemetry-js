@@ -67,6 +67,8 @@ export { isUrlIgnored, urlMatches } from './utils/url';
 export { BindOnceFuture } from './utils/callback';
 export { diagLogLevelFromString } from './utils/configuration';
 import { _export } from './internal/exporter';
+import { ExporterMetrics } from './internal/ExporterMetrics';
 export const internal = {
   _export,
-};
+  ExporterMetrics,
+} as const;
