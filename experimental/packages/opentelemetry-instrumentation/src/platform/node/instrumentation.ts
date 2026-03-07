@@ -132,11 +132,15 @@ export abstract class InstrumentationBase<
   };
 
   private _warnOnPreloadedModules(): void {
+    // Access require via globalThis to prevent webpack from analyzing it as a dependency expression
+    const nodeRequire = globalThis.require;
+    if (!nodeRequire?.resolve || !nodeRequire?.cache) return;
+
     this._modules.forEach((module: InstrumentationModuleDefinition) => {
       const { name } = module;
       try {
-        const resolvedModule = require.resolve(name);
-        if (require.cache[resolvedModule]?.loaded) {
+        const resolvedModule = nodeRequire.resolve(name);
+        if (nodeRequire.cache[resolvedModule]?.loaded) {
           // Module is already cached, which means the instrumentation hook might not work
           this._diag.warn(
             `Module ${name} has been loaded before ${this.instrumentationName} so it might not work, please initialize it before requiring ${name}`
