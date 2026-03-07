@@ -1,3 +1,4 @@
+import { InstrumentationBase } from '@opentelemetry/instrumentation';
 import { defaultServiceName } from '@opentelemetry/resources';
 
 export const runtime = 'edge';

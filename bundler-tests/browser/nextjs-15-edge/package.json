@@ -1,5 +1,5 @@
 {
-  "name": "nextjs-15-edge-bundle-test",
+  "name": "bundler-tests-browser-nextjs-15-edge",
   "type": "module",
   "private": true,
   "scripts": {
@@ -7,6 +7,7 @@
     "test:bundle": "npm i && npm run build"
   },
   "dependencies": {
+    "@opentelemetry/instrumentation": "file:../../../experimental/packages/opentelemetry-instrumentation",
     "@opentelemetry/resources": "file:../../../packages/opentelemetry-resources",
     "next": "^15",
     "react": "^18",

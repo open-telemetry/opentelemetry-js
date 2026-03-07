@@ -1,10 +1,9 @@
 {
-  "name": "bundler-tests-browser-webpack-5",
+  "name": "bundler-tests-node-webpack-4",
   "private": true,
   "type": "module",
   "scripts": {
-    "test:bundle": "npm i && node test-bundle.mjs",
-    "start": "npm i && webpack serve --config webpack.config.mjs --open"
+    "test:bundle": "npm i && node test-bundle.mjs"
   },
   "dependencies": {
     "@opentelemetry/api": "file:../../../api",
@@ -14,8 +13,11 @@
     "@opentelemetry/sdk-logs": "file:../../../experimental/packages/sdk-logs"
   },
   "devDependencies": {
-    "@types/webpack": "^5",
-    "webpack": "^5",
-    "webpack-cli": "^6"
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "@types/webpack": "^4",
+    "babel-loader": "^8.0.0",
+    "webpack": "^4",
+    "webpack-cli": "^4"
   }
 }

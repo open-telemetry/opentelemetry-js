@@ -1,10 +1,9 @@
 {
-  "name": "bundler-tests-browser-webpack-5",
+  "name": "bundler-tests-node-webpack-5",
   "private": true,
   "type": "module",
   "scripts": {
-    "test:bundle": "npm i && node test-bundle.mjs",
-    "start": "npm i && webpack serve --config webpack.config.mjs --open"
+    "test:bundle": "npm i && node test-bundle.mjs"
   },
   "dependencies": {
     "@opentelemetry/api": "file:../../../api",
