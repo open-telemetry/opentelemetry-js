@@ -5,6 +5,7 @@
 import { ValueType } from '@opentelemetry/api';
 import type {
   DataPoint,
+  Exemplar,
   ExponentialHistogram,
   Histogram,
   MetricData,
@@ -16,6 +17,7 @@ import {
   DataPointType,
 } from '@opentelemetry/sdk-metrics';
 import type {
+  IExemplar,
   IExponentialHistogramDataPoint,
   IExportMetricsServiceRequest,
   IHistogramDataPoint,
@@ -121,6 +123,11 @@ function toSingularDataPoint(
       break;
   }
 
+  const exemplars = toExemplars(dataPoint.exemplars, encoder);
+  if (exemplars) {
+    out.exemplars = exemplars;
+  }
+
   return out;
 }
 
@@ -143,7 +150,7 @@ function toHistogramDataPoints(
 ): IHistogramDataPoint[] {
   return metricData.dataPoints.map(dataPoint => {
     const histogram = dataPoint.value as Histogram;
-    return {
+    const dp: IHistogramDataPoint = {
       attributes: toAttributes(dataPoint.attributes, encoder),
       bucketCounts: histogram.buckets.counts,
       explicitBounds: histogram.buckets.boundaries,
@@ -154,6 +161,11 @@ function toHistogramDataPoints(
       startTimeUnixNano: encoder.encodeHrTime(dataPoint.startTime),
       timeUnixNano: encoder.encodeHrTime(dataPoint.endTime),
     };
+    const exemplars = toExemplars(dataPoint.exemplars, encoder);
+    if (exemplars) {
+      dp.exemplars = exemplars;
+    }
+    return dp;
   });
 }
 
@@ -163,7 +175,7 @@ function toExponentialHistogramDataPoints(
 ): IExponentialHistogramDataPoint[] {
   return metricData.dataPoints.map(dataPoint => {
     const histogram = dataPoint.value as ExponentialHistogram;
-    return {
+    const dp: IExponentialHistogramDataPoint = {
       attributes: toAttributes(dataPoint.attributes, encoder),
       count: histogram.count,
       min: histogram.min,
@@ -182,6 +194,34 @@ function toExponentialHistogramDataPoints(
       startTimeUnixNano: encoder.encodeHrTime(dataPoint.startTime),
       timeUnixNano: encoder.encodeHrTime(dataPoint.endTime),
     };
+    const exemplars = toExemplars(dataPoint.exemplars, encoder);
+    if (exemplars) {
+      dp.exemplars = exemplars;
+    }
+    return dp;
+  });
+}
+
+function toExemplars(
+  exemplars: Exemplar[] | undefined,
+  encoder: Encoder
+): IExemplar[] | undefined {
+  if (!exemplars || exemplars.length === 0) {
+    return undefined;
+  }
+  return exemplars.map(exemplar => {
+    const result: IExemplar = {
+      filteredAttributes: toAttributes(exemplar.filteredAttributes, encoder),
+      timeUnixNano: encoder.encodeHrTime(exemplar.timestamp),
+      asDouble: exemplar.value,
+    };
+    if (exemplar.spanId) {
+      result.spanId = exemplar.spanId;
+    }
+    if (exemplar.traceId) {
+      result.traceId = exemplar.traceId;
+    }
+    return result;
   });
 }
 

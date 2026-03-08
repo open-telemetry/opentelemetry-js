@@ -22,6 +22,9 @@ import type { Accumulation, Aggregator } from '../aggregator/types';
 import type { IAttributesProcessor } from '../view/AttributesProcessor';
 import { createNoopAttributesProcessor } from '../view/AttributesProcessor';
 import type { MetricStorage } from './MetricStorage';
+import type { ExemplarFilter } from '../exemplar/ExemplarFilter';
+import type { ExemplarReservoir } from '../exemplar/ExemplarReservoir';
+import { createDefaultExemplarReservoir } from '../exemplar/ExemplarReservoirFactory';
 
 /**
  * An internal record for shared meter provider states.
@@ -133,12 +136,17 @@ export class MeterSharedState {
         return compatibleStorage;
       }
       const aggregator = view.aggregation.createAggregator(viewDescriptor);
+      const reservoirFactory =
+        view.exemplarReservoir ??
+        (() => createDefaultExemplarReservoir(aggregator));
       const viewStorage = new MetricStorageType(
         viewDescriptor,
         aggregator,
         view.attributesProcessor,
         this._meterProviderSharedState.metricCollectors,
-        view.aggregationCardinalityLimit
+        view.aggregationCardinalityLimit,
+        this._meterProviderSharedState.exemplarFilter,
+        reservoirFactory
       ) as R;
       this.metricStorageRegistry.register(viewStorage);
       return viewStorage;
@@ -163,12 +171,16 @@ export class MeterSharedState {
           const cardinalityLimit = collector.selectCardinalityLimit(
             descriptor.type
           );
+          const reservoirFactory = () =>
+            createDefaultExemplarReservoir(aggregator);
           const storage = new MetricStorageType(
             descriptor,
             aggregator,
             createNoopAttributesProcessor(),
             [collector],
-            cardinalityLimit
+            cardinalityLimit,
+            this._meterProviderSharedState.exemplarFilter,
+            reservoirFactory
           ) as R;
           this.metricStorageRegistry.registerForCollector(collector, storage);
           return storage;
@@ -192,6 +204,8 @@ interface MetricStorageConstructor {
     aggregator: Aggregator<Maybe<Accumulation>>,
     attributesProcessor: IAttributesProcessor,
     collectors: MetricCollectorHandle[],
-    aggregationCardinalityLimit?: number
+    aggregationCardinalityLimit?: number,
+    exemplarFilter?: ExemplarFilter,
+    exemplarReservoirFactory?: () => ExemplarReservoir
   ): MetricStorage;
 }
