@@ -17,6 +17,10 @@ import { MetricCollector } from './state/MetricCollector';
 import type { ForceFlushOptions, ShutdownOptions } from './types';
 import type { ViewOptions } from './view/View';
 import { View } from './view/View';
+import type { ExemplarFilter } from './exemplar/ExemplarFilter';
+import { WithTraceExemplarFilter } from './exemplar/WithTraceExemplarFilter';
+import { AlwaysSampleExemplarFilter } from './exemplar/AlwaysSampleExemplarFilter';
+import { NeverSampleExemplarFilter } from './exemplar/NeverSampleExemplarFilter';
 
 /**
  * MeterProviderOptions provides an interface for configuring a MeterProvider.
@@ -26,6 +30,8 @@ export interface MeterProviderOptions {
   resource?: Resource;
   views?: ViewOptions[];
   readers?: IMetricReader[];
+  /** @experimental Exemplar filter to control exemplar collection. */
+  exemplarFilter?: ExemplarFilter;
 }
 
 /**
@@ -36,8 +42,11 @@ export class MeterProvider implements IMeterProvider {
   private _shutdown = false;
 
   constructor(options?: MeterProviderOptions) {
+    const exemplarFilter =
+      options?.exemplarFilter ?? resolveExemplarFilterFromEnv();
     this._sharedState = new MeterProviderSharedState(
-      options?.resource ?? defaultResource()
+      options?.resource ?? defaultResource(),
+      exemplarFilter
     );
     if (options?.views != null && options.views.length > 0) {
       for (const viewOption of options.views) {
@@ -109,5 +118,21 @@ export class MeterProvider implements IMeterProvider {
         return collector.forceFlush(options);
       })
     );
+  }
+}
+
+function resolveExemplarFilterFromEnv(): ExemplarFilter {
+  const envValue =
+    (typeof process !== 'undefined' &&
+      process.env.OTEL_METRICS_EXEMPLAR_FILTER) ||
+    undefined;
+  switch (envValue) {
+    case 'always_on':
+      return new AlwaysSampleExemplarFilter();
+    case 'always_off':
+      return new NeverSampleExemplarFilter();
+    case 'trace_based':
+    default:
+      return new WithTraceExemplarFilter();
   }
 }

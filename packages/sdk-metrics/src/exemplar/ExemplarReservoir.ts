@@ -57,15 +57,15 @@ class ExemplarBucket {
 
   collect(pointAttributes: Attributes): Exemplar | null {
     if (!this._offered) return null;
-    const currentAttributes = this.attributes;
-    // filter attributes
-    Object.keys(pointAttributes).forEach(key => {
-      if (pointAttributes[key] === currentAttributes[key]) {
-        delete currentAttributes[key];
+    // Build filtered attributes as a new object to avoid mutating the original
+    const filteredAttributes: Attributes = {};
+    Object.keys(this.attributes).forEach(key => {
+      if (this.attributes[key] !== pointAttributes[key]) {
+        filteredAttributes[key] = this.attributes[key];
       }
     });
     const retVal: Exemplar = {
-      filteredAttributes: currentAttributes,
+      filteredAttributes,
       value: this.value,
       timestamp: this.timestamp,
       spanId: this.spanId,

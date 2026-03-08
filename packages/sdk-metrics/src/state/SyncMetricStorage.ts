@@ -14,6 +14,10 @@ import { DeltaMetricProcessor } from './DeltaMetricProcessor';
 import { TemporalMetricProcessor } from './TemporalMetricProcessor';
 import type { Maybe } from '../utils';
 import type { MetricCollectorHandle } from './MetricCollector';
+import type { ExemplarFilter } from '../exemplar/ExemplarFilter';
+import type { ExemplarReservoir } from '../exemplar/ExemplarReservoir';
+import { AttributeHashMap } from './HashMap';
+import type { Exemplar } from '../exemplar/Exemplar';
 
 /**
  * Internal interface.
@@ -28,13 +32,18 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>>
   private _deltaMetricStorage: DeltaMetricProcessor<T>;
   private _temporalMetricStorage: TemporalMetricProcessor<T>;
   private _attributesProcessor: IAttributesProcessor;
+  private _exemplarFilter?: ExemplarFilter;
+  private _exemplarReservoirFactory?: () => ExemplarReservoir;
+  private _exemplarReservoirs = new AttributeHashMap<ExemplarReservoir>();
 
   constructor(
     instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<T>,
     attributesProcessor: IAttributesProcessor,
     collectorHandles: MetricCollectorHandle[],
-    aggregationCardinalityLimit?: number
+    aggregationCardinalityLimit?: number,
+    exemplarFilter?: ExemplarFilter,
+    exemplarReservoirFactory?: () => ExemplarReservoir
   ) {
     super(instrumentDescriptor);
     this._aggregationCardinalityLimit = aggregationCardinalityLimit;
@@ -47,6 +56,8 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>>
       collectorHandles
     );
     this._attributesProcessor = attributesProcessor;
+    this._exemplarFilter = exemplarFilter;
+    this._exemplarReservoirFactory = exemplarReservoirFactory;
   }
 
   record(
@@ -57,6 +68,18 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>>
   ) {
     attributes = this._attributesProcessor.process(attributes, context);
     this._deltaMetricStorage.record(value, attributes, context, recordTime);
+
+    if (
+      this._exemplarFilter &&
+      this._exemplarReservoirFactory &&
+      this._exemplarFilter.shouldSample(value, recordTime, attributes, context)
+    ) {
+      const reservoir = this._exemplarReservoirs.getOrDefault(
+        attributes,
+        this._exemplarReservoirFactory
+      );
+      reservoir?.offer(value, recordTime, attributes, context);
+    }
   }
 
   /**
@@ -71,11 +94,27 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>>
   ): Maybe<MetricData> {
     const accumulations = this._deltaMetricStorage.collect();
 
+    // Collect exemplars for each attribute set
+    let exemplars: AttributeHashMap<Exemplar[]> | undefined;
+    if (this._exemplarFilter) {
+      exemplars = new AttributeHashMap<Exemplar[]>();
+      for (const [attributes] of this._exemplarReservoirs.keys()) {
+        const reservoir = this._exemplarReservoirs.get(attributes);
+        if (reservoir) {
+          const collected = reservoir.collect(attributes);
+          if (collected.length > 0) {
+            exemplars.set(attributes, collected);
+          }
+        }
+      }
+    }
+
     return this._temporalMetricStorage.buildMetrics(
       collector,
       this._instrumentDescriptor,
       accumulations,
-      collectionTime
+      collectionTime,
+      exemplars
     );
   }
 }
