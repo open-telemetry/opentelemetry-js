@@ -2,6 +2,9 @@
 
 version.ts
 
+# Ephemeral clone created by scripts/config/generate-config.sh
+scripts/config/opentelemetry-configuration/
+
 # Logs
 logs
 *.log
