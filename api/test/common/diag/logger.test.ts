@@ -7,7 +7,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag, DiagLogLevel } from '../../../src';
 import { createNoopDiagLogger } from '../../../src/diag/internal/noopLogger';
-import { DiagLogger } from '../../../src/diag/types';
+import type { DiagLogger } from '../../../src/diag/types';
 
 export const diagLoggerFunctions = [
   'verbose',

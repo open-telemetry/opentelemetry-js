@@ -2,14 +2,14 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { Span, Attributes } from '@opentelemetry/api';
-import {
+import type { Span, Attributes } from '@opentelemetry/api';
+import type {
   ClientRequest,
   IncomingMessage,
   ServerResponse,
   RequestOptions,
 } from 'http';
-import { InstrumentationConfig } from '@opentelemetry/instrumentation';
+import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 
 export interface HttpCustomAttributeFunction {
   (

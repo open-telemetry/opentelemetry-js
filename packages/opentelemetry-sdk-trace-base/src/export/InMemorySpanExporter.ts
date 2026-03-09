@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { SpanExporter } from './SpanExporter';
-import { ReadableSpan } from './ReadableSpan';
-import { ExportResult, ExportResultCode } from '@opentelemetry/core';
+import type { SpanExporter } from './SpanExporter';
+import type { ReadableSpan } from './ReadableSpan';
+import type { ExportResult } from '@opentelemetry/core';
+import { ExportResultCode } from '@opentelemetry/core';
 
 /**
  * This class can be used for testing purposes. It stores the exported spans

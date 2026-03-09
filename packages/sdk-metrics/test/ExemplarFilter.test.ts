@@ -4,12 +4,8 @@
  */
 
 import * as assert from 'assert';
-import {
-  ROOT_CONTEXT,
-  SpanContext,
-  TraceFlags,
-  trace,
-} from '@opentelemetry/api';
+import type { SpanContext } from '@opentelemetry/api';
+import { ROOT_CONTEXT, TraceFlags, trace } from '@opentelemetry/api';
 
 import {
   AlwaysSampleExemplarFilter,

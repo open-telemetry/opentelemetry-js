@@ -12,7 +12,7 @@ import type {
   Client,
   ServiceClientConstructor,
 } from '@grpc/grpc-js';
-import {
+import type {
   ExportResponse,
   IExporterTransport,
 } from '@opentelemetry/otlp-exporter-base';

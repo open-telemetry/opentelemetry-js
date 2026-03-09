@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ExportResult } from '@opentelemetry/core';
+import type { ExportResult } from '@opentelemetry/core';
 
 /**
  * Exporter config

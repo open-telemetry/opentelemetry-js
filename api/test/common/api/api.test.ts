@@ -4,20 +4,22 @@
  */
 
 import * as assert from 'assert';
+import type {
+  Context,
+  Span,
+  SpanOptions,
+  TextMapGetter,
+  TextMapPropagator,
+  TextMapSetter,
+} from '../../../src';
 import api, {
   context,
-  Context,
   defaultTextMapGetter,
   defaultTextMapSetter,
   diag,
   metrics,
   propagation,
   ROOT_CONTEXT,
-  Span,
-  SpanOptions,
-  TextMapGetter,
-  TextMapPropagator,
-  TextMapSetter,
   trace,
   TraceFlags,
 } from '../../../src';

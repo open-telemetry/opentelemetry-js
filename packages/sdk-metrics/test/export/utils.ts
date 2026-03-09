@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   AggregationSelector,
   AggregationTemporalitySelector,
-  InstrumentType,
   IMetricReader,
   PushMetricExporter,
 } from '../../src';
+import { InstrumentType } from '../../src';
 import * as assert from 'assert';
 
 const instrumentTypes = [

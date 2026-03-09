@@ -5,18 +5,20 @@
 
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
-import { ConfigurationModel } from '../src';
+import type { ConfigurationModel } from '../src';
 import { diag, DiagLogLevel } from '@opentelemetry/api';
 import { createConfigFactory } from '../src/ConfigFactory';
 import { OtlpHttpEncoding, SeverityNumber } from '../src/models/commonModel';
+import type {
+  MeterProvider,
+  MetricReader,
+} from '../src/models/meterProviderModel';
 import {
   ExemplarFilter,
   ExperimentalPrometheusTranslationStrategy,
   ExporterDefaultHistogramAggregation,
   ExporterTemporalityPreference,
   InstrumentType,
-  MeterProvider,
-  MetricReader,
 } from '../src/models/meterProviderModel';
 import {
   setAttributeLimits,
@@ -33,7 +35,7 @@ import {
   getTemporalityPreference,
   getSeverity,
 } from '../src/FileConfigFactory';
-import { TracerProvider } from '../src/models/tracerProviderModel';
+import type { TracerProvider } from '../src/models/tracerProviderModel';
 
 const defaultConfig: ConfigurationModel = {
   disabled: false,

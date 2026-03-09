@@ -4,9 +4,9 @@
  */
 
 import * as assert from 'assert';
-import { Suite } from 'mocha';
+import type { Suite } from 'mocha';
 import * as sinon from 'sinon';
-import { SpanExporter } from '../../../src';
+import type { SpanExporter } from '../../../src';
 import { BatchSpanProcessor } from '../../../src/platform/browser/export/BatchSpanProcessor';
 import { TestTracingSpanExporter } from '../../common/export/TestTracingSpanExporter';
 import {

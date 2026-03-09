@@ -3,11 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  ExportResultCode,
-  ExportResult,
-  hrTimeToMicroseconds,
-} from '@opentelemetry/core';
+import type { ExportResult } from '@opentelemetry/core';
+import { ExportResultCode, hrTimeToMicroseconds } from '@opentelemetry/core';
 
 import type { ReadableLogRecord } from './ReadableLogRecord';
 import type { LogRecordExporter } from './LogRecordExporter';

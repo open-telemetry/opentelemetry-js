@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Sampler, SamplingDecision, SamplingResult } from '../Sampler';
+import type { Sampler, SamplingResult } from '../Sampler';
+import { SamplingDecision } from '../Sampler';
 
 /** Sampler that samples all traces. */
 export class AlwaysOnSampler implements Sampler {

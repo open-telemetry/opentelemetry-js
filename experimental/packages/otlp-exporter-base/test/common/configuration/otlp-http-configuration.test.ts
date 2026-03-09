@@ -3,10 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  mergeOtlpHttpConfigurationWithDefaults,
-  OtlpHttpConfiguration,
-} from '../../../src/configuration/otlp-http-configuration';
+import type { OtlpHttpConfiguration } from '../../../src/configuration/otlp-http-configuration';
+import { mergeOtlpHttpConfigurationWithDefaults } from '../../../src/configuration/otlp-http-configuration';
 import * as assert from 'assert';
 import { testSharedConfigBehavior } from './shared-configuration.test';
 

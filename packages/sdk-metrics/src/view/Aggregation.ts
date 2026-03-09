@@ -4,17 +4,17 @@
  */
 
 import * as api from '@opentelemetry/api';
+import type { Aggregator } from '../aggregator';
 import {
-  Aggregator,
   SumAggregator,
   DropAggregator,
   LastValueAggregator,
   HistogramAggregator,
   ExponentialHistogramAggregator,
 } from '../aggregator';
-import { Accumulation } from '../aggregator/types';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
-import { Maybe } from '../utils';
+import type { Accumulation } from '../aggregator/types';
+import type { InstrumentDescriptor } from '../InstrumentDescriptor';
+import type { Maybe } from '../utils';
 import { InstrumentType } from '../export/MetricData';
 
 /**

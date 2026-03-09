@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as oc from '@opencensus/core';
 import * as assert from 'assert';
 import { withTestTracer, setupNodeContextManager } from './util';
-import { ShimSpan } from '../src/ShimSpan';
+import type { ShimSpan } from '../src/ShimSpan';
 
 async function withTestSpan(
   func: (span: ShimSpan) => void | Promise<void>

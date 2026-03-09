@@ -5,7 +5,8 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { diag, DiagLogger, DiagLogLevel } from '../../../src';
+import type { DiagLogger } from '../../../src';
+import { diag, DiagLogLevel } from '../../../src';
 
 class SpyLogger implements DiagLogger {
   debug() {}

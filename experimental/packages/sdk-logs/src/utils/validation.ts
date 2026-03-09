@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { AnyValue } from '@opentelemetry/api-logs';
+import type { AnyValue } from '@opentelemetry/api-logs';
 
 /**
  * Validates if a value is a valid AnyValue for Log Attributes according to OpenTelemetry spec.

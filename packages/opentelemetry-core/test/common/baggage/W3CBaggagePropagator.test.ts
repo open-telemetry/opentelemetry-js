@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { Baggage, BaggageEntry } from '@opentelemetry/api';
 import {
-  Baggage,
-  BaggageEntry,
   defaultTextMapGetter,
   defaultTextMapSetter,
   propagation,

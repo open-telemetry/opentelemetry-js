@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { SpanContext, TraceFlags } from '@opentelemetry/api';
+import type { SpanContext } from '@opentelemetry/api';
+import { TraceFlags } from '@opentelemetry/api';
 import { TraceState } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';

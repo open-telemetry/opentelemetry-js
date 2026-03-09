@@ -9,8 +9,8 @@ import * as sinon from 'sinon';
 
 import { AggregationTemporalityPreference } from '../../src';
 import { OTLPMetricExporter } from '../../src/platform/node';
+import type { AggregationOption } from '@opentelemetry/sdk-metrics';
 import {
-  AggregationOption,
   AggregationTemporality,
   AggregationType,
   InstrumentType,

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { LoggerProvider } from '../types/LoggerProvider';
+import type { LoggerProvider } from '../types/LoggerProvider';
 
 export const GLOBAL_LOGS_API_KEY = Symbol.for('io.opentelemetry.js.api.logs');
 

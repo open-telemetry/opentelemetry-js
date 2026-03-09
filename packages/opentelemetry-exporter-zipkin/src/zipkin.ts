@@ -4,14 +4,11 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import {
-  ExportResult,
-  ExportResultCode,
-  getStringFromEnv,
-} from '@opentelemetry/core';
-import { SpanExporter, ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { ExportResult } from '@opentelemetry/core';
+import { ExportResultCode, getStringFromEnv } from '@opentelemetry/core';
+import type { SpanExporter, ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { prepareSend } from './platform/index';
-import * as zipkinTypes from './types';
+import type * as zipkinTypes from './types';
 import {
   toZipkinSpan,
   defaultStatusCodeTagName,

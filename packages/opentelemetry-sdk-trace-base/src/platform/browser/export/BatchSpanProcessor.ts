@@ -4,8 +4,8 @@
  */
 
 import { BatchSpanProcessorBase } from '../../../export/BatchSpanProcessorBase';
-import { SpanExporter } from '../../../export/SpanExporter';
-import { BatchSpanProcessorBrowserConfig } from '../../../types';
+import type { SpanExporter } from '../../../export/SpanExporter';
+import type { BatchSpanProcessorBrowserConfig } from '../../../types';
 import { globalErrorHandler } from '@opentelemetry/core';
 
 export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcessorBrowserConfig> {

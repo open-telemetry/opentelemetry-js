@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Exception } from '@opentelemetry/api';
+import type { Exception } from '@opentelemetry/api';
 
 /**
  * This interface defines the params that are be added to the wrapped function

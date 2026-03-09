@@ -5,8 +5,8 @@
 
 import type * as http from 'http';
 import type * as https from 'https';
-import { get, IncomingMessage, request } from 'http';
-import * as url from 'url';
+import type { get, IncomingMessage, request } from 'http';
+import type * as url from 'url';
 
 export type IgnoreMatcher = string | RegExp | ((url: string) => boolean);
 export type HttpCallback = (res: IncomingMessage) => void;

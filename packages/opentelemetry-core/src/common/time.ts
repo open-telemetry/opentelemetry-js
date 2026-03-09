@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as api from '@opentelemetry/api';
+import type * as api from '@opentelemetry/api';
 import { otperformance as performance } from '../platform';
 
 const NANOSECOND_DIGITS = 9;

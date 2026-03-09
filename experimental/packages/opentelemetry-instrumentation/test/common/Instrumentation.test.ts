@@ -4,13 +4,13 @@
  */
 
 import * as assert from 'assert';
-import {
+import type {
   Instrumentation,
-  InstrumentationBase,
   InstrumentationConfig,
   InstrumentationModuleDefinition,
   SpanCustomizationHook,
 } from '../../src';
+import { InstrumentationBase } from '../../src';
 
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { LoggerProvider } from '@opentelemetry/sdk-logs';

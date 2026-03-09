@@ -4,12 +4,12 @@
  */
 
 import * as api from '@opentelemetry/api';
-import {
+import type {
   Attributes,
   AttributeValue,
-  SpanStatusCode,
   TextMapPropagator,
 } from '@opentelemetry/api';
+import { SpanStatusCode } from '@opentelemetry/api';
 import * as opentracing from 'opentracing';
 import {
   ATTR_EXCEPTION_MESSAGE,

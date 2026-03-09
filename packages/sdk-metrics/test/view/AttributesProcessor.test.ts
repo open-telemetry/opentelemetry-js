@@ -4,9 +4,10 @@
  */
 
 import * as assert from 'assert';
-import { Attributes, context } from '@opentelemetry/api';
+import type { Attributes } from '@opentelemetry/api';
+import { context } from '@opentelemetry/api';
+import type { IAttributesProcessor } from '../../src/view/AttributesProcessor';
 import {
-  IAttributesProcessor,
   createMultiAttributesProcessor,
   createNoopAttributesProcessor,
   createAllowListAttributesProcessor,

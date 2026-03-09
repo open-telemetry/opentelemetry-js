@@ -5,12 +5,12 @@
 
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import { IExporterTransport } from '../../src';
+import type { IExporterTransport } from '../../src';
 import { ExportResultCode } from '@opentelemetry/core';
 import { createOtlpExportDelegate } from '../../src/otlp-export-delegate';
-import { ExportResponse } from '../../src';
-import { ISerializer } from '@opentelemetry/otlp-transformer';
-import { IExportPromiseHandler } from '../../src/bounded-queue-export-promise-handler';
+import type { ExportResponse } from '../../src';
+import type { ISerializer } from '@opentelemetry/otlp-transformer';
+import type { IExportPromiseHandler } from '../../src/bounded-queue-export-promise-handler';
 import { registerMockDiagLogger } from './test-utils';
 
 interface FakeInternalRepresentation {

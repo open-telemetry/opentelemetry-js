@@ -5,18 +5,13 @@
 
 import * as assert from 'assert';
 
-import {
-  context,
-  ContextManager,
-  ROOT_CONTEXT,
-  trace,
-  TraceFlags,
-} from '@opentelemetry/api';
+import type { ContextManager } from '@opentelemetry/api';
+import { context, ROOT_CONTEXT, trace, TraceFlags } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import type { Span } from '@opentelemetry/sdk-trace-base';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
-  Span,
 } from '@opentelemetry/sdk-trace-base';
 import { ATTR_TELEMETRY_SDK_LANGUAGE } from '@opentelemetry/semantic-conventions';
 

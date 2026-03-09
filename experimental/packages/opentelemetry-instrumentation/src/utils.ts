@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ShimWrapped } from './types';
+import type { ShimWrapped } from './types';
 
 /**
  * function to execute patched function and being able to catch errors

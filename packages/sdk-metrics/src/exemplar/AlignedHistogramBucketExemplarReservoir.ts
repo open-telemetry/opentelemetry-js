@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context, HrTime, Attributes } from '@opentelemetry/api';
+import type { Context, HrTime, Attributes } from '@opentelemetry/api';
 import { FixedSizeExemplarReservoirBase } from './ExemplarReservoir';
 
 /**
