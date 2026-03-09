@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   Context,
   TextMapGetter,
   TextMapPropagator,
-  diag,
   TextMapSetter,
 } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 
 /** Configuration object for composite propagator */
 export interface CompositePropagatorConfig {

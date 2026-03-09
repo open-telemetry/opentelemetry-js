@@ -3,14 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  OTLPMetricExporterBase,
-  OTLPMetricExporterOptions,
-} from '@opentelemetry/exporter-metrics-otlp-http';
+import type { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
+import { OTLPMetricExporterBase } from '@opentelemetry/exporter-metrics-otlp-http';
+import type { OTLPGRPCExporterConfigNode } from '@opentelemetry/otlp-grpc-exporter-base';
 import {
   convertLegacyOtlpGrpcOptions,
   createOtlpGrpcExportDelegate,
-  OTLPGRPCExporterConfigNode,
 } from '@opentelemetry/otlp-grpc-exporter-base';
 import { ProtobufMetricsSerializer } from '@opentelemetry/otlp-transformer';
 

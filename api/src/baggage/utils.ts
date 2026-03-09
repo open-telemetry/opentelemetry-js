@@ -6,7 +6,7 @@
 import { DiagAPI } from '../api/diag';
 import { BaggageImpl } from './internal/baggage-impl';
 import { baggageEntryMetadataSymbol } from './internal/symbol';
-import { Baggage, BaggageEntry, BaggageEntryMetadata } from './types';
+import type { Baggage, BaggageEntry, BaggageEntryMetadata } from './types';
 
 const diag = DiagAPI.instance();
 

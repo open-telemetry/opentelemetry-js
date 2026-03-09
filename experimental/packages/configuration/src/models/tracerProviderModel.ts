@@ -4,7 +4,7 @@
  */
 'use strict';
 
-import {
+import type {
   ExperimentalOtlpFileExporter,
   OtlpGrpcExporter,
   OtlpHttpExporter,

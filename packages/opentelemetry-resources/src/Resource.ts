@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Attributes } from '@opentelemetry/api';
-import { RawResourceAttribute } from './types';
+import type { Attributes } from '@opentelemetry/api';
+import type { RawResourceAttribute } from './types';
 
 /**
  * An interface that represents a resource. A Resource describes the entity for which signals (metrics or trace) are

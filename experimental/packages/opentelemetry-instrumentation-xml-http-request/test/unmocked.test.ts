@@ -2,9 +2,12 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { Span } from '@opentelemetry/api';
+import type { Span } from '@opentelemetry/api';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
-import { ReadableSpan, SpanProcessor } from '@opentelemetry/sdk-trace-base';
+import type {
+  ReadableSpan,
+  SpanProcessor,
+} from '@opentelemetry/sdk-trace-base';
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 import { XMLHttpRequestInstrumentation } from '../src';
 import * as assert from 'assert';

@@ -3,10 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  ConfigurationModel,
-  initializeDefaultConfiguration,
-} from './models/configModel';
+import type { ConfigurationModel } from './models/configModel';
+import { initializeDefaultConfiguration } from './models/configModel';
 import {
   getBooleanFromEnv,
   getStringFromEnv,
@@ -14,25 +12,23 @@ import {
   diagLogLevelFromString,
   getNumberFromEnv,
 } from '@opentelemetry/core';
-import { ConfigFactory } from './IConfigFactory';
+import type { ConfigFactory } from './IConfigFactory';
+import type {
+  PeriodicMetricReader,
+  PullMetricReader,
+} from './models/meterProviderModel';
 import {
   ExemplarFilter,
   ExporterDefaultHistogramAggregation,
   ExporterTemporalityPreference,
   initializeDefaultMeterProviderConfiguration,
-  PeriodicMetricReader,
-  PullMetricReader,
 } from './models/meterProviderModel';
 import { OtlpHttpEncoding } from './models/commonModel';
 import { diag } from '@opentelemetry/api';
-import {
-  BatchSpanProcessor,
-  initializeDefaultTracerProviderConfiguration,
-} from './models/tracerProviderModel';
-import {
-  BatchLogRecordProcessor,
-  initializeDefaultLoggerProviderConfiguration,
-} from './models/loggerProviderModel';
+import type { BatchSpanProcessor } from './models/tracerProviderModel';
+import { initializeDefaultTracerProviderConfiguration } from './models/tracerProviderModel';
+import type { BatchLogRecordProcessor } from './models/loggerProviderModel';
+import { initializeDefaultLoggerProviderConfiguration } from './models/loggerProviderModel';
 import { getGrpcTlsConfig, getHttpTlsConfig } from './utils';
 
 /**

@@ -3,12 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  Metadata,
-  Server,
-  ServerCredentials,
-  ServiceDefinition,
-} from '@grpc/grpc-js';
+import type { Metadata, ServiceDefinition } from '@grpc/grpc-js';
+import { Server, ServerCredentials } from '@grpc/grpc-js';
 
 export interface ExportedData {
   request: Buffer;

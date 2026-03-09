@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context, Attributes } from '@opentelemetry/api';
+import type { Context, Attributes } from '@opentelemetry/api';
 
 /**
  * The {@link AttributesProcessor} is responsible for customizing which

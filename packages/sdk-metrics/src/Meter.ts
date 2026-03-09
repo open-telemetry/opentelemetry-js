@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   Meter as IMeter,
   MetricOptions,
   Gauge,
@@ -26,7 +26,7 @@ import {
   ObservableUpDownCounterInstrument,
   UpDownCounterInstrument,
 } from './Instruments';
-import { MeterSharedState } from './state/MeterSharedState';
+import type { MeterSharedState } from './state/MeterSharedState';
 import { InstrumentType } from './export/MetricData';
 
 /**

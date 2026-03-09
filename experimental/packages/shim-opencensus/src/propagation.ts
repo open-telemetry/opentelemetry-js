@@ -3,15 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as oc from '@opencensus/core';
+import type * as oc from '@opencensus/core';
 
-import {
-  context,
-  propagation,
-  trace,
-  TextMapGetter,
-  TextMapSetter,
-} from '@opentelemetry/api';
+import type { TextMapGetter, TextMapSetter } from '@opentelemetry/api';
+import { context, propagation, trace } from '@opentelemetry/api';
 import { mapSpanContext, reverseMapSpanContext } from './trace-transform';
 
 class Getter implements TextMapGetter<void> {

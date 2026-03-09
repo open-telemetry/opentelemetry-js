@@ -3,12 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  ROOT_CONTEXT,
-  SpanContext,
-  TraceFlags,
-  trace,
-} from '@opentelemetry/api';
+import type { SpanContext } from '@opentelemetry/api';
+import { ROOT_CONTEXT, TraceFlags, trace } from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
 import * as assert from 'assert';
 

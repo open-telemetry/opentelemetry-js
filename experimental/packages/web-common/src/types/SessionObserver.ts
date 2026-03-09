@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Session } from './Session';
+import type { Session } from './Session';
 
 export interface SessionObserver {
   onSessionStarted(newSession: Session, previousSession?: Session): void;

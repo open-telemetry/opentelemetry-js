@@ -2,7 +2,7 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { GetHeaders } from './types';
+import type { GetHeaders } from './types';
 
 export function prepareGetHeaders(
   getExportRequestHeaders: GetHeaders

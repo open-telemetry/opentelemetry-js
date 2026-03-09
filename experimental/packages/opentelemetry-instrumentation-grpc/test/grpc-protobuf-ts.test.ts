@@ -19,21 +19,15 @@ import {
 import * as protoLoader from '@grpc/proto-loader';
 import * as path from 'path';
 import * as assert from 'assert';
-import {
-  context,
-  ContextManager,
-  propagation,
-  SpanKind,
-  trace,
-} from '@opentelemetry/api';
+import type { ContextManager } from '@opentelemetry/api';
+import { context, propagation, SpanKind, trace } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { startServer } from './helper';
+import type { SpanAssertionFunction, TestFunction } from './protobuf-ts-utils';
 import {
   assertExportedSpans,
   assertNoSpansExported,
-  SpanAssertionFunction,
-  TestFunction,
 } from './protobuf-ts-utils';
 
 const memoryExporter = new InMemorySpanExporter();

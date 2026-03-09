@@ -8,9 +8,9 @@ import type {
   IKeyValue,
   Resource,
 } from './internal-types';
-import { Attributes } from '@opentelemetry/api';
-import { InstrumentationScope } from '@opentelemetry/core';
-import { Resource as ISdkResource } from '@opentelemetry/resources';
+import type { Attributes } from '@opentelemetry/api';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import type { Resource as ISdkResource } from '@opentelemetry/resources';
 import type { Encoder } from './utils';
 
 export function createResource(

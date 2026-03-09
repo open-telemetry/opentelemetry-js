@@ -4,8 +4,8 @@
  */
 
 import { AggregationTemporality, MetricReader } from '../../src';
-import { MetricCollector } from '../../src/state/MetricCollector';
-import { MetricReaderOptions } from '../../src/export/MetricReader';
+import type { MetricCollector } from '../../src/state/MetricCollector';
+import type { MetricReaderOptions } from '../../src/export/MetricReader';
 
 /**
  * A test metric reader that implements no-op onForceFlush() and onShutdown() handlers.

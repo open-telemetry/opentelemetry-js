@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { HrTime } from '@opentelemetry/api';
+import type { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { AggregationTemporality } from '../../src';
 import { SumAccumulation, SumAggregator } from '../../src/aggregator';
-import { MetricData, DataPointType } from '../../src/export/MetricData';
+import type { MetricData } from '../../src/export/MetricData';
+import { DataPointType } from '../../src/export/MetricData';
 import { commonValues, defaultInstrumentDescriptor } from '../util';
 
 describe('SumAggregator', () => {

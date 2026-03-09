@@ -4,13 +4,13 @@
  */
 
 import { diagLogLevelFromString, getStringFromEnv } from '@opentelemetry/core';
-import {
+import type {
   AttributeLimits,
   Propagator,
   ConfigurationModel,
-  initializeDefaultConfiguration,
 } from './models/configModel';
-import { ConfigFactory } from './IConfigFactory';
+import { initializeDefaultConfiguration } from './models/configModel';
+import type { ConfigFactory } from './IConfigFactory';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
 import {
@@ -23,36 +23,27 @@ import {
   getStringFromConfigFile,
   getStringListFromConfigFile,
 } from './utils';
-import {
-  NameStringValuePair,
-  OtlpHttpEncoding,
-  SeverityNumber,
-} from './models/commonModel';
-import {
+import type { NameStringValuePair } from './models/commonModel';
+import { OtlpHttpEncoding, SeverityNumber } from './models/commonModel';
+import type {
   ExperimentalComposableSampler,
-  initializeDefaultTracerProviderConfiguration,
   Sampler,
   SpanExporter,
   SpanProcessor,
   TracerProvider,
 } from './models/tracerProviderModel';
-import {
+import { initializeDefaultTracerProviderConfiguration } from './models/tracerProviderModel';
+import type {
   ExperimentalLoggerMatcherAndConfig,
-  initializeDefaultLoggerProviderConfiguration,
   LoggerProvider,
   LogRecordExporter,
   LogRecordProcessor,
 } from './models/loggerProviderModel';
-import { AttributeNameValue } from './models/resourceModel';
-import {
+import { initializeDefaultLoggerProviderConfiguration } from './models/loggerProviderModel';
+import type { AttributeNameValue } from './models/resourceModel';
+import type {
   Aggregation,
   CardinalityLimits,
-  ExemplarFilter,
-  ExperimentalPrometheusTranslationStrategy,
-  ExporterDefaultHistogramAggregation,
-  ExporterTemporalityPreference,
-  initializeDefaultMeterProviderConfiguration,
-  InstrumentType,
   MeterProvider,
   MetricProducer,
   MetricReader,
@@ -61,6 +52,14 @@ import {
   View,
   ViewSelector,
   ViewStream,
+} from './models/meterProviderModel';
+import {
+  ExemplarFilter,
+  ExperimentalPrometheusTranslationStrategy,
+  ExporterDefaultHistogramAggregation,
+  ExporterTemporalityPreference,
+  initializeDefaultMeterProviderConfiguration,
+  InstrumentType,
 } from './models/meterProviderModel';
 import { diag } from '@opentelemetry/api';
 

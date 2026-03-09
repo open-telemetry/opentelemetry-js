@@ -2,11 +2,8 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import {
-  Baggage,
-  BaggageEntryMetadata,
-  baggageEntryMetadataFromString,
-} from '@opentelemetry/api';
+import type { Baggage, BaggageEntryMetadata } from '@opentelemetry/api';
+import { baggageEntryMetadataFromString } from '@opentelemetry/api';
 import {
   BAGGAGE_ITEMS_SEPARATOR,
   BAGGAGE_PROPERTIES_SEPARATOR,

@@ -5,8 +5,8 @@
 
 import { ATTR_SERVICE_INSTANCE_ID } from '../../../semconv';
 import { randomUUID } from 'crypto';
-import { ResourceDetectionConfig } from '../../../config';
-import { DetectedResource, ResourceDetector } from '../../../types';
+import type { ResourceDetectionConfig } from '../../../config';
+import type { DetectedResource, ResourceDetector } from '../../../types';
 
 /**
  * ServiceInstanceIdDetector detects the resources related to the service instance ID.

@@ -4,7 +4,7 @@
  */
 
 import { ROOT_CONTEXT } from './context';
-import * as types from './types';
+import type * as types from './types';
 
 export class NoopContextManager implements types.ContextManager {
   active(): types.Context {

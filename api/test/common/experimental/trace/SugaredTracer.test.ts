@@ -6,8 +6,9 @@ import { wrapTracer } from '../../../../src/experimental';
 import * as assert from 'assert';
 import { NoopTracerProvider } from '../../../../src/trace/NoopTracerProvider';
 import { NoopTracer } from '../../../../src/trace/NoopTracer';
-import { Span } from '../../../../src';
-import { Context, context, SpanOptions } from '../../../../src';
+import type { Span } from '../../../../src';
+import type { Context, SpanOptions } from '../../../../src';
+import { context } from '../../../../src';
 
 describe('SugaredTracer', function () {
   class TestTracer extends NoopTracer {

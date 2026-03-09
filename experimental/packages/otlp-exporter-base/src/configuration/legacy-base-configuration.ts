@@ -2,7 +2,7 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { HeadersFactory } from './otlp-http-configuration';
+import type { HeadersFactory } from './otlp-http-configuration';
 
 export interface OTLPExporterConfigBase {
   /**

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { baggageEntryMetadataSymbol } from './internal/symbol';
+import type { baggageEntryMetadataSymbol } from './internal/symbol';
 
 /*
  * Copyright The OpenTelemetry Authors

@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { HrTime, Attributes } from '@opentelemetry/api';
-import { AggregationTemporality } from '../export/AggregationTemporality';
-import { MetricData } from '../export/MetricData';
-import { Maybe } from '../utils';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
+import type { HrTime, Attributes } from '@opentelemetry/api';
+import type { AggregationTemporality } from '../export/AggregationTemporality';
+import type { MetricData } from '../export/MetricData';
+import type { Maybe } from '../utils';
+import type { InstrumentDescriptor } from '../InstrumentDescriptor';
 
 /** The kind of aggregator. */
 export enum AggregatorKind {

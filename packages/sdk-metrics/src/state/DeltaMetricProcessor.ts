@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context, HrTime, Attributes } from '@opentelemetry/api';
-import { Maybe, hashAttributes } from '../utils';
-import { Accumulation, Aggregator } from '../aggregator/types';
+import type { Context, HrTime, Attributes } from '@opentelemetry/api';
+import type { Maybe } from '../utils';
+import { hashAttributes } from '../utils';
+import type { Accumulation, Aggregator } from '../aggregator/types';
 import { AttributeHashMap } from './HashMap';
 
 /**

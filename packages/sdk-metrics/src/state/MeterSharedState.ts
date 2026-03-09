@@ -3,29 +3,25 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { HrTime } from '@opentelemetry/api';
-import { InstrumentationScope } from '@opentelemetry/core';
-import { MetricCollectOptions } from '../export/MetricProducer';
-import { MetricData, ScopeMetrics } from '../export/MetricData';
-import {
-  createInstrumentDescriptorWithView,
-  InstrumentDescriptor,
-} from '../InstrumentDescriptor';
+import type { HrTime } from '@opentelemetry/api';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import type { MetricCollectOptions } from '../export/MetricProducer';
+import type { MetricData, ScopeMetrics } from '../export/MetricData';
+import type { InstrumentDescriptor } from '../InstrumentDescriptor';
+import { createInstrumentDescriptorWithView } from '../InstrumentDescriptor';
 import { Meter } from '../Meter';
-import { Maybe } from '../utils';
+import type { Maybe } from '../utils';
 import { AsyncMetricStorage } from './AsyncMetricStorage';
-import { MeterProviderSharedState } from './MeterProviderSharedState';
-import { MetricCollectorHandle } from './MetricCollector';
+import type { MeterProviderSharedState } from './MeterProviderSharedState';
+import type { MetricCollectorHandle } from './MetricCollector';
 import { MetricStorageRegistry } from './MetricStorageRegistry';
 import { MultiMetricStorage } from './MultiWritableMetricStorage';
 import { ObservableRegistry } from './ObservableRegistry';
 import { SyncMetricStorage } from './SyncMetricStorage';
-import { Accumulation, Aggregator } from '../aggregator/types';
-import {
-  createNoopAttributesProcessor,
-  IAttributesProcessor,
-} from '../view/AttributesProcessor';
-import { MetricStorage } from './MetricStorage';
+import type { Accumulation, Aggregator } from '../aggregator/types';
+import type { IAttributesProcessor } from '../view/AttributesProcessor';
+import { createNoopAttributesProcessor } from '../view/AttributesProcessor';
+import type { MetricStorage } from './MetricStorage';
 
 /**
  * An internal record for shared meter provider states.

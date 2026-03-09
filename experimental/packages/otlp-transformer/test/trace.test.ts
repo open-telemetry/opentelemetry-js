@@ -5,17 +5,18 @@
 import * as root from '../src/generated/root';
 import { SpanKind, SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import { TraceState } from '@opentelemetry/core';
-import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
-import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { toBase64 } from './utils';
-import { OtlpEncodingOptions } from '../src/common/internal-types';
+import type { OtlpEncodingOptions } from '../src/common/internal-types';
 import { ESpanKind, EStatusCode } from '../src/trace/internal-types';
 import { createExportTraceServiceRequest } from '../src/trace/internal';
 import { ProtobufTraceSerializer } from '../src/trace/protobuf';
 import { JsonTraceSerializer } from '../src/trace/json';
 import { hexToBinary } from '../src/common/hex-to-binary';
-import { ISpan } from '../src/trace/internal-types';
+import type { ISpan } from '../src/trace/internal-types';
 import { JSON_ENCODER, PROTOBUF_ENCODER } from '../src/common/utils';
 
 function createExpectedSpanJson(options: OtlpEncodingOptions) {

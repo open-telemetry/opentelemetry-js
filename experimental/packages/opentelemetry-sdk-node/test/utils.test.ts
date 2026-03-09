@@ -13,8 +13,8 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
-import { ConfigurationModel } from '@opentelemetry/configuration';
-import { LoggerProviderConfig } from '@opentelemetry/sdk-logs';
+import type { ConfigurationModel } from '@opentelemetry/configuration';
+import type { LoggerProviderConfig } from '@opentelemetry/sdk-logs';
 
 describe('getPropagatorFromEnv', function () {
   afterEach(() => {

@@ -4,7 +4,7 @@
  */
 
 import * as assert from 'assert';
-import { Attributes } from '@opentelemetry/api';
+import type { Attributes } from '@opentelemetry/api';
 import { HashMap } from '../../src/state/HashMap';
 import { hashAttributes } from '../../src/utils';
 

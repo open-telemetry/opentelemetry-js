@@ -4,9 +4,9 @@
  */
 
 import * as assert from 'assert';
+import type { InstrumentDescriptor } from '../src/InstrumentDescriptor';
 import {
   createInstrumentDescriptor,
-  InstrumentDescriptor,
   isValidName,
   isDescriptorCompatibleWith,
 } from '../src/InstrumentDescriptor';
