@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ConfigurationModel } from './models/configModel';
+import type { ConfigurationModel } from './models/configModel';
 
 export interface ConfigFactory {
   /**

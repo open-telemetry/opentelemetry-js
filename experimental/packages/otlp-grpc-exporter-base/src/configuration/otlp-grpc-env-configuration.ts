@@ -2,7 +2,7 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { UnresolvedOtlpGrpcConfiguration } from './otlp-grpc-configuration';
+import type { UnresolvedOtlpGrpcConfiguration } from './otlp-grpc-configuration';
 import type { ChannelCredentials, Metadata } from '@grpc/grpc-js';
 import { parseKeyPairsIntoRecord } from '@opentelemetry/core';
 import {

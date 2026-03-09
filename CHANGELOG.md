@@ -12,6 +12,22 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+* fix(opentelemetry-instrumentation): improve `_warnOnPreloadedModules` function not to show warning logs when the module is not marked as loaded [#6095](https://github.com/open-telemetry/opentelemetry-js/pull/6095) @rlj1202
+
+### :books: Documentation
+
+### :house: Internal
+
+* chore: enforce `import type` for type-only imports via ESLint [#6467](https://github.com/open-telemetry/opentelemetry-js/pull/6467) @overbalance
+
+## 2.6.0
+
+### :boom: Breaking Changes
+
 * fix(resources): update `OTEL_RESOURCE_ATTRIBUTES` parsing to match spec changes (open-telemetry/opentelemetry-specification#4856) [#6261](https://github.com/open-telemetry/opentelemetry-js/pull/6261) @jacksonweber
   * **Important:** This fix is included in the "breaking changes" section because it can be breaking for some edge case usage of `OTEL_RESOURCE_ATTRIBUTES`:
     * `export OTEL_RESOURCE_ATTRIBUTES=foo=bar,spam` will now be fully ignored, because the `spam` entry is invalid (missing `=`). Per spec, any parsing error results in ignoring the entire environment variable.
@@ -23,11 +39,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(sdk-trace-base): enforce StatusCode precedence rules in `setStatus` per specification [#6461](https://github.com/open-telemetry/opentelemetry-js/pull/6461) @newbee1939
 * fix(sdk-trace-web): propagate `optimised` flag in `getElementXPath` recursion [#6335](https://github.com/open-telemetry/opentelemetry-js/pull/6335) @akkupratap323
-
-### :books: Documentation
-
-### :house: Internal
 
 ## 2.5.1
 

@@ -2,14 +2,13 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { ExportResult, ExportResultCode } from '@opentelemetry/core';
-import { AggregationTemporality } from './AggregationTemporality';
-import { ResourceMetrics, InstrumentType } from './MetricData';
-import { PushMetricExporter } from './MetricExporter';
-import {
-  AggregationTemporalitySelector,
-  DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
-} from './AggregationSelector';
+import type { ExportResult } from '@opentelemetry/core';
+import { ExportResultCode } from '@opentelemetry/core';
+import type { AggregationTemporality } from './AggregationTemporality';
+import type { ResourceMetrics, InstrumentType } from './MetricData';
+import type { PushMetricExporter } from './MetricExporter';
+import type { AggregationTemporalitySelector } from './AggregationSelector';
+import { DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR } from './AggregationSelector';
 
 interface ConsoleMetricExporterOptions {
   temporalitySelector?: AggregationTemporalitySelector;

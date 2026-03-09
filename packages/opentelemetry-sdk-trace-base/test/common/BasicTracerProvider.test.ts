@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { SpanContext } from '@opentelemetry/api';
 import {
   context,
   trace,
-  SpanContext,
   TraceFlags,
   ROOT_CONTEXT,
   diag,
@@ -19,10 +19,10 @@ import {
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import type { Span } from '../../src';
 import {
   BasicTracerProvider,
   NoopSpanProcessor,
-  Span,
   AlwaysOnSampler,
   AlwaysOffSampler,
   ConsoleSpanExporter,
@@ -30,7 +30,7 @@ import {
 } from '../../src';
 import { SpanImpl } from '../../src/Span';
 import { MultiSpanProcessor } from '../../src/MultiSpanProcessor';
-import { Tracer } from '../../src/Tracer';
+import type { Tracer } from '../../src/Tracer';
 import { TestRecordOnlySampler } from './export/TestRecordOnlySampler';
 import { TestMetricReader } from './util';
 

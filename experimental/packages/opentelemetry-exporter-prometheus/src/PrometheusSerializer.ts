@@ -3,20 +3,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { diag, Attributes, AttributeValue } from '@opentelemetry/api';
-import {
+import type { Attributes, AttributeValue } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
+import type {
   ResourceMetrics,
-  DataPointType,
   ScopeMetrics,
   MetricData,
   DataPoint,
   Histogram,
 } from '@opentelemetry/sdk-metrics';
-import {
-  InstrumentationScope,
-  hrTimeToMilliseconds,
-} from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import { DataPointType } from '@opentelemetry/sdk-metrics';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import { hrTimeToMilliseconds } from '@opentelemetry/core';
+import type { Resource } from '@opentelemetry/resources';
 import {
   ATTR_OTEL_SCOPE_NAME,
   ATTR_OTEL_SCOPE_VERSION,

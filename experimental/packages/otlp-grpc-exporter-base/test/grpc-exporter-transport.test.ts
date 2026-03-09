@@ -2,27 +2,27 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
+import type { GrpcExporterTransportParameters } from '../src/grpc-exporter-transport';
 import {
   createEmptyMetadata,
   createInsecureCredentials,
   createOtlpGrpcExporterTransport,
   createSslCredentials,
   GrpcExporterTransport,
-  GrpcExporterTransportParameters,
 } from '../src/grpc-exporter-transport';
 import { VERSION } from '../src/version';
 import * as assert from 'assert';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
+import type { Metadata } from '@grpc/grpc-js';
 import {
-  Metadata,
   Server,
   ServerCredentials,
   ServerInterceptingCall,
 } from '@grpc/grpc-js';
 import { types } from 'util';
-import {
+import type {
   ExportResponseFailure,
   ExportResponseSuccess,
 } from '@opentelemetry/otlp-exporter-base';

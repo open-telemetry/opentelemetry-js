@@ -4,8 +4,8 @@
  */
 import { INVALID_SPANID, INVALID_TRACEID } from './invalid-span-constants';
 import { NonRecordingSpan } from './NonRecordingSpan';
-import { Span } from './span';
-import { SpanContext } from './span_context';
+import type { Span } from './span';
+import type { SpanContext } from './span_context';
 
 // Valid characters (0-9, a-f, A-F) are marked as 1.
 const isHex = new Uint8Array([

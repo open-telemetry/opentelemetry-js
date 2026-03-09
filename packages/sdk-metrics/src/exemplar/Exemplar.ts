@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { HrTime, Attributes } from '@opentelemetry/api';
+import type { HrTime, Attributes } from '@opentelemetry/api';
 
 /**
  * A representation of an exemplar, which is a sample input measurement.

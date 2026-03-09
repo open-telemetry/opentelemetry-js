@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { OTLPMetricExporterOptions } from '../../OTLPMetricExporterOptions';
+import type { OTLPMetricExporterOptions } from '../../OTLPMetricExporterOptions';
 import { OTLPMetricExporterBase } from '../../OTLPMetricExporterBase';
-import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { JsonMetricsSerializer } from '@opentelemetry/otlp-transformer';
 import {
   convertLegacyHttpOptions,

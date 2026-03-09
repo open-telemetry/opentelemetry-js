@@ -8,6 +8,22 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+* fix(opentelemetry-instrumentation): access `require` via `globalThis` to avoid webpack analysis [#6481](https://github.com/open-telemetry/opentelemetry-js/pull/6481) @overbalance
+
+### :books: Documentation
+
+### :house: Internal
+
+* chore: enforce `import type` for type-only imports via ESLint [#6467](https://github.com/open-telemetry/opentelemetry-js/pull/6467) @overbalance
+
+## 0.213.0
+
+### :boom: Breaking Changes
+
 * fix(api-logs)!: drop lingering includeTraceContext from LoggerOptions type [#6451](https://github.com/open-telemetry/opentelemetry-js/pull/6451) @trentm
 
 ### :rocket: Features
@@ -26,9 +42,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(otlp-transformer): downgrade `protobufjs` to version `^7.0.0` [#6418](https://github.com/open-telemetry/opentelemetry-js/pull/6418) @vitorvasc
 * fix(instrumentation-fetch): handle HeadersInit tuple arrays in _addHeaders [#6341](https://github.com/open-telemetry/opentelemetry-js/pull/6341) @overbalance @imadha
 
-### :books: Documentation
-
-### :house: Internal
+* refactor(otlp-exporter-base): promisify sendWithHttp() [#????](https://github.com/open-telemetry/opentelemetry-js/pull/6412) @pichlermarc
 
 ## 0.212.0
 

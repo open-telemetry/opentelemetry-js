@@ -4,7 +4,7 @@
  */
 import * as assert from 'assert';
 import { mergeOtlpNodeHttpConfigurationWithDefaults } from '../../../src/configuration/otlp-node-http-configuration';
-import { OtlpNodeHttpConfiguration } from '../../../src/configuration/otlp-node-http-configuration';
+import type { OtlpNodeHttpConfiguration } from '../../../src/configuration/otlp-node-http-configuration';
 import { VERSION } from '../../../src/version';
 
 describe('mergeOtlpNodeHttpConfigurationWithDefaults', function () {

@@ -2,14 +2,10 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import {
-  isValidSpanId,
-  SpanKind,
-  SpanStatus,
-  Exception,
-} from '@opentelemetry/api';
+import type { SpanStatus, Exception } from '@opentelemetry/api';
+import { isValidSpanId, SpanKind } from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
-import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import {
   ATTR_HTTP_METHOD,
   ATTR_HTTP_REQUEST_CONTENT_LENGTH,
@@ -29,7 +25,7 @@ import {
   ATTR_NET_PEER_PORT,
 } from '../../src/semconv';
 import * as assert from 'assert';
-import * as http from 'http';
+import type * as http from 'http';
 import * as utils from '../../src/utils';
 import { DummyPropagation } from './DummyPropagation';
 import { AttributeNames } from '../../src/enums/AttributeNames';

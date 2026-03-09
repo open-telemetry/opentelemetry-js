@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Tracer } from './tracer';
-import { TracerProvider } from './tracer_provider';
+import type { Tracer } from './tracer';
+import type { TracerProvider } from './tracer_provider';
 import { ProxyTracer } from './ProxyTracer';
 import { NoopTracerProvider } from './NoopTracerProvider';
-import { TracerOptions } from './tracer_options';
+import type { TracerOptions } from './tracer_options';
 
 const NOOP_TRACER_PROVIDER = new NoopTracerProvider();
 

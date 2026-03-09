@@ -2,10 +2,10 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { ISerializer } from '../../i-serializer';
-import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
+import type { ISerializer } from '../../i-serializer';
+import type { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { createExportLogsServiceRequest } from '../internal';
-import { IExportLogsServiceResponse } from '../export-response';
+import type { IExportLogsServiceResponse } from '../export-response';
 import { JSON_ENCODER } from '../../common/utils';
 
 /*

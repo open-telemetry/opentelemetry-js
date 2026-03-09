@@ -5,9 +5,9 @@
 
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import { IExporterTransport } from '../../src';
+import type { IExporterTransport } from '../../src';
 import { createRetryingTransport } from '../../src/retrying-transport';
-import { ExportResponse } from '../../src';
+import type { ExportResponse } from '../../src';
 
 const timeoutMillis = 1000000;
 

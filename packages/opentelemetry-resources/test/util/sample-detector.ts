@@ -11,8 +11,8 @@ import {
   ATTR_HOST_ID,
   ATTR_HOST_TYPE,
 } from '../../src/semconv';
-import { ResourceDetector } from '../../src';
-import { DetectedResource } from '../../src/types';
+import type { ResourceDetector } from '../../src';
+import type { DetectedResource } from '../../src/types';
 
 class SampleDetector implements ResourceDetector {
   detect(): DetectedResource {

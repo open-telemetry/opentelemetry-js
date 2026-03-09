@@ -4,13 +4,10 @@
  */
 
 import * as Benchmark from 'benchmark';
-import {
-  BasicTracerProvider,
-  BatchSpanProcessor,
-  SpanExporter,
-  ReadableSpan,
-} from '../../../src';
-import { ExportResultCode, ExportResult } from '@opentelemetry/core';
+import type { SpanExporter, ReadableSpan } from '../../../src';
+import { BasicTracerProvider, BatchSpanProcessor } from '../../../src';
+import type { ExportResult } from '@opentelemetry/core';
+import { ExportResultCode } from '@opentelemetry/core';
 
 class NoopExporter implements SpanExporter {
   export(

@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context } from '../context/types';
+import type { Context } from '../context/types';
 import { NoopTracer } from './NoopTracer';
-import { Span } from './span';
-import { SpanOptions } from './SpanOptions';
-import { Tracer } from './tracer';
-import { TracerOptions } from './tracer_options';
+import type { Span } from './span';
+import type { SpanOptions } from './SpanOptions';
+import type { Tracer } from './tracer';
+import type { TracerOptions } from './tracer_options';
 
 const NOOP_TRACER = new NoopTracer();
 

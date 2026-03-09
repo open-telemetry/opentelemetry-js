@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Counter, Meter, ObservableResult } from '@opentelemetry/api';
+import type { Counter, Meter, ObservableResult } from '@opentelemetry/api';
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -17,7 +17,7 @@ import {
   serviceName,
   mockedHrTimeMs,
 } from './util';
-import { SinonStubbedInstance } from 'sinon';
+import type { SinonStubbedInstance } from 'sinon';
 
 const infoLine = `target_info{service_name="${serviceName}",telemetry_sdk_language="${sdkLanguage}",telemetry_sdk_name="${sdkName}",telemetry_sdk_version="${sdkVersion}"} 1`;
 

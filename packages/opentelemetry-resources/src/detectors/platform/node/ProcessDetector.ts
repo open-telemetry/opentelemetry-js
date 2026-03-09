@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Attributes, diag } from '@opentelemetry/api';
+import type { Attributes } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import {
   ATTR_PROCESS_COMMAND,
   ATTR_PROCESS_COMMAND_ARGS,
@@ -16,8 +17,8 @@ import {
   ATTR_PROCESS_RUNTIME_VERSION,
 } from '../../../semconv';
 import * as os from 'os';
-import { ResourceDetectionConfig } from '../../../config';
-import { DetectedResource, ResourceDetector } from '../../../types';
+import type { ResourceDetectionConfig } from '../../../config';
+import type { DetectedResource, ResourceDetector } from '../../../types';
 
 /**
  * ProcessDetector will be used to detect the resources related current process running

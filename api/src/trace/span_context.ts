@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { TraceState } from './trace_state';
+import type { TraceState } from './trace_state';
 
 /**
  * A SpanContext represents the portion of a {@link Span} which must be

@@ -3,11 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { LogRecordExporter, ReadableLogRecord } from '@opentelemetry/sdk-logs';
+import type {
+  LogRecordExporter,
+  ReadableLogRecord,
+} from '@opentelemetry/sdk-logs';
+import type { OTLPGRPCExporterConfigNode } from '@opentelemetry/otlp-grpc-exporter-base';
 import {
   convertLegacyOtlpGrpcOptions,
   createOtlpGrpcExportDelegate,
-  OTLPGRPCExporterConfigNode,
 } from '@opentelemetry/otlp-grpc-exporter-base';
 import { ProtobufLogsSerializer } from '@opentelemetry/otlp-transformer';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';

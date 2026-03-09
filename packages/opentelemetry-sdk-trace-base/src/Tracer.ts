@@ -4,19 +4,16 @@
  */
 
 import * as api from '@opentelemetry/api';
-import {
-  InstrumentationScope,
-  sanitizeAttributes,
-  isTracingSuppressed,
-} from '@opentelemetry/core';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import { sanitizeAttributes, isTracingSuppressed } from '@opentelemetry/core';
 import { SpanImpl } from './Span';
-import { GeneralLimits, SpanLimits, TracerConfig } from './types';
+import type { GeneralLimits, SpanLimits, TracerConfig } from './types';
 import { mergeConfig } from './utility';
-import { SpanProcessor } from './SpanProcessor';
-import { Sampler } from './Sampler';
-import { IdGenerator } from './IdGenerator';
+import type { SpanProcessor } from './SpanProcessor';
+import type { Sampler } from './Sampler';
+import type { IdGenerator } from './IdGenerator';
 import { RandomIdGenerator } from './platform';
-import { Resource } from '@opentelemetry/resources';
+import type { Resource } from '@opentelemetry/resources';
 import { TracerMetrics } from './TracerMetrics';
 import { VERSION } from './version';
 

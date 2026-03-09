@@ -3,15 +3,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   Context,
+  TextMapGetter,
+  TextMapPropagator,
+  TextMapSetter,
+} from '@opentelemetry/api';
+import {
   isSpanContextValid,
   isValidSpanId,
   isValidTraceId,
   trace,
-  TextMapGetter,
-  TextMapPropagator,
-  TextMapSetter,
   TraceFlags,
 } from '@opentelemetry/api';
 import { isTracingSuppressed } from '@opentelemetry/core';

@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context, ContextManager, ROOT_CONTEXT } from '@opentelemetry/api';
+import type { Context, ContextManager } from '@opentelemetry/api';
+import { ROOT_CONTEXT } from '@opentelemetry/api';
 
 /**
  * Stack Context Manager for managing the state in web

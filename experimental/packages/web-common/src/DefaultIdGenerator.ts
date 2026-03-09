@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { SessionIdGenerator } from './types/SessionIdGenerator';
+import type { SessionIdGenerator } from './types/SessionIdGenerator';
 
 export class DefaultIdGenerator implements SessionIdGenerator {
   generateSessionId = getIdGenerator(16);

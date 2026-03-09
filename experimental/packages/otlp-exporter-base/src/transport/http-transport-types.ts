@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { HeadersFactory } from '../configuration/otlp-http-configuration';
+import type { HeadersFactory } from '../configuration/otlp-http-configuration';
 
 export interface HttpRequestParameters {
   url: string;

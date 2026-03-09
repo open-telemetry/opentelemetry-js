@@ -4,13 +4,8 @@
  */
 
 import * as oc from '@opencensus/core';
-import {
-  Attributes,
-  SpanContext,
-  SpanKind,
-  TimeInput,
-  diag,
-} from '@opentelemetry/api';
+import type { Attributes, SpanContext, TimeInput } from '@opentelemetry/api';
+import { SpanKind, diag } from '@opentelemetry/api';
 import { TraceState } from '@opentelemetry/core';
 
 function exhaust(value: never) {

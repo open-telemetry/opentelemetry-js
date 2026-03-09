@@ -45,6 +45,13 @@ module.exports = {
             "leadingUnderscore": "require"
           }
         ],
+        "@typescript-eslint/consistent-type-imports": [
+          "error",
+          {
+            prefer: "type-imports",
+            fixStyle: "separate-type-imports",
+          },
+        ],
         "@typescript-eslint/no-unused-vars": ["error", {"argsIgnorePattern": "^_", "args": "after-used"}],
         "@typescript-eslint/no-inferrable-types": ["error", { ignoreProperties: true }],
         "@typescript-eslint/no-empty-function": ["off"],

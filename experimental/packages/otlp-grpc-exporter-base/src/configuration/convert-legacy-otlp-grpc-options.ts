@@ -2,12 +2,12 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { OTLPGRPCExporterConfigNode } from '../types';
+import type { OTLPGRPCExporterConfigNode } from '../types';
 import { diag } from '@opentelemetry/api';
+import type { OtlpGrpcConfiguration } from './otlp-grpc-configuration';
 import {
   getOtlpGrpcDefaultConfiguration,
   mergeOtlpGrpcConfigurationWithDefaults,
-  OtlpGrpcConfiguration,
 } from './otlp-grpc-configuration';
 import { createEmptyMetadata } from '../grpc-exporter-transport';
 import { getOtlpGrpcConfigurationFromEnv } from './otlp-grpc-env-configuration';

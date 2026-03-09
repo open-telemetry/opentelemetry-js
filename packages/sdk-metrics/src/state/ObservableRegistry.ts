@@ -3,14 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  diag,
+import type {
   HrTime,
   BatchObservableCallback,
   Observable,
   ObservableCallback,
 } from '@opentelemetry/api';
-import { isObservableInstrument, ObservableInstrument } from '../Instruments';
+import { diag } from '@opentelemetry/api';
+import type { ObservableInstrument } from '../Instruments';
+import { isObservableInstrument } from '../Instruments';
 import {
   BatchObservableResultImpl,
   ObservableResultImpl,

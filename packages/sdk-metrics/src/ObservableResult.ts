@@ -3,16 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  diag,
+import type {
   ObservableResult,
   Attributes,
-  ValueType,
   BatchObservableResult,
   Observable,
 } from '@opentelemetry/api';
+import { diag, ValueType } from '@opentelemetry/api';
 import { AttributeHashMap } from './state/HashMap';
-import { isObservableInstrument, ObservableInstrument } from './Instruments';
+import type { ObservableInstrument } from './Instruments';
+import { isObservableInstrument } from './Instruments';
 
 /**
  * The class implements {@link ObservableResult} interface.
