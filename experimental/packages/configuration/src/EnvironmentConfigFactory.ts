@@ -30,7 +30,7 @@ import { initializeDefaultTracerProviderConfiguration } from './models/tracerPro
 import type { BatchLogRecordProcessor } from './models/loggerProviderModel';
 import { initializeDefaultLoggerProviderConfiguration } from './models/loggerProviderModel';
 import { getGrpcTlsConfig, getHttpTlsConfig } from './utils';
-import { ExperimentalResourceDetector } from './models/resourceModel';
+import type { ExperimentalResourceDetector } from './models/resourceModel';
 
 /**
  * EnvironmentConfigProvider provides a configuration based on environment variables.
