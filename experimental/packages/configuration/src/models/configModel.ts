@@ -5,10 +5,10 @@
 'use strict';
 
 import { DiagLogLevel } from '@opentelemetry/api';
-import { TracerProvider } from './tracerProviderModel';
-import { LoggerProvider } from './loggerProviderModel';
-import { Resource } from './resourceModel';
-import { MeterProvider } from './meterProviderModel';
+import type { TracerProvider } from './tracerProviderModel';
+import type { LoggerProvider } from './loggerProviderModel';
+import type { Resource } from './resourceModel';
+import type { MeterProvider } from './meterProviderModel';
 
 export interface ConfigurationModel {
   /**

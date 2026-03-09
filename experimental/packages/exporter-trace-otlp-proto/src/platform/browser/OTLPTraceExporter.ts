@@ -3,11 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
-import {
-  OTLPExporterConfigBase,
-  OTLPExporterBase,
-} from '@opentelemetry/otlp-exporter-base';
+import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
+import type { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import { ProtobufTraceSerializer } from '@opentelemetry/otlp-transformer';
 import { createLegacyOtlpBrowserExportDelegate } from '@opentelemetry/otlp-exporter-base/browser-http';
 

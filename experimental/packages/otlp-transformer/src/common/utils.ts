@@ -4,7 +4,7 @@
  */
 
 import type { Fixed64, LongBits } from './internal-types';
-import { HrTime } from '@opentelemetry/api';
+import type { HrTime } from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { hexToBinary } from './hex-to-binary';
 

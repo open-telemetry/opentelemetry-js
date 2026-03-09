@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   PerformanceEntries,
   PerformanceResourceTimingInfo,
   PropagateTraceHeaderCorsUrls,
 } from './types';
 import { PerformanceTimingNames as PTN } from './enums/PerformanceTimingNames';
-import * as api from '@opentelemetry/api';
+import type * as api from '@opentelemetry/api';
 import {
   hrTimeToNanoseconds,
   timeInputToHrTime,

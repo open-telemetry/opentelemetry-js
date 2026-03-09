@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { context, Context, diag, TraceFlags } from '@opentelemetry/api';
+import type { Context } from '@opentelemetry/api';
+import { context, diag, TraceFlags } from '@opentelemetry/api';
 import {
   BindOnceFuture,
   ExportResultCode,
@@ -11,11 +12,11 @@ import {
   globalErrorHandler,
   suppressTracing,
 } from '@opentelemetry/core';
-import { Span } from '../Span';
-import { SpanProcessor } from '../SpanProcessor';
-import { BufferConfig } from '../types';
-import { ReadableSpan } from './ReadableSpan';
-import { SpanExporter } from './SpanExporter';
+import type { Span } from '../Span';
+import type { SpanProcessor } from '../SpanProcessor';
+import type { BufferConfig } from '../types';
+import type { ReadableSpan } from './ReadableSpan';
+import type { SpanExporter } from './SpanExporter';
 
 /**
  * Implementation of the {@link SpanProcessor} that batches spans exported by

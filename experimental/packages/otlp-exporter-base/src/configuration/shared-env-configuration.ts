@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { getNumberFromEnv, getStringFromEnv } from '@opentelemetry/core';
-import { OtlpSharedConfiguration } from './shared-configuration';
+import type { OtlpSharedConfiguration } from './shared-configuration';
 import { diag } from '@opentelemetry/api';
 
 function parseAndValidateTimeoutFromEnv(

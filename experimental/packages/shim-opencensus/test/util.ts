@@ -3,16 +3,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import {
   AlwaysOnSampler,
   BasicTracerProvider,
   InMemorySpanExporter,
-  ReadableSpan,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import { ShimTracer } from '../src/ShimTracer';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import { Tracer, TracerProvider, context } from '@opentelemetry/api';
+import type { Tracer, TracerProvider } from '@opentelemetry/api';
+import { context } from '@opentelemetry/api';
 
 export async function withTestTracer(
   func: (shimTracer: ShimTracer, otelTracer: Tracer) => void | Promise<void>

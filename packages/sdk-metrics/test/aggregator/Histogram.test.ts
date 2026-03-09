@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { HrTime, ValueType } from '@opentelemetry/api';
+import type { HrTime } from '@opentelemetry/api';
+import { ValueType } from '@opentelemetry/api';
 import * as assert from 'assert';
+import type { MetricData } from '../../src';
 import {
   AggregationTemporality,
   InstrumentType,
   DataPointType,
-  MetricData,
 } from '../../src';
 import {
   HistogramAccumulation,

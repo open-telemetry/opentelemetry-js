@@ -3,12 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  context as contextApi,
-  diag,
+import type {
   Context,
   Attributes,
-  ValueType,
   UpDownCounter,
   Counter,
   Gauge,
@@ -19,10 +16,11 @@ import {
   ObservableGauge,
   ObservableUpDownCounter,
 } from '@opentelemetry/api';
+import { context as contextApi, diag, ValueType } from '@opentelemetry/api';
 import { millisToHrTime } from '@opentelemetry/core';
-import { InstrumentDescriptor } from './InstrumentDescriptor';
-import { ObservableRegistry } from './state/ObservableRegistry';
-import {
+import type { InstrumentDescriptor } from './InstrumentDescriptor';
+import type { ObservableRegistry } from './state/ObservableRegistry';
+import type {
   AsyncWritableMetricStorage,
   WritableMetricStorage,
 } from './state/WritableMetricStorage';

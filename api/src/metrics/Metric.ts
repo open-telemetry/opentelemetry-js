@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Attributes, AttributeValue } from '../common/Attributes';
-import { Context } from '../context/types';
+import type { Attributes, AttributeValue } from '../common/Attributes';
+import type { Context } from '../context/types';
 
 /**
  * Advisory options influencing aggregation configuration parameters.

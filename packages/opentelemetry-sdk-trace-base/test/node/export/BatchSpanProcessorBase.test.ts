@@ -4,7 +4,8 @@
  */
 
 import * as assert from 'assert';
-import { BufferConfig, InMemorySpanExporter } from '../../../src';
+import type { BufferConfig } from '../../../src';
+import { InMemorySpanExporter } from '../../../src';
 import { BatchSpanProcessorBase } from '../../../src/export/BatchSpanProcessorBase';
 
 class BatchSpanProcessor extends BatchSpanProcessorBase<BufferConfig> {

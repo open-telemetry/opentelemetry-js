@@ -5,14 +5,8 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
-  MeterProvider,
-  DataPointType,
-  IMetricReader,
-  InstrumentType,
-  AggregationType,
-  ViewOptions,
-} from '../../src';
+import type { IMetricReader, InstrumentType, ViewOptions } from '../../src';
+import { MeterProvider, DataPointType, AggregationType } from '../../src';
 import {
   assertMetricData,
   defaultInstrumentationScope,
@@ -23,9 +17,9 @@ import {
   TestDeltaMetricReader,
   TestMetricReader,
 } from '../export/TestMetricReader';
-import { MeterSharedState } from '../../src/state/MeterSharedState';
-import { CollectionResult } from '../../src/export/MetricData';
-import { Meter } from '../../src/Meter';
+import type { MeterSharedState } from '../../src/state/MeterSharedState';
+import type { CollectionResult } from '../../src/export/MetricData';
+import type { Meter } from '../../src/Meter';
 
 describe('MeterSharedState', () => {
   afterEach(() => {

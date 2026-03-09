@@ -3,18 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import {
-  BasicTracerProvider,
-  SDKRegistrationConfig,
-} from '@opentelemetry/sdk-trace-base';
-import { NodeTracerConfig } from './config';
-import {
-  context,
-  ContextManager,
-  propagation,
-  TextMapPropagator,
-  trace,
-} from '@opentelemetry/api';
+import type { SDKRegistrationConfig } from '@opentelemetry/sdk-trace-base';
+import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
+import type { NodeTracerConfig } from './config';
+import type { ContextManager, TextMapPropagator } from '@opentelemetry/api';
+import { context, propagation, trace } from '@opentelemetry/api';
 import {
   CompositePropagator,
   W3CBaggagePropagator,

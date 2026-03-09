@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { MeterProvider } from '../metrics/MeterProvider';
-import { ContextManager } from '../context/types';
-import { DiagLogger } from '../diag/types';
-import { TextMapPropagator } from '../propagation/TextMapPropagator';
+import type { MeterProvider } from '../metrics/MeterProvider';
+import type { ContextManager } from '../context/types';
+import type { DiagLogger } from '../diag/types';
+import type { TextMapPropagator } from '../propagation/TextMapPropagator';
 import type { TracerProvider } from '../trace/tracer_provider';
 import { VERSION } from '../version';
 import { isCompatible } from './semver';

@@ -10,7 +10,8 @@ import {
   BasicTracerProvider,
 } from '../../../src';
 import { context, trace } from '@opentelemetry/api';
-import { ExportResult, ExportResultCode } from '@opentelemetry/core';
+import type { ExportResult } from '@opentelemetry/core';
+import { ExportResultCode } from '@opentelemetry/core';
 
 describe('InMemorySpanExporter', () => {
   let memoryExporter: InMemorySpanExporter;

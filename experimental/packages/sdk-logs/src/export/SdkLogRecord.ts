@@ -4,7 +4,7 @@
  */
 
 import type { HrTime, SpanContext } from '@opentelemetry/api';
-import { InstrumentationScope } from '@opentelemetry/core';
+import type { InstrumentationScope } from '@opentelemetry/core';
 import type {
   AnyValue,
   LogBody,

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context, TimeInput } from '@opentelemetry/api';
-import { AnyValue, AnyValueMap } from './AnyValue';
+import type { Context, TimeInput } from '@opentelemetry/api';
+import type { AnyValue, AnyValueMap } from './AnyValue';
 
 export type LogBody = AnyValue;
 export type LogAttributes = AnyValueMap;

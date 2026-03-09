@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context } from '../context/types';
-import { Span } from './span';
-import { SpanOptions } from './SpanOptions';
+import type { Context } from '../context/types';
+import type { Span } from './span';
+import type { SpanOptions } from './SpanOptions';
 
 /**
  * Tracer provides an interface for creating {@link Span}s.

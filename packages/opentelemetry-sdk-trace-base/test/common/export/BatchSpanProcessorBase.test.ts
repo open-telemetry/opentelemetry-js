@@ -4,22 +4,24 @@
  */
 
 import { diag, ROOT_CONTEXT } from '@opentelemetry/api';
+import type { ExportResult } from '@opentelemetry/core';
 import {
-  ExportResult,
   ExportResultCode,
   loggingErrorHandler,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
-  AlwaysOnSampler,
-  BasicTracerProvider,
+import type {
   BufferConfig,
-  InMemorySpanExporter,
   ReadableSpan,
   Span,
   SpanExporter,
+} from '../../../src';
+import {
+  AlwaysOnSampler,
+  BasicTracerProvider,
+  InMemorySpanExporter,
 } from '../../../src';
 import { context } from '@opentelemetry/api';
 import { TestRecordOnlySampler } from './TestRecordOnlySampler';

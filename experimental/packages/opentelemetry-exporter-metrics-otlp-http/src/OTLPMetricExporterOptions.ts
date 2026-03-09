@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
-import {
+import type { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
+import type {
   AggregationTemporality,
   AggregationSelector,
 } from '@opentelemetry/sdk-metrics';

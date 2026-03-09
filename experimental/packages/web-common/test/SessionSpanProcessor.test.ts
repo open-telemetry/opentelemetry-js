@@ -4,7 +4,8 @@
  */
 
 import * as assert from 'assert';
-import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
+import type { Span } from '@opentelemetry/sdk-trace-base';
+import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
 import { SessionSpanProcessor } from '../src/SessionSpanProcessor';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 

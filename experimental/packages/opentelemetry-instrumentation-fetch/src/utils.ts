@@ -8,7 +8,7 @@
 
 import { diag } from '@opentelemetry/api';
 import { getStringListFromEnv } from '@opentelemetry/core';
-import { URLLike } from '@opentelemetry/sdk-trace-web';
+import type { URLLike } from '@opentelemetry/sdk-trace-web';
 
 const DIAG_LOGGER = diag.createComponentLogger({
   namespace: '@opentelemetry/opentelemetry-instrumentation-fetch/utils',

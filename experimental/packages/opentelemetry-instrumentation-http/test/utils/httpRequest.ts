@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import * as http from 'http';
-import { URL } from 'url';
+import type { URL } from 'url';
 
 type GetResult = Promise<{
   data: string;

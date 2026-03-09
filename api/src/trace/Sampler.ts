@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context } from '../context/types';
-import { SpanAttributes } from './attributes';
-import { Link } from './link';
-import { SamplingResult } from './SamplingResult';
-import { SpanKind } from './span_kind';
+import type { Context } from '../context/types';
+import type { SpanAttributes } from './attributes';
+import type { Link } from './link';
+import type { SamplingResult } from './SamplingResult';
+import type { SpanKind } from './span_kind';
 
 /**
  * @deprecated use the one declared in @opentelemetry/sdk-trace-base instead.

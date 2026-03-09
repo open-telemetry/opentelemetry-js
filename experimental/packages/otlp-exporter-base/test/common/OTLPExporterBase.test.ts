@@ -2,7 +2,8 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { IOtlpExportDelegate, OTLPExporterBase } from '../../src';
+import type { IOtlpExportDelegate } from '../../src';
+import { OTLPExporterBase } from '../../src';
 
 import * as sinon from 'sinon';
 

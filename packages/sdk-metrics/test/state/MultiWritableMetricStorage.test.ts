@@ -4,16 +4,16 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { Attributes } from '@opentelemetry/api';
+import type { Attributes } from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { MultiMetricStorage } from '../../src/state/MultiWritableMetricStorage';
-import { WritableMetricStorage } from '../../src/state/WritableMetricStorage';
+import type { WritableMetricStorage } from '../../src/state/WritableMetricStorage';
+import type { Measurement } from '../util';
 import {
   assertMeasurementEqual,
   commonAttributes,
   commonValues,
-  Measurement,
 } from '../util';
 
 describe('MultiMetricStorage', () => {

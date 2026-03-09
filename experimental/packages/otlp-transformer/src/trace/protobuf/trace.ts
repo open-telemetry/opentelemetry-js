@@ -4,12 +4,12 @@
  */
 
 import * as root from '../../generated/root';
-import { ISerializer } from '../../i-serializer';
-import { ExportType } from '../../common/protobuf/protobuf-export-type';
-import { IExportTraceServiceRequest } from '../internal-types';
-import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { ISerializer } from '../../i-serializer';
+import type { ExportType } from '../../common/protobuf/protobuf-export-type';
+import type { IExportTraceServiceRequest } from '../internal-types';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { createExportTraceServiceRequest } from '../internal';
-import { IExportTraceServiceResponse } from '../export-response';
+import type { IExportTraceServiceResponse } from '../export-response';
 import { PROTOBUF_ENCODER } from '../../common/utils';
 
 const traceResponseType = root.opentelemetry.proto.collector.trace.v1

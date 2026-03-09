@@ -2,12 +2,12 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
+import type { OtlpHttpConfiguration } from './otlp-http-configuration';
 import {
   getHttpConfigurationDefaults,
   mergeOtlpHttpConfigurationWithDefaults,
-  OtlpHttpConfiguration,
 } from './otlp-http-configuration';
-import { OTLPExporterNodeConfigBase } from './legacy-node-configuration';
+import type { OTLPExporterNodeConfigBase } from './legacy-node-configuration';
 import { convertLegacyHeaders } from './convert-legacy-http-options';
 
 /**

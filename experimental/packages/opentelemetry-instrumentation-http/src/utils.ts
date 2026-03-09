@@ -2,15 +2,13 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import {
+import type {
   Attributes,
-  SpanStatusCode,
   Span,
-  context,
-  SpanKind,
   DiagLogger,
   AttributeValue,
 } from '@opentelemetry/api';
+import { SpanStatusCode, context, SpanKind } from '@opentelemetry/api';
 import {
   ATTR_CLIENT_ADDRESS,
   ATTR_ERROR_TYPE,
@@ -57,7 +55,7 @@ import {
   USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
   USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST,
 } from './semconv';
-import {
+import type {
   IncomingHttpHeaders,
   IncomingMessage,
   OutgoingHttpHeader,
@@ -69,7 +67,11 @@ import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 import { SemconvStability } from '@opentelemetry/instrumentation';
 import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
-import { Err, IgnoreMatcher, ParsedRequestOptions } from './internal-types';
+import type {
+  Err,
+  IgnoreMatcher,
+  ParsedRequestOptions,
+} from './internal-types';
 import { SYNTHETIC_BOT_NAMES, SYNTHETIC_TEST_NAMES } from './internal-types';
 import {
   DEFAULT_QUERY_STRINGS_TO_REDACT,

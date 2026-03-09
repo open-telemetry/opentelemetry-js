@@ -5,8 +5,8 @@
 
 import { ATTR_HOST_ARCH, ATTR_HOST_ID, ATTR_HOST_NAME } from '../../../semconv';
 import { arch, hostname } from 'os';
-import { ResourceDetectionConfig } from '../../../config';
-import {
+import type { ResourceDetectionConfig } from '../../../config';
+import type {
   DetectedResource,
   DetectedResourceAttributes,
   ResourceDetector,

@@ -8,13 +8,13 @@ import { _global, GLOBAL_LOGS_API_KEY } from '../../src/internal/global-utils';
 import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
 import { ProxyLoggerProvider } from '../../src/ProxyLoggerProvider';
 
-const api1 = require('../../src') as typeof import('../../src');
+const api1 = require('../../src');
 
 // clear cache and load a second instance of the api
 for (const key of Object.keys(require.cache)) {
   delete require.cache[key];
 }
-const api2 = require('../../src') as typeof import('../../src');
+const api2 = require('../../src');
 
 describe('Global Utils', () => {
   // prove they are separate instances

@@ -3,19 +3,21 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context } from '../context/types';
+import type { Context } from '../context/types';
 import {
   getGlobal,
   registerGlobal,
   unregisterGlobal,
 } from '../internal/global-utils';
 import { NoopTextMapPropagator } from '../propagation/NoopTextMapPropagator';
-import {
-  defaultTextMapGetter,
-  defaultTextMapSetter,
+import type {
   TextMapGetter,
   TextMapPropagator,
   TextMapSetter,
+} from '../propagation/TextMapPropagator';
+import {
+  defaultTextMapGetter,
+  defaultTextMapSetter,
 } from '../propagation/TextMapPropagator';
 import {
   getBaggage,

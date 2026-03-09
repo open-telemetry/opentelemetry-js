@@ -4,13 +4,8 @@
  */
 
 import * as assert from 'assert';
-import {
-  MeterProvider,
-  InstrumentType,
-  DataPointType,
-  HistogramMetricData,
-  DataPoint,
-} from '../src';
+import type { HistogramMetricData, DataPoint } from '../src';
+import { MeterProvider, InstrumentType, DataPointType } from '../src';
 import {
   assertScopeMetrics,
   assertMetricData,

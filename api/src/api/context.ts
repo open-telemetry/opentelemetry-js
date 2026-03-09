@@ -4,7 +4,7 @@
  */
 
 import { NoopContextManager } from '../context/NoopContextManager';
-import { Context, ContextManager } from '../context/types';
+import type { Context, ContextManager } from '../context/types';
 import {
   getGlobal,
   registerGlobal,

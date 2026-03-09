@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { TraceState } from '../trace_state';
+import type { TraceState } from '../trace_state';
 import { validateKey, validateValue } from './tracestate-validators';
 
 const MAX_TRACE_STATE_ITEMS = 32;

@@ -38,10 +38,8 @@ import {
   ATTR_HTTP_REQUEST_BODY_SIZE,
 } from '../src/semconv';
 import { EventNames } from '../src/enums/EventNames';
-import {
-  XMLHttpRequestInstrumentation,
-  XMLHttpRequestInstrumentationConfig,
-} from '../src/xhr';
+import type { XMLHttpRequestInstrumentationConfig } from '../src/xhr';
+import { XMLHttpRequestInstrumentation } from '../src/xhr';
 import { AttributeNames } from '../src/enums/AttributeNames';
 import {
   ATTR_ERROR_TYPE,

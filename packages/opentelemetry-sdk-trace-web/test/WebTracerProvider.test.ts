@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { context, ContextManager, trace } from '@opentelemetry/api';
+import type { ContextManager } from '@opentelemetry/api';
+import { context, trace } from '@opentelemetry/api';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { ATTR_TELEMETRY_SDK_LANGUAGE } from '@opentelemetry/semantic-conventions';
-import { Span } from '@opentelemetry/sdk-trace-base';
+import type { Span } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import { WebTracerConfig } from '../src';
+import type { WebTracerConfig } from '../src';
 import { WebTracerProvider } from '../src/WebTracerProvider';
 
 describe('WebTracerProvider', function () {

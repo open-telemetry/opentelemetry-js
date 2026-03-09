@@ -2,9 +2,9 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { OtlpHttpConfiguration } from './configuration/otlp-http-configuration';
-import { ISerializer } from '@opentelemetry/otlp-transformer';
-import { IOtlpExportDelegate } from './otlp-export-delegate';
+import type { OtlpHttpConfiguration } from './configuration/otlp-http-configuration';
+import type { ISerializer } from '@opentelemetry/otlp-transformer';
+import type { IOtlpExportDelegate } from './otlp-export-delegate';
 import { createRetryingTransport } from './retrying-transport';
 import { createOtlpNetworkExportDelegate } from './otlp-network-export-delegate';
 import { createFetchTransport } from './transport/fetch-transport';
