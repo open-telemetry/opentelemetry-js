@@ -3,9 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { z } from 'zod';
+import type { LogRecordExporterSchema } from './generated/opentelemetry-configuration';
+
 export type { ConfigFactory } from './IConfigFactory';
-export type { ConfigurationModel } from './models/configModel';
-export type { LogRecordExporter as LogRecordExporterModel } from './models/loggerProviderModel';
-export type { PushMetricExporter as MeterExporterModel } from './models/meterProviderModel';
-export type { SpanExporter as SpanExporterModel } from './models/tracerProviderModel';
+export type { Configuration } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';
+
+/** Type for a log record exporter configuration object (replaces LogRecordExporterModel). */
+export type LogRecordExporterConfiguration = z.infer<
+  typeof LogRecordExporterSchema
+>;

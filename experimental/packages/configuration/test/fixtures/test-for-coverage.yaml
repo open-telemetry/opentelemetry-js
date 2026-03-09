@@ -12,6 +12,6 @@ logger_provider:
     loggers:
       - name: io.opentelemetry.contrib.*
         config:
-          enabled: false
+          disabled: true
           minimum_severity: info
           trace_based: true

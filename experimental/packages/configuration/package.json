@@ -9,6 +9,7 @@
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
+    "generate:config": "node ../../../scripts/config/generate-config.js",
     "test": "nyc mocha test/**/*.test.ts",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
@@ -39,13 +40,15 @@
   },
   "dependencies": {
     "@opentelemetry/core": "2.6.0",
-    "yaml": "^2.0.0"
+    "yaml": "^2.0.0",
+    "zod": "^4.3.6"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.9.0"
   },
   "devDependencies": {
     "@opentelemetry/api": "^1.9.0",
+    "json-schema-to-zod": "^2.7.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",

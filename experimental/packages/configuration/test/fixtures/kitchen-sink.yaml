@@ -65,11 +65,11 @@ logger_provider:
     attribute_count_limit: 128
   logger_configurator/development:
     default_config:
-      enabled: true
+      disabled: false
     loggers:
       - name: io.opentelemetry.contrib.*
         config:
-          enabled: false
+          disabled: true
           minimum_severity: info
           trace_based: true
 meter_provider:

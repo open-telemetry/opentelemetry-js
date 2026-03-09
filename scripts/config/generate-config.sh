@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -e
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ROOT_DIR="${SCRIPT_DIR}/../../"
+
+# Get latest version by running `git tag -l --sort=version:refname | tail -1`
+# ... in git@github.com:open-telemetry/opentelemetry-configuration.git
+CONFIG_VERSION=v1.0.0-rc.3
+
+# When running on windows and you are getting references to ";C" (like Telemetry;C)
+# then this is an issue with the bash shell, so first run the following in your shell:
+# export MSYS_NO_PATHCONV=1
+
+cd ${SCRIPT_DIR}
+
+rm -rf opentelemetry-configuration || true
+mkdir opentelemetry-configuration
+cd opentelemetry-configuration
+
+git init
+git remote add origin https://github.com/open-telemetry/opentelemetry-configuration.git
+git fetch origin "${CONFIG_VERSION}" --depth=1
+git checkout FETCH_HEAD
+cd ${SCRIPT_DIR}

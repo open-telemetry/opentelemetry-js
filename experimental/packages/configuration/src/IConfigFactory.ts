@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ConfigurationModel } from './models/configModel';
+import type { Configuration } from './generated/types';
 
 export interface ConfigFactory {
   /**
-   * Returns a ConfigurationModel.
+   * Returns a Configuration.
    *
-   * @returns ConfigurationModel a Configuration Model with all configuration attributes
+   * @returns Configuration a Configuration with all configuration attributes
    */
-  getConfigModel(): ConfigurationModel;
+  getConfigModel(): Configuration;
 }

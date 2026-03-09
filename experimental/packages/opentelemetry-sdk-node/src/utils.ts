@@ -47,8 +47,8 @@ import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 import type {
-  ConfigurationModel,
-  LogRecordExporterModel,
+  Configuration,
+  LogRecordExporterConfiguration,
 } from '@opentelemetry/configuration';
 import type {
   IMetricReader,
@@ -77,7 +77,7 @@ const RESOURCE_DETECTOR_PROCESS = 'process';
 const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
 
 export function getResourceFromConfiguration(
-  config: ConfigurationModel
+  config: Configuration
 ): Resource | undefined {
   if (config.resource && config.resource.attributes) {
     const attr: DetectedResourceAttributes = {};
@@ -126,7 +126,7 @@ export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
 }
 
 export function getResourceDetectorsFromConfiguration(
-  config: ConfigurationModel
+  config: Configuration
 ): Array<ResourceDetector> {
   // When updating this list, make sure to also update the section `resourceDetectors` on README.
   const resourceDetectors = new Map<string, ResourceDetector>([
@@ -300,7 +300,7 @@ export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
  * Get a propagator as defined by configuration model from configuration
  */
 export function getPropagatorFromConfiguration(
-  config: ConfigurationModel
+  config: Configuration
 ): TextMapPropagator | null | undefined {
   const propagatorsValue = getKeyListFromObjectArray(
     config.propagator?.composite
@@ -540,7 +540,7 @@ export function getBatchLogRecordProcessorFromEnv(
 }
 
 export function getLogRecordExporter(
-  exporter: LogRecordExporterModel
+  exporter: LogRecordExporterConfiguration
 ): LogRecordExporter | undefined {
   if (exporter.otlp_http) {
     const encoding = exporter.otlp_http.encoding;
@@ -584,7 +584,7 @@ export function getLogRecordExporter(
 }
 
 export function getLogRecordProcessorsFromConfiguration(
-  config: ConfigurationModel
+  config: Configuration
 ): LogRecordProcessor[] | undefined {
   const logRecordProcessors: LogRecordProcessor[] = [];
   config.logger_provider?.processors?.forEach(processor => {
@@ -614,7 +614,7 @@ export function getLogRecordProcessorsFromConfiguration(
   return undefined;
 }
 
-export function getInstanceID(config: ConfigurationModel): string | undefined {
+export function getInstanceID(config: Configuration): string | undefined {
   if (config.resource?.attributes) {
     for (let i = 0; i < config.resource.attributes.length; i++) {
       const element = config.resource.attributes[i];

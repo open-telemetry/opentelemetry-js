@@ -2,149 +2,7 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { diag } from '@opentelemetry/api';
 import { getStringFromEnv } from '@opentelemetry/core';
-import { inspect } from 'util';
-import type { GrpcTls, HttpTls } from './models/commonModel';
-
-/**
- * Retrieves a boolean value from a configuration file parameter.
- * - Trims leading and trailing whitespace and ignores casing.
- * - Returns `undefined` if the value is empty, unset, or contains only whitespace.
- * - Returns `undefined` and a warning for values that cannot be mapped to a boolean.
- *
- * @param {unknown} value - The value from the config file.
- * @returns {boolean} - The boolean value or `false` if the environment variable is unset empty, unset, or contains only whitespace.
- */
-export function getBooleanFromConfigFile(value: unknown): boolean | undefined {
-  const raw = envVariableSubstitution(value)?.trim().toLowerCase();
-  if (raw === 'true') {
-    return true;
-  } else if (raw === 'false') {
-    return false;
-  } else if (raw == null || raw === '') {
-    return undefined;
-  } else {
-    diag.warn(`Unknown value ${inspect(raw)}, expected 'true' or 'false'`);
-    return undefined;
-  }
-}
-
-/**
- * Retrieves a list of booleans from a configuration file parameter.
- * - Uses ',' as the delimiter.
- * - Trims leading and trailing whitespace from each entry.
- * - Excludes empty entries.
- * - Returns `undefined` if the variable is empty or contains only whitespace.
- * - Returns an empty array if all entries are empty or whitespace.
- *
- * @param {unknown} value - The value from the config file.
- * @returns {boolean[] | undefined} - The list of strings or `undefined`.
- */
-export function getBooleanListFromConfigFile(
-  value: unknown
-): boolean[] | undefined {
-  const list = getStringFromConfigFile(value)?.split(',');
-  if (list) {
-    const filteredList = [];
-    for (let i = 0; i < list.length; i++) {
-      const element = getBooleanFromConfigFile(list[i]);
-      if (element != null) {
-        filteredList.push(element);
-      }
-    }
-    return filteredList;
-  }
-  return list;
-}
-
-/**
- * Retrieves a number from a configuration file parameter.
- * - Returns `undefined` if the environment variable is empty, unset, or contains only whitespace.
- * - Returns `undefined` and a warning if is not a number.
- * - Returns a number in all other cases.
- *
- * @param {unknown} value - The value from the config file.
- * @returns {number | undefined} - The number value or `undefined`.
- */
-export function getNumberFromConfigFile(value: unknown): number | undefined {
-  const raw = envVariableSubstitution(value)?.trim();
-  if (raw == null || raw.trim() === '') {
-    return undefined;
-  }
-
-  const n = Number(raw);
-  if (isNaN(n)) {
-    diag.warn(`Unknown value ${inspect(raw)}, expected a number`);
-    return undefined;
-  }
-
-  return n;
-}
-
-/**
- * Retrieves a list of numbers from a configuration file parameter.
- * - Uses ',' as the delimiter.
- * - Trims leading and trailing whitespace from each entry.
- * - Excludes empty entries.
- * - Returns `undefined` if the variable is empty or contains only whitespace.
- * - Returns an empty array if all entries are empty or whitespace.
- *
- * @param {unknown} value - The value from the config file.
- * @returns {number[] | undefined} - The list of numbers or `undefined`.
- */
-export function getNumberListFromConfigFile(
-  value: unknown
-): number[] | undefined {
-  const list = getStringFromConfigFile(value)?.split(',');
-  if (list) {
-    const filteredList = [];
-    for (let i = 0; i < list.length; i++) {
-      const element = getNumberFromConfigFile(list[i]);
-      if (element || element === 0) {
-        filteredList.push(element);
-      }
-    }
-    return filteredList;
-  }
-  return list;
-}
-
-/**
- * Retrieves a string from a configuration file parameter.
- * - Returns `undefined` if the variable is empty, unset, or contains only whitespace.
- *
- * @param {unknown} value - The value from the config file.
- * @returns {string | undefined} - The string value or `undefined`.
- */
-export function getStringFromConfigFile(value: unknown): string | undefined {
-  const raw = envVariableSubstitution(value)?.trim();
-  if (value == null || raw === '') {
-    return undefined;
-  }
-  return raw;
-}
-
-/**
- * Retrieves a list of strings from a configuration file parameter.
- * - Uses ',' as the delimiter.
- * - Trims leading and trailing whitespace from each entry.
- * - Excludes empty entries.
- * - Returns `undefined` if the variable is empty or contains only whitespace.
- * - Returns an empty array if all entries are empty or whitespace.
- *
- * @param {unknown} value - The value from the config file.
- * @returns {string[] | undefined} - The list of strings or `undefined`.
- */
-export function getStringListFromConfigFile(
-  value: unknown
-): string[] | undefined {
-  value = envVariableSubstitution(value);
-  return getStringFromConfigFile(value)
-    ?.split(',')
-    .map(v => v.trim())
-    .filter(s => s !== '');
-}
 
 export function envVariableSubstitution(value: unknown): string | undefined {
   if (value == null) {
@@ -170,9 +28,9 @@ export function getGrpcTlsConfig(
   clientKeyFile?: string,
   clientCertificateFile?: string,
   insecure?: boolean
-): GrpcTls | undefined {
+): Record<string, unknown> | undefined {
   if (certificateFile || clientKeyFile || clientCertificateFile) {
-    const tls: GrpcTls = {};
+    const tls: Record<string, unknown> = {};
     if (certificateFile) {
       tls.ca_file = certificateFile;
     }
@@ -194,9 +52,9 @@ export function getHttpTlsConfig(
   certificateFile?: string,
   clientKeyFile?: string,
   clientCertificateFile?: string
-): HttpTls | undefined {
+): Record<string, unknown> | undefined {
   if (certificateFile || clientKeyFile || clientCertificateFile) {
-    const tls: HttpTls = {};
+    const tls: Record<string, unknown> = {};
     if (certificateFile) {
       tls.ca_file = certificateFile;
     }

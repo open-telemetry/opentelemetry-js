@@ -4,7 +4,7 @@
  */
 import type {
   ConfigFactory,
-  ConfigurationModel,
+  Configuration,
 } from '@opentelemetry/configuration';
 import { createConfigFactory } from '@opentelemetry/configuration';
 import {
@@ -13,6 +13,7 @@ import {
   DiagConsoleLogger,
   propagation,
 } from '@opentelemetry/api';
+import { diagLogLevelFromString } from '@opentelemetry/core';
 import {
   getInstanceID,
   getLogRecordProcessorsFromConfiguration,
@@ -52,7 +53,8 @@ export function startNodeSDK(sdkOptions: SDKOptions): {
     return NOOP_SDK;
   }
   if (config.log_level != null) {
-    diag.setLogger(new DiagConsoleLogger(), { logLevel: config.log_level });
+    const logLevel = diagLogLevelFromString(String(config.log_level));
+    diag.setLogger(new DiagConsoleLogger(), { logLevel });
   }
 
   registerInstrumentations({
@@ -85,7 +87,7 @@ const NOOP_SDK = {
  * Interpret configuration model and return SDK components.
  */
 function create(
-  config: ConfigurationModel,
+  config: Configuration,
   sdkOptions: SDKOptions
 ): SDKComponents {
   const defaultContextManager = new AsyncLocalStorageContextManager();
@@ -117,7 +119,7 @@ function create(
 }
 
 export function setupResource(
-  config: ConfigurationModel,
+  config: Configuration,
   sdkOptions: SDKOptions
 ): Resource {
   let resource: Resource =
