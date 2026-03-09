@@ -10,6 +10,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(otlp-grpc-exporter): add gRPC channelOptions as config parameter [#6332](https://github.com/open-telemetry/opentelemetry-js/pull/6332) @vitorvasc
+
 ### :bug: Bug Fixes
 
 * fix(opentelemetry-instrumentation): access `require` via `globalThis` to avoid webpack analysis [#6481](https://github.com/open-telemetry/opentelemetry-js/pull/6481) @overbalance
