@@ -2,11 +2,11 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import {
+import type {
   ConfigFactory,
   ConfigurationModel,
-  createConfigFactory,
 } from '@opentelemetry/configuration';
+import { createConfigFactory } from '@opentelemetry/configuration';
 import {
   context,
   diag,
@@ -28,12 +28,14 @@ import type { SDKComponents, SDKOptions } from './types';
 import { LoggerProvider } from '@opentelemetry/sdk-logs';
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { logs } from '@opentelemetry/api-logs';
-import {
-  defaultResource,
-  detectResources,
+import type {
   Resource,
   ResourceDetectionConfig,
   ResourceDetector,
+} from '@opentelemetry/resources';
+import {
+  defaultResource,
+  detectResources,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';

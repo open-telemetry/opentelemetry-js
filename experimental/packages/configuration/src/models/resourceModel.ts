@@ -4,7 +4,7 @@
  */
 'use strict';
 
-import { IncludeExclude } from './commonModel';
+import type { IncludeExclude } from './commonModel';
 
 export interface Resource {
   /**

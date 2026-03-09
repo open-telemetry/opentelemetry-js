@@ -4,8 +4,8 @@
  */
 
 import { InstrumentationAbstract } from '../../instrumentation';
-import * as types from '../../types';
-import { InstrumentationConfig } from '../../types';
+import type * as types from '../../types';
+import type { InstrumentationConfig } from '../../types';
 
 /**
  * Base abstract class for instrumenting web plugins

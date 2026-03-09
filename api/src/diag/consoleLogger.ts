@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { DiagLogger, DiagLogFunction } from './types';
+import type { DiagLogger, DiagLogFunction } from './types';
 
 type ConsoleMapKeys = 'error' | 'warn' | 'info' | 'debug' | 'trace';
 const consoleMap: { n: keyof DiagLogger; c: ConsoleMapKeys }[] = [

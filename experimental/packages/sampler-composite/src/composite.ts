@@ -2,21 +2,18 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import {
+import type {
   Context,
   SpanKind,
   Attributes,
   Link,
   TraceState,
-  trace,
 } from '@opentelemetry/api';
+import { trace } from '@opentelemetry/api';
 import { TraceState as CoreTraceState } from '@opentelemetry/core';
-import {
-  Sampler,
-  SamplingDecision,
-  SamplingResult,
-} from '@opentelemetry/sdk-trace-base';
-import { ComposableSampler } from './types';
+import type { Sampler, SamplingResult } from '@opentelemetry/sdk-trace-base';
+import { SamplingDecision } from '@opentelemetry/sdk-trace-base';
+import type { ComposableSampler } from './types';
 import { parseOtelTraceState, serializeTraceState } from './tracestate';
 import {
   INVALID_THRESHOLD,

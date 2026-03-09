@@ -34,24 +34,23 @@ import {
   assertServiceInstanceIdIsUUID,
   assertServiceResource,
 } from './util/resource-assertions';
+import type { IdGenerator, SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
   BatchSpanProcessor,
   NoopSpanProcessor,
-  IdGenerator,
   AlwaysOffSampler,
-  SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
 import { NodeSDK } from '../src';
+import type { DetectedResource } from '@opentelemetry/resources';
 import {
   envDetector,
   processDetector,
   hostDetector,
   serviceInstanceIdDetector,
-  DetectedResource,
   defaultResource,
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';

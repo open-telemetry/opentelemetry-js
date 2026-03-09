@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { InstrumentSelectorCriteria } from './InstrumentSelector';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
+import type { InstrumentSelectorCriteria } from './InstrumentSelector';
+import type { InstrumentDescriptor } from '../InstrumentDescriptor';
 
 export function getIncompatibilityDetails(
   existing: InstrumentDescriptor,

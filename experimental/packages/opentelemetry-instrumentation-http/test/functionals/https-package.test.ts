@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { context, SpanKind, propagation, Span } from '@opentelemetry/api';
+import type { Span } from '@opentelemetry/api';
+import { context, SpanKind, propagation } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
@@ -20,7 +21,7 @@ const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
 instrumentation.disable();
 
-import * as http from 'http';
+import type * as http from 'http';
 import * as superagent from 'superagent';
 import * as nock from 'nock';
 import * as axios from 'axios';

@@ -10,15 +10,15 @@ import {
   loggingErrorHandler,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
+import type { Resource } from '@opentelemetry/resources';
 import {
   defaultResource,
-  Resource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
 
+import type { LogRecordExporter } from './../../../src';
 import {
   InMemoryLogRecordExporter,
-  LogRecordExporter,
   SimpleLogRecordProcessor,
 } from './../../../src';
 import { LoggerProviderSharedState } from '../../../src/internal/LoggerProviderSharedState';

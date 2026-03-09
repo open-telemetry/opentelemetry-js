@@ -11,7 +11,8 @@ import type {
   SeverityNumber,
 } from '@opentelemetry/api-logs';
 import * as api from '@opentelemetry/api';
-import { timeInputToHrTime, InstrumentationScope } from '@opentelemetry/core';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import { timeInputToHrTime } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import {
   ATTR_EXCEPTION_MESSAGE,
@@ -21,7 +22,7 @@ import {
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
 import { isLogAttributeValue } from './utils/validation';
-import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
+import type { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 
 export class LogRecordImpl implements ReadableLogRecord {
   readonly hrTime: api.HrTime;

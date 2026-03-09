@@ -5,19 +5,16 @@
 
 import * as assert from 'assert';
 import * as nock from 'nock';
-import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
-import {
-  ExportResult,
-  hrTimeToMicroseconds,
-  ExportResultCode,
-} from '@opentelemetry/core';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { ExportResult } from '@opentelemetry/core';
+import { hrTimeToMicroseconds, ExportResultCode } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import {
   emptyResource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
 import { ZipkinExporter } from '../../src';
-import * as zipkinTypes from '../../src/types';
+import type * as zipkinTypes from '../../src/types';
 import { TraceFlags } from '@opentelemetry/api';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 

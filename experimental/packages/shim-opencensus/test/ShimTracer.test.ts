@@ -7,13 +7,13 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as oc from '@opencensus/core';
 import { ShimTracer, getRootSpan } from '../src/ShimTracer';
+import type { Tracer } from '@opentelemetry/api';
 import {
   INVALID_SPANID,
   INVALID_TRACEID,
   SpanKind,
   context,
   createContextKey,
-  Tracer,
 } from '@opentelemetry/api';
 import { withTestTracer, setupNodeContextManager } from './util';
 

@@ -3,25 +3,23 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   Accumulation,
   AccumulationRecord,
   Aggregator,
-  AggregatorKind,
   ExponentialHistogram,
 } from './types';
-import {
-  DataPointType,
-  ExponentialHistogramMetricData,
-  InstrumentType,
-} from '../export/MetricData';
-import { diag, HrTime } from '@opentelemetry/api';
-import { Maybe } from '../utils';
-import { AggregationTemporality } from '../export/AggregationTemporality';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
+import { AggregatorKind } from './types';
+import type { ExponentialHistogramMetricData } from '../export/MetricData';
+import { DataPointType, InstrumentType } from '../export/MetricData';
+import type { HrTime } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
+import type { Maybe } from '../utils';
+import type { AggregationTemporality } from '../export/AggregationTemporality';
+import type { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Buckets } from './exponential-histogram/Buckets';
 import { getMapping } from './exponential-histogram/mapping/getMapping';
-import { Mapping } from './exponential-histogram/mapping/types';
+import type { Mapping } from './exponential-histogram/mapping/types';
 import { nextGreaterSquare } from './exponential-histogram/util';
 
 /**

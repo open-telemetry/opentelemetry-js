@@ -4,7 +4,8 @@
  */
 import { ExponentMapping } from './ExponentMapping';
 import { LogarithmMapping } from './LogarithmMapping';
-import { MappingError, Mapping } from './types';
+import type { Mapping } from './types';
+import { MappingError } from './types';
 
 const MIN_SCALE = -10;
 const MAX_SCALE = 20;

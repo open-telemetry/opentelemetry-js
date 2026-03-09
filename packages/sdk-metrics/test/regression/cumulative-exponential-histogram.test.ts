@@ -5,15 +5,15 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import type { AggregationOption } from '../../src';
 import {
-  AggregationOption,
   AggregationTemporality,
   AggregationType,
   InstrumentType,
   MeterProvider,
 } from '../../src';
 import { TestMetricReader } from '../export/TestMetricReader';
-import { IMetricReader } from '../../src/export/MetricReader';
+import type { IMetricReader } from '../../src/export/MetricReader';
 
 describe('cumulative-exponential-histogram', () => {
   let clock: sinon.SinonFakeTimers;

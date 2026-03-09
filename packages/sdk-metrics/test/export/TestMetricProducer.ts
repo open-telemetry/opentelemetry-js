@@ -3,8 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { CollectionResult, ResourceMetrics } from '../../src/export/MetricData';
-import { MetricProducer } from '../../src/export/MetricProducer';
+import type {
+  CollectionResult,
+  ResourceMetrics,
+} from '../../src/export/MetricData';
+import type { MetricProducer } from '../../src/export/MetricProducer';
 import { testResource } from '../util';
 
 export const emptyResourceMetrics = {

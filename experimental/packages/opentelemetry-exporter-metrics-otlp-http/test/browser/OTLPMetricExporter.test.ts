@@ -4,8 +4,8 @@
  */
 
 import { AggregationTemporalityPreference } from '../../src';
+import type { AggregationOption } from '@opentelemetry/sdk-metrics';
 import {
-  AggregationOption,
   AggregationTemporality,
   AggregationType,
   InstrumentType,

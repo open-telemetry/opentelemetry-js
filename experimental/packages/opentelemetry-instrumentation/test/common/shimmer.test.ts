@@ -40,7 +40,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import shimmer from '../../src/shimmer';
-import { ShimWrapped } from '../../src';
+import type { ShimWrapped } from '../../src';
 
 describe('Shimmer', function () {
   describe('init', function () {

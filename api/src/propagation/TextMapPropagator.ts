@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context } from '../context/types';
+import type { Context } from '../context/types';
 
 /**
  * Injects `Context` into and extracts it from carriers that travel

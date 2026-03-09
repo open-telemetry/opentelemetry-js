@@ -6,7 +6,7 @@
 import type { Resource } from '@opentelemetry/resources';
 import type { SeverityNumber } from '@opentelemetry/api-logs';
 import type { InstrumentationScope } from '@opentelemetry/core';
-import { LogRecordProcessor } from './LogRecordProcessor';
+import type { LogRecordProcessor } from './LogRecordProcessor';
 
 /**
  * A LoggerConfig defines various configurable aspects of a Logger's behavior.

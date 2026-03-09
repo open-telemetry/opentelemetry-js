@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as api from '@opentelemetry/api';
+import type * as api from '@opentelemetry/api';
 
 /**
  * method "open" from XMLHttpRequest

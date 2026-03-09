@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { OtlpSharedConfiguration } from '@opentelemetry/otlp-exporter-base';
 import {
   getSharedConfigurationDefaults,
   mergeOtlpSharedConfigurationWithDefaults,
-  OtlpSharedConfiguration,
 } from '@opentelemetry/otlp-exporter-base';
 import {
   createEmptyMetadata,

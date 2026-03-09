@@ -4,9 +4,9 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { Resource } from './Resource';
+import type { Resource } from './Resource';
 import { emptyResource, resourceFromDetectedResource } from './ResourceImpl';
-import { ResourceDetectionConfig } from './config';
+import type { ResourceDetectionConfig } from './config';
 
 /**
  * Runs all resource detectors and returns the results merged into a single Resource.

@@ -9,7 +9,7 @@ import * as assert from 'assert';
 import { SumAggregator } from '../../src/aggregator';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { DataPointType } from '../../src/export/MetricData';
-import { MetricCollectorHandle } from '../../src/state/MetricCollector';
+import type { MetricCollectorHandle } from '../../src/state/MetricCollector';
 import { SyncMetricStorage } from '../../src/state/SyncMetricStorage';
 import { createNoopAttributesProcessor } from '../../src/view/AttributesProcessor';
 import {

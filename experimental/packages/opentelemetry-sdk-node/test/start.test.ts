@@ -21,12 +21,12 @@ import {
   assertServiceInstanceIdIsUUID,
   assertServiceResource,
 } from './util/resource-assertions';
+import type { DetectedResource } from '@opentelemetry/resources';
 import {
   envDetector,
   processDetector,
   hostDetector,
   serviceInstanceIdDetector,
-  DetectedResource,
 } from '@opentelemetry/resources';
 import { logs } from '@opentelemetry/api-logs';
 import {
@@ -34,11 +34,11 @@ import {
   ConsoleLogRecordExporter,
   BatchLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
-import {
+import type {
   ConfigFactory,
-  createConfigFactory,
   LogRecordExporterModel,
 } from '@opentelemetry/configuration';
+import { createConfigFactory } from '@opentelemetry/configuration';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';

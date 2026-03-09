@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { DiagLogFunction, DiagLogger, DiagLogLevel } from '../types';
+import type { DiagLogFunction, DiagLogger } from '../types';
+import { DiagLogLevel } from '../types';
 
 export function createLogLevelDiagLogger(
   maxLevel: DiagLogLevel,

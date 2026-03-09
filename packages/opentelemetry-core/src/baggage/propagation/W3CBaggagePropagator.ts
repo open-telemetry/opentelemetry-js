@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   BaggageEntry,
   Context,
-  propagation,
   TextMapGetter,
   TextMapPropagator,
   TextMapSetter,
 } from '@opentelemetry/api';
+import { propagation } from '@opentelemetry/api';
 
 import { isTracingSuppressed } from '../../trace/suppress-tracing';
 import {

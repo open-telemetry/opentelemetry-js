@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { InstrumentationModuleFile } from './types';
+import type { InstrumentationModuleFile } from './types';
 import { normalize } from './platform/index';
 
 export class InstrumentationNodeModuleFile

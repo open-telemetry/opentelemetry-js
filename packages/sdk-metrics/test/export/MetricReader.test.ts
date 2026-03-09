@@ -8,11 +8,11 @@ import * as sinon from 'sinon';
 import { MeterProvider } from '../../src/MeterProvider';
 import { emptyResourceMetrics, TestMetricProducer } from './TestMetricProducer';
 import { TestMetricReader } from './TestMetricReader';
+import type { ScopeMetrics } from '../../src';
 import {
   AggregationTemporality,
   AggregationType,
   DataPointType,
-  ScopeMetrics,
 } from '../../src';
 import {
   DEFAULT_AGGREGATION_SELECTOR,

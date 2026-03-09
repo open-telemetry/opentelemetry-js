@@ -4,14 +4,14 @@
  */
 
 import { ContextAPI } from '../api/context';
-import { Context } from '../context/types';
+import type { Context } from '../context/types';
 import { getSpanContext, setSpan } from '../trace/context-utils';
 import { NonRecordingSpan } from './NonRecordingSpan';
-import { Span } from './span';
+import type { Span } from './span';
 import { isSpanContextValid } from './spancontext-utils';
-import { SpanOptions } from './SpanOptions';
-import { SpanContext } from './span_context';
-import { Tracer } from './tracer';
+import type { SpanOptions } from './SpanOptions';
+import type { SpanContext } from './span_context';
+import type { Tracer } from './tracer';
 
 const contextApi = ContextAPI.getInstance();
 

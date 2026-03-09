@@ -4,7 +4,8 @@
  */
 import * as ieee754 from './ieee754';
 import * as util from '../util';
-import { Mapping, MappingError } from './types';
+import type { Mapping } from './types';
+import { MappingError } from './types';
 
 /**
  * ExponentMapping implements exponential mapping functions for

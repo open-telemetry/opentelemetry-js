@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { IdGenerator } from '../../IdGenerator';
+import type { IdGenerator } from '../../IdGenerator';
 
 const SPAN_ID_BYTES = 8;
 const TRACE_ID_BYTES = 16;

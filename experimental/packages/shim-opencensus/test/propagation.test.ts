@@ -5,7 +5,7 @@
 
 import { shimPropagation } from '../src/propagation';
 
-import * as oc from '@opencensus/core';
+import type * as oc from '@opencensus/core';
 import { propagation } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
 import * as assert from 'assert';

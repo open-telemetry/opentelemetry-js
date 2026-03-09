@@ -5,16 +5,8 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
-  context,
-  ProxyTracer,
-  ROOT_CONTEXT,
-  Span,
-  SpanKind,
-  SpanOptions,
-  Tracer,
-  TracerProvider,
-} from '../../../src';
+import type { Span, SpanOptions, Tracer, TracerProvider } from '../../../src';
+import { context, ProxyTracer, ROOT_CONTEXT, SpanKind } from '../../../src';
 import { NonRecordingSpan } from '../../../src/trace/NonRecordingSpan';
 import { NoopTracer } from '../../../src/trace/NoopTracer';
 import { ProxyTracerProvider } from '../../../src/trace/ProxyTracerProvider';

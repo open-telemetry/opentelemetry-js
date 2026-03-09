@@ -4,14 +4,14 @@
  */
 
 import { diag } from '@opentelemetry/api';
+import type { ExportResult } from '@opentelemetry/core';
 import {
   BindOnceFuture,
-  ExportResult,
   ExportResultCode,
   getNumberFromEnv,
   getStringFromEnv,
 } from '@opentelemetry/core';
-import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { Socket } from 'dgram';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { spanToThrift } from './transform';

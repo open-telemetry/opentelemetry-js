@@ -6,7 +6,7 @@
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { promises as fs } from 'fs';
-import { PromiseWithChild } from 'child_process';
+import type { PromiseWithChild } from 'child_process';
 import * as util from '../../../../src/detectors/platform/node/machine-id/execAsync';
 import { getMachineId } from '../../../../src/detectors/platform/node/machine-id/getMachineId-bsd';
 

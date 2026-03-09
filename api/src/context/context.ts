@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context } from './types';
+import type { Context } from './types';
 
 /**
  * Get a key to uniquely identify a context value

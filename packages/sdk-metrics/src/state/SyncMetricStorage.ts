@@ -3,17 +3,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context, HrTime, Attributes } from '@opentelemetry/api';
-import { WritableMetricStorage } from './WritableMetricStorage';
-import { Accumulation, Aggregator } from '../aggregator/types';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
-import { IAttributesProcessor } from '../view/AttributesProcessor';
+import type { Context, HrTime, Attributes } from '@opentelemetry/api';
+import type { WritableMetricStorage } from './WritableMetricStorage';
+import type { Accumulation, Aggregator } from '../aggregator/types';
+import type { InstrumentDescriptor } from '../InstrumentDescriptor';
+import type { IAttributesProcessor } from '../view/AttributesProcessor';
 import { MetricStorage } from './MetricStorage';
-import { MetricData } from '../export/MetricData';
+import type { MetricData } from '../export/MetricData';
 import { DeltaMetricProcessor } from './DeltaMetricProcessor';
 import { TemporalMetricProcessor } from './TemporalMetricProcessor';
-import { Maybe } from '../utils';
-import { MetricCollectorHandle } from './MetricCollector';
+import type { Maybe } from '../utils';
+import type { MetricCollectorHandle } from './MetricCollector';
 
 /**
  * Internal interface.

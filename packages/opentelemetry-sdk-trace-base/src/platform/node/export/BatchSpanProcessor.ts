@@ -4,7 +4,7 @@
  */
 
 import { BatchSpanProcessorBase } from '../../../export/BatchSpanProcessorBase';
-import { BufferConfig } from '../../../types';
+import type { BufferConfig } from '../../../types';
 
 export class BatchSpanProcessor extends BatchSpanProcessorBase<BufferConfig> {
   protected onShutdown(): void {}
