@@ -591,38 +591,41 @@ export class ExponentialHistogramAggregator
       descriptor,
       aggregationTemporality,
       dataPointType: DataPointType.EXPONENTIAL_HISTOGRAM,
-      dataPoints: accumulationByAttributes.map(([attributes, accumulation]) => {
-        const pointValue = accumulation.toPointValue();
+      dataPoints: accumulationByAttributes.map(
+        ([attributes, accumulation, exemplars]) => {
+          const pointValue = accumulation.toPointValue();
 
-        // determine if instrument allows negative values.
-        const allowsNegativeValues =
-          descriptor.type === InstrumentType.GAUGE ||
-          descriptor.type === InstrumentType.UP_DOWN_COUNTER ||
-          descriptor.type === InstrumentType.OBSERVABLE_GAUGE ||
-          descriptor.type === InstrumentType.OBSERVABLE_UP_DOWN_COUNTER;
+          // determine if instrument allows negative values.
+          const allowsNegativeValues =
+            descriptor.type === InstrumentType.GAUGE ||
+            descriptor.type === InstrumentType.UP_DOWN_COUNTER ||
+            descriptor.type === InstrumentType.OBSERVABLE_GAUGE ||
+            descriptor.type === InstrumentType.OBSERVABLE_UP_DOWN_COUNTER;
 
-        return {
-          attributes,
-          startTime: accumulation.startTime,
-          endTime,
-          value: {
-            min: pointValue.hasMinMax ? pointValue.min : undefined,
-            max: pointValue.hasMinMax ? pointValue.max : undefined,
-            sum: !allowsNegativeValues ? pointValue.sum : undefined,
-            positive: {
-              offset: pointValue.positive.offset,
-              bucketCounts: pointValue.positive.bucketCounts,
+          const dp = {
+            attributes,
+            startTime: accumulation.startTime,
+            endTime,
+            value: {
+              min: pointValue.hasMinMax ? pointValue.min : undefined,
+              max: pointValue.hasMinMax ? pointValue.max : undefined,
+              sum: !allowsNegativeValues ? pointValue.sum : undefined,
+              positive: {
+                offset: pointValue.positive.offset,
+                bucketCounts: pointValue.positive.bucketCounts,
+              },
+              negative: {
+                offset: pointValue.negative.offset,
+                bucketCounts: pointValue.negative.bucketCounts,
+              },
+              count: pointValue.count,
+              scale: pointValue.scale,
+              zeroCount: pointValue.zeroCount,
             },
-            negative: {
-              offset: pointValue.negative.offset,
-              bucketCounts: pointValue.negative.bucketCounts,
-            },
-            count: pointValue.count,
-            scale: pointValue.scale,
-            zeroCount: pointValue.zeroCount,
-          },
-        };
-      }),
+          };
+          return exemplars?.length ? { ...dp, exemplars } : dp;
+        }
+      ),
     };
   }
 }

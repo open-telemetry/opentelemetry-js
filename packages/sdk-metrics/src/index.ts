@@ -63,3 +63,13 @@ export {
 } from './view/AttributesProcessor';
 
 export { TimeoutError } from './utils';
+
+export type { Exemplar } from './exemplar/Exemplar';
+export type { ExemplarFilter } from './exemplar/ExemplarFilter';
+export type { ExemplarReservoir } from './exemplar/ExemplarReservoir';
+export { AlwaysSampleExemplarFilter } from './exemplar/AlwaysSampleExemplarFilter';
+export { NeverSampleExemplarFilter } from './exemplar/NeverSampleExemplarFilter';
+export { WithTraceExemplarFilter } from './exemplar/WithTraceExemplarFilter';
+export { SimpleFixedSizeExemplarReservoir } from './exemplar/SimpleFixedSizeExemplarReservoir';
+export { AlignedHistogramBucketExemplarReservoir } from './exemplar/AlignedHistogramBucketExemplarReservoir';
+export { FixedSizeExemplarReservoirBase } from './exemplar/ExemplarReservoir';
