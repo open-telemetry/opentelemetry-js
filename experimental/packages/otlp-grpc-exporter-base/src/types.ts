@@ -10,9 +10,9 @@ import type { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
  * OTLP Exporter Config for Node
  */
 export interface OTLPGRPCExporterConfigNode {
-  url?: string;               
-  concurrencyLimit?: number;  
-  timeoutMillis?: number;     
+  url?: string;
+  concurrencyLimit?: number;
+  timeoutMillis?: number;
   credentials?: ChannelCredentials;
   metadata?: Metadata;
   compression?: CompressionAlgorithm;

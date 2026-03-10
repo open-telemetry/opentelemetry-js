@@ -20,7 +20,6 @@ export function convertLegacyOtlpGrpcOptions(
   config: OTLPGRPCExporterConfigNode,
   signalIdentifier: string
 ): OtlpGrpcConfiguration {
-
   // keep credentials locally in case user updates the reference on the config object
   const userProvidedCredentials = config.credentials;
   return mergeOtlpGrpcConfigurationWithDefaults(
