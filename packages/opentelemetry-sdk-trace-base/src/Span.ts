@@ -9,6 +9,7 @@ import type {
   HrTime,
   Link,
   Span as APISpan,
+  SpanOptions as APISpanOptions,
   Attributes,
   AttributeValue,
   SpanContext,
@@ -47,21 +48,22 @@ import type { SpanLimits } from './types';
  */
 export type Span = APISpan & ReadableSpan;
 
-interface SpanOptions {
+// `root` is omitted because it is consumed by Tracer.startSpan() to strip
+// parent context but it has no meaning when constructing a Span directly.
+type SpanOptions = Omit<APISpanOptions, 'root'> & {
   resource: Resource;
   scope: InstrumentationScope;
   context: Context;
   spanContext: SpanContext;
   name: string;
+  // Required here to override optional `kind` from the API's SpanOptions
+  // SpanImpl assigns it unconditionally and ReadableSpan expects it to be set.
   kind: SpanKind;
   parentSpanContext?: SpanContext;
-  links?: Link[];
-  startTime?: TimeInput;
-  attributes?: Attributes;
   spanLimits: SpanLimits;
   spanProcessor: SpanProcessor;
   recordEndMetrics?: () => void;
-}
+};
 
 /**
  * This class represents a span.
