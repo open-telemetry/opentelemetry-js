@@ -4,16 +4,15 @@
  */
 
 import type { ChannelCredentials, Metadata } from '@grpc/grpc-js';
-
-import type {
-  CompressionAlgorithm,
-  OTLPExporterConfigBase,
-} from '@opentelemetry/otlp-exporter-base';
+import type { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 
 /**
  * OTLP Exporter Config for Node
  */
-export interface OTLPGRPCExporterConfigNode extends OTLPExporterConfigBase {
+export interface OTLPGRPCExporterConfigNode {
+  url?: string;               
+  concurrencyLimit?: number;  
+  timeoutMillis?: number;     
   credentials?: ChannelCredentials;
   metadata?: Metadata;
   compression?: CompressionAlgorithm;
