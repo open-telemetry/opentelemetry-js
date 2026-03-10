@@ -99,8 +99,7 @@ export interface ExperimentalResourceDetector {
   process?: object;
 
   /**
-   * Enable the service detector, which populates service.name based on the OTEL_SERVICE_NAME
-   * environment variable and service.instance.id.
+   * Enable the service detector, which populates service.instance.id.
    */
   service?: object;
 }

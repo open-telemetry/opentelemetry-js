@@ -251,11 +251,11 @@ const configFromKitchenSinkFile: ConfigurationModel = {
       },
       detectors: [
         { container: {} },
+        { env: {} },
         { host: {} },
         { os: {} },
         { process: {} },
         { service: {} },
-        { env: {} },
       ],
     },
   },
