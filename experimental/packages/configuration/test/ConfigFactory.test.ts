@@ -2369,15 +2369,13 @@ describe('ConfigFactory', function () {
 
   describe('get values from config file', function () {
     it('should initialize config with default values from valid config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/sdk-config.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/sdk-config.yaml';
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), configFromFile);
     });
 
     it('should initialize config with default values from longer valid config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/kitchen-sink.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/kitchen-sink.yaml';
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(
         configFactory.getConfigModel(),
@@ -2442,17 +2440,17 @@ describe('ConfigFactory', function () {
 
     it('should return error from invalid config file', function () {
       const warnSpy = Sinon.spy(diag, 'warn');
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = './fixtures/invalid.txt';
+      process.env.OTEL_CONFIG_FILE = './fixtures/invalid.txt';
       createConfigFactory();
       Sinon.assert.calledWith(
         warnSpy,
-        'Config file ./fixtures/invalid.txt set on OTEL_EXPERIMENTAL_CONFIG_FILE is not valid'
+        'Config file ./fixtures/invalid.txt set on OTEL_CONFIG_FILE is not valid'
       );
     });
 
     it('should return error from invalid config file format', function () {
       const warnSpy = Sinon.spy(diag, 'warn');
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
       createConfigFactory();
       Sinon.assert.calledWith(
         warnSpy,
@@ -2461,20 +2459,19 @@ describe('ConfigFactory', function () {
     });
 
     it('should initialize config with default values with empty string for config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = '';
+      process.env.OTEL_CONFIG_FILE = '';
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
     });
 
     it('should initialize config with default values with all whitespace for config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = '  ';
+      process.env.OTEL_CONFIG_FILE = '  ';
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
     });
 
     it('should initialize config with default values from valid short config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/short-config.yml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/short-config.yml';
       const configFactory = createConfigFactory();
       const expectedConfig: ConfigurationModel = {
         disabled: false,
@@ -2497,8 +2494,7 @@ describe('ConfigFactory', function () {
     });
 
     it('should initialize config with config file that contains environment variables', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/sdk-migration-config.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/sdk-migration-config.yaml';
       process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://test.com:4318';
       process.env.OTEL_SDK_DISABLED = 'false';
       process.env.OTEL_LOG_LEVEL = 'debug';
@@ -2695,8 +2691,7 @@ describe('ConfigFactory', function () {
     });
 
     it('should initialize config with fallbacks defined in config file when corresponding environment variables are not defined', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/sdk-migration-config.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/sdk-migration-config.yaml';
 
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(
@@ -2707,8 +2702,7 @@ describe('ConfigFactory', function () {
 
     it('checks for incomplete providers', function () {
       const warnSpy = Sinon.spy(diag, 'warn');
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/invalid-providers.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid-providers.yaml';
       createConfigFactory();
       Sinon.assert.calledWith(
         warnSpy.firstCall,
@@ -2725,8 +2719,7 @@ describe('ConfigFactory', function () {
     });
 
     it('check resources priority', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/resources.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/resources.yaml';
       const configFactory = createConfigFactory();
       const expectedConfig: ConfigurationModel = {
         disabled: false,
@@ -2801,8 +2794,7 @@ describe('ConfigFactory', function () {
     });
 
     it('checks to keep good code coverage', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/test-for-coverage.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/test-for-coverage.yaml';
 
       let config = {};
       parseConfigFile(config);

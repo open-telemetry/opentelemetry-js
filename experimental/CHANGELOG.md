@@ -8,6 +8,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* feat(configuration)!: rename OTEL_EXPERIMENTAL_CONFIG_FILE to OTEL_CONFIG_FILE [#6486](https://github.com/open-telemetry/opentelemetry-js/pull/6486) @maryliag
+
 ### :rocket: Features
 
 * feat(configuration): add sampler configuration parsing support [#6409](https://github.com/open-telemetry/opentelemetry-js/pull/6409) @MikeGoldsmith
@@ -16,6 +18,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :bug: Bug Fixes
 
 * fix(opentelemetry-instrumentation): access `require` via `globalThis` to avoid webpack analysis [#6481](https://github.com/open-telemetry/opentelemetry-js/pull/6481) @overbalance
+* fix(sdk-logs): fix inflated `droppedAttributesCount` when updating existing attribute keys [#6479](https://github.com/open-telemetry/opentelemetry-js/pull/6479) @overbalance
 
 ### :books: Documentation
 
