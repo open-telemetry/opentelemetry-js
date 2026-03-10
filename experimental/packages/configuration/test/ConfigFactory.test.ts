@@ -1,33 +1,24 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
-import { ConfigurationModel } from '../src';
+import type { ConfigurationModel } from '../src';
 import { diag, DiagLogLevel } from '@opentelemetry/api';
 import { createConfigFactory } from '../src/ConfigFactory';
 import { OtlpHttpEncoding, SeverityNumber } from '../src/models/commonModel';
+import type {
+  MeterProvider,
+  MetricReader,
+} from '../src/models/meterProviderModel';
 import {
   ExemplarFilter,
   ExperimentalPrometheusTranslationStrategy,
   ExporterDefaultHistogramAggregation,
   ExporterTemporalityPreference,
   InstrumentType,
-  MeterProvider,
-  MetricReader,
 } from '../src/models/meterProviderModel';
 import {
   setAttributeLimits,
@@ -44,7 +35,7 @@ import {
   getTemporalityPreference,
   getSeverity,
 } from '../src/FileConfigFactory';
-import { TracerProvider } from '../src/models/tracerProviderModel';
+import type { TracerProvider } from '../src/models/tracerProviderModel';
 
 const defaultConfig: ConfigurationModel = {
   disabled: false,
@@ -2112,15 +2103,13 @@ describe('ConfigFactory', function () {
 
   describe('get values from config file', function () {
     it('should initialize config with default values from valid config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/sdk-config.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/sdk-config.yaml';
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), configFromFile);
     });
 
     it('should initialize config with default values from longer valid config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/kitchen-sink.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/kitchen-sink.yaml';
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(
         configFactory.getConfigModel(),
@@ -2130,17 +2119,17 @@ describe('ConfigFactory', function () {
 
     it('should return error from invalid config file', function () {
       const warnSpy = Sinon.spy(diag, 'warn');
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = './fixtures/invalid.txt';
+      process.env.OTEL_CONFIG_FILE = './fixtures/invalid.txt';
       createConfigFactory();
       Sinon.assert.calledWith(
         warnSpy,
-        'Config file ./fixtures/invalid.txt set on OTEL_EXPERIMENTAL_CONFIG_FILE is not valid'
+        'Config file ./fixtures/invalid.txt set on OTEL_CONFIG_FILE is not valid'
       );
     });
 
     it('should return error from invalid config file format', function () {
       const warnSpy = Sinon.spy(diag, 'warn');
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
       createConfigFactory();
       Sinon.assert.calledWith(
         warnSpy,
@@ -2149,20 +2138,19 @@ describe('ConfigFactory', function () {
     });
 
     it('should initialize config with default values with empty string for config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = '';
+      process.env.OTEL_CONFIG_FILE = '';
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
     });
 
     it('should initialize config with default values with all whitespace for config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = '  ';
+      process.env.OTEL_CONFIG_FILE = '  ';
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
     });
 
     it('should initialize config with default values from valid short config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/short-config.yml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/short-config.yml';
       const configFactory = createConfigFactory();
       const expectedConfig: ConfigurationModel = {
         disabled: false,
@@ -2185,8 +2173,7 @@ describe('ConfigFactory', function () {
     });
 
     it('should initialize config with config file that contains environment variables', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/sdk-migration-config.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/sdk-migration-config.yaml';
       process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://test.com:4318';
       process.env.OTEL_SDK_DISABLED = 'false';
       process.env.OTEL_LOG_LEVEL = 'debug';
@@ -2383,8 +2370,7 @@ describe('ConfigFactory', function () {
     });
 
     it('should initialize config with fallbacks defined in config file when corresponding environment variables are not defined', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/sdk-migration-config.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/sdk-migration-config.yaml';
 
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(
@@ -2395,8 +2381,7 @@ describe('ConfigFactory', function () {
 
     it('checks for incomplete providers', function () {
       const warnSpy = Sinon.spy(diag, 'warn');
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/invalid-providers.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid-providers.yaml';
       createConfigFactory();
       Sinon.assert.calledWith(
         warnSpy.firstCall,
@@ -2413,8 +2398,7 @@ describe('ConfigFactory', function () {
     });
 
     it('check resources priority', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/resources.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/resources.yaml';
       const configFactory = createConfigFactory();
       const expectedConfig: ConfigurationModel = {
         disabled: false,
@@ -2489,8 +2473,7 @@ describe('ConfigFactory', function () {
     });
 
     it('checks to keep good code coverage', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/test-for-coverage.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/test-for-coverage.yaml';
 
       let config = {};
       parseConfigFile(config);

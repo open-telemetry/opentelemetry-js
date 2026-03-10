@@ -10,8 +10,11 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * feat(sdk-logs)!: add required `forceFlush()` to `LogRecordExporter` interface [#6356](https://github.com/open-telemetry/opentelemetry-js/pull/6356) @pichlermarc
   * (user-facing): `LogRecordExporter` interface now requires a `forceFlush()` method to be implemented. Custom exporters will need to implement this method to continue working with the Logs SDK.
+* feat(configuration)!: rename OTEL_EXPERIMENTAL_CONFIG_FILE to OTEL_CONFIG_FILE [#6486](https://github.com/open-telemetry/opentelemetry-js/pull/6486) @maryliag
 
 ### :rocket: Features
+
+* feat(configuration): export interfaces required in other packages [#6462](https://github.com/open-telemetry/opentelemetry-js/pull/6462) @maryliag
 
 ### :bug: Bug Fixes
 
@@ -19,10 +22,36 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
   * (user-facing) createOtlpSendBeaconExportDelegate will be removed in a future version
 * fix(otlp-transformer): downgrade `protobufjs` to version `^7.0.0` [#6418](https://github.com/open-telemetry/opentelemetry-js/pull/6418) @vitorvasc
 * fix(sdk-logs): invoke exporter forceFlush without first awaiting export [#6356](https://github.com/open-telemetry/opentelemetry-js/pull/6356) @pichlermarc
+* fix(opentelemetry-instrumentation): access `require` via `globalThis` to avoid webpack analysis [#6481](https://github.com/open-telemetry/opentelemetry-js/pull/6481) @overbalance
 
 ### :books: Documentation
 
 ### :house: Internal
+
+* chore: enforce `import type` for type-only imports via ESLint [#6467](https://github.com/open-telemetry/opentelemetry-js/pull/6467) @overbalance
+
+## 0.213.0
+
+### :boom: Breaking Changes
+
+* fix(api-logs)!: drop lingering includeTraceContext from LoggerOptions type [#6451](https://github.com/open-telemetry/opentelemetry-js/pull/6451) @trentm
+
+### :rocket: Features
+
+* feat(instrumentation-http): provide `http.request.header.<key>` at server span creation time [#6396](https://github.com/open-telemetry/opentelemetry-js/pull/6396) @vitorvasc
+
+### :bug: Bug Fixes
+
+* fix(instrumentation-http): guard against double-instrumentation if loaded with `require('http')` and `import 'http'` [#6428](https://github.com/open-telemetry/opentelemetry-js/issues/6428) @trentm
+* fix(otlp-exporter-base): handle response error [#6412](https://github.com/open-telemetry/opentelemetry-js/pull/6412) @pichlermarc
+  * Fixes a bug where when the response header was received, but the connection was reset by the server,
+    an unhandled error would be thrown.
+* fix(otlp-exporter-base): remove sendBeacon in favor of fetch with keepalive [#6391](https://github.com/open-telemetry/opentelemetry-js/pull/6391) @overbalance
+  * (user-facing) createOtlpSendBeaconExportDelegate will be removed in a future version
+* fix(otlp-transformer): downgrade `protobufjs` to version `^7.0.0` [#6418](https://github.com/open-telemetry/opentelemetry-js/pull/6418) @vitorvasc
+* fix(instrumentation-fetch): handle HeadersInit tuple arrays in _addHeaders [#6341](https://github.com/open-telemetry/opentelemetry-js/pull/6341) @overbalance @imadha
+
+* refactor(otlp-exporter-base): promisify sendWithHttp() [#????](https://github.com/open-telemetry/opentelemetry-js/pull/6412) @pichlermarc
 
 ## 0.212.0
 

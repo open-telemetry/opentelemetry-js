@@ -1,26 +1,14 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
-import { ExportResult, ExportResultCode } from '@opentelemetry/core';
-import { AggregationTemporality } from './AggregationTemporality';
-import { ResourceMetrics, InstrumentType } from './MetricData';
-import { PushMetricExporter } from './MetricExporter';
-import {
-  AggregationTemporalitySelector,
-  DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
-} from './AggregationSelector';
+import type { ExportResult } from '@opentelemetry/core';
+import { ExportResultCode } from '@opentelemetry/core';
+import type { AggregationTemporality } from './AggregationTemporality';
+import type { ResourceMetrics, InstrumentType } from './MetricData';
+import type { PushMetricExporter } from './MetricExporter';
+import type { AggregationTemporalitySelector } from './AggregationSelector';
+import { DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR } from './AggregationSelector';
 
 interface ConsoleMetricExporterOptions {
   temporalitySelector?: AggregationTemporalitySelector;

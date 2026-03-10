@@ -1,32 +1,20 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as types from '../../types';
+import type * as types from '../../types';
 import * as path from 'path';
 import { types as utilTypes } from 'util';
 import { satisfies } from '../../semver';
-import { wrap, unwrap, massWrap, massUnwrap } from '../../shimmer';
+import type { massWrap, massUnwrap } from '../../shimmer';
+import { wrap, unwrap } from '../../shimmer';
 import { InstrumentationAbstract } from '../../instrumentation';
-import {
-  RequireInTheMiddleSingleton,
-  Hooked,
-} from './RequireInTheMiddleSingleton';
+import type { Hooked } from './RequireInTheMiddleSingleton';
+import { RequireInTheMiddleSingleton } from './RequireInTheMiddleSingleton';
 import type { HookFn } from 'import-in-the-middle';
 import { Hook as HookImport } from 'import-in-the-middle';
-import {
+import type {
   InstrumentationConfig,
   InstrumentationModuleDefinition,
 } from '../../types';
@@ -144,11 +132,15 @@ export abstract class InstrumentationBase<
   };
 
   private _warnOnPreloadedModules(): void {
+    // Access require via globalThis to prevent webpack from analyzing it as a dependency expression
+    const nodeRequire = globalThis.require;
+    if (!nodeRequire?.resolve || !nodeRequire?.cache) return;
+
     this._modules.forEach((module: InstrumentationModuleDefinition) => {
       const { name } = module;
       try {
-        const resolvedModule = require.resolve(name);
-        if (require.cache[resolvedModule]) {
+        const resolvedModule = nodeRequire.resolve(name);
+        if (nodeRequire.cache[resolvedModule]?.loaded) {
           // Module is already cached, which means the instrumentation hook might not work
           this._diag.warn(
             `Module ${name} has been loaded before ${this.instrumentationName} so it might not work, please initialize it before requiring ${name}`

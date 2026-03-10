@@ -1,22 +1,10 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   Context,
-  diag,
   Exception,
   HrTime,
   Link,
@@ -26,32 +14,32 @@ import {
   SpanContext,
   SpanKind,
   SpanStatus,
-  SpanStatusCode,
   TimeInput,
 } from '@opentelemetry/api';
+import { diag, SpanStatusCode } from '@opentelemetry/api';
+import type { InstrumentationScope } from '@opentelemetry/core';
 import {
   addHrTimes,
   millisToHrTime,
   hrTime,
   hrTimeDuration,
-  InstrumentationScope,
   isAttributeValue,
   isTimeInput,
   isTimeInputHrTime,
   otperformance,
   sanitizeAttributes,
 } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import type { Resource } from '@opentelemetry/resources';
 import {
   ATTR_EXCEPTION_MESSAGE,
   ATTR_EXCEPTION_STACKTRACE,
   ATTR_EXCEPTION_TYPE,
 } from '@opentelemetry/semantic-conventions';
-import { ReadableSpan } from './export/ReadableSpan';
+import type { ReadableSpan } from './export/ReadableSpan';
 import { ExceptionEventName } from './enums';
-import { SpanProcessor } from './SpanProcessor';
-import { TimedEvent } from './TimedEvent';
-import { SpanLimits } from './types';
+import type { SpanProcessor } from './SpanProcessor';
+import type { TimedEvent } from './TimedEvent';
+import type { SpanLimits } from './types';
 
 /**
  * This type provides the properties of @link{ReadableSpan} at the same time
@@ -252,19 +240,26 @@ export class SpanImpl implements Span {
 
   setStatus(status: SpanStatus): this {
     if (this._isSpanEnded()) return this;
-    this.status = { ...status };
+    if (status.code === SpanStatusCode.UNSET) return this;
+    if (this.status.code === SpanStatusCode.OK) return this;
+
+    const newStatus: SpanStatus = { code: status.code };
 
     // When using try-catch, the caught "error" is of type `any`. When then assigning `any` to `status.message`,
     // TypeScript will not error. While this can happen during use of any API, it is more common on Span#setStatus()
     // as it's likely used in a catch-block. Therefore, we validate if `status.message` is actually a string, null, or
     // undefined to avoid an incorrect type causing issues downstream.
-    if (this.status.message != null && typeof status.message !== 'string') {
-      diag.warn(
-        `Dropping invalid status.message of type '${typeof status.message}', expected 'string'`
-      );
-      delete this.status.message;
+    if (status.code === SpanStatusCode.ERROR) {
+      if (typeof status.message === 'string') {
+        newStatus.message = status.message;
+      } else if (status.message != null) {
+        diag.warn(
+          `Dropping invalid status.message of type '${typeof status.message}', expected 'string'`
+        );
+      }
     }
 
+    this.status = newStatus;
     return this;
   }
 
