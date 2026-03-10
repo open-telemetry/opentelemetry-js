@@ -2384,7 +2384,7 @@ describe('ConfigFactory', function () {
     });
 
     it('should parse samplers from config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = 'test/fixtures/samplers.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/samplers.yaml';
       const configFactory = createConfigFactory();
       const config = configFactory.getConfigModel();
       assert.deepStrictEqual(config.tracer_provider?.sampler, {
@@ -2400,7 +2400,7 @@ describe('ConfigFactory', function () {
     });
 
     it('should parse composite sampler with rule_based rules from config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
+      process.env.OTEL_CONFIG_FILE =
         'test/fixtures/composite-sampler-array.yaml';
       const configFactory = createConfigFactory();
       const config = configFactory.getConfigModel();
@@ -2417,7 +2417,7 @@ describe('ConfigFactory', function () {
     });
 
     it('should parse composite sampler with rule_based attribute matching from config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
+      process.env.OTEL_CONFIG_FILE =
         'test/fixtures/composite-sampler-rulebased-full.yaml';
       const configFactory = createConfigFactory();
       const config = configFactory.getConfigModel();
