@@ -17,6 +17,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :bug: Bug Fixes
 
 * fix(opentelemetry-instrumentation): access `require` via `globalThis` to avoid webpack analysis [#6481](https://github.com/open-telemetry/opentelemetry-js/pull/6481) @overbalance
+* fix(sdk-logs): fix inflated `droppedAttributesCount` when updating existing attribute keys [#6479](https://github.com/open-telemetry/opentelemetry-js/pull/6479) @overbalance
 
 ### :books: Documentation
 
