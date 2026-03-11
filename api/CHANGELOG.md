@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 
 * fix(api): prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
 * fix(api): update diag `consoleLogger` to use original console methods to prevent infinite loop when a console instrumentation is present [#6395](https://github.com/open-telemetry/opentelemetry-js/pull/6395)
+* fix(api): use `Attributes` instead of deprecated `SpanAttributes` in `SpanOptions` [#6478](https://github.com/open-telemetry/opentelemetry-js/pull/6478) @overbalance
 
 ### :books: (Refine Doc)
 
