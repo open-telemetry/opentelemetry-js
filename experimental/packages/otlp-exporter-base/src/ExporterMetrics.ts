@@ -27,38 +27,38 @@ import { VERSION } from './version';
 
 const componentCounter = new Map<string, number>();
 
-export interface ExporterMetricsOptions<Request> {
+export interface ExporterMetricsOptions<Internal> {
   componentType: string;
-  signal: IExporterSignal<Request>;
+  signal: IExporterSignal<Internal>;
   url: string | undefined;
   meterProvider: MeterProvider | undefined;
   errorAttributes: (error: unknown) => Attributes;
 }
 
-export interface IExporterSignal<Request> {
+export interface IExporterSignal<Internal> {
   name: 'span' | 'metric_data_point' | 'log';
-  countItems: (request: Request) => number;
+  countItems: (request: Internal) => number;
 }
 
 /**
  * Generates `otel.sdk.exporter.*` metrics.
  * https://opentelemetry.io/docs/specs/semconv/otel/sdk-metrics
  */
-export class ExporterMetrics<Request> {
+export class ExporterMetrics<Internal> {
   private readonly inflight: UpDownCounter;
   private readonly exported: Counter;
   private readonly duration: Histogram;
   private readonly standardAttrs: Attributes;
   private readonly errorAttributes: (error: unknown) => Attributes;
 
-  private readonly signal: IExporterSignal<Request>;
+  private readonly signal: IExporterSignal<Internal>;
 
-  constructor(options: ExporterMetricsOptions<Request>) {
+  constructor(options: ExporterMetricsOptions<Internal>) {
     const { componentType, signal, meterProvider, url, errorAttributes } =
       options;
     this.errorAttributes = errorAttributes;
     const meter = meterProvider
-      ? meterProvider.getMeter('@opentelemetry/core', VERSION)
+      ? meterProvider.getMeter('@opentelemetry/otlp-exporter', VERSION)
       : createNoopMeter();
 
     const counter = componentCounter.get(componentType) ?? 0;
@@ -118,7 +118,7 @@ export class ExporterMetrics<Request> {
     );
   }
 
-  startExport(request: Request): (error: unknown) => void {
+  startExport(request: Internal): (error: unknown) => void {
     const numItems = this.signal.countItems(request);
     const startTime = hrTime();
     this.inflight.add(numItems, this.standardAttrs);
