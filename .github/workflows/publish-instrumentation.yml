@@ -24,9 +24,11 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - run: |
           npm install --workspaces=false --include=dev
-          ./node_modules/.bin/tsc -p tsconfig.json
+          printf '%s\n' '{' '  "extends": "./tsconfig.json",' '  "include": ["src/**/*.ts"]' '}' > tsconfig.publish.cjs.json
+          ./node_modules/.bin/tsc -p tsconfig.publish.cjs.json
           ./node_modules/.bin/tsc -p tsconfig.esm.json
           ./node_modules/.bin/tsc -p tsconfig.esnext.json
+          rm -f tsconfig.publish.cjs.json
           npm pkg set name=@coralogix/instrumentation
           npm publish --ignore-scripts --access public
         working-directory: ./experimental/packages/opentelemetry-instrumentation
