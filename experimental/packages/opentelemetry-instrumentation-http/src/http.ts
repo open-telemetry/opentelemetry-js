@@ -98,7 +98,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       process.env.OTEL_SEMCONV_STABILITY_OPT_IN
     );
     this._headerCapture = this._createHeaderCapture(this._semconvStability);
-    console.log('XXX [instr-http] done the ctor');
   }
 
   protected override _updateMetricInstruments() {
@@ -205,18 +204,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       (moduleExports: Http): Http => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const isESM = (moduleExports as any)[Symbol.toStringTag] === 'Module';
-        console.log(
-          'XXX patch http: isEsm=%s',
-          isESM,
-          moduleExports?.request,
-          (moduleExports as any).default?.request
-        );
 
         if (
           !this.getConfig().disableOutgoingRequestInstrumentation &&
           !isWrapped(moduleExports.request)
         ) {
-          console.log('XXX [instr-http] hooking moduleExports.*');
           const patchedRequest = this._wrap(
             moduleExports,
             'request',
@@ -228,7 +220,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             this._getPatchOutgoingGetFunction(patchedRequest)
           );
           if (isESM) {
-            console.log('XXX [instr-http] hooking moduleExports.default.*');
             // To handle `import http from 'http'`, which returns the default
             // export, we need to set `module.default.*`.
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
