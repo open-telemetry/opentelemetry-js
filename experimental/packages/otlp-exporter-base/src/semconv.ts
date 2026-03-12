@@ -17,7 +17,6 @@
 export const ATTR_HTTP_RESPONSE_STATUS_CODE =
   'http.response.status_code' as const;
 
-
 /**
  * A name uniquely identifying the instance of the OpenTelemetry component within its containing SDK instance.
  *
