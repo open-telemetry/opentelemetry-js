@@ -16,9 +16,9 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
-import {
+import type {
   InstrumentTypeConfigModel,
-  type ConfigurationModel,
+  ConfigurationModel,
 } from '@opentelemetry/configuration';
 import type { LoggerProviderConfig } from '@opentelemetry/sdk-logs';
 import { AggregationType, InstrumentType } from '@opentelemetry/sdk-metrics';

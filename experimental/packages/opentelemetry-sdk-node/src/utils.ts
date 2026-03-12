@@ -689,7 +689,6 @@ export function getMeterReadersFromConfiguration(
         metricReaders.push(periodicReader);
       }
     }
-    // TODO(6426): add pull reader support (reader.pull)
   });
   if (metricReaders.length > 0) {
     return metricReaders;

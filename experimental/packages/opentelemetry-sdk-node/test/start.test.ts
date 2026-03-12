@@ -260,7 +260,7 @@ describe('startNodeSDK', function () {
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/meter.yaml';
     const sdk = startNodeSDK({});
 
-    // Periodic type 'otlp_file/development' is yet not supported
+    // Periodic type 'otlp_file/development' is not supported yet
     assert.strictEqual(
       stubLoggerWarn.args[0][0],
       'Unsupported Metric Exporter.'
