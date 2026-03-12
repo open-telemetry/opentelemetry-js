@@ -39,6 +39,7 @@ import { VERSION } from './version';
 import {
   InstrumentationBase,
   InstrumentationNodeModuleDefinition,
+  isWrapped,
   SemconvStability,
   semconvStabilityFromStr,
   safeExecuteInTheMiddle,
@@ -83,8 +84,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
   private _headerCapture;
-  private _httpPatched: boolean = false;
-  private _httpsPatched: boolean = false;
   declare private _oldHttpServerDurationHistogram: Histogram;
   declare private _stableHttpServerDurationHistogram: Histogram;
   declare private _oldHttpClientDurationHistogram: Histogram;
@@ -99,6 +98,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       process.env.OTEL_SEMCONV_STABILITY_OPT_IN
     );
     this._headerCapture = this._createHeaderCapture(this._semconvStability);
+    console.log('XXX [instr-http] done the ctor');
   }
 
   protected override _updateMetricInstruments() {
@@ -203,17 +203,20 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'http',
       ['*'],
       (moduleExports: Http): Http => {
-        // Guard against double-instrumentation, if loaded by both `require`
-        // and `import`.
-        if (this._httpPatched) {
-          return moduleExports;
-        }
-        this._httpPatched = true;
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const isESM = (moduleExports as any)[Symbol.toStringTag] === 'Module';
+        console.log(
+          'XXX patch http: isEsm=%s',
+          isESM,
+          moduleExports?.request,
+          (moduleExports as any).default?.request
+        );
 
-        if (!this.getConfig().disableOutgoingRequestInstrumentation) {
+        if (
+          !this.getConfig().disableOutgoingRequestInstrumentation &&
+          !isWrapped(moduleExports.request)
+        ) {
+          console.log('XXX [instr-http] hooking moduleExports.*');
           const patchedRequest = this._wrap(
             moduleExports,
             'request',
@@ -225,6 +228,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             this._getPatchOutgoingGetFunction(patchedRequest)
           );
           if (isESM) {
+            console.log('XXX [instr-http] hooking moduleExports.default.*');
             // To handle `import http from 'http'`, which returns the default
             // export, we need to set `module.default.*`.
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -233,7 +237,10 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             (moduleExports as any).default.get = patchedGet;
           }
         }
-        if (!this.getConfig().disableIncomingRequestInstrumentation) {
+        if (
+          !this.getConfig().disableIncomingRequestInstrumentation &&
+          !isWrapped(moduleExports.Server.prototype.emit)
+        ) {
           this._wrap(
             moduleExports.Server.prototype,
             'emit',
@@ -243,7 +250,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         return moduleExports;
       },
       (moduleExports: Http) => {
-        this._httpPatched = false;
         if (moduleExports === undefined) return;
 
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
@@ -262,17 +268,13 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'https',
       ['*'],
       (moduleExports: Https): Https => {
-        // Guard against double-instrumentation, if loaded by both `require`
-        // and `import`.
-        if (this._httpsPatched) {
-          return moduleExports;
-        }
-        this._httpsPatched = true;
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const isESM = (moduleExports as any)[Symbol.toStringTag] === 'Module';
 
-        if (!this.getConfig().disableOutgoingRequestInstrumentation) {
+        if (
+          !this.getConfig().disableOutgoingRequestInstrumentation &&
+          !isWrapped(moduleExports.request)
+        ) {
           const patchedRequest = this._wrap(
             moduleExports,
             'request',
@@ -292,7 +294,10 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             (moduleExports as any).default.get = patchedGet;
           }
         }
-        if (!this.getConfig().disableIncomingRequestInstrumentation) {
+        if (
+          !this.getConfig().disableIncomingRequestInstrumentation &&
+          !isWrapped(moduleExports.Server.prototype.emit)
+        ) {
           this._wrap(
             moduleExports.Server.prototype,
             'emit',
@@ -302,7 +307,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         return moduleExports;
       },
       (moduleExports: Https) => {
-        this._httpsPatched = false;
         if (moduleExports === undefined) return;
 
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
