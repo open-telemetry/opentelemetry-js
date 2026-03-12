@@ -6,12 +6,13 @@
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import type { IExporterTransport } from '../../src';
-import { ExportResultCode, internal } from '@opentelemetry/core';
+import { ExportResultCode } from '@opentelemetry/core';
 import { type Histogram, MeterProvider } from '@opentelemetry/sdk-metrics';
 import { createOtlpExportDelegate } from '../../src/otlp-export-delegate';
 import type { ExportResponse } from '../../src';
 import type { ISerializer } from '@opentelemetry/otlp-transformer';
 import type { IExportPromiseHandler } from '../../src/bounded-queue-export-promise-handler';
+import { ExporterMetrics } from '../../src';
 import { registerMockDiagLogger, withResolvers } from './test-utils';
 import { TestMetricReader } from '../testHelper';
 
@@ -32,7 +33,7 @@ const internalRepresentation: FakeInternalRepresentation = {
   foo: 'internal',
 };
 
-const noopMetrics = new internal.ExporterMetrics({
+const noopMetrics = new ExporterMetrics({
   componentType: 'test',
   signal: { name: 'span', countItems: () => 1 },
   url: 'http://example.com',
@@ -786,7 +787,7 @@ describe('OTLPExportDelegate', function () {
           promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
-          metrics: new internal.ExporterMetrics({
+          metrics: new ExporterMetrics({
             componentType: 'test_exporter',
             signal: { name: 'span', countItems: () => 5 },
             url: 'http://localhost:12234',
@@ -903,7 +904,7 @@ describe('OTLPExportDelegate', function () {
           promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
-          metrics: new internal.ExporterMetrics({
+          metrics: new ExporterMetrics({
             componentType: 'test_exporter',
             signal: { name: 'span', countItems: () => 5 },
             url: 'http://localhost:12234',
