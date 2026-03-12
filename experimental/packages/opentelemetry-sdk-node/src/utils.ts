@@ -697,7 +697,7 @@ export function getMeterReadersFromConfiguration(
   return undefined;
 }
 
-function getInstrumentType(
+export function getInstrumentType(
   instrument: InstrumentTypeConfigModel
 ): InstrumentType | undefined {
   switch (instrument) {
@@ -721,7 +721,7 @@ function getInstrumentType(
   }
 }
 
-function getAggregationType(
+export function getAggregationType(
   aggregation: AggregationConfigModel
 ): AggregationOption | undefined {
   if (aggregation.default) {

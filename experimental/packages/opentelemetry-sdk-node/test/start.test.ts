@@ -257,7 +257,7 @@ describe('startNodeSDK', function () {
   it('should register a meter provider if multiple metric readers are provided', async () => {
     const stubLoggerWarn: Sinon.SinonStub = Sinon.stub(diag, 'warn');
 
-    process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = 'test/fixtures/meter.yaml';
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/meter.yaml';
     const sdk = startNodeSDK({});
 
     // Periodic type 'otlp_file/development' is yet not supported
@@ -727,18 +727,6 @@ describe('startNodeSDK', function () {
         'NoopContextManager'
       );
     });
-
-    // it('should return warning with invalid compression type for meter provider', async () => {
-    //   const stubLoggerWarn: Sinon.SinonStub = Sinon.stub(diag, 'warn');
-
-    //   process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-    //     'test/fixtures/invalid_meter.yaml';
-    //   const sdk = startNodeSDK({});
-      
-
-    //   stubLoggerWarn.reset();
-    //   await sdk.shutdown();
-    // });
   });
 });
 
