@@ -4,7 +4,7 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { type ExportResult } from '@opentelemetry/core';
+import type { ExportResult } from '@opentelemetry/core';
 import { ExportResultCode, getStringFromEnv } from '@opentelemetry/core';
 import type { SpanExporter, ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { prepareSend } from './platform/index';
