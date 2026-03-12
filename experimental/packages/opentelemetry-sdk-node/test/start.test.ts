@@ -199,8 +199,7 @@ describe('startNodeSDK', function () {
   });
 
   it('should return NOOP_SDK when disabled is true', async () => {
-    process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-      'test/fixtures/kitchen-sink.yaml';
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/kitchen-sink.yaml';
     const sdk = startNodeSDK({});
 
     assertDefaultContextManagerRegistered();
@@ -222,7 +221,7 @@ describe('startNodeSDK', function () {
   });
 
   it('should register a logger provider if multiple log record processors are provided', async () => {
-    process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = 'test/fixtures/logger.yaml';
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/logger.yaml';
     const sdk = startNodeSDK({});
 
     const loggerProvider = logs.getLoggerProvider();
@@ -406,8 +405,7 @@ describe('startNodeSDK', function () {
     });
 
     it('should configure resources from config file', async () => {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/resources.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/resources.yaml';
       const configFactory: ConfigFactory = createConfigFactory();
       const config = configFactory.getConfigModel();
       const resource = setupResource(config, {});
