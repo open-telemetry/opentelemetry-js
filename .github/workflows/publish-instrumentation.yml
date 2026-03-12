@@ -24,9 +24,11 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - run: |
           npm install --workspaces=false
-          npm run compile
-          sed -i 's/"name": "@opentelemetry\/instrumentation"/"name": "@coralogix\/instrumentation"/' package.json
-          npm publish --access public
+          npx tsc -p tsconfig.json
+          npx tsc -p tsconfig.esm.json
+          npx tsc -p tsconfig.esnext.json
+          npm pkg set name=@coralogix/instrumentation
+          npm publish --ignore-scripts --access public
         working-directory: ./experimental/packages/opentelemetry-instrumentation
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
