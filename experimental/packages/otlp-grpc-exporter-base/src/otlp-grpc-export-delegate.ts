@@ -17,6 +17,33 @@ import type { OtlpGrpcConfiguration } from './configuration/otlp-grpc-configurat
 import { createOtlpGrpcExporterTransport } from './grpc-exporter-transport';
 import { ATTR_RPC_RESPONSE_STATUS_CODE } from './semconv';
 
+export function createOtlpGrpcExporterMetrics<Internal>(
+  metricsComponentType: string,
+  signal: IExporterSignal<Internal>,
+  url: string | undefined,
+  meterProvider: MeterProvider | undefined
+): ExporterMetrics<Internal> {
+  return new ExporterMetrics({
+    componentType: metricsComponentType,
+    signal,
+    url,
+    meterProvider,
+    errorAttributes: (error: unknown) => {
+      if (!isServiceError(error)) {
+        return {};
+      }
+      // Lazy-load so that we don't need to require/import '@grpc/grpc-js' before it can be wrapped by instrumentation.
+      const { status } =
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/consistent-type-imports
+        require('@grpc/grpc-js') as typeof import('@grpc/grpc-js');
+      const statusName = status[error.code] ?? 'UNKNOWN';
+      return {
+        [ATTR_RPC_RESPONSE_STATUS_CODE]: statusName,
+      };
+    },
+  });
+}
+
 export function createOtlpGrpcExportDelegate<Internal, Response>(
   options: OtlpGrpcConfiguration,
   serializer: ISerializer<Internal, Response>,
@@ -29,25 +56,12 @@ export function createOtlpGrpcExportDelegate<Internal, Response>(
   return createOtlpNetworkExportDelegate(
     options,
     serializer,
-    new ExporterMetrics({
-      componentType: metricsComponentType,
+    createOtlpGrpcExporterMetrics(
+      metricsComponentType,
       signal,
-      url: options.url,
-      meterProvider,
-      errorAttributes: (error: unknown) => {
-        if (!isServiceError(error)) {
-          return {};
-        }
-        // Lazy-load so that we don't need to require/import '@grpc/grpc-js' before it can be wrapped by instrumentation.
-        const { status } =
-          // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/consistent-type-imports
-          require('@grpc/grpc-js') as typeof import('@grpc/grpc-js');
-        const statusName = status[error.code] ?? 'UNKNOWN';
-        return {
-          [ATTR_RPC_RESPONSE_STATUS_CODE]: statusName,
-        };
-      },
-    }),
+      options.url,
+      meterProvider
+    ),
     createOtlpGrpcExporterTransport({
       address: options.url,
       compression: options.compression,

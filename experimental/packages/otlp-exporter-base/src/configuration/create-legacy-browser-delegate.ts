@@ -14,6 +14,41 @@ import { ExporterMetrics, type IExporterSignal } from '../ExporterMetrics';
 
 /**
  * @deprecated
+ */
+export function createLegacyOtlpBrowserExporterMetrics<Internal>(
+  metricsComponentType: string,
+  signal: IExporterSignal<Internal>,
+  url: string | undefined,
+  meterProvider: MeterProvider | undefined
+): ExporterMetrics<Internal> {
+  return new ExporterMetrics({
+    componentType: metricsComponentType,
+    signal,
+    url,
+    meterProvider,
+    errorAttributes: (error: unknown) => {
+      if (!(error instanceof Error)) {
+        return {};
+      }
+      if (
+        error.message.startsWith(
+          'Fetch request failed with non-retryable status '
+        )
+      ) {
+        const statusStr = error.message.substring(
+          'Fetch request failed with non-retryable status '.length
+        );
+        return {
+          [ATTR_HTTP_RESPONSE_STATUS_CODE]: Number(statusStr),
+        };
+      }
+      return {};
+    },
+  });
+}
+
+/**
+ * @deprecated
  * @param config
  * @param serializer
  * @param signalResourcePath
@@ -37,29 +72,11 @@ export function createLegacyOtlpBrowserExportDelegate<Internal, Response>(
   return createOtlpFetchExportDelegate(
     options,
     serializer,
-    new ExporterMetrics({
-      componentType: metricsComponentType,
+    createLegacyOtlpBrowserExporterMetrics(
+      metricsComponentType,
       signal,
-      url: options.url,
-      meterProvider,
-      errorAttributes: (error: unknown) => {
-        if (!(error instanceof Error)) {
-          return {};
-        }
-        if (
-          error.message.startsWith(
-            'Fetch request failed with non-retryable status '
-          )
-        ) {
-          const statusStr = error.message.substring(
-            'Fetch request failed with non-retryable status '.length
-          );
-          return {
-            [ATTR_HTTP_RESPONSE_STATUS_CODE]: Number(statusStr),
-          };
-        }
-        return {};
-      },
-    })
+      options.url,
+      config.meterProvider
+    )
   );
 }

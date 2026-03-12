@@ -16,6 +16,28 @@ import { OTLPExporterError } from './types';
 import { ATTR_HTTP_RESPONSE_STATUS_CODE } from './semconv';
 import { ExporterMetrics, type IExporterSignal } from './ExporterMetrics';
 
+export function createOtlpHttpExporterMetrics<Internal>(
+  metricsComponentType: string,
+  signal: IExporterSignal<Internal>,
+  url: string | undefined,
+  meterProvider: MeterProvider | undefined
+): ExporterMetrics<Internal> {
+  return new ExporterMetrics({
+    componentType: metricsComponentType,
+    signal,
+    url,
+    meterProvider,
+    errorAttributes: (error: unknown) => {
+      if (!(error instanceof OTLPExporterError)) {
+        return {};
+      }
+      return {
+        [ATTR_HTTP_RESPONSE_STATUS_CODE]: error.code,
+      };
+    },
+  });
+}
+
 export function createOtlpHttpExportDelegate<Internal, Response>(
   options: OtlpNodeHttpConfiguration,
   serializer: ISerializer<Internal, Response>,
@@ -30,20 +52,12 @@ export function createOtlpHttpExportDelegate<Internal, Response>(
       }),
       serializer: serializer,
       promiseHandler: createBoundedQueueExportPromiseHandler(options),
-      metrics: new ExporterMetrics({
-        componentType: metricsComponentType,
+      metrics: createOtlpHttpExporterMetrics(
+        metricsComponentType,
         signal,
-        url: options.url,
-        meterProvider,
-        errorAttributes: (error: unknown) => {
-          if (!(error instanceof OTLPExporterError)) {
-            return {};
-          }
-          return {
-            [ATTR_HTTP_RESPONSE_STATUS_CODE]: error.code,
-          };
-        },
-      }),
+        options.url,
+        meterProvider
+      ),
     },
     { timeout: options.timeoutMillis }
   );

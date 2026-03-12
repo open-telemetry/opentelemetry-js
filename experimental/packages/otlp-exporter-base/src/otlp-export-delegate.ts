@@ -25,13 +25,13 @@ export interface IOtlpExportDelegate<Internal> {
   ): void;
   forceFlush(): Promise<void>;
   shutdown(): Promise<void>;
+  setMetrics(metrics: ExporterMetrics<Internal>): void;
 }
 
 class OTLPExportDelegate<Internal, Response>
   implements IOtlpExportDelegate<Internal>
 {
-  private readonly _metrics: ExporterMetrics<Internal>;
-
+  private _metrics: ExporterMetrics<Internal>;
   private _diagLogger: DiagLogger;
   private _transport: IExporterTransport;
   private _serializer: ISerializer<Internal, Response>;
@@ -145,6 +145,10 @@ class OTLPExportDelegate<Internal, Response>
 
   forceFlush(): Promise<void> {
     return this._promiseQueue.awaitAll();
+  }
+
+  setMetrics(metrics: ExporterMetrics<Internal>) {
+    this._metrics = metrics;
   }
 
   async shutdown(): Promise<void> {
