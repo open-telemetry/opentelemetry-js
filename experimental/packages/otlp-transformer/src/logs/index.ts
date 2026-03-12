@@ -5,7 +5,7 @@
 
 import type { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 
-import type { ISignal } from '../i-signal';
+import type { IExporterSignal } from '../i-signal';
 
 // IMPORTANT: exports added here are public
 export type {
@@ -13,7 +13,7 @@ export type {
   IExportLogsPartialSuccess,
 } from './export-response';
 
-export const LogsSignal: ISignal<ReadableLogRecord[]> = {
+export const LogsSignal: IExporterSignal<ReadableLogRecord[]> = {
   name: 'log',
   countItems: (request: ReadableLogRecord[]) => request.length,
 };

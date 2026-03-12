@@ -4,12 +4,15 @@
  */
 
 import type { MeterProvider } from '@opentelemetry/api';
-import { internal } from '@opentelemetry/core';
 
 import type { ServiceError } from '@grpc/grpc-js';
 import type { IOtlpExportDelegate } from '@opentelemetry/otlp-exporter-base';
-import { createOtlpNetworkExportDelegate } from '@opentelemetry/otlp-exporter-base';
-import type { ISerializer, ISignal } from '@opentelemetry/otlp-transformer';
+import {
+  createOtlpNetworkExportDelegate,
+  ExporterMetrics,
+  type IExporterSignal,
+} from '@opentelemetry/otlp-exporter-base';
+import type { ISerializer } from '@opentelemetry/otlp-transformer';
 import type { OtlpGrpcConfiguration } from './configuration/otlp-grpc-configuration';
 import { createOtlpGrpcExporterTransport } from './grpc-exporter-transport';
 import { ATTR_RPC_RESPONSE_STATUS_CODE } from './semconv';
@@ -18,7 +21,7 @@ export function createOtlpGrpcExportDelegate<Internal, Response>(
   options: OtlpGrpcConfiguration,
   serializer: ISerializer<Internal, Response>,
   metricsComponentType: string,
-  signal: ISignal<Internal>,
+  signal: IExporterSignal<Internal>,
   meterProvider: MeterProvider | undefined,
   grpcName: string,
   grpcPath: string
@@ -26,7 +29,7 @@ export function createOtlpGrpcExportDelegate<Internal, Response>(
   return createOtlpNetworkExportDelegate(
     options,
     serializer,
-    new internal.ExporterMetrics({
+    new ExporterMetrics({
       componentType: metricsComponentType,
       signal,
       url: options.url,

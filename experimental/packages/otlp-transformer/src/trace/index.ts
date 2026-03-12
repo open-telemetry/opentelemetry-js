@@ -5,7 +5,7 @@
 
 import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 
-import type { ISignal } from '../i-signal';
+import type { IExporterSignal } from '../i-signal';
 
 // IMPORTANT: exports added here are public
 export type {
@@ -13,7 +13,7 @@ export type {
   IExportTraceServiceResponse,
 } from './export-response';
 
-export const TraceSignal: ISignal<ReadableSpan[]> = {
+export const TraceSignal: IExporterSignal<ReadableSpan[]> = {
   name: 'span',
   countItems: (request: ReadableSpan[]) => request.length,
 };

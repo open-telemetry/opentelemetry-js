@@ -4,13 +4,13 @@
  */
 
 import type { MeterProvider } from '@opentelemetry/api';
-import { internal } from '@opentelemetry/core';
-import type { ISerializer, ISignal } from '@opentelemetry/otlp-transformer';
+import type { ISerializer } from '@opentelemetry/otlp-transformer';
 import { createOtlpFetchExportDelegate } from '../otlp-browser-http-export-delegate';
 import { convertLegacyBrowserHttpOptions } from './convert-legacy-browser-http-options';
 import type { IOtlpExportDelegate } from '../otlp-export-delegate';
 import type { OTLPExporterConfigBase } from './legacy-base-configuration';
 import { ATTR_HTTP_RESPONSE_STATUS_CODE } from '../semconv';
+import { ExporterMetrics, type IExporterSignal } from '../ExporterMetrics';
 
 /**
  * @deprecated
@@ -23,7 +23,7 @@ export function createLegacyOtlpBrowserExportDelegate<Internal, Response>(
   config: OTLPExporterConfigBase,
   serializer: ISerializer<Internal, Response>,
   metricsComponentType: string,
-  signal: ISignal<Internal>,
+  signal: IExporterSignal<Internal>,
   meterProvider: MeterProvider | undefined,
   signalResourcePath: string,
   requiredHeaders: Record<string, string>
@@ -37,7 +37,7 @@ export function createLegacyOtlpBrowserExportDelegate<Internal, Response>(
   return createOtlpFetchExportDelegate(
     options,
     serializer,
-    new internal.ExporterMetrics({
+    new ExporterMetrics({
       componentType: metricsComponentType,
       signal,
       url: options.url,

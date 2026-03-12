@@ -5,7 +5,7 @@
 
 import type { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 
-import type { ISignal } from '../i-signal';
+import type { IExporterSignal } from '../i-signal';
 
 // IMPORTANT: exports added here are public
 export type {
@@ -13,7 +13,7 @@ export type {
   IExportMetricsServiceResponse,
 } from './export-response';
 
-export const MetricsSignal: ISignal<ResourceMetrics> = {
+export const MetricsSignal: IExporterSignal<ResourceMetrics> = {
   name: 'metric_data_point',
   countItems: (request: ResourceMetrics) => {
     let count = 0;

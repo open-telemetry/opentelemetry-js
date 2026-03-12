@@ -12,26 +12,30 @@ import {
   createNoopMeter,
 } from '@opentelemetry/api';
 import {
+  hrTime,
+  hrTimeDuration,
+  hrTimeToMilliseconds,
+} from '@opentelemetry/core';
+import {
   ATTR_ERROR_TYPE,
   ATTR_OTEL_COMPONENT_NAME,
   ATTR_OTEL_COMPONENT_TYPE,
   ATTR_SERVER_ADDRESS,
   ATTR_SERVER_PORT,
-} from '../semconv';
-import { hrTime, hrTimeDuration, hrTimeToMilliseconds } from '../common/time';
-import { VERSION } from '../version';
+} from './semconv';
+import { VERSION } from './version';
 
 const componentCounter = new Map<string, number>();
 
 export interface ExporterMetricsOptions<Request> {
   componentType: string;
-  signal: ISignal<Request>;
+  signal: IExporterSignal<Request>;
   url: string | undefined;
   meterProvider: MeterProvider | undefined;
   errorAttributes: (error: unknown) => Attributes;
 }
 
-export interface ISignal<Request> {
+export interface IExporterSignal<Request> {
   name: 'span' | 'metric_data_point' | 'log';
   countItems: (request: Request) => number;
 }
@@ -47,7 +51,7 @@ export class ExporterMetrics<Request> {
   private readonly standardAttrs: Attributes;
   private readonly errorAttributes: (error: unknown) => Attributes;
 
-  private readonly signal: ISignal<Request>;
+  private readonly signal: IExporterSignal<Request>;
 
   constructor(options: ExporterMetricsOptions<Request>) {
     const { componentType, signal, meterProvider, url, errorAttributes } =

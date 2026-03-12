@@ -28,4 +28,3 @@ export { JsonMetricsSerializer } from './metrics/json';
 export { JsonTraceSerializer } from './trace/json';
 
 export type { ISerializer } from './i-serializer';
-export type { ISignal } from './i-signal';

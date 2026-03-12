@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { internal, ExportResult } from '@opentelemetry/core';
+import type { ExportResult } from '@opentelemetry/core';
 import { ExportResultCode } from '@opentelemetry/core';
 import type { IExporterTransport } from './exporter-transport';
 import type { IExportPromiseHandler } from './bounded-queue-export-promise-handler';
@@ -13,6 +13,7 @@ import type { IOtlpResponseHandler } from './response-handler';
 import { createLoggingPartialSuccessResponseHandler } from './logging-response-handler';
 import type { DiagLogger } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
+import { type ExporterMetrics } from './ExporterMetrics';
 
 /**
  * Internally shared export logic for OTLP.
@@ -29,9 +30,7 @@ export interface IOtlpExportDelegate<Internal> {
 class OTLPExportDelegate<Internal, Response>
   implements IOtlpExportDelegate<Internal>
 {
-  private readonly _metrics: InstanceType<
-    typeof internal.ExporterMetrics<Internal>
-  >;
+  private readonly _metrics: ExporterMetrics<Internal>;
 
   private _diagLogger: DiagLogger;
   private _transport: IExporterTransport;
@@ -45,7 +44,7 @@ class OTLPExportDelegate<Internal, Response>
     serializer: ISerializer<Internal, Response>,
     responseHandler: IOtlpResponseHandler<Response>,
     promiseQueue: IExportPromiseHandler,
-    metrics: InstanceType<typeof internal.ExporterMetrics<Internal>>,
+    metrics: ExporterMetrics<Internal>,
     timeout: number
   ) {
     this._transport = transport;
@@ -164,7 +163,7 @@ export function createOtlpExportDelegate<Internal, Response>(
     transport: IExporterTransport;
     serializer: ISerializer<Internal, Response>;
     promiseHandler: IExportPromiseHandler;
-    metrics: InstanceType<typeof internal.ExporterMetrics<Internal>>;
+    metrics: ExporterMetrics<Internal>;
   },
   settings: { timeout: number }
 ): IOtlpExportDelegate<Internal> {
