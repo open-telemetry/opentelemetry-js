@@ -9,6 +9,7 @@ import {
   getPropagatorFromConfiguration,
   getLoggerProviderConfigFromEnv,
   getBatchLogRecordProcessorConfigFromEnv,
+  getPeriodicMetricReaderFromConfiguration,
 } from '../src/utils';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -399,5 +400,16 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
       maxExportBatchSize: undefined,
     });
     sinon.assert.callCount(warnStub, 4);
+  });
+
+  it('should return warning message for invalid compression type for meter provider', function () {
+    const warnStub = sinon.stub(diag, 'warn');
+    getPeriodicMetricReaderFromConfiguration({
+      exporter: { otlp_http: { encoding: 'invalid' } },
+    } as any);
+    sinon.assert.calledWithExactly(
+      warnStub,
+      'Unsupported OTLP metrics encoding: invalid.'
+    );
   });
 });
