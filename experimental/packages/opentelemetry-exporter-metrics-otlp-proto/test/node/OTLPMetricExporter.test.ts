@@ -13,6 +13,7 @@ import {
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
 import { Stream } from 'stream';
+import { TestMetricReader } from '../utils';
 
 /*
  * NOTE: Tests here are not intended to test the underlying components directly. They are intended as a quick
@@ -28,6 +29,7 @@ describe('OTLPMetricExporter', () => {
     });
 
     it('successfully exports data', function (done) {
+      const testMetricReader = new TestMetricReader();
       // arrange
       const fakeRequest = new Stream.PassThrough();
       Object.defineProperty(fakeRequest, 'setTimeout', {
@@ -36,13 +38,21 @@ describe('OTLPMetricExporter', () => {
 
       sinon.stub(http, 'request').returns(fakeRequest as any);
       let buff = Buffer.from('');
-      fakeRequest.on('finish', () => {
+      fakeRequest.on('finish', async () => {
         try {
           // assert
           const requestBody = buff.toString();
           assert.throws(() => {
             JSON.parse(requestBody);
           }, 'expected requestBody to be in protobuf format, but parsing as JSON succeeded');
+
+          const metrics = await testMetricReader.collect();
+          const scopeMetrics = metrics.resourceMetrics.scopeMetrics.find(
+            sm => sm.scope.name === '@opentelemetry/otlp-exporter'
+          );
+          assert.ok(scopeMetrics);
+          meterProvider.shutdown();
+
           done();
         } catch (e) {
           done(e);
@@ -53,17 +63,20 @@ describe('OTLPMetricExporter', () => {
         buff = Buffer.concat([buff, chunk]);
       });
 
+      const exporter = new OTLPMetricExporter();
       const meterProvider = new MeterProvider({
         readers: [
           new PeriodicExportingMetricReader({
-            exporter: new OTLPMetricExporter(),
+            exporter,
           }),
+          testMetricReader,
         ],
       });
+      exporter.setMeterProvider(meterProvider);
       meterProvider.getMeter('test-meter').createCounter('test-counter').add(1);
 
       // act
-      meterProvider.shutdown();
+      meterProvider.forceFlush();
     });
   });
 });

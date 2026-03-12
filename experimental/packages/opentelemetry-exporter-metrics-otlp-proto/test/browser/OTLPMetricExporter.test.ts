@@ -10,6 +10,7 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPMetricExporter } from '../../src/platform/browser';
+import { TestMetricReader } from '../utils';
 
 /*
  * NOTE: Tests here are not intended to test the underlying components directly. They are intended as a quick
@@ -30,18 +31,21 @@ describe('OTLPMetricExporter', () => {
       const stubFetch = sinon
         .stub(window, 'fetch')
         .resolves(new Response('', { status: 200 }));
+      const testMetricReader = new TestMetricReader();
+      const exporter = new OTLPMetricExporter();
       const meterProvider = new MeterProvider({
         readers: [
           new PeriodicExportingMetricReader({
-            exporter: new OTLPMetricExporter(),
+            exporter,
           }),
         ],
       });
+      exporter.setMeterProvider(meterProvider);
 
       // act
       meterProvider.getMeter('test-meter').createCounter('test-counter').add(1);
 
-      await meterProvider.shutdown();
+      await meterProvider.forceFlush();
 
       // assert
       const request = new Request(...stubFetch.args[0]);
@@ -50,6 +54,13 @@ describe('OTLPMetricExporter', () => {
         () => JSON.parse(body),
         'expected requestBody to be in protobuf format, but parsing as JSON succeeded'
       );
+
+      const metrics = await testMetricReader.collect();
+      const scopeMetrics = metrics.resourceMetrics.scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/otlp-exporter'
+      );
+      assert.ok(scopeMetrics);
+      await meterProvider.shutdown();
     });
   });
 });
