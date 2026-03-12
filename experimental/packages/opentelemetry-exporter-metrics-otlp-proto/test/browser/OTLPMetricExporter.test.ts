@@ -38,6 +38,7 @@ describe('OTLPMetricExporter', () => {
           new PeriodicExportingMetricReader({
             exporter,
           }),
+          testMetricReader,
         ],
       });
       exporter.setMeterProvider(meterProvider);
