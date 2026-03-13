@@ -400,8 +400,8 @@ describe('startNodeSDK', function () {
 
       assert.notEqual(resource.attributes[ATTR_PROCESS_PID], undefined);
       assert.notEqual(resource.attributes[ATTR_HOST_NAME], undefined);
-      assert.notEqual(resource.attributes[ATTR_OS_TYPE], undefined);
       assert.notEqual(resource.attributes[ATTR_SERVICE_INSTANCE_ID], undefined);
+      assert.notEqual(resource.attributes[ATTR_OS_TYPE], undefined);
     });
 
     it('should configure resources from config file', async () => {
