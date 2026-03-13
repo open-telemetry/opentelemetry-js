@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
 * refactor(api): remove platform-specific globalThis, use globalThis directly [#6208](https://github.com/open-telemetry/opentelemetry-js/pull/6208) @overbalance
 * chore(api): mark ProxyTracerProvider as deprecated [#6328](https://github.com/open-telemetry/opentelemetry-js/pull/6328) @cjihrig
 * chore: enforce `import type` for type-only imports via ESLint [#6467](https://github.com/open-telemetry/opentelemetry-js/pull/6467) @overbalance
+* refactor: migrate build from tsc to tsdown with dual CJS/ESM output [#6201](https://github.com/open-telemetry/opentelemetry-js/pull/6201) @overbalance
 
 ## 1.9.0
 

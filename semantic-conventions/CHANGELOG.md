@@ -15,6 +15,8 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :house: Internal
 
+* refactor: migrate build from tsc to tsdown with dual CJS/ESM output [#6201](https://github.com/open-telemetry/opentelemetry-js/pull/6201) @overbalance
+
 ## 1.40.0
 
 ### :rocket: Features
