@@ -120,17 +120,17 @@ describe('getPropagatorFromConfigFactory', function () {
   });
 
   it('should return the selected propagator when one is in the list', () => {
-    const config: ConfigurationModel = {
+    const config = {
       propagator: { composite: [{ tracecontext: undefined }] },
     };
-    assert.deepStrictEqual(getPropagatorFromConfiguration(config)?.fields(), [
+    assert.deepStrictEqual(getPropagatorFromConfiguration(config as unknown as Configuration)?.fields(), [
       'traceparent',
       'tracestate',
     ]);
   });
 
   it('should return the selected propagators when multiple are in the list', () => {
-    const config: ConfigurationModel = {
+    const config = {
       propagator: {
         composite: [
           { tracecontext: undefined },
@@ -141,7 +141,7 @@ describe('getPropagatorFromConfigFactory', function () {
         ],
       },
     };
-    assert.deepStrictEqual(getPropagatorFromConfiguration(config)?.fields(), [
+    assert.deepStrictEqual(getPropagatorFromConfiguration(config as unknown as Configuration)?.fields(), [
       'traceparent',
       'tracestate',
       'baggage',
@@ -157,7 +157,7 @@ describe('getPropagatorFromConfigFactory', function () {
 
   it('should return null and warn if propagators are unknown', () => {
     const warnStub = sinon.stub(diag, 'warn');
-    const config: ConfigurationModel = {
+    const config = {
       propagator: {
         composite: [
           { my: undefined },
@@ -166,7 +166,7 @@ describe('getPropagatorFromConfigFactory', function () {
         ],
       },
     };
-    assert.deepStrictEqual(getPropagatorFromConfiguration(config), null);
+    assert.deepStrictEqual(getPropagatorFromConfiguration(config as unknown as Configuration), null);
     sinon.assert.calledWithExactly(
       warnStub,
       'Propagator "my" requested through configuration is unavailable.'
@@ -183,13 +183,13 @@ describe('getPropagatorFromConfigFactory', function () {
   });
 
   it('should return null if only "none" is selected', () => {
-    const config: ConfigurationModel = {
+    const config = {
       propagator: {
         composite: [{ none: undefined }],
       },
     };
 
-    assert.deepStrictEqual(getPropagatorFromConfiguration(config), null);
+    assert.deepStrictEqual(getPropagatorFromConfiguration(config as unknown as Configuration), null);
   });
 });
 
@@ -414,80 +414,80 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
 
 describe('getResourceDetectorsFromConfiguration', function () {
   it('returns empty array when detection/development is not set', function () {
-    const config: ConfigurationModel = {};
-    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), []);
+    const config = {};
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config as unknown as Configuration), []);
   });
 
   it('returns empty array when detectors array is empty', function () {
-    const config: ConfigurationModel = {
+    const config = {
       resource: { 'detection/development': { detectors: [] } },
     };
-    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), []);
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config as unknown as Configuration), []);
   });
 
   it('maps env detector object to envDetector', function () {
-    const config: ConfigurationModel = {
+    const config = {
       resource: { 'detection/development': { detectors: [{ env: {} }] } },
     };
-    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config as unknown as Configuration), [
       envDetector,
     ]);
   });
 
   it('maps host detector object to hostDetector', function () {
-    const config: ConfigurationModel = {
+    const config = {
       resource: { 'detection/development': { detectors: [{ host: {} }] } },
     };
-    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config as unknown as Configuration), [
       hostDetector,
     ]);
   });
 
   it('maps os detector object to osDetector', function () {
-    const config: ConfigurationModel = {
+    const config = {
       resource: { 'detection/development': { detectors: [{ os: {} }] } },
     };
-    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config as unknown as Configuration), [
       osDetector,
     ]);
   });
 
   it('maps process detector object to processDetector', function () {
-    const config: ConfigurationModel = {
+    const config = {
       resource: { 'detection/development': { detectors: [{ process: {} }] } },
     };
-    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config as unknown as Configuration), [
       processDetector,
     ]);
   });
 
   it('maps service detector object to serviceInstanceIdDetector', function () {
-    const config: ConfigurationModel = {
+    const config = {
       resource: { 'detection/development': { detectors: [{ service: {} }] } },
     };
-    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config as unknown as Configuration), [
       serviceInstanceIdDetector,
     ]);
   });
 
   it('silently skips container detector (no JS implementation)', function () {
-    const config: ConfigurationModel = {
+    const config = {
       resource: {
         'detection/development': { detectors: [{ container: {} }] },
       },
     };
-    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), []);
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config as unknown as Configuration), []);
   });
 
   it('maps multiple detector objects in order', function () {
-    const config: ConfigurationModel = {
+    const config = {
       resource: {
         'detection/development': {
           detectors: [{ host: {} }, { process: {} }, { service: {} }],
         },
       },
     };
-    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config as unknown as Configuration), [
       hostDetector,
       processDetector,
       serviceInstanceIdDetector,

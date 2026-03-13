@@ -248,3 +248,165 @@ fs.mkdirSync(path.dirname(OUT_PATH), { recursive: true });
 fs.writeFileSync(OUT_PATH, output);
 console.log(`Written ${output.split('\n').length} lines to ${OUT_PATH}`);
 console.log(`Circular types (${circularList.length}): ${circularList.join(', ')}`);
+
+// =============================================================================
+// TypeScript interface generation → types.ts
+// =============================================================================
+
+const TYPES_PATH = path.join(
+  SCRIPT_DIR,
+  '../../experimental/packages/configuration/src/generated/types.ts'
+);
+
+/**
+ * Convert a JSON schema fragment to a TypeScript type string.
+ * `schema` is already normalised (oneOf→anyOf, single-element arrays unwrapped).
+ */
+function schemaToTsType(schema) {
+  if (!schema || schema === true) return 'unknown';
+
+  // $ref — refer to the named type directly
+  if (schema.$ref) {
+    return schema.$ref.split('/').pop();
+  }
+
+  // anyOf union
+  if (schema.anyOf) {
+    const parts = schema.anyOf.map(schemaToTsType);
+    // Deduplicate and join
+    return [...new Set(parts)].join(' | ');
+  }
+
+  // enum → string literal union
+  if (schema.enum !== undefined) {
+    return schema.enum
+      .map(v => (v === null ? 'null' : JSON.stringify(v)))
+      .join(' | ');
+  }
+
+  const types = Array.isArray(schema.type)
+    ? schema.type
+    : schema.type
+    ? [schema.type]
+    : [];
+
+  if (types.length === 0) return 'unknown';
+
+  const parts = [];
+  for (const t of types) {
+    if (t === 'null') {
+      parts.push('null');
+    } else if (t === 'string') {
+      parts.push('string');
+    } else if (t === 'number' || t === 'integer') {
+      parts.push('number');
+    } else if (t === 'boolean') {
+      parts.push('boolean');
+    } else if (t === 'array') {
+      const itemType = schema.items ? schemaToTsType(schema.items) : 'unknown';
+      parts.push(`Array<${itemType}>`);
+    } else if (t === 'object') {
+      // Inline anonymous object — just use 'object' (properties handled at def level)
+      parts.push('object');
+    } else {
+      parts.push('unknown');
+    }
+  }
+  return [...new Set(parts)].join(' | ');
+}
+
+/**
+ * Quote a property name if it contains characters that aren't valid bare identifiers.
+ */
+function quoteKey(name) {
+  return /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(name) ? name : `'${name}'`;
+}
+
+/**
+ * Generate a TypeScript type declaration for a single $defs entry.
+ * Returns an array of lines (no trailing newline).
+ */
+function generateTsDecl(name, schema) {
+  const types = Array.isArray(schema.type)
+    ? schema.type
+    : schema.type
+    ? [schema.type]
+    : [];
+
+  const isObject = types.includes('object') || !!schema.properties;
+  const isNullable = types.includes('null');
+
+  // ── Non-object: emit a type alias ──────────────────────────────────────────
+  if (!isObject) {
+    const tsType = schemaToTsType(schema);
+    return [`export type ${name} = ${tsType};`];
+  }
+
+  // ── Object: emit an interface (or type alias when the object is nullable) ──
+  const required = new Set(schema.required || []);
+  const propLines = [];
+
+  for (const [propName, propSchema] of Object.entries(schema.properties || {})) {
+    const opt = required.has(propName) ? '' : '?';
+    const tsType = schemaToTsType(propSchema);
+    propLines.push(`  ${quoteKey(propName)}${opt}: ${tsType};`);
+  }
+
+  // Index signature for open schemas
+  const ap = schema.additionalProperties;
+  if (ap !== false && ap !== undefined) {
+    // ap may be `true` or a schema fragment — either way use `unknown`
+    propLines.push(`  [key: string]: unknown;`);
+  }
+
+  if (isNullable) {
+    // TypeScript interfaces can't be unioned with null, so use a type alias.
+    const body = propLines.length ? `{\n${propLines.join('\n')}\n}` : '{}';
+    return [`export type ${name} = ${body} | null;`];
+  }
+
+  const lines = [`export interface ${name} {`, ...propLines, '}'];
+  return lines;
+}
+
+// ── Build the types file ─────────────────────────────────────────────────────
+
+const typeLines = [];
+typeLines.push(licenseHeader);
+typeLines.push(`// AUTO-GENERATED — do not edit`);
+typeLines.push(`// Generated from opentelemetry-configuration JSON schema`);
+typeLines.push(
+  `// Run \`npm run generate:config\` from the configuration package to regenerate`
+);
+typeLines.push(`import type { z } from 'zod';`);
+typeLines.push(
+  `import { OpenTelemetryConfigurationSchema } from './opentelemetry-configuration';`
+);
+typeLines.push('');
+
+// Emit one declaration per def, in topological order
+for (const name of topoOrder) {
+  if (!(name in normalizedDefs)) continue;
+  const decl = generateTsDecl(name, normalizedDefs[name]);
+  typeLines.push(...decl);
+  typeLines.push('');
+}
+
+// Root schema → Configuration interface
+const rootSchema = normalizedRootSchema;
+const rootDecl = generateTsDecl('Configuration', rootSchema);
+typeLines.push(...rootDecl);
+typeLines.push('');
+
+// ConfigurationSchema export (cast avoids TS7056 "type exceeds max length")
+typeLines.push(
+  `// eslint-disable-next-line @typescript-eslint/no-explicit-any`
+);
+typeLines.push(
+  `export const ConfigurationSchema: z.ZodType<Configuration> = OpenTelemetryConfigurationSchema as z.ZodType<Configuration>;`
+);
+typeLines.push('');
+
+const typesOutput = typeLines.join('\n');
+fs.writeFileSync(TYPES_PATH, typesOutput);
+console.log(`Written ${typesOutput.split('\n').length} lines to ${TYPES_PATH}`);
