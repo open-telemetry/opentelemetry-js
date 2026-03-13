@@ -243,6 +243,7 @@ OTEL_NODE_EXPERIMENTAL_SDK_METRICS=true
 Currently a subset of the specified metrics are implemented. See the following
 linkes for details:
 
+- Metric reader metrics: [MetricReaderMetrics](../../../packages//sdk-metrics/src/export/MetricReaderMetrics.ts)
 - Span metrics: [TracerMetrics.ts](../../../packages/opentelemetry-sdk-trace-base/src/TracerMetrics.ts)
 
 ## Useful links

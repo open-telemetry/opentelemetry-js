@@ -111,6 +111,14 @@ export function hrTimeToNanoseconds(time: api.HrTime): number {
 }
 
 /**
+ * Convert hrTime to microseconds.
+ * @param time
+ */
+export function hrTimeToMicroseconds(time: api.HrTime): number {
+  return time[0] * 1e6 + time[1] / 1e3;
+}
+
+/**
  * Convert hrTime to milliseconds.
  * @param time
  */
@@ -119,13 +127,12 @@ export function hrTimeToMilliseconds(time: api.HrTime): number {
 }
 
 /**
- * Convert hrTime to microseconds.
+ * Convert hrTime to seconds.
  * @param time
  */
-export function hrTimeToMicroseconds(time: api.HrTime): number {
-  return time[0] * 1e6 + time[1] / 1e3;
+export function hrTimeToSeconds(time: api.HrTime): number {
+  return time[0] + time[1] / SECOND_TO_NANOSECONDS;
 }
-
 /**
  * check if time is HrTime
  * @param value

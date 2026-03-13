@@ -37,6 +37,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(sdk-metrics): implement metric reader metrics  [#6449](https://github.com/open-telemetry/opentelemetry-js/pull/6449) @anuraaga
 * feat(sdk-trace): implement span start/end metrics  [#6213](https://github.com/open-telemetry/opentelemetry-js/pull/6213) @anuraaga
 
 ### :bug: Bug Fixes
