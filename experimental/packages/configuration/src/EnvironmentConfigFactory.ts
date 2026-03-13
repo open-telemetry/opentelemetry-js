@@ -164,6 +164,55 @@ export function setPropagators(config: ConfigurationModel): void {
   }
 }
 
+export function setSampler(config: ConfigurationModel): void {
+  const sampler = getStringFromEnv('OTEL_TRACES_SAMPLER');
+  const arg = getStringFromEnv('OTEL_TRACES_SAMPLER_ARG');
+
+  if (!sampler || !config.tracer_provider) {
+    return;
+  }
+
+  const ratio = arg ? parseFloat(arg) : 1.0;
+
+  switch (sampler) {
+    case 'always_on':
+      config.tracer_provider.sampler = { always_on: {} };
+      break;
+
+    case 'always_off':
+      config.tracer_provider.sampler = { always_off: {} };
+      break;
+
+    case 'traceidratio':
+      config.tracer_provider.sampler = {
+        trace_id_ratio_based: { ratio },
+      };
+      break;
+
+    case 'parentbased_always_on':
+      config.tracer_provider.sampler = {
+        parent_based: { root: { always_on: {} } },
+      };
+      break;
+
+    case 'parentbased_always_off':
+      config.tracer_provider.sampler = {
+        parent_based: { root: { always_off: {} } },
+      };
+      break;
+
+    case 'parentbased_traceidratio':
+      config.tracer_provider.sampler = {
+        parent_based: { root: { trace_id_ratio_based: { ratio } } },
+      };
+      break;
+
+    default:
+      diag.warn(`Unknown sampler type: ${sampler}`);
+      break;
+  }
+}
+
 export function setTracerProvider(config: ConfigurationModel): void {
   const exportersType = Array.from(
     new Set(getStringListFromEnv('OTEL_TRACES_EXPORTER'))
@@ -178,6 +227,7 @@ export function setTracerProvider(config: ConfigurationModel): void {
     return;
   }
   config.tracer_provider = initializeDefaultTracerProviderConfiguration();
+  setSampler(config);
 
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT'
