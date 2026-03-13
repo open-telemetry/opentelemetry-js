@@ -73,3 +73,10 @@ export const ATTR_SERVICE_INSTANCE_ID = 'service.instance.id' as const;
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ATTR_SERVICE_NAMESPACE = 'service.namespace' as const;
+
+/**
+ * The operating system type.
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_OS_TYPE = 'os.type' as const;
