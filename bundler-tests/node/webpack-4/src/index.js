@@ -1,11 +1,11 @@
-import { logs } from '@opentelemetry/api-logs';
-import { diag, DiagConsoleLogger } from '@opentelemetry/api';
-import { InstrumentationBase } from '@opentelemetry/instrumentation';
-import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
-import {
+const { diag, DiagConsoleLogger } = require('@opentelemetry/api');
+const { logs } = require('@opentelemetry/api-logs');
+const { InstrumentationBase } = require('@opentelemetry/instrumentation');
+const { OTLPLogExporter } = require('@opentelemetry/exporter-logs-otlp-http');
+const {
   LoggerProvider,
   SimpleLogRecordProcessor,
-} from '@opentelemetry/sdk-logs';
+} = require('@opentelemetry/sdk-logs');
 
 diag.setLogger({
   logger: new DiagConsoleLogger(),
