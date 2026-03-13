@@ -256,7 +256,9 @@ const configFromKitchenSinkFile = {
       },
       detectors: [
         { container: null },
+        { env: null },
         { host: null },
+        { os: null },
         { process: null },
         { service: null },
       ],
@@ -728,7 +730,69 @@ describe('ConfigFactory', function () {
       process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,host, serviceinstance';
       const expectedConfig: unknown = {
         ...defaultConfig,
-        node_resource_detectors: ['env', 'host', 'serviceinstance'],
+        resource: {
+          'detection/development': {
+            detectors: [{ host: {} }, { service: {} }, { env: {} }],
+          },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should map OTEL_NODE_RESOURCE_DETECTORS=all to all detectors', function () {
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'all';
+      const expectedConfig: unknown = {
+        ...defaultConfig,
+        resource: {
+          'detection/development': {
+            detectors: [
+              { container: {} },
+              { host: {} },
+              { os: {} },
+              { process: {} },
+              { service: {} },
+              { env: {} },
+            ],
+          },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should not set detection/development for OTEL_NODE_RESOURCE_DETECTORS=none', function () {
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'none';
+      const expectedConfig: unknown = {
+        ...defaultConfig,
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should map OTEL_NODE_RESOURCE_DETECTORS=os to os detector', function () {
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'os';
+      const expectedConfig: unknown = {
+        ...defaultConfig,
+        resource: {
+          'detection/development': {
+            detectors: [{ os: {} }],
+          },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should map OTEL_NODE_RESOURCE_DETECTORS=env to env detector', function () {
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env';
+      const expectedConfig: unknown = {
+        ...defaultConfig,
+        resource: {
+          'detection/development': {
+            detectors: [{ env: {} }],
+          },
+        },
       };
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
@@ -843,8 +907,9 @@ describe('ConfigFactory', function () {
       const configFactory = createConfigFactory();
       const config = configFactory.getConfigModel();
       assert.deepStrictEqual(config, defaultConfig);
-      assert.strictEqual(config.propagator?.composite, undefined);
-      assert.strictEqual(config.propagator?.composite_list, undefined);
+      const p = config.propagator as Configuration['propagator'];
+      assert.strictEqual(p?.composite, undefined);
+      assert.strictEqual(p?.composite_list, undefined);
     });
 
     it('should return config with custom propagator', function () {
@@ -1842,15 +1907,13 @@ describe('ConfigFactory', function () {
 
   describe('get values from config file', function () {
     it('should initialize config with default values from valid config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/sdk-config.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/sdk-config.yaml';
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), configFromFile);
     });
 
     it('should initialize config with default values from longer valid config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/kitchen-sink.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/kitchen-sink.yaml';
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(
         configFactory.getConfigModel(),
@@ -1860,17 +1923,17 @@ describe('ConfigFactory', function () {
 
     it('should return error from invalid config file', function () {
       const warnSpy = Sinon.spy(diag, 'warn');
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = './fixtures/invalid.txt';
+      process.env.OTEL_CONFIG_FILE = './fixtures/invalid.txt';
       createConfigFactory();
       Sinon.assert.calledWith(
         warnSpy,
-        'Config file ./fixtures/invalid.txt set on OTEL_EXPERIMENTAL_CONFIG_FILE is not valid'
+        'Config file ./fixtures/invalid.txt set on OTEL_CONFIG_FILE is not valid'
       );
     });
 
     it('should return error from invalid config file format', function () {
       const warnSpy = Sinon.spy(diag, 'warn');
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
       createConfigFactory();
       Sinon.assert.calledWith(
         warnSpy,
@@ -1879,20 +1942,19 @@ describe('ConfigFactory', function () {
     });
 
     it('should initialize config with default values with empty string for config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = '';
+      process.env.OTEL_CONFIG_FILE = '';
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
     });
 
     it('should initialize config with default values with all whitespace for config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = '  ';
+      process.env.OTEL_CONFIG_FILE = '  ';
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
     });
 
     it('should initialize config with default values from valid short config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/short-config.yml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/short-config.yml';
       const configFactory = createConfigFactory();
       const expectedConfig: unknown = {
         disabled: false,
@@ -1908,8 +1970,7 @@ describe('ConfigFactory', function () {
     });
 
     it('should initialize config with config file that contains environment variables', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/sdk-migration-config.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/sdk-migration-config.yaml';
       process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://test.com:4318';
       process.env.OTEL_SDK_DISABLED = 'false';
       process.env.OTEL_LOG_LEVEL = 'debug';
@@ -2084,8 +2145,7 @@ describe('ConfigFactory', function () {
     });
 
     it('should initialize config with fallbacks defined in config file when corresponding environment variables are not defined', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/sdk-migration-config.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/sdk-migration-config.yaml';
 
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(
@@ -2096,8 +2156,7 @@ describe('ConfigFactory', function () {
 
     it('checks for incomplete providers', function () {
       const warnSpy = Sinon.spy(diag, 'warn');
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/invalid-providers.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid-providers.yaml';
       createConfigFactory();
       Sinon.assert.calledWith(
         warnSpy.firstCall,
@@ -2114,8 +2173,7 @@ describe('ConfigFactory', function () {
     });
 
     it('check resources priority', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/resources.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/resources.yaml';
       const configFactory = createConfigFactory();
       const expectedConfig: unknown = {
         disabled: false,
@@ -2185,8 +2243,7 @@ describe('ConfigFactory', function () {
     });
 
     it('checks to keep good code coverage', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/test-for-coverage.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/test-for-coverage.yaml';
 
       const config = parseConfigFile();
       assert.deepStrictEqual(config, {

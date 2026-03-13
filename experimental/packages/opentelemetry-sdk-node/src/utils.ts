@@ -79,17 +79,37 @@ const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
 export function getResourceFromConfiguration(
   config: Configuration
 ): Resource | undefined {
-  if (config.resource && config.resource.attributes) {
-    const attr: DetectedResourceAttributes = {};
+  if (!config.resource) {
+    return undefined;
+  }
+  const attr: DetectedResourceAttributes = {};
+  // Parse attributes_list (lower priority) first
+  const attributesList = config.resource.attributes_list;
+  if (typeof attributesList === 'string' && attributesList.trim()) {
+    for (const pair of attributesList.split(',')) {
+      const eqIdx = pair.indexOf('=');
+      if (eqIdx > 0) {
+        const key = pair.slice(0, eqIdx).trim();
+        const value = pair.slice(eqIdx + 1).trim();
+        if (key) {
+          attr[key] = value;
+        }
+      }
+    }
+  }
+  // Parse attributes (higher priority) — overrides attributes_list
+  if (config.resource.attributes) {
     for (let i = 0; i < config.resource.attributes.length; i++) {
       const a = config.resource.attributes[i];
-      attr[a.name] = a.value;
+      attr[a.name] = a.value ?? undefined;
     }
-    return resourceFromAttributes(attr, {
-      schemaUrl: config.resource.schema_url,
-    });
   }
-  return undefined;
+  if (Object.keys(attr).length === 0 && !config.resource.schema_url) {
+    return undefined;
+  }
+  return resourceFromAttributes(attr, {
+    schemaUrl: config.resource.schema_url ?? undefined,
+  });
 }
 
 export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
@@ -128,31 +148,16 @@ export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
 export function getResourceDetectorsFromConfiguration(
   config: Configuration
 ): Array<ResourceDetector> {
-  // When updating this list, make sure to also update the section `resourceDetectors` on README.
-  const resourceDetectors = new Map<string, ResourceDetector>([
-    [RESOURCE_DETECTOR_HOST, hostDetector],
-    [RESOURCE_DETECTOR_OS, osDetector],
-    [RESOURCE_DETECTOR_SERVICE_INSTANCE_ID, serviceInstanceIdDetector],
-    [RESOURCE_DETECTOR_PROCESS, processDetector],
-    [RESOURCE_DETECTOR_ENVIRONMENT, envDetector],
-  ]);
+  const detectors = config.resource?.['detection/development']?.detectors ?? [];
 
-  const resourceDetectorsFromConfig = config.node_resource_detectors ?? [];
-
-  if (resourceDetectorsFromConfig.includes('all')) {
-    return [...resourceDetectors.values()].flat();
-  }
-
-  if (resourceDetectorsFromConfig.includes('none')) {
-    return [];
-  }
-
-  return resourceDetectorsFromConfig.flatMap(detector => {
-    const resourceDetector = resourceDetectors.get(detector);
-    if (!resourceDetector) {
-      diag.warn(`Invalid resource detector "${detector}" specified`);
-    }
-    return resourceDetector || [];
+  return detectors.flatMap(detector => {
+    const result: ResourceDetector[] = [];
+    if (detector.host !== undefined) result.push(hostDetector);
+    if (detector.os !== undefined) result.push(osDetector);
+    if (detector.process !== undefined) result.push(processDetector);
+    if (detector.service !== undefined) result.push(serviceInstanceIdDetector);
+    if (detector.env !== undefined) result.push(envDetector);
+    return result;
   });
 }
 
@@ -576,7 +581,7 @@ export function getLogRecordExporter(
           ? CompressionAlgorithm.GZIP
           : CompressionAlgorithm.NONE,
     });
-  } else if (exporter.console) {
+  } else if ('console' in exporter) {
     return new ConsoleLogRecordExporter();
   }
   diag.warn(`Unsupported Exporter value. No Log Record Exporter registered`);
@@ -589,20 +594,25 @@ export function getLogRecordProcessorsFromConfiguration(
   const logRecordProcessors: LogRecordProcessor[] = [];
   config.logger_provider?.processors?.forEach(processor => {
     if (processor.batch) {
-      const exporter = getLogRecordExporter(processor.batch.exporter);
+      const exporter = getLogRecordExporter(
+        processor.batch.exporter as LogRecordExporterConfiguration
+      );
       if (exporter) {
         logRecordProcessors.push(
           new BatchLogRecordProcessor(exporter, {
-            maxQueueSize: processor.batch.max_queue_size,
-            maxExportBatchSize: processor.batch.max_export_batch_size,
-            scheduledDelayMillis: processor.batch.schedule_delay,
-            exportTimeoutMillis: processor.batch.export_timeout,
+            maxQueueSize: processor.batch.max_queue_size ?? undefined,
+            maxExportBatchSize:
+              processor.batch.max_export_batch_size ?? undefined,
+            scheduledDelayMillis: processor.batch.schedule_delay ?? undefined,
+            exportTimeoutMillis: processor.batch.export_timeout ?? undefined,
           })
         );
       }
     }
     if (processor.simple) {
-      const exporter = getLogRecordExporter(processor.simple.exporter);
+      const exporter = getLogRecordExporter(
+        processor.simple.exporter as LogRecordExporterConfiguration
+      );
       if (exporter) {
         logRecordProcessors.push(new SimpleLogRecordProcessor(exporter));
       }

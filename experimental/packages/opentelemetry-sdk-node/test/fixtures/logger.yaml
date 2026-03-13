@@ -24,18 +24,19 @@ logger_provider:
           # Configure exporter to be OTLP with HTTP transport.
           otlp_http:
             endpoint: http://localhost:4318/v1/logs
-            # Configure certificate used to verify a server's TLS credentials. 
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key. 
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate. 
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            tls:
+              # Configure certificate used to verify a server's TLS credentials.
+              # Absolute path to certificate file in PEM format.
+              # If omitted or null, system default certificate verification is used for secure connections.
+              ca_file: /app/cert.pem
+              # Configure mTLS private client key.
+              # Absolute path to client key file in PEM format. If set, .cert_file must also be set.
+              # If omitted or null, mTLS is not used.
+              key_file: /app/cert.pem
+              # Configure mTLS client certificate.
+              # Absolute path to client certificate file in PEM format. If set, .key_file must also be set.
+              # If omitted or null, mTLS is not used.
+              cert_file: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
@@ -66,18 +67,23 @@ logger_provider:
             # Configure endpoint.
             # If omitted or null, http://localhost:4317 is used.
             endpoint: http://localhost:4317
-            # Configure certificate used to verify a server's TLS credentials. 
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key. 
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate. 
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            tls:
+              # Configure certificate used to verify a server's TLS credentials.
+              # Absolute path to certificate file in PEM format.
+              # If omitted or null, system default certificate verification is used for secure connections.
+              ca_file: /app/cert.pem
+              # Configure mTLS private client key.
+              # Absolute path to client key file in PEM format. If set, .cert_file must also be set.
+              # If omitted or null, mTLS is not used.
+              key_file: /app/cert.pem
+              # Configure mTLS client certificate.
+              # Absolute path to client certificate file in PEM format. If set, .key_file must also be set.
+              # If omitted or null, mTLS is not used.
+              cert_file: /app/cert.pem
+              # Configure client transport security for the exporter's connection.
+              # Only applicable when .endpoint is provided without http or https scheme.
+              # If omitted or null, false is used.
+              insecure: false
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
@@ -91,14 +97,10 @@ logger_provider:
             # Values include: gzip, none. Implementations may support other compression algorithms.
             # If omitted or null, none is used.
             compression: gzip
-            # Configure max time (in milliseconds) to wait for each export. 
+            # Configure max time (in milliseconds) to wait for each export.
             # Value must be non-negative. A value of 0 indicates no limit (infinity).
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure client transport security for the exporter's connection. 
-            # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
-            # If omitted or null, false is used.
-            insecure: false
     - # Configure a simple log record processor.
       simple:
         # Configure exporter.

@@ -128,7 +128,7 @@ export function setupResource(
 
   if (sdkOptions.resourceDetectors != null) {
     resourceDetectors = sdkOptions.resourceDetectors;
-  } else if (config.node_resource_detectors) {
+  } else if (config.resource?.['detection/development']?.detectors) {
     resourceDetectors = getResourceDetectorsFromConfiguration(config);
   }
 

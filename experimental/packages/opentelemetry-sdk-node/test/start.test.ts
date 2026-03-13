@@ -36,7 +36,7 @@ import {
 } from '@opentelemetry/sdk-logs';
 import type {
   ConfigFactory,
-  LogRecordExporterModel,
+  LogRecordExporterConfiguration as LogRecordExporterModel,
 } from '@opentelemetry/configuration';
 import { createConfigFactory } from '@opentelemetry/configuration';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
@@ -188,8 +188,7 @@ describe('startNodeSDK', function () {
   });
 
   it('should return NOOP_SDK when disabled is true', async () => {
-    process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-      'test/fixtures/kitchen-sink.yaml';
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/kitchen-sink.yaml';
     const sdk = startNodeSDK({});
 
     assertDefaultContextManagerRegistered();
@@ -211,7 +210,7 @@ describe('startNodeSDK', function () {
   });
 
   it('should register a logger provider if multiple log record processors are provided', async () => {
-    process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = 'test/fixtures/logger.yaml';
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/logger.yaml';
     const sdk = startNodeSDK({});
 
     const loggerProvider = logs.getLoggerProvider();
@@ -330,13 +329,12 @@ describe('startNodeSDK', function () {
 
       assert.notEqual(resource.attributes[ATTR_PROCESS_PID], undefined);
       assert.notEqual(resource.attributes[ATTR_HOST_NAME], undefined);
-      assert.notEqual(resource.attributes[ATTR_OS_TYPE], undefined);
       assert.notEqual(resource.attributes[ATTR_SERVICE_INSTANCE_ID], undefined);
+      assert.notEqual(resource.attributes[ATTR_OS_TYPE], undefined);
     });
 
     it('should configure resources from config file', async () => {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/resources.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/resources.yaml';
       const configFactory: ConfigFactory = createConfigFactory();
       const config = configFactory.getConfigModel();
       const resource = setupResource(config, {});
