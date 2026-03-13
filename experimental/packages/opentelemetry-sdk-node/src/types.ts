@@ -11,6 +11,7 @@ import type {
   LoggerProvider,
   LogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
+import type { MeterProvider } from '@opentelemetry/sdk-metrics';
 import type { IMetricReader, ViewOptions } from '@opentelemetry/sdk-metrics';
 import type {
   Sampler,
@@ -55,5 +56,6 @@ export interface SDKOptions {
 export interface SDKComponents {
   contextManager: ContextManager;
   loggerProvider?: LoggerProvider;
+  meterProvider?: MeterProvider;
   propagator?: TextMapPropagator;
 }
