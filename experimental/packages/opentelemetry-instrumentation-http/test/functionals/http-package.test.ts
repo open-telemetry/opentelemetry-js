@@ -62,6 +62,7 @@ describe('Packages', () => {
       propagation.disable();
       nock.cleanAll();
       nock.enableNetConnect();
+      instrumentation.disable();
     });
 
     let resHeaders: http.IncomingHttpHeaders;
