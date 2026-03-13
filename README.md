@@ -256,13 +256,11 @@ For more information about the maintainer role, see the [community repository](h
 
 ### Approvers
 
-- [Amir Blum](https://github.com/blumamir), Odigos
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
 - [Jackson Weber](https://github.com/JacksonWeber), Microsoft
 - [Martin Kuba](https://github.com/martinkuba), Grafana Labs
 - [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
 - [Raphaël Thériault](https://github.com/raphael-theriault-swi), SolarWinds
-- [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
 
 In addition, [Browser SIG Maintainers](https://github.com/orgs/open-telemetry/teams/browser-maintainers) are granted the
 Approver role for browser-targeted packages as defined in this repository's [CODEOWNERS](./.github/CODEOWNERS) file.
@@ -330,6 +328,8 @@ For more information about the triager role, see the [community repository](http
 - [Matthew Wear](https://github.com/mwear), Approver
 - [Neville Wylie](https://github.com/MSNev), Approver
 - [Purvi Kanal](https://github.com/pkanal), Approver
+- [Amir Blum](https://github.com/blumamir), Approver
+- [Svetlana Brennan](https://github.com/svetlanabrennan), Approver
 
 For more information about the emeritus role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#emeritus-maintainerapprovertriager).
 
