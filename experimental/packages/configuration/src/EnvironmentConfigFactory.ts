@@ -30,6 +30,7 @@ import { initializeDefaultTracerProviderConfiguration } from './models/tracerPro
 import type { BatchLogRecordProcessor } from './models/loggerProviderModel';
 import { initializeDefaultLoggerProviderConfiguration } from './models/loggerProviderModel';
 import { getGrpcTlsConfig, getHttpTlsConfig } from './utils';
+import type { ExperimentalResourceDetector } from './models/resourceModel';
 
 /**
  * EnvironmentConfigProvider provides a configuration based on environment variables.
@@ -44,13 +45,6 @@ export class EnvironmentConfigFactory implements ConfigFactory {
     const logLevel = diagLogLevelFromString(getStringFromEnv('OTEL_LOG_LEVEL'));
     if (logLevel) {
       this._config.log_level = logLevel;
-    }
-
-    const nodeResourceDetectors = getStringListFromEnv(
-      'OTEL_NODE_RESOURCE_DETECTORS'
-    );
-    if (nodeResourceDetectors) {
-      this._config.node_resource_detectors = nodeResourceDetectors;
     }
 
     setResources(this._config);
@@ -102,6 +96,31 @@ export function setResources(config: ConfigurationModel): void {
           type: 'string',
         });
       }
+    }
+  }
+
+  const nodeDetectors = getStringListFromEnv('OTEL_NODE_RESOURCE_DETECTORS');
+  if (
+    nodeDetectors &&
+    nodeDetectors.length > 0 &&
+    !nodeDetectors.includes('none')
+  ) {
+    const all = nodeDetectors.includes('all');
+    const detectors: ExperimentalResourceDetector[] = [];
+    if (all || nodeDetectors.includes('container'))
+      detectors.push({ container: {} });
+    if (all || nodeDetectors.includes('host')) detectors.push({ host: {} });
+    if (all || nodeDetectors.includes('os')) detectors.push({ os: {} });
+    if (all || nodeDetectors.includes('process'))
+      detectors.push({ process: {} });
+    if (all || nodeDetectors.includes('serviceinstance'))
+      detectors.push({ service: {} });
+    if (all || nodeDetectors.includes('env')) detectors.push({ env: {} });
+    if (detectors.length > 0) {
+      if (config.resource['detection/development'] == null) {
+        config.resource['detection/development'] = {};
+      }
+      config.resource['detection/development'].detectors = detectors;
     }
   }
 }
