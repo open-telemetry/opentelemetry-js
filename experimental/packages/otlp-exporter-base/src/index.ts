@@ -26,3 +26,5 @@ export type { OTLPExporterNodeConfigBase } from './configuration/legacy-node-con
 export type { OTLPExporterConfigBase } from './configuration/legacy-base-configuration';
 export type { IOtlpExportDelegate } from './otlp-export-delegate';
 export { createOtlpNetworkExportDelegate } from './otlp-network-export-delegate';
+
+export { ExporterMetrics, type IExporterSignal } from './ExporterMetrics';

@@ -3,17 +3,20 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export type {
-  IExportMetricsPartialSuccess,
-  IExportMetricsServiceResponse,
+export {
+  type IExportMetricsPartialSuccess,
+  type IExportMetricsServiceResponse,
+  MetricsSignal,
 } from './metrics';
-export type {
-  IExportTracePartialSuccess,
-  IExportTraceServiceResponse,
+export {
+  type IExportTracePartialSuccess,
+  type IExportTraceServiceResponse,
+  TraceSignal,
 } from './trace';
-export type {
-  IExportLogsServiceResponse,
-  IExportLogsPartialSuccess,
+export {
+  type IExportLogsServiceResponse,
+  type IExportLogsPartialSuccess,
+  LogsSignal,
 } from './logs';
 
 export { ProtobufLogsSerializer } from './logs/protobuf';

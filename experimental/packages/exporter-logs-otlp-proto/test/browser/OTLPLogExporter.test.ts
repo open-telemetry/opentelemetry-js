@@ -10,6 +10,8 @@ import {
   LoggerProvider,
   SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
+import { TestMetricReader } from '../utils';
 
 /*
  * NOTE: Tests here are not intended to test the underlying components directly. They are intended as a quick
@@ -29,8 +31,14 @@ describe('OTLPLogExporter', function () {
       const stubFetch = sinon
         .stub(window, 'fetch')
         .resolves(new Response('', { status: 200 }));
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
       const loggerProvider = new LoggerProvider({
-        processors: [new SimpleLogRecordProcessor(new OTLPLogExporter())],
+        processors: [
+          new SimpleLogRecordProcessor(new OTLPLogExporter({ meterProvider })),
+        ],
       });
 
       // act
@@ -44,6 +52,13 @@ describe('OTLPLogExporter', function () {
         () => JSON.parse(body),
         'expected requestBody to be in protobuf format, but parsing as JSON succeeded'
       );
+
+      const metrics = await metricReader.collect();
+      const scopeMetrics = metrics.resourceMetrics.scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/otlp-exporter'
+      );
+      assert.ok(scopeMetrics);
+      await meterProvider.shutdown();
     });
   });
 });

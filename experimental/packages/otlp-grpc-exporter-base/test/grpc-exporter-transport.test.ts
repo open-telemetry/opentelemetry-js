@@ -15,17 +15,23 @@ import * as assert from 'assert';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import type { Metadata } from '@grpc/grpc-js';
+import type { Metadata, ServiceError } from '@grpc/grpc-js';
 import {
   Server,
   ServerCredentials,
   ServerInterceptingCall,
+  status,
 } from '@grpc/grpc-js';
 import { types } from 'util';
 import type {
   ExportResponseFailure,
   ExportResponseSuccess,
 } from '@opentelemetry/otlp-exporter-base';
+import type { ISerializer } from '@opentelemetry/otlp-transformer';
+import type { Histogram } from '@opentelemetry/sdk-metrics';
+import { MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics';
+import { createOtlpGrpcExportDelegate } from '../src';
+import { ExportResultCode } from '@opentelemetry/core';
 
 const testServiceDefinition = {
   export: {
@@ -72,6 +78,23 @@ interface ServerTestContext {
   metadata: Metadata[];
   serverResponseProvider: () => { error: Error | null; buffer?: Buffer };
 }
+
+interface FakeInternalRepresentation {
+  foo: string;
+}
+
+interface FakeSignalResponse {
+  partialSuccess?: { foo: string };
+}
+
+type FakeSerializer = ISerializer<
+  FakeInternalRepresentation,
+  FakeSignalResponse
+>;
+
+const internalRepresentation: FakeInternalRepresentation = {
+  foo: 'internal',
+};
 
 /**
  * Starts a customizable server that saves all responses to context.responses
@@ -443,6 +466,129 @@ describe('GrpcExporterTransport', function () {
         assert.strictEqual(result.status, 'failure');
         assert.strictEqual(result.error, expectedError);
       });
+
+      it('delegate records metrics for success', async () => {
+        const metricReader = new TestMetricReader();
+        const meterProvider = new MeterProvider({
+          readers: [metricReader],
+        });
+        const serializerStubs = {
+          // simulate that the serializer returns something to send
+          serializeRequest: sinon.stub().returns(Buffer.from([1, 2, 3])),
+          // simulate that it returns a full success (empty response)
+          deserializeResponse: sinon.stub().returns({}),
+        };
+        const mockSerializer = <FakeSerializer>serializerStubs;
+
+        const delegate = createOtlpGrpcExportDelegate(
+          {
+            url: simpleClientConfig.address,
+            metadata: simpleClientConfig.metadata,
+            credentials: simpleClientConfig.credentials,
+            compression: simpleClientConfig.compression,
+            concurrencyLimit: 10,
+            timeoutMillis,
+          },
+          mockSerializer,
+          'test_grpc_exporter',
+          { name: 'log', countItems: () => 10 },
+          meterProvider,
+          simpleClientConfig.grpcName,
+          simpleClientConfig.grpcPath
+        );
+
+        await new Promise<void>(resolve =>
+          delegate.export(internalRepresentation, result => {
+            assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+            assert.strictEqual(result.error, undefined);
+            resolve();
+          })
+        );
+
+        const { resourceMetrics } = await metricReader.collect();
+        const metrics = resourceMetrics.scopeMetrics[0].metrics;
+        const duration = metrics.find(
+          metric =>
+            metric.descriptor.name === 'otel.sdk.exporter.operation.duration'
+        );
+        assert.ok(duration);
+        const histogram = duration.dataPoints[0].value as Histogram;
+        assert.strictEqual(histogram.count, 1);
+        assert.strictEqual(histogram.count, 1);
+        assert.deepStrictEqual(duration.dataPoints[0].attributes, {
+          'otel.component.type': 'test_grpc_exporter',
+          'otel.component.name': 'test_grpc_exporter/0',
+          'server.address': 'localhost',
+          'server.port': 1234,
+        });
+      });
+
+      it('delegate records metrics for gRPC error', async () => {
+        const error: ServiceError = {
+          name: 'ServiceError',
+          message: 'service failed',
+          code: status.DATA_LOSS,
+          details: 'failed',
+          metadata: simpleClientConfig.metadata(),
+        };
+        serverTestContext.serverResponseProvider = () => ({
+          error,
+        });
+        const metricReader = new TestMetricReader();
+        const meterProvider = new MeterProvider({
+          readers: [metricReader],
+        });
+        const serializerStubs = {
+          // simulate that the serializer returns something to send
+          serializeRequest: sinon.stub().returns(Buffer.from([1, 2, 3])),
+          // simulate that it returns a full success (empty response)
+          deserializeResponse: sinon.stub().returns({}),
+        };
+        const mockSerializer = <FakeSerializer>serializerStubs;
+
+        const delegate = createOtlpGrpcExportDelegate(
+          {
+            url: simpleClientConfig.address,
+            metadata: simpleClientConfig.metadata,
+            credentials: simpleClientConfig.credentials,
+            compression: simpleClientConfig.compression,
+            concurrencyLimit: 10,
+            timeoutMillis,
+          },
+          mockSerializer,
+          'test_grpc_exporter',
+          { name: 'log', countItems: () => 10 },
+          meterProvider,
+          simpleClientConfig.grpcName,
+          simpleClientConfig.grpcPath
+        );
+
+        await new Promise<void>(resolve =>
+          delegate.export(internalRepresentation, result => {
+            assert.strictEqual(result.code, ExportResultCode.FAILED);
+            resolve();
+          })
+        );
+
+        const { resourceMetrics } = await metricReader.collect();
+        const metrics = resourceMetrics.scopeMetrics[0].metrics;
+        const duration = metrics.find(
+          metric =>
+            metric.descriptor.name === 'otel.sdk.exporter.operation.duration'
+        );
+        assert.ok(duration);
+        const histogram = duration.dataPoints[0].value as Histogram;
+        assert.strictEqual(histogram.count, 1);
+        assert.strictEqual(histogram.count, 1);
+        assert.deepStrictEqual(duration.dataPoints[0].attributes, {
+          'otel.component.type': 'test_grpc_exporter',
+          'otel.component.name': 'test_grpc_exporter/1',
+          'server.address': 'localhost',
+          'server.port': 1234,
+          'rpc.response.status_code': 'DATA_LOSS',
+          'error.type': 'Error',
+        });
+      });
     });
     describe('uds', function () {
       let shutdownHandle: (() => void) | undefined;
@@ -499,3 +645,12 @@ describe('GrpcExporterTransport', function () {
     });
   });
 });
+
+export class TestMetricReader extends MetricReader {
+  protected override onShutdown(): Promise<void> {
+    return Promise.resolve();
+  }
+  protected override onForceFlush(): Promise<void> {
+    return Promise.resolve();
+  }
+}
