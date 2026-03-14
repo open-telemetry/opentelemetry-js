@@ -408,7 +408,9 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           args[0] instanceof Request ? args[0].url : String(args[0])
         ).href;
 
-        const options = args[0] instanceof Request ? args[0] : args[1] || {};
+        const options = args[0] instanceof Request 
+          ? new Request(args[0], args[1]) 
+          : { url: args[0], ...args[1] };
         const createdSpan = plugin._createSpan(url, options);
         if (!createdSpan) {
           return original.apply(this, args);
