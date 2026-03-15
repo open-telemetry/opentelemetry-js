@@ -14,6 +14,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(sdk-metrics): add `maxScale` option to `ExponentialHistogramAggregation` to allow limiting the scale of exponential histograms [#6095](https://github.com/open-telemetry/opentelemetry-js/pull/6493) @andidev
+
 ### :bug: Bug Fixes
 
 * fix(opentelemetry-instrumentation): improve `_warnOnPreloadedModules` function not to show warning logs when the module is not marked as loaded [#6095](https://github.com/open-telemetry/opentelemetry-js/pull/6095) @rlj1202
