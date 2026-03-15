@@ -540,6 +540,25 @@ describe('ExponentialHistogramAccumulation', () => {
       assert.strictEqual(acc['_maxSize'], 2);
     });
   });
+
+  describe('maxScale', () => {
+    it('defaults to 20', () => {
+      const acc = new ExponentialHistogramAccumulation([0, 0], 4);
+      acc.record(1);
+      assert.strictEqual(acc.scale, 20);
+    });
+
+    it('respects custom maxScale', () => {
+      const acc = new ExponentialHistogramAccumulation(
+        [0, 0],
+        4,
+        true,
+        5
+      );
+      acc.record(1);
+      assert.strictEqual(acc.scale, 5);
+    });
+  });
 });
 
 describe('ExponentialHistogramAggregation', () => {
@@ -629,6 +648,32 @@ describe('ExponentialHistogramAggregation', () => {
         bucketCounts(result),
         bucketCounts(delta) + bucketCounts(previous)
       );
+    });
+  });
+
+  describe('maxScale', () => {
+    it('defaults to 20 when not specified', () => {
+      const agg = new ExponentialHistogramAggregator(4, true);
+      const acc = agg.createAccumulation([0, 0]);
+      acc.record(1);
+      assert.strictEqual(acc.scale, 20);
+    });
+
+    it('passes custom maxScale to accumulations', () => {
+      const agg = new ExponentialHistogramAggregator(4, true, 5);
+      const acc = agg.createAccumulation([0, 0]);
+      acc.record(1);
+      assert.strictEqual(acc.scale, 5);
+    });
+
+    it('creates multiple accumulations with the same maxScale', () => {
+      const agg = new ExponentialHistogramAggregator(4, true, 10);
+      const acc0 = agg.createAccumulation([0, 0]);
+      const acc1 = agg.createAccumulation([0, 0]);
+      acc0.record(1);
+      acc1.record(1);
+      assert.strictEqual(acc0.scale, 10);
+      assert.strictEqual(acc1.scale, 10);
     });
   });
 
