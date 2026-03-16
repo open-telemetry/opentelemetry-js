@@ -34,6 +34,7 @@ npm run generate:config
 ```
 
 This runs `scripts/config/generate-config.sh`, which:
+
 1. Downloads the JSON schema at the version pinned in that script (currently `v1.0.0-rc.3`)
 2. Runs `scripts/config/generate-config.js` to produce:
    - `src/generated/opentelemetry-configuration.ts` — Zod validation schemas
@@ -46,7 +47,7 @@ To target a different schema version, update the `VERSION` variable in `scripts/
 The generator applies several structural patches to the raw `json-schema-to-zod` output:
 
 | Patch | Reason |
-|---|---|
+| --- | --- |
 | `z.record(v)` → `z.record(z.string(), v)` | Zod v4 requires two arguments |
 | `.array(...).min(1)` → `.array(...)` | `preprocessNullArrays` can produce empty arrays for omitted processors/readers |
 | `z.number()` → `z.coerce.number()` | Env-var values arrive as strings and need coercion |
