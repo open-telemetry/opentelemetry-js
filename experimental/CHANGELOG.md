@@ -16,6 +16,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(configuration): add sampler configuration parsing support [#6409](https://github.com/open-telemetry/opentelemetry-js/pull/6409) @MikeGoldsmith
 * feat(configuration): add resource detection parsing [#6435](https://github.com/open-telemetry/opentelemetry-js/pull/6435) @MikeGoldsmith
 * feat(configuration): export interfaces required in other packages [#6462](https://github.com/open-telemetry/opentelemetry-js/pull/6462) @maryliag
+* feat(configuration): Zod-based codegen with reproducible generation and factory-layer defaults [#6498](https://github.com/open-telemetry/opentelemetry-js/pull/6498) @MikeGoldsmith
 
 ### :bug: Bug Fixes
 
