@@ -6,6 +6,15 @@
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
 import type { Configuration } from '../src';
+import {
+  ExemplarFilter,
+  ExporterDefaultHistogramAggregation,
+  ExporterTemporalityPreference,
+  ExperimentalPrometheusTranslationStrategy,
+  InstrumentType,
+  OtlpHttpEncoding,
+  SeverityNumber,
+} from '../src/generated/types';
 import { diag } from '@opentelemetry/api';
 import { createConfigFactory } from '../src/ConfigFactory';
 import {
@@ -15,65 +24,6 @@ import {
   setResources,
 } from '../src/EnvironmentConfigFactory';
 import { parseConfigFile } from '../src/FileConfigFactory';
-
-// Enum string values (previously from models, now raw strings matching JSON schema)
-const OtlpHttpEncoding = { JSON: 'json', Protobuf: 'protobuf' } as const;
-const ExemplarFilter = {
-  AlwaysOff: 'always_off',
-  AlwaysOn: 'always_on',
-  TraceBased: 'trace_based',
-} as const;
-const ExporterTemporalityPreference = {
-  Cumulative: 'cumulative',
-  Delta: 'delta',
-  LowMemory: 'low_memory',
-} as const;
-const ExporterDefaultHistogramAggregation = {
-  Base2ExponentialBucketHistogram: 'base2_exponential_bucket_histogram',
-  ExplicitBucketHistogram: 'explicit_bucket_histogram',
-} as const;
-const InstrumentType = {
-  Counter: 'counter',
-  Gauge: 'gauge',
-  Histogram: 'histogram',
-  ObservableCounter: 'observable_counter',
-  ObservableGauge: 'observable_gauge',
-  ObservableUpDownCounter: 'observable_up_down_counter',
-  UpDownCounter: 'up_down_counter',
-} as const;
-const ExperimentalPrometheusTranslationStrategy = {
-  UnderscoreEscapingWithSuffixes: 'underscore_escaping_with_suffixes',
-  UnderscoreEscapingWithoutSuffixes: 'underscore_escaping_without_suffixes',
-  NoUtf8EscapingWithSuffixes: 'no_utf8_escaping_with_suffixes',
-  NoTranslation: 'no_translation',
-} as const;
-// SeverityNumber string enum from JSON schema
-const SeverityNumber = {
-  DEBUG: 'debug',
-  DEBUG2: 'debug2',
-  DEBUG3: 'debug3',
-  DEBUG4: 'debug4',
-  INFO: 'info',
-  INFO2: 'info2',
-  INFO3: 'info3',
-  INFO4: 'info4',
-  WARN: 'warn',
-  WARN2: 'warn2',
-  WARN3: 'warn3',
-  WARN4: 'warn4',
-  ERROR: 'error',
-  ERROR2: 'error2',
-  ERROR3: 'error3',
-  ERROR4: 'error4',
-  FATAL: 'fatal',
-  FATAL2: 'fatal2',
-  FATAL3: 'fatal3',
-  FATAL4: 'fatal4',
-  TRACE: 'trace',
-  TRACE2: 'trace2',
-  TRACE3: 'trace3',
-  TRACE4: 'trace4',
-} as const;
 
 const defaultConfig = {
   disabled: false,
@@ -557,7 +507,7 @@ const configFromKitchenSinkFile = {
           name: 'io.opentelemetry.contrib.*',
           config: {
             disabled: true,
-            minimum_severity: SeverityNumber.INFO,
+            minimum_severity: SeverityNumber.Info,
             trace_based: true,
           },
         },
@@ -1017,7 +967,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/traces',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.JSON,
+                    encoding: OtlpHttpEncoding.Json,
                   },
                 },
               },
@@ -1486,7 +1436,7 @@ describe('ConfigFactory', function () {
                       ExporterTemporalityPreference.Cumulative,
                     endpoint: 'http://localhost:4318/v1/metrics',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.JSON,
+                    encoding: OtlpHttpEncoding.Json,
                   },
                 },
               },
@@ -1691,7 +1641,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/logs',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.JSON,
+                    encoding: OtlpHttpEncoding.Json,
                   },
                 },
               },
@@ -2010,9 +1960,9 @@ describe('ConfigFactory', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_TIMEOUT = '22';
       process.env.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'metric-header';
       process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE =
-        'metric-temporality';
+        'delta';
       process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
-        'metric-hist-agg';
+        'base2_exponential_bucket_histogram';
       process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'always_off';
       process.env.OTEL_BLRP_SCHEDULE_DELAY = '23';
       process.env.OTEL_BLRP_EXPORT_TIMEOUT = '24';
@@ -2094,8 +2044,8 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://test.com:4318/v1/metrics',
                     timeout: 22,
-                    temporality_preference: 'metric-temporality',
-                    default_histogram_aggregation: 'metric-hist-agg',
+                    temporality_preference: ExporterTemporalityPreference.Delta,
+                    default_histogram_aggregation: ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
                     tls: {
                       ca_file: 'metric-certificate',
                       key_file: 'metric-client-key',
@@ -2240,6 +2190,21 @@ describe('ConfigFactory', function () {
         },
       };
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('leaves attribute type undefined when omitted in YAML', function () {
+      // The spec says "if omitted, string is used" for attribute type, but we intentionally
+      // do NOT apply this default in the config parser. The consumer (SDK init code) is
+      // responsible for interpreting undefined type as string. This matches the Java/Python
+      // pattern where the model faithfully mirrors the config file and semantic defaults
+      // are applied at the point of use.
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/attribute-type-omitted.yaml';
+      const config = parseConfigFile();
+      const attrs = (config as Record<string, unknown>).resource as { attributes: { name: string; value: string; type?: string }[] };
+      const noTypeAttr = attrs.attributes.find(a => a.name === 'no-type-key');
+      const explicitAttr = attrs.attributes.find(a => a.name === 'explicit-string-key');
+      assert.strictEqual(noTypeAttr?.type, undefined);
+      assert.strictEqual(explicitAttr?.type, 'string');
     });
 
     it('checks to keep good code coverage', function () {

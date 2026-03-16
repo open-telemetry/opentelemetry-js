@@ -72,6 +72,10 @@ function normalizeSchema(obj) {
   for (const [k, v] of Object.entries(obj)) {
     if (k === 'type' && Array.isArray(v) && v.length === 1) {
       result[k] = v[0];
+    } else if (k === 'type' && Array.isArray(v) && v.includes('null')) {
+      // Put 'null' first so json-schema-to-zod emits z.null() before z.coerce.number().
+      // Without this, z.coerce.number() would coerce null→0 since Number(null)===0.
+      result[k] = ['null', ...v.filter(t => t !== 'null')];
     } else if (k === 'oneOf') {
       result['anyOf'] = normalizeSchema(v);
     } else {
@@ -232,9 +236,10 @@ if (circularList.length > 0) {
 
 lines.push(...defLines);
 
-// Root schema
+// Root schema — annotated as ZodTypeAny to prevent TS7056 "type exceeds max length"
 const rootZod = jsonSchemaToZod(normalizedRootSchema, { parserOverride });
-lines.push(`export const OpenTelemetryConfigurationSchema = ${rootZod};`);
+lines.push(`// eslint-disable-next-line @typescript-eslint/no-explicit-any`);
+lines.push(`export const OpenTelemetryConfigurationSchema: z.ZodTypeAny = ${rootZod};`);
 lines.push('');
 
 let output = lines.join('\n');
@@ -243,6 +248,24 @@ let output = lines.join('\n');
 // json-schema-to-zod (v3 target) emits z.record(valueExpr) — add z.string() key arg.
 // The negative lookahead avoids double-patching already-correct occurrences.
 output = output.replace(/z\.record\((?!z\.string\(\))/g, 'z.record(z.string(), ');
+
+// Remove .min(1) constraints on arrays — the spec requires non-empty arrays for
+// required fields (processors, readers), but our preprocessNullArrays() can
+// legitimately produce [] when a provider section is present but has no children.
+output = output.replace(/z\.array\(([^)]+)\)\.min\(1\)/g, 'z.array($1)');
+
+// Use z.coerce.number() so that string values from env-var substitution are
+// accepted.  z.coerce.number() is idempotent on actual numbers.
+output = output.replace(/z\.number\(\)/g, 'z.coerce.number()');
+
+// After coerce-patching, fix union member ordering in AttributeNameValue.value:
+// z.boolean() / z.null() must come before z.coerce.number() so that YAML boolean
+// values (true/false) are not coerced to 1/0.  Number(true) === 1.
+output = output.replace(
+  '"value": z.union([z.string(), z.coerce.number(), z.boolean(), z.null(),',
+  '"value": z.union([z.string(), z.boolean(), z.null(), z.coerce.number(),'
+);
+
 
 fs.mkdirSync(path.dirname(OUT_PATH), { recursive: true });
 fs.writeFileSync(OUT_PATH, output);
@@ -336,8 +359,27 @@ function generateTsDecl(name, schema) {
   const isObject = types.includes('object') || !!schema.properties;
   const isNullable = types.includes('null');
 
-  // ── Non-object: emit a type alias ──────────────────────────────────────────
+  // ── Non-object: emit a type alias (or const object for pure string enums) ──
   if (!isObject) {
+    // For pure string enums, emit a const object + derived type alias so
+    // consumers can reference values as e.g. ExporterTemporalityPreference.Cumulative.
+    // This matches the Java/Python enum pattern.
+    if (schema.enum !== undefined) {
+      const stringVals = schema.enum.filter(v => typeof v === 'string');
+      if (stringVals.length > 0 && stringVals.length === schema.enum.length) {
+        const toPascalCase = s =>
+          s.split('_').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('');
+        const entries = stringVals.map(
+          v => `  ${toPascalCase(v)}: ${JSON.stringify(v)},`
+        );
+        return [
+          `export const ${name} = {`,
+          ...entries,
+          `} as const;`,
+          `export type ${name} = typeof ${name}[keyof typeof ${name}];`,
+        ];
+      }
+    }
     const tsType = schemaToTsType(schema);
     return [`export type ${name} = ${tsType};`];
   }

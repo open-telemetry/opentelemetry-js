@@ -14,6 +14,7 @@ resource:
   attributes:
     - name: service.name
       value: unknown_service
+      type: string
 attribute_limits:
   attribute_value_length_limit:
   attribute_count_limit: 128

@@ -395,6 +395,7 @@ resource:
   attributes:
     - name: service.name
       value: unknown_service
+      type: string
     - name: string_key
       value: value
       type: string

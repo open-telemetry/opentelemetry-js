@@ -78,6 +78,8 @@ export function parseConfigFile(): Configuration {
   // Strip file_format from output — it's a meta-field, not a config value
   delete (data as Record<string, unknown>)['file_format'];
 
+  applyConfigDefaults(data);
+
   // Warn for providers with empty processors/readers
   if (data.tracer_provider?.processors?.length === 0) {
     diag.warn('TracerProvider must have at least one processor configured');
@@ -91,6 +93,30 @@ export function parseConfigFile(): Configuration {
   }
 
   return data;
+}
+
+/**
+ * Apply spec-defined defaults that are not encoded in the JSON schema.
+ * Matches the pattern used by Java/Python SDKs: models are null/undefined
+ * when absent; factory code applies defaults before returning.
+ *
+ * Note: AttributeNameValue.type is intentionally NOT defaulted here. The spec
+ * says "if omitted, string is used", but this is a semantic default for the
+ * SDK init code that reads resource attributes — not a config-parser concern.
+ * The parsed model faithfully mirrors what was in the YAML.
+ */
+function applyConfigDefaults(data: Configuration): void {
+  const d = data as Record<string, unknown>;
+  if (d['disabled'] == null) d['disabled'] = false;
+  if (d['log_level'] == null) d['log_level'] = 'info';
+  if (d['attribute_limits'] == null) {
+    d['attribute_limits'] = { attribute_count_limit: 128 };
+  } else {
+    const limits = d['attribute_limits'] as Record<string, unknown>;
+    if (limits['attribute_count_limit'] == null) {
+      limits['attribute_count_limit'] = 128;
+    }
+  }
 }
 
 function preprocessNullArrays(obj: unknown): unknown {

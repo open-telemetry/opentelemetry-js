@@ -26,13 +26,13 @@ export type DropAggregation = {} | null;
 
 export type ExplicitBucketHistogramAggregation = {
   boundaries?: Array<number>;
-  record_min_max?: boolean | null;
+  record_min_max?: null | boolean;
 } | null;
 
 export type Base2ExponentialBucketHistogramAggregation = {
-  max_scale?: number | null;
-  max_size?: number | null;
-  record_min_max?: boolean | null;
+  max_scale?: null | number;
+  max_size?: null | number;
+  record_min_max?: null | boolean;
 } | null;
 
 export type LastValueAggregation = {} | null;
@@ -53,11 +53,21 @@ export type AlwaysOffSampler = {} | null;
 export type AlwaysOnSampler = {} | null;
 
 export interface AttributeLimits {
-  attribute_value_length_limit?: number | null;
-  attribute_count_limit?: number | null;
+  attribute_value_length_limit?: null | number;
+  attribute_count_limit?: null | number;
 }
 
-export type AttributeType = "string" | "bool" | "int" | "double" | "string_array" | "bool_array" | "int_array" | "double_array";
+export const AttributeType = {
+  String: "string",
+  Bool: "bool",
+  Int: "int",
+  Double: "double",
+  StringArray: "string_array",
+  BoolArray: "bool_array",
+  IntArray: "int_array",
+  DoubleArray: "double_array",
+} as const;
+export type AttributeType = typeof AttributeType[keyof typeof AttributeType];
 
 export interface AttributeNameValue {
   name: string;
@@ -72,46 +82,50 @@ export type B3Propagator = {} | null;
 export type BaggagePropagator = {} | null;
 
 export type HttpTls = {
-  ca_file?: string | null;
-  key_file?: string | null;
-  cert_file?: string | null;
+  ca_file?: null | string;
+  key_file?: null | string;
+  cert_file?: null | string;
 } | null;
 
 export interface NameStringValuePair {
   name: string;
-  value: string | null;
+  value: null | string;
 }
 
-export type OtlpHttpEncoding = "protobuf" | "json";
+export const OtlpHttpEncoding = {
+  Protobuf: "protobuf",
+  Json: "json",
+} as const;
+export type OtlpHttpEncoding = typeof OtlpHttpEncoding[keyof typeof OtlpHttpEncoding];
 
 export type OtlpHttpExporter = {
-  endpoint?: string | null;
+  endpoint?: null | string;
   tls?: HttpTls;
   headers?: Array<NameStringValuePair>;
-  headers_list?: string | null;
-  compression?: string | null;
-  timeout?: number | null;
+  headers_list?: null | string;
+  compression?: null | string;
+  timeout?: null | number;
   encoding?: OtlpHttpEncoding;
 } | null;
 
 export type GrpcTls = {
-  ca_file?: string | null;
-  key_file?: string | null;
-  cert_file?: string | null;
-  insecure?: boolean | null;
+  ca_file?: null | string;
+  key_file?: null | string;
+  cert_file?: null | string;
+  insecure?: null | boolean;
 } | null;
 
 export type OtlpGrpcExporter = {
-  endpoint?: string | null;
+  endpoint?: null | string;
   tls?: GrpcTls;
   headers?: Array<NameStringValuePair>;
-  headers_list?: string | null;
-  compression?: string | null;
-  timeout?: number | null;
+  headers_list?: null | string;
+  compression?: null | string;
+  timeout?: null | number;
 } | null;
 
 export type ExperimentalOtlpFileExporter = {
-  output_stream?: string | null;
+  output_stream?: null | string;
 } | null;
 
 export type ConsoleExporter = {} | null;
@@ -125,10 +139,10 @@ export interface LogRecordExporter {
 }
 
 export interface BatchLogRecordProcessor {
-  schedule_delay?: number | null;
-  export_timeout?: number | null;
-  max_queue_size?: number | null;
-  max_export_batch_size?: number | null;
+  schedule_delay?: null | number;
+  export_timeout?: null | number;
+  max_queue_size?: null | number;
+  max_export_batch_size?: null | number;
   exporter: LogRecordExporter;
 }
 
@@ -141,27 +155,36 @@ export interface SpanExporter {
 }
 
 export interface BatchSpanProcessor {
-  schedule_delay?: number | null;
-  export_timeout?: number | null;
-  max_queue_size?: number | null;
-  max_export_batch_size?: number | null;
+  schedule_delay?: null | number;
+  export_timeout?: null | number;
+  max_queue_size?: null | number;
+  max_export_batch_size?: null | number;
   exporter: SpanExporter;
 }
 
 export interface CardinalityLimits {
-  default?: number | null;
-  counter?: number | null;
-  gauge?: number | null;
-  histogram?: number | null;
-  observable_counter?: number | null;
-  observable_gauge?: number | null;
-  observable_up_down_counter?: number | null;
-  up_down_counter?: number | null;
+  default?: null | number;
+  counter?: null | number;
+  gauge?: null | number;
+  histogram?: null | number;
+  observable_counter?: null | number;
+  observable_gauge?: null | number;
+  observable_up_down_counter?: null | number;
+  up_down_counter?: null | number;
 }
 
-export type ExporterTemporalityPreference = "cumulative" | "delta" | "low_memory";
+export const ExporterTemporalityPreference = {
+  Cumulative: "cumulative",
+  Delta: "delta",
+  LowMemory: "low_memory",
+} as const;
+export type ExporterTemporalityPreference = typeof ExporterTemporalityPreference[keyof typeof ExporterTemporalityPreference];
 
-export type ExporterDefaultHistogramAggregation = "explicit_bucket_histogram" | "base2_exponential_bucket_histogram";
+export const ExporterDefaultHistogramAggregation = {
+  ExplicitBucketHistogram: "explicit_bucket_histogram",
+  Base2ExponentialBucketHistogram: "base2_exponential_bucket_histogram",
+} as const;
+export type ExporterDefaultHistogramAggregation = typeof ExporterDefaultHistogramAggregation[keyof typeof ExporterDefaultHistogramAggregation];
 
 export type ConsoleMetricExporter = {
   temporality_preference?: ExporterTemporalityPreference;
@@ -172,14 +195,19 @@ export interface Distribution {
   [key: string]: unknown;
 }
 
-export type ExemplarFilter = "always_on" | "always_off" | "trace_based";
+export const ExemplarFilter = {
+  AlwaysOn: "always_on",
+  AlwaysOff: "always_off",
+  TraceBased: "trace_based",
+} as const;
+export type ExemplarFilter = typeof ExemplarFilter[keyof typeof ExemplarFilter];
 
 export type ExperimentalComposableAlwaysOffSampler = {} | null;
 
 export type ExperimentalComposableAlwaysOnSampler = {} | null;
 
 export type ExperimentalComposableProbabilitySampler = {
-  ratio?: number | null;
+  ratio?: null | number;
 } | null;
 
 export interface ExperimentalComposableRuleBasedSamplerRuleAttributeValues {
@@ -193,9 +221,21 @@ export interface ExperimentalComposableRuleBasedSamplerRuleAttributePatterns {
   excluded?: Array<string>;
 }
 
-export type SpanKind = "internal" | "server" | "client" | "producer" | "consumer";
+export const SpanKind = {
+  Internal: "internal",
+  Server: "server",
+  Client: "client",
+  Producer: "producer",
+  Consumer: "consumer",
+} as const;
+export type SpanKind = typeof SpanKind[keyof typeof SpanKind];
 
-export type ExperimentalSpanParent = "none" | "remote" | "local";
+export const ExperimentalSpanParent = {
+  None: "none",
+  Remote: "remote",
+  Local: "local",
+} as const;
+export type ExperimentalSpanParent = typeof ExperimentalSpanParent[keyof typeof ExperimentalSpanParent];
 
 export interface ExperimentalComposableRuleBasedSamplerRule {
   attribute_values?: ExperimentalComposableRuleBasedSamplerRuleAttributeValues;
@@ -206,7 +246,7 @@ export interface ExperimentalComposableRuleBasedSamplerRule {
 }
 
 export type ExperimentalComposableRuleBasedSampler = {
-  rules?: Array<ExperimentalComposableRuleBasedSamplerRule> | null;
+  rules?: null | Array<ExperimentalComposableRuleBasedSamplerRule>;
 } | null;
 
 export interface ExperimentalComposableSampler {
@@ -275,11 +315,11 @@ export interface ExperimentalInstrumentation {
 }
 
 export type ExperimentalProbabilitySampler = {
-  ratio?: number | null;
+  ratio?: null | number;
 } | null;
 
 export type TraceIdRatioBasedSampler = {
-  ratio?: number | null;
+  ratio?: null | number;
 } | null;
 
 export type ParentBasedSampler = {
@@ -303,16 +343,42 @@ export interface Sampler {
 
 export type ExperimentalJaegerRemoteSampler = {
   endpoint: string;
-  interval?: number | null;
+  interval?: null | number;
   initial_sampler: Sampler;
 } | null;
 
-export type SeverityNumber = "trace" | "trace2" | "trace3" | "trace4" | "debug" | "debug2" | "debug3" | "debug4" | "info" | "info2" | "info3" | "info4" | "warn" | "warn2" | "warn3" | "warn4" | "error" | "error2" | "error3" | "error4" | "fatal" | "fatal2" | "fatal3" | "fatal4";
+export const SeverityNumber = {
+  Trace: "trace",
+  Trace2: "trace2",
+  Trace3: "trace3",
+  Trace4: "trace4",
+  Debug: "debug",
+  Debug2: "debug2",
+  Debug3: "debug3",
+  Debug4: "debug4",
+  Info: "info",
+  Info2: "info2",
+  Info3: "info3",
+  Info4: "info4",
+  Warn: "warn",
+  Warn2: "warn2",
+  Warn3: "warn3",
+  Warn4: "warn4",
+  Error: "error",
+  Error2: "error2",
+  Error3: "error3",
+  Error4: "error4",
+  Fatal: "fatal",
+  Fatal2: "fatal2",
+  Fatal3: "fatal3",
+  Fatal4: "fatal4",
+} as const;
+export type SeverityNumber = typeof SeverityNumber[keyof typeof SeverityNumber];
 
 export interface ExperimentalLoggerConfig {
-  disabled?: boolean | null;
+  disabled?: null | boolean;
   minimum_severity?: SeverityNumber;
-  trace_based?: boolean | null;
+  trace_based?: null | boolean;
 }
 
 export interface ExperimentalLoggerMatcherAndConfig {
@@ -340,7 +406,7 @@ export interface ExperimentalMeterConfigurator {
 }
 
 export type ExperimentalOtlpFileMetricExporter = {
-  output_stream?: string | null;
+  output_stream?: null | string;
   temporality_preference?: ExporterTemporalityPreference;
   default_histogram_aggregation?: ExporterDefaultHistogramAggregation;
 } | null;
@@ -352,13 +418,19 @@ export interface IncludeExclude {
   excluded?: Array<string>;
 }
 
-export type ExperimentalPrometheusTranslationStrategy = "underscore_escaping_with_suffixes" | "underscore_escaping_without_suffixes" | "no_utf8_escaping_with_suffixes" | "no_translation";
+export const ExperimentalPrometheusTranslationStrategy = {
+  UnderscoreEscapingWithSuffixes: "underscore_escaping_with_suffixes",
+  UnderscoreEscapingWithoutSuffixes: "underscore_escaping_without_suffixes",
+  NoUtf8EscapingWithSuffixes: "no_utf8_escaping_with_suffixes",
+  NoTranslation: "no_translation",
+} as const;
+export type ExperimentalPrometheusTranslationStrategy = typeof ExperimentalPrometheusTranslationStrategy[keyof typeof ExperimentalPrometheusTranslationStrategy];
 
 export type ExperimentalPrometheusMetricExporter = {
-  host?: string | null;
-  port?: number | null;
-  without_scope_info?: boolean | null;
-  without_target_info?: boolean | null;
+  host?: null | string;
+  port?: null | number;
+  without_scope_info?: null | boolean;
+  without_target_info?: null | boolean;
   with_resource_constant_labels?: IncludeExclude;
   translation_strategy?: ExperimentalPrometheusTranslationStrategy;
 } | null;
@@ -392,7 +464,16 @@ export interface ExperimentalTracerConfigurator {
   tracers?: Array<ExperimentalTracerMatcherAndConfig>;
 }
 
-export type InstrumentType = "counter" | "gauge" | "histogram" | "observable_counter" | "observable_gauge" | "observable_up_down_counter" | "up_down_counter";
+export const InstrumentType = {
+  Counter: "counter",
+  Gauge: "gauge",
+  Histogram: "histogram",
+  ObservableCounter: "observable_counter",
+  ObservableGauge: "observable_gauge",
+  ObservableUpDownCounter: "observable_up_down_counter",
+  UpDownCounter: "up_down_counter",
+} as const;
+export type InstrumentType = typeof InstrumentType[keyof typeof InstrumentType];
 
 export type JaegerPropagator = {} | null;
 
@@ -407,8 +488,8 @@ export interface LogRecordProcessor {
 }
 
 export interface LogRecordLimits {
-  attribute_value_length_limit?: number | null;
-  attribute_count_limit?: number | null;
+  attribute_value_length_limit?: null | number;
+  attribute_count_limit?: null | number;
 }
 
 export interface LoggerProvider {
@@ -418,24 +499,24 @@ export interface LoggerProvider {
 }
 
 export type OtlpHttpMetricExporter = {
-  endpoint?: string | null;
+  endpoint?: null | string;
   tls?: HttpTls;
   headers?: Array<NameStringValuePair>;
-  headers_list?: string | null;
-  compression?: string | null;
-  timeout?: number | null;
+  headers_list?: null | string;
+  compression?: null | string;
+  timeout?: null | number;
   encoding?: OtlpHttpEncoding;
   temporality_preference?: ExporterTemporalityPreference;
   default_histogram_aggregation?: ExporterDefaultHistogramAggregation;
 } | null;
 
 export type OtlpGrpcMetricExporter = {
-  endpoint?: string | null;
+  endpoint?: null | string;
   tls?: GrpcTls;
   headers?: Array<NameStringValuePair>;
-  headers_list?: string | null;
-  compression?: string | null;
-  timeout?: number | null;
+  headers_list?: null | string;
+  compression?: null | string;
+  timeout?: null | number;
   temporality_preference?: ExporterTemporalityPreference;
   default_histogram_aggregation?: ExporterDefaultHistogramAggregation;
 } | null;
@@ -456,8 +537,8 @@ export interface MetricProducer {
 }
 
 export interface PeriodicMetricReader {
-  interval?: number | null;
-  timeout?: number | null;
+  interval?: null | number;
+  timeout?: null | number;
   exporter: PushMetricExporter;
   producers?: Array<MetricProducer>;
   cardinality_limits?: CardinalityLimits;
@@ -480,19 +561,19 @@ export interface MetricReader {
 }
 
 export interface ViewSelector {
-  instrument_name?: string | null;
+  instrument_name?: null | string;
   instrument_type?: InstrumentType;
-  unit?: string | null;
-  meter_name?: string | null;
-  meter_version?: string | null;
-  meter_schema_url?: string | null;
+  unit?: null | string;
+  meter_name?: null | string;
+  meter_version?: null | string;
+  meter_schema_url?: null | string;
 }
 
 export interface ViewStream {
-  name?: string | null;
-  description?: string | null;
+  name?: null | string;
+  description?: null | string;
   aggregation?: Aggregation;
-  aggregation_cardinality_limit?: number | null;
+  aggregation_cardinality_limit?: null | number;
   attribute_keys?: IncludeExclude;
 }
 
@@ -524,14 +605,14 @@ export interface TextMapPropagator {
 
 export interface Propagator {
   composite?: Array<TextMapPropagator>;
-  composite_list?: string | null;
+  composite_list?: null | string;
 }
 
 export interface Resource {
   attributes?: Array<AttributeNameValue>;
   'detection/development'?: ExperimentalResourceDetection;
-  schema_url?: string | null;
-  attributes_list?: string | null;
+  schema_url?: null | string;
+  attributes_list?: null | string;
 }
 
 export interface SimpleSpanProcessor {
@@ -539,12 +620,12 @@ export interface SimpleSpanProcessor {
 }
 
 export interface SpanLimits {
-  attribute_value_length_limit?: number | null;
-  attribute_count_limit?: number | null;
-  event_count_limit?: number | null;
-  link_count_limit?: number | null;
-  event_attribute_count_limit?: number | null;
-  link_attribute_count_limit?: number | null;
+  attribute_value_length_limit?: null | number;
+  attribute_count_limit?: null | number;
+  event_count_limit?: null | number;
+  link_count_limit?: null | number;
+  event_attribute_count_limit?: null | number;
+  link_attribute_count_limit?: null | number;
 }
 
 export interface SpanProcessor {
@@ -562,7 +643,7 @@ export interface TracerProvider {
 
 export interface Configuration {
   file_format: string;
-  disabled?: boolean | null;
+  disabled?: null | boolean;
   log_level?: SeverityNumber;
   attribute_limits?: AttributeLimits;
   logger_provider?: LoggerProvider;
