@@ -414,80 +414,80 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
 
 describe('getResourceDetectorsFromConfiguration', function () {
   it('returns empty array when detection/development is not set', function () {
-    const config = {};
-    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config as unknown as Configuration), []);
+    const config: ConfigurationModel = {};
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), []);
   });
 
   it('returns empty array when detectors array is empty', function () {
-    const config = {
+    const config: ConfigurationModel = {
       resource: { 'detection/development': { detectors: [] } },
     };
-    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config as unknown as Configuration), []);
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), []);
   });
 
   it('maps env detector object to envDetector', function () {
-    const config = {
+    const config: ConfigurationModel = {
       resource: { 'detection/development': { detectors: [{ env: {} }] } },
     };
-    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config as unknown as Configuration), [
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
       envDetector,
     ]);
   });
 
   it('maps host detector object to hostDetector', function () {
-    const config = {
+    const config: ConfigurationModel = {
       resource: { 'detection/development': { detectors: [{ host: {} }] } },
     };
-    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config as unknown as Configuration), [
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
       hostDetector,
     ]);
   });
 
   it('maps os detector object to osDetector', function () {
-    const config = {
+    const config: ConfigurationModel = {
       resource: { 'detection/development': { detectors: [{ os: {} }] } },
     };
-    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config as unknown as Configuration), [
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
       osDetector,
     ]);
   });
 
   it('maps process detector object to processDetector', function () {
-    const config = {
+    const config: ConfigurationModel = {
       resource: { 'detection/development': { detectors: [{ process: {} }] } },
     };
-    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config as unknown as Configuration), [
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
       processDetector,
     ]);
   });
 
   it('maps service detector object to serviceInstanceIdDetector', function () {
-    const config = {
+    const config: ConfigurationModel = {
       resource: { 'detection/development': { detectors: [{ service: {} }] } },
     };
-    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config as unknown as Configuration), [
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
       serviceInstanceIdDetector,
     ]);
   });
 
   it('silently skips container detector (no JS implementation)', function () {
-    const config = {
+    const config: ConfigurationModel = {
       resource: {
         'detection/development': { detectors: [{ container: {} }] },
       },
     };
-    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config as unknown as Configuration), []);
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), []);
   });
 
   it('maps multiple detector objects in order', function () {
-    const config = {
+    const config: ConfigurationModel = {
       resource: {
         'detection/development': {
           detectors: [{ host: {} }, { process: {} }, { service: {} }],
         },
       },
     };
-    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config as unknown as Configuration), [
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
       hostDetector,
       processDetector,
       serviceInstanceIdDetector,

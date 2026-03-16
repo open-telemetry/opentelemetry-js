@@ -216,6 +216,7 @@ const licenseHeader = `/*
 
 const lines = [];
 lines.push(licenseHeader);
+lines.push(`/* eslint-disable */`);
 lines.push(`// AUTO-GENERATED — do not edit`);
 lines.push(`// Generated from opentelemetry-configuration JSON schema`);
 lines.push(`// Run \`npm run generate:config\` from the configuration package to regenerate`);
@@ -415,6 +416,7 @@ function generateTsDecl(name, schema) {
 
 const typeLines = [];
 typeLines.push(licenseHeader);
+typeLines.push(`/* eslint-disable */`);
 typeLines.push(`// AUTO-GENERATED — do not edit`);
 typeLines.push(`// Generated from opentelemetry-configuration JSON schema`);
 typeLines.push(

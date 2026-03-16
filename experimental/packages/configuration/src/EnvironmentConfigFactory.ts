@@ -15,7 +15,9 @@ import { diag } from '@opentelemetry/api';
 import { getGrpcTlsConfig, getHttpTlsConfig } from './utils';
 
 type ExperimentalResourceDetector = NonNullable<
-  NonNullable<NonNullable<Configuration['resource']>['detection/development']>['detectors']
+  NonNullable<
+    NonNullable<Configuration['resource']>['detection/development']
+  >['detectors']
 >[number];
 
 /**
@@ -50,6 +52,7 @@ export class EnvironmentConfigFactory implements ConfigFactory {
     setAttributeLimits(this._config);
     setPropagators(this._config);
     setTracerProvider(this._config);
+    setSampler(this._config);
     setMeterProvider(this._config);
     setLoggerProvider(this._config);
   }
@@ -160,6 +163,71 @@ export function setPropagators(config: Configuration): void {
   const compositeList = getStringFromEnv('OTEL_PROPAGATORS');
   if (compositeList) {
     config.propagator.composite_list = compositeList;
+  }
+}
+
+export function setSampler(config: Configuration): void {
+  const sampler = getStringFromEnv('OTEL_TRACES_SAMPLER');
+  const arg = getStringFromEnv('OTEL_TRACES_SAMPLER_ARG');
+
+  if (!sampler || !config.tracer_provider) {
+    return;
+  }
+
+  const ratio = arg ? parseFloat(arg) : 1.0;
+
+  switch (sampler) {
+    case 'always_on':
+      config.tracer_provider.sampler = {
+        always_on: {},
+      } as unknown as NonNullable<
+        NonNullable<Configuration['tracer_provider']>['sampler']
+      >;
+      break;
+
+    case 'always_off':
+      config.tracer_provider.sampler = {
+        always_off: {},
+      } as unknown as NonNullable<
+        NonNullable<Configuration['tracer_provider']>['sampler']
+      >;
+      break;
+
+    case 'traceidratio':
+      config.tracer_provider.sampler = {
+        trace_id_ratio_based: { ratio },
+      } as unknown as NonNullable<
+        NonNullable<Configuration['tracer_provider']>['sampler']
+      >;
+      break;
+
+    case 'parentbased_always_on':
+      config.tracer_provider.sampler = {
+        parent_based: { root: { always_on: {} } },
+      } as unknown as NonNullable<
+        NonNullable<Configuration['tracer_provider']>['sampler']
+      >;
+      break;
+
+    case 'parentbased_always_off':
+      config.tracer_provider.sampler = {
+        parent_based: { root: { always_off: {} } },
+      } as unknown as NonNullable<
+        NonNullable<Configuration['tracer_provider']>['sampler']
+      >;
+      break;
+
+    case 'parentbased_traceidratio':
+      config.tracer_provider.sampler = {
+        parent_based: { root: { trace_id_ratio_based: { ratio } } },
+      } as unknown as NonNullable<
+        NonNullable<Configuration['tracer_provider']>['sampler']
+      >;
+      break;
+
+    default:
+      diag.warn(`Unknown sampler type: ${sampler}`);
+      break;
   }
 }
 
@@ -423,8 +491,13 @@ export function setMeterProvider(config: Configuration): void {
         getStringFromEnv(
           'OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION'
         ) ?? 'explicit_bucket_histogram';
-      const validHistogramAggs = ['explicit_bucket_histogram', 'base2_exponential_bucket_histogram'];
-      const defaultHistogramAggregation = validHistogramAggs.includes(rawHistogramAgg)
+      const validHistogramAggs = [
+        'explicit_bucket_histogram',
+        'base2_exponential_bucket_histogram',
+      ];
+      const defaultHistogramAggregation = validHistogramAggs.includes(
+        rawHistogramAgg
+      )
         ? rawHistogramAgg
         : 'explicit_bucket_histogram';
 

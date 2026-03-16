@@ -62,9 +62,10 @@ export function parseConfigFile(): Configuration {
 
   // Preprocess: convert null to [] for provider processors/readers so schema
   // validation passes, then warn application-level after parse
-  const preprocessed = preprocessNullArrays(
-    substituted
-  ) as Record<string, unknown>;
+  const preprocessed = preprocessNullArrays(substituted) as Record<
+    string,
+    unknown
+  >;
 
   const result = ConfigurationSchema.safeParse(preprocessed);
   if (!result.success) {
@@ -84,7 +85,9 @@ export function parseConfigFile(): Configuration {
   if (data.tracer_provider?.processors?.length === 0) {
     diag.warn('TracerProvider must have at least one processor configured');
   }
-  const meterReaders = (data.meter_provider as Record<string, unknown> | undefined)?.['readers'];
+  const meterReaders = (
+    data.meter_provider as Record<string, unknown> | undefined
+  )?.['readers'];
   if (Array.isArray(meterReaders) && meterReaders.length === 0) {
     diag.warn('MeterProvider must have at least one reader configured');
   }
@@ -124,10 +127,7 @@ function preprocessNullArrays(obj: unknown): unknown {
   const record = obj as Record<string, unknown>;
   const result: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(record)) {
-    if (
-      (k === 'processors' || k === 'readers') &&
-      v === null
-    ) {
+    if ((k === 'processors' || k === 'readers') && v === null) {
       result[k] = [];
     } else {
       result[k] = preprocessNullArrays(v);

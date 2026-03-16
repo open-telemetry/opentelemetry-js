@@ -1,18 +1,10 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
+/* eslint-disable */
+// This file is auto-generated. Do not edit manually.
+// Run `npm run generate:config` from the repo root to regenerate.
 
 // AUTO-GENERATED — do not edit
 // Generated from opentelemetry-configuration JSON schema
@@ -58,20 +50,27 @@ export interface AttributeLimits {
 }
 
 export const AttributeType = {
-  String: "string",
-  Bool: "bool",
-  Int: "int",
-  Double: "double",
-  StringArray: "string_array",
-  BoolArray: "bool_array",
-  IntArray: "int_array",
-  DoubleArray: "double_array",
+  String: 'string',
+  Bool: 'bool',
+  Int: 'int',
+  Double: 'double',
+  StringArray: 'string_array',
+  BoolArray: 'bool_array',
+  IntArray: 'int_array',
+  DoubleArray: 'double_array',
 } as const;
-export type AttributeType = typeof AttributeType[keyof typeof AttributeType];
+export type AttributeType = (typeof AttributeType)[keyof typeof AttributeType];
 
 export interface AttributeNameValue {
   name: string;
-  value: string | number | boolean | null | Array<string> | Array<boolean> | Array<number>;
+  value:
+    | string
+    | number
+    | boolean
+    | null
+    | Array<string>
+    | Array<boolean>
+    | Array<number>;
   type?: AttributeType;
 }
 
@@ -93,10 +92,11 @@ export interface NameStringValuePair {
 }
 
 export const OtlpHttpEncoding = {
-  Protobuf: "protobuf",
-  Json: "json",
+  Protobuf: 'protobuf',
+  Json: 'json',
 } as const;
-export type OtlpHttpEncoding = typeof OtlpHttpEncoding[keyof typeof OtlpHttpEncoding];
+export type OtlpHttpEncoding =
+  (typeof OtlpHttpEncoding)[keyof typeof OtlpHttpEncoding];
 
 export type OtlpHttpExporter = {
   endpoint?: null | string;
@@ -174,17 +174,19 @@ export interface CardinalityLimits {
 }
 
 export const ExporterTemporalityPreference = {
-  Cumulative: "cumulative",
-  Delta: "delta",
-  LowMemory: "low_memory",
+  Cumulative: 'cumulative',
+  Delta: 'delta',
+  LowMemory: 'low_memory',
 } as const;
-export type ExporterTemporalityPreference = typeof ExporterTemporalityPreference[keyof typeof ExporterTemporalityPreference];
+export type ExporterTemporalityPreference =
+  (typeof ExporterTemporalityPreference)[keyof typeof ExporterTemporalityPreference];
 
 export const ExporterDefaultHistogramAggregation = {
-  ExplicitBucketHistogram: "explicit_bucket_histogram",
-  Base2ExponentialBucketHistogram: "base2_exponential_bucket_histogram",
+  ExplicitBucketHistogram: 'explicit_bucket_histogram',
+  Base2ExponentialBucketHistogram: 'base2_exponential_bucket_histogram',
 } as const;
-export type ExporterDefaultHistogramAggregation = typeof ExporterDefaultHistogramAggregation[keyof typeof ExporterDefaultHistogramAggregation];
+export type ExporterDefaultHistogramAggregation =
+  (typeof ExporterDefaultHistogramAggregation)[keyof typeof ExporterDefaultHistogramAggregation];
 
 export type ConsoleMetricExporter = {
   temporality_preference?: ExporterTemporalityPreference;
@@ -196,11 +198,12 @@ export interface Distribution {
 }
 
 export const ExemplarFilter = {
-  AlwaysOn: "always_on",
-  AlwaysOff: "always_off",
-  TraceBased: "trace_based",
+  AlwaysOn: 'always_on',
+  AlwaysOff: 'always_off',
+  TraceBased: 'trace_based',
 } as const;
-export type ExemplarFilter = typeof ExemplarFilter[keyof typeof ExemplarFilter];
+export type ExemplarFilter =
+  (typeof ExemplarFilter)[keyof typeof ExemplarFilter];
 
 export type ExperimentalComposableAlwaysOffSampler = {} | null;
 
@@ -222,20 +225,21 @@ export interface ExperimentalComposableRuleBasedSamplerRuleAttributePatterns {
 }
 
 export const SpanKind = {
-  Internal: "internal",
-  Server: "server",
-  Client: "client",
-  Producer: "producer",
-  Consumer: "consumer",
+  Internal: 'internal',
+  Server: 'server',
+  Client: 'client',
+  Producer: 'producer',
+  Consumer: 'consumer',
 } as const;
-export type SpanKind = typeof SpanKind[keyof typeof SpanKind];
+export type SpanKind = (typeof SpanKind)[keyof typeof SpanKind];
 
 export const ExperimentalSpanParent = {
-  None: "none",
-  Remote: "remote",
-  Local: "local",
+  None: 'none',
+  Remote: 'remote',
+  Local: 'local',
 } as const;
-export type ExperimentalSpanParent = typeof ExperimentalSpanParent[keyof typeof ExperimentalSpanParent];
+export type ExperimentalSpanParent =
+  (typeof ExperimentalSpanParent)[keyof typeof ExperimentalSpanParent];
 
 export interface ExperimentalComposableRuleBasedSamplerRule {
   attribute_values?: ExperimentalComposableRuleBasedSamplerRuleAttributeValues;
@@ -348,32 +352,33 @@ export type ExperimentalJaegerRemoteSampler = {
 } | null;
 
 export const SeverityNumber = {
-  Trace: "trace",
-  Trace2: "trace2",
-  Trace3: "trace3",
-  Trace4: "trace4",
-  Debug: "debug",
-  Debug2: "debug2",
-  Debug3: "debug3",
-  Debug4: "debug4",
-  Info: "info",
-  Info2: "info2",
-  Info3: "info3",
-  Info4: "info4",
-  Warn: "warn",
-  Warn2: "warn2",
-  Warn3: "warn3",
-  Warn4: "warn4",
-  Error: "error",
-  Error2: "error2",
-  Error3: "error3",
-  Error4: "error4",
-  Fatal: "fatal",
-  Fatal2: "fatal2",
-  Fatal3: "fatal3",
-  Fatal4: "fatal4",
+  Trace: 'trace',
+  Trace2: 'trace2',
+  Trace3: 'trace3',
+  Trace4: 'trace4',
+  Debug: 'debug',
+  Debug2: 'debug2',
+  Debug3: 'debug3',
+  Debug4: 'debug4',
+  Info: 'info',
+  Info2: 'info2',
+  Info3: 'info3',
+  Info4: 'info4',
+  Warn: 'warn',
+  Warn2: 'warn2',
+  Warn3: 'warn3',
+  Warn4: 'warn4',
+  Error: 'error',
+  Error2: 'error2',
+  Error3: 'error3',
+  Error4: 'error4',
+  Fatal: 'fatal',
+  Fatal2: 'fatal2',
+  Fatal3: 'fatal3',
+  Fatal4: 'fatal4',
 } as const;
-export type SeverityNumber = typeof SeverityNumber[keyof typeof SeverityNumber];
+export type SeverityNumber =
+  (typeof SeverityNumber)[keyof typeof SeverityNumber];
 
 export interface ExperimentalLoggerConfig {
   disabled?: null | boolean;
@@ -419,12 +424,13 @@ export interface IncludeExclude {
 }
 
 export const ExperimentalPrometheusTranslationStrategy = {
-  UnderscoreEscapingWithSuffixes: "underscore_escaping_with_suffixes",
-  UnderscoreEscapingWithoutSuffixes: "underscore_escaping_without_suffixes",
-  NoUtf8EscapingWithSuffixes: "no_utf8_escaping_with_suffixes",
-  NoTranslation: "no_translation",
+  UnderscoreEscapingWithSuffixes: 'underscore_escaping_with_suffixes',
+  UnderscoreEscapingWithoutSuffixes: 'underscore_escaping_without_suffixes',
+  NoUtf8EscapingWithSuffixes: 'no_utf8_escaping_with_suffixes',
+  NoTranslation: 'no_translation',
 } as const;
-export type ExperimentalPrometheusTranslationStrategy = typeof ExperimentalPrometheusTranslationStrategy[keyof typeof ExperimentalPrometheusTranslationStrategy];
+export type ExperimentalPrometheusTranslationStrategy =
+  (typeof ExperimentalPrometheusTranslationStrategy)[keyof typeof ExperimentalPrometheusTranslationStrategy];
 
 export type ExperimentalPrometheusMetricExporter = {
   host?: null | string;
@@ -465,15 +471,16 @@ export interface ExperimentalTracerConfigurator {
 }
 
 export const InstrumentType = {
-  Counter: "counter",
-  Gauge: "gauge",
-  Histogram: "histogram",
-  ObservableCounter: "observable_counter",
-  ObservableGauge: "observable_gauge",
-  ObservableUpDownCounter: "observable_up_down_counter",
-  UpDownCounter: "up_down_counter",
+  Counter: 'counter',
+  Gauge: 'gauge',
+  Histogram: 'histogram',
+  ObservableCounter: 'observable_counter',
+  ObservableGauge: 'observable_gauge',
+  ObservableUpDownCounter: 'observable_up_down_counter',
+  UpDownCounter: 'up_down_counter',
 } as const;
-export type InstrumentType = typeof InstrumentType[keyof typeof InstrumentType];
+export type InstrumentType =
+  (typeof InstrumentType)[keyof typeof InstrumentType];
 
 export type JaegerPropagator = {} | null;
 
@@ -657,4 +664,5 @@ export interface Configuration {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const ConfigurationSchema: z.ZodType<Configuration> = OpenTelemetryConfigurationSchema as z.ZodType<Configuration>;
+export const ConfigurationSchema: z.ZodType<Configuration> =
+  OpenTelemetryConfigurationSchema as z.ZodType<Configuration>;

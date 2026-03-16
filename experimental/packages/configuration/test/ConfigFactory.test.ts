@@ -194,7 +194,11 @@ const configFromKitchenSinkFile = {
       { name: 'bool_key', value: true, type: 'bool' },
       { name: 'int_key', value: 1, type: 'int' },
       { name: 'double_key', value: 1.1, type: 'double' },
-      { name: 'string_array_key', value: ['value1', 'value2'], type: 'string_array' },
+      {
+        name: 'string_array_key',
+        value: ['value1', 'value2'],
+        type: 'string_array',
+      },
       { name: 'bool_array_key', value: [true, false], type: 'bool_array' },
       { name: 'int_array_key', value: [1, 2], type: 'int_array' },
       { name: 'double_array_key', value: [1.1, 2.2], type: 'double_array' },
@@ -242,7 +246,11 @@ const configFromKitchenSinkFile = {
           exporter: {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/traces',
-              tls: { ca_file: '/app/cert.pem', key_file: '/app/cert.pem', cert_file: '/app/cert.pem' },
+              tls: {
+                ca_file: '/app/cert.pem',
+                key_file: '/app/cert.pem',
+                cert_file: '/app/cert.pem',
+              },
               headers: [{ name: 'api-key', value: '1234' }],
               headers_list: 'api-key=1234',
               compression: 'gzip',
@@ -257,7 +265,12 @@ const configFromKitchenSinkFile = {
           exporter: {
             otlp_grpc: {
               endpoint: 'http://localhost:4317',
-              tls: { ca_file: '/app/cert.pem', key_file: '/app/cert.pem', cert_file: '/app/cert.pem', insecure: false },
+              tls: {
+                ca_file: '/app/cert.pem',
+                key_file: '/app/cert.pem',
+                cert_file: '/app/cert.pem',
+                insecure: false,
+              },
               headers: [{ name: 'api-key', value: '1234' }],
               headers_list: 'api-key=1234',
               compression: 'gzip',
@@ -268,7 +281,11 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
-          exporter: { 'otlp_file/development': { output_stream: 'file:///var/log/traces.jsonl' } },
+          exporter: {
+            'otlp_file/development': {
+              output_stream: 'file:///var/log/traces.jsonl',
+            },
+          },
         },
       },
       {
@@ -292,22 +309,31 @@ const configFromKitchenSinkFile = {
       parent_based: {
         root: { always_on: null },
         remote_parent_sampled: { always_on: null },
-        remote_parent_not_sampled: { 'probability/development': { ratio: 0.01 } },
+        remote_parent_not_sampled: {
+          'probability/development': { ratio: 0.01 },
+        },
         local_parent_sampled: {
           'composite/development': {
             rule_based: {
               rules: [
                 {
-                  attribute_values: { key: 'http.route', values: ['/healthz', '/livez'] },
+                  attribute_values: {
+                    key: 'http.route',
+                    values: ['/healthz', '/livez'],
+                  },
                   sampler: { always_off: null },
                 },
                 {
-                  attribute_patterns: { key: 'http.path', included: ['/internal/*'], excluded: ['/internal/special/*'] },
+                  attribute_patterns: {
+                    key: 'http.path',
+                    included: ['/internal/*'],
+                    excluded: ['/internal/special/*'],
+                  },
                   sampler: { always_on: null },
                 },
                 {
-                  span_kinds: ['client'],
                   parent: ['none'],
+                  span_kinds: ['client'],
                   sampler: { probability: { ratio: 0.05 } },
                 },
                 {
@@ -325,28 +351,44 @@ const configFromKitchenSinkFile = {
     readers: [
       {
         pull: {
-          exporter: { 'prometheus/development': ksPromExporter(ExperimentalPrometheusTranslationStrategy.UnderscoreEscapingWithSuffixes) },
+          exporter: {
+            'prometheus/development': ksPromExporter(
+              ExperimentalPrometheusTranslationStrategy.UnderscoreEscapingWithSuffixes
+            ),
+          },
           producers: [{ opencensus: null }],
           cardinality_limits: ksCardinality,
         },
       },
       {
         pull: {
-          exporter: { 'prometheus/development': ksPromExporter(ExperimentalPrometheusTranslationStrategy.UnderscoreEscapingWithoutSuffixes) },
+          exporter: {
+            'prometheus/development': ksPromExporter(
+              ExperimentalPrometheusTranslationStrategy.UnderscoreEscapingWithoutSuffixes
+            ),
+          },
           producers: [{ opencensus: null }],
           cardinality_limits: ksCardinality,
         },
       },
       {
         pull: {
-          exporter: { 'prometheus/development': ksPromExporter(ExperimentalPrometheusTranslationStrategy.NoUtf8EscapingWithSuffixes) },
+          exporter: {
+            'prometheus/development': ksPromExporter(
+              ExperimentalPrometheusTranslationStrategy.NoUtf8EscapingWithSuffixes
+            ),
+          },
           producers: [{ opencensus: null }],
           cardinality_limits: ksCardinality,
         },
       },
       {
         pull: {
-          exporter: { 'prometheus/development': ksPromExporter(ExperimentalPrometheusTranslationStrategy.NoTranslation) },
+          exporter: {
+            'prometheus/development': ksPromExporter(
+              ExperimentalPrometheusTranslationStrategy.NoTranslation
+            ),
+          },
           producers: [{ opencensus: null }],
           cardinality_limits: ksCardinality,
         },
@@ -358,14 +400,19 @@ const configFromKitchenSinkFile = {
           exporter: {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/metrics',
-              tls: { ca_file: '/app/cert.pem', key_file: '/app/cert.pem', cert_file: '/app/cert.pem' },
+              tls: {
+                ca_file: '/app/cert.pem',
+                key_file: '/app/cert.pem',
+                cert_file: '/app/cert.pem',
+              },
               headers: [{ name: 'api-key', value: '1234' }],
               headers_list: 'api-key=1234',
               compression: 'gzip',
               timeout: 10000,
               encoding: OtlpHttpEncoding.Protobuf,
               temporality_preference: ExporterTemporalityPreference.Delta,
-              default_histogram_aggregation: ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+              default_histogram_aggregation:
+                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
             },
           },
           producers: [{ opencensus: null }],
@@ -377,13 +424,19 @@ const configFromKitchenSinkFile = {
           exporter: {
             otlp_grpc: {
               endpoint: 'http://localhost:4317',
-              tls: { ca_file: '/app/cert.pem', key_file: '/app/cert.pem', cert_file: '/app/cert.pem', insecure: false },
+              tls: {
+                ca_file: '/app/cert.pem',
+                key_file: '/app/cert.pem',
+                cert_file: '/app/cert.pem',
+                insecure: false,
+              },
               headers: [{ name: 'api-key', value: '1234' }],
               headers_list: 'api-key=1234',
               compression: 'gzip',
               timeout: 10000,
               temporality_preference: ExporterTemporalityPreference.Delta,
-              default_histogram_aggregation: ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+              default_histogram_aggregation:
+                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
             },
           },
         },
@@ -394,7 +447,8 @@ const configFromKitchenSinkFile = {
             'otlp_file/development': {
               output_stream: 'file:///var/log/metrics.jsonl',
               temporality_preference: ExporterTemporalityPreference.Delta,
-              default_histogram_aggregation: ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+              default_histogram_aggregation:
+                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
             },
           },
         },
@@ -405,7 +459,8 @@ const configFromKitchenSinkFile = {
             'otlp_file/development': {
               output_stream: 'stdout',
               temporality_preference: ExporterTemporalityPreference.Delta,
-              default_histogram_aggregation: ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+              default_histogram_aggregation:
+                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
             },
           },
         },
@@ -415,7 +470,8 @@ const configFromKitchenSinkFile = {
           exporter: {
             console: {
               temporality_preference: ExporterTemporalityPreference.Delta,
-              default_histogram_aggregation: ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+              default_histogram_aggregation:
+                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
             },
           },
         },
@@ -437,7 +493,10 @@ const configFromKitchenSinkFile = {
           description: 'new_description',
           aggregation: {
             explicit_bucket_histogram: {
-              boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000],
+              boundaries: [
+                0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000,
+                7500, 10000,
+              ],
               record_min_max: true,
             },
           },
@@ -458,7 +517,11 @@ const configFromKitchenSinkFile = {
           exporter: {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
-              tls: { ca_file: '/app/cert.pem', key_file: '/app/cert.pem', cert_file: '/app/cert.pem' },
+              tls: {
+                ca_file: '/app/cert.pem',
+                key_file: '/app/cert.pem',
+                cert_file: '/app/cert.pem',
+              },
               headers: [{ name: 'api-key', value: '1234' }],
               headers_list: 'api-key=1234',
               compression: 'gzip',
@@ -473,7 +536,12 @@ const configFromKitchenSinkFile = {
           exporter: {
             otlp_grpc: {
               endpoint: 'http://localhost:4317',
-              tls: { ca_file: '/app/cert.pem', key_file: '/app/cert.pem', cert_file: '/app/cert.pem', insecure: false },
+              tls: {
+                ca_file: '/app/cert.pem',
+                key_file: '/app/cert.pem',
+                cert_file: '/app/cert.pem',
+                insecure: false,
+              },
               headers: [{ name: 'api-key', value: '1234' }],
               headers_list: 'api-key=1234',
               compression: 'gzip',
@@ -484,7 +552,11 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
-          exporter: { 'otlp_file/development': { output_stream: 'file:///var/log/logs.jsonl' } },
+          exporter: {
+            'otlp_file/development': {
+              output_stream: 'file:///var/log/logs.jsonl',
+            },
+          },
         },
       },
       {
@@ -873,6 +945,240 @@ describe('ConfigFactory', function () {
       };
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with sampler always_on', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
+      process.env.OTEL_TRACES_SAMPLER = 'always_on';
+      const expectedConfig: unknown = {
+        ...defaultConfig,
+        tracer_provider: {
+          limits: {
+            attribute_count_limit: 128,
+            event_count_limit: 128,
+            link_count_limit: 128,
+            event_attribute_count_limit: 128,
+            link_attribute_count_limit: 128,
+          },
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/traces',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+          ],
+          sampler: { always_on: {} },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with sampler always_off', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
+      process.env.OTEL_TRACES_SAMPLER = 'always_off';
+      const expectedConfig: unknown = {
+        ...defaultConfig,
+        tracer_provider: {
+          limits: {
+            attribute_count_limit: 128,
+            event_count_limit: 128,
+            link_count_limit: 128,
+            event_attribute_count_limit: 128,
+            link_attribute_count_limit: 128,
+          },
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/traces',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+          ],
+          sampler: { always_off: {} },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with sampler traceidratio', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
+      process.env.OTEL_TRACES_SAMPLER = 'traceidratio';
+      process.env.OTEL_TRACES_SAMPLER_ARG = '0.5';
+      const expectedConfig: unknown = {
+        ...defaultConfig,
+        tracer_provider: {
+          limits: {
+            attribute_count_limit: 128,
+            event_count_limit: 128,
+            link_count_limit: 128,
+            event_attribute_count_limit: 128,
+            link_attribute_count_limit: 128,
+          },
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/traces',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+          ],
+          sampler: { trace_id_ratio_based: { ratio: 0.5 } },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with sampler parentbased_always_on', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
+      process.env.OTEL_TRACES_SAMPLER = 'parentbased_always_on';
+      const expectedConfig: unknown = {
+        ...defaultConfig,
+        tracer_provider: {
+          limits: {
+            attribute_count_limit: 128,
+            event_count_limit: 128,
+            link_count_limit: 128,
+            event_attribute_count_limit: 128,
+            link_attribute_count_limit: 128,
+          },
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/traces',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+          ],
+          sampler: { parent_based: { root: { always_on: {} } } },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with sampler parentbased_always_off', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
+      process.env.OTEL_TRACES_SAMPLER = 'parentbased_always_off';
+      const expectedConfig: unknown = {
+        ...defaultConfig,
+        tracer_provider: {
+          limits: {
+            attribute_count_limit: 128,
+            event_count_limit: 128,
+            link_count_limit: 128,
+            event_attribute_count_limit: 128,
+            link_attribute_count_limit: 128,
+          },
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/traces',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+          ],
+          sampler: { parent_based: { root: { always_off: {} } } },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with sampler parentbased_traceidratio', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
+      process.env.OTEL_TRACES_SAMPLER = 'parentbased_traceidratio';
+      process.env.OTEL_TRACES_SAMPLER_ARG = '0.25';
+      const expectedConfig: unknown = {
+        ...defaultConfig,
+        tracer_provider: {
+          limits: {
+            attribute_count_limit: 128,
+            event_count_limit: 128,
+            link_count_limit: 128,
+            event_attribute_count_limit: 128,
+            link_attribute_count_limit: 128,
+          },
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/traces',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+          ],
+          sampler: {
+            parent_based: { root: { trace_id_ratio_based: { ratio: 0.25 } } },
+          },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should warn on unknown sampler type', function () {
+      const warnSpy = Sinon.spy(diag, 'warn');
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
+      process.env.OTEL_TRACES_SAMPLER = 'unknown_sampler';
+      createConfigFactory();
+      Sinon.assert.calledWith(warnSpy, 'Unknown sampler type: unknown_sampler');
     });
 
     it('should return config with custom tracer_provider', function () {
@@ -1871,6 +2177,61 @@ describe('ConfigFactory', function () {
       );
     });
 
+    it('should parse samplers from config file', function () {
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/samplers.yaml';
+      const configFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      assert.deepStrictEqual(config.tracer_provider?.sampler, {
+        parent_based: {
+          root: {
+            trace_id_ratio_based: { ratio: 0.5 },
+          },
+          remote_parent_not_sampled: {
+            'probability/development': { ratio: 0.1 },
+          },
+        },
+      });
+    });
+
+    it('should parse composite sampler with rule_based rules from config file', function () {
+      process.env.OTEL_CONFIG_FILE =
+        'test/fixtures/composite-sampler-array.yaml';
+      const configFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      assert.deepStrictEqual(config.tracer_provider?.sampler, {
+        'composite/development': {
+          rule_based: {
+            rules: [
+              { sampler: { always_on: null } },
+              { sampler: { probability: { ratio: 0.5 } } },
+            ],
+          },
+        },
+      });
+    });
+
+    it('should parse composite sampler with rule_based attribute matching from config file', function () {
+      process.env.OTEL_CONFIG_FILE =
+        'test/fixtures/composite-sampler-rulebased-full.yaml';
+      const configFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      assert.deepStrictEqual(config.tracer_provider?.sampler, {
+        'composite/development': {
+          rule_based: {
+            rules: [
+              {
+                attribute_values: {
+                  key: 'http.method',
+                  values: ['GET'],
+                },
+                sampler: { always_on: null },
+              },
+            ],
+          },
+        },
+      });
+    });
+
     it('should return error from invalid config file', function () {
       const warnSpy = Sinon.spy(diag, 'warn');
       process.env.OTEL_CONFIG_FILE = './fixtures/invalid.txt';
@@ -1959,8 +2320,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_COMPRESSION = 'metric-compression';
       process.env.OTEL_EXPORTER_OTLP_METRICS_TIMEOUT = '22';
       process.env.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'metric-header';
-      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE =
-        'delta';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'delta';
       process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
         'base2_exponential_bucket_histogram';
       process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'always_off';
@@ -2045,7 +2405,8 @@ describe('ConfigFactory', function () {
                     endpoint: 'http://test.com:4318/v1/metrics',
                     timeout: 22,
                     temporality_preference: ExporterTemporalityPreference.Delta,
-                    default_histogram_aggregation: ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+                    default_histogram_aggregation:
+                      ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
                     tls: {
                       ca_file: 'metric-certificate',
                       key_file: 'metric-client-key',
@@ -2198,11 +2559,16 @@ describe('ConfigFactory', function () {
       // responsible for interpreting undefined type as string. This matches the Java/Python
       // pattern where the model faithfully mirrors the config file and semantic defaults
       // are applied at the point of use.
-      process.env.OTEL_CONFIG_FILE = 'test/fixtures/attribute-type-omitted.yaml';
+      process.env.OTEL_CONFIG_FILE =
+        'test/fixtures/attribute-type-omitted.yaml';
       const config = parseConfigFile();
-      const attrs = (config as Record<string, unknown>).resource as { attributes: { name: string; value: string; type?: string }[] };
+      const attrs = (config as Record<string, unknown>).resource as {
+        attributes: { name: string; value: string; type?: string }[];
+      };
       const noTypeAttr = attrs.attributes.find(a => a.name === 'no-type-key');
-      const explicitAttr = attrs.attributes.find(a => a.name === 'explicit-string-key');
+      const explicitAttr = attrs.attributes.find(
+        a => a.name === 'explicit-string-key'
+      );
       assert.strictEqual(noTypeAttr?.type, undefined);
       assert.strictEqual(explicitAttr?.type, 'string');
     });
@@ -2247,7 +2613,6 @@ describe('ConfigFactory', function () {
           },
         },
       });
-
     });
   });
 });
