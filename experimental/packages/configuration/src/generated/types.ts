@@ -649,7 +649,7 @@ export interface TracerProvider {
 }
 
 export interface Configuration {
-  file_format: string;
+  file_format?: string;
   disabled?: null | boolean;
   log_level?: SeverityNumber;
   attribute_limits?: AttributeLimits;

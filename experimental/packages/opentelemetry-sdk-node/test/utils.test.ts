@@ -14,9 +14,10 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
-import type { Configuration } from '@opentelemetry/configuration';
-// Alias for test convenience — test configs omit required top-level fields
-type ConfigurationModel = Configuration;
+import type {
+  Configuration,
+  ConfigurationModel,
+} from '@opentelemetry/configuration';
 import {
   envDetector,
   hostDetector,
@@ -123,10 +124,12 @@ describe('getPropagatorFromConfigFactory', function () {
     const config = {
       propagator: { composite: [{ tracecontext: undefined }] },
     };
-    assert.deepStrictEqual(getPropagatorFromConfiguration(config as unknown as Configuration)?.fields(), [
-      'traceparent',
-      'tracestate',
-    ]);
+    assert.deepStrictEqual(
+      getPropagatorFromConfiguration(
+        config as unknown as Configuration
+      )?.fields(),
+      ['traceparent', 'tracestate']
+    );
   });
 
   it('should return the selected propagators when multiple are in the list', () => {
@@ -141,18 +144,23 @@ describe('getPropagatorFromConfigFactory', function () {
         ],
       },
     };
-    assert.deepStrictEqual(getPropagatorFromConfiguration(config as unknown as Configuration)?.fields(), [
-      'traceparent',
-      'tracestate',
-      'baggage',
-      'b3',
-      'x-b3-traceid',
-      'x-b3-spanid',
-      'x-b3-flags',
-      'x-b3-sampled',
-      'x-b3-parentspanid',
-      'uber-trace-id',
-    ]);
+    assert.deepStrictEqual(
+      getPropagatorFromConfiguration(
+        config as unknown as Configuration
+      )?.fields(),
+      [
+        'traceparent',
+        'tracestate',
+        'baggage',
+        'b3',
+        'x-b3-traceid',
+        'x-b3-spanid',
+        'x-b3-flags',
+        'x-b3-sampled',
+        'x-b3-parentspanid',
+        'uber-trace-id',
+      ]
+    );
   });
 
   it('should return null and warn if propagators are unknown', () => {
@@ -166,7 +174,10 @@ describe('getPropagatorFromConfigFactory', function () {
         ],
       },
     };
-    assert.deepStrictEqual(getPropagatorFromConfiguration(config as unknown as Configuration), null);
+    assert.deepStrictEqual(
+      getPropagatorFromConfiguration(config as unknown as Configuration),
+      null
+    );
     sinon.assert.calledWithExactly(
       warnStub,
       'Propagator "my" requested through configuration is unavailable.'
@@ -189,7 +200,10 @@ describe('getPropagatorFromConfigFactory', function () {
       },
     };
 
-    assert.deepStrictEqual(getPropagatorFromConfiguration(config as unknown as Configuration), null);
+    assert.deepStrictEqual(
+      getPropagatorFromConfiguration(config as unknown as Configuration),
+      null
+    );
   });
 });
 

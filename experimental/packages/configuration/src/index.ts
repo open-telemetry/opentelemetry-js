@@ -10,6 +10,9 @@ export type { ConfigFactory } from './IConfigFactory';
 export type { Configuration } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';
 
+/** @deprecated Use Configuration instead. Kept for backward compatibility. */
+export type { Configuration as ConfigurationModel } from './generated/types';
+
 /** Type for a log record exporter configuration object (replaces LogRecordExporterModel). */
 export type LogRecordExporterConfiguration = z.infer<
   typeof LogRecordExporterSchema

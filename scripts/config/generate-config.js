@@ -451,6 +451,14 @@ typeLines.push(
 );
 typeLines.push('');
 
-const typesOutput = typeLines.join('\n');
+// file_format is required by the JSON schema (and validated at parse time by Zod),
+// but the TypeScript interface is also used in SDK code where file_format is not
+// relevant. Make it optional in the TS type so test fixtures and SDK code don't
+// need to provide it.
+let typesOutput = typeLines.join('\n');
+typesOutput = typesOutput.replace(
+  /(\binterface Configuration \{[^}]*?)  file_format: /,
+  '$1  file_format?: '
+);
 fs.writeFileSync(TYPES_PATH, typesOutput);
 console.log(`Written ${typesOutput.split('\n').length} lines to ${TYPES_PATH}`);
