@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
@@ -20,10 +9,8 @@ import { LoggerProvider, createLoggerConfigurator } from '../../src';
 import { NoopLogRecordProcessor } from '../../src/export/NoopLogRecordProcessor';
 import { LogRecordImpl } from '../../src/LogRecordImpl';
 import { ROOT_CONTEXT, TraceFlags, context, trace } from '@opentelemetry/api';
-import {
-  LogRecord as ApiLogRecord,
-  SeverityNumber,
-} from '@opentelemetry/api-logs';
+import type { LogRecord as ApiLogRecord } from '@opentelemetry/api-logs';
+import { SeverityNumber } from '@opentelemetry/api-logs';
 import { Logger } from '../../src/Logger';
 import { InMemoryLogRecordExporter } from '../../src/export/InMemoryLogRecordExporter';
 import { SimpleLogRecordProcessor } from '../../src/export/SimpleLogRecordProcessor';

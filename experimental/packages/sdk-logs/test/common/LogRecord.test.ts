@@ -1,32 +1,14 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import {
-  Attributes,
-  AttributeValue,
-  diag,
-  ROOT_CONTEXT,
-  trace,
-  TraceFlags,
-} from '@opentelemetry/api';
+import { diag, ROOT_CONTEXT, trace, TraceFlags } from '@opentelemetry/api';
 import * as logsAPI from '@opentelemetry/api-logs';
-import { AnyValue } from '@opentelemetry/api-logs';
-import type { HrTime } from '@opentelemetry/api';
+import type { AnyValue } from '@opentelemetry/api-logs';
+import type { HrTime, Attributes, AttributeValue } from '@opentelemetry/api';
 import { hrTimeToMilliseconds, timeInputToHrTime } from '@opentelemetry/core';
 import { defaultResource } from '@opentelemetry/resources';
 import {
@@ -35,11 +17,8 @@ import {
   ATTR_EXCEPTION_TYPE,
 } from '@opentelemetry/semantic-conventions';
 
-import {
-  LogRecordLimits,
-  LogRecordProcessor,
-  LoggerProvider,
-} from './../../src';
+import type { LogRecordLimits, LogRecordProcessor } from './../../src';
+import { LoggerProvider } from './../../src';
 import { invalidAttributes, validAttributes } from './utils';
 import { LoggerProviderSharedState } from '../../src/internal/LoggerProviderSharedState';
 import { LogRecordImpl } from '../../src/LogRecordImpl';
@@ -321,6 +300,27 @@ describe('LogRecord', () => {
           }
           sinon.assert.callCount(warnStub, 1);
           warnStub.restore();
+        });
+
+        it('should not increment droppedAttributesCount on key updates', () => {
+          const { logRecord } = setup({ attributeCountLimit: 2 });
+          logRecord.setAttribute('key1', 'value1');
+          logRecord.setAttribute('key2', 'value2');
+          logRecord.setAttribute('key1', 'updated');
+          assert.strictEqual(logRecord.droppedAttributesCount, 0);
+          assert.strictEqual(logRecord.attributes['key1'], 'updated');
+        });
+
+        it('should correctly track droppedAttributesCount with key updates and dropped keys', () => {
+          const { logRecord } = setup({ attributeCountLimit: 2 });
+          logRecord.setAttribute('key1', 'value1');
+          logRecord.setAttribute('key2', 'value2');
+          logRecord.setAttribute('key3', 'value3');
+          logRecord.setAttribute('key1', 'updated');
+          assert.strictEqual(logRecord.droppedAttributesCount, 1);
+          assert.strictEqual(logRecord.attributes['key1'], 'updated');
+          assert.strictEqual(logRecord.attributes['key2'], 'value2');
+          assert.strictEqual(logRecord.attributes['key3'], undefined);
         });
       });
 
