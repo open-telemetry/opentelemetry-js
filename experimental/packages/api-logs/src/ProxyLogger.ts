@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context } from '@opentelemetry/api';
+import type { Context } from '@opentelemetry/api';
 import { NOOP_LOGGER } from './NoopLogger';
 import type { Logger } from './types/Logger';
 import type { LoggerOptions } from './types/LoggerOptions';

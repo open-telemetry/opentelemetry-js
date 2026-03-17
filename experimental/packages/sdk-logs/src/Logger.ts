@@ -104,7 +104,6 @@ export class Logger implements logsAPI.Logger {
     severityNumber?: SeverityNumber;
     eventName?: string;
   }): boolean {
-    // This logger is disabled
     if (this._loggerConfig.disabled) {
       return false;
     }

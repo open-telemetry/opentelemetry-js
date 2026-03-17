@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { callWithTimeout, InstrumentationScope } from '@opentelemetry/core';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import { callWithTimeout } from '@opentelemetry/core';
 import type { Context } from '@opentelemetry/api';
 import type { LogRecordProcessor } from './LogRecordProcessor';
 import type { SdkLogRecord } from './export/SdkLogRecord';
