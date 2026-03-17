@@ -8,8 +8,7 @@ import { NOOP_LOGGER } from './NoopLogger';
 import type { Logger } from './types/Logger';
 import type { LoggerOptions } from './types/LoggerOptions';
 import type { LogRecord } from './types/LogRecord';
-import { SeverityNumber } from './types/LogRecord';
-
+import type { SeverityNumber } from './types/LogRecord';
 
 export class ProxyLogger implements Logger {
   // When a real implementation is provided, this will be it

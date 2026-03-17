@@ -7,7 +7,7 @@ import type { InstrumentationScope } from '@opentelemetry/core';
 import type { Context } from '@opentelemetry/api';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
 import type { ReadableLogRecord } from './ReadableLogRecord';
-import { SeverityNumber } from '@opentelemetry/api-logs';
+import type { SeverityNumber } from '@opentelemetry/api-logs';
 
 export class NoopLogRecordProcessor implements LogRecordProcessor {
   public forceFlush(): Promise<void> {

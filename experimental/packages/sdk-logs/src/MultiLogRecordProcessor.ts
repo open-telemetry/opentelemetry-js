@@ -8,7 +8,7 @@ import { callWithTimeout } from '@opentelemetry/core';
 import type { Context } from '@opentelemetry/api';
 import type { LogRecordProcessor } from './LogRecordProcessor';
 import type { SdkLogRecord } from './export/SdkLogRecord';
-import { SeverityNumber } from '@opentelemetry/api-logs';
+import type { SeverityNumber } from '@opentelemetry/api-logs';
 
 /**
  * Implementation of the {@link LogRecordProcessor} that simply forwards all

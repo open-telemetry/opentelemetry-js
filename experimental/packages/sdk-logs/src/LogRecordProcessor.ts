@@ -6,8 +6,7 @@
 import type { Context } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import type { SdkLogRecord } from './export/SdkLogRecord';
-import { SeverityNumber } from '@opentelemetry/api-logs';
-
+import type { SeverityNumber } from '@opentelemetry/api-logs';
 
 export interface LogRecordProcessor {
   /**

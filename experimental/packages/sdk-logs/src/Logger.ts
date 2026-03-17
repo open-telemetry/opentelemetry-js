@@ -6,12 +6,12 @@
 import type * as logsAPI from '@opentelemetry/api-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import type { InstrumentationScope } from '@opentelemetry/core';
+import type { Context } from '@opentelemetry/api';
 import {
   context,
   trace,
   TraceFlags,
   isSpanContextValid,
-  Context,
 } from '@opentelemetry/api';
 
 import { LogRecordImpl } from './LogRecordImpl';

@@ -5,7 +5,7 @@
 
 import type { Context } from '@opentelemetry/api';
 import type { LogRecord } from './LogRecord';
-import { SeverityNumber } from './LogRecord';
+import type { SeverityNumber } from './LogRecord';
 
 export interface Logger {
   /**
@@ -17,7 +17,7 @@ export interface Logger {
 
   /**
    * Will a log record with the given details get emitted?
-   * This can be used to avoid expensive calculation of log record data.   
+   * This can be used to avoid expensive calculation of log record data.
    */
   enabled(options?: {
     context?: Context;
