@@ -109,11 +109,9 @@ export class Logger implements logsAPI.Logger {
     }
 
     // Severity number given and lower than the min configured
-    let severityNumber = options?.severityNumber;
-    if (typeof severityNumber !== 'number' || isNaN(severityNumber)) {
-      severityNumber = SeverityNumber.UNSPECIFIED;
-    }
+    const severityNumber = options?.severityNumber;
     if (
+      typeof severityNumber === 'number' &&
       severityNumber !== SeverityNumber.UNSPECIFIED &&
       severityNumber < this._loggerConfig.minimumSeverity
     ) {
