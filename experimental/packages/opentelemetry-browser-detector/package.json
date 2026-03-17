@@ -71,7 +71,7 @@
     "ts-loader": "9.5.4",
     "typescript": "5.0.4",
     "webpack": "5.104.1",
-    "webpack-cli": "6.0.1"
+    "webpack-cli": "7.0.2"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.3.0"
