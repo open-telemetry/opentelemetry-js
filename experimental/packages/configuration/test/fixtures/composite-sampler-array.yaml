@@ -1,0 +1,15 @@
+file_format: "1.0-rc.3"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    composite/development:
+      rule_based:
+        rules:
+          - sampler:
+              always_on:
+          - sampler:
+              probability:
+                ratio: 0.5

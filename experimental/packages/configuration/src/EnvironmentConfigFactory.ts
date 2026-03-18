@@ -1,23 +1,10 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  ConfigurationModel,
-  initializeDefaultConfiguration,
-} from './models/configModel';
+import type { ConfigurationModel } from './models/configModel';
+import { initializeDefaultConfiguration } from './models/configModel';
 import {
   getBooleanFromEnv,
   getStringFromEnv,
@@ -25,25 +12,25 @@ import {
   diagLogLevelFromString,
   getNumberFromEnv,
 } from '@opentelemetry/core';
-import { ConfigFactory } from './IConfigFactory';
+import type { ConfigFactory } from './IConfigFactory';
+import type {
+  PeriodicMetricReader,
+  PullMetricReader,
+} from './models/meterProviderModel';
 import {
   ExemplarFilter,
   ExporterDefaultHistogramAggregation,
   ExporterTemporalityPreference,
   initializeDefaultMeterProviderConfiguration,
-  PeriodicMetricReader,
 } from './models/meterProviderModel';
 import { OtlpHttpEncoding } from './models/commonModel';
 import { diag } from '@opentelemetry/api';
-import {
-  BatchSpanProcessor,
-  initializeDefaultTracerProviderConfiguration,
-} from './models/tracerProviderModel';
-import {
-  BatchLogRecordProcessor,
-  initializeDefaultLoggerProviderConfiguration,
-} from './models/loggerProviderModel';
+import type { BatchSpanProcessor } from './models/tracerProviderModel';
+import { initializeDefaultTracerProviderConfiguration } from './models/tracerProviderModel';
+import type { BatchLogRecordProcessor } from './models/loggerProviderModel';
+import { initializeDefaultLoggerProviderConfiguration } from './models/loggerProviderModel';
 import { getGrpcTlsConfig, getHttpTlsConfig } from './utils';
+import type { ExperimentalResourceDetector } from './models/resourceModel';
 
 /**
  * EnvironmentConfigProvider provides a configuration based on environment variables.
@@ -58,13 +45,6 @@ export class EnvironmentConfigFactory implements ConfigFactory {
     const logLevel = diagLogLevelFromString(getStringFromEnv('OTEL_LOG_LEVEL'));
     if (logLevel) {
       this._config.log_level = logLevel;
-    }
-
-    const nodeResourceDetectors = getStringListFromEnv(
-      'OTEL_NODE_RESOURCE_DETECTORS'
-    );
-    if (nodeResourceDetectors) {
-      this._config.node_resource_detectors = nodeResourceDetectors;
     }
 
     setResources(this._config);
@@ -118,6 +98,31 @@ export function setResources(config: ConfigurationModel): void {
       }
     }
   }
+
+  const nodeDetectors = getStringListFromEnv('OTEL_NODE_RESOURCE_DETECTORS');
+  if (
+    nodeDetectors &&
+    nodeDetectors.length > 0 &&
+    !nodeDetectors.includes('none')
+  ) {
+    const all = nodeDetectors.includes('all');
+    const detectors: ExperimentalResourceDetector[] = [];
+    if (all || nodeDetectors.includes('container'))
+      detectors.push({ container: {} });
+    if (all || nodeDetectors.includes('host')) detectors.push({ host: {} });
+    if (all || nodeDetectors.includes('os')) detectors.push({ os: {} });
+    if (all || nodeDetectors.includes('process'))
+      detectors.push({ process: {} });
+    if (all || nodeDetectors.includes('serviceinstance'))
+      detectors.push({ service: {} });
+    if (all || nodeDetectors.includes('env')) detectors.push({ env: {} });
+    if (detectors.length > 0) {
+      if (config.resource['detection/development'] == null) {
+        config.resource['detection/development'] = {};
+      }
+      config.resource['detection/development'].detectors = detectors;
+    }
+  }
 }
 
 export function setAttributeLimits(config: ConfigurationModel): void {
@@ -159,6 +164,55 @@ export function setPropagators(config: ConfigurationModel): void {
   }
 }
 
+export function setSampler(config: ConfigurationModel): void {
+  const sampler = getStringFromEnv('OTEL_TRACES_SAMPLER');
+  const arg = getStringFromEnv('OTEL_TRACES_SAMPLER_ARG');
+
+  if (!sampler || !config.tracer_provider) {
+    return;
+  }
+
+  const ratio = arg ? parseFloat(arg) : 1.0;
+
+  switch (sampler) {
+    case 'always_on':
+      config.tracer_provider.sampler = { always_on: {} };
+      break;
+
+    case 'always_off':
+      config.tracer_provider.sampler = { always_off: {} };
+      break;
+
+    case 'traceidratio':
+      config.tracer_provider.sampler = {
+        trace_id_ratio_based: { ratio },
+      };
+      break;
+
+    case 'parentbased_always_on':
+      config.tracer_provider.sampler = {
+        parent_based: { root: { always_on: {} } },
+      };
+      break;
+
+    case 'parentbased_always_off':
+      config.tracer_provider.sampler = {
+        parent_based: { root: { always_off: {} } },
+      };
+      break;
+
+    case 'parentbased_traceidratio':
+      config.tracer_provider.sampler = {
+        parent_based: { root: { trace_id_ratio_based: { ratio } } },
+      };
+      break;
+
+    default:
+      diag.warn(`Unknown sampler type: ${sampler}`);
+      break;
+  }
+}
+
 export function setTracerProvider(config: ConfigurationModel): void {
   const exportersType = Array.from(
     new Set(getStringListFromEnv('OTEL_TRACES_EXPORTER'))
@@ -173,6 +227,7 @@ export function setTracerProvider(config: ConfigurationModel): void {
     return;
   }
   config.tracer_provider = initializeDefaultTracerProviderConfiguration();
+  setSampler(config);
 
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT'
@@ -360,13 +415,29 @@ export function setMeterProvider(config: ConfigurationModel): void {
   }
   for (let i = 0; i < exportersType.length; i++) {
     const exporterType = exportersType[i];
+    if (exporterType === 'prometheus') {
+      // Prometheus uses a pull reader
+      const pullReader: PullMetricReader = {
+        exporter: {
+          'prometheus/development': {
+            host:
+              getStringFromEnv('OTEL_EXPORTER_PROMETHEUS_HOST') ?? 'localhost',
+            port: getNumberFromEnv('OTEL_EXPORTER_PROMETHEUS_PORT') ?? 9464,
+            without_scope_info: false,
+            without_target_info: false,
+          },
+        },
+      };
+      config.meter_provider.readers.push({ pull: pullReader });
+      continue;
+    }
+
     const readerPeriodicInfo = { ...readerPeriodic };
     const timeout = getNumberFromEnv('OTEL_METRIC_EXPORT_TIMEOUT') ?? 30000;
     if (timeout) {
       readerPeriodicInfo.timeout = timeout;
     }
 
-    // TODO: add prometheus exporter support
     if (exporterType === 'console') {
       readerPeriodicInfo.exporter = { console: {} };
     } else {

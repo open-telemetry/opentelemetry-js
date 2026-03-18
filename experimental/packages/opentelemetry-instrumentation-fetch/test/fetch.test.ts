@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as api from '@opentelemetry/api';
@@ -37,11 +26,11 @@ import {
 } from '@opentelemetry/sdk-trace-web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
+import type {
   FetchCustomAttributeFunction,
-  FetchInstrumentation,
   FetchInstrumentationConfig,
 } from '../src';
+import { FetchInstrumentation } from '../src';
 import { AttributeNames } from '../src/enums/AttributeNames';
 import {
   ATTR_HTTP_HOST,
@@ -845,6 +834,23 @@ describe('fetch', () => {
 
             assert.strictEqual(headers['foo'], 'bar');
           });
+
+          it('should keep custom headers with url, untyped request object and tuple array headers', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch('/api/echo-headers.json', {
+                  headers: [
+                    ['foo', 'bar'],
+                    ['content-type', 'application/json'],
+                  ],
+                }),
+            });
+
+            const headers = await assertPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+            assert.strictEqual(headers['content-type'], 'application/json');
+          });
         });
 
         describe('without global propagator', () => {
@@ -917,6 +923,23 @@ describe('fetch', () => {
             const headers = await assertNoPropagationHeaders(response);
 
             assert.strictEqual(headers['foo'], 'bar');
+          });
+
+          it('should keep custom headers with url, untyped request object and tuple array headers', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch('/api/echo-headers.json', {
+                  headers: [
+                    ['foo', 'bar'],
+                    ['content-type', 'application/json'],
+                  ],
+                }),
+            });
+
+            const headers = await assertNoPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+            assert.strictEqual(headers['content-type'], 'application/json');
           });
         });
       });
@@ -2448,6 +2471,204 @@ describe('fetch', () => {
           // Using 'http/dup', but should *not* have `http.response.body.size`
           // attribute, because it is Opt-In.
         });
+      });
+    });
+
+    describe('Response properties preservation', () => {
+      beforeEach(async () => {
+        await startWorker(
+          msw.http.get('/api/status.json', () => {
+            return msw.HttpResponse.json({ ok: true });
+          })
+        );
+      });
+
+      it('should preserve response.url property', async () => {
+        const testUrl = `${ORIGIN}/api/status.json`;
+        let response: Response | undefined;
+
+        await trace(async () => {
+          response = await fetch('/api/status.json');
+        });
+
+        assert.ok(response);
+        assert.strictEqual(
+          response.url,
+          testUrl,
+          'response.url should match the original request URL'
+        );
+      });
+
+      it('should preserve response.type property for same-origin requests', async () => {
+        let response: Response | undefined;
+
+        await trace(async () => {
+          response = await fetch('/api/status.json');
+        });
+
+        assert.ok(response);
+        assert.strictEqual(
+          response.type,
+          'basic',
+          'response.type should be "basic" for same-origin requests'
+        );
+      });
+
+      it('should preserve response.type property for CORS requests', async () => {
+        await startWorker(
+          msw.http.get('http://example.com/api/status.json', () => {
+            return msw.HttpResponse.json({ ok: true });
+          })
+        );
+
+        let response: Response | undefined;
+
+        await trace(async () => {
+          response = await fetch('http://example.com/api/status.json', {
+            mode: 'cors',
+          });
+        });
+
+        assert.ok(response);
+        // response.type is preserved from the original; in real CORS it is "cors", but
+        // when MSW intercepts the request the browser may report "basic" or "cors"
+        assert.ok(
+          ['basic', 'cors', 'opaque'].includes(response.type),
+          'response.type should be a valid ResponseType'
+        );
+        assert.strictEqual(
+          response.clone().type,
+          response.type,
+          'cloned response.type should match original (preservation)'
+        );
+      });
+
+      it('should preserve response.redirected property', async () => {
+        let response: Response | undefined;
+
+        await trace(async () => {
+          response = await fetch('/api/status.json');
+        });
+
+        assert.ok(response);
+        assert.strictEqual(
+          typeof response.redirected,
+          'boolean',
+          'response.redirected should be a boolean'
+        );
+        // redirected will be false for this test, but we're verifying it's preserved
+        assert.strictEqual(
+          response.redirected,
+          false,
+          'response.redirected should be preserved from original response'
+        );
+      });
+
+      it('should preserve response.redirected and response.url when response followed a redirect', async () => {
+        const finalUrl = `${ORIGIN}/api/status.json`;
+        await startWorker(
+          msw.http.get('/redirect-to-status', () => {
+            return new msw.HttpResponse(null, {
+              status: 302,
+              headers: { Location: '/api/status.json' },
+            });
+          }),
+          msw.http.get('/api/status.json', () => {
+            return msw.HttpResponse.json({ ok: true });
+          })
+        );
+
+        let response: Response | undefined;
+
+        await trace(async () => {
+          response = await fetch('/redirect-to-status');
+        });
+
+        assert.ok(response);
+        assert.strictEqual(
+          response.redirected,
+          true,
+          'response.redirected should be true when request followed a redirect'
+        );
+        assert.strictEqual(
+          response.url,
+          finalUrl,
+          'response.url should be the final URL after redirect'
+        );
+      });
+
+      it('should preserve response properties when clone() is called', async () => {
+        const testUrl = `${ORIGIN}/api/status.json`;
+        let response: Response | undefined;
+
+        await trace(async () => {
+          response = await fetch('/api/status.json');
+        });
+
+        assert.ok(response);
+        const cloned = response.clone();
+
+        assert.strictEqual(
+          cloned.url,
+          testUrl,
+          'cloned response.url should match the original request URL'
+        );
+        assert.strictEqual(
+          cloned.type,
+          'basic',
+          'cloned response.type should match the original response type'
+        );
+        assert.strictEqual(
+          typeof cloned.redirected,
+          'boolean',
+          'cloned response.redirected should be a boolean'
+        );
+        assert.strictEqual(
+          cloned.redirected,
+          false,
+          'cloned response.redirected should match the original'
+        );
+      });
+
+      it('should not cause "Illegal invocation" when accessing response.headers getter', async () => {
+        let response: Response | undefined;
+
+        await trace(async () => {
+          response = await fetch('/api/status.json');
+        });
+
+        assert.ok(response);
+        // Proxy uses target as receiver so Response getters (e.g. headers) run with correct this
+        assert.doesNotThrow(() => {
+          const contentType = response!.headers.get('content-type');
+          assert.ok(
+            contentType !== null && contentType.includes('application/json'),
+            'response.headers getter should work without Illegal invocation'
+          );
+        });
+      });
+
+      it('should allow response.json() to work on the wrapped response', async () => {
+        const payload = { ok: true, message: 'hello' };
+        await startWorker(
+          msw.http.get('/api/payload.json', () => {
+            return msw.HttpResponse.json(payload);
+          })
+        );
+
+        let response: Response | undefined;
+
+        await trace(async () => {
+          response = await fetch('/api/payload.json');
+        });
+
+        assert.ok(response);
+        const data = await response.json();
+        assert.deepStrictEqual(
+          data,
+          payload,
+          'response.json() should return the response body'
+        );
       });
     });
 

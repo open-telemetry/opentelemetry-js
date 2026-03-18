@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 import type {
   IAnyValue,
@@ -19,13 +8,17 @@ import type {
   IKeyValue,
   Resource,
 } from './internal-types';
-import { Attributes } from '@opentelemetry/api';
-import { InstrumentationScope } from '@opentelemetry/core';
-import { Resource as ISdkResource } from '@opentelemetry/resources';
+import type { Attributes } from '@opentelemetry/api';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import type { Resource as ISdkResource } from '@opentelemetry/resources';
+import type { Encoder } from './utils';
 
-export function createResource(resource: ISdkResource): Resource {
+export function createResource(
+  resource: ISdkResource,
+  encoder: Encoder
+): Resource {
   const result: Resource = {
-    attributes: toAttributes(resource.attributes),
+    attributes: toAttributes(resource.attributes, encoder),
     droppedAttributesCount: 0,
   };
 
@@ -44,18 +37,27 @@ export function createInstrumentationScope(
   };
 }
 
-export function toAttributes(attributes: Attributes): IKeyValue[] {
-  return Object.keys(attributes).map(key => toKeyValue(key, attributes[key]));
+export function toAttributes(
+  attributes: Attributes,
+  encoder: Encoder
+): IKeyValue[] {
+  return Object.keys(attributes).map(key =>
+    toKeyValue(key, attributes[key], encoder)
+  );
 }
 
-export function toKeyValue(key: string, value: unknown): IKeyValue {
+export function toKeyValue(
+  key: string,
+  value: unknown,
+  encoder: Encoder
+): IKeyValue {
   return {
     key: key,
-    value: toAnyValue(value),
+    value: toAnyValue(value, encoder),
   };
 }
 
-export function toAnyValue(value: unknown): IAnyValue {
+export function toAnyValue(value: unknown, encoder: Encoder): IAnyValue {
   const t = typeof value;
   if (t === 'string') return { stringValue: value as string };
   if (t === 'number') {
@@ -63,11 +65,12 @@ export function toAnyValue(value: unknown): IAnyValue {
     return { intValue: value as number };
   }
   if (t === 'boolean') return { boolValue: value as boolean };
-  if (value instanceof Uint8Array) return { bytesValue: value };
+  if (value instanceof Uint8Array)
+    return { bytesValue: encoder.encodeUint8Array(value) };
   if (Array.isArray(value)) {
     const values: IAnyValue[] = new Array(value.length);
     for (let i = 0; i < value.length; i++) {
-      values[i] = toAnyValue(value[i]);
+      values[i] = toAnyValue(value[i], encoder);
     }
     return { arrayValue: { values } };
   }
@@ -77,7 +80,7 @@ export function toAnyValue(value: unknown): IAnyValue {
     for (let i = 0; i < keys.length; i++) {
       values[i] = {
         key: keys[i],
-        value: toAnyValue((value as Record<string, unknown>)[keys[i]]),
+        value: toAnyValue((value as Record<string, unknown>)[keys[i]], encoder),
       };
     }
     return { kvlistValue: { values } };

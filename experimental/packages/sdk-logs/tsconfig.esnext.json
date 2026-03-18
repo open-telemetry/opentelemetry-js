@@ -24,6 +24,9 @@
       "path": "../../../packages/opentelemetry-resources"
     },
     {
+      "path": "../../../semantic-conventions"
+    },
+    {
       "path": "../api-logs"
     }
   ]

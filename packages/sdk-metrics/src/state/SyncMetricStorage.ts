@@ -1,30 +1,19 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context, HrTime, Attributes } from '@opentelemetry/api';
-import { WritableMetricStorage } from './WritableMetricStorage';
-import { Accumulation, Aggregator } from '../aggregator/types';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
-import { IAttributesProcessor } from '../view/AttributesProcessor';
+import type { Context, HrTime, Attributes } from '@opentelemetry/api';
+import type { WritableMetricStorage } from './WritableMetricStorage';
+import type { Accumulation, Aggregator } from '../aggregator/types';
+import type { InstrumentDescriptor } from '../InstrumentDescriptor';
+import type { IAttributesProcessor } from '../view/AttributesProcessor';
 import { MetricStorage } from './MetricStorage';
-import { MetricData } from '../export/MetricData';
+import type { MetricData } from '../export/MetricData';
 import { DeltaMetricProcessor } from './DeltaMetricProcessor';
 import { TemporalMetricProcessor } from './TemporalMetricProcessor';
-import { Maybe } from '../utils';
-import { MetricCollectorHandle } from './MetricCollector';
+import type { Maybe } from '../utils';
+import type { MetricCollectorHandle } from './MetricCollector';
 
 /**
  * Internal interface.

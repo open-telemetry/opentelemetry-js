@@ -1,34 +1,25 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
+import type {
+  Context,
+  Span,
+  SpanOptions,
+  TextMapGetter,
+  TextMapPropagator,
+  TextMapSetter,
+} from '../../../src';
 import api, {
   context,
-  Context,
   defaultTextMapGetter,
   defaultTextMapSetter,
   diag,
   metrics,
   propagation,
   ROOT_CONTEXT,
-  Span,
-  SpanOptions,
-  TextMapGetter,
-  TextMapPropagator,
-  TextMapSetter,
   trace,
   TraceFlags,
 } from '../../../src';
@@ -221,38 +212,29 @@ describe('API', function () {
   describe('Global diag', function () {
     it('initialization', function () {
       const inst = DiagAPI.instance();
-
       assert.deepStrictEqual(diag, inst);
     });
 
     diagLoggerFunctions.forEach(fName => {
       it(`no argument logger ${fName} message doesn't throw`, function () {
-        //@ts-expect-error an undefined logger is not allowed
+        // @ts-expect-error an undefined logger is not allowed
         diag.setLogger();
-        assert.doesNotThrow(() => {
-          diag[fName](`${fName} message`);
-        });
+        diag[fName](`${fName} message`);
       });
 
       it(`null logger ${fName} message doesn't throw`, function () {
         diag.setLogger(null as any);
-        assert.doesNotThrow(() => {
-          diag[fName](`${fName} message`);
-        });
+        diag[fName](`${fName} message`);
       });
 
       it(`undefined logger ${fName} message doesn't throw`, function () {
         diag.setLogger(undefined as any);
-        assert.doesNotThrow(() => {
-          diag[fName](`${fName} message`);
-        });
+        diag[fName](`${fName} message`);
       });
 
       it(`empty logger ${fName} message doesn't throw`, function () {
         diag.setLogger({} as any);
-        assert.doesNotThrow(() => {
-          diag[fName](`${fName} message`);
-        });
+        diag[fName](`${fName} message`);
       });
     });
   });
