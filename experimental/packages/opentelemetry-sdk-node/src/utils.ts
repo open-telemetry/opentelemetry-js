@@ -49,12 +49,22 @@ import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 import type {
   ConfigurationModel,
   LogRecordExporterModel,
+  InstrumentTypeConfigModel,
+  AggregationConfigModel,
+  PeriodicMetricReaderConfigModel,
 } from '@opentelemetry/configuration';
 import type {
+  AggregationOption,
   IMetricReader,
   PushMetricExporter,
+  ViewOptions,
 } from '@opentelemetry/sdk-metrics';
-import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
+import {
+  AggregationType,
+  ConsoleMetricExporter,
+  InstrumentType,
+  PeriodicExportingMetricReader,
+} from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
 import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
@@ -480,6 +490,58 @@ export function getOtlpMetricExporterFromEnv(): PushMetricExporter {
   return new OTLPProtoMetricExporter();
 }
 
+export function getPeriodicMetricReaderFromConfiguration(
+  periodic: PeriodicMetricReaderConfigModel
+): IMetricReader | undefined {
+  if (periodic.exporter) {
+    let exporter;
+    if (periodic.exporter.otlp_http) {
+      const encoding = periodic.exporter.otlp_http.encoding;
+      if (encoding === 'json') {
+        exporter = new OTLPHttpMetricExporter({
+          compression:
+            periodic.exporter.otlp_http.compression === 'gzip'
+              ? CompressionAlgorithm.GZIP
+              : CompressionAlgorithm.NONE,
+        });
+      } else if (encoding === 'protobuf') {
+        exporter = new OTLPProtoMetricExporter({
+          compression:
+            periodic.exporter.otlp_http.compression === 'gzip'
+              ? CompressionAlgorithm.GZIP
+              : CompressionAlgorithm.NONE,
+        });
+      } else {
+        diag.warn(`Unsupported OTLP metrics encoding: ${encoding}.`);
+      }
+    }
+    if (periodic.exporter.otlp_grpc) {
+      exporter = new OTLPGrpcMetricExporter({
+        compression:
+          periodic.exporter.otlp_grpc.compression === 'gzip'
+            ? CompressionAlgorithm.GZIP
+            : CompressionAlgorithm.NONE,
+      });
+    }
+
+    if (exporter) {
+      // TODO(6425): add cardinality_limits
+      return new PeriodicExportingMetricReader({
+        exportIntervalMillis: periodic.interval ?? 60_000,
+        exportTimeoutMillis: periodic.timeout ?? 30_000,
+        exporter,
+      });
+    }
+    if (periodic.exporter.console) {
+      return new PeriodicExportingMetricReader({
+        exporter: new ConsoleMetricExporter(),
+      });
+    }
+  }
+  diag.warn(`Unsupported Metric Exporter.`);
+  return undefined;
+}
+
 /**
  * Get LoggerProviderConfig from environment variables.
  */
@@ -595,6 +657,157 @@ export function getLogRecordProcessorsFromConfiguration(
   });
   if (logRecordProcessors.length > 0) {
     return logRecordProcessors;
+  }
+  return undefined;
+}
+
+export function getMeterReadersFromConfiguration(
+  config: ConfigurationModel
+): IMetricReader[] | undefined {
+  const metricReaders: IMetricReader[] = [];
+  config.meter_provider?.readers?.forEach(reader => {
+    if (reader.periodic) {
+      const periodicReader = getPeriodicMetricReaderFromConfiguration(
+        reader.periodic
+      );
+      if (periodicReader) {
+        metricReaders.push(periodicReader);
+      }
+    }
+  });
+  if (metricReaders.length > 0) {
+    return metricReaders;
+  }
+  return undefined;
+}
+
+export function getInstrumentType(
+  instrument: InstrumentTypeConfigModel
+): InstrumentType | undefined {
+  switch (instrument) {
+    case 'counter':
+      return InstrumentType.COUNTER;
+    case 'gauge':
+      return InstrumentType.GAUGE;
+    case 'histogram':
+      return InstrumentType.HISTOGRAM;
+    case 'observable_counter':
+      return InstrumentType.OBSERVABLE_COUNTER;
+    case 'observable_gauge':
+      return InstrumentType.OBSERVABLE_GAUGE;
+    case 'observable_up_down_counter':
+      return InstrumentType.OBSERVABLE_UP_DOWN_COUNTER;
+    case 'up_down_counter':
+      return InstrumentType.UP_DOWN_COUNTER;
+    default:
+      diag.warn(`Unsupported instrument type: ${instrument}`);
+      return undefined;
+  }
+}
+
+export function getAggregationType(
+  aggregation: AggregationConfigModel
+): AggregationOption | undefined {
+  if (aggregation.default) {
+    return {
+      type: AggregationType.DEFAULT,
+    };
+  }
+  if (aggregation.drop) {
+    return {
+      type: AggregationType.DROP,
+    };
+  }
+  if (aggregation.explicit_bucket_histogram) {
+    return {
+      type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+      options: {
+        recordMinMax:
+          aggregation.explicit_bucket_histogram.record_min_max ?? true,
+        boundaries: aggregation.explicit_bucket_histogram.boundaries ?? [
+          0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500,
+          10000,
+        ],
+      },
+    };
+  }
+
+  if (aggregation.base2_exponential_bucket_histogram) {
+    return {
+      type: AggregationType.EXPONENTIAL_HISTOGRAM,
+      options: {
+        recordMinMax:
+          aggregation.base2_exponential_bucket_histogram.record_min_max ?? true,
+        maxSize: aggregation.base2_exponential_bucket_histogram.max_size,
+      },
+    };
+  }
+  if (aggregation.last_value) {
+    return {
+      type: AggregationType.LAST_VALUE,
+    };
+  }
+  if (aggregation.sum) {
+    return {
+      type: AggregationType.SUM,
+    };
+  }
+
+  diag.warn(`Unsupported aggregation type`);
+  return undefined;
+}
+
+export function getMeterViewsFromConfiguration(
+  config: ConfigurationModel
+): ViewOptions[] | undefined {
+  const metricViews: ViewOptions[] = [];
+  config.meter_provider?.views?.forEach(view => {
+    const viewOption: ViewOptions = {};
+    if (view.selector) {
+      if (view.selector.instrument_name) {
+        viewOption.instrumentName = view.selector.instrument_name;
+      }
+      if (view.selector.instrument_type) {
+        const instrumentType = getInstrumentType(view.selector.instrument_type);
+        if (instrumentType) {
+          viewOption.instrumentType = instrumentType;
+        }
+      }
+      if (view.selector.unit) {
+        viewOption.instrumentUnit = view.selector.unit;
+      }
+      if (view.selector.meter_name) {
+        viewOption.meterName = view.selector.meter_name;
+      }
+      if (view.selector.meter_version) {
+        viewOption.meterVersion = view.selector.meter_version;
+      }
+      if (view.selector.meter_schema_url) {
+        viewOption.meterSchemaUrl = view.selector.meter_schema_url;
+      }
+    }
+    if (view.stream) {
+      viewOption.name = view.stream.name ?? view.selector?.instrument_name;
+      viewOption.aggregationCardinalityLimit =
+        view.stream.aggregation_cardinality_limit ?? 2_000;
+      if (view.stream.description) {
+        viewOption.description = view.stream.description;
+      }
+      if (view.stream.aggregation) {
+        const aggregationType = getAggregationType(view.stream.aggregation);
+        if (aggregationType) {
+          viewOption.aggregation = aggregationType;
+        }
+      }
+      // TODO(6427): add support for view.stream.attribute_keys and correspondent attributes processor configuration
+    }
+
+    if (Object.keys(viewOption).length > 0) {
+      metricViews.push(viewOption);
+    }
+  });
+  if (metricViews.length > 0) {
+    return metricViews;
   }
   return undefined;
 }

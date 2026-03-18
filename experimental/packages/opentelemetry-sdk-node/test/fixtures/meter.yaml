@@ -1,0 +1,138 @@
+file_format: "1.0-rc.3"
+disabled: false
+meter_provider:
+  readers:
+    - periodic:
+        interval: 60000
+        timeout: 30000
+        exporter:
+          otlp_http:
+            endpoint: http://localhost:4318/v1/metrics
+            tls:
+              ca_file: /app/cert.pem
+              key_file: /app/cert.pem
+              cert_file: /app/cert.pem
+            headers:
+              - name: api-key
+                value: "1234"
+            headers_list: "api-key=1234"
+            compression: gzip
+            timeout: 10000
+            encoding: protobuf
+            temporality_preference: delta
+            default_histogram_aggregation: base2_exponential_bucket_histogram
+        producers:
+          - opencensus:
+        cardinality_limits:
+          default: 2000
+          counter: 2000
+          gauge: 2000
+          histogram: 2000
+          observable_counter: 2000
+          observable_gauge: 2000
+          observable_up_down_counter: 2000
+          up_down_counter: 2000
+    - periodic:
+        interval: 60000
+        timeout: 30000
+        exporter:
+          otlp_http:
+            endpoint: http://localhost:4318/v1/metrics
+            tls:
+              ca_file: /app/cert.pem
+              key_file: /app/cert.pem
+              cert_file: /app/cert.pem
+            headers:
+              - name: api-key
+                value: "1234"
+            headers_list: "api-key=1234"
+            compression: gzip
+            timeout: 10000
+            encoding: json
+            temporality_preference: delta
+            default_histogram_aggregation: base2_exponential_bucket_histogram
+        producers:
+          - opencensus:
+        cardinality_limits:
+          default: 2000
+          counter: 2000
+          gauge: 2000
+          histogram: 2000
+          observable_counter: 2000
+          observable_gauge: 2000
+          observable_up_down_counter: 2000
+          up_down_counter: 2000
+    - periodic:
+        exporter:
+          otlp_grpc:
+            endpoint: http://localhost:4317
+            tls:
+              ca_file: /app/cert.pem
+              key_file: /app/cert.pem
+              cert_file: /app/cert.pem
+              insecure: false
+            headers:
+              - name: api-key
+                value: "1234"
+            headers_list: "api-key=1234"
+            compression: gzip
+            timeout: 10000
+            temporality_preference: delta
+            default_histogram_aggregation: base2_exponential_bucket_histogram
+    - periodic:
+        exporter:
+          otlp_file/development:
+            output_stream: file:///var/log/metrics.jsonl
+            temporality_preference: delta
+            default_histogram_aggregation: base2_exponential_bucket_histogram
+    - periodic:
+        exporter:
+          otlp_file/development:
+            output_stream: stdout
+            temporality_preference: delta
+            default_histogram_aggregation: base2_exponential_bucket_histogram
+    - periodic:
+        exporter:
+          console:
+            temporality_preference: delta
+            default_histogram_aggregation: base2_exponential_bucket_histogram
+  views:
+    - selector:
+        instrument_name: my-instrument
+        instrument_type: histogram
+        unit: ms
+        meter_name: my-meter
+        meter_version: 1.0.0
+        meter_schema_url: https://opentelemetry.io/schemas/1.16.0
+      stream:
+        name: new_instrument_name
+        description: new_description
+        aggregation:
+          explicit_bucket_histogram:
+            boundaries:
+              [
+                0.0,
+                5.0,
+                10.0,
+                25.0,
+                50.0,
+                75.0,
+                100.0,
+                250.0,
+                500.0,
+                750.0,
+                1000.0,
+                2500.0,
+                5000.0,
+                7500.0,
+                10000.0
+              ]
+            record_min_max: true
+        aggregation_cardinality_limit: 2000
+        attribute_keys:
+          included:
+            - key1
+            - key2
+          excluded:
+            - key3
+  exemplar_filter: trace_based
