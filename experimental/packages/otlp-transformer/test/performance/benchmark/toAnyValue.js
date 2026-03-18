@@ -16,11 +16,16 @@
 
 const Benchmark = require('benchmark');
 const { toAnyValue } = require('../../../build/src/common/internal');
+const { JSON_ENCODER } = require('../../../build/src/common/utils');
 
 const suite = new Benchmark.Suite();
 
 suite.on('cycle', event => {
   console.log(String(event.target));
+});
+
+suite.add('toAnyValue Uint8Array (JSON)', function () {
+  toAnyValue(new Uint8Array([1, 2, 3, 4, 5]), JSON_ENCODER);
 });
 
 suite.add('toAnyValue string', function () {

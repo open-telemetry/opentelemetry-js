@@ -1,32 +1,25 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 import { ValueType } from '@opentelemetry/api';
-import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
+import type { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
+import type { MetricData, ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import {
   AggregationTemporality,
   DataPointType,
-  MetricData,
-  ResourceMetrics,
 } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import { createExportMetricsServiceRequest } from '../src/metrics/internal';
 import { EAggregationTemporality } from '../src/metrics/internal-types';
+import {
+  PROTOBUF_ENCODER,
+  encodeAsLongBits,
+  encodeAsString,
+} from '../src/common/utils';
 import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
 import * as root from '../src/generated/root';
-import { encodeAsLongBits, encodeAsString } from '../src/common/utils';
 import { ProtobufMetricsSerializer } from '../src/metrics/protobuf';
 import { JsonMetricsSerializer } from '../src/metrics/json';
 
@@ -331,7 +324,10 @@ describe('Metrics', () => {
       const metrics = createResourceMetrics([
         createCounterData(10, AggregationTemporality.DELTA),
       ]);
-      const exportRequest = createExportMetricsServiceRequest([metrics]);
+      const exportRequest = createExportMetricsServiceRequest(
+        [metrics],
+        PROTOBUF_ENCODER
+      );
       assert.ok(exportRequest);
 
       assert.deepStrictEqual(exportRequest, {
@@ -374,7 +370,10 @@ describe('Metrics', () => {
       const metrics = createResourceMetrics([
         createUpDownCounterData(10, AggregationTemporality.DELTA),
       ]);
-      const exportRequest = createExportMetricsServiceRequest([metrics]);
+      const exportRequest = createExportMetricsServiceRequest(
+        [metrics],
+        PROTOBUF_ENCODER
+      );
       assert.ok(exportRequest);
 
       assert.deepStrictEqual(exportRequest, {
@@ -414,11 +413,14 @@ describe('Metrics', () => {
     });
 
     it('serializes an observable monotonic sum metric record', () => {
-      const exportRequest = createExportMetricsServiceRequest([
-        createResourceMetrics([
-          createObservableCounterData(10, AggregationTemporality.DELTA),
-        ]),
-      ]);
+      const exportRequest = createExportMetricsServiceRequest(
+        [
+          createResourceMetrics([
+            createObservableCounterData(10, AggregationTemporality.DELTA),
+          ]),
+        ],
+        PROTOBUF_ENCODER
+      );
       assert.ok(exportRequest);
 
       assert.deepStrictEqual(exportRequest, {
@@ -458,11 +460,14 @@ describe('Metrics', () => {
     });
 
     it('serializes an observable non-monotonic sum metric record', () => {
-      const exportRequest = createExportMetricsServiceRequest([
-        createResourceMetrics([
-          createObservableUpDownCounterData(10, AggregationTemporality.DELTA),
-        ]),
-      ]);
+      const exportRequest = createExportMetricsServiceRequest(
+        [
+          createResourceMetrics([
+            createObservableUpDownCounterData(10, AggregationTemporality.DELTA),
+          ]),
+        ],
+        PROTOBUF_ENCODER
+      );
       assert.ok(exportRequest);
 
       assert.deepStrictEqual(exportRequest, {
@@ -502,9 +507,10 @@ describe('Metrics', () => {
     });
 
     it('serializes a gauge metric record', () => {
-      const exportRequest = createExportMetricsServiceRequest([
-        createResourceMetrics([createObservableGaugeData(10.5)]),
-      ]);
+      const exportRequest = createExportMetricsServiceRequest(
+        [createResourceMetrics([createObservableGaugeData(10.5)])],
+        PROTOBUF_ENCODER
+      );
       assert.ok(exportRequest);
 
       assert.deepStrictEqual(exportRequest, {
@@ -542,19 +548,22 @@ describe('Metrics', () => {
 
     describe('serializes a histogram metric record', () => {
       it('with min/max', () => {
-        const exportRequest = createExportMetricsServiceRequest([
-          createResourceMetrics([
-            createHistogramMetrics(
-              2,
-              9,
-              [5],
-              [1, 1],
-              AggregationTemporality.CUMULATIVE,
-              1,
-              8
-            ),
-          ]),
-        ]);
+        const exportRequest = createExportMetricsServiceRequest(
+          [
+            createResourceMetrics([
+              createHistogramMetrics(
+                2,
+                9,
+                [5],
+                [1, 1],
+                AggregationTemporality.CUMULATIVE,
+                1,
+                8
+              ),
+            ]),
+          ],
+          PROTOBUF_ENCODER
+        );
         assert.ok(exportRequest);
 
         assert.deepStrictEqual(exportRequest, {
@@ -598,17 +607,20 @@ describe('Metrics', () => {
       });
 
       it('without min/max', () => {
-        const exportRequest = createExportMetricsServiceRequest([
-          createResourceMetrics([
-            createHistogramMetrics(
-              2,
-              9,
-              [5],
-              [1, 1],
-              AggregationTemporality.CUMULATIVE
-            ),
-          ]),
-        ]);
+        const exportRequest = createExportMetricsServiceRequest(
+          [
+            createResourceMetrics([
+              createHistogramMetrics(
+                2,
+                9,
+                [5],
+                [1, 1],
+                AggregationTemporality.CUMULATIVE
+              ),
+            ]),
+          ],
+          PROTOBUF_ENCODER
+        );
         assert.ok(exportRequest);
 
         assert.deepStrictEqual(exportRequest, {
@@ -654,21 +666,24 @@ describe('Metrics', () => {
 
     describe('serializes an exponential histogram metric record', () => {
       it('with min/max', () => {
-        const exportRequest = createExportMetricsServiceRequest([
-          createResourceMetrics([
-            createExponentialHistogramMetrics(
-              3,
-              10,
-              1,
-              0,
-              { offset: 0, bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0] },
-              { offset: 0, bucketCounts: [0] },
-              AggregationTemporality.CUMULATIVE,
-              1,
-              8
-            ),
-          ]),
-        ]);
+        const exportRequest = createExportMetricsServiceRequest(
+          [
+            createResourceMetrics([
+              createExponentialHistogramMetrics(
+                3,
+                10,
+                1,
+                0,
+                { offset: 0, bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0] },
+                { offset: 0, bucketCounts: [0] },
+                AggregationTemporality.CUMULATIVE,
+                1,
+                8
+              ),
+            ]),
+          ],
+          PROTOBUF_ENCODER
+        );
 
         assert.ok(exportRequest);
 
@@ -718,19 +733,22 @@ describe('Metrics', () => {
       });
 
       it('without min/max', () => {
-        const exportRequest = createExportMetricsServiceRequest([
-          createResourceMetrics([
-            createExponentialHistogramMetrics(
-              3,
-              10,
-              1,
-              0,
-              { offset: 0, bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0] },
-              { offset: 0, bucketCounts: [0] },
-              AggregationTemporality.CUMULATIVE
-            ),
-          ]),
-        ]);
+        const exportRequest = createExportMetricsServiceRequest(
+          [
+            createResourceMetrics([
+              createExponentialHistogramMetrics(
+                3,
+                10,
+                1,
+                0,
+                { offset: 0, bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0] },
+                { offset: 0, bucketCounts: [0] },
+                AggregationTemporality.CUMULATIVE
+              ),
+            ]),
+          ],
+          PROTOBUF_ENCODER
+        );
 
         assert.ok(exportRequest);
 
@@ -791,9 +809,10 @@ describe('Metrics', () => {
         resourceWithSchema
       );
 
-      const exportRequest = createExportMetricsServiceRequest([
-        resourceMetrics,
-      ]);
+      const exportRequest = createExportMetricsServiceRequest(
+        [resourceMetrics],
+        PROTOBUF_ENCODER
+      );
 
       assert.ok(exportRequest);
       assert.strictEqual(exportRequest.resourceMetrics?.length, 1);
