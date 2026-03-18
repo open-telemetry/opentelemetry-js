@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1773867925127,
+  "lastUpdate": 1773868559646,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -63907,6 +63907,114 @@ window.BENCHMARK_DATA = {
             "range": "±1.51%",
             "unit": "ops/sec",
             "extra": "79 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "92992703+zxzinn@users.noreply.github.com",
+            "name": "zxzinn",
+            "username": "zxzinn"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "84bfa9040bb68492d77d7bd4a77cdb2d27a9a9cf",
+          "message": "docs: improve gRPC insecure connection guidance (#6215)",
+          "timestamp": "2026-03-18T16:28:30Z",
+          "tree_id": "befb15a3f903575825ca61644feda55652e8ffca",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/84bfa9040bb68492d77d7bd4a77cdb2d27a9a9cf"
+        },
+        "date": 1773868558544,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 2997787,
+            "range": "±0.89%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 3152191,
+            "range": "±2.93%",
+            "unit": "ops/sec",
+            "extra": "87 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 3328025,
+            "range": "±0.45%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 2990180,
+            "range": "±0.74%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 439635,
+            "range": "±2.87%",
+            "unit": "ops/sec",
+            "extra": "87 samples"
+          },
+          {
+            "name": "generateTraceId",
+            "value": 5971869,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "generateSpanId",
+            "value": 7425765,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 495575,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "transform 512 spans (protobuf)",
+            "value": 135,
+            "range": "±3.42%",
+            "unit": "ops/sec",
+            "extra": "60 samples"
+          },
+          {
+            "name": "transform 512 spans (json)",
+            "value": 305,
+            "range": "±3.28%",
+            "unit": "ops/sec",
+            "extra": "78 samples"
+          },
+          {
+            "name": "transform 512 logs (protobuf)",
+            "value": 122,
+            "range": "±5.35%",
+            "unit": "ops/sec",
+            "extra": "58 samples"
+          },
+          {
+            "name": "transform 512 logs (json)",
+            "value": 267,
+            "range": "±2.18%",
+            "unit": "ops/sec",
+            "extra": "75 samples"
           }
         ]
       }
