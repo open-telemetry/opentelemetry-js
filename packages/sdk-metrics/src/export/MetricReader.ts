@@ -1,37 +1,28 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as api from '@opentelemetry/api';
-import { AggregationTemporality } from './AggregationTemporality';
-import { MetricProducer } from './MetricProducer';
-import { CollectionResult, InstrumentType } from './MetricData';
+import type { AggregationTemporality } from './AggregationTemporality';
+import type { MetricProducer } from './MetricProducer';
+import type { CollectionResult, InstrumentType } from './MetricData';
 import { callWithTimeout } from '../utils';
-import {
+import type {
   CollectionOptions,
   ForceFlushOptions,
   ShutdownOptions,
 } from '../types';
-import {
+import type {
   AggregationSelector,
   AggregationTemporalitySelector,
+} from './AggregationSelector';
+import {
   DEFAULT_AGGREGATION_SELECTOR,
   DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
 } from './AggregationSelector';
-import { AggregationOption } from '../view/AggregationOption';
-import { CardinalitySelector } from './CardinalitySelector';
+import type { AggregationOption } from '../view/AggregationOption';
+import type { CardinalitySelector } from './CardinalitySelector';
 
 export interface MetricReaderOptions {
   /**
@@ -157,6 +148,13 @@ export abstract class MetricReader implements IMetricReader {
 
   setMetricProducer(metricProducer: MetricProducer) {
     if (this._sdkMetricProducer) {
+      // This check ensures the following requirement from the spec
+      // (https://opentelemetry.io/docs/specs/otel/metrics/sdk/#metricreader):
+      // > The SDK MUST NOT allow a `MetricReader` instance to be registered
+      // > on more than one `MeterProvider` instance.
+      //
+      // So while the argument is a `MetricProducer`, the relevant user-level
+      // error message is about the **MeterProvider**.
       throw new Error(
         'MetricReader can not be bound to a MeterProvider again.'
       );

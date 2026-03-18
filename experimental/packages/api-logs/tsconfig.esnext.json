@@ -2,8 +2,7 @@
   "extends": "../../../tsconfig.base.esnext.json",
   "compilerOptions": {
     "lib": [
-      "es2017",
-      "dom"
+      "es2017"
     ],
     "outDir": "build/esnext",
     "rootDir": "src",

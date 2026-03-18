@@ -1,42 +1,28 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import {
+import type {
   AggregationOption,
-  AggregationType,
   CollectionResult,
   InstrumentType,
   MetricProducer,
   PushMetricExporter,
 } from '../../src';
-import {
-  DataPointType,
+import { AggregationType } from '../../src';
+import type {
   ResourceMetrics,
   ScopeMetrics,
 } from '../../src/export/MetricData';
+import { DataPointType } from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { TimeoutError } from '../../src/utils';
-import {
-  ExportResult,
-  ExportResultCode,
-  setGlobalErrorHandler,
-} from '@opentelemetry/core';
+import type { ExportResult } from '@opentelemetry/core';
+import { ExportResultCode, setGlobalErrorHandler } from '@opentelemetry/core';
 import { TestMetricProducer } from './TestMetricProducer';
 import {
   assertAggregationSelector,
@@ -226,6 +212,26 @@ describe('PeriodicExportingMetricReader', () => {
           }),
         /exportIntervalMillis must be greater than or equal to exportTimeoutMillis/
       );
+    });
+
+    it('should clamp when timeout implicitly exceeds interval', () => {
+      const exporter = new TestDeltaMetricExporter();
+
+      const p1 = new PeriodicExportingMetricReader({
+        exporter,
+        // exportTimeoutMillis defaults to 30 seconds, which is greater than exportIntervalMillis.
+        exportIntervalMillis: 100,
+      }) as any;
+      assert.strictEqual(p1._exportInterval, 100);
+      assert.strictEqual(p1._exportTimeout, 100);
+
+      const p2 = new PeriodicExportingMetricReader({
+        exporter,
+        // exportIntervalMillis defaults to 60 seconds, which is less than exportTimeoutMillis.
+        exportTimeoutMillis: 90_000,
+      }) as any;
+      assert.strictEqual(p2._exportInterval, 60_000);
+      assert.strictEqual(p2._exportTimeout, 60_000);
     });
 
     it('should not start exporting', async () => {

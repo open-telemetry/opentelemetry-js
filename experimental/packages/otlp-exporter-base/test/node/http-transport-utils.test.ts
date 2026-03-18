@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 import * as http from 'http';
 import * as assert from 'assert';
@@ -50,9 +39,8 @@ describe('sendWithHttp', function () {
     sentUserAgent = '';
   });
 
-  it('sends a request setting the default user-agent header', function (done) {
-    let firstCallback = true;
-    sendWithHttp(
+  it('sends a request setting the default user-agent header', async function () {
+    await sendWithHttp(
       requestFn,
       'http://localhost:8080',
       {},
@@ -60,26 +48,16 @@ describe('sendWithHttp', function () {
       undefined,
       new http.Agent(),
       Buffer.from([1, 2, 3]),
-      // TODO: the `onDone` callback is called twice because there are two error handlers
-      // - first is attached on the request created in `sendWithHttp`
-      // - second is attached on the pipe within `compressAndSend`
-      () => {
-        if (firstCallback) {
-          firstCallback = false;
-          assert.strictEqual(
-            sentUserAgent,
-            `OTel-OTLP-Exporter-JavaScript/${VERSION}`
-          );
-          done();
-        }
-      },
       100
+    );
+    assert.strictEqual(
+      sentUserAgent,
+      `OTel-OTLP-Exporter-JavaScript/${VERSION}`
     );
   });
 
-  it('sends a request prepending the provided user-agent to the default one', function (done) {
-    let firstCallback = true;
-    sendWithHttp(
+  it('sends a request prepending the provided user-agent to the default one', async function () {
+    await sendWithHttp(
       requestFn,
       'http://localhost:8080',
       {},
@@ -87,20 +65,11 @@ describe('sendWithHttp', function () {
       'Transport-User-Agent/1.2.3',
       new http.Agent(),
       Buffer.from([1, 2, 3]),
-      // TODO: the `onDone` callback is called twice because there are two error handlers
-      // - first is attached on the request created in `sendWithHttp`
-      // - second is attached on the pipe within `compressAndSend`
-      () => {
-        if (firstCallback) {
-          firstCallback = false;
-          assert.strictEqual(
-            sentUserAgent,
-            `Transport-User-Agent/1.2.3 OTel-OTLP-Exporter-JavaScript/${VERSION}`
-          );
-          done();
-        }
-      },
       100
+    );
+    assert.strictEqual(
+      sentUserAgent,
+      `Transport-User-Agent/1.2.3 OTel-OTLP-Exporter-JavaScript/${VERSION}`
     );
   });
 });

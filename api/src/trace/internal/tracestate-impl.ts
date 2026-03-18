@@ -1,20 +1,9 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { TraceState } from '../trace_state';
+import type { TraceState } from '../trace_state';
 import { validateKey, validateValue } from './tracestate-validators';
 
 const MAX_TRACE_STATE_ITEMS = 32;
@@ -60,20 +49,23 @@ export class TraceStateImpl implements TraceState {
   }
 
   serialize(): string {
-    return this._keys()
-      .reduce((agg: string[], key) => {
-        agg.push(key + LIST_MEMBER_KEY_VALUE_SPLITTER + this.get(key));
-        return agg;
-      }, [])
-      .join(LIST_MEMBERS_SEPARATOR);
+    return (
+      Array.from(this._internalState.keys())
+        // Use reduceRight() because keys are stored in reverse insertion order.
+        .reduceRight((agg: string[], key) => {
+          agg.push(key + LIST_MEMBER_KEY_VALUE_SPLITTER + this.get(key));
+          return agg;
+        }, [])
+        .join(LIST_MEMBERS_SEPARATOR)
+    );
   }
 
   private _parse(rawTraceState: string) {
     if (rawTraceState.length > MAX_TRACE_STATE_LEN) return;
     this._internalState = rawTraceState
       .split(LIST_MEMBERS_SEPARATOR)
-      .reverse() // Store in reverse so new keys (.set(...)) will be placed at the beginning
-      .reduce((agg: Map<string, string>, part: string) => {
+      // Use reduceRight() so new keys (.set(...)) will be placed at the beginning
+      .reduceRight((agg: Map<string, string>, part: string) => {
         const listMember = part.trim(); // Optional Whitespace (OWS) handling
         const i = listMember.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
         if (i !== -1) {
@@ -98,6 +90,7 @@ export class TraceStateImpl implements TraceState {
     }
   }
 
+  // @ts-expect-error TS6133 Accessed in tests only.
   private _keys(): string[] {
     return Array.from(this._internalState.keys()).reverse();
   }

@@ -14,16 +14,21 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
-fix(api): prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
+* fix(api): prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
+* fix(api): update diag `consoleLogger` to use original console methods to prevent infinite loop when a console instrumentation is present [#6395](https://github.com/open-telemetry/opentelemetry-js/pull/6395)
+* fix(api): use `Attributes` instead of deprecated `SpanAttributes` in `SpanOptions` [#6478](https://github.com/open-telemetry/opentelemetry-js/pull/6478) @overbalance
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
 
+* refactor(api): refactor to avoid circular deps by merging observable types into `Metric.ts` [#6441](https://github.com/open-telemetry/opentelemetry-js/pull/6441) @pichlermarc
 * refactor(api): remove "export *" in favor of explicit named exports [#4880](https://github.com/open-telemetry/opentelemetry-js/pull/4880) @robbkidd
 * chore: enable tsconfig isolatedModules [#5697](https://github.com/open-telemetry/opentelemetry-js/pull/5697) @legendecas
 * chore: disallow constructor parameter property syntax [#6187](https://github.com/open-telemetry/opentelemetry-js/pull/6187) @legendecas
 * refactor(api): remove platform-specific globalThis, use globalThis directly [#6208](https://github.com/open-telemetry/opentelemetry-js/pull/6208) @overbalance
+* chore(api): mark ProxyTracerProvider as deprecated [#6328](https://github.com/open-telemetry/opentelemetry-js/pull/6328) @cjihrig
+* chore: enforce `import type` for type-only imports via ESLint [#6467](https://github.com/open-telemetry/opentelemetry-js/pull/6467) @overbalance
 
 ## 1.9.0
 
@@ -31,7 +36,7 @@ fix(api): prioritize `esnext` export condition as it is more specific [#5458](ht
 
 * feat(metrics): added synchronous gauge [#4528](https://github.com/open-telemetry/opentelemetry-js/pull/4528) @clintonb
 * feat(api): allow adding span links after span creation [#4536](https://github.com/open-telemetry/opentelemetry-js/pull/4536) @seemk
-  * This change is non-breaking for end-users, but breaking for Trace SDK implmentations in accordance with the [specification](https://github.com/open-telemetry/opentelemetry-specification/blob/a03382ada8afa9415266a84dafac0510ec8c160f/specification/upgrading.md?plain=1#L97-L122) as new features need to be implemented.
+  * This change is non-breaking for end-users, but breaking for Trace SDK implementations in accordance with the [specification](https://github.com/open-telemetry/opentelemetry-specification/blob/a03382ada8afa9415266a84dafac0510ec8c160f/specification/upgrading.md?plain=1#L97-L122) as new features need to be implemented.
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
 
 ## 1.8.0
