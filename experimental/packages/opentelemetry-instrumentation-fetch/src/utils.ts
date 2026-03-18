@@ -14,6 +14,27 @@ const DIAG_LOGGER = diag.createComponentLogger({
   namespace: '@opentelemetry/opentelemetry-instrumentation-fetch/utils',
 });
 
+/**
+ * Duck-typed check to determine if a value is a Request object.
+ *
+ * This instrumentation uses duck-typing instead of `instanceof Request` checks
+ * because the Request constructor may not be available or may differ across
+ * execution contexts (e.g., different realms, polyfills, or test environments).
+ *
+ * The function checks for the presence of key Request properties and methods:
+ * - `url` (string): The request URL
+ * - `method` (string): The HTTP method
+ * - `headers` (object with get/set methods): The Headers object
+ * - `clone` (function): Method to clone the request
+ *
+ * **Risk of false positives:** While minimal, this approach could theoretically
+ * match objects that implement a Request-like interface but are not actual Request
+ * instances. In practice, this risk is negligible as the combination of these
+ * specific properties and methods is unique to the Request interface.
+ *
+ * @param value - The value to check
+ * @returns True if the value appears to be a Request object
+ */
 export function isRequest(value: unknown): value is Request {
   if (value === null || typeof value !== 'object') {
     return false;
