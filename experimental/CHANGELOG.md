@@ -12,6 +12,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
   * (user-facing): environment variable configuration is no longer applied automatically when instantiating SDK components
     (`LoggerProvider`, `BatchLogRecordProcessor`) directly from `@opentelemetry/sdk-logs`. Please migrate to using
     `NodeSDK` from `@opentelemetry/sdk-node` to get automatic environment variable configuration.
+* feat(api-logs)!: use LogAttributes for LoggerOptions#scopeAttributes [#6354](https://github.com/open-telemetry/opentelemetry-js/pull/6354) @AnubhavPurohit691
+  * `LoggerOptions#scopeAttributes` type changed from `Attributes` (trace API) to `LogAttributes` (logs API) for consistency.
 
 ### :rocket: Features
 
@@ -19,8 +21,6 @@ feat(configuration): parse config for rc 3 [#6304](https://github.com/open-telem
 
 ### :bug: Bug Fixes
 
-* fix(api-logs): use LogAttributes for LoggerOptions#scopeAttributes [#????](https://github.com/open-telemetry/opentelemetry-js/pull/????) @author
-  * `LoggerOptions#scopeAttributes` type changed from `Attributes` (trace API) to `LogAttributes` (logs API) for consistency and to avoid a future breaking change for implementers.
 * fix(exporter-prometheus): add missing `@opentelemetry/semantic-conventions` dependency [#6330](https://github.com/open-telemetry/opentelemetry-js/pull/6330) @omizha
 
 ### :books: Documentation
