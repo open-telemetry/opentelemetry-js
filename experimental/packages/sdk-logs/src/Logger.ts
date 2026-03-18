@@ -104,7 +104,9 @@ export class Logger implements logsAPI.Logger {
     severityNumber?: SeverityNumber;
     eventName?: string;
   }): boolean {
-    if (this._loggerConfig.disabled) {
+    const loggerConfig = this._loggerConfig;
+
+    if (loggerConfig.disabled) {
       return false;
     }
 
@@ -115,22 +117,27 @@ export class Logger implements logsAPI.Logger {
     }
     if (
       severityNumber !== SeverityNumber.UNSPECIFIED &&
-      severityNumber < this._loggerConfig.minimumSeverity
+      severityNumber < loggerConfig.minimumSeverity
     ) {
       return false;
     }
 
+    const currentContext = options?.context || context.active();
     // Trace based: the context (given or the active) has a unsampled Span
-    if (this._loggerConfig.traceBased) {
-      const span = trace.getSpan(options?.context || context.active());
-      if (span && span.spanContext().traceFlags === TraceFlags.NONE) {
-        return false;
+    if (loggerConfig.traceBased) {
+      const spanContext = trace.getSpanContext(currentContext);
+      if (spanContext && isSpanContextValid(spanContext)) {
+        const isSampled =
+          (spanContext.traceFlags & TraceFlags.SAMPLED) === TraceFlags.SAMPLED;
+        if (!isSampled) {
+          return false;
+        }
       }
     }
 
     // Lastly check if there is any enabled processor
     const enabledOpts = {
-      context: options?.context || context.active(),
+      context: currentContext,
       instrumentationScope: this.instrumentationScope,
       severityNumber: options?.severityNumber,
       eventName: options?.eventName,
