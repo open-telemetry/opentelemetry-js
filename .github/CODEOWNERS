@@ -25,9 +25,11 @@ experimental/packages/api-logs/ @open-telemetry/javascript-maintainers
 # Any browser-specific code is co-owned by Browser SIG and JS SIG (list more packages here as needed):
 bundler-tests/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
 examples/opentelemetry-web/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
+experimental/packages/**/*browser* @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
 experimental/packages/opentelemetry-browser-detector/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
 experimental/packages/opentelemetry-instrumentation-fetch/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
 experimental/packages/opentelemetry-instrumentation-xml-http-request/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
+experimental/packages/otlp-exporter-base/src/transport/fetch-transport.ts @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
 experimental/packages/web-common/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
 packages/opentelemetry-context-zone/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
 packages/opentelemetry-context-zone-peer-dep/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers

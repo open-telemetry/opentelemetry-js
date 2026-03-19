@@ -55,6 +55,50 @@ const counter = meter.createCounter('metric_name');
 counter.add(10, { 'key': 'value' });
 ```
 
+By default, the exporter creates a secure (TLS) connection. When connecting to a local development collector without TLS, you can use an insecure connection by specifying the `http://` scheme in the URL:
+
+```js
+const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
+const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-grpc');
+
+const collectorOptions = {
+  url: 'http://localhost:4317',  // http:// creates an insecure connection
+};
+
+const metricExporter = new OTLPMetricExporter(collectorOptions);
+const meterProvider = new MeterProvider({
+  readers: [
+    new PeriodicExportingMetricReader({
+      exporter: metricExporter,
+      exportIntervalMillis: 1000,
+    }),
+  ],
+});
+```
+
+Alternatively, you can explicitly configure insecure credentials:
+
+```js
+const grpc = require('@grpc/grpc-js');
+const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
+const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-grpc');
+
+const collectorOptions = {
+  url: 'localhost:4317',
+  credentials: grpc.credentials.createInsecure(),
+};
+
+const metricExporter = new OTLPMetricExporter(collectorOptions);
+const meterProvider = new MeterProvider({
+  readers: [
+    new PeriodicExportingMetricReader({
+      exporter: metricExporter,
+      exportIntervalMillis: 1000,
+    }),
+  ],
+});
+```
+
 ## Environment Variable Configuration
 
 In addition to settings passed to the constructor, the exporter also supports configuration via environment variables:

@@ -1,57 +1,46 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   Context,
-  diag,
   Exception,
   HrTime,
   Link,
   Span as APISpan,
+  SpanOptions as APISpanOptions,
   Attributes,
   AttributeValue,
   SpanContext,
   SpanKind,
   SpanStatus,
-  SpanStatusCode,
   TimeInput,
 } from '@opentelemetry/api';
+import { diag, SpanStatusCode } from '@opentelemetry/api';
+import type { InstrumentationScope } from '@opentelemetry/core';
 import {
   addHrTimes,
   millisToHrTime,
   hrTime,
   hrTimeDuration,
-  InstrumentationScope,
   isAttributeValue,
   isTimeInput,
   isTimeInputHrTime,
   otperformance,
   sanitizeAttributes,
 } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import type { Resource } from '@opentelemetry/resources';
 import {
   ATTR_EXCEPTION_MESSAGE,
   ATTR_EXCEPTION_STACKTRACE,
   ATTR_EXCEPTION_TYPE,
 } from '@opentelemetry/semantic-conventions';
-import { ReadableSpan } from './export/ReadableSpan';
+import type { ReadableSpan } from './export/ReadableSpan';
 import { ExceptionEventName } from './enums';
-import { SpanProcessor } from './SpanProcessor';
-import { TimedEvent } from './TimedEvent';
-import { SpanLimits } from './types';
+import type { SpanProcessor } from './SpanProcessor';
+import type { TimedEvent } from './TimedEvent';
+import type { SpanLimits } from './types';
 
 /**
  * This type provides the properties of @link{ReadableSpan} at the same time
@@ -59,20 +48,22 @@ import { SpanLimits } from './types';
  */
 export type Span = APISpan & ReadableSpan;
 
-interface SpanOptions {
+// `root` is omitted because it is consumed by Tracer.startSpan() to strip
+// parent context but it has no meaning when constructing a Span directly.
+type SpanOptions = Omit<APISpanOptions, 'root'> & {
   resource: Resource;
   scope: InstrumentationScope;
   context: Context;
   spanContext: SpanContext;
   name: string;
+  // Required here to override optional `kind` from the API's SpanOptions
+  // SpanImpl assigns it unconditionally and ReadableSpan expects it to be set.
   kind: SpanKind;
   parentSpanContext?: SpanContext;
-  links?: Link[];
-  startTime?: TimeInput;
-  attributes?: Attributes;
   spanLimits: SpanLimits;
   spanProcessor: SpanProcessor;
-}
+  recordEndMetrics?: () => void;
+};
 
 /**
  * This class represents a span.
@@ -105,6 +96,7 @@ export class SpanImpl implements Span {
   private readonly _spanProcessor: SpanProcessor;
   private readonly _spanLimits: SpanLimits;
   private readonly _attributeValueLengthLimit: number;
+  private readonly _recordEndMetrics?: () => void;
 
   private readonly _performanceStartTime: number;
   private readonly _performanceOffset: number;
@@ -123,16 +115,21 @@ export class SpanImpl implements Span {
     this._startTimeProvided = opts.startTime != null;
     this._spanLimits = opts.spanLimits;
     this._attributeValueLengthLimit =
-      this._spanLimits.attributeValueLengthLimit || 0;
+      this._spanLimits.attributeValueLengthLimit ?? 0;
     this._spanProcessor = opts.spanProcessor;
 
     this.name = opts.name;
     this.parentSpanContext = opts.parentSpanContext;
     this.kind = opts.kind;
-    this.links = opts.links || [];
+    if (opts.links) {
+      for (const link of opts.links) {
+        this.addLink(link);
+      }
+    }
     this.startTime = this._getTime(opts.startTime ?? now);
     this.resource = opts.resource;
     this.instrumentationScope = opts.scope;
+    this._recordEndMetrics = opts.recordEndMetrics;
 
     if (opts.attributes != null) {
       this.setAttributes(opts.attributes);
@@ -226,42 +223,108 @@ export class SpanImpl implements Span {
       attributesOrStartTime = undefined;
     }
 
-    const attributes = sanitizeAttributes(attributesOrStartTime);
+    const sanitized = sanitizeAttributes(attributesOrStartTime);
+    const { attributePerEventCountLimit } = this._spanLimits;
+    const entries = Object.entries(sanitized);
+    const attributes: Attributes = {};
+    let droppedAttributesCount = 0;
+
+    for (const [attr, attrVal] of entries) {
+      if (
+        attributePerEventCountLimit !== undefined &&
+        Object.keys(attributes).length >= attributePerEventCountLimit
+      ) {
+        droppedAttributesCount++;
+        continue;
+      }
+      attributes[attr] = this._truncateToSize(attrVal!);
+    }
 
     this.events.push({
       name,
       attributes,
       time: this._getTime(timeStamp),
-      droppedAttributesCount: 0,
+      droppedAttributesCount,
     });
     return this;
   }
 
   addLink(link: Link): this {
-    this.links.push(link);
+    if (this._isSpanEnded()) return this;
+
+    const { linkCountLimit } = this._spanLimits;
+
+    if (linkCountLimit === 0) {
+      this._droppedLinksCount++;
+      return this;
+    }
+
+    if (linkCountLimit !== undefined && this.links.length >= linkCountLimit) {
+      if (this._droppedLinksCount === 0) {
+        diag.debug('Dropping extra links.');
+      }
+      this.links.shift();
+      this._droppedLinksCount++;
+    }
+
+    const { attributePerLinkCountLimit } = this._spanLimits;
+    const sanitized = sanitizeAttributes(link.attributes);
+    const entries = Object.entries(sanitized);
+    const attributes: Attributes = {};
+    let droppedAttributesCount = 0;
+
+    for (const [attr, attrVal] of entries) {
+      if (
+        attributePerLinkCountLimit !== undefined &&
+        Object.keys(attributes).length >= attributePerLinkCountLimit
+      ) {
+        droppedAttributesCount++;
+        continue;
+      }
+      attributes[attr] = this._truncateToSize(attrVal!);
+    }
+
+    const processedLink: Link = { context: link.context };
+    if (Object.keys(attributes).length > 0) {
+      processedLink.attributes = attributes;
+    }
+    if (droppedAttributesCount > 0) {
+      processedLink.droppedAttributesCount = droppedAttributesCount;
+    }
+
+    this.links.push(processedLink);
     return this;
   }
 
   addLinks(links: Link[]): this {
-    this.links.push(...links);
+    for (const link of links) {
+      this.addLink(link);
+    }
     return this;
   }
 
   setStatus(status: SpanStatus): this {
     if (this._isSpanEnded()) return this;
-    this.status = { ...status };
+    if (status.code === SpanStatusCode.UNSET) return this;
+    if (this.status.code === SpanStatusCode.OK) return this;
+
+    const newStatus: SpanStatus = { code: status.code };
 
     // When using try-catch, the caught "error" is of type `any`. When then assigning `any` to `status.message`,
     // TypeScript will not error. While this can happen during use of any API, it is more common on Span#setStatus()
     // as it's likely used in a catch-block. Therefore, we validate if `status.message` is actually a string, null, or
     // undefined to avoid an incorrect type causing issues downstream.
-    if (this.status.message != null && typeof status.message !== 'string') {
-      diag.warn(
-        `Dropping invalid status.message of type '${typeof status.message}', expected 'string'`
-      );
-      delete this.status.message;
+    if (status.code === SpanStatusCode.ERROR) {
+      if (typeof status.message === 'string') {
+        newStatus.message = status.message;
+      } else if (status.message != null) {
+        diag.warn(
+          `Dropping invalid status.message of type '${typeof status.message}', expected 'string'`
+        );
+      }
     }
 
+    this.status = newStatus;
     return this;
   }
 
@@ -296,10 +359,16 @@ export class SpanImpl implements Span {
         `Dropped ${this._droppedEventsCount} events because eventCountLimit reached`
       );
     }
+    if (this._droppedLinksCount > 0) {
+      diag.warn(
+        `Dropped ${this._droppedLinksCount} links because linkCountLimit reached`
+      );
+    }
     if (this._spanProcessor.onEnding) {
       this._spanProcessor.onEnding(this);
     }
 
+    this._recordEndMetrics?.();
     this._ended = true;
     this._spanProcessor.onEnd(this);
   }

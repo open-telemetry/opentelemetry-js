@@ -1,32 +1,22 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
-import { diag, HrTime, TraceFlags } from '@opentelemetry/api';
-import { InstrumentationScope } from '@opentelemetry/core';
-import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
+import type { HrTime } from '@opentelemetry/api';
+import { diag, TraceFlags } from '@opentelemetry/api';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import type { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
+import type { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
-import { JSON_ENCODER, PROTOBUF_ENCODER, Encoder } from '../src/common/utils';
+import type { Encoder } from '../src/common/utils';
+import { JSON_ENCODER, PROTOBUF_ENCODER } from '../src/common/utils';
 import { toBase64 } from './utils';
 import * as root from '../src/generated/root';
-import {
-  ESeverityNumber,
-  IExportLogsServiceRequest,
-} from '../src/logs/internal-types';
+import type { IExportLogsServiceRequest } from '../src/logs/internal-types';
+import { ESeverityNumber } from '../src/logs/internal-types';
 import { createExportLogsServiceRequest } from '../src/logs/internal';
 import { ProtobufLogsSerializer } from '../src/logs/protobuf';
 import { JsonLogsSerializer } from '../src/logs/json';
