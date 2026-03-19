@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { MetricReader, PushMetricExporter } from '@opentelemetry/sdk-metrics';
+import type { PushMetricExporter } from '@opentelemetry/sdk-metrics';
+import { MetricReader } from '@opentelemetry/sdk-metrics';
 
 export class TestMetricReader extends MetricReader {
   private _exporter: PushMetricExporter;

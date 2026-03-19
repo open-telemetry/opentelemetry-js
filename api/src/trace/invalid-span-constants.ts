@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { SpanContext } from './span_context';
+import type { SpanContext } from './span_context';
 import { TraceFlags } from './trace_flags';
 
 /**

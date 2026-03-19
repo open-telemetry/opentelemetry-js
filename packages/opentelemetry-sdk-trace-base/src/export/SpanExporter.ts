@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ExportResult } from '@opentelemetry/core';
-import { ReadableSpan } from './ReadableSpan';
+import type { ExportResult } from '@opentelemetry/core';
+import type { ReadableSpan } from './ReadableSpan';
 
 /**
  * An interface that allows different tracing services to export recorded data

@@ -4,10 +4,11 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { ExportResult, ExportResultCode } from '@opentelemetry/core';
+import type { ExportResult } from '@opentelemetry/core';
+import { ExportResultCode } from '@opentelemetry/core';
 import * as http from 'http';
 import * as https from 'https';
-import * as zipkinTypes from '../../types';
+import type * as zipkinTypes from '../../types';
 
 /**
  * Prepares send function that will send spans to the remote Zipkin service.

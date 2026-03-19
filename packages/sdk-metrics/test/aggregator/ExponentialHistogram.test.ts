@@ -3,20 +3,21 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { HrTime, ValueType } from '@opentelemetry/api';
+import type { HrTime } from '@opentelemetry/api';
+import { ValueType } from '@opentelemetry/api';
+import type { MetricData } from '../../src';
 import {
   AggregationTemporality,
   DataPointType,
   InstrumentType,
-  MetricData,
 } from '../../src';
 import {
   ExponentialHistogramAccumulation,
   ExponentialHistogramAggregator,
 } from '../../src/aggregator/ExponentialHistogram';
-import { Buckets } from '../../src/aggregator/exponential-histogram/Buckets';
+import type { Buckets } from '../../src/aggregator/exponential-histogram/Buckets';
 import { getMapping } from '../../src/aggregator/exponential-histogram/mapping/getMapping';
-import { Mapping } from '../../src/aggregator/exponential-histogram/mapping/types';
+import type { Mapping } from '../../src/aggregator/exponential-histogram/mapping/types';
 import * as assert from 'assert';
 import {
   assertInEpsilon,

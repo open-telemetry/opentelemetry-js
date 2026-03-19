@@ -10,8 +10,9 @@ import {
   AggregationType,
   MetricReader,
 } from '@opentelemetry/sdk-metrics';
-import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
-import { ExporterConfig } from './export/types';
+import type { IncomingMessage, Server, ServerResponse } from 'http';
+import { createServer } from 'http';
+import type { ExporterConfig } from './export/types';
 import { PrometheusSerializer } from './PrometheusSerializer';
 /** Node.js v8.x compat */
 import { URL } from 'url';

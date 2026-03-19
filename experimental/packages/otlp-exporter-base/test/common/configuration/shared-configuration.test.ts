@@ -4,10 +4,8 @@
  */
 
 import * as assert from 'assert';
-import {
-  mergeOtlpSharedConfigurationWithDefaults,
-  OtlpSharedConfiguration,
-} from '../../../src';
+import type { OtlpSharedConfiguration } from '../../../src';
+import { mergeOtlpSharedConfigurationWithDefaults } from '../../../src';
 import { validateTimeoutMillis } from '../../../src/configuration/shared-configuration';
 
 export function testSharedConfigBehavior<T extends OtlpSharedConfiguration>(

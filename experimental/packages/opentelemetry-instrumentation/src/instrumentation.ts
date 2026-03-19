@@ -3,20 +3,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  diag,
+import type {
   DiagLogger,
-  metrics,
   Meter,
   MeterProvider,
-  trace,
   Tracer,
   TracerProvider,
   Span,
 } from '@opentelemetry/api';
-import { Logger, LoggerProvider, logs } from '@opentelemetry/api-logs';
+import { diag, metrics, trace } from '@opentelemetry/api';
+import type { Logger, LoggerProvider } from '@opentelemetry/api-logs';
+import { logs } from '@opentelemetry/api-logs';
 import * as shimmer from './shimmer';
-import {
+import type {
   InstrumentationModuleDefinition,
   Instrumentation,
   InstrumentationConfig,

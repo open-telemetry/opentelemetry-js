@@ -5,11 +5,10 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import type { Span, SpanContext } from '../../../src';
 import {
   context,
   ROOT_CONTEXT,
-  Span,
-  SpanContext,
   SpanKind,
   trace,
   TraceFlags,

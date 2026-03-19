@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context, HrTime, Attributes } from '@opentelemetry/api';
-import { ExemplarFilter } from './ExemplarFilter';
+import type { Context, HrTime, Attributes } from '@opentelemetry/api';
+import type { ExemplarFilter } from './ExemplarFilter';
 
 export class AlwaysSampleExemplarFilter implements ExemplarFilter {
   shouldSample(

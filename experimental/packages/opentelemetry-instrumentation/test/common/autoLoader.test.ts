@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   Tracer,
   TracerProvider,
   Meter,
@@ -13,7 +13,11 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { InstrumentationBase, registerInstrumentations } from '../../src';
-import { Logger, LoggerOptions, LoggerProvider } from '@opentelemetry/api-logs';
+import type {
+  Logger,
+  LoggerOptions,
+  LoggerProvider,
+} from '@opentelemetry/api-logs';
 
 class DummyTracerProvider implements TracerProvider {
   getTracer(name: string, version?: string): Tracer {

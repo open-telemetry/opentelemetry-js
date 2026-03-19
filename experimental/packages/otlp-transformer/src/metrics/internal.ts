@@ -3,10 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { ValueType } from '@opentelemetry/api';
-import {
-  AggregationTemporality,
+import type {
   DataPoint,
-  DataPointType,
   ExponentialHistogram,
   Histogram,
   MetricData,
@@ -14,7 +12,10 @@ import {
   ScopeMetrics,
 } from '@opentelemetry/sdk-metrics';
 import {
-  EAggregationTemporality,
+  AggregationTemporality,
+  DataPointType,
+} from '@opentelemetry/sdk-metrics';
+import type {
   IExponentialHistogramDataPoint,
   IExportMetricsServiceRequest,
   IHistogramDataPoint,
@@ -23,7 +24,8 @@ import {
   IResourceMetrics,
   IScopeMetrics,
 } from './internal-types';
-import { Encoder } from '../common/utils';
+import { EAggregationTemporality } from './internal-types';
+import type { Encoder } from '../common/utils';
 import {
   createInstrumentationScope,
   createResource,

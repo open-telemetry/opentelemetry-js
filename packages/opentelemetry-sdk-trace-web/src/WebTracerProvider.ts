@@ -3,19 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  BasicTracerProvider,
+import type {
   SDKRegistrationConfig,
   TracerConfig,
 } from '@opentelemetry/sdk-trace-base';
+import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
 import { StackContextManager } from './StackContextManager';
-import {
-  trace,
-  context,
-  ContextManager,
-  propagation,
-  TextMapPropagator,
-} from '@opentelemetry/api';
+import type { ContextManager, TextMapPropagator } from '@opentelemetry/api';
+import { trace, context, propagation } from '@opentelemetry/api';
 import {
   CompositePropagator,
   W3CBaggagePropagator,

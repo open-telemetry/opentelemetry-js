@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { OTLPExporterConfigBase } from './legacy-base-configuration';
+import type { OTLPExporterConfigBase } from './legacy-base-configuration';
 import { wrapStaticHeadersInFunction } from './shared-configuration';
-import { HeadersFactory } from './otlp-http-configuration';
+import type { HeadersFactory } from './otlp-http-configuration';
 
 export function convertLegacyHeaders(
   config: OTLPExporterConfigBase

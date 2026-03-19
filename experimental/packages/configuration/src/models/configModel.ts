@@ -5,10 +5,10 @@
 'use strict';
 
 import { DiagLogLevel } from '@opentelemetry/api';
-import { TracerProvider } from './tracerProviderModel';
-import { LoggerProvider } from './loggerProviderModel';
-import { Resource } from './resourceModel';
-import { MeterProvider } from './meterProviderModel';
+import type { TracerProvider } from './tracerProviderModel';
+import type { LoggerProvider } from './loggerProviderModel';
+import type { Resource } from './resourceModel';
+import type { MeterProvider } from './meterProviderModel';
 
 export interface ConfigurationModel {
   /**
@@ -22,12 +22,6 @@ export interface ConfigurationModel {
    * If omitted, info is used.
    */
   log_level?: number;
-
-  /**
-   * Node resource detectors
-   * If omitted, all is used.
-   */
-  node_resource_detectors?: string[];
 
   /**
    * Configure resource for all signals.

@@ -3,13 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context, SpanKind, Link, SpanAttributes } from '@opentelemetry/api';
-import {
-  Sampler,
-  SamplingResult,
-  TraceIdRatioBasedSampler,
-} from '@opentelemetry/sdk-trace-base';
-import { PerOperationStrategy } from './types';
+import type {
+  Context,
+  SpanKind,
+  Link,
+  SpanAttributes,
+} from '@opentelemetry/api';
+import type { Sampler, SamplingResult } from '@opentelemetry/sdk-trace-base';
+import { TraceIdRatioBasedSampler } from '@opentelemetry/sdk-trace-base';
+import type { PerOperationStrategy } from './types';
 
 interface PerOperationSamplerOptions {
   /** The default sampler to use in case span does not have a custom strategy. */

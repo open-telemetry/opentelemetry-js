@@ -5,15 +5,10 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { InstrumentationScope } from '@opentelemetry/core';
-import {
-  DataPoint,
-  DataPointType,
-  Histogram,
-  InstrumentType,
-  MeterProvider,
-} from '../src';
-import { InstrumentDescriptor } from '../src/InstrumentDescriptor';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import type { DataPoint, Histogram } from '../src';
+import { DataPointType, InstrumentType, MeterProvider } from '../src';
+import type { InstrumentDescriptor } from '../src/InstrumentDescriptor';
 import {
   TestDeltaMetricReader,
   TestMetricReader,
@@ -26,9 +21,10 @@ import {
   defaultInstrumentationScope,
   testResource,
 } from './util';
-import { ObservableResult, ValueType } from '@opentelemetry/api';
-import { IMetricReader } from '../src/export/MetricReader';
-import { Resource } from '@opentelemetry/resources';
+import type { ObservableResult } from '@opentelemetry/api';
+import { ValueType } from '@opentelemetry/api';
+import type { IMetricReader } from '../src/export/MetricReader';
+import type { Resource } from '@opentelemetry/resources';
 
 describe('Instruments', () => {
   describe('Counter', () => {

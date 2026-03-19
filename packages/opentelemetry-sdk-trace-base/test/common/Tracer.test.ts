@@ -2,35 +2,32 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import {
+import type {
   Attributes,
   Context,
+  Link,
+  SpanContext,
+  TraceState,
+} from '@opentelemetry/api';
+import {
   context,
   createContextKey,
   createTraceState,
   INVALID_TRACEID,
-  Link,
   ROOT_CONTEXT,
-  SpanContext,
   SpanKind,
   trace,
   TraceFlags,
-  TraceState,
 } from '@opentelemetry/api';
-import {
-  InstrumentationScope,
-  sanitizeAttributes,
-  suppressTracing,
-} from '@opentelemetry/core';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import { sanitizeAttributes, suppressTracing } from '@opentelemetry/core';
 import * as assert from 'assert';
+import type { Sampler, Span, SpanProcessor } from '../../src';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
   BasicTracerProvider,
-  Sampler,
   SamplingDecision,
-  Span,
-  SpanProcessor,
 } from '../../src';
 import { TestStackContextManager } from './export/TestStackContextManager';
 import * as sinon from 'sinon';

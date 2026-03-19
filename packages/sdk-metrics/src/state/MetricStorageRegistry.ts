@@ -3,17 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { MetricStorage } from './MetricStorage';
-import {
-  InstrumentDescriptor,
-  isDescriptorCompatibleWith,
-} from '../InstrumentDescriptor';
+import type { MetricStorage } from './MetricStorage';
+import type { InstrumentDescriptor } from '../InstrumentDescriptor';
+import { isDescriptorCompatibleWith } from '../InstrumentDescriptor';
 import * as api from '@opentelemetry/api';
 import {
   getConflictResolutionRecipe,
   getIncompatibilityDetails,
 } from '../view/RegistrationConflicts';
-import { MetricCollectorHandle } from './MetricCollector';
+import type { MetricCollectorHandle } from './MetricCollector';
 
 type StorageMap = Map<string, MetricStorage[]>;
 

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context, HrTime, Attributes } from '@opentelemetry/api';
-import { WritableMetricStorage } from './WritableMetricStorage';
+import type { Context, HrTime, Attributes } from '@opentelemetry/api';
+import type { WritableMetricStorage } from './WritableMetricStorage';
 
 /**
  * Internal interface.

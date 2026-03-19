@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Attributes, AttributeValue } from '../common/Attributes';
+import type { Attributes, AttributeValue } from '../common/Attributes';
 
 /**
  * @deprecated please use {@link Attributes}

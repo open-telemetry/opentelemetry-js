@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { MetricProducer } from '@opentelemetry/sdk-metrics';
+import type { MetricProducer } from '@opentelemetry/sdk-metrics';
 
 /**
  * Configuration interface for prometheus exporter

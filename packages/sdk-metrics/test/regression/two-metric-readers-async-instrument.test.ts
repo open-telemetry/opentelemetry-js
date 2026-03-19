@@ -7,7 +7,7 @@ import * as assert from 'assert';
 import { DataPointType, MeterProvider } from '../../src';
 import { TestDeltaMetricReader } from '../export/TestMetricReader';
 import { assertDataPoint, assertMetricData } from '../util';
-import { IMetricReader } from '../../src/export/MetricReader';
+import type { IMetricReader } from '../../src/export/MetricReader';
 
 // https://github.com/open-telemetry/opentelemetry-js/issues/3664
 

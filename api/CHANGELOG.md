@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 
 * fix(api): prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
 * fix(api): update diag `consoleLogger` to use original console methods to prevent infinite loop when a console instrumentation is present [#6395](https://github.com/open-telemetry/opentelemetry-js/pull/6395)
+* fix(api): use `Attributes` instead of deprecated `SpanAttributes` in `SpanOptions` [#6478](https://github.com/open-telemetry/opentelemetry-js/pull/6478) @overbalance
 
 ### :books: (Refine Doc)
 
@@ -27,6 +28,7 @@ All notable changes to this project will be documented in this file.
 * chore: disallow constructor parameter property syntax [#6187](https://github.com/open-telemetry/opentelemetry-js/pull/6187) @legendecas
 * refactor(api): remove platform-specific globalThis, use globalThis directly [#6208](https://github.com/open-telemetry/opentelemetry-js/pull/6208) @overbalance
 * chore(api): mark ProxyTracerProvider as deprecated [#6328](https://github.com/open-telemetry/opentelemetry-js/pull/6328) @cjihrig
+* chore: enforce `import type` for type-only imports via ESLint [#6467](https://github.com/open-telemetry/opentelemetry-js/pull/6467) @overbalance
 
 ## 1.9.0
 

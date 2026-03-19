@@ -5,8 +5,8 @@
 
 import { ContextAPI } from '../api/context';
 import { createContextKey } from '../context/context';
-import { Context } from '../context/types';
-import { Baggage } from './types';
+import type { Context } from '../context/types';
+import type { Baggage } from './types';
 
 /**
  * Baggage key

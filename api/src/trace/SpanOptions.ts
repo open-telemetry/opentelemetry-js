@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { TimeInput } from '../common/Time';
-import { SpanAttributes } from './attributes';
-import { Link } from './link';
-import { SpanKind } from './span_kind';
+import type { Attributes } from '../common/Attributes';
+import type { TimeInput } from '../common/Time';
+import type { Link } from './link';
+import type { SpanKind } from './span_kind';
 
 /**
  * Options needed for span creation
@@ -21,7 +21,7 @@ export interface SpanOptions {
   kind?: SpanKind;
 
   /** A span's attributes */
-  attributes?: SpanAttributes;
+  attributes?: Attributes;
 
   /** {@link Link}s span to other spans */
   links?: Link[];

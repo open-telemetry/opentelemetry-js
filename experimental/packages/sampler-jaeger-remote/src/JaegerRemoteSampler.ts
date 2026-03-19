@@ -3,16 +3,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Link, SpanKind, Attributes, diag, Context } from '@opentelemetry/api';
+import type { Link, SpanKind, Attributes, Context } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
+import type { Sampler, SamplingResult } from '@opentelemetry/sdk-trace-base';
 import {
-  Sampler,
-  SamplingResult,
   ParentBasedSampler,
   TraceIdRatioBasedSampler,
 } from '@opentelemetry/sdk-trace-base';
 import * as axios from 'axios';
 import { PerOperationSampler } from './PerOperationSampler';
-import { SamplingStrategyResponse, StrategyType } from './types';
+import type { SamplingStrategyResponse } from './types';
+import { StrategyType } from './types';
 
 interface JaegerRemoteSamplerOptions {
   /** Address of a service that implements the Remote Sampling API, such as Jaeger Collector or OpenTelemetry Collector */

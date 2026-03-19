@@ -33,7 +33,8 @@ import * as assert from 'assert';
 import { HttpInstrumentation } from '../../src/http';
 import { httpRequest } from '../utils/httpRequest';
 import { TestMetricReader } from '../utils/TestMetricReader';
-import { context, ContextManager } from '@opentelemetry/api';
+import type { ContextManager } from '@opentelemetry/api';
+import { context } from '@opentelemetry/api';
 import { SemconvStability } from '@opentelemetry/instrumentation';
 
 const instrumentation = new HttpInstrumentation();

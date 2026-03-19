@@ -3,14 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Attributes, diag } from '@opentelemetry/api';
-import {
+import type { Attributes } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
+import type {
   DetectedResource,
   ResourceDetector,
   ResourceDetectionConfig,
-  emptyResource,
 } from '@opentelemetry/resources';
-import { BROWSER_ATTRIBUTES, UserAgentData } from './types';
+import { emptyResource } from '@opentelemetry/resources';
+import type { UserAgentData } from './types';
+import { BROWSER_ATTRIBUTES } from './types';
 
 /**
  * BrowserDetector will be used to detect the resources related to browser.

@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { ValueType } from '@opentelemetry/api';
-import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
+import type { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
+import type { MetricData, ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import {
   AggregationTemporality,
   DataPointType,
-  MetricData,
-  ResourceMetrics,
 } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import { createExportMetricsServiceRequest } from '../src/metrics/internal';

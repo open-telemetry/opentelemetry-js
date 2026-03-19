@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context } from '@opentelemetry/api';
+import type { Context } from '@opentelemetry/api';
 
-import { SdkLogRecord } from './export/SdkLogRecord';
+import type { SdkLogRecord } from './export/SdkLogRecord';
 
 export interface LogRecordProcessor {
   /**

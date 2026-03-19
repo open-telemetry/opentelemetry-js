@@ -36,7 +36,7 @@
  *  - aligned with style-guide
  */
 
-import { ShimWrapped } from './types';
+import type { ShimWrapped } from './types';
 
 // Default to complaining loudly when things don't go according to plan.
 // eslint-disable-next-line no-console

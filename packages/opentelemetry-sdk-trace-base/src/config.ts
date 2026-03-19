@@ -5,7 +5,7 @@
 
 import { diag } from '@opentelemetry/api';
 import { getNumberFromEnv, getStringFromEnv } from '@opentelemetry/core';
-import { Sampler } from './Sampler';
+import type { Sampler } from './Sampler';
 import { AlwaysOffSampler } from './sampler/AlwaysOffSampler';
 import { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
 import { ParentBasedSampler } from './sampler/ParentBasedSampler';

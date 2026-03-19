@@ -5,12 +5,8 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
-  getElementXPath,
-  normalizeUrl,
-  parseUrl,
-  URLLike,
-} from '../../src/utils';
+import type { URLLike } from '../../src/utils';
+import { getElementXPath, normalizeUrl, parseUrl } from '../../src/utils';
 
 const fixture = `
 <div>

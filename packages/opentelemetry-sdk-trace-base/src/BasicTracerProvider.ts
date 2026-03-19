@@ -3,14 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { TracerProvider, Tracer as ApiTracer } from '@opentelemetry/api';
+import type { TracerProvider, Tracer as ApiTracer } from '@opentelemetry/api';
 import { merge } from '@opentelemetry/core';
-import { defaultResource, Resource } from '@opentelemetry/resources';
-import { SpanProcessor } from './SpanProcessor';
+import type { Resource } from '@opentelemetry/resources';
+import { defaultResource } from '@opentelemetry/resources';
+import type { SpanProcessor } from './SpanProcessor';
 import { Tracer } from './Tracer';
 import { loadDefaultConfig } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
-import { TracerConfig } from './types';
+import type { TracerConfig } from './types';
 import { reconfigureLimits } from './utility';
 
 export enum ForceFlushState {

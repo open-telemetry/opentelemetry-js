@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Attributes, AttributeValue, diag } from '@opentelemetry/api';
+import type { Attributes, AttributeValue } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import { SDK_INFO } from '@opentelemetry/core';
 import {
   ATTR_SERVICE_NAME,
@@ -11,9 +12,9 @@ import {
   ATTR_TELEMETRY_SDK_NAME,
   ATTR_TELEMETRY_SDK_VERSION,
 } from '@opentelemetry/semantic-conventions';
-import { Resource } from './Resource';
+import type { Resource } from './Resource';
 import { defaultServiceName } from './default-service-name';
-import {
+import type {
   DetectedResource,
   DetectedResourceAttributes,
   MaybePromise,

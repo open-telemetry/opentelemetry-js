@@ -50,6 +50,13 @@ const RELEASE_GROUPS = {
   }
 };
 
+function isLowerOrEqualReleaseType(expectedLower, expectedHigher) {
+  const order = { 'patch': 1, 'minor': 2, };
+
+  // "inherit" is considered equal to any type since it will resolve to the same type as the other group
+  return expectedHigher === 'inherit' || expectedLower  === 'inherit' || order[expectedLower] <= order[expectedHigher];
+}
+
 // Check if working directory is clean
 function checkNoChanges() {
   try {
@@ -92,8 +99,8 @@ function resolveReleaseConfig() {
 
   // Check for conflicting configuration
   if (isSet(API_RELEASE)) {
-    if ((isSet(STABLE_SDK_RELEASE) && API_RELEASE !== STABLE_SDK_RELEASE)
-      || (isSet(EXPERIMENTAL_RELEASE) && API_RELEASE !== EXPERIMENTAL_RELEASE)) {
+    if ((isSet(STABLE_SDK_RELEASE) && !isLowerOrEqualReleaseType(API_RELEASE, STABLE_SDK_RELEASE))
+      || (isSet(EXPERIMENTAL_RELEASE) && !isLowerOrEqualReleaseType(API_RELEASE, EXPERIMENTAL_RELEASE))) {
       console.error('Error: API_RELEASE cannot be set to a different value STABLE_SDK_RELEASE or EXPERIMENTAL_RELEASE are also set.');
       console.error('Please align or use API_RELEASE or individually.');
       console.error('Current settings:');
@@ -107,7 +114,7 @@ function resolveReleaseConfig() {
   // Check that EXPERIMENTAL_RELEASE is not lower than STABLE_SDK_RELEASE
   // Experimental can be higher (e.g., stable=patch, experimental=minor) but not lower
   if (isSet(STABLE_SDK_RELEASE) && isSet(EXPERIMENTAL_RELEASE)) {
-    if (STABLE_SDK_RELEASE === 'minor' && EXPERIMENTAL_RELEASE === 'patch') {
+    if (!isLowerOrEqualReleaseType(STABLE_SDK_RELEASE, EXPERIMENTAL_RELEASE)) {
       console.error('Error: EXPERIMENTAL_RELEASE cannot be lower than STABLE_SDK_RELEASE.');
       console.error('Experimental packages depend on stable SDK packages, so they must have at least the same version bump.');
       console.error('Current settings:');
@@ -129,10 +136,21 @@ function resolveReleaseConfig() {
   let releaseTypeSemconv = '';
 
   if (isSet(API_RELEASE)) {
-    // API release makes SDK and experimental inherit the exact bump, enforced by the check above
+    // API release makes SDK and experimental inherit the bump, rules are enforced above to prevent conflicts.
     releaseTypeApi = API_RELEASE;
-    releaseTypeStable = API_RELEASE;
-    releaseTypeExperimental = API_RELEASE;
+    if (isSet(STABLE_SDK_RELEASE)) {
+      releaseTypeStable = STABLE_SDK_RELEASE;
+    } else {
+      releaseTypeStable = API_RELEASE;
+      console.log(`Info: STABLE_SDK_RELEASE inheriting "${API_RELEASE}" from API_RELEASE`);
+    }
+
+    if (isSet(EXPERIMENTAL_RELEASE)) {
+      releaseTypeExperimental = EXPERIMENTAL_RELEASE;
+    } else {
+      releaseTypeExperimental = releaseTypeStable;
+      console.log(`Info: EXPERIMENTAL_RELEASE inheriting "${releaseTypeStable}" from STABLE_SDK_RELEASE or API_RELEASE`);
+    }
   } else if (isSet(STABLE_SDK_RELEASE)) {
     // Stable SDK release
     releaseTypeStable = STABLE_SDK_RELEASE;
@@ -216,6 +234,16 @@ function bumpVersions(config) {
 
     const releaseType = getReleaseTypeForPackagePath(pkgPath, config);
     if (!releaseType) return;
+
+    // Skip API package as it was already bumped in Step 3
+    const normalizedPath = path.resolve(pkgPath);
+    const rootDir = path.resolve('.');
+    const relativePath = path.relative(rootDir, normalizedPath);
+    if (relativePath === 'api') {
+      // Store the current version since it was already bumped.
+      updatedVersions[pkgJson.name] = pkgJson.version;
+      return;
+    }
 
     const oldVersion = pkgJson.version;
     const newVersion = bumpVersion(oldVersion, releaseType);

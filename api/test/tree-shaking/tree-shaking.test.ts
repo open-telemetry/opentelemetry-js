@@ -4,9 +4,11 @@
  */
 
 import * as assert from 'assert';
-import { webpack, Stats } from 'webpack';
+import type { Stats } from 'webpack';
+import { webpack } from 'webpack';
 import * as path from 'path';
-import { IFS, Union } from 'unionfs';
+import type { IFS } from 'unionfs';
+import { Union } from 'unionfs';
 import { fs as mfs } from 'memfs';
 import * as realFs from 'fs';
 

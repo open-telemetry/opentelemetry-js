@@ -11,7 +11,7 @@ import {
   hashAttributes,
   TimeoutError,
 } from '../src/utils';
-import { Attributes } from '@opentelemetry/api';
+import type { Attributes } from '@opentelemetry/api';
 
 describe('utils', () => {
   afterEach(() => {

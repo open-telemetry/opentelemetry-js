@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { TracerProvider, MeterProvider, Span } from '@opentelemetry/api';
-import { LoggerProvider } from '@opentelemetry/api-logs';
+import type { TracerProvider, MeterProvider, Span } from '@opentelemetry/api';
+import type { LoggerProvider } from '@opentelemetry/api-logs';
 
 /** Interface Instrumentation to apply patch. */
 export interface Instrumentation<

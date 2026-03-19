@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { TraceState } from '@opentelemetry/api';
+import type { TraceState } from '@opentelemetry/api';
 import {
   INVALID_RANDOM_VALUE,
   INVALID_THRESHOLD,

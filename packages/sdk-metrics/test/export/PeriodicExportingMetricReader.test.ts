@@ -5,27 +5,24 @@
 
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import {
+import type {
   AggregationOption,
-  AggregationType,
   CollectionResult,
   InstrumentType,
   MetricProducer,
   PushMetricExporter,
 } from '../../src';
-import {
-  DataPointType,
+import { AggregationType } from '../../src';
+import type {
   ResourceMetrics,
   ScopeMetrics,
 } from '../../src/export/MetricData';
+import { DataPointType } from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { TimeoutError } from '../../src/utils';
-import {
-  ExportResult,
-  ExportResultCode,
-  setGlobalErrorHandler,
-} from '@opentelemetry/core';
+import type { ExportResult } from '@opentelemetry/core';
+import { ExportResultCode, setGlobalErrorHandler } from '@opentelemetry/core';
 import { TestMetricProducer } from './TestMetricProducer';
 import {
   assertAggregationSelector,

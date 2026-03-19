@@ -9,10 +9,8 @@ import { LoggerProvider, createLoggerConfigurator } from '../../src';
 import { NoopLogRecordProcessor } from '../../src/export/NoopLogRecordProcessor';
 import { LogRecordImpl } from '../../src/LogRecordImpl';
 import { ROOT_CONTEXT, TraceFlags, context, trace } from '@opentelemetry/api';
-import {
-  LogRecord as ApiLogRecord,
-  SeverityNumber,
-} from '@opentelemetry/api-logs';
+import type { LogRecord as ApiLogRecord } from '@opentelemetry/api-logs';
+import { SeverityNumber } from '@opentelemetry/api-logs';
 import { Logger } from '../../src/Logger';
 import { InMemoryLogRecordExporter } from '../../src/export/InMemoryLogRecordExporter';
 import { SimpleLogRecordProcessor } from '../../src/export/SimpleLogRecordProcessor';

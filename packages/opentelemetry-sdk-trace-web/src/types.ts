@@ -2,7 +2,7 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { PerformanceTimingNames } from './enums/PerformanceTimingNames';
+import type { PerformanceTimingNames } from './enums/PerformanceTimingNames';
 
 export type PerformanceEntries = {
   [PerformanceTimingNames.CONNECT_END]?: number;

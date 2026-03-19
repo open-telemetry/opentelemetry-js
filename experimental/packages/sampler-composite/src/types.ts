@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Attributes, TraceState } from '@opentelemetry/api';
+import type { Attributes, TraceState } from '@opentelemetry/api';
 import { type Sampler } from '@opentelemetry/sdk-trace-base';
 
 /** Information to make a sampling decision. */

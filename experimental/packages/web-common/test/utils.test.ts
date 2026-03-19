@@ -10,10 +10,10 @@ import {
   createDefaultSessionIdGenerator,
   createLocalStorageSessionStore,
 } from '../src/utils';
-import { SessionSpanProcessor } from '../src/SessionSpanProcessor';
-import { SessionLogRecordProcessor } from '../src/SessionLogRecordProcessor';
-import { SessionIdGenerator } from '../src/types/SessionIdGenerator';
-import { SessionStore } from '../src/types/SessionStore';
+import type { SessionSpanProcessor } from '../src/SessionSpanProcessor';
+import type { SessionLogRecordProcessor } from '../src/SessionLogRecordProcessor';
+import type { SessionIdGenerator } from '../src/types/SessionIdGenerator';
+import type { SessionStore } from '../src/types/SessionStore';
 
 describe('createSessionSpanProcessor', function () {
   it('returns an instance of a SessionSpanProcessor', function () {
