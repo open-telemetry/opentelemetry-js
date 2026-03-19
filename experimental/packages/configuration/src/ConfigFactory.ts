@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ConfigFactory } from './IConfigFactory';
+import type { ConfigFactory } from './IConfigFactory';
 import { EnvironmentConfigFactory } from './EnvironmentConfigFactory';
 import { FileConfigFactory, hasValidConfigFile } from './FileConfigFactory';
 

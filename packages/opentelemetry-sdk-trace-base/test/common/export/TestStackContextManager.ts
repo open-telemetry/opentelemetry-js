@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ContextManager, Context, ROOT_CONTEXT } from '@opentelemetry/api';
+import type { ContextManager, Context } from '@opentelemetry/api';
+import { ROOT_CONTEXT } from '@opentelemetry/api';
 
 /**
  * A test-only ContextManager that uses an in-memory stack to keep track of

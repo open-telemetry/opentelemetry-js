@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ComposableSampler, SamplingIntent } from './types';
+import type { ComposableSampler, SamplingIntent } from './types';
 import { INVALID_THRESHOLD, MAX_THRESHOLD } from './util';
 import { serializeTh } from './tracestate';
 

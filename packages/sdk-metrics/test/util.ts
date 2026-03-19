@@ -3,30 +3,29 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   Context,
   BatchObservableCallback,
   Attributes,
   ObservableCallback,
-  ValueType,
 } from '@opentelemetry/api';
-import { InstrumentationScope } from '@opentelemetry/core';
+import { ValueType } from '@opentelemetry/api';
+import type { InstrumentationScope } from '@opentelemetry/core';
 import {
   defaultResource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
 import * as assert from 'assert';
-import { InstrumentDescriptor } from '../src/InstrumentDescriptor';
-import {
-  InstrumentType,
+import type { InstrumentDescriptor } from '../src/InstrumentDescriptor';
+import type {
   MetricData,
   DataPoint,
-  DataPointType,
   ScopeMetrics,
 } from '../src/export/MetricData';
-import { HrTime } from '@opentelemetry/api';
-import { Histogram } from '../src/aggregator/types';
-import { AggregationTemporality } from '../src/export/AggregationTemporality';
+import { InstrumentType, DataPointType } from '../src/export/MetricData';
+import type { HrTime } from '@opentelemetry/api';
+import type { Histogram } from '../src/aggregator/types';
+import type { AggregationTemporality } from '../src/export/AggregationTemporality';
 
 export type Measurement = {
   value: number;

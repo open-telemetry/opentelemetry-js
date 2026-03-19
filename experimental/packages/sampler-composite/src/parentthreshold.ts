@@ -3,16 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  Attributes,
-  Context,
-  isSpanContextValid,
-  Link,
-  SpanKind,
-  TraceFlags,
-  trace,
-} from '@opentelemetry/api';
-import { ComposableSampler, SamplingIntent } from './types';
+import type { Attributes, Context, Link, SpanKind } from '@opentelemetry/api';
+import { isSpanContextValid, TraceFlags, trace } from '@opentelemetry/api';
+import type { ComposableSampler, SamplingIntent } from './types';
 import { parseOtelTraceState } from './tracestate';
 import { INVALID_THRESHOLD, isValidThreshold, MIN_THRESHOLD } from './util';
 

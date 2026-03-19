@@ -2,11 +2,11 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import * as metrics from '@opentelemetry/api';
-import { ExportResult } from '@opentelemetry/core';
+import type * as metrics from '@opentelemetry/api';
+import type { ExportResult } from '@opentelemetry/core';
 import { ConsoleMetricExporter } from '../../src/export/ConsoleMetricExporter';
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
-import { ResourceMetrics } from '../../src/export/MetricData';
+import type { ResourceMetrics } from '../../src/export/MetricData';
 import { MeterProvider } from '../../src/MeterProvider';
 import { testResource } from '../util';
 import * as assert from 'assert';

@@ -13,8 +13,8 @@ import {
   isSpanContextValid,
   wrapSpanContext,
 } from '../trace/spancontext-utils';
-import { Tracer } from '../trace/tracer';
-import { TracerProvider } from '../trace/tracer_provider';
+import type { Tracer } from '../trace/tracer';
+import type { TracerProvider } from '../trace/tracer_provider';
 import {
   deleteSpan,
   getActiveSpan,

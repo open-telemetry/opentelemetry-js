@@ -4,7 +4,7 @@
  */
 
 import { context } from '@opentelemetry/api';
-import { ExportResult } from '../ExportResult';
+import type { ExportResult } from '../ExportResult';
 import { suppressTracing } from '../trace/suppress-tracing';
 
 export interface Exporter<T> {

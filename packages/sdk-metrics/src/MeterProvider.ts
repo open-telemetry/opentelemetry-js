@@ -3,19 +3,20 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  diag,
+import type {
   MeterProvider as IMeterProvider,
   Meter as IMeter,
   MeterOptions,
-  createNoopMeter,
 } from '@opentelemetry/api';
-import { defaultResource, Resource } from '@opentelemetry/resources';
-import { IMetricReader } from './export/MetricReader';
+import { diag, createNoopMeter } from '@opentelemetry/api';
+import type { Resource } from '@opentelemetry/resources';
+import { defaultResource } from '@opentelemetry/resources';
+import type { IMetricReader } from './export/MetricReader';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { MetricCollector } from './state/MetricCollector';
-import { ForceFlushOptions, ShutdownOptions } from './types';
-import { View, ViewOptions } from './view/View';
+import type { ForceFlushOptions, ShutdownOptions } from './types';
+import type { ViewOptions } from './view/View';
+import { View } from './view/View';
 
 /**
  * MeterProviderOptions provides an interface for configuring a MeterProvider.

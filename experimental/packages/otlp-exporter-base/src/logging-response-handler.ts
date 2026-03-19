@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { diag } from '@opentelemetry/api';
-import { IOtlpResponseHandler } from './response-handler';
+import type { IOtlpResponseHandler } from './response-handler';
 
 function isPartialSuccessResponse(
   response: unknown

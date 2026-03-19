@@ -5,7 +5,8 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { ExportResult, ExportResultCode } from '../../../src';
+import type { ExportResult } from '../../../src';
+import { ExportResultCode } from '../../../src';
 import * as suppress from '../../../src/trace/suppress-tracing';
 import { _export } from '../../../src/internal/exporter';
 

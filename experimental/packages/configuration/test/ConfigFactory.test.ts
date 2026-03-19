@@ -5,18 +5,20 @@
 
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
-import { ConfigurationModel } from '../src';
+import type { ConfigurationModel } from '../src';
 import { diag, DiagLogLevel } from '@opentelemetry/api';
 import { createConfigFactory } from '../src/ConfigFactory';
 import { OtlpHttpEncoding, SeverityNumber } from '../src/models/commonModel';
+import type {
+  MeterProvider,
+  MetricReader,
+} from '../src/models/meterProviderModel';
 import {
   ExemplarFilter,
   ExperimentalPrometheusTranslationStrategy,
   ExporterDefaultHistogramAggregation,
   ExporterTemporalityPreference,
   InstrumentType,
-  MeterProvider,
-  MetricReader,
 } from '../src/models/meterProviderModel';
 import {
   setAttributeLimits,
@@ -33,7 +35,7 @@ import {
   getTemporalityPreference,
   getSeverity,
 } from '../src/FileConfigFactory';
-import { TracerProvider } from '../src/models/tracerProviderModel';
+import type { TracerProvider } from '../src/models/tracerProviderModel';
 
 const defaultConfig: ConfigurationModel = {
   disabled: false,
@@ -242,6 +244,20 @@ const configFromKitchenSinkFile: ConfigurationModel = {
         value: '1.0.0',
       },
     ],
+    'detection/development': {
+      attributes: {
+        included: ['process.*'],
+        excluded: ['process.command_args'],
+      },
+      detectors: [
+        { container: {} },
+        { env: {} },
+        { host: {} },
+        { os: {} },
+        { process: {} },
+        { service: {} },
+      ],
+    },
   },
   attribute_limits: {
     attribute_count_limit: 128,
@@ -353,8 +369,40 @@ const configFromKitchenSinkFile: ConfigurationModel = {
       parent_based: {
         root: { always_on: undefined },
         remote_parent_sampled: { always_on: undefined },
-        remote_parent_not_sampled: { always_off: undefined },
-        local_parent_sampled: { always_on: undefined },
+        remote_parent_not_sampled: {
+          'probability/development': { ratio: 0.01 },
+        },
+        local_parent_sampled: {
+          'composite/development': {
+            rule_based: {
+              rules: [
+                {
+                  attribute_values: {
+                    key: 'http.route',
+                    values: ['/healthz', '/livez'],
+                  },
+                  sampler: { always_off: undefined },
+                },
+                {
+                  attribute_patterns: {
+                    key: 'http.path',
+                    included: ['/internal/*'],
+                    excluded: ['/internal/special/*'],
+                  },
+                  sampler: { always_on: undefined },
+                },
+                {
+                  parent: ['none'],
+                  span_kinds: ['client'],
+                  sampler: { probability: { ratio: 0.05 } },
+                },
+                {
+                  sampler: { probability: { ratio: 0.001 } },
+                },
+              ],
+            },
+          },
+        },
         local_parent_not_sampled: { always_off: undefined },
       },
     },
@@ -987,7 +1035,69 @@ describe('ConfigFactory', function () {
       process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,host, serviceinstance';
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
-        node_resource_detectors: ['env', 'host', 'serviceinstance'],
+        resource: {
+          'detection/development': {
+            detectors: [{ host: {} }, { service: {} }, { env: {} }],
+          },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should map OTEL_NODE_RESOURCE_DETECTORS=all to all detectors', function () {
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'all';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        resource: {
+          'detection/development': {
+            detectors: [
+              { container: {} },
+              { host: {} },
+              { os: {} },
+              { process: {} },
+              { service: {} },
+              { env: {} },
+            ],
+          },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should not set detection/development for OTEL_NODE_RESOURCE_DETECTORS=none', function () {
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'none';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should map OTEL_NODE_RESOURCE_DETECTORS=os to os detector', function () {
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'os';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        resource: {
+          'detection/development': {
+            detectors: [{ os: {} }],
+          },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should map OTEL_NODE_RESOURCE_DETECTORS=env to env detector', function () {
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        resource: {
+          'detection/development': {
+            detectors: [{ env: {} }],
+          },
+        },
       };
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
@@ -1117,6 +1227,240 @@ describe('ConfigFactory', function () {
       };
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with sampler always_on', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
+      process.env.OTEL_TRACES_SAMPLER = 'always_on';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          limits: {
+            attribute_count_limit: 128,
+            event_count_limit: 128,
+            link_count_limit: 128,
+            event_attribute_count_limit: 128,
+            link_attribute_count_limit: 128,
+          },
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/traces',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+          ],
+          sampler: { always_on: {} },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with sampler always_off', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
+      process.env.OTEL_TRACES_SAMPLER = 'always_off';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          limits: {
+            attribute_count_limit: 128,
+            event_count_limit: 128,
+            link_count_limit: 128,
+            event_attribute_count_limit: 128,
+            link_attribute_count_limit: 128,
+          },
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/traces',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+          ],
+          sampler: { always_off: {} },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with sampler traceidratio', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
+      process.env.OTEL_TRACES_SAMPLER = 'traceidratio';
+      process.env.OTEL_TRACES_SAMPLER_ARG = '0.5';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          limits: {
+            attribute_count_limit: 128,
+            event_count_limit: 128,
+            link_count_limit: 128,
+            event_attribute_count_limit: 128,
+            link_attribute_count_limit: 128,
+          },
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/traces',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+          ],
+          sampler: { trace_id_ratio_based: { ratio: 0.5 } },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with sampler parentbased_always_on', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
+      process.env.OTEL_TRACES_SAMPLER = 'parentbased_always_on';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          limits: {
+            attribute_count_limit: 128,
+            event_count_limit: 128,
+            link_count_limit: 128,
+            event_attribute_count_limit: 128,
+            link_attribute_count_limit: 128,
+          },
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/traces',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+          ],
+          sampler: { parent_based: { root: { always_on: {} } } },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with sampler parentbased_always_off', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
+      process.env.OTEL_TRACES_SAMPLER = 'parentbased_always_off';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          limits: {
+            attribute_count_limit: 128,
+            event_count_limit: 128,
+            link_count_limit: 128,
+            event_attribute_count_limit: 128,
+            link_attribute_count_limit: 128,
+          },
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/traces',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+          ],
+          sampler: { parent_based: { root: { always_off: {} } } },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should return config with sampler parentbased_traceidratio', function () {
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
+      process.env.OTEL_TRACES_SAMPLER = 'parentbased_traceidratio';
+      process.env.OTEL_TRACES_SAMPLER_ARG = '0.25';
+      const expectedConfig: ConfigurationModel = {
+        ...defaultConfig,
+        tracer_provider: {
+          limits: {
+            attribute_count_limit: 128,
+            event_count_limit: 128,
+            link_count_limit: 128,
+            event_attribute_count_limit: 128,
+            link_attribute_count_limit: 128,
+          },
+          processors: [
+            {
+              batch: {
+                schedule_delay: 5000,
+                export_timeout: 30000,
+                max_queue_size: 2048,
+                max_export_batch_size: 512,
+                exporter: {
+                  otlp_http: {
+                    endpoint: 'http://localhost:4318/v1/traces',
+                    timeout: 10000,
+                    encoding: OtlpHttpEncoding.Protobuf,
+                  },
+                },
+              },
+            },
+          ],
+          sampler: {
+            parent_based: { root: { trace_id_ratio_based: { ratio: 0.25 } } },
+          },
+        },
+      };
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    });
+
+    it('should warn on unknown sampler type', function () {
+      const warnSpy = Sinon.spy(diag, 'warn');
+      process.env.OTEL_TRACES_EXPORTER = 'otlp';
+      process.env.OTEL_TRACES_SAMPLER = 'unknown_sampler';
+      createConfigFactory();
+      Sinon.assert.calledWith(warnSpy, 'Unknown sampler type: unknown_sampler');
     });
 
     it('should return config with custom tracer_provider', function () {
@@ -2101,15 +2445,13 @@ describe('ConfigFactory', function () {
 
   describe('get values from config file', function () {
     it('should initialize config with default values from valid config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/sdk-config.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/sdk-config.yaml';
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), configFromFile);
     });
 
     it('should initialize config with default values from longer valid config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/kitchen-sink.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/kitchen-sink.yaml';
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(
         configFactory.getConfigModel(),
@@ -2117,19 +2459,74 @@ describe('ConfigFactory', function () {
       );
     });
 
+    it('should parse samplers from config file', function () {
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/samplers.yaml';
+      const configFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      assert.deepStrictEqual(config.tracer_provider?.sampler, {
+        parent_based: {
+          root: {
+            trace_id_ratio_based: { ratio: 0.5 },
+          },
+          remote_parent_not_sampled: {
+            'probability/development': { ratio: 0.1 },
+          },
+        },
+      });
+    });
+
+    it('should parse composite sampler with rule_based rules from config file', function () {
+      process.env.OTEL_CONFIG_FILE =
+        'test/fixtures/composite-sampler-array.yaml';
+      const configFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      assert.deepStrictEqual(config.tracer_provider?.sampler, {
+        'composite/development': {
+          rule_based: {
+            rules: [
+              { sampler: { always_on: undefined } },
+              { sampler: { probability: { ratio: 0.5 } } },
+            ],
+          },
+        },
+      });
+    });
+
+    it('should parse composite sampler with rule_based attribute matching from config file', function () {
+      process.env.OTEL_CONFIG_FILE =
+        'test/fixtures/composite-sampler-rulebased-full.yaml';
+      const configFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      assert.deepStrictEqual(config.tracer_provider?.sampler, {
+        'composite/development': {
+          rule_based: {
+            rules: [
+              {
+                attribute_values: {
+                  key: 'http.method',
+                  values: ['GET'],
+                },
+                sampler: { always_on: undefined },
+              },
+            ],
+          },
+        },
+      });
+    });
+
     it('should return error from invalid config file', function () {
       const warnSpy = Sinon.spy(diag, 'warn');
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = './fixtures/invalid.txt';
+      process.env.OTEL_CONFIG_FILE = './fixtures/invalid.txt';
       createConfigFactory();
       Sinon.assert.calledWith(
         warnSpy,
-        'Config file ./fixtures/invalid.txt set on OTEL_EXPERIMENTAL_CONFIG_FILE is not valid'
+        'Config file ./fixtures/invalid.txt set on OTEL_CONFIG_FILE is not valid'
       );
     });
 
     it('should return error from invalid config file format', function () {
       const warnSpy = Sinon.spy(diag, 'warn');
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
       createConfigFactory();
       Sinon.assert.calledWith(
         warnSpy,
@@ -2138,20 +2535,19 @@ describe('ConfigFactory', function () {
     });
 
     it('should initialize config with default values with empty string for config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = '';
+      process.env.OTEL_CONFIG_FILE = '';
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
     });
 
     it('should initialize config with default values with all whitespace for config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE = '  ';
+      process.env.OTEL_CONFIG_FILE = '  ';
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
     });
 
     it('should initialize config with default values from valid short config file', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/short-config.yml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/short-config.yml';
       const configFactory = createConfigFactory();
       const expectedConfig: ConfigurationModel = {
         disabled: false,
@@ -2174,8 +2570,7 @@ describe('ConfigFactory', function () {
     });
 
     it('should initialize config with config file that contains environment variables', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/sdk-migration-config.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/sdk-migration-config.yaml';
       process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://test.com:4318';
       process.env.OTEL_SDK_DISABLED = 'false';
       process.env.OTEL_LOG_LEVEL = 'debug';
@@ -2372,8 +2767,7 @@ describe('ConfigFactory', function () {
     });
 
     it('should initialize config with fallbacks defined in config file when corresponding environment variables are not defined', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/sdk-migration-config.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/sdk-migration-config.yaml';
 
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(
@@ -2384,8 +2778,7 @@ describe('ConfigFactory', function () {
 
     it('checks for incomplete providers', function () {
       const warnSpy = Sinon.spy(diag, 'warn');
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/invalid-providers.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid-providers.yaml';
       createConfigFactory();
       Sinon.assert.calledWith(
         warnSpy.firstCall,
@@ -2402,8 +2795,7 @@ describe('ConfigFactory', function () {
     });
 
     it('check resources priority', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/resources.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/resources.yaml';
       const configFactory = createConfigFactory();
       const expectedConfig: ConfigurationModel = {
         disabled: false,
@@ -2478,8 +2870,7 @@ describe('ConfigFactory', function () {
     });
 
     it('checks to keep good code coverage', function () {
-      process.env.OTEL_EXPERIMENTAL_CONFIG_FILE =
-        'test/fixtures/test-for-coverage.yaml';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/test-for-coverage.yaml';
 
       let config = {};
       parseConfigFile(config);

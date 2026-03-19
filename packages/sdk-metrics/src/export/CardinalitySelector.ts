@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { InstrumentType } from './MetricData';
+import type { InstrumentType } from './MetricData';
 
 /**
  * Cardinality Limit selector based on metric instrument types.

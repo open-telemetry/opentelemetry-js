@@ -4,16 +4,14 @@
  */
 
 import * as assert from 'assert';
+import type { DataPoint, ExponentialHistogram, Histogram } from '../../src';
 import {
   AggregationTemporality,
   AggregationType,
-  DataPoint,
-  ExponentialHistogram,
-  Histogram,
   MeterProvider,
 } from '../../src';
 import { TestMetricReader } from '../export/TestMetricReader';
-import { IMetricReader } from '../../src/export/MetricReader';
+import type { IMetricReader } from '../../src/export/MetricReader';
 
 describe('histogram-recording-nan', () => {
   it('exponential histogram should not count NaN', async () => {

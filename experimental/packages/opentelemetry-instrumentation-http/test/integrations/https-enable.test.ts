@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { SpanKind, Span, context, propagation } from '@opentelemetry/api';
+import type { Span } from '@opentelemetry/api';
+import { SpanKind, context, propagation } from '@opentelemetry/api';
 import {
   HTTP_FLAVOR_VALUE_HTTP_1_1,
   NET_TRANSPORT_VALUE_IP_TCP,
@@ -11,10 +12,10 @@ import {
   ATTR_NET_TRANSPORT,
 } from '../../src/semconv';
 import * as assert from 'assert';
-import * as http from 'http';
+import type * as http from 'http';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Socket } from 'net';
+import type { Socket } from 'net';
 import { assertSpan } from '../utils/assertSpan';
 import { urlToHttpOptions } from 'url';
 import * as utils from '../utils/utils';

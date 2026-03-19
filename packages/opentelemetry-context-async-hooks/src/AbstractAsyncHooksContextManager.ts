@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ContextManager, Context } from '@opentelemetry/api';
+import type { ContextManager, Context } from '@opentelemetry/api';
 import { EventEmitter } from 'events';
 
 type Func<T> = (...args: unknown[]) => T;

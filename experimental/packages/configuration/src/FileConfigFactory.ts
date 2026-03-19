@@ -4,13 +4,13 @@
  */
 
 import { diagLogLevelFromString, getStringFromEnv } from '@opentelemetry/core';
-import {
+import type {
   AttributeLimits,
   Propagator,
   ConfigurationModel,
-  initializeDefaultConfiguration,
 } from './models/configModel';
-import { ConfigFactory } from './IConfigFactory';
+import { initializeDefaultConfiguration } from './models/configModel';
+import type { ConfigFactory } from './IConfigFactory';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
 import {
@@ -23,34 +23,31 @@ import {
   getStringFromConfigFile,
   getStringListFromConfigFile,
 } from './utils';
-import {
-  NameStringValuePair,
-  OtlpHttpEncoding,
-  SeverityNumber,
-} from './models/commonModel';
-import {
-  initializeDefaultTracerProviderConfiguration,
+import type { NameStringValuePair } from './models/commonModel';
+import { OtlpHttpEncoding, SeverityNumber } from './models/commonModel';
+import type {
+  ExperimentalComposableSampler,
+  Sampler,
   SpanExporter,
   SpanProcessor,
   TracerProvider,
 } from './models/tracerProviderModel';
-import {
+import { initializeDefaultTracerProviderConfiguration } from './models/tracerProviderModel';
+import type {
   ExperimentalLoggerMatcherAndConfig,
-  initializeDefaultLoggerProviderConfiguration,
   LoggerProvider,
   LogRecordExporter,
   LogRecordProcessor,
 } from './models/loggerProviderModel';
-import { AttributeNameValue } from './models/resourceModel';
-import {
+import { initializeDefaultLoggerProviderConfiguration } from './models/loggerProviderModel';
+import type {
+  AttributeNameValue,
+  ExperimentalResourceDetection,
+  ExperimentalResourceDetector,
+} from './models/resourceModel';
+import type {
   Aggregation,
   CardinalityLimits,
-  ExemplarFilter,
-  ExperimentalPrometheusTranslationStrategy,
-  ExporterDefaultHistogramAggregation,
-  ExporterTemporalityPreference,
-  initializeDefaultMeterProviderConfiguration,
-  InstrumentType,
   MeterProvider,
   MetricProducer,
   MetricReader,
@@ -59,6 +56,14 @@ import {
   View,
   ViewSelector,
   ViewStream,
+} from './models/meterProviderModel';
+import {
+  ExemplarFilter,
+  ExperimentalPrometheusTranslationStrategy,
+  ExporterDefaultHistogramAggregation,
+  ExporterTemporalityPreference,
+  initializeDefaultMeterProviderConfiguration,
+  InstrumentType,
 } from './models/meterProviderModel';
 import { diag } from '@opentelemetry/api';
 
@@ -76,14 +81,14 @@ export class FileConfigFactory implements ConfigFactory {
 }
 
 export function hasValidConfigFile(): boolean {
-  const configFile = getStringFromEnv('OTEL_EXPERIMENTAL_CONFIG_FILE');
+  const configFile = getStringFromEnv('OTEL_CONFIG_FILE');
   if (configFile) {
     if (
       !(configFile.endsWith('.yaml') || configFile.endsWith('.yml')) ||
       !fs.existsSync(configFile)
     ) {
       diag.warn(
-        `Config file ${configFile} set on OTEL_EXPERIMENTAL_CONFIG_FILE is not valid`
+        `Config file ${configFile} set on OTEL_CONFIG_FILE is not valid`
       );
       return false;
     }
@@ -94,7 +99,7 @@ export function hasValidConfigFile(): boolean {
 
 export function parseConfigFile(config: ConfigurationModel) {
   const supportedFileVersions = ['1.0-rc.3'];
-  const configFile = getStringFromEnv('OTEL_EXPERIMENTAL_CONFIG_FILE') || '';
+  const configFile = getStringFromEnv('OTEL_CONFIG_FILE') || '';
   const file = fs.readFileSync(configFile, 'utf8');
   const parsedContent = yaml.parse(file);
 
@@ -131,6 +136,13 @@ export function parseConfigFile(config: ConfigurationModel) {
       parsedContent['resource']?.['attributes'],
       parsedContent['resource']?.['attributes_list']
     );
+
+    const detectionConfig =
+      parsedContent['resource']?.['detection/development'];
+    if (detectionConfig) {
+      config.resource!['detection/development'] =
+        parseDetectionDevelopment(detectionConfig);
+    }
     setAttributeLimits(config, parsedContent['attribute_limits']);
     setPropagator(config, parsedContent['propagator']);
     setTracerProvider(config, parsedContent['tracer_provider']);
@@ -214,6 +226,52 @@ export function setResourceAttributes(
   }
 }
 
+function parseDetectionDevelopment(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  detection: any
+): ExperimentalResourceDetection {
+  const result: ExperimentalResourceDetection = {};
+
+  if (detection['attributes']) {
+    result.attributes = {};
+    const included = detection['attributes']['included'];
+    if (Array.isArray(included)) {
+      result.attributes.included = included.filter(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (v: any) => typeof v === 'string'
+      );
+    }
+    const excluded = detection['attributes']['excluded'];
+    if (Array.isArray(excluded)) {
+      result.attributes.excluded = excluded.filter(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (v: any) => typeof v === 'string'
+      );
+    }
+  }
+
+  if (Array.isArray(detection['detectors'])) {
+    result.detectors = [];
+    for (let i = 0; i < detection['detectors'].length; i++) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const d: any = detection['detectors'][i];
+      if (typeof d !== 'object' || d === null) {
+        continue;
+      }
+      const detector: ExperimentalResourceDetector = {};
+      if ('container' in d) detector.container = d.container ?? {};
+      if ('env' in d) detector.env = d.env ?? {};
+      if ('host' in d) detector.host = d.host ?? {};
+      if ('os' in d) detector.os = d.os ?? {};
+      if ('process' in d) detector.process = d.process ?? {};
+      if ('service' in d) detector.service = d.service ?? {};
+      result.detectors.push(detector);
+    }
+  }
+
+  return result;
+}
+
 export function setAttributeLimits(
   config: ConfigurationModel,
   attrLimits: AttributeLimits
@@ -281,6 +339,137 @@ export function setPropagator(
       config.propagator!.composite_list = auxList.join(',');
     }
   }
+}
+
+function parseComposableSampler(
+  sampler: ExperimentalComposableSampler
+): ExperimentalComposableSampler {
+  const samplerType = Object.keys(sampler)[0];
+  let parsedSampler: ExperimentalComposableSampler = {};
+
+  switch (samplerType) {
+    case 'always_on':
+      parsedSampler = { always_on: sampler['always_on'] ?? undefined };
+      break;
+
+    case 'always_off':
+      parsedSampler = { always_off: sampler['always_off'] ?? undefined };
+      break;
+
+    case 'parent_threshold': {
+      const s = sampler['parent_threshold'];
+      if (s?.root) {
+        parsedSampler = {
+          parent_threshold: { root: parseComposableSampler(s.root) },
+        };
+      }
+      break;
+    }
+
+    case 'probability': {
+      const s = sampler['probability'];
+      parsedSampler = {
+        probability: {
+          ratio: getNumberFromConfigFile(s?.ratio) ?? 1.0,
+        },
+      };
+      break;
+    }
+
+    case 'rule_based': {
+      const rb = sampler['rule_based'];
+      if (rb) {
+        parsedSampler = { rule_based: {} };
+        if (rb.rules) {
+          parsedSampler.rule_based!.rules = rb.rules.map(rule => ({
+            ...rule,
+            sampler: rule.sampler ? parseComposableSampler(rule.sampler) : {},
+          }));
+        }
+      }
+      break;
+    }
+  }
+
+  return parsedSampler;
+}
+
+function parseSampler(sampler: Sampler): Sampler {
+  const samplerType = Object.keys(sampler)[0];
+  let parsedSampler: Sampler = {};
+
+  switch (samplerType) {
+    case 'always_on':
+      parsedSampler = { always_on: sampler['always_on'] ?? undefined };
+      break;
+
+    case 'always_off':
+      parsedSampler = { always_off: sampler['always_off'] ?? undefined };
+      break;
+
+    case 'trace_id_ratio_based': {
+      const s = sampler['trace_id_ratio_based'];
+      parsedSampler = {
+        trace_id_ratio_based: {
+          ratio: getNumberFromConfigFile(s?.ratio) ?? 1.0,
+        },
+      };
+      break;
+    }
+
+    case 'parent_based': {
+      const s = sampler['parent_based'];
+      if (s) {
+        parsedSampler = { parent_based: {} };
+        if (s.root) {
+          parsedSampler.parent_based!.root = parseSampler(s.root);
+        }
+        if (s.remote_parent_sampled) {
+          parsedSampler.parent_based!.remote_parent_sampled = parseSampler(
+            s.remote_parent_sampled
+          );
+        }
+        if (s.remote_parent_not_sampled) {
+          parsedSampler.parent_based!.remote_parent_not_sampled = parseSampler(
+            s.remote_parent_not_sampled
+          );
+        }
+        if (s.local_parent_sampled) {
+          parsedSampler.parent_based!.local_parent_sampled = parseSampler(
+            s.local_parent_sampled
+          );
+        }
+        if (s.local_parent_not_sampled) {
+          parsedSampler.parent_based!.local_parent_not_sampled = parseSampler(
+            s.local_parent_not_sampled
+          );
+        }
+      }
+      break;
+    }
+
+    case 'probability/development': {
+      const s = sampler['probability/development'];
+      parsedSampler = {
+        'probability/development': {
+          ratio: getNumberFromConfigFile(s?.ratio) ?? 1.0,
+        },
+      };
+      break;
+    }
+
+    case 'composite/development': {
+      const s = sampler['composite/development'];
+      if (s) {
+        parsedSampler = {
+          'composite/development': parseComposableSampler(s),
+        };
+      }
+      break;
+    }
+  }
+
+  return parsedSampler;
 }
 
 function getConfigHeaders(
@@ -494,6 +683,11 @@ export function setTracerProvider(
         config.tracer_provider.limits!.link_attribute_count_limit =
           linkAttributeCountLimit;
       }
+    }
+
+    // Sampler
+    if (tracerProvider['sampler']) {
+      config.tracer_provider.sampler = parseSampler(tracerProvider['sampler']);
     }
 
     // Processors

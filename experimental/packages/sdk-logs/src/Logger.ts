@@ -14,8 +14,8 @@ import {
 } from '@opentelemetry/api';
 
 import { LogRecordImpl } from './LogRecordImpl';
-import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
-import { LoggerConfig } from './types';
+import type { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
+import type { LoggerConfig } from './types';
 
 export class Logger implements logsAPI.Logger {
   public readonly instrumentationScope: InstrumentationScope;

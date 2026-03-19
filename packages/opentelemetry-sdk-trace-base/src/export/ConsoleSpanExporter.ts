@@ -3,13 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { SpanExporter } from './SpanExporter';
-import { ReadableSpan } from './ReadableSpan';
-import {
-  ExportResult,
-  ExportResultCode,
-  hrTimeToMicroseconds,
-} from '@opentelemetry/core';
+import type { SpanExporter } from './SpanExporter';
+import type { ReadableSpan } from './ReadableSpan';
+import type { ExportResult } from '@opentelemetry/core';
+import { ExportResultCode, hrTimeToMicroseconds } from '@opentelemetry/core';
 
 /**
  * This is implementation of {@link SpanExporter} that prints spans to the

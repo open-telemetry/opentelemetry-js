@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context } from '@opentelemetry/api';
-import { ReadableSpan } from './export/ReadableSpan';
-import { Span } from './Span';
+import type { Context } from '@opentelemetry/api';
+import type { ReadableSpan } from './export/ReadableSpan';
+import type { Span } from './Span';
 
 /**
  * SpanProcessor is the interface Tracer SDK uses to allow synchronous hooks

@@ -3,12 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  createOtlpNetworkExportDelegate,
-  IOtlpExportDelegate,
-} from '@opentelemetry/otlp-exporter-base';
-import { ISerializer } from '@opentelemetry/otlp-transformer';
-import { OtlpGrpcConfiguration } from './configuration/otlp-grpc-configuration';
+import type { IOtlpExportDelegate } from '@opentelemetry/otlp-exporter-base';
+import { createOtlpNetworkExportDelegate } from '@opentelemetry/otlp-exporter-base';
+import type { ISerializer } from '@opentelemetry/otlp-transformer';
+import type { OtlpGrpcConfiguration } from './configuration/otlp-grpc-configuration';
 import { createOtlpGrpcExporterTransport } from './grpc-exporter-transport';
 
 export function createOtlpGrpcExportDelegate<Internal, Response>(

@@ -2,8 +2,8 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
+import type { Aggregation } from './Aggregation';
 import {
-  Aggregation,
   DEFAULT_AGGREGATION,
   DROP_AGGREGATION,
   ExplicitBucketHistogramAggregation,

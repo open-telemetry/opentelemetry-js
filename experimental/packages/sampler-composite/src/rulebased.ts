@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Attributes, Context, Link, SpanKind } from '@opentelemetry/api';
+import type { Attributes, Context, Link, SpanKind } from '@opentelemetry/api';
 
 import type { ComposableSampler, SamplingIntent, SamplingRule } from './types';
 import { INVALID_THRESHOLD } from './util';

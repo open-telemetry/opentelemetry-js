@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { diag, trace, Tracer } from '@opentelemetry/api';
+import type { Tracer } from '@opentelemetry/api';
+import { diag, trace } from '@opentelemetry/api';
 import { Hook } from 'require-in-the-middle';
-import * as oc from '@opencensus/core';
+import type * as oc from '@opencensus/core';
 
 import { ShimTracer } from './ShimTracer';
 import { VERSION } from './version';

@@ -3,12 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ExportResult, ExportResultCode } from '@opentelemetry/core';
-import {
-  AggregationTemporality,
-  PushMetricExporter,
-  ResourceMetrics,
-} from '../../src';
+import type { ExportResult } from '@opentelemetry/core';
+import { ExportResultCode } from '@opentelemetry/core';
+import type { PushMetricExporter, ResourceMetrics } from '../../src';
+import { AggregationTemporality } from '../../src';
 
 export class TestMetricExporter implements PushMetricExporter {
   resourceMetricsList: ResourceMetrics[] = [];

@@ -5,7 +5,7 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { Logger, LoggerProvider } from '../../src';
+import type { Logger, LoggerProvider } from '../../src';
 import { NoopLogger } from '../../src/NoopLogger';
 import { ProxyLogger } from '../../src/ProxyLogger';
 import { ProxyLoggerProvider } from '../../src/ProxyLoggerProvider';

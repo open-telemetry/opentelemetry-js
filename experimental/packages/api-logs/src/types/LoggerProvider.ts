@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Logger } from './Logger';
-import { LoggerOptions } from './LoggerOptions';
+import type { Logger } from './Logger';
+import type { LoggerOptions } from './LoggerOptions';
 
 /**
  * A registry for creating named {@link Logger}s.

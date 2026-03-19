@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Meter, MeterOptions } from '../metrics/Meter';
-import { MeterProvider } from '../metrics/MeterProvider';
+import type { Meter, MeterOptions } from '../metrics/Meter';
+import type { MeterProvider } from '../metrics/MeterProvider';
 import { NOOP_METER_PROVIDER } from '../metrics/NoopMeterProvider';
 import {
   getGlobal,

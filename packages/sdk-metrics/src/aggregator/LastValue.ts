@@ -3,19 +3,20 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   Accumulation,
   AccumulationRecord,
   Aggregator,
-  AggregatorKind,
   LastValue,
 } from './types';
-import { HrTime } from '@opentelemetry/api';
+import { AggregatorKind } from './types';
+import type { HrTime } from '@opentelemetry/api';
 import { millisToHrTime, hrTimeToMicroseconds } from '@opentelemetry/core';
-import { DataPointType, GaugeMetricData } from '../export/MetricData';
-import { Maybe } from '../utils';
-import { AggregationTemporality } from '../export/AggregationTemporality';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
+import type { GaugeMetricData } from '../export/MetricData';
+import { DataPointType } from '../export/MetricData';
+import type { Maybe } from '../utils';
+import type { AggregationTemporality } from '../export/AggregationTemporality';
+import type { InstrumentDescriptor } from '../InstrumentDescriptor';
 
 export class LastValueAccumulation implements Accumulation {
   public startTime;

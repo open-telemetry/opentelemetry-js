@@ -8,7 +8,7 @@ import * as assert from 'assert';
 import { createFetchTransport } from '../../src/transport/fetch-transport';
 import { createRetryingTransport } from '../../src/retrying-transport';
 import { registerMockDiagLogger } from '../common/test-utils';
-import {
+import type {
   ExportResponseRetryable,
   ExportResponseFailure,
   ExportResponseSuccess,

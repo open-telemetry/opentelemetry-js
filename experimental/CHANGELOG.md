@@ -8,9 +8,36 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* feat(configuration)!: rename OTEL_EXPERIMENTAL_CONFIG_FILE to OTEL_CONFIG_FILE [#6486](https://github.com/open-telemetry/opentelemetry-js/pull/6486) @maryliag
+* refactor!(otlp-grpc-exporter-base): remove `headers` from gRPC exporter config type, passing headers now results in a compile-time error instead of being silently ignored [#6487](https://github.com/open-telemetry/opentelemetry-js/pull/6487)
+
+### :rocket: Features
+
+* feat(configuration): add sampler configuration parsing support [#6409](https://github.com/open-telemetry/opentelemetry-js/pull/6409) @MikeGoldsmith
+* feat(configuration): add resource detection parsing [#6435](https://github.com/open-telemetry/opentelemetry-js/pull/6435) @MikeGoldsmith
+* feat(configuration): export interfaces required in other packages [#6462](https://github.com/open-telemetry/opentelemetry-js/pull/6462) @maryliag
+* feat(configuration): set MeterProvider on sdk start [#6463](https://github.com/open-telemetry/opentelemetry-js/pull/6463) @maryliag
+
+### :bug: Bug Fixes
+
+* fix(opentelemetry-instrumentation): access `require` via `globalThis` to avoid webpack analysis [#6481](https://github.com/open-telemetry/opentelemetry-js/pull/6481) @overbalance
+* fix(sdk-logs): fix inflated `droppedAttributesCount` when updating existing attribute keys [#6479](https://github.com/open-telemetry/opentelemetry-js/pull/6479) @overbalance
+
+### :books: Documentation
+
+### :house: Internal
+
+* chore: enforce `import type` for type-only imports via ESLint [#6467](https://github.com/open-telemetry/opentelemetry-js/pull/6467) @overbalance
+
+## 0.213.0
+
+### :boom: Breaking Changes
+
 * fix(api-logs)!: drop lingering includeTraceContext from LoggerOptions type [#6451](https://github.com/open-telemetry/opentelemetry-js/pull/6451) @trentm
 
 ### :rocket: Features
+
+* feat(instrumentation-http): provide `http.request.header.<key>` at server span creation time [#6396](https://github.com/open-telemetry/opentelemetry-js/pull/6396) @vitorvasc
 
 ### :bug: Bug Fixes
 
@@ -23,9 +50,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(otlp-transformer): downgrade `protobufjs` to version `^7.0.0` [#6418](https://github.com/open-telemetry/opentelemetry-js/pull/6418) @vitorvasc
 * fix(instrumentation-fetch): handle HeadersInit tuple arrays in _addHeaders [#6341](https://github.com/open-telemetry/opentelemetry-js/pull/6341) @overbalance @imadha
 
-### :books: Documentation
-
-### :house: Internal
+* refactor(otlp-exporter-base): promisify sendWithHttp() [#????](https://github.com/open-telemetry/opentelemetry-js/pull/6412) @pichlermarc
 
 ## 0.212.0
 

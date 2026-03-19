@@ -10,10 +10,11 @@ import {
   globalErrorHandler,
 } from '@opentelemetry/core';
 import { MetricReader } from './MetricReader';
-import { PushMetricExporter } from './MetricExporter';
+import type { PushMetricExporter } from './MetricExporter';
 import { callWithTimeout, TimeoutError } from '../utils';
 import { MetricProducer } from './MetricProducer';
 import { InstrumentType } from './MetricData';
+
 
 export type PeriodicExportingMetricReaderOptions = {
   /**

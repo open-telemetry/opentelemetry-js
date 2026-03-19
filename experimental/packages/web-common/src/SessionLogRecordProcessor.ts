@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context } from '@opentelemetry/api';
-import { SdkLogRecord, LogRecordProcessor } from '@opentelemetry/sdk-logs';
+import type { Context } from '@opentelemetry/api';
+import type { SdkLogRecord, LogRecordProcessor } from '@opentelemetry/sdk-logs';
 import { ATTR_SESSION_ID } from './semconv';
-import { SessionProvider } from './types/SessionProvider';
+import type { SessionProvider } from './types/SessionProvider';
 
 /**
  * SessionLogRecordProcessor is a {@link SpanProcessor} adds the session.id attribute

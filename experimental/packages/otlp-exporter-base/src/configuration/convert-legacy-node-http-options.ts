@@ -2,13 +2,15 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { OTLPExporterNodeConfigBase } from './legacy-node-configuration';
+import type { OTLPExporterNodeConfigBase } from './legacy-node-configuration';
 import { diag } from '@opentelemetry/api';
+import type {
+  HttpAgentFactory,
+  OtlpNodeHttpConfiguration,
+} from './otlp-node-http-configuration';
 import {
   getNodeHttpConfigurationDefaults,
-  HttpAgentFactory,
   mergeOtlpNodeHttpConfigurationWithDefaults,
-  OtlpNodeHttpConfiguration,
 } from './otlp-node-http-configuration';
 import { httpAgentFactoryFromOptions } from '../index-node-http';
 import { getNodeHttpConfigurationFromEnvironment } from './otlp-node-http-env-configuration';

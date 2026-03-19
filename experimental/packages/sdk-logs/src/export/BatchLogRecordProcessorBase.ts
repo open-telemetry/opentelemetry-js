@@ -4,8 +4,8 @@
  */
 
 import { diag } from '@opentelemetry/api';
+import type { ExportResult } from '@opentelemetry/core';
 import {
-  ExportResult,
   ExportResultCode,
   globalErrorHandler,
   BindOnceFuture,

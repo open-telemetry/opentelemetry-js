@@ -4,7 +4,7 @@
  */
 'use strict';
 
-import { IncludeExclude } from './commonModel';
+import type { IncludeExclude } from './commonModel';
 
 export interface Resource {
   /**
@@ -67,7 +67,7 @@ export interface ExperimentalResourceDetection {
    * Resource detector names are dependent on the SDK language ecosystem. Please consult documentation for each respective language.
    * If omitted or null, no resource detectors are enabled.
    */
-  detectors?: ExperimentalResourceDetector;
+  detectors?: ExperimentalResourceDetector[];
 }
 
 export interface ExperimentalResourceDetector {
@@ -77,9 +77,21 @@ export interface ExperimentalResourceDetector {
   container?: object;
 
   /**
-   * Enable the host resource detector, which populates host.* and os.* attributes.
+   * Enable the environment variable resource detector (Node.js only, no spec equivalent).
+   * Reads OTEL_RESOURCE_ATTRIBUTES and OTEL_SERVICE_NAME environment variables.
+   */
+  env?: object;
+
+  /**
+   * Enable the host resource detector, which populates host.* attributes.
    */
   host?: object;
+
+  /**
+   * Enable the OS resource detector (Node.js only, no spec equivalent).
+   * Populates os.type and os.version attributes.
+   */
+  os?: object;
 
   /**
    * Enable the process resource detector, which populates process.* attributes.
@@ -87,8 +99,7 @@ export interface ExperimentalResourceDetector {
   process?: object;
 
   /**
-   * Enable the service detector, which populates service.name based on the OTEL_SERVICE_NAME
-   * environment variable and service.instance.id.
+   * Enable the service detector, which populates service.instance.id.
    */
   service?: object;
 }

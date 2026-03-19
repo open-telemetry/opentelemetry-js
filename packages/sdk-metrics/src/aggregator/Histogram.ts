@@ -3,21 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  Accumulation,
-  AccumulationRecord,
-  Aggregator,
-  AggregatorKind,
-} from './types';
-import {
-  DataPointType,
-  HistogramMetricData,
-  InstrumentType,
-} from '../export/MetricData';
-import { HrTime } from '@opentelemetry/api';
-import { binarySearchUB, Maybe } from '../utils';
-import { AggregationTemporality } from '../export/AggregationTemporality';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
+import type { Accumulation, AccumulationRecord, Aggregator } from './types';
+import { AggregatorKind } from './types';
+import type { HistogramMetricData } from '../export/MetricData';
+import { DataPointType, InstrumentType } from '../export/MetricData';
+import type { HrTime } from '@opentelemetry/api';
+import type { Maybe } from '../utils';
+import { binarySearchUB } from '../utils';
+import type { AggregationTemporality } from '../export/AggregationTemporality';
+import type { InstrumentDescriptor } from '../InstrumentDescriptor';
 
 /**
  * Internal value type for HistogramAggregation.

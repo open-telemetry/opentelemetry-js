@@ -2,12 +2,11 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { OTLPGRPCExporterConfigNode } from '../types';
-import { diag } from '@opentelemetry/api';
+import type { OTLPGRPCExporterConfigNode } from '../types';
+import type { OtlpGrpcConfiguration } from './otlp-grpc-configuration';
 import {
   getOtlpGrpcDefaultConfiguration,
   mergeOtlpGrpcConfigurationWithDefaults,
-  OtlpGrpcConfiguration,
 } from './otlp-grpc-configuration';
 import { createEmptyMetadata } from '../grpc-exporter-transport';
 import { getOtlpGrpcConfigurationFromEnv } from './otlp-grpc-env-configuration';
@@ -21,10 +20,6 @@ export function convertLegacyOtlpGrpcOptions(
   config: OTLPGRPCExporterConfigNode,
   signalIdentifier: string
 ): OtlpGrpcConfiguration {
-  if (config.headers) {
-    diag.warn('Headers cannot be set when using grpc');
-  }
-
   // keep credentials locally in case user updates the reference on the config object
   const userProvidedCredentials = config.credentials;
   return mergeOtlpGrpcConfigurationWithDefaults(

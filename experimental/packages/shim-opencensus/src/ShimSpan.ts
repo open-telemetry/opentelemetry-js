@@ -4,8 +4,9 @@
  */
 
 import * as oc from '@opencensus/core';
-import { ShimTracer } from './ShimTracer';
-import { AttributeValue, Span, SpanStatusCode, diag } from '@opentelemetry/api';
+import type { ShimTracer } from './ShimTracer';
+import type { AttributeValue, Span } from '@opentelemetry/api';
+import { SpanStatusCode, diag } from '@opentelemetry/api';
 import { mapMessageEvent, reverseMapSpanContext } from './trace-transform';
 
 // Copied from
