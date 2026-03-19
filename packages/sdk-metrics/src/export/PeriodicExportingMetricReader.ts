@@ -15,7 +15,6 @@ import { callWithTimeout, TimeoutError } from '../utils';
 import { MetricProducer } from './MetricProducer';
 import { InstrumentType } from './MetricData';
 
-
 export type PeriodicExportingMetricReaderOptions = {
   /**
    * The backing exporter for the metric reader.
