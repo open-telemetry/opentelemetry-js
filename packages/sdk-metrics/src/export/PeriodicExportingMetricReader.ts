@@ -13,7 +13,7 @@ import { MetricReader } from './MetricReader';
 import { PushMetricExporter } from './MetricExporter';
 import { callWithTimeout, TimeoutError } from '../utils';
 import { MetricProducer } from './MetricProducer';
-import { CardinalitySelector } from './CardinalitySelector';
+import { InstrumentType } from './MetricData';
 
 export type PeriodicExportingMetricReaderOptions = {
   /**
@@ -37,12 +37,15 @@ export type PeriodicExportingMetricReaderOptions = {
    */
   metricProducers?: MetricProducer[];
   /**
-   * Cardinality selector based on metric instrument types. If not configured,
-   * a default value is used.
+   * Cardinality limits for the metric reader, applied per instrument. If not configured, defaults to 2000 time series per instrument. These are wrapped in a cardinalitySelector function that returns limits based on the instrument type, so they can be configured differently per type if desired.
    *
-   * <p> NOTE: the provided function MUST be pure
    */
-  cardinalitySelector?: CardinalitySelector;
+  cardinalityLimits?: {
+    counter: number;
+    gauge: number;
+    histogram: number;
+    default: number;
+  };
 };
 
 /**
@@ -60,7 +63,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
       exporter,
       exportIntervalMillis = 60000,
       metricProducers,
-      cardinalitySelector,
+      cardinalityLimits,
     } = options;
     let { exportTimeoutMillis = 30000 } = options;
 
@@ -69,7 +72,25 @@ export class PeriodicExportingMetricReader extends MetricReader {
       aggregationTemporalitySelector:
         exporter.selectAggregationTemporality?.bind(exporter),
       metricProducers,
-      cardinalitySelector: cardinalitySelector,
+      cardinalitySelector: (instrumentType: InstrumentType) => {
+        const limits = cardinalityLimits ?? {
+          counter: 1000,
+          gauge: 1000,
+          histogram: 1000,
+          default: 1000,
+        };
+
+        switch (instrumentType) {
+          case InstrumentType.COUNTER:
+            return limits.counter;
+          case InstrumentType.GAUGE:
+            return limits.gauge;
+          case InstrumentType.HISTOGRAM:
+            return limits.histogram;
+          default:
+            return limits.default;
+        }
+      },
     });
 
     if (exportIntervalMillis <= 0) {
