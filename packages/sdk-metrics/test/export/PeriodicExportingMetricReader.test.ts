@@ -8,10 +8,10 @@ import { AggregationTemporality } from '../../src/export/AggregationTemporality'
 import type {
   AggregationOption,
   CollectionResult,
-  InstrumentType,
   MetricProducer,
   PushMetricExporter,
 } from '../../src';
+import { InstrumentType } from '../../src/export/MetricData';
 import { AggregationType } from '../../src';
 import type {
   ResourceMetrics,
