@@ -225,10 +225,7 @@ function AttributesMapToAccumulationRecords<T>(
   if (exemplars) {
     return Array.from(map.entries()).map(
       ([attributes, accumulation, hashCode]) => {
-        const ex = exemplars.get(attributes, hashCode);
-        return ex && ex.length > 0
-          ? [attributes, accumulation, ex]
-          : [attributes, accumulation];
+        return [attributes, accumulation, exemplars.get(attributes, hashCode)];
       }
     ) as AccumulationRecord<T>[];
   }

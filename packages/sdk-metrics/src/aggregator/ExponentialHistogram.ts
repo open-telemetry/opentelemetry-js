@@ -602,7 +602,7 @@ export class ExponentialHistogramAggregator
             descriptor.type === InstrumentType.OBSERVABLE_GAUGE ||
             descriptor.type === InstrumentType.OBSERVABLE_UP_DOWN_COUNTER;
 
-          const dp = {
+          return {
             attributes,
             startTime: accumulation.startTime,
             endTime,
@@ -622,8 +622,8 @@ export class ExponentialHistogramAggregator
               scale: pointValue.scale,
               zeroCount: pointValue.zeroCount,
             },
+            exemplars,
           };
-          return exemplars?.length ? { ...dp, exemplars } : dp;
         }
       ),
     };

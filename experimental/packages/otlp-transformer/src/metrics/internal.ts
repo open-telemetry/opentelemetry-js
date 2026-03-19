@@ -112,6 +112,7 @@ function toSingularDataPoint(
     attributes: toAttributes(dataPoint.attributes, encoder),
     startTimeUnixNano: encoder.encodeHrTime(dataPoint.startTime),
     timeUnixNano: encoder.encodeHrTime(dataPoint.endTime),
+    exemplars: toExemplars(dataPoint.exemplars, encoder),
   };
 
   switch (valueType) {
@@ -121,11 +122,6 @@ function toSingularDataPoint(
     case ValueType.DOUBLE:
       out.asDouble = dataPoint.value as number;
       break;
-  }
-
-  const exemplars = toExemplars(dataPoint.exemplars, encoder);
-  if (exemplars) {
-    out.exemplars = exemplars;
   }
 
   return out;
@@ -150,7 +146,7 @@ function toHistogramDataPoints(
 ): IHistogramDataPoint[] {
   return metricData.dataPoints.map(dataPoint => {
     const histogram = dataPoint.value as Histogram;
-    const dp: IHistogramDataPoint = {
+    return {
       attributes: toAttributes(dataPoint.attributes, encoder),
       bucketCounts: histogram.buckets.counts,
       explicitBounds: histogram.buckets.boundaries,
@@ -160,12 +156,8 @@ function toHistogramDataPoints(
       max: histogram.max,
       startTimeUnixNano: encoder.encodeHrTime(dataPoint.startTime),
       timeUnixNano: encoder.encodeHrTime(dataPoint.endTime),
+      exemplars: toExemplars(dataPoint.exemplars, encoder),
     };
-    const exemplars = toExemplars(dataPoint.exemplars, encoder);
-    if (exemplars) {
-      dp.exemplars = exemplars;
-    }
-    return dp;
   });
 }
 
@@ -175,7 +167,7 @@ function toExponentialHistogramDataPoints(
 ): IExponentialHistogramDataPoint[] {
   return metricData.dataPoints.map(dataPoint => {
     const histogram = dataPoint.value as ExponentialHistogram;
-    const dp: IExponentialHistogramDataPoint = {
+    return {
       attributes: toAttributes(dataPoint.attributes, encoder),
       count: histogram.count,
       min: histogram.min,
@@ -193,12 +185,8 @@ function toExponentialHistogramDataPoints(
       zeroCount: histogram.zeroCount,
       startTimeUnixNano: encoder.encodeHrTime(dataPoint.startTime),
       timeUnixNano: encoder.encodeHrTime(dataPoint.endTime),
+      exemplars: toExemplars(dataPoint.exemplars, encoder),
     };
-    const exemplars = toExemplars(dataPoint.exemplars, encoder);
-    if (exemplars) {
-      dp.exemplars = exemplars;
-    }
-    return dp;
   });
 }
 

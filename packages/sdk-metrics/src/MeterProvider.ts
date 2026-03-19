@@ -42,11 +42,9 @@ export class MeterProvider implements IMeterProvider {
   private _shutdown = false;
 
   constructor(options?: MeterProviderOptions) {
-    const exemplarFilter =
-      options?.exemplarFilter ?? resolveExemplarFilterFromEnv();
     this._sharedState = new MeterProviderSharedState(
       options?.resource ?? defaultResource(),
-      exemplarFilter
+      options?.exemplarFilter ?? resolveExemplarFilterFromEnv()
     );
     if (options?.views != null && options.views.length > 0) {
       for (const viewOption of options.views) {

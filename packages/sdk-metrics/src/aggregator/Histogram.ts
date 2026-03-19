@@ -232,7 +232,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
             descriptor.type === InstrumentType.OBSERVABLE_GAUGE ||
             descriptor.type === InstrumentType.OBSERVABLE_UP_DOWN_COUNTER;
 
-          const dp = {
+          return {
             attributes,
             startTime: accumulation.startTime,
             endTime,
@@ -243,8 +243,8 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
               buckets: pointValue.buckets,
               count: pointValue.count,
             },
+            exemplars,
           };
-          return exemplars?.length ? { ...dp, exemplars } : dp;
         }
       ),
     };

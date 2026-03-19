@@ -72,4 +72,3 @@ export { NeverSampleExemplarFilter } from './exemplar/NeverSampleExemplarFilter'
 export { WithTraceExemplarFilter } from './exemplar/WithTraceExemplarFilter';
 export { SimpleFixedSizeExemplarReservoir } from './exemplar/SimpleFixedSizeExemplarReservoir';
 export { AlignedHistogramBucketExemplarReservoir } from './exemplar/AlignedHistogramBucketExemplarReservoir';
-export { FixedSizeExemplarReservoirBase } from './exemplar/ExemplarReservoir';

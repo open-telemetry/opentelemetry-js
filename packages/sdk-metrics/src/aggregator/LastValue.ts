@@ -107,15 +107,13 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
       aggregationTemporality,
       dataPointType: DataPointType.GAUGE,
       dataPoints: accumulationByAttributes.map(
-        ([attributes, accumulation, exemplars]) => {
-          const dp = {
-            attributes,
-            startTime: accumulation.startTime,
-            endTime,
-            value: accumulation.toPointValue(),
-          };
-          return exemplars?.length ? { ...dp, exemplars } : dp;
-        }
+        ([attributes, accumulation, exemplars]) => ({
+          attributes,
+          startTime: accumulation.startTime,
+          endTime,
+          value: accumulation.toPointValue(),
+          exemplars,
+        })
       ),
     };
   }
