@@ -51,7 +51,7 @@ export class SpanProcessorMetrics {
 
     if (queueConfig) {
       const { capacity, getQueueSize } = queueConfig;
-      const queueCapacity = meter.createObservableUpDownCounter(
+      const queueCapacity = meter.createUpDownCounter(
         METRIC_OTEL_SDK_PROCESSOR_SPAN_QUEUE_CAPACITY,
         {
           unit: '{span}',
@@ -59,9 +59,8 @@ export class SpanProcessorMetrics {
             'The maximum number of spans the queue of a given instance of an SDK span processor can hold.',
         }
       );
-      queueCapacity.addCallback(result =>
-        result.observe(capacity, this.standardAttrs)
-      );
+      queueCapacity.add(capacity, this.standardAttrs);
+
       const queueSize = meter.createObservableUpDownCounter(
         METRIC_OTEL_SDK_PROCESSOR_SPAN_QUEUE_SIZE,
         {
