@@ -16,8 +16,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(configuration): add sampler configuration parsing support [#6409](https://github.com/open-telemetry/opentelemetry-js/pull/6409) @MikeGoldsmith
 * feat(configuration): add resource detection parsing [#6435](https://github.com/open-telemetry/opentelemetry-js/pull/6435) @MikeGoldsmith
 * feat(configuration): export interfaces required in other packages [#6462](https://github.com/open-telemetry/opentelemetry-js/pull/6462) @maryliag
-* feat(configuration): set MeterProvider on sdk start [#6463](https://github.com/open-telemetry/opentelemetry-js/pull/6463) @
-* feat(configuration): export interfaces required in other packages [#x](https://github.com/open-telemetry/opentelemetry-js/pull/x) @maryliag
+* feat(configuration): set MeterProvider on sdk start [#6463](https://github.com/open-telemetry/opentelemetry-js/pull/6463) @maryliag
+* feat(configuration): export interfaces required in other packages [#6507](https://github.com/open-telemetry/opentelemetry-js/pull/6507) @maryliag
 
 ### :bug: Bug Fixes
 
