@@ -12,6 +12,9 @@ export { createConfigFactory } from './ConfigFactory';
 
 /** @deprecated Use Configuration instead. Kept for backward compatibility. */
 export type { Configuration as ConfigurationModel } from './generated/types';
+export type { InstrumentType as InstrumentTypeConfigModel } from './generated/types';
+export type { Aggregation as AggregationConfigModel } from './generated/types';
+export type { PeriodicMetricReader as PeriodicMetricReaderConfigModel } from './generated/types';
 
 /** Type for a log record exporter configuration object (replaces LogRecordExporterModel). */
 export type LogRecordExporterConfiguration = z.infer<

@@ -11,12 +11,15 @@ import {
   context,
   diag,
   DiagConsoleLogger,
+  metrics,
   propagation,
 } from '@opentelemetry/api';
 import { diagLogLevelFromString } from '@opentelemetry/core';
 import {
   getInstanceID,
   getLogRecordProcessorsFromConfiguration,
+  getMeterReadersFromConfiguration,
+  getMeterViewsFromConfiguration,
   getPropagatorFromConfiguration,
   getResourceDetectorsFromConfiguration,
   getResourceFromConfiguration,
@@ -24,6 +27,7 @@ import {
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import type { SDKComponents, SDKOptions } from './types';
 import { LoggerProvider } from '@opentelemetry/sdk-logs';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { logs } from '@opentelemetry/api-logs';
 import type {
   Resource,
@@ -66,6 +70,9 @@ export function startNodeSDK(sdkOptions: SDKOptions): {
   if (components.loggerProvider) {
     logs.setGlobalLoggerProvider(components.loggerProvider);
   }
+  if (components.meterProvider) {
+    metrics.setGlobalMeterProvider(components.meterProvider);
+  }
   if (components.propagator) {
     propagation.setGlobalPropagator(components.propagator);
   }
@@ -74,6 +81,9 @@ export function startNodeSDK(sdkOptions: SDKOptions): {
     const promises: Promise<unknown>[] = [];
     if (components.loggerProvider) {
       promises.push(components.loggerProvider.shutdown());
+    }
+    if (components.meterProvider) {
+      promises.push(components.meterProvider.shutdown());
     }
     await Promise.all(promises);
   };
@@ -110,6 +120,17 @@ function create(config: Configuration, sdkOptions: SDKOptions): SDKComponents {
       processors: logProcessors,
     });
     components.loggerProvider = loggerProvider;
+  }
+
+  const meterReaders = getMeterReadersFromConfiguration(config);
+  if (meterReaders) {
+    const meterViews = getMeterViewsFromConfiguration(config);
+    const meterProvider = new MeterProvider({
+      resource: resource,
+      readers: meterReaders,
+      views: meterViews ?? [],
+    });
+    components.meterProvider = meterProvider;
   }
 
   return components;

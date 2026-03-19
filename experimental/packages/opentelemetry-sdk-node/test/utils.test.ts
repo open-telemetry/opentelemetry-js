@@ -9,6 +9,9 @@ import {
   getPropagatorFromConfiguration,
   getLoggerProviderConfigFromEnv,
   getBatchLogRecordProcessorConfigFromEnv,
+  getPeriodicMetricReaderFromConfiguration,
+  getInstrumentType,
+  getAggregationType,
   getResourceDetectorsFromConfiguration,
 } from '../src/utils';
 import * as assert from 'assert';
@@ -16,6 +19,7 @@ import * as sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
 import type {
   Configuration,
+  InstrumentTypeConfigModel,
   ConfigurationModel,
 } from '@opentelemetry/configuration';
 import {
@@ -26,6 +30,7 @@ import {
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import type { LoggerProviderConfig } from '@opentelemetry/sdk-logs';
+import { AggregationType, InstrumentType } from '@opentelemetry/sdk-metrics';
 
 describe('getPropagatorFromEnv', function () {
   afterEach(() => {
@@ -423,6 +428,100 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
       maxExportBatchSize: undefined,
     });
     sinon.assert.callCount(warnStub, 4);
+  });
+
+  it('should return warning message for invalid compression type for meter provider', function () {
+    const warnStub = sinon.stub(diag, 'warn');
+    getPeriodicMetricReaderFromConfiguration({
+      exporter: { otlp_http: { encoding: 'invalid' } },
+    } as any);
+    sinon.assert.calledWithExactly(
+      warnStub,
+      'Unsupported OTLP metrics encoding: invalid.'
+    );
+  });
+
+  it('should return values for getInstrumentType', function () {
+    assert.deepStrictEqual(
+      getInstrumentType('counter' as InstrumentTypeConfigModel),
+      InstrumentType.COUNTER
+    );
+    assert.deepStrictEqual(
+      getInstrumentType('gauge' as InstrumentTypeConfigModel),
+      InstrumentType.GAUGE
+    );
+    assert.deepStrictEqual(
+      getInstrumentType('histogram' as InstrumentTypeConfigModel),
+      InstrumentType.HISTOGRAM
+    );
+    assert.deepStrictEqual(
+      getInstrumentType('observable_counter' as InstrumentTypeConfigModel),
+      InstrumentType.OBSERVABLE_COUNTER
+    );
+    assert.deepStrictEqual(
+      getInstrumentType('observable_gauge' as InstrumentTypeConfigModel),
+      InstrumentType.OBSERVABLE_GAUGE
+    );
+    assert.deepStrictEqual(
+      getInstrumentType(
+        'observable_up_down_counter' as InstrumentTypeConfigModel
+      ),
+      InstrumentType.OBSERVABLE_UP_DOWN_COUNTER
+    );
+    assert.deepStrictEqual(
+      getInstrumentType('up_down_counter' as InstrumentTypeConfigModel),
+      InstrumentType.UP_DOWN_COUNTER
+    );
+
+    const warnStub = sinon.stub(diag, 'warn');
+    assert.deepStrictEqual(
+      getInstrumentType('invalid' as InstrumentTypeConfigModel),
+      undefined
+    );
+    sinon.assert.calledWithExactly(
+      warnStub,
+      'Unsupported instrument type: invalid'
+    );
+  });
+
+  it('should return correct values for getAggregationType', function () {
+    assert.deepStrictEqual(getAggregationType({ default: {} }), {
+      type: AggregationType.DEFAULT,
+    });
+    assert.deepStrictEqual(getAggregationType({ drop: {} }), {
+      type: AggregationType.DROP,
+    });
+    assert.deepStrictEqual(
+      getAggregationType({ explicit_bucket_histogram: {} }),
+      {
+        type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+        options: {
+          recordMinMax: true,
+          boundaries: [
+            0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500,
+            10000,
+          ],
+        },
+      }
+    );
+    assert.deepStrictEqual(
+      getAggregationType({
+        base2_exponential_bucket_histogram: { max_size: 10 },
+      }),
+      {
+        type: AggregationType.EXPONENTIAL_HISTOGRAM,
+        options: {
+          recordMinMax: true,
+          maxSize: 10,
+        },
+      }
+    );
+    assert.deepStrictEqual(getAggregationType({ last_value: {} }), {
+      type: AggregationType.LAST_VALUE,
+    });
+    assert.deepStrictEqual(getAggregationType({ sum: {} }), {
+      type: AggregationType.SUM,
+    });
   });
 });
 
