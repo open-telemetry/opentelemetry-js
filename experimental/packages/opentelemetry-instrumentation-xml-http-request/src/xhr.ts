@@ -371,7 +371,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     url: string,
     method: string
   ): api.Span | undefined {
-    if (isUrlIgnored(url, this.getConfig().ignoreUrls)) {
+    const resolvedUrl = parseUrl(url).href;
+    if (isUrlIgnored(resolvedUrl, this.getConfig().ignoreUrls)) {
       this._diag.debug('ignoring span as url matches ignored url');
       return;
     }
