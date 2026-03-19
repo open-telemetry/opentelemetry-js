@@ -253,8 +253,8 @@ describe('PeriodicExportingMetricReader', () => {
     });
   });
 
-  describe('selectCardinalityLimit', () => {
-    it('should use default cardinality limit with no exporter preference', () => {
+  describe('cardinalityLimits', () => {
+    it('should use default cardinality limits with no exporter preference', () => {
       const exporter = new TestDeltaMetricExporter();
 
       const p = new PeriodicExportingMetricReader({
@@ -269,14 +269,19 @@ describe('PeriodicExportingMetricReader', () => {
       );
     });
 
-    it('should use exporter preference for cardinality limit', () => {
+    it('should use exporter preference for cardinality limits', () => {
       const exporter = new TestDeltaMetricExporter();
 
       const p = new PeriodicExportingMetricReader({
         exporter,
         exportIntervalMillis: 1,
         exportTimeoutMillis: 1,
-        cardinalitySelector: (_instrumentType: InstrumentType) => 5000,
+        cardinalityLimits: {
+          counter: 5000,
+          gauge: 5000,
+          histogram: 5000,
+          default: 5000,
+        },
       });
 
       assert.strictEqual(
