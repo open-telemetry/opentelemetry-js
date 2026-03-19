@@ -74,10 +74,10 @@ export class PeriodicExportingMetricReader extends MetricReader {
       metricProducers,
       cardinalitySelector: (instrumentType: InstrumentType) => {
         const limits = cardinalityLimits ?? {
-          counter: 1000,
-          gauge: 1000,
-          histogram: 1000,
-          default: 1000,
+          counter: 2000,
+          gauge: 2000,
+          histogram: 2000,
+          default: 2000,
         };
 
         switch (instrumentType) {
