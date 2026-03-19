@@ -24,11 +24,13 @@ import {
   InMemorySpanExporter,
 } from '../../../src';
 import { context } from '@opentelemetry/api';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { TestRecordOnlySampler } from './TestRecordOnlySampler';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestStackContextManager } from './TestStackContextManager';
 import { BatchSpanProcessorBase } from '../../../src/export/BatchSpanProcessorBase';
 import { resourceFromAttributes } from '@opentelemetry/resources';
+import { TestMetricReader, withResolvers } from '../util';
 
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracerProvider({
@@ -559,6 +561,218 @@ describe('BatchSpanProcessorBase', () => {
       await new Promise(resolve => setTimeout(resolve, 0));
       assert.equal(callbacks.length, 2);
       assert.equal(spans.length, 10);
+    });
+  });
+
+  describe('Metrics', () => {
+    it('should record metrics', async () => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+      const processor = new BatchSpanProcessor(exporter, {
+        maxQueueSize: 1,
+        maxExportBatchSize: 1,
+        scheduledDelayMillis: 1_000_000_000, // Manually flush
+        meterProvider,
+      });
+
+      const exportStub = sinon.stub(exporter, 'export');
+
+      const { resolve: resolveExport1, promise: export1Promise } =
+        withResolvers<ExportResult>();
+      const { resolve: resolveExport2, promise: export2Promise } =
+        withResolvers<ExportResult>();
+
+      // Signal for when export has started
+      const { resolve: resolveFirstExport, promise: firstExportPromise } =
+        withResolvers<void>();
+
+      exportStub
+        .onFirstCall()
+        .callsFake((_spans, resultCallback: (result: ExportResult) => void) => {
+          resolveFirstExport();
+          export1Promise.then(result => resultCallback(result));
+        })
+        .onSecondCall()
+        .callsFake((_spans, resultCallback: (result: ExportResult) => void) => {
+          export2Promise.then(result => resultCallback(result));
+        });
+
+      const span1 = createSampledSpan('span1');
+      // Immediately processed
+      processor.onStart(span1, ROOT_CONTEXT);
+      processor.onEnd(span1);
+
+      // Wait for span to be sent to exporter.
+      await firstExportPromise;
+
+      // Queue empty, export in progress, this span is queued.
+      const span2 = createSampledSpan('span2');
+      processor.onStart(span2, ROOT_CONTEXT);
+      processor.onEnd(span2);
+
+      // Queue full, this span is dropped.
+      const span3 = createSampledSpan('span3');
+      processor.onStart(span3, ROOT_CONTEXT);
+      processor.onEnd(span3);
+
+      let { resourceMetrics } = await metricReader.collect();
+      let scopeMetrics = resourceMetrics.scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/sdk-trace'
+      );
+      assert.ok(scopeMetrics);
+      let processedSpansMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.span.processed'
+      );
+      assert.ok(processedSpansMetric);
+      assert.strictEqual(processedSpansMetric.dataPoints[0].value, 1);
+      assert.strictEqual(
+        processedSpansMetric.dataPoints[0].attributes['otel.component.type'],
+        'batching_span_processor'
+      );
+      assert.ok(
+        processedSpansMetric.dataPoints[0].attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_span_processor/')
+      );
+      assert.strictEqual(
+        processedSpansMetric.dataPoints[0].attributes['error.type'],
+        'queue_full'
+      );
+      let spanCapacityMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.span.queue.capacity'
+      );
+      assert.ok(spanCapacityMetric);
+      assert.strictEqual(spanCapacityMetric.dataPoints[0].value, 1);
+      assert.strictEqual(
+        spanCapacityMetric.dataPoints[0].attributes['otel.component.type'],
+        'batching_span_processor'
+      );
+      assert.ok(
+        spanCapacityMetric.dataPoints[0].attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_span_processor/')
+      );
+      assert.strictEqual(spanCapacityMetric.dataPoints[0].value, 1);
+      let spanQueueSizeMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.span.queue.size'
+      );
+      assert.ok(spanQueueSizeMetric);
+      assert.strictEqual(spanQueueSizeMetric.dataPoints[0].value, 1);
+      assert.strictEqual(
+        spanQueueSizeMetric.dataPoints[0].attributes['otel.component.type'],
+        'batching_span_processor'
+      );
+      assert.ok(
+        spanQueueSizeMetric.dataPoints[0].attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_span_processor/')
+      );
+      sinon.assert.calledOnce(exportStub);
+
+      resolveExport1({ code: ExportResultCode.SUCCESS });
+      const error = new Error('Export failed');
+      error.name = 'BackendError';
+      resolveExport2({
+        code: ExportResultCode.FAILED,
+        error,
+      });
+
+      await assert.rejects(processor.forceFlush(), err => {
+        assert.strictEqual(err, error);
+        return true;
+      });
+      sinon.assert.calledTwice(exportStub);
+
+      ({ resourceMetrics } = await metricReader.collect());
+      scopeMetrics = resourceMetrics.scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/sdk-trace'
+      );
+      assert.ok(scopeMetrics);
+
+      processedSpansMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.span.processed'
+      );
+      assert.ok(processedSpansMetric);
+      const processedSpansDataPoints =
+        processedSpansMetric.dataPoints as Array<{
+          value: number;
+          attributes: Record<string, unknown>;
+        }>;
+      const queueFullPoint = processedSpansDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] === 'queue_full'
+      );
+      assert.ok(queueFullPoint);
+      assert.strictEqual(queueFullPoint.value, 1);
+      assert.strictEqual(
+        queueFullPoint.attributes['otel.component.type'],
+        'batching_span_processor'
+      );
+      assert.ok(
+        queueFullPoint.attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_span_processor/')
+      );
+      const successPoint = processedSpansDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] === undefined
+      );
+      assert.ok(successPoint);
+      assert.strictEqual(successPoint.value, 1);
+      assert.strictEqual(
+        successPoint.attributes['otel.component.type'],
+        'batching_span_processor'
+      );
+      assert.ok(
+        successPoint.attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_span_processor/')
+      );
+      const failedPoint = processedSpansDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] === 'BackendError'
+      );
+      assert.ok(failedPoint);
+      assert.strictEqual(failedPoint.value, 1);
+      assert.strictEqual(
+        failedPoint.attributes['otel.component.type'],
+        'batching_span_processor'
+      );
+      assert.ok(
+        failedPoint.attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_span_processor/')
+      );
+
+      spanCapacityMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.span.queue.capacity'
+      );
+      assert.ok(spanCapacityMetric);
+      assert.strictEqual(spanCapacityMetric.dataPoints[0].value, 1);
+      assert.strictEqual(
+        spanCapacityMetric.dataPoints[0].attributes['otel.component.type'],
+        'batching_span_processor'
+      );
+      assert.ok(
+        spanCapacityMetric.dataPoints[0].attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_span_processor/')
+      );
+      assert.strictEqual(spanCapacityMetric.dataPoints[0].value, 1);
+
+      spanQueueSizeMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.span.queue.size'
+      );
+      assert.ok(spanQueueSizeMetric);
+      assert.strictEqual(spanQueueSizeMetric.dataPoints[0].value, 0);
+      assert.strictEqual(
+        spanQueueSizeMetric.dataPoints[0].attributes['otel.component.type'],
+        'batching_span_processor'
+      );
+      assert.ok(
+        spanQueueSizeMetric.dataPoints[0].attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_span_processor/')
+      );
     });
   });
 });

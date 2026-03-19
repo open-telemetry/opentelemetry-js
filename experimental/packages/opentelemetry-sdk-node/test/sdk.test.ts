@@ -69,6 +69,7 @@ import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/expor
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
 import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from '../src/semconv';
+import { NOOP_COUNTER_METRIC } from '../../../../api/src/metrics/NoopMeter';
 
 function assertDefaultContextManagerRegistered() {
   assert.ok(
@@ -408,7 +409,7 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
-    it('should register a meter provider to the tracer provider if both initialized and metrics enabled', async () => {
+    it('should configure components for SDK metrics if enabled', async () => {
       process.env.OTEL_NODE_EXPERIMENTAL_SDK_METRICS = 'true';
       const exporter = new ConsoleMetricExporter();
       const metricReader = new PeriodicExportingMetricReader({
@@ -418,7 +419,7 @@ describe('Node SDK', () => {
       });
 
       const sdk = new NodeSDK({
-        metricReader: metricReader,
+        metricReaders: [metricReader],
         traceExporter: new ConsoleSpanExporter(),
         autoDetectResources: false,
       });
@@ -434,13 +435,18 @@ describe('Node SDK', () => {
       assert.ok(
         (tracerProvider as any)._config.meterProvider instanceof MeterProvider
       );
+      assert.notDeepEqual(
+        (tracerProvider as any)._activeSpanProcessor._spanProcessors[0]._metrics
+          .processedSpans,
+        NOOP_COUNTER_METRIC
+      );
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
 
       await sdk.shutdown();
     });
 
-    it('should not register a meter provider to the tracer provider if both initialized but metrics disabled', async () => {
+    it('should not configure components for SDK metrics if disabled', async () => {
       const exporter = new ConsoleMetricExporter();
       const metricReader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -463,6 +469,11 @@ describe('Node SDK', () => {
       const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
       assert.ok(tracerProvider instanceof NodeTracerProvider);
       assert.equal((tracerProvider as any)._config.meterProvider, undefined);
+      assert.deepEqual(
+        (tracerProvider as any)._activeSpanProcessor._spanProcessors[0]._metrics
+          .processedSpans,
+        NOOP_COUNTER_METRIC
+      );
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
 

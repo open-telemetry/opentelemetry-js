@@ -39,7 +39,10 @@ import {
   ConsoleMetricExporter,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
-import type { SpanProcessor } from '@opentelemetry/sdk-trace-base';
+import type {
+  SpanExporter,
+  SpanProcessor,
+} from '@opentelemetry/sdk-trace-base';
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import type { NodeTracerConfig } from '@opentelemetry/sdk-trace-node';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
@@ -65,7 +68,8 @@ import {
 
 type TracerProviderConfig = {
   tracerConfig: NodeTracerConfig;
-  spanProcessors: SpanProcessor[];
+  spanProcessors: SpanProcessor[] | undefined;
+  traceExporter: SpanExporter | undefined;
 };
 
 export type MeterProviderConfig = {
@@ -225,16 +229,16 @@ export class NodeSDK {
         );
       }
 
-      const spanProcessor =
-        configuration.spanProcessor ??
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        new BatchSpanProcessor(configuration.traceExporter!);
-
-      const spanProcessors = configuration.spanProcessors ?? [spanProcessor];
+      const spanProcessors =
+        configuration.spanProcessors ??
+        (configuration.spanProcessor
+          ? [configuration.spanProcessor]
+          : undefined);
 
       this._tracerProviderConfig = {
         tracerConfig: tracerProviderConfig,
         spanProcessors,
+        traceExporter: configuration.traceExporter,
       };
     }
 
@@ -334,17 +338,25 @@ export class NodeSDK {
       }
     }
 
+    // While SDK metrics are unstable, we require an opt-in.
+    // https://opentelemetry.io/docs/specs/semconv/otel/sdk-metrics/
+    const sdkMetricsEnabled = getBooleanFromEnv(
+      'OTEL_NODE_EXPERIMENTAL_SDK_METRICS'
+    );
+
+    // If tracerProviderConfig is set, either spanProcessors or traceExporter is set.
     const spanProcessors = this._tracerProviderConfig
-      ? this._tracerProviderConfig.spanProcessors
-      : getSpanProcessorsFromEnv();
+      ? (this._tracerProviderConfig.spanProcessors ?? [
+          new BatchSpanProcessor(this._tracerProviderConfig.traceExporter!, {
+            meterProvider: sdkMetricsEnabled ? this._meterProvider : undefined,
+          }),
+        ])
+      : getSpanProcessorsFromEnv(
+          sdkMetricsEnabled ? this._meterProvider : undefined
+        );
 
     // Only register if there is a span processor
     if (spanProcessors.length > 0) {
-      // While SDK metrics are unstable, we require an opt-in.
-      // https://opentelemetry.io/docs/specs/semconv/otel/sdk-metrics/
-      const sdkMetricsEnabled = getBooleanFromEnv(
-        'OTEL_NODE_EXPERIMENTAL_SDK_METRICS'
-      );
       this._tracerProvider = new NodeTracerProvider({
         ...this._configuration,
         resource: this._resource,
