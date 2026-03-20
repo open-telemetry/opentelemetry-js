@@ -163,7 +163,7 @@ function serializeResource(
 function serializeResourceLogs(
   writer: IProtobufWriter,
   resource: Resource,
-  scopeMap: Map<string, ReadableLogRecord[]>
+  scopeMap: Map<InstrumentationScope, ReadableLogRecord[]>
 ): void {
   const resourceLogsStart = writer.startLengthDelimited();
   const resourceLogsStartPos = writer.pos;
@@ -195,27 +195,27 @@ function serializeResourceLogs(
  */
 function createResourceMap(
   logRecords: ReadableLogRecord[]
-): Map<Resource, Map<string, ReadableLogRecord[]>> {
+): Map<Resource, Map<InstrumentationScope, ReadableLogRecord[]>> {
   const resourceMap: Map<
     Resource,
-    Map<string, ReadableLogRecord[]>
+    Map<InstrumentationScope, ReadableLogRecord[]>
   > = new Map();
 
   for (const record of logRecords) {
     const resource = record.resource;
     const scope = record.instrumentationScope;
 
-    let ismMap = resourceMap.get(resource);
+    let ismMap: Map<InstrumentationScope, ReadableLogRecord[]> | undefined =
+      resourceMap.get(resource);
     if (!ismMap) {
       ismMap = new Map();
       resourceMap.set(resource, ismMap);
     }
 
-    const ismKey = `${scope.name}@${scope.version}:${scope.schemaUrl}`;
-    let records = ismMap.get(ismKey);
+    let records = ismMap.get(scope);
     if (!records) {
       records = [];
-      ismMap.set(ismKey, records);
+      ismMap.set(scope, records);
     }
     records.push(record);
   }
