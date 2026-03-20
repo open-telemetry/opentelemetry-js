@@ -87,7 +87,7 @@ export function writeAttributes(
       continue;
     }
     const value = attributes[key];
-    writer.writeTag(fieldNumber, 2);
+    writer.writeTag(fieldNumber, 2); // repeated KeyValue attributes (field varies, length-delimited)
     const kvStart = writer.startLengthDelimited();
     const startPos = writer.pos;
     writeKeyValue(writer, key, value);
@@ -103,9 +103,9 @@ export function writeKeyValue(
   key: string,
   value: AnyValue
 ): void {
-  writer.writeTag(1, 2);
+  writer.writeTag(1, 2); // KeyValue.key (field 1, string, length-delimited)
   writer.writeString(key);
-  writer.writeTag(2, 2);
+  writer.writeTag(2, 2); // KeyValue.value (field 2, AnyValue, length-delimited)
   const valueStart = writer.startLengthDelimited();
   const startPos = writer.pos;
   writeAnyValue(writer, value);
@@ -118,30 +118,30 @@ export function writeKeyValue(
 export function writeAnyValue(writer: IProtobufWriter, value: AnyValue): void {
   const t = typeof value;
   if (t === 'string') {
-    writer.writeTag(1, 2);
+    writer.writeTag(1, 2); // AnyValue.string_value (field 1, length-delimited)
     writer.writeString(value as string);
   } else if (t === 'boolean') {
-    writer.writeTag(2, 0);
+    writer.writeTag(2, 0); // AnyValue.bool_value (field 2, varint)
     writer.writeVarint((value as boolean) ? 1 : 0);
   } else if (t === 'number') {
     // Use isSafeInteger to avoid precision loss with large integers
     // Numbers outside the safe integer range should be serialized as doubles
     if (!Number.isSafeInteger(value as number)) {
-      writer.writeTag(4, 1);
+      writer.writeTag(4, 1); // AnyValue.double_value (field 4, fixed64)
       writer.writeDouble(value as number);
     } else {
-      writer.writeTag(3, 0);
+      writer.writeTag(3, 0); // AnyValue.int_value (field 3, varint)
       writer.writeVarint(value as number);
     }
   } else if (value instanceof Uint8Array) {
-    writer.writeTag(7, 2);
+    writer.writeTag(7, 2); // AnyValue.bytes_value (field 7, length-delimited)
     writer.writeBytes(value);
   } else if (Array.isArray(value)) {
-    writer.writeTag(5, 2);
+    writer.writeTag(5, 2); // AnyValue.array_value (field 5, ArrayValue, length-delimited)
     const arrayStart = writer.startLengthDelimited();
     const arrayStartPos = writer.pos;
     for (const item of value) {
-      writer.writeTag(1, 2);
+      writer.writeTag(1, 2); // ArrayValue.values (field 1, AnyValue, length-delimited)
       const itemStart = writer.startLengthDelimited();
       const itemStartPos = writer.pos;
       writeAnyValue(writer, item);
@@ -149,7 +149,7 @@ export function writeAnyValue(writer: IProtobufWriter, value: AnyValue): void {
     }
     writer.finishLengthDelimited(arrayStart, writer.pos - arrayStartPos);
   } else if (t === 'object' && value != null) {
-    writer.writeTag(6, 2);
+    writer.writeTag(6, 2); // AnyValue.kvlist_value (field 6, KeyValueList, length-delimited)
     const kvlistStart = writer.startLengthDelimited();
     const kvlistStartPos = writer.pos;
     const obj = value as Record<string, AnyValue>;
@@ -158,12 +158,12 @@ export function writeAnyValue(writer: IProtobufWriter, value: AnyValue): void {
         continue;
       }
       const v = obj[k];
-      writer.writeTag(1, 2);
+      writer.writeTag(1, 2); // KeyValueList.values (field 1, KeyValue, length-delimited)
       const kvStart = writer.startLengthDelimited();
       const kvStartPos = writer.pos;
-      writer.writeTag(1, 2);
+      writer.writeTag(1, 2); // KeyValue.key (field 1, string, length-delimited)
       writer.writeString(k);
-      writer.writeTag(2, 2);
+      writer.writeTag(2, 2); // KeyValue.value (field 2, AnyValue, length-delimited)
       const valueStart = writer.startLengthDelimited();
       const valueStartPos = writer.pos;
       writeAnyValue(writer, v);
