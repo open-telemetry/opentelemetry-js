@@ -36,7 +36,7 @@ import {
 } from '@opentelemetry/sdk-logs';
 import type {
   ConfigFactory,
-  LogRecordExporterConfiguration as LogRecordExporterModel,
+  LogRecordExporterConfigModel,
 } from '@opentelemetry/configuration';
 import { createConfigFactory } from '@opentelemetry/configuration';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
@@ -716,7 +716,7 @@ describe('startNodeSDK', function () {
 
   describe('tests to increase code coverage', function () {
     it('should return undefined for invalid log record exporter model', async () => {
-      const exporter: LogRecordExporterModel = {};
+      const exporter: LogRecordExporterConfigModel = {};
       assert.equal(getLogRecordExporter(exporter), undefined);
     });
 

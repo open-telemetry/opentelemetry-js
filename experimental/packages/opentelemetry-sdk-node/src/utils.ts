@@ -48,7 +48,7 @@ import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 import type {
   ConfigurationModel,
-  LogRecordExporterConfiguration,
+  LogRecordExporterConfigModel,
   InstrumentTypeConfigModel,
   AggregationConfigModel,
   PeriodicMetricReaderConfigModel,
@@ -593,7 +593,7 @@ export function getBatchLogRecordProcessorFromEnv(
 }
 
 export function getLogRecordExporter(
-  exporter: LogRecordExporterConfiguration
+  exporter: LogRecordExporterConfigModel
 ): LogRecordExporter | undefined {
   if (exporter.otlp_http) {
     const encoding = exporter.otlp_http.encoding;
@@ -643,7 +643,7 @@ export function getLogRecordProcessorsFromConfiguration(
   config.logger_provider?.processors?.forEach(processor => {
     if (processor.batch) {
       const exporter = getLogRecordExporter(
-        processor.batch.exporter as LogRecordExporterConfiguration
+        processor.batch.exporter as LogRecordExporterConfigModel
       );
       if (exporter) {
         logRecordProcessors.push(
@@ -659,7 +659,7 @@ export function getLogRecordProcessorsFromConfiguration(
     }
     if (processor.simple) {
       const exporter = getLogRecordExporter(
-        processor.simple.exporter as LogRecordExporterConfiguration
+        processor.simple.exporter as LogRecordExporterConfigModel
       );
       if (exporter) {
         logRecordProcessors.push(new SimpleLogRecordProcessor(exporter));
