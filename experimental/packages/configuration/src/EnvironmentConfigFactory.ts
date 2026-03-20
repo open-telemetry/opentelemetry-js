@@ -10,7 +10,20 @@ import {
   getNumberFromEnv,
 } from '@opentelemetry/core';
 import type { ConfigFactory } from './IConfigFactory';
-import type { ConfigurationModel } from './generated/types';
+import type {
+  BatchLogRecordProcessor,
+  BatchSpanProcessor,
+  ConfigurationModel,
+  LogRecordExporter,
+  LogRecordProcessor,
+  PeriodicMetricReader,
+  PushMetricExporter,
+  Sampler,
+  SpanExporter,
+  SpanProcessor,
+  ExporterDefaultHistogramAggregation,
+  ExporterTemporalityPreference,
+} from './generated/types';
 import { ExemplarFilter, SeverityNumber } from './generated/types';
 import { diag } from '@opentelemetry/api';
 import { getGrpcTlsConfig, getHttpTlsConfig } from './utils';
@@ -93,8 +106,7 @@ export class EnvironmentConfigFactory implements ConfigFactory {
     const logLevelString = getStringFromEnv('OTEL_LOG_LEVEL');
     if (logLevelString) {
       // Store as lowercase; consumers convert to DiagLogLevel via diagLogLevelFromString
-      (this._config as Record<string, unknown>).log_level =
-        logLevelString.toLowerCase();
+      this._config.log_level = logLevelString.toLowerCase() as SeverityNumber;
     }
 
     setResources(this._config);
@@ -227,51 +239,35 @@ export function setSampler(config: ConfigurationModel): void {
 
   switch (sampler) {
     case 'always_on':
-      config.tracer_provider.sampler = {
-        always_on: {},
-      } as unknown as NonNullable<
-        NonNullable<ConfigurationModel['tracer_provider']>['sampler']
-      >;
+      config.tracer_provider.sampler = { always_on: {} } as Sampler;
       break;
 
     case 'always_off':
-      config.tracer_provider.sampler = {
-        always_off: {},
-      } as unknown as NonNullable<
-        NonNullable<ConfigurationModel['tracer_provider']>['sampler']
-      >;
+      config.tracer_provider.sampler = { always_off: {} } as Sampler;
       break;
 
     case 'traceidratio':
       config.tracer_provider.sampler = {
         trace_id_ratio_based: { ratio },
-      } as unknown as NonNullable<
-        NonNullable<ConfigurationModel['tracer_provider']>['sampler']
-      >;
+      } as Sampler;
       break;
 
     case 'parentbased_always_on':
       config.tracer_provider.sampler = {
         parent_based: { root: { always_on: {} } },
-      } as unknown as NonNullable<
-        NonNullable<ConfigurationModel['tracer_provider']>['sampler']
-      >;
+      } as Sampler;
       break;
 
     case 'parentbased_always_off':
       config.tracer_provider.sampler = {
         parent_based: { root: { always_off: {} } },
-      } as unknown as NonNullable<
-        NonNullable<ConfigurationModel['tracer_provider']>['sampler']
-      >;
+      } as Sampler;
       break;
 
     case 'parentbased_traceidratio':
       config.tracer_provider.sampler = {
         parent_based: { root: { trace_id_ratio_based: { ratio } } },
-      } as unknown as NonNullable<
-        NonNullable<ConfigurationModel['tracer_provider']>['sampler']
-      >;
+      } as Sampler;
       break;
 
     default:
@@ -336,35 +332,26 @@ export function setTracerProvider(config: ConfigurationModel): void {
       linkAttributeCountLimit;
   }
 
-  const batch: Record<string, unknown> = { exporter: {} };
-  const scheduleDelay = getNumberFromEnv('OTEL_BSP_SCHEDULE_DELAY') ?? 5000;
-  if (scheduleDelay) {
-    batch.schedule_delay = scheduleDelay;
-  }
-
-  const exportTimeout = getNumberFromEnv('OTEL_BSP_EXPORT_TIMEOUT') ?? 30000;
-  if (exportTimeout) {
-    batch.export_timeout = exportTimeout;
-  }
-
-  const maxQueueSize = getNumberFromEnv('OTEL_BSP_MAX_QUEUE_SIZE') ?? 2048;
-  if (maxQueueSize) {
-    batch.max_queue_size = maxQueueSize;
-  }
-
-  const maxExportBatchSize =
-    getNumberFromEnv('OTEL_BSP_MAX_EXPORT_BATCH_SIZE') ?? 512;
-  if (maxExportBatchSize) {
-    batch.max_export_batch_size = maxExportBatchSize;
-  }
+  const batch: BatchSpanProcessor = {
+    exporter: {} as SpanExporter,
+    schedule_delay: getNumberFromEnv('OTEL_BSP_SCHEDULE_DELAY') ?? 5000,
+    export_timeout: getNumberFromEnv('OTEL_BSP_EXPORT_TIMEOUT') ?? 30000,
+    max_queue_size: getNumberFromEnv('OTEL_BSP_MAX_QUEUE_SIZE') ?? 2048,
+    max_export_batch_size:
+      getNumberFromEnv('OTEL_BSP_MAX_EXPORT_BATCH_SIZE') ?? 512,
+  };
 
   for (let i = 0; i < exportersType.length; i++) {
     const exporterType = exportersType[i];
-    const batchInfo = { ...batch, exporter: {} as Record<string, unknown> };
+    const batchInfo: BatchSpanProcessor = {
+      ...batch,
+      exporter: {} as SpanExporter,
+    };
     if (exporterType === 'console') {
-      config.tracer_provider.processors!.push({
+      const processor: SpanProcessor = {
         simple: { exporter: { console: {} } },
-      } as never);
+      };
+      config.tracer_provider.processors!.push(processor);
     } else {
       const protocol =
         getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL') ??
@@ -391,45 +378,51 @@ export function setTracerProvider(config: ConfigurationModel): void {
         getStringFromEnv('OTEL_EXPORTER_OTLP_HEADERS');
 
       if (protocol === 'grpc') {
-        const otlpGrpc: Record<string, unknown> = {};
-        const endpoint =
-          getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_ENDPOINT') ??
-          getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT') ??
-          'http://localhost:4317';
-        if (endpoint) otlpGrpc.endpoint = endpoint;
         const tls = getGrpcTlsConfig(
           certificateFile,
           clientKeyFile,
           clientCertificateFile
         );
-        if (tls) otlpGrpc.tls = tls;
-        if (compression) otlpGrpc.compression = compression;
-        if (timeout) otlpGrpc.timeout = timeout;
-        if (headersList) otlpGrpc.headers_list = headersList;
+        const otlpGrpc: NonNullable<SpanExporter['otlp_grpc']> = {
+          endpoint:
+            getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_ENDPOINT') ??
+            getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT') ??
+            'http://localhost:4317',
+          timeout,
+          ...(tls !== undefined && { tls }),
+          ...(compression !== undefined && { compression }),
+          ...(headersList !== undefined && { headers_list: headersList }),
+        };
         batchInfo.exporter = { otlp_grpc: otlpGrpc };
       } else {
-        const otlpHttp: Record<string, unknown> = {};
-        const endpoint =
-          getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_ENDPOINT') ??
-          (getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')
-            ? `${getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')}/v1/traces`
-            : 'http://localhost:4318/v1/traces');
-        if (endpoint) otlpHttp.endpoint = endpoint;
         const tls = getHttpTlsConfig(
           certificateFile,
           clientKeyFile,
           clientCertificateFile
         );
-        if (tls) otlpHttp.tls = tls;
-        if (compression) otlpHttp.compression = compression;
-        if (timeout) otlpHttp.timeout = timeout;
-        if (headersList) otlpHttp.headers_list = headersList;
-        if (protocol === 'http/json') otlpHttp.encoding = 'json';
-        else if (protocol === 'http/protobuf') otlpHttp.encoding = 'protobuf';
+        const encoding =
+          protocol === 'http/json'
+            ? 'json'
+            : protocol === 'http/protobuf'
+              ? 'protobuf'
+              : undefined;
+        const otlpHttp: NonNullable<SpanExporter['otlp_http']> = {
+          endpoint:
+            getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_ENDPOINT') ??
+            (getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')
+              ? `${getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')}/v1/traces`
+              : 'http://localhost:4318/v1/traces'),
+          timeout,
+          ...(tls !== undefined && { tls }),
+          ...(compression !== undefined && { compression }),
+          ...(headersList !== undefined && { headers_list: headersList }),
+          ...(encoding !== undefined && { encoding }),
+        };
         batchInfo.exporter = { otlp_http: otlpHttp };
       }
 
-      config.tracer_provider.processors!.push({ batch: batchInfo } as never);
+      const processor: SpanProcessor = { batch: batchInfo };
+      config.tracer_provider.processors!.push(processor);
     }
   }
 }
@@ -449,11 +442,7 @@ export function setMeterProvider(config: ConfigurationModel): void {
   }
   config.meter_provider = initializeDefaultMeterProviderConfiguration();
 
-  const readerPeriodic: Record<string, unknown> = { exporter: {} };
   const interval = getNumberFromEnv('OTEL_METRIC_EXPORT_INTERVAL') ?? 60000;
-  if (interval) {
-    readerPeriodic.interval = interval;
-  }
   for (let i = 0; i < exportersType.length; i++) {
     const exporterType = exportersType[i];
     if (exporterType === 'prometheus') {
@@ -468,18 +457,15 @@ export function setMeterProvider(config: ConfigurationModel): void {
           },
         },
       };
-      config.meter_provider.readers!.push({ pull: pullReader } as never);
+      config.meter_provider.readers!.push({ pull: pullReader });
       continue;
     }
 
-    const readerPeriodicInfo: Record<string, unknown> = {
-      ...readerPeriodic,
-      exporter: {} as Record<string, unknown>,
+    const readerPeriodicInfo: PeriodicMetricReader = {
+      interval,
+      timeout: getNumberFromEnv('OTEL_METRIC_EXPORT_TIMEOUT') ?? 30000,
+      exporter: {} as PushMetricExporter,
     };
-    const timeout = getNumberFromEnv('OTEL_METRIC_EXPORT_TIMEOUT') ?? 30000;
-    if (timeout) {
-      readerPeriodicInfo.timeout = timeout;
-    }
 
     if (exporterType === 'console') {
       readerPeriodicInfo.exporter = { console: {} };
@@ -529,67 +515,67 @@ export function setMeterProvider(config: ConfigurationModel): void {
         : 'explicit_bucket_histogram';
 
       if (protocol === 'grpc') {
-        const otlpGrpc: Record<string, unknown> = {};
-        const endpoint =
-          getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_ENDPOINT') ??
-          getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT') ??
-          'http://localhost:4317';
-        if (endpoint) otlpGrpc.endpoint = endpoint;
         const tls = getGrpcTlsConfig(
           certificateFile,
           clientKeyFile,
           clientCertificateFile
         );
-        if (tls) otlpGrpc.tls = tls;
-        if (compression) otlpGrpc.compression = compression;
-        if (timeoutExporter) otlpGrpc.timeout = timeoutExporter;
-        if (headersList) otlpGrpc.headers_list = headersList;
-        if (temporalityPreference)
-          otlpGrpc.temporality_preference = temporalityPreference;
-        if (defaultHistogramAggregation)
-          otlpGrpc.default_histogram_aggregation = defaultHistogramAggregation;
+        const otlpGrpc: NonNullable<PushMetricExporter['otlp_grpc']> = {
+          endpoint:
+            getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_ENDPOINT') ??
+            getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT') ??
+            'http://localhost:4317',
+          timeout: timeoutExporter,
+          temporality_preference:
+            temporalityPreference as ExporterTemporalityPreference,
+          default_histogram_aggregation:
+            defaultHistogramAggregation as ExporterDefaultHistogramAggregation,
+          ...(tls !== undefined && { tls }),
+          ...(compression !== undefined && { compression }),
+          ...(headersList !== undefined && { headers_list: headersList }),
+        };
         readerPeriodicInfo.exporter = { otlp_grpc: otlpGrpc };
       } else {
-        const otlpHttp: Record<string, unknown> = {};
-        const endpoint =
-          getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_ENDPOINT') ??
-          (getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')
-            ? `${getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')}/v1/metrics`
-            : 'http://localhost:4318/v1/metrics');
-        if (endpoint) otlpHttp.endpoint = endpoint;
         const tls = getHttpTlsConfig(
           certificateFile,
           clientKeyFile,
           clientCertificateFile
         );
-        if (tls) otlpHttp.tls = tls;
-        if (compression) otlpHttp.compression = compression;
-        if (timeoutExporter) otlpHttp.timeout = timeoutExporter;
-        if (headersList) otlpHttp.headers_list = headersList;
-        if (temporalityPreference)
-          otlpHttp.temporality_preference = temporalityPreference;
-        if (defaultHistogramAggregation)
-          otlpHttp.default_histogram_aggregation = defaultHistogramAggregation;
-        if (protocol === 'http/json') otlpHttp.encoding = 'json';
-        else if (protocol === 'http/protobuf') otlpHttp.encoding = 'protobuf';
+        const encoding =
+          protocol === 'http/json'
+            ? 'json'
+            : protocol === 'http/protobuf'
+              ? 'protobuf'
+              : undefined;
+        const otlpHttp: NonNullable<PushMetricExporter['otlp_http']> = {
+          endpoint:
+            getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_ENDPOINT') ??
+            (getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')
+              ? `${getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')}/v1/metrics`
+              : 'http://localhost:4318/v1/metrics'),
+          timeout: timeoutExporter,
+          temporality_preference:
+            temporalityPreference as ExporterTemporalityPreference,
+          default_histogram_aggregation:
+            defaultHistogramAggregation as ExporterDefaultHistogramAggregation,
+          ...(tls !== undefined && { tls }),
+          ...(compression !== undefined && { compression }),
+          ...(headersList !== undefined && { headers_list: headersList }),
+          ...(encoding !== undefined && { encoding }),
+        };
         readerPeriodicInfo.exporter = { otlp_http: otlpHttp };
       }
     }
-    config.meter_provider.readers!.push({
-      periodic: readerPeriodicInfo,
-    } as never);
+    config.meter_provider.readers!.push({ periodic: readerPeriodicInfo });
   }
 
   const rawExemplarFilter =
     getStringFromEnv('OTEL_METRICS_EXEMPLAR_FILTER') ??
     ExemplarFilter.TraceBased;
-  const exemplarFilter =
+  config.meter_provider.exemplar_filter =
     rawExemplarFilter === 'default'
       ? ExemplarFilter.TraceBased
-      : rawExemplarFilter;
-  if (exemplarFilter) {
-    config.meter_provider.exemplar_filter = exemplarFilter as never;
-  }
+      : (rawExemplarFilter as ExemplarFilter);
 }
 
 export function setLoggerProvider(config: ConfigurationModel): void {
@@ -625,35 +611,26 @@ export function setLoggerProvider(config: ConfigurationModel): void {
     }
   }
 
-  const batch: Record<string, unknown> = { exporter: {} };
-  const scheduleDelay = getNumberFromEnv('OTEL_BLRP_SCHEDULE_DELAY') ?? 1000;
-  if (scheduleDelay) {
-    batch.schedule_delay = scheduleDelay;
-  }
-
-  const exportTimeout = getNumberFromEnv('OTEL_BLRP_EXPORT_TIMEOUT') ?? 30000;
-  if (exportTimeout) {
-    batch.export_timeout = exportTimeout;
-  }
-
-  const maxQueueSize = getNumberFromEnv('OTEL_BLRP_MAX_QUEUE_SIZE') ?? 2048;
-  if (maxQueueSize) {
-    batch.max_queue_size = maxQueueSize;
-  }
-
-  const maxExportBatchSize =
-    getNumberFromEnv('OTEL_BLRP_MAX_EXPORT_BATCH_SIZE') ?? 512;
-  if (maxExportBatchSize) {
-    batch.max_export_batch_size = maxExportBatchSize;
-  }
+  const batch: BatchLogRecordProcessor = {
+    exporter: {} as LogRecordExporter,
+    schedule_delay: getNumberFromEnv('OTEL_BLRP_SCHEDULE_DELAY') ?? 1000,
+    export_timeout: getNumberFromEnv('OTEL_BLRP_EXPORT_TIMEOUT') ?? 30000,
+    max_queue_size: getNumberFromEnv('OTEL_BLRP_MAX_QUEUE_SIZE') ?? 2048,
+    max_export_batch_size:
+      getNumberFromEnv('OTEL_BLRP_MAX_EXPORT_BATCH_SIZE') ?? 512,
+  };
 
   for (let i = 0; i < exportersType.length; i++) {
     const exporterType = exportersType[i];
-    const batchInfo = { ...batch, exporter: {} as Record<string, unknown> };
+    const batchInfo: BatchLogRecordProcessor = {
+      ...batch,
+      exporter: {} as LogRecordExporter,
+    };
     if (exporterType === 'console') {
-      config.logger_provider.processors!.push({
+      const processor: LogRecordProcessor = {
         simple: { exporter: { console: {} } },
-      } as never);
+      };
+      config.logger_provider.processors!.push(processor);
     } else {
       const protocol =
         getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_PROTOCOL') ??
@@ -680,44 +657,50 @@ export function setLoggerProvider(config: ConfigurationModel): void {
         getStringFromEnv('OTEL_EXPORTER_OTLP_HEADERS');
 
       if (protocol === 'grpc') {
-        const otlpGrpc: Record<string, unknown> = {};
-        const endpoint =
-          getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_ENDPOINT') ??
-          getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT') ??
-          'http://localhost:4317';
-        if (endpoint) otlpGrpc.endpoint = endpoint;
         const tls = getGrpcTlsConfig(
           certificateFile,
           clientKeyFile,
           clientCertificateFile
         );
-        if (tls) otlpGrpc.tls = tls;
-        if (compression) otlpGrpc.compression = compression;
-        if (timeout) otlpGrpc.timeout = timeout;
-        if (headersList) otlpGrpc.headers_list = headersList;
+        const otlpGrpc: NonNullable<LogRecordExporter['otlp_grpc']> = {
+          endpoint:
+            getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_ENDPOINT') ??
+            getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT') ??
+            'http://localhost:4317',
+          timeout,
+          ...(tls !== undefined && { tls }),
+          ...(compression !== undefined && { compression }),
+          ...(headersList !== undefined && { headers_list: headersList }),
+        };
         batchInfo.exporter = { otlp_grpc: otlpGrpc };
       } else {
-        const otlpHttp: Record<string, unknown> = {};
-        const endpoint =
-          getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_ENDPOINT') ??
-          (getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')
-            ? `${getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')}/v1/logs`
-            : 'http://localhost:4318/v1/logs');
-        if (endpoint) otlpHttp.endpoint = endpoint;
         const tls = getHttpTlsConfig(
           certificateFile,
           clientKeyFile,
           clientCertificateFile
         );
-        if (tls) otlpHttp.tls = tls;
-        if (compression) otlpHttp.compression = compression;
-        if (timeout) otlpHttp.timeout = timeout;
-        if (headersList) otlpHttp.headers_list = headersList;
-        if (protocol === 'http/json') otlpHttp.encoding = 'json';
-        else if (protocol === 'http/protobuf') otlpHttp.encoding = 'protobuf';
+        const encoding =
+          protocol === 'http/json'
+            ? 'json'
+            : protocol === 'http/protobuf'
+              ? 'protobuf'
+              : undefined;
+        const otlpHttp: NonNullable<LogRecordExporter['otlp_http']> = {
+          endpoint:
+            getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_ENDPOINT') ??
+            (getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')
+              ? `${getStringFromEnv('OTEL_EXPORTER_OTLP_ENDPOINT')}/v1/logs`
+              : 'http://localhost:4318/v1/logs'),
+          timeout,
+          ...(tls !== undefined && { tls }),
+          ...(compression !== undefined && { compression }),
+          ...(headersList !== undefined && { headers_list: headersList }),
+          ...(encoding !== undefined && { encoding }),
+        };
         batchInfo.exporter = { otlp_http: otlpHttp };
       }
-      config.logger_provider.processors!.push({ batch: batchInfo } as never);
+      const processor: LogRecordProcessor = { batch: batchInfo };
+      config.logger_provider.processors!.push(processor);
     }
   }
 }
