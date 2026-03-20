@@ -81,6 +81,7 @@ export function parseConfigFile(): ConfigurationModel {
   delete (data as Record<string, unknown>)['file_format'];
 
   applyConfigDefaults(data);
+  mergeAttributesList(data);
 
   // Warn for providers with empty processors/readers
   if (data.tracer_provider?.processors?.length === 0) {
@@ -97,6 +98,36 @@ export function parseConfigFile(): ConfigurationModel {
   }
 
   return data;
+}
+
+/**
+ * Merge resource.attributes_list (comma-separated key=value pairs) into
+ * resource.attributes, with entries from attributes taking precedence.
+ * Matches the behaviour of EnvironmentConfigFactory.setResources().
+ */
+function mergeAttributesList(data: ConfigurationModel): void {
+  const list = data.resource?.attributes_list;
+  if (typeof list !== 'string' || !list.trim()) return;
+
+  if (data.resource == null) return;
+  if (data.resource.attributes == null) {
+    data.resource.attributes = [];
+  }
+
+  const existingKeys = new Set(
+    data.resource.attributes.map((a: { name: string }) => a.name)
+  );
+
+  for (const pair of list.split(',')) {
+    const eqIdx = pair.indexOf('=');
+    if (eqIdx > 0) {
+      const key = pair.slice(0, eqIdx).trim();
+      const value = pair.slice(eqIdx + 1).trim();
+      if (key && !existingKeys.has(key)) {
+        data.resource.attributes.push({ name: key, value, type: 'string' });
+      }
+    }
+  }
 }
 
 /**

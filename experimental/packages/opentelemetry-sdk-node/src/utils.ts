@@ -93,21 +93,7 @@ export function getResourceFromConfiguration(
     return undefined;
   }
   const attr: DetectedResourceAttributes = {};
-  // Parse attributes_list (lower priority) first
-  const attributesList = config.resource.attributes_list;
-  if (typeof attributesList === 'string' && attributesList.trim()) {
-    for (const pair of attributesList.split(',')) {
-      const eqIdx = pair.indexOf('=');
-      if (eqIdx > 0) {
-        const key = pair.slice(0, eqIdx).trim();
-        const value = pair.slice(eqIdx + 1).trim();
-        if (key) {
-          attr[key] = value;
-        }
-      }
-    }
-  }
-  // Parse attributes (higher priority) — overrides attributes_list
+  // attributes_list has already been merged into attributes by the config package
   if (config.resource.attributes) {
     for (let i = 0; i < config.resource.attributes.length; i++) {
       const a = config.resource.attributes[i];

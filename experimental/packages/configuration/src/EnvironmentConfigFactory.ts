@@ -113,7 +113,6 @@ export class EnvironmentConfigFactory implements ConfigFactory {
     setAttributeLimits(this._config);
     setPropagators(this._config);
     setTracerProvider(this._config);
-    setSampler(this._config);
     setMeterProvider(this._config);
     setLoggerProvider(this._config);
   }
@@ -217,8 +216,22 @@ export function setPropagators(config: ConfigurationModel): void {
   const composite = getStringListFromEnv('OTEL_PROPAGATORS');
   if (composite && composite.length > 0) {
     config.propagator.composite = [];
-    for (let i = 0; i < composite.length; i++) {
-      config.propagator.composite.push({ [composite[i]]: null } as never);
+    for (const name of composite) {
+      if (name === 'tracecontext') {
+        config.propagator.composite.push({ tracecontext: null });
+      } else if (name === 'baggage') {
+        config.propagator.composite.push({ baggage: null });
+      } else if (name === 'b3') {
+        config.propagator.composite.push({ b3: null });
+      } else if (name === 'b3multi') {
+        config.propagator.composite.push({ b3multi: null });
+      } else if (name === 'jaeger') {
+        config.propagator.composite.push({ jaeger: null });
+      } else if (name === 'ottrace') {
+        config.propagator.composite.push({ ottrace: null });
+      } else {
+        config.propagator.composite.push({ [name]: null });
+      }
     }
   }
   const compositeList = getStringFromEnv('OTEL_PROPAGATORS');
@@ -425,6 +438,7 @@ export function setTracerProvider(config: ConfigurationModel): void {
       config.tracer_provider.processors!.push(processor);
     }
   }
+  setSampler(config);
 }
 
 export function setMeterProvider(config: ConfigurationModel): void {

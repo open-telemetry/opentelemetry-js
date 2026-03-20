@@ -202,6 +202,8 @@ const configFromKitchenSinkFile = {
       { name: 'bool_array_key', value: [true, false], type: 'bool_array' },
       { name: 'int_array_key', value: [1, 2], type: 'int_array' },
       { name: 'double_array_key', value: [1.1, 2.2], type: 'double_array' },
+      { name: 'service.namespace', value: 'my-namespace', type: 'string' },
+      { name: 'service.version', value: '1.0.0', type: 'string' },
     ],
     'detection/development': {
       attributes: {
@@ -2275,6 +2277,9 @@ describe('ConfigFactory', function () {
         },
         resource: {
           attributes_list: 'service.instance.id=123',
+          attributes: [
+            { name: 'service.instance.id', value: '123', type: 'string' },
+          ],
         },
       };
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
@@ -2348,6 +2353,11 @@ describe('ConfigFactory', function () {
             {
               name: 'service.name',
               value: 'custom-name',
+              type: 'string',
+            },
+            {
+              name: 'att',
+              value: '1',
               type: 'string',
             },
           ],
@@ -2546,6 +2556,11 @@ describe('ConfigFactory', function () {
               name: 'double_array_key',
               value: [1.1, 2.2],
               type: 'double_array',
+            },
+            {
+              name: 'service.version',
+              value: '1.0.0',
+              type: 'string',
             },
           ],
         },
