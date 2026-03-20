@@ -4,7 +4,7 @@
  */
 import { diag } from '@opentelemetry/api';
 import type { IProtobufWriter } from './i-protobuf-writer';
-import { sizeAsVarint } from './utils';
+import { estimateVarintSize } from './utils';
 
 export const GROWING_BUFFER_DEBUG_MESSAGE =
   'ProtobufWriter: estimated size was too small, growing buffer.';
@@ -89,7 +89,7 @@ export class ProtobufWriter implements IProtobufWriter {
     const v = length >>> 0;
 
     // Shift content forward if we need more bytes than reserved
-    const varintSize = sizeAsVarint(v);
+    const varintSize = estimateVarintSize(v);
     if (varintSize > RESERVED_LENGTH_BYTES) {
       const additionalBytes = varintSize - RESERVED_LENGTH_BYTES;
       this._ensureCapacity(additionalBytes);
@@ -130,7 +130,7 @@ export class ProtobufWriter implements IProtobufWriter {
    * Write a varint (variable-length integer)
    */
   writeVarint(value: number): void {
-    this._ensureCapacity(sizeAsVarint(value));
+    this._ensureCapacity(estimateVarintSize(value));
     // Check if value fits in 32-bit range
     if (value >= 0 && value <= 0xffffffff) {
       // 32-bit or small integer

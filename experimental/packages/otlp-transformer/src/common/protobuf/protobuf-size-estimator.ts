@@ -4,7 +4,7 @@
  */
 
 import type { IProtobufWriter } from './i-protobuf-writer';
-import { sizeAsVarint } from './utils';
+import { estimateVarintSize } from './utils';
 
 /**
  * Calculate UTF-8 byte length without encoding
@@ -44,11 +44,11 @@ export class ProtobufSizeEstimator implements IProtobufWriter {
   }
 
   finishLengthDelimited(_: number, length: number): void {
-    this.pos += sizeAsVarint(length);
+    this.pos += estimateVarintSize(length);
   }
 
   writeVarint(value: number): void {
-    this.pos += sizeAsVarint(value);
+    this.pos += estimateVarintSize(value);
   }
 
   writeFixed32(_value: number): void {
@@ -60,7 +60,7 @@ export class ProtobufSizeEstimator implements IProtobufWriter {
   }
 
   writeBytes(bytes: Uint8Array): void {
-    this.pos += sizeAsVarint(bytes.length);
+    this.pos += estimateVarintSize(bytes.length);
     this.pos += bytes.length;
   }
 
@@ -74,7 +74,7 @@ export class ProtobufSizeEstimator implements IProtobufWriter {
 
   writeString(str: string): void {
     const byteLen = utf8ByteLength(str);
-    this.pos += sizeAsVarint(byteLen);
+    this.pos += estimateVarintSize(byteLen);
     this.pos += byteLen;
   }
 }
