@@ -7,9 +7,11 @@ import { ProtobufWriter } from '../../src/common/protobuf/protobuf-writer';
 import {
   writeAnyValue,
   writeKeyValue,
+  writeHrTimeAsFixed64,
 } from '../../src/common/protobuf/common-serializer';
 import * as root from '../../src/generated/root';
 import type { AnyValue } from '@opentelemetry/api-logs';
+import type { HrTime } from '@opentelemetry/api';
 import { uint8ArrayToBase64 } from '../utils';
 
 /**
@@ -545,6 +547,113 @@ describe('common-serializer', function () {
           },
         },
       });
+    });
+  });
+
+  describe('writeHrTimeAsFixed64', function () {
+    /**
+     * Reference implementation using BigInt for correctness verification.
+     * Computes the fixed64 payload from total_nanos = seconds * 1e9 + nanos
+     * as [low32, high32], wrapping modulo 2^64 like protobuf fixed64 does.
+     */
+    function expectedFixed64(hrTime: HrTime): [number, number] {
+      const total =
+        (BigInt(hrTime[0]) * 1_000_000_000n + BigInt(hrTime[1])) &
+        0xffff_ffff_ffff_ffffn;
+      return [
+        Number(total & 0xffff_ffffn),
+        Number((total >> 32n) & 0xffff_ffffn),
+      ];
+    }
+
+    function serializeHrTime(hrTime: HrTime): [number, number] {
+      const writer = new ProtobufWriter(16);
+      writeHrTimeAsFixed64(writer, hrTime);
+      const buf = writer.finish();
+      // fixed64 is 8 bytes, little-endian: bytes 0-3 = low32, bytes 4-7 = high32
+      const low = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
+      const high = buf[4] | (buf[5] << 8) | (buf[6] << 16) | (buf[7] << 24);
+      return [low >>> 0, high >>> 0];
+    }
+
+    it('encodes [0, 0] (epoch)', function () {
+      const hrTime: HrTime = [0, 0];
+      assert.deepStrictEqual(serializeHrTime(hrTime), expectedFixed64(hrTime));
+    });
+
+    it('encodes [1, 0] (exactly 1 second)', function () {
+      const hrTime: HrTime = [1, 0];
+      assert.deepStrictEqual(serializeHrTime(hrTime), expectedFixed64(hrTime));
+    });
+
+    it('encodes [0, 1] (1 nanosecond)', function () {
+      const hrTime: HrTime = [0, 1];
+      assert.deepStrictEqual(serializeHrTime(hrTime), expectedFixed64(hrTime));
+    });
+
+    it('encodes [1, 999_999_999] (max nanos in a second)', function () {
+      const hrTime: HrTime = [1, 999_999_999];
+      assert.deepStrictEqual(serializeHrTime(hrTime), expectedFixed64(hrTime));
+    });
+
+    it('encodes a typical 2023 Unix timestamp [1_700_000_000, 0]', function () {
+      const hrTime: HrTime = [1_700_000_000, 0];
+      assert.deepStrictEqual(serializeHrTime(hrTime), expectedFixed64(hrTime));
+    });
+
+    it('encodes [1_700_000_000, 500_000_000]', function () {
+      const hrTime: HrTime = [1_700_000_000, 500_000_000];
+      assert.deepStrictEqual(serializeHrTime(hrTime), expectedFixed64(hrTime));
+    });
+
+    it('encodes [1_700_000_001, 999_999_999] (nanos cause carry into high word)', function () {
+      const hrTime: HrTime = [1_700_000_001, 999_999_999];
+      assert.deepStrictEqual(serializeHrTime(hrTime), expectedFixed64(hrTime));
+    });
+
+    // Regression: values above ~9_007_199 seconds previously lost precision
+    // because `seconds * 1e9` exceeded Number.MAX_SAFE_INTEGER.
+    it('regression: encodes [5_100_000_153, 1] without precision loss', function () {
+      const hrTime: HrTime = [5_100_000_153, 1];
+      assert.deepStrictEqual(serializeHrTime(hrTime), expectedFixed64(hrTime));
+    });
+
+    it('regression: encodes [5_300_000_159, 999_999_999] without precision loss', function () {
+      const hrTime: HrTime = [5_300_000_159, 999_999_999];
+      assert.deepStrictEqual(serializeHrTime(hrTime), expectedFixed64(hrTime));
+    });
+
+    it('regression: encodes [9_007_200, 0] (just above old precision boundary)', function () {
+      // 9_007_199 * 1e9 ≈ Number.MAX_SAFE_INTEGER; the old code lost precision here
+      const hrTime: HrTime = [9_007_200, 0];
+      assert.deepStrictEqual(serializeHrTime(hrTime), expectedFixed64(hrTime));
+    });
+
+    it('regression: encodes [9_100_000_273, 0] without precision loss', function () {
+      const hrTime: HrTime = [9_100_000_273, 0];
+      assert.deepStrictEqual(serializeHrTime(hrTime), expectedFixed64(hrTime));
+    });
+
+    it('encodes the Year 2038 boundary [2_147_483_647, 999_999_999]', function () {
+      const hrTime: HrTime = [2_147_483_647, 999_999_999];
+      assert.deepStrictEqual(serializeHrTime(hrTime), expectedFixed64(hrTime));
+    });
+
+    it('encodes a large timestamp [10_000_000_000, 999_999_999]', function () {
+      const hrTime: HrTime = [10_000_000_000, 999_999_999];
+      assert.deepStrictEqual(serializeHrTime(hrTime), expectedFixed64(hrTime));
+    });
+
+    it('encodes the largest HrTime that fits in fixed64 [18_446_744_073, 709_551_615]', function () {
+      // July 4, 2554, at 23:59:59.999999999 UTC - the largest timestamp that can be represented in fixed64 nanoseconds since Unix epoch
+      const hrTime: HrTime = [18_446_744_073, 709_551_615];
+      assert.deepStrictEqual(serializeHrTime(hrTime), expectedFixed64(hrTime));
+    });
+
+    it('wraps without throwing once total nanoseconds exceeds fixed64 range [18_446_744_073, 709_551_616]', function () {
+      const hrTime: HrTime = [18_446_744_073, 709_551_616];
+      assert.deepStrictEqual(serializeHrTime(hrTime), [0, 0]);
+      assert.deepStrictEqual(serializeHrTime(hrTime), expectedFixed64(hrTime));
     });
   });
 });

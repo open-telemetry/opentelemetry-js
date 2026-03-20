@@ -23,23 +23,53 @@ export function writeHrTimeAsFixed64(
   const seconds = hrTime[0];
   const nanos = hrTime[1];
 
-  // Calculate total nanoseconds split into 32-bit parts
-  // We use the fact that 1e9 < 2^30, so multiplication is safe for reasonable timestamps
+  // Calculate total nanoseconds (seconds * 1_000_000_000 + nanos) split into [low32, high32].
+  //
+  // We cannot use `seconds * 1e9` directly because for Unix timestamps
+  // (seconds > ~9_007_199) the product exceeds Number.MAX_SAFE_INTEGER and loses
+  // integer precision in IEEE 754 double arithmetic.
+  //
+  // So we split `seconds` into its lower 16 bits and remaining upper bits so
+  // every multiplication stays
+  // within the safe-integer range (< 2^53):
+  //   secondsLower16Bits * 1e9 <= 65535 * 1e9 ≈ 6.55e13 < 2^53
+  //   secondsUpperBits   * 1e9 <= 65535 * 1e9 ≈ 6.55e13 < 2^53
+  //
+  // Then recombine:
+  //   seconds * 1e9 =
+  //     secondsUpperBits * 1e9 * 2^16 +
+  //     secondsLower16Bits * 1e9
 
-  // For the low 32 bits: (seconds * 1e9 + nanos) & 0xFFFFFFFF
-  // For the high 32 bits: floor((seconds * 1e9 + nanos) / 2^32)
+  const nanosPerSecond = 1_000_000_000;
+  // Split `seconds` into low 16 bits and the remaining upper bits.
+  // This avoids the signed 32-bit seconds limit behind the Year 2038 problem:
+  // the practical limit here is the encoded fixed64 range. Callers must keep
+  // `seconds * 1e9 + nanos` within uint64, i.e. up to
+  // [18_446_744_073, 709_551_615]. Beyond that, the serialized value wraps.
+  const secondsLower16Bits = seconds & 0xffff; // bits 0-15 of seconds
+  const secondsUpperBits = (seconds / 0x10000) >>> 0; // bits 16+ of seconds
 
-  // Calculate seconds * 1e9 split into parts
-  const secNanos = seconds * 1e9;
-  const secNanosLow = secNanos >>> 0; // Low 32 bits of seconds * 1e9
-  const secNanosHigh = (secNanos / 0x100000000) >>> 0; // High bits from seconds * 1e9
+  const nanosFromLower16Bits = secondsLower16Bits * nanosPerSecond; // exact integer, < 2^53
+  const nanosFromUpperBits = secondsUpperBits * nanosPerSecond; // exact integer, < 2^53
 
-  // Add nanoseconds to the low part
-  const totalLow = (secNanosLow + nanos) >>> 0;
+  // Split the lower-16-bit contribution into [low32, high32].
+  const lower16ContributionLow32 = nanosFromLower16Bits >>> 0;
+  const lower16ContributionHigh32 = Math.floor(
+    nanosFromLower16Bits / 0x100000000
+  );
 
-  // Check for overflow from low to high (carry bit)
-  const carry = secNanosLow + nanos >= 0x100000000 ? 1 : 0;
-  const totalHigh = (secNanosHigh + carry) >>> 0;
+  // The upper-bits contribution is shifted left by 16 bits when recombined.
+  const upperBitsContributionLow32 =
+    ((nanosFromUpperBits & 0xffff) * 0x10000) >>> 0;
+  const upperBitsContributionHigh32 = (nanosFromUpperBits / 0x10000) >>> 0;
+
+  // Add the two contributions plus the sub-second nanoseconds with carry propagation.
+  const low32WithCarry =
+    lower16ContributionLow32 + upperBitsContributionLow32 + nanos;
+  const totalLow = low32WithCarry >>> 0;
+  const carry = Math.floor(low32WithCarry / 0x100000000); // 0, 1, or 2
+  const totalHigh =
+    (lower16ContributionHigh32 + upperBitsContributionHigh32 + carry) >>> 0;
 
   serializer.writeFixed64(totalLow, totalHigh);
 }
