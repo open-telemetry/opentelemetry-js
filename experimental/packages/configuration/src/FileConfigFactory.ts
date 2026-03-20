@@ -4,12 +4,14 @@
  */
 
 import { getStringFromEnv } from '@opentelemetry/core';
-import { initializeDefaultConfiguration } from './EnvironmentConfigFactory';
 import type { ConfigFactory } from './IConfigFactory';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
 import { diag } from '@opentelemetry/api';
-import { envVariableSubstitution } from './utils';
+import {
+  envVariableSubstitution,
+  initializeDefaultConfiguration,
+} from './utils';
 import { ConfigurationSchema } from './generated/types';
 import type { ConfigurationModel } from './generated/types';
 

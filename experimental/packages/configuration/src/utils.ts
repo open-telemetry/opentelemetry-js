@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { getStringFromEnv } from '@opentelemetry/core';
+import { ExemplarFilter, SeverityNumber } from './generated/types';
+import type { ConfigurationModel } from './generated/types';
 
 export function envVariableSubstitution(value: unknown): string | undefined {
   if (value == null) {
@@ -46,6 +48,61 @@ export function getGrpcTlsConfig(
     return tls;
   }
   return undefined;
+}
+
+export function initializeDefaultConfiguration(): ConfigurationModel {
+  return {
+    disabled: false,
+    log_level: SeverityNumber.Info,
+    resource: {},
+    attribute_limits: {
+      attribute_count_limit: 128,
+    },
+  };
+}
+
+export function initializeDefaultTracerProviderConfiguration(): NonNullable<
+  ConfigurationModel['tracer_provider']
+> {
+  return {
+    processors: [],
+    limits: {
+      attribute_count_limit: 128,
+      event_count_limit: 128,
+      link_count_limit: 128,
+      event_attribute_count_limit: 128,
+      link_attribute_count_limit: 128,
+    },
+    sampler: {
+      parent_based: {
+        root: { always_on: undefined },
+        remote_parent_sampled: { always_on: undefined },
+        remote_parent_not_sampled: { always_off: undefined },
+        local_parent_sampled: { always_on: undefined },
+        local_parent_not_sampled: { always_off: undefined },
+      },
+    },
+  };
+}
+
+export function initializeDefaultMeterProviderConfiguration(): NonNullable<
+  ConfigurationModel['meter_provider']
+> {
+  return {
+    readers: [],
+    views: [],
+    exemplar_filter: ExemplarFilter.TraceBased,
+  };
+}
+
+export function initializeDefaultLoggerProviderConfiguration(): NonNullable<
+  ConfigurationModel['logger_provider']
+> {
+  return {
+    processors: [],
+    limits: { attribute_count_limit: 128 },
+    'logger_configurator/development': {},
+  };
 }
 
 export function getHttpTlsConfig(

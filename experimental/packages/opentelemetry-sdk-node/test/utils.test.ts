@@ -125,63 +125,49 @@ describe('getPropagatorFromConfigFactory', function () {
   });
 
   it('should return the selected propagator when one is in the list', () => {
-    const config = {
-      propagator: { composite: [{ tracecontext: undefined }] },
+    const config: ConfigurationModel = {
+      propagator: { composite: [{ tracecontext: null }] },
     };
-    assert.deepStrictEqual(
-      getPropagatorFromConfiguration(
-        config as unknown as ConfigurationModel
-      )?.fields(),
-      ['traceparent', 'tracestate']
-    );
+    assert.deepStrictEqual(getPropagatorFromConfiguration(config)?.fields(), [
+      'traceparent',
+      'tracestate',
+    ]);
   });
 
   it('should return the selected propagators when multiple are in the list', () => {
-    const config = {
+    const config: ConfigurationModel = {
       propagator: {
         composite: [
-          { tracecontext: undefined },
-          { baggage: undefined },
-          { b3: undefined },
-          { b3multi: undefined },
-          { jaeger: undefined },
+          { tracecontext: null },
+          { baggage: null },
+          { b3: null },
+          { b3multi: null },
+          { jaeger: null },
         ],
       },
     };
-    assert.deepStrictEqual(
-      getPropagatorFromConfiguration(
-        config as unknown as ConfigurationModel
-      )?.fields(),
-      [
-        'traceparent',
-        'tracestate',
-        'baggage',
-        'b3',
-        'x-b3-traceid',
-        'x-b3-spanid',
-        'x-b3-flags',
-        'x-b3-sampled',
-        'x-b3-parentspanid',
-        'uber-trace-id',
-      ]
-    );
+    assert.deepStrictEqual(getPropagatorFromConfiguration(config)?.fields(), [
+      'traceparent',
+      'tracestate',
+      'baggage',
+      'b3',
+      'x-b3-traceid',
+      'x-b3-spanid',
+      'x-b3-flags',
+      'x-b3-sampled',
+      'x-b3-parentspanid',
+      'uber-trace-id',
+    ]);
   });
 
   it('should return null and warn if propagators are unknown', () => {
     const warnStub = sinon.stub(diag, 'warn');
-    const config = {
+    const config: ConfigurationModel = {
       propagator: {
-        composite: [
-          { my: undefined },
-          { unknown: undefined },
-          { propagators: undefined },
-        ],
+        composite: [{ my: null }, { unknown: null }, { propagators: null }],
       },
     };
-    assert.deepStrictEqual(
-      getPropagatorFromConfiguration(config as unknown as ConfigurationModel),
-      null
-    );
+    assert.deepStrictEqual(getPropagatorFromConfiguration(config), null);
     sinon.assert.calledWithExactly(
       warnStub,
       'Propagator "my" requested through configuration is unavailable.'
@@ -198,16 +184,13 @@ describe('getPropagatorFromConfigFactory', function () {
   });
 
   it('should return null if only "none" is selected', () => {
-    const config = {
+    const config: ConfigurationModel = {
       propagator: {
-        composite: [{ none: undefined }],
+        composite: [{ none: null }],
       },
     };
 
-    assert.deepStrictEqual(
-      getPropagatorFromConfiguration(config as unknown as ConfigurationModel),
-      null
-    );
+    assert.deepStrictEqual(getPropagatorFromConfiguration(config), null);
   });
 });
 

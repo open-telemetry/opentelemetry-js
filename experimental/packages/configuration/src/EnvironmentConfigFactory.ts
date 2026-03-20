@@ -24,70 +24,23 @@ import type {
   ExporterDefaultHistogramAggregation,
   ExporterTemporalityPreference,
 } from './generated/types';
-import { ExemplarFilter, SeverityNumber } from './generated/types';
+import { ExemplarFilter } from './generated/types';
+import type { SeverityNumber } from './generated/types';
 import { diag } from '@opentelemetry/api';
-import { getGrpcTlsConfig, getHttpTlsConfig } from './utils';
+import {
+  getGrpcTlsConfig,
+  getHttpTlsConfig,
+  initializeDefaultConfiguration,
+  initializeDefaultTracerProviderConfiguration,
+  initializeDefaultMeterProviderConfiguration,
+  initializeDefaultLoggerProviderConfiguration,
+} from './utils';
 
 type ExperimentalResourceDetector = NonNullable<
   NonNullable<
     NonNullable<ConfigurationModel['resource']>['detection/development']
   >['detectors']
 >[number];
-
-export function initializeDefaultConfiguration(): ConfigurationModel {
-  return {
-    disabled: false,
-    log_level: SeverityNumber.Info,
-    resource: {},
-    attribute_limits: {
-      attribute_count_limit: 128,
-    },
-  };
-}
-
-export function initializeDefaultTracerProviderConfiguration(): NonNullable<
-  ConfigurationModel['tracer_provider']
-> {
-  return {
-    processors: [],
-    limits: {
-      attribute_count_limit: 128,
-      event_count_limit: 128,
-      link_count_limit: 128,
-      event_attribute_count_limit: 128,
-      link_attribute_count_limit: 128,
-    },
-    sampler: {
-      parent_based: {
-        root: { always_on: undefined },
-        remote_parent_sampled: { always_on: undefined },
-        remote_parent_not_sampled: { always_off: undefined },
-        local_parent_sampled: { always_on: undefined },
-        local_parent_not_sampled: { always_off: undefined },
-      },
-    },
-  };
-}
-
-export function initializeDefaultMeterProviderConfiguration(): NonNullable<
-  ConfigurationModel['meter_provider']
-> {
-  return {
-    readers: [],
-    views: [],
-    exemplar_filter: ExemplarFilter.TraceBased,
-  };
-}
-
-export function initializeDefaultLoggerProviderConfiguration(): NonNullable<
-  ConfigurationModel['logger_provider']
-> {
-  return {
-    processors: [],
-    limits: { attribute_count_limit: 128 },
-    'logger_configurator/development': {},
-  };
-}
 
 /**
  * EnvironmentConfigProvider provides a configuration based on environment variables.
@@ -98,10 +51,7 @@ export class EnvironmentConfigFactory implements ConfigFactory {
   constructor() {
     this._config = initializeDefaultConfiguration();
 
-    const sdkDisabled = getBooleanFromEnv('OTEL_SDK_DISABLED');
-    if (sdkDisabled !== undefined) {
-      this._config.disabled = sdkDisabled;
-    }
+    this._config.disabled = getBooleanFromEnv('OTEL_SDK_DISABLED');
 
     const logLevelString = getStringFromEnv('OTEL_LOG_LEVEL');
     if (logLevelString) {
