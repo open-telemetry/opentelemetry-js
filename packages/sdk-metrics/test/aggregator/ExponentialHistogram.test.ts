@@ -552,8 +552,8 @@ describe('ExponentialHistogramAccumulation', () => {
       const acc = new ExponentialHistogramAccumulation(
         [0, 0],
         4,
-        true,
-        5
+        5,
+        true
       );
       acc.record(1);
       assert.strictEqual(acc.scale, 5);

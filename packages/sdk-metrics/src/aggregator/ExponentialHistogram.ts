@@ -70,8 +70,8 @@ export class ExponentialHistogramAccumulation implements Accumulation {
   constructor(
     startTime: HrTime,
     maxSize = DEFAULT_MAX_SIZE,
-    recordMinMax = true,
     maxScale = DEFAULT_MAX_SCALE,
+    recordMinMax = true,
     sum = 0,
     count = 0,
     zeroCount = 0,
@@ -296,8 +296,8 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     return new ExponentialHistogramAccumulation(
       this.startTime,
       this._maxSize,
-      this._recordMinMax,
       this._maxScale,
+      this._recordMinMax,
       this._sum,
       this._count,
       this._zeroCount,
@@ -558,8 +558,8 @@ export class ExponentialHistogramAggregator
     return new ExponentialHistogramAccumulation(
       startTime,
       this._maxSize,
-      this._recordMinMax,
-      this._maxScale
+      this._maxScale,
+      this._recordMinMax
     );
   }
 
