@@ -6,7 +6,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { LocalStorageSessionStore } from '../src/LocalStorageSessionStore';
-import { Session } from '../src/types/Session';
+import type { Session } from '../src/types/Session';
 
 describe('LocalStorageSessionStore', () => {
   let store: LocalStorageSessionStore;

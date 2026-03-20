@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ExportResult } from '@opentelemetry/core';
-import { InMemorySpanExporter, ReadableSpan } from '../../../src';
+import type { ExportResult } from '@opentelemetry/core';
+import type { ReadableSpan } from '../../../src';
+import { InMemorySpanExporter } from '../../../src';
 
 /**
  * A test-only exporter that delays during export to mimic a real exporter.

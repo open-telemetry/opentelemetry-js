@@ -11,7 +11,8 @@ import type {
   SeverityNumber,
 } from '@opentelemetry/api-logs';
 import * as api from '@opentelemetry/api';
-import { timeInputToHrTime, InstrumentationScope } from '@opentelemetry/core';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import { timeInputToHrTime } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import {
   ATTR_EXCEPTION_MESSAGE,
@@ -21,7 +22,7 @@ import {
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
 import { isLogAttributeValue } from './utils/validation';
-import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
+import type { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 
 export class LogRecordImpl implements ReadableLogRecord {
   readonly hrTime: api.HrTime;
@@ -34,7 +35,8 @@ export class LogRecordImpl implements ReadableLogRecord {
   private _severityNumber?: SeverityNumber;
   private _body?: LogBody;
   private _eventName?: string;
-  private totalAttributesCount: number = 0;
+  private _attributesCount: number = 0;
+  private _droppedAttributesCount: number = 0;
 
   private _isReadonly: boolean = false;
   private readonly _logRecordLimits: Required<LogRecordLimits>;
@@ -80,7 +82,7 @@ export class LogRecordImpl implements ReadableLogRecord {
   }
 
   get droppedAttributesCount(): number {
-    return this.totalAttributesCount - Object.keys(this.attributes).length;
+    return this._droppedAttributesCount;
   }
 
   constructor(
@@ -135,19 +137,25 @@ export class LogRecordImpl implements ReadableLogRecord {
       api.diag.warn(`Invalid attribute value set for key: ${key}`);
       return this;
     }
-    this.totalAttributesCount += 1;
+    const isNewKey = !Object.prototype.hasOwnProperty.call(
+      this.attributes,
+      key
+    );
     if (
-      Object.keys(this.attributes).length >=
-        this._logRecordLimits.attributeCountLimit &&
-      !Object.prototype.hasOwnProperty.call(this.attributes, key)
+      isNewKey &&
+      this._attributesCount >= this._logRecordLimits.attributeCountLimit
     ) {
-      // This logic is to create drop message at most once per LogRecord to prevent excessive logging.
-      if (this.droppedAttributesCount === 1) {
+      this._droppedAttributesCount++;
+      // Only warn once per LogRecord to avoid log spam
+      if (this._droppedAttributesCount === 1) {
         api.diag.warn('Dropping extra attributes.');
       }
       return this;
     }
     this.attributes[key] = this._truncateToSize(value);
+    if (isNewKey) {
+      this._attributesCount++;
+    }
     return this;
   }
 

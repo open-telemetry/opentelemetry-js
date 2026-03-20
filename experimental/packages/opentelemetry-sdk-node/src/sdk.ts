@@ -5,49 +5,46 @@
 
 import { metrics, trace, diag, DiagConsoleLogger } from '@opentelemetry/api';
 import { logs } from '@opentelemetry/api-logs';
-import {
-  Instrumentation,
-  registerInstrumentations,
-} from '@opentelemetry/instrumentation';
+import type { Instrumentation } from '@opentelemetry/instrumentation';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
+import type {
+  Resource,
+  ResourceDetectionConfig,
+  ResourceDetector,
+} from '@opentelemetry/resources';
 import {
   defaultResource,
   detectResources,
   envDetector,
   hostDetector,
-  Resource,
   processDetector,
-  ResourceDetectionConfig,
-  ResourceDetector,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
-import {
+import type {
   LogRecordProcessor,
+  LogRecordExporter,
+} from '@opentelemetry/sdk-logs';
+import {
   LoggerProvider,
   ConsoleLogRecordExporter,
-  LogRecordExporter,
   SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
 import { PrometheusExporter as PrometheusMetricExporter } from '@opentelemetry/exporter-prometheus';
+import type { IMetricReader, ViewOptions } from '@opentelemetry/sdk-metrics';
 import {
   MeterProvider,
-  IMetricReader,
-  ViewOptions,
   ConsoleMetricExporter,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
-import {
-  BatchSpanProcessor,
-  SpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
-import {
-  NodeTracerConfig,
-  NodeTracerProvider,
-} from '@opentelemetry/sdk-trace-node';
+import type { SpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
+import type { NodeTracerConfig } from '@opentelemetry/sdk-trace-node';
+import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
-import { NodeSDKConfiguration } from './types';
+import type { NodeSDKConfiguration } from './types';
 import {
   getBooleanFromEnv,
   getStringFromEnv,

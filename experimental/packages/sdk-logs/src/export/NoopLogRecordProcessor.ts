@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context } from '@opentelemetry/api';
-import { LogRecordProcessor } from '../LogRecordProcessor';
-import { ReadableLogRecord } from './ReadableLogRecord';
+import type { Context } from '@opentelemetry/api';
+import type { LogRecordProcessor } from '../LogRecordProcessor';
+import type { ReadableLogRecord } from './ReadableLogRecord';
 
 export class NoopLogRecordProcessor implements LogRecordProcessor {
   forceFlush(): Promise<void> {

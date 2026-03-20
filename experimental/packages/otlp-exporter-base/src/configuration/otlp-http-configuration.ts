@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { OtlpSharedConfiguration } from './shared-configuration';
 import {
   getSharedConfigurationDefaults,
   mergeOtlpSharedConfigurationWithDefaults,
-  OtlpSharedConfiguration,
 } from './shared-configuration';
 import { validateAndNormalizeHeaders } from '../util';
 

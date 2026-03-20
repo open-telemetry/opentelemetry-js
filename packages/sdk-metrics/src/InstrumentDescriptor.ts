@@ -3,15 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  MetricAdvice,
-  MetricOptions,
-  ValueType,
-  diag,
-} from '@opentelemetry/api';
-import { View } from './view/View';
+import type { MetricAdvice, MetricOptions } from '@opentelemetry/api';
+import { ValueType, diag } from '@opentelemetry/api';
+import type { View } from './view/View';
 import { equalsCaseInsensitive } from './utils';
-import { InstrumentType, MetricDescriptor } from './export/MetricData';
+import type { InstrumentType, MetricDescriptor } from './export/MetricData';
 
 /**
  * An internal interface describing the instrument.

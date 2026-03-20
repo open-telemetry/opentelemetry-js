@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Attributes } from '@opentelemetry/api';
-import { InstrumentationScope } from '@opentelemetry/core';
+import type { Attributes } from '@opentelemetry/api';
+import type { InstrumentationScope } from '@opentelemetry/core';
 
 export type Maybe<T> = T | undefined;
 

@@ -8,7 +8,7 @@ import * as assert from 'assert';
 import { SumAggregator } from '../../src/aggregator';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { DataPointType } from '../../src/export/MetricData';
-import { MetricCollectorHandle } from '../../src/state/MetricCollector';
+import type { MetricCollectorHandle } from '../../src/state/MetricCollector';
 import { AsyncMetricStorage } from '../../src/state/AsyncMetricStorage';
 import { createNoopAttributesProcessor } from '../../src/view/AttributesProcessor';
 import { ObservableRegistry } from '../../src/state/ObservableRegistry';
@@ -19,7 +19,7 @@ import {
   ObservableCallbackDelegate,
 } from '../util';
 import { ObservableInstrument } from '../../src/Instruments';
-import { HrTime } from '@opentelemetry/api';
+import type { HrTime } from '@opentelemetry/api';
 
 const deltaCollector: MetricCollectorHandle = {
   selectAggregationTemporality: () => AggregationTemporality.DELTA,

@@ -7,7 +7,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
 import * as process from 'process';
-import { OtlpSharedConfiguration } from '../../../src';
+import type { OtlpSharedConfiguration } from '../../../src';
 import { getSharedConfigurationFromEnvironment } from '../../../src/index-node-http';
 
 export function testSharedConfigurationFromEnvironment(

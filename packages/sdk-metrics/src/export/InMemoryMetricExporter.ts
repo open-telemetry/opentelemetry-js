@@ -4,10 +4,10 @@
  */
 
 import { ExportResultCode } from '@opentelemetry/core';
-import { ExportResult } from '@opentelemetry/core';
-import { AggregationTemporality } from './AggregationTemporality';
-import { InstrumentType, ResourceMetrics } from './MetricData';
-import { PushMetricExporter } from './MetricExporter';
+import type { ExportResult } from '@opentelemetry/core';
+import type { AggregationTemporality } from './AggregationTemporality';
+import type { InstrumentType, ResourceMetrics } from './MetricData';
+import type { PushMetricExporter } from './MetricExporter';
 
 /**
  * In-memory Metrics Exporter is a Push Metric Exporter

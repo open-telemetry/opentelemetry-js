@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { TraceState } from '../trace_state';
+import type { TraceState } from '../trace_state';
 import { TraceStateImpl } from './tracestate-impl';
 
 /**

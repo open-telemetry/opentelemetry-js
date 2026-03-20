@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
+import type { OTLPGRPCExporterConfigNode } from '@opentelemetry/otlp-grpc-exporter-base';
 import {
   convertLegacyOtlpGrpcOptions,
   createOtlpGrpcExportDelegate,
-  OTLPGRPCExporterConfigNode,
 } from '@opentelemetry/otlp-grpc-exporter-base';
 import { ProtobufTraceSerializer } from '@opentelemetry/otlp-transformer';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';

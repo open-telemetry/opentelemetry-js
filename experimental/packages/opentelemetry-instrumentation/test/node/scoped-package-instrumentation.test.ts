@@ -5,9 +5,9 @@
 
 import * as assert from 'assert';
 
+import type { InstrumentationConfig } from '../../src';
 import {
   InstrumentationBase,
-  InstrumentationConfig,
   InstrumentationNodeModuleDefinition,
   InstrumentationNodeModuleFile,
 } from '../../src';

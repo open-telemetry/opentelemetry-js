@@ -4,7 +4,7 @@
  */
 import * as assert from 'assert';
 import { HttpInstrumentation } from '../../src/http';
-import { AddressInfo } from 'net';
+import type { AddressInfo } from 'net';
 import * as nock from 'nock';
 import * as sinon from 'sinon';
 import { httpRequest } from '../utils/httpRequest';
@@ -15,11 +15,8 @@ instrumentation.enable();
 instrumentation.disable();
 
 import * as http from 'http';
-import {
-  trace,
-  TracerProvider,
-  INVALID_SPAN_CONTEXT,
-} from '@opentelemetry/api';
+import type { TracerProvider } from '@opentelemetry/api';
+import { trace, INVALID_SPAN_CONTEXT } from '@opentelemetry/api';
 
 describe('HttpInstrumentation', () => {
   let server: http.Server;

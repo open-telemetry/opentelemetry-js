@@ -4,15 +4,18 @@
  */
 
 import * as oc from '@opencensus/core';
-import { Attributes, HrTime, ValueType, diag } from '@opentelemetry/api';
-import {
-  AggregationTemporality,
+import type { Attributes, HrTime } from '@opentelemetry/api';
+import { ValueType, diag } from '@opentelemetry/api';
+import type {
   DataPoint,
-  DataPointType,
   GaugeMetricData,
   HistogramMetricData,
   MetricData,
   SumMetricData,
+} from '@opentelemetry/sdk-metrics';
+import {
+  AggregationTemporality,
+  DataPointType,
 } from '@opentelemetry/sdk-metrics';
 
 type BaseMetric = Omit<MetricData, 'dataPoints' | 'dataPointType'>;

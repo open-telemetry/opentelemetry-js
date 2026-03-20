@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context, ROOT_CONTEXT } from '@opentelemetry/api';
+import type { Context } from '@opentelemetry/api';
+import { ROOT_CONTEXT } from '@opentelemetry/api';
 import { AsyncLocalStorage } from 'async_hooks';
 import { AbstractAsyncHooksContextManager } from './AbstractAsyncHooksContextManager';
 

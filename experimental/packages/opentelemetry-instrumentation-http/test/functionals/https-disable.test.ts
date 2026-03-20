@@ -17,11 +17,8 @@ instrumentation.disable();
 
 import * as https from 'https';
 import { httpsRequest } from '../utils/httpsRequest';
-import {
-  INVALID_SPAN_CONTEXT,
-  trace,
-  TracerProvider,
-} from '@opentelemetry/api';
+import type { TracerProvider } from '@opentelemetry/api';
+import { INVALID_SPAN_CONTEXT, trace } from '@opentelemetry/api';
 
 describe('HttpsInstrumentation', () => {
   let server: https.Server;

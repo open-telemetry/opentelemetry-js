@@ -3,16 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { Span as ISpan } from '@opentelemetry/api';
 import {
   SpanStatusCode,
   context,
   propagation,
-  Span as ISpan,
   SpanKind,
   trace,
 } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
-import { ContextManager } from '@opentelemetry/api';
+import type { ContextManager } from '@opentelemetry/api';
 import {
   BasicTracerProvider,
   InMemorySpanExporter,

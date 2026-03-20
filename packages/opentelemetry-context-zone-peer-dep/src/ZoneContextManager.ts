@@ -4,8 +4,9 @@
  */
 
 /// <reference types="zone.js" />
-import { Context, ContextManager, ROOT_CONTEXT } from '@opentelemetry/api';
-import { TargetWithEvents } from './types';
+import type { Context, ContextManager } from '@opentelemetry/api';
+import { ROOT_CONTEXT } from '@opentelemetry/api';
+import type { TargetWithEvents } from './types';
 import { isListenerObject } from './util';
 
 /* Key name to be used to save a context reference in Zone */
@@ -25,19 +26,6 @@ export class ZoneContextManager implements ContextManager {
    * whether the context manager is enabled or not
    */
   private _enabled = false;
-
-  /**
-   * Helps to create a unique name for the zones - part of zone name
-   */
-  private _zoneCounter = 0;
-
-  /**
-   * Returns the active context from certain zone name
-   * @param activeZone
-   */
-  private _activeContextFromZone(activeZone: Zone | undefined): Context {
-    return (activeZone && activeZone.get(ZONE_CONTEXT_KEY)) || ROOT_CONTEXT;
-  }
 
   /**
    * @param context A context (span) to be executed within target function
@@ -88,15 +76,6 @@ export class ZoneContextManager implements ContextManager {
   }
 
   /**
-   * Creates a new unique zone name
-   */
-  private _createZoneName() {
-    this._zoneCounter++;
-    const random = Math.random();
-    return `${this._zoneCounter}-${random}`;
-  }
-
-  /**
    * Creates a new zone
    * @param zoneName zone name
    * @param context A context (span) to be bind with Zone
@@ -108,13 +87,6 @@ export class ZoneContextManager implements ContextManager {
         [ZONE_CONTEXT_KEY]: context,
       },
     });
-  }
-
-  /**
-   * Returns the active zone
-   */
-  private _getActiveZone(): Zone | undefined {
-    return Zone.current;
   }
 
   /**
@@ -173,17 +145,10 @@ export class ZoneContextManager implements ContextManager {
    * Returns the active context
    */
   active(): Context {
-    if (!this._enabled) {
+    if (!this._enabled || !Zone.current) {
       return ROOT_CONTEXT;
     }
-    const activeZone = this._getActiveZone();
-
-    const active = this._activeContextFromZone(activeZone);
-    if (active) {
-      return active;
-    }
-
-    return ROOT_CONTEXT;
+    return Zone.current.get(ZONE_CONTEXT_KEY) || ROOT_CONTEXT;
   }
 
   /**
@@ -193,10 +158,6 @@ export class ZoneContextManager implements ContextManager {
    *  the provided context will be used as the active context for the duration of the call.
    */
   bind<T>(context: Context, target: T | TargetWithEvents): T {
-    // if no specific context to propagate is given, we use the current one
-    if (context === undefined) {
-      context = this.active();
-    }
     if (typeof target === 'function') {
       return this._bindFunction(context, target);
     } else if (isListenerObject(target)) {
@@ -236,10 +197,10 @@ export class ZoneContextManager implements ContextManager {
     thisArg?: ThisParameterType<F>,
     ...args: A
   ): ReturnType<F> {
-    const zoneName = this._createZoneName();
-
-    const newZone = this._createZone(zoneName, context);
-
-    return newZone.run(fn, thisArg, args);
+    let zoneName = 'otel:with';
+    if (fn.name) {
+      zoneName += `:${fn.name}`;
+    }
+    return this._createZone(zoneName, context).run(fn, thisArg, args);
   }
 }

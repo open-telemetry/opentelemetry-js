@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ExportResult } from '@opentelemetry/core';
+import type { ExportResult } from '@opentelemetry/core';
+import type { ReadableSpan, SpanProcessor } from '../../../src';
 import {
   BasicTracerProvider,
   InMemorySpanExporter,
-  ReadableSpan,
-  SpanProcessor,
   AlwaysOnSampler,
 } from '../../../src';
 import { Tracer } from '../../../src/Tracer';

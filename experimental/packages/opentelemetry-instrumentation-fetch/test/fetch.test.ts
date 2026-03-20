@@ -26,11 +26,11 @@ import {
 } from '@opentelemetry/sdk-trace-web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
+import type {
   FetchCustomAttributeFunction,
-  FetchInstrumentation,
   FetchInstrumentationConfig,
 } from '../src';
+import { FetchInstrumentation } from '../src';
 import { AttributeNames } from '../src/enums/AttributeNames';
 import {
   ATTR_HTTP_HOST,

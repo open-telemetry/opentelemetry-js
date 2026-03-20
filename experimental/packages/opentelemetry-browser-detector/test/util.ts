@@ -2,10 +2,10 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { Suite } from 'mocha';
+import type { Suite } from 'mocha';
 import * as assert from 'assert';
 import { BROWSER_ATTRIBUTES } from '../src/types';
-import { DetectedResource } from '@opentelemetry/resources';
+import type { DetectedResource } from '@opentelemetry/resources';
 
 const isBrowser =
   typeof window !== 'undefined' && typeof document !== 'undefined';

@@ -3,18 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   Context,
   SpanContext,
   TextMapGetter,
   TextMapPropagator,
   TextMapSetter,
-  propagation,
-  trace,
-  TraceFlags,
 } from '@opentelemetry/api';
+import { propagation, trace, TraceFlags } from '@opentelemetry/api';
 import { isTracingSuppressed } from '@opentelemetry/core';
-import { JaegerPropagatorConfig } from './types';
+import type { JaegerPropagatorConfig } from './types';
 
 export const UBER_TRACE_ID_HEADER = 'uber-trace-id';
 export const UBER_BAGGAGE_HEADER_PREFIX = 'uberctx';

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Session } from './types/Session';
-import { SessionStore } from './types/SessionStore';
+import type { Session } from './types/Session';
+import type { SessionStore } from './types/SessionStore';
 
 const SESSION_STORAGE_KEY = 'opentelemetry-session';
 

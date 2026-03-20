@@ -2,7 +2,7 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import {
+import type {
   Fixed64,
   IInstrumentationScope,
   IKeyValue,

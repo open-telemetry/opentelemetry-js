@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context } from '@opentelemetry/api';
-import {
+import type { Context } from '@opentelemetry/api';
+import type {
   SpanProcessor,
   Span,
   ReadableSpan,
 } from '@opentelemetry/sdk-trace-base';
 import { ATTR_SESSION_ID } from './semconv';
-import { SessionProvider } from './types/SessionProvider';
+import type { SessionProvider } from './types/SessionProvider';
 
 /**
  * SessionSpanProcessor is a {@link SpanProcessor} that adds the session.id attribute

@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ExactPredicate, Predicate } from './Predicate';
+import type { Predicate } from './Predicate';
+import { ExactPredicate } from './Predicate';
 
 export interface MeterSelectorCriteria {
   name?: string;

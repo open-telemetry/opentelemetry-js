@@ -11,12 +11,12 @@ import {
   trace,
 } from '@opentelemetry/api';
 import type { Attributes, HrTime, Span } from '@opentelemetry/api';
+import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import {
   SemconvStability,
   semconvStabilityFromStr,
   isWrapped,
   InstrumentationBase,
-  InstrumentationConfig,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import * as core from '@opentelemetry/core';
@@ -41,7 +41,7 @@ import {
   ATTR_SERVER_PORT,
   ATTR_URL_FULL,
 } from '@opentelemetry/semantic-conventions';
-import { FetchError, FetchResponse, SpanData } from './types';
+import type { FetchError, FetchResponse, SpanData } from './types';
 import {
   getFetchBodyLength,
   normalizeHttpRequestMethod,

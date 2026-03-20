@@ -4,24 +4,22 @@
  */
 
 import { getStringFromEnv } from '@opentelemetry/core';
-import {
-  AggregationTemporality,
+import type {
   AggregationTemporalitySelector,
-  InstrumentType,
   PushMetricExporter,
   ResourceMetrics,
   AggregationSelector,
   AggregationOption,
-  AggregationType,
 } from '@opentelemetry/sdk-metrics';
 import {
-  AggregationTemporalityPreference,
-  OTLPMetricExporterOptions,
-} from './OTLPMetricExporterOptions';
-import {
-  IOtlpExportDelegate,
-  OTLPExporterBase,
-} from '@opentelemetry/otlp-exporter-base';
+  AggregationTemporality,
+  InstrumentType,
+  AggregationType,
+} from '@opentelemetry/sdk-metrics';
+import type { OTLPMetricExporterOptions } from './OTLPMetricExporterOptions';
+import { AggregationTemporalityPreference } from './OTLPMetricExporterOptions';
+import type { IOtlpExportDelegate } from '@opentelemetry/otlp-exporter-base';
+import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import { diag } from '@opentelemetry/api';
 
 export const CumulativeTemporalitySelector: AggregationTemporalitySelector =

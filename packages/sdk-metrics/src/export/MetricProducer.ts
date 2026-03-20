@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { CollectionResult } from './MetricData';
+import type { CollectionResult } from './MetricData';
 
 export interface MetricCollectOptions {
   /**

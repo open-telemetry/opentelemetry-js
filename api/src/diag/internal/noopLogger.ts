@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { DiagLogger } from '../types';
+import type { DiagLogger } from '../types';
 
 function noopLogFunction() {}
 

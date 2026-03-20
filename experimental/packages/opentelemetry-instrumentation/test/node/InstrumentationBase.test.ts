@@ -7,9 +7,9 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as path from 'path';
 import { InstrumentationBase } from '../../src';
+import type { InstrumentationModuleDefinition } from '../../src/';
 import {
   InstrumentationNodeModuleDefinition,
-  InstrumentationModuleDefinition,
   InstrumentationNodeModuleFile,
 } from '../../src/';
 

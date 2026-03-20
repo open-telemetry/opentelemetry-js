@@ -6,10 +6,10 @@
 import * as oc from '@opencensus/core';
 import { ValueType } from '@opentelemetry/api';
 import { emptyResource } from '@opentelemetry/resources';
+import type { SumMetricData } from '@opentelemetry/sdk-metrics';
 import {
   AggregationTemporality,
   DataPointType,
-  SumMetricData,
 } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
