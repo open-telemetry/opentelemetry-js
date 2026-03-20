@@ -25,7 +25,7 @@ import {
 } from '../src/EnvironmentConfigFactory';
 import { parseConfigFile } from '../src/FileConfigFactory';
 
-const defaultConfig = {
+const defaultConfig: ConfigurationModel = {
   disabled: false,
   log_level: 'info',
   resource: {},
@@ -35,7 +35,9 @@ const defaultConfig = {
   propagator: {},
 };
 
-const defaultTracerProvider = {
+const defaultTracerProvider: NonNullable<
+  ConfigurationModel['tracer_provider']
+> = {
   processors: [],
   limits: {
     attribute_count_limit: 128,
@@ -732,7 +734,7 @@ describe('ConfigFactory', function () {
 
     it('should return config with disable true', function () {
       process.env.OTEL_SDK_DISABLED = 'true';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         disabled: true,
       };
