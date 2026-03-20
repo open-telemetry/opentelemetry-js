@@ -82,6 +82,7 @@ export function parseConfigFile(): ConfigurationModel {
 
   applyConfigDefaults(data);
   mergeAttributesList(data);
+  applyOtlpHttpEncodingDefaults(data);
 
   // Warn for providers with empty processors/readers
   if (data.tracer_provider?.processors?.length === 0) {
@@ -98,6 +99,56 @@ export function parseConfigFile(): ConfigurationModel {
   }
 
   return data;
+}
+
+/**
+ * Apply default encoding ('protobuf') to all otlp_http exporters in the config
+ * where encoding was not explicitly specified. Matches the original FileConfigFactory
+ * behavior: any OTLP HTTP exporter defaults to protobuf unless 'json' is set.
+ */
+function applyOtlpHttpEncodingDefaults(data: ConfigurationModel): void {
+  const applyToOtlpHttp = (obj: Record<string, unknown> | undefined) => {
+    if (!obj) return;
+    if (obj['encoding'] == null) {
+      obj['encoding'] = 'protobuf';
+    }
+  };
+
+  for (const processor of data.tracer_provider?.processors ?? []) {
+    const p = processor as Record<string, unknown>;
+    const batch = p['batch'] as Record<string, unknown> | undefined;
+    const simple = p['simple'] as Record<string, unknown> | undefined;
+    const exporter = (
+      (batch ?? simple) as Record<string, unknown> | undefined
+    )?.['exporter'] as Record<string, unknown> | undefined;
+    applyToOtlpHttp(
+      exporter?.['otlp_http'] as Record<string, unknown> | undefined
+    );
+  }
+
+  const readers = data.meter_provider?.readers ?? [];
+  for (const reader of readers) {
+    const r = reader as Record<string, unknown>;
+    const periodic = r['periodic'] as Record<string, unknown> | undefined;
+    const exporter = periodic?.['exporter'] as
+      | Record<string, unknown>
+      | undefined;
+    applyToOtlpHttp(
+      exporter?.['otlp_http'] as Record<string, unknown> | undefined
+    );
+  }
+
+  for (const processor of data.logger_provider?.processors ?? []) {
+    const p = processor as Record<string, unknown>;
+    const batch = p['batch'] as Record<string, unknown> | undefined;
+    const simple = p['simple'] as Record<string, unknown> | undefined;
+    const exporter = (
+      (batch ?? simple) as Record<string, unknown> | undefined
+    )?.['exporter'] as Record<string, unknown> | undefined;
+    applyToOtlpHttp(
+      exporter?.['otlp_http'] as Record<string, unknown> | undefined
+    );
+  }
 }
 
 /**
