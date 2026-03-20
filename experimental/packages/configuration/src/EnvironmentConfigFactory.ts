@@ -11,6 +11,7 @@ import {
 } from '@opentelemetry/core';
 import type { ConfigFactory } from './IConfigFactory';
 import type { ConfigurationModel } from './generated/types';
+import { ExemplarFilter, SeverityNumber } from './generated/types';
 import { diag } from '@opentelemetry/api';
 import { getGrpcTlsConfig, getHttpTlsConfig } from './utils';
 
@@ -20,6 +21,61 @@ type ExperimentalResourceDetector = NonNullable<
   >['detectors']
 >[number];
 
+export function initializeDefaultConfiguration(): ConfigurationModel {
+  return {
+    disabled: false,
+    log_level: SeverityNumber.Info,
+    resource: {},
+    attribute_limits: {
+      attribute_count_limit: 128,
+    },
+  };
+}
+
+export function initializeDefaultTracerProviderConfiguration(): NonNullable<
+  ConfigurationModel['tracer_provider']
+> {
+  return {
+    processors: [],
+    limits: {
+      attribute_count_limit: 128,
+      event_count_limit: 128,
+      link_count_limit: 128,
+      event_attribute_count_limit: 128,
+      link_attribute_count_limit: 128,
+    },
+    sampler: {
+      parent_based: {
+        root: { always_on: undefined },
+        remote_parent_sampled: { always_on: undefined },
+        remote_parent_not_sampled: { always_off: undefined },
+        local_parent_sampled: { always_on: undefined },
+        local_parent_not_sampled: { always_off: undefined },
+      },
+    },
+  };
+}
+
+export function initializeDefaultMeterProviderConfiguration(): NonNullable<
+  ConfigurationModel['meter_provider']
+> {
+  return {
+    readers: [],
+    views: [],
+    exemplar_filter: ExemplarFilter.TraceBased,
+  };
+}
+
+export function initializeDefaultLoggerProviderConfiguration(): NonNullable<
+  ConfigurationModel['logger_provider']
+> {
+  return {
+    processors: [],
+    limits: { attribute_count_limit: 128 },
+    'logger_configurator/development': {},
+  };
+}
+
 /**
  * EnvironmentConfigProvider provides a configuration based on environment variables.
  */
@@ -27,14 +83,7 @@ export class EnvironmentConfigFactory implements ConfigFactory {
   private _config: ConfigurationModel;
 
   constructor() {
-    this._config = {
-      disabled: false,
-      log_level: 'info',
-      resource: {},
-      attribute_limits: {
-        attribute_count_limit: 128,
-      },
-    } as unknown as ConfigurationModel;
+    this._config = initializeDefaultConfiguration();
 
     const sdkDisabled = getBooleanFromEnv('OTEL_SDK_DISABLED');
     if (sdkDisabled !== undefined) {
@@ -244,25 +293,7 @@ export function setTracerProvider(config: ConfigurationModel): void {
     );
     return;
   }
-  config.tracer_provider = {
-    processors: [],
-    limits: {
-      attribute_count_limit: 128,
-      event_count_limit: 128,
-      link_count_limit: 128,
-      event_attribute_count_limit: 128,
-      link_attribute_count_limit: 128,
-    },
-    sampler: {
-      parent_based: {
-        root: { always_on: undefined },
-        remote_parent_sampled: { always_on: undefined },
-        remote_parent_not_sampled: { always_off: undefined },
-        local_parent_sampled: { always_on: undefined },
-        local_parent_not_sampled: { always_off: undefined },
-      },
-    },
-  } as unknown as NonNullable<ConfigurationModel['tracer_provider']>;
+  config.tracer_provider = initializeDefaultTracerProviderConfiguration();
 
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT'
@@ -416,11 +447,7 @@ export function setMeterProvider(config: ConfigurationModel): void {
     );
     return;
   }
-  config.meter_provider = {
-    readers: [],
-    views: [],
-    exemplar_filter: 'trace_based',
-  };
+  config.meter_provider = initializeDefaultMeterProviderConfiguration();
 
   const readerPeriodic: Record<string, unknown> = { exporter: {} };
   const interval = getNumberFromEnv('OTEL_METRIC_EXPORT_INTERVAL') ?? 60000;
@@ -554,9 +581,12 @@ export function setMeterProvider(config: ConfigurationModel): void {
   }
 
   const rawExemplarFilter =
-    getStringFromEnv('OTEL_METRICS_EXEMPLAR_FILTER') ?? 'trace_based';
+    getStringFromEnv('OTEL_METRICS_EXEMPLAR_FILTER') ??
+    ExemplarFilter.TraceBased;
   const exemplarFilter =
-    rawExemplarFilter === 'default' ? 'trace_based' : rawExemplarFilter;
+    rawExemplarFilter === 'default'
+      ? ExemplarFilter.TraceBased
+      : rawExemplarFilter;
   if (exemplarFilter) {
     config.meter_provider.exemplar_filter = exemplarFilter as never;
   }
@@ -575,11 +605,7 @@ export function setLoggerProvider(config: ConfigurationModel): void {
     );
     return;
   }
-  config.logger_provider = {
-    processors: [],
-    limits: { attribute_count_limit: 128 },
-    'logger_configurator/development': {},
-  } as unknown as NonNullable<ConfigurationModel['logger_provider']>;
+  config.logger_provider = initializeDefaultLoggerProviderConfiguration();
 
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT'

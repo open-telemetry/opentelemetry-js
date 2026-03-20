@@ -4,6 +4,7 @@
  */
 
 import { getStringFromEnv } from '@opentelemetry/core';
+import { initializeDefaultConfiguration } from './EnvironmentConfigFactory';
 import type { ConfigFactory } from './IConfigFactory';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
@@ -109,15 +110,18 @@ export function parseConfigFile(): ConfigurationModel {
  * The parsed model faithfully mirrors what was in the YAML.
  */
 function applyConfigDefaults(data: ConfigurationModel): void {
+  const defaults = initializeDefaultConfiguration();
   const d = data as Record<string, unknown>;
-  if (d['disabled'] == null) d['disabled'] = false;
-  if (d['log_level'] == null) d['log_level'] = 'info';
+  const dd = defaults as Record<string, unknown>;
+  if (d['disabled'] == null) d['disabled'] = dd['disabled'];
+  if (d['log_level'] == null) d['log_level'] = dd['log_level'];
   if (d['attribute_limits'] == null) {
-    d['attribute_limits'] = { attribute_count_limit: 128 };
+    d['attribute_limits'] = dd['attribute_limits'];
   } else {
     const limits = d['attribute_limits'] as Record<string, unknown>;
+    const defaultLimits = dd['attribute_limits'] as Record<string, unknown>;
     if (limits['attribute_count_limit'] == null) {
-      limits['attribute_count_limit'] = 128;
+      limits['attribute_count_limit'] = defaultLimits['attribute_count_limit'];
     }
   }
 }
