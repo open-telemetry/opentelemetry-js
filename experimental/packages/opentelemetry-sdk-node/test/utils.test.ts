@@ -18,9 +18,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
 import type {
-  Configuration,
-  InstrumentTypeConfigModel,
   ConfigurationModel,
+  InstrumentTypeConfigModel,
 } from '@opentelemetry/configuration';
 import {
   envDetector,
@@ -131,7 +130,7 @@ describe('getPropagatorFromConfigFactory', function () {
     };
     assert.deepStrictEqual(
       getPropagatorFromConfiguration(
-        config as unknown as Configuration
+        config as unknown as ConfigurationModel
       )?.fields(),
       ['traceparent', 'tracestate']
     );
@@ -151,7 +150,7 @@ describe('getPropagatorFromConfigFactory', function () {
     };
     assert.deepStrictEqual(
       getPropagatorFromConfiguration(
-        config as unknown as Configuration
+        config as unknown as ConfigurationModel
       )?.fields(),
       [
         'traceparent',
@@ -180,7 +179,7 @@ describe('getPropagatorFromConfigFactory', function () {
       },
     };
     assert.deepStrictEqual(
-      getPropagatorFromConfiguration(config as unknown as Configuration),
+      getPropagatorFromConfiguration(config as unknown as ConfigurationModel),
       null
     );
     sinon.assert.calledWithExactly(
@@ -206,7 +205,7 @@ describe('getPropagatorFromConfigFactory', function () {
     };
 
     assert.deepStrictEqual(
-      getPropagatorFromConfiguration(config as unknown as Configuration),
+      getPropagatorFromConfiguration(config as unknown as ConfigurationModel),
       null
     );
   });

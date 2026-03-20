@@ -5,7 +5,7 @@
 
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
-import type { Configuration } from '../src';
+import type { ConfigurationModel } from '../src';
 import {
   ExemplarFilter,
   ExporterDefaultHistogramAggregation,
@@ -929,7 +929,7 @@ describe('ConfigFactory', function () {
       const configFactory = createConfigFactory();
       const config = configFactory.getConfigModel();
       assert.deepStrictEqual(config, defaultConfig);
-      const p = config.propagator as Configuration['propagator'];
+      const p = config.propagator as ConfigurationModel['propagator'];
       assert.strictEqual(p?.composite, undefined);
       assert.strictEqual(p?.composite_list, undefined);
     });
@@ -2068,11 +2068,11 @@ describe('ConfigFactory', function () {
     });
 
     it('checks to keep good code coverage', function () {
-      let config: Configuration = {} as Configuration;
+      let config: ConfigurationModel = {} as ConfigurationModel;
       setResources(config);
       assert.deepStrictEqual(config, { resource: {} });
 
-      config = {} as Configuration;
+      config = {} as ConfigurationModel;
       process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '5';
       setAttributeLimits(config);
       assert.deepStrictEqual(config, {
@@ -2082,7 +2082,7 @@ describe('ConfigFactory', function () {
         },
       });
 
-      config = {} as Configuration;
+      config = {} as ConfigurationModel;
       delete process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
       process.env.OTEL_ATTRIBUTE_COUNT_LIMIT = '7';
       setAttributeLimits(config);
@@ -2092,11 +2092,11 @@ describe('ConfigFactory', function () {
         },
       });
 
-      config = {} as Configuration;
+      config = {} as ConfigurationModel;
       setPropagators(config);
       assert.deepStrictEqual(config, { propagator: {} });
 
-      config = {} as Configuration;
+      config = {} as ConfigurationModel;
       process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE =
         'low_memory';
       process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'always_off';
@@ -2128,7 +2128,7 @@ describe('ConfigFactory', function () {
       };
       assert.deepStrictEqual(config.meter_provider, expectedMeterProvider);
 
-      config = {} as Configuration;
+      config = {} as ConfigurationModel;
       process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'default';
       process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
         'default';

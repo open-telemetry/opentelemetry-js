@@ -4,7 +4,7 @@
  */
 import type {
   ConfigFactory,
-  Configuration,
+  ConfigurationModel,
 } from '@opentelemetry/configuration';
 import { createConfigFactory } from '@opentelemetry/configuration';
 import {
@@ -96,7 +96,10 @@ const NOOP_SDK = {
 /**
  * Interpret configuration model and return SDK components.
  */
-function create(config: Configuration, sdkOptions: SDKOptions): SDKComponents {
+function create(
+  config: ConfigurationModel,
+  sdkOptions: SDKOptions
+): SDKComponents {
   const defaultContextManager = new AsyncLocalStorageContextManager();
   defaultContextManager.enable();
   const components: SDKComponents = {
@@ -137,7 +140,7 @@ function create(config: Configuration, sdkOptions: SDKOptions): SDKComponents {
 }
 
 export function setupResource(
-  config: Configuration,
+  config: ConfigurationModel,
   sdkOptions: SDKOptions
 ): Resource {
   let resource: Resource =

@@ -10,16 +10,16 @@ import * as yaml from 'yaml';
 import { diag } from '@opentelemetry/api';
 import { envVariableSubstitution } from './utils';
 import { ConfigurationSchema } from './generated/types';
-import type { Configuration } from './generated/types';
+import type { ConfigurationModel } from './generated/types';
 
 export class FileConfigFactory implements ConfigFactory {
-  private _config: Configuration;
+  private _config: ConfigurationModel;
 
   constructor() {
     this._config = parseConfigFile();
   }
 
-  getConfigModel(): Configuration {
+  getConfigModel(): ConfigurationModel {
     return this._config;
   }
 }
@@ -41,7 +41,7 @@ export function hasValidConfigFile(): boolean {
   return false;
 }
 
-export function parseConfigFile(): Configuration {
+export function parseConfigFile(): ConfigurationModel {
   const supportedFileVersions = ['1.0-rc.3'];
   const configFile = getStringFromEnv('OTEL_CONFIG_FILE') || '';
   const file = fs.readFileSync(configFile, 'utf8');
@@ -57,7 +57,7 @@ export function parseConfigFile(): Configuration {
     diag.warn(
       `Unsupported File Format: ${substituted?.file_format}. It must be one of the following: ${supportedFileVersions}`
     );
-    return {} as Configuration;
+    return {} as ConfigurationModel;
   }
 
   // Preprocess: convert null to [] for provider processors/readers so schema
@@ -74,7 +74,7 @@ export function parseConfigFile(): Configuration {
     );
   }
 
-  const data = result.data as Configuration;
+  const data = result.data as ConfigurationModel;
 
   // Strip file_format from output — it's a meta-field, not a config value
   delete (data as Record<string, unknown>)['file_format'];
@@ -108,7 +108,7 @@ export function parseConfigFile(): Configuration {
  * SDK init code that reads resource attributes — not a config-parser concern.
  * The parsed model faithfully mirrors what was in the YAML.
  */
-function applyConfigDefaults(data: Configuration): void {
+function applyConfigDefaults(data: ConfigurationModel): void {
   const d = data as Record<string, unknown>;
   if (d['disabled'] == null) d['disabled'] = false;
   if (d['log_level'] == null) d['log_level'] = 'info';

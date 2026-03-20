@@ -47,7 +47,6 @@ import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 import type {
-  Configuration,
   ConfigurationModel,
   LogRecordExporterConfiguration,
   InstrumentTypeConfigModel,
@@ -88,7 +87,7 @@ const RESOURCE_DETECTOR_PROCESS = 'process';
 const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
 
 export function getResourceFromConfiguration(
-  config: Configuration
+  config: ConfigurationModel
 ): Resource | undefined {
   if (!config.resource) {
     return undefined;
@@ -157,7 +156,7 @@ export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
 }
 
 export function getResourceDetectorsFromConfiguration(
-  config: Configuration
+  config: ConfigurationModel
 ): Array<ResourceDetector> {
   const detectors = config.resource?.['detection/development']?.detectors ?? [];
 
@@ -316,7 +315,7 @@ export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
  * Get a propagator as defined by configuration model from configuration
  */
 export function getPropagatorFromConfiguration(
-  config: Configuration
+  config: ConfigurationModel
 ): TextMapPropagator | null | undefined {
   const propagatorsValue = getKeyListFromObjectArray(
     config.propagator?.composite
@@ -652,7 +651,7 @@ export function getLogRecordExporter(
 }
 
 export function getLogRecordProcessorsFromConfiguration(
-  config: Configuration
+  config: ConfigurationModel
 ): LogRecordProcessor[] | undefined {
   const logRecordProcessors: LogRecordProcessor[] = [];
   config.logger_provider?.processors?.forEach(processor => {

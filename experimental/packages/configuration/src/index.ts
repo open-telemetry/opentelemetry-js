@@ -7,11 +7,11 @@ import type { z } from 'zod';
 import type { LogRecordExporterSchema } from './generated/opentelemetry-configuration';
 
 export type { ConfigFactory } from './IConfigFactory';
-export type { Configuration } from './generated/types';
+export type { ConfigurationModel } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';
 
-/** @deprecated Use Configuration instead. Kept for backward compatibility. */
-export type { Configuration as ConfigurationModel } from './generated/types';
+/** @deprecated Use ConfigurationModel instead. Kept for backward compatibility. */
+export type { ConfigurationModel as Configuration } from './generated/types';
 export type { InstrumentType as InstrumentTypeConfigModel } from './generated/types';
 export type { Aggregation as AggregationConfigModel } from './generated/types';
 export type { PeriodicMetricReader as PeriodicMetricReaderConfigModel } from './generated/types';

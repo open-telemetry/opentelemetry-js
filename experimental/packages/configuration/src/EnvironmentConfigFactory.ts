@@ -10,13 +10,13 @@ import {
   getNumberFromEnv,
 } from '@opentelemetry/core';
 import type { ConfigFactory } from './IConfigFactory';
-import type { Configuration } from './generated/types';
+import type { ConfigurationModel } from './generated/types';
 import { diag } from '@opentelemetry/api';
 import { getGrpcTlsConfig, getHttpTlsConfig } from './utils';
 
 type ExperimentalResourceDetector = NonNullable<
   NonNullable<
-    NonNullable<Configuration['resource']>['detection/development']
+    NonNullable<ConfigurationModel['resource']>['detection/development']
   >['detectors']
 >[number];
 
@@ -24,7 +24,7 @@ type ExperimentalResourceDetector = NonNullable<
  * EnvironmentConfigProvider provides a configuration based on environment variables.
  */
 export class EnvironmentConfigFactory implements ConfigFactory {
-  private _config: Configuration;
+  private _config: ConfigurationModel;
 
   constructor() {
     this._config = {
@@ -34,7 +34,7 @@ export class EnvironmentConfigFactory implements ConfigFactory {
       attribute_limits: {
         attribute_count_limit: 128,
       },
-    } as unknown as Configuration;
+    } as unknown as ConfigurationModel;
 
     const sdkDisabled = getBooleanFromEnv('OTEL_SDK_DISABLED');
     if (sdkDisabled !== undefined) {
@@ -57,12 +57,12 @@ export class EnvironmentConfigFactory implements ConfigFactory {
     setLoggerProvider(this._config);
   }
 
-  getConfigModel(): Configuration {
+  getConfigModel(): ConfigurationModel {
     return this._config;
   }
 }
 
-export function setResources(config: Configuration): void {
+export function setResources(config: ConfigurationModel): void {
   if (config.resource == null) {
     config.resource = {};
   }
@@ -127,7 +127,7 @@ export function setResources(config: Configuration): void {
   }
 }
 
-export function setAttributeLimits(config: Configuration): void {
+export function setAttributeLimits(config: ConfigurationModel): void {
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT'
   );
@@ -149,7 +149,7 @@ export function setAttributeLimits(config: Configuration): void {
   }
 }
 
-export function setPropagators(config: Configuration): void {
+export function setPropagators(config: ConfigurationModel): void {
   if (config.propagator == null) {
     config.propagator = {};
   }
@@ -166,7 +166,7 @@ export function setPropagators(config: Configuration): void {
   }
 }
 
-export function setSampler(config: Configuration): void {
+export function setSampler(config: ConfigurationModel): void {
   const sampler = getStringFromEnv('OTEL_TRACES_SAMPLER');
   const arg = getStringFromEnv('OTEL_TRACES_SAMPLER_ARG');
 
@@ -181,7 +181,7 @@ export function setSampler(config: Configuration): void {
       config.tracer_provider.sampler = {
         always_on: {},
       } as unknown as NonNullable<
-        NonNullable<Configuration['tracer_provider']>['sampler']
+        NonNullable<ConfigurationModel['tracer_provider']>['sampler']
       >;
       break;
 
@@ -189,7 +189,7 @@ export function setSampler(config: Configuration): void {
       config.tracer_provider.sampler = {
         always_off: {},
       } as unknown as NonNullable<
-        NonNullable<Configuration['tracer_provider']>['sampler']
+        NonNullable<ConfigurationModel['tracer_provider']>['sampler']
       >;
       break;
 
@@ -197,7 +197,7 @@ export function setSampler(config: Configuration): void {
       config.tracer_provider.sampler = {
         trace_id_ratio_based: { ratio },
       } as unknown as NonNullable<
-        NonNullable<Configuration['tracer_provider']>['sampler']
+        NonNullable<ConfigurationModel['tracer_provider']>['sampler']
       >;
       break;
 
@@ -205,7 +205,7 @@ export function setSampler(config: Configuration): void {
       config.tracer_provider.sampler = {
         parent_based: { root: { always_on: {} } },
       } as unknown as NonNullable<
-        NonNullable<Configuration['tracer_provider']>['sampler']
+        NonNullable<ConfigurationModel['tracer_provider']>['sampler']
       >;
       break;
 
@@ -213,7 +213,7 @@ export function setSampler(config: Configuration): void {
       config.tracer_provider.sampler = {
         parent_based: { root: { always_off: {} } },
       } as unknown as NonNullable<
-        NonNullable<Configuration['tracer_provider']>['sampler']
+        NonNullable<ConfigurationModel['tracer_provider']>['sampler']
       >;
       break;
 
@@ -221,7 +221,7 @@ export function setSampler(config: Configuration): void {
       config.tracer_provider.sampler = {
         parent_based: { root: { trace_id_ratio_based: { ratio } } },
       } as unknown as NonNullable<
-        NonNullable<Configuration['tracer_provider']>['sampler']
+        NonNullable<ConfigurationModel['tracer_provider']>['sampler']
       >;
       break;
 
@@ -231,7 +231,7 @@ export function setSampler(config: Configuration): void {
   }
 }
 
-export function setTracerProvider(config: Configuration): void {
+export function setTracerProvider(config: ConfigurationModel): void {
   const exportersType = Array.from(
     new Set(getStringListFromEnv('OTEL_TRACES_EXPORTER'))
   );
@@ -262,7 +262,7 @@ export function setTracerProvider(config: Configuration): void {
         local_parent_not_sampled: { always_off: undefined },
       },
     },
-  } as unknown as NonNullable<Configuration['tracer_provider']>;
+  } as unknown as NonNullable<ConfigurationModel['tracer_provider']>;
 
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT'
@@ -403,7 +403,7 @@ export function setTracerProvider(config: Configuration): void {
   }
 }
 
-export function setMeterProvider(config: Configuration): void {
+export function setMeterProvider(config: ConfigurationModel): void {
   const exportersType = Array.from(
     new Set(getStringListFromEnv('OTEL_METRICS_EXPORTER'))
   );
@@ -562,7 +562,7 @@ export function setMeterProvider(config: Configuration): void {
   }
 }
 
-export function setLoggerProvider(config: Configuration): void {
+export function setLoggerProvider(config: ConfigurationModel): void {
   const exportersType = Array.from(
     new Set(getStringListFromEnv('OTEL_LOGS_EXPORTER'))
   );
@@ -579,7 +579,7 @@ export function setLoggerProvider(config: Configuration): void {
     processors: [],
     limits: { attribute_count_limit: 128 },
     'logger_configurator/development': {},
-  } as unknown as NonNullable<Configuration['logger_provider']>;
+  } as unknown as NonNullable<ConfigurationModel['logger_provider']>;
 
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT'
