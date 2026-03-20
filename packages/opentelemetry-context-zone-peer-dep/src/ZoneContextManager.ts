@@ -80,11 +80,18 @@ export class ZoneContextManager implements ContextManager {
    * @param zoneName zone name
    * @param context A context (span) to be bind with Zone
    */
-  private _createZone(zoneName: string, context: unknown): Zone {
+private _createZone(zoneName: string, context: unknown): Zone {
     return Zone.current.fork({
       name: zoneName,
       properties: {
         [ZONE_CONTEXT_KEY]: context,
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      onCancelTask(parentZoneDelegate: any, currentZone: any, targetZone: any, task: any): any {
+        if (task.state === 'notScheduled' || task.state === 'running') {
+          return task;
+        }
+        return parentZoneDelegate.cancelTask(targetZone, task);
       },
     });
   }
