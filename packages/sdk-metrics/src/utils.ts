@@ -3,22 +3,59 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Attributes } from '@opentelemetry/api';
+import type { Attributes, AttributeValue } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 
 export type Maybe<T> = T | undefined;
+
+function stringifyValue (value: AttributeValue | null | undefined): string {
+  if (typeof value === 'string') {
+    return `"${value}"`;
+  }
+  if (value === undefined) {
+    return 'u';
+  }
+  if (value === null) {
+    return 'n';
+  }
+  if (value === true) {
+    return 't';
+  }
+  if (value === false) {
+    return 'f';
+  }
+  return value.toString();
+}
+
+function stringifyAttribue (value: AttributeValue | undefined): string {
+  if (!Array.isArray(value)) {
+    return stringifyValue(value);
+  }
+  let str = 'A';
+  str += stringifyValue(value[0]);
+  for (let i = 1, len = value.length; i < len; i++) {
+    str += `,${stringifyValue(value[i])}`;
+  }
+  return str;
+}
 
 /**
  * Converting the unordered attributes into unique identifier string.
  * @param attributes user provided unordered Attributes.
  */
-export function hashAttributes(attributes: Attributes): string {
-  let keys = Object.keys(attributes);
-  if (keys.length === 0) return '';
+export function hashAttributes (attributes: Attributes): string {
+  const keys = Object.keys(attributes);
+  const length = keys.length;
+  if (length === 0) return '';
 
   // Return a string that is stable on key orders.
-  keys = keys.sort();
-  return JSON.stringify(keys.map(key => [key, attributes[key]]));
+  keys.sort();
+
+  let str = `${keys[0]}=${stringifyAttribue(attributes[keys[0]])}`;
+  for (let i = 1; i < length; i++) {
+    str += `;${keys[i]}=${stringifyAttribue(attributes[keys[i]])}`;
+  }
+  return str;
 }
 
 /**

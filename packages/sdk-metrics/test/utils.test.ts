@@ -36,17 +36,23 @@ describe('utils', () => {
   describe('hashAttributes', () => {
     it('should hash all types of attribute values', () => {
       const cases: [Attributes, string][] = [
-        [{ string: 'bar' }, '[["string","bar"]]'],
-        [{ number: 1 }, '[["number",1]]'],
-        [{ false: false, true: true }, '[["false",false],["true",true]]'],
+        [{ string: 'bar' }, 'string="bar"'],
+        [{ number: 1 }, 'number=1'],
+        [{ number: '1' }, 'number="1"'],
+        [{ false: false, true: true }, 'false=f;true=t'],
+        [{ false: 'false', true: 'true' }, 'false="false";true="true"'],
         [
           { arrayOfString: ['foo', 'bar'] },
-          '[["arrayOfString",["foo","bar"]]]',
+          'arrayOfString=A"foo","bar"',
         ],
-        [{ arrayOfNumber: [1, 2] }, '[["arrayOfNumber",[1,2]]]'],
-        [{ arrayOfBool: [false, true] }, '[["arrayOfBool",[false,true]]]'],
-        [{ undefined: undefined }, '[["undefined",null]]'],
-        [{ arrayOfHoles: [undefined, null] }, '[["arrayOfHoles",[null,null]]]'],
+        [{ arrayOfNumber: [1, 2] }, 'arrayOfNumber=A1,2'],
+        [{ arrayOfBool: [false, true] }, 'arrayOfBool=Af,t'],
+        [{ undefined: undefined }, 'undefined=u'],
+        [{ arrayOfHoles: [undefined, null] }, 'arrayOfHoles=Au,n'],
+
+        // Should hash to the same value regardless of key order
+        [{ a: 'a', b: 'b' }, 'a="a";b="b"'],
+        [{ b: 'b', a: 'a' }, 'a="a";b="b"'],
       ];
 
       for (const [idx, it] of cases.entries()) {
