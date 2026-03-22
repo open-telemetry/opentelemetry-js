@@ -86,8 +86,12 @@ private _createZone(zoneName: string, context: unknown): Zone {
       properties: {
         [ZONE_CONTEXT_KEY]: context,
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onCancelTask(parentZoneDelegate: any, currentZone: any, targetZone: any, task: any): any {
+      onCancelTask(
+        parentZoneDelegate: ZoneDelegate,
+        currentZone: Zone,
+        targetZone: Zone,
+        task: Task
+      ): Task {
         if (task.state === 'notScheduled' || task.state === 'running') {
           return task;
         }
