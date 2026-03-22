@@ -167,6 +167,7 @@ describe('ZoneContextManager', () => {
       });
       assert.strictEqual(contextManager.active(), window);
     });
+
     it('should correctly return the contexts for 3 parallel actions', () => {
       const rootSpan = ROOT_CONTEXT.setValue(key1, 'root');
       contextManager.with(rootSpan, () => {
@@ -349,6 +350,76 @@ describe('ZoneContextManager', () => {
           composed: true,
         })
       );
+    });
+  });
+
+  describe('onCancelTask guard (fix for issue #6259)', () => {
+    it('should not propagate cancelTask for notScheduled tasks', () => {
+      contextManager.with(ROOT_CONTEXT, () => {
+        const timerId = setTimeout(() => {}, 100);
+        clearTimeout(timerId);
+        assert.doesNotThrow(() => {
+          clearTimeout(timerId);
+        });
+      });
+    });
+
+    it('should not loop when clearTimeout is called on an already-cancelled timer', done => {
+      contextManager.with(ROOT_CONTEXT, () => {
+        const timerId = setTimeout(() => {
+          assert.fail('Timer should have been cancelled');
+        }, 100);
+        clearTimeout(timerId);
+        clearTimeout(timerId);
+        clock.tick(200);
+        done();
+      });
+    });
+
+    it('should preserve context propagation after redundant clearTimeout', done => {
+      const ctx = ROOT_CONTEXT.setValue(key1, 'test-value');
+      contextManager.with(ctx, () => {
+        const timerId = setTimeout(() => {}, 50);
+        clearTimeout(timerId);
+        clearTimeout(timerId);
+        setTimeout(() => {
+          assert.strictEqual(
+            contextManager.active().getValue(key1),
+            'test-value'
+          );
+          done();
+        }, 10);
+        clock.tick(10);
+      });
+    });
+
+    it('should not loop when clearInterval is called on an already-cancelled interval', done => {
+      contextManager.with(ROOT_CONTEXT, () => {
+        const intervalId = setInterval(() => {}, 100);
+        clearInterval(intervalId);
+        assert.doesNotThrow(() => {
+          clearInterval(intervalId);
+        });
+        clock.tick(200);
+        done();
+      });
+    });
+
+    it('should not loop with redundant clearTimeout in nested context', done => {
+      const ctx1 = ROOT_CONTEXT.setValue(key1, 'outer');
+      const ctx2 = ROOT_CONTEXT.setValue(key1, 'inner');
+      contextManager.with(ctx1, () => {
+        contextManager.with(ctx2, () => {
+          const timerId = setTimeout(() => {}, 100);
+          clearTimeout(timerId);
+          assert.doesNotThrow(() => {
+            clearTimeout(timerId);
+          });
+          assert.strictEqual(contextManager.active().getValue(key1), 'inner');
+        });
+        assert.strictEqual(contextManager.active().getValue(key1), 'outer');
+        done();
+      });
     });
   });
 });
