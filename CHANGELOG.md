@@ -20,6 +20,9 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(sdk-trace-base): derive internal `SpanOptions` from API type to prevent drift [#6478](https://github.com/open-telemetry/opentelemetry-js/pull/6478) @overbalance
 * fix(span): enforce `attributePerEventCountLimit`, `attributePerLinkCountLimit`, `linkCountLimit`, and `attributeValueLengthLimit` for event/link attributes [#6479](https://github.com/open-telemetry/opentelemetry-js/pull/6479) @overbalance
 
+* fix(context-zone): guard `onCancelTask` against terminal-state tasks to prevent infinite loop with rc-align (Ant Design) in React 16 dev mode [#6512](https://github.com/open-telemetry/opentelemetry-js/pull/6512) @Renegade2345
+
+
 ### :books: Documentation
 
 ### :house: Internal

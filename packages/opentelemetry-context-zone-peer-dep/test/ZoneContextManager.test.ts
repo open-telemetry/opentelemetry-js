@@ -376,6 +376,19 @@ describe('ZoneContextManager', () => {
       });
     });
 
+    it('should invoke onCancelTask hook when a real scheduled task is cancelled', done => {
+      const ctx = ROOT_CONTEXT.setValue(key1, 'hook-test');
+      clock.restore(); // disable fake timers for this test
+      contextManager.with(ctx, () => {
+        const timerId = setTimeout(() => {}, 500);
+        clearTimeout(timerId);
+        clearTimeout(timerId);
+        assert.strictEqual(contextManager.active().getValue(key1), 'hook-test');
+        clock = sinon.useFakeTimers(); // restore fake timers
+        done();
+      });
+    });
+
     it('should preserve context propagation after redundant clearTimeout', done => {
       const ctx = ROOT_CONTEXT.setValue(key1, 'test-value');
       contextManager.with(ctx, () => {
