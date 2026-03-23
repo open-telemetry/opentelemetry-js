@@ -177,8 +177,10 @@ export class SpanImpl implements Span {
   }
 
   setAttributes(attributes: Attributes): this {
-    for (const [k, v] of Object.entries(attributes)) {
-      this.setAttribute(k, v);
+    for (const key in attributes) {
+      if (Object.prototype.hasOwnProperty.call(attributes, key)) {
+        this.setAttribute(key, attributes[key]);
+      }
     }
     return this;
   }
