@@ -354,7 +354,11 @@ describe('ZoneContextManager', () => {
   });
 
   describe('onCancelTask guard (fix for issue #6259)', () => {
-    it('should not propagate cancelTask for notScheduled tasks', () => {
+    it('should not throw when clearTimeout is called twice on the same timer', () => {
+      // The second clearTimeout triggers onCancelTask with a task in 'notScheduled'
+      // state. The guard returns early without delegating to parentZoneDelegate,
+      // preventing Zone.js from invoking its active() fallback which would cause
+      // an infinite loop (see issue #6259).
       contextManager.with(ROOT_CONTEXT, () => {
         const timerId = setTimeout(() => {}, 100);
         clearTimeout(timerId);
