@@ -54,6 +54,32 @@ describe('Span benchmark (browser)', function () {
       .run({ async: true });
   });
 
+  it('create spans (10 attributes w/ setAttributes) (browser)', done => {
+    const suite = new Benchmark.Suite();
+    suite
+      .add('create spans (10 attributes w/ setAttributes) (browser)', () => {
+        const span = tracer.startSpan('span');
+        span.setAttributes({
+          aaaaaaaaaaaaaaaaaaaaaa: 'aaaaaaaaaaaaaaaaaaaa',
+          bbbbbbbbbbbbbbbbbbbb: 'aaaaaaaaaaaaaaaaaaaa',
+          cccccccccccccccccccc: 'aaaaaaaaaaaaaaaaaaaa',
+          dddddddddddddddddddddd: 'aaaaaaaaaaaaaaaaaaaa',
+          eeeeeeeeeeeeeeeeeeeee: 'aaaaaaaaaaaaaaaaaaaa',
+          ffffffffffffffffffff: 'aaaaaaaaaaaaaaaaaaaa',
+          gggggggggggggggggggg: 'aaaaaaaaaaaaaaaaaaaa',
+          hhhhhhhhhhhhhhhhhhhhhh: 'aaaaaaaaaaaaaaaaaaaa',
+          iiiiiiiiiiiiiiiiiiii: 'aaaaaaaaaaaaaaaaaaaa',
+          jjjjjjjjjjjjjjjjjjjj: 'aaaaaaaaaaaaaaaaaaaa',
+        });
+        span.end();
+      })
+      .on('cycle', (event: Benchmark.Event) =>
+        console.log(String(event.target))
+      )
+      .on('complete', () => done())
+      .run({ async: true });
+  });
+
   it('addEvent / addLink (128 attributes, at default per-event/link limit) (browser)', done => {
     const suite = new Benchmark.Suite();
     suite

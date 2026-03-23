@@ -25,6 +25,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :house: Internal
 
 * chore: enforce `import type` for type-only imports via ESLint [#6467](https://github.com/open-telemetry/opentelemetry-js/pull/6467) @overbalance
+* perf(sdk-trace-base): avoid Object.entries in Span.setAttributes [#6514](https://github.com/open-telemetry/opentelemetry-js/pull/6514) @daniellockyer
 * perf(sdk-trace-base): optimize `Span.{addEvent,addLink}` performance [#6516](https://github.com/open-telemetry/opentelemetry-js/pull/6516) @daniellockyer
 
 ## 2.6.0
