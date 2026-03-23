@@ -501,11 +501,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           });
         }
 
-        function onSuccess(
-          span: Span,
-          resolve: (value: Response | PromiseLike<Response>) => void,
-          response: Response
-        ): void {
+        function onSuccess(span: Span, response: Response): Response {
           let proxiedResponse: Response | null = null;
 
           try {
@@ -554,46 +550,44 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
               // some older browsers don't have .body implemented
               endSpanOnSuccess(span, response);
             }
-          } finally {
-            resolve(proxiedResponse ?? response);
+          } catch {
+            // Silently catch setup errors. The span may not be fully
+            // decorated, but the caller still receives a valid response.
+            // This matches the previous behaviour where resolve() was
+            // guaranteed inside a finally block.
           }
+          return proxiedResponse ?? response;
         }
 
-        function onError(
-          span: Span,
-          reject: (reason?: unknown) => void,
-          error: FetchError
-        ) {
+        function onError(span: Span, error: FetchError): never {
           try {
             endSpanOnError(span, error);
-          } finally {
-            reject(error);
+          } catch {
+            // endSpanOnError failed; the span may not be fully
+            // decorated but we still propagate the original error.
           }
+          // eslint-disable-next-line @typescript-eslint/only-throw-error
+          throw error;
         }
 
-        return new Promise((resolve, reject) => {
-          return context.with(
-            trace.setSpan(context.active(), createdSpan),
-            () => {
-              // Call request hook before injection so hooks cannot tamper with propagation headers.
-              // Also, this means the hook will see `options.headers` in the same type as passed in,
-              // rather than as a `Headers` instance set by `_addHeaders()`.
-              plugin._callRequestHook(createdSpan, options);
-              plugin._addHeaders(options, url);
-              plugin._tasksCount++;
+        return context.with(
+          trace.setSpan(context.active(), createdSpan),
+          () => {
+            plugin._callRequestHook(createdSpan, options);
+            plugin._addHeaders(options, url);
+            plugin._tasksCount++;
 
-              return original
-                .apply(
-                  self,
-                  options instanceof Request ? [options] : [url, options]
-                )
-                .then(
-                  onSuccess.bind(self, createdSpan, resolve),
-                  onError.bind(self, createdSpan, reject)
-                );
-            }
-          );
-        });
+            return original
+              .apply(
+                self,
+                options instanceof Request ? [options] : [url, options]
+              )
+              .then(
+                onSuccess.bind(self, createdSpan),
+                onError.bind(self, createdSpan)
+              );
+          }
+        );
       };
     };
   }
