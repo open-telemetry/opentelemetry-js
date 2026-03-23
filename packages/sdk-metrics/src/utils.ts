@@ -8,7 +8,7 @@ import type { InstrumentationScope } from '@opentelemetry/core';
 
 export type Maybe<T> = T | undefined;
 
-function stringifyValue (value: AttributeValue | null | undefined): string {
+function stringifyValue(value: AttributeValue | null | undefined): string {
   if (typeof value === 'string') {
     return `"${value}"`;
   }
@@ -27,7 +27,7 @@ function stringifyValue (value: AttributeValue | null | undefined): string {
   return value.toString();
 }
 
-function stringifyAttribue (value: AttributeValue | undefined): string {
+function stringifyAttribue(value: AttributeValue | undefined): string {
   if (!Array.isArray(value)) {
     return stringifyValue(value);
   }
@@ -43,7 +43,7 @@ function stringifyAttribue (value: AttributeValue | undefined): string {
  * Converting the unordered attributes into unique identifier string.
  * @param attributes user provided unordered Attributes.
  */
-export function hashAttributes (attributes: Attributes): string {
+export function hashAttributes(attributes: Attributes): string {
   const keys = Object.keys(attributes);
   const length = keys.length;
   if (length === 0) return '';

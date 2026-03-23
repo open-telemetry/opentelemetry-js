@@ -41,10 +41,7 @@ describe('utils', () => {
         [{ number: '1' }, 'number="1"'],
         [{ false: false, true: true }, 'false=f;true=t'],
         [{ false: 'false', true: 'true' }, 'false="false";true="true"'],
-        [
-          { arrayOfString: ['foo', 'bar'] },
-          'arrayOfString=A"foo","bar"',
-        ],
+        [{ arrayOfString: ['foo', 'bar'] }, 'arrayOfString=A"foo","bar"'],
         [{ arrayOfNumber: [1, 2] }, 'arrayOfNumber=A1,2'],
         [{ arrayOfBool: [false, true] }, 'arrayOfBool=Af,t'],
         [{ undefined: undefined }, 'undefined=u'],
