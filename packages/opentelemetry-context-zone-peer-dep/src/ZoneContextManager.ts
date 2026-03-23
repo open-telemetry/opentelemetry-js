@@ -80,7 +80,7 @@ export class ZoneContextManager implements ContextManager {
    * @param zoneName zone name
    * @param context A context (span) to be bind with Zone
    */
-private _createZone(zoneName: string, context: unknown): Zone {
+  private _createZone(zoneName: string, context: unknown): Zone {
     return Zone.current.fork({
       name: zoneName,
       properties: {
