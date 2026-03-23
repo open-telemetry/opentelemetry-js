@@ -377,27 +377,6 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   private _patchConstructor(): (original: typeof fetch) => typeof fetch {
     return original => {
       const plugin = this;
-      const readOnlyProps = new Set(['url', 'type', 'redirected']);
-      function createResponseProxy(
-        target: Response,
-        originalResponse: Response
-      ): Response {
-        return new Proxy(target, {
-          get(t, prop, _receiver) {
-            if (typeof prop === 'string' && readOnlyProps.has(prop)) {
-              return Reflect.get(originalResponse, prop);
-            }
-            if (prop === 'clone') {
-              return function clone() {
-                return createResponseProxy(t.clone(), originalResponse);
-              };
-            }
-            // Use target as receiver so getters (e.g. headers) run with correct this and avoid "Illegal invocation"
-            const value = Reflect.get(t, prop, t);
-            return typeof value === 'function' ? value.bind(t) : value;
-          },
-        }) as Response;
-      }
 
       return function patchConstructor(
         this: typeof globalThis,
@@ -459,52 +438,13 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           }
         }
 
-        function withCancelPropagation(
-          body: ReadableStream<Uint8Array> | null,
-          readerClone: ReadableStreamDefaultReader<Uint8Array>
-        ): ReadableStream<Uint8Array> | null {
-          if (!body) return null;
-
-          const reader = body.getReader();
-
-          return new ReadableStream({
-            async pull(controller) {
-              try {
-                const { value, done } = await reader.read();
-                if (done) {
-                  reader.releaseLock();
-                  controller.close();
-                } else {
-                  controller.enqueue(value);
-                }
-              } catch (err) {
-                controller.error(err);
-                reader.cancel(err).catch(_ => {});
-
-                try {
-                  reader.releaseLock();
-                } catch {
-                  // Spec reference:
-                  // https://streams.spec.whatwg.org/#default-reader-release-lock
-                  //
-                  // releaseLock() only throws if called on an invalid reader
-                  // (i.e. reader.[[stream]] is undefined, meaning the lock is already released
-                  // or the reader was never associated). In normal use this cannot happen.
-                  // This catch is defensive only.
-                }
-              }
-            },
-            cancel(reason) {
-              readerClone.cancel(reason).catch(_ => {});
-              return reader.cancel(reason);
-            },
-          });
-        }
-
         function onSuccess(span: Span, response: Response): Response {
-          let proxiedResponse: Response | null = null;
-
           try {
+            // Clone the response and eagerly consume the clone to detect
+            // when the body transfer completes.  The original response is
+            // returned to the caller untouched so that it passes internal
+            // brand-checks required by APIs such as
+            // WebAssembly.compileStreaming.
             // TODO: Switch to a consumer-driven model and drop `resClone`.
             // Keeping eager consumption here to preserve current behavior and avoid breaking existing tests.
             // Context: discussion in PR #5894 → https://github.com/open-telemetry/opentelemetry-js/pull/5894
@@ -512,24 +452,6 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
             const body = resClone.body;
             if (body) {
               const reader = body.getReader();
-              const isNullBodyStatus =
-                // 101 responses and protocol upgrading is handled internally by the browser
-                response.status === 204 ||
-                response.status === 205 ||
-                response.status === 304;
-              const wrappedBody = isNullBodyStatus
-                ? null
-                : withCancelPropagation(response.body, reader);
-
-              const newResponse = new Response(wrappedBody, {
-                status: response.status,
-                statusText: response.statusText,
-                headers: response.headers,
-              });
-
-              // Response url, type, and redirected are read-only properties that can't be set via constructor
-              // Use a Proxy to forward them from the original response and maintain the wrapped body
-              proxiedResponse = createResponseProxy(newResponse, response);
 
               const read = (): void => {
                 reader.read().then(
@@ -553,10 +475,8 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           } catch {
             // Silently catch setup errors. The span may not be fully
             // decorated, but the caller still receives a valid response.
-            // This matches the previous behaviour where resolve() was
-            // guaranteed inside a finally block.
           }
-          return proxiedResponse ?? response;
+          return response;
         }
 
         function onError(span: Span, error: FetchError): never {
