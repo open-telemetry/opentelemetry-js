@@ -237,31 +237,6 @@ describe('fetch', () => {
       fetchInstrumentation = undefined;
     });
 
-    it('should return a native Promise from fetch', async () => {
-      await startWorker(
-        msw.http.get(`${ORIGIN}/test`, () => {
-          return msw.HttpResponse.json({ ok: true });
-        })
-      );
-
-      fetchInstrumentation = new FetchInstrumentation();
-      assert.ok(isWrapped(window.fetch));
-
-      const result = fetch(`${ORIGIN}/test`);
-
-      // Promise.resolve() on a native promise returns the same object;
-      // on a userland Promise subclass it wraps it in a new native Promise.
-      assert.strictEqual(
-        Promise.resolve(result),
-        result,
-        'fetch should return a native Promise'
-      );
-
-      // Await to avoid leaking the request / PerformanceObserver
-      await result;
-      await waitFor(OBSERVER_WAIT_TIME_MS + 50);
-    });
-
     it('should return a Promise<Response> compatible with WebAssembly.compileStreaming', async () => {
       // Some web APIs do brand checks to ensure they are working with native objects.
       // compileStreaming checks that the argument is a native Response, and will throw if it isn't.

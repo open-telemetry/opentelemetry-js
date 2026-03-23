@@ -493,6 +493,9 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         return context.with(
           trace.setSpan(context.active(), createdSpan),
           () => {
+            // Call request hook before injection so hooks cannot tamper with propagation headers.
+            // Also, this means the hook will see `options.headers` in the same type as passed in,
+            // rather than as a `Headers` instance set by `_addHeaders()`.
             plugin._callRequestHook(createdSpan, options);
             plugin._addHeaders(options, url);
             plugin._tasksCount++;
