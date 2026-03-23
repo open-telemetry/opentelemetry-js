@@ -1,5 +1,5 @@
 {
-  "name": "nextjs-16-edge-bundle-test",
+  "name": "bundler-tests-browser-nextjs-16-edge",
   "type": "module",
   "private": true,
   "scripts": {
@@ -7,7 +7,12 @@
     "test:bundle": "npm i && npx tsx next.test.ts"
   },
   "dependencies": {
+    "@opentelemetry/api": "file:../../../api",
+    "@opentelemetry/api-logs": "file:../../../experimental/packages/api-logs",
+    "@opentelemetry/exporter-logs-otlp-http": "file:../../../experimental/packages/exporter-logs-otlp-http",
+    "@opentelemetry/instrumentation": "file:../../../experimental/packages/opentelemetry-instrumentation",
     "@opentelemetry/resources": "file:../../../packages/opentelemetry-resources",
+    "@opentelemetry/sdk-logs": "file:../../../experimental/packages/sdk-logs",
     "next": "^16",
     "react": "^19",
     "react-dom": "^19"

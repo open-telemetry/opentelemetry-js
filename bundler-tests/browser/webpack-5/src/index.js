@@ -1,16 +1,35 @@
-import { setupOpenTelemetry } from './opentelemetry.js';
 import { logs } from '@opentelemetry/api-logs';
+import { diag, DiagConsoleLogger } from '@opentelemetry/api';
+import { InstrumentationBase } from '@opentelemetry/instrumentation';
+import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
+import {
+  LoggerProvider,
+  SimpleLogRecordProcessor,
+} from '@opentelemetry/sdk-logs';
 
-// Setup SDK and register with API, then obtain logger from API.
-setupOpenTelemetry();
-const logger = logs.getLogger('bundle-test-webpack');
-
-console.log('loaded');
-const emitEventButton = document.getElementById('emit-event-button');
-emitEventButton.addEventListener('click', () => {
-  console.log('clicked');
-  logger.emit({
-    body: 'test-event-body',
-    eventName: 'custom.event',
-  });
+diag.setLogger({
+  logger: new DiagConsoleLogger(),
+  options: {
+    logLevel: 'info',
+  },
 });
+
+logs.setGlobalLoggerProvider(
+  new LoggerProvider({
+    processors: [new SimpleLogRecordProcessor(new OTLPLogExporter())],
+  })
+);
+
+const logger = logs.getLogger('bundle-test-webpack');
+logger.emit({
+  body: 'test-event-body',
+  eventName: 'custom.event',
+});
+
+class TestInstrumentation extends InstrumentationBase {
+  init() {
+    return [];
+  }
+}
+
+new TestInstrumentation('test', '0.0.0');
