@@ -380,6 +380,20 @@ describe('ZoneContextManager', () => {
       });
     });
 
+    it('should not propagate cancelTask when task is running', done => {
+      contextManager.with(ROOT_CONTEXT, () => {
+        const timerId = setTimeout(() => {
+          // Explicitly test behavior during execution phase
+          assert.doesNotThrow(() => {
+            clearTimeout(timerId);
+          });
+          done();
+        }, 10);
+
+        clock.tick(10); // ensures callback runs
+      });
+    });
+
     it('should invoke onCancelTask hook when a real scheduled task is cancelled', done => {
       const ctx = ROOT_CONTEXT.setValue(key1, 'hook-test');
       clock.restore(); // disable fake timers for this test
