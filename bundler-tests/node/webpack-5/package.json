@@ -1,9 +1,8 @@
 {
-  "name": "bundler-tests-browser-nextjs-15-edge",
-  "type": "module",
+  "name": "bundler-tests-node-webpack-5",
   "private": true,
+  "type": "module",
   "scripts": {
-    "build": "rm -rf .next && next build",
     "test:bundle": "npm i && node test-bundle.mjs"
   },
   "dependencies": {
@@ -14,17 +13,15 @@
     "@opentelemetry/exporter-metrics-otlp-http": "file:../../../experimental/packages/opentelemetry-exporter-metrics-otlp-http",
     "@opentelemetry/exporter-trace-otlp-http": "file:../../../experimental/packages/exporter-trace-otlp-http",
     "@opentelemetry/instrumentation": "file:../../../experimental/packages/opentelemetry-instrumentation",
-    "@opentelemetry/instrumentation-fetch": "file:../../../experimental/packages/opentelemetry-instrumentation-fetch",
-    "@opentelemetry/instrumentation-xml-http-request": "file:../../../experimental/packages/opentelemetry-instrumentation-xml-http-request",
-    "@opentelemetry/opentelemetry-browser-detector": "file:../../../experimental/packages/opentelemetry-browser-detector",
     "@opentelemetry/propagator-b3": "file:../../../packages/opentelemetry-propagator-b3",
     "@opentelemetry/resources": "file:../../../packages/opentelemetry-resources",
     "@opentelemetry/sdk-logs": "file:../../../experimental/packages/sdk-logs",
     "@opentelemetry/sdk-metrics": "file:../../../packages/sdk-metrics",
-    "@opentelemetry/sdk-trace-base": "file:../../../packages/opentelemetry-sdk-trace-base",
-    "@opentelemetry/sdk-trace-web": "file:../../../packages/opentelemetry-sdk-trace-web",
-    "next": "^15",
-    "react": "^18",
-    "react-dom": "^18"
+    "@opentelemetry/sdk-trace-base": "file:../../../packages/opentelemetry-sdk-trace-base"
+  },
+  "devDependencies": {
+    "@types/webpack": "^5",
+    "webpack": "^5",
+    "webpack-cli": "^6"
   }
 }
