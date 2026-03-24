@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "rm -rf .next && next build",
-    "test:bundle": "npm i && npm run build"
+    "test:bundle": "npm i && node test-bundle.mjs"
   },
   "dependencies": {
     "@opentelemetry/api": "file:../../../api",
