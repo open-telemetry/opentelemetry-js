@@ -8,6 +8,7 @@ export default {
   mode: 'production',
   entry: './src/index.js',
   target: 'web',
+  performance: { hints: false },
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
