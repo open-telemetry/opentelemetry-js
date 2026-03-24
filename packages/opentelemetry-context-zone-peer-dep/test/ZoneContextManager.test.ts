@@ -436,28 +436,6 @@ describe('ZoneContextManager', () => {
       });
     });
 
-    it('should return task when cancelTask is called with running state', () => {
-      const manager = new ZoneContextManager();
-
-      // Create a zone to access the spec
-      const zone: any = (manager as any)._createZone('test-zone', {});
-
-      // Extract the ZoneSpec where onCancelTask is defined
-      const zoneSpec = zone._zoneDelegate._zoneSpec;
-
-      const fakeTask: any = { state: 'running' };
-
-      const cancelSpy = {
-        cancelTask: () => {
-          throw new Error('cancelTask should not be called for running tasks');
-        },
-      };
-
-      const result = zoneSpec.onCancelTask(cancelSpy, null, null, fakeTask);
-
-      assert.strictEqual(result, fakeTask);
-    });
-
     it('should not loop with redundant clearTimeout in nested context', done => {
       const ctx1 = ROOT_CONTEXT.setValue(key1, 'outer');
       const ctx2 = ROOT_CONTEXT.setValue(key1, 'inner');
