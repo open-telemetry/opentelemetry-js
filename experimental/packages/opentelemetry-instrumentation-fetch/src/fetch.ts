@@ -472,9 +472,14 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
               // some older browsers don't have .body implemented
               endSpanOnSuccess(span, response);
             }
-          } catch {
-            // Silently catch setup errors. The span may not be fully
-            // decorated, but the caller still receives a valid response.
+          } catch (error) {
+            // Setup failed (e.g. clone() or getReader() threw).
+            // End the span and clean up so _tasksCount doesn't leak.
+            plugin._diag.error('Failed to read fetch response body', error);
+            plugin._endSpan(span, spanData, {
+              status: 0,
+              url,
+            });
           }
           return response;
         }
@@ -482,9 +487,14 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         function onError(span: Span, error: FetchError): never {
           try {
             endSpanOnError(span, error);
-          } catch {
-            // endSpanOnError failed; the span may not be fully
-            // decorated but we still propagate the original error.
+          } catch (e: unknown) {
+            // endSpanOnError failed — fall back to ending the span
+            // directly so _tasksCount doesn't leak.
+            plugin._diag.error('Failed to end span on fetch error', e);
+            plugin._endSpan(span, spanData, {
+              status: error.status || 0,
+              url,
+            });
           }
           // eslint-disable-next-line @typescript-eslint/only-throw-error
           throw error;
