@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 * fix(api): update diag `consoleLogger` to use original console methods to prevent infinite loop when a console instrumentation is present [#6395](https://github.com/open-telemetry/opentelemetry-js/pull/6395)
 * fix(api): use `Attributes` instead of deprecated `SpanAttributes` in `SpanOptions` [#6478](https://github.com/open-telemetry/opentelemetry-js/pull/6478) @overbalance
 * fix(diag): change types in `DiagComponentLogger` from `any` to `unknown`[#5478](https://github.com/open-telemetry/opentelemetry-js/pull/5478) @loganrosen
+* fix(api): re-introduce fallback chain for global utils [#6523](https://github.com/open-telemetry/opentelemetry-js/pull/6523/) @pichlermarc
 
 ### :books: (Refine Doc)
 
