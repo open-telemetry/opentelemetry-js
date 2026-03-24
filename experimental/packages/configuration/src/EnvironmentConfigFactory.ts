@@ -169,10 +169,7 @@ export function setPropagators(config: ConfigurationModel): void {
   }
 }
 
-export function setSampler(
-  config: ConfigurationModel,
-  env: EnvValues
-): void {
+export function setSampler(config: ConfigurationModel, env: EnvValues): void {
   const sampler = env.OTEL_TRACES_SAMPLER;
   const arg = env.OTEL_TRACES_SAMPLER_ARG;
 
@@ -221,7 +218,10 @@ export function setSampler(
   }
 }
 
-export function setTracerProvider(config: ConfigurationModel, env: EnvValues): void {
+export function setTracerProvider(
+  config: ConfigurationModel,
+  env: EnvValues
+): void {
   const exportersType = Array.from(
     new Set(getStringListFromEnv('OTEL_TRACES_EXPORTER'))
   );

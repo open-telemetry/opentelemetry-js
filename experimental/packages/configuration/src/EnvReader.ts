@@ -4,11 +4,8 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import {
-  getStringFromEnv,
-} from '@opentelemetry/core';
+import { getStringFromEnv } from '@opentelemetry/core';
 import { ENV_DEFS } from './EnvDefinition';
-
 
 /** Base definition shared by all env var types. */
 interface EnvVarBase<T> {
@@ -22,14 +19,14 @@ export interface StringEnvVar extends EnvVarBase<string> {
   allowedValues?: readonly string[];
 }
 
-export type EnvVarDefinition = StringEnvVar
+export type EnvVarDefinition = StringEnvVar;
 
 type ResolvedType<D extends EnvVarDefinition> = D extends StringEnvVar
   ? string | undefined
   : never;
 
 function readStringEnv(def: StringEnvVar): string | undefined {
-  let value = getStringFromEnv(def.key);
+  const value = getStringFromEnv(def.key);
   if (value == null) {
     return def.defaultValue;
   }

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { StringEnvVar } from "./EnvReader";
+import type { StringEnvVar } from './EnvReader';
 
 export enum SamplerType {
   AlwaysOn = 'always_on',
