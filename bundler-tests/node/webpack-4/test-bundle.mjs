@@ -15,13 +15,10 @@ compiler.run((err, stats) => {
   // the test passes while the bug exists and will break when it is fixed, signalling
   // that this block should be removed and warnings should be treated as errors again.
   if (stats.hasWarnings() && !stats.hasErrors()) {
-    if (stats.compilation.warnings.length === 1) {
-      if (
-        stats.compilation.warnings[0].message ===
-        'Critical dependency: require function is used in a way in which dependencies cannot be statically extracted'
-      )
-        process.exit(0);
-    }
+    const expectedMsg =
+      'Critical dependency: require function is used in a way in which dependencies cannot be statically extracted';
+    if (stats.compilation.warnings.every(w => w.message === expectedMsg))
+      process.exit(0);
   }
 
   if (err) {
