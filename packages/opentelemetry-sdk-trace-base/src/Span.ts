@@ -227,19 +227,24 @@ export class SpanImpl implements Span {
 
     const sanitized = sanitizeAttributes(attributesOrStartTime);
     const { attributePerEventCountLimit } = this._spanLimits;
-    const entries = Object.entries(sanitized);
     const attributes: Attributes = {};
     let droppedAttributesCount = 0;
+    let eventAttributesCount = 0;
 
-    for (const [attr, attrVal] of entries) {
+    for (const attr in sanitized) {
+      if (!Object.prototype.hasOwnProperty.call(sanitized, attr)) {
+        continue;
+      }
+      const attrVal = sanitized[attr];
       if (
         attributePerEventCountLimit !== undefined &&
-        Object.keys(attributes).length >= attributePerEventCountLimit
+        eventAttributesCount >= attributePerEventCountLimit
       ) {
         droppedAttributesCount++;
         continue;
       }
       attributes[attr] = this._truncateToSize(attrVal!);
+      eventAttributesCount++;
     }
 
     this.events.push({
@@ -271,23 +276,28 @@ export class SpanImpl implements Span {
 
     const { attributePerLinkCountLimit } = this._spanLimits;
     const sanitized = sanitizeAttributes(link.attributes);
-    const entries = Object.entries(sanitized);
     const attributes: Attributes = {};
     let droppedAttributesCount = 0;
+    let linkAttributesCount = 0;
 
-    for (const [attr, attrVal] of entries) {
+    for (const attr in sanitized) {
+      if (!Object.prototype.hasOwnProperty.call(sanitized, attr)) {
+        continue;
+      }
+      const attrVal = sanitized[attr];
       if (
         attributePerLinkCountLimit !== undefined &&
-        Object.keys(attributes).length >= attributePerLinkCountLimit
+        linkAttributesCount >= attributePerLinkCountLimit
       ) {
         droppedAttributesCount++;
         continue;
       }
       attributes[attr] = this._truncateToSize(attrVal!);
+      linkAttributesCount++;
     }
 
     const processedLink: Link = { context: link.context };
-    if (Object.keys(attributes).length > 0) {
+    if (linkAttributesCount > 0) {
       processedLink.attributes = attributes;
     }
     if (droppedAttributesCount > 0) {
