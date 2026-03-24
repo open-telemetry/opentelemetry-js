@@ -10,6 +10,7 @@
     "@opentelemetry/api-logs": "file:../../../experimental/packages/api-logs",
     "@opentelemetry/exporter-logs-otlp-http": "file:../../../experimental/packages/exporter-logs-otlp-http",
     "@opentelemetry/instrumentation": "file:../../../experimental/packages/opentelemetry-instrumentation",
+    "@opentelemetry/resources": "file:../../../packages/opentelemetry-resources",
     "@opentelemetry/sdk-logs": "file:../../../experimental/packages/sdk-logs"
   },
   "devDependencies": {

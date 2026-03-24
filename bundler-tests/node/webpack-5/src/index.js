@@ -6,6 +6,7 @@ const {
   LoggerProvider,
   SimpleLogRecordProcessor,
 } = require('@opentelemetry/sdk-logs');
+const { defaultServiceName } = require('@opentelemetry/resources');
 
 diag.setLogger({
   logger: new DiagConsoleLogger(),
@@ -22,7 +23,7 @@ logs.setGlobalLoggerProvider(
 
 const logger = logs.getLogger('bundle-test-webpack');
 logger.emit({
-  body: 'test-event-body',
+  body: defaultServiceName(),
   eventName: 'custom.event',
 });
 

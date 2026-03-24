@@ -25,7 +25,7 @@ class TestInstrumentation extends InstrumentationBase {
 export function middleware(request) {
   const serviceName = defaultServiceName();
   const logger = logs.getLogger('bundle-test-nextjs-edge');
-  logger.emit({ body: 'test-event-body', eventName: 'custom.event' });
+  logger.emit({ body: serviceName, eventName: 'custom.event' });
   new TestInstrumentation('test', '0.0.0');
   return Response.next();
 }
