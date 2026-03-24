@@ -1,3 +1,8 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { StringEnvVar } from "./EnvReader";
 
 export enum SamplerType {
