@@ -18,12 +18,7 @@ import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 
-diag.setLogger({
-  logger: new DiagConsoleLogger(),
-  options: {
-    logLevel: 'info',
-  },
-});
+diag.setLogger(new DiagConsoleLogger());
 
 logs.setGlobalLoggerProvider(
   new LoggerProvider({

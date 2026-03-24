@@ -9,7 +9,12 @@ import config from './webpack.config.mjs';
 const compiler = webpack(config);
 
 compiler.run((err, stats) => {
-  if (compiler.close) compiler.close(() => {});
+  if (compiler.close) compiler.close(() => { });
+
+  if (err) {
+    console.error(err);
+    process.exit(1);
+  }
 
   // Assert the known protobuf dynamic-require warning. This exit(0) is intentional:
   // the test passes while the bug exists and will break when it is fixed, signalling
@@ -19,11 +24,6 @@ compiler.run((err, stats) => {
       'Critical dependency: require function is used in a way in which dependencies cannot be statically extracted';
     if (stats.compilation.warnings.every(w => w.message === expectedMsg))
       process.exit(0);
-  }
-
-  if (err) {
-    console.error(err);
-    process.exit(1);
   }
 
   if (stats.hasErrors()) {
