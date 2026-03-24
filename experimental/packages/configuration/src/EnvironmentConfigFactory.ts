@@ -625,13 +625,13 @@ export function setMeterProvider(config: ConfigurationModel): void {
     getStringFromEnv('OTEL_METRICS_EXEMPLAR_FILTER') ?? 'trace_based';
   if (exemplarFilter) {
     switch (exemplarFilter) {
-      case ExemplarFilter.TraceBased:
+      case 'trace_based':
         config.meter_provider.exemplar_filter = ExemplarFilter.TraceBased;
         break;
-      case ExemplarFilter.AlwaysOn:
+      case 'always_on':
         config.meter_provider.exemplar_filter = ExemplarFilter.AlwaysOn;
         break;
-      case ExemplarFilter.AlwaysOff:
+      case 'always_off':
         config.meter_provider.exemplar_filter = ExemplarFilter.AlwaysOff;
         break;
       default:
