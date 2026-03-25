@@ -4,26 +4,38 @@
  */
 
 import type { TraceState as TraceStateApi } from '@opentelemetry/api';
-import { validateKey, validateValue } from '../internal/validators';
+import {
+  validateKey,
+  validateOtelKey,
+  validateOtelValue,
+  validateValue,
+} from '../internal/validators';
 
 const MAX_TRACE_STATE_ITEMS = 32;
 const MAX_TRACE_STATE_LEN = 512;
-const MAX_OTEL_ENTRY_LEN = 256;
+const MAX_MEMBER_LEN = 256;
 const LIST_MEMBERS_SEPARATOR = ',';
 const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
 
+const OT_LIST_MEMBERS_SEPARATOR = ';';
+const OT_LIST_MEMBER_KEY_VALUE_SPLITTER = ':';
+
 /**
  * TraceState must be a class and not a simple object type because of the spec
- * requirement (https://www.w3.org/TR/trace-context/#tracestate-field).
+ * requirement (https://www.w3.org/TR/trace-context/#tracestate-field). It also
+ * limits the scope of modifications to the subkeys within the OpenTelemetry
+ * vendor key (`ot`)
  *
  * Here is the list of allowed mutations:
- * - New key-value pair should be added into the beginning of the list
+ * - New key-value pair should be added into the beginning of the list.
  * - The value of any key can be updated. Modified keys MUST be moved to the
  * beginning of the list.
+ * - The intire `ot` entry MUST NOT exceed 256 characters.
  */
 export class TraceState implements TraceStateApi {
   private _raw: string;
-  private _entries: Array<{ key: string; value: string }> | undefined;
+  private _vendorEntries: Map<string, string> | undefined;
+  private _otelEntries: Map<string, string> | undefined;
 
   constructor(rawTraceState?: string) {
     this._raw = typeof rawTraceState === 'string' ? rawTraceState : '';
@@ -31,80 +43,118 @@ export class TraceState implements TraceStateApi {
 
   set(key: string, value: string): TraceState {
     // Invalid entries results in skipping
-    if (!validateKey(key) || !validateValue(value)) {
+    if (!validateOtelKey(key) || !validateOtelValue(value)) {
       return this;
     }
 
-    // Validate the `ot` entry as per spec
-    const newEntryLength = key.length + value.length + 1;
-    if (key === 'ot' && newEntryLength > MAX_OTEL_ENTRY_LEN) {
+    if (!this._vendorEntries) {
+      this._parse();
+    }
+
+    // Shallow copy the maps to manipulate and serialize
+    const vendorEntries = new Map(this._vendorEntries);
+    const otelEntries = new Map(this._otelEntries);
+    let otValue;
+
+    otelEntries.set(key, value);
+    otValue = this._serializeMap(
+      otelEntries,
+      OT_LIST_MEMBERS_SEPARATOR,
+      OT_LIST_MEMBER_KEY_VALUE_SPLITTER
+    );
+
+    vendorEntries.delete('ot');
+    vendorEntries.set('ot', otValue);
+    // Checks on max length and items
+    // - max num of vendor keys
+    // - max length of the tracestate string
+    // - max length of the "ot" entry
+    if (vendorEntries.size > MAX_TRACE_STATE_ITEMS) {
+      // TODO: move up
       return this;
     }
 
-    // Get a new entries so keep this TraceState inmutable
-    this._entries = this._entries || this._parse(this._raw);
-    const entries = this._entries.map(e => e);
-    const index = entries.findIndex(entry => entry.key === key);
-
-    if (index === -1) {
-      // New entry. Invalid if the resulting TraceState is
-      // - exceeds the length limit
-      // - exceeds the items limit
-      if (
-        this._raw.length + newEntryLength > MAX_TRACE_STATE_LEN ||
-        this._entries.length + 1 > MAX_TRACE_STATE_ITEMS
-      ) {
-        return this;
-      }
-    } else {
-      // Update entry. Invalid if the resulting TraceState is too long
-      const currentEntry = entries[index];
-      const currentEntryLength =
-        currentEntry.key.length + currentEntry.value.length + 1;
-      if (
-        this._raw.length - currentEntryLength + newEntryLength >
-        MAX_TRACE_STATE_LEN
-      ) {
-        return this;
-      }
-      entries.splice(index, 1);
+    if (otValue.length + 3 > MAX_MEMBER_LEN) {
+      return this;
     }
-    entries.unshift({ key, value });
+    const tracestate = this._serializeMap(
+      vendorEntries,
+      LIST_MEMBERS_SEPARATOR,
+      LIST_MEMBER_KEY_VALUE_SPLITTER
+    );
+    if (tracestate.length > MAX_TRACE_STATE_LEN) {
+      return this;
+    }
 
-    return new TraceState(this._serializeEntries(entries));
+    return new TraceState(tracestate);
   }
 
   unset(key: string): TraceState {
-    this._entries = this._entries || this._parse(this._raw);
-    const index = this._entries.findIndex(entry => entry.key === key);
+    if (!this._vendorEntries) {
+      this._parse();
+    }
 
-    if (index === -1) {
+    if (!this._otelEntries) {
       return this;
     }
+
+    const value = this._otelEntries.get(key);
+    if (!value) {
+      return this;
+    }
+
+    // Shallow copy the maps to manipulate and serialize
+    const vendorEntries = new Map(this._vendorEntries);
+    const otelEntries = new Map(this._otelEntries);
+
+    otelEntries.delete(key);
+    vendorEntries.delete('ot');
+    if (otelEntries.size > 0) {
+      vendorEntries.set(
+        'ot',
+        this._serializeMap(
+          otelEntries,
+          OT_LIST_MEMBERS_SEPARATOR,
+          OT_LIST_MEMBER_KEY_VALUE_SPLITTER
+        )
+      );
+    }
+
     return new TraceState(
-      this._serializeEntries(this._entries.filter((_, idx) => idx !== index))
+      this._serializeMap(
+        vendorEntries,
+        LIST_MEMBERS_SEPARATOR,
+        LIST_MEMBER_KEY_VALUE_SPLITTER
+      )
     );
   }
 
   get(key: string): string | undefined {
-    this._entries = this._entries || this._parse(this._raw);
-    const entry = this._entries.find(e => e.key === key);
+    if (!this._vendorEntries) {
+      this._parse();
+    }
 
-    return entry && entry.value;
+    return this._otelEntries?.get(key);
   }
 
   serialize(): string {
-    if (this._entries) {
-      return this._serializeEntries(this._entries);
+    if (this._vendorEntries) {
+      return this._serializeMap(
+        this._vendorEntries,
+        LIST_MEMBERS_SEPARATOR,
+        LIST_MEMBER_KEY_VALUE_SPLITTER
+      );
     }
     return this._raw;
   }
 
-  private _parse(raw: string) {
-    const members = raw.split(LIST_MEMBERS_SEPARATOR);
-    const entries = [];
+  private _parse() {
+    const vendorMembers = this._raw.split(LIST_MEMBERS_SEPARATOR);
 
-    for (const member of members) {
+    // This Map will have the order reversed
+    const vendorEntries = new Map();
+
+    for (const member of vendorMembers) {
       const m = member.trim();
       const idx = m.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
       if (idx === -1) {
@@ -113,19 +163,63 @@ export class TraceState implements TraceStateApi {
       const key = m.slice(0, idx);
       const value = m.slice(idx + 1);
       const isValid = validateKey(key) && validateValue(value);
-      const hasSpace = entries.length < MAX_TRACE_STATE_ITEMS;
-      if (isValid && hasSpace) {
-        entries.push({ key, value });
+
+      if (!isValid) {
+        continue;
+      }
+
+      const hasSpace = vendorEntries.size < MAX_TRACE_STATE_ITEMS;
+      if (!hasSpace) {
+        break;
+      }
+      // TODO: truncate to the max lenght of the raw string (512)?
+      vendorEntries.set(key, value);
+    }
+
+    // Now parse the `ot` sub-keys and its values
+    const otelEntryValue = vendorEntries.get('ot');
+    if (otelEntryValue) {
+      const otelMembers = otelEntryValue.split(OT_LIST_MEMBERS_SEPARATOR);
+      this._otelEntries = new Map();
+      for (const otelMember of otelMembers) {
+        const idx = otelMember.indexOf(OT_LIST_MEMBER_KEY_VALUE_SPLITTER);
+        if (idx === -1) {
+          continue;
+        }
+        const key = otelMember.slice(0, idx);
+        const value = otelMember.slice(idx + 1);
+        const isValid = validateOtelKey(key) && validateOtelValue(value);
+        if (!isValid) {
+          continue;
+        }
+
+        // TODO: truncate to the max lenght of antry value (256)?
+        this._otelEntries.set(key, value);
       }
     }
-    return entries;
+
+    // Now we set the Map in the right order
+    this._vendorEntries = new Map(
+      Array.from(vendorEntries.entries()).reverse()
+    );
   }
 
-  private _serializeEntries(
-    entries: Array<{ key: string; value: string }>
+  private _serializeMap(
+    entries: Map<string, string>,
+    memberSeparator: string,
+    keyvalSplitter: string
   ): string {
-    return entries
-      .map(e => `${e.key}${LIST_MEMBER_KEY_VALUE_SPLITTER}${e.value}`)
-      .join(LIST_MEMBERS_SEPARATOR);
+    // We iterate normaly but instead of appending we prepend to get
+    // the reversed order
+    let serialized = '';
+    let index = 0;
+    for (const e of entries) {
+      if (index > 0) {
+        serialized = memberSeparator + serialized;
+      }
+      serialized = `${e[0]}${keyvalSplitter}${e[1]}` + serialized;
+      index++;
+    }
+    return serialized;
   }
 }

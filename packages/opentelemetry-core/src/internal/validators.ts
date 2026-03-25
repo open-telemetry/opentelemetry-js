@@ -32,3 +32,24 @@ export function validateValue(value: string): boolean {
     !INVALID_VALUE_COMMA_EQUAL_REGEX.test(value)
   );
 }
+
+const VALID_OTEL_KEYS = ['th', 'rv'];
+const VALID_OTEL_VALUE_REGEX = /^[A-Za-z0-9._-]*$/;
+
+/**
+ * Specific keys used by OTel concerns MUST be defined as part of the Specification,
+ * and hence it is forbidden to use any key that has not been defined in the Specification itself.
+ *
+ * ref: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/tracestate-handling.md#key
+ */
+export function validateOtelKey(key: string): boolean {
+  return VALID_OTEL_KEYS.includes(key);
+}
+
+/**
+ * Value is opaque string without max lenght. Consitst of alphanumeric
+ * chars with along with the chars ".", "_" and "-".
+ */
+export function validateOtelValue(value: string): boolean {
+  return VALID_OTEL_VALUE_REGEX.test(value);
+}
