@@ -34,6 +34,7 @@ const OT_LIST_MEMBER_KEY_VALUE_SPLITTER = ':';
  */
 export class TraceState implements TraceStateApi {
   private _raw: string;
+
   private _vendorEntries: Map<string, string> | undefined;
   private _otelEntries: Map<string, string> | undefined;
 
@@ -152,6 +153,7 @@ export class TraceState implements TraceStateApi {
 
     // This Map will have the order reversed
     const vendorEntries = new Map();
+    let currentLength = 0;
 
     for (const member of vendorMembers) {
       const m = member.trim();
@@ -167,12 +169,20 @@ export class TraceState implements TraceStateApi {
         continue;
       }
 
-      const hasSpace = vendorEntries.size < MAX_TRACE_STATE_ITEMS;
-      if (!hasSpace) {
+      // Skip if adding the new member exceeds the length
+      const futureLength = currentLength + member.length + (vendorEntries.size > 0 ? 1 : 0);
+      if (futureLength > MAX_TRACE_STATE_LEN) {
+        continue;
+      }
+
+      // All good, add it
+      vendorEntries.set(key, value);
+      currentLength = futureLength;
+
+      // Check if we reached the max items
+      if (vendorEntries.size >= MAX_TRACE_STATE_ITEMS) {
         break;
       }
-      // TODO: truncate to the max lenght of the raw string (512)?
-      vendorEntries.set(key, value);
     }
 
     // Now parse the `ot` sub-keys and its values
