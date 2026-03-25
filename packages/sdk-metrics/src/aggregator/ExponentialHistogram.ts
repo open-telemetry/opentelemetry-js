@@ -1,38 +1,25 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   Accumulation,
   AccumulationRecord,
   Aggregator,
-  AggregatorKind,
   ExponentialHistogram,
 } from './types';
-import {
-  DataPointType,
-  ExponentialHistogramMetricData,
-  InstrumentType,
-} from '../export/MetricData';
-import { diag, HrTime } from '@opentelemetry/api';
-import { Maybe } from '../utils';
-import { AggregationTemporality } from '../export/AggregationTemporality';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
+import { AggregatorKind } from './types';
+import type { ExponentialHistogramMetricData } from '../export/MetricData';
+import { DataPointType, InstrumentType } from '../export/MetricData';
+import type { HrTime } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
+import type { Maybe } from '../utils';
+import type { AggregationTemporality } from '../export/AggregationTemporality';
+import type { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Buckets } from './exponential-histogram/Buckets';
 import { getMapping } from './exponential-histogram/mapping/getMapping';
-import { Mapping } from './exponential-histogram/mapping/types';
+import type { Mapping } from './exponential-histogram/mapping/types';
 import { nextGreaterSquare } from './exponential-histogram/util';
 
 /**

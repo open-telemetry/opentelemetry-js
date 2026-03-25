@@ -1,0 +1,117 @@
+file_format: "1.0-rc.3"
+disabled: false
+logger_provider:
+  # Configure log record processors.
+  processors:
+    - # Configure a batch log record processor.
+      batch:
+        # Configure delay interval (in milliseconds) between two consecutive exports. 
+        # Value must be non-negative.
+        # If omitted or null, 1000 is used.
+        schedule_delay: 5000
+        # Configure maximum allowed time (in milliseconds) to export data. 
+        # Value must be non-negative. A value of 0 indicates no limit (infinity).
+        # If omitted or null, 30000 is used.
+        export_timeout: 30000
+        # Configure maximum queue size. Value must be positive.
+        # If omitted or null, 2048 is used.
+        max_queue_size: 2048
+        # Configure maximum batch size. Value must be positive.
+        # If omitted or null, 512 is used.
+        max_export_batch_size: 512
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be OTLP with HTTP transport.
+          otlp_http:
+            endpoint: http://localhost:4318/v1/logs
+            # Configure certificate used to verify a server's TLS credentials. 
+            # Absolute path to certificate file in PEM format.
+            # If omitted or null, system default certificate verification is used for secure connections.
+            certificate_file: /app/cert.pem
+            # Configure mTLS private client key. 
+            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
+            # If omitted or null, mTLS is not used.
+            client_key_file: /app/cert.pem
+            # Configure mTLS client certificate. 
+            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
+            # If omitted or null, mTLS is not used.
+            client_certificate_file: /app/cert.pem
+            # Configure headers. Entries have higher priority than entries from .headers_list.
+            # If an entry's .value is null, the entry is ignored.
+            headers:
+              - name: api-key
+                value: "1234"
+            # Configure headers. Entries have lower priority than entries from .headers.
+            # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
+            # If omitted or null, no headers are added.
+            headers_list: "api-key=1234"
+            # Configure compression.
+            # Values include: gzip, none. Implementations may support other compression algorithms.
+            # If omitted or null, none is used.
+            compression: gzip
+            # Configure max time (in milliseconds) to wait for each export. 
+            # Value must be non-negative. A value of 0 indicates no limit (infinity).
+            # If omitted or null, 10000 is used.
+            timeout: 10000
+            # Configure the encoding used for messages. 
+            # Values include: protobuf, json. Implementations may not support json.
+            # If omitted or null, protobuf is used.
+            encoding: protobuf
+    - # Configure a batch log record processor.
+      batch:
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be OTLP with gRPC transport.
+          otlp_grpc:
+            # Configure endpoint.
+            # If omitted or null, http://localhost:4317 is used.
+            endpoint: http://localhost:4317
+            # Configure certificate used to verify a server's TLS credentials. 
+            # Absolute path to certificate file in PEM format.
+            # If omitted or null, system default certificate verification is used for secure connections.
+            certificate_file: /app/cert.pem
+            # Configure mTLS private client key. 
+            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
+            # If omitted or null, mTLS is not used.
+            client_key_file: /app/cert.pem
+            # Configure mTLS client certificate. 
+            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
+            # If omitted or null, mTLS is not used.
+            client_certificate_file: /app/cert.pem
+            # Configure headers. Entries have higher priority than entries from .headers_list.
+            # If an entry's .value is null, the entry is ignored.
+            headers:
+              - name: api-key
+                value: "1234"
+            # Configure headers. Entries have lower priority than entries from .headers.
+            # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
+            # If omitted or null, no headers are added.
+            headers_list: "api-key=1234"
+            # Configure compression.
+            # Values include: gzip, none. Implementations may support other compression algorithms.
+            # If omitted or null, none is used.
+            compression: gzip
+            # Configure max time (in milliseconds) to wait for each export. 
+            # Value must be non-negative. A value of 0 indicates no limit (infinity).
+            # If omitted or null, 10000 is used.
+            timeout: 10000
+            # Configure client transport security for the exporter's connection. 
+            # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
+            # If omitted or null, false is used.
+            insecure: false
+    - # Configure a simple log record processor.
+      simple:
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be console.
+          console:
+  # Configure log record limits. See also attribute_limits.
+  limits:
+    # Configure max attribute value size. Overrides .attribute_limits.attribute_value_length_limit. 
+    # Value must be non-negative.
+    # If omitted or null, there is no limit.
+    attribute_value_length_limit: 4096
+    # Configure max attribute count. Overrides .attribute_limits.attribute_count_limit. 
+    # Value must be non-negative.
+    # If omitted or null, 128 is used.
+    attribute_count_limit: 128

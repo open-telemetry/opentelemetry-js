@@ -40,7 +40,7 @@ const collectorOptions = {
 
 const loggerExporter = new OTLPLogExporter(collectorOptions);
 const loggerProvider = new LoggerProvider({
-  processors: [new BatchRecordProcessor(loggerExporter)]
+  processors: [new BatchLogRecordProcessor(loggerExporter)]
 });
 
 ['SIGINT', 'SIGTERM'].forEach(signal => {
@@ -50,6 +50,46 @@ const loggerProvider = new LoggerProvider({
 // logging
 const logger = loggerProvider.getLogger('example-logger');
 logger.emit({ body: 'example-log' });
+```
+
+By default, the exporter creates a secure (TLS) connection. When connecting to a local development collector without TLS, you can use an insecure connection by specifying the `http://` scheme in the URL:
+
+```js
+import {
+  LoggerProvider,
+  BatchLogRecordProcessor,
+} from '@opentelemetry/sdk-logs';
+import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
+
+const collectorOptions = {
+  url: 'http://localhost:4317',  // http:// creates an insecure connection
+};
+
+const loggerExporter = new OTLPLogExporter(collectorOptions);
+const loggerProvider = new LoggerProvider({
+  processors: [new BatchLogRecordProcessor(loggerExporter)]
+});
+```
+
+Alternatively, you can explicitly configure insecure credentials:
+
+```js
+import grpc from '@grpc/grpc-js';
+import {
+  LoggerProvider,
+  BatchLogRecordProcessor,
+} from '@opentelemetry/sdk-logs';
+import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
+
+const collectorOptions = {
+  url: 'localhost:4317',
+  credentials: grpc.credentials.createInsecure(),
+};
+
+const loggerExporter = new OTLPLogExporter(collectorOptions);
+const loggerProvider = new LoggerProvider({
+  processors: [new BatchLogRecordProcessor(loggerExporter)]
+});
 ```
 
 ## Environment Variable Configuration

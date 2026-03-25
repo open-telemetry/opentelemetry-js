@@ -1,24 +1,12 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import { diag } from '@opentelemetry/api';
+import type { ExportResult } from '@opentelemetry/core';
 import {
-  ExportResult,
   ExportResultCode,
-  getNumberFromEnv,
   globalErrorHandler,
   BindOnceFuture,
   internal,
@@ -46,22 +34,10 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
 
   constructor(exporter: LogRecordExporter, config?: T) {
     this._exporter = exporter;
-    this._maxExportBatchSize =
-      config?.maxExportBatchSize ??
-      getNumberFromEnv('OTEL_BLRP_MAX_EXPORT_BATCH_SIZE') ??
-      512;
-    this._maxQueueSize =
-      config?.maxQueueSize ??
-      getNumberFromEnv('OTEL_BLRP_MAX_QUEUE_SIZE') ??
-      2048;
-    this._scheduledDelayMillis =
-      config?.scheduledDelayMillis ??
-      getNumberFromEnv('OTEL_BLRP_SCHEDULE_DELAY') ??
-      5000;
-    this._exportTimeoutMillis =
-      config?.exportTimeoutMillis ??
-      getNumberFromEnv('OTEL_BLRP_EXPORT_TIMEOUT') ??
-      30000;
+    this._maxExportBatchSize = config?.maxExportBatchSize ?? 512;
+    this._maxQueueSize = config?.maxQueueSize ?? 2048;
+    this._scheduledDelayMillis = config?.scheduledDelayMillis ?? 5000;
+    this._exportTimeoutMillis = config?.exportTimeoutMillis ?? 30000;
 
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
 

@@ -16,9 +16,9 @@ jobs:
       matrix:
         node_version:
           - "22"
-    runs-on: oracle-bare-metal-64cpu-512gb-x86-64
+    runs-on: oracle-bare-metal-64cpu-1024gb-x86-64-ubuntu-24
     container:
-      image: ubuntu:24.04@sha256:cd1dba651b3080c3686ecf4e3c4220f026b521fb76978881737d24f200828b2b
+      image: ubuntu:24.04@sha256:186072bba1b2f436cbb91ef2567abca677337cfc786c86e107d25b7072feef0c
     timeout-minutes: 10
     steps:
       # Apt packages:
@@ -28,13 +28,13 @@ jobs:
           apt-get update && apt-get install --fix-missing -y git
 
       - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       # Avoid "detected dubious ownership in repository" error when running
       # `npm run submodule`.
       - run: git config --global --add safe.directory $GITHUB_WORKSPACE
 
-      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
         with:
           cache: 'npm'
           cache-dependency-path: |

@@ -1,21 +1,11 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 import { diag } from '@opentelemetry/api';
 import { getStringFromEnv } from '@opentelemetry/core';
 import { inspect } from 'util';
+import type { GrpcTls, HttpTls } from './models/commonModel';
 
 /**
  * Retrieves a boolean value from a configuration file parameter.
@@ -173,4 +163,50 @@ export function envVariableSubstitution(value: unknown): string | undefined {
     return stringValue;
   }
   return String(value);
+}
+
+export function getGrpcTlsConfig(
+  certificateFile?: string,
+  clientKeyFile?: string,
+  clientCertificateFile?: string,
+  insecure?: boolean
+): GrpcTls | undefined {
+  if (certificateFile || clientKeyFile || clientCertificateFile) {
+    const tls: GrpcTls = {};
+    if (certificateFile) {
+      tls.ca_file = certificateFile;
+    }
+    if (clientKeyFile) {
+      tls.key_file = clientKeyFile;
+    }
+    if (clientCertificateFile) {
+      tls.cert_file = clientCertificateFile;
+    }
+    if (insecure !== undefined) {
+      tls.insecure = insecure;
+    }
+    return tls;
+  }
+  return undefined;
+}
+
+export function getHttpTlsConfig(
+  certificateFile?: string,
+  clientKeyFile?: string,
+  clientCertificateFile?: string
+): HttpTls | undefined {
+  if (certificateFile || clientKeyFile || clientCertificateFile) {
+    const tls: HttpTls = {};
+    if (certificateFile) {
+      tls.ca_file = certificateFile;
+    }
+    if (clientKeyFile) {
+      tls.key_file = clientKeyFile;
+    }
+    if (clientCertificateFile) {
+      tls.cert_file = clientCertificateFile;
+    }
+    return tls;
+  }
+  return undefined;
 }

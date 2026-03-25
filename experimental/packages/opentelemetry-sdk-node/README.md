@@ -146,11 +146,19 @@ If `resourceDetectors` was not set, you can also use the environment variable `O
   - **NOTE:** future versions of `@opentelemetry/sdk-node` may include additional detectors that will be covered by this scope.
 - `none` - disable resource detection
 
+**NOTE:** `env` and `os` are Node.js-specific detectors with no equivalent in the [OpenTelemetry declarative configuration spec](https://github.com/open-telemetry/opentelemetry-configuration). They are supported when using the `detection/development` block in a declarative config file.
+
 For example, to enable only the `env`, `host` detectors:
 
 ```shell
-export OTEL_NODE_RESOURCE_DETECTORS="env,host"
+export OTEL_NODE_RESOURCE_DETECTORS="host,env"
 ```
+
+NOTE: The order set on `OTEL_NODE_RESOURCE_DETECTORS` will be respected and the detectors will be executed in order.
+For example, if you have `OTEL_RESOURCE_ATTRIBUTES="service.instance.id=custom-name"`, but also `serviceinstance` and `env` on `OTEL_NODE_RESOURCE_DETECTORS`, it can have 2 scenarios:
+
+- `OTEL_NODE_RESOURCE_DETECTORS="serviceinstance,env"` will have the `service.instance.id` as `custom-name`
+- `OTEL_NODE_RESOURCE_DETECTORS="env,serviceinstance"` will have the `service.instance.id` as a random UUID
 
 ### sampler
 
@@ -221,6 +229,21 @@ Additionally, you can specify other applicable environment variables that apply 
 
 - [OTLP exporter environment configuration](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options)
 - [Zipkin exporter environment configuration](https://github.com/open-telemetry/opentelemetry-specification/blob/6ce62202e5407518e19c56c445c13682ef51a51d/specification/sdk-environment-variables.md#zipkin-exporter)
+
+## Enable OpenTelemetry SDK internal metrics from environment
+
+OpenTelemetry defines [metrics for monitoring SDK components](https://opentelemetry.io/docs/specs/semconv/otel/sdk-metrics/).
+Until this spec is stabilized, the following environment variable must be used
+to enable these metrics:
+
+```bash
+OTEL_NODE_EXPERIMENTAL_SDK_METRICS=true
+```
+
+Currently a subset of the specified metrics are implemented. See the following
+linkes for details:
+
+- Span metrics: [TracerMetrics.ts](../../../packages/opentelemetry-sdk-trace-base/src/TracerMetrics.ts)
 
 ## Useful links
 

@@ -50,5 +50,6 @@
   },
   "assignees": ["@dyladan", "@legendecas", "@pichlermarc", "@trentm"],
   "labels": ["dependencies"],
+  "ignorePaths": ["**/bundler-tests/**"],
   "postUpdateOptions": ["npmDedupe"]
 }

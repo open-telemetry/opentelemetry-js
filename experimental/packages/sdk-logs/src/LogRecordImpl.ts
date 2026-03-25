@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import type {
@@ -22,12 +11,18 @@ import type {
   SeverityNumber,
 } from '@opentelemetry/api-logs';
 import * as api from '@opentelemetry/api';
-import { timeInputToHrTime, InstrumentationScope } from '@opentelemetry/core';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import { timeInputToHrTime } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
+import {
+  ATTR_EXCEPTION_MESSAGE,
+  ATTR_EXCEPTION_STACKTRACE,
+  ATTR_EXCEPTION_TYPE,
+} from '@opentelemetry/semantic-conventions';
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
 import { isLogAttributeValue } from './utils/validation';
-import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
+import type { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 
 export class LogRecordImpl implements ReadableLogRecord {
   readonly hrTime: api.HrTime;
@@ -40,7 +35,8 @@ export class LogRecordImpl implements ReadableLogRecord {
   private _severityNumber?: SeverityNumber;
   private _body?: LogBody;
   private _eventName?: string;
-  private totalAttributesCount: number = 0;
+  private _attributesCount: number = 0;
+  private _droppedAttributesCount: number = 0;
 
   private _isReadonly: boolean = false;
   private readonly _logRecordLimits: Required<LogRecordLimits>;
@@ -86,7 +82,7 @@ export class LogRecordImpl implements ReadableLogRecord {
   }
 
   get droppedAttributesCount(): number {
-    return this.totalAttributesCount - Object.keys(this.attributes).length;
+    return this._droppedAttributesCount;
   }
 
   constructor(
@@ -102,6 +98,7 @@ export class LogRecordImpl implements ReadableLogRecord {
       severityText,
       body,
       attributes = {},
+      exception,
       context,
     } = logRecord;
 
@@ -123,6 +120,9 @@ export class LogRecordImpl implements ReadableLogRecord {
     this._logRecordLimits = _sharedState.logRecordLimits;
     this._eventName = eventName;
     this.setAttributes(attributes);
+    if (exception != null) {
+      this._setException(exception);
+    }
   }
 
   public setAttribute(key: string, value?: AnyValue) {
@@ -137,19 +137,25 @@ export class LogRecordImpl implements ReadableLogRecord {
       api.diag.warn(`Invalid attribute value set for key: ${key}`);
       return this;
     }
-    this.totalAttributesCount += 1;
+    const isNewKey = !Object.prototype.hasOwnProperty.call(
+      this.attributes,
+      key
+    );
     if (
-      Object.keys(this.attributes).length >=
-        this._logRecordLimits.attributeCountLimit &&
-      !Object.prototype.hasOwnProperty.call(this.attributes, key)
+      isNewKey &&
+      this._attributesCount >= this._logRecordLimits.attributeCountLimit
     ) {
-      // This logic is to create drop message at most once per LogRecord to prevent excessive logging.
-      if (this.droppedAttributesCount === 1) {
+      this._droppedAttributesCount++;
+      // Only warn once per LogRecord to avoid log spam
+      if (this._droppedAttributesCount === 1) {
         api.diag.warn('Dropping extra attributes.');
       }
       return this;
     }
     this.attributes[key] = this._truncateToSize(value);
+    if (isNewKey) {
+      this._attributesCount++;
+    }
     return this;
   }
 
@@ -229,6 +235,54 @@ export class LogRecordImpl implements ReadableLogRecord {
 
     // Other types (number, boolean), no need to apply value length limit
     return value;
+  }
+
+  private _setException(exception: unknown): void {
+    let hasMinimumAttributes = false;
+
+    if (typeof exception === 'string' || typeof exception === 'number') {
+      if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_MESSAGE)) {
+        this.setAttribute(ATTR_EXCEPTION_MESSAGE, String(exception));
+      }
+      hasMinimumAttributes = true;
+    } else if (exception && typeof exception === 'object') {
+      const exceptionObj = exception as {
+        code?: string | number;
+        name?: string;
+        message?: string;
+        stack?: string;
+      };
+
+      if (exceptionObj.code) {
+        if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_TYPE)) {
+          this.setAttribute(ATTR_EXCEPTION_TYPE, exceptionObj.code.toString());
+        }
+        hasMinimumAttributes = true;
+      } else if (exceptionObj.name) {
+        if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_TYPE)) {
+          this.setAttribute(ATTR_EXCEPTION_TYPE, exceptionObj.name);
+        }
+        hasMinimumAttributes = true;
+      }
+
+      if (exceptionObj.message) {
+        if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_MESSAGE)) {
+          this.setAttribute(ATTR_EXCEPTION_MESSAGE, exceptionObj.message);
+        }
+        hasMinimumAttributes = true;
+      }
+
+      if (exceptionObj.stack) {
+        if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_STACKTRACE)) {
+          this.setAttribute(ATTR_EXCEPTION_STACKTRACE, exceptionObj.stack);
+        }
+        hasMinimumAttributes = true;
+      }
+    }
+
+    if (!hasMinimumAttributes) {
+      api.diag.warn(`Failed to record an exception ${exception}`);
+    }
   }
 
   private _truncateToLimitUtil(value: string, limit: number): string {
