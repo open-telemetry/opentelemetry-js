@@ -5,9 +5,17 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
-### :boom: Breaking Change
+### :boom: Breaking Changes
 
-### :rocket: (Enhancement)
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 1.9.1
 
 ### :bug: (Bug Fix)
 
@@ -16,8 +24,6 @@ All notable changes to this project will be documented in this file.
 * fix(api): use `Attributes` instead of deprecated `SpanAttributes` in `SpanOptions` [#6478](https://github.com/open-telemetry/opentelemetry-js/pull/6478) @overbalance
 * fix(diag): change types in `DiagComponentLogger` from `any` to `unknown`[#5478](https://github.com/open-telemetry/opentelemetry-js/pull/5478) @loganrosen
 * fix(api): re-introduce fallback chain for global utils [#6523](https://github.com/open-telemetry/opentelemetry-js/pull/6523/) @pichlermarc
-
-### :books: (Refine Doc)
 
 ### :house: (Internal)
 
