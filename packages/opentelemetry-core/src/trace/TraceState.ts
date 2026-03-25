@@ -4,10 +4,7 @@
  */
 
 import type { TraceState as TraceStateApi } from '@opentelemetry/api';
-import {
-  validateKey,
-  validateValue,
-} from '../internal/validators';
+import { validateKey, validateValue } from '../internal/validators';
 
 const MAX_TRACE_STATE_ITEMS = 32;
 const MAX_TRACE_STATE_LEN = 512;
@@ -28,7 +25,8 @@ export class TraceState implements TraceStateApi {
   private _internalState: Map<string, string> | undefined;
 
   constructor(rawTraceState?: string) {
-    this._rawTraceState = typeof rawTraceState === 'string' ? rawTraceState : '';
+    this._rawTraceState =
+      typeof rawTraceState === 'string' ? rawTraceState : '';
   }
 
   set(key: string, value: string): TraceState {
@@ -36,14 +34,14 @@ export class TraceState implements TraceStateApi {
       return this;
     }
 
-    const newState = new Map(this._internalState ??= this._parse());
+    const newState = new Map((this._internalState ??= this._parse()));
     newState.delete(key);
     newState.set(key, value);
     return this._fromState(newState);
   }
 
   unset(key: string): TraceState {
-    const newState = new Map(this._internalState ??= this._parse());
+    const newState = new Map((this._internalState ??= this._parse()));
     newState.delete(key);
     return this._fromState(newState);
   }
@@ -63,7 +61,9 @@ export class TraceState implements TraceStateApi {
         if (index > 0) {
           serialized = LIST_MEMBERS_SEPARATOR + serialized;
         }
-        serialized = `${entry[0]}${LIST_MEMBER_KEY_VALUE_SPLITTER}${entry[1]}` + serialized;
+        serialized =
+          `${entry[0]}${LIST_MEMBER_KEY_VALUE_SPLITTER}${entry[1]}` +
+          serialized;
         index++;
       }
       return serialized;
@@ -92,7 +92,8 @@ export class TraceState implements TraceStateApi {
       }
 
       // Skip if adding the new member exceeds the length
-      const futureLength = currentLength + member.length + (vendorEntries.size > 0 ? 1 : 0);
+      const futureLength =
+        currentLength + member.length + (vendorEntries.size > 0 ? 1 : 0);
       if (futureLength > MAX_TRACE_STATE_LEN) {
         continue;
       }
@@ -108,14 +109,12 @@ export class TraceState implements TraceStateApi {
     }
 
     // Now we set the Map in the right order
-    return new Map(
-      Array.from(vendorEntries.entries()).reverse()
-    );
+    return new Map(Array.from(vendorEntries.entries()).reverse());
   }
 
-  private _fromState(state: Map<string,string>): TraceState {
+  private _fromState(state: Map<string, string>): TraceState {
     const traceState = Object.create(TraceState.prototype) as TraceState;
-    traceState._internalState = state
+    traceState._internalState = state;
     return traceState;
   }
 }
