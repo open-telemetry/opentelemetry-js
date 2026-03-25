@@ -54,10 +54,9 @@ export class TraceState implements TraceStateApi {
     // Shallow copy the maps to manipulate and serialize
     const vendorEntries = new Map(this._vendorEntries);
     const otelEntries = new Map(this._otelEntries);
-    let otValue;
 
     otelEntries.set(key, value);
-    otValue = this._serializeMap(
+    const otValue = this._serializeMap(
       otelEntries,
       OT_LIST_MEMBERS_SEPARATOR,
       OT_LIST_MEMBER_KEY_VALUE_SPLITTER
