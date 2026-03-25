@@ -5,154 +5,74 @@
 
 import type { TraceState as TraceStateApi } from '@opentelemetry/api';
 import {
-  isValidOtelKey,
-  isValidOtelValue,
   validateKey,
   validateValue,
 } from '../internal/validators';
 
 const MAX_TRACE_STATE_ITEMS = 32;
 const MAX_TRACE_STATE_LEN = 512;
-const MAX_MEMBER_LEN = 256;
 const LIST_MEMBERS_SEPARATOR = ',';
 const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
 
-const OT_LIST_MEMBERS_SEPARATOR = ';';
-const OT_LIST_MEMBER_KEY_VALUE_SPLITTER = ':';
-
 /**
  * TraceState must be a class and not a simple object type because of the spec
- * requirement (https://www.w3.org/TR/trace-context/#tracestate-field). It also
- * limits the scope of modifications to the subkeys within the OpenTelemetry
- * vendor key (`ot`)
+ * requirement (https://www.w3.org/TR/trace-context/#tracestate-field).
  *
  * Here is the list of allowed mutations:
- * - New key-value pair should be added into the beginning of the list.
+ * - New key-value pair should be added into the beginning of the list
  * - The value of any key can be updated. Modified keys MUST be moved to the
  * beginning of the list.
- * - The intire `ot` entry MUST NOT exceed 256 characters.
  */
 export class TraceState implements TraceStateApi {
-  private _raw: string;
-
-  private _vendorEntries: Map<string, string> | undefined;
-  private _otelEntries: Map<string, string> | undefined;
+  private _rawTraceState: string;
+  private _internalState: Map<string, string> | undefined;
 
   constructor(rawTraceState?: string) {
-    this._raw = typeof rawTraceState === 'string' ? rawTraceState : '';
+    this._rawTraceState = typeof rawTraceState === 'string' ? rawTraceState : '';
   }
 
   set(key: string, value: string): TraceState {
-    if (!isValidOtelKey(key) || !isValidOtelValue(value)) {
+    if (!validateKey(key) || !validateValue(value)) {
       return this;
     }
 
-    if (!this._vendorEntries) {
-      this._parse();
-    }
-
-    // Shallow copy the maps to manipulate and serialize
-    const vendorEntries = new Map(this._vendorEntries);
-    const otelEntries = new Map(this._otelEntries);
-
-    otelEntries.set(key, value);
-    const otValue = this._serializeMap(
-      otelEntries,
-      OT_LIST_MEMBERS_SEPARATOR,
-      OT_LIST_MEMBER_KEY_VALUE_SPLITTER
-    );
-
-    vendorEntries.delete('ot');
-    vendorEntries.set('ot', otValue);
-    // Checks on max length and items
-    // - max num of vendor keys
-    // - max length of the tracestate string
-    // - max length of the "ot" entry
-    if (vendorEntries.size > MAX_TRACE_STATE_ITEMS) {
-      // TODO: move up
-      return this;
-    }
-
-    if (otValue.length + 3 > MAX_MEMBER_LEN) {
-      return this;
-    }
-    const tracestate = this._serializeMap(
-      vendorEntries,
-      LIST_MEMBERS_SEPARATOR,
-      LIST_MEMBER_KEY_VALUE_SPLITTER
-    );
-    if (tracestate.length > MAX_TRACE_STATE_LEN) {
-      return this;
-    }
-
-    return new TraceState(tracestate);
+    const newState = new Map(this._internalState ??= this._parse());
+    newState.delete(key);
+    newState.set(key, value);
+    return this._fromState(newState);
   }
 
   unset(key: string): TraceState {
-    if (!isValidOtelKey(key)) {
-      return this;
-    }
-
-    if (!this._vendorEntries) {
-      this._parse();
-    }
-
-    if (!this._otelEntries) {
-      return this;
-    }
-
-    const value = this._otelEntries.get(key);
-    if (!value) {
-      return this;
-    }
-
-    // Shallow copy the maps to manipulate and serialize
-    const vendorEntries = new Map(this._vendorEntries);
-    const otelEntries = new Map(this._otelEntries);
-
-    otelEntries.delete(key);
-    vendorEntries.delete('ot');
-    if (otelEntries.size > 0) {
-      vendorEntries.set(
-        'ot',
-        this._serializeMap(
-          otelEntries,
-          OT_LIST_MEMBERS_SEPARATOR,
-          OT_LIST_MEMBER_KEY_VALUE_SPLITTER
-        )
-      );
-    }
-
-    return new TraceState(
-      this._serializeMap(
-        vendorEntries,
-        LIST_MEMBERS_SEPARATOR,
-        LIST_MEMBER_KEY_VALUE_SPLITTER
-      )
-    );
+    const newState = new Map(this._internalState ??= this._parse());
+    newState.delete(key);
+    return this._fromState(newState);
   }
 
   get(key: string): string | undefined {
-    if (!this._vendorEntries) {
-      this._parse();
-    }
-
-    return this._otelEntries?.get(key);
+    this._internalState ??= this._parse();
+    return this._internalState.get(key);
   }
 
   serialize(): string {
-    if (this._vendorEntries) {
-      return this._serializeMap(
-        this._vendorEntries,
-        LIST_MEMBERS_SEPARATOR,
-        LIST_MEMBER_KEY_VALUE_SPLITTER
-      );
+    if (this._internalState) {
+      // We iterate normaly but instead of appending we prepend to get
+      // the reversed order
+      let serialized = '';
+      let index = 0;
+      for (const entry of this._internalState) {
+        if (index > 0) {
+          serialized = LIST_MEMBERS_SEPARATOR + serialized;
+        }
+        serialized = `${entry[0]}${LIST_MEMBER_KEY_VALUE_SPLITTER}${entry[1]}` + serialized;
+        index++;
+      }
+      return serialized;
     }
-    return this._raw;
+    return this._rawTraceState;
   }
 
-  private _parse() {
-    const vendorMembers = this._raw.split(LIST_MEMBERS_SEPARATOR);
+  private _parse(): Map<string, string> {
+    const vendorMembers = this._rawTraceState.split(LIST_MEMBERS_SEPARATOR);
 
     // This Map will have the order reversed
     const vendorEntries = new Map();
@@ -187,50 +107,15 @@ export class TraceState implements TraceStateApi {
       }
     }
 
-    // Now parse the `ot` sub-keys and its values
-    const otelEntryValue = vendorEntries.get('ot');
-    if (otelEntryValue) {
-      const otelMembers = otelEntryValue.split(OT_LIST_MEMBERS_SEPARATOR);
-      this._otelEntries = new Map();
-      for (const otelMember of otelMembers) {
-        const idx = otelMember.indexOf(OT_LIST_MEMBER_KEY_VALUE_SPLITTER);
-        if (idx === -1) {
-          continue;
-        }
-        const key = otelMember.slice(0, idx);
-        const value = otelMember.slice(idx + 1);
-
-        if (!isValidOtelKey(key) || !isValidOtelValue(value)) {
-          continue;
-        }
-
-        // TODO: truncate to the max lenght of antry value (256)?
-        this._otelEntries.set(key, value);
-      }
-    }
-
     // Now we set the Map in the right order
-    this._vendorEntries = new Map(
+    return new Map(
       Array.from(vendorEntries.entries()).reverse()
     );
   }
 
-  private _serializeMap(
-    entries: Map<string, string>,
-    memberSeparator: string,
-    keyvalSplitter: string
-  ): string {
-    // We iterate normaly but instead of appending we prepend to get
-    // the reversed order
-    let serialized = '';
-    let index = 0;
-    for (const e of entries) {
-      if (index > 0) {
-        serialized = memberSeparator + serialized;
-      }
-      serialized = `${e[0]}${keyvalSplitter}${e[1]}` + serialized;
-      index++;
-    }
-    return serialized;
+  private _fromState(state: Map<string,string>): TraceState {
+    const traceState = Object.create(TraceState.prototype) as TraceState;
+    traceState._internalState = state
+    return traceState;
   }
 }
