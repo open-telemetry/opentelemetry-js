@@ -4,23 +4,25 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { AggregationTemporality } from './AggregationTemporality';
-import { MetricProducer } from './MetricProducer';
-import { CollectionResult, InstrumentType } from './MetricData';
+import type { AggregationTemporality } from './AggregationTemporality';
+import type { MetricProducer } from './MetricProducer';
+import type { CollectionResult, InstrumentType } from './MetricData';
 import { callWithTimeout } from '../utils';
-import {
+import type {
   CollectionOptions,
   ForceFlushOptions,
   ShutdownOptions,
 } from '../types';
-import {
+import type {
   AggregationSelector,
   AggregationTemporalitySelector,
+} from './AggregationSelector';
+import {
   DEFAULT_AGGREGATION_SELECTOR,
   DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
 } from './AggregationSelector';
-import { AggregationOption } from '../view/AggregationOption';
-import { CardinalitySelector } from './CardinalitySelector';
+import type { AggregationOption } from '../view/AggregationOption';
+import type { CardinalitySelector } from './CardinalitySelector';
 
 export interface MetricReaderOptions {
   /**
@@ -146,6 +148,13 @@ export abstract class MetricReader implements IMetricReader {
 
   setMetricProducer(metricProducer: MetricProducer) {
     if (this._sdkMetricProducer) {
+      // This check ensures the following requirement from the spec
+      // (https://opentelemetry.io/docs/specs/otel/metrics/sdk/#metricreader):
+      // > The SDK MUST NOT allow a `MetricReader` instance to be registered
+      // > on more than one `MeterProvider` instance.
+      //
+      // So while the argument is a `MetricProducer`, the relevant user-level
+      // error message is about the **MeterProvider**.
       throw new Error(
         'MetricReader can not be bound to a MeterProvider again.'
       );

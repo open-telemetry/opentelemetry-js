@@ -4,20 +4,17 @@
  */
 
 import { PatternPredicate } from './Predicate';
+import type { IAttributesProcessor } from './AttributesProcessor';
 import {
   createMultiAttributesProcessor,
   createNoopAttributesProcessor,
-  IAttributesProcessor,
 } from './AttributesProcessor';
 import { InstrumentSelector } from './InstrumentSelector';
 import { MeterSelector } from './MeterSelector';
-import { Aggregation } from './Aggregation';
-import {
-  AggregationOption,
-  AggregationType,
-  toAggregation,
-} from './AggregationOption';
-import { InstrumentType } from '../export/MetricData';
+import type { Aggregation } from './Aggregation';
+import type { AggregationOption } from './AggregationOption';
+import { AggregationType, toAggregation } from './AggregationOption';
+import type { InstrumentType } from '../export/MetricData';
 
 export type ViewOptions = {
   /**

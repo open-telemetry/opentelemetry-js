@@ -2,7 +2,12 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { Counter, Meter, SpanContext, UpDownCounter } from '@opentelemetry/api';
+import type {
+  Counter,
+  Meter,
+  SpanContext,
+  UpDownCounter,
+} from '@opentelemetry/api';
 import { SamplingDecision } from './Sampler';
 import {
   ATTR_OTEL_SPAN_PARENT_ORIGIN,
