@@ -82,6 +82,9 @@
       "path": "../opentelemetry-instrumentation"
     },
     {
+      "path": "../otlp-exporter-base"
+    },
+    {
       "path": "../sdk-logs"
     }
   ]

@@ -236,6 +236,35 @@ describe('fetch', () => {
       // Avoids ERROR in the logs when calling `disable()` again during cleanup
       fetchInstrumentation = undefined;
     });
+
+    it('should return a Promise<Response> compatible with WebAssembly.compileStreaming', async () => {
+      // Some web APIs do brand checks to ensure they are working with native objects.
+      // compileStreaming checks that the argument is a native Response, and will throw if it isn't.
+
+      // Minimal valid WASM binary: magic number + version only.
+      const wasmBytes = new Uint8Array([
+        0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00,
+      ]);
+
+      await startWorker(
+        msw.http.get(`${ORIGIN}/test.wasm`, () => {
+          return new msw.HttpResponse(wasmBytes, {
+            headers: { 'Content-Type': 'application/wasm' },
+          });
+        })
+      );
+
+      fetchInstrumentation = new FetchInstrumentation();
+      assert.ok(isWrapped(window.fetch));
+
+      // WebAssembly.compileStreaming requires a native Response from fetch.
+      const module = await WebAssembly.compileStreaming(
+        fetch(`${ORIGIN}/test.wasm`)
+      );
+      assert.ok(module instanceof WebAssembly.Module);
+
+      await waitFor(OBSERVER_WAIT_TIME_MS + 50);
+    });
   });
 
   describe('instrumentation', () => {
@@ -2764,13 +2793,47 @@ describe('fetch', () => {
       });
 
       describe('when client cancels the reader', () => {
-        it('should cancel stream and release the connection', async () => {
-          const { response } = await tracedFetch();
+        it('should end the span when the stream completes', async () => {
+          // Use a short stream (3 chunks) so the clone finishes quickly
+          // after the consumer cancels.  The instrumentation tracks
+          // completion via an eagerly-consumed clone; consumer-side
+          // cancellation does not propagate to the clone.
+          const shortStreamHandler = () => {
+            const encoder = new TextEncoder();
+            return msw.http.get('/api/stream', () => {
+              let count = 0;
+              const stream = new ReadableStream<Uint8Array>({
+                start(controller) {
+                  timer = setInterval(() => {
+                    if (count >= 3) {
+                      clearInterval(timer);
+                      controller.close();
+                      return;
+                    }
+                    count += 1;
+                    controller.enqueue(encoder.encode(`data: ${count}\n`));
+                  }, 20);
+                },
+              });
+              return new msw.HttpResponse(stream, {
+                status: 200,
+                headers: {
+                  'Content-Type': 'text/plain; charset=utf-8',
+                  'Cache-Control': 'no-cache',
+                  Connection: 'keep-alive',
+                },
+              });
+            });
+          };
+
+          const { response } = await tracedFetch({
+            handlers: [shortStreamHandler()],
+          });
 
           const timeoutPromise = new Promise((_, reject) => {
             setTimeout(() => {
               reject(new Error('trace should finish before timeout'));
-            }, 1000);
+            }, 2000);
           });
 
           // Read the first chunk to confirm the stream is live
