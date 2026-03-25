@@ -5,9 +5,9 @@
 
 import type { TraceState as TraceStateApi } from '@opentelemetry/api';
 import {
+  isValidOtelKey,
+  isValidOtelValue,
   validateKey,
-  validateOtelKey,
-  validateOtelValue,
   validateValue,
 } from '../internal/validators';
 
@@ -43,8 +43,7 @@ export class TraceState implements TraceStateApi {
   }
 
   set(key: string, value: string): TraceState {
-    // Invalid entries results in skipping
-    if (!validateOtelKey(key) || !validateOtelValue(value)) {
+    if (!isValidOtelKey(key) || !isValidOtelValue(value)) {
       return this;
     }
 
@@ -90,6 +89,10 @@ export class TraceState implements TraceStateApi {
   }
 
   unset(key: string): TraceState {
+    if (!isValidOtelKey(key)) {
+      return this;
+    }
+
     if (!this._vendorEntries) {
       this._parse();
     }
@@ -161,11 +164,10 @@ export class TraceState implements TraceStateApi {
       if (idx === -1) {
         continue;
       }
+
       const key = m.slice(0, idx);
       const value = m.slice(idx + 1);
-      const isValid = validateKey(key) && validateValue(value);
-
-      if (!isValid) {
+      if (!validateKey(key) || !validateValue(value)) {
         continue;
       }
 
@@ -197,8 +199,8 @@ export class TraceState implements TraceStateApi {
         }
         const key = otelMember.slice(0, idx);
         const value = otelMember.slice(idx + 1);
-        const isValid = validateOtelKey(key) && validateOtelValue(value);
-        if (!isValid) {
+
+        if (!isValidOtelKey(key) || !isValidOtelValue(value)) {
           continue;
         }
 
