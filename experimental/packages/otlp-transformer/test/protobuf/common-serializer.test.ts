@@ -123,11 +123,48 @@ describe('common-serializer', function () {
         assert.strictEqual(obj.intValue, -4294967296 /* -2^32 */);
       });
 
-      it('serializes integers beyond MAX_SAFE_INTEGER as doubles', function () {
-        const largeInt = Number.MAX_SAFE_INTEGER + 1;
+      // 2^53 is beyond MAX_SAFE_INTEGER but exactly representable in IEEE 754 and
+      // still within the int64 range, so it must be encoded as int_value, not double.
+      it('serializes integers beyond MAX_SAFE_INTEGER but within int64 range as int_value', function () {
+        const largeInt = Number.MAX_SAFE_INTEGER + 1; // 2^53, exactly representable
         const obj = serializeAndDecodeAnyValue(largeInt);
-        // Integers beyond MAX_SAFE_INTEGER should serialize as double to avoid precision loss
-        assert.strictEqual(obj.doubleValue, largeInt);
+        assert.strictEqual(obj.intValue, largeInt);
+      });
+
+      // -(2^63) is the int64 minimum and exactly representable as a double (power of two).
+      it('serializes -(2^63) as int_value (int64 minimum, exactly representable)', function () {
+        const int64Min = -(2 ** 63);
+        const obj = serializeAndDecodeAnyValue(int64Min);
+        assert.strictEqual(obj.intValue, int64Min);
+      });
+
+      // 2^63 exceeds the int64 maximum. 2^63 - 1 is not representable in IEEE 754
+      // (it rounds up to 2^63), making 2^63 the first double past the int64 range.
+      it('serializes 2^63 as double_value (exceeds int64 maximum)', function () {
+        const overInt64Max = 2 ** 63;
+        const obj = serializeAndDecodeAnyValue(overInt64Max);
+        assert.strictEqual(obj.doubleValue, overInt64Max);
+        assert.strictEqual(obj.intValue, undefined);
+      });
+
+      it('serializes -(2^64) as double_value (below int64 minimum)', function () {
+        const belowInt64Min = -(2 ** 64);
+        const obj = serializeAndDecodeAnyValue(belowInt64Min);
+        assert.strictEqual(obj.doubleValue, belowInt64Min);
+        assert.strictEqual(obj.intValue, undefined);
+      });
+
+      // 1e100 satisfies Number.isInteger() but is far outside the int64 range.
+      it('serializes 1e100 as double_value (integer but exceeds int64 range)', function () {
+        const obj = serializeAndDecodeAnyValue(1e100);
+        assert.strictEqual(obj.doubleValue, 1e100);
+        assert.strictEqual(obj.intValue, undefined);
+      });
+
+      it('serializes -1e100 as double_value (integer but exceeds int64 range)', function () {
+        const obj = serializeAndDecodeAnyValue(-1e100);
+        assert.strictEqual(obj.doubleValue, -1e100);
+        assert.strictEqual(obj.intValue, undefined);
       });
     });
 
@@ -154,7 +191,7 @@ describe('common-serializer', function () {
 
       it('serializes Number.MAX_VALUE', function () {
         const obj = serializeAndDecodeAnyValue(Number.MAX_VALUE);
-        // Number.MAX_VALUE is beyond MAX_SAFE_INTEGER, so it should serialize as double
+        // Number.MAX_VALUE is larger than a 64-bit integer, so it should serialize as double
         assert.strictEqual(obj.doubleValue, Number.MAX_VALUE);
       });
 

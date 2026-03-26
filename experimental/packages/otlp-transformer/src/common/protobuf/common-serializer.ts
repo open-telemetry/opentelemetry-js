@@ -112,6 +112,12 @@ export function writeKeyValue(
   writer.finishLengthDelimited(valueStart, writer.pos - startPos);
 }
 
+// int64 range bounds for int_value vs double_value encoding.
+// -(2^63) is the signed int64 minimum; 2^63 is one past the maximum.
+// Both are exact IEEE 754 doubles (powers of two), so comparisons are precise.
+const MIN_64_BIT_INT = -(2 ** 63);
+const MAX_64_BIT_INT = 2 ** 63;
+
 /**
  * Write an AnyValue directly from raw attribute value to protobuf
  */
@@ -124,14 +130,21 @@ export function writeAnyValue(writer: IProtobufWriter, value: AnyValue): void {
     writer.writeTag(2, 0); // AnyValue.bool_value (field 2, varint)
     writer.writeVarint((value as boolean) ? 1 : 0);
   } else if (t === 'number') {
-    // Use isSafeInteger to avoid precision loss with large integers
-    // Numbers outside the safe integer range should be serialized as doubles
-    if (!Number.isSafeInteger(value as number)) {
-      writer.writeTag(4, 1); // AnyValue.double_value (field 4, fixed64)
-      writer.writeDouble(value as number);
-    } else {
+    const numValue = value as number;
+    // Encode as int_value (int64) when the number is an integer within the int64
+    // range. Number.isSafeInteger() would be too conservative — integers beyond
+    // 2^53-1 that are exactly representable in IEEE 754 (e.g. powers of two)
+    // still fit in int64 and must not be downgraded to double_value.
+    if (
+      Number.isInteger(numValue) &&
+      numValue >= MIN_64_BIT_INT &&
+      numValue < MAX_64_BIT_INT
+    ) {
       writer.writeTag(3, 0); // AnyValue.int_value (field 3, varint)
-      writer.writeVarint(value as number);
+      writer.writeVarint(numValue);
+    } else {
+      writer.writeTag(4, 1); // AnyValue.double_value (field 4, fixed64)
+      writer.writeDouble(numValue);
     }
   } else if (value instanceof Uint8Array) {
     writer.writeTag(7, 2); // AnyValue.bytes_value (field 7, length-delimited)
