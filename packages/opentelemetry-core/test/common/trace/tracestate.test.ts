@@ -128,8 +128,8 @@ describe('TraceState', () => {
         .map((_: null, num: number) => `a${num}=${num}`);
       const state = new TraceState(tracestate.join(','));
 
-      tracestate.forEach((entry, index) => {
-        const [key, value] = entry.split('=');
+      tracestate.forEach((member, index) => {
+        const [key, value] = member.split('=');
         if (index < 32) {
           assert.deepStrictEqual(state.get(key), value);
         } else {
@@ -154,12 +154,13 @@ describe('TraceState', () => {
 
       const state = new TraceState(tracestate.join(','));
 
-      // assert.deepStrictEqual(state['_keys']().length, 32);
-      assert.deepStrictEqual(state.get('a0'), '0');
-      assert.deepStrictEqual(state.get('a31'), '31');
+      assert.deepStrictEqual(state.get('invalid.prefix.key'), undefined);
       assert.deepStrictEqual(state.get('invalid.middle.key.a'), undefined);
       assert.deepStrictEqual(state.get('invalid.middle.key.b'), undefined);
       assert.deepStrictEqual(state.get('invalid.middle.key.c'), undefined);
+      for (let i = 0; i < 32; i++) {
+        assert.deepStrictEqual(state.get(`a${i}`), `${i}`);
+      }
     });
   });
 });
