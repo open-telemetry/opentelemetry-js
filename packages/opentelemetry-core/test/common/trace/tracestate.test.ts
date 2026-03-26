@@ -39,6 +39,13 @@ describe('TraceState', () => {
       assert.deepStrictEqual(state.serialize(), 'a=1');
       assert.strictEqual(orgState.serialize(), 'c=4,b=3,a=1');
     });
+
+    it('must not create a new TraceState and keep the keys and values', () => {
+      const orgState = new TraceState('a=1,b=2');
+      const state = orgState.set('b', '3'.repeat(257));
+      assert.strictEqual(orgState, state);
+      assert.deepStrictEqual(orgState.serialize(), 'a=1,b=2');
+    });
   });
 
   describe('.parse()', () => {
