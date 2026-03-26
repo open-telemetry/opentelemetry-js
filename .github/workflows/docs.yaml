@@ -34,7 +34,7 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=6144
 
       - name: Deploy Documentation 🚀
-        uses: JamesIves/github-pages-deploy-action@releases/v4
+        uses: JamesIves/github-pages-deploy-action@d92aa235d04922e8f08b40ce78cc5442fcfbfa2f # releases/v4
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: docs # The folder the action should deploy.
