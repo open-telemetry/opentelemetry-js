@@ -40,6 +40,10 @@ export function isRequest(value: unknown): value is Request {
     return false;
   }
 
+  if (typeof Request !== 'undefined' && value instanceof Request) {
+    return true;
+  }
+
   const candidate = value as {
     url?: unknown;
     method?: unknown;
