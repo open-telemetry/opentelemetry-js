@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/api",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Public API for OpenTelemetry",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -28,6 +28,7 @@
     "lint": "eslint . --ext .ts && npm run cycle-check",
     "test:browser": "karma start --single-run",
     "test": "nyc mocha 'test/**/*.test.ts'",
+    "test:node8-compat": "node test/backcompat/node8-compat.js",
     "test:webworker": "karma start karma.worker.js --single-run",
     "cycle-check": "dpdm --exit-code circular:1 src/index.ts",
     "version": "node ../scripts/version-update.js",
