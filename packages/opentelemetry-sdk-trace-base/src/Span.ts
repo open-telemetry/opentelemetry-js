@@ -126,7 +126,9 @@ export class SpanImpl implements Span {
         this.addLink(link);
       }
     }
-    this.startTime = this._getTime(opts.startTime ?? now);
+    this.startTime = this._startTimeProvided
+      ? this._getTime(opts.startTime)
+      : millisToHrTime(now);
     this.resource = opts.resource;
     this.instrumentationScope = opts.scope;
     this._recordEndMetrics = opts.recordEndMetrics;
