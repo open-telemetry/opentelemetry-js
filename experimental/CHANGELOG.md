@@ -10,6 +10,9 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(otlp-transformer): add custom protobuf logs serializer [#6228](https://github.com/open-telemetry/opentelemetry-js/pull/6228) @pichlermarc
+* feat(otlp-transformer): add custom protobuf logs export response deserializer [#6530](https://github.com/open-telemetry/opentelemetry-js/pull/6530) @pichlermarc
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
@@ -148,7 +151,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(opentelemetry-sdk-node): set instrumentation and propagators for experimental start [#6148](https://github.com/open-telemetry/opentelemetry-js/pull/6148) @maryliag
 * refactor(configuration): set console exporter as empty object [#6164](https://github.com/open-telemetry/opentelemetry-js/pull/6164) @maryliag
 * feat(instrumentation-http, instrumentation-fetch, instrumentation-xml-http-request): support "QUERY" as a known HTTP method
-* feat(otlp-transformer): add custom protobuf logs serializer [#6228](https://github.com/open-telemetry/opentelemetry-js/pull/6228) @pichlermarc
 
 ### :bug: Bug Fixes
 

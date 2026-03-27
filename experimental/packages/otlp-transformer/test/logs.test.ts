@@ -14,7 +14,7 @@ import { SeverityNumber } from '@opentelemetry/api-logs';
 import type { Encoder } from '../src/common/utils';
 import { JSON_ENCODER, PROTOBUF_ENCODER } from '../src/common/utils';
 import { toBase64 } from './utils';
-import * as root from '../src/generated/root';
+import * as signals from '../test/generated/signals';
 import type { IExportLogsServiceRequest } from '../src/logs/internal-types';
 import { ESeverityNumber } from '../src/logs/internal-types';
 import { createExportLogsServiceRequest } from '../src/logs/internal';
@@ -360,13 +360,13 @@ describe('Logs', () => {
       const serialized = ProtobufLogsSerializer.serializeRequest([log_1_1_1]);
       assert.ok(serialized, 'serialized response is undefined');
       const decoded =
-        root.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest.decode(
+        signals.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest.decode(
           serialized
         );
 
       const expected = createExpectedLogProtobuf();
       const decodedObj =
-        root.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest.toObject(
+        signals.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest.toObject(
           decoded,
           {
             // This incurs some precision loss that's taken into account in createExpectedLogsProtobuf()
@@ -385,7 +385,7 @@ describe('Logs', () => {
 
     it('deserializes a response', () => {
       const protobufSerializedResponse =
-        root.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse.encode(
+        signals.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse.encode(
           {
             partialSuccess: {
               errorMessage: 'foo',
