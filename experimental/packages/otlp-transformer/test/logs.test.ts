@@ -20,7 +20,10 @@ import { ESeverityNumber } from '../src/logs/internal-types';
 import { createExportLogsServiceRequest } from '../src/logs/internal';
 import { ProtobufLogsSerializer } from '../src/logs/protobuf';
 import { JsonLogsSerializer } from '../src/logs/json';
-import { GROWING_BUFFER_DEBUG_MESSAGE } from '../src/common/protobuf/protobuf-writer';
+import {
+  GROWING_BUFFER_DEBUG_MESSAGE,
+  ProtobufWriter,
+} from '../src/common/protobuf/protobuf-writer';
 
 function createExpectedLogJson(encoder: Encoder): IExportLogsServiceRequest {
   const timeUnixNano = encoder.encodeHrTime([1680253513, 123241635]);
@@ -414,6 +417,51 @@ describe('Logs', () => {
         ProtobufLogsSerializer.deserializeResponse(new Uint8Array([]))
       );
       sinon.assert.neverCalledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
+    });
+
+    it('does not throw when encountering unexpected wiretypes during deserialization', function () {
+      const writer = new ProtobufWriter(50);
+      // Construct an ExportLogsServiceResponse where the embedded
+      // ExportLogsPartialSuccess has fields encoded with incorrect wire types.
+      // ExportLogsServiceResponse { 1: partial_success (length-delimited) }
+      // ExportLogsPartialSuccess expects:
+      //   1: rejected_log_records (varint)
+      //   2: error_message (length-delimited string)
+
+      // first pretend the field number 1 is a varint (type 0, correct format expects a length delimited field)
+      writer.writeTag(1, 0);
+      writer.writeVarint(3);
+
+      // also pretend we have an extra field that we don't know yet what to do with
+      writer.writeTag(99, 0);
+      writer.writeVarint(42);
+
+      // now write field 1 again, but this time as length-delimited, as expected.
+      writer.writeTag(1, 2);
+      const lengthVarintPosition = writer.startLengthDelimited();
+      const innerStartPos = writer.pos;
+      // instead of putting the correct data here, we put unexpected wire-types for each field, ensuring it's handled gracefully.
+      // Write field 1 but with wire type 2 (length-delimited) and a string (correct format expects a varint)
+      writer.writeTag(1, 2);
+      writer.writeString('not-a-number');
+      // Write field 2 but with wire type 0 (varint) instead of length-delimited (corrent format expects a string, which is length delimited)
+      writer.writeTag(2, 0);
+      writer.writeVarint(12345);
+      // Write field 99, which is completely unknown to us; pretend it's a varint (type 0)
+      writer.writeTag(99, 0);
+      writer.writeVarint(42);
+
+      // finish up
+      writer.finishLengthDelimited(
+        lengthVarintPosition,
+        writer.pos - innerStartPos
+      );
+
+      // Ensure deserialization does not throw when encountering these
+      // unexpected wire types.
+      assert.doesNotThrow(() =>
+        ProtobufLogsSerializer.deserializeResponse(writer.finish())
+      );
     });
   });
 
