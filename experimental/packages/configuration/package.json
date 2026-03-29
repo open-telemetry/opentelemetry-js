@@ -9,6 +9,7 @@
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
+    "generate:config": "node ../../../scripts/config/generate-config.js",
     "test": "nyc mocha test/**/*.test.ts",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
@@ -39,6 +40,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "2.6.1",
+    "ajv": "^8.0.0",
     "yaml": "^2.0.0"
   },
   "peerDependencies": {

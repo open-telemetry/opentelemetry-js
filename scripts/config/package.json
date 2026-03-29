@@ -1,0 +1,8 @@
+{
+  "name": "otel-config-codegen",
+  "private": true,
+  "description": "Code generation scripts for @opentelemetry/configuration",
+  "dependencies": {
+    "json-schema-to-typescript": "^15.0.0"
+  }
+}

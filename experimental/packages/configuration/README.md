@@ -1,35 +1,135 @@
-# OpenTelemetry SDK for Node.js
+# OpenTelemetry Declarative Configuration
 
+[![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This package provides the configuration for OpenTelemetry JavaScript SDK.
+This package implements the [OpenTelemetry declarative configuration](https://github.com/open-telemetry/opentelemetry-configuration) specification for Node.js. It parses configuration from a YAML file or environment variables and produces a `ConfigurationModel` that the OpenTelemetry SDK uses to initialize providers.
 
-## Quick Start
-
-**Note: Much of OpenTelemetry JS documentation is written assuming the compiled application is run as CommonJS.**
-For more details on ECMAScript Modules vs CommonJS, refer to [esm-support](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-support.md).
-
-To get started you need to install `@opentelemetry/configuration`.
-
-### Installation
+## Installation
 
 ```sh
-# Install the package
 npm install @opentelemetry/configuration
 ```
 
+## Usage
+
+`createConfigFactory()` selects the configuration source automatically:
+
+- If `OTEL_CONFIG_FILE` points to a valid `.yaml`/`.yml` file, configuration is read from that file.
+- Otherwise, configuration is assembled from standard OpenTelemetry environment variables.
+
+```typescript
+import { createConfigFactory } from '@opentelemetry/configuration';
+
+const factory = createConfigFactory();
+const config = factory.getConfigModel();
+```
+
+### YAML file configuration
+
+Set `OTEL_CONFIG_FILE` to the path of your configuration file:
+
+```sh
+OTEL_CONFIG_FILE=./otel-config.yaml node app.js
+```
+
+Example:
+
+```yaml
+file_format: "1.0-rc.3"
+resource:
+  attributes:
+    - name: service.name
+      value: my-service
+tracer_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp_http:
+            endpoint: http://localhost:4318/v1/traces
+```
+
+Environment variable substitution is supported using `${VAR_NAME}`, `${VAR_NAME:-default}`, `${env:VAR_NAME}`, and `${env:VAR_NAME:-default}` syntax. Use `$$` for a literal `$`.
+
+```yaml
+tracer_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp_http:
+            endpoint: ${OTEL_EXPORTER_ENDPOINT:-http://localhost:4318}/v1/traces
+```
+
+### Environment variable configuration
+
+When no config file is set, the factory reads from the standard OpenTelemetry SDK environment variables:
+
+| Variable | Description |
+|---|---|
+| `OTEL_SDK_DISABLED` | Disable the SDK entirely |
+| `OTEL_LOG_LEVEL` | Internal SDK log level |
+| `OTEL_SERVICE_NAME` | Service name resource attribute |
+| `OTEL_RESOURCE_ATTRIBUTES` | Comma-separated resource attributes |
+| `OTEL_TRACES_EXPORTER` | Traces exporter(s): `otlp`, `console`, `none` |
+| `OTEL_METRICS_EXPORTER` | Metrics exporter(s): `otlp`, `prometheus`, `console`, `none` |
+| `OTEL_LOGS_EXPORTER` | Logs exporter(s): `otlp`, `console`, `none` |
+| `OTEL_EXPORTER_OTLP_PROTOCOL` | OTLP protocol: `grpc`, `http/protobuf`, `http/json` |
+| `OTEL_PROPAGATORS` | Propagators: `tracecontext`, `baggage`, `b3`, `b3multi` |
+
+## Development
+
+### Generated files
+
+`src/generated/` is auto-generated — do not edit manually. It contains:
+
+- `types.ts` — TypeScript interfaces derived from the JSON schema (via `json-schema-to-typescript`)
+- `schema.ts` — The raw JSON schema exported as a constant for runtime validation (via `ajv`)
+
+### Regenerating after a schema version bump
+
+1. Update the `VERSION` variable in `scripts/config/generate-config.sh`
+2. Run from this package directory:
+   ```sh
+   npm run generate:config
+   ```
+3. Review the diff in `src/generated/types.ts` and `src/generated/schema.ts`
+4. Update `supportedFileVersionPattern` in `src/FileConfigFactory.ts` if the new version falls outside the current regex
+5. Update `EnvironmentConfigFactory.ts` and `utils.ts` if new fields need env var mapping
+
+The generation script (`scripts/config/generate-config.js`) handles several post-processing steps:
+
+- Renames the root type from `OpenTelemetryConfiguration` to `ConfigurationModel`
+- Makes `file_format` optional (required at parse time but not needed when constructing the model in code)
+- Strips `minItems` constraints from the runtime schema (so `processors: null` in YAML is accepted)
+- Replaces narrow index signatures (`[k: string]: {} | null`) with `[k: string]: unknown`
+- Appends named `const` enum objects for inlined enum types (e.g. `ExemplarFilter`, `SeverityNumber`)
+
+### Defaults
+
+The file and env config paths apply defaults differently:
+
+- `FileConfigFactory` — applies only `attribute_count_limit: 128` after schema validation (`applyConfigDefaults()`). Fields like `disabled` and `log_level` are **not** defaulted: if absent from the YAML, they stay absent in the model (WYSIWYG principle). The SDK layer interprets missing values.
+- `EnvironmentConfigFactory` — sets `disabled: false`, `log_level: info`, and `attribute_count_limit: 128` via `initializeDefaultConfiguration()` in the constructor, because env var config is inherently opt-in and always produces a complete model.
+
+One intentional exception in both paths: `AttributeNameValue.type` is **not** defaulted even though the spec says "if omitted, string is used". This is a semantic default for SDK code interpreting resource attributes, not a config-parser concern. SDK code reading `resource.attributes` should apply `attr.type ?? 'string'` at the point of use.
+
+## Supported schema versions
+
+- `1.0-rc.3` (and any `1.0-rc.N` release candidate)
+
 ## Useful links
 
-- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
-- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
+- [OpenTelemetry Declarative Configuration Specification](https://github.com/open-telemetry/opentelemetry-configuration)
+- [OpenTelemetry for Node.js](https://github.com/open-telemetry/opentelemetry-js)
+- [OpenTelemetry Community](https://opentelemetry.io/)
 
 ## License
 
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
-[discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/configuration
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fconfiguration.svg
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
