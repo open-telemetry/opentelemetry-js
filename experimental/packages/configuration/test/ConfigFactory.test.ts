@@ -2254,10 +2254,7 @@ describe('ConfigFactory', function () {
 
     it('should throw from invalid config file format', function () {
       process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
-      assert.throws(
-        () => createConfigFactory(),
-        /Unsupported file_format/
-      );
+      assert.throws(() => createConfigFactory(), /Unsupported file_format/);
     });
 
     it('should initialize config with default values with empty string for config file', function () {

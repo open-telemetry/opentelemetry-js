@@ -55,10 +55,7 @@ describe('config utils', function () {
       );
 
       // ${env:VAR} and ${env:VAR:-default} forms (spec ABNF)
-      assert.deepStrictEqual(
-        envVariableSubstitution('${env:TEST1}'),
-        't1'
-      );
+      assert.deepStrictEqual(envVariableSubstitution('${env:TEST1}'), 't1');
       assert.deepStrictEqual(
         envVariableSubstitution('${env:TEST3:-fallback}'),
         'fallback'
@@ -70,10 +67,7 @@ describe('config utils', function () {
 
       // $$ is a literal $ escape
       assert.deepStrictEqual(envVariableSubstitution('$$'), '$');
-      assert.deepStrictEqual(
-        envVariableSubstitution('$${TEST1}'),
-        '${TEST1}'
-      );
+      assert.deepStrictEqual(envVariableSubstitution('$${TEST1}'), '${TEST1}');
     });
   });
 });

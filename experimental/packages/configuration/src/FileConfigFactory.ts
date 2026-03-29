@@ -107,7 +107,9 @@ export function parseConfigFile(): ConfigurationModel {
  * default encoding for OTLP HTTP exporters.
  */
 function applyOtlpHttpEncodingDefaults(data: ConfigurationModel): void {
-  const applyEncoding = (exporter: { encoding?: string | null } | null | undefined) => {
+  const applyEncoding = (
+    exporter: { encoding?: string | null } | null | undefined
+  ) => {
     if (exporter && exporter.encoding == null) {
       exporter.encoding = 'protobuf';
     }
