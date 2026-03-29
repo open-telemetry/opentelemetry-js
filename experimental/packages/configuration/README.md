@@ -67,7 +67,7 @@ tracer_provider:
 When no config file is set, the factory reads from the standard OpenTelemetry SDK environment variables:
 
 | Variable | Description |
-|---|---|
+| --- | --- |
 | `OTEL_SDK_DISABLED` | Disable the SDK entirely |
 | `OTEL_LOG_LEVEL` | Internal SDK log level |
 | `OTEL_SERVICE_NAME` | Service name resource attribute |
@@ -91,9 +91,11 @@ When no config file is set, the factory reads from the standard OpenTelemetry SD
 
 1. Update the `VERSION` variable in `scripts/config/generate-config.sh`
 2. Run from this package directory:
+
    ```sh
    npm run generate:config
    ```
+
 3. Review the diff in `src/generated/types.ts` and `src/generated/schema.ts`
 4. Update `supportedFileVersionPattern` in `src/FileConfigFactory.ts` if the new version falls outside the current regex
 5. Update `EnvironmentConfigFactory.ts` and `utils.ts` if new fields need env var mapping
