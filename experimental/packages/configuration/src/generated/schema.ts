@@ -10,7 +10,6 @@
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const opentelemetryConfigurationSchema: any = {
-  "$id": "https://opentelemetry.io/otelconfig/opentelemetry_configuration.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "OpenTelemetryConfiguration",
   "type": "object",
@@ -359,7 +358,7 @@ export const opentelemetryConfigurationSchema: any = {
             "null"
           ],
           "exclusiveMinimum": 0,
-          "description": "Configure default cardinality limit for all instrument types.\nInstrument-specific cardinality limits take priority. \nIf omitted or null, 2000 is used.\n"
+          "description": "Configure default cardinality limit for all instrument types.\nInstrument-specific cardinality limits take priority.\nIf omitted or null, 2000 is used.\n"
         },
         "counter": {
           "type": [
@@ -475,6 +474,16 @@ export const opentelemetryConfigurationSchema: any = {
         "trace_based"
       ]
     },
+    "ExperimentalCodeInstrumentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "semconv": {
+          "$ref": "#/$defs/ExperimentalSemconvConfig",
+          "description": "Configure code semantic convention version and migration behavior.\n\nThis property takes precedence over the .instrumentation/development.general.stability_opt_in_list setting.\n\nSee code semantic conventions: https://opentelemetry.io/docs/specs/semconv/registry/attributes/code/\nIf omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.\n"
+        }
+      }
+    },
     "ExperimentalComposableAlwaysOffSampler": {
       "type": [
         "object",
@@ -530,14 +539,11 @@ export const opentelemetryConfigurationSchema: any = {
       "additionalProperties": false,
       "properties": {
         "rules": {
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": "array",
           "items": {
             "$ref": "#/$defs/ExperimentalComposableRuleBasedSamplerRule"
           },
-          "description": "The rules for the sampler, matched in order. If no rules match, the span is not sampled.\nIf omitted or null, no span is sampled.\n"
+          "description": "The rules for the sampler, matched in order.\nEach rule can have multiple match conditions. All conditions must match for the rule to match.\nIf no conditions are specified, the rule matches all spans that reach it.\nIf no rules match, the span is not sampled.\nIf omitted, no span is sampled.\n"
         }
       }
     },
@@ -665,17 +671,64 @@ export const opentelemetryConfigurationSchema: any = {
       ],
       "additionalProperties": false
     },
+    "ExperimentalDbInstrumentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "semconv": {
+          "$ref": "#/$defs/ExperimentalSemconvConfig",
+          "description": "Configure database semantic convention version and migration behavior.\n\nThis property takes precedence over the .instrumentation/development.general.stability_opt_in_list setting.\n\nSee database migration: https://opentelemetry.io/docs/specs/semconv/database/\nIf omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.\n"
+        }
+      }
+    },
+    "ExperimentalGenAiInstrumentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "semconv": {
+          "$ref": "#/$defs/ExperimentalSemconvConfig",
+          "description": "Configure GenAI semantic convention version and migration behavior.\n\nThis property takes precedence over the .instrumentation/development.general.stability_opt_in_list setting.\n\nSee GenAI semantic conventions: https://opentelemetry.io/docs/specs/semconv/gen-ai/\nIf omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.\n"
+        }
+      }
+    },
     "ExperimentalGeneralInstrumentation": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "peer": {
-          "$ref": "#/$defs/ExperimentalPeerInstrumentation",
-          "description": "Configure instrumentations following the peer semantic conventions.\nSee peer semantic conventions: https://opentelemetry.io/docs/specs/semconv/attributes-registry/peer/\nIf omitted, defaults as described in ExperimentalPeerInstrumentation are used.\n"
-        },
         "http": {
           "$ref": "#/$defs/ExperimentalHttpInstrumentation",
           "description": "Configure instrumentations following the http semantic conventions.\nSee http semantic conventions: https://opentelemetry.io/docs/specs/semconv/http/\nIf omitted, defaults as described in ExperimentalHttpInstrumentation are used.\n"
+        },
+        "code": {
+          "$ref": "#/$defs/ExperimentalCodeInstrumentation",
+          "description": "Configure instrumentations following the code semantic conventions.\nSee code semantic conventions: https://opentelemetry.io/docs/specs/semconv/registry/attributes/code/\nIf omitted, defaults as described in ExperimentalCodeInstrumentation are used.\n"
+        },
+        "db": {
+          "$ref": "#/$defs/ExperimentalDbInstrumentation",
+          "description": "Configure instrumentations following the database semantic conventions.\nSee database semantic conventions: https://opentelemetry.io/docs/specs/semconv/database/\nIf omitted, defaults as described in ExperimentalDbInstrumentation are used.\n"
+        },
+        "gen_ai": {
+          "$ref": "#/$defs/ExperimentalGenAiInstrumentation",
+          "description": "Configure instrumentations following the GenAI semantic conventions.\nSee GenAI semantic conventions: https://opentelemetry.io/docs/specs/semconv/gen-ai/\nIf omitted, defaults as described in ExperimentalGenAiInstrumentation are used.\n"
+        },
+        "messaging": {
+          "$ref": "#/$defs/ExperimentalMessagingInstrumentation",
+          "description": "Configure instrumentations following the messaging semantic conventions.\nSee messaging semantic conventions: https://opentelemetry.io/docs/specs/semconv/messaging/\nIf omitted, defaults as described in ExperimentalMessagingInstrumentation are used.\n"
+        },
+        "rpc": {
+          "$ref": "#/$defs/ExperimentalRpcInstrumentation",
+          "description": "Configure instrumentations following the RPC semantic conventions.\nSee RPC semantic conventions: https://opentelemetry.io/docs/specs/semconv/rpc/\nIf omitted, defaults as described in ExperimentalRpcInstrumentation are used.\n"
+        },
+        "sanitization": {
+          "$ref": "#/$defs/ExperimentalSanitization",
+          "description": "Configure general sanitization options.\nIf omitted, defaults as described in ExperimentalSanitization are used.\n"
+        },
+        "stability_opt_in_list": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Configure semantic convention stability opt-in as a comma-separated list.\nThis property follows the format and semantics of the OTEL_SEMCONV_STABILITY_OPT_IN environment variable.\nControls the emission of stable vs. experimental semantic conventions for instrumentation.\nThis setting is only intended for migrating from experimental to stable semantic conventions.\n\nKnown values include:\n- http: Emit stable HTTP and networking conventions only\n- http/dup: Emit both old and stable HTTP and networking conventions (for phased migration)\n- database: Emit stable database conventions only\n- database/dup: Emit both old and stable database conventions (for phased migration)\n- rpc: Emit stable RPC conventions only\n- rpc/dup: Emit both experimental and stable RPC conventions (for phased migration)\n- messaging: Emit stable messaging conventions only\n- messaging/dup: Emit both old and stable messaging conventions (for phased migration)\n- code: Emit stable code conventions only\n- code/dup: Emit both old and stable code conventions (for phased migration)\n\nMultiple values can be specified as a comma-separated list (e.g., \"http,database/dup\").\nAdditional signal types may be supported in future versions.\n\nDomain-specific semconv properties (e.g., .instrumentation/development.general.db.semconv) take precedence over this general setting.\n\nSee:\n- HTTP migration: https://opentelemetry.io/docs/specs/semconv/non-normative/http-migration/\n- Database migration: https://opentelemetry.io/docs/specs/semconv/database/\n- RPC: https://opentelemetry.io/docs/specs/semconv/rpc/\n- Messaging: https://opentelemetry.io/docs/specs/semconv/messaging/messaging-spans/\nIf omitted or null, no opt-in is configured and instrumentations continue emitting their default semantic convention version.\n"
         }
       }
     },
@@ -703,6 +756,13 @@ export const opentelemetryConfigurationSchema: any = {
             "type": "string"
           },
           "description": "Configure headers to capture for inbound http responses.\nIf omitted, no inbound response headers are captured.\n"
+        },
+        "known_methods": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Override the default list of known HTTP methods.\nKnown methods are case-sensitive.\nThis is a full override of the default known methods, not a list of known methods in addition to the defaults.\nIf omitted, HTTP methods GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH are known.\n"
         }
       }
     },
@@ -710,6 +770,10 @@ export const opentelemetryConfigurationSchema: any = {
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "semconv": {
+          "$ref": "#/$defs/ExperimentalSemconvConfig",
+          "description": "Configure HTTP semantic convention version and migration behavior.\n\nThis property takes precedence over the .instrumentation/development.general.stability_opt_in_list setting.\n\nSee HTTP migration: https://opentelemetry.io/docs/specs/semconv/non-normative/http-migration/\nIf omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.\n"
+        },
         "client": {
           "$ref": "#/$defs/ExperimentalHttpClientInstrumentation",
           "description": "Configure instrumentations following the http client semantic conventions.\nIf omitted, defaults as described in ExperimentalHttpClientInstrumentation are used.\n"
@@ -737,6 +801,13 @@ export const opentelemetryConfigurationSchema: any = {
             "type": "string"
           },
           "description": "Configure headers to capture for outbound http responses.\nIf omitted, no response headers are captures.\n"
+        },
+        "known_methods": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Override the default list of known HTTP methods.\nKnown methods are case-sensitive.\nThis is a full override of the default known methods, not a list of known methods in addition to the defaults.\nIf omitted, HTTP methods GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH are known.\n"
         }
       }
     },
@@ -837,12 +908,12 @@ export const opentelemetryConfigurationSchema: any = {
       ],
       "additionalProperties": false,
       "properties": {
-        "disabled": {
+        "enabled": {
           "type": [
             "boolean",
             "null"
           ],
-          "description": "Configure if the logger is enabled or not.\nIf omitted or null, false is used.\n"
+          "description": "Configure if the logger is enabled or not.\nIf omitted or null, true is used.\n"
         },
         "minimum_severity": {
           "$ref": "#/$defs/SeverityNumber",
@@ -898,17 +969,27 @@ export const opentelemetryConfigurationSchema: any = {
         "config"
       ]
     },
+    "ExperimentalMessagingInstrumentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "semconv": {
+          "$ref": "#/$defs/ExperimentalSemconvConfig",
+          "description": "Configure messaging semantic convention version and migration behavior.\n\nThis property takes precedence over the .instrumentation/development.general.stability_opt_in_list setting.\n\nSee messaging semantic conventions: https://opentelemetry.io/docs/specs/semconv/messaging/\nIf omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.\n"
+        }
+      }
+    },
     "ExperimentalMeterConfig": {
       "type": [
         "object"
       ],
       "additionalProperties": false,
       "properties": {
-        "disabled": {
+        "enabled": {
           "type": [
             "boolean"
           ],
-          "description": "Configure if the meter is enabled or not.\nIf omitted, false is used.\n"
+          "description": "Configure if the meter is enabled or not.\nIf omitted, true is used.\n"
         }
       }
     },
@@ -993,37 +1074,6 @@ export const opentelemetryConfigurationSchema: any = {
         }
       }
     },
-    "ExperimentalPeerInstrumentation": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "service_mapping": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/ExperimentalPeerServiceMapping"
-          },
-          "description": "Configure the service mapping for instrumentations following peer.service semantic conventions.\nSee peer.service semantic conventions: https://opentelemetry.io/docs/specs/semconv/general/attributes/#general-remote-service-attributes\nIf omitted, no peer service mappings are used.\n"
-        }
-      }
-    },
-    "ExperimentalPeerServiceMapping": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "peer": {
-          "type": "string",
-          "description": "The IP address to map.\nProperty is required and must be non-null.\n"
-        },
-        "service": {
-          "type": "string",
-          "description": "The logical name corresponding to the IP address of .peer.\nProperty is required and must be non-null.\n"
-        }
-      },
-      "required": [
-        "peer",
-        "service"
-      ]
-    },
     "ExperimentalProbabilitySampler": {
       "type": [
         "object",
@@ -1075,9 +1125,9 @@ export const opentelemetryConfigurationSchema: any = {
             "boolean",
             "null"
           ],
-          "description": "Configure Prometheus Exporter to produce metrics without a scope info metric.\nIf omitted or null, false is used.\n"
+          "description": "Configure Prometheus Exporter to produce metrics without scope labels.\nIf omitted or null, false is used.\n"
         },
-        "without_target_info": {
+        "without_target_info/development": {
           "type": [
             "boolean",
             "null"
@@ -1090,7 +1140,7 @@ export const opentelemetryConfigurationSchema: any = {
         },
         "translation_strategy": {
           "$ref": "#/$defs/ExperimentalPrometheusTranslationStrategy",
-          "description": "Configure how metric names are translated to Prometheus metric names.\nValues include:\n* no_translation: Special character escaping is disabled. Type and unit suffixes are disabled. Metric names are unaltered.\n* no_utf8_escaping_with_suffixes: Special character escaping is disabled. Type and unit suffixes are enabled.\n* underscore_escaping_with_suffixes: Special character escaping is enabled. Type and unit suffixes are enabled.\n* underscore_escaping_without_suffixes: Special character escaping is enabled. Type and unit suffixes are disabled. This represents classic Prometheus metric name compatibility.\nIf omitted, underscore_escaping_with_suffixes is used.\n"
+          "description": "Configure how metric names are translated to Prometheus metric names.\nValues include:\n* no_translation/development: Special character escaping is disabled. Type and unit suffixes are disabled. Metric names are unaltered.\n* no_utf8_escaping_with_suffixes/development: Special character escaping is disabled. Type and unit suffixes are enabled.\n* underscore_escaping_with_suffixes: Special character escaping is enabled. Type and unit suffixes are enabled.\n* underscore_escaping_without_suffixes/development: Special character escaping is enabled. Type and unit suffixes are disabled. This represents classic Prometheus metric name compatibility.\nIf omitted, underscore_escaping_with_suffixes is used.\n"
         }
       }
     },
@@ -1101,9 +1151,9 @@ export const opentelemetryConfigurationSchema: any = {
       ],
       "enum": [
         "underscore_escaping_with_suffixes",
-        "underscore_escaping_without_suffixes",
-        "no_utf8_escaping_with_suffixes",
-        "no_translation"
+        "underscore_escaping_without_suffixes/development",
+        "no_utf8_escaping_with_suffixes/development",
+        "no_translation/development"
       ]
     },
     "ExperimentalResourceDetection": {
@@ -1152,6 +1202,54 @@ export const opentelemetryConfigurationSchema: any = {
         }
       }
     },
+    "ExperimentalRpcInstrumentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "semconv": {
+          "$ref": "#/$defs/ExperimentalSemconvConfig",
+          "description": "Configure RPC semantic convention version and migration behavior.\n\nThis property takes precedence over the .instrumentation/development.general.stability_opt_in_list setting.\n\nSee RPC semantic conventions: https://opentelemetry.io/docs/specs/semconv/rpc/\nIf omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.\n"
+        }
+      }
+    },
+    "ExperimentalSanitization": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "$ref": "#/$defs/ExperimentalUrlSanitization",
+          "description": "Configure URL sanitization options.\nIf omitted, defaults as described in ExperimentalUrlSanitization are used.\n"
+        }
+      }
+    },
+    "ExperimentalSemconvConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "The target semantic convention version for this domain (e.g., 1).\nIf omitted or null, the latest stable version is used, or if no stable version is available and .experimental is true then the latest experimental version is used.\n"
+        },
+        "experimental": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Use latest experimental semantic conventions (before stable is available or to enable experimental features on top of stable conventions).\nIf omitted or null, false is used.\n"
+        },
+        "dual_emit": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "When true, also emit the previous major version alongside the target version.\nFor version=1, the previous version refers to the pre-stable conventions that the instrumentation emitted before the first stable semantic convention version was defined.\nFor version=2 and above, the previous version is the prior stable major version (e.g., version=2, dual_emit=true emits both v2 and v1).\nEnables dual-emit for phased migration between versions.\nIf omitted or null, false is used.\n"
+        }
+      }
+    },
     "ExperimentalServiceResourceDetector": {
       "type": [
         "object",
@@ -1176,11 +1274,11 @@ export const opentelemetryConfigurationSchema: any = {
       ],
       "additionalProperties": false,
       "properties": {
-        "disabled": {
+        "enabled": {
           "type": [
             "boolean"
           ],
-          "description": "Configure if the tracer is enabled or not.\nIf omitted, false is used.\n"
+          "description": "Configure if the tracer is enabled or not.\nIf omitted, true is used.\n"
         }
       }
     },
@@ -1224,6 +1322,19 @@ export const opentelemetryConfigurationSchema: any = {
         "name",
         "config"
       ]
+    },
+    "ExperimentalUrlSanitization": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sensitive_query_parameters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of query parameter names whose values should be redacted from URLs.\nQuery parameter names are case-sensitive.\nThis is a full override of the default sensitive query parameter keys, it is not a list of keys in addition to the defaults.\nSet to an empty array to disable query parameter redaction.\nIf omitted, the default sensitive query parameter list as defined by the url semantic conventions (https://github.com/open-telemetry/semantic-conventions/blob/main/docs/registry/attributes/url.md) is used.\n"
+        }
+      }
     },
     "ExplicitBucketHistogramAggregation": {
       "type": [
@@ -1371,13 +1482,6 @@ export const opentelemetryConfigurationSchema: any = {
         "up_down_counter"
       ]
     },
-    "JaegerPropagator": {
-      "type": [
-        "object",
-        "null"
-      ],
-      "additionalProperties": false
-    },
     "LastValueAggregation": {
       "type": [
         "object",
@@ -1501,7 +1605,7 @@ export const opentelemetryConfigurationSchema: any = {
         },
         "exemplar_filter": {
           "$ref": "#/$defs/ExemplarFilter",
-          "description": "Configure the exemplar filter. \nValues include:\n* always_off: ExemplarFilter which makes no measurements eligible for being an Exemplar.\n* always_on: ExemplarFilter which makes all measurements eligible for being an Exemplar.\n* trace_based: ExemplarFilter which makes measurements recorded in the context of a sampled parent span eligible for being an Exemplar.\nIf omitted, trace_based is used.\n"
+          "description": "Configure the exemplar filter.\nValues include:\n* always_off: ExemplarFilter which makes no measurements eligible for being an Exemplar.\n* always_on: ExemplarFilter which makes all measurements eligible for being an Exemplar.\n* trace_based: ExemplarFilter which makes measurements recorded in the context of a sampled parent span eligible for being an Exemplar.\nIf omitted, trace_based is used.\n"
         },
         "meter_configurator/development": {
           "$ref": "#/$defs/ExperimentalMeterConfigurator",
@@ -1567,13 +1671,6 @@ export const opentelemetryConfigurationSchema: any = {
       ]
     },
     "OpenCensusMetricProducer": {
-      "type": [
-        "object",
-        "null"
-      ],
-      "additionalProperties": false
-    },
-    "OpenTracingPropagator": {
       "type": [
         "object",
         "null"
@@ -1888,14 +1985,14 @@ export const opentelemetryConfigurationSchema: any = {
           "items": {
             "$ref": "#/$defs/TextMapPropagator"
           },
-          "description": "Configure the propagators in the composite text map propagator. Entries from .composite_list are appended to the list here with duplicates filtered out.\nBuilt-in propagator keys include: tracecontext, baggage, b3, b3multi, jaeger, ottrace. Known third party keys include: xray. \nIf omitted, and .composite_list is omitted or null, a noop propagator is used.\n"
+          "description": "Configure the propagators in the composite text map propagator. Entries from .composite_list are appended to the list here with duplicates filtered out.\nBuilt-in propagator keys include: tracecontext, baggage, b3, b3multi. Known third party keys include: xray.\nIf omitted, and .composite_list is omitted or null, a noop propagator is used.\n"
         },
         "composite_list": {
           "type": [
             "string",
             "null"
           ],
-          "description": "Configure the propagators in the composite text map propagator. Entries are appended to .composite with duplicates filtered out.\nThe value is a comma separated list of propagator identifiers matching the format of OTEL_PROPAGATORS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration for details.\nBuilt-in propagator identifiers include: tracecontext, baggage, b3, b3multi, jaeger, ottrace. Known third party identifiers include: xray. \nIf omitted or null, and .composite is omitted or null, a noop propagator is used.\n"
+          "description": "Configure the propagators in the composite text map propagator. Entries are appended to .composite with duplicates filtered out.\nThe value is a comma separated list of propagator identifiers matching the format of OTEL_PROPAGATORS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration for details.\nBuilt-in propagator identifiers include: tracecontext, baggage, b3, b3multi. Known third party identifiers include: xray.\nIf omitted or null, and .composite is omitted or null, a noop propagator is used.\n"
         }
       }
     },
@@ -2249,14 +2346,6 @@ export const opentelemetryConfigurationSchema: any = {
         "b3multi": {
           "$ref": "#/$defs/B3MultiPropagator",
           "description": "Include the zipkin b3 multi propagator.\nIf omitted, ignore.\n"
-        },
-        "jaeger": {
-          "$ref": "#/$defs/JaegerPropagator",
-          "description": "Include the jaeger propagator.\nIf omitted, ignore.\n"
-        },
-        "ottrace": {
-          "$ref": "#/$defs/OpenTracingPropagator",
-          "description": "Include the opentracing propagator.\nIf omitted, ignore.\n"
         }
       }
     },
@@ -2396,7 +2485,7 @@ export const opentelemetryConfigurationSchema: any = {
         },
         "aggregation": {
           "$ref": "#/$defs/Aggregation",
-          "description": "Configure aggregation of the resulting stream(s). \nIf omitted, default is used.\n"
+          "description": "Configure aggregation of the resulting stream(s).\nIf omitted, default is used.\n"
         },
         "aggregation_cardinality_limit": {
           "type": [

@@ -175,10 +175,6 @@ export function setPropagators(config: ConfigurationModel): void {
         config.propagator.composite.push({ b3: {} });
       } else if (name === 'b3multi') {
         config.propagator.composite.push({ b3multi: {} });
-      } else if (name === 'jaeger') {
-        config.propagator.composite.push({ jaeger: {} });
-      } else if (name === 'ottrace') {
-        config.propagator.composite.push({ ottrace: {} });
       } else {
         config.propagator.composite.push({ [name]: {} });
       }
@@ -417,7 +413,7 @@ export function setMeterProvider(config: ConfigurationModel): void {
               getStringFromEnv('OTEL_EXPORTER_PROMETHEUS_HOST') ?? 'localhost',
             port: getNumberFromEnv('OTEL_EXPORTER_PROMETHEUS_PORT') ?? 9464,
             without_scope_info: false,
-            without_target_info: false,
+            'without_target_info/development': false,
           },
         },
       };

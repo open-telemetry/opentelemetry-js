@@ -46,8 +46,7 @@ export function hasValidConfigFile(): boolean {
 }
 
 export function parseConfigFile(): ConfigurationModel {
-  // Matches 1.0, 1.0-rc.N — any release candidate of the 1.0 line
-  const supportedFileVersionPattern = /^1\.0(-rc\.\d+)?$/;
+  const supportedFileVersionPattern = /^1\.0$/;
   const configFile = getStringFromEnv('OTEL_CONFIG_FILE') || '';
   const file = fs.readFileSync(configFile, 'utf8');
 
@@ -204,7 +203,6 @@ const NESTED_OBJECT_TYPE_TAGS = new Set([
   'baggage',
   'b3',
   'b3multi',
-  'ottrace',
   'xray',
   // Telemetry producer type discriminators
   'opencensus',

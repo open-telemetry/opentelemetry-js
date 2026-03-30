@@ -181,7 +181,7 @@ const ksPromExporter = (strategy: string) => ({
   host: 'localhost',
   port: 9464,
   without_scope_info: false,
-  without_target_info: false,
+  'without_target_info/development': false,
   with_resource_constant_labels: {
     included: ['service*'],
     excluded: ['service.attr1'],
@@ -580,12 +580,12 @@ const configFromKitchenSinkFile = {
       attribute_count_limit: 128,
     },
     'logger_configurator/development': {
-      default_config: { disabled: false },
+      default_config: { enabled: true },
       loggers: [
         {
           name: 'io.opentelemetry.contrib.*',
           config: {
-            disabled: true,
+            enabled: false,
             minimum_severity: SeverityNumber.Info,
             trace_based: true,
           },
@@ -1494,7 +1494,7 @@ describe('ConfigFactory', function () {
                     host: 'localhost',
                     port: 9464,
                     without_scope_info: false,
-                    without_target_info: false,
+                    'without_target_info/development': false,
                   },
                 },
               },
@@ -1524,7 +1524,7 @@ describe('ConfigFactory', function () {
                     host: '0.0.0.0',
                     port: 8080,
                     without_scope_info: false,
-                    without_target_info: false,
+                    'without_target_info/development': false,
                   },
                 },
               },
@@ -2624,7 +2624,7 @@ describe('ConfigFactory', function () {
             loggers: [
               {
                 config: {
-                  disabled: true,
+                  enabled: false,
                   minimum_severity: 'info',
                   trace_based: true,
                 },

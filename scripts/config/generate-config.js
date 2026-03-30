@@ -97,7 +97,7 @@ const bannerComment = [
   licenseHeader,
   '/* eslint-disable */',
   '// AUTO-GENERATED — do not edit',
-  '// Generated from opentelemetry-configuration JSON schema v1.0.0-rc.3',
+  '// Generated from opentelemetry-configuration JSON schema v1.0.0',
   '// Run `npm run generate:config` from the configuration package to regenerate',
 ].join('\n');
 
@@ -132,8 +132,10 @@ compile(schema, 'OpenTelemetryConfiguration', {
     // json-schema-to-typescript inlines enum types that lack a title property.
     // Emit const objects + type aliases for defs the public API needs by name,
     // so consumers can use e.g. ExemplarFilter.TraceBased as a value.
+    // Strip slash-qualified suffixes (e.g. "/development") before PascalCasing
+    // so that values like "no_translation/development" produce a valid key "NoTranslation".
     const toPascalCase = s =>
-      s.split('_').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('');
+      s.replace(/\/\w+$/, '').split('_').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('');
     const namedEnums = [
       'InstrumentType',
       'ExporterTemporalityPreference',

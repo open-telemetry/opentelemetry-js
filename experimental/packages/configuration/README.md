@@ -38,7 +38,7 @@ OTEL_CONFIG_FILE=./otel-config.yaml node app.js
 Example:
 
 ```yaml
-file_format: "1.0-rc.3"
+file_format: "1.0"
 resource:
   attributes:
     - name: service.name
@@ -86,12 +86,12 @@ When no config file is set, the factory reads from the standard OpenTelemetry SD
 
 - `types.ts` — TypeScript interfaces derived from the JSON schema (via `json-schema-to-typescript`)
 - `schema.ts` — The raw JSON schema exported as a constant (retained for reference; not used at runtime)
-- `validator.js` — Pre-compiled ajv validator (ahead-of-time compiled from the schema; eliminates runtime `ajv.compile()`)
+- `validator.js` — Pre-compiled ajv validator (ahead-of-time compiled from the schema at build time; eliminates runtime `ajv.compile()`)
 - `validator.d.ts` — TypeScript declarations for `validator.js`
 
 ### Regenerating after a schema version bump
 
-1. Update the `VERSION` variable in `scripts/config/generate-config.sh`
+1. Update the `CONFIG_VERSION` variable in `scripts/config/generate-config.sh`
 2. Run from this package directory:
 
    ```sh
@@ -128,7 +128,7 @@ One intentional exception in both paths: `AttributeNameValue.type` is **not** de
 
 ## Supported schema versions
 
-- `1.0-rc.3` (and any `1.0-rc.N` release candidate)
+- `1.0`
 
 ## Useful links
 

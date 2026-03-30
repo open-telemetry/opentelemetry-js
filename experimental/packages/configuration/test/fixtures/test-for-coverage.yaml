@@ -1,4 +1,4 @@
-file_format: "1.0-rc.3"
+file_format: "1.0"
 resource:
   attributes_list:
 propagator:
@@ -12,6 +12,6 @@ logger_provider:
     loggers:
       - name: io.opentelemetry.contrib.*
         config:
-          disabled: true
+          enabled: false
           minimum_severity: info
           trace_based: true

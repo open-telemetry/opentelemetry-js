@@ -5,7 +5,7 @@
 
 /* eslint-disable */
 // AUTO-GENERATED — do not edit
-// Generated from opentelemetry-configuration JSON schema v1.0.0-rc.3
+// Generated from opentelemetry-configuration JSON schema v1.0.0
 // Run `npm run generate:config` from the configuration package to regenerate
 
 /**
@@ -725,7 +725,7 @@ export type ExperimentalPrometheusMetricExporter = {
    */
   port?: number | null;
   /**
-   * Configure Prometheus Exporter to produce metrics without a scope info metric.
+   * Configure Prometheus Exporter to produce metrics without scope labels.
    * If omitted or null, false is used.
    *
    */
@@ -735,24 +735,24 @@ export type ExperimentalPrometheusMetricExporter = {
    * If omitted or null, false is used.
    *
    */
-  without_target_info?: boolean | null;
+  'without_target_info/development'?: boolean | null;
   with_resource_constant_labels?: IncludeExclude;
   /**
    * Configure how metric names are translated to Prometheus metric names.
    * Values include:
-   * * no_translation: Special character escaping is disabled. Type and unit suffixes are disabled. Metric names are unaltered.
-   * * no_utf8_escaping_with_suffixes: Special character escaping is disabled. Type and unit suffixes are enabled.
+   * * no_translation/development: Special character escaping is disabled. Type and unit suffixes are disabled. Metric names are unaltered.
+   * * no_utf8_escaping_with_suffixes/development: Special character escaping is disabled. Type and unit suffixes are enabled.
    * * underscore_escaping_with_suffixes: Special character escaping is enabled. Type and unit suffixes are enabled.
-   * * underscore_escaping_without_suffixes: Special character escaping is enabled. Type and unit suffixes are disabled. This represents classic Prometheus metric name compatibility.
+   * * underscore_escaping_without_suffixes/development: Special character escaping is enabled. Type and unit suffixes are disabled. This represents classic Prometheus metric name compatibility.
    * If omitted, underscore_escaping_with_suffixes is used.
    *
    */
   translation_strategy?:
     | (
         | 'underscore_escaping_with_suffixes'
-        | 'underscore_escaping_without_suffixes'
-        | 'no_utf8_escaping_with_suffixes'
-        | 'no_translation'
+        | 'underscore_escaping_without_suffixes/development'
+        | 'no_utf8_escaping_with_suffixes/development'
+        | 'no_translation/development'
       )
     | null;
 } & ({
@@ -769,7 +769,7 @@ export type ExperimentalPrometheusMetricExporter = {
    */
   port?: number | null;
   /**
-   * Configure Prometheus Exporter to produce metrics without a scope info metric.
+   * Configure Prometheus Exporter to produce metrics without scope labels.
    * If omitted or null, false is used.
    *
    */
@@ -779,24 +779,24 @@ export type ExperimentalPrometheusMetricExporter = {
    * If omitted or null, false is used.
    *
    */
-  without_target_info?: boolean | null;
+  'without_target_info/development'?: boolean | null;
   with_resource_constant_labels?: IncludeExclude;
   /**
    * Configure how metric names are translated to Prometheus metric names.
    * Values include:
-   * * no_translation: Special character escaping is disabled. Type and unit suffixes are disabled. Metric names are unaltered.
-   * * no_utf8_escaping_with_suffixes: Special character escaping is disabled. Type and unit suffixes are enabled.
+   * * no_translation/development: Special character escaping is disabled. Type and unit suffixes are disabled. Metric names are unaltered.
+   * * no_utf8_escaping_with_suffixes/development: Special character escaping is disabled. Type and unit suffixes are enabled.
    * * underscore_escaping_with_suffixes: Special character escaping is enabled. Type and unit suffixes are enabled.
-   * * underscore_escaping_without_suffixes: Special character escaping is enabled. Type and unit suffixes are disabled. This represents classic Prometheus metric name compatibility.
+   * * underscore_escaping_without_suffixes/development: Special character escaping is enabled. Type and unit suffixes are disabled. This represents classic Prometheus metric name compatibility.
    * If omitted, underscore_escaping_with_suffixes is used.
    *
    */
   translation_strategy?:
     | (
         | 'underscore_escaping_with_suffixes'
-        | 'underscore_escaping_without_suffixes'
-        | 'no_utf8_escaping_with_suffixes'
-        | 'no_translation'
+        | 'underscore_escaping_without_suffixes/development'
+        | 'no_utf8_escaping_with_suffixes/development'
+        | 'no_translation/development'
       )
     | null;
 } | null);
@@ -928,18 +928,6 @@ export type B3Propagator = {} | null;
  *
  */
 export type B3MultiPropagator = {} | null;
-/**
- * Include the jaeger propagator.
- * If omitted, ignore.
- *
- */
-export type JaegerPropagator = {} | null;
-/**
- * Include the opentracing propagator.
- * If omitted, ignore.
- *
- */
-export type OpenTracingPropagator = {} | null;
 /**
  * Configure exporter to be OTLP with HTTP transport.
  * If omitted, ignore.
@@ -1203,18 +1191,28 @@ export type ExperimentalComposableProbabilitySampler = {
  */
 export type ExperimentalComposableRuleBasedSampler = {
   /**
-   * The rules for the sampler, matched in order. If no rules match, the span is not sampled.
-   * If omitted or null, no span is sampled.
+   * The rules for the sampler, matched in order.
+   * Each rule can have multiple match conditions. All conditions must match for the rule to match.
+   * If no conditions are specified, the rule matches all spans that reach it.
+   * If no rules match, the span is not sampled.
+   * If omitted, no span is sampled.
    *
+   *
+   * @minItems 1
    */
-  rules?: ExperimentalComposableRuleBasedSamplerRule[] | null;
+  rules?: ExperimentalComposableRuleBasedSamplerRule[];
 } & ({
   /**
-   * The rules for the sampler, matched in order. If no rules match, the span is not sampled.
-   * If omitted or null, no span is sampled.
+   * The rules for the sampler, matched in order.
+   * Each rule can have multiple match conditions. All conditions must match for the rule to match.
+   * If no conditions are specified, the rule matches all spans that reach it.
+   * If no rules match, the span is not sampled.
+   * If omitted, no span is sampled.
    *
+   *
+   * @minItems 1
    */
-  rules?: ExperimentalComposableRuleBasedSamplerRule[] | null;
+  rules?: ExperimentalComposableRuleBasedSamplerRule[];
 } | null);
 export type SpanKind = ('internal' | 'server' | 'client' | 'producer' | 'consumer') | null;
 export type ExperimentalSpanParent = ('none' | 'remote' | 'local') | null;
@@ -1587,10 +1585,10 @@ export interface ExperimentalLoggerConfigurator {
 export interface ExperimentalLoggerConfig {
   /**
    * Configure if the logger is enabled or not.
-   * If omitted or null, false is used.
+   * If omitted or null, true is used.
    *
    */
-  disabled?: boolean | null;
+  enabled?: boolean | null;
   /**
    * Configure severity filtering.
    * Log records with an non-zero (i.e. unspecified) severity number which is less than minimum_severity are not processed.
@@ -1678,10 +1676,10 @@ export interface ExperimentalLoggerMatcherAndConfig {
 export interface ExperimentalLoggerConfig1 {
   /**
    * Configure if the logger is enabled or not.
-   * If omitted or null, false is used.
+   * If omitted or null, true is used.
    *
    */
-  disabled?: boolean | null;
+  enabled?: boolean | null;
   /**
    * Configure severity filtering.
    * Log records with an non-zero (i.e. unspecified) severity number which is less than minimum_severity are not processed.
@@ -2161,10 +2159,10 @@ export interface ExperimentalMeterConfigurator {
 export interface ExperimentalMeterConfig {
   /**
    * Configure if the meter is enabled or not.
-   * If omitted, false is used.
+   * If omitted, true is used.
    *
    */
-  disabled?: boolean;
+  enabled?: boolean;
 }
 export interface ExperimentalMeterMatcherAndConfig {
   /**
@@ -2186,10 +2184,10 @@ export interface ExperimentalMeterMatcherAndConfig {
 export interface ExperimentalMeterConfig1 {
   /**
    * Configure if the meter is enabled or not.
-   * If omitted, false is used.
+   * If omitted, true is used.
    *
    */
-  disabled?: boolean;
+  enabled?: boolean;
 }
 /**
  * Configure text map context propagators.
@@ -2199,7 +2197,7 @@ export interface ExperimentalMeterConfig1 {
 export interface Propagator {
   /**
    * Configure the propagators in the composite text map propagator. Entries from .composite_list are appended to the list here with duplicates filtered out.
-   * Built-in propagator keys include: tracecontext, baggage, b3, b3multi, jaeger, ottrace. Known third party keys include: xray.
+   * Built-in propagator keys include: tracecontext, baggage, b3, b3multi. Known third party keys include: xray.
    * If omitted, and .composite_list is omitted or null, a noop propagator is used.
    *
    *
@@ -2209,7 +2207,7 @@ export interface Propagator {
   /**
    * Configure the propagators in the composite text map propagator. Entries are appended to .composite with duplicates filtered out.
    * The value is a comma separated list of propagator identifiers matching the format of OTEL_PROPAGATORS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration for details.
-   * Built-in propagator identifiers include: tracecontext, baggage, b3, b3multi, jaeger, ottrace. Known third party identifiers include: xray.
+   * Built-in propagator identifiers include: tracecontext, baggage, b3, b3multi. Known third party identifiers include: xray.
    * If omitted or null, and .composite is omitted or null, a noop propagator is used.
    *
    */
@@ -2220,8 +2218,6 @@ export interface TextMapPropagator {
   baggage?: BaggagePropagator;
   b3?: B3Propagator;
   b3multi?: B3MultiPropagator;
-  jaeger?: JaegerPropagator;
-  ottrace?: OpenTracingPropagator;
   [k: string]: unknown;
 }
 /**
@@ -2634,10 +2630,10 @@ export interface ExperimentalTracerConfigurator {
 export interface ExperimentalTracerConfig {
   /**
    * Configure if the tracer is enabled or not.
-   * If omitted, false is used.
+   * If omitted, true is used.
    *
    */
-  disabled?: boolean;
+  enabled?: boolean;
 }
 export interface ExperimentalTracerMatcherAndConfig {
   /**
@@ -2659,10 +2655,10 @@ export interface ExperimentalTracerMatcherAndConfig {
 export interface ExperimentalTracerConfig1 {
   /**
    * Configure if the tracer is enabled or not.
-   * If omitted, false is used.
+   * If omitted, true is used.
    *
    */
-  disabled?: boolean;
+  enabled?: boolean;
 }
 /**
  * Configure resource for all signals.
@@ -2802,39 +2798,45 @@ export interface ExperimentalInstrumentation {
  *
  */
 export interface ExperimentalGeneralInstrumentation {
-  peer?: ExperimentalPeerInstrumentation;
   http?: ExperimentalHttpInstrumentation;
-}
-/**
- * Configure instrumentations following the peer semantic conventions.
- * See peer semantic conventions: https://opentelemetry.io/docs/specs/semconv/attributes-registry/peer/
- * If omitted, defaults as described in ExperimentalPeerInstrumentation are used.
- *
- */
-export interface ExperimentalPeerInstrumentation {
+  code?: ExperimentalCodeInstrumentation;
+  db?: ExperimentalDbInstrumentation;
+  gen_ai?: ExperimentalGenAiInstrumentation;
+  messaging?: ExperimentalMessagingInstrumentation;
+  rpc?: ExperimentalRpcInstrumentation;
+  sanitization?: ExperimentalSanitization;
   /**
-   * Configure the service mapping for instrumentations following peer.service semantic conventions.
-   * See peer.service semantic conventions: https://opentelemetry.io/docs/specs/semconv/general/attributes/#general-remote-service-attributes
-   * If omitted, no peer service mappings are used.
+   * Configure semantic convention stability opt-in as a comma-separated list.
+   * This property follows the format and semantics of the OTEL_SEMCONV_STABILITY_OPT_IN environment variable.
+   * Controls the emission of stable vs. experimental semantic conventions for instrumentation.
+   * This setting is only intended for migrating from experimental to stable semantic conventions.
    *
+   * Known values include:
+   * - http: Emit stable HTTP and networking conventions only
+   * - http/dup: Emit both old and stable HTTP and networking conventions (for phased migration)
+   * - database: Emit stable database conventions only
+   * - database/dup: Emit both old and stable database conventions (for phased migration)
+   * - rpc: Emit stable RPC conventions only
+   * - rpc/dup: Emit both experimental and stable RPC conventions (for phased migration)
+   * - messaging: Emit stable messaging conventions only
+   * - messaging/dup: Emit both old and stable messaging conventions (for phased migration)
+   * - code: Emit stable code conventions only
+   * - code/dup: Emit both old and stable code conventions (for phased migration)
    *
-   * @minItems 1
+   * Multiple values can be specified as a comma-separated list (e.g., "http,database/dup").
+   * Additional signal types may be supported in future versions.
+   *
+   * Domain-specific semconv properties (e.g., .instrumentation/development.general.db.semconv) take precedence over this general setting.
+   *
+   * See:
+   * - HTTP migration: https://opentelemetry.io/docs/specs/semconv/non-normative/http-migration/
+   * - Database migration: https://opentelemetry.io/docs/specs/semconv/database/
+   * - RPC: https://opentelemetry.io/docs/specs/semconv/rpc/
+   * - Messaging: https://opentelemetry.io/docs/specs/semconv/messaging/messaging-spans/
+   * If omitted or null, no opt-in is configured and instrumentations continue emitting their default semantic convention version.
+   *
    */
-  service_mapping?: ExperimentalPeerServiceMapping[];
-}
-export interface ExperimentalPeerServiceMapping {
-  /**
-   * The IP address to map.
-   * Property is required and must be non-null.
-   *
-   */
-  peer: string;
-  /**
-   * The logical name corresponding to the IP address of .peer.
-   * Property is required and must be non-null.
-   *
-   */
-  service: string;
+  stability_opt_in_list?: string | null;
 }
 /**
  * Configure instrumentations following the http semantic conventions.
@@ -2843,8 +2845,41 @@ export interface ExperimentalPeerServiceMapping {
  *
  */
 export interface ExperimentalHttpInstrumentation {
+  semconv?: ExperimentalSemconvConfig;
   client?: ExperimentalHttpClientInstrumentation;
   server?: ExperimentalHttpServerInstrumentation;
+}
+/**
+ * Configure HTTP semantic convention version and migration behavior.
+ *
+ * This property takes precedence over the .instrumentation/development.general.stability_opt_in_list setting.
+ *
+ * See HTTP migration: https://opentelemetry.io/docs/specs/semconv/non-normative/http-migration/
+ * If omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.
+ *
+ */
+export interface ExperimentalSemconvConfig {
+  /**
+   * The target semantic convention version for this domain (e.g., 1).
+   * If omitted or null, the latest stable version is used, or if no stable version is available and .experimental is true then the latest experimental version is used.
+   *
+   */
+  version?: number | null;
+  /**
+   * Use latest experimental semantic conventions (before stable is available or to enable experimental features on top of stable conventions).
+   * If omitted or null, false is used.
+   *
+   */
+  experimental?: boolean | null;
+  /**
+   * When true, also emit the previous major version alongside the target version.
+   * For version=1, the previous version refers to the pre-stable conventions that the instrumentation emitted before the first stable semantic convention version was defined.
+   * For version=2 and above, the previous version is the prior stable major version (e.g., version=2, dual_emit=true emits both v2 and v1).
+   * Enables dual-emit for phased migration between versions.
+   * If omitted or null, false is used.
+   *
+   */
+  dual_emit?: boolean | null;
 }
 /**
  * Configure instrumentations following the http client semantic conventions.
@@ -2868,6 +2903,16 @@ export interface ExperimentalHttpClientInstrumentation {
    * @minItems 1
    */
   response_captured_headers?: string[];
+  /**
+   * Override the default list of known HTTP methods.
+   * Known methods are case-sensitive.
+   * This is a full override of the default known methods, not a list of known methods in addition to the defaults.
+   * If omitted, HTTP methods GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH are known.
+   *
+   *
+   * @minItems 0
+   */
+  known_methods?: string[];
 }
 /**
  * Configure instrumentations following the http server semantic conventions.
@@ -2891,6 +2936,247 @@ export interface ExperimentalHttpServerInstrumentation {
    * @minItems 1
    */
   response_captured_headers?: string[];
+  /**
+   * Override the default list of known HTTP methods.
+   * Known methods are case-sensitive.
+   * This is a full override of the default known methods, not a list of known methods in addition to the defaults.
+   * If omitted, HTTP methods GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH are known.
+   *
+   *
+   * @minItems 0
+   */
+  known_methods?: string[];
+}
+/**
+ * Configure instrumentations following the code semantic conventions.
+ * See code semantic conventions: https://opentelemetry.io/docs/specs/semconv/registry/attributes/code/
+ * If omitted, defaults as described in ExperimentalCodeInstrumentation are used.
+ *
+ */
+export interface ExperimentalCodeInstrumentation {
+  semconv?: ExperimentalSemconvConfig1;
+}
+/**
+ * Configure code semantic convention version and migration behavior.
+ *
+ * This property takes precedence over the .instrumentation/development.general.stability_opt_in_list setting.
+ *
+ * See code semantic conventions: https://opentelemetry.io/docs/specs/semconv/registry/attributes/code/
+ * If omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.
+ *
+ */
+export interface ExperimentalSemconvConfig1 {
+  /**
+   * The target semantic convention version for this domain (e.g., 1).
+   * If omitted or null, the latest stable version is used, or if no stable version is available and .experimental is true then the latest experimental version is used.
+   *
+   */
+  version?: number | null;
+  /**
+   * Use latest experimental semantic conventions (before stable is available or to enable experimental features on top of stable conventions).
+   * If omitted or null, false is used.
+   *
+   */
+  experimental?: boolean | null;
+  /**
+   * When true, also emit the previous major version alongside the target version.
+   * For version=1, the previous version refers to the pre-stable conventions that the instrumentation emitted before the first stable semantic convention version was defined.
+   * For version=2 and above, the previous version is the prior stable major version (e.g., version=2, dual_emit=true emits both v2 and v1).
+   * Enables dual-emit for phased migration between versions.
+   * If omitted or null, false is used.
+   *
+   */
+  dual_emit?: boolean | null;
+}
+/**
+ * Configure instrumentations following the database semantic conventions.
+ * See database semantic conventions: https://opentelemetry.io/docs/specs/semconv/database/
+ * If omitted, defaults as described in ExperimentalDbInstrumentation are used.
+ *
+ */
+export interface ExperimentalDbInstrumentation {
+  semconv?: ExperimentalSemconvConfig2;
+}
+/**
+ * Configure database semantic convention version and migration behavior.
+ *
+ * This property takes precedence over the .instrumentation/development.general.stability_opt_in_list setting.
+ *
+ * See database migration: https://opentelemetry.io/docs/specs/semconv/database/
+ * If omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.
+ *
+ */
+export interface ExperimentalSemconvConfig2 {
+  /**
+   * The target semantic convention version for this domain (e.g., 1).
+   * If omitted or null, the latest stable version is used, or if no stable version is available and .experimental is true then the latest experimental version is used.
+   *
+   */
+  version?: number | null;
+  /**
+   * Use latest experimental semantic conventions (before stable is available or to enable experimental features on top of stable conventions).
+   * If omitted or null, false is used.
+   *
+   */
+  experimental?: boolean | null;
+  /**
+   * When true, also emit the previous major version alongside the target version.
+   * For version=1, the previous version refers to the pre-stable conventions that the instrumentation emitted before the first stable semantic convention version was defined.
+   * For version=2 and above, the previous version is the prior stable major version (e.g., version=2, dual_emit=true emits both v2 and v1).
+   * Enables dual-emit for phased migration between versions.
+   * If omitted or null, false is used.
+   *
+   */
+  dual_emit?: boolean | null;
+}
+/**
+ * Configure instrumentations following the GenAI semantic conventions.
+ * See GenAI semantic conventions: https://opentelemetry.io/docs/specs/semconv/gen-ai/
+ * If omitted, defaults as described in ExperimentalGenAiInstrumentation are used.
+ *
+ */
+export interface ExperimentalGenAiInstrumentation {
+  semconv?: ExperimentalSemconvConfig3;
+}
+/**
+ * Configure GenAI semantic convention version and migration behavior.
+ *
+ * This property takes precedence over the .instrumentation/development.general.stability_opt_in_list setting.
+ *
+ * See GenAI semantic conventions: https://opentelemetry.io/docs/specs/semconv/gen-ai/
+ * If omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.
+ *
+ */
+export interface ExperimentalSemconvConfig3 {
+  /**
+   * The target semantic convention version for this domain (e.g., 1).
+   * If omitted or null, the latest stable version is used, or if no stable version is available and .experimental is true then the latest experimental version is used.
+   *
+   */
+  version?: number | null;
+  /**
+   * Use latest experimental semantic conventions (before stable is available or to enable experimental features on top of stable conventions).
+   * If omitted or null, false is used.
+   *
+   */
+  experimental?: boolean | null;
+  /**
+   * When true, also emit the previous major version alongside the target version.
+   * For version=1, the previous version refers to the pre-stable conventions that the instrumentation emitted before the first stable semantic convention version was defined.
+   * For version=2 and above, the previous version is the prior stable major version (e.g., version=2, dual_emit=true emits both v2 and v1).
+   * Enables dual-emit for phased migration between versions.
+   * If omitted or null, false is used.
+   *
+   */
+  dual_emit?: boolean | null;
+}
+/**
+ * Configure instrumentations following the messaging semantic conventions.
+ * See messaging semantic conventions: https://opentelemetry.io/docs/specs/semconv/messaging/
+ * If omitted, defaults as described in ExperimentalMessagingInstrumentation are used.
+ *
+ */
+export interface ExperimentalMessagingInstrumentation {
+  semconv?: ExperimentalSemconvConfig4;
+}
+/**
+ * Configure messaging semantic convention version and migration behavior.
+ *
+ * This property takes precedence over the .instrumentation/development.general.stability_opt_in_list setting.
+ *
+ * See messaging semantic conventions: https://opentelemetry.io/docs/specs/semconv/messaging/
+ * If omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.
+ *
+ */
+export interface ExperimentalSemconvConfig4 {
+  /**
+   * The target semantic convention version for this domain (e.g., 1).
+   * If omitted or null, the latest stable version is used, or if no stable version is available and .experimental is true then the latest experimental version is used.
+   *
+   */
+  version?: number | null;
+  /**
+   * Use latest experimental semantic conventions (before stable is available or to enable experimental features on top of stable conventions).
+   * If omitted or null, false is used.
+   *
+   */
+  experimental?: boolean | null;
+  /**
+   * When true, also emit the previous major version alongside the target version.
+   * For version=1, the previous version refers to the pre-stable conventions that the instrumentation emitted before the first stable semantic convention version was defined.
+   * For version=2 and above, the previous version is the prior stable major version (e.g., version=2, dual_emit=true emits both v2 and v1).
+   * Enables dual-emit for phased migration between versions.
+   * If omitted or null, false is used.
+   *
+   */
+  dual_emit?: boolean | null;
+}
+/**
+ * Configure instrumentations following the RPC semantic conventions.
+ * See RPC semantic conventions: https://opentelemetry.io/docs/specs/semconv/rpc/
+ * If omitted, defaults as described in ExperimentalRpcInstrumentation are used.
+ *
+ */
+export interface ExperimentalRpcInstrumentation {
+  semconv?: ExperimentalSemconvConfig5;
+}
+/**
+ * Configure RPC semantic convention version and migration behavior.
+ *
+ * This property takes precedence over the .instrumentation/development.general.stability_opt_in_list setting.
+ *
+ * See RPC semantic conventions: https://opentelemetry.io/docs/specs/semconv/rpc/
+ * If omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.
+ *
+ */
+export interface ExperimentalSemconvConfig5 {
+  /**
+   * The target semantic convention version for this domain (e.g., 1).
+   * If omitted or null, the latest stable version is used, or if no stable version is available and .experimental is true then the latest experimental version is used.
+   *
+   */
+  version?: number | null;
+  /**
+   * Use latest experimental semantic conventions (before stable is available or to enable experimental features on top of stable conventions).
+   * If omitted or null, false is used.
+   *
+   */
+  experimental?: boolean | null;
+  /**
+   * When true, also emit the previous major version alongside the target version.
+   * For version=1, the previous version refers to the pre-stable conventions that the instrumentation emitted before the first stable semantic convention version was defined.
+   * For version=2 and above, the previous version is the prior stable major version (e.g., version=2, dual_emit=true emits both v2 and v1).
+   * Enables dual-emit for phased migration between versions.
+   * If omitted or null, false is used.
+   *
+   */
+  dual_emit?: boolean | null;
+}
+/**
+ * Configure general sanitization options.
+ * If omitted, defaults as described in ExperimentalSanitization are used.
+ *
+ */
+export interface ExperimentalSanitization {
+  url?: ExperimentalUrlSanitization;
+}
+/**
+ * Configure URL sanitization options.
+ * If omitted, defaults as described in ExperimentalUrlSanitization are used.
+ *
+ */
+export interface ExperimentalUrlSanitization {
+  /**
+   * List of query parameter names whose values should be redacted from URLs.
+   * Query parameter names are case-sensitive.
+   * This is a full override of the default sensitive query parameter keys, it is not a list of keys in addition to the defaults.
+   * Set to an empty array to disable query parameter redaction.
+   * If omitted, the default sensitive query parameter list as defined by the url semantic conventions (https://github.com/open-telemetry/semantic-conventions/blob/main/docs/registry/attributes/url.md) is used.
+   *
+   *
+   * @minItems 0
+   */
+  sensitive_query_parameters?: string[];
 }
 /**
  * Configure C++ language-specific instrumentation libraries.
@@ -3063,9 +3349,9 @@ export type ExporterDefaultHistogramAggregation = typeof ExporterDefaultHistogra
 
 export const ExperimentalPrometheusTranslationStrategy = {
   UnderscoreEscapingWithSuffixes: "underscore_escaping_with_suffixes",
-  UnderscoreEscapingWithoutSuffixes: "underscore_escaping_without_suffixes",
-  NoUtf8EscapingWithSuffixes: "no_utf8_escaping_with_suffixes",
-  NoTranslation: "no_translation",
+  UnderscoreEscapingWithoutSuffixes: "underscore_escaping_without_suffixes/development",
+  NoUtf8EscapingWithSuffixes: "no_utf8_escaping_with_suffixes/development",
+  NoTranslation: "no_translation/development",
 } as const;
 export type ExperimentalPrometheusTranslationStrategy = typeof ExperimentalPrometheusTranslationStrategy[keyof typeof ExperimentalPrometheusTranslationStrategy];
 
