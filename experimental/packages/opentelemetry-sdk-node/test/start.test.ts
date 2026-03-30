@@ -36,12 +36,15 @@ import {
 } from '@opentelemetry/sdk-logs';
 import type {
   ConfigFactory,
-  LogRecordExporterModel,
+  LogRecordExporterConfigModel,
 } from '@opentelemetry/configuration';
 import { createConfigFactory } from '@opentelemetry/configuration';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
+import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
+import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
+import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 
 import {
   ATTR_HOST_NAME,
@@ -50,9 +53,15 @@ import {
 } from '../src/semconv';
 import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
 import { getLogRecordExporter, setupContextManager } from '../src/utils';
+import {
+  ConsoleMetricExporter,
+  MeterProvider,
+  PeriodicExportingMetricReader,
+} from '@opentelemetry/sdk-metrics';
 
 describe('startNodeSDK', function () {
   let setGlobalLoggerProviderSpy: Sinon.SinonSpy;
+  let setGlobalMeterProviderSpy: Sinon.SinonSpy;
 
   beforeEach(() => {
     diag.disable();
@@ -63,6 +72,7 @@ describe('startNodeSDK', function () {
     logs.disable();
 
     setGlobalLoggerProviderSpy = Sinon.spy(logs, 'setGlobalLoggerProvider');
+    setGlobalMeterProviderSpy = Sinon.spy(metrics, 'setGlobalMeterProvider');
   });
 
   const _origEnvVariables = { ...process.env };
@@ -98,6 +108,7 @@ describe('startNodeSDK', function () {
         setGlobalLoggerProviderSpy.called === false,
         'logger provider should not have changed'
       );
+      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
 
       await sdk.shutdown();
     });
@@ -240,6 +251,66 @@ describe('startNodeSDK', function () {
       sharedState.registeredLogRecordProcessors[2] instanceof
         SimpleLogRecordProcessor
     );
+    await sdk.shutdown();
+  });
+
+  it('should register a meter provider if multiple metric readers are provided', async () => {
+    const stubLoggerWarn: Sinon.SinonStub = Sinon.stub(diag, 'warn');
+
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/meter.yaml';
+    const sdk = startNodeSDK({});
+
+    // Periodic type 'otlp_file/development' is not supported yet
+    assert.strictEqual(
+      stubLoggerWarn.args[0][0],
+      'Unsupported Metric Exporter.'
+    );
+    assert.strictEqual(
+      stubLoggerWarn.args[1][0],
+      'Unsupported Metric Exporter.'
+    );
+
+    const meterProvider = metrics.getMeterProvider() as MeterProvider;
+    const sharedState = (meterProvider as any)['_sharedState'];
+    assert.strictEqual(sharedState.metricCollectors.length, 4);
+
+    assert.ok(
+      sharedState.metricCollectors[0]._metricReader instanceof
+        PeriodicExportingMetricReader
+    );
+    assert.ok(
+      sharedState.metricCollectors[0]._metricReader._exporter instanceof
+        OTLPProtoMetricExporter
+    );
+
+    assert.ok(
+      sharedState.metricCollectors[1]._metricReader instanceof
+        PeriodicExportingMetricReader
+    );
+    assert.ok(
+      sharedState.metricCollectors[1]._metricReader._exporter instanceof
+        OTLPHttpMetricExporter
+    );
+
+    assert.ok(
+      sharedState.metricCollectors[2]._metricReader instanceof
+        PeriodicExportingMetricReader
+    );
+    assert.ok(
+      sharedState.metricCollectors[2]._metricReader._exporter instanceof
+        OTLPGrpcMetricExporter
+    );
+
+    assert.ok(
+      sharedState.metricCollectors[3]._metricReader instanceof
+        PeriodicExportingMetricReader
+    );
+    assert.ok(
+      sharedState.metricCollectors[3]._metricReader._exporter instanceof
+        ConsoleMetricExporter
+    );
+
+    stubLoggerWarn.reset();
     await sdk.shutdown();
   });
 
@@ -604,9 +675,48 @@ describe('startNodeSDK', function () {
     });
   });
 
+  describe('configuring meter provider from env', function () {
+    it('should register a meter provider if a exporter is provided', async () => {
+      process.env.OTEL_METRICS_EXPORTER = 'console';
+      const sdk = startNodeSDK({});
+
+      assertDefaultContextManagerRegistered();
+      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+
+      await sdk.shutdown();
+    });
+
+    it('should register a meter provider if a list of exporters is provided', async () => {
+      process.env.OTEL_METRICS_EXPORTER = 'console,otlp';
+      const sdk = startNodeSDK({});
+
+      assertDefaultContextManagerRegistered();
+
+      const meterProvider = metrics.getMeterProvider() as MeterProvider;
+      assert.ok(meterProvider instanceof MeterProvider);
+
+      // Verify that both metric readers are registered
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert.strictEqual(sharedState.metricCollectors.length, 2);
+
+      await sdk.shutdown();
+    });
+
+    it('should not register the provider if OTEL_METRICS_EXPORTER contains none', async () => {
+      process.env.OTEL_METRICS_EXPORTER = 'console,none';
+      const sdk = startNodeSDK({});
+
+      assert.ok(
+        setGlobalMeterProviderSpy.callCount === 0,
+        'meter provider should not have changed'
+      );
+      await sdk.shutdown();
+    });
+  });
+
   describe('tests to increase code coverage', function () {
     it('should return undefined for invalid log record exporter model', async () => {
-      const exporter: LogRecordExporterModel = {};
+      const exporter: LogRecordExporterConfigModel = {};
       assert.equal(getLogRecordExporter(exporter), undefined);
     });
 
