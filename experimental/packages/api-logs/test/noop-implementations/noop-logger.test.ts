@@ -21,4 +21,9 @@ describe('NoopLogger', () => {
       body: 'log body',
     });
   });
+
+  it('calling enabled should return false', () => {
+    const logger = new NoopLoggerProvider().getLogger('test-noop');
+    assert.ok(!logger.enabled());
+  });
 });

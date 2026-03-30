@@ -3,10 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { InstrumentationScope } from '@opentelemetry/core';
 import { callWithTimeout } from '@opentelemetry/core';
 import type { Context } from '@opentelemetry/api';
 import type { LogRecordProcessor } from './LogRecordProcessor';
 import type { SdkLogRecord } from './export/SdkLogRecord';
+import type { SeverityNumber } from '@opentelemetry/api-logs';
 
 /**
  * Implementation of the {@link LogRecordProcessor} that simply forwards all
@@ -40,5 +42,19 @@ export class MultiLogRecordProcessor implements LogRecordProcessor {
 
   public async shutdown(): Promise<void> {
     await Promise.all(this.processors.map(processor => processor.shutdown()));
+  }
+
+  public enabled(options: {
+    context: Context;
+    instrumentationScope: InstrumentationScope;
+    severityNumber?: SeverityNumber;
+    eventName?: string;
+  }): boolean {
+    for (const processor of this.processors) {
+      if (!processor.enabled || processor.enabled(options)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
