@@ -110,10 +110,15 @@ The generation script (`scripts/config/generate-config.js`) handles several post
 
 ### Defaults
 
-The file and env config paths apply defaults differently:
+Both config paths apply the same spec-defined defaults so consumers see consistent behaviour regardless of config source:
 
-- `FileConfigFactory` — applies only `attribute_count_limit: 128` after schema validation (`applyConfigDefaults()`). Fields like `disabled` and `log_level` are **not** defaulted: if absent from the YAML, they stay absent in the model (WYSIWYG principle). The SDK layer interprets missing values.
-- `EnvironmentConfigFactory` — sets `disabled: false`, `log_level: info`, and `attribute_count_limit: 128` via `initializeDefaultConfiguration()` in the constructor, because env var config is inherently opt-in and always produces a complete model.
+| Field | Default |
+| --- | --- |
+| `disabled` | `false` |
+| `log_level` | `info` |
+| `attribute_limits.attribute_count_limit` | `128` |
+
+`FileConfigFactory` applies these via `applyConfigDefaults()` after schema validation. `EnvironmentConfigFactory` applies them via `initializeDefaultConfiguration()` in the constructor, then overlays env var values on top.
 
 One intentional exception in both paths: `AttributeNameValue.type` is **not** defaulted even though the spec says "if omitted, string is used". This is a semantic default for SDK code interpreting resource attributes, not a config-parser concern. SDK code reading `resource.attributes` should apply `attr.type ?? 'string'` at the point of use.
 

@@ -91,7 +91,7 @@ export function setResources(config: ConfigurationModel): void {
     ];
   }
   if (list && list.length > 0) {
-    config.resource.attributes_list = resourceAttrList ?? undefined;
+    config.resource.attributes_list = resourceAttrList;
     if (config.resource.attributes == null) {
       config.resource.attributes = [];
     }
@@ -168,19 +168,19 @@ export function setPropagators(config: ConfigurationModel): void {
     config.propagator.composite = [];
     for (const name of composite) {
       if (name === 'tracecontext') {
-        config.propagator.composite.push({ tracecontext: null });
+        config.propagator.composite.push({ tracecontext: {} });
       } else if (name === 'baggage') {
-        config.propagator.composite.push({ baggage: null });
+        config.propagator.composite.push({ baggage: {} });
       } else if (name === 'b3') {
-        config.propagator.composite.push({ b3: null });
+        config.propagator.composite.push({ b3: {} });
       } else if (name === 'b3multi') {
-        config.propagator.composite.push({ b3multi: null });
+        config.propagator.composite.push({ b3multi: {} });
       } else if (name === 'jaeger') {
-        config.propagator.composite.push({ jaeger: null });
+        config.propagator.composite.push({ jaeger: {} });
       } else if (name === 'ottrace') {
-        config.propagator.composite.push({ ottrace: null });
+        config.propagator.composite.push({ ottrace: {} });
       } else {
-        config.propagator.composite.push({ [name]: null });
+        config.propagator.composite.push({ [name]: {} });
       }
     }
   }

@@ -76,7 +76,7 @@ const configFromFile = {
     attribute_count_limit: 128,
   },
   propagator: {
-    composite: [{ tracecontext: null }, { baggage: null }],
+    composite: [{ tracecontext: {} }, { baggage: {} }],
   },
   tracer_provider: {
     processors: [
@@ -108,11 +108,11 @@ const configFromFile = {
     },
     sampler: {
       parent_based: {
-        root: { always_on: null },
-        remote_parent_sampled: { always_on: null },
-        remote_parent_not_sampled: { always_off: null },
-        local_parent_sampled: { always_on: null },
-        local_parent_not_sampled: { always_off: null },
+        root: { always_on: {} },
+        remote_parent_sampled: { always_on: {} },
+        remote_parent_not_sampled: { always_off: {} },
+        local_parent_sampled: { always_on: {} },
+        local_parent_not_sampled: { always_off: {} },
       },
     },
   },
@@ -216,12 +216,12 @@ const configFromKitchenSinkFile = {
         excluded: ['process.command_args'],
       },
       detectors: [
-        { container: null },
-        { env: null },
-        { host: null },
-        { os: null },
-        { process: null },
-        { service: null },
+        { container: {} },
+        { env: {} },
+        { host: {} },
+        { os: {} },
+        { process: {} },
+        { service: {} },
       ],
     },
     schema_url: 'https://opentelemetry.io/schemas/1.16.0',
@@ -233,12 +233,12 @@ const configFromKitchenSinkFile = {
   },
   propagator: {
     composite: [
-      { tracecontext: null },
-      { baggage: null },
-      { b3: null },
-      { b3multi: null },
-      { jaeger: null },
-      { ottrace: null },
+      { tracecontext: {} },
+      { baggage: {} },
+      { b3: {} },
+      { b3multi: {} },
+      { jaeger: {} },
+      { ottrace: {} },
     ],
     composite_list: 'tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray',
   },
@@ -301,7 +301,7 @@ const configFromKitchenSinkFile = {
         },
       },
       {
-        simple: { exporter: { console: null } },
+        simple: { exporter: { console: {} } },
       },
     ],
     limits: {
@@ -314,8 +314,8 @@ const configFromKitchenSinkFile = {
     },
     sampler: {
       parent_based: {
-        root: { always_on: null },
-        remote_parent_sampled: { always_on: null },
+        root: { always_on: {} },
+        remote_parent_sampled: { always_on: {} },
         remote_parent_not_sampled: {
           'probability/development': { ratio: 0.01 },
         },
@@ -328,7 +328,7 @@ const configFromKitchenSinkFile = {
                     key: 'http.route',
                     values: ['/healthz', '/livez'],
                   },
-                  sampler: { always_off: null },
+                  sampler: { always_off: {} },
                 },
                 {
                   attribute_patterns: {
@@ -336,7 +336,7 @@ const configFromKitchenSinkFile = {
                     included: ['/internal/*'],
                     excluded: ['/internal/special/*'],
                   },
-                  sampler: { always_on: null },
+                  sampler: { always_on: {} },
                 },
                 {
                   parent: ['none'],
@@ -350,7 +350,7 @@ const configFromKitchenSinkFile = {
             },
           },
         },
-        local_parent_not_sampled: { always_off: null },
+        local_parent_not_sampled: { always_off: {} },
       },
     },
   },
@@ -363,7 +363,7 @@ const configFromKitchenSinkFile = {
               ExperimentalPrometheusTranslationStrategy.UnderscoreEscapingWithSuffixes
             ),
           },
-          producers: [{ opencensus: null }],
+          producers: [{ opencensus: {} }],
           cardinality_limits: ksCardinality,
         },
       },
@@ -374,7 +374,7 @@ const configFromKitchenSinkFile = {
               ExperimentalPrometheusTranslationStrategy.UnderscoreEscapingWithoutSuffixes
             ),
           },
-          producers: [{ opencensus: null }],
+          producers: [{ opencensus: {} }],
           cardinality_limits: ksCardinality,
         },
       },
@@ -385,7 +385,7 @@ const configFromKitchenSinkFile = {
               ExperimentalPrometheusTranslationStrategy.NoUtf8EscapingWithSuffixes
             ),
           },
-          producers: [{ opencensus: null }],
+          producers: [{ opencensus: {} }],
           cardinality_limits: ksCardinality,
         },
       },
@@ -396,7 +396,7 @@ const configFromKitchenSinkFile = {
               ExperimentalPrometheusTranslationStrategy.NoTranslation
             ),
           },
-          producers: [{ opencensus: null }],
+          producers: [{ opencensus: {} }],
           cardinality_limits: ksCardinality,
         },
       },
@@ -422,7 +422,7 @@ const configFromKitchenSinkFile = {
                 ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
             },
           },
-          producers: [{ opencensus: null }],
+          producers: [{ opencensus: {} }],
           cardinality_limits: ksCardinality,
         },
       },
@@ -572,7 +572,7 @@ const configFromKitchenSinkFile = {
         },
       },
       {
-        simple: { exporter: { console: null } },
+        simple: { exporter: { console: {} } },
       },
     ],
     limits: {
@@ -597,9 +597,9 @@ const configFromKitchenSinkFile = {
 
 const nullTls = { ca_file: null, key_file: null, cert_file: null };
 
-const defaultConfigFromFileWithEnvVariables = {
+const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
   disabled: false,
-  log_level: 'info',
+  log_level: SeverityNumber.Info,
   resource: {
     attributes: [
       {
@@ -648,11 +648,11 @@ const defaultConfigFromFileWithEnvVariables = {
     },
     sampler: {
       parent_based: {
-        root: { always_on: null },
-        remote_parent_sampled: { always_on: null },
-        remote_parent_not_sampled: { always_off: null },
-        local_parent_sampled: { always_on: null },
-        local_parent_not_sampled: { always_off: null },
+        root: { always_on: {} },
+        remote_parent_sampled: { always_on: {} },
+        remote_parent_not_sampled: { always_off: {} },
+        local_parent_sampled: { always_on: {} },
+        local_parent_not_sampled: { always_off: {} },
       },
     },
   },
@@ -750,7 +750,7 @@ describe('ConfigFactory', function () {
 
     it('should return config with log level as debug', function () {
       process.env.OTEL_LOG_LEVEL = 'DEBUG';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         log_level: 'debug',
       };
@@ -760,7 +760,7 @@ describe('ConfigFactory', function () {
 
     it('should return config with a list of options for node resource detectors', function () {
       process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,host, serviceinstance';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         resource: {
           'detection/development': {
@@ -774,7 +774,7 @@ describe('ConfigFactory', function () {
 
     it('should map OTEL_NODE_RESOURCE_DETECTORS=all to all detectors', function () {
       process.env.OTEL_NODE_RESOURCE_DETECTORS = 'all';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         resource: {
           'detection/development': {
@@ -795,7 +795,7 @@ describe('ConfigFactory', function () {
 
     it('should not set detection/development for OTEL_NODE_RESOURCE_DETECTORS=none', function () {
       process.env.OTEL_NODE_RESOURCE_DETECTORS = 'none';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
       };
       const configFactory = createConfigFactory();
@@ -804,7 +804,7 @@ describe('ConfigFactory', function () {
 
     it('should map OTEL_NODE_RESOURCE_DETECTORS=os to os detector', function () {
       process.env.OTEL_NODE_RESOURCE_DETECTORS = 'os';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         resource: {
           'detection/development': {
@@ -818,7 +818,7 @@ describe('ConfigFactory', function () {
 
     it('should map OTEL_NODE_RESOURCE_DETECTORS=env to env detector', function () {
       process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         resource: {
           'detection/development': {
@@ -833,7 +833,7 @@ describe('ConfigFactory', function () {
     it('should return config with a resource attribute list', function () {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.namespace=my-namespace,service.version=1.0.0';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         resource: {
           attributes_list:
@@ -858,7 +858,7 @@ describe('ConfigFactory', function () {
 
     it('should return config with custom service name', function () {
       process.env.OTEL_SERVICE_NAME = 'my service name';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         resource: {
           attributes: [
@@ -878,7 +878,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_SERVICE_NAME = 'name-from-service-name';
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.name=name-from-attributes';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         resource: {
           attributes: [
@@ -899,7 +899,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_SERVICE_NAME = 'name-from-service-name';
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.instance.id=my-instance-id';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         resource: {
           attributes: [
@@ -924,7 +924,7 @@ describe('ConfigFactory', function () {
     it('should return config with custom attribute_limits', function () {
       process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '100';
       process.env.OTEL_ATTRIBUTE_COUNT_LIMIT = '200';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         attribute_limits: {
           attribute_value_length_limit: 100,
@@ -946,10 +946,10 @@ describe('ConfigFactory', function () {
 
     it('should return config with custom propagator', function () {
       process.env.OTEL_PROPAGATORS = 'tracecontext,jaeger';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         propagator: {
-          composite: [{ tracecontext: null }, { jaeger: null }],
+          composite: [{ tracecontext: {} }, { jaeger: {} }],
           composite_list: 'tracecontext,jaeger',
         },
       };
@@ -960,7 +960,7 @@ describe('ConfigFactory', function () {
     it('should return config with sampler always_on', function () {
       process.env.OTEL_TRACES_EXPORTER = 'otlp';
       process.env.OTEL_TRACES_SAMPLER = 'always_on';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
           limits: {
@@ -997,7 +997,7 @@ describe('ConfigFactory', function () {
     it('should return config with sampler always_off', function () {
       process.env.OTEL_TRACES_EXPORTER = 'otlp';
       process.env.OTEL_TRACES_SAMPLER = 'always_off';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
           limits: {
@@ -1035,7 +1035,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_TRACES_EXPORTER = 'otlp';
       process.env.OTEL_TRACES_SAMPLER = 'traceidratio';
       process.env.OTEL_TRACES_SAMPLER_ARG = '0.5';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
           limits: {
@@ -1072,7 +1072,7 @@ describe('ConfigFactory', function () {
     it('should return config with sampler parentbased_always_on', function () {
       process.env.OTEL_TRACES_EXPORTER = 'otlp';
       process.env.OTEL_TRACES_SAMPLER = 'parentbased_always_on';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
           limits: {
@@ -1109,7 +1109,7 @@ describe('ConfigFactory', function () {
     it('should return config with sampler parentbased_always_off', function () {
       process.env.OTEL_TRACES_EXPORTER = 'otlp';
       process.env.OTEL_TRACES_SAMPLER = 'parentbased_always_off';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
           limits: {
@@ -1147,7 +1147,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_TRACES_EXPORTER = 'otlp';
       process.env.OTEL_TRACES_SAMPLER = 'parentbased_traceidratio';
       process.env.OTEL_TRACES_SAMPLER_ARG = '0.25';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
           limits: {
@@ -1214,7 +1214,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = 'gzip';
       process.env.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT = '2000';
       process.env.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'host=localhost';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
           limits: {
@@ -1268,7 +1268,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_TRACES_EXPORTER = 'otlp';
       process.env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'http/json';
 
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
           ...defaultTracerProvider,
@@ -1297,7 +1297,7 @@ describe('ConfigFactory', function () {
 
     it('should return config with tracer_provider with console exporter', function () {
       process.env.OTEL_TRACES_EXPORTER = 'console';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
           ...defaultTracerProvider,
@@ -1318,7 +1318,7 @@ describe('ConfigFactory', function () {
 
     it('should return config with tracer_provider with exporter list', function () {
       process.env.OTEL_TRACES_EXPORTER = 'otlp,console';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
           ...defaultTracerProvider,
@@ -1367,7 +1367,7 @@ describe('ConfigFactory', function () {
         'traces-client-cert.pem';
       process.env.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = 'gzip';
       process.env.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'host=localhost';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
           ...defaultTracerProvider,
@@ -1419,7 +1419,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
         'base2_exponential_bucket_histogram';
       process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'always_on';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         meter_provider: {
           readers: [
@@ -1458,7 +1458,7 @@ describe('ConfigFactory', function () {
     it('should return config with meter_provider with console exporter', function () {
       process.env.OTEL_METRICS_EXPORTER = 'console';
 
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         meter_provider: {
           readers: [
@@ -1483,7 +1483,7 @@ describe('ConfigFactory', function () {
     it('should return config with meter_provider with prometheus exporter', function () {
       process.env.OTEL_METRICS_EXPORTER = 'prometheus';
 
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         meter_provider: {
           readers: [
@@ -1513,7 +1513,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_EXPORTER_PROMETHEUS_HOST = '0.0.0.0';
       process.env.OTEL_EXPORTER_PROMETHEUS_PORT = '8080';
 
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         meter_provider: {
           readers: [
@@ -1546,7 +1546,7 @@ describe('ConfigFactory', function () {
 
     it('should return config with meter_provider with list of exporters', function () {
       process.env.OTEL_METRICS_EXPORTER = 'otlp,console';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         meter_provider: {
           readers: [
@@ -1594,7 +1594,7 @@ describe('ConfigFactory', function () {
         'metric-client-cert.pem';
       process.env.OTEL_EXPORTER_OTLP_METRICS_COMPRESSION = 'gzip';
       process.env.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'host=localhost';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         meter_provider: {
           readers: [
@@ -1636,7 +1636,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'delta';
       process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
         'base2_exponential_bucket_histogram';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         meter_provider: {
           readers: [
@@ -1669,7 +1669,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'grpc';
       process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE =
         'low_memory';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         meter_provider: {
           readers: [
@@ -1704,7 +1704,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'invalid';
       process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
         'invalid';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         meter_provider: {
           readers: [
@@ -1736,7 +1736,7 @@ describe('ConfigFactory', function () {
     it('should return config with meter_provider with otlp http/json exporter', function () {
       process.env.OTEL_METRICS_EXPORTER = 'otlp';
       process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'http/json';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         meter_provider: {
           readers: [
@@ -1783,7 +1783,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_EXPORTER_OTLP_LOGS_COMPRESSION = 'gzip';
       process.env.OTEL_EXPORTER_OTLP_LOGS_TIMEOUT = '700';
       process.env.OTEL_EXPORTER_OTLP_LOGS_HEADERS = 'host=localhost';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         logger_provider: {
           limits: {
@@ -1823,7 +1823,7 @@ describe('ConfigFactory', function () {
 
     it('should return config with logger_provider with console exporter', function () {
       process.env.OTEL_LOGS_EXPORTER = 'console';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         logger_provider: {
           limits: {
@@ -1853,7 +1853,7 @@ describe('ConfigFactory', function () {
 
     it('should return config with logger_provider with exporter list', function () {
       process.env.OTEL_LOGS_EXPORTER = 'otlp,console';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         logger_provider: {
           limits: {
@@ -1901,7 +1901,7 @@ describe('ConfigFactory', function () {
         'log-client-cert.pem';
       process.env.OTEL_EXPORTER_OTLP_LOGS_HEADERS = 'host=localhost';
       process.env.OTEL_EXPORTER_OTLP_LOGS_COMPRESSION = 'gzip';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         logger_provider: {
           limits: {
@@ -1940,7 +1940,7 @@ describe('ConfigFactory', function () {
     it('should return config with logger_provider with otlp http/json exporter', function () {
       process.env.OTEL_LOGS_EXPORTER = 'otlp';
       process.env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL = 'http/json';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         logger_provider: {
           limits: {
@@ -1983,7 +1983,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_TRACES_EXPORTER = 'otlp';
       process.env.OTEL_METRICS_EXPORTER = 'otlp';
       process.env.OTEL_LOGS_EXPORTER = 'otlp';
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         tracer_provider: {
           ...defaultTracerProvider,
@@ -2113,7 +2113,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_METRICS_EXPORTER = 'otlp';
       setMeterProvider(config);
 
-      let expectedMeterProvider: unknown = {
+      let expectedMeterProvider: ConfigurationModel['meter_provider'] = {
         exemplar_filter: ExemplarFilter.AlwaysOff,
         readers: [
           {
@@ -2212,7 +2212,7 @@ describe('ConfigFactory', function () {
         'composite/development': {
           rule_based: {
             rules: [
-              { sampler: { always_on: null } },
+              { sampler: { always_on: {} } },
               { sampler: { probability: { ratio: 0.5 } } },
             ],
           },
@@ -2234,7 +2234,7 @@ describe('ConfigFactory', function () {
                   key: 'http.method',
                   values: ['GET'],
                 },
-                sampler: { always_on: null },
+                sampler: { always_on: {} },
               },
             ],
           },
@@ -2272,8 +2272,9 @@ describe('ConfigFactory', function () {
     it('should initialize config with default values from valid short config file', function () {
       process.env.OTEL_CONFIG_FILE = 'test/fixtures/short-config.yml';
       const configFactory = createConfigFactory();
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         disabled: false,
+        log_level: SeverityNumber.Info,
         attribute_limits: {
           attribute_count_limit: 128,
         },
@@ -2347,7 +2348,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = '28';
       process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '29';
       const configFactory = createConfigFactory();
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         ...defaultConfigFromFileWithEnvVariables,
         resource: {
           attributes_list: 'att=1',
@@ -2501,8 +2502,9 @@ describe('ConfigFactory', function () {
     it('check resources priority', function () {
       process.env.OTEL_CONFIG_FILE = 'test/fixtures/resources.yaml';
       const configFactory = createConfigFactory();
-      const expectedConfig: unknown = {
+      const expectedConfig: ConfigurationModel = {
         disabled: false,
+        log_level: SeverityNumber.Info,
         attribute_limits: {
           attribute_count_limit: 128,
         },
@@ -2597,6 +2599,8 @@ describe('ConfigFactory', function () {
 
       const config = parseConfigFile();
       assert.deepStrictEqual(config, {
+        disabled: false,
+        log_level: SeverityNumber.Info,
         attribute_limits: {
           attribute_count_limit: 128,
         },
@@ -2611,7 +2615,7 @@ describe('ConfigFactory', function () {
             {
               simple: {
                 exporter: {
-                  console: null,
+                  console: {},
                 },
               },
             },

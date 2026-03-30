@@ -11,6 +11,7 @@ import { diag } from '@opentelemetry/api';
 import Ajv from 'ajv/dist/2020';
 import { envVariableSubstitution } from './utils';
 import { opentelemetryConfigurationSchema } from './generated/schema';
+import { SeverityNumber } from './generated/types';
 import type { ConfigurationModel } from './generated/types';
 
 const ajv = new Ajv({ strict: false });
@@ -68,6 +69,9 @@ export function parseConfigFile(): ConfigurationModel {
     string,
     unknown
   >;
+
+  // Normalize YAML null type-tag values to {} before validation
+  normalizeYamlNulls(preprocessed);
 
   const valid = validateConfig(preprocessed);
   if (!valid) {
@@ -161,16 +165,90 @@ function mergeAttributesList(data: ConfigurationModel): void {
 
 /**
  * Apply spec-defined defaults that are not encoded in the JSON schema.
- *
- * Only attribute_count_limit is defaulted here. disabled and log_level are
- * intentionally left absent when not specified in the YAML — per the WYSIWYG
- * principle, the SDK layer should interpret missing values, not the parser.
+ * Both FileConfigFactory and EnvironmentConfigFactory apply the same defaults
+ * so consumers see consistent behaviour regardless of config source.
  */
 function applyConfigDefaults(data: ConfigurationModel): void {
+  if (data.disabled == null) {
+    data.disabled = false;
+  }
+  if (data.log_level == null) {
+    data.log_level = SeverityNumber.Info;
+  }
   if (data.attribute_limits == null) {
     data.attribute_limits = { attribute_count_limit: 128 };
   } else if (data.attribute_limits.attribute_count_limit == null) {
     data.attribute_limits.attribute_count_limit = 128;
+  }
+}
+
+/**
+ * Object type-tag keys that may appear as nested (non-array-element) properties.
+ * YAML `console:` (no value) parses to `{ console: null }`, but the SDK checks
+ * `if (exporter.console)` — truthy — so null must become {}.
+ *
+ * We exclude keys that are also used as nullable primitives in other contexts
+ * (e.g. `host` is a string field in prometheus config; detectors use it as a
+ * type-tag but only as array elements, which are already handled below).
+ */
+const NESTED_OBJECT_TYPE_TAGS = new Set([
+  // Exporter type discriminators (nested inside simple/batch processor)
+  'console',
+  // Sampler type discriminators (nested inside tracer_provider.sampler)
+  'always_on',
+  'always_off',
+  'trace_id_ratio_based',
+  'parent_based',
+  'jaeger_remote',
+  // Propagator type discriminators (array elements, but covered here for completeness)
+  'tracecontext',
+  'baggage',
+  'b3',
+  'b3multi',
+  'ottrace',
+  'xray',
+  // Telemetry producer type discriminators
+  'opencensus',
+]);
+
+/**
+ * Normalizes YAML null values to empty objects for discriminated-union type-tag fields.
+ *
+ * YAML `key:` (no value) parses to `{ key: null }`, but the SDK checks `if (obj.key)`
+ * to determine which type to instantiate — null fails that check. Two cases:
+ *
+ * 1. Array element properties: convert ALL null-valued keys to {} (handles detectors,
+ *    composite propagators, and most exporter/processor discriminators).
+ * 2. Nested NESTED_OBJECT_TYPE_TAGS: convert known type-discriminator keys to {} when
+ *    encountered anywhere in the tree (handles sampler types, console exporter nested
+ *    inside simple/batch, etc.).
+ *
+ * Top-level nullable primitive fields (disabled, log_level, endpoint, ca_file, etc.)
+ * are NOT in NESTED_OBJECT_TYPE_TAGS and are left as-is; applyConfigDefaults()
+ * handles the boolean/string ones that need defaults.
+ */
+function normalizeYamlNulls(value: unknown): void {
+  if (value == null || typeof value !== 'object') return;
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      if (item != null && typeof item === 'object' && !Array.isArray(item)) {
+        // All null-valued properties of array elements are type-tag discriminators.
+        for (const key of Object.keys(item as object)) {
+          if ((item as Record<string, unknown>)[key] === null) {
+            (item as Record<string, unknown>)[key] = {};
+          }
+        }
+      }
+      normalizeYamlNulls(item);
+    }
+  } else {
+    for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
+      if (val === null && NESTED_OBJECT_TYPE_TAGS.has(key)) {
+        (value as Record<string, unknown>)[key] = {};
+      } else {
+        normalizeYamlNulls(val);
+      }
+    }
   }
 }
 

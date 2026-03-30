@@ -5,7 +5,7 @@
 
 import { getStringFromEnv } from '@opentelemetry/core';
 import { ExemplarFilter, SeverityNumber } from './generated/types';
-import type { ConfigurationModel } from './generated/types';
+import type { ConfigurationModel, GrpcTls, HttpTls } from './generated/types';
 
 export function envVariableSubstitution(value: unknown): string | undefined {
   if (value == null) {
@@ -40,9 +40,9 @@ export function getGrpcTlsConfig(
   clientKeyFile?: string,
   clientCertificateFile?: string,
   insecure?: boolean
-): Record<string, unknown> | undefined {
+): GrpcTls | undefined {
   if (certificateFile || clientKeyFile || clientCertificateFile) {
-    const tls: Record<string, unknown> = {};
+    const tls: GrpcTls = {};
     if (certificateFile) {
       tls.ca_file = certificateFile;
     }
@@ -119,9 +119,9 @@ export function getHttpTlsConfig(
   certificateFile?: string,
   clientKeyFile?: string,
   clientCertificateFile?: string
-): Record<string, unknown> | undefined {
+): HttpTls | undefined {
   if (certificateFile || clientKeyFile || clientCertificateFile) {
-    const tls: Record<string, unknown> = {};
+    const tls: HttpTls = {};
     if (certificateFile) {
       tls.ca_file = certificateFile;
     }

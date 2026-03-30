@@ -5,7 +5,7 @@
 
 /* eslint-disable */
 // AUTO-GENERATED — do not edit
-// Generated from opentelemetry-configuration JSON schema
+// Generated from opentelemetry-configuration JSON schema v1.0.0-rc.3
 // Run `npm run generate:config` from the configuration package to regenerate
 
 /**
@@ -346,7 +346,7 @@ export type OtlpHttpMetricExporter = {
    *
    */
   endpoint?: string | null;
-  tls?: HttpTls1;
+  tls?: HttpTls;
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
    * If an entry's .value is null, the entry is ignored.
@@ -413,7 +413,7 @@ export type OtlpHttpMetricExporter = {
    *
    */
   endpoint?: string | null;
-  tls?: HttpTls1;
+  tls?: HttpTls;
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
    * If an entry's .value is null, the entry is ignored.
@@ -479,56 +479,6 @@ export type OtlpHttpMetricExporter = {
  * If omitted, system default TLS settings are used.
  *
  */
-export type HttpTls1 = {
-  /**
-   * Configure certificate used to verify a server's TLS credentials.
-   * Absolute path to certificate file in PEM format.
-   * If omitted or null, system default certificate verification is used for secure connections.
-   *
-   */
-  ca_file?: string | null;
-  /**
-   * Configure mTLS private client key.
-   * Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-   * If omitted or null, mTLS is not used.
-   *
-   */
-  key_file?: string | null;
-  /**
-   * Configure mTLS client certificate.
-   * Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-   * If omitted or null, mTLS is not used.
-   *
-   */
-  cert_file?: string | null;
-} & ({
-  /**
-   * Configure certificate used to verify a server's TLS credentials.
-   * Absolute path to certificate file in PEM format.
-   * If omitted or null, system default certificate verification is used for secure connections.
-   *
-   */
-  ca_file?: string | null;
-  /**
-   * Configure mTLS private client key.
-   * Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-   * If omitted or null, mTLS is not used.
-   *
-   */
-  key_file?: string | null;
-  /**
-   * Configure mTLS client certificate.
-   * Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-   * If omitted or null, mTLS is not used.
-   *
-   */
-  cert_file?: string | null;
-} | null);
-/**
- * Configure exporter to be OTLP with gRPC transport.
- * If omitted, ignore.
- *
- */
 export type OtlpGrpcMetricExporter = {
   /**
    * Configure endpoint.
@@ -536,7 +486,7 @@ export type OtlpGrpcMetricExporter = {
    *
    */
   endpoint?: string | null;
-  tls?: GrpcTls1;
+  tls?: GrpcTls;
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
    * If an entry's .value is null, the entry is ignored.
@@ -593,7 +543,7 @@ export type OtlpGrpcMetricExporter = {
    *
    */
   endpoint?: string | null;
-  tls?: GrpcTls1;
+  tls?: GrpcTls;
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
    * If an entry's .value is null, the entry is ignored.
@@ -647,70 +597,6 @@ export type OtlpGrpcMetricExporter = {
 /**
  * Configure TLS settings for the exporter.
  * If omitted, system default TLS settings are used.
- *
- */
-export type GrpcTls1 = {
-  /**
-   * Configure certificate used to verify a server's TLS credentials.
-   * Absolute path to certificate file in PEM format.
-   * If omitted or null, system default certificate verification is used for secure connections.
-   *
-   */
-  ca_file?: string | null;
-  /**
-   * Configure mTLS private client key.
-   * Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-   * If omitted or null, mTLS is not used.
-   *
-   */
-  key_file?: string | null;
-  /**
-   * Configure mTLS client certificate.
-   * Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-   * If omitted or null, mTLS is not used.
-   *
-   */
-  cert_file?: string | null;
-  /**
-   * Configure client transport security for the exporter's connection.
-   * Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
-   * If omitted or null, false is used.
-   *
-   */
-  insecure?: boolean | null;
-} & ({
-  /**
-   * Configure certificate used to verify a server's TLS credentials.
-   * Absolute path to certificate file in PEM format.
-   * If omitted or null, system default certificate verification is used for secure connections.
-   *
-   */
-  ca_file?: string | null;
-  /**
-   * Configure mTLS private client key.
-   * Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-   * If omitted or null, mTLS is not used.
-   *
-   */
-  key_file?: string | null;
-  /**
-   * Configure mTLS client certificate.
-   * Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-   * If omitted or null, mTLS is not used.
-   *
-   */
-  cert_file?: string | null;
-  /**
-   * Configure client transport security for the exporter's connection.
-   * Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
-   * If omitted or null, false is used.
-   *
-   */
-  insecure?: boolean | null;
-} | null);
-/**
- * Configure exporter to be OTLP with file transport.
- * If omitted, ignore.
  *
  */
 export type ExperimentalOtlpFileMetricExporter = {

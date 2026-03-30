@@ -4,9 +4,9 @@
  */
 
 export type { ConfigFactory } from './IConfigFactory';
-export type { ConfigurationModel } from './generated/types';
-export type { LogRecordExporter as LogRecordExporterConfigModel } from './generated/types';
 export type {
+  ConfigurationModel,
+  LogRecordExporter as LogRecordExporterConfigModel,
   PushMetricExporter as PushMetricExporterConfigModel,
   InstrumentType as InstrumentTypeConfigModel,
   Aggregation as AggregationConfigModel,
