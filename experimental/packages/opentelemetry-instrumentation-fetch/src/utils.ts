@@ -15,6 +15,58 @@ const DIAG_LOGGER = diag.createComponentLogger({
 });
 
 /**
+ * Duck-typed check to determine if a value is a Request object.
+ *
+ * This instrumentation uses duck-typing instead of `instanceof Request` checks
+ * because the Request constructor may not be available or may differ across
+ * execution contexts (e.g., different realms, polyfills, or test environments).
+ *
+ * The function checks for the presence of key Request properties and methods:
+ * - `url` (string): The request URL
+ * - `method` (string): The HTTP method
+ * - `headers` (object with get/set methods): The Headers object
+ * - `clone` (function): Method to clone the request
+ *
+ * **Risk of false positives:** While minimal, this approach could theoretically
+ * match objects that implement a Request-like interface but are not actual Request
+ * instances. In practice, this risk is negligible as the combination of these
+ * specific properties and methods is unique to the Request interface.
+ *
+ * @param value - The value to check
+ * @returns True if the value appears to be a Request object
+ */
+export function isRequest(value: unknown): value is Request {
+  if (value === null || typeof value !== 'object') {
+    return false;
+  }
+
+  if (typeof Request !== 'undefined' && value instanceof Request) {
+    return true;
+  }
+
+  const candidate = value as {
+    url?: unknown;
+    method?: unknown;
+    headers?: unknown;
+    clone?: unknown;
+  };
+
+  const headers = candidate.headers as
+    | { get?: unknown; set?: unknown }
+    | undefined;
+
+  return (
+    typeof candidate.url === 'string' &&
+    typeof candidate.method === 'string' &&
+    typeof candidate.clone === 'function' &&
+    typeof headers === 'object' &&
+    headers !== null &&
+    typeof headers.get === 'function' &&
+    typeof headers.set === 'function'
+  );
+}
+
+/**
  * Helper function to determine payload content length for fetch requests
  *
  * The fetch API is kinda messy: there are a couple of ways the body can be passed in.
@@ -56,9 +108,9 @@ export function getFetchBodyLength(...args: Parameters<typeof fetch>) {
     } else {
       return Promise.resolve(getXHRBodyLength(requestInit.body));
     }
-  } else {
+  } else if (isRequest(args[0])) {
     const info = args[0];
-    if (!info?.body) {
+    if (!info.body) {
       return Promise.resolve();
     }
 
@@ -66,6 +118,8 @@ export function getFetchBodyLength(...args: Parameters<typeof fetch>) {
       .clone()
       .text()
       .then(t => getByteLength(t));
+  } else {
+    return Promise.resolve();
   }
 }
 
@@ -203,7 +257,7 @@ function getKnownMethods() {
     );
     if (cfgMethods && cfgMethods.length > 0) {
       knownMethods = {};
-      cfgMethods.forEach(m => {
+      cfgMethods.forEach((m: string) => {
         knownMethods[m] = true;
       });
     } else {

@@ -44,6 +44,7 @@ import {
 import type { FetchError, FetchResponse, SpanData } from './types';
 import {
   getFetchBodyLength,
+  isRequest,
   normalizeHttpRequestMethod,
   serverPortFromUrl,
 } from './utils';
@@ -204,7 +205,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       return;
     }
 
-    if (options instanceof Request) {
+    if (isRequest(options)) {
       // This mutates `Request.headers` in-place, because it is read-only
       // (per https://developer.mozilla.org/en-US/docs/Web/API/Request/headers),
       // so we cannot (easily) replace it.
@@ -384,10 +385,10 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       ): Promise<Response> {
         const self = this;
         const url = web.parseUrl(
-          args[0] instanceof Request ? args[0].url : String(args[0])
+          isRequest(args[0]) ? args[0].url : String(args[0])
         ).href;
 
-        const options = args[0] instanceof Request ? args[0] : args[1] || {};
+        const options = isRequest(args[0]) ? args[0] : args[1] || {};
         const createdSpan = plugin._createSpan(url, options);
         if (!createdSpan) {
           return original.apply(this, args);
@@ -513,7 +514,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
             return original
               .apply(
                 self,
-                options instanceof Request ? [options] : [url, options]
+                isRequest(options) ? [options] : [url, options]
               )
               .then(
                 onSuccess.bind(self, createdSpan),
