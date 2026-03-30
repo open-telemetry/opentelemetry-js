@@ -8,6 +8,7 @@
   "scripts": {
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build",
+    "postcompile": "node -e \"require('fs').copyFileSync('src/generated/validator.js', 'build/src/generated/validator.js')\"",
     "clean": "tsc --build --clean",
     "generate:config": "node ../../../scripts/config/generate-config.js",
     "test": "nyc mocha test/**/*.test.ts",
@@ -40,7 +41,6 @@
   },
   "dependencies": {
     "@opentelemetry/core": "2.6.1",
-    "ajv": "^8.0.0",
     "yaml": "^2.0.0"
   },
   "peerDependencies": {
@@ -49,6 +49,7 @@
   "devDependencies": {
     "@opentelemetry/api": "^1.9.0",
     "@types/mocha": "10.0.10",
+    "ajv": "^8.0.0",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
     "mocha": "11.7.5",

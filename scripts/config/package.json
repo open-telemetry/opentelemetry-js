@@ -3,6 +3,7 @@
   "private": true,
   "description": "Code generation scripts for @opentelemetry/configuration",
   "dependencies": {
+    "ajv": "^8.0.0",
     "json-schema-to-typescript": "^15.0.0"
   }
 }

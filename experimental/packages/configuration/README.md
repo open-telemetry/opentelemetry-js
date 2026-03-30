@@ -85,7 +85,9 @@ When no config file is set, the factory reads from the standard OpenTelemetry SD
 `src/generated/` is auto-generated — do not edit manually. It contains:
 
 - `types.ts` — TypeScript interfaces derived from the JSON schema (via `json-schema-to-typescript`)
-- `schema.ts` — The raw JSON schema exported as a constant for runtime validation (via `ajv`)
+- `schema.ts` — The raw JSON schema exported as a constant (retained for reference; not used at runtime)
+- `validator.js` — Pre-compiled ajv validator (ahead-of-time compiled from the schema; eliminates runtime `ajv.compile()`)
+- `validator.d.ts` — TypeScript declarations for `validator.js`
 
 ### Regenerating after a schema version bump
 
@@ -96,7 +98,7 @@ When no config file is set, the factory reads from the standard OpenTelemetry SD
    npm run generate:config
    ```
 
-3. Review the diff in `src/generated/types.ts` and `src/generated/schema.ts`
+3. Review the diff in `src/generated/types.ts`, `src/generated/schema.ts`, and `src/generated/validator.js`
 4. Update `supportedFileVersionPattern` in `src/FileConfigFactory.ts` if the new version falls outside the current regex
 5. Update `EnvironmentConfigFactory.ts` and `utils.ts` if new fields need env var mapping
 
@@ -107,6 +109,8 @@ The generation script (`scripts/config/generate-config.js`) handles several post
 - Strips `minItems` constraints from the runtime schema (so `processors: null` in YAML is accepted)
 - Replaces narrow index signatures (`[k: string]: {} | null`) with `[k: string]: unknown`
 - Appends named `const` enum objects for inlined enum types (e.g. `ExemplarFilter`, `SeverityNumber`)
+- Deduplicates structurally-identical TLS types (`GrpcTls1`/`HttpTls1` → `GrpcTls`/`HttpTls`)
+- Produces a pre-compiled ajv validator (`validator.js` + `validator.d.ts`) for use at runtime
 
 ### Defaults
 
