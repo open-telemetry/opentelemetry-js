@@ -192,6 +192,13 @@ describeNode('envDetector() on Node.js', () => {
         'value,with,commas'
       );
     });
+
+    it('skips empty pairs', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES = 'key1=value1,,key2=value2,';
+      const resource = resourceFromDetectedResource(envDetector.detect());
+      assert.strictEqual(resource.attributes?.['key1'], 'value1');
+      assert.strictEqual(resource.attributes?.['key2'], 'value2');
+    });
   });
 
   describe('service name and error handling', () => {
