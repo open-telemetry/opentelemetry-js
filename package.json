@@ -118,5 +118,8 @@
     "examples/http",
     "examples/https",
     "examples/esm-http-ts"
-  ]
+  ],
+  "overrides": {
+    "basic-ftp": "5.2.0"
+  }
 }
