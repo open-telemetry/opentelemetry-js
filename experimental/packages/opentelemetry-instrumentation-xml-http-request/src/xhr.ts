@@ -371,13 +371,13 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     url: string,
     method: string
   ): api.Span | undefined {
-    if (isUrlIgnored(url, this.getConfig().ignoreUrls)) {
+    const parsedUrl = parseUrl(url);
+    if (isUrlIgnored(parsedUrl.href, this.getConfig().ignoreUrls)) {
       this._diag.debug('ignoring span as url matches ignored url');
       return;
     }
 
     let name = '';
-    const parsedUrl = parseUrl(url);
     const attributes = {} as api.Attributes;
     if (this._semconvStability & SemconvStability.OLD) {
       name = method.toUpperCase();

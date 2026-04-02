@@ -755,6 +755,20 @@ describe('xhr', () => {
           });
         });
 
+
+        describe('when relative url is ignored via domain regex', () => {
+          beforeEach(done => {
+            clearData();
+            prepareData(done, '/xml-http-request.js', {
+              propagateTraceHeaderCorsUrls: [/.*/],
+              ignoreUrls: [/.*localhost.*/],
+            });
+          });
+
+          it('should NOT create any span', () => {
+            assert.ok(exportSpy.notCalled, "span shouldn't be exported");
+          });
+        });
         describe('when clearTimingResources is set', () => {
           beforeEach(done => {
             clearData();
