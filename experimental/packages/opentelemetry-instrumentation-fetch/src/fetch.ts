@@ -377,27 +377,6 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   private _patchConstructor(): (original: typeof fetch) => typeof fetch {
     return original => {
       const plugin = this;
-      const readOnlyProps = new Set(['url', 'type', 'redirected']);
-      function createResponseProxy(
-        target: Response,
-        originalResponse: Response
-      ): Response {
-        return new Proxy(target, {
-          get(t, prop, _receiver) {
-            if (typeof prop === 'string' && readOnlyProps.has(prop)) {
-              return Reflect.get(originalResponse, prop);
-            }
-            if (prop === 'clone') {
-              return function clone() {
-                return createResponseProxy(t.clone(), originalResponse);
-              };
-            }
-            // Use target as receiver so getters (e.g. headers) run with correct this and avoid "Illegal invocation"
-            const value = Reflect.get(t, prop, t);
-            return typeof value === 'function' ? value.bind(t) : value;
-          },
-        }) as Response;
-      }
 
       return function patchConstructor(
         this: typeof globalThis,
@@ -408,7 +387,18 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           args[0] instanceof Request ? args[0].url : String(args[0])
         ).href;
 
-        const options = args[0] instanceof Request ? args[0] : args[1] || {};
+        // Per the Fetch spec, when fetch() is called with a Request object
+        // and a separate init object, the init properties override the
+        // Request's properties. Merge them into a new Request so that
+        // downstream consumers (hooks, header injection, the actual fetch
+        // call) see the correct final values.
+        // See: https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#parameters
+        let options: Request | RequestInit;
+        if (args[0] instanceof Request) {
+          options = args[1] != null ? new Request(args[0], args[1]) : args[0];
+        } else {
+          options = args[1] || {};
+        }
         const createdSpan = plugin._createSpan(url, options);
         if (!createdSpan) {
           return original.apply(this, args);
@@ -459,56 +449,13 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           }
         }
 
-        function withCancelPropagation(
-          body: ReadableStream<Uint8Array> | null,
-          readerClone: ReadableStreamDefaultReader<Uint8Array>
-        ): ReadableStream<Uint8Array> | null {
-          if (!body) return null;
-
-          const reader = body.getReader();
-
-          return new ReadableStream({
-            async pull(controller) {
-              try {
-                const { value, done } = await reader.read();
-                if (done) {
-                  reader.releaseLock();
-                  controller.close();
-                } else {
-                  controller.enqueue(value);
-                }
-              } catch (err) {
-                controller.error(err);
-                reader.cancel(err).catch(_ => {});
-
-                try {
-                  reader.releaseLock();
-                } catch {
-                  // Spec reference:
-                  // https://streams.spec.whatwg.org/#default-reader-release-lock
-                  //
-                  // releaseLock() only throws if called on an invalid reader
-                  // (i.e. reader.[[stream]] is undefined, meaning the lock is already released
-                  // or the reader was never associated). In normal use this cannot happen.
-                  // This catch is defensive only.
-                }
-              }
-            },
-            cancel(reason) {
-              readerClone.cancel(reason).catch(_ => {});
-              return reader.cancel(reason);
-            },
-          });
-        }
-
-        function onSuccess(
-          span: Span,
-          resolve: (value: Response | PromiseLike<Response>) => void,
-          response: Response
-        ): void {
-          let proxiedResponse: Response | null = null;
-
+        function onSuccess(span: Span, response: Response): Response {
           try {
+            // Clone the response and eagerly consume the clone to detect
+            // when the body transfer completes.  The original response is
+            // returned to the caller untouched so that it passes internal
+            // brand-checks required by APIs such as
+            // WebAssembly.compileStreaming.
             // TODO: Switch to a consumer-driven model and drop `resClone`.
             // Keeping eager consumption here to preserve current behavior and avoid breaking existing tests.
             // Context: discussion in PR #5894 → https://github.com/open-telemetry/opentelemetry-js/pull/5894
@@ -516,24 +463,6 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
             const body = resClone.body;
             if (body) {
               const reader = body.getReader();
-              const isNullBodyStatus =
-                // 101 responses and protocol upgrading is handled internally by the browser
-                response.status === 204 ||
-                response.status === 205 ||
-                response.status === 304;
-              const wrappedBody = isNullBodyStatus
-                ? null
-                : withCancelPropagation(response.body, reader);
-
-              const newResponse = new Response(wrappedBody, {
-                status: response.status,
-                statusText: response.statusText,
-                headers: response.headers,
-              });
-
-              // Response url, type, and redirected are read-only properties that can't be set via constructor
-              // Use a Proxy to forward them from the original response and maintain the wrapped body
-              proxiedResponse = createResponseProxy(newResponse, response);
 
               const read = (): void => {
                 reader.read().then(
@@ -554,46 +483,55 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
               // some older browsers don't have .body implemented
               endSpanOnSuccess(span, response);
             }
-          } finally {
-            resolve(proxiedResponse ?? response);
+          } catch (error) {
+            // Setup failed (e.g. clone() or getReader() threw).
+            // End the span and clean up so _tasksCount doesn't leak.
+            plugin._diag.error('Failed to read fetch response body', error);
+            plugin._endSpan(span, spanData, {
+              status: 0,
+              url,
+            });
           }
+          return response;
         }
 
-        function onError(
-          span: Span,
-          reject: (reason?: unknown) => void,
-          error: FetchError
-        ) {
+        function onError(span: Span, error: FetchError): never {
           try {
             endSpanOnError(span, error);
-          } finally {
-            reject(error);
+          } catch (e: unknown) {
+            // endSpanOnError failed — fall back to ending the span
+            // directly so _tasksCount doesn't leak.
+            plugin._diag.error('Failed to end span on fetch error', e);
+            plugin._endSpan(span, spanData, {
+              status: error.status || 0,
+              url,
+            });
           }
+          // eslint-disable-next-line @typescript-eslint/only-throw-error
+          throw error;
         }
 
-        return new Promise((resolve, reject) => {
-          return context.with(
-            trace.setSpan(context.active(), createdSpan),
-            () => {
-              // Call request hook before injection so hooks cannot tamper with propagation headers.
-              // Also, this means the hook will see `options.headers` in the same type as passed in,
-              // rather than as a `Headers` instance set by `_addHeaders()`.
-              plugin._callRequestHook(createdSpan, options);
-              plugin._addHeaders(options, url);
-              plugin._tasksCount++;
+        return context.with(
+          trace.setSpan(context.active(), createdSpan),
+          () => {
+            // Call request hook before injection so hooks cannot tamper with propagation headers.
+            // Also, this means the hook will see `options.headers` in the same type as passed in,
+            // rather than as a `Headers` instance set by `_addHeaders()`.
+            plugin._callRequestHook(createdSpan, options);
+            plugin._addHeaders(options, url);
+            plugin._tasksCount++;
 
-              return original
-                .apply(
-                  self,
-                  options instanceof Request ? [options] : [url, options]
-                )
-                .then(
-                  onSuccess.bind(self, createdSpan, resolve),
-                  onError.bind(self, createdSpan, reject)
-                );
-            }
-          );
-        });
+            return original
+              .apply(
+                self,
+                options instanceof Request ? [options] : [url, options]
+              )
+              .then(
+                onSuccess.bind(self, createdSpan),
+                onError.bind(self, createdSpan)
+              );
+          }
+        );
       };
     };
   }
