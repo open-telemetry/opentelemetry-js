@@ -361,6 +361,7 @@ export class NodeSDK {
         ...getLoggerProviderConfigFromEnv(),
         resource: this._resource,
         processors: this._loggerProviderConfig.logRecordProcessors,
+        meterProvider: sdkMetricsEnabled ? this._meterProvider : undefined,
       });
 
       this._loggerProvider = loggerProvider;

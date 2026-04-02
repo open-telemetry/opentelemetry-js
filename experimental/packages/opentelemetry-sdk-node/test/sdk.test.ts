@@ -68,6 +68,7 @@ import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/expo
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
+import { NOOP_COUNTER_METRIC } from '../../../../api/src/metrics/NoopMeter';
 import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from '../src/semconv';
 import { NOOP_HISTOGRAM_METRIC } from '../../../../api/src/metrics/NoopMeter';
 
@@ -421,6 +422,9 @@ describe('Node SDK', () => {
       const sdk = new NodeSDK({
         metricReaders: [metricReader],
         traceExporter: new ConsoleSpanExporter(),
+        logRecordProcessors: [
+          new SimpleLogRecordProcessor(new InMemoryLogRecordExporter()),
+        ],
         autoDetectResources: false,
       });
 
@@ -434,6 +438,12 @@ describe('Node SDK', () => {
       assert.ok(tracerProvider instanceof NodeTracerProvider);
       assert.ok(
         (tracerProvider as any)._config.meterProvider instanceof MeterProvider
+      );
+
+      const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
+      assert.notDeepEqual(
+        (loggerProvider as any)['_sharedState'].loggerMetrics.createdLogs,
+        NOOP_COUNTER_METRIC
       );
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
@@ -456,6 +466,9 @@ describe('Node SDK', () => {
       const sdk = new NodeSDK({
         metricReaders: [metricReader],
         traceExporter: new ConsoleSpanExporter(),
+        logRecordProcessors: [
+          new SimpleLogRecordProcessor(new InMemoryLogRecordExporter()),
+        ],
         autoDetectResources: false,
       });
 
@@ -468,6 +481,12 @@ describe('Node SDK', () => {
       const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
       assert.ok(tracerProvider instanceof NodeTracerProvider);
       assert.equal((tracerProvider as any)._config.meterProvider, undefined);
+
+      const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
+      assert.deepEqual(
+        (loggerProvider as any)['_sharedState'].loggerMetrics.createdLogs,
+        NOOP_COUNTER_METRIC
+      );
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
       assert.deepEqual(
