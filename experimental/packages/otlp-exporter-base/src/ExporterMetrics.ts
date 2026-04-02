@@ -29,13 +29,13 @@ const componentCounter = new Map<string, number>();
 
 export interface ExporterMetricsOptions<Internal> {
   componentType: string;
-  signal: IExporterSignal<Internal>;
+  signal: IExporterMetricsHelper<Internal>;
   url: string | undefined;
   meterProvider: MeterProvider | undefined;
   errorAttributes: (error: unknown) => Attributes;
 }
 
-export interface IExporterSignal<Internal> {
+export interface IExporterMetricsHelper<Internal> {
   name: 'span' | 'metric_data_point' | 'log';
   countItems: (request: Internal) => number;
 }
@@ -51,7 +51,7 @@ export class ExporterMetrics<Internal> {
   private readonly standardAttrs: Attributes;
   private readonly errorAttributes: (error: unknown) => Attributes;
 
-  private readonly signal: IExporterSignal<Internal>;
+  private readonly exporterMetricsHelper: IExporterMetricsHelper<Internal>;
 
   constructor(options: ExporterMetricsOptions<Internal>) {
     const { componentType, signal, meterProvider, url, errorAttributes } =
@@ -90,7 +90,7 @@ export class ExporterMetrics<Internal> {
       }
     }
 
-    this.signal = signal;
+    this.exporterMetricsHelper = signal;
 
     this.inflight = meter.createUpDownCounter(
       `otel.sdk.exporter.${signal.name}.inflight`,
@@ -119,7 +119,7 @@ export class ExporterMetrics<Internal> {
   }
 
   startExport(request: Internal): (error: unknown) => void {
-    const numItems = this.signal.countItems(request);
+    const numItems = this.exporterMetricsHelper.countItems(request);
     const startTime = hrTime();
     this.inflight.add(numItems, this.standardAttrs);
     return (error: unknown) => {

@@ -8,7 +8,7 @@ import type { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import {
   ProtobufTraceSerializer,
-  TraceSignal,
+  TraceExporterMetricsHelper,
 } from '@opentelemetry/otlp-transformer';
 import { createLegacyOtlpBrowserExportDelegate } from '@opentelemetry/otlp-exporter-base/browser-http';
 import { OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_SPAN_EXPORTER } from '../../semconv';
@@ -28,7 +28,7 @@ export class OTLPTraceExporter
         config,
         ProtobufTraceSerializer,
         OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_SPAN_EXPORTER,
-        TraceSignal,
+        TraceExporterMetricsHelper,
         config.meterProvider,
         DEFAULT_COLLECTOR_RESOURCE_PATH,
         { 'Content-Type': 'application/x-protobuf' }

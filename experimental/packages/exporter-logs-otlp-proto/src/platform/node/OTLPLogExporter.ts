@@ -6,7 +6,7 @@
 import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import {
-  LogsSignal,
+  LogsExporterMetricsHelper,
   ProtobufLogsSerializer,
 } from '@opentelemetry/otlp-transformer';
 import {
@@ -35,7 +35,7 @@ export class OTLPLogExporter
         }),
         ProtobufLogsSerializer,
         OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_LOG_EXPORTER,
-        LogsSignal,
+        LogsExporterMetricsHelper,
         config.meterProvider
       )
     );

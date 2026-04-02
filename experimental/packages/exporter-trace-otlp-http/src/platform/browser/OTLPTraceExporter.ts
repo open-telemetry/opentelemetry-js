@@ -8,7 +8,7 @@ import type { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import {
   JsonTraceSerializer,
-  TraceSignal,
+  TraceExporterMetricsHelper,
 } from '@opentelemetry/otlp-transformer';
 import { createLegacyOtlpBrowserExportDelegate } from '@opentelemetry/otlp-exporter-base/browser-http';
 
@@ -27,7 +27,7 @@ export class OTLPTraceExporter
         config,
         JsonTraceSerializer,
         OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_SPAN_EXPORTER,
-        TraceSignal,
+        TraceExporterMetricsHelper,
         config.meterProvider,
         'v1/traces',
         { 'Content-Type': 'application/json' }

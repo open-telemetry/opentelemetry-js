@@ -9,7 +9,7 @@ import { OTLPMetricExporterBase } from '../../OTLPMetricExporterBase';
 import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import {
   JsonMetricsSerializer,
-  MetricsSignal,
+  MetricsExporterMetricsHelper,
 } from '@opentelemetry/otlp-transformer';
 import {
   convertLegacyHttpOptions,
@@ -32,7 +32,7 @@ export class OTLPMetricExporter extends OTLPMetricExporterBase {
         }),
         JsonMetricsSerializer,
         OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER,
-        MetricsSignal,
+        MetricsExporterMetricsHelper,
         config?.meterProvider
       ),
       config
@@ -48,7 +48,7 @@ export class OTLPMetricExporter extends OTLPMetricExporterBase {
     this.setMetrics(
       createOtlpHttpExporterMetrics(
         OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER,
-        MetricsSignal,
+        MetricsExporterMetricsHelper,
         this._url,
         meterProvider
       )

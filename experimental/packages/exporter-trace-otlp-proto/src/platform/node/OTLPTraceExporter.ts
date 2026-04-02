@@ -8,7 +8,7 @@ import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-ba
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import {
   ProtobufTraceSerializer,
-  TraceSignal,
+  TraceExporterMetricsHelper,
 } from '@opentelemetry/otlp-transformer';
 import {
   createOtlpHttpExportDelegate,
@@ -31,7 +31,7 @@ export class OTLPTraceExporter
         }),
         ProtobufTraceSerializer,
         OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_SPAN_EXPORTER,
-        TraceSignal,
+        TraceExporterMetricsHelper,
         config.meterProvider
       )
     );

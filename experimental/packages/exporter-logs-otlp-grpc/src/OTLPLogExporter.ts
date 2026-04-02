@@ -13,7 +13,7 @@ import {
   createOtlpGrpcExportDelegate,
 } from '@opentelemetry/otlp-grpc-exporter-base';
 import {
-  LogsSignal,
+  LogsExporterMetricsHelper,
   ProtobufLogsSerializer,
 } from '@opentelemetry/otlp-transformer';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
@@ -32,7 +32,7 @@ export class OTLPLogExporter
         convertLegacyOtlpGrpcOptions(config, 'LOGS'),
         ProtobufLogsSerializer,
         OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_LOG_EXPORTER,
-        LogsSignal,
+        LogsExporterMetricsHelper,
         config.meterProvider,
         'LogsExportService',
         '/opentelemetry.proto.collector.logs.v1.LogsService/Export'

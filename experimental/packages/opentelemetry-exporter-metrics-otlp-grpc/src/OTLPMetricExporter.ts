@@ -12,7 +12,7 @@ import {
   createOtlpGrpcExporterMetrics,
 } from '@opentelemetry/otlp-grpc-exporter-base';
 import {
-  MetricsSignal,
+  MetricsExporterMetricsHelper,
   ProtobufMetricsSerializer,
 } from '@opentelemetry/otlp-transformer';
 import { OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_METRIC_EXPORTER } from './semconv';
@@ -29,7 +29,7 @@ export class OTLPMetricExporter extends OTLPMetricExporterBase {
         convertLegacyOtlpGrpcOptions(config ?? {}, 'METRICS'),
         ProtobufMetricsSerializer,
         OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_METRIC_EXPORTER,
-        MetricsSignal,
+        MetricsExporterMetricsHelper,
         config?.meterProvider,
         'MetricsExportService',
         '/opentelemetry.proto.collector.metrics.v1.MetricsService/Export'
@@ -47,7 +47,7 @@ export class OTLPMetricExporter extends OTLPMetricExporterBase {
     this.setMetrics(
       createOtlpGrpcExporterMetrics(
         OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_METRIC_EXPORTER,
-        MetricsSignal,
+        MetricsExporterMetricsHelper,
         this._url,
         meterProvider
       )

@@ -11,7 +11,7 @@ import {
 } from '@opentelemetry/otlp-grpc-exporter-base';
 import {
   ProtobufTraceSerializer,
-  TraceSignal,
+  TraceExporterMetricsHelper,
 } from '@opentelemetry/otlp-transformer';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 
@@ -30,7 +30,7 @@ export class OTLPTraceExporter
         convertLegacyOtlpGrpcOptions(config, 'TRACES'),
         ProtobufTraceSerializer,
         OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_SPAN_EXPORTER,
-        TraceSignal,
+        TraceExporterMetricsHelper,
         config.meterProvider,
         'TraceExportService',
         '/opentelemetry.proto.collector.trace.v1.TraceService/Export'

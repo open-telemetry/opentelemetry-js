@@ -14,17 +14,20 @@ import { createRetryingTransport } from './retrying-transport';
 import type { OtlpNodeHttpConfiguration } from './configuration/otlp-node-http-configuration';
 import { OTLPExporterError } from './types';
 import { ATTR_HTTP_RESPONSE_STATUS_CODE } from './semconv';
-import { ExporterMetrics, type IExporterSignal } from './ExporterMetrics';
+import {
+  ExporterMetrics,
+  type IExporterMetricsHelper,
+} from './ExporterMetrics';
 
 export function createOtlpHttpExporterMetrics<Internal>(
   metricsComponentType: string,
-  signal: IExporterSignal<Internal>,
+  exporterMetricsHelper: IExporterMetricsHelper<Internal>,
   url: string | undefined,
   meterProvider: MeterProvider | undefined
 ): ExporterMetrics<Internal> {
   return new ExporterMetrics({
     componentType: metricsComponentType,
-    signal,
+    signal: exporterMetricsHelper,
     url,
     meterProvider,
     errorAttributes: (error: unknown) => {
@@ -42,7 +45,7 @@ export function createOtlpHttpExportDelegate<Internal, Response>(
   options: OtlpNodeHttpConfiguration,
   serializer: ISerializer<Internal, Response>,
   metricsComponentType: string,
-  signal: IExporterSignal<Internal>,
+  exporterMetricsHelper: IExporterMetricsHelper<Internal>,
   meterProvider: MeterProvider | undefined
 ): IOtlpExportDelegate<Internal> {
   return createOtlpExportDelegate(
@@ -54,7 +57,7 @@ export function createOtlpHttpExportDelegate<Internal, Response>(
       promiseHandler: createBoundedQueueExportPromiseHandler(options),
       metrics: createOtlpHttpExporterMetrics(
         metricsComponentType,
-        signal,
+        exporterMetricsHelper,
         options.url,
         meterProvider
       ),

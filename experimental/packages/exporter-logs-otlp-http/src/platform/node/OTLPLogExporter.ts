@@ -11,7 +11,7 @@ import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-ba
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import {
   JsonLogsSerializer,
-  LogsSignal,
+  LogsExporterMetricsHelper,
 } from '@opentelemetry/otlp-transformer';
 import {
   convertLegacyHttpOptions,
@@ -35,7 +35,7 @@ export class OTLPLogExporter
         }),
         JsonLogsSerializer,
         OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_LOG_EXPORTER,
-        LogsSignal,
+        LogsExporterMetricsHelper,
         config.meterProvider
       )
     );

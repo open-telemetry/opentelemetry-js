@@ -8,7 +8,7 @@ import type { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-
 import { OTLPMetricExporterBase } from '@opentelemetry/exporter-metrics-otlp-http';
 import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import {
-  MetricsSignal,
+  MetricsExporterMetricsHelper,
   ProtobufMetricsSerializer,
 } from '@opentelemetry/otlp-transformer';
 import {
@@ -28,7 +28,7 @@ export class OTLPMetricExporter extends OTLPMetricExporterBase {
         config,
         ProtobufMetricsSerializer,
         OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER,
-        MetricsSignal,
+        MetricsExporterMetricsHelper,
         config?.meterProvider,
         'v1/metrics',
         { 'Content-Type': 'application/x-protobuf' }
@@ -46,7 +46,7 @@ export class OTLPMetricExporter extends OTLPMetricExporterBase {
     this.setMetrics(
       createLegacyOtlpBrowserExporterMetrics(
         OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER,
-        MetricsSignal,
+        MetricsExporterMetricsHelper,
         this._url,
         meterProvider
       )

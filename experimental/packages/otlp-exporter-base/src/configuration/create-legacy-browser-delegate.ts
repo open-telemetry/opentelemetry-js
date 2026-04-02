@@ -10,20 +10,23 @@ import { convertLegacyBrowserHttpOptions } from './convert-legacy-browser-http-o
 import type { IOtlpExportDelegate } from '../otlp-export-delegate';
 import type { OTLPExporterConfigBase } from './legacy-base-configuration';
 import { ATTR_HTTP_RESPONSE_STATUS_CODE } from '../semconv';
-import { ExporterMetrics, type IExporterSignal } from '../ExporterMetrics';
+import {
+  ExporterMetrics,
+  type IExporterMetricsHelper,
+} from '../ExporterMetrics';
 
 /**
  * @deprecated
  */
 export function createLegacyOtlpBrowserExporterMetrics<Internal>(
   metricsComponentType: string,
-  signal: IExporterSignal<Internal>,
+  exporterMetricsHelper: IExporterMetricsHelper<Internal>,
   url: string | undefined,
   meterProvider: MeterProvider | undefined
 ): ExporterMetrics<Internal> {
   return new ExporterMetrics({
     componentType: metricsComponentType,
-    signal,
+    signal: exporterMetricsHelper,
     url,
     meterProvider,
     errorAttributes: (error: unknown) => {
@@ -58,7 +61,7 @@ export function createLegacyOtlpBrowserExportDelegate<Internal, Response>(
   config: OTLPExporterConfigBase,
   serializer: ISerializer<Internal, Response>,
   metricsComponentType: string,
-  signal: IExporterSignal<Internal>,
+  exporterMetricsHelper: IExporterMetricsHelper<Internal>,
   meterProvider: MeterProvider | undefined,
   signalResourcePath: string,
   requiredHeaders: Record<string, string>
@@ -74,7 +77,7 @@ export function createLegacyOtlpBrowserExportDelegate<Internal, Response>(
     serializer,
     createLegacyOtlpBrowserExporterMetrics(
       metricsComponentType,
-      signal,
+      exporterMetricsHelper,
       options.url,
       config.meterProvider
     )

@@ -6,17 +6,17 @@
 export {
   type IExportMetricsPartialSuccess,
   type IExportMetricsServiceResponse,
-  MetricsSignal,
+  MetricsExporterMetricsHelper,
 } from './metrics';
 export {
   type IExportTracePartialSuccess,
   type IExportTraceServiceResponse,
-  TraceSignal,
+  TraceExporterMetricsHelper,
 } from './trace';
 export {
   type IExportLogsServiceResponse,
   type IExportLogsPartialSuccess,
-  LogsSignal,
+  LogsExporterMetricsHelper,
 } from './logs';
 
 export { ProtobufLogsSerializer } from './logs/protobuf';

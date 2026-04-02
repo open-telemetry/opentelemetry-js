@@ -11,7 +11,7 @@ import type { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import {
   JsonLogsSerializer,
-  LogsSignal,
+  LogsExporterMetricsHelper,
 } from '@opentelemetry/otlp-transformer';
 import { createLegacyOtlpBrowserExportDelegate } from '@opentelemetry/otlp-exporter-base/browser-http';
 
@@ -30,7 +30,7 @@ export class OTLPLogExporter
         config,
         JsonLogsSerializer,
         OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_LOG_EXPORTER,
-        LogsSignal,
+        LogsExporterMetricsHelper,
         config.meterProvider,
         'v1/logs',
         { 'Content-Type': 'application/json' }
