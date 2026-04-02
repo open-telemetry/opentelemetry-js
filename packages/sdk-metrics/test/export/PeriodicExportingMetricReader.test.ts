@@ -266,7 +266,7 @@ describe('PeriodicExportingMetricReader', () => {
       );
     });
 
-    it('should use exporter preference for cardinality limits', () => {
+    it('provided cardinalityLimits over defaults', () => {
       const exporter = new TestDeltaMetricExporter();
 
       const p = new PeriodicExportingMetricReader({
