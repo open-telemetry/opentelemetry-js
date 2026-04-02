@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 22
 
-      - run: npm install -g npm@latest
+      - run: npm install -g npm@latest || npx --yes npm@latest install -g npm@latest
 
       - name: Bootstrap
         run: npm ci --ignore-scripts
