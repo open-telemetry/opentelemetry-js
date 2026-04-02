@@ -68,6 +68,7 @@ import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/expo
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
+import { NOOP_COUNTER_METRIC } from '../../../../api/src/metrics/NoopMeter';
 import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from '../src/semconv';
 import { NOOP_COUNTER_METRIC } from '../../../../api/src/metrics/NoopMeter';
 
@@ -421,6 +422,9 @@ describe('Node SDK', () => {
       const sdk = new NodeSDK({
         metricReaders: [metricReader],
         traceExporter: new ConsoleSpanExporter(),
+        logRecordProcessors: [
+          new SimpleLogRecordProcessor(new InMemoryLogRecordExporter()),
+        ],
         autoDetectResources: false,
       });
 
@@ -441,6 +445,12 @@ describe('Node SDK', () => {
         NOOP_COUNTER_METRIC
       );
 
+      const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
+      assert.notDeepEqual(
+        (loggerProvider as any)['_sharedState'].loggerMetrics.createdLogs,
+        NOOP_COUNTER_METRIC
+      );
+
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
 
       await sdk.shutdown();
@@ -457,6 +467,9 @@ describe('Node SDK', () => {
       const sdk = new NodeSDK({
         metricReader: metricReader,
         traceExporter: new ConsoleSpanExporter(),
+        logRecordProcessors: [
+          new SimpleLogRecordProcessor(new InMemoryLogRecordExporter()),
+        ],
         autoDetectResources: false,
       });
 
@@ -472,6 +485,12 @@ describe('Node SDK', () => {
       assert.deepEqual(
         (tracerProvider as any)._activeSpanProcessor._spanProcessors[0]._metrics
           .processedSpans,
+        NOOP_COUNTER_METRIC
+      );
+
+      const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
+      assert.deepEqual(
+        (loggerProvider as any)['_sharedState'].loggerMetrics.createdLogs,
         NOOP_COUNTER_METRIC
       );
 
