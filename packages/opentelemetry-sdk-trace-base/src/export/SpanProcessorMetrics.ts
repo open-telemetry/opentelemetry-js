@@ -3,7 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Attributes, Counter, Meter } from '@opentelemetry/api';
+import type {
+  Attributes,
+  Counter,
+  Meter,
+  ObservableCallback,
+  ObservableUpDownCounter,
+} from '@opentelemetry/api';
 import {
   ATTR_ERROR_TYPE,
   ATTR_OTEL_COMPONENT_NAME,
@@ -22,6 +28,8 @@ interface QueueConfig {
 
 export class SpanProcessorMetrics {
   private readonly processedSpans: Counter;
+  private readonly queueSize: ObservableUpDownCounter | undefined;
+  private readonly queueSizeCallback: ObservableCallback | undefined;
 
   private readonly standardAttrs: Attributes;
   private readonly droppedAttrs: Attributes;
@@ -69,9 +77,9 @@ export class SpanProcessorMetrics {
             'The number of spans in the queue of a given instance of an SDK span processor.',
         }
       );
-      queueSize.addCallback(result =>
-        result.observe(getQueueSize(), this.standardAttrs)
-      );
+      this.queueSizeCallback = result =>
+        result.observe(getQueueSize(), this.standardAttrs);
+      queueSize.addCallback(this.queueSizeCallback);
     }
   }
 
@@ -90,5 +98,11 @@ export class SpanProcessorMetrics {
       [ATTR_ERROR_TYPE]: error.name,
     };
     this.processedSpans.add(count, attrs);
+  }
+
+  shutdown() {
+    if (this.queueSize && this.queueSizeCallback) {
+      this.queueSize.removeCallback(this.queueSizeCallback);
+    }
   }
 }

@@ -117,6 +117,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
         return this._flushAll();
       })
       .then(() => {
+        this._metrics.shutdown();
         return this._exporter.shutdown();
       });
   }

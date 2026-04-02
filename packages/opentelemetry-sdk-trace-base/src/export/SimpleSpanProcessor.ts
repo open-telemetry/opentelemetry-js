@@ -96,6 +96,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
   }
 
   private _shutdown(): Promise<void> {
+    this._metrics.shutdown();
     return this._exporter.shutdown();
   }
 }
