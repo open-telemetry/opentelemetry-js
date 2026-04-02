@@ -755,7 +755,6 @@ describe('xhr', () => {
           });
         });
 
-
         describe('when relative url is ignored via domain regex', () => {
           beforeEach(done => {
             clearData();
