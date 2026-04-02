@@ -30,9 +30,11 @@ export function createOtlpHttpExporterMetrics<Internal>(
     metricsHelper: exporterMetricsHelper,
     url,
     meterProvider,
-    errorAttributes: (error: unknown) => {
+    responseAttributes: (error: unknown) => {
       if (!(error instanceof OTLPExporterError)) {
-        return {};
+        return {
+          [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
+        };
       }
       return {
         [ATTR_HTTP_RESPONSE_STATUS_CODE]: error.code,

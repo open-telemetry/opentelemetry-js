@@ -32,7 +32,7 @@ export interface ExporterMetricsOptions<Internal> {
   metricsHelper: IExporterMetricsHelper<Internal>;
   url: string | undefined;
   meterProvider: MeterProvider | undefined;
-  errorAttributes: (error: unknown) => Attributes;
+  responseAttributes: (error: unknown) => Attributes;
 }
 
 export interface IExporterMetricsHelper<Internal> {
@@ -49,7 +49,7 @@ export class ExporterMetrics<Internal> {
   private readonly exported: Counter;
   private readonly duration: Histogram;
   private readonly standardAttrs: Attributes;
-  private readonly errorAttributes: (error: unknown) => Attributes;
+  private readonly responseAttributes: (error: unknown) => Attributes;
 
   private readonly helper: IExporterMetricsHelper<Internal>;
 
@@ -59,9 +59,9 @@ export class ExporterMetrics<Internal> {
       metricsHelper,
       meterProvider,
       url,
-      errorAttributes,
+      responseAttributes,
     } = options;
-    this.errorAttributes = errorAttributes;
+    this.responseAttributes = responseAttributes;
     const meter = meterProvider
       ? meterProvider.getMeter('@opentelemetry/otlp-exporter', VERSION)
       : createNoopMeter();
@@ -140,7 +140,7 @@ export class ExporterMetrics<Internal> {
       this.exported.add(numItems, exportedAttrs);
       const durationAttrs = {
         ...exportedAttrs,
-        ...this.errorAttributes(error),
+        ...this.responseAttributes(error),
       };
       const duration =
         hrTimeToMilliseconds(hrTimeDuration(startTime, endTime)) / 1000;

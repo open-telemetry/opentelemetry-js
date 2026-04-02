@@ -520,6 +520,7 @@ describe('GrpcExporterTransport', function () {
           'otel.component.name': 'test_grpc_exporter/0',
           'server.address': 'localhost',
           'server.port': 1234,
+          'rpc.response.status_code': 'OK',
         });
       });
 

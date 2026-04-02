@@ -122,6 +122,7 @@ describe('createOtlpHttpExportDelegate', function () {
       'otel.component.name': 'test_http_exporter/0',
       'server.address': 'localhost',
       'server.port': 8083,
+      'http.response.status_code': 200,
     });
   });
 

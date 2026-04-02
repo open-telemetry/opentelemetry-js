@@ -29,9 +29,11 @@ export function createLegacyOtlpBrowserExporterMetrics<Internal>(
     metricsHelper: exporterMetricsHelper,
     url,
     meterProvider,
-    errorAttributes: (error: unknown) => {
+    responseAttributes: (error: unknown) => {
       if (!(error instanceof Error)) {
-        return {};
+        return {
+          [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
+        };
       }
       if (
         error.message.startsWith(
