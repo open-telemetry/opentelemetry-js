@@ -12,7 +12,7 @@ import {
 import { MetricReader } from './MetricReader';
 import type { PushMetricExporter } from './MetricExporter';
 import { callWithTimeout, TimeoutError } from '../utils';
-import { MetricProducer } from './MetricProducer';
+import type { MetricProducer } from './MetricProducer';
 import { InstrumentType } from './MetricData';
 
 export type PeriodicExportingMetricReaderOptions = {
@@ -41,10 +41,14 @@ export type PeriodicExportingMetricReaderOptions = {
    *
    */
   cardinalityLimits?: {
-    counter: number;
-    gauge: number;
-    histogram: number;
-    default: number;
+    counter?: number;
+    gauge?: number;
+    histogram?: number;
+    upDownCounter?: number;
+    observableCounter?: number;
+    observableGauge?: number;
+    observableUpDownCounter?: number;
+    default?: number;
   };
 };
 
@@ -73,11 +77,16 @@ export class PeriodicExportingMetricReader extends MetricReader {
         exporter.selectAggregationTemporality?.bind(exporter),
       metricProducers,
       cardinalitySelector: (instrumentType: InstrumentType) => {
-        const limits = cardinalityLimits ?? {
+        const limits = {
           counter: 2000,
           gauge: 2000,
           histogram: 2000,
+          upDownCounter: 2000,
+          observableCounter: 2000,
+          observableGauge: 2000,
+          observableUpDownCounter: 2000,
           default: 2000,
+          ...(cardinalityLimits ?? {}),
         };
 
         switch (instrumentType) {
@@ -87,6 +96,14 @@ export class PeriodicExportingMetricReader extends MetricReader {
             return limits.gauge;
           case InstrumentType.HISTOGRAM:
             return limits.histogram;
+          case InstrumentType.OBSERVABLE_COUNTER:
+            return limits.observableCounter;
+          case InstrumentType.OBSERVABLE_UP_DOWN_COUNTER:
+            return limits.observableUpDownCounter;
+          case InstrumentType.OBSERVABLE_GAUGE:
+            return limits.observableGauge;
+          case InstrumentType.UP_DOWN_COUNTER:
+            return limits.upDownCounter;
           default:
             return limits.default;
         }
