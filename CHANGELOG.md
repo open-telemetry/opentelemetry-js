@@ -18,15 +18,25 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
-* fix(opentelemetry-instrumentation): improve `_warnOnPreloadedModules` function not to show warning logs when the module is not marked as loaded [#6095](https://github.com/open-telemetry/opentelemetry-js/pull/6095) @rlj1202
-* fix(sdk-trace-base): derive internal `SpanOptions` from API type to prevent drift [#6478](https://github.com/open-telemetry/opentelemetry-js/pull/6478) @overbalance
-* fix(span): enforce `attributePerEventCountLimit`, `attributePerLinkCountLimit`, `linkCountLimit`, and `attributeValueLengthLimit` for event/link attributes [#6479](https://github.com/open-telemetry/opentelemetry-js/pull/6479) @overbalance
-
 ### :books: Documentation
 
 ### :house: Internal
 
+## 2.6.1
+
+### :bug: Bug Fixes
+
+* fix(opentelemetry-instrumentation): improve `_warnOnPreloadedModules` function not to show warning logs when the module is not marked as loaded [#6095](https://github.com/open-telemetry/opentelemetry-js/pull/6095) @rlj1202
+* fix(sdk-trace-base): derive internal `SpanOptions` from API type to prevent drift [#6478](https://github.com/open-telemetry/opentelemetry-js/pull/6478) @overbalance
+* fix(span): enforce `attributePerEventCountLimit`, `attributePerLinkCountLimit`, `linkCountLimit`, and `attributeValueLengthLimit` for event/link attributes [#6479](https://github.com/open-telemetry/opentelemetry-js/pull/6479) @overbalance
+* fix(context-zone): guard `onCancelTask` against terminal-state tasks to prevent infinite loop with rc-align (Ant Design) in React 16 dev mode [#6512](https://github.com/open-telemetry/opentelemetry-js/pull/6512) @Renegade2345
+
+### :house: Internal
+
 * chore: enforce `import type` for type-only imports via ESLint [#6467](https://github.com/open-telemetry/opentelemetry-js/pull/6467) @overbalance
+* perf(sdk-trace-base): avoid Object.entries in Span.setAttributes [#6514](https://github.com/open-telemetry/opentelemetry-js/pull/6514) @daniellockyer
+* perf(sdk-trace-base): optimize `Span.{addEvent,addLink}` performance [#6516](https://github.com/open-telemetry/opentelemetry-js/pull/6516) @daniellockyer
+* test(bundlers): broaden bundler test coverage and assert known protobuf dynamic-require failures [#6482](https://github.com/open-telemetry/opentelemetry-js/pull/6482) @overbalance
 
 ## 2.6.0
 
