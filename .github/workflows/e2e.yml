@@ -18,7 +18,7 @@ jobs:
           - "18"
           - "20.6.0"
           - "20"
-          - "22"
+          - "22.22.1" # pin to avoid bug in 22.22.2
           - "24"
           - "25"
     runs-on: ubuntu-latest
@@ -44,7 +44,7 @@ jobs:
       - run: npm install -g npm@latest
         if: ${{
           matrix.node_version == '20' ||
-          matrix.node_version == '22' ||
+          matrix.node_version == '22.22.1' ||
           matrix.node_version == '24' ||
           matrix.node_version == '25'
           }}
