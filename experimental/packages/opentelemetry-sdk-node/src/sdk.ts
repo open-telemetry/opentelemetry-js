@@ -344,16 +344,23 @@ export class NodeSDK {
       'OTEL_NODE_EXPERIMENTAL_SDK_METRICS'
     );
 
-    // If tracerProviderConfig is set, either spanProcessors or traceExporter is set.
-    const spanProcessors = this._tracerProviderConfig
-      ? (this._tracerProviderConfig.spanProcessors ?? [
+    let spanProcessors: SpanProcessor[];
+    if (this._tracerProviderConfig) {
+      // If tracerProviderConfig is set, either spanProcessors or traceExporter is set.
+      if (this._tracerProviderConfig.spanProcessors) {
+        spanProcessors = this._tracerProviderConfig.spanProcessors;
+      } else {
+        spanProcessors = [
           new BatchSpanProcessor(this._tracerProviderConfig.traceExporter!, {
             meterProvider: sdkMetricsEnabled ? this._meterProvider : undefined,
           }),
-        ])
-      : getSpanProcessorsFromEnv(
-          sdkMetricsEnabled ? this._meterProvider : undefined
-        );
+        ];
+      }
+    } else {
+      spanProcessors = getSpanProcessorsFromEnv(
+        sdkMetricsEnabled ? this._meterProvider : undefined
+      );
+    }
 
     // Only register if there is a span processor
     if (spanProcessors.length > 0) {
