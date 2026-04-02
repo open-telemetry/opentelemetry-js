@@ -6,6 +6,7 @@
 import type * as logsAPI from '@opentelemetry/api-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import type { InstrumentationScope } from '@opentelemetry/core';
+import type { Context } from '@opentelemetry/api';
 import {
   context,
   trace,
@@ -97,5 +98,54 @@ export class Logger implements logsAPI.Logger {
      * If logRecord is needed after OnEmit returns (i.e. for asynchronous processing) only reads are permitted.
      */
     logRecordInstance._makeReadonly();
+  }
+
+  public enabled(options?: {
+    context?: Context;
+    severityNumber?: SeverityNumber;
+    eventName?: string;
+  }): boolean {
+    const loggerConfig = this._loggerConfig;
+
+    if (loggerConfig.disabled) {
+      return false;
+    }
+
+    // Severity number given and lower than the min configured
+    const severityNumber = options?.severityNumber;
+    if (
+      typeof severityNumber === 'number' &&
+      severityNumber !== SeverityNumber.UNSPECIFIED &&
+      severityNumber < loggerConfig.minimumSeverity
+    ) {
+      return false;
+    }
+
+    const currentContext = options?.context || context.active();
+    // Trace based: the context (given or the active) has a unsampled Span
+    if (loggerConfig.traceBased) {
+      const spanContext = trace.getSpanContext(currentContext);
+      if (spanContext && isSpanContextValid(spanContext)) {
+        const isSampled =
+          (spanContext.traceFlags & TraceFlags.SAMPLED) === TraceFlags.SAMPLED;
+        if (!isSampled) {
+          return false;
+        }
+      }
+    }
+
+    // Lastly check if there is any enabled processor
+    const enabledOpts = {
+      context: currentContext,
+      instrumentationScope: this.instrumentationScope,
+      severityNumber: options?.severityNumber,
+      eventName: options?.eventName,
+    };
+    for (const processor of this._sharedState.processors) {
+      if (!processor.enabled || processor.enabled(enabledOpts)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

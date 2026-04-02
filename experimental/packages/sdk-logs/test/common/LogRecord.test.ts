@@ -301,6 +301,27 @@ describe('LogRecord', () => {
           sinon.assert.callCount(warnStub, 1);
           warnStub.restore();
         });
+
+        it('should not increment droppedAttributesCount on key updates', () => {
+          const { logRecord } = setup({ attributeCountLimit: 2 });
+          logRecord.setAttribute('key1', 'value1');
+          logRecord.setAttribute('key2', 'value2');
+          logRecord.setAttribute('key1', 'updated');
+          assert.strictEqual(logRecord.droppedAttributesCount, 0);
+          assert.strictEqual(logRecord.attributes['key1'], 'updated');
+        });
+
+        it('should correctly track droppedAttributesCount with key updates and dropped keys', () => {
+          const { logRecord } = setup({ attributeCountLimit: 2 });
+          logRecord.setAttribute('key1', 'value1');
+          logRecord.setAttribute('key2', 'value2');
+          logRecord.setAttribute('key3', 'value3');
+          logRecord.setAttribute('key1', 'updated');
+          assert.strictEqual(logRecord.droppedAttributesCount, 1);
+          assert.strictEqual(logRecord.attributes['key1'], 'updated');
+          assert.strictEqual(logRecord.attributes['key2'], 'value2');
+          assert.strictEqual(logRecord.attributes['key3'], undefined);
+        });
       });
 
       describe('when "attributeValueLengthLimit" option defined', () => {

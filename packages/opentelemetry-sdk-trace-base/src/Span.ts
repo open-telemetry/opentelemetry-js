@@ -9,6 +9,7 @@ import type {
   HrTime,
   Link,
   Span as APISpan,
+  SpanOptions as APISpanOptions,
   Attributes,
   AttributeValue,
   SpanContext,
@@ -47,21 +48,22 @@ import type { SpanLimits } from './types';
  */
 export type Span = APISpan & ReadableSpan;
 
-interface SpanOptions {
+// `root` is omitted because it is consumed by Tracer.startSpan() to strip
+// parent context but it has no meaning when constructing a Span directly.
+type SpanOptions = Omit<APISpanOptions, 'root'> & {
   resource: Resource;
   scope: InstrumentationScope;
   context: Context;
   spanContext: SpanContext;
   name: string;
+  // Required here to override optional `kind` from the API's SpanOptions
+  // SpanImpl assigns it unconditionally and ReadableSpan expects it to be set.
   kind: SpanKind;
   parentSpanContext?: SpanContext;
-  links?: Link[];
-  startTime?: TimeInput;
-  attributes?: Attributes;
   spanLimits: SpanLimits;
   spanProcessor: SpanProcessor;
   recordEndMetrics?: () => void;
-}
+};
 
 /**
  * This class represents a span.
@@ -113,13 +115,17 @@ export class SpanImpl implements Span {
     this._startTimeProvided = opts.startTime != null;
     this._spanLimits = opts.spanLimits;
     this._attributeValueLengthLimit =
-      this._spanLimits.attributeValueLengthLimit || 0;
+      this._spanLimits.attributeValueLengthLimit ?? 0;
     this._spanProcessor = opts.spanProcessor;
 
     this.name = opts.name;
     this.parentSpanContext = opts.parentSpanContext;
     this.kind = opts.kind;
-    this.links = opts.links || [];
+    if (opts.links) {
+      for (const link of opts.links) {
+        this.addLink(link);
+      }
+    }
     this.startTime = this._getTime(opts.startTime ?? now);
     this.resource = opts.resource;
     this.instrumentationScope = opts.scope;
@@ -171,8 +177,10 @@ export class SpanImpl implements Span {
   }
 
   setAttributes(attributes: Attributes): this {
-    for (const [k, v] of Object.entries(attributes)) {
-      this.setAttribute(k, v);
+    for (const key in attributes) {
+      if (Object.prototype.hasOwnProperty.call(attributes, key)) {
+        this.setAttribute(key, attributes[key]);
+      }
     }
     return this;
   }
@@ -217,42 +225,118 @@ export class SpanImpl implements Span {
       attributesOrStartTime = undefined;
     }
 
-    const attributes = sanitizeAttributes(attributesOrStartTime);
+    const sanitized = sanitizeAttributes(attributesOrStartTime);
+    const { attributePerEventCountLimit } = this._spanLimits;
+    const attributes: Attributes = {};
+    let droppedAttributesCount = 0;
+    let eventAttributesCount = 0;
+
+    for (const attr in sanitized) {
+      if (!Object.prototype.hasOwnProperty.call(sanitized, attr)) {
+        continue;
+      }
+      const attrVal = sanitized[attr];
+      if (
+        attributePerEventCountLimit !== undefined &&
+        eventAttributesCount >= attributePerEventCountLimit
+      ) {
+        droppedAttributesCount++;
+        continue;
+      }
+      attributes[attr] = this._truncateToSize(attrVal!);
+      eventAttributesCount++;
+    }
 
     this.events.push({
       name,
       attributes,
       time: this._getTime(timeStamp),
-      droppedAttributesCount: 0,
+      droppedAttributesCount,
     });
     return this;
   }
 
   addLink(link: Link): this {
-    this.links.push(link);
+    if (this._isSpanEnded()) return this;
+
+    const { linkCountLimit } = this._spanLimits;
+
+    if (linkCountLimit === 0) {
+      this._droppedLinksCount++;
+      return this;
+    }
+
+    if (linkCountLimit !== undefined && this.links.length >= linkCountLimit) {
+      if (this._droppedLinksCount === 0) {
+        diag.debug('Dropping extra links.');
+      }
+      this.links.shift();
+      this._droppedLinksCount++;
+    }
+
+    const { attributePerLinkCountLimit } = this._spanLimits;
+    const sanitized = sanitizeAttributes(link.attributes);
+    const attributes: Attributes = {};
+    let droppedAttributesCount = 0;
+    let linkAttributesCount = 0;
+
+    for (const attr in sanitized) {
+      if (!Object.prototype.hasOwnProperty.call(sanitized, attr)) {
+        continue;
+      }
+      const attrVal = sanitized[attr];
+      if (
+        attributePerLinkCountLimit !== undefined &&
+        linkAttributesCount >= attributePerLinkCountLimit
+      ) {
+        droppedAttributesCount++;
+        continue;
+      }
+      attributes[attr] = this._truncateToSize(attrVal!);
+      linkAttributesCount++;
+    }
+
+    const processedLink: Link = { context: link.context };
+    if (linkAttributesCount > 0) {
+      processedLink.attributes = attributes;
+    }
+    if (droppedAttributesCount > 0) {
+      processedLink.droppedAttributesCount = droppedAttributesCount;
+    }
+
+    this.links.push(processedLink);
     return this;
   }
 
   addLinks(links: Link[]): this {
-    this.links.push(...links);
+    for (const link of links) {
+      this.addLink(link);
+    }
     return this;
   }
 
   setStatus(status: SpanStatus): this {
     if (this._isSpanEnded()) return this;
-    this.status = { ...status };
+    if (status.code === SpanStatusCode.UNSET) return this;
+    if (this.status.code === SpanStatusCode.OK) return this;
+
+    const newStatus: SpanStatus = { code: status.code };
 
     // When using try-catch, the caught "error" is of type `any`. When then assigning `any` to `status.message`,
     // TypeScript will not error. While this can happen during use of any API, it is more common on Span#setStatus()
     // as it's likely used in a catch-block. Therefore, we validate if `status.message` is actually a string, null, or
     // undefined to avoid an incorrect type causing issues downstream.
-    if (this.status.message != null && typeof status.message !== 'string') {
-      diag.warn(
-        `Dropping invalid status.message of type '${typeof status.message}', expected 'string'`
-      );
-      delete this.status.message;
+    if (status.code === SpanStatusCode.ERROR) {
+      if (typeof status.message === 'string') {
+        newStatus.message = status.message;
+      } else if (status.message != null) {
+        diag.warn(
+          `Dropping invalid status.message of type '${typeof status.message}', expected 'string'`
+        );
+      }
     }
 
+    this.status = newStatus;
     return this;
   }
 
@@ -285,6 +369,11 @@ export class SpanImpl implements Span {
     if (this._droppedEventsCount > 0) {
       diag.warn(
         `Dropped ${this._droppedEventsCount} events because eventCountLimit reached`
+      );
+    }
+    if (this._droppedLinksCount > 0) {
+      diag.warn(
+        `Dropped ${this._droppedLinksCount} links because linkCountLimit reached`
       );
     }
     if (this._spanProcessor.onEnding) {
