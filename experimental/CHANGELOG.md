@@ -13,10 +13,10 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :rocket: Features
 
 * feat(otlp-transformer): add custom protobuf logs serializer [#6228](https://github.com/open-telemetry/opentelemetry-js/pull/6228) @pichlermarc
-
 ### :bug: Bug Fixes
 
 * fix(instrumentation-fetch): preserve init overrides when input is a Request object [#6421](https://github.com/open-telemetry/opentelemetry-js/issues/6421) @akandic47
+* fix(otlp-exporter-base): limit node.js HTTP transport response body to 4 MiB [#6539](https://github.com/open-telemetry/opentelemetry-js/issues/6539) @kartikgola
 
 ### :books: Documentation
 

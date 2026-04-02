@@ -17,6 +17,13 @@ import { VERSION } from '../version';
 const DEFAULT_USER_AGENT = `OTel-OTLP-Exporter-JavaScript/${VERSION}`;
 
 /**
+ * Maximum uncompressed response body size (4 MiB) that the HTTP transport
+ *  will read. If the server sends more data the connection is destroyed
+ *  and the result is determined by the HTTP status code.
+ */
+export const MAX_RESPONSE_BODY_SIZE = 4 * 1024 * 1024;
+
+/**
  * Sends data using http
  * @param request
  * @param url
@@ -57,7 +64,29 @@ export function sendWithHttp(
 
     const req = request(options, (res: http.IncomingMessage) => {
       const responseData: Buffer[] = [];
-      res.on('data', chunk => responseData.push(chunk));
+      let responseSize = 0;
+      res.on('data', (chunk: Buffer) => {
+        responseSize += chunk.length;
+        if (responseSize > MAX_RESPONSE_BODY_SIZE) {
+          const sizeError = new Error(
+            `OTLP export response body exceeded size limit of ${MAX_RESPONSE_BODY_SIZE} bytes`
+          );
+          // resolve before destroying: res.destroy() tears down the socket which
+          // triggers ECONNRESET on req.on('error'), so, resolving first makes that
+          // a no-op. res.on('error') does not fire because destroy() is called
+          // without an error argument.
+          if (res.statusCode && res.statusCode <= 299) {
+            resolve({ status: 'success' });
+          } else {
+            // oversized responses are treated as non-retryable errors
+            // regardless of status code.
+            resolve({ status: 'failure', error: sizeError });
+          }
+          res.destroy();
+          return;
+        }
+        responseData.push(chunk);
+      });
 
       res.on('end', () => {
         if (res.statusCode && res.statusCode <= 299) {

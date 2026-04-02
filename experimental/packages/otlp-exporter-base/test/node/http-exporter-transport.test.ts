@@ -4,6 +4,7 @@
  */
 
 import { createHttpExporterTransport } from '../../src/transport/http-exporter-transport';
+import { MAX_RESPONSE_BODY_SIZE } from '../../src/transport/http-transport-utils';
 import * as http from 'http';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -443,6 +444,80 @@ describe('HttpExporterTransport', function () {
 
       // assert
       transport.send(sampleRequestData, 100);
+    });
+
+    it('returns success with data when response body is exactly at limit', async function () {
+      // arrange
+      const atLimitData = Buffer.alloc(MAX_RESPONSE_BODY_SIZE);
+      server = http.createServer((_, res) => {
+        res.statusCode = 200;
+        res.write(atLimitData);
+        res.end();
+      });
+      server.listen(8080);
+
+      const transport = createHttpExporterTransport({
+        url: 'http://localhost:8080',
+        headers: async () => ({}),
+        compression: 'none',
+        agentFactory: () => new http.Agent(),
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 10000);
+
+      // assert
+      assert.strictEqual(result.status, 'success');
+      assert.deepEqual((result as ExportResponseSuccess).data, atLimitData);
+    });
+
+    it('returns success without data when 2xx response body exceeds limit', async function () {
+      // arrange
+      const oversizeData = Buffer.alloc(MAX_RESPONSE_BODY_SIZE + 1);
+      server = http.createServer((_, res) => {
+        res.statusCode = 200;
+        res.write(oversizeData);
+        res.end();
+      });
+      server.listen(8080);
+
+      const transport = createHttpExporterTransport({
+        url: 'http://localhost:8080',
+        headers: async () => ({}),
+        compression: 'none',
+        agentFactory: () => new http.Agent(),
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 10000);
+
+      // assert: export succeeded (data was delivered), but we can't read the oversized response
+      assert.strictEqual(result.status, 'success');
+      assert.strictEqual((result as ExportResponseSuccess).data, undefined);
+    });
+
+    it('returns failure when non-2xx response body exceeds limit', async function () {
+      // arrange
+      const oversizeData = Buffer.alloc(MAX_RESPONSE_BODY_SIZE + 1);
+      server = http.createServer((_, res) => {
+        res.statusCode = 503;
+        res.write(oversizeData);
+        res.end();
+      });
+      server.listen(8080);
+
+      const transport = createHttpExporterTransport({
+        url: 'http://localhost:8080',
+        headers: async () => ({}),
+        compression: 'none',
+        agentFactory: () => new http.Agent(),
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 10000);
+
+      // assert: oversized response from misbehaving server is non-retryable
+      assert.strictEqual(result.status, 'failure');
     });
 
     it('passes gzip compressed input to server', function (done) {
