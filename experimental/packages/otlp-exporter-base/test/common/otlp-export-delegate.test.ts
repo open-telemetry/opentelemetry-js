@@ -35,7 +35,7 @@ const internalRepresentation: FakeInternalRepresentation = {
 
 const noopMetrics = new ExporterMetrics({
   componentType: 'test',
-  signal: { name: 'span', countItems: () => 1 },
+  metricsHelper: { name: 'span', countItems: () => 1 },
   url: 'http://example.com',
   meterProvider: undefined,
   errorAttributes: () => ({}),
@@ -789,7 +789,7 @@ describe('OTLPExportDelegate', function () {
           transport: mockTransport,
           metrics: new ExporterMetrics({
             componentType: 'test_exporter',
-            signal: { name: 'span', countItems: () => 5 },
+            metricsHelper: { name: 'span', countItems: () => 5 },
             url: 'http://localhost:12234',
             meterProvider,
             errorAttributes: () => ({}),
@@ -906,7 +906,7 @@ describe('OTLPExportDelegate', function () {
           transport: mockTransport,
           metrics: new ExporterMetrics({
             componentType: 'test_exporter',
-            signal: { name: 'span', countItems: () => 5 },
+            metricsHelper: { name: 'span', countItems: () => 5 },
             url: 'http://localhost:12234',
             meterProvider,
             errorAttributes: (e: unknown) => {

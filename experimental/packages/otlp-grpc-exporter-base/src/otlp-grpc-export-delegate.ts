@@ -25,7 +25,7 @@ export function createOtlpGrpcExporterMetrics<Internal>(
 ): ExporterMetrics<Internal> {
   return new ExporterMetrics({
     componentType: metricsComponentType,
-    signal: exporterMetricsHelper,
+    metricsHelper: exporterMetricsHelper,
     url,
     meterProvider,
     errorAttributes: (error: unknown) => {

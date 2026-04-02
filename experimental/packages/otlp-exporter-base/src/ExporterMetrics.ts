@@ -29,7 +29,7 @@ const componentCounter = new Map<string, number>();
 
 export interface ExporterMetricsOptions<Internal> {
   componentType: string;
-  signal: IExporterMetricsHelper<Internal>;
+  metricsHelper: IExporterMetricsHelper<Internal>;
   url: string | undefined;
   meterProvider: MeterProvider | undefined;
   errorAttributes: (error: unknown) => Attributes;
@@ -51,11 +51,16 @@ export class ExporterMetrics<Internal> {
   private readonly standardAttrs: Attributes;
   private readonly errorAttributes: (error: unknown) => Attributes;
 
-  private readonly exporterMetricsHelper: IExporterMetricsHelper<Internal>;
+  private readonly helper: IExporterMetricsHelper<Internal>;
 
   constructor(options: ExporterMetricsOptions<Internal>) {
-    const { componentType, signal, meterProvider, url, errorAttributes } =
-      options;
+    const {
+      componentType,
+      metricsHelper,
+      meterProvider,
+      url,
+      errorAttributes,
+    } = options;
     this.errorAttributes = errorAttributes;
     const meter = meterProvider
       ? meterProvider.getMeter('@opentelemetry/otlp-exporter', VERSION)
@@ -90,20 +95,20 @@ export class ExporterMetrics<Internal> {
       }
     }
 
-    this.exporterMetricsHelper = signal;
+    this.helper = metricsHelper;
 
     this.inflight = meter.createUpDownCounter(
-      `otel.sdk.exporter.${signal.name}.inflight`,
+      `otel.sdk.exporter.${this.helper.name}.inflight`,
       {
-        unit: `{${signal.name}}`,
-        description: `The number of ${signal.name}s which were passed to the exporter, but that have not been exported yet (neither successful, nor failed).`,
+        unit: `{${this.helper.name}}`,
+        description: `The number of ${this.helper.name}s which were passed to the exporter, but that have not been exported yet (neither successful, nor failed).`,
       }
     );
     this.exported = meter.createCounter(
-      `otel.sdk.exporter.${signal.name}.exported`,
+      `otel.sdk.exporter.${this.helper.name}.exported`,
       {
-        unit: `{${signal.name}}`,
-        description: `The number of ${signal.name}s for which the export has finished, either successful or failed.`,
+        unit: `{${this.helper.name}}`,
+        description: `The number of ${this.helper.name}s for which the export has finished, either successful or failed.`,
       }
     );
     this.duration = meter.createHistogram(
@@ -119,7 +124,7 @@ export class ExporterMetrics<Internal> {
   }
 
   startExport(request: Internal): (error: unknown) => void {
-    const numItems = this.exporterMetricsHelper.countItems(request);
+    const numItems = this.helper.countItems(request);
     const startTime = hrTime();
     this.inflight.add(numItems, this.standardAttrs);
     return (error: unknown) => {
