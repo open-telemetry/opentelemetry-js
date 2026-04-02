@@ -15,6 +15,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :rocket: Features
 
 * feat(otlp-exporter): implement exporter metrics [#6480](https://github.com/open-telemetry/opentelemetry-js/pull/6480) @anuraaga
+* feat(sdk-logs): implement log creation metrics  [#6433](https://github.com/open-telemetry/opentelemetry-js/pull/6433) @anuraaga
 
 ### :bug: Bug Fixes
 
