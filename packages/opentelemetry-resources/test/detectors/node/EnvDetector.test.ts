@@ -194,7 +194,8 @@ describeNode('envDetector() on Node.js', () => {
     });
 
     it('skips empty pairs', async () => {
-      process.env.OTEL_RESOURCE_ATTRIBUTES = '  ,\t , key1=value1,,key2=value2,';
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        '  ,\t , key1=value1,,key2=value2,';
       const resource = resourceFromDetectedResource(envDetector.detect());
       assert.strictEqual(resource.attributes?.['key1'], 'value1');
       assert.strictEqual(resource.attributes?.['key2'], 'value2');
