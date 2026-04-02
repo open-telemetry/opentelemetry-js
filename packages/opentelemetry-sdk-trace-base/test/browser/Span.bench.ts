@@ -30,6 +30,20 @@ const benchLinkContext: SpanContext = {
 describe('Span benchmark (browser)', function () {
   this.timeout(60000);
 
+  it('creates spans', done => {
+    const suite = new Benchmark.Suite();
+    suite
+      .add('creates spans', () => {
+        const span = tracer.startSpan('span');
+        span.end();
+      })
+      .on('cycle', (event: Benchmark.Event) =>
+        console.log(String(event.target))
+      )
+      .on('complete', () => done())
+      .run({ async: true });
+  });
+
   it('create spans (10 attributes) (browser)', done => {
     const suite = new Benchmark.Suite();
     suite

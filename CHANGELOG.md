@@ -24,6 +24,8 @@ fix(opentelemetry-resources): do not discard OTEL_RESOURCE_ATTRIBUTES when it co
 
 ### :house: Internal
 
+* perf(sdk-trace-base): avoid `_getTime` for default `Span.startTime` [#6528](https://github.com/open-telemetry/opentelemetry-js/pull/6528) @daniellockyer
+
 ## 2.6.1
 
 ### :bug: Bug Fixes

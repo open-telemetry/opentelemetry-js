@@ -21,6 +21,7 @@ import {
   hrTimeDuration,
   hrTimeToMilliseconds,
   hrTimeToNanoseconds,
+  millisToHrTime,
   otperformance as performance,
 } from '@opentelemetry/core';
 import {
@@ -101,6 +102,53 @@ describe('Span', () => {
       hrTimeToMilliseconds(span.startTime) >
         hrTimeToMilliseconds(performanceTimeOrigin)
     );
+  });
+
+  describe('default vs explicit startTime', () => {
+    const baseOpts = () => ({
+      scope: tracer.instrumentationScope,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
+      spanContext,
+      name,
+      kind: SpanKind.SERVER,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
+
+    it('should set startTime to millisToHrTime(Date.now()) when startTime is omitted', () => {
+      const epochMs = 1234567890123;
+      sinon.stub(Date, 'now').returns(epochMs);
+      const span = new SpanImpl(baseOpts());
+      assert.deepStrictEqual(span.startTime, millisToHrTime(epochMs));
+      assert.strictEqual(span['_startTimeProvided'], false);
+    });
+
+    it('should use _getTime when startTime is provided as epoch millis', () => {
+      const clockNow = 1111111111111;
+      const explicitStart = 2222222222222;
+      sinon.stub(Date, 'now').returns(clockNow);
+      const span = new SpanImpl({
+        ...baseOpts(),
+        startTime: explicitStart,
+      });
+      assert.deepStrictEqual(span.startTime, millisToHrTime(explicitStart));
+      assert.strictEqual(span['_startTimeProvided'], true);
+    });
+
+    it('should treat startTime 0 as explicit (not default clock time)', () => {
+      sinon.stub(Date, 'now').returns(1234567890123);
+      const span = new SpanImpl({
+        ...baseOpts(),
+        startTime: 0,
+      });
+      assert.strictEqual(span['_startTimeProvided'], true);
+      assert.notDeepStrictEqual(
+        span.startTime,
+        millisToHrTime(1234567890123),
+        'explicit 0 must use performance-relative path, not default epoch millis'
+      );
+    });
   });
 
   it('should have valid endTime', () => {
