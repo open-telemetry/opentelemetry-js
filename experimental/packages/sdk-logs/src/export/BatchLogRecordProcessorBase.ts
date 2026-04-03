@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { diag } from '@opentelemetry/api';
+import { createNoopMeter, diag } from '@opentelemetry/api';
 import type { ExportResult } from '@opentelemetry/core';
 import {
   ExportResultCode,
@@ -17,6 +17,9 @@ import type { BufferConfig } from '../types';
 import type { SdkLogRecord } from './SdkLogRecord';
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
+import type { LogRecordProcessorConfig } from './LogRecordProcessorConfig';
+import { LogRecordProcessorMetrics } from './LogRecordProcessorMetrics';
+import { OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR } from '../semconv';
 
 export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   implements LogRecordProcessor
@@ -26,13 +29,17 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   private readonly _scheduledDelayMillis: number;
   private readonly _exportTimeoutMillis: number;
   private readonly _exporter: LogRecordExporter;
+  private readonly _metrics: LogRecordProcessorMetrics;
 
   private _isExporting = false;
   private _finishedLogRecords: SdkLogRecord[] = [];
   private _timer: NodeJS.Timeout | number | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
 
-  constructor(exporter: LogRecordExporter, config?: T) {
+  constructor(
+    exporter: LogRecordExporter,
+    config?: T & LogRecordProcessorConfig
+  ) {
     this._exporter = exporter;
     this._maxExportBatchSize = config?.maxExportBatchSize ?? 512;
     this._maxQueueSize = config?.maxQueueSize ?? 2048;
@@ -47,6 +54,19 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
       );
       this._maxExportBatchSize = this._maxQueueSize;
     }
+
+    const meter = config?.meterProvider
+      ? config.meterProvider.getMeter('@opentelemetry/sdk-logs')
+      : createNoopMeter();
+
+    this._metrics = new LogRecordProcessorMetrics(
+      OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR,
+      meter,
+      {
+        capacity: this._maxQueueSize,
+        getQueueSize: () => this._finishedLogRecords.length,
+      }
+    );
   }
 
   public onEmit(logRecord: SdkLogRecord): void {
@@ -70,12 +90,14 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   private async _shutdown(): Promise<void> {
     this.onShutdown();
     await this._flushAll();
+    this._metrics.shutdown();
     await this._exporter.shutdown();
   }
 
   /** Add a LogRecord in the buffer. */
   private _addToBuffer(logRecord: SdkLogRecord) {
     if (this._finishedLogRecords.length >= this._maxQueueSize) {
+      this._metrics.dropLogs(1);
       return;
     }
     this._finishedLogRecords.push(logRecord);
@@ -158,6 +180,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
       internal
         ._export(this._exporter, logRecords)
         .then((result: ExportResult) => {
+          this._metrics.finishLogs(logRecords.length, result.error);
           if (result.code !== ExportResultCode.SUCCESS) {
             globalErrorHandler(
               result.error ??
