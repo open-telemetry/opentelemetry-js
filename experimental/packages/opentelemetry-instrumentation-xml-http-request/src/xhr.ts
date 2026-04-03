@@ -12,7 +12,7 @@ import {
   InstrumentationBase,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
-import { hrTime, isUrlIgnored, otperformance } from '@opentelemetry/core';
+import { isUrlIgnored } from '@opentelemetry/core';
 import {
   addSpanNetworkEvents,
   getResource,
@@ -278,7 +278,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    */
   private _clearResources() {
     if (this._tasksCount === 0 && this.getConfig().clearTimingResources) {
-      (otperformance as unknown as Performance).clearResourceTimings();
+      performance.clearResourceTimings();
       this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
       this._usedResources = new WeakSet<PerformanceResourceTiming>();
     }
@@ -292,10 +292,15 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     xhrMem: XhrMem,
     span: api.Span,
     spanUrl?: string,
-    startTime?: api.HrTime,
-    endTime?: api.HrTime
+    startTime?: number,
+    endTime?: number
   ): void {
-    if (!spanUrl || !startTime || !endTime || !xhrMem.createdResources) {
+    if (
+      spanUrl == null ||
+      startTime == null ||
+      endTime == null ||
+      xhrMem.createdResources == null
+    ) {
       return;
     }
 
@@ -307,7 +312,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       // then OBSERVER_WAIT_TIME_MS and observer didn't collect enough
       // information
       // ts thinks this is the perf_hooks module, but it is the browser performance api
-      resources = (otperformance as unknown as Performance).getEntriesByType(
+      resources = performance.getEntriesByType(
         'resource'
       ) as PerformanceResourceTiming[];
     }
@@ -459,7 +464,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     function endSpanTimeout(
       eventName: string,
       xhrMem: XhrMem,
-      performanceEndTime: api.HrTime,
+      performanceEndTime: number,
       endTime: number
     ) {
       const callbackToRemoveEvents = xhrMem.callbackToRemoveEvents;
@@ -520,7 +525,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         }
       }
 
-      const performanceEndTime = hrTime();
+      const performanceEndTime = performance.now();
       const endTime = Date.now();
 
       // the timeout is needed as observer doesn't have yet information
@@ -595,7 +600,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
             api.trace.setSpan(api.context.active(), currentSpan),
             () => {
               plugin._tasksCount++;
-              xhrMem.sendStartTime = hrTime();
+              xhrMem.sendStartTime = performance.now();
               currentSpan.addEvent(EventNames.METHOD_SEND);
 
               this.addEventListener('abort', onAbort);
