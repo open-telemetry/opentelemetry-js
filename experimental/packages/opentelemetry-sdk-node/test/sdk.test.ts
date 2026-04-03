@@ -70,7 +70,6 @@ import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
 import { NOOP_COUNTER_METRIC } from '../../../../api/src/metrics/NoopMeter';
 import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from '../src/semconv';
-import { NOOP_COUNTER_METRIC } from '../../../../api/src/metrics/NoopMeter';
 
 function assertDefaultContextManagerRegistered() {
   assert.ok(

@@ -344,12 +344,6 @@ export class NodeSDK {
       }
     }
 
-    // While SDK metrics are unstable, we require an opt-in.
-    // https://opentelemetry.io/docs/specs/semconv/otel/sdk-metrics/
-    const sdkMetricsEnabled = getBooleanFromEnv(
-      'OTEL_NODE_EXPERIMENTAL_SDK_METRICS'
-    );
-
     let spanProcessors: SpanProcessor[];
     if (this._tracerProviderConfig) {
       // If tracerProviderConfig is set, either spanProcessors or traceExporter is set.
