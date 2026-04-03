@@ -442,6 +442,48 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
+    it('should configure initialized components for SDK metrics if enabled', async () => {
+      process.env.OTEL_NODE_EXPERIMENTAL_SDK_METRICS = 'true';
+      process.env.OTEL_LOGS_EXPORTER = 'console';
+
+      const exporter = new ConsoleMetricExporter();
+      const metricReader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+
+      const sdk = new NodeSDK({
+        metricReader: metricReader,
+        traceExporter: new ConsoleSpanExporter(),
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
+      const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
+      assert.ok(tracerProvider instanceof NodeTracerProvider);
+      assert.ok(
+        (tracerProvider as any)._config.meterProvider instanceof MeterProvider
+      );
+
+      const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
+      assert.notDeepEqual(
+        (loggerProvider as any)['_sharedState'].loggerMetrics.createdLogs,
+        NOOP_COUNTER_METRIC
+      );
+      assert.notDeepEqual(
+        (loggerProvider as any)['_sharedState'].registeredLogRecordProcessors[0]
+          ._metrics.processedLogs,
+        NOOP_COUNTER_METRIC
+      );
+
+      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+
+      await sdk.shutdown();
+    });
+
     it('should not configure components for SDK metrics if disabled', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'console';
       process.env.OTEL_LOGS_EXPORTER = 'console';
