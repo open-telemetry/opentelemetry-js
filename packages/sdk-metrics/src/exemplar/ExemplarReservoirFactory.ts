@@ -26,7 +26,7 @@ export function createDefaultExemplarReservoir(
   switch (aggregator.kind) {
     case AggregatorKind.HISTOGRAM: {
       const histAggregator = aggregator as unknown as HistogramAggregator;
-      const boundaries = histAggregator._boundaries;
+      const boundaries = histAggregator.boundaries;
       if (boundaries && boundaries.length > 0) {
         return new AlignedHistogramBucketExemplarReservoir(boundaries);
       }

@@ -202,13 +202,9 @@ function toExemplars(
       filteredAttributes: toAttributes(exemplar.filteredAttributes, encoder),
       timeUnixNano: encoder.encodeHrTime(exemplar.timestamp),
       asDouble: exemplar.value,
+      spanId: exemplar.spanId,
+      traceId: exemplar.traceId,
     };
-    if (exemplar.spanId) {
-      result.spanId = exemplar.spanId;
-    }
-    if (exemplar.traceId) {
-      result.traceId = exemplar.traceId;
-    }
     return result;
   });
 }

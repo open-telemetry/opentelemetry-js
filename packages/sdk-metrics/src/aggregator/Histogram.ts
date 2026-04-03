@@ -99,22 +99,22 @@ export class HistogramAccumulation implements Accumulation {
  */
 export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
   public kind: AggregatorKind.HISTOGRAM = AggregatorKind.HISTOGRAM;
-  readonly _boundaries: number[];
+  readonly boundaries: number[];
   private readonly _recordMinMax: boolean;
 
   /**
-   * @param _boundaries sorted upper bounds of recorded values.
+   * @param boundaries sorted upper bounds of recorded values.
    * @param _recordMinMax If set to true, min and max will be recorded. Otherwise, min and max will not be recorded.
    */
   constructor(boundaries: number[], recordMinMax: boolean) {
-    this._boundaries = boundaries;
+    this.boundaries = boundaries;
     this._recordMinMax = recordMinMax;
   }
 
   createAccumulation(startTime: HrTime) {
     return new HistogramAccumulation(
       startTime,
-      this._boundaries,
+      this.boundaries,
       this._recordMinMax
     );
   }
