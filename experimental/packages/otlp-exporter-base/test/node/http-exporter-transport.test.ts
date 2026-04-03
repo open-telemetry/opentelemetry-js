@@ -471,7 +471,7 @@ describe('HttpExporterTransport', function () {
       assert.deepEqual((result as ExportResponseSuccess).data, atLimitData);
     });
 
-    it('returns success without data when 2xx response body exceeds limit', async function () {
+    it('returns failure when 2xx response body exceeds limit', async function () {
       // arrange
       const oversizeData = Buffer.alloc(MAX_RESPONSE_BODY_SIZE + 1);
       server = http.createServer((_, res) => {
@@ -491,9 +491,16 @@ describe('HttpExporterTransport', function () {
       // act
       const result = await transport.send(sampleRequestData, 10000);
 
-      // assert: export succeeded (data was delivered), but we can't read the oversized response
-      assert.strictEqual(result.status, 'success');
-      assert.strictEqual((result as ExportResponseSuccess).data, undefined);
+      // assert: per spec, oversized response is always a non-retryable error
+      assert.strictEqual(result.status, 'failure');
+      assert.ok(
+        (result as ExportResponseFailure).error,
+        'Expected error to be present'
+      );
+      assert.ok(
+        (result as ExportResponseFailure).error.message.includes('size limit'),
+        'Expected error message to mention size limit'
+      );
     });
 
     it('returns failure when non-2xx response body exceeds limit', async function () {
@@ -518,6 +525,14 @@ describe('HttpExporterTransport', function () {
 
       // assert: oversized response from misbehaving server is non-retryable
       assert.strictEqual(result.status, 'failure');
+      assert.ok(
+        (result as ExportResponseFailure).error,
+        'Expected error to be present'
+      );
+      assert.ok(
+        (result as ExportResponseFailure).error.message.includes('size limit'),
+        'Expected error message to mention size limit'
+      );
     });
 
     it('passes gzip compressed input to server', function (done) {
