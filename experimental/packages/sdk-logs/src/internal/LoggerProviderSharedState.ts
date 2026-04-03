@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { type MeterProvider, createNoopMeter } from '@opentelemetry/api';
 import type { Logger } from '@opentelemetry/api-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import type { Resource } from '@opentelemetry/resources';
@@ -16,6 +17,8 @@ import type {
 import { NoopLogRecordProcessor } from '../export/NoopLogRecordProcessor';
 import { MultiLogRecordProcessor } from '../MultiLogRecordProcessor';
 import { getInstrumentationScopeKey } from './utils';
+import { LoggerMetrics } from '../LoggerMetrics';
+import { VERSION } from '../version';
 
 const DEFAULT_LOGGER_CONFIG: Required<LoggerConfig> = {
   disabled: false,
@@ -38,6 +41,7 @@ export class LoggerProviderSharedState {
   readonly forceFlushTimeoutMillis: number;
   readonly logRecordLimits: Required<LogRecordLimits>;
   readonly processors: LogRecordProcessor[];
+  readonly loggerMetrics: LoggerMetrics;
   private _loggerConfigurator: LoggerConfigurator;
   private _loggerConfigs: Map<string, Required<LoggerConfig>> = new Map();
 
@@ -46,7 +50,8 @@ export class LoggerProviderSharedState {
     forceFlushTimeoutMillis: number,
     logRecordLimits: Required<LogRecordLimits>,
     processors: LogRecordProcessor[],
-    loggerConfigurator?: LoggerConfigurator
+    loggerConfigurator?: LoggerConfigurator,
+    meterProvider?: MeterProvider
   ) {
     this.resource = resource;
     this.forceFlushTimeoutMillis = forceFlushTimeoutMillis;
@@ -64,6 +69,11 @@ export class LoggerProviderSharedState {
 
     this._loggerConfigurator =
       loggerConfigurator ?? DEFAULT_LOGGER_CONFIGURATOR;
+
+    const meter = meterProvider
+      ? meterProvider.getMeter('@opentelemetry/sdk-logs', VERSION)
+      : createNoopMeter();
+    this.loggerMetrics = new LoggerMetrics(meter);
   }
 
   /**

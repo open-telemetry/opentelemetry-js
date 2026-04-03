@@ -8,6 +8,24 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* feat(api-logs, sdk-logs)!: add Logger#enabled() [#6371](https://github.com/open-telemetry/opentelemetry-js/pull/6371) @david-luna
+
+### :rocket: Features
+
+* feat(otlp-transformer): add custom protobuf logs serializer [#6228](https://github.com/open-telemetry/opentelemetry-js/pull/6228) @pichlermarc
+
+### :bug: Bug Fixes
+
+* fix(instrumentation-fetch): preserve init overrides when input is a Request object [#6421](https://github.com/open-telemetry/opentelemetry-js/issues/6421) @akandic47
+
+### :books: Documentation
+
+### :house: Internal
+
+## 0.214.0
+
+### :boom: Breaking Changes
+
 * feat(configuration)!: rename OTEL_EXPERIMENTAL_CONFIG_FILE to OTEL_CONFIG_FILE [#6486](https://github.com/open-telemetry/opentelemetry-js/pull/6486) @maryliag
 * refactor!(otlp-grpc-exporter-base): remove `headers` from gRPC exporter config type, passing headers now results in a compile-time error instead of being silently ignored [#6487](https://github.com/open-telemetry/opentelemetry-js/pull/6487)
 
@@ -17,14 +35,15 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(configuration): add resource detection parsing [#6435](https://github.com/open-telemetry/opentelemetry-js/pull/6435) @MikeGoldsmith
 * feat(configuration): export interfaces required in other packages [#6462](https://github.com/open-telemetry/opentelemetry-js/pull/6462) @maryliag
 * feat(configuration): set MeterProvider on sdk start [#6463](https://github.com/open-telemetry/opentelemetry-js/pull/6463) @maryliag
+* feat(configuration): export interfaces required in other packages [#6507](https://github.com/open-telemetry/opentelemetry-js/pull/6507) @maryliag
 * feat(otlp-transformer): serialize exemplars on all metric data point types [#6483](https://github.com/open-telemetry/opentelemetry-js/pull/6483) @CharlieTLe
 
 ### :bug: Bug Fixes
 
 * fix(opentelemetry-instrumentation): access `require` via `globalThis` to avoid webpack analysis [#6481](https://github.com/open-telemetry/opentelemetry-js/pull/6481) @overbalance
 * fix(sdk-logs): fix inflated `droppedAttributesCount` when updating existing attribute keys [#6479](https://github.com/open-telemetry/opentelemetry-js/pull/6479) @overbalance
-
-### :books: Documentation
+* fix(instrumentation-fetch): do not modify the returned type of fetch [#6521](https://github.com/open-telemetry/opentelemetry-js/pull/6521) @dyladan
+* fix(opentelemetry-sdk-node): add missing `@opentelemetry/otlp-exporter-base` dependency [#6520](https://github.com/open-telemetry/opentelemetry-js/pull/6520) @gotgenes
 
 ### :house: Internal
 
