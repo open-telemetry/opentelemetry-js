@@ -872,6 +872,8 @@ describe('Metrics', () => {
       filteredAttributes: [],
       timeUnixNano: encodeAsLongBits(EXEMPLAR_TIME),
       asDouble: 10,
+      spanId: undefined,
+      traceId: undefined,
     };
 
     it('serializes exemplars on sum data points', () => {
