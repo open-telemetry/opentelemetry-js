@@ -10,6 +10,7 @@ import { AlwaysOffSampler } from './sampler/AlwaysOffSampler';
 import { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
 import { ParentBasedSampler } from './sampler/ParentBasedSampler';
 import { TraceIdRatioBasedSampler } from './sampler/TraceIdRatioBasedSampler';
+import type { Sampler as SamplerConfigModel } from '@opentelemetry/configuration';
 
 const enum TracesSamplerValues {
   AlwaysOff = 'always_off',
@@ -90,6 +91,48 @@ export function buildSamplerFromEnv(): Sampler {
         root: new AlwaysOnSampler(),
       });
   }
+}
+
+/**
+ * Builds a {@link Sampler} from a {@link SamplerConfigModel} data model.
+ * This allows sampler construction from declarative configuration.
+ */
+export function buildSamplerFromConfig(config: SamplerConfigModel): Sampler {
+  if (config.always_on !== undefined) {
+    return new AlwaysOnSampler();
+  }
+  if (config.always_off !== undefined) {
+    return new AlwaysOffSampler();
+  }
+  if (config.trace_id_ratio_based !== undefined) {
+    return new TraceIdRatioBasedSampler(
+      config.trace_id_ratio_based.ratio ?? DEFAULT_RATIO
+    );
+  }
+  if (config.parent_based !== undefined) {
+    const pb = config.parent_based;
+    return new ParentBasedSampler({
+      root: pb.root
+        ? buildSamplerFromConfig(pb.root)
+        : new AlwaysOnSampler(),
+      remoteParentSampled: pb.remote_parent_sampled
+        ? buildSamplerFromConfig(pb.remote_parent_sampled)
+        : undefined,
+      remoteParentNotSampled: pb.remote_parent_not_sampled
+        ? buildSamplerFromConfig(pb.remote_parent_not_sampled)
+        : undefined,
+      localParentSampled: pb.local_parent_sampled
+        ? buildSamplerFromConfig(pb.local_parent_sampled)
+        : undefined,
+      localParentNotSampled: pb.local_parent_not_sampled
+        ? buildSamplerFromConfig(pb.local_parent_not_sampled)
+        : undefined,
+    });
+  }
+  diag.error(
+    'Unknown sampler config, defaulting to ParentBased(AlwaysOn).'
+  );
+  return new ParentBasedSampler({ root: new AlwaysOnSampler() });
 }
 
 function getSamplerProbabilityFromEnv(): number | undefined {
