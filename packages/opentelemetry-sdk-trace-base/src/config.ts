@@ -10,7 +10,7 @@ import { AlwaysOffSampler } from './sampler/AlwaysOffSampler';
 import { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
 import { ParentBasedSampler } from './sampler/ParentBasedSampler';
 import { TraceIdRatioBasedSampler } from './sampler/TraceIdRatioBasedSampler';
-import type { Sampler as SamplerConfigModel } from '@opentelemetry/configuration';
+import type { SamplerConfigModel } from '@opentelemetry/configuration';
 
 const enum TracesSamplerValues {
   AlwaysOff = 'always_off',

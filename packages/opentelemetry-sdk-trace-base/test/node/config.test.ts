@@ -113,6 +113,15 @@ describe('config', () => {
       assert.strictEqual(sampler.toString(), 'TraceIdRatioBased{1}');
     });
 
+    it('should return ParentBasedSampler with default always_on root when root is omitted', () => {
+      const sampler = buildSamplerFromConfig({ parent_based: {} });
+      assert.ok(sampler instanceof ParentBasedSampler);
+      assert.strictEqual(
+        sampler.toString(),
+        'ParentBased{root=AlwaysOnSampler, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}'
+      );
+    });
+
     it('should return ParentBasedSampler with always_on root', () => {
       const sampler = buildSamplerFromConfig({
         parent_based: { root: { always_on: {} } },
