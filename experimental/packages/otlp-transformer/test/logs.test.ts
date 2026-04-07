@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import type { HrTime } from '@opentelemetry/api';
-import { TraceFlags } from '@opentelemetry/api';
+import { diag, TraceFlags } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import type { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import type { Encoder } from '../src/common/utils';
@@ -19,6 +20,7 @@ import { ESeverityNumber } from '../src/logs/internal-types';
 import { createExportLogsServiceRequest } from '../src/logs/internal';
 import { ProtobufLogsSerializer } from '../src/logs/protobuf';
 import { JsonLogsSerializer } from '../src/logs/json';
+import { GROWING_BUFFER_DEBUG_MESSAGE } from '../src/common/protobuf/protobuf-writer';
 
 function createExpectedLogJson(encoder: Encoder): IExportLogsServiceRequest {
   const timeUnixNano = encoder.encodeHrTime([1680253513, 123241635]);
@@ -67,6 +69,10 @@ function createExpectedLogJson(encoder: Encoder): IExportLogsServiceRequest {
                   {
                     key: 'bytes-attribute',
                     value: { bytesValue: bytesValue },
+                  },
+                  {
+                    key: 'double-attribute',
+                    value: { doubleValue: 1.23 },
                   },
                 ],
                 droppedAttributesCount: 0,
@@ -125,6 +131,10 @@ function createExpectedLogProtobuf(): IExportLogsServiceRequest {
                     key: 'bytes-attribute',
                     value: { bytesValue: bytesValue },
                   },
+                  {
+                    key: 'double-attribute',
+                    value: { doubleValue: 1.23 },
+                  },
                 ],
                 droppedAttributesCount: 0,
                 flags: 1,
@@ -149,6 +159,7 @@ const DEFAULT_LOG_FRAGMENT: Omit<
   attributes: {
     'some-attribute': 'some attribute value',
     'bytes-attribute': new Uint8Array([1, 2, 3, 4, 5]),
+    'double-attribute': 1.23,
   },
   droppedAttributesCount: 0,
   severityNumber: SeverityNumber.ERROR,
@@ -335,7 +346,17 @@ describe('Logs', () => {
   });
 
   describe('ProtobufLogsSerializer', function () {
-    it('serializes an export request', () => {
+    let diagStub: sinon.SinonStub;
+
+    beforeEach(function () {
+      diagStub = sinon.stub(diag, 'debug');
+    });
+
+    afterEach(function () {
+      sinon.restore();
+    });
+
+    it('serializes an export request', function () {
       const serialized = ProtobufLogsSerializer.serializeRequest([log_1_1_1]);
       assert.ok(serialized, 'serialized response is undefined');
       const decoded =
@@ -359,6 +380,7 @@ describe('Logs', () => {
         );
 
       assert.deepStrictEqual(decodedObj, expected);
+      sinon.assert.neverCalledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
     });
 
     it('deserializes a response', () => {
@@ -387,10 +409,11 @@ describe('Logs', () => {
       );
     });
 
-    it('does not throw when deserializing an empty response', () => {
+    it('does not throw when deserializing an empty response', function () {
       assert.doesNotThrow(() =>
         ProtobufLogsSerializer.deserializeResponse(new Uint8Array([]))
       );
+      sinon.assert.neverCalledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
     });
   });
 
