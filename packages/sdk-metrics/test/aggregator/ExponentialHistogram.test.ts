@@ -107,103 +107,101 @@ describe('ExponentialHistogramAccumulation', () => {
         assert.strictEqual(accumulation.positive.at(0), 1);
         assert.strictEqual(accumulation.positive.at(1), 2);
       });
+    });
 
-      // Tests that every permutation of {1, 1/2, 1/4} with maxSize=2
-      // results in the same scale=-1 histogram.
-      it('handles permutations of [1, 1/2, 1/4] with maxSize: 2', () => {
-        [
-          [1, 0.5, 0.25],
-          [1, 0.25, 0.5],
-          [0.5, 0.25, 1],
-          [0.5, 1, 0.25],
-          [0.25, 1, 0.5],
-          [0.25, 0.5, 1],
-        ].forEach(row => {
-          const accumulation = new ExponentialHistogramAccumulation([0, 0], 2);
-          row.forEach(value => {
-            accumulation.record(value);
-          });
-
-          assert.strictEqual(accumulation.scale, -1);
-          assert.strictEqual(accumulation.positive.offset, -2);
-          assert.strictEqual(accumulation.positive.length, 2);
-          assert.strictEqual(accumulation.positive.at(0), 1);
-          assert.strictEqual(accumulation.positive.at(1), 2);
+    // Tests that every permutation of {1, 1/2, 1/4} with maxSize=2
+    // results in the same scale=-1 histogram.
+    it('handles permutations of [1, 1/2, 1/4] with maxSize: 2', () => {
+      [
+        [1, 0.5, 0.25],
+        [1, 0.25, 0.5],
+        [0.5, 0.25, 1],
+        [0.5, 1, 0.25],
+        [0.25, 1, 0.5],
+        [0.25, 0.5, 1],
+      ].forEach(row => {
+        const accumulation = new ExponentialHistogramAccumulation([0, 0], 2);
+        row.forEach(value => {
+          accumulation.record(value);
         });
+
+        assert.strictEqual(accumulation.scale, -1);
+        assert.strictEqual(accumulation.positive.offset, -2);
+        assert.strictEqual(accumulation.positive.length, 2);
+        assert.strictEqual(accumulation.positive.at(0), 1);
+        assert.strictEqual(accumulation.positive.at(1), 2);
       });
+    });
 
-      // Tests a variety of ascending sequences, calculated using known
-      // index ranges.  For example, with maxSize=3, using scale=0 and
-      // offset -5, add a sequence of numbers. Because the numbers have
-      // known range, we know the expected scale.
-      it('handles ascending sequences', () => {
-        for (const maxSize of [3, 4, 6, 9]) {
-          for (let offset = -5; offset <= 5; offset++) {
-            for (const initScale of [0, 4]) {
-              for (let step = maxSize; step < 4 * maxSize; step++) {
-                const accumulation = new ExponentialHistogramAccumulation(
-                  [0, 0],
-                  maxSize
-                );
-                let mapper = getMapping(initScale);
+    // Tests a variety of ascending sequences, calculated using known
+    // index ranges. For example, with maxSize=3, using scale=0 and
+    // offset -5, add a sequence of numbers. Because the numbers have
+    // known range, we know the expected scale.
+    it('handles ascending sequences', () => {
+      for (const maxSize of [3, 4, 6, 9]) {
+        for (let offset = -5; offset <= 5; offset++) {
+          for (const initScale of [0, 4]) {
+            for (let step = maxSize; step < 4 * maxSize; step++) {
+              const accumulation = new ExponentialHistogramAccumulation(
+                [0, 0],
+                maxSize
+              );
+              let mapper = getMapping(initScale);
 
-                const minValue = centerValue(mapper, offset);
-                const maxValue = centerValue(mapper, offset + step);
-                let sum = 0.0;
+              const minValue = centerValue(mapper, offset);
+              const maxValue = centerValue(mapper, offset + step);
+              let sum = 0.0;
 
-                for (let i = 0; i < maxSize; i++) {
-                  const value = centerValue(mapper, offset + i);
-                  accumulation.record(value);
-                  sum += value;
-                }
-
-                assert.strictEqual(accumulation.scale, initScale);
-                assert.strictEqual(accumulation.positive.offset, offset);
-
-                accumulation.record(maxValue);
-                sum += maxValue;
-
-                // The zeroth bucket is not empty
-                assert.notStrictEqual(accumulation.positive.at(0), 0);
-
-                // The maximum-index is at or above the midpoint,
-                // otherwise we downscaled too much.
-
-                let maxFill = 0;
-                let totalCount = 0;
-
-                for (let i = 0; i < accumulation.positive.length; i++) {
-                  totalCount += accumulation.positive.at(i);
-                  if (accumulation.positive.at(i) !== 0) {
-                    maxFill = 0;
-                  }
-                }
-                assert.ok(maxFill >= maxSize / 2);
-
-                // count is correct
-                assert.ok(maxSize + 1 >= totalCount);
-                assert.ok(maxSize + 1 >= accumulation.count);
-                // sum is correct
-                assert.ok(sum >= accumulation.sum);
-
-                // the offset is correct at the computed scale
-                mapper = getMapping(accumulation.scale);
-                let index = mapper.mapToIndex(minValue);
-                assert.strictEqual(accumulation.positive.offset, index);
-
-                // the maximum range is correct at the computed scale
-                index = mapper.mapToIndex(maxValue);
-                assert.strictEqual(
-                  accumulation.positive.offset +
-                    accumulation.positive.length -
-                    1,
-                  index
-                );
+              for (let i = 0; i < maxSize; i++) {
+                const value = centerValue(mapper, offset + i);
+                accumulation.record(value);
+                sum += value;
               }
+
+              assert.strictEqual(accumulation.scale, initScale);
+              assert.strictEqual(accumulation.positive.offset, offset);
+
+              accumulation.record(maxValue);
+              sum += maxValue;
+
+              // The zeroth bucket is not empty
+              assert.notStrictEqual(accumulation.positive.at(0), 0);
+
+              // The maximum-index is at or above the midpoint,
+              // otherwise we downscaled too much.
+
+              let maxFill = 0;
+              let totalCount = 0;
+
+              for (let i = 0; i < accumulation.positive.length; i++) {
+                totalCount += accumulation.positive.at(i);
+                if (accumulation.positive.at(i) !== 0) {
+                  maxFill = i;
+                }
+              }
+              assert.ok(maxFill >= maxSize / 2);
+
+              // count is correct
+              assert.ok(maxSize + 1 >= totalCount);
+              assert.ok(maxSize + 1 >= accumulation.count);
+              // sum is correct
+              assert.ok(sum >= accumulation.sum);
+
+              // the offset is correct at the computed scale
+              mapper = getMapping(accumulation.scale);
+              let index = mapper.mapToIndex(minValue);
+              assert.strictEqual(accumulation.positive.offset, index);
+
+              // the maximum range is correct at the computed scale
+              index = mapper.mapToIndex(maxValue);
+              assert.strictEqual(
+                accumulation.positive.offset + accumulation.positive.length - 1,
+                index
+              );
             }
           }
         }
-      });
+      }
     });
 
     it('ignores NaN', () => {
