@@ -39,6 +39,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(instrumentation-http): better solution for avoiding double-wrapping of http [#6491](https://github.com/open-telemetry/opentelemetry-js/pull/6491) @trentm
 * fix(opentelemetry-instrumentation): access `require` via `globalThis` to avoid webpack analysis [#6481](https://github.com/open-telemetry/opentelemetry-js/pull/6481) @overbalance
 * fix(sdk-logs): fix inflated `droppedAttributesCount` when updating existing attribute keys [#6479](https://github.com/open-telemetry/opentelemetry-js/pull/6479) @overbalance
 * fix(instrumentation-fetch): do not modify the returned type of fetch [#6521](https://github.com/open-telemetry/opentelemetry-js/pull/6521) @dyladan
