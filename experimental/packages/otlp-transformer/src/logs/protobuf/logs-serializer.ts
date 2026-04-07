@@ -7,7 +7,7 @@ import { ProtobufWriter } from '../../common/protobuf/protobuf-writer';
 import { hexToBinary } from '../../common/hex-to-binary';
 import type { Resource } from '@opentelemetry/resources';
 import type { InstrumentationScope } from '@opentelemetry/core';
-import { SeverityNumber } from '@opentelemetry/api-logs';
+import { type LogAttributes, SeverityNumber } from '@opentelemetry/api-logs';
 import {
   writeAnyValue,
   writeAttributes,
@@ -99,7 +99,10 @@ function serializeLogRecord(
  */
 function serializeScopeLogs(
   writer: IProtobufWriter,
-  scope: InstrumentationScope,
+  scope: InstrumentationScope & {
+    attributes?: LogAttributes;
+    droppedAttributesCount?: number;
+  },
   logRecords: ReadableLogRecord[]
 ): void {
   const scopeLogsStart = writer.startLengthDelimited();
@@ -117,6 +120,18 @@ function serializeScopeLogs(
   if (scope.version) {
     writer.writeTag(2, 2);
     writer.writeString(scope.version);
+  }
+
+  // Write scope attributes directly
+  if (scope.attributes) {
+    // attributes (field 3, repeated KeyValue)
+    writeAttributes(writer, scope.attributes, 3);
+  }
+
+  if (scope.droppedAttributesCount) {
+    // dropped_attributes_count (field 4, uint32)
+    writer.writeTag(4, 0);
+    writer.writeVarint(scope.droppedAttributesCount);
   }
 
   writer.finishLengthDelimited(scopeStart, writer.pos - scopeStartPos);

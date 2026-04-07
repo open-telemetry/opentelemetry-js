@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { AnyValue } from '@opentelemetry/api-logs';
+import { diag } from '@opentelemetry/api';
+import type { AnyValue, LogAttributes } from '@opentelemetry/api-logs';
 
 /**
  * Validates if a value is a valid AnyValue for Log Attributes according to OpenTelemetry spec.
@@ -19,6 +20,48 @@ import type { AnyValue } from '@opentelemetry/api-logs';
  */
 export function isLogAttributeValue(val: unknown): val is AnyValue {
   return isLogAttributeValueInternal(val, new WeakSet());
+}
+
+/**
+ * Sanitize attributes for use on the instrumentation scope. Drops invalid attributes and keeps track of
+ * how many were dropped.
+ *
+ * @param attributes
+ */
+export function sanitizeScopeAttributes(attributes?: LogAttributes): {
+  readonly attributes?: LogAttributes;
+  readonly droppedAttributesCount?: number;
+} {
+  if (attributes == null) {
+    return {};
+  }
+
+  const sanitizedAttributes: LogAttributes = {};
+  let droppedAttributesCount = 0;
+
+  for (const [key, value] of Object.entries(attributes)) {
+    if (key.length === 0) {
+      diag.warn(`Invalid attribute key: ${key}`);
+      droppedAttributesCount++;
+      continue;
+    }
+
+    if (!isLogAttributeValue(value)) {
+      diag.warn(`Invalid attribute value set for key: ${key}`);
+      droppedAttributesCount++;
+      continue;
+    }
+
+    sanitizedAttributes[key] = value;
+  }
+
+  return {
+    attributes:
+      Object.keys(sanitizedAttributes).length > 0
+        ? sanitizedAttributes
+        : undefined,
+    droppedAttributesCount,
+  };
 }
 
 function isLogAttributeValueInternal(

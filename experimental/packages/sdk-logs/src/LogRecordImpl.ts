@@ -29,7 +29,10 @@ export class LogRecordImpl implements ReadableLogRecord {
   readonly hrTimeObserved: api.HrTime;
   readonly spanContext?: api.SpanContext;
   readonly resource: Resource;
-  readonly instrumentationScope: InstrumentationScope;
+  readonly instrumentationScope: InstrumentationScope & {
+    attributes?: LogAttributes;
+    droppedAttributesCount?: number;
+  };
   readonly attributes: LogAttributes = {};
   private _severityText?: string;
   private _severityNumber?: SeverityNumber;

@@ -58,9 +58,17 @@ export class LogsAPI {
   }
 
   /**
-   * Returns a logger from the global logger provider.
+   * Returns a Logger, creating one if one with the given name, version,
+   * schemaUrl, and scopeAttributes is not already created.
    *
-   * @returns Logger
+   * Getting a Logger may be expensive, especially when `scopeAttributes` are
+   * provided. Reuse Logger instances where possible instead of calling
+   * `getLogger()` on hot paths.
+   *
+   * @param name The name of the logger or instrumentation library.
+   * @param version The version of the logger or instrumentation library.
+   * @param options The options of the logger or instrumentation library.
+   * @returns {@link Logger} A Logger with the given name and version
    */
   public getLogger(
     name: string,
