@@ -24,6 +24,8 @@ fix(opentelemetry-resources): do not discard OTEL_RESOURCE_ATTRIBUTES when it co
 
 ### :house: Internal
 
+* fix(sdk-metrics): repair ExponentialHistogram tests [#6565](https://github.com/open-telemetry/opentelemetry-js/pull/6565) @overbalance
+
 ## 2.6.1
 
 ### :bug: Bug Fixes
