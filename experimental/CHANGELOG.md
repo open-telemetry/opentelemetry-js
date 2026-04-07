@@ -8,12 +8,16 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* feat(api-logs, sdk-logs)!: add Logger#enabled() [#6371](https://github.com/open-telemetry/opentelemetry-js/pull/6371) @david-luna
+
 ### :rocket: Features
 
 * feat(otlp-transformer): add custom protobuf logs serializer [#6228](https://github.com/open-telemetry/opentelemetry-js/pull/6228) @pichlermarc
 * feat(otlp-transformer): add custom protobuf logs export response deserializer [#6530](https://github.com/open-telemetry/opentelemetry-js/pull/6530) @pichlermarc
 
 ### :bug: Bug Fixes
+
+* fix(instrumentation-fetch): preserve init overrides when input is a Request object [#6421](https://github.com/open-telemetry/opentelemetry-js/issues/6421) @akandic47
 
 ### :books: Documentation
 
