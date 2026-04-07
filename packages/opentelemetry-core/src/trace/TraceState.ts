@@ -21,12 +21,14 @@ const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
  * beginning of the list.
  */
 export class TraceState implements TraceStateApi {
+  private _length: number;
   private _rawTraceState: string;
   private _internalState: Map<string, string> | undefined;
 
   constructor(rawTraceState?: string) {
     this._rawTraceState =
       typeof rawTraceState === 'string' ? rawTraceState : '';
+    this._length = this._rawTraceState.length;
   }
 
   set(key: string, value: string): TraceState {
@@ -34,21 +36,55 @@ export class TraceState implements TraceStateApi {
       return this;
     }
 
-    const newState = new Map((this._internalState ??= this._parse()));
+    const currState = this._getState();
+    const currValue = currState.get(key);
+    // Get the new length depending if we already have a value or not
+    // - for existing keys we add the difference in length of the values
+    // - for new keys is the key & value lenght plus
+    //   - +1 for the key/value splitter
+    //   - +1 for the separator if there are other keys
+    let newLength = this._length;
+    if (typeof currValue === 'string') {
+      newLength += value.length - currValue.length;
+    } else {
+      newLength += key.length + value.length + (currState.size > 0 ? 2 : 1);
+    }
+    if (newLength > MAX_TRACE_STATE_LEN) {
+      return this;
+    }
+
+    const newState = new Map(currState);
     newState.delete(key);
     newState.set(key, value);
-    return this._fromState(newState);
+    return this._fromState(newState, newLength);
   }
 
   unset(key: string): TraceState {
-    const newState = new Map((this._internalState ??= this._parse()));
+    const currState = this._getState();
+    const currValue = currState.get(key);
+
+    // No need to craete a new instance if the key does not exist
+    if (typeof currValue !== 'string') {
+      return this;
+    }
+
+    // Get the new length depending if we already have a value or not
+    // - for existing keys we substract key and value length plus
+    //   - +1 for the key/value splitter
+    //   - +1 for the separator if there are other keys
+    let newLength = this._length - (key.length + currValue.length + 1);
+    if (currState.size > 0) {
+      newLength = newLength - 1;
+    }
+
+    const newState = new Map(currState);
     newState.delete(key);
-    return this._fromState(newState);
+    return this._fromState(newState, newLength);
   }
 
   get(key: string): string | undefined {
-    this._internalState ??= this._parse();
-    return this._internalState.get(key);
+    const currState = this._getState();
+    return currState.get(key);
   }
 
   serialize(): string {
@@ -71,7 +107,12 @@ export class TraceState implements TraceStateApi {
     return this._rawTraceState;
   }
 
-  private _parse(): Map<string, string> {
+  private _getState(): Map<string, string> {
+    if (this._internalState) {
+      return this._internalState;
+    }
+
+    // Not parsed yet, lets do it
     const vendorMembers = this._rawTraceState.split(LIST_MEMBERS_SEPARATOR);
 
     // This Map will have the order reversed
@@ -109,12 +150,16 @@ export class TraceState implements TraceStateApi {
     }
 
     // Now we set the Map in the right order
-    return new Map(Array.from(vendorEntries.entries()).reverse());
+    this._internalState = new Map(
+      Array.from(vendorEntries.entries()).reverse()
+    );
+    return this._internalState;
   }
 
-  private _fromState(state: Map<string, string>): TraceState {
+  private _fromState(state: Map<string, string>, length: number): TraceState {
     const traceState = Object.create(TraceState.prototype) as TraceState;
     traceState._internalState = state;
+    traceState._length = length;
     return traceState;
   }
 }

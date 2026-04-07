@@ -40,11 +40,45 @@ describe('TraceState', () => {
       assert.strictEqual(orgState.serialize(), 'c=4,b=3,a=1');
     });
 
-    it('must not create a new TraceState and keep the keys and values', () => {
-      const orgState = new TraceState('a=1,b=2');
-      const state = orgState.set('b', '3'.repeat(257));
+    it('must not create a new TraceState when the entry does not exist', () => {
+      const orgState = new TraceState('c=4,b=3,a=1');
+      const state = orgState.unset('d');
       assert.strictEqual(orgState, state);
-      assert.deepStrictEqual(orgState.serialize(), 'a=1,b=2');
+      assert.deepStrictEqual(orgState.serialize(), 'c=4,b=3,a=1');
+    });
+
+    describe('when adding a new list member', () => {
+      it('must not create a new TraceState if the value is to long', () => {
+        const orgState = new TraceState('a=1,b=2');
+        const state = orgState.set('c', '3'.repeat(257));
+        assert.strictEqual(orgState, state);
+        assert.deepStrictEqual(orgState.serialize(), 'a=1,b=2');
+      });
+
+      it('must not create a new TraceState if makes exceed the total limit', () => {
+        const tracestate = 'a=' + '1'.repeat(200) + ',b=' + '2'.repeat(200);
+        const orgState = new TraceState(tracestate);
+        const state = orgState.set('c', '3'.repeat(200)); // this makes it exceed 512
+        assert.strictEqual(orgState, state);
+        assert.deepStrictEqual(orgState.serialize(), tracestate);
+      });
+    });
+
+    describe('when updating a list member', () => {
+      it('must not create a new TraceState if the value is to long', () => {
+        const orgState = new TraceState('a=1,b=2');
+        const state = orgState.set('b', '3'.repeat(257));
+        assert.strictEqual(orgState, state);
+        assert.deepStrictEqual(orgState.serialize(), 'a=1,b=2');
+      });
+
+      it('must not create a new TraceState if makes exceed the total limit', () => {
+        const tracestate = 'a=' + '1'.repeat(200) + ',b=' + '2'.repeat(200);
+        const orgState = new TraceState(tracestate);
+        const state = orgState.set('c', '3'.repeat(200)); // this makes it exceed 512
+        assert.strictEqual(orgState, state);
+        assert.deepStrictEqual(orgState.serialize(), tracestate);
+      });
     });
   });
 
