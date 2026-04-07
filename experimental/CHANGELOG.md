@@ -8,6 +8,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* feat(sdk-logs)!: add required `forceFlush()` to `LogRecordExporter` interface [#6356](https://github.com/open-telemetry/opentelemetry-js/pull/6356) @pichlermarc
+  * (user-facing): `LogRecordExporter` interface now requires a `forceFlush()` method to be implemented. Custom exporters will need to implement this method to continue working with the Logs SDK.
 * feat(api-logs, sdk-logs)!: add Logger#enabled() [#6371](https://github.com/open-telemetry/opentelemetry-js/pull/6371) @david-luna
 
 ### :rocket: Features
@@ -40,6 +42,10 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(otlp-exporter-base): remove sendBeacon in favor of fetch with keepalive [#6391](https://github.com/open-telemetry/opentelemetry-js/pull/6391) @overbalance
+  * (user-facing) createOtlpSendBeaconExportDelegate will be removed in a future version
+* fix(otlp-transformer): downgrade `protobufjs` to version `^7.0.0` [#6418](https://github.com/open-telemetry/opentelemetry-js/pull/6418) @vitorvasc
+* fix(sdk-logs): invoke exporter forceFlush without first awaiting export [#6356](https://github.com/open-telemetry/opentelemetry-js/pull/6356) @pichlermarc
 * fix(opentelemetry-instrumentation): access `require` via `globalThis` to avoid webpack analysis [#6481](https://github.com/open-telemetry/opentelemetry-js/pull/6481) @overbalance
 * fix(sdk-logs): fix inflated `droppedAttributesCount` when updating existing attribute keys [#6479](https://github.com/open-telemetry/opentelemetry-js/pull/6479) @overbalance
 * fix(instrumentation-fetch): do not modify the returned type of fetch [#6521](https://github.com/open-telemetry/opentelemetry-js/pull/6521) @dyladan
