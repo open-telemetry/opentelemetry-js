@@ -19,9 +19,5 @@
 //
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2021 Datadog, Inc.
 
-import {
-  load,
-  resolve,
-  initialize,
-} from 'import-in-the-middle/hook.mjs';
+import { load, resolve, initialize } from 'import-in-the-middle/hook.mjs';
 export { load, resolve, initialize };

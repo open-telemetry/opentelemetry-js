@@ -27,7 +27,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['*.ts'],
+      files: ['*.{ts,mts,cts}'],
       // Enable typescript-eslint for ts files.
       extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:prettier/recommended"],
       parserOptions: {
@@ -63,7 +63,17 @@ module.exports = {
       }
     },
     {
-      files: ["test/**/*.ts"],
+      files: ["*.config.{ts,mts,cts}"],
+      parserOptions: {
+        "projectService": false,
+      },
+      rules: {
+        "@typescript-eslint/no-floating-promises": "off",
+        "header/header": "off",
+      }
+    },
+    {
+      files: ["test/**/*.{ts,mts,cts}"],
       // Enable typescript-eslint for ts files.
       extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:prettier/recommended"],
       parserOptions: {

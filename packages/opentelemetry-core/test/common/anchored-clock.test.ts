@@ -7,12 +7,10 @@ import * as assert from 'assert';
 import { AnchoredClock, otperformance } from '../../src';
 
 describe('AnchoredClock', () => {
-  it('should keep time', done => {
+  it('should keep time', async () => {
     const clock = new AnchoredClock(Date, otperformance);
-    setTimeout(() => {
-      // after about 100ms, the clocks are within 10ms of each other
-      assert.ok(Math.abs(Date.now() - clock.now()) < 10);
-      done();
-    }, 100);
+    await new Promise(resolve => setTimeout(resolve, 100));
+    // after about 100ms, the clocks are within 10ms of each other
+    assert.ok(Math.abs(Date.now() - clock.now()) < 10);
   });
 });

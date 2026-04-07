@@ -47,18 +47,18 @@ function createSpan(): void {
 }
 
 describe('BatchSpanProcessor benchmark (browser)', function () {
-  this.timeout(60000);
-
-  it('process span (browser)', done => {
-    const suite = new Benchmark.Suite();
-    suite
-      .add('BatchSpanProcessor process span (browser)', () => {
-        createSpan();
-      })
-      .on('cycle', (event: Benchmark.Event) =>
-        console.log(String(event.target))
-      )
-      .on('complete', () => done())
-      .run({ async: true });
+  it('process span (browser)', async () => {
+    await new Promise<void>(resolve => {
+      const suite = new Benchmark.Suite();
+      suite
+        .add('BatchSpanProcessor process span (browser)', () => {
+          createSpan();
+        })
+        .on('cycle', (event: Benchmark.Event) =>
+          console.log(String(event.target))
+        )
+        .on('complete', () => resolve())
+        .run({ async: true });
+    });
   });
 });

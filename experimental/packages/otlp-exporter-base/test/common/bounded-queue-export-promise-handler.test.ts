@@ -17,7 +17,7 @@ describe('BoundedQueueExportPromiseHandler', function () {
     assert.throws(() => promiseHandler.pushPromise(Promise.resolve()));
   });
 
-  it('removes from queue when promise resolves without calling awaitAll', function (done) {
+  it('removes from queue when promise resolves without calling awaitAll', async function () {
     const promiseHandler = createBoundedQueueExportPromiseHandler({
       concurrencyLimit: 3,
     });
@@ -26,21 +26,15 @@ describe('BoundedQueueExportPromiseHandler', function () {
     promiseHandler.pushPromise(Promise.resolve());
     assert.ok(promiseHandler.hasReachedLimit());
 
-    queueMicrotask(() => {
-      try {
-        assert.strictEqual(
-          promiseHandler.hasReachedLimit(),
-          false,
-          'expected that once promises resolve, the queue becomes available again'
-        );
-        done();
-      } catch (error) {
-        done(error);
-      }
-    });
+    await new Promise<void>(resolve => queueMicrotask(resolve));
+    assert.strictEqual(
+      promiseHandler.hasReachedLimit(),
+      false,
+      'expected that once promises resolve, the queue becomes available again'
+    );
   });
 
-  it('removes from queue when promise rejects without calling awaitAll', function (done) {
+  it('removes from queue when promise rejects without calling awaitAll', async function () {
     const promiseHandler = createBoundedQueueExportPromiseHandler({
       concurrencyLimit: 3,
     });
@@ -49,18 +43,12 @@ describe('BoundedQueueExportPromiseHandler', function () {
     promiseHandler.pushPromise(Promise.reject());
     assert.ok(promiseHandler.hasReachedLimit());
 
-    queueMicrotask(() => {
-      try {
-        assert.strictEqual(
-          promiseHandler.hasReachedLimit(),
-          false,
-          'expected that once promises resolve, the queue becomes available again'
-        );
-        done();
-      } catch (error) {
-        done(error);
-      }
-    });
+    await new Promise<void>(resolve => queueMicrotask(resolve));
+    assert.strictEqual(
+      promiseHandler.hasReachedLimit(),
+      false,
+      'expected that once promises resolve, the queue becomes available again'
+    );
   });
 
   it('removes from queue when promise resolves when calling awaitAll', async function () {

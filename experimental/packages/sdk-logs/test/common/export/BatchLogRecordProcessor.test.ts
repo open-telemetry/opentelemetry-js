@@ -132,7 +132,7 @@ describe('BatchLogRecordProcessorBase', () => {
   });
 
   describe('onEmit', () => {
-    it('should export the log records with buffer size reached', done => {
+    it('should export the log records with buffer size reached', async () => {
       const processor = new BatchLogRecordProcessor(
         exporter,
         defaultBufferConfig
@@ -147,16 +147,14 @@ describe('BatchLogRecordProcessorBase', () => {
       // Add the final log that reaches maxExportBatchSize (should trigger immediate export)
       const logRecord = createLogRecord();
       processor.onEmit(logRecord);
-      setTimeout(async () => {
-        // Should now have exported the batch immediately
-        assert.strictEqual(
-          exporter.getFinishedLogRecords().length,
-          defaultBufferConfig.maxExportBatchSize
-        );
-        await processor.shutdown();
-        assert.strictEqual(exporter.getFinishedLogRecords().length, 0);
-        done();
-      }, 10); // Small delay to allow async export to complete
+      await new Promise(resolve => setTimeout(resolve, 10)); // Small delay to allow async export to complete
+      // Should now have exported the batch immediately
+      assert.strictEqual(
+        exporter.getFinishedLogRecords().length,
+        defaultBufferConfig.maxExportBatchSize
+      );
+      await processor.shutdown();
+      assert.strictEqual(exporter.getFinishedLogRecords().length, 0);
     });
 
     it('should export immediately when maxExportBatchSize is reached', async () => {
@@ -311,22 +309,24 @@ describe('BatchLogRecordProcessorBase', () => {
       clock.restore();
     });
 
-    it('should not export empty log record lists', done => {
+    it('should not export empty log record lists', async () => {
       const spy = sinon.spy(exporter, 'export');
       const clock = sinon.useFakeTimers();
       new BatchLogRecordProcessor(exporter, defaultBufferConfig);
-      setTimeout(() => {
-        assert.strictEqual(exporter.getFinishedLogRecords().length, 0);
-        sinon.assert.notCalled(spy);
-        done();
-      }, defaultBufferConfig.scheduledDelayMillis + 1000);
+      const p = new Promise<void>(resolve => {
+        setTimeout(() => {
+          assert.strictEqual(exporter.getFinishedLogRecords().length, 0);
+          sinon.assert.notCalled(spy);
+          resolve();
+        }, defaultBufferConfig.scheduledDelayMillis + 1000);
+      });
       assert.strictEqual(exporter.getFinishedLogRecords().length, 0);
       clock.tick(defaultBufferConfig.scheduledDelayMillis + 1000);
-
+      await p;
       clock.restore();
     });
 
-    it('should export each log record exactly once with buffer size  reached multiple times', done => {
+    it('should export each log record exactly once with buffer size  reached multiple times', async () => {
       const originalTimeout = setTimeout;
       const clock = sinon.useFakeTimers();
       const processor = new BatchLogRecordProcessor(
@@ -341,18 +341,20 @@ describe('BatchLogRecordProcessorBase', () => {
       const logRecord = createLogRecord();
       processor.onEmit(logRecord);
       clock.tick(defaultBufferConfig.scheduledDelayMillis + 10);
-      originalTimeout(() => {
-        clock.tick(defaultBufferConfig.scheduledDelayMillis + 10);
-        originalTimeout(async () => {
+      await new Promise<void>(resolve => {
+        originalTimeout(() => {
           clock.tick(defaultBufferConfig.scheduledDelayMillis + 10);
-          clock.restore();
-          assert.strictEqual(
-            exporter.getFinishedLogRecords().length,
-            totalLogRecords + 1
-          );
-          await processor.shutdown();
-          assert.strictEqual(exporter.getFinishedLogRecords().length, 0);
-          done();
+          originalTimeout(async () => {
+            clock.tick(defaultBufferConfig.scheduledDelayMillis + 10);
+            clock.restore();
+            assert.strictEqual(
+              exporter.getFinishedLogRecords().length,
+              totalLogRecords + 1
+            );
+            await processor.shutdown();
+            assert.strictEqual(exporter.getFinishedLogRecords().length, 0);
+            resolve();
+          });
         });
       });
     });

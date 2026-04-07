@@ -78,18 +78,20 @@ describe('safeExecuteInTheMiddle', function () {
 });
 
 describe('safeExecuteInTheMiddleAsync', function () {
-  it('should not throw error', function (done) {
-    safeExecuteInTheMiddleAsync(
-      async () => {
-        await new Promise(res => setTimeout(res, 1));
-        return 'foo';
-      },
-      err => {
-        assert.deepStrictEqual(err, undefined);
-        done();
-      },
-      true
-    );
+  it('should not throw error', async function () {
+    await new Promise<void>(resolve => {
+      safeExecuteInTheMiddleAsync(
+        async () => {
+          await new Promise(res => setTimeout(res, 1));
+          return 'foo';
+        },
+        err => {
+          assert.deepStrictEqual(err, undefined);
+          resolve();
+        },
+        true
+      );
+    });
   });
   it('should throw error', async function () {
     const error = new Error('test');

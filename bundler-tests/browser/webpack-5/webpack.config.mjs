@@ -12,4 +12,19 @@ export default {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
+  module: {
+    rules: [
+      {
+        // Packages like protobufjs lack an "exports" field, so webpack 5
+        // falls back to file-path resolution for subpath imports (e.g.
+        // "protobufjs/minimal"). In .mjs files, fullySpecified mode then
+        // requires a file extension on the resolved path, which fails.
+        // Disabling fullySpecified restores normal node_modules resolution.
+        test: /\.m?js/,
+        resolve: {
+          fullySpecified: false,
+        },
+      },
+    ],
+  },
 };

@@ -7,13 +7,8 @@ import * as assert from 'assert';
 import { VERSION } from '../../../src/version';
 
 describe('version', function () {
-  it('should have generated VERSION.ts', function () {
-    // Skip in case we're not running in Node.js
-    if (global.process?.versions?.node === undefined) {
-      this.skip();
-    }
-
-    const pjson = require('../../../package.json');
+  it('should have generated VERSION.ts', async function () {
+    const pjson: { version: string } = require('../../../package.json');
     assert.strictEqual(pjson.version, VERSION);
   });
 

@@ -16,13 +16,14 @@ export default {
     alias: {
       // Webpack 4 doesn't support package.json exports field, so we need to manually map the node-http subpath
       '@opentelemetry/otlp-exporter-base/node-http':
-        '@opentelemetry/otlp-exporter-base/build/esm/index-node-http.js',
+        '@opentelemetry/otlp-exporter-base/build/node-http',
     },
   },
   module: {
     rules: [
       {
         test: /\.(?:js|mjs|cjs)$/,
+        type: 'javascript/auto',
         exclude: /node_modules\/(?!@opentelemetry)/,
         use: {
           loader: 'babel-loader',

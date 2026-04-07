@@ -55,31 +55,27 @@ describe('utils', function () {
   });
 
   describe('getElementXPath', function () {
-    let $fixture: any;
-    let child: any;
-    before(() => {
-      $fixture = $(fixture);
-      const body = document.querySelector('body');
-      if (body) {
-        body.appendChild($fixture[0]);
-        child = body.lastChild;
-      }
+    let fixtureEl: HTMLDivElement;
+    beforeAll(() => {
+      const doc = new DOMParser().parseFromString(fixture, 'text/html');
+      fixtureEl = doc.body.firstElementChild as HTMLDivElement;
+      document.body.appendChild(fixtureEl);
     });
-    after(() => {
-      child.parentNode.removeChild(child);
+    afterAll(() => {
+      fixtureEl.remove();
     });
 
     it('should return correct path for element with id and optimise = true', function () {
-      const element = getElementXPath($fixture.find('#btn22')[0], true);
+      const element = getElementXPath(fixtureEl.querySelector('#btn22')!, true);
       assert.strictEqual(element, '//*[@id="btn22"]');
       assert.strictEqual(
-        $fixture.find('#btn22')[0],
+        fixtureEl.querySelector('#btn22'),
         getElementByXpath(element)
       );
     });
 
     it('should use ancestor id when optimised recursively', function () {
-      const inner = $fixture.find('#body-id div')[0];
+      const inner = fixtureEl.querySelector('#body-id div')!;
       const element = getElementXPath(inner, true);
       assert.strictEqual(element, '//*[@id="body-id"]/div');
       assert.strictEqual(inner, getElementByXpath(element));
@@ -89,10 +85,10 @@ describe('utils', function () {
       'should return correct path for element with id and surrounded by the' +
         ' same type',
       function () {
-        const element = getElementXPath($fixture.find('#btn22')[0]);
+        const element = getElementXPath(fixtureEl.querySelector('#btn22')!);
         assert.strictEqual(element, '//html/body/div/div[4]/div[5]/button[3]');
         assert.strictEqual(
-          $fixture.find('#btn22')[0],
+          fixtureEl.querySelector('#btn22'),
           getElementByXpath(element)
         );
       }
@@ -102,10 +98,10 @@ describe('utils', function () {
       'should return correct path for element with id and surrounded by' +
         ' text nodes mixed with cnode',
       function () {
-        const element = getElementXPath($fixture.find('#btn23')[0]);
+        const element = getElementXPath(fixtureEl.querySelector('#btn23')!);
         assert.strictEqual(element, '//html/body/div/div[4]/div[6]/button');
         assert.strictEqual(
-          $fixture.find('#btn23')[0],
+          fixtureEl.querySelector('#btn23'),
           getElementByXpath(element)
         );
       }
@@ -115,7 +111,7 @@ describe('utils', function () {
       'should return correct path for text node element surrounded by cdata' +
         ' nodes',
       function () {
-        const text = $fixture.find('#cdata')[0];
+        const text = fixtureEl.querySelector('#cdata')!;
         const textNode = document.createTextNode('foobar');
         text.appendChild(textNode);
         const element = getElementXPath(textNode);
@@ -125,7 +121,7 @@ describe('utils', function () {
     );
 
     it('should return correct path when element is text node', function () {
-      const text = $fixture.find('#text')[0];
+      const text = fixtureEl.querySelector('#text')!;
       const textNode = document.createTextNode('foobar');
       text.appendChild(textNode);
       const element = getElementXPath(textNode);
@@ -134,7 +130,7 @@ describe('utils', function () {
     });
 
     it('should return correct path when element is comment node', function () {
-      const comment = $fixture.find('#comment')[0];
+      const comment = fixtureEl.querySelector('#comment')!;
       const node = document.createComment('foobar');
       comment.appendChild(node);
       const element = getElementXPath(node);

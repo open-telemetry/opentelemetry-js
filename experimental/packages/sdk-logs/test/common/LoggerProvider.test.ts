@@ -206,7 +206,7 @@ describe('LoggerProvider', () => {
   });
 
   describe('.forceFlush()', () => {
-    it('should call forceFlush on all registered log record processors', done => {
+    it('should call forceFlush on all registered log record processors', async () => {
       sinon.restore();
       const forceFlushStub = sinon.stub(
         NoopLogRecordProcessor.prototype,
@@ -220,20 +220,12 @@ describe('LoggerProvider', () => {
         processors: [logRecordProcessorOne, logRecordProcessorTwo],
       });
 
-      provider
-        .forceFlush()
-        .then(() => {
-          sinon.restore();
-          assert.ok(forceFlushStub.calledTwice);
-          done();
-        })
-        .catch(error => {
-          sinon.restore();
-          done(error);
-        });
+      await provider.forceFlush();
+      sinon.restore();
+      assert.ok(forceFlushStub.calledTwice);
     });
 
-    it('should throw error when calling forceFlush on all registered processors fails', done => {
+    it('should throw error when calling forceFlush on all registered processors fails', async () => {
       sinon.restore();
 
       const forceFlushStub = sinon.stub(
@@ -248,17 +240,9 @@ describe('LoggerProvider', () => {
         processors: [logRecordProcessorOne, logRecordProcessorTwo],
       });
 
-      provider
-        .forceFlush()
-        .then(() => {
-          sinon.restore();
-          done(new Error('Successful forceFlush not expected'));
-        })
-        .catch(_error => {
-          sinon.restore();
-          sinon.assert.calledTwice(forceFlushStub);
-          done();
-        });
+      await assert.rejects(() => provider.forceFlush());
+      sinon.restore();
+      sinon.assert.calledTwice(forceFlushStub);
     });
   });
 
