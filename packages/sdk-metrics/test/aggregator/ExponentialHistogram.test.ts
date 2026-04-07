@@ -179,13 +179,13 @@ describe('ExponentialHistogramAccumulation', () => {
                   maxFill = i;
                 }
               }
-              assert.ok(maxFill >= maxSize / 2);
+              assert.ok(maxFill >= accumulation.positive.length / 2);
 
               // count is correct
-              assert.ok(maxSize + 1 >= totalCount);
-              assert.ok(maxSize + 1 >= accumulation.count);
+              assert.strictEqual(totalCount, maxSize + 1);
+              assert.strictEqual(accumulation.count, maxSize + 1);
               // sum is correct
-              assert.ok(sum >= accumulation.sum);
+              assert.strictEqual(sum, accumulation.sum);
 
               // the offset is correct at the computed scale
               mapper = getMapping(accumulation.scale);
