@@ -39,7 +39,7 @@ export class TraceState implements TraceStateApi {
     const currState = this._getState();
     const currValue = currState.get(key);
     // Get the new length depending if we already have a value or not
-    // - for existing keys we add the difference in length of the values
+    // - for existing keys we add the difference between the length of the values
     // - for new keys is the key & value lenght plus
     //   - +1 for the key/value splitter
     //   - +1 for the separator if there are other keys
@@ -63,7 +63,7 @@ export class TraceState implements TraceStateApi {
     const currState = this._getState();
     const currValue = currState.get(key);
 
-    // No need to craete a new instance if the key does not exist
+    // No need to create a new instance if the key does not exist
     if (typeof currValue !== 'string') {
       return this;
     }
@@ -89,8 +89,8 @@ export class TraceState implements TraceStateApi {
 
   serialize(): string {
     if (this._internalState) {
-      // We iterate normaly but instead of appending we prepend to get
-      // the reversed order
+      // Maps put new entries at the end. We prepend the seralized entry
+      // to get the right order according to the spec (updated members go 1st)
       let serialized = '';
       let index = 0;
       for (const entry of this._internalState) {
