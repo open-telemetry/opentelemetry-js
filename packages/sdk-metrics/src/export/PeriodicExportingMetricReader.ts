@@ -78,32 +78,25 @@ export class PeriodicExportingMetricReader extends MetricReader {
       metricProducers,
       cardinalitySelector: (instrumentType: InstrumentType) => {
         const limits = {
-          counter: 2000,
-          gauge: 2000,
-          histogram: 2000,
-          upDownCounter: 2000,
-          observableCounter: 2000,
-          observableGauge: 2000,
-          observableUpDownCounter: 2000,
           default: 2000,
-          ...(cardinalityLimits ?? {}),
+          ...cardinalityLimits,
         };
 
         switch (instrumentType) {
           case InstrumentType.COUNTER:
-            return limits.counter;
+            return limits.counter ?? limits.default;
           case InstrumentType.GAUGE:
-            return limits.gauge;
+            return limits.gauge ?? limits.default;
           case InstrumentType.HISTOGRAM:
-            return limits.histogram;
+            return limits.histogram ?? limits.default;
           case InstrumentType.OBSERVABLE_COUNTER:
-            return limits.observableCounter;
+            return limits.observableCounter ?? limits.default;
           case InstrumentType.OBSERVABLE_UP_DOWN_COUNTER:
-            return limits.observableUpDownCounter;
+            return limits.observableUpDownCounter ?? limits.default;
           case InstrumentType.OBSERVABLE_GAUGE:
-            return limits.observableGauge;
+            return limits.observableGauge ?? limits.default;
           case InstrumentType.UP_DOWN_COUNTER:
-            return limits.upDownCounter;
+            return limits.upDownCounter ?? limits.default;
           default:
             return limits.default;
         }
