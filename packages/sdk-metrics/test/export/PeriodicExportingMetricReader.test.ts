@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
+import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import type {
   AggregationOption,
@@ -12,7 +12,7 @@ import type {
   PushMetricExporter,
 } from '../../src';
 import { InstrumentType } from '../../src/export/MetricData';
-import { AggregationType, PeriodicExportingMetricReader } from '../../src';
+import { AggregationType } from '../../src';
 import type {
   ResourceMetrics,
   ScopeMetrics,
@@ -251,6 +251,22 @@ describe('PeriodicExportingMetricReader', () => {
   });
 
   describe('cardinalityLimits', () => {
+    const instrumentTypes = [
+      { instrument: InstrumentType.COUNTER, name: 'counter' },
+      { instrument: InstrumentType.GAUGE, name: 'gauge' },
+      { instrument: InstrumentType.HISTOGRAM, name: 'histogram' },
+      { instrument: InstrumentType.UP_DOWN_COUNTER, name: 'upDownCounter' },
+      {
+        instrument: InstrumentType.OBSERVABLE_COUNTER,
+        name: 'observableCounter',
+      },
+      { instrument: InstrumentType.OBSERVABLE_GAUGE, name: 'observableGauge' },
+      {
+        instrument: InstrumentType.OBSERVABLE_UP_DOWN_COUNTER,
+        name: 'observableUpDownCounter',
+      },
+    ] as const;
+
     it('should use default the cardinality limit value if not specified', () => {
       const exporter = new TestDeltaMetricExporter();
 
@@ -266,42 +282,20 @@ describe('PeriodicExportingMetricReader', () => {
       );
     });
 
-    it('should use the provided cardinality limits for each instrument type', () => {
-      const exporter = new TestDeltaMetricExporter();
+    instrumentTypes.forEach(({ instrument, name }) => {
+      it('should use the provided cardinality limit for ' + name, () => {
+        const exporter = new TestDeltaMetricExporter();
 
-      const instrumentTypesValues = {
-        [InstrumentType.COUNTER]: 1000,
-        [InstrumentType.GAUGE]: 2000,
-        [InstrumentType.HISTOGRAM]: 3000,
-        [InstrumentType.UP_DOWN_COUNTER]: 4000,
-        [InstrumentType.OBSERVABLE_COUNTER]: 5000,
-        [InstrumentType.OBSERVABLE_GAUGE]: 6000,
-        [InstrumentType.OBSERVABLE_UP_DOWN_COUNTER]: 7000,
-      };
-
-      const p = new PeriodicExportingMetricReader({
-        exporter,
-        exportIntervalMillis: 1,
-        exportTimeoutMillis: 1,
-        cardinalityLimits: {
-          counter: instrumentTypesValues.COUNTER,
-          gauge: instrumentTypesValues.GAUGE,
-          histogram: instrumentTypesValues.HISTOGRAM,
-          upDownCounter: instrumentTypesValues.UP_DOWN_COUNTER,
-          observableCounter: instrumentTypesValues.OBSERVABLE_COUNTER,
-          observableGauge: instrumentTypesValues.OBSERVABLE_GAUGE,
-          observableUpDownCounter:
-            instrumentTypesValues.OBSERVABLE_UP_DOWN_COUNTER,
-          default: 1,
-        },
+        const p = new PeriodicExportingMetricReader({
+          exporter,
+          exportIntervalMillis: 1,
+          exportTimeoutMillis: 1,
+          cardinalityLimits: {
+            [name]: 5000,
+          },
+        });
+        assert.strictEqual(p.selectCardinalityLimit(instrument), 5000);
       });
-
-      for (const instrument in instrumentTypesValues) {
-        assert.strictEqual(
-          p.selectCardinalityLimit(instrument as InstrumentType),
-          instrumentTypesValues[instrument as InstrumentType]
-        );
-      }
     });
 
     it('should use the provided default cardinality limit when no specific limit is provided', () => {
