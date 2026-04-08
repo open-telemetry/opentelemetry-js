@@ -11,7 +11,6 @@ describe('NoopLoggerProvider', () => {
   const loggerProvider = new NoopLoggerProvider();
 
   it('should not crash', () => {
-
     assert.ok(loggerProvider.getLogger('logger-name') instanceof NoopLogger);
     assert.ok(
       loggerProvider.getLogger('logger-name', 'v1') instanceof NoopLogger
