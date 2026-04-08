@@ -10,7 +10,19 @@ import { AlwaysOffSampler } from './sampler/AlwaysOffSampler';
 import { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
 import { ParentBasedSampler } from './sampler/ParentBasedSampler';
 import { TraceIdRatioBasedSampler } from './sampler/TraceIdRatioBasedSampler';
-import type { SamplerConfigModel } from '@opentelemetry/configuration';
+
+interface SamplerConfigModel {
+  parent_based?: {
+    root?: SamplerConfigModel;
+    remote_parent_sampled?: SamplerConfigModel;
+    remote_parent_not_sampled?: SamplerConfigModel;
+    local_parent_sampled?: SamplerConfigModel;
+    local_parent_not_sampled?: SamplerConfigModel;
+  };
+  always_off?: object;
+  always_on?: object;
+  trace_id_ratio_based?: { ratio?: number };
+}
 
 const enum TracesSamplerValues {
   AlwaysOff = 'always_off',
@@ -112,9 +124,7 @@ export function buildSamplerFromConfig(config: SamplerConfigModel): Sampler {
   if (config.parent_based !== undefined) {
     const pb = config.parent_based;
     return new ParentBasedSampler({
-      root: pb.root
-        ? buildSamplerFromConfig(pb.root)
-        : new AlwaysOnSampler(),
+      root: pb.root ? buildSamplerFromConfig(pb.root) : new AlwaysOnSampler(),
       remoteParentSampled: pb.remote_parent_sampled
         ? buildSamplerFromConfig(pb.remote_parent_sampled)
         : undefined,
@@ -129,9 +139,7 @@ export function buildSamplerFromConfig(config: SamplerConfigModel): Sampler {
         : undefined,
     });
   }
-  diag.error(
-    'Unknown sampler config, defaulting to ParentBased(AlwaysOn).'
-  );
+  diag.error('Unknown sampler config, defaulting to ParentBased(AlwaysOn).');
   return new ParentBasedSampler({ root: new AlwaysOnSampler() });
 }
 
