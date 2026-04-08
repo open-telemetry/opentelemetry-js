@@ -414,6 +414,18 @@ describe('LoggerProvider', () => {
       });
       assert.strictEqual(logger1, logger2);
     });
+
+    it('should return the same logger for empty scopeAttributes and no scopeAttributes', () => {
+      const provider = new LoggerProvider();
+      const logger1 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+      });
+      const logger2 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        scopeAttributes: {},
+      });
+      assert.strictEqual(logger1, logger2);
+    });
   });
 
   describe('.forceFlush()', () => {

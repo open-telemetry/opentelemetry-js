@@ -73,7 +73,7 @@ function createExpectedLogJson(encoder: Encoder): IExportLogsServiceRequest {
                   },
                 },
               ],
-              droppedAttributesCount: 0,
+              droppedAttributesCount: 1,
             },
             logRecords: [
               {
@@ -153,6 +153,7 @@ function createExpectedLogProtobuf(): IExportLogsServiceRequest {
                   },
                 },
               ],
+              droppedAttributesCount: 1,
             },
             logRecords: [
               {
@@ -262,6 +263,7 @@ describe('Logs', () => {
         'scope-attribute': 'scope attribute value',
         'scope-array': ['prod', true],
       },
+      droppedAttributesCount: 1,
     };
     scope_2 = {
       name: 'scope_name_2',
@@ -460,7 +462,7 @@ describe('Logs', () => {
       assert.strictEqual(
         exportRequest.resourceLogs?.[0].scopeLogs[0].scope
           ?.droppedAttributesCount,
-        0
+        1
       );
     });
   });
