@@ -31,30 +31,33 @@ describe('NoopContextManager', function () {
   });
 
   describe('.with()', function () {
-    it('should run the callback (ROOT_CONTEXT as target)', done => {
-      contextManager.with(ROOT_CONTEXT, done);
-    });
+    it('should run the callback (ROOT_CONTEXT as target)', () =>
+      new Promise<void>(resolve => {
+        contextManager.with(ROOT_CONTEXT, resolve);
+      }));
 
-    it('should run the callback (object as target)', done => {
-      const key = createContextKey('test key 1');
-      const test = ROOT_CONTEXT.setValue(key, 1);
-      contextManager.with(test, function () {
-        assert.strictEqual(
-          contextManager.active(),
-          ROOT_CONTEXT,
-          'should not have context'
-        );
-        return done();
-      });
-    });
+    it('should run the callback (object as target)', () =>
+      new Promise<void>(resolve => {
+        const key = createContextKey('test key 1');
+        const test = ROOT_CONTEXT.setValue(key, 1);
+        contextManager.with(test, function () {
+          assert.strictEqual(
+            contextManager.active(),
+            ROOT_CONTEXT,
+            'should not have context'
+          );
+          resolve();
+        });
+      }));
 
-    it('should run the callback (when disabled)', done => {
-      contextManager.disable();
-      contextManager.with(ROOT_CONTEXT, function () {
-        contextManager.enable();
-        return done();
-      });
-    });
+    it('should run the callback (when disabled)', () =>
+      new Promise<void>(resolve => {
+        contextManager.disable();
+        contextManager.with(ROOT_CONTEXT, function () {
+          contextManager.enable();
+          resolve();
+        });
+      }));
 
     it('should forward this, arguments and return value', function () {
       function fnWithThis(this: string, a: string, b: number): string {

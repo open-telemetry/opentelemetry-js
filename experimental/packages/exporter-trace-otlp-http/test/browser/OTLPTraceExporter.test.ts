@@ -9,7 +9,7 @@ import {
 } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { OTLPTraceExporter } from '../../src/platform/browser/index';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 
 /*
  * NOTE: Tests here are not intended to test the underlying components directly. They are intended as a quick

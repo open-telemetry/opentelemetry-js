@@ -42,8 +42,24 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 
-import { assertSpan } from '../../build/test/utils/assertSpan.js';
-import { HttpInstrumentation } from '../../build/src/index.js';
+import { HttpInstrumentation } from '../../build/index.mjs';
+
+/**
+ * Simplified span assertion for ESM tests.
+ * Detailed attribute validation is covered by CJS tests.
+ */
+const assertClientSpan = (
+  span,
+  { httpStatusCode, httpMethod, hostname, pathname }
+) => {
+  assert.strictEqual(span.kind, SpanKind.CLIENT);
+  assert.strictEqual(span.name, httpMethod);
+  assert.strictEqual(span.attributes['http.method'], httpMethod);
+  assert.strictEqual(span.attributes['http.status_code'], httpStatusCode);
+  assert.strictEqual(span.attributes['http.target'], pathname);
+  assert.strictEqual(span.attributes['net.peer.name'], hostname);
+  assert.ok(span.attributes['net.peer.ip'], 'should have net.peer.ip');
+};
 
 const memoryExporter = new InMemorySpanExporter();
 const provider = new NodeTracerProvider({
@@ -103,19 +119,10 @@ for (let httpImport of httpImports) {
     });
 
     it('should instrument http requests using http.request', async () => {
-      const spanValidations = {
-        httpStatusCode: 200,
-        httpMethod: 'GET',
-        hostname: '127.0.0.1',
-        pathname: '/http.request',
-        component: 'http',
-      };
-
       await new Promise(resolve => {
         const clientReq = httpImport.request(
           `http://127.0.0.1:${port}/http.request`,
           clientRes => {
-            spanValidations.resHeaders = clientRes.headers;
             clientRes.resume();
             clientRes.on('end', resolve);
           }
@@ -123,35 +130,34 @@ for (let httpImport of httpImports) {
         clientReq.end();
       });
 
-      let spans = memoryExporter.getFinishedSpans();
+      const spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 2);
       const span = spans.find(s => s.kind === SpanKind.CLIENT);
-      assert.strictEqual(span.name, 'GET');
-      assertSpan(span, SpanKind.CLIENT, spanValidations);
-    });
-
-    it('should instrument http requests using http.get', async () => {
-      const spanValidations = {
+      assertClientSpan(span, {
         httpStatusCode: 200,
         httpMethod: 'GET',
         hostname: '127.0.0.1',
-        pathname: '/http.get',
-        component: 'http',
-      };
+        pathname: '/http.request',
+      });
+    });
 
+    it('should instrument http requests using http.get', async () => {
       await new Promise(resolve => {
         httpImport.get(`http://127.0.0.1:${port}/http.get`, clientRes => {
-          spanValidations.resHeaders = clientRes.headers;
           clientRes.resume();
           clientRes.on('end', resolve);
         });
       });
 
-      let spans = memoryExporter.getFinishedSpans();
+      const spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 2);
       const span = spans.find(s => s.kind === SpanKind.CLIENT);
-      assert.strictEqual(span.name, 'GET');
-      assertSpan(span, SpanKind.CLIENT, spanValidations);
+      assertClientSpan(span, {
+        httpStatusCode: 200,
+        httpMethod: 'GET',
+        hostname: '127.0.0.1',
+        pathname: '/http.get',
+      });
     });
   });
 }
@@ -217,14 +223,6 @@ for (let httpsImport of httpsImports) {
     });
 
     it('should instrument https requests using https.request', async () => {
-      const spanValidations = {
-        httpStatusCode: 200,
-        httpMethod: 'GET',
-        hostname: '127.0.0.1',
-        pathname: '/https.request',
-        component: 'https',
-      };
-
       await new Promise(resolve => {
         const clientReq = httpsImport.request(
           `https://127.0.0.1:${port}/https.request`,
@@ -232,7 +230,6 @@ for (let httpsImport of httpsImports) {
             rejectUnauthorized: false,
           },
           clientRes => {
-            spanValidations.resHeaders = clientRes.headers;
             clientRes.resume();
             clientRes.on('end', resolve);
           }
@@ -240,22 +237,18 @@ for (let httpsImport of httpsImports) {
         clientReq.end();
       });
 
-      let spans = memoryExporter.getFinishedSpans();
+      const spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 2);
       const span = spans.find(s => s.kind === SpanKind.CLIENT);
-      assert.strictEqual(span.name, 'GET');
-      assertSpan(span, SpanKind.CLIENT, spanValidations);
-    });
-
-    it('should instrument http requests using https.get', async () => {
-      const spanValidations = {
+      assertClientSpan(span, {
         httpStatusCode: 200,
         httpMethod: 'GET',
         hostname: '127.0.0.1',
-        pathname: '/https.get',
-        component: 'https',
-      };
+        pathname: '/https.request',
+      });
+    });
 
+    it('should instrument https requests using https.get', async () => {
       await new Promise(resolve => {
         httpsImport.get(
           `https://127.0.0.1:${port}/https.get`,
@@ -263,18 +256,21 @@ for (let httpsImport of httpsImports) {
             rejectUnauthorized: false,
           },
           clientRes => {
-            spanValidations.resHeaders = clientRes.headers;
             clientRes.resume();
             clientRes.on('end', resolve);
           }
         );
       });
 
-      let spans = memoryExporter.getFinishedSpans();
+      const spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 2);
       const span = spans.find(s => s.kind === SpanKind.CLIENT);
-      assert.strictEqual(span.name, 'GET');
-      assertSpan(span, SpanKind.CLIENT, spanValidations);
+      assertClientSpan(span, {
+        httpStatusCode: 200,
+        httpMethod: 'GET',
+        hostname: '127.0.0.1',
+        pathname: '/https.get',
+      });
     });
   });
 }

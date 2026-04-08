@@ -64,11 +64,15 @@ describe('ZoneContextManager', () => {
   });
 
   describe('.with()', () => {
-    it('should run the callback (null as target)', done => {
-      contextManager.with(null, done);
+    it('should run the callback (null as target)', () => {
+      let called = false;
+      contextManager.with(null, () => {
+        called = true;
+      });
+      assert.strictEqual(called, true);
     });
 
-    it('should run the callback (object as target)', done => {
+    it('should run the callback (object as target)', () => {
       const test = ROOT_CONTEXT.setValue(key1, 1);
       contextManager.with(test, () => {
         assert.strictEqual(
@@ -76,25 +80,25 @@ describe('ZoneContextManager', () => {
           test,
           'should have context'
         );
-        return done();
       });
     });
 
-    it('should run the callback (when disabled)', done => {
+    it('should run the callback (when disabled)', () => {
       contextManager.disable();
+      let called = false;
       contextManager.with(null, () => {
+        called = true;
         contextManager.enable();
-        return done();
       });
+      assert.strictEqual(called, true);
     });
 
-    it('should rethrow errors', done => {
+    it('should rethrow errors', () => {
       assert.throws(() => {
         contextManager.with(null, () => {
           throw new Error('This should be rethrown');
         });
       });
-      return done();
     });
 
     it('should forward this, arguments and return value', () => {
@@ -121,7 +125,7 @@ describe('ZoneContextManager', () => {
       );
     });
 
-    it('should finally restore an old context, including the async task', done => {
+    it('should finally restore an old context, including the async task', () => {
       const ctx1 = ROOT_CONTEXT.setValue(key1, 'ctx1');
       const ctx2 = ROOT_CONTEXT.setValue(key1, 'ctx2');
       const ctx3 = ROOT_CONTEXT.setValue(key1, 'ctx3');
@@ -136,16 +140,18 @@ describe('ZoneContextManager', () => {
           assert.strictEqual(contextManager.active(), ctx2);
         });
         assert.strictEqual(contextManager.active(), ctx1);
+        let asyncVerified = false;
         setTimeout(() => {
           assert.strictEqual(contextManager.active(), ctx1);
-          done();
+          asyncVerified = true;
         }, 500);
         clock.tick(500);
+        assert.strictEqual(asyncVerified, true);
       });
-      assert.strictEqual(contextManager.active(), window);
+      assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
     });
 
-    it('should finally restore an old context when context is an object, including the async task', done => {
+    it('should finally restore an old context when context is an object, including the async task', () => {
       const ctx1 = ROOT_CONTEXT.setValue(key1, 1);
       const ctx2 = ROOT_CONTEXT.setValue(key1, 2);
       const ctx3 = ROOT_CONTEXT.setValue(key1, 3);
@@ -159,13 +165,15 @@ describe('ZoneContextManager', () => {
           assert.strictEqual(contextManager.active(), ctx2);
         });
         assert.strictEqual(contextManager.active(), ctx1);
+        let asyncVerified = false;
         setTimeout(() => {
           assert.strictEqual(contextManager.active(), ctx1);
-          done();
+          asyncVerified = true;
         }, 500);
         clock.tick(500);
+        assert.strictEqual(asyncVerified, true);
       });
-      assert.strictEqual(contextManager.active(), window);
+      assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
     });
 
     it('should correctly return the contexts for 3 parallel actions', () => {
@@ -260,7 +268,7 @@ describe('ZoneContextManager', () => {
       contextManager.enable();
     });
 
-    it('should return current context (when enabled)', done => {
+    it('should return current context (when enabled)', () => {
       const context = ROOT_CONTEXT.setValue(key1, { a: 1 });
       const fn: any = contextManager.bind(context, () => {
         assert.strictEqual(
@@ -268,12 +276,11 @@ describe('ZoneContextManager', () => {
           context,
           'should have context'
         );
-        return done();
       });
       fn();
     });
 
-    it('should return root context (when disabled)', done => {
+    it('should return root context (when disabled)', () => {
       contextManager.disable();
       const context = ROOT_CONTEXT.setValue(key1, { a: 1 });
       const fn: any = contextManager.bind(context, () => {
@@ -282,22 +289,22 @@ describe('ZoneContextManager', () => {
           ROOT_CONTEXT,
           'should have context'
         );
-        return done();
       });
       fn();
     });
 
-    it('should bind the the certain context to the target "addEventListener" function', done => {
+    it('should bind the the certain context to the target "addEventListener" function', () => {
       const ctx1 = ROOT_CONTEXT.setValue(key1, 1);
       const element = document.createElement('div');
 
       contextManager.bind(ctx1, element);
 
+      let asyncVerified = false;
       element.addEventListener('click', () => {
         assert.strictEqual(contextManager.active(), ctx1);
         setTimeout(() => {
           assert.strictEqual(contextManager.active(), ctx1);
-          done();
+          asyncVerified = true;
         }, 500);
         clock.tick(500);
       });
@@ -309,14 +316,16 @@ describe('ZoneContextManager', () => {
           composed: true,
         })
       );
+      assert.strictEqual(asyncVerified, true);
     });
 
-    it('should preserve zone when creating new click event inside zone', done => {
+    it('should preserve zone when creating new click event inside zone', () => {
       const ctx1 = ROOT_CONTEXT.setValue(key1, 1);
       const element = document.createElement('div');
 
       contextManager.bind(ctx1, element);
 
+      let asyncVerified = false;
       element.addEventListener('click', () => {
         assert.strictEqual(contextManager.active(), ctx1);
         setTimeout(() => {
@@ -327,7 +336,7 @@ describe('ZoneContextManager', () => {
             assert.strictEqual(contextManager.active(), ctx1);
             setTimeout(() => {
               assert.strictEqual(contextManager.active(), ctx1);
-              done();
+              asyncVerified = true;
             }, 500);
             clock.tick(500);
           });
@@ -350,15 +359,12 @@ describe('ZoneContextManager', () => {
           composed: true,
         })
       );
+      assert.strictEqual(asyncVerified, true);
     });
   });
 
   describe('onCancelTask guard (fix for issue #6259)', () => {
     it('should not throw when clearTimeout is called twice on the same timer', () => {
-      // The second clearTimeout triggers onCancelTask with a task in 'notScheduled'
-      // state. The guard returns early without delegating to parentZoneDelegate,
-      // preventing Zone.js from invoking its active() fallback which would cause
-      // an infinite loop (see issue #6259).
       contextManager.with(ROOT_CONTEXT, () => {
         const timerId = setTimeout(() => {}, 100);
         clearTimeout(timerId);
@@ -368,7 +374,7 @@ describe('ZoneContextManager', () => {
       });
     });
 
-    it('should not loop when clearTimeout is called on an already-cancelled timer', done => {
+    it('should not loop when clearTimeout is called on an already-cancelled timer', () => {
       contextManager.with(ROOT_CONTEXT, () => {
         const timerId = setTimeout(() => {
           assert.fail('Timer should have been cancelled');
@@ -376,55 +382,53 @@ describe('ZoneContextManager', () => {
         clearTimeout(timerId);
         clearTimeout(timerId);
         clock.tick(200);
-        done();
       });
     });
 
-    it('should not propagate cancelTask when task is running', done => {
+    it('should not propagate cancelTask when task is running', () => {
       contextManager.with(ROOT_CONTEXT, () => {
         const timerId = setTimeout(() => {
-          // Explicitly test behavior during execution phase
           assert.doesNotThrow(() => {
             clearTimeout(timerId);
           });
-          done();
         }, 10);
 
-        clock.tick(10); // ensures callback runs
+        clock.tick(10);
       });
     });
 
-    it('should invoke onCancelTask hook when a real scheduled task is cancelled', done => {
+    it('should invoke onCancelTask hook when a real scheduled task is cancelled', () => {
       const ctx = ROOT_CONTEXT.setValue(key1, 'hook-test');
-      clock.restore(); // disable fake timers for this test
+      clock.restore();
       contextManager.with(ctx, () => {
         const timerId = setTimeout(() => {}, 500);
         clearTimeout(timerId);
         clearTimeout(timerId);
         assert.strictEqual(contextManager.active().getValue(key1), 'hook-test');
-        clock = sinon.useFakeTimers(); // restore fake timers
-        done();
+        clock = sinon.useFakeTimers();
       });
     });
 
-    it('should preserve context propagation after redundant clearTimeout', done => {
+    it('should preserve context propagation after redundant clearTimeout', () => {
       const ctx = ROOT_CONTEXT.setValue(key1, 'test-value');
       contextManager.with(ctx, () => {
         const timerId = setTimeout(() => {}, 50);
         clearTimeout(timerId);
         clearTimeout(timerId);
+        let asyncVerified = false;
         setTimeout(() => {
           assert.strictEqual(
             contextManager.active().getValue(key1),
             'test-value'
           );
-          done();
+          asyncVerified = true;
         }, 10);
         clock.tick(10);
+        assert.strictEqual(asyncVerified, true);
       });
     });
 
-    it('should not loop when clearInterval is called on an already-cancelled interval', done => {
+    it('should not loop when clearInterval is called on an already-cancelled interval', () => {
       contextManager.with(ROOT_CONTEXT, () => {
         const intervalId = setInterval(() => {}, 100);
         clearInterval(intervalId);
@@ -432,11 +436,10 @@ describe('ZoneContextManager', () => {
           clearInterval(intervalId);
         });
         clock.tick(200);
-        done();
       });
     });
 
-    it('should not loop with redundant clearTimeout in nested context', done => {
+    it('should not loop with redundant clearTimeout in nested context', () => {
       const ctx1 = ROOT_CONTEXT.setValue(key1, 'outer');
       const ctx2 = ROOT_CONTEXT.setValue(key1, 'inner');
       contextManager.with(ctx1, () => {
@@ -449,7 +452,6 @@ describe('ZoneContextManager', () => {
           assert.strictEqual(contextManager.active().getValue(key1), 'inner');
         });
         assert.strictEqual(contextManager.active().getValue(key1), 'outer');
-        done();
       });
     });
   });

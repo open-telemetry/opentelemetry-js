@@ -19,7 +19,7 @@ import type { SamplingStrategyResponse } from '../src/types';
 import { StrategyType } from '../src/types';
 import { PerOperationSampler } from '../src/PerOperationSampler';
 import { randomSamplingProability } from './utils';
-import * as axios from 'axios';
+import axios from 'axios';
 
 describe('JaegerRemoteSampler', () => {
   const endpoint = 'http://localhost:5778';

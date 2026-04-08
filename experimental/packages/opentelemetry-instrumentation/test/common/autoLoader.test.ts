@@ -82,7 +82,9 @@ describe('autoLoader', function () {
       });
 
       afterEach(() => {
-        Object.keys(require.cache).forEach(key => delete require.cache[key]);
+        if (typeof require !== 'undefined' && require.cache) {
+          Object.keys(require.cache).forEach(key => delete require.cache[key]);
+        }
         if (typeof unload === 'function') {
           unload();
           unload = undefined;

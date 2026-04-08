@@ -6,6 +6,7 @@
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import type { IExporterTransport } from '../../src';
+import type { ExportResult } from '@opentelemetry/core';
 import { ExportResultCode } from '@opentelemetry/core';
 import { createOtlpExportDelegate } from '../../src/otlp-export-delegate';
 import type { ExportResponse } from '../../src';
@@ -122,7 +123,7 @@ describe('OTLPExportDelegate', function () {
       sinon.restore();
     });
 
-    it('fails if serializer returns undefined', function (done) {
+    it('fails if serializer returns undefined', async function () {
       // transport does not need to do anything in this case.
       const transportStubs = {
         send: sinon.stub(),
@@ -155,15 +156,11 @@ describe('OTLPExportDelegate', function () {
         }
       );
 
-      exporter.export(internalRepresentation, result => {
-        try {
-          assert.strictEqual(result.code, ExportResultCode.FAILED);
-          assert.ok(result.error);
-        } catch (err) {
-          // ensures we throw if there are more calls to result;
-          done(err);
-        }
+      const result = await new Promise<ExportResult>(resolve => {
+        exporter.export(internalRepresentation, resolve);
       });
+      assert.strictEqual(result.code, ExportResultCode.FAILED);
+      assert.ok(result.error);
 
       sinon.assert.calledOnceWithExactly(
         serializerStubs.serializeRequest,
@@ -174,10 +171,9 @@ describe('OTLPExportDelegate', function () {
       sinon.assert.notCalled(promiseHandlerStubs.pushPromise);
       sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
       sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
-      done();
     });
 
-    it('fails if promise queue is full', function (done) {
+    it('fails if promise queue is full', async function () {
       // transport does not need to do anything in this case.
       const transportStubs = {
         send: sinon.stub(),
@@ -211,15 +207,11 @@ describe('OTLPExportDelegate', function () {
         }
       );
 
-      exporter.export(internalRepresentation, result => {
-        try {
-          assert.strictEqual(result.code, ExportResultCode.FAILED);
-          assert.ok(result.error);
-        } catch (err) {
-          // ensures we throw if there are more calls to result;
-          done(err);
-        }
+      const result = await new Promise<ExportResult>(resolve => {
+        exporter.export(internalRepresentation, resolve);
       });
+      assert.strictEqual(result.code, ExportResultCode.FAILED);
+      assert.ok(result.error);
 
       sinon.assert.notCalled(serializerStubs.serializeRequest);
       sinon.assert.notCalled(serializerStubs.deserializeResponse);
@@ -227,10 +219,9 @@ describe('OTLPExportDelegate', function () {
       sinon.assert.notCalled(promiseHandlerStubs.pushPromise);
       sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
       sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
-      done();
     });
 
-    it('returns success if send promise resolves with success', function (done) {
+    it('returns success if send promise resolves with success', async function () {
       const exportResponse: ExportResponse = {
         data: Uint8Array.from([]),
         status: 'success',
@@ -269,26 +260,23 @@ describe('OTLPExportDelegate', function () {
         }
       );
 
-      exporter.export(internalRepresentation, result => {
-        try {
-          assert.strictEqual(result.code, ExportResultCode.SUCCESS);
-          assert.strictEqual(result.error, undefined);
-
-          // assert here as otherwise the promise will not have executed yet
-          sinon.assert.calledOnce(serializerStubs.serializeRequest);
-          sinon.assert.calledOnce(transportStubs.send);
-          sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
-          sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
-          sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
-          done();
-        } catch (err) {
-          // ensures we throw if there are more calls to result;
-          done(err);
-        }
+      const result = await new Promise<ExportResult>(resolve => {
+        exporter.export(internalRepresentation, resolve);
       });
+      {
+        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+        assert.strictEqual(result.error, undefined);
+
+        // assert here as otherwise the promise will not have executed yet
+        sinon.assert.calledOnce(serializerStubs.serializeRequest);
+        sinon.assert.calledOnce(transportStubs.send);
+        sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
+        sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
+        sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
+      }
     });
 
-    it('returns failure if send promise resolves with failure', function (done) {
+    it('returns failure if send promise resolves with failure', async function () {
       const exportResponse: ExportResponse = {
         status: 'failure',
         error: new Error('failure'),
@@ -327,26 +315,23 @@ describe('OTLPExportDelegate', function () {
         }
       );
 
-      exporter.export(internalRepresentation, result => {
-        try {
-          assert.strictEqual(result.code, ExportResultCode.FAILED);
-          assert.strictEqual(result.error, exportResponse.error);
-
-          // assert here as otherwise the promise will not have executed yet
-          sinon.assert.calledOnce(serializerStubs.serializeRequest);
-          sinon.assert.calledOnce(transportStubs.send);
-          sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
-          sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
-          sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
-          done();
-        } catch (err) {
-          // ensures we throw if there are more calls to result;
-          done(err);
-        }
+      const result = await new Promise<ExportResult>(resolve => {
+        exporter.export(internalRepresentation, resolve);
       });
+      {
+        assert.strictEqual(result.code, ExportResultCode.FAILED);
+        assert.strictEqual(result.error, exportResponse.error);
+
+        // assert here as otherwise the promise will not have executed yet
+        sinon.assert.calledOnce(serializerStubs.serializeRequest);
+        sinon.assert.calledOnce(transportStubs.send);
+        sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
+        sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
+        sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
+      }
     });
 
-    it('returns unknown failure if send promise resolves with failure but no error', function (done) {
+    it('returns unknown failure if send promise resolves with failure but no error', async function () {
       const exportResponse: ExportResponse = {
         status: 'failure',
         error: undefined as any,
@@ -385,29 +370,26 @@ describe('OTLPExportDelegate', function () {
         }
       );
 
-      exporter.export(internalRepresentation, result => {
-        try {
-          assert.strictEqual(result.code, ExportResultCode.FAILED);
-          assert.strictEqual(
-            result.error?.message,
-            'Export failed with unknown error'
-          );
-
-          // assert here as otherwise the promise will not have executed yet
-          sinon.assert.calledOnce(serializerStubs.serializeRequest);
-          sinon.assert.calledOnce(transportStubs.send);
-          sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
-          sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
-          sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
-          done();
-        } catch (err) {
-          // ensures we throw if there are more calls to result;
-          done(err);
-        }
+      const result = await new Promise<ExportResult>(resolve => {
+        exporter.export(internalRepresentation, resolve);
       });
+      {
+        assert.strictEqual(result.code, ExportResultCode.FAILED);
+        assert.strictEqual(
+          result.error?.message,
+          'Export failed with unknown error'
+        );
+
+        // assert here as otherwise the promise will not have executed yet
+        sinon.assert.calledOnce(serializerStubs.serializeRequest);
+        sinon.assert.calledOnce(transportStubs.send);
+        sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
+        sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
+        sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
+      }
     });
 
-    it('returns failure if send promise resolves with retryable', function (done) {
+    it('returns failure if send promise resolves with retryable', async function () {
       const exportResponse: ExportResponse = {
         status: 'retryable',
       };
@@ -445,29 +427,26 @@ describe('OTLPExportDelegate', function () {
         }
       );
 
-      exporter.export(internalRepresentation, result => {
-        try {
-          assert.strictEqual(result.code, ExportResultCode.FAILED);
-          assert.strictEqual(
-            result.error?.message,
-            'Export failed with retryable status'
-          );
-
-          // assert here as otherwise the promise will not have executed yet
-          sinon.assert.calledOnce(serializerStubs.serializeRequest);
-          sinon.assert.calledOnce(transportStubs.send);
-          sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
-          sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
-          sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
-          done();
-        } catch (err) {
-          // ensures we throw if there are more calls to result;
-          done(err);
-        }
+      const result = await new Promise<ExportResult>(resolve => {
+        exporter.export(internalRepresentation, resolve);
       });
+      {
+        assert.strictEqual(result.code, ExportResultCode.FAILED);
+        assert.strictEqual(
+          result.error?.message,
+          'Export failed with retryable status'
+        );
+
+        // assert here as otherwise the promise will not have executed yet
+        sinon.assert.calledOnce(serializerStubs.serializeRequest);
+        sinon.assert.calledOnce(transportStubs.send);
+        sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
+        sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
+        sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
+      }
     });
 
-    it('returns success if response is returned', function (done) {
+    it('returns success if response is returned', async function () {
       // returns full success response (empty body)
       const exportResponse: ExportResponse = {
         data: Uint8Array.from([]),
@@ -510,26 +489,23 @@ describe('OTLPExportDelegate', function () {
         }
       );
 
-      exporter.export(internalRepresentation, result => {
-        try {
-          assert.strictEqual(result.code, ExportResultCode.SUCCESS);
-          assert.strictEqual(result.error, undefined);
-
-          // assert here as otherwise the promise will not have executed yet
-          sinon.assert.calledOnce(serializerStubs.serializeRequest);
-          sinon.assert.calledOnce(transportStubs.send);
-          sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
-          sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
-          sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
-          done();
-        } catch (err) {
-          // ensures we throw if there are more calls to result;
-          done(err);
-        }
+      const result = await new Promise<ExportResult>(resolve => {
+        exporter.export(internalRepresentation, resolve);
       });
+      {
+        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+        assert.strictEqual(result.error, undefined);
+
+        // assert here as otherwise the promise will not have executed yet
+        sinon.assert.calledOnce(serializerStubs.serializeRequest);
+        sinon.assert.calledOnce(transportStubs.send);
+        sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
+        sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
+        sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
+      }
     });
 
-    it('returns success even if response cannot be deserialized', function (done) {
+    it('returns success even if response cannot be deserialized', async function () {
       const { warn } = registerMockDiagLogger();
       // returns mock success response (empty body)
       const exportResponse: ExportResponse = {
@@ -571,33 +547,30 @@ describe('OTLPExportDelegate', function () {
         }
       );
 
-      exporter.export(internalRepresentation, result => {
-        try {
-          assert.strictEqual(result.code, ExportResultCode.SUCCESS);
-          assert.strictEqual(result.error, undefined);
-
-          // assert here as otherwise the promise will not have executed yet
-          sinon.assert.calledOnceWithMatch(
-            warn,
-            'OTLPExportDelegate',
-            'Export succeeded but could not deserialize response - is the response specification compliant?',
-            sinon.match.instanceOf(Error),
-            exportResponse.data
-          );
-          sinon.assert.calledOnce(serializerStubs.serializeRequest);
-          sinon.assert.calledOnce(transportStubs.send);
-          sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
-          sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
-          sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
-          done();
-        } catch (err) {
-          // ensures we throw if there are more calls to result;
-          done(err);
-        }
+      const result = await new Promise<ExportResult>(resolve => {
+        exporter.export(internalRepresentation, resolve);
       });
+      {
+        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+        assert.strictEqual(result.error, undefined);
+
+        // assert here as otherwise the promise will not have executed yet
+        sinon.assert.calledOnceWithMatch(
+          warn,
+          'OTLPExportDelegate',
+          'Export succeeded but could not deserialize response - is the response specification compliant?',
+          sinon.match.instanceOf(Error),
+          exportResponse.data
+        );
+        sinon.assert.calledOnce(serializerStubs.serializeRequest);
+        sinon.assert.calledOnce(transportStubs.send);
+        sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
+        sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
+        sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
+      }
     });
 
-    it('returns success and warns on partial success response', function (done) {
+    it('returns success and warns on partial success response', async function () {
       const { warn } = registerMockDiagLogger();
       // returns mock success response (empty body)
       const exportResponse: ExportResponse = {
@@ -643,31 +616,28 @@ describe('OTLPExportDelegate', function () {
         }
       );
 
-      exporter.export(internalRepresentation, result => {
-        try {
-          assert.strictEqual(result.code, ExportResultCode.SUCCESS);
-          assert.strictEqual(result.error, undefined);
-
-          // assert here as otherwise the promise will not have executed yet
-          sinon.assert.calledOnceWithMatch(
-            warn,
-            'Received Partial Success response:',
-            JSON.stringify(partialSuccessResponse.partialSuccess)
-          );
-          sinon.assert.calledOnce(serializerStubs.serializeRequest);
-          sinon.assert.calledOnce(transportStubs.send);
-          sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
-          sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
-          sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
-          done();
-        } catch (err) {
-          // ensures we throw if there are more calls to result;
-          done(err);
-        }
+      const result = await new Promise<ExportResult>(resolve => {
+        exporter.export(internalRepresentation, resolve);
       });
+      {
+        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+        assert.strictEqual(result.error, undefined);
+
+        // assert here as otherwise the promise will not have executed yet
+        sinon.assert.calledOnceWithMatch(
+          warn,
+          'Received Partial Success response:',
+          JSON.stringify(partialSuccessResponse.partialSuccess)
+        );
+        sinon.assert.calledOnce(serializerStubs.serializeRequest);
+        sinon.assert.calledOnce(transportStubs.send);
+        sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
+        sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
+        sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
+      }
     });
 
-    it('returns failure when send rejects', function (done) {
+    it('returns failure when send rejects', async function () {
       const transportStubs = {
         // make transport reject
         send: sinon.stub().returns(Promise.reject(new Error())),
@@ -702,24 +672,21 @@ describe('OTLPExportDelegate', function () {
         }
       );
 
-      exporter.export(internalRepresentation, result => {
-        try {
-          assert.strictEqual(result.code, ExportResultCode.FAILED);
-          assert.ok(result.error);
-
-          // assert here as otherwise the promise will not have executed yet
-          sinon.assert.calledOnce(serializerStubs.serializeRequest);
-          sinon.assert.notCalled(serializerStubs.deserializeResponse);
-          sinon.assert.calledOnce(transportStubs.send);
-          sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
-          sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
-          sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
-          done();
-        } catch (err) {
-          // ensures we throw if there are more calls to result;
-          done(err);
-        }
+      const result = await new Promise<ExportResult>(resolve => {
+        exporter.export(internalRepresentation, resolve);
       });
+      {
+        assert.strictEqual(result.code, ExportResultCode.FAILED);
+        assert.ok(result.error);
+
+        // assert here as otherwise the promise will not have executed yet
+        sinon.assert.calledOnce(serializerStubs.serializeRequest);
+        sinon.assert.notCalled(serializerStubs.deserializeResponse);
+        sinon.assert.calledOnce(transportStubs.send);
+        sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
+        sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
+        sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
+      }
     });
   });
 });

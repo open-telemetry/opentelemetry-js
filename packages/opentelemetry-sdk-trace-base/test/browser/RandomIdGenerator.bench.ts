@@ -9,27 +9,29 @@ import { RandomIdGenerator } from '../../src/platform';
 const idGenerator = new RandomIdGenerator();
 
 describe('RandomIdGenerator benchmark (browser)', function () {
-  this.timeout(60000);
-
-  it('generateTraceId (browser)', done => {
-    const suite = new Benchmark.Suite();
-    suite
-      .add('generateTraceId (browser)', () => idGenerator.generateTraceId())
-      .on('cycle', (event: Benchmark.Event) =>
-        console.log(String(event.target))
-      )
-      .on('complete', () => done())
-      .run({ async: true });
+  it('generateTraceId (browser)', async () => {
+    await new Promise<void>(resolve => {
+      const suite = new Benchmark.Suite();
+      suite
+        .add('generateTraceId (browser)', () => idGenerator.generateTraceId())
+        .on('cycle', (event: Benchmark.Event) =>
+          console.log(String(event.target))
+        )
+        .on('complete', () => resolve())
+        .run({ async: true });
+    });
   });
 
-  it('generateSpanId (browser)', done => {
-    const suite = new Benchmark.Suite();
-    suite
-      .add('generateSpanId (browser)', () => idGenerator.generateSpanId())
-      .on('cycle', (event: Benchmark.Event) =>
-        console.log(String(event.target))
-      )
-      .on('complete', () => done())
-      .run({ async: true });
+  it('generateSpanId (browser)', async () => {
+    await new Promise<void>(resolve => {
+      const suite = new Benchmark.Suite();
+      suite
+        .add('generateSpanId (browser)', () => idGenerator.generateSpanId())
+        .on('cycle', (event: Benchmark.Event) =>
+          console.log(String(event.target))
+        )
+        .on('complete', () => resolve())
+        .run({ async: true });
+    });
   });
 });

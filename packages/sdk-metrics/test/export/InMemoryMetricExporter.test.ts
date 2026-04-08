@@ -56,31 +56,29 @@ describe('InMemoryMetricExporter', () => {
     await metricReader.shutdown();
   });
 
-  it('should return failed result code', done => {
-    exporter.shutdown().then(() => {
-      const resource = resourceFromAttributes({
-        'resource-attribute': 'resource attribute value',
-      });
-      const resourceMetrics: ResourceMetrics = {
-        resource: resource,
-        scopeMetrics: [
-          {
-            scope: {
-              name: 'mylib',
-              version: '0.1.0',
-              schemaUrl: 'http://url.to.schema',
-            },
-            metrics: [],
-          },
-        ],
-      };
-      exporter.export(resourceMetrics, result => {
-        assert.ok(result.code === ExportResultCode.FAILED);
-        metricReader.shutdown().then(() => {
-          done();
-        });
-      });
+  it('should return failed result code', async () => {
+    await exporter.shutdown();
+    const resource = resourceFromAttributes({
+      'resource-attribute': 'resource attribute value',
     });
+    const resourceMetrics: ResourceMetrics = {
+      resource: resource,
+      scopeMetrics: [
+        {
+          scope: {
+            name: 'mylib',
+            version: '0.1.0',
+            schemaUrl: 'http://url.to.schema',
+          },
+          metrics: [],
+        },
+      ],
+    };
+    const result = await new Promise<{ code: ExportResultCode }>(resolve => {
+      exporter.export(resourceMetrics, resolve);
+    });
+    assert.ok(result.code === ExportResultCode.FAILED);
+    await metricReader.shutdown();
   });
 
   it('should reset metrics when reset is called', async () => {
