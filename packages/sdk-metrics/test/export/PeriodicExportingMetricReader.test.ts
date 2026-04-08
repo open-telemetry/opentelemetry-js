@@ -250,7 +250,7 @@ describe('PeriodicExportingMetricReader', () => {
     });
   });
 
-  describe.only('cardinalityLimits', () => {
+  describe('cardinalityLimits', () => {
     it('should use default the cardinality limit value if not specified', () => {
       const exporter = new TestDeltaMetricExporter();
 
