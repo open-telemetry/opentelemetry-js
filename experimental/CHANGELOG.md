@@ -23,6 +23,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :bug: Bug Fixes
 
 * fix(instrumentation-fetch): preserve init overrides when input is a Request object [#6421](https://github.com/open-telemetry/opentelemetry-js/issues/6421) @akandic47
+* fix(otlp-exporter-base): limit Node.js HTTP transport response body to 4 MiB [#6552](https://github.com/open-telemetry/opentelemetry-js/pull/6552) @kartikgola
 
 ### :books: Documentation
 
@@ -34,6 +35,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * feat(configuration)!: rename OTEL_EXPERIMENTAL_CONFIG_FILE to OTEL_CONFIG_FILE [#6486](https://github.com/open-telemetry/opentelemetry-js/pull/6486) @maryliag
 * refactor!(otlp-grpc-exporter-base): remove `headers` from gRPC exporter config type, passing headers now results in a compile-time error instead of being silently ignored [#6487](https://github.com/open-telemetry/opentelemetry-js/pull/6487)
+* feat(api-logs)!: use LogAttributes for LoggerOptions#scopeAttributes [#6354](https://github.com/open-telemetry/opentelemetry-js/pull/6354) @AnubhavPurohit691
+  * `LoggerOptions#scopeAttributes` type changed from `Attributes` (trace API) to `LogAttributes` (logs API) for consistency.
 
 ### :rocket: Features
 
