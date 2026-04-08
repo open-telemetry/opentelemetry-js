@@ -267,7 +267,7 @@ describe('PeriodicExportingMetricReader', () => {
       },
     ] as const;
 
-    it('should use default the cardinality limit value if not specified', () => {
+    it('should use default cardinality limit value if not specified', () => {
       const exporter = new TestDeltaMetricExporter();
 
       const p = new PeriodicExportingMetricReader({
@@ -324,6 +324,7 @@ describe('PeriodicExportingMetricReader', () => {
         assert.strictEqual(p.selectCardinalityLimit(instrument), defaultLimit);
       });
     });
+
     it('should use the provided values for a given instrument type, or fallback to the default value otherwise', () => {
       const exporter = new TestDeltaMetricExporter();
 
@@ -333,8 +334,8 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 1,
         cardinalityLimits: {
           counter: 1000,
-          histogram: 1000,
-          observableCounter: 1000,
+          histogram: 3000,
+          observableCounter: 4000,
         },
       });
 
@@ -344,11 +345,11 @@ describe('PeriodicExportingMetricReader', () => {
       );
       assert.strictEqual(
         p.selectCardinalityLimit(InstrumentType.HISTOGRAM),
-        1000
+        3000
       );
       assert.strictEqual(
         p.selectCardinalityLimit(InstrumentType.OBSERVABLE_COUNTER),
-        1000
+        4000
       );
       assert.strictEqual(p.selectCardinalityLimit(InstrumentType.GAUGE), 2000);
       assert.strictEqual(
@@ -364,6 +365,7 @@ describe('PeriodicExportingMetricReader', () => {
         2000
       );
     });
+
     it("should fallback to the default value if the specified cardinality selector doesn't exists", () => {
       const exporter = new TestDeltaMetricExporter();
       const defaultLimit = 1;
