@@ -122,7 +122,6 @@ function serializeScopeLogs(
     writer.writeString(scope.version);
   }
 
-  // Write scope attributes directly
   if (scope.attributes) {
     // attributes (field 3, repeated KeyValue)
     writeAttributes(writer, scope.attributes, 3);

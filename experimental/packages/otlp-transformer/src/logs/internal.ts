@@ -16,11 +16,9 @@ import {
   createInstrumentationScope,
   createResource,
   toAnyValue,
-  toKeyValue,
+  toAttributes,
 } from '../common/internal';
 import type { SeverityNumber } from '@opentelemetry/api-logs';
-import type { IKeyValue } from '../common/internal-types';
-import type { LogAttributes } from '@opentelemetry/api-logs';
 
 export function createExportLogsServiceRequest(
   logRecords: ReadableLogRecord[],
@@ -93,7 +91,7 @@ function toLogRecord(log: ReadableLogRecord, encoder: Encoder): ILogRecord {
     severityText: log.severityText,
     body: toAnyValue(log.body, encoder),
     eventName: log.eventName,
-    attributes: toLogAttributes(log.attributes, encoder),
+    attributes: toAttributes(log.attributes, encoder),
     droppedAttributesCount: log.droppedAttributesCount,
     flags: log.spanContext?.traceFlags,
     traceId: encoder.encodeOptionalSpanContext(log.spanContext?.traceId),
@@ -105,13 +103,4 @@ function toSeverityNumber(
   severityNumber: SeverityNumber | undefined
 ): ESeverityNumber | undefined {
   return severityNumber as number | undefined as ESeverityNumber | undefined;
-}
-
-export function toLogAttributes(
-  attributes: LogAttributes,
-  encoder: Encoder
-): IKeyValue[] {
-  return Object.keys(attributes).map(key =>
-    toKeyValue(key, attributes[key], encoder)
-  );
 }
