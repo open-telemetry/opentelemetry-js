@@ -121,14 +121,15 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
       descriptor,
       aggregationTemporality,
       dataPointType: DataPointType.SUM,
-      dataPoints: accumulationByAttributes.map(([attributes, accumulation]) => {
-        return {
+      dataPoints: accumulationByAttributes.map(
+        ([attributes, accumulation, exemplars]) => ({
           attributes,
           startTime: accumulation.startTime,
           endTime,
           value: accumulation.toPointValue(),
-        };
-      }),
+          exemplars,
+        })
+      ),
       isMonotonic: this.monotonic,
     };
   }

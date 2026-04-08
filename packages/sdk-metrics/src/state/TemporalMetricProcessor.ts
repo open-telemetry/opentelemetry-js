@@ -15,6 +15,7 @@ import { AggregationTemporality } from '../export/AggregationTemporality';
 import type { Maybe } from '../utils';
 import type { MetricCollectorHandle } from './MetricCollector';
 import { AttributeHashMap } from './HashMap';
+import type { Exemplar } from '../exemplar/Exemplar';
 
 /**
  * Remembers what was presented to a specific exporter.
@@ -74,7 +75,8 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
     collector: MetricCollectorHandle,
     instrumentDescriptor: InstrumentDescriptor,
     currentAccumulations: AttributeHashMap<T>,
-    collectionTime: HrTime
+    collectionTime: HrTime,
+    exemplars?: AttributeHashMap<Exemplar[]>
   ): Maybe<MetricData> {
     this._stashAccumulations(currentAccumulations);
     const unreportedAccumulations =
@@ -130,7 +132,10 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
       aggregationTemporality,
     });
 
-    const accumulationRecords = AttributesMapToAccumulationRecords(result);
+    const accumulationRecords = AttributesMapToAccumulationRecords(
+      result,
+      exemplars
+    );
 
     // do not convert to metric data if there is nothing to convert.
     if (accumulationRecords.length === 0) {
@@ -214,7 +219,15 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
 
 // TypeScript complains about converting 3 elements tuple to AccumulationRecord<T>.
 function AttributesMapToAccumulationRecords<T>(
-  map: AttributeHashMap<T>
+  map: AttributeHashMap<T>,
+  exemplars?: AttributeHashMap<Exemplar[]>
 ): AccumulationRecord<T>[] {
+  if (exemplars) {
+    return Array.from(map.entries()).map(
+      ([attributes, accumulation, hashCode]) => {
+        return [attributes, accumulation, exemplars.get(attributes, hashCode)];
+      }
+    ) as AccumulationRecord<T>[];
+  }
   return Array.from(map.entries()) as unknown as AccumulationRecord<T>[];
 }
