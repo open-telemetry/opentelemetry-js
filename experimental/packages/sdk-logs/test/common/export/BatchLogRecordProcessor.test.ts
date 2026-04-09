@@ -11,6 +11,7 @@ import {
   loggingErrorHandler,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 
 import type {
   BufferConfig,
@@ -27,6 +28,7 @@ import {
   resourceFromAttributes,
 } from '@opentelemetry/resources';
 import { LogRecordImpl } from '../../../src/LogRecordImpl';
+import { TestMetricReader, withResolvers } from '../utils';
 
 class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BufferConfig> {
   onShutdown() {}
@@ -622,6 +624,211 @@ describe('BatchLogRecordProcessorBase', () => {
       await new Promise(resolve => setTimeout(resolve, 0));
       assert.equal(callbacks.length, 2);
       assert.equal(logRecords.length, 10);
+    });
+  });
+
+  describe('Metrics', () => {
+    it('should record metrics', async () => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+      const processor = new BatchLogRecordProcessor(exporter, {
+        maxQueueSize: 1,
+        maxExportBatchSize: 1,
+        scheduledDelayMillis: 1_000_000_000, // Manually flush
+        meterProvider,
+      });
+
+      const exportStub = sinon.stub(exporter, 'export');
+
+      const { resolve: resolveExport1, promise: export1Promise } =
+        withResolvers<ExportResult>();
+      const { resolve: resolveExport2, promise: export2Promise } =
+        withResolvers<ExportResult>();
+
+      // Signal for when export has started
+      const { resolve: resolveFirstExport, promise: firstExportPromise } =
+        withResolvers<void>();
+
+      exportStub
+        .onFirstCall()
+        .callsFake((_logs, resultCallback: (result: ExportResult) => void) => {
+          resolveFirstExport();
+          export1Promise.then(result => resultCallback(result));
+        })
+        .onSecondCall()
+        .callsFake((_logs, resultCallback: (result: ExportResult) => void) => {
+          export2Promise.then(result => resultCallback(result));
+        });
+
+      const log1 = createLogRecord();
+      // Immediately processed
+      processor.onEmit(log1);
+
+      // Wait for log to be sent to exporter.
+      await firstExportPromise;
+
+      // Queue empty, export in progress, this log is queued.
+      const log2 = createLogRecord();
+      processor.onEmit(log2);
+
+      // Queue full, this log is dropped.
+      const log3 = createLogRecord();
+      processor.onEmit(log3);
+
+      let { resourceMetrics } = await metricReader.collect();
+      let scopeMetrics = resourceMetrics.scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/sdk-logs'
+      );
+      assert.ok(scopeMetrics);
+      let processedLogsMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.log.processed'
+      );
+      assert.ok(processedLogsMetric);
+      assert.strictEqual(processedLogsMetric.dataPoints[0].value, 1);
+      assert.strictEqual(
+        processedLogsMetric.dataPoints[0].attributes['otel.component.type'],
+        'batching_log_processor'
+      );
+      assert.ok(
+        processedLogsMetric.dataPoints[0].attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_log_processor/')
+      );
+      assert.strictEqual(
+        processedLogsMetric.dataPoints[0].attributes['error.type'],
+        'queue_full'
+      );
+      let logCapacityMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.log.queue.capacity'
+      );
+      assert.ok(logCapacityMetric);
+      assert.strictEqual(logCapacityMetric.dataPoints[0].value, 1);
+      assert.strictEqual(
+        logCapacityMetric.dataPoints[0].attributes['otel.component.type'],
+        'batching_log_processor'
+      );
+      assert.ok(
+        logCapacityMetric.dataPoints[0].attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_log_processor/')
+      );
+      assert.strictEqual(logCapacityMetric.dataPoints[0].value, 1);
+      let logQueueSizeMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.log.queue.size'
+      );
+      assert.ok(logQueueSizeMetric);
+      assert.strictEqual(logQueueSizeMetric.dataPoints[0].value, 1);
+      assert.strictEqual(
+        logQueueSizeMetric.dataPoints[0].attributes['otel.component.type'],
+        'batching_log_processor'
+      );
+      assert.ok(
+        logQueueSizeMetric.dataPoints[0].attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_log_processor/')
+      );
+      sinon.assert.calledOnce(exportStub);
+
+      resolveExport1({ code: ExportResultCode.SUCCESS });
+      const error = new Error('Export failed');
+      error.name = 'BackendError';
+      resolveExport2({
+        code: ExportResultCode.FAILED,
+        error,
+      });
+
+      await processor.forceFlush();
+      sinon.assert.calledTwice(exportStub);
+
+      ({ resourceMetrics } = await metricReader.collect());
+      scopeMetrics = resourceMetrics.scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/sdk-logs'
+      );
+      assert.ok(scopeMetrics);
+
+      processedLogsMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.log.processed'
+      );
+      assert.ok(processedLogsMetric);
+      const processedLogsDataPoints = processedLogsMetric.dataPoints as Array<{
+        value: number;
+        attributes: Record<string, unknown>;
+      }>;
+      const queueFullPoint = processedLogsDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] === 'queue_full'
+      );
+      assert.ok(queueFullPoint);
+      assert.strictEqual(queueFullPoint.value, 1);
+      assert.strictEqual(
+        queueFullPoint.attributes['otel.component.type'],
+        'batching_log_processor'
+      );
+      assert.ok(
+        queueFullPoint.attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_log_processor/')
+      );
+      const successPoint = processedLogsDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] === undefined
+      );
+      assert.ok(successPoint);
+      assert.strictEqual(successPoint.value, 1);
+      assert.strictEqual(
+        successPoint.attributes['otel.component.type'],
+        'batching_log_processor'
+      );
+      assert.ok(
+        successPoint.attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_log_processor/')
+      );
+      const failedPoint = processedLogsDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] === 'BackendError'
+      );
+      assert.ok(failedPoint);
+      assert.strictEqual(failedPoint.value, 1);
+      assert.strictEqual(
+        failedPoint.attributes['otel.component.type'],
+        'batching_log_processor'
+      );
+      assert.ok(
+        failedPoint.attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_log_processor/')
+      );
+
+      logCapacityMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.log.queue.capacity'
+      );
+      assert.ok(logCapacityMetric);
+      assert.strictEqual(logCapacityMetric.dataPoints[0].value, 1);
+      assert.strictEqual(
+        logCapacityMetric.dataPoints[0].attributes['otel.component.type'],
+        'batching_log_processor'
+      );
+      assert.ok(
+        logCapacityMetric.dataPoints[0].attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_log_processor/')
+      );
+      assert.strictEqual(logCapacityMetric.dataPoints[0].value, 1);
+
+      logQueueSizeMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.log.queue.size'
+      );
+      assert.ok(logQueueSizeMetric);
+      assert.strictEqual(logQueueSizeMetric.dataPoints[0].value, 0);
+      assert.strictEqual(
+        logQueueSizeMetric.dataPoints[0].attributes['otel.component.type'],
+        'batching_log_processor'
+      );
+      assert.ok(
+        logQueueSizeMetric.dataPoints[0].attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_log_processor/')
+      );
     });
   });
 });
