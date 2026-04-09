@@ -31,6 +31,9 @@ import type { BatchLogRecordProcessor } from './models/loggerProviderModel';
 import { initializeDefaultLoggerProviderConfiguration } from './models/loggerProviderModel';
 import { getGrpcTlsConfig, getHttpTlsConfig } from './utils';
 import type { ExperimentalResourceDetector } from './models/resourceModel';
+import type { EnvValues } from './EnvReader';
+import { readAllEnvVars } from './EnvReader';
+import { SamplerType } from './EnvDefinition';
 
 /**
  * EnvironmentConfigProvider provides a configuration based on environment variables.
@@ -47,10 +50,12 @@ export class EnvironmentConfigFactory implements ConfigFactory {
       this._config.log_level = logLevel;
     }
 
+    const envValues = readAllEnvVars();
+
     setResources(this._config);
     setAttributeLimits(this._config);
     setPropagators(this._config);
-    setTracerProvider(this._config);
+    setTracerProvider(this._config, envValues);
     setMeterProvider(this._config);
     setLoggerProvider(this._config);
   }
@@ -164,9 +169,9 @@ export function setPropagators(config: ConfigurationModel): void {
   }
 }
 
-export function setSampler(config: ConfigurationModel): void {
-  const sampler = getStringFromEnv('OTEL_TRACES_SAMPLER');
-  const arg = getStringFromEnv('OTEL_TRACES_SAMPLER_ARG');
+export function setSampler(config: ConfigurationModel, env: EnvValues): void {
+  const sampler = env.OTEL_TRACES_SAMPLER;
+  const arg = env.OTEL_TRACES_SAMPLER_ARG;
 
   if (!sampler || !config.tracer_provider) {
     return;
@@ -175,45 +180,48 @@ export function setSampler(config: ConfigurationModel): void {
   const ratio = arg ? parseFloat(arg) : 1.0;
 
   switch (sampler) {
-    case 'always_on':
+    case SamplerType.AlwaysOn:
       config.tracer_provider.sampler = { always_on: {} };
       break;
 
-    case 'always_off':
+    case SamplerType.AlwaysOff:
       config.tracer_provider.sampler = { always_off: {} };
       break;
 
-    case 'traceidratio':
+    case SamplerType.TraceIdRatio:
       config.tracer_provider.sampler = {
         trace_id_ratio_based: { ratio },
       };
       break;
 
-    case 'parentbased_always_on':
+    case SamplerType.ParentBasedAlwaysOn:
       config.tracer_provider.sampler = {
         parent_based: { root: { always_on: {} } },
       };
       break;
 
-    case 'parentbased_always_off':
+    case SamplerType.ParentBasedAlwaysOff:
       config.tracer_provider.sampler = {
         parent_based: { root: { always_off: {} } },
       };
       break;
 
-    case 'parentbased_traceidratio':
+    case SamplerType.ParentBasedTraceIdRatio:
       config.tracer_provider.sampler = {
         parent_based: { root: { trace_id_ratio_based: { ratio } } },
       };
       break;
 
     default:
-      diag.warn(`Unknown sampler type: ${sampler}`);
+      // readEnvVar already warns for invalid values via allowedValues
       break;
   }
 }
 
-export function setTracerProvider(config: ConfigurationModel): void {
+export function setTracerProvider(
+  config: ConfigurationModel,
+  env: EnvValues
+): void {
   const exportersType = Array.from(
     new Set(getStringListFromEnv('OTEL_TRACES_EXPORTER'))
   );
@@ -227,7 +235,7 @@ export function setTracerProvider(config: ConfigurationModel): void {
     return;
   }
   config.tracer_provider = initializeDefaultTracerProviderConfiguration();
-  setSampler(config);
+  setSampler(config, env);
 
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT'

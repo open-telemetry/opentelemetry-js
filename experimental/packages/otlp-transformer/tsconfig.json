@@ -10,6 +10,8 @@
     "src/**/*.ts",
     "src/generated/*.js",
     "src/generated/*.ts",
+    "test/generated/*.js",
+    "test/generated/*.ts",
     "test/**/*.ts"
   ],
   "references": [
