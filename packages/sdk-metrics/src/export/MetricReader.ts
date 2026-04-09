@@ -126,12 +126,6 @@ export interface IMetricReader {
    * @param options options with timeout.
    */
   forceFlush(options?: ForceFlushOptions): Promise<void>;
-
-  /**
-   * Sets the MeterProvider to use for reporting metrics for this reader.
-   * @experimental This option is experimental and is subject to breaking changes in minor releases.
-   */
-  setMeterProvider?(meterProvider: api.MeterProvider): void;
 }
 
 /**
