@@ -180,7 +180,7 @@ export abstract class MetricReader implements IMetricReader {
     this.onInitialized();
   }
 
-  setMeterProvider(meterProvider: api.MeterProvider): void {
+  _setMeterProvider(meterProvider: api.MeterProvider): void {
     const meter = meterProvider.getMeter('@opentelemetry/sdk-metrics', VERSION);
     this._metrics = new MetricReaderMetrics(this._otelComponentType, meter);
   }
