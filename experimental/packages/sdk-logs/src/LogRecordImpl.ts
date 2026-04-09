@@ -22,7 +22,7 @@ import {
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
 import type { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
-import { addAttribute, AddAttributeDecision } from './utils/attributes';
+import { addAttribute, AddAttributeDecision } from './utils/validation';
 
 export class LogRecordImpl implements ReadableLogRecord {
   readonly hrTime: api.HrTime;

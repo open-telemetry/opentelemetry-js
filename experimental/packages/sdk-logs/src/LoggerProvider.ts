@@ -18,7 +18,7 @@ import {
   getInstrumentationScopeKey,
   type LogInstrumentationScope,
 } from './internal/utils';
-import { normalizeScopeAttributes } from './utils/attributes';
+import { normalizeScopeAttributes } from './utils/validation';
 
 export const DEFAULT_LOGGER_NAME = 'unknown';
 

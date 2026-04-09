@@ -4,7 +4,7 @@
  */
 
 import * as assert from 'assert';
-import { isLogAttributeValue } from '../../../src/utils/attributes';
+import { isLogAttributeValue } from '../../../src/utils/validation';
 
 describe('isLogAttributeValue', () => {
   describe('should accept scalar values', () => {
