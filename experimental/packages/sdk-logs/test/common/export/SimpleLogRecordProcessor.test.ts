@@ -86,6 +86,7 @@ describe('SimpleLogRecordProcessor', () => {
             0
           ),
         shutdown: () => Promise.resolve(),
+        forceFlush: () => Promise.resolve(),
       };
       const { processor, logRecord } = setup(exporter);
 
@@ -107,6 +108,7 @@ describe('SimpleLogRecordProcessor', () => {
       const exporter: LogRecordExporter = {
         export: (_, callback) => callback({ code: ExportResultCode.SUCCESS }),
         shutdown: shutdownSpy,
+        forceFlush: () => Promise.resolve(),
       };
       const { processor } = setup(exporter);
       await processor.shutdown();
