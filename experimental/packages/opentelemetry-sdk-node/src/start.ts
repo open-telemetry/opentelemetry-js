@@ -12,6 +12,7 @@ import {
   diag,
   DiagConsoleLogger,
   metrics,
+  trace,
   propagation,
 } from '@opentelemetry/api';
 import {
@@ -22,6 +23,8 @@ import {
   getPropagatorFromConfiguration,
   getResourceDetectorsFromConfiguration,
   getResourceFromConfiguration,
+  getSpanLimitsFromConfiguration,
+  getTracerProcessorsFromConfiguration,
 } from './utils';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import type { SDKComponents, SDKOptions } from './types';
@@ -40,6 +43,7 @@ import {
 } from '@opentelemetry/resources';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
+import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 
 /**
  * @experimental Function to start the OpenTelemetry Node SDK
@@ -71,6 +75,9 @@ export function startNodeSDK(sdkOptions: SDKOptions): {
   if (components.meterProvider) {
     metrics.setGlobalMeterProvider(components.meterProvider);
   }
+  if (components.tracerProvider) {
+    trace.setGlobalTracerProvider(components.tracerProvider);
+  }
   if (components.propagator) {
     propagation.setGlobalPropagator(components.propagator);
   }
@@ -82,6 +89,9 @@ export function startNodeSDK(sdkOptions: SDKOptions): {
     }
     if (components.meterProvider) {
       promises.push(components.meterProvider.shutdown());
+    }
+    if (components.tracerProvider) {
+      promises.push(components.tracerProvider.shutdown());
     }
     await Promise.all(promises);
   };
@@ -132,6 +142,19 @@ function create(
       views: meterViews ?? [],
     });
     components.meterProvider = meterProvider;
+  }
+
+  const spanProcessors = getTracerProcessorsFromConfiguration(config);
+  if (spanProcessors) {
+    const spanLimits = getSpanLimitsFromConfiguration(config);
+    // TODO (6506): support sampler configuration from config
+    const tracerProvider = new NodeTracerProvider({
+      resource,
+      spanProcessors,
+      spanLimits,
+      meterProvider: components.meterProvider,
+    });
+    components.tracerProvider = tracerProvider;
   }
 
   return components;

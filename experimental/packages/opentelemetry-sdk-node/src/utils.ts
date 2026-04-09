@@ -32,6 +32,7 @@ import {
 } from '@opentelemetry/resources';
 import type {
   SpanExporter,
+  SpanLimits,
   SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import {
@@ -52,6 +53,7 @@ import type {
   InstrumentTypeConfigModel,
   AggregationConfigModel,
   PeriodicMetricReaderConfigModel,
+  SpanExporterConfigModel,
 } from '@opentelemetry/configuration';
 import type {
   AggregationOption,
@@ -657,6 +659,90 @@ export function getLogRecordProcessorsFromConfiguration(
   });
   if (logRecordProcessors.length > 0) {
     return logRecordProcessors;
+  }
+  return undefined;
+}
+
+export function getTracerExporter(
+  exporter: SpanExporterConfigModel
+): SpanExporter | undefined {
+  if (exporter.otlp_http) {
+    const encoding = exporter.otlp_http.encoding;
+    if (encoding === 'json') {
+      return new OTLPHttpTraceExporter({
+        compression:
+          exporter.otlp_http.compression === 'gzip'
+            ? CompressionAlgorithm.GZIP
+            : CompressionAlgorithm.NONE,
+      });
+    } else {
+      return new OTLPProtoTraceExporter({
+        compression:
+          exporter.otlp_http.compression === 'gzip'
+            ? CompressionAlgorithm.GZIP
+            : CompressionAlgorithm.NONE,
+      });
+    }
+  } else if (exporter.otlp_grpc) {
+    return new OTLPGrpcTraceExporter({
+      compression:
+        exporter.otlp_grpc.compression === 'gzip'
+          ? CompressionAlgorithm.GZIP
+          : CompressionAlgorithm.NONE,
+    });
+  } else if (exporter.console) {
+    return new ConsoleSpanExporter();
+  }
+  diag.warn(`Unsupported Exporter value. No Span Exporter registered`);
+  return undefined;
+}
+
+export function getTracerProcessorsFromConfiguration(
+  config: ConfigurationModel
+): SpanProcessor[] | undefined {
+  const tracerProcessors: SpanProcessor[] = [];
+  config.tracer_provider?.processors?.forEach(processor => {
+    if (processor.batch) {
+      const exporter = getTracerExporter(processor.batch.exporter);
+      if (exporter) {
+        tracerProcessors.push(
+          new BatchSpanProcessor(exporter, {
+            maxQueueSize: processor.batch.max_queue_size,
+            maxExportBatchSize: processor.batch.max_export_batch_size,
+            scheduledDelayMillis: processor.batch.schedule_delay,
+            exportTimeoutMillis: processor.batch.export_timeout,
+          })
+        );
+      }
+    }
+    if (processor.simple) {
+      const exporter = getTracerExporter(processor.simple.exporter);
+      if (exporter) {
+        tracerProcessors.push(new SimpleSpanProcessor(exporter));
+      }
+    }
+  });
+  if (tracerProcessors.length > 0) {
+    return tracerProcessors;
+  }
+  return undefined;
+}
+
+export function getSpanLimitsFromConfiguration(
+  config: ConfigurationModel
+): SpanLimits | undefined {
+  if (config.tracer_provider?.limits) {
+    const limitsConfig = config.tracer_provider.limits;
+    const spanLimits: SpanLimits = {};
+    spanLimits.attributeCountLimit = limitsConfig.attribute_count_limit ?? 128;
+    spanLimits.eventCountLimit = limitsConfig.event_count_limit ?? 128;
+
+    if (limitsConfig.attribute_value_length_limit != null) {
+      spanLimits.attributeValueLengthLimit =
+        limitsConfig.attribute_value_length_limit;
+    }
+
+    return spanLimits;
   }
   return undefined;
 }
