@@ -18,7 +18,7 @@ import {
   getInstrumentationScopeKey,
   type LogInstrumentationScope,
 } from './internal/utils';
-import { sanitizeScopeAttributes } from './utils/validation';
+import { normalizeScopeAttributes } from './utils/attributes';
 
 export const DEFAULT_LOGGER_NAME = 'unknown';
 
@@ -72,7 +72,10 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
       name: loggerName,
       version,
       schemaUrl: options?.schemaUrl,
-      ...sanitizeScopeAttributes(options?.attributes),
+      ...normalizeScopeAttributes(
+        this._sharedState.logRecordLimits,
+        options?.attributes
+      ),
     };
     const key = getInstrumentationScopeKey(instrumentationScope);
     if (!this._sharedState.loggers.has(key)) {
