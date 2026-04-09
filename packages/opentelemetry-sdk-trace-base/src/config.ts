@@ -10,19 +10,7 @@ import { AlwaysOffSampler } from './sampler/AlwaysOffSampler';
 import { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
 import { ParentBasedSampler } from './sampler/ParentBasedSampler';
 import { TraceIdRatioBasedSampler } from './sampler/TraceIdRatioBasedSampler';
-
-interface SamplerConfigModel {
-  parent_based?: {
-    root?: SamplerConfigModel;
-    remote_parent_sampled?: SamplerConfigModel;
-    remote_parent_not_sampled?: SamplerConfigModel;
-    local_parent_sampled?: SamplerConfigModel;
-    local_parent_not_sampled?: SamplerConfigModel;
-  };
-  always_off?: object;
-  always_on?: object;
-  trace_id_ratio_based?: { ratio?: number };
-}
+import type { SamplerConfigModel } from '@opentelemetry/configuration';
 
 const enum TracesSamplerValues {
   AlwaysOff = 'always_off',
