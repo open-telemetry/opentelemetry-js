@@ -72,7 +72,7 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
       name: loggerName,
       version,
       schemaUrl: options?.schemaUrl,
-      ...sanitizeScopeAttributes(options?.scopeAttributes),
+      ...sanitizeScopeAttributes(options?.attributes),
     };
     const key = getInstrumentationScopeKey(instrumentationScope);
     if (!this._sharedState.loggers.has(key)) {

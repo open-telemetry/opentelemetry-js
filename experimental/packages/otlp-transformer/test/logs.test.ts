@@ -340,7 +340,7 @@ describe('Logs', () => {
       assert.strictEqual(exportRequest.resourceLogs?.[0].scopeLogs.length, 2);
     });
 
-    it('separates logs with different scopeAttributes into different scope groups', () => {
+    it('separates logs with different attributes into different scope groups', () => {
       const logWithDifferentScopeAttributes = createReadableLogRecord(
         resource_1,
         {
