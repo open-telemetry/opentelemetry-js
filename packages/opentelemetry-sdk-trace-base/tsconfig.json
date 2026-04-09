@@ -19,6 +19,9 @@
       "path": "../../api"
     },
     {
+      "path": "../../experimental/packages/configuration"
+    },
+    {
       "path": "../../semantic-conventions"
     },
     {
