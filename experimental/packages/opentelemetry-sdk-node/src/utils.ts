@@ -675,17 +675,7 @@ export function getTracerExporter(
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
       });
-    } else if (encoding === 'protobuf') {
-      return new OTLPProtoTraceExporter({
-        compression:
-          exporter.otlp_http.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
-      });
     } else {
-      diag.warn(
-        `Unsupported OTLP traces encoding: ${encoding}. Using http/protobuf.`
-      );
       return new OTLPProtoTraceExporter({
         compression:
           exporter.otlp_http.compression === 'gzip'

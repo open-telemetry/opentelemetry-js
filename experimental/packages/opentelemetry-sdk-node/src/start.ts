@@ -152,6 +152,7 @@ function create(
       resource,
       spanProcessors,
       spanLimits,
+      meterProvider: components.meterProvider,
     });
     components.tracerProvider = tracerProvider;
   }
