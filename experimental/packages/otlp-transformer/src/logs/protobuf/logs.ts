@@ -2,17 +2,12 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import * as root from '../../generated/root';
-
-import type { IExportLogsServiceResponse } from '../export-response';
 
 import type { ReadableLogRecord } from '@opentelemetry/sdk-logs';
-import type { ExportType } from '../../common/protobuf/protobuf-export-type';
+import type { IExportLogsServiceResponse } from '../export-response';
 import type { ISerializer } from '../../i-serializer';
 import { serializeLogsExportRequest } from './logs-serializer';
-
-const logsResponseType = root.opentelemetry.proto.collector.logs.v1
-  .ExportLogsServiceResponse as ExportType<IExportLogsServiceResponse>;
+import { deserializeExportLogsServiceResponse } from './response-deserializer';
 
 /*
  * @experimental this serializer may receive breaking changes in minor versions, pin this package's version when using this constant
@@ -25,6 +20,6 @@ export const ProtobufLogsSerializer: ISerializer<
     return serializeLogsExportRequest(arg);
   },
   deserializeResponse: (arg: Uint8Array) => {
-    return logsResponseType.decode(arg);
+    return deserializeExportLogsServiceResponse(arg);
   },
 };

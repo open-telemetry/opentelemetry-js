@@ -1460,7 +1460,10 @@ describe('ConfigFactory', function () {
       process.env.OTEL_TRACES_EXPORTER = 'otlp';
       process.env.OTEL_TRACES_SAMPLER = 'unknown_sampler';
       createConfigFactory();
-      Sinon.assert.calledWith(warnSpy, 'Unknown sampler type: unknown_sampler');
+      Sinon.assert.calledWith(
+        warnSpy,
+        'Invalid value "unknown_sampler" for Traces sampler (env: OTEL_TRACES_SAMPLER). Expected one of: always_on, always_off, traceidratio, parentbased_always_on, parentbased_always_off, parentbased_traceidratio. Value will be ignored.'
+      );
     });
 
     it('should return config with custom tracer_provider', function () {
