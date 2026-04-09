@@ -27,4 +27,5 @@ export { JsonLogsSerializer } from './logs/json';
 export { JsonMetricsSerializer } from './metrics/json';
 export { JsonTraceSerializer } from './trace/json';
 
+export type { IExporterMetricsHelper } from './i-exporter-metrics-helper';
 export type { ISerializer } from './i-serializer';

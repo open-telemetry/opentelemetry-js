@@ -10,9 +10,11 @@ import type { IOtlpExportDelegate } from '@opentelemetry/otlp-exporter-base';
 import {
   createOtlpNetworkExportDelegate,
   ExporterMetrics,
-  type IExporterMetricsHelper,
 } from '@opentelemetry/otlp-exporter-base';
-import type { ISerializer } from '@opentelemetry/otlp-transformer';
+import type {
+  IExporterMetricsHelper,
+  ISerializer,
+} from '@opentelemetry/otlp-transformer';
 import type { OtlpGrpcConfiguration } from './configuration/otlp-grpc-configuration';
 import { createOtlpGrpcExporterTransport } from './grpc-exporter-transport';
 import { ATTR_RPC_RESPONSE_STATUS_CODE } from './semconv';

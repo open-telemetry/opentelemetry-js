@@ -16,6 +16,7 @@ import {
   hrTimeDuration,
   hrTimeToMilliseconds,
 } from '@opentelemetry/core';
+import { type IExporterMetricsHelper } from '@opentelemetry/otlp-transformer';
 import {
   ATTR_ERROR_TYPE,
   ATTR_OTEL_COMPONENT_NAME,
@@ -33,11 +34,6 @@ export interface ExporterMetricsOptions<Internal> {
   url: string | undefined;
   meterProvider: MeterProvider | undefined;
   responseAttributes: (error: unknown) => Attributes;
-}
-
-export interface IExporterMetricsHelper<Internal> {
-  name: 'span' | 'metric_data_point' | 'log';
-  countItems: (request: Internal) => number;
 }
 
 /**
@@ -74,8 +70,15 @@ export class ExporterMetrics<Internal> {
       [ATTR_OTEL_COMPONENT_NAME]: `${componentType}/${counter}`,
     };
     if (url) {
-      if (url.includes('://')) {
-        const parsedUrl = new URL(url);
+      // URLs may exclude scheme for gRPC endpoints, but in this case they always
+      // have a port number. Because the URL constructor requires a scheme, we
+      // can still handle gRPC endpoints by prepending an arbitrary scheme.
+      let urlToParse = url;
+      if (!url.includes('://')) {
+        urlToParse = `http://${url}`;
+      }
+      try {
+        const parsedUrl = new URL(urlToParse);
         this.standardAttrs[ATTR_SERVER_ADDRESS] = parsedUrl.hostname;
         let port: number | undefined = undefined;
         if (parsedUrl.port) {
@@ -85,13 +88,13 @@ export class ExporterMetrics<Internal> {
         } else if (parsedUrl.protocol === 'https:') {
           port = 443;
         }
-        this.standardAttrs[ATTR_SERVER_PORT] = port;
-      } else {
-        const parts = url.split(':');
-        this.standardAttrs[ATTR_SERVER_ADDRESS] = parts[0];
-        if (parts[1]) {
-          this.standardAttrs[ATTR_SERVER_PORT] = Number(parts[1]);
+        if (typeof port === 'number') {
+          this.standardAttrs[ATTR_SERVER_PORT] = port;
         }
+      } catch {
+        // In practice, URLs will be valid or something else will break. Better to let that
+        // inform the user than an exception in this internal code and proceed best-effort
+        // here.
       }
     }
 

@@ -7,17 +7,17 @@ import type { MeterProvider } from '@opentelemetry/api';
 
 import type { IOtlpExportDelegate } from './otlp-export-delegate';
 import { createOtlpExportDelegate } from './otlp-export-delegate';
-import type { ISerializer } from '@opentelemetry/otlp-transformer';
+import type {
+  IExporterMetricsHelper,
+  ISerializer,
+} from '@opentelemetry/otlp-transformer';
 import { createHttpExporterTransport } from './transport/http-exporter-transport';
 import { createBoundedQueueExportPromiseHandler } from './bounded-queue-export-promise-handler';
 import { createRetryingTransport } from './retrying-transport';
 import type { OtlpNodeHttpConfiguration } from './configuration/otlp-node-http-configuration';
 import { OTLPExporterError } from './types';
 import { ATTR_HTTP_RESPONSE_STATUS_CODE } from './semconv';
-import {
-  ExporterMetrics,
-  type IExporterMetricsHelper,
-} from './ExporterMetrics';
+import { ExporterMetrics } from './ExporterMetrics';
 
 export function createOtlpHttpExporterMetrics<Internal>(
   metricsComponentType: string,
@@ -31,10 +31,13 @@ export function createOtlpHttpExporterMetrics<Internal>(
     url,
     meterProvider,
     responseAttributes: (error: unknown) => {
-      if (!(error instanceof OTLPExporterError)) {
+      if (!error) {
         return {
           [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
         };
+      }
+      if (!(error instanceof OTLPExporterError)) {
+        return {};
       }
       return {
         [ATTR_HTTP_RESPONSE_STATUS_CODE]: error.code,

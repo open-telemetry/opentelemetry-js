@@ -126,7 +126,7 @@ describe('createOtlpHttpExportDelegate', function () {
     });
   });
 
-  it('records metrics for error', async () => {
+  it('records metrics for HTTP error', async () => {
     handler = (request, response) => {
       response.statusCode = 501;
       response.end();

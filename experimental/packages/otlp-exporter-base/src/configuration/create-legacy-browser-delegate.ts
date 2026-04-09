@@ -4,16 +4,16 @@
  */
 
 import type { MeterProvider } from '@opentelemetry/api';
-import type { ISerializer } from '@opentelemetry/otlp-transformer';
+import type {
+  IExporterMetricsHelper,
+  ISerializer,
+} from '@opentelemetry/otlp-transformer';
 import { createOtlpFetchExportDelegate } from '../otlp-browser-http-export-delegate';
 import { convertLegacyBrowserHttpOptions } from './convert-legacy-browser-http-options';
 import type { IOtlpExportDelegate } from '../otlp-export-delegate';
 import type { OTLPExporterConfigBase } from './legacy-base-configuration';
 import { ATTR_HTTP_RESPONSE_STATUS_CODE } from '../semconv';
-import {
-  ExporterMetrics,
-  type IExporterMetricsHelper,
-} from '../ExporterMetrics';
+import { ExporterMetrics } from '../ExporterMetrics';
 
 /**
  * @deprecated
@@ -30,10 +30,13 @@ export function createLegacyOtlpBrowserExporterMetrics<Internal>(
     url,
     meterProvider,
     responseAttributes: (error: unknown) => {
-      if (!(error instanceof Error)) {
+      if (!error) {
         return {
           [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
         };
+      }
+      if (!(error instanceof Error)) {
+        return {};
       }
       if (
         error.message.startsWith(

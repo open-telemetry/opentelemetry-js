@@ -27,7 +27,4 @@ export type { OTLPExporterConfigBase } from './configuration/legacy-base-configu
 export type { IOtlpExportDelegate } from './otlp-export-delegate';
 export { createOtlpNetworkExportDelegate } from './otlp-network-export-delegate';
 
-export {
-  ExporterMetrics,
-  type IExporterMetricsHelper,
-} from './ExporterMetrics';
+export { ExporterMetrics } from './ExporterMetrics';
