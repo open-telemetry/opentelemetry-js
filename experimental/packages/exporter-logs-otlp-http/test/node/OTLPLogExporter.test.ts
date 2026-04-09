@@ -12,7 +12,9 @@ import {
   LoggerProvider,
   SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { Stream } from 'stream';
+import { TestMetricReader } from '../utils';
 
 /*
  * NOTE: Tests here are not intended to test the underlying components directly. They are intended as a quick
@@ -28,6 +30,11 @@ describe('OTLPLogExporter', () => {
     });
 
     it('successfully exports data', done => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+
       const fakeRequest = new Stream.PassThrough();
       Object.defineProperty(fakeRequest, 'setTimeout', {
         value: function (_timeout: number) {},
@@ -35,12 +42,19 @@ describe('OTLPLogExporter', () => {
 
       sinon.stub(http, 'request').returns(fakeRequest as any);
       let buff = Buffer.from('');
-      fakeRequest.on('finish', () => {
+      fakeRequest.on('finish', async () => {
         try {
           const requestBody = buff.toString();
           assert.doesNotThrow(() => {
             JSON.parse(requestBody);
           }, 'expected requestBody to be in JSON format, but parsing failed');
+
+          const metrics = await metricReader.collect();
+          const scopeMetrics = metrics.resourceMetrics.scopeMetrics.find(
+            sm => sm.scope.name === '@opentelemetry/otlp-exporter'
+          );
+          assert.ok(scopeMetrics);
+
           done();
         } catch (e) {
           done(e);
@@ -52,7 +66,9 @@ describe('OTLPLogExporter', () => {
       });
 
       const loggerProvider = new LoggerProvider({
-        processors: [new SimpleLogRecordProcessor(new OTLPLogExporter())],
+        processors: [
+          new SimpleLogRecordProcessor(new OTLPLogExporter({ meterProvider })),
+        ],
       });
 
       loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });

@@ -6,11 +6,15 @@
 import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
-import { ProtobufTraceSerializer } from '@opentelemetry/otlp-transformer';
+import {
+  ProtobufTraceSerializer,
+  TraceExporterMetricsHelper,
+} from '@opentelemetry/otlp-transformer';
 import {
   createOtlpHttpExportDelegate,
   convertLegacyHttpOptions,
 } from '@opentelemetry/otlp-exporter-base/node-http';
+import { OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_SPAN_EXPORTER } from '../../semconv';
 
 /**
  * Collector Trace Exporter for Node with protobuf
@@ -25,7 +29,10 @@ export class OTLPTraceExporter
         convertLegacyHttpOptions(config, 'TRACES', 'v1/traces', {
           'Content-Type': 'application/x-protobuf',
         }),
-        ProtobufTraceSerializer
+        ProtobufTraceSerializer,
+        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_SPAN_EXPORTER,
+        TraceExporterMetricsHelper,
+        config.meterProvider
       )
     );
   }

@@ -5,7 +5,7 @@
 
 import { OTLPMetricExporter } from '../src';
 import type { ServerTestContext } from './utils';
-import { startServer } from './utils';
+import { startServer, TestMetricReader } from './utils';
 import * as assert from 'assert';
 import {
   MeterProvider,
@@ -68,19 +68,30 @@ describe('OTLPMetricsExporter', function () {
 
   it('successfully exports data', async () => {
     // arrange
+    const testMetricReader = new TestMetricReader();
+    const exporter = new OTLPMetricExporter({ url: 'http://localhost:1502' });
     const meterProvider = new MeterProvider({
       readers: [
         new PeriodicExportingMetricReader({
-          exporter: new OTLPMetricExporter({ url: 'http://localhost:1502' }),
+          exporter,
         }),
+        testMetricReader,
       ],
     });
+    exporter.setMeterProvider(meterProvider);
 
     // act
     meterProvider.getMeter('test-meter').createCounter('test-counter').add(1);
-    await meterProvider.shutdown();
+    await meterProvider.forceFlush();
 
     // assert
     assert.strictEqual(serverTestContext.requests.length, 1);
+
+    const metrics = await testMetricReader.collect();
+    const scopeMetrics = metrics.resourceMetrics.scopeMetrics.find(
+      sm => sm.scope.name === '@opentelemetry/otlp-exporter'
+    );
+    assert.ok(scopeMetrics);
+    await meterProvider.shutdown();
   });
 });

@@ -7,11 +7,14 @@ import * as sinon from 'sinon';
 import * as assert from 'assert';
 import type { IExporterTransport } from '../../src';
 import { ExportResultCode } from '@opentelemetry/core';
+import { type Histogram, MeterProvider } from '@opentelemetry/sdk-metrics';
 import { createOtlpExportDelegate } from '../../src/otlp-export-delegate';
 import type { ExportResponse } from '../../src';
 import type { ISerializer } from '@opentelemetry/otlp-transformer';
 import type { IExportPromiseHandler } from '../../src/bounded-queue-export-promise-handler';
-import { registerMockDiagLogger } from './test-utils';
+import { ExporterMetrics } from '../../src';
+import { registerMockDiagLogger, withResolvers } from './test-utils';
+import { TestMetricReader } from '../testHelper';
 
 interface FakeInternalRepresentation {
   foo: string;
@@ -29,6 +32,14 @@ type FakeSerializer = ISerializer<
 const internalRepresentation: FakeInternalRepresentation = {
   foo: 'internal',
 };
+
+const noopMetrics = new ExporterMetrics({
+  componentType: 'test',
+  metricsHelper: { name: 'span', countItems: () => 1 },
+  url: 'http://example.com',
+  meterProvider: undefined,
+  responseAttributes: () => ({}),
+});
 
 describe('OTLPExportDelegate', function () {
   describe('forceFlush', function () {
@@ -63,6 +74,7 @@ describe('OTLPExportDelegate', function () {
           promiseHandler: promiseQueue,
           serializer: mockSerializer,
           transport: mockTransport,
+          metrics: noopMetrics,
         },
         {
           timeout: 1000,
@@ -106,6 +118,7 @@ describe('OTLPExportDelegate', function () {
           promiseHandler: promiseQueue,
           serializer: mockSerializer,
           transport: mockTransport,
+          metrics: noopMetrics,
         },
         {
           timeout: 1000,
@@ -149,6 +162,7 @@ describe('OTLPExportDelegate', function () {
           promiseHandler: promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
+          metrics: noopMetrics,
         },
         {
           timeout: 1000,
@@ -205,6 +219,7 @@ describe('OTLPExportDelegate', function () {
           promiseHandler: promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
+          metrics: noopMetrics,
         },
         {
           timeout: 1000,
@@ -263,6 +278,7 @@ describe('OTLPExportDelegate', function () {
           promiseHandler: promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
+          metrics: noopMetrics,
         },
         {
           timeout: 1000,
@@ -321,6 +337,7 @@ describe('OTLPExportDelegate', function () {
           promiseHandler: promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
+          metrics: noopMetrics,
         },
         {
           timeout: 1000,
@@ -379,6 +396,7 @@ describe('OTLPExportDelegate', function () {
           promiseHandler: promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
+          metrics: noopMetrics,
         },
         {
           timeout: 1000,
@@ -439,6 +457,7 @@ describe('OTLPExportDelegate', function () {
           promiseHandler: promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
+          metrics: noopMetrics,
         },
         {
           timeout: 1000,
@@ -504,6 +523,7 @@ describe('OTLPExportDelegate', function () {
           promiseHandler: promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
+          metrics: noopMetrics,
         },
         {
           timeout: 1000,
@@ -565,6 +585,7 @@ describe('OTLPExportDelegate', function () {
           promiseHandler: promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
+          metrics: noopMetrics,
         },
         {
           timeout: 1000,
@@ -637,6 +658,7 @@ describe('OTLPExportDelegate', function () {
           promiseHandler: promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
+          metrics: noopMetrics,
         },
         {
           timeout: 1000,
@@ -696,6 +718,7 @@ describe('OTLPExportDelegate', function () {
           promiseHandler: promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
+          metrics: noopMetrics,
         },
         {
           timeout: 1000,
@@ -720,6 +743,224 @@ describe('OTLPExportDelegate', function () {
           done(err);
         }
       });
+    });
+  });
+
+  describe('sdk metrics', () => {
+    it('records metrics for success', async () => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+      const exportResponse: ExportResponse = {
+        data: Uint8Array.from([]),
+        status: 'success',
+      };
+
+      const { resolve: resolveSend, promise: sendPromise } =
+        withResolvers<typeof exportResponse>();
+
+      const transportStubs = {
+        send: sinon.stub().returns(sendPromise),
+        shutdown: sinon.stub(),
+      };
+      const mockTransport = <IExporterTransport>transportStubs;
+
+      const serializerStubs = {
+        // simulate that the serializer returns something to send
+        serializeRequest: sinon.stub().returns(Uint8Array.from([1])),
+        // simulate that it returns a full success (empty response)
+        deserializeResponse: sinon.stub().returns({}),
+      };
+      const mockSerializer = <FakeSerializer>serializerStubs;
+
+      // mock a queue that has not yet reached capacity
+      const promiseHandlerStubs = {
+        pushPromise: sinon.stub(),
+        hasReachedLimit: sinon.stub().returns(false),
+        awaitAll: sinon.stub(),
+      };
+      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
+
+      const exporter = createOtlpExportDelegate(
+        {
+          promiseHandler,
+          serializer: mockSerializer,
+          transport: mockTransport,
+          metrics: new ExporterMetrics({
+            componentType: 'test_exporter',
+            metricsHelper: { name: 'span', countItems: () => 5 },
+            url: 'http://localhost:12234',
+            meterProvider,
+            responseAttributes: () => ({}),
+          }),
+        },
+        {
+          timeout: 1000,
+        }
+      );
+
+      const exportPromise = new Promise<void>(resolve => {
+        exporter.export(internalRepresentation, result => {
+          assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+          assert.strictEqual(result.error, undefined);
+          resolve();
+        });
+      });
+
+      let { resourceMetrics } = await metricReader.collect();
+      let metrics = resourceMetrics.scopeMetrics[0].metrics;
+      let inflight = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.exporter.span.inflight'
+      );
+      assert.ok(inflight);
+      assert.strictEqual(inflight.dataPoints[0].value, 5);
+      assert.deepStrictEqual(inflight.dataPoints[0].attributes, {
+        'otel.component.type': 'test_exporter',
+        'otel.component.name': 'test_exporter/0',
+        'server.address': 'localhost',
+        'server.port': 12234,
+      });
+
+      resolveSend(exportResponse);
+      await exportPromise;
+
+      ({ resourceMetrics } = await metricReader.collect());
+      metrics = resourceMetrics.scopeMetrics[0].metrics;
+      inflight = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.exporter.span.inflight'
+      );
+      const exported = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.exporter.span.exported'
+      );
+      const duration = metrics.find(
+        metric =>
+          metric.descriptor.name === 'otel.sdk.exporter.operation.duration'
+      );
+      assert.ok(inflight);
+      assert.strictEqual(inflight.dataPoints[0].value, 0);
+      assert.deepStrictEqual(inflight.dataPoints[0].attributes, {
+        'otel.component.type': 'test_exporter',
+        'otel.component.name': 'test_exporter/0',
+        'server.address': 'localhost',
+        'server.port': 12234,
+      });
+
+      assert.ok(exported);
+      assert.ok(duration);
+      assert.strictEqual(exported.dataPoints[0].value, 5);
+      assert.deepStrictEqual(exported.dataPoints[0].attributes, {
+        'otel.component.type': 'test_exporter',
+        'otel.component.name': 'test_exporter/0',
+        'server.address': 'localhost',
+        'server.port': 12234,
+      });
+      const histogram = duration.dataPoints[0].value as Histogram;
+      assert.strictEqual(histogram.count, 1);
+      assert.deepStrictEqual(duration.dataPoints[0].attributes, {
+        'otel.component.type': 'test_exporter',
+        'otel.component.name': 'test_exporter/0',
+        'server.address': 'localhost',
+        'server.port': 12234,
+      });
+
+      await exporter.shutdown();
+    });
+
+    it('records metrics for Error', async () => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+      const exportResponse: ExportResponse = {
+        status: 'failure',
+        error: TypeError('code 123'),
+      };
+
+      const transportStubs = {
+        send: sinon.stub().returns(Promise.resolve(exportResponse)),
+        shutdown: sinon.stub(),
+      };
+      const mockTransport = <IExporterTransport>transportStubs;
+
+      const serializerStubs = {
+        // simulate that the serializer returns something to send
+        serializeRequest: sinon.stub().returns(Uint8Array.from([1])),
+        // simulate that it returns a full success (empty response)
+        deserializeResponse: sinon.stub().returns({}),
+      };
+      const mockSerializer = <FakeSerializer>serializerStubs;
+
+      // mock a queue that has not yet reached capacity
+      const promiseHandlerStubs = {
+        pushPromise: sinon.stub(),
+        hasReachedLimit: sinon.stub().returns(false),
+        awaitAll: sinon.stub(),
+      };
+      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
+
+      const exporter = createOtlpExportDelegate(
+        {
+          promiseHandler,
+          serializer: mockSerializer,
+          transport: mockTransport,
+          metrics: new ExporterMetrics({
+            componentType: 'test_exporter',
+            metricsHelper: { name: 'span', countItems: () => 5 },
+            url: 'http://localhost:12234',
+            meterProvider,
+            responseAttributes: (e: unknown) => {
+              if (e instanceof TypeError) {
+                return { code: e.message.split(' ')[1] };
+              }
+              return {};
+            },
+          }),
+        },
+        {
+          timeout: 1000,
+        }
+      );
+
+      await new Promise<void>(resolve => {
+        exporter.export(internalRepresentation, result => {
+          assert.strictEqual(result.code, ExportResultCode.FAILED);
+          resolve();
+        });
+      });
+
+      const { resourceMetrics } = await metricReader.collect();
+      const metrics = resourceMetrics.scopeMetrics[0].metrics;
+      const exported = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.exporter.span.exported'
+      );
+      const duration = metrics.find(
+        metric =>
+          metric.descriptor.name === 'otel.sdk.exporter.operation.duration'
+      );
+      assert.ok(exported);
+      assert.ok(duration);
+      assert.strictEqual(exported.dataPoints[0].value, 5);
+      assert.deepStrictEqual(exported.dataPoints[0].attributes, {
+        'otel.component.type': 'test_exporter',
+        'otel.component.name': 'test_exporter/1',
+        'server.address': 'localhost',
+        'server.port': 12234,
+        'error.type': 'TypeError',
+      });
+      const histogram = duration.dataPoints[0].value as Histogram;
+      assert.strictEqual(histogram.count, 1);
+      assert.strictEqual(histogram.count, 1);
+      assert.deepStrictEqual(duration.dataPoints[0].attributes, {
+        'otel.component.type': 'test_exporter',
+        'otel.component.name': 'test_exporter/1',
+        'server.address': 'localhost',
+        'server.port': 12234,
+        'error.type': 'TypeError',
+        code: '123',
+      });
+
+      await exporter.shutdown();
     });
   });
 });

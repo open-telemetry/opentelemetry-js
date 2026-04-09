@@ -7,9 +7,11 @@ import {
   BasicTracerProvider,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPTraceExporter } from '../../src/platform/browser/index';
+import { TestMetricReader } from '../utils';
 
 /*
  * NOTE: Tests here are not intended to test the underlying components directly. They are intended as a quick
@@ -30,8 +32,14 @@ describe('OTLPTraceExporter', () => {
       const stubFetch = sinon
         .stub(window, 'fetch')
         .resolves(new Response('', { status: 200 }));
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
       const tracerProvider = new BasicTracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(new OTLPTraceExporter())],
+        spanProcessors: [
+          new SimpleSpanProcessor(new OTLPTraceExporter({ meterProvider })),
+        ],
       });
 
       // act
@@ -45,6 +53,13 @@ describe('OTLPTraceExporter', () => {
         () => JSON.parse(body),
         'expected request body to be in protobuf format, but parsing as JSON succeeded'
       );
+
+      const metrics = await metricReader.collect();
+      const scopeMetrics = metrics.resourceMetrics.scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/otlp-exporter'
+      );
+      assert.ok(scopeMetrics);
+      await meterProvider.shutdown();
     });
   });
 });

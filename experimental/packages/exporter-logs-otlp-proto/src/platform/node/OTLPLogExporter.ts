@@ -5,7 +5,10 @@
 
 import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
-import { ProtobufLogsSerializer } from '@opentelemetry/otlp-transformer';
+import {
+  LogsExporterMetricsHelper,
+  ProtobufLogsSerializer,
+} from '@opentelemetry/otlp-transformer';
 import {
   convertLegacyHttpOptions,
   createOtlpHttpExportDelegate,
@@ -14,6 +17,8 @@ import type {
   ReadableLogRecord,
   LogRecordExporter,
 } from '@opentelemetry/sdk-logs';
+
+import { OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_LOG_EXPORTER } from '../../semconv';
 
 /**
  * OTLP Log Protobuf Exporter for Node.js
@@ -28,7 +33,10 @@ export class OTLPLogExporter
         convertLegacyHttpOptions(config, 'LOGS', 'v1/logs', {
           'Content-Type': 'application/x-protobuf',
         }),
-        ProtobufLogsSerializer
+        ProtobufLogsSerializer,
+        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_LOG_EXPORTER,
+        LogsExporterMetricsHelper,
+        config.meterProvider
       )
     );
   }

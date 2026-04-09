@@ -5,8 +5,9 @@
 
 import { OTLPTraceExporter } from '../src';
 import type { ServerTestContext } from './utils';
-import { startServer } from './utils';
+import { startServer, TestMetricReader } from './utils';
 import * as assert from 'assert';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import {
   SimpleSpanProcessor,
   BasicTracerProvider,
@@ -68,11 +69,16 @@ describe('OTLPTraceExporter', function () {
 
   it('successfully exports data', async () => {
     // arrange
+    const metricReader = new TestMetricReader();
+    const meterProvider = new MeterProvider({
+      readers: [metricReader],
+    });
     const tracerProvider = new BasicTracerProvider({
       spanProcessors: [
         new SimpleSpanProcessor(
           new OTLPTraceExporter({
             url: 'http://localhost:1501',
+            meterProvider,
           })
         ),
       ],
@@ -84,5 +90,12 @@ describe('OTLPTraceExporter', function () {
 
     // assert
     assert.strictEqual(serverTestContext.requests.length, 1);
+
+    const metrics = await metricReader.collect();
+    const scopeMetrics = metrics.resourceMetrics.scopeMetrics.find(
+      sm => sm.scope.name === '@opentelemetry/otlp-exporter'
+    );
+    assert.ok(scopeMetrics);
+    await meterProvider.shutdown();
   });
 });
