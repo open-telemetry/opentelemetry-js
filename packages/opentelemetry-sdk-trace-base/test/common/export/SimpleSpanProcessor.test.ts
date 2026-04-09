@@ -11,10 +11,12 @@ import {
   TraceFlags,
 } from '@opentelemetry/api';
 import {
+  type ExportResult,
   ExportResultCode,
   loggingErrorHandler,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
@@ -28,6 +30,7 @@ import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestExporterWithDelay } from './TestExporterWithDelay';
 import type { Tracer } from '../../../src/Tracer';
 import { resourceFromAttributes } from '@opentelemetry/resources';
+import { TestMetricReader } from '../util';
 
 describe('SimpleSpanProcessor', () => {
   let provider: BasicTracerProvider;
@@ -334,6 +337,97 @@ describe('SimpleSpanProcessor', () => {
       const exporterCreatedSpans =
         testTracingExporter.getExporterCreatedSpans();
       assert.equal(exporterCreatedSpans.length, 0);
+    });
+  });
+
+  describe('Metrics', () => {
+    it('should record metrics', async () => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+      const processor = new SimpleSpanProcessor(exporter, {
+        meterProvider,
+      });
+
+      const exportStub = sinon.stub(exporter, 'export');
+      exportStub
+        .onFirstCall()
+        .callsFake((_spans, resultCallback: (result: ExportResult) => void) => {
+          resultCallback({ code: ExportResultCode.SUCCESS });
+        })
+        .onSecondCall()
+        .callsFake((_spans, resultCallback: (result: ExportResult) => void) => {
+          const error = new Error('Export failed');
+          error.name = 'SystemError';
+          resultCallback({ code: ExportResultCode.FAILED, error });
+        });
+
+      const spanContext: SpanContext = {
+        traceId: 'a3cda95b652f4a1592b449d5929fda1b',
+        spanId: '5e0c63257de34c92',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+      const tracer = provider.getTracer('default') as Tracer;
+      const span = new SpanImpl({
+        scope: tracer.instrumentationScope,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
+        spanContext,
+        name: 'span-name',
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
+      processor.onStart(span, ROOT_CONTEXT);
+      processor.onEnd(span);
+      processor.onStart(span, ROOT_CONTEXT);
+      processor.onEnd(span);
+
+      await processor.forceFlush();
+
+      const { resourceMetrics } = await metricReader.collect();
+      const scopeMetrics = resourceMetrics.scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/sdk-trace'
+      );
+      assert.ok(scopeMetrics);
+      const processedSpansMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.span.processed'
+      );
+      assert.ok(processedSpansMetric);
+      const processedSpansDataPoints =
+        processedSpansMetric.dataPoints as Array<{
+          value: number;
+          attributes: Record<string, unknown>;
+        }>;
+      const successPoint = processedSpansDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] === undefined
+      );
+      assert.ok(successPoint);
+      assert.strictEqual(successPoint.value, 1);
+      assert.strictEqual(
+        successPoint.attributes['otel.component.type'],
+        'simple_span_processor'
+      );
+      assert.ok(
+        successPoint.attributes['otel.component.name']
+          ?.toString()
+          .startsWith('simple_span_processor/')
+      );
+      const failedPoint = processedSpansDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] === 'SystemError'
+      );
+      assert.ok(failedPoint);
+      assert.strictEqual(failedPoint.value, 1);
+      assert.strictEqual(
+        failedPoint.attributes['otel.component.type'],
+        'simple_span_processor'
+      );
+      assert.ok(
+        failedPoint.attributes['otel.component.name']
+          ?.toString()
+          .startsWith('simple_span_processor/')
+      );
     });
   });
 });

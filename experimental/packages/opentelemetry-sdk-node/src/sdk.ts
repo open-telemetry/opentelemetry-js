@@ -39,7 +39,10 @@ import {
   ConsoleMetricExporter,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
-import type { SpanProcessor } from '@opentelemetry/sdk-trace-base';
+import type {
+  SpanExporter,
+  SpanProcessor,
+} from '@opentelemetry/sdk-trace-base';
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import type { NodeTracerConfig } from '@opentelemetry/sdk-trace-node';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
@@ -65,7 +68,8 @@ import {
 
 type TracerProviderConfig = {
   tracerConfig: NodeTracerConfig;
-  spanProcessors: SpanProcessor[];
+  spanProcessors: SpanProcessor[] | undefined;
+  traceExporter: SpanExporter | undefined;
 };
 
 export type MeterProviderConfig = {
@@ -225,16 +229,16 @@ export class NodeSDK {
         );
       }
 
-      const spanProcessor =
-        configuration.spanProcessor ??
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        new BatchSpanProcessor(configuration.traceExporter!);
-
-      const spanProcessors = configuration.spanProcessors ?? [spanProcessor];
+      const spanProcessors =
+        configuration.spanProcessors ??
+        (configuration.spanProcessor
+          ? [configuration.spanProcessor]
+          : undefined);
 
       this._tracerProviderConfig = {
         tracerConfig: tracerProviderConfig,
         spanProcessors,
+        traceExporter: configuration.traceExporter,
       };
     }
 
@@ -340,9 +344,23 @@ export class NodeSDK {
       }
     }
 
-    const spanProcessors = this._tracerProviderConfig
-      ? this._tracerProviderConfig.spanProcessors
-      : getSpanProcessorsFromEnv();
+    let spanProcessors: SpanProcessor[];
+    if (this._tracerProviderConfig) {
+      // If tracerProviderConfig is set, either spanProcessors or traceExporter is set.
+      if (this._tracerProviderConfig.spanProcessors) {
+        spanProcessors = this._tracerProviderConfig.spanProcessors;
+      } else {
+        spanProcessors = [
+          new BatchSpanProcessor(this._tracerProviderConfig.traceExporter!, {
+            meterProvider: sdkMetricsEnabled ? this._meterProvider : undefined,
+          }),
+        ];
+      }
+    } else {
+      spanProcessors = getSpanProcessorsFromEnv(
+        sdkMetricsEnabled ? this._meterProvider : undefined
+      );
+    }
 
     // Only register if there is a span processor
     if (spanProcessors.length > 0) {
