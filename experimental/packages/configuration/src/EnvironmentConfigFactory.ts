@@ -12,6 +12,7 @@ import {
 import type { ConfigFactory } from './IConfigFactory';
 import {
   ExemplarFilter,
+  OtlpHttpEncoding,
   type BatchLogRecordProcessor,
   type BatchSpanProcessor,
   type ConfigurationModel,
@@ -361,9 +362,9 @@ export function setTracerProvider(config: ConfigurationModel): void {
         );
         const encoding =
           protocol === 'http/json'
-            ? 'json'
+            ? OtlpHttpEncoding.Json
             : protocol === 'http/protobuf'
-              ? 'protobuf'
+              ? OtlpHttpEncoding.Protobuf
               : undefined;
         const otlpHttp: NonNullable<SpanExporter['otlp_http']> = {
           endpoint:
@@ -503,9 +504,9 @@ export function setMeterProvider(config: ConfigurationModel): void {
         );
         const encoding =
           protocol === 'http/json'
-            ? 'json'
+            ? OtlpHttpEncoding.Json
             : protocol === 'http/protobuf'
-              ? 'protobuf'
+              ? OtlpHttpEncoding.Protobuf
               : undefined;
         const otlpHttp: NonNullable<PushMetricExporter['otlp_http']> = {
           endpoint:
@@ -641,9 +642,9 @@ export function setLoggerProvider(config: ConfigurationModel): void {
         );
         const encoding =
           protocol === 'http/json'
-            ? 'json'
+            ? OtlpHttpEncoding.Json
             : protocol === 'http/protobuf'
-              ? 'protobuf'
+              ? OtlpHttpEncoding.Protobuf
               : undefined;
         const otlpHttp: NonNullable<LogRecordExporter['otlp_http']> = {
           endpoint:

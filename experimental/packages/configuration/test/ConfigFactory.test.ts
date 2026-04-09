@@ -134,6 +134,7 @@ const configFromFile = {
               encoding: OtlpHttpEncoding.Protobuf,
             },
           },
+          cardinality_limits: { default: 2000 },
         },
       },
     ],
@@ -239,6 +240,7 @@ const configFromKitchenSinkFile = {
       { b3multi: {} },
       { jaeger: {} },
       { ottrace: {} },
+      { xray: {} },
     ],
     composite_list: 'tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray',
   },
@@ -269,6 +271,10 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
+          schedule_delay: 5000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
           exporter: {
             otlp_grpc: {
               endpoint: 'http://localhost:4317',
@@ -288,6 +294,10 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
+          schedule_delay: 5000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
           exporter: {
             'otlp_file/development': {
               output_stream: 'file:///var/log/traces.jsonl',
@@ -297,6 +307,10 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
+          schedule_delay: 5000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
           exporter: { 'otlp_file/development': { output_stream: 'stdout' } },
         },
       },
@@ -428,6 +442,8 @@ const configFromKitchenSinkFile = {
       },
       {
         periodic: {
+          interval: 60000,
+          timeout: 30000,
           exporter: {
             otlp_grpc: {
               endpoint: 'http://localhost:4317',
@@ -446,10 +462,13 @@ const configFromKitchenSinkFile = {
                 ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
             },
           },
+          cardinality_limits: { default: 2000 },
         },
       },
       {
         periodic: {
+          interval: 60000,
+          timeout: 30000,
           exporter: {
             'otlp_file/development': {
               output_stream: 'file:///var/log/metrics.jsonl',
@@ -458,10 +477,13 @@ const configFromKitchenSinkFile = {
                 ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
             },
           },
+          cardinality_limits: { default: 2000 },
         },
       },
       {
         periodic: {
+          interval: 60000,
+          timeout: 30000,
           exporter: {
             'otlp_file/development': {
               output_stream: 'stdout',
@@ -470,10 +492,13 @@ const configFromKitchenSinkFile = {
                 ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
             },
           },
+          cardinality_limits: { default: 2000 },
         },
       },
       {
         periodic: {
+          interval: 60000,
+          timeout: 30000,
           exporter: {
             console: {
               temporality_preference: ExporterTemporalityPreference.Delta,
@@ -481,6 +506,7 @@ const configFromKitchenSinkFile = {
                 ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
             },
           },
+          cardinality_limits: { default: 2000 },
         },
       },
     ],
@@ -540,6 +566,10 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
+          schedule_delay: 5000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
           exporter: {
             otlp_grpc: {
               endpoint: 'http://localhost:4317',
@@ -559,6 +589,10 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
+          schedule_delay: 5000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
           exporter: {
             'otlp_file/development': {
               output_stream: 'file:///var/log/logs.jsonl',
@@ -568,6 +602,10 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
+          schedule_delay: 5000,
+          export_timeout: 30000,
+          max_queue_size: 2048,
+          max_export_batch_size: 512,
           exporter: { 'otlp_file/development': { output_stream: 'stdout' } },
         },
       },
@@ -615,6 +653,7 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
     attribute_value_length_limit: null,
   },
   propagator: {
+    composite: [{ tracecontext: {} }, { baggage: {} }],
     composite_list: 'tracecontext,baggage',
   },
   tracer_provider: {
@@ -675,6 +714,7 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
               encoding: OtlpHttpEncoding.Protobuf,
             },
           },
+          cardinality_limits: { default: 2000 },
         },
       },
     ],
@@ -2370,6 +2410,7 @@ describe('ConfigFactory', function () {
           attribute_value_length_limit: 23,
         },
         propagator: {
+          composite: [{ b3multi: {} }],
           composite_list: 'b3multi',
         },
         tracer_provider: {
@@ -2431,6 +2472,7 @@ describe('ConfigFactory', function () {
                     headers_list: 'metric-header',
                   },
                 },
+                cardinality_limits: { default: 2000 },
               },
             },
           ],
@@ -2608,6 +2650,7 @@ describe('ConfigFactory', function () {
           attributes_list: null,
         },
         propagator: {
+          composite: [{ tracecontext: {} }],
           composite_list: 'tracecontext',
         },
         logger_provider: {
