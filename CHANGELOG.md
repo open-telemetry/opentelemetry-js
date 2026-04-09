@@ -69,6 +69,7 @@ fix(opentelemetry-resources): do not discard OTEL_RESOURCE_ATTRIBUTES when it co
 
 ### :house: Internal
 
+* perf(core): optimize TraceState serialize, parse, and clone [#6281](https://github.com/open-telemetry/opentelemetry-js/pull/6281) @AbhiPrasad
 * perf(sdk-trace-base): use Uint8Array for browser RandomIdGenerator [#6209](https://github.com/open-telemetry/opentelemetry-js/pull/6209) @overbalance
 * test(sdk-trace-base): remove obsolete TypeScript and platform workarounds [#6327](https://github.com/open-telemetry/opentelemetry-js/pull/6327) @overbalance
 * fix(example-web): update Docker config and deps for collector [#6342](https://github.com/open-telemetry/opentelemetry-js/pull/6342) @overbalance
