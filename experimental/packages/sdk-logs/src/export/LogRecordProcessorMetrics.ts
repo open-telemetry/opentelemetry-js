@@ -69,7 +69,7 @@ export class LogRecordProcessorMetrics {
       );
       queueCapacity.add(capacity, this.standardAttrs);
 
-      const queueSize = meter.createObservableUpDownCounter(
+      this.queueSize = meter.createObservableUpDownCounter(
         METRIC_OTEL_SDK_PROCESSOR_LOG_QUEUE_SIZE,
         {
           unit: '{log_record}',
@@ -79,7 +79,7 @@ export class LogRecordProcessorMetrics {
       );
       this.queueSizeCallback = result =>
         result.observe(getQueueSize(), this.standardAttrs);
-      queueSize.addCallback(this.queueSizeCallback);
+      this.queueSize.addCallback(this.queueSizeCallback);
     }
   }
 
