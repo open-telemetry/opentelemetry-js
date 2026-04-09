@@ -126,7 +126,7 @@ const reader = new PeriodicExportingMetricReader({
 });
 ```
 
-Available Configuration Options:
+Available configuration options:
 
 ```js
 type cardinalityLimits = {
