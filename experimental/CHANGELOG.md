@@ -16,7 +16,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * feat(otlp-transformer): add custom protobuf logs serializer [#6228](https://github.com/open-telemetry/opentelemetry-js/pull/6228) @pichlermarc
 * feat(otlp-transformer): add custom protobuf logs export response deserializer [#6530](https://github.com/open-telemetry/opentelemetry-js/pull/6530) @pichlermarc
-* feat(opentelemetry-sdk-node): set TracerProvider on sdk start [#x](https://github.com/open-telemetry/opentelemetry-js/pull/x) @maryliag
+* feat(opentelemetry-sdk-node): set TracerProvider on sdk start [#6578](https://github.com/open-telemetry/opentelemetry-js/pull/6578) @maryliag
 
 ### :bug: Bug Fixes
 
