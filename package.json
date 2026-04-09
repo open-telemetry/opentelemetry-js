@@ -98,5 +98,17 @@
     "examples/http",
     "examples/https",
     "examples/esm-http-ts"
-  ]
+  ],
+  "packageManager": "npm@11.1.0",
+  "devEngines": {
+    "packageManager": {
+      "name": "npm",
+      "version": "^11.9.0",
+      "onFail": "error"
+    },
+    "runtime": {
+      "name": "node",
+      "version": "^18.19.0 || >=20.6.0 <22.22.1 || >=22.22.2"
+    }
+  }
 }
