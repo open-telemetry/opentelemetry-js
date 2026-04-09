@@ -52,7 +52,7 @@ class ExportOperation {
     exporter: LogRecordExporter,
     logRecords: SdkLogRecord[],
     exportTimeoutMillis: number,
-    metrics: LogRecordProcessorMetrics,
+    metrics: LogRecordProcessorMetrics
   ) {
     this._exportScheduledPromise = new Promise<void>(resolve => {
       this._exportScheduledResolve = resolve;
