@@ -227,11 +227,11 @@ describe('fetch', () => {
       assert.ok(isWrapped(window.fetch));
     });
 
-    it('should unwrap global fetch when disabled', () => {
+    it('should not unwrap global fetch when disabled', () => {
       fetchInstrumentation = new FetchInstrumentation();
       assert.ok(isWrapped(window.fetch));
       fetchInstrumentation.disable();
-      assert.ok(!isWrapped(window.fetch));
+      assert.ok(isWrapped(window.fetch));
 
       // Avoids ERROR in the logs when calling `disable()` again during cleanup
       fetchInstrumentation = undefined;

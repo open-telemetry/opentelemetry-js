@@ -15,7 +15,6 @@ import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import {
   SemconvStability,
   semconvStabilityFromStr,
-  isWrapped,
   InstrumentationBase,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
@@ -110,6 +109,12 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   private _tasksCount = 0;
 
   private _semconvStability: SemconvStability;
+
+  // Note: Intentionally *not* using `_enabled` as the field name to avoid
+  // any possible confusion with the `_enabled` field used on the *Node.js*
+  // InstrumentationBase class.
+  declare private _isEnabled: boolean;
+  declare private _isFetchPatched: boolean;
 
   constructor(config: FetchInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-fetch', VERSION, config);
@@ -611,10 +616,17 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       );
       return;
     }
-    if (isWrapped(fetch)) {
-      this._unwrap(globalThis, 'fetch');
-      this._diag.debug('removing previous patch for constructor');
+
+    if (this._isEnabled) {
+      return;
     }
+    this._isEnabled = true;
+
+    if (this._isFetchPatched) {
+      this._diag.debug('fetch constructor already patched');
+      return;
+    }
+    this._isFetchPatched = true;
     this._wrap(globalThis, 'fetch', this._patchConstructor());
   }
 
@@ -625,7 +637,10 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     if (!hasBrowserPerformanceAPI) {
       return;
     }
-    this._unwrap(globalThis, 'fetch');
+    if (!this._isEnabled) {
+      return;
+    }
+    this._isEnabled = false;
     this._usedResources = new WeakSet<PerformanceResourceTiming>();
   }
 }
