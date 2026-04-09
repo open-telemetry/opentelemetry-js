@@ -4,8 +4,9 @@
  */
 
 import type { Context } from '@opentelemetry/api';
-
+import type { InstrumentationScope } from '@opentelemetry/core';
 import type { SdkLogRecord } from './export/SdkLogRecord';
+import type { SeverityNumber } from '@opentelemetry/api-logs';
 
 export interface LogRecordProcessor {
   /**
@@ -25,4 +26,16 @@ export interface LogRecordProcessor {
    * opportunity for processor to do any cleanup required.
    */
   shutdown(): Promise<void>;
+
+  /**
+   * Tells if the logger is enabled for the given context, severity number and event
+   * name if provided.
+   * @param options
+   */
+  enabled?(options: {
+    context: Context;
+    instrumentationScope: InstrumentationScope;
+    severityNumber?: SeverityNumber;
+    eventName?: string;
+  }): boolean;
 }

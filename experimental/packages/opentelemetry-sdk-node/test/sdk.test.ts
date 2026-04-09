@@ -68,6 +68,7 @@ import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/expo
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
+import { NOOP_COUNTER_METRIC } from '../../../../api/src/metrics/NoopMeter';
 import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from '../src/semconv';
 
 function assertDefaultContextManagerRegistered() {
@@ -408,7 +409,7 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
-    it('should register a meter provider to the tracer provider if both initialized and metrics enabled', async () => {
+    it('should configure components for SDK metrics if enabled', async () => {
       process.env.OTEL_NODE_EXPERIMENTAL_SDK_METRICS = 'true';
       const exporter = new ConsoleMetricExporter();
       const metricReader = new PeriodicExportingMetricReader({
@@ -420,6 +421,9 @@ describe('Node SDK', () => {
       const sdk = new NodeSDK({
         metricReader: metricReader,
         traceExporter: new ConsoleSpanExporter(),
+        logRecordProcessors: [
+          new SimpleLogRecordProcessor(new InMemoryLogRecordExporter()),
+        ],
         autoDetectResources: false,
       });
 
@@ -435,12 +439,18 @@ describe('Node SDK', () => {
         (tracerProvider as any)._config.meterProvider instanceof MeterProvider
       );
 
+      const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
+      assert.notDeepEqual(
+        (loggerProvider as any)['_sharedState'].loggerMetrics.createdLogs,
+        NOOP_COUNTER_METRIC
+      );
+
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
 
       await sdk.shutdown();
     });
 
-    it('should not register a meter provider to the tracer provider if both initialized but metrics disabled', async () => {
+    it('should not configure components for SDK metrics if disabled', async () => {
       const exporter = new ConsoleMetricExporter();
       const metricReader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -451,6 +461,9 @@ describe('Node SDK', () => {
       const sdk = new NodeSDK({
         metricReader: metricReader,
         traceExporter: new ConsoleSpanExporter(),
+        logRecordProcessors: [
+          new SimpleLogRecordProcessor(new InMemoryLogRecordExporter()),
+        ],
         autoDetectResources: false,
       });
 
@@ -463,6 +476,12 @@ describe('Node SDK', () => {
       const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
       assert.ok(tracerProvider instanceof NodeTracerProvider);
       assert.equal((tracerProvider as any)._config.meterProvider, undefined);
+
+      const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
+      assert.deepEqual(
+        (loggerProvider as any)['_sharedState'].loggerMetrics.createdLogs,
+        NOOP_COUNTER_METRIC
+      );
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
 

@@ -66,6 +66,32 @@ describe('ProxyLogger', () => {
         { schemaUrl: 'https://opentelemetry.io/schemas/1.7.0' },
       ]);
     });
+
+    it('should pass LoggerOptions with scopeAttributes (LogAttributes) to delegate', () => {
+      const scopeAttributes = {
+        'service.name': 'api',
+        version: 1,
+        nested: { key: 'value' },
+        bytes: new Uint8Array([1, 2, 3]),
+      };
+      const options = {
+        schemaUrl: 'https://opentelemetry.io/schemas/1.7.0',
+        scopeAttributes,
+      };
+      const logger = provider.getLogger('test', 'v0', options);
+
+      sandbox.assert.calledOnce(getLoggerStub);
+      assert.strictEqual(getLoggerStub.firstCall.returnValue, logger);
+      assert.deepStrictEqual(getLoggerStub.firstCall.args, [
+        'test',
+        'v0',
+        options,
+      ]);
+      assert.strictEqual(
+        getLoggerStub.firstCall.args[2]?.scopeAttributes,
+        scopeAttributes
+      );
+    });
   });
 
   describe('when delegate is set after getLogger', () => {
@@ -74,12 +100,17 @@ describe('ProxyLogger', () => {
 
     let delegateLogger: Logger;
     let emitCalled: boolean;
+    let enabledCalled: boolean;
 
     beforeEach(() => {
       emitCalled = false;
       delegateLogger = {
         emit() {
           emitCalled = true;
+        },
+        enabled() {
+          enabledCalled = true;
+          return true;
         },
       };
 
@@ -98,6 +129,11 @@ describe('ProxyLogger', () => {
         body: 'Test',
       });
       assert.ok(emitCalled);
+    });
+
+    it('should call enabled from the delegate logger', () => {
+      logger.enabled();
+      assert.ok(enabledCalled);
     });
   });
 });
