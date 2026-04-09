@@ -387,6 +387,9 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         this: typeof globalThis,
         ...args: Parameters<typeof fetch>
       ): Promise<Response> {
+        if (!plugin._isEnabled) {
+          return original.apply(this, args);
+        }  
         const self = this;
         const url = web.parseUrl(
           args[0] instanceof Request ? args[0].url : String(args[0])
