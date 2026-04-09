@@ -90,10 +90,11 @@ const meterProvider = new MeterProvider({
 The `cardinalityLimits` is an optional property in `PeriodicExportingMetricReader` that allows configuration of the maximum cardinality limits per instrument type (`InstrumentType`). This limit controls the maximum number of unique time series that can be tracked for each metric instrument. If not specified in the property, the limit will default to 2000 (the default value can also be specified).
 
 It is converted to a `cardinalitySelector` function that:
-  - Takes an `InstrumentType` as input
-  - Returns the configured cardinality limit for that instrument type
-  - Falls back to the default value if a specific type isn't configured
-  - Uses 2000 as the default if the default value is also not specified
+
+- Takes an `InstrumentType` as input
+- Returns the configured cardinality limit for that instrument type
+- Falls back to the default value if a specific type isn't configured
+- Uses 2000 as the default if the default value is also not specified
 
 If the `cardinalityLimits` property is omitted:
 
@@ -117,15 +118,15 @@ const reader = new PeriodicExportingMetricReader({
   exporter,
   exportIntervalMillis: 60000,
   cardinalityLimits: {
-    counter: 10000,   // Counters can have up to 10,000 time series
-    histogram: 5000,  // Histograms limited to 5,000 time series
-    gauge: 3000,      // Gauges limited to 3,000 time series
-    default: 2500,    // changes the default from 2000 to 2500
+    counter: 10000, // Counters can have up to 10,000 time series
+    histogram: 5000, // Histograms limited to 5,000 time series
+    gauge: 3000, // Gauges limited to 3,000 time series
+    default: 2500, // changes the default from 2000 to 2500
   },
 });
 ```
 
-Available Configuration Options: 
+Available Configuration Options:
 
 ```js
 type cardinalityLimits = {
