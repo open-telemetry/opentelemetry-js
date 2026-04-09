@@ -11,7 +11,7 @@ import type {
 import { diag, createNoopMeter } from '@opentelemetry/api';
 import type { Resource } from '@opentelemetry/resources';
 import { defaultResource } from '@opentelemetry/resources';
-import type { IMetricReader } from './export/MetricReader';
+import { MetricReader, type IMetricReader } from './export/MetricReader';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { MetricCollector } from './state/MetricCollector';
 import type { ForceFlushOptions, ShutdownOptions } from './types';
@@ -26,6 +26,12 @@ export interface MeterProviderOptions {
   resource?: Resource;
   views?: ViewOptions[];
   readers?: IMetricReader[];
+
+  /**
+   * Whether to enable SDK metrics for this meter provider.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  sdkMetricsEnabled?: boolean;
 }
 
 /**
@@ -50,6 +56,9 @@ export class MeterProvider implements IMeterProvider {
         const collector = new MetricCollector(this._sharedState, metricReader);
         metricReader.setMetricProducer(collector);
         this._sharedState.metricCollectors.push(collector);
+        if (options.sdkMetricsEnabled && metricReader instanceof MetricReader) {
+          metricReader._setMeterProvider(this);
+        }
       }
     }
   }

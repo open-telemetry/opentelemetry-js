@@ -13,6 +13,7 @@ import { MetricReader } from './MetricReader';
 import type { PushMetricExporter } from './MetricExporter';
 import { callWithTimeout, TimeoutError } from '../utils';
 import type { MetricProducer } from './MetricProducer';
+import { OTEL_COMPONENT_TYPE_VALUE_PERIODIC_METRIC_READER } from '../semconv';
 
 export type PeriodicExportingMetricReaderOptions = {
   /**
@@ -55,6 +56,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
       aggregationSelector: exporter.selectAggregation?.bind(exporter),
       aggregationTemporalitySelector:
         exporter.selectAggregationTemporality?.bind(exporter),
+      otelComponentType: OTEL_COMPONENT_TYPE_VALUE_PERIODIC_METRIC_READER,
       metricProducers,
     });
 
