@@ -69,7 +69,7 @@ export class SpanProcessorMetrics {
       );
       queueCapacity.add(capacity, this.standardAttrs);
 
-      const queueSize = meter.createObservableUpDownCounter(
+      this.queueSize = meter.createObservableUpDownCounter(
         METRIC_OTEL_SDK_PROCESSOR_SPAN_QUEUE_SIZE,
         {
           unit: '{span}',
@@ -79,7 +79,7 @@ export class SpanProcessorMetrics {
       );
       this.queueSizeCallback = result =>
         result.observe(getQueueSize(), this.standardAttrs);
-      queueSize.addCallback(this.queueSizeCallback);
+      this.queueSize.addCallback(this.queueSizeCallback);
     }
   }
 
