@@ -96,7 +96,7 @@ export class SpanImpl implements Span {
   private _duration: HrTime = [-1, -1];
   private readonly _spanProcessor: SpanProcessor;
   private readonly _spanLimits: SpanLimits;
-  private readonly _attributeValueLengthLimit: number;
+  // private readonly _attributeValueLengthLimit: number; // XXX need this?
   private readonly _recordEndMetrics?: () => void;
 
   private readonly _performanceStartTime: number;
@@ -116,8 +116,8 @@ export class SpanImpl implements Span {
     this._startTimeProvided = opts.startTime != null;
     this._spanLimits = opts.spanLimits;
     // XXX Why this denormalized var? Just use from spanLimits? `0` isn't a reasonable default.
-    this._attributeValueLengthLimit =
-      this._spanLimits.attributeValueLengthLimit ?? 0;
+    // this._attributeValueLengthLimit =
+    //   this._spanLimits.attributeValueLengthLimit ?? 0;
     this._spanProcessor = opts.spanProcessor;
 
     this.name = opts.name;
@@ -448,52 +448,5 @@ export class SpanImpl implements Span {
       );
     }
     return this._ended;
-  }
-
-  // Utility function to truncate given value within size
-  // for value type of string, will truncate to given limit
-  // for type of non-string, will return same value
-  private _truncateToLimitUtil(value: string, limit: number): string {
-    if (value.length <= limit) {
-      return value;
-    }
-    return value.substring(0, limit);
-  }
-
-  /**
-   * If the given attribute value is of type string and has more characters than given {@code attributeValueLengthLimit} then
-   * return string with truncated to {@code attributeValueLengthLimit} characters
-   *
-   * If the given attribute value is array of strings then
-   * return new array of strings with each element truncated to {@code attributeValueLengthLimit} characters
-   *
-   * Otherwise return same Attribute {@code value}
-   *
-   * @param value Attribute value
-   * @returns truncated attribute value if required, otherwise same value
-   */
-  private _truncateToSize(value: AttributeValue): AttributeValue {
-    const limit = this._attributeValueLengthLimit;
-    // Check limit
-    if (limit <= 0) {
-      // Negative values are invalid, so do not truncate
-      diag.warn(`Attribute value limit must be positive, got ${limit}`);
-      return value;
-    }
-
-    // String
-    if (typeof value === 'string') {
-      return this._truncateToLimitUtil(value, limit);
-    }
-
-    // Array of strings
-    if (Array.isArray(value)) {
-      return (value as []).map(val =>
-        typeof val === 'string' ? this._truncateToLimitUtil(val, limit) : val
-      );
-    }
-
-    // Other types, no need to apply value length limit
-    return value;
   }
 }

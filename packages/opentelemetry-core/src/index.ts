@@ -12,6 +12,7 @@ export {
   normalizeAttributes,
   addAttribute, // XXX perhaps change name
   AddAttributeDecision, // XXX ew, enums :)
+  keyObjFromAnyValue,
 } from './common/attributes';
 export {
   globalErrorHandler,

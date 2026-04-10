@@ -230,3 +230,62 @@ export function normalizeAttributes(
     droppedAttributesCount,
   };
 }
+
+// XXX adapted from Marc's https://github.com/open-telemetry/opentelemetry-js/pull/6573/changes#diff-51e43be6170821a96fa159a51a1c557810feb4ba2cf6f5c9a13ca365bda3a4c4R14-R27
+/**
+ * Return a normalized JSON-serializable object for an AnyValue.
+ *
+ * This is useful for creating a mapping key for SDK data structures including
+ * `Attributes`. For example:
+ * - the Metrics SDK needs to group instrument values based on Attributes
+ * - LoggerProvider et al need to key on InstrumentationScope data, which can
+ *   include Attributes.
+ *
+ * Dev Notes:
+ * This normalization uses a [typeTag, payload] tuple.
+ * Using a type tag as the first element guarantees that two values can only
+ * produce the same tuple when they have the same type AND the same data,
+ * avoiding cross-type collisions such as:
+ *   - null vs NaN vs Infinity (all become JSON `null` via JSON.stringify)
+ *   - -0 vs 0 (both become JSON `0` via JSON.stringify)
+ *   - string "null" vs the value null
+ *
+ * Object keys are sorted so that attribute maps with the same entries but
+ * different insertion orders produce the same key.
+ */
+export function keyObjFromAnyValue(value: AttributeValue): unknown {
+  if (value === undefined) {
+    return ['u', null];
+  }
+  if (value === null) {
+    return ['n', null];
+  }
+
+  const valueType = typeof value;
+  if (valueType === 'string') {
+    return ['s', value];
+  }
+  if (valueType === 'boolean') {
+    return ['b', value];
+  }
+  if (valueType === 'number') {
+    if (Number.isNaN(value)) return ['nan', null];
+    if (value === Infinity) return ['inf', null];
+    if (value === -Infinity) return ['-inf', null];
+    if (Object.is(value, -0)) return ['n0', null];
+    return ['d', value];
+  }
+  if (value instanceof Uint8Array) {
+    return ['bytes', Array.from(value)];
+  }
+  if (Array.isArray(value)) {
+    return ['arr', value.map(keyObjFromAnyValue)];
+  }
+  // AnyValueMap — sort keys for insertion-order independence
+  return [
+    'map',
+    Object.entries(value)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([k, v]) => [k, keyObjFromAnyValue(v)]),
+  ];
+}
