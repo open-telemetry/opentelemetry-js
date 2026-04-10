@@ -67,7 +67,7 @@ describe('attributes', () => {
         arrNum: [0, null, 1],
         arrBool: [false, undefined, true],
         mixedArr: [0, false],
-        uint16array: new Uint16Array([1,2,3]),
+        uint16array: new Uint16Array([1, 2, 3]),
         date: new Date(),
       });
 

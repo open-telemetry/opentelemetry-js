@@ -13,8 +13,8 @@ export const validAttributes = {
   'array<number>': [1, 2],
   'array<bool>': [true, false],
   bytes: new Uint8Array([68, 69]),
-  obj: {foo: 'bar'},
-  nested: {anObj: {}, anArray: [1,2,3]},
+  obj: { foo: 'bar' },
+  nested: { anObj: {}, anArray: [1, 2, 3] },
 };
 
 export const invalidAttributes = {
