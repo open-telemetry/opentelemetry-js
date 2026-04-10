@@ -60,7 +60,6 @@ describe('ShimSpan', () => {
         attributes: {
           foo: 'bar',
         },
-        droppedAttributesCount: 0,
         name: 'the annotation',
       });
     });
@@ -81,7 +80,6 @@ describe('ShimSpan', () => {
           'message.event.size.uncompressed': 12,
           'message.event.type': 'SENT',
         },
-        droppedAttributesCount: 0,
         name: '98',
       });
     });
