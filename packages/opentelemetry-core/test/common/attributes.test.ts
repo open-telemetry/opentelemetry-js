@@ -24,8 +24,8 @@ describe('attributes', () => {
       assert.ok(isAttributeValue());
     });
 
-    it('should not allow objects', () => {
-      assert.ok(!isAttributeValue({}));
+    it('should allow objects', () => {
+      assert.ok(isAttributeValue({}));
     });
 
     it('should allow homogeneous arrays', () => {
@@ -42,18 +42,21 @@ describe('attributes', () => {
       assert.ok(isAttributeValue(['str1', undefined, 'str3']));
     });
 
-    it('should not allow heterogeneous arrays', () => {
-      assert.ok(!isAttributeValue([0, false, 2]));
-      assert.ok(!isAttributeValue([true, 'false', true]));
-      assert.ok(!isAttributeValue(['str1', 2, 'str3']));
+    it('should allow heterogeneous arrays', () => {
+      assert.ok(isAttributeValue([0, false, 2]));
+      assert.ok(isAttributeValue([true, 'false', true]));
+      assert.ok(isAttributeValue(['str1', 2, 'str3']));
     });
 
-    it('should not allow arrays of objects or nested arrays', () => {
-      assert.ok(!isAttributeValue([{}]));
-      assert.ok(!isAttributeValue([[]]));
+    it('should allow arrays of objects or nested arrays', () => {
+      assert.ok(isAttributeValue([{}]));
+      assert.ok(isAttributeValue([[]]));
     });
+
+    // XXX add more tests on new AnyValue edge cases
   });
-  describe('#sanitize', () => {
+
+  describe('#sanitizeAttributes', () => {
     it('should remove invalid fields', () => {
       const attributes = sanitizeAttributes({
         str: 'string',
@@ -64,15 +67,19 @@ describe('attributes', () => {
         arrNum: [0, null, 1],
         arrBool: [false, undefined, true],
         mixedArr: [0, false],
+        uint16array: new Uint16Array([1,2,3]),
+        date: new Date(),
       });
 
       assert.deepStrictEqual(attributes, {
         str: 'string',
         num: 0,
         bool: false,
+        object: {},
         arrStr: ['str1', null, 'str2'],
         arrNum: [0, null, 1],
         arrBool: [false, undefined, true],
+        mixedArr: [0, false],
       });
     });
 
@@ -92,4 +99,6 @@ describe('attributes', () => {
       assert.strictEqual(attributes.arr[0], 'unmodified');
     });
   });
+
+  // XXX test new core exports: addAttribute, keyObjFromAnyValue, normalizeAttributes
 });
