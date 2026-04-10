@@ -5,6 +5,7 @@
 
 import type { Attributes } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
+import { keyObjFromAnyValue } from '@opentelemetry/core';
 
 export type Maybe<T> = T | undefined;
 
@@ -13,12 +14,13 @@ export type Maybe<T> = T | undefined;
  * @param attributes user provided unordered Attributes.
  */
 export function hashAttributes(attributes: Attributes): string {
-  let keys = Object.keys(attributes);
+  const keys = Object.keys(attributes);
   if (keys.length === 0) return '';
 
-  // Return a string that is stable on key orders.
-  keys = keys.sort();
-  return JSON.stringify(keys.map(key => [key, attributes[key]]));
+  // XXX Should this be defensively dropping attributes with invalid type?
+
+  const keyObj = keyObjFromAnyValue(attributes);
+  return JSON.stringify(keyObj);
 }
 
 /**

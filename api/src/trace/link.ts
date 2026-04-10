@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { SpanAttributes } from './attributes';
+import type { Attributes } from '../common/Attributes';
 import type { SpanContext } from './span_context';
 
 /**
@@ -26,8 +26,11 @@ import type { SpanContext } from './span_context';
 export interface Link {
   /** The {@link SpanContext} of a linked span. */
   context: SpanContext;
-  /** A set of {@link SpanAttributes} on the link. */
-  attributes?: SpanAttributes;
+  /** A set of {@link Attributes} on the link. */
+  attributes?: Attributes;
+  // XXX A bit silly/incorrect to have this dropped count on the `Link` type
+  //     used by Span#addLink. The user is not meant to specify this count.
+  //     We could deprecate this, and then cope in the SDK.
   /** Count of attributes of the link that were dropped due to collection limits */
   droppedAttributesCount?: number;
 }
