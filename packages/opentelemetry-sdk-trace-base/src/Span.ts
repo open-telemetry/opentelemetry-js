@@ -24,11 +24,13 @@ import {
   millisToHrTime,
   hrTime,
   hrTimeDuration,
-  isAttributeValue,
   isTimeInput,
   isTimeInputHrTime,
   otperformance,
   sanitizeAttributes,
+  normalizeAttributes,
+  addAttribute,
+  AddAttributeDecision,
 } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import {
@@ -114,6 +116,7 @@ export class SpanImpl implements Span {
       now - (this._performanceStartTime + otperformance.timeOrigin);
     this._startTimeProvided = opts.startTime != null;
     this._spanLimits = opts.spanLimits;
+    // XXX Why this denormalized var? Just use from spanLimits? `0` isn't a reasonable default.
     this._attributeValueLengthLimit =
       this._spanLimits.attributeValueLengthLimit ?? 0;
     this._spanProcessor = opts.spanProcessor;
@@ -132,7 +135,17 @@ export class SpanImpl implements Span {
     this._recordEndMetrics = opts.recordEndMetrics;
 
     if (opts.attributes != null) {
-      this.setAttributes(opts.attributes);
+      const { attributes, droppedAttributesCount } = normalizeAttributes(
+        opts.attributes,
+        this._spanLimits.attributeCountLimit,
+        this._spanLimits.attributeValueLengthLimit
+      );
+      if (attributes) {
+        this.attributes = attributes;
+      }
+      if (droppedAttributesCount) {
+        this._droppedAttributesCount += droppedAttributesCount;
+      }
     }
 
     this._spanProcessor.onStart(this, opts.context);
@@ -144,35 +157,29 @@ export class SpanImpl implements Span {
 
   setAttribute(key: string, value?: AttributeValue): this;
   setAttribute(key: string, value: unknown): this {
-    if (value == null || this._isSpanEnded()) return this;
-    if (key.length === 0) {
-      diag.warn(`Invalid attribute key: ${key}`);
-      return this;
-    }
-    if (!isAttributeValue(value)) {
-      diag.warn(`Invalid attribute value set for key: ${key}`);
-      return this;
-    }
+    // console.log('XXX _attributesCount: ', this._attributesCount)
+    // throw new Error(`XXX setAttribute: ${key}=${value}`);
 
-    const { attributeCountLimit } = this._spanLimits;
-    const isNewKey = !Object.prototype.hasOwnProperty.call(
+    const decision = addAttribute(
       this.attributes,
-      key
+      this._attributesCount,
+      this._spanLimits.attributeCountLimit ?? 128, // XXX how to ensure this is set in ctor? Hack for now
+      this._spanLimits.attributeValueLengthLimit ?? Infinity, // XXX hack default for now. Type should be Required<SpanLimits>
+      key,
+      value
     );
 
-    if (
-      attributeCountLimit !== undefined &&
-      this._attributesCount >= attributeCountLimit &&
-      isNewKey
-    ) {
+    // XXX Handle DROP_INVALID?
+    if (decision === AddAttributeDecision.DROP_LIMIT_REACHED) {
       this._droppedAttributesCount++;
-      return this;
-    }
-
-    this.attributes[key] = this._truncateToSize(value);
-    if (isNewKey) {
+      if (this._droppedAttributesCount === 1) {
+        // Only warn once per LogRecord to avoid log spam
+        diag.warn('Dropping extra attributes.');
+      }
+    } else if (decision === AddAttributeDecision.ADD_NEW) {
       this._attributesCount++;
     }
+
     return this;
   }
 
@@ -225,34 +232,17 @@ export class SpanImpl implements Span {
       attributesOrStartTime = undefined;
     }
 
-    const sanitized = sanitizeAttributes(attributesOrStartTime);
-    const { attributePerEventCountLimit } = this._spanLimits;
-    const attributes: Attributes = {};
-    let droppedAttributesCount = 0;
-    let eventAttributesCount = 0;
-
-    for (const attr in sanitized) {
-      if (!Object.prototype.hasOwnProperty.call(sanitized, attr)) {
-        continue;
-      }
-      const attrVal = sanitized[attr];
-      if (
-        attributePerEventCountLimit !== undefined &&
-        eventAttributesCount >= attributePerEventCountLimit
-      ) {
-        droppedAttributesCount++;
-        continue;
-      }
-      attributes[attr] = this._truncateToSize(attrVal!);
-      eventAttributesCount++;
-    }
-
     this.events.push({
       name,
-      attributes,
       time: this._getTime(timeStamp),
-      droppedAttributesCount,
+      ...normalizeAttributes(
+        attributesOrStartTime,
+        // XXX old code is handling `attributePerEventCountLimit !== undefined`. Need we here?
+        this._spanLimits.attributePerEventCountLimit,
+        this._spanLimits.attributeValueLengthLimit
+      ),
     });
+
     return this;
   }
 
@@ -274,6 +264,7 @@ export class SpanImpl implements Span {
       this._droppedLinksCount++;
     }
 
+    // XXX use normalizeAttributes
     const { attributePerLinkCountLimit } = this._spanLimits;
     const sanitized = sanitizeAttributes(link.attributes);
     const attributes: Attributes = {};
