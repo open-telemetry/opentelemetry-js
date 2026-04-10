@@ -122,6 +122,7 @@ function waitFor(timeout: number): Promise<void> {
 }
 
 describe('fetch', () => {
+  const originalFetch = globalThis.fetch;
   let workerStarted = false;
 
   const startWorker = async (
@@ -202,17 +203,18 @@ describe('fetch', () => {
       );
     } finally {
       sinon.restore();
+      globalThis.fetch = originalFetch;
     }
   });
 
   describe('enabling/disabling', () => {
-    const originalFetch = globalThis.fetch;
+    // const originalFetch = globalThis.fetch;
     let fetchInstrumentation: FetchInstrumentation | undefined;
 
     afterEach(() => {
       fetchInstrumentation?.disable();
       fetchInstrumentation = undefined;
-      globalThis.fetch = originalFetch;
+      // globalThis.fetch = originalFetch;
     });
 
     it('should wrap global fetch when instantiated', () => {
