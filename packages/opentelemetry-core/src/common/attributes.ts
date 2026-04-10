@@ -12,48 +12,14 @@ import { diag } from '@opentelemetry/api';
  * Limitations:
  * - This does not handle attribute limits.
  *   https://opentelemetry.io/docs/specs/otel/common/#attribute-limits
- * - This makes a top-level copy of keys. Nested elements should be immutable,
- *   but this is the caller's responsibility.
- *
- * XXX Deprecate in favour of normalizeAttributes()? ddtrace uses this FWIW.
- *     Or just replace with normalizeAttributes and drop the dropped count.
- * XXX add circular ref check? Or deprecate and not bother?
+ * - This does not return a number of dropped attributes, needed for
+ *   handling `droppedAttributesCount` OTLP fields.
  *
  * @deprecated use normalizeAttributes
  */
-export function sanitizeAttributes(attributes: unknown): Attributes {
-  const out: Attributes = {};
-
-  if (typeof attributes !== 'object' || attributes == null) {
-    return out;
-  }
-
-  for (const key in attributes) {
-    if (!Object.hasOwn(attributes, key)) {
-      continue;
-    }
-    if (!isAttributeKey(key)) {
-      diag.warn(`Invalid attribute key: ${key}`);
-      continue;
-    }
-    const val = (attributes as Record<string, unknown>)[key];
-    if (!isAttributeValue(val)) {
-      diag.warn(`Invalid attribute value set for key: ${key}`);
-      continue;
-    }
-    if (Array.isArray(val)) {
-      // XXX I think we should drop this copy.
-      out[key] = val.slice();
-    } else {
-      out[key] = val;
-    }
-  }
-
-  return out;
-}
-
-function isAttributeKey(key: unknown): key is string {
-  return typeof key === 'string' && key !== '';
+export function sanitizeAttributes(obj: unknown): Attributes {
+  const { attributes } = normalizeAttributes(obj);
+  return attributes ?? {};
 }
 
 /**

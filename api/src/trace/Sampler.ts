@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { Attributes } from '../common/Attributes';
 import type { Context } from '../context/types';
-import type { SpanAttributes } from './attributes';
 import type { Link } from './link';
 import type { SamplingResult } from './SamplingResult';
 import type { SpanKind } from './span_kind';
@@ -27,7 +27,7 @@ export interface Sampler {
    *     span to be created starts a new trace.
    * @param spanName of the span to be created.
    * @param spanKind of the span to be created.
-   * @param attributes Initial set of SpanAttributes for the Span being constructed.
+   * @param attributes Initial set of Attributes for the Span being constructed.
    * @param links Collection of links that will be associated with the Span to
    *     be created. Typically useful for batch operations.
    * @returns a {@link SamplingResult}.
@@ -37,7 +37,7 @@ export interface Sampler {
     traceId: string,
     spanName: string,
     spanKind: SpanKind,
-    attributes: SpanAttributes,
+    attributes: Attributes,
     links: Link[]
   ): SamplingResult;
 

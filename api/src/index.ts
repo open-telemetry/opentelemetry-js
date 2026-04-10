@@ -71,13 +71,8 @@ export type {
 export type { PropagationAPI } from './api/propagation';
 
 // Trace APIs
-export type { SpanAttributes, SpanAttributeValue } from './trace/attributes';
 export type { Link } from './trace/link';
 export { ProxyTracer, type TracerDelegator } from './trace/ProxyTracer';
-// TODO: Remove ProxyTracerProvider export in the next major version.
-export { ProxyTracerProvider } from './trace/ProxyTracerProvider';
-export type { Sampler } from './trace/Sampler';
-export { SamplingDecision, type SamplingResult } from './trace/SamplingResult';
 export type { SpanContext } from './trace/span_context';
 export { SpanKind } from './trace/span_kind';
 export type { Span } from './trace/span';
@@ -100,6 +95,13 @@ export {
   INVALID_SPAN_CONTEXT,
 } from './trace/invalid-span-constants';
 export type { TraceAPI } from './api/trace';
+
+// Deprecated Trace APIs
+export type { SpanAttributes, SpanAttributeValue } from './trace/attributes';
+// TODO: Remove ProxyTracerProvider export in the next major version.
+export { ProxyTracerProvider } from './trace/ProxyTracerProvider';
+export type { Sampler } from './trace/Sampler';
+export { SamplingDecision, type SamplingResult } from './trace/SamplingResult';
 
 // Split module-level variable definition into separate files to allow
 // tree-shaking on each api instance.

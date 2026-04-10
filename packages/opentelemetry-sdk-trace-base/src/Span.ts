@@ -27,7 +27,6 @@ import {
   isTimeInput,
   isTimeInputHrTime,
   otperformance,
-  sanitizeAttributes,
   normalizeAttributes,
   addAttribute,
   AddAttributeDecision,
@@ -124,6 +123,8 @@ export class SpanImpl implements Span {
     this.name = opts.name;
     this.parentSpanContext = opts.parentSpanContext;
     this.kind = opts.kind;
+    // XXX should be able to assign these directly. Tracer.startSpan already
+    //     handles normalization. It should passing droppedAttributeCount too.
     if (opts.links) {
       for (const link of opts.links) {
         this.addLink(link);
@@ -155,11 +156,13 @@ export class SpanImpl implements Span {
     return this._spanContext;
   }
 
+  // XXX For next major:
+  //      - Could we drop the `value?`? setAttribute() in API doesn't have it.
+  //      - Could we drop the `unknown`? While the SDK setAttribute defensively
+  //        handles whatever type is thrown at it, the *API* intent is that the
+  //        called only sends `AttributeValue`.
   setAttribute(key: string, value?: AttributeValue): this;
   setAttribute(key: string, value: unknown): this {
-    // console.log('XXX _attributesCount: ', this._attributesCount)
-    // throw new Error(`XXX setAttribute: ${key}=${value}`);
-
     const decision = addAttribute(
       this.attributes,
       this._attributesCount,
@@ -264,38 +267,16 @@ export class SpanImpl implements Span {
       this._droppedLinksCount++;
     }
 
-    // XXX use normalizeAttributes
-    const { attributePerLinkCountLimit } = this._spanLimits;
-    const sanitized = sanitizeAttributes(link.attributes);
-    const attributes: Attributes = {};
-    let droppedAttributesCount = 0;
-    let linkAttributesCount = 0;
+    this.links.push({
+      context: link.context,
+      ...normalizeAttributes(
+        link.attributes,
+        // XXX old code is handling `attributePerLinkCountLimit !== undefined`. Need we here?
+        this._spanLimits.attributePerLinkCountLimit,
+        this._spanLimits.attributeValueLengthLimit
+      ),
+    });
 
-    for (const attr in sanitized) {
-      if (!Object.prototype.hasOwnProperty.call(sanitized, attr)) {
-        continue;
-      }
-      const attrVal = sanitized[attr];
-      if (
-        attributePerLinkCountLimit !== undefined &&
-        linkAttributesCount >= attributePerLinkCountLimit
-      ) {
-        droppedAttributesCount++;
-        continue;
-      }
-      attributes[attr] = this._truncateToSize(attrVal!);
-      linkAttributesCount++;
-    }
-
-    const processedLink: Link = { context: link.context };
-    if (linkAttributesCount > 0) {
-      processedLink.attributes = attributes;
-    }
-    if (droppedAttributesCount > 0) {
-      processedLink.droppedAttributesCount = droppedAttributesCount;
-    }
-
-    this.links.push(processedLink);
     return this;
   }
 
