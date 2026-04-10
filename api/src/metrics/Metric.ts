@@ -80,9 +80,7 @@ export enum ValueType {
  *
  * @since 1.3.0
  */
-export interface Counter<
-  AttributesTypes extends Attributes = Attributes,
-> {
+export interface Counter<AttributesTypes extends Attributes = Attributes> {
   /**
    * Increment value of counter by the input. Inputs must not be negative.
    */
@@ -104,9 +102,7 @@ export interface UpDownCounter<
 /**
  * @since 1.9.0
  */
-export interface Gauge<
-  AttributesTypes extends Attributes = Attributes,
-> {
+export interface Gauge<AttributesTypes extends Attributes = Attributes> {
   /**
    * Records a measurement.
    */
@@ -116,9 +112,7 @@ export interface Gauge<
 /**
  * @since 1.3.0
  */
-export interface Histogram<
-  AttributesTypes extends Attributes = Attributes,
-> {
+export interface Histogram<AttributesTypes extends Attributes = Attributes> {
   /**
    * Records a measurement. Value of the measurement must not be negative.
    */
@@ -208,9 +202,7 @@ export type BatchObservableCallback<
 /**
  * @since 1.3.0
  */
-export interface Observable<
-  AttributesTypes extends Attributes = Attributes,
-> {
+export interface Observable<AttributesTypes extends Attributes = Attributes> {
   /**
    * Sets up a function that will be called whenever a metric collection is initiated.
    *
@@ -227,9 +219,8 @@ export interface Observable<
 /**
  * @since 1.3.0
  */
-export type ObservableCounter<
-  AttributesTypes extends Attributes = Attributes,
-> = Observable<AttributesTypes>;
+export type ObservableCounter<AttributesTypes extends Attributes = Attributes> =
+  Observable<AttributesTypes>;
 /**
  * @since 1.3.0
  */
@@ -239,6 +230,5 @@ export type ObservableUpDownCounter<
 /**
  * @since 1.3.0
  */
-export type ObservableGauge<
-  AttributesTypes extends Attributes = Attributes,
-> = Observable<AttributesTypes>;
+export type ObservableGauge<AttributesTypes extends Attributes = Attributes> =
+  Observable<AttributesTypes>;

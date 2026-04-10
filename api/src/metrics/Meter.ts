@@ -88,9 +88,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createUpDownCounter<
-    AttributesTypes extends Attributes = Attributes,
-  >(
+  createUpDownCounter<AttributesTypes extends Attributes = Attributes>(
     name: string,
     options?: MetricOptions
   ): UpDownCounter<AttributesTypes>;
@@ -103,9 +101,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createObservableGauge<
-    AttributesTypes extends Attributes = Attributes,
-  >(
+  createObservableGauge<AttributesTypes extends Attributes = Attributes>(
     name: string,
     options?: MetricOptions
   ): ObservableGauge<AttributesTypes>;
@@ -118,9 +114,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createObservableCounter<
-    AttributesTypes extends Attributes = Attributes,
-  >(
+  createObservableCounter<AttributesTypes extends Attributes = Attributes>(
     name: string,
     options?: MetricOptions
   ): ObservableCounter<AttributesTypes>;
@@ -154,9 +148,7 @@ export interface Meter {
    * @param callback the batch observable callback
    * @param observables the observables associated with this batch observable callback
    */
-  addBatchObservableCallback<
-    AttributesTypes extends Attributes = Attributes,
-  >(
+  addBatchObservableCallback<AttributesTypes extends Attributes = Attributes>(
     callback: BatchObservableCallback<AttributesTypes>,
     observables: Observable<AttributesTypes>[]
   ): void;
