@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Attributes, AttributeValue } from '../common/Attributes';
+import type { AnyValue } from '../common/AnyValue';
+import type { Attributes } from '../common/Attributes';
 import type { Exception } from '../common/Exception';
 import type { TimeInput } from '../common/Time';
 import type { SpanContext } from './span_context';
@@ -39,17 +40,14 @@ export interface Span {
    * Sets a single Attribute with the key and value passed as arguments.
    *
    * @param key the key for this attribute.
-   * @param value the value for this attribute. Setting a value null or
-   *              undefined is invalid and will result in undefined behavior.
+   * @param value the value for this attribute.
    */
-  setAttribute(key: string, value: AttributeValue): this;
+  setAttribute(key: string, value: AnyValue): this;
 
   /**
    * Sets attributes to the span.
    *
    * @param attributes the attributes that will be added.
-   *                   null or undefined attribute values
-   *                   are invalid and will result in undefined behavior.
    */
   setAttributes(attributes: Attributes): this;
 

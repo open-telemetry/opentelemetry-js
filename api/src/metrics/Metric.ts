@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Attributes, AttributeValue } from '../common/Attributes';
+import type { AnyValue } from '../common/AnyValue';
+import type { Attributes } from '../common/Attributes';
 import type { Context } from '../context/types';
 
 /**
@@ -80,7 +81,7 @@ export enum ValueType {
  * @since 1.3.0
  */
 export interface Counter<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
+  AttributesTypes extends Attributes = Attributes,
 > {
   /**
    * Increment value of counter by the input. Inputs must not be negative.
@@ -92,7 +93,7 @@ export interface Counter<
  * @since 1.3.0
  */
 export interface UpDownCounter<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
+  AttributesTypes extends Attributes = Attributes,
 > {
   /**
    * Increment value of counter by the input. Inputs may be negative.
@@ -104,7 +105,7 @@ export interface UpDownCounter<
  * @since 1.9.0
  */
 export interface Gauge<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
+  AttributesTypes extends Attributes = Attributes,
 > {
   /**
    * Records a measurement.
@@ -116,7 +117,7 @@ export interface Gauge<
  * @since 1.3.0
  */
 export interface Histogram<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
+  AttributesTypes extends Attributes = Attributes,
 > {
   /**
    * Records a measurement. Value of the measurement must not be negative.
@@ -134,7 +135,7 @@ export type MetricAttributes = Attributes;
  * @deprecated please use {@link AttributeValue}
  * @since 1.3.0
  */
-export type MetricAttributeValue = AttributeValue;
+export type MetricAttributeValue = AnyValue;
 
 /**
  * Interface that is being used in callback function for Observable Metric.
@@ -142,7 +143,7 @@ export type MetricAttributeValue = AttributeValue;
  * @since 1.3.0
  */
 export interface ObservableResult<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
+  AttributesTypes extends Attributes = Attributes,
 > {
   /**
    * Observe a measurement of the value associated with the given attributes.
@@ -163,7 +164,7 @@ export interface ObservableResult<
  * Interface that is being used in batch observable callback function.
  */
 export interface BatchObservableResult<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
+  AttributesTypes extends Attributes = Attributes,
 > {
   /**
    * Observe a measurement of the value associated with the given attributes.
@@ -188,7 +189,7 @@ export interface BatchObservableResult<
  * @since 1.3.0
  */
 export type ObservableCallback<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
+  AttributesTypes extends Attributes = Attributes,
 > = (
   observableResult: ObservableResult<AttributesTypes>
 ) => void | Promise<void>;
@@ -199,7 +200,7 @@ export type ObservableCallback<
  * @since 1.3.0
  */
 export type BatchObservableCallback<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
+  AttributesTypes extends Attributes = Attributes,
 > = (
   observableResult: BatchObservableResult<AttributesTypes>
 ) => void | Promise<void>;
@@ -208,7 +209,7 @@ export type BatchObservableCallback<
  * @since 1.3.0
  */
 export interface Observable<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
+  AttributesTypes extends Attributes = Attributes,
 > {
   /**
    * Sets up a function that will be called whenever a metric collection is initiated.
@@ -227,17 +228,17 @@ export interface Observable<
  * @since 1.3.0
  */
 export type ObservableCounter<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
+  AttributesTypes extends Attributes = Attributes,
 > = Observable<AttributesTypes>;
 /**
  * @since 1.3.0
  */
 export type ObservableUpDownCounter<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
+  AttributesTypes extends Attributes = Attributes,
 > = Observable<AttributesTypes>;
 /**
  * @since 1.3.0
  */
 export type ObservableGauge<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
+  AttributesTypes extends Attributes = Attributes,
 > = Observable<AttributesTypes>;
