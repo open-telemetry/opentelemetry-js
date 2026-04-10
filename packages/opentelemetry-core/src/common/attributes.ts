@@ -203,7 +203,9 @@ function truncateToSize(value: AttributeValue, limit: number): AttributeValue {
   // Objects/Maps - recursively truncate nested values
   if (typeof value === 'object') {
     const truncatedObj: Record<string, AttributeValue> = {};
-    for (const [k, v] of Object.entries(value as Record<string, AttributeValue>)) {
+    for (const [k, v] of Object.entries(
+      value as Record<string, AttributeValue>
+    )) {
       truncatedObj[k] = truncateToSize(v, limit);
     }
     return truncatedObj;
@@ -262,4 +264,3 @@ export function normalizeAttributes(
     droppedAttributesCount,
   };
 }
-
