@@ -97,10 +97,10 @@ export class Tracer implements api.Tracer {
     }
 
     const spanKind = options.kind ?? api.SpanKind.INTERNAL;
-    // XXX use normalizeAttributes, keep droppedAttributeCount values,
+    // XXX use normalizeAttributes, keep droppedAttributesCount values,
     //     separate from the `links` sent to shouldSample. Then pass links
-    //     *with* droppedAttributeCount to SpanImpl, which accepts those.
-    //     I.e. SpanImpl type shoudl be `Array<Link & {droppedAttributeCount?: number}>`
+    //     *with* droppedAttributesCount to SpanImpl, which accepts those.
+    //     I.e. SpanImpl type shoudl be `Array<Link & {droppedAttributesCount?: number}>`
     const links = (options.links ?? []).map(link => {
       return {
         context: link.context,

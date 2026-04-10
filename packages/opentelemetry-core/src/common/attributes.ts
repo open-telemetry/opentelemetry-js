@@ -34,6 +34,7 @@ export function sanitizeAttributes(obj: unknown): Attributes {
 export function isAttributeValue(val: unknown): val is AttributeValue {
   return isAttributeValueInternal(val, new WeakSet());
 }
+// XXX rename this to `isAnyValue`, and deprecated isAttributeValue
 
 function isAttributeValueInternal(
   val: unknown,
@@ -193,8 +194,8 @@ export function normalizeAttributes(
   countLimit = Infinity,
   valueLengthLimit = Infinity
 ): {
-  readonly attributes?: Attributes;
-  readonly droppedAttributesCount?: number;
+  attributes?: Attributes;
+  droppedAttributesCount?: number;
 } {
   if (attributes == null) {
     return {};
@@ -225,10 +226,14 @@ export function normalizeAttributes(
     }
   }
 
-  return {
-    attributes: currentAttributesCount > 0 ? normalizedAttributes : undefined,
-    droppedAttributesCount,
-  };
+  const result: ReturnType<typeof normalizeAttributes> = {};
+  if (currentAttributesCount > 0) {
+    result.attributes = normalizedAttributes;
+  }
+  if (droppedAttributesCount) {
+    result.droppedAttributesCount = droppedAttributesCount;
+  }
+  return result;
 }
 
 // XXX adapted from Marc's https://github.com/open-telemetry/opentelemetry-js/pull/6573/changes#diff-51e43be6170821a96fa159a51a1c557810feb4ba2cf6f5c9a13ca365bda3a4c4R14-R27

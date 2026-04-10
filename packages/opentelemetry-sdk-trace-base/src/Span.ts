@@ -124,7 +124,7 @@ export class SpanImpl implements Span {
     this.parentSpanContext = opts.parentSpanContext;
     this.kind = opts.kind;
     // XXX should be able to assign these directly. Tracer.startSpan already
-    //     handles normalization. It should passing droppedAttributeCount too.
+    //     handles normalization. It should passing droppedAttributesCount too.
     if (opts.links) {
       for (const link of opts.links) {
         this.addLink(link);
@@ -163,6 +163,8 @@ export class SpanImpl implements Span {
   //        called only sends `AttributeValue`.
   setAttribute(key: string, value?: AttributeValue): this;
   setAttribute(key: string, value: unknown): this {
+    if (this._isSpanEnded()) return this;
+
     const decision = addAttribute(
       this.attributes,
       this._attributesCount,
