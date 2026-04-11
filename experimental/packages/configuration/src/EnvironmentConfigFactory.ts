@@ -6,7 +6,6 @@
 import type { ConfigurationModel } from './models/configModel';
 import { initializeDefaultConfiguration } from './models/configModel';
 import {
-  getBooleanFromEnv,
   getStringFromEnv,
   getStringListFromEnv,
   diagLogLevelFromString,
@@ -43,14 +42,13 @@ export class EnvironmentConfigFactory implements ConfigFactory {
 
   constructor() {
     this._config = initializeDefaultConfiguration();
-    this._config.disabled = getBooleanFromEnv('OTEL_SDK_DISABLED');
+    const envValues = readAllEnvVars();
+    this._config.disabled = envValues.OTEL_SDK_DISABLED;
 
     const logLevel = diagLogLevelFromString(getStringFromEnv('OTEL_LOG_LEVEL'));
     if (logLevel) {
       this._config.log_level = logLevel;
     }
-
-    const envValues = readAllEnvVars();
 
     setResources(this._config);
     setAttributeLimits(this._config);
