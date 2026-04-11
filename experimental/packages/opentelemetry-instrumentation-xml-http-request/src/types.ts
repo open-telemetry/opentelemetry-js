@@ -45,7 +45,7 @@ export interface XhrMem {
   // span url - not available on types.Span
   spanUrl?: string;
   // startTime of send function - used to filter cors preflight requests
-  sendStartTime?: api.HrTime;
+  sendStartTime?: number;
   // resources created between send and end plus some additional timeout
   createdResources?: {
     observer: PerformanceObserver;
