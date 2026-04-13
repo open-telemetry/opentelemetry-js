@@ -388,7 +388,18 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           isRequest(args[0]) ? args[0].url : String(args[0])
         ).href;
 
-        const options = isRequest(args[0]) ? args[0] : args[1] || {};
+        // Per the Fetch spec, when fetch() is called with a Request object
+        // and a separate init object, the init properties override the
+        // Request's properties. Merge them into a new Request so that
+        // downstream consumers (hooks, header injection, the actual fetch
+        // call) see the correct final values.
+        // See: https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#parameters
+        let options: Request | RequestInit;
+        if (isRequest(args[0])) {
+          options = args[1] != null ? new Request(args[0], args[1]) : args[0];
+        } else {
+          options = args[1] || {};
+        }
         const createdSpan = plugin._createSpan(url, options);
         if (!createdSpan) {
           return original.apply(this, args);
