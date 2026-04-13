@@ -73,9 +73,9 @@ class EnvDetector implements ResourceDetector {
     if (!rawEnvAttributes) return {};
 
     const attributes: Attributes = {};
-    const rawAttributes: string[] = rawEnvAttributes.split(
-      this._COMMA_SEPARATOR
-    );
+    const rawAttributes: string[] = rawEnvAttributes
+      .split(this._COMMA_SEPARATOR)
+      .filter(attr => attr.trim() !== ''); // Filter out empty entries
 
     for (const rawAttribute of rawAttributes) {
       const keyValuePair: string[] = rawAttribute.split(

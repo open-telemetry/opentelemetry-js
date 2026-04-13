@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { MetricReader } from '@opentelemetry/sdk-metrics';
+
 export const validAttributes = {
   string: 'string',
   number: 0,
@@ -19,3 +21,12 @@ export const invalidAttributes = {
   // This empty length attribute should not be set
   '': 'empty-key',
 };
+
+export class TestMetricReader extends MetricReader {
+  protected override onShutdown(): Promise<void> {
+    return Promise.resolve();
+  }
+  protected override onForceFlush(): Promise<void> {
+    return Promise.resolve();
+  }
+}
