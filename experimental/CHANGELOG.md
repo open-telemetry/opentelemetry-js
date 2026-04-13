@@ -21,6 +21,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * fix(instrumentation-fetch): preserve init overrides when input is a Request object [#6421](https://github.com/open-telemetry/opentelemetry-js/issues/6421) @akandic47
 * fix(otlp-exporter-base): limit Node.js HTTP transport response body to 4 MiB [#6552](https://github.com/open-telemetry/opentelemetry-js/pull/6552) @kartikgola
+* fix(instrumentation-fetch): avoid unwrapping fetch API when disabling [#6575](https://github.com/open-telemetry/opentelemetry-js/issues/6575) @david-luna
 
 ### :books: Documentation
 
