@@ -31,13 +31,18 @@ import {
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import type {
+  Sampler,
   SpanExporter,
   SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import {
+  AlwaysOffSampler,
+  AlwaysOnSampler,
   BatchSpanProcessor,
   ConsoleSpanExporter,
+  ParentBasedSampler,
   SimpleSpanProcessor,
+  TraceIdRatioBasedSampler,
 } from '@opentelemetry/sdk-trace-base';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
@@ -52,6 +57,7 @@ import type {
   InstrumentTypeConfigModel,
   AggregationConfigModel,
   PeriodicMetricReaderConfigModel,
+  SamplerConfigModel,
 } from '@opentelemetry/configuration';
 import type {
   AggregationOption,
@@ -822,4 +828,44 @@ export function getInstanceID(config: ConfigurationModel): string | undefined {
     }
   }
   return undefined;
+}
+
+const DEFAULT_RATIO = 1;
+
+/**
+ * Builds a {@link Sampler} from a {@link SamplerConfigModel} data model.
+ * This allows sampler construction from declarative configuration.
+ */
+export function buildSamplerFromConfig(config: SamplerConfigModel): Sampler {
+  if (config.always_on !== undefined) {
+    return new AlwaysOnSampler();
+  }
+  if (config.always_off !== undefined) {
+    return new AlwaysOffSampler();
+  }
+  if (config.trace_id_ratio_based !== undefined) {
+    return new TraceIdRatioBasedSampler(
+      config.trace_id_ratio_based.ratio ?? DEFAULT_RATIO
+    );
+  }
+  if (config.parent_based !== undefined) {
+    const pb = config.parent_based;
+    return new ParentBasedSampler({
+      root: pb.root ? buildSamplerFromConfig(pb.root) : new AlwaysOnSampler(),
+      remoteParentSampled: pb.remote_parent_sampled
+        ? buildSamplerFromConfig(pb.remote_parent_sampled)
+        : undefined,
+      remoteParentNotSampled: pb.remote_parent_not_sampled
+        ? buildSamplerFromConfig(pb.remote_parent_not_sampled)
+        : undefined,
+      localParentSampled: pb.local_parent_sampled
+        ? buildSamplerFromConfig(pb.local_parent_sampled)
+        : undefined,
+      localParentNotSampled: pb.local_parent_not_sampled
+        ? buildSamplerFromConfig(pb.local_parent_not_sampled)
+        : undefined,
+    });
+  }
+  diag.error('Unknown sampler config, defaulting to ParentBased(AlwaysOn).');
+  return new ParentBasedSampler({ root: new AlwaysOnSampler() });
 }
