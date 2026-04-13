@@ -25,6 +25,10 @@ export const JsonLogsSerializer: ISerializer<
       return {};
     }
     const decoder = new TextDecoder();
-    return JSON.parse(decoder.decode(arg)) as IExportLogsServiceResponse;
+    try {
+      return JSON.parse(decoder.decode(arg)) as IExportLogsServiceResponse;
+    } catch {
+      return {};
+    }
   },
 };

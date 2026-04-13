@@ -22,6 +22,10 @@ export const JsonTraceSerializer: ISerializer<
       return {};
     }
     const decoder = new TextDecoder();
-    return JSON.parse(decoder.decode(arg)) as IExportTraceServiceResponse;
+    try {
+      return JSON.parse(decoder.decode(arg)) as IExportTraceServiceResponse;
+    } catch {
+      return {};
+    }
   },
 };

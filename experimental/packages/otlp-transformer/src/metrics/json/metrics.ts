@@ -22,6 +22,10 @@ export const JsonMetricsSerializer: ISerializer<
       return {};
     }
     const decoder = new TextDecoder();
-    return JSON.parse(decoder.decode(arg)) as IExportMetricsServiceResponse;
+    try {
+      return JSON.parse(decoder.decode(arg)) as IExportMetricsServiceResponse;
+    } catch {
+      return {};
+    }
   },
 };
