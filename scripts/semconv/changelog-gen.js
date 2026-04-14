@@ -27,7 +27,7 @@
 const fs = require('fs');
 const path = require('path');
 const globSync = require('glob').sync;
-const {execSync} = require('child_process');
+const {execSync, execFileSync} = require('child_process');
 const rimraf = require('rimraf');
 
 const TOP = path.resolve(__dirname, '..', '..');
@@ -259,7 +259,7 @@ function semconvChangelogGen(aVer=undefined, bVer=undefined) {
 
   const localDir = path.join(TOP, 'semantic-conventions');
   const pj = JSON.parse(fs.readFileSync(path.join(localDir, 'package.json')));
-  const pkgInfo = JSON.parse(execSync(`npm info -j ${pj.name}`))
+  const pkgInfo = JSON.parse(execFileSync('npm', ['info', '-j', pj.name]).toString())
 
   let aDir;
   if (!aVer) {
@@ -271,7 +271,7 @@ function semconvChangelogGen(aVer=undefined, bVer=undefined) {
     const tarballUrl = `https://registry.npmjs.org/@opentelemetry/semantic-conventions/-/semantic-conventions-${aVer}.tgz`;
     fs.mkdirSync(path.dirname(aDir));
     const cwd = path.dirname(aDir);
-    execSync(`curl -sf -o package.tgz ${tarballUrl}`, { cwd });
+    execFileSync('curl', ['-sf', '-o', 'package.tgz', tarballUrl], { cwd });
     execSync(`tar xzf package.tgz`, { cwd });
   }
 
@@ -296,7 +296,7 @@ function semconvChangelogGen(aVer=undefined, bVer=undefined) {
     const tarballUrl = `https://registry.npmjs.org/@opentelemetry/semantic-conventions/-/semantic-conventions-${bVer}.tgz`;
     fs.mkdirSync(path.dirname(bDir));
     const cwd = path.dirname(bDir);
-    execSync(`curl -sf -o package.tgz ${tarballUrl}`, { cwd });
+    execFileSync('curl', ['-sf', '-o', 'package.tgz', tarballUrl], { cwd });
     execSync(`tar xzf package.tgz`, { cwd });
   }
 
