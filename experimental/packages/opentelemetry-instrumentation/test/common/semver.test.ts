@@ -29,7 +29,6 @@ import * as assert from 'assert';
 
 import type { SatisfiesOptions } from '../../src/semver';
 import { satisfies } from '../../src/semver';
-
 const rangeInclude = require('./third-party/node-semver/range-include.js');
 const rangeExclude = require('./third-party/node-semver/range-exclude.js');
 

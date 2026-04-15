@@ -4,8 +4,7 @@
  */
 
 import * as assert from 'assert';
-import { otperformance as performance } from '../../src/platform';
-import * as sinon from 'sinon';
+import { vi } from 'vitest';
 import type * as api from '@opentelemetry/api';
 import {
   getTimeOrigin,
@@ -20,29 +19,41 @@ import {
   addHrTimes,
 } from '../../src/common/time';
 
+// vi.hoisted ensures mockPerformance is available when vi.mock's factory runs
+// (vi.mock calls are hoisted to the top of the file).
+const { mockPerformance } = vi.hoisted(() => ({
+  mockPerformance: { timeOrigin: 0, now: () => 0 },
+}));
+// Mock only otperformance; importOriginal triggers transitive Node.js imports
+// (util.js -> process) that break in browser mode, so we avoid it entirely.
+vi.mock('../../src/platform', () => ({
+  otperformance: mockPerformance,
+}));
+
 describe('time', () => {
   afterEach(() => {
-    sinon.restore();
+    mockPerformance.timeOrigin = 0;
+    mockPerformance.now = () => 0;
   });
 
   describe('#getTimeOrigin', () => {
     it('should return performance.timeOrigin', () => {
-      sinon.stub(performance, 'timeOrigin').value(1234567890.123);
+      mockPerformance.timeOrigin = 1234567890.123;
       assert.strictEqual(getTimeOrigin(), 1234567890.123);
     });
   });
 
   describe('#hrTime', () => {
     it('should return hrtime now', () => {
-      sinon.stub(performance, 'timeOrigin').value(11.5);
-      sinon.stub(performance, 'now').callsFake(() => 11.3);
+      mockPerformance.timeOrigin = 11.5;
+      mockPerformance.now = () => 11.3;
 
       const output = hrTime();
       assert.deepStrictEqual(output, [0, 22800000]);
     });
 
     it('should convert performance now', () => {
-      sinon.stub(performance, 'timeOrigin').value(11.5);
+      mockPerformance.timeOrigin = 11.5;
       const performanceNow = 11.3;
 
       const output = hrTime(performanceNow);
@@ -50,7 +61,7 @@ describe('time', () => {
     });
 
     it('should handle nanosecond overflow', () => {
-      sinon.stub(performance, 'timeOrigin').value(11.5);
+      mockPerformance.timeOrigin = 11.5;
       const performanceNow = 11.6;
 
       const output = hrTime(performanceNow);
@@ -58,24 +69,24 @@ describe('time', () => {
     });
 
     it('should allow passed "performanceNow" equal to 0', () => {
-      sinon.stub(performance, 'timeOrigin').value(11.5);
-      sinon.stub(performance, 'now').callsFake(() => 11.3);
+      mockPerformance.timeOrigin = 11.5;
+      mockPerformance.now = () => 11.3;
 
       const output = hrTime(0);
       assert.deepStrictEqual(output, [0, 11500000]);
     });
 
     it('should use performance.now() when "performanceNow" is equal to undefined', () => {
-      sinon.stub(performance, 'timeOrigin').value(11.5);
-      sinon.stub(performance, 'now').callsFake(() => 11.3);
+      mockPerformance.timeOrigin = 11.5;
+      mockPerformance.now = () => 11.3;
 
       const output = hrTime(undefined);
       assert.deepStrictEqual(output, [0, 22800000]);
     });
 
     it('should use performance.now() when "performanceNow" is equal to null', () => {
-      sinon.stub(performance, 'timeOrigin').value(11.5);
-      sinon.stub(performance, 'now').callsFake(() => 11.3);
+      mockPerformance.timeOrigin = 11.5;
+      mockPerformance.now = () => 11.3;
 
       const output = hrTime(null as any);
       assert.deepStrictEqual(output, [0, 22800000]);
@@ -96,7 +107,7 @@ describe('time', () => {
     });
 
     it('should convert arbitrary epoch milliseconds (with sub-millis precision) hrTime', () => {
-      sinon.stub(performance, 'timeOrigin').value(111.5);
+      mockPerformance.timeOrigin = 111.5;
       const inputs = [
         // [ input, expected ]
         [1609297640313, [1609297640, 313000000]],
@@ -112,7 +123,7 @@ describe('time', () => {
     });
 
     it('should convert performance.now() hrTime', () => {
-      sinon.stub(performance, 'timeOrigin').value(111.5);
+      mockPerformance.timeOrigin = 111.5;
 
       const timeInput = 11.9;
       const output = timeInputToHrTime(timeInput);
@@ -121,7 +132,7 @@ describe('time', () => {
     });
 
     it('should not convert hrtime hrTime', () => {
-      sinon.stub(performance, 'timeOrigin').value(111.5);
+      mockPerformance.timeOrigin = 111.5;
 
       const timeInput: [number, number] = [3138971, 245466222];
       const output = timeInputToHrTime(timeInput);

@@ -15,6 +15,8 @@ All notable changes to this project will be documented in this file.
 
 ### :house: Internal
 
+* refactor: migrate build from tsc to tsdown with dual CJS/ESM output [#6201](https://github.com/open-telemetry/opentelemetry-js/pull/6201) @overbalance
+
 ## 1.9.1
 
 ### :bug: (Bug Fix)

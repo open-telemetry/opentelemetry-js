@@ -128,41 +128,41 @@ describe('transform', () => {
         timestamp: hrTimeToMicroseconds(span.startTime),
         traceId: span.spanContext().traceId,
       });
-      it("should skip parentSpanId if doesn't exist", () => {
-        const span = getSpan({
-          parentSpanContext: undefined,
-        });
+    });
+    it("should skip parentSpanId if doesn't exist", () => {
+      const span = getSpan({
+        parentSpanContext: undefined,
+      });
 
-        const zipkinSpan = toZipkinSpan(
-          span,
-          'my-service',
-          defaultStatusCodeTagName,
-          defaultStatusErrorTagName
-        );
-        assert.deepStrictEqual(zipkinSpan, {
-          kind: 'SERVER',
-          annotations: undefined,
-          duration: Math.round(
-            hrTimeToMicroseconds(hrTimeDuration(span.startTime, span.endTime))
-          ),
-          id: span.spanContext().spanId,
-          localEndpoint: {
-            serviceName: 'my-service',
-          },
-          name: span.name,
-          parentId: undefined,
-          tags: {
-            [ATTR_SERVICE_NAME]: 'zipkin-test',
-            cost: '112.12',
-            service: 'ui',
-            version: '1',
-            'telemetry.sdk.language': 'nodejs',
-            'telemetry.sdk.name': 'opentelemetry',
-            'telemetry.sdk.version': VERSION,
-          },
-          timestamp: hrTimeToMicroseconds(span.startTime),
-          traceId: span.spanContext().traceId,
-        });
+      const zipkinSpan = toZipkinSpan(
+        span,
+        'my-service',
+        defaultStatusCodeTagName,
+        defaultStatusErrorTagName
+      );
+      assert.deepStrictEqual(zipkinSpan, {
+        kind: 'SERVER',
+        annotations: undefined,
+        duration: Math.round(
+          hrTimeToMicroseconds(hrTimeDuration(span.startTime, span.endTime))
+        ),
+        id: span.spanContext().spanId,
+        localEndpoint: {
+          serviceName: 'my-service',
+        },
+        name: span.name,
+        parentId: undefined,
+        tags: {
+          [ATTR_SERVICE_NAME]: 'zipkin-test',
+          cost: '112.12',
+          service: 'ui',
+          version: '1',
+          'telemetry.sdk.language': 'nodejs',
+          'telemetry.sdk.name': 'opentelemetry',
+          'telemetry.sdk.version': VERSION,
+        },
+        timestamp: hrTimeToMicroseconds(span.startTime),
+        traceId: span.spanContext().traceId,
       });
     });
     // SpanKind mapping tests

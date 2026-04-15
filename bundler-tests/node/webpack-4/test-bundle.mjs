@@ -9,7 +9,7 @@ import config from './webpack.config.mjs';
 const compiler = webpack(config);
 
 compiler.run((err, stats) => {
-  if (compiler.close) compiler.close(() => { });
+  if (compiler.close) compiler.close(() => {});
 
   if (err) {
     console.error(err);

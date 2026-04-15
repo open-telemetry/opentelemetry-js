@@ -23,7 +23,7 @@ function freshApi() {
   Object.keys(require.cache).forEach(function (key) {
     delete require.cache[key];
   });
-  return require('../../build/src/index.js');
+  return require('../../build/index.cjs');
 }
 
 // Test 1: test global registration (the global used must exist)

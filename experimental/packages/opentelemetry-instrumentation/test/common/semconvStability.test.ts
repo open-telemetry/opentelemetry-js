@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { inspect } from 'util';
 import * as assert from 'assert';
 import { SemconvStability, semconvStabilityFromStr } from '../../src';
 
@@ -64,7 +63,7 @@ describe('semconvStabilityFromStr', function () {
     },
   ];
   for (const { namespace, str, expected } of table) {
-    it(`str: ${inspect(str)}`, function () {
+    it(`str: ${JSON.stringify(str)}`, function () {
       assert.strictEqual(semconvStabilityFromStr(namespace, str), expected);
     });
   }

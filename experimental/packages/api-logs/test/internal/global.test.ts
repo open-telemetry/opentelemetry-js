@@ -4,30 +4,42 @@
  */
 
 import * as assert from 'assert';
+import { beforeAll, vi } from 'vitest';
 import { _global, GLOBAL_LOGS_API_KEY } from '../../src/internal/global-utils';
-import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
-import { ProxyLoggerProvider } from '../../src/ProxyLoggerProvider';
-
-const api1 = require('../../src');
-
-// clear cache and load a second instance of the api
-for (const key of Object.keys(require.cache)) {
-  delete require.cache[key];
-}
-const api2 = require('../../src');
+import type * as ApiModule from '../../src';
+import type { NoopLoggerProvider as NoopLoggerProviderType } from '../../src/NoopLoggerProvider';
+import type { ProxyLoggerProvider as ProxyLoggerProviderType } from '../../src/ProxyLoggerProvider';
 
 describe('Global Utils', () => {
+  let api1: typeof ApiModule;
+  let api2: typeof ApiModule;
+  let NoopLoggerProvider: typeof NoopLoggerProviderType;
+  let ProxyLoggerProvider: typeof ProxyLoggerProviderType;
+
+  beforeAll(async () => {
+    vi.resetModules();
+    api1 = await import('../../src/index.js');
+    // Import from the same module graph as api1 so instanceof checks match
+    ({ NoopLoggerProvider } = await import('../../src/NoopLoggerProvider'));
+    ({ ProxyLoggerProvider } = await import('../../src/ProxyLoggerProvider'));
+    vi.resetModules();
+    api2 = await import('../../src/index.js');
+  });
+
   // prove they are separate instances
-  assert.notStrictEqual(api1, api2);
   // that return separate noop instances to start
-  assert.notStrictEqual(
-    api1.logs.getLoggerProvider(),
-    api2.logs.getLoggerProvider()
-  );
 
   beforeEach(() => {
     api1.logs.disable();
     api2.logs.disable();
+  });
+
+  it('should be separate instances', () => {
+    assert.notStrictEqual(api1, api2);
+    assert.notStrictEqual(
+      api1.logs.getLoggerProvider(),
+      api2.logs.getLoggerProvider()
+    );
   });
 
   it('should change the global logger provider', () => {

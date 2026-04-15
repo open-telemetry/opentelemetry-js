@@ -120,7 +120,7 @@ describe('MultiLogRecordProcessor', () => {
       assert.ok(flushed);
     });
 
-    it('should wait for all log record processors to finish flushing', done => {
+    it('should wait for all log record processors to finish flushing', async () => {
       let flushed = 0;
       const processor1 = new SimpleLogRecordProcessor(
         new InMemoryLogRecordExporter()
@@ -139,12 +139,10 @@ describe('MultiLogRecordProcessor', () => {
       });
 
       const { multiProcessor } = setup([processor1, processor2]);
-      multiProcessor.forceFlush().then(() => {
-        sinon.assert.calledOnce(spy1);
-        sinon.assert.calledOnce(spy2);
-        assert.strictEqual(flushed, 2);
-        done();
-      });
+      await multiProcessor.forceFlush();
+      sinon.assert.calledOnce(spy1);
+      sinon.assert.calledOnce(spy2);
+      assert.strictEqual(flushed, 2);
     });
 
     it('should throw error if either time out', async () => {

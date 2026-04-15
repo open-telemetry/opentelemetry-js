@@ -50,8 +50,8 @@ import {
   ATTR_HOST_NAME,
   ATTR_PROCESS_PID,
   ATTR_SERVICE_INSTANCE_ID,
+  ATTR_OS_TYPE,
 } from '../src/semconv';
-import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
 import { getLogRecordExporter, setupContextManager } from '../src/utils';
 import {
   ConsoleMetricExporter,
