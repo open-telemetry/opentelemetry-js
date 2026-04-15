@@ -145,7 +145,8 @@ export class TraceState implements TraceStateApi {
       }
     }
 
-    // Now we set the Map in the right order
+    // Now we set the length & the Map in the right order
+    this._length = currentLength;
     this._internalState = new Map(
       Array.from(vendorEntries.entries()).reverse()
     );
