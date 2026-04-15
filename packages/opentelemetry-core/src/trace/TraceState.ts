@@ -88,23 +88,19 @@ export class TraceState implements TraceStateApi {
   }
 
   serialize(): string {
-    if (this._internalState) {
-      // Maps put new entries at the end. We prepend the seralized entry
-      // to get the right order according to the spec (updated members go 1st)
-      let serialized = '';
-      let index = 0;
-      for (const entry of this._internalState) {
-        if (index > 0) {
-          serialized = LIST_MEMBERS_SEPARATOR + serialized;
-        }
-        serialized =
-          `${entry[0]}${LIST_MEMBER_KEY_VALUE_SPLITTER}${entry[1]}` +
-          serialized;
-        index++;
+    // Maps put new entries at the end. We prepend the seralized entry
+    // to get the right order according to the spec (updated members go 1st)
+    let serialized = '';
+    let index = 0;
+    for (const entry of this._getState()) {
+      if (index > 0) {
+        serialized = LIST_MEMBERS_SEPARATOR + serialized;
       }
-      return serialized;
+      serialized =
+        `${entry[0]}${LIST_MEMBER_KEY_VALUE_SPLITTER}${entry[1]}` + serialized;
+      index++;
     }
-    return this._rawTraceState;
+    return serialized;
   }
 
   private _getState(): Map<string, string> {

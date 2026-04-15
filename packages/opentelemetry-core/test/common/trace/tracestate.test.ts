@@ -83,7 +83,7 @@ describe('TraceState', () => {
   });
 
   describe('.parse()', () => {
-    it('must skip parsing if keys are not accessed', () => {
+    it('must remove invalid entries when serializing', () => {
       // valid
       let tracestate = 'a=1';
       let state = new TraceState(tracestate);
@@ -92,14 +92,14 @@ describe('TraceState', () => {
       // invalid: value exceeds 256 chars
       tracestate = 'a=' + 'b'.repeat(512);
       state = new TraceState(tracestate);
-      assert.deepStrictEqual(state.serialize(), tracestate);
+      assert.deepStrictEqual(state.serialize(), '');
 
       // invalid: too many entries
-      tracestate = new Array(33)
+      tracestate = new Array(32)
         .fill(0)
         .map((_: null, num: number) => `a${num}=${num}`)
         .join(',');
-      state = new TraceState(tracestate);
+      state = new TraceState(tracestate + ',a32=32');
       assert.deepStrictEqual(state.serialize(), tracestate);
     });
 
