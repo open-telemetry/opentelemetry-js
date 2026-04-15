@@ -312,7 +312,7 @@ Typically, members of this are [component owners](https://github.com/open-teleme
 
 For more information about the triager role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#triager).
 
-### Emeriti
+### Emeritus
 
 - [Bartlomiej Obecny](https://github.com/obecny), Maintainer
 - [Brandon Gonzalez](https://github.com/bg451), Approver
