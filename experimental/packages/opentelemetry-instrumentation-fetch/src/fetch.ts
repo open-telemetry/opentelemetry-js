@@ -637,7 +637,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   }
 
   /**
-   * implements unpatch function
+   * deactivates fetch instrumentation
    */
   override disable(): void {
     if (!hasBrowserPerformanceAPI) {
