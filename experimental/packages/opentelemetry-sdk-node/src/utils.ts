@@ -400,9 +400,14 @@ export function getKeyListFromObjectArray(
   if (!obj || obj.length === 0) {
     return undefined;
   }
-  return obj
-    .map(item => Object.keys(item))
-    .reduce((prev, curr) => prev.concat(curr), []);
+
+  const keys: string[] = [];
+  for (const item of obj) {
+    for (const key of Object.keys(item)) {
+      keys.push(key);
+    }
+  }
+  return keys;
 }
 
 export function getNonNegativeNumberFromEnv(
