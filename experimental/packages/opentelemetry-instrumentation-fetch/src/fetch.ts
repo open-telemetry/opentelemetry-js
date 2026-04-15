@@ -113,6 +113,9 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   // Note: Intentionally *not* using `_enabled` as the field name to avoid
   // any possible confusion with the `_enabled` field used on the *Node.js*
   // InstrumentationBase class.
+  // Also not initializing the fields to `false` because the base class
+  // constructor already call `enable` modifying their values and it will
+  // set the instrumentaitons in a bas state (enabled, patched but with flags set to false)
   declare private _isEnabled: boolean;
   declare private _isFetchPatched: boolean;
 
