@@ -19,7 +19,7 @@ import { URL } from 'url';
 
 export class PrometheusExporter extends MetricReader {
   static readonly DEFAULT_OPTIONS = {
-    host: undefined,
+    host: 'localhost',
     port: 9464,
     endpoint: '/metrics',
     prefix: '',
@@ -29,7 +29,7 @@ export class PrometheusExporter extends MetricReader {
     withoutTargetInfo: false,
   };
 
-  private readonly _host?: string;
+  private readonly _host: string;
   private readonly _port: number;
   private readonly _baseUrl: string;
   private readonly _endpoint: string;
