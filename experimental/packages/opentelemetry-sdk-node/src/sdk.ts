@@ -327,6 +327,7 @@ export class NodeSDK {
         resource: this._resource,
         views: this._meterProviderConfig?.views ?? [],
         readers: this._meterProviderConfig.readers,
+        sdkMetricsEnabled,
       });
 
       this._meterProvider = meterProvider;
