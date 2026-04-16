@@ -145,9 +145,13 @@ export class SessionManager implements SessionProvider, SessionPublisher {
       clearTimeout(this._inactivityTimeoutId);
     }
 
+    const timeoutIn = Math.min(
+      this._inactivityTimeout * 1000,
+      2147483647 // max setTimeout value
+    );
     this._inactivityTimeoutId = setTimeout(() => {
       this.resetSession();
-    }, this._inactivityTimeout * 1000);
+    }, timeoutIn);
   }
 
   private resetMaxDurationTimer() {
@@ -159,8 +163,10 @@ export class SessionManager implements SessionProvider, SessionPublisher {
       clearTimeout(this._maxDurationTimeoutId);
     }
 
-    const timeoutIn =
-      this._maxDuration * 1000 - (Date.now() - this._session?.startTimestamp);
+    const timeoutIn = Math.min(
+      this._maxDuration * 1000 - (Date.now() - this._session?.startTimestamp),
+      2147483647 // max setTimeout value
+    );
 
     this._maxDurationTimeoutId = setTimeout(() => {
       this.resetSession();
