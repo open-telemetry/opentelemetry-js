@@ -5,13 +5,18 @@
 
 import type { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
-import { ProtobufLogsSerializer } from '@opentelemetry/otlp-transformer';
+import {
+  LogsExporterMetricsHelper,
+  ProtobufLogsSerializer,
+} from '@opentelemetry/otlp-transformer';
 
 import type {
   ReadableLogRecord,
   LogRecordExporter,
 } from '@opentelemetry/sdk-logs';
 import { createLegacyOtlpBrowserExportDelegate } from '@opentelemetry/otlp-exporter-base/browser-http';
+
+import { OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_LOG_EXPORTER } from '../../semconv';
 
 /**
  * Collector Trace Exporter for Web
@@ -25,6 +30,9 @@ export class OTLPLogExporter
       createLegacyOtlpBrowserExportDelegate(
         config,
         ProtobufLogsSerializer,
+        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_LOG_EXPORTER,
+        LogsExporterMetricsHelper,
+        config.meterProvider,
         'v1/logs',
         { 'Content-Type': 'application/x-protobuf' }
       )

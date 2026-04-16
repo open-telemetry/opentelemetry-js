@@ -6,11 +6,15 @@
 import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
-import { JsonTraceSerializer } from '@opentelemetry/otlp-transformer';
+import {
+  JsonTraceSerializer,
+  TraceExporterMetricsHelper,
+} from '@opentelemetry/otlp-transformer';
 import {
   convertLegacyHttpOptions,
   createOtlpHttpExportDelegate,
 } from '@opentelemetry/otlp-exporter-base/node-http';
+import { OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_SPAN_EXPORTER } from '../../semconv';
 
 /**
  * Collector Trace Exporter for Node
@@ -25,7 +29,10 @@ export class OTLPTraceExporter
         convertLegacyHttpOptions(config, 'TRACES', 'v1/traces', {
           'Content-Type': 'application/json',
         }),
-        JsonTraceSerializer
+        JsonTraceSerializer,
+        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_SPAN_EXPORTER,
+        TraceExporterMetricsHelper,
+        config.meterProvider
       )
     );
   }

@@ -3,28 +3,55 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { type MeterProvider } from '@opentelemetry/api';
 import type { OTLPMetricExporterOptions } from '../../OTLPMetricExporterOptions';
 import { OTLPMetricExporterBase } from '../../OTLPMetricExporterBase';
 import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
-import { JsonMetricsSerializer } from '@opentelemetry/otlp-transformer';
+import {
+  JsonMetricsSerializer,
+  MetricsExporterMetricsHelper,
+} from '@opentelemetry/otlp-transformer';
 import {
   convertLegacyHttpOptions,
   createOtlpHttpExportDelegate,
+  createOtlpHttpExporterMetrics,
 } from '@opentelemetry/otlp-exporter-base/node-http';
+
+import { OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER } from '../../semconv';
 
 /**
  * OTLP Metric Exporter for Node.js
  */
 export class OTLPMetricExporter extends OTLPMetricExporterBase {
+  private readonly _url: string | undefined;
   constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
     super(
       createOtlpHttpExportDelegate(
         convertLegacyHttpOptions(config ?? {}, 'METRICS', 'v1/metrics', {
           'Content-Type': 'application/json',
         }),
-        JsonMetricsSerializer
+        JsonMetricsSerializer,
+        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER,
+        MetricsExporterMetricsHelper,
+        config?.meterProvider
       ),
       config
+    );
+    this._url = config?.url;
+  }
+
+  /**
+   * Sets the meter provider to use to collect metrics for this exporter.
+   * @experimental This method is experimental and is subject to breaking changes in minor releases.
+   */
+  setMeterProvider(meterProvider: MeterProvider) {
+    this.setMetrics(
+      createOtlpHttpExporterMetrics(
+        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER,
+        MetricsExporterMetricsHelper,
+        this._url,
+        meterProvider
+      )
     );
   }
 }

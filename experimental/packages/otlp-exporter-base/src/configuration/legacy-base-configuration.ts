@@ -2,6 +2,7 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
+import type { MeterProvider } from '@opentelemetry/api';
 import type { HeadersFactory } from './otlp-http-configuration';
 
 export interface OTLPExporterConfigBase {
@@ -35,4 +36,10 @@ export interface OTLPExporterConfigBase {
   /** Maximum time the OTLP exporter will wait for each batch export.
    * The default value is 10000ms. */
   timeoutMillis?: number;
+
+  /**
+   * MeterProvider to record exporter metrics.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  meterProvider?: MeterProvider;
 }
