@@ -9,11 +9,10 @@ import type {
   AggregationOption,
   CollectionResult,
   Histogram,
-  InstrumentType,
   MetricProducer,
   PushMetricExporter,
 } from '../../src';
-import { AggregationType, MeterProvider } from '../../src';
+import { AggregationType, InstrumentType, MeterProvider } from '../../src';
 import type {
   ResourceMetrics,
   ScopeMetrics,
