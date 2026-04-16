@@ -10,6 +10,7 @@ import type { SessionObserver } from './types/SessionObserver';
 import type { SessionStore } from './types/SessionStore';
 import type { SessionPublisher } from './types/SessionPublisher';
 
+const MAX_DURATION = 2147483647; // max setTimeout value in seconds
 export interface SessionManagerConfig {
   /** Class responsible for generating a session ID */
   sessionIdGenerator: SessionIdGenerator;
@@ -145,10 +146,7 @@ export class SessionManager implements SessionProvider, SessionPublisher {
       clearTimeout(this._inactivityTimeoutId);
     }
 
-    const timeoutIn = Math.min(
-      this._inactivityTimeout * 1000,
-      2147483647 // max setTimeout value
-    );
+    const timeoutIn = Math.min(this._inactivityTimeout * 1000, MAX_DURATION);
     this._inactivityTimeoutId = setTimeout(() => {
       this.resetSession();
     }, timeoutIn);
@@ -163,9 +161,12 @@ export class SessionManager implements SessionProvider, SessionPublisher {
       clearTimeout(this._maxDurationTimeoutId);
     }
 
-    const timeoutIn = Math.min(
-      this._maxDuration * 1000 - (Date.now() - this._session?.startTimestamp),
-      2147483647 // max setTimeout value
+    const timeoutIn = Math.max(
+      0, // a backgrounded tab can cause a negative timeout value, so we use 0 to trigger session reset immediately on resume of the tab
+      Math.min(
+        this._maxDuration * 1000 - (Date.now() - this._session.startTimestamp),
+        MAX_DURATION
+      )
     );
 
     this._maxDurationTimeoutId = setTimeout(() => {
