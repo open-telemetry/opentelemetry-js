@@ -3,13 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  hrTimeToNanoseconds,
-  otperformance as performance,
-} from '@opentelemetry/core';
-import * as core from '@opentelemetry/core';
 import type * as tracing from '@opentelemetry/sdk-trace-base';
-import type { HrTime } from '@opentelemetry/api';
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -24,26 +18,12 @@ import {
 } from '../src';
 import { PerformanceTimingNames as PTN } from '../src/enums/PerformanceTimingNames';
 
-const SECOND_TO_NANOSECONDS = 1e9;
-
-function createHrTime(startTime: HrTime, addToStart: number): HrTime {
-  let seconds = startTime[0];
-  let nanos = startTime[1] + addToStart;
-  if (nanos >= SECOND_TO_NANOSECONDS) {
-    nanos = SECOND_TO_NANOSECONDS - nanos;
-    seconds++;
-  }
-  return [seconds, nanos];
-}
-
 function createResource(
   resource = {},
-  startTime: HrTime,
+  startTime: number,
   addToStart: number
 ): PerformanceResourceTiming {
-  const fetchStart = core.hrTimeToNanoseconds(startTime) + 1;
-  const responseEnd = fetchStart + addToStart;
-  const million = 1000 * 1000; // used to convert nano to milli
+  const fetchStart = startTime + 1;
   const defaultResource = {
     connectEnd: 0,
     connectStart: 0,
@@ -51,13 +31,13 @@ function createResource(
     domainLookupEnd: 0,
     domainLookupStart: 0,
     encodedBodySize: 0,
-    fetchStart: fetchStart / million,
+    fetchStart,
     initiatorType: 'xmlhttprequest',
     nextHopProtocol: '',
     redirectEnd: 0,
     redirectStart: 0,
     requestStart: 0,
-    responseEnd: responseEnd / million,
+    responseEnd: fetchStart + addToStart,
     responseStart: 0,
     secureConnectionStart: 0,
     transferSize: 0,
@@ -350,17 +330,17 @@ describe('utils', function () {
   });
 
   describe('getResource', function () {
-    const startTime = [0, 123123123] as HrTime;
+    const startTime = 123_123_123;
     beforeEach(() => {
-      const time = createHrTime(startTime, 500);
+      const time = startTime + 5;
       sinon.stub(performance, 'timeOrigin').value(0);
-      sinon.stub(performance, 'now').callsFake(() => hrTimeToNanoseconds(time));
+      sinon.stub(performance, 'now').callsFake(() => time);
     });
 
     describe('when resources are empty', function () {
       it('should return undefined', function () {
-        const spanStartTime = createHrTime(startTime, 1);
-        const spanEndTime = createHrTime(startTime, 100);
+        const spanStartTime = startTime + 1;
+        const spanEndTime = startTime + 100;
         const spanUrl = 'http://foo.com/bar.json';
         const resources: PerformanceResourceTiming[] = [];
 
@@ -381,8 +361,8 @@ describe('utils', function () {
 
     describe('when resources has correct entry', function () {
       it('should return the closest one', function () {
-        const spanStartTime = createHrTime(startTime, 1);
-        const spanEndTime = createHrTime(startTime, 402);
+        const spanStartTime = startTime + 1;
+        const spanEndTime = startTime + 402;
         const spanUrl = 'http://foo.com/bar.json';
         const resources: PerformanceResourceTiming[] = [];
 
@@ -392,7 +372,7 @@ describe('utils', function () {
             {
               name: 'http://foo.com/bar.json',
             },
-            createHrTime(startTime, -1),
+            startTime - 1,
             100
           )
         );
@@ -403,8 +383,8 @@ describe('utils', function () {
             {
               name: 'http://foo.com/bar.json',
             },
-            createHrTime(startTime, 1),
-            400
+            startTime + 1,
+            300
           )
         );
 
@@ -414,7 +394,7 @@ describe('utils', function () {
             {
               name: 'http://foo.com/bar.json',
             },
-            createHrTime(startTime, 1),
+            startTime + 2,
             1000
           )
         );
@@ -434,8 +414,8 @@ describe('utils', function () {
       });
       describe('But one resource has been already used', function () {
         it('should return the next closest', function () {
-          const spanStartTime = createHrTime(startTime, 1);
-          const spanEndTime = createHrTime(startTime, 402);
+          const spanStartTime = startTime + 1;
+          const spanEndTime = startTime + 402;
           const spanUrl = 'http://foo.com/bar.json';
           const resources: PerformanceResourceTiming[] = [];
 
@@ -445,7 +425,7 @@ describe('utils', function () {
               {
                 name: 'http://foo.com/bar.json',
               },
-              createHrTime(startTime, -1),
+              startTime - 1,
               100
             )
           );
@@ -456,7 +436,7 @@ describe('utils', function () {
               {
                 name: 'http://foo.com/bar.json',
               },
-              createHrTime(startTime, 1),
+              startTime + 1,
               400
             )
           );
@@ -467,7 +447,7 @@ describe('utils', function () {
               {
                 name: 'http://foo.com/bar.json',
               },
-              createHrTime(startTime, 1),
+              startTime + 1,
               300
             )
           );
@@ -478,7 +458,7 @@ describe('utils', function () {
               {
                 name: 'http://foo.com/bar.json',
               },
-              createHrTime(startTime, 1),
+              startTime + 1,
               1000
             )
           );
@@ -504,8 +484,8 @@ describe('utils', function () {
 
     describe('when there are multiple resources from CorsPreflight requests', function () {
       it('should return main request and cors preflight request', function () {
-        const spanStartTime = createHrTime(startTime, 1);
-        const spanEndTime = createHrTime(startTime, 182);
+        const spanStartTime = startTime + 1;
+        const spanEndTime = startTime + 182;
         const spanUrl = 'http://foo.com/bar.json';
         const resources: PerformanceResourceTiming[] = [];
 
@@ -515,7 +495,7 @@ describe('utils', function () {
             {
               name: 'http://foo.com/bar.json',
             },
-            createHrTime(startTime, 1),
+            startTime + 1,
             10
           )
         );
@@ -526,7 +506,7 @@ describe('utils', function () {
             {
               name: 'http://foo.com/bar.json',
             },
-            createHrTime(startTime, 1),
+            startTime + 1,
             11
           )
         );
@@ -537,7 +517,7 @@ describe('utils', function () {
             {
               name: 'http://foo.com/bar.json',
             },
-            createHrTime(startTime, 50),
+            startTime + 50,
             100
           )
         );
@@ -548,7 +528,7 @@ describe('utils', function () {
             {
               name: 'http://foo.com/bar.json',
             },
-            createHrTime(startTime, 50),
+            startTime + 50,
             130
           )
         );
