@@ -67,11 +67,14 @@ import {
   MeterProvider,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
-import type { SpanProcessor } from '@opentelemetry/sdk-trace-node';
+import type {
+  SpanProcessor,
+  NodeTracerProvider,
+} from '@opentelemetry/sdk-trace-node';
+import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
 import {
   BatchSpanProcessor,
   ConsoleSpanExporter,
-  NodeTracerProvider,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-node';
 
@@ -353,10 +356,10 @@ describe('startNodeSDK', function () {
 
     assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
     assert.ok(
-      setGlobalTracerProviderSpy.lastCall.args[0] instanceof NodeTracerProvider
+      setGlobalTracerProviderSpy.lastCall.args[0] instanceof BasicTracerProvider
     );
 
-    const tracerProvider = trace.getTracerProvider() as NodeTracerProvider;
+    const tracerProvider = trace.getTracerProvider() as BasicTracerProvider;
     const delegateInfo = (tracerProvider as any)['_delegate'];
     assert.strictEqual(delegateInfo._config.spanProcessors.length, 5);
 

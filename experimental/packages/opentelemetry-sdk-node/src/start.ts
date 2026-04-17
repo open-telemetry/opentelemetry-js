@@ -24,7 +24,7 @@ import {
   getResourceDetectorsFromConfiguration,
   getResourceFromConfiguration,
   getSpanLimitsFromConfiguration,
-  getTracerProcessorsFromConfiguration,
+  getSpanProcessorsFromConfiguration,
 } from './utils';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import type { SDKComponents, SDKOptions } from './types';
@@ -144,7 +144,7 @@ function create(
     components.meterProvider = meterProvider;
   }
 
-  const spanProcessors = getTracerProcessorsFromConfiguration(config);
+  const spanProcessors = getSpanProcessorsFromConfiguration(config);
   if (spanProcessors) {
     const spanLimits = getSpanLimitsFromConfiguration(config);
     // TODO (6506): support sampler configuration from config

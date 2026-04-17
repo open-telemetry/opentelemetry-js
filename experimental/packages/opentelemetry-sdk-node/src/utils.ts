@@ -663,7 +663,7 @@ export function getLogRecordProcessorsFromConfiguration(
   return undefined;
 }
 
-export function getTracerExporter(
+export function getSpanExporter(
   exporter: SpanExporterConfigModel
 ): SpanExporter | undefined {
   if (exporter.otlp_http) {
@@ -697,15 +697,15 @@ export function getTracerExporter(
   return undefined;
 }
 
-export function getTracerProcessorsFromConfiguration(
+export function getSpanProcessorsFromConfiguration(
   config: ConfigurationModel
 ): SpanProcessor[] | undefined {
-  const tracerProcessors: SpanProcessor[] = [];
+  const spanProcessors: SpanProcessor[] = [];
   config.tracer_provider?.processors?.forEach(processor => {
     if (processor.batch) {
-      const exporter = getTracerExporter(processor.batch.exporter);
+      const exporter = getSpanExporter(processor.batch.exporter);
       if (exporter) {
-        tracerProcessors.push(
+        spanProcessors.push(
           new BatchSpanProcessor(exporter, {
             maxQueueSize: processor.batch.max_queue_size,
             maxExportBatchSize: processor.batch.max_export_batch_size,
@@ -716,14 +716,14 @@ export function getTracerProcessorsFromConfiguration(
       }
     }
     if (processor.simple) {
-      const exporter = getTracerExporter(processor.simple.exporter);
+      const exporter = getSpanExporter(processor.simple.exporter);
       if (exporter) {
-        tracerProcessors.push(new SimpleSpanProcessor(exporter));
+        spanProcessors.push(new SimpleSpanProcessor(exporter));
       }
     }
   });
-  if (tracerProcessors.length > 0) {
-    return tracerProcessors;
+  if (spanProcessors.length > 0) {
+    return spanProcessors;
   }
   return undefined;
 }
@@ -736,6 +736,10 @@ export function getSpanLimitsFromConfiguration(
     const spanLimits: SpanLimits = {};
     spanLimits.attributeCountLimit = limitsConfig.attribute_count_limit ?? 128;
     spanLimits.eventCountLimit = limitsConfig.event_count_limit ?? 128;
+    spanLimits.linkCountLimit = limitsConfig.link_count_limit ?? 128;
+    spanLimits.attributePerLinkCountLimit =
+      limitsConfig.link_attribute_count_limit ?? 128;
+    // TODO (6606): add support for spanLimits.eventAttributeCountLimit
 
     if (limitsConfig.attribute_value_length_limit != null) {
       spanLimits.attributeValueLengthLimit =

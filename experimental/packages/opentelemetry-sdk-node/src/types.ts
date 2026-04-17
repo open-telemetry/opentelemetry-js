@@ -2,20 +2,15 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-
 import type { ContextManager } from '@opentelemetry/api';
-import type {
-  ContextManager,
-  LoggerProvider,
-  MeterProvider,
-  TracerProvider,
-  TextMapPropagator
-} from '@opentelemetry/api';
+import type { TextMapPropagator } from '@opentelemetry/api';
 import type { Instrumentation } from '@opentelemetry/instrumentation';
 import type { Resource, ResourceDetector } from '@opentelemetry/resources';
 import type {
+  LoggerProvider,
   LogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
+import type { MeterProvider } from '@opentelemetry/sdk-metrics';
 import type { IMetricReader, ViewOptions } from '@opentelemetry/sdk-metrics';
 import type {
   Sampler,
@@ -24,7 +19,7 @@ import type {
   SpanProcessor,
   IdGenerator,
 } from '@opentelemetry/sdk-trace-base';
-import type { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import type { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
 
 export interface NodeSDKConfiguration {
   autoDetectResources: boolean;
@@ -62,6 +57,6 @@ export interface SDKComponents {
   contextManager: ContextManager;
   loggerProvider?: LoggerProvider;
   meterProvider?: MeterProvider;
-  tracerProvider?: TracerProvider;
+  tracerProvider?: BasicTracerProvider;
   propagator?: TextMapPropagator;
 }
