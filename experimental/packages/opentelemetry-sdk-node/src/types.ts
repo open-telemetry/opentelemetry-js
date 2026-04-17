@@ -4,14 +4,18 @@
  */
 
 import type { ContextManager } from '@opentelemetry/api';
-import type { TextMapPropagator } from '@opentelemetry/api';
+import type {
+  ContextManager,
+  LoggerProvider,
+  MeterProvider,
+  TracerProvider,
+  TextMapPropagator
+} from '@opentelemetry/api';
 import type { Instrumentation } from '@opentelemetry/instrumentation';
 import type { Resource, ResourceDetector } from '@opentelemetry/resources';
 import type {
-  LoggerProvider,
   LogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
-import type { MeterProvider } from '@opentelemetry/sdk-metrics';
 import type { IMetricReader, ViewOptions } from '@opentelemetry/sdk-metrics';
 import type {
   Sampler,
@@ -58,6 +62,6 @@ export interface SDKComponents {
   contextManager: ContextManager;
   loggerProvider?: LoggerProvider;
   meterProvider?: MeterProvider;
-  tracerProvider?: NodeTracerProvider;
+  tracerProvider?: TracerProvider;
   propagator?: TextMapPropagator;
 }

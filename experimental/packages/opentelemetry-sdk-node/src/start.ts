@@ -43,7 +43,7 @@ import {
 } from '@opentelemetry/resources';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
 
 /**
  * @experimental Function to start the OpenTelemetry Node SDK
@@ -148,7 +148,7 @@ function create(
   if (spanProcessors) {
     const spanLimits = getSpanLimitsFromConfiguration(config);
     // TODO (6506): support sampler configuration from config
-    const tracerProvider = new NodeTracerProvider({
+    const tracerProvider = new BasicTracerProvider({
       resource,
       spanProcessors,
       spanLimits,
