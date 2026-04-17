@@ -173,7 +173,6 @@ function mergeAttributesList(data: ConfigurationModel): void {
 /**
  * Merge propagator.composite_list (comma-separated propagator names) into
  * propagator.composite, with entries already in composite taking precedence.
- * Mirrors the mergeAttributesList pattern for resource attributes.
  */
 function mergeCompositeList(data: ConfigurationModel): void {
   const propagator = data.propagator;
