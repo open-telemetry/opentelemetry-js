@@ -788,6 +788,18 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
+    it('should warn and fall back to false when OTEL_SDK_DISABLED is set to an invalid value', function () {
+      const warnSpy = Sinon.spy(diag, 'warn');
+      process.env.OTEL_SDK_DISABLED = 'not_a_boolean_value';
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
+      Sinon.assert.calledOnce(warnSpy);
+      Sinon.assert.calledWith(
+        warnSpy,
+        'Invalid value "not_a_boolean_value" for Disable the SDK (env: OTEL_SDK_DISABLED). Expected \'true\' or \'false\'. Falling back to "false".'
+      );
+    });
+
     it('should return config with log level as debug', function () {
       process.env.OTEL_LOG_LEVEL = 'DEBUG';
       const expectedConfig: ConfigurationModel = {

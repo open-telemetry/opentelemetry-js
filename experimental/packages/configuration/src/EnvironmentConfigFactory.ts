@@ -4,7 +4,6 @@
  */
 
 import {
-  getBooleanFromEnv,
   getStringFromEnv,
   getStringListFromEnv,
   getNumberFromEnv,
@@ -54,16 +53,14 @@ export class EnvironmentConfigFactory implements ConfigFactory {
 
   constructor() {
     this._config = initializeDefaultConfiguration();
-
-    this._config.disabled = getBooleanFromEnv('OTEL_SDK_DISABLED');
+    const envValues = readAllEnvVars();
+    this._config.disabled = envValues.OTEL_SDK_DISABLED;
 
     const logLevelString = getStringFromEnv('OTEL_LOG_LEVEL');
     if (logLevelString) {
       // Store as lowercase; consumers convert to DiagLogLevel via diagLogLevelFromString
       this._config.log_level = logLevelString.toLowerCase() as SeverityNumber;
     }
-
-    const envValues = readAllEnvVars();
 
     setResources(this._config);
     setAttributeLimits(this._config);
