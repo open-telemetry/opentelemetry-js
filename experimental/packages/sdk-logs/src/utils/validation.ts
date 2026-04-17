@@ -56,7 +56,12 @@ function isLogAttributeValueInternal(
 
     // Arrays (can contain any AnyValue, including heterogeneous)
     if (Array.isArray(val)) {
-      return val.every(item => isLogAttributeValueInternal(item, visited));
+      for (const item of val) {
+        if (!isLogAttributeValueInternal(item, visited)) {
+          return false;
+        }
+      }
+      return true;
     }
 
     // Only accept plain objects (not built-in objects like Date, RegExp, Error, etc.)
@@ -68,9 +73,15 @@ function isLogAttributeValueInternal(
 
     // Objects/Maps (including empty objects)
     // All object properties must be valid AnyValues
-    return Object.values(obj).every(item =>
-      isLogAttributeValueInternal(item, visited)
-    );
+    for (const key in obj) {
+      if (
+        Object.prototype.hasOwnProperty.call(obj, key) &&
+        !isLogAttributeValueInternal(obj[key], visited)
+      ) {
+        return false;
+      }
+    }
+    return true;
   }
 
   return false;
