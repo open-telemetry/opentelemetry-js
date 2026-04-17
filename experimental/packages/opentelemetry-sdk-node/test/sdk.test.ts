@@ -419,7 +419,7 @@ describe('Node SDK', () => {
       });
 
       const sdk = new NodeSDK({
-        metricReader: metricReader,
+        metricReaders: [metricReader],
         traceExporter: new ConsoleSpanExporter(),
         logRecordProcessors: [
           new SimpleLogRecordProcessor(new InMemoryLogRecordExporter()),
@@ -437,6 +437,11 @@ describe('Node SDK', () => {
       assert.ok(tracerProvider instanceof NodeTracerProvider);
       assert.ok(
         (tracerProvider as any)._config.meterProvider instanceof MeterProvider
+      );
+      assert.notDeepEqual(
+        (tracerProvider as any)._activeSpanProcessor._spanProcessors[0]._metrics
+          .processedSpans,
+        NOOP_COUNTER_METRIC
       );
 
       const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
@@ -476,6 +481,11 @@ describe('Node SDK', () => {
       const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
       assert.ok(tracerProvider instanceof NodeTracerProvider);
       assert.equal((tracerProvider as any)._config.meterProvider, undefined);
+      assert.deepEqual(
+        (tracerProvider as any)._activeSpanProcessor._spanProcessors[0]._metrics
+          .processedSpans,
+        NOOP_COUNTER_METRIC
+      );
 
       const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
       assert.deepEqual(

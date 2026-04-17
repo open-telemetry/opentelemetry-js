@@ -4,7 +4,7 @@
  */
 
 import type { Context } from '@opentelemetry/api';
-import { TraceFlags } from '@opentelemetry/api';
+import { createNoopMeter, TraceFlags } from '@opentelemetry/api';
 import {
   internal,
   ExportResultCode,
@@ -13,8 +13,11 @@ import {
 } from '@opentelemetry/core';
 import type { Span } from '../Span';
 import type { SpanProcessor } from '../SpanProcessor';
+import type { SpanProcessorConfig } from './SpanProcessorConfig';
 import type { ReadableSpan } from './ReadableSpan';
 import type { SpanExporter } from './SpanExporter';
+import { SpanProcessorMetrics } from './SpanProcessorMetrics';
+import { OTEL_COMPONENT_TYPE_VALUE_SIMPLE_SPAN_PROCESSOR } from '../semconv';
 
 /**
  * An implementation of the {@link SpanProcessor} that converts the {@link Span}
@@ -26,13 +29,22 @@ import type { SpanExporter } from './SpanExporter';
  */
 export class SimpleSpanProcessor implements SpanProcessor {
   private readonly _exporter: SpanExporter;
+  private readonly _metrics: SpanProcessorMetrics;
   private _shutdownOnce: BindOnceFuture<void>;
   private _pendingExports: Set<Promise<void>>;
 
-  constructor(exporter: SpanExporter) {
+  constructor(exporter: SpanExporter, config?: SpanProcessorConfig) {
     this._exporter = exporter;
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
     this._pendingExports = new Set<Promise<void>>();
+
+    const meter = config?.meterProvider
+      ? config.meterProvider.getMeter('@opentelemetry/sdk-trace')
+      : createNoopMeter();
+    this._metrics = new SpanProcessorMetrics(
+      OTEL_COMPONENT_TYPE_VALUE_SIMPLE_SPAN_PROCESSOR,
+      meter
+    );
   }
 
   async forceFlush(): Promise<void> {
@@ -70,6 +82,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
     }
 
     const result = await internal._export(this._exporter, [span]);
+    this._metrics.finishSpans(1, result.error);
     if (result.code !== ExportResultCode.SUCCESS) {
       throw (
         result.error ??
@@ -83,6 +96,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
   }
 
   private _shutdown(): Promise<void> {
+    this._metrics.shutdown();
     return this._exporter.shutdown();
   }
 }
