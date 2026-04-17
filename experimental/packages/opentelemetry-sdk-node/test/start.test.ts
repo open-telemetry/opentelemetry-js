@@ -70,6 +70,7 @@ import {
 import type {
   SpanProcessor,
   NodeTracerProvider,
+  SpanLimits,
 } from '@opentelemetry/sdk-trace-node';
 import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
 import {
@@ -982,6 +983,32 @@ describe('startNodeSDK', function () {
         getSpanLimitsFromConfiguration({} as ConfigurationModel),
         undefined
       );
+    });
+
+    it('return span limits', async () => {
+      const config: ConfigurationModel = {
+        tracer_provider: {
+          processors: [],
+          limits: {
+            attribute_count_limit: 10,
+            event_count_limit: 20,
+            link_count_limit: 30,
+            attribute_value_length_limit: 40,
+            event_attribute_count_limit: 50,
+            link_attribute_count_limit: 60,
+          },
+        },
+      } as ConfigurationModel;
+      const expectedSpanLimits: SpanLimits = {
+        attributeCountLimit: 10,
+        eventCountLimit: 20,
+        linkCountLimit: 30,
+        attributeValueLengthLimit: 40,
+        attributePerLinkCountLimit: 60,
+      };
+
+      const spanLimits = getSpanLimitsFromConfiguration(config);
+      assert.deepEqual(spanLimits, expectedSpanLimits);
     });
 
     it('return undefined for no aggregation type', async () => {
