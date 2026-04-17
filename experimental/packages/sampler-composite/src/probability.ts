@@ -7,7 +7,7 @@ import type { ComposableSampler, SamplingIntent } from './types';
 import { INVALID_THRESHOLD, MAX_THRESHOLD } from './util';
 import { serializeTh } from './tracestate';
 
-class ComposableTraceIDRatioBasedSampler implements ComposableSampler {
+class ComposableProbabilitySampler implements ComposableSampler {
   private readonly intent: SamplingIntent;
   private readonly description: string;
 
@@ -34,7 +34,7 @@ class ComposableTraceIDRatioBasedSampler implements ComposableSampler {
         thresholdReliable: false,
       });
     }
-    this.description = `ComposableTraceIDRatioBasedSampler(threshold=${thresholdStr}, ratio=${ratio})`;
+    this.description = `ComposableProbabilitySampler(threshold=${thresholdStr}, ratio=${ratio})`;
   }
 
   getSamplingIntent(): SamplingIntent {
@@ -49,10 +49,10 @@ class ComposableTraceIDRatioBasedSampler implements ComposableSampler {
 /**
  * Returns a composable sampler that samples each span with a fixed ratio.
  */
-export function createComposableTraceIDRatioBasedSampler(
+export function createComposableProbabilitySampler(
   ratio: number
 ): ComposableSampler {
-  return new ComposableTraceIDRatioBasedSampler(ratio);
+  return new ComposableProbabilitySampler(ratio);
 }
 
 const probabilityThresholdScale = Math.pow(2, 56);
