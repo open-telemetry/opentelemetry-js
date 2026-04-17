@@ -10,7 +10,7 @@ import type { SessionObserver } from './types/SessionObserver';
 import type { SessionStore } from './types/SessionStore';
 import type { SessionPublisher } from './types/SessionPublisher';
 
-const MAX_DURATION = 2147483647; // max setTimeout value in seconds
+const MAX_DURATION = 2147483647; // max setTimeout value in milliseconds (~24.8 days)
 export interface SessionManagerConfig {
   /** Class responsible for generating a session ID */
   sessionIdGenerator: SessionIdGenerator;
