@@ -4,7 +4,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.214.0",
+  "version": "0.215.0",
   "description": "Transform OpenTelemetry SDK data into OTLP",
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
@@ -79,19 +79,19 @@
     "karma-webpack": "5.0.1",
     "mocha": "11.7.5",
     "nyc": "17.1.0",
-    "protobufjs-cli": "2.0.0",
+    "protobufjs-cli": "2.0.1",
     "ts-loader": "9.5.4",
     "typescript": "5.0.4",
     "webpack": "5.104.1"
   },
   "dependencies": {
-    "@opentelemetry/api-logs": "0.214.0",
-    "@opentelemetry/core": "2.6.1",
-    "@opentelemetry/resources": "2.6.1",
-    "@opentelemetry/sdk-logs": "0.214.0",
-    "@opentelemetry/sdk-metrics": "2.6.1",
-    "@opentelemetry/sdk-trace-base": "2.6.1",
-    "protobufjs": "^7.0.0"
+    "@opentelemetry/api-logs": "0.215.0",
+    "@opentelemetry/core": "2.7.0",
+    "@opentelemetry/resources": "2.7.0",
+    "@opentelemetry/sdk-logs": "0.215.0",
+    "@opentelemetry/sdk-metrics": "2.7.0",
+    "@opentelemetry/sdk-trace-base": "2.7.0",
+    "protobufjs": "^8.0.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-transformer",
   "sideEffects": false
