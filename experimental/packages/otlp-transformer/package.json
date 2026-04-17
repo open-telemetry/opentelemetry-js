@@ -79,7 +79,7 @@
     "karma-webpack": "5.0.1",
     "mocha": "11.7.5",
     "nyc": "17.1.0",
-    "protobufjs-cli": "2.0.0",
+    "protobufjs-cli": "2.0.1",
     "ts-loader": "9.5.4",
     "typescript": "5.0.4",
     "webpack": "5.104.1"
@@ -91,7 +91,7 @@
     "@opentelemetry/sdk-logs": "0.214.0",
     "@opentelemetry/sdk-metrics": "2.6.1",
     "@opentelemetry/sdk-trace-base": "2.6.1",
-    "protobufjs": "^8.0.0"
+    "protobufjs": "^8.0.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-transformer",
   "sideEffects": false
