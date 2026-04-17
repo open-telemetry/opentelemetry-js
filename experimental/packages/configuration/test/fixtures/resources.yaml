@@ -1,4 +1,4 @@
-file_format: "1.0-rc.3"
+file_format: "1.0"
 disabled: false
 resource:
   # Configure resource attributes. Entries have higher priority than entries from .resource.attributes_list.
@@ -7,8 +7,10 @@ resource:
   attributes:
     - name: service.name
       value: config-name
+      type: string
     - name: service.namespace
       value: priority-config-namespace
+      type: string
     - name: string_key
       value: value
       type: string
