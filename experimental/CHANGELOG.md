@@ -22,6 +22,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(instrumentation-fetch): preserve init overrides when input is a Request object [#6421](https://github.com/open-telemetry/opentelemetry-js/issues/6421) @akandic47
 * fix(otlp-exporter-base): limit Node.js HTTP transport response body to 4 MiB [#6552](https://github.com/open-telemetry/opentelemetry-js/pull/6552) @kartikgola
 * fix(instrumentation-fetch): avoid unwrapping fetch API when disabling [#6575](https://github.com/open-telemetry/opentelemetry-js/pull/6575) @david-luna
+* fix(web-common): add check for possible unsafe json parse [#6589](https://github.com/open-telemetry/opentelemetry-js/pull/6589) @maryliag
 
 ### :books: Documentation
 
@@ -44,6 +45,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(configuration): set MeterProvider on sdk start [#6463](https://github.com/open-telemetry/opentelemetry-js/pull/6463) @maryliag
 * feat(configuration): export interfaces required in other packages [#6507](https://github.com/open-telemetry/opentelemetry-js/pull/6507) @maryliag
 * feat(configuration): refactoring config loader to print warning message [#6524](https://github.com/open-telemetry/opentelemetry-js/pull/6524) @maxday
+* feat(configuration): refactoring config loader to print warning message for booleans
+ [#6583](https://github.com/open-telemetry/opentelemetry-js/pull/6583) @maxday
 
 ### :bug: Bug Fixes
 
