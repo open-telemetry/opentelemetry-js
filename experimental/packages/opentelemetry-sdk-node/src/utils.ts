@@ -56,6 +56,7 @@ import type {
 import type {
   AggregationOption,
   IMetricReader,
+  MeterProvider,
   PushMetricExporter,
   ViewOptions,
 } from '@opentelemetry/sdk-metrics';
@@ -578,12 +579,13 @@ export function getBatchLogRecordProcessorConfigFromEnv(): BufferConfig {
 }
 
 export function getBatchLogRecordProcessorFromEnv(
-  exporter: LogRecordExporter
+  exporter: LogRecordExporter,
+  meterProvider: MeterProvider | undefined
 ): BatchLogRecordProcessor {
-  return new BatchLogRecordProcessor(
-    exporter,
-    getBatchLogRecordProcessorConfigFromEnv()
-  );
+  return new BatchLogRecordProcessor(exporter, {
+    ...getBatchLogRecordProcessorConfigFromEnv(),
+    meterProvider,
+  });
 }
 
 export function getLogRecordExporter(
