@@ -24,11 +24,12 @@ import {
   millisToHrTime,
   hrTime,
   hrTimeDuration,
-  isAttributeValue,
   isTimeInput,
   isTimeInputHrTime,
   otperformance,
-  sanitizeAttributes,
+  normalizeAttributes,
+  addAttribute,
+  AddAttributeDecision,
 } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import {
@@ -95,7 +96,7 @@ export class SpanImpl implements Span {
   private _duration: HrTime = [-1, -1];
   private readonly _spanProcessor: SpanProcessor;
   private readonly _spanLimits: SpanLimits;
-  private readonly _attributeValueLengthLimit: number;
+  // private readonly _attributeValueLengthLimit: number; // XXX need this?
   private readonly _recordEndMetrics?: () => void;
 
   private readonly _performanceStartTime: number;
@@ -114,13 +115,16 @@ export class SpanImpl implements Span {
       now - (this._performanceStartTime + otperformance.timeOrigin);
     this._startTimeProvided = opts.startTime != null;
     this._spanLimits = opts.spanLimits;
-    this._attributeValueLengthLimit =
-      this._spanLimits.attributeValueLengthLimit ?? 0;
+    // XXX Why this denormalized var? Just use from spanLimits? `0` isn't a reasonable default.
+    // this._attributeValueLengthLimit =
+    //   this._spanLimits.attributeValueLengthLimit ?? 0;
     this._spanProcessor = opts.spanProcessor;
 
     this.name = opts.name;
     this.parentSpanContext = opts.parentSpanContext;
     this.kind = opts.kind;
+    // XXX should be able to assign these directly. Tracer.startSpan already
+    //     handles normalization. It should passing droppedAttributesCount too.
     if (opts.links) {
       for (const link of opts.links) {
         this.addLink(link);
@@ -132,7 +136,17 @@ export class SpanImpl implements Span {
     this._recordEndMetrics = opts.recordEndMetrics;
 
     if (opts.attributes != null) {
-      this.setAttributes(opts.attributes);
+      const { attributes, droppedAttributesCount } = normalizeAttributes(
+        opts.attributes,
+        this._spanLimits.attributeCountLimit,
+        this._spanLimits.attributeValueLengthLimit
+      );
+      if (attributes) {
+        this.attributes = attributes;
+      }
+      if (droppedAttributesCount) {
+        this._droppedAttributesCount += droppedAttributesCount;
+      }
     }
 
     this._spanProcessor.onStart(this, opts.context);
@@ -142,37 +156,35 @@ export class SpanImpl implements Span {
     return this._spanContext;
   }
 
+  // XXX For next major:
+  //      - Could we drop the `value?`? setAttribute() in API doesn't have it.
+  //      - Could we drop the `unknown`? While the SDK setAttribute defensively
+  //        handles whatever type is thrown at it, the *API* intent is that the
+  //        called only sends `AttributeValue`.
   setAttribute(key: string, value?: AttributeValue): this;
   setAttribute(key: string, value: unknown): this {
-    if (value == null || this._isSpanEnded()) return this;
-    if (key.length === 0) {
-      diag.warn(`Invalid attribute key: ${key}`);
-      return this;
-    }
-    if (!isAttributeValue(value)) {
-      diag.warn(`Invalid attribute value set for key: ${key}`);
-      return this;
-    }
+    if (this._isSpanEnded()) return this;
 
-    const { attributeCountLimit } = this._spanLimits;
-    const isNewKey = !Object.prototype.hasOwnProperty.call(
+    const decision = addAttribute(
       this.attributes,
-      key
+      this._attributesCount,
+      this._spanLimits.attributeCountLimit ?? 128, // XXX how to ensure this is set in ctor? Hack for now
+      this._spanLimits.attributeValueLengthLimit ?? Infinity, // XXX hack default for now. Type should be Required<SpanLimits>
+      key,
+      value
     );
 
-    if (
-      attributeCountLimit !== undefined &&
-      this._attributesCount >= attributeCountLimit &&
-      isNewKey
-    ) {
+    // XXX Handle DROP_INVALID?
+    if (decision === AddAttributeDecision.DROP_LIMIT_REACHED) {
       this._droppedAttributesCount++;
-      return this;
-    }
-
-    this.attributes[key] = this._truncateToSize(value);
-    if (isNewKey) {
+      if (this._droppedAttributesCount === 1) {
+        // Only warn once per LogRecord to avoid log spam
+        diag.warn('Dropping extra attributes.');
+      }
+    } else if (decision === AddAttributeDecision.ADD_NEW) {
       this._attributesCount++;
     }
+
     return this;
   }
 
@@ -225,34 +237,17 @@ export class SpanImpl implements Span {
       attributesOrStartTime = undefined;
     }
 
-    const sanitized = sanitizeAttributes(attributesOrStartTime);
-    const { attributePerEventCountLimit } = this._spanLimits;
-    const attributes: Attributes = {};
-    let droppedAttributesCount = 0;
-    let eventAttributesCount = 0;
-
-    for (const attr in sanitized) {
-      if (!Object.prototype.hasOwnProperty.call(sanitized, attr)) {
-        continue;
-      }
-      const attrVal = sanitized[attr];
-      if (
-        attributePerEventCountLimit !== undefined &&
-        eventAttributesCount >= attributePerEventCountLimit
-      ) {
-        droppedAttributesCount++;
-        continue;
-      }
-      attributes[attr] = this._truncateToSize(attrVal!);
-      eventAttributesCount++;
-    }
-
     this.events.push({
       name,
-      attributes,
       time: this._getTime(timeStamp),
-      droppedAttributesCount,
+      ...normalizeAttributes(
+        attributesOrStartTime,
+        // XXX old code is handling `attributePerEventCountLimit !== undefined`. Need we here?
+        this._spanLimits.attributePerEventCountLimit,
+        this._spanLimits.attributeValueLengthLimit
+      ),
     });
+
     return this;
   }
 
@@ -274,37 +269,16 @@ export class SpanImpl implements Span {
       this._droppedLinksCount++;
     }
 
-    const { attributePerLinkCountLimit } = this._spanLimits;
-    const sanitized = sanitizeAttributes(link.attributes);
-    const attributes: Attributes = {};
-    let droppedAttributesCount = 0;
-    let linkAttributesCount = 0;
+    this.links.push({
+      context: link.context,
+      ...normalizeAttributes(
+        link.attributes,
+        // XXX old code is handling `attributePerLinkCountLimit !== undefined`. Need we here?
+        this._spanLimits.attributePerLinkCountLimit,
+        this._spanLimits.attributeValueLengthLimit
+      ),
+    });
 
-    for (const attr in sanitized) {
-      if (!Object.prototype.hasOwnProperty.call(sanitized, attr)) {
-        continue;
-      }
-      const attrVal = sanitized[attr];
-      if (
-        attributePerLinkCountLimit !== undefined &&
-        linkAttributesCount >= attributePerLinkCountLimit
-      ) {
-        droppedAttributesCount++;
-        continue;
-      }
-      attributes[attr] = this._truncateToSize(attrVal!);
-      linkAttributesCount++;
-    }
-
-    const processedLink: Link = { context: link.context };
-    if (linkAttributesCount > 0) {
-      processedLink.attributes = attributes;
-    }
-    if (droppedAttributesCount > 0) {
-      processedLink.droppedAttributesCount = droppedAttributesCount;
-    }
-
-    this.links.push(processedLink);
     return this;
   }
 
@@ -476,52 +450,5 @@ export class SpanImpl implements Span {
       );
     }
     return this._ended;
-  }
-
-  // Utility function to truncate given value within size
-  // for value type of string, will truncate to given limit
-  // for type of non-string, will return same value
-  private _truncateToLimitUtil(value: string, limit: number): string {
-    if (value.length <= limit) {
-      return value;
-    }
-    return value.substring(0, limit);
-  }
-
-  /**
-   * If the given attribute value is of type string and has more characters than given {@code attributeValueLengthLimit} then
-   * return string with truncated to {@code attributeValueLengthLimit} characters
-   *
-   * If the given attribute value is array of strings then
-   * return new array of strings with each element truncated to {@code attributeValueLengthLimit} characters
-   *
-   * Otherwise return same Attribute {@code value}
-   *
-   * @param value Attribute value
-   * @returns truncated attribute value if required, otherwise same value
-   */
-  private _truncateToSize(value: AttributeValue): AttributeValue {
-    const limit = this._attributeValueLengthLimit;
-    // Check limit
-    if (limit <= 0) {
-      // Negative values are invalid, so do not truncate
-      diag.warn(`Attribute value limit must be positive, got ${limit}`);
-      return value;
-    }
-
-    // String
-    if (typeof value === 'string') {
-      return this._truncateToLimitUtil(value, limit);
-    }
-
-    // Array of strings
-    if (Array.isArray(value)) {
-      return (value as []).map(val =>
-        typeof val === 'string' ? this._truncateToLimitUtil(val, limit) : val
-      );
-    }
-
-    // Other types, no need to apply value length limit
-    return value;
   }
 }
