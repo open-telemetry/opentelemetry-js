@@ -7,6 +7,7 @@ import type { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import { createExportMetricsServiceRequest } from '../internal';
 import type { IExportMetricsServiceResponse } from '../export-response';
 import { JSON_ENCODER } from '../../common/utils';
+import { diag } from '@opentelemetry/api';
 
 export const JsonMetricsSerializer: ISerializer<
   ResourceMetrics,
@@ -22,6 +23,13 @@ export const JsonMetricsSerializer: ISerializer<
       return {};
     }
     const decoder = new TextDecoder();
-    return JSON.parse(decoder.decode(arg)) as IExportMetricsServiceResponse;
+    try {
+      return JSON.parse(decoder.decode(arg)) as IExportMetricsServiceResponse;
+    } catch (err) {
+      diag.warn(
+        `Failed to parse metrics export response: ${err.message}. Returning empty response`
+      );
+      return {};
+    }
   },
 };
