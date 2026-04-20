@@ -9,13 +9,13 @@ import { SamplingDecision } from '@opentelemetry/sdk-trace-base';
 
 import {
   createCompositeSampler,
-  createComposableTraceIDRatioBasedSampler,
+  createComposableProbabilitySampler,
 } from '../src';
 import { traceIdGenerator } from './util';
 import { parseOtelTraceState } from '../src/tracestate';
 import { INVALID_RANDOM_VALUE } from '../src/util';
 
-describe('ComposableTraceIDRatioBasedSampler', () => {
+describe('ComposableProbabilitySampler', () => {
   [
     { ratio: 1.0, thresholdStr: '0' },
     { ratio: 0.5, thresholdStr: '8' },
@@ -24,10 +24,10 @@ describe('ComposableTraceIDRatioBasedSampler', () => {
     { ratio: 0, thresholdStr: 'max' },
   ].forEach(({ ratio, thresholdStr }) => {
     it(`should have a description for ratio ${ratio}`, () => {
-      const sampler = createComposableTraceIDRatioBasedSampler(ratio);
+      const sampler = createComposableProbabilitySampler(ratio);
       assert.strictEqual(
         sampler.toString(),
-        `ComposableTraceIDRatioBasedSampler(threshold=${thresholdStr}, ratio=${ratio})`
+        `ComposableProbabilitySampler(threshold=${thresholdStr}, ratio=${ratio})`
       );
     });
   });
@@ -45,7 +45,7 @@ describe('ComposableTraceIDRatioBasedSampler', () => {
   ].forEach(({ ratio, threshold }) => {
     it(`should sample spans with ratio ${ratio}`, () => {
       const sampler = createCompositeSampler(
-        createComposableTraceIDRatioBasedSampler(ratio)
+        createComposableProbabilitySampler(ratio)
       );
 
       const generator = traceIdGenerator();
