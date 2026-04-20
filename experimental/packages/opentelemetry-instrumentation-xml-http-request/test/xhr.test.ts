@@ -238,11 +238,11 @@ function testForCorrectEvents(
 describe('xhr', () => {
   const asyncTests = [
     { async: true, semconvStabilityOptIn: undefined },
-    // { async: true, semconvStabilityOptIn: 'http' },
-    // { async: true, semconvStabilityOptIn: 'http/dup' },
-    // { async: false, semconvStabilityOptIn: undefined },
-    // { async: false, semconvStabilityOptIn: 'http' },
-    // { async: false, semconvStabilityOptIn: 'http/dup' },
+    { async: true, semconvStabilityOptIn: 'http' },
+    { async: true, semconvStabilityOptIn: 'http/dup' },
+    { async: false, semconvStabilityOptIn: undefined },
+    { async: false, semconvStabilityOptIn: 'http' },
+    { async: false, semconvStabilityOptIn: 'http/dup' },
   ];
 
   let timer: sinon.SinonFakeTimers;
@@ -1037,7 +1037,7 @@ describe('xhr', () => {
           );
         }
 
-        describe.only('when request loads and receives an error code', () => {
+        describe('when request loads and receives an error code', () => {
           beforeEach(done => {
             erroredRequest(done);
           });
@@ -1527,7 +1527,7 @@ describe('xhr', () => {
             });
 
             it('span should have custom attribute', () => {
-              const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+              const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
               const attributes = span.attributes;
               assert.ok(attributes['xhr-custom-error-code'] === 400);
             });
