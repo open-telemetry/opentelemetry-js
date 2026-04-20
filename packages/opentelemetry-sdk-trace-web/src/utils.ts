@@ -10,7 +10,11 @@ import type {
 } from './types';
 import { PerformanceTimingNames as PTN } from './enums/PerformanceTimingNames';
 import type * as api from '@opentelemetry/api';
-import { urlMatches } from '@opentelemetry/core';
+import {
+  hrTimeToNanoseconds,
+  timeInputToHrTime,
+  urlMatches,
+} from '@opentelemetry/core';
 import {
   ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
   ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
@@ -140,16 +144,16 @@ function getOrigin(): string | undefined {
  * Get closest performance resource ignoring the resources that have been
  * already used.
  * @param spanUrl
- * @param performanceStartTime
- * @param performanceEndTime
+ * @param startTimeHR
+ * @param endTimeHR
  * @param resources
  * @param ignoredResources
  * @param initiatorType
  */
 export function getResource(
   spanUrl: string,
-  performanceStartTime: number,
-  performanceEndTime: number,
+  startTimeHR: api.HrTime,
+  endTimeHR: api.HrTime,
   resources: PerformanceResourceTiming[],
   ignoredResources: WeakSet<PerformanceResourceTiming> = new WeakSet<PerformanceResourceTiming>(),
   initiatorType?: string
@@ -160,8 +164,8 @@ export function getResource(
 
   const filteredResources = filterResourcesForSpan(
     spanUrl,
-    performanceStartTime,
-    performanceEndTime,
+    startTimeHR,
+    endTimeHR,
     resources,
     ignoredResources,
     initiatorType
@@ -184,7 +188,7 @@ export function getResource(
     let mainRequest: PerformanceResourceTiming = findMainRequest(
       sorted,
       corsPreFlightRequest[PTN.RESPONSE_END],
-      performanceEndTime
+      endTimeHR
     );
 
     const responseEnd = corsPreFlightRequest[PTN.RESPONSE_END];
@@ -211,28 +215,35 @@ export function getResource(
  * Will find the main request skipping the cors pre flight requests
  * @param resources
  * @param corsPreFlightRequestEndTime
- * @param performanceEndTime
+ * @param spanEndTimeHR
  */
 function findMainRequest(
   resources: PerformanceResourceTiming[],
   corsPreFlightRequestEndTime: number,
-  performanceEndTime: number
+  spanEndTimeHR: api.HrTime
 ): PerformanceResourceTiming {
+  const spanEndTime = hrTimeToNanoseconds(spanEndTimeHR);
+  const minTime = hrTimeToNanoseconds(
+    timeInputToHrTime(corsPreFlightRequestEndTime)
+  );
+
   let mainRequest: PerformanceResourceTiming = resources[1];
   let bestGap;
 
   const length = resources.length;
   for (let i = 1; i < length; i++) {
     const resource = resources[i];
-    const resourceStartTime = resource[PTN.FETCH_START];
-    const resourceEndTime = resource[PTN.RESPONSE_END];
+    const resourceStartTime = hrTimeToNanoseconds(
+      timeInputToHrTime(resource[PTN.FETCH_START])
+    );
 
-    const currentGap = performanceEndTime - resourceEndTime;
+    const resourceEndTime = hrTimeToNanoseconds(
+      timeInputToHrTime(resource[PTN.RESPONSE_END])
+    );
 
-    if (
-      resourceStartTime >= corsPreFlightRequestEndTime &&
-      (!bestGap || currentGap < bestGap)
-    ) {
+    const currentGap = spanEndTime - resourceEndTime;
+
+    if (resourceStartTime >= minTime && (!bestGap || currentGap < bestGap)) {
       bestGap = currentGap;
       mainRequest = resource;
     }
@@ -251,22 +262,28 @@ function findMainRequest(
  */
 function filterResourcesForSpan(
   spanUrl: string,
-  performanceStartTime: number,
-  performanceEndTime: number,
+  startTimeHR: api.HrTime,
+  endTimeHR: api.HrTime,
   resources: PerformanceResourceTiming[],
   ignoredResources: WeakSet<PerformanceResourceTiming>,
   initiatorType?: string
 ) {
+  const startTime = hrTimeToNanoseconds(startTimeHR);
+  const endTime = hrTimeToNanoseconds(endTimeHR);
   let filteredResources = resources.filter(resource => {
-    const resourceStartTime = resource[PTN.FETCH_START];
-    const resourceEndTime = resource[PTN.RESPONSE_END];
+    const resourceStartTime = hrTimeToNanoseconds(
+      timeInputToHrTime(resource[PTN.FETCH_START])
+    );
+    const resourceEndTime = hrTimeToNanoseconds(
+      timeInputToHrTime(resource[PTN.RESPONSE_END])
+    );
 
     return (
       resource.initiatorType.toLowerCase() ===
         (initiatorType || 'xmlhttprequest') &&
       resource.name === spanUrl &&
-      resourceStartTime >= performanceStartTime &&
-      resourceEndTime <= performanceEndTime
+      resourceStartTime >= startTime &&
+      resourceEndTime <= endTime
     );
   });
 

@@ -44,6 +44,7 @@ import {
 import type { FetchError, FetchResponse, SpanData } from './types';
 import {
   getFetchBodyLength,
+  getResource,
   normalizeHttpRequestMethod,
   serverPortFromUrl,
 } from './utils';
@@ -302,7 +303,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         'resource'
       ) as PerformanceResourceTiming[];
     }
-    const resource = web.getResource(
+    const resource = getResource(
       resourcesObserver.spanUrl,
       resourcesObserver.startTime,
       endTime,
