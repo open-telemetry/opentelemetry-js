@@ -57,7 +57,7 @@ const defaultTracerProvider: NonNullable<
   },
 };
 
-const tls = { ca_file: null, key_file: null, cert_file: null };
+const tls = {};
 
 const configFromFile = {
   disabled: false,
@@ -72,7 +72,6 @@ const configFromFile = {
     ],
   },
   attribute_limits: {
-    attribute_value_length_limit: null,
     attribute_count_limit: 128,
   },
   propagator: {
@@ -99,7 +98,6 @@ const configFromFile = {
       },
     ],
     limits: {
-      attribute_value_length_limit: null,
       attribute_count_limit: 128,
       event_count_limit: 128,
       link_count_limit: 128,
@@ -161,7 +159,6 @@ const configFromFile = {
       },
     ],
     limits: {
-      attribute_value_length_limit: null,
       attribute_count_limit: 128,
     },
   },
@@ -633,7 +630,7 @@ const configFromKitchenSinkFile = {
   },
 };
 
-const nullTls = { ca_file: null, key_file: null, cert_file: null };
+const nullTls = {};
 
 const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
   disabled: false,
@@ -646,11 +643,9 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
         type: 'string',
       },
     ],
-    attributes_list: null,
   },
   attribute_limits: {
     attribute_count_limit: 128,
-    attribute_value_length_limit: null,
   },
   propagator: {
     composite: [{ tracecontext: {} }, { baggage: {} }],
@@ -669,7 +664,6 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
               endpoint: 'http://localhost:4318/v1/traces',
               timeout: 10000,
               compression: 'gzip',
-              headers_list: null,
               tls: nullTls,
               encoding: OtlpHttpEncoding.Protobuf,
             },
@@ -678,7 +672,6 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
       },
     ],
     limits: {
-      attribute_value_length_limit: null,
       attribute_count_limit: 128,
       event_count_limit: 128,
       link_count_limit: 128,
@@ -709,7 +702,6 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
               temporality_preference: ExporterTemporalityPreference.Cumulative,
               default_histogram_aggregation:
                 ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
-              headers_list: null,
               tls: nullTls,
               encoding: OtlpHttpEncoding.Protobuf,
             },
@@ -733,7 +725,6 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
               compression: 'gzip',
-              headers_list: null,
               tls: nullTls,
               encoding: OtlpHttpEncoding.Protobuf,
             },
@@ -743,7 +734,6 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
     ],
     limits: {
       attribute_count_limit: 128,
-      attribute_value_length_limit: null,
     },
   },
 };
@@ -2661,9 +2651,7 @@ describe('ConfigFactory', function () {
         attribute_limits: {
           attribute_count_limit: 128,
         },
-        resource: {
-          attributes_list: null,
-        },
+        resource: {},
         propagator: {
           composite: [{ tracecontext: {} }],
           composite_list: 'tracecontext',

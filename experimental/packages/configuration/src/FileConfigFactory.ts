@@ -91,6 +91,14 @@ export function parseConfigFile(): ConfigurationModel {
   // Strip file_format from output — it's a meta-field, not a config value
   delete (data as Record<string, unknown>)['file_format'];
 
+  // The generated TypeScript types omit `| null` from unions (see
+  // generate-config.js) because consumers expect `T | undefined`, not
+  // `T | null`. To match, we delete any properties still set to `null`
+  // after YAML parsing so that accessing them returns `undefined`.
+  // Runs after normalizeYamlNulls, which has already converted type-tag
+  // nulls (e.g. `console:`) to `{}`.
+  stripNulls(preprocessed);
+
   applyConfigDefaults(data);
   mergeAttributesList(data);
   mergeCompositeList(data);
@@ -252,6 +260,37 @@ function applyConfigDefaults(data: ConfigurationModel): void {
     data.attribute_limits = { attribute_count_limit: 128 };
   } else if (data.attribute_limits.attribute_count_limit == null) {
     data.attribute_limits.attribute_count_limit = 128;
+  }
+}
+
+/**
+ * Recursively delete object properties whose value is `null`.
+ *
+ * YAML `key:` (no value) parses to `{ key: null }`. The generated TypeScript
+ * types use `?: T` (not `T | null`) because downstream consumers like sdk-node
+ * assign config values to interfaces that only accept `T | undefined`. The
+ * codegen script (generate-config.js) strips `| null` from type unions; this
+ * function makes the runtime data match by deleting null-valued keys so that
+ * property access returns `undefined` instead of `null`.
+ *
+ * Must run AFTER normalizeYamlNulls, which converts type-tag nulls
+ * (e.g. `console: null` → `console: {}`) — those are already `{}` by the
+ * time this function runs and won't be affected.
+ */
+function stripNulls(value: unknown): void {
+  if (value == null || typeof value !== 'object') return;
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      stripNulls(item);
+    }
+  } else {
+    for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
+      if (val === null) {
+        delete (value as Record<string, unknown>)[key];
+      } else {
+        stripNulls(val);
+      }
+    }
   }
 }
 

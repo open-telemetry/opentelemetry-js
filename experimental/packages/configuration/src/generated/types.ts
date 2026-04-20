@@ -19,7 +19,7 @@ export type OtlpHttpExporter = {
    * If omitted or null, the http://localhost:4318/v1/{signal} (where signal is 'traces', 'logs', or 'metrics') is used.
    *
    */
-  endpoint?: string | null;
+  endpoint?: string;
   tls?: HttpTls;
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
@@ -36,21 +36,21 @@ export type OtlpHttpExporter = {
    * If omitted or null, no headers are added.
    *
    */
-  headers_list?: string | null;
+  headers_list?: string;
   /**
    * Configure compression.
    * Known values include: gzip, none. Implementations may support other compression algorithms.
    * If omitted or null, none is used.
    *
    */
-  compression?: string | null;
+  compression?: string;
   /**
    * Configure max time (in milliseconds) to wait for each export.
    * Value must be non-negative. A value of 0 indicates no limit (infinity).
    * If omitted or null, 10000 is used.
    *
    */
-  timeout?: number | null;
+  timeout?: number;
   /**
    * Configure the encoding used for messages.
    * Implementations may not support json.
@@ -60,14 +60,14 @@ export type OtlpHttpExporter = {
    * If omitted, protobuf is used.
    *
    */
-  encoding?: ('protobuf' | 'json') | null;
+  encoding?: ('protobuf' | 'json');
 } & ({
   /**
    * Configure endpoint, including the signal specific path.
    * If omitted or null, the http://localhost:4318/v1/{signal} (where signal is 'traces', 'logs', or 'metrics') is used.
    *
    */
-  endpoint?: string | null;
+  endpoint?: string;
   tls?: HttpTls;
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
@@ -84,21 +84,21 @@ export type OtlpHttpExporter = {
    * If omitted or null, no headers are added.
    *
    */
-  headers_list?: string | null;
+  headers_list?: string;
   /**
    * Configure compression.
    * Known values include: gzip, none. Implementations may support other compression algorithms.
    * If omitted or null, none is used.
    *
    */
-  compression?: string | null;
+  compression?: string;
   /**
    * Configure max time (in milliseconds) to wait for each export.
    * Value must be non-negative. A value of 0 indicates no limit (infinity).
    * If omitted or null, 10000 is used.
    *
    */
-  timeout?: number | null;
+  timeout?: number;
   /**
    * Configure the encoding used for messages.
    * Implementations may not support json.
@@ -108,8 +108,8 @@ export type OtlpHttpExporter = {
    * If omitted, protobuf is used.
    *
    */
-  encoding?: ('protobuf' | 'json') | null;
-} | null);
+  encoding?: ('protobuf' | 'json');
+});
 /**
  * Configure TLS settings for the exporter.
  * If omitted, system default TLS settings are used.
@@ -122,21 +122,21 @@ export type HttpTls = {
    * If omitted or null, system default certificate verification is used for secure connections.
    *
    */
-  ca_file?: string | null;
+  ca_file?: string;
   /**
    * Configure mTLS private client key.
    * Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
    * If omitted or null, mTLS is not used.
    *
    */
-  key_file?: string | null;
+  key_file?: string;
   /**
    * Configure mTLS client certificate.
    * Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
    * If omitted or null, mTLS is not used.
    *
    */
-  cert_file?: string | null;
+  cert_file?: string;
 } & ({
   /**
    * Configure certificate used to verify a server's TLS credentials.
@@ -144,22 +144,22 @@ export type HttpTls = {
    * If omitted or null, system default certificate verification is used for secure connections.
    *
    */
-  ca_file?: string | null;
+  ca_file?: string;
   /**
    * Configure mTLS private client key.
    * Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
    * If omitted or null, mTLS is not used.
    *
    */
-  key_file?: string | null;
+  key_file?: string;
   /**
    * Configure mTLS client certificate.
    * Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
    * If omitted or null, mTLS is not used.
    *
    */
-  cert_file?: string | null;
-} | null);
+  cert_file?: string;
+});
 /**
  * Configure exporter to be OTLP with gRPC transport.
  * If omitted, ignore.
@@ -171,7 +171,7 @@ export type OtlpGrpcExporter = {
    * If omitted or null, http://localhost:4317 is used.
    *
    */
-  endpoint?: string | null;
+  endpoint?: string;
   tls?: GrpcTls;
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
@@ -188,28 +188,28 @@ export type OtlpGrpcExporter = {
    * If omitted or null, no headers are added.
    *
    */
-  headers_list?: string | null;
+  headers_list?: string;
   /**
    * Configure compression.
    * Known values include: gzip, none. Implementations may support other compression algorithms.
    * If omitted or null, none is used.
    *
    */
-  compression?: string | null;
+  compression?: string;
   /**
    * Configure max time (in milliseconds) to wait for each export.
    * Value must be non-negative. A value of 0 indicates no limit (infinity).
    * If omitted or null, 10000 is used.
    *
    */
-  timeout?: number | null;
+  timeout?: number;
 } & ({
   /**
    * Configure endpoint.
    * If omitted or null, http://localhost:4317 is used.
    *
    */
-  endpoint?: string | null;
+  endpoint?: string;
   tls?: GrpcTls;
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
@@ -226,22 +226,22 @@ export type OtlpGrpcExporter = {
    * If omitted or null, no headers are added.
    *
    */
-  headers_list?: string | null;
+  headers_list?: string;
   /**
    * Configure compression.
    * Known values include: gzip, none. Implementations may support other compression algorithms.
    * If omitted or null, none is used.
    *
    */
-  compression?: string | null;
+  compression?: string;
   /**
    * Configure max time (in milliseconds) to wait for each export.
    * Value must be non-negative. A value of 0 indicates no limit (infinity).
    * If omitted or null, 10000 is used.
    *
    */
-  timeout?: number | null;
-} | null);
+  timeout?: number;
+});
 /**
  * Configure TLS settings for the exporter.
  * If omitted, system default TLS settings are used.
@@ -254,28 +254,28 @@ export type GrpcTls = {
    * If omitted or null, system default certificate verification is used for secure connections.
    *
    */
-  ca_file?: string | null;
+  ca_file?: string;
   /**
    * Configure mTLS private client key.
    * Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
    * If omitted or null, mTLS is not used.
    *
    */
-  key_file?: string | null;
+  key_file?: string;
   /**
    * Configure mTLS client certificate.
    * Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
    * If omitted or null, mTLS is not used.
    *
    */
-  cert_file?: string | null;
+  cert_file?: string;
   /**
    * Configure client transport security for the exporter's connection.
    * Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
    * If omitted or null, false is used.
    *
    */
-  insecure?: boolean | null;
+  insecure?: boolean;
 } & ({
   /**
    * Configure certificate used to verify a server's TLS credentials.
@@ -283,29 +283,29 @@ export type GrpcTls = {
    * If omitted or null, system default certificate verification is used for secure connections.
    *
    */
-  ca_file?: string | null;
+  ca_file?: string;
   /**
    * Configure mTLS private client key.
    * Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
    * If omitted or null, mTLS is not used.
    *
    */
-  key_file?: string | null;
+  key_file?: string;
   /**
    * Configure mTLS client certificate.
    * Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
    * If omitted or null, mTLS is not used.
    *
    */
-  cert_file?: string | null;
+  cert_file?: string;
   /**
    * Configure client transport security for the exporter's connection.
    * Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
    * If omitted or null, false is used.
    *
    */
-  insecure?: boolean | null;
-} | null);
+  insecure?: boolean;
+});
 /**
  * Configure exporter to be OTLP with file transport.
  * If omitted, ignore.
@@ -318,7 +318,7 @@ export type ExperimentalOtlpFileExporter = {
    * If omitted or null, stdout is used.
    *
    */
-  output_stream?: string | null;
+  output_stream?: string;
 } & ({
   /**
    * Configure output stream.
@@ -326,14 +326,14 @@ export type ExperimentalOtlpFileExporter = {
    * If omitted or null, stdout is used.
    *
    */
-  output_stream?: string | null;
-} | null);
+  output_stream?: string;
+});
 /**
  * Configure exporter to be console.
  * If omitted, ignore.
  *
  */
-export type ConsoleExporter = {} | null;
+export type ConsoleExporter = {};
 /**
  * Configure exporter to be OTLP with HTTP transport.
  * If omitted, ignore.
@@ -345,7 +345,7 @@ export type OtlpHttpMetricExporter = {
    * If omitted or null, http://localhost:4318/v1/metrics is used.
    *
    */
-  endpoint?: string | null;
+  endpoint?: string;
   tls?: HttpTls;
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
@@ -362,21 +362,21 @@ export type OtlpHttpMetricExporter = {
    * If omitted or null, no headers are added.
    *
    */
-  headers_list?: string | null;
+  headers_list?: string;
   /**
    * Configure compression.
    * Known values include: gzip, none. Implementations may support other compression algorithms.
    * If omitted or null, none is used.
    *
    */
-  compression?: string | null;
+  compression?: string;
   /**
    * Configure max time (in milliseconds) to wait for each export.
    * Value must be non-negative. A value of 0 indicates no limit (infinity).
    * If omitted or null, 10000 is used.
    *
    */
-  timeout?: number | null;
+  timeout?: number;
   /**
    * Configure the encoding used for messages.
    * Implementations may not support json.
@@ -386,7 +386,7 @@ export type OtlpHttpMetricExporter = {
    * If omitted, protobuf is used.
    *
    */
-  encoding?: ('protobuf' | 'json') | null;
+  encoding?: ('protobuf' | 'json');
   /**
    * Configure temporality preference.
    * Values include:
@@ -396,7 +396,7 @@ export type OtlpHttpMetricExporter = {
    * If omitted, cumulative is used.
    *
    */
-  temporality_preference?: ('cumulative' | 'delta' | 'low_memory') | null;
+  temporality_preference?: ('cumulative' | 'delta' | 'low_memory');
   /**
    * Configure default histogram aggregation.
    * Values include:
@@ -405,14 +405,14 @@ export type OtlpHttpMetricExporter = {
    * If omitted, explicit_bucket_histogram is used.
    *
    */
-  default_histogram_aggregation?: ('explicit_bucket_histogram' | 'base2_exponential_bucket_histogram') | null;
+  default_histogram_aggregation?: ('explicit_bucket_histogram' | 'base2_exponential_bucket_histogram');
 } & ({
   /**
    * Configure endpoint.
    * If omitted or null, http://localhost:4318/v1/metrics is used.
    *
    */
-  endpoint?: string | null;
+  endpoint?: string;
   tls?: HttpTls;
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
@@ -429,21 +429,21 @@ export type OtlpHttpMetricExporter = {
    * If omitted or null, no headers are added.
    *
    */
-  headers_list?: string | null;
+  headers_list?: string;
   /**
    * Configure compression.
    * Known values include: gzip, none. Implementations may support other compression algorithms.
    * If omitted or null, none is used.
    *
    */
-  compression?: string | null;
+  compression?: string;
   /**
    * Configure max time (in milliseconds) to wait for each export.
    * Value must be non-negative. A value of 0 indicates no limit (infinity).
    * If omitted or null, 10000 is used.
    *
    */
-  timeout?: number | null;
+  timeout?: number;
   /**
    * Configure the encoding used for messages.
    * Implementations may not support json.
@@ -453,7 +453,7 @@ export type OtlpHttpMetricExporter = {
    * If omitted, protobuf is used.
    *
    */
-  encoding?: ('protobuf' | 'json') | null;
+  encoding?: ('protobuf' | 'json');
   /**
    * Configure temporality preference.
    * Values include:
@@ -463,7 +463,7 @@ export type OtlpHttpMetricExporter = {
    * If omitted, cumulative is used.
    *
    */
-  temporality_preference?: ('cumulative' | 'delta' | 'low_memory') | null;
+  temporality_preference?: ('cumulative' | 'delta' | 'low_memory');
   /**
    * Configure default histogram aggregation.
    * Values include:
@@ -472,8 +472,8 @@ export type OtlpHttpMetricExporter = {
    * If omitted, explicit_bucket_histogram is used.
    *
    */
-  default_histogram_aggregation?: ('explicit_bucket_histogram' | 'base2_exponential_bucket_histogram') | null;
-} | null);
+  default_histogram_aggregation?: ('explicit_bucket_histogram' | 'base2_exponential_bucket_histogram');
+});
 /**
  * Configure TLS settings for the exporter.
  * If omitted, system default TLS settings are used.
@@ -485,7 +485,7 @@ export type OtlpGrpcMetricExporter = {
    * If omitted or null, http://localhost:4317 is used.
    *
    */
-  endpoint?: string | null;
+  endpoint?: string;
   tls?: GrpcTls;
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
@@ -502,21 +502,21 @@ export type OtlpGrpcMetricExporter = {
    * If omitted or null, no headers are added.
    *
    */
-  headers_list?: string | null;
+  headers_list?: string;
   /**
    * Configure compression.
    * Known values include: gzip, none. Implementations may support other compression algorithms.
    * If omitted or null, none is used.
    *
    */
-  compression?: string | null;
+  compression?: string;
   /**
    * Configure max time (in milliseconds) to wait for each export.
    * Value must be non-negative. A value of 0 indicates no limit (infinity).
    * If omitted or null, 10000 is used.
    *
    */
-  timeout?: number | null;
+  timeout?: number;
   /**
    * Configure temporality preference.
    * Values include:
@@ -526,7 +526,7 @@ export type OtlpGrpcMetricExporter = {
    * If omitted, cumulative is used.
    *
    */
-  temporality_preference?: ('cumulative' | 'delta' | 'low_memory') | null;
+  temporality_preference?: ('cumulative' | 'delta' | 'low_memory');
   /**
    * Configure default histogram aggregation.
    * Values include:
@@ -535,14 +535,14 @@ export type OtlpGrpcMetricExporter = {
    * If omitted, explicit_bucket_histogram is used.
    *
    */
-  default_histogram_aggregation?: ('explicit_bucket_histogram' | 'base2_exponential_bucket_histogram') | null;
+  default_histogram_aggregation?: ('explicit_bucket_histogram' | 'base2_exponential_bucket_histogram');
 } & ({
   /**
    * Configure endpoint.
    * If omitted or null, http://localhost:4317 is used.
    *
    */
-  endpoint?: string | null;
+  endpoint?: string;
   tls?: GrpcTls;
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
@@ -559,21 +559,21 @@ export type OtlpGrpcMetricExporter = {
    * If omitted or null, no headers are added.
    *
    */
-  headers_list?: string | null;
+  headers_list?: string;
   /**
    * Configure compression.
    * Known values include: gzip, none. Implementations may support other compression algorithms.
    * If omitted or null, none is used.
    *
    */
-  compression?: string | null;
+  compression?: string;
   /**
    * Configure max time (in milliseconds) to wait for each export.
    * Value must be non-negative. A value of 0 indicates no limit (infinity).
    * If omitted or null, 10000 is used.
    *
    */
-  timeout?: number | null;
+  timeout?: number;
   /**
    * Configure temporality preference.
    * Values include:
@@ -583,7 +583,7 @@ export type OtlpGrpcMetricExporter = {
    * If omitted, cumulative is used.
    *
    */
-  temporality_preference?: ('cumulative' | 'delta' | 'low_memory') | null;
+  temporality_preference?: ('cumulative' | 'delta' | 'low_memory');
   /**
    * Configure default histogram aggregation.
    * Values include:
@@ -592,8 +592,8 @@ export type OtlpGrpcMetricExporter = {
    * If omitted, explicit_bucket_histogram is used.
    *
    */
-  default_histogram_aggregation?: ('explicit_bucket_histogram' | 'base2_exponential_bucket_histogram') | null;
-} | null);
+  default_histogram_aggregation?: ('explicit_bucket_histogram' | 'base2_exponential_bucket_histogram');
+});
 /**
  * Configure TLS settings for the exporter.
  * If omitted, system default TLS settings are used.
@@ -606,7 +606,7 @@ export type ExperimentalOtlpFileMetricExporter = {
    * If omitted or null, stdout is used.
    *
    */
-  output_stream?: string | null;
+  output_stream?: string;
   /**
    * Configure temporality preference.
    * Values include:
@@ -616,7 +616,7 @@ export type ExperimentalOtlpFileMetricExporter = {
    * If omitted, cumulative is used.
    *
    */
-  temporality_preference?: ('cumulative' | 'delta' | 'low_memory') | null;
+  temporality_preference?: ('cumulative' | 'delta' | 'low_memory');
   /**
    * Configure default histogram aggregation.
    * Values include:
@@ -625,7 +625,7 @@ export type ExperimentalOtlpFileMetricExporter = {
    * If omitted, explicit_bucket_histogram is used.
    *
    */
-  default_histogram_aggregation?: ('explicit_bucket_histogram' | 'base2_exponential_bucket_histogram') | null;
+  default_histogram_aggregation?: ('explicit_bucket_histogram' | 'base2_exponential_bucket_histogram');
 } & ({
   /**
    * Configure output stream.
@@ -633,7 +633,7 @@ export type ExperimentalOtlpFileMetricExporter = {
    * If omitted or null, stdout is used.
    *
    */
-  output_stream?: string | null;
+  output_stream?: string;
   /**
    * Configure temporality preference.
    * Values include:
@@ -643,7 +643,7 @@ export type ExperimentalOtlpFileMetricExporter = {
    * If omitted, cumulative is used.
    *
    */
-  temporality_preference?: ('cumulative' | 'delta' | 'low_memory') | null;
+  temporality_preference?: ('cumulative' | 'delta' | 'low_memory');
   /**
    * Configure default histogram aggregation.
    * Values include:
@@ -652,8 +652,8 @@ export type ExperimentalOtlpFileMetricExporter = {
    * If omitted, explicit_bucket_histogram is used.
    *
    */
-  default_histogram_aggregation?: ('explicit_bucket_histogram' | 'base2_exponential_bucket_histogram') | null;
-} | null);
+  default_histogram_aggregation?: ('explicit_bucket_histogram' | 'base2_exponential_bucket_histogram');
+});
 /**
  * Configure exporter to be console.
  * If omitted, ignore.
@@ -669,7 +669,7 @@ export type ConsoleMetricExporter = {
    * If omitted, cumulative is used.
    *
    */
-  temporality_preference?: ('cumulative' | 'delta' | 'low_memory') | null;
+  temporality_preference?: ('cumulative' | 'delta' | 'low_memory');
   /**
    * Configure default histogram aggregation.
    * Values include:
@@ -678,7 +678,7 @@ export type ConsoleMetricExporter = {
    * If omitted, explicit_bucket_histogram is used.
    *
    */
-  default_histogram_aggregation?: ('explicit_bucket_histogram' | 'base2_exponential_bucket_histogram') | null;
+  default_histogram_aggregation?: ('explicit_bucket_histogram' | 'base2_exponential_bucket_histogram');
 } & ({
   /**
    * Configure temporality preference.
@@ -689,7 +689,7 @@ export type ConsoleMetricExporter = {
    * If omitted, cumulative is used.
    *
    */
-  temporality_preference?: ('cumulative' | 'delta' | 'low_memory') | null;
+  temporality_preference?: ('cumulative' | 'delta' | 'low_memory');
   /**
    * Configure default histogram aggregation.
    * Values include:
@@ -698,14 +698,14 @@ export type ConsoleMetricExporter = {
    * If omitted, explicit_bucket_histogram is used.
    *
    */
-  default_histogram_aggregation?: ('explicit_bucket_histogram' | 'base2_exponential_bucket_histogram') | null;
-} | null);
+  default_histogram_aggregation?: ('explicit_bucket_histogram' | 'base2_exponential_bucket_histogram');
+});
 /**
  * Configure metric producer to be opencensus.
  * If omitted, ignore.
  *
  */
-export type OpenCensusMetricProducer = {} | null;
+export type OpenCensusMetricProducer = {};
 /**
  * Configure exporter to be prometheus.
  * If omitted, ignore.
@@ -717,25 +717,25 @@ export type ExperimentalPrometheusMetricExporter = {
    * If omitted or null, localhost is used.
    *
    */
-  host?: string | null;
+  host?: string;
   /**
    * Configure port.
    * If omitted or null, 9464 is used.
    *
    */
-  port?: number | null;
+  port?: number;
   /**
    * Configure Prometheus Exporter to produce metrics without scope labels.
    * If omitted or null, false is used.
    *
    */
-  without_scope_info?: boolean | null;
+  without_scope_info?: boolean;
   /**
    * Configure Prometheus Exporter to produce metrics without a target info metric for the resource.
    * If omitted or null, false is used.
    *
    */
-  'without_target_info/development'?: boolean | null;
+  'without_target_info/development'?: boolean;
   with_resource_constant_labels?: IncludeExclude;
   /**
    * Configure how metric names are translated to Prometheus metric names.
@@ -754,32 +754,32 @@ export type ExperimentalPrometheusMetricExporter = {
         | 'no_utf8_escaping_with_suffixes/development'
         | 'no_translation/development'
       )
-    | null;
+   ;
 } & ({
   /**
    * Configure host.
    * If omitted or null, localhost is used.
    *
    */
-  host?: string | null;
+  host?: string;
   /**
    * Configure port.
    * If omitted or null, 9464 is used.
    *
    */
-  port?: number | null;
+  port?: number;
   /**
    * Configure Prometheus Exporter to produce metrics without scope labels.
    * If omitted or null, false is used.
    *
    */
-  without_scope_info?: boolean | null;
+  without_scope_info?: boolean;
   /**
    * Configure Prometheus Exporter to produce metrics without a target info metric for the resource.
    * If omitted or null, false is used.
    *
    */
-  'without_target_info/development'?: boolean | null;
+  'without_target_info/development'?: boolean;
   with_resource_constant_labels?: IncludeExclude;
   /**
    * Configure how metric names are translated to Prometheus metric names.
@@ -798,20 +798,20 @@ export type ExperimentalPrometheusMetricExporter = {
         | 'no_utf8_escaping_with_suffixes/development'
         | 'no_translation/development'
       )
-    | null;
-} | null);
+   ;
+});
 /**
  * Configures the stream to use the instrument kind to select an aggregation and advisory parameters to influence aggregation configuration parameters. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#default-aggregation for details.
  * If omitted, ignore.
  *
  */
-export type DefaultAggregation = {} | null;
+export type DefaultAggregation = {};
 /**
  * Configures the stream to ignore/drop all instrument measurements. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#drop-aggregation for details.
  * If omitted, ignore.
  *
  */
-export type DropAggregation = {} | null;
+export type DropAggregation = {};
 /**
  * Configures the stream to collect data for the histogram metric point using a set of explicit boundary values for histogram bucketing. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#explicit-bucket-histogram-aggregation for details
  * If omitted, ignore.
@@ -831,7 +831,7 @@ export type ExplicitBucketHistogramAggregation = {
    * If omitted or null, true is used.
    *
    */
-  record_min_max?: boolean | null;
+  record_min_max?: boolean;
 } & ({
   /**
    * Configure bucket boundaries.
@@ -846,8 +846,8 @@ export type ExplicitBucketHistogramAggregation = {
    * If omitted or null, true is used.
    *
    */
-  record_min_max?: boolean | null;
-} | null);
+  record_min_max?: boolean;
+});
 /**
  * Configures the stream to collect data for the exponential histogram metric point, which uses a base-2 exponential formula to determine bucket boundaries and an integer scale parameter to control resolution. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#base2-exponential-bucket-histogram-aggregation for details.
  * If omitted, ignore.
@@ -859,75 +859,75 @@ export type Base2ExponentialBucketHistogramAggregation = {
    * If omitted or null, 20 is used.
    *
    */
-  max_scale?: number | null;
+  max_scale?: number;
   /**
    * Configure the maximum number of buckets in each of the positive and negative ranges, not counting the special zero bucket.
    * If omitted or null, 160 is used.
    *
    */
-  max_size?: number | null;
+  max_size?: number;
   /**
    * Configure whether or not to record min and max.
    * If omitted or null, true is used.
    *
    */
-  record_min_max?: boolean | null;
+  record_min_max?: boolean;
 } & ({
   /**
    * Configure the max scale factor.
    * If omitted or null, 20 is used.
    *
    */
-  max_scale?: number | null;
+  max_scale?: number;
   /**
    * Configure the maximum number of buckets in each of the positive and negative ranges, not counting the special zero bucket.
    * If omitted or null, 160 is used.
    *
    */
-  max_size?: number | null;
+  max_size?: number;
   /**
    * Configure whether or not to record min and max.
    * If omitted or null, true is used.
    *
    */
-  record_min_max?: boolean | null;
-} | null);
+  record_min_max?: boolean;
+});
 /**
  * Configures the stream to collect data using the last measurement. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#last-value-aggregation for details.
  * If omitted, ignore.
  *
  */
-export type LastValueAggregation = {} | null;
+export type LastValueAggregation = {};
 /**
  * Configures the stream to collect the arithmetic sum of measurement values. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#sum-aggregation for details.
  * If omitted, ignore.
  *
  */
-export type SumAggregation = {} | null;
+export type SumAggregation = {};
 /**
  * Include the w3c trace context propagator.
  * If omitted, ignore.
  *
  */
-export type TraceContextPropagator = {} | null;
+export type TraceContextPropagator = {};
 /**
  * Include the w3c baggage propagator.
  * If omitted, ignore.
  *
  */
-export type BaggagePropagator = {} | null;
+export type BaggagePropagator = {};
 /**
  * Include the zipkin b3 propagator.
  * If omitted, ignore.
  *
  */
-export type B3Propagator = {} | null;
+export type B3Propagator = {};
 /**
  * Include the zipkin b3 multi propagator.
  * If omitted, ignore.
  *
  */
-export type B3MultiPropagator = {} | null;
+export type B3MultiPropagator = {};
 /**
  * Configure exporter to be OTLP with HTTP transport.
  * If omitted, ignore.
@@ -939,7 +939,7 @@ export type OtlpHttpExporter1 = {
    * If omitted or null, the http://localhost:4318/v1/{signal} (where signal is 'traces', 'logs', or 'metrics') is used.
    *
    */
-  endpoint?: string | null;
+  endpoint?: string;
   tls?: HttpTls;
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
@@ -956,21 +956,21 @@ export type OtlpHttpExporter1 = {
    * If omitted or null, no headers are added.
    *
    */
-  headers_list?: string | null;
+  headers_list?: string;
   /**
    * Configure compression.
    * Known values include: gzip, none. Implementations may support other compression algorithms.
    * If omitted or null, none is used.
    *
    */
-  compression?: string | null;
+  compression?: string;
   /**
    * Configure max time (in milliseconds) to wait for each export.
    * Value must be non-negative. A value of 0 indicates no limit (infinity).
    * If omitted or null, 10000 is used.
    *
    */
-  timeout?: number | null;
+  timeout?: number;
   /**
    * Configure the encoding used for messages.
    * Implementations may not support json.
@@ -980,14 +980,14 @@ export type OtlpHttpExporter1 = {
    * If omitted, protobuf is used.
    *
    */
-  encoding?: ('protobuf' | 'json') | null;
+  encoding?: ('protobuf' | 'json');
 } & ({
   /**
    * Configure endpoint, including the signal specific path.
    * If omitted or null, the http://localhost:4318/v1/{signal} (where signal is 'traces', 'logs', or 'metrics') is used.
    *
    */
-  endpoint?: string | null;
+  endpoint?: string;
   tls?: HttpTls;
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
@@ -1004,21 +1004,21 @@ export type OtlpHttpExporter1 = {
    * If omitted or null, no headers are added.
    *
    */
-  headers_list?: string | null;
+  headers_list?: string;
   /**
    * Configure compression.
    * Known values include: gzip, none. Implementations may support other compression algorithms.
    * If omitted or null, none is used.
    *
    */
-  compression?: string | null;
+  compression?: string;
   /**
    * Configure max time (in milliseconds) to wait for each export.
    * Value must be non-negative. A value of 0 indicates no limit (infinity).
    * If omitted or null, 10000 is used.
    *
    */
-  timeout?: number | null;
+  timeout?: number;
   /**
    * Configure the encoding used for messages.
    * Implementations may not support json.
@@ -1028,8 +1028,8 @@ export type OtlpHttpExporter1 = {
    * If omitted, protobuf is used.
    *
    */
-  encoding?: ('protobuf' | 'json') | null;
-} | null);
+  encoding?: ('protobuf' | 'json');
+});
 /**
  * Configure exporter to be OTLP with gRPC transport.
  * If omitted, ignore.
@@ -1041,7 +1041,7 @@ export type OtlpGrpcExporter1 = {
    * If omitted or null, http://localhost:4317 is used.
    *
    */
-  endpoint?: string | null;
+  endpoint?: string;
   tls?: GrpcTls;
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
@@ -1058,28 +1058,28 @@ export type OtlpGrpcExporter1 = {
    * If omitted or null, no headers are added.
    *
    */
-  headers_list?: string | null;
+  headers_list?: string;
   /**
    * Configure compression.
    * Known values include: gzip, none. Implementations may support other compression algorithms.
    * If omitted or null, none is used.
    *
    */
-  compression?: string | null;
+  compression?: string;
   /**
    * Configure max time (in milliseconds) to wait for each export.
    * Value must be non-negative. A value of 0 indicates no limit (infinity).
    * If omitted or null, 10000 is used.
    *
    */
-  timeout?: number | null;
+  timeout?: number;
 } & ({
   /**
    * Configure endpoint.
    * If omitted or null, http://localhost:4317 is used.
    *
    */
-  endpoint?: string | null;
+  endpoint?: string;
   tls?: GrpcTls;
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
@@ -1096,22 +1096,22 @@ export type OtlpGrpcExporter1 = {
    * If omitted or null, no headers are added.
    *
    */
-  headers_list?: string | null;
+  headers_list?: string;
   /**
    * Configure compression.
    * Known values include: gzip, none. Implementations may support other compression algorithms.
    * If omitted or null, none is used.
    *
    */
-  compression?: string | null;
+  compression?: string;
   /**
    * Configure max time (in milliseconds) to wait for each export.
    * Value must be non-negative. A value of 0 indicates no limit (infinity).
    * If omitted or null, 10000 is used.
    *
    */
-  timeout?: number | null;
-} | null);
+  timeout?: number;
+});
 /**
  * Configure exporter to be OTLP with file transport.
  * If omitted, ignore.
@@ -1124,7 +1124,7 @@ export type ExperimentalOtlpFileExporter1 = {
    * If omitted or null, stdout is used.
    *
    */
-  output_stream?: string | null;
+  output_stream?: string;
 } & ({
   /**
    * Configure output stream.
@@ -1132,38 +1132,38 @@ export type ExperimentalOtlpFileExporter1 = {
    * If omitted or null, stdout is used.
    *
    */
-  output_stream?: string | null;
-} | null);
+  output_stream?: string;
+});
 /**
  * Configure exporter to be console.
  * If omitted, ignore.
  *
  */
-export type ConsoleExporter1 = {} | null;
+export type ConsoleExporter1 = {};
 /**
  * Configure sampler to be always_off.
  * If omitted, ignore.
  *
  */
-export type AlwaysOffSampler = {} | null;
+export type AlwaysOffSampler = {};
 /**
  * Configure sampler to be always_on.
  * If omitted, ignore.
  *
  */
-export type AlwaysOnSampler = {} | null;
+export type AlwaysOnSampler = {};
 /**
  * Configure sampler to be always_off.
  * If omitted, ignore.
  *
  */
-export type ExperimentalComposableAlwaysOffSampler = {} | null;
+export type ExperimentalComposableAlwaysOffSampler = {};
 /**
  * Configure sampler to be always_on.
  * If omitted, ignore.
  *
  */
-export type ExperimentalComposableAlwaysOnSampler = {} | null;
+export type ExperimentalComposableAlwaysOnSampler = {};
 /**
  * Configure sampler to be probability.
  * If omitted, ignore.
@@ -1175,15 +1175,15 @@ export type ExperimentalComposableProbabilitySampler = {
    * If omitted or null, 1.0 is used.
    *
    */
-  ratio?: number | null;
+  ratio?: number;
 } & ({
   /**
    * Configure ratio.
    * If omitted or null, 1.0 is used.
    *
    */
-  ratio?: number | null;
-} | null);
+  ratio?: number;
+});
 /**
  * Configure sampler to be rule_based.
  * If omitted, ignore.
@@ -1213,9 +1213,9 @@ export type ExperimentalComposableRuleBasedSampler = {
    * @minItems 1
    */
   rules?: ExperimentalComposableRuleBasedSamplerRule[];
-} | null);
-export type SpanKind = ('internal' | 'server' | 'client' | 'producer' | 'consumer') | null;
-export type ExperimentalSpanParent = ('none' | 'remote' | 'local') | null;
+});
+export type SpanKind = ('internal' | 'server' | 'client' | 'producer' | 'consumer');
+export type ExperimentalSpanParent = ('none' | 'remote' | 'local');
 /**
  * Configure sampler to be jaeger_remote.
  * If omitted, ignore.
@@ -1233,7 +1233,7 @@ export type ExperimentalJaegerRemoteSampler = {
    * If omitted or null, 60000 is used.
    *
    */
-  interval?: number | null;
+  interval?: number;
   initial_sampler: Sampler1;
 } & ({
   /**
@@ -1247,9 +1247,9 @@ export type ExperimentalJaegerRemoteSampler = {
    * If omitted or null, 60000 is used.
    *
    */
-  interval?: number | null;
+  interval?: number;
   initial_sampler: Sampler1;
-} | null);
+});
 /**
  * Configure sampler to be parent_based.
  * If omitted, ignore.
@@ -1267,7 +1267,7 @@ export type ParentBasedSampler = {
   remote_parent_not_sampled?: Sampler4;
   local_parent_sampled?: Sampler5;
   local_parent_not_sampled?: Sampler6;
-} | null);
+});
 /**
  * Configure sampler to be probability.
  * If omitted, ignore.
@@ -1279,15 +1279,15 @@ export type ExperimentalProbabilitySampler = {
    * If omitted or null, 1.0 is used.
    *
    */
-  ratio?: number | null;
+  ratio?: number;
 } & ({
   /**
    * Configure ratio.
    * If omitted or null, 1.0 is used.
    *
    */
-  ratio?: number | null;
-} | null);
+  ratio?: number;
+});
 /**
  * Configure sampler to be trace_id_ratio_based.
  * If omitted, ignore.
@@ -1299,39 +1299,39 @@ export type TraceIdRatioBasedSampler = {
    * If omitted or null, 1.0 is used.
    *
    */
-  ratio?: number | null;
+  ratio?: number;
 } & ({
   /**
    * Configure trace_id_ratio.
    * If omitted or null, 1.0 is used.
    *
    */
-  ratio?: number | null;
-} | null);
+  ratio?: number;
+});
 /**
  * Enable the container resource detector, which populates container.* attributes.
  * If omitted, ignore.
  *
  */
-export type ExperimentalContainerResourceDetector = {} | null;
+export type ExperimentalContainerResourceDetector = {};
 /**
  * Enable the host resource detector, which populates host.* and os.* attributes.
  * If omitted, ignore.
  *
  */
-export type ExperimentalHostResourceDetector = {} | null;
+export type ExperimentalHostResourceDetector = {};
 /**
  * Enable the process resource detector, which populates process.* attributes.
  * If omitted, ignore.
  *
  */
-export type ExperimentalProcessResourceDetector = {} | null;
+export type ExperimentalProcessResourceDetector = {};
 /**
  * Enable the service detector, which populates service.name based on the OTEL_SERVICE_NAME environment variable and service.instance.id.
  * If omitted, ignore.
  *
  */
-export type ExperimentalServiceResourceDetector = {} | null;
+export type ExperimentalServiceResourceDetector = {};
 
 export interface ConfigurationModel {
   /**
@@ -1348,7 +1348,7 @@ export interface ConfigurationModel {
    * If omitted or null, false is used.
    *
    */
-  disabled?: boolean | null;
+  disabled?: boolean;
   /**
    * Configure the log level of the internal logger used by the SDK.
    * Values include:
@@ -1406,7 +1406,7 @@ export interface ConfigurationModel {
         | 'fatal3'
         | 'fatal4'
       )
-    | null;
+   ;
   attribute_limits?: AttributeLimits;
   logger_provider?: LoggerProvider;
   meter_provider?: MeterProvider;
@@ -1429,14 +1429,14 @@ export interface AttributeLimits {
    * If omitted or null, there is no limit.
    *
    */
-  attribute_value_length_limit?: number | null;
+  attribute_value_length_limit?: number;
   /**
    * Configure max attribute count.
    * Value must be non-negative.
    * If omitted or null, 128 is used.
    *
    */
-  attribute_count_limit?: number | null;
+  attribute_count_limit?: number;
 }
 /**
  * Configure logger provider.
@@ -1472,26 +1472,26 @@ export interface BatchLogRecordProcessor {
    * If omitted or null, 1000 is used.
    *
    */
-  schedule_delay?: number | null;
+  schedule_delay?: number;
   /**
    * Configure maximum allowed time (in milliseconds) to export data.
    * Value must be non-negative. A value of 0 indicates no limit (infinity).
    * If omitted or null, 30000 is used.
    *
    */
-  export_timeout?: number | null;
+  export_timeout?: number;
   /**
    * Configure maximum queue size. Value must be positive.
    * If omitted or null, 2048 is used.
    *
    */
-  max_queue_size?: number | null;
+  max_queue_size?: number;
   /**
    * Configure maximum batch size. Value must be positive.
    * If omitted or null, 512 is used.
    *
    */
-  max_export_batch_size?: number | null;
+  max_export_batch_size?: number;
   exporter: LogRecordExporter;
 }
 /**
@@ -1518,7 +1518,7 @@ export interface NameStringValuePair {
    * Property must be present, but if null the behavior is dependent on usage context.
    *
    */
-  value: string | null;
+  value: string;
 }
 /**
  * Configure a simple log record processor.
@@ -1552,14 +1552,14 @@ export interface LogRecordLimits {
    * If omitted or null, there is no limit.
    *
    */
-  attribute_value_length_limit?: number | null;
+  attribute_value_length_limit?: number;
   /**
    * Configure max attribute count. Overrides .attribute_limits.attribute_count_limit.
    * Value must be non-negative.
    * If omitted or null, 128 is used.
    *
    */
-  attribute_count_limit?: number | null;
+  attribute_count_limit?: number;
 }
 /**
  * Configure loggers.
@@ -1588,7 +1588,7 @@ export interface ExperimentalLoggerConfig {
    * If omitted or null, true is used.
    *
    */
-  enabled?: boolean | null;
+  enabled?: boolean;
   /**
    * Configure severity filtering.
    * Log records with an non-zero (i.e. unspecified) severity number which is less than minimum_severity are not processed.
@@ -1647,14 +1647,14 @@ export interface ExperimentalLoggerConfig {
         | 'fatal3'
         | 'fatal4'
       )
-    | null;
+   ;
   /**
    * Configure trace based filtering.
    * If true, log records associated with unsampled trace contexts traces are not processed. If false, or if a log record is not associated with a trace context, trace based filtering is not applied.
    * If omitted or null, trace based filtering is not applied.
    *
    */
-  trace_based?: boolean | null;
+  trace_based?: boolean;
 }
 export interface ExperimentalLoggerMatcherAndConfig {
   /**
@@ -1679,7 +1679,7 @@ export interface ExperimentalLoggerConfig1 {
    * If omitted or null, true is used.
    *
    */
-  enabled?: boolean | null;
+  enabled?: boolean;
   /**
    * Configure severity filtering.
    * Log records with an non-zero (i.e. unspecified) severity number which is less than minimum_severity are not processed.
@@ -1738,14 +1738,14 @@ export interface ExperimentalLoggerConfig1 {
         | 'fatal3'
         | 'fatal4'
       )
-    | null;
+   ;
   /**
    * Configure trace based filtering.
    * If true, log records associated with unsampled trace contexts traces are not processed. If false, or if a log record is not associated with a trace context, trace based filtering is not applied.
    * If omitted or null, trace based filtering is not applied.
    *
    */
-  trace_based?: boolean | null;
+  trace_based?: boolean;
 }
 /**
  * Configure meter provider.
@@ -1779,7 +1779,7 @@ export interface MeterProvider {
    * If omitted, trace_based is used.
    *
    */
-  exemplar_filter?: ('always_on' | 'always_off' | 'trace_based') | null;
+  exemplar_filter?: ('always_on' | 'always_off' | 'trace_based');
   'meter_configurator/development'?: ExperimentalMeterConfigurator;
 }
 export interface MetricReader {
@@ -1798,14 +1798,14 @@ export interface PeriodicMetricReader {
    * If omitted or null, 60000 is used.
    *
    */
-  interval?: number | null;
+  interval?: number;
   /**
    * Configure maximum allowed time (in milliseconds) to export data.
    * Value must be non-negative. A value of 0 indicates no limit (infinity).
    * If omitted or null, 30000 is used.
    *
    */
-  timeout?: number | null;
+  timeout?: number;
   exporter: PushMetricExporter;
   /**
    * Configure metric producers.
@@ -1845,49 +1845,49 @@ export interface CardinalityLimits {
    * If omitted or null, 2000 is used.
    *
    */
-  default?: number | null;
+  default?: number;
   /**
    * Configure default cardinality limit for counter instruments.
    * If omitted or null, the value from .default is used.
    *
    */
-  counter?: number | null;
+  counter?: number;
   /**
    * Configure default cardinality limit for gauge instruments.
    * If omitted or null, the value from .default is used.
    *
    */
-  gauge?: number | null;
+  gauge?: number;
   /**
    * Configure default cardinality limit for histogram instruments.
    * If omitted or null, the value from .default is used.
    *
    */
-  histogram?: number | null;
+  histogram?: number;
   /**
    * Configure default cardinality limit for observable_counter instruments.
    * If omitted or null, the value from .default is used.
    *
    */
-  observable_counter?: number | null;
+  observable_counter?: number;
   /**
    * Configure default cardinality limit for observable_gauge instruments.
    * If omitted or null, the value from .default is used.
    *
    */
-  observable_gauge?: number | null;
+  observable_gauge?: number;
   /**
    * Configure default cardinality limit for observable_up_down_counter instruments.
    * If omitted or null, the value from .default is used.
    *
    */
-  observable_up_down_counter?: number | null;
+  observable_up_down_counter?: number;
   /**
    * Configure default cardinality limit for up_down_counter instruments.
    * If omitted or null, the value from .default is used.
    *
    */
-  up_down_counter?: number | null;
+  up_down_counter?: number;
 }
 /**
  * Configure a pull based metric reader.
@@ -1956,49 +1956,49 @@ export interface CardinalityLimits1 {
    * If omitted or null, 2000 is used.
    *
    */
-  default?: number | null;
+  default?: number;
   /**
    * Configure default cardinality limit for counter instruments.
    * If omitted or null, the value from .default is used.
    *
    */
-  counter?: number | null;
+  counter?: number;
   /**
    * Configure default cardinality limit for gauge instruments.
    * If omitted or null, the value from .default is used.
    *
    */
-  gauge?: number | null;
+  gauge?: number;
   /**
    * Configure default cardinality limit for histogram instruments.
    * If omitted or null, the value from .default is used.
    *
    */
-  histogram?: number | null;
+  histogram?: number;
   /**
    * Configure default cardinality limit for observable_counter instruments.
    * If omitted or null, the value from .default is used.
    *
    */
-  observable_counter?: number | null;
+  observable_counter?: number;
   /**
    * Configure default cardinality limit for observable_gauge instruments.
    * If omitted or null, the value from .default is used.
    *
    */
-  observable_gauge?: number | null;
+  observable_gauge?: number;
   /**
    * Configure default cardinality limit for observable_up_down_counter instruments.
    * If omitted or null, the value from .default is used.
    *
    */
-  observable_up_down_counter?: number | null;
+  observable_up_down_counter?: number;
   /**
    * Configure default cardinality limit for up_down_counter instruments.
    * If omitted or null, the value from .default is used.
    *
    */
-  up_down_counter?: number | null;
+  up_down_counter?: number;
 }
 export interface View {
   selector: ViewSelector;
@@ -2016,7 +2016,7 @@ export interface ViewSelector {
    * If omitted or null, all instrument names match.
    *
    */
-  instrument_name?: string | null;
+  instrument_name?: string;
   /**
    * Configure instrument type selection criteria.
    * Values include:
@@ -2040,31 +2040,31 @@ export interface ViewSelector {
         | 'observable_up_down_counter'
         | 'up_down_counter'
       )
-    | null;
+   ;
   /**
    * Configure the instrument unit selection criteria.
    * If omitted or null, all instrument units match.
    *
    */
-  unit?: string | null;
+  unit?: string;
   /**
    * Configure meter name selection criteria.
    * If omitted or null, all meter names match.
    *
    */
-  meter_name?: string | null;
+  meter_name?: string;
   /**
    * Configure meter version selection criteria.
    * If omitted or null, all meter versions match.
    *
    */
-  meter_version?: string | null;
+  meter_version?: string;
   /**
    * Configure meter schema url selection criteria.
    * If omitted or null, all meter schema URLs match.
    *
    */
-  meter_schema_url?: string | null;
+  meter_schema_url?: string;
 }
 /**
  * Configure view stream.
@@ -2077,20 +2077,20 @@ export interface ViewStream {
    * If omitted or null, the instrument's original name is used.
    *
    */
-  name?: string | null;
+  name?: string;
   /**
    * Configure metric description of the resulting stream(s).
    * If omitted or null, the instrument's origin description is used.
    *
    */
-  description?: string | null;
+  description?: string;
   aggregation?: Aggregation;
   /**
    * Configure the aggregation cardinality limit.
    * If omitted or null, the metric reader's default cardinality limit is used.
    *
    */
-  aggregation_cardinality_limit?: number | null;
+  aggregation_cardinality_limit?: number;
   attribute_keys?: IncludeExclude1;
 }
 /**
@@ -2211,7 +2211,7 @@ export interface Propagator {
    * If omitted or null, and .composite is omitted or null, a noop propagator is used.
    *
    */
-  composite_list?: string | null;
+  composite_list?: string;
 }
 export interface TextMapPropagator {
   tracecontext?: TraceContextPropagator;
@@ -2255,26 +2255,26 @@ export interface BatchSpanProcessor {
    * If omitted or null, 5000 is used.
    *
    */
-  schedule_delay?: number | null;
+  schedule_delay?: number;
   /**
    * Configure maximum allowed time (in milliseconds) to export data.
    * Value must be non-negative. A value of 0 indicates no limit (infinity).
    * If omitted or null, 30000 is used.
    *
    */
-  export_timeout?: number | null;
+  export_timeout?: number;
   /**
    * Configure maximum queue size. Value must be positive.
    * If omitted or null, 2048 is used.
    *
    */
-  max_queue_size?: number | null;
+  max_queue_size?: number;
   /**
    * Configure maximum batch size. Value must be positive.
    * If omitted or null, 512 is used.
    *
    */
-  max_export_batch_size?: number | null;
+  max_export_batch_size?: number;
   exporter: SpanExporter;
 }
 /**
@@ -2321,42 +2321,42 @@ export interface SpanLimits {
    * If omitted or null, there is no limit.
    *
    */
-  attribute_value_length_limit?: number | null;
+  attribute_value_length_limit?: number;
   /**
    * Configure max attribute count. Overrides .attribute_limits.attribute_count_limit.
    * Value must be non-negative.
    * If omitted or null, 128 is used.
    *
    */
-  attribute_count_limit?: number | null;
+  attribute_count_limit?: number;
   /**
    * Configure max span event count.
    * Value must be non-negative.
    * If omitted or null, 128 is used.
    *
    */
-  event_count_limit?: number | null;
+  event_count_limit?: number;
   /**
    * Configure max span link count.
    * Value must be non-negative.
    * If omitted or null, 128 is used.
    *
    */
-  link_count_limit?: number | null;
+  link_count_limit?: number;
   /**
    * Configure max attributes per span event.
    * Value must be non-negative.
    * If omitted or null, 128 is used.
    *
    */
-  event_attribute_count_limit?: number | null;
+  event_attribute_count_limit?: number;
   /**
    * Configure max attributes per span link.
    * Value must be non-negative.
    * If omitted or null, 128 is used.
    *
    */
-  link_attribute_count_limit?: number | null;
+  link_attribute_count_limit?: number;
 }
 /**
  * Configure the sampler.
@@ -2680,14 +2680,14 @@ export interface Resource {
    * If omitted or null, no schema URL is used.
    *
    */
-  schema_url?: string | null;
+  schema_url?: string;
   /**
    * Configure resource attributes. Entries have lower priority than entries from .resource.attributes.
    * The value is a list of comma separated key-value pairs matching the format of OTEL_RESOURCE_ATTRIBUTES. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration for details.
    * If omitted or null, no resource attributes are added.
    *
    */
-  attributes_list?: string | null;
+  attributes_list?: string;
 }
 export interface AttributeNameValue {
   /**
@@ -2702,7 +2702,7 @@ export interface AttributeNameValue {
    * Property is required and must be non-null.
    *
    */
-  value: string | number | boolean | null | string[] | boolean[] | number[];
+  value: string | number | boolean | string[] | boolean[] | number[];
   /**
    * The attribute type.
    * Values include:
@@ -2717,7 +2717,7 @@ export interface AttributeNameValue {
    * If omitted, string is used.
    *
    */
-  type?: ('string' | 'bool' | 'int' | 'double' | 'string_array' | 'bool_array' | 'int_array' | 'double_array') | null;
+  type?: ('string' | 'bool' | 'int' | 'double' | 'string_array' | 'bool_array' | 'int_array' | 'double_array');
 }
 /**
  * Configure resource detection.
@@ -2836,7 +2836,7 @@ export interface ExperimentalGeneralInstrumentation {
    * If omitted or null, no opt-in is configured and instrumentations continue emitting their default semantic convention version.
    *
    */
-  stability_opt_in_list?: string | null;
+  stability_opt_in_list?: string;
 }
 /**
  * Configure instrumentations following the http semantic conventions.
@@ -2864,13 +2864,13 @@ export interface ExperimentalSemconvConfig {
    * If omitted or null, the latest stable version is used, or if no stable version is available and .experimental is true then the latest experimental version is used.
    *
    */
-  version?: number | null;
+  version?: number;
   /**
    * Use latest experimental semantic conventions (before stable is available or to enable experimental features on top of stable conventions).
    * If omitted or null, false is used.
    *
    */
-  experimental?: boolean | null;
+  experimental?: boolean;
   /**
    * When true, also emit the previous major version alongside the target version.
    * For version=1, the previous version refers to the pre-stable conventions that the instrumentation emitted before the first stable semantic convention version was defined.
@@ -2879,7 +2879,7 @@ export interface ExperimentalSemconvConfig {
    * If omitted or null, false is used.
    *
    */
-  dual_emit?: boolean | null;
+  dual_emit?: boolean;
 }
 /**
  * Configure instrumentations following the http client semantic conventions.
@@ -2971,13 +2971,13 @@ export interface ExperimentalSemconvConfig1 {
    * If omitted or null, the latest stable version is used, or if no stable version is available and .experimental is true then the latest experimental version is used.
    *
    */
-  version?: number | null;
+  version?: number;
   /**
    * Use latest experimental semantic conventions (before stable is available or to enable experimental features on top of stable conventions).
    * If omitted or null, false is used.
    *
    */
-  experimental?: boolean | null;
+  experimental?: boolean;
   /**
    * When true, also emit the previous major version alongside the target version.
    * For version=1, the previous version refers to the pre-stable conventions that the instrumentation emitted before the first stable semantic convention version was defined.
@@ -2986,7 +2986,7 @@ export interface ExperimentalSemconvConfig1 {
    * If omitted or null, false is used.
    *
    */
-  dual_emit?: boolean | null;
+  dual_emit?: boolean;
 }
 /**
  * Configure instrumentations following the database semantic conventions.
@@ -3012,13 +3012,13 @@ export interface ExperimentalSemconvConfig2 {
    * If omitted or null, the latest stable version is used, or if no stable version is available and .experimental is true then the latest experimental version is used.
    *
    */
-  version?: number | null;
+  version?: number;
   /**
    * Use latest experimental semantic conventions (before stable is available or to enable experimental features on top of stable conventions).
    * If omitted or null, false is used.
    *
    */
-  experimental?: boolean | null;
+  experimental?: boolean;
   /**
    * When true, also emit the previous major version alongside the target version.
    * For version=1, the previous version refers to the pre-stable conventions that the instrumentation emitted before the first stable semantic convention version was defined.
@@ -3027,7 +3027,7 @@ export interface ExperimentalSemconvConfig2 {
    * If omitted or null, false is used.
    *
    */
-  dual_emit?: boolean | null;
+  dual_emit?: boolean;
 }
 /**
  * Configure instrumentations following the GenAI semantic conventions.
@@ -3053,13 +3053,13 @@ export interface ExperimentalSemconvConfig3 {
    * If omitted or null, the latest stable version is used, or if no stable version is available and .experimental is true then the latest experimental version is used.
    *
    */
-  version?: number | null;
+  version?: number;
   /**
    * Use latest experimental semantic conventions (before stable is available or to enable experimental features on top of stable conventions).
    * If omitted or null, false is used.
    *
    */
-  experimental?: boolean | null;
+  experimental?: boolean;
   /**
    * When true, also emit the previous major version alongside the target version.
    * For version=1, the previous version refers to the pre-stable conventions that the instrumentation emitted before the first stable semantic convention version was defined.
@@ -3068,7 +3068,7 @@ export interface ExperimentalSemconvConfig3 {
    * If omitted or null, false is used.
    *
    */
-  dual_emit?: boolean | null;
+  dual_emit?: boolean;
 }
 /**
  * Configure instrumentations following the messaging semantic conventions.
@@ -3094,13 +3094,13 @@ export interface ExperimentalSemconvConfig4 {
    * If omitted or null, the latest stable version is used, or if no stable version is available and .experimental is true then the latest experimental version is used.
    *
    */
-  version?: number | null;
+  version?: number;
   /**
    * Use latest experimental semantic conventions (before stable is available or to enable experimental features on top of stable conventions).
    * If omitted or null, false is used.
    *
    */
-  experimental?: boolean | null;
+  experimental?: boolean;
   /**
    * When true, also emit the previous major version alongside the target version.
    * For version=1, the previous version refers to the pre-stable conventions that the instrumentation emitted before the first stable semantic convention version was defined.
@@ -3109,7 +3109,7 @@ export interface ExperimentalSemconvConfig4 {
    * If omitted or null, false is used.
    *
    */
-  dual_emit?: boolean | null;
+  dual_emit?: boolean;
 }
 /**
  * Configure instrumentations following the RPC semantic conventions.
@@ -3135,13 +3135,13 @@ export interface ExperimentalSemconvConfig5 {
    * If omitted or null, the latest stable version is used, or if no stable version is available and .experimental is true then the latest experimental version is used.
    *
    */
-  version?: number | null;
+  version?: number;
   /**
    * Use latest experimental semantic conventions (before stable is available or to enable experimental features on top of stable conventions).
    * If omitted or null, false is used.
    *
    */
-  experimental?: boolean | null;
+  experimental?: boolean;
   /**
    * When true, also emit the previous major version alongside the target version.
    * For version=1, the previous version refers to the pre-stable conventions that the instrumentation emitted before the first stable semantic convention version was defined.
@@ -3150,7 +3150,7 @@ export interface ExperimentalSemconvConfig5 {
    * If omitted or null, false is used.
    *
    */
-  dual_emit?: boolean | null;
+  dual_emit?: boolean;
 }
 /**
  * Configure general sanitization options.

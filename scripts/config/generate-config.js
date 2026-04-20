@@ -178,6 +178,16 @@ compile(schema, 'OpenTelemetryConfiguration', {
     ts = ts.replace(/\[k: string\]: \{\} \| null;/g, '[k: string]: unknown;');
     ts = ts.replace(/\[k: string\]: \{\};/g, '[k: string]: unknown;');
 
+    // Strip `| null` from type unions. The JSON schema uses
+    // "type": ["string", "null"] to express optional/nullable fields, which
+    // json-schema-to-typescript converts to `T | null`. In TypeScript the `?:`
+    // modifier already expresses absence; consumers (e.g. sdk-node) expect
+    // `T | undefined`, not `T | null`, so null in the union causes type errors
+    // at assignment sites. Removing it keeps the types compatible.
+    // The runtime counterpart is stripNulls() in FileConfigFactory.ts, which
+    // deletes null-valued properties after YAML parsing so the data matches.
+    ts = ts.replace(/ \| null\b/g, '');
+
     fs.mkdirSync(path.dirname(TYPES_PATH), { recursive: true });
     fs.writeFileSync(TYPES_PATH, ts);
     console.log(`Written ${ts.split('\n').length} lines to ${TYPES_PATH}`);
