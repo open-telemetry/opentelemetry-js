@@ -60,6 +60,7 @@ import type {
   PeriodicMetricReaderConfigModel,
   SpanExporterConfigModel,
   SamplerConfigModel,
+  NameStringValuePair,
 } from '@opentelemetry/configuration';
 import type {
   AggregationOption,
@@ -669,6 +670,19 @@ export function getLogRecordProcessorsFromConfiguration(
   return undefined;
 }
 
+export function getHeadersFromConfiguration(
+  headers: NameStringValuePair[] | undefined
+): Record<string, string> | undefined {
+  if (!headers) {
+    return undefined;
+  }
+  const result: Record<string, string> = {};
+  headers.forEach(header => {
+    result[header.name] = header.value;
+  });
+  return result;
+}
+
 export function getSpanExporter(
   exporter: SpanExporterConfigModel
 ): SpanExporter | undefined {
@@ -680,6 +694,14 @@ export function getSpanExporter(
           exporter.otlp_http.compression === 'gzip'
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
+        url: exporter.otlp_http.endpoint,
+        headers: getHeadersFromConfiguration(exporter.otlp_http.headers),
+        timeoutMillis: exporter.otlp_http.timeout,
+        httpAgentOptions: {
+          ca: exporter.otlp_http.tls?.ca_file,
+          cert: exporter.otlp_http.tls?.cert_file,
+          key: exporter.otlp_http.tls?.key_file,
+        },
       });
     } else {
       return new OTLPProtoTraceExporter({
@@ -687,6 +709,14 @@ export function getSpanExporter(
           exporter.otlp_http.compression === 'gzip'
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
+        url: exporter.otlp_http.endpoint,
+        headers: getHeadersFromConfiguration(exporter.otlp_http.headers),
+        timeoutMillis: exporter.otlp_http.timeout,
+        httpAgentOptions: {
+          ca: exporter.otlp_http.tls?.ca_file,
+          cert: exporter.otlp_http.tls?.cert_file,
+          key: exporter.otlp_http.tls?.key_file,
+        },
       });
     }
   } else if (exporter.otlp_grpc) {
@@ -695,6 +725,8 @@ export function getSpanExporter(
         exporter.otlp_grpc.compression === 'gzip'
           ? CompressionAlgorithm.GZIP
           : CompressionAlgorithm.NONE,
+      url: exporter.otlp_grpc.endpoint,
+      timeoutMillis: exporter.otlp_grpc.timeout,
     });
   } else if (exporter.console) {
     return new ConsoleSpanExporter();

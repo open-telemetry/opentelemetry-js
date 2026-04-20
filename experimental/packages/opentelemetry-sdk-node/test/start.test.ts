@@ -1004,6 +1004,7 @@ describe('startNodeSDK', function () {
         eventCountLimit: 20,
         linkCountLimit: 30,
         attributeValueLengthLimit: 40,
+        attributePerEventCountLimit: 50,
         attributePerLinkCountLimit: 60,
       };
 
