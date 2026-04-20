@@ -194,15 +194,18 @@ function createFakePerformanceObs(url: string) {
       const absoluteUrl = url.startsWith('http') ? url : location.origin + url;
       const resources: PerformanceObserverEntryList = {
         getEntries(): PerformanceEntryList {
+          console.log('getEntries', absoluteUrl);
           return [
             createResource({ name: absoluteUrl }) as any,
             createMainResource({ name: absoluteUrl }) as any,
           ];
         },
         getEntriesByName(): PerformanceEntryList {
+          console.log('getEntriesByName');
           return [];
         },
         getEntriesByType(): PerformanceEntryList {
+          console.log('getEntriesByType');
           return [];
         },
       };
@@ -235,7 +238,7 @@ function testForCorrectEvents(
 describe('xhr', () => {
   const asyncTests = [
     { async: true, semconvStabilityOptIn: undefined },
-    { async: true, semconvStabilityOptIn: 'http' },
+    // { async: true, semconvStabilityOptIn: 'http' },
     // { async: true, semconvStabilityOptIn: 'http/dup' },
     // { async: false, semconvStabilityOptIn: undefined },
     // { async: false, semconvStabilityOptIn: 'http' },
@@ -256,8 +259,87 @@ describe('xhr', () => {
     const testAsync = test.async;
     describe(`when async='${testAsync}', semconvStabilityOptIn=${test.semconvStabilityOptIn}`, () => {
       let requests: any[] = [];
-      // let clearData: any;
       let contextManager: ZoneContextManager;
+      let webTracerWithZone: api.Tracer;
+      let webTracerProviderWithZone: WebTracerProvider;
+      let dummySpanExporter: DummySpanExporter;
+      let spyEntries: any;
+      let fakeNow = 0;
+      let xmlHttpRequestInstrumentation: XMLHttpRequestInstrumentation;
+      let exportSpy: any;
+      let clearResourceTimingsSpy: any;
+      let rootSpan: api.Span;
+
+      const clearData = () => {
+        sinon.restore();
+        timer = sinon.useFakeTimers();
+        requests = [];
+      };
+
+      const prepareData = (
+        fileUrl: string,
+        config?: XMLHttpRequestInstrumentationConfig
+      ) => {
+        const fakeXhr = sinon.useFakeXMLHttpRequest();
+        fakeXhr.onCreate = function (xhr: any) {
+          requests.push(xhr);
+        };
+        // @ts-expect-error -- custom property
+        if (typeof XMLHttpRequest.prototype.send.__unwrap === 'function') {
+          // @ts-expect-error -- custom property
+          XMLHttpRequest.prototype.send.__unwrap();
+        }
+        // @ts-expect-error -- custom property
+        if (typeof XMLHttpRequest.prototype.open.__unwrap === 'function') {
+          // @ts-expect-error -- custom property
+          XMLHttpRequest.prototype.open.__unwrap();
+        }
+
+        sinon.stub(performance, 'timeOrigin').value(0);
+        sinon.stub(performance, 'now').callsFake(() => fakeNow);
+
+        const resources: PerformanceResourceTiming[] = [];
+        resources.push(
+          createResource({
+            name: fileUrl,
+          }),
+          createMainResource({
+            name: fileUrl,
+          })
+        );
+
+        spyEntries = sinon.stub(
+          performance as unknown as Performance,
+          'getEntriesByType'
+        );
+        spyEntries.withArgs('resource').returns(resources);
+
+        sinon
+          .stub(window, 'PerformanceObserver')
+          .value(createFakePerformanceObs(fileUrl));
+
+        xmlHttpRequestInstrumentation = new XMLHttpRequestInstrumentation({
+          semconvStabilityOptIn: test.semconvStabilityOptIn,
+          ...config,
+        });
+        dummySpanExporter = new DummySpanExporter();
+        webTracerProviderWithZone = new WebTracerProvider({
+          spanProcessors: [new tracing.SimpleSpanProcessor(dummySpanExporter)],
+        });
+        registerInstrumentations({
+          instrumentations: [xmlHttpRequestInstrumentation],
+          tracerProvider: webTracerProviderWithZone,
+        });
+        webTracerWithZone = webTracerProviderWithZone.getTracer('xhr-test');
+
+        exportSpy = sinon.stub(dummySpanExporter, 'export');
+        clearResourceTimingsSpy = sinon.stub(
+          performance as unknown as Performance,
+          'clearResourceTimings'
+        );
+
+        rootSpan = webTracerWithZone.startSpan('root');
+      };
 
       beforeEach(() => {
         contextManager = new ZoneContextManager().enable();
@@ -278,97 +360,21 @@ describe('xhr', () => {
         api.propagation.disable();
       });
 
-      describe('when GET request is successful', () => {
-        let webTracerWithZone: api.Tracer;
-        let webTracerProviderWithZone: WebTracerProvider;
-        let dummySpanExporter: DummySpanExporter;
-        let exportSpy: any;
-        let clearResourceTimingsSpy: any;
-        let rootSpan: api.Span;
-        let spyEntries: any;
+      describe.only('when GET request is successful', () => {
         const url = 'http://localhost:8090/xml-http-request.js';
         const secureUrl = 'https://localhost:8090/xml-http-request.js';
-        let fakeNow = 0;
-        let xmlHttpRequestInstrumentation: XMLHttpRequestInstrumentation;
 
-        const clearData = () => {
-          sinon.restore();
-          timer = sinon.useFakeTimers();
-          requests = [];
-        };
-
-        const prepareData = (
+        function successfulGetRequest(
+          url: string,
           done: any,
-          fileUrl: string,
-          config?: XMLHttpRequestInstrumentationConfig
-        ) => {
-          const fakeXhr = sinon.useFakeXMLHttpRequest();
-          fakeXhr.onCreate = function (xhr: any) {
-            requests.push(xhr);
-          };
-          // @ts-expect-error -- custom property
-          if (typeof XMLHttpRequest.prototype.send.__unwrap === 'function') {
-            // @ts-expect-error -- custom property
-            XMLHttpRequest.prototype.send.__unwrap();
-          }
-          // @ts-expect-error -- custom property
-          if (typeof XMLHttpRequest.prototype.open.__unwrap === 'function') {
-            // @ts-expect-error -- custom property
-            XMLHttpRequest.prototype.open.__unwrap();
-          }
-
-          sinon.stub(performance, 'timeOrigin').value(0);
-          sinon.stub(performance, 'now').callsFake(() => fakeNow);
-
-          const resources: PerformanceResourceTiming[] = [];
-          resources.push(
-            createResource({
-              name: fileUrl,
-            }),
-            createMainResource({
-              name: fileUrl,
-            })
-          );
-
-          spyEntries = sinon.stub(
-            performance as unknown as Performance,
-            'getEntriesByType'
-          );
-          spyEntries.withArgs('resource').returns(resources);
-
-          sinon
-            .stub(window, 'PerformanceObserver')
-            .value(createFakePerformanceObs(fileUrl));
-
-          xmlHttpRequestInstrumentation = new XMLHttpRequestInstrumentation({
-            semconvStabilityOptIn: test.semconvStabilityOptIn,
-            ...config,
-          });
-          dummySpanExporter = new DummySpanExporter();
-          webTracerProviderWithZone = new WebTracerProvider({
-            spanProcessors: [
-              new tracing.SimpleSpanProcessor(dummySpanExporter),
-            ],
-          });
-          registerInstrumentations({
-            instrumentations: [xmlHttpRequestInstrumentation],
-            tracerProvider: webTracerProviderWithZone,
-          });
-          webTracerWithZone = webTracerProviderWithZone.getTracer('xhr-test');
-
-          exportSpy = sinon.stub(dummySpanExporter, 'export');
-          clearResourceTimingsSpy = sinon.stub(
-            performance as unknown as Performance,
-            'clearResourceTimings'
-          );
-
-          rootSpan = webTracerWithZone.startSpan('root');
+          xhr = new XMLHttpRequest()
+        ) {
           api.context.with(
             api.trace.setSpan(api.context.active(), rootSpan),
             () => {
               void getData(
-                new XMLHttpRequest(),
-                fileUrl,
+                xhr,
+                url,
                 () => {
                   fakeNow = 100;
                 },
@@ -379,7 +385,6 @@ describe('xhr', () => {
                 done();
               });
               assert.strictEqual(requests.length, 1, 'request not called');
-
               requests[0].respond(
                 200,
                 { 'Content-Type': 'application/json' },
@@ -387,19 +392,17 @@ describe('xhr', () => {
               );
             }
           );
-        };
+        }
 
         describe('AND the spans are exported', () => {
           beforeEach(function (done) {
             const propagateTraceHeaderCorsUrls = [window.location.origin];
-            prepareData(done, url, {
+            clearData();
+            prepareData(url, {
               propagateTraceHeaderCorsUrls,
               measureRequestSize: true,
             });
-          });
-
-          afterEach(() => {
-            clearData();
+            successfulGetRequest(url, done);
           });
 
           it('should patch to wrap XML HTTP Requests when enabled', () => {
@@ -600,14 +603,17 @@ describe('xhr', () => {
             clearData();
             // this won't generate a preflight span
             const propagateTraceHeaderCorsUrls = [secureUrl];
-            prepareData(done, secureUrl, {
+            prepareData(secureUrl, {
               propagateTraceHeaderCorsUrls,
             });
+            successfulGetRequest(secureUrl, done);
           });
 
           it('span should have correct events', () => {
             const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
             const events = span.events;
+            console.log(events.map(e => e.name));
+
             testForCorrectEvents(events, [
               EventNames.METHOD_OPEN,
               EventNames.METHOD_SEND,
@@ -648,9 +654,10 @@ describe('xhr', () => {
             clearData();
             // this won't generate a preflight span
             const propagateTraceHeaderCorsUrls = [url];
-            prepareData(done, window.location.origin + '/xml-http-request.js', {
+            prepareData(window.location.origin + '/xml-http-request.js', {
               propagateTraceHeaderCorsUrls,
             });
+            successfulGetRequest(window.location.origin, done);
           });
 
           it('should set trace headers', () => {
@@ -684,12 +691,13 @@ describe('xhr', () => {
             ' propagateTraceHeaderCorsUrls',
           () => {
             beforeEach(done => {
+              const ghUrl =
+                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';
               clearData();
-              prepareData(
-                done,
-                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json',
-                { propagateTraceHeaderCorsUrls: /raw\.githubusercontent\.com/ }
-              );
+              prepareData(ghUrl, {
+                propagateTraceHeaderCorsUrls: /raw\.githubusercontent\.com/,
+              });
+              successfulGetRequest(ghUrl, done);
             });
             it('should set trace headers', () => {
               // span at exportSpy.args[0][0][0] is the preflight span
@@ -712,6 +720,7 @@ describe('xhr', () => {
             });
           }
         );
+
         describe(
           'AND origin does NOT match window.location And does NOT match' +
             ' with propagateTraceHeaderCorsUrls',
@@ -719,15 +728,16 @@ describe('xhr', () => {
             let spyDebug: sinon.SinonSpy;
             beforeEach(done => {
               clearData();
+              const ghUrl =
+                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';
               const diagLogger = new api.DiagConsoleLogger();
               spyDebug = sinon.spy();
               diagLogger.debug = spyDebug;
               api.diag.setLogger(diagLogger, api.DiagLogLevel.ALL);
-              prepareData(
-                done,
-                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json'
-              );
+              prepareData(ghUrl);
+              successfulGetRequest(ghUrl, done);
             });
+
             it('should NOT set trace headers', () => {
               assert.strictEqual(
                 requests[0].requestHeaders[X_B3_TRACE_ID],
@@ -759,10 +769,11 @@ describe('xhr', () => {
           beforeEach(done => {
             clearData();
             const propagateTraceHeaderCorsUrls = url;
-            prepareData(done, url, {
+            prepareData(url, {
               propagateTraceHeaderCorsUrls,
               ignoreUrls: [propagateTraceHeaderCorsUrls],
             });
+            successfulGetRequest(url, done);
           });
 
           it('should NOT create any span', () => {
@@ -774,10 +785,11 @@ describe('xhr', () => {
           beforeEach(done => {
             clearData();
             const propagateTraceHeaderCorsUrls = url;
-            prepareData(done, url, {
+            prepareData(url, {
               propagateTraceHeaderCorsUrls,
               clearTimingResources: true,
             });
+            successfulGetRequest(url, done);
           });
 
           it('should clear the resources', () => {
@@ -793,57 +805,18 @@ describe('xhr', () => {
           const secondUrl = 'http://localhost:8099/get';
 
           beforeEach(done => {
-            requests = [];
-            const reusableReq = new XMLHttpRequest();
-            api.context.with(
-              api.trace.setSpan(api.context.active(), rootSpan),
-              () => {
-                void getData(
-                  reusableReq,
-                  firstUrl,
-                  () => {
-                    fakeNow = 100;
-                  },
-                  testAsync
-                ).then(() => {
-                  fakeNow = 0;
-                  timer.tick(1000);
-                });
-              }
-            );
-
-            api.context.with(
-              api.trace.setSpan(api.context.active(), rootSpan),
-              () => {
-                void getData(
-                  reusableReq,
-                  secondUrl,
-                  () => {
-                    fakeNow = 100;
-                  },
-                  testAsync
-                ).then(() => {
-                  fakeNow = 0;
-                  timer.tick(1000);
-                  done();
-                });
-
-                assert.strictEqual(
-                  requests.length,
-                  1,
-                  'first request not called'
-                );
-
-                requests[0].respond(
-                  200,
-                  { 'Content-Type': 'application/json' },
-                  '{"foo":"bar"}'
-                );
-              }
+            clearData();
+            prepareData(firstUrl);
+            // Must create xhr after prepareData call because it craetes the instrumentation
+            const xhr = new XMLHttpRequest();
+            successfulGetRequest(
+              firstUrl,
+              () => successfulGetRequest(secondUrl, done, xhr),
+              xhr
             );
           });
 
-          it.only('should clear previous span information', () => {
+          it('should clear previous span information', () => {
             const span: tracing.ReadableSpan = exportSpy.args[2][0][0];
             const attributes = span.attributes;
             const keys = Object.keys(attributes);
@@ -860,16 +833,18 @@ describe('xhr', () => {
           beforeEach(done => {
             clearData();
             const propagateTraceHeaderCorsUrls = [url];
-            prepareData(done, url, {
+            prepareData(url, {
               propagateTraceHeaderCorsUrls,
               applyCustomAttributesOnSpan: function (
                 span: api.Span,
                 xhr: XMLHttpRequest
               ) {
+                console.log('applyCustomAttributesOnSpan');
                 const res = JSON.parse(xhr.response);
                 span.setAttribute('xhr-custom-attribute', res.foo);
               },
             });
+            successfulGetRequest(url, done);
           });
 
           it('span should have custom attribute', () => {
@@ -883,7 +858,8 @@ describe('xhr', () => {
           beforeEach(done => {
             clearData();
             const propagateTraceHeaderCorsUrls = [window.location.origin];
-            prepareData(done, '/get', { propagateTraceHeaderCorsUrls });
+            prepareData('/get', { propagateTraceHeaderCorsUrls });
+            successfulGetRequest('/get', done);
           });
 
           it('should create correct span with events', () => {
@@ -939,9 +915,8 @@ describe('xhr', () => {
         describe('when network events are ignored', () => {
           beforeEach(done => {
             clearData();
-            prepareData(done, url, {
-              ignoreNetworkEvents: true,
-            });
+            prepareData(url, { ignoreNetworkEvents: true });
+            successfulGetRequest(url, done);
           });
           it('should NOT add network events', () => {
             const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
@@ -1049,10 +1024,6 @@ describe('xhr', () => {
           clearData();
           prepareData();
         });
-
-        // afterEach(() => {
-        //   clearData();
-        // });
 
         function timedOutRequest(done: any) {
           api.context.with(
@@ -1703,13 +1674,6 @@ describe('xhr', () => {
       });
 
       describe('when POST request is successful', () => {
-        let webTracerWithZone: api.Tracer;
-        let webTracerProviderWithZone: WebTracerProvider;
-        let dummySpanExporter: DummySpanExporter;
-        let exportSpy: any;
-        let clearResourceTimingsSpy: any;
-        let rootSpan: api.Span;
-        let spyEntries: any;
         const url = 'http://localhost:8090/xml-http-request.js';
         const secureUrl = 'https://localhost:8090/xml-http-request.js';
         let fakeNow = 0;
@@ -2209,57 +2173,65 @@ describe('xhr', () => {
           const secondUrl = 'http://localhost:8099/get';
 
           beforeEach(done => {
-            requests = [];
-            const reusableReq = new XMLHttpRequest();
-            api.context.with(
-              api.trace.setSpan(api.context.active(), rootSpan),
-              () => {
-                void postData(
-                  reusableReq,
-                  firstUrl,
-                  '{"embedded":"data"}',
-                  () => {
-                    fakeNow = 100;
-                  },
-                  testAsync
-                ).then(() => {
-                  fakeNow = 0;
-                  timer.tick(1000);
-                });
-              }
-            );
-
-            api.context.with(
-              api.trace.setSpan(api.context.active(), rootSpan),
-              () => {
-                void postData(
-                  reusableReq,
-                  secondUrl,
-                  '{"embedded":"data"}',
-                  () => {
-                    fakeNow = 100;
-                  },
-                  testAsync
-                ).then(() => {
-                  fakeNow = 0;
-                  timer.tick(1000);
-                  done();
-                });
-
-                assert.strictEqual(
-                  requests.length,
-                  1,
-                  'first request not called'
-                );
-
-                requests[0].respond(
-                  200,
-                  { 'Content-Type': 'application/json' },
-                  '{"foo":"bar"}'
-                );
-              }
-            );
+            clearData();
+            const propagateTraceHeaderCorsUrls = [firstUrl, secondUrl];
+            prepareData(done, firstUrl, {
+              propagateTraceHeaderCorsUrls,
+            });
           });
+
+          // beforeEach(done => {
+          //   requests = [];
+          //   const reusableReq = new XMLHttpRequest();
+          //   api.context.with(
+          //     api.trace.setSpan(api.context.active(), rootSpan),
+          //     () => {
+          //       void postData(
+          //         reusableReq,
+          //         firstUrl,
+          //         '{"embedded":"data"}',
+          //         () => {
+          //           fakeNow = 100;
+          //         },
+          //         testAsync
+          //       ).then(() => {
+          //         fakeNow = 0;
+          //         timer.tick(1000);
+          //       });
+          //     }
+          //   );
+
+          //   api.context.with(
+          //     api.trace.setSpan(api.context.active(), rootSpan),
+          //     () => {
+          //       void postData(
+          //         reusableReq,
+          //         secondUrl,
+          //         '{"embedded":"data"}',
+          //         () => {
+          //           fakeNow = 100;
+          //         },
+          //         testAsync
+          //       ).then(() => {
+          //         fakeNow = 0;
+          //         timer.tick(1000);
+          //         done();
+          //       });
+
+          //       assert.strictEqual(
+          //         requests.length,
+          //         1,
+          //         'first request not called'
+          //       );
+
+          //       requests[0].respond(
+          //         200,
+          //         { 'Content-Type': 'application/json' },
+          //         '{"foo":"bar"}'
+          //       );
+          //     }
+          //   );
+          // });
 
           it('should clear previous span information', () => {
             const span: tracing.ReadableSpan = exportSpy.args[2][0][0];

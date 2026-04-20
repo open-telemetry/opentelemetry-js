@@ -126,7 +126,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       'http',
       config?.semconvStabilityOptIn
     );
-    console.log('contructor', this._id);
+    console.log('constructor', this._id);
   }
 
   init() {}
@@ -138,7 +138,6 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * @private
    */
   private _addHeaders(xhr: XMLHttpRequest, spanUrl: string) {
-    console.log('_addHeaders', this._id);
     const url = parseUrl(spanUrl).href;
     if (
       !shouldPropagateTraceHeaders(
@@ -311,7 +310,6 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     if (!spanUrl || !startTime || !endTime || !xhrMem.createdResources) {
       return;
     }
-
     let resources: PerformanceResourceTiming[] =
       xhrMem.createdResources.entries;
 
@@ -388,6 +386,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       this._diag.debug('ignoring span as url matches ignored url');
       return;
     }
+    console.log('_createSpan', url, method);
 
     let name = '';
     const parsedUrl = parseUrl(url);
@@ -470,6 +469,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * @private
    */
   protected _patchSend() {
+    console.log('_patchSend');
     const plugin = this;
 
     function endSpanTimeout(
@@ -580,7 +580,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
 
     return (original: SendFunction): SendFunction => {
       return function patchSend(this: XMLHttpRequest, ...args): void {
-        console.log('plugin send', plugin._id, plugin._isEnabled);
+        console.log('patchSend', plugin._isEnabled);
         if (!plugin._isEnabled) {
           return original.apply(this, args);
         }
@@ -672,7 +672,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * implements disable function
    */
   override disable() {
-    console.log('disable', this._id);
+    // console.log('disable', this._id);
     this._isEnabled = false;
     // this._diag.debug('removing patch from', this.moduleName, this.version);
     // this._unwrap(XMLHttpRequest.prototype, 'open');
