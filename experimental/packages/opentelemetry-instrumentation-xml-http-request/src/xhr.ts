@@ -15,11 +15,11 @@ import {
 import { isUrlIgnored } from '@opentelemetry/core';
 import {
   addSpanNetworkEvents,
-  getResource,
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
   parseUrl,
 } from '@opentelemetry/sdk-trace-web';
+import { getResource } from './utils';
 import {
   ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
