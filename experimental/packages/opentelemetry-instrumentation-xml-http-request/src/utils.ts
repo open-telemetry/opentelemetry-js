@@ -8,6 +8,7 @@
 
 import * as api from '@opentelemetry/api';
 import { getStringListFromEnv } from '@opentelemetry/core';
+import type { URLLike } from '@opentelemetry/sdk-trace-web';
 import { parseUrl } from '@opentelemetry/sdk-trace-web';
 
 const DIAG_LOGGER = api.diag.createComponentLogger({
@@ -124,8 +125,6 @@ const HTTP_PORT_FROM_PROTOCOL: { [key: string]: string } = {
   'https:': '443',
   'http:': '80',
 };
-
-export type URLLike = ReturnType<typeof parseUrl>;
 
 export function serverPortFromUrl(url: URLLike): number | undefined {
   const serverPort = Number(url.port || HTTP_PORT_FROM_PROTOCOL[url.protocol]);
