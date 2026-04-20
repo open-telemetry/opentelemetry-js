@@ -739,7 +739,8 @@ export function getSpanLimitsFromConfiguration(
     spanLimits.linkCountLimit = limitsConfig.link_count_limit ?? 128;
     spanLimits.attributePerLinkCountLimit =
       limitsConfig.link_attribute_count_limit ?? 128;
-    // TODO (6606): add support for spanLimits.eventAttributeCountLimit
+    spanLimits.attributePerEventCountLimit =
+      limitsConfig.event_attribute_count_limit ?? 128;
 
     if (limitsConfig.attribute_value_length_limit != null) {
       spanLimits.attributeValueLengthLimit =
