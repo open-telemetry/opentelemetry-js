@@ -37,7 +37,7 @@ describe('FetchTransport', function () {
   });
 
   describe('send', function () {
-    it('it uses global fetch API and is not affected by patching', function (done) {
+    it('uses global fetch API and is not affected by patching', function (done) {
       // arrange
       const fetchStub = sinon
         .stub(globalThis, 'fetch')
@@ -61,6 +61,32 @@ describe('FetchTransport', function () {
         done();
       }, done /* catch any rejections */);
     });
+
+    it('uses provided fetch API and does not call global fetch', function (done) {
+      // arrange
+      const fetchStub = sinon
+        .stub(globalThis, 'fetch')
+        .resolves(new Response('test response', { status: 200 }));
+      const customStub = sinon.stub().callsFake(fetchStub);
+      const transport = createFetchTransport({
+        ...testTransportParameters,
+        fetch: customStub as unknown as typeof globalThis.fetch,
+      });
+
+      //act
+      transport.send(testPayload, requestTimeout).then(response => {
+        // assert
+        try {
+          assert.strictEqual(response.status, 'success');
+          sinon.assert.called(customStub);
+          sinon.assert.notCalled(fetchStub);
+        } catch (e) {
+          done(e);
+        }
+        done();
+      }, done /* catch any rejections */);
+    });
+
     it('returns success when request succeeds', function (done) {
       // arrange
       const fetchStub = sinon
