@@ -25,11 +25,13 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(sdk-logs)!: add required `forceFlush()` to `LogRecordExporter` interface [#6356](https://github.com/open-telemetry/opentelemetry-js/pull/6356) @pichlermarc
   * (user-facing): `LogRecordExporter` interface now requires a `forceFlush()` method to be implemented. Custom exporters will need to implement this method to continue working with the Logs SDK.
 * feat(api-logs, sdk-logs)!: add Logger#enabled() [#6371](https://github.com/open-telemetry/opentelemetry-js/pull/6371) @david-luna
+* feat(sampler-composite)!: rename `createComposableTraceIDRatioBasedSampler` to `createComposableProbabilitySampler` [#6541](https://github.com/open-telemetry/opentelemetry-js/pull/6541) @ravitheja4531-cell
 
 ### :rocket: Features
 
 * feat(otlp-transformer): add custom protobuf logs serializer [#6228](https://github.com/open-telemetry/opentelemetry-js/pull/6228) @pichlermarc
 * feat(otlp-transformer): add custom protobuf logs export response deserializer [#6530](https://github.com/open-telemetry/opentelemetry-js/pull/6530) @pichlermarc
+* feat(sdk-node): add `buildSamplerFromConfig` to construct a sampler from a declarative config model [#6536](https://github.com/open-telemetry/opentelemetry-js/pull/6536) @ravitheja4531-cell
 
 ### :bug: Bug Fixes
 
@@ -56,6 +58,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(opentelemetry-sdk-node): set MeterProvider on sdk start [#6463](https://github.com/open-telemetry/opentelemetry-js/pull/6463) @maryliag
 * feat(configuration): export interfaces required in other packages [#6507](https://github.com/open-telemetry/opentelemetry-js/pull/6507) @maryliag
 * feat(configuration): refactoring config loader to print warning message [#6524](https://github.com/open-telemetry/opentelemetry-js/pull/6524) @maxday
+* feat(configuration): export `SamplerConfigModel` type for use with `buildSamplerFromConfig` [#6536](https://github.com/open-telemetry/opentelemetry-js/pull/6536) @ravitheja4531-cell
 * feat(configuration): refactoring config loader to print warning message for booleans
  [#6583](https://github.com/open-telemetry/opentelemetry-js/pull/6583) @maxday
 
