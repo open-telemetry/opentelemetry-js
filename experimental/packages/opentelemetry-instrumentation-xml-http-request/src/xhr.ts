@@ -8,7 +8,7 @@ import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import {
   SemconvStability,
   semconvStabilityFromStr,
-  isWrapped,
+  // isWrapped,
   InstrumentationBase,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
@@ -109,12 +109,24 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
   private _semconvStability: SemconvStability;
 
+  // Note: Intentionally *not* using `_enabled` as the field name to avoid
+  // any possible confusion with the `_enabled` field used on the *Node.js*
+  // InstrumentationBase class.
+  // Also not initializing the fields to `false` because the base class
+  // constructor already call `enable` modifying their values and it will
+  // set the instrumentaitons in a bas state (enabled, patched but with flags set to false)
+  declare private _isEnabled: boolean;
+  declare private _isXhrPatched: boolean;
+
+  private _id = Math.random();
+
   constructor(config: XMLHttpRequestInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-xml-http-request', VERSION, config);
     this._semconvStability = semconvStabilityFromStr(
       'http',
       config?.semconvStabilityOptIn
     );
+    console.log('contructor', this._id);
   }
 
   init() {}
@@ -126,6 +138,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * @private
    */
   private _addHeaders(xhr: XMLHttpRequest, spanUrl: string) {
+    console.log('_addHeaders', this._id);
     const url = parseUrl(spanUrl).href;
     if (
       !shouldPropagateTraceHeaders(
@@ -440,6 +453,9 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     return (original: OpenFunction): OpenFunction => {
       const plugin = this;
       return function patchOpen(this: XMLHttpRequest, ...args): void {
+        if (!plugin._isEnabled) {
+          return original.apply(this, args);
+        }
         const method: string = args[0];
         const url: string = args[1];
         plugin._createSpan(this, url, method);
@@ -564,6 +580,10 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
 
     return (original: SendFunction): SendFunction => {
       return function patchSend(this: XMLHttpRequest, ...args): void {
+        console.log('plugin send', plugin._id, plugin._isEnabled);
+        if (!plugin._isEnabled) {
+          return original.apply(this, args);
+        }
         const xhrMem = plugin._xhrMem.get(this);
         if (!xhrMem) {
           return original.apply(this, args);
@@ -623,18 +643,27 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * implements enable function
    */
   override enable() {
+    console.log('enable', this._id);
+    if (this._isEnabled) {
+      return;
+    }
+    this._isEnabled = true;
     this._diag.debug('applying patch to', this.moduleName, this.version);
 
-    if (isWrapped(XMLHttpRequest.prototype.open)) {
-      this._unwrap(XMLHttpRequest.prototype, 'open');
-      this._diag.debug('removing previous patch from method open');
-    }
+    // if (isWrapped(XMLHttpRequest.prototype.open)) {
+    //   this._unwrap(XMLHttpRequest.prototype, 'open');
+    //   this._diag.debug('removing previous patch from method open');
+    // }
 
-    if (isWrapped(XMLHttpRequest.prototype.send)) {
-      this._unwrap(XMLHttpRequest.prototype, 'send');
-      this._diag.debug('removing previous patch from method send');
-    }
+    // if (isWrapped(XMLHttpRequest.prototype.send)) {
+    //   this._unwrap(XMLHttpRequest.prototype, 'send');
+    //   this._diag.debug('removing previous patch from method send');
+    // }
 
+    if (this._isXhrPatched) {
+      return;
+    }
+    this._isXhrPatched = true;
     this._wrap(XMLHttpRequest.prototype, 'open', this._patchOpen());
     this._wrap(XMLHttpRequest.prototype, 'send', this._patchSend());
   }
@@ -643,10 +672,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * implements disable function
    */
   override disable() {
-    this._diag.debug('removing patch from', this.moduleName, this.version);
-
-    this._unwrap(XMLHttpRequest.prototype, 'open');
-    this._unwrap(XMLHttpRequest.prototype, 'send');
+    console.log('disable', this._id);
+    this._isEnabled = false;
+    // this._diag.debug('removing patch from', this.moduleName, this.version);
+    // this._unwrap(XMLHttpRequest.prototype, 'open');
+    // this._unwrap(XMLHttpRequest.prototype, 'send');
 
     this._tasksCount = 0;
     this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
