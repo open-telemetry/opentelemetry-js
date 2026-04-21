@@ -60,7 +60,7 @@ import type {
   PeriodicMetricReaderConfigModel,
   SpanExporterConfigModel,
   SamplerConfigModel,
-  NameStringValuePair,
+  NameStringValuePairConfigModel,
 } from '@opentelemetry/configuration';
 import type {
   AggregationOption,
@@ -671,7 +671,7 @@ export function getLogRecordProcessorsFromConfiguration(
 }
 
 export function getHeadersFromConfiguration(
-  headers: NameStringValuePair[] | undefined
+  headers: NameStringValuePairConfigModel[] | undefined
 ): Record<string, string> | undefined {
   if (!headers) {
     return undefined;
