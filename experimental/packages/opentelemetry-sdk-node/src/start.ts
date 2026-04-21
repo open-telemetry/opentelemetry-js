@@ -153,6 +153,11 @@ function create(
       spanProcessors,
       spanLimits,
       meterProvider: components.meterProvider,
+      generalLimits: {
+        attributeValueLengthLimit:
+          config.attribute_limits?.attribute_value_length_limit,
+        attributeCountLimit: config.attribute_limits?.attribute_count_limit,
+      },
     });
     components.tracerProvider = tracerProvider;
   }
