@@ -89,11 +89,19 @@ function enforcePrometheusNamingConvention(
   name: string,
   data: MetricData
 ): string {
+  if (
+    data.dataPointType === DataPointType.GAUGE &&
+    data.descriptor.unit === '1' &&
+    !name.endsWith('_ratio')
+  ) {
+    name += '_ratio';
+  }
+
   // Prometheus requires that metrics of the Counter kind have "_total" suffix
   if (
-    !name.endsWith('_total') &&
     data.dataPointType === DataPointType.SUM &&
-    data.isMonotonic
+    data.isMonotonic &&
+    !name.endsWith('_total')
   ) {
     name = name + '_total';
   }

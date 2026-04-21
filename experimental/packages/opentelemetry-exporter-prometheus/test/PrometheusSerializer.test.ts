@@ -662,6 +662,46 @@ describe('PrometheusSerializer', () => {
 
       assert.strictEqual(result, 'test_total 1\n');
     });
+
+    it('gauges should rename metric of type counter when name misses _total suffix', async () => {
+      const serializer = new PrometheusSerializer();
+      const reader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        views: [
+          {
+            aggregation: {
+              type: AggregationType.LAST_VALUE,
+            },
+            instrumentName: '*',
+          },
+        ],
+        readers: [reader],
+      });
+      const meter = meterProvider.getMeter('test');
+      const gauge = meter.createUpDownCounter('test_gauge', {
+        description: 'foobar',
+        unit: '1',
+      });
+
+      gauge.add(1, { val: '1' });
+      const { resourceMetrics, errors } = await reader.collect();
+      assert.strictEqual(errors.length, 0);
+      assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
+      assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
+      const scopeMetrics = resourceMetrics.scopeMetrics[0];
+      const resourceAttributes = resourceMetrics.resource.attributes;
+      serializer['_additionalAttributes'] = serializer[
+        '_filterResourceConstantLabels'
+      ](resourceAttributes, serializer['_withResourceConstantLabels']);
+      const result = serializer['_serializeScopeMetrics'](scopeMetrics);
+      assert.strictEqual(
+        result,
+        '# HELP test_gauge_ratio foobar\n' +
+          '# UNIT test_gauge_ratio 1\n' +
+          '# TYPE test_gauge_ratio gauge\n' +
+          'test_gauge_ratio{val="1",otel_scope_name="test"} 1\n'
+      );
+    });
   });
 
   describe('serialize non-normalized values', () => {
