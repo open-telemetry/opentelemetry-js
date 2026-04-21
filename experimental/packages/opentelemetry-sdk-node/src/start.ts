@@ -158,6 +158,7 @@ function create(
           config.attribute_limits?.attribute_value_length_limit,
         attributeCountLimit: config.attribute_limits?.attribute_count_limit,
       },
+      // TODO (6616): support idGenerator configuration from config
     });
     components.tracerProvider = tracerProvider;
   }
