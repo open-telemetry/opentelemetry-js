@@ -118,15 +118,12 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   declare private _isEnabled: boolean;
   declare private _isXhrPatched: boolean;
 
-  private _id = Math.random();
-
   constructor(config: XMLHttpRequestInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-xml-http-request', VERSION, config);
     this._semconvStability = semconvStabilityFromStr(
       'http',
       config?.semconvStabilityOptIn
     );
-    console.log('constructor', this._id);
   }
 
   init() {}
@@ -386,8 +383,6 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       this._diag.debug('ignoring span as url matches ignored url');
       return;
     }
-    console.log('_createSpan', url, method);
-
     let name = '';
     const parsedUrl = parseUrl(url);
     const attributes = {} as api.Attributes;
@@ -469,7 +464,6 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * @private
    */
   protected _patchSend() {
-    console.log('_patchSend');
     const plugin = this;
 
     function endSpanTimeout(
@@ -580,7 +574,6 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
 
     return (original: SendFunction): SendFunction => {
       return function patchSend(this: XMLHttpRequest, ...args): void {
-        console.log('patchSend', plugin._isEnabled);
         if (!plugin._isEnabled) {
           return original.apply(this, args);
         }
@@ -643,22 +636,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * implements enable function
    */
   override enable() {
-    console.log('enable', this._id);
     if (this._isEnabled) {
       return;
     }
     this._isEnabled = true;
     this._diag.debug('applying patch to', this.moduleName, this.version);
-
-    // if (isWrapped(XMLHttpRequest.prototype.open)) {
-    //   this._unwrap(XMLHttpRequest.prototype, 'open');
-    //   this._diag.debug('removing previous patch from method open');
-    // }
-
-    // if (isWrapped(XMLHttpRequest.prototype.send)) {
-    //   this._unwrap(XMLHttpRequest.prototype, 'send');
-    //   this._diag.debug('removing previous patch from method send');
-    // }
 
     if (this._isXhrPatched) {
       return;
@@ -672,12 +654,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * implements disable function
    */
   override disable() {
-    // console.log('disable', this._id);
     this._isEnabled = false;
-    // this._diag.debug('removing patch from', this.moduleName, this.version);
-    // this._unwrap(XMLHttpRequest.prototype, 'open');
-    // this._unwrap(XMLHttpRequest.prototype, 'send');
-
     this._tasksCount = 0;
     this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
     this._usedResources = new WeakSet<PerformanceResourceTiming>();
