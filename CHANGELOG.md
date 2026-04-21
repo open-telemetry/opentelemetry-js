@@ -29,6 +29,7 @@ fix(opentelemetry-resources): do not discard OTEL_RESOURCE_ATTRIBUTES when it co
 
 * test(exporter-zipkin): fix broken browser test assertions and add missing coverage [#6566](https://github.com/open-telemetry/opentelemetry-js/pull/6566) @overbalance
 * fix(sdk-metrics): repair ExponentialHistogram tests [#6565](https://github.com/open-telemetry/opentelemetry-js/pull/6565) @overbalance
+* perf(sdk-metrics): reduce loop overhead in sdk hot paths [#6593](https://github.com/open-telemetry/opentelemetry-js/pull/6593) @mcollina
 
 ## 2.6.1
 
