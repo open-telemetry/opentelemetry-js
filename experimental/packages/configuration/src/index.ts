@@ -17,5 +17,5 @@ export type {
   SpanExporter as SpanExporterConfigModel,
   SpanProcessor as SpanProcessorConfigModel,
 } from './models/tracerProviderModel';
-export type { NameStringValuePair } from './models/commonModel';
+export type { NameStringValuePair as NameStringValuePairConfigModel } from './models/commonModel';
 export { createConfigFactory } from './ConfigFactory';
