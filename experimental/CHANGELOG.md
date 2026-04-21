@@ -11,7 +11,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(sdk-logs)!: add required `forceFlush()` to `LogRecordExporter` interface [#6356](https://github.com/open-telemetry/opentelemetry-js/pull/6356) @pichlermarc
   * (user-facing): `LogRecordExporter` interface now requires a `forceFlush()` method to be implemented. Custom exporters will need to implement this method to continue working with the Logs SDK.
 * feat(api-logs, sdk-logs)!: add Logger#enabled() [#6371](https://github.com/open-telemetry/opentelemetry-js/pull/6371) @david-luna
-* fix(opentelemetry-exporter-prometheus)!: apply ratio suffix to gauges when necessary [#xxxx](https://github.com/open-telemetry/opentelemetry-js/pull/xxxx) @cjihrig
+* fix(opentelemetry-exporter-prometheus)!: apply ratio suffix to gauges when necessary [#6613](https://github.com/open-telemetry/opentelemetry-js/pull/6613) @cjihrig
 
 ### :rocket: Features
 
