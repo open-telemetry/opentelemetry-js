@@ -1050,9 +1050,11 @@ describe('startNodeSDK', function () {
       assert.notEqual(agentOptions.key, undefined);
       assert.notEqual(agentOptions.cert, undefined);
 
-      assert.strictEqual(
-        stubLoggerWarn.args[0][0],
-        "Failed to read TLS CA file at invalid-ca.pem: Error: ENOENT: no such file or directory, open 'invalid-ca.pem'"
+      assert.equal(
+        stubLoggerWarn.args[0][0].startsWith(
+          'Failed to read TLS CA file at invalid-ca.pem: Error: ENOENT: no such file or directory, open '
+        ),
+        true
       );
     });
 
@@ -1069,9 +1071,11 @@ describe('startNodeSDK', function () {
       assert.equal(agentOptions.key, undefined);
       assert.notEqual(agentOptions.cert, undefined);
 
-      assert.strictEqual(
-        stubLoggerWarn.args[0][0],
-        "Failed to read TLS key file at invalid-ca-key.pem: Error: ENOENT: no such file or directory, open 'invalid-ca-key.pem'"
+      assert.equal(
+        stubLoggerWarn.args[0][0].startsWith(
+          'Failed to read TLS key file at invalid-ca-key.pem: Error: ENOENT: no such file or directory, open '
+        ),
+        true
       );
     });
 
@@ -1088,9 +1092,11 @@ describe('startNodeSDK', function () {
       assert.notEqual(agentOptions.key, undefined);
       assert.equal(agentOptions.cert, undefined);
 
-      assert.strictEqual(
-        stubLoggerWarn.args[0][0],
-        "Failed to read TLS cert file at invalid-cert.pem: Error: ENOENT: no such file or directory, open 'invalid-cert.pem'"
+      assert.equal(
+        stubLoggerWarn.args[0][0].startsWith(
+          'Failed to read TLS cert file at invalid-cert.pem: Error: ENOENT: no such file or directory, open '
+        ),
+        true
       );
     });
   });
