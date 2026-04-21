@@ -37,6 +37,7 @@ import {
 import type {
   ConfigFactory,
   ConfigurationModel,
+  HttpTlsConfigModel,
   LogRecordExporterConfigModel,
 } from '@opentelemetry/configuration';
 import { createConfigFactory } from '@opentelemetry/configuration';
@@ -58,6 +59,7 @@ import {
 import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
 import {
   getAggregationType,
+  getHttpAgentOptionsFromTls,
   getLogRecordExporter,
   getSpanLimitsFromConfiguration,
   setupContextManager,
@@ -1014,6 +1016,82 @@ describe('startNodeSDK', function () {
 
     it('return undefined for no aggregation type', async () => {
       assert.equal(getAggregationType({}), undefined);
+    });
+  });
+
+  describe('getHttpAgentOptionsFromTls', function () {
+    it('should return undefined if no TLS config is provided', async () => {
+      assert.equal(getHttpAgentOptionsFromTls({}), undefined);
+    });
+
+    it('should return https agent options if TLS config is provided', async () => {
+      const tlsConfig: HttpTlsConfigModel = {
+        ca_file: 'test/fixtures/ca.pem',
+        key_file: 'test/fixtures/ca-key.pem',
+        cert_file: 'test/fixtures/cert.pem',
+      };
+      const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);
+      assert.ok(agentOptions);
+      assert.notEqual(agentOptions.ca, undefined);
+      assert.notEqual(agentOptions.key, undefined);
+      assert.notEqual(agentOptions.cert, undefined);
+    });
+
+    it('show warning messages for invalid ca file', async () => {
+      const stubLoggerWarn: Sinon.SinonStub = Sinon.stub(diag, 'warn');
+      const tlsConfig: HttpTlsConfigModel = {
+        ca_file: 'invalid-ca.pem',
+        key_file: 'test/fixtures/ca-key.pem',
+        cert_file: 'test/fixtures/cert.pem',
+      };
+      const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);
+      assert.ok(agentOptions);
+      assert.equal(agentOptions.ca, undefined);
+      assert.notEqual(agentOptions.key, undefined);
+      assert.notEqual(agentOptions.cert, undefined);
+
+      assert.strictEqual(
+        stubLoggerWarn.args[0][0],
+        "Failed to read TLS CA file at invalid-ca.pem: Error: ENOENT: no such file or directory, open 'invalid-ca.pem'"
+      );
+    });
+
+    it('show warning messages for invalid ca-key file', async () => {
+      const stubLoggerWarn: Sinon.SinonStub = Sinon.stub(diag, 'warn');
+      const tlsConfig: HttpTlsConfigModel = {
+        ca_file: 'test/fixtures/ca.pem',
+        key_file: 'invalid-ca-key.pem',
+        cert_file: 'test/fixtures/cert.pem',
+      };
+      const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);
+      assert.ok(agentOptions);
+      assert.notEqual(agentOptions.ca, undefined);
+      assert.equal(agentOptions.key, undefined);
+      assert.notEqual(agentOptions.cert, undefined);
+
+      assert.strictEqual(
+        stubLoggerWarn.args[0][0],
+        "Failed to read TLS key file at invalid-ca-key.pem: Error: ENOENT: no such file or directory, open 'invalid-ca-key.pem'"
+      );
+    });
+
+    it('show warning messages for invalid cert file', async () => {
+      const stubLoggerWarn: Sinon.SinonStub = Sinon.stub(diag, 'warn');
+      const tlsConfig: HttpTlsConfigModel = {
+        ca_file: 'test/fixtures/ca.pem',
+        key_file: 'test/fixtures/ca-key.pem',
+        cert_file: 'invalid-cert.pem',
+      };
+      const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);
+      assert.ok(agentOptions);
+      assert.notEqual(agentOptions.ca, undefined);
+      assert.notEqual(agentOptions.key, undefined);
+      assert.equal(agentOptions.cert, undefined);
+
+      assert.strictEqual(
+        stubLoggerWarn.args[0][0],
+        "Failed to read TLS cert file at invalid-cert.pem: Error: ENOENT: no such file or directory, open 'invalid-cert.pem'"
+      );
     });
   });
 });

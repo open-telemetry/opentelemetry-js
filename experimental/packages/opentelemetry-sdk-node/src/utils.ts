@@ -61,6 +61,7 @@ import type {
   SpanExporterConfigModel,
   SamplerConfigModel,
   NameStringValuePairConfigModel,
+  HttpTlsConfigModel,
 } from '@opentelemetry/configuration';
 import type {
   AggregationOption,
@@ -88,6 +89,7 @@ import {
   ConsoleLogRecordExporter,
   SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
+import * as fs from 'fs';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
@@ -688,6 +690,46 @@ export function getHeadersFromConfiguration(
   return result;
 }
 
+export function getHttpAgentOptionsFromTls(
+  tls: HttpTlsConfigModel | undefined
+): { ca?: Buffer; cert?: Buffer; key?: Buffer } | undefined {
+  if (tls && (tls.ca_file || tls.cert_file || tls.key_file)) {
+    let httpsAgentOptions = {};
+    if (tls.ca_file) {
+      try {
+        httpsAgentOptions = {
+          ...httpsAgentOptions,
+          ca: fs.readFileSync(tls.ca_file),
+        };
+      } catch (e) {
+        diag.warn(`Failed to read TLS CA file at ${tls.ca_file}: ${e}`);
+      }
+    }
+    if (tls.cert_file) {
+      try {
+        httpsAgentOptions = {
+          ...httpsAgentOptions,
+          cert: fs.readFileSync(tls.cert_file),
+        };
+      } catch (e) {
+        diag.warn(`Failed to read TLS cert file at ${tls.cert_file}: ${e}`);
+      }
+    }
+    if (tls.key_file) {
+      try {
+        httpsAgentOptions = {
+          ...httpsAgentOptions,
+          key: fs.readFileSync(tls.key_file),
+        };
+      } catch (e) {
+        diag.warn(`Failed to read TLS key file at ${tls.key_file}: ${e}`);
+      }
+    }
+    return httpsAgentOptions;
+  }
+  return undefined;
+}
+
 export function getSpanExporter(
   exporter: SpanExporterConfigModel
 ): SpanExporter | undefined {
@@ -702,11 +744,7 @@ export function getSpanExporter(
         url: exporter.otlp_http.endpoint,
         headers: getHeadersFromConfiguration(exporter.otlp_http.headers),
         timeoutMillis: exporter.otlp_http.timeout,
-        httpAgentOptions: {
-          ca: exporter.otlp_http.tls?.ca_file,
-          cert: exporter.otlp_http.tls?.cert_file,
-          key: exporter.otlp_http.tls?.key_file,
-        },
+        httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http.tls),
       });
     } else {
       return new OTLPProtoTraceExporter({
@@ -717,11 +755,7 @@ export function getSpanExporter(
         url: exporter.otlp_http.endpoint,
         headers: getHeadersFromConfiguration(exporter.otlp_http.headers),
         timeoutMillis: exporter.otlp_http.timeout,
-        httpAgentOptions: {
-          ca: exporter.otlp_http.tls?.ca_file,
-          cert: exporter.otlp_http.tls?.cert_file,
-          key: exporter.otlp_http.tls?.key_file,
-        },
+        httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http.tls),
       });
     }
   } else if (exporter.otlp_grpc) {
