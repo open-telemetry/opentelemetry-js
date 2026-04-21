@@ -14,17 +14,29 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
-* feat(sdk-logs): implement log creation metrics  [#6433](https://github.com/open-telemetry/opentelemetry-js/pull/6433) @anuraaga
-
 ### :bug: Bug Fixes
-
-fix(opentelemetry-resources): do not discard OTEL_RESOURCE_ATTRIBUTES when it contains empty kv pairs
 
 ### :books: Documentation
 
 ### :house: Internal
 
+## 2.7.0
+
+### :rocket: Features
+
+* feat(sdk-logs): implement log creation metrics [#6433](https://github.com/open-telemetry/opentelemetry-js/pull/6433) @anuraaga
+* feat(sdk-metrics): add the cardinalitySelector argument to PeriodicExportingMetricReaders
+  [#6460](https://github.com/open-telemetry/opentelemetry-js/pull/6460) @starzlocker
+* feat(opentelemetry-core): add extra checks on internal merge function for safety [#6587](https://github.com/open-telemetry/opentelemetry-js/pull/6587) @maryliag
+
+### :bug: Bug Fixes
+
+* fix(opentelemetry-resources): do not discard OTEL_RESOURCE_ATTRIBUTES when it contains empty kv pairs
+
+### :house: Internal
+
 * test(exporter-zipkin): fix broken browser test assertions and add missing coverage [#6566](https://github.com/open-telemetry/opentelemetry-js/pull/6566) @overbalance
+* fix(sdk-metrics): repair ExponentialHistogram tests [#6565](https://github.com/open-telemetry/opentelemetry-js/pull/6565) @overbalance
 
 ## 2.6.1
 
