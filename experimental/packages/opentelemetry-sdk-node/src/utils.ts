@@ -727,6 +727,8 @@ export function getSpanExporter(
           : CompressionAlgorithm.NONE,
       url: exporter.otlp_grpc.endpoint,
       timeoutMillis: exporter.otlp_grpc.timeout,
+      // TODO (6614): add support for credentials
+      // TODO (6615): add metadata (headers) support
     });
   } else if (exporter.console) {
     return new ConsoleSpanExporter();
