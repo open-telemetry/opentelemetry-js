@@ -59,11 +59,14 @@ class ExemplarBucket {
     if (!this._offered) return null;
     const currentAttributes = this.attributes;
     // filter attributes
-    Object.keys(pointAttributes).forEach(key => {
-      if (pointAttributes[key] === currentAttributes[key]) {
+    for (const key in pointAttributes) {
+      if (
+        Object.prototype.hasOwnProperty.call(pointAttributes, key) &&
+        pointAttributes[key] === currentAttributes[key]
+      ) {
         delete currentAttributes[key];
       }
-    });
+    }
     const retVal: Exemplar = {
       filteredAttributes: currentAttributes,
       value: this.value,
@@ -113,12 +116,12 @@ export abstract class FixedSizeExemplarReservoirBase
 
   collect(pointAttributes: Attributes): Exemplar[] {
     const exemplars: Exemplar[] = [];
-    this._reservoirStorage.forEach(storageItem => {
+    for (const storageItem of this._reservoirStorage) {
       const res = storageItem.collect(pointAttributes);
       if (res !== null) {
         exemplars.push(res);
       }
-    });
+    }
     this.reset();
     return exemplars;
   }
