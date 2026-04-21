@@ -798,7 +798,7 @@ describe('xhr', () => {
           beforeEach(done => {
             clearData();
             prepareData(firstUrl);
-            // Must create xhr after prepareData call because it craetes the instrumentation
+            // Must create xhr after prepareData call because it creates the instrumentation
             const xhr = new XMLHttpRequest();
             successfulGetRequest(
               firstUrl,
@@ -2043,6 +2043,7 @@ describe('xhr', () => {
             prepareData(firstUrl, {
               propagateTraceHeaderCorsUrls,
             });
+            // Must create xhr after prepareData call because it creates the instrumentation
             const xhr = new XMLHttpRequest();
             successfulPostRequest(
               firstUrl,
