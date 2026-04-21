@@ -787,7 +787,9 @@ export function getMeterViewsFromConfiguration(
       }
     }
     if (view.stream) {
-      viewOption.name = view.stream.name ?? view.selector?.instrument_name;
+      if (view.stream.name) {
+        viewOption.name = view.stream.name;
+      }
       viewOption.aggregationCardinalityLimit =
         view.stream.aggregation_cardinality_limit ?? 2_000;
       if (view.stream.description) {
