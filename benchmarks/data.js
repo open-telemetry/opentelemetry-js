@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1776824571890,
+  "lastUpdate": 1776843033116,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -70820,6 +70820,135 @@ window.BENCHMARK_DATA = {
             "range": "±0.35%",
             "unit": "ops/sec",
             "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f2378db9ef10cd8b892403dcc006f01ad8632c53",
+          "message": "chore: opt out of nx telemetry (#6619)",
+          "timestamp": "2026-04-22T07:16:23Z",
+          "tree_id": "67615e273dfc81e71da8ac47f151e5649352c76d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/f2378db9ef10cd8b892403dcc006f01ad8632c53"
+        },
+        "date": 1776843031960,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 3206421,
+            "range": "±2.45%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 3458304,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 3300775,
+            "range": "±0.46%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 2939437,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 434493,
+            "range": "±2.56%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
+          },
+          {
+            "name": "generateTraceId",
+            "value": 5936225,
+            "range": "±0.37%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "generateSpanId",
+            "value": 7327804,
+            "range": "±0.46%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 484543,
+            "range": "±0.60%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "addEvent (128 attributes)",
+            "value": 41238,
+            "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "addLink (128 attributes)",
+            "value": 41973,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes w/ setAttributes)",
+            "value": 490240,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 512 spans (protobuf)",
+            "value": 160,
+            "range": "±4.30%",
+            "unit": "ops/sec",
+            "extra": "68 samples"
+          },
+          {
+            "name": "transform 512 spans (json)",
+            "value": 377,
+            "range": "±1.67%",
+            "unit": "ops/sec",
+            "extra": "84 samples"
+          },
+          {
+            "name": "transform 512 logs (protobuf)",
+            "value": 408,
+            "range": "±0.79%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "transform 512 logs (json)",
+            "value": 487,
+            "range": "±1.36%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
           }
         ]
       }
