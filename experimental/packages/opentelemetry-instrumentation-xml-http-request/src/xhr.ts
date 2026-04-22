@@ -653,6 +653,9 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * implements disable function
    */
   override disable() {
+    if (!this._isEnabled) {
+      return;
+    }
     this._isEnabled = false;
     this._tasksCount = 0;
     this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
