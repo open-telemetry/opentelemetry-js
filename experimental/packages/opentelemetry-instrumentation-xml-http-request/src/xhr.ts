@@ -112,8 +112,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   // any possible confusion with the `_enabled` field used on the *Node.js*
   // InstrumentationBase class.
   // Also not initializing the fields to `false` because the base class
-  // constructor already call `enable` modifying their values and it will
-  // set the instrumentaitons in a bas state (enabled, patched but with flags set to false)
+  // constructor already calls `enable` modifying their values and it will
+  // set the instrumentations in a bad state (enabled, patched but with flags set to false)
   declare private _isEnabled: boolean;
   declare private _isXhrPatched: boolean;
 
