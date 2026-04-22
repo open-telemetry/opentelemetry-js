@@ -11,6 +11,7 @@ export type {
   InstrumentType as InstrumentTypeConfigModel,
   Aggregation as AggregationConfigModel,
   PeriodicMetricReader as PeriodicMetricReaderConfigModel,
+  Sampler as SamplerConfigModel,
   SpanExporter as SpanExporterConfigModel,
   SpanProcessor as SpanProcessorConfigModel,
 } from './generated/types';
