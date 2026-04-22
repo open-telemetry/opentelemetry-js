@@ -61,6 +61,7 @@ import type {
 } from '@opentelemetry/configuration';
 import type {
   AggregationOption,
+  IAttributesProcessor,
   IMetricReader,
   PushMetricExporter,
   ViewOptions,
@@ -68,6 +69,8 @@ import type {
 import {
   AggregationType,
   ConsoleMetricExporter,
+  createAllowListAttributesProcessor,
+  createDenyListAttributesProcessor,
   InstrumentType,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
@@ -810,7 +813,32 @@ export function getMeterViewsFromConfiguration(
           viewOption.aggregation = aggregationType;
         }
       }
-      // TODO(6427): add support for view.stream.attribute_keys and correspondent attributes processor configuration
+      if (view.stream.attribute_keys) {
+        const processors: IAttributesProcessor[] = [];
+        if (
+          view.stream.attribute_keys.included &&
+          view.stream.attribute_keys.included.length > 0
+        ) {
+          processors.push(
+            createAllowListAttributesProcessor(
+              view.stream.attribute_keys.included
+            )
+          );
+        }
+        if (
+          view.stream.attribute_keys.excluded &&
+          view.stream.attribute_keys.excluded.length > 0
+        ) {
+          processors.push(
+            createDenyListAttributesProcessor(
+              view.stream.attribute_keys.excluded
+            )
+          );
+        }
+        if (processors.length > 0) {
+          viewOption.attributesProcessors = processors;
+        }
+      }
     }
 
     if (Object.keys(viewOption).length > 0) {

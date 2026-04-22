@@ -10,6 +10,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(sdk-node): wire attribute_keys from declarative configuration to ViewOptions.attributesProcessors [#6427](https://github.com/open-telemetry/opentelemetry-js/issues/6427) @ravitheja4531-cell
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
