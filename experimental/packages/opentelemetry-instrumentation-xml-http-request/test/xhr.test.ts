@@ -281,7 +281,7 @@ describe('xhr', () => {
         fakeXhr.onCreate = function (xhr: any) {
           requests.push(xhr);
         };
-        // @ts-expect-error -- custom property
+        // @ts-expect-error - disable no longer unpatches
         if (typeof XMLHttpRequest.prototype.send.__unwrap === 'function') {
           // @ts-expect-error -- custom property
           XMLHttpRequest.prototype.send.__unwrap();
