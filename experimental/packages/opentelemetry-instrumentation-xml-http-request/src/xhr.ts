@@ -640,11 +640,12 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       return;
     }
     this._isEnabled = true;
-    this._diag.debug('applying patch to', this.moduleName, this.version);
 
     if (this._isXhrPatched) {
+      this._diag.debug('reactivating existing patch on', this.moduleName, this.version);
       return;
     }
+    this._diag.debug('applying patch to', this.moduleName, this.version);
     this._isXhrPatched = true;
     this._wrap(XMLHttpRequest.prototype, 'open', this._patchOpen());
     this._wrap(XMLHttpRequest.prototype, 'send', this._patchSend());
