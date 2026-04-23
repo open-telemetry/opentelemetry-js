@@ -626,14 +626,26 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     if (this._isEnabled) {
       return;
     }
-    this._isEnabled = true;
 
     if (this._isFetchPatched) {
       this._diag.debug('fetch constructor already patched');
+      this._isEnabled = true;
       return;
     }
-    this._isFetchPatched = true;
-    this._wrap(globalThis, 'fetch', this._patchConstructor());
+
+    try {
+      // `_wrap` throws if a third-party script has locked globalThis.fetch via
+      // Object.defineProperty(window, 'fetch', { writable: false, ... }).
+      this._wrap(globalThis, 'fetch', this._patchConstructor());
+      this._isFetchPatched = true;
+      this._isEnabled = true;
+    } catch (err) {
+      this._diag.warn(
+        'Failed to patch globalThis.fetch; instrumentation will not be enabled. ' +
+          'Another script may have locked globalThis.fetch via Object.defineProperty.',
+        err
+      );
+    }
   }
 
   /**
