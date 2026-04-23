@@ -252,6 +252,22 @@ describe('xhr', () => {
     sinon.restore();
   });
 
+  describe('enable', () => {
+    it('should patch to wrap XML HTTP Requests when enabled', () => {
+      const xhttp = new XMLHttpRequest();
+      assert.ok(!isWrapped(xhttp.send), 'should not be wrapped');
+      // NOTE: constructor already calls `enable()`
+      // @ts-expect-error -- constructor already enables, no need to use the var
+      const xhrInstrumentation = new XMLHttpRequestInstrumentation();
+      const xhttp2 = new XMLHttpRequest();
+      assert.ok(isWrapped(xhttp2.send), 'should be wrapped');
+      // @ts-expect-error -- property added by instrumentation.wrap(...)
+      XMLHttpRequest.prototype.send.__unwrap();
+      // @ts-expect-error -- property added by instrumentation.wrap(...)
+      XMLHttpRequest.prototype.open.__unwrap();
+    });
+  });
+
   asyncTests.forEach(test => {
     const testAsync = test.async;
     describe(`when async='${testAsync}', semconvStabilityOptIn=${test.semconvStabilityOptIn}`, () => {
@@ -281,14 +297,12 @@ describe('xhr', () => {
         fakeXhr.onCreate = function (xhr: any) {
           requests.push(xhr);
         };
-        // @ts-expect-error - disable no longer unpatches
-        if (typeof XMLHttpRequest.prototype.send.__unwrap === 'function') {
-          // @ts-expect-error -- custom property
+        if (isWrapped(XMLHttpRequest.prototype.send)) {
+          // @ts-expect-error -- property added by instrumentation.wrap(...)
           XMLHttpRequest.prototype.send.__unwrap();
         }
-        // @ts-expect-error -- custom property
-        if (typeof XMLHttpRequest.prototype.open.__unwrap === 'function') {
-          // @ts-expect-error -- custom property
+        if (isWrapped(XMLHttpRequest.prototype.open)) {
+          // @ts-expect-error -- property added by instrumentation.wrap(...)
           XMLHttpRequest.prototype.open.__unwrap();
         }
 
@@ -400,13 +414,6 @@ describe('xhr', () => {
               measureRequestSize: true,
             });
             successfulGetRequest(url, done);
-          });
-
-          it('should patch to wrap XML HTTP Requests when enabled', () => {
-            const xhttp = new XMLHttpRequest();
-            assert.ok(isWrapped(xhttp.send));
-            xmlHttpRequestInstrumentation.enable();
-            assert.ok(isWrapped(xhttp.send));
           });
 
           it('should create a span with correct root span', () => {
@@ -1652,13 +1659,6 @@ describe('xhr', () => {
               measureRequestSize: true,
             });
             successfulPostRequest(url, done);
-          });
-
-          it('should patch to wrap XML HTTP Requests when enabled', () => {
-            const xhttp = new XMLHttpRequest();
-            assert.ok(isWrapped(xhttp.send));
-            xmlHttpRequestInstrumentation.enable();
-            assert.ok(isWrapped(xhttp.send));
           });
 
           it('should create a span with correct root span', () => {
