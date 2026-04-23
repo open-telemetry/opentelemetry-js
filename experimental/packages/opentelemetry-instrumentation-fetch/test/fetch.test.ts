@@ -244,33 +244,35 @@ describe('fetch', () => {
     describe('when the fetch property cannot be wrapped', () => {
       // Simulate the production failure mode (third-party scripts locking
       // `globalThis.fetch` via `Object.defineProperty` with `writable: false,
-      // configurable: false`) by stubbing the inherited `_wrap` to throw the
-      // same TypeError the browser would throw. We stub the method rather
-      // than actually locking the property because a non-configurable slot
-      // is irreversible within a realm, and the outer `afterEach` restores
-      // `globalThis.fetch` via assignment, which would itself throw.
+      // configurable: false`) by stubbing `_wrap` to throw the same TypeError
+      // the browser would throw. We stub the method rather than actually
+      // locking the property because a non-configurable slot is irreversible
+      // within a realm, and the outer `afterEach` restores `globalThis.fetch`
+      // via assignment, which would itself throw.
       const wrapError = new TypeError(
         "Cannot assign to read only property 'fetch' of object '[object Window]'"
       );
 
       beforeEach(() => {
+        // Construct with `enabled: false` so the stub is in place before
+        // `enable()` runs — `_wrap` is an instance-level field inherited
+        // from `InstrumentationBase`, not a prototype method.
+        fetchInstrumentation = new FetchInstrumentation({ enabled: false });
         // @ts-expect-error access internal property for testing
-        sinon.stub(FetchInstrumentation.prototype, '_wrap').throws(wrapError);
+        sinon.stub(fetchInstrumentation, '_wrap').throws(wrapError);
       });
 
       it('should not throw when _wrap fails', () => {
-        assert.doesNotThrow(() => {
-          fetchInstrumentation = new FetchInstrumentation();
-        });
+        assert.doesNotThrow(() => fetchInstrumentation!.enable());
       });
 
       it('should leave fetch unwrapped when _wrap fails', () => {
-        fetchInstrumentation = new FetchInstrumentation();
+        fetchInstrumentation!.enable();
         assert.ok(!isWrapped(globalThis.fetch));
       });
 
       it('should allow enable() to be retried after _wrap fails', () => {
-        fetchInstrumentation = new FetchInstrumentation();
+        fetchInstrumentation!.enable();
         assert.doesNotThrow(() => fetchInstrumentation!.enable());
       });
     });
