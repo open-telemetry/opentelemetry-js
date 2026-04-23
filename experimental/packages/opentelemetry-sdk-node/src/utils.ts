@@ -694,33 +694,24 @@ export function getHttpAgentOptionsFromTls(
   tls: HttpTlsConfigModel | undefined
 ): { ca?: Buffer; cert?: Buffer; key?: Buffer } | undefined {
   if (tls && (tls.ca_file || tls.cert_file || tls.key_file)) {
-    let httpsAgentOptions = {};
+    let httpsAgentOptions: { ca?: Buffer; cert?: Buffer; key?: Buffer } = {};
     if (tls.ca_file) {
       try {
-        httpsAgentOptions = {
-          ...httpsAgentOptions,
-          ca: fs.readFileSync(tls.ca_file),
-        };
+        httpsAgentOptions.ca = fs.readFileSync(tls.ca_file);
       } catch (e) {
         diag.warn(`Failed to read TLS CA file at ${tls.ca_file}: ${e}`);
       }
     }
     if (tls.cert_file) {
       try {
-        httpsAgentOptions = {
-          ...httpsAgentOptions,
-          cert: fs.readFileSync(tls.cert_file),
-        };
+        httpsAgentOptions.cert = fs.readFileSync(tls.cert_file);
       } catch (e) {
         diag.warn(`Failed to read TLS cert file at ${tls.cert_file}: ${e}`);
       }
     }
     if (tls.key_file) {
       try {
-        httpsAgentOptions = {
-          ...httpsAgentOptions,
-          key: fs.readFileSync(tls.key_file),
-        };
+        httpsAgentOptions.key = fs.readFileSync(tls.key_file);
       } catch (e) {
         diag.warn(`Failed to read TLS key file at ${tls.key_file}: ${e}`);
       }
