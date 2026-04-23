@@ -241,50 +241,38 @@ describe('fetch', () => {
       fetchInstrumentation = undefined;
     });
 
-    describe('when globalThis.fetch is locked (non-writable)', () => {
+    describe('when the fetch property cannot be wrapped', () => {
+      // Simulate the production failure mode (third-party scripts locking
+      // `globalThis.fetch` via `Object.defineProperty` with `writable: false,
+      // configurable: false`) by stubbing the inherited `_wrap` to throw the
+      // same TypeError the browser would throw. We stub the method rather
+      // than actually locking the property because a non-configurable slot
+      // is irreversible within a realm, and the outer `afterEach` restores
+      // `globalThis.fetch` via assignment, which would itself throw.
+      const wrapError = new TypeError(
+        "Cannot assign to read only property 'fetch' of object '[object Window]'"
+      );
+
       beforeEach(() => {
-        // Simulate a third-party script that locks fetch (e.g. anti-bot or
-        // affiliate tag using Object.defineProperty(window, 'fetch', { ... })).
-        Object.defineProperty(globalThis, 'fetch', {
-          value: originalFetch,
-          writable: false,
-          configurable: false,
-          enumerable: true,
-        });
+        sinon
+          .stub(FetchInstrumentation.prototype as never, '_wrap' as never)
+          .throws(wrapError);
       });
 
-      afterEach(() => {
-        // Break the lock so subsequent tests start clean. The outer afterEach
-        // does `globalThis.fetch = originalFetch` which would be a no-op write
-        // to a non-writable slot.
-        try {
-          Object.defineProperty(globalThis, 'fetch', {
-            value: originalFetch,
-            writable: true,
-            configurable: true,
-            enumerable: true,
-          });
-        } catch {
-          /* slot is permanently locked in this realm; tolerate */
-        }
-      });
-
-      it('should not throw when fetch cannot be wrapped', () => {
+      it('should not throw when _wrap fails', () => {
         assert.doesNotThrow(() => {
           fetchInstrumentation = new FetchInstrumentation();
         });
       });
 
-      it('should leave _isEnabled false when wrap fails', () => {
-        fetchInstrumentation = new FetchInstrumentation();
-        // Calling enable() again should still be a no-op + not throw, because
-        // the previous attempt left state clean instead of half-applied.
-        assert.doesNotThrow(() => fetchInstrumentation!.enable());
-      });
-
-      it('should not mark fetch as wrapped when wrap fails', () => {
+      it('should leave fetch unwrapped when _wrap fails', () => {
         fetchInstrumentation = new FetchInstrumentation();
         assert.ok(!isWrapped(globalThis.fetch));
+      });
+
+      it('should allow enable() to be retried after _wrap fails', () => {
+        fetchInstrumentation = new FetchInstrumentation();
+        assert.doesNotThrow(() => fetchInstrumentation!.enable());
       });
     });
 
