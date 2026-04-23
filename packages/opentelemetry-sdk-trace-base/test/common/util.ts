@@ -12,15 +12,18 @@ export const validAttributes = {
   'array<string>': ['str1', 'str2'],
   'array<number>': [1, 2],
   'array<bool>': [true, false],
+  bytes: new Uint8Array([68, 69]),
+  obj: { foo: 'bar' },
+  nested: { anObj: {}, anArray: [1, 2, 3] },
 };
 
 export const invalidAttributes = {
-  // invalid attribute type object
-  object: { foo: 'bar' },
-  // invalid attribute inhomogenous array
-  'non-homogeneous-array': [0, ''],
   // This empty length attribute should not be set
   '': 'empty-key',
+  // Non-Object objects, for example:
+  date: new Date(),
+  regexp: /^f./,
+  err: new Error('boom'),
 };
 
 export function assertAssignable<T>(val: T): asserts val is T {}

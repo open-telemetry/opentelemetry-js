@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Attributes, AttributeValue } from '../common/Attributes';
+import type { AnyValue } from '../common/AnyValue';
+import type { Attributes } from '../common/Attributes';
 
 /**
  * @deprecated please use {@link Attributes}
@@ -12,7 +13,7 @@ import type { Attributes, AttributeValue } from '../common/Attributes';
 export type SpanAttributes = Attributes;
 
 /**
- * @deprecated please use {@link AttributeValue}
+ * @deprecated please use {@link AnyValue}
  * @since 1.0.0
  */
-export type SpanAttributeValue = AttributeValue;
+export type SpanAttributeValue = AnyValue;
