@@ -14,7 +14,7 @@ import {
   createComposableAlwaysOffSampler,
   createComposableAlwaysOnSampler,
   createComposableParentThresholdSampler,
-  createComposableTraceIDRatioBasedSampler,
+  createComposableProbabilitySampler,
 } from '../src';
 import { INVALID_RANDOM_VALUE, INVALID_THRESHOLD } from '../src/util';
 import {
@@ -84,7 +84,7 @@ describe('ConsistentSampler', () => {
       testId: 'parent based in legacy mode',
     },
     {
-      sampler: createComposableTraceIDRatioBasedSampler(0.5),
+      sampler: createComposableProbabilitySampler(0.5),
       parentSampled: true,
       parentThreshold: undefined,
       parentRandomValue: 0x7fffffffffffffn,
@@ -94,7 +94,7 @@ describe('ConsistentSampler', () => {
       testId: 'half threshold not sampled',
     },
     {
-      sampler: createComposableTraceIDRatioBasedSampler(0.5),
+      sampler: createComposableProbabilitySampler(0.5),
       parentSampled: false,
       parentThreshold: undefined,
       parentRandomValue: 0x80000000000000n,
@@ -104,7 +104,7 @@ describe('ConsistentSampler', () => {
       testId: 'half threshold sampled',
     },
     {
-      sampler: createComposableTraceIDRatioBasedSampler(1.0),
+      sampler: createComposableProbabilitySampler(1.0),
       parentSampled: false,
       parentThreshold: 0x80000000000000n,
       parentRandomValue: 0x80000000000000n,
