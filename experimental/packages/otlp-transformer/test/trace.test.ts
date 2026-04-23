@@ -2,13 +2,14 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import * as root from '../src/generated/root';
-import { SpanKind, SpanStatusCode, TraceFlags } from '@opentelemetry/api';
+import * as signals from '../test/generated/signals';
+import { diag, SpanKind, SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import { TraceState } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { toBase64 } from './utils';
 import type { OtlpEncodingOptions } from '../src/common/internal-types';
 import { ESpanKind, EStatusCode } from '../src/trace/internal-types';
@@ -18,6 +19,10 @@ import { JsonTraceSerializer } from '../src/trace/json';
 import { hexToBinary } from '../src/common/hex-to-binary';
 import type { ISpan } from '../src/trace/internal-types';
 import { JSON_ENCODER, PROTOBUF_ENCODER } from '../src/common/utils';
+import {
+  GROWING_BUFFER_DEBUG_MESSAGE,
+  ProtobufWriter,
+} from '../src/common/protobuf/protobuf-writer';
 
 function createExpectedSpanJson(options: OtlpEncodingOptions) {
   const useHex = options.useHex ?? false;
@@ -482,16 +487,26 @@ describe('Trace', () => {
   });
 
   describe('ProtobufTracesSerializer', function () {
+    let diagStub: sinon.SinonStub;
+
+    beforeEach(function () {
+      diagStub = sinon.stub(diag, 'debug');
+    });
+
+    afterEach(function () {
+      sinon.restore();
+    });
+
     it('serializes an export request', () => {
       const serialized = ProtobufTraceSerializer.serializeRequest([span]);
       assert.ok(serialized, 'serialized response is undefined');
       const decoded =
-        root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest.decode(
+        signals.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest.decode(
           serialized
         );
       const expected = createExpectedSpanProtobuf();
       const decodedObj =
-        root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest.toObject(
+        signals.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest.toObject(
           decoded,
           {
             // This incurs some precision loss that's taken into account in createExpectedSpanProtobuf()
@@ -504,11 +519,12 @@ describe('Trace', () => {
           }
         );
       assert.deepStrictEqual(decodedObj, expected);
+      sinon.assert.neverCalledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
     });
 
     it('deserializes a response', () => {
       const protobufSerializedResponse =
-        root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceResponse.encode(
+        signals.opentelemetry.proto.collector.trace.v1.ExportTraceServiceResponse.encode(
           {
             partialSuccess: {
               errorMessage: 'foo',
@@ -535,6 +551,52 @@ describe('Trace', () => {
     it('does not throw when deserializing an empty response', () => {
       assert.doesNotThrow(() =>
         ProtobufTraceSerializer.deserializeResponse(new Uint8Array([]))
+      );
+      sinon.assert.neverCalledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
+    });
+
+    it('does not throw when encountering unexpected wiretypes during deserialization', function () {
+      const writer = new ProtobufWriter(50);
+      // Construct an ExportTraceServiceResponse where the embedded
+      // ExportTracePartialSuccess has fields encoded with incorrect wire types.
+      // ExportTraceServiceResponse { 1: partial_success (length-delimited) }
+      // ExportTracePartialSuccess expects:
+      //   1: rejected_spans (varint)
+      //   2: error_message (length-delimited string)
+
+      // first pretend the field number 1 is a varint (type 0, correct format expects a length delimited field)
+      writer.writeTag(1, 0);
+      writer.writeVarint(3);
+
+      // also pretend we have an extra field that we don't know yet what to do with
+      writer.writeTag(99, 0);
+      writer.writeVarint(42);
+
+      // now write field 1 again, but this time as length-delimited, as expected.
+      writer.writeTag(1, 2);
+      const lengthVarintPosition = writer.startLengthDelimited();
+      const innerStartPos = writer.pos;
+      // instead of putting the correct data here, we put unexpected wire-types for each field, ensuring it's handled gracefully.
+      // Write field 1 but with wire type 2 (length-delimited) and a string (correct format expects a varint)
+      writer.writeTag(1, 2);
+      writer.writeString('not-a-number');
+      // Write field 2 but with wire type 0 (varint) instead of length-delimited (correct format expects a string, which is length delimited)
+      writer.writeTag(2, 0);
+      writer.writeVarint(12345);
+      // Write field 99, which is completely unknown to us; pretend it's a varint (type 0)
+      writer.writeTag(99, 0);
+      writer.writeVarint(42);
+
+      // finish up
+      writer.finishLengthDelimited(
+        lengthVarintPosition,
+        writer.pos - innerStartPos
+      );
+
+      // Ensure deserialization does not throw when encountering these
+      // unexpected wire types.
+      assert.doesNotThrow(() =>
+        ProtobufTraceSerializer.deserializeResponse(writer.finish())
       );
     });
   });
