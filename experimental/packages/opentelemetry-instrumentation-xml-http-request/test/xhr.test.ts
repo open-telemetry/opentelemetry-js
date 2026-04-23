@@ -775,10 +775,11 @@ describe('xhr', () => {
         describe('when relative url is ignored via domain regex', () => {
           beforeEach(done => {
             clearData();
-            prepareData(done, '/xml-http-request.js', {
+            prepareData('/xml-http-request.js', {
               propagateTraceHeaderCorsUrls: [/.*/],
               ignoreUrls: [/.*localhost.*/],
             });
+            successfulGetRequest('/xml-http-request.js', done);
           });
 
           it('should NOT create any span', () => {
