@@ -241,6 +241,53 @@ describe('fetch', () => {
       fetchInstrumentation = undefined;
     });
 
+    describe('when globalThis.fetch is locked (non-writable)', () => {
+      beforeEach(() => {
+        // Simulate a third-party script that locks fetch (e.g. anti-bot or
+        // affiliate tag using Object.defineProperty(window, 'fetch', { ... })).
+        Object.defineProperty(globalThis, 'fetch', {
+          value: originalFetch,
+          writable: false,
+          configurable: false,
+          enumerable: true,
+        });
+      });
+
+      afterEach(() => {
+        // Break the lock so subsequent tests start clean. The outer afterEach
+        // does `globalThis.fetch = originalFetch` which would be a no-op write
+        // to a non-writable slot.
+        try {
+          Object.defineProperty(globalThis, 'fetch', {
+            value: originalFetch,
+            writable: true,
+            configurable: true,
+            enumerable: true,
+          });
+        } catch {
+          /* slot is permanently locked in this realm; tolerate */
+        }
+      });
+
+      it('should not throw when fetch cannot be wrapped', () => {
+        assert.doesNotThrow(() => {
+          fetchInstrumentation = new FetchInstrumentation();
+        });
+      });
+
+      it('should leave _isEnabled false when wrap fails', () => {
+        fetchInstrumentation = new FetchInstrumentation();
+        // Calling enable() again should still be a no-op + not throw, because
+        // the previous attempt left state clean instead of half-applied.
+        assert.doesNotThrow(() => fetchInstrumentation!.enable());
+      });
+
+      it('should not mark fetch as wrapped when wrap fails', () => {
+        fetchInstrumentation = new FetchInstrumentation();
+        assert.ok(!isWrapped(globalThis.fetch));
+      });
+    });
+
     it('should return a Promise<Response> compatible with WebAssembly.compileStreaming', async () => {
       // Some web APIs do brand checks to ensure they are working with native objects.
       // compileStreaming checks that the argument is a native Response, and will throw if it isn't.
