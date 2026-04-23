@@ -586,6 +586,21 @@ describe('Trace', () => {
       );
     });
 
+    it('deserializes a malformed response', () => {
+      const malformedResponse =
+        '{ "partialSuccess": { "errorMessage": foo, "rejectedLogRecords": 1, }';
+      const encoder = new TextEncoder();
+      const encodedResponse = encoder.encode(malformedResponse);
+      const deserializedResponse =
+        JsonTraceSerializer.deserializeResponse(encodedResponse);
+
+      assert.deepEqual(
+        deserializedResponse,
+        {},
+        'Malformed response should result in an empty object being returned'
+      );
+    });
+
     it('does not throw when deserializing an empty response', () => {
       assert.doesNotThrow(() =>
         JsonTraceSerializer.deserializeResponse(new Uint8Array([]))
