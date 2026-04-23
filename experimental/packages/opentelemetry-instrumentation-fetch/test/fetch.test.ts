@@ -254,11 +254,8 @@ describe('fetch', () => {
       );
 
       beforeEach(() => {
-        // `_wrap` is protected on InstrumentationBase, so cast to sidestep
-        // the visibility check while keeping sinon's return type intact.
-        sinon
-          .stub(FetchInstrumentation.prototype as never as Record<string, () => void>, '_wrap')
-          .throws(wrapError);
+        // @ts-expect-error access internal property for testing
+        sinon.stub(FetchInstrumentation.prototype, '_wrap').throws(wrapError);
       });
 
       it('should not throw when _wrap fails', () => {
