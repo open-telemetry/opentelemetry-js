@@ -2563,7 +2563,6 @@ describe('ConfigFactory', function () {
             {
               name: 'service.name',
               value: 'config-name',
-              type: 'string',
             },
             {
               name: 'service.namespace',

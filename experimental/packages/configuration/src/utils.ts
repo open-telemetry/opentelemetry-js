@@ -7,11 +7,7 @@ import { getStringFromEnv } from '@opentelemetry/core';
 import { ExemplarFilter, SeverityNumber } from './generated/types';
 import type { ConfigurationModel, GrpcTls, HttpTls } from './generated/types';
 
-export function envVariableSubstitution(value: unknown): string | undefined {
-  if (value == null) {
-    return undefined;
-  }
-
+export function envVariableSubstitution(value: string): string {
   const str = String(value);
   // Spec ABNF: $$ is a literal $; ${VAR}, ${VAR:-default}, ${env:VAR}, ${env:VAR:-default}
   const TOKEN_RE = /\$\$|\$\{(?:env:)?([a-zA-Z_][a-zA-Z0-9_]*)(?::-(.*?))?\}/g;

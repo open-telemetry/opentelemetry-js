@@ -25,7 +25,6 @@ describe('config utils', function () {
       process.env.TEST2 = 't2';
       process.env.TEST_LONG_NAME = '100';
       process.env.TEST_ENDPOINT = 'http://test.com:4318/v1/traces';
-      assert.deepStrictEqual(envVariableSubstitution(null), undefined);
       assert.deepStrictEqual(envVariableSubstitution(' '), ' ');
       assert.deepStrictEqual(envVariableSubstitution('${TEST1}'), 't1');
       assert.deepStrictEqual(
