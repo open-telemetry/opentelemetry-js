@@ -697,7 +697,7 @@ export function getHttpAgentOptionsFromTls(
   tls: HttpTlsConfigModel | undefined
 ): { ca?: Buffer; cert?: Buffer; key?: Buffer } | undefined {
   if (tls && (tls.ca_file || tls.cert_file || tls.key_file)) {
-    let httpsAgentOptions: { ca?: Buffer; cert?: Buffer; key?: Buffer } = {};
+    const httpsAgentOptions: { ca?: Buffer; cert?: Buffer; key?: Buffer } = {};
     if (tls.ca_file) {
       try {
         httpsAgentOptions.ca = fs.readFileSync(tls.ca_file);
