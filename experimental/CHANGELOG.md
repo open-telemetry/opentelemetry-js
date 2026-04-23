@@ -14,6 +14,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(instrumentation-xhr): resolve relative URLs before matching `ignoreUrls` [#6551](https://github.com/open-telemetry/opentelemetry-js/pull/6551) @Maximiliano-Zeballos
 * fix(sdk-node): fix setting of ViewOption#name from ConfigurationModel [#6620](https://github.com/open-telemetry/opentelemetry-js/pull/6620) @trentm
 * fix(web-common): add limit for timeout [#6601](https://github.com/open-telemetry/opentelemetry-js/pull/6601) @maryliag
 
