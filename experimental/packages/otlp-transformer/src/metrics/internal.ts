@@ -50,7 +50,7 @@ export function toScopeMetrics(
 ): IScopeMetrics[] {
   return Array.from(
     scopeMetrics.map(metrics => ({
-      scope: createInstrumentationScope(metrics.scope),
+      scope: createInstrumentationScope(metrics.scope, encoder),
       metrics: metrics.metrics.map(metricData => toMetric(metricData, encoder)),
       schemaUrl: metrics.scope.schemaUrl,
     }))

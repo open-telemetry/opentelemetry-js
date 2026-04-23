@@ -26,7 +26,10 @@ export interface ReadableLogRecord {
    * MUST be stable across identical scopes, as it is intended be used for efficient scope-based
    * filtering and grouping.
    */
-  readonly instrumentationScope: InstrumentationScope;
+  readonly instrumentationScope: InstrumentationScope & {
+    attributes?: LogAttributes;
+    droppedAttributesCount?: number;
+  };
   readonly attributes: LogAttributes;
   readonly droppedAttributesCount: number;
 }

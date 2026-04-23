@@ -16,11 +16,9 @@ import {
   createInstrumentationScope,
   createResource,
   toAnyValue,
-  toKeyValue,
+  toAttributes,
 } from '../common/internal';
 import type { SeverityNumber } from '@opentelemetry/api-logs';
-import type { IKeyValue } from '../common/internal-types';
-import type { LogAttributes } from '@opentelemetry/api-logs';
 
 export function createExportLogsServiceRequest(
   logRecords: ReadableLogRecord[],
@@ -33,17 +31,17 @@ export function createExportLogsServiceRequest(
 
 function createResourceMap(
   logRecords: ReadableLogRecord[]
-): Map<Resource, Map<string, ReadableLogRecord[]>> {
+): Map<
+  Resource,
+  Map<ReadableLogRecord['instrumentationScope'], ReadableLogRecord[]>
+> {
   const resourceMap: Map<
     Resource,
-    Map<string, ReadableLogRecord[]>
+    Map<ReadableLogRecord['instrumentationScope'], ReadableLogRecord[]>
   > = new Map();
 
   for (const record of logRecords) {
-    const {
-      resource,
-      instrumentationScope: { name, version = '', schemaUrl = '' },
-    } = record;
+    const { resource, instrumentationScope } = record;
 
     let ismMap = resourceMap.get(resource);
     if (!ismMap) {
@@ -51,11 +49,10 @@ function createResourceMap(
       resourceMap.set(resource, ismMap);
     }
 
-    const ismKey = `${name}@${version}:${schemaUrl}`;
-    let records = ismMap.get(ismKey);
+    let records = ismMap.get(instrumentationScope);
     if (!records) {
       records = [];
-      ismMap.set(ismKey, records);
+      ismMap.set(instrumentationScope, records);
     }
     records.push(record);
   }
@@ -73,7 +70,10 @@ function logRecordsToResourceLogs(
       resource: processedResource,
       scopeLogs: Array.from(ismMap, ([, scopeLogs]) => {
         return {
-          scope: createInstrumentationScope(scopeLogs[0].instrumentationScope),
+          scope: createInstrumentationScope(
+            scopeLogs[0].instrumentationScope,
+            encoder
+          ),
           logRecords: scopeLogs.map(log => toLogRecord(log, encoder)),
           schemaUrl: scopeLogs[0].instrumentationScope.schemaUrl,
         };
@@ -91,7 +91,7 @@ function toLogRecord(log: ReadableLogRecord, encoder: Encoder): ILogRecord {
     severityText: log.severityText,
     body: toAnyValue(log.body, encoder),
     eventName: log.eventName,
-    attributes: toLogAttributes(log.attributes, encoder),
+    attributes: toAttributes(log.attributes, encoder),
     droppedAttributesCount: log.droppedAttributesCount,
     flags: log.spanContext?.traceFlags,
     traceId: encoder.encodeOptionalSpanContext(log.spanContext?.traceId),
@@ -103,13 +103,4 @@ function toSeverityNumber(
   severityNumber: SeverityNumber | undefined
 ): ESeverityNumber | undefined {
   return severityNumber as number | undefined as ESeverityNumber | undefined;
-}
-
-export function toLogAttributes(
-  attributes: LogAttributes,
-  encoder: Encoder
-): IKeyValue[] {
-  return Object.keys(attributes).map(key =>
-    toKeyValue(key, attributes[key], encoder)
-  );
 }
