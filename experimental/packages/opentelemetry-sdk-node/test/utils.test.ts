@@ -15,6 +15,8 @@ import {
   getResourceDetectorsFromConfiguration,
   getHeadersFromConfiguration,
   getMeterViewsFromConfiguration,
+  getSpanLimitsFromConfiguration,
+  getHttpAgentOptionsFromTls,
 } from '../src/utils';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -22,6 +24,7 @@ import { diag } from '@opentelemetry/api';
 import type {
   InstrumentTypeConfigModel,
   ConfigurationModel,
+  HttpTlsConfigModel,
 } from '@opentelemetry/configuration';
 import {
   envDetector,
@@ -32,6 +35,7 @@ import {
 } from '@opentelemetry/resources';
 import type { LoggerProviderConfig } from '@opentelemetry/sdk-logs';
 import { AggregationType, InstrumentType } from '@opentelemetry/sdk-metrics';
+import type { SpanLimits } from '@opentelemetry/sdk-trace-node';
 
 describe('getPropagatorFromEnv', function () {
   afterEach(() => {
@@ -473,6 +477,7 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
   });
 
   it('should return correct values for getAggregationType', function () {
+    assert.equal(getAggregationType({}), undefined);
     assert.deepStrictEqual(getAggregationType({ default: {} }), {
       type: AggregationType.DEFAULT,
     });
@@ -780,5 +785,127 @@ describe('getMeterViewsFromConfiguration', function () {
     assert.ok(result);
     assert.strictEqual(result.length, 1);
     assert.strictEqual(result[0].attributesProcessors, undefined);
+  });
+});
+
+describe('getSpanLimitsFromConfiguration', function () {
+  it('return undefined with no config for tracer limits', async () => {
+    assert.equal(
+      getSpanLimitsFromConfiguration({} as ConfigurationModel),
+      undefined
+    );
+  });
+
+  it('return span limits', async () => {
+    const config: ConfigurationModel = {
+      tracer_provider: {
+        processors: [],
+        limits: {
+          attribute_count_limit: 10,
+          event_count_limit: 20,
+          link_count_limit: 30,
+          attribute_value_length_limit: 40,
+          event_attribute_count_limit: 50,
+          link_attribute_count_limit: 60,
+        },
+      },
+    } as ConfigurationModel;
+    const expectedSpanLimits: SpanLimits = {
+      attributeCountLimit: 10,
+      eventCountLimit: 20,
+      linkCountLimit: 30,
+      attributeValueLengthLimit: 40,
+      attributePerEventCountLimit: 50,
+      attributePerLinkCountLimit: 60,
+    };
+
+    const spanLimits = getSpanLimitsFromConfiguration(config);
+    assert.deepEqual(spanLimits, expectedSpanLimits);
+  });
+});
+
+describe('getHttpAgentOptionsFromTls', function () {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it('should return undefined if no TLS config is provided', async () => {
+    assert.equal(getHttpAgentOptionsFromTls({}), undefined);
+  });
+
+  it('should return https agent options if TLS config is provided', async () => {
+    const tlsConfig: HttpTlsConfigModel = {
+      ca_file: 'test/fixtures/ca.pem',
+      key_file: 'test/fixtures/ca-key.pem',
+      cert_file: 'test/fixtures/cert.pem',
+    };
+    const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);
+    assert.ok(agentOptions);
+    assert.notEqual(agentOptions.ca, undefined);
+    assert.notEqual(agentOptions.key, undefined);
+    assert.notEqual(agentOptions.cert, undefined);
+  });
+
+  it('show warning messages for invalid ca file', async () => {
+    const warnStub = sinon.stub(diag, 'warn');
+    const tlsConfig: HttpTlsConfigModel = {
+      ca_file: 'invalid-ca.pem',
+      key_file: 'test/fixtures/ca-key.pem',
+      cert_file: 'test/fixtures/cert.pem',
+    };
+    const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);
+    assert.ok(agentOptions);
+    assert.equal(agentOptions.ca, undefined);
+    assert.notEqual(agentOptions.key, undefined);
+    assert.notEqual(agentOptions.cert, undefined);
+
+    assert.equal(
+      warnStub.args[0][0].startsWith(
+        'Failed to read TLS CA file at invalid-ca.pem: Error: ENOENT: no such file or directory, open '
+      ),
+      true
+    );
+  });
+
+  it('show warning messages for invalid ca-key file', async () => {
+    const warnStub = sinon.stub(diag, 'warn');
+    const tlsConfig: HttpTlsConfigModel = {
+      ca_file: 'test/fixtures/ca.pem',
+      key_file: 'invalid-ca-key.pem',
+      cert_file: 'test/fixtures/cert.pem',
+    };
+    const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);
+    assert.ok(agentOptions);
+    assert.notEqual(agentOptions.ca, undefined);
+    assert.equal(agentOptions.key, undefined);
+    assert.notEqual(agentOptions.cert, undefined);
+
+    assert.equal(
+      warnStub.args[0][0].startsWith(
+        'Failed to read TLS key file at invalid-ca-key.pem: Error: ENOENT: no such file or directory, open '
+      ),
+      true
+    );
+  });
+
+  it('show warning messages for invalid cert file', async () => {
+    const warnStub = sinon.stub(diag, 'warn');
+    const tlsConfig: HttpTlsConfigModel = {
+      ca_file: 'test/fixtures/ca.pem',
+      key_file: 'test/fixtures/ca-key.pem',
+      cert_file: 'invalid-cert.pem',
+    };
+    const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);
+    assert.ok(agentOptions);
+    assert.notEqual(agentOptions.ca, undefined);
+    assert.notEqual(agentOptions.key, undefined);
+    assert.equal(agentOptions.cert, undefined);
+
+    assert.equal(
+      warnStub.args[0][0].startsWith(
+        'Failed to read TLS cert file at invalid-cert.pem: Error: ENOENT: no such file or directory, open '
+      ),
+      true
+    );
   });
 });
