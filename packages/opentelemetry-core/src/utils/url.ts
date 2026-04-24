@@ -9,6 +9,7 @@ export function urlMatches(url: string, urlToMatch: string | RegExp): boolean {
     return !!url.match(urlToMatch);
   }
 }
+
 /**
  * Check if {@param url} should be ignored when comparing against {@param ignoredUrls}
  * @param url
