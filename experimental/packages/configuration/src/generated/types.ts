@@ -1458,7 +1458,7 @@ export interface LoggerProvider {
 export interface LogRecordProcessor {
   batch?: BatchLogRecordProcessor;
   simple?: SimpleLogRecordProcessor;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure a batch log record processor.
@@ -1504,7 +1504,7 @@ export interface LogRecordExporter {
   otlp_grpc?: OtlpGrpcExporter;
   'otlp_file/development'?: ExperimentalOtlpFileExporter;
   console?: ConsoleExporter;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 export interface NameStringValuePair {
   /**
@@ -1538,7 +1538,7 @@ export interface LogRecordExporter1 {
   otlp_grpc?: OtlpGrpcExporter;
   'otlp_file/development'?: ExperimentalOtlpFileExporter;
   console?: ConsoleExporter;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure log record limits. See also attribute_limits.
@@ -1827,11 +1827,11 @@ export interface PushMetricExporter {
   otlp_grpc?: OtlpGrpcMetricExporter;
   'otlp_file/development'?: ExperimentalOtlpFileMetricExporter;
   console?: ConsoleMetricExporter;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 export interface MetricProducer {
   opencensus?: OpenCensusMetricProducer;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure cardinality limits.
@@ -1913,7 +1913,7 @@ export interface PullMetricReader {
  */
 export interface PullMetricExporter {
   'prometheus/development'?: ExperimentalPrometheusMetricExporter;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure Prometheus Exporter to add resource attributes as metrics attributes, where the resource attribute keys match the patterns.
@@ -2218,7 +2218,7 @@ export interface TextMapPropagator {
   baggage?: BaggagePropagator;
   b3?: B3Propagator;
   b3multi?: B3MultiPropagator;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure tracer provider.
@@ -2241,7 +2241,7 @@ export interface TracerProvider {
 export interface SpanProcessor {
   batch?: BatchSpanProcessor;
   simple?: SimpleSpanProcessor;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure a batch span processor.
@@ -2287,7 +2287,7 @@ export interface SpanExporter {
   otlp_grpc?: OtlpGrpcExporter1;
   'otlp_file/development'?: ExperimentalOtlpFileExporter1;
   console?: ConsoleExporter1;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure a simple span processor.
@@ -2307,7 +2307,7 @@ export interface SpanExporter1 {
   otlp_grpc?: OtlpGrpcExporter1;
   'otlp_file/development'?: ExperimentalOtlpFileExporter1;
   console?: ConsoleExporter1;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure span limits. See also attribute_limits.
@@ -2371,7 +2371,7 @@ export interface Sampler {
   parent_based?: ParentBasedSampler;
   'probability/development'?: ExperimentalProbabilitySampler;
   trace_id_ratio_based?: TraceIdRatioBasedSampler;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure sampler to be composite.
@@ -2384,7 +2384,7 @@ export interface ExperimentalComposableSampler {
   parent_threshold?: ExperimentalComposableParentThresholdSampler;
   probability?: ExperimentalComposableProbabilitySampler;
   rule_based?: ExperimentalComposableRuleBasedSampler;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure sampler to be parent_threshold.
@@ -2405,7 +2405,7 @@ export interface ExperimentalComposableSampler1 {
   parent_threshold?: ExperimentalComposableParentThresholdSampler;
   probability?: ExperimentalComposableProbabilitySampler;
   rule_based?: ExperimentalComposableRuleBasedSampler;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * A rule for ExperimentalComposableRuleBasedSampler. A rule can have multiple match conditions - the sampler will be applied if all match.
@@ -2514,7 +2514,7 @@ export interface ExperimentalComposableSampler2 {
   parent_threshold?: ExperimentalComposableParentThresholdSampler;
   probability?: ExperimentalComposableProbabilitySampler;
   rule_based?: ExperimentalComposableRuleBasedSampler;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure the initial sampler used before first configuration is fetched.
@@ -2529,7 +2529,7 @@ export interface Sampler1 {
   parent_based?: ParentBasedSampler;
   'probability/development'?: ExperimentalProbabilitySampler;
   trace_id_ratio_based?: TraceIdRatioBasedSampler;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure root sampler.
@@ -2544,7 +2544,7 @@ export interface Sampler2 {
   parent_based?: ParentBasedSampler;
   'probability/development'?: ExperimentalProbabilitySampler;
   trace_id_ratio_based?: TraceIdRatioBasedSampler;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure remote_parent_sampled sampler.
@@ -2559,7 +2559,7 @@ export interface Sampler3 {
   parent_based?: ParentBasedSampler;
   'probability/development'?: ExperimentalProbabilitySampler;
   trace_id_ratio_based?: TraceIdRatioBasedSampler;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure remote_parent_not_sampled sampler.
@@ -2574,7 +2574,7 @@ export interface Sampler4 {
   parent_based?: ParentBasedSampler;
   'probability/development'?: ExperimentalProbabilitySampler;
   trace_id_ratio_based?: TraceIdRatioBasedSampler;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure local_parent_sampled sampler.
@@ -2589,7 +2589,7 @@ export interface Sampler5 {
   parent_based?: ParentBasedSampler;
   'probability/development'?: ExperimentalProbabilitySampler;
   trace_id_ratio_based?: TraceIdRatioBasedSampler;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure local_parent_not_sampled sampler.
@@ -2604,7 +2604,7 @@ export interface Sampler6 {
   parent_based?: ParentBasedSampler;
   'probability/development'?: ExperimentalProbabilitySampler;
   trace_id_ratio_based?: TraceIdRatioBasedSampler;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure tracers.
@@ -2770,7 +2770,7 @@ export interface ExperimentalResourceDetector {
   host?: ExperimentalHostResourceDetector;
   process?: ExperimentalProcessResourceDetector;
   service?: ExperimentalServiceResourceDetector;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure instrumentation.
@@ -3184,7 +3184,7 @@ export interface ExperimentalUrlSanitization {
  *
  */
 export interface ExperimentalLanguageSpecificInstrumentation {
-  [k: string]: unknown;
+  [k: string]: object;
 }
 /**
  * Configure .NET language-specific instrumentation libraries.
@@ -3193,7 +3193,7 @@ export interface ExperimentalLanguageSpecificInstrumentation {
  *
  */
 export interface ExperimentalLanguageSpecificInstrumentation1 {
-  [k: string]: unknown;
+  [k: string]: object;
 }
 /**
  * Configure Erlang language-specific instrumentation libraries.
@@ -3202,7 +3202,7 @@ export interface ExperimentalLanguageSpecificInstrumentation1 {
  *
  */
 export interface ExperimentalLanguageSpecificInstrumentation2 {
-  [k: string]: unknown;
+  [k: string]: object;
 }
 /**
  * Configure Go language-specific instrumentation libraries.
@@ -3211,7 +3211,7 @@ export interface ExperimentalLanguageSpecificInstrumentation2 {
  *
  */
 export interface ExperimentalLanguageSpecificInstrumentation3 {
-  [k: string]: unknown;
+  [k: string]: object;
 }
 /**
  * Configure Java language-specific instrumentation libraries.
@@ -3220,7 +3220,7 @@ export interface ExperimentalLanguageSpecificInstrumentation3 {
  *
  */
 export interface ExperimentalLanguageSpecificInstrumentation4 {
-  [k: string]: unknown;
+  [k: string]: object;
 }
 /**
  * Configure JavaScript language-specific instrumentation libraries.
@@ -3229,7 +3229,7 @@ export interface ExperimentalLanguageSpecificInstrumentation4 {
  *
  */
 export interface ExperimentalLanguageSpecificInstrumentation5 {
-  [k: string]: unknown;
+  [k: string]: object;
 }
 /**
  * Configure PHP language-specific instrumentation libraries.
@@ -3238,7 +3238,7 @@ export interface ExperimentalLanguageSpecificInstrumentation5 {
  *
  */
 export interface ExperimentalLanguageSpecificInstrumentation6 {
-  [k: string]: unknown;
+  [k: string]: object;
 }
 /**
  * Configure Python language-specific instrumentation libraries.
@@ -3247,7 +3247,7 @@ export interface ExperimentalLanguageSpecificInstrumentation6 {
  *
  */
 export interface ExperimentalLanguageSpecificInstrumentation7 {
-  [k: string]: unknown;
+  [k: string]: object;
 }
 /**
  * Configure Ruby language-specific instrumentation libraries.
@@ -3256,7 +3256,7 @@ export interface ExperimentalLanguageSpecificInstrumentation7 {
  *
  */
 export interface ExperimentalLanguageSpecificInstrumentation8 {
-  [k: string]: unknown;
+  [k: string]: object;
 }
 /**
  * Configure Rust language-specific instrumentation libraries.
@@ -3265,7 +3265,7 @@ export interface ExperimentalLanguageSpecificInstrumentation8 {
  *
  */
 export interface ExperimentalLanguageSpecificInstrumentation9 {
-  [k: string]: unknown;
+  [k: string]: object;
 }
 /**
  * Configure Swift language-specific instrumentation libraries.
@@ -3274,7 +3274,7 @@ export interface ExperimentalLanguageSpecificInstrumentation9 {
  *
  */
 export interface ExperimentalLanguageSpecificInstrumentation10 {
-  [k: string]: unknown;
+  [k: string]: object;
 }
 /**
  * Defines configuration parameters specific to a particular OpenTelemetry distribution or vendor.
@@ -3285,7 +3285,7 @@ export interface ExperimentalLanguageSpecificInstrumentation10 {
  *
  */
 export interface Distribution {
-  [k: string]: unknown;
+  [k: string]: object;
 }
 
 export const InstrumentType = {

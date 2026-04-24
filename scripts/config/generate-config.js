@@ -167,11 +167,32 @@ compile(schema, 'OpenTelemetryConfiguration', {
     ts = ts.replace(/\bGrpcTls1\b/g, 'GrpcTls');
     ts = ts.replace(/\bHttpTls1\b/g, 'HttpTls');
 
-    // Replace overly-narrow index signatures that conflict with typed properties.
-    // When additionalProperties is absent or true, json-schema-to-typescript emits
-    // [k: string]: {} | null which is too narrow to accommodate specific typed fields.
-    ts = ts.replace(/\[k: string\]: \{\} \| null;/g, '[k: string]: unknown;');
-    ts = ts.replace(/\[k: string\]: \{\};/g, '[k: string]: unknown;');
+    // Change the TypeScript representation for interfaces where
+    // "additionalProperties" is allowed.
+    //
+    // The configuration JSON schema uses:
+    //    "additionalProperties": {
+    //      "type": [ "object", "null" ],
+    // for types that have well-known property keys (e.g. 'batch' or 'simple'
+    // for `SpanProcessor`), but allow custom values.
+    //
+    // json-schema-to-typescript represents this with:
+    //    [k: string]: {} | null
+    //
+    // However, we want:
+    //    [k: string]: object | undefined
+    //
+    // - `object` instead of `{}`, because JSON schema "object" means a thing
+    //   with keys and values (https://json-schema.org/understanding-json-schema/reference/object)
+    //   and TypeScript "object" means non-Primitive values (https://stackoverflow.com/a/49465172)
+    //   which is closest. `{}` allows too much (e.g. 42 matches `{}`).
+    // - `undefined` rather than `null` because we want to express that the
+    //   property can be unspecified.
+    ts = ts.replace(/\[k: string\]: \{\} \| null;/g, '[k: string]: object | undefined;');
+    // Similarly for schema types with the following (e.g. `Distribution`):
+    //    "additionalProperties": {
+    //      "type": [ "object" ],
+    ts = ts.replace(/\[k: string\]: \{\};/g, '[k: string]: object;');
 
     // Strip `| null` from type unions. The JSON schema uses
     // "type": ["string", "null"] to express optional/nullable fields, which
