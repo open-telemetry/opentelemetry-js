@@ -35,13 +35,14 @@
 #
 # For schema documentation, including required properties, semantics, default behavior, etc,
 # see: https://github.com/open-telemetry/opentelemetry-configuration/blob/main/schema-docs.md
-file_format: "1.0-rc.3"
+file_format: "1.0"
 disabled: ${OTEL_SDK_DISABLED:-false}
 log_level: info
 resource:
   attributes:
     - name: service.name
       value: ${OTEL_SERVICE_NAME:-unknown_service}
+      type: string
   attributes_list: ${OTEL_RESOURCE_ATTRIBUTES}
 attribute_limits:
   attribute_value_length_limit: ${OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT}

@@ -1,11 +1,13 @@
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
+    "allowJs": true,
     "outDir": "build",
     "rootDir": "."
   },
   "include": [
     "src/**/*.ts",
+    "src/generated/*.js",
     "test/**/*.ts"
   ],
   "references": [
