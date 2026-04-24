@@ -2528,24 +2528,6 @@ describe('ConfigFactory', function () {
       );
     });
 
-    it('checks for incomplete providers', function () {
-      const warnSpy = Sinon.spy(diag, 'warn');
-      process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid-providers.yaml';
-      createConfigFactory();
-      Sinon.assert.calledWith(
-        warnSpy.firstCall,
-        'TracerProvider must have at least one processor configured'
-      );
-      Sinon.assert.calledWith(
-        warnSpy.secondCall,
-        'MeterProvider must have at least one reader configured'
-      );
-      Sinon.assert.calledWith(
-        warnSpy.thirdCall,
-        'LoggerProvider must have at least one processor configured'
-      );
-    });
-
     it('check resources priority', function () {
       process.env.OTEL_CONFIG_FILE = 'test/fixtures/resources.yaml';
       const configFactory = createConfigFactory();

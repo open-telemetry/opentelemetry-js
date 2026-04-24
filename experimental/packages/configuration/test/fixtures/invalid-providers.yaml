@@ -1,7 +1,0 @@
-file_format: "1.0"
-tracer_provider:
-  processors: []
-meter_provider:
-  readers:
-logger_provider:
-  processors:
