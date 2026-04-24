@@ -9,6 +9,7 @@
 import * as api from '@opentelemetry/api';
 import { getStringListFromEnv } from '@opentelemetry/core';
 import type { URLLike } from '@opentelemetry/sdk-trace-web';
+import { parseUrl } from '@opentelemetry/sdk-trace-web';
 
 const DIAG_LOGGER = api.diag.createComponentLogger({
   namespace:
@@ -124,6 +125,7 @@ const HTTP_PORT_FROM_PROTOCOL: { [key: string]: string } = {
   'https:': '443',
   'http:': '80',
 };
+
 export function serverPortFromUrl(url: URLLike): number | undefined {
   const serverPort = Number(url.port || HTTP_PORT_FROM_PROTOCOL[url.protocol]);
   // Guard with `if (serverPort)` because `Number('') === 0`.
@@ -132,4 +134,177 @@ export function serverPortFromUrl(url: URLLike): number | undefined {
   } else {
     return undefined;
   }
+}
+
+export interface PerformanceResourceTimingInfo {
+  corsPreFlightRequest?: PerformanceResourceTiming;
+  mainRequest?: PerformanceResourceTiming;
+}
+
+/** Returns the origin if present (if in browser context). */
+function getOrigin(): string | undefined {
+  return typeof location !== 'undefined' ? location.origin : undefined;
+}
+
+/**
+ * Get closest performance resource ignoring the resources that have been
+ * already used.
+ * @param spanUrl
+ * @param performanceStartTime
+ * @param performanceEndTime
+ * @param resources
+ * @param ignoredResources
+ * @param initiatorType
+ */
+export function getResource(
+  spanUrl: string,
+  performanceStartTime: number,
+  performanceEndTime: number,
+  resources: PerformanceResourceTiming[],
+  ignoredResources: WeakSet<PerformanceResourceTiming> = new WeakSet<PerformanceResourceTiming>(),
+  initiatorType?: string
+): PerformanceResourceTimingInfo {
+  // de-relativize the URL before usage (does no harm to absolute URLs)
+  const parsedSpanUrl = parseUrl(spanUrl);
+  spanUrl = parsedSpanUrl.toString();
+
+  const filteredResources = filterResourcesForSpan(
+    spanUrl,
+    performanceStartTime,
+    performanceEndTime,
+    resources,
+    ignoredResources,
+    initiatorType
+  );
+
+  if (filteredResources.length === 0) {
+    return {
+      mainRequest: undefined,
+    };
+  }
+  if (filteredResources.length === 1) {
+    return {
+      mainRequest: filteredResources[0],
+    };
+  }
+  const sorted = sortResources(filteredResources);
+
+  if (parsedSpanUrl.origin !== getOrigin() && sorted.length > 1) {
+    let corsPreFlightRequest: PerformanceResourceTiming | undefined = sorted[0];
+    let mainRequest: PerformanceResourceTiming = findMainRequest(
+      sorted,
+      corsPreFlightRequest.responseEnd,
+      performanceEndTime
+    );
+
+    const responseEnd = corsPreFlightRequest.responseEnd;
+    const fetchStart = mainRequest.fetchStart;
+
+    // no corsPreFlightRequest
+    if (fetchStart < responseEnd) {
+      mainRequest = corsPreFlightRequest;
+      corsPreFlightRequest = undefined;
+    }
+
+    return {
+      corsPreFlightRequest,
+      mainRequest,
+    };
+  } else {
+    return {
+      mainRequest: filteredResources[0],
+    };
+  }
+}
+
+/**
+ * Will find the main request skipping the cors pre flight requests
+ * @param resources
+ * @param corsPreFlightRequestEndTime
+ * @param performanceEndTime
+ */
+function findMainRequest(
+  resources: PerformanceResourceTiming[],
+  corsPreFlightRequestEndTime: number,
+  performanceEndTime: number
+): PerformanceResourceTiming {
+  let mainRequest: PerformanceResourceTiming = resources[1];
+  let bestGap;
+
+  const length = resources.length;
+  for (let i = 1; i < length; i++) {
+    const resource = resources[i];
+    const resourceStartTime = resource.fetchStart;
+    const resourceEndTime = resource.responseEnd;
+
+    const currentGap = performanceEndTime - resourceEndTime;
+
+    if (
+      resourceStartTime >= corsPreFlightRequestEndTime &&
+      (!bestGap || currentGap < bestGap)
+    ) {
+      bestGap = currentGap;
+      mainRequest = resource;
+    }
+  }
+  return mainRequest;
+}
+
+/**
+ * Filter all resources that has started and finished according to span start time and end time.
+ *     It will return the closest resource to a start time
+ * @param spanUrl
+ * @param performanceStartTime
+ * @param performanceEndTime
+ * @param resources
+ * @param ignoredResources
+ * @param initiatorType
+ */
+function filterResourcesForSpan(
+  spanUrl: string,
+  performanceStartTime: number,
+  performanceEndTime: number,
+  resources: PerformanceResourceTiming[],
+  ignoredResources: WeakSet<PerformanceResourceTiming>,
+  initiatorType?: string
+) {
+  let filteredResources = resources.filter(resource => {
+    const resourceStartTime = resource.fetchStart;
+    const resourceEndTime = resource.responseEnd;
+
+    return (
+      resource.initiatorType.toLowerCase() ===
+        (initiatorType || 'xmlhttprequest') &&
+      resource.name === spanUrl &&
+      resourceStartTime >= performanceStartTime &&
+      resourceEndTime <= performanceEndTime
+    );
+  });
+
+  if (filteredResources.length > 0) {
+    filteredResources = filteredResources.filter(resource => {
+      return !ignoredResources.has(resource);
+    });
+  }
+
+  return filteredResources;
+}
+
+/**
+ * sort resources by startTime
+ * @param filteredResources
+ */
+function sortResources(
+  filteredResources: PerformanceResourceTiming[]
+): PerformanceResourceTiming[] {
+  return filteredResources.slice().sort((a, b) => {
+    const valueA = a.fetchStart;
+    const valueB = b.fetchStart;
+    if (valueA > valueB) {
+      return 1;
+    } else if (valueA < valueB) {
+      return -1;
+    }
+    return 0;
+  });
 }
