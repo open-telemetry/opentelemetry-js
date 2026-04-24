@@ -344,7 +344,7 @@ describe('startNodeSDK', function () {
 
     const tracerProvider = trace.getTracerProvider() as BasicTracerProvider;
     const delegateInfo = (tracerProvider as any)['_delegate'];
-    assert.strictEqual(delegateInfo._config.spanProcessors.length, 5);
+    assert.strictEqual(delegateInfo._config.spanProcessors.length, 4);
 
     assert.ok(
       delegateInfo._config.spanProcessors[0] instanceof BatchSpanProcessor
@@ -367,22 +367,14 @@ describe('startNodeSDK', function () {
     );
     assert.ok(
       (delegateInfo._config.spanProcessors[2] as any)['_exporter'] instanceof
-        OTLPProtoTraceExporter
-    );
-
-    assert.ok(
-      delegateInfo._config.spanProcessors[3] instanceof BatchSpanProcessor
-    );
-    assert.ok(
-      (delegateInfo._config.spanProcessors[3] as any)['_exporter'] instanceof
         OTLPGrpcTraceExporter
     );
 
     assert.ok(
-      delegateInfo._config.spanProcessors[4] instanceof SimpleSpanProcessor
+      delegateInfo._config.spanProcessors[3] instanceof SimpleSpanProcessor
     );
     assert.ok(
-      (delegateInfo._config.spanProcessors[4] as any)['_exporter'] instanceof
+      (delegateInfo._config.spanProcessors[3] as any)['_exporter'] instanceof
         ConsoleSpanExporter
     );
 
