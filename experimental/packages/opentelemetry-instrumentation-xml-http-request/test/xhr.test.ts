@@ -445,7 +445,20 @@ describe('xhr', () => {
           );
         }
 
-        describe('AND the spans are exported', () => {
+        describe('AND instrumentation is disabled', () => {
+          beforeEach(function (done) {
+            clearData();
+            prepareData(url);
+            xmlHttpRequestInstrumentation!.disable();
+            successfulGetRequest(url, done);
+          });
+
+          it('should not export spans', () => {
+            assert.equal(exportSpy.args.length, 0, 'no spans are exported');
+          });
+        });
+
+        describe('when making http requests', () => {
           beforeEach(function (done) {
             const propagateTraceHeaderCorsUrls = [window.location.origin];
             clearData();
@@ -642,7 +655,7 @@ describe('xhr', () => {
           });
         });
 
-        describe('When making https requests', () => {
+        describe('when making https requests', () => {
           beforeEach(done => {
             clearData();
             // this won't generate a preflight span
@@ -881,7 +894,7 @@ describe('xhr', () => {
           });
         });
 
-        describe('and applyCustomAttributesOnSpan hook is configured', () => {
+        describe('AND applyCustomAttributesOnSpan hook is configured', () => {
           beforeEach(done => {
             clearData();
             const propagateTraceHeaderCorsUrls = [url];
@@ -1690,7 +1703,20 @@ describe('xhr', () => {
           );
         }
 
-        describe('When making http requests', () => {
+        describe('AND instrumentation is disabled', () => {
+          beforeEach(function (done) {
+            clearData();
+            prepareData(url);
+            xmlHttpRequestInstrumentation!.disable();
+            successfulPostRequest(url, done);
+          });
+
+          it('should not export spans', () => {
+            assert.equal(exportSpy.args.length, 0, 'no spans are exported');
+          });
+        });
+
+        describe('when making http requests', () => {
           beforeEach(done => {
             clearData();
             const propagateTraceHeaderCorsUrls = [window.location.origin];
