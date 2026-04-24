@@ -11,6 +11,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :rocket: Features
 
 * feat(sdk-node): wire attribute_keys from declarative configuration to ViewOptions.attributesProcessors [#6427](https://github.com/open-telemetry/opentelemetry-js/issues/6427) @ravitheja4531-cell
+* feat(sdk-node): set TracerProvider in startNodeSDK() [#6607](https://github.com/open-telemetry/opentelemetry-js/pull/6607) @maryliag
 
 ### :bug: Bug Fixes
 
@@ -61,7 +62,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(configuration): add sampler configuration parsing support [#6409](https://github.com/open-telemetry/opentelemetry-js/pull/6409) @MikeGoldsmith
 * feat(configuration): add resource detection parsing [#6435](https://github.com/open-telemetry/opentelemetry-js/pull/6435) @MikeGoldsmith
 * feat(configuration): export interfaces required in other packages [#6462](https://github.com/open-telemetry/opentelemetry-js/pull/6462) @maryliag
-* feat(configuration): set MeterProvider on sdk start [#6463](https://github.com/open-telemetry/opentelemetry-js/pull/6463) @maryliag
+* feat(sdk-node): set MeterProvider in startNodeSDK() [#6463](https://github.com/open-telemetry/opentelemetry-js/pull/6463) @maryliag
 * feat(configuration): export interfaces required in other packages [#6507](https://github.com/open-telemetry/opentelemetry-js/pull/6507) @maryliag
 * feat(configuration): refactoring config loader to print warning message [#6524](https://github.com/open-telemetry/opentelemetry-js/pull/6524) @maxday
 * feat(configuration): export `SamplerConfigModel` type for use with `buildSamplerFromConfig` [#6536](https://github.com/open-telemetry/opentelemetry-js/pull/6536) @ravitheja4531-cell
