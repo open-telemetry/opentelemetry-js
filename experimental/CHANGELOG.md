@@ -12,6 +12,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * feat(sdk-node): wire attribute_keys from declarative configuration to ViewOptions.attributesProcessors [#6427](https://github.com/open-telemetry/opentelemetry-js/issues/6427) @ravitheja4531-cell
 * feat(otlp-transformer): replace protobufjs trace serialization with custom implementation [#6625](https://github.com/open-telemetry/opentelemetry-js/pull/6625) @pichlermarc
+* feat(otlp-transformer): replace protobufjs metrics serialization with custom implementation [#6625](https://github.com/open-telemetry/opentelemetry-js/pull/6629) @pichlermarc
 
 ### :bug: Bug Fixes
 
