@@ -19,7 +19,7 @@ import {
   encodeAsString,
 } from '../src/common/utils';
 import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
-import * as root from '../src/generated/root';
+import * as signals from '../test/generated/signals';
 import { ProtobufMetricsSerializer } from '../src/metrics/protobuf';
 import { JsonMetricsSerializer } from '../src/metrics/json';
 
@@ -832,12 +832,12 @@ describe('Metrics', () => {
       );
       assert.ok(serialized, 'serialized response is undefined');
       const decoded =
-        root.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.decode(
+        signals.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.decode(
           serialized
         );
 
       const decodedObj =
-        root.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.toObject(
+        signals.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.toObject(
           decoded,
           {
             longs: Number,
@@ -882,7 +882,7 @@ describe('Metrics', () => {
 
     it('deserializes a response', () => {
       const protobufSerializedResponse =
-        root.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceResponse.encode(
+        signals.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceResponse.encode(
           {
             partialSuccess: {
               errorMessage: 'foo',
@@ -910,6 +910,132 @@ describe('Metrics', () => {
     it('does not throw when deserializing an empty response', () => {
       assert.doesNotThrow(() =>
         ProtobufMetricsSerializer.deserializeResponse(new Uint8Array([]))
+      );
+    });
+
+    it('serializes a gauge metric', () => {
+      const serialized = ProtobufMetricsSerializer.serializeRequest(
+        createResourceMetrics([createObservableGaugeData(10.5)])
+      );
+      assert.ok(serialized, 'serialized response is undefined');
+      const decoded =
+        signals.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.decode(
+          serialized
+        );
+      const decodedObj =
+        signals.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.toObject(
+          decoded,
+          { longs: Number }
+        );
+
+      assert.strictEqual(decodedObj.resourceMetrics.length, 1);
+      const metric = decodedObj.resourceMetrics[0].scopeMetrics[0].metrics[0];
+      assert.strictEqual(metric.name, 'gauge');
+      assert.ok(metric.gauge);
+      assert.strictEqual(metric.gauge.dataPoints[0].asDouble, 10.5);
+    });
+
+    it('serializes a histogram metric', () => {
+      const serialized = ProtobufMetricsSerializer.serializeRequest(
+        createResourceMetrics([
+          createHistogramMetrics(
+            2,
+            9,
+            [5],
+            [1, 1],
+            AggregationTemporality.CUMULATIVE,
+            1,
+            8
+          ),
+        ])
+      );
+      assert.ok(serialized, 'serialized response is undefined');
+      const decoded =
+        signals.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.decode(
+          serialized
+        );
+      const decodedObj =
+        signals.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.toObject(
+          decoded,
+          { longs: Number }
+        );
+
+      const metric = decodedObj.resourceMetrics[0].scopeMetrics[0].metrics[0];
+      assert.strictEqual(metric.name, 'hist');
+      assert.ok(metric.histogram);
+      assert.strictEqual(
+        metric.histogram.aggregationTemporality,
+        EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE
+      );
+      const dp = metric.histogram.dataPoints[0];
+      assert.strictEqual(dp.count, 2);
+      assert.strictEqual(dp.sum, 9);
+      assert.deepStrictEqual(dp.bucketCounts, [1, 1]);
+      assert.deepStrictEqual(dp.explicitBounds, [5]);
+      assert.strictEqual(dp.min, 1);
+      assert.strictEqual(dp.max, 8);
+    });
+
+    it('serializes an exponential histogram metric', () => {
+      const serialized = ProtobufMetricsSerializer.serializeRequest(
+        createResourceMetrics([
+          createExponentialHistogramMetrics(
+            3,
+            10,
+            1,
+            0,
+            { offset: 0, bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0] },
+            { offset: 0, bucketCounts: [0] },
+            AggregationTemporality.CUMULATIVE,
+            1,
+            8
+          ),
+        ])
+      );
+      assert.ok(serialized, 'serialized response is undefined');
+      const decoded =
+        signals.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.decode(
+          serialized
+        );
+      const decodedObj =
+        signals.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.toObject(
+          decoded,
+          { longs: Number }
+        );
+
+      const metric = decodedObj.resourceMetrics[0].scopeMetrics[0].metrics[0];
+      assert.strictEqual(metric.name, 'xhist');
+      assert.ok(metric.exponentialHistogram);
+      assert.strictEqual(
+        metric.exponentialHistogram.aggregationTemporality,
+        EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE
+      );
+      const dp = metric.exponentialHistogram.dataPoints[0];
+      assert.strictEqual(dp.count, 3);
+      assert.strictEqual(dp.sum, 10);
+      assert.strictEqual(dp.scale, 1);
+      assert.strictEqual(dp.zeroCount, 0);
+      assert.deepStrictEqual(dp.positive.bucketCounts, [1, 0, 0, 0, 1, 0, 1, 0]);
+      assert.deepStrictEqual(dp.negative.bucketCounts, [0]);
+      assert.strictEqual(dp.min, 1);
+      assert.strictEqual(dp.max, 8);
+    });
+
+    it('does not throw when encountering unexpected wiretypes during deserialization', function () {
+      // Construct a response with unexpected wire types for known fields.
+      const { ProtobufWriter } = require('../src/common/protobuf/protobuf-writer');
+      const writer = new ProtobufWriter(64);
+
+      // field 1 (partial_success) with wire type 0 (varint) instead of 2 (length-delimited)
+      writer.writeTag(1, 0);
+      writer.writeVarint(42);
+
+      // unknown field 99 with wire type 5 (32-bit)
+      writer.writeTag(99, 5);
+      writer.writeFixed32(0);
+
+      assert.doesNotThrow(() =>
+        ProtobufMetricsSerializer.deserializeResponse(writer.finish())
       );
     });
   });
