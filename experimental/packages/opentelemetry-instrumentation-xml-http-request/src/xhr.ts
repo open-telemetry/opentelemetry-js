@@ -638,20 +638,32 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     if (this._isEnabled) {
       return;
     }
-    this._isEnabled = true;
-
     if (this._isXhrPatched) {
       this._diag.debug(
         'reactivating existing patch on',
         this.moduleName,
         this.version
       );
+      this._isEnabled = true;
       return;
     }
-    this._diag.debug('applying patch to', this.moduleName, this.version);
-    this._isXhrPatched = true;
-    this._wrap(XMLHttpRequest.prototype, 'open', this._patchOpen());
-    this._wrap(XMLHttpRequest.prototype, 'send', this._patchSend());
+
+    try {
+      this._diag.debug('applying patch to', this.moduleName, this.version);
+      this._wrap(XMLHttpRequest.prototype, 'open', this._patchOpen());
+      this._wrap(XMLHttpRequest.prototype, 'send', this._patchSend());
+      this._isXhrPatched = true;
+      this._isEnabled = true;
+    } catch (err) {
+      // make sure there is no wrapped functions
+      this._unwrap(XMLHttpRequest.prototype, 'open');
+      this._unwrap(XMLHttpRequest.prototype, 'send');
+      this._diag.warn(
+        'Failed to patch globalThis.XMLHttpRequest; instrumentation will not be enabled. ' +
+          'Another script may have locked globalThis.XMLHttpRequest via Object.defineProperty.',
+        err
+      );
+    }
   }
 
   /**

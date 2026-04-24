@@ -253,18 +253,58 @@ describe('xhr', () => {
   });
 
   describe('enable', () => {
-    it('should patch to wrap XML HTTP Requests when enabled', () => {
-      const xhttp = new XMLHttpRequest();
-      assert.ok(!isWrapped(xhttp.send), 'should not be wrapped');
-      // NOTE: constructor already calls `enable()`
-      // @ts-expect-error -- constructor already enables, no need to use the var
-      const xhrInstrumentation = new XMLHttpRequestInstrumentation();
-      const xhttp2 = new XMLHttpRequest();
-      assert.ok(isWrapped(xhttp2.send), 'should be wrapped');
-      // @ts-expect-error -- property added by instrumentation.wrap(...)
-      XMLHttpRequest.prototype.send.__unwrap();
-      // @ts-expect-error -- property added by instrumentation.wrap(...)
-      XMLHttpRequest.prototype.open.__unwrap();
+    let xhrInstrumentation: XMLHttpRequestInstrumentation;
+
+    describe('when XMLHttpRequest prototype methods can not be wrapped', () => {
+      // Simulate the production failure mode (third-party scripts locking
+      // `XMLHttpRequest.prototype.open` and `XMLHttpRequest.prototype.send`
+      // via `Object.defineProperty` with `writable: false,
+      // configurable: false`).
+      const wrapError = new TypeError(
+        "Cannot assign to read only property 'open' of object '[object XMLHttpRequest]'"
+      );
+
+      beforeEach(() => {
+        // Construct with `enabled: false` so the stub is in place before
+        // `enable()` runs — `_wrap` is an instance-level field inherited
+        // from `InstrumentationBase`, not a prototype method.
+        xhrInstrumentation = new XMLHttpRequestInstrumentation({
+          enabled: false,
+        });
+        // @ts-expect-error access internal property for testing
+        sinon.stub(xhrInstrumentation, '_wrap').throws(wrapError);
+      });
+
+      it('should not throw when _wrap fails', () => {
+        assert.doesNotThrow(() => xhrInstrumentation!.enable());
+      });
+
+      it('should leave open/send unwrapped when _wrap fails', () => {
+        xhrInstrumentation!.enable();
+        assert.ok(!isWrapped(globalThis.XMLHttpRequest.prototype.open));
+        assert.ok(!isWrapped(globalThis.XMLHttpRequest.prototype.send));
+      });
+
+      it('should allow enable() to be retried after _wrap fails', () => {
+        xhrInstrumentation!.enable();
+        assert.doesNotThrow(() => xhrInstrumentation!.enable());
+      });
+    });
+
+    describe('when XMLHttpRequest prototype methods can be wrapped', () => {
+      it('should patch to wrap XML HTTP Requests when enabled', () => {
+        const xhttp = new XMLHttpRequest();
+        assert.ok(!isWrapped(xhttp.send), 'should not be wrapped');
+        // NOTE: constructor already calls `enable()`
+        xhrInstrumentation = new XMLHttpRequestInstrumentation();
+        const xhttp2 = new XMLHttpRequest();
+        assert.ok(isWrapped(xhttp2.open), 'open method should be wrapped');
+        assert.ok(isWrapped(xhttp2.send), 'send method should be wrapped');
+        // @ts-expect-error -- property added by instrumentation.wrap(...)
+        XMLHttpRequest.prototype.send.__unwrap();
+        // @ts-expect-error -- property added by instrumentation.wrap(...)
+        XMLHttpRequest.prototype.open.__unwrap();
+      });
     });
   });
 
