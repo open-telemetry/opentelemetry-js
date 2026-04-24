@@ -23,6 +23,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+* test(otlp-transformer): add metrics transform benchmark [#6628](https://github.com/open-telemetry/opentelemetry-js/pull/6628) @pichlermarc
+
 ## 0.215.0
 
 ### :boom: Breaking Changes
