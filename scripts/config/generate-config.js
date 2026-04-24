@@ -55,11 +55,6 @@ const TYPES_PATH = path.join(
   '../../experimental/packages/configuration/src/generated/types.ts'
 );
 
-const SCHEMA_OUT_PATH = path.join(
-  SCRIPT_DIR,
-  '../../experimental/packages/configuration/src/generated/schema.ts'
-);
-
 const VALIDATOR_JS_PATH = path.join(
   SCRIPT_DIR,
   '../../experimental/packages/configuration/src/generated/validator.js'
@@ -191,22 +186,6 @@ compile(schema, 'OpenTelemetryConfiguration', {
     fs.mkdirSync(path.dirname(TYPES_PATH), { recursive: true });
     fs.writeFileSync(TYPES_PATH, ts);
     console.log(`Written ${ts.split('\n').length} lines to ${TYPES_PATH}`);
-
-    // Emit the raw JSON schema as a TS module so it can be imported for
-    // runtime validation (ajv) without needing resolveJsonModule in tsconfig.
-    const schemaTs = [
-      licenseHeader,
-      '/* eslint-disable */',
-      '// AUTO-GENERATED — do not edit',
-      '// Generated from opentelemetry-configuration JSON schema',
-      '// Run `npm run generate:config` from the configuration package to regenerate',
-      '',
-      '// eslint-disable-next-line @typescript-eslint/no-explicit-any',
-      `export const opentelemetryConfigurationSchema: any = ${JSON.stringify(runtimeSchema, null, 2)};`,
-      '',
-    ].join('\n');
-    fs.writeFileSync(SCHEMA_OUT_PATH, schemaTs);
-    console.log(`Written schema to ${SCHEMA_OUT_PATH}`);
 
     // Generate a pre-compiled (ahead-of-time) validator using ajv standalone mode.
     // This eliminates the synchronous ajv.compile() call on every cold start by moving
