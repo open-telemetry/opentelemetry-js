@@ -26,17 +26,21 @@ describe('compressAndSend', function () {
 });
 
 describe('sendWithHttp', function () {
+  let sentUserAgent: string;
+  let sentHostname: string;
+
   const requestFn: typeof http.request = (
     opts: any,
     cb: any
   ): http.ClientRequest => {
     sentUserAgent = opts.headers['User-Agent'];
+    sentHostname = opts.hostname;
     return http.request(opts, cb).destroy();
   };
-  let sentUserAgent: string;
 
   beforeEach(function () {
     sentUserAgent = '';
+    sentHostname = '';
   });
 
   it('sends a request setting the default user-agent header', async function () {
@@ -71,5 +75,61 @@ describe('sendWithHttp', function () {
       sentUserAgent,
       `Transport-User-Agent/1.2.3 OTel-OTLP-Exporter-JavaScript/${VERSION}`
     );
+  });
+
+  it('removes brackets from IPv6 hostname', async function () {
+    await sendWithHttp(
+      requestFn,
+      'http://[::1]:4318/v1/traces',
+      {},
+      'none',
+      undefined,
+      new http.Agent(),
+      Buffer.from([1, 2, 3]),
+      100
+    );
+    assert.strictEqual(sentHostname, '::1');
+  });
+
+  it('handles IPv6 loopback address', async function () {
+    await sendWithHttp(
+      requestFn,
+      'http://[fe80::1]:4318/v1/traces',
+      {},
+      'none',
+      undefined,
+      new http.Agent(),
+      Buffer.from([1, 2, 3]),
+      100
+    );
+    assert.strictEqual(sentHostname, 'fe80::1');
+  });
+
+  it('preserves IPv4 hostname unchanged', async function () {
+    await sendWithHttp(
+      requestFn,
+      'http://192.168.1.1:4318/v1/traces',
+      {},
+      'none',
+      undefined,
+      new http.Agent(),
+      Buffer.from([1, 2, 3]),
+      100
+    );
+    assert.strictEqual(sentHostname, '192.168.1.1');
+  });
+
+  it('preserves regular hostname unchanged', async function () {
+    await sendWithHttp(
+      requestFn,
+      'http://example.com:4318/v1/traces',
+      {},
+      'none',
+      undefined,
+      new http.Agent(),
+      Buffer.from([1, 2, 3]),
+      100
+    );
+    assert.strictEqual(sentHostname, 'example.com');
   });
 });
