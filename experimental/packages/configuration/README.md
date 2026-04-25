@@ -102,16 +102,6 @@ When no config file is set, the factory reads from the standard OpenTelemetry SD
 4. Update `supportedFileVersionPattern` in `src/FileConfigFactory.ts` if the new version falls outside the current regex
 5. Update `EnvironmentConfigFactory.ts` and `utils.ts` if new fields need env var mapping
 
-The generation script (`scripts/config/generate-config.js`) handles several post-processing steps:
-
-- Renames the root type from `OpenTelemetryConfiguration` to `ConfigurationModel`
-- Makes `file_format` optional (required at parse time but not needed when constructing the model in code)
-- Strips `minItems` constraints from the runtime schema (so `processors: null` in YAML is accepted)
-- Replaces narrow index signatures (`[k: string]: {} | null`) with `[k: string]: unknown`
-- Appends named `const` enum objects for inlined enum types (e.g. `ExemplarFilter`, `SeverityNumber`)
-- Deduplicates structurally-identical TLS types (`GrpcTls1`/`HttpTls1` → `GrpcTls`/`HttpTls`)
-- Produces a pre-compiled ajv validator (`validator.js` + `validator.d.ts`) for use at runtime
-
 ### Defaults
 
 Both config paths apply the same spec-defined defaults so consumers see consistent behaviour regardless of config source:

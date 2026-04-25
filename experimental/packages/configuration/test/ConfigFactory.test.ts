@@ -6,15 +6,6 @@
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
 import type { ConfigurationModel } from '../src';
-import {
-  ExemplarFilter,
-  ExporterDefaultHistogramAggregation,
-  ExporterTemporalityPreference,
-  ExperimentalPrometheusTranslationStrategy,
-  InstrumentType,
-  OtlpHttpEncoding,
-  SeverityNumber,
-} from '../src/generated/types';
 import { diag } from '@opentelemetry/api';
 import { createConfigFactory } from '../src/ConfigFactory';
 import {
@@ -91,7 +82,7 @@ const configFromFile = {
               tls,
               timeout: 10000,
               compression: 'gzip',
-              encoding: OtlpHttpEncoding.Protobuf,
+              encoding: 'protobuf',
             },
           },
         },
@@ -126,17 +117,17 @@ const configFromFile = {
               tls,
               compression: 'gzip',
               timeout: 10000,
-              temporality_preference: ExporterTemporalityPreference.Cumulative,
+              temporality_preference: 'cumulative',
               default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
-              encoding: OtlpHttpEncoding.Protobuf,
+                'explicit_bucket_histogram',
+              encoding: 'protobuf',
             },
           },
           cardinality_limits: { default: 2000 },
         },
       },
     ],
-    exemplar_filter: ExemplarFilter.TraceBased,
+    exemplar_filter: 'trace_based',
   },
   logger_provider: {
     processors: [
@@ -152,7 +143,7 @@ const configFromFile = {
               tls,
               timeout: 10000,
               compression: 'gzip',
-              encoding: OtlpHttpEncoding.Protobuf,
+              encoding: 'protobuf',
             },
           },
         },
@@ -261,7 +252,7 @@ const configFromKitchenSinkFile = {
               headers_list: 'api-key=1234',
               compression: 'gzip',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.Protobuf,
+              encoding: 'protobuf',
             },
           },
         },
@@ -371,7 +362,7 @@ const configFromKitchenSinkFile = {
         pull: {
           exporter: {
             'prometheus/development': ksPromExporter(
-              ExperimentalPrometheusTranslationStrategy.UnderscoreEscapingWithSuffixes
+              'underscore_escaping_with_suffixes'
             ),
           },
           producers: [{ opencensus: {} }],
@@ -382,7 +373,7 @@ const configFromKitchenSinkFile = {
         pull: {
           exporter: {
             'prometheus/development': ksPromExporter(
-              ExperimentalPrometheusTranslationStrategy.UnderscoreEscapingWithoutSuffixes
+              'underscore_escaping_without_suffixes/development'
             ),
           },
           producers: [{ opencensus: {} }],
@@ -393,7 +384,7 @@ const configFromKitchenSinkFile = {
         pull: {
           exporter: {
             'prometheus/development': ksPromExporter(
-              ExperimentalPrometheusTranslationStrategy.NoUtf8EscapingWithSuffixes
+              'no_utf8_escaping_with_suffixes/development'
             ),
           },
           producers: [{ opencensus: {} }],
@@ -404,7 +395,7 @@ const configFromKitchenSinkFile = {
         pull: {
           exporter: {
             'prometheus/development': ksPromExporter(
-              ExperimentalPrometheusTranslationStrategy.NoTranslation
+              'no_translation/development'
             ),
           },
           producers: [{ opencensus: {} }],
@@ -427,10 +418,10 @@ const configFromKitchenSinkFile = {
               headers_list: 'api-key=1234',
               compression: 'gzip',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.Protobuf,
-              temporality_preference: ExporterTemporalityPreference.Delta,
+              encoding: 'protobuf',
+              temporality_preference: 'delta',
               default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+                'base2_exponential_bucket_histogram',
             },
           },
           producers: [{ opencensus: {} }],
@@ -454,9 +445,9 @@ const configFromKitchenSinkFile = {
               headers_list: 'api-key=1234',
               compression: 'gzip',
               timeout: 10000,
-              temporality_preference: ExporterTemporalityPreference.Delta,
+              temporality_preference: 'delta',
               default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+                'base2_exponential_bucket_histogram',
             },
           },
           cardinality_limits: { default: 2000 },
@@ -469,9 +460,9 @@ const configFromKitchenSinkFile = {
           exporter: {
             'otlp_file/development': {
               output_stream: 'file:///var/log/metrics.jsonl',
-              temporality_preference: ExporterTemporalityPreference.Delta,
+              temporality_preference: 'delta',
               default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+                'base2_exponential_bucket_histogram',
             },
           },
           cardinality_limits: { default: 2000 },
@@ -484,9 +475,9 @@ const configFromKitchenSinkFile = {
           exporter: {
             'otlp_file/development': {
               output_stream: 'stdout',
-              temporality_preference: ExporterTemporalityPreference.Delta,
+              temporality_preference: 'delta',
               default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+                'base2_exponential_bucket_histogram',
             },
           },
           cardinality_limits: { default: 2000 },
@@ -498,21 +489,21 @@ const configFromKitchenSinkFile = {
           timeout: 30000,
           exporter: {
             console: {
-              temporality_preference: ExporterTemporalityPreference.Delta,
+              temporality_preference: 'delta',
               default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+                'base2_exponential_bucket_histogram',
             },
           },
           cardinality_limits: { default: 2000 },
         },
       },
     ],
-    exemplar_filter: ExemplarFilter.TraceBased,
+    exemplar_filter: 'trace_based',
     views: [
       {
         selector: {
           instrument_name: 'my-instrument',
-          instrument_type: InstrumentType.Histogram,
+          instrument_type: 'histogram',
           unit: 'ms',
           meter_name: 'my-meter',
           meter_version: '1.0.0',
@@ -556,7 +547,7 @@ const configFromKitchenSinkFile = {
               headers_list: 'api-key=1234',
               compression: 'gzip',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.Protobuf,
+              encoding: 'protobuf',
             },
           },
         },
@@ -621,7 +612,7 @@ const configFromKitchenSinkFile = {
           name: 'io.opentelemetry.contrib.*',
           config: {
             enabled: false,
-            minimum_severity: SeverityNumber.Info,
+            minimum_severity: 'info',
             trace_based: true,
           },
         },
@@ -634,7 +625,7 @@ const nullTls = {};
 
 const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
   disabled: false,
-  log_level: SeverityNumber.Info,
+  log_level: 'info',
   resource: {
     attributes: [
       {
@@ -665,7 +656,7 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
               timeout: 10000,
               compression: 'gzip',
               tls: nullTls,
-              encoding: OtlpHttpEncoding.Protobuf,
+              encoding: 'protobuf',
             },
           },
         },
@@ -699,18 +690,18 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
               endpoint: 'http://localhost:4318/v1/metrics',
               compression: 'gzip',
               timeout: 10000,
-              temporality_preference: ExporterTemporalityPreference.Cumulative,
+              temporality_preference: 'cumulative',
               default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                'explicit_bucket_histogram',
               tls: nullTls,
-              encoding: OtlpHttpEncoding.Protobuf,
+              encoding: 'protobuf',
             },
           },
           cardinality_limits: { default: 2000 },
         },
       },
     ],
-    exemplar_filter: ExemplarFilter.TraceBased,
+    exemplar_filter: 'trace_based',
   },
   logger_provider: {
     processors: [
@@ -726,7 +717,7 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
               timeout: 10000,
               compression: 'gzip',
               tls: nullTls,
-              encoding: OtlpHttpEncoding.Protobuf,
+              encoding: 'protobuf',
             },
           },
         },
@@ -1023,7 +1014,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/traces',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -1060,7 +1051,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/traces',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -1098,7 +1089,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/traces',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -1135,7 +1126,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/traces',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -1172,7 +1163,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/traces',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -1210,7 +1201,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/traces',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -1288,7 +1279,7 @@ describe('ConfigFactory', function () {
                     compression: 'gzip',
                     timeout: 2000,
                     headers_list: 'host=localhost',
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -1328,7 +1319,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/traces',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Json,
+                    encoding: 'json',
                   },
                 },
               },
@@ -1378,7 +1369,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/traces',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -1483,16 +1474,16 @@ describe('ConfigFactory', function () {
                     compression: 'gzip',
                     timeout: 300,
                     headers_list: 'host=localhost',
-                    temporality_preference: ExporterTemporalityPreference.Delta,
+                    temporality_preference: 'delta',
                     default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                      'base2_exponential_bucket_histogram',
+                    encoding: 'protobuf',
                   },
                 },
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.AlwaysOn,
+          exemplar_filter: 'always_on',
           views: [],
         },
       };
@@ -1517,7 +1508,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           views: [],
         },
       };
@@ -1545,7 +1536,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           views: [],
         },
       };
@@ -1575,7 +1566,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           views: [],
         },
       };
@@ -1602,12 +1593,12 @@ describe('ConfigFactory', function () {
                 exporter: {
                   otlp_http: {
                     default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                      'explicit_bucket_histogram',
                     temporality_preference:
-                      ExporterTemporalityPreference.Cumulative,
+                      'cumulative',
                     endpoint: 'http://localhost:4318/v1/metrics',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -1622,7 +1613,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           views: [],
         },
       };
@@ -1650,9 +1641,9 @@ describe('ConfigFactory', function () {
                 exporter: {
                   otlp_grpc: {
                     default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                      'explicit_bucket_histogram',
                     temporality_preference:
-                      ExporterTemporalityPreference.Cumulative,
+                      'cumulative',
                     endpoint: 'http://localhost:4317',
                     timeout: 10000,
                     tls: {
@@ -1667,7 +1658,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           views: [],
         },
       };
@@ -1692,8 +1683,8 @@ describe('ConfigFactory', function () {
                 exporter: {
                   otlp_grpc: {
                     default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
-                    temporality_preference: ExporterTemporalityPreference.Delta,
+                      'base2_exponential_bucket_histogram',
+                    temporality_preference: 'delta',
                     endpoint: 'http://localhost:4317',
                     timeout: 10000,
                   },
@@ -1701,7 +1692,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           views: [],
         },
       };
@@ -1725,9 +1716,9 @@ describe('ConfigFactory', function () {
                 exporter: {
                   otlp_grpc: {
                     default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                      'explicit_bucket_histogram',
                     temporality_preference:
-                      ExporterTemporalityPreference.LowMemory,
+                      'low_memory',
                     endpoint: 'http://localhost:4317',
                     timeout: 10000,
                   },
@@ -1735,7 +1726,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           views: [],
         },
       };
@@ -1760,9 +1751,9 @@ describe('ConfigFactory', function () {
                 exporter: {
                   otlp_grpc: {
                     default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                      'explicit_bucket_histogram',
                     temporality_preference:
-                      ExporterTemporalityPreference.Cumulative,
+                      'cumulative',
                     endpoint: 'http://localhost:4317',
                     timeout: 10000,
                   },
@@ -1770,7 +1761,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           views: [],
         },
       };
@@ -1792,18 +1783,18 @@ describe('ConfigFactory', function () {
                 exporter: {
                   otlp_http: {
                     default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                      'explicit_bucket_histogram',
                     temporality_preference:
-                      ExporterTemporalityPreference.Cumulative,
+                      'cumulative',
                     endpoint: 'http://localhost:4318/v1/metrics',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Json,
+                    encoding: 'json',
                   },
                 },
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           views: [],
         },
       };
@@ -1853,7 +1844,7 @@ describe('ConfigFactory', function () {
                     compression: 'gzip',
                     timeout: 700,
                     headers_list: 'host=localhost',
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -1915,7 +1906,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/logs',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -2002,7 +1993,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/logs',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Json,
+                    encoding: 'json',
                   },
                 },
               },
@@ -2044,7 +2035,7 @@ describe('ConfigFactory', function () {
                     endpoint: 'http://backup.com:4318/v1/traces',
                     timeout: 12000,
                     compression: 'backup_compression',
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                     tls: {
                       ca_file: 'backup_certificate_file.pem',
                       key_file: 'backup_client_key.pem',
@@ -2058,7 +2049,7 @@ describe('ConfigFactory', function () {
           ],
         },
         meter_provider: {
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           readers: [
             {
               periodic: {
@@ -2070,16 +2061,16 @@ describe('ConfigFactory', function () {
                     timeout: 12000,
                     compression: 'backup_compression',
                     temporality_preference:
-                      ExporterTemporalityPreference.Cumulative,
+                      'cumulative',
                     default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                      'explicit_bucket_histogram',
                     tls: {
                       ca_file: 'backup_certificate_file.pem',
                       key_file: 'backup_client_key.pem',
                       cert_file: 'backup_client_certificate.pem',
                     },
                     headers_list: 'backup_headers=123',
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -2103,7 +2094,7 @@ describe('ConfigFactory', function () {
                     endpoint: 'http://backup.com:4318/v1/logs',
                     timeout: 12000,
                     compression: 'backup_compression',
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                     tls: {
                       ca_file: 'backup_certificate_file.pem',
                       key_file: 'backup_client_key.pem',
@@ -2159,18 +2150,18 @@ describe('ConfigFactory', function () {
       setMeterProvider(config);
 
       let expectedMeterProvider: ConfigurationModel['meter_provider'] = {
-        exemplar_filter: ExemplarFilter.AlwaysOff,
+        exemplar_filter: 'always_off',
         readers: [
           {
             periodic: {
               exporter: {
                 otlp_http: {
                   default_histogram_aggregation:
-                    ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
-                  encoding: OtlpHttpEncoding.Protobuf,
+                    'explicit_bucket_histogram',
+                  encoding: 'protobuf',
                   endpoint: 'http://localhost:4318/v1/metrics',
                   temporality_preference:
-                    ExporterTemporalityPreference.LowMemory,
+                    'low_memory',
                   timeout: 10000,
                 },
               },
@@ -2190,18 +2181,18 @@ describe('ConfigFactory', function () {
       process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'default';
       setMeterProvider(config);
       expectedMeterProvider = {
-        exemplar_filter: ExemplarFilter.TraceBased,
+        exemplar_filter: 'trace_based',
         readers: [
           {
             periodic: {
               exporter: {
                 otlp_http: {
                   default_histogram_aggregation:
-                    ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
-                  encoding: OtlpHttpEncoding.Protobuf,
+                    'explicit_bucket_histogram',
+                  encoding: 'protobuf',
                   endpoint: 'http://localhost:4318/v1/metrics',
                   temporality_preference:
-                    ExporterTemporalityPreference.Cumulative,
+                    'cumulative',
                   timeout: 10000,
                 },
               },
@@ -2319,7 +2310,7 @@ describe('ConfigFactory', function () {
       const configFactory = createConfigFactory();
       const expectedConfig: ConfigurationModel = {
         disabled: false,
-        log_level: SeverityNumber.Info,
+        log_level: 'info',
         attribute_limits: {
           attribute_count_limit: 128,
         },
@@ -2443,7 +2434,7 @@ describe('ConfigFactory', function () {
                       cert_file: 'trace-client-certificate',
                     },
                     compression: 'trace-compression',
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                     endpoint: 'http://test.com:4318/v1/traces',
                     headers_list: 'trace-headers',
                     timeout: 1213,
@@ -2454,7 +2445,7 @@ describe('ConfigFactory', function () {
           ],
         },
         meter_provider: {
-          exemplar_filter: ExemplarFilter.AlwaysOff,
+          exemplar_filter: 'always_off',
           readers: [
             {
               periodic: {
@@ -2464,16 +2455,16 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://test.com:4318/v1/metrics',
                     timeout: 22,
-                    temporality_preference: ExporterTemporalityPreference.Delta,
+                    temporality_preference: 'delta',
                     default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+                      'base2_exponential_bucket_histogram',
                     tls: {
                       ca_file: 'metric-certificate',
                       key_file: 'metric-client-key',
                       cert_file: 'metric-client-certificate',
                     },
                     compression: 'metric-compression',
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                     headers_list: 'metric-header',
                   },
                 },
@@ -2503,7 +2494,7 @@ describe('ConfigFactory', function () {
                       cert_file: 'logs-client-certificate',
                     },
                     compression: 'logs-compression',
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                     endpoint: 'http://test.com:4318/v1/logs',
                     headers_list: 'logs-header',
                     timeout: 27,
@@ -2533,7 +2524,7 @@ describe('ConfigFactory', function () {
       const configFactory = createConfigFactory();
       const expectedConfig: ConfigurationModel = {
         disabled: false,
-        log_level: SeverityNumber.Info,
+        log_level: 'info',
         attribute_limits: {
           attribute_count_limit: 128,
         },
@@ -2628,7 +2619,7 @@ describe('ConfigFactory', function () {
       const config = parseConfigFile();
       assert.deepStrictEqual(config, {
         disabled: false,
-        log_level: SeverityNumber.Info,
+        log_level: 'info',
         attribute_limits: {
           attribute_count_limit: 128,
         },

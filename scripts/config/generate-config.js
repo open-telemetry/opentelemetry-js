@@ -133,6 +133,17 @@ const bannerComment = [
   '// Run `npm run generate:config` from the configuration package to regenerate',
 ].join('\n');
 
+// Ensure the types have an export for all `$defs`.
+//
+// opentelemetry-configuration discourages putting `title` on `$defs`.
+// json-schema-to-typescript *inlines* enum types that lack a `title`.
+// We'd like to have an explicit type for enums, e.g. for `SeverityNumber`
+//  https://github.com/open-telemetry/opentelemetry-configuration/blob/main/schema-docs.md#severitynumber
+// Adding a 'title' results in json-schema-to-typescript doing this.
+for (const name of Object.keys(schema.$defs)) {
+  schema.$defs[name].title = name;
+}
+
 compile(schema, 'OpenTelemetryConfiguration', {
   bannerComment,
   unknownAny: false,
@@ -160,32 +171,6 @@ compile(schema, 'OpenTelemetryConfiguration', {
       /\bOpenTelemetryConfiguration\b/g,
       'ConfigurationModel'
     );
-
-    // json-schema-to-typescript inlines enum types that lack a title property.
-    // Emit const objects + type aliases for defs the public API needs by name,
-    // so consumers can use e.g. ExemplarFilter.TraceBased as a value.
-    // Strip slash-qualified suffixes (e.g. "/development") before PascalCasing
-    // so that values like "no_translation/development" produce a valid key "NoTranslation".
-    const toPascalCase = s =>
-      s.replace(/\/\w+$/, '').split('_').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('');
-    const namedEnums = [
-      'InstrumentType',
-      'ExporterTemporalityPreference',
-      'ExemplarFilter',
-      'SeverityNumber',
-      'ExporterDefaultHistogramAggregation',
-      'ExperimentalPrometheusTranslationStrategy',
-      'OtlpHttpEncoding',
-    ];
-    for (const defName of namedEnums) {
-      const def = schema.$defs && schema.$defs[defName];
-      if (!def || !Array.isArray(def.enum)) continue;
-      const stringVals = def.enum.filter(v => v !== null && typeof v === 'string');
-      if (!stringVals.length) continue;
-      const entries = stringVals.map(v => `  ${toPascalCase(v)}: ${JSON.stringify(v)},`);
-      ts += `\nexport const ${defName} = {\n${entries.join('\n')}\n} as const;\n`;
-      ts += `export type ${defName} = typeof ${defName}[keyof typeof ${defName}];\n`;
-    }
 
     // Deduplicate TLS types: json-schema-to-typescript emits GrpcTls1/HttpTls1 as
     // structurally identical duplicates of GrpcTls/HttpTls (same $defs reused in multiple
