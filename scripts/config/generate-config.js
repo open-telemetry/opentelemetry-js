@@ -205,23 +205,6 @@ compile(schema, 'OpenTelemetryConfiguration', {
       'ConfigurationModel'
     );
 
-    // Deduplicate TLS types: json-schema-to-typescript emits GrpcTls1/HttpTls1 as
-    // structurally identical duplicates of GrpcTls/HttpTls (same $defs reused in multiple
-    // schema locations). Remove the duplicate type declarations and rename all references
-    // to the canonical names so consumers only see GrpcTls and HttpTls.
-    function removeTypeDef(src, typeName) {
-      const startMarker = `\nexport type ${typeName} =`;
-      const start = src.indexOf(startMarker);
-      if (start === -1) return src;
-      // Find the next top-level export after this type declaration
-      const nextExport = src.indexOf('\nexport ', start + startMarker.length);
-      return nextExport === -1 ? src.slice(0, start) : src.slice(0, start) + '\n' + src.slice(nextExport + 1);
-    }
-    ts = removeTypeDef(ts, 'GrpcTls1');
-    ts = removeTypeDef(ts, 'HttpTls1');
-    ts = ts.replace(/\bGrpcTls1\b/g, 'GrpcTls');
-    ts = ts.replace(/\bHttpTls1\b/g, 'HttpTls');
-
     // Change the TypeScript representation for interfaces where
     // "additionalProperties" is allowed.
     //

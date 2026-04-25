@@ -785,7 +785,7 @@ export interface OtlpHttpMetricExporter {
    *
    */
   endpoint?: string;
-  tls?: HttpTls;
+  tls?: HttpTls1;
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
    * If an entry's .value is null, the entry is ignored.
@@ -825,7 +825,7 @@ export interface OtlpHttpMetricExporter {
  * If omitted, system default TLS settings are used.
  *
  */
-export interface HttpTls {
+export interface HttpTls1 {
   /**
    * Configure certificate used to verify a server's TLS credentials.
    * Absolute path to certificate file in PEM format.
@@ -860,7 +860,7 @@ export interface OtlpGrpcMetricExporter {
    *
    */
   endpoint?: string;
-  tls?: GrpcTls;
+  tls?: GrpcTls1;
   /**
    * Configure headers. Entries have higher priority than entries from .headers_list.
    * If an entry's .value is null, the entry is ignored.
@@ -899,7 +899,7 @@ export interface OtlpGrpcMetricExporter {
  * If omitted, system default TLS settings are used.
  *
  */
-export interface GrpcTls {
+export interface GrpcTls1 {
   /**
    * Configure certificate used to verify a server's TLS credentials.
    * Absolute path to certificate file in PEM format.
