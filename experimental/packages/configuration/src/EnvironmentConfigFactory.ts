@@ -535,8 +535,7 @@ export function setMeterProvider(config: ConfigurationModel): void {
   }
 
   const rawExemplarFilter =
-    getStringFromEnv('OTEL_METRICS_EXEMPLAR_FILTER') ??
-    'trace_based';
+    getStringFromEnv('OTEL_METRICS_EXEMPLAR_FILTER') ?? 'trace_based';
   config.meter_provider.exemplar_filter =
     rawExemplarFilter === 'default'
       ? 'trace_based'

@@ -118,8 +118,7 @@ const configFromFile = {
               compression: 'gzip',
               timeout: 10000,
               temporality_preference: 'cumulative',
-              default_histogram_aggregation:
-                'explicit_bucket_histogram',
+              default_histogram_aggregation: 'explicit_bucket_histogram',
               encoding: 'protobuf',
             },
           },
@@ -691,8 +690,7 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
               compression: 'gzip',
               timeout: 10000,
               temporality_preference: 'cumulative',
-              default_histogram_aggregation:
-                'explicit_bucket_histogram',
+              default_histogram_aggregation: 'explicit_bucket_histogram',
               tls: nullTls,
               encoding: 'protobuf',
             },
@@ -1592,10 +1590,8 @@ describe('ConfigFactory', function () {
                 timeout: 30000,
                 exporter: {
                   otlp_http: {
-                    default_histogram_aggregation:
-                      'explicit_bucket_histogram',
-                    temporality_preference:
-                      'cumulative',
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                    temporality_preference: 'cumulative',
                     endpoint: 'http://localhost:4318/v1/metrics',
                     timeout: 10000,
                     encoding: 'protobuf',
@@ -1640,10 +1636,8 @@ describe('ConfigFactory', function () {
                 timeout: 30000,
                 exporter: {
                   otlp_grpc: {
-                    default_histogram_aggregation:
-                      'explicit_bucket_histogram',
-                    temporality_preference:
-                      'cumulative',
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                    temporality_preference: 'cumulative',
                     endpoint: 'http://localhost:4317',
                     timeout: 10000,
                     tls: {
@@ -1715,10 +1709,8 @@ describe('ConfigFactory', function () {
                 timeout: 30000,
                 exporter: {
                   otlp_grpc: {
-                    default_histogram_aggregation:
-                      'explicit_bucket_histogram',
-                    temporality_preference:
-                      'low_memory',
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                    temporality_preference: 'low_memory',
                     endpoint: 'http://localhost:4317',
                     timeout: 10000,
                   },
@@ -1750,10 +1742,8 @@ describe('ConfigFactory', function () {
                 timeout: 30000,
                 exporter: {
                   otlp_grpc: {
-                    default_histogram_aggregation:
-                      'explicit_bucket_histogram',
-                    temporality_preference:
-                      'cumulative',
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                    temporality_preference: 'cumulative',
                     endpoint: 'http://localhost:4317',
                     timeout: 10000,
                   },
@@ -1782,10 +1772,8 @@ describe('ConfigFactory', function () {
                 timeout: 30000,
                 exporter: {
                   otlp_http: {
-                    default_histogram_aggregation:
-                      'explicit_bucket_histogram',
-                    temporality_preference:
-                      'cumulative',
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                    temporality_preference: 'cumulative',
                     endpoint: 'http://localhost:4318/v1/metrics',
                     timeout: 10000,
                     encoding: 'json',
@@ -2060,10 +2048,8 @@ describe('ConfigFactory', function () {
                     endpoint: 'http://backup.com:4318/v1/metrics',
                     timeout: 12000,
                     compression: 'backup_compression',
-                    temporality_preference:
-                      'cumulative',
-                    default_histogram_aggregation:
-                      'explicit_bucket_histogram',
+                    temporality_preference: 'cumulative',
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
                     tls: {
                       ca_file: 'backup_certificate_file.pem',
                       key_file: 'backup_client_key.pem',
@@ -2156,12 +2142,10 @@ describe('ConfigFactory', function () {
             periodic: {
               exporter: {
                 otlp_http: {
-                  default_histogram_aggregation:
-                    'explicit_bucket_histogram',
+                  default_histogram_aggregation: 'explicit_bucket_histogram',
                   encoding: 'protobuf',
                   endpoint: 'http://localhost:4318/v1/metrics',
-                  temporality_preference:
-                    'low_memory',
+                  temporality_preference: 'low_memory',
                   timeout: 10000,
                 },
               },
@@ -2187,12 +2171,10 @@ describe('ConfigFactory', function () {
             periodic: {
               exporter: {
                 otlp_http: {
-                  default_histogram_aggregation:
-                    'explicit_bucket_histogram',
+                  default_histogram_aggregation: 'explicit_bucket_histogram',
                   encoding: 'protobuf',
                   endpoint: 'http://localhost:4318/v1/metrics',
-                  temporality_preference:
-                    'cumulative',
+                  temporality_preference: 'cumulative',
                   timeout: 10000,
                 },
               },
