@@ -7,6 +7,7 @@ export { W3CBaggagePropagator } from './baggage/propagation/W3CBaggagePropagator
 export { AnchoredClock } from './common/anchored-clock';
 export type { Clock } from './common/anchored-clock';
 export { isAttributeValue, sanitizeAttributes } from './common/attributes';
+export { buildExceptionCauseChain } from './common/exception';
 export {
   globalErrorHandler,
   setGlobalErrorHandler,

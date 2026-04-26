@@ -10,6 +10,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(sdk-logs): append `exception.cause` chain to `ATTR_EXCEPTION_STACKTRACE` [#6423](https://github.com/open-telemetry/opentelemetry-js/issues/6423) @abhisheksurve45
 * feat(sdk-node): wire attribute_keys from declarative configuration to ViewOptions.attributesProcessors [#6427](https://github.com/open-telemetry/opentelemetry-js/issues/6427) @ravitheja4531-cell
 * feat(sdk-node): set TracerProvider in startNodeSDK() [#6607](https://github.com/open-telemetry/opentelemetry-js/pull/6607) @maryliag
 

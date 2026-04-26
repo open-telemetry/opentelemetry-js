@@ -21,6 +21,7 @@ import { diag, SpanStatusCode } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import {
   addHrTimes,
+  buildExceptionCauseChain,
   millisToHrTime,
   hrTime,
   hrTimeDuration,
@@ -432,7 +433,10 @@ export class SpanImpl implements Span {
         attributes[ATTR_EXCEPTION_MESSAGE] = exception.message;
       }
       if (exception.stack) {
-        attributes[ATTR_EXCEPTION_STACKTRACE] = exception.stack;
+        const causeChain = buildExceptionCauseChain(
+          (exception as { cause?: unknown }).cause
+        );
+        attributes[ATTR_EXCEPTION_STACKTRACE] = exception.stack + causeChain;
       }
     }
 

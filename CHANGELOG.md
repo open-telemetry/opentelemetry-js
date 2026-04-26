@@ -14,6 +14,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(opentelemetry-core,sdk-trace-base): append `exception.cause` chain to `ATTR_EXCEPTION_STACKTRACE` [#6423](https://github.com/open-telemetry/opentelemetry-js/issues/6423) @abhisheksurve45
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation

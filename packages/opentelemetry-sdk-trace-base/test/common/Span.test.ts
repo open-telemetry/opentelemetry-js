@@ -1919,6 +1919,61 @@ describe('Span', () => {
       });
     });
 
+    describe('when exception has a cause', () => {
+      it('should append cause stack to stacktrace', () => {
+        const span = new SpanImpl({
+          scope: tracer.instrumentationScope,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
+          spanContext,
+          name,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
+        const cause = new Error('inner');
+        cause.stack = 'Error: inner\n    at inner:1:1';
+        const outer = new Error('outer') as Error & { cause?: unknown };
+        outer.stack = 'Error: outer\n    at outer:1:1';
+        outer.cause = cause;
+
+        span.recordException(outer);
+        const event = span.events[0];
+        assert.strictEqual(
+          event.attributes?.[ATTR_EXCEPTION_STACKTRACE],
+          'Error: outer\n    at outer:1:1\nCaused by: Error: inner\n    at inner:1:1'
+        );
+      });
+
+      it('should walk a multi-level cause chain', () => {
+        const span = new SpanImpl({
+          scope: tracer.instrumentationScope,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
+          spanContext,
+          name,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
+        const root = new Error('root') as any;
+        root.stack = 'Error: root\n    at root:1:1';
+        const mid = new Error('mid') as any;
+        mid.stack = 'Error: mid\n    at mid:1:1';
+        mid.cause = root;
+        const top = new Error('top') as any;
+        top.stack = 'Error: top\n    at top:1:1';
+        top.cause = mid;
+
+        span.recordException(top);
+        const event = span.events[0];
+        assert.strictEqual(
+          event.attributes?.[ATTR_EXCEPTION_STACKTRACE],
+          'Error: top\n    at top:1:1\nCaused by: Error: mid\n    at mid:1:1\nCaused by: Error: root\n    at root:1:1'
+        );
+      });
+    });
+
     describe('when attributes are specified', () => {
       it('should store specified attributes', () => {
         const span = new SpanImpl({
