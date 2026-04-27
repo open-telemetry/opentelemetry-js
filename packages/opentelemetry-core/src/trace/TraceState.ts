@@ -73,7 +73,8 @@ export class TraceState implements TraceStateApi {
     //   - +1 for the key/value splitter
     //   - +1 for the separator if there are other keys
     let newLength = this._length - (key.length + currValue.length + 1);
-    if (currState.size > 0) {
+    if (currState.size > 1) {
+      // remove separator from length if there's no key or only one. 
       newLength = newLength - 1;
     }
 
@@ -130,7 +131,7 @@ export class TraceState implements TraceStateApi {
 
       // Skip if adding the new member exceeds the length
       const futureLength =
-        currentLength + member.length + (vendorEntries.size > 0 ? 1 : 0);
+        currentLength + m.length + (vendorEntries.size > 0 ? 1 : 0);
       if (futureLength > MAX_TRACE_STATE_LEN) {
         continue;
       }
