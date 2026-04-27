@@ -31,13 +31,19 @@ import {
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import type {
+  Sampler,
   SpanExporter,
+  SpanLimits,
   SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import {
+  AlwaysOffSampler,
+  AlwaysOnSampler,
   BatchSpanProcessor,
   ConsoleSpanExporter,
+  ParentBasedSampler,
   SimpleSpanProcessor,
+  TraceIdRatioBasedSampler,
 } from '@opentelemetry/sdk-trace-base';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
@@ -48,13 +54,18 @@ import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 import type {
   ConfigurationModel,
-  LogRecordExporterModel,
+  LogRecordExporterConfigModel,
   InstrumentTypeConfigModel,
   AggregationConfigModel,
   PeriodicMetricReaderConfigModel,
+  SpanExporterConfigModel,
+  SamplerConfigModel,
+  NameStringValuePairConfigModel,
+  HttpTlsConfigModel,
 } from '@opentelemetry/configuration';
 import type {
   AggregationOption,
+  IAttributesProcessor,
   IMetricReader,
   PushMetricExporter,
   ViewOptions,
@@ -62,6 +73,8 @@ import type {
 import {
   AggregationType,
   ConsoleMetricExporter,
+  createAllowListAttributesProcessor,
+  createDenyListAttributesProcessor,
   InstrumentType,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
@@ -79,6 +92,7 @@ import {
   ConsoleLogRecordExporter,
   SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
+import * as fs from 'fs';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
@@ -400,9 +414,14 @@ export function getKeyListFromObjectArray(
   if (!obj || obj.length === 0) {
     return undefined;
   }
-  return obj
-    .map(item => Object.keys(item))
-    .reduce((prev, curr) => prev.concat(curr), []);
+
+  const keys: string[] = [];
+  for (const item of obj) {
+    for (const key of Object.keys(item)) {
+      keys.push(key);
+    }
+  }
+  return keys;
 }
 
 export function getNonNegativeNumberFromEnv(
@@ -587,7 +606,7 @@ export function getBatchLogRecordProcessorFromEnv(
 }
 
 export function getLogRecordExporter(
-  exporter: LogRecordExporterModel
+  exporter: LogRecordExporterConfigModel
 ): LogRecordExporter | undefined {
   if (exporter.otlp_http) {
     const encoding = exporter.otlp_http.encoding;
@@ -657,6 +676,151 @@ export function getLogRecordProcessorsFromConfiguration(
   });
   if (logRecordProcessors.length > 0) {
     return logRecordProcessors;
+  }
+  return undefined;
+}
+
+export function getHeadersFromConfiguration(
+  headers: NameStringValuePairConfigModel[] | undefined
+): Record<string, string> | undefined {
+  if (!headers) {
+    return undefined;
+  }
+  const result: Record<string, string> = {};
+  headers.forEach(header => {
+    result[header.name] = header.value;
+  });
+  return result;
+}
+
+export function getHttpAgentOptionsFromTls(
+  tls: HttpTlsConfigModel | undefined
+): { ca?: Buffer; cert?: Buffer; key?: Buffer } | undefined {
+  if (tls && (tls.ca_file || tls.cert_file || tls.key_file)) {
+    const httpsAgentOptions: { ca?: Buffer; cert?: Buffer; key?: Buffer } = {};
+    if (tls.ca_file) {
+      try {
+        httpsAgentOptions.ca = fs.readFileSync(tls.ca_file);
+      } catch (e) {
+        diag.warn(`Failed to read TLS CA file at ${tls.ca_file}: ${e}`);
+      }
+    }
+    if (tls.cert_file) {
+      try {
+        httpsAgentOptions.cert = fs.readFileSync(tls.cert_file);
+      } catch (e) {
+        diag.warn(`Failed to read TLS cert file at ${tls.cert_file}: ${e}`);
+      }
+    }
+    if (tls.key_file) {
+      try {
+        httpsAgentOptions.key = fs.readFileSync(tls.key_file);
+      } catch (e) {
+        diag.warn(`Failed to read TLS key file at ${tls.key_file}: ${e}`);
+      }
+    }
+    return httpsAgentOptions;
+  }
+  return undefined;
+}
+
+export function getSpanExporter(
+  exporter: SpanExporterConfigModel
+): SpanExporter | undefined {
+  if (exporter.otlp_http) {
+    const encoding = exporter.otlp_http.encoding;
+    if (encoding === 'json') {
+      return new OTLPHttpTraceExporter({
+        compression:
+          exporter.otlp_http.compression === 'gzip'
+            ? CompressionAlgorithm.GZIP
+            : CompressionAlgorithm.NONE,
+        url: exporter.otlp_http.endpoint,
+        headers: getHeadersFromConfiguration(exporter.otlp_http.headers),
+        timeoutMillis: exporter.otlp_http.timeout,
+        httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http.tls),
+      });
+    } else {
+      return new OTLPProtoTraceExporter({
+        compression:
+          exporter.otlp_http.compression === 'gzip'
+            ? CompressionAlgorithm.GZIP
+            : CompressionAlgorithm.NONE,
+        url: exporter.otlp_http.endpoint,
+        headers: getHeadersFromConfiguration(exporter.otlp_http.headers),
+        timeoutMillis: exporter.otlp_http.timeout,
+        httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http.tls),
+      });
+    }
+  } else if (exporter.otlp_grpc) {
+    return new OTLPGrpcTraceExporter({
+      compression:
+        exporter.otlp_grpc.compression === 'gzip'
+          ? CompressionAlgorithm.GZIP
+          : CompressionAlgorithm.NONE,
+      url: exporter.otlp_grpc.endpoint,
+      timeoutMillis: exporter.otlp_grpc.timeout,
+      // TODO (6614): add support for credentials
+      // TODO (6615): add metadata (headers) support
+    });
+  } else if (exporter.console) {
+    return new ConsoleSpanExporter();
+  }
+  diag.warn(`Unsupported Exporter value. No Span Exporter registered`);
+  return undefined;
+}
+
+export function getSpanProcessorsFromConfiguration(
+  config: ConfigurationModel
+): SpanProcessor[] | undefined {
+  const spanProcessors: SpanProcessor[] = [];
+  config.tracer_provider?.processors?.forEach(processor => {
+    if (processor.batch) {
+      const exporter = getSpanExporter(processor.batch.exporter);
+      if (exporter) {
+        spanProcessors.push(
+          new BatchSpanProcessor(exporter, {
+            maxQueueSize: processor.batch.max_queue_size,
+            maxExportBatchSize: processor.batch.max_export_batch_size,
+            scheduledDelayMillis: processor.batch.schedule_delay,
+            exportTimeoutMillis: processor.batch.export_timeout,
+          })
+        );
+      }
+    }
+    if (processor.simple) {
+      const exporter = getSpanExporter(processor.simple.exporter);
+      if (exporter) {
+        spanProcessors.push(new SimpleSpanProcessor(exporter));
+      }
+    }
+  });
+  if (spanProcessors.length > 0) {
+    return spanProcessors;
+  }
+  return undefined;
+}
+
+export function getSpanLimitsFromConfiguration(
+  config: ConfigurationModel
+): SpanLimits | undefined {
+  if (config.tracer_provider?.limits) {
+    const limitsConfig = config.tracer_provider.limits;
+    const spanLimits: SpanLimits = {};
+    spanLimits.attributeCountLimit = limitsConfig.attribute_count_limit ?? 128;
+    spanLimits.eventCountLimit = limitsConfig.event_count_limit ?? 128;
+    spanLimits.linkCountLimit = limitsConfig.link_count_limit ?? 128;
+    spanLimits.attributePerLinkCountLimit =
+      limitsConfig.link_attribute_count_limit ?? 128;
+    spanLimits.attributePerEventCountLimit =
+      limitsConfig.event_attribute_count_limit ?? 128;
+
+    if (limitsConfig.attribute_value_length_limit != null) {
+      spanLimits.attributeValueLengthLimit =
+        limitsConfig.attribute_value_length_limit;
+    }
+
+    return spanLimits;
   }
   return undefined;
 }
@@ -787,7 +951,9 @@ export function getMeterViewsFromConfiguration(
       }
     }
     if (view.stream) {
-      viewOption.name = view.stream.name ?? view.selector?.instrument_name;
+      if (view.stream.name) {
+        viewOption.name = view.stream.name;
+      }
       viewOption.aggregationCardinalityLimit =
         view.stream.aggregation_cardinality_limit ?? 2_000;
       if (view.stream.description) {
@@ -799,7 +965,32 @@ export function getMeterViewsFromConfiguration(
           viewOption.aggregation = aggregationType;
         }
       }
-      // TODO(6427): add support for view.stream.attribute_keys and correspondent attributes processor configuration
+      if (view.stream.attribute_keys) {
+        const processors: IAttributesProcessor[] = [];
+        if (
+          view.stream.attribute_keys.included &&
+          view.stream.attribute_keys.included.length > 0
+        ) {
+          processors.push(
+            createAllowListAttributesProcessor(
+              view.stream.attribute_keys.included
+            )
+          );
+        }
+        if (
+          view.stream.attribute_keys.excluded &&
+          view.stream.attribute_keys.excluded.length > 0
+        ) {
+          processors.push(
+            createDenyListAttributesProcessor(
+              view.stream.attribute_keys.excluded
+            )
+          );
+        }
+        if (processors.length > 0) {
+          viewOption.attributesProcessors = processors;
+        }
+      }
     }
 
     if (Object.keys(viewOption).length > 0) {
@@ -822,4 +1013,44 @@ export function getInstanceID(config: ConfigurationModel): string | undefined {
     }
   }
   return undefined;
+}
+
+const DEFAULT_RATIO = 1;
+
+/**
+ * Builds a {@link Sampler} from a {@link SamplerConfigModel} data model.
+ * This allows sampler construction from declarative configuration.
+ */
+export function buildSamplerFromConfig(config: SamplerConfigModel): Sampler {
+  if (config.always_on !== undefined) {
+    return new AlwaysOnSampler();
+  }
+  if (config.always_off !== undefined) {
+    return new AlwaysOffSampler();
+  }
+  if (config.trace_id_ratio_based !== undefined) {
+    return new TraceIdRatioBasedSampler(
+      config.trace_id_ratio_based.ratio ?? DEFAULT_RATIO
+    );
+  }
+  if (config.parent_based !== undefined) {
+    const pb = config.parent_based;
+    return new ParentBasedSampler({
+      root: pb.root ? buildSamplerFromConfig(pb.root) : new AlwaysOnSampler(),
+      remoteParentSampled: pb.remote_parent_sampled
+        ? buildSamplerFromConfig(pb.remote_parent_sampled)
+        : undefined,
+      remoteParentNotSampled: pb.remote_parent_not_sampled
+        ? buildSamplerFromConfig(pb.remote_parent_not_sampled)
+        : undefined,
+      localParentSampled: pb.local_parent_sampled
+        ? buildSamplerFromConfig(pb.local_parent_sampled)
+        : undefined,
+      localParentNotSampled: pb.local_parent_not_sampled
+        ? buildSamplerFromConfig(pb.local_parent_not_sampled)
+        : undefined,
+    });
+  }
+  diag.error('Unknown sampler config, defaulting to ParentBased(AlwaysOn).');
+  return new ParentBasedSampler({ root: new AlwaysOnSampler() });
 }

@@ -1021,6 +1021,18 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
+    it('should warn and fall back to false when OTEL_SDK_DISABLED is set to an invalid value', function () {
+      const warnSpy = Sinon.spy(diag, 'warn');
+      process.env.OTEL_SDK_DISABLED = 'not_a_boolean_value';
+      const configFactory = createConfigFactory();
+      assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
+      Sinon.assert.calledOnce(warnSpy);
+      Sinon.assert.calledWith(
+        warnSpy,
+        'Invalid value "not_a_boolean_value" for Disable the SDK (env: OTEL_SDK_DISABLED). Expected \'true\' or \'false\'. Falling back to "false".'
+      );
+    });
+
     it('should return config with log level as debug', function () {
       process.env.OTEL_LOG_LEVEL = 'DEBUG';
       const expectedConfig: ConfigurationModel = {
@@ -1460,7 +1472,10 @@ describe('ConfigFactory', function () {
       process.env.OTEL_TRACES_EXPORTER = 'otlp';
       process.env.OTEL_TRACES_SAMPLER = 'unknown_sampler';
       createConfigFactory();
-      Sinon.assert.calledWith(warnSpy, 'Unknown sampler type: unknown_sampler');
+      Sinon.assert.calledWith(
+        warnSpy,
+        'Invalid value "unknown_sampler" for Traces sampler (env: OTEL_TRACES_SAMPLER). Expected one of: always_on, always_off, traceidratio, parentbased_always_on, parentbased_always_off, parentbased_traceidratio. Value will be ignored.'
+      );
     });
 
     it('should return config with custom tracer_provider', function () {

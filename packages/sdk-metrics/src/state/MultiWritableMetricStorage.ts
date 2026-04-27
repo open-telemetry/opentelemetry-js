@@ -21,8 +21,9 @@ export class MultiMetricStorage implements WritableMetricStorage {
     context: Context,
     recordTime: HrTime
   ) {
-    this._backingStorages.forEach(it => {
-      it.record(value, attributes, context, recordTime);
-    });
+    const storages = this._backingStorages;
+    for (let i = 0; i < storages.length; i++) {
+      storages[i].record(value, attributes, context, recordTime);
+    }
   }
 }

@@ -3,18 +3,29 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { InstrumentationScope } from '@opentelemetry/core';
 import type { Context } from '@opentelemetry/api';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
 import type { ReadableLogRecord } from './ReadableLogRecord';
+import type { SeverityNumber } from '@opentelemetry/api-logs';
 
 export class NoopLogRecordProcessor implements LogRecordProcessor {
-  forceFlush(): Promise<void> {
+  public forceFlush(): Promise<void> {
     return Promise.resolve();
   }
 
-  onEmit(_logRecord: ReadableLogRecord, _context: Context): void {}
+  public onEmit(_logRecord: ReadableLogRecord, _context: Context): void {}
 
-  shutdown(): Promise<void> {
+  public shutdown(): Promise<void> {
     return Promise.resolve();
+  }
+
+  public enabled(_options: {
+    context: Context;
+    instrumentationScope: InstrumentationScope;
+    severityNumber?: SeverityNumber;
+    eventName?: string;
+  }): boolean {
+    return false;
   }
 }

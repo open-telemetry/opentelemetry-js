@@ -8,7 +8,6 @@ import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import {
   SemconvStability,
   semconvStabilityFromStr,
-  isWrapped,
   InstrumentationBase,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
@@ -108,6 +107,15 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   private _xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
   private _semconvStability: SemconvStability;
+
+  // Note: Intentionally *not* using `_enabled` as the field name to avoid
+  // any possible confusion with the `_enabled` field used on the *Node.js*
+  // InstrumentationBase class.
+  // Also not initializing the fields to `false` because the base class
+  // constructor already calls `enable` modifying their values and it will
+  // set the instrumentations in a bad state (enabled, patched but with flags set to false)
+  declare private _isEnabled: boolean;
+  declare private _isXhrPatched: boolean;
 
   constructor(config: XMLHttpRequestInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-xml-http-request', VERSION, config);
@@ -298,7 +306,6 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     if (!spanUrl || !startTime || !endTime || !xhrMem.createdResources) {
       return;
     }
-
     let resources: PerformanceResourceTiming[] =
       xhrMem.createdResources.entries;
 
@@ -371,13 +378,12 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     url: string,
     method: string
   ): api.Span | undefined {
-    if (isUrlIgnored(url, this.getConfig().ignoreUrls)) {
+    const parsedUrl = parseUrl(url);
+    if (isUrlIgnored(parsedUrl.href, this.getConfig().ignoreUrls)) {
       this._diag.debug('ignoring span as url matches ignored url');
       return;
     }
-
     let name = '';
-    const parsedUrl = parseUrl(url);
     const attributes = {} as api.Attributes;
     if (this._semconvStability & SemconvStability.OLD) {
       name = method.toUpperCase();
@@ -440,6 +446,9 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     return (original: OpenFunction): OpenFunction => {
       const plugin = this;
       return function patchOpen(this: XMLHttpRequest, ...args): void {
+        if (!plugin._isEnabled) {
+          return original.apply(this, args);
+        }
         const method: string = args[0];
         const url: string = args[1];
         plugin._createSpan(this, url, method);
@@ -564,6 +573,9 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
 
     return (original: SendFunction): SendFunction => {
       return function patchSend(this: XMLHttpRequest, ...args): void {
+        if (!plugin._isEnabled) {
+          return original.apply(this, args);
+        }
         const xhrMem = plugin._xhrMem.get(this);
         if (!xhrMem) {
           return original.apply(this, args);
@@ -623,31 +635,45 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * implements enable function
    */
   override enable() {
-    this._diag.debug('applying patch to', this.moduleName, this.version);
+    if (this._isEnabled) {
+      return;
+    }
+    if (this._isXhrPatched) {
+      this._diag.debug(
+        'reactivating existing patch on',
+        this.moduleName,
+        this.version
+      );
+      this._isEnabled = true;
+      return;
+    }
 
-    if (isWrapped(XMLHttpRequest.prototype.open)) {
+    try {
+      this._diag.debug('applying patch to', this.moduleName, this.version);
+      this._wrap(XMLHttpRequest.prototype, 'open', this._patchOpen());
+      this._wrap(XMLHttpRequest.prototype, 'send', this._patchSend());
+      this._isXhrPatched = true;
+      this._isEnabled = true;
+    } catch (err) {
+      // make sure there is no wrapped functions
       this._unwrap(XMLHttpRequest.prototype, 'open');
-      this._diag.debug('removing previous patch from method open');
-    }
-
-    if (isWrapped(XMLHttpRequest.prototype.send)) {
       this._unwrap(XMLHttpRequest.prototype, 'send');
-      this._diag.debug('removing previous patch from method send');
+      this._diag.warn(
+        'Failed to patch globalThis.XMLHttpRequest; instrumentation will not be enabled. ' +
+          'Another script may have locked globalThis.XMLHttpRequest via Object.defineProperty.',
+        err
+      );
     }
-
-    this._wrap(XMLHttpRequest.prototype, 'open', this._patchOpen());
-    this._wrap(XMLHttpRequest.prototype, 'send', this._patchSend());
   }
 
   /**
    * implements disable function
    */
   override disable() {
-    this._diag.debug('removing patch from', this.moduleName, this.version);
-
-    this._unwrap(XMLHttpRequest.prototype, 'open');
-    this._unwrap(XMLHttpRequest.prototype, 'send');
-
+    if (!this._isEnabled) {
+      return;
+    }
+    this._isEnabled = false;
     this._tasksCount = 0;
     this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
     this._usedResources = new WeakSet<PerformanceResourceTiming>();

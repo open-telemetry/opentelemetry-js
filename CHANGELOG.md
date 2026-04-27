@@ -16,16 +16,46 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
-* fix(opentelemetry-instrumentation): improve `_warnOnPreloadedModules` function not to show warning logs when the module is not marked as loaded [#6095](https://github.com/open-telemetry/opentelemetry-js/pull/6095) @rlj1202
-* fix(sdk-trace-base): derive internal `SpanOptions` from API type to prevent drift [#6478](https://github.com/open-telemetry/opentelemetry-js/pull/6478) @overbalance
-* fix(span): enforce `attributePerEventCountLimit`, `attributePerLinkCountLimit`, `linkCountLimit`, and `attributeValueLengthLimit` for event/link attributes [#6479](https://github.com/open-telemetry/opentelemetry-js/pull/6479) @overbalance
-
 ### :books: Documentation
 
 ### :house: Internal
 
-* chore: enforce `import type` for type-only imports via ESLint [#6467](https://github.com/open-telemetry/opentelemetry-js/pull/6467) @overbalance
 * perf(sdk-trace-base): optimize TraceIdRatioBasedSampler performance [#6284](https://github.com/open-telemetry/opentelemetry-js/pull/6284) @AbhiPrasad
+
+## 2.7.0
+
+### :rocket: Features
+
+* feat(sdk-logs): implement log creation metrics [#6433](https://github.com/open-telemetry/opentelemetry-js/pull/6433) @anuraaga
+* feat(sdk-metrics): add the cardinalitySelector argument to PeriodicExportingMetricReaders
+  [#6460](https://github.com/open-telemetry/opentelemetry-js/pull/6460) @starzlocker
+* feat(opentelemetry-core): add extra checks on internal merge function for safety [#6587](https://github.com/open-telemetry/opentelemetry-js/pull/6587) @maryliag
+
+### :bug: Bug Fixes
+
+* fix(opentelemetry-resources): do not discard OTEL_RESOURCE_ATTRIBUTES when it contains empty kv pairs
+
+### :house: Internal
+
+* test(exporter-zipkin): fix broken browser test assertions and add missing coverage [#6566](https://github.com/open-telemetry/opentelemetry-js/pull/6566) @overbalance
+* fix(sdk-metrics): repair ExponentialHistogram tests [#6565](https://github.com/open-telemetry/opentelemetry-js/pull/6565) @overbalance
+* perf(sdk-metrics): reduce loop overhead in sdk hot paths [#6593](https://github.com/open-telemetry/opentelemetry-js/pull/6593) @mcollina
+
+## 2.6.1
+
+### :bug: Bug Fixes
+
+* fix(opentelemetry-instrumentation): improve `_warnOnPreloadedModules` function not to show warning logs when the module is not marked as loaded [#6095](https://github.com/open-telemetry/opentelemetry-js/pull/6095) @rlj1202
+* fix(sdk-trace-base): derive internal `SpanOptions` from API type to prevent drift [#6478](https://github.com/open-telemetry/opentelemetry-js/pull/6478) @overbalance
+* fix(span): enforce `attributePerEventCountLimit`, `attributePerLinkCountLimit`, `linkCountLimit`, and `attributeValueLengthLimit` for event/link attributes [#6479](https://github.com/open-telemetry/opentelemetry-js/pull/6479) @overbalance
+* fix(context-zone): guard `onCancelTask` against terminal-state tasks to prevent infinite loop with rc-align (Ant Design) in React 16 dev mode [#6512](https://github.com/open-telemetry/opentelemetry-js/pull/6512) @Renegade2345
+
+### :house: Internal
+
+* chore: enforce `import type` for type-only imports via ESLint [#6467](https://github.com/open-telemetry/opentelemetry-js/pull/6467) @overbalance
+* perf(sdk-trace-base): avoid Object.entries in Span.setAttributes [#6514](https://github.com/open-telemetry/opentelemetry-js/pull/6514) @daniellockyer
+* perf(sdk-trace-base): optimize `Span.{addEvent,addLink}` performance [#6516](https://github.com/open-telemetry/opentelemetry-js/pull/6516) @daniellockyer
+* test(bundlers): broaden bundler test coverage and assert known protobuf dynamic-require failures [#6482](https://github.com/open-telemetry/opentelemetry-js/pull/6482) @overbalance
 
 ## 2.6.0
 

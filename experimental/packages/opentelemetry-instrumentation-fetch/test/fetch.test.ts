@@ -122,6 +122,7 @@ function waitFor(timeout: number): Promise<void> {
 }
 
 describe('fetch', () => {
+  const originalFetch = globalThis.fetch;
   let workerStarted = false;
 
   const startWorker = async (
@@ -202,15 +203,18 @@ describe('fetch', () => {
       );
     } finally {
       sinon.restore();
+      globalThis.fetch = originalFetch;
     }
   });
 
   describe('enabling/disabling', () => {
+    // const originalFetch = globalThis.fetch;
     let fetchInstrumentation: FetchInstrumentation | undefined;
 
     afterEach(() => {
       fetchInstrumentation?.disable();
       fetchInstrumentation = undefined;
+      // globalThis.fetch = originalFetch;
     });
 
     it('should wrap global fetch when instantiated', () => {
@@ -227,14 +231,79 @@ describe('fetch', () => {
       assert.ok(isWrapped(window.fetch));
     });
 
-    it('should unwrap global fetch when disabled', () => {
+    it('should not unwrap global fetch when disabled', () => {
       fetchInstrumentation = new FetchInstrumentation();
       assert.ok(isWrapped(window.fetch));
       fetchInstrumentation.disable();
-      assert.ok(!isWrapped(window.fetch));
+      assert.ok(isWrapped(window.fetch));
 
       // Avoids ERROR in the logs when calling `disable()` again during cleanup
       fetchInstrumentation = undefined;
+    });
+
+    describe('when the fetch property cannot be wrapped', () => {
+      // Simulate the production failure mode (third-party scripts locking
+      // `globalThis.fetch` via `Object.defineProperty` with `writable: false,
+      // configurable: false`) by stubbing `_wrap` to throw the same TypeError
+      // the browser would throw. We stub the method rather than actually
+      // locking the property because a non-configurable slot is irreversible
+      // within a realm, and the outer `afterEach` restores `globalThis.fetch`
+      // via assignment, which would itself throw.
+      const wrapError = new TypeError(
+        "Cannot assign to read only property 'fetch' of object '[object Window]'"
+      );
+
+      beforeEach(() => {
+        // Construct with `enabled: false` so the stub is in place before
+        // `enable()` runs — `_wrap` is an instance-level field inherited
+        // from `InstrumentationBase`, not a prototype method.
+        fetchInstrumentation = new FetchInstrumentation({ enabled: false });
+        // @ts-expect-error access internal property for testing
+        sinon.stub(fetchInstrumentation, '_wrap').throws(wrapError);
+      });
+
+      it('should not throw when _wrap fails', () => {
+        assert.doesNotThrow(() => fetchInstrumentation!.enable());
+      });
+
+      it('should leave fetch unwrapped when _wrap fails', () => {
+        fetchInstrumentation!.enable();
+        assert.ok(!isWrapped(globalThis.fetch));
+      });
+
+      it('should allow enable() to be retried after _wrap fails', () => {
+        fetchInstrumentation!.enable();
+        assert.doesNotThrow(() => fetchInstrumentation!.enable());
+      });
+    });
+
+    it('should return a Promise<Response> compatible with WebAssembly.compileStreaming', async () => {
+      // Some web APIs do brand checks to ensure they are working with native objects.
+      // compileStreaming checks that the argument is a native Response, and will throw if it isn't.
+
+      // Minimal valid WASM binary: magic number + version only.
+      const wasmBytes = new Uint8Array([
+        0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00,
+      ]);
+
+      await startWorker(
+        msw.http.get(`${ORIGIN}/test.wasm`, () => {
+          return new msw.HttpResponse(wasmBytes, {
+            headers: { 'Content-Type': 'application/wasm' },
+          });
+        })
+      );
+
+      fetchInstrumentation = new FetchInstrumentation();
+      assert.ok(isWrapped(window.fetch));
+
+      // WebAssembly.compileStreaming requires a native Response from fetch.
+      const module = await WebAssembly.compileStreaming(
+        fetch(`${ORIGIN}/test.wasm`)
+      );
+      assert.ok(module instanceof WebAssembly.Module);
+
+      await waitFor(OBSERVER_WAIT_TIME_MS + 50);
     });
   });
 
@@ -793,6 +862,73 @@ describe('fetch', () => {
             const headers = await assertPropagationHeaders(response);
 
             assert.strictEqual(headers['foo'], 'bar');
+          });
+
+          it('should keep custom headers from init overrides when first arg is a Request object', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch(new Request('/api/echo-headers.json'), {
+                  headers: { foo: 'bar' },
+                }),
+            });
+
+            const headers = await assertPropagationHeaders(response);
+
+            assert.strictEqual(
+              headers['foo'],
+              'bar',
+              'headers from init overrides should be preserved when first arg is a Request'
+            );
+          });
+
+          it('should keep custom headers from init overrides with typed Headers when first arg is a Request object', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch(new Request('/api/echo-headers.json'), {
+                  headers: new Headers({ foo: 'bar' }),
+                }),
+            });
+
+            const headers = await assertPropagationHeaders(response);
+
+            assert.strictEqual(
+              headers['foo'],
+              'bar',
+              'typed headers from init overrides should be preserved when first arg is a Request'
+            );
+          });
+
+          it('should merge headers from Request and init overrides with init taking precedence', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch(
+                  new Request('/api/echo-headers.json', {
+                    headers: {
+                      'x-from-request': 'request-value',
+                      shared: 'from-request',
+                    },
+                  }),
+                  {
+                    headers: {
+                      'x-from-init': 'init-value',
+                      shared: 'from-init',
+                    },
+                  }
+                ),
+            });
+
+            const headers = await assertPropagationHeaders(response);
+
+            assert.strictEqual(
+              headers['x-from-init'],
+              'init-value',
+              'headers from init overrides should be present'
+            );
+            assert.strictEqual(
+              headers['shared'],
+              'from-init',
+              'init overrides should take precedence over Request headers'
+            );
           });
 
           it('should keep custom headers with url, untyped request object and typed (Headers) headers object', async () => {
@@ -2764,13 +2900,47 @@ describe('fetch', () => {
       });
 
       describe('when client cancels the reader', () => {
-        it('should cancel stream and release the connection', async () => {
-          const { response } = await tracedFetch();
+        it('should end the span when the stream completes', async () => {
+          // Use a short stream (3 chunks) so the clone finishes quickly
+          // after the consumer cancels.  The instrumentation tracks
+          // completion via an eagerly-consumed clone; consumer-side
+          // cancellation does not propagate to the clone.
+          const shortStreamHandler = () => {
+            const encoder = new TextEncoder();
+            return msw.http.get('/api/stream', () => {
+              let count = 0;
+              const stream = new ReadableStream<Uint8Array>({
+                start(controller) {
+                  timer = setInterval(() => {
+                    if (count >= 3) {
+                      clearInterval(timer);
+                      controller.close();
+                      return;
+                    }
+                    count += 1;
+                    controller.enqueue(encoder.encode(`data: ${count}\n`));
+                  }, 20);
+                },
+              });
+              return new msw.HttpResponse(stream, {
+                status: 200,
+                headers: {
+                  'Content-Type': 'text/plain; charset=utf-8',
+                  'Cache-Control': 'no-cache',
+                  Connection: 'keep-alive',
+                },
+              });
+            });
+          };
+
+          const { response } = await tracedFetch({
+            handlers: [shortStreamHandler()],
+          });
 
           const timeoutPromise = new Promise((_, reject) => {
             setTimeout(() => {
               reject(new Error('trace should finish before timeout'));
-            }, 1000);
+            }, 2000);
           });
 
           // Read the first chunk to confirm the stream is live

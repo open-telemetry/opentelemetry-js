@@ -1,0 +1,63 @@
+name: Old Node.js Compatibility
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'api/**'
+      - '.github/workflows/backcompat.yml'
+  pull_request:
+    paths:
+      - 'api/**'
+      - '.github/workflows/backcompat.yml'
+  merge_group:
+    paths:
+      - 'api/**'
+      - '.github/workflows/backcompat.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  backcompat:
+    name: 'backcompat: ${{ matrix.package }} on Node.js ${{ matrix.node-version }}'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package: api
+            node-version: '8'
+            script: test/backcompat/node8-compat.js
+    runs-on: ubuntu-latest
+    env:
+      PACKAGE: ${{ matrix.package }}
+      NODE_VERSION: ${{ matrix.node-version }}
+      SCRIPT: ${{ matrix.script }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      # Use a modern Node.js to install dependencies and compile TypeScript.
+      - name: Setup Node.js (compile)
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Bootstrap
+        run: npm ci --ignore-scripts
+
+      - name: Compile
+        run: npm run compile
+
+      # Switch to the target old Node.js and run the standalone plain-JS smoke
+      # test. Package is already compiled and dependencies are already installed.
+      - name: Setup Node.js ${{ env.NODE_VERSION }} (test)
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Run compatibility smoke test
+        run: node "$SCRIPT"
+        working-directory: ${{ env.PACKAGE }}
