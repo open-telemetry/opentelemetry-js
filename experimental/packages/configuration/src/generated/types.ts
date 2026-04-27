@@ -2159,7 +2159,7 @@ export interface AttributeNameValue {
    * Property is required and must be non-null.
    *
    */
-  value: string | number | boolean | null | string[] | boolean[] | number[];
+  value: string | number | boolean | string[] | boolean[] | number[];
   type?: AttributeType;
 }
 /**

@@ -155,16 +155,28 @@ for (const name of Object.keys(schema.$defs)) {
 //         ],
 // See explanation at: https://github.com/open-telemetry/opentelemetry-configuration/blob/main/CONTRIBUTING.md#required-and-null-properties
 //
-// In TypeScript `?` expresses optional, e.g.:
+// In TypeScript, `?` expresses a property being optional, e.g.:
 //      endpoint?: string;
 // Leaving "null" in the schema results in TypeScript like this:
 //      endpoint?: string | null;
-// This is unnecessary and makes using these types more difficult in .ts code.
+//
+// That null option has a downstream blast radius. E.g. a downstream API that
+// takes that `endpoint` value, now needs to handle `null`.
 //
 // By preprocessing the schema to remove those we get nicer typescript types.
 function stripNullTypeFallback(obj) {
-  if (Array.isArray(obj.type) && obj.type.length === 2 && obj.type[1] === 'null') {
-    obj.type.pop();
+  if (Array.isArray(obj.type)) {
+    if (obj.type.length === 2 && obj.type[1] === 'null') {
+      obj.type.pop();
+    }
+  } else if (Array.isArray(obj.oneOf)) {
+    // Handle the more complex case of AttributeNameValue#value, which uses:
+    //    "value": { "oneOf": [{"type":"string"}, {"type":"null"}, ...] }
+    if (obj.oneOf.length > 1) {
+      obj.oneOf = obj.oneOf.filter(entry => {
+        return !(entry?.type === 'null' && Object.keys(entry).length === 1);
+      });
+    }
   }
   if (typeof obj.properties === 'object' && obj.properties != null) {
     for (const prop of Object.values(obj.properties)) {
