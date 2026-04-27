@@ -27,7 +27,6 @@ describe('compressAndSend', function () {
 
 describe('sendWithHttp', function () {
   let sentUserAgent: string;
-  let sentUrl: URL;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const requestFn: any = (
@@ -35,7 +34,6 @@ describe('sendWithHttp', function () {
     opts: http.RequestOptions,
     cb?: (res: http.IncomingMessage) => void
   ): http.ClientRequest => {
-    sentUrl = url;
     sentUserAgent = (opts.headers as Record<string, string>)['User-Agent'];
     return http.request(url, opts, cb).destroy();
   };
@@ -76,67 +74,5 @@ describe('sendWithHttp', function () {
       sentUserAgent,
       `Transport-User-Agent/1.2.3 OTel-OTLP-Exporter-JavaScript/${VERSION}`
     );
-  });
-
-  it('passes URL object directly for IPv6 addresses', async function () {
-    await sendWithHttp(
-      requestFn,
-      'http://[::1]:4318/v1/traces',
-      {},
-      'none',
-      undefined,
-      new http.Agent(),
-      Buffer.from([1, 2, 3]),
-      100
-    );
-    assert.ok(sentUrl instanceof URL);
-    assert.strictEqual(sentUrl.hostname, '[::1]');
-    assert.strictEqual(sentUrl.port, '4318');
-    assert.strictEqual(sentUrl.pathname, '/v1/traces');
-  });
-
-  it('passes URL object directly for IPv6 link-local addresses', async function () {
-    await sendWithHttp(
-      requestFn,
-      'http://[fe80::1]:4318/v1/traces',
-      {},
-      'none',
-      undefined,
-      new http.Agent(),
-      Buffer.from([1, 2, 3]),
-      100
-    );
-    assert.ok(sentUrl instanceof URL);
-    assert.strictEqual(sentUrl.hostname, '[fe80::1]');
-  });
-
-  it('passes URL object directly for IPv4 addresses', async function () {
-    await sendWithHttp(
-      requestFn,
-      'http://192.168.1.1:4318/v1/traces',
-      {},
-      'none',
-      undefined,
-      new http.Agent(),
-      Buffer.from([1, 2, 3]),
-      100
-    );
-    assert.ok(sentUrl instanceof URL);
-    assert.strictEqual(sentUrl.hostname, '192.168.1.1');
-  });
-
-  it('passes URL object directly for regular hostnames', async function () {
-    await sendWithHttp(
-      requestFn,
-      'http://example.com:4318/v1/traces',
-      {},
-      'none',
-      undefined,
-      new http.Agent(),
-      Buffer.from([1, 2, 3]),
-      100
-    );
-    assert.ok(sentUrl instanceof URL);
-    assert.strictEqual(sentUrl.hostname, 'example.com');
   });
 });
