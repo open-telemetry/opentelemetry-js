@@ -27,13 +27,15 @@
 'use strict';
 
 const { compile } = require('json-schema-to-typescript');
-const { spawnSync } = require('child_process');
+const { spawnSync, execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const Ajv = require('ajv/dist/2020');
 const standaloneCode = require('ajv/dist/standalone').default;
+const typescript = require('typescript');
 
 const SCRIPT_DIR = __dirname;
+const PKG_DIR = path.resolve(__dirname, '../../experimental/packages/configuration');
 
 // Run the bash script to clone / refresh the schema repository
 const bashResult = spawnSync('bash', ['generate-config.sh'], {
@@ -70,6 +72,46 @@ const licenseHeader = `/*
  * SPDX-License-Identifier: Apache-2.0
  */
 `;
+
+// ---- Utility to remove duplicate declarations from TypeScript code
+// Based on https://github.com/bcherny/json-schema-to-typescript/issues/193#issuecomment-2595760821
+
+// FITS strings that do not end with digits (so duplicated types)
+// AND strings that contain V1,V2,V3,... ant the end (versioned API is considered as not duplicate)
+const NON_DUPLICATED_IDENTIFIER_REGEXP = /\b(?!\w*\d+$)\w+\b|\b\w*V\d+\b/;
+
+function isDuplicatedTypeIdentifier(typeIdentifier) {
+  return !(typeIdentifier.escapedText.toString().match(NON_DUPLICATED_IDENTIFIER_REGEXP));
+}
+
+function getNonDuplicatedIdentifierName(typeIdentifier) {
+  // removes tail digits
+  return typeIdentifier.escapedText.toString().replace(/[\d.]+$/, '');
+}
+
+function removeDuplicateTsDeclarations(tsCode) {
+  const tsPrinter = typescript.createPrinter({
+    newLine: typescript.NewLineKind.LineFeed,
+  }, {
+    substituteNode: (_, node) => {
+      if (typescript.isTypeReferenceNode(node) && isDuplicatedTypeIdentifier(node.typeName)) {
+        const originalIdentifierName = getNonDuplicatedIdentifierName(node.typeName);
+        return typescript.factory.createTypeReferenceNode(originalIdentifierName);
+      }
+      if ((typescript.isInterfaceDeclaration(node) || typescript.isEnumDeclaration(node) || typescript.isTypeAliasDeclaration(node))
+           && isDuplicatedTypeIdentifier(node.name)) {
+        const declarationIsCleared = typescript.factory.createIdentifier('');
+        return declarationIsCleared;
+      }
+      return node;
+    },
+  });
+
+  const sourceFile = typescript.createSourceFile('', tsCode, typescript.ScriptTarget.ESNext, false, typescript.ScriptKind.TS);
+
+  const result = tsPrinter.printFile(sourceFile);
+  return result;
+}
 
 // ---- Generate AJV-based schema validator.
 
@@ -127,10 +169,13 @@ console.log(`Written validator declaration to ${VALIDATOR_DTS_PATH}`);
 
 const bannerComment = [
   licenseHeader,
-  '/* eslint-disable */',
+  '',
+  '//',
   '// AUTO-GENERATED — do not edit',
   '// Generated from opentelemetry-configuration JSON schema v1.0.0',
   '// Run `npm run generate:config` from the configuration package to regenerate',
+  '//',
+  '/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-object-type */',
 ].join('\n');
 
 // Ensure the types have an export for all `$defs`.
@@ -244,10 +289,22 @@ compile(schema, 'OpenTelemetryConfiguration', {
     //      "type": [ "object" ],
     ts = ts.replace(/\[k: string\]: \{\};/g, '[k: string]: object;');
 
+    // json-schema-to-ts has a limitation where duplicate types are created
+    // for re-referenced JSON schema definitions. For example `OtlpHttpExporter`
+    // is referenced twice in the schema, and the resulting TS includes both:
+    //    export type OtlpHttpExporter = {
+    //    export type OtlpHttpExporter1 = {
+    // See https://github.com/bcherny/json-schema-to-typescript/issues/193
+    // `removeDuplicateTsDeclarations` removes those duplicates.
+    ts = removeDuplicateTsDeclarations(ts);
+
     fs.mkdirSync(path.dirname(TYPES_PATH), { recursive: true });
     fs.writeFileSync(TYPES_PATH, ts);
+    execSync(`npm run lint:fix -- ${TYPES_PATH}`, {
+      cwd: PKG_DIR,
+      encoding: 'utf8'
+    });
     console.log(`Written ${ts.split('\n').length} lines to ${TYPES_PATH}`);
-
   })
   .catch(err => {
     console.error('Generation failed:', err);
