@@ -322,7 +322,6 @@ export class PrometheusSerializer {
   ): string {
     let results = '';
 
-    name = enforcePrometheusNamingConvention(name, data);
     const { value, attributes } = dataPoint;
     const timestamp = hrTimeToMilliseconds(dataPoint.endTime);
     results += stringify(
@@ -343,7 +342,6 @@ export class PrometheusSerializer {
   ): string {
     let results = '';
 
-    name = enforcePrometheusNamingConvention(name, data);
     const attributes = dataPoint.attributes;
     const histogram = dataPoint.value;
     const timestamp = hrTimeToMilliseconds(dataPoint.endTime);
