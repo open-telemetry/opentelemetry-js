@@ -12,11 +12,14 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
-* fix(core, api): defer trace state validation. Deprecate trace state implementation in api [#6459](https://github.com/open-telemetry/opentelemetry-js/pull/6459) @david-luna
-
 ### :rocket: Features
 
 ### :bug: Bug Fixes
+
+* fix(core, api): defer trace state validation. Deprecate trace state implementation in api [#6459](https://github.com/open-telemetry/opentelemetry-js/pull/6459) @david-luna
+  * **important:** this bug fix may be breaking for certain uses of `TraceState`
+    * `set` now returns the same `TraceState` instance if key/value are invalid or makes the while trace state invalid.
+    * `unset` now returns the same `TraceState` instance if key is not present.
 
 ### :books: Documentation
 
