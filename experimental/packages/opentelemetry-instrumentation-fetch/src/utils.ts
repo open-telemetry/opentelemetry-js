@@ -15,7 +15,10 @@ import {
 } from '@opentelemetry/core';
 
 import { PerformanceTimingNames } from './enums/PerformanceTimingNames';
-import { ATTR_HTTP_RESPONSE_CONTENT_LENGTH, ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED } from './semconv';
+import {
+  ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
+  ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+} from './semconv';
 
 const DIAG_LOGGER = diag.createComponentLogger({
   namespace: '@opentelemetry/opentelemetry-instrumentation-fetch/utils',
@@ -217,7 +220,10 @@ export function serverPortFromUrl(url: URLLike): number | undefined {
   }
 }
 
-export type PropagateTraceHeaderCorsUrls = string | RegExp | Array<string | RegExp>;
+export type PropagateTraceHeaderCorsUrls =
+  | string
+  | RegExp
+  | Array<string | RegExp>;
 export type PerformanceEntries = {
   [PerformanceTimingNames.CONNECT_END]?: number;
   [PerformanceTimingNames.CONNECT_START]?: number;
@@ -258,20 +264,60 @@ export function addSpanNetworkEvents(
   }
 
   if (!ignoreNetworkEvents) {
-    addSpanNetworkEvent(span, PerformanceTimingNames.FETCH_START, resource, ignoreZeros);
-    addSpanNetworkEvent(span, PerformanceTimingNames.DOMAIN_LOOKUP_START, resource, ignoreZeros);
-    addSpanNetworkEvent(span, PerformanceTimingNames.DOMAIN_LOOKUP_END, resource, ignoreZeros);
-    addSpanNetworkEvent(span, PerformanceTimingNames.CONNECT_START, resource, ignoreZeros);
+    addSpanNetworkEvent(
+      span,
+      PerformanceTimingNames.FETCH_START,
+      resource,
+      ignoreZeros
+    );
+    addSpanNetworkEvent(
+      span,
+      PerformanceTimingNames.DOMAIN_LOOKUP_START,
+      resource,
+      ignoreZeros
+    );
+    addSpanNetworkEvent(
+      span,
+      PerformanceTimingNames.DOMAIN_LOOKUP_END,
+      resource,
+      ignoreZeros
+    );
+    addSpanNetworkEvent(
+      span,
+      PerformanceTimingNames.CONNECT_START,
+      resource,
+      ignoreZeros
+    );
     addSpanNetworkEvent(
       span,
       PerformanceTimingNames.SECURE_CONNECTION_START,
       resource,
       ignoreZeros
     );
-    addSpanNetworkEvent(span, PerformanceTimingNames.CONNECT_END, resource, ignoreZeros);
-    addSpanNetworkEvent(span, PerformanceTimingNames.REQUEST_START, resource, ignoreZeros);
-    addSpanNetworkEvent(span, PerformanceTimingNames.RESPONSE_START, resource, ignoreZeros);
-    addSpanNetworkEvent(span, PerformanceTimingNames.RESPONSE_END, resource, ignoreZeros);
+    addSpanNetworkEvent(
+      span,
+      PerformanceTimingNames.CONNECT_END,
+      resource,
+      ignoreZeros
+    );
+    addSpanNetworkEvent(
+      span,
+      PerformanceTimingNames.REQUEST_START,
+      resource,
+      ignoreZeros
+    );
+    addSpanNetworkEvent(
+      span,
+      PerformanceTimingNames.RESPONSE_START,
+      resource,
+      ignoreZeros
+    );
+    addSpanNetworkEvent(
+      span,
+      PerformanceTimingNames.RESPONSE_END,
+      resource,
+      ignoreZeros
+    );
   }
 
   if (!skipOldSemconvContentLengthAttrs) {
@@ -561,7 +607,8 @@ export function getResource(
       endTimeHR
     );
 
-    const responseEnd = corsPreFlightRequest[PerformanceTimingNames.RESPONSE_END];
+    const responseEnd =
+      corsPreFlightRequest[PerformanceTimingNames.RESPONSE_END];
     const fetchStart = mainRequest[PerformanceTimingNames.FETCH_START];
 
     // no corsPreFlightRequest
@@ -580,4 +627,3 @@ export function getResource(
     };
   }
 }
-

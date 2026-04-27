@@ -41,7 +41,13 @@ import {
   ATTR_URL_FULL,
 } from '@opentelemetry/semantic-conventions';
 import type { FetchError, FetchResponse, SpanData } from './types';
-import {addSpanNetworkEvents, getResource, parseUrl, PropagateTraceHeaderCorsUrls, shouldPropagateTraceHeaders} from './utils';
+import type { PropagateTraceHeaderCorsUrls } from './utils';
+import {
+  addSpanNetworkEvents,
+  getResource,
+  parseUrl,
+  shouldPropagateTraceHeaders,
+} from './utils';
 import {
   getFetchBodyLength,
   normalizeHttpRequestMethod,
@@ -156,9 +162,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       undefined,
       skipOldSemconvContentLengthAttrs
     );
-    childSpan.end(
-      corsPreFlightRequest[PerformanceTimingNames.RESPONSE_END]
-    );
+    childSpan.end(corsPreFlightRequest[PerformanceTimingNames.RESPONSE_END]);
   }
 
   /**
