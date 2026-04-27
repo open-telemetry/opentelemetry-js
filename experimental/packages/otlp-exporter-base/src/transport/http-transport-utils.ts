@@ -53,23 +53,13 @@ export function sendWithHttp(
       headers['User-Agent'] = DEFAULT_USER_AGENT;
     }
 
-    // Remove brackets from IPv6 addresses as they're only needed in URL format
-    // but http.RequestOptions.hostname expects the raw address
-    const hostname =
-      parsedUrl.hostname.startsWith('[') && parsedUrl.hostname.endsWith(']')
-        ? parsedUrl.hostname.slice(1, -1)
-        : parsedUrl.hostname;
-
     const options: http.RequestOptions | https.RequestOptions = {
-      hostname,
-      port: parsedUrl.port,
-      path: parsedUrl.pathname,
       method: 'POST',
       headers,
       agent,
     };
 
-    const req = request(options, (res: http.IncomingMessage) => {
+    const req = request(parsedUrl, options, (res: http.IncomingMessage) => {
       const responseData: Buffer[] = [];
       let responseSize = 0;
       res.on('data', (chunk: Buffer) => {
