@@ -13,7 +13,12 @@ export type {
   PeriodicMetricReader as PeriodicMetricReaderConfigModel,
 } from './models/meterProviderModel';
 export type {
+  Sampler as SamplerConfigModel,
   SpanExporter as SpanExporterConfigModel,
   SpanProcessor as SpanProcessorConfigModel,
 } from './models/tracerProviderModel';
+export type {
+  NameStringValuePair as NameStringValuePairConfigModel,
+  HttpTls as HttpTlsConfigModel,
+} from './models/commonModel';
 export { createConfigFactory } from './ConfigFactory';

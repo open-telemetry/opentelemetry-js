@@ -19,11 +19,18 @@ export interface StringEnvVar extends EnvVarBase<string> {
   allowedValues?: readonly string[];
 }
 
-export type EnvVarDefinition = StringEnvVar;
+export interface BooleanEnvVar extends EnvVarBase<boolean> {
+  type: 'boolean';
+  defaultValue: boolean;
+}
+
+export type EnvVarDefinition = StringEnvVar | BooleanEnvVar;
 
 type ResolvedType<D extends EnvVarDefinition> = D extends StringEnvVar
   ? string | undefined
-  : never;
+  : D extends BooleanEnvVar
+    ? boolean
+    : never;
 
 function readStringEnv(def: StringEnvVar): string | undefined {
   const value = getStringFromEnv(def.key);
@@ -43,12 +50,34 @@ function readStringEnv(def: StringEnvVar): string | undefined {
   return value;
 }
 
+function readBooleanEnv(def: BooleanEnvVar): boolean {
+  const raw = getStringFromEnv(def.key)?.trim().toLowerCase();
+  // Handle the case where the env var is not set (no warning).
+  if (raw == null || raw === '') {
+    return def.defaultValue;
+  }
+  if (raw === 'true') {
+    return true;
+  }
+  if (raw === 'false') {
+    return false;
+  }
+  // If set to an unrecognized value, warn and fall back to the default.
+  diag.warn(
+    `Invalid value "${raw}" for ${def.description} (env: ${def.key}). ` +
+      `Expected 'true' or 'false'. Falling back to "${def.defaultValue}".`
+  );
+  return def.defaultValue;
+}
+
 export function readEnvVar<D extends EnvVarDefinition>(
   def: D
 ): ResolvedType<D> {
   switch (def.type) {
     case 'string':
       return readStringEnv(def) as ResolvedType<D>;
+    case 'boolean':
+      return readBooleanEnv(def) as ResolvedType<D>;
   }
 }
 

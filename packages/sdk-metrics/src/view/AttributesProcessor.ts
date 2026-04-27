@@ -42,35 +42,41 @@ class MultiAttributesProcessor implements IAttributesProcessor {
 }
 
 class AllowListProcessor implements IAttributesProcessor {
-  private _allowedAttributeNames: string[];
+  private readonly _allowedAttributeNames: Set<string>;
   constructor(allowedAttributeNames: string[]) {
-    this._allowedAttributeNames = allowedAttributeNames;
+    this._allowedAttributeNames = new Set(allowedAttributeNames);
   }
 
   process(incoming: Attributes, _context?: Context): Attributes {
     const filteredAttributes: Attributes = {};
-    Object.keys(incoming).forEach(attributeName => {
-      if (this._allowedAttributeNames.includes(attributeName)) {
+    for (const attributeName in incoming) {
+      if (
+        Object.prototype.hasOwnProperty.call(incoming, attributeName) &&
+        this._allowedAttributeNames.has(attributeName)
+      ) {
         filteredAttributes[attributeName] = incoming[attributeName];
       }
-    });
+    }
     return filteredAttributes;
   }
 }
 
 class DenyListProcessor implements IAttributesProcessor {
-  private _deniedAttributeNames: string[];
+  private readonly _deniedAttributeNames: Set<string>;
   constructor(deniedAttributeNames: string[]) {
-    this._deniedAttributeNames = deniedAttributeNames;
+    this._deniedAttributeNames = new Set(deniedAttributeNames);
   }
 
   process(incoming: Attributes, _context?: Context): Attributes {
     const filteredAttributes: Attributes = {};
-    Object.keys(incoming).forEach(attributeName => {
-      if (!this._deniedAttributeNames.includes(attributeName)) {
+    for (const attributeName in incoming) {
+      if (
+        Object.prototype.hasOwnProperty.call(incoming, attributeName) &&
+        !this._deniedAttributeNames.has(attributeName)
+      ) {
         filteredAttributes[attributeName] = incoming[attributeName];
       }
-    });
+    }
     return filteredAttributes;
   }
 }
