@@ -55,11 +55,6 @@ const TYPES_PATH = path.join(
   '../../experimental/packages/configuration/src/generated/types.ts'
 );
 
-const SCHEMA_OUT_PATH = path.join(
-  SCRIPT_DIR,
-  '../../experimental/packages/configuration/src/generated/schema.ts'
-);
-
 const VALIDATOR_JS_PATH = path.join(
   SCRIPT_DIR,
   '../../experimental/packages/configuration/src/generated/validator.js'
@@ -155,22 +150,32 @@ compile(schema, 'OpenTelemetryConfiguration', {
       ts += `export type ${defName} = typeof ${defName}[keyof typeof ${defName}];\n`;
     }
 
-    // Deduplicate TLS types: json-schema-to-typescript emits GrpcTls1/HttpTls1 as
-    // structurally identical duplicates of GrpcTls/HttpTls (same $defs reused in multiple
-    // schema locations). Remove the duplicate type declarations and rename all references
-    // to the canonical names so consumers only see GrpcTls and HttpTls.
+    // Deduplicate numbered type suffixes: json-schema-to-typescript emits
+    // Sampler, Sampler1, Sampler2, ... when the same $defs type is referenced
+    // in multiple schema locations. All are structurally identical. Find all
+    // numbered duplicates, remove their definitions, and rewrite references
+    // to the canonical (un-suffixed) name.
     function removeTypeDef(src, typeName) {
-      const startMarker = `\nexport type ${typeName} =`;
+      // Match both `export type X =` and `export interface X {`
+      const typeMarker = `\nexport type ${typeName} =`;
+      const ifaceMarker = `\nexport interface ${typeName} {`;
+      const startMarker = src.includes(typeMarker) ? typeMarker : ifaceMarker;
       const start = src.indexOf(startMarker);
       if (start === -1) return src;
-      // Find the next top-level export after this type declaration
       const nextExport = src.indexOf('\nexport ', start + startMarker.length);
       return nextExport === -1 ? src.slice(0, start) : src.slice(0, start) + '\n' + src.slice(nextExport + 1);
     }
-    ts = removeTypeDef(ts, 'GrpcTls1');
-    ts = removeTypeDef(ts, 'HttpTls1');
-    ts = ts.replace(/\bGrpcTls1\b/g, 'GrpcTls');
-    ts = ts.replace(/\bHttpTls1\b/g, 'HttpTls');
+    // Collect all exported type/interface names ending in digits
+    const numberedTypes = [...ts.matchAll(/\nexport (?:type|interface) ([A-Za-z]+\d+)[\s={]/g)]
+      .map(m => m[1]);
+    for (const numbered of numberedTypes) {
+      const baseName = numbered.replace(/\d+$/, '');
+      // Only deduplicate if the un-suffixed base type also exists
+      if (ts.includes(`\nexport type ${baseName} `) || ts.includes(`\nexport interface ${baseName} `)) {
+        ts = removeTypeDef(ts, numbered);
+        ts = ts.replace(new RegExp(`\\b${numbered}\\b`, 'g'), baseName);
+      }
+    }
 
     // Replace overly-narrow index signatures that conflict with typed properties.
     // When additionalProperties is absent or true, json-schema-to-typescript emits
@@ -191,22 +196,6 @@ compile(schema, 'OpenTelemetryConfiguration', {
     fs.mkdirSync(path.dirname(TYPES_PATH), { recursive: true });
     fs.writeFileSync(TYPES_PATH, ts);
     console.log(`Written ${ts.split('\n').length} lines to ${TYPES_PATH}`);
-
-    // Emit the raw JSON schema as a TS module so it can be imported for
-    // runtime validation (ajv) without needing resolveJsonModule in tsconfig.
-    const schemaTs = [
-      licenseHeader,
-      '/* eslint-disable */',
-      '// AUTO-GENERATED — do not edit',
-      '// Generated from opentelemetry-configuration JSON schema',
-      '// Run `npm run generate:config` from the configuration package to regenerate',
-      '',
-      '// eslint-disable-next-line @typescript-eslint/no-explicit-any',
-      `export const opentelemetryConfigurationSchema: any = ${JSON.stringify(runtimeSchema, null, 2)};`,
-      '',
-    ].join('\n');
-    fs.writeFileSync(SCHEMA_OUT_PATH, schemaTs);
-    console.log(`Written schema to ${SCHEMA_OUT_PATH}`);
 
     // Generate a pre-compiled (ahead-of-time) validator using ajv standalone mode.
     // This eliminates the synchronous ajv.compile() call on every cold start by moving

@@ -933,218 +933,6 @@ export type B3MultiPropagator = {};
  * If omitted, ignore.
  *
  */
-export type OtlpHttpExporter1 = {
-  /**
-   * Configure endpoint, including the signal specific path.
-   * If omitted or null, the http://localhost:4318/v1/{signal} (where signal is 'traces', 'logs', or 'metrics') is used.
-   *
-   */
-  endpoint?: string;
-  tls?: HttpTls;
-  /**
-   * Configure headers. Entries have higher priority than entries from .headers_list.
-   * If an entry's .value is null, the entry is ignored.
-   * If omitted, no headers are added.
-   *
-   *
-   * @minItems 1
-   */
-  headers?: NameStringValuePair[];
-  /**
-   * Configure headers. Entries have lower priority than entries from .headers.
-   * The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
-   * If omitted or null, no headers are added.
-   *
-   */
-  headers_list?: string;
-  /**
-   * Configure compression.
-   * Known values include: gzip, none. Implementations may support other compression algorithms.
-   * If omitted or null, none is used.
-   *
-   */
-  compression?: string;
-  /**
-   * Configure max time (in milliseconds) to wait for each export.
-   * Value must be non-negative. A value of 0 indicates no limit (infinity).
-   * If omitted or null, 10000 is used.
-   *
-   */
-  timeout?: number;
-  /**
-   * Configure the encoding used for messages.
-   * Implementations may not support json.
-   * Values include:
-   * * json: Protobuf JSON encoding.
-   * * protobuf: Protobuf binary encoding.
-   * If omitted, protobuf is used.
-   *
-   */
-  encoding?: ('protobuf' | 'json');
-} & ({
-  /**
-   * Configure endpoint, including the signal specific path.
-   * If omitted or null, the http://localhost:4318/v1/{signal} (where signal is 'traces', 'logs', or 'metrics') is used.
-   *
-   */
-  endpoint?: string;
-  tls?: HttpTls;
-  /**
-   * Configure headers. Entries have higher priority than entries from .headers_list.
-   * If an entry's .value is null, the entry is ignored.
-   * If omitted, no headers are added.
-   *
-   *
-   * @minItems 1
-   */
-  headers?: NameStringValuePair[];
-  /**
-   * Configure headers. Entries have lower priority than entries from .headers.
-   * The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
-   * If omitted or null, no headers are added.
-   *
-   */
-  headers_list?: string;
-  /**
-   * Configure compression.
-   * Known values include: gzip, none. Implementations may support other compression algorithms.
-   * If omitted or null, none is used.
-   *
-   */
-  compression?: string;
-  /**
-   * Configure max time (in milliseconds) to wait for each export.
-   * Value must be non-negative. A value of 0 indicates no limit (infinity).
-   * If omitted or null, 10000 is used.
-   *
-   */
-  timeout?: number;
-  /**
-   * Configure the encoding used for messages.
-   * Implementations may not support json.
-   * Values include:
-   * * json: Protobuf JSON encoding.
-   * * protobuf: Protobuf binary encoding.
-   * If omitted, protobuf is used.
-   *
-   */
-  encoding?: ('protobuf' | 'json');
-});
-/**
- * Configure exporter to be OTLP with gRPC transport.
- * If omitted, ignore.
- *
- */
-export type OtlpGrpcExporter1 = {
-  /**
-   * Configure endpoint.
-   * If omitted or null, http://localhost:4317 is used.
-   *
-   */
-  endpoint?: string;
-  tls?: GrpcTls;
-  /**
-   * Configure headers. Entries have higher priority than entries from .headers_list.
-   * If an entry's .value is null, the entry is ignored.
-   * If omitted, no headers are added.
-   *
-   *
-   * @minItems 1
-   */
-  headers?: NameStringValuePair[];
-  /**
-   * Configure headers. Entries have lower priority than entries from .headers.
-   * The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
-   * If omitted or null, no headers are added.
-   *
-   */
-  headers_list?: string;
-  /**
-   * Configure compression.
-   * Known values include: gzip, none. Implementations may support other compression algorithms.
-   * If omitted or null, none is used.
-   *
-   */
-  compression?: string;
-  /**
-   * Configure max time (in milliseconds) to wait for each export.
-   * Value must be non-negative. A value of 0 indicates no limit (infinity).
-   * If omitted or null, 10000 is used.
-   *
-   */
-  timeout?: number;
-} & ({
-  /**
-   * Configure endpoint.
-   * If omitted or null, http://localhost:4317 is used.
-   *
-   */
-  endpoint?: string;
-  tls?: GrpcTls;
-  /**
-   * Configure headers. Entries have higher priority than entries from .headers_list.
-   * If an entry's .value is null, the entry is ignored.
-   * If omitted, no headers are added.
-   *
-   *
-   * @minItems 1
-   */
-  headers?: NameStringValuePair[];
-  /**
-   * Configure headers. Entries have lower priority than entries from .headers.
-   * The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
-   * If omitted or null, no headers are added.
-   *
-   */
-  headers_list?: string;
-  /**
-   * Configure compression.
-   * Known values include: gzip, none. Implementations may support other compression algorithms.
-   * If omitted or null, none is used.
-   *
-   */
-  compression?: string;
-  /**
-   * Configure max time (in milliseconds) to wait for each export.
-   * Value must be non-negative. A value of 0 indicates no limit (infinity).
-   * If omitted or null, 10000 is used.
-   *
-   */
-  timeout?: number;
-});
-/**
- * Configure exporter to be OTLP with file transport.
- * If omitted, ignore.
- *
- */
-export type ExperimentalOtlpFileExporter1 = {
-  /**
-   * Configure output stream.
-   * Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
-   * If omitted or null, stdout is used.
-   *
-   */
-  output_stream?: string;
-} & ({
-  /**
-   * Configure output stream.
-   * Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
-   * If omitted or null, stdout is used.
-   *
-   */
-  output_stream?: string;
-});
-/**
- * Configure exporter to be console.
- * If omitted, ignore.
- *
- */
-export type ConsoleExporter1 = {};
-/**
- * Configure sampler to be always_off.
- * If omitted, ignore.
- *
- */
 export type AlwaysOffSampler = {};
 /**
  * Configure sampler to be always_on.
@@ -1234,7 +1022,7 @@ export type ExperimentalJaegerRemoteSampler = {
    *
    */
   interval?: number;
-  initial_sampler: Sampler1;
+  initial_sampler: Sampler;
 } & ({
   /**
    * Configure the endpoint of the jaeger remote sampling service.
@@ -1248,7 +1036,7 @@ export type ExperimentalJaegerRemoteSampler = {
    *
    */
   interval?: number;
-  initial_sampler: Sampler1;
+  initial_sampler: Sampler;
 });
 /**
  * Configure sampler to be parent_based.
@@ -1256,17 +1044,17 @@ export type ExperimentalJaegerRemoteSampler = {
  *
  */
 export type ParentBasedSampler = {
-  root?: Sampler2;
-  remote_parent_sampled?: Sampler3;
-  remote_parent_not_sampled?: Sampler4;
-  local_parent_sampled?: Sampler5;
-  local_parent_not_sampled?: Sampler6;
+  root?: Sampler;
+  remote_parent_sampled?: Sampler;
+  remote_parent_not_sampled?: Sampler;
+  local_parent_sampled?: Sampler;
+  local_parent_not_sampled?: Sampler;
 } & ({
-  root?: Sampler2;
-  remote_parent_sampled?: Sampler3;
-  remote_parent_not_sampled?: Sampler4;
-  local_parent_sampled?: Sampler5;
-  local_parent_not_sampled?: Sampler6;
+  root?: Sampler;
+  remote_parent_sampled?: Sampler;
+  remote_parent_not_sampled?: Sampler;
+  local_parent_sampled?: Sampler;
+  local_parent_not_sampled?: Sampler;
 });
 /**
  * Configure sampler to be probability.
@@ -1526,23 +1314,11 @@ export interface NameStringValuePair {
  *
  */
 export interface SimpleLogRecordProcessor {
-  exporter: LogRecordExporter1;
+  exporter: LogRecordExporter;
 }
 /**
  * Configure exporter.
  * Property is required and must be non-null.
- *
- */
-export interface LogRecordExporter1 {
-  otlp_http?: OtlpHttpExporter;
-  otlp_grpc?: OtlpGrpcExporter;
-  'otlp_file/development'?: ExperimentalOtlpFileExporter;
-  console?: ConsoleExporter;
-  [k: string]: unknown;
-}
-/**
- * Configure log record limits. See also attribute_limits.
- * If omitted, default values as described in LogRecordLimits are used.
  *
  */
 export interface LogRecordLimits {
@@ -1666,90 +1442,11 @@ export interface ExperimentalLoggerMatcherAndConfig {
    *
    */
   name: string;
-  config: ExperimentalLoggerConfig1;
+  config: ExperimentalLoggerConfig;
 }
 /**
  * The logger config.
  * Property is required and must be non-null.
- *
- */
-export interface ExperimentalLoggerConfig1 {
-  /**
-   * Configure if the logger is enabled or not.
-   * If omitted or null, true is used.
-   *
-   */
-  enabled?: boolean;
-  /**
-   * Configure severity filtering.
-   * Log records with an non-zero (i.e. unspecified) severity number which is less than minimum_severity are not processed.
-   * Values include:
-   * * debug: debug, severity number 5.
-   * * debug2: debug2, severity number 6.
-   * * debug3: debug3, severity number 7.
-   * * debug4: debug4, severity number 8.
-   * * error: error, severity number 17.
-   * * error2: error2, severity number 18.
-   * * error3: error3, severity number 19.
-   * * error4: error4, severity number 20.
-   * * fatal: fatal, severity number 21.
-   * * fatal2: fatal2, severity number 22.
-   * * fatal3: fatal3, severity number 23.
-   * * fatal4: fatal4, severity number 24.
-   * * info: info, severity number 9.
-   * * info2: info2, severity number 10.
-   * * info3: info3, severity number 11.
-   * * info4: info4, severity number 12.
-   * * trace: trace, severity number 1.
-   * * trace2: trace2, severity number 2.
-   * * trace3: trace3, severity number 3.
-   * * trace4: trace4, severity number 4.
-   * * warn: warn, severity number 13.
-   * * warn2: warn2, severity number 14.
-   * * warn3: warn3, severity number 15.
-   * * warn4: warn4, severity number 16.
-   * If omitted, severity filtering is not applied.
-   *
-   */
-  minimum_severity?:
-    | (
-        | 'trace'
-        | 'trace2'
-        | 'trace3'
-        | 'trace4'
-        | 'debug'
-        | 'debug2'
-        | 'debug3'
-        | 'debug4'
-        | 'info'
-        | 'info2'
-        | 'info3'
-        | 'info4'
-        | 'warn'
-        | 'warn2'
-        | 'warn3'
-        | 'warn4'
-        | 'error'
-        | 'error2'
-        | 'error3'
-        | 'error4'
-        | 'fatal'
-        | 'fatal2'
-        | 'fatal3'
-        | 'fatal4'
-      )
-   ;
-  /**
-   * Configure trace based filtering.
-   * If true, log records associated with unsampled trace contexts traces are not processed. If false, or if a log record is not associated with a trace context, trace based filtering is not applied.
-   * If omitted or null, trace based filtering is not applied.
-   *
-   */
-  trace_based?: boolean;
-}
-/**
- * Configure meter provider.
- * If omitted, a noop meter provider is used.
  *
  */
 export interface MeterProvider {
@@ -1904,7 +1601,7 @@ export interface PullMetricReader {
    * @minItems 1
    */
   producers?: MetricProducer[];
-  cardinality_limits?: CardinalityLimits1;
+  cardinality_limits?: CardinalityLimits;
 }
 /**
  * Configure exporter.
@@ -1949,57 +1646,6 @@ export interface IncludeExclude {
  * If omitted, default values as described in CardinalityLimits are used.
  *
  */
-export interface CardinalityLimits1 {
-  /**
-   * Configure default cardinality limit for all instrument types.
-   * Instrument-specific cardinality limits take priority.
-   * If omitted or null, 2000 is used.
-   *
-   */
-  default?: number;
-  /**
-   * Configure default cardinality limit for counter instruments.
-   * If omitted or null, the value from .default is used.
-   *
-   */
-  counter?: number;
-  /**
-   * Configure default cardinality limit for gauge instruments.
-   * If omitted or null, the value from .default is used.
-   *
-   */
-  gauge?: number;
-  /**
-   * Configure default cardinality limit for histogram instruments.
-   * If omitted or null, the value from .default is used.
-   *
-   */
-  histogram?: number;
-  /**
-   * Configure default cardinality limit for observable_counter instruments.
-   * If omitted or null, the value from .default is used.
-   *
-   */
-  observable_counter?: number;
-  /**
-   * Configure default cardinality limit for observable_gauge instruments.
-   * If omitted or null, the value from .default is used.
-   *
-   */
-  observable_gauge?: number;
-  /**
-   * Configure default cardinality limit for observable_up_down_counter instruments.
-   * If omitted or null, the value from .default is used.
-   *
-   */
-  observable_up_down_counter?: number;
-  /**
-   * Configure default cardinality limit for up_down_counter instruments.
-   * If omitted or null, the value from .default is used.
-   *
-   */
-  up_down_counter?: number;
-}
 export interface View {
   selector: ViewSelector;
   stream: ViewStream;
@@ -2091,7 +1737,7 @@ export interface ViewStream {
    *
    */
   aggregation_cardinality_limit?: number;
-  attribute_keys?: IncludeExclude1;
+  attribute_keys?: IncludeExclude;
 }
 /**
  * Configure aggregation of the resulting stream(s).
@@ -2109,35 +1755,6 @@ export interface Aggregation {
 /**
  * Configure attribute keys retained in the resulting stream(s).
  * If omitted, all attribute keys are retained.
- *
- */
-export interface IncludeExclude1 {
-  /**
-   * Configure list of value patterns to include.
-   * Values are evaluated to match as follows:
-   *  * If the value exactly matches.
-   *  * If the value matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
-   * If omitted, all values are included.
-   *
-   *
-   * @minItems 1
-   */
-  included?: string[];
-  /**
-   * Configure list of value patterns to exclude. Applies after .included (i.e. excluded has higher priority than included).
-   * Values are evaluated to match as follows:
-   *  * If the value exactly matches.
-   *  * If the value matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
-   * If omitted, .included attributes are included.
-   *
-   *
-   * @minItems 1
-   */
-  excluded?: string[];
-}
-/**
- * Configure meters.
- * If omitted, all meters use default values as described in ExperimentalMeterConfig.
  *
  */
 export interface ExperimentalMeterConfigurator {
@@ -2174,24 +1791,11 @@ export interface ExperimentalMeterMatcherAndConfig {
    *
    */
   name: string;
-  config: ExperimentalMeterConfig1;
+  config: ExperimentalMeterConfig;
 }
 /**
  * The meter config.
  * Property is required and must be non-null.
- *
- */
-export interface ExperimentalMeterConfig1 {
-  /**
-   * Configure if the meter is enabled or not.
-   * If omitted, true is used.
-   *
-   */
-  enabled?: boolean;
-}
-/**
- * Configure text map context propagators.
- * If omitted, a noop propagator is used.
  *
  */
 export interface Propagator {
@@ -2283,10 +1887,10 @@ export interface BatchSpanProcessor {
  *
  */
 export interface SpanExporter {
-  otlp_http?: OtlpHttpExporter1;
-  otlp_grpc?: OtlpGrpcExporter1;
-  'otlp_file/development'?: ExperimentalOtlpFileExporter1;
-  console?: ConsoleExporter1;
+  otlp_http?: OtlpHttpExporter;
+  otlp_grpc?: OtlpGrpcExporter;
+  'otlp_file/development'?: ExperimentalOtlpFileExporter;
+  console?: ConsoleExporter;
   [k: string]: unknown;
 }
 /**
@@ -2295,23 +1899,11 @@ export interface SpanExporter {
  *
  */
 export interface SimpleSpanProcessor {
-  exporter: SpanExporter1;
+  exporter: SpanExporter;
 }
 /**
  * Configure exporter.
  * Property is required and must be non-null.
- *
- */
-export interface SpanExporter1 {
-  otlp_http?: OtlpHttpExporter1;
-  otlp_grpc?: OtlpGrpcExporter1;
-  'otlp_file/development'?: ExperimentalOtlpFileExporter1;
-  console?: ConsoleExporter1;
-  [k: string]: unknown;
-}
-/**
- * Configure span limits. See also attribute_limits.
- * If omitted, default values as described in SpanLimits are used.
  *
  */
 export interface SpanLimits {
@@ -2392,24 +1984,11 @@ export interface ExperimentalComposableSampler {
  *
  */
 export interface ExperimentalComposableParentThresholdSampler {
-  root: ExperimentalComposableSampler1;
+  root: ExperimentalComposableSampler;
 }
 /**
  * Sampler to use when there is no parent.
  * Property is required and must be non-null.
- *
- */
-export interface ExperimentalComposableSampler1 {
-  always_off?: ExperimentalComposableAlwaysOffSampler;
-  always_on?: ExperimentalComposableAlwaysOnSampler;
-  parent_threshold?: ExperimentalComposableParentThresholdSampler;
-  probability?: ExperimentalComposableProbabilitySampler;
-  rule_based?: ExperimentalComposableRuleBasedSampler;
-  [k: string]: unknown;
-}
-/**
- * A rule for ExperimentalComposableRuleBasedSampler. A rule can have multiple match conditions - the sampler will be applied if all match.
- * If no conditions are specified, the rule matches all spans that reach it.
  *
  */
 export interface ExperimentalComposableRuleBasedSamplerRule {
@@ -2441,7 +2020,7 @@ export interface ExperimentalComposableRuleBasedSamplerRule {
    * @minItems 1
    */
   parent?: ExperimentalSpanParent[];
-  sampler: ExperimentalComposableSampler2;
+  sampler: ExperimentalComposableSampler;
 }
 /**
  * Values to match against a single attribute. Non-string attributes are matched using their string representation:
@@ -2508,109 +2087,6 @@ export interface ExperimentalComposableRuleBasedSamplerRuleAttributePatterns {
  * Property is required and must be non-null.
  *
  */
-export interface ExperimentalComposableSampler2 {
-  always_off?: ExperimentalComposableAlwaysOffSampler;
-  always_on?: ExperimentalComposableAlwaysOnSampler;
-  parent_threshold?: ExperimentalComposableParentThresholdSampler;
-  probability?: ExperimentalComposableProbabilitySampler;
-  rule_based?: ExperimentalComposableRuleBasedSampler;
-  [k: string]: unknown;
-}
-/**
- * Configure the initial sampler used before first configuration is fetched.
- * Property is required and must be non-null.
- *
- */
-export interface Sampler1 {
-  always_off?: AlwaysOffSampler;
-  always_on?: AlwaysOnSampler;
-  'composite/development'?: ExperimentalComposableSampler;
-  'jaeger_remote/development'?: ExperimentalJaegerRemoteSampler;
-  parent_based?: ParentBasedSampler;
-  'probability/development'?: ExperimentalProbabilitySampler;
-  trace_id_ratio_based?: TraceIdRatioBasedSampler;
-  [k: string]: unknown;
-}
-/**
- * Configure root sampler.
- * If omitted, always_on is used.
- *
- */
-export interface Sampler2 {
-  always_off?: AlwaysOffSampler;
-  always_on?: AlwaysOnSampler;
-  'composite/development'?: ExperimentalComposableSampler;
-  'jaeger_remote/development'?: ExperimentalJaegerRemoteSampler;
-  parent_based?: ParentBasedSampler;
-  'probability/development'?: ExperimentalProbabilitySampler;
-  trace_id_ratio_based?: TraceIdRatioBasedSampler;
-  [k: string]: unknown;
-}
-/**
- * Configure remote_parent_sampled sampler.
- * If omitted, always_on is used.
- *
- */
-export interface Sampler3 {
-  always_off?: AlwaysOffSampler;
-  always_on?: AlwaysOnSampler;
-  'composite/development'?: ExperimentalComposableSampler;
-  'jaeger_remote/development'?: ExperimentalJaegerRemoteSampler;
-  parent_based?: ParentBasedSampler;
-  'probability/development'?: ExperimentalProbabilitySampler;
-  trace_id_ratio_based?: TraceIdRatioBasedSampler;
-  [k: string]: unknown;
-}
-/**
- * Configure remote_parent_not_sampled sampler.
- * If omitted, always_off is used.
- *
- */
-export interface Sampler4 {
-  always_off?: AlwaysOffSampler;
-  always_on?: AlwaysOnSampler;
-  'composite/development'?: ExperimentalComposableSampler;
-  'jaeger_remote/development'?: ExperimentalJaegerRemoteSampler;
-  parent_based?: ParentBasedSampler;
-  'probability/development'?: ExperimentalProbabilitySampler;
-  trace_id_ratio_based?: TraceIdRatioBasedSampler;
-  [k: string]: unknown;
-}
-/**
- * Configure local_parent_sampled sampler.
- * If omitted, always_on is used.
- *
- */
-export interface Sampler5 {
-  always_off?: AlwaysOffSampler;
-  always_on?: AlwaysOnSampler;
-  'composite/development'?: ExperimentalComposableSampler;
-  'jaeger_remote/development'?: ExperimentalJaegerRemoteSampler;
-  parent_based?: ParentBasedSampler;
-  'probability/development'?: ExperimentalProbabilitySampler;
-  trace_id_ratio_based?: TraceIdRatioBasedSampler;
-  [k: string]: unknown;
-}
-/**
- * Configure local_parent_not_sampled sampler.
- * If omitted, always_off is used.
- *
- */
-export interface Sampler6 {
-  always_off?: AlwaysOffSampler;
-  always_on?: AlwaysOnSampler;
-  'composite/development'?: ExperimentalComposableSampler;
-  'jaeger_remote/development'?: ExperimentalJaegerRemoteSampler;
-  parent_based?: ParentBasedSampler;
-  'probability/development'?: ExperimentalProbabilitySampler;
-  trace_id_ratio_based?: TraceIdRatioBasedSampler;
-  [k: string]: unknown;
-}
-/**
- * Configure tracers.
- * If omitted, all tracers use default values as described in ExperimentalTracerConfig.
- *
- */
 export interface ExperimentalTracerConfigurator {
   default_config?: ExperimentalTracerConfig;
   /**
@@ -2645,24 +2121,11 @@ export interface ExperimentalTracerMatcherAndConfig {
    *
    */
   name: string;
-  config: ExperimentalTracerConfig1;
+  config: ExperimentalTracerConfig;
 }
 /**
  * The tracer config.
  * Property is required and must be non-null.
- *
- */
-export interface ExperimentalTracerConfig1 {
-  /**
-   * Configure if the tracer is enabled or not.
-   * If omitted, true is used.
-   *
-   */
-  enabled?: boolean;
-}
-/**
- * Configure resource for all signals.
- * If omitted, the default resource is used.
  *
  */
 export interface Resource {
@@ -2725,7 +2188,7 @@ export interface AttributeNameValue {
  *
  */
 export interface ExperimentalResourceDetection {
-  attributes?: IncludeExclude2;
+  attributes?: IncludeExclude;
   /**
    * Configure resource detectors.
    * Resource detector names are dependent on the SDK language ecosystem. Please consult documentation for each respective language.
@@ -2741,30 +2204,6 @@ export interface ExperimentalResourceDetection {
  * If omitted, all attributes from resource detectors are added.
  *
  */
-export interface IncludeExclude2 {
-  /**
-   * Configure list of value patterns to include.
-   * Values are evaluated to match as follows:
-   *  * If the value exactly matches.
-   *  * If the value matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
-   * If omitted, all values are included.
-   *
-   *
-   * @minItems 1
-   */
-  included?: string[];
-  /**
-   * Configure list of value patterns to exclude. Applies after .included (i.e. excluded has higher priority than included).
-   * Values are evaluated to match as follows:
-   *  * If the value exactly matches.
-   *  * If the value matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
-   * If omitted, .included attributes are included.
-   *
-   *
-   * @minItems 1
-   */
-  excluded?: string[];
-}
 export interface ExperimentalResourceDetector {
   container?: ExperimentalContainerResourceDetector;
   host?: ExperimentalHostResourceDetector;
@@ -2780,16 +2219,16 @@ export interface ExperimentalResourceDetector {
 export interface ExperimentalInstrumentation {
   general?: ExperimentalGeneralInstrumentation;
   cpp?: ExperimentalLanguageSpecificInstrumentation;
-  dotnet?: ExperimentalLanguageSpecificInstrumentation1;
-  erlang?: ExperimentalLanguageSpecificInstrumentation2;
-  go?: ExperimentalLanguageSpecificInstrumentation3;
-  java?: ExperimentalLanguageSpecificInstrumentation4;
-  js?: ExperimentalLanguageSpecificInstrumentation5;
-  php?: ExperimentalLanguageSpecificInstrumentation6;
-  python?: ExperimentalLanguageSpecificInstrumentation7;
-  ruby?: ExperimentalLanguageSpecificInstrumentation8;
-  rust?: ExperimentalLanguageSpecificInstrumentation9;
-  swift?: ExperimentalLanguageSpecificInstrumentation10;
+  dotnet?: ExperimentalLanguageSpecificInstrumentation;
+  erlang?: ExperimentalLanguageSpecificInstrumentation;
+  go?: ExperimentalLanguageSpecificInstrumentation;
+  java?: ExperimentalLanguageSpecificInstrumentation;
+  js?: ExperimentalLanguageSpecificInstrumentation;
+  php?: ExperimentalLanguageSpecificInstrumentation;
+  python?: ExperimentalLanguageSpecificInstrumentation;
+  ruby?: ExperimentalLanguageSpecificInstrumentation;
+  rust?: ExperimentalLanguageSpecificInstrumentation;
+  swift?: ExperimentalLanguageSpecificInstrumentation;
 }
 /**
  * Configure general SemConv options that may apply to multiple languages and instrumentations.
@@ -2954,7 +2393,7 @@ export interface ExperimentalHttpServerInstrumentation {
  *
  */
 export interface ExperimentalCodeInstrumentation {
-  semconv?: ExperimentalSemconvConfig1;
+  semconv?: ExperimentalSemconvConfig;
 }
 /**
  * Configure code semantic convention version and migration behavior.
@@ -2965,37 +2404,8 @@ export interface ExperimentalCodeInstrumentation {
  * If omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.
  *
  */
-export interface ExperimentalSemconvConfig1 {
-  /**
-   * The target semantic convention version for this domain (e.g., 1).
-   * If omitted or null, the latest stable version is used, or if no stable version is available and .experimental is true then the latest experimental version is used.
-   *
-   */
-  version?: number;
-  /**
-   * Use latest experimental semantic conventions (before stable is available or to enable experimental features on top of stable conventions).
-   * If omitted or null, false is used.
-   *
-   */
-  experimental?: boolean;
-  /**
-   * When true, also emit the previous major version alongside the target version.
-   * For version=1, the previous version refers to the pre-stable conventions that the instrumentation emitted before the first stable semantic convention version was defined.
-   * For version=2 and above, the previous version is the prior stable major version (e.g., version=2, dual_emit=true emits both v2 and v1).
-   * Enables dual-emit for phased migration between versions.
-   * If omitted or null, false is used.
-   *
-   */
-  dual_emit?: boolean;
-}
-/**
- * Configure instrumentations following the database semantic conventions.
- * See database semantic conventions: https://opentelemetry.io/docs/specs/semconv/database/
- * If omitted, defaults as described in ExperimentalDbInstrumentation are used.
- *
- */
 export interface ExperimentalDbInstrumentation {
-  semconv?: ExperimentalSemconvConfig2;
+  semconv?: ExperimentalSemconvConfig;
 }
 /**
  * Configure database semantic convention version and migration behavior.
@@ -3006,37 +2416,8 @@ export interface ExperimentalDbInstrumentation {
  * If omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.
  *
  */
-export interface ExperimentalSemconvConfig2 {
-  /**
-   * The target semantic convention version for this domain (e.g., 1).
-   * If omitted or null, the latest stable version is used, or if no stable version is available and .experimental is true then the latest experimental version is used.
-   *
-   */
-  version?: number;
-  /**
-   * Use latest experimental semantic conventions (before stable is available or to enable experimental features on top of stable conventions).
-   * If omitted or null, false is used.
-   *
-   */
-  experimental?: boolean;
-  /**
-   * When true, also emit the previous major version alongside the target version.
-   * For version=1, the previous version refers to the pre-stable conventions that the instrumentation emitted before the first stable semantic convention version was defined.
-   * For version=2 and above, the previous version is the prior stable major version (e.g., version=2, dual_emit=true emits both v2 and v1).
-   * Enables dual-emit for phased migration between versions.
-   * If omitted or null, false is used.
-   *
-   */
-  dual_emit?: boolean;
-}
-/**
- * Configure instrumentations following the GenAI semantic conventions.
- * See GenAI semantic conventions: https://opentelemetry.io/docs/specs/semconv/gen-ai/
- * If omitted, defaults as described in ExperimentalGenAiInstrumentation are used.
- *
- */
 export interface ExperimentalGenAiInstrumentation {
-  semconv?: ExperimentalSemconvConfig3;
+  semconv?: ExperimentalSemconvConfig;
 }
 /**
  * Configure GenAI semantic convention version and migration behavior.
@@ -3047,37 +2428,8 @@ export interface ExperimentalGenAiInstrumentation {
  * If omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.
  *
  */
-export interface ExperimentalSemconvConfig3 {
-  /**
-   * The target semantic convention version for this domain (e.g., 1).
-   * If omitted or null, the latest stable version is used, or if no stable version is available and .experimental is true then the latest experimental version is used.
-   *
-   */
-  version?: number;
-  /**
-   * Use latest experimental semantic conventions (before stable is available or to enable experimental features on top of stable conventions).
-   * If omitted or null, false is used.
-   *
-   */
-  experimental?: boolean;
-  /**
-   * When true, also emit the previous major version alongside the target version.
-   * For version=1, the previous version refers to the pre-stable conventions that the instrumentation emitted before the first stable semantic convention version was defined.
-   * For version=2 and above, the previous version is the prior stable major version (e.g., version=2, dual_emit=true emits both v2 and v1).
-   * Enables dual-emit for phased migration between versions.
-   * If omitted or null, false is used.
-   *
-   */
-  dual_emit?: boolean;
-}
-/**
- * Configure instrumentations following the messaging semantic conventions.
- * See messaging semantic conventions: https://opentelemetry.io/docs/specs/semconv/messaging/
- * If omitted, defaults as described in ExperimentalMessagingInstrumentation are used.
- *
- */
 export interface ExperimentalMessagingInstrumentation {
-  semconv?: ExperimentalSemconvConfig4;
+  semconv?: ExperimentalSemconvConfig;
 }
 /**
  * Configure messaging semantic convention version and migration behavior.
@@ -3088,37 +2440,8 @@ export interface ExperimentalMessagingInstrumentation {
  * If omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.
  *
  */
-export interface ExperimentalSemconvConfig4 {
-  /**
-   * The target semantic convention version for this domain (e.g., 1).
-   * If omitted or null, the latest stable version is used, or if no stable version is available and .experimental is true then the latest experimental version is used.
-   *
-   */
-  version?: number;
-  /**
-   * Use latest experimental semantic conventions (before stable is available or to enable experimental features on top of stable conventions).
-   * If omitted or null, false is used.
-   *
-   */
-  experimental?: boolean;
-  /**
-   * When true, also emit the previous major version alongside the target version.
-   * For version=1, the previous version refers to the pre-stable conventions that the instrumentation emitted before the first stable semantic convention version was defined.
-   * For version=2 and above, the previous version is the prior stable major version (e.g., version=2, dual_emit=true emits both v2 and v1).
-   * Enables dual-emit for phased migration between versions.
-   * If omitted or null, false is used.
-   *
-   */
-  dual_emit?: boolean;
-}
-/**
- * Configure instrumentations following the RPC semantic conventions.
- * See RPC semantic conventions: https://opentelemetry.io/docs/specs/semconv/rpc/
- * If omitted, defaults as described in ExperimentalRpcInstrumentation are used.
- *
- */
 export interface ExperimentalRpcInstrumentation {
-  semconv?: ExperimentalSemconvConfig5;
+  semconv?: ExperimentalSemconvConfig;
 }
 /**
  * Configure RPC semantic convention version and migration behavior.
@@ -3127,34 +2450,6 @@ export interface ExperimentalRpcInstrumentation {
  *
  * See RPC semantic conventions: https://opentelemetry.io/docs/specs/semconv/rpc/
  * If omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.
- *
- */
-export interface ExperimentalSemconvConfig5 {
-  /**
-   * The target semantic convention version for this domain (e.g., 1).
-   * If omitted or null, the latest stable version is used, or if no stable version is available and .experimental is true then the latest experimental version is used.
-   *
-   */
-  version?: number;
-  /**
-   * Use latest experimental semantic conventions (before stable is available or to enable experimental features on top of stable conventions).
-   * If omitted or null, false is used.
-   *
-   */
-  experimental?: boolean;
-  /**
-   * When true, also emit the previous major version alongside the target version.
-   * For version=1, the previous version refers to the pre-stable conventions that the instrumentation emitted before the first stable semantic convention version was defined.
-   * For version=2 and above, the previous version is the prior stable major version (e.g., version=2, dual_emit=true emits both v2 and v1).
-   * Enables dual-emit for phased migration between versions.
-   * If omitted or null, false is used.
-   *
-   */
-  dual_emit?: boolean;
-}
-/**
- * Configure general sanitization options.
- * If omitted, defaults as described in ExperimentalSanitization are used.
  *
  */
 export interface ExperimentalSanitization {
@@ -3190,98 +2485,6 @@ export interface ExperimentalLanguageSpecificInstrumentation {
  * Configure .NET language-specific instrumentation libraries.
  * Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
  * If omitted, instrumentation defaults are used.
- *
- */
-export interface ExperimentalLanguageSpecificInstrumentation1 {
-  [k: string]: unknown;
-}
-/**
- * Configure Erlang language-specific instrumentation libraries.
- * Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
- * If omitted, instrumentation defaults are used.
- *
- */
-export interface ExperimentalLanguageSpecificInstrumentation2 {
-  [k: string]: unknown;
-}
-/**
- * Configure Go language-specific instrumentation libraries.
- * Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
- * If omitted, instrumentation defaults are used.
- *
- */
-export interface ExperimentalLanguageSpecificInstrumentation3 {
-  [k: string]: unknown;
-}
-/**
- * Configure Java language-specific instrumentation libraries.
- * Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
- * If omitted, instrumentation defaults are used.
- *
- */
-export interface ExperimentalLanguageSpecificInstrumentation4 {
-  [k: string]: unknown;
-}
-/**
- * Configure JavaScript language-specific instrumentation libraries.
- * Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
- * If omitted, instrumentation defaults are used.
- *
- */
-export interface ExperimentalLanguageSpecificInstrumentation5 {
-  [k: string]: unknown;
-}
-/**
- * Configure PHP language-specific instrumentation libraries.
- * Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
- * If omitted, instrumentation defaults are used.
- *
- */
-export interface ExperimentalLanguageSpecificInstrumentation6 {
-  [k: string]: unknown;
-}
-/**
- * Configure Python language-specific instrumentation libraries.
- * Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
- * If omitted, instrumentation defaults are used.
- *
- */
-export interface ExperimentalLanguageSpecificInstrumentation7 {
-  [k: string]: unknown;
-}
-/**
- * Configure Ruby language-specific instrumentation libraries.
- * Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
- * If omitted, instrumentation defaults are used.
- *
- */
-export interface ExperimentalLanguageSpecificInstrumentation8 {
-  [k: string]: unknown;
-}
-/**
- * Configure Rust language-specific instrumentation libraries.
- * Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
- * If omitted, instrumentation defaults are used.
- *
- */
-export interface ExperimentalLanguageSpecificInstrumentation9 {
-  [k: string]: unknown;
-}
-/**
- * Configure Swift language-specific instrumentation libraries.
- * Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
- * If omitted, instrumentation defaults are used.
- *
- */
-export interface ExperimentalLanguageSpecificInstrumentation10 {
-  [k: string]: unknown;
-}
-/**
- * Defines configuration parameters specific to a particular OpenTelemetry distribution or vendor.
- * This section provides a standardized location for distribution-specific settings
- * that are not part of the OpenTelemetry configuration model.
- * It allows vendors to expose their own extensions and general configuration options.
- * If omitted, distribution defaults are used.
  *
  */
 export interface Distribution {
