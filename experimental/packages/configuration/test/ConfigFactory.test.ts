@@ -2530,7 +2530,7 @@ describe('ConfigFactory', function () {
     });
 
     it('should throw on non-existant config file', function () {
-      process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid.txt';
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/no-such-file.txt';
       try {
         createConfigFactory();
       } catch (err) {
