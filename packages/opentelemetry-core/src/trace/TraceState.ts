@@ -74,7 +74,7 @@ export class TraceState implements TraceStateApi {
     //   - +1 for the separator if there are other keys
     let newLength = this._length - (key.length + currValue.length + 1);
     if (currState.size > 1) {
-      // remove separator from length if there's no key or only one. 
+      // remove separator from length if there's no key or only one.
       newLength = newLength - 1;
     }
 
