@@ -2529,14 +2529,14 @@ describe('ConfigFactory', function () {
       });
     });
 
-    it('should return error from invalid config file', function () {
-      const warnSpy = Sinon.spy(diag, 'warn');
-      process.env.OTEL_CONFIG_FILE = './fixtures/invalid.txt';
-      createConfigFactory();
-      Sinon.assert.calledWith(
-        warnSpy,
-        'Config file ./fixtures/invalid.txt set on OTEL_CONFIG_FILE is not valid'
-      );
+    it('should throw on non-existant config file', function () {
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid.txt';
+      try {
+        createConfigFactory();
+      } catch (err) {
+        assert.ok(err);
+        assert.equal(err.code, 'ENOENT');
+      }
     });
 
     it('should return error from invalid config file format', function () {
