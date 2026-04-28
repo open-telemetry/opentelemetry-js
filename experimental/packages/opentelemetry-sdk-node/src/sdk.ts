@@ -39,10 +39,14 @@ import {
   ConsoleMetricExporter,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
-import type { SpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
-import type { NodeTracerConfig } from '@opentelemetry/sdk-trace-node';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import type {
+  SpanProcessor,
+  TracerConfig,
+} from '@opentelemetry/sdk-trace-base';
+import {
+  BasicTracerProvider,
+  BatchSpanProcessor,
+} from '@opentelemetry/sdk-trace-base';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import type { NodeSDKConfiguration } from './types';
 import {
@@ -64,7 +68,7 @@ import {
 } from './utils';
 
 type TracerProviderConfig = {
-  tracerConfig: NodeTracerConfig;
+  tracerConfig: TracerConfig;
   spanProcessors: SpanProcessor[];
 };
 
@@ -160,7 +164,7 @@ export class NodeSDK {
 
   private _autoDetectResources: boolean;
 
-  private _tracerProvider?: NodeTracerProvider;
+  private _tracerProvider?: BasicTracerProvider;
   private _loggerProvider?: LoggerProvider;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
@@ -207,7 +211,7 @@ export class NodeSDK {
       configuration.spanProcessor ||
       configuration.spanProcessors
     ) {
-      const tracerProviderConfig: NodeTracerConfig = {};
+      const tracerProviderConfig: TracerConfig = {};
 
       if (configuration.sampler) {
         tracerProviderConfig.sampler = configuration.sampler;
@@ -346,7 +350,7 @@ export class NodeSDK {
 
     // Only register if there is a span processor
     if (spanProcessors.length > 0) {
-      this._tracerProvider = new NodeTracerProvider({
+      this._tracerProvider = new BasicTracerProvider({
         ...this._configuration,
         resource: this._resource,
         meterProvider: sdkMetricsEnabled ? this._meterProvider : undefined,

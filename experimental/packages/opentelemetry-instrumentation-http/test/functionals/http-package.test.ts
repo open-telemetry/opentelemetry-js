@@ -6,8 +6,8 @@
 import type { Span } from '@opentelemetry/api';
 import { context, SpanKind, propagation } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
+  BasicTracerProvider,
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
@@ -41,7 +41,7 @@ describe('Packages', () => {
     context.disable();
   });
   describe('get', () => {
-    const provider = new NodeTracerProvider({
+    const provider = new BasicTracerProvider({
       spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
     });
     instrumentation.setTracerProvider(provider);

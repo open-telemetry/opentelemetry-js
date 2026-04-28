@@ -29,13 +29,13 @@ import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exp
 import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
 import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { PrometheusExporter as PrometheusMetricExporter } from '@opentelemetry/exporter-prometheus';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   assertServiceInstanceIdIsUUID,
   assertServiceResource,
 } from './util/resource-assertions';
 import type { IdGenerator, SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import {
+  BasicTracerProvider,
   ConsoleSpanExporter,
   SimpleSpanProcessor,
   BatchSpanProcessor,
@@ -193,7 +193,7 @@ describe('Node SDK', () => {
       assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
       assert.ok(
         setGlobalTracerProviderSpy.lastCall.args[0] instanceof
-          NodeTracerProvider
+          BasicTracerProvider
       );
       await sdk.shutdown();
     });
@@ -216,7 +216,7 @@ describe('Node SDK', () => {
       );
       assert.ok(
         setGlobalTracerProviderSpy.lastCall.args[0] instanceof
-          NodeTracerProvider
+          BasicTracerProvider
       );
       await sdk.shutdown();
     });
@@ -240,7 +240,7 @@ describe('Node SDK', () => {
 
       const nodeTracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
       assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
-      assert.ok(nodeTracerProvider instanceof NodeTracerProvider);
+      assert.ok(nodeTracerProvider instanceof BasicTracerProvider);
 
       const spanProcessor = nodeTracerProvider['_activeSpanProcessor'] as any;
 
@@ -434,7 +434,7 @@ describe('Node SDK', () => {
 
       assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
       const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
-      assert.ok(tracerProvider instanceof NodeTracerProvider);
+      assert.ok(tracerProvider instanceof BasicTracerProvider);
       assert.ok(
         (tracerProvider as any)._config.meterProvider instanceof MeterProvider
       );
@@ -474,7 +474,7 @@ describe('Node SDK', () => {
 
       assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
       const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
-      assert.ok(tracerProvider instanceof NodeTracerProvider);
+      assert.ok(tracerProvider instanceof BasicTracerProvider);
       assert.equal((tracerProvider as any)._config.meterProvider, undefined);
 
       const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
@@ -1722,7 +1722,7 @@ describe('Node SDK', () => {
     const getSdkSpanProcessors = (sdk: NodeSDK) => {
       const tracerProvider = sdk['_tracerProvider'];
 
-      assert.ok(tracerProvider instanceof NodeTracerProvider);
+      assert.ok(tracerProvider instanceof BasicTracerProvider);
 
       const activeSpanProcessor = tracerProvider['_activeSpanProcessor'];
 

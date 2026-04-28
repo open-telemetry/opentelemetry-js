@@ -11,9 +11,9 @@ import type {
   SpanKind,
 } from '@opentelemetry/api';
 import { context } from '@opentelemetry/api';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import type { Sampler, SamplingResult } from '@opentelemetry/sdk-trace-base';
 import {
+  BasicTracerProvider,
   InMemorySpanExporter,
   SamplingDecision,
   SimpleSpanProcessor,
@@ -56,7 +56,7 @@ import * as http from 'http';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 
 const memoryExporter = new InMemorySpanExporter();
-const provider = new NodeTracerProvider({
+const provider = new BasicTracerProvider({
   sampler,
   spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
 });
