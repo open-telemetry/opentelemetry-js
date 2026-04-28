@@ -20,6 +20,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
   * **important:** this bug fix may be breaking for certain uses of `TraceState`
     * `set` now returns the same `TraceState` instance if key/value are invalid or makes the while trace state invalid.
     * `unset` now returns the same `TraceState` instance if key is not present.
+    *  best-effort parsing of invalid `TraceState`s has changed: when multiple keys with the same name are present, the most recent one will win.
 
 ### :books: Documentation
 
