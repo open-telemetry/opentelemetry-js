@@ -80,23 +80,6 @@ export class FileConfigFactory implements ConfigFactory {
   }
 }
 
-export function hasValidConfigFile(): boolean {
-  const configFile = getStringFromEnv('OTEL_CONFIG_FILE');
-  if (configFile) {
-    if (
-      !(configFile.endsWith('.yaml') || configFile.endsWith('.yml')) ||
-      !fs.existsSync(configFile)
-    ) {
-      diag.warn(
-        `Config file ${configFile} set on OTEL_CONFIG_FILE is not valid`
-      );
-      return false;
-    }
-    return true;
-  }
-  return false;
-}
-
 export function parseConfigFile(config: ConfigurationModel) {
   const supportedFileVersions = ['1.0-rc.3'];
   const configFile = getStringFromEnv('OTEL_CONFIG_FILE') || '';
