@@ -7,6 +7,9 @@
 /**
  * Parse declaractive config files and print its JS object representation.
  * This is a convenience script for development of this package.
+ *
+ * Usage:
+ *    ./scripts/parse-config.mjs CONFIG_FILE
  */
 
 /* eslint-disable no-console */
