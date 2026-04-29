@@ -5,6 +5,9 @@
 
 import { ResourceMetrics, ScopeMetrics } from './MetricData';
 
+/**
+ * @internal
+ */
 export class MetricDataSplitter {
   /**
    * Splits a ResourceMetrics object into smaller ResourceMetrics objects
