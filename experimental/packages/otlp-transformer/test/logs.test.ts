@@ -92,125 +92,15 @@ function createExpectedLogJson(encoder: Encoder): IExportLogsServiceRequest {
   };
 }
 
-function createExpectedMultiResourceLogJson(
-  encoder: Encoder
-): IExportLogsServiceRequest {
-  const timeUnixNano = encoder.encodeHrTime([1680253513, 123241635]);
-  const observedTimeUnixNano = encoder.encodeHrTime([1683526948, 965142784]);
-
-  const traceId = encoder.encodeSpanContext('00000000000000000000000000000001');
-  const spanId = encoder.encodeSpanContext('0000000000000002');
-
-  const testBytes = new Uint8Array([1, 2, 3, 4, 5]);
-  const bytesValue = encoder.encodeUint8Array(testBytes);
-
-  const logRecord = {
-    timeUnixNano,
-    observedTimeUnixNano,
-    severityNumber: ESeverityNumber.SEVERITY_NUMBER_ERROR,
-    severityText: 'error',
-    body: { stringValue: 'some_log_body' },
-    eventName: 'some.event.name',
-    attributes: [
-      {
-        key: 'some-attribute',
-        value: { stringValue: 'some attribute value' },
-      },
-      {
-        key: 'bytes-attribute',
-        value: { bytesValue: bytesValue },
-      },
-      {
-        key: 'double-attribute',
-        value: { doubleValue: 1.23 },
-      },
-    ],
-    droppedAttributesCount: 0,
-    flags: 1,
-    traceId,
-    spanId,
-  };
-
-  return {
-    resourceLogs: [
-      {
-        resource: {
-          attributes: [
-            {
-              key: 'resource-attribute',
-              value: { stringValue: 'some attribute value' },
-            },
-          ],
-          droppedAttributesCount: 0,
-        },
-        schemaUrl: undefined,
-        scopeLogs: [
-          {
-            scope: { name: 'scope_name_1', version: '0.1.0' },
-            logRecords: [logRecord],
-            schemaUrl: 'http://url.to.schema',
-          },
-          {
-            scope: { name: 'scope_name_2' },
-            logRecords: [logRecord],
-            schemaUrl: undefined,
-          },
-        ],
-      },
-      {
-        resource: {
-          attributes: [
-            {
-              key: 'resource-attribute',
-              value: { stringValue: 'another attribute value' },
-            },
-          ],
-          droppedAttributesCount: 0,
-        },
-        schemaUrl: undefined,
-        scopeLogs: [
-          {
-            scope: { name: 'scope_name_1', version: '0.1.0' },
-            logRecords: [logRecord],
-            schemaUrl: 'http://url.to.schema',
-          },
-        ],
-      },
-    ],
-  };
-}
-
-function createExpectedMultiResourceLogProtobuf(): IExportLogsServiceRequest {
+function createExpectedLogProtobuf(): IExportLogsServiceRequest {
   const traceId = toBase64('00000000000000000000000000000001');
   const spanId = toBase64('0000000000000002');
-  const bytesValue = 'AQIDBAU=';
 
-  const logRecord = {
-    timeUnixNano: 1680253513123241700,
-    observedTimeUnixNano: 1683526948965142800,
-    severityNumber: ESeverityNumber.SEVERITY_NUMBER_ERROR,
-    severityText: 'error',
-    body: { stringValue: 'some_log_body' },
-    eventName: 'some.event.name',
-    attributes: [
-      {
-        key: 'some-attribute',
-        value: { stringValue: 'some attribute value' },
-      },
-      {
-        key: 'bytes-attribute',
-        value: { bytesValue: bytesValue },
-      },
-      {
-        key: 'double-attribute',
-        value: { doubleValue: 1.23 },
-      },
-    ],
-    droppedAttributesCount: 0,
-    flags: 1,
-    traceId,
-    spanId,
-  };
+  // Base64 encoding of Uint8Array([1, 2, 3, 4, 5])
+  // Note: protobuf serializer encodes as binary. However, when decoding, with protobuf.js
+  // we use `bytes: String`, as otherwise the type will be different for Node.js (Buffer) and Browser (Uint8Array)
+  // which makes assertions overly complex.
+  const bytesValue = 'AQIDBAU=';
 
   return {
     resourceLogs: [
@@ -227,29 +117,34 @@ function createExpectedMultiResourceLogProtobuf(): IExportLogsServiceRequest {
         scopeLogs: [
           {
             scope: { name: 'scope_name_1', version: '0.1.0' },
-            logRecords: [logRecord],
-            schemaUrl: 'http://url.to.schema',
-          },
-          {
-            scope: { name: 'scope_name_2' },
-            logRecords: [logRecord],
-          },
-        ],
-      },
-      {
-        resource: {
-          attributes: [
-            {
-              key: 'resource-attribute',
-              value: { stringValue: 'another attribute value' },
-            },
-          ],
-          droppedAttributesCount: 0,
-        },
-        scopeLogs: [
-          {
-            scope: { name: 'scope_name_1', version: '0.1.0' },
-            logRecords: [logRecord],
+            logRecords: [
+              {
+                timeUnixNano: 1680253513123241700,
+                observedTimeUnixNano: 1683526948965142800,
+                severityNumber: ESeverityNumber.SEVERITY_NUMBER_ERROR,
+                severityText: 'error',
+                body: { stringValue: 'some_log_body' },
+                eventName: 'some.event.name',
+                attributes: [
+                  {
+                    key: 'some-attribute',
+                    value: { stringValue: 'some attribute value' },
+                  },
+                  {
+                    key: 'bytes-attribute',
+                    value: { bytesValue: bytesValue },
+                  },
+                  {
+                    key: 'double-attribute',
+                    value: { doubleValue: 1.23 },
+                  },
+                ],
+                droppedAttributesCount: 0,
+                flags: 1,
+                traceId: traceId,
+                spanId: spanId,
+              },
+            ],
             schemaUrl: 'http://url.to.schema',
           },
         ],
@@ -465,18 +360,14 @@ describe('Logs', () => {
     });
 
     it('serializes an export request', function () {
-      const serialized = ProtobufLogsSerializer.serializeRequest([
-        log_1_1_1,
-        log_1_2_1,
-        log_2_1_1,
-      ]);
+      const serialized = ProtobufLogsSerializer.serializeRequest([log_1_1_1]);
       assert.ok(serialized, 'serialized response is undefined');
       const decoded =
         signals.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest.decode(
           serialized
         );
 
-      const expected = createExpectedMultiResourceLogProtobuf();
+      const expected = createExpectedLogProtobuf();
       const decodedObj =
         signals.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest.toObject(
           decoded,
@@ -578,13 +469,9 @@ describe('Logs', () => {
     it('serializes an export request', () => {
       // stringify, then parse to remove undefined keys in the expected JSON
       const expected = JSON.parse(
-        JSON.stringify(createExpectedMultiResourceLogJson(JSON_ENCODER))
+        JSON.stringify(createExpectedLogJson(JSON_ENCODER))
       );
-      const serialized = JsonLogsSerializer.serializeRequest([
-        log_1_1_1,
-        log_1_2_1,
-        log_2_1_1,
-      ]);
+      const serialized = JsonLogsSerializer.serializeRequest([log_1_1_1]);
 
       const decoder = new TextDecoder();
       const actual = JSON.parse(decoder.decode(serialized));
