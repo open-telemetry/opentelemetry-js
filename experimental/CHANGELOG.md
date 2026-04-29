@@ -10,6 +10,18 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+* fix(configuration): do not validate `OTEL_CONFIG_FILE` value before using it for file config [#6643](https://github.com/open-telemetry/opentelemetry-js/pull/6643) @trentm
+
+### :books: Documentation
+
+### :house: Internal
+
+## 0.216.0
+
+### :rocket: Features
+
 * feat(sdk-node): wire attribute_keys from declarative configuration to ViewOptions.attributesProcessors [#6427](https://github.com/open-telemetry/opentelemetry-js/issues/6427) @ravitheja4531-cell
 * feat(sdk-node): set TracerProvider in startNodeSDK() [#6607](https://github.com/open-telemetry/opentelemetry-js/pull/6607) @maryliag
 
@@ -20,12 +32,11 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(instrumentation-xhr): resolve relative URLs before matching `ignoreUrls` [#6551](https://github.com/open-telemetry/opentelemetry-js/pull/6551) @Maximiliano-Zeballos
 * fix(sdk-node): fix setting of ViewOption#name from ConfigurationModel [#6620](https://github.com/open-telemetry/opentelemetry-js/pull/6620) @trentm
 * fix(web-common): add limit for timeout [#6601](https://github.com/open-telemetry/opentelemetry-js/pull/6601) @maryliag
-* fix(configuration): do not validate OTEL_CONFIG_FILE value before using it for file config [#6643](https://github.com/open-telemetry/opentelemetry-js/pull/6643) @trentm
-
-### :books: Documentation
+* fix(otlp-transformer): pin protobufjs@8.0.1 as protobufjs@8.0.3 is broken for browser use [#6646](https://github.com/open-telemetry/opentelemetry-js/pull/6646)
 
 ### :house: Internal
 
+* test(otlp-transformer): add metrics transform benchmark [#6628](https://github.com/open-telemetry/opentelemetry-js/pull/6628) @pichlermarc
 * refactor(opentelemetry-exporter-prometheus): do not call enforcePrometheusNamingConvention() multiple times per metric [#6636](https://github.com/open-telemetry/opentelemetry-js/pull/6636) @cjihrig
 
 ## 0.215.0
@@ -39,6 +50,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(configuration): auto-generate TypeScript types from OTel declarative config JSON schema (stable v1.0.0) using `json-schema-to-typescript` and `ajv` [#6533](https://github.com/open-telemetry/opentelemetry-js/pull/6533)
 * feat(otlp-transformer): add custom protobuf logs serializer [#6228](https://github.com/open-telemetry/opentelemetry-js/pull/6228) @pichlermarc
 * feat(otlp-transformer): add custom protobuf logs export response deserializer [#6530](https://github.com/open-telemetry/opentelemetry-js/pull/6530) @pichlermarc
 * feat(sdk-node): add `buildSamplerFromConfig` to construct a sampler from a declarative config model [#6536](https://github.com/open-telemetry/opentelemetry-js/pull/6536) @ravitheja4531-cell
