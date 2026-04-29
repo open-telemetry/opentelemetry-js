@@ -13,7 +13,8 @@ import { MetricReader } from './MetricReader';
 import type { PushMetricExporter } from './MetricExporter';
 import { callWithTimeout, TimeoutError } from '../utils';
 import type { MetricProducer } from './MetricProducer';
-import { InstrumentType, ResourceMetrics, ScopeMetrics } from './MetricData';
+import { InstrumentType } from './MetricData';
+import { MetricDataSplitter } from './MetricDataSplitter';
 
 export type PeriodicExportingMetricReaderOptions = {
   /**
@@ -143,80 +144,6 @@ export class PeriodicExportingMetricReader extends MetricReader {
     this._maxExportBatchSize = maxExportBatchSize;
   }
 
-  private _splitResourceMetrics(
-    resourceMetrics: ResourceMetrics,
-    maxExportBatchSize: number
-  ): ResourceMetrics[] {
-    const batches: ResourceMetrics[] = [];
-    let currentBatchPoints = 0;
-    let currentScopeMetrics: ScopeMetrics[] = [];
-
-    function flush() {
-      if (currentScopeMetrics.length > 0) {
-        batches.push({
-          resource: resourceMetrics.resource,
-          scopeMetrics: currentScopeMetrics,
-        });
-        currentScopeMetrics = [];
-        currentBatchPoints = 0;
-      }
-    }
-
-    for (const scopeMetric of resourceMetrics.scopeMetrics) {
-      let scopeMetricCopy: ScopeMetrics | null = null;
-
-      for (const metric of scopeMetric.metrics) {
-        let dataPointsRemaining = metric.dataPoints;
-
-        if (dataPointsRemaining.length === 0) {
-          if (!scopeMetricCopy) {
-            scopeMetricCopy = { scope: scopeMetric.scope, metrics: [] };
-            currentScopeMetrics.push(scopeMetricCopy);
-          }
-          scopeMetricCopy.metrics.push(metric);
-          continue;
-        }
-
-        while (dataPointsRemaining.length > 0) {
-          const spaceLeft = maxExportBatchSize - currentBatchPoints;
-          if (spaceLeft === 0) {
-            flush();
-            scopeMetricCopy = null;
-            continue;
-          }
-
-          const take = Math.min(spaceLeft, dataPointsRemaining.length);
-          const chunk = dataPointsRemaining.slice(0, take);
-          dataPointsRemaining = dataPointsRemaining.slice(take);
-
-          if (!scopeMetricCopy) {
-            scopeMetricCopy = { scope: scopeMetric.scope, metrics: [] };
-            currentScopeMetrics.push(scopeMetricCopy);
-          }
-
-          let metricCopy = scopeMetricCopy.metrics.find(
-            m => m.descriptor.name === metric.descriptor.name
-          );
-          if (!metricCopy) {
-            metricCopy = { ...metric, dataPoints: [] };
-            scopeMetricCopy.metrics.push(metricCopy);
-          }
-
-          (metricCopy.dataPoints as any[]).push(...chunk);
-          currentBatchPoints += take;
-
-          if (currentBatchPoints === maxExportBatchSize) {
-            flush();
-            scopeMetricCopy = null;
-          }
-        }
-      }
-    }
-
-    flush();
-    return batches;
-  }
-
   private async _runOnce(): Promise<void> {
     try {
       await callWithTimeout(this._doRun(), this._exportTimeout);
@@ -259,7 +186,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
     }
 
     const batches = this._maxExportBatchSize
-      ? this._splitResourceMetrics(resourceMetrics, this._maxExportBatchSize)
+      ? MetricDataSplitter.split(resourceMetrics, this._maxExportBatchSize)
       : [resourceMetrics];
 
     const currentExport = async () => {
