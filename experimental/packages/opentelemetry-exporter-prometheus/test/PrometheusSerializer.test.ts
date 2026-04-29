@@ -652,8 +652,16 @@ describe('PrometheusSerializer', () => {
     it('should rename metric of type counter when name misses _total suffix', async () => {
       const serializer = new PrometheusSerializer();
 
-      const result = await getCounterResult('test', serializer);
-      assert.strictEqual(result, 'test_total 1\n');
+      const result = await getCounterResult('test', serializer, {
+        exportAll: true,
+      });
+      assert.strictEqual(
+        result,
+        serializedDefaultResource +
+          '# HELP test_total description missing\n' +
+          '# TYPE test_total counter\n' +
+          'test_total{otel_scope_name="test"} 1\n'
+      );
     });
 
     it('should not rename metric of type counter when name contains _total suffix', async () => {
