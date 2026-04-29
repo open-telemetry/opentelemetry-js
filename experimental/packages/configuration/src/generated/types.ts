@@ -1246,7 +1246,7 @@ export interface LoggerProvider {
 export interface LogRecordProcessor {
   batch?: BatchLogRecordProcessor;
   simple?: SimpleLogRecordProcessor;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure a batch log record processor.
@@ -1292,7 +1292,7 @@ export interface LogRecordExporter {
   otlp_grpc?: OtlpGrpcExporter;
   'otlp_file/development'?: ExperimentalOtlpFileExporter;
   console?: ConsoleExporter;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 export interface NameStringValuePair {
   /**
@@ -1524,11 +1524,11 @@ export interface PushMetricExporter {
   otlp_grpc?: OtlpGrpcMetricExporter;
   'otlp_file/development'?: ExperimentalOtlpFileMetricExporter;
   console?: ConsoleMetricExporter;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 export interface MetricProducer {
   opencensus?: OpenCensusMetricProducer;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure cardinality limits.
@@ -1610,7 +1610,7 @@ export interface PullMetricReader {
  */
 export interface PullMetricExporter {
   'prometheus/development'?: ExperimentalPrometheusMetricExporter;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure Prometheus Exporter to add resource attributes as metrics attributes, where the resource attribute keys match the patterns.
@@ -1822,7 +1822,7 @@ export interface TextMapPropagator {
   baggage?: BaggagePropagator;
   b3?: B3Propagator;
   b3multi?: B3MultiPropagator;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure tracer provider.
@@ -1845,7 +1845,7 @@ export interface TracerProvider {
 export interface SpanProcessor {
   batch?: BatchSpanProcessor;
   simple?: SimpleSpanProcessor;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure a batch span processor.
@@ -1891,7 +1891,7 @@ export interface SpanExporter {
   otlp_grpc?: OtlpGrpcExporter;
   'otlp_file/development'?: ExperimentalOtlpFileExporter;
   console?: ConsoleExporter;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure a simple span processor.
@@ -1963,7 +1963,7 @@ export interface Sampler {
   parent_based?: ParentBasedSampler;
   'probability/development'?: ExperimentalProbabilitySampler;
   trace_id_ratio_based?: TraceIdRatioBasedSampler;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure sampler to be composite.
@@ -1976,7 +1976,7 @@ export interface ExperimentalComposableSampler {
   parent_threshold?: ExperimentalComposableParentThresholdSampler;
   probability?: ExperimentalComposableProbabilitySampler;
   rule_based?: ExperimentalComposableRuleBasedSampler;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure sampler to be parent_threshold.
@@ -2209,7 +2209,7 @@ export interface ExperimentalResourceDetector {
   host?: ExperimentalHostResourceDetector;
   process?: ExperimentalProcessResourceDetector;
   service?: ExperimentalServiceResourceDetector;
-  [k: string]: unknown;
+  [k: string]: object | undefined;
 }
 /**
  * Configure instrumentation.
@@ -2479,7 +2479,7 @@ export interface ExperimentalUrlSanitization {
  *
  */
 export interface ExperimentalLanguageSpecificInstrumentation {
-  [k: string]: unknown;
+  [k: string]: object;
 }
 /**
  * Configure .NET language-specific instrumentation libraries.
@@ -2488,7 +2488,7 @@ export interface ExperimentalLanguageSpecificInstrumentation {
  *
  */
 export interface Distribution {
-  [k: string]: unknown;
+  [k: string]: object;
 }
 
 export const InstrumentType = {
