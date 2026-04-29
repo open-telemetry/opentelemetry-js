@@ -13,7 +13,7 @@ import { MetricReader } from './MetricReader';
 import type { PushMetricExporter } from './MetricExporter';
 import { callWithTimeout, TimeoutError } from '../utils';
 import type { MetricProducer } from './MetricProducer';
-import { InstrumentType } from './MetricData';
+import { InstrumentType, ResourceMetrics, ScopeMetrics } from './MetricData';
 
 export type PeriodicExportingMetricReaderOptions = {
   /**
@@ -50,6 +50,11 @@ export type PeriodicExportingMetricReaderOptions = {
     observableUpDownCounter?: number;
     default?: number;
   };
+  /**
+   * The maximum batch size for exports. If configured, the reader will split
+   * batches larger than this size into smaller batches.
+   */
+  maxExportBatchSize?: number;
 };
 
 /**
@@ -61,6 +66,8 @@ export class PeriodicExportingMetricReader extends MetricReader {
   private _exporter: PushMetricExporter;
   private readonly _exportInterval: number;
   private readonly _exportTimeout: number;
+  private readonly _maxExportBatchSize?: number;
+  private _previousExportPromise: Promise<void> = Promise.resolve();
 
   constructor(options: PeriodicExportingMetricReaderOptions) {
     const {
@@ -68,6 +75,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
       exportIntervalMillis = 60000,
       metricProducers,
       cardinalityLimits,
+      maxExportBatchSize,
     } = options;
     let { exportTimeoutMillis = 30000 } = options;
 
@@ -132,6 +140,81 @@ export class PeriodicExportingMetricReader extends MetricReader {
     this._exportInterval = exportIntervalMillis;
     this._exportTimeout = exportTimeoutMillis;
     this._exporter = exporter;
+    this._maxExportBatchSize = maxExportBatchSize;
+  }
+
+  private _splitResourceMetrics(
+    resourceMetrics: ResourceMetrics,
+    maxExportBatchSize: number
+  ): ResourceMetrics[] {
+    const batches: ResourceMetrics[] = [];
+    let currentBatchPoints = 0;
+    let currentScopeMetrics: ScopeMetrics[] = [];
+
+    function flush() {
+      if (currentScopeMetrics.length > 0) {
+        batches.push({
+          resource: resourceMetrics.resource,
+          scopeMetrics: currentScopeMetrics,
+        });
+        currentScopeMetrics = [];
+        currentBatchPoints = 0;
+      }
+    }
+
+    for (const scopeMetric of resourceMetrics.scopeMetrics) {
+      let scopeMetricCopy: ScopeMetrics | null = null;
+
+      for (const metric of scopeMetric.metrics) {
+        let dataPointsRemaining = metric.dataPoints;
+
+        if (dataPointsRemaining.length === 0) {
+          if (!scopeMetricCopy) {
+            scopeMetricCopy = { scope: scopeMetric.scope, metrics: [] };
+            currentScopeMetrics.push(scopeMetricCopy);
+          }
+          scopeMetricCopy.metrics.push(metric);
+          continue;
+        }
+
+        while (dataPointsRemaining.length > 0) {
+          const spaceLeft = maxExportBatchSize - currentBatchPoints;
+          if (spaceLeft === 0) {
+            flush();
+            scopeMetricCopy = null;
+            continue;
+          }
+
+          const take = Math.min(spaceLeft, dataPointsRemaining.length);
+          const chunk = dataPointsRemaining.slice(0, take);
+          dataPointsRemaining = dataPointsRemaining.slice(take);
+
+          if (!scopeMetricCopy) {
+            scopeMetricCopy = { scope: scopeMetric.scope, metrics: [] };
+            currentScopeMetrics.push(scopeMetricCopy);
+          }
+
+          let metricCopy = scopeMetricCopy.metrics.find(
+            m => m.descriptor.name === metric.descriptor.name
+          );
+          if (!metricCopy) {
+            metricCopy = { ...metric, dataPoints: [] };
+            scopeMetricCopy.metrics.push(metricCopy);
+          }
+
+          (metricCopy.dataPoints as any[]).push(...chunk);
+          currentBatchPoints += take;
+
+          if (currentBatchPoints === maxExportBatchSize) {
+            flush();
+            scopeMetricCopy = null;
+          }
+        }
+      }
+    }
+
+    flush();
+    return batches;
   }
 
   private async _runOnce(): Promise<void> {
@@ -175,12 +258,31 @@ export class PeriodicExportingMetricReader extends MetricReader {
       return;
     }
 
-    const result = await internal._export(this._exporter, resourceMetrics);
-    if (result.code !== ExportResultCode.SUCCESS) {
-      throw new Error(
-        `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
-      );
-    }
+    const batches = this._maxExportBatchSize
+      ? this._splitResourceMetrics(resourceMetrics, this._maxExportBatchSize)
+      : [resourceMetrics];
+
+    const currentExport = async () => {
+      let anyErr: Error | null = null;
+      for (const batch of batches) {
+        const result = await internal._export(this._exporter, batch);
+        if (result.code !== ExportResultCode.SUCCESS) {
+          const err = new Error(
+            `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
+          );
+          api.diag.error(err.message);
+          anyErr = err;
+        }
+      }
+      if (anyErr) {
+        throw anyErr;
+      }
+    };
+
+    // Schedules the current export to run after all previously scheduled exports have finished.
+    const promise = this._previousExportPromise.then(currentExport);
+    this._previousExportPromise = promise.catch(() => { });
+    await promise;
   }
 
   protected override onInitialized(): void {
