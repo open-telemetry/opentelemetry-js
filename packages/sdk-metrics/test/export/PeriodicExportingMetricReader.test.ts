@@ -207,6 +207,31 @@ describe('PeriodicExportingMetricReader', () => {
       );
     });
 
+    it('should throw when maxExportBatchSize less or equal to 0', () => {
+      const exporter = new TestDeltaMetricExporter();
+      assert.throws(
+        () =>
+          new PeriodicExportingMetricReader({
+            exporter: exporter,
+            exportIntervalMillis: 1,
+            exportTimeoutMillis: 1,
+            maxExportBatchSize: 0,
+          }),
+        /maxExportBatchSize must be greater than 0/
+      );
+
+      assert.throws(
+        () =>
+          new PeriodicExportingMetricReader({
+            exporter: exporter,
+            exportIntervalMillis: 1,
+            exportTimeoutMillis: 1,
+            maxExportBatchSize: -1,
+          }),
+        /maxExportBatchSize must be greater than 0/
+      );
+    });
+
     it('should throw when timeout less or equal to interval', () => {
       const exporter = new TestDeltaMetricExporter();
       assert.throws(
