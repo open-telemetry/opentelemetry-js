@@ -202,11 +202,12 @@ export class PeriodicExportingMetricReader extends MetricReader {
           }
         } catch (e) {
           if (e instanceof TimeoutError) {
+            // We do not report TimeoutError to the globalErrorHandler in _runOnce().
             api.diag.error(`PeriodicExportingMetricReader: metrics export timed out after ${this._exportTimeout}ms`);
           } else {
             api.diag.error('PeriodicExportingMetricReader: metrics export threw error', e);
+            anyErr = e instanceof Error ? e : new Error(String(e));
           }
-          anyErr = e instanceof Error ? e : new Error(String(e));
         }
       }
       if (anyErr) {

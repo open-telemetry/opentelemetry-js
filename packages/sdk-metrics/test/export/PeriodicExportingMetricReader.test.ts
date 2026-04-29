@@ -1055,52 +1055,6 @@ describe('PeriodicExportingMetricReader', () => {
 
         await reader.shutdown();
       });
-
-      it('should report timeout to global error handler when a batch times out', async () => {
-        const exporter = new TestMetricExporter();
-        exporter.exportTime = 50; // Make it take 50ms
-
-        const reader = new PeriodicExportingMetricReader({
-          exporter: exporter,
-          exportIntervalMillis: MAX_32_BIT_INT,
-          exportTimeoutMillis: 20, // Timeout is 20ms
-        });
-
-        const resourceMetrics: ResourceMetrics = {
-          resource: { attributes: {}, merge: sinon.stub(), getRawAttributes: () => [] } as any,
-          scopeMetrics: [
-            {
-              scope: { name: 'test' },
-              metrics: [
-                {
-                  dataPointType: DataPointType.GAUGE,
-                  dataPoints: [{ startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 1 }],
-                  descriptor: { name: 'm1', description: '', unit: '', valueType: ValueType.INT },
-                  aggregationTemporality: AggregationTemporality.CUMULATIVE,
-                },
-              ],
-            },
-          ],
-        };
-
-        reader.setMetricProducer(
-          new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
-        );
-
-        const errorHandlerStub = sinon.stub();
-        setGlobalErrorHandler(errorHandlerStub);
-
-        await reader.forceFlush();
-
-        sinon.assert.calledOnce(errorHandlerStub);
-        const error = errorHandlerStub.firstCall.args[0];
-        assert.ok(error instanceof TimeoutError || error.message === 'Operation timed out.');
-
-        // Restore global error handler to avoid affecting other tests
-        setGlobalErrorHandler(() => {});
-
-        await reader.shutdown();
-      });
     });
   });
 });
