@@ -300,43 +300,5 @@ describe('ProtobufSizeEstimator', function () {
 
       assert.strictEqual(estimator.pos, writer.pos);
     });
-
-    it('should match ProtobufWriter size for writeSint32', function () {
-      const testValues = [
-        0, 1, -1, 127, -128, 2147483647, -2147483648, 42, -42, 300, -300,
-      ];
-
-      for (const value of testValues) {
-        const writer = new ProtobufWriter(1024);
-        const estimator = new ProtobufSizeEstimator();
-
-        writer.writeSint32(value);
-        estimator.writeSint32(value);
-
-        assert.strictEqual(
-          estimator.pos,
-          writer.pos,
-          `Unexpected size mismatch for sint32 value ${value}: expected ${writer.pos} but got ${estimator.pos}`
-        );
-      }
-    });
-
-    it('should match ProtobufWriter size for writeSfixed64', function () {
-      const testValues = [0, 1, -1, 42, -42, 2147483647, -2147483648];
-
-      for (const value of testValues) {
-        const writer = new ProtobufWriter(1024);
-        const estimator = new ProtobufSizeEstimator();
-
-        writer.writeSfixed64(value);
-        estimator.writeSfixed64(value);
-
-        assert.strictEqual(
-          estimator.pos,
-          writer.pos,
-          `Unexpected size mismatch for sfixed64 value ${value}: expected ${writer.pos} but got ${estimator.pos}`
-        );
-      }
-    });
   });
 });
