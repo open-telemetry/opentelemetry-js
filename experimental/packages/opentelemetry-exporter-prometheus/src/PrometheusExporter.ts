@@ -13,6 +13,8 @@ import {
 import type { IncomingMessage, Server, ServerResponse } from 'http';
 import { createServer } from 'http';
 import type { ExporterConfig } from './export/types';
+import { TranslationStrategy } from './export/types';
+import type { TranslationStrategyOptions } from './PrometheusSerializer';
 import { PrometheusSerializer } from './PrometheusSerializer';
 /** Node.js v8.x compat */
 import { URL } from 'url';
@@ -24,6 +26,7 @@ export class PrometheusExporter extends MetricReader {
     endpoint: '/metrics',
     prefix: '',
     appendTimestamp: false,
+    translationStrategy: TranslationStrategy.UnderscoreEscapingWithSuffixes,
     withResourceConstantLabels: undefined,
     withoutScopeInfo: false,
     withoutTargetInfo: false,
@@ -36,6 +39,7 @@ export class PrometheusExporter extends MetricReader {
   private readonly _server: Server;
   private readonly _prefix?: string;
   private readonly _appendTimestamp: boolean;
+  private readonly _translationStrategy: TranslationStrategyOptions;
   private _serializer: PrometheusSerializer;
   private _startServerPromise: Promise<void> | undefined;
 
@@ -84,6 +88,22 @@ export class PrometheusExporter extends MetricReader {
     const _withoutTargetInfo =
       config.withoutTargetInfo ||
       PrometheusExporter.DEFAULT_OPTIONS.withoutTargetInfo;
+    const _translationStrategy =
+      config.translationStrategy ||
+      PrometheusExporter.DEFAULT_OPTIONS.translationStrategy;
+
+    this._translationStrategy = {
+      escape:
+        _translationStrategy ===
+          TranslationStrategy.UnderscoreEscapingWithSuffixes ||
+        _translationStrategy ===
+          TranslationStrategy.UnderscoreEscapingWithoutSuffixes,
+      suffixes:
+        _translationStrategy ===
+          TranslationStrategy.UnderscoreEscapingWithSuffixes ||
+        _translationStrategy === TranslationStrategy.NoUTF8EscapingWithSuffixes,
+    };
+
     // unref to prevent prometheus exporter from holding the process open on exit
     this._server = createServer(this._requestHandler).unref();
     this._serializer = new PrometheusSerializer(
@@ -220,7 +240,12 @@ export class PrometheusExporter extends MetricReader {
             ...errors
           );
         }
-        response.end(this._serializer.serialize(resourceMetrics));
+        // Translation strategy options are passed to the serlialize() method
+        // because in the future, these options may also be influenced by the
+        // content negotiation process of the incoming request.
+        response.end(
+          this._serializer.serialize(resourceMetrics, this._translationStrategy)
+        );
       },
       err => {
         response.end(`# failed to export metrics: ${err}`);
