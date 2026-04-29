@@ -790,7 +790,55 @@ describe('PeriodicExportingMetricReader', () => {
     });
 
     describe('maxExportBatchSize', () => {
+      it('should split batches when exceeding maxExportBatchSize', async () => {
+        const exporter = new TestMetricExporter();
+        const reader = new PeriodicExportingMetricReader({
+          exporter: exporter,
+          exportIntervalMillis: MAX_32_BIT_INT,
+          maxExportBatchSize: 2,
+        });
 
+        const resourceMetrics: ResourceMetrics = {
+          resource: { attributes: {}, merge: sinon.stub(), getRawAttributes: () => [] } as any,
+          scopeMetrics: [
+            {
+              scope: { name: 'test' },
+              metrics: [
+                {
+                  dataPointType: DataPointType.GAUGE,
+                  dataPoints: [
+                    { startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 1 },
+                    { startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 2 },
+                    { startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 3 },
+                  ],
+                  descriptor: { name: 'm1', description: '', unit: '', valueType: ValueType.INT },
+                  aggregationTemporality: AggregationTemporality.CUMULATIVE,
+                },
+              ],
+            },
+          ],
+        };
+
+        reader.setMetricProducer(
+          new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+        );
+
+        await reader.forceFlush();
+
+        const exports = exporter.getExports();
+        assert.strictEqual(exports.length, 2);
+
+        // First batch should have 2 data points
+        assert.strictEqual(exports[0].scopeMetrics[0].metrics[0].dataPoints.length, 2);
+        assert.strictEqual(exports[0].scopeMetrics[0].metrics[0].dataPoints[0].value, 1);
+        assert.strictEqual(exports[0].scopeMetrics[0].metrics[0].dataPoints[1].value, 2);
+
+        // Second batch should have 1 data point
+        assert.strictEqual(exports[1].scopeMetrics[0].metrics[0].dataPoints.length, 1);
+        assert.strictEqual(exports[1].scopeMetrics[0].metrics[0].dataPoints[0].value, 3);
+
+        await reader.shutdown();
+      });
 
       it('should synchronize concurrent exports', async () => {
         const exporter = new TestMetricExporter();
@@ -835,6 +883,67 @@ describe('PeriodicExportingMetricReader', () => {
         await reader.shutdown();
       });
 
+      it('should split data points across metrics if needed', async () => {
+        const exporter = new TestMetricExporter();
+        const reader = new PeriodicExportingMetricReader({
+          exporter: exporter,
+          exportIntervalMillis: MAX_32_BIT_INT,
+          maxExportBatchSize: 2,
+        });
+
+        const resourceMetrics: ResourceMetrics = {
+          resource: { attributes: {}, merge: sinon.stub(), getRawAttributes: () => [] } as any,
+          scopeMetrics: [
+            {
+              scope: { name: 'test' },
+              metrics: [
+                {
+                  dataPointType: DataPointType.GAUGE,
+                  dataPoints: [
+                    { startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 1 },
+                  ],
+                  descriptor: { name: 'm1', description: '', unit: '', valueType: ValueType.INT },
+                  aggregationTemporality: AggregationTemporality.CUMULATIVE,
+                },
+                {
+                  dataPointType: DataPointType.GAUGE,
+                  dataPoints: [
+                    { startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 2 },
+                    { startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 3 },
+                  ],
+                  descriptor: { name: 'm2', description: '', unit: '', valueType: ValueType.INT },
+                  aggregationTemporality: AggregationTemporality.CUMULATIVE,
+                },
+              ],
+            },
+          ],
+        };
+
+        reader.setMetricProducer(
+          new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+        );
+
+        await reader.forceFlush();
+
+        const exports = exporter.getExports();
+        assert.strictEqual(exports.length, 2);
+
+        // First batch should have 2 data points (m1:1, m2:2)
+        assert.strictEqual(exports[0].scopeMetrics[0].metrics.length, 2);
+        assert.strictEqual(exports[0].scopeMetrics[0].metrics[0].dataPoints.length, 1);
+        assert.strictEqual(exports[0].scopeMetrics[0].metrics[0].dataPoints[0].value, 1);
+        assert.strictEqual(exports[0].scopeMetrics[0].metrics[1].dataPoints.length, 1);
+        assert.strictEqual(exports[0].scopeMetrics[0].metrics[1].dataPoints[0].value, 2);
+
+        // Second batch should have 1 data point (m2:3)
+        assert.strictEqual(exports[1].scopeMetrics[0].metrics.length, 1);
+        assert.strictEqual(exports[1].scopeMetrics[0].metrics[0].descriptor.name, 'm2');
+        assert.strictEqual(exports[1].scopeMetrics[0].metrics[0].dataPoints.length, 1);
+        assert.strictEqual(exports[1].scopeMetrics[0].metrics[0].dataPoints[0].value, 3);
+
+        await reader.shutdown();
+      });
+
       it('should continue exporting remaining batches if one fails', async () => {
         const exporter = new TestMetricExporter();
         exporter.rejectExport = true; // Fail all exports
@@ -873,6 +982,97 @@ describe('PeriodicExportingMetricReader', () => {
 
         const exports = exporter.getExports();
         assert.strictEqual(exports.length, 2); // Both batches should have been attempted
+
+        await reader.shutdown();
+      });
+
+      it('should apply timeout to individual batches and not combination', async () => {
+        const exporter = new TestMetricExporter();
+        exporter.exportTime = 15; // Each batch takes 15ms
+
+        const reader = new PeriodicExportingMetricReader({
+          exporter: exporter,
+          exportIntervalMillis: MAX_32_BIT_INT,
+          maxExportBatchSize: 1, // Results in 2 batches
+          exportTimeoutMillis: 20, // Timeout is 20ms
+        });
+
+        const resourceMetrics: ResourceMetrics = {
+          resource: { attributes: {}, merge: sinon.stub(), getRawAttributes: () => [] } as any,
+          scopeMetrics: [
+            {
+              scope: { name: 'test' },
+              metrics: [
+                {
+                  dataPointType: DataPointType.GAUGE,
+                  dataPoints: [
+                    { startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 1 },
+                    { startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 2 },
+                  ],
+                  descriptor: { name: 'm1', description: '', unit: '', valueType: ValueType.INT },
+                  aggregationTemporality: AggregationTemporality.CUMULATIVE,
+                },
+              ],
+            },
+          ],
+        };
+
+        reader.setMetricProducer(
+          new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+        );
+
+        // If timeout applied to all, this would fail because total time is 30ms > 20ms.
+        // Since it applies to individual, it should succeed!
+        await reader.forceFlush();
+
+        const exports = exporter.getExports();
+        assert.strictEqual(exports.length, 2);
+
+        await reader.shutdown();
+      });
+
+      it('should report timeout to global error handler when a batch times out', async () => {
+        const exporter = new TestMetricExporter();
+        exporter.exportTime = 50; // Make it take 50ms
+
+        const reader = new PeriodicExportingMetricReader({
+          exporter: exporter,
+          exportIntervalMillis: MAX_32_BIT_INT,
+          exportTimeoutMillis: 20, // Timeout is 20ms
+        });
+
+        const resourceMetrics: ResourceMetrics = {
+          resource: { attributes: {}, merge: sinon.stub(), getRawAttributes: () => [] } as any,
+          scopeMetrics: [
+            {
+              scope: { name: 'test' },
+              metrics: [
+                {
+                  dataPointType: DataPointType.GAUGE,
+                  dataPoints: [{ startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 1 }],
+                  descriptor: { name: 'm1', description: '', unit: '', valueType: ValueType.INT },
+                  aggregationTemporality: AggregationTemporality.CUMULATIVE,
+                },
+              ],
+            },
+          ],
+        };
+
+        reader.setMetricProducer(
+          new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+        );
+
+        const errorHandlerStub = sinon.stub();
+        setGlobalErrorHandler(errorHandlerStub);
+
+        await reader.forceFlush();
+
+        sinon.assert.calledOnce(errorHandlerStub);
+        const error = errorHandlerStub.firstCall.args[0];
+        assert.ok(error instanceof TimeoutError || error.message === 'Operation timed out.');
+
+        // Restore global error handler to avoid affecting other tests
+        setGlobalErrorHandler(() => {});
 
         await reader.shutdown();
       });

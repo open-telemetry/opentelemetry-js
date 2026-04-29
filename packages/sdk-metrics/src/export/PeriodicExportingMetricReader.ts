@@ -146,16 +146,8 @@ export class PeriodicExportingMetricReader extends MetricReader {
 
   private async _runOnce(): Promise<void> {
     try {
-      await callWithTimeout(this._doRun(), this._exportTimeout);
+      await this._doRun();
     } catch (err) {
-      if (err instanceof TimeoutError) {
-        api.diag.error(
-          'Export took longer than %s milliseconds and timed out.',
-          this._exportTimeout
-        );
-        return;
-      }
-
       globalErrorHandler(err);
     }
   }
@@ -192,13 +184,25 @@ export class PeriodicExportingMetricReader extends MetricReader {
     const currentExport = async () => {
       let anyErr: Error | null = null;
       for (const batch of batches) {
-        const result = await internal._export(this._exporter, batch);
-        if (result.code !== ExportResultCode.SUCCESS) {
-          const err = new Error(
-            `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
+        try {
+          const result = await callWithTimeout(
+            internal._export(this._exporter, batch),
+            this._exportTimeout
           );
-          api.diag.error(err.message);
-          anyErr = err;
+          if (result.code !== ExportResultCode.SUCCESS) {
+            const err = new Error(
+              `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
+            );
+            api.diag.error(err.message);
+            anyErr = err;
+          }
+        } catch (e) {
+          if (e instanceof TimeoutError) {
+            api.diag.error(`PeriodicExportingMetricReader: metrics export timed out after ${this._exportTimeout}ms`);
+          } else {
+            api.diag.error('PeriodicExportingMetricReader: metrics export threw error', e);
+          }
+          anyErr = e instanceof Error ? e : new Error(String(e));
         }
       }
       if (anyErr) {
