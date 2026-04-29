@@ -220,6 +220,39 @@ describe('LogRecord', () => {
 
       assert.strictEqual(logRecord.attributes[ATTR_EXCEPTION_TYPE], '12');
     });
+
+    it('should append cause stack to stacktrace', () => {
+      const cause = new Error('inner');
+      cause.stack = 'Error: inner\n    at inner:1:1';
+      const outer = new Error('outer') as Error & { cause?: unknown };
+      outer.stack = 'Error: outer\n    at outer:1:1';
+      outer.cause = cause;
+
+      const { logRecord } = setup(undefined, { exception: outer });
+
+      assert.strictEqual(
+        logRecord.attributes[ATTR_EXCEPTION_STACKTRACE],
+        'Error: outer\n    at outer:1:1\nCaused by: Error: inner\n    at inner:1:1'
+      );
+    });
+
+    it('should walk a multi-level cause chain in stacktrace', () => {
+      const root = new Error('root') as any;
+      root.stack = 'Error: root\n    at root:1:1';
+      const mid = new Error('mid') as any;
+      mid.stack = 'Error: mid\n    at mid:1:1';
+      mid.cause = root;
+      const top = new Error('top') as any;
+      top.stack = 'Error: top\n    at top:1:1';
+      top.cause = mid;
+
+      const { logRecord } = setup(undefined, { exception: top });
+
+      assert.strictEqual(
+        logRecord.attributes[ATTR_EXCEPTION_STACKTRACE],
+        'Error: top\n    at top:1:1\nCaused by: Error: mid\n    at mid:1:1\nCaused by: Error: root\n    at root:1:1'
+      );
+    });
   });
 
   describe('setAttribute', () => {

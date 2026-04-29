@@ -12,7 +12,7 @@ import type {
 } from '@opentelemetry/api-logs';
 import * as api from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
-import { timeInputToHrTime } from '@opentelemetry/core';
+import { buildExceptionCauseChain, timeInputToHrTime } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import {
   ATTR_EXCEPTION_MESSAGE,
@@ -274,7 +274,13 @@ export class LogRecordImpl implements ReadableLogRecord {
 
       if (exceptionObj.stack) {
         if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_STACKTRACE)) {
-          this.setAttribute(ATTR_EXCEPTION_STACKTRACE, exceptionObj.stack);
+          const causeChain = buildExceptionCauseChain(
+            (exceptionObj as { cause?: unknown }).cause
+          );
+          this.setAttribute(
+            ATTR_EXCEPTION_STACKTRACE,
+            exceptionObj.stack + causeChain
+          );
         }
         hasMinimumAttributes = true;
       }
