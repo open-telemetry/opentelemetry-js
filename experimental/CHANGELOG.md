@@ -11,9 +11,12 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :rocket: Features
 
 * feat(sdk-node): wire attribute_keys from declarative configuration to ViewOptions.attributesProcessors [#6427](https://github.com/open-telemetry/opentelemetry-js/issues/6427) @ravitheja4531-cell
+* feat(sdk-node): set TracerProvider in startNodeSDK() [#6607](https://github.com/open-telemetry/opentelemetry-js/pull/6607) @maryliag
 
 ### :bug: Bug Fixes
 
+* fix(instrumentation-xml-http-request): avoid unwrapping `XMLHttpRequest` API when disabling [#6611](https://github.com/open-telemetry/opentelemetry-js/pull/6611) @david-luna
+* fix(instrumentation-fetch): tolerate non-writable `globalThis.fetch` and fix premature `_isEnabled` / `_isFetchPatched` flips in `enable()` @brunorodmoreira
 * fix(instrumentation-xhr): resolve relative URLs before matching `ignoreUrls` [#6551](https://github.com/open-telemetry/opentelemetry-js/pull/6551) @Maximiliano-Zeballos
 * fix(sdk-node): fix setting of ViewOption#name from ConfigurationModel [#6620](https://github.com/open-telemetry/opentelemetry-js/pull/6620) @trentm
 * fix(web-common): add limit for timeout [#6601](https://github.com/open-telemetry/opentelemetry-js/pull/6601) @maryliag
@@ -21,6 +24,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :books: Documentation
 
 ### :house: Internal
+
+* refactor(opentelemetry-exporter-prometheus): do not call enforcePrometheusNamingConvention() multiple times per metric [#6636](https://github.com/open-telemetry/opentelemetry-js/pull/6636) @cjihrig
 
 ## 0.215.0
 
@@ -60,7 +65,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(configuration): add sampler configuration parsing support [#6409](https://github.com/open-telemetry/opentelemetry-js/pull/6409) @MikeGoldsmith
 * feat(configuration): add resource detection parsing [#6435](https://github.com/open-telemetry/opentelemetry-js/pull/6435) @MikeGoldsmith
 * feat(configuration): export interfaces required in other packages [#6462](https://github.com/open-telemetry/opentelemetry-js/pull/6462) @maryliag
-* feat(configuration): set MeterProvider on sdk start [#6463](https://github.com/open-telemetry/opentelemetry-js/pull/6463) @maryliag
+* feat(sdk-node): set MeterProvider in startNodeSDK() [#6463](https://github.com/open-telemetry/opentelemetry-js/pull/6463) @maryliag
 * feat(configuration): export interfaces required in other packages [#6507](https://github.com/open-telemetry/opentelemetry-js/pull/6507) @maryliag
 * feat(configuration): refactoring config loader to print warning message [#6524](https://github.com/open-telemetry/opentelemetry-js/pull/6524) @maxday
 * feat(configuration): export `SamplerConfigModel` type for use with `buildSamplerFromConfig` [#6536](https://github.com/open-telemetry/opentelemetry-js/pull/6536) @ravitheja4531-cell

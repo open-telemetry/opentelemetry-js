@@ -1840,7 +1840,7 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
 
-    it('sohuld use exporter and processor from env, signal specific env for protocol takes precedence', async () => {
+    it('should use exporter and processor from env, signal specific env for protocol takes precedence', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'otlp';
       process.env.OTEL_EXPORTER_OTLP_PROTOCOL = 'http/protobuf';
       process.env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';

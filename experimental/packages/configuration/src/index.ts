@@ -14,5 +14,7 @@ export type {
   Sampler as SamplerConfigModel,
   SpanExporter as SpanExporterConfigModel,
   SpanProcessor as SpanProcessorConfigModel,
+  NameStringValuePair as NameStringValuePairConfigModel,
+  HttpTls as HttpTlsConfigModel,
 } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';
