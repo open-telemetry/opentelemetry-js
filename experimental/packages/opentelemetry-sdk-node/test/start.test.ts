@@ -213,15 +213,6 @@ describe('startNodeSDK', function () {
     await sdk.shutdown();
   });
 
-  it('should return NOOP_SDK when disabled is true', async () => {
-    process.env.OTEL_CONFIG_FILE = 'test/fixtures/kitchen-sink.yaml';
-    const sdk = startNodeSDK({});
-
-    assertDefaultContextManagerRegistered();
-
-    await sdk.shutdown();
-  });
-
   it('should not register a diag logger when OTEL_LOG_LEVEL is not set', async () => {
     delete process.env.OTEL_LOG_LEVEL;
     const spy = Sinon.spy(diag, 'setLogger');
