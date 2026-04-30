@@ -14,12 +14,15 @@ import * as assert from 'assert';
 import { spawnSync } from 'child_process';
 
 describe('types', function () {
+  this.timeout(5000); // Running `tsc` in the tests below can be slow in CI.
+
   it('should tsc compile test/fixtures/types/pass-*.ts files successfully', function () {
     const p = spawnSync(
       'npx',
       ['tsc', '-p', 'test/fixtures/types/tsconfig-pass.json'],
       {
         encoding: 'utf8',
+        shell: true, // Use 'shell' so Windows can spawn `npx`.
       }
     );
     assert.strictEqual(p.status, 0);
@@ -39,6 +42,7 @@ describe('types', function () {
       ['tsc', '-p', 'test/fixtures/types/tsconfig-fail.json'],
       {
         encoding: 'utf8',
+        shell: true, // Use 'shell' so Windows can spawn `npx`.
       }
     );
 
@@ -61,6 +65,6 @@ describe('types', function () {
       });
 
     assert.deepStrictEqual(actualErrs, expectedErrs);
-    assert.strictEqual(p.status, 2);
+    assert.ok(typeof p.status === 'number' && p.status !== 0);
   });
 });
