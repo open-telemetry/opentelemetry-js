@@ -2,26 +2,16 @@
 
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * Generates TypeScript types from the OpenTelemetry configuration JSON schema
  * using json-schema-to-typescript.
  *
- * Usage: node generate-config.js
- * Run from the configuration package: npm run generate:config
+ * Usage:
+ *    cd experimental/packages/configuration
+ *    npm run generate:config
  */
 
 'use strict';
@@ -177,11 +167,32 @@ compile(schema, 'OpenTelemetryConfiguration', {
       }
     }
 
-    // Replace overly-narrow index signatures that conflict with typed properties.
-    // When additionalProperties is absent or true, json-schema-to-typescript emits
-    // [k: string]: {} | null which is too narrow to accommodate specific typed fields.
-    ts = ts.replace(/\[k: string\]: \{\} \| null;/g, '[k: string]: unknown;');
-    ts = ts.replace(/\[k: string\]: \{\};/g, '[k: string]: unknown;');
+    // Change the TypeScript representation for interfaces where
+    // "additionalProperties" is allowed.
+    //
+    // The configuration JSON schema uses the following for types that have
+    // well-known property keys (e.g. 'batch' or 'simple' for `SpanProcessor`),
+    // but also allow custom values.
+    //    "additionalProperties": {
+    //      "type": [ "object", "null" ],
+    //
+    // json-schema-to-typescript represents this with:
+    //    [k: string]: {} | null
+    //
+    // However, we want:
+    //    [k: string]: object | undefined
+    //
+    // - `object` instead of `{}`, because JSON schema "object" means a thing
+    //   with keys and values (https://json-schema.org/understanding-json-schema/reference/object)
+    //   and TypeScript "object" means non-Primitive values (https://stackoverflow.com/a/49465172)
+    //   which is closest. `{}` allows too much (e.g. 42 matches `{}`).
+    // - `undefined` rather than `null` because we want to express that the
+    //   property can be unspecified.
+    ts = ts.replace(/\[k: string\]: \{\} \| null;/g, '[k: string]: object | undefined;');
+    // Similarly for schema types with the following (e.g. `Distribution`):
+    //    "additionalProperties": {
+    //      "type": [ "object" ],
+    ts = ts.replace(/\[k: string\]: \{\};/g, '[k: string]: object;');
 
     // Strip `| null` from type unions. The JSON schema uses
     // "type": ["string", "null"] to express optional/nullable fields, which
