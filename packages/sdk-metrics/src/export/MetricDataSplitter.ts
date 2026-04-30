@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ResourceMetrics, ScopeMetrics } from './MetricData';
+import type { DataPoint, ResourceMetrics, ScopeMetrics } from './MetricData';
 
 /**
  * @internal
@@ -77,7 +77,9 @@ export class MetricDataSplitter {
             scopeMetricCopy.metrics.push(metricCopy);
           }
 
-          (metricCopy.dataPoints as any[]).push(...chunk);
+          (metricCopy.dataPoints as DataPoint<unknown>[]).push(
+            ...(chunk as DataPoint<unknown>[])
+          );
           currentBatchPoints += take;
 
           if (currentBatchPoints === maxExportBatchSize) {

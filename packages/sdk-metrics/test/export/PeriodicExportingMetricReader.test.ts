@@ -53,7 +53,10 @@ class TestMetricExporter implements PushMetricExporter {
   ): void {
     this._batches.push(metrics);
     this.concurrentCalls++;
-    this.maxConcurrentCalls = Math.max(this.maxConcurrentCalls, this.concurrentCalls);
+    this.maxConcurrentCalls = Math.max(
+      this.maxConcurrentCalls,
+      this.concurrentCalls
+    );
 
     if (this.throwExport) {
       this.concurrentCalls--;
@@ -824,7 +827,11 @@ describe('PeriodicExportingMetricReader', () => {
         });
 
         const resourceMetrics: ResourceMetrics = {
-          resource: { attributes: {}, merge: sinon.stub(), getRawAttributes: () => [] } as any,
+          resource: {
+            attributes: {},
+            merge: sinon.stub(),
+            getRawAttributes: () => [],
+          } as any,
           scopeMetrics: [
             {
               scope: { name: 'test' },
@@ -832,11 +839,31 @@ describe('PeriodicExportingMetricReader', () => {
                 {
                   dataPointType: DataPointType.GAUGE,
                   dataPoints: [
-                    { startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 1 },
-                    { startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 2 },
-                    { startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 3 },
+                    {
+                      startTime: [0, 0],
+                      endTime: [0, 0],
+                      attributes: {},
+                      value: 1,
+                    },
+                    {
+                      startTime: [0, 0],
+                      endTime: [0, 0],
+                      attributes: {},
+                      value: 2,
+                    },
+                    {
+                      startTime: [0, 0],
+                      endTime: [0, 0],
+                      attributes: {},
+                      value: 3,
+                    },
                   ],
-                  descriptor: { name: 'm1', description: '', unit: '', valueType: ValueType.INT },
+                  descriptor: {
+                    name: 'm1',
+                    description: '',
+                    unit: '',
+                    valueType: ValueType.INT,
+                  },
                   aggregationTemporality: AggregationTemporality.CUMULATIVE,
                 },
               ],
@@ -845,7 +872,10 @@ describe('PeriodicExportingMetricReader', () => {
         };
 
         reader.setMetricProducer(
-          new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+          new TestMetricProducer({
+            resourceMetrics: resourceMetrics,
+            errors: [],
+          })
         );
 
         await reader.forceFlush();
@@ -854,13 +884,28 @@ describe('PeriodicExportingMetricReader', () => {
         assert.strictEqual(exports.length, 2);
 
         // First batch should have 2 data points
-        assert.strictEqual(exports[0].scopeMetrics[0].metrics[0].dataPoints.length, 2);
-        assert.strictEqual(exports[0].scopeMetrics[0].metrics[0].dataPoints[0].value, 1);
-        assert.strictEqual(exports[0].scopeMetrics[0].metrics[0].dataPoints[1].value, 2);
+        assert.strictEqual(
+          exports[0].scopeMetrics[0].metrics[0].dataPoints.length,
+          2
+        );
+        assert.strictEqual(
+          exports[0].scopeMetrics[0].metrics[0].dataPoints[0].value,
+          1
+        );
+        assert.strictEqual(
+          exports[0].scopeMetrics[0].metrics[0].dataPoints[1].value,
+          2
+        );
 
         // Second batch should have 1 data point
-        assert.strictEqual(exports[1].scopeMetrics[0].metrics[0].dataPoints.length, 1);
-        assert.strictEqual(exports[1].scopeMetrics[0].metrics[0].dataPoints[0].value, 3);
+        assert.strictEqual(
+          exports[1].scopeMetrics[0].metrics[0].dataPoints.length,
+          1
+        );
+        assert.strictEqual(
+          exports[1].scopeMetrics[0].metrics[0].dataPoints[0].value,
+          3
+        );
 
         await reader.shutdown();
       });
@@ -874,15 +919,31 @@ describe('PeriodicExportingMetricReader', () => {
         });
 
         const resourceMetrics: ResourceMetrics = {
-          resource: { attributes: {}, merge: sinon.stub(), getRawAttributes: () => [] } as any,
+          resource: {
+            attributes: {},
+            merge: sinon.stub(),
+            getRawAttributes: () => [],
+          } as any,
           scopeMetrics: [
             {
               scope: { name: 'test' },
               metrics: [
                 {
                   dataPointType: DataPointType.GAUGE,
-                  dataPoints: [{ startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 1 }],
-                  descriptor: { name: 'm1', description: '', unit: '', valueType: ValueType.INT },
+                  dataPoints: [
+                    {
+                      startTime: [0, 0],
+                      endTime: [0, 0],
+                      attributes: {},
+                      value: 1,
+                    },
+                  ],
+                  descriptor: {
+                    name: 'm1',
+                    description: '',
+                    unit: '',
+                    valueType: ValueType.INT,
+                  },
                   aggregationTemporality: AggregationTemporality.CUMULATIVE,
                 },
               ],
@@ -890,7 +951,10 @@ describe('PeriodicExportingMetricReader', () => {
           ],
         };
 
-        const producer = new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] });
+        const producer = new TestMetricProducer({
+          resourceMetrics: resourceMetrics,
+          errors: [],
+        });
         reader.setMetricProducer(producer);
 
         // Trigger two exports quickly
@@ -917,7 +981,11 @@ describe('PeriodicExportingMetricReader', () => {
         });
 
         const resourceMetrics: ResourceMetrics = {
-          resource: { attributes: {}, merge: sinon.stub(), getRawAttributes: () => [] } as any,
+          resource: {
+            attributes: {},
+            merge: sinon.stub(),
+            getRawAttributes: () => [],
+          } as any,
           scopeMetrics: [
             {
               scope: { name: 'test' },
@@ -925,18 +993,43 @@ describe('PeriodicExportingMetricReader', () => {
                 {
                   dataPointType: DataPointType.GAUGE,
                   dataPoints: [
-                    { startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 1 },
+                    {
+                      startTime: [0, 0],
+                      endTime: [0, 0],
+                      attributes: {},
+                      value: 1,
+                    },
                   ],
-                  descriptor: { name: 'm1', description: '', unit: '', valueType: ValueType.INT },
+                  descriptor: {
+                    name: 'm1',
+                    description: '',
+                    unit: '',
+                    valueType: ValueType.INT,
+                  },
                   aggregationTemporality: AggregationTemporality.CUMULATIVE,
                 },
                 {
                   dataPointType: DataPointType.GAUGE,
                   dataPoints: [
-                    { startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 2 },
-                    { startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 3 },
+                    {
+                      startTime: [0, 0],
+                      endTime: [0, 0],
+                      attributes: {},
+                      value: 2,
+                    },
+                    {
+                      startTime: [0, 0],
+                      endTime: [0, 0],
+                      attributes: {},
+                      value: 3,
+                    },
                   ],
-                  descriptor: { name: 'm2', description: '', unit: '', valueType: ValueType.INT },
+                  descriptor: {
+                    name: 'm2',
+                    description: '',
+                    unit: '',
+                    valueType: ValueType.INT,
+                  },
                   aggregationTemporality: AggregationTemporality.CUMULATIVE,
                 },
               ],
@@ -945,7 +1038,10 @@ describe('PeriodicExportingMetricReader', () => {
         };
 
         reader.setMetricProducer(
-          new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+          new TestMetricProducer({
+            resourceMetrics: resourceMetrics,
+            errors: [],
+          })
         );
 
         await reader.forceFlush();
@@ -955,16 +1051,37 @@ describe('PeriodicExportingMetricReader', () => {
 
         // First batch should have 2 data points (m1:1, m2:2)
         assert.strictEqual(exports[0].scopeMetrics[0].metrics.length, 2);
-        assert.strictEqual(exports[0].scopeMetrics[0].metrics[0].dataPoints.length, 1);
-        assert.strictEqual(exports[0].scopeMetrics[0].metrics[0].dataPoints[0].value, 1);
-        assert.strictEqual(exports[0].scopeMetrics[0].metrics[1].dataPoints.length, 1);
-        assert.strictEqual(exports[0].scopeMetrics[0].metrics[1].dataPoints[0].value, 2);
+        assert.strictEqual(
+          exports[0].scopeMetrics[0].metrics[0].dataPoints.length,
+          1
+        );
+        assert.strictEqual(
+          exports[0].scopeMetrics[0].metrics[0].dataPoints[0].value,
+          1
+        );
+        assert.strictEqual(
+          exports[0].scopeMetrics[0].metrics[1].dataPoints.length,
+          1
+        );
+        assert.strictEqual(
+          exports[0].scopeMetrics[0].metrics[1].dataPoints[0].value,
+          2
+        );
 
         // Second batch should have 1 data point (m2:3)
         assert.strictEqual(exports[1].scopeMetrics[0].metrics.length, 1);
-        assert.strictEqual(exports[1].scopeMetrics[0].metrics[0].descriptor.name, 'm2');
-        assert.strictEqual(exports[1].scopeMetrics[0].metrics[0].dataPoints.length, 1);
-        assert.strictEqual(exports[1].scopeMetrics[0].metrics[0].dataPoints[0].value, 3);
+        assert.strictEqual(
+          exports[1].scopeMetrics[0].metrics[0].descriptor.name,
+          'm2'
+        );
+        assert.strictEqual(
+          exports[1].scopeMetrics[0].metrics[0].dataPoints.length,
+          1
+        );
+        assert.strictEqual(
+          exports[1].scopeMetrics[0].metrics[0].dataPoints[0].value,
+          3
+        );
 
         await reader.shutdown();
       });
@@ -979,7 +1096,11 @@ describe('PeriodicExportingMetricReader', () => {
         });
 
         const resourceMetrics: ResourceMetrics = {
-          resource: { attributes: {}, merge: sinon.stub(), getRawAttributes: () => [] } as any,
+          resource: {
+            attributes: {},
+            merge: sinon.stub(),
+            getRawAttributes: () => [],
+          } as any,
           scopeMetrics: [
             {
               scope: { name: 'test' },
@@ -987,10 +1108,25 @@ describe('PeriodicExportingMetricReader', () => {
                 {
                   dataPointType: DataPointType.GAUGE,
                   dataPoints: [
-                    { startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 1 },
-                    { startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 2 },
+                    {
+                      startTime: [0, 0],
+                      endTime: [0, 0],
+                      attributes: {},
+                      value: 1,
+                    },
+                    {
+                      startTime: [0, 0],
+                      endTime: [0, 0],
+                      attributes: {},
+                      value: 2,
+                    },
                   ],
-                  descriptor: { name: 'm1', description: '', unit: '', valueType: ValueType.INT },
+                  descriptor: {
+                    name: 'm1',
+                    description: '',
+                    unit: '',
+                    valueType: ValueType.INT,
+                  },
                   aggregationTemporality: AggregationTemporality.CUMULATIVE,
                 },
               ],
@@ -999,7 +1135,10 @@ describe('PeriodicExportingMetricReader', () => {
         };
 
         reader.setMetricProducer(
-          new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+          new TestMetricProducer({
+            resourceMetrics: resourceMetrics,
+            errors: [],
+          })
         );
 
         // Call forceFlush to trigger the export
@@ -1023,7 +1162,11 @@ describe('PeriodicExportingMetricReader', () => {
         });
 
         const resourceMetrics: ResourceMetrics = {
-          resource: { attributes: {}, merge: sinon.stub(), getRawAttributes: () => [] } as any,
+          resource: {
+            attributes: {},
+            merge: sinon.stub(),
+            getRawAttributes: () => [],
+          } as any,
           scopeMetrics: [
             {
               scope: { name: 'test' },
@@ -1031,10 +1174,25 @@ describe('PeriodicExportingMetricReader', () => {
                 {
                   dataPointType: DataPointType.GAUGE,
                   dataPoints: [
-                    { startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 1 },
-                    { startTime: [0, 0], endTime: [0, 0], attributes: {}, value: 2 },
+                    {
+                      startTime: [0, 0],
+                      endTime: [0, 0],
+                      attributes: {},
+                      value: 1,
+                    },
+                    {
+                      startTime: [0, 0],
+                      endTime: [0, 0],
+                      attributes: {},
+                      value: 2,
+                    },
                   ],
-                  descriptor: { name: 'm1', description: '', unit: '', valueType: ValueType.INT },
+                  descriptor: {
+                    name: 'm1',
+                    description: '',
+                    unit: '',
+                    valueType: ValueType.INT,
+                  },
                   aggregationTemporality: AggregationTemporality.CUMULATIVE,
                 },
               ],
@@ -1043,7 +1201,10 @@ describe('PeriodicExportingMetricReader', () => {
         };
 
         reader.setMetricProducer(
-          new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+          new TestMetricProducer({
+            resourceMetrics: resourceMetrics,
+            errors: [],
+          })
         );
 
         // If timeout applied to all, this would fail because total time is 30ms > 20ms.
