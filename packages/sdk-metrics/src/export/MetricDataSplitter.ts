@@ -54,12 +54,6 @@ export class MetricDataSplitter {
 
         while (dataPointsRemaining.length > 0) {
           const spaceLeft = maxExportBatchSize - currentBatchPoints;
-          if (spaceLeft === 0) {
-            flush();
-            scopeMetricCopy = null;
-            continue;
-          }
-
           const take = Math.min(spaceLeft, dataPointsRemaining.length);
           const chunk = dataPointsRemaining.slice(0, take);
           dataPointsRemaining = dataPointsRemaining.slice(take);
