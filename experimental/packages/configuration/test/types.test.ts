@@ -22,8 +22,13 @@ describe('types', function () {
       ['tsc', '-p', 'test/fixtures/types/tsconfig-pass.json'],
       {
         encoding: 'utf8',
+        shell: true, // Use 'shell' so Windows can spawn `npx`.
       }
     );
+    console.log('XXX stdout: ', p.stdout);
+    console.log('XXX stderr: ', p.stderr);
+    console.log('XXX error: ', p.error);
+    console.log('XXX status: ', p.status);
     assert.ifError(p.error);
   });
 
@@ -41,6 +46,7 @@ describe('types', function () {
       ['tsc', '-p', 'test/fixtures/types/tsconfig-fail.json'],
       {
         encoding: 'utf8',
+        shell: true, // Use 'shell' so Windows can spawn `npx`.
       }
     );
 
@@ -50,6 +56,8 @@ describe('types', function () {
     const ERR_RE = /^test\/fixtures\/types\/([^(]*)\((\d+),\d+\): (.*?)$/;
     console.log('XXX stdout: ', p.stdout);
     console.log('XXX stderr: ', p.stderr);
+    console.log('XXX error: ', p.error);
+    console.log('XXX status: ', p.status);
     const actualErrs = p.stdout
       .trim()
       .split(/\n/g)
