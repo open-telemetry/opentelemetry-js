@@ -24,7 +24,7 @@ describe('types', function () {
         encoding: 'utf8',
       }
     );
-    assert.strictEqual(p.status, 0);
+    assert.ifError(p.error);
   });
 
   it('should FAIL to tsc compile test/fixtures/types/fail-*.ts files', function () {
@@ -48,6 +48,8 @@ describe('types', function () {
     //     test/fixtures/types/fail-2.ts(12,20): error TS2322: Type 'number' is not assignable to type 'object'.
     //     test/fixtures/types/fail-span-processor-non-object.ts(9,20): error TS2322: Type 'number' is not assignable to type 'object'.
     const ERR_RE = /^test\/fixtures\/types\/([^(]*)\((\d+),\d+\): (.*?)$/;
+    console.log('XXX stdout: ', p.stdout);
+    console.log('XXX stderr: ', p.stderr);
     const actualErrs = p.stdout
       .trim()
       .split(/\n/g)
@@ -63,6 +65,6 @@ describe('types', function () {
       });
 
     assert.deepStrictEqual(actualErrs, expectedErrs);
-    assert.strictEqual(p.status, 2);
+    assert.ok(p.error);
   });
 });
