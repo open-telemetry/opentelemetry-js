@@ -100,16 +100,18 @@ function serializeLink(writer: IProtobufWriter, link: Link): void {
   const linkStart = writer.startLengthDelimited();
   const linkStartPos = writer.pos;
 
+  const context = link.context;
+
   // trace_id (field 1, bytes)
   writer.writeTag(1, 2);
-  writer.writeBytes(hexToBinary(link.context.traceId));
+  writer.writeBytes(hexToBinary(context.traceId));
 
   // span_id (field 2, bytes)
   writer.writeTag(2, 2);
-  writer.writeBytes(hexToBinary(link.context.spanId));
+  writer.writeBytes(hexToBinary(context.spanId));
 
   // trace_state (field 3, string) - skip if empty
-  const linkTraceState = link.context.traceState?.serialize();
+  const linkTraceState = context.traceState?.serialize();
   if (linkTraceState) {
     writer.writeTag(3, 2);
     writer.writeString(linkTraceState);
@@ -125,10 +127,7 @@ function serializeLink(writer: IProtobufWriter, link: Link): void {
   writer.writeVarint(link.droppedAttributesCount || 0);
 
   // flags (field 6, fixed32)
-  const linkFlags = buildSpanFlags(
-    link.context.traceFlags,
-    link.context.isRemote
-  );
+  const linkFlags = buildSpanFlags(context.traceFlags, context.isRemote);
   if (linkFlags) {
     writer.writeTag(6, 5);
     writer.writeFixed32(linkFlags);
