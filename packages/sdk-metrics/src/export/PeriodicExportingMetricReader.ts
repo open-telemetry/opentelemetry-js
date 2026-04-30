@@ -203,9 +203,14 @@ export class PeriodicExportingMetricReader extends MetricReader {
         } catch (e) {
           if (e instanceof TimeoutError) {
             // We do not report TimeoutError to the globalErrorHandler in _runOnce().
-            api.diag.error(`PeriodicExportingMetricReader: metrics export timed out after ${this._exportTimeout}ms`);
+            api.diag.error(
+              `PeriodicExportingMetricReader: metrics export timed out after ${this._exportTimeout}ms`
+            );
           } else {
-            api.diag.error('PeriodicExportingMetricReader: metrics export threw error', e);
+            api.diag.error(
+              'PeriodicExportingMetricReader: metrics export threw error',
+              e
+            );
             anyErr = e instanceof Error ? e : new Error(String(e));
           }
         }
@@ -217,7 +222,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
 
     // Schedules the current export to run after all previously scheduled exports have finished.
     const promise = this._previousExportPromise.then(currentExport);
-    this._previousExportPromise = promise.catch(() => { });
+    this._previousExportPromise = promise.catch(() => {});
     await promise;
   }
 
