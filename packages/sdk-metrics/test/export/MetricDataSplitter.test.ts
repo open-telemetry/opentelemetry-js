@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { MetricDataSplitter } from '../../src/export/MetricDataSplitter';
+import { splitMetricData } from '../../src/export/MetricDataSplitter';
 import type { ResourceMetrics } from '../../src/export/MetricData';
 import { DataPointType } from '../../src/export/MetricData';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { ValueType } from '@opentelemetry/api';
 import * as assert from 'assert';
 
-describe('MetricDataSplitter', () => {
+describe('splitMetricData', () => {
   const dummyResource = { attributes: {} } as any;
 
   // ==========================================================================
@@ -59,7 +59,7 @@ describe('MetricDataSplitter', () => {
       ],
     };
 
-    const batches = MetricDataSplitter.split(resourceMetrics, 2);
+    const batches = splitMetricData(resourceMetrics, 2);
 
     assert.strictEqual(batches.length, 2);
 
@@ -166,7 +166,7 @@ describe('MetricDataSplitter', () => {
       ],
     };
 
-    const batches = MetricDataSplitter.split(resourceMetrics, 2);
+    const batches = splitMetricData(resourceMetrics, 2);
 
     assert.strictEqual(batches.length, 2);
 
@@ -245,7 +245,7 @@ describe('MetricDataSplitter', () => {
       ],
     };
 
-    const batches = MetricDataSplitter.split(resourceMetrics, 2);
+    const batches = splitMetricData(resourceMetrics, 2);
 
     assert.strictEqual(batches.length, 1);
     assert.strictEqual(
@@ -335,7 +335,7 @@ describe('MetricDataSplitter', () => {
       ],
     };
 
-    const batches = MetricDataSplitter.split(resourceMetrics, 2);
+    const batches = splitMetricData(resourceMetrics, 2);
 
     assert.strictEqual(batches.length, 2);
 
@@ -436,7 +436,7 @@ describe('MetricDataSplitter', () => {
       ],
     };
 
-    const batches = MetricDataSplitter.split(resourceMetrics, 2);
+    const batches = splitMetricData(resourceMetrics, 2);
 
     assert.strictEqual(batches.length, 3);
 
@@ -521,7 +521,7 @@ describe('MetricDataSplitter', () => {
       ],
     };
 
-    const batches = MetricDataSplitter.split(resourceMetrics, 3);
+    const batches = splitMetricData(resourceMetrics, 3);
 
     assert.strictEqual(batches.length, 1);
     assert.strictEqual(batches[0].scopeMetrics.length, 2);
@@ -590,7 +590,7 @@ describe('MetricDataSplitter', () => {
       ],
     };
 
-    const batches = MetricDataSplitter.split(resourceMetrics, 2);
+    const batches = splitMetricData(resourceMetrics, 2);
 
     assert.strictEqual(batches.length, 2);
     assert.strictEqual(
@@ -687,7 +687,7 @@ describe('MetricDataSplitter', () => {
       ],
     };
 
-    const batches = MetricDataSplitter.split(resourceMetrics, 2);
+    const batches = splitMetricData(resourceMetrics, 2);
 
     assert.strictEqual(batches.length, 2);
     assert.strictEqual(batches[0].scopeMetrics.length, 1);
@@ -745,7 +745,7 @@ describe('MetricDataSplitter', () => {
       ],
     };
 
-    const batches = MetricDataSplitter.split(resourceMetrics, 2);
+    const batches = splitMetricData(resourceMetrics, 2);
 
     assert.strictEqual(batches.length, 2);
     assert.strictEqual(
@@ -840,7 +840,7 @@ describe('MetricDataSplitter', () => {
       ],
     };
 
-    const batches = MetricDataSplitter.split(resourceMetrics, 2);
+    const batches = splitMetricData(resourceMetrics, 2);
 
     assert.strictEqual(batches.length, 2);
     assert.strictEqual(batches[0].scopeMetrics.length, 1);
@@ -901,7 +901,7 @@ describe('MetricDataSplitter', () => {
       ],
     };
 
-    const batches = MetricDataSplitter.split(resourceMetrics, 2);
+    const batches = splitMetricData(resourceMetrics, 2);
 
     assert.strictEqual(batches.length, 2);
     assert.strictEqual(
@@ -925,12 +925,12 @@ describe('MetricDataSplitter', () => {
     };
 
     assert.throws(
-      () => MetricDataSplitter.split(resourceMetrics, 0),
+      () => splitMetricData(resourceMetrics, 0),
       /maxExportBatchSize must be greater than 0/
     );
 
     assert.throws(
-      () => MetricDataSplitter.split(resourceMetrics, -1),
+      () => splitMetricData(resourceMetrics, -1),
       /maxExportBatchSize must be greater than 0/
     );
   });

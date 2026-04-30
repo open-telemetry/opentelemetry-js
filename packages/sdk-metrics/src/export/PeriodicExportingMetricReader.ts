@@ -14,7 +14,7 @@ import type { PushMetricExporter } from './MetricExporter';
 import { callWithTimeout, TimeoutError } from '../utils';
 import type { MetricProducer } from './MetricProducer';
 import { InstrumentType } from './MetricData';
-import { MetricDataSplitter } from './MetricDataSplitter';
+import { splitMetricData } from './MetricDataSplitter';
 
 export type PeriodicExportingMetricReaderOptions = {
   /**
@@ -182,7 +182,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
     }
 
     const batches = this._maxExportBatchSize
-      ? MetricDataSplitter.split(resourceMetrics, this._maxExportBatchSize)
+      ? splitMetricData(resourceMetrics, this._maxExportBatchSize)
       : [resourceMetrics];
 
     const currentExport = async () => {
