@@ -46,10 +46,8 @@ function serializeStatus(writer: IProtobufWriter, status: SpanStatus): void {
   }
 
   // code (field 3, enum/varint) - always write as it defaults to UNSET (0) in proto
-  if (status.code !== 0) {
-    writer.writeTag(3, 0);
-    writer.writeVarint(status.code);
-  }
+  writer.writeTag(3, 0);
+  writer.writeVarint(status.code);
 
   writer.finishLengthDelimited(statusStart, writer.pos - statusStartPos);
 }
