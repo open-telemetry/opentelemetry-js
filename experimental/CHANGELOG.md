@@ -10,6 +10,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(otlp-transformer): replace protobufjs trace serialization with custom implementation [#6625](https://github.com/open-telemetry/opentelemetry-js/pull/6625) @pichlermarc
 * feat(configuration): auto-generate TypeScript types from OTel declarative config JSON schema (stable v1.0.0) using `json-schema-to-typescript` and `ajv` [#6533](https://github.com/open-telemetry/opentelemetry-js/pull/6533) @MikeGoldsmith
 * feat(otlp-transformer): replace protobufjs trace serialization with custom implementation [#6625](https://github.com/open-telemetry/opentelemetry-js/pull/6625) @pichlermarc
 * feat(otlp-transformer): replace protobufjs metrics serialization with custom implementation [#6625](https://github.com/open-telemetry/opentelemetry-js/pull/6629) @pichlermarc
