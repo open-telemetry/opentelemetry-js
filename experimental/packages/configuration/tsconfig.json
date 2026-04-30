@@ -5,13 +5,13 @@
     "outDir": "build",
     "rootDir": "."
   },
+  "exclude": [
+    "test/fixtures/**"
+  ],
   "include": [
     "src/**/*.ts",
     "src/generated/*.js",
     "test/**/*.ts"
-  ],
-  "exclude": [
-    "test/fixtures/**"
   ],
   "references": [
     {
