@@ -14,6 +14,8 @@ import * as assert from 'assert';
 import { spawnSync } from 'child_process';
 
 describe('types', function () {
+  this.timeout(5000); // Running `tsc` in the tests below can be slow in CI.
+
   it('should tsc compile test/fixtures/types/pass-*.ts files successfully', function () {
     const p = spawnSync(
       'npx',
