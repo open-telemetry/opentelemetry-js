@@ -32,7 +32,7 @@ import {
   DEFAULT_AGGREGATION_SELECTOR,
   DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
 } from '../../src/export/AggregationSelector';
-import { ValueType } from '@opentelemetry/api';
+import { ValueType, diag } from '@opentelemetry/api';
 
 const MAX_32_BIT_INT = 2 ** 31 - 1;
 
@@ -1151,6 +1151,7 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       it('should apply timeout to individual batches and not combination', async () => {
+        const clock = sinon.useFakeTimers();
         const exporter = new TestMetricExporter();
         exporter.exportTime = 15; // Each batch takes 15ms
 
@@ -1207,14 +1208,98 @@ describe('PeriodicExportingMetricReader', () => {
           })
         );
 
-        // If timeout applied to all, this would fail because total time is 30ms > 20ms.
-        // Since it applies to individual, it should succeed!
-        await reader.forceFlush();
+        // Call _runOnce directly to avoid forceFlush timer issues in this specific test
+        const runOncePromise = (reader as any)._runOnce();
+
+        // Batch 1 should be scheduled. Tick 15ms to complete it.
+        await clock.tickAsync(15);
+
+        // Batch 2 should be scheduled. Tick 15ms to complete it.
+        await clock.tickAsync(15);
+
+        await runOncePromise;
 
         const exports = exporter.getExports();
         assert.strictEqual(exports.length, 2);
 
-        await reader.shutdown();
+        clock.restore();
+      });
+
+      it('should log timeout error to diag and not propagate to globalErrorHandler', async () => {
+        const clock = sinon.useFakeTimers();
+        const exporter = new TestMetricExporter();
+        exporter.exportTime = 50; // Make it take 50ms
+
+        const reader = new PeriodicExportingMetricReader({
+          exporter: exporter,
+          exportIntervalMillis: MAX_32_BIT_INT,
+          maxExportBatchSize: 1,
+          exportTimeoutMillis: 20, // Timeout is 20ms
+        });
+
+        const resourceMetrics: ResourceMetrics = {
+          resource: {
+            attributes: {},
+            merge: sinon.stub(),
+            getRawAttributes: () => [],
+          } as any,
+          scopeMetrics: [
+            {
+              scope: { name: 'test' },
+              metrics: [
+                {
+                  dataPointType: DataPointType.GAUGE,
+                  dataPoints: [
+                    {
+                      startTime: [0, 0],
+                      endTime: [0, 0],
+                      attributes: {},
+                      value: 1,
+                    },
+                  ],
+                  descriptor: {
+                    name: 'm1',
+                    description: '',
+                    unit: '',
+                    valueType: ValueType.INT,
+                  },
+                  aggregationTemporality: AggregationTemporality.CUMULATIVE,
+                },
+              ],
+            },
+          ],
+        };
+
+        reader.setMetricProducer(
+          new TestMetricProducer({
+            resourceMetrics: resourceMetrics,
+            errors: [],
+          })
+        );
+
+        const diagErrorStub = sinon.stub(diag, 'error');
+        const errorHandlerStub = sinon.stub();
+        setGlobalErrorHandler(errorHandlerStub);
+
+        const runOncePromise = (reader as any)._runOnce();
+
+        // Tick 20ms to trigger timeout
+        await clock.tickAsync(20);
+
+        await runOncePromise;
+
+        sinon.assert.calledOnce(diagErrorStub);
+        assert.match(
+          diagErrorStub.firstCall.args[0],
+          /metrics export timed out/
+        );
+
+        // Global error handler should not be called for timeout errors
+        sinon.assert.notCalled(errorHandlerStub);
+
+        // Restore global error handler
+        setGlobalErrorHandler(() => {});
+        clock.restore();
       });
     });
   });
