@@ -25,11 +25,7 @@ describe('types', function () {
         shell: true, // Use 'shell' so Windows can spawn `npx`.
       }
     );
-    console.log('XXX stdout: ', p.stdout);
-    console.log('XXX stderr: ', p.stderr);
-    console.log('XXX error: ', p.error);
-    console.log('XXX status: ', p.status);
-    assert.ifError(p.error);
+    assert.strictEqual(p.status, 0);
   });
 
   it('should FAIL to tsc compile test/fixtures/types/fail-*.ts files', function () {
@@ -54,10 +50,6 @@ describe('types', function () {
     //     test/fixtures/types/fail-2.ts(12,20): error TS2322: Type 'number' is not assignable to type 'object'.
     //     test/fixtures/types/fail-span-processor-non-object.ts(9,20): error TS2322: Type 'number' is not assignable to type 'object'.
     const ERR_RE = /^test\/fixtures\/types\/([^(]*)\((\d+),\d+\): (.*?)$/;
-    console.log('XXX stdout: ', p.stdout);
-    console.log('XXX stderr: ', p.stderr);
-    console.log('XXX error: ', p.error);
-    console.log('XXX status: ', p.status);
     const actualErrs = p.stdout
       .trim()
       .split(/\n/g)
@@ -73,6 +65,6 @@ describe('types', function () {
       });
 
     assert.deepStrictEqual(actualErrs, expectedErrs);
-    assert.ok(p.error);
+    assert.ok(typeof p.status === 'number' && p.status !== 0);
   });
 });
