@@ -17,6 +17,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * fix(configuration): do not validate `OTEL_CONFIG_FILE` value before using it for file config [#6643](https://github.com/open-telemetry/opentelemetry-js/pull/6643) @trentm
 * fix(configuration): improve how 'additionalProperties' in JSON schema is translated to TS types [#6650](https://github.com/open-telemetry/opentelemetry-js/pull/6650) @trentm
+* fix(configuration): remove stripMinItems and preprocessNullArrays from validation/parsing [#6657](https://github.com/open-telemetry/opentelemetry-js/pull/6657) @trentm
 
 ### :books: Documentation
 
