@@ -17,13 +17,15 @@
 'use strict';
 
 const { compile } = require('json-schema-to-typescript');
-const { spawnSync } = require('child_process');
+const { spawnSync, execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const Ajv = require('ajv/dist/2020');
 const standaloneCode = require('ajv/dist/standalone').default;
+const typescript = require('typescript');
 
 const SCRIPT_DIR = __dirname;
+const PKG_DIR = path.resolve(__dirname, '../../experimental/packages/configuration');
 const SCHEMA_PATH = path.join(
   SCRIPT_DIR,
   'opentelemetry-configuration',
@@ -47,6 +49,46 @@ const licenseHeader = `/*
  * SPDX-License-Identifier: Apache-2.0
  */
 `;
+
+// ---- Utility to remove duplicate declarations from TypeScript code
+// Based on https://github.com/bcherny/json-schema-to-typescript/issues/193#issuecomment-2595760821
+
+// FITS strings that do not end with digits (so duplicated types)
+// AND strings that contain V1,V2,V3,... at the end (versioned API is considered as not duplicate)
+const NON_DUPLICATED_IDENTIFIER_REGEXP = /\b(?!\w*\d+$)\w+\b|\b\w*V\d+\b/;
+
+function isDuplicatedTypeIdentifier(typeIdentifier) {
+  return !(typeIdentifier.escapedText.toString().match(NON_DUPLICATED_IDENTIFIER_REGEXP));
+}
+
+function getNonDuplicatedIdentifierName(typeIdentifier) {
+  // removes tail digits
+  return typeIdentifier.escapedText.toString().replace(/[\d.]+$/, '');
+}
+
+function removeDuplicateTsDeclarations(tsCode) {
+  const tsPrinter = typescript.createPrinter({
+    newLine: typescript.NewLineKind.LineFeed,
+  }, {
+    substituteNode: (_, node) => {
+      if (typescript.isTypeReferenceNode(node) && isDuplicatedTypeIdentifier(node.typeName)) {
+        const originalIdentifierName = getNonDuplicatedIdentifierName(node.typeName);
+        return typescript.factory.createTypeReferenceNode(originalIdentifierName);
+      }
+      if ((typescript.isInterfaceDeclaration(node) || typescript.isEnumDeclaration(node) || typescript.isTypeAliasDeclaration(node))
+           && isDuplicatedTypeIdentifier(node.name)) {
+        const declarationIsCleared = typescript.factory.createIdentifier('');
+        return declarationIsCleared;
+      }
+      return node;
+    },
+  });
+
+  const sourceFile = typescript.createSourceFile('', tsCode, typescript.ScriptTarget.ESNext, false, typescript.ScriptKind.TS);
+
+  const result = tsPrinter.printFile(sourceFile);
+  return result;
+}
 
 // ---- 1. Get and load the OpenTelemetry Configuration JSON schema.
 
@@ -114,10 +156,13 @@ console.log(`Written validator declaration to ${VALIDATOR_DTS_PATH}`);
 
 const bannerComment = [
   licenseHeader,
-  '/* eslint-disable */',
+  '',
+  '//',
   '// AUTO-GENERATED — do not edit',
   '// Generated from opentelemetry-configuration JSON schema v1.0.0',
   '// Run `npm run generate:config` from the configuration package to regenerate',
+  '//',
+  '/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-object-type */',
 ].join('\n');
 
 // Ensure the types have an export for all `$defs`.
@@ -131,6 +176,51 @@ const bannerComment = [
 // Adding a 'title' results in json-schema-to-typescript doing this.
 for (const name of Object.keys(schema.$defs)) {
   schema.$defs[name].title = name;
+}
+
+// Avoid unnecessary `| null` in TypeScript types.
+//
+// opentelemetry-configuration intentionally adds an optional "null" type to
+// most fields to express optional/nullable values, e.g.:
+//       "ConsoleMetricExporter": {
+//         "type": [
+//           "object",
+//           "null"
+//         ],
+// See explanation at: https://github.com/open-telemetry/opentelemetry-configuration/blob/main/CONTRIBUTING.md#required-and-null-properties
+//
+// In TypeScript, `?` expresses a property being optional, e.g.:
+//      endpoint?: string;
+// Leaving "null" in the JSON Schema results in TypeScript like this:
+//      endpoint?: string | null;
+//
+// That null option has a downstream blast radius. E.g. a downstream API that
+// takes that `endpoint` value, now needs to handle `null`.
+//
+// By preprocessing the schema to remove those we get nicer typescript types.
+function stripNullTypeFallback(obj) {
+  if (Array.isArray(obj.type)) {
+    if (obj.type.length === 2 && obj.type[1] === 'null') {
+      obj.type.pop();
+    }
+  } else if (Array.isArray(obj.oneOf)) {
+    // Handle the more complex case of AttributeNameValue#value, which uses:
+    //    "value": { "oneOf": [{"type":"string"}, {"type":"null"}, ...] }
+    if (obj.oneOf.length > 1) {
+      obj.oneOf = obj.oneOf.filter(entry => {
+        return !(entry?.type === 'null' && Object.keys(entry).length === 1);
+      });
+    }
+  }
+  if (typeof obj.properties === 'object' && obj.properties != null) {
+    for (const prop of Object.values(obj.properties)) {
+      stripNullTypeFallback(prop)
+    }
+  }
+}
+stripNullTypeFallback(schema);
+for (const def of Object.values(schema.$defs)) {
+  stripNullTypeFallback(def);
 }
 
 compile(schema, 'OpenTelemetryConfiguration', {
@@ -161,33 +251,6 @@ compile(schema, 'OpenTelemetryConfiguration', {
       'ConfigurationModel'
     );
 
-    // Deduplicate numbered type suffixes: json-schema-to-typescript emits
-    // Sampler, Sampler1, Sampler2, ... when the same $defs type is referenced
-    // in multiple schema locations. All are structurally identical. Find all
-    // numbered duplicates, remove their definitions, and rewrite references
-    // to the canonical (un-suffixed) name.
-    function removeTypeDef(src, typeName) {
-      // Match both `export type X =` and `export interface X {`
-      const typeMarker = `\nexport type ${typeName} =`;
-      const ifaceMarker = `\nexport interface ${typeName} {`;
-      const startMarker = src.includes(typeMarker) ? typeMarker : ifaceMarker;
-      const start = src.indexOf(startMarker);
-      if (start === -1) return src;
-      const nextExport = src.indexOf('\nexport ', start + startMarker.length);
-      return nextExport === -1 ? src.slice(0, start) : src.slice(0, start) + '\n' + src.slice(nextExport + 1);
-    }
-    // Collect all exported type/interface names ending in digits
-    const numberedTypes = [...ts.matchAll(/\nexport (?:type|interface) ([A-Za-z]+\d+)[\s={]/g)]
-      .map(m => m[1]);
-    for (const numbered of numberedTypes) {
-      const baseName = numbered.replace(/\d+$/, '');
-      // Only deduplicate if the un-suffixed base type also exists
-      if (ts.includes(`\nexport type ${baseName} `) || ts.includes(`\nexport interface ${baseName} `)) {
-        ts = removeTypeDef(ts, numbered);
-        ts = ts.replace(new RegExp(`\\b${numbered}\\b`, 'g'), baseName);
-      }
-    }
-
     // Change the TypeScript representation for interfaces where
     // "additionalProperties" is allowed.
     //
@@ -215,18 +278,21 @@ compile(schema, 'OpenTelemetryConfiguration', {
     //      "type": [ "object" ],
     ts = ts.replace(/\[k: string\]: \{\};/g, '[k: string]: object;');
 
-    // Strip `| null` from type unions. The JSON schema uses
-    // "type": ["string", "null"] to express optional/nullable fields, which
-    // json-schema-to-typescript converts to `T | null`. In TypeScript the `?:`
-    // modifier already expresses absence; consumers (e.g. sdk-node) expect
-    // `T | undefined`, not `T | null`, so null in the union causes type errors
-    // at assignment sites. Removing it keeps the types compatible.
-    // The runtime counterpart is stripNulls() in FileConfigFactory.ts, which
-    // deletes null-valued properties after YAML parsing so the data matches.
-    ts = ts.replace(/ \| null\b/g, '');
+    // json-schema-to-ts has a limitation where duplicate types are created
+    // for re-referenced JSON schema definitions. For example `OtlpHttpExporter`
+    // is referenced twice in the schema, and the resulting TS includes both:
+    //    export interface OtlpHttpExporter {
+    //    export interface OtlpHttpExporter1 {
+    // See https://github.com/bcherny/json-schema-to-typescript/issues/193
+    // `removeDuplicateTsDeclarations` removes those duplicates.
+    ts = removeDuplicateTsDeclarations(ts);
 
     fs.mkdirSync(path.dirname(TYPES_PATH), { recursive: true });
     fs.writeFileSync(TYPES_PATH, ts);
+    execSync(`npm run lint:fix -- ${TYPES_PATH}`, {
+      cwd: PKG_DIR,
+      encoding: 'utf8'
+    });
     console.log(`Written ${ts.split('\n').length} lines to ${TYPES_PATH}`);
   })
   .catch(err => {
