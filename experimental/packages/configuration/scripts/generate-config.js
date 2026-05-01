@@ -167,6 +167,24 @@ for (const name of Object.keys(schema.$defs)) {
   schema.$defs[name].title = name;
 }
 
+// Trim newlines from the end of descriptions. This is to avoid an extra
+// blank line in TypeScript comments. This is purely cosmetic.
+function rtrimDescription(node) {
+  if (Array.isArray(node)) {
+    for (let item of node) {
+      rtrimDescription(item);
+    }
+  } else if (typeof node === 'object' && node !== null) {
+    if (typeof node.description === 'string') {
+      node.description = node.description.trimEnd();
+    }
+    for (const val of Object.values(node)) {
+      rtrimDescription(val);
+    }
+  }
+}
+rtrimDescription(schema)
+
 // Avoid unnecessary `| null` in TypeScript types.
 //
 // opentelemetry-configuration intentionally adds an optional "null" type to
@@ -275,6 +293,10 @@ compile(schema, 'OpenTelemetryConfiguration', {
     // See https://github.com/bcherny/json-schema-to-typescript/issues/193
     // `removeDuplicateTsDeclarations` removes those duplicates.
     ts = removeDuplicateTsDeclarations(ts);
+
+    // Cosmetic: add blank lines between exports.
+    ts = ts.replace(/\n\/\*\*/g, '\n\n/**')
+      .replace(/([^/])\nexport/g, '$1\n\nexport');
 
     fs.mkdirSync(path.dirname(TYPES_PATH), { recursive: true });
     fs.writeFileSync(TYPES_PATH, ts);
