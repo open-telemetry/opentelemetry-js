@@ -54,7 +54,7 @@ const licenseHeader = `/*
 // Based on https://github.com/bcherny/json-schema-to-typescript/issues/193#issuecomment-2595760821
 
 // FITS strings that do not end with digits (so duplicated types)
-// AND strings that contain V1,V2,V3,... ant the end (versioned API is considered as not duplicate)
+// AND strings that contain V1,V2,V3,... at the end (versioned API is considered as not duplicate)
 const NON_DUPLICATED_IDENTIFIER_REGEXP = /\b(?!\w*\d+$)\w+\b|\b\w*V\d+\b/;
 
 function isDuplicatedTypeIdentifier(typeIdentifier) {
