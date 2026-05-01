@@ -61,21 +61,6 @@ if (bashResult.error) {
 
 const schema = JSON.parse(fs.readFileSync(SCHEMA_PATH, 'utf8'));
 
-// Strip minItems constraints from the schema used for runtime validation.
-// preprocessNullArrays() converts null → [] for processors/readers so providers
-// with no children still pass validation; minItems: 1 would reject those.
-function stripMinItems(obj) {
-  if (typeof obj !== 'object' || obj === null) return obj;
-  if (Array.isArray(obj)) return obj.map(stripMinItems);
-  const result = {};
-  for (const [k, v] of Object.entries(obj)) {
-    if (k === 'minItems') continue;
-    result[k] = stripMinItems(v);
-  }
-  return result;
-}
-const runtimeSchema = stripMinItems(schema);
-
 // ---- 2. Generate a pre-compiled validator
 
 // Generate a pre-compiled (ahead-of-time) validator using ajv standalone mode.
@@ -83,7 +68,7 @@ const runtimeSchema = stripMinItems(schema);
 // schema compilation to build time. The generated validator.js module is self-contained
 // aside from small ajv/dist/runtime/* helper imports (~4KB).
 const ajvAot = new Ajv({ strict: false, code: { source: true } });
-const validateFn = ajvAot.compile(runtimeSchema);
+const validateFn = ajvAot.compile(schema);
 const validatorJs = standaloneCode(ajvAot, validateFn);
 const validatorJsWithHeader = [
   '// AUTO-GENERATED — do not edit',

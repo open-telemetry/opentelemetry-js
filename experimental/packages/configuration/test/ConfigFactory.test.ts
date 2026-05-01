@@ -2528,22 +2528,17 @@ describe('ConfigFactory', function () {
       );
     });
 
-    it('checks for incomplete providers', function () {
-      const warnSpy = Sinon.spy(diag, 'warn');
+    it('should throw for empty processors (minItems)', function () {
       process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid-providers.yaml';
-      createConfigFactory();
-      Sinon.assert.calledWith(
-        warnSpy.firstCall,
-        'TracerProvider must have at least one processor configured'
-      );
-      Sinon.assert.calledWith(
-        warnSpy.secondCall,
-        'MeterProvider must have at least one reader configured'
-      );
-      Sinon.assert.calledWith(
-        warnSpy.thirdCall,
-        'LoggerProvider must have at least one processor configured'
-      );
+      try {
+        createConfigFactory();
+      } catch (err) {
+        assert.ok(err);
+        assert.strictEqual(
+          err.message,
+          'Invalid OpenTelemetry config file: /logger_provider/processors must be array'
+        );
+      }
     });
 
     it('check resources priority', function () {
