@@ -133,6 +133,51 @@ for (const name of Object.keys(schema.$defs)) {
   schema.$defs[name].title = name;
 }
 
+// Avoid unnecessary `| null` in TypeScript types.
+//
+// opentelemetry-configuration intentionally adds an optional "null" type to
+// most fields to express optional/nullable values, e.g.:
+//       "ConsoleMetricExporter": {
+//         "type": [
+//           "object",
+//           "null"
+//         ],
+// See explanation at: https://github.com/open-telemetry/opentelemetry-configuration/blob/main/CONTRIBUTING.md#required-and-null-properties
+//
+// In TypeScript, `?` expresses a property being optional, e.g.:
+//      endpoint?: string;
+// Leaving "null" in the JSON Schema results in TypeScript like this:
+//      endpoint?: string | null;
+//
+// That null option has a downstream blast radius. E.g. a downstream API that
+// takes that `endpoint` value, now needs to handle `null`.
+//
+// By preprocessing the schema to remove those we get nicer typescript types.
+function stripNullTypeFallback(obj) {
+  if (Array.isArray(obj.type)) {
+    if (obj.type.length === 2 && obj.type[1] === 'null') {
+      obj.type.pop();
+    }
+  } else if (Array.isArray(obj.oneOf)) {
+    // Handle the more complex case of AttributeNameValue#value, which uses:
+    //    "value": { "oneOf": [{"type":"string"}, {"type":"null"}, ...] }
+    if (obj.oneOf.length > 1) {
+      obj.oneOf = obj.oneOf.filter(entry => {
+        return !(entry?.type === 'null' && Object.keys(entry).length === 1);
+      });
+    }
+  }
+  if (typeof obj.properties === 'object' && obj.properties != null) {
+    for (const prop of Object.values(obj.properties)) {
+      stripNullTypeFallback(prop)
+    }
+  }
+}
+stripNullTypeFallback(schema);
+for (const def of Object.values(schema.$defs)) {
+  stripNullTypeFallback(def);
+}
+
 compile(schema, 'OpenTelemetryConfiguration', {
   bannerComment,
   unknownAny: false,
@@ -214,16 +259,6 @@ compile(schema, 'OpenTelemetryConfiguration', {
     //    "additionalProperties": {
     //      "type": [ "object" ],
     ts = ts.replace(/\[k: string\]: \{\};/g, '[k: string]: object;');
-
-    // Strip `| null` from type unions. The JSON schema uses
-    // "type": ["string", "null"] to express optional/nullable fields, which
-    // json-schema-to-typescript converts to `T | null`. In TypeScript the `?:`
-    // modifier already expresses absence; consumers (e.g. sdk-node) expect
-    // `T | undefined`, not `T | null`, so null in the union causes type errors
-    // at assignment sites. Removing it keeps the types compatible.
-    // The runtime counterpart is stripNulls() in FileConfigFactory.ts, which
-    // deletes null-valued properties after YAML parsing so the data matches.
-    ts = ts.replace(/ \| null\b/g, '');
 
     fs.mkdirSync(path.dirname(TYPES_PATH), { recursive: true });
     fs.writeFileSync(TYPES_PATH, ts);

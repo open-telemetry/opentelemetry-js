@@ -39,106 +39,30 @@
  *
  */
 export type SeverityNumber =
-  | (
-      | 'trace'
-      | 'trace2'
-      | 'trace3'
-      | 'trace4'
-      | 'debug'
-      | 'debug2'
-      | 'debug3'
-      | 'debug4'
-      | 'info'
-      | 'info2'
-      | 'info3'
-      | 'info4'
-      | 'warn'
-      | 'warn2'
-      | 'warn3'
-      | 'warn4'
-      | 'error'
-      | 'error2'
-      | 'error3'
-      | 'error4'
-      | 'fatal'
-      | 'fatal2'
-      | 'fatal3'
-      | 'fatal4'
-    )
- ;
-/**
- * Configure exporter to be OTLP with HTTP transport.
- * If omitted, ignore.
- *
- */
-export type OtlpHttpExporter = {
-  /**
-   * Configure endpoint, including the signal specific path.
-   * If omitted or null, the http://localhost:4318/v1/{signal} (where signal is 'traces', 'logs', or 'metrics') is used.
-   *
-   */
-  endpoint?: string;
-  tls?: HttpTls;
-  /**
-   * Configure headers. Entries have higher priority than entries from .headers_list.
-   * If an entry's .value is null, the entry is ignored.
-   * If omitted, no headers are added.
-   *
-   *
-   * @minItems 1
-   */
-  headers?: NameStringValuePair[];
-  /**
-   * Configure headers. Entries have lower priority than entries from .headers.
-   * The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
-   * If omitted or null, no headers are added.
-   *
-   */
-  headers_list?: string;
-  /**
-   * Configure compression.
-   * Known values include: gzip, none. Implementations may support other compression algorithms.
-   * If omitted or null, none is used.
-   *
-   */
-  compression?: string;
-  /**
-   * Configure max time (in milliseconds) to wait for each export.
-   * Value must be non-negative. A value of 0 indicates no limit (infinity).
-   * If omitted or null, 10000 is used.
-   *
-   */
-  timeout?: number;
-  encoding?: OtlpHttpEncoding;
-};
-/**
- * Configure TLS settings for the exporter.
- * If omitted, system default TLS settings are used.
- *
- */
-export type HttpTls = {
-  /**
-   * Configure certificate used to verify a server's TLS credentials.
-   * Absolute path to certificate file in PEM format.
-   * If omitted or null, system default certificate verification is used for secure connections.
-   *
-   */
-  ca_file?: string;
-  /**
-   * Configure mTLS private client key.
-   * Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-   * If omitted or null, mTLS is not used.
-   *
-   */
-  key_file?: string;
-  /**
-   * Configure mTLS client certificate.
-   * Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-   * If omitted or null, mTLS is not used.
-   *
-   */
-  cert_file?: string;
-};
+  | 'trace'
+  | 'trace2'
+  | 'trace3'
+  | 'trace4'
+  | 'debug'
+  | 'debug2'
+  | 'debug3'
+  | 'debug4'
+  | 'info'
+  | 'info2'
+  | 'info3'
+  | 'info4'
+  | 'warn'
+  | 'warn2'
+  | 'warn3'
+  | 'warn4'
+  | 'error'
+  | 'error2'
+  | 'error3'
+  | 'error4'
+  | 'fatal'
+  | 'fatal2'
+  | 'fatal3'
+  | 'fatal4';
 /**
  * Configure the encoding used for messages.
  * Implementations may not support json.
@@ -148,106 +72,7 @@ export type HttpTls = {
  * If omitted, protobuf is used.
  *
  */
-export type OtlpHttpEncoding = ('protobuf' | 'json');
-/**
- * Configure exporter to be OTLP with gRPC transport.
- * If omitted, ignore.
- *
- */
-export type OtlpGrpcExporter = {
-  /**
-   * Configure endpoint.
-   * If omitted or null, http://localhost:4317 is used.
-   *
-   */
-  endpoint?: string;
-  tls?: GrpcTls;
-  /**
-   * Configure headers. Entries have higher priority than entries from .headers_list.
-   * If an entry's .value is null, the entry is ignored.
-   * If omitted, no headers are added.
-   *
-   *
-   * @minItems 1
-   */
-  headers?: NameStringValuePair[];
-  /**
-   * Configure headers. Entries have lower priority than entries from .headers.
-   * The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
-   * If omitted or null, no headers are added.
-   *
-   */
-  headers_list?: string;
-  /**
-   * Configure compression.
-   * Known values include: gzip, none. Implementations may support other compression algorithms.
-   * If omitted or null, none is used.
-   *
-   */
-  compression?: string;
-  /**
-   * Configure max time (in milliseconds) to wait for each export.
-   * Value must be non-negative. A value of 0 indicates no limit (infinity).
-   * If omitted or null, 10000 is used.
-   *
-   */
-  timeout?: number;
-};
-/**
- * Configure TLS settings for the exporter.
- * If omitted, system default TLS settings are used.
- *
- */
-export type GrpcTls = {
-  /**
-   * Configure certificate used to verify a server's TLS credentials.
-   * Absolute path to certificate file in PEM format.
-   * If omitted or null, system default certificate verification is used for secure connections.
-   *
-   */
-  ca_file?: string;
-  /**
-   * Configure mTLS private client key.
-   * Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-   * If omitted or null, mTLS is not used.
-   *
-   */
-  key_file?: string;
-  /**
-   * Configure mTLS client certificate.
-   * Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-   * If omitted or null, mTLS is not used.
-   *
-   */
-  cert_file?: string;
-  /**
-   * Configure client transport security for the exporter's connection.
-   * Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
-   * If omitted or null, false is used.
-   *
-   */
-  insecure?: boolean;
-};
-/**
- * Configure exporter to be OTLP with file transport.
- * If omitted, ignore.
- *
- */
-export type ExperimentalOtlpFileExporter = {
-  /**
-   * Configure output stream.
-   * Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
-   * If omitted or null, stdout is used.
-   *
-   */
-  output_stream?: string;
-};
-/**
- * Configure exporter to be console.
- * If omitted, ignore.
- *
- */
-export type ConsoleExporter = {};
+export type OtlpHttpEncoding = 'protobuf' | 'json';
 /**
  * Configure severity filtering.
  * Log records with an non-zero (i.e. unspecified) severity number which is less than minimum_severity are not processed.
@@ -279,54 +104,7 @@ export type ConsoleExporter = {};
  * If omitted, severity filtering is not applied.
  *
  */
-export type OtlpHttpMetricExporter = {
-  /**
-   * Configure endpoint.
-   * If omitted or null, http://localhost:4318/v1/metrics is used.
-   *
-   */
-  endpoint?: string;
-  tls?: HttpTls;
-  /**
-   * Configure headers. Entries have higher priority than entries from .headers_list.
-   * If an entry's .value is null, the entry is ignored.
-   * If omitted, no headers are added.
-   *
-   *
-   * @minItems 1
-   */
-  headers?: NameStringValuePair[];
-  /**
-   * Configure headers. Entries have lower priority than entries from .headers.
-   * The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
-   * If omitted or null, no headers are added.
-   *
-   */
-  headers_list?: string;
-  /**
-   * Configure compression.
-   * Known values include: gzip, none. Implementations may support other compression algorithms.
-   * If omitted or null, none is used.
-   *
-   */
-  compression?: string;
-  /**
-   * Configure max time (in milliseconds) to wait for each export.
-   * Value must be non-negative. A value of 0 indicates no limit (infinity).
-   * If omitted or null, 10000 is used.
-   *
-   */
-  timeout?: number;
-  encoding?: OtlpHttpEncoding;
-  temporality_preference?: ExporterTemporalityPreference;
-  default_histogram_aggregation?: ExporterDefaultHistogramAggregation;
-};
-/**
- * Configure TLS settings for the exporter.
- * If omitted, system default TLS settings are used.
- *
- */
-export type ExporterTemporalityPreference = ('cumulative' | 'delta' | 'low_memory');
+export type ExporterTemporalityPreference = 'cumulative' | 'delta' | 'low_memory';
 /**
  * Configure default histogram aggregation.
  * Values include:
@@ -335,71 +113,7 @@ export type ExporterTemporalityPreference = ('cumulative' | 'delta' | 'low_memor
  * If omitted, explicit_bucket_histogram is used.
  *
  */
-export type ExporterDefaultHistogramAggregation =
-  | ('explicit_bucket_histogram' | 'base2_exponential_bucket_histogram')
- ;
-/**
- * Configure exporter to be OTLP with gRPC transport.
- * If omitted, ignore.
- *
- */
-export type OtlpGrpcMetricExporter = {
-  /**
-   * Configure endpoint.
-   * If omitted or null, http://localhost:4317 is used.
-   *
-   */
-  endpoint?: string;
-  tls?: GrpcTls;
-  /**
-   * Configure headers. Entries have higher priority than entries from .headers_list.
-   * If an entry's .value is null, the entry is ignored.
-   * If omitted, no headers are added.
-   *
-   *
-   * @minItems 1
-   */
-  headers?: NameStringValuePair[];
-  /**
-   * Configure headers. Entries have lower priority than entries from .headers.
-   * The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
-   * If omitted or null, no headers are added.
-   *
-   */
-  headers_list?: string;
-  /**
-   * Configure compression.
-   * Known values include: gzip, none. Implementations may support other compression algorithms.
-   * If omitted or null, none is used.
-   *
-   */
-  compression?: string;
-  /**
-   * Configure max time (in milliseconds) to wait for each export.
-   * Value must be non-negative. A value of 0 indicates no limit (infinity).
-   * If omitted or null, 10000 is used.
-   *
-   */
-  timeout?: number;
-  temporality_preference?: ExporterTemporalityPreference;
-  default_histogram_aggregation?: ExporterDefaultHistogramAggregation;
-};
-/**
- * Configure TLS settings for the exporter.
- * If omitted, system default TLS settings are used.
- *
- */
-export type ExperimentalOtlpFileMetricExporter = {
-  /**
-   * Configure output stream.
-   * Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
-   * If omitted or null, stdout is used.
-   *
-   */
-  output_stream?: string;
-  temporality_preference?: ExporterTemporalityPreference;
-  default_histogram_aggregation?: ExporterDefaultHistogramAggregation;
-};
+export type ExporterDefaultHistogramAggregation = 'explicit_bucket_histogram' | 'base2_exponential_bucket_histogram';
 /**
  * Configure temporality preference.
  * Values include:
@@ -407,73 +121,13 @@ export type ExperimentalOtlpFileMetricExporter = {
  * * delta: Use delta aggregation for all instrument types except up down counter and asynchronous up down counter.
  * * low_memory: Use delta aggregation temporality for counter and histogram instrument types. Use cumulative aggregation temporality for all other instrument types.
  * If omitted, cumulative is used.
- *
- */
-export type ConsoleMetricExporter = {
-  temporality_preference?: ExporterTemporalityPreference;
-  default_histogram_aggregation?: ExporterDefaultHistogramAggregation;
-};
-/**
- * Configure temporality preference.
- * Values include:
- * * cumulative: Use cumulative aggregation temporality for all instrument types.
- * * delta: Use delta aggregation for all instrument types except up down counter and asynchronous up down counter.
- * * low_memory: Use delta aggregation temporality for counter and histogram instrument types. Use cumulative aggregation temporality for all other instrument types.
- * If omitted, cumulative is used.
- *
- */
-export type OpenCensusMetricProducer = {};
-/**
- * Configure exporter to be prometheus.
- * If omitted, ignore.
- *
- */
-export type ExperimentalPrometheusMetricExporter = {
-  /**
-   * Configure host.
-   * If omitted or null, localhost is used.
-   *
-   */
-  host?: string;
-  /**
-   * Configure port.
-   * If omitted or null, 9464 is used.
-   *
-   */
-  port?: number;
-  /**
-   * Configure Prometheus Exporter to produce metrics without scope labels.
-   * If omitted or null, false is used.
-   *
-   */
-  without_scope_info?: boolean;
-  /**
-   * Configure Prometheus Exporter to produce metrics without a target info metric for the resource.
-   * If omitted or null, false is used.
-   *
-   */
-  'without_target_info/development'?: boolean;
-  with_resource_constant_labels?: IncludeExclude;
-  translation_strategy?: ExperimentalPrometheusTranslationStrategy;
-};
-/**
- * Configure how metric names are translated to Prometheus metric names.
- * Values include:
- * * no_translation/development: Special character escaping is disabled. Type and unit suffixes are disabled. Metric names are unaltered.
- * * no_utf8_escaping_with_suffixes/development: Special character escaping is disabled. Type and unit suffixes are enabled.
- * * underscore_escaping_with_suffixes: Special character escaping is enabled. Type and unit suffixes are enabled.
- * * underscore_escaping_without_suffixes/development: Special character escaping is enabled. Type and unit suffixes are disabled. This represents classic Prometheus metric name compatibility.
- * If omitted, underscore_escaping_with_suffixes is used.
  *
  */
 export type ExperimentalPrometheusTranslationStrategy =
-  | (
-      | 'underscore_escaping_with_suffixes'
-      | 'underscore_escaping_without_suffixes/development'
-      | 'no_utf8_escaping_with_suffixes/development'
-      | 'no_translation/development'
-    )
- ;
+  | 'underscore_escaping_with_suffixes'
+  | 'underscore_escaping_without_suffixes/development'
+  | 'no_utf8_escaping_with_suffixes/development'
+  | 'no_translation/development';
 /**
  * Configure instrument type selection criteria.
  * Values include:
@@ -488,86 +142,13 @@ export type ExperimentalPrometheusTranslationStrategy =
  *
  */
 export type InstrumentType =
-  | (
-      | 'counter'
-      | 'gauge'
-      | 'histogram'
-      | 'observable_counter'
-      | 'observable_gauge'
-      | 'observable_up_down_counter'
-      | 'up_down_counter'
-    )
- ;
-/**
- * Configures the stream to use the instrument kind to select an aggregation and advisory parameters to influence aggregation configuration parameters. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#default-aggregation for details.
- * If omitted, ignore.
- *
- */
-export type DefaultAggregation = {};
-/**
- * Configures the stream to ignore/drop all instrument measurements. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#drop-aggregation for details.
- * If omitted, ignore.
- *
- */
-export type DropAggregation = {};
-/**
- * Configures the stream to collect data for the histogram metric point using a set of explicit boundary values for histogram bucketing. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#explicit-bucket-histogram-aggregation for details
- * If omitted, ignore.
- *
- */
-export type ExplicitBucketHistogramAggregation = {
-  /**
-   * Configure bucket boundaries.
-   * If omitted, [0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000] is used.
-   *
-   *
-   * @minItems 0
-   */
-  boundaries?: number[];
-  /**
-   * Configure record min and max.
-   * If omitted or null, true is used.
-   *
-   */
-  record_min_max?: boolean;
-};
-/**
- * Configures the stream to collect data for the exponential histogram metric point, which uses a base-2 exponential formula to determine bucket boundaries and an integer scale parameter to control resolution. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#base2-exponential-bucket-histogram-aggregation for details.
- * If omitted, ignore.
- *
- */
-export type Base2ExponentialBucketHistogramAggregation = {
-  /**
-   * Configure the max scale factor.
-   * If omitted or null, 20 is used.
-   *
-   */
-  max_scale?: number;
-  /**
-   * Configure the maximum number of buckets in each of the positive and negative ranges, not counting the special zero bucket.
-   * If omitted or null, 160 is used.
-   *
-   */
-  max_size?: number;
-  /**
-   * Configure whether or not to record min and max.
-   * If omitted or null, true is used.
-   *
-   */
-  record_min_max?: boolean;
-};
-/**
- * Configures the stream to collect data using the last measurement. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#last-value-aggregation for details.
- * If omitted, ignore.
- *
- */
-export type LastValueAggregation = {};
-/**
- * Configures the stream to collect the arithmetic sum of measurement values. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#sum-aggregation for details.
- * If omitted, ignore.
- *
- */
-export type SumAggregation = {};
+  | 'counter'
+  | 'gauge'
+  | 'histogram'
+  | 'observable_counter'
+  | 'observable_gauge'
+  | 'observable_up_down_counter'
+  | 'up_down_counter';
 /**
  * Configure the exemplar filter.
  * Values include:
@@ -577,146 +158,9 @@ export type SumAggregation = {};
  * If omitted, trace_based is used.
  *
  */
-export type ExemplarFilter = ('always_on' | 'always_off' | 'trace_based');
-/**
- * Include the w3c trace context propagator.
- * If omitted, ignore.
- *
- */
-export type TraceContextPropagator = {};
-/**
- * Include the w3c baggage propagator.
- * If omitted, ignore.
- *
- */
-export type BaggagePropagator = {};
-/**
- * Include the zipkin b3 propagator.
- * If omitted, ignore.
- *
- */
-export type B3Propagator = {};
-/**
- * Include the zipkin b3 multi propagator.
- * If omitted, ignore.
- *
- */
-export type B3MultiPropagator = {};
-/**
- * Configure exporter to be OTLP with HTTP transport.
- * If omitted, ignore.
- *
- */
-export type AlwaysOffSampler = {};
-/**
- * Configure sampler to be always_on.
- * If omitted, ignore.
- *
- */
-export type AlwaysOnSampler = {};
-/**
- * Configure sampler to be always_off.
- * If omitted, ignore.
- *
- */
-export type ExperimentalComposableAlwaysOffSampler = {};
-/**
- * Configure sampler to be always_on.
- * If omitted, ignore.
- *
- */
-export type ExperimentalComposableAlwaysOnSampler = {};
-/**
- * Configure sampler to be probability.
- * If omitted, ignore.
- *
- */
-export type ExperimentalComposableProbabilitySampler = {
-  /**
-   * Configure ratio.
-   * If omitted or null, 1.0 is used.
-   *
-   */
-  ratio?: number;
-};
-/**
- * Configure sampler to be rule_based.
- * If omitted, ignore.
- *
- */
-export type ExperimentalComposableRuleBasedSampler = {
-  /**
-   * The rules for the sampler, matched in order.
-   * Each rule can have multiple match conditions. All conditions must match for the rule to match.
-   * If no conditions are specified, the rule matches all spans that reach it.
-   * If no rules match, the span is not sampled.
-   * If omitted, no span is sampled.
-   *
-   *
-   * @minItems 1
-   */
-  rules?: ExperimentalComposableRuleBasedSamplerRule[];
-};
-export type SpanKind = ('internal' | 'server' | 'client' | 'producer' | 'consumer');
-export type ExperimentalSpanParent = ('none' | 'remote' | 'local');
-/**
- * Configure sampler to be jaeger_remote.
- * If omitted, ignore.
- *
- */
-export type ExperimentalJaegerRemoteSampler = {
-  /**
-   * Configure the endpoint of the jaeger remote sampling service.
-   * Property is required and must be non-null.
-   *
-   */
-  endpoint: string;
-  /**
-   * Configure the polling interval (in milliseconds) to fetch from the remote sampling service.
-   * If omitted or null, 60000 is used.
-   *
-   */
-  interval?: number;
-  initial_sampler: Sampler;
-};
-/**
- * Configure sampler to be parent_based.
- * If omitted, ignore.
- *
- */
-export type ParentBasedSampler = {
-  root?: Sampler;
-  remote_parent_sampled?: Sampler;
-  remote_parent_not_sampled?: Sampler;
-  local_parent_sampled?: Sampler;
-  local_parent_not_sampled?: Sampler;
-};
-/**
- * Configure sampler to be probability.
- * If omitted, ignore.
- *
- */
-export type ExperimentalProbabilitySampler = {
-  /**
-   * Configure ratio.
-   * If omitted or null, 1.0 is used.
-   *
-   */
-  ratio?: number;
-};
-/**
- * Configure sampler to be trace_id_ratio_based.
- * If omitted, ignore.
- *
- */
-export type TraceIdRatioBasedSampler = {
-  /**
-   * Configure trace_id_ratio.
-   * If omitted or null, 1.0 is used.
-   *
-   */
-  ratio?: number;
-};
+export type ExemplarFilter = 'always_on' | 'always_off' | 'trace_based';
+export type SpanKind = 'internal' | 'server' | 'client' | 'producer' | 'consumer';
+export type ExperimentalSpanParent = 'none' | 'remote' | 'local';
 /**
  * The attribute type.
  * Values include:
@@ -732,32 +176,14 @@ export type TraceIdRatioBasedSampler = {
  *
  */
 export type AttributeType =
-  | ('string' | 'bool' | 'int' | 'double' | 'string_array' | 'bool_array' | 'int_array' | 'double_array')
- ;
-/**
- * Enable the container resource detector, which populates container.* attributes.
- * If omitted, ignore.
- *
- */
-export type ExperimentalContainerResourceDetector = {};
-/**
- * Enable the host resource detector, which populates host.* and os.* attributes.
- * If omitted, ignore.
- *
- */
-export type ExperimentalHostResourceDetector = {};
-/**
- * Enable the process resource detector, which populates process.* attributes.
- * If omitted, ignore.
- *
- */
-export type ExperimentalProcessResourceDetector = {};
-/**
- * Enable the service detector, which populates service.name based on the OTEL_SERVICE_NAME environment variable and service.instance.id.
- * If omitted, ignore.
- *
- */
-export type ExperimentalServiceResourceDetector = {};
+  | 'string'
+  | 'bool'
+  | 'int'
+  | 'double'
+  | 'string_array'
+  | 'bool_array'
+  | 'int_array'
+  | 'double_array';
 
 export interface ConfigurationModel {
   /**
@@ -875,6 +301,79 @@ export interface LogRecordExporter {
   console?: ConsoleExporter;
   [k: string]: object | undefined;
 }
+/**
+ * Configure exporter to be OTLP with HTTP transport.
+ * If omitted, ignore.
+ *
+ */
+export interface OtlpHttpExporter {
+  /**
+   * Configure endpoint, including the signal specific path.
+   * If omitted or null, the http://localhost:4318/v1/{signal} (where signal is 'traces', 'logs', or 'metrics') is used.
+   *
+   */
+  endpoint?: string;
+  tls?: HttpTls;
+  /**
+   * Configure headers. Entries have higher priority than entries from .headers_list.
+   * If an entry's .value is null, the entry is ignored.
+   * If omitted, no headers are added.
+   *
+   *
+   * @minItems 1
+   */
+  headers?: NameStringValuePair[];
+  /**
+   * Configure headers. Entries have lower priority than entries from .headers.
+   * The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
+   * If omitted or null, no headers are added.
+   *
+   */
+  headers_list?: string;
+  /**
+   * Configure compression.
+   * Known values include: gzip, none. Implementations may support other compression algorithms.
+   * If omitted or null, none is used.
+   *
+   */
+  compression?: string;
+  /**
+   * Configure max time (in milliseconds) to wait for each export.
+   * Value must be non-negative. A value of 0 indicates no limit (infinity).
+   * If omitted or null, 10000 is used.
+   *
+   */
+  timeout?: number;
+  encoding?: OtlpHttpEncoding;
+}
+/**
+ * Configure TLS settings for the exporter.
+ * If omitted, system default TLS settings are used.
+ *
+ */
+export interface HttpTls {
+  /**
+   * Configure certificate used to verify a server's TLS credentials.
+   * Absolute path to certificate file in PEM format.
+   * If omitted or null, system default certificate verification is used for secure connections.
+   *
+   */
+  ca_file?: string;
+  /**
+   * Configure mTLS private client key.
+   * Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
+   * If omitted or null, mTLS is not used.
+   *
+   */
+  key_file?: string;
+  /**
+   * Configure mTLS client certificate.
+   * Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
+   * If omitted or null, mTLS is not used.
+   *
+   */
+  cert_file?: string;
+}
 export interface NameStringValuePair {
   /**
    * The name of the pair.
@@ -889,6 +388,105 @@ export interface NameStringValuePair {
    */
   value: string;
 }
+/**
+ * Configure exporter to be OTLP with gRPC transport.
+ * If omitted, ignore.
+ *
+ */
+export interface OtlpGrpcExporter {
+  /**
+   * Configure endpoint.
+   * If omitted or null, http://localhost:4317 is used.
+   *
+   */
+  endpoint?: string;
+  tls?: GrpcTls;
+  /**
+   * Configure headers. Entries have higher priority than entries from .headers_list.
+   * If an entry's .value is null, the entry is ignored.
+   * If omitted, no headers are added.
+   *
+   *
+   * @minItems 1
+   */
+  headers?: NameStringValuePair[];
+  /**
+   * Configure headers. Entries have lower priority than entries from .headers.
+   * The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
+   * If omitted or null, no headers are added.
+   *
+   */
+  headers_list?: string;
+  /**
+   * Configure compression.
+   * Known values include: gzip, none. Implementations may support other compression algorithms.
+   * If omitted or null, none is used.
+   *
+   */
+  compression?: string;
+  /**
+   * Configure max time (in milliseconds) to wait for each export.
+   * Value must be non-negative. A value of 0 indicates no limit (infinity).
+   * If omitted or null, 10000 is used.
+   *
+   */
+  timeout?: number;
+}
+/**
+ * Configure TLS settings for the exporter.
+ * If omitted, system default TLS settings are used.
+ *
+ */
+export interface GrpcTls {
+  /**
+   * Configure certificate used to verify a server's TLS credentials.
+   * Absolute path to certificate file in PEM format.
+   * If omitted or null, system default certificate verification is used for secure connections.
+   *
+   */
+  ca_file?: string;
+  /**
+   * Configure mTLS private client key.
+   * Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
+   * If omitted or null, mTLS is not used.
+   *
+   */
+  key_file?: string;
+  /**
+   * Configure mTLS client certificate.
+   * Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
+   * If omitted or null, mTLS is not used.
+   *
+   */
+  cert_file?: string;
+  /**
+   * Configure client transport security for the exporter's connection.
+   * Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
+   * If omitted or null, false is used.
+   *
+   */
+  insecure?: boolean;
+}
+/**
+ * Configure exporter to be OTLP with file transport.
+ * If omitted, ignore.
+ *
+ */
+export interface ExperimentalOtlpFileExporter {
+  /**
+   * Configure output stream.
+   * Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
+   * If omitted or null, stdout is used.
+   *
+   */
+  output_stream?: string;
+}
+/**
+ * Configure exporter to be console.
+ * If omitted, ignore.
+ *
+ */
+export interface ConsoleExporter {}
 /**
  * Configure a simple log record processor.
  * If omitted, ignore.
@@ -1040,10 +638,134 @@ export interface PushMetricExporter {
   console?: ConsoleMetricExporter;
   [k: string]: object | undefined;
 }
+/**
+ * Configure exporter to be OTLP with HTTP transport.
+ * If omitted, ignore.
+ *
+ */
+export interface OtlpHttpMetricExporter {
+  /**
+   * Configure endpoint.
+   * If omitted or null, http://localhost:4318/v1/metrics is used.
+   *
+   */
+  endpoint?: string;
+  tls?: HttpTls;
+  /**
+   * Configure headers. Entries have higher priority than entries from .headers_list.
+   * If an entry's .value is null, the entry is ignored.
+   * If omitted, no headers are added.
+   *
+   *
+   * @minItems 1
+   */
+  headers?: NameStringValuePair[];
+  /**
+   * Configure headers. Entries have lower priority than entries from .headers.
+   * The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
+   * If omitted or null, no headers are added.
+   *
+   */
+  headers_list?: string;
+  /**
+   * Configure compression.
+   * Known values include: gzip, none. Implementations may support other compression algorithms.
+   * If omitted or null, none is used.
+   *
+   */
+  compression?: string;
+  /**
+   * Configure max time (in milliseconds) to wait for each export.
+   * Value must be non-negative. A value of 0 indicates no limit (infinity).
+   * If omitted or null, 10000 is used.
+   *
+   */
+  timeout?: number;
+  encoding?: OtlpHttpEncoding;
+  temporality_preference?: ExporterTemporalityPreference;
+  default_histogram_aggregation?: ExporterDefaultHistogramAggregation;
+}
+/**
+ * Configure TLS settings for the exporter.
+ * If omitted, system default TLS settings are used.
+ *
+ */
+export interface OtlpGrpcMetricExporter {
+  /**
+   * Configure endpoint.
+   * If omitted or null, http://localhost:4317 is used.
+   *
+   */
+  endpoint?: string;
+  tls?: GrpcTls;
+  /**
+   * Configure headers. Entries have higher priority than entries from .headers_list.
+   * If an entry's .value is null, the entry is ignored.
+   * If omitted, no headers are added.
+   *
+   *
+   * @minItems 1
+   */
+  headers?: NameStringValuePair[];
+  /**
+   * Configure headers. Entries have lower priority than entries from .headers.
+   * The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
+   * If omitted or null, no headers are added.
+   *
+   */
+  headers_list?: string;
+  /**
+   * Configure compression.
+   * Known values include: gzip, none. Implementations may support other compression algorithms.
+   * If omitted or null, none is used.
+   *
+   */
+  compression?: string;
+  /**
+   * Configure max time (in milliseconds) to wait for each export.
+   * Value must be non-negative. A value of 0 indicates no limit (infinity).
+   * If omitted or null, 10000 is used.
+   *
+   */
+  timeout?: number;
+  temporality_preference?: ExporterTemporalityPreference;
+  default_histogram_aggregation?: ExporterDefaultHistogramAggregation;
+}
+/**
+ * Configure TLS settings for the exporter.
+ * If omitted, system default TLS settings are used.
+ *
+ */
+export interface ExperimentalOtlpFileMetricExporter {
+  /**
+   * Configure output stream.
+   * Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
+   * If omitted or null, stdout is used.
+   *
+   */
+  output_stream?: string;
+  temporality_preference?: ExporterTemporalityPreference;
+  default_histogram_aggregation?: ExporterDefaultHistogramAggregation;
+}
+/**
+ * Configure exporter to be console.
+ * If omitted, ignore.
+ *
+ */
+export interface ConsoleMetricExporter {
+  temporality_preference?: ExporterTemporalityPreference;
+  default_histogram_aggregation?: ExporterDefaultHistogramAggregation;
+}
 export interface MetricProducer {
   opencensus?: OpenCensusMetricProducer;
   [k: string]: object | undefined;
 }
+/**
+ * Configure metric producer to be opencensus.
+ * If omitted, ignore.
+ *
+ */
+export interface OpenCensusMetricProducer {}
 /**
  * Configure cardinality limits.
  * If omitted, default values as described in CardinalityLimits are used.
@@ -1125,6 +847,39 @@ export interface PullMetricReader {
 export interface PullMetricExporter {
   'prometheus/development'?: ExperimentalPrometheusMetricExporter;
   [k: string]: object | undefined;
+}
+/**
+ * Configure exporter to be prometheus.
+ * If omitted, ignore.
+ *
+ */
+export interface ExperimentalPrometheusMetricExporter {
+  /**
+   * Configure host.
+   * If omitted or null, localhost is used.
+   *
+   */
+  host?: string;
+  /**
+   * Configure port.
+   * If omitted or null, 9464 is used.
+   *
+   */
+  port?: number;
+  /**
+   * Configure Prometheus Exporter to produce metrics without scope labels.
+   * If omitted or null, false is used.
+   *
+   */
+  without_scope_info?: boolean;
+  /**
+   * Configure Prometheus Exporter to produce metrics without a target info metric for the resource.
+   * If omitted or null, false is used.
+   *
+   */
+  'without_target_info/development'?: boolean;
+  with_resource_constant_labels?: IncludeExclude;
+  translation_strategy?: ExperimentalPrometheusTranslationStrategy;
 }
 /**
  * Configure Prometheus Exporter to add resource attributes as metrics attributes, where the resource attribute keys match the patterns.
@@ -1244,6 +999,76 @@ export interface Aggregation {
   sum?: SumAggregation;
 }
 /**
+ * Configures the stream to use the instrument kind to select an aggregation and advisory parameters to influence aggregation configuration parameters. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#default-aggregation for details.
+ * If omitted, ignore.
+ *
+ */
+export interface DefaultAggregation {}
+/**
+ * Configures the stream to ignore/drop all instrument measurements. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#drop-aggregation for details.
+ * If omitted, ignore.
+ *
+ */
+export interface DropAggregation {}
+/**
+ * Configures the stream to collect data for the histogram metric point using a set of explicit boundary values for histogram bucketing. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#explicit-bucket-histogram-aggregation for details
+ * If omitted, ignore.
+ *
+ */
+export interface ExplicitBucketHistogramAggregation {
+  /**
+   * Configure bucket boundaries.
+   * If omitted, [0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000] is used.
+   *
+   *
+   * @minItems 0
+   */
+  boundaries?: number[];
+  /**
+   * Configure record min and max.
+   * If omitted or null, true is used.
+   *
+   */
+  record_min_max?: boolean;
+}
+/**
+ * Configures the stream to collect data for the exponential histogram metric point, which uses a base-2 exponential formula to determine bucket boundaries and an integer scale parameter to control resolution. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#base2-exponential-bucket-histogram-aggregation for details.
+ * If omitted, ignore.
+ *
+ */
+export interface Base2ExponentialBucketHistogramAggregation {
+  /**
+   * Configure the max scale factor.
+   * If omitted or null, 20 is used.
+   *
+   */
+  max_scale?: number;
+  /**
+   * Configure the maximum number of buckets in each of the positive and negative ranges, not counting the special zero bucket.
+   * If omitted or null, 160 is used.
+   *
+   */
+  max_size?: number;
+  /**
+   * Configure whether or not to record min and max.
+   * If omitted or null, true is used.
+   *
+   */
+  record_min_max?: boolean;
+}
+/**
+ * Configures the stream to collect data using the last measurement. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#last-value-aggregation for details.
+ * If omitted, ignore.
+ *
+ */
+export interface LastValueAggregation {}
+/**
+ * Configures the stream to collect the arithmetic sum of measurement values. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#sum-aggregation for details.
+ * If omitted, ignore.
+ *
+ */
+export interface SumAggregation {}
+/**
  * Configure attribute keys retained in the resulting stream(s).
  * If omitted, all attribute keys are retained.
  *
@@ -1316,6 +1141,30 @@ export interface TextMapPropagator {
   [k: string]: object | undefined;
 }
 /**
+ * Include the w3c trace context propagator.
+ * If omitted, ignore.
+ *
+ */
+export interface TraceContextPropagator {}
+/**
+ * Include the w3c baggage propagator.
+ * If omitted, ignore.
+ *
+ */
+export interface BaggagePropagator {}
+/**
+ * Include the zipkin b3 propagator.
+ * If omitted, ignore.
+ *
+ */
+export interface B3Propagator {}
+/**
+ * Include the zipkin b3 multi propagator.
+ * If omitted, ignore.
+ *
+ */
+export interface B3MultiPropagator {}
+/**
  * Configure tracer provider.
  * If omitted, a noop tracer provider is used.
  *
@@ -1385,7 +1234,7 @@ export interface SpanExporter {
   [k: string]: object | undefined;
 }
 /**
- * Configure a simple span processor.
+ * Configure exporter to be OTLP with HTTP transport.
  * If omitted, ignore.
  *
  */
@@ -1457,6 +1306,18 @@ export interface Sampler {
   [k: string]: object | undefined;
 }
 /**
+ * Configure sampler to be always_off.
+ * If omitted, ignore.
+ *
+ */
+export interface AlwaysOffSampler {}
+/**
+ * Configure sampler to be always_on.
+ * If omitted, ignore.
+ *
+ */
+export interface AlwaysOnSampler {}
+/**
  * Configure sampler to be composite.
  * If omitted, ignore.
  *
@@ -1470,6 +1331,18 @@ export interface ExperimentalComposableSampler {
   [k: string]: object | undefined;
 }
 /**
+ * Configure sampler to be always_off.
+ * If omitted, ignore.
+ *
+ */
+export interface ExperimentalComposableAlwaysOffSampler {}
+/**
+ * Configure sampler to be always_on.
+ * If omitted, ignore.
+ *
+ */
+export interface ExperimentalComposableAlwaysOnSampler {}
+/**
  * Configure sampler to be parent_threshold.
  * If omitted, ignore.
  *
@@ -1480,6 +1353,37 @@ export interface ExperimentalComposableParentThresholdSampler {
 /**
  * Sampler to use when there is no parent.
  * Property is required and must be non-null.
+ *
+ */
+export interface ExperimentalComposableProbabilitySampler {
+  /**
+   * Configure ratio.
+   * If omitted or null, 1.0 is used.
+   *
+   */
+  ratio?: number;
+}
+/**
+ * Configure sampler to be rule_based.
+ * If omitted, ignore.
+ *
+ */
+export interface ExperimentalComposableRuleBasedSampler {
+  /**
+   * The rules for the sampler, matched in order.
+   * Each rule can have multiple match conditions. All conditions must match for the rule to match.
+   * If no conditions are specified, the rule matches all spans that reach it.
+   * If no rules match, the span is not sampled.
+   * If omitted, no span is sampled.
+   *
+   *
+   * @minItems 1
+   */
+  rules?: ExperimentalComposableRuleBasedSamplerRule[];
+}
+/**
+ * A rule for ExperimentalComposableRuleBasedSampler. A rule can have multiple match conditions - the sampler will be applied if all match.
+ * If no conditions are specified, the rule matches all spans that reach it.
  *
  */
 export interface ExperimentalComposableRuleBasedSamplerRule {
@@ -1576,6 +1480,64 @@ export interface ExperimentalComposableRuleBasedSamplerRuleAttributePatterns {
 /**
  * The sampler to use for matching spans.
  * Property is required and must be non-null.
+ *
+ */
+export interface ExperimentalJaegerRemoteSampler {
+  /**
+   * Configure the endpoint of the jaeger remote sampling service.
+   * Property is required and must be non-null.
+   *
+   */
+  endpoint: string;
+  /**
+   * Configure the polling interval (in milliseconds) to fetch from the remote sampling service.
+   * If omitted or null, 60000 is used.
+   *
+   */
+  interval?: number;
+  initial_sampler: Sampler;
+}
+/**
+ * Configure the initial sampler used before first configuration is fetched.
+ * Property is required and must be non-null.
+ *
+ */
+export interface ParentBasedSampler {
+  root?: Sampler;
+  remote_parent_sampled?: Sampler;
+  remote_parent_not_sampled?: Sampler;
+  local_parent_sampled?: Sampler;
+  local_parent_not_sampled?: Sampler;
+}
+/**
+ * Configure root sampler.
+ * If omitted, always_on is used.
+ *
+ */
+export interface ExperimentalProbabilitySampler {
+  /**
+   * Configure ratio.
+   * If omitted or null, 1.0 is used.
+   *
+   */
+  ratio?: number;
+}
+/**
+ * Configure sampler to be trace_id_ratio_based.
+ * If omitted, ignore.
+ *
+ */
+export interface TraceIdRatioBasedSampler {
+  /**
+   * Configure trace_id_ratio.
+   * If omitted or null, 1.0 is used.
+   *
+   */
+  ratio?: number;
+}
+/**
+ * Configure remote_parent_sampled sampler.
+ * If omitted, always_on is used.
  *
  */
 export interface ExperimentalTracerConfigurator {
@@ -1688,6 +1650,30 @@ export interface ExperimentalResourceDetector {
   service?: ExperimentalServiceResourceDetector;
   [k: string]: object | undefined;
 }
+/**
+ * Enable the container resource detector, which populates container.* attributes.
+ * If omitted, ignore.
+ *
+ */
+export interface ExperimentalContainerResourceDetector {}
+/**
+ * Enable the host resource detector, which populates host.* and os.* attributes.
+ * If omitted, ignore.
+ *
+ */
+export interface ExperimentalHostResourceDetector {}
+/**
+ * Enable the process resource detector, which populates process.* attributes.
+ * If omitted, ignore.
+ *
+ */
+export interface ExperimentalProcessResourceDetector {}
+/**
+ * Enable the service detector, which populates service.name based on the OTEL_SERVICE_NAME environment variable and service.instance.id.
+ * If omitted, ignore.
+ *
+ */
+export interface ExperimentalServiceResourceDetector {}
 /**
  * Configure instrumentation.
  * If omitted, instrumentation defaults are used.
