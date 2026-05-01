@@ -2,12 +2,12 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-
-/* eslint-disable */
+//
 // AUTO-GENERATED — do not edit
 // Generated from opentelemetry-configuration JSON schema v1.0.0
 // Run `npm run generate:config` from the configuration package to regenerate
-
+//
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-object-type */
 /**
  * Configure the log level of the internal logger used by the SDK.
  * Values include:
@@ -74,37 +74,18 @@ export type SeverityNumber =
  */
 export type OtlpHttpEncoding = 'protobuf' | 'json';
 /**
- * Configure severity filtering.
- * Log records with an non-zero (i.e. unspecified) severity number which is less than minimum_severity are not processed.
+ * Configure temporality preference.
  * Values include:
- * * debug: debug, severity number 5.
- * * debug2: debug2, severity number 6.
- * * debug3: debug3, severity number 7.
- * * debug4: debug4, severity number 8.
- * * error: error, severity number 17.
- * * error2: error2, severity number 18.
- * * error3: error3, severity number 19.
- * * error4: error4, severity number 20.
- * * fatal: fatal, severity number 21.
- * * fatal2: fatal2, severity number 22.
- * * fatal3: fatal3, severity number 23.
- * * fatal4: fatal4, severity number 24.
- * * info: info, severity number 9.
- * * info2: info2, severity number 10.
- * * info3: info3, severity number 11.
- * * info4: info4, severity number 12.
- * * trace: trace, severity number 1.
- * * trace2: trace2, severity number 2.
- * * trace3: trace3, severity number 3.
- * * trace4: trace4, severity number 4.
- * * warn: warn, severity number 13.
- * * warn2: warn2, severity number 14.
- * * warn3: warn3, severity number 15.
- * * warn4: warn4, severity number 16.
- * If omitted, severity filtering is not applied.
+ * * cumulative: Use cumulative aggregation temporality for all instrument types.
+ * * delta: Use delta aggregation for all instrument types except up down counter and asynchronous up down counter.
+ * * low_memory: Use delta aggregation temporality for counter and histogram instrument types. Use cumulative aggregation temporality for all other instrument types.
+ * If omitted, cumulative is used.
  *
  */
-export type ExporterTemporalityPreference = 'cumulative' | 'delta' | 'low_memory';
+export type ExporterTemporalityPreference =
+  | 'cumulative'
+  | 'delta'
+  | 'low_memory';
 /**
  * Configure default histogram aggregation.
  * Values include:
@@ -113,14 +94,17 @@ export type ExporterTemporalityPreference = 'cumulative' | 'delta' | 'low_memory
  * If omitted, explicit_bucket_histogram is used.
  *
  */
-export type ExporterDefaultHistogramAggregation = 'explicit_bucket_histogram' | 'base2_exponential_bucket_histogram';
+export type ExporterDefaultHistogramAggregation =
+  | 'explicit_bucket_histogram'
+  | 'base2_exponential_bucket_histogram';
 /**
- * Configure temporality preference.
+ * Configure how metric names are translated to Prometheus metric names.
  * Values include:
- * * cumulative: Use cumulative aggregation temporality for all instrument types.
- * * delta: Use delta aggregation for all instrument types except up down counter and asynchronous up down counter.
- * * low_memory: Use delta aggregation temporality for counter and histogram instrument types. Use cumulative aggregation temporality for all other instrument types.
- * If omitted, cumulative is used.
+ * * no_translation/development: Special character escaping is disabled. Type and unit suffixes are disabled. Metric names are unaltered.
+ * * no_utf8_escaping_with_suffixes/development: Special character escaping is disabled. Type and unit suffixes are enabled.
+ * * underscore_escaping_with_suffixes: Special character escaping is enabled. Type and unit suffixes are enabled.
+ * * underscore_escaping_without_suffixes/development: Special character escaping is enabled. Type and unit suffixes are disabled. This represents classic Prometheus metric name compatibility.
+ * If omitted, underscore_escaping_with_suffixes is used.
  *
  */
 export type ExperimentalPrometheusTranslationStrategy =
@@ -159,7 +143,12 @@ export type InstrumentType =
  *
  */
 export type ExemplarFilter = 'always_on' | 'always_off' | 'trace_based';
-export type SpanKind = 'internal' | 'server' | 'client' | 'producer' | 'consumer';
+export type SpanKind =
+  | 'internal'
+  | 'server'
+  | 'client'
+  | 'producer'
+  | 'consumer';
 export type ExperimentalSpanParent = 'none' | 'remote' | 'local';
 /**
  * The attribute type.
@@ -184,7 +173,6 @@ export type AttributeType =
   | 'bool_array'
   | 'int_array'
   | 'double_array';
-
 export interface ConfigurationModel {
   /**
    * The file format version.
@@ -496,8 +484,8 @@ export interface SimpleLogRecordProcessor {
   exporter: LogRecordExporter;
 }
 /**
- * Configure exporter.
- * Property is required and must be non-null.
+ * Configure log record limits. See also attribute_limits.
+ * If omitted, default values as described in LogRecordLimits are used.
  *
  */
 export interface LogRecordLimits {
@@ -566,8 +554,8 @@ export interface ExperimentalLoggerMatcherAndConfig {
   config: ExperimentalLoggerConfig;
 }
 /**
- * The logger config.
- * Property is required and must be non-null.
+ * Configure meter provider.
+ * If omitted, a noop meter provider is used.
  *
  */
 export interface MeterProvider {
@@ -686,8 +674,8 @@ export interface OtlpHttpMetricExporter {
   default_histogram_aggregation?: ExporterDefaultHistogramAggregation;
 }
 /**
- * Configure TLS settings for the exporter.
- * If omitted, system default TLS settings are used.
+ * Configure exporter to be OTLP with gRPC transport.
+ * If omitted, ignore.
  *
  */
 export interface OtlpGrpcMetricExporter {
@@ -732,8 +720,8 @@ export interface OtlpGrpcMetricExporter {
   default_histogram_aggregation?: ExporterDefaultHistogramAggregation;
 }
 /**
- * Configure TLS settings for the exporter.
- * If omitted, system default TLS settings are used.
+ * Configure exporter to be OTLP with file transport.
+ * If omitted, ignore.
  *
  */
 export interface ExperimentalOtlpFileMetricExporter {
@@ -910,11 +898,6 @@ export interface IncludeExclude {
    */
   excluded?: string[];
 }
-/**
- * Configure cardinality limits.
- * If omitted, default values as described in CardinalityLimits are used.
- *
- */
 export interface View {
   selector: ViewSelector;
   stream: ViewStream;
@@ -1069,8 +1052,8 @@ export interface LastValueAggregation {}
  */
 export interface SumAggregation {}
 /**
- * Configure attribute keys retained in the resulting stream(s).
- * If omitted, all attribute keys are retained.
+ * Configure meters.
+ * If omitted, all meters use default values as described in ExperimentalMeterConfig.
  *
  */
 export interface ExperimentalMeterConfigurator {
@@ -1110,8 +1093,8 @@ export interface ExperimentalMeterMatcherAndConfig {
   config: ExperimentalMeterConfig;
 }
 /**
- * The meter config.
- * Property is required and must be non-null.
+ * Configure text map context propagators.
+ * If omitted, a noop propagator is used.
  *
  */
 export interface Propagator {
@@ -1234,7 +1217,7 @@ export interface SpanExporter {
   [k: string]: object | undefined;
 }
 /**
- * Configure exporter to be OTLP with HTTP transport.
+ * Configure a simple span processor.
  * If omitted, ignore.
  *
  */
@@ -1242,8 +1225,8 @@ export interface SimpleSpanProcessor {
   exporter: SpanExporter;
 }
 /**
- * Configure exporter.
- * Property is required and must be non-null.
+ * Configure span limits. See also attribute_limits.
+ * If omitted, default values as described in SpanLimits are used.
  *
  */
 export interface SpanLimits {
@@ -1351,8 +1334,8 @@ export interface ExperimentalComposableParentThresholdSampler {
   root: ExperimentalComposableSampler;
 }
 /**
- * Sampler to use when there is no parent.
- * Property is required and must be non-null.
+ * Configure sampler to be probability.
+ * If omitted, ignore.
  *
  */
 export interface ExperimentalComposableProbabilitySampler {
@@ -1478,8 +1461,8 @@ export interface ExperimentalComposableRuleBasedSamplerRuleAttributePatterns {
   excluded?: string[];
 }
 /**
- * The sampler to use for matching spans.
- * Property is required and must be non-null.
+ * Configure sampler to be jaeger_remote.
+ * If omitted, ignore.
  *
  */
 export interface ExperimentalJaegerRemoteSampler {
@@ -1498,8 +1481,8 @@ export interface ExperimentalJaegerRemoteSampler {
   initial_sampler: Sampler;
 }
 /**
- * Configure the initial sampler used before first configuration is fetched.
- * Property is required and must be non-null.
+ * Configure sampler to be parent_based.
+ * If omitted, ignore.
  *
  */
 export interface ParentBasedSampler {
@@ -1510,8 +1493,8 @@ export interface ParentBasedSampler {
   local_parent_not_sampled?: Sampler;
 }
 /**
- * Configure root sampler.
- * If omitted, always_on is used.
+ * Configure sampler to be probability.
+ * If omitted, ignore.
  *
  */
 export interface ExperimentalProbabilitySampler {
@@ -1536,8 +1519,8 @@ export interface TraceIdRatioBasedSampler {
   ratio?: number;
 }
 /**
- * Configure remote_parent_sampled sampler.
- * If omitted, always_on is used.
+ * Configure tracers.
+ * If omitted, all tracers use default values as described in ExperimentalTracerConfig.
  *
  */
 export interface ExperimentalTracerConfigurator {
@@ -1577,8 +1560,8 @@ export interface ExperimentalTracerMatcherAndConfig {
   config: ExperimentalTracerConfig;
 }
 /**
- * The tracer config.
- * Property is required and must be non-null.
+ * Configure resource for all signals.
+ * If omitted, the default resource is used.
  *
  */
 export interface Resource {
@@ -1638,11 +1621,6 @@ export interface ExperimentalResourceDetection {
    */
   detectors?: ExperimentalResourceDetector[];
 }
-/**
- * Configure attributes provided by resource detectors.
- * If omitted, all attributes from resource detectors are added.
- *
- */
 export interface ExperimentalResourceDetector {
   container?: ExperimentalContainerResourceDetector;
   host?: ExperimentalHostResourceDetector;
@@ -1859,60 +1837,44 @@ export interface ExperimentalCodeInstrumentation {
   semconv?: ExperimentalSemconvConfig;
 }
 /**
- * Configure code semantic convention version and migration behavior.
- *
- * This property takes precedence over the .instrumentation/development.general.stability_opt_in_list setting.
- *
- * See code semantic conventions: https://opentelemetry.io/docs/specs/semconv/registry/attributes/code/
- * If omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.
+ * Configure instrumentations following the database semantic conventions.
+ * See database semantic conventions: https://opentelemetry.io/docs/specs/semconv/database/
+ * If omitted, defaults as described in ExperimentalDbInstrumentation are used.
  *
  */
 export interface ExperimentalDbInstrumentation {
   semconv?: ExperimentalSemconvConfig;
 }
 /**
- * Configure database semantic convention version and migration behavior.
- *
- * This property takes precedence over the .instrumentation/development.general.stability_opt_in_list setting.
- *
- * See database migration: https://opentelemetry.io/docs/specs/semconv/database/
- * If omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.
+ * Configure instrumentations following the GenAI semantic conventions.
+ * See GenAI semantic conventions: https://opentelemetry.io/docs/specs/semconv/gen-ai/
+ * If omitted, defaults as described in ExperimentalGenAiInstrumentation are used.
  *
  */
 export interface ExperimentalGenAiInstrumentation {
   semconv?: ExperimentalSemconvConfig;
 }
 /**
- * Configure GenAI semantic convention version and migration behavior.
- *
- * This property takes precedence over the .instrumentation/development.general.stability_opt_in_list setting.
- *
- * See GenAI semantic conventions: https://opentelemetry.io/docs/specs/semconv/gen-ai/
- * If omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.
+ * Configure instrumentations following the messaging semantic conventions.
+ * See messaging semantic conventions: https://opentelemetry.io/docs/specs/semconv/messaging/
+ * If omitted, defaults as described in ExperimentalMessagingInstrumentation are used.
  *
  */
 export interface ExperimentalMessagingInstrumentation {
   semconv?: ExperimentalSemconvConfig;
 }
 /**
- * Configure messaging semantic convention version and migration behavior.
- *
- * This property takes precedence over the .instrumentation/development.general.stability_opt_in_list setting.
- *
- * See messaging semantic conventions: https://opentelemetry.io/docs/specs/semconv/messaging/
- * If omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.
+ * Configure instrumentations following the RPC semantic conventions.
+ * See RPC semantic conventions: https://opentelemetry.io/docs/specs/semconv/rpc/
+ * If omitted, defaults as described in ExperimentalRpcInstrumentation are used.
  *
  */
 export interface ExperimentalRpcInstrumentation {
   semconv?: ExperimentalSemconvConfig;
 }
 /**
- * Configure RPC semantic convention version and migration behavior.
- *
- * This property takes precedence over the .instrumentation/development.general.stability_opt_in_list setting.
- *
- * See RPC semantic conventions: https://opentelemetry.io/docs/specs/semconv/rpc/
- * If omitted, uses the general stability_opt_in_list setting, or instrumentations continue emitting their default semantic convention version if not set.
+ * Configure general sanitization options.
+ * If omitted, defaults as described in ExperimentalSanitization are used.
  *
  */
 export interface ExperimentalSanitization {
@@ -1945,9 +1907,11 @@ export interface ExperimentalLanguageSpecificInstrumentation {
   [k: string]: object;
 }
 /**
- * Configure .NET language-specific instrumentation libraries.
- * Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
- * If omitted, instrumentation defaults are used.
+ * Defines configuration parameters specific to a particular OpenTelemetry distribution or vendor.
+ * This section provides a standardized location for distribution-specific settings
+ * that are not part of the OpenTelemetry configuration model.
+ * It allows vendors to expose their own extensions and general configuration options.
+ * If omitted, distribution defaults are used.
  *
  */
 export interface Distribution {
