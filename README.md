@@ -312,7 +312,7 @@ For more information about the triager role, see the [community repository](http
 
 ### Emeritus
 
-- [Amir Blum](https://github.com/blumamir), Approver
+- [Amir Blum](https://github.com/blumamir), Maintainer
 - [Bartlomiej Obecny](https://github.com/obecny), Maintainer
 - [Brandon Gonzalez](https://github.com/bg451), Approver
 - [Daniel Khan](https://github.com/dkhan), Maintainer
