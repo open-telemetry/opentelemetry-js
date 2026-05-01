@@ -256,13 +256,11 @@ For more information about the maintainer role, see the [community repository](h
 
 ### Approvers
 
-- [Amir Blum](https://github.com/blumamir), Odigos
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
 - [Jackson Weber](https://github.com/JacksonWeber), Microsoft
 - [Martin Kuba](https://github.com/martinkuba), Grafana Labs
 - [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
 - [Raphaël Thériault](https://github.com/raphael-theriault-swi), SolarWinds
-- [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
 
 In addition, [Browser SIG Maintainers](https://github.com/orgs/open-telemetry/teams/browser-maintainers) are granted the
 Approver role for browser-targeted packages as defined in this repository's [CODEOWNERS](./.github/CODEOWNERS) file.
@@ -314,6 +312,7 @@ For more information about the triager role, see the [community repository](http
 
 ### Emeritus
 
+- [Amir Blum](https://github.com/blumamir), Maintainer
 - [Bartlomiej Obecny](https://github.com/obecny), Maintainer
 - [Brandon Gonzalez](https://github.com/bg451), Approver
 - [Daniel Khan](https://github.com/dkhan), Maintainer
@@ -321,15 +320,16 @@ For more information about the triager role, see the [community repository](http
 - [Haddas Bronfman](https://github.com/haddasbronfman), Approver
 - [John Bley](https://github.com/johnbley), Approver
 - [Mark Wolff](https://github.com/markwolff), Approver
+- [Matthew Wear](https://github.com/mwear), Approver
 - [Mayur Kale](https://github.com/mayurkale22), Maintainer
 - [Naseem K. Ullah](https://github.com/naseemkullah), Approver
+- [Neville Wylie](https://github.com/MSNev), Approver
 - [Olivier Albertini](https://github.com/OlivierAlbertini), Approver
+- [Purvi Kanal](https://github.com/pkanal), Approver
 - [Rauno Viskus](https://github.com/rauno56), Maintainer
 - [Roch Devost](https://github.com/rochdev), Approver
+- [Svetlana Brennan](https://github.com/svetlanabrennan), Approver
 - [Valentin Marchaud](https://github.com/vmarchaud), Maintainer
-- [Matthew Wear](https://github.com/mwear), Approver
-- [Neville Wylie](https://github.com/MSNev), Approver
-- [Purvi Kanal](https://github.com/pkanal), Approver
 
 For more information about the emeritus role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#emeritus-maintainerapprovertriager).
 
