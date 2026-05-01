@@ -24,25 +24,14 @@ const Ajv = require('ajv/dist/2020');
 const standaloneCode = require('ajv/dist/standalone').default;
 const typescript = require('typescript');
 
-const SCRIPT_DIR = __dirname;
-const PKG_DIR = path.resolve(__dirname, '../../experimental/packages/configuration');
+const TOP = path.resolve(__dirname, '..');
 const SCHEMA_PATH = path.join(
-  SCRIPT_DIR,
-  'opentelemetry-configuration',
-  'opentelemetry_configuration.json'
+  TOP,
+  'build/opentelemetry-configuration/opentelemetry_configuration.json'
 );
-const TYPES_PATH = path.join(
-  SCRIPT_DIR,
-  '../../experimental/packages/configuration/src/generated/types.ts'
-);
-const VALIDATOR_JS_PATH = path.join(
-  SCRIPT_DIR,
-  '../../experimental/packages/configuration/src/generated/validator.js'
-);
-const VALIDATOR_DTS_PATH = path.join(
-  SCRIPT_DIR,
-  '../../experimental/packages/configuration/src/generated/validator.d.ts'
-);
+const TYPES_PATH = path.join(TOP, 'src/generated/types.ts');
+const VALIDATOR_JS_PATH = path.join(TOP, 'src/generated/validator.js');
+const VALIDATOR_DTS_PATH = path.join(TOP, 'src/generated/validator.d.ts');
 
 const licenseHeader = `/*
  * Copyright The OpenTelemetry Authors
@@ -95,7 +84,7 @@ function removeDuplicateTsDeclarations(tsCode) {
 // Run the bash script to clone / refresh the schema repository
 const bashResult = spawnSync('bash', ['generate-config.sh'], {
   stdio: 'inherit',
-  cwd: SCRIPT_DIR,
+  cwd: __dirname,
 });
 if (bashResult.error) {
   throw bashResult.error;
@@ -290,7 +279,7 @@ compile(schema, 'OpenTelemetryConfiguration', {
     fs.mkdirSync(path.dirname(TYPES_PATH), { recursive: true });
     fs.writeFileSync(TYPES_PATH, ts);
     execSync(`npm run lint:fix -- ${TYPES_PATH}`, {
-      cwd: PKG_DIR,
+      cwd: TOP,
       encoding: 'utf8'
     });
     console.log(`Written ${ts.split('\n').length} lines to ${TYPES_PATH}`);
