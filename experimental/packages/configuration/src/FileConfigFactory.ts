@@ -8,7 +8,6 @@ import type { ConfigFactory } from './IConfigFactory';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
 import { envVariableSubstitution } from './utils';
-import { SeverityNumber } from './generated/types';
 import type {
   BatchLogRecordProcessor,
   BatchSpanProcessor,
@@ -217,7 +216,7 @@ function applyConfigDefaults(data: ConfigurationModel): void {
     data.disabled = false;
   }
   if (data.log_level == null) {
-    data.log_level = SeverityNumber.Info;
+    data.log_level = 'info';
   }
   if (data.attribute_limits == null) {
     data.attribute_limits = { attribute_count_limit: 128 };
