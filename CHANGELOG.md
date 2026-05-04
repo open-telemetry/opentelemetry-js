@@ -14,7 +14,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
-* feat(sdk-metrics): add maxExportBatchSize option to PeriodicExportingMetricReader [#6641](https://github.com/open-telemetry/opentelemetry-js/issues/6641) @psx95
+* feat(sdk-metrics): add maxExportBatchSize option to PeriodicExportingMetricReader [#6655](https://github.com/open-telemetry/opentelemetry-js/pull/6655) @psx95
 
 * feat(sdk-trace-base): pretty-print `SpanImpl`, `Tracer`, and `BasicTracerProvider` via `util.inspect` so they render through `diag` and `console.log` [#6690](https://github.com/open-telemetry/opentelemetry-js/pull/6690) @mcollina
 
