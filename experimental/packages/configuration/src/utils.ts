@@ -4,7 +4,7 @@
  */
 
 import { getStringFromEnv } from '@opentelemetry/core';
-import { ExemplarFilter, SeverityNumber } from './generated/types';
+import { ExemplarFilter } from './generated/types';
 import type { ConfigurationModel, GrpcTls, HttpTls } from './generated/types';
 
 export function envVariableSubstitution(value: string): string {
@@ -59,7 +59,6 @@ export function getGrpcTlsConfig(
 export function initializeDefaultConfiguration(): ConfigurationModel {
   return {
     disabled: false,
-    log_level: SeverityNumber.Info,
     resource: {},
     attribute_limits: {
       attribute_count_limit: 128,

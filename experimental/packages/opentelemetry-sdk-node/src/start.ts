@@ -43,8 +43,8 @@ import {
 } from '@opentelemetry/resources';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
-import { diagLogLevelFromString, getStringFromEnv } from '@opentelemetry/core';
 import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
+import { diagLogLevelFromSeverityNumberConfig } from './diag';
 
 /**
  * @experimental Function to start the OpenTelemetry Node SDK
@@ -53,19 +53,29 @@ import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
 export function startNodeSDK(sdkOptions: SDKOptions): {
   shutdown: () => Promise<void>;
 } {
-  const configFactory: ConfigFactory = createConfigFactory();
-  const config = configFactory.getConfigModel();
-
-  if (config.disabled) {
-    diag.info('OpenTelemetry SDK is disabled');
+  let config: ConfigurationModel;
+  try {
+    const configFactory: ConfigFactory = createConfigFactory();
+    config = configFactory.getConfigModel();
+  } catch (configErr) {
+    // Set the diag logger, otherwise the diag.error will typically not be shown.
+    const logLevel = diagLogLevelFromSeverityNumberConfig();
+    diag.setLogger(new DiagConsoleLogger(), { logLevel });
+    diag.error(
+      `Could not load OpenTelemetry configuration, SDK will not be setup: ${configErr.message}`
+    );
     return NOOP_SDK;
   }
-  // TODO: use config.log_level once the spec aligns SeverityNumber with
-  // DiagLogLevel values, see https://github.com/open-telemetry/opentelemetry-specification/issues/2039
-  const logLevel = diagLogLevelFromString(getStringFromEnv('OTEL_LOG_LEVEL'));
-  if (logLevel) {
-    diag.setLogger(new DiagConsoleLogger(), { logLevel });
+
+  if (config.disabled) {
+    return NOOP_SDK;
   }
+
+  // This differs from `new NodeSDK()`. Here a diag logger is created at info
+  // level by default. With `new NodeSDK()` a diag logger is only created if
+  // the envvar is set.
+  const logLevel = diagLogLevelFromSeverityNumberConfig(config.log_level);
+  diag.setLogger(new DiagConsoleLogger(), { logLevel });
 
   registerInstrumentations({
     instrumentations: sdkOptions?.instrumentations?.flat() ?? [],

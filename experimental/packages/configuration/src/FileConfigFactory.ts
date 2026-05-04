@@ -45,7 +45,7 @@ export function parseConfigFile(): ConfigurationModel {
   const fileFormat = substituted?.file_format;
   if (!fileFormat || !supportedFileVersionPattern.test(String(fileFormat))) {
     throw new Error(
-      `Unsupported file_format: "${fileFormat}". Must match ${supportedFileVersionPattern}.`
+      `${configFile}: Unsupported file_format: "${fileFormat}". Must match ${supportedFileVersionPattern}.`
     );
   }
 
