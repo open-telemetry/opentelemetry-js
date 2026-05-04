@@ -10,6 +10,26 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(otlp-transformer): replace protobufjs trace serialization with custom implementation [#6625](https://github.com/open-telemetry/opentelemetry-js/pull/6625) @pichlermarc
+* feat(configuration): auto-generate TypeScript types from OTel declarative config JSON schema (stable v1.0.0) using `json-schema-to-typescript` and `ajv` [#6533](https://github.com/open-telemetry/opentelemetry-js/pull/6533) @MikeGoldsmith
+
+### :bug: Bug Fixes
+
+* fix(configuration): do not validate `OTEL_CONFIG_FILE` value before using it for file config [#6643](https://github.com/open-telemetry/opentelemetry-js/pull/6643) @trentm
+* fix(configuration): improve how 'additionalProperties' in JSON schema is translated to TS types [#6650](https://github.com/open-telemetry/opentelemetry-js/pull/6650) @trentm
+* fix(configuration): remove stripMinItems and preprocessNullArrays from validation/parsing [#6657](https://github.com/open-telemetry/opentelemetry-js/pull/6657) @trentm
+* fix(configuration): improve handling of enums in generated types [#6659](https://github.com/open-telemetry/opentelemetry-js/pull/6659) @trentm
+* fix(configuration): improve the technique for removing '| null' on types the JSON Schema [#6662](https://github.com/open-telemetry/opentelemetry-js/pull/6662) @trentm
+* fix(sampler-jaeger-remote): add missing axios dep [#6656](https://github.com/open-telemetry/opentelemetry-js/pull/6656) @trentm
+
+### :books: Documentation
+
+### :house: Internal
+
+## 0.216.0
+
+### :rocket: Features
+
 * feat(sdk-node): wire attribute_keys from declarative configuration to ViewOptions.attributesProcessors [#6427](https://github.com/open-telemetry/opentelemetry-js/issues/6427) @ravitheja4531-cell
 * feat(sdk-node): set TracerProvider in startNodeSDK() [#6607](https://github.com/open-telemetry/opentelemetry-js/pull/6607) @maryliag
 
@@ -20,11 +40,11 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(instrumentation-xhr): resolve relative URLs before matching `ignoreUrls` [#6551](https://github.com/open-telemetry/opentelemetry-js/pull/6551) @Maximiliano-Zeballos
 * fix(sdk-node): fix setting of ViewOption#name from ConfigurationModel [#6620](https://github.com/open-telemetry/opentelemetry-js/pull/6620) @trentm
 * fix(web-common): add limit for timeout [#6601](https://github.com/open-telemetry/opentelemetry-js/pull/6601) @maryliag
-
-### :books: Documentation
+* fix(otlp-transformer): pin protobufjs@8.0.1 as protobufjs@8.0.3 is broken for browser use [#6646](https://github.com/open-telemetry/opentelemetry-js/pull/6646)
 
 ### :house: Internal
 
+* test(otlp-transformer): add metrics transform benchmark [#6628](https://github.com/open-telemetry/opentelemetry-js/pull/6628) @pichlermarc
 * refactor(opentelemetry-exporter-prometheus): do not call enforcePrometheusNamingConvention() multiple times per metric [#6636](https://github.com/open-telemetry/opentelemetry-js/pull/6636) @cjihrig
 * refactor(sdk-node): replace usage of `NodeTracerProvider` for `BasicTracerProvider` in SDK start [#6640](https://github.com/open-telemetry/opentelemetry-js/pull/6640) @david-luna
 

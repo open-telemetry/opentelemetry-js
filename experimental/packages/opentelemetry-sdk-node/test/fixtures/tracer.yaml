@@ -1,4 +1,4 @@
-file_format: "1.0-rc.3"
+file_format: "1.0"
 disabled: false
 tracer_provider:
   processors:
@@ -40,25 +40,6 @@ tracer_provider:
             compression: gzip
             timeout: 10000
             encoding: json
-    - batch:
-        schedule_delay: 5000
-        export_timeout: 30000
-        max_queue_size: 2048
-        max_export_batch_size: 512
-        exporter:
-          otlp_http:
-            endpoint: http://localhost:4318/v1/traces
-            tls:
-              ca_file: test/fixtures/ca.pem
-              key_file: test/fixtures/ca-key.pem
-              cert_file: test/fixtures/cert.pem
-            headers:
-              - name: api-key
-                value: "1234"
-            headers_list: "api-key=1234"
-            compression: gzip
-            timeout: 10000
-            encoding: invalid
     - batch:
         exporter:
           otlp_grpc:

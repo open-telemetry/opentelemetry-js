@@ -43,6 +43,7 @@ import {
 } from '@opentelemetry/resources';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
+import { diagLogLevelFromString, getStringFromEnv } from '@opentelemetry/core';
 import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
 
 /**
@@ -59,8 +60,11 @@ export function startNodeSDK(sdkOptions: SDKOptions): {
     diag.info('OpenTelemetry SDK is disabled');
     return NOOP_SDK;
   }
-  if (config.log_level != null) {
-    diag.setLogger(new DiagConsoleLogger(), { logLevel: config.log_level });
+  // TODO: use config.log_level once the spec aligns SeverityNumber with
+  // DiagLogLevel values, see https://github.com/open-telemetry/opentelemetry-specification/issues/2039
+  const logLevel = diagLogLevelFromString(getStringFromEnv('OTEL_LOG_LEVEL'));
+  if (logLevel) {
+    diag.setLogger(new DiagConsoleLogger(), { logLevel });
   }
 
   registerInstrumentations({
