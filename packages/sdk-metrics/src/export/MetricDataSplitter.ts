@@ -16,8 +16,8 @@ export function splitMetricData(
   resourceMetrics: ResourceMetrics,
   maxExportBatchSize: number
 ): ResourceMetrics[] {
-  if (maxExportBatchSize <= 0) {
-    throw new Error('maxExportBatchSize must be greater than 0');
+  if (!Number.isInteger(maxExportBatchSize) || maxExportBatchSize <= 0) {
+    throw new Error('maxExportBatchSize must be a positive integer');
   }
   const batches: ResourceMetrics[] = [];
   let currentBatchPoints = 0;

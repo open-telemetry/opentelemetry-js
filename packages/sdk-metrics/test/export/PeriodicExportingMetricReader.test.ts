@@ -220,7 +220,7 @@ describe('PeriodicExportingMetricReader', () => {
             exportTimeoutMillis: 1,
             maxExportBatchSize: 0,
           }),
-        /maxExportBatchSize must be greater than 0/
+        /maxExportBatchSize must be a positive integer/
       );
 
       assert.throws(
@@ -231,7 +231,18 @@ describe('PeriodicExportingMetricReader', () => {
             exportTimeoutMillis: 1,
             maxExportBatchSize: -1,
           }),
-        /maxExportBatchSize must be greater than 0/
+        /maxExportBatchSize must be a positive integer/
+      );
+
+      assert.throws(
+        () =>
+          new PeriodicExportingMetricReader({
+            exporter: exporter,
+            exportIntervalMillis: 1,
+            exportTimeoutMillis: 1,
+            maxExportBatchSize: 1.5,
+          }),
+        /maxExportBatchSize must be a positive integer/
       );
     });
 
