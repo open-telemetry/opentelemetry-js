@@ -926,12 +926,17 @@ describe('splitMetricData', () => {
 
     assert.throws(
       () => splitMetricData(resourceMetrics, 0),
-      /maxExportBatchSize must be greater than 0/
+      /maxExportBatchSize must be a positive integer/
     );
 
     assert.throws(
       () => splitMetricData(resourceMetrics, -1),
-      /maxExportBatchSize must be greater than 0/
+      /maxExportBatchSize must be a positive integer/
+    );
+
+    assert.throws(
+      () => splitMetricData(resourceMetrics, -1.5),
+      /maxExportBatchSize must be a positive integer/
     );
   });
 });

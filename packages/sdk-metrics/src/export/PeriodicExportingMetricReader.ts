@@ -120,8 +120,11 @@ export class PeriodicExportingMetricReader extends MetricReader {
       throw Error('exportTimeoutMillis must be greater than 0');
     }
 
-    if (maxExportBatchSize !== undefined && maxExportBatchSize <= 0) {
-      throw Error('maxExportBatchSize must be greater than 0');
+    if (
+      maxExportBatchSize !== undefined &&
+      (!Number.isInteger(maxExportBatchSize) || maxExportBatchSize <= 0)
+    ) {
+      throw Error('maxExportBatchSize must be a positive integer');
     }
 
     if (exportIntervalMillis < exportTimeoutMillis) {
