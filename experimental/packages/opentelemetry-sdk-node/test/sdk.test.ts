@@ -68,7 +68,10 @@ import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/expo
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
-import { NOOP_COUNTER_METRIC } from '../../../../api/src/metrics/NoopMeter';
+import {
+  NOOP_COUNTER_METRIC,
+  NOOP_METER,
+} from '../../../../api/src/metrics/NoopMeter';
 import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from '../src/semconv';
 
 function assertDefaultContextManagerRegistered() {
@@ -238,11 +241,13 @@ describe('Node SDK', () => {
       assertDefaultContextManagerRegistered();
       assertDefaultPropagatorRegistered();
 
-      const nodeTracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
+      const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
       assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
-      assert.ok(nodeTracerProvider instanceof BasicTracerProvider);
+      assert.ok(tracerProvider instanceof BasicTracerProvider);
 
-      const spanProcessor = nodeTracerProvider['_activeSpanProcessor'] as any;
+      const spanProcessor = tracerProvider['_delegate'][
+        '_activeSpanProcessor'
+      ] as any;
 
       assert.ok(
         spanProcessor.constructor.name === 'MultiSpanProcessor',
@@ -436,7 +441,8 @@ describe('Node SDK', () => {
       const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
       assert.ok(tracerProvider instanceof BasicTracerProvider);
       assert.ok(
-        (tracerProvider as any)._config.meterProvider instanceof MeterProvider
+        (tracerProvider as any)._delegate._config.meterProvider instanceof
+          MeterProvider
       );
 
       const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
@@ -475,7 +481,10 @@ describe('Node SDK', () => {
       assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
       const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
       assert.ok(tracerProvider instanceof BasicTracerProvider);
-      assert.equal((tracerProvider as any)._config.meterProvider, undefined);
+      assert.deepEqual(
+        (tracerProvider as any)._delegate._config.meterProvider.getMeter(),
+        NOOP_METER
+      );
 
       const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
       assert.deepEqual(
@@ -1724,7 +1733,8 @@ describe('Node SDK', () => {
 
       assert.ok(tracerProvider instanceof BasicTracerProvider);
 
-      const activeSpanProcessor = tracerProvider['_activeSpanProcessor'];
+      const activeSpanProcessor =
+        tracerProvider['_delegate']['_activeSpanProcessor'];
 
       assert.ok(activeSpanProcessor.constructor.name === 'MultiSpanProcessor');
 
@@ -1815,7 +1825,8 @@ describe('Node SDK', () => {
       const listOfProcessors = getSdkSpanProcessors(sdk);
 
       assert.ok(
-        sdk['_tracerProvider']!['_config']?.sampler instanceof AlwaysOffSampler
+        sdk['_tracerProvider']!['_delegate']['_config']?.sampler instanceof
+          AlwaysOffSampler
       );
       assert.strictEqual(listOfProcessors.length, 1);
       assert.ok(listOfProcessors[0] instanceof SimpleSpanProcessor);

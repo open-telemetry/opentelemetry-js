@@ -351,7 +351,7 @@ describe('startNodeSDK', function () {
     );
 
     const tracerProvider = trace.getTracerProvider() as BasicTracerProvider;
-    const delegateInfo = (tracerProvider as any)['_delegate'];
+    const delegateInfo = (tracerProvider as any)['_delegate']['_delegate'];
     assert.strictEqual(delegateInfo._config.spanProcessors.length, 5);
 
     assert.ok(
@@ -804,7 +804,7 @@ describe('startNodeSDK', function () {
 
     const getSdkSpanProcessors = () => {
       const tracerProvider = trace.getTracerProvider() as BasicTracerProvider;
-      const delegateInfo = (tracerProvider as any)['_delegate'];
+      const delegateInfo = (tracerProvider as any)['_delegate']['_delegate'];
       return delegateInfo?._config?.spanProcessors as SpanProcessor[];
     };
 

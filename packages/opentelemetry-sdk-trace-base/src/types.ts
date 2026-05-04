@@ -56,6 +56,11 @@ export interface TracerConfig {
 }
 
 /**
+ * TracerProviderConfig provides an interface for configuring a Tracer Provider.
+ */
+export type TracerProviderConfig = TracerConfig;
+
+/**
  * Configuration options for registering the API with the SDK.
  * Undefined values may be substituted for defaults, and null
  * values will not be registered.
