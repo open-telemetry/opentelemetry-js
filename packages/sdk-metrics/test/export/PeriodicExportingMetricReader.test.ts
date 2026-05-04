@@ -979,7 +979,11 @@ describe('PeriodicExportingMetricReader', () => {
         await reader.forceFlush();
 
         // Assert that they didn't overlap
-        assert.strictEqual(exporter.maxConcurrentCalls, 1, 'Batches should not be exported simultaneously');
+        assert.strictEqual(
+          exporter.maxConcurrentCalls,
+          1,
+          'Batches should not be exported simultaneously'
+        );
 
         await reader.shutdown();
       });

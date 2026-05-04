@@ -914,6 +914,81 @@ describe('splitMetricData', () => {
     );
   });
 
+  it('should not merge metrics with the same name but different types', () => {
+    const resourceMetrics: ResourceMetrics = {
+      resource: dummyResource,
+      scopeMetrics: [
+        {
+          scope: { name: 'test' },
+          metrics: [
+            {
+              dataPointType: DataPointType.GAUGE,
+              dataPoints: [
+                {
+                  startTime: [0, 0],
+                  endTime: [0, 0],
+                  attributes: {},
+                  value: 1,
+                },
+              ],
+              descriptor: {
+                name: 'm1',
+                description: 'desc1',
+                unit: 'unit1',
+                valueType: ValueType.INT,
+              },
+              aggregationTemporality: AggregationTemporality.CUMULATIVE,
+            },
+            {
+              dataPointType: DataPointType.SUM,
+              dataPoints: [
+                {
+                  startTime: [0, 0],
+                  endTime: [0, 0],
+                  attributes: {},
+                  value: 2,
+                },
+              ],
+              descriptor: {
+                name: 'm1', // Same name!
+                description: 'desc2',
+                unit: 'unit2',
+                valueType: ValueType.INT,
+              },
+              aggregationTemporality: AggregationTemporality.CUMULATIVE,
+              isMonotonic: true,
+            },
+          ],
+        },
+      ],
+    };
+
+    const batches = splitMetricData(resourceMetrics, 10);
+
+    assert.strictEqual(batches.length, 1);
+    assert.strictEqual(
+      batches[0].scopeMetrics[0].metrics.length,
+      2,
+      'Should keep distinct metrics separate'
+    );
+    assert.strictEqual(
+      batches[0].scopeMetrics[0].metrics[0].descriptor.name,
+      'm1'
+    );
+    assert.strictEqual(
+      batches[0].scopeMetrics[0].metrics[1].descriptor.name,
+      'm1'
+    );
+    assert.strictEqual(
+      batches[0].scopeMetrics[0].metrics[0].dataPointType,
+      DataPointType.GAUGE
+    );
+    assert.strictEqual(
+      batches[0].scopeMetrics[0].metrics[1].dataPointType,
+      DataPointType.SUM
+    );
+  });
+
   // ==========================================================================
   // Validation Tests
   // ==========================================================================
