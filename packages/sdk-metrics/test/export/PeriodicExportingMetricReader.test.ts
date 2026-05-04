@@ -921,6 +921,69 @@ describe('PeriodicExportingMetricReader', () => {
         await reader.shutdown();
       });
 
+      it('should not export batches simultaneously when one times out', async () => {
+        const exporter = new TestMetricExporter();
+        exporter.exportTime = 50; // Make export take some time
+        const reader = new PeriodicExportingMetricReader({
+          exporter: exporter,
+          exportIntervalMillis: MAX_32_BIT_INT,
+          exportTimeoutMillis: 20, // Timeout smaller than export time
+          maxExportBatchSize: 1,
+        });
+
+        const resourceMetrics: ResourceMetrics = {
+          resource: {
+            attributes: {},
+            merge: sinon.stub(),
+            getRawAttributes: () => [],
+          } as any,
+          scopeMetrics: [
+            {
+              scope: { name: 'test' },
+              metrics: [
+                {
+                  dataPointType: DataPointType.GAUGE,
+                  dataPoints: [
+                    {
+                      startTime: [0, 0],
+                      endTime: [0, 0],
+                      attributes: {},
+                      value: 1,
+                    },
+                    {
+                      startTime: [0, 0],
+                      endTime: [0, 0],
+                      attributes: {},
+                      value: 2,
+                    },
+                  ],
+                  descriptor: {
+                    name: 'm1',
+                    description: '',
+                    unit: '',
+                    valueType: ValueType.INT,
+                  },
+                  aggregationTemporality: AggregationTemporality.CUMULATIVE,
+                },
+              ],
+            },
+          ],
+        };
+
+        const producer = new TestMetricProducer({
+          resourceMetrics: resourceMetrics,
+          errors: [],
+        });
+        reader.setMetricProducer(producer);
+
+        await reader.forceFlush();
+
+        // Assert that they didn't overlap
+        assert.strictEqual(exporter.maxConcurrentCalls, 1, 'Batches should not be exported simultaneously');
+
+        await reader.shutdown();
+      });
+
       it('should synchronize concurrent exports', async () => {
         const exporter = new TestMetricExporter();
         exporter.exportTime = 50; // Make export take some time

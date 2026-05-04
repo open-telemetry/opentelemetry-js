@@ -209,6 +209,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
             api.diag.error(
               `PeriodicExportingMetricReader: metrics export timed out after ${this._exportTimeout}ms`
             );
+            break;
           } else {
             api.diag.error(
               'PeriodicExportingMetricReader: metrics export threw error',
