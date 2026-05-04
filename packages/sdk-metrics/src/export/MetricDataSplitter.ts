@@ -34,12 +34,16 @@ export function splitMetricData(
     }
   }
 
+  // Iterate through all scopes in the input metrics
   for (const scopeMetric of resourceMetrics.scopeMetrics) {
     let scopeMetricCopy: ScopeMetrics | null = null;
 
+    // Iterate through all metrics within the current scope
     for (const metric of scopeMetric.metrics) {
       let dataPointsRemaining = metric.dataPoints;
+      let metricCopy: typeof metric | undefined = undefined;
 
+      // If a metric has no data points, add it directly to the current batch
       if (dataPointsRemaining.length === 0) {
         if (!scopeMetricCopy) {
           scopeMetricCopy = { scope: scopeMetric.scope, metrics: [] };
@@ -49,20 +53,21 @@ export function splitMetricData(
         continue;
       }
 
+      // Chunk the data points of the current metric across batches
       while (dataPointsRemaining.length > 0) {
         const spaceLeft = maxExportBatchSize - currentBatchPoints;
         const take = Math.min(spaceLeft, dataPointsRemaining.length);
         const chunk = dataPointsRemaining.slice(0, take);
         dataPointsRemaining = dataPointsRemaining.slice(take);
 
+        // Ensure we have a ScopeMetrics object in the current batch
         if (!scopeMetricCopy) {
           scopeMetricCopy = { scope: scopeMetric.scope, metrics: [] };
           currentScopeMetrics.push(scopeMetricCopy);
+          metricCopy = undefined; // Reset because we are starting a new batch
         }
 
-        let metricCopy = scopeMetricCopy.metrics.find(
-          m => m.descriptor.name === metric.descriptor.name
-        );
+        // Ensure we have a MetricData object for this specific metric in the current batch.
         if (!metricCopy) {
           metricCopy = { ...metric, dataPoints: [] };
           scopeMetricCopy.metrics.push(metricCopy);
@@ -73,9 +78,10 @@ export function splitMetricData(
         );
         currentBatchPoints += take;
 
+        // If the current batch is full, flush it and start a new one
         if (currentBatchPoints === maxExportBatchSize) {
           flush();
-          scopeMetricCopy = null;
+          scopeMetricCopy = null; // Force recreation of scope copy in the next batch
         }
       }
     }
