@@ -11,6 +11,48 @@ import prettierPlugin from 'eslint-plugin-prettier';
 import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import yalhPlugin from 'eslint-plugin-yet-another-license-header';
 
+// `eslint-plugin-yet-another-license-header@0.2.0` calls
+// `getCommentsBefore(programNode)`, which returns no comments under
+// ESLint 10. Wrap the rule so it inspects comments before the first
+// statement instead, which is the correct location for a leading file
+// header. Drop this once the upstream plugin supports ESLint 10.
+const patchedHeaderRule = {
+  ...yalhPlugin.rules.header,
+  create(context) {
+    const sourceCode = context.sourceCode;
+    const wrappedSource = new Proxy(sourceCode, {
+      get(target, prop, receiver) {
+        if (prop === 'getCommentsBefore') {
+          return node => {
+            if (node.type === 'Program') {
+              const first = node.body[0];
+              if (first) {
+                return target.getCommentsBefore(first);
+              }
+              return target.getAllComments();
+            }
+            return target.getCommentsBefore(node);
+          };
+        }
+        return Reflect.get(target, prop, receiver);
+      },
+    });
+    return yalhPlugin.rules.header.create(
+      new Proxy(context, {
+        get(target, prop, receiver) {
+          if (prop === 'sourceCode') return wrappedSource;
+          return Reflect.get(target, prop, receiver);
+        },
+      })
+    );
+  },
+};
+
+const patchedYalhPlugin = {
+  ...yalhPlugin,
+  rules: { ...yalhPlugin.rules, header: patchedHeaderRule },
+};
+
 const fullLicenseHeader = `
 /*
  * Copyright The OpenTelemetry Authors
@@ -56,6 +98,8 @@ export default tseslint.config(
       'docs/**',
       // Generated files committed back to the tree.
       'experimental/packages/configuration/src/generated/**',
+      // tsd-style negative type-check fixtures, intentionally outside tsconfig.
+      'experimental/packages/configuration/test/fixtures/types/**',
       'experimental/packages/otlp-transformer/src/generated/**',
       'semantic-conventions/src/experimental_attributes.ts',
       'semantic-conventions/src/experimental_metrics.ts',
@@ -79,7 +123,7 @@ export default tseslint.config(
     plugins: {
       n: nodePlugin,
       prettier: prettierPlugin,
-      'yet-another-license-header': yalhPlugin,
+      'yet-another-license-header': patchedYalhPlugin,
     },
     extends: [eslint.configs.recommended, prettierRecommended],
     languageOptions: {
