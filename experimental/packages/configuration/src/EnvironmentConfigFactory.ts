@@ -57,8 +57,8 @@ export class EnvironmentConfigFactory implements ConfigFactory {
 
     const logLevelString = getStringFromEnv('OTEL_LOG_LEVEL');
     if (logLevelString) {
-      // Store as lowercase; consumers convert to DiagLogLevel via diagLogLevelFromString
-      this._config.log_level = logLevelString.toLowerCase() as SeverityNumber;
+      this._config.log_level =
+        severityNumberConfigFromLogLevelString(logLevelString);
     }
 
     setResources(this._config);
@@ -72,6 +72,42 @@ export class EnvironmentConfigFactory implements ConfigFactory {
   getConfigModel(): ConfigurationModel {
     return this._config;
   }
+}
+
+const SEV_NUM_CONFIG_FROM_LOG_LEVEL: { [key: string]: SeverityNumber } = {
+  // Declarative config `log_level` has no "NONE". Using 'fatal' is
+  // equivalent, because the OTel JS diag API does not have a "fatal" level.
+  NONE: 'fatal',
+  ERROR: 'error',
+  WARN: 'warn',
+  INFO: 'info',
+  DEBUG: 'debug',
+  VERBOSE: 'trace2',
+  // Declarative config `log_level` has no "ALL". Using 'trace' is
+  // equivalent, because that is the lowest SeverityNumber level.
+  ALL: 'trace',
+};
+
+/**
+ * Return a declarative config SeverityNumberConfig value (as used for
+ * `log_level`) for the given `OTEL_LOG_LEVEL` string value.
+ *
+ * See notes at "opentelemetr-sdk-node/src/diag.ts".
+ */
+function severityNumberConfigFromLogLevelString(
+  str?: string
+): SeverityNumber | undefined {
+  if (!str) {
+    return undefined;
+  }
+  const sevNumConfig = SEV_NUM_CONFIG_FROM_LOG_LEVEL[str.toUpperCase()];
+  if (!sevNumConfig) {
+    diag.warn(
+      `Unknown log level "${str}", expected one of ${Object.keys(SEV_NUM_CONFIG_FROM_LOG_LEVEL)}, using default info`
+    );
+    return 'info';
+  }
+  return sevNumConfig;
 }
 
 export function setResources(config: ConfigurationModel): void {
