@@ -877,7 +877,7 @@ function bucketCounts(histo: ExponentialHistogramAccumulation): number {
   return histo
     .toPointValue()
     .positive.bucketCounts.reduce(
-      (total, current) => (total += current),
+      (total, current) => total + current,
       histo.zeroCount
     );
 }
