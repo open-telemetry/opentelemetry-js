@@ -80,8 +80,8 @@ function serializeNumberDataPoint(
  *   3  time_unix_nano           fixed64            (wire type 1)
  *   4  count                    fixed64            (wire type 1)
  *   5  sum                      optional double    (wire type 1)
- *   6  bucket_counts            repeated fixed64   (wire type 1)
- *   7  explicit_bounds          repeated double    (wire type 1)
+ *   6  bucket_counts            repeated fixed64   (packed, wire type 2)
+ *   7  explicit_bounds          repeated double    (packed, wire type 2)
  *   8  exemplars                repeated Exemplar  (wire type 2)
  *  10  flags                    uint32             (wire type 0)
  *  11  min                      optional double    (wire type 1)
@@ -116,16 +116,26 @@ function serializeHistogramDataPoint(
     writer.writeDouble(histogram.sum);
   }
 
-  // bucket_counts (field 6, repeated fixed64)
-  for (const count of histogram.buckets.counts) {
-    writer.writeTag(6, 1);
-    writer.writeFixed64(count >>> 0, (count / 0x100000000) >>> 0);
+  // bucket_counts (field 6, repeated fixed64, packed)
+  if (histogram.buckets.counts.length > 0) {
+    writer.writeTag(6, 2);
+    const countsStart = writer.startLengthDelimited();
+    const countsStartPos = writer.pos;
+    for (const count of histogram.buckets.counts) {
+      writer.writeFixed64(count >>> 0, (count / 0x100000000) >>> 0);
+    }
+    writer.finishLengthDelimited(countsStart, writer.pos - countsStartPos);
   }
 
-  // explicit_bounds (field 7, repeated double)
-  for (const bound of histogram.buckets.boundaries) {
-    writer.writeTag(7, 1);
-    writer.writeDouble(bound);
+  // explicit_bounds (field 7, repeated double, packed)
+  if (histogram.buckets.boundaries.length > 0) {
+    writer.writeTag(7, 2);
+    const boundsStart = writer.startLengthDelimited();
+    const boundsStartPos = writer.pos;
+    for (const bound of histogram.buckets.boundaries) {
+      writer.writeDouble(bound);
+    }
+    writer.finishLengthDelimited(boundsStart, writer.pos - boundsStartPos);
   }
 
   // attributes (field 9, repeated KeyValue)
@@ -153,7 +163,7 @@ function serializeHistogramDataPoint(
  *
  * Proto fields (Buckets):
  *   1  offset         sint32           (wire type 0, zigzag)
- *   2  bucket_counts  repeated uint64  (wire type 0)
+ *   2  bucket_counts  repeated uint64  (packed, wire type 2)
  */
 function serializeExponentialBuckets(
   writer: IProtobufWriter,
@@ -169,10 +179,15 @@ function serializeExponentialBuckets(
     writer.writeSint32(offset);
   }
 
-  // bucket_counts (field 2, repeated uint64)
-  for (const count of bucketCounts) {
-    writer.writeTag(2, 0);
-    writer.writeVarint(count);
+  // bucket_counts (field 2, repeated uint64, packed)
+  if (bucketCounts.length > 0) {
+    writer.writeTag(2, 2);
+    const bcStart = writer.startLengthDelimited();
+    const bcStartPos = writer.pos;
+    for (const count of bucketCounts) {
+      writer.writeVarint(count);
+    }
+    writer.finishLengthDelimited(bcStart, writer.pos - bcStartPos);
   }
 
   writer.finishLengthDelimited(start, writer.pos - startPos);
