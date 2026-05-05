@@ -250,7 +250,7 @@ export function setTracerProvider(
   }
   if (exportersType.includes('none')) {
     diag.info(
-      `OTEL_TRACES_EXPORTER contains "none". Tracer provider will not be initialized.`
+      'OTEL_TRACES_EXPORTER contains "none". Tracer provider will not be initialized.'
     );
     return;
   }
@@ -402,7 +402,7 @@ export function setMeterProvider(config: ConfigurationModel): void {
   }
   if (exportersType.includes('none')) {
     diag.info(
-      `OTEL_METRICS_EXPORTER contains "none". Meter provider will not be initialized.`
+      'OTEL_METRICS_EXPORTER contains "none". Meter provider will not be initialized.'
     );
     return;
   }
@@ -553,7 +553,7 @@ export function setLoggerProvider(config: ConfigurationModel): void {
   }
   if (exportersType.includes('none')) {
     diag.info(
-      `OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.`
+      'OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.'
     );
     return;
   }

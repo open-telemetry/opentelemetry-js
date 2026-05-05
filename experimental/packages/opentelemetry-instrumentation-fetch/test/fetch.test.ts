@@ -2431,7 +2431,7 @@ describe('fetch', () => {
           it('span should have correct basic attributes', () => {
             const span: tracing.ReadableSpan = exportedSpans[0];
 
-            assert.strictEqual(span.name, 'HTTP GET', `wrong span name`);
+            assert.strictEqual(span.name, 'HTTP GET', 'wrong span name');
 
             assert.strictEqual(
               span.attributes[ATTR_HTTP_STATUS_CODE],

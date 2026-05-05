@@ -17,7 +17,6 @@ import { DEFAULT_SPAN_NAME, ShimSpan } from './ShimSpan';
 import { mapSpanContext, mapSpanKind } from './trace-transform';
 import { shimPropagation } from './propagation';
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const INVALID_SPAN = trace.getSpan(
   trace.setSpanContext(context.active(), INVALID_SPAN_CONTEXT)
 )!;

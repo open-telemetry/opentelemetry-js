@@ -73,7 +73,7 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
         )
       );
     }
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     return this._sharedState.loggers.get(key)!;
   }
 
