@@ -101,6 +101,9 @@ export default tseslint.config(
       // tsd-style negative type-check fixtures, intentionally outside tsconfig.
       'experimental/packages/configuration/test/fixtures/types/**',
       'experimental/packages/otlp-transformer/src/generated/**',
+      // protobuf-generated example sources.
+      'examples/grpc-js/helloworld_pb.js',
+      'examples/grpc-js/helloworld_grpc_pb.js',
       'semantic-conventions/src/experimental_attributes.ts',
       'semantic-conventions/src/experimental_metrics.ts',
       'semantic-conventions/src/stable_attributes.ts',
@@ -230,8 +233,16 @@ export default tseslint.config(
         ecmaVersion: 2021,
       },
     },
+    // The legacy `examples/.eslintrc.js` was a standalone config that didn't
+    // inherit the base, so prettier, quotes, and no-console were never
+    // enforced on example code. Preserve that behavior to keep this PR scoped
+    // to the ESLint 10 migration; tightening up examples is its own change.
     rules: {
       'yet-another-license-header/header': 'off',
+      'prettier/prettier': 'off',
+      'no-console': 'off',
+      'no-unused-vars': 'off',
+      quotes: 'off',
     },
   },
 
