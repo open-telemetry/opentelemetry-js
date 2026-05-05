@@ -76,9 +76,6 @@ export function startNodeSDK(sdkOptions: SDKOptions): {
     return NOOP_SDK;
   }
 
-  // This differs from `new NodeSDK()`. Here a diag logger is created at info
-  // level by default. With `new NodeSDK()` a diag logger is only created if
-  // the envvar is set.
   const logLevel = diagLogLevelFromSeverityNumberConfig(config.log_level);
   diag.setLogger(new DiagConsoleLogger(), { logLevel });
 
