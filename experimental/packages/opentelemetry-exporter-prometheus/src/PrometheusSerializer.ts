@@ -24,6 +24,19 @@ import {
 // This is currently listed as experimental.
 const ATTR_OTEL_SCOPE_SCHEMA_URL = 'otel.scope.schema_url';
 
+const invalidCharacterRegex = /[^a-z0-9_]/gi;
+const multipleUnderscoreRegex = /_{2,}/g;
+
+// These should be sanitized, even if escaping is disabled.
+const ATTR_OTEL_SCOPE_NAME_LABEL =
+  sanitizePrometheusMetricName(ATTR_OTEL_SCOPE_NAME);
+const ATTR_OTEL_SCOPE_VERSION_LABEL = sanitizePrometheusMetricName(
+  ATTR_OTEL_SCOPE_VERSION
+);
+const ATTR_OTEL_SCOPE_SCHEMA_URL_LABEL = sanitizePrometheusMetricName(
+  ATTR_OTEL_SCOPE_SCHEMA_URL
+);
+
 type PrometheusDataTypeLiteral =
   | 'counter'
   | 'gauge'
@@ -33,6 +46,14 @@ type PrometheusDataTypeLiteral =
 
 function escapeString(str: string) {
   return str.replace(/\\/g, '\\\\').replace(/\n/g, '\\n');
+}
+
+function escapeQuotes(str: string) {
+  return str.replace(/"/g, '\\"');
+}
+
+function quoteName(str: string) {
+  return `"${escapeQuotes(str)}"`;
 }
 
 /**
@@ -45,11 +66,8 @@ function escapeAttributeValue(str: AttributeValue = '') {
   if (typeof str !== 'string') {
     str = JSON.stringify(str);
   }
-  return escapeString(str).replace(/"/g, '\\"');
+  return escapeQuotes(escapeString(str));
 }
-
-const invalidCharacterRegex = /[^a-z0-9_]/gi;
-const multipleUnderscoreRegex = /_{2,}/g;
 
 /**
  * Ensures metric names are valid Prometheus metric names by removing
@@ -101,6 +119,11 @@ function enforcePrometheusNamingConvention(
   return name;
 }
 
+function hasNonLegacyCharacters(name: string): boolean {
+  // Use search() instead of test() since this regex has the 'g' flag.
+  return name.search(invalidCharacterRegex) !== -1;
+}
+
 function valueString(value: number) {
   if (value === Infinity) {
     return '+Inf';
@@ -132,14 +155,19 @@ function stringify(
   metricName: string,
   attributes: Attributes,
   value: number,
-  timestamp?: number,
-  additionalAttributes?: Attributes
+  timestamp: number | undefined,
+  additionalAttributes: Attributes | undefined,
+  translationStrategy: TranslationStrategyOptions
 ) {
   let hasAttribute = false;
   let attributesStr = '';
 
   for (const [key, val] of Object.entries(attributes)) {
-    const sanitizedAttributeName = sanitizePrometheusMetricName(key);
+    const sanitizedAttributeName = translationStrategy.escape
+      ? sanitizePrometheusMetricName(key)
+      : hasNonLegacyCharacters(key)
+        ? quoteName(key)
+        : key;
     hasAttribute = true;
     attributesStr += `${
       attributesStr.length > 0 ? ',' : ''
@@ -147,7 +175,11 @@ function stringify(
   }
   if (additionalAttributes) {
     for (const [key, val] of Object.entries(additionalAttributes)) {
-      const sanitizedAttributeName = sanitizePrometheusMetricName(key);
+      const sanitizedAttributeName = translationStrategy.escape
+        ? sanitizePrometheusMetricName(key)
+        : hasNonLegacyCharacters(key)
+          ? quoteName(key)
+          : key;
       hasAttribute = true;
       attributesStr += `${
         attributesStr.length > 0 ? ',' : ''
@@ -155,7 +187,13 @@ function stringify(
     }
   }
 
-  if (hasAttribute) {
+  if (hasNonLegacyCharacters(metricName)) {
+    if (hasAttribute) {
+      metricName = `{${quoteName(metricName)} ${attributesStr}}`;
+    } else {
+      metricName = `{${quoteName(metricName)}}`;
+    }
+  } else if (hasAttribute) {
     metricName += `{${attributesStr}}`;
   }
 
@@ -165,6 +203,11 @@ function stringify(
 }
 
 const NO_REGISTERED_METRICS = '# no registered metrics';
+
+export interface TranslationStrategyOptions {
+  escape: boolean;
+  suffixes: boolean;
+}
 
 export class PrometheusSerializer {
   private _prefix: string | undefined;
@@ -190,7 +233,10 @@ export class PrometheusSerializer {
     this._withoutTargetInfo = !!withoutTargetInfo;
   }
 
-  serialize(resourceMetrics: ResourceMetrics): string {
+  serialize(
+    resourceMetrics: ResourceMetrics,
+    translationStrategy: TranslationStrategyOptions
+  ): string {
     let str = '';
 
     this._additionalAttributes = this._filterResourceConstantLabels(
@@ -199,14 +245,17 @@ export class PrometheusSerializer {
     );
 
     for (const scopeMetrics of resourceMetrics.scopeMetrics) {
-      str += this._serializeScopeMetrics(scopeMetrics);
+      str += this._serializeScopeMetrics(scopeMetrics, translationStrategy);
     }
 
     if (str === '') {
       str += NO_REGISTERED_METRICS;
     }
 
-    return this._serializeResource(resourceMetrics.resource) + str;
+    return (
+      this._serializeResource(resourceMetrics.resource, translationStrategy) +
+      str
+    );
   }
 
   private _filterResourceConstantLabels(
@@ -225,48 +274,69 @@ export class PrometheusSerializer {
     return;
   }
 
-  private _serializeScopeMetrics(scopeMetrics: ScopeMetrics) {
+  private _serializeScopeMetrics(
+    scopeMetrics: ScopeMetrics,
+    translationStrategy: TranslationStrategyOptions
+  ) {
     let str = '';
     for (const metric of scopeMetrics.metrics) {
-      str += this._serializeMetricData(metric, scopeMetrics.scope) + '\n';
+      str +=
+        this._serializeMetricData(
+          metric,
+          scopeMetrics.scope,
+          translationStrategy
+        ) + '\n';
     }
     return str;
   }
 
   private _serializeMetricData(
     metricData: MetricData,
-    scope: InstrumentationScope
+    scope: InstrumentationScope,
+    translationStrategy: TranslationStrategyOptions
   ) {
-    let name = sanitizePrometheusMetricName(
-      escapeString(metricData.descriptor.name)
-    );
+    let name = escapeString(metricData.descriptor.name);
+    let handleNonLegacyChars = false;
+
     if (this._prefix) {
       name = `${this._prefix}${name}`;
     }
+
+    if (translationStrategy.escape) {
+      name = sanitizePrometheusMetricName(name);
+    } else {
+      handleNonLegacyChars = hasNonLegacyCharacters(name);
+    }
+
+    if (translationStrategy.suffixes) {
+      name = enforcePrometheusNamingConvention(name, metricData);
+    }
+
     const dataPointType = metricData.dataPointType;
 
-    name = enforcePrometheusNamingConvention(name, metricData);
-
-    const help = `# HELP ${name} ${escapeString(
+    const outputName = handleNonLegacyChars ? quoteName(name) : name;
+    const help = `# HELP ${outputName} ${escapeString(
       metricData.descriptor.description || 'description missing'
     )}`;
     const unit = metricData.descriptor.unit
-      ? `\n# UNIT ${name} ${escapeString(metricData.descriptor.unit)}`
+      ? `\n# UNIT ${outputName} ${escapeString(metricData.descriptor.unit)}`
       : '';
-    const type = `# TYPE ${name} ${toPrometheusType(metricData)}`;
+    const type = `# TYPE ${outputName} ${toPrometheusType(metricData)}`;
     let additionalAttributes: Attributes | undefined;
 
     if (this._withoutScopeInfo) {
       additionalAttributes = this._additionalAttributes;
     } else {
-      const scopeInfo: Attributes = { [ATTR_OTEL_SCOPE_NAME]: scope.name };
+      const scopeInfo: Attributes = {
+        [ATTR_OTEL_SCOPE_NAME_LABEL]: scope.name,
+      };
 
       if (scope.schemaUrl) {
-        scopeInfo[ATTR_OTEL_SCOPE_SCHEMA_URL] = scope.schemaUrl;
+        scopeInfo[ATTR_OTEL_SCOPE_SCHEMA_URL_LABEL] = scope.schemaUrl;
       }
 
       if (scope.version) {
-        scopeInfo[ATTR_OTEL_SCOPE_VERSION] = scope.version;
+        scopeInfo[ATTR_OTEL_SCOPE_VERSION_LABEL] = scope.version;
       }
 
       additionalAttributes = Object.assign(
@@ -285,7 +355,8 @@ export class PrometheusSerializer {
               name,
               metricData,
               it,
-              additionalAttributes
+              additionalAttributes,
+              translationStrategy
             )
           )
           .join('');
@@ -298,7 +369,8 @@ export class PrometheusSerializer {
               name,
               metricData,
               it,
-              additionalAttributes
+              additionalAttributes,
+              translationStrategy
             )
           )
           .join('');
@@ -318,7 +390,8 @@ export class PrometheusSerializer {
     name: string,
     data: MetricData,
     dataPoint: DataPoint<number>,
-    additionalAttributes: Attributes | undefined
+    additionalAttributes: Attributes | undefined,
+    translationStrategy: TranslationStrategyOptions
   ): string {
     let results = '';
 
@@ -329,7 +402,8 @@ export class PrometheusSerializer {
       attributes,
       value,
       this._appendTimestamp ? timestamp : undefined,
-      additionalAttributes
+      additionalAttributes,
+      translationStrategy
     );
     return results;
   }
@@ -338,7 +412,8 @@ export class PrometheusSerializer {
     name: string,
     data: MetricData,
     dataPoint: DataPoint<Histogram>,
-    additionalAttributes: Attributes | undefined
+    additionalAttributes: Attributes | undefined,
+    translationStrategy: TranslationStrategyOptions
   ): string {
     let results = '';
 
@@ -354,7 +429,8 @@ export class PrometheusSerializer {
           attributes,
           value,
           this._appendTimestamp ? timestamp : undefined,
-          additionalAttributes
+          additionalAttributes,
+          translationStrategy
         );
     }
 
@@ -386,14 +462,18 @@ export class PrometheusSerializer {
             upperBound === undefined || upperBound === Infinity
               ? '+Inf'
               : String(upperBound),
-        })
+        }),
+        translationStrategy
       );
     }
 
     return results;
   }
 
-  protected _serializeResource(resource: Resource): string {
+  protected _serializeResource(
+    resource: Resource,
+    translationStrategy: TranslationStrategyOptions
+  ): string {
     if (this._withoutTargetInfo === true) {
       return '';
     }
@@ -402,7 +482,14 @@ export class PrometheusSerializer {
     const help = `# HELP ${name} Target metadata`;
     const type = `# TYPE ${name} gauge`;
 
-    const results = stringify(name, resource.attributes, 1).trim();
+    const results = stringify(
+      name,
+      resource.attributes,
+      1,
+      undefined,
+      undefined,
+      translationStrategy
+    ).trim();
     return `${help}\n${type}\n${results}\n`;
   }
 }

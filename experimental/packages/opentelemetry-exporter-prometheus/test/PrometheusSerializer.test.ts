@@ -14,6 +14,7 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import * as sinon from 'sinon';
 import { PrometheusSerializer } from '../src';
+import type { TranslationStrategyOptions } from '../src/PrometheusSerializer';
 import {
   mockedHrTimeMs,
   mockHrTime,
@@ -25,17 +26,27 @@ import {
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import { AggregationType } from '@opentelemetry/sdk-metrics';
 
+const defaultTranslationStrategy: TranslationStrategyOptions = {
+  escape: true,
+  suffixes: true,
+};
+
 const attributes = {
   foo1: 'bar1',
   foo2: 'bar2',
 };
 
 const resourceAttributes = `service_name="${serviceName}",telemetry_sdk_language="${sdkLanguage}",telemetry_sdk_name="${sdkName}",telemetry_sdk_version="${sdkVersion}"`;
+const resourceAttributesUnescaped = `"service.name"="${serviceName}","telemetry.sdk.language"="${sdkLanguage}","telemetry.sdk.name"="${sdkName}","telemetry.sdk.version"="${sdkVersion}"`;
 
 const serializedDefaultResource =
   '# HELP target_info Target metadata\n' +
   '# TYPE target_info gauge\n' +
   `target_info{${resourceAttributes}} 1\n`;
+const serializedDefaultResourceUnescaped =
+  '# HELP target_info Target metadata\n' +
+  '# TYPE target_info gauge\n' +
+  `target_info{${resourceAttributesUnescaped}} 1\n`;
 
 class TestMetricReader extends MetricReader {
   constructor() {
@@ -103,7 +114,8 @@ describe('PrometheusSerializer', () => {
           metric.descriptor.name,
           metric,
           pointData[0],
-          serializer['_additionalAttributes']
+          serializer['_additionalAttributes'],
+          defaultTranslationStrategy
         );
         return result;
       }
@@ -163,7 +175,8 @@ describe('PrometheusSerializer', () => {
           metric.descriptor.name,
           metric,
           pointData[0],
-          serializer['_additionalAttributes']
+          serializer['_additionalAttributes'],
+          defaultTranslationStrategy
         );
         return result;
       }
@@ -243,7 +256,10 @@ describe('PrometheusSerializer', () => {
           '_filterResourceConstantLabels'
         ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
-        const result = serializer['_serializeScopeMetrics'](scopeMetrics);
+        const result = serializer['_serializeScopeMetrics'](
+          scopeMetrics,
+          defaultTranslationStrategy
+        );
         return result;
       }
 
@@ -314,7 +330,10 @@ describe('PrometheusSerializer', () => {
           '_filterResourceConstantLabels'
         ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
-        return serializer['_serializeScopeMetrics'](scopeMetrics);
+        return serializer['_serializeScopeMetrics'](
+          scopeMetrics,
+          defaultTranslationStrategy
+        );
       }
 
       it('should serialize metric record', async () => {
@@ -387,7 +406,10 @@ describe('PrometheusSerializer', () => {
           '_filterResourceConstantLabels'
         ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
-        return serializer['_serializeScopeMetrics'](scopeMetrics);
+        return serializer['_serializeScopeMetrics'](
+          scopeMetrics,
+          defaultTranslationStrategy
+        );
       }
 
       it('should serialize metric record', async () => {
@@ -463,7 +485,10 @@ describe('PrometheusSerializer', () => {
           '_filterResourceConstantLabels'
         ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
-        const result = serializer['_serializeScopeMetrics'](scopeMetrics);
+        const result = serializer['_serializeScopeMetrics'](
+          scopeMetrics,
+          defaultTranslationStrategy
+        );
         return result;
       }
 
@@ -547,7 +572,10 @@ describe('PrometheusSerializer', () => {
           '_filterResourceConstantLabels'
         ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
-        const result = serializer['_serializeScopeMetrics'](scopeMetrics);
+        const result = serializer['_serializeScopeMetrics'](
+          scopeMetrics,
+          defaultTranslationStrategy
+        );
         assert.strictEqual(
           result,
           '# HELP test foobar\n' +
@@ -571,7 +599,11 @@ describe('PrometheusSerializer', () => {
     async function getCounterResult(
       name: string,
       serializer: PrometheusSerializer,
-      options: Partial<{ unit: string; exportAll: boolean }> = {}
+      options: Partial<{
+        unit: string;
+        exportAll: boolean;
+        translationStrategy: TranslationStrategyOptions;
+      }> = {}
     ) {
       const reader = new TestMetricReader();
       const meterProvider = new MeterProvider({
@@ -585,7 +617,11 @@ describe('PrometheusSerializer', () => {
       });
       const meter = meterProvider.getMeter('test');
 
-      const { unit, exportAll = false } = options;
+      const {
+        unit,
+        exportAll = false,
+        translationStrategy = defaultTranslationStrategy,
+      } = options;
       const counter = meter.createCounter(name, { unit: unit });
       counter.add(1);
 
@@ -603,14 +639,18 @@ describe('PrometheusSerializer', () => {
       ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
       if (exportAll) {
-        const result = serializer.serialize(resourceMetrics);
+        const result = serializer.serialize(
+          resourceMetrics,
+          translationStrategy
+        );
         return result;
       } else {
         const result = serializer['_serializeSingularDataPoint'](
           metric.descriptor.name,
           metric,
           pointData[0],
-          serializer['_additionalAttributes']
+          serializer['_additionalAttributes'],
+          translationStrategy
         );
         return result;
       }
@@ -670,6 +710,70 @@ describe('PrometheusSerializer', () => {
 
       assert.strictEqual(result, 'test_total 1\n');
     });
+
+    it('should not append _total to counters when suffixes are disabled', async () => {
+      const serializer = new PrometheusSerializer();
+      const result = await getCounterResult('test', serializer, {
+        exportAll: true,
+        translationStrategy: { escape: true, suffixes: false },
+      });
+
+      assert.strictEqual(
+        result,
+        serializedDefaultResource +
+          '# HELP test description missing\n' +
+          '# TYPE test counter\n' +
+          'test{otel_scope_name="test"} 1\n'
+      );
+    });
+
+    it('should not sanitize names when escaping is disabled', async () => {
+      const serializer = new PrometheusSerializer();
+      const result = await getCounterResult('test.dotted', serializer, {
+        exportAll: true,
+        translationStrategy: { escape: false, suffixes: true },
+      });
+
+      assert.strictEqual(
+        result,
+        serializedDefaultResourceUnescaped +
+          '# HELP "test.dotted_total" description missing\n' +
+          '# TYPE "test.dotted_total" counter\n' +
+          '{"test.dotted_total" otel_scope_name="test"} 1\n'
+      );
+    });
+
+    it('escapes quotes within quoted names', async () => {
+      const serializer = new PrometheusSerializer();
+      const result = await getCounterResult('test"quoted"', serializer, {
+        exportAll: true,
+        translationStrategy: { escape: false, suffixes: true },
+      });
+
+      assert.strictEqual(
+        result,
+        serializedDefaultResourceUnescaped +
+          '# HELP "test\\"quoted\\"_total" description missing\n' +
+          '# TYPE "test\\"quoted\\"_total" counter\n' +
+          '{"test\\"quoted\\"_total" otel_scope_name="test"} 1\n'
+      );
+    });
+
+    it('does not quote names if escaping is disabled but name is legacy compatible', async () => {
+      const serializer = new PrometheusSerializer();
+      const result = await getCounterResult('test', serializer, {
+        exportAll: true,
+        translationStrategy: { escape: false, suffixes: true },
+      });
+
+      assert.strictEqual(
+        result,
+        serializedDefaultResourceUnescaped +
+          '# HELP test_total description missing\n' +
+          '# TYPE test_total counter\n' +
+          'test_total{otel_scope_name="test"} 1\n'
+      );
+    });
   });
 
   describe('serialize non-normalized values', () => {
@@ -710,7 +814,8 @@ describe('PrometheusSerializer', () => {
         metric.descriptor.name,
         metric,
         pointData[0],
-        serializer['_additionalAttributes']
+        serializer['_additionalAttributes'],
+        defaultTranslationStrategy
       );
       return result;
     }
@@ -820,7 +925,8 @@ describe('PrometheusSerializer', () => {
           datacenter: 'sdc',
           region: 'europe',
           owner: 'frontend',
-        })
+        }),
+        defaultTranslationStrategy
       );
 
       assert.strictEqual(
@@ -845,7 +951,8 @@ describe('PrometheusSerializer', () => {
           datacenter: 'sdc',
           region: 'europe',
           owner: 'frontend',
-        })
+        }),
+        defaultTranslationStrategy
       );
 
       assert.strictEqual(result.includes('target_info'), false);
@@ -866,7 +973,8 @@ describe('PrometheusSerializer', () => {
           datacenter: 'sdc',
           region: 'europe',
           owner: 'frontend',
-        })
+        }),
+        defaultTranslationStrategy
       );
 
       assert.strictEqual(result.includes('otel_scope_name'), false);

@@ -5,4 +5,5 @@
 
 export { PrometheusExporter } from './PrometheusExporter';
 export { PrometheusSerializer } from './PrometheusSerializer';
+export { TranslationStrategy } from './export/types';
 export type { ExporterConfig } from './export/types';

@@ -57,6 +57,14 @@ export interface ExporterConfig {
   metricProducers?: MetricProducer[];
 
   /**
+   * This option controls the translation of metric names from OpenTelemetry Naming
+   * Conventions to Prometheus Naming conventions.
+   * @default TranslationStrategy.UnderscoreEscapingWithSuffixes
+   * @experimental
+   */
+  translationStrategy?: (typeof TranslationStrategy)[keyof typeof TranslationStrategy];
+
+  /**
    * Regex pattern for defining which resource attributes will be applied
    * as constant labels to the metrics.
    * e.g. 'telemetry_.+' for all attributes starting with 'telemetry'.
@@ -76,3 +84,26 @@ export interface ExporterConfig {
    */
   withoutTargetInfo?: boolean;
 }
+
+export const TranslationStrategy = {
+  /**
+   * This fully escapes metric names for classic Prometheus metric name compatibility,
+   * and includes appending type and unit suffixes. This is the default strategy.
+   */
+  UnderscoreEscapingWithSuffixes: 'UnderscoreEscapingWithSuffixes',
+  /**
+   * Metric names will continue to escape special characters to _, but suffixes
+   * won’t be attached.
+   */
+  UnderscoreEscapingWithoutSuffixes: 'UnderscoreEscapingWithoutSuffixes',
+  /**
+   * Disables changing special characters to _. Special suffixes like units and
+   * _total for counters will be attached.
+   */
+  NoUTF8EscapingWithSuffixes: 'NoUTF8EscapingWithSuffixes',
+  /**
+   * This strategy bypasses all metric and label name translation, passing them
+   * through unaltered.
+   */
+  NoTranslation: 'NoTranslation',
+} as const;
