@@ -636,7 +636,9 @@ describe('ProtobufReader', function () {
     describe('readBytes()', function () {
       it('throws when length exceeds remaining buffer', function () {
         // Varint 10 (0x0a) says 10 bytes follow, but only 3 are available
-        const reader = new ProtobufReader(new Uint8Array([0x0a, 0x01, 0x02, 0x03]));
+        const reader = new ProtobufReader(
+          new Uint8Array([0x0a, 0x01, 0x02, 0x03])
+        );
         assert.throws(
           () => reader.readBytes(),
           /Truncated buffer: expected 10 bytes at position 1, but only 3 available/
@@ -654,7 +656,9 @@ describe('ProtobufReader', function () {
 
       it('succeeds when length matches remaining buffer exactly', function () {
         // Varint 3 (0x03) says 3 bytes follow, and exactly 3 are available
-        const reader = new ProtobufReader(new Uint8Array([0x03, 0xaa, 0xbb, 0xcc]));
+        const reader = new ProtobufReader(
+          new Uint8Array([0x03, 0xaa, 0xbb, 0xcc])
+        );
         const result = reader.readBytes();
         assert.deepStrictEqual(result, new Uint8Array([0xaa, 0xbb, 0xcc]));
         assert.ok(reader.isAtEnd());
@@ -665,10 +669,7 @@ describe('ProtobufReader', function () {
       it('throws on truncated string', function () {
         // Length says 10 bytes but only 2 content bytes available
         const reader = new ProtobufReader(new Uint8Array([0x0a, 0x41, 0x42]));
-        assert.throws(
-          () => reader.readString(),
-          /Truncated buffer/
-        );
+        assert.throws(() => reader.readString(), /Truncated buffer/);
       });
     });
   });

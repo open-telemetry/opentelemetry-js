@@ -53,7 +53,9 @@ export class ProtobufReader {
       }
     }
     if (!terminated) {
-      throw new Error('Truncated buffer: unexpected end of data while reading varint');
+      throw new Error(
+        'Truncated buffer: unexpected end of data while reading varint'
+      );
     }
     return result;
   }

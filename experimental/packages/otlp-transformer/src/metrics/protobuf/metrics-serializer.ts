@@ -370,7 +370,11 @@ function serializeGauge(
 
   for (const dataPoint of metricData.dataPoints) {
     writer.writeTag(1, 2);
-    serializeNumberDataPoint(writer, dataPoint, metricData.descriptor.valueType);
+    serializeNumberDataPoint(
+      writer,
+      dataPoint,
+      metricData.descriptor.valueType
+    );
   }
 
   writer.finishLengthDelimited(start, writer.pos - startPos);
@@ -391,7 +395,11 @@ function serializeSum(
 
   for (const dataPoint of metricData.dataPoints) {
     writer.writeTag(1, 2);
-    serializeNumberDataPoint(writer, dataPoint, metricData.descriptor.valueType);
+    serializeNumberDataPoint(
+      writer,
+      dataPoint,
+      metricData.descriptor.valueType
+    );
   }
 
   // aggregation_temporality (field 2, enum/varint)
