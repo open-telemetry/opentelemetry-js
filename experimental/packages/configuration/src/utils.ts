@@ -4,7 +4,6 @@
  */
 
 import { getStringFromEnv } from '@opentelemetry/core';
-import { ExemplarFilter } from './generated/types';
 import type { ConfigurationModel, GrpcTls, HttpTls } from './generated/types';
 
 export function envVariableSubstitution(value: string): string {
@@ -96,7 +95,7 @@ export function initializeDefaultMeterProviderConfiguration(): NonNullable<
   return {
     readers: [],
     views: [],
-    exemplar_filter: ExemplarFilter.TraceBased,
+    exemplar_filter: 'trace_based',
   };
 }
 

@@ -9,22 +9,21 @@ import {
   getNumberFromEnv,
 } from '@opentelemetry/core';
 import type { ConfigFactory } from './IConfigFactory';
-import {
+import type {
   ExemplarFilter,
-  OtlpHttpEncoding,
-  type BatchLogRecordProcessor,
-  type BatchSpanProcessor,
-  type ConfigurationModel,
-  type ExporterDefaultHistogramAggregation,
-  type ExporterTemporalityPreference,
-  type LogRecordExporter,
-  type LogRecordProcessor,
-  type PeriodicMetricReader,
-  type PushMetricExporter,
-  type Sampler,
-  type SeverityNumber,
-  type SpanExporter,
-  type SpanProcessor,
+  BatchLogRecordProcessor,
+  BatchSpanProcessor,
+  ConfigurationModel,
+  ExporterDefaultHistogramAggregation,
+  ExporterTemporalityPreference,
+  LogRecordExporter,
+  LogRecordProcessor,
+  PeriodicMetricReader,
+  PushMetricExporter,
+  Sampler,
+  SeverityNumber,
+  SpanExporter,
+  SpanProcessor,
 } from './generated/types';
 import { diag } from '@opentelemetry/api';
 import {
@@ -404,9 +403,9 @@ export function setTracerProvider(
         );
         const encoding =
           protocol === 'http/json'
-            ? OtlpHttpEncoding.Json
+            ? 'json'
             : protocol === 'http/protobuf'
-              ? OtlpHttpEncoding.Protobuf
+              ? 'protobuf'
               : undefined;
         const otlpHttp: NonNullable<SpanExporter['otlp_http']> = {
           endpoint:
@@ -545,9 +544,9 @@ export function setMeterProvider(config: ConfigurationModel): void {
         );
         const encoding =
           protocol === 'http/json'
-            ? OtlpHttpEncoding.Json
+            ? 'json'
             : protocol === 'http/protobuf'
-              ? OtlpHttpEncoding.Protobuf
+              ? 'protobuf'
               : undefined;
         const otlpHttp: NonNullable<PushMetricExporter['otlp_http']> = {
           endpoint:
@@ -572,11 +571,10 @@ export function setMeterProvider(config: ConfigurationModel): void {
   }
 
   const rawExemplarFilter =
-    getStringFromEnv('OTEL_METRICS_EXEMPLAR_FILTER') ??
-    ExemplarFilter.TraceBased;
+    getStringFromEnv('OTEL_METRICS_EXEMPLAR_FILTER') ?? 'trace_based';
   config.meter_provider.exemplar_filter =
     rawExemplarFilter === 'default'
-      ? ExemplarFilter.TraceBased
+      ? 'trace_based'
       : (rawExemplarFilter as ExemplarFilter);
 }
 
@@ -683,9 +681,9 @@ export function setLoggerProvider(config: ConfigurationModel): void {
         );
         const encoding =
           protocol === 'http/json'
-            ? OtlpHttpEncoding.Json
+            ? 'json'
             : protocol === 'http/protobuf'
-              ? OtlpHttpEncoding.Protobuf
+              ? 'protobuf'
               : undefined;
         const otlpHttp: NonNullable<LogRecordExporter['otlp_http']> = {
           endpoint:
