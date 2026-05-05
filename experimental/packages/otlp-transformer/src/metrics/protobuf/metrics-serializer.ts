@@ -19,9 +19,9 @@ import {
   AggregationTemporality,
   DataPointType,
 } from '@opentelemetry/sdk-metrics';
-import type { Resource } from '@opentelemetry/resources';
-import type { InstrumentationScope } from '@opentelemetry/core';
 import {
+  writeInstrumentationScope,
+  writeResource,
   writeAttributes,
   writeHrTimeAsFixed64,
 } from '../../common/protobuf/common-serializer';
@@ -481,8 +481,7 @@ function serializeScopeMetrics(
   const scopeStartPos = writer.pos;
 
   // scope (field 1, InstrumentationScope)
-  writer.writeTag(1, 2);
-  serializeInstrumentationScope(writer, scopeMetrics.scope);
+  writeInstrumentationScope(writer, scopeMetrics.scope, 1);
 
   // metrics (field 2, repeated Metric)
   for (const metric of scopeMetrics.metrics) {
@@ -497,47 +496,6 @@ function serializeScopeMetrics(
   }
 
   writer.finishLengthDelimited(scopeStart, writer.pos - scopeStartPos);
-}
-
-function serializeInstrumentationScope(
-  writer: IProtobufWriter,
-  scope: InstrumentationScope
-): void {
-  const start = writer.startLengthDelimited();
-  const startPos = writer.pos;
-
-  // name (field 1, string)
-  writer.writeTag(1, 2);
-  writer.writeString(scope.name);
-
-  // version (field 2, string) - skip if empty
-  if (scope.version) {
-    writer.writeTag(2, 2);
-    writer.writeString(scope.version);
-  }
-
-  writer.finishLengthDelimited(start, writer.pos - startPos);
-}
-
-function serializeResource(
-  writer: IProtobufWriter,
-  resource: Resource,
-  fieldNumber: number
-): void {
-  writer.writeTag(fieldNumber, 2);
-  const resourceStart = writer.startLengthDelimited();
-  const resourceStartPos = writer.pos;
-
-  // Write Resource attributes directly
-  if (resource.attributes) {
-    writeAttributes(writer, resource.attributes, 1);
-  }
-
-  // dropped_attributes_count (field 2, uint32) - set to 0 as we don't track this
-  writer.writeTag(2, 0);
-  writer.writeVarint(0);
-
-  writer.finishLengthDelimited(resourceStart, writer.pos - resourceStartPos);
 }
 
 /**
@@ -556,7 +514,7 @@ function serializeResourceMetrics(
   const startPos = writer.pos;
 
   // resource (field 1, Resource)
-  serializeResource(writer, resourceMetrics.resource, 1);
+  writeResource(writer, resourceMetrics.resource, 1);
 
   // scope_metrics (field 2, repeated ScopeMetrics)
   for (const scopeMetrics of resourceMetrics.scopeMetrics) {
