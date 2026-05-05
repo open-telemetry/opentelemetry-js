@@ -14,14 +14,16 @@ on:
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v6
         with:
-          node-version: 20
-          registry-url: https://registry.npmjs.org/
+          node-version: 24
       - run: |
           npm install --workspaces=false --include=dev
           printf '%s\n' '{' '  "extends": "./tsconfig.json",' '  "include": ["src/**/*.ts"]' '}' > tsconfig.publish.cjs.json
@@ -32,5 +34,3 @@ jobs:
           npm pkg set name=@coralogix/instrumentation
           npm publish --ignore-scripts --access public
         working-directory: ./experimental/packages/opentelemetry-instrumentation
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
