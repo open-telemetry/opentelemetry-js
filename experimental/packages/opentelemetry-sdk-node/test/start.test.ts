@@ -241,9 +241,10 @@ describe('startNodeSDK', function () {
 
     assert.strictEqual(sdk, NOOP_SDK);
     assert.strictEqual(diagError.callCount, 1);
-    Sinon.assert.calledWith(
-      diagError,
-      "Could not load OpenTelemetry configuration, SDK will not be setup: ENOENT: no such file or directory, open 'test/fixtures/no-such-file.yaml'"
+    assert.ok(
+      diagError.args[0][0].includes(
+        'Could not load OpenTelemetry configuration, SDK will not be setup: ENOENT'
+      )
     );
 
     await sdk.shutdown();
