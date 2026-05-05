@@ -103,7 +103,7 @@ function severityNumberConfigFromLogLevelString(
   const sevNumConfig = SEV_NUM_CONFIG_FROM_LOG_LEVEL[str.toUpperCase()];
   if (!sevNumConfig) {
     diag.warn(
-      `Unknown log level "${str}", expected one of ${Object.keys(SEV_NUM_CONFIG_FROM_LOG_LEVEL)}, using default`
+      `Unknown log level "${str}", expected one of ${Object.keys(SEV_NUM_CONFIG_FROM_LOG_LEVEL)}, using default info`
     );
     return 'info';
   }
