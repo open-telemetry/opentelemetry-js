@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -13,6 +12,8 @@
  *    cd experimental/packages/configuration
  *    npm run generate:config
  */
+
+/* eslint-disable no-console */
 
 'use strict';
 
@@ -47,7 +48,9 @@ const licenseHeader = `/*
 const NON_DUPLICATED_IDENTIFIER_REGEXP = /\b(?!\w*\d+$)\w+\b|\b\w*V\d+\b/;
 
 function isDuplicatedTypeIdentifier(typeIdentifier) {
-  return !(typeIdentifier.escapedText.toString().match(NON_DUPLICATED_IDENTIFIER_REGEXP));
+  return !typeIdentifier.escapedText
+    .toString()
+    .match(NON_DUPLICATED_IDENTIFIER_REGEXP);
 }
 
 function getNonDuplicatedIdentifierName(typeIdentifier) {
@@ -56,24 +59,44 @@ function getNonDuplicatedIdentifierName(typeIdentifier) {
 }
 
 function removeDuplicateTsDeclarations(tsCode) {
-  const tsPrinter = typescript.createPrinter({
-    newLine: typescript.NewLineKind.LineFeed,
-  }, {
-    substituteNode: (_, node) => {
-      if (typescript.isTypeReferenceNode(node) && isDuplicatedTypeIdentifier(node.typeName)) {
-        const originalIdentifierName = getNonDuplicatedIdentifierName(node.typeName);
-        return typescript.factory.createTypeReferenceNode(originalIdentifierName);
-      }
-      if ((typescript.isInterfaceDeclaration(node) || typescript.isEnumDeclaration(node) || typescript.isTypeAliasDeclaration(node))
-           && isDuplicatedTypeIdentifier(node.name)) {
-        const declarationIsCleared = typescript.factory.createIdentifier('');
-        return declarationIsCleared;
-      }
-      return node;
+  const tsPrinter = typescript.createPrinter(
+    {
+      newLine: typescript.NewLineKind.LineFeed,
     },
-  });
+    {
+      substituteNode: (_, node) => {
+        if (
+          typescript.isTypeReferenceNode(node) &&
+          isDuplicatedTypeIdentifier(node.typeName)
+        ) {
+          const originalIdentifierName = getNonDuplicatedIdentifierName(
+            node.typeName
+          );
+          return typescript.factory.createTypeReferenceNode(
+            originalIdentifierName
+          );
+        }
+        if (
+          (typescript.isInterfaceDeclaration(node) ||
+            typescript.isEnumDeclaration(node) ||
+            typescript.isTypeAliasDeclaration(node)) &&
+          isDuplicatedTypeIdentifier(node.name)
+        ) {
+          const declarationIsCleared = typescript.factory.createIdentifier('');
+          return declarationIsCleared;
+        }
+        return node;
+      },
+    }
+  );
 
-  const sourceFile = typescript.createSourceFile('', tsCode, typescript.ScriptTarget.ESNext, false, typescript.ScriptKind.TS);
+  const sourceFile = typescript.createSourceFile(
+    '',
+    tsCode,
+    typescript.ScriptTarget.ESNext,
+    false,
+    typescript.ScriptKind.TS
+  );
 
   const result = tsPrinter.printFile(sourceFile);
   return result;
@@ -183,7 +206,7 @@ function rtrimDescription(node) {
     }
   }
 }
-rtrimDescription(schema)
+rtrimDescription(schema);
 
 // Avoid unnecessary `| null` in TypeScript types.
 //
@@ -221,7 +244,7 @@ function stripNullTypeFallback(obj) {
   }
   if (typeof obj.properties === 'object' && obj.properties != null) {
     for (const prop of Object.values(obj.properties)) {
-      stripNullTypeFallback(prop)
+      stripNullTypeFallback(prop);
     }
   }
 }
@@ -247,16 +270,13 @@ compile(schema, 'OpenTelemetryConfiguration', {
     // but callers constructing ConfigurationModel programmatically shouldn't
     // need to supply it. Make it optional in the TypeScript type.
     ts = ts.replace(
-      /(\binterface OpenTelemetryConfiguration \{[^}]*?)  file_format: /,
+      /(\binterface OpenTelemetryConfiguration \{[^}]*?) {2}file_format: /,
       '$1  file_format?: '
     );
 
     // Rename the root type to ConfigurationModel for consistency with the rest
     // of the codebase and other OTel SDKs.
-    ts = ts.replace(
-      /\bOpenTelemetryConfiguration\b/g,
-      'ConfigurationModel'
-    );
+    ts = ts.replace(/\bOpenTelemetryConfiguration\b/g, 'ConfigurationModel');
 
     // Change the TypeScript representation for interfaces where
     // "additionalProperties" is allowed.
@@ -279,7 +299,10 @@ compile(schema, 'OpenTelemetryConfiguration', {
     //   which is closest. `{}` allows too much (e.g. 42 matches `{}`).
     // - `undefined` rather than `null` because we want to express that the
     //   property can be unspecified.
-    ts = ts.replace(/\[k: string\]: \{\} \| null;/g, '[k: string]: object | undefined;');
+    ts = ts.replace(
+      /\[k: string\]: \{\} \| null;/g,
+      '[k: string]: object | undefined;'
+    );
     // Similarly for schema types with the following (e.g. `Distribution`):
     //    "additionalProperties": {
     //      "type": [ "object" ],
@@ -295,14 +318,15 @@ compile(schema, 'OpenTelemetryConfiguration', {
     ts = removeDuplicateTsDeclarations(ts);
 
     // Cosmetic: add blank lines between exports.
-    ts = ts.replace(/\n\/\*\*/g, '\n\n/**')
+    ts = ts
+      .replace(/\n\/\*\*/g, '\n\n/**')
       .replace(/([^/])\nexport/g, '$1\n\nexport');
 
     fs.mkdirSync(path.dirname(TYPES_PATH), { recursive: true });
     fs.writeFileSync(TYPES_PATH, ts);
     execSync(`npm run lint:fix -- ${TYPES_PATH}`, {
       cwd: TOP,
-      encoding: 'utf8'
+      encoding: 'utf8',
     });
     console.log(`Written ${ts.split('\n').length} lines to ${TYPES_PATH}`);
   })
