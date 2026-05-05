@@ -346,6 +346,12 @@ function serializeMetric(
       writer.writeTag(10, 2); // exponential_histogram (field 10)
       serializeExponentialHistogramMetric(writer, metricData);
       break;
+    default: {
+      // Compile-time exhaustiveness check: if a new DataPointType is added,
+      // TypeScript will error here until the case is handled.
+      const _exhaustive: never = metricData;
+      void _exhaustive;
+    }
   }
 
   writer.finishLengthDelimited(metricStart, writer.pos - metricStartPos);
