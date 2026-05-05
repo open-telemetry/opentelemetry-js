@@ -47,6 +47,7 @@
 import { DiagLogLevel } from '@opentelemetry/api';
 import type { SeverityNumberConfigModel } from '@opentelemetry/configuration';
 
+/* istanbul ignore next */
 /**
  * @throws Error if `sevNum` is not a known value from the Configuration schema.
  */
