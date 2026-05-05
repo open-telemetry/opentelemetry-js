@@ -6,7 +6,10 @@ import { ValueType } from '@opentelemetry/api';
 import type {
   DataPoint,
   ExponentialHistogram,
+  ExponentialHistogramMetricData,
+  GaugeMetricData,
   Histogram,
+  HistogramMetricData,
   MetricData,
   ResourceMetrics,
   ScopeMetrics,
@@ -333,7 +336,7 @@ function serializeMetric(
       break;
     case DataPointType.SUM:
       writer.writeTag(7, 2); // sum (field 7)
-      serializeSum(writer, metricData as SumMetricData);
+      serializeSum(writer, metricData);
       break;
     case DataPointType.HISTOGRAM:
       writer.writeTag(9, 2); // histogram (field 9)
@@ -352,17 +355,16 @@ function serializeMetric(
  * Proto fields (Gauge):
  *   1  data_points  repeated NumberDataPoint  (wire type 2)
  */
-function serializeGauge(writer: IProtobufWriter, metricData: MetricData): void {
+function serializeGauge(
+  writer: IProtobufWriter,
+  metricData: GaugeMetricData
+): void {
   const start = writer.startLengthDelimited();
   const startPos = writer.pos;
 
   for (const dataPoint of metricData.dataPoints) {
     writer.writeTag(1, 2);
-    serializeNumberDataPoint(
-      writer,
-      dataPoint as DataPoint<number>,
-      metricData.descriptor.valueType
-    );
+    serializeNumberDataPoint(writer, dataPoint, metricData.descriptor.valueType);
   }
 
   writer.finishLengthDelimited(start, writer.pos - startPos);
@@ -383,11 +385,7 @@ function serializeSum(
 
   for (const dataPoint of metricData.dataPoints) {
     writer.writeTag(1, 2);
-    serializeNumberDataPoint(
-      writer,
-      dataPoint as DataPoint<number>,
-      metricData.descriptor.valueType
-    );
+    serializeNumberDataPoint(writer, dataPoint, metricData.descriptor.valueType);
   }
 
   // aggregation_temporality (field 2, enum/varint)
@@ -415,14 +413,14 @@ function serializeSum(
  */
 function serializeHistogramMetric(
   writer: IProtobufWriter,
-  metricData: MetricData
+  metricData: HistogramMetricData
 ): void {
   const start = writer.startLengthDelimited();
   const startPos = writer.pos;
 
   for (const dataPoint of metricData.dataPoints) {
     writer.writeTag(1, 2);
-    serializeHistogramDataPoint(writer, dataPoint as DataPoint<Histogram>);
+    serializeHistogramDataPoint(writer, dataPoint);
   }
 
   // aggregation_temporality (field 2, enum/varint)
@@ -444,17 +442,14 @@ function serializeHistogramMetric(
  */
 function serializeExponentialHistogramMetric(
   writer: IProtobufWriter,
-  metricData: MetricData
+  metricData: ExponentialHistogramMetricData
 ): void {
   const start = writer.startLengthDelimited();
   const startPos = writer.pos;
 
   for (const dataPoint of metricData.dataPoints) {
     writer.writeTag(1, 2);
-    serializeExponentialHistogramDataPoint(
-      writer,
-      dataPoint as DataPoint<ExponentialHistogram>
-    );
+    serializeExponentialHistogramDataPoint(writer, dataPoint);
   }
 
   // aggregation_temporality (field 2, enum/varint)
