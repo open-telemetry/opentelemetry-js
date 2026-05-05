@@ -46,6 +46,11 @@ import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
 import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
 import { diagLogLevelFromSeverityNumberConfig } from './diag';
 
+// Exported for testing.
+export const NOOP_SDK = {
+  shutdown: async () => {},
+};
+
 /**
  * @experimental Function to start the OpenTelemetry Node SDK
  * @param sdkOptions
@@ -111,9 +116,6 @@ export function startNodeSDK(sdkOptions: SDKOptions): {
   };
   return { shutdown: shutdownFn };
 }
-const NOOP_SDK = {
-  shutdown: async () => {},
-};
 
 /**
  * Interpret configuration model and return SDK components.
