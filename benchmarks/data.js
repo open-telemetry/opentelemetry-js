@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1777993202630,
+  "lastUpdate": 1778020534684,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -75099,6 +75099,149 @@ window.BENCHMARK_DATA = {
             "range": "±3.99%",
             "unit": "ops/sec",
             "extra": "88 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "ab3a2e280e589a43d705278be5e8c8308b1b4081",
+          "message": "feat(sdk-node, configuration): diag log handling updates for startNodeSDK(), return noop SDK on invalid config (#6668)\n\nCo-authored-by: Marylia Gutierrez <maryliag@gmail.com>",
+          "timestamp": "2026-05-05T21:39:22Z",
+          "tree_id": "c83510069ee324af8f33046b4fdd2b4168f355dc",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/ab3a2e280e589a43d705278be5e8c8308b1b4081"
+        },
+        "date": 1778020533533,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 3520029,
+            "range": "±2.95%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 3532444,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 3374287,
+            "range": "±0.37%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 3018193,
+            "range": "±0.35%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 425077,
+            "range": "±2.65%",
+            "unit": "ops/sec",
+            "extra": "80 samples"
+          },
+          {
+            "name": "generateTraceId",
+            "value": 5824992,
+            "range": "±1.75%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "generateSpanId",
+            "value": 6609288,
+            "range": "±2.62%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 490582,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "addEvent (128 attributes)",
+            "value": 39111,
+            "range": "±0.45%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "addLink (128 attributes)",
+            "value": 39714,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "create spans (10 attributes w/ setAttributes)",
+            "value": 505257,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 512 spans (protobuf)",
+            "value": 419,
+            "range": "±0.67%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "transform 512 spans (json)",
+            "value": 464,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "transform 512 logs (protobuf)",
+            "value": 421,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "transform 512 logs (json)",
+            "value": 367,
+            "range": "±1.53%",
+            "unit": "ops/sec",
+            "extra": "82 samples"
+          },
+          {
+            "name": "transform 512 metrics (protobuf)",
+            "value": 147,
+            "range": "±2.82%",
+            "unit": "ops/sec",
+            "extra": "65 samples"
+          },
+          {
+            "name": "transform 512 metrics (json)",
+            "value": 351,
+            "range": "±3.10%",
+            "unit": "ops/sec",
+            "extra": "80 samples"
           }
         ]
       }
