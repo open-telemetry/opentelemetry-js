@@ -218,6 +218,37 @@ describe('startNodeSDK', function () {
     });
   });
 
+  it('should return NOOP_SDK when OTEL_CONFIG_FILE is invalid', async () => {
+    const diagError = Sinon.spy(diag, 'error');
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
+    const sdk = startNodeSDK({});
+
+    assert.strictEqual(sdk, NOOP_SDK);
+    assert.strictEqual(diagError.callCount, 1);
+    assert.ok(
+      diagError.args[0][0].includes(
+        'Could not load OpenTelemetry configuration, SDK will not be setup: test/fixtures/invalid.yaml: Unsupported file_format: "bogus"'
+      )
+    );
+
+    await sdk.shutdown();
+  });
+
+  it('should return NOOP_SDK when OTEL_CONFIG_FILE does not exist', async () => {
+    const diagError = Sinon.spy(diag, 'error');
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/no-such-file.yaml';
+    const sdk = startNodeSDK({});
+
+    assert.strictEqual(sdk, NOOP_SDK);
+    assert.strictEqual(diagError.callCount, 1);
+    Sinon.assert.calledWith(
+      diagError,
+      "Could not load OpenTelemetry configuration, SDK will not be setup: ENOENT: no such file or directory, open 'test/fixtures/no-such-file.yaml'"
+    );
+
+    await sdk.shutdown();
+  });
+
   it('should register a logger provider if multiple log record processors are provided', async () => {
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/logger.yaml';
     const sdk = startNodeSDK({});
