@@ -1,25 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  webpack: (config, { dev, webpack }) => {
-    // tsdown's rolldown runtime emits `import { createRequire } from "node:module"`
-    // for ESM->CJS interop (e.g. protobufjs in @opentelemetry/otlp-transformer).
-    // Strip the `node:` prefix and stub the module for browser builds; the
-    // createRequire helper isn't reached on browser code paths.
-    config.plugins.push(
-      new webpack.NormalModuleReplacementPlugin(/^node:/, resource => {
-        resource.request = resource.request.replace(/^node:/, '');
-      })
-    );
-    config.resolve = config.resolve || {};
-    config.resolve.fallback = {
-      ...(config.resolve.fallback || {}),
-      module: false,
-      path: false,
-      fs: false,
-      util: false,
-      os: false,
-    };
-
+  webpack: (config, { dev }) => {
     // Treat warnings as errors
     config.plugins.push({
       apply: compiler => {

@@ -14,7 +14,6 @@ export default {
     path: path.resolve(__dirname, 'dist'),
   },
   resolve: {
-    mainFields: ['browser', 'module', 'main'],
     alias: {
       // Webpack 4 doesn't support package.json exports field, so we need to manually map the browser-http subpath
       '@opentelemetry/otlp-exporter-base/browser-http':
@@ -30,10 +29,7 @@ export default {
         use: {
           loader: 'babel-loader',
           options: {
-            // modules: false leaves ESM imports/exports intact so webpack can
-            // do its own tree-shaking; without this, preset-env converts to
-            // CJS and named imports against the OpenTelemetry .mjs files fail.
-            presets: [['@babel/preset-env', { modules: false }]],
+            presets: [['@babel/preset-env']],
           },
         },
       },
