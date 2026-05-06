@@ -13,7 +13,7 @@ import { defaultResource } from '@opentelemetry/resources';
 import type { SpanProcessor } from './SpanProcessor';
 import { Tracer } from './Tracer';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
-import type { TracerProviderConfig } from './types';
+import type { TracerProviderOptions } from './types';
 import { ParentBasedSampler } from './sampler/ParentBasedSampler';
 import { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
 import { RandomIdGenerator } from './platform';
@@ -29,12 +29,12 @@ export enum ForceFlushState {
  * This class represents a basic tracer provider which platform libraries can extend
  */
 export class TracerProvider implements ApiTracerProvider {
-  private readonly _config: Required<TracerProviderConfig>;
+  private readonly _config: Required<TracerProviderOptions>;
   private readonly _tracers: Map<string, Tracer> = new Map();
   private readonly _resource: Resource;
   private readonly _activeSpanProcessor: MultiSpanProcessor;
 
-  constructor(config: TracerProviderConfig = {}) {
+  constructor(config: TracerProviderOptions = {}) {
     this._config = {
       resource: config.resource ?? defaultResource(),
       sampler:
