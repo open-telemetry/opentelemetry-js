@@ -35,6 +35,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(configuration): improve handling of enums in generated types [#6659](https://github.com/open-telemetry/opentelemetry-js/pull/6659) @trentm
 * fix(configuration): improve the technique for removing '| null' on types the JSON Schema [#6662](https://github.com/open-telemetry/opentelemetry-js/pull/6662) @trentm
 * fix(sampler-jaeger-remote): add missing axios dep [#6656](https://github.com/open-telemetry/opentelemetry-js/pull/6656) @trentm
+* fix(exporter-prometheus): handle malformed URLs in Prometheus exporter request handler [#6674](https://github.com/open-telemetry/opentelemetry-js/pull/6674) @homanp
 
 ## 0.216.0
 
