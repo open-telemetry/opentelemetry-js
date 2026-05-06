@@ -43,6 +43,8 @@
     "./dist/platform/node/index.cjs": "./dist/platform/browser/index.cjs",
     "./dist/platform/node/instrumentation.mjs": "./dist/platform/browser/instrumentation.mjs",
     "./dist/platform/node/instrumentation.cjs": "./dist/platform/browser/instrumentation.cjs",
+    "./dist/platform/node/normalize.mjs": "./dist/platform/browser/noop-normalize.mjs",
+    "./dist/platform/node/normalize.cjs": "./dist/platform/browser/noop-normalize.cjs",
     "./dist/platform/index.mjs": "./dist/platform/browser/index.mjs",
     "./dist/platform/index.cjs": "./dist/platform/browser/index.cjs"
   },

@@ -30,9 +30,8 @@ jobs:
       - name: Generate version.ts files
         run: npm run version:update
 
-      - name: Build 🔧
-        run: npm run compile
-        working-directory: ./integration-tests/propagation-validation-server
+      # propagation-validation-server is plain JS post-tsdown migration; no
+      # compile step needed.
 
       - name: Run W3C Test harness
         run: ./integration-tests/tracecontext-integration-test.sh
