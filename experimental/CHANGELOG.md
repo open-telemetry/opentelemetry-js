@@ -10,6 +10,16 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 0.217.0
+
+### :rocket: Features
+
 * feat(otlp-transformer): replace protobufjs trace serialization with custom implementation [#6625](https://github.com/open-telemetry/opentelemetry-js/pull/6625) @pichlermarc
 * feat(configuration): auto-generate TypeScript types from OTel declarative config JSON schema (stable v1.0.0) using `json-schema-to-typescript` and `ajv` [#6533](https://github.com/open-telemetry/opentelemetry-js/pull/6533) @MikeGoldsmith
 * feat(configuration, sdk-node): `startNodeSDK()` code path now uses `log_level` configuration to setup a DiagConsoleLogger [#6668](https://github.com/open-telemetry/opentelemetry-js/pull/6668) @trentm
@@ -25,10 +35,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(configuration): improve handling of enums in generated types [#6659](https://github.com/open-telemetry/opentelemetry-js/pull/6659) @trentm
 * fix(configuration): improve the technique for removing '| null' on types the JSON Schema [#6662](https://github.com/open-telemetry/opentelemetry-js/pull/6662) @trentm
 * fix(sampler-jaeger-remote): add missing axios dep [#6656](https://github.com/open-telemetry/opentelemetry-js/pull/6656) @trentm
-
-### :books: Documentation
-
-### :house: Internal
 
 ## 0.216.0
 

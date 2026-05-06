@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/configuration",
-  "version": "0.216.0",
+  "version": "0.217.0",
   "description": "OpenTelemetry Configuration",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
