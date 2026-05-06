@@ -17,7 +17,7 @@ export default {
     alias: {
       // Webpack 4 doesn't support package.json exports field, so we need to manually map the browser-http subpath
       '@opentelemetry/otlp-exporter-base/browser-http':
-        '@opentelemetry/otlp-exporter-base/build/esm/index-browser-http.js',
+        '@opentelemetry/otlp-exporter-base/dist/index-browser-http.mjs',
     },
   },
   module: {

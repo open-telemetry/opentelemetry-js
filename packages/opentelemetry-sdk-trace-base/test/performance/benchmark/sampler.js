@@ -15,7 +15,7 @@
  */
 
 const Benchmark = require('benchmark');
-const { TraceIdRatioBasedSampler } = require('../../../build/src');
+const { TraceIdRatioBasedSampler } = require('../../../dist/index.cjs');
 
 const suite = new Benchmark.Suite();
 
