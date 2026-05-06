@@ -6,7 +6,7 @@
 import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
-import { ProtobufTraceSerializer } from '@opentelemetry/otlp-transformer';
+import { ProtobufTraceSerializer } from '@opentelemetry/otlp-transformer/protobuf';
 import {
   createOtlpHttpExportDelegate,
   convertLegacyHttpOptions,

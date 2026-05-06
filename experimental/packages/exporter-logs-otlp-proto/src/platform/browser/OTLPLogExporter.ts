@@ -5,7 +5,7 @@
 
 import type { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
-import { ProtobufLogsSerializer } from '@opentelemetry/otlp-transformer';
+import { ProtobufLogsSerializer } from '@opentelemetry/otlp-transformer/protobuf';
 
 import type {
   ReadableLogRecord,

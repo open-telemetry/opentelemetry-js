@@ -30,8 +30,12 @@ jobs:
       - name: Generate version.ts files
         run: npm run version:update
 
-      # propagation-validation-server is plain JS post-tsdown migration; no
-      # compile step needed.
+      # propagation-validation-server is plain JS post-tsdown migration but it
+      # `require()`s workspace packages (@opentelemetry/core, sdk-trace-base,
+      # context-async-hooks) at runtime, so we still need to build their dist/
+      # before running the harness.
+      - name: Build workspace
+        run: npm run compile
 
       - name: Run W3C Test harness
         run: ./integration-tests/tracecontext-integration-test.sh

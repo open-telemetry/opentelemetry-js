@@ -35,10 +35,24 @@ module.exports = {
       // paths never reach `path.normalize`. If that assumption ever breaks, the
       // failure will be loud: `TypeError: path.normalize is not a function`.
       "path": false,
+      // The OTLP-over-protobuf exporters' browser unit tests bundle
+      // `@opentelemetry/otlp-transformer/protobuf`, which transitively pulls
+      // tsdown's rolldown CJS-interop runtime helper that does
+      // `import { createRequire } from "node:module"`. Stub it for the test
+      // bundle. (Note: this is test-time only; protobufjs uses dynamic code
+      // evaluation that browser CSPs block at runtime, so OTLP-over-protobuf
+      // is not actually browser-supported — these tests just verify wiring.)
+      "module": false,
     },
   },
   devtool: 'eval-source-map',
   plugins: [
+    // Webpack 5 doesn't strip the `node:` URI prefix; map it to the bare
+    // module name so resolve.fallback above can pick `module: false` up.
+    // Used by tsdown's rolldown CJS-interop helper that protobufjs pulls in.
+    new webpack.NormalModuleReplacementPlugin(/^node:/, function (resource) {
+      resource.request = resource.request.replace(/^node:/, '');
+    }),
     // Karma+webpack bundles each package's src/ directly, so the dist-level
     // `package.json#browser` field doesn't apply during tests. This plugin
     // performs the equivalent test-time path-swap at the source level —

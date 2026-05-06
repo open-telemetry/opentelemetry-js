@@ -25,6 +25,16 @@
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
+    },
+    "./protobuf": {
+      "import": {
+        "types": "./dist/index-protobuf.d.mts",
+        "default": "./dist/index-protobuf.mjs"
+      },
+      "require": {
+        "types": "./dist/index-protobuf.d.cts",
+        "default": "./dist/index-protobuf.cjs"
+      }
     }
   },
   "browser": {
