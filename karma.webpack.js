@@ -27,10 +27,44 @@ module.exports = {
       // Enable the assert library polyfill because that is used in tests
       "assert": require.resolve('assert/'),
       "util": require.resolve('util/'),
+      // tsdown's CJS output for instrumentation's `instrumentationNodeModuleFile.ts`
+      // inlines `path.normalize` from `platform/node/normalize.ts` (instead of
+      // preserving the platform indirection like ESM does), so the dist-level
+      // browser swap can't catch it. Stub `path` to an empty module for the browser
+      // bundle — InstrumentationNodeModuleFile is a node-only class and browser code
+      // paths never reach `path.normalize`. If that assumption ever breaks, the
+      // failure will be loud: `TypeError: path.normalize is not a function`.
+      "path": false,
     },
   },
   devtool: 'eval-source-map',
   plugins: [
+    // Karma+webpack bundles each package's src/ directly, so the dist-level
+    // `package.json#browser` field doesn't apply during tests. This plugin
+    // performs the equivalent test-time path-swap at the source level —
+    // `./platform`, `./platform/index`, `./detectors/platform` (and their
+    // `/index` variants) get rewritten to their `/browser/` equivalents.
+    // Skipped for issuers in node_modules (third-party packages).
+    new webpack.NormalModuleReplacementPlugin(
+      /(^|[\\/])(?:detectors[\\/])?platform([\\/]index(\.ts)?)?$/,
+      function (resource) {
+        if (/[\\/]browser([\\/]|$)/.test(resource.request)) return;
+        const issuer = resource.contextInfo && resource.contextInfo.issuer;
+        if (!issuer || /[\\/]node_modules[\\/]/.test(issuer)) return;
+        const original = resource.request;
+        const rewritten = original.replace(
+          /platform([\\/]index)?$/,
+          'platform/browser$1'
+        );
+        if (rewritten === original) {
+          throw new Error(
+            `karma platform-swap: outer regex matched ${JSON.stringify(original)} ` +
+            `but inner replace did not rewrite it. The two regexes have drifted out of sync.`
+          );
+        }
+        resource.request = rewritten;
+      }
+    ),
     new webpack.ProvidePlugin({
       // Make a global `process` variable that points to the `process` package,
       // because the `util` package expects there to be a global variable named `process`.
@@ -47,7 +81,15 @@ module.exports = {
   ],
   module: {
     rules: [
-      {test: /\.ts$/, use: 'ts-loader'},
+      {
+        test: /\.ts$/,
+        // transpileOnly skips type checking and the composite-project lookup
+        // for `.tsbuildinfo`. We use tsdown for actual builds and don't run
+        // `tsc -b`, so `composite` is set in tsconfig.base.json but no
+        // `.tsbuildinfo` exists. ts-loader's default mode requires one;
+        // transpileOnly bypasses that.
+        use: { loader: 'ts-loader', options: { transpileOnly: true } },
+      },
       {
         test: /\.js$/,
         exclude: {

@@ -2,32 +2,38 @@
   "name": "@opentelemetry/semantic-conventions",
   "version": "1.40.0",
   "description": "OpenTelemetry semantic conventions",
-  "main": "build/src/index.js",
-  "module": "build/esm/index.js",
-  "esnext": "build/esnext/index.js",
-  "types": "build/src/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
   "exports": {
     ".": {
-      "esnext": "./build/esnext/index.js",
-      "module": "./build/esm/index.js",
-      "types": "./build/src/index.d.ts",
-      "default": "./build/src/index.js"
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./incubating": {
-      "esnext": "./build/esnext/index-incubating.js",
-      "module": "./build/esm/index-incubating.js",
-      "types": "./build/src/index-incubating.d.ts",
-      "default": "./build/src/index-incubating.js"
+      "import": {
+        "types": "./dist/index-incubating.d.mts",
+        "default": "./dist/index-incubating.mjs"
+      },
+      "require": {
+        "types": "./dist/index-incubating.d.cts",
+        "default": "./dist/index-incubating.cjs"
+      }
     }
   },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "compile": "tsdown",
+    "clean": "rimraf dist build",
     "version": "node ../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "prewatch": "npm run precompile",
+    "watch": "tsdown --watch --no-clean",
     "peer-api-check": "node ../scripts/peer-api-check.js",
     "size-check": "npm run compile && mocha 'test/**/*.test.ts'",
     "align-api-deps": "node ../scripts/align-api-deps.js"
@@ -45,18 +51,10 @@
     "node": ">=14"
   },
   "files": [
-    "build/esm/**/*.js",
-    "build/esm/**/*.js.map",
-    "build/esm/**/*.d.ts",
-    "build/esnext/**/*.js",
-    "build/esnext/**/*.js.map",
-    "build/esnext/**/*.d.ts",
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
     "doc",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "dist"
   ],
   "publishConfig": {
     "access": "public"

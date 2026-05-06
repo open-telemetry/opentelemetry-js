@@ -2,22 +2,34 @@
   "name": "@opentelemetry/instrumentation-http",
   "version": "0.217.0",
   "description": "OpenTelemetry instrumentation for `node:http` and `node:https` http client and server modules",
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build",
-    "clean": "tsc --build --clean",
+    "compile": "tsdown && tsdown -c tsdown.test.config.ts",
+    "clean": "rimraf dist build",
     "test:cjs": "nyc mocha test/**/*.test.ts",
-    "test:esm": "nyc node --experimental-loader=@opentelemetry/instrumentation/hook.mjs ../../../node_modules/mocha/bin/mocha 'test/**/*.test.mjs'",
-    "test:double-instr": "nyc node --experimental-loader=@opentelemetry/instrumentation/hook.mjs ../../../node_modules/mocha/bin/mocha 'test/integrations/double-instr.test.cjs'",
+    "test:esm": "nyc node --experimental-loader=@opentelemetry/instrumentation/hook.mjs run-mocha.mjs 'test/**/*.test.mjs'",
+    "test:double-instr": "nyc node --experimental-loader=@opentelemetry/instrumentation/hook.mjs run-mocha.mjs 'test/integrations/double-instr.test.cjs'",
     "test": "npm run test:cjs && npm run test:esm && npm run test:double-instr",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../../scripts/version-update.js",
-    "watch": "tsc --build --watch",
+    "watch": "tsdown --watch --no-clean",
     "prewatch": "node ../../../scripts/version-update.js",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js",
@@ -37,12 +49,10 @@
     "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
     "doc",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "dist"
   ],
   "publishConfig": {
     "access": "public"

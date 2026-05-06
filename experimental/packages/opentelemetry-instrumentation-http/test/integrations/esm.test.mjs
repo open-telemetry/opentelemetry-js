@@ -42,8 +42,8 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 
-import { assertSpan } from '../../build/test/utils/assertSpan.js';
-import { HttpInstrumentation } from '../../build/src/index.js';
+import { assertSpan } from '../../build/assertSpan.mjs';
+import { HttpInstrumentation } from '../../dist/index.mjs';
 
 const memoryExporter = new InMemorySpanExporter();
 const provider = new NodeTracerProvider({

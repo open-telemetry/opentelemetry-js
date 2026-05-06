@@ -2,21 +2,56 @@
   "name": "@opentelemetry/sdk-trace-base",
   "version": "2.7.1",
   "description": "OpenTelemetry Tracing",
-  "main": "build/src/index.js",
-  "module": "build/esm/index.js",
-  "esnext": "build/esnext/index.js",
-  "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts",
-    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
-    "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
-    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./platform": {
+      "import": {
+        "types": "./dist/platform/index.d.mts",
+        "default": "./dist/platform/index.mjs"
+      },
+      "require": {
+        "types": "./dist/platform/index.d.cts",
+        "default": "./dist/platform/index.cjs"
+      }
+    },
+    "./platform/browser": {
+      "import": {
+        "types": "./dist/platform/browser/index.d.mts",
+        "default": "./dist/platform/browser/index.mjs"
+      },
+      "require": {
+        "types": "./dist/platform/browser/index.d.cts",
+        "default": "./dist/platform/browser/index.cjs"
+      }
+    }
   },
-  "types": "build/src/index.d.ts",
+  "browser": {
+    "./dist/platform/node/RandomIdGenerator.mjs": "./dist/platform/browser/RandomIdGenerator.mjs",
+    "./dist/platform/node/RandomIdGenerator.cjs": "./dist/platform/browser/RandomIdGenerator.cjs",
+    "./dist/platform/node/export/BatchSpanProcessor.mjs": "./dist/platform/browser/export/BatchSpanProcessor.mjs",
+    "./dist/platform/node/export/BatchSpanProcessor.cjs": "./dist/platform/browser/export/BatchSpanProcessor.cjs",
+    "./dist/platform/node/index.mjs": "./dist/platform/browser/index.mjs",
+    "./dist/platform/node/index.cjs": "./dist/platform/browser/index.cjs",
+    "./dist/platform/index.mjs": "./dist/platform/browser/index.mjs",
+    "./dist/platform/index.cjs": "./dist/platform/browser/index.cjs"
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "compile": "tsdown",
+    "clean": "rimraf dist build",
     "test": "nyc mocha 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "karma start --single-run",
     "test:webworker": "karma start karma.worker.js --single-run",
@@ -28,8 +63,7 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "prewatch": "npm run precompile",
+    "watch": "tsdown --watch --no-clean",
     "peer-api-check": "node ../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../scripts/align-api-deps.js"
   },
@@ -47,18 +81,10 @@
     "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
-    "build/esm/**/*.js",
-    "build/esm/**/*.js.map",
-    "build/esm/**/*.d.ts",
-    "build/esnext/**/*.js",
-    "build/esnext/**/*.js.map",
-    "build/esnext/**/*.d.ts",
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
     "doc",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "dist"
   ],
   "publishConfig": {
     "access": "public"
