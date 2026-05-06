@@ -26,36 +26,25 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+      # rolldown needs Node >=20.12, so build on 24; dist is target-agnostic.
+      - name: Setup Node.js 24 (build)
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: ${{ matrix.node_version }}
-
-      # npm@11.0.0 drops support for Node.js v18
-      # Install the latest npm compatible with this version of Node.js
-      # - npm@11.1.0 supports: {"node":"^20.17.0 || >=22.9.0"}
-      - run: npm install -g npm@"<11.0.0"
-        if: ${{
-          matrix.node_version == '18.19.0' ||
-          matrix.node_version == '18' ||
-          matrix.node_version == '20.6.0'
-          }}
-      - run: npm install -g npm@latest
-        if: ${{
-          matrix.node_version == '20' ||
-          matrix.node_version == '22.22.1' ||
-          matrix.node_version == '24' ||
-          matrix.node_version == '25' ||
-          matrix.node_version == '26'
-          }}
+          node-version: 24
 
       - name: Bootstrap
         run: npm ci --ignore-scripts
 
-      - name: Build 🔧
+      - name: Build
         run: npm run compile
+
+      - name: Setup Node.js (test)
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: ${{ matrix.node_version }}
 
       - name: Install collector
         run: |
