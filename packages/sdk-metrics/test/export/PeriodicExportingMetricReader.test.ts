@@ -524,6 +524,39 @@ describe('PeriodicExportingMetricReader', () => {
       exporter.throwExport = false;
       await reader.shutdown();
     });
+
+    it('should not initiate collect when an export is ongoing', async () => {
+      const exporter = new TestMetricExporter();
+      exporter.exportTime = 100; // Make it slow
+      const reader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: MAX_32_BIT_INT,
+        exportTimeoutMillis: 80,
+      });
+
+      reader.setMetricProducer(
+        new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+      );
+
+      const collectSpy = sinon.spy(reader, 'collect');
+
+      // Trigger first export
+      const firstFlush = reader.forceFlush();
+
+      // Wait a bit to ensure the first call has passed the `this.collect` call
+      // and is now in the export phase.
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Trigger second export
+      await reader.forceFlush();
+
+      // The second forceFlush should have skipped collection.
+      assert.strictEqual(collectSpy.callCount, 1);
+
+      // Wait for the first export to complete to clean up
+      await firstFlush;
+      await reader.shutdown();
+    });
   });
 
   describe('forceFlush', () => {
@@ -988,7 +1021,7 @@ describe('PeriodicExportingMetricReader', () => {
         await reader.shutdown();
       });
 
-      it('should synchronize concurrent exports', async () => {
+      it('should skip subsequent export when one is ongoing', async () => {
         const exporter = new TestMetricExporter();
         exporter.exportTime = 50; // Make export take some time
         const reader = new PeriodicExportingMetricReader({
@@ -1035,16 +1068,20 @@ describe('PeriodicExportingMetricReader', () => {
         });
         reader.setMetricProducer(producer);
 
-        // Trigger two exports quickly
+        // Trigger first export
         const p1 = reader.forceFlush();
+        // Wait a bit to ensure the first call has passed the `this.collect` call
+        // and is now in the export phase.
+        await new Promise(resolve => setTimeout(resolve, 10));
+        // Trigger second export
         const p2 = reader.forceFlush();
 
         await Promise.all([p1, p2]);
 
         const exports = exporter.getExports();
-        assert.strictEqual(exports.length, 2);
+        assert.strictEqual(exports.length, 1);
 
-        // Assert that they didn't overlap
+        // Assert that they didn't overlap (only 1 ran)
         assert.strictEqual(exporter.maxConcurrentCalls, 1);
 
         await reader.shutdown();

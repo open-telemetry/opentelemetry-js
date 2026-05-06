@@ -68,7 +68,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
   private readonly _exportInterval: number;
   private readonly _exportTimeout: number;
   private readonly _maxExportBatchSize?: number;
-  private _previousExportPromise: Promise<void> = Promise.resolve();
+  private _ongoingExportPromise: Promise<void> | null = null;
 
   constructor(options: PeriodicExportingMetricReaderOptions) {
     const {
@@ -160,6 +160,13 @@ export class PeriodicExportingMetricReader extends MetricReader {
   }
 
   private async _doRun(): Promise<void> {
+    if (this._ongoingExportPromise) {
+      api.diag.debug(
+        'PeriodicExportingMetricReader: export already in progress, skipping'
+      );
+      return;
+    }
+
     const { resourceMetrics, errors } = await this.collect({
       timeoutMillis: this._exportTimeout,
     });
@@ -224,10 +231,12 @@ export class PeriodicExportingMetricReader extends MetricReader {
       }
     };
 
-    // Schedules the current export to run after all previously scheduled exports have finished.
-    const promise = this._previousExportPromise.then(currentExport);
-    this._previousExportPromise = promise.catch(() => {});
-    await promise;
+    this._ongoingExportPromise = currentExport();
+    try {
+      await this._ongoingExportPromise;
+    } finally {
+      this._ongoingExportPromise = null;
+    }
   }
 
   protected override onInitialized(): void {
