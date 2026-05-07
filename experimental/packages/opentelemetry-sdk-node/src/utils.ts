@@ -104,13 +104,19 @@ export function getResourceFromConfiguration(
   config: ConfigurationModel
 ): Resource | undefined {
   if (config.resource && config.resource.attributes) {
-    const attr: DetectedResourceAttributes = {};
+    const attrs: DetectedResourceAttributes = {};
     for (let i = 0; i < config.resource.attributes.length; i++) {
       const a = config.resource.attributes[i];
-      attr[a.name] = a.value;
+      // DetectedResourceAttributes does not (yet) support extended/complex
+      // attributes. It is not clear if OTel Configuration supports `null`
+      // resource attributes (https://github.com/open-telemetry/opentelemetry-configuration/issues/613).
+      // For now we will drop resource attributes from config with a `null` value.
+      if (a.value !== null) {
+        attrs[a.name] = a.value;
+      }
     }
-    return resourceFromAttributes(attr, {
-      schemaUrl: config.resource.schema_url,
+    return resourceFromAttributes(attrs, {
+      schemaUrl: config.resource.schema_url ?? undefined,
     });
   }
   return undefined;
@@ -156,11 +162,11 @@ export function getResourceDetectorsFromConfiguration(
 
   return detectors.flatMap(detector => {
     const result: ResourceDetector[] = [];
-    if (detector.host != null) result.push(hostDetector);
-    if (detector.os != null) result.push(osDetector);
-    if (detector.process != null) result.push(processDetector);
-    if (detector.service != null) result.push(serviceInstanceIdDetector);
-    if (detector.env != null) result.push(envDetector);
+    if (detector.host !== undefined) result.push(hostDetector);
+    if (detector.os !== undefined) result.push(osDetector);
+    if (detector.process !== undefined) result.push(processDetector);
+    if (detector.service !== undefined) result.push(serviceInstanceIdDetector);
+    if (detector.env !== undefined) result.push(envDetector);
     return result;
   });
 }
@@ -514,19 +520,19 @@ export function getPeriodicMetricReaderFromConfiguration(
 ): IMetricReader | undefined {
   if (periodic.exporter) {
     let exporter;
-    if (periodic.exporter.otlp_http) {
-      const encoding = periodic.exporter.otlp_http.encoding;
+    if (periodic.exporter.otlp_http !== undefined) {
+      const encoding = periodic.exporter.otlp_http?.encoding ?? 'protobuf';
       if (encoding === 'json') {
         exporter = new OTLPHttpMetricExporter({
           compression:
-            periodic.exporter.otlp_http.compression === 'gzip'
+            periodic.exporter.otlp_http?.compression === 'gzip'
               ? CompressionAlgorithm.GZIP
               : CompressionAlgorithm.NONE,
         });
       } else if (encoding === 'protobuf') {
         exporter = new OTLPProtoMetricExporter({
           compression:
-            periodic.exporter.otlp_http.compression === 'gzip'
+            periodic.exporter.otlp_http?.compression === 'gzip'
               ? CompressionAlgorithm.GZIP
               : CompressionAlgorithm.NONE,
         });
@@ -534,10 +540,10 @@ export function getPeriodicMetricReaderFromConfiguration(
         diag.warn(`Unsupported OTLP metrics encoding: ${encoding}.`);
       }
     }
-    if (periodic.exporter.otlp_grpc) {
+    if (periodic.exporter.otlp_grpc !== undefined) {
       exporter = new OTLPGrpcMetricExporter({
         compression:
-          periodic.exporter.otlp_grpc.compression === 'gzip'
+          periodic.exporter.otlp_grpc?.compression === 'gzip'
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
       });
@@ -551,7 +557,7 @@ export function getPeriodicMetricReaderFromConfiguration(
         exporter,
       });
     }
-    if (periodic.exporter.console) {
+    if (periodic.exporter.console !== undefined) {
       return new PeriodicExportingMetricReader({
         exporter: new ConsoleMetricExporter(),
       });
@@ -608,12 +614,12 @@ export function getBatchLogRecordProcessorFromEnv(
 export function getLogRecordExporter(
   exporter: LogRecordExporterConfigModel
 ): LogRecordExporter | undefined {
-  if (exporter.otlp_http) {
-    const encoding = exporter.otlp_http.encoding;
+  if (exporter.otlp_http !== undefined) {
+    const encoding = exporter.otlp_http?.encoding ?? 'protobuf';
     if (encoding === 'json') {
       return new OTLPHttpLogExporter({
         compression:
-          exporter.otlp_http.compression === 'gzip'
+          exporter.otlp_http?.compression === 'gzip'
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
       });
@@ -621,7 +627,7 @@ export function getLogRecordExporter(
     if (encoding === 'protobuf') {
       return new OTLPProtoLogExporter({
         compression:
-          exporter.otlp_http.compression === 'gzip'
+          exporter.otlp_http?.compression === 'gzip'
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
       });
@@ -631,18 +637,18 @@ export function getLogRecordExporter(
     );
     return new OTLPProtoLogExporter({
       compression:
-        exporter.otlp_http.compression === 'gzip'
+        exporter.otlp_http?.compression === 'gzip'
           ? CompressionAlgorithm.GZIP
           : CompressionAlgorithm.NONE,
     });
-  } else if (exporter.otlp_grpc) {
+  } else if (exporter.otlp_grpc !== undefined) {
     return new OTLPGrpcLogExporter({
       compression:
-        exporter.otlp_grpc.compression === 'gzip'
+        exporter.otlp_grpc?.compression === 'gzip'
           ? CompressionAlgorithm.GZIP
           : CompressionAlgorithm.NONE,
     });
-  } else if (exporter.console) {
+  } else if (exporter.console !== undefined) {
     return new ConsoleLogRecordExporter();
   }
   diag.warn(`Unsupported Exporter value. No Log Record Exporter registered`);
@@ -659,10 +665,10 @@ export function getLogRecordProcessorsFromConfiguration(
       if (exporter) {
         logRecordProcessors.push(
           new BatchLogRecordProcessor(exporter, {
-            maxQueueSize: processor.batch.max_queue_size,
-            maxExportBatchSize: processor.batch.max_export_batch_size,
-            scheduledDelayMillis: processor.batch.schedule_delay,
-            exportTimeoutMillis: processor.batch.export_timeout,
+            maxQueueSize: processor.batch.max_queue_size ?? 2048,
+            maxExportBatchSize: processor.batch.max_export_batch_size ?? 512,
+            scheduledDelayMillis: processor.batch.schedule_delay ?? 1000,
+            exportTimeoutMillis: processor.batch.export_timeout ?? 30000,
           })
         );
       }
@@ -688,7 +694,9 @@ export function getHeadersFromConfiguration(
   }
   const result: Record<string, string> = {};
   headers.forEach(header => {
-    result[header.name] = header.value;
+    if (header.value !== null) {
+      result[header.name] = header.value;
+    }
   });
   return result;
 }
@@ -727,43 +735,43 @@ export function getHttpAgentOptionsFromTls(
 export function getSpanExporter(
   exporter: SpanExporterConfigModel
 ): SpanExporter | undefined {
-  if (exporter.otlp_http) {
-    const encoding = exporter.otlp_http.encoding;
+  if (exporter.otlp_http !== undefined) {
+    const encoding = exporter.otlp_http?.encoding ?? 'protobuf';
     if (encoding === 'json') {
       return new OTLPHttpTraceExporter({
         compression:
-          exporter.otlp_http.compression === 'gzip'
+          exporter.otlp_http?.compression === 'gzip'
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
-        url: exporter.otlp_http.endpoint,
-        headers: getHeadersFromConfiguration(exporter.otlp_http.headers),
-        timeoutMillis: exporter.otlp_http.timeout,
-        httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http.tls),
+        url: exporter.otlp_http?.endpoint ?? 'http://localhost:4318/v1/traces',
+        headers: getHeadersFromConfiguration(exporter.otlp_http?.headers),
+        timeoutMillis: exporter.otlp_http?.timeout ?? 10000,
+        httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http?.tls),
       });
     } else {
       return new OTLPProtoTraceExporter({
         compression:
-          exporter.otlp_http.compression === 'gzip'
+          exporter.otlp_http?.compression === 'gzip'
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
-        url: exporter.otlp_http.endpoint,
-        headers: getHeadersFromConfiguration(exporter.otlp_http.headers),
-        timeoutMillis: exporter.otlp_http.timeout,
-        httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http.tls),
+        url: exporter.otlp_http?.endpoint ?? 'http://localhost:4318/v1/traces',
+        headers: getHeadersFromConfiguration(exporter.otlp_http?.headers),
+        timeoutMillis: exporter.otlp_http?.timeout ?? 10000,
+        httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http?.tls),
       });
     }
-  } else if (exporter.otlp_grpc) {
+  } else if (exporter.otlp_grpc !== undefined) {
     return new OTLPGrpcTraceExporter({
       compression:
-        exporter.otlp_grpc.compression === 'gzip'
+        exporter.otlp_grpc?.compression === 'gzip'
           ? CompressionAlgorithm.GZIP
           : CompressionAlgorithm.NONE,
-      url: exporter.otlp_grpc.endpoint,
-      timeoutMillis: exporter.otlp_grpc.timeout,
+      url: exporter.otlp_grpc?.endpoint ?? 'http://localhost:4317',
+      timeoutMillis: exporter.otlp_grpc?.timeout ?? 10000,
       // TODO (6614): add support for credentials
       // TODO (6615): add metadata (headers) support
     });
-  } else if (exporter.console) {
+  } else if (exporter.console !== undefined) {
     return new ConsoleSpanExporter();
   }
   diag.warn(`Unsupported Exporter value. No Span Exporter registered`);
@@ -780,10 +788,10 @@ export function getSpanProcessorsFromConfiguration(
       if (exporter) {
         spanProcessors.push(
           new BatchSpanProcessor(exporter, {
-            maxQueueSize: processor.batch.max_queue_size,
-            maxExportBatchSize: processor.batch.max_export_batch_size,
-            scheduledDelayMillis: processor.batch.schedule_delay,
-            exportTimeoutMillis: processor.batch.export_timeout,
+            maxQueueSize: processor.batch.max_queue_size ?? 2048,
+            maxExportBatchSize: processor.batch.max_export_batch_size ?? 512,
+            scheduledDelayMillis: processor.batch.schedule_delay ?? 5000,
+            exportTimeoutMillis: processor.batch.export_timeout ?? 30000,
           })
         );
       }
@@ -902,7 +910,7 @@ export function getAggregationType(
       options: {
         recordMinMax:
           aggregation.base2_exponential_bucket_histogram.record_min_max ?? true,
-        maxSize: aggregation.base2_exponential_bucket_histogram.max_size,
+        maxSize: aggregation.base2_exponential_bucket_histogram.max_size ?? 160,
       },
     };
   }
@@ -1021,20 +1029,22 @@ const DEFAULT_RATIO = 1;
  * Builds a {@link Sampler} from a {@link SamplerConfigModel} data model.
  * This allows sampler construction from declarative configuration.
  */
-export function buildSamplerFromConfig(config: SamplerConfigModel): Sampler {
-  if (config.always_on !== undefined) {
+export function buildSamplerFromConfig(
+  samplerConfig: SamplerConfigModel
+): Sampler {
+  if (samplerConfig.always_on !== undefined) {
     return new AlwaysOnSampler();
   }
-  if (config.always_off !== undefined) {
+  if (samplerConfig.always_off !== undefined) {
     return new AlwaysOffSampler();
   }
-  if (config.trace_id_ratio_based !== undefined) {
+  if (samplerConfig.trace_id_ratio_based !== undefined) {
     return new TraceIdRatioBasedSampler(
-      config.trace_id_ratio_based.ratio ?? DEFAULT_RATIO
+      samplerConfig.trace_id_ratio_based?.ratio ?? DEFAULT_RATIO
     );
   }
-  if (config.parent_based !== undefined) {
-    const pb = config.parent_based;
+  if (samplerConfig.parent_based !== undefined) {
+    const pb = samplerConfig.parent_based ?? {};
     return new ParentBasedSampler({
       root: pb.root ? buildSamplerFromConfig(pb.root) : new AlwaysOnSampler(),
       remoteParentSampled: pb.remote_parent_sampled

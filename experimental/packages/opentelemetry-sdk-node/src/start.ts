@@ -167,8 +167,9 @@ function create(
       spanLimits,
       generalLimits: {
         attributeValueLengthLimit:
-          config.attribute_limits?.attribute_value_length_limit,
-        attributeCountLimit: config.attribute_limits?.attribute_count_limit,
+          config.attribute_limits?.attribute_value_length_limit ?? undefined,
+        attributeCountLimit:
+          config.attribute_limits?.attribute_count_limit ?? 128,
       },
       // TODO (6616): support idGenerator configuration from config
       // TODO (6624): support for `meterProvider: components.meterProvider`
