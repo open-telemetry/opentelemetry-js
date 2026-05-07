@@ -2274,6 +2274,15 @@ describe('ConfigFactory', function () {
       assert.throws(() => createConfigFactory(), /Unsupported file_format/);
     });
 
+    it('should show multiple validation errors for invalid config', function () {
+      process.env.OTEL_CONFIG_FILE =
+        'test/fixtures/invalid-multiple-errors.yaml';
+      assert.throws(
+        () => createConfigFactory(),
+        /Invalid OpenTelemetry config file: .*?:.*must be string.*must be number/s
+      );
+    });
+
     it('should initialize config with default values with empty string for config file', function () {
       process.env.OTEL_CONFIG_FILE = '';
       const configFactory = createConfigFactory();
@@ -2502,15 +2511,10 @@ describe('ConfigFactory', function () {
 
     it('should throw for empty processors (minItems)', function () {
       process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid-providers.yaml';
-      try {
-        createConfigFactory();
-      } catch (err) {
-        assert.ok(err);
-        assert.strictEqual(
-          err.message,
-          'Invalid OpenTelemetry config file: /logger_provider/processors must be array'
-        );
-      }
+      assert.throws(
+        () => createConfigFactory(),
+        /Invalid OpenTelemetry config file: .*?: \/logger_provider\/processors must be array/
+      );
     });
 
     it('check resources priority', function () {
