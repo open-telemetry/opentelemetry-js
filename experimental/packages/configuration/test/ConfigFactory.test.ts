@@ -969,7 +969,7 @@ describe('ConfigFactory', function () {
       const configFactory = createConfigFactory();
       const config = configFactory.getConfigModel();
       assert.deepStrictEqual(config, defaultConfig);
-      const p = config.propagator as ConfigurationModel['propagator'];
+      const p = config.propagator;
       assert.strictEqual(p?.composite, undefined);
       assert.strictEqual(p?.composite_list, undefined);
     });
@@ -2099,11 +2099,11 @@ describe('ConfigFactory', function () {
     });
 
     it('checks to keep good code coverage', function () {
-      let config: ConfigurationModel = {} as ConfigurationModel;
+      let config: ConfigurationModel = {};
       setResources(config);
       assert.deepStrictEqual(config, { resource: {} });
 
-      config = {} as ConfigurationModel;
+      config = {};
       process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '5';
       setAttributeLimits(config);
       assert.deepStrictEqual(config, {
@@ -2113,7 +2113,7 @@ describe('ConfigFactory', function () {
         },
       });
 
-      config = {} as ConfigurationModel;
+      config = {};
       delete process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
       process.env.OTEL_ATTRIBUTE_COUNT_LIMIT = '7';
       setAttributeLimits(config);
@@ -2123,11 +2123,11 @@ describe('ConfigFactory', function () {
         },
       });
 
-      config = {} as ConfigurationModel;
+      config = {};
       setPropagators(config);
       assert.deepStrictEqual(config, { propagator: {} });
 
-      config = {} as ConfigurationModel;
+      config = {};
       process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE =
         'low_memory';
       process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'always_off';
@@ -2157,7 +2157,7 @@ describe('ConfigFactory', function () {
       };
       assert.deepStrictEqual(config.meter_provider, expectedMeterProvider);
 
-      config = {} as ConfigurationModel;
+      config = {};
       process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'default';
       process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
         'default';
