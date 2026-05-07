@@ -28,8 +28,8 @@ elements are outside the scope of this threat model.
 - **Export destinations** — The configured collector or backend endpoints are
   trusted. Users should not export telemetry to untrusted destinations, as
   telemetry data discloses information about the application. Responses received
-  from export destinations (response headers, error messages, etc.) are also
-  trusted.
+  from export destinations (response headers, error messages, etc.) are considered
+  untrusted.
 
 - **Instrumented libraries** — For instrumentations, the third-party library
   being instrumented (e.g., `express`, `pg`, `redis`) is trusted. If that
@@ -74,6 +74,17 @@ untrusted inbound data can cause:
 - Disclosure of sensitive data that the instrumented library itself would not
   expose.
 
+### Exporters
+
+Exporters send telemetry to a configured destination and process responses from
+it. While the destination is trusted, its responses are not — an export
+destination could become compromised. A vulnerability exists if a response from
+an export destination can cause:
+
+- Crashes or unrecoverable errors in the application.
+- Unbounded resource consumption (e.g., reading an arbitrarily large response
+  body into memory).
+
 ### Denial of Service (DoS)
 
 For a behavior to be considered a DoS vulnerability, the proof of concept must
@@ -106,11 +117,6 @@ Any usage of OpenTelemetry APIs that does not adhere to the contract laid out by
 their TypeScript types and documentation is not covered by this threat model.
 Scenarios that rely on passing incorrect types, calling internal or undocumented
 APIs, or otherwise violating the API contract are not considered vulnerabilities.
-
-### Resource Exhaustion from Export Destinations
-
-If a configured collector or backend sends responses large enough to impact
-performance, this is not a vulnerability. Export destinations are trusted.
 
 ### Environment Variable Manipulation
 
