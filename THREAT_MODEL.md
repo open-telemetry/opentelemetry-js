@@ -42,13 +42,12 @@ elements are outside the scope of this threat model.
 
 ### SDK and API Packages
 
-A vulnerability exists in SDK or API packages if untrusted data that passes
-*through* OpenTelemetry (not application-provided inputs) can cause:
+A vulnerability exists in SDK or API packages if a defect in the SDK itself
+can cause — even when used correctly with trusted inputs:
 
-- Loss of confidentiality, integrity, or availability of data protected through
-  the correct use of OpenTelemetry APIs.
 - Crashes or unrecoverable errors in the application.
 - Unbounded degradation of runtime performance.
+- Unintended disclosure of telemetry data.
 
 ### Propagators (Context Extraction)
 
