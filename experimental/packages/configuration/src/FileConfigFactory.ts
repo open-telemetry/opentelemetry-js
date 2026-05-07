@@ -52,11 +52,23 @@ export function parseConfigFile(): ConfigurationModel {
 
   const valid = validateConfig(processed);
   if (!valid) {
-    const firstError = validateConfig.errors?.[0];
-    const detail = firstError
-      ? `${firstError.instancePath} ${firstError.message}`
-      : 'unknown error';
-    throw new Error(`Invalid OpenTelemetry config file: ${detail.trim()}`);
+    let detail: string;
+    if (!validateConfig.errors) {
+      detail = 'unknown error';
+    } else if (validateConfig.errors.length === 1) {
+      const err = validateConfig.errors[0];
+      detail = `${err.instancePath} ${err.message}`;
+    } else {
+      const sep = '\n  ';
+      detail =
+        sep +
+        validateConfig.errors
+          .map(e => `${e.instancePath} ${e.message}`)
+          .join(sep);
+    }
+    throw new Error(
+      `Invalid OpenTelemetry config file: ${configFile}: ${detail}`
+    );
   }
 
   const data = processed as unknown as ConfigurationModel;
