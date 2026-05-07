@@ -98,7 +98,6 @@ describe('Logger', () => {
     });
 
     it('should make log record instance readonly after emit it', () => {
-      // const { logger } = setup();
       const { logger } = setupLoggerProvider('simple');
       const makeOnlySpy = sinon.spy(LogRecordImpl.prototype, '_makeReadonly');
       logger.emit({
