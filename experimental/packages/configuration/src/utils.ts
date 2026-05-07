@@ -4,7 +4,6 @@
  */
 
 import { getStringFromEnv } from '@opentelemetry/core';
-import { ExemplarFilter, SeverityNumber } from './generated/types';
 import type { ConfigurationModel, GrpcTls, HttpTls } from './generated/types';
 
 export function envVariableSubstitution(value: string): string {
@@ -59,7 +58,6 @@ export function getGrpcTlsConfig(
 export function initializeDefaultConfiguration(): ConfigurationModel {
   return {
     disabled: false,
-    log_level: SeverityNumber.Info,
     resource: {},
     attribute_limits: {
       attribute_count_limit: 128,
@@ -97,7 +95,7 @@ export function initializeDefaultMeterProviderConfiguration(): NonNullable<
   return {
     readers: [],
     views: [],
-    exemplar_filter: ExemplarFilter.TraceBased,
+    exemplar_filter: 'trace_based',
   };
 }
 

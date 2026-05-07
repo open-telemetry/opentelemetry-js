@@ -9,22 +9,21 @@ import {
   getNumberFromEnv,
 } from '@opentelemetry/core';
 import type { ConfigFactory } from './IConfigFactory';
-import {
+import type {
   ExemplarFilter,
-  OtlpHttpEncoding,
-  type BatchLogRecordProcessor,
-  type BatchSpanProcessor,
-  type ConfigurationModel,
-  type ExporterDefaultHistogramAggregation,
-  type ExporterTemporalityPreference,
-  type LogRecordExporter,
-  type LogRecordProcessor,
-  type PeriodicMetricReader,
-  type PushMetricExporter,
-  type Sampler,
-  type SeverityNumber,
-  type SpanExporter,
-  type SpanProcessor,
+  BatchLogRecordProcessor,
+  BatchSpanProcessor,
+  ConfigurationModel,
+  ExporterDefaultHistogramAggregation,
+  ExporterTemporalityPreference,
+  LogRecordExporter,
+  LogRecordProcessor,
+  PeriodicMetricReader,
+  PushMetricExporter,
+  Sampler,
+  SeverityNumber,
+  SpanExporter,
+  SpanProcessor,
 } from './generated/types';
 import { diag } from '@opentelemetry/api';
 import {
@@ -58,8 +57,8 @@ export class EnvironmentConfigFactory implements ConfigFactory {
 
     const logLevelString = getStringFromEnv('OTEL_LOG_LEVEL');
     if (logLevelString) {
-      // Store as lowercase; consumers convert to DiagLogLevel via diagLogLevelFromString
-      this._config.log_level = logLevelString.toLowerCase() as SeverityNumber;
+      this._config.log_level =
+        severityNumberConfigFromLogLevelString(logLevelString);
     }
 
     setResources(this._config);
@@ -73,6 +72,42 @@ export class EnvironmentConfigFactory implements ConfigFactory {
   getConfigModel(): ConfigurationModel {
     return this._config;
   }
+}
+
+const SEV_NUM_CONFIG_FROM_LOG_LEVEL: { [key: string]: SeverityNumber } = {
+  // Declarative config `log_level` has no "NONE". Using 'fatal' is
+  // equivalent, because the OTel JS diag API does not have a "fatal" level.
+  NONE: 'fatal',
+  ERROR: 'error',
+  WARN: 'warn',
+  INFO: 'info',
+  DEBUG: 'debug',
+  VERBOSE: 'trace2',
+  // Declarative config `log_level` has no "ALL". Using 'trace' is
+  // equivalent, because that is the lowest SeverityNumber level.
+  ALL: 'trace',
+};
+
+/**
+ * Return a declarative config SeverityNumberConfig value (as used for
+ * `log_level`) for the given `OTEL_LOG_LEVEL` string value.
+ *
+ * See notes at "opentelemetr-sdk-node/src/diag.ts".
+ */
+function severityNumberConfigFromLogLevelString(
+  str?: string
+): SeverityNumber | undefined {
+  if (!str) {
+    return undefined;
+  }
+  const sevNumConfig = SEV_NUM_CONFIG_FROM_LOG_LEVEL[str.toUpperCase()];
+  if (!sevNumConfig) {
+    diag.warn(
+      `Unknown log level "${str}", expected one of ${Object.keys(SEV_NUM_CONFIG_FROM_LOG_LEVEL)}, using default info`
+    );
+    return 'info';
+  }
+  return sevNumConfig;
 }
 
 export function setResources(config: ConfigurationModel): void {
@@ -368,9 +403,9 @@ export function setTracerProvider(
         );
         const encoding =
           protocol === 'http/json'
-            ? OtlpHttpEncoding.Json
+            ? 'json'
             : protocol === 'http/protobuf'
-              ? OtlpHttpEncoding.Protobuf
+              ? 'protobuf'
               : undefined;
         const otlpHttp: NonNullable<SpanExporter['otlp_http']> = {
           endpoint:
@@ -509,9 +544,9 @@ export function setMeterProvider(config: ConfigurationModel): void {
         );
         const encoding =
           protocol === 'http/json'
-            ? OtlpHttpEncoding.Json
+            ? 'json'
             : protocol === 'http/protobuf'
-              ? OtlpHttpEncoding.Protobuf
+              ? 'protobuf'
               : undefined;
         const otlpHttp: NonNullable<PushMetricExporter['otlp_http']> = {
           endpoint:
@@ -536,11 +571,10 @@ export function setMeterProvider(config: ConfigurationModel): void {
   }
 
   const rawExemplarFilter =
-    getStringFromEnv('OTEL_METRICS_EXEMPLAR_FILTER') ??
-    ExemplarFilter.TraceBased;
+    getStringFromEnv('OTEL_METRICS_EXEMPLAR_FILTER') ?? 'trace_based';
   config.meter_provider.exemplar_filter =
     rawExemplarFilter === 'default'
-      ? ExemplarFilter.TraceBased
+      ? 'trace_based'
       : (rawExemplarFilter as ExemplarFilter);
 }
 
@@ -647,9 +681,9 @@ export function setLoggerProvider(config: ConfigurationModel): void {
         );
         const encoding =
           protocol === 'http/json'
-            ? OtlpHttpEncoding.Json
+            ? 'json'
             : protocol === 'http/protobuf'
-              ? OtlpHttpEncoding.Protobuf
+              ? 'protobuf'
               : undefined;
         const otlpHttp: NonNullable<LogRecordExporter['otlp_http']> = {
           endpoint:

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-trace-otlp-proto",
-  "version": "0.216.0",
+  "version": "0.217.0",
   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector using protobuf over HTTP",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -67,7 +67,7 @@
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
-    "babel-plugin-istanbul": "7.0.1",
+    "babel-plugin-istanbul": "8.0.0",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",
@@ -87,8 +87,8 @@
   },
   "dependencies": {
     "@opentelemetry/core": "2.7.1",
-    "@opentelemetry/otlp-exporter-base": "0.216.0",
-    "@opentelemetry/otlp-transformer": "0.216.0",
+    "@opentelemetry/otlp-exporter-base": "0.217.0",
+    "@opentelemetry/otlp-transformer": "0.217.0",
     "@opentelemetry/resources": "2.7.1",
     "@opentelemetry/sdk-trace-base": "2.7.1"
   },

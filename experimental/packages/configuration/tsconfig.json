@@ -5,6 +5,9 @@
     "outDir": "build",
     "rootDir": "."
   },
+  "exclude": [
+    "test/fixtures/**"
+  ],
   "include": [
     "src/**/*.ts",
     "src/generated/*.js",
