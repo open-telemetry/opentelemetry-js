@@ -2277,7 +2277,8 @@ describe('ConfigFactory', function () {
     it('should show multiple validation errors for invalid config', function () {
       process.env.OTEL_CONFIG_FILE =
         'test/fixtures/invalid-multiple-errors.yaml';
-      assert.throws(() => createConfigFactory(),
+      assert.throws(
+        () => createConfigFactory(),
         /Invalid OpenTelemetry config file: .*?:.*must be string.*must be number/s
       );
     });
@@ -2510,7 +2511,8 @@ describe('ConfigFactory', function () {
 
     it('should throw for empty processors (minItems)', function () {
       process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid-providers.yaml';
-      assert.throws(() => createConfigFactory(),
+      assert.throws(
+        () => createConfigFactory(),
         /Invalid OpenTelemetry config file: .*?: \/logger_provider\/processors must be array/
       );
     });
