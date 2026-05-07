@@ -8,6 +8,9 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* fix(configuration)!: stop removing `null` values from parsed config object [#6679](https://github.com/open-telemetry/opentelemetry-js/pull/6679) @trentm
+  * It is now the responsibility of the user of a parsed declarative config object, typically just the `sdk-node` package, to handle `null` values.
+
 ### :rocket: Features
 
 ### :bug: Bug Fixes
