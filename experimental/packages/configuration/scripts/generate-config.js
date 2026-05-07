@@ -25,6 +25,11 @@ const Ajv = require('ajv/dist/2020');
 const standaloneCode = require('ajv/dist/standalone').default;
 const typescript = require('typescript');
 
+// Get latest version by running:
+//    git tag -l --sort=version:refname | grep -v -- - | tail -1
+// in git@github.com:open-telemetry/opentelemetry-configuration.git
+const CONFIG_VERSION = 'v1.0.0';
+
 const TOP = path.resolve(__dirname, '..');
 const SCHEMA_PATH = path.join(
   TOP,
@@ -105,10 +110,13 @@ function removeDuplicateTsDeclarations(tsCode) {
 // ---- 1. Get and load the OpenTelemetry Configuration JSON schema.
 
 // Run the bash script to clone / refresh the schema repository
-const bashResult = spawnSync('bash', ['generate-config.sh'], {
-  stdio: 'inherit',
-  cwd: __dirname,
-});
+const bashResult = spawnSync(
+  'bash',
+  ['clone-config-repo-at-tag.sh', CONFIG_VERSION],
+  {
+    stdio: 'inherit',
+    cwd: __dirname,
+  });
 if (bashResult.error) {
   throw bashResult.error;
 }
@@ -171,8 +179,8 @@ const bannerComment = [
   '',
   '//',
   '// AUTO-GENERATED — do not edit',
-  '// Generated from opentelemetry-configuration JSON schema v1.0.0',
-  '// Run `npm run generate:config` from the configuration package to regenerate',
+  `// Generated from opentelemetry-configuration.git ${CONFIG_VERSION}`,
+  '// Run `npm run generate:config` to regenerate',
   '//',
   '/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-object-type */',
 ].join('\n');
