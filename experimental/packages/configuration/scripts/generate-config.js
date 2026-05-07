@@ -256,7 +256,7 @@ compile(schema, 'OpenTelemetryConfiguration', {
     // - `undefined` to allow the property to not be specified in the YAML
     ts = ts.replace(
       /\[k: string\]: \{\} \| null;/g,
-      '[k: string]: object | undefined;'
+      '[k: string]: object | null | undefined;'
     );
     // Similarly for schema types with the following (e.g. `Distribution`):
     //    "additionalProperties": {
