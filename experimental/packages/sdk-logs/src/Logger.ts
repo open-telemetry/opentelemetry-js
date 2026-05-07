@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type * as logsAPI from '@opentelemetry/api-logs';
+import type { Logger as ILogger, LogRecord } from '@opentelemetry/api-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import type { Context } from '@opentelemetry/api';
@@ -18,7 +18,7 @@ import { LogRecordImpl } from './LogRecordImpl';
 import type { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 import type { LoggerConfig } from './types';
 
-export class Logger implements logsAPI.Logger {
+export class Logger implements ILogger {
   public readonly instrumentationScope: InstrumentationScope;
   private _sharedState: LoggerProviderSharedState;
   private readonly _loggerConfig: Required<LoggerConfig>;
@@ -37,43 +37,7 @@ export class Logger implements logsAPI.Logger {
     );
   }
 
-  public emit(logRecord: logsAPI.LogRecord): void {
-    // const loggerConfig = this._loggerConfig;
-
-    // const currentContext = logRecord.context || context.active();
-
-    // // Apply minimum severity filtering
-    // const recordSeverity =
-    //   logRecord.severityNumber ?? SeverityNumber.UNSPECIFIED;
-
-    // // 1. Minimum severity: If the log record's SeverityNumber is specified
-    // //    (i.e. not 0) and is less than the configured minimum_severity,
-    // //    the log record MUST be dropped.
-    // if (
-    //   recordSeverity !== SeverityNumber.UNSPECIFIED &&
-    //   recordSeverity < loggerConfig.minimumSeverity
-    // ) {
-    //   // Log record is dropped due to minimum severity filter
-    //   return;
-    // }
-
-    // // 2. Trace-based: If trace_based is true, and if the log record has a
-    // //    SpanId and the TraceFlags SAMPLED flag is unset, the log record MUST be dropped.
-    // if (loggerConfig.traceBased) {
-    //   const spanContext = trace.getSpanContext(currentContext);
-    //   if (spanContext && isSpanContextValid(spanContext)) {
-    //     // Check if the trace is unsampled (SAMPLED flag is unset)
-    //     const isSampled =
-    //       (spanContext.traceFlags & TraceFlags.SAMPLED) === TraceFlags.SAMPLED;
-    //     if (!isSampled) {
-    //       // Log record is dropped due to trace-based filter
-    //       return;
-    //     }
-    //   }
-    //   // If there's no valid span context, the log record is not associated with a trace
-    //   // and therefore bypasses trace-based filtering (as per spec)
-    // }
-
+  public emit(logRecord: LogRecord): void {
     const currentContext = logRecord.context || context.active();
     if (!this.enabled(logRecord)) {
       return;
