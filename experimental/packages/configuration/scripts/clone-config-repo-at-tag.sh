@@ -1,11 +1,20 @@
 #!/bin/bash
+#
+# Clone the opentelemetry-configuration.git repo to the "build/" dir at the
+# given tag. Usage:
+#   bash clone-config-repo-at-tag.sh GIT_TAG
+#
 
 set -o errexit
 set -o pipefail
 
-# Get latest version by running `git tag -l --sort=version:refname | tail -1`
-# ... in git@github.com:open-telemetry/opentelemetry-configuration.git
-CONFIG_VERSION=v1.0.0
+function fatal {
+    echo "$(basename $0): error: $*"
+    exit 1
+}
+
+GIT_TAG="$1"
+[[ -n "$GIT_TAG" ]] || fatal "missing GIT_TAG argument"
 
 # When running on windows and you are getting references to ";C" (like Telemetry;C)
 # then this is an issue with the bash shell, so first run the following in your shell:
@@ -20,5 +29,5 @@ cd "${REPO_DIR}"
 
 git init
 git remote add origin https://github.com/open-telemetry/opentelemetry-configuration.git
-git fetch origin "${CONFIG_VERSION}" --depth=1
+git fetch origin "${GIT_TAG}" --depth=1
 git checkout FETCH_HEAD
