@@ -4,6 +4,7 @@
  */
 
 export type {
+  LoggerProviderConfig,
   LoggerProviderOptions,
   LoggerConfig,
   LoggerConfigurator,

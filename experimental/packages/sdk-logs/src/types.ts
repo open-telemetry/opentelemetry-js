@@ -92,6 +92,11 @@ export interface LoggerProviderOptions {
   meterProvider?: MeterProvider;
 }
 
+/**
+ * @deprecated please use {@link LoggerProviderOptions}
+ */
+export type LoggerProviderConfig = LoggerProviderOptions;
+
 export interface LogRecordLimits {
   /** attributeValueLengthLimit is maximum allowed attribute value size */
   attributeValueLengthLimit?: number;

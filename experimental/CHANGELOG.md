@@ -16,6 +16,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+* refactor(sdk-logs): rename `LoggerProviderConfig` to `LoggerProviderOptions` [#6691](https://github.com/open-telemetry/opentelemetry-js/pull/6691) @david-luna
 * refactor(sdk-logs): use `Logger.enabled()` within `Logger.emit()` implementation [#6680](https://github.com/open-telemetry/opentelemetry-js/pull/6680) @david-luna
 
 ## 0.217.0
