@@ -20,7 +20,6 @@ import type {
   LogRecordProcessor,
   PeriodicMetricReader,
   PushMetricExporter,
-  Sampler,
   SeverityNumber,
   SpanExporter,
   SpanProcessor,
@@ -236,35 +235,35 @@ export function setSampler(config: ConfigurationModel, env: EnvValues): void {
 
   switch (sampler) {
     case SamplerType.AlwaysOn:
-      config.tracer_provider.sampler = { always_on: {} } as Sampler;
+      config.tracer_provider.sampler = { always_on: {} };
       break;
 
     case SamplerType.AlwaysOff:
-      config.tracer_provider.sampler = { always_off: {} } as Sampler;
+      config.tracer_provider.sampler = { always_off: {} };
       break;
 
     case SamplerType.TraceIdRatio:
       config.tracer_provider.sampler = {
         trace_id_ratio_based: { ratio },
-      } as Sampler;
+      };
       break;
 
     case SamplerType.ParentBasedAlwaysOn:
       config.tracer_provider.sampler = {
         parent_based: { root: { always_on: {} } },
-      } as Sampler;
+      };
       break;
 
     case SamplerType.ParentBasedAlwaysOff:
       config.tracer_provider.sampler = {
         parent_based: { root: { always_off: {} } },
-      } as Sampler;
+      };
       break;
 
     case SamplerType.ParentBasedTraceIdRatio:
       config.tracer_provider.sampler = {
         parent_based: { root: { trace_id_ratio_based: { ratio } } },
-      } as Sampler;
+      };
       break;
 
     default:
@@ -334,7 +333,7 @@ export function setTracerProvider(
   }
 
   const batch: BatchSpanProcessor = {
-    exporter: {} as SpanExporter,
+    exporter: {},
     schedule_delay: getNumberFromEnv('OTEL_BSP_SCHEDULE_DELAY') ?? 5000,
     export_timeout: getNumberFromEnv('OTEL_BSP_EXPORT_TIMEOUT') ?? 30000,
     max_queue_size: getNumberFromEnv('OTEL_BSP_MAX_QUEUE_SIZE') ?? 2048,
@@ -346,7 +345,7 @@ export function setTracerProvider(
     const exporterType = exportersType[i];
     const batchInfo: BatchSpanProcessor = {
       ...batch,
-      exporter: {} as SpanExporter,
+      exporter: {},
     };
     if (exporterType === 'console') {
       const processor: SpanProcessor = {
@@ -465,7 +464,7 @@ export function setMeterProvider(config: ConfigurationModel): void {
     const readerPeriodicInfo: PeriodicMetricReader = {
       interval,
       timeout: getNumberFromEnv('OTEL_METRIC_EXPORT_TIMEOUT') ?? 30000,
-      exporter: {} as PushMetricExporter,
+      exporter: {},
     };
 
     if (exporterType === 'console') {
@@ -612,7 +611,7 @@ export function setLoggerProvider(config: ConfigurationModel): void {
   }
 
   const batch: BatchLogRecordProcessor = {
-    exporter: {} as LogRecordExporter,
+    exporter: {},
     schedule_delay: getNumberFromEnv('OTEL_BLRP_SCHEDULE_DELAY') ?? 1000,
     export_timeout: getNumberFromEnv('OTEL_BLRP_EXPORT_TIMEOUT') ?? 30000,
     max_queue_size: getNumberFromEnv('OTEL_BLRP_MAX_QUEUE_SIZE') ?? 2048,
@@ -624,7 +623,7 @@ export function setLoggerProvider(config: ConfigurationModel): void {
     const exporterType = exportersType[i];
     const batchInfo: BatchLogRecordProcessor = {
       ...batch,
-      exporter: {} as LogRecordExporter,
+      exporter: {},
     };
     if (exporterType === 'console') {
       const processor: LogRecordProcessor = {
