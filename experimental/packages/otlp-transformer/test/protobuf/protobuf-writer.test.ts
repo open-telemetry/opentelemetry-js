@@ -137,7 +137,9 @@ describe('ProtobufWriter', function () {
       }
 
       // Repeated sfixed64 field12 (wire type 1 - 64-bit LE)
-      const field12Values = [0, 1, -1, 42, -42, 2147483647, -2147483648];
+      const field12Values = [
+        0, 1, -1, 42, -42, 2147483647, -2147483648, -4294967296,
+      ];
 
       const field12ExpectedWithProtobufJsPrecisionLoss = field12Values.map(
         val => Number(val)
