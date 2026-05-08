@@ -673,9 +673,7 @@ describe('startNodeSDK', function () {
       await sdk.shutdown();
     });
 
-    // TODO: this test was failing on main (masked by log_level compile error).
-    // Needs investigation — the OTLPProtoLogExporter instanceof check fails.
-    it.skip('should set up all allowed exporters', async () => {
+    it('should set up all allowed exporters', async () => {
       process.env.OTEL_LOGS_EXPORTER = 'console,otlp';
       const sdk = startNodeSDK({});
 
@@ -906,8 +904,7 @@ describe('startNodeSDK', function () {
       await sdk.shutdown();
     });
 
-    // TODO: pre-existing failure on main (masked by log_level compile error)
-    it.skip('should be able to use console and otlp exporters', async () => {
+    it('should be able to use console and otlp exporters', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'console, otlp';
       const sdk = startNodeSDK({});
 
@@ -940,8 +937,7 @@ describe('startNodeSDK', function () {
       await sdk.shutdown();
     });
 
-    // TODO: pre-existing failure on main (masked by log_level compile error)
-    it.skip('should not register the same exporter twice', async () => {
+    it('should not register the same exporter twice', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'console,otlp,console';
       const sdk = startNodeSDK({});
 
