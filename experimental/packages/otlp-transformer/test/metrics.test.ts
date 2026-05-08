@@ -1043,6 +1043,45 @@ describe('Metrics', () => {
         ProtobufMetricsSerializer.deserializeResponse(writer.finish())
       );
     });
+
+    it('does not throw when encountering unexpected wiretypes inside partialSuccess during deserialization', function () {
+      // Construct an ExportMetricsServiceResponse where the embedded
+      // ExportMetricsPartialSuccess has fields encoded with incorrect wire types.
+      // ExportMetricsPartialSuccess expects:
+      //   1: rejected_data_points (varint, wire type 0)
+      //   2: error_message (length-delimited, wire type 2)
+      const {
+        ProtobufWriter,
+      } = require('../src/common/protobuf/protobuf-writer');
+      const writer = new ProtobufWriter(128);
+
+      // Write field 1 (partial_success) with correct wire type 2 (length-delimited),
+      // but encode the inner fields with incorrect wire types.
+      writer.writeTag(1, 2);
+      const lengthVarintPosition = writer.startLengthDelimited();
+      const innerStartPos = writer.pos;
+
+      // Write field 1 (rejected_data_points, expects varint/wire type 0) with wire type 2 (length-delimited)
+      writer.writeTag(1, 2);
+      writer.writeString('not-a-number');
+
+      // Write field 2 (error_message, expects length-delimited/wire type 2) with wire type 0 (varint)
+      writer.writeTag(2, 0);
+      writer.writeVarint(12345);
+
+      // Write unknown field 99 with wire type 0 (varint)
+      writer.writeTag(99, 0);
+      writer.writeVarint(42);
+
+      writer.finishLengthDelimited(
+        lengthVarintPosition,
+        writer.pos - innerStartPos
+      );
+
+      assert.doesNotThrow(() =>
+        ProtobufMetricsSerializer.deserializeResponse(writer.finish())
+      );
+    });
   });
 
   describe('JsonMetricsSerializer', function () {
