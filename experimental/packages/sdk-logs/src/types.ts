@@ -61,7 +61,7 @@ export type LoggerConfigurator = (
   loggerScope: InstrumentationScope
 ) => Required<LoggerConfig>;
 
-export interface LoggerProviderConfig {
+export interface LoggerProviderOptions {
   /** Resource associated with trace telemetry  */
   resource?: Resource;
 
