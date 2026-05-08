@@ -27,7 +27,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * feat(otlp-transformer): replace protobufjs trace serialization with custom implementation [#6625](https://github.com/open-telemetry/opentelemetry-js/pull/6625) @pichlermarc
 * feat(configuration): auto-generate TypeScript types from OTel declarative config JSON schema (stable v1.0.0) using `json-schema-to-typescript` and `ajv` [#6533](https://github.com/open-telemetry/opentelemetry-js/pull/6533) @MikeGoldsmith
-* feat(otlp-transformer): replace protobufjs trace serialization with custom implementation [#6625](https://github.com/open-telemetry/opentelemetry-js/pull/6625) @pichlermarc
 * feat(configuration, sdk-node): `startNodeSDK()` code path now uses `log_level` configuration to setup a DiagConsoleLogger [#6668](https://github.com/open-telemetry/opentelemetry-js/pull/6668) @trentm
   * Note that allowed values for `log_level` in a configuration YAML file are *not* the same set as for `OTEL_LOG_LEVEL`. Use `log_level: trace` to see *all* logs (equivalent of `OTEL_LOG_LEVEL=ALL`). Use `log_level: fatal` to effectively disable the SDK's internal diagnostic logger (equivalent of `OTEL_LOG_LEVEL=NONE`).
   * If `log_level` is not specified, a diagnostic console logger at "info" level will be setup.
