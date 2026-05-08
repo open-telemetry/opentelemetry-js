@@ -111,7 +111,7 @@ describe('startNodeSDK', function () {
   describe('Basic Registration', function () {
     it('should return NOOP_SDK when disabled is true', async () => {
       process.env.OTEL_SDK_DISABLED = 'true';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSDK();
 
       assert.strictEqual(sdk, NOOP_SDK);
 
@@ -123,7 +123,7 @@ describe('startNodeSDK', function () {
       process.env.OTEL_TRACES_EXPORTER = 'none';
       process.env.OTEL_LOGS_EXPORTER = 'none';
       process.env.OTEL_METRICS_EXPORTER = 'none';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSDK();
 
       // These are minimal OTel functionality and always registered.
       assertDefaultContextManagerRegistered();
@@ -146,7 +146,7 @@ describe('startNodeSDK', function () {
       process.env.OTEL_LOG_LEVEL = 'ERROR';
 
       const spy = Sinon.spy(diag, 'setLogger');
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSDK();
 
       assert.strictEqual(spy.callCount, 1);
       assert.ok(spy.args[0][0] instanceof DiagConsoleLogger);
@@ -161,7 +161,7 @@ describe('startNodeSDK', function () {
       delete process.env.OTEL_LOG_LEVEL;
 
       const spy = Sinon.spy(diag, 'setLogger');
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSDK();
 
       assert.strictEqual(spy.callCount, 1);
       assert.ok(spy.args[0][0] instanceof DiagConsoleLogger);
