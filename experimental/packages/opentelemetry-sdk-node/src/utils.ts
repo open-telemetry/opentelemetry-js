@@ -84,7 +84,7 @@ import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/ex
 import type {
   BufferConfig,
   LogRecordExporter,
-  LoggerProviderConfig,
+  LoggerProviderOptions,
   LogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
 import {
@@ -564,7 +564,7 @@ export function getPeriodicMetricReaderFromConfiguration(
 /**
  * Get LoggerProviderConfig from environment variables.
  */
-export function getLoggerProviderConfigFromEnv(): LoggerProviderConfig {
+export function getLoggerProviderConfigFromEnv(): LoggerProviderOptions {
   return {
     logRecordLimits: {
       attributeCountLimit:
