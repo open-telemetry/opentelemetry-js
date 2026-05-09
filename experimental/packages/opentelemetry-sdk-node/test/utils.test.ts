@@ -34,8 +34,57 @@ import {
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import type { LoggerProviderConfig } from '@opentelemetry/sdk-logs';
-import { AggregationType, InstrumentType } from '@opentelemetry/sdk-metrics';
+import type { AggregationOption } from '@opentelemetry/sdk-metrics';
+import {
+  AggregationTemporality,
+  AggregationType,
+  InstrumentType,
+} from '@opentelemetry/sdk-metrics';
 import type { SpanLimits } from '@opentelemetry/sdk-trace-node';
+
+interface OtlpHttpTransportParameters {
+  url: string;
+  compression: string;
+  headers: () => Promise<Record<string, string>>;
+  agentFactory: (protocol: string) => Promise<{
+    options: {
+      ca?: Buffer;
+      cert?: Buffer;
+      key?: Buffer;
+    };
+  }>;
+}
+
+interface OtlpMetricExporterInternals {
+  _delegate: {
+    _timeout: number;
+    _transport: {
+      _transport: {
+        _parameters: OtlpHttpTransportParameters;
+      };
+    };
+  };
+  selectAggregation(instrumentType: InstrumentType): AggregationOption;
+  selectAggregationTemporality(
+    instrumentType: InstrumentType
+  ): AggregationTemporality;
+}
+
+interface PeriodicMetricReaderInternals {
+  _exporter: OtlpMetricExporterInternals;
+}
+
+function getMetricExporterInternals(
+  reader: unknown
+): OtlpMetricExporterInternals {
+  return (reader as PeriodicMetricReaderInternals)._exporter;
+}
+
+function getHttpTransportParameters(
+  exporter: OtlpMetricExporterInternals
+): OtlpHttpTransportParameters {
+  return exporter._delegate._transport._transport._parameters;
+}
 
 describe('getPropagatorFromEnv', function () {
   afterEach(() => {
@@ -431,6 +480,78 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
       warnStub,
       'Unsupported OTLP metrics encoding: invalid.'
     );
+  });
+
+  it('passes OTLP HTTP metric exporter connection options from configuration', async function () {
+    const reader = getPeriodicMetricReaderFromConfiguration({
+      interval: 7000,
+      timeout: 5000,
+      exporter: {
+        otlp_http: {
+          endpoint: 'https://collector.example/v1/metrics',
+          tls: {
+            ca_file: 'test/fixtures/ca.pem',
+            key_file: 'test/fixtures/ca-key.pem',
+            cert_file: 'test/fixtures/cert.pem',
+          },
+          headers_list: 'x-list=list-value,x-overridden=list-value',
+          headers: [
+            { name: 'x-test-header', value: 'test-value' },
+            { name: 'x-overridden', value: 'header-value' },
+          ],
+          compression: 'gzip',
+          timeout: 1234,
+        },
+      },
+    });
+
+    assert.ok(reader);
+    const exporter = getMetricExporterInternals(reader);
+    const parameters = getHttpTransportParameters(exporter);
+
+    assert.strictEqual(parameters.url, 'https://collector.example/v1/metrics');
+    assert.strictEqual(parameters.compression, 'gzip');
+    assert.strictEqual(exporter._delegate._timeout, 1234);
+    assert.deepStrictEqual(await parameters.headers(), {
+      'x-list': 'list-value',
+      'x-overridden': 'header-value',
+      'x-test-header': 'test-value',
+      'Content-Type': 'application/x-protobuf',
+    });
+
+    const agent = await parameters.agentFactory('https:');
+    assert.ok(agent.options.ca);
+    assert.ok(agent.options.key);
+    assert.ok(agent.options.cert);
+  });
+
+  it('passes OTLP HTTP metric exporter aggregation options from configuration', function () {
+    const reader = getPeriodicMetricReaderFromConfiguration({
+      exporter: {
+        otlp_http: {
+          encoding: 'json',
+          temporality_preference: 'delta',
+          default_histogram_aggregation: 'base2_exponential_bucket_histogram',
+        },
+      },
+    });
+
+    assert.ok(reader);
+    const exporter = getMetricExporterInternals(reader);
+
+    assert.strictEqual(
+      exporter.selectAggregationTemporality(InstrumentType.COUNTER),
+      AggregationTemporality.DELTA
+    );
+    assert.deepStrictEqual(
+      exporter.selectAggregation(InstrumentType.HISTOGRAM),
+      {
+        type: AggregationType.EXPONENTIAL_HISTOGRAM,
+      }
+    );
+    assert.deepStrictEqual(exporter.selectAggregation(InstrumentType.COUNTER), {
+      type: AggregationType.DEFAULT,
+    });
   });
 
   it('should return values for getInstrumentType', function () {

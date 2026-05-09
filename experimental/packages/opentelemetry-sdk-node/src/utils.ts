@@ -10,6 +10,7 @@ import {
   getNumberFromEnv,
   getStringFromEnv,
   getStringListFromEnv,
+  parseKeyPairsIntoRecord,
   W3CBaggagePropagator,
   W3CTraceContextPropagator,
 } from '@opentelemetry/core';
@@ -65,6 +66,7 @@ import type {
 } from '@opentelemetry/configuration';
 import type {
   AggregationOption,
+  AggregationSelector,
   IAttributesProcessor,
   IMetricReader,
   PushMetricExporter,
@@ -79,7 +81,10 @@ import {
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
-import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
+import {
+  AggregationTemporalityPreference,
+  OTLPMetricExporter as OTLPHttpMetricExporter,
+} from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
 import type {
   BufferConfig,
@@ -509,37 +514,88 @@ export function getOtlpMetricExporterFromEnv(): PushMetricExporter {
   return new OTLPProtoMetricExporter();
 }
 
+type OtlpHttpMetricExporterConfigModel = NonNullable<
+  PeriodicMetricReaderConfigModel['exporter']['otlp_http']
+>;
+
+function getMetricExporterCompression(
+  compression: string | undefined
+): CompressionAlgorithm {
+  return compression === 'gzip'
+    ? CompressionAlgorithm.GZIP
+    : CompressionAlgorithm.NONE;
+}
+
+function getMetricExporterTemporalityPreference(
+  temporalityPreference: OtlpHttpMetricExporterConfigModel['temporality_preference']
+): AggregationTemporalityPreference | undefined {
+  switch (temporalityPreference) {
+    case 'delta':
+      return AggregationTemporalityPreference.DELTA;
+    case 'low_memory':
+      return AggregationTemporalityPreference.LOWMEMORY;
+    case 'cumulative':
+      return AggregationTemporalityPreference.CUMULATIVE;
+    default:
+      return undefined;
+  }
+}
+
+function getMetricExporterDefaultHistogramAggregation(
+  defaultHistogramAggregation: OtlpHttpMetricExporterConfigModel['default_histogram_aggregation']
+): AggregationSelector | undefined {
+  if (defaultHistogramAggregation !== 'base2_exponential_bucket_histogram') {
+    return undefined;
+  }
+
+  return instrumentType => {
+    if (instrumentType === InstrumentType.HISTOGRAM) {
+      return { type: AggregationType.EXPONENTIAL_HISTOGRAM };
+    }
+    return { type: AggregationType.DEFAULT };
+  };
+}
+
+function getOtlpHttpMetricExporterConfig(
+  config: OtlpHttpMetricExporterConfigModel
+) {
+  return {
+    compression: getMetricExporterCompression(config.compression),
+    url: config.endpoint,
+    headers: getHeadersFromConfiguration(config.headers, config.headers_list),
+    timeoutMillis: config.timeout,
+    httpAgentOptions: getHttpAgentOptionsFromTls(config.tls),
+    temporalityPreference: getMetricExporterTemporalityPreference(
+      config.temporality_preference
+    ),
+    aggregationPreference: getMetricExporterDefaultHistogramAggregation(
+      config.default_histogram_aggregation
+    ),
+  };
+}
+
 export function getPeriodicMetricReaderFromConfiguration(
   periodic: PeriodicMetricReaderConfigModel
 ): IMetricReader | undefined {
   if (periodic.exporter) {
     let exporter;
     if (periodic.exporter.otlp_http) {
-      const encoding = periodic.exporter.otlp_http.encoding;
+      const config = periodic.exporter.otlp_http;
+      const encoding = config.encoding ?? 'protobuf';
+      const exporterConfig = getOtlpHttpMetricExporterConfig(config);
       if (encoding === 'json') {
-        exporter = new OTLPHttpMetricExporter({
-          compression:
-            periodic.exporter.otlp_http.compression === 'gzip'
-              ? CompressionAlgorithm.GZIP
-              : CompressionAlgorithm.NONE,
-        });
+        exporter = new OTLPHttpMetricExporter(exporterConfig);
       } else if (encoding === 'protobuf') {
-        exporter = new OTLPProtoMetricExporter({
-          compression:
-            periodic.exporter.otlp_http.compression === 'gzip'
-              ? CompressionAlgorithm.GZIP
-              : CompressionAlgorithm.NONE,
-        });
+        exporter = new OTLPProtoMetricExporter(exporterConfig);
       } else {
         diag.warn(`Unsupported OTLP metrics encoding: ${encoding}.`);
       }
     }
     if (periodic.exporter.otlp_grpc) {
       exporter = new OTLPGrpcMetricExporter({
-        compression:
-          periodic.exporter.otlp_grpc.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
+        compression: getMetricExporterCompression(
+          periodic.exporter.otlp_grpc.compression
+        ),
       });
     }
 
@@ -681,13 +737,14 @@ export function getLogRecordProcessorsFromConfiguration(
 }
 
 export function getHeadersFromConfiguration(
-  headers: NameStringValuePairConfigModel[] | undefined
+  headers: NameStringValuePairConfigModel[] | undefined,
+  headersList?: string
 ): Record<string, string> | undefined {
-  if (!headers) {
+  if (!headers && headersList === undefined) {
     return undefined;
   }
-  const result: Record<string, string> = {};
-  headers.forEach(header => {
+  const result: Record<string, string> = parseKeyPairsIntoRecord(headersList);
+  headers?.forEach(header => {
     result[header.name] = header.value;
   });
   return result;
