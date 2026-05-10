@@ -30,6 +30,7 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import * as util from 'util';
 import type { Span, SpanProcessor } from '../../src';
 import { BasicTracerProvider } from '../../src';
 import { SpanImpl } from '../../src/Span';
@@ -1934,6 +1935,45 @@ describe('Span', () => {
         });
         assert.deepStrictEqual(span.attributes, { foo: 'bar' });
       });
+    });
+  });
+
+  describe('util.inspect', () => {
+    it('should render with class tag and key fields', () => {
+      const span = new SpanImpl({
+        scope: tracer.instrumentationScope,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
+        spanContext,
+        name,
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+        attributes: { foo: 'bar' },
+      });
+
+      const out = util.inspect(span, { depth: 5, colors: false });
+      assert.ok(out.startsWith('SpanImpl '), `unexpected prefix: ${out}`);
+      assert.ok(out.includes(`name: '${name}'`));
+      assert.ok(out.includes(spanContext.traceId));
+      assert.ok(out.includes(spanContext.spanId));
+      assert.ok(out.includes("foo: 'bar'"));
+    });
+
+    it('should collapse to a stub when depth budget is exhausted', () => {
+      const span = new SpanImpl({
+        scope: tracer.instrumentationScope,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
+        spanContext,
+        name,
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
+
+      const out = util.inspect({ span }, { depth: 0, colors: false });
+      assert.ok(out.includes('[SpanImpl]'), `unexpected output: ${out}`);
     });
   });
 });

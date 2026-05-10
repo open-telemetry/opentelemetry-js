@@ -13,6 +13,8 @@ import { loadDefaultConfig } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
 import type { TracerConfig } from './types';
 import { reconfigureLimits } from './utility';
+import type { InspectFn, InspectStylizeOptions } from './inspect';
+import { formatInspect, inspectCustom } from './inspect';
 
 export enum ForceFlushState {
   'resolved',
@@ -124,5 +126,29 @@ export class BasicTracerProvider implements TracerProvider {
 
   shutdown(): Promise<void> {
     return this._activeSpanProcessor.shutdown();
+  }
+
+  [inspectCustom](
+    depth: number,
+    options: InspectStylizeOptions | undefined,
+    inspect: InspectFn | undefined
+  ): unknown {
+    const processors = this._activeSpanProcessor[
+      '_spanProcessors'
+    ] as SpanProcessor[];
+    const payload = {
+      resource: { attributes: this._resource.attributes },
+      tracers: Array.from(this._tracers.keys()),
+      spanProcessors: processors.map(
+        p => p.constructor?.name ?? 'SpanProcessor'
+      ),
+    };
+    return formatInspect(
+      'BasicTracerProvider',
+      payload,
+      depth,
+      options,
+      inspect
+    );
   }
 }
