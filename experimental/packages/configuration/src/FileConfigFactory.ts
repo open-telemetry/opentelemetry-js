@@ -7,9 +7,7 @@ import { getStringFromEnv } from '@opentelemetry/core';
 import type { ConfigFactory } from './IConfigFactory';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
-import { diag } from '@opentelemetry/api';
 import { envVariableSubstitution } from './utils';
-import { SeverityNumber } from './generated/types';
 import type {
   BatchLogRecordProcessor,
   BatchSpanProcessor,
@@ -40,35 +38,40 @@ export function parseConfigFile(): ConfigurationModel {
 
   // Apply env var substitution to all string values before schema parsing
   const rawParsed = yaml.parse(file) as Record<string, unknown>;
-  const substituted = substituteEnvVars(rawParsed) as Record<string, unknown>;
+  const processed = substituteEnvVars(rawParsed) as Record<string, unknown>;
 
-  const fileFormat = substituted?.file_format;
+  const fileFormat = processed?.file_format;
   if (!fileFormat || !supportedFileVersionPattern.test(String(fileFormat))) {
     throw new Error(
-      `Unsupported file_format: "${fileFormat}". Must match ${supportedFileVersionPattern}.`
+      `${configFile}: Unsupported file_format: "${fileFormat}". Must match ${supportedFileVersionPattern}.`
     );
   }
 
-  // Preprocess: convert null to [] for provider processors/readers so schema
-  // validation passes, then warn application-level after parse
-  const preprocessed = preprocessNullArrays(substituted) as Record<
-    string,
-    unknown
-  >;
-
   // Normalize YAML null type-tag values to {} before validation
-  normalizeYamlNulls(preprocessed);
+  normalizeYamlNulls(processed);
 
-  const valid = validateConfig(preprocessed);
+  const valid = validateConfig(processed);
   if (!valid) {
-    const firstError = validateConfig.errors?.[0];
-    const detail = firstError
-      ? `${firstError.instancePath} ${firstError.message}`
-      : 'unknown error';
-    throw new Error(`Invalid OpenTelemetry config file: ${detail.trim()}`);
+    let detail: string;
+    if (!validateConfig.errors) {
+      detail = 'unknown error';
+    } else if (validateConfig.errors.length === 1) {
+      const err = validateConfig.errors[0];
+      detail = `${err.instancePath} ${err.message}`;
+    } else {
+      const sep = '\n  ';
+      detail =
+        sep +
+        validateConfig.errors
+          .map(e => `${e.instancePath} ${e.message}`)
+          .join(sep);
+    }
+    throw new Error(
+      `Invalid OpenTelemetry config file: ${configFile}: ${detail}`
+    );
   }
 
-  const data = preprocessed as unknown as ConfigurationModel;
+  const data = processed as unknown as ConfigurationModel;
 
   // Strip file_format from output — it's a meta-field, not a config value
   delete (data as Record<string, unknown>)['file_format'];
@@ -79,7 +82,7 @@ export function parseConfigFile(): ConfigurationModel {
   // after YAML parsing so that accessing them returns `undefined`.
   // Runs after normalizeYamlNulls, which has already converted type-tag
   // nulls (e.g. `console:`) to `{}`.
-  stripNulls(preprocessed);
+  stripNulls(processed);
 
   applyConfigDefaults(data);
   mergeAttributesList(data);
@@ -87,17 +90,6 @@ export function parseConfigFile(): ConfigurationModel {
   applyBatchProcessorDefaults(data);
   applyPeriodicReaderDefaults(data);
   applyOtlpHttpEncodingDefaults(data);
-
-  // Warn for providers with empty processors/readers
-  if (data.tracer_provider?.processors?.length === 0) {
-    diag.warn('TracerProvider must have at least one processor configured');
-  }
-  if (data.meter_provider?.readers?.length === 0) {
-    diag.warn('MeterProvider must have at least one reader configured');
-  }
-  if (data.logger_provider?.processors?.length === 0) {
-    diag.warn('LoggerProvider must have at least one processor configured');
-  }
 
   return data;
 }
@@ -236,7 +228,7 @@ function applyConfigDefaults(data: ConfigurationModel): void {
     data.disabled = false;
   }
   if (data.log_level == null) {
-    data.log_level = SeverityNumber.Info;
+    data.log_level = 'info';
   }
   if (data.attribute_limits == null) {
     data.attribute_limits = { attribute_count_limit: 128 };
@@ -350,20 +342,6 @@ function normalizeYamlNulls(value: unknown): void {
       }
     }
   }
-}
-
-function preprocessNullArrays(obj: unknown): unknown {
-  if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) return obj;
-  const record = obj as Record<string, unknown>;
-  const result: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(record)) {
-    if ((k === 'processors' || k === 'readers') && v === null) {
-      result[k] = [];
-    } else {
-      result[k] = preprocessNullArrays(v);
-    }
-  }
-  return result;
 }
 
 const ENV_VAR_PATTERN = /\$\{[^}]+\}/;

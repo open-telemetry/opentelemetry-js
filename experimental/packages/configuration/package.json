@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/configuration",
-  "version": "0.216.0",
+  "version": "0.217.0",
   "description": "OpenTelemetry Configuration",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -9,7 +9,7 @@
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
-    "generate:config": "node ../../../scripts/config/generate-config.js",
+    "generate:config": "node ./scripts/generate-config.js",
     "test": "nyc mocha test/**/*.test.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -48,9 +48,10 @@
   "devDependencies": {
     "@opentelemetry/api": "^1.9.0",
     "@types/mocha": "10.0.10",
-    "ajv": "^8.0.0",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
+    "ajv": "^8.0.0",
+    "json-schema-to-typescript": "^15.0.0",
     "mocha": "11.7.5",
     "nyc": "17.1.0",
     "sinon": "18.0.1",

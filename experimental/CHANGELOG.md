@@ -10,18 +10,38 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(configuration): show all config validation errors, if there are multiple [#6683](https://github.com/open-telemetry/opentelemetry-js/pull/6683) @trentm
+* feat(sdk-node): allow startNodeSDK() without an arg [#6688](https://github.com/open-telemetry/opentelemetry-js/pull/6688) @trentm
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+* refactor(sdk-logs): alias `LoggerProviderConfig` to `LoggerProviderOptions` [#6691](https://github.com/open-telemetry/opentelemetry-js/pull/6691) @david-luna
+* refactor(sdk-logs): use `Logger.enabled()` within `Logger.emit()` implementation [#6680](https://github.com/open-telemetry/opentelemetry-js/pull/6680) @david-luna
+
+## 0.217.0
+
+### :rocket: Features
+
 * feat(otlp-transformer): replace protobufjs trace serialization with custom implementation [#6625](https://github.com/open-telemetry/opentelemetry-js/pull/6625) @pichlermarc
 * feat(configuration): auto-generate TypeScript types from OTel declarative config JSON schema (stable v1.0.0) using `json-schema-to-typescript` and `ajv` [#6533](https://github.com/open-telemetry/opentelemetry-js/pull/6533) @MikeGoldsmith
+* feat(configuration, sdk-node): `startNodeSDK()` code path now uses `log_level` configuration to setup a DiagConsoleLogger [#6668](https://github.com/open-telemetry/opentelemetry-js/pull/6668) @trentm
+  * Note that allowed values for `log_level` in a configuration YAML file are *not* the same set as for `OTEL_LOG_LEVEL`. Use `log_level: trace` to see *all* logs (equivalent of `OTEL_LOG_LEVEL=ALL`). Use `log_level: fatal` to effectively disable the SDK's internal diagnostic logger (equivalent of `OTEL_LOG_LEVEL=NONE`).
+  * If `log_level` is not specified, a diagnostic console logger at "info" level will be setup.
+  * An invalid YAML config file will now result in a noop OTel SDK.
 
 ### :bug: Bug Fixes
 
 * fix(configuration): do not validate `OTEL_CONFIG_FILE` value before using it for file config [#6643](https://github.com/open-telemetry/opentelemetry-js/pull/6643) @trentm
 * fix(configuration): improve how 'additionalProperties' in JSON schema is translated to TS types [#6650](https://github.com/open-telemetry/opentelemetry-js/pull/6650) @trentm
+* fix(configuration): remove stripMinItems and preprocessNullArrays from validation/parsing [#6657](https://github.com/open-telemetry/opentelemetry-js/pull/6657) @trentm
+* fix(configuration): improve handling of enums in generated types [#6659](https://github.com/open-telemetry/opentelemetry-js/pull/6659) @trentm
+* fix(configuration): improve the technique for removing '| null' on types the JSON Schema [#6662](https://github.com/open-telemetry/opentelemetry-js/pull/6662) @trentm
 * fix(sampler-jaeger-remote): add missing axios dep [#6656](https://github.com/open-telemetry/opentelemetry-js/pull/6656) @trentm
-
-### :books: Documentation
-
-### :house: Internal
+* fix(exporter-prometheus): handle malformed URLs in Prometheus exporter request handler [#6674](https://github.com/open-telemetry/opentelemetry-js/pull/6674) @homanp
 
 ## 0.216.0
 
@@ -32,6 +52,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(otlp-exporter-base): fix IPv6 address handling by passing URL object to http.request [#5768](https://github.com/open-telemetry/opentelemetry-js/issues/5768) @raphaeltorquat0
 * fix(instrumentation-xml-http-request): avoid unwrapping `XMLHttpRequest` API when disabling [#6611](https://github.com/open-telemetry/opentelemetry-js/pull/6611) @david-luna
 * fix(instrumentation-fetch): tolerate non-writable `globalThis.fetch` and fix premature `_isEnabled` / `_isFetchPatched` flips in `enable()` @brunorodmoreira
 * fix(instrumentation-xhr): resolve relative URLs before matching `ignoreUrls` [#6551](https://github.com/open-telemetry/opentelemetry-js/pull/6551) @Maximiliano-Zeballos

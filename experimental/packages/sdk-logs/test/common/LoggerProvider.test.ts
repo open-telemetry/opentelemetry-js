@@ -12,7 +12,11 @@ import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-import { LoggerProvider } from '../../src';
+import {
+  InMemoryLogRecordExporter,
+  LoggerProvider,
+  SimpleLogRecordProcessor,
+} from '../../src';
 import { NoopLogRecordProcessor } from '../../src/export/NoopLogRecordProcessor';
 import { DEFAULT_LOGGER_NAME } from './../../src/LoggerProvider';
 import { MultiLogRecordProcessor } from '../../src/MultiLogRecordProcessor';
@@ -313,7 +317,10 @@ describe('LoggerProvider', () => {
         readers: [metricReader],
       });
 
-      const logRecordProcessor = new NoopLogRecordProcessor();
+      const logRecordExporter = new InMemoryLogRecordExporter();
+      const logRecordProcessor = new SimpleLogRecordProcessor(
+        logRecordExporter
+      );
       const provider = new LoggerProvider({
         processors: [logRecordProcessor],
         meterProvider,
