@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { logs, NoopLogger } from '@opentelemetry/api-logs';
+import type { LogAttributes } from '@opentelemetry/api-logs';
 import { diag } from '@opentelemetry/api';
 import {
   defaultResource,
@@ -161,11 +162,22 @@ describe('LoggerProvider', () => {
     const testName = 'test name';
     const testVersion = 'test version';
     const testSchemaURL = 'test schema url';
+    const testScopeAttributes = {
+      service: 'payments',
+      nested: {
+        enabled: true,
+        region: 'us-east-1',
+      },
+      tags: ['prod', 'logs'],
+    };
 
     it('should create a logger instance with default name if the name is invalid ', () => {
       const provider = new LoggerProvider();
       const logger = provider.getLogger('') as Logger;
-      assert.strictEqual(logger.instrumentationScope.name, DEFAULT_LOGGER_NAME);
+      assert.strictEqual(
+        logger['_instrumentationScope'].name,
+        DEFAULT_LOGGER_NAME
+      );
     });
 
     it("should create a logger instance if the name doesn't exist", () => {
@@ -189,6 +201,30 @@ describe('LoggerProvider', () => {
       assert.strictEqual(sharedState.loggers.size, 3);
     });
 
+    it('should create a new object if scope attributes are not unique', function () {
+      // arrange
+      const provider = new LoggerProvider();
+      const sharedState = provider['_sharedState'];
+
+      // act
+      const logger1 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: testScopeAttributes,
+      });
+
+      const logger2 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: {
+          ...testScopeAttributes,
+          service: 'checkout',
+        },
+      });
+
+      // assert
+      assert.strictEqual(sharedState.loggers.size, 2);
+      assert.notStrictEqual(logger1, logger2);
+    });
+
     it('should not create A new object if the name & version & schemaUrl are unique', () => {
       const provider = new LoggerProvider();
       const sharedState = provider['_sharedState'];
@@ -205,6 +241,193 @@ describe('LoggerProvider', () => {
       });
       assert.strictEqual(sharedState.loggers.size, 2);
       assert.ok(logger2 instanceof Logger);
+      assert.strictEqual(logger1, logger2);
+    });
+
+    it('should not create a new object for equivalent scope attributes data', function () {
+      // arrange
+      const provider = new LoggerProvider();
+      const sharedState = provider['_sharedState'];
+
+      // act
+      const logger1 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: testScopeAttributes,
+      });
+
+      const logger2 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: {
+          tags: ['prod', 'logs'],
+          nested: {
+            region: 'us-east-1',
+            enabled: true,
+          },
+          service: 'payments',
+        },
+      });
+
+      // assert
+      assert.strictEqual(logger1, logger2);
+      assert.strictEqual(sharedState.loggers.size, 1);
+    });
+
+    it('should drop invalid scope attributes but still use distinct logger due to dropped attrs', () => {
+      // arrange
+      const warnStub = sinon.stub(diag, 'warn');
+      const provider = new LoggerProvider();
+      const circular: Record<string, unknown> = {};
+      circular.self = circular;
+      const invalidScopeAttributes = {
+        valid: 'payments',
+        invalid: circular,
+        '': 'empty-key',
+      } as unknown as LogAttributes;
+
+      // act
+      const logger1 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: invalidScopeAttributes,
+      });
+      const logger2 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: {
+          valid: 'payments',
+        },
+      });
+
+      // assert
+      assert.deepStrictEqual(
+        (logger1 as Logger)['_instrumentationScope'].attributes,
+        {
+          valid: 'payments',
+        }
+      );
+      assert.strictEqual(
+        (logger1 as Logger)['_instrumentationScope'].droppedAttributesCount,
+        2
+      );
+      assert.notStrictEqual(logger1, logger2);
+      sinon.assert.calledWith(
+        warnStub,
+        'Invalid attribute value set for key: invalid'
+      );
+      sinon.assert.calledWith(warnStub, 'Invalid attribute key: ');
+    });
+
+    it('should distinguish NaN from null in scope attributes', () => {
+      const provider = new LoggerProvider();
+      const logger1 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: { n: null },
+      });
+      const logger2 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: { n: NaN },
+      });
+      assert.notStrictEqual(logger1, logger2);
+    });
+
+    it('should distinguish Infinity from null in scope attributes', () => {
+      const provider = new LoggerProvider();
+      const logger1 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: { v: null },
+      });
+      const logger2 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: { v: Infinity },
+      });
+      assert.notStrictEqual(logger1, logger2);
+    });
+
+    it('should distinguish -Infinity from Infinity in scope attributes', () => {
+      const provider = new LoggerProvider();
+      const logger1 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: { v: Infinity },
+      });
+      const logger2 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: { v: -Infinity },
+      });
+      assert.notStrictEqual(logger1, logger2);
+    });
+
+    it('should distinguish -0 from 0 in scope attributes', () => {
+      const provider = new LoggerProvider();
+      const logger1 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: { v: 0 },
+      });
+      const logger2 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: { v: -0 },
+      });
+      assert.notStrictEqual(logger1, logger2);
+    });
+
+    it('should distinguish string "null" from null in scope attributes', () => {
+      const provider = new LoggerProvider();
+      const logger1 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: { v: null },
+      });
+      const logger2 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: { v: 'null' },
+      });
+      assert.notStrictEqual(logger1, logger2);
+    });
+
+    it('should return the same logger for identical special-value attributes', () => {
+      const provider = new LoggerProvider();
+      const logger1 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: { a: NaN, b: Infinity, c: -Infinity },
+      });
+      const logger2 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: { a: NaN, b: Infinity, c: -Infinity },
+      });
+      assert.strictEqual(logger1, logger2);
+    });
+
+    it('should distinguish Uint8Arrays from in scope attributes', () => {
+      const provider = new LoggerProvider();
+      const logger1 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: { v: new Uint8Array([1, 2, 3]) },
+      });
+      const logger2 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: { v: new Uint8Array([3, 2, 1]) },
+      });
+      assert.notStrictEqual(logger1, logger2);
+    });
+
+    it('should return the same logger for identical Uint8Array attributes', () => {
+      const provider = new LoggerProvider();
+      const logger1 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: { v: new Uint8Array([1, 2, 3]) },
+      });
+      const logger2 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: { v: new Uint8Array([1, 2, 3]) },
+      });
+      assert.strictEqual(logger1, logger2);
+    });
+
+    it('should return the same logger for empty scope attributes and no scope attributes', () => {
+      const provider = new LoggerProvider();
+      const logger1 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+      });
+      const logger2 = provider.getLogger(testName, testVersion, {
+        schemaUrl: testSchemaURL,
+        attributes: {},
+      });
       assert.strictEqual(logger1, logger2);
     });
   });
