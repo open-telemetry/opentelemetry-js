@@ -195,10 +195,17 @@ export class PrometheusExporter extends MetricReader {
     request: IncomingMessage,
     response: ServerResponse
   ) => {
-    if (
-      request.url != null &&
-      new URL(request.url, this._baseUrl).pathname === this._endpoint
-    ) {
+    let pathname: string | undefined;
+    try {
+      if (request.url != null) {
+        pathname = new URL(request.url, this._baseUrl).pathname;
+      }
+    } catch {
+      response.statusCode = 400;
+      response.end('Bad Request');
+      return;
+    }
+    if (pathname === this._endpoint) {
       this._exportMetrics(response);
     } else {
       this._notFound(response);

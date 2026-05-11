@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { diag } from '@opentelemetry/api';
-import type * as logsAPI from '@opentelemetry/api-logs';
+import type {
+  LoggerProvider as ILoggerProvider,
+  LoggerOptions as ILoggerOptions,
+  Logger as ILogger,
+} from '@opentelemetry/api-logs';
 import { NOOP_LOGGER } from '@opentelemetry/api-logs';
 import { defaultResource } from '@opentelemetry/resources';
 import { BindOnceFuture } from '@opentelemetry/core';
 
-import type { LoggerProviderConfig } from './types';
+import type { LoggerProviderOptions } from './types';
 import { Logger } from './Logger';
 import {
   DEFAULT_LOGGER_CONFIGURATOR,
@@ -22,11 +26,11 @@ import { normalizeScopeAttributes } from './utils/validation';
 
 export const DEFAULT_LOGGER_NAME = 'unknown';
 
-export class LoggerProvider implements logsAPI.LoggerProvider {
+export class LoggerProvider implements ILoggerProvider {
   private _shutdownOnce: BindOnceFuture<void>;
   private readonly _sharedState: LoggerProviderSharedState;
 
-  constructor(config: LoggerProviderConfig = {}) {
+  constructor(config: LoggerProviderOptions = {}) {
     const mergedConfig = {
       resource: config.resource ?? defaultResource(),
       forceFlushTimeoutMillis: config.forceFlushTimeoutMillis ?? 30000,
@@ -57,8 +61,8 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
   public getLogger(
     name: string,
     version?: string,
-    options?: logsAPI.LoggerOptions
-  ): logsAPI.Logger {
+    options?: ILoggerOptions
+  ): ILogger {
     if (this._shutdownOnce.isCalled) {
       diag.warn('A shutdown LoggerProvider cannot provide a Logger');
       return NOOP_LOGGER;

@@ -4,17 +4,18 @@
  */
 
 export type { ConfigFactory } from './IConfigFactory';
-export type { ConfigurationModel } from './models/configModel';
-export type { LogRecordExporter as LogRecordExporterConfigModel } from './models/loggerProviderModel';
 export type {
+  ConfigurationModel,
+  LogRecordExporter as LogRecordExporterConfigModel,
   PushMetricExporter as PushMetricExporterConfigModel,
   InstrumentType as InstrumentTypeConfigModel,
   Aggregation as AggregationConfigModel,
   PeriodicMetricReader as PeriodicMetricReaderConfigModel,
-} from './models/meterProviderModel';
-export type {
   Sampler as SamplerConfigModel,
   SpanExporter as SpanExporterConfigModel,
   SpanProcessor as SpanProcessorConfigModel,
-} from './models/tracerProviderModel';
+  NameStringValuePair as NameStringValuePairConfigModel,
+  HttpTls as HttpTlsConfigModel,
+  SeverityNumber as SeverityNumberConfigModel,
+} from './generated/types';
 export { createConfigFactory } from './ConfigFactory';

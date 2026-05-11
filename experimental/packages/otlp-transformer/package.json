@@ -4,7 +4,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.215.0",
+  "version": "0.217.0",
   "description": "Transform OpenTelemetry SDK data into OTLP",
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
@@ -17,10 +17,10 @@
     "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "protos": "npm run submodule && npm run protos:generate",
-    "protos:generate:js": "pbjs -t static-module -p ./protos -w commonjs --null-defaults -o ./src/generated/root.js ./protos/opentelemetry/proto/common/v1/common.proto ./protos/opentelemetry/proto/resource/v1/resource.proto ./protos/opentelemetry/proto/trace/v1/trace.proto ./protos/opentelemetry/proto/collector/trace/v1/trace_service.proto ./protos/opentelemetry/proto/metrics/v1/metrics.proto ./protos/opentelemetry/proto/collector/metrics/v1/metrics_service.proto && npm run protos:generate:js:tests",
+    "protos:generate:js": "pbjs -t static-module -p ./protos -w commonjs --null-defaults -o ./src/generated/root.js ./protos/opentelemetry/proto/common/v1/common.proto ./protos/opentelemetry/proto/resource/v1/resource.proto ./protos/opentelemetry/proto/metrics/v1/metrics.proto ./protos/opentelemetry/proto/collector/metrics/v1/metrics_service.proto && npm run protos:generate:js:tests",
     "protos:generate:js:tests": "npm run protos:generate:js:testbed && npm run protos:generate:js:test-signals",
     "protos:generate:js:testbed": "pbjs -t static-module -p ./test/fixtures -w commonjs --null-defaults -o ./test/generated/testbed.js ./test/fixtures/testbed.proto",
-    "protos:generate:js:test-signals": "pbjs -r signals -t static-module -p ./protos -w commonjs --null-defaults -o ./test/generated/signals.js ./protos/opentelemetry/proto/common/v1/common.proto ./protos/opentelemetry/proto/resource/v1/resource.proto ./protos/opentelemetry/proto/logs/v1/logs.proto ./protos/opentelemetry/proto/collector/logs/v1/logs_service.proto",
+    "protos:generate:js:test-signals": "pbjs -r signals -t static-module -p ./protos -w commonjs --null-defaults -o ./test/generated/signals.js ./protos/opentelemetry/proto/common/v1/common.proto ./protos/opentelemetry/proto/resource/v1/resource.proto ./protos/opentelemetry/proto/logs/v1/logs.proto ./protos/opentelemetry/proto/collector/logs/v1/logs_service.proto ./protos/opentelemetry/proto/trace/v1/trace.proto ./protos/opentelemetry/proto/collector/trace/v1/trace_service.proto",
     "protos:generate:ts": "pbts -o ./src/generated/root.d.ts ./src/generated/root.js && pbts -o ./test/generated/testbed.d.ts ./test/generated/testbed.js && pbts -o ./test/generated/signals.d.ts ./test/generated/signals.js",
     "protos:generate": "npm run protos:generate:js && npm run protos:generate:ts",
     "lint": "eslint . --ext .ts",
@@ -70,7 +70,7 @@
     "@types/mocha": "10.0.10",
     "@types/sinon": "^17.0.4",
     "@types/webpack-env": "1.16.3",
-    "babel-plugin-istanbul": "7.0.1",
+    "babel-plugin-istanbul": "8.0.0",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",
@@ -85,13 +85,13 @@
     "webpack": "5.104.1"
   },
   "dependencies": {
-    "@opentelemetry/api-logs": "0.215.0",
-    "@opentelemetry/core": "2.7.0",
-    "@opentelemetry/resources": "2.7.0",
-    "@opentelemetry/sdk-logs": "0.215.0",
-    "@opentelemetry/sdk-metrics": "2.7.0",
-    "@opentelemetry/sdk-trace-base": "2.7.0",
-    "protobufjs": "^8.0.1"
+    "@opentelemetry/api-logs": "0.217.0",
+    "@opentelemetry/core": "2.7.1",
+    "@opentelemetry/resources": "2.7.1",
+    "@opentelemetry/sdk-logs": "0.217.0",
+    "@opentelemetry/sdk-metrics": "2.7.1",
+    "@opentelemetry/sdk-trace-base": "2.7.1",
+    "protobufjs": "8.0.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-transformer",
   "sideEffects": false

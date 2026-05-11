@@ -6,40 +6,18 @@
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
 import type { ConfigurationModel } from '../src';
-import { diag, DiagLogLevel } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import { createConfigFactory } from '../src/ConfigFactory';
-import { OtlpHttpEncoding, SeverityNumber } from '../src/models/commonModel';
-import type {
-  MeterProvider,
-  MetricReader,
-} from '../src/models/meterProviderModel';
-import {
-  ExemplarFilter,
-  ExperimentalPrometheusTranslationStrategy,
-  ExporterDefaultHistogramAggregation,
-  ExporterTemporalityPreference,
-  InstrumentType,
-} from '../src/models/meterProviderModel';
 import {
   setAttributeLimits,
   setMeterProvider,
   setPropagators,
   setResources,
 } from '../src/EnvironmentConfigFactory';
-import {
-  parseConfigFile,
-  setResourceAttributes,
-  setAttributeLimits as setFileAttributeLimits,
-  setPropagator,
-  setMeterProvider as setFileMeterProvider,
-  getTemporalityPreference,
-  getSeverity,
-} from '../src/FileConfigFactory';
-import type { TracerProvider } from '../src/models/tracerProviderModel';
+import { parseConfigFile } from '../src/FileConfigFactory';
 
 const defaultConfig: ConfigurationModel = {
   disabled: false,
-  log_level: DiagLogLevel.INFO,
   resource: {},
   attribute_limits: {
     attribute_count_limit: 128,
@@ -47,7 +25,9 @@ const defaultConfig: ConfigurationModel = {
   propagator: {},
 };
 
-const defaultTracerProvider: TracerProvider = {
+const defaultTracerProvider: NonNullable<
+  ConfigurationModel['tracer_provider']
+> = {
   processors: [],
   limits: {
     attribute_count_limit: 128,
@@ -67,9 +47,11 @@ const defaultTracerProvider: TracerProvider = {
   },
 };
 
-const configFromFile: ConfigurationModel = {
+const tls = {};
+
+const configFromFile = {
   disabled: false,
-  log_level: DiagLogLevel.INFO,
+  log_level: 'info',
   resource: {
     attributes: [
       {
@@ -83,8 +65,7 @@ const configFromFile: ConfigurationModel = {
     attribute_count_limit: 128,
   },
   propagator: {
-    composite: [{ tracecontext: null }, { baggage: null }],
-    composite_list: 'tracecontext,baggage',
+    composite: [{ tracecontext: {} }, { baggage: {} }],
   },
   tracer_provider: {
     processors: [
@@ -97,9 +78,10 @@ const configFromFile: ConfigurationModel = {
           exporter: {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/traces',
+              tls,
               timeout: 10000,
               compression: 'gzip',
-              encoding: OtlpHttpEncoding.Protobuf,
+              encoding: 'protobuf',
             },
           },
         },
@@ -114,11 +96,11 @@ const configFromFile: ConfigurationModel = {
     },
     sampler: {
       parent_based: {
-        root: { always_on: undefined },
-        remote_parent_sampled: { always_on: undefined },
-        remote_parent_not_sampled: { always_off: undefined },
-        local_parent_sampled: { always_on: undefined },
-        local_parent_not_sampled: { always_off: undefined },
+        root: { always_on: {} },
+        remote_parent_sampled: { always_on: {} },
+        remote_parent_not_sampled: { always_off: {} },
+        local_parent_sampled: { always_on: {} },
+        local_parent_not_sampled: { always_off: {} },
       },
     },
   },
@@ -131,29 +113,19 @@ const configFromFile: ConfigurationModel = {
           exporter: {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/metrics',
+              tls,
               compression: 'gzip',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.Protobuf,
-              temporality_preference: ExporterTemporalityPreference.Cumulative,
-              default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+              temporality_preference: 'cumulative',
+              default_histogram_aggregation: 'explicit_bucket_histogram',
+              encoding: 'protobuf',
             },
           },
-          cardinality_limits: {
-            default: 2000,
-            counter: 2000,
-            gauge: 2000,
-            histogram: 2000,
-            observable_counter: 2000,
-            observable_gauge: 2000,
-            observable_up_down_counter: 2000,
-            up_down_counter: 2000,
-          },
+          cardinality_limits: { default: 2000 },
         },
       },
     ],
-    exemplar_filter: ExemplarFilter.TraceBased,
-    views: [],
+    exemplar_filter: 'trace_based',
   },
   logger_provider: {
     processors: [
@@ -166,9 +138,10 @@ const configFromFile: ConfigurationModel = {
           exporter: {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
+              tls,
               timeout: 10000,
-              encoding: OtlpHttpEncoding.Protobuf,
               compression: 'gzip',
+              encoding: 'protobuf',
             },
           },
         },
@@ -177,72 +150,52 @@ const configFromFile: ConfigurationModel = {
     limits: {
       attribute_count_limit: 128,
     },
-    'logger_configurator/development': {},
   },
 };
 
-const configFromKitchenSinkFile: ConfigurationModel = {
+const ksCardinality = {
+  default: 2000,
+  counter: 2000,
+  gauge: 2000,
+  histogram: 2000,
+  observable_counter: 2000,
+  observable_gauge: 2000,
+  observable_up_down_counter: 2000,
+  up_down_counter: 2000,
+};
+
+const ksPromExporter = (strategy: string) => ({
+  host: 'localhost',
+  port: 9464,
+  without_scope_info: false,
+  'without_target_info/development': false,
+  with_resource_constant_labels: {
+    included: ['service*'],
+    excluded: ['service.attr1'],
+  },
+  translation_strategy: strategy,
+});
+
+const configFromKitchenSinkFile = {
   disabled: false,
-  log_level: DiagLogLevel.INFO,
+  log_level: 'info',
   resource: {
-    schema_url: 'https://opentelemetry.io/schemas/1.16.0',
-    attributes_list: 'service.namespace=my-namespace,service.version=1.0.0',
     attributes: [
-      {
-        name: 'service.name',
-        value: 'unknown_service',
-        type: 'string',
-      },
-      {
-        name: 'string_key',
-        value: 'value',
-        type: 'string',
-      },
-      {
-        name: 'bool_key',
-        value: true,
-        type: 'bool',
-      },
-      {
-        name: 'int_key',
-        value: 1,
-        type: 'int',
-      },
-      {
-        name: 'double_key',
-        value: 1.1,
-        type: 'double',
-      },
+      { name: 'service.name', value: 'unknown_service', type: 'string' },
+      { name: 'string_key', value: 'value', type: 'string' },
+      { name: 'bool_key', value: true, type: 'bool' },
+      { name: 'int_key', value: 1, type: 'int' },
+      { name: 'double_key', value: 1.1, type: 'double' },
       {
         name: 'string_array_key',
         value: ['value1', 'value2'],
         type: 'string_array',
       },
-      {
-        name: 'bool_array_key',
-        value: [true, false],
-        type: 'bool_array',
-      },
-      {
-        name: 'int_array_key',
-        value: [1, 2],
-        type: 'int_array',
-      },
-      {
-        name: 'double_array_key',
-        value: [1.1, 2.2],
-        type: 'double_array',
-      },
-      {
-        name: 'service.namespace',
-        type: 'string',
-        value: 'my-namespace',
-      },
-      {
-        name: 'service.version',
-        type: 'string',
-        value: '1.0.0',
-      },
+      { name: 'bool_array_key', value: [true, false], type: 'bool_array' },
+      { name: 'int_array_key', value: [1, 2], type: 'int_array' },
+      { name: 'double_array_key', value: [1.1, 2.2], type: 'double_array' },
+      { name: 'service.namespace', value: 'my-namespace', type: 'string' },
+      { name: 'service.version', value: '1.0.0', type: 'string' },
     ],
     'detection/development': {
       attributes: {
@@ -258,20 +211,22 @@ const configFromKitchenSinkFile: ConfigurationModel = {
         { service: {} },
       ],
     },
+    schema_url: 'https://opentelemetry.io/schemas/1.16.0',
+    attributes_list: 'service.namespace=my-namespace,service.version=1.0.0',
   },
   attribute_limits: {
-    attribute_count_limit: 128,
     attribute_value_length_limit: 4096,
+    attribute_count_limit: 128,
   },
   propagator: {
     composite: [
-      { tracecontext: null },
-      { baggage: null },
-      { b3: null },
-      { b3multi: null },
-      { jaeger: null },
-      { ottrace: null },
-      { xray: null },
+      { tracecontext: {} },
+      { baggage: {} },
+      { b3: {} },
+      { b3multi: {} },
+      { jaeger: {} },
+      { ottrace: {} },
+      { xray: {} },
     ],
     composite_list: 'tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray',
   },
@@ -286,7 +241,6 @@ const configFromKitchenSinkFile: ConfigurationModel = {
           exporter: {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/traces',
-              timeout: 10000,
               tls: {
                 ca_file: '/app/cert.pem',
                 key_file: '/app/cert.pem',
@@ -295,7 +249,8 @@ const configFromKitchenSinkFile: ConfigurationModel = {
               headers: [{ name: 'api-key', value: '1234' }],
               headers_list: 'api-key=1234',
               compression: 'gzip',
-              encoding: OtlpHttpEncoding.Protobuf,
+              timeout: 10000,
+              encoding: 'protobuf',
             },
           },
         },
@@ -309,7 +264,6 @@ const configFromKitchenSinkFile: ConfigurationModel = {
           exporter: {
             otlp_grpc: {
               endpoint: 'http://localhost:4317',
-              timeout: 10000,
               tls: {
                 ca_file: '/app/cert.pem',
                 key_file: '/app/cert.pem',
@@ -319,6 +273,7 @@ const configFromKitchenSinkFile: ConfigurationModel = {
               headers: [{ name: 'api-key', value: '1234' }],
               headers_list: 'api-key=1234',
               compression: 'gzip',
+              timeout: 10000,
             },
           },
         },
@@ -342,24 +297,16 @@ const configFromKitchenSinkFile: ConfigurationModel = {
           export_timeout: 30000,
           max_queue_size: 2048,
           max_export_batch_size: 512,
-          exporter: {
-            'otlp_file/development': {
-              output_stream: 'stdout',
-            },
-          },
+          exporter: { 'otlp_file/development': { output_stream: 'stdout' } },
         },
       },
       {
-        simple: {
-          exporter: {
-            console: {},
-          },
-        },
+        simple: { exporter: { console: {} } },
       },
     ],
     limits: {
-      attribute_count_limit: 128,
       attribute_value_length_limit: 4096,
+      attribute_count_limit: 128,
       event_count_limit: 128,
       link_count_limit: 128,
       event_attribute_count_limit: 128,
@@ -367,8 +314,8 @@ const configFromKitchenSinkFile: ConfigurationModel = {
     },
     sampler: {
       parent_based: {
-        root: { always_on: undefined },
-        remote_parent_sampled: { always_on: undefined },
+        root: { always_on: {} },
+        remote_parent_sampled: { always_on: {} },
         remote_parent_not_sampled: {
           'probability/development': { ratio: 0.01 },
         },
@@ -381,7 +328,7 @@ const configFromKitchenSinkFile: ConfigurationModel = {
                     key: 'http.route',
                     values: ['/healthz', '/livez'],
                   },
-                  sampler: { always_off: undefined },
+                  sampler: { always_off: {} },
                 },
                 {
                   attribute_patterns: {
@@ -389,7 +336,7 @@ const configFromKitchenSinkFile: ConfigurationModel = {
                     included: ['/internal/*'],
                     excluded: ['/internal/special/*'],
                   },
-                  sampler: { always_on: undefined },
+                  sampler: { always_on: {} },
                 },
                 {
                   parent: ['none'],
@@ -403,7 +350,7 @@ const configFromKitchenSinkFile: ConfigurationModel = {
             },
           },
         },
-        local_parent_not_sampled: { always_off: undefined },
+        local_parent_not_sampled: { always_off: {} },
       },
     },
   },
@@ -412,133 +359,45 @@ const configFromKitchenSinkFile: ConfigurationModel = {
       {
         pull: {
           exporter: {
-            'prometheus/development': {
-              host: 'localhost',
-              port: 9464,
-              without_scope_info: false,
-              without_target_info: false,
-              with_resource_constant_labels: {
-                included: ['service*'],
-                excluded: ['service.attr1'],
-              },
-              translation_strategy:
-                ExperimentalPrometheusTranslationStrategy.UnderscoreEscapingWithSuffixes,
-            },
+            'prometheus/development': ksPromExporter(
+              'underscore_escaping_with_suffixes'
+            ),
           },
-          producers: [
-            {
-              opencensus: {},
-            },
-          ],
-          cardinality_limits: {
-            default: 2000,
-            counter: 2000,
-            gauge: 2000,
-            histogram: 2000,
-            observable_counter: 2000,
-            observable_gauge: 2000,
-            observable_up_down_counter: 2000,
-            up_down_counter: 2000,
-          },
+          producers: [{ opencensus: {} }],
+          cardinality_limits: ksCardinality,
         },
       },
       {
         pull: {
           exporter: {
-            'prometheus/development': {
-              host: 'localhost',
-              port: 9464,
-              without_scope_info: false,
-              without_target_info: false,
-              with_resource_constant_labels: {
-                included: ['service*'],
-                excluded: ['service.attr1'],
-              },
-              translation_strategy:
-                ExperimentalPrometheusTranslationStrategy.UnderscoreEscapingWithoutSuffixes,
-            },
+            'prometheus/development': ksPromExporter(
+              'underscore_escaping_without_suffixes/development'
+            ),
           },
-          producers: [
-            {
-              opencensus: {},
-            },
-          ],
-          cardinality_limits: {
-            default: 2000,
-            counter: 2000,
-            gauge: 2000,
-            histogram: 2000,
-            observable_counter: 2000,
-            observable_gauge: 2000,
-            observable_up_down_counter: 2000,
-            up_down_counter: 2000,
-          },
+          producers: [{ opencensus: {} }],
+          cardinality_limits: ksCardinality,
         },
       },
       {
         pull: {
           exporter: {
-            'prometheus/development': {
-              host: 'localhost',
-              port: 9464,
-              without_scope_info: false,
-              without_target_info: false,
-              with_resource_constant_labels: {
-                included: ['service*'],
-                excluded: ['service.attr1'],
-              },
-              translation_strategy:
-                ExperimentalPrometheusTranslationStrategy.NoUtf8EscapingWithSuffixes,
-            },
+            'prometheus/development': ksPromExporter(
+              'no_utf8_escaping_with_suffixes/development'
+            ),
           },
-          producers: [
-            {
-              opencensus: {},
-            },
-          ],
-          cardinality_limits: {
-            default: 2000,
-            counter: 2000,
-            gauge: 2000,
-            histogram: 2000,
-            observable_counter: 2000,
-            observable_gauge: 2000,
-            observable_up_down_counter: 2000,
-            up_down_counter: 2000,
-          },
+          producers: [{ opencensus: {} }],
+          cardinality_limits: ksCardinality,
         },
       },
       {
         pull: {
           exporter: {
-            'prometheus/development': {
-              host: 'localhost',
-              port: 9464,
-              without_scope_info: false,
-              without_target_info: false,
-              with_resource_constant_labels: {
-                included: ['service*'],
-                excluded: ['service.attr1'],
-              },
-              translation_strategy:
-                ExperimentalPrometheusTranslationStrategy.NoTranslation,
-            },
+            'prometheus/development': ksPromExporter(
+              'no_translation/development'
+            ),
           },
-          producers: [
-            {
-              opencensus: {},
-            },
-          ],
-          cardinality_limits: {
-            default: 2000,
-            counter: 2000,
-            gauge: 2000,
-            histogram: 2000,
-            observable_counter: 2000,
-            observable_gauge: 2000,
-            observable_up_down_counter: 2000,
-            up_down_counter: 2000,
-          },
+          producers: [{ opencensus: {} }],
+          cardinality_limits: ksCardinality,
         },
       },
       {
@@ -553,36 +412,18 @@ const configFromKitchenSinkFile: ConfigurationModel = {
                 key_file: '/app/cert.pem',
                 cert_file: '/app/cert.pem',
               },
-              headers: [
-                {
-                  name: 'api-key',
-                  value: '1234',
-                },
-              ],
+              headers: [{ name: 'api-key', value: '1234' }],
               headers_list: 'api-key=1234',
               compression: 'gzip',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.Protobuf,
-              temporality_preference: ExporterTemporalityPreference.Delta,
+              encoding: 'protobuf',
+              temporality_preference: 'delta',
               default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+                'base2_exponential_bucket_histogram',
             },
           },
-          producers: [
-            {
-              opencensus: {},
-            },
-          ],
-          cardinality_limits: {
-            default: 2000,
-            counter: 2000,
-            gauge: 2000,
-            histogram: 2000,
-            observable_counter: 2000,
-            observable_gauge: 2000,
-            observable_up_down_counter: 2000,
-            up_down_counter: 2000,
-          },
+          producers: [{ opencensus: {} }],
+          cardinality_limits: ksCardinality,
         },
       },
       {
@@ -598,110 +439,69 @@ const configFromKitchenSinkFile: ConfigurationModel = {
                 cert_file: '/app/cert.pem',
                 insecure: false,
               },
-              headers: [
-                {
-                  name: 'api-key',
-                  value: '1234',
-                },
-              ],
+              headers: [{ name: 'api-key', value: '1234' }],
               headers_list: 'api-key=1234',
               compression: 'gzip',
               timeout: 10000,
-              temporality_preference: ExporterTemporalityPreference.Delta,
+              temporality_preference: 'delta',
               default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+                'base2_exponential_bucket_histogram',
             },
           },
-          cardinality_limits: {
-            default: 2000,
-            counter: 2000,
-            gauge: 2000,
-            histogram: 2000,
-            observable_counter: 2000,
-            observable_gauge: 2000,
-            observable_up_down_counter: 2000,
-            up_down_counter: 2000,
-          },
+          cardinality_limits: { default: 2000 },
         },
       },
       {
         periodic: {
-          timeout: 30000,
           interval: 60000,
+          timeout: 30000,
           exporter: {
             'otlp_file/development': {
               output_stream: 'file:///var/log/metrics.jsonl',
-              temporality_preference: ExporterTemporalityPreference.Delta,
+              temporality_preference: 'delta',
               default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+                'base2_exponential_bucket_histogram',
             },
           },
-          cardinality_limits: {
-            default: 2000,
-            counter: 2000,
-            gauge: 2000,
-            histogram: 2000,
-            observable_counter: 2000,
-            observable_gauge: 2000,
-            observable_up_down_counter: 2000,
-            up_down_counter: 2000,
-          },
+          cardinality_limits: { default: 2000 },
         },
       },
       {
         periodic: {
-          timeout: 30000,
           interval: 60000,
+          timeout: 30000,
           exporter: {
             'otlp_file/development': {
               output_stream: 'stdout',
-              temporality_preference: ExporterTemporalityPreference.Delta,
+              temporality_preference: 'delta',
               default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+                'base2_exponential_bucket_histogram',
             },
           },
-          cardinality_limits: {
-            default: 2000,
-            counter: 2000,
-            gauge: 2000,
-            histogram: 2000,
-            observable_counter: 2000,
-            observable_gauge: 2000,
-            observable_up_down_counter: 2000,
-            up_down_counter: 2000,
-          },
+          cardinality_limits: { default: 2000 },
         },
       },
       {
         periodic: {
-          timeout: 30000,
           interval: 60000,
+          timeout: 30000,
           exporter: {
             console: {
-              temporality_preference: ExporterTemporalityPreference.Delta,
+              temporality_preference: 'delta',
               default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
+                'base2_exponential_bucket_histogram',
             },
           },
-          cardinality_limits: {
-            default: 2000,
-            counter: 2000,
-            gauge: 2000,
-            histogram: 2000,
-            observable_counter: 2000,
-            observable_gauge: 2000,
-            observable_up_down_counter: 2000,
-            up_down_counter: 2000,
-          },
+          cardinality_limits: { default: 2000 },
         },
       },
     ],
-    exemplar_filter: ExemplarFilter.TraceBased,
+    exemplar_filter: 'trace_based',
     views: [
       {
         selector: {
           instrument_name: 'my-instrument',
-          instrument_type: InstrumentType.Histogram,
+          instrument_type: 'histogram',
           unit: 'ms',
           meter_name: 'my-meter',
           meter_version: '1.0.0',
@@ -720,10 +520,7 @@ const configFromKitchenSinkFile: ConfigurationModel = {
             },
           },
           aggregation_cardinality_limit: 2000,
-          attribute_keys: {
-            included: ['key1', 'key2'],
-            excluded: ['key3'],
-          },
+          attribute_keys: { included: ['key1', 'key2'], excluded: ['key3'] },
         },
       },
     ],
@@ -739,8 +536,6 @@ const configFromKitchenSinkFile: ConfigurationModel = {
           exporter: {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
-              timeout: 10000,
-              encoding: OtlpHttpEncoding.Protobuf,
               tls: {
                 ca_file: '/app/cert.pem',
                 key_file: '/app/cert.pem',
@@ -749,20 +544,21 @@ const configFromKitchenSinkFile: ConfigurationModel = {
               headers: [{ name: 'api-key', value: '1234' }],
               headers_list: 'api-key=1234',
               compression: 'gzip',
+              timeout: 10000,
+              encoding: 'protobuf',
             },
           },
         },
       },
       {
         batch: {
-          schedule_delay: 1000,
+          schedule_delay: 5000,
           export_timeout: 30000,
           max_queue_size: 2048,
           max_export_batch_size: 512,
           exporter: {
             otlp_grpc: {
               endpoint: 'http://localhost:4317',
-              timeout: 10000,
               tls: {
                 ca_file: '/app/cert.pem',
                 key_file: '/app/cert.pem',
@@ -772,13 +568,14 @@ const configFromKitchenSinkFile: ConfigurationModel = {
               headers: [{ name: 'api-key', value: '1234' }],
               headers_list: 'api-key=1234',
               compression: 'gzip',
+              timeout: 10000,
             },
           },
         },
       },
       {
         batch: {
-          schedule_delay: 1000,
+          schedule_delay: 5000,
           export_timeout: 30000,
           max_queue_size: 2048,
           max_export_batch_size: 512,
@@ -791,39 +588,29 @@ const configFromKitchenSinkFile: ConfigurationModel = {
       },
       {
         batch: {
-          schedule_delay: 1000,
+          schedule_delay: 5000,
           export_timeout: 30000,
           max_queue_size: 2048,
           max_export_batch_size: 512,
-          exporter: {
-            'otlp_file/development': {
-              output_stream: 'stdout',
-            },
-          },
+          exporter: { 'otlp_file/development': { output_stream: 'stdout' } },
         },
       },
       {
-        simple: {
-          exporter: {
-            console: {},
-          },
-        },
+        simple: { exporter: { console: {} } },
       },
     ],
     limits: {
-      attribute_count_limit: 128,
       attribute_value_length_limit: 4096,
+      attribute_count_limit: 128,
     },
     'logger_configurator/development': {
-      default_config: {
-        enabled: true,
-      },
+      default_config: { enabled: true },
       loggers: [
         {
           name: 'io.opentelemetry.contrib.*',
           config: {
             enabled: false,
-            minimum_severity: SeverityNumber.INFO,
+            minimum_severity: 'info',
             trace_based: true,
           },
         },
@@ -832,9 +619,11 @@ const configFromKitchenSinkFile: ConfigurationModel = {
   },
 };
 
+const nullTls = {};
+
 const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
   disabled: false,
-  log_level: DiagLogLevel.INFO,
+  log_level: 'info',
   resource: {
     attributes: [
       {
@@ -848,7 +637,7 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
     attribute_count_limit: 128,
   },
   propagator: {
-    composite: [{ tracecontext: null }, { baggage: null }],
+    composite: [{ tracecontext: {} }, { baggage: {} }],
     composite_list: 'tracecontext,baggage',
   },
   tracer_provider: {
@@ -863,8 +652,9 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/traces',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.Protobuf,
               compression: 'gzip',
+              tls: nullTls,
+              encoding: 'protobuf',
             },
           },
         },
@@ -879,11 +669,11 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
     },
     sampler: {
       parent_based: {
-        root: { always_on: undefined },
-        remote_parent_sampled: { always_on: undefined },
-        remote_parent_not_sampled: { always_off: undefined },
-        local_parent_sampled: { always_on: undefined },
-        local_parent_not_sampled: { always_off: undefined },
+        root: { always_on: {} },
+        remote_parent_sampled: { always_on: {} },
+        remote_parent_not_sampled: { always_off: {} },
+        local_parent_sampled: { always_on: {} },
+        local_parent_not_sampled: { always_off: {} },
       },
     },
   },
@@ -896,29 +686,19 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
           exporter: {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/metrics',
-              encoding: OtlpHttpEncoding.Protobuf,
               compression: 'gzip',
               timeout: 10000,
-              temporality_preference: ExporterTemporalityPreference.Cumulative,
-              default_histogram_aggregation:
-                ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+              temporality_preference: 'cumulative',
+              default_histogram_aggregation: 'explicit_bucket_histogram',
+              tls: nullTls,
+              encoding: 'protobuf',
             },
           },
-          cardinality_limits: {
-            default: 2000,
-            counter: 2000,
-            gauge: 2000,
-            histogram: 2000,
-            observable_counter: 2000,
-            observable_gauge: 2000,
-            observable_up_down_counter: 2000,
-            up_down_counter: 2000,
-          },
+          cardinality_limits: { default: 2000 },
         },
       },
     ],
-    exemplar_filter: ExemplarFilter.TraceBased,
-    views: [],
+    exemplar_filter: 'trace_based',
   },
   logger_provider: {
     processors: [
@@ -932,8 +712,9 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
-              encoding: OtlpHttpEncoding.Protobuf,
               compression: 'gzip',
+              tls: nullTls,
+              encoding: 'protobuf',
             },
           },
         },
@@ -942,57 +723,21 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
     limits: {
       attribute_count_limit: 128,
     },
-    'logger_configurator/development': {},
-  },
-};
-
-const readerExample: MetricReader = {
-  periodic: {
-    interval: 60000,
-    timeout: 30000,
-    exporter: {
-      otlp_http: {
-        endpoint: 'http://localhost:4318/v1/metrics',
-        tls: {
-          ca_file: '/app/cert.pem',
-          key_file: '/app/cert.pem',
-          cert_file: '/app/cert.pem',
-        },
-        headers: [
-          {
-            name: 'api-key',
-            value: '1234',
-          },
-        ],
-        headers_list: 'api-key=1234',
-        compression: 'gzip',
-        timeout: 10000,
-        encoding: OtlpHttpEncoding.Protobuf,
-        temporality_preference: ExporterTemporalityPreference.Delta,
-        default_histogram_aggregation:
-          ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
-      },
-    },
-    producers: [
-      {
-        opencensus: {},
-      },
-    ],
-    cardinality_limits: {
-      default: 2000,
-      counter: 2000,
-      gauge: 2000,
-      histogram: 2000,
-      observable_counter: 2000,
-      observable_gauge: 2000,
-      observable_up_down_counter: 2000,
-      up_down_counter: 2000,
-    },
   },
 };
 
 describe('ConfigFactory', function () {
   const _origEnvVariables = { ...process.env };
+
+  beforeEach(function () {
+    // Clear all OTEL_ env vars so tests run in a hermetic environment,
+    // regardless of what the user's shell has set.
+    for (const key of Object.keys(process.env)) {
+      if (key.startsWith('OTEL_')) {
+        delete process.env[key];
+      }
+    }
+  });
 
   afterEach(function () {
     for (const key of Object.keys(process.env)) {
@@ -1037,7 +782,7 @@ describe('ConfigFactory', function () {
       process.env.OTEL_LOG_LEVEL = 'DEBUG';
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
-        log_level: DiagLogLevel.DEBUG,
+        log_level: 'debug',
       };
       const configFactory = createConfigFactory();
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
@@ -1224,8 +969,9 @@ describe('ConfigFactory', function () {
       const configFactory = createConfigFactory();
       const config = configFactory.getConfigModel();
       assert.deepStrictEqual(config, defaultConfig);
-      assert.strictEqual(config.propagator?.composite, undefined);
-      assert.strictEqual(config.propagator?.composite_list, undefined);
+      const p = config.propagator;
+      assert.strictEqual(p?.composite, undefined);
+      assert.strictEqual(p?.composite_list, undefined);
     });
 
     it('should return config with custom propagator', function () {
@@ -1233,7 +979,7 @@ describe('ConfigFactory', function () {
       const expectedConfig: ConfigurationModel = {
         ...defaultConfig,
         propagator: {
-          composite: [{ tracecontext: null }, { jaeger: null }],
+          composite: [{ tracecontext: {} }, { jaeger: {} }],
           composite_list: 'tracecontext,jaeger',
         },
       };
@@ -1265,7 +1011,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/traces',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -1302,7 +1048,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/traces',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -1340,7 +1086,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/traces',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -1377,7 +1123,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/traces',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -1414,7 +1160,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/traces',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -1452,7 +1198,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/traces',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -1530,7 +1276,7 @@ describe('ConfigFactory', function () {
                     compression: 'gzip',
                     timeout: 2000,
                     headers_list: 'host=localhost',
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -1570,7 +1316,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/traces',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.JSON,
+                    encoding: 'json',
                   },
                 },
               },
@@ -1620,7 +1366,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/traces',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -1725,16 +1471,16 @@ describe('ConfigFactory', function () {
                     compression: 'gzip',
                     timeout: 300,
                     headers_list: 'host=localhost',
-                    temporality_preference: ExporterTemporalityPreference.Delta,
+                    temporality_preference: 'delta',
                     default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                      'base2_exponential_bucket_histogram',
+                    encoding: 'protobuf',
                   },
                 },
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.AlwaysOn,
+          exemplar_filter: 'always_on',
           views: [],
         },
       };
@@ -1759,7 +1505,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           views: [],
         },
       };
@@ -1781,13 +1527,13 @@ describe('ConfigFactory', function () {
                     host: 'localhost',
                     port: 9464,
                     without_scope_info: false,
-                    without_target_info: false,
+                    'without_target_info/development': false,
                   },
                 },
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           views: [],
         },
       };
@@ -1811,13 +1557,13 @@ describe('ConfigFactory', function () {
                     host: '0.0.0.0',
                     port: 8080,
                     without_scope_info: false,
-                    without_target_info: false,
+                    'without_target_info/development': false,
                   },
                 },
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           views: [],
         },
       };
@@ -1843,13 +1589,11 @@ describe('ConfigFactory', function () {
                 timeout: 30000,
                 exporter: {
                   otlp_http: {
-                    default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
-                    temporality_preference:
-                      ExporterTemporalityPreference.Cumulative,
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                    temporality_preference: 'cumulative',
                     endpoint: 'http://localhost:4318/v1/metrics',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -1864,7 +1608,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           views: [],
         },
       };
@@ -1891,10 +1635,8 @@ describe('ConfigFactory', function () {
                 timeout: 30000,
                 exporter: {
                   otlp_grpc: {
-                    default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
-                    temporality_preference:
-                      ExporterTemporalityPreference.Cumulative,
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                    temporality_preference: 'cumulative',
                     endpoint: 'http://localhost:4317',
                     timeout: 10000,
                     tls: {
@@ -1909,7 +1651,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           views: [],
         },
       };
@@ -1934,8 +1676,8 @@ describe('ConfigFactory', function () {
                 exporter: {
                   otlp_grpc: {
                     default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.Base2ExponentialBucketHistogram,
-                    temporality_preference: ExporterTemporalityPreference.Delta,
+                      'base2_exponential_bucket_histogram',
+                    temporality_preference: 'delta',
                     endpoint: 'http://localhost:4317',
                     timeout: 10000,
                   },
@@ -1943,7 +1685,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           views: [],
         },
       };
@@ -1966,10 +1708,8 @@ describe('ConfigFactory', function () {
                 timeout: 30000,
                 exporter: {
                   otlp_grpc: {
-                    default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
-                    temporality_preference:
-                      ExporterTemporalityPreference.LowMemory,
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                    temporality_preference: 'low_memory',
                     endpoint: 'http://localhost:4317',
                     timeout: 10000,
                   },
@@ -1977,7 +1717,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           views: [],
         },
       };
@@ -2001,10 +1741,8 @@ describe('ConfigFactory', function () {
                 timeout: 30000,
                 exporter: {
                   otlp_grpc: {
-                    default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
-                    temporality_preference:
-                      ExporterTemporalityPreference.Cumulative,
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                    temporality_preference: 'cumulative',
                     endpoint: 'http://localhost:4317',
                     timeout: 10000,
                   },
@@ -2012,7 +1750,7 @@ describe('ConfigFactory', function () {
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           views: [],
         },
       };
@@ -2033,19 +1771,17 @@ describe('ConfigFactory', function () {
                 timeout: 30000,
                 exporter: {
                   otlp_http: {
-                    default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
-                    temporality_preference:
-                      ExporterTemporalityPreference.Cumulative,
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
+                    temporality_preference: 'cumulative',
                     endpoint: 'http://localhost:4318/v1/metrics',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.JSON,
+                    encoding: 'json',
                   },
                 },
               },
             },
           ],
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           views: [],
         },
       };
@@ -2095,7 +1831,7 @@ describe('ConfigFactory', function () {
                     compression: 'gzip',
                     timeout: 700,
                     headers_list: 'host=localhost',
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -2157,7 +1893,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/logs',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -2244,7 +1980,7 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://localhost:4318/v1/logs',
                     timeout: 10000,
-                    encoding: OtlpHttpEncoding.JSON,
+                    encoding: 'json',
                   },
                 },
               },
@@ -2286,7 +2022,7 @@ describe('ConfigFactory', function () {
                     endpoint: 'http://backup.com:4318/v1/traces',
                     timeout: 12000,
                     compression: 'backup_compression',
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                     tls: {
                       ca_file: 'backup_certificate_file.pem',
                       key_file: 'backup_client_key.pem',
@@ -2300,7 +2036,7 @@ describe('ConfigFactory', function () {
           ],
         },
         meter_provider: {
-          exemplar_filter: ExemplarFilter.TraceBased,
+          exemplar_filter: 'trace_based',
           readers: [
             {
               periodic: {
@@ -2311,17 +2047,15 @@ describe('ConfigFactory', function () {
                     endpoint: 'http://backup.com:4318/v1/metrics',
                     timeout: 12000,
                     compression: 'backup_compression',
-                    temporality_preference:
-                      ExporterTemporalityPreference.Cumulative,
-                    default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                    temporality_preference: 'cumulative',
+                    default_histogram_aggregation: 'explicit_bucket_histogram',
                     tls: {
                       ca_file: 'backup_certificate_file.pem',
                       key_file: 'backup_client_key.pem',
                       cert_file: 'backup_client_certificate.pem',
                     },
                     headers_list: 'backup_headers=123',
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                   },
                 },
               },
@@ -2345,7 +2079,7 @@ describe('ConfigFactory', function () {
                     endpoint: 'http://backup.com:4318/v1/logs',
                     timeout: 12000,
                     compression: 'backup_compression',
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                     tls: {
                       ca_file: 'backup_certificate_file.pem',
                       key_file: 'backup_client_key.pem',
@@ -2400,19 +2134,17 @@ describe('ConfigFactory', function () {
       process.env.OTEL_METRICS_EXPORTER = 'otlp';
       setMeterProvider(config);
 
-      let expectedMeterProvider: MeterProvider = {
-        exemplar_filter: ExemplarFilter.AlwaysOff,
+      let expectedMeterProvider: ConfigurationModel['meter_provider'] = {
+        exemplar_filter: 'always_off',
         readers: [
           {
             periodic: {
               exporter: {
                 otlp_http: {
-                  default_histogram_aggregation:
-                    ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
-                  encoding: OtlpHttpEncoding.Protobuf,
+                  default_histogram_aggregation: 'explicit_bucket_histogram',
+                  encoding: 'protobuf',
                   endpoint: 'http://localhost:4318/v1/metrics',
-                  temporality_preference:
-                    ExporterTemporalityPreference.LowMemory,
+                  temporality_preference: 'low_memory',
                   timeout: 10000,
                 },
               },
@@ -2432,18 +2164,16 @@ describe('ConfigFactory', function () {
       process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'default';
       setMeterProvider(config);
       expectedMeterProvider = {
-        exemplar_filter: ExemplarFilter.TraceBased,
+        exemplar_filter: 'trace_based',
         readers: [
           {
             periodic: {
               exporter: {
                 otlp_http: {
-                  default_histogram_aggregation:
-                    ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
-                  encoding: OtlpHttpEncoding.Protobuf,
+                  default_histogram_aggregation: 'explicit_bucket_histogram',
+                  encoding: 'protobuf',
                   endpoint: 'http://localhost:4318/v1/metrics',
-                  temporality_preference:
-                    ExporterTemporalityPreference.Cumulative,
+                  temporality_preference: 'cumulative',
                   timeout: 10000,
                 },
               },
@@ -2499,7 +2229,7 @@ describe('ConfigFactory', function () {
         'composite/development': {
           rule_based: {
             rules: [
-              { sampler: { always_on: undefined } },
+              { sampler: { always_on: {} } },
               { sampler: { probability: { ratio: 0.5 } } },
             ],
           },
@@ -2521,7 +2251,7 @@ describe('ConfigFactory', function () {
                   key: 'http.method',
                   values: ['GET'],
                 },
-                sampler: { always_on: undefined },
+                sampler: { always_on: {} },
               },
             ],
           },
@@ -2529,23 +2259,27 @@ describe('ConfigFactory', function () {
       });
     });
 
-    it('should return error from invalid config file', function () {
-      const warnSpy = Sinon.spy(diag, 'warn');
-      process.env.OTEL_CONFIG_FILE = './fixtures/invalid.txt';
-      createConfigFactory();
-      Sinon.assert.calledWith(
-        warnSpy,
-        'Config file ./fixtures/invalid.txt set on OTEL_CONFIG_FILE is not valid'
-      );
+    it('should throw on non-existant config file', function () {
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/no-such-file.txt';
+      try {
+        createConfigFactory();
+      } catch (err) {
+        assert.ok(err);
+        assert.equal(err.code, 'ENOENT');
+      }
     });
 
-    it('should return error from invalid config file format', function () {
-      const warnSpy = Sinon.spy(diag, 'warn');
+    it('should throw from invalid config file format', function () {
       process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
-      createConfigFactory();
-      Sinon.assert.calledWith(
-        warnSpy,
-        'Unsupported File Format: invalid. It must be one of the following: 1.0-rc.3'
+      assert.throws(() => createConfigFactory(), /Unsupported file_format/);
+    });
+
+    it('should show multiple validation errors for invalid config', function () {
+      process.env.OTEL_CONFIG_FILE =
+        'test/fixtures/invalid-multiple-errors.yaml';
+      assert.throws(
+        () => createConfigFactory(),
+        /Invalid OpenTelemetry config file: .*?:.*must be string.*must be number/s
       );
     });
 
@@ -2566,18 +2300,14 @@ describe('ConfigFactory', function () {
       const configFactory = createConfigFactory();
       const expectedConfig: ConfigurationModel = {
         disabled: false,
-        log_level: DiagLogLevel.INFO,
+        log_level: 'info',
         attribute_limits: {
           attribute_count_limit: 128,
         },
         resource: {
           attributes_list: 'service.instance.id=123',
           attributes: [
-            {
-              name: 'service.instance.id',
-              value: '123',
-              type: 'string',
-            },
+            { name: 'service.instance.id', value: '123', type: 'string' },
           ],
         },
       };
@@ -2624,10 +2354,9 @@ describe('ConfigFactory', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_COMPRESSION = 'metric-compression';
       process.env.OTEL_EXPORTER_OTLP_METRICS_TIMEOUT = '22';
       process.env.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'metric-header';
-      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE =
-        'metric-temporality';
+      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'delta';
       process.env.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
-        'metric-hist-agg';
+        'base2_exponential_bucket_histogram';
       process.env.OTEL_METRICS_EXEMPLAR_FILTER = 'always_off';
       process.env.OTEL_BLRP_SCHEDULE_DELAY = '23';
       process.env.OTEL_BLRP_EXPORT_TIMEOUT = '24';
@@ -2667,7 +2396,7 @@ describe('ConfigFactory', function () {
           attribute_value_length_limit: 23,
         },
         propagator: {
-          composite: [{ b3multi: null }],
+          composite: [{ b3multi: {} }],
           composite_list: 'b3multi',
         },
         tracer_provider: {
@@ -2695,7 +2424,7 @@ describe('ConfigFactory', function () {
                       cert_file: 'trace-client-certificate',
                     },
                     compression: 'trace-compression',
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                     endpoint: 'http://test.com:4318/v1/traces',
                     headers_list: 'trace-headers',
                     timeout: 1213,
@@ -2706,7 +2435,7 @@ describe('ConfigFactory', function () {
           ],
         },
         meter_provider: {
-          exemplar_filter: ExemplarFilter.AlwaysOff,
+          exemplar_filter: 'always_off',
           readers: [
             {
               periodic: {
@@ -2716,34 +2445,23 @@ describe('ConfigFactory', function () {
                   otlp_http: {
                     endpoint: 'http://test.com:4318/v1/metrics',
                     timeout: 22,
-                    temporality_preference:
-                      ExporterTemporalityPreference.Cumulative,
+                    temporality_preference: 'delta',
                     default_histogram_aggregation:
-                      ExporterDefaultHistogramAggregation.ExplicitBucketHistogram,
+                      'base2_exponential_bucket_histogram',
                     tls: {
                       ca_file: 'metric-certificate',
                       key_file: 'metric-client-key',
                       cert_file: 'metric-client-certificate',
                     },
                     compression: 'metric-compression',
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                     headers_list: 'metric-header',
                   },
                 },
-                cardinality_limits: {
-                  default: 2000,
-                  counter: 2000,
-                  gauge: 2000,
-                  histogram: 2000,
-                  observable_counter: 2000,
-                  observable_gauge: 2000,
-                  observable_up_down_counter: 2000,
-                  up_down_counter: 2000,
-                },
+                cardinality_limits: { default: 2000 },
               },
             },
           ],
-          views: [],
         },
         logger_provider: {
           ...defaultConfigFromFileWithEnvVariables.logger_provider,
@@ -2766,7 +2484,7 @@ describe('ConfigFactory', function () {
                       cert_file: 'logs-client-certificate',
                     },
                     compression: 'logs-compression',
-                    encoding: OtlpHttpEncoding.Protobuf,
+                    encoding: 'protobuf',
                     endpoint: 'http://test.com:4318/v1/logs',
                     headers_list: 'logs-header',
                     timeout: 27,
@@ -2791,21 +2509,11 @@ describe('ConfigFactory', function () {
       );
     });
 
-    it('checks for incomplete providers', function () {
-      const warnSpy = Sinon.spy(diag, 'warn');
+    it('should throw for empty processors (minItems)', function () {
       process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid-providers.yaml';
-      createConfigFactory();
-      Sinon.assert.calledWith(
-        warnSpy.firstCall,
-        'TracerProvider must have at least one processor configured'
-      );
-      Sinon.assert.calledWith(
-        warnSpy.secondCall,
-        'MeterProvider must have at least one reader configured'
-      );
-      Sinon.assert.calledWith(
-        warnSpy.thirdCall,
-        'LoggerProvider must have at least one processor configured'
+      assert.throws(
+        () => createConfigFactory(),
+        /Invalid OpenTelemetry config file: .*?: \/logger_provider\/processors must be array/
       );
     });
 
@@ -2814,7 +2522,7 @@ describe('ConfigFactory', function () {
       const configFactory = createConfigFactory();
       const expectedConfig: ConfigurationModel = {
         disabled: false,
-        log_level: DiagLogLevel.INFO,
+        log_level: 'info',
         attribute_limits: {
           attribute_count_limit: 128,
         },
@@ -2826,7 +2534,6 @@ describe('ConfigFactory', function () {
             {
               name: 'service.name',
               value: 'config-name',
-              type: 'string',
             },
             {
               name: 'service.namespace',
@@ -2884,21 +2591,42 @@ describe('ConfigFactory', function () {
       assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
     });
 
+    it('leaves attribute type undefined when omitted in YAML', function () {
+      // The spec says "if omitted, string is used" for attribute type, but we intentionally
+      // do NOT apply this default in the config parser. The consumer (SDK init code) is
+      // responsible for interpreting undefined type as string. This matches the Java/Python
+      // pattern where the model faithfully mirrors the config file and semantic defaults
+      // are applied at the point of use.
+      process.env.OTEL_CONFIG_FILE =
+        'test/fixtures/attribute-type-omitted.yaml';
+      const config = parseConfigFile();
+      const attrs = (config as Record<string, unknown>).resource as {
+        attributes: { name: string; value: string; type?: string }[];
+      };
+      const noTypeAttr = attrs.attributes.find(a => a.name === 'no-type-key');
+      const explicitAttr = attrs.attributes.find(
+        a => a.name === 'explicit-string-key'
+      );
+      assert.strictEqual(noTypeAttr?.type, undefined);
+      assert.strictEqual(explicitAttr?.type, 'string');
+    });
+
     it('checks to keep good code coverage', function () {
       process.env.OTEL_CONFIG_FILE = 'test/fixtures/test-for-coverage.yaml';
 
-      let config = {};
-      parseConfigFile(config);
+      const config = parseConfigFile();
       assert.deepStrictEqual(config, {
+        disabled: false,
+        log_level: 'info',
+        attribute_limits: {
+          attribute_count_limit: 128,
+        },
         resource: {},
         propagator: {
-          composite: [{ tracecontext: null }],
+          composite: [{ tracecontext: {} }],
           composite_list: 'tracecontext',
         },
         logger_provider: {
-          limits: {
-            attribute_count_limit: 128,
-          },
           processors: [
             {
               simple: {
@@ -2922,343 +2650,6 @@ describe('ConfigFactory', function () {
           },
         },
       });
-
-      config = {};
-      setResourceAttributes(config, [], '');
-      assert.deepStrictEqual(config, { resource: {} });
-
-      config = {};
-      setFileAttributeLimits(config, { attribute_count_limit: 128 });
-      assert.deepStrictEqual(config, {
-        attribute_limits: { attribute_count_limit: 128 },
-      });
-
-      config = {};
-      setPropagator(config, { composite: [{ tracecontext: null }] });
-      assert.deepStrictEqual(config, {
-        propagator: {
-          composite: [{ tracecontext: null }],
-          composite_list: 'tracecontext',
-        },
-      });
-
-      const res = getTemporalityPreference(
-        ExporterTemporalityPreference.LowMemory
-      );
-      assert.deepStrictEqual(res, 'low_memory');
-
-      config = {};
-      setFileMeterProvider(config, {
-        readers: [readerExample],
-        exemplar_filter: ExemplarFilter.AlwaysOn,
-        views: [{ selector: { instrument_type: InstrumentType.Counter } }],
-      });
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          exemplar_filter: 'always_on',
-          readers: [readerExample],
-          views: [{ selector: { instrument_type: 'counter' } }],
-        },
-      });
-
-      config = {};
-      setFileMeterProvider(config, {
-        readers: [readerExample],
-        views: [{ selector: { instrument_type: InstrumentType.Gauge } }],
-      });
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          exemplar_filter: 'trace_based',
-          readers: [readerExample],
-          views: [{ selector: { instrument_type: 'gauge' } }],
-        },
-      });
-
-      config = {};
-      setFileMeterProvider(config, {
-        readers: [readerExample],
-        views: [
-          { selector: { instrument_type: InstrumentType.ObservableCounter } },
-        ],
-      });
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          exemplar_filter: 'trace_based',
-          readers: [readerExample],
-          views: [{ selector: { instrument_type: 'observable_counter' } }],
-        },
-      });
-
-      config = {};
-      setFileMeterProvider(config, {
-        readers: [readerExample],
-        views: [
-          { selector: { instrument_type: InstrumentType.ObservableGauge } },
-        ],
-      });
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          exemplar_filter: 'trace_based',
-          readers: [readerExample],
-          views: [{ selector: { instrument_type: 'observable_gauge' } }],
-        },
-      });
-
-      config = {};
-      setFileMeterProvider(config, {
-        readers: [readerExample],
-        views: [
-          {
-            selector: {
-              instrument_type: InstrumentType.ObservableUpDownCounter,
-            },
-          },
-        ],
-      });
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          exemplar_filter: 'trace_based',
-          readers: [readerExample],
-          views: [
-            { selector: { instrument_type: 'observable_up_down_counter' } },
-          ],
-        },
-      });
-
-      config = {};
-      setFileMeterProvider(config, {
-        readers: [readerExample],
-        views: [
-          { selector: { instrument_type: InstrumentType.UpDownCounter } },
-        ],
-        exemplar_filter: 'default' as ExemplarFilter,
-      });
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          exemplar_filter: 'trace_based',
-          readers: [readerExample],
-          views: [{ selector: { instrument_type: 'up_down_counter' } }],
-        },
-      });
-
-      config = {};
-      setFileMeterProvider(config, {
-        views: [{ stream: { aggregation: { default: {} } } }],
-        readers: [readerExample],
-      });
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          exemplar_filter: 'trace_based',
-          readers: [readerExample],
-          views: [
-            {
-              stream: {
-                aggregation: {
-                  default: {},
-                },
-              },
-            },
-          ],
-        },
-      });
-
-      config = {};
-      setFileMeterProvider(config, {
-        views: [{ stream: { aggregation: { drop: {} } } }],
-        readers: [readerExample],
-      });
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          exemplar_filter: 'trace_based',
-          readers: [readerExample],
-          views: [
-            {
-              stream: {
-                aggregation: {
-                  drop: {},
-                },
-              },
-            },
-          ],
-        },
-      });
-
-      config = {};
-      setFileMeterProvider(config, {
-        views: [{ stream: { aggregation: { last_value: {} } } }],
-        readers: [readerExample],
-      });
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          exemplar_filter: 'trace_based',
-          readers: [readerExample],
-          views: [
-            {
-              stream: {
-                aggregation: {
-                  last_value: {},
-                },
-              },
-            },
-          ],
-        },
-      });
-
-      config = {};
-      setFileMeterProvider(config, {
-        views: [{ stream: { aggregation: { sum: {} } } }],
-        readers: [readerExample],
-      });
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          exemplar_filter: 'trace_based',
-          readers: [readerExample],
-          views: [
-            {
-              stream: {
-                aggregation: {
-                  sum: {},
-                },
-              },
-            },
-          ],
-        },
-      });
-
-      config = {};
-      setFileMeterProvider(config, {
-        views: [
-          {
-            stream: {
-              aggregation: {
-                base2_exponential_bucket_histogram: {
-                  record_min_max: false,
-                  max_scale: 20,
-                  max_size: 160,
-                },
-              },
-            },
-          },
-        ],
-        readers: [readerExample],
-      });
-      assert.deepStrictEqual(config, {
-        meter_provider: {
-          exemplar_filter: 'trace_based',
-          readers: [readerExample],
-          views: [
-            {
-              stream: {
-                aggregation: {
-                  base2_exponential_bucket_histogram: {
-                    record_min_max: false,
-                    max_scale: 20,
-                    max_size: 160,
-                  },
-                },
-              },
-            },
-          ],
-        },
-      });
-
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.DEBUG),
-        SeverityNumber.DEBUG
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.DEBUG2),
-        SeverityNumber.DEBUG2
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.DEBUG3),
-        SeverityNumber.DEBUG3
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.DEBUG4),
-        SeverityNumber.DEBUG4
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.INFO),
-        SeverityNumber.INFO
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.INFO2),
-        SeverityNumber.INFO2
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.INFO3),
-        SeverityNumber.INFO3
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.INFO4),
-        SeverityNumber.INFO4
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.WARN),
-        SeverityNumber.WARN
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.WARN2),
-        SeverityNumber.WARN2
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.WARN3),
-        SeverityNumber.WARN3
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.WARN4),
-        SeverityNumber.WARN4
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.ERROR),
-        SeverityNumber.ERROR
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.ERROR2),
-        SeverityNumber.ERROR2
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.ERROR3),
-        SeverityNumber.ERROR3
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.ERROR4),
-        SeverityNumber.ERROR4
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.FATAL),
-        SeverityNumber.FATAL
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.FATAL2),
-        SeverityNumber.FATAL2
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.FATAL3),
-        SeverityNumber.FATAL3
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.FATAL4),
-        SeverityNumber.FATAL4
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.TRACE),
-        SeverityNumber.TRACE
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.TRACE2),
-        SeverityNumber.TRACE2
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.TRACE3),
-        SeverityNumber.TRACE3
-      );
-      assert.deepStrictEqual(
-        getSeverity(SeverityNumber.TRACE4),
-        SeverityNumber.TRACE4
-      );
-      assert.deepStrictEqual(getSeverity(undefined), undefined);
     });
   });
 });

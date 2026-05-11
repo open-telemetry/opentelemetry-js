@@ -13,6 +13,7 @@ import {
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
 import type { SdkLogRecord } from './SdkLogRecord';
+import type { Context } from '@opentelemetry/api';
 
 /**
  * An implementation of the {@link LogRecordProcessor} interface that exports
@@ -34,7 +35,7 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
     this._unresolvedExports = new Set<Promise<void>>();
   }
 
-  public onEmit(logRecord: SdkLogRecord): void {
+  public onEmit(logRecord: SdkLogRecord, _context?: Context): void {
     if (this._shutdownOnce.isCalled) {
       return;
     }

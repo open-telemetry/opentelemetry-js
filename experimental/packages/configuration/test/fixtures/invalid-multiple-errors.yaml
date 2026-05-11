@@ -1,0 +1,8 @@
+file_format: "1.0"
+resource:
+  attributes:
+    - name: my.null
+      # This results in multiple ajv validation errors, one for each
+      # element of the 'oneOf' for supported attribute value types.
+      # (At least if/until extended/complex attributes are supported.)
+      value: {}
