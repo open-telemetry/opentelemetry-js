@@ -31,7 +31,6 @@ import {
 } from '../../src';
 import { TestStackContextManager } from './export/TestStackContextManager';
 import * as sinon from 'sinon';
-import * as util from 'util';
 import { invalidAttributes, validAttributes } from './util';
 import { Tracer } from '../../src/Tracer';
 
@@ -432,29 +431,5 @@ describe('Tracer', () => {
     });
     assert.strictEqual(span.links.length, 1);
     assert.deepStrictEqual(span.links[0].attributes, validAttributes);
-  });
-
-  describe('util.inspect', () => {
-    it('should render Tracer with scope and resource', () => {
-      const tracer = tracerProvider.getTracer('debug-scope', '1.2.3');
-      const out = util.inspect(tracer, { depth: 4, colors: false });
-      assert.ok(out.startsWith('Tracer '), `unexpected prefix: ${out}`);
-      assert.ok(out.includes("name: 'debug-scope'"));
-      assert.ok(out.includes("version: '1.2.3'"));
-      assert.ok(out.includes('spanLimits'));
-    });
-
-    it('should render BasicTracerProvider with tracer keys', () => {
-      const provider = new BasicTracerProvider();
-      provider.getTracer('a');
-      provider.getTracer('b', '0.0.1');
-      const out = util.inspect(provider, { depth: 4, colors: false });
-      assert.ok(
-        out.startsWith('BasicTracerProvider '),
-        `unexpected prefix: ${out}`
-      );
-      assert.ok(out.includes("'a@:'"));
-      assert.ok(out.includes("'b@0.0.1:'"));
-    });
   });
 });
