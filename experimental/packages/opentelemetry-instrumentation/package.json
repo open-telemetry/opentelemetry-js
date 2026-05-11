@@ -2,13 +2,55 @@
   "name": "@opentelemetry/instrumentation",
   "version": "0.217.0",
   "description": "Base class for node which OpenTelemetry instrumentation modules extend",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./hook.mjs": "./hook.mjs",
+    "./platform": {
+      "import": {
+        "types": "./dist/platform/index.d.mts",
+        "default": "./dist/platform/index.mjs"
+      },
+      "require": {
+        "types": "./dist/platform/index.d.cts",
+        "default": "./dist/platform/index.cjs"
+      }
+    },
+    "./platform/browser": {
+      "import": {
+        "types": "./dist/platform/browser/index.d.mts",
+        "default": "./dist/platform/browser/index.mjs"
+      },
+      "require": {
+        "types": "./dist/platform/browser/index.d.cts",
+        "default": "./dist/platform/browser/index.cjs"
+      }
+    }
+  },
+  "browser": {
+    "./dist/platform/node/index.mjs": "./dist/platform/browser/index.mjs",
+    "./dist/platform/node/index.cjs": "./dist/platform/browser/index.cjs",
+    "./dist/platform/node/instrumentation.mjs": "./dist/platform/browser/instrumentation.mjs",
+    "./dist/platform/node/instrumentation.cjs": "./dist/platform/browser/instrumentation.cjs",
+    "./dist/platform/node/normalize.mjs": "./dist/platform/browser/noop-normalize.mjs",
+    "./dist/platform/node/normalize.cjs": "./dist/platform/browser/noop-normalize.cjs",
+    "./dist/platform/index.mjs": "./dist/platform/browser/index.mjs",
+    "./dist/platform/index.cjs": "./dist/platform/browser/index.cjs"
+  },
   "author": "OpenTelemetry Authors",
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation",
   "license": "Apache-2.0",
-  "main": "build/src/index.js",
-  "module": "build/esm/index.js",
-  "esnext": "build/esnext/index.js",
-  "types": "build/src/index.d.ts",
   "publishConfig": {
     "access": "public"
   },
@@ -16,43 +58,29 @@
     "type": "git",
     "url": "git+https://github.com/open-telemetry/opentelemetry-js.git"
   },
-  "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts",
-    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
-    "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
-    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
-  },
   "files": [
-    "build/esm/**/*.js",
-    "build/esm/**/*.js.map",
-    "build/esm/**/*.d.ts",
-    "build/esnext/**/*.js",
-    "build/esnext/**/*.js.map",
-    "build/esnext/**/*.d.ts",
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
     "hook.mjs",
     "doc",
     "LICENSE",
     "LICENSES/**/*",
-    "README.md"
+    "README.md",
+    "dist"
   ],
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "compile": "tsdown",
+    "clean": "rimraf dist build",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "tdd": "npm run tdd:node",
     "tdd:node": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
     "test:cjs": "nyc mocha 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
-    "test:esm": "nyc node --experimental-loader=./hook.mjs ../../../node_modules/mocha/bin/mocha 'test/node/*.test.mjs'",
+    "test:esm": "nyc node --experimental-loader=./hook.mjs run-mocha.mjs 'test/node/*.test.mjs'",
     "test": "npm run test:cjs && npm run test:esm",
     "test:browser": "karma start --single-run",
     "version": "node ../../../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "watch": "tsdown --watch --no-clean",
     "prewatch": "node ../../../scripts/version-update.js",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"

@@ -30,9 +30,12 @@ jobs:
       - name: Generate version.ts files
         run: npm run version:update
 
-      - name: Build 🔧
+      # propagation-validation-server is plain JS post-tsdown migration but it
+      # `require()`s workspace packages (@opentelemetry/core, sdk-trace-base,
+      # context-async-hooks) at runtime, so we still need to build their dist/
+      # before running the harness.
+      - name: Build workspace
         run: npm run compile
-        working-directory: ./integration-tests/propagation-validation-server
 
       - name: Run W3C Test harness
         run: ./integration-tests/tracecontext-integration-test.sh

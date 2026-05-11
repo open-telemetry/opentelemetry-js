@@ -2,28 +2,35 @@
   "name": "@opentelemetry/api",
   "version": "1.9.1",
   "description": "Public API for OpenTelemetry",
-  "main": "build/src/index.js",
-  "module": "build/esm/index.js",
-  "esnext": "build/esnext/index.js",
-  "types": "build/src/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
   "exports": {
     ".": {
-      "esnext": "./build/esnext/index.js",
-      "module": "./build/esm/index.js",
-      "types": "./build/src/index.d.ts",
-      "default": "./build/src/index.js"
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./experimental": {
-      "esnext": "./build/esnext/experimental/index.js",
-      "module": "./build/esm/experimental/index.js",
-      "types": "./build/src/experimental/index.d.ts",
-      "default": "./build/src/experimental/index.js"
+      "import": {
+        "types": "./dist/experimental/index.d.mts",
+        "default": "./dist/experimental/index.mjs"
+      },
+      "require": {
+        "types": "./dist/experimental/index.d.cts",
+        "default": "./dist/experimental/index.cjs"
+      }
     }
   },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "clean": "rimraf dist build",
+    "compile": "tsdown",
     "lint:fix": "eslint . --ext .ts --fix",
     "lint": "eslint . --ext .ts && npm run cycle-check",
     "test:browser": "karma start --single-run",
@@ -32,8 +39,7 @@
     "test:webworker": "karma start karma.worker.js --single-run",
     "cycle-check": "dpdm --exit-code circular:1 src/index.ts",
     "version": "node ../scripts/version-update.js",
-    "prewatch": "npm run precompile",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "watch": "tsdown --watch --no-clean",
     "peer-api-check": "node ../scripts/peer-api-check.js"
   },
   "keywords": [
@@ -51,17 +57,9 @@
     "node": ">=8.0.0"
   },
   "files": [
-    "build/esm/**/*.js",
-    "build/esm/**/*.js.map",
-    "build/esm/**/*.d.ts",
-    "build/esnext/**/*.js",
-    "build/esnext/**/*.js.map",
-    "build/esnext/**/*.d.ts",
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "dist"
   ],
   "publishConfig": {
     "access": "public"

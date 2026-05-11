@@ -33,7 +33,7 @@ const {
   SimpleSpanProcessor,
 } = require('@opentelemetry/sdk-trace-base');
 
-const { HttpInstrumentation } = require('../../build/src/index.js');
+const { HttpInstrumentation } = require('../../dist/index.cjs');
 
 const memoryExporter = new InMemorySpanExporter();
 const provider = new NodeTracerProvider({

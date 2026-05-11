@@ -2,35 +2,46 @@
   "name": "@opentelemetry/otlp-exporter-base",
   "version": "0.217.0",
   "description": "OpenTelemetry OTLP Exporter base (for internal use only)",
-  "main": "build/src/index.js",
-  "module": "build/esm/index.js",
-  "esnext": "build/esnext/index.js",
-  "types": "build/src/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
   "exports": {
     ".": {
-      "esnext": "./build/esnext/index.js",
-      "module": "./build/esm/index.js",
-      "types": "./build/src/index.d.ts",
-      "default": "./build/src/index.js"
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./node-http": {
-      "esnext": "./build/esnext/index-node-http.js",
-      "module": "./build/esm/index-node-http.js",
-      "types": "./build/src/index-node-http.d.ts",
-      "default": "./build/src/index-node-http.js"
+      "import": {
+        "types": "./dist/index-node-http.d.mts",
+        "default": "./dist/index-node-http.mjs"
+      },
+      "require": {
+        "types": "./dist/index-node-http.d.cts",
+        "default": "./dist/index-node-http.cjs"
+      }
     },
     "./browser-http": {
-      "esnext": "./build/esnext/index-browser-http.js",
-      "module": "./build/esm/index-browser-http.js",
-      "types": "./build/src/index-browser-http.d.ts",
-      "default": "./build/src/index-browser-http.js"
+      "import": {
+        "types": "./dist/index-browser-http.d.mts",
+        "default": "./dist/index-browser-http.mjs"
+      },
+      "require": {
+        "types": "./dist/index-browser-http.d.cts",
+        "default": "./dist/index-browser-http.cjs"
+      }
     }
   },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "compile": "tsdown",
+    "clean": "rimraf dist build",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "tdd": "npm run test -- --watch-extensions ts --watch",
@@ -38,8 +49,7 @@
     "test": "nyc mocha 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "karma start --single-run",
     "version": "node ../../../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "prewatch": "npm run precompile",
+    "watch": "tsdown --watch --no-clean",
     "align-api-deps": "node ../../../scripts/align-api-deps.js",
     "maint:regenerate-test-certs": "cd test/certs && ./regenerate.sh"
   },
@@ -58,17 +68,9 @@
     "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
-    "build/esm/**/*.js",
-    "build/esm/**/*.js.map",
-    "build/esm/**/*.d.ts",
-    "build/esnext/**/*.js",
-    "build/esnext/**/*.js.map",
-    "build/esnext/**/*.d.ts",
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "dist"
   ],
   "publishConfig": {
     "access": "public"

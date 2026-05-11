@@ -54,7 +54,7 @@ import {
   ATTR_PROCESS_PID,
   ATTR_SERVICE_INSTANCE_ID,
 } from '../src/semconv';
-import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
+import { ATTR_OS_TYPE } from '@opentelemetry/semantic-conventions/incubating';
 import { getLogRecordExporter, setupContextManager } from '../src/utils';
 import { NOOP_SDK } from '../src/start';
 import {

@@ -1,16 +1,28 @@
 {
   "name": "@opentelemetry/template",
   "version": "2.7.1",
+  "description": "> TODO: description",
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
   "private": true,
   "publishConfig": {
     "access": "restricted"
   },
-  "description": "> TODO: description",
   "author": "OpenTelemetry Authors",
   "Update homepage location": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/template",
   "license": "Apache-2.0",
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
   "Add these entries if browser is supported": {
     "module": "build/esm/index.js",
     "esnext": "build/esnext/index.js"
@@ -27,10 +39,9 @@
   },
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build",
+    "compile": "tsdown",
     "version": "node ../../scripts/version-update.js",
-    "clean": "tsc --build --clean",
-    "prewatch": "npm run precompile",
+    "clean": "rimraf dist build",
     "peer-api-check": "node ../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../scripts/align-api-deps.js"
   },
@@ -60,11 +71,9 @@
     "monitoring"
   ],
   "files": [
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "dist"
   ],
   "sideEffects": false,
   "Add these to files if browser is supported": [

@@ -15,8 +15,8 @@
  */
 
 const Benchmark = require('benchmark');
-const { toAnyValue } = require('../../../build/src/common/internal');
-const { JSON_ENCODER } = require('../../../build/src/common/utils');
+const { toAnyValue } = require('../../../dist/common/internal.cjs');
+const { JSON_ENCODER } = require('../../../dist/common/utils.cjs');
 
 const suite = new Benchmark.Suite();
 

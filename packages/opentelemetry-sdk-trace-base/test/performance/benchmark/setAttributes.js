@@ -15,7 +15,7 @@
  */
 
 const Benchmark = require('benchmark');
-const { BasicTracerProvider } = require('../../../build/src');
+const { BasicTracerProvider } = require('../../../dist/index.cjs');
 
 const tracerProvider = new BasicTracerProvider();
 const tracer = tracerProvider.getTracer('test');
