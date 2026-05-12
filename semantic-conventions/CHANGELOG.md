@@ -3,16 +3,18 @@
 
 All notable changes to the semantic-conventions package will be documented in this file.
 
-## Unreleased
+## 1.41.1
+
+Note: Semantic Conventions v1.41.0 included [an issue](https://github.com/open-telemetry/semantic-conventions/issues/3705) that prevented publishing a "1.41.0" version of this package.
 
 ### :rocket: Features
 
-* feat: update semantic conventions to 2fa8638d9dd0e95ef6c7808d0b3b2ebf89d0229e [#6695] @trentm
-  * Semantic Conventions 2fa8638d9dd0e95ef6c7808d0b3b2ebf89d0229e: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#2fa8638d9dd0e95ef6c7808d0b3b2ebf89d0229e) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+* feat: update semantic conventions to v1.41.1 [#6695](https://github.com/open-telemetry/opentelemetry-js/pull/6695) @trentm
+  * Semantic Conventions v1.41.1: [changelog v1.41.0](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1410) | [changelog v1.41.1](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1411) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * `@opentelemetry/semantic-conventions` (stable) changes: *8 added exports*
-  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *2 exported values changed, 69 newly deprecated exports, 87 added exports*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *2 exported values changed, 4 newly deprecated exports, 80 added exports*
 
-#### Stable changes in 2fa8638d9dd0e95ef6c7808d0b3b2ebf89d0229e
+#### Stable changes in v1.41.1
 
 <details open>
 <summary>8 added exports</summary>
@@ -32,7 +34,7 @@ ATTR_TELEMETRY_DISTRO_VERSION                 // telemetry.distro.version
 
 </details>
 
-#### Unstable changes in 2fa8638d9dd0e95ef6c7808d0b3b2ebf89d0229e
+#### Unstable changes in v1.41.1
 
 <details>
 <summary>2 exported values changed</summary>
@@ -45,84 +47,19 @@ METRIC_K8S_CONTAINER_CPU_REQUEST_UTILIZATION // k8s.container.cpu.request_utiliz
 </details>
 
 <details>
-<summary>69 newly deprecated exports</summary>
+<summary>4 newly deprecated exports</summary>
 
 ```js
-METRIC_GEN_AI_CLIENT_OPERATION_DURATION         // gen_ai.client.operation.duration: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-METRIC_GEN_AI_CLIENT_TOKEN_USAGE                // gen_ai.client.token.usage: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-METRIC_GEN_AI_SERVER_REQUEST_DURATION           // gen_ai.server.request.duration: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-METRIC_GEN_AI_SERVER_TIME_PER_OUTPUT_TOKEN      // gen_ai.server.time_per_output_token: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-METRIC_GEN_AI_SERVER_TIME_TO_FIRST_TOKEN        // gen_ai.server.time_to_first_token: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-METRIC_K8S_CONTAINER_CPU_LIMIT                  // k8s.container.cpu.limit: Replaced by `k8s.container.cpu.limit.desired`.
-METRIC_K8S_CONTAINER_CPU_REQUEST                // k8s.container.cpu.request: Replaced by `k8s.container.cpu.request.desired`.
-METRIC_K8S_CONTAINER_MEMORY_LIMIT               // k8s.container.memory.limit: Replaced by `k8s.container.memory.limit.desired`.
-METRIC_K8S_CONTAINER_MEMORY_REQUEST             // k8s.container.memory.request: Replaced by `k8s.container.memory.request.desired`.
-METRIC_MCP_CLIENT_OPERATION_DURATION            // mcp.client.operation.duration: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-METRIC_MCP_CLIENT_SESSION_DURATION              // mcp.client.session.duration: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-METRIC_MCP_SERVER_OPERATION_DURATION            // mcp.server.operation.duration: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-METRIC_MCP_SERVER_SESSION_DURATION              // mcp.server.session.duration: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-EVENT_GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS // gen_ai.client.inference.operation.details: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-EVENT_GEN_AI_EVALUATION_RESULT                  // gen_ai.evaluation.result: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_AGENT_DESCRIPTION                   // gen_ai.agent.description: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_AGENT_ID                            // gen_ai.agent.id: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_AGENT_NAME                          // gen_ai.agent.name: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_AGENT_VERSION                       // gen_ai.agent.version: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_CONVERSATION_ID                     // gen_ai.conversation.id: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_DATA_SOURCE_ID                      // gen_ai.data_source.id: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_EMBEDDINGS_DIMENSION_COUNT          // gen_ai.embeddings.dimension.count: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_EVALUATION_EXPLANATION              // gen_ai.evaluation.explanation: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_EVALUATION_NAME                     // gen_ai.evaluation.name: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_EVALUATION_SCORE_LABEL              // gen_ai.evaluation.score.label: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_EVALUATION_SCORE_VALUE              // gen_ai.evaluation.score.value: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_INPUT_MESSAGES                      // gen_ai.input.messages: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_OPERATION_NAME                      // gen_ai.operation.name: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_OUTPUT_MESSAGES                     // gen_ai.output.messages: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_OUTPUT_TYPE                         // gen_ai.output.type: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_PROMPT_NAME                         // gen_ai.prompt.name: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_PROVIDER_NAME                       // gen_ai.provider.name: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_REQUEST_CHOICE_COUNT                // gen_ai.request.choice.count: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_REQUEST_ENCODING_FORMATS            // gen_ai.request.encoding_formats: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_REQUEST_FREQUENCY_PENALTY           // gen_ai.request.frequency_penalty: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_REQUEST_MAX_TOKENS                  // gen_ai.request.max_tokens: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_REQUEST_MODEL                       // gen_ai.request.model: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_REQUEST_PRESENCE_PENALTY            // gen_ai.request.presence_penalty: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_REQUEST_SEED                        // gen_ai.request.seed: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_REQUEST_STOP_SEQUENCES              // gen_ai.request.stop_sequences: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_REQUEST_TEMPERATURE                 // gen_ai.request.temperature: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_REQUEST_TOP_K                       // gen_ai.request.top_k: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_REQUEST_TOP_P                       // gen_ai.request.top_p: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_RESPONSE_FINISH_REASONS             // gen_ai.response.finish_reasons: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_RESPONSE_ID                         // gen_ai.response.id: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_RESPONSE_MODEL                      // gen_ai.response.model: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_RETRIEVAL_DOCUMENTS                 // gen_ai.retrieval.documents: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_RETRIEVAL_QUERY_TEXT                // gen_ai.retrieval.query.text: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_SYSTEM_INSTRUCTIONS                 // gen_ai.system_instructions: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_TOKEN_TYPE                          // gen_ai.token.type: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_TOOL_CALL_ARGUMENTS                 // gen_ai.tool.call.arguments: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_TOOL_CALL_ID                        // gen_ai.tool.call.id: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_TOOL_CALL_RESULT                    // gen_ai.tool.call.result: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_TOOL_DEFINITIONS                    // gen_ai.tool.definitions: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_TOOL_DESCRIPTION                    // gen_ai.tool.description: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_TOOL_NAME                           // gen_ai.tool.name: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_TOOL_TYPE                           // gen_ai.tool.type: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_USAGE_CACHE_CREATION_INPUT_TOKENS   // gen_ai.usage.cache_creation.input_tokens: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_USAGE_CACHE_READ_INPUT_TOKENS       // gen_ai.usage.cache_read.input_tokens: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_USAGE_INPUT_TOKENS                  // gen_ai.usage.input_tokens: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_GEN_AI_USAGE_OUTPUT_TOKENS                 // gen_ai.usage.output_tokens: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_MCP_METHOD_NAME                            // mcp.method.name: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_MCP_PROTOCOL_VERSION                       // mcp.protocol.version: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_MCP_RESOURCE_URI                           // mcp.resource.uri: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_MCP_SESSION_ID                             // mcp.session.id: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_OPENAI_API_TYPE                            // openai.api.type: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_OPENAI_REQUEST_SERVICE_TIER                // openai.request.service_tier: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_OPENAI_RESPONSE_SERVICE_TIER               // openai.response.service_tier: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
-ATTR_OPENAI_RESPONSE_SYSTEM_FINGERPRINT         // openai.response.system_fingerprint: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+METRIC_K8S_CONTAINER_CPU_LIMIT      // k8s.container.cpu.limit: Replaced by `k8s.container.cpu.limit.desired`.
+METRIC_K8S_CONTAINER_CPU_REQUEST    // k8s.container.cpu.request: Replaced by `k8s.container.cpu.request.desired`.
+METRIC_K8S_CONTAINER_MEMORY_LIMIT   // k8s.container.memory.limit: Replaced by `k8s.container.memory.limit.desired`.
+METRIC_K8S_CONTAINER_MEMORY_REQUEST // k8s.container.memory.request: Replaced by `k8s.container.memory.request.desired`.
 ```
 
 </details>
 
 <details>
-<summary>87 added exports</summary>
+<summary>80 added exports</summary>
 
 ```js
 METRIC_GEN_AI_CLIENT_OPERATION_TIME_PER_OUTPUT_CHUNK // gen_ai.client.operation.time_per_output_chunk
@@ -136,7 +73,6 @@ METRIC_K8S_CONTAINER_CPU_LIMIT_CURRENT               // k8s.container.cpu.limit.
 METRIC_K8S_CONTAINER_CPU_LIMIT_DESIRED               // k8s.container.cpu.limit.desired
 METRIC_K8S_CONTAINER_CPU_REQUEST_CURRENT             // k8s.container.cpu.request.current
 METRIC_K8S_CONTAINER_CPU_REQUEST_DESIRED             // k8s.container.cpu.request.desired
-METRIC_K8S_CONTAINER_EPHEMERAL_STORAGE_USAGE         // k8s.container.ephemeral_storage.usage
 METRIC_K8S_CONTAINER_MEMORY_LIMIT_CURRENT            // k8s.container.memory.limit.current
 METRIC_K8S_CONTAINER_MEMORY_LIMIT_DESIRED            // k8s.container.memory.limit.desired
 METRIC_K8S_CONTAINER_MEMORY_REQUEST_CURRENT          // k8s.container.memory.request.current
@@ -158,7 +94,6 @@ METRIC_SYSTEM_MEMORY_LINUX_HUGEPAGES_SURPLUS         // system.memory.linux.huge
 METRIC_SYSTEM_MEMORY_LINUX_HUGEPAGES_USAGE           // system.memory.linux.hugepages.usage
 METRIC_SYSTEM_MEMORY_LINUX_HUGEPAGES_UTILIZATION     // system.memory.linux.hugepages.utilization
 
-METRIC_V8JS_MEMORY_HEAP_SPACE_SIZE                   // v8js.memory.heap.space.size
 METRIC_V8JS_RESOURCE_ACTIVE                          // v8js.resource.active
 
 EVENT_FAAS_INVOCATION_EXCEPTION                      // faas.invocation.exception
@@ -168,10 +103,6 @@ EVENT_MESSAGING_PROCESS_EXCEPTION                    // messaging.process.except
 EVENT_MESSAGING_RECEIVE_EXCEPTION                    // messaging.receive.exception
 EVENT_MESSAGING_SEND_EXCEPTION                       // messaging.send.exception
 EVENT_MESSAGING_SETTLE_EXCEPTION                     // messaging.settle.exception
-
-ATTR_BROWSER_DOCUMENT_URL_FULL                       // browser.document.url.full
-
-ATTR_GCP_GCE_INSTANCE_LABELS                         // (key) => `gcp.gce.instance.labels.${key}`
 
 GEN_AI_OPERATION_NAME_VALUE_INVOKE_WORKFLOW          // "invoke_workflow"
 ATTR_GEN_AI_REQUEST_STREAM                           // gen_ai.request.stream
@@ -187,9 +118,6 @@ ATTR_GO_CPU_STATE                                    // go.cpu.state
   GO_CPU_STATE_VALUE_USER                              // "user"
 ATTR_GO_MEMORY_DETAILED_TYPE                         // go.memory.detailed_type
 
-ATTR_K8S_CONTAINER_EPHEMERAL_STORAGE_FS_TYPE         // k8s.container.ephemeral_storage.fs_type
-  K8S_CONTAINER_EPHEMERAL_STORAGE_FS_TYPE_VALUE_LOGS   // "logs"
-  K8S_CONTAINER_EPHEMERAL_STORAGE_FS_TYPE_VALUE_ROOTFS // "rootfs"
 ATTR_K8S_NODE_SYSTEM_CONTAINER_NAME                  // k8s.node.system_container.name
 ATTR_K8S_PERSISTENTVOLUME_ANNOTATION                 // (key) => `k8s.persistentvolume.annotation.${key}`
 ATTR_K8S_PERSISTENTVOLUME_LABEL                      // (key) => `k8s.persistentvolume.label.${key}`

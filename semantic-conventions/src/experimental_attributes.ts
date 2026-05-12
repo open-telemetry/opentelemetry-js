@@ -1776,15 +1776,6 @@ export const ATTR_AZURE_SERVICE_REQUEST_ID = 'azure.service.request.id' as const
 export const ATTR_BROWSER_BRANDS = 'browser.brands' as const;
 
 /**
- * Absolute URL of the current browser document according to [RFC3986](https://www.rfc-editor.org/rfc/rfc3986).
- *
- * @example https://www.example.com/search?q=OpenTelemetry#SemConv
- *
- * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const ATTR_BROWSER_DOCUMENT_URL_FULL = 'browser.document.url.full' as const;
-
-/**
  * Preferred language of the user using the browser
  *
  * @example en
@@ -2045,7 +2036,7 @@ export const CICD_PIPELINE_RESULT_VALUE_CANCELLATION = "cancellation" as const;
 /**
  * Enum value "error" for attribute {@link ATTR_CICD_PIPELINE_RESULT}.
  *
- * The pipeline run failed due to an error in the CI/CD system, eg. due to the worker being killed.
+ * The pipeline run failed due to an error in the CICD system, eg. due to the worker being killed.
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2190,7 +2181,7 @@ export const CICD_PIPELINE_TASK_RUN_RESULT_VALUE_CANCELLATION = "cancellation" a
 /**
  * Enum value "error" for attribute {@link ATTR_CICD_PIPELINE_TASK_RUN_RESULT}.
  *
- * The task run failed due to an error in the CI/CD system, eg. due to the worker being killed.
+ * The task run failed due to an error in the CICD system, eg. due to the worker being killed.
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2280,7 +2271,7 @@ export const CICD_PIPELINE_TASK_TYPE_VALUE_DEPLOY = "deploy" as const;
 export const CICD_PIPELINE_TASK_TYPE_VALUE_TEST = "test" as const;
 
 /**
- * The name of a component of the CI/CD system.
+ * The name of a component of the CICD system.
  *
  * @example controller
  * @example scheduler
@@ -2291,7 +2282,7 @@ export const CICD_PIPELINE_TASK_TYPE_VALUE_TEST = "test" as const;
 export const ATTR_CICD_SYSTEM_COMPONENT = 'cicd.system.component' as const;
 
 /**
- * The unique identifier of a worker within a CI/CD system.
+ * The unique identifier of a worker within a CICD system.
  *
  * @example abc123
  * @example 10.0.1.2
@@ -2302,7 +2293,7 @@ export const ATTR_CICD_SYSTEM_COMPONENT = 'cicd.system.component' as const;
 export const ATTR_CICD_WORKER_ID = 'cicd.worker.id' as const;
 
 /**
- * The name of a worker within a CI/CD system.
+ * The name of a worker within a CICD system.
  *
  * @example agent-abc
  * @example controller
@@ -2313,7 +2304,7 @@ export const ATTR_CICD_WORKER_ID = 'cicd.worker.id' as const;
 export const ATTR_CICD_WORKER_NAME = 'cicd.worker.name' as const;
 
 /**
- * The state of a CI/CD worker / agent.
+ * The state of a CICD worker / agent.
  *
  * @example idle
  * @example busy
@@ -2326,7 +2317,7 @@ export const ATTR_CICD_WORKER_STATE = 'cicd.worker.state' as const;
 /**
  * Enum value "available" for attribute {@link ATTR_CICD_WORKER_STATE}.
  *
- * The worker is not performing work for the CI/CD system. It is available to the CI/CD system to perform work on (online / idle).
+ * The worker is not performing work for the CICD system. It is available to the CICD system to perform work on (online / idle).
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2335,7 +2326,7 @@ export const CICD_WORKER_STATE_VALUE_AVAILABLE = "available" as const;
 /**
  * Enum value "busy" for attribute {@link ATTR_CICD_WORKER_STATE}.
  *
- * The worker is performing work for the CI/CD system.
+ * The worker is performing work for the CICD system.
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2344,7 +2335,7 @@ export const CICD_WORKER_STATE_VALUE_BUSY = "busy" as const;
 /**
  * Enum value "offline" for attribute {@link ATTR_CICD_WORKER_STATE}.
  *
- * The worker is not available to the CI/CD system (disconnected / down).
+ * The worker is not available to the CICD system (disconnected / down).
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -6523,17 +6514,6 @@ export const ATTR_GCP_CLOUD_RUN_JOB_TASK_INDEX = 'gcp.cloud_run.job.task_index' 
 export const ATTR_GCP_GCE_INSTANCE_HOSTNAME = 'gcp.gce.instance.hostname' as const;
 
 /**
- * GCE instance labels, `<key>` being the label name and the value being the label value.
- *
- * @example observability
- *
- * @note For example, a GCE instance label `team` with value `observability` **SHOULD** be recorded as the `gcp.gce.instance.labels.team` attribute with value `"observability"`. The `<key>` **MUST** be the exact GCE instance label key.
- *
- * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const ATTR_GCP_GCE_INSTANCE_LABELS = (key: string) => `gcp.gce.instance.labels.${key}`;
-
-/**
  * The instance name of a GCE instance. This is the value provided by `host.name`, the visible name of the instance in the Cloud Console UI, and the prefix for the default hostname of the instance as defined by the [default internal DNS name](https://cloud.google.com/compute/docs/internal-dns#instance-fully-qualified-domain-names).
  *
  * @example instance-1
@@ -6580,8 +6560,6 @@ export const ATTR_GCP_GCE_INSTANCE_GROUP_MANAGER_ZONE = 'gcp.gce.instance_group_
  * @example Generates fiction stories
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_AGENT_DESCRIPTION = 'gen_ai.agent.description' as const;
 
@@ -6591,8 +6569,6 @@ export const ATTR_GEN_AI_AGENT_DESCRIPTION = 'gen_ai.agent.description' as const
  * @example asst_5j66UpCpwteGg4YSxUnt7lPY
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_AGENT_ID = 'gen_ai.agent.id' as const;
 
@@ -6603,8 +6579,6 @@ export const ATTR_GEN_AI_AGENT_ID = 'gen_ai.agent.id' as const;
  * @example Fiction Writer
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_AGENT_NAME = 'gen_ai.agent.name' as const;
 
@@ -6615,8 +6589,6 @@ export const ATTR_GEN_AI_AGENT_NAME = 'gen_ai.agent.name' as const;
  * @example 2025-05-01
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_AGENT_VERSION = 'gen_ai.agent.version' as const;
 
@@ -6637,8 +6609,6 @@ export const ATTR_GEN_AI_COMPLETION = 'gen_ai.completion' as const;
  * @example conv_5j66UpCpwteGg4YSxUnt7lPY
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_CONVERSATION_ID = 'gen_ai.conversation.id' as const;
 
@@ -6650,8 +6620,6 @@ export const ATTR_GEN_AI_CONVERSATION_ID = 'gen_ai.conversation.id' as const;
  * @note Data sources are used by AI agents and RAG applications to store grounding data. A data source may be an external database, object store, document collection, website, or any other storage system used by the GenAI agent or application. The `gen_ai.data_source.id` **SHOULD** match the identifier used by the GenAI system rather than a name specific to the external storage, such as a database or object store. Semantic conventions referencing `gen_ai.data_source.id` **MAY** also leverage additional attributes, such as `db.*`, to further identify and describe the data source.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_DATA_SOURCE_ID = 'gen_ai.data_source.id' as const;
 
@@ -6662,8 +6630,6 @@ export const ATTR_GEN_AI_DATA_SOURCE_ID = 'gen_ai.data_source.id' as const;
  * @example 1024
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_EMBEDDINGS_DIMENSION_COUNT = 'gen_ai.embeddings.dimension.count' as const;
 
@@ -6673,8 +6639,6 @@ export const ATTR_GEN_AI_EMBEDDINGS_DIMENSION_COUNT = 'gen_ai.embeddings.dimensi
  * @example The response is factually accurate but lacks sufficient detail to fully address the question.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_EVALUATION_EXPLANATION = 'gen_ai.evaluation.explanation' as const;
 
@@ -6685,8 +6649,6 @@ export const ATTR_GEN_AI_EVALUATION_EXPLANATION = 'gen_ai.evaluation.explanation
  * @example IntentResolution
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_EVALUATION_NAME = 'gen_ai.evaluation.name' as const;
 
@@ -6703,8 +6665,6 @@ export const ATTR_GEN_AI_EVALUATION_NAME = 'gen_ai.evaluation.name' as const;
  * @note This attribute provides a human-readable interpretation of the evaluation score produced by an evaluator. For example, a score value of 1 could mean "relevant" in one evaluation system and "not relevant" in another, depending on the scoring range and evaluator. The label **SHOULD** have low cardinality. Possible values depend on the evaluation metric and evaluator used; implementations **SHOULD** document the possible values.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_EVALUATION_SCORE_LABEL = 'gen_ai.evaluation.score.label' as const;
 
@@ -6714,8 +6674,6 @@ export const ATTR_GEN_AI_EVALUATION_SCORE_LABEL = 'gen_ai.evaluation.score.label
  * @example 4.0
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_EVALUATION_SCORE_VALUE = 'gen_ai.evaluation.score.value' as const;
 
@@ -6757,7 +6715,7 @@ export const ATTR_GEN_AI_EVALUATION_SCORE_VALUE = 'gen_ai.evaluation.score.value
  * }
  * ]
  *
- * @note Instrumentations **MUST** follow [Input messages JSON schema](https://github.com/open-telemetry/semantic-conventions/blob/v1.41.0/docs/gen-ai/gen-ai-input-messages.json).
+ * @note Instrumentations **MUST** follow [Input messages JSON schema](/docs/gen-ai/gen-ai-input-messages.json).
  * When the attribute is recorded on events, it **MUST** be recorded in structured
  * form. When recorded on spans, it **MAY** be recorded as a JSON string if structured
  * format is not supported and **SHOULD** be recorded in structured form otherwise.
@@ -6769,12 +6727,10 @@ export const ATTR_GEN_AI_EVALUATION_SCORE_VALUE = 'gen_ai.evaluation.score.value
  * > [!Warning]
  * > This attribute is likely to contain sensitive information including user/PII data.
  *
- * See [Recording content on attributes](https://github.com/open-telemetry/semantic-conventions/blob/v1.41.0/docs/gen-ai/gen-ai-spans.md#recording-content-on-attributes)
+ * See [Recording content on attributes](/docs/gen-ai/gen-ai-spans.md#recording-content-on-attributes)
  * section for more details.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_INPUT_MESSAGES = 'gen_ai.input.messages' as const;
 
@@ -6783,7 +6739,7 @@ export const ATTR_GEN_AI_INPUT_MESSAGES = 'gen_ai.input.messages' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Replaced by `gen_ai.output.type`, which has moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ * @deprecated Replaced by `gen_ai.output.type`.
  */
 export const ATTR_GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT = 'gen_ai.openai.request.response_format' as const;
 
@@ -6821,7 +6777,7 @@ export const GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT_VALUE_TEXT = "text" as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Replaced by `gen_ai.request.seed`, which has moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ * @deprecated Replaced by `gen_ai.request.seed`.
  */
 export const ATTR_GEN_AI_OPENAI_REQUEST_SEED = 'gen_ai.openai.request.seed' as const;
 
@@ -6830,7 +6786,7 @@ export const ATTR_GEN_AI_OPENAI_REQUEST_SEED = 'gen_ai.openai.request.seed' as c
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Replaced by `openai.request.service_tier`, which has moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ * @deprecated Replaced by `openai.request.service_tier`.
  */
 export const ATTR_GEN_AI_OPENAI_REQUEST_SERVICE_TIER = 'gen_ai.openai.request.service_tier' as const;
 
@@ -6860,7 +6816,7 @@ export const GEN_AI_OPENAI_REQUEST_SERVICE_TIER_VALUE_DEFAULT = "default" as con
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Replaced by `openai.response.service_tier`, which has moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ * @deprecated Replaced by `openai.response.service_tier`.
  */
 export const ATTR_GEN_AI_OPENAI_RESPONSE_SERVICE_TIER = 'gen_ai.openai.response.service_tier' as const;
 
@@ -6871,7 +6827,7 @@ export const ATTR_GEN_AI_OPENAI_RESPONSE_SERVICE_TIER = 'gen_ai.openai.response.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Replaced by `openai.response.system_fingerprint`, which has moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ * @deprecated Replaced by `openai.response.system_fingerprint`.
  */
 export const ATTR_GEN_AI_OPENAI_RESPONSE_SYSTEM_FINGERPRINT = 'gen_ai.openai.response.system_fingerprint' as const;
 
@@ -6881,8 +6837,6 @@ export const ATTR_GEN_AI_OPENAI_RESPONSE_SYSTEM_FINGERPRINT = 'gen_ai.openai.res
  * @note If one of the predefined values applies, but specific system uses a different name it's **RECOMMENDED** to document it in the semantic conventions for specific GenAI system and use system-specific name in the instrumentation. If a different name is not documented, instrumentation libraries **SHOULD** use applicable predefined value.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_OPERATION_NAME = 'gen_ai.operation.name' as const;
 
@@ -6983,7 +6937,7 @@ export const GEN_AI_OPERATION_NAME_VALUE_TEXT_COMPLETION = "text_completion" as 
  * }
  * ]
  *
- * @note Instrumentations **MUST** follow [Output messages JSON schema](https://github.com/open-telemetry/semantic-conventions/blob/v1.41.0/docs/gen-ai/gen-ai-output-messages.json)
+ * @note Instrumentations **MUST** follow [Output messages JSON schema](/docs/gen-ai/gen-ai-output-messages.json)
  *
  * Each message represents a single output choice/candidate generated by
  * the model. Each message corresponds to exactly one generation
@@ -7000,12 +6954,10 @@ export const GEN_AI_OPERATION_NAME_VALUE_TEXT_COMPLETION = "text_completion" as 
  * > [!Warning]
  * > This attribute is likely to contain sensitive information including user/PII data.
  *
- * See [Recording content on attributes](https://github.com/open-telemetry/semantic-conventions/blob/v1.41.0/docs/gen-ai/gen-ai-spans.md#recording-content-on-attributes)
+ * See [Recording content on attributes](/docs/gen-ai/gen-ai-spans.md#recording-content-on-attributes)
  * section for more details.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_OUTPUT_MESSAGES = 'gen_ai.output.messages' as const;
 
@@ -7017,8 +6969,6 @@ export const ATTR_GEN_AI_OUTPUT_MESSAGES = 'gen_ai.output.messages' as const;
  * Additional output format details may be recorded in the future in the `gen_ai.output.{type}.*` attributes.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_OUTPUT_TYPE = 'gen_ai.output.type' as const;
 
@@ -7075,8 +7025,6 @@ export const ATTR_GEN_AI_PROMPT = 'gen_ai.prompt' as const;
  * @example analyze-code
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_PROMPT_NAME = 'gen_ai.prompt.name' as const;
 
@@ -7103,8 +7051,6 @@ export const ATTR_GEN_AI_PROMPT_NAME = 'gen_ai.prompt.name' as const;
  * `openai.*` attributes.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_PROVIDER_NAME = 'gen_ai.provider.name' as const;
 
@@ -7249,8 +7195,6 @@ export const GEN_AI_PROVIDER_NAME_VALUE_X_AI = "x_ai" as const;
  * @example 3
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_REQUEST_CHOICE_COUNT = 'gen_ai.request.choice.count' as const;
 
@@ -7263,8 +7207,6 @@ export const ATTR_GEN_AI_REQUEST_CHOICE_COUNT = 'gen_ai.request.choice.count' as
  * @note In some GenAI systems the encoding formats are called embedding types. Also, some GenAI systems only accept a single format per request.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_REQUEST_ENCODING_FORMATS = 'gen_ai.request.encoding_formats' as const;
 
@@ -7274,8 +7216,6 @@ export const ATTR_GEN_AI_REQUEST_ENCODING_FORMATS = 'gen_ai.request.encoding_for
  * @example 0.1
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_REQUEST_FREQUENCY_PENALTY = 'gen_ai.request.frequency_penalty' as const;
 
@@ -7285,8 +7225,6 @@ export const ATTR_GEN_AI_REQUEST_FREQUENCY_PENALTY = 'gen_ai.request.frequency_p
  * @example 100
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_REQUEST_MAX_TOKENS = 'gen_ai.request.max_tokens' as const;
 
@@ -7296,8 +7234,6 @@ export const ATTR_GEN_AI_REQUEST_MAX_TOKENS = 'gen_ai.request.max_tokens' as con
  * @example "gpt-4"
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_REQUEST_MODEL = 'gen_ai.request.model' as const;
 
@@ -7307,8 +7243,6 @@ export const ATTR_GEN_AI_REQUEST_MODEL = 'gen_ai.request.model' as const;
  * @example 0.1
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_REQUEST_PRESENCE_PENALTY = 'gen_ai.request.presence_penalty' as const;
 
@@ -7318,8 +7252,6 @@ export const ATTR_GEN_AI_REQUEST_PRESENCE_PENALTY = 'gen_ai.request.presence_pen
  * @example 100
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_REQUEST_SEED = 'gen_ai.request.seed' as const;
 
@@ -7329,8 +7261,6 @@ export const ATTR_GEN_AI_REQUEST_SEED = 'gen_ai.request.seed' as const;
  * @example ["forest", "lived"]
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_REQUEST_STOP_SEQUENCES = 'gen_ai.request.stop_sequences' as const;
 
@@ -7338,8 +7268,6 @@ export const ATTR_GEN_AI_REQUEST_STOP_SEQUENCES = 'gen_ai.request.stop_sequences
  * Indicates whether the GenAI request was made in streaming mode.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_REQUEST_STREAM = 'gen_ai.request.stream' as const;
 
@@ -7349,8 +7277,6 @@ export const ATTR_GEN_AI_REQUEST_STREAM = 'gen_ai.request.stream' as const;
  * @example 0.0
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_REQUEST_TEMPERATURE = 'gen_ai.request.temperature' as const;
 
@@ -7360,8 +7286,6 @@ export const ATTR_GEN_AI_REQUEST_TEMPERATURE = 'gen_ai.request.temperature' as c
  * @example 1.0
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_REQUEST_TOP_K = 'gen_ai.request.top_k' as const;
 
@@ -7371,8 +7295,6 @@ export const ATTR_GEN_AI_REQUEST_TOP_K = 'gen_ai.request.top_k' as const;
  * @example 1.0
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_REQUEST_TOP_P = 'gen_ai.request.top_p' as const;
 
@@ -7383,8 +7305,6 @@ export const ATTR_GEN_AI_REQUEST_TOP_P = 'gen_ai.request.top_p' as const;
  * @example ["stop", "length"]
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_RESPONSE_FINISH_REASONS = 'gen_ai.response.finish_reasons' as const;
 
@@ -7394,8 +7314,6 @@ export const ATTR_GEN_AI_RESPONSE_FINISH_REASONS = 'gen_ai.response.finish_reaso
  * @example chatcmpl-123
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_RESPONSE_ID = 'gen_ai.response.id' as const;
 
@@ -7405,8 +7323,6 @@ export const ATTR_GEN_AI_RESPONSE_ID = 'gen_ai.response.id' as const;
  * @example gpt-4-0613
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_RESPONSE_MODEL = 'gen_ai.response.model' as const;
 
@@ -7417,8 +7333,6 @@ export const ATTR_GEN_AI_RESPONSE_MODEL = 'gen_ai.response.model' as const;
  * @example 1.2
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_RESPONSE_TIME_TO_FIRST_CHUNK = 'gen_ai.response.time_to_first_chunk' as const;
 
@@ -7440,7 +7354,7 @@ export const ATTR_GEN_AI_RESPONSE_TIME_TO_FIRST_CHUNK = 'gen_ai.response.time_to
  * }
  * ]
  *
- * @note Instrumentations **MUST** follow [Retrieval documents JSON schema](https://github.com/open-telemetry/semantic-conventions/blob/v1.41.0/docs/gen-ai/gen-ai-retrieval-documents.json).
+ * @note Instrumentations **MUST** follow [Retrieval documents JSON schema](/docs/gen-ai/gen-ai-retrieval-documents.json).
  * When the attribute is recorded on events, it **MUST** be recorded in structured
  * form. When recorded on spans, it **MAY** be recorded as a JSON string if structured
  * format is not supported and **SHOULD** be recorded in structured form otherwise.
@@ -7449,8 +7363,6 @@ export const ATTR_GEN_AI_RESPONSE_TIME_TO_FIRST_CHUNK = 'gen_ai.response.time_to
  * `id` (string): A unique identifier for the document, `score` (double): The relevance score of the document
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_RETRIEVAL_DOCUMENTS = 'gen_ai.retrieval.documents' as const;
 
@@ -7465,8 +7377,6 @@ export const ATTR_GEN_AI_RETRIEVAL_DOCUMENTS = 'gen_ai.retrieval.documents' as c
  * > This attribute may contain sensitive information.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_RETRIEVAL_QUERY_TEXT = 'gen_ai.retrieval.query.text' as const;
 
@@ -7475,7 +7385,7 @@ export const ATTR_GEN_AI_RETRIEVAL_QUERY_TEXT = 'gen_ai.retrieval.query.text' as
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Replaced by `gen_ai.provider.name`, which has moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ * @deprecated Replaced by `gen_ai.provider.name`.
  */
 export const ATTR_GEN_AI_SYSTEM = 'gen_ai.system' as const;
 
@@ -7686,7 +7596,7 @@ export const GEN_AI_SYSTEM_VALUE_XAI = "xai" as const;
  * Instructions that are part of the chat history **SHOULD** be recorded in
  * `gen_ai.input.messages` attribute instead.
  *
- * Instrumentations **MUST** follow [System instructions JSON schema](https://github.com/open-telemetry/semantic-conventions/blob/v1.41.0/docs/gen-ai/gen-ai-system-instructions.json).
+ * Instrumentations **MUST** follow [System instructions JSON schema](/docs/gen-ai/gen-ai-system-instructions.json).
  *
  * When recorded on spans, it **MAY** be recorded as a JSON string if structured
  * format is not supported and **SHOULD** be recorded in structured form otherwise.
@@ -7697,12 +7607,10 @@ export const GEN_AI_SYSTEM_VALUE_XAI = "xai" as const;
  * > [!Warning]
  * > This attribute may contain sensitive information.
  *
- * See [Recording content on attributes](https://github.com/open-telemetry/semantic-conventions/blob/v1.41.0/docs/gen-ai/gen-ai-spans.md#recording-content-on-attributes)
+ * See [Recording content on attributes](/docs/gen-ai/gen-ai-spans.md#recording-content-on-attributes)
  * section for more details.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_SYSTEM_INSTRUCTIONS = 'gen_ai.system_instructions' as const;
 
@@ -7713,8 +7621,6 @@ export const ATTR_GEN_AI_SYSTEM_INSTRUCTIONS = 'gen_ai.system_instructions' as c
  * @example output
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_TOKEN_TYPE = 'gen_ai.token.type' as const;
 
@@ -7764,8 +7670,6 @@ export const GEN_AI_TOKEN_TYPE_VALUE_OUTPUT = "output" as const;
  * deserialize it to an object. When recorded on spans, it **MAY** be recorded as a JSON string if structured format is not supported and **SHOULD** be recorded in structured form otherwise.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_TOOL_CALL_ARGUMENTS = 'gen_ai.tool.call.arguments' as const;
 
@@ -7775,8 +7679,6 @@ export const ATTR_GEN_AI_TOOL_CALL_ARGUMENTS = 'gen_ai.tool.call.arguments' as c
  * @example call_mszuSIzqtI65i1wAUOE8w5H4
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_TOOL_CALL_ID = 'gen_ai.tool.call.id' as const;
 
@@ -7800,8 +7702,6 @@ export const ATTR_GEN_AI_TOOL_CALL_ID = 'gen_ai.tool.call.id' as const;
  * deserialize it to an object. When recorded on spans, it **MAY** be recorded as a JSON string if structured format is not supported and **SHOULD** be recorded in structured form otherwise.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_TOOL_CALL_RESULT = 'gen_ai.tool.call.result' as const;
 
@@ -7836,7 +7736,7 @@ export const ATTR_GEN_AI_TOOL_CALL_RESULT = 'gen_ai.tool.call.result' as const;
  * }
  * ]
  *
- * @note Instrumentations **MUST** follow [Tool Definitions JSON Schema](https://github.com/open-telemetry/semantic-conventions/blob/v1.41.0/docs/gen-ai/gen-ai-tool-definitions.json).
+ * @note Instrumentations **MUST** follow [Tool Definitions JSON Schema](/docs/gen-ai/gen-ai-tool-definitions.json).
  *
  * When the attribute is recorded on events, it **MUST** be recorded in structured
  * form. When recorded on spans, it **MAY** be recorded as a JSON string if structured
@@ -7847,8 +7747,6 @@ export const ATTR_GEN_AI_TOOL_CALL_RESULT = 'gen_ai.tool.call.result' as const;
  * to enable populating optional properties.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_TOOL_DEFINITIONS = 'gen_ai.tool.definitions' as const;
 
@@ -7858,8 +7756,6 @@ export const ATTR_GEN_AI_TOOL_DEFINITIONS = 'gen_ai.tool.definitions' as const;
  * @example Multiply two numbers
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_TOOL_DESCRIPTION = 'gen_ai.tool.description' as const;
 
@@ -7869,8 +7765,6 @@ export const ATTR_GEN_AI_TOOL_DESCRIPTION = 'gen_ai.tool.description' as const;
  * @example Flights
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_TOOL_NAME = 'gen_ai.tool.name' as const;
 
@@ -7888,8 +7782,6 @@ export const ATTR_GEN_AI_TOOL_NAME = 'gen_ai.tool.name' as const;
  * Datastore: A tool used by the agent to access and query structured or unstructured external data for retrieval-augmented tasks or knowledge updates.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_TOOL_TYPE = 'gen_ai.tool.type' as const;
 
@@ -7901,8 +7793,6 @@ export const ATTR_GEN_AI_TOOL_TYPE = 'gen_ai.tool.type' as const;
  * @note The value **SHOULD** be included in `gen_ai.usage.input_tokens`.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_USAGE_CACHE_CREATION_INPUT_TOKENS = 'gen_ai.usage.cache_creation.input_tokens' as const;
 
@@ -7914,8 +7804,6 @@ export const ATTR_GEN_AI_USAGE_CACHE_CREATION_INPUT_TOKENS = 'gen_ai.usage.cache
  * @note The value **SHOULD** be included in `gen_ai.usage.input_tokens`.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_USAGE_CACHE_READ_INPUT_TOKENS = 'gen_ai.usage.cache_read.input_tokens' as const;
 
@@ -7926,7 +7814,7 @@ export const ATTR_GEN_AI_USAGE_CACHE_READ_INPUT_TOKENS = 'gen_ai.usage.cache_rea
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Replaced by `gen_ai.usage.output_tokens`, which has moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ * @deprecated Replaced by `gen_ai.usage.output_tokens`.
  */
 export const ATTR_GEN_AI_USAGE_COMPLETION_TOKENS = 'gen_ai.usage.completion_tokens' as const;
 
@@ -7941,8 +7829,6 @@ export const ATTR_GEN_AI_USAGE_COMPLETION_TOKENS = 'gen_ai.usage.completion_toke
  * by summing different token types parsed from the provider output.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_USAGE_INPUT_TOKENS = 'gen_ai.usage.input_tokens' as const;
 
@@ -7952,8 +7838,6 @@ export const ATTR_GEN_AI_USAGE_INPUT_TOKENS = 'gen_ai.usage.input_tokens' as con
  * @example 180
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_USAGE_OUTPUT_TOKENS = 'gen_ai.usage.output_tokens' as const;
 
@@ -7964,7 +7848,7 @@ export const ATTR_GEN_AI_USAGE_OUTPUT_TOKENS = 'gen_ai.usage.output_tokens' as c
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Replaced by `gen_ai.usage.input_tokens`, which has moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ * @deprecated Replaced by `gen_ai.usage.input_tokens`.
  */
 export const ATTR_GEN_AI_USAGE_PROMPT_TOKENS = 'gen_ai.usage.prompt_tokens' as const;
 
@@ -7976,8 +7860,6 @@ export const ATTR_GEN_AI_USAGE_PROMPT_TOKENS = 'gen_ai.usage.prompt_tokens' as c
  * @note The value **SHOULD** be included in `gen_ai.usage.output_tokens`.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_USAGE_REASONING_OUTPUT_TOKENS = 'gen_ai.usage.reasoning.output_tokens' as const;
 
@@ -7990,8 +7872,6 @@ export const ATTR_GEN_AI_USAGE_REASONING_OUTPUT_TOKENS = 'gen_ai.usage.reasoning
  * @note This attribute can be populated in different frameworks eg: name of the first chain in LangChain OR name of the crew in CrewAI.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_GEN_AI_WORKFLOW_NAME = 'gen_ai.workflow.name' as const;
 
@@ -9606,36 +9486,6 @@ export const ATTR_K8S_CLUSTER_NAME = 'k8s.cluster.name' as const;
 export const ATTR_K8S_CLUSTER_UID = 'k8s.cluster.uid' as const;
 
 /**
- * The type of file system component for ephemeral storage.
- *
- * @example rootfs
- * @example logs
- *
- * @note Eviction decisions based on ephemeral-storage resource limits are made based on the total container usage.
- *
- * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const ATTR_K8S_CONTAINER_EPHEMERAL_STORAGE_FS_TYPE = 'k8s.container.ephemeral_storage.fs_type' as const;
-
-/**
- * Enum value "logs" for attribute {@link ATTR_K8S_CONTAINER_EPHEMERAL_STORAGE_FS_TYPE}.
- *
- * For the container's log files usage (stdout/stderr).
- *
- * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const K8S_CONTAINER_EPHEMERAL_STORAGE_FS_TYPE_VALUE_LOGS = "logs" as const;
-
-/**
- * Enum value "rootfs" for attribute {@link ATTR_K8S_CONTAINER_EPHEMERAL_STORAGE_FS_TYPE}.
- *
- * For the container's writable layer usage.
- *
- * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const K8S_CONTAINER_EPHEMERAL_STORAGE_FS_TYPE_VALUE_ROOTFS = "rootfs" as const;
-
-/**
  * The name of the Container from Pod specification, must be unique within a Pod. Container runtime usually uses different globally unique name (`container.name`).
  *
  * @example redis
@@ -9662,7 +9512,7 @@ export const ATTR_K8S_CONTAINER_RESTART_COUNT = 'k8s.container.restart_count' as
 export const ATTR_K8S_CONTAINER_STATUS_LAST_TERMINATED_REASON = 'k8s.container.status.last_terminated_reason' as const;
 
 /**
- * The reason for the container state. Corresponds to the `reason` field of the: [K8s ContainerStateWaiting](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#containerstatewaiting-v1-core) or [K8s ContainerStateTerminated](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#containerstateterminated-v1-core)
+ * The reason for the container state. Corresponds to the `reason` field of the: [K8s ContainerStateWaiting](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#containerstatewaiting-v1-core) or [K8s ContainerStateTerminated](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#containerstateterminated-v1-core)
  *
  * @example ContainerCreating
  * @example CrashLoopBackOff
@@ -9760,7 +9610,7 @@ export const K8S_CONTAINER_STATUS_REASON_VALUE_IMAGE_PULL_BACK_OFF = "ImagePullB
 export const K8S_CONTAINER_STATUS_REASON_VALUE_OOM_KILLED = "OOMKilled" as const;
 
 /**
- * The state of the container. [K8s ContainerState](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#containerstate-v1-core)
+ * The state of the container. [K8s ContainerState](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#containerstate-v1-core)
  *
  * @example terminated
  * @example running
@@ -10138,7 +9988,7 @@ export const ATTR_K8S_NAMESPACE_NAME = 'k8s.namespace.name' as const;
  * @example terminating
  *
  * @note This attribute aligns with the `phase` field of the
- * [K8s NamespaceStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#namespacestatus-v1-core)
+ * [K8s NamespaceStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#namespacestatus-v1-core)
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -10187,7 +10037,7 @@ export const ATTR_K8S_NODE_ANNOTATION = (key: string) => `k8s.node.annotation.${
  * @example unknown
  *
  * @note This attribute aligns with the `status` field of the
- * [NodeCondition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#nodecondition-v1-core)
+ * [NodeCondition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#nodecondition-v1-core)
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -10221,10 +10071,10 @@ export const K8S_NODE_CONDITION_STATUS_VALUE_CONDITION_UNKNOWN = "unknown" as co
  * @example DiskPressure
  *
  * @note K8s Node conditions as described
- * by [K8s documentation](https://kubernetes.io/docs/reference/node/node-status/#condition).
+ * by [K8s documentation](https://v1-32.docs.kubernetes.io/docs/reference/node/node-status/#condition).
  *
  * This attribute aligns with the `type` field of the
- * [NodeCondition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#nodecondition-v1-core)
+ * [NodeCondition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#nodecondition-v1-core)
  *
  * The set of possible values is not limited to those listed here. Managed Kubernetes environments,
  * or custom controllers **MAY** introduce additional node condition types.
@@ -11213,7 +11063,7 @@ export const ATTR_K8S_STATEFULSET_NAME = 'k8s.statefulset.name' as const;
 export const ATTR_K8S_STATEFULSET_UID = 'k8s.statefulset.uid' as const;
 
 /**
- * The name of K8s [StorageClass](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#storageclass-v1-storage-k8s-io) object.
+ * The name of K8s [StorageClass](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#storageclass-v1-storage-k8s-io) object.
  *
  * @example gold.storageclass.storage.k8s.io
  *
@@ -11243,7 +11093,7 @@ export const ATTR_K8S_VOLUME_TYPE = 'k8s.volume.type' as const;
 /**
  * Enum value "configMap" for attribute {@link ATTR_K8S_VOLUME_TYPE}.
  *
- * A [configMap](https://kubernetes.io/docs/concepts/storage/volumes/#configmap) volume
+ * A [configMap](https://v1-30.docs.kubernetes.io/docs/concepts/storage/volumes/#configmap) volume
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -11252,7 +11102,7 @@ export const K8S_VOLUME_TYPE_VALUE_CONFIG_MAP = "configMap" as const;
 /**
  * Enum value "downwardAPI" for attribute {@link ATTR_K8S_VOLUME_TYPE}.
  *
- * A [downwardAPI](https://kubernetes.io/docs/concepts/storage/volumes/#downwardapi) volume
+ * A [downwardAPI](https://v1-30.docs.kubernetes.io/docs/concepts/storage/volumes/#downwardapi) volume
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -11261,7 +11111,7 @@ export const K8S_VOLUME_TYPE_VALUE_DOWNWARD_API = "downwardAPI" as const;
 /**
  * Enum value "emptyDir" for attribute {@link ATTR_K8S_VOLUME_TYPE}.
  *
- * An [emptyDir](https://kubernetes.io/docs/concepts/storage/volumes/#emptydir) volume
+ * An [emptyDir](https://v1-30.docs.kubernetes.io/docs/concepts/storage/volumes/#emptydir) volume
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -11270,7 +11120,7 @@ export const K8S_VOLUME_TYPE_VALUE_EMPTY_DIR = "emptyDir" as const;
 /**
  * Enum value "local" for attribute {@link ATTR_K8S_VOLUME_TYPE}.
  *
- * A [local](https://kubernetes.io/docs/concepts/storage/volumes/#local) volume
+ * A [local](https://v1-30.docs.kubernetes.io/docs/concepts/storage/volumes/#local) volume
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -11279,7 +11129,7 @@ export const K8S_VOLUME_TYPE_VALUE_LOCAL = "local" as const;
 /**
  * Enum value "persistentVolumeClaim" for attribute {@link ATTR_K8S_VOLUME_TYPE}.
  *
- * A [persistentVolumeClaim](https://kubernetes.io/docs/concepts/storage/volumes/#persistentvolumeclaim) volume
+ * A [persistentVolumeClaim](https://v1-30.docs.kubernetes.io/docs/concepts/storage/volumes/#persistentvolumeclaim) volume
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -11288,7 +11138,7 @@ export const K8S_VOLUME_TYPE_VALUE_PERSISTENT_VOLUME_CLAIM = "persistentVolumeCl
 /**
  * Enum value "secret" for attribute {@link ATTR_K8S_VOLUME_TYPE}.
  *
- * A [secret](https://kubernetes.io/docs/concepts/storage/volumes/#secret) volume
+ * A [secret](https://v1-30.docs.kubernetes.io/docs/concepts/storage/volumes/#secret) volume
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -11418,8 +11268,6 @@ export const ATTR_MAINFRAME_LPAR_NAME = 'mainframe.lpar.name' as const;
  * The name of the request or notification method.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_MCP_METHOD_NAME = 'mcp.method.name' as const;
 
@@ -11654,8 +11502,6 @@ export const MCP_METHOD_NAME_VALUE_TOOLS_LIST = "tools/list" as const;
  * @example 2025-06-18
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_MCP_PROTOCOL_VERSION = 'mcp.protocol.version' as const;
 
@@ -11668,8 +11514,6 @@ export const ATTR_MCP_PROTOCOL_VERSION = 'mcp.protocol.version' as const;
  * @note This is a URI of the resource provided in the following requests or notifications: `resources/read`, `resources/subscribe`, `resources/unsubscribe`, or `notifications/resources/updated`.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_MCP_RESOURCE_URI = 'mcp.resource.uri' as const;
 
@@ -11679,8 +11523,6 @@ export const ATTR_MCP_RESOURCE_URI = 'mcp.resource.uri' as const;
  * @example 191c4850af6c49e08843a3f6c80e5046
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_MCP_SESSION_ID = 'mcp.session.id' as const;
 
@@ -13170,8 +13012,6 @@ export const ATTR_ONC_RPC_VERSION = 'onc_rpc.version' as const;
  * The type of OpenAI API being used.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_OPENAI_API_TYPE = 'openai.api.type' as const;
 
@@ -13200,8 +13040,6 @@ export const OPENAI_API_TYPE_VALUE_RESPONSES = "responses" as const;
  * @example default
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_OPENAI_REQUEST_SERVICE_TIER = 'openai.request.service_tier' as const;
 
@@ -13230,8 +13068,6 @@ export const OPENAI_REQUEST_SERVICE_TIER_VALUE_DEFAULT = "default" as const;
  * @example default
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_OPENAI_RESPONSE_SERVICE_TIER = 'openai.response.service_tier' as const;
 
@@ -13241,8 +13077,6 @@ export const ATTR_OPENAI_RESPONSE_SERVICE_TIER = 'openai.response.service_tier' 
  * @example fp_44709d6fcb
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const ATTR_OPENAI_RESPONSE_SYSTEM_FINGERPRINT = 'openai.response.system_fingerprint' as const;
 

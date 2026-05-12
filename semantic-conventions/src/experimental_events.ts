@@ -123,8 +123,6 @@ export const EVENT_GEN_AI_CHOICE = 'gen_ai.choice' as const;
  * @note This event is opt-in and could be used to store input and output details independently from traces.
  *
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const EVENT_GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS = 'gen_ai.client.inference.operation.details' as const;
 
@@ -136,8 +134,6 @@ export const EVENT_GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS = 'gen_ai.client.in
  * Instrumentations **MAY** provide a configuration option to populate exception events with the attributes captured on the corresponding Generative AI client span.
  *
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const EVENT_GEN_AI_CLIENT_OPERATION_EXCEPTION = 'gen_ai.client.operation.exception' as const;
 
@@ -145,8 +141,6 @@ export const EVENT_GEN_AI_CLIENT_OPERATION_EXCEPTION = 'gen_ai.client.operation.
  * This event captures the result of evaluating GenAI output for quality, accuracy, or other characteristics. This event **SHOULD** be parented to GenAI operation span being evaluated when possible or set `gen_ai.response.id` when span id is not available.
  *
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- *
- * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const EVENT_GEN_AI_EVALUATION_RESULT = 'gen_ai.evaluation.result' as const;
 

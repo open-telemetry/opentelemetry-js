@@ -7,9 +7,7 @@ ROOT_DIR="${SCRIPT_DIR}/../../"
 
 # Get latest version by running `git tag -l --sort=version:refname | tail -1`
 # ... in git@github.com:open-telemetry/semantic-conventions.git
-# SPEC_VERSION=v1.41.0
-# XXX
-SPEC_VERSION=2fa8638d9dd0e95ef6c7808d0b3b2ebf89d0229e
+SPEC_VERSION=v1.41.1
 # ... in git@github.com:open-telemetry/weaver.git
 GENERATOR_VERSION=v0.23.0
 
