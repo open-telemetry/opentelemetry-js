@@ -10,7 +10,7 @@ Note: Semantic Conventions v1.41.0 included [an issue](https://github.com/open-t
 ### :rocket: Features
 
 * feat: update semantic conventions to v1.41.1 [#6695](https://github.com/open-telemetry/opentelemetry-js/pull/6695) @trentm
-  * Semantic Conventions v1.41.1: [changelog v1.41.0](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1410) | [changelog v1.41.1](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1411) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * Semantic Conventions v1.41.1: [changelog v1.41.0](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1410) | [changelog v1.41.1](https://github.com/open-telemetry/semantic-conventions/blob/release/v1.41.x/CHANGELOG.md#v1411) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * `@opentelemetry/semantic-conventions` (stable) changes: *8 added exports*
   * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *2 exported values changed, 4 newly deprecated exports, 80 added exports*
 
