@@ -15,7 +15,7 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :house: Internal
 
-## 1.41.0
+## 1.41.1
 
 ### :rocket: Features
 
