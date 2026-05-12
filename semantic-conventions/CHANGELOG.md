@@ -3,11 +3,13 @@
 
 All notable changes to the semantic-conventions package will be documented in this file.
 
-## 1.41.1
+## Unreleased
 
-Note: Semantic Conventions v1.41.0 included [an issue](https://github.com/open-telemetry/semantic-conventions/issues/3705) that prevented publishing a "1.41.0" version of this package.
+### :boom: Breaking Changes
 
 ### :rocket: Features
+
+Note: Semantic Conventions v1.41.0 included [an issue](https://github.com/open-telemetry/semantic-conventions/issues/3705) that prevented publishing a "1.41.0" version of this package.
 
 * feat: update semantic conventions to v1.41.1 [#6695](https://github.com/open-telemetry/opentelemetry-js/pull/6695) @trentm
   * Semantic Conventions v1.41.1: [changelog v1.41.0](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1410) | [changelog v1.41.1](https://github.com/open-telemetry/semantic-conventions/blob/release/v1.41.x/CHANGELOG.md#v1411) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
@@ -155,6 +157,12 @@ ATTR_V8JS_RESOURCE_TYPE                              // v8js.resource.type
 ```
 
 </details>
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
 
 ## 1.40.0
 
