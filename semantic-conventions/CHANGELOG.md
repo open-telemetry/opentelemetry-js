@@ -9,6 +9,16 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 1.41.1
+
+### :rocket: Features
+
 Note: Semantic Conventions v1.41.0 included [an issue](https://github.com/open-telemetry/semantic-conventions/issues/3705) that prevented publishing a "1.41.0" version of this package.
 
 * feat: update semantic conventions to v1.41.1 [#6695](https://github.com/open-telemetry/opentelemetry-js/pull/6695) @trentm
@@ -157,12 +167,6 @@ ATTR_V8JS_RESOURCE_TYPE                              // v8js.resource.type
 ```
 
 </details>
-
-### :bug: Bug Fixes
-
-### :books: Documentation
-
-### :house: Internal
 
 ## 1.40.0
 
