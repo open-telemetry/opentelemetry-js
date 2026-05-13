@@ -81,7 +81,7 @@
     "nyc": "17.1.0",
     "protobufjs": "8.0.1",
     "protobufjs-cli": "2.0.1",
-    "ts-loader": "9.5.4",
+    "ts-loader": "9.5.7",
     "typescript": "5.0.4",
     "webpack": "5.104.1"
   },
