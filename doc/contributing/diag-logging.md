@@ -131,6 +131,7 @@ this is my span: SpanImpl {
 > [!TIP]
 >
 > - Node.js default *depth* of `2` is used. If that hides too much detail for your debugging (e.g. `resource: { attributes: [Object] }` above), then you can bump Node.js's default inspect depth:
+>
 >     ```js
 >     import { inspect } from 'node:util';
 >     inspect.defaultOptions.depth = 10;
@@ -138,8 +139,4 @@ this is my span: SpanImpl {
 >
 > - If you *want* the raw dump with internal properties, use Node.js's `console.dir()`, which bypasses custom inspect methods.
 
-
 Note that the exact output of these custom inspect methods is **not a promised interface**. A change to format of the inspect string output is not considered a breaking change.
-
-
-
