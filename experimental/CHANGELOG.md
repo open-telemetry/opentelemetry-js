@@ -10,6 +10,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(sdk-node): wire up metric producers from declarative config [#6712](https://github.com/open-telemetry/opentelemetry-js/pull/6712) @MikeGoldsmith
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
