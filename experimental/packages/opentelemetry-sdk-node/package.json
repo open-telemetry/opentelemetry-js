@@ -60,6 +60,7 @@
     "@opentelemetry/exporter-zipkin": "2.7.1",
     "@opentelemetry/instrumentation": "0.218.0",
     "@opentelemetry/otlp-exporter-base": "0.218.0",
+    "@opentelemetry/otlp-grpc-exporter-base": "0.218.0",
     "@opentelemetry/propagator-b3": "2.7.1",
     "@opentelemetry/propagator-jaeger": "2.7.1",
     "@opentelemetry/resources": "2.7.1",
