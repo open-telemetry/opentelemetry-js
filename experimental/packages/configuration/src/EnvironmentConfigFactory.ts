@@ -214,6 +214,9 @@ export function setPropagators(config: ConfigurationModel): void {
       .filter(s => s);
     if (names.length > 0) {
       config.propagator.composite = [];
+      // Store each propagator name as a type-discriminator key. The config
+      // model doesn't validate names here — known vs third-party propagators
+      // are resolved when the SDK instantiates from the model.
       for (const name of names) {
         config.propagator.composite.push({ [name]: {} });
       }
