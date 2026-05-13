@@ -75,7 +75,7 @@
     "msw": "2.8.4",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
-    "ts-loader": "9.5.4",
+    "ts-loader": "9.5.7",
     "typescript": "5.0.4",
     "webpack": "5.104.1",
     "webpack-cli": "7.0.2"
