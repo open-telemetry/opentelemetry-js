@@ -55,7 +55,11 @@ import {
   ATTR_SERVICE_INSTANCE_ID,
 } from '../src/semconv';
 import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
-import { getLogRecordExporter, setupContextManager } from '../src/utils';
+import {
+  getLogRecordExporter,
+  getPeriodicMetricReaderFromConfiguration,
+  setupContextManager,
+} from '../src/utils';
 import { NOOP_SDK } from '../src/start';
 import {
   ConsoleMetricExporter,
@@ -960,6 +964,30 @@ describe('startNodeSDK', function () {
     it('should return undefined for invalid log record exporter model', async () => {
       const exporter: LogRecordExporterConfigModel = {};
       assert.equal(getLogRecordExporter(exporter), undefined);
+    });
+
+    it('should create metric reader with opencensus producer when shim is available', async () => {
+      const reader = getPeriodicMetricReaderFromConfiguration({
+        exporter: { console: {} },
+        producers: [{ opencensus: {} }],
+      });
+      assert.ok(reader !== undefined);
+      await (reader as PeriodicExportingMetricReader).shutdown();
+    });
+
+    it('should warn for unsupported metric producer', async () => {
+      const warnSpy = Sinon.spy(diag, 'warn');
+      const reader = getPeriodicMetricReaderFromConfiguration({
+        exporter: { console: {} },
+        producers: [{ 'unknown/producer': {} }],
+      });
+      assert.ok(reader !== undefined);
+      assert.ok(
+        warnSpy.args.some(args =>
+          String(args[0]).includes('Unsupported metric producer')
+        )
+      );
+      await (reader as PeriodicExportingMetricReader).shutdown();
     });
 
     it('null context manager', async () => {
