@@ -693,6 +693,23 @@ export function getHeadersFromConfiguration(
   return result;
 }
 
+/**
+ * Validate an exporter timeout value. The spec says 0 means "no limit
+ * (infinity)" but the JS exporters don't support that yet (see #6617).
+ * Warn and return undefined so the exporter falls back to its default.
+ */
+function validateExporterTimeout(
+  timeout: number | undefined
+): number | undefined {
+  if (timeout === 0) {
+    diag.warn(
+      'Exporter timeout of 0 (infinite) is not supported. Using default timeout.'
+    );
+    return undefined;
+  }
+  return timeout;
+}
+
 export function getHttpAgentOptionsFromTls(
   tls: HttpTlsConfigModel | undefined
 ): { ca?: Buffer; cert?: Buffer; key?: Buffer } | undefined {
@@ -737,7 +754,7 @@ export function getSpanExporter(
             : CompressionAlgorithm.NONE,
         url: exporter.otlp_http.endpoint,
         headers: getHeadersFromConfiguration(exporter.otlp_http.headers),
-        timeoutMillis: exporter.otlp_http.timeout,
+        timeoutMillis: validateExporterTimeout(exporter.otlp_http.timeout),
         httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http.tls),
       });
     } else {
@@ -748,7 +765,7 @@ export function getSpanExporter(
             : CompressionAlgorithm.NONE,
         url: exporter.otlp_http.endpoint,
         headers: getHeadersFromConfiguration(exporter.otlp_http.headers),
-        timeoutMillis: exporter.otlp_http.timeout,
+        timeoutMillis: validateExporterTimeout(exporter.otlp_http.timeout),
         httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http.tls),
       });
     }
@@ -759,7 +776,7 @@ export function getSpanExporter(
           ? CompressionAlgorithm.GZIP
           : CompressionAlgorithm.NONE,
       url: exporter.otlp_grpc.endpoint,
-      timeoutMillis: exporter.otlp_grpc.timeout,
+      timeoutMillis: validateExporterTimeout(exporter.otlp_grpc.timeout),
       // TODO (6614): add support for credentials
       // TODO (6615): add metadata (headers) support
     });
