@@ -129,6 +129,27 @@ describe('ProtobufWriter', function () {
         writer.writeDouble(d);
       }
 
+      // Repeated sint32 field11 (wire type 0 - zigzag varint)
+      const field11Values = [0, 1, -1, 127, -128, 2147483647, -2147483648];
+      for (const v of field11Values) {
+        writer.writeTag(11, 0);
+        writer.writeSint32(v);
+      }
+
+      // Repeated sfixed64 field12 (wire type 1 - 64-bit LE)
+      const field12Values = [
+        0, 1, -1, 42, -42, 2147483647, -2147483648, -4294967296,
+      ];
+
+      const field12ExpectedWithProtobufJsPrecisionLoss = field12Values.map(
+        val => Number(val)
+      );
+
+      for (const v of field12Values) {
+        writer.writeTag(12, 1);
+        writer.writeSfixed64(v);
+      }
+
       const buffer = writer.finish();
 
       // Decode using generated protobuf types
@@ -174,6 +195,15 @@ describe('ProtobufWriter', function () {
 
       // field10 repeated double
       assert.deepStrictEqual(decoded.field10, field10Values);
+
+      // field11 repeated sint32
+      assert.deepStrictEqual(decoded.field11, field11Values);
+
+      // field12 repeated sfixed64
+      assert.deepStrictEqual(
+        decoded.field12,
+        field12ExpectedWithProtobufJsPrecisionLoss
+      );
 
       // field9 fixed64 repeated.
       assert.deepStrictEqual(

@@ -37,15 +37,25 @@ export class ProtobufReader {
   /**
    * Read a base-128 varint.
    * Returns a JS `number`; precision above 2^53 is silently lost.
+   * Throws if the buffer is truncated mid-varint.
    */
   readVarint(): number {
     let result = 0;
     let shift = 0;
+    let terminated = false;
     while (this.pos < this._buf.length) {
       const b = this._buf[this.pos++];
       result += (b & 0x7f) * Math.pow(2, shift);
       shift += 7;
-      if ((b & 0x80) === 0) break;
+      if ((b & 0x80) === 0) {
+        terminated = true;
+        break;
+      }
+    }
+    if (!terminated) {
+      throw new Error(
+        'Truncated buffer: unexpected end of data while reading varint'
+      );
     }
     return result;
   }
@@ -53,6 +63,11 @@ export class ProtobufReader {
   /** Read a length-delimited byte sequence (bytes field or embedded message). */
   readBytes(): Uint8Array {
     const len = this.readVarint();
+    if (this.pos + len > this._buf.length) {
+      throw new Error(
+        `Truncated buffer: expected ${len} bytes at position ${this.pos}, but only ${this._buf.length - this.pos} available`
+      );
+    }
     const slice = this._buf.subarray(this.pos, this.pos + len);
     this.pos += len;
     return slice;
