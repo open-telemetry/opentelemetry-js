@@ -52,6 +52,12 @@ import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
+import {
+  createEmptyMetadata,
+  createInsecureCredentials,
+  createSslCredentials,
+} from '@opentelemetry/otlp-grpc-exporter-base';
+import { AggregationTemporalityPreference } from '@opentelemetry/exporter-metrics-otlp-http';
 import type {
   ConfigurationModel,
   LogRecordExporterConfigModel,
@@ -513,33 +519,45 @@ export function getPeriodicMetricReaderFromConfiguration(
   periodic: PeriodicMetricReaderConfigModel
 ): IMetricReader | undefined {
   if (periodic.exporter) {
-    let exporter;
+    let exporter: PushMetricExporter | undefined;
     if (periodic.exporter.otlp_http) {
-      const encoding = periodic.exporter.otlp_http.encoding;
+      const cfg = periodic.exporter.otlp_http;
+      const commonOpts = {
+        compression:
+          cfg.compression === 'gzip'
+            ? CompressionAlgorithm.GZIP
+            : CompressionAlgorithm.NONE,
+        url: cfg.endpoint,
+        headers: getHeadersFromConfiguration(cfg.headers),
+        timeoutMillis: cfg.timeout,
+        httpAgentOptions: getHttpAgentOptionsFromTls(cfg.tls),
+        temporalityPreference: mapTemporalityPreference(
+          cfg.temporality_preference
+        ),
+      };
+      const encoding = cfg.encoding;
       if (encoding === 'json') {
-        exporter = new OTLPHttpMetricExporter({
-          compression:
-            periodic.exporter.otlp_http.compression === 'gzip'
-              ? CompressionAlgorithm.GZIP
-              : CompressionAlgorithm.NONE,
-        });
-      } else if (encoding === 'protobuf') {
-        exporter = new OTLPProtoMetricExporter({
-          compression:
-            periodic.exporter.otlp_http.compression === 'gzip'
-              ? CompressionAlgorithm.GZIP
-              : CompressionAlgorithm.NONE,
-        });
+        exporter = new OTLPHttpMetricExporter(commonOpts);
+      } else if (encoding === 'protobuf' || encoding == null) {
+        exporter = new OTLPProtoMetricExporter(commonOpts);
       } else {
         diag.warn(`Unsupported OTLP metrics encoding: ${encoding}.`);
       }
     }
     if (periodic.exporter.otlp_grpc) {
+      const cfg = periodic.exporter.otlp_grpc;
       exporter = new OTLPGrpcMetricExporter({
         compression:
-          periodic.exporter.otlp_grpc.compression === 'gzip'
+          cfg.compression === 'gzip'
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
+        url: cfg.endpoint,
+        timeoutMillis: cfg.timeout,
+        credentials: getGrpcCredentialsFromTls(cfg.tls),
+        metadata: getGrpcMetadataFromHeaders(cfg.headers),
+        temporalityPreference: mapTemporalityPreference(
+          cfg.temporality_preference
+        ),
       });
     }
 
@@ -693,35 +711,85 @@ export function getHeadersFromConfiguration(
   return result;
 }
 
+function readFileOrWarn(
+  filePath: string | undefined,
+  label: string
+): Buffer | undefined {
+  if (!filePath) return undefined;
+  try {
+    return fs.readFileSync(filePath);
+  } catch (e) {
+    diag.warn(`Failed to read ${label} file at ${filePath}: ${e}`);
+    return undefined;
+  }
+}
+
 export function getHttpAgentOptionsFromTls(
   tls: HttpTlsConfigModel | undefined
 ): { ca?: Buffer; cert?: Buffer; key?: Buffer } | undefined {
   if (tls && (tls.ca_file || tls.cert_file || tls.key_file)) {
-    const httpsAgentOptions: { ca?: Buffer; cert?: Buffer; key?: Buffer } = {};
-    if (tls.ca_file) {
-      try {
-        httpsAgentOptions.ca = fs.readFileSync(tls.ca_file);
-      } catch (e) {
-        diag.warn(`Failed to read TLS CA file at ${tls.ca_file}: ${e}`);
-      }
-    }
-    if (tls.cert_file) {
-      try {
-        httpsAgentOptions.cert = fs.readFileSync(tls.cert_file);
-      } catch (e) {
-        diag.warn(`Failed to read TLS cert file at ${tls.cert_file}: ${e}`);
-      }
-    }
-    if (tls.key_file) {
-      try {
-        httpsAgentOptions.key = fs.readFileSync(tls.key_file);
-      } catch (e) {
-        diag.warn(`Failed to read TLS key file at ${tls.key_file}: ${e}`);
-      }
-    }
-    return httpsAgentOptions;
+    return {
+      ca: readFileOrWarn(tls.ca_file, 'TLS CA'),
+      cert: readFileOrWarn(tls.cert_file, 'TLS cert'),
+      key: readFileOrWarn(tls.key_file, 'TLS key'),
+    };
   }
   return undefined;
+}
+
+function getGrpcCredentialsFromTls(
+  tls:
+    | {
+        ca_file?: string;
+        key_file?: string;
+        cert_file?: string;
+        insecure?: boolean;
+      }
+    | undefined
+) {
+  if (tls?.insecure) {
+    return createInsecureCredentials();
+  }
+  const rootCert = readFileOrWarn(tls?.ca_file, 'TLS CA');
+  const privateKey = readFileOrWarn(tls?.key_file, 'TLS key');
+  const certChain = readFileOrWarn(tls?.cert_file, 'TLS cert');
+  if (rootCert || privateKey || certChain) {
+    try {
+      return createSslCredentials(rootCert, privateKey, certChain);
+    } catch (e) {
+      diag.warn(`Failed to create gRPC SSL credentials: ${e}`);
+      return undefined;
+    }
+  }
+  return undefined;
+}
+
+function getGrpcMetadataFromHeaders(
+  headers: NameStringValuePairConfigModel[] | undefined
+) {
+  if (!headers || headers.length === 0) {
+    return undefined;
+  }
+  const metadata = createEmptyMetadata();
+  for (const header of headers) {
+    metadata.set(header.name, header.value);
+  }
+  return metadata;
+}
+
+function mapTemporalityPreference(
+  value: string | undefined
+): AggregationTemporalityPreference | undefined {
+  switch (value) {
+    case 'cumulative':
+      return AggregationTemporalityPreference.CUMULATIVE;
+    case 'delta':
+      return AggregationTemporalityPreference.DELTA;
+    case 'low_memory':
+      return AggregationTemporalityPreference.LOWMEMORY;
+    default:
+      return undefined;
+  }
 }
 
 export function getSpanExporter(
