@@ -81,7 +81,11 @@ export class ProtobufReader {
   /**
    * Skip an unknown field.
    * Handles wire types 0 (varint), 1 (64-bit), 2 (length-delimited),
-   * 3 (start-group), 4 (end-group), and 5 (32-bit).
+   * and 5 (32-bit).
+   *
+   * Wire types 3 and 4 (start-group / end-group) are deprecated in proto3
+   * and are not used by any OpenTelemetry proto definition. Encountering
+   * them is treated as an error.
    */
   skip(wireType: number): void {
     switch (wireType) {
@@ -93,26 +97,6 @@ export class ProtobufReader {
         break;
       case 2: // length-delimited
         this.readBytes();
-        break;
-      case 3: // start group (deprecated)
-        // We should never encounter this, but let's handle it gracefully in case we do:
-        // Read nested tags until matching end-group (wire type 4) is found.
-        // Groups can be nested, so continue until the end-group for this
-        // start-group is encountered.
-        while (!this.isAtEnd()) {
-          const { wireType: nestedWireType } = this.readTag();
-          if (nestedWireType === 4) {
-            // matched end-group for this start-group
-            break;
-          }
-          // recursive skip also handles nested groups
-          this.skip(nestedWireType);
-        }
-        break;
-      case 4: // end group
-        // End-group should be handled by the start-group logic above.
-        // When encountered directly in skip, treat it as a no-op (it signals
-        // termination of the enclosing group).
         break;
       case 5: // 32-bit fixed
         this.pos += 4;
