@@ -67,6 +67,7 @@ import type {
   SamplerConfigModel,
   NameStringValuePairConfigModel,
   HttpTlsConfigModel,
+  GrpcTlsConfigModel,
 } from '@opentelemetry/configuration';
 import type {
   AggregationOption,
@@ -719,17 +720,7 @@ export function getHttpAgentOptionsFromTls(
   return undefined;
 }
 
-function getGrpcCredentialsFromTls(
-  tls:
-    | {
-        ca_file?: string;
-        key_file?: string;
-        cert_file?: string;
-        insecure?: boolean;
-      }
-    | null
-    | undefined
-) {
+function getGrpcCredentialsFromTls(tls?: GrpcTlsConfigModel) {
   if (tls?.insecure) {
     return createInsecureCredentials();
   }
@@ -755,13 +746,15 @@ function getGrpcMetadataFromHeaders(
   }
   const metadata = createEmptyMetadata();
   for (const header of headers) {
-    metadata.set(header.name, header.value);
+    if (header.value !== null) {
+      metadata.set(header.name, header.value);
+    }
   }
   return metadata;
 }
 
 function readFileOrWarn(
-  filePath: string | undefined,
+  filePath: string | null | undefined,
   label: string
 ): Buffer | undefined {
   if (!filePath) return undefined;
@@ -809,8 +802,8 @@ export function getSpanExporter(
           : CompressionAlgorithm.NONE,
       url: exporter.otlp_grpc?.endpoint ?? 'http://localhost:4317',
       timeoutMillis: exporter.otlp_grpc?.timeout ?? 10000,
-      credentials: getGrpcCredentialsFromTls(exporter.otlp_grpc.tls),
-      metadata: getGrpcMetadataFromHeaders(exporter.otlp_grpc.headers),
+      credentials: getGrpcCredentialsFromTls(exporter.otlp_grpc?.tls),
+      metadata: getGrpcMetadataFromHeaders(exporter.otlp_grpc?.headers),
     });
   } else if (exporter.console !== undefined) {
     return new ConsoleSpanExporter();
