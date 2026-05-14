@@ -14,6 +14,7 @@ import type { PushMetricExporter } from './MetricExporter';
 import { callWithTimeout, TimeoutError } from '../utils';
 import type { MetricProducer } from './MetricProducer';
 import { InstrumentType } from './MetricData';
+import { splitMetricData } from './MetricDataSplitter';
 
 export type PeriodicExportingMetricReaderOptions = {
   /**
@@ -50,6 +51,11 @@ export type PeriodicExportingMetricReaderOptions = {
     observableUpDownCounter?: number;
     default?: number;
   };
+  /**
+   * The maximum batch size for exports. If configured, the reader will split
+   * batches larger than this size into smaller batches.
+   */
+  maxExportBatchSize?: number;
 };
 
 /**
@@ -61,6 +67,8 @@ export class PeriodicExportingMetricReader extends MetricReader {
   private _exporter: PushMetricExporter;
   private readonly _exportInterval: number;
   private readonly _exportTimeout: number;
+  private readonly _maxExportBatchSize?: number;
+  private _ongoingExportPromise: Promise<void> | null = null;
 
   constructor(options: PeriodicExportingMetricReaderOptions) {
     const {
@@ -68,6 +76,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
       exportIntervalMillis = 60000,
       metricProducers,
       cardinalityLimits,
+      maxExportBatchSize,
     } = options;
     let { exportTimeoutMillis = 30000 } = options;
 
@@ -111,6 +120,13 @@ export class PeriodicExportingMetricReader extends MetricReader {
       throw Error('exportTimeoutMillis must be greater than 0');
     }
 
+    if (
+      maxExportBatchSize !== undefined &&
+      (!Number.isInteger(maxExportBatchSize) || maxExportBatchSize <= 0)
+    ) {
+      throw Error('maxExportBatchSize must be a positive integer');
+    }
+
     if (exportIntervalMillis < exportTimeoutMillis) {
       if (
         'exportIntervalMillis' in options &&
@@ -132,25 +148,25 @@ export class PeriodicExportingMetricReader extends MetricReader {
     this._exportInterval = exportIntervalMillis;
     this._exportTimeout = exportTimeoutMillis;
     this._exporter = exporter;
+    this._maxExportBatchSize = maxExportBatchSize;
   }
 
   private async _runOnce(): Promise<void> {
     try {
-      await callWithTimeout(this._doRun(), this._exportTimeout);
+      await this._doRun();
     } catch (err) {
-      if (err instanceof TimeoutError) {
-        api.diag.error(
-          'Export took longer than %s milliseconds and timed out.',
-          this._exportTimeout
-        );
-        return;
-      }
-
       globalErrorHandler(err);
     }
   }
 
   private async _doRun(): Promise<void> {
+    if (this._ongoingExportPromise) {
+      api.diag.debug(
+        'PeriodicExportingMetricReader: export already in progress, skipping'
+      );
+      return;
+    }
+
     const { resourceMetrics, errors } = await this.collect({
       timeoutMillis: this._exportTimeout,
     });
@@ -175,11 +191,51 @@ export class PeriodicExportingMetricReader extends MetricReader {
       return;
     }
 
-    const result = await internal._export(this._exporter, resourceMetrics);
-    if (result.code !== ExportResultCode.SUCCESS) {
-      throw new Error(
-        `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
-      );
+    const batches = this._maxExportBatchSize
+      ? splitMetricData(resourceMetrics, this._maxExportBatchSize)
+      : [resourceMetrics];
+
+    const currentExport = async () => {
+      let anyErr: Error | null = null;
+      for (const batch of batches) {
+        try {
+          const result = await callWithTimeout(
+            internal._export(this._exporter, batch),
+            this._exportTimeout
+          );
+          if (result.code !== ExportResultCode.SUCCESS) {
+            const err = new Error(
+              `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
+            );
+            api.diag.error(err.message);
+            anyErr = err;
+          }
+        } catch (e) {
+          if (e instanceof TimeoutError) {
+            // We do not report TimeoutError to the globalErrorHandler in _runOnce().
+            api.diag.error(
+              `PeriodicExportingMetricReader: metrics export timed out after ${this._exportTimeout}ms`
+            );
+            break;
+          } else {
+            api.diag.error(
+              'PeriodicExportingMetricReader: metrics export threw error',
+              e
+            );
+            anyErr = e instanceof Error ? e : new Error(String(e));
+          }
+        }
+      }
+      if (anyErr) {
+        throw anyErr;
+      }
+    };
+
+    this._ongoingExportPromise = currentExport();
+    try {
+      await this._ongoingExportPromise;
+    } finally {
+      this._ongoingExportPromise = null;
     }
   }
 
