@@ -9,7 +9,7 @@ import {
   writeKeyValue,
   writeHrTimeAsFixed64,
 } from '../../src/common/protobuf/common-serializer';
-import * as root from '../../src/generated/root';
+import * as signals from '../generated/signals';
 import type { AnyValue } from '@opentelemetry/api-logs';
 import type { HrTime } from '@opentelemetry/api';
 import { uint8ArrayToBase64 } from '../utils';
@@ -23,8 +23,8 @@ function serializeAndDecodeAnyValue(value: AnyValue): any {
   writeAnyValue(writer, value);
   const buffer = writer.finish();
 
-  const decoded = root.opentelemetry.proto.common.v1.AnyValue.decode(buffer);
-  return root.opentelemetry.proto.common.v1.AnyValue.toObject(decoded, {
+  const decoded = signals.opentelemetry.proto.common.v1.AnyValue.decode(buffer);
+  return signals.opentelemetry.proto.common.v1.AnyValue.toObject(decoded, {
     longs: Number,
     bytes: String,
   });
@@ -39,8 +39,8 @@ function serializeAndDecodeKeyValue(key: string, value: AnyValue): any {
   writeKeyValue(writer, key, value);
   const buffer = writer.finish();
 
-  const decoded = root.opentelemetry.proto.common.v1.KeyValue.decode(buffer);
-  return root.opentelemetry.proto.common.v1.KeyValue.toObject(decoded, {
+  const decoded = signals.opentelemetry.proto.common.v1.KeyValue.decode(buffer);
+  return signals.opentelemetry.proto.common.v1.KeyValue.toObject(decoded, {
     longs: Number,
     bytes: String,
   });

@@ -111,7 +111,7 @@ describe('startNodeSDK', function () {
   describe('Basic Registration', function () {
     it('should return NOOP_SDK when disabled is true', async () => {
       process.env.OTEL_SDK_DISABLED = 'true';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSDK();
 
       assert.strictEqual(sdk, NOOP_SDK);
 
@@ -123,7 +123,7 @@ describe('startNodeSDK', function () {
       process.env.OTEL_TRACES_EXPORTER = 'none';
       process.env.OTEL_LOGS_EXPORTER = 'none';
       process.env.OTEL_METRICS_EXPORTER = 'none';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSDK();
 
       // These are minimal OTel functionality and always registered.
       assertDefaultContextManagerRegistered();
@@ -146,7 +146,7 @@ describe('startNodeSDK', function () {
       process.env.OTEL_LOG_LEVEL = 'ERROR';
 
       const spy = Sinon.spy(diag, 'setLogger');
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSDK();
 
       assert.strictEqual(spy.callCount, 1);
       assert.ok(spy.args[0][0] instanceof DiagConsoleLogger);
@@ -161,7 +161,7 @@ describe('startNodeSDK', function () {
       delete process.env.OTEL_LOG_LEVEL;
 
       const spy = Sinon.spy(diag, 'setLogger');
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSDK();
 
       assert.strictEqual(spy.callCount, 1);
       assert.ok(spy.args[0][0] instanceof DiagConsoleLogger);
@@ -345,15 +345,12 @@ describe('startNodeSDK', function () {
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/tracer.yaml';
     const sdk = startNodeSDK({});
 
-    // Periodic type 'otlp_file/development' is not supported yet
-    assert.strictEqual(
-      stubLoggerWarn.args[0][0],
-      'Unsupported Exporter value. No Span Exporter registered'
+    // otlp_file/development exporters are not supported yet
+    const unsupportedWarnings = stubLoggerWarn.args.filter(
+      args =>
+        args[0] === 'Unsupported Exporter value. No Span Exporter registered'
     );
-    assert.strictEqual(
-      stubLoggerWarn.args[1][0],
-      'Unsupported Exporter value. No Span Exporter registered'
-    );
+    assert.strictEqual(unsupportedWarnings.length, 2);
 
     assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
     assert.ok(
@@ -673,9 +670,7 @@ describe('startNodeSDK', function () {
       await sdk.shutdown();
     });
 
-    // TODO: this test was failing on main (masked by log_level compile error).
-    // Needs investigation — the OTLPProtoLogExporter instanceof check fails.
-    it.skip('should set up all allowed exporters', async () => {
+    it('should set up all allowed exporters', async () => {
       process.env.OTEL_LOGS_EXPORTER = 'console,otlp';
       const sdk = startNodeSDK({});
 
@@ -906,8 +901,7 @@ describe('startNodeSDK', function () {
       await sdk.shutdown();
     });
 
-    // TODO: pre-existing failure on main (masked by log_level compile error)
-    it.skip('should be able to use console and otlp exporters', async () => {
+    it('should be able to use console and otlp exporters', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'console, otlp';
       const sdk = startNodeSDK({});
 
@@ -940,8 +934,7 @@ describe('startNodeSDK', function () {
       await sdk.shutdown();
     });
 
-    // TODO: pre-existing failure on main (masked by log_level compile error)
-    it.skip('should not register the same exporter twice', async () => {
+    it('should not register the same exporter twice', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'console,otlp,console';
       const sdk = startNodeSDK({});
 

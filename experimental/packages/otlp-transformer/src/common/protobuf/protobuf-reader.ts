@@ -37,15 +37,25 @@ export class ProtobufReader {
   /**
    * Read a base-128 varint.
    * Returns a JS `number`; precision above 2^53 is silently lost.
+   * Throws if the buffer is truncated mid-varint.
    */
   readVarint(): number {
     let result = 0;
     let shift = 0;
+    let terminated = false;
     while (this.pos < this._buf.length) {
       const b = this._buf[this.pos++];
       result += (b & 0x7f) * Math.pow(2, shift);
       shift += 7;
-      if ((b & 0x80) === 0) break;
+      if ((b & 0x80) === 0) {
+        terminated = true;
+        break;
+      }
+    }
+    if (!terminated) {
+      throw new Error(
+        'Truncated buffer: unexpected end of data while reading varint'
+      );
     }
     return result;
   }
@@ -53,6 +63,11 @@ export class ProtobufReader {
   /** Read a length-delimited byte sequence (bytes field or embedded message). */
   readBytes(): Uint8Array {
     const len = this.readVarint();
+    if (this.pos + len > this._buf.length) {
+      throw new Error(
+        `Truncated buffer: expected ${len} bytes at position ${this.pos}, but only ${this._buf.length - this.pos} available`
+      );
+    }
     const slice = this._buf.subarray(this.pos, this.pos + len);
     this.pos += len;
     return slice;
@@ -66,7 +81,11 @@ export class ProtobufReader {
   /**
    * Skip an unknown field.
    * Handles wire types 0 (varint), 1 (64-bit), 2 (length-delimited),
-   * 3 (start-group), 4 (end-group), and 5 (32-bit).
+   * and 5 (32-bit).
+   *
+   * Wire types 3 and 4 (start-group / end-group) are deprecated in proto3
+   * and are not used by any OpenTelemetry proto definition. Encountering
+   * them is treated as an error.
    */
   skip(wireType: number): void {
     switch (wireType) {
@@ -78,26 +97,6 @@ export class ProtobufReader {
         break;
       case 2: // length-delimited
         this.readBytes();
-        break;
-      case 3: // start group (deprecated)
-        // We should never encounter this, but let's handle it gracefully in case we do:
-        // Read nested tags until matching end-group (wire type 4) is found.
-        // Groups can be nested, so continue until the end-group for this
-        // start-group is encountered.
-        while (!this.isAtEnd()) {
-          const { wireType: nestedWireType } = this.readTag();
-          if (nestedWireType === 4) {
-            // matched end-group for this start-group
-            break;
-          }
-          // recursive skip also handles nested groups
-          this.skip(nestedWireType);
-        }
-        break;
-      case 4: // end group
-        // End-group should be handled by the start-group logic above.
-        // When encountered directly in skip, treat it as a no-op (it signals
-        // termination of the enclosing group).
         break;
       case 5: // 32-bit fixed
         this.pos += 4;

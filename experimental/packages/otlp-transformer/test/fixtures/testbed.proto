@@ -19,4 +19,6 @@ message TestMessage {
   repeated fixed32 field8 = 8;
   repeated fixed64 field9 = 9;
   repeated double field10 = 10;
+  repeated sint32 field11 = 11;
+  repeated sfixed64 field12 = 12;
 }

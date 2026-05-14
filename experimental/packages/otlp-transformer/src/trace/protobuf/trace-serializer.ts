@@ -9,6 +9,8 @@ import { hexToBinary } from '../../common/hex-to-binary';
 import type { Resource } from '@opentelemetry/resources';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import {
+  writeInstrumentationScope,
+  writeResource,
   writeAttributes,
   writeHrTimeAsFixed64,
 } from '../../common/protobuf/common-serializer';
@@ -262,20 +264,7 @@ function serializeScopeSpans(
   const scopeSpansStartPos = writer.pos;
 
   // scope (field 1, InstrumentationScope)
-  writer.writeTag(1, 2);
-  const scopeStart = writer.startLengthDelimited();
-  const scopeStartPos = writer.pos;
-
-  // Write InstrumentationScope fields directly
-  writer.writeTag(1, 2);
-  writer.writeString(scope.name);
-
-  if (scope.version) {
-    writer.writeTag(2, 2);
-    writer.writeString(scope.version);
-  }
-
-  writer.finishLengthDelimited(scopeStart, writer.pos - scopeStartPos);
+  writeInstrumentationScope(writer, scope, 1);
 
   // spans (field 2, repeated Span)
   for (const span of spans) {
@@ -295,27 +284,6 @@ function serializeScopeSpans(
   );
 }
 
-function serializeResource(
-  writer: IProtobufWriter,
-  resource: Resource,
-  fieldNumber: number
-) {
-  writer.writeTag(fieldNumber, 2);
-  const resourceStart = writer.startLengthDelimited();
-  const resourceStartPos = writer.pos;
-
-  // Write Resource attributes directly
-  if (resource.attributes) {
-    writeAttributes(writer, resource.attributes, 1);
-  }
-
-  // dropped_attributes_count (field 2, uint32) - set to 0 as we don't track this
-  writer.writeTag(2, 0);
-  writer.writeVarint(0);
-
-  writer.finishLengthDelimited(resourceStart, writer.pos - resourceStartPos);
-}
-
 /**
  * Serialize ResourceSpans directly from SDK Resource type
  */
@@ -328,7 +296,7 @@ function serializeResourceSpans(
   const resourceSpansStartPos = writer.pos;
 
   // resource (field 1, Resource)
-  serializeResource(writer, resource, 1);
+  writeResource(writer, resource, 1);
 
   // scope_spans (field 2, repeated ScopeSpans)
   for (const scopeSpans of scopeMap.values()) {

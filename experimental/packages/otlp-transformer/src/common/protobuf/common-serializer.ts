@@ -4,6 +4,8 @@
  */
 import type { Attributes, HrTime } from '@opentelemetry/api';
 import type { AnyValue, LogAttributes } from '@opentelemetry/api-logs';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import type { Resource } from '@opentelemetry/resources';
 import type { IProtobufWriter } from './i-protobuf-writer';
 
 /**
@@ -186,4 +188,61 @@ export function writeAnyValue(writer: IProtobufWriter, value: AnyValue): void {
     writer.finishLengthDelimited(kvlistStart, writer.pos - kvlistStartPos);
   }
   // Else: unsupported type, write nothing
+}
+
+/**
+ * Write an InstrumentationScope message.
+ *
+ * Proto fields (InstrumentationScope):
+ *   1  name     string  (wire type 2)
+ *   2  version  string  (wire type 2)
+ */
+export function writeInstrumentationScope(
+  writer: IProtobufWriter,
+  scope: InstrumentationScope,
+  fieldNumber: number
+): void {
+  writer.writeTag(fieldNumber, 2);
+  const start = writer.startLengthDelimited();
+  const startPos = writer.pos;
+
+  // name (field 1, string)
+  writer.writeTag(1, 2);
+  writer.writeString(scope.name);
+
+  // version (field 2, string) - skip if empty
+  if (scope.version) {
+    writer.writeTag(2, 2);
+    writer.writeString(scope.version);
+  }
+
+  writer.finishLengthDelimited(start, writer.pos - startPos);
+}
+
+/**
+ * Write a Resource message and its enclosing tag.
+ *
+ * Proto fields (Resource):
+ *   1  attributes                repeated KeyValue  (wire type 2)
+ *   2  dropped_attributes_count  uint32             (wire type 0)
+ */
+export function writeResource(
+  writer: IProtobufWriter,
+  resource: Resource,
+  fieldNumber: number
+): void {
+  writer.writeTag(fieldNumber, 2);
+  const resourceStart = writer.startLengthDelimited();
+  const resourceStartPos = writer.pos;
+
+  // attributes (field 1, repeated KeyValue)
+  if (resource.attributes) {
+    writeAttributes(writer, resource.attributes, 1);
+  }
+
+  // dropped_attributes_count (field 2, uint32) - set to 0 as we don't track this
+  writer.writeTag(2, 0);
+  writer.writeVarint(0);
+
+  writer.finishLengthDelimited(resourceStart, writer.pos - resourceStartPos);
 }

@@ -51,5 +51,6 @@
   "assignees": ["@dyladan", "@legendecas", "@pichlermarc", "@trentm"],
   "labels": ["dependencies"],
   "ignorePaths": ["**/bundler-tests/**"],
-  "postUpdateOptions": ["npmDedupe"]
+  "postUpdateOptions": ["npmDedupe"],
+  "minimumReleaseAge": "1 week"
 }

@@ -55,7 +55,7 @@ export const NOOP_SDK = {
  * @experimental Function to start the OpenTelemetry Node SDK
  * @param sdkOptions
  */
-export function startNodeSDK(sdkOptions: SDKOptions): {
+export function startNodeSDK(sdkOptions?: SDKOptions): {
   shutdown: () => Promise<void>;
 } {
   let config: ConfigurationModel;
@@ -119,7 +119,7 @@ export function startNodeSDK(sdkOptions: SDKOptions): {
  */
 function create(
   config: ConfigurationModel,
-  sdkOptions: SDKOptions
+  sdkOptions?: SDKOptions
 ): SDKComponents {
   const defaultContextManager = new AsyncLocalStorageContextManager();
   defaultContextManager.enable();
@@ -182,13 +182,13 @@ function create(
 
 export function setupResource(
   config: ConfigurationModel,
-  sdkOptions: SDKOptions
+  sdkOptions?: SDKOptions
 ): Resource {
   let resource: Resource =
     getResourceFromConfiguration(config) ?? defaultResource();
   let resourceDetectors: ResourceDetector[] = [];
 
-  if (sdkOptions.resourceDetectors != null) {
+  if (sdkOptions?.resourceDetectors != null) {
     resourceDetectors = sdkOptions.resourceDetectors;
   } else if (config.resource?.['detection/development']?.detectors) {
     resourceDetectors = getResourceDetectorsFromConfiguration(config);

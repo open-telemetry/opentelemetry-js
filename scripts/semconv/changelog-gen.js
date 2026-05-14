@@ -259,7 +259,7 @@ function semconvChangelogGen(aVer=undefined, bVer=undefined) {
 
   const localDir = path.join(TOP, 'semantic-conventions');
   const pj = JSON.parse(fs.readFileSync(path.join(localDir, 'package.json')));
-  const pkgInfo = JSON.parse(execFileSync('npm', ['info', '-j', pj.name]).toString())
+  const pkgInfo = JSON.parse(execFileSync('npm', ['info', '--json', pj.name]).toString())
 
   let aDir;
   if (!aVer) {

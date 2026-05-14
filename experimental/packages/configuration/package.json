@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/configuration",
-  "version": "0.217.0",
+  "version": "0.218.0",
   "description": "OpenTelemetry Configuration",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -55,7 +55,7 @@
     "mocha": "11.7.5",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
-    "ts-loader": "9.5.4",
+    "ts-loader": "9.5.7",
     "typescript": "5.0.4"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/configuration",
