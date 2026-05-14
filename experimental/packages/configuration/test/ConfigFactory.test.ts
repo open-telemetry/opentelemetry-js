@@ -47,8 +47,6 @@ const defaultTracerProvider: NonNullable<
   },
 };
 
-const tls = {};
-
 const configFromFile = {
   disabled: false,
   log_level: 'info',
@@ -62,10 +60,11 @@ const configFromFile = {
     ],
   },
   attribute_limits: {
+    attribute_value_length_limit: null,
     attribute_count_limit: 128,
   },
   propagator: {
-    composite: [{ tracecontext: {} }, { baggage: {} }],
+    composite: [{ tracecontext: null }, { baggage: null }],
   },
   tracer_provider: {
     processors: [
@@ -78,7 +77,11 @@ const configFromFile = {
           exporter: {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/traces',
-              tls,
+              tls: {
+                ca_file: null,
+                cert_file: null,
+                key_file: null,
+              },
               timeout: 10000,
               compression: 'gzip',
               encoding: 'protobuf',
@@ -88,6 +91,7 @@ const configFromFile = {
       },
     ],
     limits: {
+      attribute_value_length_limit: null,
       attribute_count_limit: 128,
       event_count_limit: 128,
       link_count_limit: 128,
@@ -96,11 +100,11 @@ const configFromFile = {
     },
     sampler: {
       parent_based: {
-        root: { always_on: {} },
-        remote_parent_sampled: { always_on: {} },
-        remote_parent_not_sampled: { always_off: {} },
-        local_parent_sampled: { always_on: {} },
-        local_parent_not_sampled: { always_off: {} },
+        root: { always_on: null },
+        remote_parent_sampled: { always_on: null },
+        remote_parent_not_sampled: { always_off: null },
+        local_parent_sampled: { always_on: null },
+        local_parent_not_sampled: { always_off: null },
       },
     },
   },
@@ -113,7 +117,11 @@ const configFromFile = {
           exporter: {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/metrics',
-              tls,
+              tls: {
+                ca_file: null,
+                cert_file: null,
+                key_file: null,
+              },
               compression: 'gzip',
               timeout: 10000,
               temporality_preference: 'cumulative',
@@ -138,7 +146,11 @@ const configFromFile = {
           exporter: {
             otlp_http: {
               endpoint: 'http://localhost:4318/v1/logs',
-              tls,
+              tls: {
+                ca_file: null,
+                cert_file: null,
+                key_file: null,
+              },
               timeout: 10000,
               compression: 'gzip',
               encoding: 'protobuf',
@@ -148,6 +160,7 @@ const configFromFile = {
       },
     ],
     limits: {
+      attribute_value_length_limit: null,
       attribute_count_limit: 128,
     },
   },
@@ -203,12 +216,12 @@ const configFromKitchenSinkFile = {
         excluded: ['process.command_args'],
       },
       detectors: [
-        { container: {} },
-        { env: {} },
-        { host: {} },
-        { os: {} },
-        { process: {} },
-        { service: {} },
+        { container: null },
+        { env: null },
+        { host: null },
+        { os: null },
+        { process: null },
+        { service: null },
       ],
     },
     schema_url: 'https://opentelemetry.io/schemas/1.16.0',
@@ -220,12 +233,12 @@ const configFromKitchenSinkFile = {
   },
   propagator: {
     composite: [
-      { tracecontext: {} },
-      { baggage: {} },
-      { b3: {} },
-      { b3multi: {} },
-      { jaeger: {} },
-      { ottrace: {} },
+      { tracecontext: null },
+      { baggage: null },
+      { b3: null },
+      { b3multi: null },
+      { jaeger: null },
+      { ottrace: null },
       { xray: {} },
     ],
     composite_list: 'tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray',
@@ -301,7 +314,7 @@ const configFromKitchenSinkFile = {
         },
       },
       {
-        simple: { exporter: { console: {} } },
+        simple: { exporter: { console: null } },
       },
     ],
     limits: {
@@ -314,8 +327,8 @@ const configFromKitchenSinkFile = {
     },
     sampler: {
       parent_based: {
-        root: { always_on: {} },
-        remote_parent_sampled: { always_on: {} },
+        root: { always_on: null },
+        remote_parent_sampled: { always_on: null },
         remote_parent_not_sampled: {
           'probability/development': { ratio: 0.01 },
         },
@@ -328,7 +341,7 @@ const configFromKitchenSinkFile = {
                     key: 'http.route',
                     values: ['/healthz', '/livez'],
                   },
-                  sampler: { always_off: {} },
+                  sampler: { always_off: null },
                 },
                 {
                   attribute_patterns: {
@@ -336,7 +349,7 @@ const configFromKitchenSinkFile = {
                     included: ['/internal/*'],
                     excluded: ['/internal/special/*'],
                   },
-                  sampler: { always_on: {} },
+                  sampler: { always_on: null },
                 },
                 {
                   parent: ['none'],
@@ -350,7 +363,7 @@ const configFromKitchenSinkFile = {
             },
           },
         },
-        local_parent_not_sampled: { always_off: {} },
+        local_parent_not_sampled: { always_off: null },
       },
     },
   },
@@ -363,7 +376,7 @@ const configFromKitchenSinkFile = {
               'underscore_escaping_with_suffixes'
             ),
           },
-          producers: [{ opencensus: {} }],
+          producers: [{ opencensus: null }],
           cardinality_limits: ksCardinality,
         },
       },
@@ -374,7 +387,7 @@ const configFromKitchenSinkFile = {
               'underscore_escaping_without_suffixes/development'
             ),
           },
-          producers: [{ opencensus: {} }],
+          producers: [{ opencensus: null }],
           cardinality_limits: ksCardinality,
         },
       },
@@ -385,7 +398,7 @@ const configFromKitchenSinkFile = {
               'no_utf8_escaping_with_suffixes/development'
             ),
           },
-          producers: [{ opencensus: {} }],
+          producers: [{ opencensus: null }],
           cardinality_limits: ksCardinality,
         },
       },
@@ -396,7 +409,7 @@ const configFromKitchenSinkFile = {
               'no_translation/development'
             ),
           },
-          producers: [{ opencensus: {} }],
+          producers: [{ opencensus: null }],
           cardinality_limits: ksCardinality,
         },
       },
@@ -422,7 +435,7 @@ const configFromKitchenSinkFile = {
                 'base2_exponential_bucket_histogram',
             },
           },
-          producers: [{ opencensus: {} }],
+          producers: [{ opencensus: null }],
           cardinality_limits: ksCardinality,
         },
       },
@@ -596,7 +609,7 @@ const configFromKitchenSinkFile = {
         },
       },
       {
-        simple: { exporter: { console: {} } },
+        simple: { exporter: { console: null } },
       },
     ],
     limits: {
@@ -619,12 +632,11 @@ const configFromKitchenSinkFile = {
   },
 };
 
-const nullTls = {};
-
 const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
   disabled: false,
   log_level: 'info',
   resource: {
+    attributes_list: null,
     attributes: [
       {
         name: 'service.name',
@@ -634,6 +646,7 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
     ],
   },
   attribute_limits: {
+    attribute_value_length_limit: null,
     attribute_count_limit: 128,
   },
   propagator: {
@@ -653,14 +666,20 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
               endpoint: 'http://localhost:4318/v1/traces',
               timeout: 10000,
               compression: 'gzip',
-              tls: nullTls,
               encoding: 'protobuf',
+              headers_list: null,
+              tls: {
+                ca_file: null,
+                cert_file: null,
+                key_file: null,
+              },
             },
           },
         },
       },
     ],
     limits: {
+      attribute_value_length_limit: null,
       attribute_count_limit: 128,
       event_count_limit: 128,
       link_count_limit: 128,
@@ -669,11 +688,11 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
     },
     sampler: {
       parent_based: {
-        root: { always_on: {} },
-        remote_parent_sampled: { always_on: {} },
-        remote_parent_not_sampled: { always_off: {} },
-        local_parent_sampled: { always_on: {} },
-        local_parent_not_sampled: { always_off: {} },
+        root: { always_on: null },
+        remote_parent_sampled: { always_on: null },
+        remote_parent_not_sampled: { always_off: null },
+        local_parent_sampled: { always_on: null },
+        local_parent_not_sampled: { always_off: null },
       },
     },
   },
@@ -690,7 +709,12 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
               timeout: 10000,
               temporality_preference: 'cumulative',
               default_histogram_aggregation: 'explicit_bucket_histogram',
-              tls: nullTls,
+              tls: {
+                ca_file: null,
+                cert_file: null,
+                key_file: null,
+              },
+              headers_list: null,
               encoding: 'protobuf',
             },
           },
@@ -713,7 +737,12 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
               endpoint: 'http://localhost:4318/v1/logs',
               timeout: 10000,
               compression: 'gzip',
-              tls: nullTls,
+              tls: {
+                ca_file: null,
+                cert_file: null,
+                key_file: null,
+              },
+              headers_list: null,
               encoding: 'protobuf',
             },
           },
@@ -721,6 +750,7 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
       },
     ],
     limits: {
+      attribute_value_length_limit: null,
       attribute_count_limit: 128,
     },
   },
@@ -2229,7 +2259,7 @@ describe('ConfigFactory', function () {
         'composite/development': {
           rule_based: {
             rules: [
-              { sampler: { always_on: {} } },
+              { sampler: { always_on: null } },
               { sampler: { probability: { ratio: 0.5 } } },
             ],
           },
@@ -2251,7 +2281,7 @@ describe('ConfigFactory', function () {
                   key: 'http.method',
                   values: ['GET'],
                 },
-                sampler: { always_on: {} },
+                sampler: { always_on: null },
               },
             ],
           },
@@ -2621,7 +2651,9 @@ describe('ConfigFactory', function () {
         attribute_limits: {
           attribute_count_limit: 128,
         },
-        resource: {},
+        resource: {
+          attributes_list: null,
+        },
         propagator: {
           composite: [{ tracecontext: {} }],
           composite_list: 'tracecontext',
@@ -2631,7 +2663,7 @@ describe('ConfigFactory', function () {
             {
               simple: {
                 exporter: {
-                  console: {},
+                  console: null,
                 },
               },
             },

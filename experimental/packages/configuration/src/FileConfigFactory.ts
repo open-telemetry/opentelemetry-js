@@ -47,9 +47,6 @@ export function parseConfigFile(): ConfigurationModel {
     );
   }
 
-  // Normalize YAML null type-tag values to {} before validation
-  normalizeYamlNulls(processed);
-
   const valid = validateConfig(processed);
   if (!valid) {
     let detail: string;
@@ -75,14 +72,6 @@ export function parseConfigFile(): ConfigurationModel {
 
   // Strip file_format from output — it's a meta-field, not a config value
   delete (data as Record<string, unknown>)['file_format'];
-
-  // The generated TypeScript types omit `| null` from unions (see
-  // generate-config.js) because consumers expect `T | undefined`, not
-  // `T | null`. To match, we delete any properties still set to `null`
-  // after YAML parsing so that accessing them returns `undefined`.
-  // Runs after normalizeYamlNulls, which has already converted type-tag
-  // nulls (e.g. `console:`) to `{}`.
-  stripNulls(processed);
 
   applyConfigDefaults(data);
   mergeAttributesList(data);
@@ -234,113 +223,6 @@ function applyConfigDefaults(data: ConfigurationModel): void {
     data.attribute_limits = { attribute_count_limit: 128 };
   } else if (data.attribute_limits.attribute_count_limit == null) {
     data.attribute_limits.attribute_count_limit = 128;
-  }
-}
-
-/**
- * Recursively delete object properties whose value is `null`.
- *
- * YAML `key:` (no value) parses to `{ key: null }`. The generated TypeScript
- * types use `?: T` (not `T | null`) because downstream consumers like sdk-node
- * assign config values to interfaces that only accept `T | undefined`. The
- * codegen script (generate-config.js) strips `| null` from type unions; this
- * function makes the runtime data match by deleting null-valued keys so that
- * property access returns `undefined` instead of `null`.
- *
- * Must run AFTER normalizeYamlNulls, which converts type-tag nulls
- * (e.g. `console: null` → `console: {}`) — those are already `{}` by the
- * time this function runs and won't be affected.
- */
-function stripNulls(value: unknown): void {
-  if (value == null || typeof value !== 'object') return;
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      stripNulls(item);
-    }
-  } else {
-    for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
-      if (val === null) {
-        delete (value as Record<string, unknown>)[key];
-      } else {
-        stripNulls(val);
-      }
-    }
-  }
-}
-
-/**
- * Object type-tag keys that may appear as nested (non-array-element) properties.
- * YAML `console:` (no value) parses to `{ console: null }`, but the SDK checks
- * `if (exporter.console)` — truthy — so null must become {}.
- *
- * We exclude keys that are also used as nullable primitives in other contexts
- * (e.g. `host` is a string field in prometheus config; detectors use it as a
- * type-tag but only as array elements, which are already handled below).
- */
-const NESTED_OBJECT_TYPE_TAGS = new Set([
-  // Exporter type discriminators (nested inside simple/batch processor or reader)
-  'console',
-  'otlp_http',
-  'otlp_grpc',
-  // Sampler type discriminators (nested inside tracer_provider.sampler)
-  'always_on',
-  'always_off',
-  'trace_id_ratio_based',
-  'parent_based',
-  'jaeger_remote',
-  // Propagator type discriminators (array elements, but covered here for completeness)
-  'tracecontext',
-  'baggage',
-  'b3',
-  'b3multi',
-  'xray',
-  // Telemetry producer type discriminators
-  'opencensus',
-]);
-
-/**
- * Normalizes YAML null values to empty objects for discriminated-union type-tag fields.
- *
- * YAML `key:` (no value) parses to `{ key: null }`, but the SDK checks `if (obj.key)`
- * to determine which type to instantiate — null fails that check. Two cases:
- *
- * 1. Array element properties: convert ALL null-valued keys to {} (handles detectors,
- *    composite propagators, and most exporter/processor discriminators).
- * 2. Nested NESTED_OBJECT_TYPE_TAGS: convert known type-discriminator keys to {} when
- *    encountered anywhere in the tree (handles sampler types, console exporter nested
- *    inside simple/batch, etc.).
- *
- * Top-level nullable primitive fields (disabled, log_level, endpoint, ca_file, etc.)
- * are NOT in NESTED_OBJECT_TYPE_TAGS and are left as-is; applyConfigDefaults()
- * handles the boolean/string ones that need defaults.
- */
-function normalizeYamlNulls(value: unknown): void {
-  if (value == null || typeof value !== 'object') return;
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      if (item != null && typeof item === 'object' && !Array.isArray(item)) {
-        // All null-valued properties of array elements are type-tag discriminators.
-        for (const key of Object.keys(item as object)) {
-          if ((item as Record<string, unknown>)[key] === null) {
-            (item as Record<string, unknown>)[key] = {};
-          }
-        }
-      }
-      normalizeYamlNulls(item);
-    }
-  } else {
-    for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
-      if (
-        val === null &&
-        // Known type-tag keys, or slash-qualified experimental type-tags
-        // (e.g. otlp_file/development, prometheus/development)
-        (NESTED_OBJECT_TYPE_TAGS.has(key) || key.includes('/'))
-      ) {
-        (value as Record<string, unknown>)[key] = {};
-      } else {
-        normalizeYamlNulls(val);
-      }
-    }
   }
 }
 
