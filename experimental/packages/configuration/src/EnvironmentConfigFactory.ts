@@ -115,7 +115,12 @@ export function setResources(config: ConfigurationModel): void {
   }
 
   const resourceAttrList = getStringFromEnv('OTEL_RESOURCE_ATTRIBUTES');
-  const list = getStringListFromEnv('OTEL_RESOURCE_ATTRIBUTES');
+  const list = resourceAttrList
+    ? resourceAttrList
+        .split(',')
+        .map(s => s.trim())
+        .filter(s => s)
+    : [];
   const serviceName = getStringFromEnv('OTEL_SERVICE_NAME');
 
   if (serviceName) {
@@ -127,7 +132,7 @@ export function setResources(config: ConfigurationModel): void {
       },
     ];
   }
-  if (list && list.length > 0) {
+  if (list.length > 0) {
     config.resource.attributes_list = resourceAttrList;
     if (config.resource.attributes == null) {
       config.resource.attributes = [];
@@ -200,26 +205,22 @@ export function setPropagators(config: ConfigurationModel): void {
   if (config.propagator == null) {
     config.propagator = {};
   }
-  const composite = getStringListFromEnv('OTEL_PROPAGATORS');
-  if (composite && composite.length > 0) {
-    config.propagator.composite = [];
-    for (const name of composite) {
-      if (name === 'tracecontext') {
-        config.propagator.composite.push({ tracecontext: {} });
-      } else if (name === 'baggage') {
-        config.propagator.composite.push({ baggage: {} });
-      } else if (name === 'b3') {
-        config.propagator.composite.push({ b3: {} });
-      } else if (name === 'b3multi') {
-        config.propagator.composite.push({ b3multi: {} });
-      } else {
-        config.propagator.composite.push({ [name]: {} });
-      }
-    }
-  }
   const compositeList = getStringFromEnv('OTEL_PROPAGATORS');
   if (compositeList) {
     config.propagator.composite_list = compositeList;
+    const names = compositeList
+      .split(',')
+      .map(s => s.trim())
+      .filter(s => s);
+    if (names.length > 0) {
+      config.propagator.composite = [];
+      // Store each propagator name as a type-discriminator key. The config
+      // model doesn't validate names here — known vs third-party propagators
+      // are resolved when the SDK instantiates from the model.
+      for (const name of names) {
+        config.propagator.composite.push({ [name]: {} });
+      }
+    }
   }
 }
 
