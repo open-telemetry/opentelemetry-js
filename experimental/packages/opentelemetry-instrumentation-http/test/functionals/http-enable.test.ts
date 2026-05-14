@@ -1048,7 +1048,7 @@ describe('HttpInstrumentation', () => {
 
       it('using an invalid url does throw from client but still creates a span', async () => {
         try {
-          await httpRequest.get(`http://instrumentation.test:string-as-port/`);
+          await httpRequest.get('http://instrumentation.test:string-as-port/');
         } catch (e) {
           assert.match(e.message, /Invalid URL/);
         }

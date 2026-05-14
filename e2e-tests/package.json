@@ -5,8 +5,8 @@
   "version": "0.10.0",
   "scripts": {
     "test:e2e": "npm run stop-collector; npm run run-collector && npm run export-telemetry && npm run verify || npm run stop-collector",
-    "lint": "eslint . --ext .mjs",
-    "lint:fix": "eslint . --ext .mjs --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "run-collector": "docker run --pull=always -d --rm --name otelcol-e2e -v $(pwd)/collector-config.yaml:/etc/otelcol/config.yaml -v $(pwd)/collector-output.json:/tmp/collector-output.json -p 4317:4317 -p 4318:4318 -w /tmp otel/opentelemetry-collector-contrib:latest --config /etc/otelcol/config.yaml && sleep 5",
     "export-telemetry": "node test.mjs; sleep 5",
     "prerun-collector": "node -e \"require('fs').writeFileSync('collector-output.json', '')\"",

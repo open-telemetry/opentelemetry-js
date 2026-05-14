@@ -69,7 +69,6 @@ export class BasicTracerProvider implements TracerProvider {
       );
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this._tracers.get(key)!;
   }
 

@@ -595,7 +595,7 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP counter_total description missing',
         '# TYPE counter_total counter',
-        `counter_total{key1="attributeValue1"} 10`,
+        'counter_total{key1="attributeValue1"} 10',
         '',
       ]);
     });

@@ -562,7 +562,7 @@ export function getPeriodicMetricReaderFromConfiguration(
       });
     }
   }
-  diag.warn(`Unsupported Metric Exporter.`);
+  diag.warn('Unsupported Metric Exporter.');
   return undefined;
 }
 
@@ -650,7 +650,7 @@ export function getLogRecordExporter(
   } else if (exporter.console) {
     return new ConsoleLogRecordExporter();
   }
-  diag.warn(`Unsupported Exporter value. No Log Record Exporter registered`);
+  diag.warn('Unsupported Exporter value. No Log Record Exporter registered');
   return undefined;
 }
 
@@ -806,7 +806,7 @@ export function getSpanExporter(
   } else if (exporter.console) {
     return new ConsoleSpanExporter();
   }
-  diag.warn(`Unsupported Exporter value. No Span Exporter registered`);
+  diag.warn('Unsupported Exporter value. No Span Exporter registered');
   return undefined;
 }
 
@@ -957,7 +957,7 @@ export function getAggregationType(
     };
   }
 
-  diag.warn(`Unsupported aggregation type`);
+  diag.warn('Unsupported aggregation type');
   return undefined;
 }
 

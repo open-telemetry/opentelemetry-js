@@ -518,7 +518,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
               url,
             });
           }
-          // eslint-disable-next-line @typescript-eslint/only-throw-error
+
           throw error;
         }
 

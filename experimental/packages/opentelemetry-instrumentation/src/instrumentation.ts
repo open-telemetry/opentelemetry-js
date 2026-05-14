@@ -196,7 +196,7 @@ export abstract class InstrumentationAbstract<
       hookHandler(span, info);
     } catch (e) {
       this._diag.error(
-        `Error running span customization hook due to exception in handler`,
+        'Error running span customization hook due to exception in handler',
         { triggerName },
         e
       );
