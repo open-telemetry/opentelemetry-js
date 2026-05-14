@@ -66,7 +66,7 @@
     "@opentelemetry/api": ">=1.0.0 <1.10.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
-    "@types/sinon": "17.0.4",
+    "@types/sinon": "21.0.1",
     "@types/webpack-env": "1.16.3",
     "babel-plugin-istanbul": "8.0.0",
     "karma": "6.4.4",
