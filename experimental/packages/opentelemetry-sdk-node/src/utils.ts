@@ -113,10 +113,8 @@ export function getResourceFromConfiguration(
     const attrs: DetectedResourceAttributes = {};
     for (let i = 0; i < config.resource.attributes.length; i++) {
       const a = config.resource.attributes[i];
-      // DetectedResourceAttributes does not (yet) support extended/complex
-      // attributes. It is not clear if OTel Configuration supports `null`
-      // resource attributes (https://github.com/open-telemetry/opentelemetry-configuration/issues/613).
-      // For now we will drop resource attributes from config with a `null` value.
+      // https://github.com/open-telemetry/opentelemetry-configuration/issues/613
+      // will likely clarify that entries with a `null` value should be ignored.
       if (a.value !== null) {
         attrs[a.name] = a.value;
       }
