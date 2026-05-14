@@ -671,10 +671,11 @@ export function getLogRecordProcessorsFromConfiguration(
       if (exporter) {
         logRecordProcessors.push(
           new BatchLogRecordProcessor(exporter, {
-            maxQueueSize: processor.batch.max_queue_size ?? 2048,
-            maxExportBatchSize: processor.batch.max_export_batch_size ?? 512,
-            scheduledDelayMillis: processor.batch.schedule_delay ?? 1000,
-            exportTimeoutMillis: processor.batch.export_timeout ?? 30000,
+            maxQueueSize: processor.batch.max_queue_size ?? undefined,
+            maxExportBatchSize:
+              processor.batch.max_export_batch_size ?? undefined,
+            scheduledDelayMillis: processor.batch.schedule_delay ?? undefined,
+            exportTimeoutMillis: processor.batch.export_timeout ?? undefined,
           })
         );
       }
@@ -777,9 +778,9 @@ export function getSpanExporter(
           exporter.otlp_http?.compression === 'gzip'
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
-        url: exporter.otlp_http?.endpoint ?? 'http://localhost:4318/v1/traces',
+        url: exporter.otlp_http?.endpoint ?? undefined,
         headers: getHeadersFromConfiguration(exporter.otlp_http?.headers),
-        timeoutMillis: exporter.otlp_http?.timeout ?? 10000,
+        timeoutMillis: exporter.otlp_http?.timeout ?? undefined,
         httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http?.tls),
       });
     } else {
@@ -788,9 +789,9 @@ export function getSpanExporter(
           exporter.otlp_http?.compression === 'gzip'
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
-        url: exporter.otlp_http?.endpoint ?? 'http://localhost:4318/v1/traces',
+        url: exporter.otlp_http?.endpoint ?? undefined,
         headers: getHeadersFromConfiguration(exporter.otlp_http?.headers),
-        timeoutMillis: exporter.otlp_http?.timeout ?? 10000,
+        timeoutMillis: exporter.otlp_http?.timeout ?? undefined,
         httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http?.tls),
       });
     }
@@ -800,8 +801,8 @@ export function getSpanExporter(
         exporter.otlp_grpc?.compression === 'gzip'
           ? CompressionAlgorithm.GZIP
           : CompressionAlgorithm.NONE,
-      url: exporter.otlp_grpc?.endpoint ?? 'http://localhost:4317',
-      timeoutMillis: exporter.otlp_grpc?.timeout ?? 10000,
+      url: exporter.otlp_grpc?.endpoint ?? undefined,
+      timeoutMillis: exporter.otlp_grpc?.timeout ?? undefined,
       credentials: getGrpcCredentialsFromTls(exporter.otlp_grpc?.tls),
       metadata: getGrpcMetadataFromHeaders(exporter.otlp_grpc?.headers),
     });
@@ -822,10 +823,11 @@ export function getSpanProcessorsFromConfiguration(
       if (exporter) {
         spanProcessors.push(
           new BatchSpanProcessor(exporter, {
-            maxQueueSize: processor.batch.max_queue_size ?? 2048,
-            maxExportBatchSize: processor.batch.max_export_batch_size ?? 512,
-            scheduledDelayMillis: processor.batch.schedule_delay ?? 5000,
-            exportTimeoutMillis: processor.batch.export_timeout ?? 30000,
+            maxQueueSize: processor.batch.max_queue_size ?? undefined,
+            maxExportBatchSize:
+              processor.batch.max_export_batch_size ?? undefined,
+            scheduledDelayMillis: processor.batch.schedule_delay ?? undefined,
+            exportTimeoutMillis: processor.batch.export_timeout ?? undefined,
           })
         );
       }
@@ -943,8 +945,10 @@ export function getAggregationType(
       type: AggregationType.EXPONENTIAL_HISTOGRAM,
       options: {
         recordMinMax:
-          aggregation.base2_exponential_bucket_histogram.record_min_max ?? true,
-        maxSize: aggregation.base2_exponential_bucket_histogram.max_size ?? 160,
+          aggregation.base2_exponential_bucket_histogram.record_min_max ??
+          undefined,
+        maxSize:
+          aggregation.base2_exponential_bucket_histogram.max_size ?? undefined,
       },
     };
   }
