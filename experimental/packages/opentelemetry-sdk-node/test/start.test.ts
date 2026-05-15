@@ -57,6 +57,7 @@ import {
 import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
 import {
   getLogRecordExporter,
+  getPeriodicMetricReaderFromConfiguration,
   getSpanExporter,
   setupContextManager,
 } from '../src/utils';
@@ -963,6 +964,28 @@ describe('startNodeSDK', function () {
       assert.equal(getLogRecordExporter(exporter), undefined);
     });
 
+    it('should create metric reader with opencensus producer when shim is available', async () => {
+      const reader = getPeriodicMetricReaderFromConfiguration({
+        exporter: { console: {} },
+        producers: [{ opencensus: {} }],
+      });
+      assert.ok(reader !== undefined);
+      await (reader as PeriodicExportingMetricReader).shutdown();
+    });
+
+    it('should warn for unsupported metric producer', async () => {
+      const warnSpy = Sinon.spy(diag, 'warn');
+      const reader = getPeriodicMetricReaderFromConfiguration({
+        exporter: { console: {} },
+        producers: [{ 'unknown/producer': {} }],
+      });
+      assert.ok(reader !== undefined);
+      assert.ok(
+        warnSpy.args.some(args =>
+          String(args[0]).includes('Unsupported metric producer')
+        )
+      );
+      await (reader as PeriodicExportingMetricReader).shutdown();
     it('should warn when exporter timeout is 0', async () => {
       const warnSpy = Sinon.spy(diag, 'warn');
       const exporter = getSpanExporter({
