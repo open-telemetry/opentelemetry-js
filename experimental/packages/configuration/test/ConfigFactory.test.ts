@@ -2627,6 +2627,40 @@ describe('ConfigFactory', function () {
           composite: [{ tracecontext: {} }],
           composite_list: 'tracecontext',
         },
+        tracer_provider: {
+          processors: [
+            {
+              simple: {
+                exporter: {
+                  console: {},
+                },
+              },
+            },
+          ],
+          limits: {
+            attribute_value_length_limit: 4096,
+            attribute_count_limit: 128,
+            event_count_limit: 128,
+            link_count_limit: 128,
+            event_attribute_count_limit: 128,
+            link_attribute_count_limit: 128,
+          },
+        },
+        meter_provider: {
+          readers: [
+            {
+              periodic: {
+                interval: 60000,
+                timeout: 30000,
+                exporter: {
+                  console: {},
+                },
+                cardinality_limits: { default: 2000 },
+              },
+            },
+          ],
+          exemplar_filter: 'trace_based',
+        },
         logger_provider: {
           processors: [
             {
@@ -2637,6 +2671,10 @@ describe('ConfigFactory', function () {
               },
             },
           ],
+          limits: {
+            attribute_value_length_limit: 4096,
+            attribute_count_limit: 128,
+          },
           'logger_configurator/development': {
             loggers: [
               {
