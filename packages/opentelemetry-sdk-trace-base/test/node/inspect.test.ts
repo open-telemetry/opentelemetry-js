@@ -139,8 +139,10 @@ describe('util.inspect', () => {
         `unexpected diag.error calls: ${diagError.args.map(a => a.join(' ')).join('; ')}`
       );
       assert.ok(
-        !diagDebug.args.some(([msg]) =>
-          typeof msg === 'string' && msg.startsWith('Unsettled resource attribute')
+        !diagDebug.args.some(
+          ([msg]) =>
+            typeof msg === 'string' &&
+            msg.startsWith('Unsettled resource attribute')
         ),
         'inspect should not emit "Unsettled resource attribute" debug logs'
       );
