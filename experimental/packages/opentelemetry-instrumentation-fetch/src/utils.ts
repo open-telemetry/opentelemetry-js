@@ -6,9 +6,19 @@
 // Much of the logic here overlaps with the same utils file in opentelemetry-instrumentation-xml-http-request
 // These may be unified in the future.
 
+import type { HrTime, Span } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
-import { getStringListFromEnv } from '@opentelemetry/core';
-import type { URLLike } from '@opentelemetry/sdk-trace-web';
+import {
+  hrTimeToNanoseconds,
+  timeInputToHrTime,
+  urlMatches,
+} from '@opentelemetry/core';
+
+import { PerformanceTimingNames } from './enums/PerformanceTimingNames';
+import {
+  ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
+  ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+} from './semconv';
 
 const DIAG_LOGGER = diag.createComponentLogger({
   namespace: '@opentelemetry/opentelemetry-instrumentation-fetch/utils',
@@ -168,20 +178,6 @@ function getFormDataSize(formData: FormData): number {
   return size;
 }
 
-/**
- * Normalize an HTTP request method string per `http.request.method` spec
- * https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#http-client-span
- */
-export function normalizeHttpRequestMethod(method: string): string {
-  const knownMethods = getKnownMethods();
-  const methUpper = method.toUpperCase();
-  if (methUpper in knownMethods) {
-    return methUpper;
-  } else {
-    return '_OTHER';
-  }
-}
-
 const DEFAULT_KNOWN_METHODS = {
   CONNECT: true,
   DELETE: true,
@@ -195,22 +191,19 @@ const DEFAULT_KNOWN_METHODS = {
   // QUERY from https://datatracker.ietf.org/doc/draft-ietf-httpbis-safe-method-w-body/
   QUERY: true,
 };
-let knownMethods: { [key: string]: boolean };
-function getKnownMethods() {
-  if (knownMethods === undefined) {
-    const cfgMethods = getStringListFromEnv(
-      'OTEL_INSTRUMENTATION_HTTP_KNOWN_METHODS'
-    );
-    if (cfgMethods && cfgMethods.length > 0) {
-      knownMethods = {};
-      cfgMethods.forEach(m => {
-        knownMethods[m] = true;
-      });
-    } else {
-      knownMethods = DEFAULT_KNOWN_METHODS;
-    }
+
+/**
+ * Normalize an HTTP request method string per `http.request.method` spec
+ * https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#http-client-span
+ */
+export function normalizeHttpRequestMethod(method: string): string {
+  const knownMethods = DEFAULT_KNOWN_METHODS;
+  const methUpper = method.toUpperCase();
+  if (methUpper in knownMethods) {
+    return methUpper;
+  } else {
+    return '_OTHER';
   }
-  return knownMethods;
 }
 
 const HTTP_PORT_FROM_PROTOCOL: { [key: string]: string } = {
@@ -224,5 +217,413 @@ export function serverPortFromUrl(url: URLLike): number | undefined {
     return serverPort;
   } else {
     return undefined;
+  }
+}
+
+export type PropagateTraceHeaderCorsUrls =
+  | string
+  | RegExp
+  | Array<string | RegExp>;
+export type PerformanceEntries = {
+  [PerformanceTimingNames.CONNECT_END]?: number;
+  [PerformanceTimingNames.CONNECT_START]?: number;
+  [PerformanceTimingNames.DECODED_BODY_SIZE]?: number;
+  [PerformanceTimingNames.DOM_COMPLETE]?: number;
+  [PerformanceTimingNames.DOM_CONTENT_LOADED_EVENT_END]?: number;
+  [PerformanceTimingNames.DOM_CONTENT_LOADED_EVENT_START]?: number;
+  [PerformanceTimingNames.DOM_INTERACTIVE]?: number;
+  [PerformanceTimingNames.DOMAIN_LOOKUP_END]?: number;
+  [PerformanceTimingNames.DOMAIN_LOOKUP_START]?: number;
+  [PerformanceTimingNames.ENCODED_BODY_SIZE]?: number;
+  [PerformanceTimingNames.FETCH_START]?: number;
+  [PerformanceTimingNames.LOAD_EVENT_END]?: number;
+  [PerformanceTimingNames.LOAD_EVENT_START]?: number;
+  [PerformanceTimingNames.REDIRECT_END]?: number;
+  [PerformanceTimingNames.REDIRECT_START]?: number;
+  [PerformanceTimingNames.REQUEST_START]?: number;
+  [PerformanceTimingNames.RESPONSE_END]?: number;
+  [PerformanceTimingNames.RESPONSE_START]?: number;
+  [PerformanceTimingNames.SECURE_CONNECTION_START]?: number;
+  [PerformanceTimingNames.START_TIME]?: number;
+  [PerformanceTimingNames.UNLOAD_EVENT_END]?: number;
+  [PerformanceTimingNames.UNLOAD_EVENT_START]?: number;
+};
+
+/**
+ * Helper function for adding network events and content length attributes.
+ */
+export function addSpanNetworkEvents(
+  span: Span,
+  resource: PerformanceEntries,
+  ignoreNetworkEvents = false,
+  ignoreZeros?: boolean,
+  skipOldSemconvContentLengthAttrs?: boolean
+): void {
+  if (ignoreZeros === undefined) {
+    ignoreZeros = resource[PerformanceTimingNames.START_TIME] !== 0;
+  }
+
+  if (!ignoreNetworkEvents) {
+    addSpanNetworkEvent(
+      span,
+      PerformanceTimingNames.FETCH_START,
+      resource,
+      ignoreZeros
+    );
+    addSpanNetworkEvent(
+      span,
+      PerformanceTimingNames.DOMAIN_LOOKUP_START,
+      resource,
+      ignoreZeros
+    );
+    addSpanNetworkEvent(
+      span,
+      PerformanceTimingNames.DOMAIN_LOOKUP_END,
+      resource,
+      ignoreZeros
+    );
+    addSpanNetworkEvent(
+      span,
+      PerformanceTimingNames.CONNECT_START,
+      resource,
+      ignoreZeros
+    );
+    addSpanNetworkEvent(
+      span,
+      PerformanceTimingNames.SECURE_CONNECTION_START,
+      resource,
+      ignoreZeros
+    );
+    addSpanNetworkEvent(
+      span,
+      PerformanceTimingNames.CONNECT_END,
+      resource,
+      ignoreZeros
+    );
+    addSpanNetworkEvent(
+      span,
+      PerformanceTimingNames.REQUEST_START,
+      resource,
+      ignoreZeros
+    );
+    addSpanNetworkEvent(
+      span,
+      PerformanceTimingNames.RESPONSE_START,
+      resource,
+      ignoreZeros
+    );
+    addSpanNetworkEvent(
+      span,
+      PerformanceTimingNames.RESPONSE_END,
+      resource,
+      ignoreZeros
+    );
+  }
+
+  if (!skipOldSemconvContentLengthAttrs) {
+    // This block adds content-length-related span attributes using the
+    // *old* HTTP semconv (v1.7.0).
+    const encodedLength = resource[PerformanceTimingNames.ENCODED_BODY_SIZE];
+    if (encodedLength !== undefined) {
+      span.setAttribute(ATTR_HTTP_RESPONSE_CONTENT_LENGTH, encodedLength);
+    }
+
+    const decodedLength = resource[PerformanceTimingNames.DECODED_BODY_SIZE];
+    // Spec: Not set if transport encoding not used (in which case encoded and decoded sizes match)
+    if (decodedLength !== undefined && encodedLength !== decodedLength) {
+      span.setAttribute(
+        ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+        decodedLength
+      );
+    }
+  }
+}
+
+/**
+ * Helper function to be able to use enum as typed key in type and in interface when using forEach
+ * @param obj
+ * @param key
+ */
+export function hasKey<O extends object>(
+  obj: O,
+  key: PropertyKey
+): key is keyof O {
+  return key in obj;
+}
+
+/**
+ * Helper function for starting an event on span based on {@link PerformanceEntries}
+ * @param span
+ * @param performanceName name of performance entry for time start
+ * @param entries
+ * @param ignoreZeros
+ */
+export function addSpanNetworkEvent(
+  span: Span,
+  performanceName: string,
+  entries: PerformanceEntries,
+  ignoreZeros = true
+): Span | undefined {
+  if (
+    hasKey(entries, performanceName) &&
+    typeof entries[performanceName] === 'number' &&
+    !(ignoreZeros && entries[performanceName] === 0)
+  ) {
+    return span.addEvent(performanceName, entries[performanceName]);
+  }
+
+  return undefined;
+}
+
+/**
+ * The URLLike interface represents an URL and HTMLAnchorElement compatible fields.
+ */
+export interface URLLike {
+  hash: string;
+  host: string;
+  hostname: string;
+  href: string;
+  readonly origin: string;
+  password: string;
+  pathname: string;
+  port: string;
+  protocol: string;
+  search: string;
+  username: string;
+}
+
+let urlNormalizingAnchor: HTMLAnchorElement | undefined;
+/**
+ * Parses url using URL constructor or fallback to anchor element.
+ * @param url
+ */
+export function parseUrl(url: string): URLLike {
+  if (typeof URL === 'function') {
+    return new URL(
+      url,
+      typeof document !== 'undefined'
+        ? document.baseURI
+        : typeof location !== 'undefined' // Some JS runtimes (e.g. Deno) don't define this
+          ? location.href
+          : undefined
+    );
+  }
+
+  if (!urlNormalizingAnchor) {
+    urlNormalizingAnchor = document.createElement('a');
+  }
+  urlNormalizingAnchor.href = url;
+  return urlNormalizingAnchor;
+}
+
+/**
+ * Checks if trace headers should be propagated
+ * @param spanUrl
+ * @private
+ */
+export function shouldPropagateTraceHeaders(
+  spanUrl: string,
+  propagateTraceHeaderCorsUrls?: PropagateTraceHeaderCorsUrls
+): boolean {
+  let propagateTraceHeaderUrls = propagateTraceHeaderCorsUrls || [];
+  if (
+    typeof propagateTraceHeaderUrls === 'string' ||
+    propagateTraceHeaderUrls instanceof RegExp
+  ) {
+    propagateTraceHeaderUrls = [propagateTraceHeaderUrls];
+  }
+  const parsedSpanUrl = parseUrl(spanUrl);
+
+  if (parsedSpanUrl.origin === location?.origin) {
+    return true;
+  } else {
+    return propagateTraceHeaderUrls.some(propagateTraceHeaderUrl =>
+      urlMatches(spanUrl, propagateTraceHeaderUrl)
+    );
+  }
+}
+
+/**
+ * This interface is used in {@link getResource} function to return
+ *     main request and it's corresponding PreFlight request
+ */
+export interface PerformanceResourceTimingInfo {
+  corsPreFlightRequest?: PerformanceResourceTiming;
+  mainRequest?: PerformanceResourceTiming;
+}
+
+/**
+ * Filter all resources that has started and finished according to span start time and end time.
+ *     It will return the closest resource to a start time
+ * @param spanUrl
+ * @param startTimeHR
+ * @param endTimeHR
+ * @param resources
+ * @param ignoredResources
+ */
+function filterResourcesForSpan(
+  spanUrl: string,
+  startTimeHR: HrTime,
+  endTimeHR: HrTime,
+  resources: PerformanceResourceTiming[],
+  ignoredResources: WeakSet<PerformanceResourceTiming>,
+  initiatorType?: string
+) {
+  const startTime = hrTimeToNanoseconds(startTimeHR);
+  const endTime = hrTimeToNanoseconds(endTimeHR);
+  let filteredResources = resources.filter(resource => {
+    const resourceStartTime = hrTimeToNanoseconds(
+      timeInputToHrTime(resource[PerformanceTimingNames.FETCH_START])
+    );
+    const resourceEndTime = hrTimeToNanoseconds(
+      timeInputToHrTime(resource[PerformanceTimingNames.RESPONSE_END])
+    );
+
+    return (
+      resource.initiatorType.toLowerCase() ===
+        (initiatorType || 'xmlhttprequest') &&
+      resource.name === spanUrl &&
+      resourceStartTime >= startTime &&
+      resourceEndTime <= endTime
+    );
+  });
+
+  if (filteredResources.length > 0) {
+    filteredResources = filteredResources.filter(resource => {
+      return !ignoredResources.has(resource);
+    });
+  }
+
+  return filteredResources;
+}
+
+/**
+ * sort resources by startTime
+ * @param filteredResources
+ */
+function sortResources(
+  filteredResources: PerformanceResourceTiming[]
+): PerformanceResourceTiming[] {
+  return filteredResources.slice().sort((a, b) => {
+    const valueA = a[PerformanceTimingNames.FETCH_START];
+    const valueB = b[PerformanceTimingNames.FETCH_START];
+    if (valueA > valueB) {
+      return 1;
+    } else if (valueA < valueB) {
+      return -1;
+    }
+    return 0;
+  });
+}
+
+/**
+ * Will find the main request skipping the cors pre flight requests
+ * @param resources
+ * @param corsPreFlightRequestEndTime
+ * @param spanEndTimeHR
+ */
+function findMainRequest(
+  resources: PerformanceResourceTiming[],
+  corsPreFlightRequestEndTime: number,
+  spanEndTimeHR: HrTime
+): PerformanceResourceTiming {
+  const spanEndTime = hrTimeToNanoseconds(spanEndTimeHR);
+  const minTime = hrTimeToNanoseconds(
+    timeInputToHrTime(corsPreFlightRequestEndTime)
+  );
+
+  let mainRequest: PerformanceResourceTiming = resources[1];
+  let bestGap;
+
+  const length = resources.length;
+  for (let i = 1; i < length; i++) {
+    const resource = resources[i];
+    const resourceStartTime = hrTimeToNanoseconds(
+      timeInputToHrTime(resource[PerformanceTimingNames.FETCH_START])
+    );
+
+    const resourceEndTime = hrTimeToNanoseconds(
+      timeInputToHrTime(resource[PerformanceTimingNames.RESPONSE_END])
+    );
+
+    const currentGap = spanEndTime - resourceEndTime;
+
+    if (resourceStartTime >= minTime && (!bestGap || currentGap < bestGap)) {
+      bestGap = currentGap;
+      mainRequest = resource;
+    }
+  }
+  return mainRequest;
+}
+
+/**
+ * Get closest performance resource ignoring the resources that have been
+ * already used.
+ * @param spanUrl
+ * @param startTimeHR
+ * @param endTimeHR
+ * @param resources
+ * @param ignoredResources
+ * @param initiatorType
+ */
+export function getResource(
+  spanUrl: string,
+  startTimeHR: HrTime,
+  endTimeHR: HrTime,
+  resources: PerformanceResourceTiming[],
+  ignoredResources: WeakSet<PerformanceResourceTiming> = new WeakSet<PerformanceResourceTiming>(),
+  initiatorType?: string
+): PerformanceResourceTimingInfo {
+  // de-relativize the URL before usage (does no harm to absolute URLs)
+  const parsedSpanUrl = parseUrl(spanUrl);
+  spanUrl = parsedSpanUrl.toString();
+
+  const filteredResources = filterResourcesForSpan(
+    spanUrl,
+    startTimeHR,
+    endTimeHR,
+    resources,
+    ignoredResources,
+    initiatorType
+  );
+
+  if (filteredResources.length === 0) {
+    return {
+      mainRequest: undefined,
+    };
+  }
+  if (filteredResources.length === 1) {
+    return {
+      mainRequest: filteredResources[0],
+    };
+  }
+  const sorted = sortResources(filteredResources);
+
+  if (parsedSpanUrl.origin !== location?.origin && sorted.length > 1) {
+    let corsPreFlightRequest: PerformanceResourceTiming | undefined = sorted[0];
+    let mainRequest: PerformanceResourceTiming = findMainRequest(
+      sorted,
+      corsPreFlightRequest[PerformanceTimingNames.RESPONSE_END],
+      endTimeHR
+    );
+
+    const responseEnd =
+      corsPreFlightRequest[PerformanceTimingNames.RESPONSE_END];
+    const fetchStart = mainRequest[PerformanceTimingNames.FETCH_START];
+
+    // no corsPreFlightRequest
+    if (fetchStart < responseEnd) {
+      mainRequest = corsPreFlightRequest;
+      corsPreFlightRequest = undefined;
+    }
+
+    return {
+      corsPreFlightRequest,
+      mainRequest,
+    };
+  } else {
+    return {
+      mainRequest: filteredResources[0],
+    };
   }
 }
