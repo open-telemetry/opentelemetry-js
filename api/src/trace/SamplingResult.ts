@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { SpanAttributes } from './attributes';
+import type { Attributes } from '../common/Attributes';
 import type { TraceState } from './trace_state';
 
 /**
@@ -48,7 +48,7 @@ export interface SamplingResult {
    * Caller may call {@link Sampler}.shouldSample any number of times and
    * can safely cache the returned value.
    */
-  attributes?: Readonly<SpanAttributes>;
+  attributes?: Readonly<Attributes>;
   /**
    * A {@link TraceState} that will be associated with the {@link Span} through
    * the new {@link SpanContext}. Samplers SHOULD return the TraceState from

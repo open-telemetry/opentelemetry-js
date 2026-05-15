@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { Attributes } from '../common/Attributes';
 import type { Exception } from '../common/Exception';
 import type { TimeInput } from '../common/Time';
-import type { SpanAttributes } from './attributes';
 import { INVALID_SPAN_CONTEXT } from './invalid-span-constants';
 import type { Span } from './span';
 import type { SpanContext } from './span_context';
@@ -35,12 +35,12 @@ export class NonRecordingSpan implements Span {
   }
 
   // By default does nothing
-  setAttributes(_attributes: SpanAttributes): this {
+  setAttributes(_attributes: Attributes): this {
     return this;
   }
 
   // By default does nothing
-  addEvent(_name: string, _attributes?: SpanAttributes): this {
+  addEvent(_name: string, _attributes?: Attributes): this {
     return this;
   }
 

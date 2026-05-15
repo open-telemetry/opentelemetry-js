@@ -35,6 +35,9 @@ describe('utils', () => {
 
   describe('hashAttributes', () => {
     it('should hash all types of attribute values', () => {
+      // XXX re-write this test. The goal isn't that `hashAttributes` is stable
+      //     over time, but that two equivalent-data Attributes objects hash to the same value,
+      //     and diff ones do not.
       const cases: [Attributes, string][] = [
         [{ string: 'bar' }, '[["string","bar"]]'],
         [{ number: 1 }, '[["number",1]]'],
