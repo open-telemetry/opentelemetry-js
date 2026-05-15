@@ -42,7 +42,11 @@ import type { SpanProcessor } from './SpanProcessor';
 import type { TimedEvent } from './TimedEvent';
 import type { SpanLimits } from './types';
 import type { InspectFn, InspectStylizeOptions } from './inspect';
-import { formatInspect, inspectCustom } from './inspect';
+import {
+  formatInspect,
+  inspectCustom,
+  settledResourceAttributes,
+} from './inspect';
 
 /**
  * This type provides the properties of @link{ReadableSpan} at the same time
@@ -549,7 +553,7 @@ export class SpanImpl implements Span {
       droppedEventsCount: this._droppedEventsCount,
       droppedLinksCount: this._droppedLinksCount,
       instrumentationScope: this.instrumentationScope,
-      resource: { attributes: this.resource.attributes },
+      resource: { attributes: settledResourceAttributes(this.resource) },
     };
     return formatInspect('SpanImpl', payload, depth, options, inspect);
   }

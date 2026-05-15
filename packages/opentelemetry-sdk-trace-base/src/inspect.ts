@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { Attributes, AttributeValue } from '@opentelemetry/api';
+import type { Resource } from '@opentelemetry/resources';
+
 /**
  * Well-known symbol used by Node.js `util.inspect` (and `console.*`) to
  * render an object via a custom representation. Defined as a global Symbol
@@ -10,6 +13,26 @@
  * for browser builds (where the symbol is simply never looked up).
  */
 export const inspectCustom = Symbol.for('nodejs.util.inspect.custom');
+
+/**
+ * Collect a Resource's settled attributes without touching the
+ * `attributes` getter, which emits diag.error/debug entries when async
+ * attribute detectors are still pending. Promise-like (unsettled)
+ * entries are silently skipped so logging a Span/Tracer/Provider during
+ * startup doesn't recurse through the diag pipeline.
+ */
+export function settledResourceAttributes(resource: Resource): Attributes {
+  const attrs: Attributes = {};
+  for (const [k, v] of resource.getRawAttributes()) {
+    if (typeof (v as Partial<PromiseLike<unknown>>)?.then === 'function') {
+      continue;
+    }
+    if (v != null) {
+      attrs[k] ??= v as AttributeValue;
+    }
+  }
+  return attrs;
+}
 
 export type InspectFn = (value: unknown, options: unknown) => string;
 

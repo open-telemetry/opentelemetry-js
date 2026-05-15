@@ -4,8 +4,16 @@
  */
 
 import type { SpanContext } from '@opentelemetry/api';
-import { ROOT_CONTEXT, SpanKind, TraceFlags } from '@opentelemetry/api';
+import {
+  diag,
+  DiagLogLevel,
+  ROOT_CONTEXT,
+  SpanKind,
+  TraceFlags,
+} from '@opentelemetry/api';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import * as util from 'util';
 import { BasicTracerProvider } from '../../src';
 import { SpanImpl } from '../../src/Span';
@@ -82,6 +90,62 @@ describe('util.inspect', () => {
       );
       assert.ok(out.includes("'a@:'"));
       assert.ok(out.includes("'b@0.0.1:'"));
+    });
+  });
+
+  describe('resource with unsettled async attributes', () => {
+    let diagError: sinon.SinonSpy;
+    let diagDebug: sinon.SinonSpy;
+
+    beforeEach(() => {
+      diagError = sinon.spy();
+      diagDebug = sinon.spy();
+      diag.setLogger(
+        {
+          error: diagError,
+          warn: () => {},
+          info: () => {},
+          debug: diagDebug,
+          verbose: () => {},
+        },
+        DiagLogLevel.DEBUG
+      );
+    });
+    afterEach(() => diag.disable());
+
+    it('should not emit diag warnings and should skip unsettled attributes', () => {
+      const resource = resourceFromAttributes({
+        'service.name': 'svc',
+        'cloud.region': Promise.resolve('us-east-1'),
+      });
+      const provider = new BasicTracerProvider({ resource });
+      const t = provider.getTracer('default') as Tracer;
+      const span = new SpanImpl({
+        scope: t.instrumentationScope,
+        resource: t['_resource'],
+        context: ROOT_CONTEXT,
+        spanContext,
+        name: 'span1',
+        kind: SpanKind.INTERNAL,
+        spanLimits: t.getSpanLimits(),
+        spanProcessor: t['_spanProcessor'],
+      });
+
+      const out = util.inspect(span, { depth: 5, colors: false });
+
+      assert.strictEqual(
+        diagError.callCount,
+        0,
+        `unexpected diag.error calls: ${diagError.args.map(a => a.join(' ')).join('; ')}`
+      );
+      assert.ok(
+        !diagDebug.args.some(([msg]) =>
+          typeof msg === 'string' && msg.startsWith('Unsettled resource attribute')
+        ),
+        'inspect should not emit "Unsettled resource attribute" debug logs'
+      );
+      assert.ok(out.includes("'service.name': 'svc'"));
+      assert.ok(!out.includes('cloud.region'));
     });
   });
 });

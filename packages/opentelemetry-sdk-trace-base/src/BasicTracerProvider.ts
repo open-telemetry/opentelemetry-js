@@ -14,7 +14,11 @@ import { MultiSpanProcessor } from './MultiSpanProcessor';
 import type { TracerConfig } from './types';
 import { reconfigureLimits } from './utility';
 import type { InspectFn, InspectStylizeOptions } from './inspect';
-import { formatInspect, inspectCustom } from './inspect';
+import {
+  formatInspect,
+  inspectCustom,
+  settledResourceAttributes,
+} from './inspect';
 
 export enum ForceFlushState {
   'resolved',
@@ -137,7 +141,7 @@ export class BasicTracerProvider implements TracerProvider {
       '_spanProcessors'
     ] as SpanProcessor[];
     const payload = {
-      resource: { attributes: this._resource.attributes },
+      resource: { attributes: settledResourceAttributes(this._resource) },
       tracers: Array.from(this._tracers.keys()),
       spanProcessors: processors.map(
         p => p.constructor?.name ?? 'SpanProcessor'

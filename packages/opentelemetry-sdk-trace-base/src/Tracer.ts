@@ -17,7 +17,11 @@ import type { Resource } from '@opentelemetry/resources';
 import { TracerMetrics } from './TracerMetrics';
 import { VERSION } from './version';
 import type { InspectFn, InspectStylizeOptions } from './inspect';
-import { formatInspect, inspectCustom } from './inspect';
+import {
+  formatInspect,
+  inspectCustom,
+  settledResourceAttributes,
+} from './inspect';
 
 /**
  * This class represents a basic tracer.
@@ -265,7 +269,7 @@ export class Tracer implements api.Tracer {
   ): unknown {
     const payload = {
       instrumentationScope: this.instrumentationScope,
-      resource: { attributes: this._resource.attributes },
+      resource: { attributes: settledResourceAttributes(this._resource) },
       spanLimits: this._spanLimits,
       generalLimits: this._generalLimits,
     };
