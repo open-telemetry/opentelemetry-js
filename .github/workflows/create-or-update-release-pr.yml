@@ -58,7 +58,7 @@ jobs:
         with:
           cache: 'npm'
           cache-dependency-path: package-lock.json
-          node-version: "22.22.1" # pin to avoid bug in 22.22.2
+          node-version: 22
       - run: npm install -g npm@latest
 
       - run: npm ci --ignore-scripts
