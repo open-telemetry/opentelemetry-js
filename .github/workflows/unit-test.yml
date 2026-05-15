@@ -44,12 +44,10 @@ jobs:
           matrix.node_version == '18' ||
           matrix.node_version == '20.6.0'
           }}
-      # Workaround: skip this install of npm@latest for Node.js v22 to
-      # workaround https://github.com/nodejs/node/issues/62425
-      # Npm@latest isn't typically *required*.
       - run: npm install -g npm@latest
         if: ${{
           matrix.node_version == '20' ||
+          matrix.node_version == '22' ||
           matrix.node_version == '24' ||
           matrix.node_version == '25' ||
           matrix.node_version == '26'
@@ -80,7 +78,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: "22.22.1" # pin to avoid bug in 22.22.2
+          node-version: '22'
 
       - run: npm install -g npm@latest
 
