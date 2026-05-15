@@ -614,38 +614,39 @@ export function getLogRecordExporter(
   exporter: LogRecordExporterConfigModel
 ): LogRecordExporter | undefined {
   if (exporter.otlp_http) {
-    const encoding = exporter.otlp_http.encoding;
+    const cfg = exporter.otlp_http;
+    const commonOpts = {
+      compression:
+        cfg.compression === 'gzip'
+          ? CompressionAlgorithm.GZIP
+          : CompressionAlgorithm.NONE,
+      url: cfg.endpoint,
+      headers: getHeadersFromConfiguration(cfg.headers),
+      timeoutMillis: cfg.timeout,
+      httpAgentOptions: getHttpAgentOptionsFromTls(cfg.tls),
+    };
+    const encoding = cfg.encoding;
     if (encoding === 'json') {
-      return new OTLPHttpLogExporter({
-        compression:
-          exporter.otlp_http.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
-      });
+      return new OTLPHttpLogExporter(commonOpts);
     }
-    if (encoding === 'protobuf') {
-      return new OTLPProtoLogExporter({
-        compression:
-          exporter.otlp_http.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
-      });
+    if (encoding === 'protobuf' || encoding == null) {
+      return new OTLPProtoLogExporter(commonOpts);
     }
     diag.warn(
       `Unsupported OTLP logs encoding: ${encoding}. Using http/protobuf.`
     );
-    return new OTLPProtoLogExporter({
-      compression:
-        exporter.otlp_http.compression === 'gzip'
-          ? CompressionAlgorithm.GZIP
-          : CompressionAlgorithm.NONE,
-    });
+    return new OTLPProtoLogExporter(commonOpts);
   } else if (exporter.otlp_grpc) {
+    const cfg = exporter.otlp_grpc;
     return new OTLPGrpcLogExporter({
       compression:
-        exporter.otlp_grpc.compression === 'gzip'
+        cfg.compression === 'gzip'
           ? CompressionAlgorithm.GZIP
           : CompressionAlgorithm.NONE,
+      url: cfg.endpoint,
+      timeoutMillis: cfg.timeout,
+      credentials: getGrpcCredentialsFromTls(cfg.tls),
+      metadata: getGrpcMetadataFromHeaders(cfg.headers),
     });
   } else if (exporter.console) {
     return new ConsoleLogRecordExporter();
