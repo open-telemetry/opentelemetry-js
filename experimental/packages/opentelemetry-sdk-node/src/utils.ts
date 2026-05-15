@@ -699,19 +699,6 @@ export function getHeadersFromConfiguration(
   return result;
 }
 
-function readFileOrWarn(
-  filePath: string | undefined,
-  label: string
-): Buffer | undefined {
-  if (!filePath) return undefined;
-  try {
-    return fs.readFileSync(filePath);
-  } catch (e) {
-    diag.warn(`Failed to read ${label} file at ${filePath}: ${e}`);
-    return undefined;
-  }
-}
-
 export function getHttpAgentOptionsFromTls(
   tls: HttpTlsConfigModel | undefined
 ): { ca?: Buffer; cert?: Buffer; key?: Buffer } | undefined {
@@ -765,6 +752,19 @@ function getGrpcMetadataFromHeaders(
   return metadata;
 }
 
+function readFileOrWarn(
+  filePath: string | undefined,
+  label: string
+): Buffer | undefined {
+  if (!filePath) return undefined;
+  try {
+    return fs.readFileSync(filePath);
+  } catch (e) {
+    diag.warn(`Failed to read ${label} file at ${filePath}: ${e}`);
+    return undefined;
+  }
+}
+
 export function getSpanExporter(
   exporter: SpanExporterConfigModel
 ): SpanExporter | undefined {
@@ -801,8 +801,8 @@ export function getSpanExporter(
           : CompressionAlgorithm.NONE,
       url: exporter.otlp_grpc.endpoint,
       timeoutMillis: exporter.otlp_grpc.timeout,
-      // TODO (6614): add support for credentials
-      // TODO (6615): add metadata (headers) support
+      credentials: getGrpcCredentialsFromTls(exporter.otlp_grpc.tls),
+      metadata: getGrpcMetadataFromHeaders(exporter.otlp_grpc.headers),
     });
   } else if (exporter.console) {
     return new ConsoleSpanExporter();
