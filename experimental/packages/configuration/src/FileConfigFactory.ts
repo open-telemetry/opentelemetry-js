@@ -186,20 +186,26 @@ function mergeCompositeList(data: ConfigurationModel): void {
  * are not encoded in the JSON schema.
  */
 function applyBatchProcessorDefaults(data: ConfigurationModel): void {
-  const applyDefaults = (
-    batch: BatchSpanProcessor | BatchLogRecordProcessor
-  ) => {
+  const applySpanDefaults = (batch: BatchSpanProcessor) => {
     if (batch.schedule_delay == null) batch.schedule_delay = 5000;
     if (batch.export_timeout == null) batch.export_timeout = 30000;
     if (batch.max_queue_size == null) batch.max_queue_size = 2048;
     if (batch.max_export_batch_size == null) batch.max_export_batch_size = 512;
   };
 
+  // BLRP has a different schedule_delay default (1000) than BSP (5000)
+  const applyLogDefaults = (batch: BatchLogRecordProcessor) => {
+    if (batch.schedule_delay == null) batch.schedule_delay = 1000;
+    if (batch.export_timeout == null) batch.export_timeout = 30000;
+    if (batch.max_queue_size == null) batch.max_queue_size = 2048;
+    if (batch.max_export_batch_size == null) batch.max_export_batch_size = 512;
+  };
+
   for (const processor of data.tracer_provider?.processors ?? []) {
-    if (processor.batch) applyDefaults(processor.batch);
+    if (processor.batch) applySpanDefaults(processor.batch);
   }
   for (const processor of data.logger_provider?.processors ?? []) {
-    if (processor.batch) applyDefaults(processor.batch);
+    if (processor.batch) applyLogDefaults(processor.batch);
   }
 }
 
@@ -234,6 +240,31 @@ function applyConfigDefaults(data: ConfigurationModel): void {
     data.attribute_limits = { attribute_count_limit: 128 };
   } else if (data.attribute_limits.attribute_count_limit == null) {
     data.attribute_limits.attribute_count_limit = 128;
+  }
+
+  // Tracer provider limits
+  const tpLimits = data.tracer_provider?.limits;
+  if (tpLimits) {
+    if (tpLimits.attribute_count_limit == null)
+      tpLimits.attribute_count_limit = 128;
+    if (tpLimits.event_count_limit == null) tpLimits.event_count_limit = 128;
+    if (tpLimits.link_count_limit == null) tpLimits.link_count_limit = 128;
+    if (tpLimits.event_attribute_count_limit == null)
+      tpLimits.event_attribute_count_limit = 128;
+    if (tpLimits.link_attribute_count_limit == null)
+      tpLimits.link_attribute_count_limit = 128;
+  }
+
+  // Logger provider limits
+  const lpLimits = data.logger_provider?.limits;
+  if (lpLimits) {
+    if (lpLimits.attribute_count_limit == null)
+      lpLimits.attribute_count_limit = 128;
+  }
+
+  // Meter provider exemplar filter
+  if (data.meter_provider && data.meter_provider.exemplar_filter == null) {
+    data.meter_provider.exemplar_filter = 'trace_based';
   }
 }
 

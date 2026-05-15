@@ -18,6 +18,7 @@ import { parseConfigFile } from '../src/FileConfigFactory';
 
 const defaultConfig: ConfigurationModel = {
   disabled: false,
+  log_level: 'info',
   resource: {},
   attribute_limits: {
     attribute_count_limit: 128,
@@ -552,7 +553,7 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
-          schedule_delay: 5000,
+          schedule_delay: 1000,
           export_timeout: 30000,
           max_queue_size: 2048,
           max_export_batch_size: 512,
@@ -575,7 +576,7 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
-          schedule_delay: 5000,
+          schedule_delay: 1000,
           export_timeout: 30000,
           max_queue_size: 2048,
           max_export_batch_size: 512,
@@ -588,7 +589,7 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
-          schedule_delay: 5000,
+          schedule_delay: 1000,
           export_timeout: 30000,
           max_queue_size: 2048,
           max_export_batch_size: 512,
