@@ -16,6 +16,12 @@ import { RandomIdGenerator } from './platform';
 import type { Resource } from '@opentelemetry/resources';
 import { TracerMetrics } from './TracerMetrics';
 import { VERSION } from './version';
+import type { InspectFn, InspectStylizeOptions } from './inspect';
+import {
+  formatInspect,
+  inspectCustom,
+  settledResourceAttributes,
+} from './inspect';
 
 /**
  * This class represents a basic tracer.
@@ -254,5 +260,19 @@ export class Tracer implements api.Tracer {
   /** Returns the active {@link SpanLimits}. */
   getSpanLimits(): SpanLimits {
     return this._spanLimits;
+  }
+
+  [inspectCustom](
+    depth: number,
+    options: InspectStylizeOptions | undefined,
+    inspect: InspectFn | undefined
+  ): unknown {
+    const payload = {
+      instrumentationScope: this.instrumentationScope,
+      resource: { attributes: settledResourceAttributes(this._resource) },
+      spanLimits: this._spanLimits,
+      generalLimits: this._generalLimits,
+    };
+    return formatInspect('Tracer', payload, depth, options, inspect);
   }
 }
