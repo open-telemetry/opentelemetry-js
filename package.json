@@ -40,7 +40,8 @@
     "_github:draft_release:semconv": "node scripts/extract-latest-release-notes.js ./semantic-conventions/CHANGELOG.md && VERSION=$(node scripts/get-version.mjs ./semantic-conventions/package.json | grep -oE '^[0-9]+\\.[0-9]+\\.[0-9]+$') && gh release create --draft --notes-file ./.tmp/release-notes.md --target $(git rev-parse HEAD) --title semconv/v$VERSION semconv/v$VERSION",
     "_github:update_release_pr_body": "gh pr edit --repo open-telemetry/opentelemetry-js $RELEASE_PR_OWNER:otelbot/prepare-next-version --body-file ./.tmp/release-summary.md",
     "_github:update_release_branch": "git remote get-url $RELEASE_PR_REMOTE && (git checkout main && git pull $RELEASE_PR_REMOTE main && git branch -D otelbot/prepare-next-version; git checkout -b otelbot/prepare-next-version && npm run prepare_release && git commit -am \"chore: prepare release\" && git push --set-upstream $RELEASE_PR_REMOTE --force otelbot/prepare-next-version)",
-    "github:create_or_update_release_pr": "npm run _github:update_release_branch && (gh pr create --repo open-telemetry/opentelemetry-js --title 'chore: prepare next release' --body '' || true) && npm run _github:update_release_pr_body"
+    "github:create_or_update_release_pr": "npm run _github:update_release_branch && (gh pr create --repo open-telemetry/opentelemetry-js --title 'chore: prepare next release' --body '' || true) && npm run _github:update_release_pr_body",
+    "size-limit": "size-limit"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "keywords": [
@@ -53,6 +54,8 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@size-limit/file": "^12.1.0",
+    "@size-limit/esbuild": "^12.1.0",
     "@types/node": "18.19.130",
     "@typescript-eslint/eslint-plugin": "8.41.0",
     "@typescript-eslint/parser": "8.41.0",
@@ -79,6 +82,7 @@
     "prettier": "3.6.2",
     "process": "0.11.10",
     "semver": "7.7.4",
+    "size-limit": "^12.1.0",
     "ts-node": "10.9.2",
     "typedoc": "0.27.9",
     "typedoc-plugin-missing-exports": "3.1.0",
