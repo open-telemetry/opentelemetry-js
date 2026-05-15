@@ -139,4 +139,4 @@ this is my span: SpanImpl {
 >
 > - If you *want* the raw dump with internal properties, use Node.js's `console.dir()`, which bypasses custom inspect methods.
 
-Note that the exact output of these custom inspect methods is **not a promised interface**. A change to format of the inspect string output is not considered a breaking change.
+Note that the exact output of these custom inspect methods is **not a promised interface**. A change to the format or content of the inspect string output is not considered a breaking change.
