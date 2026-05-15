@@ -31,7 +31,7 @@ Instrumentations (subclasses of `InstrumentationBase`) have a `this._diag` logge
 
 ## Logging recommendations
 
-Be sparing in your use of `diag` logging. Ideally the user of OTel JS need not see much, if any, log output from the OTel SDK unless (a) something is wrong or (b) they have explicitly configure debug-level diag log output.
+Be sparing in your use of `diag` logging. Ideally the user of OTel JS need not see much, if any, log output from the OTel SDK unless (a) something is wrong or (b) they have explicitly configured debug-level diag log output.
 
 See the recommended usage of each diag log level [in the comments of `DiagConsoleLogger`](https://github.com/open-telemetry/opentelemetry-js/blob/67c1e891f1298be2bef5a12e85fb18c7022e52e2/api/src/diag/consoleLogger.ts#L78-L109).
 
