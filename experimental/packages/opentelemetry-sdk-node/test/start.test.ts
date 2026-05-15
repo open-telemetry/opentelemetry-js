@@ -58,6 +58,7 @@ import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
 import {
   getLogRecordExporter,
   getPeriodicMetricReaderFromConfiguration,
+  getSpanExporter,
   setupContextManager,
 } from '../src/utils';
 import { NOOP_SDK } from '../src/start';
@@ -985,6 +986,17 @@ describe('startNodeSDK', function () {
         )
       );
       await (reader as PeriodicExportingMetricReader).shutdown();
+    it('should warn when exporter timeout is 0', async () => {
+      const warnSpy = Sinon.spy(diag, 'warn');
+      const exporter = getSpanExporter({
+        otlp_http: { timeout: 0 },
+      });
+      assert.ok(exporter !== undefined);
+      assert.ok(
+        warnSpy.args.some(args =>
+          String(args[0]).includes('timeout of 0 (infinite) is not supported')
+        )
+      );
     });
 
     it('null context manager', async () => {
