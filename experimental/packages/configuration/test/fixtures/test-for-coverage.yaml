@@ -3,11 +3,25 @@ resource:
   attributes_list:
 propagator:
   composite_list: tracecontext
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    attribute_value_length_limit: 4096
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
 logger_provider:
   processors:
     - simple:
           exporter:
             console:
+  limits:
+    attribute_value_length_limit: 4096
   logger_configurator/development:
     loggers:
       - name: io.opentelemetry.contrib.*
