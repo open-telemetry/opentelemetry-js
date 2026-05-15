@@ -349,15 +349,12 @@ describe('startNodeSDK', function () {
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/tracer.yaml';
     const sdk = startNodeSDK({});
 
-    // Periodic type 'otlp_file/development' is not supported yet
-    assert.strictEqual(
-      stubLoggerWarn.args[0][0],
-      'Unsupported Exporter value. No Span Exporter registered'
+    // otlp_file/development exporters are not supported yet
+    const unsupportedWarnings = stubLoggerWarn.args.filter(
+      args =>
+        args[0] === 'Unsupported Exporter value. No Span Exporter registered'
     );
-    assert.strictEqual(
-      stubLoggerWarn.args[1][0],
-      'Unsupported Exporter value. No Span Exporter registered'
-    );
+    assert.strictEqual(unsupportedWarnings.length, 2);
 
     assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
     assert.ok(
