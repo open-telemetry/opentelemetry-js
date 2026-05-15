@@ -8,6 +8,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* fix(api-logs): Removed `NOOP_LOGGER` and `NoopLogger` exports from `@opentelemetry/api-logs`. Use `createNoopLogger(): Logger` instead. [#6713](https://github.com/open-telemetry/opentelemetry-js/pull/6713) @dyladan
+
 ### :rocket: Features
 
 ### :bug: Bug Fixes
