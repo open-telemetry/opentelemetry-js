@@ -62,6 +62,7 @@ import type {
   LogRecordExporterConfigModel,
   InstrumentTypeConfigModel,
   AggregationConfigModel,
+  MetricProducerConfigModel,
   PeriodicMetricReaderConfigModel,
   SpanExporterConfigModel,
   SamplerConfigModel,
@@ -516,7 +517,7 @@ export function getOtlpMetricExporterFromEnv(): PushMetricExporter {
 }
 
 function getMetricProducersFromConfiguration(
-  producers: PeriodicMetricReaderConfigModel['producers']
+  producers: MetricProducerConfigModel[] | undefined
 ): MetricProducer[] | undefined {
   if (!producers || producers.length === 0) {
     return undefined;
