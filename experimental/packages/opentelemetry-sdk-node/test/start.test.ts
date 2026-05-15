@@ -62,16 +62,13 @@ import {
   MeterProvider,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
-import type {
-  SpanProcessor,
-  NodeTracerProvider,
-} from '@opentelemetry/sdk-trace-node';
-import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
+import type { SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import {
+  BasicTracerProvider,
   BatchSpanProcessor,
   ConsoleSpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-node';
+} from '@opentelemetry/sdk-trace-base';
 
 describe('startNodeSDK', function () {
   let setGlobalLoggerProviderSpy: Sinon.SinonSpy;
@@ -358,7 +355,7 @@ describe('startNodeSDK', function () {
     );
 
     const tracerProvider = trace.getTracerProvider() as BasicTracerProvider;
-    const delegateInfo = (tracerProvider as any)['_delegate'];
+    const delegateInfo = (tracerProvider as any)['_delegate']['_delegate'];
     assert.strictEqual(delegateInfo._config.spanProcessors.length, 4);
 
     assert.ok(
@@ -802,8 +799,8 @@ describe('startNodeSDK', function () {
     let stubLoggerInfo: Sinon.SinonStub;
 
     const getSdkSpanProcessors = () => {
-      const tracerProvider = trace.getTracerProvider() as NodeTracerProvider;
-      const delegateInfo = (tracerProvider as any)['_delegate'];
+      const tracerProvider = trace.getTracerProvider() as BasicTracerProvider;
+      const delegateInfo = (tracerProvider as any)['_delegate']['_delegate'];
       return delegateInfo?._config?.spanProcessors as SpanProcessor[];
     };
 

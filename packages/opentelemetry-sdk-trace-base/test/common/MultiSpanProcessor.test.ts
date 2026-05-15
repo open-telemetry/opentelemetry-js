@@ -6,11 +6,8 @@
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
 import type { Span, SpanProcessor } from '../../src';
-import {
-  BasicTracerProvider,
-  InMemorySpanExporter,
-  SimpleSpanProcessor,
-} from '../../src';
+import { InMemorySpanExporter, SimpleSpanProcessor } from '../../src';
+import { TracerProvider } from '../../src/TracerProvider';
 import {
   setGlobalErrorHandler,
   loggingErrorHandler,
@@ -62,7 +59,7 @@ describe('MultiSpanProcessor', () => {
 
   it('should handle one span processor', () => {
     const processor1 = new TestProcessor('sp1');
-    const tracerProvider = new BasicTracerProvider({
+    const tracerProvider = new TracerProvider({
       spanProcessors: [processor1],
     });
     const tracer = tracerProvider.getTracer('default');
@@ -76,7 +73,7 @@ describe('MultiSpanProcessor', () => {
   it('should handle one span processor with on ending', () => {
     TestProcessor.events = [];
     const processor1 = new ExtendedTestProcessor('sp1');
-    const tracerProvider = new BasicTracerProvider({
+    const tracerProvider = new TracerProvider({
       spanProcessors: [processor1],
     });
     const tracer = tracerProvider.getTracer('default');
@@ -95,7 +92,7 @@ describe('MultiSpanProcessor', () => {
     TestProcessor.events = [];
     const processor1 = new TestProcessor('p1');
     const processor2 = new ExtendedTestProcessor('p2');
-    const tracerProvider = new BasicTracerProvider({
+    const tracerProvider = new TracerProvider({
       spanProcessors: [processor1, processor2],
     });
     const tracer = tracerProvider.getTracer('default');
@@ -126,7 +123,7 @@ describe('MultiSpanProcessor', () => {
     TestProcessor.events = [];
     const processor1 = new TestProcessor('p1');
     const processor2 = new ExtendedTestProcessor('p2');
-    const tracerProvider = new BasicTracerProvider({
+    const tracerProvider = new TracerProvider({
       spanProcessors: [processor1, processor2],
     });
     const tracer = tracerProvider.getTracer('default');

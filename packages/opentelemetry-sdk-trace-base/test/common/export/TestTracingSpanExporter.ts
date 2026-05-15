@@ -5,11 +5,8 @@
 
 import type { ExportResult } from '@opentelemetry/core';
 import type { ReadableSpan, SpanProcessor } from '../../../src';
-import {
-  BasicTracerProvider,
-  InMemorySpanExporter,
-  AlwaysOnSampler,
-} from '../../../src';
+import { InMemorySpanExporter, AlwaysOnSampler } from '../../../src';
+import { TracerProvider } from '../../../src/TracerProvider';
 import { Tracer } from '../../../src/Tracer';
 
 /**
@@ -36,7 +33,7 @@ export class TestTracingSpanExporter extends InMemorySpanExporter {
       },
     };
 
-    const tracerProvider = new BasicTracerProvider({
+    const tracerProvider = new TracerProvider({
       spanProcessors: [spanProcessor],
     });
 

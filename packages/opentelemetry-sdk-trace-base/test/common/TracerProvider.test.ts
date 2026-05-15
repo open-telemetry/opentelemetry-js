@@ -21,20 +21,20 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import type { Span } from '../../src';
 import {
-  BasicTracerProvider,
   NoopSpanProcessor,
   AlwaysOnSampler,
   AlwaysOffSampler,
   ConsoleSpanExporter,
   SimpleSpanProcessor,
 } from '../../src';
+import { TracerProvider } from '../../src/TracerProvider';
 import { SpanImpl } from '../../src/Span';
 import { MultiSpanProcessor } from '../../src/MultiSpanProcessor';
 import type { Tracer } from '../../src/Tracer';
 import { TestRecordOnlySampler } from './export/TestRecordOnlySampler';
 import { TestMetricReader } from './util';
 
-describe('BasicTracerProvider', () => {
+describe('TracerProvider', () => {
   beforeEach(() => {
     context.disable();
   });
@@ -46,21 +46,17 @@ describe('BasicTracerProvider', () => {
   describe('constructor', () => {
     describe('when options not defined', () => {
       it('should construct an instance', () => {
-        const tracerProvider = new BasicTracerProvider();
-        assert.ok(tracerProvider instanceof BasicTracerProvider);
+        const tracer = new TracerProvider();
+        assert.ok(tracer instanceof TracerProvider);
       });
 
       it('should use empty span processor by default', () => {
         const errorStub = sinon.spy(diag, 'error');
-        const tracerProvider = new BasicTracerProvider();
+        const tracer = new TracerProvider();
 
-        assert.ok(
-          tracerProvider['_delegate']['_activeSpanProcessor'] instanceof
-            MultiSpanProcessor
-        );
+        assert.ok(tracer['_activeSpanProcessor'] instanceof MultiSpanProcessor);
         assert.strictEqual(
-          tracerProvider['_delegate']['_activeSpanProcessor']['_spanProcessors']
-            .length,
+          tracer['_activeSpanProcessor']['_spanProcessors'].length,
           0
         );
         sinon.assert.notCalled(errorStub);
@@ -71,46 +67,39 @@ describe('BasicTracerProvider', () => {
       it('should use the span processors defined in the config', () => {
         const traceExporter = new ConsoleSpanExporter();
         const spanProcessor = new SimpleSpanProcessor(traceExporter);
-        const tracerProvider = new BasicTracerProvider({
+        const tracer = new TracerProvider({
           spanProcessors: [spanProcessor],
         });
 
+        assert.ok(tracer['_activeSpanProcessor'] instanceof MultiSpanProcessor);
         assert.ok(
-          tracerProvider['_delegate']['_activeSpanProcessor'] instanceof
-            MultiSpanProcessor
+          tracer['_activeSpanProcessor']['_spanProcessors'].length === 1
         );
         assert.ok(
-          tracerProvider['_delegate']['_activeSpanProcessor']['_spanProcessors']
-            .length === 1
+          tracer['_activeSpanProcessor']['_spanProcessors'][0] instanceof
+            SimpleSpanProcessor
         );
         assert.ok(
-          tracerProvider['_delegate']['_activeSpanProcessor'][
-            '_spanProcessors'
-          ][0] instanceof SimpleSpanProcessor
-        );
-        assert.ok(
-          tracerProvider['_delegate']['_activeSpanProcessor'][
-            '_spanProcessors'
-          ][0]['_exporter'] instanceof ConsoleSpanExporter
+          tracer['_activeSpanProcessor']['_spanProcessors'][0][
+            '_exporter'
+          ] instanceof ConsoleSpanExporter
         );
       });
     });
 
     describe('when "sampler" option defined', () => {
       it('should have an instance with sampler', () => {
-        const tracer = new BasicTracerProvider({
+        const tracer = new TracerProvider({
           sampler: new AlwaysOnSampler(),
         });
-        assert.ok(tracer instanceof BasicTracerProvider);
+        assert.ok(tracer instanceof TracerProvider);
       });
     });
 
     describe('generalLimits', () => {
       describe('when not defined default values', () => {
         it('should have tracer with default values', () => {
-          const tracer = new BasicTracerProvider({}).getTracer(
-            'default'
-          ) as Tracer;
+          const tracer = new TracerProvider({}).getTracer('default') as Tracer;
           assert.deepStrictEqual(tracer.getGeneralLimits(), {
             attributeValueLengthLimit: Infinity,
             attributeCountLimit: 128,
@@ -120,7 +109,7 @@ describe('BasicTracerProvider', () => {
 
       describe('when "attributeCountLimit" is defined', () => {
         it('should have tracer with defined value', () => {
-          const tracer = new BasicTracerProvider({
+          const tracer = new TracerProvider({
             generalLimits: {
               attributeCountLimit: 100,
             },
@@ -132,7 +121,7 @@ describe('BasicTracerProvider', () => {
 
       describe('when "attributeValueLengthLimit" is defined', () => {
         it('should have tracer with defined value', () => {
-          const tracer = new BasicTracerProvider({
+          const tracer = new TracerProvider({
             generalLimits: {
               attributeValueLengthLimit: 10,
             },
@@ -142,7 +131,7 @@ describe('BasicTracerProvider', () => {
         });
 
         it('should have tracer with negative "attributeValueLengthLimit" value', () => {
-          const tracer = new BasicTracerProvider({
+          const tracer = new TracerProvider({
             generalLimits: {
               attributeValueLengthLimit: -10,
             },
@@ -156,9 +145,7 @@ describe('BasicTracerProvider', () => {
     describe('spanLimits', () => {
       describe('when not defined default values', () => {
         it('should have tracer with default values', () => {
-          const tracer = new BasicTracerProvider({}).getTracer(
-            'default'
-          ) as Tracer;
+          const tracer = new TracerProvider({}).getTracer('default') as Tracer;
           assert.deepStrictEqual(tracer.getSpanLimits(), {
             attributeValueLengthLimit: Infinity,
             attributeCountLimit: 128,
@@ -172,7 +159,7 @@ describe('BasicTracerProvider', () => {
 
       describe('when "attributeCountLimit" is defined', () => {
         it('should have tracer with defined value', () => {
-          const tracer = new BasicTracerProvider({
+          const tracer = new TracerProvider({
             spanLimits: {
               attributeCountLimit: 100,
             },
@@ -184,7 +171,7 @@ describe('BasicTracerProvider', () => {
 
       describe('when "attributeValueLengthLimit" is defined', () => {
         it('should have tracer with defined value', () => {
-          const tracer = new BasicTracerProvider({
+          const tracer = new TracerProvider({
             spanLimits: {
               attributeValueLengthLimit: 10,
             },
@@ -194,7 +181,7 @@ describe('BasicTracerProvider', () => {
         });
 
         it('should have tracer with negative "attributeValueLengthLimit" value', () => {
-          const tracer = new BasicTracerProvider({
+          const tracer = new TracerProvider({
             spanLimits: {
               attributeValueLengthLimit: -10,
             },
@@ -206,9 +193,7 @@ describe('BasicTracerProvider', () => {
 
       describe('when attribute value length limit is not defined', () => {
         it('should use default value of Infinity', () => {
-          const tracer = new BasicTracerProvider().getTracer(
-            'default'
-          ) as Tracer;
+          const tracer = new TracerProvider().getTracer('default') as Tracer;
           const spanLimits = tracer.getSpanLimits();
           const generalLimits = tracer.getGeneralLimits();
           assert.strictEqual(generalLimits.attributeValueLengthLimit, Infinity);
@@ -218,9 +203,7 @@ describe('BasicTracerProvider', () => {
 
       describe('when attribute count limit is not defined', () => {
         it('should use default value of 128', () => {
-          const tracer = new BasicTracerProvider().getTracer(
-            'default'
-          ) as Tracer;
+          const tracer = new TracerProvider().getTracer('default') as Tracer;
           const spanLimits = tracer.getSpanLimits();
           const generalLimits = tracer.getGeneralLimits();
           assert.strictEqual(generalLimits.attributeCountLimit, 128);
@@ -230,7 +213,7 @@ describe('BasicTracerProvider', () => {
 
       describe('when "eventCountLimit" is defined', () => {
         it('should have tracer with defined value', () => {
-          const tracer = new BasicTracerProvider({
+          const tracer = new TracerProvider({
             spanLimits: {
               eventCountLimit: 300,
             },
@@ -242,7 +225,7 @@ describe('BasicTracerProvider', () => {
 
       describe('when "linkCountLimit" is defined', () => {
         it('should have tracer with defined value', () => {
-          const tracer = new BasicTracerProvider({
+          const tracer = new TracerProvider({
             spanLimits: {
               linkCountLimit: 10,
             },
@@ -254,7 +237,7 @@ describe('BasicTracerProvider', () => {
 
       describe('when only generalLimits are defined', () => {
         it('should have span limits as general limits', () => {
-          const tracer = new BasicTracerProvider({
+          const tracer = new TracerProvider({
             generalLimits: {
               attributeValueLengthLimit: 100,
               attributeCountLimit: 200,
@@ -268,7 +251,7 @@ describe('BasicTracerProvider', () => {
 
       describe('when both generalLimits and spanLimits defined', () => {
         it('should have span limits as priority than general limits', () => {
-          const tracer = new BasicTracerProvider({
+          const tracer = new TracerProvider({
             generalLimits: {
               attributeValueLengthLimit: 100,
               attributeCountLimit: 200,
@@ -288,28 +271,22 @@ describe('BasicTracerProvider', () => {
 
   describe('.startSpan()', () => {
     it('should start a span with name only', () => {
-      const tracer = new BasicTracerProvider().getTracer('default');
+      const tracer = new TracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       assert.ok(span);
       assert.ok(span instanceof SpanImpl);
     });
 
     it('should propagate resources', () => {
-      const tracerProvider = new BasicTracerProvider();
+      const tracerProvider = new TracerProvider();
       const tracer = tracerProvider.getTracer('default') as Tracer;
       const span = tracer.startSpan('my-span') as Span;
-      assert.strictEqual(
-        tracer['_resource'],
-        tracerProvider['_delegate']['_resource']
-      );
-      assert.strictEqual(
-        span.resource,
-        tracerProvider['_delegate']['_resource']
-      );
+      assert.strictEqual(tracer['_resource'], tracerProvider['_resource']);
+      assert.strictEqual(span.resource, tracerProvider['_resource']);
     });
 
     it('should start a span with name and options', () => {
-      const tracer = new BasicTracerProvider().getTracer('default');
+      const tracer = new TracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span', {});
       assert.ok(span);
       assert.ok(span instanceof SpanImpl);
@@ -322,7 +299,7 @@ describe('BasicTracerProvider', () => {
     });
 
     it('should start a span with given attributes', () => {
-      const tracer = new BasicTracerProvider().getTracer('default');
+      const tracer = new TracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span', {
         attributes: { foo: 'foo', bar: 'bar' },
       }) as Span;
@@ -331,7 +308,7 @@ describe('BasicTracerProvider', () => {
     });
 
     it('should start a span with spanoptions->attributes', () => {
-      const tracer = new BasicTracerProvider().getTracer('default');
+      const tracer = new TracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span', {
         attributes: { foo: 'foo', bar: 'bar' },
       }) as Span;
@@ -340,7 +317,7 @@ describe('BasicTracerProvider', () => {
     });
 
     it('should start a span with name and parent spancontext', () => {
-      const tracer = new BasicTracerProvider().getTracer('default');
+      const tracer = new TracerProvider().getTracer('default');
       const state = new TraceState('a=1,b=2');
 
       const span = tracer.startSpan(
@@ -362,7 +339,7 @@ describe('BasicTracerProvider', () => {
     });
 
     it('should start a span with name and parent span', () => {
-      const tracer = new BasicTracerProvider().getTracer('default');
+      const tracer = new TracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       const childSpan = tracer.startSpan(
         'child-span',
@@ -377,7 +354,7 @@ describe('BasicTracerProvider', () => {
     });
 
     it('should create a root span when root is true', () => {
-      const tracer = new BasicTracerProvider().getTracer('default');
+      const tracer = new TracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       const overrideParent = tracer.startSpan('my-parent-override-span');
       const rootSpan = tracer.startSpan(
@@ -395,7 +372,7 @@ describe('BasicTracerProvider', () => {
     });
 
     it('should start a span with name and with invalid parent span', () => {
-      const tracer = new BasicTracerProvider({
+      const tracer = new TracerProvider({
         sampler: new AlwaysOnSampler(),
       }).getTracer('default');
       const span = tracer.startSpan(
@@ -414,7 +391,7 @@ describe('BasicTracerProvider', () => {
     });
 
     it('should start a span with name and with invalid spancontext', () => {
-      const tracer = new BasicTracerProvider().getTracer('default');
+      const tracer = new TracerProvider().getTracer('default');
       const span = tracer.startSpan(
         'my-span',
         {},
@@ -433,7 +410,7 @@ describe('BasicTracerProvider', () => {
     });
 
     it('should return a non recording span when never sampling', () => {
-      const tracer = new BasicTracerProvider({
+      const tracer = new TracerProvider({
         sampler: new AlwaysOffSampler(),
       }).getTracer('default');
       const span = tracer.startSpan('my-span');
@@ -447,7 +424,7 @@ describe('BasicTracerProvider', () => {
     });
 
     it('should create real span when sampled', () => {
-      const tracer = new BasicTracerProvider({
+      const tracer = new TracerProvider({
         sampler: new AlwaysOnSampler(),
       }).getTracer('default');
       const span = tracer.startSpan('my-span');
@@ -457,7 +434,7 @@ describe('BasicTracerProvider', () => {
     });
 
     it('should assign a resource', () => {
-      const tracer = new BasicTracerProvider().getTracer('default');
+      const tracer = new TracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span') as Span;
       assert.ok(span);
       assert.ok(span.resource);
@@ -466,7 +443,7 @@ describe('BasicTracerProvider', () => {
 
   describe('.withSpan()', () => {
     it('should run context with NoopContextManager context manager', done => {
-      const tracer = new BasicTracerProvider().getTracer('default');
+      const tracer = new TracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       context.with(trace.setSpan(context.active(), span), () => {
         assert.deepStrictEqual(trace.getSpan(context.active()), undefined);
@@ -486,7 +463,7 @@ describe('BasicTracerProvider', () => {
 
       const spanProcessorOne = new NoopSpanProcessor();
       const spanProcessorTwo = new NoopSpanProcessor();
-      const tracerProvider = new BasicTracerProvider({
+      const tracerProvider = new TracerProvider({
         spanProcessors: [spanProcessorOne, spanProcessorTwo],
       });
 
@@ -514,7 +491,7 @@ describe('BasicTracerProvider', () => {
 
       const spanProcessorOne = new NoopSpanProcessor();
       const spanProcessorTwo = new NoopSpanProcessor();
-      const tracerProvider = new BasicTracerProvider({
+      const tracerProvider = new TracerProvider({
         spanProcessors: [spanProcessorOne, spanProcessorTwo],
       });
 
@@ -534,7 +511,7 @@ describe('BasicTracerProvider', () => {
 
   describe('.bind()', () => {
     it('should bind context with NoopContextManager context manager', done => {
-      const tracer = new BasicTracerProvider().getTracer('default');
+      const tracer = new TracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       const fn = () => {
         assert.deepStrictEqual(trace.getSpan(context.active()), undefined);
@@ -547,30 +524,24 @@ describe('BasicTracerProvider', () => {
 
   describe('.resource', () => {
     it('should use the default resource when no resource is provided', function () {
-      const tracerProvider = new BasicTracerProvider();
-      assert.deepStrictEqual(
-        tracerProvider['_delegate']['_resource'],
-        defaultResource()
-      );
+      const tracerProvider = new TracerProvider();
+      assert.deepStrictEqual(tracerProvider['_resource'], defaultResource());
     });
 
     it('should use not use the default if resource passed', function () {
       const providedResource = resourceFromAttributes({ foo: 'bar' });
-      const tracerProvider = new BasicTracerProvider({
+      const tracerProvider = new TracerProvider({
         resource: providedResource,
       });
-      assert.deepStrictEqual(
-        tracerProvider['_delegate']['_resource'],
-        providedResource
-      );
+      assert.deepStrictEqual(tracerProvider['_resource'], providedResource);
     });
   });
 
   describe('.shutdown()', () => {
     it('should trigger shutdown when manually invoked', () => {
-      const tracerProvider = new BasicTracerProvider();
+      const tracerProvider = new TracerProvider();
       const shutdownStub = sinon.stub(
-        tracerProvider['_delegate']['_activeSpanProcessor'],
+        tracerProvider['_activeSpanProcessor'],
         'shutdown'
       );
       tracerProvider.shutdown();
@@ -584,7 +555,7 @@ describe('BasicTracerProvider', () => {
       const meterProvider = new MeterProvider({
         readers: [metricReader],
       });
-      const tracerProvider = new BasicTracerProvider({
+      const tracerProvider = new TracerProvider({
         meterProvider,
         sampler: new AlwaysOnSampler(),
       });
@@ -636,7 +607,7 @@ describe('BasicTracerProvider', () => {
       const meterProvider = new MeterProvider({
         readers: [metricReader],
       });
-      const tracerProvider = new BasicTracerProvider({
+      const tracerProvider = new TracerProvider({
         meterProvider,
         sampler: new TestRecordOnlySampler(),
       });
@@ -688,7 +659,7 @@ describe('BasicTracerProvider', () => {
       const meterProvider = new MeterProvider({
         readers: [metricReader],
       });
-      const tracerProvider = new BasicTracerProvider({
+      const tracerProvider = new TracerProvider({
         meterProvider,
         sampler: new AlwaysOffSampler(),
       });
@@ -732,7 +703,7 @@ describe('BasicTracerProvider', () => {
       const meterProvider = new MeterProvider({
         readers: [metricReader],
       });
-      const tracerProvider = new BasicTracerProvider({
+      const tracerProvider = new TracerProvider({
         meterProvider,
         sampler: new AlwaysOffSampler(),
       });
@@ -782,7 +753,7 @@ describe('BasicTracerProvider', () => {
       const meterProvider = new MeterProvider({
         readers: [metricReader],
       });
-      const tracerProvider = new BasicTracerProvider({
+      const tracerProvider = new TracerProvider({
         meterProvider,
         sampler: new AlwaysOffSampler(),
       });

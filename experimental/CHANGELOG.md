@@ -76,6 +76,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * test(otlp-transformer): add metrics transform benchmark [#6628](https://github.com/open-telemetry/opentelemetry-js/pull/6628) @pichlermarc
 * refactor(opentelemetry-exporter-prometheus): do not call enforcePrometheusNamingConvention() multiple times per metric [#6636](https://github.com/open-telemetry/opentelemetry-js/pull/6636) @cjihrig
+* refactor(sdk-node): replace usage of `NodeTracerProvider` for `BasicTracerProvider` in SDK start [#6640](https://github.com/open-telemetry/opentelemetry-js/pull/6640) @david-luna
 
 ## 0.215.0
 

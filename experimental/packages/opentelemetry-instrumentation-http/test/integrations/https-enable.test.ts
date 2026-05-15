@@ -19,8 +19,8 @@ import type { Socket } from 'net';
 import { assertSpan } from '../utils/assertSpan';
 import { urlToHttpOptions } from 'url';
 import * as utils from '../utils/utils';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
+  BasicTracerProvider,
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
@@ -119,7 +119,7 @@ describe('HttpsInstrumentation Integration tests', () => {
         done();
       });
     });
-    const provider = new NodeTracerProvider({
+    const provider = new BasicTracerProvider({
       spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
     });
     instrumentation.setTracerProvider(provider);

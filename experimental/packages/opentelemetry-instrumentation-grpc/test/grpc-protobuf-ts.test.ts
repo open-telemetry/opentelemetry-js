@@ -13,9 +13,9 @@ import * as grpc from '@grpc/grpc-js';
 import { GrpcTesterClient } from './proto/ts/fixtures/grpc-test.client';
 import {
   InMemorySpanExporter,
-  NodeTracerProvider,
+  BasicTracerProvider,
   SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-node';
+} from '@opentelemetry/sdk-trace-base';
 import * as protoLoader from '@grpc/proto-loader';
 import * as path from 'path';
 import * as assert from 'assert';
@@ -138,7 +138,7 @@ describe('#grpc-protobuf', () => {
   let client: GrpcTesterClient;
   let server: grpc.Server;
   let contextManager: ContextManager;
-  const provider = new NodeTracerProvider({
+  const provider = new BasicTracerProvider({
     spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
   });
 

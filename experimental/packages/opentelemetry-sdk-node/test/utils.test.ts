@@ -35,7 +35,7 @@ import {
 } from '@opentelemetry/resources';
 import type { LoggerProviderOptions } from '@opentelemetry/sdk-logs';
 import { AggregationType, InstrumentType } from '@opentelemetry/sdk-metrics';
-import type { SpanLimits } from '@opentelemetry/sdk-trace-node';
+import type { SpanLimits } from '@opentelemetry/sdk-trace-base';
 
 describe('getPropagatorFromEnv', function () {
   afterEach(() => {

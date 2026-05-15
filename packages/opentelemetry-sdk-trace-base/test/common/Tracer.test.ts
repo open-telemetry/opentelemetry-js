@@ -23,19 +23,15 @@ import type { InstrumentationScope } from '@opentelemetry/core';
 import { sanitizeAttributes, suppressTracing } from '@opentelemetry/core';
 import * as assert from 'assert';
 import type { Sampler, Span, SpanProcessor } from '../../src';
-import {
-  AlwaysOffSampler,
-  AlwaysOnSampler,
-  BasicTracerProvider,
-  SamplingDecision,
-} from '../../src';
+import { AlwaysOffSampler, AlwaysOnSampler, SamplingDecision } from '../../src';
+import { TracerProvider } from '../../src/TracerProvider';
 import { TestStackContextManager } from './export/TestStackContextManager';
 import * as sinon from 'sinon';
 import { invalidAttributes, validAttributes } from './util';
 import { Tracer } from '../../src/Tracer';
 
 describe('Tracer', () => {
-  const tracerProvider = new BasicTracerProvider();
+  const tracerProvider = new TracerProvider();
 
   class TestSampler implements Sampler {
     private readonly traceState?: TraceState;
@@ -251,7 +247,7 @@ describe('Tracer', () => {
 
     const sp: SpanProcessor = new DummySpanProcessor();
     const onStartSpy = sinon.spy(sp, 'onStart');
-    const tp = new BasicTracerProvider({
+    const tp = new TracerProvider({
       spanProcessors: [sp],
     });
 
@@ -287,7 +283,7 @@ describe('Tracer', () => {
 
     const sp: SpanProcessor = new DummySpanProcessor();
     const onStartSpy = sinon.spy(sp, 'onStart');
-    const tp = new BasicTracerProvider({
+    const tp = new TracerProvider({
       spanProcessors: [sp],
     });
 
