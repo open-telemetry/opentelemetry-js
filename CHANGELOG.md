@@ -20,6 +20,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+* build: migrate package builds from `tsc` to `tsdown`, emitting dual CJS/ESM output in `dist/`; published package contents are unchanged for consumers [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293) @overbalance
+
 ## 2.8.0
 
 ### :rocket: Features
