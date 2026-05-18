@@ -7,7 +7,7 @@ import { ProtobufWriter } from '../../common/protobuf/protobuf-writer';
 import { hexToBinary } from '../../common/hex-to-binary';
 import type { Resource } from '@opentelemetry/resources';
 import type { InstrumentationScope } from '@opentelemetry/core';
-import { type LogAttributes, SeverityNumber } from '@opentelemetry/api-logs';
+import { SeverityNumber } from '@opentelemetry/api-logs';
 import {
   writeInstrumentationScope,
   writeResource,
