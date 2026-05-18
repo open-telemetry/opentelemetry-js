@@ -21,9 +21,8 @@ module.exports = {
     "no-shadow": "off",
     "n/no-deprecated-api": ["warn"],
     "header/header": ["error", "block", [{
-      pattern: / \* Copyright The OpenTelemetry Authors[\r\n]+ \*[\r\n]+ \* Licensed under the Apache License, Version 2\.0 \(the \"License\"\);[\r\n]+ \* you may not use this file except in compliance with the License\.[\r\n]+ \* You may obtain a copy of the License at[\r\n]+ \*[\r\n]+ \*      https:\/\/www\.apache\.org\/licenses\/LICENSE-2\.0[\r\n]+ \*[\r\n]+ \* Unless required by applicable law or agreed to in writing, software[\r\n]+ \* distributed under the License is distributed on an \"AS IS\" BASIS,[\r\n]+ \* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied\.[\r\n]+ \* See the License for the specific language governing permissions and[\r\n]+ \* limitations under the License\./gm,
-      template:
-        `\n * Copyright The OpenTelemetry Authors\n *\n * Licensed under the Apache License, Version 2.0 (the "License");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      https://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an "AS IS" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n `
+      pattern: / \* Copyright The OpenTelemetry Authors[\r\n]+ \* SPDX-License-Identifier: Apache-2\.0/,
+      template: `\n * Copyright The OpenTelemetry Authors\n * SPDX-License-Identifier: Apache-2.0\n `
     }]]
   },
   overrides: [
@@ -46,6 +45,13 @@ module.exports = {
             "leadingUnderscore": "require"
           }
         ],
+        "@typescript-eslint/consistent-type-imports": [
+          "error",
+          {
+            prefer: "type-imports",
+            fixStyle: "separate-type-imports",
+          },
+        ],
         "@typescript-eslint/no-unused-vars": ["error", {"argsIgnorePattern": "^_", "args": "after-used"}],
         "@typescript-eslint/no-inferrable-types": ["error", { ignoreProperties: true }],
         "@typescript-eslint/no-empty-function": ["off"],
@@ -64,6 +70,7 @@ module.exports = {
         "projectService": true
       },
       rules: {
+        "no-console": "warn",
         "no-empty": "off",
         "@typescript-eslint/ban-ts-ignore": "off",
         "@typescript-eslint/no-unsafe-function-type": ["warn"],

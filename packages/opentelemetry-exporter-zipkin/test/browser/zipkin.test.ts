@@ -1,28 +1,18 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import {
+  ExportResultCode,
   setGlobalErrorHandler,
   loggingErrorHandler,
 } from '@opentelemetry/core';
-import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { ZipkinExporter } from '../../src';
-import * as zipkinTypes from '../../src/types';
+import type * as zipkinTypes from '../../src/types';
 import {
   ensureHeadersContain,
   ensureSpanIsCorrect,
@@ -35,7 +25,7 @@ describe('Zipkin Exporter - web', () => {
   let zipkinExporter: ZipkinExporter;
   let zipkinConfig: zipkinTypes.ExporterConfig = {};
   let spySend: sinon.SinonSpy;
-  let spyBeacon: sinon.SinonSpy;
+  let spyBeacon: sinon.SinonStub;
   let spans: ReadableSpan[];
 
   beforeEach(() => {
@@ -70,6 +60,18 @@ describe('Zipkin Exporter - web', () => {
           done();
         });
       });
+
+      // sendBeacon returning false signals the browser refused to queue the
+      // request (e.g. payload too large). The export callback receives FAILED.
+      it('should report FAILED when sendBeacon returns false', done => {
+        spyBeacon.returns(false);
+        zipkinExporter.export(spans, result => {
+          assert.strictEqual(result.code, ExportResultCode.FAILED);
+          assert.ok(result.error);
+          assert.ok(result.error!.message.includes('sendBeacon - cannot send'));
+          done();
+        });
+      });
     });
 
     describe('when "sendBeacon" is NOT available', () => {
@@ -95,15 +97,40 @@ describe('Zipkin Exporter - web', () => {
           done();
         });
       });
+
+      // Network-level errors (DNS failure, CORS, connection refused) trigger
+      // xhr.onerror, which calls globalErrorHandler. The export callback
+      // receives FAILED without an error object.
+      it('should call globalErrorHandler on network error', done => {
+        const errorHandlerSpy = sinon.spy();
+        setGlobalErrorHandler(errorHandlerSpy);
+
+        zipkinExporter.export(spans, result => {
+          assert.strictEqual(result.code, ExportResultCode.FAILED);
+          assert.strictEqual(result.error, undefined);
+          assert.strictEqual(errorHandlerSpy.callCount, 1);
+          assert.ok(
+            errorHandlerSpy.args[0][0].message.includes('Zipkin request error')
+          );
+          setGlobalErrorHandler(loggingErrorHandler());
+          done();
+        });
+
+        setTimeout(() => {
+          const request = server.requests[0];
+          request.onerror(new ProgressEvent('error'));
+        });
+      });
     });
 
-    describe('should use url defined in environment', () => {
+    describe('should use url from config', () => {
       let server: any;
       const endpointUrl = 'http://localhost:9412';
       beforeEach(() => {
         (window.navigator as any).sendBeacon = false;
-        (window as any).OTEL_EXPORTER_ZIPKIN_ENDPOINT = endpointUrl;
-        zipkinExporter = new ZipkinExporter(zipkinConfig);
+        // Browser getStringFromEnv() always returns undefined, so env-based
+        // URL override does not work. Use config.url instead.
+        zipkinExporter = new ZipkinExporter({ url: endpointUrl });
         server = sinon.fakeServer.create();
       });
       afterEach(() => {
@@ -115,7 +142,7 @@ describe('Zipkin Exporter - web', () => {
 
         setTimeout(() => {
           const request = server.requests[0];
-          assert.ok(request.url, endpointUrl);
+          assert.strictEqual(request.url, endpointUrl);
           const body = request.requestBody;
           const json = JSON.parse(body) as any;
           ensureSpanIsCorrect(json[0]);
@@ -195,17 +222,19 @@ describe('Zipkin Exporter - web', () => {
         });
       });
 
-      it('should call globalErrorHandler on error', () => {
-        const errorHandlerSpy = sinon.spy();
-        setGlobalErrorHandler(errorHandlerSpy);
-
-        zipkinExporter.export(spans, () => {
-          const [[error]] = errorHandlerSpy.args;
-          assert.strictEqual(errorHandlerSpy.callCount, 1);
-          assert.ok(error.message.includes('Zipkin request error'));
-
-          //reset global error handler
-          setGlobalErrorHandler(loggingErrorHandler());
+      // HTTP 400 triggers onreadystatechange, not xhr.onerror, so
+      // globalErrorHandler is not called. The export callback receives FAILED.
+      // Custom headers force XHR usage regardless of sendBeacon availability.
+      it('should report FAILED export result on HTTP error', done => {
+        zipkinExporter.export(spans, result => {
+          assert.strictEqual(result.code, ExportResultCode.FAILED);
+          assert.ok(result.error);
+          assert.ok(
+            result.error!.message.includes(
+              'Got unexpected status code from zipkin: 400'
+            )
+          );
+          done();
         });
 
         setTimeout(() => {
@@ -234,17 +263,18 @@ describe('Zipkin Exporter - web', () => {
         });
       });
 
-      it('should call globalErrorHandler on error', () => {
-        const errorHandlerSpy = sinon.spy();
-        setGlobalErrorHandler(errorHandlerSpy);
-
-        zipkinExporter.export(spans, () => {
-          const [[error]] = errorHandlerSpy.args;
-          assert.strictEqual(errorHandlerSpy.callCount, 1);
-          assert.ok(error.message.includes('sendBeacon - cannot send'));
-
-          //reset global error handler
-          setGlobalErrorHandler(loggingErrorHandler());
+      // sendBeacon is false here so XHR is used. HTTP 400 triggers
+      // onreadystatechange (not onerror), so the export callback receives FAILED.
+      it('should report FAILED export result on HTTP error', done => {
+        zipkinExporter.export(spans, result => {
+          assert.strictEqual(result.code, ExportResultCode.FAILED);
+          assert.ok(result.error);
+          assert.ok(
+            result.error!.message.includes(
+              'Got unexpected status code from zipkin: 400'
+            )
+          );
+          done();
         });
 
         setTimeout(() => {

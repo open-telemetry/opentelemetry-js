@@ -82,6 +82,12 @@
       "path": "../opentelemetry-instrumentation"
     },
     {
+      "path": "../otlp-exporter-base"
+    },
+    {
+      "path": "../otlp-grpc-exporter-base"
+    },
+    {
       "path": "../sdk-logs"
     }
   ]

@@ -38,10 +38,10 @@
     "@opentelemetry/semantic-conventions": "^1.22.0",
     "@opentelemetry/sdk-trace-base": "^1.0.1",
     "@opentelemetry/sdk-trace-node": "^1.0.1",
-    "google-protobuf": "^3.9.2"
+    "google-protobuf": "^4.0.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/grpc-js",
   "devDependencies": {
-    "cross-env": "^6.0.0"
+    "cross-env": "^10.0.0"
   }
 }

@@ -1,24 +1,14 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { Logger, LoggerProvider, ProxyLoggerProvider } from '../../src';
+import type { Logger, LoggerProvider } from '../../src';
 import { NoopLogger } from '../../src/NoopLogger';
 import { ProxyLogger } from '../../src/ProxyLogger';
+import { ProxyLoggerProvider } from '../../src/ProxyLoggerProvider';
 
 describe('ProxyLogger', () => {
   let provider: ProxyLoggerProvider;
@@ -76,6 +66,32 @@ describe('ProxyLogger', () => {
         { schemaUrl: 'https://opentelemetry.io/schemas/1.7.0' },
       ]);
     });
+
+    it('should pass LoggerOptions with scopeAttributes (LogAttributes) to delegate', () => {
+      const scopeAttributes = {
+        'service.name': 'api',
+        version: 1,
+        nested: { key: 'value' },
+        bytes: new Uint8Array([1, 2, 3]),
+      };
+      const options = {
+        schemaUrl: 'https://opentelemetry.io/schemas/1.7.0',
+        scopeAttributes,
+      };
+      const logger = provider.getLogger('test', 'v0', options);
+
+      sandbox.assert.calledOnce(getLoggerStub);
+      assert.strictEqual(getLoggerStub.firstCall.returnValue, logger);
+      assert.deepStrictEqual(getLoggerStub.firstCall.args, [
+        'test',
+        'v0',
+        options,
+      ]);
+      assert.strictEqual(
+        getLoggerStub.firstCall.args[2]?.scopeAttributes,
+        scopeAttributes
+      );
+    });
   });
 
   describe('when delegate is set after getLogger', () => {
@@ -84,12 +100,17 @@ describe('ProxyLogger', () => {
 
     let delegateLogger: Logger;
     let emitCalled: boolean;
+    let enabledCalled: boolean;
 
     beforeEach(() => {
       emitCalled = false;
       delegateLogger = {
         emit() {
           emitCalled = true;
+        },
+        enabled() {
+          enabledCalled = true;
+          return true;
         },
       };
 
@@ -108,6 +129,11 @@ describe('ProxyLogger', () => {
         body: 'Test',
       });
       assert.ok(emitCalled);
+    });
+
+    it('should call enabled from the delegate logger', () => {
+      logger.enabled();
+      assert.ok(enabledCalled);
     });
   });
 });

@@ -1,24 +1,10 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
-import type { OtlpEncodingOptions } from '../common/internal-types';
 import { ValueType } from '@opentelemetry/api';
-import {
-  AggregationTemporality,
+import type {
   DataPoint,
-  DataPointType,
   ExponentialHistogram,
   Histogram,
   MetricData,
@@ -26,7 +12,10 @@ import {
   ScopeMetrics,
 } from '@opentelemetry/sdk-metrics';
 import {
-  EAggregationTemporality,
+  AggregationTemporality,
+  DataPointType,
+} from '@opentelemetry/sdk-metrics';
+import type {
   IExponentialHistogramDataPoint,
   IExportMetricsServiceRequest,
   IHistogramDataPoint,
@@ -35,7 +24,8 @@ import {
   IResourceMetrics,
   IScopeMetrics,
 } from './internal-types';
-import { Encoder, getOtlpEncoder } from '../common/utils';
+import { EAggregationTemporality } from './internal-types';
+import type { Encoder } from '../common/utils';
 import {
   createInstrumentationScope,
   createResource,
@@ -44,10 +34,9 @@ import {
 
 export function toResourceMetrics(
   resourceMetrics: ResourceMetrics,
-  options?: OtlpEncodingOptions
+  encoder: Encoder
 ): IResourceMetrics {
-  const encoder = getOtlpEncoder(options);
-  const processedResource = createResource(resourceMetrics.resource);
+  const processedResource = createResource(resourceMetrics.resource, encoder);
   return {
     resource: processedResource,
     schemaUrl: processedResource.schemaUrl,
@@ -118,7 +107,7 @@ function toSingularDataPoint(
   encoder: Encoder
 ) {
   const out: INumberDataPoint = {
-    attributes: toAttributes(dataPoint.attributes),
+    attributes: toAttributes(dataPoint.attributes, encoder),
     startTimeUnixNano: encoder.encodeHrTime(dataPoint.startTime),
     timeUnixNano: encoder.encodeHrTime(dataPoint.endTime),
   };
@@ -155,7 +144,7 @@ function toHistogramDataPoints(
   return metricData.dataPoints.map(dataPoint => {
     const histogram = dataPoint.value as Histogram;
     return {
-      attributes: toAttributes(dataPoint.attributes),
+      attributes: toAttributes(dataPoint.attributes, encoder),
       bucketCounts: histogram.buckets.counts,
       explicitBounds: histogram.buckets.boundaries,
       count: histogram.count,
@@ -175,7 +164,7 @@ function toExponentialHistogramDataPoints(
   return metricData.dataPoints.map(dataPoint => {
     const histogram = dataPoint.value as ExponentialHistogram;
     return {
-      attributes: toAttributes(dataPoint.attributes),
+      attributes: toAttributes(dataPoint.attributes, encoder),
       count: histogram.count,
       min: histogram.min,
       max: histogram.max,
@@ -209,11 +198,11 @@ function toAggregationTemporality(
 
 export function createExportMetricsServiceRequest(
   resourceMetrics: ResourceMetrics[],
-  options?: OtlpEncodingOptions
+  encoder: Encoder
 ): IExportMetricsServiceRequest {
   return {
     resourceMetrics: resourceMetrics.map(metrics =>
-      toResourceMetrics(metrics, options)
+      toResourceMetrics(metrics, encoder)
     ),
   };
 }

@@ -1,33 +1,27 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
-import { logs, NoopLogger } from '@opentelemetry/api-logs';
+import { logs } from '@opentelemetry/api-logs';
 import { diag } from '@opentelemetry/api';
 import {
   defaultResource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-import { LoggerProvider } from '../../src';
+import {
+  InMemoryLogRecordExporter,
+  LoggerProvider,
+  SimpleLogRecordProcessor,
+} from '../../src';
 import { NoopLogRecordProcessor } from '../../src/export/NoopLogRecordProcessor';
-import { loadDefaultConfig } from '../../src/config';
 import { DEFAULT_LOGGER_NAME } from './../../src/LoggerProvider';
 import { MultiLogRecordProcessor } from '../../src/MultiLogRecordProcessor';
 import { Logger } from '../../src/Logger';
+import { TestMetricReader } from './utils';
 
 describe('LoggerProvider', () => {
   beforeEach(() => {
@@ -87,10 +81,7 @@ describe('LoggerProvider', () => {
       it('should have default forceFlushTimeoutMillis if not pass', () => {
         const provider = new LoggerProvider();
         const sharedState = provider['_sharedState'];
-        assert.ok(
-          sharedState.forceFlushTimeoutMillis ===
-            loadDefaultConfig().forceFlushTimeoutMillis
-        );
+        assert.ok(sharedState.forceFlushTimeoutMillis === 30_000);
       });
     });
 
@@ -284,12 +275,14 @@ describe('LoggerProvider', () => {
       sinon.assert.calledOnce(shutdownStub);
     });
 
-    it('get a noop logger on shutdown', () => {
+    it('get a noop logger after shutdown', () => {
       const provider = new LoggerProvider();
+      let logger = provider.getLogger('default', '1.0.0');
+      assert.ok(logger instanceof Logger);
       provider.shutdown();
-      const logger = provider.getLogger('default', '1.0.0');
-      // returned tracer should be no-op, not instance of Logger (from SDK)
-      assert.ok(logger instanceof NoopLogger);
+      logger = provider.getLogger('default', '1.0.0');
+      // returned logger should be no-op, not instance of Logger (from SDK)
+      assert.ok(!(logger instanceof Logger));
     });
 
     it('should not force flush on shutdown', () => {
@@ -316,6 +309,44 @@ describe('LoggerProvider', () => {
       provider.shutdown();
       sinon.assert.calledOnce(shutdownStub);
       sinon.assert.calledOnce(warnStub);
+    });
+  });
+
+  describe('LoggerMetrics', () => {
+    it('should record metrics for created logs', async () => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+
+      const logRecordExporter = new InMemoryLogRecordExporter();
+      const logRecordProcessor = new SimpleLogRecordProcessor(
+        logRecordExporter
+      );
+      const provider = new LoggerProvider({
+        processors: [logRecordProcessor],
+        meterProvider,
+      });
+      const logger = provider.getLogger('test');
+      logger.emit({ body: 'log 1' });
+      let { resourceMetrics } = await metricReader.collect();
+      let metrics = resourceMetrics.scopeMetrics[0].metrics;
+      let logsCreatedMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.log.created'
+      );
+      assert.ok(logsCreatedMetric);
+      assert.strictEqual(logsCreatedMetric.dataPoints[0].value, 1);
+      assert.deepStrictEqual(logsCreatedMetric.dataPoints[0].attributes, {});
+
+      logger.emit({ body: 'log 1' });
+      ({ resourceMetrics } = await metricReader.collect());
+      metrics = resourceMetrics.scopeMetrics[0].metrics;
+      logsCreatedMetric = metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.log.created'
+      );
+      assert.ok(logsCreatedMetric);
+      assert.strictEqual(logsCreatedMetric.dataPoints[0].value, 2);
+      assert.deepStrictEqual(logsCreatedMetric.dataPoints[0].attributes, {});
     });
   });
 });

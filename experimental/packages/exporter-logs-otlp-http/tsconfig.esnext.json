@@ -1,6 +1,11 @@
 {
   "extends": "../../../tsconfig.base.esnext.json",
   "compilerOptions": {
+    "lib": [
+      "es2022",
+      "dom",
+      "dom.iterable"
+    ],
     "outDir": "build/esnext",
     "rootDir": "src",
     "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo"

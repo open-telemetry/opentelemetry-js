@@ -1,6 +1,11 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "lib": [
+      "es2022",
+      "dom",
+      "dom.iterable"
+    ],
     "outDir": "build",
     "rootDir": "."
   },
@@ -21,6 +26,9 @@
     },
     {
       "path": "../opentelemetry-resources"
+    },
+    {
+      "path": "../sdk-metrics"
     }
   ]
 }

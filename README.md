@@ -131,9 +131,10 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 | Platform Version    | Supported                                     |
 | ------------------- | --------------------------------------------- |
-| Node.JS `v22`       | :heavy_check_mark:                            |
-| Node.JS `v20`       | :heavy_check_mark:                            |
-| Node.JS `v18`       | :heavy_check_mark:                            |
+| Node.js `v24`       | :heavy_check_mark:                            |
+| Node.js `v22`       | :heavy_check_mark:                            |
+| Node.js `v20`       | :heavy_check_mark:                            |
+| Node.js `v18`       | :heavy_check_mark:                            |
 | Older Node Versions | See [Node Support](#node-support)             |
 | Web Browsers        | See [Browser Support](#browser-support) below |
 
@@ -151,7 +152,7 @@ Previous versions of node *may* work, but they are not tested by OpenTelemetry a
 Rather than define versions of specific browsers / runtimes, OpenTelemetry sets the minimum supported version based on the
 underlying language features used.
 
-The current minumum language feature support is set as [ECMAScript 2022](https://262.ecma-international.org/13.0/) that are available
+The current minimum language feature support is set as [ECMAScript 2022](https://262.ecma-international.org/13.0/) that are available
 in all modern browsers / runtimes.
 
 This means that if you are targeting or your end-users are using a browser / runtime that does not support ES2022, you will need
@@ -165,7 +166,7 @@ This minimum support level is subject to change as the project evolves and as th
 OpenTelemetry JavaScript is built with TypeScript `v5.0.4`. If you have a TypeScript project (app, library, instrumentation, etc.)
 that depends on it, we recommend using same or higher version to compile the project.
 
-OpenTelemetry JavaScript will follows DefinitelyType's [support policy for TypeScript](https://github.com/DefinitelyTyped/DefinitelyTyped#support-window) which sets a support window of 2 years. Support for TypeScript versions older than 2 years will be dropped in minor releases of OpenTelemetry JavaScript.
+OpenTelemetry JavaScript will follow DefinitelyType's [support policy for TypeScript](https://github.com/DefinitelyTyped/DefinitelyTyped#support-window) which sets a support window of 2 years. Support for TypeScript versions older than 2 years will be dropped in minor releases of OpenTelemetry JavaScript.
 
 ## Package Version Compatibility
 
@@ -255,13 +256,11 @@ For more information about the maintainer role, see the [community repository](h
 
 ### Approvers
 
-- [Amir Blum](https://github.com/blumamir), Odigos
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
 - [Jackson Weber](https://github.com/JacksonWeber), Microsoft
 - [Martin Kuba](https://github.com/martinkuba), Grafana Labs
 - [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
 - [Raphaël Thériault](https://github.com/raphael-theriault-swi), SolarWinds
-- [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
 
 In addition, [Browser SIG Maintainers](https://github.com/orgs/open-telemetry/teams/browser-maintainers) are granted the
 Approver role for browser-targeted packages as defined in this repository's [CODEOWNERS](./.github/CODEOWNERS) file.
@@ -311,8 +310,9 @@ Typically, members of this are [component owners](https://github.com/open-teleme
 
 For more information about the triager role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#triager).
 
-### Emeriti
+### Emeritus
 
+- [Amir Blum](https://github.com/blumamir), Maintainer
 - [Bartlomiej Obecny](https://github.com/obecny), Maintainer
 - [Brandon Gonzalez](https://github.com/bg451), Approver
 - [Daniel Khan](https://github.com/dkhan), Maintainer
@@ -320,15 +320,16 @@ For more information about the triager role, see the [community repository](http
 - [Haddas Bronfman](https://github.com/haddasbronfman), Approver
 - [John Bley](https://github.com/johnbley), Approver
 - [Mark Wolff](https://github.com/markwolff), Approver
+- [Matthew Wear](https://github.com/mwear), Approver
 - [Mayur Kale](https://github.com/mayurkale22), Maintainer
 - [Naseem K. Ullah](https://github.com/naseemkullah), Approver
+- [Neville Wylie](https://github.com/MSNev), Approver
 - [Olivier Albertini](https://github.com/OlivierAlbertini), Approver
+- [Purvi Kanal](https://github.com/pkanal), Approver
 - [Rauno Viskus](https://github.com/rauno56), Maintainer
 - [Roch Devost](https://github.com/rochdev), Approver
+- [Svetlana Brennan](https://github.com/svetlanabrennan), Approver
 - [Valentin Marchaud](https://github.com/vmarchaud), Maintainer
-- [Matthew Wear](https://github.com/mwear), Approver
-- [Neville Wylie](https://github.com/MSNev), Approver
-- [Purvi Kanal](https://github.com/pkanal), Approver
 
 For more information about the emeritus role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#emeritus-maintainerapprovertriager).
 
