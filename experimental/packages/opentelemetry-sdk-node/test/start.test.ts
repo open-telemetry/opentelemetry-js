@@ -55,7 +55,11 @@ import {
   ATTR_SERVICE_INSTANCE_ID,
 } from '../src/semconv';
 import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
-import { getLogRecordExporter, setupContextManager } from '../src/utils';
+import {
+  getLogRecordExporter,
+  getSpanExporter,
+  setupContextManager,
+} from '../src/utils';
 import { NOOP_SDK } from '../src/start';
 import {
   ConsoleMetricExporter,
@@ -345,15 +349,12 @@ describe('startNodeSDK', function () {
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/tracer.yaml';
     const sdk = startNodeSDK({});
 
-    // Periodic type 'otlp_file/development' is not supported yet
-    assert.strictEqual(
-      stubLoggerWarn.args[0][0],
-      'Unsupported Exporter value. No Span Exporter registered'
+    // otlp_file/development exporters are not supported yet
+    const unsupportedWarnings = stubLoggerWarn.args.filter(
+      args =>
+        args[0] === 'Unsupported Exporter value. No Span Exporter registered'
     );
-    assert.strictEqual(
-      stubLoggerWarn.args[1][0],
-      'Unsupported Exporter value. No Span Exporter registered'
-    );
+    assert.strictEqual(unsupportedWarnings.length, 2);
 
     assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
     assert.ok(
@@ -960,6 +961,19 @@ describe('startNodeSDK', function () {
     it('should return undefined for invalid log record exporter model', async () => {
       const exporter: LogRecordExporterConfigModel = {};
       assert.equal(getLogRecordExporter(exporter), undefined);
+    });
+
+    it('should warn when exporter timeout is 0', async () => {
+      const warnSpy = Sinon.spy(diag, 'warn');
+      const exporter = getSpanExporter({
+        otlp_http: { timeout: 0 },
+      });
+      assert.ok(exporter !== undefined);
+      assert.ok(
+        warnSpy.args.some(args =>
+          String(args[0]).includes('timeout of 0 (infinite) is not supported')
+        )
+      );
     });
 
     it('null context manager', async () => {
