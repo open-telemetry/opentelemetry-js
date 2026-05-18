@@ -305,9 +305,9 @@ The document will be available under `docs` path.
 
 ### Adding a package
 
-To add a new package, copy `packages/template` to your new package directory and modify the `package.json` file to reflect your desired package settings. If the package will not support browser, the `karma.conf` and `tsconfig.esm.json` files may be deleted. If the package will support es5 targets, the reference to `tsconfig.base.json` in `tsconfig.json` should be changed to `tsconfig.es5.json`.
+To add a new package, copy `packages/template` to your new package directory and modify the `package.json` file to reflect your desired package settings. If the package will not support browser, the `karma.conf.js` file may be deleted. Per-package compiler options live in `tsdown.config.ts`, which imports the shared options from the workspace root `tsdown.config.ts` and adds an `entry` list; override fields like `target` only when you have a concrete reason to (see `api/tsdown.config.ts` for an example).
 
-After adding the package, run `npm install` from the root of the project. This will update the `tsconfig.json` project references automatically and install all dependencies in your new package. For packages supporting browser, file `tsconfig.esm.json` needs to be manually updated to include reference to ES modules build.
+After adding the package, run `npm install` from the root of the project to install all dependencies in your new package. For packages with platform-conditional code (browser vs node), add a `browser` field to the `package.json` that path-swaps the relevant `./dist/*.mjs` and `./dist/*.cjs` files; see `@opentelemetry/core`'s `package.json` for a working example.
 
 ### Platform conditional exports
 

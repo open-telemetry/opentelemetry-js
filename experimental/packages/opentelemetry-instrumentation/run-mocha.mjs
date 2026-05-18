@@ -4,16 +4,8 @@
  */
 
 /**
- * ESM entry point for running mocha. We need this because Node's
- * --experimental-loader / module.register() hooks are only applied to ESM
- * imports that go through the ESM resolver — and `dynamic import()` calls made
- * from CJS code (which is what mocha's `bin/mocha.js` is) bypass the loader.
- *
- * The `import-in-the-middle` ESM loader that powers @opentelemetry/instrumentation's
- * ESM patching needs to intercept the test files' `import 'test-esm-module'`
- * statements; that only happens when the test files are imported from an ESM
- * entry. So we invoke mocha programmatically from this .mjs file.
- *
+ * ESM mocha entry: import-in-the-middle's loader hooks only fire for imports
+ * resolved through the ESM resolver, which mocha's CJS binary bypasses.
  * Test glob is taken from the first positional CLI argument.
  */
 
