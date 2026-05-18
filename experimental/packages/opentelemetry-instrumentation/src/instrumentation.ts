@@ -1,33 +1,21 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  diag,
+import type {
   DiagLogger,
-  metrics,
   Meter,
   MeterProvider,
-  trace,
   Tracer,
   TracerProvider,
   Span,
 } from '@opentelemetry/api';
-import { Logger, LoggerProvider, logs } from '@opentelemetry/api-logs';
+import { diag, metrics, trace } from '@opentelemetry/api';
+import type { Logger, LoggerProvider } from '@opentelemetry/api-logs';
+import { logs } from '@opentelemetry/api-logs';
 import * as shimmer from './shimmer';
-import {
+import type {
   InstrumentationModuleDefinition,
   Instrumentation,
   InstrumentationConfig,
@@ -47,12 +35,17 @@ export abstract class InstrumentationAbstract<
   private _meter: Meter;
   private _logger: Logger;
   protected _diag: DiagLogger;
+  public readonly instrumentationName: string;
+  public readonly instrumentationVersion: string;
 
   constructor(
-    public readonly instrumentationName: string,
-    public readonly instrumentationVersion: string,
+    instrumentationName: string,
+    instrumentationVersion: string,
     config: ConfigType
   ) {
+    this.instrumentationName = instrumentationName;
+    this.instrumentationVersion = instrumentationVersion;
+
     this.setConfig(config);
 
     this._diag = diag.createComponentLogger({

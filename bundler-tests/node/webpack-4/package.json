@@ -1,0 +1,30 @@
+{
+  "name": "bundler-tests-node-webpack-4",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:bundle": "npm i && node test-bundle.mjs"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "file:../../../api",
+    "@opentelemetry/api-logs": "file:../../../experimental/packages/api-logs",
+    "@opentelemetry/core": "file:../../../packages/opentelemetry-core",
+    "@opentelemetry/exporter-logs-otlp-http": "file:../../../experimental/packages/exporter-logs-otlp-http",
+    "@opentelemetry/exporter-metrics-otlp-http": "file:../../../experimental/packages/opentelemetry-exporter-metrics-otlp-http",
+    "@opentelemetry/exporter-trace-otlp-http": "file:../../../experimental/packages/exporter-trace-otlp-http",
+    "@opentelemetry/instrumentation": "file:../../../experimental/packages/opentelemetry-instrumentation",
+    "@opentelemetry/propagator-b3": "file:../../../packages/opentelemetry-propagator-b3",
+    "@opentelemetry/resources": "file:../../../packages/opentelemetry-resources",
+    "@opentelemetry/sdk-logs": "file:../../../experimental/packages/sdk-logs",
+    "@opentelemetry/sdk-metrics": "file:../../../packages/sdk-metrics",
+    "@opentelemetry/sdk-trace-base": "file:../../../packages/opentelemetry-sdk-trace-base"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "@types/webpack": "^4",
+    "babel-loader": "^8.0.0",
+    "webpack": "^4",
+    "webpack-cli": "^4"
+  }
+}

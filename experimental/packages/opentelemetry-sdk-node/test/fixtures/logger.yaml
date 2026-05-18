@@ -1,0 +1,71 @@
+file_format: "1.0"
+disabled: false
+logger_provider:
+  # Configure log record processors.
+  processors:
+    - # Configure a batch log record processor.
+      batch:
+        # Configure delay interval (in milliseconds) between two consecutive exports. 
+        # Value must be non-negative.
+        # If omitted or null, 1000 is used.
+        schedule_delay: 5000
+        # Configure maximum allowed time (in milliseconds) to export data. 
+        # Value must be non-negative. A value of 0 indicates no limit (infinity).
+        # If omitted or null, 30000 is used.
+        export_timeout: 30000
+        # Configure maximum queue size. Value must be positive.
+        # If omitted or null, 2048 is used.
+        max_queue_size: 2048
+        # Configure maximum batch size. Value must be positive.
+        # If omitted or null, 512 is used.
+        max_export_batch_size: 512
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be OTLP with HTTP transport.
+          otlp_http:
+            endpoint: http://localhost:4318/v1/logs
+            tls:
+              ca_file: /app/cert.pem
+              key_file: /app/cert.pem
+              cert_file: /app/cert.pem
+            headers:
+              - name: api-key
+                value: "1234"
+            headers_list: "api-key=1234"
+            compression: gzip
+            timeout: 10000
+            encoding: protobuf
+    - # Configure a batch log record processor.
+      batch:
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be OTLP with gRPC transport.
+          otlp_grpc:
+            endpoint: http://localhost:4317
+            tls:
+              ca_file: /app/cert.pem
+              key_file: /app/cert.pem
+              cert_file: /app/cert.pem
+              insecure: false
+            headers:
+              - name: api-key
+                value: "1234"
+            headers_list: "api-key=1234"
+            compression: gzip
+            timeout: 10000
+    - # Configure a simple log record processor.
+      simple:
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be console.
+          console:
+  # Configure log record limits. See also attribute_limits.
+  limits:
+    # Configure max attribute value size. Overrides .attribute_limits.attribute_value_length_limit. 
+    # Value must be non-negative.
+    # If omitted or null, there is no limit.
+    attribute_value_length_limit: 4096
+    # Configure max attribute count. Overrides .attribute_limits.attribute_count_limit. 
+    # Value must be non-negative.
+    # If omitted or null, 128 is used.
+    attribute_count_limit: 128

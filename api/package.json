@@ -1,17 +1,11 @@
 {
   "name": "@opentelemetry/api",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Public API for OpenTelemetry",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
   "types": "build/src/index.d.ts",
-  "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts",
-    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
-    "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
-    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
-  },
   "exports": {
     ".": {
       "esnext": "./build/esnext/index.js",
@@ -31,9 +25,10 @@
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "lint:fix": "eslint . --ext .ts --fix",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint . --ext .ts && npm run cycle-check",
     "test:browser": "karma start --single-run",
     "test": "nyc mocha 'test/**/*.test.ts'",
+    "test:node8-compat": "node test/backcompat/node8-compat.js",
     "test:webworker": "karma start karma.worker.js --single-run",
     "cycle-check": "dpdm --exit-code circular:1 src/index.ts",
     "version": "node ../scripts/version-update.js",
@@ -77,8 +72,8 @@
     "@types/sinon": "17.0.4",
     "@types/webpack": "5.28.5",
     "@types/webpack-env": "1.16.3",
-    "babel-plugin-istanbul": "7.0.1",
-    "dpdm": "3.13.1",
+    "babel-plugin-istanbul": "8.0.0",
+    "dpdm": "4.0.1",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",
@@ -90,10 +85,10 @@
     "mocha": "11.7.5",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
-    "ts-loader": "9.5.4",
+    "ts-loader": "9.5.7",
     "typescript": "5.0.4",
     "unionfs": "4.5.4",
-    "webpack": "5.101.3"
+    "webpack": "5.104.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/api",
   "sideEffects": false

@@ -17,7 +17,7 @@
 
 import * as oc from '@opencensus/core';
 import { emptyResource } from '@opentelemetry/resources';
-import {
+import type {
   CollectionResult,
   MetricData,
   MetricProducer,

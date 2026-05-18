@@ -1,33 +1,19 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
-import {
+import type {
   Context,
   SpanKind,
   Attributes,
   Link,
   TraceState,
-  trace,
 } from '@opentelemetry/api';
+import { trace } from '@opentelemetry/api';
 import { TraceState as CoreTraceState } from '@opentelemetry/core';
-import {
-  Sampler,
-  SamplingDecision,
-  SamplingResult,
-} from '@opentelemetry/sdk-trace-base';
-import { ComposableSampler } from './types';
+import type { Sampler, SamplingResult } from '@opentelemetry/sdk-trace-base';
+import { SamplingDecision } from '@opentelemetry/sdk-trace-base';
+import type { ComposableSampler } from './types';
 import { parseOtelTraceState, serializeTraceState } from './tracestate';
 import {
   INVALID_THRESHOLD,
@@ -36,7 +22,11 @@ import {
 } from './util';
 
 class CompositeSampler implements Sampler {
-  constructor(private readonly delegate: ComposableSampler) {}
+  private readonly delegate: ComposableSampler;
+
+  constructor(delegate: ComposableSampler) {
+    this.delegate = delegate;
+  }
 
   shouldSample(
     context: Context,

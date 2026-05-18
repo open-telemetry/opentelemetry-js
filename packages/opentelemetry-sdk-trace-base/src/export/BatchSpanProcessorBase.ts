@@ -1,20 +1,10 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { context, Context, diag, TraceFlags } from '@opentelemetry/api';
+import type { Context } from '@opentelemetry/api';
+import { context, diag, TraceFlags } from '@opentelemetry/api';
 import {
   BindOnceFuture,
   ExportResultCode,
@@ -22,11 +12,11 @@ import {
   globalErrorHandler,
   suppressTracing,
 } from '@opentelemetry/core';
-import { Span } from '../Span';
-import { SpanProcessor } from '../SpanProcessor';
-import { BufferConfig } from '../types';
-import { ReadableSpan } from './ReadableSpan';
-import { SpanExporter } from './SpanExporter';
+import type { Span } from '../Span';
+import type { SpanProcessor } from '../SpanProcessor';
+import type { BufferConfig } from '../types';
+import type { ReadableSpan } from './ReadableSpan';
+import type { SpanExporter } from './SpanExporter';
 
 /**
  * Implementation of the {@link SpanProcessor} that batches spans exported by
@@ -39,6 +29,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   private readonly _maxQueueSize: number;
   private readonly _scheduledDelayMillis: number;
   private readonly _exportTimeoutMillis: number;
+  private readonly _exporter: SpanExporter;
 
   private _isExporting = false;
   private _finishedSpans: ReadableSpan[] = [];
@@ -46,10 +37,8 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   private _shutdownOnce: BindOnceFuture<void>;
   private _droppedSpansCount: number = 0;
 
-  constructor(
-    private readonly _exporter: SpanExporter,
-    config?: T
-  ) {
+  constructor(exporter: SpanExporter, config?: T) {
+    this._exporter = exporter;
     this._maxExportBatchSize =
       typeof config?.maxExportBatchSize === 'number'
         ? config.maxExportBatchSize

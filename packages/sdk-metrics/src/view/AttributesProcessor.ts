@@ -1,20 +1,9 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context, Attributes } from '@opentelemetry/api';
+import type { Context, Attributes } from '@opentelemetry/api';
 
 /**
  * The {@link AttributesProcessor} is responsible for customizing which
@@ -39,7 +28,10 @@ class NoopAttributesProcessor implements IAttributesProcessor {
 }
 
 class MultiAttributesProcessor implements IAttributesProcessor {
-  constructor(private readonly _processors: IAttributesProcessor[]) {}
+  private readonly _processors: IAttributesProcessor[];
+  constructor(processors: IAttributesProcessor[]) {
+    this._processors = processors;
+  }
   process(incoming: Attributes, context?: Context): Attributes {
     let filteredAttributes = incoming;
     for (const processor of this._processors) {
@@ -50,29 +42,41 @@ class MultiAttributesProcessor implements IAttributesProcessor {
 }
 
 class AllowListProcessor implements IAttributesProcessor {
-  constructor(private _allowedAttributeNames: string[]) {}
+  private readonly _allowedAttributeNames: Set<string>;
+  constructor(allowedAttributeNames: string[]) {
+    this._allowedAttributeNames = new Set(allowedAttributeNames);
+  }
 
   process(incoming: Attributes, _context?: Context): Attributes {
     const filteredAttributes: Attributes = {};
-    Object.keys(incoming).forEach(attributeName => {
-      if (this._allowedAttributeNames.includes(attributeName)) {
+    for (const attributeName in incoming) {
+      if (
+        Object.prototype.hasOwnProperty.call(incoming, attributeName) &&
+        this._allowedAttributeNames.has(attributeName)
+      ) {
         filteredAttributes[attributeName] = incoming[attributeName];
       }
-    });
+    }
     return filteredAttributes;
   }
 }
 
 class DenyListProcessor implements IAttributesProcessor {
-  constructor(private _deniedAttributeNames: string[]) {}
+  private readonly _deniedAttributeNames: Set<string>;
+  constructor(deniedAttributeNames: string[]) {
+    this._deniedAttributeNames = new Set(deniedAttributeNames);
+  }
 
   process(incoming: Attributes, _context?: Context): Attributes {
     const filteredAttributes: Attributes = {};
-    Object.keys(incoming).forEach(attributeName => {
-      if (!this._deniedAttributeNames.includes(attributeName)) {
+    for (const attributeName in incoming) {
+      if (
+        Object.prototype.hasOwnProperty.call(incoming, attributeName) &&
+        !this._deniedAttributeNames.has(attributeName)
+      ) {
         filteredAttributes[attributeName] = incoming[attributeName];
       }
-    });
+    }
     return filteredAttributes;
   }
 }

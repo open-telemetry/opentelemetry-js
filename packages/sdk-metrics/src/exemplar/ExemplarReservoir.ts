@@ -1,27 +1,11 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  Context,
-  HrTime,
-  isSpanContextValid,
-  trace,
-  Attributes,
-} from '@opentelemetry/api';
-import { Exemplar } from './Exemplar';
+import type { Context, HrTime, Attributes } from '@opentelemetry/api';
+import { isSpanContextValid, trace } from '@opentelemetry/api';
+import type { Exemplar } from './Exemplar';
 
 /**
  * An interface for an exemplar reservoir of samples.
@@ -75,11 +59,14 @@ class ExemplarBucket {
     if (!this._offered) return null;
     const currentAttributes = this.attributes;
     // filter attributes
-    Object.keys(pointAttributes).forEach(key => {
-      if (pointAttributes[key] === currentAttributes[key]) {
+    for (const key in pointAttributes) {
+      if (
+        Object.prototype.hasOwnProperty.call(pointAttributes, key) &&
+        pointAttributes[key] === currentAttributes[key]
+      ) {
         delete currentAttributes[key];
       }
-    });
+    }
     const retVal: Exemplar = {
       filteredAttributes: currentAttributes,
       value: this.value,
@@ -129,12 +116,12 @@ export abstract class FixedSizeExemplarReservoirBase
 
   collect(pointAttributes: Attributes): Exemplar[] {
     const exemplars: Exemplar[] = [];
-    this._reservoirStorage.forEach(storageItem => {
+    for (const storageItem of this._reservoirStorage) {
       const res = storageItem.collect(pointAttributes);
       if (res !== null) {
         exemplars.push(res);
       }
-    });
+    }
     this.reset();
     return exemplars;
   }

@@ -1,43 +1,51 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 import { diag } from '@opentelemetry/api';
-import type * as logsAPI from '@opentelemetry/api-logs';
-import { NOOP_LOGGER } from '@opentelemetry/api-logs';
+import type {
+  LoggerProvider as ILoggerProvider,
+  LoggerOptions as ILoggerOptions,
+  Logger as ILogger,
+} from '@opentelemetry/api-logs';
+import { createNoopLogger } from '@opentelemetry/api-logs';
 import { defaultResource } from '@opentelemetry/resources';
-import { BindOnceFuture, merge } from '@opentelemetry/core';
+import { BindOnceFuture } from '@opentelemetry/core';
 
-import type { LoggerProviderConfig } from './types';
+import type { LoggerProviderOptions } from './types';
 import { Logger } from './Logger';
-import { loadDefaultConfig, reconfigureLimits } from './config';
-import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
+import {
+  DEFAULT_LOGGER_CONFIGURATOR,
+  LoggerProviderSharedState,
+} from './internal/LoggerProviderSharedState';
 
 export const DEFAULT_LOGGER_NAME = 'unknown';
 
-export class LoggerProvider implements logsAPI.LoggerProvider {
+export class LoggerProvider implements ILoggerProvider {
   private _shutdownOnce: BindOnceFuture<void>;
   private readonly _sharedState: LoggerProviderSharedState;
 
-  constructor(config: LoggerProviderConfig = {}) {
-    const mergedConfig = merge({}, loadDefaultConfig(), config);
-    const resource = config.resource ?? defaultResource();
+  constructor(config: LoggerProviderOptions = {}) {
+    const mergedConfig = {
+      resource: config.resource ?? defaultResource(),
+      forceFlushTimeoutMillis: config.forceFlushTimeoutMillis ?? 30000,
+      logRecordLimits: {
+        attributeCountLimit: config.logRecordLimits?.attributeCountLimit ?? 128,
+        attributeValueLengthLimit:
+          config.logRecordLimits?.attributeValueLengthLimit ?? Infinity,
+      },
+      loggerConfigurator:
+        config.loggerConfigurator ?? DEFAULT_LOGGER_CONFIGURATOR,
+      processors: config.processors ?? [],
+      meterProvider: config.meterProvider,
+    };
     this._sharedState = new LoggerProviderSharedState(
-      resource,
+      mergedConfig.resource,
       mergedConfig.forceFlushTimeoutMillis,
-      reconfigureLimits(mergedConfig.logRecordLimits),
-      config?.processors ?? []
+      mergedConfig.logRecordLimits,
+      mergedConfig.processors,
+      mergedConfig.loggerConfigurator,
+      mergedConfig.meterProvider
     );
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
   }
@@ -48,11 +56,11 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
   public getLogger(
     name: string,
     version?: string,
-    options?: logsAPI.LoggerOptions
-  ): logsAPI.Logger {
+    options?: ILoggerOptions
+  ): ILogger {
     if (this._shutdownOnce.isCalled) {
       diag.warn('A shutdown LoggerProvider cannot provide a Logger');
-      return NOOP_LOGGER;
+      return createNoopLogger();
     }
 
     if (!name) {

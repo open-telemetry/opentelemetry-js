@@ -1,26 +1,15 @@
-import { fileURLToPath } from 'url';
-import path from 'path';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('./node_modules/@types/webpack').Configuration} */
 export default {
-  mode: 'development',
+  mode: 'production',
   entry: './src/index.js',
+  target: 'web',
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
-  devServer: {
-    static: {
-      directory: path.resolve(__dirname, 'dist/'),
-    },
-  },
-  plugins: [
-    new HtmlWebpackPlugin({
-      title: 'Development',
-      template: 'index.html',
-    }),
-  ],
 };

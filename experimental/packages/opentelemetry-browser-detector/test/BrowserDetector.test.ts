@@ -1,21 +1,15 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 import * as sinon from 'sinon';
 import { browserDetector } from '../src/BrowserDetector';
-import { assertEmptyResource, assertResource, describeBrowser } from './util';
+import {
+  assertEmptyResource,
+  assertResource,
+  describeBrowser,
+  describeNode,
+} from './util';
 
 describeBrowser('browserDetector()', () => {
   afterEach(() => {
@@ -69,10 +63,27 @@ describeBrowser('browserDetector()', () => {
     });
   });
 
-  it('should return empty resources if user agent is missing', async () => {
+  it('should return empty resource if userAgent is missing', async () => {
     sinon.stub(globalThis, 'navigator').value({
       userAgent: '',
     });
+    const resource = browserDetector.detect();
+    assertEmptyResource(resource);
+  });
+});
+
+describeNode('browserDetector()', () => {
+  it('should return empty resource even if navigator is present', () => {
+    // Cannot use sinon.stub for non-existent properties (Node.js <=20)
+    Object.defineProperty(globalThis, 'navigator', {
+      value: {
+        userAgent: 'dddd',
+        language: 'en-US',
+        userAgentData: undefined,
+      },
+      configurable: true,
+    });
+
     const resource = browserDetector.detect();
     assertEmptyResource(resource);
   });
