@@ -36,7 +36,7 @@ import {
 } from 'https'; // ESM import style C
 
 import { SpanKind } from '@opentelemetry/api';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -46,7 +46,7 @@ import { assertSpan } from '../../build/test/utils/assertSpan.js';
 import { HttpInstrumentation } from '../../build/src/index.js';
 
 const memoryExporter = new InMemorySpanExporter();
-const provider = new NodeTracerProvider({
+const provider = new BasicTracerProvider({
   spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
 });
 const instrumentation = new HttpInstrumentation();

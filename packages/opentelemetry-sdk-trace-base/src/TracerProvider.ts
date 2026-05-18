@@ -17,6 +17,13 @@ import type { TracerProviderOptions } from './types';
 import { ParentBasedSampler } from './sampler/ParentBasedSampler';
 import { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
 import { RandomIdGenerator } from './platform';
+import type { InspectFn, InspectStylizeOptions } from './inspect';
+import {
+  formatInspect,
+  inspectCustom,
+  settledResourceAttributes,
+} from './inspect';
+
 
 export enum ForceFlushState {
   'resolved',
@@ -157,5 +164,29 @@ export class TracerProvider implements ApiTracerProvider {
 
   shutdown(): Promise<void> {
     return this._activeSpanProcessor.shutdown();
+  }
+
+  [inspectCustom](
+    depth: number,
+    options: InspectStylizeOptions | undefined,
+    inspect: InspectFn | undefined
+  ): unknown {
+    const processors = this._activeSpanProcessor[
+      '_spanProcessors'
+    ] as SpanProcessor[];
+    const payload = {
+      resource: { attributes: settledResourceAttributes(this._resource) },
+      tracers: Array.from(this._tracers.keys()),
+      spanProcessors: processors.map(
+        p => p.constructor?.name ?? 'SpanProcessor'
+      ),
+    };
+    return formatInspect(
+      'BasicTracerProvider',
+      payload,
+      depth,
+      options,
+      inspect
+    );
   }
 }

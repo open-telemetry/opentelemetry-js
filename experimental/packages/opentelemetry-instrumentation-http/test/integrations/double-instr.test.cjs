@@ -27,7 +27,7 @@ const path = require('path');
 const fs = require('fs');
 
 const { SpanKind } = require('@opentelemetry/api');
-const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
+const { BasicTracerProvider } = require('@opentelemetry/sdk-trace-base');
 const {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -36,7 +36,7 @@ const {
 const { HttpInstrumentation } = require('../../build/src/index.js');
 
 const memoryExporter = new InMemorySpanExporter();
-const provider = new NodeTracerProvider({
+const provider = new BasicTracerProvider({
   spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
 });
 const instrumentation = new HttpInstrumentation();

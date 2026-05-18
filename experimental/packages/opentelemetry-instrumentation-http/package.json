@@ -52,7 +52,6 @@
     "@opentelemetry/context-async-hooks": "2.7.1",
     "@opentelemetry/sdk-metrics": "2.7.1",
     "@opentelemetry/sdk-trace-base": "2.7.1",
-    "@opentelemetry/sdk-trace-node": "2.7.1",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/request-promise-native": "1.0.21",

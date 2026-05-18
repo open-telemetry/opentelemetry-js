@@ -13,11 +13,7 @@ import type { TracerConfig } from './types';
 import { reconfigureLimits } from './utility';
 import { TracerProvider } from './TracerProvider';
 import type { InspectFn, InspectStylizeOptions } from './inspect';
-import {
-  formatInspect,
-  inspectCustom,
-  settledResourceAttributes,
-} from './inspect';
+import { inspectCustom } from './inspect';
 
 export enum ForceFlushState {
   'resolved',
@@ -64,22 +60,6 @@ export class BasicTracerProvider implements ApiTracerProvider {
     options: InspectStylizeOptions | undefined,
     inspect: InspectFn | undefined
   ): unknown {
-    const processors = this._activeSpanProcessor[
-      '_spanProcessors'
-    ] as SpanProcessor[];
-    const payload = {
-      resource: { attributes: settledResourceAttributes(this._resource) },
-      tracers: Array.from(this._tracers.keys()),
-      spanProcessors: processors.map(
-        p => p.constructor?.name ?? 'SpanProcessor'
-      ),
-    };
-    return formatInspect(
-      'BasicTracerProvider',
-      payload,
-      depth,
-      options,
-      inspect
-    );
+    return this._delegate[inspectCustom](depth, options, inspect);
   }
 }

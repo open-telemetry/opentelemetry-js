@@ -27,16 +27,35 @@ OpenTelemetry gRPC Instrumentation allows the user to automatically collect trac
 To load a specific instrumentation (**gRPC** in this case), specify it in the Node Tracer's configuration.
 
 ```javascript
-const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
+const { BasicTracerProvider, SimpleSpanProcessor, ConsoleSpanExporter } = require('@opentelemetry/sdk-trace-base');
 const { GrpcInstrumentation } = require('@opentelemetry/instrumentation-grpc');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
+const { AsyncLocalStorageContextManager } = require('@opentelemetry/context-async-hooks');
+const {
+  CompositePropagator,
+  W3CBaggagePropagator,
+  W3CTraceContextPropagator,
+} = require('@opentelemetry/core');
+const {
+  trace, propagation, context,
+} = require('@opentelemetry/api');
 
-const provider = new NodeTracerProvider({
+const provider = new BasicTracerProvider({
   spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
 });
 
-provider.register();
+// Set context manager and propagation
+context.setGlobalContextManager(new AsyncLocalStorageContextManager());
+propagation.setGlobalPropagator(
+  new CompositePropagator({
+    propagators: [
+      new W3CTraceContextPropagator(),
+      new W3CBaggagePropagator(),
+    ],
+  })
+);
 
+trace.setGlobalTracerProvider(provider);
 registerInstrumentations({
   instrumentations: [new GrpcInstrumentation()]
 });
