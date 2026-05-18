@@ -986,6 +986,8 @@ describe('startNodeSDK', function () {
         )
       );
       await (reader as PeriodicExportingMetricReader).shutdown();
+    });
+
     it('should warn when exporter timeout is 0', async () => {
       const warnSpy = Sinon.spy(diag, 'warn');
       const exporter = getSpanExporter({
