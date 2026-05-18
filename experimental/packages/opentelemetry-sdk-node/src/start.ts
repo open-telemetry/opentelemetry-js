@@ -43,29 +43,41 @@ import {
 } from '@opentelemetry/resources';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
-import { diagLogLevelFromString, getStringFromEnv } from '@opentelemetry/core';
 import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
+import { diagLogLevelFromSeverityNumberConfig } from './diag';
+
+// Exported for testing.
+export const NOOP_SDK = {
+  shutdown: async () => {},
+};
 
 /**
  * @experimental Function to start the OpenTelemetry Node SDK
  * @param sdkOptions
  */
-export function startNodeSDK(sdkOptions: SDKOptions): {
+export function startNodeSDK(sdkOptions?: SDKOptions): {
   shutdown: () => Promise<void>;
 } {
-  const configFactory: ConfigFactory = createConfigFactory();
-  const config = configFactory.getConfigModel();
-
-  if (config.disabled) {
-    diag.info('OpenTelemetry SDK is disabled');
+  let config: ConfigurationModel;
+  try {
+    const configFactory: ConfigFactory = createConfigFactory();
+    config = configFactory.getConfigModel();
+  } catch (configErr) {
+    // Set the diag logger, otherwise the diag.error will typically not be shown.
+    const logLevel = diagLogLevelFromSeverityNumberConfig();
+    diag.setLogger(new DiagConsoleLogger(), { logLevel });
+    diag.error(
+      `Could not load OpenTelemetry configuration, SDK will not be setup: ${configErr.message}`
+    );
     return NOOP_SDK;
   }
-  // TODO: use config.log_level once the spec aligns SeverityNumber with
-  // DiagLogLevel values, see https://github.com/open-telemetry/opentelemetry-specification/issues/2039
-  const logLevel = diagLogLevelFromString(getStringFromEnv('OTEL_LOG_LEVEL'));
-  if (logLevel) {
-    diag.setLogger(new DiagConsoleLogger(), { logLevel });
+
+  if (config.disabled) {
+    return NOOP_SDK;
   }
+
+  const logLevel = diagLogLevelFromSeverityNumberConfig(config.log_level);
+  diag.setLogger(new DiagConsoleLogger(), { logLevel });
 
   registerInstrumentations({
     instrumentations: sdkOptions?.instrumentations?.flat() ?? [],
@@ -101,16 +113,13 @@ export function startNodeSDK(sdkOptions: SDKOptions): {
   };
   return { shutdown: shutdownFn };
 }
-const NOOP_SDK = {
-  shutdown: async () => {},
-};
 
 /**
  * Interpret configuration model and return SDK components.
  */
 function create(
   config: ConfigurationModel,
-  sdkOptions: SDKOptions
+  sdkOptions?: SDKOptions
 ): SDKComponents {
   const defaultContextManager = new AsyncLocalStorageContextManager();
   defaultContextManager.enable();
@@ -172,13 +181,13 @@ function create(
 
 export function setupResource(
   config: ConfigurationModel,
-  sdkOptions: SDKOptions
+  sdkOptions?: SDKOptions
 ): Resource {
   let resource: Resource =
     getResourceFromConfiguration(config) ?? defaultResource();
   let resourceDetectors: ResourceDetector[] = [];
 
-  if (sdkOptions.resourceDetectors != null) {
+  if (sdkOptions?.resourceDetectors != null) {
     resourceDetectors = sdkOptions.resourceDetectors;
   } else if (config.resource?.['detection/development']?.detectors) {
     resourceDetectors = getResourceDetectorsFromConfiguration(config);

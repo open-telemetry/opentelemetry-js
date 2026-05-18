@@ -374,6 +374,50 @@ export const DB_SYSTEM_NAME_VALUE_MYSQL = "mysql" as const;
 export const DB_SYSTEM_NAME_VALUE_POSTGRESQL = "postgresql" as const;
 
 /**
+ * Name of the [deployment environment](https://wikipedia.org/wiki/Deployment_environment) (aka deployment tier).
+ *
+ * @example staging
+ * @example production
+ *
+ * @note `deployment.environment.name` does not affect the uniqueness constraints defined through
+ * the `service.namespace`, `service.name` and `service.instance.id` resource attributes.
+ * This implies that resources carrying the following attribute combinations **MUST** be
+ * considered to be identifying the same service:
+ *
+ *   - `service.name=frontend`, `deployment.environment.name=production`
+ *   - `service.name=frontend`, `deployment.environment.name=staging`.
+ */
+export const ATTR_DEPLOYMENT_ENVIRONMENT_NAME = 'deployment.environment.name' as const;
+
+/**
+ * Enum value "development" for attribute {@link ATTR_DEPLOYMENT_ENVIRONMENT_NAME}.
+ *
+ * Development environment
+ */
+export const DEPLOYMENT_ENVIRONMENT_NAME_VALUE_DEVELOPMENT = "development" as const;
+
+/**
+ * Enum value "production" for attribute {@link ATTR_DEPLOYMENT_ENVIRONMENT_NAME}.
+ *
+ * Production environment
+ */
+export const DEPLOYMENT_ENVIRONMENT_NAME_VALUE_PRODUCTION = "production" as const;
+
+/**
+ * Enum value "staging" for attribute {@link ATTR_DEPLOYMENT_ENVIRONMENT_NAME}.
+ *
+ * Staging environment
+ */
+export const DEPLOYMENT_ENVIRONMENT_NAME_VALUE_STAGING = "staging" as const;
+
+/**
+ * Enum value "test" for attribute {@link ATTR_DEPLOYMENT_ENVIRONMENT_NAME}.
+ *
+ * Testing environment
+ */
+export const DEPLOYMENT_ENVIRONMENT_NAME_VALUE_TEST = "test" as const;
+
+/**
  * Name of the garbage collector managed heap generation.
  *
  * @example gen0
@@ -430,6 +474,12 @@ export const DOTNET_GC_HEAP_GENERATION_VALUE_POH = "poh" as const;
  * When `error.type` is set to a type (e.g., an exception type), its
  * canonical class name identifying the type within the artifact **SHOULD** be used.
  *
+ * If the recorded error type is a wrapper that is not meaningful for
+ * failure classification, instrumentation **MAY** use the type of the inner
+ * error instead. For example, in Go, errors created with `fmt.Errorf`
+ * using `%w` **MAY** be unwrapped when the wrapper type does not help
+ * classify the failure.
+ *
  * Instrumentations **SHOULD** document the list of errors they report.
  *
  * The cardinality of `error.type` within one instrumentation library **SHOULD** be low.
@@ -485,6 +535,12 @@ export const ATTR_EXCEPTION_STACKTRACE = 'exception.stacktrace' as const;
  *
  * @example java.net.ConnectException
  * @example OSError
+ *
+ * @note If the recorded exception type is a wrapper that is not meaningful for
+ * failure classification, instrumentation **MAY** use the type of the inner
+ * exception instead. For example, in Go, errors created with `fmt.Errorf`
+ * using `%w` **MAY** be unwrapped when the wrapper type does not help
+ * classify the failure.
  */
 export const ATTR_EXCEPTION_TYPE = 'exception.type' as const;
 
@@ -916,6 +972,16 @@ export const NETWORK_TYPE_VALUE_IPV4 = "ipv4" as const;
 export const NETWORK_TYPE_VALUE_IPV6 = "ipv6" as const;
 
 /**
+ * Identifies the class / type of event.
+ *
+ * @example browser.mouse.click
+ * @example device.app.lifecycle
+ *
+ * @note This attribute **SHOULD** be used by non-OTLP exporters when destination does not support `EventName` or equivalent field. This attribute **MAY** be used by applications using existing logging libraries so that it can be used to set the `EventName` field by Collector or SDK components.
+ */
+export const ATTR_OTEL_EVENT_NAME = 'otel.event.name' as const;
+
+/**
  * The name of the instrumentation scope - (`InstrumentationScope.Name` in OTLP).
  *
  * @example io.opentelemetry.contrib.mongodb
@@ -1016,7 +1082,8 @@ export const ATTR_SERVICE_INSTANCE_ID = 'service.instance.id' as const;
  *
  * @example shoppingcart
  *
- * @note **MUST** be the same for all instances of horizontally scaled services. If the value was not specified, SDKs **MUST** fallback to `unknown_service:` concatenated with [`process.executable.name`](process.md), e.g. `unknown_service:bash`. If `process.executable.name` is not available, the value **MUST** be set to `unknown_service`.
+ * @note **MUST** be the same for all instances of horizontally scaled services. If the value was not specified, SDKs **MUST** fallback to `unknown_service:` concatenated with the process executable name, e.g. `unknown_service:bash`. If the process executable name is not available, the value **MUST** be set to `unknown_service`.
+ * The process executable name is the name of the process executable, the same value as described by the [`process.executable.name`](process.md) resource attribute.
  */
 export const ATTR_SERVICE_NAME = 'service.name' as const;
 
@@ -1094,6 +1161,23 @@ export const SIGNALR_TRANSPORT_VALUE_SERVER_SENT_EVENTS = "server_sent_events" a
  * WebSockets protocol
  */
 export const SIGNALR_TRANSPORT_VALUE_WEB_SOCKETS = "web_sockets" as const;
+
+/**
+ * The name of the auto instrumentation agent or distribution, if used.
+ *
+ * @example parts-unlimited-java
+ *
+ * @note Official auto instrumentation agents and distributions **SHOULD** set the `telemetry.distro.name` attribute to
+ * a string starting with `opentelemetry-`, e.g. `opentelemetry-java-instrumentation`.
+ */
+export const ATTR_TELEMETRY_DISTRO_NAME = 'telemetry.distro.name' as const;
+
+/**
+ * The version string of the auto instrumentation agent or distribution, if used.
+ *
+ * @example 1.2.3
+ */
+export const ATTR_TELEMETRY_DISTRO_VERSION = 'telemetry.distro.version' as const;
 
 /**
  * The language of the telemetry SDK.

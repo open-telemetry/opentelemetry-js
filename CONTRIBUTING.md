@@ -2,6 +2,7 @@
 
 We'd love your help!
 
+- [OpenTelemetry JS SIG](#opentelemetry-js-sig)
 - [Development Quick Start](#development-quick-start)
 - [Pull Request Merge Guidelines](#pull-request-merge-guidelines)
   - [General Merge Requirements](#general-merge-requirements)
@@ -20,6 +21,21 @@ We'd love your help!
   - [Generating docs](#generating-docs)
   - [Adding a package](#adding-a-package)
   - [Platform conditional exports](#platform-conditional-exports)
+
+## OpenTelemetry JS SIG
+
+The JavaScript special interest group (SIG) meets regularly. See the
+OpenTelemetry [community](https://github.com/open-telemetry/community#implementation-sigs)
+repo for information on this and other language SIGs.
+
+See the [public meeting notes](https://docs.google.com/document/d/1tCyoQK49WVcE-x8oryZOTTToFm7sIeUhxFPm9g-qL1k)
+for a summary description of past meetings. To request edit access, join the
+meeting or get in touch on [Slack](https://cloud-native.slack.com/archives/C01NL1GRPQR).
+
+The meeting is open for all to join. We invite everyone to join our meeting,
+regardless of your experience level. Whether you're a seasoned OpenTelemetry
+developer, just starting your journey, or simply curious about the work we do,
+you're more than welcome to participate!
 
 ## Development Quick Start
 

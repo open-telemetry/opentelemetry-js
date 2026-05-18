@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -14,6 +13,8 @@
  *    npm run generate:config
  */
 
+/* eslint-disable no-console */
+
 'use strict';
 
 const { compile } = require('json-schema-to-typescript');
@@ -24,25 +25,19 @@ const Ajv = require('ajv/dist/2020');
 const standaloneCode = require('ajv/dist/standalone').default;
 const typescript = require('typescript');
 
-const SCRIPT_DIR = __dirname;
-const PKG_DIR = path.resolve(__dirname, '../../experimental/packages/configuration');
+// Get latest version by running:
+//    git tag -l --sort=version:refname | grep -v -- - | tail -1
+// in git@github.com:open-telemetry/opentelemetry-configuration.git
+const CONFIG_VERSION = 'v1.0.0';
+
+const TOP = path.resolve(__dirname, '..');
 const SCHEMA_PATH = path.join(
-  SCRIPT_DIR,
-  'opentelemetry-configuration',
-  'opentelemetry_configuration.json'
+  TOP,
+  'build/opentelemetry-configuration/opentelemetry_configuration.json'
 );
-const TYPES_PATH = path.join(
-  SCRIPT_DIR,
-  '../../experimental/packages/configuration/src/generated/types.ts'
-);
-const VALIDATOR_JS_PATH = path.join(
-  SCRIPT_DIR,
-  '../../experimental/packages/configuration/src/generated/validator.js'
-);
-const VALIDATOR_DTS_PATH = path.join(
-  SCRIPT_DIR,
-  '../../experimental/packages/configuration/src/generated/validator.d.ts'
-);
+const TYPES_PATH = path.join(TOP, 'src/generated/types.ts');
+const VALIDATOR_JS_PATH = path.join(TOP, 'src/generated/validator.js');
+const VALIDATOR_DTS_PATH = path.join(TOP, 'src/generated/validator.d.ts');
 
 const licenseHeader = `/*
  * Copyright The OpenTelemetry Authors
@@ -58,7 +53,9 @@ const licenseHeader = `/*
 const NON_DUPLICATED_IDENTIFIER_REGEXP = /\b(?!\w*\d+$)\w+\b|\b\w*V\d+\b/;
 
 function isDuplicatedTypeIdentifier(typeIdentifier) {
-  return !(typeIdentifier.escapedText.toString().match(NON_DUPLICATED_IDENTIFIER_REGEXP));
+  return !typeIdentifier.escapedText
+    .toString()
+    .match(NON_DUPLICATED_IDENTIFIER_REGEXP);
 }
 
 function getNonDuplicatedIdentifierName(typeIdentifier) {
@@ -67,24 +64,44 @@ function getNonDuplicatedIdentifierName(typeIdentifier) {
 }
 
 function removeDuplicateTsDeclarations(tsCode) {
-  const tsPrinter = typescript.createPrinter({
-    newLine: typescript.NewLineKind.LineFeed,
-  }, {
-    substituteNode: (_, node) => {
-      if (typescript.isTypeReferenceNode(node) && isDuplicatedTypeIdentifier(node.typeName)) {
-        const originalIdentifierName = getNonDuplicatedIdentifierName(node.typeName);
-        return typescript.factory.createTypeReferenceNode(originalIdentifierName);
-      }
-      if ((typescript.isInterfaceDeclaration(node) || typescript.isEnumDeclaration(node) || typescript.isTypeAliasDeclaration(node))
-           && isDuplicatedTypeIdentifier(node.name)) {
-        const declarationIsCleared = typescript.factory.createIdentifier('');
-        return declarationIsCleared;
-      }
-      return node;
+  const tsPrinter = typescript.createPrinter(
+    {
+      newLine: typescript.NewLineKind.LineFeed,
     },
-  });
+    {
+      substituteNode: (_, node) => {
+        if (
+          typescript.isTypeReferenceNode(node) &&
+          isDuplicatedTypeIdentifier(node.typeName)
+        ) {
+          const originalIdentifierName = getNonDuplicatedIdentifierName(
+            node.typeName
+          );
+          return typescript.factory.createTypeReferenceNode(
+            originalIdentifierName
+          );
+        }
+        if (
+          (typescript.isInterfaceDeclaration(node) ||
+            typescript.isEnumDeclaration(node) ||
+            typescript.isTypeAliasDeclaration(node)) &&
+          isDuplicatedTypeIdentifier(node.name)
+        ) {
+          const declarationIsCleared = typescript.factory.createIdentifier('');
+          return declarationIsCleared;
+        }
+        return node;
+      },
+    }
+  );
 
-  const sourceFile = typescript.createSourceFile('', tsCode, typescript.ScriptTarget.ESNext, false, typescript.ScriptKind.TS);
+  const sourceFile = typescript.createSourceFile(
+    '',
+    tsCode,
+    typescript.ScriptTarget.ESNext,
+    false,
+    typescript.ScriptKind.TS
+  );
 
   const result = tsPrinter.printFile(sourceFile);
   return result;
@@ -93,10 +110,13 @@ function removeDuplicateTsDeclarations(tsCode) {
 // ---- 1. Get and load the OpenTelemetry Configuration JSON schema.
 
 // Run the bash script to clone / refresh the schema repository
-const bashResult = spawnSync('bash', ['generate-config.sh'], {
-  stdio: 'inherit',
-  cwd: SCRIPT_DIR,
-});
+const bashResult = spawnSync(
+  'bash',
+  ['clone-config-repo-at-tag.sh', CONFIG_VERSION],
+  {
+    stdio: 'inherit',
+    cwd: __dirname,
+  });
 if (bashResult.error) {
   throw bashResult.error;
 }
@@ -115,7 +135,8 @@ const validatorJs = standaloneCode(ajvAot, validateFn);
 const validatorJsWithHeader = [
   '// AUTO-GENERATED — do not edit',
   '// Pre-compiled ajv validator for the OpenTelemetry configuration schema',
-  '// Run `npm run generate:config` from the configuration package to regenerate',
+  `// Generated from opentelemetry-configuration.git ${CONFIG_VERSION}`,
+  '// Run `npm run generate:config` to regenerate',
   '// eslint-disable-next-line',
   '',
   validatorJs,
@@ -132,7 +153,8 @@ const validatorDts = [
   '/* eslint-disable */',
   '// AUTO-GENERATED — do not edit',
   '// Pre-compiled ajv validator for the OpenTelemetry configuration schema',
-  '// Run `npm run generate:config` from the configuration package to regenerate',
+  `// Generated from opentelemetry-configuration.git ${CONFIG_VERSION}`,
+  '// Run `npm run generate:config` to regenerate',
   '',
   '/** Minimal subset of ajv ErrorObject used by FileConfigFactory */',
   'interface ValidatorError {',
@@ -159,8 +181,8 @@ const bannerComment = [
   '',
   '//',
   '// AUTO-GENERATED — do not edit',
-  '// Generated from opentelemetry-configuration JSON schema v1.0.0',
-  '// Run `npm run generate:config` from the configuration package to regenerate',
+  `// Generated from opentelemetry-configuration.git ${CONFIG_VERSION}`,
+  '// Run `npm run generate:config` to regenerate',
   '//',
   '/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-object-type */',
 ].join('\n');
@@ -194,7 +216,7 @@ function rtrimDescription(node) {
     }
   }
 }
-rtrimDescription(schema)
+rtrimDescription(schema);
 
 // Avoid unnecessary `| null` in TypeScript types.
 //
@@ -232,7 +254,7 @@ function stripNullTypeFallback(obj) {
   }
   if (typeof obj.properties === 'object' && obj.properties != null) {
     for (const prop of Object.values(obj.properties)) {
-      stripNullTypeFallback(prop)
+      stripNullTypeFallback(prop);
     }
   }
 }
@@ -258,16 +280,13 @@ compile(schema, 'OpenTelemetryConfiguration', {
     // but callers constructing ConfigurationModel programmatically shouldn't
     // need to supply it. Make it optional in the TypeScript type.
     ts = ts.replace(
-      /(\binterface OpenTelemetryConfiguration \{[^}]*?)  file_format: /,
+      /(\binterface OpenTelemetryConfiguration \{[^}]*?) {2}file_format: /,
       '$1  file_format?: '
     );
 
     // Rename the root type to ConfigurationModel for consistency with the rest
     // of the codebase and other OTel SDKs.
-    ts = ts.replace(
-      /\bOpenTelemetryConfiguration\b/g,
-      'ConfigurationModel'
-    );
+    ts = ts.replace(/\bOpenTelemetryConfiguration\b/g, 'ConfigurationModel');
 
     // Change the TypeScript representation for interfaces where
     // "additionalProperties" is allowed.
@@ -290,7 +309,10 @@ compile(schema, 'OpenTelemetryConfiguration', {
     //   which is closest. `{}` allows too much (e.g. 42 matches `{}`).
     // - `undefined` rather than `null` because we want to express that the
     //   property can be unspecified.
-    ts = ts.replace(/\[k: string\]: \{\} \| null;/g, '[k: string]: object | undefined;');
+    ts = ts.replace(
+      /\[k: string\]: \{\} \| null;/g,
+      '[k: string]: object | undefined;'
+    );
     // Similarly for schema types with the following (e.g. `Distribution`):
     //    "additionalProperties": {
     //      "type": [ "object" ],
@@ -306,14 +328,15 @@ compile(schema, 'OpenTelemetryConfiguration', {
     ts = removeDuplicateTsDeclarations(ts);
 
     // Cosmetic: add blank lines between exports.
-    ts = ts.replace(/\n\/\*\*/g, '\n\n/**')
+    ts = ts
+      .replace(/\n\/\*\*/g, '\n\n/**')
       .replace(/([^/])\nexport/g, '$1\n\nexport');
 
     fs.mkdirSync(path.dirname(TYPES_PATH), { recursive: true });
     fs.writeFileSync(TYPES_PATH, ts);
     execSync(`npm run lint:fix -- ${TYPES_PATH}`, {
-      cwd: PKG_DIR,
-      encoding: 'utf8'
+      cwd: TOP,
+      encoding: 'utf8',
     });
     console.log(`Written ${ts.split('\n').length} lines to ${TYPES_PATH}`);
   })

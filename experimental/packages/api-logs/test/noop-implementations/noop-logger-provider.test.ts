@@ -4,21 +4,18 @@
  */
 
 import * as assert from 'assert';
-import { NoopLogger } from '../../src/NoopLogger';
 import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
 
 describe('NoopLoggerProvider', () => {
   const loggerProvider = new NoopLoggerProvider();
 
   it('should not crash', () => {
-    assert.ok(loggerProvider.getLogger('logger-name') instanceof NoopLogger);
-    assert.ok(
-      loggerProvider.getLogger('logger-name', 'v1') instanceof NoopLogger
-    );
+    assert.ok(loggerProvider.getLogger('logger-name'));
+    assert.ok(loggerProvider.getLogger('logger-name', 'v1'));
     assert.ok(
       loggerProvider.getLogger('logger-name', 'v1', {
         schemaUrl: 'https://opentelemetry.io/schemas/1.7.0',
-      }) instanceof NoopLogger
+      })
     );
   });
 
@@ -31,7 +28,7 @@ describe('NoopLoggerProvider', () => {
           enabled: true,
         },
       });
-      assert.ok(logger instanceof NoopLogger);
+      assert.ok(logger);
     });
 
     it('should accept scopeAttributes with LogAttribute value types', () => {
@@ -46,7 +43,7 @@ describe('NoopLoggerProvider', () => {
           nullVal: null,
         },
       });
-      assert.ok(logger instanceof NoopLogger);
+      assert.ok(logger);
     });
   });
 });

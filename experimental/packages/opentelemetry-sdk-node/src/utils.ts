@@ -52,6 +52,11 @@ import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
+import {
+  createEmptyMetadata,
+  createInsecureCredentials,
+  createSslCredentials,
+} from '@opentelemetry/otlp-grpc-exporter-base';
 import type {
   ConfigurationModel,
   LogRecordExporterConfigModel,
@@ -84,7 +89,7 @@ import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/ex
 import type {
   BufferConfig,
   LogRecordExporter,
-  LoggerProviderConfig,
+  LoggerProviderOptions,
   LogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
 import {
@@ -564,7 +569,7 @@ export function getPeriodicMetricReaderFromConfiguration(
 /**
  * Get LoggerProviderConfig from environment variables.
  */
-export function getLoggerProviderConfigFromEnv(): LoggerProviderConfig {
+export function getLoggerProviderConfigFromEnv(): LoggerProviderOptions {
   return {
     logRecordLimits: {
       attributeCountLimit:
@@ -609,38 +614,39 @@ export function getLogRecordExporter(
   exporter: LogRecordExporterConfigModel
 ): LogRecordExporter | undefined {
   if (exporter.otlp_http) {
-    const encoding = exporter.otlp_http.encoding;
+    const cfg = exporter.otlp_http;
+    const commonOpts = {
+      compression:
+        cfg.compression === 'gzip'
+          ? CompressionAlgorithm.GZIP
+          : CompressionAlgorithm.NONE,
+      url: cfg.endpoint,
+      headers: getHeadersFromConfiguration(cfg.headers),
+      timeoutMillis: cfg.timeout,
+      httpAgentOptions: getHttpAgentOptionsFromTls(cfg.tls),
+    };
+    const encoding = cfg.encoding;
     if (encoding === 'json') {
-      return new OTLPHttpLogExporter({
-        compression:
-          exporter.otlp_http.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
-      });
+      return new OTLPHttpLogExporter(commonOpts);
     }
-    if (encoding === 'protobuf') {
-      return new OTLPProtoLogExporter({
-        compression:
-          exporter.otlp_http.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
-      });
+    if (encoding === 'protobuf' || encoding == null) {
+      return new OTLPProtoLogExporter(commonOpts);
     }
     diag.warn(
       `Unsupported OTLP logs encoding: ${encoding}. Using http/protobuf.`
     );
-    return new OTLPProtoLogExporter({
-      compression:
-        exporter.otlp_http.compression === 'gzip'
-          ? CompressionAlgorithm.GZIP
-          : CompressionAlgorithm.NONE,
-    });
+    return new OTLPProtoLogExporter(commonOpts);
   } else if (exporter.otlp_grpc) {
+    const cfg = exporter.otlp_grpc;
     return new OTLPGrpcLogExporter({
       compression:
-        exporter.otlp_grpc.compression === 'gzip'
+        cfg.compression === 'gzip'
           ? CompressionAlgorithm.GZIP
           : CompressionAlgorithm.NONE,
+      url: cfg.endpoint,
+      timeoutMillis: cfg.timeout,
+      credentials: getGrpcCredentialsFromTls(cfg.tls),
+      metadata: getGrpcMetadataFromHeaders(cfg.headers),
     });
   } else if (exporter.console) {
     return new ConsoleLogRecordExporter();
@@ -693,35 +699,87 @@ export function getHeadersFromConfiguration(
   return result;
 }
 
+/**
+ * Validate an exporter timeout value. The spec says 0 means "no limit
+ * (infinity)" but the JS exporters don't support that yet (see #6617).
+ * Warn and return undefined so the exporter falls back to its default.
+ */
+function validateExporterTimeout(
+  timeout: number | undefined
+): number | undefined {
+  if (timeout === 0) {
+    diag.warn(
+      'Exporter timeout of 0 (infinite) is not supported. Using default timeout.'
+    );
+    return undefined;
+  }
+  return timeout;
+}
+
 export function getHttpAgentOptionsFromTls(
   tls: HttpTlsConfigModel | undefined
 ): { ca?: Buffer; cert?: Buffer; key?: Buffer } | undefined {
   if (tls && (tls.ca_file || tls.cert_file || tls.key_file)) {
-    const httpsAgentOptions: { ca?: Buffer; cert?: Buffer; key?: Buffer } = {};
-    if (tls.ca_file) {
-      try {
-        httpsAgentOptions.ca = fs.readFileSync(tls.ca_file);
-      } catch (e) {
-        diag.warn(`Failed to read TLS CA file at ${tls.ca_file}: ${e}`);
-      }
-    }
-    if (tls.cert_file) {
-      try {
-        httpsAgentOptions.cert = fs.readFileSync(tls.cert_file);
-      } catch (e) {
-        diag.warn(`Failed to read TLS cert file at ${tls.cert_file}: ${e}`);
-      }
-    }
-    if (tls.key_file) {
-      try {
-        httpsAgentOptions.key = fs.readFileSync(tls.key_file);
-      } catch (e) {
-        diag.warn(`Failed to read TLS key file at ${tls.key_file}: ${e}`);
-      }
-    }
-    return httpsAgentOptions;
+    return {
+      ca: readFileOrWarn(tls.ca_file, 'TLS CA'),
+      cert: readFileOrWarn(tls.cert_file, 'TLS cert'),
+      key: readFileOrWarn(tls.key_file, 'TLS key'),
+    };
   }
   return undefined;
+}
+
+function getGrpcCredentialsFromTls(
+  tls:
+    | {
+        ca_file?: string;
+        key_file?: string;
+        cert_file?: string;
+        insecure?: boolean;
+      }
+    | undefined
+) {
+  if (tls?.insecure) {
+    return createInsecureCredentials();
+  }
+  const rootCert = readFileOrWarn(tls?.ca_file, 'TLS CA');
+  const privateKey = readFileOrWarn(tls?.key_file, 'TLS key');
+  const certChain = readFileOrWarn(tls?.cert_file, 'TLS cert');
+  if (rootCert || privateKey || certChain) {
+    try {
+      return createSslCredentials(rootCert, privateKey, certChain);
+    } catch (e) {
+      diag.warn(`Failed to create gRPC SSL credentials: ${e}`);
+      return undefined;
+    }
+  }
+  return undefined;
+}
+
+function getGrpcMetadataFromHeaders(
+  headers: NameStringValuePairConfigModel[] | undefined
+) {
+  if (!headers || headers.length === 0) {
+    return undefined;
+  }
+  const metadata = createEmptyMetadata();
+  for (const header of headers) {
+    metadata.set(header.name, header.value);
+  }
+  return metadata;
+}
+
+function readFileOrWarn(
+  filePath: string | undefined,
+  label: string
+): Buffer | undefined {
+  if (!filePath) return undefined;
+  try {
+    return fs.readFileSync(filePath);
+  } catch (e) {
+    diag.warn(`Failed to read ${label} file at ${filePath}: ${e}`);
+    return undefined;
+  }
 }
 
 export function getSpanExporter(
@@ -737,7 +795,7 @@ export function getSpanExporter(
             : CompressionAlgorithm.NONE,
         url: exporter.otlp_http.endpoint,
         headers: getHeadersFromConfiguration(exporter.otlp_http.headers),
-        timeoutMillis: exporter.otlp_http.timeout,
+        timeoutMillis: validateExporterTimeout(exporter.otlp_http.timeout),
         httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http.tls),
       });
     } else {
@@ -748,7 +806,7 @@ export function getSpanExporter(
             : CompressionAlgorithm.NONE,
         url: exporter.otlp_http.endpoint,
         headers: getHeadersFromConfiguration(exporter.otlp_http.headers),
-        timeoutMillis: exporter.otlp_http.timeout,
+        timeoutMillis: validateExporterTimeout(exporter.otlp_http.timeout),
         httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http.tls),
       });
     }
@@ -759,9 +817,9 @@ export function getSpanExporter(
           ? CompressionAlgorithm.GZIP
           : CompressionAlgorithm.NONE,
       url: exporter.otlp_grpc.endpoint,
-      timeoutMillis: exporter.otlp_grpc.timeout,
-      // TODO (6614): add support for credentials
-      // TODO (6615): add metadata (headers) support
+      timeoutMillis: validateExporterTimeout(exporter.otlp_grpc.timeout),
+      credentials: getGrpcCredentialsFromTls(exporter.otlp_grpc.tls),
+      metadata: getGrpcMetadataFromHeaders(exporter.otlp_grpc.headers),
     });
   } else if (exporter.console) {
     return new ConsoleSpanExporter();

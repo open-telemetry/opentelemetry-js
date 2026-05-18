@@ -41,6 +41,12 @@ import { ExceptionEventName } from './enums';
 import type { SpanProcessor } from './SpanProcessor';
 import type { TimedEvent } from './TimedEvent';
 import type { SpanLimits } from './types';
+import type { InspectFn, InspectStylizeOptions } from './inspect';
+import {
+  formatInspect,
+  inspectCustom,
+  settledResourceAttributes,
+} from './inspect';
 
 /**
  * This type provides the properties of @link{ReadableSpan} at the same time
@@ -523,5 +529,32 @@ export class SpanImpl implements Span {
 
     // Other types, no need to apply value length limit
     return value;
+  }
+
+  [inspectCustom](
+    depth: number,
+    options: InspectStylizeOptions | undefined,
+    inspect: InspectFn | undefined
+  ): unknown {
+    const payload = {
+      name: this.name,
+      kind: this.kind,
+      spanContext: this._spanContext,
+      parentSpanContext: this.parentSpanContext,
+      status: this.status,
+      startTime: this.startTime,
+      endTime: this.endTime,
+      duration: this._duration,
+      ended: this._ended,
+      attributes: this.attributes,
+      events: this.events,
+      links: this.links,
+      droppedAttributesCount: this._droppedAttributesCount,
+      droppedEventsCount: this._droppedEventsCount,
+      droppedLinksCount: this._droppedLinksCount,
+      instrumentationScope: this.instrumentationScope,
+      resource: { attributes: settledResourceAttributes(this.resource) },
+    };
+    return formatInspect('SpanImpl', payload, depth, options, inspect);
   }
 }

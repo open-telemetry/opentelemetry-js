@@ -21,6 +21,7 @@ jobs:
           - "22.22.1" # pin to avoid bug in 22.22.2
           - "24"
           - "25"
+          - "26"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -46,7 +47,8 @@ jobs:
           matrix.node_version == '20' ||
           matrix.node_version == '22.22.1' ||
           matrix.node_version == '24' ||
-          matrix.node_version == '25'
+          matrix.node_version == '25' ||
+          matrix.node_version == '26'
           }}
 
       - name: Bootstrap

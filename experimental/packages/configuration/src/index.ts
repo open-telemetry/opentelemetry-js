@@ -16,5 +16,6 @@ export type {
   SpanProcessor as SpanProcessorConfigModel,
   NameStringValuePair as NameStringValuePairConfigModel,
   HttpTls as HttpTlsConfigModel,
+  SeverityNumber as SeverityNumberConfigModel,
 } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';
