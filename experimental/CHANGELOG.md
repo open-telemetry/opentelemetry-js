@@ -12,6 +12,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(sdk-logs)!: add support for attributes in LoggerOptions [#6573](https://github.com/open-telemetry/opentelemetry-js/pull/6573) @pichlermarc
+
 ### :bug: Bug Fixes
 
 * fix(sdk-node): pass all config properties to log record exporters in declarative config [#6708](https://github.com/open-telemetry/opentelemetry-js/pull/6708) @MikeGoldsmith
@@ -95,7 +97,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * feat(otlp-transformer): add custom protobuf logs serializer [#6228](https://github.com/open-telemetry/opentelemetry-js/pull/6228) @pichlermarc
 * feat(otlp-transformer): add custom protobuf logs export response deserializer [#6530](https://github.com/open-telemetry/opentelemetry-js/pull/6530) @pichlermarc
-* feat(sdk-logs): add support for attributes in LoggerOptions [#6573](https://github.com/open-telemetry/opentelemetry-js/pull/6573) @pichlermarc
 * feat(sdk-node): add `buildSamplerFromConfig` to construct a sampler from a declarative config model [#6536](https://github.com/open-telemetry/opentelemetry-js/pull/6536) @ravitheja4531-cell
 
 ### :bug: Bug Fixes
