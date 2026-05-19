@@ -2,7 +2,7 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { logs, NoopLogger } from '@opentelemetry/api-logs';
+import { logs } from '@opentelemetry/api-logs';
 import { diag } from '@opentelemetry/api';
 import {
   defaultResource,
@@ -275,12 +275,14 @@ describe('LoggerProvider', () => {
       sinon.assert.calledOnce(shutdownStub);
     });
 
-    it('get a noop logger on shutdown', () => {
+    it('get a noop logger after shutdown', () => {
       const provider = new LoggerProvider();
+      let logger = provider.getLogger('default', '1.0.0');
+      assert.ok(logger instanceof Logger);
       provider.shutdown();
-      const logger = provider.getLogger('default', '1.0.0');
-      // returned tracer should be no-op, not instance of Logger (from SDK)
-      assert.ok(logger instanceof NoopLogger);
+      logger = provider.getLogger('default', '1.0.0');
+      // returned logger should be no-op, not instance of Logger (from SDK)
+      assert.ok(!(logger instanceof Logger));
     });
 
     it('should not force flush on shutdown', () => {

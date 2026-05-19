@@ -619,38 +619,39 @@ export function getLogRecordExporter(
   exporter: LogRecordExporterConfigModel
 ): LogRecordExporter | undefined {
   if (exporter.otlp_http !== undefined) {
-    const encoding = exporter.otlp_http?.encoding ?? 'protobuf';
+    const cfg = exporter.otlp_http;
+    const commonOpts = {
+      compression:
+        cfg?.compression === 'gzip'
+          ? CompressionAlgorithm.GZIP
+          : CompressionAlgorithm.NONE,
+      url: cfg?.endpoint ?? undefined,
+      headers: getHeadersFromConfiguration(cfg?.headers),
+      timeoutMillis: cfg?.timeout,
+      httpAgentOptions: getHttpAgentOptionsFromTls(cfg?.tls),
+    };
+    const encoding = cfg.encoding ?? 'protobuf';
     if (encoding === 'json') {
-      return new OTLPHttpLogExporter({
-        compression:
-          exporter.otlp_http?.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
-      });
+      return new OTLPHttpLogExporter(commonOpts);
     }
     if (encoding === 'protobuf') {
-      return new OTLPProtoLogExporter({
-        compression:
-          exporter.otlp_http?.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
-      });
+      return new OTLPProtoLogExporter(commonOpts);
     }
     diag.warn(
       `Unsupported OTLP logs encoding: ${encoding}. Using http/protobuf.`
     );
-    return new OTLPProtoLogExporter({
-      compression:
-        exporter.otlp_http?.compression === 'gzip'
-          ? CompressionAlgorithm.GZIP
-          : CompressionAlgorithm.NONE,
-    });
+    return new OTLPProtoLogExporter(commonOpts);
   } else if (exporter.otlp_grpc !== undefined) {
+    const cfg = exporter.otlp_grpc;
     return new OTLPGrpcLogExporter({
       compression:
-        exporter.otlp_grpc?.compression === 'gzip'
+        cfg?.compression === 'gzip'
           ? CompressionAlgorithm.GZIP
           : CompressionAlgorithm.NONE,
+      url: cfg?.endpoint ?? undefined,
+      timeoutMillis: cfg?.timeout,
+      credentials: getGrpcCredentialsFromTls(cfg?.tls),
+      metadata: getGrpcMetadataFromHeaders(cfg?.headers),
     });
   } else if (exporter.console !== undefined) {
     return new ConsoleLogRecordExporter();
@@ -704,6 +705,25 @@ export function getHeadersFromConfiguration(
     }
   });
   return result;
+}
+
+/**
+ * Validate an exporter timeout value. The spec says 0 means "no limit
+ * (infinity)" but the JS exporters don't support that yet (see #6617).
+ * Warn and return undefined so the exporter falls back to its default.
+ */
+function validateExporterTimeout(
+  timeout: number | null | undefined
+): number | undefined {
+  if (timeout === null) {
+    return undefined;
+  } else if (timeout === 0) {
+    diag.warn(
+      'Exporter timeout of 0 (infinite) is not supported. Using default timeout.'
+    );
+    return undefined;
+  }
+  return timeout;
 }
 
 export function getHttpAgentOptionsFromTls(
@@ -778,7 +798,7 @@ export function getSpanExporter(
             : CompressionAlgorithm.NONE,
         url: exporter.otlp_http?.endpoint ?? undefined,
         headers: getHeadersFromConfiguration(exporter.otlp_http?.headers),
-        timeoutMillis: exporter.otlp_http?.timeout ?? undefined,
+        timeoutMillis: validateExporterTimeout(exporter.otlp_http?.timeout),
         httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http?.tls),
       });
     } else {
@@ -789,7 +809,7 @@ export function getSpanExporter(
             : CompressionAlgorithm.NONE,
         url: exporter.otlp_http?.endpoint ?? undefined,
         headers: getHeadersFromConfiguration(exporter.otlp_http?.headers),
-        timeoutMillis: exporter.otlp_http?.timeout ?? undefined,
+        timeoutMillis: validateExporterTimeout(exporter.otlp_http?.timeout),
         httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http?.tls),
       });
     }
@@ -800,7 +820,7 @@ export function getSpanExporter(
           ? CompressionAlgorithm.GZIP
           : CompressionAlgorithm.NONE,
       url: exporter.otlp_grpc?.endpoint ?? undefined,
-      timeoutMillis: exporter.otlp_grpc?.timeout ?? undefined,
+      timeoutMillis: validateExporterTimeout(exporter.otlp_grpc?.timeout),
       credentials: getGrpcCredentialsFromTls(exporter.otlp_grpc?.tls),
       metadata: getGrpcMetadataFromHeaders(exporter.otlp_grpc?.headers),
     });
