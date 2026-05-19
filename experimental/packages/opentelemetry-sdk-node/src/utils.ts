@@ -630,7 +630,7 @@ export function getLogRecordExporter(
       timeoutMillis: validateExporterTimeout(cfg?.timeout),
       httpAgentOptions: getHttpAgentOptionsFromTls(cfg?.tls),
     };
-    const encoding = cfg.encoding ?? 'protobuf';
+    const encoding = cfg?.encoding ?? 'protobuf';
     if (encoding === 'json') {
       return new OTLPHttpLogExporter(commonOpts);
     }
