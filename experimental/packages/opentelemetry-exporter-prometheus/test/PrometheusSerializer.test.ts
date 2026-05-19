@@ -670,6 +670,79 @@ describe('PrometheusSerializer', () => {
 
       assert.strictEqual(result, 'test_total 1\n');
     });
+
+    it('replaces special characters with underscores when escaping is enabled', async () => {
+      const serializer = new PrometheusSerializer();
+      const result = await getCounterResult(
+        'metric@with#special$chars',
+        serializer,
+        {
+          exportAll: true,
+        }
+      );
+
+      assert.strictEqual(
+        result,
+        serializedDefaultResource +
+          '# HELP metric_with_special_chars_total description missing\n' +
+          '# TYPE metric_with_special_chars_total counter\n' +
+          'metric_with_special_chars_total{otel_scope_name="test"} 1\n'
+      );
+    });
+
+    it('metric names do not start with a digit when escaping is enabled', async () => {
+      const serializer = new PrometheusSerializer();
+      const result = await getCounterResult('123metric', serializer, {
+        exportAll: true,
+      });
+
+      assert.strictEqual(
+        result,
+        serializedDefaultResource +
+          '# HELP _123metric_total description missing\n' +
+          '# TYPE _123metric_total counter\n' +
+          '_123metric_total{otel_scope_name="test"} 1\n'
+      );
+    });
+
+    it('multiple special characters are collapsed to a single underscore when escaping is enabled', async () => {
+      const serializer = new PrometheusSerializer();
+      const result = await getCounterResult('metric@@##$$name', serializer, {
+        exportAll: true,
+      });
+
+      assert.strictEqual(
+        result,
+        serializedDefaultResource +
+          '# HELP metric_name_total description missing\n' +
+          '# TYPE metric_name_total counter\n' +
+          'metric_name_total{otel_scope_name="test"} 1\n'
+      );
+    });
+
+    it('metric names of only special characters throw when escaping is enabled', async () => {
+      const serializer = new PrometheusSerializer();
+      const result = await getCounterResult('@#$%', serializer, {
+        exportAll: true,
+      });
+
+      assert.strictEqual(
+        result,
+        serializedDefaultResource + '# no registered metrics'
+      );
+    });
+
+    it('metrics with empty names are not serialized', async () => {
+      const serializer = new PrometheusSerializer();
+      const result = await getCounterResult('', serializer, {
+        exportAll: true,
+      });
+
+      assert.strictEqual(
+        result,
+        serializedDefaultResource + '# no registered metrics'
+      );
+    });
   });
 
   describe('serialize non-normalized values', () => {
