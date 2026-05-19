@@ -15,6 +15,7 @@
     "test:webworker": "nx run-many -t test:webworker",
     "test:bench": "nx run-many -t test:bench",
     "test:bench:browser": "nx run-many -t test:bench:browser -- --verbose",
+    "verify-pack": "node scripts/verify-pack.mjs",
     "predocs-test": "npm run docs",
     "docs": "typedoc --readme none && touch docs/.nojekyll",
     "docs-deploy": "gh-pages --dotfiles --dist docs",
