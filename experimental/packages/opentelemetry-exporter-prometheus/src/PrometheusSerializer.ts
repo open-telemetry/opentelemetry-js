@@ -255,7 +255,7 @@ export class PrometheusSerializer {
       return '';
     } else if (name === '_') {
       diag.error(
-        `Normalization for metric "${metricData.descriptor.name}" resulted in an invalid name`
+        `Normalization for metric "${metricData.descriptor.name}" resulted in an invalid name: "_"`
       );
       return '';
     } else if (name[0] >= '0' && name[0] <= '9') {

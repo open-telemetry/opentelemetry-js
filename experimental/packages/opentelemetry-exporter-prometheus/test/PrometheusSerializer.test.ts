@@ -4,6 +4,7 @@
  */
 
 import * as assert from 'assert';
+import { diag } from '@opentelemetry/api';
 import type { Attributes, UpDownCounter } from '@opentelemetry/api';
 import type { DataPoint, Histogram } from '@opentelemetry/sdk-metrics';
 import {
@@ -720,27 +721,45 @@ describe('PrometheusSerializer', () => {
       );
     });
 
-    it('metric names of only special characters throw when escaping is enabled', async () => {
+    it('metric names of only special characters are not serialized when escaping is enabled', async () => {
       const serializer = new PrometheusSerializer();
+      const diagErr = diag.error;
+      const spy = sinon.spy();
+      diag.error = spy;
       const result = await getCounterResult('@#$%', serializer, {
         exportAll: true,
       });
+      diag.error = diagErr;
 
       assert.strictEqual(
         result,
         serializedDefaultResource + '# no registered metrics'
       );
+      assert.strictEqual(spy.calledOnce, true);
+      sinon.assert.calledWith(
+        spy,
+        `Normalization for metric "@#$%" resulted in an invalid name: "_"`
+      );
     });
 
     it('metrics with empty names are not serialized', async () => {
       const serializer = new PrometheusSerializer();
+      const diagErr = diag.error;
+      const spy = sinon.spy();
+      diag.error = spy;
       const result = await getCounterResult('', serializer, {
         exportAll: true,
       });
+      diag.error = diagErr;
 
       assert.strictEqual(
         result,
         serializedDefaultResource + '# no registered metrics'
+      );
+      assert.strictEqual(spy.calledOnce, true);
+      sinon.assert.calledWith(
+        spy,
+        `Normalization for metric "" resulted in empty name`
       );
     });
   });
