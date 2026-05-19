@@ -4,7 +4,6 @@
  */
 
 export { BasicTracerProvider } from './BasicTracerProvider';
-export { TracerProvider } from './TracerProvider';
 export { BatchSpanProcessor, RandomIdGenerator } from './platform';
 export { ConsoleSpanExporter } from './export/ConsoleSpanExporter';
 export { InMemorySpanExporter } from './export/InMemorySpanExporter';
