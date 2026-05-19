@@ -30,17 +30,36 @@ To load a specific instrumentation (HTTP in this case), specify it in the Node T
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
 const {
   ConsoleSpanExporter,
-  NodeTracerProvider,
+  BasicTracerProvider,
   SimpleSpanProcessor,
-} = require('@opentelemetry/sdk-trace-node');
+} = require('@opentelemetry/sdk-trace-base');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
+const { AsyncLocalStorageContextManager } = require('@opentelemetry/context-async-hooks');
+const {
+  CompositePropagator,
+  W3CBaggagePropagator,
+  W3CTraceContextPropagator,
+} = require('@opentelemetry/core');
+const {
+  trace, propagation, context,
+} = require('@opentelemetry/api');
 
-const provider = new NodeTracerProvider({
+const provider = new BasicTracerProvider({
   spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
 });
 
-provider.register();
+// Set context manager and propagation
+context.setGlobalContextManager(new AsyncLocalStorageContextManager());
+propagation.setGlobalPropagator(
+  new CompositePropagator({
+    propagators: [
+      new W3CTraceContextPropagator(),
+      new W3CBaggagePropagator(),
+    ],
+  })
+);
 
+trace.setGlobalTracerProvider(provider);
 registerInstrumentations({
   instrumentations: [new HttpInstrumentation()],
 });

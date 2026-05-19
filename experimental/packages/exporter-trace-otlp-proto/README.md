@@ -22,8 +22,17 @@ To see documentation and sample code for the metric exporter, see the [exporter-
 ## Traces in Node - PROTO over http
 
 ```js
-const { NodeTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-node');
+const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-proto');
+const { AsyncLocalStorageContextManager } = require('@opentelemetry/context-async-hooks');
+const {
+  CompositePropagator,
+  W3CBaggagePropagator,
+  W3CTraceContextPropagator,
+} = require('@opentelemetry/core');
+const {
+  trace, propagation, context,
+} = require('@opentelemetry/api');
 
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/traces
@@ -37,8 +46,18 @@ const provider = new NodeTracerProvider({
   spanProcessors: [new SimpleSpanProcessor(exporter)]
 });
 
-provider.register();
+// Set context manager and propagation
+context.setGlobalContextManager(new AsyncLocalStorageContextManager());
+propagation.setGlobalPropagator(
+  new CompositePropagator({
+    propagators: [
+      new W3CTraceContextPropagator(),
+      new W3CBaggagePropagator(),
+    ],
+  })
+);
 
+trace.setGlobalTracerProvider(provider);
 ```
 
 ## Exporter Timeout Configuration

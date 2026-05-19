@@ -165,16 +165,15 @@ myInstrumentation.enable();
 ### NODE - Auto Loader
 
 ```javascript
+const { propagation } = require('@opentelemetry/api');
 const { B3Propagator } = require('@opentelemetry/propagator-b3');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
-const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
+const { BasicTracerProvider } = require('@opentelemetry/sdk-trace-base');
 
-const tracerProvider = new NodeTracerProvider();
+const tracerProvider = new BasicTracerProvider();
 
-tracerProvider.register({
-  propagator: new B3Propagator(),
-});
+propagation.setGlobalPropagator(new B3Propagator());
 
 registerInstrumentations({
   instrumentations: [
@@ -194,6 +193,7 @@ const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 const { XMLHttpRequestInstrumentation } = require('@opentelemetry/instrumentation-xml-http-request');
 const { WebTracerProvider } = require('@opentelemetry/sdk-trace-web');
 
+// XXX
 const tracerProvider = new WebTracerProvider();
 
 tracerProvider.register({

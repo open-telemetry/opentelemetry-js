@@ -24,8 +24,17 @@ To see documentation and sample code for the metric exporter, see the [exporter-
 The OTLPTraceExporter in Node expects the URL to only be the hostname. It will not work with `/v1/traces`.
 
 ```js
-const { NodeTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-node');
+const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
+const { AsyncLocalStorageContextManager } = require('@opentelemetry/context-async-hooks');
+const {
+  CompositePropagator,
+  W3CBaggagePropagator,
+  W3CTraceContextPropagator,
+} = require('@opentelemetry/core');
+const {
+  trace, propagation, context,
+} = require('@opentelemetry/api');
 
 const collectorOptions = {
   // url is optional and can be omitted - default is http://localhost:4317
@@ -34,11 +43,22 @@ const collectorOptions = {
 };
 
 const exporter = new OTLPTraceExporter(collectorOptions);
-const provider = new NodeTracerProvider({
+const provider = new BasicTracerProvider({
   spanProcessors: [new SimpleSpanProcessor(exporter)]
 });
 
-provider.register();
+// Set context manager and propagation
+context.setGlobalContextManager(new AsyncLocalStorageContextManager());
+propagation.setGlobalPropagator(
+  new CompositePropagator({
+    propagators: [
+      new W3CTraceContextPropagator(),
+      new W3CBaggagePropagator(),
+    ],
+  })
+);
+
+trace.setGlobalTracerProvider(provider);
 ['SIGINT', 'SIGTERM'].forEach(signal => {
   process.on(signal, () => provider.shutdown().catch(console.error));
 });
@@ -47,8 +67,17 @@ provider.register();
 By default, the exporter creates a secure (TLS) connection. When connecting to a local development collector without TLS, you can use an insecure connection by specifying the `http://` scheme in the URL:
 
 ```js
-const { NodeTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-node');
+const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
+const { AsyncLocalStorageContextManager } = require('@opentelemetry/context-async-hooks');
+const {
+  CompositePropagator,
+  W3CBaggagePropagator,
+  W3CTraceContextPropagator,
+} = require('@opentelemetry/core');
+const {
+  trace, propagation, context,
+} = require('@opentelemetry/api');
 
 const collectorOptions = {
   url: 'http://localhost:4317',  // http:// creates an insecure connection
@@ -59,7 +88,18 @@ const provider = new NodeTracerProvider({
   spanProcessors: [new SimpleSpanProcessor(exporter)]
 });
 
-provider.register();
+// Set context manager and propagation
+context.setGlobalContextManager(new AsyncLocalStorageContextManager());
+propagation.setGlobalPropagator(
+  new CompositePropagator({
+    propagators: [
+      new W3CTraceContextPropagator(),
+      new W3CBaggagePropagator(),
+    ],
+  })
+);
+
+trace.setGlobalTracerProvider(provider);
 ```
 
 Alternatively, you can explicitly configure insecure credentials:
@@ -67,8 +107,17 @@ Alternatively, you can explicitly configure insecure credentials:
 ```js
 const grpc = require('@grpc/grpc-js');
 
-const { NodeTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-node');
+const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
+const { AsyncLocalStorageContextManager } = require('@opentelemetry/context-async-hooks');
+const {
+  CompositePropagator,
+  W3CBaggagePropagator,
+  W3CTraceContextPropagator,
+} = require('@opentelemetry/core');
+const {
+  trace, propagation, context,
+} = require('@opentelemetry/api');
 
 const collectorOptions = {
   url: 'localhost:4317',
@@ -80,7 +129,18 @@ const provider = new NodeTracerProvider({
   spanProcessors: [new SimpleSpanProcessor(exporter)]
 });
 
-provider.register();
+// Set context manager and propagation
+context.setGlobalContextManager(new AsyncLocalStorageContextManager());
+propagation.setGlobalPropagator(
+  new CompositePropagator({
+    propagators: [
+      new W3CTraceContextPropagator(),
+      new W3CBaggagePropagator(),
+    ],
+  })
+);
+
+trace.setGlobalTracerProvider(provider);
 ```
 
 To use TLS in Node.js, provide `credentials` option like so:
@@ -89,8 +149,17 @@ To use TLS in Node.js, provide `credentials` option like so:
 const fs = require('fs');
 const grpc = require('@grpc/grpc-js');
 
-const { NodeTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-node');
+const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
+const { AsyncLocalStorageContextManager } = require('@opentelemetry/context-async-hooks');
+const {
+  CompositePropagator,
+  W3CBaggagePropagator,
+  W3CTraceContextPropagator,
+} = require('@opentelemetry/core');
+const {
+  trace, propagation, context,
+} = require('@opentelemetry/api');
 
 const collectorOptions = {
   // url is optional and can be omitted - default is http://localhost:4317
@@ -104,7 +173,18 @@ const provider = new NodeTracerProvider({
   spanProcessors: [new SimpleSpanProcessor(exporter)]
 });
 
-provider.register();
+// Set context manager and propagation
+context.setGlobalContextManager(new AsyncLocalStorageContextManager());
+propagation.setGlobalPropagator(
+  new CompositePropagator({
+    propagators: [
+      new W3CTraceContextPropagator(),
+      new W3CBaggagePropagator(),
+    ],
+  })
+);
+
+trace.setGlobalTracerProvider(provider);
 ['SIGINT', 'SIGTERM'].forEach(signal => {
   process.on(signal, () => provider.shutdown().catch(console.error));
 });
@@ -127,8 +207,17 @@ The exporter can be configured to send custom metadata with each request as in t
 ```js
 const grpc = require('@grpc/grpc-js');
 
-const { NodeTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-node');
+const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
+const { AsyncLocalStorageContextManager } = require('@opentelemetry/context-async-hooks');
+const {
+  CompositePropagator,
+  W3CBaggagePropagator,
+  W3CTraceContextPropagator,
+} = require('@opentelemetry/core');
+const {
+  trace, propagation, context,
+} = require('@opentelemetry/api');
 
 const metadata = new grpc.Metadata();
 // For instance, an API key or access token might go here.
@@ -146,7 +235,18 @@ const provider = new NodeTracerProvider({
   spanProcessors: [new SimpleSpanProcessor(exporter)]
 });
 
-provider.register();
+// Set context manager and propagation
+context.setGlobalContextManager(new AsyncLocalStorageContextManager());
+propagation.setGlobalPropagator(
+  new CompositePropagator({
+    propagators: [
+      new W3CTraceContextPropagator(),
+      new W3CBaggagePropagator(),
+    ],
+  })
+);
+
+trace.setGlobalTracerProvider(provider);
 ['SIGINT', 'SIGTERM'].forEach(signal => {
   process.on(signal, () => provider.shutdown().catch(console.error));
 });

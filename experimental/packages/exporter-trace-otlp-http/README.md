@@ -59,8 +59,17 @@ provider.register();
 ## Traces in Node - JSON over http
 
 ```js
-const { NodeTracerProvider, BatchSpanProcessor } = require('@opentelemetry/sdk-trace-node');
+const { BasicTracerProvider, BatchSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-http');
+const { AsyncLocalStorageContextManager } = require('@opentelemetry/context-async-hooks');
+const {
+  CompositePropagator,
+  W3CBaggagePropagator,
+  W3CTraceContextPropagator,
+} = require('@opentelemetry/core');
+const {
+  trace, propagation, context,
+} = require('@opentelemetry/api');
 
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/traces
@@ -71,7 +80,7 @@ const collectorOptions = {
 };
 
 const exporter = new OTLPTraceExporter(collectorOptions);
-const provider = new NodeTracerProvider({
+const provider = new BasicTracerProvider({
   spanProcessors: [
     new BatchSpanProcessor(exporter, {
       // The maximum queue size. After the size is reached spans are dropped.
@@ -82,8 +91,18 @@ const provider = new NodeTracerProvider({
   ]
 });
 
-provider.register();
+// Set context manager and propagation
+context.setGlobalContextManager(new AsyncLocalStorageContextManager());
+propagation.setGlobalPropagator(
+  new CompositePropagator({
+    propagators: [
+      new W3CTraceContextPropagator(),
+      new W3CBaggagePropagator(),
+    ],
+  })
+);
 
+trace.setGlobalTracerProvider(provider);
 ```
 
 ## GRPC
