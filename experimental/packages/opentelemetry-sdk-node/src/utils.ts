@@ -627,7 +627,7 @@ export function getLogRecordExporter(
           : CompressionAlgorithm.NONE,
       url: cfg?.endpoint ?? undefined,
       headers: getHeadersFromConfiguration(cfg?.headers),
-      timeoutMillis: cfg?.timeout,
+      timeoutMillis: validateExporterTimeout(cfg?.timeout),
       httpAgentOptions: getHttpAgentOptionsFromTls(cfg?.tls),
     };
     const encoding = cfg.encoding ?? 'protobuf';
@@ -649,7 +649,7 @@ export function getLogRecordExporter(
           ? CompressionAlgorithm.GZIP
           : CompressionAlgorithm.NONE,
       url: cfg?.endpoint ?? undefined,
-      timeoutMillis: cfg?.timeout,
+      timeoutMillis: validateExporterTimeout(cfg?.timeout),
       credentials: getGrpcCredentialsFromTls(cfg?.tls),
       metadata: getGrpcMetadataFromHeaders(cfg?.headers),
     });
