@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/opentelemetry-browser-detector",
-  "version": "0.216.0",
+  "version": "0.218.0",
   "description": "OpenTelemetry Resource Detector for Browser",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -58,7 +58,7 @@
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
-    "babel-plugin-istanbul": "7.0.1",
+    "babel-plugin-istanbul": "8.0.0",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",
@@ -68,7 +68,7 @@
     "mocha": "11.7.5",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
-    "ts-loader": "9.5.4",
+    "ts-loader": "9.5.7",
     "typescript": "5.0.4",
     "webpack": "5.104.1",
     "webpack-cli": "7.0.2"

@@ -22,6 +22,7 @@ jobs:
           - "22"
           - "24"
           - "25"
+          - "26"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -50,7 +51,8 @@ jobs:
         if: ${{
           matrix.node_version == '20' ||
           matrix.node_version == '24' ||
-          matrix.node_version == '25'
+          matrix.node_version == '25' ||
+          matrix.node_version == '26'
           }}
 
       - name: Bootstrap

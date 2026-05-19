@@ -54,15 +54,12 @@ export function sendWithHttp(
     }
 
     const options: http.RequestOptions | https.RequestOptions = {
-      hostname: parsedUrl.hostname,
-      port: parsedUrl.port,
-      path: parsedUrl.pathname,
       method: 'POST',
       headers,
       agent,
     };
 
-    const req = request(options, (res: http.IncomingMessage) => {
+    const req = request(parsedUrl, options, (res: http.IncomingMessage) => {
       const responseData: Buffer[] = [];
       let responseSize = 0;
       res.on('data', (chunk: Buffer) => {

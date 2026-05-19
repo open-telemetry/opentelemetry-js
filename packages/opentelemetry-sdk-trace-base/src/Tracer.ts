@@ -16,6 +16,12 @@ import { RandomIdGenerator } from './platform';
 import type { Resource } from '@opentelemetry/resources';
 import { TracerMetrics } from './TracerMetrics';
 import { VERSION } from './version';
+import type { InspectFn, InspectStylizeOptions } from './inspect';
+import {
+  formatInspect,
+  inspectCustom,
+  settledResourceAttributes,
+} from './inspect';
 
 /**
  * This class represents a basic tracer.
@@ -164,6 +170,11 @@ export class Tracer implements api.Tracer {
    * Additionally the new span gets set in context and this context is activated
    * for the duration of the function call.
    *
+   * **Important**: The callback function is responsible for calling `span.end()`
+   * to finish the span. Unlike some other OpenTelemetry implementations, the span
+   * is NOT automatically ended when the callback returns. If `span.end()` is not
+   * called, the span will never be exported and will be silently lost.
+   *
    * @param name The name of the span
    * @param [options] SpanOptions used for span creation
    * @param [context] Context to use to extract parent
@@ -254,5 +265,19 @@ export class Tracer implements api.Tracer {
   /** Returns the active {@link SpanLimits}. */
   getSpanLimits(): SpanLimits {
     return this._spanLimits;
+  }
+
+  [inspectCustom](
+    depth: number,
+    options: InspectStylizeOptions | undefined,
+    inspect: InspectFn | undefined
+  ): unknown {
+    const payload = {
+      instrumentationScope: this.instrumentationScope,
+      resource: { attributes: settledResourceAttributes(this._resource) },
+      spanLimits: this._spanLimits,
+      generalLimits: this._generalLimits,
+    };
+    return formatInspect('Tracer', payload, depth, options, inspect);
   }
 }

@@ -33,7 +33,7 @@ import {
   processDetector,
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
-import type { LoggerProviderConfig } from '@opentelemetry/sdk-logs';
+import type { LoggerProviderOptions } from '@opentelemetry/sdk-logs';
 import type { AggregationOption } from '@opentelemetry/sdk-metrics';
 import {
   AggregationTemporality,
@@ -272,7 +272,7 @@ describe('getLoggerProviderConfigFromEnv', function () {
   it('should return empty config when no env variables are set', function () {
     const config = getLoggerProviderConfigFromEnv();
 
-    const expectedConfig: LoggerProviderConfig = {
+    const expectedConfig: LoggerProviderOptions = {
       logRecordLimits: {
         attributeValueLengthLimit: undefined,
         attributeCountLimit: undefined,
@@ -285,7 +285,7 @@ describe('getLoggerProviderConfigFromEnv', function () {
     process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = '512';
     const config = getLoggerProviderConfigFromEnv();
 
-    const expectedConfig: LoggerProviderConfig = {
+    const expectedConfig: LoggerProviderOptions = {
       logRecordLimits: {
         attributeValueLengthLimit: 512,
         attributeCountLimit: undefined,
@@ -298,7 +298,7 @@ describe('getLoggerProviderConfigFromEnv', function () {
     process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '35';
     const config = getLoggerProviderConfigFromEnv();
 
-    const expectedConfig: LoggerProviderConfig = {
+    const expectedConfig: LoggerProviderOptions = {
       logRecordLimits: {
         attributeValueLengthLimit: undefined,
         attributeCountLimit: 35,
@@ -314,7 +314,7 @@ describe('getLoggerProviderConfigFromEnv', function () {
 
     const config = getLoggerProviderConfigFromEnv();
 
-    const expectedConfig: LoggerProviderConfig = {
+    const expectedConfig: LoggerProviderOptions = {
       logRecordLimits: {
         attributeValueLengthLimit: undefined,
         attributeCountLimit: undefined,
@@ -336,7 +336,7 @@ describe('getLoggerProviderConfigFromEnv', function () {
 
     const config = getLoggerProviderConfigFromEnv();
 
-    const expectedConfig: LoggerProviderConfig = {
+    const expectedConfig: LoggerProviderOptions = {
       logRecordLimits: {
         attributeValueLengthLimit: undefined,
         attributeCountLimit: undefined,

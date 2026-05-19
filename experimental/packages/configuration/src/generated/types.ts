@@ -4,8 +4,8 @@
  */
 //
 // AUTO-GENERATED — do not edit
-// Generated from opentelemetry-configuration JSON schema v1.0.0
-// Run `npm run generate:config` from the configuration package to regenerate
+// Generated from opentelemetry-configuration.git v1.0.0
+// Run `npm run generate:config` to regenerate
 //
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-object-type */
 

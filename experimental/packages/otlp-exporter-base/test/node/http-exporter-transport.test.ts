@@ -106,6 +106,47 @@ describe('HttpExporterTransport', function () {
       );
     });
 
+    it('returns success when sending to IPv6 localhost address', async function () {
+      // arrange
+      const expectedResponseData = Buffer.from([4, 5, 6]);
+      server = http.createServer((_, res) => {
+        res.statusCode = 200;
+        res.write(expectedResponseData);
+        res.end();
+      });
+
+      // Listen on IPv6 localhost - skip test if IPv6 is not available
+      try {
+        await new Promise<void>((resolve, reject) => {
+          server!.listen(0, '::1', () => resolve());
+          server!.once('error', reject);
+        });
+      } catch (err: unknown) {
+        if ((err as NodeJS.ErrnoException).code === 'EADDRNOTAVAIL') {
+          this.skip();
+        }
+        throw err;
+      }
+      const port = (server!.address() as any).port;
+
+      const transport = createHttpExporterTransport({
+        url: `http://[::1]:${port}`,
+        headers: async () => ({}),
+        compression: 'none',
+        agentFactory: () => new http.Agent(),
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 1000);
+
+      // assert
+      assert.strictEqual(result.status, 'success');
+      assert.deepEqual(
+        (result as ExportResponseSuccess).data,
+        expectedResponseData
+      );
+    });
+
     it('returns retryable on retryable status', async function () {
       //arrange
       server = http.createServer((_, res) => {

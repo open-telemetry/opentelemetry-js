@@ -6,7 +6,8 @@
 /* eslint-disable */
 // AUTO-GENERATED — do not edit
 // Pre-compiled ajv validator for the OpenTelemetry configuration schema
-// Run `npm run generate:config` from the configuration package to regenerate
+// Generated from opentelemetry-configuration.git v1.0.0
+// Run `npm run generate:config` to regenerate
 
 /** Minimal subset of ajv ErrorObject used by FileConfigFactory */
 interface ValidatorError {
