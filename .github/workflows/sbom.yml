@@ -3,7 +3,8 @@ on:
   release:
     types: [published]
 
-permissions: read-all
+permissions:
+  contents: read
 
 jobs:
   generate-sboms:
@@ -17,6 +18,12 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: "22.22.1" # pin to avoid bug in 22.22.2
+          # Disable caching in release workflows (https://docs.zizmor.sh/audits/#cache-poisoning).
+          # Zizmor didn't actually warn about this, but its general advice
+          # was to avoid caching in workflows that publish artifacts. While
+          # the published SBOM.zip does not include executable code, it is
+          # still a published artifact.
+          package-manager-cache: false
 
       - run: npm install -g npm@latest
 
