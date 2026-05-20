@@ -72,15 +72,15 @@ Options                                 | Type                                  
 
 #### Hook function signatures
 
-Hook type                                | Parameters                                                 | Return value
----------------------------------------- | ---------------------------------------------------------- | ------------
-`IgnoreIncomingRequestFunction`          | `request: IncomingMessage`                                 | `true` skips tracing the incoming request; `false` traces it
-`IgnoreOutgoingRequestFunction`          | `request: RequestOptions`                                  | `true` skips tracing the outgoing request; `false` traces it
-`HttpRequestCustomAttributeFunction`     | `span: Span`, `request: ClientRequest \| IncomingMessage`   | `void`
-`HttpResponseCustomAttributeFunction`    | `span: Span`, `response: IncomingMessage \| ServerResponse` | `void`
-`StartIncomingSpanCustomAttributeFunction` | `request: IncomingMessage`                               | `Attributes` to add before the incoming request span starts
-`StartOutgoingSpanCustomAttributeFunction` | `request: RequestOptions`                                | `Attributes` to add before the outgoing request span starts
-`HttpCustomAttributeFunction`            | `span: Span`, `request: ClientRequest \| IncomingMessage`, `response: IncomingMessage \| ServerResponse` | `void`
+Hook type                                  | Parameters                                                                                                   | Return value
+------------------------------------------ | ------------------------------------------------------------------------------------------------------------ | ------------
+`IgnoreIncomingRequestFunction`            | `request: IncomingMessage`                                                                                   | `true` skips tracing the incoming request; `false` traces it
+`IgnoreOutgoingRequestFunction`            | `request: RequestOptions`                                                                                    | `true` skips tracing the outgoing request; `false` traces it
+`HttpRequestCustomAttributeFunction`       | `span: Span`, `request: ClientRequest` or `IncomingMessage`                                                  | `void`
+`HttpResponseCustomAttributeFunction`      | `span: Span`, `response: IncomingMessage` or `ServerResponse`                                                | `void`
+`StartIncomingSpanCustomAttributeFunction` | `request: IncomingMessage`                                                                                   | `Attributes` to add before the incoming request span starts
+`StartOutgoingSpanCustomAttributeFunction` | `request: RequestOptions`                                                                                    | `Attributes` to add before the outgoing request span starts
+`HttpCustomAttributeFunction`              | `span: Span`, `request: ClientRequest` or `IncomingMessage`, `response: IncomingMessage` or `ServerResponse` | `void`
 
 ## Semantic Conventions
 
