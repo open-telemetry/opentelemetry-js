@@ -56,10 +56,11 @@ import {
 } from '../src/semconv';
 import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
 import {
-  getLogRecordExporter,
-  getSpanExporter,
+  resolveSpanExporter,
+  resolveLogRecordExporter,
   setupContextManager,
 } from '../src/utils';
+import { ComponentProviderRegistry } from '../src/component-provider';
 import { NOOP_SDK } from '../src/start';
 import {
   ConsoleMetricExporter,
@@ -76,6 +77,7 @@ import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-node';
+import { getBuiltinComponentProviders } from '../src/builtin-providers';
 
 describe('startNodeSDK', function () {
   let setGlobalLoggerProviderSpy: Sinon.SinonSpy;
@@ -350,11 +352,16 @@ describe('startNodeSDK', function () {
     const sdk = startNodeSDK({});
 
     // otlp_file/development exporters are not supported yet
-    const unsupportedWarnings = stubLoggerWarn.args.filter(
+    const unsupportedProviderWarnings = stubLoggerWarn.args.filter(
       args =>
-        args[0] === 'Unsupported Exporter value. No Span Exporter registered'
+        args[0] ===
+        'No SpanExporterComponentProvider registered for name "otlp_file/development". Skipping.'
     );
-    assert.strictEqual(unsupportedWarnings.length, 2);
+    assert.strictEqual(unsupportedProviderWarnings.length, 2);
+    const unsupportedExporterWarnings = stubLoggerWarn.args.filter(
+      args => args[0] === 'Unsupported Exporter value. No Span Exporter registered'
+    );
+    assert.strictEqual(unsupportedExporterWarnings.length, 2);
 
     assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
     assert.ok(
@@ -959,15 +966,20 @@ describe('startNodeSDK', function () {
 
   describe('tests to increase code coverage', function () {
     it('should return undefined for invalid log record exporter model', async () => {
+      const registry = new ComponentProviderRegistry(
+        getBuiltinComponentProviders()
+      );
       const exporter: LogRecordExporterConfigModel = {};
-      assert.equal(getLogRecordExporter(exporter), undefined);
+      assert.equal(resolveLogRecordExporter(exporter, registry), undefined);
     });
 
     it('should warn when exporter timeout is 0', async () => {
       const warnSpy = Sinon.spy(diag, 'warn');
-      const exporter = getSpanExporter({
-        otlp_http: { timeout: 0 },
-      });
+      const registry = new ComponentProviderRegistry(getBuiltinComponentProviders());
+      const exporter = resolveSpanExporter(
+        { otlp_http: { timeout: 0 } },
+        registry
+      );
       assert.ok(exporter !== undefined);
       assert.ok(
         warnSpy.args.some(args =>
