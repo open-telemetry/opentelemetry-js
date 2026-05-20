@@ -15,13 +15,6 @@ import { TracerProvider } from './TracerProvider';
 import type { InspectFn, InspectStylizeOptions } from './inspect';
 import { inspectCustom } from './inspect';
 
-export enum ForceFlushState {
-  'resolved',
-  'timeout',
-  'error',
-  'unresolved',
-}
-
 /**
  * This class represents a basic tracer provider which platform libraries can extend
  */

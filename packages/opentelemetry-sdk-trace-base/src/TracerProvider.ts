@@ -24,7 +24,7 @@ import {
   settledResourceAttributes,
 } from './inspect';
 
-export enum ForceFlushState {
+enum ForceFlushState {
   'resolved',
   'timeout',
   'error',
