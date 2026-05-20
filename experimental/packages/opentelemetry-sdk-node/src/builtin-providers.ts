@@ -44,9 +44,8 @@ import type {
   ConsoleExporterConfigModel,
   ConsoleMetricExporterConfigModel,
   NameStringValuePairConfigModel,
+  GrpcTlsConfigModel,
 } from '@opentelemetry/configuration';
-
-type GrpcTlsConfigModel = OtlpGrpcExporterConfigModel['tls'];
 
 /**
  * Validate an exporter timeout value. The spec says 0 means "no limit
@@ -108,29 +107,25 @@ class OtlpHttpSpanExporterProvider
   readonly name = 'otlp_http';
 
   createComponent(properties: OtlpHttpExporterConfigModel): SpanExporter {
+    const cfg = properties ?? {};
     const compressionAlg =
-      properties.compression === 'gzip'
+      cfg.compression === 'gzip'
         ? CompressionAlgorithm.GZIP
         : CompressionAlgorithm.NONE;
-    const headers = getHeadersFromConfiguration(properties.headers);
-    const httpAgentOptions = getHttpAgentOptionsFromTls(properties.tls);
-
-    if (properties.encoding === 'json') {
-      return new OTLPHttpTraceExporter({
-        compression: compressionAlg,
-        url: properties.endpoint,
-        headers,
-        timeoutMillis: validateExporterTimeout(properties.timeout),
-        httpAgentOptions,
-      });
-    }
-    return new OTLPProtoTraceExporter({
+    const headers = getHeadersFromConfiguration(cfg.headers);
+    const httpAgentOptions = getHttpAgentOptionsFromTls(cfg.tls);
+    const commonOpts = {
       compression: compressionAlg,
-      url: properties.endpoint,
+      url: cfg.endpoint ?? undefined,
       headers,
-      timeoutMillis: validateExporterTimeout(properties.timeout),
+      timeoutMillis: validateExporterTimeout(cfg.timeout),
       httpAgentOptions,
-    });
+    };
+
+    if (cfg.encoding === 'json') {
+      return new OTLPHttpTraceExporter(commonOpts);
+    }
+    return new OTLPProtoTraceExporter(commonOpts);
   }
 }
 
@@ -140,15 +135,16 @@ class OtlpGrpcSpanExporterProvider
   readonly name = 'otlp_grpc';
 
   createComponent(properties: OtlpGrpcExporterConfigModel): SpanExporter {
+    const cfg = properties ?? {};
     return new OTLPGrpcTraceExporter({
       compression:
-        properties.compression === 'gzip'
+        cfg.compression === 'gzip'
           ? CompressionAlgorithm.GZIP
           : CompressionAlgorithm.NONE,
-      url: properties.endpoint,
-      timeoutMillis: validateExporterTimeout(properties.timeout),
-      credentials: getGrpcCredentialsFromTls(properties.tls),
-      metadata: getGrpcMetadataFromHeaders(properties.headers),
+      url: cfg.endpoint ?? undefined,
+      timeoutMillis: validateExporterTimeout(cfg.timeout),
+      credentials: getGrpcCredentialsFromTls(cfg.tls ?? undefined),
+      metadata: getGrpcMetadataFromHeaders(cfg.headers),
     });
   }
 }
@@ -161,27 +157,28 @@ class OtlpHttpLogRecordExporterProvider
   readonly name = 'otlp_http';
 
   createComponent(properties: OtlpHttpExporterConfigModel): LogRecordExporter {
+    const cfg = properties ?? {};
     const compressionAlg =
-      properties.compression === 'gzip'
+      cfg.compression === 'gzip'
         ? CompressionAlgorithm.GZIP
         : CompressionAlgorithm.NONE;
     const commonOpts = {
       compression: compressionAlg,
-      url: properties.endpoint,
-      headers: getHeadersFromConfiguration(properties.headers),
-      timeoutMillis: validateExporterTimeout(properties.timeout),
-      httpAgentOptions: getHttpAgentOptionsFromTls(properties.tls),
+      url: cfg.endpoint ?? undefined,
+      headers: getHeadersFromConfiguration(cfg.headers),
+      timeoutMillis: validateExporterTimeout(cfg.timeout),
+      httpAgentOptions: getHttpAgentOptionsFromTls(cfg.tls),
     };
 
-    if (properties.encoding === 'json') {
+    if (cfg.encoding === 'json') {
       return new OTLPHttpLogExporter(commonOpts);
     }
-    if (properties.encoding === 'protobuf') {
+    if (cfg.encoding === 'protobuf') {
       return new OTLPProtoLogExporter(commonOpts);
     }
-    if (properties.encoding != null) {
+    if (cfg.encoding != null) {
       diag.warn(
-        `Unsupported OTLP logs encoding: ${properties.encoding}. Using http/protobuf.`
+        `Unsupported OTLP logs encoding: ${cfg.encoding}. Using http/protobuf.`
       );
     }
     return new OTLPProtoLogExporter(commonOpts);
@@ -194,15 +191,16 @@ class OtlpGrpcLogRecordExporterProvider
   readonly name = 'otlp_grpc';
 
   createComponent(properties: OtlpGrpcExporterConfigModel): LogRecordExporter {
+    const cfg = properties ?? {};
     return new OTLPGrpcLogExporter({
       compression:
-        properties.compression === 'gzip'
+        cfg.compression === 'gzip'
           ? CompressionAlgorithm.GZIP
           : CompressionAlgorithm.NONE,
-      url: properties.endpoint,
-      timeoutMillis: validateExporterTimeout(properties.timeout),
-      credentials: getGrpcCredentialsFromTls(properties.tls),
-      metadata: getGrpcMetadataFromHeaders(properties.headers),
+      url: cfg.endpoint ?? undefined,
+      timeoutMillis: validateExporterTimeout(cfg.timeout),
+      credentials: getGrpcCredentialsFromTls(cfg.tls ?? undefined),
+      metadata: getGrpcMetadataFromHeaders(cfg.headers),
     });
   }
 }
@@ -218,27 +216,28 @@ class OtlpHttpPushMetricExporterProvider
   createComponent(
     properties: OtlpHttpMetricExporterConfigModel
   ): PushMetricExporter {
+    const cfg = properties ?? {};
     const compressionAlg =
-      properties.compression === 'gzip'
+      cfg.compression === 'gzip'
         ? CompressionAlgorithm.GZIP
         : CompressionAlgorithm.NONE;
     const commonOpts = {
       compression: compressionAlg,
-      url: properties.endpoint,
-      headers: getHeadersFromConfiguration(properties.headers),
-      timeoutMillis: validateExporterTimeout(properties.timeout),
-      httpAgentOptions: getHttpAgentOptionsFromTls(properties.tls),
+      url: cfg.endpoint ?? undefined,
+      headers: getHeadersFromConfiguration(cfg.headers),
+      timeoutMillis: validateExporterTimeout(cfg.timeout),
+      httpAgentOptions: getHttpAgentOptionsFromTls(cfg.tls),
     };
 
-    if (properties.encoding === 'json') {
+    if (cfg.encoding === 'json') {
       return new OTLPHttpMetricExporter(commonOpts);
     }
-    if (properties.encoding === 'protobuf') {
+    if (cfg.encoding === 'protobuf') {
       return new OTLPProtoMetricExporter(commonOpts);
     }
-    if (properties.encoding != null) {
+    if (cfg.encoding != null) {
       diag.warn(
-        `Unsupported OTLP metrics encoding: ${properties.encoding}. Using http/protobuf.`
+        `Unsupported OTLP metrics encoding: ${cfg.encoding}. Using http/protobuf.`
       );
     }
     return new OTLPProtoMetricExporter(commonOpts);
@@ -254,15 +253,16 @@ class OtlpGrpcPushMetricExporterProvider
   createComponent(
     properties: OtlpGrpcMetricExporterConfigModel
   ): PushMetricExporter {
+    const cfg = properties ?? {};
     return new OTLPGrpcMetricExporter({
       compression:
-        properties.compression === 'gzip'
+        cfg.compression === 'gzip'
           ? CompressionAlgorithm.GZIP
           : CompressionAlgorithm.NONE,
-      url: properties.endpoint,
-      timeoutMillis: validateExporterTimeout(properties.timeout),
-      credentials: getGrpcCredentialsFromTls(properties.tls),
-      metadata: getGrpcMetadataFromHeaders(properties.headers),
+      url: cfg.endpoint ?? undefined,
+      timeoutMillis: validateExporterTimeout(cfg.timeout),
+      credentials: getGrpcCredentialsFromTls(cfg.tls ?? undefined),
+      metadata: getGrpcMetadataFromHeaders(cfg.headers),
     });
   }
 }

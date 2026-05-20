@@ -36,6 +36,8 @@ import {
 import type { LoggerProviderOptions } from '@opentelemetry/sdk-logs';
 import { AggregationType, InstrumentType } from '@opentelemetry/sdk-metrics';
 import type { SpanLimits } from '@opentelemetry/sdk-trace-node';
+import { getBuiltinComponentProviders } from '../src/builtin-providers';
+import { ComponentProviderRegistry } from '../src/component-provider';
 
 describe('getPropagatorFromEnv', function () {
   afterEach(() => {
@@ -423,9 +425,9 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
   });
 
   it('should return warning message for invalid compression type for meter provider', function () {
-    const { ComponentProviderRegistry } = require('../src/component-provider');
-    const { getBuiltinComponentProviders } = require('../src/builtin-providers');
-    const registry = new ComponentProviderRegistry(getBuiltinComponentProviders());
+    const registry = new ComponentProviderRegistry(
+      getBuiltinComponentProviders()
+    );
     const warnStub = sinon.stub(diag, 'warn');
     resolvePushMetricExporter(
       { otlp_http: { encoding: 'invalid' } } as any,

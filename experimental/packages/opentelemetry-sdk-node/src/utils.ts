@@ -933,10 +933,10 @@ export function resolveSpanProcessorsFromConfiguration(
       if (exporter) {
         spanProcessors.push(
           new BatchSpanProcessor(exporter, {
-            maxQueueSize: processor.batch.max_queue_size,
-            maxExportBatchSize: processor.batch.max_export_batch_size,
-            scheduledDelayMillis: processor.batch.schedule_delay,
-            exportTimeoutMillis: processor.batch.export_timeout,
+            maxQueueSize: processor.batch.max_queue_size ?? undefined,
+            maxExportBatchSize: processor.batch.max_export_batch_size ?? undefined,
+            scheduledDelayMillis: processor.batch.schedule_delay ?? undefined,
+            exportTimeoutMillis: processor.batch.export_timeout ?? undefined,
           })
         );
       }
@@ -971,10 +971,10 @@ export function resolveLogRecordProcessorsFromConfiguration(
       if (exporter) {
         logRecordProcessors.push(
           new BatchLogRecordProcessor(exporter, {
-            maxQueueSize: processor.batch.max_queue_size,
-            maxExportBatchSize: processor.batch.max_export_batch_size,
-            scheduledDelayMillis: processor.batch.schedule_delay,
-            exportTimeoutMillis: processor.batch.export_timeout,
+            maxQueueSize: processor.batch.max_queue_size ?? undefined,
+            maxExportBatchSize: processor.batch.max_export_batch_size ?? undefined,
+            scheduledDelayMillis: processor.batch.schedule_delay ?? undefined,
+            exportTimeoutMillis: processor.batch.export_timeout ?? undefined,
           })
         );
       }
