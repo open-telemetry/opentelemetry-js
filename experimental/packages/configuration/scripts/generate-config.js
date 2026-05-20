@@ -218,51 +218,6 @@ function rtrimDescription(node) {
 }
 rtrimDescription(schema);
 
-// Avoid unnecessary `| null` in TypeScript types.
-//
-// opentelemetry-configuration intentionally adds an optional "null" type to
-// most fields to express optional/nullable values, e.g.:
-//       "ConsoleMetricExporter": {
-//         "type": [
-//           "object",
-//           "null"
-//         ],
-// See explanation at: https://github.com/open-telemetry/opentelemetry-configuration/blob/main/CONTRIBUTING.md#required-and-null-properties
-//
-// In TypeScript, `?` expresses a property being optional, e.g.:
-//      endpoint?: string;
-// Leaving "null" in the JSON Schema results in TypeScript like this:
-//      endpoint?: string | null;
-//
-// That null option has a downstream blast radius. E.g. a downstream API that
-// takes that `endpoint` value, now needs to handle `null`.
-//
-// By preprocessing the schema to remove those we get nicer typescript types.
-function stripNullTypeFallback(obj) {
-  if (Array.isArray(obj.type)) {
-    if (obj.type.length === 2 && obj.type[1] === 'null') {
-      obj.type.pop();
-    }
-  } else if (Array.isArray(obj.oneOf)) {
-    // Handle the more complex case of AttributeNameValue#value, which uses:
-    //    "value": { "oneOf": [{"type":"string"}, {"type":"null"}, ...] }
-    if (obj.oneOf.length > 1) {
-      obj.oneOf = obj.oneOf.filter(entry => {
-        return !(entry?.type === 'null' && Object.keys(entry).length === 1);
-      });
-    }
-  }
-  if (typeof obj.properties === 'object' && obj.properties != null) {
-    for (const prop of Object.values(obj.properties)) {
-      stripNullTypeFallback(prop);
-    }
-  }
-}
-stripNullTypeFallback(schema);
-for (const def of Object.values(schema.$defs)) {
-  stripNullTypeFallback(def);
-}
-
 compile(schema, 'OpenTelemetryConfiguration', {
   bannerComment,
   unknownAny: false,
@@ -288,7 +243,7 @@ compile(schema, 'OpenTelemetryConfiguration', {
     // of the codebase and other OTel SDKs.
     ts = ts.replace(/\bOpenTelemetryConfiguration\b/g, 'ConfigurationModel');
 
-    // Change the TypeScript representation for interfaces where
+    // Refine the TypeScript representation for interfaces where
     // "additionalProperties" is allowed.
     //
     // The configuration JSON schema uses the following for types that have
@@ -301,17 +256,17 @@ compile(schema, 'OpenTelemetryConfiguration', {
     //    [k: string]: {} | null
     //
     // However, we want:
-    //    [k: string]: object | undefined
+    //    [k: string]: object | null | undefined
     //
     // - `object` instead of `{}`, because JSON schema "object" means a thing
     //   with keys and values (https://json-schema.org/understanding-json-schema/reference/object)
     //   and TypeScript "object" means non-Primitive values (https://stackoverflow.com/a/49465172)
     //   which is closest. `{}` allows too much (e.g. 42 matches `{}`).
-    // - `undefined` rather than `null` because we want to express that the
-    //   property can be unspecified.
+    // - `null` to allow an empty value in the YAML
+    // - `undefined` to allow the property to not be specified in the YAML
     ts = ts.replace(
       /\[k: string\]: \{\} \| null;/g,
-      '[k: string]: object | undefined;'
+      '[k: string]: object | null | undefined;'
     );
     // Similarly for schema types with the following (e.g. `Distribution`):
     //    "additionalProperties": {
