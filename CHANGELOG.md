@@ -18,6 +18,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(otlp-grpc-exporter-base): recreate client after 5 consecutive `DEADLINE_EXCEEDED` to recover from connection dropped deadlock [#6296](https://github.com/open-telemetry/opentelemetry-js/pull/6296) @afharo
+
 ### :books: Documentation
 
 ### :house: Internal
