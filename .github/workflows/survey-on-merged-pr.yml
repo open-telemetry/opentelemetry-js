@@ -21,11 +21,14 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
     steps:
-      - uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: otelbot-token
         with:
           app-id: ${{ vars.OTELBOT_APP_ID }}
           private-key: ${{ secrets.OTELBOT_PRIVATE_KEY }}
+          repositories: ${{ github.repository }}
+          permission-pull-requests: write # for 'gh pr comment ...'
+          permission-members: read # for 'gh api orgs/$ORG/members/$USERNAME'
 
       - name: Add survey comment if author is not a member or bot
         run: |
