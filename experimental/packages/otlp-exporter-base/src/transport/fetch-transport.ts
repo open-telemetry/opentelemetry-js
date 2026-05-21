@@ -54,7 +54,13 @@ class FetchTransport implements IExporterTransport {
 
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
     const abortController = new AbortController();
-    const timeout = setTimeout(() => abortController.abort(), timeoutMillis);
+    const timeoutReason = new Error(
+      `Fetch request timed out after ${timeoutMillis}ms`
+    );
+    const timeout = setTimeout(
+      () => abortController.abort(timeoutReason),
+      timeoutMillis
+    );
     // Fetch API may be wrapped by an instrumentation like `@opentelemetry/instrumentation-fetch`.
     // In that case the instrumentation would create a new Span for this request
     // because the context manager cannot keep the context after `await` calls.
@@ -119,6 +125,12 @@ class FetchTransport implements IExporterTransport {
         ),
       };
     } catch (error) {
+      // Surface our own timeout as a clean failure rather than letting the
+      // AbortError reach error monitors via the cause chain.
+      if (abortController.signal.reason === timeoutReason) {
+        diag.warn(`export request timed out after ${timeoutMillis}ms`);
+        return { status: 'failure', error: timeoutReason };
+      }
       if (isFetchNetworkErrorRetryable(error)) {
         diag.warn(`export request retryable (network error: ${error})`);
         return {

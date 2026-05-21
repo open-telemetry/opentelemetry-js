@@ -23,6 +23,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(browser-detector): use the right semantic convention for user agent resource attribute [#6729](https://github.com/open-telemetry/opentelemetry-js/pull/6729) @david-luna
 * fix(browser-detector): user agent resource attribute always [#6754](https://github.com/open-telemetry/opentelemetry-js/pull/6754) @david-luna
 * fix(opentelemetry-exporter-prometheus): handle additional edge cases in metric name conversion [#6727](https://github.com/open-telemetry/opentelemetry-js/pull/6727) @cjihrig
+* fix(otlp-exporter-base): surface FetchTransport timeout as a clean failure instead of leaking the underlying AbortError via the cause chain [#6751](https://github.com/open-telemetry/opentelemetry-js/pull/6751) @devareddy05
 
 ### :books: Documentation
 
