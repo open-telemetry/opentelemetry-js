@@ -48,7 +48,6 @@ jobs:
         with:
           app-id: ${{ vars.OTELBOT_JS_APP_ID }}
           private-key: ${{ secrets.OTELBOT_JS_PRIVATE_KEY }}
-          repositories: ${{ github.repository }}
           # Scope to just the permissions required by the "Create/Update Release PR" step below.
           permission-contents: write
           permission-pull-requests: write

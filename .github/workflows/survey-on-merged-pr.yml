@@ -26,7 +26,6 @@ jobs:
         with:
           app-id: ${{ vars.OTELBOT_APP_ID }}
           private-key: ${{ secrets.OTELBOT_PRIVATE_KEY }}
-          repositories: ${{ github.repository }}
           permission-pull-requests: write # for 'gh pr comment ...'
           permission-members: read # for 'gh api orgs/$ORG/members/$USERNAME'
 
