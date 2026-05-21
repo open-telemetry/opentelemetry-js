@@ -27,7 +27,8 @@ jobs:
           app-id: ${{ vars.OTELBOT_APP_ID }}
           private-key: ${{ secrets.OTELBOT_PRIVATE_KEY }}
           repositories: ${{ github.repository }}
-          permission-pull-requests: write
+          permission-pull-requests: write # for 'gh pr comment ...'
+          permission-members: read # for 'gh api orgs/$ORG/members/$USERNAME'
 
       - name: Add survey comment if author is not a member or bot
         run: |
