@@ -15,6 +15,35 @@ This module provides base components for OTLP Exporters, both Web and Node.js.
 npm install --save @opentelemetry/otlp-exporter-base
 ```
 
+## HTTP exporter configuration
+
+HTTP JSON and HTTP/protobuf exporters for traces, metrics, and logs share these configuration options.
+Node.js exporters accept `OTLPExporterNodeConfigBase`, which also includes the options from `OTLPExporterConfigBase`.
+
+| Option | Type | Default | Description |
+| ------ | ---- | ------- | ----------- |
+| `url` | `string` | Signal-specific localhost endpoint, such as `http://localhost:4318/v1/traces` | Collector endpoint URL. Signal-specific environment variables override `OTEL_EXPORTER_OTLP_ENDPOINT`. |
+| `headers` | `Record<string, string> \| HeadersFactory` | Required OTLP headers for the exporter transport | Custom HTTP headers. A factory function may be async and must not throw. |
+| `concurrencyLimit` | `number` | `30` | Maximum number of in-flight export requests. |
+| `timeoutMillis` | `number` | `10000` | Maximum time, in milliseconds, to wait for each batch export. |
+| `compression` | `CompressionAlgorithm.NONE \| CompressionAlgorithm.GZIP` | `CompressionAlgorithm.NONE` | Compression for outgoing OTLP HTTP requests in Node.js. |
+| `keepAlive` | `boolean` | `true` | Sets `keepAlive` on the Node.js HTTP or HTTPS agent created by the exporter. A `keepAlive` value in `httpAgentOptions` takes precedence. |
+| `httpAgentOptions` | `http.AgentOptions \| https.AgentOptions \| HttpAgentFactory` | Agent options with `keepAlive: true` | Custom Node.js HTTP or HTTPS agent options, or a factory function that receives the request protocol and returns an agent. |
+| `userAgent` | `string` | The exporter's default user agent | Prefix to add to the exporter's default `User-Agent` header in Node.js. |
+
+Programmatic options take precedence over environment variables. Per-signal environment variables take precedence over non-signal variables.
+
+| Option | General environment variable | Signal-specific environment variables |
+| ------ | ---------------------------- | ------------------------------------- |
+| `url` | `OTEL_EXPORTER_OTLP_ENDPOINT` | `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`, `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT`, `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT` |
+| `headers` | `OTEL_EXPORTER_OTLP_HEADERS` | `OTEL_EXPORTER_OTLP_TRACES_HEADERS`, `OTEL_EXPORTER_OTLP_METRICS_HEADERS`, `OTEL_EXPORTER_OTLP_LOGS_HEADERS` |
+| `timeoutMillis` | `OTEL_EXPORTER_OTLP_TIMEOUT` | `OTEL_EXPORTER_OTLP_TRACES_TIMEOUT`, `OTEL_EXPORTER_OTLP_METRICS_TIMEOUT`, `OTEL_EXPORTER_OTLP_LOGS_TIMEOUT` |
+| `compression` | `OTEL_EXPORTER_OTLP_COMPRESSION` | `OTEL_EXPORTER_OTLP_TRACES_COMPRESSION`, `OTEL_EXPORTER_OTLP_METRICS_COMPRESSION`, `OTEL_EXPORTER_OTLP_LOGS_COMPRESSION` |
+| `concurrencyLimit` | Not supported | Not supported |
+| `keepAlive` | Not supported | Not supported |
+| `httpAgentOptions` | `OTEL_EXPORTER_OTLP_CERTIFICATE`, `OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE`, `OTEL_EXPORTER_OTLP_CLIENT_KEY` | `OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE`, `OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE`, `OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY`, `OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE`, `OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE`, `OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY`, `OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE`, `OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE`, `OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY` |
+| `userAgent` | Not supported | Not supported |
+
 ## GRPC
 
 For GRPC please check [npm-url-grpc]

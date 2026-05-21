@@ -13,6 +13,11 @@ This module provides a logs-exporter for OTLP (http/protobuf) using protocol ver
 npm install --save @opentelemetry/exporter-logs-otlp-proto
 ```
 
+## Shared HTTP exporter options
+
+This exporter uses the shared HTTP options documented in [`@opentelemetry/otlp-exporter-base`][otlp-exporter-base-config].
+That includes `url`, `headers`, `timeoutMillis`, `concurrencyLimit`, and Node.js options such as `compression`, `keepAlive`, `httpAgentOptions`, and `userAgent`.
+
 ## Further Documentation
 
 To see documentation and sample code for the traces exporter, as well as instructions for using TLS, see the [exporter-trace-otlp-proto package][trace-exporter-url].
@@ -104,6 +109,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-logs-otlp-proto
+[otlp-exporter-base-config]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-exporter-base#http-exporter-configuration
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-logs-otlp-proto.svg
 [trace-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/exporter-trace-otlp-proto
 [metrics-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-proto
