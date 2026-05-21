@@ -1,8 +1,12 @@
 name: Survey on Merged PR by Non-Member
 
 on:
+  # Using 'pull_request_target' for permission to `gh pr comment`.
+  # https://docs.zizmor.sh/audits/#dangerous-triggers
+  # zizmor: ignore[dangerous-triggers]
   pull_request_target:
     types: [closed]
+    branches: [main]
 
 permissions:
   contents: read
@@ -28,19 +32,19 @@ jobs:
           USERNAME="${GITHUB_EVENT_PULL_REQUEST_USER_LOGIN}"
           USER_TYPE="${GITHUB_EVENT_PULL_REQUEST_USER_TYPE}"
           ORG="${{ github.repository_owner }}"
-          
+
           # Skip if user is a bot
           if [[ "$USER_TYPE" == "Bot" ]]; then
             echo "Skipping survey for bot user: $USERNAME"
             exit 0
           fi
-          
+
           # Skip if user is an org member
           if gh api "orgs/$ORG/members/$USERNAME" --silent; then
             echo "Skipping survey for org member: $USERNAME"
             exit 0
           fi
-          
+
           # Add survey comment for external contributor
           echo "Adding survey comment for external contributor: $USERNAME"
           gh pr comment ${PR_NUM} --repo ${{ github.repository }} --body "Thank you for your contribution @${USERNAME}! 🎉 We would like to hear from you about your experience contributing to OpenTelemetry by taking a few minutes to fill out this [survey](${SURVEY_URL})."
