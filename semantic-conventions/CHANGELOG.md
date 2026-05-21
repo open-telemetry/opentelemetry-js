@@ -15,6 +15,159 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :house: Internal
 
+## 1.41.1
+
+### :rocket: Features
+
+Note: Semantic Conventions v1.41.0 included [an issue](https://github.com/open-telemetry/semantic-conventions/issues/3705) that prevented publishing a "1.41.0" version of this package.
+
+* feat: update semantic conventions to v1.41.1 [#6695](https://github.com/open-telemetry/opentelemetry-js/pull/6695) @trentm
+  * Semantic Conventions v1.41.1: [changelog v1.41.0](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1410) | [changelog v1.41.1](https://github.com/open-telemetry/semantic-conventions/blob/release/v1.41.x/CHANGELOG.md#v1411) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *8 added exports*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *2 exported values changed, 4 newly deprecated exports, 80 added exports*
+
+#### Stable changes in v1.41.1
+
+<details open>
+<summary>8 added exports</summary>
+
+```js
+ATTR_DEPLOYMENT_ENVIRONMENT_NAME              // deployment.environment.name
+  DEPLOYMENT_ENVIRONMENT_NAME_VALUE_DEVELOPMENT // "development"
+  DEPLOYMENT_ENVIRONMENT_NAME_VALUE_PRODUCTION  // "production"
+  DEPLOYMENT_ENVIRONMENT_NAME_VALUE_STAGING     // "staging"
+  DEPLOYMENT_ENVIRONMENT_NAME_VALUE_TEST        // "test"
+
+ATTR_OTEL_EVENT_NAME                          // otel.event.name
+
+ATTR_TELEMETRY_DISTRO_NAME                    // telemetry.distro.name
+ATTR_TELEMETRY_DISTRO_VERSION                 // telemetry.distro.version
+```
+
+</details>
+
+#### Unstable changes in v1.41.1
+
+<details>
+<summary>2 exported values changed</summary>
+
+```js
+METRIC_K8S_CONTAINER_CPU_LIMIT_UTILIZATION   // k8s.container.cpu.limit_utilization -> k8s.container.cpu.limit.utilization
+METRIC_K8S_CONTAINER_CPU_REQUEST_UTILIZATION // k8s.container.cpu.request_utilization -> k8s.container.cpu.request.utilization
+```
+
+</details>
+
+<details>
+<summary>4 newly deprecated exports</summary>
+
+```js
+METRIC_K8S_CONTAINER_CPU_LIMIT      // k8s.container.cpu.limit: Replaced by `k8s.container.cpu.limit.desired`.
+METRIC_K8S_CONTAINER_CPU_REQUEST    // k8s.container.cpu.request: Replaced by `k8s.container.cpu.request.desired`.
+METRIC_K8S_CONTAINER_MEMORY_LIMIT   // k8s.container.memory.limit: Replaced by `k8s.container.memory.limit.desired`.
+METRIC_K8S_CONTAINER_MEMORY_REQUEST // k8s.container.memory.request: Replaced by `k8s.container.memory.request.desired`.
+```
+
+</details>
+
+<details>
+<summary>80 added exports</summary>
+
+```js
+METRIC_GEN_AI_CLIENT_OPERATION_TIME_PER_OUTPUT_CHUNK // gen_ai.client.operation.time_per_output_chunk
+METRIC_GEN_AI_CLIENT_OPERATION_TIME_TO_FIRST_CHUNK   // gen_ai.client.operation.time_to_first_chunk
+
+METRIC_GO_CPU_TIME                                   // go.cpu.time
+METRIC_GO_MEMORY_GC_CYCLES                           // go.memory.gc.cycles
+METRIC_GO_MEMORY_GC_PAUSE_DURATION                   // go.memory.gc.pause.duration
+
+METRIC_K8S_CONTAINER_CPU_LIMIT_CURRENT               // k8s.container.cpu.limit.current
+METRIC_K8S_CONTAINER_CPU_LIMIT_DESIRED               // k8s.container.cpu.limit.desired
+METRIC_K8S_CONTAINER_CPU_REQUEST_CURRENT             // k8s.container.cpu.request.current
+METRIC_K8S_CONTAINER_CPU_REQUEST_DESIRED             // k8s.container.cpu.request.desired
+METRIC_K8S_CONTAINER_MEMORY_LIMIT_CURRENT            // k8s.container.memory.limit.current
+METRIC_K8S_CONTAINER_MEMORY_LIMIT_DESIRED            // k8s.container.memory.limit.desired
+METRIC_K8S_CONTAINER_MEMORY_REQUEST_CURRENT          // k8s.container.memory.request.current
+METRIC_K8S_CONTAINER_MEMORY_REQUEST_DESIRED          // k8s.container.memory.request.desired
+METRIC_K8S_NODE_SYSTEM_CONTAINER_CPU_TIME            // k8s.node.system_container.cpu.time
+METRIC_K8S_NODE_SYSTEM_CONTAINER_CPU_USAGE           // k8s.node.system_container.cpu.usage
+METRIC_K8S_NODE_SYSTEM_CONTAINER_MEMORY_USAGE        // k8s.node.system_container.memory.usage
+METRIC_K8S_NODE_SYSTEM_CONTAINER_MEMORY_WORKING_SET  // k8s.node.system_container.memory.working_set
+METRIC_K8S_PERSISTENTVOLUME_STATUS_PHASE             // k8s.persistentvolume.status.phase
+METRIC_K8S_PERSISTENTVOLUME_STORAGE_CAPACITY         // k8s.persistentvolume.storage.capacity
+METRIC_K8S_PERSISTENTVOLUMECLAIM_STATUS_PHASE        // k8s.persistentvolumeclaim.status.phase
+METRIC_K8S_PERSISTENTVOLUMECLAIM_STORAGE_CAPACITY    // k8s.persistentvolumeclaim.storage.capacity
+METRIC_K8S_PERSISTENTVOLUMECLAIM_STORAGE_REQUEST     // k8s.persistentvolumeclaim.storage.request
+
+METRIC_SYSTEM_MEMORY_LINUX_HUGEPAGES_LIMIT           // system.memory.linux.hugepages.limit
+METRIC_SYSTEM_MEMORY_LINUX_HUGEPAGES_PAGE_SIZE       // system.memory.linux.hugepages.page_size
+METRIC_SYSTEM_MEMORY_LINUX_HUGEPAGES_RESERVED        // system.memory.linux.hugepages.reserved
+METRIC_SYSTEM_MEMORY_LINUX_HUGEPAGES_SURPLUS         // system.memory.linux.hugepages.surplus
+METRIC_SYSTEM_MEMORY_LINUX_HUGEPAGES_USAGE           // system.memory.linux.hugepages.usage
+METRIC_SYSTEM_MEMORY_LINUX_HUGEPAGES_UTILIZATION     // system.memory.linux.hugepages.utilization
+
+METRIC_V8JS_RESOURCE_ACTIVE                          // v8js.resource.active
+
+EVENT_FAAS_INVOCATION_EXCEPTION                      // faas.invocation.exception
+EVENT_GEN_AI_CLIENT_OPERATION_EXCEPTION              // gen_ai.client.operation.exception
+EVENT_MESSAGING_CREATE_EXCEPTION                     // messaging.create.exception
+EVENT_MESSAGING_PROCESS_EXCEPTION                    // messaging.process.exception
+EVENT_MESSAGING_RECEIVE_EXCEPTION                    // messaging.receive.exception
+EVENT_MESSAGING_SEND_EXCEPTION                       // messaging.send.exception
+EVENT_MESSAGING_SETTLE_EXCEPTION                     // messaging.settle.exception
+
+GEN_AI_OPERATION_NAME_VALUE_INVOKE_WORKFLOW          // "invoke_workflow"
+ATTR_GEN_AI_REQUEST_STREAM                           // gen_ai.request.stream
+ATTR_GEN_AI_RESPONSE_TIME_TO_FIRST_CHUNK             // gen_ai.response.time_to_first_chunk
+ATTR_GEN_AI_USAGE_REASONING_OUTPUT_TOKENS            // gen_ai.usage.reasoning.output_tokens
+ATTR_GEN_AI_WORKFLOW_NAME                            // gen_ai.workflow.name
+
+ATTR_GO_CPU_DETAILED_STATE                           // go.cpu.detailed_state
+ATTR_GO_CPU_STATE                                    // go.cpu.state
+  GO_CPU_STATE_VALUE_GC                                // "gc"
+  GO_CPU_STATE_VALUE_IDLE                              // "idle"
+  GO_CPU_STATE_VALUE_SCAVENGE                          // "scavenge"
+  GO_CPU_STATE_VALUE_USER                              // "user"
+ATTR_GO_MEMORY_DETAILED_TYPE                         // go.memory.detailed_type
+
+ATTR_K8S_NODE_SYSTEM_CONTAINER_NAME                  // k8s.node.system_container.name
+ATTR_K8S_PERSISTENTVOLUME_ANNOTATION                 // (key) => `k8s.persistentvolume.annotation.${key}`
+ATTR_K8S_PERSISTENTVOLUME_LABEL                      // (key) => `k8s.persistentvolume.label.${key}`
+ATTR_K8S_PERSISTENTVOLUME_NAME                       // k8s.persistentvolume.name
+ATTR_K8S_PERSISTENTVOLUME_RECLAIM_POLICY             // k8s.persistentvolume.reclaim_policy
+  K8S_PERSISTENTVOLUME_RECLAIM_POLICY_VALUE_DELETE     // "Delete"
+  K8S_PERSISTENTVOLUME_RECLAIM_POLICY_VALUE_RECYCLE    // "Recycle"
+  K8S_PERSISTENTVOLUME_RECLAIM_POLICY_VALUE_RETAIN     // "Retain"
+ATTR_K8S_PERSISTENTVOLUME_STATUS_PHASE               // k8s.persistentvolume.status.phase
+  K8S_PERSISTENTVOLUME_STATUS_PHASE_VALUE_AVAILABLE    // "Available"
+  K8S_PERSISTENTVOLUME_STATUS_PHASE_VALUE_BOUND        // "Bound"
+  K8S_PERSISTENTVOLUME_STATUS_PHASE_VALUE_FAILED       // "Failed"
+  K8S_PERSISTENTVOLUME_STATUS_PHASE_VALUE_PENDING      // "Pending"
+  K8S_PERSISTENTVOLUME_STATUS_PHASE_VALUE_RELEASED     // "Released"
+ATTR_K8S_PERSISTENTVOLUME_UID                        // k8s.persistentvolume.uid
+ATTR_K8S_PERSISTENTVOLUMECLAIM_ANNOTATION            // (key) => `k8s.persistentvolumeclaim.annotation.${key}`
+ATTR_K8S_PERSISTENTVOLUMECLAIM_LABEL                 // (key) => `k8s.persistentvolumeclaim.label.${key}`
+ATTR_K8S_PERSISTENTVOLUMECLAIM_NAME                  // k8s.persistentvolumeclaim.name
+ATTR_K8S_PERSISTENTVOLUMECLAIM_STATUS_PHASE          // k8s.persistentvolumeclaim.status.phase
+  K8S_PERSISTENTVOLUMECLAIM_STATUS_PHASE_VALUE_BOUND   // "Bound"
+  K8S_PERSISTENTVOLUMECLAIM_STATUS_PHASE_VALUE_LOST    // "Lost"
+  K8S_PERSISTENTVOLUMECLAIM_STATUS_PHASE_VALUE_PENDING // "Pending"
+ATTR_K8S_PERSISTENTVOLUMECLAIM_UID                   // k8s.persistentvolumeclaim.uid
+
+ATTR_SYSTEM_MEMORY_LINUX_HUGEPAGES_STATE             // system.memory.linux.hugepages.state
+  SYSTEM_MEMORY_LINUX_HUGEPAGES_STATE_VALUE_FREE       // "free"
+  SYSTEM_MEMORY_LINUX_HUGEPAGES_STATE_VALUE_USED       // "used"
+
+ATTR_V8JS_RESOURCE_TYPE                              // v8js.resource.type
+  V8JS_RESOURCE_TYPE_VALUE_IMMEDIATE                   // "Immediate"
+  V8JS_RESOURCE_TYPE_VALUE_TCPSERVERWRAP               // "TCPServerWrap"
+  V8JS_RESOURCE_TYPE_VALUE_TCPWRAP                     // "TCPWrap"
+  V8JS_RESOURCE_TYPE_VALUE_TIMEOUT                     // "Timeout"
+  V8JS_RESOURCE_TYPE_VALUE_TTYWRAP                     // "TTYWrap"
+```
+
+</details>
+
 ## 1.40.0
 
 ### :rocket: Features

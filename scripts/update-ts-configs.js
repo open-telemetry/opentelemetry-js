@@ -27,6 +27,7 @@ const {
 const packageJsonDependencyFields = ['dependencies', 'peerDependencies', 'devDependencies'];
 const tsConfigMergeKeys = [
   'compilerOptions',
+  'exclude',
   'include',
   'files',
 ];

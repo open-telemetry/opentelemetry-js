@@ -9,6 +9,8 @@ import type { Resource } from '@opentelemetry/resources';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import {
+  writeInstrumentationScope,
+  writeResource,
   writeAnyValue,
   writeAttributes,
   writeHrTimeAsFixed64,
@@ -106,20 +108,7 @@ function serializeScopeLogs(
   const scopeLogsStartPos = writer.pos;
 
   // scope (field 1, InstrumentationScope)
-  writer.writeTag(1, 2);
-  const scopeStart = writer.startLengthDelimited();
-  const scopeStartPos = writer.pos;
-
-  // Write InstrumentationScope fields directly
-  writer.writeTag(1, 2);
-  writer.writeString(scope.name);
-
-  if (scope.version) {
-    writer.writeTag(2, 2);
-    writer.writeString(scope.version);
-  }
-
-  writer.finishLengthDelimited(scopeStart, writer.pos - scopeStartPos);
+  writeInstrumentationScope(writer, scope, 1);
 
   // log_records (field 2, repeated LogRecord)
   for (const logRecord of logRecords) {
@@ -136,27 +125,6 @@ function serializeScopeLogs(
   writer.finishLengthDelimited(scopeLogsStart, writer.pos - scopeLogsStartPos);
 }
 
-function serializeResource(
-  writer: IProtobufWriter,
-  resource: Resource,
-  fieldNumber: number
-) {
-  writer.writeTag(fieldNumber, 2);
-  const resourceStart = writer.startLengthDelimited();
-  const resourceStartPos = writer.pos;
-
-  // Write Resource attributes directly
-  if (resource.attributes) {
-    writeAttributes(writer, resource.attributes, 1);
-  }
-
-  // dropped_attributes_count (field 2, uint32) - set to 0 as we don't track this
-  writer.writeTag(2, 0);
-  writer.writeVarint(0);
-
-  writer.finishLengthDelimited(resourceStart, writer.pos - resourceStartPos);
-}
-
 /**
  * Serialize ResourceLogs directly from SDK Resource type
  */
@@ -169,7 +137,7 @@ function serializeResourceLogs(
   const resourceLogsStartPos = writer.pos;
 
   // resource (field 1, Resource)
-  serializeResource(writer, resource, 1);
+  writeResource(writer, resource, 1);
 
   // scope_logs (field 2, repeated ScopeLogs)
   for (const scopeLogs of scopeMap.values()) {
