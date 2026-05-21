@@ -8,6 +8,7 @@ import type { DetectedResource } from '@opentelemetry/resources';
 import { ATTR_USER_AGENT_ORIGINAL } from '@opentelemetry/semantic-conventions';
 import {
   ATTR_BROWSER_BRANDS,
+  ATTR_BROWSER_DOCUMENT_URL_FULL,
   ATTR_BROWSER_LANGUAGE,
   ATTR_BROWSER_MOBILE,
   ATTR_BROWSER_PLATFORM,
@@ -73,6 +74,10 @@ export const assertResource = (
       validations.user_agent
     );
   }
+  assert.strictEqual(
+    resource.attributes?.[ATTR_BROWSER_DOCUMENT_URL_FULL],
+    location.href
+  );
 };
 
 /**

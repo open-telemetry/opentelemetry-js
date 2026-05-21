@@ -50,3 +50,13 @@ export const ATTR_BROWSER_MOBILE = 'browser.mobile' as const;
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ATTR_BROWSER_PLATFORM = 'browser.platform' as const;
+
+/**
+ * Absolute URL of the current browser document according to [RFC3986](https://www.rfc-editor.org/rfc/rfc3986)
+ *
+ * @example https://www.example.com/search?q=OpenTelemetry#SemConv
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_BROWSER_DOCUMENT_URL_FULL =
+  'browser.document.url.full' as const;
