@@ -18,7 +18,6 @@ import {
   ATTR_BROWSER_PLATFORM,
   ATTR_BROWSER_BRANDS,
   ATTR_BROWSER_MOBILE,
-  ATTR_BROWSER_DOCUMENT_URL_FULL,
 } from './semconv';
 
 /**
@@ -72,10 +71,10 @@ function getBrowserAttributes(): Attributes {
       b => `${b.brand} ${b.version}`
     );
     browserAttribs[ATTR_BROWSER_MOBILE] = userAgentData.mobile;
+  } else {
+    browserAttribs[ATTR_USER_AGENT_ORIGINAL] = navigator.userAgent;
   }
-  browserAttribs[ATTR_USER_AGENT_ORIGINAL] = navigator.userAgent;
   browserAttribs[ATTR_BROWSER_LANGUAGE] = navigator.language;
-  browserAttribs[ATTR_BROWSER_DOCUMENT_URL_FULL] = location.href;
   return browserAttribs;
 }
 
