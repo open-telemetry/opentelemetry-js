@@ -25,7 +25,7 @@ export default {
       {
         test: /\.(?:js|mjs|cjs)$/,
         // Include OpenTelemetry ES2022 packages for transpilation
-        exclude: /node_modules\/(?!@opentelemetry)/,
+        exclude: /node_modules\/(?!@opentelemetry|import-in-the-middle)/,
         use: {
           loader: 'babel-loader',
           options: {

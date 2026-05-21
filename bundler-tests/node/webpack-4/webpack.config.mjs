@@ -23,7 +23,7 @@ export default {
     rules: [
       {
         test: /\.(?:js|mjs|cjs)$/,
-        exclude: /node_modules\/(?!@opentelemetry)/,
+        exclude: /node_modules\/(?!@opentelemetry|import-in-the-middle)/,
         use: {
           loader: 'babel-loader',
           options: {
