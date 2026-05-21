@@ -54,6 +54,7 @@ export type PeriodicExportingMetricReaderOptions = {
   /**
    * The maximum batch size for exports. If configured, the reader will split
    * batches larger than this size into smaller batches.
+   * @experimental
    */
   maxExportBatchSize?: number;
 };
