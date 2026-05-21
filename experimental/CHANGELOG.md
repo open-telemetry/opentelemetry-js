@@ -24,6 +24,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :books: Documentation
 
+* docs(otlp-exporter-base): index the package's public API in generated docs so types like `OTLPExporterNodeConfigBase` resolve and link from consumer exporter pages [#6725](https://github.com/open-telemetry/opentelemetry-js/issues/6725) @devareddy05
+
 ### :house: Internal
 
 * refactor(configuration): remove redundant env var parsing in EnvironmentConfigFactory [#6710](https://github.com/open-telemetry/opentelemetry-js/pull/6710) @MikeGoldsmith
