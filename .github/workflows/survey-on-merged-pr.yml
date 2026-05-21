@@ -27,7 +27,7 @@ jobs:
           app-id: ${{ vars.OTELBOT_APP_ID }}
           private-key: ${{ secrets.OTELBOT_PRIVATE_KEY }}
           repositories: ${{ github.repository }}
-          permission-issues: write
+          permission-pull-requests: write
 
       - name: Add survey comment if author is not a member or bot
         run: |
