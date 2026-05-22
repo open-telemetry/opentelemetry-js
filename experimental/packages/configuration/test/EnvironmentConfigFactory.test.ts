@@ -185,8 +185,7 @@ describe('EnvironmentConfigFactory', function () {
     const expectedConfig: ConfigurationModel = {
       ...defaultConfig,
       resource: {
-        attributes_list:
-          'service.namespace=my-namespace,service.version=1.0.0',
+        attributes_list: 'service.namespace=my-namespace,service.version=1.0.0',
         attributes: [
           {
             name: 'service.namespace',
@@ -225,8 +224,7 @@ describe('EnvironmentConfigFactory', function () {
 
   it('OTEL_SERVICE_NAME takes precedence over service name value in OTEL_RESOURCE_ATTRIBUTES', function () {
     process.env.OTEL_SERVICE_NAME = 'name-from-service-name';
-    process.env.OTEL_RESOURCE_ATTRIBUTES =
-      'service.name=name-from-attributes';
+    process.env.OTEL_RESOURCE_ATTRIBUTES = 'service.name=name-from-attributes';
     const expectedConfig: ConfigurationModel = {
       ...defaultConfig,
       resource: {
@@ -246,8 +244,7 @@ describe('EnvironmentConfigFactory', function () {
 
   it('should configure service name via OTEL_SERVICE_NAME env var', function () {
     process.env.OTEL_SERVICE_NAME = 'name-from-service-name';
-    process.env.OTEL_RESOURCE_ATTRIBUTES =
-      'service.instance.id=my-instance-id';
+    process.env.OTEL_RESOURCE_ATTRIBUTES = 'service.instance.id=my-instance-id';
     const expectedConfig: ConfigurationModel = {
       ...defaultConfig,
       resource: {
@@ -557,10 +554,8 @@ describe('EnvironmentConfigFactory', function () {
     process.env.OTEL_BSP_MAX_EXPORT_BATCH_SIZE = '1000';
     process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT =
       'http://test.com:4318/v1/traces';
-    process.env.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE =
-      'certificate_file.txt';
-    process.env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY =
-      'certificate_key_value';
+    process.env.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE = 'certificate_file.txt';
+    process.env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY = 'certificate_key_value';
     process.env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE =
       'client_certificate_file.txt';
     process.env.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = 'gzip';
@@ -758,10 +753,8 @@ describe('EnvironmentConfigFactory', function () {
     process.env.OTEL_METRICS_EXPORTER = 'otlp';
     process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT =
       'http://test.com:4318/v1/metrics';
-    process.env.OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE =
-      'certificate_file.txt';
-    process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY =
-      'certificate_key_value';
+    process.env.OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE = 'certificate_file.txt';
+    process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY = 'certificate_key_value';
     process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE =
       'client_certificate_file.txt';
     process.env.OTEL_EXPORTER_OTLP_METRICS_COMPRESSION = 'gzip';
@@ -1313,8 +1306,7 @@ describe('EnvironmentConfigFactory', function () {
   });
 
   it('should use backup options for exporters', function () {
-    process.env.OTEL_EXPORTER_OTLP_CERTIFICATE =
-      'backup_certificate_file.pem';
+    process.env.OTEL_EXPORTER_OTLP_CERTIFICATE = 'backup_certificate_file.pem';
     process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY = 'backup_client_key.pem';
     process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE =
       'backup_client_certificate.pem';

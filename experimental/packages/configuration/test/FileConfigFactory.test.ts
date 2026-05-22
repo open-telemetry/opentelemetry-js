@@ -783,8 +783,7 @@ describe('FileConfigFactory', function () {
   });
 
   it('should parse composite sampler with rule_based rules from config file', function () {
-    process.env.OTEL_CONFIG_FILE =
-      'test/fixtures/composite-sampler-array.yaml';
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/composite-sampler-array.yaml';
     const configFactory = createConfigFactory();
     const config = configFactory.getConfigModel();
     assert.deepStrictEqual(config.tracer_provider?.sampler, {
@@ -837,8 +836,7 @@ describe('FileConfigFactory', function () {
   });
 
   it('should show multiple validation errors for invalid config', function () {
-    process.env.OTEL_CONFIG_FILE =
-      'test/fixtures/invalid-multiple-errors.yaml';
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid-multiple-errors.yaml';
     assert.throws(
       () => createConfigFactory(),
       /Invalid OpenTelemetry config file: .*?:.*must be string.*must be number/s
@@ -1159,8 +1157,7 @@ describe('FileConfigFactory', function () {
     // responsible for interpreting undefined type as string. This matches the Java/Python
     // pattern where the model faithfully mirrors the config file and semantic defaults
     // are applied at the point of use.
-    process.env.OTEL_CONFIG_FILE =
-      'test/fixtures/attribute-type-omitted.yaml';
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/attribute-type-omitted.yaml';
     const config = parseConfigFile();
     const attrs = (config as Record<string, unknown>).resource as {
       attributes: { name: string; value: string; type?: string }[];
