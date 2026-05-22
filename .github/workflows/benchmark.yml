@@ -29,6 +29,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
 
       # Avoid "detected dubious ownership in repository" error when running
       # `npm run submodule`.
@@ -55,7 +57,7 @@ jobs:
           find . -name .benchmark-results.txt -exec cat {} + > combined_benchmarks.txt
 
       - name: Store benchmark results
-        uses: benchmark-action/github-action-benchmark@v1
+        uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba # v1
         with:
           tool: 'benchmarkjs'
           output-file-path: combined_benchmarks.txt

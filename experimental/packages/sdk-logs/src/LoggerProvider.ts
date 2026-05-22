@@ -8,7 +8,7 @@ import type {
   LoggerOptions as ILoggerOptions,
   Logger as ILogger,
 } from '@opentelemetry/api-logs';
-import { NOOP_LOGGER } from '@opentelemetry/api-logs';
+import { createNoopLogger } from '@opentelemetry/api-logs';
 import { defaultResource } from '@opentelemetry/resources';
 import { BindOnceFuture } from '@opentelemetry/core';
 
@@ -60,7 +60,7 @@ export class LoggerProvider implements ILoggerProvider {
   ): ILogger {
     if (this._shutdownOnce.isCalled) {
       diag.warn('A shutdown LoggerProvider cannot provide a Logger');
-      return NOOP_LOGGER;
+      return createNoopLogger();
     }
 
     if (!name) {

@@ -52,8 +52,8 @@
     "access": "public"
   },
   "devDependencies": {
-    "@babel/core": "7.27.1",
-    "@babel/preset-env": "7.27.2",
+    "@babel/core": "7.29.0",
+    "@babel/preset-env": "7.29.5",
     "@opentelemetry/api": ">=1.0.0 <1.10.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
@@ -75,7 +75,7 @@
     "typescript": "5.0.4",
     "webpack": "5.104.1",
     "webpack-cli": "7.0.2",
-    "zone.js": "0.16.1"
+    "zone.js": "0.16.2"
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0",
