@@ -121,24 +121,24 @@ describe('substituteEnvVars', function () {
       inputYaml: 'key: "${BOOL_VALUE}"',
       outputObj: { key: 'true' },
     },
-    // // key: "${INT_VALUE}"	key: "1"	tag:yaml.org,2002:str	Double quoted to force coercion to string "1"
-    // {
-    //   env: specExampleEnv,
-    //   inputYaml: 'key: "${INT_VALUE}"',
-    //   outputObj: { key: '1' },
-    // },
-    // // key: "${FLOAT_VALUE}"	key: "1.1"	tag:yaml.org,2002:str	Double quoted to force coercion to string "1.1"
-    // {
-    //   env: specExampleEnv,
-    //   inputYaml: 'key: "${FLOAT_VALUE}"',
-    //   outputObj: { key: '1.1' },
-    // },
-    // // key: "${HEX_VALUE}"	key: "0xdeadbeef"	tag:yaml.org,2002:str	Double quoted to force coercion to string "0xdeadbeef"
-    // {
-    //   env: specExampleEnv,
-    //   inputYaml: 'key: "${HEX_VALUE}"',
-    //   outputObj: { key: '0xdeadbeef' },
-    // },
+    // key: "${INT_VALUE}"	key: "1"	tag:yaml.org,2002:str	Double quoted to force coercion to string "1"
+    {
+      env: specExampleEnv,
+      inputYaml: 'key: "${INT_VALUE}"',
+      outputObj: { key: '1' },
+    },
+    // key: "${FLOAT_VALUE}"	key: "1.1"	tag:yaml.org,2002:str	Double quoted to force coercion to string "1.1"
+    {
+      env: specExampleEnv,
+      inputYaml: 'key: "${FLOAT_VALUE}"',
+      outputObj: { key: '1.1' },
+    },
+    // key: "${HEX_VALUE}"	key: "0xdeadbeef"	tag:yaml.org,2002:str	Double quoted to force coercion to string "0xdeadbeef"
+    {
+      env: specExampleEnv,
+      inputYaml: 'key: "${HEX_VALUE}"',
+      outputObj: { key: '0xdeadbeef' },
+    },
     // key: ${env:STRING_VALUE}	key: value	tag:yaml.org,2002:str	Alternative env: syntax
     {
       env: specExampleEnv,
