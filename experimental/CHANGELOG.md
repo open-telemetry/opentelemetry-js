@@ -20,6 +20,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(sdk-node): warn and ignore zero exporter timeout in declarative config [#6711](https://github.com/open-telemetry/opentelemetry-js/pull/6711) @MikeGoldsmith
 * fix(sdk-node): pass gRPC credentials and headers to span exporter in declarative config [#6705](https://github.com/open-telemetry/opentelemetry-js/pull/6705) @MikeGoldsmith
 * fix(otlp-transformer): do not attempt to skip groups [#6704](https://github.com/open-telemetry/opentelemetry-js/pull/6704) @pichlermarc
+* fix(browser-detector): use the right semantic convention for user agent resource attribute [#6729](https://github.com/open-telemetry/opentelemetry-js/pull/6729) @david-luna
 * fix(opentelemetry-exporter-prometheus): handle additional edge cases in metric name conversion [#6727](https://github.com/open-telemetry/opentelemetry-js/pull/6727) @cjihrig
 
 ### :books: Documentation
