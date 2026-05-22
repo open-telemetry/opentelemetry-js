@@ -71,9 +71,8 @@ function getBrowserAttributes(): Attributes {
       b => `${b.brand} ${b.version}`
     );
     browserAttribs[ATTR_BROWSER_MOBILE] = userAgentData.mobile;
-  } else {
-    browserAttribs[ATTR_USER_AGENT_ORIGINAL] = navigator.userAgent;
   }
+  browserAttribs[ATTR_USER_AGENT_ORIGINAL] = navigator.userAgent;
   browserAttribs[ATTR_BROWSER_LANGUAGE] = navigator.language;
   return browserAttribs;
 }
