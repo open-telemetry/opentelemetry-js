@@ -46,6 +46,7 @@ describeBrowser('browserDetector()', () => {
       brands: ['Chromium 106', 'Google Chrome 106', 'Not;A=Brand 99'],
       mobile: false,
       language: 'en-US',
+      user_agent: 'dddd',
     });
   });
 

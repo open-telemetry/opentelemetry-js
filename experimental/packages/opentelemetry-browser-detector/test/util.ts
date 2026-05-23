@@ -4,8 +4,14 @@
  */
 import type { Suite } from 'mocha';
 import * as assert from 'assert';
-import { BROWSER_ATTRIBUTES } from '../src/types';
 import type { DetectedResource } from '@opentelemetry/resources';
+import { ATTR_USER_AGENT_ORIGINAL } from '@opentelemetry/semantic-conventions';
+import {
+  ATTR_BROWSER_BRANDS,
+  ATTR_BROWSER_LANGUAGE,
+  ATTR_BROWSER_MOBILE,
+  ATTR_BROWSER_PLATFORM,
+} from '../src/semconv';
 
 const isBrowser =
   typeof window !== 'undefined' && typeof document !== 'undefined';
@@ -38,32 +44,32 @@ export const assertResource = (
 ) => {
   if (validations.platform) {
     assert.strictEqual(
-      resource.attributes?.[BROWSER_ATTRIBUTES.PLATFORM],
+      resource.attributes?.[ATTR_BROWSER_PLATFORM],
       validations.platform
     );
   }
   if (validations.brands) {
-    assert.ok(Array.isArray(resource.attributes?.[BROWSER_ATTRIBUTES.BRANDS]));
+    assert.ok(Array.isArray(resource.attributes?.[ATTR_BROWSER_BRANDS]));
     assert.deepStrictEqual(
-      resource.attributes?.[BROWSER_ATTRIBUTES.BRANDS] as string[],
+      resource.attributes?.[ATTR_BROWSER_BRANDS] as string[],
       validations.brands
     );
   }
   if (validations.mobile) {
     assert.strictEqual(
-      resource.attributes?.[BROWSER_ATTRIBUTES.MOBILE],
+      resource.attributes?.[ATTR_BROWSER_MOBILE],
       validations.mobile
     );
   }
   if (validations.language) {
     assert.strictEqual(
-      resource.attributes?.[BROWSER_ATTRIBUTES.LANGUAGE],
+      resource.attributes?.[ATTR_BROWSER_LANGUAGE],
       validations.language
     );
   }
   if (validations.user_agent) {
     assert.strictEqual(
-      resource.attributes?.[BROWSER_ATTRIBUTES.USER_AGENT],
+      resource.attributes?.[ATTR_USER_AGENT_ORIGINAL],
       validations.user_agent
     );
   }
