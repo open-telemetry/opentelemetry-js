@@ -10,12 +10,19 @@ import {
   AggregationType,
   MetricReader,
 } from '@opentelemetry/sdk-metrics';
+import type { AggregationSelector } from '@opentelemetry/sdk-metrics';
 import type { IncomingMessage, Server, ServerResponse } from 'http';
 import { createServer } from 'http';
 import type { ExporterConfig } from './export/types';
 import { PrometheusSerializer } from './PrometheusSerializer';
 /** Node.js v8.x compat */
 import { URL } from 'url';
+
+const DEFAULT_AGGREGATION_SELECTOR: AggregationSelector = _instrumentType => {
+  return {
+    type: AggregationType.DEFAULT,
+  };
+};
 
 export class PrometheusExporter extends MetricReader {
   static readonly DEFAULT_OPTIONS = {
@@ -53,11 +60,8 @@ export class PrometheusExporter extends MetricReader {
     callback: (error: Error | void) => void = () => {}
   ) {
     super({
-      aggregationSelector: _instrumentType => {
-        return {
-          type: AggregationType.DEFAULT,
-        };
-      },
+      aggregationSelector:
+        config.defaultAggregation ?? DEFAULT_AGGREGATION_SELECTOR,
       aggregationTemporalitySelector: _instrumentType =>
         AggregationTemporality.CUMULATIVE,
       metricProducers: config.metricProducers,

@@ -4,7 +4,12 @@
  */
 
 import type { Counter, Meter, ObservableResult } from '@opentelemetry/api';
-import { MeterProvider } from '@opentelemetry/sdk-metrics';
+import {
+  AggregationType,
+  InstrumentType,
+  MeterProvider,
+} from '@opentelemetry/sdk-metrics';
+import type { AggregationOption } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as http from 'http';
@@ -78,6 +83,35 @@ describe('PrometheusExporter', () => {
     it('should not start the server if preventServerStart is passed as an option', () => {
       const exporter = new PrometheusExporter({ preventServerStart: true });
       assert.ok(exporter['_server'].listening === false);
+    });
+
+    it('should use default aggregation when no defaultAggregation is configured', () => {
+      const exporter = new PrometheusExporter({ preventServerStart: true });
+
+      assert.deepStrictEqual(
+        exporter.selectAggregation(InstrumentType.COUNTER),
+        {
+          type: AggregationType.DEFAULT,
+        }
+      );
+    });
+
+    it('should use configured defaultAggregation', () => {
+      const aggregation: AggregationOption = {
+        type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+        options: {
+          boundaries: [0, 100, 100000],
+        },
+      };
+      const exporter = new PrometheusExporter({
+        defaultAggregation: _instrumentType => aggregation,
+        preventServerStart: true,
+      });
+
+      assert.strictEqual(
+        exporter.selectAggregation(InstrumentType.HISTOGRAM),
+        aggregation
+      );
     });
   });
 

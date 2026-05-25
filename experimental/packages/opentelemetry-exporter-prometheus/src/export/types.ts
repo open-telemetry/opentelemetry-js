@@ -3,12 +3,21 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { MetricProducer } from '@opentelemetry/sdk-metrics';
+import type {
+  AggregationSelector,
+  MetricProducer,
+} from '@opentelemetry/sdk-metrics';
 
 /**
  * Configuration interface for prometheus exporter
  */
 export interface ExporterConfig {
+  /**
+   * Default aggregation to use as a function of instrument kind.
+   * @default AggregationType.DEFAULT
+   */
+  defaultAggregation?: AggregationSelector;
+
   /**
    * App prefix for metrics, if needed
    *
