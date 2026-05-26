@@ -19,13 +19,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
 
       - name: Check for CHANGELOG changes
         run: |
           # Only the latest commit of the feature branch is available
           # automatically. To diff with the base branch, we need to
           # fetch that too (and we only need its latest commit).
-          git fetch origin ${{ github.base_ref }} --depth=1
+          git fetch origin ${GITHUB_BASE_REF} --depth=1
           if [[ $(git diff --name-only FETCH_HEAD | grep CHANGELOG) ]]
           then
             echo "A CHANGELOG was modified. Looks good!"
