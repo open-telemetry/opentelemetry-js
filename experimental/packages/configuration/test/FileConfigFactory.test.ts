@@ -98,7 +98,6 @@ const configFromFile = {
               default_histogram_aggregation: 'explicit_bucket_histogram',
             },
           },
-          cardinality_limits: { default: 2000 },
         },
       },
     ],
@@ -397,8 +396,6 @@ const configFromKitchenSinkFile = {
       },
       {
         periodic: {
-          interval: 60000,
-          timeout: 30000,
           exporter: {
             otlp_grpc: {
               endpoint: 'http://localhost:4317',
@@ -417,13 +414,10 @@ const configFromKitchenSinkFile = {
                 'base2_exponential_bucket_histogram',
             },
           },
-          cardinality_limits: { default: 2000 },
         },
       },
       {
         periodic: {
-          interval: 60000,
-          timeout: 30000,
           exporter: {
             'otlp_file/development': {
               output_stream: 'file:///var/log/metrics.jsonl',
@@ -432,13 +426,10 @@ const configFromKitchenSinkFile = {
                 'base2_exponential_bucket_histogram',
             },
           },
-          cardinality_limits: { default: 2000 },
         },
       },
       {
         periodic: {
-          interval: 60000,
-          timeout: 30000,
           exporter: {
             'otlp_file/development': {
               output_stream: 'stdout',
@@ -447,13 +438,10 @@ const configFromKitchenSinkFile = {
                 'base2_exponential_bucket_histogram',
             },
           },
-          cardinality_limits: { default: 2000 },
         },
       },
       {
         periodic: {
-          interval: 60000,
-          timeout: 30000,
           exporter: {
             console: {
               temporality_preference: 'delta',
@@ -461,7 +449,6 @@ const configFromKitchenSinkFile = {
                 'base2_exponential_bucket_histogram',
             },
           },
-          cardinality_limits: { default: 2000 },
         },
       },
     ],
@@ -660,7 +647,6 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
               headers_list: null,
             },
           },
-          cardinality_limits: { default: 2000 },
         },
       },
     ],
@@ -982,7 +968,6 @@ describe('FileConfigFactory', function () {
                   headers_list: 'metric-header',
                 },
               },
-              cardinality_limits: { default: 2000 },
             },
           },
         ],
