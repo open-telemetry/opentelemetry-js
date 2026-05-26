@@ -168,35 +168,38 @@ export class PeriodicExportingMetricReader extends MetricReader {
       return;
     }
 
-    const { resourceMetrics, errors } = await this.collect({
-      timeoutMillis: this._exportTimeout,
-    });
+    const currentRun = async () => {
+      const { resourceMetrics, errors } = await this.collect({
+        timeoutMillis: this._exportTimeout,
+      });
 
-    if (errors.length > 0) {
-      api.diag.error(
-        'PeriodicExportingMetricReader: metrics collection errors',
-        ...errors
-      );
-    }
-
-    if (resourceMetrics.resource.asyncAttributesPending) {
-      try {
-        await resourceMetrics.resource.waitForAsyncAttributes?.();
-      } catch (e) {
-        api.diag.debug('Error while resolving async portion of resource: ', e);
-        globalErrorHandler(e);
+      if (errors.length > 0) {
+        api.diag.error(
+          'PeriodicExportingMetricReader: metrics collection errors',
+          ...errors
+        );
       }
-    }
 
-    if (resourceMetrics.scopeMetrics.length === 0) {
-      return;
-    }
+      if (resourceMetrics.resource.asyncAttributesPending) {
+        try {
+          await resourceMetrics.resource.waitForAsyncAttributes?.();
+        } catch (e) {
+          api.diag.debug(
+            'Error while resolving async portion of resource: ',
+            e
+          );
+          globalErrorHandler(e);
+        }
+      }
 
-    const batches = this._maxExportBatchSize
-      ? splitMetricData(resourceMetrics, this._maxExportBatchSize)
-      : [resourceMetrics];
+      if (resourceMetrics.scopeMetrics.length === 0) {
+        return;
+      }
 
-    const currentExport = async () => {
+      const batches = this._maxExportBatchSize
+        ? splitMetricData(resourceMetrics, this._maxExportBatchSize)
+        : [resourceMetrics];
+
       let anyErr: Error | null = null;
       for (const batch of batches) {
         try {
@@ -213,7 +216,6 @@ export class PeriodicExportingMetricReader extends MetricReader {
           }
         } catch (e) {
           if (e instanceof TimeoutError) {
-            // We do not report TimeoutError to the globalErrorHandler in _runOnce().
             api.diag.error(
               `PeriodicExportingMetricReader: metrics export timed out after ${this._exportTimeout}ms`
             );
@@ -232,7 +234,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
       }
     };
 
-    this._ongoingExportPromise = currentExport();
+    this._ongoingExportPromise = currentRun();
     try {
       await this._ongoingExportPromise;
     } finally {
