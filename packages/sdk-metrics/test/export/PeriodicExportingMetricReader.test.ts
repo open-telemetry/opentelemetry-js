@@ -557,6 +557,41 @@ describe('PeriodicExportingMetricReader', () => {
       await firstFlush;
       await reader.shutdown();
     });
+
+    it('should not initiate collect when a previous collect is ongoing', async () => {
+      const exporter = new TestMetricExporter();
+      const reader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: MAX_32_BIT_INT,
+        exportTimeoutMillis: 80,
+      });
+
+      reader.setMetricProducer(
+        new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+      );
+
+      // Stub collect to be slow
+      const collectStub = sinon.stub(reader, 'collect').callsFake(async () => {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        return { resourceMetrics, errors: [] };
+      });
+
+      // Trigger first export (which calls collect)
+      const firstFlush = reader.forceFlush();
+
+      // Wait a bit to ensure the first call has entered `collect`
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Trigger second export
+      await reader.forceFlush();
+
+      // The second forceFlush should have skipped collection because the first is still ongoing
+      assert.strictEqual(collectStub.callCount, 1);
+
+      // Wait for the first export to complete to clean up
+      await firstFlush;
+      await reader.shutdown();
+    });
   });
 
   describe('forceFlush', () => {
