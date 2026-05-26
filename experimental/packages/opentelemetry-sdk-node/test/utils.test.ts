@@ -9,7 +9,6 @@ import {
   getPropagatorFromConfiguration,
   getLoggerProviderConfigFromEnv,
   getBatchLogRecordProcessorConfigFromEnv,
-  getPeriodicMetricReaderFromConfiguration,
   getInstrumentType,
   getAggregationType,
   getResourceDetectorsFromConfiguration,
@@ -17,6 +16,7 @@ import {
   getMeterViewsFromConfiguration,
   getSpanLimitsFromConfiguration,
   getHttpAgentOptionsFromTls,
+  resolvePushMetricExporter,
 } from '../src/utils';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -36,6 +36,8 @@ import {
 import type { LoggerProviderOptions } from '@opentelemetry/sdk-logs';
 import { AggregationType, InstrumentType } from '@opentelemetry/sdk-metrics';
 import type { SpanLimits } from '@opentelemetry/sdk-trace-node';
+import { getBuiltinComponentProviders } from '../src/builtin-providers';
+import { ComponentProviderRegistry } from '../src/component-provider';
 
 describe('getPropagatorFromEnv', function () {
   afterEach(() => {
@@ -423,13 +425,17 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
   });
 
   it('should return warning message for invalid compression type for meter provider', function () {
+    const registry = new ComponentProviderRegistry(
+      getBuiltinComponentProviders()
+    );
     const warnStub = sinon.stub(diag, 'warn');
-    getPeriodicMetricReaderFromConfiguration({
-      exporter: { otlp_http: { encoding: 'invalid' } },
-    } as any);
+    resolvePushMetricExporter(
+      { otlp_http: { encoding: 'invalid' } } as any,
+      registry
+    );
     sinon.assert.calledWithExactly(
       warnStub,
-      'Unsupported OTLP metrics encoding: invalid.'
+      'Unsupported OTLP metrics encoding: invalid. Using http/protobuf.'
     );
   });
 

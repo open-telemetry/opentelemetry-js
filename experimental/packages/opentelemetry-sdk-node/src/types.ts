@@ -45,6 +45,7 @@ export interface NodeSDKConfiguration {
   spanLimits: SpanLimits;
   idGenerator: IdGenerator;
 }
+
 /**
  * @experimental Options for new experimental SDK setup
  */

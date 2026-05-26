@@ -18,5 +18,11 @@ export type {
   HttpTls as HttpTlsConfigModel,
   GrpcTls as GrpcTlsConfigModel,
   SeverityNumber as SeverityNumberConfigModel,
+  OtlpHttpExporter as OtlpHttpExporterConfigModel,
+  OtlpGrpcExporter as OtlpGrpcExporterConfigModel,
+  OtlpHttpMetricExporter as OtlpHttpMetricExporterConfigModel,
+  OtlpGrpcMetricExporter as OtlpGrpcMetricExporterConfigModel,
+  ConsoleExporter as ConsoleExporterConfigModel,
+  ConsoleMetricExporter as ConsoleMetricExporterConfigModel,
 } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';

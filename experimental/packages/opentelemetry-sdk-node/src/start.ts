@@ -17,14 +17,14 @@ import {
 } from '@opentelemetry/api';
 import {
   getInstanceID,
-  getLogRecordProcessorsFromConfiguration,
-  getMeterReadersFromConfiguration,
+  resolveLogRecordProcessorsFromConfiguration,
+  resolveMeterReadersFromConfiguration,
   getMeterViewsFromConfiguration,
   getPropagatorFromConfiguration,
   getResourceDetectorsFromConfiguration,
   getResourceFromConfiguration,
   getSpanLimitsFromConfiguration,
-  getSpanProcessorsFromConfiguration,
+  resolveSpanProcessorsFromConfiguration,
 } from './utils';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import type { SDKComponents, SDKOptions } from './types';
@@ -45,6 +45,9 @@ import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-ho
 import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
 import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
 import { diagLogLevelFromSeverityNumberConfig } from './diag';
+import type { ComponentProviderMap } from './component-provider';
+import { ComponentProviderRegistry } from './component-provider';
+import { getBuiltinComponentProviders } from './builtin-providers';
 
 // Exported for testing.
 export const NOOP_SDK = {
@@ -83,7 +86,13 @@ export function startNodeSDK(sdkOptions?: SDKOptions): {
     instrumentations: sdkOptions?.instrumentations?.flat() ?? [],
   });
 
-  const components = create(config, sdkOptions);
+  const components = create(config, {
+    ...sdkOptions,
+    // note: it is intentional that users cannot provide these yet so that we can move quickly without breaking users,
+    // we may want to start modeling everything (resource detectors, instrumentations, etc.) as component providers in the future
+    // instead of the sdkOptions provided to this function. If we do that, then these can be removed from the SDKOptions type.
+    componentProviders: getBuiltinComponentProviders(),
+  });
   context.setGlobalContextManager(components.contextManager);
   if (components.loggerProvider) {
     logs.setGlobalLoggerProvider(components.loggerProvider);
@@ -119,25 +128,31 @@ export function startNodeSDK(sdkOptions?: SDKOptions): {
  */
 function create(
   config: ConfigurationModel,
-  sdkOptions?: SDKOptions
+  options?: SDKOptions & {
+    componentProviders: ComponentProviderMap;
+  }
 ): SDKComponents {
+  const registry = new ComponentProviderRegistry(options?.componentProviders ?? {});
+
   const defaultContextManager = new AsyncLocalStorageContextManager();
   defaultContextManager.enable();
   const components: SDKComponents = {
     contextManager: defaultContextManager,
   };
-  const resource = setupResource(config, sdkOptions);
+  const resource = setupResource(config, options);
 
   const propagator =
-    sdkOptions?.textMapPropagator === null
+    options?.textMapPropagator === null
       ? null
-      : (sdkOptions?.textMapPropagator ??
-        getPropagatorFromConfiguration(config));
+      : (options?.textMapPropagator ?? getPropagatorFromConfiguration(config));
   if (propagator) {
     components.propagator = propagator;
   }
 
-  const logProcessors = getLogRecordProcessorsFromConfiguration(config);
+  const logProcessors = resolveLogRecordProcessorsFromConfiguration(
+    config,
+    registry
+  );
   if (logProcessors) {
     const loggerProvider = new LoggerProvider({
       resource: resource,
@@ -146,7 +161,7 @@ function create(
     components.loggerProvider = loggerProvider;
   }
 
-  const meterReaders = getMeterReadersFromConfiguration(config);
+  const meterReaders = resolveMeterReadersFromConfiguration(config, registry);
   if (meterReaders) {
     const meterViews = getMeterViewsFromConfiguration(config);
     const meterProvider = new MeterProvider({
@@ -157,7 +172,10 @@ function create(
     components.meterProvider = meterProvider;
   }
 
-  const spanProcessors = getSpanProcessorsFromConfiguration(config);
+  const spanProcessors = resolveSpanProcessorsFromConfiguration(
+    config,
+    registry
+  );
   if (spanProcessors) {
     const spanLimits = getSpanLimitsFromConfiguration(config);
     // TODO (6506): support sampler configuration from config
