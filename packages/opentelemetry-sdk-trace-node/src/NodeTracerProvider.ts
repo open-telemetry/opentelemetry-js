@@ -61,8 +61,7 @@ function setupPropagator(propagator: TextMapPropagator | null | undefined) {
  * Undefined values may be replaced with defaults, and
  * null values will be skipped.
  *
- * @deprecated this class and package will be removed in next major (3.0) and replaced by
- * the `TracerProvider` class of the future `@opentelemetry/sdk-trace` package.
+ * @deprecated Use `BasicTracerProvider` from the `@opentelemetry/sdk-trace-base` package. (In the next major (3.0) these will be replaced by a `TracerProvider` class from a `@opentelemetry/sdk-trace` package.
  *
  * @param config Configuration object for SDK registration
  */
