@@ -238,10 +238,6 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
-          schedule_delay: 5000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
           exporter: {
             otlp_grpc: {
               endpoint: 'http://localhost:4317',
@@ -261,10 +257,6 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
-          schedule_delay: 5000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
           exporter: {
             'otlp_file/development': {
               output_stream: 'file:///var/log/traces.jsonl',
@@ -274,10 +266,6 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
-          schedule_delay: 5000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
           exporter: { 'otlp_file/development': { output_stream: 'stdout' } },
         },
       },
@@ -533,10 +521,6 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
-          schedule_delay: 5000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
           exporter: {
             otlp_grpc: {
               endpoint: 'http://localhost:4317',
@@ -556,10 +540,6 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
-          schedule_delay: 5000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
           exporter: {
             'otlp_file/development': {
               output_stream: 'file:///var/log/logs.jsonl',
@@ -569,10 +549,6 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
-          schedule_delay: 5000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
           exporter: { 'otlp_file/development': { output_stream: 'stdout' } },
         },
       },

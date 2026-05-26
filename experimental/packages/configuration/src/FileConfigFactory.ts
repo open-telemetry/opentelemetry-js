@@ -9,8 +9,6 @@ import * as fs from 'fs';
 import * as yaml from 'yaml';
 import { envVariableSubstitution } from './utils';
 import type {
-  BatchLogRecordProcessor,
-  BatchSpanProcessor,
   CardinalityLimits,
   ConfigurationModel,
   PeriodicMetricReader,
@@ -75,7 +73,6 @@ export function parseConfigFile(): ConfigurationModel {
 
   mergeAttributesList(data);
   mergeCompositeList(data);
-  applyBatchProcessorDefaults(data);
   applyPeriodicReaderDefaults(data);
 
   return data;
@@ -136,28 +133,6 @@ function mergeCompositeList(data: ConfigurationModel): void {
         [trimmed]: {},
       });
     }
-  }
-}
-
-/**
- * Apply spec-defined defaults for batch span/log-record processor fields that
- * are not encoded in the JSON schema.
- */
-function applyBatchProcessorDefaults(data: ConfigurationModel): void {
-  const applyDefaults = (
-    batch: BatchSpanProcessor | BatchLogRecordProcessor
-  ) => {
-    if (batch.schedule_delay == null) batch.schedule_delay = 5000;
-    if (batch.export_timeout == null) batch.export_timeout = 30000;
-    if (batch.max_queue_size == null) batch.max_queue_size = 2048;
-    if (batch.max_export_batch_size == null) batch.max_export_batch_size = 512;
-  };
-
-  for (const processor of data.tracer_provider?.processors ?? []) {
-    if (processor.batch) applyDefaults(processor.batch);
-  }
-  for (const processor of data.logger_provider?.processors ?? []) {
-    if (processor.batch) applyDefaults(processor.batch);
   }
 }
 
