@@ -77,38 +77,8 @@ export function parseConfigFile(): ConfigurationModel {
   mergeCompositeList(data);
   applyBatchProcessorDefaults(data);
   applyPeriodicReaderDefaults(data);
-  applyOtlpHttpEncodingDefaults(data);
 
   return data;
-}
-
-/**
- * Apply default encoding ('protobuf') to all otlp_http exporters in the config
- * where encoding was not explicitly specified. The spec defines protobuf as the
- * default encoding for OTLP HTTP exporters.
- */
-function applyOtlpHttpEncodingDefaults(data: ConfigurationModel): void {
-  const applyEncoding = (
-    exporter: { encoding?: string | null } | null | undefined
-  ) => {
-    if (exporter && exporter.encoding == null) {
-      exporter.encoding = 'protobuf';
-    }
-  };
-
-  for (const processor of data.tracer_provider?.processors ?? []) {
-    applyEncoding(processor.batch?.exporter?.otlp_http);
-    applyEncoding(processor.simple?.exporter?.otlp_http);
-  }
-
-  for (const reader of data.meter_provider?.readers ?? []) {
-    applyEncoding(reader.periodic?.exporter?.otlp_http);
-  }
-
-  for (const processor of data.logger_provider?.processors ?? []) {
-    applyEncoding(processor.batch?.exporter?.otlp_http);
-    applyEncoding(processor.simple?.exporter?.otlp_http);
-  }
 }
 
 /**
