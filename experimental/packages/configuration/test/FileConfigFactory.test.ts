@@ -860,10 +860,6 @@ describe('FileConfigFactory', function () {
     const configFactory = createConfigFactory();
     const expectedConfig: ConfigurationModel = {
       disabled: false,
-      log_level: 'info',
-      attribute_limits: {
-        attribute_count_limit: 128,
-      },
       resource: {
         attributes_list: 'service.instance.id=123',
         attributes: [
@@ -1082,10 +1078,6 @@ describe('FileConfigFactory', function () {
     const configFactory = createConfigFactory();
     const expectedConfig: ConfigurationModel = {
       disabled: false,
-      log_level: 'info',
-      attribute_limits: {
-        attribute_count_limit: 128,
-      },
       resource: {
         schema_url: 'https://opentelemetry.io/schemas/1.16.0',
         attributes_list:
@@ -1175,11 +1167,6 @@ describe('FileConfigFactory', function () {
 
     const config = parseConfigFile();
     assert.deepStrictEqual(config, {
-      disabled: false,
-      log_level: 'info',
-      attribute_limits: {
-        attribute_count_limit: 128,
-      },
       resource: {
         attributes_list: null,
       },

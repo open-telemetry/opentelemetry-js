@@ -161,6 +161,9 @@ function create(
   if (spanProcessors) {
     const spanLimits = getSpanLimitsFromConfiguration(config);
     // TODO (6506): support sampler configuration from config
+    // XXX before decl conf can drop `config.attribute_limits?.attribute_count_limit`
+    //    default from `applyConfigDefaults`, we need to use `TracerProvider` from https://github.com/open-telemetry/opentelemetry-js/pull/6640
+    //    otherwise with an empty value BasicTracerProvider will use envvars.
     const tracerProvider = new BasicTracerProvider({
       resource,
       spanProcessors,

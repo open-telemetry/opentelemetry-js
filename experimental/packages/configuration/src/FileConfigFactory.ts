@@ -73,7 +73,6 @@ export function parseConfigFile(): ConfigurationModel {
   // Strip file_format from output — it's a meta-field, not a config value
   delete (data as Record<string, unknown>)['file_format'];
 
-  applyConfigDefaults(data);
   mergeAttributesList(data);
   mergeCompositeList(data);
   applyBatchProcessorDefaults(data);
@@ -204,25 +203,6 @@ function applyPeriodicReaderDefaults(data: ConfigurationModel): void {
     if (periodic.cardinality_limits == null) {
       periodic.cardinality_limits = { default: 2000 } as CardinalityLimits;
     }
-  }
-}
-
-/**
- * Apply spec-defined defaults that are not encoded in the JSON schema.
- * Both FileConfigFactory and EnvironmentConfigFactory apply the same defaults
- * so consumers see consistent behaviour regardless of config source.
- */
-function applyConfigDefaults(data: ConfigurationModel): void {
-  if (data.disabled == null) {
-    data.disabled = false;
-  }
-  if (data.log_level == null) {
-    data.log_level = 'info';
-  }
-  if (data.attribute_limits == null) {
-    data.attribute_limits = { attribute_count_limit: 128 };
-  } else if (data.attribute_limits.attribute_count_limit == null) {
-    data.attribute_limits.attribute_count_limit = 128;
   }
 }
 
