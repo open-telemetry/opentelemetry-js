@@ -27,6 +27,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * refactor(configuration): remove redundant env var parsing in EnvironmentConfigFactory [#6710](https://github.com/open-telemetry/opentelemetry-js/pull/6710) @MikeGoldsmith
 * refactor(sdk-node): replace usage of `NodeTracerProvider` for `BasicTracerProvider` in SDK start [#6640](https://github.com/open-telemetry/opentelemetry-js/pull/6640) @david-luna
+  * Deprecates `NodeTracerProvider` from the `@opentelemetry/sdk-trace-node` package, in favor of using `BasicTracerProvider` directly and manually reproducing `NodeTracerProvider#register()` if necessary.
 
 ## 0.218.0
 
