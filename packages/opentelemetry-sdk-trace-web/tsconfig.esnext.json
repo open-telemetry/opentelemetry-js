@@ -6,15 +6,10 @@
       "dom",
       "dom.iterable"
     ],
+    "types": ["node", "mocha", "webpack-env", "jquery"],
     "outDir": "build/esnext",
     "rootDir": "src",
-    "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo",
-    "types": [
-      "node",
-      "mocha",
-      "webpack-env",
-      "jquery"
-    ]
+    "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo"
   },
   "include": [
     "src/**/*.ts"
