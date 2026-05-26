@@ -59,6 +59,8 @@ export default tseslint.config(
       // tsd-style negative type-check fixtures, intentionally outside tsconfig.
       'experimental/packages/configuration/test/fixtures/types/**',
       'experimental/packages/otlp-transformer/src/generated/**',
+      // protobuf-ts generated test fixtures (buf generate output, gitignored).
+      'experimental/packages/opentelemetry-instrumentation-grpc/test/proto/**',
       // protobuf-generated example sources.
       'examples/grpc-js/helloworld_pb.js',
       'examples/grpc-js/helloworld_grpc_pb.js',
@@ -179,7 +181,10 @@ export default tseslint.config(
 
   // Examples: pure JS, no license header check (matches legacy ./examples/.eslintrc.js).
   {
-    files: ['examples/**/*.{js,mjs,cjs}', 'experimental/examples/**/*.{js,mjs,cjs}'],
+    files: [
+      'examples/**/*.{js,mjs,cjs}',
+      'experimental/examples/**/*.{js,mjs,cjs}',
+    ],
     languageOptions: {
       sourceType: 'commonjs',
       globals: {
@@ -235,7 +240,9 @@ export default tseslint.config(
 
   // shim-opencensus carries an upstream OpenCensus header for one file.
   {
-    files: ['experimental/packages/shim-opencensus/src/OpenCensusMetricProducer.ts'],
+    files: [
+      'experimental/packages/shim-opencensus/src/OpenCensusMetricProducer.ts',
+    ],
     rules: {
       'yet-another-license-header/header': 'off',
     },
