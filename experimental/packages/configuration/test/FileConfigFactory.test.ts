@@ -3,11 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import * as util from 'util';
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
 import type { ConfigurationModel } from '../src';
 import { createConfigFactory } from '../src/ConfigFactory';
-import { parseConfigFile } from '../src/FileConfigFactory';
+import {
+  mergeResourceAttributesConfig,
+  parseConfigFile,
+} from '../src/FileConfigFactory';
+import type { AttributeNameValue } from '../src/generated/types';
 
 const defaultConfig: ConfigurationModel = {
   disabled: false,
@@ -174,8 +179,6 @@ const configFromKitchenSinkFile = {
       { name: 'bool_array_key', value: [true, false], type: 'bool_array' },
       { name: 'int_array_key', value: [1, 2], type: 'int_array' },
       { name: 'double_array_key', value: [1.1, 2.2], type: 'double_array' },
-      { name: 'service.namespace', value: 'my-namespace', type: 'string' },
-      { name: 'service.version', value: '1.0.0', type: 'string' },
     ],
     'detection/development': {
       attributes: {
@@ -818,9 +821,6 @@ describe('FileConfigFactory', function () {
       disabled: false,
       resource: {
         attributes_list: 'service.instance.id=123',
-        attributes: [
-          { name: 'service.instance.id', value: '123', type: 'string' },
-        ],
       },
     };
     assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
@@ -894,11 +894,6 @@ describe('FileConfigFactory', function () {
           {
             name: 'service.name',
             value: 'custom-name',
-            type: 'string',
-          },
-          {
-            name: 'att',
-            value: '1',
             type: 'string',
           },
         ],
@@ -1084,11 +1079,6 @@ describe('FileConfigFactory', function () {
             value: [1.1, 2.2],
             type: 'double_array',
           },
-          {
-            name: 'service.version',
-            value: '1.0.0',
-            type: 'string',
-          },
         ],
       },
     };
@@ -1151,4 +1141,65 @@ describe('FileConfigFactory', function () {
       },
     });
   });
+});
+
+describe('mergeResourceAttributesConfig', function () {
+  const corpus: {
+    attributes?: AttributeNameValue[];
+    attributes_list?: string | null;
+    expected: AttributeNameValue[] | undefined;
+    only?: boolean;
+  }[] = [
+    { expected: undefined },
+    {
+      attributes_list: null,
+      expected: undefined,
+    },
+    {
+      attributes: [{ name: 'spam', value: 'eggs' }],
+      expected: [{ name: 'spam', value: 'eggs' }],
+    },
+    {
+      attributes_list: 'foo=bar',
+      expected: [{ name: 'foo', value: 'bar', type: 'string' }],
+    },
+    {
+      attributes: [{ name: 'spam', value: 'eggs' }],
+      attributes_list: 'foo=bar',
+      expected: [
+        { name: 'spam', value: 'eggs' },
+        { name: 'foo', value: 'bar', type: 'string' },
+      ],
+    },
+    {
+      attributes: [{ name: 'spam', value: 'eggs' }],
+      attributes_list: 'foo=bar,spam=baz',
+      expected: [
+        { name: 'spam', value: 'eggs' },
+        { name: 'foo', value: 'bar', type: 'string' },
+      ],
+    },
+    {
+      attributes: [{ name: 'spam', value: 'eggs' }],
+      attributes_list: 'foo=42',
+      expected: [
+        { name: 'spam', value: 'eggs' },
+        { name: 'foo', value: '42', type: 'string' }, // no type coercion
+      ],
+    },
+  ];
+
+  for (const item of corpus) {
+    const testName =
+      util.inspect(item.attributes, { breakLength: Infinity, compact: 10 }) +
+      ', ' +
+      util.inspect(item.attributes_list);
+    (item.only ? it.only : it)(testName, function () {
+      const actual = mergeResourceAttributesConfig(
+        item.attributes,
+        item.attributes_list
+      );
+      assert.deepStrictEqual(actual, item.expected);
+    });
+  }
 });

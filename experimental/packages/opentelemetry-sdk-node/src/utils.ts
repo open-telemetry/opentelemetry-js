@@ -69,6 +69,7 @@ import type {
   HttpTlsConfigModel,
   GrpcTlsConfigModel,
 } from '@opentelemetry/configuration';
+import { mergeResourceAttributesConfig } from '@opentelemetry/configuration';
 import type {
   AggregationOption,
   IAttributesProcessor,
@@ -109,21 +110,28 @@ const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
 export function getResourceFromConfiguration(
   config: ConfigurationModel
 ): Resource | undefined {
-  if (config.resource && config.resource.attributes) {
-    const attrs: DetectedResourceAttributes = {};
-    for (let i = 0; i < config.resource.attributes.length; i++) {
-      const a = config.resource.attributes[i];
-      // https://github.com/open-telemetry/opentelemetry-configuration/issues/613
-      // will likely clarify that entries with a `null` value should be ignored.
-      if (a.value !== null) {
-        attrs[a.name] = a.value;
-      }
-    }
-    return resourceFromAttributes(attrs, {
-      schemaUrl: config.resource.schema_url ?? undefined,
-    });
+  if (!config.resource) {
+    return undefined;
   }
-  return undefined;
+
+  const configAttrs = mergeResourceAttributesConfig(
+    config.resource.attributes,
+    config.resource.attributes_list
+  );
+  if (!configAttrs) {
+    return undefined;
+  }
+
+  const attrs: DetectedResourceAttributes = {};
+  for (let i = 0; i < configAttrs.length; i++) {
+    const a = configAttrs[i];
+    if (a.value !== null) {
+      attrs[a.name] = a.value;
+    }
+  }
+  return resourceFromAttributes(attrs, {
+    schemaUrl: config.resource.schema_url ?? undefined,
+  });
 }
 
 export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {

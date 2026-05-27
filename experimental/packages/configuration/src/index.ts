@@ -20,3 +20,4 @@ export type {
   SeverityNumber as SeverityNumberConfigModel,
 } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';
+export { mergeResourceAttributesConfig } from './FileConfigFactory';
