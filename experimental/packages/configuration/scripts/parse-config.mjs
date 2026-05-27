@@ -12,8 +12,6 @@
  *    ./scripts/parse-config.mjs CONFIG_FILE
  */
 
-/* eslint-disable no-console */
-
 import { createConfigFactory } from '@opentelemetry/configuration';
 import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api';
 

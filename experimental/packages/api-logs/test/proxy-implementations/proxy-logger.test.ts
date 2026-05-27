@@ -67,8 +67,8 @@ describe('ProxyLogger', () => {
       ]);
     });
 
-    it('should pass LoggerOptions with scopeAttributes (LogAttributes) to delegate', () => {
-      const scopeAttributes = {
+    it('should pass LoggerOptions with attributes (LogAttributes) to delegate', () => {
+      const attributes = {
         'service.name': 'api',
         version: 1,
         nested: { key: 'value' },
@@ -76,7 +76,7 @@ describe('ProxyLogger', () => {
       };
       const options = {
         schemaUrl: 'https://opentelemetry.io/schemas/1.7.0',
-        scopeAttributes,
+        attributes,
       };
       const logger = provider.getLogger('test', 'v0', options);
 
@@ -88,8 +88,8 @@ describe('ProxyLogger', () => {
         options,
       ]);
       assert.strictEqual(
-        getLoggerStub.firstCall.args[2]?.scopeAttributes,
-        scopeAttributes
+        getLoggerStub.firstCall.args[2]?.attributes,
+        attributes
       );
     });
   });

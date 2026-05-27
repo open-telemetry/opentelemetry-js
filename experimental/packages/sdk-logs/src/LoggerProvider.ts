@@ -8,7 +8,7 @@ import type {
   LoggerOptions as ILoggerOptions,
   Logger as ILogger,
 } from '@opentelemetry/api-logs';
-import { NOOP_LOGGER } from '@opentelemetry/api-logs';
+import { createNoopLogger } from '@opentelemetry/api-logs';
 import { defaultResource } from '@opentelemetry/resources';
 import { BindOnceFuture } from '@opentelemetry/core';
 
@@ -18,6 +18,11 @@ import {
   DEFAULT_LOGGER_CONFIGURATOR,
   LoggerProviderSharedState,
 } from './internal/LoggerProviderSharedState';
+import {
+  getInstrumentationScopeKey,
+  type LogInstrumentationScope,
+} from './internal/utils';
+import { normalizeScopeAttributes } from './utils/validation';
 
 export const DEFAULT_LOGGER_NAME = 'unknown';
 
@@ -60,24 +65,30 @@ export class LoggerProvider implements ILoggerProvider {
   ): ILogger {
     if (this._shutdownOnce.isCalled) {
       diag.warn('A shutdown LoggerProvider cannot provide a Logger');
-      return NOOP_LOGGER;
+      return createNoopLogger();
     }
 
     if (!name) {
       diag.warn('Logger requested without instrumentation scope name.');
     }
     const loggerName = name || DEFAULT_LOGGER_NAME;
-    const key = `${loggerName}@${version || ''}:${options?.schemaUrl || ''}`;
+    const instrumentationScope: LogInstrumentationScope = {
+      name: loggerName,
+      version,
+      schemaUrl: options?.schemaUrl,
+      ...normalizeScopeAttributes(
+        this._sharedState.logRecordLimits,
+        options?.attributes
+      ),
+    };
+    const key = getInstrumentationScopeKey(instrumentationScope);
     if (!this._sharedState.loggers.has(key)) {
       this._sharedState.loggers.set(
         key,
-        new Logger(
-          { name: loggerName, version, schemaUrl: options?.schemaUrl },
-          this._sharedState
-        )
+        new Logger(instrumentationScope, this._sharedState)
       );
     }
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     return this._sharedState.loggers.get(key)!;
   }
 

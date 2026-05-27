@@ -6,6 +6,7 @@
       "dom",
       "dom.iterable"
     ],
+    "types": ["node", "mocha", "webpack-env", "jquery"],
     "outDir": "build",
     "rootDir": "."
   },

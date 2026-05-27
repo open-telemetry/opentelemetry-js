@@ -17,6 +17,7 @@ export type {
   MetricProducer as MetricProducerConfigModel,
   NameStringValuePair as NameStringValuePairConfigModel,
   HttpTls as HttpTlsConfigModel,
+  GrpcTls as GrpcTlsConfigModel,
   SeverityNumber as SeverityNumberConfigModel,
 } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';

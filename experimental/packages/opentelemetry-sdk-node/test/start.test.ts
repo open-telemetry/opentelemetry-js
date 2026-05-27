@@ -970,6 +970,12 @@ describe('startNodeSDK', function () {
         producers: [{ opencensus: {} }],
       });
       assert.ok(reader !== undefined);
+      const producers = (reader as any)._metricProducers;
+      assert.ok(producers.length === 1);
+      assert.strictEqual(
+        producers[0].constructor.name,
+        'OpenCensusMetricProducer'
+      );
       await (reader as PeriodicExportingMetricReader).shutdown();
     });
 
