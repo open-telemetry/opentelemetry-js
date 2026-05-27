@@ -5,7 +5,6 @@
 
 import type { Logger as ILogger, LogRecord } from '@opentelemetry/api-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
-import type { InstrumentationScope } from '@opentelemetry/core';
 import type { Context } from '@opentelemetry/api';
 import {
   context,
@@ -17,23 +16,24 @@ import {
 import { LogRecordImpl } from './LogRecordImpl';
 import type { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 import type { LoggerConfig } from './types';
+import type { LogInstrumentationScope } from './internal/utils';
 
 export class Logger implements ILogger {
-  public readonly instrumentationScope: InstrumentationScope;
-  private _sharedState: LoggerProviderSharedState;
+  private readonly _instrumentationScope: LogInstrumentationScope;
+  private readonly _sharedState: LoggerProviderSharedState;
   private readonly _loggerConfig: Required<LoggerConfig>;
 
   constructor(
-    instrumentationScope: InstrumentationScope,
+    instrumentationScope: LogInstrumentationScope,
     sharedState: LoggerProviderSharedState
   ) {
-    this.instrumentationScope = instrumentationScope;
+    this._instrumentationScope = instrumentationScope;
     this._sharedState = sharedState;
     // Cache the logger configuration at construction time
     // Since we don't support re-configuration, this avoids map lookups
     // and string allocations on each emit() call
     this._loggerConfig = this._sharedState.getLoggerConfig(
-      this.instrumentationScope
+      this._instrumentationScope
     );
   }
 
@@ -50,7 +50,7 @@ export class Logger implements ILogger {
      */
     const logRecordInstance = new LogRecordImpl(
       this._sharedState,
-      this.instrumentationScope,
+      this._instrumentationScope,
       {
         context: currentContext,
         ...logRecord,
@@ -106,7 +106,7 @@ export class Logger implements ILogger {
     // Lastly check if there is any enabled processor
     const enabledOpts = {
       context: currentContext,
-      instrumentationScope: this.instrumentationScope,
+      instrumentationScope: this._instrumentationScope,
       severityNumber: options?.severityNumber,
       eventName: options?.eventName,
     };

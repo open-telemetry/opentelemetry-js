@@ -24,8 +24,8 @@
   "scripts": {
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "lint:fix": "eslint . --ext .ts --fix",
-    "lint": "eslint . --ext .ts && npm run cycle-check",
+    "lint:fix": "eslint . --fix",
+    "lint": "eslint . && npm run cycle-check",
     "test:browser": "karma start --single-run",
     "test": "nyc mocha 'test/**/*.test.ts'",
     "test:node8-compat": "node test/backcompat/node8-compat.js",

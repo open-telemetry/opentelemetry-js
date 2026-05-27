@@ -625,7 +625,7 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
       {
         type: AggregationType.EXPONENTIAL_HISTOGRAM,
         options: {
-          recordMinMax: true,
+          recordMinMax: undefined,
           maxSize: 10,
         },
       }
