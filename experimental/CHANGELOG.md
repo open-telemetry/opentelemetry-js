@@ -10,9 +10,12 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * fix(configuration)!: stop removing `null` values from parsed config object [#6679](https://github.com/open-telemetry/opentelemetry-js/pull/6679) @trentm
   * It is now the responsibility of the user of a parsed declarative config object, typically just the `sdk-node` package, to handle `null` values.
-* fix(api-logs): Removed `NOOP_LOGGER` and `NoopLogger` exports from `@opentelemetry/api-logs`. Use `createNoopLogger(): Logger` instead. [#6713](https://github.com/open-telemetry/opentelemetry-js/pull/6713) @dyladan
+* fix(api-logs)!: Removed `NOOP_LOGGER` and `NoopLogger` exports from `@opentelemetry/api-logs`. Use `createNoopLogger(): Logger` instead. [#6713](https://github.com/open-telemetry/opentelemetry-js/pull/6713) @dyladan
+* feat(api-logs)!: rename scopeAttributes to attributes in LoggerOptions [#6573](https://github.com/open-telemetry/opentelemetry-js/pull/6573) @pichlermarc
 
 ### :rocket: Features
+
+* feat(sdk-logs)!: add support for attributes in LoggerOptions [#6573](https://github.com/open-telemetry/opentelemetry-js/pull/6573) @pichlermarc
 
 ### :bug: Bug Fixes
 
@@ -20,6 +23,10 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(sdk-node): warn and ignore zero exporter timeout in declarative config [#6711](https://github.com/open-telemetry/opentelemetry-js/pull/6711) @MikeGoldsmith
 * fix(sdk-node): pass gRPC credentials and headers to span exporter in declarative config [#6705](https://github.com/open-telemetry/opentelemetry-js/pull/6705) @MikeGoldsmith
 * fix(otlp-transformer): do not attempt to skip groups [#6704](https://github.com/open-telemetry/opentelemetry-js/pull/6704) @pichlermarc
+* fix(otlp-grpc-exporter-base): recreate client after 5 consecutive `DEADLINE_EXCEEDED` to recover from connection dropped deadlock [#6296](https://github.com/open-telemetry/opentelemetry-js/pull/6296) @afharo
+* fix(browser-detector): use the right semantic convention for user agent resource attribute [#6729](https://github.com/open-telemetry/opentelemetry-js/pull/6729) @david-luna
+* fix(browser-detector): user agent resource attribute always [#6754](https://github.com/open-telemetry/opentelemetry-js/pull/6754) @david-luna
+* fix(opentelemetry-exporter-prometheus): handle additional edge cases in metric name conversion [#6727](https://github.com/open-telemetry/opentelemetry-js/pull/6727) @cjihrig
 
 ### :books: Documentation
 
@@ -78,6 +85,9 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(instrumentation-xhr): resolve relative URLs before matching `ignoreUrls` [#6551](https://github.com/open-telemetry/opentelemetry-js/pull/6551) @Maximiliano-Zeballos
 * fix(sdk-node): fix setting of ViewOption#name from ConfigurationModel [#6620](https://github.com/open-telemetry/opentelemetry-js/pull/6620) @trentm
 * fix(web-common): add limit for timeout [#6601](https://github.com/open-telemetry/opentelemetry-js/pull/6601) @maryliag
+
+### :books: Documentation
+
 * fix(otlp-transformer): pin protobufjs@8.0.1 as protobufjs@8.0.3 is broken for browser use [#6646](https://github.com/open-telemetry/opentelemetry-js/pull/6646)
 
 ### :house: Internal

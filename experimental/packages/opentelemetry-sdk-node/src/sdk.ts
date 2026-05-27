@@ -107,7 +107,7 @@ function getMetricReadersFromEnv(): IMetricReader[] {
 
   if (enabledExporters.includes('none')) {
     diag.info(
-      `OTEL_METRICS_EXPORTER contains "none". Metric provider will not be initialized.`
+      'OTEL_METRICS_EXPORTER contains "none". Metric provider will not be initialized.'
     );
     return metricReaders;
   }
@@ -231,7 +231,6 @@ export class NodeSDK {
 
       const spanProcessor =
         configuration.spanProcessor ??
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         new BatchSpanProcessor(configuration.traceExporter!);
 
       const spanProcessors = configuration.spanProcessors ?? [spanProcessor];
@@ -404,7 +403,7 @@ export class NodeSDK {
 
     if (enabledExporters.includes('none')) {
       diag.info(
-        `OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.`
+        'OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.'
       );
       return;
     }
