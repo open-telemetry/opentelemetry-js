@@ -105,54 +105,6 @@ describe('BasicTracerProvider', () => {
       });
     });
 
-    describe('generalLimits', () => {
-      describe('when not defined default values', () => {
-        it('should have tracer with default values', () => {
-          const tracer = new BasicTracerProvider({}).getTracer(
-            'default'
-          ) as Tracer;
-          assert.deepStrictEqual(tracer.getGeneralLimits(), {
-            attributeValueLengthLimit: Infinity,
-            attributeCountLimit: 128,
-          });
-        });
-      });
-
-      describe('when "attributeCountLimit" is defined', () => {
-        it('should have tracer with defined value', () => {
-          const tracer = new BasicTracerProvider({
-            generalLimits: {
-              attributeCountLimit: 100,
-            },
-          }).getTracer('default') as Tracer;
-          const generalLimits = tracer.getGeneralLimits();
-          assert.strictEqual(generalLimits.attributeCountLimit, 100);
-        });
-      });
-
-      describe('when "attributeValueLengthLimit" is defined', () => {
-        it('should have tracer with defined value', () => {
-          const tracer = new BasicTracerProvider({
-            generalLimits: {
-              attributeValueLengthLimit: 10,
-            },
-          }).getTracer('default') as Tracer;
-          const generalLimits = tracer.getGeneralLimits();
-          assert.strictEqual(generalLimits.attributeValueLengthLimit, 10);
-        });
-
-        it('should have tracer with negative "attributeValueLengthLimit" value', () => {
-          const tracer = new BasicTracerProvider({
-            generalLimits: {
-              attributeValueLengthLimit: -10,
-            },
-          }).getTracer('default') as Tracer;
-          const generalLimits = tracer.getGeneralLimits();
-          assert.strictEqual(generalLimits.attributeValueLengthLimit, -10);
-        });
-      });
-    });
-
     describe('spanLimits', () => {
       describe('when not defined default values', () => {
         it('should have tracer with default values', () => {
@@ -210,8 +162,6 @@ describe('BasicTracerProvider', () => {
             'default'
           ) as Tracer;
           const spanLimits = tracer.getSpanLimits();
-          const generalLimits = tracer.getGeneralLimits();
-          assert.strictEqual(generalLimits.attributeValueLengthLimit, Infinity);
           assert.strictEqual(spanLimits.attributeValueLengthLimit, Infinity);
         });
       });
@@ -222,8 +172,6 @@ describe('BasicTracerProvider', () => {
             'default'
           ) as Tracer;
           const spanLimits = tracer.getSpanLimits();
-          const generalLimits = tracer.getGeneralLimits();
-          assert.strictEqual(generalLimits.attributeCountLimit, 128);
           assert.strictEqual(spanLimits.attributeCountLimit, 128);
         });
       });

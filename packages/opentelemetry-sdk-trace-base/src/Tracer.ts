@@ -7,7 +7,7 @@ import * as api from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import { sanitizeAttributes, isTracingSuppressed } from '@opentelemetry/core';
 import { SpanImpl } from './Span';
-import type { GeneralLimits, SpanLimits, TracerConfig } from './types';
+import type { SpanLimits, TracerConfig } from './types';
 import { mergeConfig } from './utility';
 import type { SpanProcessor } from './SpanProcessor';
 import type { Sampler } from './Sampler';
@@ -28,7 +28,6 @@ import {
  */
 export class Tracer implements api.Tracer {
   private readonly _sampler: Sampler;
-  private readonly _generalLimits: GeneralLimits;
   private readonly _spanLimits: SpanLimits;
   private readonly _idGenerator: IdGenerator;
   readonly instrumentationScope: InstrumentationScope;
@@ -42,13 +41,12 @@ export class Tracer implements api.Tracer {
    */
   constructor(
     instrumentationScope: InstrumentationScope,
-    config: TracerConfig,
+    config: Omit<TracerConfig, 'generalLimits'>,
     resource: Resource,
     spanProcessor: SpanProcessor
   ) {
     const localConfig = mergeConfig(config);
     this._sampler = localConfig.sampler;
-    this._generalLimits = localConfig.generalLimits;
     this._spanLimits = localConfig.spanLimits;
     this._idGenerator = config.idGenerator || new RandomIdGenerator();
     this._resource = resource;
@@ -257,11 +255,6 @@ export class Tracer implements api.Tracer {
     return api.context.with(contextWithSpanSet, fn, undefined, span);
   }
 
-  /** Returns the active {@link GeneralLimits}. */
-  getGeneralLimits(): GeneralLimits {
-    return this._generalLimits;
-  }
-
   /** Returns the active {@link SpanLimits}. */
   getSpanLimits(): SpanLimits {
     return this._spanLimits;
@@ -276,7 +269,6 @@ export class Tracer implements api.Tracer {
       instrumentationScope: this.instrumentationScope,
       resource: { attributes: settledResourceAttributes(this._resource) },
       spanLimits: this._spanLimits,
-      generalLimits: this._generalLimits,
     };
     return formatInspect('Tracer', payload, depth, options, inspect);
   }

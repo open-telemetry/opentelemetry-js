@@ -49,15 +49,10 @@ export class TracerProvider implements ApiTracerProvider {
           root: new AlwaysOnSampler(),
         }),
       forceFlushTimeoutMillis: 3000,
-      generalLimits: {
-        attributeCountLimit: config.generalLimits?.attributeCountLimit ?? 128,
-        attributeValueLengthLimit:
-          config.generalLimits?.attributeValueLengthLimit ?? Infinity,
-      },
       spanLimits: {
         // We will check and set default value later
-        attributeCountLimit: config.spanLimits?.attributeCountLimit,
-        attributeValueLengthLimit: config.spanLimits?.attributeValueLengthLimit,
+        attributeCountLimit: config.spanLimits?.attributeCountLimit ?? 128,
+        attributeValueLengthLimit: config.spanLimits?.attributeValueLengthLimit ?? Infinity,
         eventCountLimit: config.spanLimits?.eventCountLimit ?? 128,
         linkCountLimit: config.spanLimits?.linkCountLimit ?? 128,
         attributePerEventCountLimit:
@@ -73,16 +68,6 @@ export class TracerProvider implements ApiTracerProvider {
         },
       },
     };
-
-    // Ensure Span limits
-    if (!this._config.spanLimits.attributeValueLengthLimit) {
-      this._config.spanLimits.attributeValueLengthLimit =
-        config.generalLimits?.attributeValueLengthLimit ?? Infinity;
-    }
-    if (!this._config.spanLimits.attributeCountLimit) {
-      this._config.spanLimits.attributeCountLimit =
-        config.generalLimits?.attributeCountLimit ?? 128;
-    }
 
     this._resource = this._config.resource;
     this._activeSpanProcessor = new MultiSpanProcessor(
