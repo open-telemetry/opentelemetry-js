@@ -21,8 +21,8 @@
   },
   "scripts": {
     "test": "nyc mocha test/**/*.test.js",
-    "lint": "eslint . --ext .js",
-    "lint:fix": "eslint . --ext .js --fix"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
     "@opentelemetry/api": "^1.3.0",

@@ -28,7 +28,6 @@ describe('compressAndSend', function () {
 describe('sendWithHttp', function () {
   let sentUserAgent: string;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const requestFn: any = (
     url: URL,
     opts: http.RequestOptions,
