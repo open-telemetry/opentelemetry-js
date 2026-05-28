@@ -1,0 +1,87 @@
+name: Getting Started Example
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/getting-started-example.yml'
+      - 'examples/getting-started/**'
+  pull_request:
+    paths:
+      - '.github/workflows/getting-started-example.yml'
+      - 'examples/getting-started/**'
+  merge_group:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        variant:
+          - uninstrumented
+          - instrumented
+
+    env:
+      EXAMPLE_DIR: examples/getting-started/${{ matrix.variant }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: |
+          cd "$EXAMPLE_DIR"
+          npm install --package-lock=false
+
+      - name: Check syntax
+        run: |
+          cd "$EXAMPLE_DIR"
+          node --check app.js
+          node --check dice.js
+          if [ -f instrumentation.mjs ]; then
+            node --check instrumentation.mjs
+          fi
+
+      - name: Run application
+        env:
+          APPLICATION_PORT: '18080'
+          OTEL_SERVICE_NAME: dice-server
+          OTEL_EXPORTER_OTLP_ENDPOINT: http://127.0.0.1:9
+        run: |
+          set -euo pipefail
+          cd "$EXAMPLE_DIR"
+          if [ -f instrumentation.mjs ]; then
+            node --import ./instrumentation.mjs app.js > app.log 2>&1 &
+          else
+            node app.js > app.log 2>&1 &
+          fi
+          app_pid=$!
+          trap 'kill "$app_pid" 2>/dev/null || true; wait "$app_pid" 2>/dev/null || true' EXIT
+
+          ready=false
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:18080/rolldice > /dev/null; then
+              ready=true
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" != "true" ]; then
+            cat app.log
+            exit 1
+          fi
+
+      - name: Build container image
+        run: docker build "$EXAMPLE_DIR"
