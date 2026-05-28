@@ -132,7 +132,7 @@ describe('getPropagatorFromConfigFactory', function () {
 
   it('should return the selected propagator when one is in the list', () => {
     const config: ConfigurationModel = {
-      propagator: { composite: [{ tracecontext: undefined }] },
+      propagator: { composite: [{ tracecontext: null }] },
     };
     assert.deepStrictEqual(getPropagatorFromConfiguration(config)?.fields(), [
       'traceparent',
@@ -144,11 +144,11 @@ describe('getPropagatorFromConfigFactory', function () {
     const config: ConfigurationModel = {
       propagator: {
         composite: [
-          { tracecontext: undefined },
-          { baggage: undefined },
-          { b3: undefined },
-          { b3multi: undefined },
-          { jaeger: undefined },
+          { tracecontext: null },
+          { baggage: null },
+          { b3: null },
+          { b3multi: null },
+          { jaeger: null },
         ],
       },
     };
@@ -166,18 +166,14 @@ describe('getPropagatorFromConfigFactory', function () {
     ]);
   });
 
-  it('should return null and warn if propagators are unknown', () => {
+  it('should return undefined and warn if propagators are unknown', () => {
     const warnStub = sinon.stub(diag, 'warn');
     const config: ConfigurationModel = {
       propagator: {
-        composite: [
-          { my: undefined },
-          { unknown: undefined },
-          { propagators: undefined },
-        ],
+        composite: [{ my: null }, { unknown: null }, { propagators: null }],
       },
     };
-    assert.deepStrictEqual(getPropagatorFromConfiguration(config), null);
+    assert.deepStrictEqual(getPropagatorFromConfiguration(config), undefined);
     sinon.assert.calledWithExactly(
       warnStub,
       'Propagator "my" requested through configuration is unavailable.'
@@ -193,14 +189,25 @@ describe('getPropagatorFromConfigFactory', function () {
     sinon.assert.calledThrice(warnStub);
   });
 
-  it('should return null if only "none" is selected', () => {
+  it('should return undefined if only "none" is included', () => {
     const config: ConfigurationModel = {
       propagator: {
-        composite: [{ none: undefined }],
+        composite: [{ traceparent: null }, { none: null }],
       },
     };
+    assert.deepStrictEqual(getPropagatorFromConfiguration(config), undefined);
+  });
 
-    assert.deepStrictEqual(getPropagatorFromConfiguration(config), null);
+  it('should throw on invalid composite entry with two keys', () => {
+    const config: ConfigurationModel = {
+      propagator: {
+        composite: [{ traceparent: null, tracestate: null }],
+      },
+    };
+    assert.throws(
+      () => getPropagatorFromConfiguration(config),
+      /invalid "propagator" entry/
+    );
   });
 });
 

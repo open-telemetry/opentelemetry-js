@@ -18,6 +18,10 @@ export type {
   HttpTls as HttpTlsConfigModel,
   GrpcTls as GrpcTlsConfigModel,
   SeverityNumber as SeverityNumberConfigModel,
+  TextMapPropagator as TextMapPropagatorConfigModel,
 } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';
-export { mergeResourceAttributesConfig } from './FileConfigFactory';
+export {
+  mergeResourceAttributesConfig,
+  mergePropagatorCompositeConfig,
+} from './FileConfigFactory';

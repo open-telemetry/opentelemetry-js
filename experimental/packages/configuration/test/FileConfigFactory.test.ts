@@ -10,9 +10,10 @@ import type { ConfigurationModel } from '../src';
 import { createConfigFactory } from '../src/ConfigFactory';
 import {
   mergeResourceAttributesConfig,
+  mergePropagatorCompositeConfig,
   parseConfigFile,
 } from '../src/FileConfigFactory';
-import type { AttributeNameValue } from '../src/generated/types';
+import type { AttributeNameValue, TextMapPropagator } from '../src/generated/types';
 
 const defaultConfig: ConfigurationModel = {
   disabled: false,
@@ -209,7 +210,6 @@ const configFromKitchenSinkFile = {
       { b3multi: null },
       { jaeger: null },
       { ottrace: null },
-      { xray: {} },
     ],
     composite_list: 'tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray',
   },
@@ -584,7 +584,6 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
     attribute_count_limit: 128,
   },
   propagator: {
-    composite: [{ tracecontext: {} }, { baggage: {} }],
     composite_list: 'tracecontext,baggage',
   },
   tracer_provider: {
@@ -903,7 +902,6 @@ describe('FileConfigFactory', function () {
         attribute_value_length_limit: 23,
       },
       propagator: {
-        composite: [{ b3multi: {} }],
         composite_list: 'b3multi',
       },
       tracer_provider: {
@@ -1113,7 +1111,6 @@ describe('FileConfigFactory', function () {
         attributes_list: null,
       },
       propagator: {
-        composite: [{ tracecontext: {} }],
         composite_list: 'tracecontext',
       },
       logger_provider: {
@@ -1191,13 +1188,66 @@ describe('mergeResourceAttributesConfig', function () {
 
   for (const item of corpus) {
     const testName =
-      util.inspect(item.attributes, { breakLength: Infinity, compact: 10 }) +
+      util.inspect(item.attributes, { breakLength: Infinity }) +
       ', ' +
       util.inspect(item.attributes_list);
     (item.only ? it.only : it)(testName, function () {
       const actual = mergeResourceAttributesConfig(
         item.attributes,
         item.attributes_list
+      );
+      assert.deepStrictEqual(actual, item.expected);
+    });
+  }
+});
+
+describe('mergePropagatorCompositeConfig', function () {
+  const corpus: {
+    composite?: TextMapPropagator[];
+    composite_list?: string | null;
+    expected: TextMapPropagator[] | undefined;
+    only?: boolean;
+  }[] = [
+    { expected: undefined },
+    {
+      composite_list: null,
+      expected: undefined,
+    },
+    {
+      composite: [{ tracecontext: null }, { baggage: {} }],
+      expected: [{ tracecontext: null }, { baggage: {} }],
+    },
+    {
+      composite_list: 'custom',
+      expected: [{ custom: null }],
+    },
+    {
+      composite: [{ tracecontext: null }, { baggage: {} }],
+      composite_list: ' custom,baggage, b3',
+      expected: [
+        { tracecontext: null },
+        { baggage: {} },
+        { custom: null },
+        { b3: null },
+      ],
+    },
+    {
+      composite: [{ tracecontext: null }, { baggage: {} }],
+      // Duplicates from composite_list are not added.
+      composite_list: 'custom,custom,custom',
+      expected: [{ tracecontext: null }, { baggage: {} }, { custom: null }],
+    },
+  ];
+
+  for (const item of corpus) {
+    const testName =
+      util.inspect(item.composite, { breakLength: Infinity }) +
+      ', ' +
+      util.inspect(item.composite_list);
+    (item.only ? it.only : it)(testName, function () {
+      const actual = mergePropagatorCompositeConfig(
+        item.composite,
+        item.composite_list
       );
       assert.deepStrictEqual(actual, item.expected);
     });

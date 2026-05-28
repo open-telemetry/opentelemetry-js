@@ -68,8 +68,12 @@ import type {
   NameStringValuePairConfigModel,
   HttpTlsConfigModel,
   GrpcTlsConfigModel,
+  TextMapPropagatorConfigModel,
 } from '@opentelemetry/configuration';
-import { mergeResourceAttributesConfig } from '@opentelemetry/configuration';
+import {
+  mergePropagatorCompositeConfig,
+  mergeResourceAttributesConfig,
+} from '@opentelemetry/configuration';
 import type {
   AggregationOption,
   IAttributesProcessor,
@@ -100,6 +104,7 @@ import {
   SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
 import * as fs from 'fs';
+import { inspect } from 'util';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
@@ -328,17 +333,61 @@ export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
  */
 export function getPropagatorFromConfiguration(
   config: ConfigurationModel
-): TextMapPropagator | null | undefined {
-  const propagatorsValue = getKeyListFromObjectArray(
-    config.propagator?.composite
-  );
-  if (propagatorsValue == null) {
-    // return undefined to fall back to default
+): TextMapPropagator | undefined {
+  if (!config.propagator) {
     return undefined;
   }
 
-  if (propagatorsValue.includes('none')) {
-    return null;
+  const configComposite = mergePropagatorCompositeConfig(
+    config.propagator.composite,
+    config.propagator.composite_list
+  );
+  if (!configComposite) {
+    return undefined;
+  }
+
+  // TextMapPropagator config items are objects with a single key (the name).
+  // Transform this into a more convenient `(name, value)` 2-tuple.
+  //
+  // As well, guard against two cases where the TypeScript type
+  // `TextMapPropagatorConfigModel` does not exactly represent the JSON schema:
+  // 1. `"minProperties": 1, "maxProperties": 1,`
+  // 2. The type allows keys with an `undefined` value, but the JSON schema
+  //    does not.
+  const kvFromItem = (
+    item: TextMapPropagatorConfigModel
+  ): [string, object | null] => {
+    const keys = [];
+    let value = undefined;
+    for (const key of Object.keys(item)) {
+      value = item[key];
+      if (value === undefined) {
+        continue;
+      }
+      keys.push(key);
+    }
+    if (keys.length !== 1) {
+      throw new Error(
+        `invalid "propagator" entry in configuration, there must be exactly one key (with a non-undefined value): ${inspect(item)}`
+      );
+    }
+    return [keys[0], value as object | null];
+  };
+
+  // First pass: handle 'none', remove dupes.
+  const names = new Set();
+  const kvs = [];
+  for (const item of configComposite) {
+    const kv = kvFromItem(item);
+    const k = kv[0];
+    if (names.has(k)) {
+      continue;
+    }
+    names.add(k);
+    kvs.push(kv);
+    if (k === 'none') {
+      return undefined;
+    }
   }
 
   // Implementation note: this only contains specification required propagators that are actually hosted in this repo.
@@ -354,26 +403,21 @@ export function getPropagatorFromConfiguration(
     ['jaeger', () => new JaegerPropagator()],
   ]);
 
-  // Values MUST be deduplicated in order to register a Propagator only once.
-  const uniquePropagatorNames = Array.from(new Set(propagatorsValue));
   const validPropagators: TextMapPropagator[] = [];
-
-  uniquePropagatorNames.forEach(name => {
+  for (const [name] of kvs) {
     const propagator = propagatorsFactory.get(name)?.();
     if (!propagator) {
       diag.warn(
         `Propagator "${name}" requested through configuration is unavailable.`
       );
-      return;
+      continue;
     }
-
     validPropagators.push(propagator);
-  });
+  }
 
   if (validPropagators.length === 0) {
-    // null to signal that the default should **not** be used in its place.
-    return null;
-  } else if (uniquePropagatorNames.length === 1) {
+    return undefined;
+  } else if (validPropagators.length === 1) {
     return validPropagators[0];
   } else {
     return new CompositePropagator({
