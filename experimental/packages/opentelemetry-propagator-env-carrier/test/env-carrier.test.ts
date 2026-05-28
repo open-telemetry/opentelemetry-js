@@ -55,6 +55,29 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       });
     });
 
+    it('should preserve digits and underscores when normalizing keys', () => {
+      const carrier: EnvironmentCarrier = {};
+      const setter = new EnvironmentSetter();
+
+      setter.set(carrier, 'a_1-b_2', 'value');
+
+      assert.deepStrictEqual(carrier, {
+        A_1_B_2: 'value',
+      });
+    });
+
+    it('should overwrite values with the same normalized key', () => {
+      const carrier: EnvironmentCarrier = {};
+      const setter = new EnvironmentSetter();
+
+      setter.set(carrier, 'trace-state', 'first');
+      setter.set(carrier, 'TRACE_STATE', 'second');
+
+      assert.deepStrictEqual(carrier, {
+        TRACE_STATE: 'second',
+      });
+    });
+
     it('should treat values as opaque strings', () => {
       const carrier: EnvironmentCarrier = {};
       const setter = new EnvironmentSetter();
@@ -111,6 +134,29 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
         'TRACEPARENT',
         'TRACE_STATE',
       ]);
+    });
+
+    it('should return empty keys for an empty environment snapshot', () => {
+      const getter = new EnvironmentGetter();
+
+      assert.deepStrictEqual(getter.keys({}), []);
+    });
+
+    it('should return undefined when a key is missing', () => {
+      process.env.TRACEPARENT = 'traceparent-value';
+
+      const getter = new EnvironmentGetter();
+
+      assert.strictEqual(getter.get({}, 'tracestate'), undefined);
+    });
+
+    it('should list duplicate normalized environment names once', () => {
+      process.env.traceparent = 'first';
+      process.env.TRACEPARENT = 'second';
+
+      const getter = new EnvironmentGetter();
+
+      assert.deepStrictEqual(getter.keys({}), ['TRACEPARENT']);
     });
 
     it('should preserve empty string values', () => {
