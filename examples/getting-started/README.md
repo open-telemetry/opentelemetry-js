@@ -42,11 +42,25 @@ OTEL_SERVICE_NAME=dice-server OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318 
 
 To enable OpenTelemetry diagnostic logging, set `OTEL_LOG_LEVEL=debug`.
 
+### Docker
+
+```sh
+docker build -t otel-js-getting-started-uninstrumented ./uninstrumented
+docker run --rm -p 8080:8080 otel-js-getting-started-uninstrumented
+```
+
+```sh
+docker build -t otel-js-getting-started-instrumented ./instrumented
+docker run --rm -p 8080:8080 \
+  -e OTEL_SERVICE_NAME=dice-server \
+  otel-js-getting-started-instrumented
+```
+
 ### Test the endpoint
 
 ```sh
 curl http://localhost:8080/rolldice
-curl http://localhost:8080/rolldice?rolls=3
+curl "http://localhost:8080/rolldice?rolls=3"
 curl "http://localhost:8080/rolldice?rolls=2&player=Alice"
 ```
 
