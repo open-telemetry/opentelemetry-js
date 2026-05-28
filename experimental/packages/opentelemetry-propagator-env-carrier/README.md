@@ -83,6 +83,12 @@ Environment variable names used for propagation are normalized by:
 For example, `traceparent` becomes `TRACEPARENT`, `trace-state` becomes
 `TRACE_STATE`, and `1abc` becomes `_1ABC`.
 
+`EnvironmentSetter` always writes normalized key names. `EnvironmentGetter`
+normalizes both the requested propagator key and the environment variable names
+from its snapshot before matching, and its `keys()` method returns normalized
+names. For example, a propagator request for `x-b3-traceid` matches either
+`X_B3_TRACEID` or `x-b3-traceid` from `process.env`.
+
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

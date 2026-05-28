@@ -87,6 +87,7 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       process.env.MIXED_CASE = 'mixed-value';
       process.env.H_LLO = 'non-ascii-value';
       process.env._1ABC = 'leading-digit-value';
+      process.env['x-b3-traceid'] = 'b3-value';
 
       const getter = new EnvironmentGetter();
 
@@ -96,6 +97,8 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       assert.strictEqual(getter.get({}, 'MiXeD_cAsE'), 'mixed-value');
       assert.strictEqual(getter.get({}, 'h\u00e9llo'), 'non-ascii-value');
       assert.strictEqual(getter.get({}, '1abc'), 'leading-digit-value');
+      assert.strictEqual(getter.get({}, 'X_B3_TRACEID'), 'b3-value');
+      assert.strictEqual(getter.get({}, 'x-b3-traceid'), 'b3-value');
     });
 
     it('should return normalized snapshot keys', () => {
