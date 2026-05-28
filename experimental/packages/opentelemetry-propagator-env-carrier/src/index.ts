@@ -3,4 +3,4 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export { EnvironmentGetter, EnvironmentSetter } from './EnvironmentCarrier';
+export { EnvironmentGetter, EnvironmentSetter } from './env-carrier';
