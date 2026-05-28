@@ -59,29 +59,7 @@ jobs:
           APPLICATION_PORT: '18080'
           OTEL_SERVICE_NAME: dice-server
           OTEL_EXPORTER_OTLP_ENDPOINT: http://127.0.0.1:9
-        run: |
-          set -euo pipefail
-          cd "$EXAMPLE_DIR"
-          if [ -f instrumentation.mjs ]; then
-            node --import ./instrumentation.mjs app.js > app.log 2>&1 &
-          else
-            node app.js > app.log 2>&1 &
-          fi
-          app_pid=$!
-          trap 'kill "$app_pid" 2>/dev/null || true; wait "$app_pid" 2>/dev/null || true' EXIT
-
-          ready=false
-          for i in $(seq 1 30); do
-            if curl -fsS http://127.0.0.1:18080/rolldice > /dev/null; then
-              ready=true
-              break
-            fi
-            sleep 1
-          done
-          if [ "$ready" != "true" ]; then
-            cat app.log
-            exit 1
-          fi
+        run: ./examples/dice/verify.sh ${{ matrix.variant }}
 
       - name: Build container image
         run: docker build "$EXAMPLE_DIR"
