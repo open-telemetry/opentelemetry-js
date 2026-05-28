@@ -120,6 +120,21 @@ describe('time', () => {
       assert.deepStrictEqual(output, [0, 123400000]);
     });
 
+    it('should treat an epoch-ms timestamp as epoch even when it falls just below performance.timeOrigin due to clock skew', () => {
+      // Simulate the scenario reported in issue #6772: performance.timeOrigin
+      // uses a monotonic clock and can be slightly ahead of Date.now() at page
+      // load, causing a real epoch-ms value to be misclassified as a relative
+      // performance.now() reading and doubled.
+      const epochMs = 1779958953234; // a real Date.now()-style timestamp
+      // Set timeOrigin to a value slightly larger than epochMs to reproduce
+      // the clock-skew window.
+      sinon.stub(performance, 'timeOrigin').value(epochMs + 100);
+
+      const output = timeInputToHrTime(epochMs);
+      // Should decode as epoch seconds + remainder nanoseconds, NOT doubled.
+      assert.deepStrictEqual(output, [1779958953, 234000000]);
+    });
+
     it('should not convert hrtime hrTime', () => {
       sinon.stub(performance, 'timeOrigin').value(111.5);
 

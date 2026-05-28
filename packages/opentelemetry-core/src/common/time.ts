@@ -54,8 +54,23 @@ export function timeInputToHrTime(time: api.TimeInput): api.HrTime {
   if (isTimeInputHrTime(time)) {
     return time as api.HrTime;
   } else if (typeof time === 'number') {
-    // Must be a performance.now() if it's smaller than process start time.
-    if (time < performance.timeOrigin) {
+    // Distinguish between a relative performance.now() value and an absolute
+    // epoch-millisecond timestamp.
+    //
+    // performance.timeOrigin uses a monotonic clock that may be slightly ahead
+    // of Date.now() due to clock adjustments (see MDN docs). This means a
+    // real epoch-ms value (e.g. Date.now()) can land just below
+    // performance.timeOrigin, causing it to be misclassified as a relative
+    // performance.now() reading and doubled when timeOrigin is added.
+    //
+    // A genuine performance.now() value represents elapsed time since the
+    // document/process started, so it is bounded by system uptime. No real
+    // system has been running long enough for performance.now() to reach half
+    // the current epoch time (~1994 in ms terms). We therefore treat any value
+    // that is both less than performance.timeOrigin AND less than half of
+    // performance.timeOrigin as a relative performance.now() reading, and
+    // everything else as an absolute epoch-millisecond timestamp.
+    if (time < performance.timeOrigin && time < performance.timeOrigin / 2) {
       return hrTime(time);
     } else {
       // epoch milliseconds or performance.timeOrigin
