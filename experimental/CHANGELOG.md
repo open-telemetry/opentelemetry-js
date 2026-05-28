@@ -15,7 +15,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
-* feat(propagator-env-carrier): add environment variable carrier helpers for context propagation
+* feat(propagator-env-carrier): add environment variable carrier helpers for context propagation [#6774](https://github.com/open-telemetry/opentelemetry-js/pull/6774) @pellared
 * feat(sdk-logs)!: add support for attributes in LoggerOptions [#6573](https://github.com/open-telemetry/opentelemetry-js/pull/6573) @pichlermarc
 
 ### :bug: Bug Fixes
