@@ -7,18 +7,27 @@ import type { TextMapGetter, TextMapSetter } from '@opentelemetry/api';
 
 type EnvironmentCarrierMap = Record<string, string>;
 
+const ASCII_UPPER_A = 'A'.charCodeAt(0);
+const ASCII_UPPER_Z = 'Z'.charCodeAt(0);
+const ASCII_LOWER_A = 'a'.charCodeAt(0);
+const ASCII_LOWER_Z = 'z'.charCodeAt(0);
+const ASCII_DIGIT_0 = '0'.charCodeAt(0);
+const ASCII_DIGIT_9 = '9'.charCodeAt(0);
+const ASCII_UNDERSCORE = '_'.charCodeAt(0);
+const ASCII_CASE_OFFSET = ASCII_LOWER_A - ASCII_UPPER_A;
+
 function normalizeKey(key: string): string {
   let result = '';
 
   for (let i = 0; i < key.length; i++) {
     const charCode = key.charCodeAt(i);
 
-    if (charCode >= 0x61 && charCode <= 0x7a) {
-      result += String.fromCharCode(charCode - 0x20);
+    if (charCode >= ASCII_LOWER_A && charCode <= ASCII_LOWER_Z) {
+      result += String.fromCharCode(charCode - ASCII_CASE_OFFSET);
     } else if (
-      (charCode >= 0x41 && charCode <= 0x5a) ||
-      (charCode >= 0x30 && charCode <= 0x39) ||
-      charCode === 0x5f
+      (charCode >= ASCII_UPPER_A && charCode <= ASCII_UPPER_Z) ||
+      (charCode >= ASCII_DIGIT_0 && charCode <= ASCII_DIGIT_9) ||
+      charCode === ASCII_UNDERSCORE
     ) {
       result += key[i];
     } else {
@@ -27,7 +36,7 @@ function normalizeKey(key: string): string {
   }
 
   const firstCharCode = result.charCodeAt(0);
-  if (firstCharCode >= 0x30 && firstCharCode <= 0x39) {
+  if (firstCharCode >= ASCII_DIGIT_0 && firstCharCode <= ASCII_DIGIT_9) {
     return `_${result}`;
   }
 
