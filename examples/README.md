@@ -10,7 +10,7 @@ use the latest and greatest features, and best practices.
 
 | Name                                      | Description                                                                                                                      | Complexity Level |
 | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
-| [getting-started](getting-started/)       | Introductory example for instrumenting a Node.js application                                                                     | Beginner         |
+| [dice](dice/)                             | Introductory example for instrumenting a Node.js application                                                                     | Beginner         |
 | [basic-tracer-node](basic-tracer-node/)   | Basic use of Tracing in Node.js application                                                                                      | Beginner         |
 | [opentelemetry-web](opentelemetry-web/)   | Basic use of Tracing and Metrics in a Web application                                                                            | Beginner         |
 | [http](http/)                             | HTTP Instrumentation to automatically collect trace data and export them to the backend of choice                                | Intermediate     |

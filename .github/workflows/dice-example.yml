@@ -1,16 +1,16 @@
-name: Getting Started Example
+name: Dice Example
 
 on:
   push:
     branches:
       - main
     paths:
-      - '.github/workflows/getting-started-example.yml'
-      - 'examples/getting-started/**'
+      - '.github/workflows/dice-example.yml'
+      - 'examples/dice/**'
   pull_request:
     paths:
-      - '.github/workflows/getting-started-example.yml'
-      - 'examples/getting-started/**'
+      - '.github/workflows/dice-example.yml'
+      - 'examples/dice/**'
   merge_group:
 
 permissions:
@@ -28,7 +28,7 @@ jobs:
           - instrumented
 
     env:
-      EXAMPLE_DIR: examples/getting-started/${{ matrix.variant }}
+      EXAMPLE_DIR: examples/dice/${{ matrix.variant }}
 
     steps:
       - name: Checkout

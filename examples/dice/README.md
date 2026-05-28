@@ -1,9 +1,14 @@
 # Overview
 
-This example shows how to instrument a Node.js application with OpenTelemetry,
+This is the Node.js implementation of the OpenTelemetry [Getting Started][] reference application,
+extended with patterns from the [Instrumentation][] guide.
+It shows how to instrument a Node.js application with OpenTelemetry,
 adding distributed tracing, metrics, and log collection to a dice-rolling service.
 It demonstrates auto-instrumentation with existing frameworks (Express,
 HTTP, Winston) and manual instrumentation of application logic.
+
+[Getting Started]: https://opentelemetry.io/docs/languages/js/getting-started/nodejs/
+[Instrumentation]: https://opentelemetry.io/docs/languages/js/instrumentation/
 
 There are two versions:
 
@@ -45,15 +50,15 @@ To enable OpenTelemetry diagnostic logging, set `OTEL_LOG_LEVEL=debug`.
 ### Docker
 
 ```sh
-docker build -t otel-js-getting-started-uninstrumented ./uninstrumented
-docker run --rm -p 8080:8080 otel-js-getting-started-uninstrumented
+docker build -t otel-js-dice-uninstrumented ./uninstrumented
+docker run --rm -p 8080:8080 otel-js-dice-uninstrumented
 ```
 
 ```sh
-docker build -t otel-js-getting-started-instrumented ./instrumented
+docker build -t otel-js-dice-instrumented ./instrumented
 docker run --rm -p 8080:8080 \
   -e OTEL_SERVICE_NAME=dice-server \
-  otel-js-getting-started-instrumented
+  otel-js-dice-instrumented
 ```
 
 ### Test the endpoint
@@ -63,11 +68,6 @@ curl http://localhost:8080/rolldice
 curl "http://localhost:8080/rolldice?rolls=3"
 curl "http://localhost:8080/rolldice?rolls=2&player=Alice"
 ```
-
-## Useful links
-
-- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For the JavaScript getting-started guide, visit: <https://opentelemetry.io/docs/languages/js/getting-started/nodejs/>
 
 ## LICENSE
 

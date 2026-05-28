@@ -1,8 +1,8 @@
 {
-  "name": "example-getting-started-uninstrumented",
+  "name": "example-dice-uninstrumented",
   "private": true,
   "version": "1.0.0",
-  "description": "Uninstrumented Getting Started reference application",
+  "description": "Uninstrumented dice example application",
   "main": "app.js",
   "scripts": {
     "start": "node app.js"
@@ -13,6 +13,7 @@
   },
   "keywords": [
     "opentelemetry",
+    "dice",
     "getting-started"
   ],
   "engines": {
@@ -23,7 +24,7 @@
   "bugs": {
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/getting-started/uninstrumented",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/dice/uninstrumented",
   "dependencies": {
     "express": "^5.2.1",
     "winston": "^3.19.0"
