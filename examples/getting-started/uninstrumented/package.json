@@ -1,14 +1,29 @@
 {
-  "name": "uninstrumented",
+  "name": "example-getting-started-uninstrumented",
+  "private": true,
   "version": "1.0.0",
+  "description": "Uninstrumented Getting Started reference application",
   "main": "app.js",
   "scripts": {
     "start": "node app.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "keywords": [
+    "opentelemetry",
+    "getting-started"
+  ],
+  "engines": {
+    "node": "^18.19.0 || >=20.6.0"
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/getting-started/uninstrumented",
   "dependencies": {
     "express": "^5.2.1",
     "winston": "^3.19.0"
