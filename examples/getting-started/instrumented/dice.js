@@ -1,4 +1,4 @@
-const { trace, metrics } = require('@opentelemetry/api');
+const { SpanStatusCode, trace, metrics } = require('@opentelemetry/api');
 
 const tracer = trace.getTracer('dice-lib');
 const meter = metrics.getMeter('dice-lib');
@@ -16,6 +16,7 @@ const rollsGauge = meter.createGauge('dice.rolls_last_value', {
 function rollOnce() {
   return tracer.startActiveSpan('rollOnce', (span) => {
     const result = Math.floor(Math.random() * 6) + 1;
+    span.setAttribute('code.function', 'rollOnce');
     span.setAttribute('dice.value', result);
     rollHistogram.record(result);
     span.end();
@@ -25,6 +26,7 @@ function rollOnce() {
 
 function rollTheDice(rolls) {
   return tracer.startActiveSpan('rollTheDice', (span) => {
+    span.setAttribute('code.function', 'rollTheDice');
     span.setAttribute('dice.rolls', rolls);
     rollCounter.add(1);
     rollsGauge.record(rolls);
@@ -32,7 +34,7 @@ function rollTheDice(rolls) {
     if (!Number.isInteger(rolls) || rolls <= 0) {
       const error = new Error('rolls must be a positive integer');
       span.recordException(error);
-      span.setStatus({ code: 2, message: error.message });
+      span.setStatus({ code: SpanStatusCode.ERROR, message: error.message });
       span.end();
       throw error;
     }
