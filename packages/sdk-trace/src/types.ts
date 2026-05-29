@@ -3,27 +3,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type {
-  ContextManager,
-  MeterProvider,
-  TextMapPropagator,
-} from '@opentelemetry/api';
+import type { MeterProvider } from '@opentelemetry/api';
 import type { Resource } from '@opentelemetry/resources';
 import type { IdGenerator } from './IdGenerator';
 import type { Sampler } from './Sampler';
 import type { SpanProcessor } from './SpanProcessor';
 
-/**
- * TracerConfig provides an interface for configuring a Basic Tracer.
- */
-export interface TracerConfig {
+export interface TracerProviderOptions {
   /**
    * Sampler determines if a span should be recorded or should be a NoopSpan.
    */
   sampler?: Sampler;
-
-  /** General Limits */
-  generalLimits?: GeneralLimits;
 
   /** Span Limits */
   spanLimits?: SpanLimits;
@@ -55,25 +45,14 @@ export interface TracerConfig {
   meterProvider?: MeterProvider;
 }
 
-/**
- * Configuration options for registering the API with the SDK.
- * Undefined values may be substituted for defaults, and null
- * values will not be registered.
- */
-export interface SDKRegistrationConfig {
-  /** Propagator to register as the global propagator */
-  propagator?: TextMapPropagator | null;
-
-  /** Context manager to register as the global context manager */
-  contextManager?: ContextManager | null;
-}
-
-/** Global configuration limits of trace service */
-export interface GeneralLimits {
-  /** attributeValueLengthLimit is maximum allowed attribute value size */
-  attributeValueLengthLimit?: number;
-  /** attributeCountLimit is number of attributes per trace */
-  attributeCountLimit?: number;
+// XXX could perhaps share parts of TracerProviderOptions and TracerOptions, though note spanProcessor{,s} diff
+export interface TracerOptions {
+  resource: Resource;
+  sampler: Sampler;
+  spanLimits: SpanLimits;
+  idGenerator: IdGenerator;
+  spanProcessor: SpanProcessor;
+  meterProvider: MeterProvider;
 }
 
 /** Global configuration of trace service */

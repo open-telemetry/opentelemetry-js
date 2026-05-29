@@ -8,7 +8,6 @@ import { context, diag, TraceFlags } from '@opentelemetry/api';
 import {
   BindOnceFuture,
   ExportResultCode,
-  getNumberFromEnv,
   globalErrorHandler,
   suppressTracing,
 } from '@opentelemetry/core';
@@ -39,22 +38,10 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
 
   constructor(exporter: SpanExporter, config?: T) {
     this._exporter = exporter;
-    this._maxExportBatchSize =
-      typeof config?.maxExportBatchSize === 'number'
-        ? config.maxExportBatchSize
-        : (getNumberFromEnv('OTEL_BSP_MAX_EXPORT_BATCH_SIZE') ?? 512);
-    this._maxQueueSize =
-      typeof config?.maxQueueSize === 'number'
-        ? config.maxQueueSize
-        : (getNumberFromEnv('OTEL_BSP_MAX_QUEUE_SIZE') ?? 2048);
-    this._scheduledDelayMillis =
-      typeof config?.scheduledDelayMillis === 'number'
-        ? config.scheduledDelayMillis
-        : (getNumberFromEnv('OTEL_BSP_SCHEDULE_DELAY') ?? 5000);
-    this._exportTimeoutMillis =
-      typeof config?.exportTimeoutMillis === 'number'
-        ? config.exportTimeoutMillis
-        : (getNumberFromEnv('OTEL_BSP_EXPORT_TIMEOUT') ?? 30000);
+    this._maxExportBatchSize = config?.maxExportBatchSize ?? 512;
+    this._maxQueueSize = config?.maxQueueSize ?? 2048;
+    this._scheduledDelayMillis = config?.scheduledDelayMillis ?? 5000;
+    this._exportTimeoutMillis = config?.exportTimeoutMillis ?? 30000;
 
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
 

@@ -46,6 +46,7 @@
       "packages/opentelemetry-sdk-trace-web",
       "packages/opentelemetry-shim-opentracing",
       "packages/sdk-metrics",
+      "packages/sdk-trace",
       "semantic-conventions"
     ],
     "out": "docs",
@@ -184,6 +185,9 @@
     },
     {
       "path": "packages/sdk-metrics"
+    },
+    {
+      "path": "packages/sdk-trace"
     },
     {
       "path": "packages/template"

@@ -3,16 +3,20 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { TracerProvider, Tracer as ApiTracer } from '@opentelemetry/api';
-import { merge } from '@opentelemetry/core';
+import type {
+  TracerProvider as ApiTracerProvider,
+  Tracer as ApiTracer,
+} from '@opentelemetry/api';
+import { createNoopMeter } from '@opentelemetry/api';
 import type { Resource } from '@opentelemetry/resources';
 import { defaultResource } from '@opentelemetry/resources';
 import type { SpanProcessor } from './SpanProcessor';
 import { Tracer } from './Tracer';
-import { loadDefaultConfig } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
-import type { TracerConfig } from './types';
-import { reconfigureLimits } from './utility';
+import type { TracerProviderOptions, TracerOptions } from './types';
+import { ParentBasedSampler } from './sampler/ParentBasedSampler';
+import { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
+import { RandomIdGenerator } from './platform';
 import type { InspectFn, InspectStylizeOptions } from './inspect';
 import {
   formatInspect,
@@ -20,7 +24,7 @@ import {
   settledResourceAttributes,
 } from './inspect';
 
-export enum ForceFlushState {
+enum ForceFlushState {
   'resolved',
   'timeout',
   'error',
@@ -30,31 +34,46 @@ export enum ForceFlushState {
 /**
  * This class represents a basic tracer provider which platform libraries can extend
  */
-export class BasicTracerProvider implements TracerProvider {
-  private readonly _config: TracerConfig;
-  private readonly _tracers: Map<string, Tracer> = new Map();
+export class TracerProvider implements ApiTracerProvider {
   private readonly _resource: Resource;
   private readonly _activeSpanProcessor: MultiSpanProcessor;
+  private readonly _forceFlushTimeoutMillis: number;
+  private readonly _tracerOptions: TracerOptions;
+  private readonly _tracers: Map<string, Tracer> = new Map();
 
-  constructor(config: TracerConfig = {}) {
-    const mergedConfig = merge(
-      {},
-      loadDefaultConfig(),
-      reconfigureLimits(config)
-    );
-    this._resource = mergedConfig.resource ?? defaultResource();
-
-    this._config = Object.assign({}, mergedConfig, {
-      resource: this._resource,
-    });
-
-    const spanProcessors: SpanProcessor[] = [];
-
-    if (config.spanProcessors?.length) {
-      spanProcessors.push(...config.spanProcessors);
-    }
-
+  constructor(options: TracerProviderOptions = {}) {
+    this._forceFlushTimeoutMillis = options.forceFlushTimeoutMillis ?? 30000;
+    this._resource = options.resource ?? defaultResource();
+    // XXX FWIW sdk-logs sets NoopLogRecordProcessor if array is empty. Do same?
+    // XXX want to rename spanProcessors to processors? As in sdk-logs and declconf?
+    const spanProcessors = options.spanProcessors ?? [];
     this._activeSpanProcessor = new MultiSpanProcessor(spanProcessors);
+
+    this._tracerOptions = {
+      resource: this._resource,
+      sampler:
+        options.sampler ??
+        new ParentBasedSampler({
+          root: new AlwaysOnSampler(),
+        }),
+      spanLimits: {
+        attributeCountLimit: options.spanLimits?.attributeCountLimit ?? 128,
+        attributeValueLengthLimit: options.spanLimits?.attributeValueLengthLimit ?? Infinity,
+        eventCountLimit: options.spanLimits?.eventCountLimit ?? 128,
+        linkCountLimit: options.spanLimits?.linkCountLimit ?? 128,
+        attributePerEventCountLimit:
+          options.spanLimits?.attributePerEventCountLimit ?? 128,
+        attributePerLinkCountLimit:
+          options.spanLimits?.attributePerLinkCountLimit ?? 128,
+      },
+      idGenerator: options.idGenerator || new RandomIdGenerator(),
+      spanProcessor: this._activeSpanProcessor,
+      meterProvider: options.meterProvider ?? {
+        getMeter() {
+          return createNoopMeter();
+        },
+      },
+    };
   }
 
   getTracer(
@@ -68,18 +87,17 @@ export class BasicTracerProvider implements TracerProvider {
         key,
         new Tracer(
           { name, version, schemaUrl: options?.schemaUrl },
-          this._config,
-          this._resource,
-          this._activeSpanProcessor
+          this._tracerOptions,
         )
       );
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this._tracers.get(key)!;
   }
 
   forceFlush(): Promise<void> {
-    const timeout = this._config.forceFlushTimeoutMillis;
+    const timeout = this._forceFlushTimeoutMillis;
     const promises = this._activeSpanProcessor['_spanProcessors'].map(
       (spanProcessor: SpanProcessor) => {
         return new Promise(resolve => {
@@ -147,7 +165,7 @@ export class BasicTracerProvider implements TracerProvider {
       ),
     };
     return formatInspect(
-      'BasicTracerProvider',
+      'TracerProvider',
       payload,
       depth,
       options,

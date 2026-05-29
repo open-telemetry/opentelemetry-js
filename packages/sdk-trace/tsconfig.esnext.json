@@ -8,13 +8,7 @@
     ],
     "outDir": "build/esnext",
     "rootDir": "src",
-    "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo",
-    "types": [
-      "node",
-      "mocha",
-      "webpack-env",
-      "jquery"
-    ]
+    "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo"
   },
   "include": [
     "src/**/*.ts"
@@ -27,16 +21,13 @@
       "path": "../../semantic-conventions"
     },
     {
-      "path": "../opentelemetry-context-zone"
-    },
-    {
       "path": "../opentelemetry-core"
     },
     {
       "path": "../opentelemetry-resources"
     },
     {
-      "path": "../opentelemetry-sdk-trace-base"
+      "path": "../sdk-metrics"
     }
   ]
 }

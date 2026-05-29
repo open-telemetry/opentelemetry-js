@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export { BasicTracerProvider } from './BasicTracerProvider';
+export { TracerProvider } from './TracerProvider';
 export { BatchSpanProcessor, RandomIdGenerator } from './platform';
 export { ConsoleSpanExporter } from './export/ConsoleSpanExporter';
 export { InMemorySpanExporter } from './export/InMemorySpanExporter';
@@ -23,9 +23,7 @@ export type { TimedEvent } from './TimedEvent';
 export type {
   BatchSpanProcessorBrowserConfig,
   BufferConfig,
-  GeneralLimits,
-  SDKRegistrationConfig,
   SpanLimits,
-  TracerConfig,
+  TracerProviderOptions,
 } from './types';
 export type { IdGenerator } from './IdGenerator';
