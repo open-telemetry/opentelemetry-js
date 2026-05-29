@@ -15,9 +15,9 @@
  */
 
 const Benchmark = require('benchmark');
-const { BasicTracerProvider } = require('../../../build/src');
+const { TracerProvider } = require('../../../build/src');
 
-const tracerProvider = new BasicTracerProvider();
+const tracerProvider = new TracerProvider();
 const tracer = tracerProvider.getTracer('test');
 
 const suite = new Benchmark.Suite('setAttribute performance');
