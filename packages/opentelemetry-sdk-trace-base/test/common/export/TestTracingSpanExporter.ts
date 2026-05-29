@@ -5,9 +5,13 @@
 
 import type { ExportResult } from '@opentelemetry/core';
 import type { ReadableSpan, SpanProcessor } from '../../../src';
-import { InMemorySpanExporter, AlwaysOnSampler } from '../../../src';
-import { TracerProvider } from '../../../src/TracerProvider';
-import { Tracer } from '../../../src/Tracer';
+import {
+  InMemorySpanExporter,
+  AlwaysOnSampler,
+  TracerProvider,
+} from '../../../src';
+import type { Tracer } from '../../../src/Tracer';
+import { createTracer } from '../../util';
 
 /**
  * A test-only span exporter that naively simulates triggering instrumentation
@@ -37,7 +41,7 @@ export class TestTracingSpanExporter extends InMemorySpanExporter {
       spanProcessors: [spanProcessor],
     });
 
-    this._tracer = new Tracer(
+    this._tracer = createTracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new AlwaysOnSampler() },
       tracerProvider['_resource'],

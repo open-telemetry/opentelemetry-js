@@ -27,7 +27,7 @@ import { AlwaysOffSampler, AlwaysOnSampler, SamplingDecision } from '../../src';
 import { TracerProvider } from '../../src/TracerProvider';
 import { TestStackContextManager } from './export/TestStackContextManager';
 import * as sinon from 'sinon';
-import { invalidAttributes, validAttributes } from './util';
+import { invalidAttributes, validAttributes, createTracer } from '../util';
 import { Tracer } from '../../src/Tracer';
 
 describe('Tracer', () => {
@@ -89,7 +89,7 @@ describe('Tracer', () => {
   });
 
   it('should create a Tracer instance', () => {
-    const tracer = new Tracer(
+    const tracer = createTracer(
       { name: 'default', version: '0.0.1' },
       {},
       tracerProvider['_resource'],
@@ -99,7 +99,7 @@ describe('Tracer', () => {
   });
 
   it('should use an ParentBasedSampler by default', () => {
-    const tracer = new Tracer(
+    const tracer = createTracer(
       { name: 'default', version: '0.0.1' },
       {},
       tracerProvider['_resource'],
@@ -112,7 +112,7 @@ describe('Tracer', () => {
   });
 
   it('should respect NO_RECORD sampling result', () => {
-    const tracer = new Tracer(
+    const tracer = createTracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new AlwaysOffSampler() },
       tracerProvider['_resource'],
@@ -124,7 +124,7 @@ describe('Tracer', () => {
   });
 
   it('should respect RECORD_AND_SAMPLE sampling result', () => {
-    const tracer = new Tracer(
+    const tracer = createTracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new AlwaysOnSampler() },
       tracerProvider['_resource'],
@@ -136,7 +136,7 @@ describe('Tracer', () => {
   });
 
   it('should start a span with attributes in sampling result', () => {
-    const tracer = new Tracer(
+    const tracer = createTracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
       tracerProvider['_resource'],
@@ -149,7 +149,7 @@ describe('Tracer', () => {
 
   it('should start a span with traceState in sampling result', () => {
     const traceState = createTraceState();
-    const tracer = new Tracer(
+    const tracer = createTracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler(traceState) },
       tracerProvider['_resource'],
@@ -160,7 +160,7 @@ describe('Tracer', () => {
   });
 
   it('should have an instrumentationScope', () => {
-    const tracer = new Tracer(
+    const tracer = createTracer(
       { name: 'default', version: '0.0.1' },
       {},
       tracerProvider['_resource'],
@@ -177,7 +177,7 @@ describe('Tracer', () => {
     const context = suppressTracing(ROOT_CONTEXT);
 
     it('should return cached no-op span ', done => {
-      const tracer = new Tracer(
+      const tracer = createTracer(
         { name: 'default', version: '0.0.1' },
         { sampler: new TestSampler() },
         tracerProvider['_resource'],
@@ -201,7 +201,7 @@ describe('Tracer', () => {
       traceFlags: TraceFlags.SAMPLED,
       traceState,
     };
-    const tracer = new Tracer(
+    const tracer = createTracer(
       { name: 'default', version: '0.0.1' },
       {},
       tracerProvider['_resource'],
@@ -223,7 +223,7 @@ describe('Tracer', () => {
       spanId: '0011223344556677',
       traceFlags: TraceFlags.SAMPLED,
     };
-    const tracer = new Tracer(
+    const tracer = createTracer(
       { name: 'default', version: '0.0.1' },
       {},
       tracerProvider['_resource'],
@@ -253,7 +253,7 @@ describe('Tracer', () => {
 
     const sampler: Sampler = new AlwaysOnSampler();
     const shouldSampleSpy = sinon.spy(sampler, 'shouldSample');
-    const tracer = new Tracer(
+    const tracer = createTracer(
       { name: 'default' },
       { sampler },
       tp['_resource'],
@@ -289,7 +289,7 @@ describe('Tracer', () => {
 
     const sampler: Sampler = new AlwaysOnSampler();
     const shouldSampleSpy = sinon.spy(sampler, 'shouldSample');
-    const tracer = new Tracer(
+    const tracer = createTracer(
       { name: 'default' },
       { sampler },
       tp['_resource'],
@@ -306,7 +306,7 @@ describe('Tracer', () => {
   });
 
   it('should start an active span with name and function args', () => {
-    const tracer = new Tracer(
+    const tracer = createTracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
       tracerProvider['_resource'],
@@ -330,7 +330,7 @@ describe('Tracer', () => {
   });
 
   it('should start an active span with name, options and function args', () => {
-    const tracer = new Tracer(
+    const tracer = createTracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
       tracerProvider['_resource'],
@@ -360,7 +360,7 @@ describe('Tracer', () => {
   });
 
   it('should start an active span with name, options, context and function args', () => {
-    const tracer = new Tracer(
+    const tracer = createTracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
       tracerProvider['_resource'],
@@ -396,7 +396,7 @@ describe('Tracer', () => {
   });
 
   it('should sample with valid attributes', () => {
-    const tracer = new Tracer(
+    const tracer = createTracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
       tracerProvider['_resource'],

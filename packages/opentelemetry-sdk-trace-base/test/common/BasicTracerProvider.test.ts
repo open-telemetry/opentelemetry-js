@@ -32,7 +32,7 @@ import { SpanImpl } from '../../src/Span';
 import { MultiSpanProcessor } from '../../src/MultiSpanProcessor';
 import type { Tracer } from '../../src/Tracer';
 import { TestRecordOnlySampler } from './export/TestRecordOnlySampler';
-import { TestMetricReader } from './util';
+import { TestMetricReader } from '../util';
 
 describe('BasicTracerProvider', () => {
   beforeEach(() => {
@@ -108,7 +108,7 @@ describe('BasicTracerProvider', () => {
     describe('spanLimits', () => {
       describe('when not defined default values', () => {
         it('should have tracer with default values', () => {
-          const tracer = new BasicTracerProvider({}).getTracer(
+          const tracer = new BasicTracerProvider().getTracer(
             'default'
           ) as Tracer;
           assert.deepStrictEqual(tracer.getSpanLimits(), {

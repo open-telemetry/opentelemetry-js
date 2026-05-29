@@ -32,7 +32,7 @@ import { SpanImpl } from '../../src/Span';
 import { MultiSpanProcessor } from '../../src/MultiSpanProcessor';
 import type { Tracer } from '../../src/Tracer';
 import { TestRecordOnlySampler } from './export/TestRecordOnlySampler';
-import { TestMetricReader } from './util';
+import { TestMetricReader } from '../util';
 
 describe('TracerProvider', () => {
   beforeEach(() => {

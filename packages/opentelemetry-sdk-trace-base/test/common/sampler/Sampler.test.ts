@@ -11,7 +11,7 @@ import {
   ParentBasedSampler,
   TraceIdRatioBasedSampler,
 } from '../../../src';
-import { assertAssignable } from '../util';
+import { assertAssignable } from '../../util';
 
 describe('Sampler', () => {
   const samplers = [

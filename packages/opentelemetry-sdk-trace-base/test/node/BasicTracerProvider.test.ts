@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { context, trace } from '@opentelemetry/api';
+import { TraceFlags, context, trace } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { BasicTracerProvider } from '../../src';
 import type { Tracer } from '../../src/Tracer';
+import { TestStackContextManager } from '../common/export/TestStackContextManager';
 
 describe('BasicTracerProvider - Node', () => {
   beforeEach(() => {
@@ -21,6 +22,52 @@ describe('BasicTracerProvider - Node', () => {
   });
 
   describe('constructor', () => {
+    describe('sampler', () => {
+      describe('when sampler is defined via env', () => {
+        beforeEach(() => {
+          // ???
+          const contextManager = new TestStackContextManager().enable();
+          context.setGlobalContextManager(contextManager);
+        });
+
+        afterEach(() => {
+          context.disable();
+          delete process.env.OTEL_TRACES_SAMPLER;
+          delete process.env.OTEL_TRACES_SAMPLER_ARG;
+        });
+
+        it('should sample a trace when OTEL_TRACES_SAMPLER_ARG is unset', () => {
+          process.env.OTEL_TRACES_SAMPLER = 'traceidratio';
+          process.env.OTEL_TRACES_SAMPLER_ARG = '';
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const span = tracer.startSpan('my-span');
+          const context = span.spanContext();
+          assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
+          span.end();
+        });
+      });
+
+      it('should not sample a trace when OTEL_TRACES_SAMPLER_ARG is out of range', () => {
+        process.env.OTEL_TRACES_SAMPLER = 'traceidratio';
+        process.env.OTEL_TRACES_SAMPLER_ARG = '2';
+        const tracer = new BasicTracerProvider().getTracer('default');
+        const span = tracer.startSpan('my-span');
+        const context = span.spanContext();
+        assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
+        span.end();
+      });
+
+      it('should not sample a trace when OTEL_TRACES_SAMPLER_ARG is 0', () => {
+        process.env.OTEL_TRACES_SAMPLER = 'traceidratio';
+        process.env.OTEL_TRACES_SAMPLER_ARG = '0';
+        const tracer = new BasicTracerProvider().getTracer('default');
+        const span = tracer.startSpan('my-span');
+        const context = span.spanContext();
+        assert.strictEqual(context.traceFlags, TraceFlags.NONE);
+        span.end();
+      });
+    });
+
     describe('spanLimits', () => {
       describe('when attribute value length limit is defined via env', () => {
         afterEach(function () {

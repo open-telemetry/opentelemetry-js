@@ -52,7 +52,8 @@ export class TracerProvider implements ApiTracerProvider {
       spanLimits: {
         // We will check and set default value later
         attributeCountLimit: config.spanLimits?.attributeCountLimit ?? 128,
-        attributeValueLengthLimit: config.spanLimits?.attributeValueLengthLimit ?? Infinity,
+        attributeValueLengthLimit:
+          config.spanLimits?.attributeValueLengthLimit ?? Infinity,
         eventCountLimit: config.spanLimits?.eventCountLimit ?? 128,
         linkCountLimit: config.spanLimits?.linkCountLimit ?? 128,
         attributePerEventCountLimit:
@@ -93,7 +94,6 @@ export class TracerProvider implements ApiTracerProvider {
       );
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this._tracers.get(key)!;
   }
 
