@@ -30,15 +30,18 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import type { Span, SpanProcessor } from '../../src';
-import { BasicTracerProvider } from '../../src';
-import { SpanImpl } from '../../src/Span';
+import type { Span, SpanProcessor } from '@opentelemetry/sdk-trace';
+import { BasicTracerProvider } from '../../src/BasicTracerProvider-shim';
+import { SpanImpl } from '@opentelemetry/sdk-trace/src/Span';
 import { invalidAttributes, validAttributes } from './util';
-import type { Tracer } from '../../src/Tracer';
+import type { Tracer } from '@opentelemetry/sdk-trace/src/Tracer';
 import {
   DEFAULT_ATTRIBUTE_COUNT_LIMIT,
   DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
 } from '../../src/utility';
+
+import { cheatSpanLimitsFromTracer } from './util';
+
 
 const performanceTimeOrigin: HrTime = [1, 1];
 
@@ -79,7 +82,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.SERVER,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     assert.ok(span instanceof SpanImpl);
@@ -94,7 +97,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.SERVER,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     assert.ok(
@@ -111,7 +114,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.SERVER,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     span.end();
@@ -135,7 +138,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.SERVER,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     span.end();
@@ -150,7 +153,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.SERVER,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     // @ts-expect-error writing readonly property. performance time origin is mocked to return ms value of [1,1]
@@ -167,7 +170,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.SERVER,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     span.addEvent('my-event');
@@ -187,7 +190,7 @@ describe('Span', () => {
       name,
       kind: SpanKind.SERVER,
       startTime,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     const eventTimeMS = 123;
@@ -211,7 +214,7 @@ describe('Span', () => {
         name,
         kind: SpanKind.SERVER,
         startTime,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
       const eventTimeMS = 123;
@@ -233,7 +236,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.CLIENT,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     const context = span.spanContext();
@@ -254,7 +257,7 @@ describe('Span', () => {
         spanContext,
         name,
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
       assert.ok(span.isRecording());
@@ -268,7 +271,7 @@ describe('Span', () => {
         spanContext,
         name,
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
       span.end();
@@ -284,7 +287,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.CLIENT,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     span.end();
@@ -311,7 +314,7 @@ describe('Span', () => {
           spanContext,
           name,
           kind: SpanKind.CLIENT,
-          spanLimits: tracer.getSpanLimits(),
+          spanLimits: cheatSpanLimitsFromTracer(tracer),
           spanProcessor: tracer['_spanProcessor'],
         });
 
@@ -333,7 +336,7 @@ describe('Span', () => {
           spanContext,
           name,
           kind: SpanKind.CLIENT,
-          spanLimits: tracer.getSpanLimits(),
+          spanLimits: cheatSpanLimitsFromTracer(tracer),
           spanProcessor: tracer['_spanProcessor'],
         });
 
@@ -362,7 +365,7 @@ describe('Span', () => {
           spanContext,
           name,
           kind: SpanKind.CLIENT,
-          spanLimits: tracer.getSpanLimits(),
+          spanLimits: cheatSpanLimitsFromTracer(tracer),
           spanProcessor: tracer['_spanProcessor'],
         });
         for (let i = 0; i < 150; i++) {
@@ -397,7 +400,7 @@ describe('Span', () => {
           spanContext,
           name,
           kind: SpanKind.CLIENT,
-          spanLimits: tracer.getSpanLimits(),
+          spanLimits: cheatSpanLimitsFromTracer(tracer),
           spanProcessor: tracer['_spanProcessor'],
         });
 
@@ -444,7 +447,7 @@ describe('Span', () => {
             spanContext,
             name,
             kind: SpanKind.CLIENT,
-            spanLimits: tracer.getSpanLimits(),
+            spanLimits: cheatSpanLimitsFromTracer(tracer),
             spanProcessor: tracer['_spanProcessor'],
             attributes: { 'attr-with-more-length': 'abcdefgh' },
           });
@@ -467,7 +470,7 @@ describe('Span', () => {
           spanContext,
           name,
           kind: SpanKind.CLIENT,
-          spanLimits: tracer.getSpanLimits(),
+          spanLimits: cheatSpanLimitsFromTracer(tracer),
           spanProcessor: tracer['_spanProcessor'],
         });
 
@@ -507,7 +510,7 @@ describe('Span', () => {
           spanContext,
           name,
           kind: SpanKind.CLIENT,
-          spanLimits: tracer.getSpanLimits(),
+          spanLimits: cheatSpanLimitsFromTracer(tracer),
           spanProcessor: tracer['_spanProcessor'],
         });
         for (let i = 0; i < 150; i++) {
@@ -538,7 +541,7 @@ describe('Span', () => {
           spanContext,
           name,
           kind: SpanKind.CLIENT,
-          spanLimits: tracer.getSpanLimits(),
+          spanLimits: cheatSpanLimitsFromTracer(tracer),
           spanProcessor: tracer['_spanProcessor'],
         });
 
@@ -593,7 +596,7 @@ describe('Span', () => {
           spanContext,
           name,
           kind: SpanKind.CLIENT,
-          spanLimits: tracer.getSpanLimits(),
+          spanLimits: cheatSpanLimitsFromTracer(tracer),
           spanProcessor: tracer['_spanProcessor'],
         });
 
@@ -636,7 +639,7 @@ describe('Span', () => {
           spanContext,
           name,
           kind: SpanKind.CLIENT,
-          spanLimits: tracer.getSpanLimits(),
+          spanLimits: cheatSpanLimitsFromTracer(tracer),
           spanProcessor: tracer['_spanProcessor'],
         });
         for (let i = 0; i < 150; i++) {
@@ -671,7 +674,7 @@ describe('Span', () => {
           spanContext,
           name,
           kind: SpanKind.CLIENT,
-          spanLimits: tracer.getSpanLimits(),
+          spanLimits: cheatSpanLimitsFromTracer(tracer),
           spanProcessor: tracer['_spanProcessor'],
         });
         for (let i = 0; i < 150; i++) {
@@ -710,7 +713,7 @@ describe('Span', () => {
           spanContext,
           name,
           kind: SpanKind.CLIENT,
-          spanLimits: tracer.getSpanLimits(),
+          spanLimits: cheatSpanLimitsFromTracer(tracer),
           spanProcessor: tracer['_spanProcessor'],
         });
 
@@ -769,7 +772,7 @@ describe('Span', () => {
           spanContext,
           name,
           kind: SpanKind.CLIENT,
-          spanLimits: tracer.getSpanLimits(),
+          spanLimits: cheatSpanLimitsFromTracer(tracer),
           spanProcessor: tracer['_spanProcessor'],
         });
 
@@ -818,7 +821,7 @@ describe('Span', () => {
         spanContext,
         name,
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
 
@@ -838,7 +841,7 @@ describe('Span', () => {
         spanContext,
         name,
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
       span.addEvent('sent');
@@ -854,7 +857,7 @@ describe('Span', () => {
         spanContext,
         name,
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
       span.addEvent('rev', {
@@ -877,7 +880,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.CLIENT,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
 
@@ -907,7 +910,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.CLIENT,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     for (let i = 0; i < 150; i++) {
@@ -932,7 +935,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.CLIENT,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     for (let i = 0; i < 10; i++) {
@@ -957,7 +960,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.CLIENT,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     span.addEvent('testEvent', {
@@ -988,7 +991,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.CLIENT,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     span.addEvent('testEvent', {
@@ -1015,7 +1018,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.CLIENT,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     span.addLink({
@@ -1049,7 +1052,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.CLIENT,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     span.addLink({
@@ -1079,7 +1082,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.CLIENT,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     for (let i = 0; i < 5; i++) {
@@ -1111,7 +1114,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.CLIENT,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
       links: [
         { context: linkContext, attributes: { index: 0 } },
@@ -1143,7 +1146,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.CLIENT,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     span.addLink({ context: linkContext });
@@ -1168,7 +1171,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.CLIENT,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     span.addLinks([
@@ -1193,7 +1196,7 @@ describe('Span', () => {
         spanContext,
         name,
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
 
@@ -1214,7 +1217,7 @@ describe('Span', () => {
         spanContext,
         name,
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
 
@@ -1232,7 +1235,7 @@ describe('Span', () => {
         spanContext,
         name,
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
 
@@ -1250,7 +1253,7 @@ describe('Span', () => {
         spanContext,
         name,
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
 
@@ -1275,7 +1278,7 @@ describe('Span', () => {
         spanContext,
         name,
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
 
@@ -1293,7 +1296,7 @@ describe('Span', () => {
         spanContext,
         name,
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
 
@@ -1314,7 +1317,7 @@ describe('Span', () => {
         spanContext,
         name,
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
 
@@ -1333,7 +1336,7 @@ describe('Span', () => {
         spanContext,
         name,
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
 
@@ -1352,7 +1355,7 @@ describe('Span', () => {
         spanContext,
         name,
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
 
@@ -1370,7 +1373,7 @@ describe('Span', () => {
         spanContext,
         name,
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
 
@@ -1389,7 +1392,7 @@ describe('Span', () => {
         spanContext,
         name,
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
 
@@ -1408,7 +1411,7 @@ describe('Span', () => {
         spanContext,
         name,
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
 
@@ -1442,7 +1445,7 @@ describe('Span', () => {
         traceId: '',
         traceFlags: TraceFlags.SAMPLED,
       },
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
 
@@ -1471,7 +1474,7 @@ describe('Span', () => {
       spanContext,
       name: 'my-span',
       kind: SpanKind.CLIENT,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     span.setAttribute('attr1', 'value1');
@@ -1500,7 +1503,7 @@ describe('Span', () => {
       spanContext,
       name: 'my-span',
       kind: SpanKind.CLIENT,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
       links: [
         { context: linkContext },
@@ -1532,7 +1535,7 @@ describe('Span', () => {
       spanContext,
       name: 'my-span',
       kind: SpanKind.CONSUMER,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
 
@@ -1556,7 +1559,7 @@ describe('Span', () => {
       spanContext,
       name: 'my-span',
       kind: SpanKind.CONSUMER,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
 
@@ -1590,7 +1593,7 @@ describe('Span', () => {
       spanContext,
       name: 'my-span',
       kind: SpanKind.CLIENT,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     span.addEvent('sent');
@@ -1628,7 +1631,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.SERVER,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     const endTime = Date.now();
@@ -1645,7 +1648,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.SERVER,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     span.updateName('foo-span');
@@ -1664,7 +1667,7 @@ describe('Span', () => {
       spanContext,
       name,
       kind: SpanKind.SERVER,
-      spanLimits: tracer.getSpanLimits(),
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
     });
     assert.strictEqual(span.ended, false);
@@ -1794,7 +1797,7 @@ describe('Span', () => {
             spanContext,
             name,
             kind: SpanKind.CLIENT,
-            spanLimits: tracer.getSpanLimits(),
+            spanLimits: cheatSpanLimitsFromTracer(tracer),
             spanProcessor: tracer['_spanProcessor'],
           });
           assert.strictEqual(span.events.length, 0);
@@ -1817,7 +1820,7 @@ describe('Span', () => {
           spanContext,
           name,
           kind: SpanKind.CLIENT,
-          spanLimits: tracer.getSpanLimits(),
+          spanLimits: cheatSpanLimitsFromTracer(tracer),
           spanProcessor: tracer['_spanProcessor'],
         });
         assert.strictEqual(span.events.length, 0);
@@ -1853,7 +1856,7 @@ describe('Span', () => {
             spanContext,
             name,
             kind: SpanKind.CLIENT,
-            spanLimits: tracer.getSpanLimits(),
+            spanLimits: cheatSpanLimitsFromTracer(tracer),
             spanProcessor: tracer['_spanProcessor'],
           });
           assert.strictEqual(span.events.length, 0);
@@ -1886,7 +1889,7 @@ describe('Span', () => {
           spanContext,
           name,
           kind: SpanKind.CLIENT,
-          spanLimits: tracer.getSpanLimits(),
+          spanLimits: cheatSpanLimitsFromTracer(tracer),
           spanProcessor: tracer['_spanProcessor'],
         });
         // @ts-expect-error writing readonly property. performance time origin is mocked to return ms value of [1,1]
@@ -1907,7 +1910,7 @@ describe('Span', () => {
           spanContext,
           name,
           kind: SpanKind.CLIENT,
-          spanLimits: tracer.getSpanLimits(),
+          spanLimits: cheatSpanLimitsFromTracer(tracer),
           spanProcessor: tracer['_spanProcessor'],
         });
         assert.strictEqual(span.events.length, 0);
@@ -1928,7 +1931,7 @@ describe('Span', () => {
           spanContext,
           name,
           kind: SpanKind.CLIENT,
-          spanLimits: tracer.getSpanLimits(),
+          spanLimits: cheatSpanLimitsFromTracer(tracer),
           spanProcessor: tracer['_spanProcessor'],
           attributes: { foo: 'bar' },
         });

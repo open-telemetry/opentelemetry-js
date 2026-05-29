@@ -6,8 +6,12 @@
 import * as assert from 'assert';
 import type { Suite } from 'mocha';
 import * as sinon from 'sinon';
-import type { SpanExporter } from '../../../src';
-import { BatchSpanProcessor } from '../../../src/platform/browser/export/BatchSpanProcessor';
+import type { SpanExporter } from '@opentelemetry/sdk-trace';
+// XXX deep import will go away when moving this test to sdk-trace package
+// import { BatchSpanProcessor } from '../../../src/platform/browser/export/BatchSpanProcessor';
+// import { BatchSpanProcessor } from '@opentelemetry/sdk-trace';
+// import { BatchSpanProcessor } from '@opentelemetry/sdk-trace/build/src/platform/browser/export/BatchSpanProcessor'; ???
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace/src/platform/browser/export/BatchSpanProcessor';
 import { TestTracingSpanExporter } from '../../common/export/TestTracingSpanExporter';
 import {
   loggingErrorHandler,

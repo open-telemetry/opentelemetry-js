@@ -4,13 +4,13 @@
  */
 
 import { context, SpanKind } from '@opentelemetry/api';
-import type { Sampler, SamplingDecision, SamplingResult } from '../../../src';
+import type { Sampler, SamplingDecision, SamplingResult } from '@opentelemetry/sdk-trace';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
   ParentBasedSampler,
   TraceIdRatioBasedSampler,
-} from '../../../src';
+} from '@opentelemetry/sdk-trace';
 import { assertAssignable } from '../util';
 
 describe('Sampler', () => {

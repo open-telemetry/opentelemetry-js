@@ -18,16 +18,17 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
-  BasicTracerProvider,
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '../../../src';
-import { SpanImpl } from '../../../src/Span';
+} from '@opentelemetry/sdk-trace';
+import { BasicTracerProvider } from '../../../src/BasicTracerProvider-shim';
+import { SpanImpl } from '@opentelemetry/sdk-trace/src/Span';
 import { TestStackContextManager } from './TestStackContextManager';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestExporterWithDelay } from './TestExporterWithDelay';
-import type { Tracer } from '../../../src/Tracer';
+import type { Tracer } from '@opentelemetry/sdk-trace/src/Tracer';
 import { resourceFromAttributes } from '@opentelemetry/resources';
+import { cheatSpanLimitsFromTracer } from '../util';
 
 describe('SimpleSpanProcessor', () => {
   let provider: BasicTracerProvider;
@@ -61,7 +62,7 @@ describe('SimpleSpanProcessor', () => {
         spanContext,
         name: 'span-name',
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
       processor.onStart(span, ROOT_CONTEXT);
@@ -89,7 +90,7 @@ describe('SimpleSpanProcessor', () => {
         spanContext,
         name: 'span-name',
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
       processor.onStart(span, ROOT_CONTEXT);
@@ -118,7 +119,7 @@ describe('SimpleSpanProcessor', () => {
         spanContext,
         name: 'span-name',
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
       processor.onStart(span, ROOT_CONTEXT);
@@ -184,7 +185,7 @@ describe('SimpleSpanProcessor', () => {
         spanContext,
         name: 'span-name',
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
       processor.onStart(span, ROOT_CONTEXT);
@@ -220,7 +221,7 @@ describe('SimpleSpanProcessor', () => {
         spanContext,
         name: 'span-name',
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
       processor.onStart(span, ROOT_CONTEXT);
@@ -261,7 +262,7 @@ describe('SimpleSpanProcessor', () => {
         spanContext,
         name: 'span-name',
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
       processor.onStart(span, ROOT_CONTEXT);
@@ -324,7 +325,7 @@ describe('SimpleSpanProcessor', () => {
         spanContext,
         name: 'span-name',
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
 

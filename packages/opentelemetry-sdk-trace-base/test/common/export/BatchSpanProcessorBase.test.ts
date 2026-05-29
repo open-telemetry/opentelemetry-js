@@ -13,22 +13,21 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import type {
-  BufferConfig,
   ReadableSpan,
   Span,
   SpanExporter,
-} from '../../../src';
+} from '@opentelemetry/sdk-trace';
 import {
   AlwaysOnSampler,
-  BasicTracerProvider,
   InMemorySpanExporter,
-} from '../../../src';
+} from '@opentelemetry/sdk-trace';
+import { BasicTracerProvider } from '../../../src/BasicTracerProvider-shim';
 import { context } from '@opentelemetry/api';
 import { TestRecordOnlySampler } from './TestRecordOnlySampler';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestStackContextManager } from './TestStackContextManager';
-import { BatchSpanProcessorBase } from '../../../src/export/BatchSpanProcessorBase';
 import { resourceFromAttributes } from '@opentelemetry/resources';
+import { BatchSpanProcessor } from '../../../src/BatchSpanProcessor-shim';
 
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracerProvider({
@@ -46,11 +45,6 @@ function createUnsampledSpan(spanName: string): Span {
   const span = tracer.startSpan(spanName);
   span.end();
   return span as Span;
-}
-
-class BatchSpanProcessor extends BatchSpanProcessorBase<BufferConfig> {
-  onInit() {}
-  onShutdown() {}
 }
 
 describe('BatchSpanProcessorBase', () => {
@@ -92,7 +86,7 @@ describe('BatchSpanProcessorBase', () => {
 
   describe('.onStart/.onEnd/.shutdown', () => {
     it('should call onShutdown', async () => {
-      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
+      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig) as any;
       const onShutdownSpy = sinon.stub(processor, 'onShutdown');
       assert.strictEqual(onShutdownSpy.callCount, 0);
       await processor.shutdown();
@@ -227,7 +221,7 @@ describe('BatchSpanProcessorBase', () => {
         ' reached multiple times',
       done => {
         const originalTimeout = setTimeout;
-        const clock = sinon.useFakeTimers();
+        const clock = sinon.useFakeTimers({shouldClearNativeTimers: true});
         const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
         const totalSpans = defaultBufferConfig.maxExportBatchSize * 2;
         for (let i = 0; i < totalSpans; i++) {

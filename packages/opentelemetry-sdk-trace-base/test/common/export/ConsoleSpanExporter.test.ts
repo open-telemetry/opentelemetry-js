@@ -10,10 +10,10 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
   AlwaysOnSampler,
-  BasicTracerProvider,
   ConsoleSpanExporter,
   SimpleSpanProcessor,
-} from '../../../src';
+} from '@opentelemetry/sdk-trace';
+import { BasicTracerProvider } from '../../../src/BasicTracerProvider-shim';
 
 /* eslint-disable no-console */
 describe('ConsoleSpanExporter', () => {

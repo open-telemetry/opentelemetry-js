@@ -4,8 +4,8 @@
  */
 
 import type { ExportResult } from '@opentelemetry/core';
-import type { ReadableSpan } from '../../../src';
-import { InMemorySpanExporter } from '../../../src';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace';
+import { InMemorySpanExporter } from '@opentelemetry/sdk-trace';
 
 /**
  * A test-only exporter that delays during export to mimic a real exporter.

@@ -4,8 +4,9 @@
  */
 
 import * as Benchmark from 'benchmark';
-import type { SpanExporter, ReadableSpan } from '../../../src';
-import { BasicTracerProvider, BatchSpanProcessor } from '../../../src';
+import type { SpanExporter, ReadableSpan } from '@opentelemetry/sdk-trace';
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace';
+import { BasicTracerProvider } from '../../../src/index-shim';
 import type { ExportResult } from '@opentelemetry/core';
 import { ExportResultCode } from '@opentelemetry/core';
 

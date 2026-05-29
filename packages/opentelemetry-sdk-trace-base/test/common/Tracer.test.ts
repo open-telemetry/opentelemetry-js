@@ -22,21 +22,24 @@ import {
 import type { InstrumentationScope } from '@opentelemetry/core';
 import { sanitizeAttributes, suppressTracing } from '@opentelemetry/core';
 import * as assert from 'assert';
-import type { Sampler, Span, SpanProcessor } from '../../src';
+import type { Sampler, Span, SpanProcessor } from '@opentelemetry/sdk-trace';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
-  BasicTracerProvider,
   SamplingDecision,
-} from '../../src';
+} from '@opentelemetry/sdk-trace';
+import { BasicTracerProvider } from '../../src/BasicTracerProvider-shim';
 import { TestStackContextManager } from './export/TestStackContextManager';
 import * as sinon from 'sinon';
 import { invalidAttributes, validAttributes } from './util';
-import { Tracer } from '../../src/Tracer';
+import { Tracer } from '@opentelemetry/sdk-trace/build/src/Tracer';
+
+function getTestTracerImpl(sampler?: Sampler, spanProcessors?: SpanProcessor[]): Tracer {
+  const tracerProvider = new BasicTracerProvider({ sampler, spanProcessors });
+  return tracerProvider.getTracer('default', '0.0.1') as Tracer;
+}
 
 describe('Tracer', () => {
-  const tracerProvider = new BasicTracerProvider();
-
   class TestSampler implements Sampler {
     private readonly traceState?: TraceState;
 
@@ -93,22 +96,12 @@ describe('Tracer', () => {
   });
 
   it('should create a Tracer instance', () => {
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      {},
-      tracerProvider['_resource'],
-      tracerProvider['_activeSpanProcessor']
-    );
+    const tracer = getTestTracerImpl();
     assert.ok(tracer instanceof Tracer);
   });
 
   it('should use an ParentBasedSampler by default', () => {
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      {},
-      tracerProvider['_resource'],
-      tracerProvider['_activeSpanProcessor']
-    );
+    const tracer = getTestTracerImpl();
     assert.strictEqual(
       tracer['_sampler'].toString(),
       'ParentBased{root=AlwaysOnSampler, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}'
@@ -116,36 +109,21 @@ describe('Tracer', () => {
   });
 
   it('should respect NO_RECORD sampling result', () => {
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      { sampler: new AlwaysOffSampler() },
-      tracerProvider['_resource'],
-      tracerProvider['_activeSpanProcessor']
-    );
+    const tracer = getTestTracerImpl(new AlwaysOffSampler());
     const span = tracer.startSpan('span1');
     assert.ok(!span.isRecording());
     span.end();
   });
 
   it('should respect RECORD_AND_SAMPLE sampling result', () => {
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      { sampler: new AlwaysOnSampler() },
-      tracerProvider['_resource'],
-      tracerProvider['_activeSpanProcessor']
-    );
+    const tracer = getTestTracerImpl(new AlwaysOnSampler());
     const span = tracer.startSpan('span2');
     assert.ok(span.isRecording());
     span.end();
   });
 
   it('should start a span with attributes in sampling result', () => {
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      { sampler: new TestSampler() },
-      tracerProvider['_resource'],
-      tracerProvider['_activeSpanProcessor']
-    );
+    const tracer = getTestTracerImpl(new TestSampler());
     const span = tracer.startSpan('span3');
     assert.strictEqual((span as Span).attributes.testAttribute, 'foobar');
     span.end();
@@ -153,23 +131,13 @@ describe('Tracer', () => {
 
   it('should start a span with traceState in sampling result', () => {
     const traceState = createTraceState();
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      { sampler: new TestSampler(traceState) },
-      tracerProvider['_resource'],
-      tracerProvider['_activeSpanProcessor']
-    );
+    const tracer = getTestTracerImpl(new TestSampler(traceState));
     const span = tracer.startSpan('stateSpan');
     assert.strictEqual(span.spanContext().traceState, traceState);
   });
 
   it('should have an instrumentationScope', () => {
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      {},
-      tracerProvider['_resource'],
-      tracerProvider['_activeSpanProcessor']
-    );
+    const tracer = getTestTracerImpl();
 
     const lib: InstrumentationScope = tracer.instrumentationScope;
 
@@ -181,12 +149,7 @@ describe('Tracer', () => {
     const context = suppressTracing(ROOT_CONTEXT);
 
     it('should return cached no-op span ', done => {
-      const tracer = new Tracer(
-        { name: 'default', version: '0.0.1' },
-        { sampler: new TestSampler() },
-        tracerProvider['_resource'],
-        tracerProvider['_activeSpanProcessor']
-      );
+      const tracer = getTestTracerImpl(new TestSampler());
 
       const span = tracer.startSpan('span3', undefined, context);
 
@@ -205,12 +168,7 @@ describe('Tracer', () => {
       traceFlags: TraceFlags.SAMPLED,
       traceState,
     };
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      {},
-      tracerProvider['_resource'],
-      tracerProvider['_activeSpanProcessor']
-    );
+    const tracer = getTestTracerImpl();
     const span = tracer.startSpan(
       'aSpan',
       undefined,
@@ -227,12 +185,7 @@ describe('Tracer', () => {
       spanId: '0011223344556677',
       traceFlags: TraceFlags.SAMPLED,
     };
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      {},
-      tracerProvider['_resource'],
-      tracerProvider['_activeSpanProcessor']
-    );
+    const tracer = getTestTracerImpl();
     const span = tracer.startSpan(
       'aSpan',
       undefined,
@@ -251,18 +204,9 @@ describe('Tracer', () => {
 
     const sp: SpanProcessor = new DummySpanProcessor();
     const onStartSpy = sinon.spy(sp, 'onStart');
-    const tp = new BasicTracerProvider({
-      spanProcessors: [sp],
-    });
-
     const sampler: Sampler = new AlwaysOnSampler();
     const shouldSampleSpy = sinon.spy(sampler, 'shouldSample');
-    const tracer = new Tracer(
-      { name: 'default' },
-      { sampler },
-      tp['_resource'],
-      tp['_activeSpanProcessor']
-    );
+    const tracer = getTestTracerImpl(sampler, [sp]);
     const span = tracer.startSpan('a', {}, context) as Span;
     assert.strictEqual(span.parentSpanContext?.spanId, parent.spanId);
     sinon.assert.calledOnceWithExactly(
@@ -287,18 +231,9 @@ describe('Tracer', () => {
 
     const sp: SpanProcessor = new DummySpanProcessor();
     const onStartSpy = sinon.spy(sp, 'onStart');
-    const tp = new BasicTracerProvider({
-      spanProcessors: [sp],
-    });
-
     const sampler: Sampler = new AlwaysOnSampler();
     const shouldSampleSpy = sinon.spy(sampler, 'shouldSample');
-    const tracer = new Tracer(
-      { name: 'default' },
-      { sampler },
-      tp['_resource'],
-      tp['_activeSpanProcessor']
-    );
+    const tracer = getTestTracerImpl(sampler,  [sp]);
     const span = tracer.startSpan('a', { root: true }, context) as Span;
     assert.strictEqual(span.parentSpanContext?.spanId, undefined);
     sinon.assert.calledOnce(shouldSampleSpy);
@@ -310,13 +245,7 @@ describe('Tracer', () => {
   });
 
   it('should start an active span with name and function args', () => {
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      { sampler: new TestSampler() },
-      tracerProvider['_resource'],
-      tracerProvider['_activeSpanProcessor']
-    );
-
+    const tracer = getTestTracerImpl(new TestSampler());
     const spy = sinon.spy(tracer, 'startSpan');
 
     assert.strictEqual(
@@ -334,12 +263,7 @@ describe('Tracer', () => {
   });
 
   it('should start an active span with name, options and function args', () => {
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      { sampler: new TestSampler() },
-      tracerProvider['_resource'],
-      tracerProvider['_activeSpanProcessor']
-    );
+    const tracer = getTestTracerImpl(new TestSampler());
 
     const spy = sinon.spy(tracer, 'startSpan');
 
@@ -364,12 +288,7 @@ describe('Tracer', () => {
   });
 
   it('should start an active span with name, options, context and function args', () => {
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      { sampler: new TestSampler() },
-      tracerProvider['_resource'],
-      tracerProvider['_activeSpanProcessor']
-    );
+    const tracer = getTestTracerImpl(new TestSampler());
 
     const ctxKey = createContextKey('foo');
 
@@ -400,12 +319,7 @@ describe('Tracer', () => {
   });
 
   it('should sample with valid attributes', () => {
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      { sampler: new TestSampler() },
-      tracerProvider['_resource'],
-      tracerProvider['_activeSpanProcessor']
-    );
+    const tracer = getTestTracerImpl(new TestSampler());
 
     const attributes = {
       ...validAttributes,

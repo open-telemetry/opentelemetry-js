@@ -7,8 +7,8 @@ import * as assert from 'assert';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-  BasicTracerProvider,
-} from '../../../src';
+} from '@opentelemetry/sdk-trace';
+import { BasicTracerProvider } from '../../../src/BasicTracerProvider-shim';
 import { context, trace } from '@opentelemetry/api';
 import type { ExportResult } from '@opentelemetry/core';
 import { ExportResultCode } from '@opentelemetry/core';

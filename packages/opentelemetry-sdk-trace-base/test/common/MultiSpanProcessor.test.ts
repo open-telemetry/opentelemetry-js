@@ -5,17 +5,17 @@
 
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
-import type { Span, SpanProcessor } from '../../src';
+import type { Span, SpanProcessor } from '@opentelemetry/sdk-trace';
 import {
-  BasicTracerProvider,
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '../../src';
+  TracerProvider
+} from '@opentelemetry/sdk-trace';
 import {
   setGlobalErrorHandler,
   loggingErrorHandler,
 } from '@opentelemetry/core';
-import { MultiSpanProcessor } from '../../src/MultiSpanProcessor';
+import { MultiSpanProcessor } from '@opentelemetry/sdk-trace/src/MultiSpanProcessor';
 
 class TestProcessor implements SpanProcessor {
   static events: string[] = [];
@@ -62,7 +62,7 @@ describe('MultiSpanProcessor', () => {
 
   it('should handle one span processor', () => {
     const processor1 = new TestProcessor('sp1');
-    const tracerProvider = new BasicTracerProvider({
+    const tracerProvider = new TracerProvider({
       spanProcessors: [processor1],
     });
     const tracer = tracerProvider.getTracer('default');
@@ -70,13 +70,13 @@ describe('MultiSpanProcessor', () => {
     assert.deepStrictEqual(TestProcessor.events, ['sp1:start']);
     span.end();
     assert.deepStrictEqual(TestProcessor.events, ['sp1:start', 'sp1:end']);
-    tracerProvider['_activeSpanProcessor'].shutdown();
+    tracerProvider.shutdown();
   });
 
   it('should handle one span processor with on ending', () => {
     TestProcessor.events = [];
     const processor1 = new ExtendedTestProcessor('sp1');
-    const tracerProvider = new BasicTracerProvider({
+    const tracerProvider = new TracerProvider({
       spanProcessors: [processor1],
     });
     const tracer = tracerProvider.getTracer('default');
@@ -88,14 +88,14 @@ describe('MultiSpanProcessor', () => {
       'sp1:ending',
       'sp1:end',
     ]);
-    tracerProvider['_activeSpanProcessor'].shutdown();
+    tracerProvider.shutdown();
   });
 
   it('should handle two span processor', async () => {
     TestProcessor.events = [];
     const processor1 = new TestProcessor('p1');
     const processor2 = new ExtendedTestProcessor('p2');
-    const tracerProvider = new BasicTracerProvider({
+    const tracerProvider = new TracerProvider({
       spanProcessors: [processor1, processor2],
     });
     const tracer = tracerProvider.getTracer('default');
@@ -126,7 +126,7 @@ describe('MultiSpanProcessor', () => {
     TestProcessor.events = [];
     const processor1 = new TestProcessor('p1');
     const processor2 = new ExtendedTestProcessor('p2');
-    const tracerProvider = new BasicTracerProvider({
+    const tracerProvider = new TracerProvider({
       spanProcessors: [processor1, processor2],
     });
     const tracer = tracerProvider.getTracer('default');

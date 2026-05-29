@@ -4,15 +4,10 @@
  */
 
 import * as assert from 'assert';
-import type { BufferConfig } from '../../../src';
-import { InMemorySpanExporter } from '../../../src';
-import { BatchSpanProcessorBase } from '../../../src/export/BatchSpanProcessorBase';
+import { InMemorySpanExporter } from '@opentelemetry/sdk-trace';
+import { BatchSpanProcessor } from '../../../src/BatchSpanProcessor-shim';
 
-class BatchSpanProcessor extends BatchSpanProcessorBase<BufferConfig> {
-  onShutdown() {}
-}
-
-describe('BatchSpanProcessorBase', () => {
+describe('BatchSpanProcessor', () => {
   describe('constructor', () => {
     it('should read defaults from environment', () => {
       const bspConfig = {
