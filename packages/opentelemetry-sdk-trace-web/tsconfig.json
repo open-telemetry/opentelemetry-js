@@ -6,9 +6,14 @@
       "dom",
       "dom.iterable"
     ],
-    "types": ["node", "mocha", "webpack-env", "jquery"],
     "outDir": "build",
-    "rootDir": "."
+    "rootDir": ".",
+    "types": [
+      "node",
+      "mocha",
+      "webpack-env",
+      "jquery"
+    ]
   },
   "files": [],
   "include": [
