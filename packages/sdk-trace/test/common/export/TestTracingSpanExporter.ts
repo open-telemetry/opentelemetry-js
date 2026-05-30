@@ -4,12 +4,12 @@
  */
 
 import type { ExportResult } from '@opentelemetry/core';
-import type { ReadableSpan, SpanProcessor } from '@opentelemetry/sdk-trace';
+import type { ReadableSpan, SpanProcessor } from '../../../src';
 import {
   InMemorySpanExporter,
   AlwaysOnSampler,
-} from '@opentelemetry/sdk-trace';
-import { BasicTracerProvider } from '../../../src/index-shim';
+} from '../../../src';
+import { BasicTracerProvider } from '../../../src';
 
 /**
  * A test-only span exporter that naively simulates triggering instrumentation

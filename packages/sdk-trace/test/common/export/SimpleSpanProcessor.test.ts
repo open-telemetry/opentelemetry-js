@@ -20,8 +20,8 @@ import * as sinon from 'sinon';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace';
-import { BasicTracerProvider } from '../../../src/BasicTracerProvider-shim';
+} from '../../../src';
+import { BasicTracerProvider } from '../../../src';
 import { SpanImpl } from '@opentelemetry/sdk-trace/src/Span';
 import { TestStackContextManager } from './TestStackContextManager';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';

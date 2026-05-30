@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import * as assert from 'assert';
-import { RandomIdGenerator } from '@opentelemetry/sdk-trace';
+import { RandomIdGenerator } from '../../src';
 
 const idGenerator = new RandomIdGenerator();
 

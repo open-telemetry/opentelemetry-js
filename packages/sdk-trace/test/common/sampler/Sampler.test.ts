@@ -8,13 +8,13 @@ import type {
   Sampler,
   SamplingDecision,
   SamplingResult,
-} from '@opentelemetry/sdk-trace';
+} from '../../../src';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
   ParentBasedSampler,
   TraceIdRatioBasedSampler,
-} from '@opentelemetry/sdk-trace';
+} from '../../../src';
 import { assertAssignable } from '../util';
 
 describe('Sampler', () => {

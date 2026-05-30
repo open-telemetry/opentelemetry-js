@@ -5,12 +5,12 @@
 
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
-import type { Span, SpanProcessor } from '@opentelemetry/sdk-trace';
+import type { Span, SpanProcessor } from '../../src';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
   TracerProvider,
-} from '@opentelemetry/sdk-trace';
+} from '../../src';
 import {
   setGlobalErrorHandler,
   loggingErrorHandler,

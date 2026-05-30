@@ -6,8 +6,8 @@
 import { MetricReader } from '@opentelemetry/sdk-metrics';
 import type { Tracer as ApiTracer } from '@opentelemetry/api';
 import type { Resource } from '@opentelemetry/resources';
-import type { SpanLimits, SpanProcessor } from '@opentelemetry/sdk-trace';
-import type { BasicTracerProvider } from '../../src/BasicTracerProvider-shim';
+import type { SpanLimits, SpanProcessor } from '../../src';
+import type { BasicTracerProvider } from '../../src';
 
 export const validAttributes = {
   string: 'string',

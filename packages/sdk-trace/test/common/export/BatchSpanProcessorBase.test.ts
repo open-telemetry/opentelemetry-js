@@ -16,18 +16,18 @@ import type {
   ReadableSpan,
   Span,
   SpanExporter,
-} from '@opentelemetry/sdk-trace';
+} from '../../../src';
 import {
   AlwaysOnSampler,
   InMemorySpanExporter,
-} from '@opentelemetry/sdk-trace';
-import { BasicTracerProvider } from '../../../src/BasicTracerProvider-shim';
+  BatchSpanProcessor
+} from '../../../src';
+import { BasicTracerProvider } from '../../../src';
 import { context } from '@opentelemetry/api';
 import { TestRecordOnlySampler } from './TestRecordOnlySampler';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestStackContextManager } from './TestStackContextManager';
 import { resourceFromAttributes } from '@opentelemetry/resources';
-import { BatchSpanProcessor } from '../../../src/BatchSpanProcessor-shim';
 
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracerProvider({

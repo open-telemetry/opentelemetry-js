@@ -6,7 +6,7 @@
 import type { Attributes, SpanContext } from '@opentelemetry/api';
 import { TraceFlags } from '@opentelemetry/api';
 import * as Benchmark from 'benchmark';
-import { BasicTracerProvider } from '../../src/index-shim';
+import { BasicTracerProvider } from '../../src';
 
 const tracerProvider = new BasicTracerProvider();
 const tracer = tracerProvider.getTracer('test');

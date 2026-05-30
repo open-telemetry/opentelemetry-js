@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+// XXX HACK for quick testing
+export { TracerProvider as BasicTracerProvider } from './TracerProvider';
+
 export { TracerProvider } from './TracerProvider';
 export { BatchSpanProcessor, RandomIdGenerator } from './platform';
 export { ConsoleSpanExporter } from './export/ConsoleSpanExporter';

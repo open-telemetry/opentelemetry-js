@@ -12,8 +12,8 @@ import {
   AlwaysOnSampler,
   ConsoleSpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace';
-import { BasicTracerProvider } from '../../../src/BasicTracerProvider-shim';
+} from '../../../src';
+import { BasicTracerProvider } from '../../../src';
 
 /* eslint-disable no-console */
 describe('ConsoleSpanExporter', () => {

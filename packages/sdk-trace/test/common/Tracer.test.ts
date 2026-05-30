@@ -22,17 +22,17 @@ import {
 import type { InstrumentationScope } from '@opentelemetry/core';
 import { sanitizeAttributes, suppressTracing } from '@opentelemetry/core';
 import * as assert from 'assert';
-import type { Sampler, Span, SpanProcessor } from '@opentelemetry/sdk-trace';
+import type { Sampler, Span, SpanProcessor } from '../../src';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
   SamplingDecision,
-} from '@opentelemetry/sdk-trace';
-import { BasicTracerProvider } from '../../src/BasicTracerProvider-shim';
+} from '../../src';
+import { BasicTracerProvider } from '../../src';
 import { TestStackContextManager } from './export/TestStackContextManager';
 import * as sinon from 'sinon';
 import { invalidAttributes, validAttributes } from './util';
-import { Tracer } from '@opentelemetry/sdk-trace/build/src/Tracer';
+import { Tracer } from '../../src/Tracer';
 
 function getTestTracerImpl(
   sampler?: Sampler,
