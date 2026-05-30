@@ -28,6 +28,9 @@
     },
     {
       "path": "../sdk-metrics"
+    },
+    {
+      "path": "../sdk-trace"
     }
   ]
 }
